@@ -153,7 +153,7 @@ $writable_calendars = $current_view->get_writable_calendars($obm["uid"]);
 $default_writable_calendar = $current_view->get_default_writable_calendar($obm["uid"]);
 
 
-get_calendar_action($current_view);
+get_calendar_action();
 update_calendar_action($writable_calendars);
 $perm->check_permissions($module, $action);
 
@@ -1741,7 +1741,7 @@ function get_calendar_params() {
 ///////////////////////////////////////////////////////////////////////////////
 //  Calendar Action 
 ///////////////////////////////////////////////////////////////////////////////
-function get_calendar_action($current_view) {
+function get_calendar_action() {
   global $actions, $path, $params;
   global $l_header_consult, $l_header_update,$l_header_right,$l_header_meeting;
   global $l_header_planning, $l_header_list, $l_header_duplicate, $l_header_delete;
@@ -1754,8 +1754,6 @@ function get_calendar_action($current_view) {
   if (isset($params['date_edit_occurrence'])){
     $exception_date="&amp;date_edit_occurrence=".$params['date_edit_occurrence'];
   }
-
-  $organizer = $current_view->get_new_organizer_of_new_event();
 
   // Index
   $actions['calendar']['index'] = array (
@@ -1816,7 +1814,7 @@ function get_calendar_action($current_view) {
   // New   
   $actions['calendar']['new'] = array (
     'Name'     => $l_header_new_event,
-    'Url'      => "$path/calendar/calendar_index.php?action=new&new_user_id[]=$organizer&organizer=$organizer",
+    'Url'      => "$path/calendar/calendar_index.php?action=new",
     'Right'    => $cright_write,
     'Condition'=> array ('all'),
     'Id'       => "newEventCalendar"
