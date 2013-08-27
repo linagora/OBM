@@ -5010,7 +5010,7 @@ CREATE TABLE p_ugroup (
     group_archive smallint NOT NULL,
     group_privacy integer,
     group_local integer,
-    group_ext_id character varying(255),
+    group_ext_id character(36) NOT NULL,
     group_samba integer,
     group_gid integer,
     group_mailing integer,
@@ -6408,7 +6408,7 @@ CREATE TABLE ugroup (
     group_archive smallint DEFAULT 0 NOT NULL,
     group_privacy integer DEFAULT 0,
     group_local integer DEFAULT 1,
-    group_ext_id character varying(255),
+    group_ext_id character(36) NOT NULL,
     group_samba integer DEFAULT 0,
     group_gid integer,
     group_mailing integer DEFAULT 0,
@@ -8968,6 +8968,21 @@ ALTER TABLE ugroup
 
 ALTER TABLE ugroup
     ADD CONSTRAINT ugroup_pkey PRIMARY KEY (group_id);
+
+--
+-- Name: ugroup_ext_id_unique_idx; Type: CONSTRAINT; Schema: public; Owner: obm; Tablespace:
+--
+
+
+ALTER TABLE ugroup
+    ADD CONSTRAINT ugroup_ext_id_unique_idx UNIQUE (group_domain_id, group_ext_id);
+
+--
+-- Name: p_ugroup_ext_id_unique_idx; Type: CONSTRAINT; Schema: public; Owner: obm; Tablespace:
+--
+
+ALTER TABLE p_ugroup
+    ADD CONSTRAINT p_ugroup_ext_id_unique_idx UNIQUE (group_domain_id, group_ext_id);
 
 
 --
@@ -17104,13 +17119,13 @@ INSERT INTO ugroup (group_id, group_domain_id, group_ext_id, group_name, group_d
         (5, 1, 'existing-users-subgroups', 'existing-users-subgroups-name', 'existing-users-subgroups-description'),
         (6, 1, 'existing-users-subgroups-child1', 'existing-users-subgroups-child1-name', 'existing-users-subgroups-child1-description'),
         (7, 1, 'existing-users-subgroups-child2', 'existing-users-subgroups-child2-name', 'existing-users-subgroups-child2-description'),
-        (8, 1, 'recursive-direct-parent', 'recursive-direct-parent-name', 'recursive-direct-parent-description'),
-        (9, 1, 'recursive-direct-child1', 'recursive-direct-child1-name', 'recursive-direct-child1-description'),
-        (10, 1, 'recursive-multichild-parent', 'recursive-multichild-parent-name', 'recursive-multichild-parent-description'),
-        (11, 1, 'recursive-multichild-child1', 'recursive-multichild-child1-name', 'recursive-multichild-child1-description'),
-        (12, 1, 'recursive-multichild-child2', 'recursive-multichild-child2-name', 'recursive-multichild-child2-description'),
-        (13, 1, 'recursive-multichild-childcommon', 'recursive-multichild-childcommon-name', 'recursive-multichild-childcommon-description'),
-        (14, 1, 'recursive-multichild-childcommonexpand', 'recursive-multichild-childcommonexpand-name', 'recursive-multichild-childcommonexpand-description'),
+        (8, 1, 'r-direct-parent', 'r-direct-parent-name', 'r-direct-parent-description'),
+        (9, 1, 'r-direct-child1', 'r-direct-child1-name', 'r-direct-child1-description'),
+        (10, 1, 'r-multichild-parent', 'r-multichild-parent-name', 'r-multichild-parent-description'),
+        (11, 1, 'r-multichild-child1', 'r-multichild-child1-name', 'r-multichild-child1-description'),
+        (12, 1, 'r-multichild-child2', 'r-multichild-child2-name', 'r-multichild-child2-description'),
+        (13, 1, 'r-multichild-childcommon', 'r-multichild-childcommon-name', 'r-multichild-childcommon-description'),
+        (14, 1, 'r-multichild-childcommonexpand', 'r-multichild-childcommonexpand-name', 'r-multichild-childcommonexpand-description'),
         (15, 1, 'modified-group', 'modified-group-name', 'modified-group-description'),
         (16, 1, 'delete-group', 'delete-group-name', 'delete-group-description'),
         (17, 1, 'addusersubgroup-group-parent', 'addusersubgroup-group-parent-name', 'addusersubgroup-group-parent-description'),
@@ -17120,9 +17135,9 @@ INSERT INTO ugroup (group_id, group_domain_id, group_ext_id, group_name, group_d
 
 ALTER SEQUENCE ugroup_group_id_seq RESTART WITH 21;
 
-INSERT INTO ugroup (group_domain_id, group_gid, group_name)
+INSERT INTO ugroup (group_domain_id, group_gid, group_name, group_ext_id)
     VALUES
-        (1, 1000, 'Utilisateurs');
+        (1, 1000, 'Utilisateurs', 'users');
 
 INSERT INTO ugroup (group_domain_id, group_ext_id, group_name, group_desc)
     VALUES

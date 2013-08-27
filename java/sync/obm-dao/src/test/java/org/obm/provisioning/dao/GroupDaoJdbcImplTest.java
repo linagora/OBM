@@ -273,7 +273,7 @@ public class GroupDaoJdbcImplTest {
                   |-recursive-direct-child1
                      |-...
         */
-        String prefix = "recursive-direct-parent";
+        String prefix = "r-direct-parent";
         GroupExtId groupExtId = GroupExtId.valueOf(prefix);
 
         Group group = dao.getRecursive(domain1, groupExtId, false, -1);
@@ -294,7 +294,7 @@ public class GroupDaoJdbcImplTest {
                    |-recursive-multichild-childcommonexpand
 
          */
-        String prefix = "recursive-multichild-parent";
+        String prefix = "r-multichild-parent";
         GroupExtId groupExtId = GroupExtId.valueOf(prefix);
 
         Group group = dao.getRecursive(domain1, groupExtId, false, -1);
