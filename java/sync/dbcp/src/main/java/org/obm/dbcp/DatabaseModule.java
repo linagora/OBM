@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,37 +29,19 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.dbcp;
 
-import org.obm.domain.dao.AddressBookDao;
-import org.obm.domain.dao.AddressBookDaoJdbcImpl;
-import org.obm.domain.dao.ObmInfoDao;
-import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
-import org.obm.domain.dao.UserDao;
-import org.obm.domain.dao.UserDaoJdbcImpl;
-import org.obm.domain.dao.UserPatternDao;
-import org.obm.domain.dao.UserPatternDaoJdbcImpl;
-import org.obm.provisioning.dao.GroupDao;
-import org.obm.provisioning.dao.GroupDaoJdbcImpl;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
 
 import com.google.inject.AbstractModule;
-
-import fr.aliacom.obm.common.addition.CommitedOperationDao;
-import fr.aliacom.obm.common.addition.CommitedOperationDaoJdbcImpl;
-import fr.aliacom.obm.common.calendar.CalendarDao;
-import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
 
 public class DatabaseModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		install(new org.obm.dbcp.DatabaseModule());
-		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
-		bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
-		bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
-		bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
-		bind(UserDao.class).to(UserDaoJdbcImpl.class);
-		bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
+		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
 	}
+	
 }

@@ -31,10 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.jdbc;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
-import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
 import org.obm.push.store.CalendarDao;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
@@ -52,8 +48,8 @@ public class JdbcDaoModule extends AbstractModule{
 
 	@Override
 	protected void configure() {
-		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+		install(new org.obm.dbcp.DatabaseModule());
+
 		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
 		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
 		bind(HearbeatDao.class).to(HearbeatDaoJdbcDaoImpl.class);

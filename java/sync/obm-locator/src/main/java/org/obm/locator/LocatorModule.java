@@ -39,10 +39,7 @@ import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
-import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
+import org.obm.dbcp.DatabaseModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,9 +56,7 @@ public class LocatorModule extends AbstractModule {
 		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
 		
-		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-
+		install(new DatabaseModule());
 		install(new ConfigurationModule(buildConfiguration()));
 		install(new TransactionalModule());
 		install(new LocatorServletModule());

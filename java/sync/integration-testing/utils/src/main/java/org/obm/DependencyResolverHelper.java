@@ -832,6 +832,7 @@ public class DependencyResolverHelper {
 	
 	public static Class<?>[] projectDBCPClasses() {
 		return new Class<?>[] {
+				org.obm.dbcp.DatabaseModule.class,
 				DatabaseConnectionProviderImpl.class,
 				DatabaseConnectionProvider.class,
 				DatabaseDriverConfiguration.class,
