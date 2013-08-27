@@ -31,22 +31,46 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.dbcp;
 
+import static org.easymock.EasyMock.createControl;
+import static org.fest.assertions.api.Assertions.assertThat;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.easymock.IMocksControl;
+import org.junit.Before;
+import org.junit.Test;
+import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
-import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
+import org.slf4j.Logger;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+import com.google.common.collect.ImmutableSet;
 
-public class DatabaseModule extends AbstractModule {
+public class DatabaseConnectionProviderInitTest {
 
-	@Override
-	protected void configure() {
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
-		databaseDrivers.addBinding().to(MySQLDriverConfiguration.class);
-		databaseDrivers.addBinding().to(PostgresDriverConfiguration.class);
+	private IMocksControl control;
+	private DatabaseConnectionProviderImpl testee;
+	private H2DriverConfiguration h2Driver;
+	
+	@Before
+	public void setup() {
+		control = createControl();
+		ITransactionAttributeBinder transactionAttributeBinder = control.createMock(ITransactionAttributeBinder.class);
+		Logger logger = control.createMock(Logger.class);
+		h2Driver = new H2DriverConfiguration();
+		testee = new DatabaseConnectionProviderImpl(
+				ImmutableSet.<DatabaseDriverConfiguration>of(h2Driver), 
+				transactionAttributeBinder, new DatabaseConfigurationFixtureH2(), logger);
 	}
+
+	@Test
+	public void testGetConnection() throws SQLException {
+		Connection connection = testee.getConnection();
+		ResultSet result = connection.createStatement().executeQuery("SELECT 1");
+		assertThat(result.first()).isTrue();
+		assertThat(result.getInt(1)).isEqualTo(1);
+	}
+	
 	
 }

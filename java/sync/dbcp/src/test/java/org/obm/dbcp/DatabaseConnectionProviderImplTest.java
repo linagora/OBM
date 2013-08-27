@@ -44,7 +44,11 @@ import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
 import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableSet;
 
 
 public class DatabaseConnectionProviderImplTest {
@@ -58,7 +62,9 @@ public class DatabaseConnectionProviderImplTest {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		transactionAttributeBinder = EasyMock.createMock(ITransactionAttributeBinder.class);
 		databaseConfiguration = new DatabaseConfigurationFixturePostgreSQL();
-		dbConnProvider = new DatabaseConnectionProviderImpl(transactionAttributeBinder, databaseConfiguration, logger);
+		dbConnProvider = new DatabaseConnectionProviderImpl(
+				ImmutableSet.<DatabaseDriverConfiguration>of(new PostgresDriverConfiguration()),
+				transactionAttributeBinder, databaseConfiguration, logger);
 	}
 
 	@Test(expected=SQLException.class)

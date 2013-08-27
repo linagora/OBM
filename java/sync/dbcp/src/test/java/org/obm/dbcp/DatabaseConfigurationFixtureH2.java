@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013 Linagora
+ * Copyright (C) 2011-2012  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,24 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+
 package org.obm.dbcp;
 
-import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
-import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseFlavour;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
-
-public class DatabaseModule extends AbstractModule {
+public class DatabaseConfigurationFixtureH2 implements DatabaseConfiguration {
 
 	@Override
-	protected void configure() {
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
-		databaseDrivers.addBinding().to(MySQLDriverConfiguration.class);
-		databaseDrivers.addBinding().to(PostgresDriverConfiguration.class);
+	public Integer getDatabaseMaxConnectionPoolSize() {
+		return 10;
 	}
-	
+
+	@Override
+	public DatabaseFlavour getDatabaseSystem() {
+		return DatabaseFlavour.H2;
+	}
+
+	@Override
+	public String getDatabaseName() {
+		return "obm";
+	}
+
+	@Override
+	public String getDatabaseHost() {
+		return "localhost";
+	}
+
+	@Override
+	public String getDatabaseLogin() {
+		return "sa";
+	}
+
+	@Override
+	public String getDatabasePassword() {
+		return "sa";
+	}
+
+    @Override
+    public boolean isPostgresSSLEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isPostgresSSLNonValidating() {
+        return false;
+    }
 }

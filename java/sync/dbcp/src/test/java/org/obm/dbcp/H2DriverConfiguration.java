@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013 Linagora
+ * Copyright (C) 2011-2012  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,24 +29,55 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+
 package org.obm.dbcp;
 
+import java.util.Map;
+
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseFlavour;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
-import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+import com.google.common.collect.ImmutableMap;
 
-public class DatabaseModule extends AbstractModule {
+public class H2DriverConfiguration implements DatabaseDriverConfiguration {
 
 	@Override
-	protected void configure() {
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
-		databaseDrivers.addBinding().to(MySQLDriverConfiguration.class);
-		databaseDrivers.addBinding().to(PostgresDriverConfiguration.class);
+	public String getLastInsertIdQuery() {
+		return "SELECT lastval()";
+	}
+
+	@Override
+	public String getDataSourceClassName() {
+		return "org.h2.jdbcx.JdbcDataSource";
+	}
+
+	@Override
+	public DatabaseFlavour getFlavour() {
+		return DatabaseFlavour.H2;
+	}
+
+	@Override
+	public Map<String, String> getDriverProperties(DatabaseConfiguration conf) {
+		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+		builder.put("user", conf.getDatabaseLogin());
+		builder.put("password", conf.getDatabasePassword());
+		builder.put("URL", getJDBCUrl(conf.getDatabaseName()));
+		return builder.build();
+	}
+
+	private String getJDBCUrl(String dbName) {
+		return "jdbc:h2:mem:" + dbName + ";TRACE_LEVEL_SYSTEM_OUT=2";
 	}
 	
+	@Override
+	public boolean readOnlySupported() {
+		return false;
+	}
+
+	@Override
+	public String getGMTTimezoneQuery() {
+		return null;
+	}
+
 }

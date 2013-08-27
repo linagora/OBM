@@ -37,6 +37,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Set;
 
 import org.obm.annotations.technicallogging.KindToBeLogged;
 import org.obm.annotations.technicallogging.ResourceType;
@@ -48,8 +49,6 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
-import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
 import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,11 +75,15 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 
 	private static final String VALIDATION_QUERY = "SELECT 666";
 
+	private final Set<DatabaseDriverConfiguration> drivers;
+
 	@Inject
 	public DatabaseConnectionProviderImpl(
+			Set<DatabaseDriverConfiguration> drivers,
 			ITransactionAttributeBinder transactionAttributeBinder,
 			DatabaseConfiguration databaseConfiguration,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
+		this.drivers = drivers;
 		this.transactionAttributeBinder = transactionAttributeBinder;
 		this.databaseConfiguration = databaseConfiguration;
 
@@ -107,16 +110,13 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	}
 
 	private DatabaseDriverConfiguration buildDriverConfigurationForDatabaseFlavour(DatabaseFlavour databaseFlavour) {
-		DatabaseDriverConfiguration driverConfiguration = null;
-		if (databaseFlavour.equals(DatabaseFlavour.PGSQL)) {
-			driverConfiguration = new PostgresDriverConfiguration();
-		} else if (databaseFlavour.equals(DatabaseFlavour.MYSQL)) {
-			driverConfiguration = new MySQLDriverConfiguration();
-		} else {
-			throw new IllegalArgumentException(
-					"No connection factory found for database flavour: [" + databaseFlavour + "]");
+		for (DatabaseDriverConfiguration driver: drivers) {
+			if (driver.getFlavour().equals(databaseFlavour)) {
+				return driver;
+			}
 		}
-		return driverConfiguration;
+		throw new IllegalArgumentException(
+				"No connection factory found for database flavour: [" + databaseFlavour + "]");
 	}
 
 	public int lastInsertId(Connection con) throws SQLException {
@@ -145,8 +145,11 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	}
 
 	private void setTimeZoneToUTC(Connection connection) throws SQLException {
-		PreparedStatement ps = connection.prepareStatement(driverConfiguration.getGMTTimezoneQuery());
-		ps.executeUpdate();
+		String gmtTimezoneQuery = driverConfiguration.getGMTTimezoneQuery();
+		if (gmtTimezoneQuery != null) {
+			PreparedStatement ps = connection.prepareStatement(gmtTimezoneQuery);
+			ps.executeUpdate();
+		}
 	}
 
 	@VisibleForTesting void setConnectionReadOnlyIfNecessary(Connection connection) throws SQLException {
