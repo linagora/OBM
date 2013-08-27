@@ -412,13 +412,15 @@ function run_query_domain_init_groups($domain_id, $windows=false) {
     $gname = $group_infos[0];
     $samba = $group_infos[1];
     if (! check_domain_group_exists($gid, $domain_id)) { 
-      $query = "INSERT INTO UGroup (group_domain_id,
+      $query = "INSERT INTO UGroup (group_ext_id,
+        group_domain_id,
         group_usercreate,
         group_timecreate,
         group_samba,
         group_gid,
         group_name)
       VALUES (
+        UUID(),
         $domain_id,
         $uid,
         NOW(),

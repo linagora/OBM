@@ -334,6 +334,7 @@ function run_query_group_insert($group) {
   $q_delegation = of_delegation_query_insert_clauses('group_delegation', stripslashes($group['delegation']));
 
   $query = "INSERT INTO UGroup (
+  group_ext_id,
   group_timeupdate,
   group_timecreate,
   group_userupdate,
@@ -348,6 +349,7 @@ function run_query_group_insert($group) {
   group_desc,
   group_email
   ) VALUES (
+  UUID(),
   null,
   NOW(),
   null,
