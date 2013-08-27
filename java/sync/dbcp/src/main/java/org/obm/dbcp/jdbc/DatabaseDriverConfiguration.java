@@ -34,6 +34,7 @@ package org.obm.dbcp.jdbc;
 import java.util.Map;
 
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseFlavour;
 
 public interface DatabaseDriverConfiguration {
 
@@ -41,7 +42,7 @@ public interface DatabaseDriverConfiguration {
 
 	String getDataSourceClassName();
 
-	String getUniqueName();
+	DatabaseFlavour getFlavour();
 
 	Map<String, String> getDriverProperties(DatabaseConfiguration configuration);
 

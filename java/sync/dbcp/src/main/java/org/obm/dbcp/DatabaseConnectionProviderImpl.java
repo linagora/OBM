@@ -95,9 +95,8 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 
 		poolingDataSource = new PoolingDataSource();
 		poolingDataSource.setClassName(driverConfiguration.getDataSourceClassName());
-		poolingDataSource.setUniqueName(driverConfiguration.getUniqueName());
-		poolingDataSource.setMaxPoolSize(databaseConfiguration
-				.getDatabaseMaxConnectionPoolSize());
+		poolingDataSource.setUniqueName(driverConfiguration.getFlavour().name());
+		poolingDataSource.setMaxPoolSize(databaseConfiguration.getDatabaseMaxConnectionPoolSize());
 		poolingDataSource.setAllowLocalTransactions(true);
 		poolingDataSource.getDriverProperties().putAll(
 				driverConfiguration.getDriverProperties(databaseConfiguration));
