@@ -35,6 +35,7 @@ package org.obm.dbcp.jdbc;
 import java.util.Map;
 
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseFlavour;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -51,10 +52,10 @@ public class H2DriverConfiguration implements DatabaseDriverConfiguration {
 	}
 
 	@Override
-	public String getUniqueName() {
-		return "h2db";
+	public DatabaseFlavour getFlavour() {
+		return DatabaseFlavour.H2;
 	}
-
+	
 	@Override
 	public Map<String, String> getDriverProperties(DatabaseConfiguration conf) {
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();

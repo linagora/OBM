@@ -35,6 +35,7 @@ package org.obm.dbcp.jdbc;
 import java.util.Map;
 
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseFlavour;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -51,8 +52,8 @@ public class PostgresDriverConfiguration implements DatabaseDriverConfiguration 
 	}
 
 	@Override
-	public String getUniqueName() {
-		return "pgsql";
+	public DatabaseFlavour getFlavour() {
+		return DatabaseFlavour.PGSQL;
 	}
 
 	@Override

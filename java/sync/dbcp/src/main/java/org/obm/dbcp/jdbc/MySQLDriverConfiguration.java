@@ -35,6 +35,7 @@ package org.obm.dbcp.jdbc;
 import java.util.Map;
 
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseFlavour;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -70,8 +71,8 @@ public class MySQLDriverConfiguration implements DatabaseDriverConfiguration {
 	}
 
 	@Override
-	public String getUniqueName() {
-		return "mysql";
+	public DatabaseFlavour getFlavour() {
+		return DatabaseFlavour.MYSQL;
 	}
 
 	@Override
