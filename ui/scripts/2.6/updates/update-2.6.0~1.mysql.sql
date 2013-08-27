@@ -58,4 +58,19 @@ SET pu.userobm_ext_id = u.userobm_ext_id;
 ALTER TABLE P_UserObm MODIFY userobm_ext_id CHARACTER(36) NOT NULL;
 ALTER TABLE P_UserObm ADD UNIQUE (userobm_domain_id, userobm_ext_id);
 
+UPDATE UGroup
+SET group_ext_id = UUID()
+WHERE group_ext_id IS NULL;
+
+ALTER TABLE UGroup MODIFY group_ext_id CHARACTER(36) NOT NULL;
+ALTER TABLE UGroup ADD UNIQUE (group_domain_id, group_ext_id);
+
+UPDATE P_UGroup pug
+INNER JOIN UGroup ug
+ON ug.group_id = pug.group_id
+SET pug.group_ext_id = ug.group_ext_id;
+
+ALTER TABLE P_UGroup MODIFY group_ext_id CHARACTER(36) NOT NULL;
+ALTER TABLE P_UGroup ADD UNIQUE (group_domain_id, group_ext_id);
+
 COMMIT;

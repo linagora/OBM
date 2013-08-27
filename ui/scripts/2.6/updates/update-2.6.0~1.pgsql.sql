@@ -66,4 +66,23 @@ WHERE pu.userobm_id = u.userobm_id;
 ALTER TABLE ONLY p_userobm ALTER userobm_ext_id SET NOT NULL;
 CREATE UNIQUE INDEX p_userobm_ext_id_unique_idx ON p_userobm (userobm_domain_id, userobm_ext_id);
 
+ALTER TABLE ONLY ugroup ALTER group_ext_id TYPE CHARACTER(36);
+
+UPDATE ONLY ugroup
+SET group_ext_id = UUID()
+WHERE group_ext_id IS NULL;
+
+ALTER TABLE ONLY ugroup ALTER group_ext_id SET NOT NULL;
+CREATE UNIQUE INDEX group_ext_id_unique_idx ON ugroup (group_domain_id, group_ext_id);
+
+ALTER TABLE ONLY p_ugroup ALTER group_ext_id TYPE CHARACTER(36);
+
+UPDATE ONLY p_ugroup pug
+SET group_ext_id = ug.group_ext_id
+FROM ugroup ug
+WHERE pug.group_id = ug.group_id;
+
+ALTER TABLE ONLY p_ugroup ALTER group_ext_id SET NOT NULL;
+CREATE UNIQUE INDEX p_ugroup_ext_id_unique_idx ON p_ugroup (group_domain_id, group_ext_id);
+
 COMMIT;
