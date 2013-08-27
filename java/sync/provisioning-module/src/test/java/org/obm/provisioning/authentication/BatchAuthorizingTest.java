@@ -32,6 +32,7 @@
 package org.obm.provisioning.authentication;
 
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.RestAssured.expect;
 import static org.easymock.EasyMock.expect;
 
 import javax.ws.rs.core.Response.Status;
@@ -151,6 +152,18 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
+	public void testSubjectCannotPostWithoutAuthentication() throws Exception {
+		mocksControl.replay();
+		
+		expect()
+			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
+		when()
+			.post("/batches");
+		
+		mocksControl.verify();
+	}
+	
+	@Test
 	public void testSubjectCannotDeleteWithWrongPermissions() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthentication("username", "password");
@@ -182,6 +195,25 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/batches/1");
+		
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testSubjectCanGetBatchWithUrlWithLastSlash() throws Exception {
+		expectDomain();
+		expectBatch();
+		expect(batchTracker.getTrackedBatch(batchId(1))).andReturn(null);
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("batches:read")));
+		mocksControl.replay();
+		
+		given()
+			.auth().basic("username@domain", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/batches/1/");
 		
 		mocksControl.verify();
 	}

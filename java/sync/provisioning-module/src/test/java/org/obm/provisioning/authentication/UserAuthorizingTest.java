@@ -210,6 +210,25 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
+	public void testSubjectCanGetUserWithUrlWithLastSlash() throws Exception {
+		expectDomain();
+		expectSuccessfulAuthentication("username", "password");
+		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read")));
+		expect(userDao.getByExtIdWithGroups(userExtId("1"), domain)).andReturn(fakeUser());
+		
+		mocksControl.replay();
+		
+		given()
+			.auth().basic("username@domain", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/users/1/");
+		
+		mocksControl.verify();
+	}
+	
+	@Test
 	public void testSubjectCanGetListOfUserWithReadPermission() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthentication("username", "password");
