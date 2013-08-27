@@ -77,6 +77,8 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
+import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
+import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
 import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.AddressBookDaoJdbcImpl;
 import org.obm.domain.dao.DomainDao;
@@ -837,6 +839,8 @@ public class DependencyResolverHelper {
 				DatabaseConnectionProvider.class,
 				DatabaseDriverConfiguration.class,
 				DatabaseDriverConfigurationProvider.class,
+				MySQLDriverConfiguration.class,
+				PostgresDriverConfiguration.class
 		};
 	}
 	

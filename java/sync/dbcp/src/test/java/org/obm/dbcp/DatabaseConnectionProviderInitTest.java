@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,51 +29,45 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.obm.dbcp;
 
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.DatabaseFlavour;
+import static org.easymock.EasyMock.createControl;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-public class DatabaseConfigurationFixtureH2 implements DatabaseConfiguration {
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-	@Override
-	public Integer getDatabaseMaxConnectionPoolSize() {
-		return 10;
+import org.easymock.IMocksControl;
+import org.junit.Before;
+import org.junit.Test;
+import org.obm.annotations.transactional.ITransactionAttributeBinder;
+import org.obm.dbcp.jdbc.H2DriverConfiguration;
+import org.slf4j.Logger;
+
+public class DatabaseConnectionProviderInitTest {
+
+	private IMocksControl control;
+	private DatabaseConnectionProviderImpl testee;
+	private H2DriverConfiguration h2Driver;
+	
+	@Before
+	public void setup() {
+		control = createControl();
+		ITransactionAttributeBinder transactionAttributeBinder = control.createMock(ITransactionAttributeBinder.class);
+		Logger logger = control.createMock(Logger.class);
+		h2Driver = new H2DriverConfiguration();
+		testee = new DatabaseConnectionProviderImpl(
+				transactionAttributeBinder, new DatabaseConfigurationFixtureH2(), h2Driver, logger);
 	}
 
-	@Override
-	public DatabaseFlavour getDatabaseSystem() {
-		return DatabaseFlavour.H2;
+	@Test
+	public void testGetConnection() throws SQLException {
+		Connection connection = testee.getConnection();
+		ResultSet result = connection.createStatement().executeQuery("SELECT 1");
+		assertThat(result.first()).isTrue();
+		assertThat(result.getInt(1)).isEqualTo(1);
 	}
-
-	@Override
-	public String getDatabaseName() {
-		return "obm";
-	}
-
-	@Override
-	public String getDatabaseHost() {
-		return "localhost";
-	}
-
-	@Override
-	public String getDatabaseLogin() {
-		return "sa";
-	}
-
-	@Override
-	public String getDatabasePassword() {
-		return "sa";
-	}
-
-    @Override
-    public boolean isPostgresSSLEnabled() {
-        return false;
-    }
-
-    @Override
-    public boolean isPostgresSSLNonValidating() {
-        return false;
-    }
+	
+	
 }

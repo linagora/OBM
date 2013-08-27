@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.dbcp.jdbc;
 
+import java.util.Set;
+
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
 
@@ -46,20 +48,18 @@ public class DatabaseDriverConfigurationProvider implements Provider<DatabaseDri
 	private final Supplier<DatabaseDriverConfiguration> databaseDriverMemoize;
 
 	@Inject
-	private DatabaseDriverConfigurationProvider(final DatabaseConfiguration databaseConfiguration) {
+	private DatabaseDriverConfigurationProvider(final Set<DatabaseDriverConfiguration> drivers, final DatabaseConfiguration databaseConfiguration) {
 		databaseDriverMemoize = Suppliers.memoize(new Supplier<DatabaseDriverConfiguration>() {
 			@Override
 			public DatabaseDriverConfiguration get() {
-				DatabaseDriverConfiguration driverConfiguration = null;
-				if (databaseConfiguration.getDatabaseSystem().equals(DatabaseFlavour.PGSQL)) {
-					driverConfiguration = new PostgresDriverConfiguration();
-				} else if (databaseConfiguration.getDatabaseSystem().equals(DatabaseFlavour.MYSQL)) {
-					driverConfiguration = new MySQLDriverConfiguration();
-				} else {
-					throw new IllegalArgumentException(
-							"No connection factory found for database flavour: [" + databaseConfiguration.getDatabaseSystem() + "]");
+				DatabaseFlavour flavour = databaseConfiguration.getDatabaseSystem();
+				for (DatabaseDriverConfiguration driver: drivers) {
+					if (driver.getFlavour().equals(flavour)) {
+						return driver;
+					}
 				}
-				return driverConfiguration;
+				throw new IllegalArgumentException(
+						"No connection factory found for database flavour: [" + flavour + "]");
 			}
 		});
 	}
