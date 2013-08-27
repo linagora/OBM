@@ -50,8 +50,7 @@ import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.DatabaseModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
 import org.obm.locator.store.LocatorCache;
@@ -128,6 +127,7 @@ public class GuiceServletContextListener implements ServletContextListener {
             @Override
             protected void configure() {
             	install(new ConfigurationModule());
+            	install(new DatabaseModule());
             	bind(DomainService.class).to(DomainCache.class);
             	bind(UserService.class).to(UserServiceImpl.class);
             	bind(SettingsService.class).to(SettingsServiceImpl.class);
@@ -136,7 +136,6 @@ public class GuiceServletContextListener implements ServletContextListener {
             	bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
             	bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
             	bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
-            	bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
             	bind(LocatorService.class).to(LocatorCache.class);
             	bind(HelperService.class).to(HelperServiceImpl.class);
             	bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);

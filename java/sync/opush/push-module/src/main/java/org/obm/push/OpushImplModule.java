@@ -33,6 +33,7 @@ package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
+import org.obm.dbcp.DatabaseModule;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.auth.AuthenticationServiceImpl;
@@ -125,6 +126,7 @@ public class OpushImplModule extends AbstractModule {
 		install(new TransactionalModule());
 		install(new TechnicalLoggingModule());
 		install(new DaoModule());
+		install(new DatabaseModule());
 		install(qosModule());
 		install(new OpushServletModule());
 		install(new TechnicalLogServletModule());

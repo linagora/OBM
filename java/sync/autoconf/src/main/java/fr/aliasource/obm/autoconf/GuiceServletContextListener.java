@@ -46,8 +46,7 @@ import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.DatabaseModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,8 +81,8 @@ public class GuiceServletContextListener implements ServletContextListener{
             @Override
             protected void configure() {
             	install(new ConfigurationModule());
+            	install(new DatabaseModule());
             	bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
-            	bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
             	bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
             	bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
             	bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
