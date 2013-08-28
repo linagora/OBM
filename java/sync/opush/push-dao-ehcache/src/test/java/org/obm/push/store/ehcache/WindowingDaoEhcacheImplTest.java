@@ -31,79 +31,52 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import java.io.IOException;
 
-import org.junit.Test;
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+
+import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+import org.obm.annotations.transactional.TransactionProvider;
+import org.obm.configuration.ConfigurationService;
+import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.bean.SyncKey;
-import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl.WindowingIndex;
+import org.obm.push.dao.testsuite.WindowingDaoTest;
+import org.slf4j.Logger;
 
-@RunWith(SlowFilterRunner.class)
-public class WindowingDaoEhcacheImplTest {
+import bitronix.tm.BitronixTransactionManager;
+import bitronix.tm.TransactionManagerServices;
 
-	@SuppressWarnings("unused")
-	@Test(expected=IllegalArgumentException.class)
-	public void testPreconditionIndexNegative() {
-		new WindowingIndex(-1, new SyncKey("123"));
+@RunWith(SlowFilterRunner.class) @Slow
+public class WindowingDaoEhcacheImplTest extends WindowingDaoTest {
+
+	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
+
+	private ObjectStoreManager objectStoreManager;
+	private BitronixTransactionManager transactionManager;
+
+	@Before
+	public void init() throws NotSupportedException, SystemException, IOException {
+		Logger logger = EasyMock.createNiceMock(Logger.class);
+		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
+		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
+
+		objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
+		windowingDao = new WindowingDaoEhcacheImpl(objectStoreManager);
+		
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 	}
 	
-	@Test
-	public void testPreconditionIndexZero() {
-		assertThat(new WindowingIndex(0, new SyncKey("123")).getIndex()).isEqualTo(0);
+	@After
+	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
+		transactionManager.rollback();
+		objectStoreManager.shutdown();
+		transactionManager.shutdown();
 	}
-
-
-	@SuppressWarnings("unused")
-	@Test(expected=IllegalArgumentException.class)
-	public void testPreconditionSyncKeyNull() {
-		new WindowingIndex(-1, null);
-	}
-
-	@SuppressWarnings("unused")
-	@Test(expected=IllegalArgumentException.class)
-	public void testPreconditionSyncKeyInitial() {
-		new WindowingIndex(-1, SyncKey.INITIAL_FOLDER_SYNC_KEY);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testNextToBeStoredWhenSyncKeyIsNull() {
-		new WindowingIndex(0, new SyncKey("123")).nextToBeStored(null);
-	}
-	
-	@Test
-	public void testNextToBeStoredWhenIndexIsZero() {
-		assertThat(new WindowingIndex(0, new SyncKey("123")).nextToBeStored(new SyncKey("456")))
-			.isEqualTo(new WindowingIndex(1, new SyncKey("456")));
-	}
-	
-	@Test
-	public void testNextToBeStoredWhenIndexIsOne() {
-		assertThat(new WindowingIndex(1, new SyncKey("123")).nextToBeStored(new SyncKey("456")))
-			.isEqualTo(new WindowingIndex(2, new SyncKey("456")));
-	}
-
-	@Test
-	public void testNextToBeStoredWhenIndexIsTenThousand() {
-		assertThat(new WindowingIndex(10000, new SyncKey("123")).nextToBeStored(new SyncKey("456")))
-			.isEqualTo(new WindowingIndex(10001, new SyncKey("456")));
-	}
-
-	@Test
-	public void testNextToBeRetrievedWhenIndexIsZeroThousand() {
-		assertThat(new WindowingIndex(0, new SyncKey("123")).nextToBeRetrieved()).isNull();
-	}
-	
-	@Test
-	public void testNextToBeRetrievedWhenIndexIsOneThousand() {
-		assertThat(new WindowingIndex(1, new SyncKey("123")).nextToBeRetrieved())
-			.isEqualTo(new WindowingIndex(0, new SyncKey("123")));
-	}
-	
-	@Test
-	public void testNextToBeRetrievedWhenIndexIsTenThousand() {
-		assertThat(new WindowingIndex(10000, new SyncKey("123")).nextToBeRetrieved())
-			.isEqualTo(new WindowingIndex(9999, new SyncKey("123")));
-	}
-	
 }
