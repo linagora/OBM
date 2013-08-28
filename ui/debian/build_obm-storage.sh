@@ -14,13 +14,10 @@ UPGRADE_SQL_DIR_PGSQL="${BUILD_DEB_DIR_STORAGE}/usr/share/dbconfig-common/data/o
 
 OBM_UPDATE_SCRIPTS_24=${CURDIR}/scripts/2.4/updates
 OBM_UPDATE_SCRIPTS_25=${CURDIR}/scripts/2.5/updates
-<<<<<<< HEAD
 OBM_UPDATE_SCRIPTS_26=${CURDIR}/scripts/2.6/updates
-=======
 OBM_UPDATE_SCRIPTS_30=${CURDIR}/scripts/3.0/updates
->>>>>>> OBMFULL-5151 New Top Bar for New User by default, add configuration in My Settings menu
 
-OBM_ROUNDCUBE_SCRIPTS=${CURDIR}/php/webmail/SQL
+
 
 ##Mysql OBM Installation
 cp ${CURDIR}/debian/misc/db/mysql/mysql.sh ${INSTALL_DIR_SCRIPT}/mysql
@@ -109,12 +106,10 @@ cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.beta3.mysql.sql ${UPGRADE_SQL_DIR_M
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.0~0.beta4.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.0~0.beta4
 cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.2~0.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.2~0
 
-#Upgrade My OBM 2.5.0
+# Upgrade My OBM 2.5.0
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.0~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.5.0~1
-cp ${OBM_UPDATE_SCRIPTS_25}/update-2.4.2.9~0.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.4.2.9~0
 
-<<<<<<< HEAD
-#Upgrade My OBM 2.5.1
+# Upgrade My OBM 2.5.1
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.1~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.5.1~1
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.7~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.5.7~1
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.7~2.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.5.7~2
@@ -122,10 +117,9 @@ cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.8~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.
 
 # Upgrade My OBM 2.5.6
 cp ${OBM_UPDATE_SCRIPTS_26}/update-2.6.0~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.6.0~1
-=======
-#Upgrade My OBM 3.0.0
-cp ${OBM_UPDATE_SCRIPTS_30}/update-3.0.0~0.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/3.0.0~0
->>>>>>> OBMFULL-5151 New Top Bar for New User by default, add configuration in My Settings menu
+
+# Upgrade My OBM 3.0.0
+cp ${OBM_UPDATE_SCRIPTS_30}/update-2.5-3.0.sh ${UPGRADE_SCRIPTS_DIR_MYSQL}/3.0.0-1
 
 #PGSQL UPGRADE
 #upgrade Pgsql OBM 2.2.1
@@ -197,9 +191,8 @@ cp ${OBM_UPDATE_SCRIPTS_24}/update-2.4.2.2~0.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/
 
 #Upgrade Pg OBM 2.5.0
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.0~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.5.0~1
-cp ${OBM_UPDATE_SCRIPTS_25}/update-2.4.2.9~0.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.4.2.9~0
 
-#Upgrade Pg OBM 2.5.1
+# Upgrade Pg OBM 2.5.1
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.1~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.5.1~1
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.7~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.5.7~1
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.7~2.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.5.7~2
@@ -209,11 +202,7 @@ cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.8~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.
 cp ${OBM_UPDATE_SCRIPTS_26}/update-2.6.0~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.6.0~1
 
 # Upgrade Pg OBM 3.0.0
-cp ${OBM_UPDATE_SCRIPTS_30}/update-3.0.0~0.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}3.0.0~0
+cp ${OBM_UPDATE_SCRIPTS_30}/update-2.5-3.0.sh ${UPGRADE_SCRIPTS_DIR_PGSQL}/3.0.0-1
 
-#RoundCube
-BUILD_DEB_ROUNDCUBE_SCRIPTS=${BUILD_DEB_DIR_STORAGE_SCRIPTS}/scripts/2.5/roundcube
-mkdir -p ${BUILD_DEB_ROUNDCUBE_SCRIPTS}
-cp -a ${OBM_ROUNDCUBE_SCRIPTS} ${BUILD_DEB_ROUNDCUBE_SCRIPTS}/
 
 exit 0
