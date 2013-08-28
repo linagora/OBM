@@ -452,7 +452,7 @@ $rcmail_config['drafts_mbox'] = 'Drafts';
 
 // store spam messages in this mailbox
 // NOTE: Use folder names with namespace prefix (INBOX. on Courier-IMAP)
-$rcmail_config['junk_mbox'] = 'Junk';
+$rcmail_config['junk_mbox'] = 'SPAM';
 
 // store sent message is this mailbox
 // leave blank if sent messages should not be stored
@@ -467,10 +467,10 @@ $rcmail_config['trash_mbox'] = 'Trash';
 // display these folders separately in the mailbox list.
 // these folders will also be displayed with localized names
 // NOTE: Use folder names with namespace prefix (INBOX. on Courier-IMAP)
-$rcmail_config['default_folders'] = array('INBOX', 'Drafts', 'Sent', 'Junk', 'Trash');
+$rcmail_config['default_folders'] = array('INBOX', 'Drafts', 'Sent', 'SPAM', 'Trash');
 
 // automatically create the above listed default folders on first login
-$rcmail_config['create_default_folders'] = false;
+$rcmail_config['create_default_folders'] = true;
 
 // protect the default folders from renames, deletes, and subscription changes
 $rcmail_config['protect_default_folders'] = true;
