@@ -95,6 +95,10 @@ class ReportFactory {
    * @return string
    */
   private static function build_mailshare_query($obm_q) {
+    global $obm;
+
+    $domain_id = $obm['domain_id'];
+
     $query =  "SELECT
     mailshare_id,
     mailshare_domain_id,
@@ -117,7 +121,8 @@ class ReportFactory {
     INNER JOIN Domain ON domain_id = mailshare_domain_id
     LEFT JOIN Host ON mailshare_mail_server_id=host_id
     LEFT JOIN UserObm as A ON MailShare.mailshare_usercreate=A.userobm_id
-    LEFT JOIN UserObm as B ON MailShare.mailshare_userupdate=B.userobm_id";
+    LEFT JOIN UserObm as B ON MailShare.mailshare_userupdate=B.userobm_id
+    WHERE mailshare_domain_id = '$domain_id'";
 
     return $query;
   }
