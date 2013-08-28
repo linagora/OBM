@@ -61,12 +61,12 @@ public class H2DriverConfiguration implements DatabaseDriverConfiguration {
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
 		builder.put("user", conf.getDatabaseLogin());
 		builder.put("password", conf.getDatabasePassword());
-		builder.put("URL", getJDBCUrl(conf.getDatabaseName()));
+		builder.put("URL", getJDBCUrl(conf.getDatabaseName(), conf.getJdbcOptions()));
 		return builder.build();
 	}
 
-	private String getJDBCUrl(String dbName) {
-		return "jdbc:h2:mem:" + dbName + ";TRACE_LEVEL_SYSTEM_OUT=2";
+	private String getJDBCUrl(String dbName, String jdbcOptions) {
+		return "jdbc:h2:mem:" + dbName + ";TRACE_LEVEL_SYSTEM_OUT=2" + jdbcOptions;
 	}
 	
 	@Override

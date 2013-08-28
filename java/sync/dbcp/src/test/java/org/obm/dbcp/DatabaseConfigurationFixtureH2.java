@@ -37,6 +37,18 @@ import org.obm.configuration.DatabaseFlavour;
 
 public class DatabaseConfigurationFixtureH2 implements DatabaseConfiguration {
 
+	private final String jdbcOptions;
+	private int minPoolSize;
+
+	public DatabaseConfigurationFixtureH2() {
+		this(NO_JDBC_OPTION, 0);
+	}
+	
+	public DatabaseConfigurationFixtureH2(String jdbcOptions, int minPoolSize) {
+		this.jdbcOptions = jdbcOptions;
+		this.minPoolSize = minPoolSize;
+	}
+	
 	@Override
 	public Integer getDatabaseMaxConnectionPoolSize() {
 		return 10;
@@ -76,4 +88,14 @@ public class DatabaseConfigurationFixtureH2 implements DatabaseConfiguration {
     public boolean isPostgresSSLNonValidating() {
         return false;
     }
+
+	@Override
+	public String getJdbcOptions() {
+		return jdbcOptions;
+	}
+	
+	@Override
+	public Integer getDatabaseMinConnectionPoolSize() {
+		return minPoolSize;
+	}
 }

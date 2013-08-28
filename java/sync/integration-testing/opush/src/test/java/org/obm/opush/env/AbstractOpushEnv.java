@@ -176,6 +176,16 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 			public String getDatabaseHost() {
 				return null;
 			}
+			
+			@Override
+			public Integer getDatabaseMinConnectionPoolSize() {
+				return null;
+			}
+			
+			@Override
+			public String getJdbcOptions() {
+				return null;
+			}
 		};
 	}
 	

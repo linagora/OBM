@@ -52,6 +52,7 @@ import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bitronix.tm.resource.ResourceConfigurationException;
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -87,6 +88,7 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 
 		configurationLogger.info("Database system : {}", databaseConfiguration.getDatabaseSystem());
 		configurationLogger.info("Database name {} on host {}", databaseConfiguration.getDatabaseName(), databaseConfiguration.getDatabaseHost());
+		configurationLogger.info("Database connection min pool size : {}", databaseConfiguration.getDatabaseMinConnectionPoolSize());
 		configurationLogger.info("Database connection pool size : {}", databaseConfiguration.getDatabaseMaxConnectionPoolSize());
 		configurationLogger.info("Database login : {}", databaseConfiguration.getDatabaseLogin());
 		logger.info("Starting OBM connection pool...");
@@ -94,14 +96,15 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		poolingDataSource = new PoolingDataSource();
 		poolingDataSource.setClassName(driverConfiguration.getDataSourceClassName());
 		poolingDataSource.setUniqueName(driverConfiguration.getFlavour().name());
+		if (databaseConfiguration.getDatabaseMinConnectionPoolSize() != null) {
+			poolingDataSource.setMinPoolSize(databaseConfiguration.getDatabaseMinConnectionPoolSize());
+		}
 		poolingDataSource.setMaxPoolSize(databaseConfiguration.getDatabaseMaxConnectionPoolSize());
 		poolingDataSource.setAllowLocalTransactions(true);
 		poolingDataSource.getDriverProperties().putAll(
 				driverConfiguration.getDriverProperties(databaseConfiguration));
 		poolingDataSource.setTestQuery(VALIDATION_QUERY);
 		poolingDataSource.setShareTransactionConnections(true);
-
-		poolingDataSource.init();
 	}
 
 	public int lastInsertId(Connection con) throws SQLException {
@@ -123,10 +126,14 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	@Override
 	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.JDBC_CONNECTION)
 	public Connection getConnection() throws SQLException {
-		Connection connection = poolingDataSource.getConnection();
-		setConnectionReadOnlyIfNecessary(connection);
-		setTimeZoneToUTC(connection);
-		return connection;
+		try {
+			Connection connection = poolingDataSource.getConnection();
+			setConnectionReadOnlyIfNecessary(connection);
+			setTimeZoneToUTC(connection);
+			return connection;
+		} catch (ResourceConfigurationException e) {
+			throw new SQLException(e);
+		}
 	}
 
 	private void setTimeZoneToUTC(Connection connection) throws SQLException {
