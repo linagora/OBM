@@ -36,7 +36,6 @@ $rcmail_config['multiple_smtp_server'] = array();
 
 while ($obm_q->next_record()) {
 	if ($obm_q->f('serviceproperty_property') == 'imap_frontend') {
-error_log("config: found iamp frontend ".$obm_q->f('host_ip')." ".$obm_q->f('domain_name'));
 		$rcmail_config['default_host'][$obm_q->f('host_ip')] = $obm_q->f('domain_name');
 	} else if ($obm_q->f('serviceproperty_property') == 'smtp_out') {
 		$rcmail_config['multiple_smtp_server'][$obm_q->f('domain_name')] = $obm_q->f('host_ip');
