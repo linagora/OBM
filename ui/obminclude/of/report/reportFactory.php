@@ -164,6 +164,10 @@ class ReportFactory {
    * @return string
    */
   private static function build_group_query($obm_q) {
+    global $obm;
+
+    $domain_id = $obm['domain_id'];
+
     $query =  "SELECT
     group_id,
     group_domain_id,
@@ -193,6 +197,7 @@ class ReportFactory {
     LEFT JOIN of_usergroup usergroup ON of_usergroup_group_id=group_id
     LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
     LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
+    WHERE group_domain_id = '$domain_id'
     GROUP BY 
     group_id,
     group_domain_id,
@@ -263,8 +268,12 @@ class ReportFactory {
    * @return string
    */
   private static function build_user_query($obm_q) {
+    global $obm;
+
     $date = new Of_Date();
     $date->subMonth(3);
+    $domain_id = $obm['domain_id'];
+
     $query =  "SELECT
     U.userobm_id,
     U.userobm_domain_id,
@@ -351,6 +360,7 @@ class ReportFactory {
     LEFT JOIN EventLink ON (eventlink_entity_id = userentity_entity_id AND eventlink_state != 'NEEDS-ACTION' AND (eventlink_timeupdate > '$date' OR eventlink_timecreate > '$date'))
       OR (eventlink_userupdate = U.userobm_id AND eventlink_timeupdate > '$date') OR (eventlink_usercreate = U.userobm_id AND eventlink_timecreate > '$date')
     LEFT JOIN UserObm as B ON U.userobm_userupdate=B.userobm_id 
+    WHERE U.userobm_domain_id = '$domain_id'
     GROUP BY  
     U.userobm_id,
     U.userobm_domain_id,
