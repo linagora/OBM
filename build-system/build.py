@@ -252,7 +252,9 @@ def main():
             packages)
 
     try:
-        pool = multiprocessing.Pool(args.processcount)
+        processcount=int(args.processcount)
+        
+        pool = multiprocessing.Pool(processcount)
         tasks = set([pool.apply_async(launch_packager, [packager]) for packager in packagers])
         pending_tasks = tasks.copy()
         pool.close()
