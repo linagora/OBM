@@ -36,7 +36,7 @@ applicable to the OBM software.
  * Search query
  */
 function run_query_admin_device_search($device) {
-  global $cdg_sql;
+  global $cdg_sql, $obm;
 
   $user = $device['user'];
   $type = $device['type'];
@@ -56,8 +56,10 @@ function run_query_admin_device_search($device) {
     array_push($where, "opush_sync_perms.device_id IS NULL");
   }
 
+  array_push($where, "userobm_domain_id = " . $obm["domain_id"]);
+
   if (sizeof($where) >= 1)
-    $where_clause = "WHERE ".implode('AND ', $where);
+    $where_clause = "WHERE ".implode(' AND ', $where);
 
   $ORDER_BY = "ORDER BY userobm_lastname";
   if (isset($device['sql_order_field'])) {
