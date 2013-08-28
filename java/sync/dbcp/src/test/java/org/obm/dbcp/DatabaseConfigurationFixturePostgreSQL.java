@@ -77,4 +77,14 @@ public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfigura
     public boolean isPostgresSSLNonValidating() {
         return true;
     }
+    
+    @Override
+    public String getJdbcOptions() {
+    	return NO_JDBC_OPTION;
+    }
+    
+    @Override
+    public Integer getDatabaseMinConnectionPoolSize() {
+    	return null;
+    }
 }

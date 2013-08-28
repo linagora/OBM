@@ -35,13 +35,16 @@ import static org.easymock.EasyMock.createControl;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.easymock.IMocksControl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
+import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.slf4j.Logger;
 
@@ -52,25 +55,58 @@ public class DatabaseConnectionProviderInitTest {
 	private IMocksControl control;
 	private DatabaseConnectionProviderImpl testee;
 	private H2DriverConfiguration h2Driver;
+	private Logger logger;
+	private ITransactionAttributeBinder transactionAttributeBinder;
 	
 	@Before
 	public void setup() {
 		control = createControl();
-		ITransactionAttributeBinder transactionAttributeBinder = control.createMock(ITransactionAttributeBinder.class);
-		Logger logger = control.createMock(Logger.class);
+		transactionAttributeBinder = control.createMock(ITransactionAttributeBinder.class);
+		logger = control.createMock(Logger.class);
 		h2Driver = new H2DriverConfiguration();
-		testee = new DatabaseConnectionProviderImpl(
+	}
+
+	@After
+	public void teardown() {
+		testee.cleanup();
+	}
+	
+	private DatabaseConnectionProviderImpl newDatabaseConnectionProviderImpl(DatabaseConfiguration databaseConfiguration) {
+		return testee = new DatabaseConnectionProviderImpl(
 				ImmutableSet.<DatabaseDriverConfiguration>of(h2Driver), 
-				transactionAttributeBinder, new DatabaseConfigurationFixtureH2(), logger);
+				transactionAttributeBinder, databaseConfiguration, logger);
 	}
 
 	@Test
 	public void testGetConnection() throws SQLException {
+		testee = newDatabaseConnectionProviderImpl(new DatabaseConfigurationFixtureH2());
 		Connection connection = testee.getConnection();
 		ResultSet result = connection.createStatement().executeQuery("SELECT 1");
 		assertThat(result.first()).isTrue();
 		assertThat(result.getInt(1)).isEqualTo(1);
 	}
 	
+	@Test(expected=SQLException.class)
+	public void testGetConnectionDatabaseNotStarted() throws SQLException {
+		testee = newDatabaseConnectionProviderImpl(new DatabaseConfigurationFixtureH2(";IFEXISTS=TRUE", 1));
+		testee.getConnection();
+	}
 	
+	@Test
+	public void testGetConnectionDatabaseStartingLater() throws SQLException {
+		testee = newDatabaseConnectionProviderImpl(new DatabaseConfigurationFixtureH2(";IFEXISTS=TRUE", 0));
+		Connection connection = null;
+		try {
+			//fail getting a connection because database doesn't exist yet
+			testee.getConnection();
+		} catch (SQLException e) {
+			//make database exists
+			DatabaseConfigurationFixtureH2 configuration = new DatabaseConfigurationFixtureH2();
+			DriverManager.getConnection(h2Driver.getDriverProperties(configuration).get("URL"), 
+					configuration.getDatabaseLogin(), configuration.getDatabasePassword());
+			//then check that the pool now get one connection
+			connection = testee.getConnection();
+		}
+		assertThat(connection).isNotNull();
+	}
 }

@@ -34,20 +34,26 @@ package org.obm.configuration;
 
 public interface DatabaseConfiguration {
 
-    Integer getDatabaseMaxConnectionPoolSize();
+	String NO_JDBC_OPTION = "";
 
-    DatabaseFlavour getDatabaseSystem();
+	Integer getDatabaseMinConnectionPoolSize();
 
-    String getDatabaseName();
+	Integer getDatabaseMaxConnectionPoolSize();
 
-    String getDatabaseHost();
+	DatabaseFlavour getDatabaseSystem();
 
-    String getDatabaseLogin();
+	String getDatabaseName();
 
-    String getDatabasePassword();
+	String getDatabaseHost();
 
-    boolean isPostgresSSLEnabled();
+	String getDatabaseLogin();
 
-    boolean isPostgresSSLNonValidating();
+	String getDatabasePassword();
+
+	boolean isPostgresSSLEnabled();
+
+	boolean isPostgresSSLNonValidating();
+
+	String getJdbcOptions();
 
 }

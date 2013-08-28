@@ -102,4 +102,14 @@ public class DatabaseConfigurationImpl implements DatabaseConfiguration {
     public boolean isPostgresSSLNonValidating() {
         return iniFile.getBooleanValue(DB_PG_SSL_NON_VALIDATING, false);
     }
+    
+    @Override
+    public String getJdbcOptions() {
+    	return NO_JDBC_OPTION;
+    }
+    
+    @Override
+    public Integer getDatabaseMinConnectionPoolSize() {
+    	return null;
+    }
 }
