@@ -207,6 +207,61 @@ public class ProfileDaoJdbcImplTest {
 
 		assertThat(dao.get(id, ToolBox.getDefaultObmDomain())).isEqualTo(profile);
 	}
+	
+	@Test
+	public void testGetWithInvalidDefaultRight() throws DaoException {
+		ProfileId id = ProfileId.valueOf("4");
+		Profile profile = Profile
+				.builder()
+				.id(id)
+				.name(ProfileName.valueOf("superadmin"))
+				.domain(ToolBox.getDefaultObmDomain())
+				.level(9)
+				.managePeers(false)
+				.accessRestriction(AccessRestriction.ALLOW_ALL)
+				.accessExceptions("")
+				.adminRealms(AdminRealm.DOMAIN, AdminRealm.USER)
+				.defaultMailQuota(0)
+				.maxMailQuota(0)
+				.defaultCheckBoxState(Module.CALENDAR, ModuleCheckBoxStates
+						.builder()
+						.module(Module.CALENDAR)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.MAILBOX, ModuleCheckBoxStates
+						.builder()
+						.module(Module.MAILBOX)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.MAILSHARE, ModuleCheckBoxStates
+						.builder()
+						.module(Module.MAILSHARE)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.RESOURCE, ModuleCheckBoxStates
+						.builder()
+						.module(Module.RESOURCE)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.defaultCheckBoxState(Module.CONTACTS, ModuleCheckBoxStates
+						.builder()
+						.module(Module.CONTACTS)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build())
+				.build();
+
+		assertThat(dao.get(id, ToolBox.getDefaultObmDomain())).isEqualTo(profile);
+	}
 
 	@Test
 	public void testGetUserProfile() throws Exception {

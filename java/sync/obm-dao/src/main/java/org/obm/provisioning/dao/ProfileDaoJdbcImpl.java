@@ -333,19 +333,45 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 
 	private Profile.Builder fetchDefaultCheckBoxStates(Connection con, ProfileId id, Profile.Builder builder) throws SQLException {
 		String defaultRightsStr = fetchProfileProperty(con, id, DEFAULT_RIGHT);
+		
+		if (Strings.isNullOrEmpty(defaultRightsStr)) {
+			return buildDefaultCheckBoxState(builder);
+		}
+		
 		Iterator<String> defaultRights = Splitter.on(',').split(defaultRightsStr).iterator();
 
-		for (Module module : defaultRightModules) {
-			builder.defaultCheckBoxState(module, ModuleCheckBoxStates
-					.builder()
-					.module(module)
-					.checkBoxState(Right.ACCESS, CheckBoxState.fromValue(Integer.parseInt(defaultRights.next())))
-					.checkBoxState(Right.READ, CheckBoxState.fromValue(Integer.parseInt(defaultRights.next())))
-					.checkBoxState(Right.WRITE, CheckBoxState.fromValue(Integer.parseInt(defaultRights.next())))
-					.build());
-		}
+		return buildCheckBoxStateFromDefaultRights(builder, defaultRights);
+	}
 
+	private Profile.Builder buildCheckBoxStateFromDefaultRights(
+			Profile.Builder builder, Iterator<String> defaultRights) {
+		for (Module module : defaultRightModules) {
+			builder.defaultCheckBoxState(module,
+					ModuleCheckBoxStates.builder()
+						.module(module)
+						.checkBoxState(Right.ACCESS, getCheckBoxStateNextValueFrom(defaultRights))
+						.checkBoxState(Right.READ, getCheckBoxStateNextValueFrom(defaultRights))
+						.checkBoxState(Right.WRITE, getCheckBoxStateNextValueFrom(defaultRights))
+						.build());
+		}
 		return builder;
+	}
+
+	private Profile.Builder buildDefaultCheckBoxState(Profile.Builder builder) {
+		for (Module module : defaultRightModules) {
+			builder.defaultCheckBoxState(module,
+					ModuleCheckBoxStates.builder()
+						.module(module)
+						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
+						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
+						.build());
+		}
+		return builder;
+	}
+	
+	private CheckBoxState getCheckBoxStateNextValueFrom(Iterator<String> defaultRights) {
+		return CheckBoxState.fromValue(Integer.parseInt(defaultRights.next()));
 	}
 
 }

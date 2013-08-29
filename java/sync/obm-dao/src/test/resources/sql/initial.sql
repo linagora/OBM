@@ -17097,7 +17097,12 @@ INSERT INTO profileproperty (profileproperty_profile_id, profileproperty_name, p
         (3, 'access_exceptions', ''),
         (3, 'admin_realm', 'domain,delegation'),
         (3, 'default_right', '1,-1,-2,0,0,0,0,0,0,0,0,0,0,0,0'),
-        (3, 'mail_quota_max', 'NaN');
+        (3, 'mail_quota_max', 'NaN'),
+        (4, 'level', '9'),
+        (4, 'level_managepeers', '0'),
+        (4, 'access_restriction', 'ALLOW_ALL'),
+        (4, 'access_exceptions', ''),
+        (4, 'admin_realm', 'domain,user');
 
 INSERT INTO UserObm (userobm_ext_id, userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
     VALUES
