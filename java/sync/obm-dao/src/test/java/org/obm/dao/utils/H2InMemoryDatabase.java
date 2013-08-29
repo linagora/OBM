@@ -50,7 +50,6 @@ import org.junit.rules.ExternalResource;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 /**
  * An {@link ExternalResource} that loads an in-memory H2 database before a test and shut it down afterwards.<br />
@@ -78,7 +77,7 @@ public class H2InMemoryDatabase extends ExternalResource {
 	 * @param initialSql The initial SQL script to load when the DB is started.
 	 */
 	@Inject
-	public H2InMemoryDatabase(@Named("initialSchema") String initialSql) {
+	public H2InMemoryDatabase(String initialSql) {
 		this.schema = initialSql;
 		this.openedConnections = new HashSet<Connection>();
 	}

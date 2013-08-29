@@ -45,7 +45,6 @@ import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import com.google.inject.name.Names;
 
 import fr.aliacom.obm.common.system.ObmSystemUser;
 
@@ -57,8 +56,6 @@ public class UserSystemDaoJdbcImplTest {
 
 		@Override
 		protected void configure() {
-			bindConstant().annotatedWith(Names.named("initialSchema")).to("sql/initial.sql");
-
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 		}
@@ -69,7 +66,6 @@ public class UserSystemDaoJdbcImplTest {
 	private UserSystemDaoJdbcImpl dao;
 
 	@Rule
-	@Inject
 	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 
 	@Test

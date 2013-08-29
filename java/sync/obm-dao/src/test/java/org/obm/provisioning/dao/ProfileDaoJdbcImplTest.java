@@ -22,7 +22,6 @@ import org.obm.sync.Right;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import com.google.inject.name.Names;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -43,8 +42,6 @@ public class ProfileDaoJdbcImplTest {
 
 		@Override
 		protected void configure() {
-			bindConstant().annotatedWith(Names.named("initialSchema")).to("sql/initial.sql");
-
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
 		}
@@ -55,8 +52,7 @@ public class ProfileDaoJdbcImplTest {
 	private ProfileDao dao;
 
 	@Rule
-	@Inject
-	public H2InMemoryDatabase db;
+	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");;
 	
 	private final ObmDomainUuid uuid1 = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 	private final ObmDomainUuid uuid2 = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");

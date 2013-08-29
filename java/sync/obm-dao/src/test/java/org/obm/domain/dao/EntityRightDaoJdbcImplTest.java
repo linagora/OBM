@@ -48,7 +48,6 @@ import org.obm.sync.dao.EntityId;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import com.google.inject.name.Names;
 
 @RunWith(SlowGuiceRunner.class)
 @GuiceModule(EntityRightDaoJdbcImplTest.Env.class)
@@ -58,8 +57,6 @@ public class EntityRightDaoJdbcImplTest {
 
 		@Override
 		protected void configure() {
-			bindConstant().annotatedWith(Names.named("initialSchema")).to("sql/initial.sql");
-
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 		}
@@ -70,7 +67,6 @@ public class EntityRightDaoJdbcImplTest {
 	private EntityRightDaoJdbcImpl dao;
 
 	@Rule
-	@Inject
 	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 
 	@Test(expected = DaoException.class)

@@ -49,7 +49,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import com.google.inject.name.Names;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -62,8 +61,6 @@ public class UserPatternDaoJdbcImplTest {
 
 		@Override
 		protected void configure() {
-			bindConstant().annotatedWith(Names.named("initialSchema")).to("sql/initial.sql");
-
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 		}
@@ -74,7 +71,6 @@ public class UserPatternDaoJdbcImplTest {
 	private UserPatternDaoJdbcImpl dao;
 
 	@Rule
-	@Inject
 	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 
 	@Test

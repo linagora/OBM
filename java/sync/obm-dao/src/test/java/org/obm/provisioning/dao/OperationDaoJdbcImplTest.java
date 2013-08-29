@@ -53,7 +53,6 @@ import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import com.google.inject.name.Names;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -67,8 +66,6 @@ public class OperationDaoJdbcImplTest {
 
 		@Override
 		protected void configure() {
-			bindConstant().annotatedWith(Names.named("initialSchema")).to("sql/initial.sql");
-
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
 		}
@@ -79,7 +76,6 @@ public class OperationDaoJdbcImplTest {
 	private OperationDao dao;
 
 	@Rule
-	@Inject
 	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 	
 	@Test

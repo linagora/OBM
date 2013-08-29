@@ -46,7 +46,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import com.google.inject.name.Names;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomain.Builder;
@@ -60,8 +59,6 @@ public class DomainDaoJdbcImplTest {
 
 		@Override
 		protected void configure() {
-			bindConstant().annotatedWith(Names.named("initialSchema")).to("sql/initial.sql");
-
 			bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 			bind(DomainDao.class);
 		}
@@ -72,7 +69,6 @@ public class DomainDaoJdbcImplTest {
 	private DomainDao dao;
 
 	@Rule
-	@Inject
 	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 	
 	@Test
