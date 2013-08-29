@@ -104,7 +104,7 @@ public class Profile {
 			return this;
 		}
 
-		public Builder level(int level) {
+		public Builder level(Integer level) {
 			this.level = level;
 			return this;
 		}
@@ -131,12 +131,12 @@ public class Profile {
 			return this;
 		}
 
-		public Builder defaultMailQuota(int defaultMailQuota) {
+		public Builder defaultMailQuota(Integer defaultMailQuota) {
 			this.defaultMailQuota = defaultMailQuota;
 			return this;
 		}
 
-		public Builder maxMailQuota(int maxMailQuota) {
+		public Builder maxMailQuota(Integer maxMailQuota) {
 			this.maxMailQuota = maxMailQuota;
 			return this;
 		}

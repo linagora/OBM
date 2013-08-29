@@ -56,6 +56,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -278,22 +279,22 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 		builder.accessRestriction(AccessRestriction.valueOf(fetchProfileProperty(con, id, ACCESS_RESTRICTION).toUpperCase()));
 		builder.accessExceptions(fetchProfileProperty(con, id, ACCESS_EXCEPTIONS));
 		builder.adminRealms(parseAdminRealms(fetchProfileProperty(con, id, ADMIN_REALM).toUpperCase()));
-		builder.defaultMailQuota(Integer.parseInt(fetchProfileProperty(con, id, DEFAULT_MAIL_QUOTA)));
-		builder.maxMailQuota(Integer.parseInt(fetchProfileProperty(con, id, MAX_MAIL_QUOTA)));
-
+		final String defaultQuota = Strings.nullToEmpty(fetchProfileProperty(con, id, DEFAULT_MAIL_QUOTA));
+		builder.defaultMailQuota(Ints.tryParse(defaultQuota));
+		final String maxQuota = Strings.nullToEmpty(fetchProfileProperty(con, id, MAX_MAIL_QUOTA));
+		builder.maxMailQuota(Ints.tryParse(maxQuota));
+		
 		fetchDefaultCheckBoxStates(con, id, builder);
 
 		return builder;
 	}
-
+	
 	private AdminRealm[] parseAdminRealms(String adminRealmsStr) {
-		List<String> adminRealmsStrs;
-		
 		if (Strings.isNullOrEmpty(adminRealmsStr)) {
 			return new AdminRealm[0];
 		}
 		
-		adminRealmsStrs = Lists.newArrayList(adminRealmsStr.split(","));
+		List<String> adminRealmsStrs = Lists.newArrayList(adminRealmsStr.split(","));
 		List<AdminRealm> realms =  Lists.transform(adminRealmsStrs, new Function<String, AdminRealm>() {
 			@Override
 			public AdminRealm apply(String input) {

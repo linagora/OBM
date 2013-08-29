@@ -16,6 +16,7 @@ import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.ProfileEntry;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.Right;
@@ -31,6 +32,7 @@ import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
 import fr.aliacom.obm.common.profile.Profile;
 import fr.aliacom.obm.common.profile.Profile.AccessRestriction;
 import fr.aliacom.obm.common.profile.Profile.AdminRealm;
+import fr.aliacom.obm.common.profile.Profile.Builder;
 import fr.aliacom.obm.common.user.ObmUser;
 
 @Slow
@@ -122,10 +124,19 @@ public class ProfileDaoJdbcImplTest {
 	@Test
 	public void testGet() throws Exception {
 		ProfileId id = ProfileId.valueOf("1");
-		Profile profile = Profile
-				.builder()
+		final Builder profileBuilder = profileBuilderToTest();
+		
+		Profile profile = profileBuilder
 				.id(id)
 				.name(ProfileName.valueOf("admin"))
+				.build();
+
+		assertThat(dao.get(id, ToolBox.getDefaultObmDomain())).isEqualTo(profile);
+	}
+
+	private Builder profileBuilderToTest() {
+		final Builder profileBuilderToTest = Profile
+				.builder()
 				.domain(ToolBox.getDefaultObmDomain())
 				.level(0)
 				.managePeers(true)
@@ -168,10 +179,8 @@ public class ProfileDaoJdbcImplTest {
 						.checkBoxState(Right.ACCESS, CheckBoxState.UNCHECKED)
 						.checkBoxState(Right.READ, CheckBoxState.UNCHECKED)
 						.checkBoxState(Right.WRITE, CheckBoxState.UNCHECKED)
-						.build())
-				.build();
-
-		assertThat(dao.get(id, ToolBox.getDefaultObmDomain())).isEqualTo(profile);
+						.build());
+		return profileBuilderToTest;
 	}
 
 	@Test(expected = UserNotFoundException.class)
@@ -184,6 +193,19 @@ public class ProfileDaoJdbcImplTest {
 				.build();
 
 		dao.getUserProfile(user);
+	}
+	
+	@Test
+	public void testGetWithInvalidQuota() throws DaoException {
+		ProfileId id = ProfileId.valueOf("3");
+		final Builder profileBuilder = profileBuilderToTest();
+		
+		Profile profile = profileBuilder
+				.id(id)
+				.name(ProfileName.valueOf("editor"))
+				.build();
+
+		assertThat(dao.get(id, ToolBox.getDefaultObmDomain())).isEqualTo(profile);
 	}
 
 	@Test
