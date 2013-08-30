@@ -503,6 +503,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.mailingList.MailingListBindingImpl;
 import fr.aliacom.obm.common.mailingList.MailingListHome;
+import fr.aliacom.obm.common.profile.CheckBoxState;
 import fr.aliacom.obm.common.profile.Module;
 import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
 import fr.aliacom.obm.common.profile.Profile;
@@ -1202,7 +1203,8 @@ public class DependencyResolverHelper {
 				MailUtils.class,
 				XTrustProvider.class,
 				ObmSystemUser.class,
-				EntityId.class
+				EntityId.class,
+				CheckBoxState.class
 		};
 	}
 }

@@ -35,7 +35,6 @@ import java.util.Set;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.EntityRightDao;
-import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
@@ -82,15 +81,16 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		ObmUser user = getUserFromRequestBody(operation, batch);
 		ObmUser userFromDao = createUserInDao(user);
 
-		addUserInDefaultGroup(userFromDao);
+		Group defaultGroup = getDefaultGroup(user.getDomain());
+		
+		addUserInDefaultGroup(userFromDao, defaultGroup);
 		setDefaultUserRights(userFromDao);
 
 		if (user.isEmailAvailable()) {
 			createUserMailboxes(userFromDao);
 		}
 
-		createUserInLdap(userFromDao);
-		addUserInDefaultGroupInLdap(userFromDao);
+		createUserInLdap(userFromDao, defaultGroup);
 	}
 
 	private void setDefaultUserRights(ObmUser user) {
@@ -173,16 +173,10 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
-	private void addUserInDefaultGroup(ObmUser user) {
+	private void addUserInDefaultGroup(ObmUser user, Group defaultGroup) {
 		ObmDomain domain = user.getDomain();
 
 		try {
-			Group defaultGroup = groupDao.getByGid(domain, UserDao.DEFAULT_GID);
-
-			if (defaultGroup == null) {
-				throw new ProcessingException(String.format("Default group with GID %s not found for domain %s.", UserDao.DEFAULT_GID, domain.getName()));
-			}
-
 			groupDao.addUser(domain, defaultGroup.getUid(), user);
 		}
 		catch (DaoException e) {
@@ -190,11 +184,12 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
-	private void createUserInLdap(ObmUser user) {
+	private void createUserInLdap(ObmUser user, Group defaultGroup) {
 		LdapManager ldapManager = buildLdapManager(user.getDomain());
 
 		try {
 			ldapManager.createUser(user);
+			addUserToDefaultGroupInLdap(ldapManager, user, defaultGroup);
 		} catch (Exception e) {
 			throw new ProcessingException(
 					String.format("Cannot insert new user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
@@ -203,19 +198,10 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
-	private void addUserInDefaultGroupInLdap(ObmUser user) {
-		ObmDomain domain = user.getDomain();
-
+	private void addUserToDefaultGroupInLdap(LdapManager ldapManager, ObmUser user, Group defaultGroup) {
 		try {
-			Group defaultGroup = groupDao.getByGid(domain, UserDao.DEFAULT_GID);
-
-			if (defaultGroup == null) {
-				throw new ProcessingException(String.format("Default group with GID %s not found for domain %s.", UserDao.DEFAULT_GID, domain.getName()));
-			}
-
-			addUserToGroupInLdap(domain, defaultGroup, user);
-		}
-		catch (DaoException e) {
+			ldapManager.addUserToDefaultGroup(user.getDomain(), defaultGroup, user);
+		} catch (Exception e) {
 			throw new ProcessingException(String.format("Cannot add user '%s' (%s) in his/her default group in LDAP.", user.getLogin(), user.getExtId()), e);
 		}
 	}

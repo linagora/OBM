@@ -37,6 +37,7 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.isNull;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
@@ -294,9 +295,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		groupDao.addUser(domain, usersGroup.getUid(), userFromDao);
 		expectLastCall();
 		expectSetDefaultRights(userFromDao);
-		expectLdapCreateUser(userFromDao);
-		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
-		expectLdapAddUserToGroup(usersGroup, userFromDao);
+		expectLdapCreateUser(userFromDao, usersGroup);
 		expectCyrusCreateMailbox(userFromDao);
 		
 		expect(batchDao.update(batchBuilder
@@ -474,9 +473,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectLastCall();
 		expectSetDefaultRights(userFromDao);
 
-		expectLdapCreateUser(userFromDao);
-		expect(groupDao.getByGid(domainWithSmtpIn, UserDao.DEFAULT_GID)).andReturn(usersGroup);
-		expectLdapAddUserToGroup(usersGroup, userFromDao);
+		expectLdapCreateUser(userFromDao, usersGroup);
 		expect(userSystemDao.getByLogin("obmsatelliterequest")).andReturn(obmSatelliteUser);
 		expect(satelliteService.create(isA(Configuration.class), eq(domainWithSmtpIn))).andReturn(satelliteConnection);
 		satelliteConnection.updateMTA();
@@ -546,9 +543,11 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(batchDao.get(batchId(1))).andReturn(batch);
 	}
 
-	private void expectLdapCreateUser(ObmUser user) {
+	private void expectLdapCreateUser(ObmUser userToAdd ,Group defaultGroup) {
 		LdapManager ldapManager = expectLdapBuild();
-		ldapManager.createUser(user);
+		ldapManager.createUser(userToAdd);
+		expectLastCall();
+		ldapManager.addUserToDefaultGroup(userToAdd.getDomain(), defaultGroup, userToAdd);
 		expectLastCall();
 		ldapManager.shutdown();
 		expectLastCall();
@@ -563,9 +562,11 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectLastCall();
 	}
 	
-	private void expectLdapdeleteUser(ObmUser user) {
+	private void expectLdapdeleteUser(ObmUser userToRemove, Group defaultGroup) {
 		LdapManager ldapManager = expectLdapBuild();
-		ldapManager.deleteUser(user);
+		ldapManager.removeUserFromDefaultGroup(userToRemove.getDomain(), defaultGroup, userToRemove);
+		expectLastCall();
+		ldapManager.deleteUser(userToRemove);
 		expectLastCall();
 		ldapManager.shutdown();
 		expectLastCall();
@@ -677,9 +678,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		groupDao.addUser(domain, usersGroup.getUid(), userFromDao);
 		expectLastCall();
 		expectSetDefaultRights(userFromDao);
-		expectLdapCreateUser(userFromDao);
-		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
-		expectLdapAddUserToGroup(usersGroup, userFromDao);
+		expectLdapCreateUser(userFromDao, usersGroup);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
@@ -730,7 +729,9 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(userDao.getByExtId(extId, domain)).andReturn(user);
 		userDao.archive(user);
 		expectLastCall();
-		expectLdapdeleteUser(user);
+		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		expectLdapdeleteUser(user, usersGroup);
+		expect(groupDao.getAllGroupsForUserExtId(user.getDomain(), user.getExtId())).andReturn(Collections.EMPTY_SET);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
@@ -785,7 +786,9 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		userDao.delete(user);
 		expectLastCall();
 		expectDeleteUserMailbox(user);
-		expectLdapdeleteUser(user);
+		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		expectLdapdeleteUser(user, usersGroup);
+		expect(groupDao.getAllGroupsForUserExtId(user.getDomain(), user.getExtId())).andReturn(Collections.EMPTY_SET);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)

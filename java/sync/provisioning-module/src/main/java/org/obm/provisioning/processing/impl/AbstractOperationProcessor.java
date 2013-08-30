@@ -38,6 +38,7 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
@@ -115,6 +116,23 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 		}
 	}
 
+	protected Group getDefaultGroup(ObmDomain domain) {
+		Group defaultGroup;
+		try {
+			defaultGroup = groupDao.getByGid(domain, UserDao.DEFAULT_GID);
+		} catch (DaoException e) {
+			throw new ProcessingException(e);
+		}
+
+		if (defaultGroup == null) {
+			throw new ProcessingException(
+					String.format("Default group with GID %d not found for domain %s.",
+					UserDao.DEFAULT_GID, domain.getName()));
+		}
+		
+		return defaultGroup;
+	}
+	
 	protected void addUserToGroupInLdap(ObmDomain domain, Group group, ObmUser userToAdd) {
 		LdapManager ldapManager = buildLdapManager(domain);
 
@@ -128,5 +146,4 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 			ldapManager.shutdown();
 		}
 	}
-
 }

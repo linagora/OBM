@@ -33,8 +33,12 @@ package org.obm.provisioning.processing.impl.users;
 
 import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
 
+import java.sql.SQLException;
+import java.util.Set;
+
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
+import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
@@ -87,12 +91,24 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 		LdapManager ldapManager = buildLdapManager(user.getDomain());
 		
 		try {
+			Group defaultGroup = getDefaultGroup(user.getDomain());
+			ldapManager.removeUserFromDefaultGroup(user.getDomain(), defaultGroup, user);
+			deleteUserFromGroupsExceptDefaultOneInLdap(ldapManager, defaultGroup, user);
 			ldapManager.deleteUser(user);
 		} catch (Exception e) {
 			throw new ProcessingException(
 					String.format("Cannot delete user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId().getExtId()), e);
 		} finally {
 			ldapManager.shutdown();
+		}
+	}
+	
+	private void deleteUserFromGroupsExceptDefaultOneInLdap(LdapManager ldapManager, Group defaultGroup, ObmUser user) throws SQLException {
+		Set<Group> groups = groupDao.getAllGroupsForUserExtId(user.getDomain(), user.getExtId());
+		for (Group group: groups) {
+			if (!group.equals(defaultGroup)) {
+				ldapManager.removeUserFromGroup(user.getDomain(), group, user);
+			}
 		}
 	}
 

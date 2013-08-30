@@ -135,12 +135,29 @@ public class LdapManagerImpl implements LdapManager {
 				Cn.valueOf(group.getName()),
 				LdapDomain.valueOf(domain.getName()));
 	}
+
+	@Override
+	public void addUserToDefaultGroup(ObmDomain domain, Group defaultGroup, ObmUser user) {
+		conn.addUserToDefaultGroup(
+				userMembershipBuilderProvider.get().fromObmUser(user).build(),
+				Cn.valueOf(defaultGroup.getName()),
+				LdapDomain.valueOf(domain.getName()));
+		
+	}
 	
 	@Override
 	public void removeUserFromGroup(ObmDomain domain, Group group, ObmUser user) {
 		conn.removeUserFromGroup(
 				userMembershipBuilderProvider.get().fromObmUser(user).build(),
 				Cn.valueOf(group.getName()),
+				LdapDomain.valueOf(domain.getName()));
+	}
+
+	@Override
+	public void removeUserFromDefaultGroup(ObmDomain domain, Group defaultGroup, ObmUser user) {
+		conn.removeUserFromDefaultGroup(
+				userMembershipBuilderProvider.get().fromObmUser(user).build(),
+				Cn.valueOf(defaultGroup.getName()),
 				LdapDomain.valueOf(domain.getName()));
 	}
 	

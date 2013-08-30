@@ -215,6 +215,12 @@ public class ConnectionImpl implements Connection {
 			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		modifyGroup(ldapGroupCn, ldapUserMembership.buildAddModifications(), ldapDomain);
 	}
+
+	@Override
+	public void addUserToDefaultGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn, LdapDomain ldapDomain)
+			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+		modifyGroup(ldapGroupCn, ldapUserMembership.buildAddModificationsForDefaultGroup(), ldapDomain);
+	}
 	
 	@Override
 	public void addUsersToGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Cn ldapGroupCn, LdapDomain ldapDomain)
@@ -240,6 +246,12 @@ public class ConnectionImpl implements Connection {
 	public void removeUserFromGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn, LdapDomain ldapDomain)
 			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		modifyGroup(ldapGroupCn, ldapUserMembership.buildRemoveModifications(), ldapDomain);
+	}
+
+	@Override
+	public void removeUserFromDefaultGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn, LdapDomain ldapDomain)
+			throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+		modifyGroup(ldapGroupCn, ldapUserMembership.buildRemoveModificationsForDefaultGroup(), ldapDomain);
 	}
 
 	@Override

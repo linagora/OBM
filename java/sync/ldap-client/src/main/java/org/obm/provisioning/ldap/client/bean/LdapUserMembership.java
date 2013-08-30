@@ -128,6 +128,21 @@ public class LdapUserMembership {
 				new DefaultModification(operation, "mailBox", getMailBox())
 		};
 	}
+	
+	public Modification[] buildAddModificationsForDefaultGroup() {
+		return buildModificationsForDefaultGroup(ModificationOperation.ADD_ATTRIBUTE);
+	}
+
+	public Modification[] buildRemoveModificationsForDefaultGroup() {
+		return buildModificationsForDefaultGroup(ModificationOperation.REMOVE_ATTRIBUTE);
+	}
+	
+	private Modification[] buildModificationsForDefaultGroup(ModificationOperation operation) {
+		return new Modification[] {
+				new DefaultModification(operation, "memberUid", getMemberUid()),
+				new DefaultModification(operation, "member", getMember())
+		};
+	}
 
 
 	@Override
