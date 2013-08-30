@@ -87,10 +87,6 @@ public class UserResource {
 	public List<UserIdentifier> listAll() throws SQLException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_read);
 		List<ObmUser> users = userDao.list(domain);
-		return returnListOfUsers(users);
-	}
-
-	private List<UserIdentifier> returnListOfUsers(List<ObmUser> users) {
 		if (users == null) {
 			return Collections.emptyList();
 		}
