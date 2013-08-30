@@ -325,21 +325,6 @@ public class AbstractEventSyncClientTest {
 	}
 	
 	@Test(expected=NotAllowedException.class)
-	public void testGetEventTimeUpdateNotRefusedFromIntervalDateNotAllowed() throws Exception {
-		testGetEventTimeUpdateNotRefusedFromIntervalDate(NotAllowedException.class);
-	}
-	
-	private void testGetEventTimeUpdateNotRefusedFromIntervalDate(Class<? extends Exception> exceptionClass) throws Exception {
-		Date start = new Date(123456789), end = new Date(123456780);
-		Document document = mockErrorDocument(exceptionClass, null);
-		
-		expect(responder.execute(eq(token), eq("/calendar/getEventTimeUpdateNotRefusedFromIntervalDate"), isA(Multimap.class))).andReturn(document).once();
-		control.replay();
-		
-		client.getEventTimeUpdateNotRefusedFromIntervalDate(token, CALENDAR, start, end);
-	}
-	
-	@Test(expected=NotAllowedException.class)
 	public void testGetLastUpdateNotAllowed() throws Exception {
 		testGetLastUpdate(NotAllowedException.class);
 	}

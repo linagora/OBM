@@ -51,8 +51,6 @@ import org.obm.sync.book.Folder;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.CalendarItemsWriter;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.EventParticipationState;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.ResourceInfo;
@@ -343,23 +341,6 @@ public class XmlResponder {
 		return emitResponse(ciw.getXMLDocumentFrom(events));
 	}
 
-	public String sendListEventTimeUpdate(List<EventTimeUpdate> evs) {
-		String res = "";
-		try {
-			Document doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/events.xsd",
-			"eventTimeUpdates");
-			Element root = doc.getDocumentElement();
-			for (EventTimeUpdate etu : evs) {
-				ciw.appendEventTimeUpdate(root, etu);
-			}
-			res = emitResponse(doc);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-		return res;
-	}
-
 	public String sendListContact(List<Contact> ret) {
 		String res = "";
 		try {
@@ -385,23 +366,6 @@ public class XmlResponder {
 			Element root = doc.getDocumentElement();
 			for (Entry<String, String> entry : ret.entrySet()) {
 				siw.appendSetting(root, entry.getKey(), entry.getValue());
-			}
-			res = emitResponse(doc);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-		return res;
-	}
-
-	public String sendListEventParticipationState(List<EventParticipationState> e) {
-		String res = "";
-		try {
-			Document doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/events.xsd",
-			"eventParticipationStates");
-			Element root = doc.getDocumentElement();
-			for (EventParticipationState etu : e) {
-				ciw.appendEventParticipationState(root, etu);
 			}
 			res = emitResponse(doc);
 		} catch (Exception ex) {

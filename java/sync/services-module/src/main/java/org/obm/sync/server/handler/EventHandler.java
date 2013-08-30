@@ -38,7 +38,6 @@ import java.util.List;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.apache.commons.lang.StringUtils;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
@@ -52,8 +51,6 @@ import org.obm.sync.calendar.CalendarItemsParser;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.EventParticipationState;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
@@ -183,13 +180,6 @@ public class EventHandler extends SecureSyncHandler {
 			return parseICS(at, request, responder);
 		} else if (method.equals("parseICSFreeBusy")) {
 			return parseICSFreeBusy(at, request, responder);
-		} else if (method
-				.equals("getEventParticipationStateWithAlertFromIntervalDate")) {
-			return getEventParticipationStateWithAlertFromIntervalDate(at, request,
-					responder);
-		} else if (method
-				.equals("getEventTimeUpdateNotRefusedFromIntervalDate")) {
-			return getEventTimeUpdateNotRefusedFromIntervalDate(at, request, responder);
 		} else if (method.equals("getLastUpdate")) {
 			return getLastUpdate(at, request, responder);
 		} else if (method.equals("isWritableCalendar")) {
@@ -270,32 +260,6 @@ public class EventHandler extends SecureSyncHandler {
 			throws ServerFault, NotAllowedException {
 		Date d = binding.getLastUpdate(at, getCalendar(request));
 		return responder.sendLong(d.getTime());
-	}
-
-	private String getEventTimeUpdateNotRefusedFromIntervalDate(
-			AccessToken at, Request request, XmlResponder responder) throws ServerFault, NotAllowedException {
-		String calendar = getCalendar(request);
-		Date start = DateHelper.asDate(request.getParameter("start"));
-		Date end = null;
-		if (StringUtils.isNotEmpty("end")) {
-			end = DateHelper.asDate(request.getParameter("end"));
-		}
-		List<EventTimeUpdate> e = 
-			binding.getEventTimeUpdateNotRefusedFromIntervalDate(at, calendar, start, end);
-
-		return responder.sendListEventTimeUpdate(e);
-	}
-
-	private String getEventParticipationStateWithAlertFromIntervalDate(
-			AccessToken at, Request request, XmlResponder responder)
-			throws ServerFault {
-		List<EventParticipationState> e = 
-			binding.getEventParticipationStateWithAlertFromIntervalDate(at,
-				getCalendar(request),
-				DateHelper.asDate(request.getParameter("start")),
-				DateHelper.asDate(request.getParameter("end")));
-
-		return responder.sendListEventParticipationState(e);
 	}
 
 	private String parseICS(

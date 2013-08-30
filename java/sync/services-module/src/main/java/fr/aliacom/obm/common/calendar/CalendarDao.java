@@ -45,8 +45,6 @@ import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.EventParticipationState;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
@@ -79,14 +77,6 @@ public interface CalendarDao {
 	List<Event> listEventsByIntervalDate(AccessToken token, ObmUser obmUser, Date start, Date end, EventType typeFilter);
 
 	List<String> findRefusedEventsKeys(ObmUser calendarUser, Date date);
-
-	List<EventParticipationState> getEventParticipationStateWithAlertFromIntervalDate(
-			AccessToken token, ObmUser calendarUser, Date start, Date end,
-			EventType typeFilter);
-
-	List<EventTimeUpdate> getEventTimeUpdateNotRefusedFromIntervalDate(
-			AccessToken token, ObmUser calendarUser, Date start, Date end,
-			EventType typeFilter);
 
 	List<FreeBusy> getFreeBusy(ObmDomain domain, FreeBusyRequest request);
 

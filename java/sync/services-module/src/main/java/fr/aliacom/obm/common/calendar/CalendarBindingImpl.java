@@ -69,9 +69,7 @@ import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.EventParticipationState;
 import org.obm.sync.calendar.EventRecurrence;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
@@ -1239,53 +1237,8 @@ public class CalendarBindingImpl implements ICalendar {
 
 	}
 
-	@Override
-	@Transactional(readOnly=true)
-	public List<EventParticipationState> getEventParticipationStateWithAlertFromIntervalDate(
-			AccessToken token, String specificCalendar, Date start, Date end)
-			throws ServerFault {
-
-		try {
-			String calendar = getCalendarOrDefault(token, specificCalendar);
-			
-			assertUserCanReadCalendar(token, calendar);
-			
-			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
-			
-			return calendarDao.getEventParticipationStateWithAlertFromIntervalDate(token, calendarUser, start, end, type);
-		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault(e.getMessage());
-		}
-	}
-
 	private String getDefaultCalendarFromToken(AccessToken token) {
 		return token.getUserLogin();
-	}
-
-	
-	private String getCalendarOrDefault(AccessToken token, String calendar) {
-		if (StringUtils.isEmpty(calendar)) {
-			return getDefaultCalendarFromToken(token);
-		}
-		return calendar;
-	}
-
-	@Override
-	@Transactional(readOnly=true)
-	public List<EventTimeUpdate> getEventTimeUpdateNotRefusedFromIntervalDate(
-			AccessToken token, String calendar, Date start, Date end)
-			throws ServerFault, NotAllowedException {
-		try {
-			assertUserCanReadCalendar(token, calendar);
-			
-			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
-			
-			return calendarDao.getEventTimeUpdateNotRefusedFromIntervalDate(token, calendarUser, start, end, type);
-		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault(e.getMessage());
-		}
 	}
 
 	@Override

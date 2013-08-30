@@ -53,8 +53,6 @@ import org.obm.sync.calendar.CalendarItemsWriter;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.EventParticipationState;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
@@ -367,21 +365,6 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public List<EventTimeUpdate> getEventTimeUpdateNotRefusedFromIntervalDate(
-			AccessToken token, String calendar, Date start, Date end)
-			throws ServerFault, NotAllowedException {
-		Multimap<String, String> params = initParams(token);
-		params.put("calendar", calendar);
-		params.put("start", Long.toString(start.getTime()));
-		if (end != null) {
-			params.put("end", Long.toString(end.getTime()));
-		}
-		Document doc = execute(token, type + "/getEventTimeUpdateNotRefusedFromIntervalDate", params);
-		exceptionFactory.checkNotAllowedException(doc);
-		return respParser.parseListEventTimeUpdate(doc.getDocumentElement());
-	}
-
-	@Override
 	public String parseEvent(AccessToken token, Event event) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		try {
@@ -426,22 +409,6 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		Document doc = execute(token, type + "/parseICSFreeBusy", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseFreeBusyRequest(doc.getDocumentElement());
-	}
-
-	@Override
-	public List<EventParticipationState> getEventParticipationStateWithAlertFromIntervalDate(
-			AccessToken token, String calendar, Date start, Date end) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("calendar", calendar);
-		params.put("start", Long.toString(start.getTime()));
-		params.put("end", Long.toString(end.getTime()));
-
-		Document doc = execute(token, type
-				+ "/getEventParticipationStateWithAlertFromIntervalDate",
-				params);
-		exceptionFactory.checkServerFaultException(doc);
-		return respParser.parseListEventParticipationState(doc
-				.getDocumentElement());
 	}
 
 	@Override

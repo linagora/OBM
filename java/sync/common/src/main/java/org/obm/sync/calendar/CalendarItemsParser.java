@@ -297,38 +297,6 @@ public class CalendarItemsParser extends AbstractItemsParser {
 		return ret;
 	}
 
-	public List<EventTimeUpdate> parseListEventTimeUpdate(
-			Element documentElement) {
-		List<EventTimeUpdate> ret = new LinkedList<EventTimeUpdate>();
-		NodeList nl = documentElement.getElementsByTagName("eventTimeUpdate");
-		for (int i = 0; i < nl.getLength(); i++) {
-			Element e = (Element) nl.item(i);
-			ret.add(parseEventTimeUpdate(e));
-		}
-		return ret;
-	}
-
-	private EventTimeUpdate parseEventTimeUpdate(Element e) {
-		EventTimeUpdate ev = new EventTimeUpdate();
-		ev.setUid(e.getAttribute("id"));
-		ev.setExtId(s(e, "extId"));
-		ev.setTimeUpdate(d(e, "timeupdate"));
-		ev.setRecurrenceId(d(e, "recurrenceId"));
-		return ev;
-	}
-
-	public List<EventParticipationState> parseListEventParticipationState(
-			Element documentElement) {
-		List<EventParticipationState> ret = new LinkedList<EventParticipationState>();
-		NodeList nl = documentElement
-				.getElementsByTagName("eventParticipationState");
-		for (int i = 0; i < nl.getLength(); i++) {
-			Element e = (Element) nl.item(i);
-			ret.add(parseEventParticipationState(e));
-		}
-		return ret;
-	}
-
 	public EventParticipationState parseEventParticipationState(Element e) {
 		EventParticipationState eps = new EventParticipationState();
 		eps.setUid(e.getAttribute("id"));

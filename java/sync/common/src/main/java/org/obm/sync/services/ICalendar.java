@@ -47,8 +47,6 @@ import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.EventParticipationState;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
@@ -277,14 +275,6 @@ public interface ICalendar {
 			EventType eventType) throws ServerFault;
 
 	/**
-	 * List event with their ids and last update timestamp that the user didn't
-	 * refused in a given time interval
-	 */
-	List<EventTimeUpdate> getEventTimeUpdateNotRefusedFromIntervalDate(
-			AccessToken token, String calendar, Date start, Date end)
-			throws ServerFault, NotAllowedException;
-
-	/**
 	 * Convert an event into an ICS
 	 */
 	String parseEvent(AccessToken token, Event event) throws ServerFault;
@@ -323,14 +313,6 @@ public interface ICalendar {
 	 * @return a {@link String} representing an ICS content
 	 */
 	String parseFreeBusyToICS(AccessToken token, FreeBusy fbr)
-			throws ServerFault;
-
-	/**
-	 * List accepted events with an alert configured in the given time interval.
-	 * Logged user must have read access on the calendar.
-	 */
-	List<EventParticipationState> getEventParticipationStateWithAlertFromIntervalDate(
-			AccessToken token, String calendar, Date start, Date end)
 			throws ServerFault;
 
 	/**

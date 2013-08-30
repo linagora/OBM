@@ -74,10 +74,8 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventOpacity;
-import org.obm.sync.calendar.EventParticipationState;
 import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
-import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyInterval;
@@ -732,14 +730,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			}
 		}
 		return firstEmail;
-	}
-
-	private Participation getAttendeeState(ResultSet rs)
-			throws SQLException {
-		return Participation.builder()
-							.state(State.getValueOf(rs.getString("eventlink_state")))
-							.comment(rs.getString("eventlink_comment"))
-							.build();
 	}
 	
 	@Override
@@ -2482,136 +2472,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return ret;
 	}
 
-	@Override
-	public List<EventParticipationState> getEventParticipationStateWithAlertFromIntervalDate(
-			AccessToken token, ObmUser calendarUser, Date start, Date end,
-			EventType typeFilter) {
-		String ev = "SELECT e.event_id, e.event_title, att.eventlink_state, att.eventlink_comment, e.event_date, e.event_repeatkind, e.event_repeatdays, e.event_repeatfrequence, e.event_endrepeat, al.eventalert_duration"
-				+ " FROM Event e "
-				+ "INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id "
-				+ "LEFT JOIN EventAlert al ON eventlink_event_id=eventalert_event_id "
-				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
-				+ "INNER JOIN UserObm ON e.event_owner=userobm_id "
-				+ "INNER JOIN Domain ON e.event_domain_id=domain_id "
-				+ "WHERE e.event_type=? AND ue.userentity_user_id=? "
-				+ "AND al.eventalert_duration != 0 "
-				+ "AND ((event_repeatkind != 'none' AND (event_endrepeat IS NULL OR event_endrepeat >= ?)) OR "
-				+ "(event_date >= ? AND event_date <= ?) )";
-
-		PreparedStatement evps = null;
-		ResultSet evrs = null;
-		Connection con = null;
-
-		List<EventParticipationState> ret = new LinkedList<EventParticipationState>();
-		try {
-			con = obmHelper.getConnection();
-			evps = con.prepareStatement(ev);
-			int idx = 1;
-			evps.setObject(idx++, obmHelper.getDBCP()
-					.getJdbcObject(ObmHelper.VCOMPONENT, typeFilter.toString()));
-			evps.setObject(idx++, calendarUser.getUid());
-			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
-			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
-			evps.setTimestamp(idx++, new Timestamp(end.getTime()));
-
-			evrs = evps.executeQuery();
-			while (evrs.next()) {
-				EventParticipationState psEvent = participationEventFromCursor(evrs);
-				Calendar cal = getGMTCalendar();
-				EventRecurrence er = eventRecurrenceFromCursor(cal, evrs);
-
-				cal.setTimeInMillis(evrs.getTimestamp("event_date").getTime());
-				Set<Date> extDate = getAllDateEventException(con,
-						new EventObmId(evrs.getInt("event_id")));
-				Date recurDate = ical4jHelper.isInIntervalDate(er,
-						cal.getTime(), start, end, extDate);
-				if (recurDate != null) {
-					psEvent.setDate(recurDate);
-					ret.add(psEvent);
-				}
-			}
-		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
-		} finally {
-			obmHelper.cleanup(con, evps, evrs);
-		}
-		return ret;
-	}
 
 	private Calendar getGMTCalendar() {
 		return Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-	}
-
-	private EventParticipationState participationEventFromCursor(
-			ResultSet evrs) throws SQLException {
-		EventParticipationState e = new EventParticipationState();
-		int id = evrs.getInt("event_id");
-		e.setUid("" + id);
-		e.setTitle(evrs.getString("event_title"));
-		e.setParticipation(getAttendeeState(evrs));
-		e.setAlert(evrs.getInt("eventalert_duration"));
-		return e;
-	}
-
-	@Override
-	public List<EventTimeUpdate> getEventTimeUpdateNotRefusedFromIntervalDate(
-			AccessToken token, ObmUser calendarUser, Date start, Date end,
-			EventType typeFilter) {
-
-		String ev = "SELECT event_id, event_ext_id, event_timecreate, event_timeupdate, e.event_date, e.event_repeatkind, e.event_repeatdays, e.event_repeatfrequence, e.event_endrepeat, eventexception_date as recurrenceId"
-				+ " FROM Event e "
-				+ "INNER JOIN EventLink att ON att.eventlink_event_id=e.event_id "
-				+ "INNER JOIN UserEntity ue ON att.eventlink_entity_id=ue.userentity_entity_id "
-				+ "LEFT JOIN EventException ON e.event_id = eventexception_child_id "
-				+ "WHERE ue.userentity_user_id=? and e.event_type=? "
-				+ "AND eventlink_state != ? "
-				+ "AND ((event_repeatkind != 'none' AND (event_endrepeat IS NULL OR event_endrepeat >= ?)) OR "
-				+ "(event_date >= ? ";
-		if (end != null) {
-			ev += "  AND event_date <= ?";
-		}
-		ev += ") )";
-
-		StringBuilder sb = new StringBuilder(ev);
-		PreparedStatement evps = null;
-		ResultSet evrs = null;
-		Connection con = null;
-		List<EventTimeUpdate> ret = new LinkedList<EventTimeUpdate>();
-		Calendar cal = getGMTCalendar();
-		try {
-			con = obmHelper.getConnection();
-			evps = con.prepareStatement(sb.toString());
-			int idx = 1;
-			evps.setObject(idx++, calendarUser.getUid());
-			evps.setObject(idx++, obmHelper.getDBCP()
-					.getJdbcObject(ObmHelper.VCOMPONENT, typeFilter.toString()));
-			State declined = Participation.declined().getState();
-			evps.setObject(idx++, obmHelper.getDBCP()
-					.getJdbcObject(ObmHelper.VPARTSTAT, declined.toString()));
-			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
-			evps.setTimestamp(idx++, new Timestamp(start.getTime()));
-			if (end != null) {
-				evps.setTimestamp(idx++, new Timestamp(end.getTime()));
-			}
-			evrs = evps.executeQuery();
-
-			while (evrs.next()) {
-				EventTimeUpdate event = eventTimeUpdateFromCursor(cal, evrs);
-				EventRecurrence er = eventRecurrenceFromCursor(cal, evrs);
-				Set<Date> extDate = getAllDateEventException(con,
-						new EventObmId(evrs.getInt("event_id")));
-				Date recurDate = ical4jHelper.isInIntervalDate(er,
-						event.getDate(), start, end, extDate);
-				if (recurDate != null) {
-					ret.add(event);
-				}
-			}
-		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
-		} finally {
-			obmHelper.cleanup(con, evps, evrs);
-		}
-		return ret;
 	}
 
 	@Override
@@ -2650,22 +2513,6 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			return lastUpdate;
 		}
 		return lastCreate;
-	}
-
-	private EventTimeUpdate eventTimeUpdateFromCursor(Calendar cal,
-			ResultSet evrs) throws SQLException {
-		EventTimeUpdate e = new EventTimeUpdate();
-		e.setUid("" + evrs.getInt("event_id"));
-		Date update = evrs.getTimestamp("event_timeupdate");
-		if (update == null) {
-			update = JDBCUtils.getDate(evrs, "event_timecreate");
-		}
-		e.setTimeUpdate(update);
-		e.setExtId(evrs.getString("event_ext_id"));
-		e.setRecurrenceId(JDBCUtils.getDate(evrs, "recurrenceId"));
-		cal.setTimeInMillis(evrs.getTimestamp("event_date").getTime());
-		e.setDate(cal.getTime());
-		return e;
 	}
 
 	private EventRecurrence eventRecurrenceFromCursor(Calendar cal,
