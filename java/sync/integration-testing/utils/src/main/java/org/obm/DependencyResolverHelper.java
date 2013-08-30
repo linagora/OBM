@@ -157,6 +157,7 @@ import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.GroupExistsException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.obm.provisioning.dao.exceptions.GroupRecursionException;
@@ -807,7 +808,8 @@ public class DependencyResolverHelper {
 				PUserDao.class,
 				PUserDaoJdbcImpl.class,
 				PGroupDao.class,
-				PGroupDaoJdbcImpl.class
+				PGroupDaoJdbcImpl.class,
+				DomainNotFoundException.class
 		};
 	}
 

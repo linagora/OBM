@@ -39,6 +39,8 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
@@ -108,13 +110,13 @@ public class DomainDaoJdbcImplTest {
 		assertThat(domain.getHosts()).isEqualTo(hosts);
 	}
 
-	@Test
-	public void testGetByUuidWhenDomainDoesntExist() {
-		assertThat(dao.findDomainByUuid(ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66"))).isNull();
+	@Test(expected=DomainNotFoundException.class)
+	public void testGetByUuidWhenDomainDoesntExist() throws DaoException, DomainNotFoundException {
+		dao.findDomainByUuid(ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66"));
 	}
 
 	@Test
-	public void testCreateThenGetByUuid() {
+	public void testCreateThenGetByUuid() throws DaoException, DomainNotFoundException {
 		ObmDomainUuid uuid = ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66");
 		Builder domainBuilder = ObmDomain.builder()
 			.uuid(uuid)
@@ -128,7 +130,7 @@ public class DomainDaoJdbcImplTest {
 	}
 	
 	@Test
-	public void testCreateThenList() {
+	public void testCreateThenList() throws DaoException {
 		Builder domainBuilder = ObmDomain.builder()
 			.uuid(ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66"))
 			.name("mydomain")
@@ -162,7 +164,7 @@ public class DomainDaoJdbcImplTest {
 	}
 	
 	@Test
-	public void testCreateWithAliasThenList() {
+	public void testCreateWithAliasThenList() throws DaoException {
 		Builder domainBuilder = ObmDomain.builder()
 			.uuid(ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66"))
 			.name("mydomain")
@@ -197,7 +199,7 @@ public class DomainDaoJdbcImplTest {
 	}
 
 	@Test
-	public void testCreateWithAliasesThenList() {
+	public void testCreateWithAliasesThenList() throws DaoException {
 		Builder domainBuilder = ObmDomain.builder()
 			.uuid(ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66"))
 			.name("mydomain")

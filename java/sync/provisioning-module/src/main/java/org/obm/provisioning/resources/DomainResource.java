@@ -43,6 +43,8 @@ import javax.ws.rs.core.Response.Status;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.domain.dao.DomainDao;
 import org.obm.provisioning.beans.ObmDomainEntry;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
@@ -60,20 +62,18 @@ public class DomainResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly = true)
-	public List<ObmDomainEntry> list() {
+	public List<ObmDomainEntry> list() throws DaoException {
 		List<ObmDomain> domains = domainDao.list();
-
+		
 		if (domains == null) {
 			return Collections.emptyList();
 		}
 
 		return Lists.transform(domains, new Function<ObmDomain, ObmDomainEntry>() {
-
 			@Override
 			public ObmDomainEntry apply(ObmDomain domain) {
 				return ObmDomainEntry.builder().id(domain.getUuid().get()).build();
 			}
-
 		});
 	}
 
@@ -81,11 +81,13 @@ public class DomainResource {
 	@Path("{domainUuid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly = true)
-	public ObmDomain get(@PathParam("domainUuid") ObmDomainUuid domainUuid) {
-		ObmDomain domain = domainDao.findDomainByUuid(domainUuid);
-
-		if (domain == null) {
-			throw new WebApplicationException(Status.NOT_FOUND);
+	public ObmDomain get(@PathParam("domainUuid") ObmDomainUuid domainUuid) throws DaoException {
+		ObmDomain domain;
+		
+		try {
+			domain = domainDao.findDomainByUuid(domainUuid);
+		} catch (DomainNotFoundException e) {
+			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
 
 		return domain;

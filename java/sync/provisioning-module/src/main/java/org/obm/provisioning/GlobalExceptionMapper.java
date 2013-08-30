@@ -34,6 +34,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
@@ -44,7 +45,7 @@ public class GlobalExceptionMapper implements ExceptionMapper<Exception> {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public Response toResponse(Exception exception) {
-		return Response.status(500).entity(exception).build();
+		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(exception).type(MediaType.APPLICATION_JSON).build();
 	}
 
 }

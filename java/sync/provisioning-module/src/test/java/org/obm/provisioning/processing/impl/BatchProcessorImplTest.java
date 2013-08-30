@@ -67,6 +67,7 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
 import org.obm.provisioning.dao.exceptions.GroupRecursionException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
@@ -733,7 +734,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testProcessDeleteUserWithFalseExpunge() throws SQLException, DaoException, BatchNotFoundException, UserNotFoundException {
+	public void testProcessDeleteUserWithFalseExpunge() throws SQLException, DaoException, BatchNotFoundException, UserNotFoundException, DomainNotFoundException {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -788,7 +789,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testProcessDeleteUserWithTrueExpunge()
-			throws SQLException, DaoException, BatchNotFoundException, UserNotFoundException, IMAPException {
+			throws SQLException, DaoException, BatchNotFoundException, UserNotFoundException, IMAPException, DomainNotFoundException {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -1144,7 +1145,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testProcessDeleteGroup() throws DaoException, BatchNotFoundException, GroupNotFoundException {
+	public void testProcessDeleteGroup() throws DaoException, BatchNotFoundException, GroupNotFoundException, DomainNotFoundException {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -1193,7 +1194,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testProcessModifyGroup() throws DaoException, BatchNotFoundException, GroupNotFoundException {
+	public void testProcessModifyGroup() throws DaoException, BatchNotFoundException, GroupNotFoundException, DomainNotFoundException {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -1430,7 +1431,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testProcessAddUserToGroup()
-			throws DaoException, BatchNotFoundException, GroupNotFoundException, UserNotFoundException, SQLException {
+			throws DaoException, BatchNotFoundException, GroupNotFoundException, UserNotFoundException, SQLException, DomainNotFoundException {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -1488,7 +1489,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testProcessDeleteUserFromGroup()
-			throws DaoException, BatchNotFoundException, GroupNotFoundException, UserNotFoundException, SQLException {
+			throws DaoException, BatchNotFoundException, GroupNotFoundException, UserNotFoundException, SQLException, DomainNotFoundException {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -1544,7 +1545,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testProcessAddGroupToGroup()
-			throws DaoException, BatchNotFoundException, GroupNotFoundException, GroupRecursionException {
+			throws DaoException, BatchNotFoundException, GroupNotFoundException, GroupRecursionException, DomainNotFoundException {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -1600,7 +1601,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testProcessRemoveGroupFromGroup()
-			throws DaoException, BatchNotFoundException, GroupNotFoundException {
+			throws DaoException, BatchNotFoundException, GroupNotFoundException, DomainNotFoundException {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))

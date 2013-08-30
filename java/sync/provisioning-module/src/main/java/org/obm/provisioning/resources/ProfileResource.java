@@ -16,22 +16,17 @@ import javax.ws.rs.core.Response.Status;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
-import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class ProfileResource {
-
-	private final Logger logger = LoggerFactory.getLogger(ProvisioningService.class);
 
 	@Inject
 	private ProfileDao profileDao;
@@ -60,8 +55,6 @@ public class ProfileResource {
 			return profileDao.getProfileName(domain.getUuid(), profileId);
 		}
 		catch (ProfileNotFoundException e) {
-			logger.error(String.format("Profile %s not found.", profileId), e);
-
 			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
 	}

@@ -43,6 +43,8 @@ import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 
 @Slow
@@ -51,7 +53,7 @@ import org.obm.provisioning.CommonDomainEndPointEnvTest;
 public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 
 	@Test
-	public void testUnknownUrl() {
+	public void testUnknownUrl() throws DaoException, DomainNotFoundException {
 		expectDomain();
 		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
@@ -85,7 +87,7 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testGetAUserOnNonExistentDomain() {
+	public void testGetAUserOnNonExistentDomain() throws DaoException, DomainNotFoundException {
 		expectNoDomain();
 		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();

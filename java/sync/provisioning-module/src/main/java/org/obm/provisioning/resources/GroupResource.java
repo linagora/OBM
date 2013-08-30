@@ -49,14 +49,11 @@ import javax.ws.rs.core.Response.Status;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
-import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.bean.GroupIdentifier;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -66,8 +63,6 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class GroupResource {
-
-	private Logger logger = LoggerFactory.getLogger(ProvisioningService.class);
 	
 	@Inject
 	private GroupDao groupDao;
@@ -88,26 +83,24 @@ public class GroupResource {
 		}
 
 		return Collections2.transform(groups, new Function<Group, GroupIdentifier>() {
-
 			@Override
 			public GroupIdentifier apply(Group group) {
 				return GroupIdentifier.builder().id(group.getExtId()).domainUuid(domain.getUuid()).build();
 			}
-
 		});
 	}
 
 	@GET
 	@Path("/{groupExtId}")
 	@Produces(JSON_WITH_UTF8)
-	public Group get(@PathParam("groupExtId") GroupExtId groupExtId, @QueryParam("expandDepth") @DefaultValue("0") int expandDepth) throws DaoException {
+	public Group get(@PathParam("groupExtId") GroupExtId groupExtId, @QueryParam("expandDepth") @DefaultValue("0") int expandDepth)
+			throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, groups_read);
+		
 		try {
 			return groupDao.getRecursive(domain, groupExtId, true, expandDepth);
 		} catch (GroupNotFoundException e) {
-			logger.error(String.format("Group %s not found", groupExtId), e);
-
-			throw new WebApplicationException(Status.NOT_FOUND);
+			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
 	}
 
@@ -116,12 +109,11 @@ public class GroupResource {
 	@Produces(JSON_WITH_UTF8)
 	public Set<ObmUser> getUserMembers(@PathParam("groupExtId") GroupExtId groupExtId) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, groups_read);
+		
 		try {
 			return groupDao.getRecursive(domain, groupExtId, true, 0).getUsers();
 		} catch (GroupNotFoundException e) {
-			logger.error(String.format("Group %s not found", groupExtId), e);
-
-			throw new WebApplicationException(Status.NOT_FOUND);
+			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
 	}
 
@@ -130,12 +122,11 @@ public class GroupResource {
 	@Produces(JSON_WITH_UTF8)
 	public Set<Group> getUserMembersOfSubgroups(@PathParam("groupExtId") GroupExtId groupExtId) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, groups_read);
+		
 		try {
 			return groupDao.getRecursive(domain, groupExtId, true, 1).getSubgroups();
 		} catch (GroupNotFoundException e) {
-			logger.error(String.format("Group %s not found", groupExtId), e);
-
-			throw new WebApplicationException(Status.NOT_FOUND);
+			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
 	}
 }

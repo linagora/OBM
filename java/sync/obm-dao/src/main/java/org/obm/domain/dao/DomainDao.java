@@ -40,6 +40,8 @@ import java.sql.Types;
 import java.util.List;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 import org.obm.utils.DBUtils;
@@ -97,7 +99,7 @@ public class DomainDao {
 		return null;
 	}
 	
-	public ObmDomain findDomainByUuid(ObmDomainUuid uuid) {
+	public ObmDomain findDomainByUuid(ObmDomainUuid uuid) throws DaoException, DomainNotFoundException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -114,12 +116,12 @@ public class DomainDao {
 				return domainFromCursor(rs);
 			}
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
-		} finally {
+            throw new DaoException(e);
+        } finally {
 			DBUtils.cleanup(con, ps, rs);
 		}
-
-		return null;
+		
+		throw new DomainNotFoundException(uuid);
 	}
 
 	public ObmDomain create(ObmDomain domain) {
@@ -150,28 +152,29 @@ public class DomainDao {
 		return null;
 	}
 	
-	public List<ObmDomain> list() {
+	public List<ObmDomain> list() throws DaoException {
 		Connection con = null;
 		Statement statement = null;
 		ResultSet rs = null;
+		List<ObmDomain> domains = Lists.newArrayList();
+		
 		try {
 			String query = "SELECT " + DOMAIN_FIELDS + " FROM Domain";
 			con = dbcp.getConnection();
 			statement = con.createStatement();
 			rs = statement.executeQuery(query);
-			List<ObmDomain> domains = Lists.newArrayList();
 
 			while (rs.next()) {
 				domains.add(domainFromCursor(rs));
 			}
-
-			return domains;
+			
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
+			throw new DaoException(e);
 		} finally {
 			DBUtils.cleanup(con, statement, rs);
 		}
-		return null;
+		
+		return domains;
 	}
 	
 	private Iterable<String> aliasToIterable(String aliases) {

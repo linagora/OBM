@@ -45,6 +45,8 @@ import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import com.google.common.collect.ImmutableList;
 
@@ -58,7 +60,7 @@ import fr.aliacom.obm.common.user.UserExtId;
 public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 
 	@Test
-	public void testListAllUserOnNonExistentDomain() {
+	public void testListAllUserOnNonExistentDomain() throws DaoException, DomainNotFoundException {
 		expectNoDomain();
 		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();

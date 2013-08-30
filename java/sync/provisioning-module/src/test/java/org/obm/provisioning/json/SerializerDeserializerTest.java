@@ -42,6 +42,8 @@ import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import com.jayway.restassured.http.ContentType;
 
@@ -51,7 +53,7 @@ import com.jayway.restassured.http.ContentType;
 public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
-	public void testObmUserDeserializerAndSerializer() {
+	public void testObmUserDeserializerAndSerializer() throws DaoException, DomainNotFoundException {
 		expectDomain();
 		mocksControl.replay();
 		
@@ -68,7 +70,7 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testObmUserDeserializerWithMinimalRepresentation() {
+	public void testObmUserDeserializerWithMinimalRepresentation() throws DaoException, DomainNotFoundException {
 		expectDomain();
 		mocksControl.replay();
 
@@ -84,7 +86,7 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testObmUserDeserializerWhenNoLastName() {
+	public void testObmUserDeserializerWhenNoLastName() throws DaoException, DomainNotFoundException {
 		expectDomain();
 		mocksControl.replay();
 
@@ -100,7 +102,7 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testObmUserDeserializerWhenNoProfile() {
+	public void testObmUserDeserializerWhenNoProfile() throws DaoException, DomainNotFoundException {
 		expectDomain();
 		mocksControl.replay();
 
@@ -116,7 +118,7 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testGroupDeserializerAndSerializerWithFullJson() {
+	public void testGroupDeserializerAndSerializerWithFullJson() throws DaoException, DomainNotFoundException {
 		expectDomain();
 		mocksControl.replay();
 		
@@ -151,7 +153,7 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testGroupDeserializerAndSerializerWithPartialJson() {
+	public void testGroupDeserializerAndSerializerWithPartialJson() throws DaoException, DomainNotFoundException {
 		expectDomain();
 		mocksControl.replay();
 		
@@ -178,6 +180,46 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 					"}")).
 		when()
 			.post("/do/tests/on/serialization/of/group");
+		
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testRuntimeExceptionSerializer() throws DaoException, DomainNotFoundException {
+		expectDomain();
+		mocksControl.replay();
+		
+		given()
+			.auth().basic("user", "password").
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+			.content(containsString(
+					"{" +
+						"\"message\":\"foo\"," +
+						"\"type\":\"java.lang.IllegalStateException\"" +
+					"}")).
+		when()
+			.get("/do/tests/on/serialization/of/runtimeException");
+		
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testExceptionSerializer() throws DaoException, DomainNotFoundException {
+		expectDomain();
+		mocksControl.replay();
+		
+		given()
+			.auth().basic("user", "password").
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+			.content(containsString(
+					"{" +
+						"\"message\":\"foo\"," +
+						"\"type\":\"java.lang.Exception\"" +
+					"}")).
+		when()
+			.get("/do/tests/on/serialization/of/exception");
 		
 		mocksControl.verify();
 	}

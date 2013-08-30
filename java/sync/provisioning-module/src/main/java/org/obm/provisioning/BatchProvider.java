@@ -37,7 +37,9 @@ import javax.ws.rs.ext.Provider;
 
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.dao.BatchDao;
+import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -77,12 +79,11 @@ public class BatchProvider extends PerRequestTypeInjectableProvider<Context, Bat
 
 				try {
 					batch = batchDao.get(Batch.Id.valueOf(batchId));
-				}
-				catch (DaoException e) {
+				} catch (DaoException e) {
 					throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
-				}
-
-				if (batch == null) {
+				} catch (BatchNotFoundException e) {
+					throw new WebApplicationException(Status.NOT_FOUND);
+				} catch (DomainNotFoundException e) {
 					throw new WebApplicationException(Status.NOT_FOUND);
 				}
 

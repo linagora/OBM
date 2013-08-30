@@ -21,7 +21,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.shiro.authz.AuthorizationException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.beans.Batch;
@@ -29,10 +28,10 @@ import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -50,13 +49,11 @@ public class BatchResource {
 	@Inject
 	private BatchTracker batchTracker;
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
-
 	@GET
 	@Path("{batchId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional(readOnly = true)
-	public Batch get(@PathParam("batchId") Batch.Id batchId) throws DaoException, AuthorizationException {
+	public Batch get(@PathParam("batchId") Batch.Id batchId) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, batches_read);
 		Batch batch = batchTracker.getTrackedBatch(batchId);
 
@@ -64,26 +61,36 @@ public class BatchResource {
 			return batch;
 		}
 
-		batch = batchDao.get(batchId);
-
-		if (batch == null) {
-			throw new WebApplicationException(Status.NOT_FOUND);
+		try {
+			batch = batchDao.get(batchId);
+		} catch (BatchNotFoundException e) {
+			throw new WebApplicationException(e, Status.NOT_FOUND);
+		} catch (DomainNotFoundException e) {
+			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
-
+		
 		return batch;
 	}
 
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Response create() throws DaoException, URISyntaxException, AuthorizationException {
+	public Response create() throws DaoException, URISyntaxException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, batches_create);
 		Batch batch = Batch
 				.builder()
 				.domain(domain)
 				.status(BatchStatus.IDLE)
 				.build();
-		Batch createdBatch = batchDao.create(batch);
+		Batch createdBatch;
+		
+		try {
+			createdBatch = batchDao.create(batch);
+		} catch (BatchNotFoundException e) {
+			throw new WebApplicationException(e, Status.NOT_FOUND);
+		} catch (DomainNotFoundException e) {
+			throw new WebApplicationException(e, Status.NOT_FOUND);
+		}
 
 		return Response
 				.created(new URI(String.valueOf(createdBatch.getId().getId())))
@@ -94,12 +101,11 @@ public class BatchResource {
 	@DELETE
 	@Path("{batchId}")
 	@Transactional
-	public Response discard(@PathParam("batchId") Batch.Id batchId) throws DaoException, AuthorizationException {
+	public Response discard(@PathParam("batchId") Batch.Id batchId) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, batches_delete);
 		try {
 			batchDao.delete(batchId);
-		}
-		catch (BatchNotFoundException e) {
+		} catch (BatchNotFoundException e) {
 			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
 
@@ -115,21 +121,20 @@ public class BatchResource {
 		Batch batch = batchTracker.getTrackedBatch(batchId);
 
 		if (batch == null) {
-			batch = batchDao.get(batchId);
-
-			if (batch == null) {
-				throw new WebApplicationException(Status.NOT_FOUND);
+			try {
+				batch = batchDao.get(batchId);
+			} catch (BatchNotFoundException e) {
+				throw new WebApplicationException(e, Status.NOT_FOUND);
+			} catch (DomainNotFoundException e) {
+				throw new WebApplicationException(e, Status.NOT_FOUND);
 			}
 
 			if (BatchStatus.IDLE.equals(batch.getStatus())) {
-				try {
-					batchProcessor.process(batch);
-				}
-				catch (Exception e) {
-					throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
-				}
+				batchProcessor.process(batch);
 			} else {
-				logger.info("Not commiting batch {} in status {}.", batch.getId(), batch.getStatus());
+				throw new WebApplicationException(
+					new ProcessingException(
+						String.format("Not commiting batch %s in status %s.", batch.getId(), batch.getStatus())), Status.OK);
 			}
 		}
 

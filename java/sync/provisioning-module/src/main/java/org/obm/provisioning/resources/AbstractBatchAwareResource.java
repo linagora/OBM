@@ -48,6 +48,7 @@ import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
@@ -96,8 +97,9 @@ public abstract class AbstractBatchAwareResource {
 
 		try {
 			batchDao.addOperation(batch.getId(), operation);
-		}
-		catch (BatchNotFoundException e) {
+		} catch (BatchNotFoundException e) {
+			throw new WebApplicationException(e, Status.NOT_FOUND);
+		} catch (DomainNotFoundException e) {
 			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
 

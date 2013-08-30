@@ -27,24 +27,29 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.dao;
+package org.obm.provisioning.dao.exceptions;
 
-import org.obm.provisioning.beans.Batch;
-import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public interface BatchDao {
+public class DomainNotFoundException extends Exception {
 
-	Batch get(Batch.Id id) throws DaoException, BatchNotFoundException, DomainNotFoundException;
+	public DomainNotFoundException(ObmDomainUuid uuid) {
+		super(String.format("The domain with the uuid %s was not found", uuid.get()));
+	}
+	
+	public DomainNotFoundException() {
+		super();
+	}
 
-	Batch create(Batch batch) throws DaoException, BatchNotFoundException, DomainNotFoundException;
+	public DomainNotFoundException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-	Batch update(Batch batch) throws DaoException, BatchNotFoundException, DomainNotFoundException;
+	public DomainNotFoundException(Throwable cause) {
+		super(cause);
+	}
 
-	void delete(Batch.Id id) throws DaoException, BatchNotFoundException;
-
-	Batch addOperation(Batch.Id batchId, Operation operation) throws DaoException, BatchNotFoundException, DomainNotFoundException;
-
+	public DomainNotFoundException(String message) {
+		super(message);
+	}
 }

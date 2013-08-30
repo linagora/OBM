@@ -47,6 +47,7 @@ import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
@@ -64,7 +65,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	private BatchTracker batchTracker;
 
 	@Test
-	public void testDeleteWithUnknownDomain() {
+	public void testDeleteWithUnknownDomain() throws DaoException, DomainNotFoundException {
 		expectNoDomain();
 		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
@@ -142,7 +143,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testCreateWithUnknownDomain() {
+	public void testCreateWithUnknownDomain() throws DaoException, DomainNotFoundException {
 		expectNoDomain();
 		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
@@ -179,7 +180,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchDao.get(batchId(12))).andReturn(null);
+		expect(batchDao.get(batchId(12))).andThrow(new BatchNotFoundException());
 		mocksControl.replay();
 		
 		given()
@@ -193,7 +194,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testGetWithUnknownDomain() {
+	public void testGetWithUnknownDomain() throws DaoException, DomainNotFoundException {
 		expectNoDomain();
 		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
@@ -313,7 +314,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
-		expect(batchDao.get(batchId(12))).andReturn(null);
+		expect(batchDao.get(batchId(12))).andThrow(new BatchNotFoundException());
 		mocksControl.replay();
 
 		given()

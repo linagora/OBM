@@ -69,7 +69,9 @@ import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.PermissionDao;
 import org.obm.provisioning.dao.ProfileDao;
+import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.ldap.client.Configuration;
 import org.obm.provisioning.ldap.client.LdapService;
@@ -264,15 +266,15 @@ public abstract class CommonDomainEndPointEnvTest {
 		return String.format("%s:%s", domain.getUuid().get(), permission);
 	}
 
-	protected void expectDomain() {
+	protected void expectDomain() throws DaoException, DomainNotFoundException {
 		expectDomain(domain);
 	}
 
-	protected void expectDomain(ObmDomain domain) {
+	protected void expectDomain(ObmDomain domain) throws DaoException, DomainNotFoundException {
 		expect(domainDao.findDomainByUuid(domain.getUuid())).andReturn(domain).atLeastOnce();
 	}
 
-	protected void expectBatch() throws DaoException {
+	protected void expectBatch() throws DaoException, BatchNotFoundException, DomainNotFoundException {
 		expect(batchDao.get(batch.getId())).andReturn(batch).atLeastOnce();
 	}
 
@@ -286,12 +288,12 @@ public abstract class CommonDomainEndPointEnvTest {
 				ProfileId.builder().id(profileEntry.getId()).build())).andReturn(profileName);
 	}
 
-	protected void expectNoDomain() {
-		expect(domainDao.findDomainByUuid(domain.getUuid())).andReturn(null);
+	protected void expectNoDomain() throws DaoException, DomainNotFoundException {
+		expect(domainDao.findDomainByUuid(domain.getUuid())).andThrow(new DomainNotFoundException());
 	}
 
-	protected void expectNoBatch() throws DaoException {
-		expect(batchDao.get(batch.getId())).andReturn(null);
+	protected void expectNoBatch() throws DaoException, BatchNotFoundException, DomainNotFoundException {
+		expect(batchDao.get(batch.getId())).andThrow(new BatchNotFoundException());
 	}
 
 	protected void expectSuccessfulAuthentication(String login, String password) {

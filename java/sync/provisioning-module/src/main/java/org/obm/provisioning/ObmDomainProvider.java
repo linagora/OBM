@@ -36,6 +36,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.Provider;
 
 import org.obm.domain.dao.DomainDao;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -73,13 +75,17 @@ public class ObmDomainProvider extends PerRequestTypeInjectableProvider<Context,
 				String domainUuid = pathParameters.getFirst("domain");
 
 				if (domainUuid == null) {
-					throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+					throw new WebApplicationException(Status.BAD_REQUEST);
 				}
 
-				ObmDomain domain = domainDao.findDomainByUuid(ObmDomainUuid.of(domainUuid));
-
-				if (domain == null) {
-					throw new WebApplicationException(Status.NOT_FOUND.getStatusCode());
+				ObmDomain domain;
+				
+				try {
+					domain = domainDao.findDomainByUuid(ObmDomainUuid.of(domainUuid));
+				} catch (DaoException e) {
+					throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+				} catch (DomainNotFoundException e) {
+					throw new WebApplicationException(e, Status.NOT_FOUND);
 				}
 
 				// Store it in the request context so that it can be retrieved by a request-scoped guice provider

@@ -76,9 +76,8 @@ public class UserResource {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_read);
 		try {
 			return userDao.getByExtIdWithGroups(userExtId, domain);
-		}
-		catch (UserNotFoundException e) {
-			throw new WebApplicationException(Status.NOT_FOUND);
+		} catch (UserNotFoundException e) {
+			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
 	}
 
@@ -88,18 +87,19 @@ public class UserResource {
 	public List<UserIdentifier> listAll() throws SQLException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_read);
 		List<ObmUser> users = userDao.list(domain);
+		return returnListOfUsers(users);
+	}
 
+	private List<UserIdentifier> returnListOfUsers(List<ObmUser> users) {
 		if (users == null) {
 			return Collections.emptyList();
 		}
 
 		return Lists.transform(users, new Function<ObmUser, UserIdentifier>() {
-
 			@Override
 			public UserIdentifier apply(ObmUser user) {
 				return UserIdentifier.builder().id(user.getExtId()).domainUuid(domain.getUuid()).build();
 			}
-
 		});
 	}
 }

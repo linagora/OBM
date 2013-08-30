@@ -80,9 +80,9 @@ public class BatchDaoJdbcImplTest {
 	@Rule
 	public H2InMemoryDatabase db = new H2InMemoryDatabase("sql/initial.sql");
 
-	@Test
+	@Test(expected=BatchNotFoundException.class)
 	public void testGetWhenBatchNotFound() throws Exception {
-		assertThat(dao.get(batchId(123))).isNull();
+		dao.get(batchId(123));
 	}
 
 	@Test

@@ -32,6 +32,7 @@
 package org.obm.provisioning;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -61,5 +62,19 @@ public class ResourceForTest {
 	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
 	public Group create(Group group) {
 		return group;
+	}
+	
+	@GET
+	@Path("serialization/of/runtimeException")
+	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
+	public void throwRuntimeException() {
+		throw new IllegalStateException("foo");
+	}
+	
+	@GET
+	@Path("serialization/of/exception")
+	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
+	public void throwException() throws Exception {
+		throw new Exception("foo");
 	}
 }

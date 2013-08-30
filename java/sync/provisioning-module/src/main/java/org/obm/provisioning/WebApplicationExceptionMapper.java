@@ -37,6 +37,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import com.google.common.base.Throwables;
+
 @Singleton
 @Provider
 public class WebApplicationExceptionMapper implements ExceptionMapper<WebApplicationException> {
@@ -44,7 +46,7 @@ public class WebApplicationExceptionMapper implements ExceptionMapper<WebApplica
 	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public Response toResponse(WebApplicationException exception) {
-		return exception.getResponse();
+		return Response.status(exception.getResponse().getStatus()).entity(Throwables.getRootCause(exception)).type(MediaType.APPLICATION_JSON).build();
 	}
 
 }

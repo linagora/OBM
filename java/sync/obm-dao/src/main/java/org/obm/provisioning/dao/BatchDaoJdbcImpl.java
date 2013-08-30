@@ -44,6 +44,7 @@ import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.utils.ObmHelper;
 
@@ -69,7 +70,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	@Override
-	public Batch get(Batch.Id id) throws DaoException {
+	public Batch get(Batch.Id id) throws DaoException, BatchNotFoundException, DomainNotFoundException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -93,11 +94,11 @@ public class BatchDaoJdbcImpl implements BatchDao {
 			JDBCUtils.cleanup(connection, ps, rs);
 		}
 
-		return null;
+		throw new BatchNotFoundException(id);
 	}
 
 	@Override
-	public Batch create(Batch batch) throws DaoException {
+	public Batch create(Batch batch) throws DaoException, BatchNotFoundException, DomainNotFoundException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -121,7 +122,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	@Override
-	public Batch update(Batch batch) throws DaoException, BatchNotFoundException {
+	public Batch update(Batch batch) throws DaoException, BatchNotFoundException, DomainNotFoundException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 
@@ -191,7 +192,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	@Override
-	public Batch addOperation(Batch.Id batchId, Operation operation) throws DaoException, BatchNotFoundException {
+	public Batch addOperation(Batch.Id batchId, Operation operation) throws DaoException, BatchNotFoundException, DomainNotFoundException {
 		Batch batch = get(batchId);
 
 		if (batch == null) {
@@ -203,7 +204,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 		return get(batch.getId());
 	}
 
-	private Batch batchFromCursor(ResultSet rs) throws DaoException, SQLException {
+	private Batch batchFromCursor(ResultSet rs) throws DaoException, SQLException, DomainNotFoundException {
 		Batch.Id batchId = Batch.Id.builder().id(rs.getInt("id")).build();
 
 		return Batch.builder()

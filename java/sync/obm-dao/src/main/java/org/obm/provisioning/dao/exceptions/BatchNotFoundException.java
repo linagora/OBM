@@ -29,8 +29,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.dao.exceptions;
 
+import org.obm.provisioning.beans.Batch;
+
 public class BatchNotFoundException extends Exception {
 
+	public BatchNotFoundException(Batch.Id id) {
+		super(String.format("The batch with the id %d was not found", id.getId()));
+	}
+	
 	public BatchNotFoundException() {
 		super();
 	}
