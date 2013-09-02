@@ -3116,7 +3116,7 @@ function run_query_quick_attendee_update($params, $event_id) {
   $entities = get_calendar_event_entity($event_id);
   $users = isset($entities['user']) ? $entities['user']['ids'] : array();
   $contacts = isset($entities['contact']) ? $entities['contact']['ids'] : array();
-  $resources = isset($entities['resources']) ? $entities['resources']['ids'] : array();
+  $resources = isset($entities['resource']) ? $entities['resource']['ids'] : array();
   run_query_calendar_reset_occurrence_links($users, $contacts, $resources, $event_id);
 }
 
