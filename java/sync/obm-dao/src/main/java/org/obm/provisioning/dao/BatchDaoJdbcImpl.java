@@ -61,12 +61,14 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	private final DatabaseConnectionProvider dbcp;
 	private final OperationDao operationDao;
 	private final DomainDao domainDao;
+	private final ObmHelper obmHelper;
 
 	@Inject
-	private BatchDaoJdbcImpl(DatabaseConnectionProvider dbcp, OperationDao operationDao, DomainDao domainDao) {
+	private BatchDaoJdbcImpl(DatabaseConnectionProvider dbcp, OperationDao operationDao, DomainDao domainDao, ObmHelper obmHelper) {
 		this.dbcp = dbcp;
 		this.operationDao = operationDao;
 		this.domainDao = domainDao;
+		this.obmHelper = obmHelper;
 	}
 
 	@Override
@@ -111,7 +113,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 			ps.executeUpdate();
 
-			return get(Batch.Id.builder().id(JDBCUtils.lastInsertId(connection)).build());
+			return get(Batch.Id.builder().id(obmHelper.lastInsertId(connection)).build());
 		}
 		catch (SQLException e) {
 			throw new DaoException(e);

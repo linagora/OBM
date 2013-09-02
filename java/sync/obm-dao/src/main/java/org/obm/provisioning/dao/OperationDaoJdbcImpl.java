@@ -58,11 +58,13 @@ import com.google.inject.Singleton;
 @Singleton
 public class OperationDaoJdbcImpl implements OperationDao {
 
-	private DatabaseConnectionProvider dbcp;
+	private final DatabaseConnectionProvider dbcp;
+	private final ObmHelper obmHelper;
 
 	@Inject
-	private OperationDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
+	private OperationDaoJdbcImpl(DatabaseConnectionProvider dbcp, ObmHelper obmHelper) {
 		this.dbcp = dbcp;
+		this.obmHelper = obmHelper;
 	}
 
 	@Override
@@ -140,7 +142,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 
 			ps.executeUpdate();
 
-			int operationId = JDBCUtils.lastInsertId(connection);
+			int operationId = obmHelper.lastInsertId(connection);
 
 			insertOperationParameters(operation, operationId);
 

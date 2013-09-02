@@ -36,10 +36,12 @@ import java.sql.ResultSet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseRule;
 import org.obm.dao.utils.H2TestClass;
+import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
@@ -69,6 +71,7 @@ public class BatchDaoJdbcImplTest implements H2TestClass {
 		protected void configureImpl() {
 			bind(BatchDao.class).to(BatchDaoJdbcImpl.class);
 			bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
+			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 		}
 
 	}

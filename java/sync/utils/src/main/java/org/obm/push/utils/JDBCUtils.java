@@ -66,26 +66,6 @@ public class JDBCUtils {
 		}
 	}
 
-	/**
-	 * PostgreSQL only
-	 * 
-	 * @param con
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int lastInsertId(Connection con) throws SQLException {
-		Statement st = null;
-		ResultSet rs = null;
-		try {
-			st = con.createStatement();
-			rs = st.executeQuery("SELECT lastval()");
-			rs.next();
-			return rs.getInt(1);
-		} finally {
-			cleanup(null, st, rs);
-		}
-	}
-
 	public static final void cleanup(Connection con, Statement ps, ResultSet rs) {
 		Throwable resultSetFailure = closeResultSetThenGetFailure(rs);
 		Throwable statementFailure = closeStatementThenGetFailure(ps);
