@@ -169,6 +169,15 @@ public class PUserDaoJdbcImplTest {
 						"  FROM (SELECT userentity_entity_id " +
 						"                                FROM UserEntity " +
 						"                                WHERE userentity_user_id = 6)");
+		db.executeUpdate(
+				"INSERT INTO of_usergroup (of_usergroup_group_id, of_usergroup_user_id)" +
+				"VALUES" +
+				"	(1, 1)," +
+				"	(1, 2)," +
+				"	(1, 3)," +
+				"	(1, 4)," +
+				"	(1, 5)," +
+				"	(1, 6)");
 	}
 
 	@Test
@@ -185,6 +194,7 @@ public class PUserDaoJdbcImplTest {
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_EntityRight")).isEqualTo(1);
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_CategoryLink")).isEqualTo(1);
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_Field")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_of_usergroup")).isEqualTo(5);
 	}
 
 	@Test

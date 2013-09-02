@@ -273,6 +273,14 @@ public class PUserDaoJdbcImpl implements PUserDao {
 							"                                FROM MailboxEntity " +
 							"                                WHERE mailboxentity_mailbox_id = ?)",
 					user);
+			userQuery(conn,
+					"INSERT INTO P_of_usergroup " +
+							"(   of_usergroup_group_id, " +
+							"    of_usergroup_user_id " +
+							") SELECT    of_usergroup_group_id, " +
+							"            of_usergroup_user_id " +
+							"  FROM of_usergroup " +
+							"  WHERE of_usergroup_user_id=?", user);
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
