@@ -320,6 +320,8 @@ public class PUserDaoJdbcImpl implements PUserDao {
 					user);
 			userQuery(conn,
 					"DELETE FROM P_UserObm WHERE userobm_id=?", user);
+			userQuery(conn,
+					"DELETE FROM P_of_usergroup WHERE of_usergroup_user_id=?", user);
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {

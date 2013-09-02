@@ -352,6 +352,7 @@ public class PUserDaoJdbcImplTest {
 		db.executeUpdate("INSERT INTO P_EntityRight SELECT * FROM EntityRight");
 		db.executeUpdate("INSERT INTO P_CategoryLink SELECT * FROM CategoryLink");
 		db.executeUpdate("INSERT INTO P_Field SELECT * FROM Field");
+		db.executeUpdate("INSERT INTO P_of_usergroup SELECT * FROM of_usergroup");
 
 		dao.delete(obmUser(1, "1"));
 		dao.delete(obmUser(2, "2"));
@@ -366,6 +367,7 @@ public class PUserDaoJdbcImplTest {
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_EntityRight")).isEqualTo(1);
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_CategoryLink")).isEqualTo(1);
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_Field")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_of_usergroup")).isEqualTo(1);
 	}
 	
 	@Test
