@@ -326,6 +326,20 @@ public class PUserDaoJdbcImpl implements PUserDao {
 			JDBCUtils.cleanup(conn, null, null);
 		}
 	}
+	
+	@Override
+	public void archive(ObmUser user) throws DaoException {
+		Connection conn = null;
+
+		try {
+			conn = dbcp.getConnection();
+			userQuery(conn, "UPDATE P_UserObm SET userobm_archive = 1 WHERE userobm_id=?", user);
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(conn, null, null);
+		}
+	}
 
 	private void userQuery(Connection conn, String query, ObmUser user)
 			throws SQLException {

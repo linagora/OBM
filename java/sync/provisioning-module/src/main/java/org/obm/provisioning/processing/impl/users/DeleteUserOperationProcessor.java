@@ -77,12 +77,13 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 		if (expunge == true) {
 			deleteUserInDao(userFromDao);
 			deleteUserMailBoxes(userFromDao);
+			deleteUserFromPTables(userFromDao);
 		}
 		else {
 			archiveUserInDao(userFromDao);
+			archiveUserInPTables(userFromDao);
 		}
 		deleteUserInLdap(userFromDao);
-		deleteUserFromPTables(userFromDao);
 	}
 
 	private void archiveUserInDao(ObmUser user) {
@@ -150,6 +151,14 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 		try {
 			pUserDao.delete(user);
 		} catch (DaoException e) {
+			throw new ProcessingException(e);
+		}
+	}
+	
+	private void archiveUserInPTables(ObmUser user) throws ProcessingException {
+		try {
+			pUserDao.archive(user);
+		} catch (Exception e) {
 			throw new ProcessingException(e);
 		}
 	}

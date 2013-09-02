@@ -336,6 +336,11 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		pUserDao.delete(user);
 		expectLastCall();
 	}
+	
+	private void expectPUserDaoArchive(ObmUser user) throws DaoException {
+		pUserDao.archive(user);
+		expectLastCall();
+	}
 
 	private void expectPUserDaoInsert(ObmUser user) throws DaoException  {
 		pUserDao.insert(user);
@@ -778,7 +783,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
-		expectPUserDaoDelete(user);
+		expectPUserDaoArchive(user);
 		
 		mocksControl.replay();
 

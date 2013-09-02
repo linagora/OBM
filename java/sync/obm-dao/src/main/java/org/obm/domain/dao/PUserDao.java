@@ -37,4 +37,6 @@ public interface PUserDao {
     void insert(ObmUser user) throws DaoException;
 
     void delete(ObmUser user) throws DaoException;
+
+	void archive(ObmUser user) throws DaoException;
 }
