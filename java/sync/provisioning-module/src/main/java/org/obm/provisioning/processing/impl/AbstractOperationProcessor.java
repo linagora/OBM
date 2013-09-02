@@ -79,7 +79,7 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 
 		return ldapService.buildManager(connectionConfig);
 	}
-	
+
 	protected ObmUser getUserFromDao(UserExtId extId, ObmDomain domain) {
 		try {
 			return userDao.getByExtId(extId, domain);
@@ -111,21 +111,35 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 					String.format("Default group with GID %d not found for domain %s.",
 					UserDao.DEFAULT_GID, domain.getName()));
 		}
-		
+
 		return defaultGroup;
 	}
-	
+
+	protected Group getGroupFromDao(Group.Id id) {
+		try {
+			return groupDao.get(id);
+		} catch (Exception e) {
+			throw new ProcessingException(String.format("Cannot fetch existing group with id '%s' from database.", id), e);
+		}
+	}
+
 	protected void addUserToGroupInLdap(ObmDomain domain, Group group, ObmUser userToAdd) {
 		LdapManager ldapManager = buildLdapManager(domain);
 
+		try {
+			addUserToGroupInLdap(ldapManager, domain, group, userToAdd);
+		} finally {
+			ldapManager.shutdown();
+		}
+	}
+
+	protected void addUserToGroupInLdap( LdapManager ldapManager, ObmDomain domain, Group group, ObmUser userToAdd) {
 		try {
 			ldapManager.addUserToGroup(domain, group, userToAdd);
 		} catch (Exception e) {
 			throw new ProcessingException(
 					String.format("Cannot add user with extId '%s' to group with extId '%s' in ldap.",
 							userToAdd.getExtId().getExtId(), group.getExtId()), e);
-		} finally {
-			ldapManager.shutdown();
 		}
 	}
 }

@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.groups;
 
+import java.util.Set;
+
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
@@ -40,6 +42,7 @@ import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.processing.impl.OperationUtils;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -47,7 +50,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
 public class AddUserToGroupOperationProcessor extends AbstractGroupOperationProcessor {
-	
+
 	protected AddUserToGroupOperationProcessor() {
 		super(BatchEntityType.USER_MEMBERSHIP, HttpVerb.PUT);
 	}
@@ -59,11 +62,11 @@ public class AddUserToGroupOperationProcessor extends AbstractGroupOperationProc
 		ObmDomain domain = batch.getDomain();
 		UserExtId userExtId = OperationUtils.getUserExtIdFromRequest(operation);
 		ObmUser userFromDao = getUserFromDao(userExtId, domain);
-		
+
 		addUserToGroupInDao(domain, groupExtId, userFromDao);
 		Group groupFromDao = getGroupFromDao(groupExtId, domain);
-		addUserToGroupInLdap(domain, groupFromDao, userFromDao);
 		updateGroupInPTables(groupFromDao);
+		addUserToAllParentGroupsInLdap(domain, groupExtId, userFromDao);
 	}
 
 	private void addUserToGroupInDao(ObmDomain domain, GroupExtId groupExtId, ObmUser userFromDao) {
@@ -75,13 +78,34 @@ public class AddUserToGroupOperationProcessor extends AbstractGroupOperationProc
 							userFromDao.getExtId().getExtId(), groupExtId.getId()), e);
 		}
 	}
-	
+
 	private void updateGroupInPTables(Group group) {
 		try {
 			pGroupDao.delete(group);
 			pGroupDao.insert(group);
 		} catch (DaoException e) {
 			throw new ProcessingException(e);
+		}
+	}
+
+	private void addUserToAllParentGroupsInLdap(ObmDomain domain, GroupExtId groupExtId, ObmUser userFromDao){
+		Set<Group.Id> groupsId = null;
+
+		try {
+			groupsId = groupDao.listParents(domain, groupExtId);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot get hierarchy of group with extId '%s' in database.", groupExtId.getId()), e);
+		}
+
+		LdapManager ldapManager = buildLdapManager(domain);
+
+		try {
+			for (Group.Id id : groupsId) {
+				addUserToGroupInLdap(ldapManager, domain, getGroupFromDao(id), userFromDao);
+			}
+		} finally {
+			ldapManager.shutdown();
 		}
 	}
 }

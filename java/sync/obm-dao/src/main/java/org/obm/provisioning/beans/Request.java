@@ -36,24 +36,24 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
 public class Request {
-	
+
 	public final static String USERS_ID_KEY = "userId";
 	public final static String GROUPS_ID_KEY = "groupId";
 	public final static String SUBGROUPS_ID_KEY = "subgroupId";
 	public final static String BATCHS_ID_KEY = "batchId";
 	public final static String EXPUNGE_KEY = "expunge";
-	
+
 	public static Builder builder() {
 		return new Builder();
 	}
-	
+
 	public static class Builder {
-		
+
 		private String resourcePath;
 		private HttpVerb verb;
 		private ImmutableMap.Builder<String, String> params;
 		private String body;
-		
+
 		private Builder() {
 			this.params = ImmutableMap.builder();
 		}
@@ -62,35 +62,35 @@ public class Request {
 			this.resourcePath = resourcePath;
 			return this;
 		}
-		
+
 		public Builder params(Map<String, String> params) {
 			this.params.putAll(params);
 			return this;
 		}
-		
+
 		public Builder param(String key, String value) {
 			this.params.put(key, value);
 			return this;
 		}
-		
+
 		public Builder verb(HttpVerb verb) {
 			this.verb = verb;
 			return this;
 		}
-		
+
 		public Builder body(String body) {
 			this.body = body;
 			return this;
 		}
-		
+
 		public Request build() {
 			Preconditions.checkState(resourcePath != null, "'resourcePath' should be set");
 			Preconditions.checkState(verb != null, "'verb' should be set");
-			
+
 			return new Request(resourcePath, verb, params.build(), body);
 		}
 	}
-	
+
 	private String resourcePath;
 	private HttpVerb verb;
 	private Map<String, String> params;
@@ -128,13 +128,13 @@ public class Request {
 	public boolean equals(Object obj) {
 		if (obj instanceof Request) {
 			Request other = (Request) obj;
-			
+
 			return Objects.equal(resourcePath, other.resourcePath)
 					&& Objects.equal(verb, other.verb)
 					&& Objects.equal(body, other.body)
 					&& Objects.equal(params, other.params);
 		}
-		
+
 		return false;
 	}
 
