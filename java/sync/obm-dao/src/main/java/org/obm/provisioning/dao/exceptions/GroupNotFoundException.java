@@ -32,6 +32,7 @@
 
 package org.obm.provisioning.dao.exceptions;
 
+import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 
 public class GroupNotFoundException extends Exception {
@@ -41,6 +42,10 @@ public class GroupNotFoundException extends Exception {
     public GroupNotFoundException(GroupExtId extId) {
         super("The Group " + extId + " was not found");
         this.extId = extId;
+    }
+
+    public GroupNotFoundException(Group.Id id) {
+        super("The Group " + id + " was not found");
     }
 
     public GroupExtId getExtId() {

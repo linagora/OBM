@@ -44,6 +44,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.Group.Builder;
+import org.obm.provisioning.Group.Id;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupExistsException;
@@ -149,6 +150,34 @@ public class GroupDaoJdbcImpl implements GroupDao {
         } finally {
             JDBCUtils.cleanup(conn, null, null);
         }
+    }
+
+	@Override
+    public Group get(Group.Id id) throws DaoException, GroupNotFoundException {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String query = "SELECT " + FIELDS + " FROM UGroup WHERE group_id = ?";
+
+		try {
+			conn = obmHelper.getConnection();
+			ps = conn.prepareStatement(query);
+
+			ps.setInt(1, id.getId());
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return groupBuilderFromCursor(rs).build();
+			}
+		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
+		finally {
+			obmHelper.cleanup(conn, ps, rs);
+		}
+
+		throw new GroupNotFoundException(id);
     }
 
     @Override
@@ -742,14 +771,30 @@ public class GroupDaoJdbcImpl implements GroupDao {
     }
 
 	private void updateGroupMappingsHierarchy(Connection con, Group.Id groupId) throws SQLException {
-		Set<Group.Id> parentGroupIds = getAllParentGroupIdsOfGroup(con, groupId);
+		Set<Group.Id> alreadyAddedGroups = Sets.newHashSet();
+		Set<Group.Id> parentGroupIds = getAllParentGroupIdsOfGroup(con, groupId, alreadyAddedGroups);
 
 		for (Group.Id id : parentGroupIds) {
 			updateGroupMappings(con, id);
 		}
 	}
+	@Override
+	public Set<Group.Id> listParents(ObmDomain domain, GroupExtId groupId) throws DaoException, GroupNotFoundException {
+		Connection con = null;
+		Set<Group.Id> alreadyAddedGroups = Sets.newHashSet();
 
-	private Set<Group.Id> getAllParentGroupIdsOfGroup(Connection con, Group.Id groupId) throws SQLException {
+        try {
+            con = obmHelper.getConnection();
+
+            return getAllParentGroupIdsOfGroup(con, getInternalGroupId(con, domain, groupId), alreadyAddedGroups);
+        } catch (SQLException e) {
+            throw new DaoException(e);
+        } finally {
+            obmHelper.cleanup(con, null, null);
+        }
+}
+
+	private Set<Group.Id> getAllParentGroupIdsOfGroup(Connection con, Group.Id groupId, Set<Group.Id> alreadyAddedGroups) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		ImmutableSet.Builder<Group.Id> groups = ImmutableSet.builder();
@@ -763,10 +808,16 @@ public class GroupDaoJdbcImpl implements GroupDao {
 			rs = ps.executeQuery();
 
 			while (rs.next()) {
-				groups.addAll(getAllParentGroupIdsOfGroup(con, Group.Id.valueOf(rs.getInt("groupgroup_parent_id"))));
+				Id groupIdFromDao = Group.Id.valueOf(rs.getInt("groupgroup_parent_id"));
+
+				if (alreadyAddedGroups.contains(groupIdFromDao)){
+					return groups.build();
+				}
+
+				alreadyAddedGroups.add(groupIdFromDao);
+				groups.addAll(getAllParentGroupIdsOfGroup(con, groupIdFromDao, alreadyAddedGroups));
 			}
-		}
-		finally {
+		} finally {
 			JDBCUtils.cleanup(null, ps, rs);
 		}
 

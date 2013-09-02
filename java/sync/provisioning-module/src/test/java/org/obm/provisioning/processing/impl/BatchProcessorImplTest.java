@@ -87,6 +87,7 @@ import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 import org.obm.utils.ObmHelper;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.util.Modules;
@@ -151,7 +152,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 			.login("obmsatelliterequest")
 			.password("secret")
 			.build();
-	
+
 	private final ObmSystemUser obmCyrusUser = ObmSystemUser
 			.builder()
 			.id(2)
@@ -271,7 +272,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.domain(domain)
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
-		
+
 		final ObmUser user = ObmUser
 				.builder()
 				.login("user1")
@@ -304,7 +305,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectSetDefaultRights(userFromDao);
 		expectLdapCreateUser(userFromDao, usersGroup);
 		expectCyrusCreateMailbox(userFromDao);
-		
+
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
@@ -314,7 +315,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.timecommit(date)
 				.build())).andReturn(null);
 		expectPUserDaoInsert(userFromDao);
-		
+
 		mocksControl.replay();
 
 		createBatchWithOneUserAndCommit();
@@ -551,7 +552,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
             .auth().basic("username@domain", "password")
             .put("/batches/1");
 	}
-	
+
 	private void createBatchWithOneUserPatchAndCommit() {
 		given()
 			.auth().basic("username@domain", "password")
@@ -621,7 +622,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ldapManager.shutdown();
 		expectLastCall();
 	}
-	
+
 	private void expectLdapModifyGroup(Group group, Group oldGroup) {
 		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.modifyGroup(domain, group, oldGroup);
@@ -629,7 +630,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ldapManager.shutdown();
 		expectLastCall();
 	}
-	
+
 	private void expectLdapAddUserToGroup(Group group, ObmUser userToAdd) {
 		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.addUserToGroup(userToAdd.getDomain(), group, userToAdd);
@@ -637,15 +638,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ldapManager.shutdown();
 		expectLastCall();
 	}
-	
-	private void expectLdapDeleteUserFromGroup(Group group, ObmUser userToAdd) {
-		LdapManager ldapManager = expectLdapBuild();
-		ldapManager.removeUserFromGroup(domain, group, userToAdd);
-		expectLastCall();
-		ldapManager.shutdown();
-		expectLastCall();
-	}
-	
+
 	private void expectLdapAddGroupToGroup(Group group, Group subgroup) {
 		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.addSubgroupToGroup(domain, group, subgroup);
@@ -653,7 +646,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		ldapManager.shutdown();
 		expectLastCall();
 	}
-	
+
 	private void expectLdapRemoveGroupFromGroup(Group group, Group subgroup) {
 		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.removeSubgroupFromGroup(domain, group, subgroup);
@@ -668,7 +661,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(ldapService.buildManager(isA(LdapConnectionConfig.class))).andReturn(ldapManager);
 		return ldapManager;
 	}
-	
+
 	@Test
 	public void testCreateUserWithNoEmail() throws Exception {
 		Operation.Builder opBuilder = Operation
@@ -737,7 +730,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testProcessDeleteUserWithFalseExpunge() throws SQLException, DaoException, BatchNotFoundException, UserNotFoundException, DomainNotFoundException {
 		Operation.Builder opBuilder = Operation
@@ -791,7 +784,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testProcessDeleteUserWithTrueExpunge()
 			throws SQLException, DaoException, BatchNotFoundException, UserNotFoundException, IMAPException, DomainNotFoundException {
@@ -935,7 +928,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.domain(domainWithImapAndLdap)
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
-		
+
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
@@ -981,14 +974,14 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
-		
+
 		mocksControl.replay();
 
 		createBatchWithOneUserUpdateAndCommit();
 
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testProcessModifyUserCannotChangeLogin() throws Exception {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
@@ -1138,7 +1131,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.domain(domain)
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
-		
+
 		ObmUser.Builder builder = ObmUser.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
@@ -1149,11 +1142,11 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domain)
 				.mailHost(ObmHost.builder().name("host").ip("127.0.0.1").build());
-		
+
 		ObmUser user = builder
 				.lastName("user1")
 				.build();
-		
+
 		ObmUser userFromDao = builder.build();
 
 		expectDomain();
@@ -1175,14 +1168,14 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
-		
+
 		mocksControl.replay();
 
 		createBatchWithOneUserPatchAndCommit();
 
 		mocksControl.verify();
 	}
-	
+
 	private void expectDeleteUserMailbox(final ObmUser user) throws DaoException, IMAPException {
 		CyrusManager cyrusManager = expectCyrusBuild();
 		cyrusManager.setAcl(user, "cyrus", Acl.builder().user("user1").rights("lc").build());
@@ -1208,7 +1201,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(cyrusService.buildManager("127.0.0.1", "cyrus", "secret")).andReturn(cyrusManager);
 		return cyrusManager;
 	}
-	
+
 	@Test
 	public void testProcessDeleteGroup() throws DaoException, BatchNotFoundException, GroupNotFoundException, DomainNotFoundException {
 		Operation.Builder opBuilder = Operation
@@ -1229,7 +1222,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
-		
+
 		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
 		final Group groupFromDao = Group.builder()
 										.name("group1")
@@ -1250,14 +1243,14 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
-		
+
 		mocksControl.replay();
 
 		processor.process(batchBuilder.build());
 
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testProcessModifyGroup() throws DaoException, BatchNotFoundException, GroupNotFoundException, DomainNotFoundException {
 		Operation.Builder opBuilder = Operation
@@ -1284,7 +1277,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
-		
+
 		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
 		final Group groupFromDao = Group.builder()
 										.name("group1")
@@ -1370,7 +1363,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
-		
+
 		mocksControl.replay();
 
 		processor.process(batchBuilder.build());
@@ -1455,7 +1448,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
-		
+
 		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
 		final Group groupFromDao = Group.builder()
 										.name("group1")
@@ -1486,14 +1479,14 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
-		
+
 		mocksControl.replay();
 
 		processor.process(batchBuilder.build());
 
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testProcessAddUserToGroup()
 			throws DaoException, BatchNotFoundException, GroupNotFoundException, UserNotFoundException, SQLException, DomainNotFoundException {
@@ -1516,7 +1509,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
-		
+
 		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
 		final Group groupFromDao = Group.builder()
 										.name("group1")
@@ -1533,9 +1526,10 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		groupDao.addUser(domain, extId, userFromDao);
 		expectLastCall();
 		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
-		expectLdapAddUserToGroup(groupFromDao, userFromDao);
+		expectLdapAddUserToAllParentsOfGroup(groupFromDao, userFromDao);
 		expectPGroupDaoDelete(groupFromDao);
 		expectPGroupDaoInsert(groupFromDao);
+		
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
@@ -1544,14 +1538,40 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
-		
+
 		mocksControl.replay();
 
 		processor.process(batchBuilder.build());
 
 		mocksControl.verify();
 	}
-	
+
+	private void expectLdapAddUserToAllParentsOfGroup(Group group, ObmUser userToAdd) throws DaoException, GroupNotFoundException {
+		ImmutableSet<Group.Id> groupIds = ImmutableSet.of(Group.Id.valueOf(1), Group.Id.valueOf(2));
+
+		expect(groupDao.listParents(domain, group.getExtId())).andReturn(groupIds);
+		LdapManager ldapManager = expectLdapBuild();
+
+		 Group group1 = Group.builder()
+					.uid(Group.Id.valueOf(1))
+					.build();
+
+		 Group group2 = Group.builder()
+					.uid(Group.Id.valueOf(2))
+					.build();
+
+		expect(groupDao.get(Group.Id.valueOf(1))).andReturn(group1);
+		expect(groupDao.get(Group.Id.valueOf(2))).andReturn(group2);
+
+		ldapManager.addUserToGroup(domain, group1, userToAdd);
+		expectLastCall();
+		ldapManager.addUserToGroup(domain, group2, userToAdd);
+		expectLastCall();
+
+		ldapManager.shutdown();
+		expectLastCall();
+	}
+
 	@Test
 	public void testProcessDeleteUserFromGroup()
 			throws DaoException, BatchNotFoundException, GroupNotFoundException, UserNotFoundException, SQLException, DomainNotFoundException {
@@ -1574,7 +1594,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
-		
+
 		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
 		final Group groupFromDao = Group.builder()
 										.name("group1")
@@ -1590,8 +1610,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domain)).andReturn(userFromDao);
 		groupDao.removeUser(domain, extId, userFromDao);
 		expectLastCall();
-		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
-		expectLdapDeleteUserFromGroup(groupFromDao, userFromDao);
+		expectLdapDeleteUserFromAllParentGroup(groupFromDao, userFromDao);
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder
 						.status(BatchStatus.SUCCESS)
@@ -1600,14 +1619,40 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
-		
+
 		mocksControl.replay();
 
 		processor.process(batchBuilder.build());
 
 		mocksControl.verify();
 	}
-	
+
+	private void expectLdapDeleteUserFromAllParentGroup(Group group, ObmUser userToDelete) throws GroupNotFoundException, DaoException {
+		ImmutableSet<Group.Id> groupIds = ImmutableSet.of(Group.Id.valueOf(1), Group.Id.valueOf(2));
+
+		expect(groupDao.listParents(domain, group.getExtId())).andReturn(groupIds);
+		LdapManager ldapManager = expectLdapBuild();
+
+		 Group group1 = Group.builder()
+					.uid(Group.Id.valueOf(1))
+					.build();
+
+		 Group group2 = Group.builder()
+					.uid(Group.Id.valueOf(2))
+					.build();
+
+		expect(groupDao.get(Group.Id.valueOf(1))).andReturn(group1);
+		expect(groupDao.get(Group.Id.valueOf(2))).andReturn(group2);
+
+		ldapManager.removeUserFromGroup(domain, group1, userToDelete);
+		expectLastCall();
+		ldapManager.removeUserFromGroup(domain, group2, userToDelete);
+		expectLastCall();
+
+		ldapManager.shutdown();
+		expectLastCall();
+	}
+
 	@Test
 	public void testProcessAddGroupToGroup()
 			throws DaoException, BatchNotFoundException, GroupNotFoundException, GroupRecursionException, DomainNotFoundException {
@@ -1630,7 +1675,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
-		
+
 		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
 		final Group groupFromDao = Group.builder()
 										.name("group1")
@@ -1656,14 +1701,14 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
-		
+
 		mocksControl.replay();
 
 		processor.process(batchBuilder.build());
 
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testProcessRemoveGroupFromGroup()
 			throws DaoException, BatchNotFoundException, GroupNotFoundException, DomainNotFoundException {
@@ -1686,7 +1731,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
-		
+
 		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
 		final Group groupFromDao = Group.builder()
 										.name("group1")
@@ -1712,7 +1757,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.status(BatchStatus.SUCCESS)
 				.timecommit(date)
 				.build())).andReturn(null);
-		
+
 		mocksControl.replay();
 
 		processor.process(batchBuilder.build());

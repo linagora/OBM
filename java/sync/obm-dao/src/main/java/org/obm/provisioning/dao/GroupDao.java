@@ -36,6 +36,7 @@ import java.sql.SQLException;
 import java.util.Set;
 
 import org.obm.provisioning.Group;
+import org.obm.provisioning.Group.Id;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.GroupExistsException;
@@ -59,6 +60,7 @@ public interface GroupDao {
      * @throws DaoException             If an exception occurred retrieving the data.
      */
     Group get(ObmDomain domain, GroupExtId extId) throws GroupNotFoundException, DaoException;
+    Group get(Id id) throws GroupNotFoundException, DaoException;
 
     /**
      * Recursively get group information and members.
@@ -159,4 +161,17 @@ public interface GroupDao {
     Set<Group> listPublicGroups(ObmDomain domain) throws DaoException;
 
     Set<Group> getAllGroupsForUserExtId(ObmDomain domain, UserExtId userExtId) throws SQLException;
+
+    /**
+     * Recursively get parent group id of group
+     *
+     * @param domain						The domain of the group.
+     * @param extId				 			The external id of the group.
+     * @return                         			Set of parent Group Id
+     * @throws DaoException             				If any dao error occurs
+     * @throws GroupNotFoundException		If group id doesn't exist
+     *
+     */
+    Set<Id> listParents(ObmDomain domain, GroupExtId groupId) throws DaoException, GroupNotFoundException;
+
 }

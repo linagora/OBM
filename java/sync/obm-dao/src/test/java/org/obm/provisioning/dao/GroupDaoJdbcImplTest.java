@@ -164,12 +164,57 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
         dao.get(domain1, GroupExtId.valueOf("1234"));
     }
 
+    @Test(expected = GroupNotFoundException.class)
+    public void testGetByIdNonExistantGroup() throws Exception {
+        dao.get(Group.Id.valueOf(666));
+    }
+
+    @Test
+    public void testGetById() throws Exception {
+    	Group group = Group.builder()
+    				.uid(Group.Id.valueOf(21))
+    				.gid(1000)
+    				.name("Utilisateurs")
+    				.extId(GroupExtId.valueOf("users"))
+    				.build();
+
+    	assertThat(dao.get(Group.Id.valueOf(21))).isEqualTo(group);
+    }
+
     @Test
     public void testExistingGroup() throws Exception {
         Group group = dao.get(domain1, GroupExtId.valueOf("existing-nousers-nosubgroups"));
         testGroupBase("existing-nousers-nosubgroups", group);
         assertThat(group.getUsers()).isEmpty();
         assertThat(group.getSubgroups()).isEmpty();
+    }
+
+    @Test
+    public void testGetGroupWithoutParent() throws Exception {
+        Group group = dao.get(domain1, GroupExtId.valueOf("existing-nousers-nosubgroups"));
+        Set <Group.Id> ids = dao.listParents(domain1, group.getExtId());
+
+        assertThat(ids).containsExactly(group.getUid());
+    }
+
+    @Test
+    public void testListGroupWithParents() throws Exception {
+    	Group group1 = dao.get(domain1, GroupExtId.valueOf("r-multichild-parent"));
+        Group group2 = dao.get(domain1, GroupExtId.valueOf("r-multichild-child1"));
+
+        Set <Group.Id> ids = dao.listParents(domain1, group2.getExtId());
+
+        assertThat(ids).containsExactly(group1.getUid(), group2.getUid());
+    }
+
+    @Test
+    public void testListCyclicGroups() throws Exception {
+    	Group group1 = dao.get(domain1, GroupExtId.valueOf("r-direct-parent"));
+        Group group2 = dao.get(domain1, GroupExtId.valueOf("r-direct-child1"));
+
+        Set <Group.Id> ids = dao.listParents(domain1, group2.getExtId());
+
+        assertThat(ids).containsExactly(group1.getUid(), group2.getUid());
     }
 
     @Test(expected = GroupNotFoundException.class)
@@ -626,7 +671,7 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
 
 		assertThat(groups).isEqualTo(expectedGroups);
 	}
-	
+
 	@Test
 	public void testGetAllGroupsForUserExtId() throws Exception {
 		Group group1 = dao.create(user1.getDomain(),
