@@ -329,7 +329,7 @@ public class UserDaoJdbcImpl implements UserDao {
 		Builder builder = ObmUser.builder()
 				.uid(rs.getInt(1))
 				.login(rs.getString("userobm_login"))
-				.emailAndAliases(rs.getString(2))
+				.emailAndAliases(nullToEmpty(rs.getString(2)))
 				.domain(domain)
 				.firstName(emptyToNull(rs.getString("userobm_firstname")))
 				.lastName(emptyToNull(rs.getString("userobm_lastname")))
