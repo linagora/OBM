@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.groups;
 
+import java.util.Set;
+
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
@@ -57,11 +59,11 @@ public class DeleteUserFromGroupOperationProcessor extends AbstractGroupOperatio
 		ObmDomain domain = batch.getDomain();
 		GroupExtId groupExtid = getGroupExtIdFromRequest(operation);
 		ObmUser userToDelete = getUserFromDao(OperationUtils.getUserExtIdFromRequest(operation), domain);
-		
+
 		deleteUserFromGroupInDao(domain, groupExtid, userToDelete);
-		deleteUserFromGroupInLdap(domain, groupExtid, userToDelete);
+		deleteUserFromAllParentGroupsInLdap(domain, groupExtid, userToDelete);
 	}
-	
+
 	private void deleteUserFromGroupInDao(ObmDomain domain, GroupExtId groupExtId, ObmUser userToDelete) {
 		try {
 			groupDao.removeUser(domain, groupExtId, userToDelete);
@@ -72,16 +74,22 @@ public class DeleteUserFromGroupOperationProcessor extends AbstractGroupOperatio
 		}
 	}
 
-	private void deleteUserFromGroupInLdap(ObmDomain domain, GroupExtId groupExtId, ObmUser userToDelete) {
-		LdapManager ldapManager = buildLdapManager(domain);
-		Group group = getGroupFromDao(groupExtId, domain);
-		
+	private void deleteUserFromAllParentGroupsInLdap(ObmDomain domain, GroupExtId groupExtId, ObmUser userToDelete){
+		Set<Group.Id> groupsId = null;
+
 		try {
-			ldapManager.removeUserFromGroup(domain, group, userToDelete);
+			groupsId = groupDao.listParents(domain, groupExtId);
 		} catch (Exception e) {
 			throw new ProcessingException(
-					String.format("Cannot delete user with extId '%s' from group with extId '%s' in ldap.",
-							userToDelete.getExtId().getExtId(), groupExtId.getId()), e);
+					String.format("Cannot get hierarchy of group with extId '%s' in database.", groupExtId.getId()), e);
+		}
+
+		LdapManager ldapManager = buildLdapManager(domain);
+
+		try {
+			for (Group.Id id : groupsId) {
+				deleteUserFromGroupInLdap(ldapManager, domain, getGroupFromDao(id), userToDelete);
+			}
 		} finally {
 			ldapManager.shutdown();
 		}

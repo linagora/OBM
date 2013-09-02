@@ -142,4 +142,14 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 							userToAdd.getExtId().getExtId(), group.getExtId()), e);
 		}
 	}
+
+	protected void deleteUserFromGroupInLdap(LdapManager ldapManager,ObmDomain domain, Group group, ObmUser userToDelete) {
+		try {
+			ldapManager.removeUserFromGroup(domain, group, userToDelete);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot delete user with extId '%s' from group with extId '%s' in ldap.",
+							userToDelete.getExtId().getExtId(), group.getGid()), e);
+		}
+	}
 }
