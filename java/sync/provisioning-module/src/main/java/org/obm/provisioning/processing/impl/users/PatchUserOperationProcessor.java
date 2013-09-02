@@ -70,6 +70,7 @@ public class PatchUserOperationProcessor extends ModifyUserOperationProcessor {
 		}
 
 		modifyUserInLdap(newUser, oldUser);
+		updateUserInPTables(newUser);
 	}
 	
 	private ObmUser getUserFromRequestBody(Operation operation, ObmUser oldUser) {

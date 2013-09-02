@@ -1106,6 +1106,8 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		CyrusManager cyrusManager = expectCyrusBuild();
 		expectApplyQuota(cyrusManager, userFromDao);
 		expectCyrusShutDown(cyrusManager);
+		expectPUserDaoDelete(userFromDao);
+		expectPUserDaoInsert(userFromDao);
 		
 		expect(batchDao.update(batchBuilder
 				.operation(opBuilder

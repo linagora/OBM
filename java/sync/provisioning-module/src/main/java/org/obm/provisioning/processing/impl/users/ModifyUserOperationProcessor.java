@@ -123,7 +123,7 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
-	private void updateUserInPTables(ObmUser user) throws ProcessingException {
+	protected void updateUserInPTables(ObmUser user) throws ProcessingException {
 		try {
 			pUserDao.delete(user);
 			pUserDao.insert(user);
