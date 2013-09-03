@@ -371,6 +371,12 @@ public class MimeMessageTest {
 		assertThat(actual).isSameAs(inputStream);
 	}
 
+	@Test
+	public void testGetAttachmentExtension() {
+		MimeMessage mimePart = MimeMessageImpl.builder().from(MimePartImpl.builder().contentType("text/plain").encoding(null).build()).build();
+		assertThat(mimePart.getAttachmentExtension()).isNull();
+	}
+	
 	private MimePart buildMimePart(String contentType) {
 		return MimePartImpl.builder().contentType(contentType).build();
 	}

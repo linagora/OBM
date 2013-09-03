@@ -91,6 +91,8 @@ public interface MimePart {
 
 	boolean isAttachment();
 
+	String getAttachmentExtension();
+
 	boolean isNested();
 	
 	MimePart getInvitation();
