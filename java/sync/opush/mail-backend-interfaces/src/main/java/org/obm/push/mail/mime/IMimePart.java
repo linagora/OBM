@@ -91,6 +91,8 @@ public interface IMimePart {
 
 	boolean isAttachment();
 
+	String getAttachmentExtension();
+
 	boolean isNested();
 	
 	IMimePart getInvitation();
@@ -123,5 +125,4 @@ public interface IMimePart {
 	String getContentLocation();
 
 	boolean isInline();
-
 }

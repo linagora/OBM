@@ -272,6 +272,11 @@ public class MimePart extends AbstractMimePart implements IMimePart {
 				&& contentTypeIsAttachment());
 	}
 
+	@Override
+	public String getAttachmentExtension() {
+		return AttachmentExtensionMapper.extensionFromContentType(getContentType());
+	}
+
 	private boolean contentTypeIsAttachment() {
 		if (parent != null) {
 			if (!parent.getFullMimeType().equalsIgnoreCase("multipart/alternative")) {

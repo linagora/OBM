@@ -38,11 +38,6 @@ import java.io.InputStream;
 
 import org.fest.assertions.api.Assertions;
 import org.junit.Test;
-import org.obm.push.mail.mime.BodyParam;
-import org.obm.push.mail.mime.ContentType;
-import org.obm.push.mail.mime.IMimePart;
-import org.obm.push.mail.mime.MimeMessage;
-import org.obm.push.mail.mime.MimePart;
 
 public class MimeMessageTest {
 
@@ -376,6 +371,12 @@ public class MimeMessageTest {
 		assertThat(actual).isSameAs(inputStream);
 	}
 
+	@Test
+	public void testGetAttachmentExtension() {
+		MimeMessage mimePart = MimeMessage.builder().from(MimePart.builder().contentType("text/plain").encoding(null).build()).build();
+		assertThat(mimePart.getAttachmentExtension()).isNull();
+	}
+	
 	private MimePart buildMimePart(String contentType) {
 		return MimePart.builder().contentType(contentType).build();
 	}

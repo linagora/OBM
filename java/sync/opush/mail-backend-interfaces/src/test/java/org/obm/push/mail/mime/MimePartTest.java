@@ -39,7 +39,6 @@ import java.io.InputStream;
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.junit.Test;
-import org.obm.push.mail.mime.MimePart;
 
 
 public class MimePartTest {
@@ -93,5 +92,9 @@ public class MimePartTest {
 		assertThat(actual).isSameAs(inputStream);
 	}
 	
-	
+	@Test
+	public void testGetAttachmentExtension() {
+		MimePart mimePart = MimePart.builder().contentType("image/jpeg").encoding(null).build();
+		assertThat(mimePart.getAttachmentExtension()).isEqualTo(".jpg");
+	}
 }

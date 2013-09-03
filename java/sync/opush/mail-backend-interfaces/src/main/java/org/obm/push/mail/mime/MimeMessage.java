@@ -236,6 +236,11 @@ public class MimeMessage implements IMimePart {
 	public boolean isAttachment() {
 		return false;
 	}
+
+	@Override
+	public String getAttachmentExtension() {
+		return null;
+	}
 	
 	@Override
 	public List<IMimePart> getSibling() {
