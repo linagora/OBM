@@ -34,6 +34,7 @@ package org.obm.provisioning.ldap.client;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.apache.directory.api.ldap.model.entry.Attribute;
+import org.apache.directory.api.ldap.model.exception.LdapInvalidDnException;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.api.ldap.model.schema.AttributeType;
@@ -522,6 +523,43 @@ public class ConnectionImplTest {
 	}
 	
 	@Test
+	public void testAddGroupWithNoMembersToGroup() throws LdapInvalidDnException, org.apache.directory.api.ldap.model.exception.LdapException {
+		
+		LdapGroup group = groupBuilderProvider.get()
+				.objectClasses(new String[] {"posixGroup", "obmGroup"})
+				.cn(LdapGroup.Cn.valueOf("group1"))
+				.gidNumber(1001)
+				.mailAccess("PERMIT")
+				.mail("group1@test.obm.org")
+				.domain(ldapDomain)
+				.build();
+		connection.createGroup(group);
+		LdapGroup.Cn groupCn = group.getCn();
+		
+		LdapGroup toGroup = groupBuilderProvider.get()
+				.objectClasses(new String[] {"posixGroup", "obmGroup"})
+				.cn(LdapGroup.Cn.valueOf("toGroup"))
+				.gidNumber(1001)
+				.mailAccess("PERMIT")
+				.mail("toGroup@test.obm.org")
+				.domain(ldapDomain)
+				.build();
+		connection.createGroup(toGroup);
+		LdapGroup.Cn toGroupCn = toGroup.getCn();
+		
+		connection.addGroupToGroup(groupCn, toGroupCn, ldapDomain);
+		
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
+				"(cn=group1)", SearchScope.ONELEVEL);
+		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
+		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
+		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
+		assertThat(entry.get(new AttributeType("mail")).getString()).isEqualTo("group1@test.obm.org");
+		assertThat(entry.get(new AttributeType("obmdomain")).getString()).isEqualTo("test.obm.org");
+		assertThat(entry.get(new AttributeType("member"))).isNull();		
+	}
+	
+	@Test
 	public void testAddGroupToGroup() throws Exception {
 		
 		LdapUserMembership userMembership = groupMemberShipProvider.get()
@@ -678,6 +716,53 @@ public class ConnectionImplTest {
 		assertThat(entry.get(new AttributeType("obmdomain")).getString()).isEqualTo("test.obm.org");
 		assertThat(entry.get(new AttributeType("member")).contains("uid=test,ou=users,dc=test.obm.org,dc=local",
 				"uid=test2,ou=users,dc=test.obm.org,dc=local")).isTrue();
+	}
+	
+	@Test
+	public void testAddGroupsWithoutMembersToGroup() throws Exception {
+		
+		LdapGroup group = groupBuilderProvider.get()
+				.objectClasses(new String[] {"posixGroup", "obmGroup"})
+				.cn(LdapGroup.Cn.valueOf("group1"))
+				.gidNumber(1001)
+				.mailAccess("PERMIT")
+				.mail("group1@test.obm.org")
+				.domain(ldapDomain)
+				.build();
+		connection.createGroup(group);
+		LdapGroup.Cn groupCn = group.getCn();
+		
+		LdapGroup group2 = groupBuilderProvider.get()
+				.objectClasses(new String[] {"posixGroup", "obmGroup"})
+				.cn(LdapGroup.Cn.valueOf("group2"))
+				.gidNumber(1001)
+				.mailAccess("PERMIT")
+				.mail("group2@test.obm.org")
+				.domain(ldapDomain)
+				.build();
+		connection.createGroup(group2);
+		LdapGroup.Cn groupCn2 = group2.getCn();
+		
+		LdapGroup toGroup = groupBuilderProvider.get()
+				.objectClasses(new String[] {"posixGroup", "obmGroup"})
+				.cn(LdapGroup.Cn.valueOf("subgroup"))
+				.gidNumber(1001)
+				.mailAccess("PERMIT")
+				.mail("subgroup@test.obm.org")
+				.domain(ldapDomain)
+				.build();
+		connection.createGroup(toGroup);
+		LdapGroup.Cn toGroupCn = toGroup.getCn();
+		
+		connection.addGroupsToGroup(ImmutableList.of(groupCn, groupCn2), toGroupCn, ldapDomain);
+		
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
+				"(cn=subgroup)", SearchScope.ONELEVEL);
+		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("subgroup");
+		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
+		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
+		assertThat(entry.get(new AttributeType("mail")).getString()).isEqualTo("subgroup@test.obm.org");
+		assertThat(entry.get(new AttributeType("obmdomain")).getString()).isEqualTo("test.obm.org");
 	}
 	
 	@Test

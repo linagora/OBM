@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.directory.api.ldap.model.constants.SchemaConstants;
 import org.apache.directory.api.ldap.model.cursor.Cursor;
+import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.entry.Modification;
@@ -302,15 +303,26 @@ public class ConnectionImpl implements Connection {
 	private void modifyGroupByGroup(Entry entry, Entry byEntry, ModificationOperation modificationOperation) throws LdapException {
 		List<Modification> modifications = memberModificationsFromEntry(byEntry, modificationOperation);
 		
+		if (modifications.isEmpty()) {
+			return;
+		}
+		
 		connection.modify(entry.getDn(), modifications.toArray(new Modification[] {}));
 		incrementAndCheckRequestCounter();
 	}
 
 	private List<Modification> memberModificationsFromEntry(Entry entry, ModificationOperation modificationOperation) {
 		List<Modification> modifications = Lists.newArrayList();
-		for (Value<?> value : entry.get(new AttributeType("member"))) {
+		final Attribute entries = entry.get(new AttributeType("member"));
+		
+		if (entries == null) {
+			return modifications;
+		}
+		
+		for (Value<?> value : entries) {
 			modifications.add(new DefaultModification(modificationOperation, "member", value));
 		}
+		
 		return modifications;
 	}
 	
@@ -340,8 +352,11 @@ public class ConnectionImpl implements Connection {
 		List<Modification> modifications = Lists.newArrayList();
 		for (LdapGroup.Cn ldapGroupCn : ldapGroupCns) {
 			Entry entry = getGroupEntry(ldapGroupCn, ldapDomain);
-			
 			modifications.addAll(memberModificationsFromEntry(entry, modificationOperation));
+		}
+		
+		if (modifications.isEmpty()) {
+			return;
 		}
 		
 		Entry fromEntry = getGroupEntry(modifiedLdapGroupCn, ldapDomain);
