@@ -51,6 +51,7 @@ import com.google.inject.Singleton;
 public class ObjectStoreManager implements LifecycleListener {
 
 	public static final String REQUEST_STORE = "request";
+	public static final String STORE_NAME = ObjectStoreManager.class.getName();
 	
 	private final static int UNLIMITED_CACHE_MEMORY = 0;
 	private final static int MAX_ELEMENT_IN_MEMORY = 5000;
@@ -58,7 +59,9 @@ public class ObjectStoreManager implements LifecycleListener {
 
 	@Inject 
 	@VisibleForTesting ObjectStoreManager() {
-		this.singletonManager = new CacheManager(ehCacheConfiguration());
+		Configuration configuration = ehCacheConfiguration();
+		configuration.addCache(unlimitedMemoryConfiguration().name(REQUEST_STORE));
+		this.singletonManager = new CacheManager(configuration);
 	}
 
 	@Override
@@ -67,15 +70,14 @@ public class ObjectStoreManager implements LifecycleListener {
 	}
 	
 	private Configuration ehCacheConfiguration() {
-		Configuration configuration = new Configuration();
-		configuration.updateCheck(false);
-		configuration.addCache(unlimitedMemoryConfiguration().name(REQUEST_STORE));
-		return configuration;
+		return new Configuration()
+			.name(STORE_NAME)
+			.updateCheck(false);
 	}
 	
 	private CacheConfiguration unlimitedMemoryConfiguration() {
 		return new CacheConfiguration()
-			.maxElementsInMemory(UNLIMITED_CACHE_MEMORY)
+			.maxEntriesLocalHeap(UNLIMITED_CACHE_MEMORY)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(TransactionalMode.OFF)
 			.eternal(false);
