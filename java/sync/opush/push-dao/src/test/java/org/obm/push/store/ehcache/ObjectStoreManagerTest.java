@@ -31,12 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.io.IOException;
-import java.util.List;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.easymock.EasyMock;
+import java.io.IOException;
+
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,14 +52,11 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	private ObjectStoreManager opushCacheManager;
 	private Logger logger;
 
-	public ObjectStoreManagerTest() {
-		super();
-	}
 	
 	@Before
 	public void init() throws IOException {
-		logger = EasyMock.createNiceMock(Logger.class);
-		this.opushCacheManager = new ObjectStoreManager(super.initConfigurationServiceMock(), logger);
+		logger = createNiceMock(Logger.class);
+		opushCacheManager = new ObjectStoreManager(super.initConfigurationServiceMock(), logger);
 	}
 
 	@After
@@ -70,9 +67,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 	@Test
 	public void loadStores() {
-		List<String> stores = opushCacheManager.listStores();
-		Assert.assertNotNull(stores);
-		Assert.assertEquals(8, stores.size());
+		assertThat(opushCacheManager.listStores()).hasSize(8);
 	}
 	
 	@Test
@@ -82,30 +77,28 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 		opushCacheManager.createNewStore("test 3");
 		
 		opushCacheManager.removeStore("test 2");
-		
-		Assert.assertNotNull(opushCacheManager.getStore("test 1"));
-		Assert.assertNotNull(opushCacheManager.getStore("test 3"));
 
-		Assert.assertNull(opushCacheManager.getStore("test 2"));
-		
-		Assert.assertEquals(10, opushCacheManager.listStores().size());
+		assertThat(opushCacheManager.getStore("test 1")).isNotNull();
+		assertThat(opushCacheManager.getStore("test 3")).isNotNull();
+		assertThat(opushCacheManager.getStore("test 2")).isNull();
+		assertThat(opushCacheManager.listStores()).hasSize(10);
 	}
 	
 	@Test
 	public void createAndRemoveCache() {
 		opushCacheManager.createNewStore("test 1");
 		opushCacheManager.removeStore("test 1");
-		
-		Assert.assertNull(opushCacheManager.getStore("test 1"));
+
+		assertThat(opushCacheManager.getStore("test 1")).isNull();
 	}
 
 	@Test
 	public void createTwoIdenticalCache() {
 		opushCacheManager.createNewStore("test 1");
 		opushCacheManager.createNewStore("test 1");
-		Assert.assertNotNull(opushCacheManager.getStore("test 1"));
-
-		Assert.assertEquals(9, opushCacheManager.listStores().size());
+		
+		assertThat(opushCacheManager.getStore("test 1")).isNotNull();
+		assertThat(opushCacheManager.listStores()).hasSize(9);
 	}
 
 }
