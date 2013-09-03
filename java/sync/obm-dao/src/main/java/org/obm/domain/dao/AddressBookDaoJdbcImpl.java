@@ -109,7 +109,7 @@ public class AddressBookDaoJdbcImpl implements AddressBookDao {
 
 			int bookId = obmHelper.lastInsertId(con);
 
-			obmHelper.linkEntity(con, "AddressBookEntity", "addressbook_id", bookId);
+			obmHelper.linkEntity(con, "AddressbookEntity", "addressbook_id", bookId);
 
 			return get(Id.valueOf(bookId));
 		} catch (SQLException e) {
