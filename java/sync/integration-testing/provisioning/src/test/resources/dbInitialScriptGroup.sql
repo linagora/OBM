@@ -78,7 +78,7 @@ CREATE TABLE batch_operation
 CREATE TABLE batch_operation_param
 (
   id integer PRIMARY KEY AUTO_INCREMENT,
-  key text NOT NULL,
+  param_key text NOT NULL,
   value text NOT NULL,
   operation integer NOT NULL,
   CONSTRAINT batch_operation_param_operation_fkey FOREIGN KEY (operation)

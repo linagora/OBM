@@ -96,7 +96,7 @@ public class BatchDaoJdbcImplTest implements H2TestClass {
 	public void testGet() throws Exception {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
 		db.executeUpdate("INSERT INTO batch_operation (status, resource_path, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/users', 'POST', 'USER', 1)");
-		db.executeUpdate("INSERT INTO batch_operation_param (key, value, operation) VALUES ('p1', 'v1', 1)");
+		db.executeUpdate("INSERT INTO batch_operation_param (param_key, value, operation) VALUES ('p1', 'v1', 1)");
 		db.executeUpdate("INSERT INTO batch_operation (status, resource_path, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/groups', 'POST', 'GROUP', 1)");
 
 		Batch batch = dao.get(batchId(1));

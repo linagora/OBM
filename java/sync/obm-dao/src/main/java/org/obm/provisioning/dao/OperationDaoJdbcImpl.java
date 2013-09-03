@@ -197,7 +197,7 @@ public class OperationDaoJdbcImpl implements OperationDao {
 
 		try {
 			connection = dbcp.getConnection();
-			psParams = connection.prepareStatement("INSERT INTO batch_operation_param (key, value, operation) VALUES (?, ?, ?)");
+			psParams = connection.prepareStatement("INSERT INTO batch_operation_param (param_key, value, operation) VALUES (?, ?, ?)");
 
 			for (Map.Entry<String, String> param : operation.getRequest().getParams().entrySet()) {
 				psParams.setString(1, param.getKey());
@@ -243,14 +243,14 @@ public class OperationDaoJdbcImpl implements OperationDao {
 
 		try {
 			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("SELECT key, value FROM batch_operation_param WHERE operation = ?");
+			ps = connection.prepareStatement("SELECT param_key, value FROM batch_operation_param WHERE operation = ?");
 
 			ps.setInt(1, operationId);
 
 			rs = ps.executeQuery();
 
 			while (rs.next()) {
-				requestBuilder.param(rs.getString("key"), rs.getString("value"));
+				requestBuilder.param(rs.getString("param_key"), rs.getString("value"));
 			}
 		}
 		finally {

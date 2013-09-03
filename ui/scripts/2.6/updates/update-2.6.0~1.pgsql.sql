@@ -38,7 +38,7 @@ CREATE TABLE batch_operation
 CREATE TABLE batch_operation_param
 (
   id serial NOT NULL,
-  key text NOT NULL,
+  param_key text NOT NULL,
   value text NOT NULL,
   operation integer NOT NULL,
   CONSTRAINT batch_operation_param_pkey PRIMARY KEY (id),

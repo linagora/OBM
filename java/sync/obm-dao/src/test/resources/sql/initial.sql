@@ -1559,7 +1559,7 @@ CREATE SEQUENCE batch_operation_id_seq
 
 CREATE TABLE batch_operation_param (
     id integer NOT NULL,
-    key text NOT NULL,
+    param_key text NOT NULL,
     value text NOT NULL,
     operation integer NOT NULL
 );

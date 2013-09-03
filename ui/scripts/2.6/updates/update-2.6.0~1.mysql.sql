@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `batch_operation`
 CREATE TABLE IF NOT EXISTS batch_operation_param
 (
   `id` int(8) NOT NULL AUTO_INCREMENT,
-  `key` text NOT NULL,
+  `param_key` text NOT NULL,
   `value` text NOT NULL,
   `operation` int(8) NOT NULL,
   PRIMARY KEY (`id`),
