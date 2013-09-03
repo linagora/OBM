@@ -135,6 +135,41 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
+	public void testGroupDeserializerAndSerializerWithFullJsonAndNullValue() throws DaoException, DomainNotFoundException {
+		expectDomain();
+		mocksControl.replay();
+		
+		given()
+			.auth().basic("user", "password")
+			.content(
+					"{" +
+						"\"id\":\"groupExtId\"," +
+						"\"name\":\"null\"," +
+						"\"email\":\"group1@domain\"," +
+						"\"description\":null" +
+					"}")
+			.contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.content(containsString(
+					"{" +
+						"\"id\":\"groupExtId\"," +
+						"\"name\":\"null\"," +
+						"\"email\":\"group1@domain\"," +
+						"\"description\":null," +
+						"\"members\":" +
+							"{" +
+								"\"users\":[]," +
+								"\"subgroups\":[]" +	
+							"}" +
+					"}")).
+		when()
+			.post("/do/tests/on/serialization/of/group");
+		
+		mocksControl.verify();
+	}
+	
+	@Test
 	public void testGroupDeserializerAndSerializerWithFullJson() throws DaoException, DomainNotFoundException {
 		expectDomain();
 		mocksControl.replay();

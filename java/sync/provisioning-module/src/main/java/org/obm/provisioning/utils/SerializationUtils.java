@@ -113,7 +113,7 @@ public class SerializationUtils {
 	public static void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields, ObmUser.Builder toBuild) {
 		JsonNode value = jsonNode.findValue(jsonFields.asSpecificationValue());
 
-		if (value == null || value.isNull()) {
+		if (isNullOrNullNode(value)) {
 			return;
 		}
 
@@ -204,23 +204,27 @@ public class SerializationUtils {
 		JsonNode root = jp.readValueAsTree();
 
 		JsonNode at = root.findValue("id");
-		if (at != null) {
+		if (!isNullOrNullNode(at)) {
 			builder.extId(GroupExtId.valueOf(at.asText()));
 		}
 		
 		at = root.findValue("name");
-		if (at != null) {
+		if (!isNullOrNullNode(at)) {
 			builder.name(root.findValue("name").asText());
 		}
 		
 		at = root.findValue("email");
-		if (at != null) {
+		if (!isNullOrNullNode(at)) {
 			builder.email(at.asText());
 		}
 		
 		at = root.findValue("description");
-		if (at != null) {
+		if (!isNullOrNullNode(at)) {
 			builder.description(at.asText());
 		}
+	}
+
+	private static boolean isNullOrNullNode(JsonNode at) {
+		return at == null || at.isNull();
 	}
 }
