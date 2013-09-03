@@ -62,7 +62,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -185,10 +184,10 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	@VisibleForTesting void fetchAttachments(Builder emailViewBuilder, FetchInstruction fetchInstruction, long uid) {
 		List<EmailViewAttachment> attachments = Lists.newArrayList();
 		IMimePart parentMessage = fetchInstruction.getMimePart().findRootMimePartInTree();
-		int nbAttachments = 0;
+		int attachmentId = 0;
 		for (IMimePart mp : parentMessage.listLeaves(true, true)) {
 			if (mp.isAttachment() && !mp.isICSAttachment()) {
-				EmailViewAttachment emailViewAttachment = extractEmailViewAttachment(mp, nbAttachments++, uid);
+				EmailViewAttachment emailViewAttachment = extractEmailViewAttachment(mp, attachmentId++, uid);
 				if (emailViewAttachment != null) {
 					attachments.add(emailViewAttachment);
 				}
@@ -197,12 +196,12 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		emailViewBuilder.attachments(attachments);
 	}
 	
-	private EmailViewAttachment extractEmailViewAttachment(IMimePart mp, int nbAttachments, long uid) {
-		String id = "at_" + uid + "_" + nbAttachments;
+	private EmailViewAttachment extractEmailViewAttachment(IMimePart mp, int attachmentId, long uid) {
+		String id = "at_" + uid + "_" + attachmentId;
 		String fileReference = AttachmentHelper.getAttachmentId(String.valueOf(collectionId), String.valueOf(uid), 
 				mp.getAddress().getAddress(), mp.getFullMimeType(), mp.getContentTransfertEncoding());
 		
-		Optional<String> displayName = selectAttachmentDisplayName(mp);
+		Optional<String> displayName = selectDisplayName(mp, attachmentId);
 		if (displayName.isPresent()) {
 			return EmailViewAttachment.builder()
 					.id(id)
@@ -218,13 +217,16 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		return null;
 	}
 
-	@VisibleForTesting Optional<String> selectAttachmentDisplayName(IMimePart attachment) {
+	@VisibleForTesting Optional<String> selectDisplayName(IMimePart attachment, int attachmentId) {
 		String partName = attachment.getName();
-		String contentId = attachment.getContentId();
-		if (!Strings.isNullOrEmpty(partName) || !Strings.isNullOrEmpty(contentId)) {
-			return Optional.of(Objects.firstNonNull(partName, contentId));
+		if (!Strings.isNullOrEmpty(partName)) {
+			return Optional.of(partName);
 		}
-		return Optional.absent();
+		String contentId = attachment.getContentId();
+		if (Strings.isNullOrEmpty(contentId)) {
+			return Optional.absent();
+		}
+		return Optional.of(String.format("ATT%05d%s", attachmentId, Strings.nullToEmpty(attachment.getAttachmentExtension())));
 	}
 	
 	private void fetchInvitation(Builder emailViewBuilder, MimeMessage mimeMessage, long uid) 
