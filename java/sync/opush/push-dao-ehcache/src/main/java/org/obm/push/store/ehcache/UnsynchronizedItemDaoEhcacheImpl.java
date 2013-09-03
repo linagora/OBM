@@ -124,7 +124,7 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 		Element element = store.get(key);
 		logger.debug("List Key : {} Element : {}", key, element);
 		if (element != null) {
-			return (Set<T>) element.getValue();
+			return (Set<T>) element.getObjectValue();
 		} else {
 			return new HashSet<T>();
 		}

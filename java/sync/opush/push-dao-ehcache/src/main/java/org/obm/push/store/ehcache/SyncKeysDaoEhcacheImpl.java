@@ -64,7 +64,7 @@ public class SyncKeysDaoEhcacheImpl extends AbstractEhcacheDao implements SyncKe
 			.build();
 		Element element = store.get(key);
 		if (element != null) {
-			return (List<SyncKey>) element.getValue();
+			return (List<SyncKey>) element.getObjectValue();
 		}
 		return null;
 	}

@@ -32,13 +32,16 @@
 package org.obm.push.technicallog;
 
 import org.obm.push.technicallog.bean.TechnicalLogging;
+import org.obm.push.technicallog.jaxb.store.ehcache.ObjectStoreManager;
 import org.obm.push.technicallog.logger.ITechnicalLoggingBinder;
 import org.obm.push.technicallog.logger.TechnicalLoggingBinder;
+import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 
 public class TechnicalLoggingModule extends AbstractModule {
@@ -50,6 +53,9 @@ public class TechnicalLoggingModule extends AbstractModule {
 		install(new TechnicalLogServletModule());
 		bind(Logger.class).annotatedWith(Names.named(TECHNICAL_LOG)).toInstance(LoggerFactory.getLogger(TECHNICAL_LOG));
 		bind(ITechnicalLoggingBinder.class).to(TechnicalLoggingBinder.class);
+
+		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
+		lifecycleListeners.addBinding().to(ObjectStoreManager.class);
 		
 		TechnicalLoggingInterceptor technicalLoggingInterceptor = new TechnicalLoggingInterceptor();
 		bindInterceptor(Matchers.any(), Matchers.annotatedWith(TechnicalLogging.class), 
