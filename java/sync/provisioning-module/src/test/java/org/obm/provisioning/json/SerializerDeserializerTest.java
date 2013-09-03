@@ -68,6 +68,23 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 		
 		mocksControl.verify();
 	}
+	
+	@Test
+	public void testObmUserSerializerWithNullValue() throws DaoException, DomainNotFoundException {
+		expectDomain();
+		mocksControl.replay();
+		
+		given()
+			.auth().basic("user", "password")
+			.content(obmUserJsonStringWithNullValue()).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.content(containsString(obmUserJsonStringWithNullValueAfterDeserialization())).
+		when()
+			.post("/do/tests/on/serialization/of/user");
+		
+		mocksControl.verify();
+	}
 
 	@Test
 	public void testObmUserDeserializerWithMinimalRepresentation() throws DaoException, DomainNotFoundException {

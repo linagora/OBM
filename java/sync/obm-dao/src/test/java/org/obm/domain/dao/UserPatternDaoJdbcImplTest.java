@@ -65,7 +65,7 @@ public class UserPatternDaoJdbcImplTest implements H2TestClass {
 	
 	@Inject
 	private UserPatternDaoJdbcImpl dao;
-
+	
 	@Test
 	public void testGetUserPatterns() {
 		ObmUser user = ObmUser

@@ -113,7 +113,7 @@ public class SerializationUtils {
 	public static void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields, ObmUser.Builder toBuild) {
 		JsonNode value = jsonNode.findValue(jsonFields.asSpecificationValue());
 
-		if (value == null) {
+		if (value == null || value.isNull()) {
 			return;
 		}
 

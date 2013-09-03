@@ -11,6 +11,7 @@ import org.codehaus.jackson.map.DeserializationConfig.Feature;
 import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.cyrus.imap.CyrusClientModule;
 import org.obm.domain.dao.EntityRightDao;
@@ -174,6 +175,7 @@ public class ProvisioningService extends ServletModule {
 		ObjectMapper mapper = new ObjectMapper()
 				.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false)
 				.configure(Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+				.setSerializationInclusion(Inclusion.NON_NULL)
 				.withModule(module);
 
 		for (Module m : modules) {

@@ -448,6 +448,51 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"lastname\":\"Doe\"" +
 			"}";
 	}
+	
+	protected String obmUserJsonStringWithNullValue() {
+		return
+			"{" +
+				"\"id\":\"extId\"," +
+				"\"login\":\"user1\"," +
+				"\"lastname\":\"Doe\"," +
+				"\"profile\":\"Utilisateurs\"," +
+				"\"country\":null," +
+				"\"title\":\"null\"" +
+			"}";
+	}
+	
+	protected String obmUserJsonStringWithNullValueAfterDeserialization() {
+		return 
+				"{" +
+					"\"id\":\"extId\"," +
+					"\"login\":\"user1\"," +
+					"\"lastname\":\"Doe\"," +
+					"\"profile\":\"Utilisateurs\"," +
+					"\"firstname\":null," +
+					"\"commonname\":null," +
+					"\"password\":null," +
+					"\"kind\":null," +
+					"\"title\":\"null\"," +
+					"\"description\":null," +
+					"\"company\":null," +
+					"\"service\":null," +
+					"\"direction\":null," +
+					"\"addresses\":[]," +
+					"\"town\":null," +
+					"\"zipcode\":null," +
+					"\"business_zipcode\":null," +
+					"\"country\":null," +
+					"\"phones\":[]," +
+					"\"mobile\":null," +
+					"\"faxes\":[]," +
+					"\"mail_quota\":\"0\"," +
+					"\"mail_server\":null," +
+					"\"mails\":[null]," +
+					"\"timecreate\":null," +
+					"\"timeupdate\":null," +
+					"\"groups\":[]" +
+				"}";
+	}
 
 	protected ObmUser fakeUser() {
 		return ObmUser.builder()
