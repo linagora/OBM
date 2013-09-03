@@ -98,6 +98,7 @@ import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.Participation.State;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
@@ -2670,12 +2671,14 @@ public class CalendarBindingImplTest {
 		ObmUser user = ToolBox.getDefaultObmUser();
 		String calendar = user.getEmail();
 		String attendeeEmail = "test@obm.org";
+		String resourceEmail = "resource@obm.org";
 
 		UserAttendee userAttendee = UserAttendee.builder().email(calendar).build();
 		ContactAttendee contactAttendee = ContactAttendee.builder().email(attendeeEmail).build();
+		ResourceAttendee resourceAttendee = ResourceAttendee.builder().email(resourceEmail).build();
 		AttendeeService attendeeService = mocksControl.createMock(AttendeeService.class);
 		
-		List<Attendee> attendees = ImmutableList.of(ToolBox.getFakeAttendee(calendar), ToolBox.getFakeAttendee(attendeeEmail));
+		List<Attendee> attendees = ImmutableList.of(ToolBox.getFakeAttendee(calendar), ToolBox.getFakeAttendee(attendeeEmail), ToolBox.getFakeAttendee(resourceEmail));
 		Event event = createEvent(attendees);
 		Event exception = createEventException(attendees, DateUtils.date("2012-01-01T00:00:00"));
 		Event exception2 = createEventException(ImmutableList.of(ToolBox.getFakeAttendee(calendar)), DateUtils.date("2012-02-01T00:00:00"));
@@ -2688,13 +2691,15 @@ public class CalendarBindingImplTest {
 		event.getRecurrence().setKind(RecurrenceKind.daily);
 		
 		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).anyTimes();
+		expect(helperService.canWriteOnCalendar(token, resourceEmail)).andReturn(true).anyTimes();
 		expect(helperService.canWriteOnCalendar(token, attendeeEmail)).andReturn(false).anyTimes();
 		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user).anyTimes();
 		// times(3) = 1 for the event, 1 for each exception 
 		expect(attendeeService.findUserAttendee(null, calendar, user.getDomain())).andReturn(userAttendee).times(3);
 		// times(2) = 1 for the event, 1 for the first exception
-		expect(attendeeService.findUserAttendee(null, attendeeEmail, user.getDomain())).andReturn(null).times(2);
-		expect(attendeeService.findContactAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid())).andReturn(contactAttendee).times(2);
+		expect(attendeeService.findAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid())).andReturn(contactAttendee).times(2);
+		expect(attendeeService.findAttendee(null, resourceEmail, true, user.getDomain(), user.getUid())).andReturn(resourceAttendee).times(2);
+
 		expect(calendarDao.createEvent(token, calendar, event, true)).andReturn(event);
 		expect(calendarDao.findEventById(token, null)).andReturn(event);
 		messageQueueService.writeIcsInvitationRequest(token, event);
@@ -2735,8 +2740,7 @@ public class CalendarBindingImplTest {
 		expect(helperService.canWriteOnCalendar(token, attendeeEmail)).andReturn(false).anyTimes();
 		expect(userService.getUserFromCalendar(userEmail, user.getDomain().getName())).andReturn(user).anyTimes();
 		expect(attendeeService.findUserAttendee(null, userEventAlias, user.getDomain())).andReturn(userAttendee);
-		expect(attendeeService.findUserAttendee(null, attendeeEmail, user.getDomain())).andReturn(null);
-		expect(attendeeService.findContactAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid()))
+		expect(attendeeService.findAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid()))
 			.andReturn(contactAttendee);
 		
 		expect(calendarDao.createEvent(token, userEmail, toStoreEvent, true)).andReturn(toStoreEvent);

@@ -1756,13 +1756,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 	
 	private Attendee findTypedAttendee(Attendee attendee, ObmUser owner) {
-		Attendee userAttendee = findUserAttendee(attendee, owner);
-		if (userAttendee != null) {
-			return userAttendee;
-		}
-		
-		// User not found, we'll fallback to a contact and create it if needed
-		return findContactAttendee(attendee, owner);
+		return attendeeService.findAttendee(attendee.getDisplayName(), attendee.getEmail(), true, owner.getDomain(), owner.getUid());
 	}
 
 	private Attendee findUserAttendee(Attendee attendee, ObmUser owner) {
