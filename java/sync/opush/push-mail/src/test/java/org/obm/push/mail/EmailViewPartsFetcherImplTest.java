@@ -642,7 +642,7 @@ public class EmailViewPartsFetcherImplTest {
 				.build());
 		
 		assertThat(displayName.isPresent()).isTrue();
-		assertThat(displayName.get()).isEqualTo("hello");
+		assertThat(displayName.get()).isEqualTo("ATT00000");
 	}
 	
 	@Test
@@ -726,6 +726,20 @@ public class EmailViewPartsFetcherImplTest {
 		replay(mailboxService);
 		return mailboxService;
 	}
+	
+	@Test
+	public void testDisplayNameWhenExtensionMapped() {
+		Optional<String> displayName = getDisplayNameOfMimePart(MimePartImpl.builder()
+				.contentType("image/jpeg")
+				.contentId("hello contentId")
+				.bodyParams(BodyParams.builder().add(
+						new BodyParam("name", "hello Name"))
+						.build())
+				.build());
+		
+		assertThat(displayName.isPresent()).isTrue();
+		assertThat(displayName.get()).isEqualTo("hello Name");
+	}
 
 	private Optional<String> getDisplayNameOfMimePart(MimePart attachment) {
 		IMocksControl mocks = createControl();
@@ -736,7 +750,7 @@ public class EmailViewPartsFetcherImplTest {
 		
 		mocks.replay();
 		Optional<String> displayName = new EmailViewPartsFetcherImpl(transformer, mailboxService, preferences, udr, "name", 15)
-			.selectAttachmentDisplayName(attachment);
+			.selectDisplayName(attachment, 0);
 	
 		mocks.verify();
 		return displayName;
@@ -817,6 +831,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.findRootMimePartInTree()).andReturn(mimePart);
 		expect(mimePart.listLeaves(true, true)).andReturn(ImmutableList.<MimePart> of(mimePart));
 		expect(mimePart.isAttachment()).andReturn(messageFixture.isAttachment);
+		expect(mimePart.getAttachmentExtension()).andReturn("ATT00001");
 		expect(mimePart.getName()).andReturn(messageFixture.subject);
 		expect(mimePart.getAddress()).andReturn(mimeAddress).anyTimes();
 		expect(mimePart.getFullMimeType()).andReturn(messageFixture.fullMimeType).anyTimes();
