@@ -40,11 +40,13 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.util.Properties;
 
 import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.ProtocolVersion;
@@ -59,10 +61,17 @@ public class ContinuationTransactionMapImplTest {
 	public final static String PENDING_CONTINUATIONS = "pendingContinuation";
 	public final static String KEY_ID_REQUEST = "key_id_request";
 	private Device device;
+	private CacheManager cacheManager;
 	
 	@Before
 	public void setUp() {
 		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121);
+		cacheManager = new CacheManager();
+	}
+	
+	@After
+	public void tearDown() {
+		cacheManager.shutdown();
 	}
 	
 	@Test
@@ -173,7 +182,7 @@ public class ContinuationTransactionMapImplTest {
 	
 	private CacheConfiguration cacheConfigurationForContinuation() {
 		return new CacheConfiguration()
-			.maxElementsInMemory(0)
+			.maxEntriesLocalHeap(0)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(TransactionalMode.OFF)
 			.eternal(false)
@@ -190,6 +199,7 @@ public class ContinuationTransactionMapImplTest {
 
 	private Cache buildCache() {
 		Cache cache = new Cache(cacheConfigurationForContinuation());
+		cache.setCacheManager(cacheManager);
 		cache.initialise();
 		return cache;
 	}

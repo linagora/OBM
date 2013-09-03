@@ -63,10 +63,11 @@ public class ConcurrentRequestInfoStore<K extends Serializable> {
 		store = cacheManager.getCache(STORE_NAME);
 	}
 	
+	@SuppressWarnings("deprecation")
 	private static Cache storeDefinition() {
 		return new Cache(
 				new CacheConfiguration()
-				.maxElementsInMemory(NO_LIMIT)
+				.maxEntriesLocalHeap(NO_LIMIT)
 				.copyOnRead(false)
 				.copyOnWrite(false)
 				.overflowToDisk(false)
@@ -93,7 +94,7 @@ public class ConcurrentRequestInfoStore<K extends Serializable> {
 		if (element == null) {
 			return RequestInfo.create(key);
 		}
-		return (RequestInfo<K>) element.getValue();
+		return (RequestInfo<K>) element.getObjectValue();
 	}
 	
 	public RequestInfo<K> storeRequestInfo(RequestInfo<K> value) {

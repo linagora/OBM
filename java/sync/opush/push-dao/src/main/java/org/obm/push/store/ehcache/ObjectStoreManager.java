@@ -53,6 +53,8 @@ import com.google.inject.name.Named;
 @Singleton
 public class ObjectStoreManager {
 
+	public static final String STORE_NAME = ObjectStoreManager.class.getName();
+	
 	public static final String MONITORED_COLLECTION_STORE = "monitoredCollectionService";
 	public static final String SYNCED_COLLECTION_STORE = "syncedCollectionStoreService";
 	public static final String UNSYNCHRONIZED_ITEM_STORE = "unsynchronizedItemService";
@@ -83,6 +85,7 @@ public class ObjectStoreManager {
 	
 	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds, boolean usePersistentCache, String dataDirectory) {
 		return new Configuration()
+			.name(STORE_NAME)
 			.diskStore(new DiskStoreConfiguration().path(dataDirectory))
 			.updateCheck(false)
 			.cache(eternal(defaultCacheConfiguration().name(UNSYNCHRONIZED_ITEM_STORE), usePersistentCache))
@@ -98,21 +101,23 @@ public class ObjectStoreManager {
 	
 	private CacheConfiguration pendingContinuationConfiguration() {
 		return new CacheConfiguration()
-			.maxElementsInMemory(UNLIMITED_CACHE_MEMORY)
+			.maxEntriesLocalHeap(UNLIMITED_CACHE_MEMORY)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(TransactionalMode.OFF)
 			.eternal(false);
 	}
-	
+
+	@SuppressWarnings("deprecation")
 	private CacheConfiguration defaultCacheConfiguration() {
 		return new CacheConfiguration()
-			.maxElementsInMemory(1000)
-			.maxElementsOnDisk(100000)
+			.maxEntriesLocalHeap(1000)
+			.maxEntriesLocalDisk(100000)
 			.overflowToDisk(true)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(TransactionalMode.XA);
 	}
-	
+
+	@SuppressWarnings("deprecation")
 	private CacheConfiguration eternal(CacheConfiguration configuration, boolean eternal) {
 		return configuration.eternal(eternal).diskPersistent(eternal);
 	}
