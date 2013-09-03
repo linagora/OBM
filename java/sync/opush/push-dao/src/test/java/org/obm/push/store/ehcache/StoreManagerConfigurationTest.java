@@ -47,8 +47,8 @@ public class StoreManagerConfigurationTest {
 	protected ConfigurationService initConfigurationServiceMock() throws IOException {
 		File dataDir = temporaryFolder.newFolder();
 		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2);
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true);
+		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2).anyTimes();
+		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true).anyTimes();
 		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
 		EasyMock.replay(configurationService);
 		
