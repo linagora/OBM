@@ -76,13 +76,15 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 
 		if (expunge == true) {
 			deleteUserInDao(userFromDao);
-			deleteUserMailBoxes(userFromDao);
+			if (userFromDao.isEmailAvailable()) {
+				deleteUserMailBoxes(userFromDao);
+			}
 			deleteUserFromPTables(userFromDao);
-		}
-		else {
+		} else {
 			archiveUserInDao(userFromDao);
 			archiveUserInPTables(userFromDao);
 		}
+		
 		deleteUserInLdap(userFromDao);
 	}
 

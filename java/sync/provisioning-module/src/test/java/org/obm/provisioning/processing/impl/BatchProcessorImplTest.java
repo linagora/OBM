@@ -822,6 +822,7 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domain)
 				.mailHost(ObmHost.builder().name("host").ip("127.0.0.1").build())
+				.email("user1@domain")
 				.build();
 
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
@@ -830,6 +831,63 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		userDao.delete(user);
 		expectLastCall();
 		expectDeleteUserMailbox(user);
+		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		expectLdapdeleteUser(user, usersGroup);
+		expect(groupDao.getAllGroupsForUserExtId(user.getDomain(), user.getExtId())).andReturn(Collections.EMPTY_SET);
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.SUCCESS)
+						.timecommit(date)
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+		expectPUserDaoDelete(user);
+		
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testProcessDeleteUserWithoutMailWithTrueExpunge()
+			throws SQLException, DaoException, BatchNotFoundException, UserNotFoundException, DomainNotFoundException {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(Request
+						.builder()
+						.resourcePath("/users/extIdUser1")
+						.param(Request.USERS_ID_KEY, "extIdUser1")
+						.param(Request.EXPUNGE_KEY, "true")
+						.verb(HttpVerb.DELETE)
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domain)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		final ObmUser user = ObmUser
+				.builder()
+				.login("user1")
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.mailHost(ObmHost.builder().name("host").ip("127.0.0.1").build())
+				.build();
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		final UserExtId extId = UserExtId.valueOf("extIdUser1");
+		expect(userDao.getByExtId(extId, domain)).andReturn(user);
+		userDao.delete(user);
+		expectLastCall();
 		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(usersGroup);
 		expectLdapdeleteUser(user, usersGroup);
 		expect(groupDao.getAllGroupsForUserExtId(user.getDomain(), user.getExtId())).andReturn(Collections.EMPTY_SET);
