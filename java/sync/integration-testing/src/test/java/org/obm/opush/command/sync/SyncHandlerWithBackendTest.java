@@ -126,6 +126,8 @@ import org.obm.test.SlowGuiceRunner;
 
 import bitronix.tm.TransactionManagerServices;
 
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -745,6 +747,53 @@ public class SyncHandlerWithBackendTest {
 		
 		assertThat(attachment.getMethod()).isEqualTo(MethodAttachment.NormalAttachment);
 		assertThat(attachment.getDisplayName()).isEqualTo("attachment.ics");
+	}
+	
+	public void testForwardedEmailWithAttachments() throws Exception {
+		appendToINBOX(greenMailUser, "eml/forwardedEmailWithAttachments.eml");
+
+		SyncKey firstAllocatedSyncKey = new SyncKey("132");
+		SyncKey secondAllocatedSyncKey = new SyncKey("456");
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(firstAllocatedSyncKey)
+				.id(3)
+				.build();
+		ItemSyncState secondAllocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T16:22:53"))
+				.syncKey(secondAllocatedSyncKey)
+				.id(4)
+				.build();
+		
+		ServerId emailServerId = new ServerId(inboxCollectionIdAsString + ":" + 1);
+		expect(dateService.getCurrentDate()).andReturn(secondAllocatedState.getSyncDate()).once();
+		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, emailServerId)).andReturn(false);
+		itemTrackingDao.markAsSynced(secondAllocatedState, ImmutableSet.of(emailServerId));
+		expectLastCall().once();
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, secondAllocatedSyncKey);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, secondAllocatedState, inboxCollectionId);
+		
+		mocksControl.replay();
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		SyncResponse response = opClient.sync(decoder, firstAllocatedSyncKey, inboxCollectionId, PIMDataType.EMAIL);
+		mocksControl.verify();
+
+		SyncCollectionResponse collectionResponse = getCollectionWithId(response, inboxCollectionIdAsString);
+		MSEmail mail = (MSEmail) Iterables.getOnlyElement(collectionResponse.getItemChanges()).getData();
+		Set<MSAttachement> attachments = mail.getAttachments();
+		assertThat(attachments.size()).isEqualTo(2);
+		
+		assertThat(FluentIterable.from(attachments)
+			.transform(new Function<MSAttachement, String>() {
+				
+				@Override
+				public String apply(MSAttachement input) {
+					return input.getDisplayName();
+				}
+			})).containsOnly("ATT00000.gif", "ATT00001.jpg");
 	}
 	
 	@Test
