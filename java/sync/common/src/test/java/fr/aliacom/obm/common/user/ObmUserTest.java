@@ -362,6 +362,7 @@ public class ObmUserTest {
 				.emailAndAliases("jdoe\r\njohn.doe")
 				.kind("Mr")
 				.mailQuota(500)
+				.archived(true)
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();
 
@@ -442,5 +443,43 @@ public class ObmUserTest {
 				.build();
 
 		assertThat(user.getMailQuotaAsInt()).isEqualTo(0);
+	}
+
+	@Test
+	public void testIsArchivedWhenDefaultValue() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login("jdoe")
+				.domain(ToolBox.getDefaultObmDomain())
+				.build();
+
+		assertThat(user.isArchived()).isFalse();
+	}
+
+	@Test
+	public void testIsArchivedWhenTrue() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login("jdoe")
+				.domain(ToolBox.getDefaultObmDomain())
+				.archived(true)
+				.build();
+
+		assertThat(user.isArchived()).isTrue();
+	}
+
+	@Test
+	public void testIsArchivedWhenFalse() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login("jdoe")
+				.domain(ToolBox.getDefaultObmDomain())
+				.archived(false)
+				.build();
+
+		assertThat(user.isArchived()).isFalse();
 	}
 }

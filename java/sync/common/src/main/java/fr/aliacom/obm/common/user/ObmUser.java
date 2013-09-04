@@ -109,6 +109,7 @@ public class ObmUser {
 		private String fax2;
 		private Integer mailQuota;
 		private ObmHost mailHost;
+		private Boolean archived;
 
 		private Integer uidNumber;
 		private Integer gidNumber;
@@ -154,6 +155,7 @@ public class ObmUser {
 					.fax2(user.fax2)
 					.mailQuota(user.mailQuota)
 					.mailHost(user.mailHost)
+					.archived(user.archived)
 					.timeCreate(user.timeCreate)
 					.timeUpdate(user.timeUpdate)
 					.createdBy(user.createdBy)
@@ -315,6 +317,12 @@ public class ObmUser {
 			this.mailHost = mailHost;
 			return this;
 		}
+
+		public Builder archived(boolean archived) {
+			this.archived = archived;
+			return this;
+		}
+
 		public Builder password(String password) {
 			this.password = password;
 			return this;
@@ -390,14 +398,16 @@ public class ObmUser {
 			if (mailQuota != null && mailQuota == 0) {
 				mailQuota = null;
 			}
-			
+
+			archived = Objects.firstNonNull(archived, false);
+
 			return new ObmUser(
 					uid, entityId, login, extId, commonName, lastName, firstName,
 					email, emailAlias.build(),
 					address1, address2, address3, expresspostal, mobile, service, title, town,
 					zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName, kind, company, direction, countryCode,
-					phone, phone2, fax, fax2, mailQuota, mailHost, password, uidNumber, gidNumber, groups.build());
+					phone, phone2, fax, fax2, mailQuota, mailHost, archived, password, uidNumber, gidNumber, groups.build());
 		}
 		
 	}
@@ -444,6 +454,7 @@ public class ObmUser {
 	private final String fax2;
 	private final Integer mailQuota;
 	private final ObmHost mailHost;
+	private final boolean archived;
 
 	private final Integer uidNumber;
 	private final Integer gidNumber;
@@ -460,7 +471,7 @@ public class ObmUser {
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName, String kind, String company,
 			String direction, String countryCode, String phone, String phone2, String fax, String fax2,
-			Integer mailQuota, ObmHost mailHost, String password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
+			Integer mailQuota, ObmHost mailHost, boolean archived, String password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -497,6 +508,7 @@ public class ObmUser {
 		this.fax2 = fax2;
 		this.mailQuota = mailQuota;
 		this.mailHost = mailHost;
+		this.archived = archived;
 		this.password = password;
 		this.uidNumber = uidNumber;
 		this.gidNumber = gidNumber;
@@ -700,6 +712,10 @@ public class ObmUser {
 		return mailHost;
 	}
 
+	public boolean isArchived() {
+		return archived;
+	}
+
 	public String getPassword() {
 		return password;
 	}
@@ -725,7 +741,7 @@ public class ObmUser {
 		return Objects.hashCode(uid, entityId, login, extId, commonName, lastName, firstName, email,
 				emailAlias, address1, address2, address3, expresspostal, mobile,
 				service, title, town, zipCode,	description, createdBy, updatedBy, domain, publicFreeBusy, profileName, kind, company,
-				direction, countryCode, phone, phone2, fax, fax2, mailQuota, mailHost, password, uidNumber, gidNumber, groups);
+				direction, countryCode, phone, phone2, fax, fax2, mailQuota, archived, mailHost, password, uidNumber, gidNumber, groups);
 	}
 	
 	@Override
@@ -766,6 +782,7 @@ public class ObmUser {
 				&& Objects.equal(this.fax2, that.fax2)
 				&& Objects.equal(this.mailQuota, that.mailQuota)
 				&& Objects.equal(this.mailHost, that.mailHost)
+				&& Objects.equal(this.archived, that.archived)
 				&& Objects.equal(this.password, that.password)
 				&& Objects.equal(this.uidNumber, that.uidNumber)
 				&& Objects.equal(this.gidNumber, that.gidNumber)
@@ -813,6 +830,7 @@ public class ObmUser {
 			.add("fax2", fax2)
 			.add("mailQuota", mailQuota)
 			.add("mailHost", mailHost)
+			.add("archived", archived)
 			.add("uidNumber", uidNumber)
 			.add("gidNumber", gidNumber)
 			.add("groups", groups)
