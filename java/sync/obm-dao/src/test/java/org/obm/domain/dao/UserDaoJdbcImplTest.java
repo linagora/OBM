@@ -98,6 +98,12 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 			.uuid(ObmDomainUuid.of("3af47236-3638-458e-9c3e-5eebbaa8f9ae"))
 			.name("domain")
 			.build();
+	private final ObmDomain domain2 = ObmDomain
+			.builder()
+			.id(2)
+			.uuid(ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf"))
+			.name("test2.tlse.lng")
+			.build();
 	private final ObmHost mailHost = ObmHost
 			.builder()
 			.id(1)
@@ -667,6 +673,40 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 
 		assertThat(rs.next()).isTrue();
 		assertThat(rs.getInt(1)).isEqualTo(1);
+	}
+
+	@Test
+	public void testGetArchivedUser() {
+		ObmUser user = sampleUserBuilder(7, 32, "7")
+				.archived(true)
+				.domain(domain2)
+				.build();
+
+		assertThat(dao.findUserById(7, domain2)).isEqualTo(user);
+	}
+
+	@Test
+	public void testListAlsoListsArchivedUsers() throws Exception {
+		List<ObmUser> users = ImmutableList.of(
+				sampleUserBuilder(1, 7, "5")
+					.uid(5)
+					.mailHost(mailHost)
+					.emailAndAliases("user1")
+					.domain(domain2)
+					.build(),
+				sampleUserBuilder(2, 8, "6")
+					.uid(6)
+					.profileName(ProfileName.valueOf("admin"))
+					.mailHost(mailHost)
+					.emailAndAliases("user2")
+					.domain(domain2)
+					.build(),
+				sampleUserBuilder(7, 32, "7")
+					.archived(true)
+					.domain(domain2)
+					.build());
+
+		assertThat(dao.list(domain2)).isEqualTo(users);
 	}
 
 	public void testArchiveUser() throws Exception {

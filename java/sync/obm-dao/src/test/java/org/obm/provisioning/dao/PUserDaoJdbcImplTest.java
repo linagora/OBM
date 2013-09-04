@@ -365,8 +365,8 @@ public class PUserDaoJdbcImplTest implements H2TestClass {
 		dao.delete(obmUser(5, "5"));
 
 
-		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserObm")).isEqualTo(1);
-		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserEntity")).isEqualTo(1);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserObm")).isEqualTo(2);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserEntity")).isEqualTo(2);
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_MailboxEntity")).isEqualTo(1);
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_EntityRight")).isEqualTo(1);
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_CategoryLink")).isEqualTo(1);
@@ -527,7 +527,7 @@ public class PUserDaoJdbcImplTest implements H2TestClass {
 		
 		dao.archive(obmUser(1, "1"));
 		dao.archive(obmUser(2, "2"));
-		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserObm WHERE userobm_archive=1")).isEqualTo(2);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserObm WHERE userobm_archive=1")).isEqualTo(3);
 	}
 
 	private ObmUser obmUser(int id, String extId) {

@@ -29,7 +29,8 @@ INSERT INTO entity (entity_mailing)
         (true), // <- Groups
         (true), // <- Global Domain
         (true),
-        (true); // <- Groups
+        (true), // <- Groups
+        (true);
 
 INSERT INTO domain (domain_name, domain_uuid, domain_label) VALUES ('test.tlse.lng', 'ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6', 'test.tlse.lng');
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (1, 1);
@@ -77,14 +78,15 @@ INSERT INTO profileproperty (profileproperty_profile_id, profileproperty_name, p
         (2, 'mail_quota_max', '0'),
         (2, 'mail_quota_default', '0');
 
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
+INSERT INTO UserObm (userobm_ext_id, userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
     VALUES
-        (1, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),
-        (1, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1),
-        (1, 'user3','user3','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user3', 1),
-        (1, 'user4','user4','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', '', NULL),
-        (2, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),
-        (2, 'user2','user2','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1);
+        (1, 1, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),
+        (2, 1, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1),
+        (3, 1, 'user3','user3','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user3', 1),
+        (4, 1, 'user4','user4','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', '', NULL),
+        (5, 2, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),
+        (6, 2, 'user2','user2','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1),
+        (7, 2, 'user7','user7','PLAIN', 'user', 'Lastname', 'Firstname', '1000', '512', '1', '', NULL);
         
 INSERT INTO userentity (userentity_entity_id, userentity_user_id)
     VALUES
@@ -93,7 +95,8 @@ INSERT INTO userentity (userentity_entity_id, userentity_user_id)
         (5, 3),
         (6, 4),
         (7, 5),
-        (8, 6);
+        (8, 6),
+        (32, 7);
 
 INSERT INTO ugroup (group_id, group_domain_id, group_ext_id, group_name, group_desc)
     VALUES

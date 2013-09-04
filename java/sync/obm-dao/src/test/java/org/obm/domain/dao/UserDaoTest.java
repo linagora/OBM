@@ -336,9 +336,11 @@ public class UserDaoTest {
 		expect(rs.wasNull()).andReturn(false);
 		expect(rs.wasNull()).andReturn(false);
 		expect(rs.getInt("userobm_mail_server_id")).andReturn(1);
+		expect(rs.getBoolean("userobm_archive")).andReturn(false);
 		expect(rs.getString("host_name")).andReturn("host");
 		expect(rs.getString("host_ip")).andReturn("ip");
 		expect(rs.getString("host_fqdn")).andReturn("fqdn");
+		expect(rs.getInt("host_domain_id")).andReturn(1);
 		expect(rs.getTimestamp("userobm_timecreate")).andReturn(null);
 		expect(rs.getTimestamp("userobm_timeupdate")).andReturn(null);
 		expect(rs.getInt("userobm_userupdate")).andReturn(0);

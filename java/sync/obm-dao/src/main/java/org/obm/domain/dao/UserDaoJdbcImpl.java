@@ -110,6 +110,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			"userobm_fax2, " +
 			"userobm_mail_quota, " +
 			"userobm_mail_server_id, " +
+			"userobm_archive, " +
 			"userobm_timecreate, " +
 			"userobm_timeupdate, " +
 			"userobm_usercreate, " +
@@ -121,7 +122,8 @@ public class UserDaoJdbcImpl implements UserDao {
 			"userentity_entity_id, " +
 			"host_name, " +
 			"host_fqdn, " +
-			"host_ip";
+			"host_ip, " +
+			"host_domain_id";
 	private static final AddressBook CONTACTS_BOOK = AddressBook
 			.builder()
 			.name("contacts")
@@ -358,7 +360,8 @@ public class UserDaoJdbcImpl implements UserDao {
 				.fax(emptyToNull(rs.getString("userobm_fax")))
 				.fax2(emptyToNull(rs.getString("userobm_fax2")))
 				.mailQuota(rs.getInt("userobm_mail_quota"))
-				.mailHost(hostFromCursor(rs, domain))
+				.mailHost(hostFromCursor(rs))
+				.archived(rs.getBoolean("userobm_archive"))
 				.timeCreate(JDBCUtils.getDate(rs, "userobm_timecreate"))
 				.timeUpdate(JDBCUtils.getDate(rs, "userobm_timeupdate"))
 				.uidNumber(JDBCUtils.getInteger(rs, "userobm_uid"))
@@ -370,7 +373,7 @@ public class UserDaoJdbcImpl implements UserDao {
 		return builder.build();
 	}
 
-	private ObmHost hostFromCursor(ResultSet rs, ObmDomain domain) throws SQLException {
+	private ObmHost hostFromCursor(ResultSet rs) throws SQLException {
 		int id = rs.getInt("userobm_mail_server_id");
 
 		if (rs.wasNull()) {
@@ -383,7 +386,7 @@ public class UserDaoJdbcImpl implements UserDao {
 				.name(rs.getString("host_name"))
 				.fqdn(rs.getString("host_fqdn"))
 				.ip(rs.getString("host_ip"))
-				.domainId(domain.getId())
+				.domainId(rs.getInt("host_domain_id"))
 				.build();
 	}
 	
@@ -543,7 +546,7 @@ public class UserDaoJdbcImpl implements UserDao {
 				"LEFT JOIN Host ON host_id = userobm_mail_server_id " +
 				"LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL " + 
 				"LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id " + 
-				"WHERE userobm_domain_id = ? AND userobm_archive != '1'";
+				"WHERE userobm_domain_id = ?";
 
 		try {
 			conn = obmHelper.getConnection();
