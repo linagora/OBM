@@ -848,7 +848,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 	public Set<Group> getAllGroupsForUserExtId(ObmDomain domain, UserExtId userExtId) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Connection con;
+		Connection con = null;
 		ImmutableSet.Builder<Group> userGroups = ImmutableSet.builder();
 
 		try {
@@ -879,7 +879,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 
 		}
 		finally {
-			JDBCUtils.cleanup(null, ps, null);
+			JDBCUtils.cleanup(con, ps, rs);
 		}
 
 		return userGroups.build();
