@@ -538,7 +538,7 @@ public class EmailViewPartsFetcherImplTest {
 
 		MimePart parentMimePart = createMock(MimePart.class);
 		expect(parentMimePart.findRootMimePartInTree()).andReturn(parentMimePart);
-		expect(parentMimePart.listLeaves(true, true)).andReturn(ImmutableList.of(multipartLeaf));
+		expect(parentMimePart.listLeaves(true, true)).andReturn(ImmutableList.of(multipartLeaf)).anyTimes();
 		multipartLeaf.defineParent(parentMimePart, multipartLeafIndex);
 		
 		FetchInstruction fetchInstruction = FetchInstruction.builder()
@@ -829,7 +829,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.getPrimaryType()).andReturn(messageFixture.bodyPrimaryType).anyTimes();
 		expect(mimePart.getSubtype()).andReturn(messageFixture.bodySubType).anyTimes();
 		expect(mimePart.findRootMimePartInTree()).andReturn(mimePart);
-		expect(mimePart.listLeaves(true, true)).andReturn(ImmutableList.<MimePart> of(mimePart));
+		expect(mimePart.listLeaves(true, true)).andReturn(ImmutableList.<MimePart> of(mimePart)).anyTimes();
 		expect(mimePart.isAttachment()).andReturn(messageFixture.isAttachment);
 		expect(mimePart.getAttachmentExtension()).andReturn("ATT00001");
 		expect(mimePart.getName()).andReturn(messageFixture.subject);
@@ -838,7 +838,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.getContentType()).andReturn(ContentType.builder().contentType(messageFixture.fullMimeType).build()).anyTimes();
 		expect(mimePart.getContentTransfertEncoding()).andReturn(messageFixture.encoding).anyTimes();
 		expect(mimePart.getSize()).andReturn(messageFixture.estimatedDataSize).anyTimes();
-		expect(mimePart.isInvitation()).andReturn(messageFixture.isInvitation);
+		expect(mimePart.isInvitation()).andReturn(messageFixture.isInvitation).anyTimes();
 		expect(mimePart.isCancelInvitation()).andReturn(false);
 		expect(mimePart.isReplyInvitation()).andReturn(false);
 		expect(mimePart.getContentId()).andReturn(messageFixture.contentId).anyTimes();

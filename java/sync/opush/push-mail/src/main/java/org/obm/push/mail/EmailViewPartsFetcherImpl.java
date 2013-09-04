@@ -38,6 +38,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.Collection;
 import java.util.List;
 
 import net.fortuna.ical4j.data.ParserException;
@@ -66,6 +67,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -214,9 +216,13 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	@VisibleForTesting void fetchAttachments(Builder emailViewBuilder, FetchInstruction fetchInstruction, long uid) {
 		List<EmailViewAttachment> attachments = Lists.newArrayList();
 		MimePart parentMessage = fetchInstruction.getMimePart().findRootMimePartInTree();
+		Collection<MimePart> children = parentMessage.listLeaves(true, true);
+		if (containsInvitation(children)) {
+			return;
+		}
 		int attachmentId = 0;
 		for (MimePart mp : parentMessage.listLeaves(true, true)) {
-			if (mp.isAttachment() && !mp.isICSAttachment()) {
+			if (mp.isAttachment()) {
 				EmailViewAttachment emailViewAttachment = extractEmailViewAttachment(mp, attachmentId++, uid);
 				if (emailViewAttachment != null) {
 					attachments.add(emailViewAttachment);
@@ -226,6 +232,15 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		emailViewBuilder.attachments(attachments);
 	}
 	
+	private boolean containsInvitation(Collection<MimePart> children) {
+		return Iterables.any(children, new Predicate<MimePart>() {
+				@Override
+				public boolean apply(MimePart input) {
+					return input.isInvitation();
+				}
+			});
+	}
+
 	private EmailViewAttachment extractEmailViewAttachment(MimePart mp, int attachmentId, long uid) {
 		String id = "at_" + uid + "_" + attachmentId;
 		String fileReference = AttachmentHelper.getAttachmentId(String.valueOf(collectionId), String.valueOf(uid), 
