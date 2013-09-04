@@ -112,6 +112,7 @@ import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
@@ -690,7 +691,9 @@ public class SyncHandlerWithBackendTest {
 
 		SyncCollectionResponse collectionResponse = getCollectionWithId(response, inboxCollectionIdAsString);
 		MSEmail mail = (MSEmail) Iterables.getOnlyElement(collectionResponse.getItemChanges()).getData();
-		MSAttachement attachment = Iterables.getOnlyElement(mail.getAttachments());
+		Set<MSAttachement> attachments = mail.getAttachments();
+		assertThat(attachments.size()).isEqualTo(1);
+		MSAttachement attachment = Iterables.getOnlyElement(attachments);
 		
 		assertThat(attachment.getMethod()).isEqualTo(MethodAttachment.NormalAttachment);
 		assertThat(attachment.getDisplayName()).isEqualTo("TB_import.JPG");
@@ -699,6 +702,91 @@ public class SyncHandlerWithBackendTest {
 		assertThat(attachment.getContentId()).isEqualTo("555343607@11062013-0EC1");
 		assertThat(attachment.getContentLocation()).isEqualTo("location");
 		assertThat(attachment.isInline()).isTrue();
+	}
+	
+	@Test
+	public void testMailWithICSAttachment() throws Exception {
+		appendToINBOX(greenMailUser, "eml/iCSAsAttachment.eml");
+
+		SyncKey firstAllocatedSyncKey = new SyncKey("132");
+		SyncKey secondAllocatedSyncKey = new SyncKey("456");
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(firstAllocatedSyncKey)
+				.id(3)
+				.build();
+		ItemSyncState secondAllocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T16:22:53"))
+				.syncKey(secondAllocatedSyncKey)
+				.id(4)
+				.build();
+		
+		ServerId emailServerId = new ServerId(inboxCollectionIdAsString + ":" + 1);
+		expect(dateService.getCurrentDate()).andReturn(secondAllocatedState.getSyncDate()).once();
+		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, emailServerId)).andReturn(false);
+		itemTrackingDao.markAsSynced(secondAllocatedState, ImmutableSet.of(emailServerId));
+		expectLastCall().once();
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, secondAllocatedSyncKey);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, secondAllocatedState, inboxCollectionId);
+		
+		mocksControl.replay();
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		SyncResponse response = opClient.sync(decoder, firstAllocatedSyncKey, inboxCollectionId, PIMDataType.EMAIL);
+		mocksControl.verify();
+
+		SyncCollectionResponse collectionResponse = getCollectionWithId(response, inboxCollectionIdAsString);
+		MSEmail mail = (MSEmail) Iterables.getOnlyElement(collectionResponse.getItemChanges()).getData();
+		Set<MSAttachement> attachments = mail.getAttachments();
+		assertThat(attachments.size()).isEqualTo(1);
+		MSAttachement attachment = Iterables.getOnlyElement(attachments);
+		
+		assertThat(attachment.getMethod()).isEqualTo(MethodAttachment.NormalAttachment);
+		assertThat(attachment.getDisplayName()).isEqualTo("attachment.ics");
+	}
+	
+	@Test
+	public void testInvitationDoesntShownInAttachments() throws Exception {
+		appendToINBOX(greenMailUser, "eml/invitation.eml");
+
+		SyncKey firstAllocatedSyncKey = new SyncKey("132");
+		SyncKey secondAllocatedSyncKey = new SyncKey("456");
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(DateUtils.getEpochPlusOneSecondCalendar().getTime())
+				.syncKey(firstAllocatedSyncKey)
+				.id(3)
+				.build();
+		ItemSyncState secondAllocatedState = ItemSyncState.builder()
+				.syncDate(date("2012-10-10T16:22:53"))
+				.syncKey(secondAllocatedSyncKey)
+				.id(4)
+				.build();
+		
+		ServerId emailServerId = new ServerId(inboxCollectionIdAsString + ":" + 1);
+		expect(dateService.getCurrentDate()).andReturn(secondAllocatedState.getSyncDate()).once();
+		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, emailServerId)).andReturn(false);
+		itemTrackingDao.markAsSynced(secondAllocatedState, ImmutableSet.of(emailServerId));
+		expectLastCall().once();
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, secondAllocatedSyncKey);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, secondAllocatedState, inboxCollectionId);
+		
+		expect(eventService.getMSEventUidFor(anyObject(EventExtId.class), eq(singleUserFixture.jaures.device)))
+			.andReturn(new MSEventUid("1"));
+		
+		mocksControl.replay();
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		SyncResponse response = opClient.sync(decoder, firstAllocatedSyncKey, inboxCollectionId, PIMDataType.EMAIL);
+		mocksControl.verify();
+
+		SyncCollectionResponse collectionResponse = getCollectionWithId(response, inboxCollectionIdAsString);
+		MSEmail mail = (MSEmail) Iterables.getOnlyElement(collectionResponse.getItemChanges()).getData();
+		Set<MSAttachement> attachments = mail.getAttachments();
+		assertThat(attachments.size()).isEqualTo(0);
 	}
 
 	@Test

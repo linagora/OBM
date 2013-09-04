@@ -732,7 +732,7 @@ public class EmailViewPartsFetcherImplTest {
 		expect(mimePart.getContentType()).andReturn(ContentType.builder().contentType(messageFixture.fullMimeType).build()).anyTimes();
 		expect(mimePart.getContentTransfertEncoding()).andReturn(messageFixture.encoding).anyTimes();
 		expect(mimePart.getSize()).andReturn(messageFixture.estimatedDataSize).anyTimes();
-		expect(mimePart.isInvitation()).andReturn(messageFixture.isInvitation);
+		expect(mimePart.isInvitation()).andReturn(messageFixture.isInvitation).anyTimes();
 		expect(mimePart.isCancelInvitation()).andReturn(false);
 		expect(mimePart.getContentId()).andReturn(messageFixture.contentId).anyTimes();
 		expect(mimePart.getContentLocation()).andReturn(null).anyTimes();
