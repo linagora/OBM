@@ -35,6 +35,7 @@ import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
+import org.obm.push.store.ehcache.EhCacheConfiguration;
 
 public class OpushStaticConfigurationService extends StaticConfigurationService {
 
@@ -63,9 +64,9 @@ public class OpushStaticConfigurationService extends StaticConfigurationService 
 	
 	public static class SyncPerms implements SyncPermsConfigurationService {
 
-		private final org.obm.Configuration.SyncPerms configuration;
+		private final Configuration.SyncPerms configuration;
 
-		public SyncPerms(org.obm.Configuration.SyncPerms configuration) {
+		public SyncPerms(Configuration.SyncPerms configuration) {
 			this.configuration = configuration;
 		}
 
@@ -80,4 +81,25 @@ public class OpushStaticConfigurationService extends StaticConfigurationService 
 		}
 	}
 
+	public static class EhCache implements EhCacheConfiguration {
+
+		private final Configuration.EhCache configuration;
+
+		public EhCache(Configuration.EhCache configuration) {
+			this.configuration = configuration;
+		}
+
+		@Override
+		public int maxMemoryInMB() {
+			return configuration.maxMemoryInMB;
+		}
+
+		@Override
+		public Percentage percentageAllowedToCache(String cacheName) {
+			if(configuration.percentageAllowedToCache != null) {
+				return Percentage.of(configuration.percentageAllowedToCache);
+			}
+			return Percentage.UNDEFINED;
+		}
+	}
 }

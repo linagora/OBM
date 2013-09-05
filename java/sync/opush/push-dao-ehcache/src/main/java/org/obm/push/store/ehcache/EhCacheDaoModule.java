@@ -47,6 +47,8 @@ public class EhCacheDaoModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		bind(EhCacheConfiguration.class).to(EhCacheConfigurationFileImpl.class);
+
 		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
 		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
 		bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);

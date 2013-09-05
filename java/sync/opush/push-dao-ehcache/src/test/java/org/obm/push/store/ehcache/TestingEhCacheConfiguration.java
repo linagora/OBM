@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,24 +31,41 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.io.File;
-import java.io.IOException;
+import org.obm.push.utils.jvm.JvmUtils;
 
-import org.easymock.EasyMock;
-import org.junit.rules.TemporaryFolder;
-import org.obm.configuration.ConfigurationService;
+import com.google.common.primitives.Ints;
 
-public class EhCacheConfigurationService {
+public class TestingEhCacheConfiguration implements EhCacheConfiguration {
+
+	private int maxMemoryInMB;
+	private Integer percentageAllowedToCache;
+
+	public TestingEhCacheConfiguration() {
+		this.percentageAllowedToCache = 10;
+		this.maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
+	}
 	
-	public ConfigurationService mock(TemporaryFolder temporaryFolder) throws IOException {
-		File dataDir = temporaryFolder.newFolder();
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true).anyTimes();
-		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
-		EasyMock.replay(configurationService);
-		
-		return configurationService;
+	public TestingEhCacheConfiguration withPercentageAllowedToCache(Integer percentageAllowedToCache) {
+		this.percentageAllowedToCache = percentageAllowedToCache;
+		return this;
+	}
+	
+	public TestingEhCacheConfiguration withMaxMemoryInMB(int maxMemoryInMB) {
+		this.maxMemoryInMB = maxMemoryInMB;
+		return this;
+	}
+
+	@Override
+	public int maxMemoryInMB() {
+		return maxMemoryInMB;
+	}
+
+	@Override
+	public Percentage percentageAllowedToCache(String cacheName) {
+		if (percentageAllowedToCache == null) {
+			return Percentage.UNDEFINED;
+		}
+		return Percentage.of(percentageAllowedToCache);
 	}
 
 }

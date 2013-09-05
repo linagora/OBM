@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,53 +31,41 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.io.IOException;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import javax.transaction.NotSupportedException;
-import javax.transaction.SystemException;
-
-import org.easymock.EasyMock;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.configuration.ConfigurationService;
-import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.dao.testsuite.SyncedCollectionDaoTest;
-import org.slf4j.Logger;
+import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
+@RunWith(SlowFilterRunner.class)
+public class EhCacheConfigurationTest {
 
-@RunWith(SlowFilterRunner.class) @Slow
-public class SyncedCollectionDaoEhcacheImplTest extends SyncedCollectionDaoTest {
-
-	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
-
-	private ObjectStoreManager objectStoreManager;
-	private BitronixTransactionManager transactionManager;
-	
-	@Before
-	public void init() throws NotSupportedException, SystemException, IOException {
-		Logger logger = EasyMock.createNiceMock(Logger.class);
-		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
-		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
-
-		TestingEhCacheConfiguration config = new TestingEhCacheConfiguration();
-		objectStoreManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
-		syncedCollectionDao = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
-		
-		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+	@Test
+	public void testPercentageWhenUndefined() {
+		assertThat(Percentage.UNDEFINED.isDefined()).isFalse();
 	}
 	
-	@After
-	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		transactionManager.rollback();
-		objectStoreManager.shutdown();
-		transactionManager.shutdown();
+	@Test(expected=IllegalStateException.class)
+	public void testPercentageGetWhenUndefined() {
+		assertThat(Percentage.UNDEFINED.get());
 	}
+	
+	@Test
+	public void testPercentageWhenZero() {
+		assertThat(Percentage.of(0).isDefined()).isTrue();
+		assertThat(Percentage.of(0).get()).isEqualTo("0%");
+	}
+	
+	@Test
+	public void testPercentageWhenFiftyFive() {
+		assertThat(Percentage.of(55).isDefined()).isTrue();
+		assertThat(Percentage.of(55).get()).isEqualTo("55%");
+	}
+	
+	@Test
+	public void testPercentageGetWhenOneHundred() {
+		assertThat(Percentage.of(100).get()).isEqualTo("100%");
+	}
+	
 }
