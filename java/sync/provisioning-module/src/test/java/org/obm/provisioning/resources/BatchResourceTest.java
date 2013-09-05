@@ -64,6 +64,13 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	@Inject
 	private BatchTracker batchTracker;
 
+	private static final Batch commitedBatch = Batch
+			.builder()
+			.id(batchId(13))
+			.domain(domain)
+			.status(BatchStatus.SUCCESS)
+			.build();
+
 	@Test
 	public void testDeleteWithUnknownDomain() throws DaoException, DomainNotFoundException {
 		expectNoDomain();
@@ -126,7 +133,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.create(batchBuilder.build())).andReturn(batchBuilder.id(batchId(1)).build());
 		mocksControl.replay();
-		
+
 		given()
 			.auth().basic("username@domain", "password").
 		expect()
@@ -147,7 +154,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectNoDomain();
 		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
-		
+
 		given()
 			.auth().basic("username@domain", "password").
 		expect()
@@ -182,7 +189,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.get(batchId(12))).andThrow(new BatchNotFoundException());
 		mocksControl.replay();
-		
+
 		given()
 			.auth().basic("username@domain", "password").
 			expect()
@@ -198,7 +205,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectNoDomain();
 		expectSuccessfulAuthentication("username", "password");
 		mocksControl.replay();
-		
+
 		given()
 			.auth().basic("username@domain", "password").
 			expect()
@@ -234,7 +241,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchDao.get(batchId(12))).andReturn(batch);
 		mocksControl.replay();
-		
+
 		given()
 			.auth().basic("username@domain", "password").
 		expect()
@@ -264,7 +271,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 						"}")).
 		when()
 			.get("/batches/12");
-		
+
 
 		mocksControl.verify();
 	}
@@ -380,6 +387,28 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.put("/batches/12");
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testCommitBatchAlreadyCommited() throws Exception {
+		expectDomain();
+		expectSuccessfulAuthenticationAndFullAuthorization();
+		expect(batchTracker.getTrackedBatch(batchId(13))).andReturn(null);
+		expect(batchDao.get(batchId(13))).andReturn(commitedBatch);
+		mocksControl.replay();
+
+		given()
+			.auth().basic("username@domain", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.content(containsString(  "{"
+						+ "\"message\":\"org.obm.provisioning.exception.ProcessingException: Not commiting batch 13 in status SUCCESS.\","
+						+ "\"type\":\"org.obm.provisioning.resources.BatchAlreadyCommitedException\""
+					+ "}")).
+		when()
+			.put("/batches/13");
 
 		mocksControl.verify();
 	}

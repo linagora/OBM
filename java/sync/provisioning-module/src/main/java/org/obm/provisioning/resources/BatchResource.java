@@ -68,7 +68,7 @@ public class BatchResource {
 		} catch (DomainNotFoundException e) {
 			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
-		
+
 		return batch;
 	}
 
@@ -83,7 +83,7 @@ public class BatchResource {
 				.status(BatchStatus.IDLE)
 				.build();
 		Batch createdBatch;
-		
+
 		try {
 			createdBatch = batchDao.create(batch);
 		} catch (BatchNotFoundException e) {
@@ -132,9 +132,11 @@ public class BatchResource {
 			if (BatchStatus.IDLE.equals(batch.getStatus())) {
 				batchProcessor.process(batch);
 			} else {
-				throw new WebApplicationException(
-					new ProcessingException(
-						String.format("Not commiting batch %s in status %s.", batch.getId(), batch.getStatus())), Status.OK);
+				return Response.ok(
+						new BatchAlreadyCommitedException(
+								new ProcessingException(
+										String.format("Not commiting batch %s in status %s.", batch.getId(), batch.getStatus())))
+						).build();
 			}
 		}
 
@@ -147,7 +149,7 @@ public class BatchResource {
 
 		return UserWriteResource.class;
 	}
-	
+
 	@Path("{batchId}/groups")
 	public Class<GroupWriteResource> groups(@Context Batch batch) {
 		assertBatchIsIdle(batch);
