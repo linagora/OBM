@@ -53,35 +53,41 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.ObmUser.Builder;
 
 public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
-	
+
 	private final Provider<ObmDomain> domainProvider;
-	private final Builder builder = ObmUser.builder();
+	private final Builder userBuilder;
 
 	@Inject
 	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider) {
 		this.domainProvider = domainProvider;
+		this.userBuilder = ObmUser.builder();
 	}
-	
+
+	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ObmUser fromUser) {
+		this.domainProvider = domainProvider;
+		this.userBuilder = ObmUser.builder().from(fromUser);
+	}
+
 	@Override
 	public ObmUser deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 		JsonNode jsonNode = jp.readValueAsTree();
+		ObmDomain domain = domainProvider.get();
 
 		for(UserJsonFields field: UserJsonFields.fields) {
-			addFieldValueToBuilder(jsonNode, field, builder);
+			addFieldValueToBuilder(jsonNode, field, userBuilder);
 		}
 
-		ObmDomain domain = domainProvider.get();
-		
 		ObmHost mailHost = getMailHostValue(jsonNode, domain);
 
-		ObmUser user = builder
-				.domain(domain)
-				.mailHost(mailHost)
-				.build();
+		if (mailHost != null) {
+			userBuilder
+				.mailHost(mailHost);
+		}
 
-		Preconditions.checkArgument(user.getProfileName() != null, UserJsonFields.PROFILE.asSpecificationValue() + " is required.");
-		Preconditions.checkArgument(user.getLastName() != null, UserJsonFields.LASTNAME.asSpecificationValue() + " is required.");
+		ObmUser newUser = userBuilder.domain(domain).build();
+		Preconditions.checkArgument(newUser.getProfileName() != null, UserJsonFields.PROFILE.asSpecificationValue() + " is required.");
+		Preconditions.checkArgument(newUser.getLastName() != null, UserJsonFields.LASTNAME.asSpecificationValue() + " is required.");
 
-		return user;
+		return newUser;
 	}
 }

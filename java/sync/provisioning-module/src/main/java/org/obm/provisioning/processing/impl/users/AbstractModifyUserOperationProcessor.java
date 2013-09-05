@@ -29,6 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.users;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.PUserDao;
@@ -38,24 +39,50 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
+import org.obm.provisioning.processing.impl.OperationUtils;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
-public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor {
+public abstract class AbstractModifyUserOperationProcessor extends AbstractUserOperationProcessor {
 	@Inject
 	private PUserDao pUserDao;
 
-	@Inject
-	ModifyUserOperationProcessor() {
-		super(HttpVerb.PUT);
-	}
-	
-	ModifyUserOperationProcessor(HttpVerb verb) {
+	private ObmUser existingUser;
+
+	AbstractModifyUserOperationProcessor(HttpVerb verb) {
 		super(verb);
+	}
+
+	protected abstract ObjectMapper getObjectMapper(ObmDomain domain);
+
+	protected final ObmUser getExistingUser() {
+		return existingUser;
+	}
+
+	@Override
+	@Transactional
+	public final void process(Operation operation, Batch batch) throws ProcessingException {
+		final UserExtId extId = OperationUtils.getUserExtIdFromRequest(operation);
+		final ObmDomain domain = batch.getDomain();
+		existingUser = getUserFromDao(extId, domain);
+		ObmUser user = getUserFromRequestBody(operation, getObjectMapper(domain));
+
+		validateUserChanges(user, existingUser);
+
+		ObmUser newUser = modifyUserInDao(inheritDatabaseIdentifiers(user, existingUser));
+
+		if (newUser.isEmailAvailable()) {
+			updateUserMailbox(newUser);
+		}
+
+		modifyUserInLdap(newUser, existingUser);
+		updateUserInPTables(newUser);
 	}
 
 	@VisibleForTesting void validateUserChanges(ObmUser modifiedUser, ObmUser existingUser) {
@@ -69,25 +96,6 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 		if (modifiedUser.isArchived() != existingUser.isArchived()) {
 			throw new ProcessingException("Cannot change user archived state");
 		}
-
-	}
-
-	@Override
-	@Transactional
-	public void process(Operation operation, Batch batch) throws ProcessingException {
-		ObmUser user = getUserFromRequestBody(operation, batch);
-		ObmUser existingUser = getUserFromDao(user.getExtId(), batch.getDomain());
-		
-		validateUserChanges(user, existingUser);
-		
-		ObmUser newUser = modifyUserInDao(inheritDatabaseIdentifiers(user, existingUser));
-
-		if (newUser.isEmailAvailable()) {
-			updateUserMailbox(newUser);
-		}
-
-		modifyUserInLdap(newUser, existingUser);
-		updateUserInPTables(newUser);
 	}
 
 	protected void updateUserMailbox(ObmUser user) {
@@ -105,7 +113,7 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
-	protected ObmUser modifyUserInDao(ObmUser user) {
+	private ObmUser modifyUserInDao(ObmUser user) {
 		try {
 			return userDao.update(user);
 		}
@@ -114,7 +122,7 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
-	protected void modifyUserInLdap(ObmUser user, ObmUser oldObmUser) {
+	private void modifyUserInLdap(ObmUser user, ObmUser oldObmUser) {
 		LdapManager ldapManager = buildLdapManager(user.getDomain());
 
 		try {
@@ -128,7 +136,7 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 	}
 
-	protected void updateUserInPTables(ObmUser user) throws ProcessingException {
+	private void updateUserInPTables(ObmUser user) throws ProcessingException {
 		try {
 			pUserDao.delete(user);
 			pUserDao.insert(user);

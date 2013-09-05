@@ -81,7 +81,7 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 	@Override
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
-		ObmUser user = getUserFromRequestBody(operation, batch);
+		ObmUser user = getUserFromRequestBody(operation, getDefaultObjectMapper(batch.getDomain()));
 		ObmUser userFromDao = createUserInDao(user);
 
 		Group defaultGroup = getDefaultGroup(user.getDomain());

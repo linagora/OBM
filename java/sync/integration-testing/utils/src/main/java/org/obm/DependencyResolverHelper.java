@@ -181,7 +181,6 @@ import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
 import org.obm.provisioning.json.PatchGroupJsonDeserializer;
-import org.obm.provisioning.json.PatchObmUserJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonSerializer;
 import org.obm.provisioning.ldap.client.Connection;
@@ -218,11 +217,12 @@ import org.obm.provisioning.processing.impl.groups.DeleteSubgroupFromGroupOperat
 import org.obm.provisioning.processing.impl.groups.DeleteUserFromGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.ModifyGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.PatchGroupOperationProcessor;
+import org.obm.provisioning.processing.impl.users.AbstractModifyUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.AbstractUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
-import org.obm.provisioning.processing.impl.users.ModifyUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.PatchUserOperationProcessor;
+import org.obm.provisioning.processing.impl.users.PutUserOperationProcessor;
 import org.obm.provisioning.resources.AbstractBatchAwareResource;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
@@ -718,12 +718,13 @@ public class DependencyResolverHelper {
 				BatchTrackerImpl.class,
 				BatchProcessingListener.class,
 				AbstractUserOperationProcessor.class,
-				ModifyUserOperationProcessor.class,
+				AbstractModifyUserOperationProcessor.class,
 				GroupResource.class,
 				GroupWriteResource.class,
 				SystemUserLdapConfiguration.class,
-				PatchObmUserJsonDeserializer.class,
+				ObmUserJsonDeserializer.class,
 				PatchUserOperationProcessor.class,
+				PutUserOperationProcessor.class,
 				Module.class,
 				Profile.class,
 				ModuleCheckBoxStates.class,

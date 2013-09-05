@@ -35,61 +35,28 @@ import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.ProvisioningService;
-import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
-import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.exception.ProcessingException;
-import org.obm.provisioning.json.PatchObmUserJsonDeserializer;
-import org.obm.provisioning.processing.impl.OperationUtils;
+import org.obm.provisioning.json.ObmUserJsonDeserializer;
 
 import com.google.inject.Inject;
+import com.google.inject.util.Providers;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserExtId;
 
-public class PatchUserOperationProcessor extends ModifyUserOperationProcessor {
+public class PatchUserOperationProcessor extends AbstractModifyUserOperationProcessor {
 	
 	@Inject
 	PatchUserOperationProcessor() {
 		super(HttpVerb.PATCH);
-		
 	}
-	
+
 	@Override
-	@Transactional
-	public void process(Operation operation, Batch batch) throws ProcessingException {
-		final UserExtId extId = OperationUtils.getUserExtIdFromRequest(operation);
-		ObmUser oldUser = getUserFromDao(extId, batch.getDomain());
-		ObmUser user = getUserFromRequestBody(operation, oldUser);
-		ObmUser newUser = modifyUserInDao(inheritDatabaseIdentifiers(user, oldUser));
-
-		if (newUser.isEmailAvailable()) {
-			updateUserMailbox(newUser);
-		}
-
-		modifyUserInLdap(newUser, oldUser);
-		updateUserInPTables(newUser);
-	}
-	
-	private ObmUser getUserFromRequestBody(Operation operation, ObmUser oldUser) {
-		String requestBody = operation.getRequest().getBody();
-		ObjectMapper objectMapper = getObjectMapperForDomain(oldUser);
-
-		try {
-			return objectMapper.readValue(requestBody, ObmUser.class);
-		}
-		catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot parse ObmUser object from request body %s.", requestBody), e);
-		}
-	}
-
-	private ObjectMapper getObjectMapperForDomain(ObmUser oldUser) {
+	protected ObjectMapper getObjectMapper(ObmDomain domain) {
 		Module module = new SimpleModule("InBatch", new Version(0, 0, 0, null))
-			.addDeserializer(ObmUser.class, new PatchObmUserJsonDeserializer(oldUser));
+			.addDeserializer(ObmUser.class, new ObmUserJsonDeserializer(Providers.of(domain), getExistingUser()));
 
 		return ProvisioningService.createObjectMapper(module);
 	}
-	
 }

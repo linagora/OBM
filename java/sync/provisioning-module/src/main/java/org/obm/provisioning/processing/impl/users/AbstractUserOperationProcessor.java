@@ -32,14 +32,12 @@ package org.obm.provisioning.processing.impl.users;
 import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
 
 import org.codehaus.jackson.Version;
-import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.ProvisioningService;
-import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
@@ -78,9 +76,8 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 		return ObmUser.builder().from(user).uid(existingUser.getUid()).entityId(existingUser.getEntityId()).build();
 	}
 
-	protected ObmUser getUserFromRequestBody(Operation operation, Batch batch) {
+	protected ObmUser getUserFromRequestBody(Operation operation, ObjectMapper objectMapper) {
 		String requestBody = operation.getRequest().getBody();
-		ObjectMapper objectMapper = getObjectMapperForDomain(batch.getDomain());
 
 		try {
 			return objectMapper.readValue(requestBody, ObmUser.class);
@@ -90,8 +87,8 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 		}
 	}
 
-	private ObjectMapper getObjectMapperForDomain(ObmDomain domain) {
-		Module module = new SimpleModule("InBatch", new Version(0, 0, 0, null)).addDeserializer(ObmUser.class, new ObmUserJsonDeserializer(Providers.of(domain)));
+	protected ObjectMapper getDefaultObjectMapper(ObmDomain domain) {
+		SimpleModule module = new SimpleModule("InBatch", new Version(0, 0, 0, null)).addDeserializer(ObmUser.class, new ObmUserJsonDeserializer(Providers.of(domain)));
 
 		return ProvisioningService.createObjectMapper(module);
 	}
