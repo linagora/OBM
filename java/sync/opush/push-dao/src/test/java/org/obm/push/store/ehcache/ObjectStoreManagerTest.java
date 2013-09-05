@@ -56,6 +56,7 @@ import com.google.common.collect.ImmutableList;
 public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManager opushCacheManager;
+	private EhCacheConfiguration config;
 	private ConfigurationService configurationService;
 	private Logger logger;
 
@@ -63,8 +64,9 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	@Before
 	public void init() throws IOException {
 		logger = createNiceMock(Logger.class);
-		configurationService = super.initConfigurationServiceMock();
-		opushCacheManager = new ObjectStoreManager(configurationService, logger);
+		configurationService = super.mockConfigurationService();
+		config = new TestingEhCacheConfiguration();
+		opushCacheManager = new ObjectStoreManager(configurationService, config, logger);
 	}
 
 	@After
@@ -98,7 +100,7 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 		opushCacheManager.shutdown();
 
 		TransactionManagerServices.getTransactionManager().begin();
-		ObjectStoreManager newCacheManager = new ObjectStoreManager(configurationService, logger);
+		ObjectStoreManager newCacheManager = new ObjectStoreManager(configurationService, config, logger);
 		for (String persistentStoreName : persistentStoreNames) {
 			Cache loadedCache = newCacheManager.createNewStore(persistentStoreName);
 			assertThat(loadedCache.get(el1.getObjectKey())).isEqualTo(el1);

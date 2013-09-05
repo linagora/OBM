@@ -70,7 +70,8 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		EhCacheConfiguration config = new TestingEhCacheConfiguration();
+		this.objectStoreManager = new ObjectStoreManager(super.mockConfigurationService(), config, logger);
 		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");

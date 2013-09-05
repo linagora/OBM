@@ -42,6 +42,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.opush.env.Configuration.Mail;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
+import org.obm.push.store.ehcache.EhCacheConfiguration;
 
 import com.google.common.base.Throwables;
 
@@ -83,6 +84,25 @@ public class StaticConfigurationService implements ConfigurationService {
 		@Override
 		public Boolean allowUnknownPdaToSync() {
 			return configuration.allowUnknownDevice;
+		}
+	}
+
+	public static class EhCache implements EhCacheConfiguration {
+
+		private final org.obm.opush.env.Configuration.EhCache configuration;
+
+		public EhCache(org.obm.opush.env.Configuration.EhCache configuration) {
+			this.configuration = configuration;
+		}
+
+		@Override
+		public int maxMemoryInMB() {
+			return configuration.maxMemoryInMB;
+		}
+
+		@Override
+		public Percentage percentageAllowedToCache(String cacheName) {
+			return configuration.percentageAllowedToCache;
 		}
 	}
 

@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,39 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store;
+package org.obm.push.store.ehcache;
 
-import org.obm.push.store.ehcache.EhCacheConfiguration;
-import org.obm.push.store.ehcache.EhCacheConfigurationFileImpl;
-import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
-import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
-import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
-import org.obm.push.store.jdbc.CalendarDaoJdbcImpl;
-import org.obm.push.store.jdbc.CollectionDaoJdbcImpl;
-import org.obm.push.store.jdbc.DeviceDaoJdbcImpl;
-import org.obm.push.store.jdbc.FolderSnapshotDaoJdbcImpl;
-import org.obm.push.store.jdbc.FolderSyncStateBackendMappingDaoJdbcImpl;
-import org.obm.push.store.jdbc.HearbeatDaoJdbcDaoImpl;
-import org.obm.push.store.jdbc.TransactionDateProvider;
-import org.obm.sync.date.DateProvider;
+import org.obm.push.utils.IniFile;
+import org.obm.push.utils.jvm.JvmUtils;
 
-import com.google.inject.AbstractModule;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
 
-public class DaoModule extends AbstractModule{
+public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 
+	private static final String configFilePath = "/etc/opush/ehcache_conf.ini";
+	private final IniFile iniFile;
+	
+	@Inject
+	@VisibleForTesting EhCacheConfigurationFileImpl(IniFile.Factory factory) {
+		iniFile = factory.build(configFilePath);
+	}
+	
 	@Override
-	protected void configure() {
-		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
-		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
-		bind(HearbeatDao.class).to(HearbeatDaoJdbcDaoImpl.class);
-		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
-		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
-		bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
-		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-		bind(FolderSyncStateBackendMappingDao.class).to(FolderSyncStateBackendMappingDaoJdbcImpl.class);
-		bind(FolderSnapshotDao.class).to(FolderSnapshotDaoJdbcImpl.class);
-		bind(DateProvider.class).to(TransactionDateProvider.class);
-		bind(EhCacheConfiguration.class).to(EhCacheConfigurationFileImpl.class);
+	public int maxMemoryInMB() {
+		int value = iniFile.getIntValue("maxMemoryInMB", -1);
+		if (value > JvmUtils.maxRuntimeJvmMemoryInMB()) {
+			throw new IllegalStateException("maxMemoryInMB is higher than JVM Xmx value");
+		}
+		if (value > 0) {
+			return value;
+		}
+		throw new IllegalStateException("illegal maxMemoryInMB value");
 	}
 
+	@Override
+	public Percentage percentageAllowedToCache(String cacheName) {
+		Integer value = iniFile.getIntegerValue(cacheName, null);
+		if (value == null || value == 0) {
+			return Percentage.UNDEFINED;
+		}
+		return Percentage.of(value);
+	}
 }

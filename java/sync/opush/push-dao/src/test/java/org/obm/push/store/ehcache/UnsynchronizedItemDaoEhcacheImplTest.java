@@ -71,7 +71,8 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		this.transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		EhCacheConfiguration config = new TestingEhCacheConfiguration();
+		this.objectStoreManager = new ObjectStoreManager(super.mockConfigurationService(), config, logger);
 		this.unSynchronizedItemImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
 	}
 	

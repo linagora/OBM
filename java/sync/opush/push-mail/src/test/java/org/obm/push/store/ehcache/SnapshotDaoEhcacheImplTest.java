@@ -77,8 +77,21 @@ public class SnapshotDaoEhcacheImplTest {
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		objectStoreManager = new ObjectStoreManager( initConfigurationServiceMock(), logger);
+		this.objectStoreManager = new ObjectStoreManager(initConfigurationServiceMock(), createEhCacheConfiguration(), logger);
 		snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager);
+	}
+
+	private EhCacheConfiguration createEhCacheConfiguration() {
+		return new EhCacheConfiguration() {
+			@Override
+			public int maxMemoryInMB() {
+				return 10;
+			}
+
+			@Override
+			public Percentage percentageAllowedToCache(String cacheName) {
+				return Percentage.UNDEFINED;
+			}};
 	}
 	
 	private ConfigurationService initConfigurationServiceMock() throws IOException {

@@ -149,8 +149,6 @@ public class PingHandlerTest {
 		opushServer.start();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
-		
-		Stopwatch stopwatch = new Stopwatch().start();
 		Document document = DOMUtils.parse(
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 				"<Ping>" +
@@ -166,6 +164,8 @@ public class PingHandlerTest {
 						"</Folder>" +
 					"</Folders>" +
 				"</Ping>");
+		
+		Stopwatch stopwatch = new Stopwatch().start();
 		Document response = opClient.postXml("Ping", document, "Ping", null, false);
 		
 		checkExecutionTime(2, 5, stopwatch);

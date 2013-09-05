@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,64 +29,43 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.env;
+package org.obm.push.store.ehcache;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
+import static org.fest.assertions.api.Assertions.assertThat;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 
-import com.google.common.base.Charsets;
+@RunWith(SlowFilterRunner.class)
+public class EhCacheConfigurationTest {
 
-public class Configuration {
-
-	public static class EhCache {
-		public int maxMemoryInMB = 10;
-		public Percentage percentageAllowedToCache = Percentage.UNDEFINED;
+	@Test
+	public void testPercentageWhenUndefined() {
+		assertThat(Percentage.UNDEFINED.isDefined()).isFalse();
 	}
 	
-	public static class SyncPerms {
-		public String blacklist = "";
-		public boolean allowUnknownDevice = true;
-	}
-
-	public static class Mail {
-		public boolean activateTls = false;
-		public boolean loginWithDomain = true;
-		public int timeoutInMilliseconds = 5000;
-		public int imapPort = 143;
-		protected int maxMessageSize = 1024;
-		protected int fetchBlockSize = 1 << 20;
-	}
-
-	public static class Transaction {
-		public int timeoutInSeconds = 10;
-		public boolean usePersistentCache = true;
-	}
-
-	public static class RemoteConsole {
-		public boolean enable = true;
-		public int port = 0; //random
+	@Test(expected=IllegalStateException.class)
+	public void testPercentageGetWhenUndefined() {
+		assertThat(Percentage.UNDEFINED.get());
 	}
 	
-	public ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.FRANCE);
-	public SyncPerms syncPerms = new SyncPerms();
-	public Mail mail = new Mail();
-	public Transaction transaction = new Transaction();
-	public RemoteConsole remoteConsole = new RemoteConsole();
-	public EhCache ehCache = new EhCache();
-	public File dataDir;
-	public String locatorUrl = null;
-	public String obmUiBaseUrl = null;
-	public String obmSyncUrl = null;
-	public int locatorCacheTimeout = 10;
-	public TimeUnit locatorCacheTimeUnit = TimeUnit.SECONDS;
-	public String activeSyncServletUrl = null;
-	public Charset defautEncoding = Charsets.UTF_8;
-	public int trustTokenTimeoutInSeconds = 10;
-	public int solrCheckingInterval = 10;
-
+	@Test
+	public void testPercentageWhenZero() {
+		assertThat(Percentage.of(0).isDefined()).isTrue();
+		assertThat(Percentage.of(0).get()).isEqualTo("0%");
+	}
+	
+	@Test
+	public void testPercentageWhenFiftyFive() {
+		assertThat(Percentage.of(55).isDefined()).isTrue();
+		assertThat(Percentage.of(55).get()).isEqualTo("55%");
+	}
+	
+	@Test
+	public void testPercentageGetWhenOneHundred() {
+		assertThat(Percentage.of(100).get()).isEqualTo("100%");
+	}
+	
 }

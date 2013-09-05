@@ -37,6 +37,7 @@ import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
+import org.obm.push.store.ehcache.EhCacheConfiguration;
 
 import com.google.inject.Provider;
 import com.google.inject.name.Names;
@@ -58,6 +59,7 @@ public final class ConfigurationModule extends AbstractOverrideModule {
 		bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
 		bind(SyncPermsConfigurationService.class).toInstance(new StaticConfigurationService.SyncPerms(configuration.syncPerms));
 		bind(RemoteConsoleConfiguration.class).toInstance(new StaticConfigurationService.RemoteConsole(configuration.remoteConsole));
+		bind(EhCacheConfiguration.class).toInstance(new StaticConfigurationService.EhCache(configuration.ehCache));
 		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toProvider(bindWithMock(PolicyConfigurationProvider.class));
 	}
 	

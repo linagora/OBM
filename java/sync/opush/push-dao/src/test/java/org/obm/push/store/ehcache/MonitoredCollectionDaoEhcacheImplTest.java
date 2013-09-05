@@ -37,7 +37,6 @@ import java.util.Set;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -56,6 +55,7 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.slf4j.Logger;
 
+import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.Sets;
@@ -66,24 +66,25 @@ public class MonitoredCollectionDaoEhcacheImplTest extends StoreManagerConfigura
 	private ObjectStoreManager objectStoreManager;
 	private MonitoredCollectionDaoEhcacheImpl monitoredCollectionStoreServiceImpl;
 	private Credentials credentials;
-	private TransactionManager transactionManager;
+	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
-		this.transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManager = new ObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		EhCacheConfiguration config = new TestingEhCacheConfiguration();
+		this.objectStoreManager = new ObjectStoreManager(super.mockConfigurationService(), config, logger);
 		this.monitoredCollectionStoreServiceImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 	}
 	
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
 		transactionManager.rollback();
+		transactionManager.shutdown();
 		objectStoreManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

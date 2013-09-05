@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,50 +29,43 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.windowing;
+package org.obm.push.store.ehcache;
 
-import java.util.concurrent.TimeUnit;
+import org.obm.push.utils.jvm.JvmUtils;
 
-import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.opush.env.Configuration;
-import org.obm.opush.env.StaticConfigurationService;
-import org.obm.push.mail.WindowingService;
-import org.obm.push.mail.WindowingServiceImpl;
-import org.obm.push.store.WindowingDao;
-import org.obm.push.store.ehcache.EhCacheConfiguration;
-import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.io.Files;
 import com.google.common.primitives.Ints;
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
 
-public class WindowingModule extends AbstractModule {
+public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 
-	private final Logger configurationLogger;
+	private int maxMemoryInMB;
+	private Integer percentageAllowedToCache;
 
-	public WindowingModule() {
-		configurationLogger = LoggerFactory.getLogger(getClass());
+	public TestingEhCacheConfiguration() {
+		this.percentageAllowedToCache = 10;
+		this.maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
 	}
 	
-	@Override
-	protected void configure() {
-		Configuration configuration = configuration();
-		bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
-		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
-		bind(WindowingService.class).to(WindowingServiceImpl.class);
-		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(configurationLogger);
-		bind(EhCacheConfiguration.class).toInstance(new StaticConfigurationService.EhCache(configuration.ehCache));
-	}		
+	public TestingEhCacheConfiguration withPercentageAllowedToCache(Integer percentageAllowedToCache) {
+		this.percentageAllowedToCache = percentageAllowedToCache;
+		return this;
+	}
+	
+	public TestingEhCacheConfiguration withMaxMemoryInMB(int maxMemoryInMB) {
+		this.maxMemoryInMB = maxMemoryInMB;
+		return this;
+	}
 
-	protected Configuration configuration() {
-		Configuration configuration = new Configuration();
-		configuration.transaction.timeoutInSeconds = Ints.checkedCast(TimeUnit.MINUTES.toSeconds(10));
-		configuration.dataDir = Files.createTempDir();
-		return configuration;
+	@Override
+	public int maxMemoryInMB() {
+		return maxMemoryInMB;
+	}
+
+	@Override
+	public Percentage percentageAllowedToCache(String cacheName) {
+		if (percentageAllowedToCache == null) {
+			return Percentage.UNDEFINED;
+		}
+		return Percentage.of(percentageAllowedToCache);
 	}
 
 }

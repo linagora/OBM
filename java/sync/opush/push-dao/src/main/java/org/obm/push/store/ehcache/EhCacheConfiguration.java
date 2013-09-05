@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,28 +31,63 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.io.File;
-import java.io.IOException;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
-import org.easymock.EasyMock;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.obm.configuration.ConfigurationService;
+public interface EhCacheConfiguration {
 
-public class StoreManagerConfigurationTest {
-
-	@Rule 
-	public TemporaryFolder temporaryFolder =  new TemporaryFolder();
+	/**
+	 * @return Global ehcache heap memory allowed
+	 */
+	int maxMemoryInMB();
 	
-	protected ConfigurationService mockConfigurationService() throws IOException {
-		File dataDir = temporaryFolder.newFolder();
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true).anyTimes();
-		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
-		EasyMock.replay(configurationService);
-		
-		return configurationService;
-	}
+	/**
+	 * @return percentage related to the global heap memory allowed for the given cache
+	 */
+	Percentage percentageAllowedToCache(String cacheName);
+	
+	public static class Percentage {
 
+		public static final Percentage UNDEFINED = new Percentage(null);
+		public static final Percentage of(int percentage) {
+			Preconditions.checkArgument(percentage >= 0, "must be positive");
+			Preconditions.checkArgument(percentage <= 100, "must between 0 and 100");
+			return new Percentage(percentage);
+		}
+		
+		private final Integer percentage;
+		
+		private Percentage(Integer percent) {
+			this.percentage = percent;
+		}
+		
+		public boolean isDefined() {
+			return percentage != null;
+		}
+
+		public String get() {
+			Preconditions.checkState(isDefined(), "cannot call get() on undefined percentage");
+			return String.valueOf(percentage) + "%";
+		}
+
+		
+		@Override
+		public final int hashCode(){
+			return Objects.hashCode(percentage);
+		}
+		
+		@Override
+		public final boolean equals(Object object){
+			if (object instanceof Percentage) {
+				Percentage that = (Percentage) object;
+				return Objects.equal(this.percentage, that.percentage);
+			}
+			return false;
+		}
+
+		@Override
+		public String toString() {
+			return get();
+		}
+	}
 }

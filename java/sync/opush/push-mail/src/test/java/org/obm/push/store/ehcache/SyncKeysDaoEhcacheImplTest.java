@@ -73,8 +73,22 @@ public class SyncKeysDaoEhcacheImplTest {
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		objectStoreManager = new ObjectStoreManager(initConfigurationServiceMock(), logger);
+		EhCacheConfiguration config = createEhCacheConfiguration();
+		this.objectStoreManager = new ObjectStoreManager(initConfigurationServiceMock(), config, logger);
 		syncKeysDaoEhcacheImpl = new SyncKeysDaoEhcacheImpl(objectStoreManager);
+	}
+
+	private EhCacheConfiguration createEhCacheConfiguration() {
+		return new EhCacheConfiguration() {
+			@Override
+			public int maxMemoryInMB() {
+				return 10;
+			}
+
+			@Override
+			public Percentage percentageAllowedToCache(String cacheName) {
+				return Percentage.UNDEFINED;
+			}};
 	}
 	
 	private ConfigurationService initConfigurationServiceMock() throws IOException {
