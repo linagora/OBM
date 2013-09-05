@@ -142,4 +142,48 @@ public class EhCacheSettingsTest extends StoreManagerConfigurationTest {
 			.withPercentageAllowedToCache(60);
 		new ObjectStoreManager(configurationService, configWhenMoreThanOneHundred, logger);
 	}
+	
+	@Test
+	public void testTimeToLiveReached() throws Exception {
+		TestingEhCacheConfiguration configOneMBMax = new TestingEhCacheConfiguration()
+			.withTimeToLive(1);
+		
+		ObjectStoreManager cacheManager = new ObjectStoreManager(configurationService, configOneMBMax, logger);
+	
+		try {
+			Element el1 = new Element("key1", "value1");
+			TransactionManagerServices.getTransactionManager().begin();
+			Cache cache = cacheManager.getStore("mailSnapshotStore");
+			cache.put(el1);
+		
+			Thread.sleep(2000);
+			assertThat(cache.get(el1.getObjectKey())).isNull();
+		} finally {
+			TransactionManagerServices.getTransactionManager().commit();
+			TransactionManagerServices.getTransactionManager().shutdown();
+			cacheManager.shutdown();
+		}
+	}
+	
+	@Test
+	public void testTimeToLiveStillAlive() throws Exception {
+		TestingEhCacheConfiguration configOneMBMax = new TestingEhCacheConfiguration()
+			.withTimeToLive(1);
+		
+		ObjectStoreManager cacheManager = new ObjectStoreManager(configurationService, configOneMBMax, logger);
+	
+		try {
+			Element element = new Element("key1", "value1");
+			TransactionManagerServices.getTransactionManager().begin();
+			Cache cache = cacheManager.getStore("mailSnapshotStore");
+			cache.put(element);
+		
+			Thread.sleep(20);
+			assertThat(cache.get(element.getObjectKey())).isNotNull();
+		} finally {
+			TransactionManagerServices.getTransactionManager().commit();
+			TransactionManagerServices.getTransactionManager().shutdown();
+			cacheManager.shutdown();
+		}
+	}
 }
