@@ -39,10 +39,10 @@ import java.util.concurrent.TimeUnit;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.resourcebundle.Control;
-import org.obm.push.utils.IniFile;
+import org.obm.configuration.utils.IniFile;
+import org.obm.configuration.utils.TimeUnitMapper;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -80,20 +80,17 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private static final String GLOBAL_DOMAIN = "global.virt";
 
-	private final ImmutableMap<String, TimeUnit> timeUnits;
-
 	private final String applicationName;
 	protected final IniFile iniFile;
+	private final TimeUnitMapper timeUnitMapper;
 
     @Inject
 	public ConfigurationServiceImpl(IniFile.Factory iniFileFactory, @Named("application-name")String applicationName, 
-			@Named("globalConfigurationFile") String globalConfigurationFile) {
+			@Named("globalConfigurationFile") String globalConfigurationFile,
+			TimeUnitMapper timeUnitMapper) {
 		this.iniFile = iniFileFactory.build(globalConfigurationFile);
 		this.applicationName = applicationName;
-		this.timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
-								"seconds", TimeUnit.SECONDS,
-								"minutes", TimeUnit.MINUTES,
-								"hours", TimeUnit.HOURS);
+		this.timeUnitMapper = timeUnitMapper;
 	}
 
 	@Override
@@ -127,7 +124,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public TimeUnit getLocatorCacheTimeUnit() {
 		String key = iniFile.getStringValue(LOCATOR_CACHE_TIMEUNIT_KEY);
-		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
+		return timeUnitMapper.getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
 
 	private int getTransactionTimeout() {
@@ -136,19 +133,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private TimeUnit getTransactionTimeoutUnit() {
 		String key = iniFile.getStringValue(TRANSACTION_TIMEOUT_UNIT_KEY);
-		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
+		return timeUnitMapper.getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
 
-	private TimeUnit getTimeUnitOrDefault(String key, TimeUnit defaultUnit) {
-		if (key != null) {
-			TimeUnit unit = timeUnits.get(key.toLowerCase());
-			if (unit != null) {
-				return unit;
-			}
-		}
-		return defaultUnit;
-	}
-	
 	@Override
 	public int transactionTimeoutInSeconds() {
 		TimeUnit transactionTimeoutUnit = getTransactionTimeoutUnit();

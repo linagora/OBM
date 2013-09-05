@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,33 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.service;
+package org.obm.configuration.utils;
 
-import org.obm.configuration.SyncPermsConfigurationService;
-import org.obm.configuration.utils.IniFile;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.concurrent.TimeUnit;
 
-@Singleton
-public class OpushSyncPermsConfigurationService implements SyncPermsConfigurationService {
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-	private static final String BLACKLIST_USERS_PARAMS = "blacklist.users";
-	private static final String ALLOW_UNKNOWN_PDA_PARAMS = "allow.unknown.pda";
-	private final IniFile iniFile;
+@RunWith(SlowFilterRunner.class)
+public class TimeUnitMapperTest {
 
-	@Inject
-	protected OpushSyncPermsConfigurationService(IniFile.Factory iniFileFactory) {
-		iniFile = iniFileFactory.build("/etc/opush/sync_perms.ini");
+	@Test
+	public void testGetTimeUnitOrDefaultNullTimeUnit() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault(null, TimeUnit.SECONDS)).isEqualTo(TimeUnit.SECONDS);
 	}
 
-	@Override
-	public String getBlackListUser(){
-		return iniFile.getStringValue(BLACKLIST_USERS_PARAMS);
+	@Test
+	public void testGetTimeUnitOrDefaultEmptyTimeUnit() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("", TimeUnit.SECONDS)).isEqualTo(TimeUnit.SECONDS);
+	}
+
+	@Test
+	public void testGetTimeUnitOrDefaultUnkownTimeUnit() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("unknown", TimeUnit.SECONDS)).isEqualTo(TimeUnit.SECONDS);
+	}
+
+	@Test
+	public void testGetTimeUnitMilliseconds() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("milliseconds", TimeUnit.MINUTES)).isEqualTo(TimeUnit.MILLISECONDS);
+	}
+
+	@Test
+	public void testGetTimeUnitSeconds() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("seconds", TimeUnit.MINUTES)).isEqualTo(TimeUnit.SECONDS);
 	}
 	
-	@Override
-	public Boolean allowUnknownPdaToSync(){
-		return iniFile.getBooleanValue(ALLOW_UNKNOWN_PDA_PARAMS);
+	@Test
+	public void testGetTimeUnitMinutes() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("minutes", TimeUnit.SECONDS)).isEqualTo(TimeUnit.MINUTES);
+	}
+	
+	@Test
+	public void testGetTimeUnitHours() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("hours", TimeUnit.SECONDS)).isEqualTo(TimeUnit.HOURS);
 	}
 }

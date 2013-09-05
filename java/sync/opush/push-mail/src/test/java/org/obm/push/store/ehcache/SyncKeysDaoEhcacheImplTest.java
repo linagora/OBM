@@ -88,7 +88,8 @@ public class SyncKeysDaoEhcacheImplTest {
 			@Override
 			public Percentage percentageAllowedToCache(String cacheName) {
 				return Percentage.UNDEFINED;
-			}};
+			}
+		};
 	}
 	
 	private ConfigurationService initConfigurationServiceMock() throws IOException {

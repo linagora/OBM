@@ -38,9 +38,9 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.utils.IniFile;
+import org.obm.configuration.utils.IniFile.Factory;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.utils.IniFile;
-import org.obm.push.utils.IniFile.Factory;
 
 import fr.aliacom.obm.common.calendar.CalendarEncoding;
 
@@ -64,7 +64,7 @@ public class ObmSyncConfigurationServiceTest {
 	public void testGetEmailCalendarEncodingInvalidEncoding() {
 		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn("InvalidEncoding");
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath", null);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 		control.verify();
 	}
@@ -73,7 +73,7 @@ public class ObmSyncConfigurationServiceTest {
 	public void testGetEmailCalendarEncodingEmptyPropertyDefined() {
 		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn("");
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath", null);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 		control.verify();
 	}
@@ -82,7 +82,7 @@ public class ObmSyncConfigurationServiceTest {
 	public void testGetEmailCalendarEncodingNoPropertyDefined() {
 		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn(null);
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath", null);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Auto);
 		control.verify();
 	}
@@ -91,7 +91,7 @@ public class ObmSyncConfigurationServiceTest {
 	public void testGetEmailCalendarEncodingBase64() {
 		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn("Base64");
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath", null);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.Base64);
 		control.verify();
 	}
@@ -100,7 +100,7 @@ public class ObmSyncConfigurationServiceTest {
 	public void testGetEmailCalendarEncodingQuotedPrintable() {
 		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn("QuotedPrintable");
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath", null);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.QuotedPrintable);
 		control.verify();
 	}
@@ -109,7 +109,7 @@ public class ObmSyncConfigurationServiceTest {
 	public void testGetEmailCalendarEncodingSevenBit() {
 		expect(configuration.getStringValue(ObmSyncConfigurationService.EMAIL_CALENDAR_ENCODING_PARAMETER)).andReturn("SevenBit");
 		control.replay();
-		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConfPath", null);
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.SevenBit);
 		control.verify();
 	}
@@ -119,7 +119,7 @@ public class ObmSyncConfigurationServiceTest {
 		expect(configuration.getBooleanValue(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, ObmSyncConfigurationService.DB_AUTO_TRUNCATE_DEFAULT_VALUE)).andReturn(true);
 		control.replay();
 
-		service = new ObmSyncConfigurationService(factory, "test", "fakeConf");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConf", null);
 
 		assertThat(service.isAutoTruncateEnabled()).isTrue();
 
@@ -131,7 +131,7 @@ public class ObmSyncConfigurationServiceTest {
 		expect(configuration.getBooleanValue(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, ObmSyncConfigurationService.DB_AUTO_TRUNCATE_DEFAULT_VALUE)).andReturn(false);
 		control.replay();
 
-		service = new ObmSyncConfigurationService(factory, "test", "fakeConf");
+		service = new ObmSyncConfigurationService(factory, "test", "fakeConf", null);
 
 		assertThat(service.isAutoTruncateEnabled()).isFalse();
 

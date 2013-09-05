@@ -32,7 +32,8 @@
 package fr.aliacom.obm.services.constant;
 
 import org.obm.configuration.ConfigurationServiceImpl;
-import org.obm.push.utils.IniFile;
+import org.obm.configuration.utils.IniFile;
+import org.obm.configuration.utils.TimeUnitMapper;
 import org.obm.sync.auth.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +67,11 @@ public class ObmSyncConfigurationService extends ConfigurationServiceImpl {
 	
 	@Inject
 	@VisibleForTesting
-	ObmSyncConfigurationService(IniFile.Factory iniFileFactory, @Named("application-name")String applicationName, @Named("globalConfigurationFile") String globalConfigurationFile) {
-		super(iniFileFactory, applicationName, globalConfigurationFile);
+	ObmSyncConfigurationService(IniFile.Factory iniFileFactory, 
+			@Named("application-name")String applicationName, 
+			@Named("globalConfigurationFile") String globalConfigurationFile,
+			TimeUnitMapper timeUnitMapper) {
+		super(iniFileFactory, applicationName, globalConfigurationFile, timeUnitMapper);
 	}
 
 	public String getDefaultTemplateFolder() {

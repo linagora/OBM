@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,58 +29,31 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.configuration.utils;
 
-package org.obm.configuration;
+import java.util.concurrent.TimeUnit;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.expect;
-
-import org.easymock.IMocksControl;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.obm.configuration.utils.IniFile;
-import org.obm.configuration.utils.IniFile.Factory;
-
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Singleton;
 
-public class DatabaseConfigurationImplTest {
+@Singleton
+public class TimeUnitMapper {
 
-	private DatabaseConfigurationImpl databaseConfigurationImpl;
-
-	@Before
-	public void setup() {
-		IMocksControl control = createControl();
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getData()).andReturn(ImmutableMap.<String, String>of());
-		Factory factory = control.createMock(IniFile.Factory.class);
-		expect(factory.build(anyObject(String.class))).andReturn(iniFile);
-		control.replay();
-		databaseConfigurationImpl = new DatabaseConfigurationImpl(factory, "fakeFilePath");
-	}
+	private final ImmutableMap<String, TimeUnit> timeUnits;
 	
-    @Test
-    public void testGetDatabasePassword() {
-        String password = "\"obm\"";
+	@VisibleForTesting TimeUnitMapper() {
+		timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
+				"seconds", TimeUnit.SECONDS,
+				"minutes", TimeUnit.MINUTES,
+				"hours", TimeUnit.HOURS);
+	}
 
-        String unquotedPassword = databaseConfigurationImpl.removeEnclosingDoubleQuotes(password);
-        Assert.assertEquals(unquotedPassword, "obm");
-    }
-
-    @Test
-    public void testGetDatabasePasswordWithQuotes() {
-        String password = "obm";
-
-        String unquotedPassword = databaseConfigurationImpl.removeEnclosingDoubleQuotes(password);
-        Assert.assertEquals(unquotedPassword, "obm");
-    }
-
-    @Test
-    public void testGetDatabasePasswordWithOnlyQuotes() {
-        String password = "\"\"";
-
-        String unquotedPassword = databaseConfigurationImpl.removeEnclosingDoubleQuotes(password);
-        Assert.assertEquals(unquotedPassword, "\"\"");
-    }
+	public TimeUnit getTimeUnitOrDefault(String timeUnit, TimeUnit defaultUnit) {
+		if (timeUnit != null) {
+			return Objects.firstNonNull(timeUnits.get(timeUnit.toLowerCase()), defaultUnit);
+		}
+		return defaultUnit;
+	}
 }

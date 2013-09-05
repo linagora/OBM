@@ -67,5 +67,4 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 		}
 		return Percentage.of(percentageAllowedToCache);
 	}
-
 }

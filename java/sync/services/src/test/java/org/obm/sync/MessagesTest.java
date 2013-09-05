@@ -43,9 +43,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.configuration.utils.IniFile;
+import org.obm.configuration.utils.IniFile.Factory;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.utils.IniFile;
-import org.obm.push.utils.IniFile.Factory;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -62,7 +62,7 @@ public class MessagesTest {
 		Factory factory = control.createMock(IniFile.Factory.class);
 		expect(factory.build(anyObject(String.class))).andReturn(iniFile);
 		control.replay();
-		configurationService = new ConfigurationServiceImpl(factory, "test", "fakeConfPath");
+		configurationService = new ConfigurationServiceImpl(factory, "test", "fakeConfPath", null);
 		Locale.setDefault(Locale.US);
 	}
 
