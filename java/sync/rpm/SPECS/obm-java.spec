@@ -16,6 +16,7 @@ License: AGPLv3
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source0: obm-java-%{version}.tar.gz
 Source1: obm-sync.postinst
+Source2: obm-autoconf.xml
 
 BuildArch:      noarch
 BuildRequires:  java-devel >= 1.6.0
@@ -75,8 +76,24 @@ Requires: obm-config
 Requires(post): obm-jetty-common-libs = %{version}-%{release}
 
 %description -n obm-locator
-This package is a J2E web service, which allows can be queried to retrieve
+This package is a J2E web service, which can be queried to retrieve
 the location of an OBM component.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
+
+%package -n obm-autoconf
+Summary: Locator for Open Business Management
+Group:	Development/Tools
+Requires: java-devel >= 1.6.0
+Requires: obm-config
+Requires: obm-tomcat
+
+%description -n obm-autoconf
+This package contains a J2E web service which can be queried to retrieve a
+configuration as xml to autoconfigure Thunderbird.
 
 OBM is a global groupware, messaging and CRM application. It is intended to
 be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
@@ -160,6 +177,19 @@ mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/obm-locator
 cp -r obm-locator/target/obm-locator/* $RPM_BUILD_ROOT/%{jetty_home}/webapps/obm-locator/
 
+# obm-autoconf
+
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/obm-autoconf
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/obm-tomcat/applis
+WEB_INF=`find autoconf/target -name WEB-INF`
+cp -r ${WEB_INF} $RPM_BUILD_ROOT%{_datadir}/obm-autoconf
+rm -f $RPM_BUILD_ROOT%{_datadir}/obm-autoconf/WEB-INF/lib/postgresql-9.0-801.jdbc4.jar
+rm -f $RPM_BUILD_ROOT%{_datadir}/obm-autoconf/WEB-INF/lib/slf4j-api-*.jar
+rm -f $RPM_BUILD_ROOT%{_datadir}/obm-autoconf/WEB-INF/lib/logback*.jar
+rm -f $RPM_BUILD_ROOT%{_datadir}/obm-autoconf/WEB-INF/lib/jta-1.1.jar
+cp %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/obm-tomcat/applis/
+
+
 # obm-jetty-common-libs
 mkdir -p $RPM_BUILD_ROOT/%{jetty_home}/lib/ext
 cp -p webapp-common-dependencies/target/jetty/*.jar \
@@ -199,6 +229,11 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %{jetty_home}/webapps/obm-locator
 %attr(0775,jetty,jetty) %{_localstatedir}/log/obm-locator
 %attr(0775,jetty,jetty) %{_localstatedir}/lib/obm-locator
+
+%files -n obm-autoconf
+%defattr(-,root,root,-)
+%{_datadir}/obm-autoconf
+%config(noreplace) %{_sysconfdir}/obm-tomcat/applis/obm-autoconf.xml
 
 %files -n obm-tomcat-common-libs
 %defattr(-,root,root,-)
@@ -246,6 +281,14 @@ fi
 if [ "$1" = "0" ]; then
   rm -f /etc/obm-tomcat/applis/obm-sync.xml
   rm -f /usr/share/tomcat/conf/Catalina/localhost/obm-sync.xml
+fi
+
+%post -n obm-autoconf
+/usr/bin/obm-tomcat-trigger
+
+%postun -n obm-autoconf
+if [ "$1" = "0" ]; then
+  rm -f %{_sysconfdir}/obm-tomcat/applis/obm-autoconf.xml
 fi
 
 
