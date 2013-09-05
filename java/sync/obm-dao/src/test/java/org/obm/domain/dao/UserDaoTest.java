@@ -330,6 +330,7 @@ public class UserDaoTest {
 		expect(rs.getString("userobm_expresspostal")).andReturn(null);
 		expect(rs.getString("userobm_country_iso3166")).andReturn("0");
 		expect(rs.getInt("userobm_mail_quota")).andReturn(100);
+		expect(rs.getInt("userobm_hidden")).andReturn(1);
 		expect(rs.getInt("userobm_uid")).andReturn(1001);
 		expect(rs.wasNull()).andReturn(false);
 		expect(rs.getInt("userobm_gid")).andReturn(1000);
@@ -375,6 +376,7 @@ public class UserDaoTest {
 					.fqdn("fqdn")
 					.domainId(domain.getId())
 					.build())
+			.hidden(true)
 			.uidNumber(1001)
 			.gidNumber(1000)
 			.build();

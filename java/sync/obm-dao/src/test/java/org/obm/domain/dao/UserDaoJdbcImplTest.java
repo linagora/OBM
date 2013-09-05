@@ -341,6 +341,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.kind("Mr")
 				.mailHost(mailHost)
 				.mailQuota(500)
+				.hidden(true)
 				.domain(domain);
 
 		ObmUser createdUser = dao.create(userBuilder.build());
@@ -441,6 +442,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = sampleUserBuilder(1, 3, "1")
 				.firstName("John")
 				.lastName("Doe")
+				.hidden(true)
 				.build();
 
 		assertThat(dao.update(user)).isEqualTo(user);

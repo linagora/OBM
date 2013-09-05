@@ -80,6 +80,7 @@ import fr.aliacom.obm.common.user.UserExtId;
 public class UserDaoJdbcImpl implements UserDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
+	private static final int HIDDEN_TRUE = 1;
 	private static final String USER_FIELDS = 
 			"userobm_id, " +
 			"userobm_email, " +
@@ -111,6 +112,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			"userobm_mail_quota, " +
 			"userobm_mail_server_id, " +
 			"userobm_archive, " +
+			"userobm_hidden, " +
 			"userobm_timecreate, " +
 			"userobm_timeupdate, " +
 			"userobm_usercreate, " +
@@ -362,6 +364,7 @@ public class UserDaoJdbcImpl implements UserDao {
 				.mailQuota(rs.getInt("userobm_mail_quota"))
 				.mailHost(hostFromCursor(rs))
 				.archived(rs.getBoolean("userobm_archive"))
+				.hidden(rs.getInt("userobm_hidden") == HIDDEN_TRUE)
 				.timeCreate(JDBCUtils.getDate(rs, "userobm_timecreate"))
 				.timeUpdate(JDBCUtils.getDate(rs, "userobm_timeupdate"))
 				.uidNumber(JDBCUtils.getInteger(rs, "userobm_uid"))
@@ -602,12 +605,13 @@ public class UserDaoJdbcImpl implements UserDao {
 				"userobm_mail_server_id, " +
 				"userobm_mail_quota," +
 				"userobm_mail_perms, " +
+				"userobm_hidden, " +
 				"userobm_uid," +
 				"userobm_gid" +
 				") VALUES (" +
 				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?" +
+				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?" +
 				")";
 
 		try {
@@ -676,7 +680,9 @@ public class UserDaoJdbcImpl implements UserDao {
 				ps.setInt(idx++, 0);
 				ps.setInt(idx++, 0);
 			}
-
+			
+			ps.setInt(idx++, user.isHidden() ? 1 : 0);
+			
 			if (user.getUidNumber() != null) {
 				ps.setInt(idx++, user.getUidNumber());
 			} else {
@@ -758,7 +764,8 @@ public class UserDaoJdbcImpl implements UserDao {
                     "userobm_email = ?, " +
                     "userobm_mail_server_id = ?, " +
                     "userobm_mail_quota = ?, " +
-                    "userobm_mail_perms = ? " +
+                    "userobm_mail_perms = ?, " +
+                    "userobm_hidden = ? " +
                     "WHERE userobm_id = ?";
 
 		try {
@@ -828,6 +835,8 @@ public class UserDaoJdbcImpl implements UserDao {
 				ps.setInt(idx++, 0);
 			}
 
+			ps.setInt(idx++, user.isHidden() ? 1 : 0);
+			
 			ps.setInt(idx++, user.getUid());
 
 			int updateCount = ps.executeUpdate();
