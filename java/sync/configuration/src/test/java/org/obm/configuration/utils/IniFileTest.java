@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.utils;
+package org.obm.configuration.utils;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -38,6 +38,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.utils.IniFile;
 import org.obm.filter.SlowFilterRunner;
 
 import com.google.common.collect.ImmutableMap;

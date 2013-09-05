@@ -30,7 +30,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.utils;
+package org.obm.configuration.utils;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -39,10 +39,10 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.configuration.EmailConfiguration.MailboxNameCheckPolicy;
 import org.obm.configuration.EmailConfiguration.ExpungePolicy;
-import org.obm.push.utils.IniFile;
-import org.obm.push.utils.IniFile.Factory;
+import org.obm.configuration.EmailConfiguration.MailboxNameCheckPolicy;
+import org.obm.configuration.utils.IniFile;
+import org.obm.configuration.utils.IniFile.Factory;
 
 public class EmailConfigurationImplTest {
 
