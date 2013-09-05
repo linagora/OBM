@@ -101,5 +101,10 @@ public class OpushStaticConfigurationService extends StaticConfigurationService 
 			}
 			return Percentage.UNDEFINED;
 		}
+
+		@Override
+		public long timeToLiveInSeconds() {
+			return configuration.timeToLiveInSeconds;
+		}
 	}
 }
