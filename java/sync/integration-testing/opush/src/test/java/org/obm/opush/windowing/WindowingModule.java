@@ -41,9 +41,11 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.opush.env.OpushStaticConfigurationService.EhCache;
 import org.obm.push.mail.WindowingService;
 import org.obm.push.mail.WindowingServiceImpl;
 import org.obm.push.store.WindowingDao;
+import org.obm.push.store.ehcache.EhCacheConfiguration;
 import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,19 +65,21 @@ public class WindowingModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
-		bind(ConfigurationService.class).toInstance(configuration());
+		Configuration configuration = configuration();
+		bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
 		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
 		bind(TransactionProvider.class).to(LazyTransactionProvider.class);
 		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
 		bind(WindowingService.class).to(WindowingServiceImpl.class);
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(configurationLogger);
+		bind(EhCacheConfiguration.class).toInstance(new EhCache(configuration.ehCache));
 	}		
 
-	protected ConfigurationService configuration() {
+	protected Configuration configuration() {
 		Configuration configuration = new Configuration();
 		configuration.transaction.timeoutInSeconds = Ints.checkedCast(TimeUnit.MINUTES.toSeconds(10));
 		configuration.dataDir = Files.createTempDir();
-		return new StaticConfigurationService(configuration);
+		return configuration;
 	}
 
 }

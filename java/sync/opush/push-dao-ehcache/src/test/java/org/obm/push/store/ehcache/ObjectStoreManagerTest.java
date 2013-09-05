@@ -66,10 +66,10 @@ public class ObjectStoreManagerTest {
 	
 	private TransactionProvider transactionProvider;
 	private ObjectStoreManager opushCacheManager;
+	private EhCacheConfiguration config;
 	private ConfigurationService configurationService;
 	private Logger logger;
 	private BitronixTransactionManager transactionManager;
-
 
 	
 	@Before
@@ -83,7 +83,8 @@ public class ObjectStoreManagerTest {
 		control.replay();
 		
 		configurationService = new EhCacheConfigurationService().mock(tempFolder);
-		opushCacheManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
+		config = new TestingEhCacheConfiguration();
+		opushCacheManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
 	}
 
 	@After
@@ -117,7 +118,7 @@ public class ObjectStoreManagerTest {
 		opushCacheManager.shutdown();
 
 		TransactionManagerServices.getTransactionManager().begin();
-		ObjectStoreManager newCacheManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
+		ObjectStoreManager newCacheManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
 		for (String persistentStoreName : persistentStoreNames) {
 			Cache loadedCache = newCacheManager.createNewStore(persistentStoreName);
 			assertThat(loadedCache.get(el1.getObjectKey())).isEqualTo(el1);

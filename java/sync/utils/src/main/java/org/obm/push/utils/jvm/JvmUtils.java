@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,26 +29,11 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store.ehcache;
+package org.obm.push.utils.jvm;
 
-import java.io.File;
-import java.io.IOException;
+public class JvmUtils {
 
-import org.easymock.EasyMock;
-import org.junit.rules.TemporaryFolder;
-import org.obm.configuration.ConfigurationService;
-
-public class EhCacheConfigurationService {
-	
-	public ConfigurationService mock(TemporaryFolder temporaryFolder) throws IOException {
-		File dataDir = temporaryFolder.newFolder();
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true).anyTimes();
-		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
-		EasyMock.replay(configurationService);
-		
-		return configurationService;
+	public static long maxRuntimeJvmMemoryInMB() {
+		return Runtime.getRuntime().maxMemory() / (1024 * 1024);
 	}
-
 }

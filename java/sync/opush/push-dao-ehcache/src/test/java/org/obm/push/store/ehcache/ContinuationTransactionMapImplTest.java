@@ -62,7 +62,8 @@ public class ContinuationTransactionMapImplTest extends ContinuationTransactionM
 		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
 		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
 
-		objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
+		TestingEhCacheConfiguration config = new TestingEhCacheConfiguration();
+		objectStoreManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
 		continuationTransactionMap = new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
 		
 		transactionManager = TransactionManagerServices.getTransactionManager();

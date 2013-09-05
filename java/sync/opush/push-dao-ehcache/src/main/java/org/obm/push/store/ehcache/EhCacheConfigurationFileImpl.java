@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,24 +31,40 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.io.File;
-import java.io.IOException;
+import org.obm.push.utils.IniFile;
+import org.obm.push.utils.jvm.JvmUtils;
 
-import org.easymock.EasyMock;
-import org.junit.rules.TemporaryFolder;
-import org.obm.configuration.ConfigurationService;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
 
-public class EhCacheConfigurationService {
+public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
+
+	private static final String configFilePath = "/etc/opush/ehcache_conf.ini";
+	private final IniFile iniFile;
 	
-	public ConfigurationService mock(TemporaryFolder temporaryFolder) throws IOException {
-		File dataDir = temporaryFolder.newFolder();
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true).anyTimes();
-		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
-		EasyMock.replay(configurationService);
-		
-		return configurationService;
+	@Inject
+	@VisibleForTesting EhCacheConfigurationFileImpl(IniFile.Factory factory) {
+		iniFile = factory.build(configFilePath);
+	}
+	
+	@Override
+	public int maxMemoryInMB() {
+		int value = iniFile.getIntValue("maxMemoryInMB", -1);
+		if (value > JvmUtils.maxRuntimeJvmMemoryInMB()) {
+			throw new IllegalStateException("maxMemoryInMB is higher than JVM Xmx value");
+		}
+		if (value > 0) {
+			return value;
+		}
+		throw new IllegalStateException("illegal maxMemoryInMB value");
 	}
 
+	@Override
+	public Percentage percentageAllowedToCache(String cacheName) {
+		Integer value = iniFile.getIntegerValue(cacheName, null);
+		if (value == null || value == 0) {
+			return Percentage.UNDEFINED;
+		}
+		return Percentage.of(value);
+	}
 }
