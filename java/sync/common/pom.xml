@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>2.5.2-SNAPSHOT</version>
+		<version>2.5.2-rc1</version>
 	</parent>
 	
 	<artifactId>common</artifactId>
 	<packaging>jar</packaging>
 	<name>obm-sync common objects</name>
 	<url>http://www.obm.org/</url>
-	<version>2.5.2-SNAPSHOT</version>
+	<version>2.5.2-rc1</version>
 
 	<licenses>
 		<license>
