@@ -49,6 +49,7 @@ import static org.obm.provisioning.bean.UserJsonFields.LOGIN;
 import static org.obm.provisioning.bean.UserJsonFields.MAILS;
 import static org.obm.provisioning.bean.UserJsonFields.MAIL_QUOTA;
 import static org.obm.provisioning.bean.UserJsonFields.MAIL_SERVER;
+import static org.obm.provisioning.bean.UserJsonFields.HIDDEN;
 import static org.obm.provisioning.bean.UserJsonFields.MOBILE;
 import static org.obm.provisioning.bean.UserJsonFields.PASSWORD;
 import static org.obm.provisioning.bean.UserJsonFields.PHONES;
@@ -116,6 +117,7 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeStringField(MAIL_QUOTA.asSpecificationValue(), String.valueOf(value.getMailQuotaAsInt()));
 		jgen.writeStringField(MAIL_SERVER.asSpecificationValue(), getMailHostName(value));
 		jgen.writeObjectField(MAILS.asSpecificationValue(), mails);
+		jgen.writeBooleanField(HIDDEN.asSpecificationValue(), value.isHidden());
 		jgen.writeObjectField(TIMECREATE.asSpecificationValue(), value.getTimeCreate());
 		jgen.writeObjectField(TIMEUPDATE.asSpecificationValue(), value.getTimeUpdate());
 		jgen.writeObjectField(GROUPS.asSpecificationValue(), extractGroupIdentifiers(value.getGroups(), value.getDomain()));

@@ -374,6 +374,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"mail_quota\":\"1234\"," +
 					"\"mail_server\":\"host\"," +
 					"\"mails\":[\"john@domain\"]," +
+					"\"hidden\":true," +
 					"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
 					"\"timeupdate\":\"2013-06-11T13:00:00.000+0000\"," +
 					"\"groups\":" +
@@ -409,6 +410,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"mail_quota\":\"1234\"," +
 				"\"mail_server\":\"host\"," +
 				"\"mails\":[\"john@domain\"]," +
+				"\"hidden\":true," +
 				"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
 				"\"timeupdate\":\"2013-06-11T13:00:00.000+0000\"," +
 				"\"groups\":" +
@@ -491,6 +493,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"mail_quota\":\"0\"," +
 					"\"mail_server\":null," +
 					"\"mails\":[null]," +
+					"\"hidden\":false," +
 					"\"timecreate\":null," +
 					"\"timeupdate\":null," +
 					"\"groups\":[]" +
@@ -526,6 +529,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				.fax2("fax2")
 				.mailQuota(1234)
 				.mailHost(ObmHost.builder().name("host").build())
+				.hidden(true)
 				.emailAndAliases("john@domain")
 				.timeCreate(TIMECREATE)
 				.timeUpdate(TIMEUPDATE)

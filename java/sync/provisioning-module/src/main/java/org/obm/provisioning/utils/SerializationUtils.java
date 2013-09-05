@@ -200,6 +200,9 @@ public class SerializationUtils {
 			case ZIPCODE:
 				toBuild.zipCode(value.asText());
 				break;
+			case HIDDEN:
+				toBuild.hidden(value.asBoolean());
+				break;
 		}
 	}
 
