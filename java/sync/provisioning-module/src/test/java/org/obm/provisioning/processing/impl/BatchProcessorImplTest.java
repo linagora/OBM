@@ -1046,6 +1046,68 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
+	public void testProcessModifyUserCannotChangeArchivedState() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(org.obm.provisioning.beans.Request
+						.builder()
+						.resourcePath("/users/1")
+						.verb(HttpVerb.PUT)
+						.body(	"{" +
+										"\"id\": \"extIdUser1\"," +
+										"\"login\": \"user1\"," +
+										"\"lastname\": \"user1\"," +
+										"\"profile\": \"user\"," +
+										"\"mails\":[\"john@domain\"]," +
+										"\"archived\": true" +
+								"}")
+						.build());
+		Batch.Builder batchBuilder = Batch
+				.builder()
+				.id(batchId(1))
+				.domain(domainWithImapAndLdap)
+				.status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.mailHost(ObmHost.builder().name("Cyrus").ip("127.0.0.1").build())
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domainWithImapAndLdap)).andReturn(userFromDao);
+
+		expect(batchDao.update(batchBuilder
+				.operation(opBuilder
+						.status(BatchStatus.ERROR)
+						.timecommit(date)
+						.error("org.obm.provisioning.exception.ProcessingException: Cannot change user archived state")
+						.build())
+				.status(BatchStatus.SUCCESS)
+				.timecommit(date)
+				.build())).andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
 	public void testProcessModifyUserCannotChangeMailHost() throws Exception {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
 		Operation.Builder opBuilder = Operation

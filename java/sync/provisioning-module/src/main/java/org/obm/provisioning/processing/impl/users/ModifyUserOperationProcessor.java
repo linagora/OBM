@@ -40,6 +40,7 @@ import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
@@ -59,12 +60,16 @@ public class ModifyUserOperationProcessor extends AbstractUserOperationProcessor
 
 	@VisibleForTesting void validateUserChanges(ObmUser modifiedUser, ObmUser existingUser) {
 
-		if (!modifiedUser.getMailHost().equals(existingUser.getMailHost())) {
+		if (!Objects.equal(modifiedUser.getMailHost(), existingUser.getMailHost())) {
 			throw new ProcessingException("Cannot change user mail host");
 		}
-		if (!modifiedUser.getLogin().equals(existingUser.getLogin())) {
+		if (!Objects.equal(modifiedUser.getLogin(), existingUser.getLogin())) {
 			throw new ProcessingException("Cannot change user login");
 		}
+		if (modifiedUser.isArchived() != existingUser.isArchived()) {
+			throw new ProcessingException("Cannot change user archived state");
+		}
+
 	}
 
 	@Override

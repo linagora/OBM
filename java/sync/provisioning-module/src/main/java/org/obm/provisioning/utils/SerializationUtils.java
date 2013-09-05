@@ -168,6 +168,7 @@ public class SerializationUtils {
 			case MAIL_SERVER:
 				break;
 			case ARCHIVED:
+				toBuild.archived(value.asBoolean());
 				break;
 			case MOBILE:
 				toBuild.mobile(value.asText());
