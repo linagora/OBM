@@ -1729,11 +1729,17 @@ function json_search_companies($company,$results) {
 
   $companies = array();
   foreach($company_q as $name => $data) {
-    $id = $data['company_id'];
-    $label = phpStringToJsString($data['company_name']);
-    $companies[] = "{id:'$id', label:'$label', extra:'".$data['company_aka']."'}";
+    $companies[] = array(
+      "id" => $data['company_id'],
+      "label" => $data['company_name'],
+      "extra" => $data['company_aka'] ? $data['company_aka'] : ""
+    );
   }
-  $display['json'] = "{length:".$results['length'].", datas:[".implode(',',$companies)."]}";
+  $search_results = array(
+    "length" => $results['length'],
+    "datas" => $companies
+  );
+  $display['json'] = json_encode($search_results);
 }
 
 
