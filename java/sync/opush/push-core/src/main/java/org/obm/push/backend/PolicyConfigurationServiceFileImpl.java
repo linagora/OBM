@@ -32,9 +32,9 @@
 package org.obm.push.backend;
 
 import org.joda.time.Duration;
+import org.obm.configuration.utils.IniFile;
 import org.obm.push.DefaultPolicy;
 import org.obm.push.Policy;
-import org.obm.push.utils.IniFile;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;

@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import org.obm.push.utils.IniFile;
+import org.obm.configuration.utils.IniFile;
 import org.obm.push.utils.jvm.JvmUtils;
 
 import com.google.common.annotations.VisibleForTesting;

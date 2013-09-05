@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,54 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.configuration.utils;
 
-package org.obm.configuration;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.expect;
+import java.util.concurrent.TimeUnit;
 
-import org.easymock.IMocksControl;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.obm.configuration.utils.IniFile;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-import com.google.common.collect.ImmutableMap;
+@RunWith(SlowFilterRunner.class)
+public class TimeUnitMapperTest {
 
-public class DatabaseConfigurationImplTest {
+	@Test
+	public void testGetTimeUnitOrDefaultNullTimeUnit() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault(null, TimeUnit.SECONDS)).isEqualTo(TimeUnit.SECONDS);
+	}
 
-	private DatabaseConfigurationImpl databaseConfigurationImpl;
+	@Test
+	public void testGetTimeUnitOrDefaultEmptyTimeUnit() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("", TimeUnit.SECONDS)).isEqualTo(TimeUnit.SECONDS);
+	}
 
-	@Before
-	public void setup() {
-		IMocksControl control = createControl();
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getData()).andReturn(ImmutableMap.<String, String>of());
-		control.replay();
-		databaseConfigurationImpl = new DatabaseConfigurationImpl(iniFile);
+	@Test
+	public void testGetTimeUnitOrDefaultUnkownTimeUnit() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("unknown", TimeUnit.SECONDS)).isEqualTo(TimeUnit.SECONDS);
+	}
+
+	@Test
+	public void testGetTimeUnitMilliseconds() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("milliseconds", TimeUnit.MINUTES)).isEqualTo(TimeUnit.MILLISECONDS);
+	}
+
+	@Test
+	public void testGetTimeUnitSeconds() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("seconds", TimeUnit.MINUTES)).isEqualTo(TimeUnit.SECONDS);
 	}
 	
-    @Test
-    public void testGetDatabasePassword() {
-        String password = "\"obm\"";
-
-        String unquotedPassword = databaseConfigurationImpl.removeEnclosingDoubleQuotes(password);
-        Assert.assertEquals(unquotedPassword, "obm");
-    }
-
-    @Test
-    public void testGetDatabasePasswordWithQuotes() {
-        String password = "obm";
-
-        String unquotedPassword = databaseConfigurationImpl.removeEnclosingDoubleQuotes(password);
-        Assert.assertEquals(unquotedPassword, "obm");
-    }
-
-    @Test
-    public void testGetDatabasePasswordWithOnlyQuotes() {
-        String password = "\"\"";
-
-        String unquotedPassword = databaseConfigurationImpl.removeEnclosingDoubleQuotes(password);
-        Assert.assertEquals(unquotedPassword, "\"\"");
-    }
+	@Test
+	public void testGetTimeUnitMinutes() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("minutes", TimeUnit.SECONDS)).isEqualTo(TimeUnit.MINUTES);
+	}
+	
+	@Test
+	public void testGetTimeUnitHours() {
+		assertThat(new TimeUnitMapper().getTimeUnitOrDefault("hours", TimeUnit.SECONDS)).isEqualTo(TimeUnit.HOURS);
+	}
 }

@@ -32,7 +32,7 @@
 package org.obm.push.impl;
 
 import org.obm.configuration.SyncPermsConfigurationService;
-import org.obm.push.utils.IniFile;
+import org.obm.configuration.utils.IniFile;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

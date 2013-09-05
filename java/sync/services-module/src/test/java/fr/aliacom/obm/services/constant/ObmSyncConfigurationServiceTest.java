@@ -37,8 +37,8 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.utils.IniFile;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.utils.IniFile;
 
 import fr.aliacom.obm.common.calendar.CalendarEncoding;
 
