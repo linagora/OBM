@@ -631,14 +631,6 @@ public class BatchProcessorImplTest extends CommonDomainEndPointEnvTest {
 		expectLastCall();
 	}
 
-	private void expectLdapAddUserToGroup(Group group, ObmUser userToAdd) {
-		LdapManager ldapManager = expectLdapBuild();
-		ldapManager.addUserToGroup(userToAdd.getDomain(), group, userToAdd);
-		expectLastCall();
-		ldapManager.shutdown();
-		expectLastCall();
-	}
-
 	private void expectLdapAddGroupToGroup(Group group, Group subgroup) {
 		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.addSubgroupToGroup(domain, group, subgroup);

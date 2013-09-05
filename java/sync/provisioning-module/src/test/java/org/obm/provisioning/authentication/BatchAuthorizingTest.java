@@ -152,7 +152,7 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	}
 	
 	@Test
-	public void testSubjectCannotPostWithoutAuthentication() throws Exception {
+	public void testSubjectCannotPostWithoutAuthentication() {
 		mocksControl.replay();
 		
 		expect()
