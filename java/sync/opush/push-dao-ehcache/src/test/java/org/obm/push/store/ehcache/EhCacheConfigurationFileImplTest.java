@@ -35,12 +35,15 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.util.concurrent.TimeUnit;
+
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.utils.IniFile;
 import org.obm.configuration.utils.IniFile.Factory;
+import org.obm.configuration.utils.TimeUnitMapper;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 
@@ -50,17 +53,19 @@ public class EhCacheConfigurationFileImplTest {
 	private IMocksControl control;
 	private IniFile iniFile;
 	private Factory factory;
+	private TimeUnitMapper timeUnitMapper;
 
 	@Before
 	public void setup() {
 		control = createControl();
 		iniFile = control.createMock(IniFile.class);
 		factory = control.createMock(IniFile.Factory.class);
+		timeUnitMapper = control.createMock(TimeUnitMapper.class);
 		expect(factory.build("/etc/opush/ehcache_conf.ini")).andReturn(iniFile);
 	}
 
 	private EhCacheConfigurationFileImpl testee() {
-		return new EhCacheConfigurationFileImpl(factory);
+		return new EhCacheConfigurationFileImpl(factory, timeUnitMapper);
 	}
 
 	@Test(expected=IllegalStateException.class)
@@ -172,4 +177,37 @@ public class EhCacheConfigurationFileImplTest {
 		assertThat(testee().percentageAllowedToCache("cacheName")).isEqualTo(Percentage.UNDEFINED);
 		control.verify();
 	}
+	
+	@Test
+		public void testTimeToLiveInSeconds() {
+			expect(iniFile.getIntValue("timeToLive", EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE)).andReturn(100);
+			expect(iniFile.getStringValue(EhCacheConfigurationFileImpl.TIME_TO_LIVE_UNIT)).andReturn("minutes");
+			expect(timeUnitMapper.getTimeUnitOrDefault("minutes", TimeUnit.SECONDS)).andReturn(TimeUnit.MINUTES);
+			control.replay();
+			
+			assertThat(testee().timeToLiveInSeconds()).isEqualTo(100 * 60);
+			control.verify();
+		}
+	
+	@Test
+		public void testTimeToLiveInSecondsWithDefaultValue() {
+			expect(iniFile.getIntValue("timeToLive", EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE)).andReturn(EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE);
+			expect(iniFile.getStringValue(EhCacheConfigurationFileImpl.TIME_TO_LIVE_UNIT)).andReturn("seconds");
+			expect(timeUnitMapper.getTimeUnitOrDefault("seconds", TimeUnit.SECONDS)).andReturn(TimeUnit.SECONDS);
+			control.replay();
+			
+			assertThat(testee().timeToLiveInSeconds()).isEqualTo(EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE);
+			control.verify();
+		}
+	
+	@Test
+		public void testTimeToLiveInSecondsWithDefaultTimeUnit() {
+			expect(iniFile.getIntValue("timeToLive", EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE)).andReturn(100);
+			expect(iniFile.getStringValue(EhCacheConfigurationFileImpl.TIME_TO_LIVE_UNIT)).andReturn(null);
+			expect(timeUnitMapper.getTimeUnitOrDefault(null, TimeUnit.SECONDS)).andReturn(TimeUnit.SECONDS);
+			control.replay();
+			
+			assertThat(testee().timeToLiveInSeconds()).isEqualTo(100);
+			control.verify();
+		}
 }
