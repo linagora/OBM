@@ -104,6 +104,11 @@ public class StaticConfigurationService implements ConfigurationService {
 		public Percentage percentageAllowedToCache(String cacheName) {
 			return configuration.percentageAllowedToCache;
 		}
+
+		@Override
+		public long timeToLiveInSeconds() {
+			return 60;
+		}
 	}
 
 	public static class Email implements EmailConfiguration {

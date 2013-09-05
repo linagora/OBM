@@ -92,6 +92,11 @@ public class SnapshotDaoEhcacheImplTest {
 			public Percentage percentageAllowedToCache(String cacheName) {
 				return Percentage.UNDEFINED;
 			}
+
+			@Override
+			public long timeToLiveInSeconds() {
+				return 60;
+			}
 		};
 	}
 	
