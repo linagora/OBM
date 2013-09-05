@@ -370,6 +370,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"phones\":[\"phone\",\"phone2\"]," +
 					"\"mobile\":\"mobile\"," +
 					"\"faxes\":[\"fax\",\"fax2\"]," +
+					"\"archived\":false," +
 					"\"mail_quota\":\"1234\"," +
 					"\"mail_server\":\"host\"," +
 					"\"mails\":[\"john@domain\"]," +
@@ -404,6 +405,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"phones\":[\"phone\",\"phone2\"]," +
 				"\"mobile\":\"mobile\"," +
 				"\"faxes\":[\"fax\",\"fax2\"]," +
+				"\"archived\":false," +
 				"\"mail_quota\":\"1234\"," +
 				"\"mail_server\":\"host\"," +
 				"\"mails\":[\"john@domain\"]," +
@@ -485,6 +487,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"phones\":[]," +
 					"\"mobile\":null," +
 					"\"faxes\":[]," +
+					"\"archived\":false," +
 					"\"mail_quota\":\"0\"," +
 					"\"mail_server\":null," +
 					"\"mails\":[null]," +

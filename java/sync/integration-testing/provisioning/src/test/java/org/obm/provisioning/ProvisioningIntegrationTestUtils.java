@@ -42,7 +42,7 @@ public class ProvisioningIntegrationTestUtils {
 				+ "\"firstname\":\"Firstname\",\"commonname\":null,\"password\":\"admin0\","
 				+ "\"kind\":null,\"title\":null,\"description\":null,\"company\":null,\"service\":null,"
 				+ "\"direction\":null,\"addresses\":[],\"town\":null,\"zipcode\":null,\"business_zipcode\":null,"
-				+ "\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],\"mail_quota\":\"0\","
+				+ "\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],\"archived\":false,\"mail_quota\":\"0\","
 				+ "\"mail_server\":null,\"mails\":[\"admin0@test.tlse.lng\"],\"timecreate\":null,\"timeupdate\":null,"
 				+ "\"groups\":[]}";
 	}
@@ -51,7 +51,7 @@ public class ProvisioningIntegrationTestUtils {
 		return "{\"id\":\"Admin0ExtId\",\"login\":\"admin0\",\"lastname\":\"Lastname\",\"profile\":\"admin\","
 				+ "\"firstname\":\"Firstname\",\"commonname\":null,\"password\":\"admin0\",\"kind\":null,\"title\":null,"
 				+ "\"description\":null,\"company\":null,\"service\":null,\"direction\":null,\"addresses\":[],\"town\":null,"
-				+ "\"zipcode\":null,\"business_zipcode\":null,\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],"
+				+ "\"zipcode\":null,\"business_zipcode\":null,\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],\"archived\":false,"
 				+ "\"mail_quota\":\"0\",\"mail_server\":null,\"mails\":[\"admin0@global.virt\"],\"timecreate\":null,\"timeupdate\":null,"
 				+ "\"groups\":[{\"id\":\"GroupWithUsers\",\"url\":\"/123456789/groups/GroupWithUsers\"}]}";
 	}

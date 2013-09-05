@@ -32,6 +32,7 @@
 package org.obm.provisioning.json;
 
 import static org.obm.provisioning.bean.UserJsonFields.ADDRESSES;
+import static org.obm.provisioning.bean.UserJsonFields.ARCHIVED;
 import static org.obm.provisioning.bean.UserJsonFields.BUSINESS_ZIPCODE;
 import static org.obm.provisioning.bean.UserJsonFields.COMMONNAME;
 import static org.obm.provisioning.bean.UserJsonFields.COMPANY;
@@ -111,6 +112,7 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		writeObjectsField(jgen, PHONES.asSpecificationValue(), value.getPhone(), value.getPhone2());
 		jgen.writeStringField(MOBILE.asSpecificationValue(), value.getMobile());
 		writeObjectsField(jgen, FAXES.asSpecificationValue(), value.getFax(), value.getFax2());
+		jgen.writeBooleanField(ARCHIVED.asSpecificationValue(), value.isArchived());
 		jgen.writeStringField(MAIL_QUOTA.asSpecificationValue(), String.valueOf(value.getMailQuotaAsInt()));
 		jgen.writeStringField(MAIL_SERVER.asSpecificationValue(), getMailHostName(value));
 		jgen.writeObjectField(MAILS.asSpecificationValue(), mails);
