@@ -284,7 +284,7 @@ if [ "$1" = "0" ]; then
 fi
 
 %post -n obm-autoconf
-[ ! -f %{_sysconfdir}/obm-tomcat/applis/obm-autoconf.xml ] && /usr/bin/obm-tomcat-trigger
+/usr/bin/obm-tomcat-trigger
 
 %postun -n obm-autoconf
 if [ "$1" = "0" ]; then
