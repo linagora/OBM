@@ -364,6 +364,7 @@ public class ObmUserTest {
 				.mailQuota(500)
 				.archived(true)
 				.domain(ToolBox.getDefaultObmDomain())
+				.hidden(true)
 				.build();
 
 		assertThat(ObmUser.builder().from(user).build()).isEqualTo(user);

@@ -76,6 +76,7 @@ public class ObmUser {
 		private String firstName;
 		private String email;
 		private ImmutableSet.Builder<String> emailAlias;
+		private Boolean hidden;
 		
 		private String address1;
 		private String address2;
@@ -156,6 +157,7 @@ public class ObmUser {
 					.mailQuota(user.mailQuota)
 					.mailHost(user.mailHost)
 					.archived(user.archived)
+					.hidden(user.hidden)
 					.timeCreate(user.timeCreate)
 					.timeUpdate(user.timeUpdate)
 					.createdBy(user.createdBy)
@@ -364,6 +366,11 @@ public class ObmUser {
 			return this;
 		}
 		
+		public Builder hidden(boolean hidden) {
+			this.hidden = hidden;
+			return this;
+		}
+		
 		public Builder addresses(Iterable<String> addresses) {
 			Preconditions.checkNotNull(addresses);
 			Preconditions.checkState(Iterables.size(addresses) <= MAXIMUM_SUPPORTED_ADDRESSES);
@@ -399,11 +406,12 @@ public class ObmUser {
 				mailQuota = null;
 			}
 
-			archived = Objects.firstNonNull(archived, false);
+			archived = Objects.firstNonNull(archived, false);			
+			hidden = Objects.firstNonNull(hidden, false);
 
 			return new ObmUser(
 					uid, entityId, login, extId, commonName, lastName, firstName,
-					email, emailAlias.build(),
+					email, emailAlias.build(), hidden,
 					address1, address2, address3, expresspostal, mobile, service, title, town,
 					zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName, kind, company, direction, countryCode,
@@ -421,6 +429,7 @@ public class ObmUser {
 	private final String firstName;
 	private final String email;
 	private final Set<String> emailAlias;
+	private final boolean hidden;
 	
 	private final String address1;
 	private final String address2;
@@ -463,7 +472,8 @@ public class ObmUser {
 
 	public ObmUser(Integer uid, EntityId entityId, String login, UserExtId extId, String commonName,
 			String lastName, String firstName, String email,
-			Set<String> emailAlias, String address1, String address2,
+			Set<String> emailAlias, boolean hidden,
+			String address1, String address2,
 			String address3, String expresspostal,
 			String mobile, String service, String title, String town,
 			String zipCode,
@@ -481,6 +491,7 @@ public class ObmUser {
 		this.firstName = firstName;
 		this.email = email;
 		this.emailAlias = emailAlias;
+		this.hidden = hidden;
 		this.address1 = address1;
 		this.address2 = address2;
 		this.address3 = address3;
@@ -545,6 +556,10 @@ public class ObmUser {
 
 	public Set<String> getEmailAlias() {
 		return emailAlias;
+	}
+	
+	public boolean isHidden() {
+		return hidden;
 	}
 
 	public String getAddress1() {
@@ -739,7 +754,7 @@ public class ObmUser {
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(uid, entityId, login, extId, commonName, lastName, firstName, email,
-				emailAlias, address1, address2, address3, expresspostal, mobile,
+				emailAlias, hidden, address1, address2, address3, expresspostal, mobile,
 				service, title, town, zipCode,	description, createdBy, updatedBy, domain, publicFreeBusy, profileName, kind, company,
 				direction, countryCode, phone, phone2, fax, fax2, mailQuota, archived, mailHost, password, uidNumber, gidNumber, groups);
 	}
@@ -757,6 +772,7 @@ public class ObmUser {
 				&& Objects.equal(this.firstName, that.firstName)
 				&& Objects.equal(this.email, that.email)
 				&& Objects.equal(this.emailAlias, that.emailAlias)
+				&& Objects.equal(this.hidden, that.hidden)
 				&& Objects.equal(this.address1, that.address1)
 				&& Objects.equal(this.address2, that.address2)
 				&& Objects.equal(this.address3, that.address3)
@@ -803,6 +819,7 @@ public class ObmUser {
 			.add("firstName", firstName)
 			.add("email", email)
 			.add("emailAlias", emailAlias)
+			.add("hidden", hidden)
 			.add("address1", address1)
 			.add("address2", address2)
 			.add("address3", address3)
