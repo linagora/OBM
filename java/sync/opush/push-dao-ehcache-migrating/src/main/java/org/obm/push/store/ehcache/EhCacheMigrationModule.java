@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,57 +29,19 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.store.ehcache;
 
-import java.util.Collections;
-import java.util.TimeZone;
+import org.obm.sync.LifecycleListener;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 
-import org.obm.sync.LifecycleListenerHelper;
-import org.obm.sync.XTrustProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class EhCacheMigrationModule extends AbstractModule {
 
-import bitronix.tm.TransactionManagerServices;
-
-import com.google.inject.CreationException;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.spi.Message;
-
-public class GuiceServletContextListener implements ServletContextListener { 
-
-	private static final Logger logger = LoggerFactory.getLogger(GuiceServletContextListener.class);
-	private Injector injector;
-	
-	public void contextInitialized(ServletContextEvent servletContextEvent) {
-
-		try {
-			injector = createInjector();
-			if (injector == null) { 
-				failStartup("Could not create injector: createInjector() returned null"); 
-			} 
-			XTrustProvider.install();
-			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			failStartup(e.getMessage());
-		} 
-	} 
-
-	private Injector createInjector() {
-		return Guice.createInjector(new OpushModule());
+	@Override
+	protected void configure() {
+		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
+		lifecycleListeners.addBinding().to(ObjectStoreManagerMigration.class);
 	}
-
-    private void failStartup(String message) { 
-        throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
-    }
-    
-    public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    	LifecycleListenerHelper.shutdownListeners(injector);
-    	TransactionManagerServices.getTransactionManager().shutdown();
-    }
 
 }

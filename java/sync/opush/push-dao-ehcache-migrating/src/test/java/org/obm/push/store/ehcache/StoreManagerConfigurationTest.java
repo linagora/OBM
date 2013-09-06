@@ -29,57 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.store.ehcache;
 
-import java.util.Collections;
-import java.util.TimeZone;
+import java.io.File;
+import java.io.IOException;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import org.easymock.EasyMock;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.obm.configuration.ConfigurationService;
 
-import org.obm.sync.LifecycleListenerHelper;
-import org.obm.sync.XTrustProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class StoreManagerConfigurationTest {
 
-import bitronix.tm.TransactionManagerServices;
-
-import com.google.inject.CreationException;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.spi.Message;
-
-public class GuiceServletContextListener implements ServletContextListener { 
-
-	private static final Logger logger = LoggerFactory.getLogger(GuiceServletContextListener.class);
-	private Injector injector;
+	@Rule 
+	public TemporaryFolder temporaryFolder =  new TemporaryFolder();
 	
-	public void contextInitialized(ServletContextEvent servletContextEvent) {
-
-		try {
-			injector = createInjector();
-			if (injector == null) { 
-				failStartup("Could not create injector: createInjector() returned null"); 
-			} 
-			XTrustProvider.install();
-			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			failStartup(e.getMessage());
-		} 
-	} 
-
-	private Injector createInjector() {
-		return Guice.createInjector(new OpushModule());
+	protected ConfigurationService initConfigurationServiceMock() throws IOException {
+		File dataDir = temporaryFolder.newFolder();
+		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
+		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2);
+		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true);
+		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
+		EasyMock.replay(configurationService);
+		
+		return configurationService;
 	}
-
-    private void failStartup(String message) { 
-        throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
-    }
-    
-    public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    	LifecycleListenerHelper.shutdownListeners(injector);
-    	TransactionManagerServices.getTransactionManager().shutdown();
-    }
 
 }

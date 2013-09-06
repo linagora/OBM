@@ -42,6 +42,7 @@ import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
 import org.obm.push.java.mail.ImapModule;
 import org.obm.push.store.ehcache.EhCacheDaoModule;
+import org.obm.push.store.ehcache.EhCacheMigrationModule;
 import org.obm.push.store.jdbc.JdbcDaoModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +91,7 @@ public class OpushModule extends AbstractModule {
 		install(new HealthCheckModule());
 		install(new HealthCheckDefaultHandlersModule());
 		install(new EhCacheDaoModule());
+		install(new EhCacheMigrationModule());
 		install(new JdbcDaoModule());
 		install(databaseModule);
 		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(false);
