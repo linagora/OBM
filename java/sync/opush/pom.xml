@@ -38,6 +38,7 @@
 		<module>push-dao-ehcache</module>
 		<module>push-dao-mail</module>
 		<module>push-dao-testsuite</module>
+		<module>push-dao-ehcache-migrating</module>
 		<module>push-bean</module>
 		<module>push-interfaces</module>
 		<module>push-mail</module>
