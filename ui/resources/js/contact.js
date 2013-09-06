@@ -177,7 +177,7 @@ Obm.Contact.AddressBook = new Class ({
       onSuccess: callback
     });
 
-    similarContactRequest.get({
+    similarContactRequest.post({
       ajax: 1,
       action: 'searchSimilar',
       firstname: firstname,
