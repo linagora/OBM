@@ -117,7 +117,6 @@ public class UserPatternDaoJdbcImpl implements UserPatternDao {
 		String query = "DELETE FROM _userpattern WHERE id = ?";
 
 		try {
-			con = obmHelper.getConnection();
 			ps = con.prepareStatement(query);
 
 			ps.setInt(1, user.getUid());

@@ -800,7 +800,6 @@ public class GroupDaoJdbcImpl implements GroupDao {
 		ImmutableSet.Builder<Group.Id> groups = ImmutableSet.builder();
 
 		try {
-			con = connectionProvider.getConnection();
 			ps = con.prepareStatement("SELECT groupgroup_parent_id FROM GroupGroup WHERE groupgroup_child_id = ?");
 
 			ps.setInt(1, groupId.getId());
@@ -831,7 +830,6 @@ public class GroupDaoJdbcImpl implements GroupDao {
 		Set<Integer> userIds = getAllUserIdsOfGroup(con, groupId);
 
 		try {
-			con = connectionProvider.getConnection();
 			ps = con.prepareStatement("DELETE FROM of_usergroup WHERE of_usergroup_group_id = ?");
 
 			ps.setInt(1, groupId.getId());
@@ -863,7 +861,6 @@ public class GroupDaoJdbcImpl implements GroupDao {
 		ImmutableSet.Builder<Integer> users = ImmutableSet.builder();
 
 		try {
-			con = connectionProvider.getConnection();
 			ps = con.prepareStatement("SELECT groupgroup_child_id FROM GroupGroup WHERE groupgroup_parent_id = ?");
 
 			ps.setInt(1, groupId.getId());
