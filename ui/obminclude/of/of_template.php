@@ -124,10 +124,10 @@ class OBM_Template {
 
   public static function __getaddress($address) {
     $formatedAddress = array();
-    if(!empty($address['street'])) $formatedAddress[] = $address['street'];
-    if(!empty($address['zipcode']) || !empty($address['town'])) $formatedAddress[] = $address['zipcode'].' '.$address['town'];
-    if(!empty($address['expresspostal']) || !empty($address['state'])) $formatedAddress[] = $address['expresspostal'].' '.$address['state'];
-    if(!empty($address['address_country'])) $formatedAddress[] = get_localized_country($address['address_country']);
+    if(!empty($address['street'])) $formatedAddress[] = htmlspecialchars($address['street']);
+    if(!empty($address['zipcode']) || !empty($address['town'])) $formatedAddress[] = htmlspecialchars($address['zipcode'].' '.$address['town']);
+    if(!empty($address['expresspostal']) || !empty($address['state'])) $formatedAddress[] = htmlspecialchars($address['expresspostal'].' '.$address['state']);
+    if(!empty($address['address_country'])) $formatedAddress[] = htmlspecialchars(get_localized_country($address['address_country']));
     return implode('<br />', $formatedAddress);
   }
 
@@ -141,8 +141,8 @@ class OBM_Template {
       <tr>
       <th rowspan="3"><select  name="addresses['.$addressIndex.'][label]">';
     foreach($GLOBALS['l_address_labels'] as $label => $locale) {
-      if($value['label'] == $label) $return .= '<option selected="selected" value="'.$label.'">'.$locale.'</option>';
-      else $return .= '<option value="'.$label.'">'.$locale.'</option>';
+      if($value['label'] == $label) $return .= '<option selected="selected" value="'.htmlspecialchars($label).'">'.htmlspecialchars($locale).'</option>';
+      else $return .= '<option value="'.htmlspecialchars($label).'">'.htmlspecialchars($locale).'</option>';
     }
 
     $country = (!empty($value['address_country'])) ? $value['address_country'] : $value['country_iso3166'];
@@ -152,12 +152,12 @@ class OBM_Template {
     
     $return .= '
         </select></th>
-        <th colspan="2"><textarea rows="3" name="addresses['.$addressIndex.'][street]" alt="'.__('Street').'" title="'.__('Street').'">'.$value['street'].'</textarea></th>
+        <th colspan="2"><textarea rows="3" name="addresses['.$addressIndex.'][street]" alt="'.__('Street').'" title="'.__('Street').'">'.htmlspecialchars($value['street']).'</textarea></th>
       </tr><tr>
-        <th><input type="text" name="addresses['.$addressIndex.'][zipcode]" alt="'.__('Zip code').'" title="'.__('Zip code').'" value="'.$value['zipcode'].'"/></th>
-        <th><input type="text" name="addresses['.$addressIndex.'][town]" alt="'.__('Town').'" title="'.__('Town').'" value="'.$value['town'].'"/></th>
+        <th><input type="text" name="addresses['.$addressIndex.'][zipcode]" alt="'.htmlspecialchars(__('Zip code')).'" title="'.htmlspecialchars(__('Zip code')).'" value="'.htmlspecialchars($value['zipcode']).'"/></th>
+        <th><input type="text" name="addresses['.$addressIndex.'][town]" alt="'.htmlspecialchars(__('Town')).'" title="'.htmlspecialchars(__('Town')).'" value="'.htmlspecialchars($value['town']).'"/></th>
       </tr><tr>
-        <th><input type="text" name="addresses['.$addressIndex.'][expresspostal]" alt="'.__('Express postal').'" title="'.__('Express postal').'" value="'.$value['expresspostal'].'"/></th>
+        <th><input type="text" name="addresses['.$addressIndex.'][expresspostal]" alt="'.htmlspecialchars(__('Express postal')).'" title="'.htmlspecialchars(__('Express postal')).'" value="'.htmlspecialchars($value['expresspostal']).'"/></th>
         <th>'.$sel_countries.'</th>
       </tr>
       </tbody>
@@ -172,7 +172,7 @@ class OBM_Template {
   }
 
   public static function __setboolean($name, $value, $label, $idSuffix = 'Field') {
-    return "<input id='${name}$idSuffix' type='checkbox' name='$name' value='1' ".(($value)? "checked='checked'": '')."' title='".__($label)."'/>";
+    return "<input id='${name}$idSuffix' type='checkbox' name='$name' value='1' ".(($value)? "checked='checked'": '')." title='".htmlspecialchars(__($label))."'/>";
   }
 
   public static function __setcategory($name, $datas, $label, $selected=null) {
@@ -195,11 +195,9 @@ class OBM_Template {
   public static function __setdate($name, $value, $label, $time=false, $idSuffix = 'Field') {
     if(is_object($value)) $value = $value->getInputDate();
     $field = "<span class='NW'>
-      <input class='datePicker' autocomplete='off' type='text' title='".__($label)."' name='$name' value='$value' id='${name}$idSuffix' />
-      <img src='$GLOBALS[ico_datepicker]' onclick=\"displayDatePicker($('${name}$idSuffix'))\" />
+      <input class='datePicker' autocomplete='off' type='text' title='".htmlspecialchars(__($label))."' name='".htmlspecialchars($name)."' value='".htmlspecialchars($value)."' id='".htmlspecialchars($name.$idSuffix)."' />
+      <img src='$GLOBALS[ico_datepicker]' onclick=\"displayDatePicker($('".htmlspecialchars($name.$idSuffix)."'))\" />
       </span>";
-    if($time) {
-    }
     return $field;
   }
 
@@ -214,8 +212,8 @@ class OBM_Template {
       <tr>
         <th><select  name="emails['.$emailIndex.'][label]">';
     foreach($GLOBALS['l_email_labels'] as $label => $locale) {
-      if($value['label'] == $label) $return .= '<option selected="selected" value="'.$label.'">'.$locale.'</option>';
-      else $return .= '<option value="'.$label.'">'.$locale.'</option>';
+      if($value['label'] == $label) $return .= '<option selected="selected" value="'.htmlspecialchars($label).'">'.htmlspecialchars($locale).'</option>';
+      else $return .= '<option value="'.htmlspecialchars($label).'">'.htmlspecialchars($locale).'</option>';
     }
     $return .= '
         </select></th>
@@ -239,14 +237,14 @@ class OBM_Template {
     $encodedValue = htmlspecialchars($value);
     if($GLOBALS['perm']->check_module_rights('company')) {
       return  "
-        <input type='text' name='${name}_text' value=\"".$encodedValue."\" id='${name}Field' autocomplete='off'/>
-        <input type='hidden' name='${name}_id' value='$id' id='${name}_idField' />
+        <input type='text' name='".htmlspecialchars($name)."_text' value=\"".$encodedValue."\" id='".htmlspecialchars($name)."Field' autocomplete='off'/>
+        <input type='hidden' name='".htmlspecialchars($name)."_id' value='".htmlspecialchars($id)."' id='".htmlspecialchars($name)."_idField' />
         <script type='text/javascript'>
           new obm.AutoComplete.Search('$GLOBALS[path]/$module/${module}_index.php?action=ext_search', '${name}_idField', '${name}Field', {mode: 'mono', locked: true, resetable: true});
         </script>
       ";
     } else {
-      return "<input type='text' name='$name' id='".$name."Field' value=\"".$encodedValue."\" title='".__($label)."' />";
+      return "<input type='text' name='".htmlspecialchars($name)."' id='".htmlspecialchars($name)."Field' value=\"".$encodedValue."\" title='".htmlspecialchars(__($label))."' />";
     }
   }
 
@@ -266,12 +264,12 @@ class OBM_Template {
       <tr>
         <th><select  name="ims['.$imIndex.'][protocol]">';
     foreach($GLOBALS['l_im_labels'] as $protocol => $locale) {
-      if($value['protocol'] == $protocol) $return .= '<option selected="selected" value="'.$protocol.'">'.$locale.'</option>';
-      else $return .= '<option value="'.$protocol.'">'.$locale.'</option>';
+      if($value['protocol'] == $protocol) $return .= '<option selected="selected" value="'.htmlspecialchars($protocol).'">'.htmlspecialchars($locale).'</option>';
+      else $return .= '<option value="'.htmlspecialchars($protocol).'">'.htmlspecialchars($locale).'</option>';
     }
     $return .= '
         </select></th>
-        <th><input type="text" name="ims['.$imIndex.'][address]" alt="'.__('Address').'" title="'.__('Address').'" value="'.$value['address'].'"/></th>
+        <th><input type="text" name="ims['.$imIndex.'][address]" alt="'.htmlspecialchars(__('Address')).'" title="'.htmlspecialchars(__('Address')).'" value="'.htmlspecialchars($value['address']).'"/></th>
       </tr>
       </tbody>
       </table>';    
@@ -282,7 +280,7 @@ class OBM_Template {
   public static function __getlink($uri, $label=null) {
     if(!$label) $label = $uri;
     $uri = ((strpos($uri,'://') === false)?'http://'.$uri:$uri);
-    return '<a href="'.$uri.'" target="__blank">'.$label.'</a>';
+    return '<a href="'.htmlspecialchars($uri).'" target="__blank">'.htmlspecialchars($label).'</a>';
   }
 
   public static function __setlist($name, $datas, $label, $selected=null, $none=false, $idSuffix = 'Field') {
@@ -290,17 +288,17 @@ class OBM_Template {
     if($none) $list = '<option value="">---</option>';
     if(is_array($datas))
       foreach($datas as $id => $data) {
-        if($id == $selected) $list .= '<option value="'.$id.'" selected="selected">'.$data.'</option>';
-        else $list .= '<option value="'.$id.'">'.$data.'</option>';
+        if($id == $selected) $list .= '<option value="'.htmlspecialchars($id).'" selected="selected">'.htmlspecialchars($data).'</option>';
+        else $list .= '<option value="'.htmlspecialchars($id).'">'.htmlspecialchars($data).'</option>';
       }
 
-    return '<select name="'.$name.'" title="'.__($label).'" id="'.$name.$idSuffix.'">'.$list.'</select>';
+    return '<select name="'.htmlspecialchars($name).'" title="'.htmlspecialchars(__($label)).'" id="'.htmlspecialchars($name.$idSuffix).'">'.$list.'</select>';
   } 
 
   //TODO : Refactor : getmail ? getemail?
   public static function __getmail($uri, $label=null) {
     if(!$label) $label = $uri;
-    return '<a href="mailto:'.$uri.'">'.$label.'</a>';
+    return '<a href="mailto:'.htmlspecialchars($uri).'">'.htmlspecialchars($label).'</a>';
   }
 
   //TODO : Add getphone function.
@@ -314,12 +312,12 @@ class OBM_Template {
       <tr>
         <th><select  name="phones['.$phoneIndex.'][label]">';
     foreach($GLOBALS['l_phone_labels'] as $label => $locale) {
-      if($value['label'] == $label) $return .= '<option selected="selected" value="'.$label.'">'.$locale.'</option>';
-      else $return .= '<option value="'.$label.'">'.$locale.'</option>';
+      if($value['label'] == $label) $return .= '<option selected="selected" value="'.htmlspecialchars($label).'">'.htmlspecialchars($locale).'</option>';
+      else $return .= '<option value="'.htmlspecialchars($label).'">'.htmlspecialchars($locale).'</option>';
     }
     $return .= '
         </select></th>
-        <th><input type="text" name="phones['.$phoneIndex.'][number]" alt="'.__('Phone').'" title="'.__('Phone').'" value="'.$value['number'].'"/></th>
+        <th><input type="text" name="phones['.$phoneIndex.'][number]" alt="'.htmlspecialchars(__('Phone')).'" title="'.htmlspecialchars(__('Phone')).'" value="'.htmlspecialchars($value['number']).'"/></th>
       </tr>
       </tbody>
       </table>';    
@@ -343,12 +341,12 @@ class OBM_Template {
       <tr>
         <th><select  name="websites['.$websiteIndex.'][label]">';
     foreach($GLOBALS['l_website_labels'] as $label => $locale) {
-      if($value['label'] == $label) $return .= '<option selected="selected" value="'.$label.'">'.$locale.'</option>';
-      else $return .= '<option value="'.$label.'">'.$locale.'</option>';
+      if($value['label'] == $label) $return .= '<option selected="selected" value="'.htmlspecialchars($label).'">'.htmlspecialchars($locale).'</option>';
+      else $return .= '<option value="'.htmlspecialchars($label).'">'.htmlspecialchars($locale).'</option>';
     }
     $return .= '
         </select></th>
-        <th><input type="text" name="websites['.$websiteIndex.'][url]" alt="'.__('Website').'" title="'.__('Website').'" value="'.$value['url'].'"/></th>
+        <th><input type="text" name="websites['.$websiteIndex.'][url]" alt="'.htmlspecialchars(__('Website')).'" title="'.htmlspecialchars(__('Website')).'" value="'.htmlspecialchars($value['url']).'"/></th>
       </tr>
       </tbody>
       </table>';    

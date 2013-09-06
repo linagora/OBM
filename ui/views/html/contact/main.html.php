@@ -4,10 +4,10 @@
     <td id='addressBookGrid'>
       <table class='contactPanelHeader'>
         <thead>
-          <tr><th><?php echo __('Addressbook')?></th></tr>
+          <tr><th><?php echo htmlspecialchars(__('Addressbook')) ?></th></tr>
           <tr><td class='toolbar'>
-            <input type='button' value='' id='addContact' title="<?php echo __('Add contact')?>" onclick='obm.contact.addressbook.addContact();'/>
-            <input type='button' value='' id='addAddressBook' title="<?php echo __('Add addressbook')?>" onclick="obm.popup.show('addressbookForm');"/>
+            <input type='button' value='' id='addContact' title="<?php echo htmlspecialchars(__('Add contact'))?>" onclick='obm.contact.addressbook.addContact();'/>
+            <input type='button' value='' id='addAddressBook' title="<?php echo htmlspecialchars(__('Add addressbook'))?>" onclick="obm.popup.show('addressbookForm');"/>
           </td></tr>
         </thead>           
       </table>
@@ -15,14 +15,14 @@
         <?php echo $this->__template($template['addressbooks'], 'addressbooks'); ?>
       </div>
       <form id='addressbookForm' class='obmPopup' onsubmit="obm.popup.hide('addressbookForm');obm.contact.addressbook.storeAddressBook(this); return false;" style='display:none'>
-        <h1><? echo __('What would you like to name this addressbook ?') ?></h1>
+        <h1><? echo htmlspecialchars(__('What would you like to name this addressbook) ?')) ?></h1>
         <fieldset>
           <input type='text' name='name' value='' />
         </fieldset>
         <fieldset class='buttons'>
           <input type='hidden' name='action' value='storeAddressBook' />
-          <input type='submit' value='<?php echo __('Validate') ?>' />
-          <input type='button' value='<?php echo __('Close') ?>' onclick="obm.popup.hide('addressbookForm');$(this.form.name).set('value','');"/>
+          <input type='submit' value='<?php echo htmlspecialchars(__('Validate')) ?>' />
+          <input type='button' value='<?php echo htmlspecialchars(__('Close')) ?>' onclick="obm.popup.hide('addressbookForm');$(this.form.name).set('value','');"/>
         </fieldset>
       </form>
     </td>
@@ -33,9 +33,9 @@
             <?php $_size = floor(100/count($fields)).'%'; ?>
             <?php foreach($fields as $_fieldname => $_metadata)  { ?>
             <?php if($_metadata['status'] == 2) { ?>
-            <th><?php echo $GLOBALS['fieldnames'][$_fieldname] ?></th>
+            <th><?php echo htmlspecialchars($GLOBALS['fieldnames'][$_fieldname]) ?></th>
             <?php } else { ?>
-            <td style='width:<?php echo $_size; ?>'><?php echo $GLOBALS['fieldnames'][$_fieldname] ?></td>
+            <td style='width:<?php echo $_size; ?>'><?php echo htmlspecialchars($GLOBALS['fieldnames'][$_fieldname]) ?></td>
             <?php }?>
             <?php } ?>
             <td class='filler'> </td>
@@ -63,7 +63,7 @@
 </table>
 <script type='text/javascript'>
   obm.initialize.chain(function () {
-    obm.contact.addressbook = new Obm.Contact.AddressBook('addressbook-<?php echo $addressbooks->getMyContacts()->id ?>');
+    obm.contact.addressbook = new Obm.Contact.AddressBook('addressbook-<?php echo htmlspecialchars($addressbooks->getMyContacts()->id) ?>');
     //FIXME No js here should coded on server side;
     <?php if(isset($template['card'])) { ?>
       //obm.contact.addressbook.showContact();
