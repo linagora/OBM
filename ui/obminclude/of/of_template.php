@@ -236,16 +236,17 @@ class OBM_Template {
   }
 
   public static function __setentitylink($name, $value, $id, $module, $label, $idSuffix = 'Field') {
+    $encodedValue = htmlspecialchars($value);
     if($GLOBALS['perm']->check_module_rights('company')) {
       return  "
-        <input type='text' name='${name}_text' value='$value' id='${name}Field' autocomplete='off'/>
+        <input type='text' name='${name}_text' value=\"".$encodedValue."\" id='${name}Field' autocomplete='off'/>
         <input type='hidden' name='${name}_id' value='$id' id='${name}_idField' />
         <script type='text/javascript'>
           new obm.AutoComplete.Search('$GLOBALS[path]/$module/${module}_index.php?action=ext_search', '${name}_idField', '${name}Field', {mode: 'mono', locked: true, resetable: true});
         </script>
       ";
     } else {
-      return "<input type='text' name='$name' id='".$name."Field' value='$value' title='".__($label)."' />";
+      return "<input type='text' name='$name' id='".$name."Field' value=\"".$encodedValue."\" title='".__($label)."' />";
     }
   }
 
