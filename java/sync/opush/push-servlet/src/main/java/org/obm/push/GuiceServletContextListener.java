@@ -37,6 +37,7 @@ import java.util.TimeZone;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.obm.push.store.ehcache.ObjectStoreManagerMigration;
 import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +85,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 	private void shutdown() {
 		injector.getInstance(org.obm.push.store.ehcache.ObjectStoreManager.class).shutdown();
 		injector.getInstance(org.obm.push.jaxb.store.ehcache.ObjectStoreManager.class).shutdown();
+		injector.getInstance(ObjectStoreManagerMigration.class).shutdown();
 		TransactionManagerServices.getTransactionManager().shutdown();
 		shutdownCRaSH();
 	}

@@ -64,6 +64,11 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-dao-ehcache-migrating</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
 			<version>${obm.version}</version>
