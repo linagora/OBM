@@ -35,7 +35,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.exception.LdapInvalidDnException;
-import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.api.ldap.model.schema.AttributeType;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
@@ -150,8 +149,8 @@ public class ConnectionImplTest {
 		assertThat(connection.getGroupDnFromGroupCn(ldapGroup.getCn(), ldapDomain)
 			.equals(new Dn("cn=group1,ou=groups,dc=test.obm.org,dc=local"))).isTrue();
 		
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL);
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -212,8 +211,8 @@ public class ConnectionImplTest {
 		assertThat(connection.getUserDnFromUserId(ldapUser.getUid(), LdapDomain.valueOf("test.obm.org"))
 			.equals(new Dn("uid=test,ou=users,dc=test.obm.org,dc=local"))).isTrue();
 		
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=users,dc=test.obm.org,dc=local"), 
-				"(uid=test)", SearchScope.ONELEVEL);
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getUserEntry(LdapUser.Uid.valueOf("test"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("uid")).getString()).isEqualTo("test");
 		assertThat(entry.get(new AttributeType("uidnumber")).getString()).isEqualTo("1008");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1000");
@@ -291,13 +290,12 @@ public class ConnectionImplTest {
 				.build();
 		connection.addUserToGroup(userMembership, groupCn, ldapDomain);
 		
-		Attribute attribute = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL)
+		Attribute attribute = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain)
 			.get(new AttributeType("member"));
 		assertThat(attribute.contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
 		
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL);
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -332,8 +330,8 @@ public class ConnectionImplTest {
 				.build();
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
 		
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL);
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -376,8 +374,8 @@ public class ConnectionImplTest {
 				.build();
 		connection.addUsersToGroup(ImmutableList.of(userMembership2, userMembership3), groupCn, ldapDomain);
 		
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL);
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -415,14 +413,13 @@ public class ConnectionImplTest {
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
 		
 		// In order to be sure that user is really inserted
-		Attribute attributeInserted = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL)
+		Attribute attributeInserted = 	connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain)
 			.get(new AttributeType("member"));
 		assertThat(attributeInserted.contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
 		
 		connection.removeUserFromGroup(userMembership, groupCn, ldapDomain);
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL);
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -458,14 +455,13 @@ public class ConnectionImplTest {
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
 		
 		// In order to be sure that user is really inserted
-		Attribute attributeInserted = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL)
+		Attribute attributeInserted = 	connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain)
 			.get(new AttributeType("member"));
 		assertThat(attributeInserted.contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
 		
 		connection.removeUsersFromGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL);
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -506,14 +502,14 @@ public class ConnectionImplTest {
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2, userMembership3), groupCn, ldapDomain);
 		
 		// In order to be sure that user is really inserted
-		Attribute attributeInserted = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL)
+		Attribute attributeInserted = 	connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain)
 			.get(new AttributeType("member"));
 		assertThat(attributeInserted.contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
 		
 		connection.removeUsersFromGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL);
+
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -549,8 +545,8 @@ public class ConnectionImplTest {
 		
 		connection.addGroupToGroup(groupCn, toGroupCn, ldapDomain);
 		
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL);
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -597,8 +593,9 @@ public class ConnectionImplTest {
 		LdapGroup.Cn toGroupCn = toGroup.getCn();
 		
 		connection.addGroupToGroup(groupCn, toGroupCn, ldapDomain);
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL);
+
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -647,8 +644,9 @@ public class ConnectionImplTest {
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
 		
 		connection.removeGroupFromGroup(groupCn, fromGroupCn, ldapDomain);
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL);
+
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -707,8 +705,9 @@ public class ConnectionImplTest {
 		LdapGroup.Cn toGroupCn = toGroup.getCn();
 		
 		connection.addGroupsToGroup(ImmutableList.of(groupCn, groupCn2), toGroupCn, ldapDomain);
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=subgroup)", SearchScope.ONELEVEL);
+
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("subgroup"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("subgroup");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -756,8 +755,8 @@ public class ConnectionImplTest {
 		
 		connection.addGroupsToGroup(ImmutableList.of(groupCn, groupCn2), toGroupCn, ldapDomain);
 		
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=subgroup)", SearchScope.ONELEVEL);
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("subgroup"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("subgroup");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
@@ -815,8 +814,9 @@ public class ConnectionImplTest {
 		connection.addUsersToGroup(ImmutableList.of(userMembership2), groupCn2, ldapDomain);
 
 		connection.removeGroupsFromGroup(ImmutableList.of(groupCn, groupCn2), fromGroupCn, ldapDomain);
-		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getEntry(new Dn("ou=groups,dc=test.obm.org,dc=local"), 
-				"(cn=group1)", SearchScope.ONELEVEL);
+
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");

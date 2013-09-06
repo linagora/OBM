@@ -35,8 +35,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.directory.api.ldap.model.constants.SchemaConstants;
-import org.apache.directory.api.ldap.model.cursor.Cursor;
 import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Entry;
@@ -44,7 +42,6 @@ import org.apache.directory.api.ldap.model.entry.Modification;
 import org.apache.directory.api.ldap.model.entry.ModificationOperation;
 import org.apache.directory.api.ldap.model.entry.Value;
 import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.api.ldap.model.name.Rdn;
 import org.apache.directory.api.ldap.model.schema.AttributeType;
@@ -59,9 +56,6 @@ import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
 import org.obm.provisioning.ldap.client.exception.ConnectionException;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ObjectArrays;
 import com.google.inject.Inject;
@@ -200,15 +194,6 @@ public class ConnectionImpl implements Connection {
 		return new Dn(
 				new Rdn(String.format("cn=%s", ldapGroupCn.get())),
 				configuration.getGroupBaseDn(domain));
-	}
-	
-	@VisibleForTesting Entry getEntry(Dn baseDn, String filter, SearchScope scope) throws LdapException {
-		Cursor<Entry> entries = connection.search(baseDn, filter, scope, SchemaConstants.ALL_ATTRIBUTES_ARRAY);
-		incrementAndCheckRequestCounter();
-		ImmutableList<Entry> entriesList = FluentIterable.from(entries).toList();
-		Preconditions.checkState(entriesList.size() == 1,
-				"Entry has not been found or too many group found for the filter " + filter + " in the base " + baseDn.getName() + " with scope " + scope);
-		return entriesList.get(0);
 	}
 
 	@Override
@@ -363,10 +348,15 @@ public class ConnectionImpl implements Connection {
 		connection.modify(fromEntry.getDn(), modifications.toArray(new Modification[] {}));
 		incrementAndCheckRequestCounter();
 	}
-	
-	private Entry getGroupEntry(LdapGroup.Cn ldapGroupCn, LdapDomain ldapDomain) throws LdapException {
-		return getEntry(configuration.getGroupBaseDn(ldapDomain),
-				configuration.buildGroupFilter(ldapGroupCn), 
-				configuration.getGroupSearchScope());
+
+	@VisibleForTesting
+	Entry getGroupEntry(LdapGroup.Cn ldapGroupCn, LdapDomain ldapDomain) throws LdapException {
+		return connection.lookup(getGroupDnFromGroupCn(ldapGroupCn, ldapDomain));
 	}
+
+	@VisibleForTesting
+	Entry getUserEntry(LdapUser.Uid ldapUserUid, LdapDomain ldapDomain) throws LdapException {
+		return connection.lookup(getUserDnFromUserId(ldapUserUid, ldapDomain));
+	}
+
 }
