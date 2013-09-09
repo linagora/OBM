@@ -7703,7 +7703,7 @@ Class CalendarView {
       obmbookmark_label,
       obmbookmark_entity) VALUES (
         $user_id,
-        '{".$obm_q->escape($this->label)."}',
+        '".$obm_q->escape($this->label)."',
         'calendar')";
     display_debug_msg($query, $cdg_sql, 'CalendarView::insert()');
     $obm_q->query($query);
