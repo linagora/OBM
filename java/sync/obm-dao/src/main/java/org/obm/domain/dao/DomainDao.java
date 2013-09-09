@@ -203,13 +203,13 @@ public class DomainDao {
 		try {
 			con = dbcp.getConnection();
 			ps = con.prepareStatement(
-				"SELECT serviceproperty_service, serviceproperty_property, host_id, host_name, host_ip, host_fqdn " +
+				"SELECT serviceproperty_service, serviceproperty_property, host_id, host_name, host_ip, host_fqdn, host_domain_id " +
 				"FROM Domain " +
 				"INNER JOIN DomainEntity ON domainentity_domain_id = domain_id " +
 				"LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id " +
 				"LEFT JOIN Host ON host_id = CAST(serviceproperty_value AS " + dbcp.getIntegerCastType() + ") " +
 				"WHERE domain_id = ? AND host_id IS NOT NULL " +
-				"GROUP BY serviceproperty_service, serviceproperty_property, host_id, host_name, host_ip, host_fqdn");
+				"GROUP BY serviceproperty_service, serviceproperty_property, host_id, host_name, host_ip, host_fqdn, host_domain_id");
 
 			ps.setInt(1, domainId);
 			rs = ps.executeQuery();
@@ -225,7 +225,7 @@ public class DomainDao {
 						.id(rs.getInt("host_id"))
 						.name(rs.getString("host_name"))
 						.ip(rs.getString("host_ip"))
-						.domainId(domainId)
+						.domainId(rs.getInt("host_domain_id"))
 						.fqdn(rs.getString("host_fqdn"))
 						.build();
 

@@ -168,6 +168,7 @@ public class DomainDaoTest {
 		expect(rs.getString("host_ip")).andReturn("1.2.3.4");
 		expect(rs.getString("host_name")).andReturn("local");
 		expect(rs.getString("host_fqdn")).andReturn("local.global.virt");
+		expect(rs.getInt("host_domain_id")).andReturn(1);
 	}
 
 	private void expectFindDomainCalls(Connection con, ResultSet rs, String domainName, String aliases) throws Exception {
