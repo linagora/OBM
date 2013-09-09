@@ -85,6 +85,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		}
 
 		ObmUser newUser = userBuilder.domain(domain).build();
+
 		Preconditions.checkArgument(newUser.getProfileName() != null, UserJsonFields.PROFILE.asSpecificationValue() + " is required.");
 		Preconditions.checkArgument(newUser.getLastName() != null, UserJsonFields.LASTNAME.asSpecificationValue() + " is required.");
 

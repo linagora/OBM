@@ -62,7 +62,6 @@ public class BatchProcessorImplTestEnv extends CommonDomainEndPointEnvTest {
 
 					}));
 		}
-
 	}
 
 	@Inject

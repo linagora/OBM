@@ -69,18 +69,18 @@ public class SerializationUtils {
 
 	public static ObmHost getMailHostValue(JsonNode jsonNode, ObmDomain domain) {
 		ObmHost mailHost = null;
+
+		JsonNode serverNode = jsonNode.findValue(MAIL_SERVER.asSpecificationValue());
 		JsonNode emailsNode = jsonNode.findValue(MAILS.asSpecificationValue());
-		Collection<String> mails = emailsNode != null ? getCurrentTokenTextValues(emailsNode) : null;
 
-		if (mails != null && !mails.isEmpty()) {
-			JsonNode serverNode = jsonNode.findValue(MAIL_SERVER.asSpecificationValue());
+		final Collection<String> mails = !isNullOrNullNode(emailsNode) ? getCurrentTokenTextValues(emailsNode) : null;
+		final Collection<ObmHost> imapServices = domain.getHosts().get(IMAP_SERVICE_PROPERTY);
 
-			final Collection<ObmHost> imapServices = domain.getHosts().get(IMAP_SERVICE_PROPERTY);
-			if (serverNode != null) {
-				mailHost = findMailHostForUser(serverNode.asText(), imapServices);
-			} else {
-				mailHost = Iterables.getFirst(imapServices, null);
-			}
+		if (!isNullOrNullNode(serverNode)) {
+			mailHost = findMailHostForUser(serverNode.asText(), imapServices);
+		}
+		else if (mails != null && !mails.isEmpty()) {
+			mailHost = Iterables.getFirst(imapServices, null);
 		}
 		
 		return mailHost;

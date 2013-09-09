@@ -115,7 +115,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 			.build();
 
 	@Test
-	public void testProcessWithInvalidJSONData() throws Exception {
+	public void testProcessCreateUserWithInvalidJSONData() throws Exception {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -1011,6 +1011,178 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		mocksControl.verify();
 	}
 
+	@Test
+	public void testProcessPatchUserCannotChangeArchivedState()
+			throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PATCH)
+								.body("{" + "\"archived\": true" + "}").build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login("user1")
+				.lastName("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.mailHost(
+						ObmHost.builder().name("Cyrus").ip("127.0.0.1").build())
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(
+				userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
+						domainWithImapAndLdap)).andReturn(userFromDao);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder
+										.status(BatchStatus.ERROR)
+										.timecommit(date)
+										.error("org.obm.provisioning.exception.ProcessingException: Cannot change user archived state")
+										.build()).status(BatchStatus.SUCCESS)
+						.timecommit(date).build())).andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testProcessPatchUserCannotChangeLogin() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PATCH)
+								.body("{" + "\"login\": \"user1new\"" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.lastName("user1lastname")
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.mailHost(
+						ObmHost.builder().name("Cyrus").ip("127.0.0.1").build())
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(
+				userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
+						domainWithImapAndLdap)).andReturn(userFromDao);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder
+										.status(BatchStatus.ERROR)
+										.timecommit(date)
+										.error("org.obm.provisioning.exception.ProcessingException: Cannot change user login")
+										.build()).status(BatchStatus.SUCCESS)
+						.timecommit(date).build())).andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testProcessPatchUserCannotChangeMailHost() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PATCH)
+								.body("{" + "\"mail_server\":\"NewCyrus\""
+										+ "}").build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.lastName("user1lastname")
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.mailHost(
+						ObmHost.builder().name("Cyrus").ip("127.0.0.1").build())
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(
+				userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
+						domainWithImapAndLdap)).andReturn(userFromDao);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder
+										.status(BatchStatus.ERROR)
+										.timecommit(date)
+										.error("org.obm.provisioning.exception.ProcessingException: Cannot change user mail host")
+										.build()).status(BatchStatus.SUCCESS)
+						.timecommit(date).build())).andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
 	private void expectDeleteUserMailbox(final ObmUser user)
 			throws DaoException, IMAPException {
 		CyrusManager cyrusManager = expectCyrusBuild();
@@ -1039,4 +1211,5 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.andReturn(cyrusManager);
 		return cyrusManager;
 	}
+
 }
