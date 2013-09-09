@@ -692,7 +692,7 @@ function html_calendar_view_selector($calendar, $current_view, $my_views) {
   $uid = $GLOBALS['obm']['uid'];
 
   $view_id = $current_view->get_id();
-  if ($calendar['set_cal_view_id'] === 0) $view_id = 0;
+  if (!$calendar['set_cal_view_id']) $view_id = 0;
   $default_view_id = $_SESSION['set_cal_default_view'];
   $display = 'none';
   if (isset($default_view_id)) {
