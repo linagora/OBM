@@ -41,6 +41,7 @@ import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -304,6 +305,11 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public boolean containsCalendarMethod() {
+		return !Strings.isNullOrEmpty(retrieveMethodFromCalendarPart());
 	}
 
 	@Override

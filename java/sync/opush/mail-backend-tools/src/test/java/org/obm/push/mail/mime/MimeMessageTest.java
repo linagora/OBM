@@ -376,6 +376,18 @@ public class MimeMessageTest {
 		MimeMessage mimePart = MimeMessageImpl.builder().from(MimePartImpl.builder().contentType("text/plain").encoding(null).build()).build();
 		assertThat(mimePart.getAttachmentExtension()).isNull();
 	}
+
+	@Test
+	public void testContainsCalendarMethod() {
+		MimeMessage mimePart = MimeMessageImpl.builder().from(buildInvitationContentType("method")).build();
+		assertThat(mimePart.containsCalendarMethod()).isTrue();
+	}
+
+	@Test
+	public void testDoesntContainsCalendarMethod() {
+		MimeMessage mimePart = MimeMessageImpl.builder().from(buildMimePart("text/plain")).build();
+		assertThat(mimePart.containsCalendarMethod()).isFalse();
+	}
 	
 	private MimePart buildMimePart(String contentType) {
 		return MimePartImpl.builder().contentType(contentType).build();

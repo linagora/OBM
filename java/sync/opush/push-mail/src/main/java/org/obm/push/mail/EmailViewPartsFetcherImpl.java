@@ -217,7 +217,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		List<EmailViewAttachment> attachments = Lists.newArrayList();
 		MimePart parentMessage = fetchInstruction.getMimePart().findRootMimePartInTree();
 		Collection<MimePart> children = parentMessage.listLeaves(true, true);
-		if (containsInvitation(children)) {
+		if (isCalendarOperation(children)) {
 			return;
 		}
 		int attachmentId = 0;
@@ -232,11 +232,11 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		emailViewBuilder.attachments(attachments);
 	}
 	
-	private boolean containsInvitation(Collection<MimePart> children) {
+	private boolean isCalendarOperation(Collection<MimePart> children) {
 		return Iterables.any(children, new Predicate<MimePart>() {
 				@Override
 				public boolean apply(MimePart input) {
-					return input.isInvitation();
+					return input.containsCalendarMethod();
 				}
 			});
 	}

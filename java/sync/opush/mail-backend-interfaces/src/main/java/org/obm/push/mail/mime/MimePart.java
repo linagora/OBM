@@ -38,7 +38,6 @@ import java.util.List;
 
 import org.obm.push.mail.bean.IMAPHeaders;
 
-
 public interface MimePart {
 
 	interface Builder<T extends MimePart> {
@@ -73,6 +72,8 @@ public interface MimePart {
 
 	String getFullMimeType();
 
+	boolean containsCalendarMethod();
+	
 	boolean isInvitation();
 
 	String getContentTransfertEncoding();

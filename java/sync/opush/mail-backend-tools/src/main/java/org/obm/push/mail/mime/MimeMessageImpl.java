@@ -178,6 +178,11 @@ public class MimeMessageImpl implements MimeMessage {
 	}
 
 	@Override
+	public boolean containsCalendarMethod() {
+		return from.containsCalendarMethod();
+	}
+	
+	@Override
 	public boolean isInvitation() {
 		return from.isInvitation();
 	}
