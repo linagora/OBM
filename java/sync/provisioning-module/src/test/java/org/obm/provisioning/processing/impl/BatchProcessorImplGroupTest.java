@@ -232,7 +232,7 @@ public class BatchProcessorImplGroupTest extends BatchProcessorImplTestEnv {
 	}
 
 	@Test
-	public void testProcessRenameGroup() throws Exception {
+	public void testModifyGroupCannotRename() throws Exception {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -287,7 +287,7 @@ public class BatchProcessorImplGroupTest extends BatchProcessorImplTestEnv {
 								.resourcePath("/groups/extIdGroup1")
 								.param(Request.GROUPS_ID_KEY, "extIdGroup1")
 								.verb(HttpVerb.PATCH)
-								.body("{" + "\"name\": \"newName\","
+								.body("{"
 										+ "\"description\": \"newDescription\""
 										+ "}").build());
 		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
@@ -299,7 +299,7 @@ public class BatchProcessorImplGroupTest extends BatchProcessorImplTestEnv {
 		final Group groupFromDao = Group.builder().name("group1").gid(1)
 				.uid(Id.valueOf(1)).description("description").extId(extId)
 				.build();
-		final Group newGroup = Group.builder().name("newName").gid(1)
+		final Group newGroup = Group.builder().name("group1").gid(1)
 				.uid(Id.valueOf(1)).description("newDescription").extId(extId)
 				.build();
 
@@ -313,6 +313,50 @@ public class BatchProcessorImplGroupTest extends BatchProcessorImplTestEnv {
 				batchDao.update(batchBuilder
 						.operation(
 								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testProcessPatchGroupCannotRename() throws Exception {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.GROUP)
+				.request(
+						Request.builder()
+								.resourcePath("/groups/extIdGroup1")
+								.param(Request.GROUPS_ID_KEY, "extIdGroup1")
+								.verb(HttpVerb.PATCH)
+								.body("{" + "\"name\": \"newName\","
+										+ "\"description\": \"newDescription\""
+										+ "}").build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domain).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+
+		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
+		final Group groupFromDao = Group.builder().name("group1").gid(1)
+				.uid(Id.valueOf(1)).description("description").extId(extId)
+				.build();
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expect(groupDao.get(domain, extId)).andReturn(groupFromDao);
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder
+										.status(BatchStatus.ERROR)
+										.error("org.obm.provisioning.exception.ProcessingException: Cannot rename a group.")
 										.timecommit(date).build())
 						.status(BatchStatus.SUCCESS).timecommit(date).build()))
 				.andReturn(null);

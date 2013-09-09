@@ -75,9 +75,8 @@ public abstract class AbstractGroupOperationProcessor extends AbstractOperationP
 		return Group.builder().from(group).uid(oldgroup.getUid()).gid(oldgroup.getGid()).build();
 	}
 	
-	protected Group getGroupFromRequestBody(Operation operation) {
+	protected Group getGroupFromRequestBody(Operation operation, ObjectMapper objectMapper) {
 		String requestBody = operation.getRequest().getBody();
-		ObjectMapper objectMapper = getObjectMapperForDomain();
 
 		try {
 			return objectMapper.readValue(requestBody, Group.class);
@@ -87,7 +86,7 @@ public abstract class AbstractGroupOperationProcessor extends AbstractOperationP
 		}
 	}
 
-	private ObjectMapper getObjectMapperForDomain() {
+	protected ObjectMapper getDefaultObjectMapper() {
 		Module module = new SimpleModule("InBatch", new Version(0, 0, 0, null))
 			.addDeserializer(Group.class, new GroupJsonDeserializer());
 

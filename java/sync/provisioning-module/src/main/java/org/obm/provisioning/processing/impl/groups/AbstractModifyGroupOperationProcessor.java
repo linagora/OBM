@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.groups;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.Group;
+import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
@@ -44,27 +46,34 @@ import com.google.common.base.Objects;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-public class ModifyGroupOperationProcessor extends AbstractGroupOperationProcessor {
+public abstract class AbstractModifyGroupOperationProcessor extends AbstractGroupOperationProcessor {
 
-	ModifyGroupOperationProcessor() {
-		super(HttpVerb.PUT);
-	}
+	private Group existingGroup;
 
-	ModifyGroupOperationProcessor(HttpVerb verb) {
+	AbstractModifyGroupOperationProcessor(HttpVerb verb) {
 		super(verb);
 	}
 
+	public final Group getExistingGroup() {
+		return existingGroup;
+	}
+
+	protected abstract ObjectMapper getObjectMapper();
+
 	@Override
 	@Transactional
-	public void process(Operation operation, Batch batch) throws ProcessingException {
-		Group group = getGroupFromRequestBody(operation);
-		ObmDomain domain = batch.getDomain();
-		Group oldGroup = getGroupFromDao(group.getExtId(), domain);
+	public final void process(Operation operation, Batch batch) throws ProcessingException {
+		final ObmDomain domain = batch.getDomain();
+		GroupExtId extId = getGroupExtIdFromRequest(operation);
 
-		validateGroupChanges(group, oldGroup);
+		existingGroup = getExistingGroupFromDao(extId, domain);
 
-		Group newGroup = modifyGroupInDao(domain, inheritDatabaseIdentifiers(group, oldGroup));
-		modifyGroupInLdap(domain, newGroup, oldGroup);
+		Group group = getGroupFromRequestBody(operation, getObjectMapper());
+
+		validateGroupChanges(group, existingGroup);
+
+		Group newGroup = modifyGroupInDao(domain, inheritDatabaseIdentifiers(group, existingGroup));
+		modifyGroupInLdap(domain, newGroup, existingGroup);
 		modifyGroupInPTables(newGroup);
 	}
 
@@ -74,7 +83,7 @@ public class ModifyGroupOperationProcessor extends AbstractGroupOperationProcess
 		}
 	}
 
-	protected Group modifyGroupInDao(ObmDomain domain, Group group) {
+	private Group modifyGroupInDao(ObmDomain domain, Group group) {
 		try {
 			return groupDao.update(domain, group);
 		} catch (Exception e) {
@@ -82,10 +91,10 @@ public class ModifyGroupOperationProcessor extends AbstractGroupOperationProcess
 					String.format("Cannot modify group '%s' (%s) in database.", group.getName(), group.getExtId()), e);
 		}
 	}
-	
-	protected void modifyGroupInLdap(ObmDomain domain, Group group, Group oldGroup) {
+
+	private void modifyGroupInLdap(ObmDomain domain, Group group, Group oldGroup) {
 		LdapManager ldapManager = buildLdapManager(domain);
-		
+
 		try {
 			ldapManager.modifyGroup(domain, group, oldGroup);
 		} catch (Exception e) {
@@ -95,7 +104,7 @@ public class ModifyGroupOperationProcessor extends AbstractGroupOperationProcess
 			ldapManager.shutdown();
 		}
 	}
-	
+
 	private void modifyGroupInPTables(Group group) {
 		try {
 			pGroupDao.delete(group);

@@ -89,7 +89,7 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 		}
 	}
 
-	protected Group getGroupFromDao(GroupExtId extId, ObmDomain domain) {
+	protected Group getExistingGroupFromDao(GroupExtId extId, ObmDomain domain) {
 		try {
 			return groupDao.get(domain, extId);
 		} catch (Exception e) {

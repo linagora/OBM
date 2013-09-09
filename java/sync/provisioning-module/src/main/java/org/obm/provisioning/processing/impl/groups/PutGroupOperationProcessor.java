@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2013  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -27,34 +27,23 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.json;
+package org.obm.provisioning.processing.impl.groups;
 
-import java.io.IOException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.obm.provisioning.beans.HttpVerb;
 
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
-import org.obm.provisioning.Group;
-import org.obm.provisioning.Group.Builder;
-import org.obm.provisioning.utils.SerializationUtils;
+import com.google.inject.Inject;
 
-public final class GroupJsonDeserializer extends JsonDeserializer<Group> {
+public final class PutGroupOperationProcessor extends AbstractModifyGroupOperationProcessor {
 
-	public final Builder builder;
-
-	public GroupJsonDeserializer() {
-		builder = Group.builder();
-	}
-
-	public GroupJsonDeserializer(Group fromGroup) {
-		builder = Group.builder().from(fromGroup);
+	@Inject
+	PutGroupOperationProcessor() {
+		super(HttpVerb.PUT);
 	}
 
 	@Override
-	public Group deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-		SerializationUtils.readJsonGroup(jp, builder);
-		return builder.build();
+	protected ObjectMapper getObjectMapper() {
+		return getDefaultObjectMapper();
 	}
 
 }

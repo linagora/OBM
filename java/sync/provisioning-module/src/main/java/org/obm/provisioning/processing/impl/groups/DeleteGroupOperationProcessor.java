@@ -54,7 +54,7 @@ public class DeleteGroupOperationProcessor extends AbstractGroupOperationProcess
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		GroupExtId extId = getGroupExtIdFromRequest(operation);
 		ObmDomain domain = batch.getDomain();
-		Group groupFromDao = getGroupFromDao(extId, domain);
+		Group groupFromDao = getExistingGroupFromDao(extId, domain);
 		
 		deleteGroupInDao(domain, extId);
 		deleteGroupInLdap(domain, groupFromDao);

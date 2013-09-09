@@ -72,8 +72,8 @@ public class DeleteSubgroupFromGroupOperationProcessor extends AbstractGroupOper
 	
 	private void removeSubgroupFromGroupInLdap(ObmDomain domain, GroupExtId groupExtId, GroupExtId subgroupExtId) {
 		LdapManager ldapManager = buildLdapManager(domain);
-		Group group = getGroupFromDao(groupExtId, domain);
-		Group subgroup = getGroupFromDao(subgroupExtId, domain);
+		Group group = getExistingGroupFromDao(groupExtId, domain);
+		Group subgroup = getExistingGroupFromDao(subgroupExtId, domain);
 		
 		try {
 			ldapManager.removeSubgroupFromGroup(domain, group, subgroup);

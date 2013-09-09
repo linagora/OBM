@@ -35,66 +35,25 @@ import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.Group;
-import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.ProvisioningService;
-import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
-import org.obm.provisioning.beans.Operation;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.exception.ProcessingException;
-import org.obm.provisioning.json.PatchGroupJsonDeserializer;
+import org.obm.provisioning.json.GroupJsonDeserializer;
 
 import com.google.inject.Inject;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+public final class PatchGroupOperationProcessor extends AbstractModifyGroupOperationProcessor {
 
-public class PatchGroupOperationProcessor extends ModifyGroupOperationProcessor {
-	
 	@Inject
 	PatchGroupOperationProcessor() {
 		super(HttpVerb.PATCH);
 	}
-	
+
 	@Override
-	@Transactional
-	public void process(Operation operation, Batch batch) throws ProcessingException {
-		final ObmDomain domain = batch.getDomain();
-		GroupExtId extId = getGroupExtIdFromRequest(operation);
-		Group oldGroup = getGroupFromDao(extId, domain);
-		Group group = getGroupFromRequestBody(operation, oldGroup);
-		
-		Group newGroup = modifyGroupInDao(domain, inheritDatabaseIdentifiers(group, oldGroup));
-		modifyGroupInLdap(domain, newGroup, oldGroup);
-		modifyGroupInPTables(group);
-	}
-
-	private Group getGroupFromRequestBody(Operation operation, Group oldGroup) {
-		String requestBody = operation.getRequest().getBody();
-		ObjectMapper objectMapper = getObjectMapperForDomain(oldGroup);
-
-		try {
-			return objectMapper.readValue(requestBody, Group.class);
-		}
-		catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot parse ObmUser object from request body %s.", requestBody), e);
-		}
-	}
-
-	private ObjectMapper getObjectMapperForDomain(Group oldGroup) {
+	protected ObjectMapper getObjectMapper() {
 		Module module = new SimpleModule("InBatch", new Version(0, 0, 0, null))
-			.addDeserializer(Group.class, new PatchGroupJsonDeserializer(oldGroup));
+				.addDeserializer(Group.class, new GroupJsonDeserializer(getExistingGroup()));
 
 		return ProvisioningService.createObjectMapper(module);
-	}
-
-	private void modifyGroupInPTables(Group group) {
-		try {
-			pGroupDao.delete(group);
-			pGroupDao.insert(group);
-		} catch (DaoException e) {
-			throw new ProcessingException(e);
-		}
 	}
 }

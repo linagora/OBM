@@ -180,7 +180,6 @@ import org.obm.provisioning.json.ObmDomainUuidJsonSerializer;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
-import org.obm.provisioning.json.PatchGroupJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonSerializer;
 import org.obm.provisioning.ldap.client.Connection;
@@ -209,15 +208,16 @@ import org.obm.provisioning.processing.impl.HttpVerbBasedOperationProcessor;
 import org.obm.provisioning.processing.impl.OperationUtils;
 import org.obm.provisioning.processing.impl.ParallelBatchProcessor;
 import org.obm.provisioning.processing.impl.groups.AbstractGroupOperationProcessor;
+import org.obm.provisioning.processing.impl.groups.AbstractModifyGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.AddSubgroupToGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.AddUserToGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.CreateGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteSubgroupFromGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.DeleteUserFromGroupOperationProcessor;
-import org.obm.provisioning.processing.impl.groups.ModifyGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.groups.PatchGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.users.AbstractModifyUserOperationProcessor;
+import org.obm.provisioning.processing.impl.groups.PutGroupOperationProcessor;
 import org.obm.provisioning.processing.impl.users.AbstractUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
@@ -735,8 +735,8 @@ public class DependencyResolverHelper {
 				DeleteUserFromGroupOperationProcessor.class,
 				AddSubgroupToGroupOperationProcessor.class,
 				DeleteSubgroupFromGroupOperationProcessor.class,
-				ModifyGroupOperationProcessor.class,
-				PatchGroupJsonDeserializer.class,
+				AbstractModifyGroupOperationProcessor.class,
+				PutGroupOperationProcessor.class,
 				PatchGroupOperationProcessor.class,
 				CreateGroupOperationProcessor.class,
 				LifecycleListener.class,

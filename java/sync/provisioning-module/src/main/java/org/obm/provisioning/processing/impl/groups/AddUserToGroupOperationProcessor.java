@@ -64,7 +64,7 @@ public class AddUserToGroupOperationProcessor extends AbstractGroupOperationProc
 		ObmUser userFromDao = getUserFromDao(userExtId, domain);
 
 		addUserToGroupInDao(domain, groupExtId, userFromDao);
-		Group groupFromDao = getGroupFromDao(groupExtId, domain);
+		Group groupFromDao = getExistingGroupFromDao(groupExtId, domain);
 		updateGroupInPTables(groupFromDao);
 		addUserToAllParentGroupsInLdap(domain, groupExtId, userFromDao);
 	}

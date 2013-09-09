@@ -52,7 +52,7 @@ public class CreateGroupOperationProcessor extends AbstractGroupOperationProcess
 	@Override
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
-		Group group = getGroupFromRequestBody(operation);
+		Group group = getGroupFromRequestBody(operation, getDefaultObjectMapper());
 		Group groupFromDao = createGroupInDao(group, batch.getDomain());
 
 		createGroupInLdap(groupFromDao, batch.getDomain());
@@ -87,5 +87,4 @@ public class CreateGroupOperationProcessor extends AbstractGroupOperationProcess
 			throw new ProcessingException(e);
 		}
 	}
-
 }
