@@ -263,19 +263,6 @@ function html_group_search_form ($group) {
 
   // User defined data
   $block_userdata .= of_userdata_dis_search('group', $group);
-  if($group['filter'] == $GLOBALS['c_public']) {
-    $block_visi = "
-      <input type='hidden' name='sel_privacy' value='$GLOBALS[c_public]' />
-      <input type='hidden' name='filter' value='$GLOBALS[c_public]' />
-      ";
-  } else {
-    $sel_privacy = dis_privacy_search_select($privacy);
-    $block_visi = "
-    <label>$l_visibility<br />
-      $sel_privacy
-    </label>";
-
-  }
   
   $display_pref = get_display_pref($obm['uid'],'group');
 
@@ -329,7 +316,6 @@ function html_group_search_form ($group) {
   }
   
   $block .= "
-    $block_visi
     $block_userdata
     <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
