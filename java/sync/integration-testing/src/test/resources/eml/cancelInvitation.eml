@@ -1,0 +1,119 @@
+Return-Path: <usera@adupratvm.lyon.lan>
+Received: from adupratvm.lyon.lan (localhost [127.0.0.1])
+	 by adupratvm (Cyrus v2.4.16-Debian-2.4.16-2~obm60+1) with LMTPA;
+	 Mon, 09 Sep 2013 15:38:45 +0200
+X-Sieve: CMU Sieve 2.4
+Received: by adupratvm.lyon.lan (Postfix, from userid 33)
+	id 080BF16684; Mon,  9 Sep 2013 15:38:45 +0200 (CEST)
+To: userb <userb@adupratvm.lyon.lan>
+Subject: =?UTF-8?Q?Ev=C3=A9nement=20de=20=20user?==?UTF-8?Q?a=20ann?=  =?UTF-8?Q?ul=C3=A9=20:=205374-3?=
+X-PHP-Originating-Script: 0:sendmail.php
+Date: Mon, 09 Sep 13 15:38:44 +0200
+MIME-Version: 1.0
+From: usera <usera@adupratvm.lyon.lan>
+X-OBM-NOTIFICATION-EMAIL: 2.5.2-SNAPSHOT
+Content-Type: multipart/mixed; boundary="bd3f04ee6ce8b15304167a437d53fdc5"
+Message-Id: <20130909133845.080BF16684@adupratvm.lyon.lan>
+
+This is a multi-part message in MIME format.
+--bd3f04ee6ce8b15304167a437d53fdc5
+Content-Type: multipart/alternative; boundary="5d28648844747642fab5e5152a580c54"
+
+This is a multi-part message in MIME format.
+--5d28648844747642fab5e5152a580c54
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+
+Message automatique envoyé par OBM
+------------------------------------------------------------------
+RENDEZ-VOUS ANNULÉ !
+------------------------------------------------------------------
+
+Le rendez-vous suivant a été annulé
+
+du              : 2013-09-10 10:00
+au              : 2013-09-10 11:00
+sujet           : 5374-3
+lieu            : 
+organisateur    :  usera
+créé par        :  usera
+--5d28648844747642fab5e5152a580c54
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+
+<table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
+    <tr>
+        <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
+          Annulation d'un événement 
+        </th>
+    </tr>
+    <tr>
+        <td colspan="2">Le rendez-vous suivant a été annulé :</td>
+    </tr>
+    <tr>
+        <td style="text-align:right; width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;">5374-3</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Du</td><td style="font-weight:bold;">2013-09-10 10:00</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Au</td><td style="font-weight:bold;">2013-09-10 11:00</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Lieu</td><td style="font-weight:bold;"></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Organisateur</td><td style="font-weight:bold;"> usera</td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Créé par</td><td style="font-weight:bold;"> usera</td>
+    </tr>
+</table>
+
+--5d28648844747642fab5e5152a580c54
+Content-Type: text/calendar; charset=UTF-8; method=CANCEL; charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+QkVHSU46VkNBTEVOREFSDQpQUk9ESUQ6LS8vQWxpYXNvdXJjZSBHcm91cGUgTElOQUdPUkEv
+L09CTSBDYWxlbmRhciAyLjUuMi1TTkFQU0hPVC8vRlINCkNBTFNDQUxFOkdSRUdPUklBTg0K
+WC1PQk0tVElNRToxMzc4NzMzOTI0DQpWRVJTSU9OOjIuMA0KTUVUSE9EOkNBTkNFTA0KQkVH
+SU46VkVWRU5UDQpDUkVBVEVEOjIwMTMwOTA5VDEzMzgzMloNCkxBU1QtTU9ESUZJRUQ6MjAx
+MzA5MDlUMTMzODQ0Wg0KRFRTVEFNUDoyMDEzMDkwOVQxMzM4NDRaDQpEVFNUQVJUOjIwMTMw
+OTEwVDA4MDAwMFoNCkRVUkFUSU9OOlBUMUgNClRSQU5TUDpPUEFRVUUNClNFUVVFTkNFOjEN
+ClNVTU1BUlk6NTM3NC0zDQpERVNDUklQVElPTjoNCkNMQVNTOlBVQkxJQw0KUFJJT1JJVFk6
+NQ0KT1JHQU5JWkVSO1gtT0JNLUlEPTM7Q049IHVzZXJhOk1BSUxUTzp1c2VyYUBhZHVwcmF0
+dm0ubHlvbi5sYW4NClgtT0JNLURPTUFJTjphZHVwcmF0dm0ubHlvbi5sYW4NClgtT0JNLURP
+TUFJTi1VVUlEOjI1NTdkYTlhLTFiNmEtMGM2OS1mZmYxLTNmMzQ4N2VlMDU4NA0KTE9DQVRJ
+T046DQpDQVRFR09SSUVTOg0KWC1PQk0tQ09MT1I6DQpVSUQ6ODhhYTFhMTNjNzM0MGQ3ZDYz
+MGIyMWFlMGU1M2FiNTk2MzkyNzk4YzdlNjEzZGQ1OGQ4Nzk5M2M2ZGNlYTMxNWUyN2YzNw0K
+IGFmYjBmYTViN2E5ZTNhYTdmNzcxYzQzNmM3ODZmMjBjYWViY2Y1MzRlZGY4M2U1NzI0MTFl
+MjAxZDgwNjJmNjFkNmJkZGQwNDAzDQpBVFRFTkRFRTtDVVRZUEU9SU5ESVZJRFVBTDtDTj0g
+dXNlcmI7UEFSVFNUQVQ9TkVFRFMtQUNUSU9OO1gtT0JNLUlEPTQ6TUFJTA0KIFRPOnVzZXJi
+QGFkdXByYXR2bS5seW9uLmxhbg0KQVRURU5ERUU7Q1VUWVBFPUlORElWSURVQUw7Q049IHVz
+ZXJhO1BBUlRTVEFUPUFDQ0VQVEVEO1gtT0JNLUlEPTM6TUFJTFRPOnUNCiBzZXJhQGFkdXBy
+YXR2bS5seW9uLmxhbg0KRU5EOlZFVkVOVA0KRU5EOlZDQUxFTkRBUg0K
+--5d28648844747642fab5e5152a580c54--
+--bd3f04ee6ce8b15304167a437d53fdc5
+Content-Type: application/ics; name="meeting.ics"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="meeting.ics"
+
+QkVHSU46VkNBTEVOREFSDQpQUk9ESUQ6LS8vQWxpYXNvdXJjZSBHcm91cGUgTElOQUdPUkEv
+L09CTSBDYWxlbmRhciAyLjUuMi1TTkFQU0hPVC8vRlINCkNBTFNDQUxFOkdSRUdPUklBTg0K
+WC1PQk0tVElNRToxMzc4NzMzOTI0DQpWRVJTSU9OOjIuMA0KTUVUSE9EOkNBTkNFTA0KQkVH
+SU46VkVWRU5UDQpDUkVBVEVEOjIwMTMwOTA5VDEzMzgzMloNCkxBU1QtTU9ESUZJRUQ6MjAx
+MzA5MDlUMTMzODQ0Wg0KRFRTVEFNUDoyMDEzMDkwOVQxMzM4NDRaDQpEVFNUQVJUOjIwMTMw
+OTEwVDA4MDAwMFoNCkRVUkFUSU9OOlBUMUgNClRSQU5TUDpPUEFRVUUNClNFUVVFTkNFOjEN
+ClNVTU1BUlk6NTM3NC0zDQpERVNDUklQVElPTjoNCkNMQVNTOlBVQkxJQw0KUFJJT1JJVFk6
+NQ0KT1JHQU5JWkVSO1gtT0JNLUlEPTM7Q049IHVzZXJhOk1BSUxUTzp1c2VyYUBhZHVwcmF0
+dm0ubHlvbi5sYW4NClgtT0JNLURPTUFJTjphZHVwcmF0dm0ubHlvbi5sYW4NClgtT0JNLURP
+TUFJTi1VVUlEOjI1NTdkYTlhLTFiNmEtMGM2OS1mZmYxLTNmMzQ4N2VlMDU4NA0KTE9DQVRJ
+T046DQpDQVRFR09SSUVTOg0KWC1PQk0tQ09MT1I6DQpVSUQ6ODhhYTFhMTNjNzM0MGQ3ZDYz
+MGIyMWFlMGU1M2FiNTk2MzkyNzk4YzdlNjEzZGQ1OGQ4Nzk5M2M2ZGNlYTMxNWUyN2YzNw0K
+IGFmYjBmYTViN2E5ZTNhYTdmNzcxYzQzNmM3ODZmMjBjYWViY2Y1MzRlZGY4M2U1NzI0MTFl
+MjAxZDgwNjJmNjFkNmJkZGQwNDAzDQpBVFRFTkRFRTtDVVRZUEU9SU5ESVZJRFVBTDtDTj0g
+dXNlcmI7UEFSVFNUQVQ9TkVFRFMtQUNUSU9OO1gtT0JNLUlEPTQ6TUFJTA0KIFRPOnVzZXJi
+QGFkdXByYXR2bS5seW9uLmxhbg0KQVRURU5ERUU7Q1VUWVBFPUlORElWSURVQUw7Q049IHVz
+ZXJhO1BBUlRTVEFUPUFDQ0VQVEVEO1gtT0JNLUlEPTM6TUFJTFRPOnUNCiBzZXJhQGFkdXBy
+YXR2bS5seW9uLmxhbg0KRU5EOlZFVkVOVA0KRU5EOlZDQUxFTkRBUg0K
+--bd3f04ee6ce8b15304167a437d53fdc5--

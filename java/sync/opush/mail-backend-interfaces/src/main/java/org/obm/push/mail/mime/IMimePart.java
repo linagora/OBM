@@ -73,6 +73,8 @@ public interface IMimePart {
 
 	String getFullMimeType();
 
+	boolean containsCalendarMethod();
+	
 	boolean isInvitation();
 
 	String getContentTransfertEncoding();

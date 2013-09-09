@@ -175,6 +175,11 @@ public class MimeMessage implements IMimePart {
 	}
 
 	@Override
+	public boolean containsCalendarMethod() {
+		return from.containsCalendarMethod();
+	}
+
+	@Override
 	public boolean isInvitation() {
 		return from.isInvitation();
 	}

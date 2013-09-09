@@ -97,4 +97,16 @@ public class MimePartTest {
 		MimePart mimePart = MimePart.builder().contentType("image/jpeg").encoding(null).build();
 		assertThat(mimePart.getAttachmentExtension()).isEqualTo(".jpg");
 	}
+
+	@Test
+	public void testContainsCalendarMethod() {
+		MimePart mimePart = MimePart.builder().contentType("text/calendar; charset=utf-8; method=method").encoding(null).build();
+		assertThat(mimePart.containsCalendarMethod()).isTrue();
+	}
+
+	@Test
+	public void testDoesntContainsCalendarMethod() {
+		MimePart mimePart = MimePart.builder().contentType("text/plain").encoding(null).build();
+		assertThat(mimePart.containsCalendarMethod()).isFalse();
+	}
 }
