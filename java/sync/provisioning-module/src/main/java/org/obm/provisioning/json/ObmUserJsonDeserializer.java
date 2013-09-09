@@ -73,22 +73,27 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		JsonNode jsonNode = jp.readValueAsTree();
 		ObmDomain domain = domainProvider.get();
 
-		for(UserJsonFields field: UserJsonFields.fields) {
+		for (UserJsonFields field : UserJsonFields.fields) {
 			addFieldValueToBuilder(jsonNode, field, userBuilder);
 		}
 
 		ObmHost mailHost = getMailHostValue(jsonNode, domain);
 
 		if (mailHost != null) {
-			userBuilder
-				.mailHost(mailHost);
+			userBuilder.mailHost(mailHost);
 		}
 
 		ObmUser newUser = userBuilder.domain(domain).build();
 
 		Preconditions.checkArgument(newUser.getProfileName() != null, UserJsonFields.PROFILE.asSpecificationValue() + " is required.");
 		Preconditions.checkArgument(newUser.getLastName() != null, UserJsonFields.LASTNAME.asSpecificationValue() + " is required.");
+		Preconditions.checkArgument(!hasMailHostButNoEmails(newUser), "Cannot set " + UserJsonFields.MAIL_SERVER + " when no " + UserJsonFields.MAILS + " are defined.");
 
 		return newUser;
 	}
+
+	private boolean hasMailHostButNoEmails(ObmUser user) {
+		return user.getMailHost() != null && !user.isEmailAvailable();
+	}
+
 }

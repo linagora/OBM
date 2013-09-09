@@ -484,12 +484,13 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 										+ "\"password\": \"secret\"" + "}")
 								.build());
 		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
-				.domain(domain).status(BatchStatus.IDLE)
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
 		final ObmUser user = ObmUser.builder().login("user1").lastName("user1")
 				.password("secret").profileName(ProfileName.valueOf("user"))
-				.extId(UserExtId.valueOf("extIdUser1")).domain(domain).build();
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap).build();
 		final ObmUser userFromDao = ObmUser.builder().uid(1).login("user1")
 				.password("secret").profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1")).domain(domain).build();
@@ -510,6 +511,47 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 						.status(BatchStatus.SUCCESS).timecommit(date).build()))
 				.andReturn(null);
 		expectPUserDaoInsert(userFromDao);
+
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testCreateUserWithNoEmailButAMailHost() throws Exception {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						Request.builder()
+								.resourcePath("/users/")
+								.verb(HttpVerb.POST)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"mail_server\":\"Cyrus\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\"" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domain).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+
+		expect(dateProvider.getDate()).andReturn(date).anyTimes();
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder
+										.status(BatchStatus.ERROR)
+										.error("org.obm.provisioning.exception.ProcessingException: Cannot parse ObmUser object from request body {\"id\": \"extIdUser1\",\"mail_server\":\"Cyrus\",\"login\": \"user1\",\"lastname\": \"user1\",\"profile\": \"user\",\"password\": \"secret\"}.")
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
 
 		mocksControl.replay();
 
