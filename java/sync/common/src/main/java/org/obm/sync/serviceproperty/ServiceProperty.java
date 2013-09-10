@@ -30,10 +30,12 @@
 
 package org.obm.sync.serviceproperty;
 
+import java.io.Serializable;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
-public class ServiceProperty {
+public class ServiceProperty implements Serializable {
 
 	public static final ServiceProperty IMAP = ServiceProperty
 			.builder()

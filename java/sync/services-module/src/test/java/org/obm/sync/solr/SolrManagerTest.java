@@ -70,12 +70,17 @@ import org.obm.sync.calendar.RecurrenceDay;
 import org.obm.sync.calendar.RecurrenceDays;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.dao.EntityId;
+import org.obm.sync.host.ObmHost;
+import org.obm.sync.serviceproperty.ServiceProperty;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
 import org.obm.sync.solr.jms.SolrJmsQueue;
 
 import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.QueueManager;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 
 public class SolrManagerTest {
@@ -142,7 +147,42 @@ public class SolrManagerTest {
 	public void tearDown() throws Exception {
 		queueManager.stop();
 	}
-	
+
+	@Test
+	public void test_domain_serialization() throws Exception {
+		ObmDomain domain = ObmDomain
+				.builder()
+				.id(1)
+				.name("domain_name")
+				.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
+				.label("domain_label")
+				.alias("domain_alias")
+				.global(false)
+				.host(ServiceProperty.IMAP, ObmHost
+						.builder()
+						.id(1)
+						.domainId(1)
+						.name("imap")
+						.ip("1.2.3.4")
+						.fqdn("imap.domain_name")
+						.build())
+				.build();
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(baos);
+
+		oos.writeObject(domain);
+		oos.close();
+
+		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+		ObjectInputStream ois = new ObjectInputStream(bais);
+		Object object = ois.readObject();
+
+		ois.close();
+
+		Assertions.assertThat(object).isInstanceOf(ObmDomain.class);
+	}
+
 	@Test
 	public void test_event_serialization() throws Exception {
 		Event event = new Event();
