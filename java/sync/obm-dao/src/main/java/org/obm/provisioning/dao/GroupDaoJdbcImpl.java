@@ -544,8 +544,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
                          "  INNER JOIN Domain ON pgroup.group_domain_id = domain_id" +
                          "       WHERE pgroup.group_id = ?" +
                          "         AND domain_uuid = ?" +
-                         "    ORDER BY cgroup.group_ext_id" +
-                         (groupDepth > 0 ? " LIMIT " + String.valueOf(groupDepth) : ""));
+                         "    ORDER BY cgroup.group_ext_id");
 
                  ps.setInt(1, internalGroupId.getId());
                  ps.setString(2, domain.getUuid().get());

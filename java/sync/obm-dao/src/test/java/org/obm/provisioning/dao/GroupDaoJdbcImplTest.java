@@ -274,7 +274,7 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
     }
 
     @Test
-    public void testExtistingRecursiveUsersSubgroups() throws Exception {
+    public void testExistingRecursiveUsersSubgroups() throws Exception {
         String prefix = "existing-users-subgroups";
         GroupExtId groupExtId = GroupExtId.valueOf(prefix);
 
@@ -296,7 +296,7 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
         group = dao.getRecursive(domain1, groupExtId, true, 1);
         testGroupBase(prefix, group);
         assertThat(group.getUsers()).containsOnly(user1);
-        assertThat(group.getSubgroups()).containsOnly(group6);
+        assertThat(group.getSubgroups()).containsOnly(group6, group7);
 
         group = dao.getRecursive(domain1, groupExtId, true, 2);
         testGroupBase(prefix, group);

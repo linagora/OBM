@@ -236,7 +236,10 @@ INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, g
  VALUES (2, 0, 0, 1, 'AdminExtId', 0, 1001, 'Admin', 'Admin Group Desc', 'group_admin@obm.org'), 
  (2, 0, 0, 2, 'GroupWithUsers', 0, 1002, 'GroupWithUsers', 'Group With Users', 'group_with_user@obm.org'), 
  (2, 0, 0, 3, 'GroupWithSubGroup', 0, 1002, 'GroupWithSubGroup', 'Group With SubGroup', 'group_with_subgroup@obm.org'),
- (2, 0, 0, 4, 'GroupWhoSubgroupHaveUser', 0, 1002, 'GroupWhoSubgroupHaveUser', 'Group Who Subgroup Have User', 'group_with_subgroup@obm.org');
+ (2, 0, 0, 4, 'GroupWhoSubgroupHaveUser', 0, 1002, 'GroupWhoSubgroupHaveUser', 'Group Who Subgroup Have User', 'group_with_subgroup@obm.org'),
+ (2, 0, 0, 5, 'GroupA', 0, 1002, 'GroupA', 'Group A', 'groupA@obm.org'), 
+ (2, 0, 0, 6, 'GroupAA', 0, 1002, 'GroupAA', 'Group AA', 'groupAA@obm.org'),
+ (2, 0, 0, 7, 'GroupAB', 0, 1002, 'GroupAB', 'Group AB', 'groupAB@obm.org');
  
 INSERT INTO entity (entity_mailing)
     VALUES
@@ -254,7 +257,7 @@ INSERT INTO UserObm (userobm_domain_id, userobm_ext_id, userobm_login, userobm_p
 		(2, 'User1','user1','','','', '', '', '2002', '512', '0', 'user1', NULL);
  
 INSERT INTO userobmgroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES (2, 1);
-INSERT INTO groupgroup (groupgroup_parent_id, groupgroup_child_id) VALUES (3, 1), (4, 2);
+INSERT INTO groupgroup (groupgroup_parent_id, groupgroup_child_id) VALUES (3, 1), (4, 2), (5, 6), (5, 7);
 
 INSERT INTO UserSystem (usersystem_login, usersystem_password, usersystem_homedir)
     VALUES

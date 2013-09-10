@@ -129,6 +129,54 @@ public class GroupIntegrationTest {
 			.get("/GroupWithUsers");
 	}
 
+
+
+	@Test
+	@RunAsClient
+	public void testGetGroupWithTwoSubgroup(@ArquillianResource URL baseURL) {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
+		
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString(
+					"{" +
+							"\"id\":\"GroupA\"," +
+							"\"name\":\"GroupA\"," +
+							"\"email\":\"groupA@obm.org\"," +
+							"\"description\":\"Group A\"," +
+							"\"members\":{" +
+							"\"users\":[]," +
+							"\"subgroups\":[" +
+									"{" +
+									"\"id\":\"GroupAA\"," +
+									"\"name\":\"GroupAA\"," +
+									"\"email\":\"groupAA@obm.org\"," +
+									"\"description\":\"Group AA\"," +
+									"\"members\":{" +
+											"\"users\":[]," +
+											"\"subgroups\":[]" +
+										"}" +
+									"}," +
+									"{" +
+									  "\"id\":\"GroupAB\"," +
+									  "\"name\":\"GroupAB\","    +
+									  "\"email\":\"groupAB@obm.org\","    + 
+									  "\"description\":\"Group AB\","  +
+									  "\"members\":{"    +
+											  "\"users\":[],"         +
+											  "\"subgroups\":[]"	 +
+										  "}" +
+									"}" +
+							"]" +
+						"}"+
+					"}")).
+		when()
+			.get("/GroupA?expandDepth=1");
+	}
+	
 	@Test
 	@RunAsClient
 	public void testGetUsersFromGroup(@ArquillianResource URL baseURL) {
@@ -722,6 +770,18 @@ public class GroupIntegrationTest {
 			.statusCode(Status.OK.getStatusCode())
 			.body(containsString(
 				"[" +
+					"{" +
+						"\"id\":\"GroupAB\"," +
+						"\"url\":\"/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6/groups/GroupAB\"" +
+					"}," +
+					"{" +
+						"\"id\":\"GroupAA\"," +
+						"\"url\":\"/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6/groups/GroupAA\"" +
+					"}," +
+					"{" +
+						"\"id\":\"GroupA\"," +
+						"\"url\":\"/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6/groups/GroupA\"" +
+					"}," +
 					"{" +
 						"\"id\":\"AdminExtId\"," +
 						"\"url\":\"/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6/groups/AdminExtId\"" +
