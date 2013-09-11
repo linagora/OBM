@@ -47,4 +47,7 @@ public interface WindowingDao {
 
 	void removePreviousCollectionWindowing(WindowingIndexKey key);
 
+	Object getChunksStore();
+
+	Object getIndexStore();
 }

@@ -31,29 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.io.File;
-import java.io.IOException;
+public interface MigrationService {
 
-import org.easymock.EasyMock;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.obm.configuration.ConfigurationService;
-
-public class StoreManagerConfigurationTest {
-
-	@Rule 
-	public TemporaryFolder temporaryFolder =  new TemporaryFolder();
-	protected File dataDir;
-	
-	protected ConfigurationService initConfigurationServiceMock() throws IOException {
-		dataDir = temporaryFolder.newFolder();
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true).anyTimes();
-		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
-		EasyMock.replay(configurationService);
-		
-		return configurationService;
-	}
-
+	void migrate();
 }
