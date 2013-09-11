@@ -62,9 +62,10 @@ else if ($_GET['_thumb']) {
     $thumbnail_size = $RCMAIL->config->get('image_thumbnail_size', 240);
     $temp_dir       = $RCMAIL->config->get('temp_dir');
     list(,$ext)     = explode('/', $part->mimetype);
-    $cache_basename = $temp_dir . '/' . md5($MESSAGE->headers->messageID . $part->mime_id . ':' . $RCMAIL->user->ID . ':' . $thumbnail_size);
-    $cache_file     = $cache_basename . '.' . $ext;
     $mimetype       = $part->mimetype;
+    $file_ident     = $MESSAGE->headers->messageID . ':' . $part->mime_id . ':' . $part->size . ':' . $part->mimetype;
+    $cache_basename = $temp_dir . '/' . md5($file_ident . ':' . $RCMAIL->user->ID . ':' . $thumbnail_size);
+    $cache_file     = $cache_basename . '.' . $ext;
 
     // render thumbnail image if not done yet
     if (!is_file($cache_file)) {
@@ -94,9 +95,7 @@ else if ($_GET['_thumb']) {
 else if (strlen($pid = get_input_value('_part', RCUBE_INPUT_GET))) {
 
   if ($part = $MESSAGE->mime_parts[$pid]) {
-    $ctype_primary = strtolower($part->ctype_primary);
-    $ctype_secondary = strtolower($part->ctype_secondary);
-    $mimetype = sprintf('%s/%s', $ctype_primary, $ctype_secondary);
+    $mimetype = rcmail_fix_mimetype($part->mimetype);
 
     // allow post-processing of the message body
     $plugin = $RCMAIL->plugins->exec_hook('message_part_get',
@@ -106,7 +105,7 @@ else if (strlen($pid = get_input_value('_part', RCUBE_INPUT_GET))) {
       exit;
 
     // overwrite modified vars from plugin
-    $mimetype = $plugin['mimetype'];
+    $mimetype   = $plugin['mimetype'];
     $extensions = rcube_mime::get_mime_extensions($mimetype);
 
     if ($plugin['body'])
@@ -216,7 +215,6 @@ else if (strlen($pid = get_input_value('_part', RCUBE_INPUT_GET))) {
       header("Content-Type: text/$ctype_secondary; charset=" . ($part->charset ? $part->charset : RCMAIL_CHARSET));
     }
     else {
-      $mimetype = rcmail_fix_mimetype($mimetype);
       header("Content-Type: $mimetype");
       header("Content-Transfer-Encoding: binary");
     }

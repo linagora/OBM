@@ -90,7 +90,7 @@ class rcube_vcard
      */
     public function __construct($vcard = null, $charset = RCUBE_CHARSET, $detect = false, $fieldmap = array())
     {
-        if (!empty($fielmap)) {
+        if (!empty($fieldmap)) {
             $this->extend_fieldmap($fieldmap);
         }
 
@@ -714,9 +714,15 @@ class rcube_vcard
                             $value[] = $attrvalues;
                         }
                         else if (is_bool($attrvalues)) {
-                            // true means just tag, not tag=value, as in PHOTO;BASE64:...
+                            // true means just a tag, not tag=value, as in PHOTO;BASE64:...
                             if ($attrvalues) {
-                                $attr .= strtoupper(";$attrname");
+                                // vCard v3 uses ENCODING=B (#1489183)
+                                if ($attrname == 'base64') {
+                                    $attr .= ";ENCODING=B";
+                                }
+                                else {
+                                    $attr .= strtoupper(";$attrname");
+                                }
                             }
                         }
                         else {
@@ -784,9 +790,30 @@ class rcube_vcard
                 }
                 return $result;
             }
+
+            $s = strtr($s, $rep2);
         }
 
-        return strtr($s, array("\r" => '', '\\\\' => '\\', '\n' => "\n", '\N' => "\n", '\,' => ',', '\;' => ';'));
+        // some implementations (GMail) use non-standard backslash before colon (#1489085)
+        // we will handle properly any backslashed character - removing dummy backslahes
+        // return strtr($s, array("\r" => '', '\\\\' => '\\', '\n' => "\n", '\N' => "\n", '\,' => ',', '\;' => ';'));
+
+        $s   = str_replace("\r", '', $s);
+        $pos = 0;
+
+        while (($pos = strpos($s, '\\', $pos)) !== false) {
+            $next = substr($s, $pos + 1, 1);
+            if ($next == 'n' || $next == 'N') {
+                $s = substr_replace($s, "\n", $pos, 2);
+            }
+            else {
+                $s = substr_replace($s, '', $pos, 1);
+            }
+
+            $pos += 1;
+        }
+
+        return $s;
     }
 
     /**

@@ -67,7 +67,7 @@
 
 #directorylist li a,
 #contacts-table .contact td.name {
-	background-image: url(images/listicons.png);
+	background-image: url(images/listicons.png?v=bd98.25486);
 	background-position: -100px 0;
 	background-repeat: no-repeat;
 	overflow: hidden;
@@ -164,7 +164,7 @@
 }
 
 #contactpic.droptarget {
-	background-image: url(images/filedrop.png);
+	background-image: url(images/filedrop.png?v=deab.605);
 	background-position: center;
 	background-repeat: no-repeat;
 }
@@ -315,5 +315,5 @@ a.deletebutton {
 	height: 18px;
 	text-decoration: none;
 	text-indent: -5000px;
-	background: url(images/buttons.png) -7px -377px no-repeat;
+	background: url(images/buttons.png?v=abf1.36693) -7px -377px no-repeat;
 }

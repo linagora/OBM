@@ -174,6 +174,8 @@ $rcmail_config['smtp_auth_pw'] = null;
 $rcmail_config['smtp_helo_host'] = '';
 
 // SMTP connection timeout, in seconds. Default: 0 (no limit)
+// Note: There's a known issue where using ssl connection with
+// timeout > 0 causes connection errors (https://bugs.php.net/bug.php?id=54511)
 $rcmail_config['smtp_timeout'] = 0;
 
 // ----------------------------------
@@ -431,7 +433,8 @@ $rcmail_config['language'] = null;
 $rcmail_config['date_format'] = 'Y-m-d';
 
 // give this choice of date formats to the user to select from
-$rcmail_config['date_formats'] = array('Y-m-d', 'd-m-Y', 'Y/m/d', 'm/d/Y', 'd/m/Y', 'd.m.Y', 'j.n.Y');
+// Note: do not use ambiguous formats like m/d/Y
+$rcmail_config['date_formats'] = array('Y-m-d', 'Y/m/d', 'Y.m.d', 'd-m-Y', 'd/m/Y', 'd.m.Y', 'j.n.Y');
 
 // use this format for time display (date or strftime format)
 $rcmail_config['time_format'] = 'H:i';
@@ -888,8 +891,10 @@ $rcmail_config['autocomplete_single'] = false;
 // Default font for composed HTML message.
 // Supported values: Andale Mono, Arial, Arial Black, Book Antiqua, Courier New,
 // Georgia, Helvetica, Impact, Tahoma, Terminal, Times New Roman, Trebuchet MS, Verdana
-$rcmail_config['default_font'] = '';
+$rcmail_config['default_font'] = 'Verdana';
 
 // OBM specific configuration
 require_once("config/obm.inc.php");
 // /OBM specific configuration
+
+// end of config file

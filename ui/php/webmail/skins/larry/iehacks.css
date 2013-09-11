@@ -118,7 +118,7 @@ ul.toolbarmenu li a.active:hover,
 .pagenav a.button.disabled span.inner,
 .boxfooter .listbutton.disabled .inner,
 .dropbutton a.button.disabled + .dropbuttontip {
-	background-image: url(images/buttons.gif);
+	background-image: url(images/buttons.gif?v=aab8.13054);
 }
 
 /*** addressbook.css ***/

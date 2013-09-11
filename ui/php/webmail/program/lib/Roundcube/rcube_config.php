@@ -174,7 +174,7 @@ class rcube_config
             ob_end_clean();
 
             if (is_array($rcmail_config)) {
-                $this->prop = array_merge($this->prop, $rcmail_config, $this->userprefs);
+                $this->merge($rcmail_config);
                 return true;
             }
         }
@@ -194,9 +194,6 @@ class rcube_config
     {
         if (isset($this->prop[$name])) {
             $result = $this->prop[$name];
-        }
-        else if (isset($this->legacy_props[$name])) {
-            return $this->get($this->legacy_props[$name], $def);
         }
         else {
             $result = $def;
@@ -240,6 +237,7 @@ class rcube_config
      */
     public function merge($prefs)
     {
+        $prefs = $this->fix_legacy_props($prefs);
         $this->prop = array_merge($this->prop, $prefs, $this->userprefs);
     }
 
@@ -252,6 +250,8 @@ class rcube_config
      */
     public function set_user_prefs($prefs)
     {
+        $prefs = $this->fix_legacy_props($prefs);
+
         // Honor the dont_override setting for any existing user preferences
         $dont_override = $this->get('dont_override');
         if (is_array($dont_override) && !empty($dont_override)) {
@@ -285,7 +285,7 @@ class rcube_config
     /**
      * Getter for all config options
      *
-     * @return array  Hash array containg all config properties
+     * @return array  Hash array containing all config properties
      */
     public function all()
     {
@@ -435,4 +435,24 @@ class rcube_config
         return date_default_timezone_get();
     }
 
+    /**
+     * Convert legacy options into new ones
+     *
+     * @param array $props Hash array with config props
+     *
+     * @return array Converted config props
+     */
+    private function fix_legacy_props($props)
+    {
+        foreach ($this->legacy_props as $new => $old) {
+            if (isset($props[$old])) {
+                if (!isset($props[$new])) {
+                    $props[$new] = $props[$old];
+                }
+                unset($props[$old]);
+            }
+        }
+
+        return $props;
+    }
 }

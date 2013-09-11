@@ -772,10 +772,12 @@ function rcmail_plain_body($body, $flowed=false)
       if ($q > $quote_level) {
         $body[$n] = $replacer->get_replacement($replacer->add(
           str_repeat('<blockquote>', $q - $quote_level))) . $body[$n];
+        $last = $n;
       }
       else if ($q < $quote_level) {
         $body[$n] = $replacer->get_replacement($replacer->add(
           str_repeat('</blockquote>', $quote_level - $q))) . $body[$n];
+        $last = $n;
       }
       else if ($flowed) {
         // previous line is flowed
@@ -927,7 +929,7 @@ function rcmail_message_headers($attrib, $headers=null)
       $value = $headers[$hkey];
     else if ($headers['others'][$hkey])
       $value = $headers['others'][$hkey];
-    else
+    else if (!$attrib['valueof'])
       continue;
 
     if (in_array($hkey, $exclude_headers))
@@ -1439,9 +1441,10 @@ function rcmail_address_string($input, $max=null, $linked=false, $addicon=null, 
     $name   = $part['name'];
     $mailto = $part['mailto'];
     $string = $part['string'];
+    $valid  = check_email($mailto, false);
 
     // phishing email prevention (#1488981), e.g. "valid@email.addr <phishing@email.addr>"
-    if ($name && $name != $mailto && strpos($name, '@')) {
+    if ($name && $valid && $name != $mailto && strpos($name, '@')) {
       $name = '';
     }
 
@@ -1457,7 +1460,7 @@ function rcmail_address_string($input, $max=null, $linked=false, $addicon=null, 
       // for printing we display all addresses
       continue;
     }
-    else if (check_email($part['mailto'], false)) {
+    else if ($valid) {
       if ($linked) {
         $address = html::a(array(
             'href' => 'mailto:'.$mailto,
@@ -1490,7 +1493,7 @@ function rcmail_address_string($input, $max=null, $linked=false, $addicon=null, 
       if ($name)
         $address .= Q($name);
       if ($mailto)
-        $address .= (strlen($address) ? ' ' : '') . sprintf('&lt;%s&gt;', Q($mailto));
+        $address = trim($address . ' ' . Q($name ? sprintf('<%s>', $mailto) : $mailto));
     }
 
     $address = html::span('adr', $address);
@@ -1529,11 +1532,11 @@ function rcmail_address_string($input, $max=null, $linked=false, $addicon=null, 
 /**
  * Wrap text to a given number of characters per line
  * but respect the mail quotation of replies messages (>).
- * Finally add another quotation level by prpending the lines
+ * Finally add another quotation level by prepending the lines
  * with >
  *
  * @param string Text to wrap
- * @param int The line width
+ * @param int    The line width
  * @return string The wrapped text
  */
 function rcmail_wrap_and_quote($text, $length = 72)
@@ -1549,7 +1552,7 @@ function rcmail_wrap_and_quote($text, $length = 72)
       $line = '>' . rtrim($line);
     else if (mb_strlen($line) > $max) {
       $newline = '';
-      foreach(explode("\n", rc_wordwrap($line, $length - 2)) as $l) {
+      foreach (explode("\n", rc_wordwrap($line, $length - 2)) as $l) {
         if (strlen($l))
           $newline .= '> ' . $l . "\n";
         else
@@ -1745,7 +1748,7 @@ function rcmail_identity_select($MESSAGE, $identities = null, $compose_mode = 'r
         $a_to = rcube_mime::decode_address_list($MESSAGE->headers->to, null, true, $MESSAGE->headers->charset);
         foreach ($a_to as $addr) {
             if (!empty($addr['mailto'])) {
-                $a_recipients[] = format_email($addr['mailto']);
+                $a_recipients[] = strtolower($addr['mailto']);
                 $a_names[]      = $addr['name'];
             }
         }
@@ -1754,7 +1757,7 @@ function rcmail_identity_select($MESSAGE, $identities = null, $compose_mode = 'r
             $a_cc = rcube_mime::decode_address_list($MESSAGE->headers->cc, null, true, $MESSAGE->headers->charset);
             foreach ($a_cc as $addr) {
                 if (!empty($addr['mailto'])) {
-                    $a_recipients[] = format_email($addr['mailto']);
+                    $a_recipients[] = strtolower($addr['mailto']);
                     $a_names[]      = $addr['name'];
                 }
             }
@@ -1780,7 +1783,7 @@ function rcmail_identity_select($MESSAGE, $identities = null, $compose_mode = 'r
             break;
         }
         // use replied message recipients
-        else if (($found = array_search($ident['email_ascii'], $a_recipients)) !== false) {
+        else if (($found = array_search(strtolower($ident['email_ascii']), $a_recipients)) !== false) {
             if ($found_idx === null) {
                 $found_idx = $idx;
             }
@@ -1800,9 +1803,17 @@ function rcmail_identity_select($MESSAGE, $identities = null, $compose_mode = 'r
     // Try Return-Path
     if ($from_idx === null && ($return_path = $MESSAGE->headers->others['return-path'])) {
         foreach ($identities as $idx => $ident) {
-            if (strpos($return_path, str_replace('@', '=', $ident['email_ascii']).'@') !== false) {
-                $from_idx = $idx;
-                break;
+            // Return-Path header contains an email address, but on some mailing list
+            // it can be e.g. <pear-dev-return-55250-local=domain.tld@lists.php.net>
+            // where local@domain.tld is the address we're looking for (#1489241)
+            $ident1 = $ident['email_ascii'];
+            $ident2 = str_replace('@', '=', $ident1);
+
+            foreach ((array)$return_path as $path) {
+                if (stripos($path, $ident1) !== false || stripos($path, $ident2)) {
+                    $from_idx = $idx;
+                    break 2;
+                }
             }
         }
     }
@@ -1837,8 +1848,7 @@ function rcmail_fix_mimetype($name)
   // application/pdf.A520491B_3BF7_494D_8855_7FAC2C6C0608
   if (preg_match('/^application\/pdf.+/', $name))
     $name = 'application/pdf';
-
-  // treat image/pjpeg as image/jpeg
+  // treat image/pjpeg (image/pjpg, image/jpg) as image/jpeg (#1489097)
   else if (preg_match('/^image\/p?jpe?g$/', $name))
     $name = 'image/jpeg';
 

@@ -127,10 +127,11 @@ class rcube_mime
      * @param int     $max      List only this number of addresses
      * @param boolean $decode   Decode address strings
      * @param string  $fallback Fallback charset if none specified
+     * @param boolean $addronly Return flat array with e-mail addresses only
      *
-     * @return array  Indexed list of addresses
+     * @return array Indexed list of addresses
      */
-    static function decode_address_list($input, $max = null, $decode = true, $fallback = null)
+    static function decode_address_list($input, $max = null, $decode = true, $fallback = null, $addronly = false)
     {
         $a   = self::parse_address_list($input, $decode, $fallback);
         $out = array();
@@ -145,20 +146,21 @@ class rcube_mime
         foreach ($a as $val) {
             $j++;
             $address = trim($val['address']);
-            $name    = trim($val['name']);
 
-            if ($name && $address && $name != $address)
-                $string = sprintf('%s <%s>', preg_match("/$special_chars/", $name) ? '"'.addcslashes($name, '"').'"' : $name, $address);
-            else if ($address)
-                $string = $address;
-            else if ($name)
-                $string = $name;
+            if ($addronly) {
+                $out[$j] = $address;
+            }
+            else {
+                $name = trim($val['name']);
+                if ($name && $address && $name != $address)
+                    $string = sprintf('%s <%s>', preg_match("/$special_chars/", $name) ? '"'.addcslashes($name, '"').'"' : $name, $address);
+                else if ($address)
+                    $string = $address;
+                else if ($name)
+                    $string = $name;
 
-            $out[$j] = array(
-                'name'   => $name,
-                'mailto' => $address,
-                'string' => $string
-            );
+                $out[$j] = array('name' => $name, 'mailto' => $address, 'string' => $string);
+            }
 
             if ($max && $j==$max)
                 break;
@@ -359,6 +361,11 @@ class rcube_mime
                 $address = $m[1];
                 $name    = '';
             }
+            // special case (#1489092)
+            else if (preg_match('/(\s*<MAILER-DAEMON>)$/', $val, $m)) {
+                $address = 'MAILER-DAEMON';
+                $name    = substr($val, 0, -strlen($m[1]));
+            }
             else {
                 $name = $val;
             }
@@ -476,9 +483,10 @@ class rcube_mime
         $q_level = 0;
 
         foreach ($text as $idx => $line) {
-            if ($line[0] == '>') {
-                // remove quote chars, store level in $q
-                $line = preg_replace('/^>+/', '', $line, -1, $q);
+            if (preg_match('/^(>+)/', $line, $m)) {
+                // remove quote chars
+                $q    = strlen($m[1]);
+                $line = preg_replace('/^>+/', '', $line);
                 // remove (optional) space-staffing
                 $line = preg_replace('/^ /', '', $line);
 
@@ -541,9 +549,10 @@ class rcube_mime
 
         foreach ($text as $idx => $line) {
             if ($line != '-- ') {
-                if ($line[0] == '>') {
-                    // remove quote chars, store level in $level
-                    $line   = preg_replace('/^>+/', '', $line, -1, $level);
+                if (preg_match('/^(>+)/', $line, $m)) {
+                    // remove quote chars
+                    $level  = strlen($m[1]);
+                    $line   = preg_replace('/^>+/', '', $line);
                     // remove (optional) space-staffing and spaces before the line end
                     $line   = preg_replace('/(^ | +$)/', '', $line);
                     $prefix = str_repeat('>', $level) . ' ';
@@ -564,82 +573,122 @@ class rcube_mime
 
 
     /**
-     * Improved wordwrap function.
+     * Improved wordwrap function with multibyte support.
+     * The code is based on Zend_Text_MultiByte::wordWrap().
      *
-     * @param string $string  Text to wrap
-     * @param int    $width   Line width
-     * @param string $break   Line separator
-     * @param bool   $cut     Enable to cut word
-     * @param string $charset Charset of $string
+     * @param string $string      Text to wrap
+     * @param int    $width       Line width
+     * @param string $break       Line separator
+     * @param bool   $cut         Enable to cut word
+     * @param string $charset     Charset of $string
+     * @param bool   $wrap_quoted When enabled quoted lines will not be wrapped
      *
      * @return string Text
      */
-    public static function wordwrap($string, $width=75, $break="\n", $cut=false, $charset=null)
+    public static function wordwrap($string, $width=75, $break="\n", $cut=false, $charset=null, $wrap_quoted=true)
     {
-        if ($charset && function_exists('mb_internal_encoding')) {
+        // Note: Never try to use iconv instead of mbstring functions here
+        //       Iconv's substr/strlen are 100x slower (#1489113)
+
+        if ($charset && $charset != RCUBE_CHARSET && function_exists('mb_internal_encoding')) {
             mb_internal_encoding($charset);
         }
 
-        $para   = preg_split('/\r?\n/', $string);
-        $string = '';
+        // Convert \r\n to \n, this is our line-separator
+        $string       = str_replace("\r\n", "\n", $string);
+        $separator    = "\n"; // must be 1 character length
+        $result       = array();
 
-        while (count($para)) {
-            $line = array_shift($para);
-            if ($line[0] == '>') {
-                $string .= $line . (count($para) ? $break : '');
-                continue;
-            }
+        while (($stringLength = mb_strlen($string)) > 0) {
+            $breakPos = mb_strpos($string, $separator, 0);
 
-            $list = explode(' ', $line);
-            $len = 0;
-            while (count($list)) {
-                $line   = array_shift($list);
-                $l      = mb_strlen($line);
-                $space  = $len ? 1 : 0;
-                $newlen = $len + $l + $space;
-
-                if ($newlen <= $width) {
-                    $string .= ($space ? ' ' : '').$line;
-                    $len += ($space + $l);
+            // quoted line (do not wrap)
+            if ($wrap_quoted && $string[0] == '>') {
+                if ($breakPos === $stringLength - 1 || $breakPos === false) {
+                    $subString = $string;
+                    $cutLength = null;
                 }
                 else {
-                    if ($l > $width) {
-                        if ($cut) {
-                            $start = 0;
-                            while ($l) {
-                                $str = mb_substr($line, $start, $width);
-                                $strlen = mb_strlen($str);
-                                $string .= ($len ? $break : '').$str;
-                                $start += $strlen;
-                                $l -= $strlen;
-                                $len = $strlen;
+                    $subString = mb_substr($string, 0, $breakPos);
+                    $cutLength = $breakPos + 1;
+                }
+            }
+            // next line found and current line is shorter than the limit
+            else if ($breakPos !== false && $breakPos < $width) {
+                if ($breakPos === $stringLength - 1) {
+                    $subString = $string;
+                    $cutLength = null;
+                }
+                else {
+                    $subString = mb_substr($string, 0, $breakPos);
+                    $cutLength = $breakPos + 1;
+                }
+            }
+            else {
+                $subString = mb_substr($string, 0, $width);
+
+                // last line
+                if ($breakPos === false && $subString === $string) {
+                    $cutLength = null;
+                }
+                else {
+                    $nextChar = mb_substr($string, $width, 1);
+
+                    if ($nextChar === ' ' || $nextChar === $separator) {
+                        $afterNextChar = mb_substr($string, $width + 1, 1);
+
+                        if ($afterNextChar === false) {
+                            $subString .= $nextChar;
+                        }
+
+                        $cutLength = mb_strlen($subString) + 1;
+                    }
+                    else {
+                        $spacePos = mb_strrpos($subString, ' ', 0);
+
+                        if ($spacePos !== false) {
+                            $subString = mb_substr($subString, 0, $spacePos);
+                            $cutLength = $spacePos + 1;
+                        }
+                        else if ($cut === false && $breakPos === false) {
+                            $subString = $string;
+                            $cutLength = null;
+                        }
+                        else if ($cut === false) {
+                            $spacePos = mb_strpos($string, ' ', 0);
+
+                            if ($spacePos !== false && $spacePos < $breakPos) {
+                                $subString = mb_substr($string, 0, $spacePos);
+                                $cutLength = $spacePos + 1;
+                            }
+                            else {
+                                $subString = mb_substr($string, 0, $breakPos);
+                                $cutLength = $breakPos + 1;
                             }
                         }
                         else {
-                            $string .= ($len ? $break : '').$line;
-                            if (count($list)) {
-                                $string .= $break;
-                            }
-                            $len = 0;
+                            $subString = mb_substr($subString, 0, $width);
+                            $cutLength = $width;
                         }
-                    }
-                    else {
-                        $string .= $break.$line;
-                        $len = $l;
                     }
                 }
             }
 
-            if (count($para)) {
-                $string .= $break;
+            $result[] = $subString;
+
+            if ($cutLength !== null) {
+                $string = mb_substr($string, $cutLength, ($stringLength - $cutLength));
+            }
+            else {
+                break;
             }
         }
 
-        if ($charset && function_exists('mb_internal_encoding')) {
+        if ($charset && $charset != RCUBE_CHARSET && function_exists('mb_internal_encoding')) {
             mb_internal_encoding(RCUBE_CHARSET);
         }
 
-        return $string;
+        return implode($break, $result);
     }
 
 
@@ -746,7 +795,7 @@ class rcube_mime
         }
 
         foreach ($file_paths as $fp) {
-            if (is_readable($fp)) {
+            if (@is_readable($fp)) {
                 $lines = file($fp, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
                 break;
             }

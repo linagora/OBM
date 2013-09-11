@@ -15,7 +15,6 @@ $RCI->load_defaults();
 // register these boolean fields
 $RCI->bool_config_props = array(
   'ip_check' => 1,
-  'enable_caching' => 1,
   'enable_spellcheck' => 1,
   'auto_create_user' => 1,
   'smtp_log' => 1,
@@ -30,8 +29,8 @@ $_SESSION['allowinstaller'] = true;
 if (!empty($_POST['submit'])) {
   
   echo '<p class="notice">Copy or download the following configurations and save them in two files';
-  echo ' (names above the text box) within the <tt>'.RCMAIL_CONFIG_DIR.'</tt> directory of your Roundcube installation.<br/>';
-  echo ' Make sure that there are no characters outside the <tt>&lt;?php ?&gt;</tt> brackets when saving the files.</p>';
+  echo ' (names above the text box) within the <tt>'.RCMAIL_CONFIG_DIR.'</tt> directory of your Roundcube installation.';
+  echo '</p>';
   
   $textbox = new html_textarea(array('rows' => 16, 'cols' => 60, 'class' => "configfile"));
   
@@ -127,16 +126,6 @@ echo $check_ipcheck->show(intval($RCI->getprop('ip_check')), array('value' => 1)
 <p class="hint">This increases security but can cause sudden logouts when someone uses a proxy with changing IPs.</p>
 </dd>
 
-<dt class="propname">enable_caching</dt>
-<dd>
-<?php
-
-$check_caching = new html_checkbox(array('name' => '_enable_caching', 'id' => "cfgcache"));
-echo $check_caching->show(intval($RCI->getprop('enable_caching')), array('value' => 1));
-
-?>
-<label for="cfgcache">Cache messages in local database</label><br />
-</dd>
 
 <dt class="propname">enable_spellcheck</dt>
 <dd>

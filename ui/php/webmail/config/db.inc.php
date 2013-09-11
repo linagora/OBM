@@ -5,7 +5,7 @@
  | Configuration file for database access                                |
  |                                                                       |
  | This file is part of the Roundcube Webmail client                     |
- | Copyright (C) 2005-2009, The Roundcube Dev Team                       |
+ | Copyright (C) 2005-2012, The Roundcube Dev Team                       |
  |                                                                       |
  | Licensed under the GNU General Public License version 3 or            |
  | any later version with exceptions for skins & plugins.                |
@@ -37,14 +37,10 @@ $rcmail_config['db_dsnw'] = strtolower($obmdb_dbtype) . '://' . $obmdb_user . ':
 // useful for database replication
 $rcmail_config['db_dsnr'] = '';
 
-// maximum length of a query in bytes
-$rcmail_config['db_max_length'] = 512000;  // 500K
-
 // use persistent db-connections
 // beware this will not "always" work as expected
 // see: http://www.php.net/manual/en/features.persistent-connections.php
 $rcmail_config['db_persistent'] = FALSE;
-
 
 // you can define specific table names used to store webmail data
 $rcmail_config['db_table_users'] = 'rc_users';
@@ -57,7 +53,9 @@ $rcmail_config['db_table_cache'] = 'rc_cache';
 $rcmail_config['db_table_cache_index'] = 'rc_cache_index';
 $rcmail_config['db_table_cache_thread'] = 'rc_cache_thread';
 $rcmail_config['db_table_cache_messages'] = 'rc_cache_messages';
-
+$rcmail_config['db_table_dictionary'] = 'rc_dictionary';
+$rcmail_config['db_table_searches'] = 'rc_searches';
+$rcmail_config['db_table_system'] = 'rc_system';
 
 // you can define specific sequence names used in PostgreSQL
 $rcmail_config['db_sequence_users'] = 'rc_user_ids';

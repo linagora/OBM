@@ -436,6 +436,10 @@ class rcube
         $this->session->set_secret($this->config->get('des_key') . dirname($_SERVER['SCRIPT_NAME']));
         $this->session->set_ip_check($this->config->get('ip_check'));
 
+        if ($this->config->get('session_auth_name')) {
+            $this->session->set_cookiename($this->config->get('session_auth_name'));
+        }
+
         // start PHP session (if not in CLI mode)
         if ($_SERVER['REMOTE_ADDR']) {
             session_start();
@@ -1074,14 +1078,20 @@ class rcube
     {
         // handle PHP exceptions
         if (is_object($arg) && is_a($arg, 'Exception')) {
-            $err = array(
+            $arg = array(
                 'type' => 'php',
                 'code' => $arg->getCode(),
                 'line' => $arg->getLine(),
                 'file' => $arg->getFile(),
                 'message' => $arg->getMessage(),
             );
-            $arg = $err;
+        }
+        else if (is_string($arg)) {
+            $arg = array('message' => $arg, 'type' => 'php');
+        }
+
+        if (empty($arg['code'])) {
+            $arg['code'] = 500;
         }
 
         // installer
@@ -1091,14 +1101,24 @@ class rcube
             return;
         }
 
-        if (($log || $terminate) && $arg['type'] && $arg['message']) {
+        $cli = php_sapi_name() == 'cli';
+
+        if (($log || $terminate) && !$cli && $arg['type'] && $arg['message']) {
             $arg['fatal'] = $terminate;
             self::log_bug($arg);
         }
 
-        // display error page and terminate script
-        if ($terminate && is_object(self::$instance->output)) {
-            self::$instance->output->raise_error($arg['code'], $arg['message']);
+        // terminate script
+        if ($terminate) {
+            // display error page
+            if (is_object(self::$instance->output)) {
+                self::$instance->output->raise_error($arg['code'], $arg['message']);
+            }
+            else if ($cli) {
+                fwrite(STDERR, 'ERROR: ' . $arg['message']);
+            }
+
+            exit(1);
         }
     }
 
@@ -1137,7 +1157,7 @@ class rcube
 
             if (!self::write_log('errors', $log_entry)) {
                 // send error to PHPs error handler if write_log didn't succeed
-                trigger_error($arg_arr['message']);
+                trigger_error($arg_arr['message'], E_USER_WARNING);
             }
         }
 
@@ -1275,6 +1295,7 @@ class rcube
             return $_SESSION['language'];
         }
     }
+
 }
 
 

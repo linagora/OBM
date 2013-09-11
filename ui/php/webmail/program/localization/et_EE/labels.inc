@@ -37,6 +37,7 @@ $labels['drafts'] = 'Mustandid';
 $labels['sent']   = 'Saadetud';
 $labels['trash']  = 'Prügikast';
 $labels['junk']   = 'Rämps';
+$labels['show_real_foldernames'] = 'Show real names for special folders';
 
 // message listing
 $labels['subject'] = 'Pealkiri';
@@ -64,6 +65,7 @@ $labels['copy']     = 'Kopeeri';
 $labels['move']     = 'Liiguta';
 $labels['moveto']   = 'liiguta kausta...';
 $labels['download'] = 'laadi arvutisse';
+$labels['open']     = 'Ava';
 $labels['showattachment'] = 'Näita';
 $labels['showanyway'] = 'Näita ikka';
 
@@ -161,6 +163,7 @@ $labels['currpage'] = 'Praegune leht';
 $labels['unread'] = 'Lugemata';
 $labels['flagged'] = 'Märgistatud';
 $labels['unanswered'] = 'Vastamata';
+$labels['withattachment'] = 'Koos manusega';
 $labels['deleted'] = 'Kustutatud';
 $labels['undeleted'] = 'Pole kustutatud';
 $labels['invert'] = 'Vaheta';
@@ -204,6 +207,8 @@ $labels['body']  = 'Keha';
 
 $labels['openinextwin'] = 'Ava uues aknas';
 $labels['emlsave'] = 'Salvesta (.eml)';
+$labels['changeformattext'] = 'Näita lihttekstina';
+$labels['changeformathtml'] = 'Näita HTMLis';
 
 // message compose
 $labels['editasnew']      = 'Kasuta uue kirja põhjana';
@@ -398,6 +403,7 @@ $labels['htmleditor'] = 'Kasuta HTML redaktorit';
 $labels['htmlonreply'] = 'vaid HTML-vormingus kirjale vastamisel';
 $labels['htmlonreplyandforward'] = 'edastamisel või HTML kirjale vastates';
 $labels['htmlsignature'] = 'HTML allkiri';
+$labels['showemail'] = 'Näita nime juures e-posti aadressi';
 $labels['previewpane'] = 'Näita eelvaate akent';
 $labels['skin'] = 'Kliendi välimus';
 $labels['logoutclear'] = 'Tühjenda väljumisel prügikast';
@@ -451,9 +457,6 @@ $labels['replyremovesignature'] = 'Vastates eemalda kirjast esialgne allkiri';
 $labels['autoaddsignature'] = 'Lisa allkiri automaatselt';
 $labels['newmessageonly'] = 'ainult uutele';
 $labels['replyandforwardonly'] = 'ainult vastates ja edastades';
-$labels['replysignaturepos'] = 'Vastates või edastades aseta allkiri';
-$labels['belowquote'] = 'tsiteeritu alla';
-$labels['abovequote'] = 'tsiteeritu kohale';
 $labels['insertsignature'] = 'Sisesta allkiri';
 $labels['previewpanemarkread']  = 'Märgi eelvaadatud kirjad loetuks';
 $labels['afternseconds']  = '$n sekundi pärast';
@@ -470,6 +473,7 @@ $labels['spellcheckignorenums'] = 'Ignoreeri sõnu, milles on numbreid';
 $labels['spellcheckignorecaps'] = 'Ignoreeri suurte tähtedega kirjutatud sõnu';
 $labels['addtodict'] = 'Lisa sõnastikku';
 $labels['mailtoprotohandler'] = 'Kasuta mailto: linkide avamisel';
+$labels['standardwindows'] = 'Käsitle hüpikaknaid tavaliste akendena';
 $labels['forwardmode'] = 'Kirja edastamine';
 $labels['inline'] = 'kirja sees';
 $labels['asattachment'] = 'manusena';

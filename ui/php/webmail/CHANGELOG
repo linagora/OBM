@@ -1,6 +1,112 @@
 CHANGELOG Roundcube Webmail
 ===========================
 
+RELEASE 0.9.4
+-------------
+- Make identities matching case insensitive (#1485480)
+- Fix issue where too big message data was stored in cache causing sql errors (#1489316)
+- Fix iframe scrollbars on webkit desktop browsers (#1489306)
+- Fix issue where legacy config was overriden by default config (#1489288)
+- Fix newmail_notifier issue where favicon wasn't changed back to default (#1489313)
+- Fix setting of Junk and NonJunk flags by markasjunk plugin (#1489285)
+- Fix lack of Reply-To address in header of forwarded message body (#1489298)
+- Fix bugs when invoking contact creation form when read-only addressbook is selected (#1489296)
+- Fix identity selection on reply (#1489291)
+- Fix so additional headers are added to all messages sent (#1489284)
+- Fix display issue after moving folder in Folder Manager (#1489293)
+- Fix handling of non-default date formats (#1489294)
+- Fix unquoted path in PREG expression on Windows (#1489290)
+- Fix Junk folder icon alignment when it's nested in inbox folder (#1489292)
+- Fix wrong close tag in /template/mail.html (#1489295)
+
+RELEASE 0.9.3
+-------------
+- Fix setting refresh_interval to "Never" in Preferences (#1489286)
+- Optimized UI behavior for touch devices
+- Fix purge action in folder manager (#1489280)
+- Fix base URL resolving on attribute values with no quotes (#1489275)
+- Fix wrong handling of links with '|' character (#1489276)
+- Fix colorspace issue on image conversion using ImageMagick (#1489270)
+- Fix XSS vulnerability when saving HTML signatures (#1489251)
+- Fix XSS vulnerability when editing a message "as new" or draft (#1489251)
+- Fix rewrite rule in .htaccess (#1489240)
+- Fix detecting Turkish language in ISO-8859-9 encoding (#1489252)
+- Fix identity-selection using Return-Path headers (#1489241)
+- Fix parsing of links with ... in URL (#1489192)
+- Fix compose priority selector when opening in new window (#1489257)
+- Fix bug where signature wasn't changed on identity selection when editing a draft (#1489229)
+- Fix IMAP SETMETADATA parameters quoting (#1489231)
+- Fix "could not load message" error on valid empty message body (#1489228)
+- Fix handling of message/rfc822 attachments on message forward and edit (#1489214)
+- Fix parsing of square bracket characters in IMAP response strings (#1489223)
+- Don't clear References and in-Reply-To when a message is "edited as new" (#1489216)
+- Fix messages list sorting with THREAD=REFS
+- Remove deprecated (in PHP 5.5) PREG /e modifier usage (#1489174)
+- Fix empty messages list when register_globals is enabled (#1489157)
+- Fix so valid and set date.timezone is not required by installer checks (#1489180)
+- Canonize boolean ini_get() results (#1489189)
+- Fix so install do not fail when one of DB driver checks fails but other drivers exist (#1489178)
+- Fix so exported vCard specifies encoding in v3-compatible format (#1489183)
+
+RELEASE 0.9.2
+-------------
+- Fix image thumbnails display in print mode (#1489134)
+- Fix height of message headers block (#1489108)
+- Fix timeout issue on drag&drop uploads (#1489170)
+- Fix default sorting of threaded list when THREAD=REFS isn't supported
+- Fix list mode switch to 'List' after saving list settings in Larry skin (#1489164)
+- Fix error when there's no writeable addressbook source (#1489162)
+- Fix zipdownload plugin issue with filenames charset (#1489156)
+- Fix so non-inline images aren't skipped on forward (#1489150)
+- Fix "null" instead of empty string on messages list in IE10 (#1489145)
+- Fix legacy options handling
+- Fix so bounces addresses in Sender headers are skipped on Reply-All (#1489011)
+- Fix bug where serialized strings were truncated in PDO::quote() (#1489142)
+- Fix displaying messages with invalid self-closing HTML tags (#1489137)
+- Fix PHP warning when responding to a message with many Return-Path headers (#1489136)
+- Fix unintentional compose window resize (#1489114)
+- Fix performance regression in text wrapping function (#1489133)
+- Fix connection to posgtres db using unix socket (#1489132)
+- Fix handling of comma when adding contact from contacts widget (#1489107)
+- Fix bug where a message was opened in both preview pane and new window on double-click (#1489122)
+- Fix fatal error when xdebug.max_nesting_level was exceeded in rcube_washtml (#1489110)
+- Fix PHP warning in html_table::set_row_attribs() in PHP 5.4 (#1489094)
+- Fix invalid option selected in default_font selector when font is unset (#1489112)
+- Fix displaying contact with ID divisible by 100 in sql addressbook (#1489121)
+- Fix browser warnings on PDF plugin detection (#1489118)
+- Fix fatal error when parsing UUencoded messages (#1489119)
+
+RELEASE 0.9.1
+-------------
+- Better German labels for from/to to avoid conflicts with 'sender' (#1489084)
+- Fix problem where security warning was displayed for valid images with image/jpg type (#1489097)
+- Fix handling of invalid email addresses in headers (#1489092)
+- Fix IMAP connection issue with default_socket_timeout < 0 and imap_timeout < 0 (#1489090)
+- Fix various PHP code bugs found using static analysis (#1489086)
+- Fix backslash character handling on vCard import (#1489085)
+- Fix csv import from Thunderbird with French localization (#1489059)
+- Fix messages list focus issue in Opera and Webkit (#1489058)
+- Fix Reply-To header handling in Reply-All action (#1489037)
+- Fix so Sender: address is added to Cc: field on reply to all (#1489011)
+- Fix so addressbook_search_mode works also for group search (#1489079)
+- Fix removal of a contact from a group in LDAP addressbook (#1489081)
+- Inlcude SQL query in the log on SQL error (#1489064)
+- Fix handling untagged responses in IMAP FETCH - "could not load message" error (#1489074)
+- Fix very small window size in Chrome (#1488931)
+- Fix list page reset when viewing a message in Larry skin (#1489076)
+- Fix min_refresh_interval handling on preferences save (#1489073)
+- Fix PDF support detection for Firefox PDF.js (#1488972)
+- Fix possible collision in generated thumbnail cache key (#1489069)
+- Fix exit code on bootsrap errors in CLI mode (#1489044)
+- Fix error handling in CLI mode, use STDERR and non-empty exit code (#1489043)
+- Fix error when using check_referer=true
+- Fix incorrect handling of some specific links (#1489060)
+- Fix incorrect handling of leading spaces in text wrapping
+- Fix unintentional messages list jumps on click in Internet Explorer (#1489056)
+- Fix list of required configuration options (#1489055)
+- Fix DB error when creating a new contact and a group is selected (#1489051)
+- Fix handling of deprecated boolean value of reply_mode option (#1489052)
+
 RELEASE 0.9.0
 -------------
 - Fix display of HTML entities in protected folder name (#1489042)

@@ -36,9 +36,9 @@ class rcube_string_replacer
         // Support unicode/punycode in top-level domain part
         $utf_domain = '[^?&@"\'\\/()<>\s\r\t\n]+\\.?([^\\x00-\\x2f\\x3b-\\x40\\x5b-\\x60\\x7b-\\x7f]{2,}|xn--[a-zA-Z0-9]{2,})';
         $url1       = '.:;,';
-        $url2       = 'a-zA-Z0-9%=#$@+?!&\\/_~\\[\\]\\(\\){}\*-';
+        $url2       = 'a-zA-Z0-9%=#$@+?|!&\\/_~\\[\\]\\(\\){}\*-';
 
-        $this->link_pattern = "/([\w]+:\/\/|\W[Ww][Ww][Ww]\.|^[Ww][Ww][Ww]\.)($utf_domain([$url1]?[$url2]+)*)/";
+        $this->link_pattern = "/([\w]+:\/\/|\W[Ww][Ww][Ww]\.|^[Ww][Ww][Ww]\.)($utf_domain([$url1]*[$url2]+)*)/";
         $this->mailto_pattern = "/("
             ."[-\w!\#\$%&\'*+~\/^`|{}=]+(?:\.[-\w!\#\$%&\'*+~\/^`|{}=]+)*"  // local-part
             ."@$utf_domain"                                                 // domain-part
@@ -89,7 +89,7 @@ class rcube_string_replacer
 
         if ($url) {
             $suffix = $this->parse_url_brackets($url);
-            $i = $this->add($prefix . html::a(array(
+            $i = $this->add(html::a(array(
                 'href'   => $url_prefix . $url,
                 'target' => '_blank'
             ), rcube::Q($url)) . $suffix);
@@ -97,7 +97,7 @@ class rcube_string_replacer
 
         // Return valid link for recognized schemes, otherwise
         // return the unmodified string for unrecognized schemes.
-        return $i >= 0 ? $this->get_replacement($i) : $matches[0];
+        return $i >= 0 ? $prefix . $this->get_replacement($i) : $matches[0];
     }
 
     /**

@@ -70,7 +70,7 @@ class rcube_imap extends rcube_storage
     protected $search_sort_field = '';
     protected $search_threads = false;
     protected $search_sorted = false;
-    protected $options = array('auth_method' => 'check');
+    protected $options = array('auth_type' => 'check');
     protected $caching = false;
     protected $messages_caching = false;
     protected $threading = false;
@@ -398,10 +398,10 @@ class rcube_imap extends rcube_storage
     public function check_permflag($flag)
     {
         $flag       = strtoupper($flag);
-        $imap_flag  = $this->conn->flags[$flag];
         $perm_flags = $this->get_permflags($this->folder);
+        $imap_flag  = $this->conn->flags[$flag];
 
-        return in_array_nocase($imap_flag, $perm_flags);
+        return $imap_flag && !empty($perm_flags) && in_array_nocase($imap_flag, $perm_flags);
     }
 
 
@@ -417,17 +417,7 @@ class rcube_imap extends rcube_storage
         if (!strlen($folder)) {
             return array();
         }
-/*
-        Checking PERMANENTFLAGS is rather rare, so we disable caching of it
-        Re-think when we'll use it for more than only MDNSENT flag
 
-        $cache_key = 'mailboxes.permanentflags.' . $folder;
-        $permflags = $this->get_cache($cache_key);
-
-        if ($permflags !== null) {
-            return explode(' ', $permflags);
-        }
-*/
         if (!$this->check_connection()) {
             return array();
         }
@@ -442,10 +432,7 @@ class rcube_imap extends rcube_storage
         if (!is_array($permflags)) {
             $permflags = array();
         }
-/*
-        // Store permflags as string to limit cached object size
-        $this->update_cache($cache_key, implode(' ', $permflags));
-*/
+
         return $permflags;
     }
 
@@ -981,7 +968,7 @@ class rcube_imap extends rcube_storage
             // use memory less expensive (and quick) method for big result set
             $index = clone $this->index('', $this->sort_field, $this->sort_order);
             // get messages uids for one page...
-            $index->slice($start_msg, min($cnt-$from, $this->page_size));
+            $index->slice($from, min($cnt-$from, $this->page_size));
 
             if ($slice) {
                 $index->slice(-$slice, $slice);
@@ -1336,17 +1323,16 @@ class rcube_imap extends rcube_storage
         // THREAD=REFERENCES:     sorting by sent date of root message
         // THREAD=REFS:           sorting by the most recent date in each thread
 
-        if ($this->sort_field && ($this->sort_field != 'date' || $this->get_capability('THREAD') != 'REFS')) {
-            $index = $this->index_direct($this->folder, $this->sort_field, $this->sort_order, false);
+        if ($this->threading != 'REFS' || ($this->sort_field && $this->sort_field != 'date')) {
+            $sortby = $this->sort_field ? $this->sort_field : 'date';
+            $index  = $this->index_direct($this->folder, $sortby, $this->sort_order, false);
 
             if (!$index->is_empty()) {
                 $threads->sort($index);
             }
         }
-        else {
-            if ($this->sort_order != $threads->get_parameters('ORDER')) {
-                $threads->revert();
-            }
+        else if ($this->sort_order != $threads->get_parameters('ORDER')) {
+            $threads->revert();
         }
     }
 
@@ -2726,7 +2712,7 @@ class rcube_imap extends rcube_storage
 
         // filter folders list according to rights requirements
         if ($rights && $this->get_capability('ACL')) {
-            $a_folders = $this->filter_rights($a_folders, $rights);
+            $a_mboxes = $this->filter_rights($a_mboxes, $rights);
         }
 
         // filter folders and sort them

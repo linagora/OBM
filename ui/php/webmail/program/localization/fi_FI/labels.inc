@@ -37,6 +37,7 @@ $labels['drafts'] = 'Luonnokset';
 $labels['sent']   = 'Lähetetyt';
 $labels['trash']  = 'Roskakori';
 $labels['junk']   = 'Roskaposti';
+$labels['show_real_foldernames'] = 'Show real names for special folders';
 
 // message listing
 $labels['subject'] = 'Aihe';
@@ -64,6 +65,7 @@ $labels['copy']     = 'Kopioi';
 $labels['move']     = 'Siirrä';
 $labels['moveto']   = 'siirrä kansioon...';
 $labels['download'] = 'lataa';
+$labels['open']     = 'Avaa';
 $labels['showattachment'] = 'Näytä';
 $labels['showanyway'] = 'Näytä silti';
 
@@ -161,6 +163,7 @@ $labels['currpage'] = 'Nykyinen sivu';
 $labels['unread'] = 'Lukemattomat';
 $labels['flagged'] = 'Korostettu';
 $labels['unanswered'] = 'Vastaamaton';
+$labels['withattachment'] = 'Liitteen kera';
 $labels['deleted'] = 'Poistettu';
 $labels['undeleted'] = 'Ei poistettu';
 $labels['invert'] = 'Käännä';
@@ -204,6 +207,8 @@ $labels['body']  = 'Runko';
 
 $labels['openinextwin'] = 'Avaa uudessa ikkunassa';
 $labels['emlsave'] = 'Tallenna (.eml)';
+$labels['changeformattext'] = 'Näytä raakatekstimuodossa';
+$labels['changeformathtml'] = 'Näytä HTML-muodossa';
 
 // message compose
 $labels['editasnew']      = 'Muokkaa uutena';
@@ -241,9 +246,9 @@ $labels['nosubject']  = '(ei otsikkoa)';
 $labels['showimages'] = 'Näytä kuvat';
 $labels['alwaysshow'] = 'Näytä aina lähettäjältä $sender saapuneet kuvat';
 $labels['isdraft']    = 'Tämä on luonnosviesti.';
-$labels['andnmore']   = '$nr more...';
+$labels['andnmore']   = '$nr lisää...';
 $labels['togglemoreheaders'] = 'Näytä lisää viestiotsakkeita';
-$labels['togglefullheaders'] = 'Toggle raw message headers';
+$labels['togglefullheaders'] = 'Viestin otsakkeet päällä/pois';
 
 $labels['htmltoggle'] = 'HTML';
 $labels['plaintoggle'] = 'Tavallinen teksti';
@@ -396,8 +401,9 @@ $labels['showinextwin'] = 'Avaa viesti uudessa ikkunassa';
 $labels['composeextwin'] = 'Lähetä viesti uudessa ikkunassa';
 $labels['htmleditor'] = 'Kirjoita HTML-muodossa';
 $labels['htmlonreply'] = 'Vain vastatessa HTML-viesteihin';
-$labels['htmlonreplyandforward'] = 'on forward or reply to HTML message';
+$labels['htmlonreplyandforward'] = 'välittäessä tai vastatessa HTML-viestiin';
 $labels['htmlsignature'] = 'HTML-allekirjoitus';
+$labels['showemail'] = 'Näytä sähköpostiosoite näyttönimen kanssa';
 $labels['previewpane'] = 'Näytä esikatselulehti';
 $labels['skin'] = 'Käyttöliittymän teema';
 $labels['logoutclear'] = 'Tyhjennä roskakori kirjautuessa ulos';
@@ -451,9 +457,6 @@ $labels['replyremovesignature'] = 'Vastattaessa poista alkuperäinen allekirjoit
 $labels['autoaddsignature'] = 'Lisää allekirjoitus automaattisesti';
 $labels['newmessageonly'] = 'vain uuteen viestiin';
 $labels['replyandforwardonly'] = 'vain vastauksiin ja välityksiin';
-$labels['replysignaturepos'] = 'Vastattaessa tai välitettäessä laita allekirjoitus';
-$labels['belowquote'] = 'lainauksen alle';
-$labels['abovequote'] = 'lainauksen ylle';
 $labels['insertsignature'] = 'Lisää allekirjoitus';
 $labels['previewpanemarkread']  = 'Merkitse esikatsellut viestit luetuiksi';
 $labels['afternseconds']  = '$n sekunnin jälkeen';
@@ -470,6 +473,7 @@ $labels['spellcheckignorenums'] = 'Jätä huomiotta sanat, joissa on numeroita';
 $labels['spellcheckignorecaps'] = 'Jätä huomiotta sanat, joissa kaikki kirjaimet on isoja';
 $labels['addtodict'] = 'Lisää sanakirjaan';
 $labels['mailtoprotohandler'] = 'Rekisteröi mailto:-linkkien protokollakäsitteljä';
+$labels['standardwindows'] = 'Käsittele popup-ikkunoita tavallisina ikkunoina';
 $labels['forwardmode'] = 'Viestin välitys';
 $labels['inline'] = 'inline';
 $labels['asattachment'] = 'liitteenä';

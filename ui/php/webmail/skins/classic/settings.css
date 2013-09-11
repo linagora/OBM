@@ -178,7 +178,7 @@ div.readtext
 {
   min-height: 200px;
   padding-bottom: 2em;
-  background: url(images/watermark.gif) no-repeat center;
+  background: url(images/watermark.gif?v=4094.9288) no-repeat center;
 }
 
 #license .sysname

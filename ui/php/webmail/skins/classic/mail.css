@@ -36,7 +36,7 @@
   padding: 0;
   margin: 0 5px;
   overflow: hidden;
-  background: url(images/mail_toolbar.png) 0 0 no-repeat transparent;
+  background: url(images/mail_toolbar.png?v=1594.36649) 0 0 no-repeat transparent;
   opacity: 0.99; /* this is needed to make buttons appear correctly in Chrome */
 }
 
@@ -181,7 +181,7 @@
 
 #messagemenu li a
 {
-  background: url(images/messageactions.png) no-repeat 7px 0;
+  background: url(images/messageactions.png?v=e5b9.2211) no-repeat 7px 0;
   background-position: 7px 20px;
 }
 
@@ -213,7 +213,7 @@
 #markmessagemenu li a,
 #compose-attachments li a
 {
-  background: url(images/messageicons.png) no-repeat;
+  background: url(images/messageicons.png?v=9df0.3673) no-repeat;
 }
 
 #markmessagemenu li a.readlink
@@ -384,7 +384,7 @@
   display: block;
   position: relative;
   font-size: 11px;
-  background: url(images/icons/folders.png) 5px 0 no-repeat;
+  background: url(images/icons/folders.png?v=87af.4822) 5px 0 no-repeat;
   border-bottom: 1px solid #EBEBEB;
 }
 
@@ -411,12 +411,12 @@
 
 #mailboxlist li div.collapsed
 {
-  background: url(images/icons/collapsed.png) bottom right no-repeat;
+  background: url(images/icons/collapsed.png?v=45aa.97) bottom right no-repeat;
 }
 
 #mailboxlist li div.expanded
 {
-  background: url(images/icons/expanded.png) bottom right no-repeat;
+  background: url(images/icons/expanded.png?v=f647.107) bottom right no-repeat;
 }
 
 #mailboxlist li.inbox
@@ -536,7 +536,7 @@
   margin-top: 4px;
   margin-right: 2px;
   overflow: hidden;
-  background: url(images/mail_footer.png) 0 0 no-repeat transparent;
+  background: url(images/mail_footer.png?v=819f.977) 0 0 no-repeat transparent;
   opacity: 0.99; /* this is needed to make buttons appear correctly in Chrome */
 }
 
@@ -647,7 +647,7 @@ body.messagelist
   vertical-align: middle;
   border-bottom: 1px solid #999999;
   color: #333333;
-  background: url(images/listheader.gif) top left repeat-x #CCC;
+  background: url(images/listheader.gif?v=ab42.314) top left repeat-x #CCC;
   font-size: 11px;
   font-weight: bold;
 }
@@ -660,12 +660,12 @@ body.messagelist
 
 #messagelist thead tr td.sortedASC a
 {
-  background: url(images/icons/sort.gif) right 0 no-repeat;
+  background: url(images/icons/sort.gif?v=92aa.144) right 0 no-repeat;
 }
 
 #messagelist thead tr td.sortedDESC a
 {
-  background: url(images/icons/sort.gif) right -14px no-repeat;
+  background: url(images/icons/sort.gif?v=92aa.144) right -14px no-repeat;
 }
 
 #messagelist thead tr td a
@@ -762,7 +762,7 @@ body.messagelist
   vertical-align: middle;
   height: 17px;
   width: 15px;
-  background: url(images/messageicons.png) center no-repeat;
+  background: url(images/messageicons.png?v=9df0.3673) center no-repeat;
 }
 
 #messagelist tr td.attachment span.attachment
@@ -1011,7 +1011,7 @@ td span.branch div.tree
 {
   height: 17px;
   width: 15px;
-  background: url(images/tree.gif) 0px 0px no-repeat;
+  background: url(images/tree.gif?v=9b73.92) 0px 0px no-repeat;
 }
 
 td span.branch div.l1
@@ -1119,7 +1119,7 @@ table.headers-table tr td.header span
   min-height: 16px;
   list-style-image: none;
   list-style-type: none;
-  background: url(images/icons/attachment.png) 4px 2px no-repeat #DFDFDF;
+  background: url(images/icons/attachment.png?v=08f7.518) 4px 2px no-repeat #DFDFDF;
 }
 
 #messageframe #attachment-list
@@ -1363,12 +1363,12 @@ div.more-headers
 
 div.show-headers
 {
-  background: url(images/icons/down_small.gif) no-repeat center;
+  background: url(images/icons/down_small.gif?v=f368.105) no-repeat center;
 }
 
 div.hide-headers
 {
-  background: url(images/icons/up_small.gif) no-repeat center;
+  background: url(images/icons/up_small.gif?v=c56c.106) no-repeat center;
 }
 
 #headers-source
@@ -1650,7 +1650,7 @@ input.from_address
 {
   display: block;
   font-size: 11px;
-  background: url(images/icons/folders.png) 5px -108px no-repeat;
+  background: url(images/icons/folders.png?v=87af.4822) 5px -108px no-repeat;
   border-bottom: 1px solid #EBEBEB;
   white-space: nowrap;
 }
@@ -1717,7 +1717,7 @@ input.from_address
   padding-left: 5px;
   padding-right: 5px;
   text-shadow: 1px 1px white;
-  background: url("images/icons/groupactions.png") no-repeat right -70px;
+  background: url(images/icons/groupactions.png?v=ace6.1092) no-repeat right -70px;
 }
 
 #abookactions a.disabled

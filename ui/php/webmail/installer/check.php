@@ -42,12 +42,13 @@ $ini_checks = array(
     'suhosin.session.encrypt'       => 0,
     'magic_quotes_runtime'          => 0,
     'magic_quotes_sybase'           => 0,
-    'date.timezone'                 => '-NOTEMPTY-',
 );
 
 $optional_checks = array(
     // required for utils/modcss.inc, should we require this?
     'allow_url_fopen'  => 1,
+    'date.timezone'    => '-VALID-',
+    'register_globals' => 0, // #1489157
 );
 
 $source_urls = array(
@@ -64,12 +65,12 @@ $source_urls = array(
     'Intl'      => 'http://www.php.net/manual/en/book.intl.php',
     'Exif'      => 'http://www.php.net/manual/en/book.exif.php',
     'PDO'       => 'http://www.php.net/manual/en/book.pdo.php',
-    'pdo_mysql'   => 'http://www.php.net/manual/en/book.pdo-mysql.php',
-    'pdo_pgsql'   => 'http://www.php.net/manual/en/book.pdo-pgsql.php',
-    'pdo_sqlite'  => 'http://www.php.net/manual/en/book.pdo-sqlite.php',
-    'pdo_sqlite2' => 'http://www.php.net/manual/en/book.pdo-sqlite.php',
-    'pdo_sqlsrv'  => 'http://www.php.net/manual/en/book.pdo-sqlsrv.php',
-    'pdo_dblib'   => 'http://www.php.net/manual/en/book.pdo-dblib.php',
+    'pdo_mysql'   => 'http://www.php.net/manual/en/ref.pdo-mysql.php',
+    'pdo_pgsql'   => 'http://www.php.net/manual/en/ref.pdo-pgsql.php',
+    'pdo_sqlite'  => 'http://www.php.net/manual/en/ref.pdo-sqlite.php',
+    'pdo_sqlite2' => 'http://www.php.net/manual/en/ref.pdo-sqlite.php',
+    'pdo_sqlsrv'  => 'http://www.php.net/manual/en/ref.pdo-sqlsrv.php',
+    'pdo_dblib'   => 'http://www.php.net/manual/en/ref.pdo-dblib.php',
     'PEAR'      => 'http://pear.php.net',
     'Net_SMTP'  => 'http://pear.php.net/package/Net_SMTP',
     'Mail_mime' => 'http://pear.php.net/package/Mail_mime',
@@ -139,10 +140,11 @@ foreach ($RCI->supported_dbs as $database => $ext) {
     if (extension_loaded($ext)) {
         // MySQL driver requires PHP >= 5.3 (#1488875)
         if ($ext == 'pdo_mysql' && version_compare(PHP_VERSION, '5.3.0', '<')) {
-            $RCI->fail($database, 'PHP >= 5.3 required');
+            $RCI->fail($database, 'PHP >= 5.3 required', null, true);
         }
         else {
             $RCI->pass($database);
+            $found_db_driver = true;
         }
     }
     else {
@@ -151,6 +153,9 @@ foreach ($RCI->supported_dbs as $database => $ext) {
         $RCI->na($database, $msg, $source_urls[$ext]);
     }
     echo '<br />';
+}
+if (empty($found_db_driver)) {
+  $RCI->failures++;
 }
 
 ?>
@@ -185,23 +190,15 @@ foreach ($ini_checks as $var => $val) {
     if ($val === '-NOTEMPTY-') {
         if (empty($status)) {
             $RCI->fail($var, "empty value detected");
-        } else if ($var == 'date.timezone') {
-            try {
-                $tz = new DateTimeZone($status);
-                $RCI->pass($var);
-            }
-            catch (Exception $e) {
-                $RCI->fail($var, "invalid value detected: $status");
-            }
-        } else {
+        }
+        else {
             $RCI->pass($var);
         }
-        echo '<br />';
-        continue;
     }
-    if ($status == $val) {
+    else if (filter_var($status, FILTER_VALIDATE_BOOLEAN) == $val) {
         $RCI->pass($var);
-    } else {
+    }
+    else {
       $RCI->fail($var, "is '$status', should be '$val'");
     }
     echo '<br />';
@@ -223,9 +220,24 @@ foreach ($optional_checks as $var => $val) {
         echo '<br />';
         continue;
     }
-    if ($status == $val) {
+    if ($val === '-VALID-') {
+        if ($var == 'date.timezone') {
+            try {
+                $tz = new DateTimeZone($status);
+                $RCI->pass($var);
+            }
+            catch (Exception $e) {
+                $RCI->optfail($var, empty($status) ? "not set" : "invalid value detected: $status");
+            }
+        }
+        else {
+            $RCI->pass($var);
+        }
+    }
+    else if (filter_var($status, FILTER_VALIDATE_BOOLEAN) == $val) {
         $RCI->pass($var);
-    } else {
+    }
+    else {
       $RCI->optfail($var, "is '$status', could be '$val'");
     }
     echo '<br />';

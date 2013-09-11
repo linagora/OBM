@@ -128,7 +128,7 @@ class rcube_db
         $dsn_string  = $this->dsn_string($dsn);
         $dsn_options = $this->dsn_options($dsn);
 
-        if ($db_pconn) {
+        if ($this->db_pconn) {
             $dsn_options[PDO::ATTR_PERSISTENT] = true;
         }
 
@@ -405,21 +405,22 @@ class rcube_db
         $this->db_error_msg = null;
 
         // send query
-        $query = $this->dbh->query($query);
+        $result = $this->dbh->query($query);
 
-        if ($query === false) {
+        if ($result === false) {
             $error = $this->dbh->errorInfo();
             $this->db_error = true;
             $this->db_error_msg = sprintf('[%s] %s', $error[1], $error[2]);
 
             rcube::raise_error(array('code' => 500, 'type' => 'db',
                 'line' => __LINE__, 'file' => __FILE__,
-                'message' => $this->db_error_msg), true, false);
+                'message' => $this->db_error_msg . " (SQL Query: $query)"
+                ), true, false);
         }
 
-        $this->last_result = $query;
+        $this->last_result = $result;
 
-        return $query;
+        return $result;
     }
 
     /**
@@ -634,6 +635,22 @@ class rcube_db
     }
 
     /**
+     * Escapes a string so it can be safely used in a query
+     *
+     * @param string $str A string to escape
+     *
+     * @return string Escaped string for use in a query
+     */
+    public function escape($str)
+    {
+        if (is_null($str)) {
+            return 'NULL';
+        }
+
+        return substr($this->quote($str), 1, -1);
+    }
+
+    /**
      * Quotes a string so it can be safely used as a table or column name
      *
      * @param string $str Value to quote
@@ -645,6 +662,20 @@ class rcube_db
     public function quoteIdentifier($str)
     {
         return $this->quote_identifier($str);
+    }
+
+    /**
+     * Escapes a string so it can be safely used in a query
+     *
+     * @param string $str A string to escape
+     *
+     * @return string Escaped string for use in a query
+     * @deprecated    Replaced by rcube_db::escape
+     * @see           rcube_db::escape
+     */
+    public function escapeSimple($str)
+    {
+        return $this->escape($str);
     }
 
     /**
@@ -758,12 +789,19 @@ class rcube_db
     /**
      * Encodes non-UTF-8 characters in string/array/object (recursive)
      *
-     * @param mixed $input Data to fix
+     * @param mixed $input      Data to fix
+     * @param bool  $serialized Enable serialization
      *
      * @return mixed Properly UTF-8 encoded data
      */
-    public static function encode($input)
+    public static function encode($input, $serialized = false)
     {
+        // use Base64 encoding to workaround issues with invalid
+        // or null characters in serialized string (#1489142)
+        if ($serialized) {
+            return base64_encode(serialize($input));
+        }
+
         if (is_object($input)) {
             foreach (get_object_vars($input) as $idx => $value) {
                 $input->$idx = self::encode($value);
@@ -774,6 +812,7 @@ class rcube_db
             foreach ($input as $idx => $value) {
                 $input[$idx] = self::encode($value);
             }
+
             return $input;
         }
 
@@ -783,12 +822,24 @@ class rcube_db
     /**
      * Decodes encoded UTF-8 string/object/array (recursive)
      *
-     * @param mixed $input Input data
+     * @param mixed $input      Input data
+     * @param bool  $serialized Enable serialization
      *
      * @return mixed Decoded data
      */
-    public static function decode($input)
+    public static function decode($input, $serialized = false)
     {
+        // use Base64 encoding to workaround issues with invalid
+        // or null characters in serialized string (#1489142)
+        if ($serialized) {
+            // Keep backward compatybility where base64 wasn't used
+            if (strpos(substr($input, 0, 16), ':') !== false) {
+                return self::decode(@unserialize($input));
+            }
+
+            return @unserialize(base64_decode($input));
+        }
+
         if (is_object($input)) {
             foreach (get_object_vars($input) as $idx => $value) {
                 $input->$idx = self::decode($value);

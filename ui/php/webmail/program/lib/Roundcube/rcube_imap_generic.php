@@ -702,18 +702,11 @@ class rcube_imap_generic
      */
     function connect($host, $user, $password, $options=null)
     {
-        // set options
-        if (is_array($options)) {
-            $this->prefs = $options;
-        }
-        // set auth method
-        if (!empty($this->prefs['auth_type'])) {
-            $auth_method = strtoupper($this->prefs['auth_type']);
-        } else {
-            $auth_method = 'CHECK';
-        }
+        // configure
+        $this->set_prefs($options);
 
-        $result = false;
+        $auth_method = $this->prefs['auth_type'];
+        $result      = false;
 
         // initialize connection
         $this->error    = '';
@@ -746,7 +739,7 @@ class rcube_imap_generic
         }
 
         if ($this->prefs['timeout'] <= 0) {
-            $this->prefs['timeout'] = ini_get('default_socket_timeout');
+            $this->prefs['timeout'] = max(0, intval(ini_get('default_socket_timeout')));
         }
 
         // Connect
@@ -889,6 +882,31 @@ class rcube_imap_generic
         $this->closeConnection();
 
         return false;
+    }
+
+    /**
+     * Initializes environment
+     */
+    protected function set_prefs($prefs)
+    {
+        // set preferences
+        if (is_array($prefs)) {
+            $this->prefs = $prefs;
+        }
+
+        // set auth method
+        if (!empty($this->prefs['auth_type'])) {
+            $this->prefs['auth_type'] = strtoupper($this->prefs['auth_type']);
+        }
+        else {
+            $this->prefs['auth_type'] = 'CHECK';
+        }
+
+        // additional message flags
+        if (!empty($this->prefs['message_flags'])) {
+            $this->flags = array_merge($this->flags, $this->prefs['message_flags']);
+            unset($this->prefs['message_flags']);
+        }
     }
 
     /**
@@ -1077,7 +1095,7 @@ class rcube_imap_generic
         }
 
         if (!$this->data['READ-WRITE']) {
-            $this->setError(self::ERROR_READONLY, "Mailbox is read-only", 'EXPUNGE');
+            $this->setError(self::ERROR_READONLY, "Mailbox is read-only");
             return false;
         }
 
@@ -1933,7 +1951,7 @@ class rcube_imap_generic
         }
 
         if (!$this->data['READ-WRITE']) {
-            $this->setError(self::ERROR_READONLY, "Mailbox is read-only", 'STORE');
+            $this->setError(self::ERROR_READONLY, "Mailbox is read-only");
             return false;
         }
 
@@ -1995,7 +2013,7 @@ class rcube_imap_generic
         }
 
         if (!$this->data['READ-WRITE']) {
-            $this->setError(self::ERROR_READONLY, "Mailbox is read-only", 'STORE');
+            $this->setError(self::ERROR_READONLY, "Mailbox is read-only");
             return false;
         }
 
@@ -2130,14 +2148,18 @@ class rcube_imap_generic
                     else if ($name == 'RFC822') {
                         $result[$id]->body = $value;
                     }
-                    else if ($name == 'BODY') {
-                        $body = $this->tokenizeResponse($line, 1);
-                        if ($value[0] == 'HEADER.FIELDS')
-                            $headers = $body;
-                        else if (!empty($value))
-                            $result[$id]->bodypart[$value[0]] = $body;
+                    else if (stripos($name, 'BODY[') === 0) {
+                        $name = str_replace(']', '', substr($name, 5));
+
+                        if ($name == 'HEADER.FIELDS') {
+                            // skip ']' after headers list
+                            $this->tokenizeResponse($line, 1);
+                            $headers = $this->tokenizeResponse($line, 1);
+                        }
+                        else if (strlen($name))
+                            $result[$id]->bodypart[$name] = $value;
                         else
-                            $result[$id]->body = $body;
+                            $result[$id]->body = $value;
                     }
                 }
 
@@ -2447,6 +2469,7 @@ class rcube_imap_generic
         $key     = $this->nextTag();
         $request = $key . ($is_uid ? ' UID' : '') . " FETCH $id ($fetch_mode.PEEK[$part]$partial)";
         $result  = false;
+        $found   = false;
 
         // send request
         if (!$this->putLine($request)) {
@@ -2466,18 +2489,25 @@ class rcube_imap_generic
                 break;
             }
 
-            if (!preg_match('/^\* ([0-9]+) FETCH (.*)$/', $line, $m)) {
+            // skip irrelevant untagged responses (we have a result already)
+            if ($found || !preg_match('/^\* ([0-9]+) FETCH (.*)$/', $line, $m)) {
                 continue;
             }
 
             $line = $m[2];
-            $last = substr($line, -1);
 
             // handle one line response
-            if ($line[0] == '(' && $last == ')') {
+            if ($line[0] == '(' && substr($line, -1) == ')') {
                 // tokenize content inside brackets
-                $tokens = $this->tokenizeResponse(preg_replace('/(^\(|\$)/', '', $line));
-                $result = count($tokens) == 1 ? $tokens[0] : false;
+                $tokens = $this->tokenizeResponse(preg_replace('/(^\(|\)$)/', '', $line));
+
+                for ($i=0; $i<count($tokens); $i+=2) {
+                    if (preg_match('/^(BODY|BINARY)/i', $tokens[$i])) {
+                        $result = $tokens[$i+1];
+                        $found  = true;
+                        break;
+                    }
+                }
 
                 if ($result !== false) {
                     if ($mode == 1) {
@@ -2495,8 +2525,13 @@ class rcube_imap_generic
             else if (preg_match('/\{([0-9]+)\}$/', $line, $m)) {
                 $bytes = (int) $m[1];
                 $prev  = '';
+                $found = true;
 
-                while ($bytes > 0) {
+                // empty body
+                if (!$bytes) {
+                    $result = '';
+                }
+                else while ($bytes > 0) {
                     $line = $this->readLine(8192);
 
                     if ($line === NULL) {
@@ -2971,7 +3006,7 @@ class rcube_imap_generic
         }
 
         foreach ($entries as $name => $value) {
-            $entries[$name] = $this->escape($name) . ' ' . $this->escape($value);
+            $entries[$name] = $this->escape($name) . ' ' . $this->escape($value, true);
         }
 
         $entries = implode(' ', $entries);
@@ -3468,25 +3503,24 @@ class rcube_imap_generic
 
             // Parenthesized list
             case '(':
-            case '[':
                 $str = substr($str, 1);
                 $result[] = self::tokenizeResponse($str);
                 break;
             case ')':
-            case ']':
                 $str = substr($str, 1);
                 return $result;
                 break;
 
-            // String atom, number, NIL, *, %
+            // String atom, number, astring, NIL, *, %
             default:
                 // empty string
                 if ($str === '' || $str === null) {
                     break 2;
                 }
 
-                // excluded chars: SP, CTL, ), [, ]
-                if (preg_match('/^([^\x00-\x20\x29\x5B\x5D\x7F]+)/', $str, $m)) {
+                // excluded chars: SP, CTL, ), DEL
+                // we do not exclude [ and ] (#1489223)
+                if (preg_match('/^([^\x00-\x20\x29\x7F]+)/', $str, $m)) {
                     $result[] = $m[1] == 'NIL' ? NULL : $m[1];
                     $str = substr($str, strlen($m[1]));
                 }
