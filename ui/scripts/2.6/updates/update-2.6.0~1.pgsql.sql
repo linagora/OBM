@@ -85,4 +85,6 @@ WHERE pug.group_id = ug.group_id;
 ALTER TABLE ONLY p_ugroup ALTER group_ext_id SET NOT NULL;
 CREATE UNIQUE INDEX p_ugroup_ext_id_unique_idx ON p_ugroup (group_domain_id, group_ext_id);
 
+UPDATE profileproperty SET profileproperty_value = 'domain' WHERE profileproperty_value = 'admin';
+
 COMMIT;

@@ -96,7 +96,7 @@ INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, p
 INSERT into ProfileProperty (profileproperty_profile_id, profileproperty_name, profileproperty_value) values ((select profile_id from Profile where profile_name='admin'), 'level', '0');
 INSERT into ProfileProperty (profileproperty_profile_id, profileproperty_name, profileproperty_value) values ((select profile_id from Profile where profile_name='admin'), 'level_managepeers', '1');
 INSERT into ProfileProperty (profileproperty_profile_id, profileproperty_name, profileproperty_value) values ((select profile_id from Profile where profile_name='admin'), 'access_restriction', 'ALLOW_ALL');
-INSERT into ProfileProperty (profileproperty_profile_id, profileproperty_name, profileproperty_value) values ((select profile_id from Profile where profile_name='admin'), 'admin_realm', 'admin');
+INSERT into ProfileProperty (profileproperty_profile_id, profileproperty_name, profileproperty_value) values ((select profile_id from Profile where profile_name='admin'), 'admin_realm', 'domain');
 -- -----------------------------------------------------------------------------
 -- Admin_delegue Profile
 INSERT INTO Profile (profile_timeupdate, profile_timecreate, profile_userupdate, profile_usercreate, profile_domain_id, profile_name) values (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, (select domain_id from Domain where domain_name='global.virt'), 'admin_delegue');

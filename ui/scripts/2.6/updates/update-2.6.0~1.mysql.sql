@@ -73,4 +73,6 @@ SET pug.group_ext_id = ug.group_ext_id;
 ALTER TABLE P_UGroup MODIFY group_ext_id CHARACTER(36) NOT NULL;
 ALTER TABLE P_UGroup ADD UNIQUE (group_domain_id, group_ext_id);
 
+UPDATE ProfileProperty SET profileproperty_value = 'domain' WHERE profileproperty_value = 'admin';
+
 COMMIT;
