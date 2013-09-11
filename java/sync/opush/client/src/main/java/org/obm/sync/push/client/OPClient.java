@@ -80,7 +80,8 @@ import org.obm.sync.push.client.commands.PingCommand;
 import org.obm.sync.push.client.commands.ProvisionStepOne;
 import org.obm.sync.push.client.commands.ProvisionStepTwo;
 import org.obm.sync.push.client.commands.SimpleSyncCommand;
-import org.obm.sync.push.client.commands.SmartReply;
+import org.obm.sync.push.client.commands.SmartEmailCommand.SmartForward;
+import org.obm.sync.push.client.commands.SmartEmailCommand.SmartReply;
 import org.obm.sync.push.client.commands.Sync;
 import org.obm.sync.push.client.commands.SyncWithCommand;
 import org.obm.sync.push.client.commands.SyncWithDataCommand;
@@ -117,6 +118,10 @@ public abstract class OPClient {
 
 	public Boolean emailReply(byte[] emailData, int collectionId, ServerId serverId) throws Exception {
 		return run(new SmartReply(emailData, collectionId, serverId));
+	}
+
+	public Boolean emailForward(byte[] emailData, int collectionId, ServerId serverId) throws Exception {
+		return run(new SmartForward(emailData, collectionId, serverId));
 	}
 
 	public FolderSyncResponse folderSync(SyncKey key) throws Exception {
