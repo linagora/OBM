@@ -29,31 +29,18 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store.ehcache;
+package org.obm.push.store;
 
-import java.io.File;
-import java.io.IOException;
+import org.obm.push.store.ehcache.MigrationService;
+import org.obm.push.store.ehcache.MigrationServiceImpl;
 
-import org.easymock.EasyMock;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
-import org.obm.configuration.ConfigurationService;
+import com.google.inject.AbstractModule;
 
-public class StoreManagerConfigurationTest {
+public class DaoMigrationModule extends AbstractModule{
 
-	@Rule 
-	public TemporaryFolder temporaryFolder =  new TemporaryFolder();
-	protected File dataDir;
-	
-	protected ConfigurationService initConfigurationServiceMock() throws IOException {
-		dataDir = temporaryFolder.newFolder();
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true).anyTimes();
-		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
-		EasyMock.replay(configurationService);
-		
-		return configurationService;
+	@Override
+	protected void configure() {
+		bind(MigrationService.class).to(MigrationServiceImpl.class);
 	}
 
 }

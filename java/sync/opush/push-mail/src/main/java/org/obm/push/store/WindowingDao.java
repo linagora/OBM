@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store;
 
+import net.sf.ehcache.Cache;
+
 import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.EmailChanges;
 import org.obm.push.mail.bean.WindowingIndexKey;
@@ -47,4 +49,7 @@ public interface WindowingDao {
 
 	void removePreviousCollectionWindowing(WindowingIndexKey key);
 
+	Cache getChunksStore();
+
+	Cache getIndexStore();
 }
