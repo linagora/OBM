@@ -49,6 +49,8 @@ import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.PerRequestTypeInjectableProvider;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 @Singleton
 @Provider
 public class BatchProvider extends PerRequestTypeInjectableProvider<Context, Batch> {
@@ -76,9 +78,10 @@ public class BatchProvider extends PerRequestTypeInjectableProvider<Context, Bat
 				}
 
 				Batch batch = null;
+				ObmDomain domainInRequest = (ObmDomain) c.getProperties().get(ObmDomainProvider.DOMAIN_KEY);
 
 				try {
-					batch = batchDao.get(Batch.Id.valueOf(batchId));
+					batch = batchDao.get(Batch.Id.valueOf(batchId), domainInRequest);
 				} catch (DaoException e) {
 					throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
 				} catch (BatchNotFoundException e) {

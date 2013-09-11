@@ -87,9 +87,11 @@ public class BatchDaoJdbcImplTest implements H2TestClass {
 	@Inject
 	private BatchDao dao;
 
+	private final ObmDomain domain = ToolBox.getDefaultObmDomain();
+
 	@Test(expected=BatchNotFoundException.class)
 	public void testGetWhenBatchNotFound() throws Exception {
-		dao.get(batchId(123));
+		dao.get(batchId(123), domain);
 	}
 
 	@Test
@@ -99,9 +101,16 @@ public class BatchDaoJdbcImplTest implements H2TestClass {
 		db.executeUpdate("INSERT INTO batch_operation_param (param_key, value, operation) VALUES ('p1', 'v1', 1)");
 		db.executeUpdate("INSERT INTO batch_operation (status, resource_path, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/groups', 'POST', 'GROUP', 1)");
 
-		Batch batch = dao.get(batchId(1));
+		Batch batch = dao.get(batchId(1), domain);
 
 		assertThat(batch.getOperations()).hasSize(2);
+	}
+
+	@Test(expected = BatchNotFoundException.class)
+	public void testGetInOtherDomain() throws Exception {
+		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 2)");
+
+		dao.get(batchId(1), domain);
 	}
 
 	@Test(expected = DaoException.class)
@@ -169,7 +178,7 @@ public class BatchDaoJdbcImplTest implements H2TestClass {
 		Batch batch = batchBuilder.build();
 
 		batch = dao.create(batch);
-		batch = dao.addOperation(batch.getId(), operation);
+		batch = dao.addOperation(batch, operation);
 
 		batch = batchBuilder
 				.status(BatchStatus.SUCCESS)
@@ -224,11 +233,6 @@ public class BatchDaoJdbcImplTest implements H2TestClass {
 		dao.delete(batchId(1));
 	}
 
-	@Test(expected = BatchNotFoundException.class)
-	public void testAddOperationWhenBatchNotFound() throws Exception {
-		dao.addOperation(batchId(1), null);
-	}
-
 	@Test
 	public void testAddOperation() throws Exception {
 		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
@@ -245,7 +249,9 @@ public class BatchDaoJdbcImplTest implements H2TestClass {
 				.entityType(BatchEntityType.USER)
 				.build();
 
-		assertThat(dao.addOperation(batchId(1), operation).getOperations()).isNotEmpty();
+		Batch batch = dao.get(batchId(1), domain);
+
+		assertThat(dao.addOperation(batch, operation).getOperations()).isNotEmpty();
 	}
 
 	@Test
@@ -264,7 +270,9 @@ public class BatchDaoJdbcImplTest implements H2TestClass {
 				.entityType(BatchEntityType.USER)
 				.build();
 
-		dao.addOperation(batchId(1), operation).getOperations();
+		Batch batch = dao.get(batchId(1), domain);
+
+		dao.addOperation(batch, operation).getOperations();
 
 		ResultSet rs = db.execute("SELECT COUNT(id) FROM batch_operation");
 

@@ -187,7 +187,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchDao.get(batchId(12))).andThrow(new BatchNotFoundException());
+		expect(batchDao.get(batchId(12), domain)).andThrow(new BatchNotFoundException());
 		mocksControl.replay();
 
 		given()
@@ -221,7 +221,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchDao.get(batchId(12))).andThrow(new DaoException());
+		expect(batchDao.get(batchId(12), domain)).andThrow(new DaoException());
 		mocksControl.replay();
 
 		given()
@@ -239,7 +239,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchDao.get(batchId(12))).andReturn(batch);
+		expect(batchDao.get(batchId(12), domain)).andReturn(batch);
 		mocksControl.replay();
 
 		given()
@@ -321,7 +321,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
-		expect(batchDao.get(batchId(12))).andThrow(new BatchNotFoundException());
+		expect(batchDao.get(batchId(12), domain)).andThrow(new BatchNotFoundException());
 		mocksControl.replay();
 
 		given()
@@ -356,7 +356,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
-		expect(batchDao.get(batchId(12))).andReturn(batch);
+		expect(batchDao.get(batchId(12), domain)).andReturn(batch);
 		batchProcessor.process(batch);
 		expectLastCall().andThrow(new ProcessingException());
 		mocksControl.replay();
@@ -376,7 +376,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchTracker.getTrackedBatch(batchId(12))).andReturn(null);
-		expect(batchDao.get(batchId(12))).andReturn(batch);
+		expect(batchDao.get(batchId(12), domain)).andReturn(batch);
 		batchProcessor.process(batch);
 		expectLastCall();
 		mocksControl.replay();
@@ -396,7 +396,7 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
 		expect(batchTracker.getTrackedBatch(batchId(13))).andReturn(null);
-		expect(batchDao.get(batchId(13))).andReturn(commitedBatch);
+		expect(batchDao.get(batchId(13), domain)).andReturn(commitedBatch);
 		mocksControl.replay();
 
 		given()

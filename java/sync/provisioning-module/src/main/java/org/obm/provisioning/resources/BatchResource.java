@@ -62,7 +62,7 @@ public class BatchResource {
 		}
 
 		try {
-			batch = batchDao.get(batchId);
+			batch = batchDao.get(batchId, domain);
 		} catch (BatchNotFoundException e) {
 			throw new WebApplicationException(e, Status.NOT_FOUND);
 		} catch (DomainNotFoundException e) {
@@ -122,7 +122,7 @@ public class BatchResource {
 
 		if (batch == null) {
 			try {
-				batch = batchDao.get(batchId);
+				batch = batchDao.get(batchId, domain);
 			} catch (BatchNotFoundException e) {
 				throw new WebApplicationException(e, Status.NOT_FOUND);
 			} catch (DomainNotFoundException e) {

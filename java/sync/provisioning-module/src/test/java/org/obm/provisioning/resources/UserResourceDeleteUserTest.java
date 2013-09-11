@@ -58,7 +58,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchDao.addOperation(batch.getId(),
+		expect(batchDao.addOperation(batch,
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE,
 						ImmutableMap.of(
 								"expunge", "true", "domain", "a3443822-bb58-4585-af72-543a287f7c0e", "batchId", "1", "userId", "1"))))
@@ -82,7 +82,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchDao.addOperation(batch.getId(),
+		expect(batchDao.addOperation(batch,
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE,
 						ImmutableMap.of(
 								"expunge", "false", "domain", "a3443822-bb58-4585-af72-543a287f7c0e", "batchId", "1", "userId", "1"))))
@@ -106,7 +106,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchDao.addOperation(batch.getId(),
+		expect(batchDao.addOperation(batch,
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE,
 						ImmutableMap.<String, String>of(
 								"domain", "a3443822-bb58-4585-af72-543a287f7c0e", "batchId", "1", "userId", "1"))))
@@ -129,7 +129,7 @@ public class UserResourceDeleteUserTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchDao.addOperation(batch.getId(),
+		expect(batchDao.addOperation(batch,
 				operation(BatchEntityType.USER, "/batches/1/users/1", null, HttpVerb.DELETE,
 						ImmutableMap.<String, String>of(
 								"domain", "a3443822-bb58-4585-af72-543a287f7c0e", "batchId", "1", "userId", "1"))))

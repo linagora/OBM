@@ -35,9 +35,11 @@ import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public interface BatchDao {
 
-	Batch get(Batch.Id id) throws DaoException, BatchNotFoundException, DomainNotFoundException;
+	Batch get(Batch.Id id, ObmDomain domain) throws DaoException, BatchNotFoundException, DomainNotFoundException;
 
 	Batch create(Batch batch) throws DaoException, BatchNotFoundException, DomainNotFoundException;
 
@@ -45,6 +47,6 @@ public interface BatchDao {
 
 	void delete(Batch.Id id) throws DaoException, BatchNotFoundException;
 
-	Batch addOperation(Batch.Id batchId, Operation operation) throws DaoException, BatchNotFoundException, DomainNotFoundException;
+	Batch addOperation(Batch batch, Operation operation) throws DaoException, BatchNotFoundException, DomainNotFoundException;
 
 }

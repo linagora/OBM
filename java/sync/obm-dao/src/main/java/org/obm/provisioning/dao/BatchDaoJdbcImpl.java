@@ -51,6 +51,7 @@ import org.obm.utils.ObmHelper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
@@ -72,16 +73,20 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	@Override
-	public Batch get(Batch.Id id) throws DaoException, BatchNotFoundException, DomainNotFoundException {
+	public Batch get(Batch.Id id, ObmDomain domain) throws DaoException, BatchNotFoundException, DomainNotFoundException {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
 			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("SELECT " + FIELDS + " FROM batch INNER JOIN Domain ON domain_id = domain WHERE id = ?");
+			ps = connection.prepareStatement(
+					"SELECT " + FIELDS + " FROM batch " +
+					"INNER JOIN Domain ON domain_id = domain " +
+					"WHERE id = ? AND domain_id = ?");
 
 			ps.setInt(1, id.getId());
+			ps.setInt(2, domain.getId());
 
 			rs = ps.executeQuery();
 
@@ -113,7 +118,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 			ps.executeUpdate();
 
-			return get(Batch.Id.builder().id(obmHelper.lastInsertId(connection)).build());
+			return get(Batch.Id.builder().id(obmHelper.lastInsertId(connection)).build(), batch.getDomain());
 		}
 		catch (SQLException e) {
 			throw new DaoException(e);
@@ -158,7 +163,7 @@ public class BatchDaoJdbcImpl implements BatchDao {
 				}
 			}
 
-			return get(batch.getId());
+			return get(batch.getId(), batch.getDomain());
 		}
 		catch (SQLException e) {
 			throw new DaoException(e);
@@ -194,16 +199,10 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	@Override
-	public Batch addOperation(Batch.Id batchId, Operation operation) throws DaoException, BatchNotFoundException, DomainNotFoundException {
-		Batch batch = get(batchId);
-
-		if (batch == null) {
-			throw new BatchNotFoundException(String.format("No such batch: %s", batchId));
-		}
-
+	public Batch addOperation(Batch batch, Operation operation) throws DaoException, BatchNotFoundException, DomainNotFoundException {
 		operationDao.create(batch, operation);
 
-		return get(batch.getId());
+		return get(batch.getId(), batch.getDomain());
 	}
 
 	private Batch batchFromCursor(ResultSet rs) throws DaoException, SQLException, DomainNotFoundException {

@@ -427,12 +427,11 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expectSuccessfulAuthenticationAndFullAuthorization();
 
 		expect(batchDao.create(isA(Batch.class))).andReturn(batch);
-		expect(batchDao.get(batchId(1))).andReturn(batch);
-		expect(batchDao.addOperation(eq(batchId(1)), isA(Operation.class)))
-				.andReturn(batch);
-		expect(batchDao.get(batchId(1))).andReturn(batch);
+		expect(batchDao.get(batchId(1), domain)).andReturn(batch);
+		expect(batchDao.addOperation(eq(batch), isA(Operation.class))).andReturn(batch);
+		expect(batchDao.get(batchId(1), domain)).andReturn(batch);
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
-		expect(batchDao.get(batchId(1))).andReturn(batch);
+		expect(batchDao.get(batchId(1), domain)).andReturn(batch);
 	}
 
 	private void expectLdapCreateUser(ObmUser userToAdd, Group defaultGroup) {

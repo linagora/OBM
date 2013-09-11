@@ -96,7 +96,7 @@ public abstract class AbstractBatchAwareResource {
 				.build();
 
 		try {
-			batchDao.addOperation(batch.getId(), operation);
+			batchDao.addOperation(batch, operation);
 		} catch (BatchNotFoundException e) {
 			throw new WebApplicationException(e, Status.NOT_FOUND);
 		} catch (DomainNotFoundException e) {

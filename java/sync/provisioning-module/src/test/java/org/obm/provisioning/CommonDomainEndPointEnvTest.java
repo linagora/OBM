@@ -275,7 +275,7 @@ public abstract class CommonDomainEndPointEnvTest {
 	}
 
 	protected void expectBatch() throws DaoException, BatchNotFoundException, DomainNotFoundException {
-		expect(batchDao.get(batch.getId())).andReturn(batch).atLeastOnce();
+		expect(batchDao.get(batch.getId(), domain)).andReturn(batch).atLeastOnce();
 	}
 
 	protected void expectProfiles() throws DaoException {
@@ -293,7 +293,7 @@ public abstract class CommonDomainEndPointEnvTest {
 	}
 
 	protected void expectNoBatch() throws DaoException, BatchNotFoundException, DomainNotFoundException {
-		expect(batchDao.get(batch.getId())).andThrow(new BatchNotFoundException());
+		expect(batchDao.get(batch.getId(), domain)).andThrow(new BatchNotFoundException());
 	}
 
 	protected void expectSuccessfulAuthentication(String login, String password) {
