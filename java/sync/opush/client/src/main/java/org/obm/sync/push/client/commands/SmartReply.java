@@ -41,13 +41,13 @@ import org.obm.sync.push.client.IEasCommand;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.AccountInfos;
 
-public abstract class SmartEmailCommand implements IEasCommand<Boolean> {
+public class SmartReply implements IEasCommand<Boolean> {
 
 	private final byte[] emailData;
 	private final int collectionId;
 	private final ServerId serverId;
 	
-	public SmartEmailCommand(byte[] emailData, int collectionId, ServerId serverId) {
+	public SmartReply(byte[] emailData, int collectionId, ServerId serverId) {
 		this.emailData = emailData;
 		this.collectionId = collectionId;
 		this.serverId = serverId;
@@ -56,7 +56,7 @@ public abstract class SmartEmailCommand implements IEasCommand<Boolean> {
 	@Override
 	public Boolean run(AccountInfos ai, OPClient opc, HttpClient hc) throws Exception {
 		return Request
-			.Post(opc.buildUrl(ai.getUrl(), ai.getLogin(), ai.getDevId(), ai.getDevType(), getCommandName(), commandParams()))
+			.Post(opc.buildUrl(ai.getUrl(), ai.getLogin(), ai.getDevId(), ai.getDevType(), "SmartReply", commandParams()))
 				.addHeader("User-Agent", ai.getUserAgent())
 				.addHeader("Authorization", ai.authValue())
 				.addHeader("Ms-Asprotocolversion", ProtocolVersion.V121.asSpecificationValue())
@@ -70,8 +70,6 @@ public abstract class SmartEmailCommand implements IEasCommand<Boolean> {
 				.getStatusCode() == HttpStatus.SC_OK;
 	}
 
-	protected abstract String getCommandName();
-
 	private String commandParams() {
 		return new StringBuilder()
 			.append("&CollectionId=")
@@ -80,29 +78,5 @@ public abstract class SmartEmailCommand implements IEasCommand<Boolean> {
 			.append(serverId.toString())
 			.append("&SaveInSent=T")
 			.toString();
-	}
-	
-	public static class SmartReply extends SmartEmailCommand {
-
-		public SmartReply(byte[] emailData, int collectionId, ServerId serverId) {
-			super(emailData, collectionId, serverId);
-		}
-
-		@Override
-		protected String getCommandName() {
-			return "SmartReply";
-		}
-	}
-	
-	public static class SmartForward extends SmartEmailCommand {
-		
-		public SmartForward(byte[] emailData, int collectionId, ServerId serverId) {
-			super(emailData, collectionId, serverId);
-		}
-		
-		@Override
-		protected String getCommandName() {
-			return "SmartForward";
-		}
 	}
 }
