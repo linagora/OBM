@@ -777,3 +777,115 @@ Obm.Browsers = $merge({
     }
   }
 });
+
+/******************************************************************************
+ * Calendar Manager Popup
+ ******************************************************************************/
+Obm.CalendarPopupManager = new Class({
+
+  Implements: Events,
+
+  initialize: function() {
+    this.evt = null;
+    this.chain = new Chain();
+
+    // Close popup and redraw event
+    $('popup_form_close').addEvent('click', function() {
+      obm.calendarManager.destroyDummy();
+    }.bind(this));
+
+    // Close popup and redraw event
+    $('popup_close').addEvent('click', function() {
+      this.cancel();
+    }.bind(this));
+
+    // Redirect to conflict manager form
+    $('popup_manage').addEvent('click', function() {
+      this.fireEvent('conflict');
+      this.cancel();
+    }.bind(this));
+
+    // Force event update
+    $('popup_force').addEvent('click', function() {
+      obm.popup.hide('calendarConflictPopup');
+      this.chain.callChain();
+    }.bind(this));
+
+    // Close popup and redraw event
+    $('popup_cancel').addEvent('click', function() {
+      this.cancel();
+    }.bind(this));
+
+    // Event delete confirmation
+    $('popup_delete').addEvent('click', function() {
+      this.chain.callChain();
+    }.bind(this));
+
+    $('popup_cancel_delete').addEvent('click', function() {
+      this.evtId = null;
+      this.cancel();
+    }.bind(this));
+
+    // Repeated event popup
+    $('popup_update_one').addEvent('click', function() {
+      this.fireEvent('update_one');
+    }.bind(this));
+
+    $('popup_update_all').addEvent('click', function() {
+      this.fireEvent('update_all');
+      this.chain.callChain();
+    }.bind(this));
+
+    $('popup_delete_one').addEvent('click', function() {
+      this.chain.callChain();
+    }.bind(this));
+
+    $('popup_delete_all').addEvent('click', function() {
+      this.fireEvent('delete_all');
+      this.chain.callChain();
+    }.bind(this));
+
+    // Mail Notification actions
+    $('popup_sendmail_yes').addEvent('click', function() {
+      this.fireEvent('mail');
+      this.chain.callChain();
+    }.bind(this));
+
+    $('popup_sendmail_no').addEvent('click', function() {
+      this.chain.callChain();
+    }.bind(this));
+
+    $('popup_sendmail_close').addEvent('click', function() {
+      this.chain.callChain();
+    }.bind(this));
+  },
+
+  show: function(evt) {
+    this.evtId = evt.element_id;
+    this.ivent = evt;
+    this.chain.chain(this.complete.bind(this));
+    this.chain.callChain();
+  },
+
+  add: function(popup) {
+    this.chain.chain(function () {
+      obm.popup.show(popup)
+    }.bind(this));
+  },
+
+  cancel: function() {
+    obm.calendarManager.destroyDummy();
+    this.chain.clearChain();
+    this.removeEvents();
+    if (this.evtId) {
+      obm.calendarManager.cancel(this.ivent.element_id);
+    }
+  },
+  
+  complete: function() {
+    this.chain.clearChain();
+    this.fireEvent('complete')
+    this.removeEvents();
+  }
+
+});
