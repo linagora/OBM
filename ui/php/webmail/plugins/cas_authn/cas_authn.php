@@ -304,7 +304,7 @@ class cas_authn extends rcube_plugin {
                 phpCAS::setFixedCallbackURL($this->generate_url(array('action' => 'pgtcallback')));
                 
                 // set PGT storage
-                phpCAS::setPGTStorageFile('xml', $cfg['cas_pgt_dir']);
+                phpCAS::setPGTStorageFile($cfg['cas_pgt_dir']);
             }
             else {
 		// Manage the session only the first time
