@@ -199,10 +199,8 @@ public class BatchDaoJdbcImpl implements BatchDao {
 	}
 
 	@Override
-	public Batch addOperation(Batch batch, Operation operation) throws DaoException, BatchNotFoundException, DomainNotFoundException {
+	public void addOperation(Batch batch, Operation operation) throws DaoException, BatchNotFoundException, DomainNotFoundException {
 		operationDao.create(batch, operation);
-
-		return get(batch.getId(), batch.getDomain());
 	}
 
 	private Batch batchFromCursor(ResultSet rs) throws DaoException, SQLException, DomainNotFoundException {

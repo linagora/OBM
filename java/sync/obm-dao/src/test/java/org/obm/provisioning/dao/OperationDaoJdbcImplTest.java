@@ -143,6 +143,76 @@ public class OperationDaoJdbcImplTest implements H2TestClass {
 	}
 
 	@Test
+	public void testGetByBatchIdNoParams() throws Exception {
+		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
+		db.executeUpdate("INSERT INTO batch_operation (status, resource_path, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/users', 'POST', 'USER', 1)");
+		db.executeUpdate("INSERT INTO batch_operation (status, resource_path, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/groups', 'POST', 'GROUP', 1)");
+		
+		Request request1 = Request.builder()
+				.resourcePath("/batches/1/users")
+				.verb(HttpVerb.POST)
+				.build();
+		Operation operation1 = Operation.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.request(request1)
+				.entityType(BatchEntityType.USER)
+				.build();
+		Request request2 = Request.builder()
+				.resourcePath("/batches/1/groups")
+				.verb(HttpVerb.POST)
+				.build();
+		Operation operation2 = Operation.builder()
+				.id(operationId(2))
+				.status(BatchStatus.IDLE)
+				.request(request2)
+				.entityType(BatchEntityType.GROUP)
+				.build();
+		
+		assertThat(dao.getByBatchId(batchId(1))).containsExactly(operation1, operation2);
+	}
+
+	@Test
+	public void testGetByBatchIdMultipleParamsMultipleOperations() throws Exception {
+		db.executeUpdate("INSERT INTO batch (status, domain) VALUES ('IDLE', 1)");
+		db.executeUpdate("INSERT INTO batch_operation (status, resource_path, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/users', 'POST', 'USER', 1)");
+		db.executeUpdate("INSERT INTO batch_operation_param (param_key, value, operation) VALUES ('p1', 'v1', 1)");
+		db.executeUpdate("INSERT INTO batch_operation_param (param_key, value, operation) VALUES ('p2', 'v2', 1)");
+		db.executeUpdate("INSERT INTO batch_operation_param (param_key, value, operation) VALUES ('p3', 'v3', 1)");
+		db.executeUpdate("INSERT INTO batch_operation (status, resource_path, verb, entity_type, batch) VALUES ('IDLE', '/batches/1/groups', 'POST', 'GROUP', 1)");
+		db.executeUpdate("INSERT INTO batch_operation_param (param_key, value, operation) VALUES ('p1', 'v1', 2)");
+		db.executeUpdate("INSERT INTO batch_operation_param (param_key, value, operation) VALUES ('p2', 'v2', 2)");
+		
+		Request request1 = Request.builder()
+				.resourcePath("/batches/1/users")
+				.verb(HttpVerb.POST)
+				.param("p1", "v1")
+				.param("p2", "v2")
+				.param("p3", "v3")
+				.build();
+		Operation operation1 = Operation.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.request(request1)
+				.entityType(BatchEntityType.USER)
+				.build();
+		Request request2 = Request.builder()
+				.resourcePath("/batches/1/groups")
+				.verb(HttpVerb.POST)
+				.param("p1", "v1")
+				.param("p2", "v2")
+				.build();
+		Operation operation2 = Operation.builder()
+				.id(operationId(2))
+				.status(BatchStatus.IDLE)
+				.request(request2)
+				.entityType(BatchEntityType.GROUP)
+				.build();
+		
+		assertThat(dao.getByBatchId(batchId(1))).containsExactly(operation1, operation2);
+	}
+
+	@Test
 	public void testCreate() throws Exception {
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
 		Batch batch = Batch.builder().id(batchId(1)).domain(domain).status(BatchStatus.RUNNING).build();

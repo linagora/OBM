@@ -32,7 +32,7 @@
 package org.obm.provisioning.resources;
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -60,11 +60,11 @@ public class UserResourceModifyUserTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchDao.addOperation(batch,
+		batchDao.addOperation(batch,
 				operation(BatchEntityType.USER, "/batches/1/users/1", obmUserToJsonString(), HttpVerb.PUT,
 						ImmutableMap.<String, String>of(
-								"domain", "a3443822-bb58-4585-af72-543a287f7c0e", "batchId", "1", "userId", "1"))))
-				.andReturn(batch);
+								"domain", "a3443822-bb58-4585-af72-543a287f7c0e", "batchId", "1", "userId", "1")));
+		expectLastCall();
 		
 		mocksControl.replay();
 		
@@ -84,11 +84,11 @@ public class UserResourceModifyUserTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectBatch();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(batchDao.addOperation(batch,
+		batchDao.addOperation(batch,
 				operation(BatchEntityType.USER, "/batches/1/users/1", obmUserToJsonString(), HttpVerb.PUT,
 						ImmutableMap.<String, String>of(
-								"domain", "a3443822-bb58-4585-af72-543a287f7c0e", "batchId", "1", "userId", "1"))))
-				.andThrow(new DaoException());
+								"domain", "a3443822-bb58-4585-af72-543a287f7c0e", "batchId", "1", "userId", "1")));
+		expectLastCall().andThrow(new DaoException());
 		
 		mocksControl.replay();
 		

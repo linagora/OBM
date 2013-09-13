@@ -51,12 +51,26 @@ import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.utils.ObmHelper;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class OperationDaoJdbcImpl implements OperationDao {
+
+	private static final String FIELDS = 
+			"o.id," +
+			"o.status, " +
+			"o.entity_type, " +
+			"o.timecreate, " +
+			"o.timecommit, " +
+			"o.error, " +
+			"o.resource_path, " +
+			"o.body, " +
+			"o.verb, " +
+			"p.param_key, " +
+			"p.value";
 
 	private final DatabaseConnectionProvider dbcp;
 	private final ObmHelper obmHelper;
@@ -75,15 +89,17 @@ public class OperationDaoJdbcImpl implements OperationDao {
 
 		try {
 			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("SELECT * FROM batch_operation WHERE id = ?");
+			ps = connection.prepareStatement(
+					"SELECT " + FIELDS + " FROM batch_operation o " +
+					"LEFT JOIN batch_operation_param p ON p.operation = o.id " +
+					"WHERE o.id = ? " +
+					"ORDER BY o.id ASC");
 
 			ps.setInt(1, operationId.getId());
 
 			rs = ps.executeQuery();
 
-			if (rs.next()) {
-				return operationFromCursor(rs);
-			}
+			return Iterables.getFirst(operationsFromCursor(rs), null);
 		}
 		catch (SQLException e) {
 			throw new DaoException(e);
@@ -91,8 +107,6 @@ public class OperationDaoJdbcImpl implements OperationDao {
 		finally {
 			JDBCUtils.cleanup(connection, ps, rs);
 		}
-
-		return null;
 	}
 
 	@Override
@@ -100,19 +114,20 @@ public class OperationDaoJdbcImpl implements OperationDao {
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		List<Operation> operations = Lists.newArrayList();
 
 		try {
 			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("SELECT * FROM batch_operation WHERE batch = ? ORDER BY id ASC");
+			ps = connection.prepareStatement(
+					"SELECT " + FIELDS + " FROM batch_operation o " +
+					"LEFT JOIN batch_operation_param p ON p.operation = o.id " +
+					"WHERE o.batch = ? " +
+					"ORDER BY o.id ASC");
 
 			ps.setInt(1, batchId.getId());
 
 			rs = ps.executeQuery();
 
-			while (rs.next()) {
-				operations.add(operationFromCursor(rs));
-			}
+			return operationsFromCursor(rs);
 		}
 		catch (SQLException e) {
 			throw new DaoException(e);
@@ -120,8 +135,6 @@ public class OperationDaoJdbcImpl implements OperationDao {
 		finally {
 			JDBCUtils.cleanup(connection, ps, rs);
 		}
-
-		return operations;
 	}
 
 	@Override
@@ -217,47 +230,65 @@ public class OperationDaoJdbcImpl implements OperationDao {
 		}
 	}
 
-	private Operation operationFromCursor(ResultSet rs) throws SQLException {
-		int operationId = rs.getInt("id");
+	private List<Operation> operationsFromCursor(ResultSet rs) throws SQLException {
+		int operationId = -1;
+		Operation.Builder operationBuilder = null;
+		Request.Builder requestBuilder = null;
+		List<Operation> operations = Lists.newArrayList();
 
-		Request.Builder requestBuilder = Request.builder()
-				.resourcePath(rs.getString("resource_path"))
-				.body(rs.getString("body"))
-				.verb(HttpVerb.valueOf(rs.getString("verb")));
+		while (rs.next()) {
+			int id = rs.getInt("id");
 
+			if (id != operationId) {
+				if (operationBuilder != null && requestBuilder != null) {
+					operations.add(operationBuilder
+							.request(requestBuilder.build())
+							.build());
+				}
+
+				operationId = id;
+				operationBuilder = operationBuilderFromCursor(rs);
+				requestBuilder = requestBuilderFromCursor(rs);
+			} else {
+				String key = rs.getString("param_key");
+
+				if (requestBuilder != null && key != null) {
+					requestBuilder.param(key, rs.getString("value"));
+				}
+			}
+		}
+
+		if (operationBuilder != null && requestBuilder != null) {
+			operations.add(operationBuilder
+					.request(requestBuilder.build())
+					.build());
+		}
+
+		return operations;
+	}
+
+	private Operation.Builder operationBuilderFromCursor(ResultSet rs) throws SQLException {
 		return Operation.builder()
-				.id(Operation.Id.builder().id(operationId).build())
+				.id(Operation.Id.builder().id(rs.getInt("id")).build())
 				.status(BatchStatus.valueOf(rs.getString("status")))
 				.entityType(BatchEntityType.valueOf(rs.getString("entity_type")))
 				.timecreate(JDBCUtils.getDate(rs, "timecreate"))
 				.timecommit(JDBCUtils.getDate(rs, "timecommit"))
-				.error(rs.getString("error"))
-				.request(fetchOperationParameters(operationId, requestBuilder).build())
-				.build();
+				.error(rs.getString("error"));
 	}
 
-	private Request.Builder fetchOperationParameters(Integer operationId, Request.Builder requestBuilder) throws SQLException {
-		Connection connection = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+	private Request.Builder requestBuilderFromCursor(ResultSet rs) throws SQLException {
+		String key = rs.getString("param_key");
+		Request.Builder builder =  Request.builder()
+				.resourcePath(rs.getString("resource_path"))
+				.body(rs.getString("body"))
+				.verb(HttpVerb.valueOf(rs.getString("verb")));
 
-		try {
-			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("SELECT param_key, value FROM batch_operation_param WHERE operation = ?");
-
-			ps.setInt(1, operationId);
-
-			rs = ps.executeQuery();
-
-			while (rs.next()) {
-				requestBuilder.param(rs.getString("param_key"), rs.getString("value"));
-			}
-		}
-		finally {
-			JDBCUtils.cleanup(connection, ps, rs);
+		if (key != null) {
+			builder.param(key, rs.getString("value"));
 		}
 
-		return requestBuilder;
+		return builder;
 	}
 
 }

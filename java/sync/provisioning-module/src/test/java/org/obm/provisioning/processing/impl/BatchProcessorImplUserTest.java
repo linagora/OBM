@@ -428,7 +428,8 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		expect(batchDao.create(isA(Batch.class))).andReturn(batch);
 		expect(batchDao.get(batchId(1), domain)).andReturn(batch);
-		expect(batchDao.addOperation(eq(batch), isA(Operation.class))).andReturn(batch);
+		batchDao.addOperation(eq(batch), isA(Operation.class));
+		expectLastCall();
 		expect(batchDao.get(batchId(1), domain)).andReturn(batch);
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
 		expect(batchDao.get(batchId(1), domain)).andReturn(batch);

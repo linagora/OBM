@@ -178,7 +178,8 @@ public class BatchDaoJdbcImplTest implements H2TestClass {
 		Batch batch = batchBuilder.build();
 
 		batch = dao.create(batch);
-		batch = dao.addOperation(batch, operation);
+
+		dao.addOperation(batch, operation);
 
 		batch = batchBuilder
 				.status(BatchStatus.SUCCESS)
@@ -251,7 +252,9 @@ public class BatchDaoJdbcImplTest implements H2TestClass {
 
 		Batch batch = dao.get(batchId(1), domain);
 
-		assertThat(dao.addOperation(batch, operation).getOperations()).isNotEmpty();
+		dao.addOperation(batch, operation);
+
+		assertThat(dao.get(batch.getId(), domain).getOperations()).isNotEmpty();
 	}
 
 	@Test
@@ -272,7 +275,7 @@ public class BatchDaoJdbcImplTest implements H2TestClass {
 
 		Batch batch = dao.get(batchId(1), domain);
 
-		dao.addOperation(batch, operation).getOperations();
+		dao.addOperation(batch, operation);
 
 		ResultSet rs = db.execute("SELECT COUNT(id) FROM batch_operation");
 

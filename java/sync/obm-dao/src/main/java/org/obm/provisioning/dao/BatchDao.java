@@ -47,6 +47,6 @@ public interface BatchDao {
 
 	void delete(Batch.Id id) throws DaoException, BatchNotFoundException;
 
-	Batch addOperation(Batch batch, Operation operation) throws DaoException, BatchNotFoundException, DomainNotFoundException;
+	void addOperation(Batch batch, Operation operation) throws DaoException, BatchNotFoundException, DomainNotFoundException;
 
 }
