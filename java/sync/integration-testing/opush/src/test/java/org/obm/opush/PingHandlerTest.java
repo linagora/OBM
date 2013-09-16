@@ -150,7 +150,6 @@ public class PingHandlerTest {
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		
-		Stopwatch stopwatch = new Stopwatch().start();
 		Document document = DOMUtils.parse(
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 				"<Ping>" +
@@ -166,6 +165,8 @@ public class PingHandlerTest {
 						"</Folder>" +
 					"</Folders>" +
 				"</Ping>");
+
+		Stopwatch stopwatch = Stopwatch.createStarted();
 		Document response = opClient.postXml("Ping", document, "Ping", null, false);
 		
 		checkExecutionTime(2, 5, stopwatch);
@@ -190,7 +191,7 @@ public class PingHandlerTest {
 		ThreadPoolExecutor threadPoolExecutor = 
 				new ThreadPoolExecutor(20, 20, 1,TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
 
-		Stopwatch stopwatch = new Stopwatch().start();
+		Stopwatch stopwatch = Stopwatch.createStarted();
 		
 		List<Future<Document>> futures = new ArrayList<Future<Document>>();
 		for (int i = 0; i < 4; ++i) {
@@ -214,7 +215,7 @@ public class PingHandlerTest {
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		Document document = buildPingCommand(20);
-		Stopwatch stopwatch = new Stopwatch().start();
+		Stopwatch stopwatch = Stopwatch.createStarted();
 		
 		Document response = opClient.postXml("Ping", document, "Ping", null, false);
 		
@@ -230,7 +231,7 @@ public class PingHandlerTest {
 		opushServer.start();
 
 		Document document = buildPingCommand(20);
-		Stopwatch stopwatch = new Stopwatch().start();
+		Stopwatch stopwatch = Stopwatch.createStarted();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		Document response = opClient.postXml("Ping", document, "Ping", null, false);
@@ -284,7 +285,7 @@ public class PingHandlerTest {
 		opushServer.start();
 		
 		Document document = buildPingCommand(heartbeatInterval);
-		Stopwatch stopwatch = new Stopwatch().start();
+		Stopwatch stopwatch = Stopwatch.createStarted();
 
 		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		Document response = opClient.postXml("Ping", document, "Ping", null, false);
