@@ -47,6 +47,9 @@ CREATE TABLE batch_operation_param
       ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+CREATE INDEX batch_operation_param_operation_idx ON batch_operation_param(operation);
+CREATE INDEX batch_operation_batch_idx ON batch_operation(batch);
+
 ALTER TABLE ONLY userobm ALTER userobm_ext_id TYPE CHARACTER(36);
 
 UPDATE ONLY userobm

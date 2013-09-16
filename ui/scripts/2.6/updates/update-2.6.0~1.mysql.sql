@@ -43,6 +43,9 @@ CREATE TABLE IF NOT EXISTS batch_operation_param
       ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+CREATE INDEX batch_operation_param_operation_idx ON batch_operation_param(operation);
+CREATE INDEX batch_operation_batch_idx ON batch_operation(batch);
+
 UPDATE UserObm
 SET userobm_ext_id = UUID()
 WHERE userobm_ext_id IS NULL;
