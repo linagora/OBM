@@ -43,6 +43,7 @@ import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.address.AddressList;
+import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.stream.Field;
@@ -84,12 +85,22 @@ public class SendEmail {
 				lookForInvitation(part);
 			}
 		} else {
-			if (entity.getMimeType().equalsIgnoreCase("text/calendar")) {
+			if (containsCalendarMethod(entity)) {
 				invitation = true;
 			}
 		}
 	}
 
+	private boolean containsCalendarMethod(Entity entity) {
+		if ("text/calendar".equals(entity.getMimeType())) {
+			String body = entity.getHeader().getField(FieldName.CONTENT_TYPE).getBody();
+			if (body.contains("method")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	protected ByteArrayOutputStream serializeMimeData() {
 		return serializeMimeData(message);
 	}

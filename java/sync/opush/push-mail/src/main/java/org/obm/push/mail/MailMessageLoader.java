@@ -70,6 +70,8 @@ import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 
@@ -201,31 +203,38 @@ public class MailMessageLoader {
 	private Set<MSAttachement> convertMailMessageAttachmentToMSAttachment(MailMessage mailMessage, long uid, 
 			Integer collectionId, long messageId, UserDataRequest udr, String collectionPath) {
 		
+		if (isCalendarOperation(mailMessage)) {
+			return ImmutableSet.of();
+		}
 		Set<MSAttachement> msAttachements = new HashSet<MSAttachement>();
 		for (MailMessageAttachment mailMessageAttachment: mailMessage.getAttachments()) {			
 			
 			IMimePart part = mailMessageAttachment.getPart();
-			if (part != null && !part.isInvitation()) {
-				MSAttachement extractAttachments = extractAttachmentData(part, uid, collectionId, messageId, udr, collectionPath);
-				if (isNotICSAttachments(extractAttachments)) {
-					msAttachements.add(extractAttachments);
-				}
+			if (part != null) {
+				msAttachements.add(extractAttachmentData(part, uid, collectionId, messageId, udr, collectionPath));
 			}
 			
 		}
 		return msAttachements;
 	}
-
-	private boolean isNotICSAttachments(MSAttachement msAttachment) {
-		if (msAttachment != null) {
-			String displayName = msAttachment.getDisplayName();
-			if (displayName != null && !displayName.endsWith(".ics")) {
-				return true;
-			}
-		}
-		return false;
-	}
 	
+	private boolean isCalendarOperation(MailMessage mailMessage) {
+		IMimePart invitation = mailMessage.getInvitation();
+		if (invitation == null) {
+			return false; 
+		}
+		
+		Collection<IMimePart> children = invitation
+			.findRootMimePartInTree()
+			.listLeaves(true, true);
+		return Iterables.any(children, new Predicate<IMimePart>() {
+				@Override
+				public boolean apply(IMimePart input) {
+					return input.containsCalendarMethod();
+				}
+			});
+	}
+
 	private MSAddress convertAdressToMSAddress(Address adress) {
 		if (adress != null) {
 			return new MSAddress(adress.getDisplayName(), adress.getMail());
