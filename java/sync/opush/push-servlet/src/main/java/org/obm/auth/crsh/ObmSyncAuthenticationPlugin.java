@@ -39,8 +39,9 @@ import org.obm.sync.client.login.LoginClient;
 
 import com.google.inject.Inject;
 
-public class ObmSyncAuthenticationPlugin extends CRaSHPlugin<AuthenticationPlugin> implements
-		AuthenticationPlugin {
+@SuppressWarnings("rawtypes")
+public class ObmSyncAuthenticationPlugin extends CRaSHPlugin<AuthenticationPlugin> 
+	implements AuthenticationPlugin<String> {
 
 	private final LoginClient.Factory loginClientFactory;
 
@@ -60,13 +61,18 @@ public class ObmSyncAuthenticationPlugin extends CRaSHPlugin<AuthenticationPlugi
 	}
 	
 	@Override
-	public AuthenticationPlugin getImplementation() {
+	public AuthenticationPlugin<String> getImplementation() {
 		return this;
 	}
 	
 	@Override
 	public String getName() {
 		return "obm-sync";
+	}
+
+	@Override
+	public Class<String> getCredentialType() {
+		return String.class;
 	}
 	
 }
