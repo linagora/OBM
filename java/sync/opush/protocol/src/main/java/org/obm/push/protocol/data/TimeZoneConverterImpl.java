@@ -34,9 +34,7 @@ package org.obm.push.protocol.data;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.obm.push.protocol.bean.ASSystemTime;
@@ -72,7 +70,7 @@ public class TimeZoneConverterImpl implements TimeZoneConverter {
 	private ASSystemTime standardDate(TimeZone timeZone) {
 		DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(timeZone);
 
-		DateMidnight dateMidnight = new DateMidnight(DateTimeUtils.getInstantMillis(null), dateTimeZone);
+		DateTime dateMidnight = new DateTime(dateTimeZone).withTimeAtStartOfDay();
 		
 		long firstDSTTransitionInstant = dateTimeZone.nextTransition(dateMidnight.getMillis());
 		long secondDSTTransitionInstant = dateTimeZone.nextTransition(firstDSTTransitionInstant);
@@ -90,7 +88,7 @@ public class TimeZoneConverterImpl implements TimeZoneConverter {
 	private ASSystemTime dayLightDate(TimeZone timeZone) {
 		DateTimeZone dateTimeZone = DateTimeZone.forTimeZone(timeZone);
 
-		DateMidnight dateMidnight = new DateMidnight(DateTimeUtils.getInstantMillis(null), dateTimeZone);
+		DateTime dateMidnight = new DateTime(dateTimeZone).withTimeAtStartOfDay();
 		
 		long firstDSTTransitionInstant = dateTimeZone.nextTransition(dateMidnight.getMillis());
 		long secondDSTTransitionInstant = dateTimeZone.nextTransition(firstDSTTransitionInstant);

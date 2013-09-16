@@ -214,7 +214,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 			MSEventException msEventException, DateTimeZone timeZone) {
 		Date exceptionStartTime = new DateTime(msEventException.getExceptionStartTime(), DateTimeZone.UTC)
 			.withZone(timeZone)
-			.toDateMidnight()
+			.withTimeAtStartOfDay()
 			.toDateTime()
 			.withZone(DateTimeZone.UTC)
 			.toDate();
