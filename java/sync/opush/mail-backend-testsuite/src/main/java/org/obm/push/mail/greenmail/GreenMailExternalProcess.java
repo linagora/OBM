@@ -97,7 +97,7 @@ public class GreenMailExternalProcess extends JavaExternalProcess {
 
 	private List<String> readProcessOutputLinesUntilStartedTag() throws IOException, InterruptedException {
 		List<String> outputLines = Lists.newArrayList();
-		Stopwatch stopwatch = new Stopwatch().start();
+		Stopwatch stopwatch = Stopwatch.createStarted();
 		do {
 			outputLines.addAll(CharStreams.readLines(readProcessOutput()));
 			if (outputLines.contains(STARTED_TAG)) {
