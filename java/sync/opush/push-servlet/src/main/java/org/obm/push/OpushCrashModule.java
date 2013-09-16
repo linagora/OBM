@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
+import org.crsh.auth.AuthenticationPlugin;
 import org.crsh.plugin.CRaSHPlugin;
 import org.crsh.ssh.SSHPlugin;
 import org.obm.auth.crsh.ObmSyncAuthenticationPlugin;
@@ -96,7 +97,7 @@ public class OpushCrashModule extends AbstractModule {
 	public CrashGuiceConfiguration crashConfiguration(RemoteConsoleConfiguration configuration) {
 		return CrashGuiceConfiguration.builder()
 				.property(SSHPlugin.SSH_PORT.getName(), configuration.port())
-				.property(SSHPlugin.AUTH.getName(), "obm-sync")
+				.property(AuthenticationPlugin.AUTH.getName(), "obm-sync")
 				.build();
 	}
 }

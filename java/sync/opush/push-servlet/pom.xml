@@ -62,12 +62,12 @@
 		<dependency>	
 			<groupId>com.linagora</groupId>
 	        <artifactId>crsh.shell.embed.guice</artifactId>
-	        <version>0.1</version>
+	        <version>0.3</version>
         </dependency>
 		<dependency>
 			<groupId>org.crsh</groupId>
 			<artifactId>crsh.shell.ssh</artifactId>
-			<version>1.2.0-cr9</version>
+			<version>1.2.7</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
