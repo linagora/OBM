@@ -49,6 +49,11 @@ public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 	public final static String TIME_TO_LIVE = "timeToLive";
 	public final static int DEFAULT_TIME_TO_LIVE = 2592000; // One month in seconds 60 * 60 * 24 * 30
 	public final static TransactionalMode TRANSACTIONAL_MODE = TransactionalMode.XA;
+	public final static int DEFAULT_STATS_SAMPLE_COUNT = 10;
+	public final static int DEFAULT_STATS_SHORT_SAMPLE_TIME = 1;
+	public final static int DEFAULT_STATS_MEDIUM_SAMPLE_TIME = 10;
+	public final static int DEFAULT_STATS_LONG_SAMPLE_TIME = 60;
+	public final static int DEFAULT_STATS_SAMPLE_TIME_STOP = 10;
 
 	private static final String configFilePath = "/etc/opush/ehcache_conf.ini";
 	private final IniFile iniFile;
@@ -100,5 +105,30 @@ public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 	@Override
 	public TransactionalMode transactionalMode() {
 		return TRANSACTIONAL_MODE;
+	}
+	
+	@Override
+	public int statsSampleToRecordCount() {
+		return iniFile.getIntValue("statsSampleToRecordCount", DEFAULT_STATS_SAMPLE_COUNT);
+	}
+
+	@Override
+	public int statsSamplingTimeStopInMinutes() {
+		return iniFile.getIntValue("statsSamplingTimeStopInMinutes", DEFAULT_STATS_SAMPLE_TIME_STOP);
+	}
+
+	@Override
+	public int statsShortSamplingTimeInSeconds() {
+		return iniFile.getIntValue("statsShortSamplingTimeInSeconds", DEFAULT_STATS_SHORT_SAMPLE_TIME);
+	}
+
+	@Override
+	public int statsMediumSamplingTimeInSeconds() {
+		return iniFile.getIntValue("statsMediumSamplingTimeInSeconds", DEFAULT_STATS_MEDIUM_SAMPLE_TIME);
+	}
+
+	@Override
+	public int statsLongSamplingTimeInSeconds() {
+		return iniFile.getIntValue("statsLongSamplingTimeInSeconds", DEFAULT_STATS_LONG_SAMPLE_TIME);
 	}
 }

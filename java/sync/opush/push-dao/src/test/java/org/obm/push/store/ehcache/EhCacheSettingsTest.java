@@ -36,10 +36,19 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.config.DiskStoreConfiguration;
 import net.sf.ehcache.config.InvalidConfigurationException;
+import net.sf.ehcache.statistics.extended.ExtendedStatistics.Operation;
+import net.sf.ehcache.statistics.extended.ExtendedStatistics.Statistic;
+import net.sf.ehcache.store.StoreOperationOutcomes.GetOutcome;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -49,6 +58,7 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
+import org.terracotta.statistics.archive.Timestamped;
 
 import bitronix.tm.TransactionManagerServices;
 
@@ -185,5 +195,340 @@ public class EhCacheSettingsTest extends StoreManagerConfigurationTest {
 			TransactionManagerServices.getTransactionManager().shutdown();
 			cacheManager.shutdown();
 		}
+	}
+	
+	@Test
+	public void statsDiskHitRatioWhenNoOperation() {
+		ObjectStoreManager cacheManager = new ObjectStoreManager(configurationService, config, logger);
+		Cache store = cacheManager.createNewStore("storeName");
+		
+		assertThat(store.getStatistics().localDiskHitCount()).isEqualTo(0l);
+		assertThat(store.getStatistics().cacheHitCount()).isEqualTo(0l);
+		cacheManager.shutdown();
+	}
+	
+	@Test
+	public void statsDiskHitRatioWhenMoreWriteThanInMemoryLimit() {
+		int maxElementsInMemory = 3;
+		int untilWriteCount = 10;
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+
+		for (int writeCount = 0; writeCount < untilWriteCount; writeCount ++) {
+			store.put(new Element("a" + writeCount, "b" + writeCount));
+		}
+
+		assertThat(store.getStatistics().localDiskHitCount()).isEqualTo(0l);
+		assertThat(store.getStatistics().cacheHitCount()).isEqualTo(0l);
+		store.getCacheManager().shutdown();
+	}
+	
+	@Test
+	public void statsDiskHitRatioWhenWriteLimitAcceptedInMemory() {
+		int maxElementsInMemory = 3;
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		for (int writeCount = 0; writeCount < maxElementsInMemory; writeCount ++) {
+			store.put(new Element("a" + writeCount, "b" + writeCount));
+		}
+
+		assertThat(store.getStatistics().localDiskHitCount()).isEqualTo(0l);
+		assertThat(store.getStatistics().cacheHitCount()).isEqualTo(0l);
+		store.getCacheManager().shutdown();
+	}
+	
+	@Test
+	public void statsDiskHitRatioWhenReadInMemory() {
+		int maxElementsInMemory = 3;
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		store.put(new Element("a", "b"));
+		for (int readCount = 0; readCount < maxElementsInMemory; readCount ++) {
+			store.get("a");
+		}
+
+		assertThat(store.getStatistics().localDiskHitCount()).isEqualTo(0l);
+		assertThat(store.getStatistics().cacheHitCount()).isEqualTo(maxElementsInMemory);
+		store.getCacheManager().shutdown();
+	}
+	
+	@Test
+	public void statsDiskHitRatioWhenReadInMemoryAndOnDisk() {
+		int maxElementsInMemory = 3;
+		int untilCount = 10;
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		
+		for (int writeCount = 0; writeCount < untilCount; writeCount ++) { 
+			store.put(new Element("a" + writeCount, "b" + writeCount));
+		}
+		for (int readCount = 0; readCount < untilCount; readCount ++) { 
+			store.get("a" + readCount);
+		}
+		
+		Operation<GetOutcome> diskGets = store.getStatistics().getExtended().diskGet();
+		diskGets.setWindow(10, TimeUnit.SECONDS);
+		assertThat(diskGets.component(GetOutcome.HIT).count().value()).isEqualTo(untilCount - maxElementsInMemory);
+		assertThat(store.getStatistics().localDiskHitCount()).isEqualTo(untilCount - maxElementsInMemory);
+		assertThat(store.getStatistics().cacheHitCount()).isEqualTo(untilCount);
+		store.getCacheManager().shutdown();
+	}
+	
+	@Test
+	public void statsDiskHitRatioWhenReadAfterRestart() {
+		int maxElementsInMemory = 3;
+		int untilCount = 5;
+		
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		for (int writeCount = 0; writeCount < untilCount; writeCount ++) {
+			store.put(new Element("a" + writeCount, "b" + writeCount));
+		}
+		store.getCacheManager().shutdown();
+		
+		Cache afterRestartStore = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		for (int readCount = 0; readCount < untilCount; readCount ++) { 
+			assertThat(afterRestartStore.get("a" + readCount).getObjectValue()).isEqualTo("b" + readCount);
+		}
+		
+		assertThat(afterRestartStore.getStatistics().localDiskHitCount()).isEqualTo(untilCount);
+		assertThat(afterRestartStore.getStatistics().cacheHitCount()).isEqualTo(untilCount);
+		afterRestartStore.getCacheManager().shutdown();
+	}
+	
+	@Test
+	public void statsDiskHistoryWhenNoGetInDisk() throws InterruptedException {
+		int maxElementsInMemory = 3;
+		int samplingTime = 100;
+		
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		for (int writeCount = 0; writeCount < maxElementsInMemory; writeCount ++) { 
+			store.put(new Element("a" + writeCount, "b" + writeCount));
+		}
+		
+		Operation<GetOutcome> diskGet = store.getStatistics().getExtended().diskGet();
+		Statistic<Long> diskGetStats = diskGet.component(GetOutcome.HIT).count();
+		diskGet.setHistory(10, samplingTime, TimeUnit.MILLISECONDS);
+		for (int readCount = 0; readCount < maxElementsInMemory; readCount ++) {
+			diskGetStats.history(); // TOUCH TO CONTINUE RECORDING
+			assertThat(store.get("a" + readCount).getObjectValue()).isEqualTo("b" + readCount);
+		}
+		Thread.sleep(samplingTime + 10);
+		
+		try {
+			assertThat(diskGetStats.history()).hasSize(1);
+			assertThat(diskGetStats.history().get(0).getSample()).isEqualTo(0);
+		} finally {
+			store.getCacheManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void statsDiskHistoryWhenGetsFitInOneSample() throws InterruptedException {
+		int maxElementsInMemory = 3;
+		int untilCount = 5;
+		int samplingTime = 100;
+		
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		for (int writeCount = 0; writeCount < untilCount; writeCount ++) { 
+			store.put(new Element("a" + writeCount, "b" + writeCount));
+		}
+		store.getCacheManager().shutdown();
+		
+		Cache afterRestartStore = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		Operation<GetOutcome> diskGet = afterRestartStore.getStatistics().getExtended().diskGet();
+		Statistic<Long> diskGetStats = diskGet.component(GetOutcome.HIT).count();
+		diskGet.setHistory(10, samplingTime, TimeUnit.MILLISECONDS);
+		for (int readCount = 0; readCount < untilCount; readCount ++) {
+			diskGetStats.history(); // TOUCH TO CONTINUE RECORDING
+			assertThat(afterRestartStore.get("a" + readCount).getObjectValue()).isEqualTo("b" + readCount);
+			Thread.sleep(10);
+		}
+		Thread.sleep(samplingTime / 2);
+		
+		List<Timestamped<Long>> history = diskGetStats.history();
+		assertThat(history).hasSize(1);
+		assertThat(history.get(0).getSample()).isEqualTo(untilCount);
+		afterRestartStore.getCacheManager().shutdown();
+	}
+	
+	@Test
+	public void statsDiskHistoryWhenGetsFitInThreeSample() throws InterruptedException {
+		int maxElementsInMemory = 3;
+		int untilCount = 20;
+		int samplingTime = 100;
+		
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		for (int writeCount = 0; writeCount < untilCount; writeCount ++) { 
+			store.put(new Element("a" + writeCount, "b" + writeCount));
+		}
+		store.getCacheManager().shutdown();
+		
+		Cache afterRestartStore = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		Operation<GetOutcome> diskGet = afterRestartStore.getStatistics().getExtended().diskGet();
+		Statistic<Long> diskGetStats = diskGet.component(GetOutcome.HIT).count();
+		diskGet.setHistory(10, samplingTime, TimeUnit.MILLISECONDS);
+		diskGetStats.history(); // TOUCH TO CONTINUE RECORDING
+		for (int readCount = 0; readCount < untilCount; readCount ++) {
+			assertThat(afterRestartStore.get("a" + readCount).getObjectValue()).isEqualTo("b" + readCount);
+			Thread.sleep(11);
+		}
+		Thread.sleep(samplingTime);
+		
+		try {
+			List<Timestamped<Long>> history = diskGetStats.history();
+			assertThat(history).hasSize(3);
+			assertThat(history.get(0).getSample()).isLessThan(10);
+			assertThat(history.get(1).getSample()).isLessThan(untilCount);
+			assertThat(history.get(2).getSample()).isEqualTo(untilCount);
+		} finally {
+			afterRestartStore.getCacheManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void statsDiskHistoryWhenOneDiskHitBySampleTime() throws InterruptedException {
+		int maxElementsInMemory = 3;
+		int untilCount = 5;
+		int samplingTime = 100;
+
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		for (int writeCount = 0; writeCount < untilCount; writeCount ++) { 
+			store.put(new Element("a" + writeCount, "b" + writeCount));
+		}
+		store.getCacheManager().shutdown();
+		
+		Cache afterRestartStore = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		Operation<GetOutcome> diskGet = afterRestartStore.getStatistics().getExtended().diskGet();
+		Statistic<Long> diskGetStats = diskGet.component(GetOutcome.HIT).count();
+		diskGet.setHistory(10, samplingTime, TimeUnit.MILLISECONDS);
+		for (int readCount = 0; readCount < untilCount; readCount ++) {
+			diskGetStats.history(); // TOUCH TO CONTINUE RECORDING
+			assertThat(afterRestartStore.get("a" + readCount).getObjectValue()).isEqualTo("b" + readCount);
+			Thread.sleep(samplingTime);
+		}
+		
+		try {
+			assertThat(diskGetStats.history().get(0).getSample()).isEqualTo(1);
+			assertThat(diskGetStats.history().get(1).getSample()).isEqualTo(2);
+			assertThat(diskGetStats.history().get(2).getSample()).isEqualTo(3);
+			assertThat(diskGetStats.history().get(3).getSample()).isEqualTo(4);
+			assertThat(diskGetStats.history().get(4).getSample()).isEqualTo(5);
+		} finally {
+			afterRestartStore.getCacheManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void statsDiskHistoryWhenHistorySizeIsReached() throws InterruptedException {
+		int maxElementsInMemory = 3;
+		int untilCount = 5;
+		int samplingTime = 100;
+		int historySize = 3;
+
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		for (int writeCount = 0; writeCount < untilCount; writeCount ++) { 
+			store.put(new Element("a" + writeCount, "b" + writeCount));
+		}
+		store.getCacheManager().shutdown();
+		
+		Cache afterRestartStore = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		Operation<GetOutcome> diskGet = afterRestartStore.getStatistics().getExtended().diskGet();
+		Statistic<Long> diskGetStats = diskGet.component(GetOutcome.HIT).count();
+		diskGet.setHistory(historySize, samplingTime, TimeUnit.MILLISECONDS);
+		for (int readCount = 0; readCount < untilCount; readCount ++) {
+			diskGetStats.history(); // TOUCH TO CONTINUE RECORDING
+			assertThat(afterRestartStore.get("a" + readCount).getObjectValue()).isEqualTo("b" + readCount);
+			Thread.sleep(samplingTime);
+		}
+		
+		try {
+			assertThat(diskGetStats.history().get(0).getSample()).isEqualTo(3);
+			assertThat(diskGetStats.history().get(1).getSample()).isEqualTo(4);
+			assertThat(diskGetStats.history().get(2).getSample()).isEqualTo(5);
+		} finally {
+			afterRestartStore.getCacheManager().shutdown();
+		}
+	}
+	
+	@Test
+	public void statsDiskHistoryWhenNoDiskReadInLastSample() throws InterruptedException {
+		int maxElementsInMemory = 5;
+		int samplingTime = 100;
+		int historySize = 3;
+
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		for (int writeCount = 0; writeCount < maxElementsInMemory; writeCount ++) { 
+			store.put(new Element("a" + writeCount, "b" + writeCount));
+		}
+		store.getCacheManager().shutdown();
+		
+		Cache afterRestartStore = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		Operation<GetOutcome> diskGet = afterRestartStore.getStatistics().getExtended().diskGet();
+		Statistic<Long> diskGetStats = diskGet.component(GetOutcome.HIT).count();
+		diskGet.setHistory(historySize, samplingTime, TimeUnit.MILLISECONDS);
+		for (int readCount = 0; readCount < maxElementsInMemory; readCount ++) {
+			diskGetStats.history(); // TOUCH TO CONTINUE RECORDING
+			assertThat(afterRestartStore.get("a" + readCount).getObjectValue()).isEqualTo("b" + readCount);
+			Thread.sleep(samplingTime);
+		}
+		afterRestartStore.get("a0");
+		Thread.sleep(samplingTime);
+		assertThat(diskGetStats.history().size()).isEqualTo(historySize);
+		
+		try {
+			assertThat(diskGetStats.history().get(0).getSample()).isEqualTo(maxElementsInMemory - 1);
+			assertThat(diskGetStats.history().get(1).getSample()).isEqualTo(maxElementsInMemory);
+			assertThat(diskGetStats.history().get(2).getSample()).isEqualTo(maxElementsInMemory);
+		} finally {
+			afterRestartStore.getCacheManager().shutdown();
+		}
+	}
+	
+	@Ignore
+	@Test
+	public void statsDiskHistoryWhenTimeToDisableIsReached() throws InterruptedException {
+		int maxElementsInMemory = 3;
+		int untilCount = 5;
+		int samplingTime = 100;
+		int historySize = 3;
+
+		Cache store = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		for (int writeCount = 0; writeCount < untilCount; writeCount ++) {
+			store.put(new Element("a" + writeCount, "b" + writeCount));
+		}
+		store.getCacheManager().shutdown();
+		
+		Cache afterRestartStore = storeAcceptingXElementsInMemory(maxElementsInMemory);
+		Operation<GetOutcome> diskGet = afterRestartStore.getStatistics().getExtended().diskGet();
+		afterRestartStore.getStatistics().setStatisticsTimeToDisable(samplingTime, TimeUnit.MILLISECONDS);
+		Statistic<Long> diskGetStats = diskGet.component(GetOutcome.HIT).count();
+		diskGet.setHistory(historySize, samplingTime, TimeUnit.MILLISECONDS);
+		for (int readCount = 0; readCount < untilCount; readCount ++) {
+			diskGetStats.history(); // TOUCH TO CONTINUE RECORDING
+			assertThat(afterRestartStore.get("a" + readCount).getObjectValue()).isEqualTo("b" + readCount);
+			Thread.sleep(samplingTime);
+		}
+		afterRestartStore.get("a0");
+		Thread.sleep(samplingTime);
+		assertThat(diskGetStats.history().size()).isEqualTo(historySize);
+		
+		try {
+			assertThat(diskGetStats.history().get(0).getSample()).isEqualTo(untilCount - 1);
+			assertThat(diskGetStats.history().get(1).getSample()).isEqualTo(untilCount);
+			assertThat(diskGetStats.history().get(2).getSample()).isEqualTo(untilCount);
+		} finally {
+			afterRestartStore.getCacheManager().shutdown();
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private Cache storeAcceptingXElementsInMemory(int maxElementsInMemory) {
+		return new CacheManager(new Configuration()
+			.name("manager")
+			.diskStore(new DiskStoreConfiguration().path(configurationService.getDataDirectory()))
+			.updateCheck(false)
+			.cache(new CacheConfiguration()
+				.name("storeName")
+				.maxEntriesLocalHeap(maxElementsInMemory)
+				.overflowToDisk(true)
+				.diskPersistent(true)
+				.eternal(true)))
+			.getCache("storeName");
 	}
 }

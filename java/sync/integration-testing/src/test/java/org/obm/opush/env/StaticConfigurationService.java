@@ -116,6 +116,31 @@ public class StaticConfigurationService implements ConfigurationService {
 		public TransactionalMode transactionalMode() {
 			return TransactionalMode.XA;
 		}
+		
+		@Override
+		public int statsSampleToRecordCount() {
+			return configuration.statsSampleToRecordCount;
+		}
+
+		@Override
+		public int statsShortSamplingTimeInSeconds() {
+			return configuration.statsShortSamplingTimeInSeconds;
+		}
+		
+		@Override
+		public int statsMediumSamplingTimeInSeconds() {
+			return configuration.statsMediumSamplingTimeInSeconds;
+		}
+		
+		@Override
+		public int statsLongSamplingTimeInSeconds() {
+			return configuration.statsLongSamplingTimeInSeconds;
+		}
+
+		@Override
+		public int statsSamplingTimeStopInMinutes() {
+			return configuration.statsSamplingTimeStopInMinutes;
+		}
 	}
 
 	public static class Email implements EmailConfiguration {

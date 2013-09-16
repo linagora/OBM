@@ -31,85 +31,26 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
-
-import org.obm.push.utils.jvm.JvmUtils;
-
-import com.google.common.primitives.Ints;
-
-public class TestingEhCacheConfiguration implements EhCacheConfiguration {
-
-	private int maxMemoryInMB;
-	private Integer percentageAllowedToCache;
-	private long timeToLive;
-
-	public TestingEhCacheConfiguration() {
-		this.percentageAllowedToCache = null;
-		this.maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
-		this.timeToLive = 60;
-	}
-	
-	public TestingEhCacheConfiguration withPercentageAllowedToCache(Integer percentageAllowedToCache) {
-		this.percentageAllowedToCache = percentageAllowedToCache;
-		return this;
-	}
-	
-	public TestingEhCacheConfiguration withMaxMemoryInMB(int maxMemoryInMB) {
-		this.maxMemoryInMB = maxMemoryInMB;
-		return this;
-	}
-
-	public TestingEhCacheConfiguration withTimeToLive(long timeToLive) {
-		this.timeToLive = timeToLive;
-		return this;
-	}
-	
-	@Override
-	public int maxMemoryInMB() {
-		return maxMemoryInMB;
-	}
+public class FakeEhCacheStatistics implements EhCacheStatistics {
 
 	@Override
-	public Percentage percentageAllowedToCache(String cacheName) {
-		if (percentageAllowedToCache == null) {
-			return Percentage.UNDEFINED;
-		}
-		return Percentage.of(percentageAllowedToCache);
-	}
-
-	@Override
-	public long timeToLiveInSeconds() {
-		return timeToLive;
-	}
-
-	@Override
-	public TransactionalMode transactionalMode() {
-		return TransactionalMode.XA;
-	}
-	
-	@Override
-	public int statsSampleToRecordCount() {
-		return 10;
-	}
-
-	@Override
-	public int statsShortSamplingTimeInSeconds() {
+	public int shortTimeDiskGets(String storeName) throws StatisticsNotAvailableException {
 		return 1;
 	}
-	
+
 	@Override
-	public int statsMediumSamplingTimeInSeconds() {
-		return 10;
-	}
-	
-	@Override
-	public int statsLongSamplingTimeInSeconds() {
-		return 60;
+	public int mediumTimeDiskGets(String storeName) throws StatisticsNotAvailableException {
+		return 5;
 	}
 
 	@Override
-	public int statsSamplingTimeStopInMinutes() {
-		return 10;
+	public int longTimeDiskGets(String storeName) throws StatisticsNotAvailableException {
+		throw new StatisticsNotAvailableException();
+	}
+
+	@Override
+	public int memorySizeInBytes(String storeName) {
+		return 600000;
 	}
 
 }

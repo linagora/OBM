@@ -40,8 +40,6 @@ import java.util.List;
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 
-import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
-
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -79,32 +77,8 @@ public class SnapshotDaoEhcacheImplTest {
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManager = new ObjectStoreManager(initConfigurationServiceMock(), createEhCacheConfiguration(), logger);
+		this.objectStoreManager = new ObjectStoreManager(initConfigurationServiceMock(), new MailEhCacheConfiguration(), logger);
 		snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager);
-	}
-
-	private EhCacheConfiguration createEhCacheConfiguration() {
-		return new EhCacheConfiguration() {
-			@Override
-			public int maxMemoryInMB() {
-				return 10;
-			}
-
-			@Override
-			public Percentage percentageAllowedToCache(String cacheName) {
-				return Percentage.UNDEFINED;
-			}
-
-			@Override
-			public long timeToLiveInSeconds() {
-				return 60;
-			}
-
-			@Override
-			public TransactionalMode transactionalMode() {
-				return TransactionalMode.XA;
-			}
-		};
 	}
 	
 	private ConfigurationService initConfigurationServiceMock() throws IOException {

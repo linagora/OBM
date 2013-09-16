@@ -46,6 +46,11 @@ public class Configuration {
 	public static class EhCache {
 		public int maxMemoryInMB = 10;
 		public Percentage percentageAllowedToCache = Percentage.UNDEFINED;
+		public int statsSampleToRecordCount = 10;
+		public int statsShortSamplingTimeInSeconds = 1;
+		public int statsMediumSamplingTimeInSeconds = 10;
+		public int statsLongSamplingTimeInSeconds = 60;
+		public int statsSamplingTimeStopInMinutes = 10;
 	}
 	
 	public static class SyncPerms {

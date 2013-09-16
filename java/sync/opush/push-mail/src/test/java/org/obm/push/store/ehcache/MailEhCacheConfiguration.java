@@ -31,75 +31,52 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
+public class MailEhCacheConfiguration implements EhCacheConfiguration {
+	
+	@Override
+	public int maxMemoryInMB() {
+		return 10;
+	}
 
-@RunWith(SlowFilterRunner.class)
-public class EhCacheConfigurationTest {
+	@Override
+	public Percentage percentageAllowedToCache(String cacheName) {
+		return Percentage.UNDEFINED;
+	}
 
-	@Test
-	public void testPercentageWhenUndefined() {
-		assertThat(Percentage.UNDEFINED.isDefined()).isFalse();
+	@Override
+	public int statsSampleToRecordCount() {
+		return 10;
+	}
+
+	@Override
+	public int statsShortSamplingTimeInSeconds() {
+		return 1;
 	}
 	
-	@Test(expected=IllegalStateException.class)
-	public void testPercentageGetWhenUndefined() {
-		assertThat(Percentage.UNDEFINED.get());
+	@Override
+	public int statsMediumSamplingTimeInSeconds() {
+		return 10;
 	}
 	
-	@Test
-	public void testPercentageWhenZero() {
-		assertThat(Percentage.of(0).isDefined()).isTrue();
-		assertThat(Percentage.of(0).get()).isEqualTo("0%");
-	}
-	
-	@Test
-	public void testPercentageWhenFiftyFive() {
-		assertThat(Percentage.of(55).isDefined()).isTrue();
-		assertThat(Percentage.of(55).get()).isEqualTo("55%");
-	}
-	
-	@Test
-	public void testPercentageGetWhenOneHundred() {
-		assertThat(Percentage.of(100).get()).isEqualTo("100%");
-	}
-	
-	@Test(expected=IllegalStateException.class)
-	public void testCalculateOnUndefined() {
-		Percentage.UNDEFINED.applyTo(5);
+	@Override
+	public int statsLongSamplingTimeInSeconds() {
+		return 60;
 	}
 
-	@Test(expected=IllegalArgumentException.class)
-	public void testCalculateToNegative() {
-		Percentage.of(50).applyTo(-1);
+	@Override
+	public int statsSamplingTimeStopInMinutes() {
+		return 10;
 	}
 
-	@Test
-	public void testCalculateToZero() {
-		assertThat(Percentage.of(25).applyTo(0)).isEqualTo(0);
+	@Override
+	public long timeToLiveInSeconds() {
+		return 60;
 	}
 
-	@Test
-	public void testCalculateWhenZero() {
-		assertThat(Percentage.of(0).applyTo(5000)).isEqualTo(0);
-	}
-
-	@Test
-	public void testCalculateWhenQuart() {
-		assertThat(Percentage.of(25).applyTo(1000)).isEqualTo(250);
-	}
-
-	@Test
-	public void testCalculateWhenRoundedDown() {
-		assertThat(Percentage.of(1).applyTo(10)).isEqualTo(0);
-	}
-
-	@Test
-	public void testCalculateWhenRoundedUp() {
-		assertThat(Percentage.of(99).applyTo(10)).isEqualTo(10);
+	@Override
+	public TransactionalMode transactionalMode() {
+		return TransactionalMode.XA;
 	}
 }

@@ -31,85 +31,25 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
+public interface EhCacheStatistics {
 
-import org.obm.push.utils.jvm.JvmUtils;
+	/**
+	 * @return disk gets count for a short time before this call
+	 */
+	int shortTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
 
-import com.google.common.primitives.Ints;
+	/**
+	 * @return disk gets count for a medium time before this call
+	 */
+	int mediumTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
 
-public class TestingEhCacheConfiguration implements EhCacheConfiguration {
+	/**
+	 * @return disk gets count for a long time before this call
+	 */
+	int longTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
 
-	private int maxMemoryInMB;
-	private Integer percentageAllowedToCache;
-	private long timeToLive;
-
-	public TestingEhCacheConfiguration() {
-		this.percentageAllowedToCache = null;
-		this.maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
-		this.timeToLive = 60;
-	}
-	
-	public TestingEhCacheConfiguration withPercentageAllowedToCache(Integer percentageAllowedToCache) {
-		this.percentageAllowedToCache = percentageAllowedToCache;
-		return this;
-	}
-	
-	public TestingEhCacheConfiguration withMaxMemoryInMB(int maxMemoryInMB) {
-		this.maxMemoryInMB = maxMemoryInMB;
-		return this;
-	}
-
-	public TestingEhCacheConfiguration withTimeToLive(long timeToLive) {
-		this.timeToLive = timeToLive;
-		return this;
-	}
-	
-	@Override
-	public int maxMemoryInMB() {
-		return maxMemoryInMB;
-	}
-
-	@Override
-	public Percentage percentageAllowedToCache(String cacheName) {
-		if (percentageAllowedToCache == null) {
-			return Percentage.UNDEFINED;
-		}
-		return Percentage.of(percentageAllowedToCache);
-	}
-
-	@Override
-	public long timeToLiveInSeconds() {
-		return timeToLive;
-	}
-
-	@Override
-	public TransactionalMode transactionalMode() {
-		return TransactionalMode.XA;
-	}
-	
-	@Override
-	public int statsSampleToRecordCount() {
-		return 10;
-	}
-
-	@Override
-	public int statsShortSamplingTimeInSeconds() {
-		return 1;
-	}
-	
-	@Override
-	public int statsMediumSamplingTimeInSeconds() {
-		return 10;
-	}
-	
-	@Override
-	public int statsLongSamplingTimeInSeconds() {
-		return 60;
-	}
-
-	@Override
-	public int statsSamplingTimeStopInMinutes() {
-		return 10;
-	}
-
+	/**
+	 * @return current heap memory took by the given store, in bytes
+	 */
+	int memorySizeInBytes(String storeName);
 }
