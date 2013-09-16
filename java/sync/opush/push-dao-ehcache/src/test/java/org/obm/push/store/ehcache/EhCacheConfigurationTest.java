@@ -68,4 +68,38 @@ public class EhCacheConfigurationTest {
 		assertThat(Percentage.of(100).get()).isEqualTo("100%");
 	}
 	
+	@Test(expected=IllegalStateException.class)
+	public void testCalculateOnUndefined() {
+		Percentage.UNDEFINED.applyTo(5);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testCalculateToNegative() {
+		Percentage.of(50).applyTo(-1);
+	}
+
+	@Test
+	public void testCalculateToZero() {
+		assertThat(Percentage.of(25).applyTo(0)).isEqualTo(0);
+	}
+
+	@Test
+	public void testCalculateWhenZero() {
+		assertThat(Percentage.of(0).applyTo(5000)).isEqualTo(0);
+	}
+
+	@Test
+	public void testCalculateWhenQuart() {
+		assertThat(Percentage.of(25).applyTo(1000)).isEqualTo(250);
+	}
+
+	@Test
+	public void testCalculateWhenRoundedDown() {
+		assertThat(Percentage.of(1).applyTo(10)).isEqualTo(0);
+	}
+
+	@Test
+	public void testCalculateWhenRoundedUp() {
+		assertThat(Percentage.of(99).applyTo(10)).isEqualTo(10);
+	}
 }

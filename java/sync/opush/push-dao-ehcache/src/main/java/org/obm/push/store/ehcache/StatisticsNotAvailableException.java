@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,35 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import org.obm.push.ContinuationTransactionMap;
-import org.obm.push.store.MonitoredCollectionDao;
-import org.obm.push.store.SnapshotDao;
-import org.obm.push.store.SyncKeysDao;
-import org.obm.push.store.SyncedCollectionDao;
-import org.obm.push.store.UnsynchronizedItemDao;
-import org.obm.push.store.WindowingDao;
-import org.obm.sync.LifecycleListener;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
-
-public class EhCacheDaoModule extends AbstractModule {
-
-	@Override
-	protected void configure() {
-		bind(EhCacheConfiguration.class).to(EhCacheConfigurationFileImpl.class);
-		bind(EhCacheStatistics.class).to(FakeEhCacheStatistics.class);
-
-		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
-		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
-		bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
-		bind(ContinuationTransactionMap.class).to(ContinuationTransactionMapImpl.class);
-		bind(SnapshotDao.class).to(SnapshotDaoEhcacheImpl.class);
-		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
-		bind(SyncKeysDao.class).to(SyncKeysDaoEhcacheImpl.class);
-
-		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		lifecycleListeners.addBinding().to(ObjectStoreManager.class);
-	}
+public class StatisticsNotAvailableException extends Exception {
 
 }
