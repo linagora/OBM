@@ -44,7 +44,7 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 	private long timeToLive;
 
 	public TestingEhCacheConfiguration() {
-		this.percentageAllowedToCache = 10;
+		this.percentageAllowedToCache = null;
 		this.maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
 		this.timeToLive = 60;
 	}
@@ -86,4 +86,30 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 	public TransactionalMode transactionalMode() {
 		return TransactionalMode.XA;
 	}
+	
+	@Override
+	public int statsSampleToRecordCount() {
+		return 10;
+	}
+
+	@Override
+	public int statsShortSamplingTimeInSeconds() {
+		return 1;
+	}
+	
+	@Override
+	public int statsMediumSamplingTimeInSeconds() {
+		return 10;
+	}
+	
+	@Override
+	public int statsLongSamplingTimeInSeconds() {
+		return 60;
+	}
+
+	@Override
+	public int statsSamplingTimeStopInMinutes() {
+		return 10;
+	}
+
 }

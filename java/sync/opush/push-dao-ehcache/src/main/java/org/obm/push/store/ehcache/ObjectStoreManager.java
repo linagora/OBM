@@ -33,6 +33,7 @@ package org.obm.push.store.ehcache;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -41,6 +42,7 @@ import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
 import net.sf.ehcache.config.MemoryUnit;
+import net.sf.ehcache.statistics.StatisticsGateway;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.obm.annotations.transactional.TransactionProvider;
@@ -93,6 +95,17 @@ public class ObjectStoreManager implements LifecycleListener {
 
 		forceInitializeTransactionManager(transactionProvider);
 		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache, dataDirectory));
+		configureCachesStatistics(singletonManager);
+	}
+
+	private void configureCachesStatistics(CacheManager singletonManager2) {
+		for (String cacheName : singletonManager2.getCacheNames()) {
+			StatisticsGateway stats = singletonManager2.getCache(cacheName).getStatistics();
+			stats.setStatisticsTimeToDisable(ehCacheConfiguration.statsSamplingTimeStopInMinutes(), TimeUnit.MINUTES);
+			stats.getExtended().diskGet().setHistory(
+					ehCacheConfiguration.statsSampleToRecordCount(), 
+					EhCacheConfiguration.STATS_SAMPLING_IN_SECONDS, TimeUnit.SECONDS);
+		}
 	}
 
 	private void forceInitializeTransactionManager(TransactionProvider transactionProvider) {

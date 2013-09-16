@@ -179,35 +179,80 @@ public class EhCacheConfigurationFileImplTest {
 	}
 	
 	@Test
-		public void testTimeToLiveInSeconds() {
-			expect(iniFile.getIntValue("timeToLive", EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE)).andReturn(100);
-			expect(iniFile.getStringValue(EhCacheConfigurationFileImpl.TIME_TO_LIVE_UNIT)).andReturn("minutes");
-			expect(timeUnitMapper.getTimeUnitOrDefault("minutes", TimeUnit.SECONDS)).andReturn(TimeUnit.MINUTES);
-			control.replay();
-			
-			assertThat(testee().timeToLiveInSeconds()).isEqualTo(100 * 60);
-			control.verify();
-		}
+	public void testTimeToLiveInSeconds() {
+		expect(iniFile.getIntValue("timeToLive", EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE)).andReturn(100);
+		expect(iniFile.getStringValue(EhCacheConfigurationFileImpl.TIME_TO_LIVE_UNIT)).andReturn("minutes");
+		expect(timeUnitMapper.getTimeUnitOrDefault("minutes", TimeUnit.SECONDS)).andReturn(TimeUnit.MINUTES);
+		control.replay();
+		
+		assertThat(testee().timeToLiveInSeconds()).isEqualTo(100 * 60);
+		control.verify();
+	}
 	
 	@Test
-		public void testTimeToLiveInSecondsWithDefaultValue() {
-			expect(iniFile.getIntValue("timeToLive", EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE)).andReturn(EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE);
-			expect(iniFile.getStringValue(EhCacheConfigurationFileImpl.TIME_TO_LIVE_UNIT)).andReturn("seconds");
-			expect(timeUnitMapper.getTimeUnitOrDefault("seconds", TimeUnit.SECONDS)).andReturn(TimeUnit.SECONDS);
-			control.replay();
-			
-			assertThat(testee().timeToLiveInSeconds()).isEqualTo(EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE);
-			control.verify();
-		}
+	public void testTimeToLiveInSecondsWithDefaultValue() {
+		expect(iniFile.getIntValue("timeToLive", EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE)).andReturn(EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE);
+		expect(iniFile.getStringValue(EhCacheConfigurationFileImpl.TIME_TO_LIVE_UNIT)).andReturn("seconds");
+		expect(timeUnitMapper.getTimeUnitOrDefault("seconds", TimeUnit.SECONDS)).andReturn(TimeUnit.SECONDS);
+		control.replay();
+		
+		assertThat(testee().timeToLiveInSeconds()).isEqualTo(EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE);
+		control.verify();
+	}
 	
 	@Test
-		public void testTimeToLiveInSecondsWithDefaultTimeUnit() {
-			expect(iniFile.getIntValue("timeToLive", EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE)).andReturn(100);
-			expect(iniFile.getStringValue(EhCacheConfigurationFileImpl.TIME_TO_LIVE_UNIT)).andReturn(null);
-			expect(timeUnitMapper.getTimeUnitOrDefault(null, TimeUnit.SECONDS)).andReturn(TimeUnit.SECONDS);
-			control.replay();
-			
-			assertThat(testee().timeToLiveInSeconds()).isEqualTo(100);
-			control.verify();
-		}
+	public void testTimeToLiveInSecondsWithDefaultTimeUnit() {
+		expect(iniFile.getIntValue("timeToLive", EhCacheConfigurationFileImpl.DEFAULT_TIME_TO_LIVE)).andReturn(100);
+		expect(iniFile.getStringValue(EhCacheConfigurationFileImpl.TIME_TO_LIVE_UNIT)).andReturn(null);
+		expect(timeUnitMapper.getTimeUnitOrDefault(null, TimeUnit.SECONDS)).andReturn(TimeUnit.SECONDS);
+		control.replay();
+		
+		assertThat(testee().timeToLiveInSeconds()).isEqualTo(100);
+		control.verify();
+	}
+
+	@Test
+	public void testStatsSampleToRecordCount() {
+		expect(iniFile.getIntValue("statsSampleToRecordCount", 10)).andReturn(5);
+
+		control.replay();
+		assertThat(testee().statsSampleToRecordCount()).isEqualTo(5);
+		control.verify();
+	}
+
+	@Test
+	public void testStatsShortSamplingTimeInSeconds() {
+		expect(iniFile.getIntValue("statsShortSamplingTimeInSeconds", 1)).andReturn(10);
+
+		control.replay();
+		assertThat(testee().statsShortSamplingTimeInSeconds()).isEqualTo(10);
+		control.verify();
+	}
+
+	@Test
+	public void testStatsMediumSamplingTimeInSeconds() {
+		expect(iniFile.getIntValue("statsMediumSamplingTimeInSeconds", 10)).andReturn(100);
+
+		control.replay();
+		assertThat(testee().statsMediumSamplingTimeInSeconds()).isEqualTo(100);
+		control.verify();
+	}
+
+	@Test
+	public void testStatsLongSamplingTimeInSeconds() {
+		expect(iniFile.getIntValue("statsLongSamplingTimeInSeconds", 60)).andReturn(100);
+
+		control.replay();
+		assertThat(testee().statsLongSamplingTimeInSeconds()).isEqualTo(100);
+		control.verify();
+	}
+	
+	@Test
+	public void testStatsSamplingTimeStopInMinutes() {
+		expect(iniFile.getIntValue("statsSamplingTimeStopInMinutes", 10)).andReturn(5);
+		
+		control.replay();
+		assertThat(testee().statsSamplingTimeStopInMinutes()).isEqualTo(5);
+		control.verify();
+	}
 }
