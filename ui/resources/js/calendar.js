@@ -1420,6 +1420,7 @@ Obm.CalendarManager = new Class({
           var eventsToRemove = obm.calendarManager.events.filter(function(evt) {
             return evt.event.entity_id == ivent.entity_id && 
                     evt.event.entity == ivent.entity &&
+                    evt.event.time == parseInt(str[4],10) && 
                     evt.event.id == str[1];
           });
           eventsToRemove.each(function(evt) {
