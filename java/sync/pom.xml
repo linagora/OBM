@@ -60,6 +60,7 @@
 		<cucumber.version>1.1.5</cucumber.version>
 		<shiro.version>1.2.2</shiro.version>
 		<arquillian.jetty.version>6.1.12</arquillian.jetty.version>
+		<arquillian.tomcat.version>1.0.0.CR5</arquillian.tomcat.version>
 		<plugin.jar.version>2.4</plugin.jar.version>
 		<plugin.war.version>2.3</plugin.war.version>
 		<plugin.surefire.version>2.15</plugin.surefire.version>

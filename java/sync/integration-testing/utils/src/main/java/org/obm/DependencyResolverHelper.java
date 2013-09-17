@@ -568,6 +568,8 @@ public class DependencyResolverHelper {
 			.offline()
 			.loadPomFromFile(pomFile)
 			.importRuntimeAndTestDependencies()
+			.resolve()
+			.withTransitivity()
 			.asResolvedArtifact();
 	}
 

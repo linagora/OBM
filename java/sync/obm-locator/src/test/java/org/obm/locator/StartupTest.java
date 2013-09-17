@@ -48,7 +48,6 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
-import org.jboss.shrinkwrap.resolver.api.maven.strategy.AcceptScopesStrategy;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.arquillian.ArtifactFilters;
@@ -82,7 +81,9 @@ public class StartupTest {
 					.resolver()
 					.offline()
 					.loadPomFromClassLoaderResource("pom.xml")
-					.importRuntimeDependencies(new AcceptScopesStrategy(ScopeType.PROVIDED, ScopeType.COMPILE))
+					.importDependencies(ScopeType.PROVIDED, ScopeType.COMPILE)
+					.resolve()
+					.withTransitivity()
 					.asResolvedArtifact()));
 	}
 	
