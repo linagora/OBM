@@ -59,7 +59,10 @@
 		<asm.version>4.1</asm.version>
 		<cucumber.version>1.1.5</cucumber.version>
 		<shiro.version>1.2.2</shiro.version>
+		<version.shrinkwrap.resolvers>2.0.0</version.shrinkwrap.resolvers>
+		<arquillian.version>1.1.1.Final</arquillian.version>
 		<arquillian.jetty.version>6.1.12</arquillian.jetty.version>
+		<arquillian.tomcat.version>1.0.0.CR5</arquillian.tomcat.version>
 		<plugin.jar.version>2.4</plugin.jar.version>
 		<plugin.war.version>2.3</plugin.war.version>
 		<plugin.surefire.version>2.15</plugin.surefire.version>
@@ -358,6 +361,34 @@ org.eclipse.jdt.core.compiler.source=1.6
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.jboss.shrinkwrap.descriptors</groupId>
+				<artifactId>shrinkwrap-descriptors-bom</artifactId>
+				<version>2.0.0-alpha-5</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.shrinkwrap</groupId>
+				<artifactId>shrinkwrap-bom</artifactId>
+				<version>1.2.0</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.shrinkwrap.resolver</groupId>
+				<artifactId>shrinkwrap-resolver-bom</artifactId>
+				<version>${version.shrinkwrap.resolvers}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.arquillian</groupId>
+				<artifactId>arquillian-bom</artifactId>
+				<version>${arquillian.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
 			<dependency>
 				<groupId>org.jboss.arquillian.container</groupId>
 				<artifactId>arquillian-jetty-embedded-6.1</artifactId>
