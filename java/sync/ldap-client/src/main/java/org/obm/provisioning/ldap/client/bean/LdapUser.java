@@ -32,6 +32,7 @@
 package org.obm.provisioning.ldap.client.bean;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Entry;
@@ -44,6 +45,7 @@ import org.obm.provisioning.ldap.client.Configuration;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
@@ -114,6 +116,7 @@ public class LdapUser {
 		private String mailBoxServer;
 		private String mailAccess;
 		private String mail;
+		private ImmutableSet.Builder<String> mailAlias;
 		private boolean hiddenUser;
 		private LdapDomain domain;
 		
@@ -122,6 +125,7 @@ public class LdapUser {
 		@Inject
 		private Builder(Configuration configuration) {
 			this.configuration = configuration;
+			this.mailAlias = ImmutableSet.builder();
 		}
 	
 		public Builder fromObmUser(ObmUser obmUser) {
@@ -159,6 +163,7 @@ public class LdapUser {
 			this.hiddenUser = DEFAULT_HIDDEN_USER;
 			this.domain = LdapDomain.valueOf(obmUser.getDomain().getName());
 			this.mail = obmUser.getEmailAtDomain();
+			this.mailAlias.addAll(obmUser.getEmailAlias());
 			this.loginShell = DEFAULT_LOGIN_SHELL;
 			return this;
 		}
@@ -276,6 +281,11 @@ public class LdapUser {
 			return this;
 		}
 		
+		public Builder mailAlias(Set<String> mailAlias) {
+			this.mailAlias.addAll(mailAlias);
+			return this;
+		}
+		
 		public Builder hiddenUser(boolean hiddenUser) {
 			this.hiddenUser = hiddenUser;
 			return this;
@@ -296,7 +306,7 @@ public class LdapUser {
 	
 			return new LdapUser(configuration.getUserBaseDn(domain), objectClasses, uid, uidNumber, gidNumber, loginShell,
 					cn, displayName, sn, givenName, homeDirectory, userPassword, webAccess,
-					mailBox, mailBoxServer, mailAccess, mail, hiddenUser, domain);
+					mailBox, mailBoxServer, mailAccess, mail, mailAlias.build(), hiddenUser, domain);
 		}
 	}
 	
@@ -317,12 +327,13 @@ public class LdapUser {
 	private final String mailBoxServer;
 	private final String mailAccess;
 	private final String mail;
+	private final Set<String> mailAlias;
 	private final boolean hiddenUser;
 	private final LdapDomain domain;
 	
 	private LdapUser(Dn userBaseDn, String[] objectClasses, Uid uid, int uidNumber, int gidNumber, String loginShell,
 			String cn, String displayName, String sn, String givenName, String homeDirectory, String userPassword, String webAccess,
-			String mailBox, String mailBoxServer, String mailAccess, String mail, boolean hiddenUser, LdapDomain domain) {
+			String mailBox, String mailBoxServer, String mailAccess, String mail, Set<String>mailAlias, boolean hiddenUser, LdapDomain domain) {
 		this.userBaseDn = userBaseDn;
 		this.objectClasses = objectClasses;
 		this.uid = uid;
@@ -340,6 +351,7 @@ public class LdapUser {
 		this.mailBoxServer = mailBoxServer;
 		this.mailAccess = mailAccess;
 		this.mail = mail;
+		this.mailAlias = mailAlias;
 		this.hiddenUser = hiddenUser;
 		this.domain = domain;
 	}
@@ -407,6 +419,10 @@ public class LdapUser {
 	public String getMail() {
 		return mail;
 	}
+	
+	public Set<String> getMailAlias() {
+		return mailAlias;
+	}
 
 	public boolean isHiddenUser() {
 		return hiddenUser;
@@ -421,6 +437,9 @@ public class LdapUser {
 				.dn(buildDn());
 		for (String objectClass: getObjectClasses()) {
 			builder.attribute(Attribute.valueOf("objectClass", objectClass));
+		}
+		for (String mail: mailAlias) {
+			builder.attribute(Attribute.valueOf("MAILALIAS", mail));
 		}
 		LdapEntry ldapEntry = builder
 			.attribute(Attribute.valueOf("uid", uid.get()))
@@ -489,6 +508,14 @@ public class LdapUser {
 		if (!Objects.equal(mail, oldUser.mail)) {
 			mods.add(buildAttributeModification("mail", mail));
 		}
+		if (!Objects.equal(mailAlias, oldUser.mailAlias)) {
+			for (String mail: oldUser.mailAlias) {
+				mods.add(removeAttributeModification("MAILALIAS", mail));
+			}
+			for (String mail: mailAlias) {
+				mods.add(addAttributeModification("MAILALIAS", mail));
+			}
+		}
 		if (!Objects.equal(hiddenUser, oldUser.hiddenUser)) {
 			mods.add(buildAttributeModification("hiddenUser", String.valueOf(hiddenUser).toUpperCase()));
 		}
@@ -503,6 +530,14 @@ public class LdapUser {
 
 		return new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, field, value);
 	}
+	
+	private Modification removeAttributeModification(String field, String value) {
+		return new DefaultModification(ModificationOperation.REMOVE_ATTRIBUTE, field, value);
+	}
+	
+	private Modification addAttributeModification(String field, String value) {
+		return new DefaultModification(ModificationOperation.ADD_ATTRIBUTE, field, value);
+	}
 
 	private org.obm.provisioning.ldap.client.bean.Dn buildDn() {
 		return org.obm.provisioning.ldap.client.bean.Dn.valueOf(
@@ -512,7 +547,7 @@ public class LdapUser {
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(uid, uidNumber, gidNumber, loginShell, cn, displayName, sn, givenName, 
-				homeDirectory, userPassword, webAccess, mailBox, mailBoxServer, mailAccess, mail, hiddenUser, domain);
+				homeDirectory, userPassword, webAccess, mailBox, mailBoxServer, mailAccess, mail, mailAlias, hiddenUser, domain);
 	}
 	
 	@Override
@@ -534,6 +569,7 @@ public class LdapUser {
 				&& Objects.equal(this.mailBoxServer, that.mailBoxServer)
 				&& Objects.equal(this.mailAccess, that.mailAccess)
 				&& Objects.equal(this.mail, that.mail)
+				&& Objects.equal(this.mailAlias, that.mailAlias)
 				&& Objects.equal(this.hiddenUser, that.hiddenUser)
 				&& Objects.equal(this.domain, that.domain);
 		}
@@ -558,6 +594,7 @@ public class LdapUser {
 			.add("mailBoxServer", mailBoxServer)
 			.add("mailAccess", mailAccess)
 			.add("mail", mail)
+			.add("mailAlias", mailAlias)
 			.add("hiddenUser", hiddenUser)
 			.add("obmDomain", domain)
 			.toString();

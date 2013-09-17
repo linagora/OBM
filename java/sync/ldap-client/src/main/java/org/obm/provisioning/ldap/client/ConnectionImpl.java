@@ -126,9 +126,9 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void modifyUser(Uid ldapUser, LdapDomain domain, Modification... modifications) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
+	public void modifyUser(Uid ldapUserId, LdapDomain domain, Modification... modifications) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		try {
-			connection.modify(getUserDnFromUserId(ldapUser, domain), modifications);
+			connection.modify(getUserDnFromUserId(ldapUserId, domain), modifications);
 			incrementAndCheckRequestCounter();
 		} catch (LdapException e) {
 			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);

@@ -65,6 +65,7 @@ import org.opends.server.util.LDIFReader;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -77,6 +78,7 @@ public class ConnectionImplTest {
 	@Inject DirectoryServer directoryServer;
 	@Inject Provider<LdapGroup.Builder> groupBuilderProvider;
 	@Inject Provider<LdapUser.Builder> userBuilderProvider;
+	@Inject Provider<LdapUser.Builder> userBuilderProvider2;
 	@Inject Provider<LdapUserMembership.Builder> groupMemberShipProvider;
 	private ConnectionImpl connection;
 	private LdapDomain ldapDomain;
@@ -202,6 +204,7 @@ public class ConnectionImplTest {
 				.mailBoxServer("lmtp:127.0.0.1:24")
 				.mailAccess("PERMIT")
 				.mail("test@test.obm.org")
+				.mailAlias(ImmutableSet.of("alias1", "alias2"))
 				.hiddenUser(false)
 				.domain(LdapDomain.valueOf("test.obm.org"))
 				.build();
@@ -228,10 +231,84 @@ public class ConnectionImplTest {
 		assertThat(entry.get(new AttributeType("mailboxserver")).getString()).isEqualTo("lmtp:127.0.0.1:24");
 		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
 		assertThat(entry.get(new AttributeType("mail")).getString()).isEqualTo("test@test.obm.org");
+		assertThat(entry.get(new AttributeType("mailalias")).contains("alias1", "alias2")).isTrue();
 		assertThat(entry.get(new AttributeType("hiddenuser")).getString()).isEqualTo("FALSE");
 		assertThat(entry.get(new AttributeType("obmdomain")).getString()).isEqualTo("test.obm.org");
 	}
 
+	@Test
+	public void testModifyUser() throws Exception {
+		LdapUser ldapUser = userBuilderProvider.get()
+				.objectClasses(new String[] {"shadowAccount", "obmUser", "posixAccount", "inetOrgPerson"})
+				.uid(LdapUser.Uid.valueOf("test"))
+				.uidNumber(1008)
+				.gidNumber(1000)
+				.loginShell("/bin/bash")
+				.cn("prenom nom")
+				.displayName("prenom nom")
+				.sn("nom")
+				.givenName("prenom")
+				.homeDirectory("/home/test")
+				.userPassword("password")
+				.webAccess("REJECT")
+				.mailBox("test@test.obm.org")
+				.mailBoxServer("lmtp:127.0.0.1:24")
+				.mailAccess("PERMIT")
+				.mail("test@test.obm.org")
+				.mailAlias(ImmutableSet.of("alias1", "alias2"))
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("test.obm.org"))
+				.build();
+		
+		connection.createUser(ldapUser);
+		
+		LdapUser newLdapUser = userBuilderProvider2.get()
+				.objectClasses(new String[] {"shadowAccount", "obmUser", "posixAccount", "inetOrgPerson"})
+				.uid(LdapUser.Uid.valueOf("test"))
+				.uidNumber(10082)
+				.gidNumber(10002)
+				.loginShell("/bin/bash")
+				.cn("prenom2 nom2")
+				.displayName("prenom2 nom2")
+				.sn("nom2")
+				.givenName("prenom2")
+				.homeDirectory("/home/test2")
+				.userPassword("password2")
+				.webAccess("REJECT")
+				.mailBox("test2@test.obm.org")
+				.mailBoxServer("lmtp:127.0.0.1:24")
+				.mailAccess("PERMIT")
+				.mail("test2@test.obm.org")
+				.mailAlias(ImmutableSet.of("alias0", "alias2", "alias3"))
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("test.obm.org"))
+				.build();
+		
+		connection.modifyUser(ldapUser.getUid(), LdapDomain.valueOf("test.obm.org"), newLdapUser.buildDiffModifications(ldapUser));
+		
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getUserEntry(LdapUser.Uid.valueOf("test"), ldapDomain);
+
+		assertThat(entry.get(new AttributeType("uid")).getString()).isEqualTo("test");
+		assertThat(entry.get(new AttributeType("uidnumber")).getString()).isEqualTo("10082");
+		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("10002");
+		assertThat(entry.get(new AttributeType("loginshell")).getString()).isEqualTo("/bin/bash");
+		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("prenom2 nom2");
+		assertThat(entry.get(new AttributeType("displayname")).getString()).isEqualTo("prenom2 nom2");
+		assertThat(entry.get(new AttributeType("sn")).getString()).isEqualTo("nom2");
+		assertThat(entry.get(new AttributeType("givenname")).getString()).isEqualTo("prenom2");
+		assertThat(entry.get(new AttributeType("homedirectory")).getString()).isEqualTo("/home/test2");
+		assertThat(entry.get(new AttributeType("userpassword")).getBytes()).isNotNull();
+		assertThat(entry.get(new AttributeType("webaccess")).getString()).isEqualTo("REJECT");
+		assertThat(entry.get(new AttributeType("mailbox")).getString()).isEqualTo("test2@test.obm.org");
+		assertThat(entry.get(new AttributeType("mailboxserver")).getString()).isEqualTo("lmtp:127.0.0.1:24");
+		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
+		assertThat(entry.get(new AttributeType("mail")).getString()).isEqualTo("test2@test.obm.org");
+		assertThat(entry.get(new AttributeType("mailalias")).contains("alias0", "alias2", "alias3")).isTrue();
+		assertThat(entry.get(new AttributeType("mailalias")).contains("alias1")).isFalse();
+		assertThat(entry.get(new AttributeType("hiddenuser")).getString()).isEqualTo("FALSE");
+		assertThat(entry.get(new AttributeType("obmdomain")).getString()).isEqualTo("test.obm.org");
+	}
+	
 	@Test
 	public void testDeleteUser() throws Exception {
 		LdapUser ldapUser = userBuilderProvider.get()

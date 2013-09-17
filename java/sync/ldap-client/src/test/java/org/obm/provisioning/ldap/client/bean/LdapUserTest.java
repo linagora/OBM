@@ -13,6 +13,7 @@ import org.obm.provisioning.ldap.client.EmbeddedLdapModule;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -23,6 +24,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 public class LdapUserTest {
 
 	@Inject LdapUser.Builder ldapUserBuilder;
+	@Inject LdapUser.Builder ldapUserBuilder2;
 
 	private ObmUser buildObmUser() {
 		ObmUser obmUser = ObmUser.builder()
@@ -412,6 +414,38 @@ public class LdapUserTest {
 		});
 	}
 
+	@Test
+	public void testBuildMailAliasDiffModifications() {
+		LdapUser user = ldapUserBuilder
+				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.uidNumber(1895)
+				.gidNumber(1066)
+				.cn("Richard Sorge")
+				.domain(LdapDomain.valueOf("gru.gov.ru"))
+				.mailAlias(ImmutableSet.of("alias0", "alias2", "alias3"))
+				.mail("mail")
+				.build();
+		LdapUser newUser = ldapUserBuilder2
+				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.uidNumber(1895)
+				.gidNumber(1066)
+				.cn("Richard Sorge")
+				.domain(LdapDomain.valueOf("gru.gov.ru"))
+				.mail("mail")
+				.mailAlias(ImmutableSet.of("alias1", "alias2"))
+				.build();
+
+		assertThat(newUser.buildDiffModifications(user)).isEqualTo(new Modification[] {
+				new DefaultModification(ModificationOperation.REMOVE_ATTRIBUTE, "MAILALIAS", "alias0"),
+				new DefaultModification(ModificationOperation.REMOVE_ATTRIBUTE, "MAILALIAS", "alias2"),
+				new DefaultModification(ModificationOperation.REMOVE_ATTRIBUTE, "MAILALIAS", "alias3"),
+				new DefaultModification(ModificationOperation.ADD_ATTRIBUTE, "MAILALIAS", "alias1"),
+				new DefaultModification(ModificationOperation.ADD_ATTRIBUTE, "MAILALIAS", "alias2"),
+		});
+	}
+	
 	@Test
 	public void testBuildDiffModificationsWhenNoModifications() {
 		LdapUser user = ldapUserBuilder
