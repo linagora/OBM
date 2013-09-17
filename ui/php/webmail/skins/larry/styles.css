@@ -805,14 +805,14 @@ a.iconlink.upload {
 
 #mainscreen {
 	position: absolute;
-	top: 88px;
+	top: 45px;
 	left: 10px;
 	right: 10px;
 	bottom: 20px;
 }
 
 .minimal #mainscreen {
-	top: 40px;
+	top: 30px;
 }
 
 .minimal #mainscreen.offset {
