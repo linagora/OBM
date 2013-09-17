@@ -31,7 +31,7 @@
 		<easymock.version>3.1</easymock.version>
 		<fest.version>2.0M10</fest.version>
 		<guava.version>15.0</guava.version>
-		<powermock.version>1.5</powermock.version>
+		<powermock.version>1.5.1</powermock.version>
 		<httpclient.version>4.2.4</httpclient.version>
 		<commons-io.version>2.4</commons-io.version>
     	<commons-validator.version>1.4.0</commons-validator.version>
