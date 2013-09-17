@@ -36,20 +36,20 @@ public interface EhCacheStatistics {
 	/**
 	 * @return disk gets count for a short time before this call
 	 */
-	int shortTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
+	long shortTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
 
 	/**
 	 * @return disk gets count for a medium time before this call
 	 */
-	int mediumTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
+	long mediumTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
 
 	/**
 	 * @return disk gets count for a long time before this call
 	 */
-	int longTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
+	long longTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
 
 	/**
 	 * @return current heap memory took by the given store, in bytes
 	 */
-	int memorySizeInBytes(String storeName);
+	long memorySizeInBytes(String storeName);
 }

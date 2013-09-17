@@ -42,11 +42,15 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 	private int maxMemoryInMB;
 	private Integer percentageAllowedToCache;
 	private long timeToLive;
+	private int statsShortSamplingTimeInSeconds;
+	private int statsMediumSamplingTimeInSeconds;
+	private int statsLongSamplingTimeInSeconds;
 
 	public TestingEhCacheConfiguration() {
 		this.percentageAllowedToCache = null;
 		this.maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
 		this.timeToLive = 60;
+		this.statsShortSamplingTimeInSeconds = 1;
 	}
 	
 	public TestingEhCacheConfiguration withPercentageAllowedToCache(Integer percentageAllowedToCache) {
@@ -64,6 +68,21 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 		return this;
 	}
 	
+	public TestingEhCacheConfiguration withStatsShortSamplingTimeInSeconds(int statsShortSamplingTimeInSeconds) {
+		this.statsShortSamplingTimeInSeconds = statsShortSamplingTimeInSeconds;
+		return this;
+	}
+
+	public TestingEhCacheConfiguration withStatsMediumSamplingTimeInSeconds(int statsMediumSamplingTimeInSeconds) {
+		this.statsMediumSamplingTimeInSeconds = statsMediumSamplingTimeInSeconds;
+		return this;
+	}
+	
+	public TestingEhCacheConfiguration withStatsLongSamplingTimeInSeconds(int statsLongSamplingTimeInSeconds) {
+		this.statsLongSamplingTimeInSeconds = statsLongSamplingTimeInSeconds;
+		return this;
+	}
+
 	@Override
 	public int maxMemoryInMB() {
 		return maxMemoryInMB;
@@ -94,17 +113,17 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 
 	@Override
 	public int statsShortSamplingTimeInSeconds() {
-		return 1;
+		return statsShortSamplingTimeInSeconds;
 	}
 	
 	@Override
 	public int statsMediumSamplingTimeInSeconds() {
-		return 10;
+		return statsMediumSamplingTimeInSeconds;
 	}
 	
 	@Override
 	public int statsLongSamplingTimeInSeconds() {
-		return 60;
+		return statsLongSamplingTimeInSeconds;
 	}
 
 	@Override
