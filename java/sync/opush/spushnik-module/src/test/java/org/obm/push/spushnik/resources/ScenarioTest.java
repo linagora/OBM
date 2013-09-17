@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.spushnik.resources;
 
-import static org.fest.assertions.api.Assertions.assertThat;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,18 +38,13 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.spushnik.bean.CheckResult;
 import org.obm.push.spushnik.bean.Credentials;
 import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.Pkcs12HttpClientBuilder;
-import org.obm.sync.push.client.PoolingHttpClientBuilder;
-import org.obm.sync.push.client.SSLHttpClientBuilder;
 
 @RunWith(SlowFilterRunner.class)
 public class ScenarioTest {
 
 	private Scenario testee;
 	private Credentials noCertificateCredentials;
-	private Credentials pkcs12CertificateCredentials;
 	private String httpServiceUrl;
-	private String httpsServiceUrl;
 
 	@Before
 	public void setUp() {
@@ -66,50 +59,19 @@ public class ScenarioTest {
 				.password("pwd")
 				.build();
 		
-		pkcs12CertificateCredentials = Credentials.builder()
-				.loginAtDomain("user@domain")
-				.password("pwd")
-				.pkcs12(new byte[]{1, 2, 3, 4})
-				.pkcs12Password("pkcs12Password")
-				.build();
 		httpServiceUrl = "http://localhost";
-		httpsServiceUrl = "https://localhost";
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testChooseHttpClientWhenNullCredentials() {
 		Credentials credentials = null;
-		testee.chooseHttpClientBuilder(credentials, httpServiceUrl);
+		testee.chooseHttpClient(credentials, httpServiceUrl);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testChooseHttpClientWhenNullUrl() {
 		String serviceUrl = null;
-		testee.chooseHttpClientBuilder(noCertificateCredentials, serviceUrl);
-	}
-	
-	@Test
-	public void testChooseHttpClientWhenHttpServiceAndNoCertificateCredentials() {
-		assertThat(testee.chooseHttpClientBuilder(noCertificateCredentials, httpServiceUrl))
-			.isExactlyInstanceOf(PoolingHttpClientBuilder.class);
-	}
-	
-	@Test
-	public void testChooseHttpClientWhenHttpServiceAndClientCertificateCredentials() {
-		assertThat(testee.chooseHttpClientBuilder(pkcs12CertificateCredentials, httpServiceUrl))
-		.isExactlyInstanceOf(PoolingHttpClientBuilder.class);
-	}
-	
-	@Test
-	public void testChooseHttpClientWhenHttpsServiceAndNoCertificateCredentials() {
-		assertThat(testee.chooseHttpClientBuilder(noCertificateCredentials, httpsServiceUrl))
-			.isExactlyInstanceOf(SSLHttpClientBuilder.class);
-	}
-	
-	@Test
-	public void testChooseHttpClientWhenHttpsServiceAndClientCertificateCredentials() {
-		assertThat(testee.chooseHttpClientBuilder(pkcs12CertificateCredentials, httpsServiceUrl))
-			.isExactlyInstanceOf(Pkcs12HttpClientBuilder.class);
+		testee.chooseHttpClient(noCertificateCredentials, serviceUrl);
 	}
 	
 }

@@ -36,6 +36,8 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 
 import org.apache.http.Header;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -62,15 +64,18 @@ public class OptionsHandlerTest {
 	@Inject	OpushServer opushServer;
 	@Inject IMocksControl mocksControl;
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	private CloseableHttpClient httpClient;
 
 	@Before
 	public void init() {
 		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
+		httpClient = HttpClientBuilder.create().build();
 	}
 	
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
+		httpClient.close();
 	}
 	
 	@Test
@@ -78,7 +83,7 @@ public class OptionsHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		
-		OPClient opClient = buildWBXMLOpushClient(user.jaures, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user.jaures, opushServer.getPort(), httpClient);
 		OptionsResponse options = opClient.options();
 		
 		assertThat(Iterables.tryFind(options.getHeaders(), new Predicate<Header>() {

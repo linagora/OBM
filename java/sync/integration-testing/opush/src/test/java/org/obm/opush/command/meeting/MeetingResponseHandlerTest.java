@@ -45,6 +45,8 @@ import java.util.Date;
 import javax.xml.transform.TransformerException;
 
 import org.apache.http.HttpStatus;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
@@ -114,9 +116,11 @@ public class MeetingResponseHandlerTest {
 	private int meetingItemId;
 	private int invitationCollectionId;
 	private int invitationItemId;
+	private CloseableHttpClient httpClient;
 
 	@Before
 	public void setUp() {
+		httpClient = HttpClientBuilder.create().build();
 		meetingCollectionId = 2;
 		meetingItemId = 8;
 		invitationCollectionId = 5;
@@ -128,6 +132,7 @@ public class MeetingResponseHandlerTest {
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
+		httpClient.close();
 		Files.delete(configuration.dataDir);
 	}
 
@@ -282,7 +287,7 @@ public class MeetingResponseHandlerTest {
 	private Document postMeetingAcceptedResponse()
 			throws TransformerException, WBXmlException, IOException, HttpRequestException, SAXException  {
 		
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
 		Document document = buildMeetingAcceptedResponse();
 
 		Document serverResponse = opClient.postXml("MeetingResponse", document, "MeetingResponse");

@@ -29,13 +29,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Comparator;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.After;
 import org.junit.Before;
 import org.obm.Configuration;
 import org.obm.configuration.ConfigurationService;
@@ -63,19 +67,28 @@ public abstract class ObmSyncIntegrationTest {
 	protected LoginClient loginClient;
 	protected CalendarClient calendarClient;
 	protected BookClient bookClient;
-	protected HttpClient httpClient;
+	protected CloseableHttpClient httpClient;
 	protected Locator locator;
 	protected SyncClientException exceptionFactory;
 	protected Logger logger;
+	protected BasicCookieStore cookieStore;
 
 	@Before
 	public void setUp() {
 		logger = LoggerFactory.getLogger(ObmSyncIntegrationTest.class);
 		configuration = new ObmSyncConfiguration(new Configuration(), new Configuration.ObmSync());
 		exceptionFactory = new SyncClientException();
-		httpClient = new DefaultHttpClient();
+		cookieStore = new BasicCookieStore();
+		httpClient = HttpClientBuilder.create()
+				.setDefaultCookieStore(cookieStore)
+				.build();
 	}
 
+	@After
+	public void teardown() throws IOException {
+		httpClient.close();
+	}
+	
 	protected void configureTest(URL baseUrl) {
 		LocatorService locatorService = arquillianLocatorService(baseUrl);
 		locator = new Locator(configuration, locatorService) {};

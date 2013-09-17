@@ -46,6 +46,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.fest.util.Files;
@@ -117,9 +119,11 @@ public class MailBackendGetItemEstimateTest {
 	private String inboxCollectionPath;
 	private int inboxCollectionId;
 	private String inboxCollectionIdAsString;
+	private CloseableHttpClient httpClient;
 
 	@Before
 	public void init() throws Exception {
+		httpClient = HttpClientBuilder.create().build();
 		user = singleUserFixture.jaures;
 		greenMail.start();
 		smtpServerSetup = greenMail.getSmtp().getServerSetup();
@@ -175,7 +179,7 @@ public class MailBackendGetItemEstimateTest {
 		mocksControl.replay();
 		
 		opushServer.start();
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		sendTwoEmailsToImapServer();
 		GetItemEstimateSingleFolderResponse itemEstimateResponse = opClient.getItemEstimateOnMailFolder(invalidSyncKey, inboxCollectionId);
 
@@ -211,7 +215,7 @@ public class MailBackendGetItemEstimateTest {
 		mocksControl.replay();
 
 		opushServer.start();
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		sendTwoEmailsToImapServer();
 		opClient.syncEmail(decoder, initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		opClient.syncEmail(decoder, firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
@@ -257,7 +261,7 @@ public class MailBackendGetItemEstimateTest {
 		mocksControl.replay();
 
 		opushServer.start();
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		sendTwoEmailsToImapServer();
 		opClient.syncEmail(decoder, initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
 		opClient.syncEmail(decoder, firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
@@ -303,7 +307,7 @@ public class MailBackendGetItemEstimateTest {
 		mocksControl.replay();
 
 		opushServer.start();
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		sendTwoEmailsToImapServer();
 		opClient.syncEmail(decoder, initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		opClient.syncEmail(decoder, firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);

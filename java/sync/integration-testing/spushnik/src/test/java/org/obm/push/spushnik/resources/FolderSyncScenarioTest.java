@@ -44,7 +44,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -83,12 +84,13 @@ public class FolderSyncScenarioTest {
 	@Inject Configuration configuration;
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
-	private DefaultHttpClient httpClient;
+	private CloseableHttpClient httpClient;
 
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
 		Files.delete(configuration.dataDir);
+		httpClient.close();
 	}
 	
 	@Before
@@ -97,7 +99,7 @@ public class FolderSyncScenarioTest {
 		SpushnikScenarioTestUtils.mockWorkingFolderSync(classToInstanceMap, singleUserFixture.jaures);
 		mocksControl.replay();
 		opushServer.start();
-		httpClient = new DefaultHttpClient();
+		httpClient = HttpClientBuilder.create().build();
 	}
 	
 	@Test

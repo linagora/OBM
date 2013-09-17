@@ -37,13 +37,16 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -105,6 +108,7 @@ public class ContactsBackendHierarchyChangesTest {
 	private BackendWindowingService backendWindowingService;
 	private ClientIdService clientIdService;
 	private ContactsBackend contactsBackend;
+	private CloseableHttpClient httpClient;
 
 	@Before
 	public void setUp() {
@@ -112,6 +116,7 @@ public class ContactsBackendHierarchyChangesTest {
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
 		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
 		accessToken = new AccessToken(0, "OBM");
+		httpClient = HttpClientBuilder.create().build();
 		
 		mocks = createControl();
 		AccessTokenResource accessTokenResource = mocks.createMock(AccessTokenResource.class);
@@ -119,8 +124,7 @@ public class ContactsBackendHierarchyChangesTest {
 			.andReturn(accessToken).anyTimes();
 		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
 		HttpClientResource httpClientResource = mocks.createMock(HttpClientResource.class);
-		expect(httpClientResource.getHttpClient())
-			.andReturn(new DefaultHttpClient()).anyTimes();
+		expect(httpClientResource.getHttpClient()).andReturn(httpClient).anyTimes();
 		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
 		contactParentId = 0;
 		contactParentIdAsString = String.valueOf(contactParentId);
@@ -144,6 +148,11 @@ public class ContactsBackendHierarchyChangesTest {
 				clientIdService);
 	}
 
+	@After
+	public void teardown() throws IOException {
+		httpClient.close();
+	}
+	
 	private ContactConfiguration publicContactConfiguration() {
 		return new ContactConfiguration() {
 			@Override

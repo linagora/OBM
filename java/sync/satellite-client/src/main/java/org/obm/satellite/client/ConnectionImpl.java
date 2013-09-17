@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
@@ -91,7 +92,6 @@ public class ConnectionImpl implements Connection {
 
 	@Override
 	public void shutdown() throws ConnectionException {
-		client.getConnectionManager().shutdown();
 	}
 
 	private void post(String hostName, String host, String path) {
@@ -101,10 +101,11 @@ public class ConnectionImpl implements Connection {
 			.setHost(host)
 			.setPort(configuration.getSatellitePort())
 			.setPath(String.format(path, hostName))
-			.setUserInfo(configuration.getUsername(), configuration.getPassword())
 			.build();
 			StatusLine statusLine = Executor
 					.newInstance(client)
+					.authPreemptive(new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme()))
+					.auth(configuration.getUsername(), configuration.getPassword())
 					.execute(Request.Post(uri))
 					.returnResponse()
 					.getStatusLine();
