@@ -33,4 +33,12 @@ package org.obm.push.store.ehcache;
 
 public class StatisticsNotAvailableException extends Exception {
 
+	public StatisticsNotAvailableException() {
+		super();
+	}
+	
+	public StatisticsNotAvailableException(String msg) {
+		super(msg);
+	}
+
 }

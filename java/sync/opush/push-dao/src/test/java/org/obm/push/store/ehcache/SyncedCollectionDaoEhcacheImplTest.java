@@ -37,7 +37,6 @@ import java.io.IOException;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -55,6 +54,7 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.slf4j.Logger;
 
+import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -63,25 +63,25 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 	private ObjectStoreManager objectStoreManager;
 	private SyncedCollectionDaoEhcacheImpl syncedCollectionStoreServiceImpl;
 	private Credentials credentials;
-	private TransactionManager transactionManager;
+	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
-		this.transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		EhCacheConfiguration config = new TestingEhCacheConfiguration();
 		this.objectStoreManager = new ObjectStoreManager(super.mockConfigurationService(), config, logger);
 		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");
+		this.transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 	}
 	
 	@After
-	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		transactionManager.rollback();
+	public void cleanup() throws Exception {
+		transactionManager.commit();
+		transactionManager.shutdown();
 		objectStoreManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

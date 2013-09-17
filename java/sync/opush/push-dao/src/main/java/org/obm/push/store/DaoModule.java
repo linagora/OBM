@@ -34,7 +34,7 @@ package org.obm.push.store;
 import org.obm.push.store.ehcache.EhCacheConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfigurationFileImpl;
 import org.obm.push.store.ehcache.EhCacheStatistics;
-import org.obm.push.store.ehcache.FakeEhCacheStatistics;
+import org.obm.push.store.ehcache.EhCacheStatisticsImpl;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
@@ -64,7 +64,7 @@ public class DaoModule extends AbstractModule{
 		bind(FolderSnapshotDao.class).to(FolderSnapshotDaoJdbcImpl.class);
 		bind(DateProvider.class).to(TransactionDateProvider.class);
 		bind(EhCacheConfiguration.class).to(EhCacheConfigurationFileImpl.class);
-		bind(EhCacheStatistics.class).to(FakeEhCacheStatistics.class);
+		bind(EhCacheStatistics.class).to(EhCacheStatisticsImpl.class);
 	}
 
 }
