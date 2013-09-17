@@ -471,12 +471,12 @@ org.eclipse.jdt.core.compiler.source=1.6
 			<dependency>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-continuation</artifactId>
-				<version>7.6.10.v20130312</version>
+				<version>7.6.12.v20130726</version>
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-http</artifactId>
-				<version>7.6.10.v20130312</version>
+				<version>7.6.12.v20130726</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mortbay.jetty</groupId>
