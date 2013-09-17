@@ -54,7 +54,7 @@
 		<resteasy.version>3.0.4.Final</resteasy.version>
 		<scala.version>2.9.3</scala.version>
 		<scala-maven-plugin.version>3.1.0</scala-maven-plugin.version>
-		<gatling.version>1.5.1</gatling.version>
+		<gatling.version>1.5.2</gatling.version>
 		<cglib.version>3.0</cglib.version>
 		<asm.version>4.1</asm.version>
 		<cucumber.version>1.1.5</cucumber.version>
