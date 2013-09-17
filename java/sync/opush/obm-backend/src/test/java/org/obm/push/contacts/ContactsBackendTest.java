@@ -37,6 +37,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -47,8 +48,10 @@ import javax.naming.NoPermissionException;
 import net.fortuna.ical4j.util.Strings;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -120,6 +123,7 @@ public class ContactsBackendTest {
 	private ClientIdService clientIdService;
 	private AccessToken token;
 	private ContactsBackend contactsBackend;
+	private CloseableHttpClient httpClient;
 	
 	@Before
 	public void setUp() {
@@ -127,6 +131,7 @@ public class ContactsBackendTest {
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
 		token = new AccessToken(0, "OBM");
 		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		httpClient = HttpClientBuilder.create().build();
 		
 		mocks = createControl();
 		AccessTokenResource accessTokenResource = mocks.createMock(AccessTokenResource.class);
@@ -134,8 +139,7 @@ public class ContactsBackendTest {
 			.andReturn(token).anyTimes();
 		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
 		HttpClientResource httpClientResource = mocks.createMock(HttpClientResource.class);
-		expect(httpClientResource.getHttpClient())
-			.andReturn(new DefaultHttpClient()).anyTimes();
+		expect(httpClientResource.getHttpClient()).andReturn(httpClient).anyTimes();
 		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
 		
 		mappingService = mocks.createMock(MappingService.class);
@@ -153,6 +157,11 @@ public class ContactsBackendTest {
 				collectionPathBuilderProvider, backendWindowingService, clientIdService);
 		
 		expectDefaultAddressAndParentForContactConfiguration();
+	}
+	
+	@After
+	public void teardown() throws IOException {
+		httpClient.close();
 	}
 	
 	@Test

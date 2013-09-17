@@ -43,6 +43,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
@@ -62,16 +63,16 @@ public class WBXMLOPClient extends OPClient {
 
 	private final WBXMLTools wbxmlTools;
 	
-	public WBXMLOPClient(String loginAtDomain, String password,
+	public WBXMLOPClient(HttpClient httpClient, String loginAtDomain, String password,
 			DeviceId devId, String devType, String userAgent, String serverAddress, int port, String webApp, WBXMLTools wbxmlTools, ProtocolVersion protocolVersion) {
 
-		this(new PoolingHttpClientBuilder(), loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(serverAddress, port, webApp), wbxmlTools, protocolVersion);
+		this(httpClient, loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(serverAddress, port, webApp), wbxmlTools, protocolVersion);
 	}
 
-	public WBXMLOPClient(HttpClientBuilder httpClientBuilder, String loginAtDomain, String password,
+	public WBXMLOPClient(HttpClient httpClient, String loginAtDomain, String password,
 			DeviceId devId, String devType, String userAgent, String serviceUrl, WBXMLTools wbxmlTools, ProtocolVersion protocolVersion) {
 
-		super(httpClientBuilder, loginAtDomain, password, devId, devType, userAgent, serviceUrl, protocolVersion);
+		super(httpClient, loginAtDomain, password, devId, devType, userAgent, serviceUrl, protocolVersion);
 		this.wbxmlTools = wbxmlTools;
 	}
 	

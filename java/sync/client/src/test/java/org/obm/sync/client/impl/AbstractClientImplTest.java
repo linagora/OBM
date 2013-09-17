@@ -48,7 +48,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -78,7 +79,7 @@ public class AbstractClientImplTest {
 	private IMocksControl control;
 	private SyncClientException syncClientException;
 	private Logger logger;
-	private DefaultHttpClient defaultHttpClient;
+	private CloseableHttpClient httpClient;
 	private Locator locator;
 	private TestClient client;
 	private int serverPort;
@@ -91,8 +92,8 @@ public class AbstractClientImplTest {
 		syncClientException = control.createMock(SyncClientException.class);
 		logger = control.createMock(Logger.class);
 		locator = control.createMock(Locator.class);
-		defaultHttpClient = new DefaultHttpClient();
-		client = new TestClient(syncClientException, logger, defaultHttpClient);
+		httpClient = HttpClientBuilder.create().build();
+		client = new TestClient(syncClientException, logger, httpClient);
 		
 		testServlet = new TestServlet();
 		server = new Server(0);
@@ -109,7 +110,7 @@ public class AbstractClientImplTest {
 	@After
 	public void shutdown() throws Exception {
 		server.stop();
-		defaultHttpClient.getConnectionManager().shutdown();
+		httpClient.close();
 	}
 	
 	@Test

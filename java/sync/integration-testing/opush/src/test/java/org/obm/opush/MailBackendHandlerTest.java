@@ -45,6 +45,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.fest.util.Files;
@@ -123,9 +125,11 @@ public class MailBackendHandlerTest {
 	private GreenMailUser greenMailUser;
 	private ImapHostManager imapHostManager;
 	private OpushUser user;
+	private CloseableHttpClient httpClient;
 
 	@Before
 	public void init() throws AuthorizationException, FolderException {
+		httpClient = HttpClientBuilder.create().build();
 		user = singleUserFixture.jaures;
 		greenMail.start();
 		smtpServerSetup = greenMail.getSmtp().getServerSetup();
@@ -141,6 +145,7 @@ public class MailBackendHandlerTest {
 	public void shutdown() throws Exception {
 		opushServer.stop();
 		greenMail.stop();
+		httpClient.close();
 		Files.delete(configuration.dataDir);
 	}
 
@@ -177,7 +182,7 @@ public class MailBackendHandlerTest {
 		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject2", "body", smtpServerSetup);
 		greenMail.waitForIncomingEmail(2);
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
 		opClient.deleteEmail(decoder, syncEmailSyncKey, serverId, serverId + syncEmailId);
 
 		assertEmailCountInMailbox(EmailConfiguration.IMAP_INBOX_NAME, 1);

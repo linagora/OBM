@@ -39,6 +39,8 @@ import java.util.Locale;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.fest.assertions.api.Assertions;
 import org.fest.util.Files;
@@ -78,15 +80,18 @@ public class AutodiscoverHandlerTest {
 	@Inject IMocksControl mocksControl;
 	@Inject Configuration configuration;
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
+	private CloseableHttpClient httpClient;
 	
 	@Before
 	public void init() {
+		httpClient = HttpClientBuilder.create().build();
 		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 	
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
+		httpClient.close();
 		Files.delete(configuration.dataDir);
 	}
 
@@ -98,7 +103,7 @@ public class AutodiscoverHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 
-		OPClient opClient = IntegrationTestUtils.buildOpushClient(singleUserFixture.jaures, opushServer.getPort());
+		OPClient opClient = IntegrationTestUtils.buildOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
 		
 		String emailAddress = singleUserFixture.jaures.user.getEmail();
 		Document document = opClient.postXml("Autodiscover", buildAutodiscoverCommand(emailAddress), "Autodiscover", null, false);

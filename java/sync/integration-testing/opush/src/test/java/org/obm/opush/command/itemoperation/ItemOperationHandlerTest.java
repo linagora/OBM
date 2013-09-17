@@ -39,6 +39,8 @@ import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
@@ -97,6 +99,7 @@ public class ItemOperationHandlerTest {
 	private String mailbox;
 	private String inboxCollectionPath;
 	private int inboxCollectionId;
+	private CloseableHttpClient httpClient;
 
 	@Before
 	public void init() throws Exception {
@@ -106,6 +109,7 @@ public class ItemOperationHandlerTest {
 		greenMailUser = greenMail.setUser(mailbox, user.password);
 		imapHostManager = greenMail.getManagers().getImapHostManager();
 		imapHostManager.createMailbox(greenMailUser, "Trash");
+		httpClient = HttpClientBuilder.create().build();
 
 		inboxCollectionPath = IntegrationTestUtils.buildEmailInboxCollectionPath(user);
 		inboxCollectionId = 1234;
@@ -126,6 +130,7 @@ public class ItemOperationHandlerTest {
 		opushServer.stop();
 		greenMail.stop();
 		Files.delete(configuration.dataDir);
+		httpClient.close();
 	}
 
 	@Test
@@ -137,7 +142,7 @@ public class ItemOperationHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		sendEmailsToImapServer("email body data");
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		ItemOperationResponse itemOperationFetch = opClient.itemOperationFetch(inboxCollectionId, inboxCollectionId + emailId1);
 		mocksControl.verify();
 
@@ -164,7 +169,7 @@ public class ItemOperationHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		sendEmailsToImapServer("email body data");
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		ItemOperationResponse itemOperationFetch = opClient.itemOperationFetch(
 				inboxCollectionId, MSEmailBodyType.HTML, inboxCollectionId + emailId1);
 		mocksControl.verify();
@@ -193,7 +198,7 @@ public class ItemOperationHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		sendEmailsToImapServer("email body data");
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		ItemOperationResponse itemOperationFetch = opClient.itemOperationFetch(
 				inboxCollectionId, MSEmailBodyType.MIME, inboxCollectionId + emailId1);
 		mocksControl.verify();
@@ -228,7 +233,7 @@ public class ItemOperationHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		sendEmailsToImapServer("email body data", "email 2 body data");
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		opClient.itemOperationFetch(inboxCollectionId, inboxCollectionId + emailId1);
 		ItemOperationResponse itemOperationFetch = opClient.itemOperationFetch(inboxCollectionId, inboxCollectionId + emailId2);
 		mocksControl.verify();
@@ -258,7 +263,7 @@ public class ItemOperationHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		sendEmailsToImapServer("email body data", "email 2 body data");
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		opClient.itemOperationFetch(inboxCollectionId, inboxCollectionId + emailId1);
 		ItemOperationResponse itemOperationFetch = opClient.itemOperationFetch(inboxCollectionId,
 				inboxCollectionId + emailId1,

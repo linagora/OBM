@@ -42,6 +42,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
@@ -89,16 +91,19 @@ public class ProvisionHandlerTest {
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 
 	private List<OpushUser> fakeTestUsers;
+	private CloseableHttpClient httpClient;
 
 	@Before
 	public void init() {
 		fakeTestUsers = Arrays.asList(singleUserFixture.jaures);
+		httpClient = HttpClientBuilder.create().build();
 	}
 		
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
 		Files.delete(configuration.dataDir);
+		httpClient.close();
 	}
 
 	@Test
@@ -118,7 +123,7 @@ public class ProvisionHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		ProvisionResponse provisionResponse = opClient.provisionStepOne();
 
 		assertOnProvisionResponseSendPolicy(nextPolicyKeyGenerated, provisionResponse);
@@ -140,7 +145,7 @@ public class ProvisionHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), ProtocolVersion.V121);
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), ProtocolVersion.V121, httpClient);
 		ProvisionResponse provisionResponse = opClient.provisionStepOne();
 
 		XMLAssert.assertXMLEqual(DOMUtils.createDocFromElement(provisionResponse.getPolicyDataEl()), DOMUtils.parse(
@@ -209,7 +214,7 @@ public class ProvisionHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), ProtocolVersion.V121);
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), ProtocolVersion.V121, httpClient);
 		ProvisionResponse provisionResponse = opClient.provisionStepOne();
 
 		XMLAssert.assertXMLEqual(DOMUtils.createDocFromElement(provisionResponse.getPolicyDataEl()), DOMUtils.parse(
@@ -280,7 +285,7 @@ public class ProvisionHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), ProtocolVersion.V120);
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), ProtocolVersion.V120, httpClient);
 		ProvisionResponse provisionResponse = opClient.provisionStepOne();
 
 		XMLAssert.assertXMLEqual(DOMUtils.createDocFromElement(provisionResponse.getPolicyDataEl()), DOMUtils.parse(
@@ -321,7 +326,7 @@ public class ProvisionHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		ProvisionResponse provisionResponse = opClient.provisionStepOne();
 
 		assertOnProvisionResponseSendPolicy(nextPolicyKeyGenerated, provisionResponse);
@@ -352,7 +357,7 @@ public class ProvisionHandlerTest {
 		
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		ProvisionResponse provisionResponse1 = opClient.provisionStepOne();
 		ProvisionResponse provisionResponse2 = opClient.provisionStepOne();
 
@@ -386,7 +391,7 @@ public class ProvisionHandlerTest {
 		
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		opClient.provisionStepOne();
 		opClient.provisionStepTwo(pendingPolicyKey);
 		ProvisionResponse provisionResponse3 = opClient.provisionStepTwo(acknowledgedPolicyKey);
@@ -414,7 +419,7 @@ public class ProvisionHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
   
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		ProvisionResponse provisionResponse = opClient.provisionStepTwo(userRegistredPolicyKey);
 
 		assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);
@@ -439,7 +444,7 @@ public class ProvisionHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		ProvisionResponse provisionResponse = opClient.provisionStepTwo(acknowledgingPolicyKey);
 
 		assertThat(provisionResponse.getProvisionStatus()).isEqualTo(ProvisionStatus.SUCCESS);

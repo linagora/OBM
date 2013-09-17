@@ -36,7 +36,6 @@ import java.util.List;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -110,7 +109,7 @@ public class ClientIntegrationTest extends ObmSyncIntegrationTest {
 		}
 
 		private List<Cookie> getCookies() {
-			return ((DefaultHttpClient) httpClient).getCookieStore().getCookies();
+			return cookieStore.getCookies();
 		}
 	}
 }

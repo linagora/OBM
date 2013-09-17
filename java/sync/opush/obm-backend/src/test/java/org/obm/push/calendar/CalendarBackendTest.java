@@ -50,8 +50,10 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.util.Strings;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -154,6 +156,7 @@ public class CalendarBackendTest {
 	private CalendarBackend calendarBackend;
 	private IMocksControl mockControl;
 	private Builder collectionPathBuilder;
+	private CloseableHttpClient httpClient;
 	
 	private static class CalendarCollectionPath extends CollectionPath {
 
@@ -173,6 +176,7 @@ public class CalendarBackendTest {
 		this.outgoingSyncState = buildFolderSyncState(new SyncKey("1234567890b"));
 		this.rootCalendarPath = "obm:\\\\test@test\\calendar\\";
 		this.userCalendarCollectionPath = new CalendarCollectionPath(rootCalendarPath, "test");
+		this.httpClient = HttpClientBuilder.create().build();
 
 		mockControl = createControl();
 		AccessTokenResource accessTokenResource = mockControl.createMock(AccessTokenResource.class);
@@ -181,7 +185,7 @@ public class CalendarBackendTest {
 		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
 		HttpClientResource httpClientResource = mockControl.createMock(HttpClientResource.class);
 		expect(httpClientResource.getHttpClient())
-			.andReturn(new DefaultHttpClient()).anyTimes();
+			.andReturn(httpClient).anyTimes();
 		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
 		
 		this.mappingService = mockControl.createMock(MappingService.class);
@@ -214,6 +218,11 @@ public class CalendarBackendTest {
 				clientIdService,
 				ical4jHelper,
 				ical4jUserFactory);
+	}
+	
+	@After
+	public void teardown() throws IOException {
+		httpClient.close();
 	}
 	
 	@Test
@@ -290,7 +299,7 @@ public class CalendarBackendTest {
 		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
 		HttpClientResource httpClientResource = mockControl.createMock(HttpClientResource.class);
 		expect(httpClientResource.getHttpClient())
-			.andReturn(new DefaultHttpClient()).anyTimes();
+			.andReturn(httpClient).anyTimes();
 		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
 		
 		int calendar1MappingId = 1;
@@ -356,7 +365,7 @@ public class CalendarBackendTest {
 		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
 		HttpClientResource httpClientResource = mockControl.createMock(HttpClientResource.class);
 		expect(httpClientResource.getHttpClient())
-			.andReturn(new DefaultHttpClient()).anyTimes();
+			.andReturn(httpClient).anyTimes();
 		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
 		
 		int calendar1MappingId = 1;
@@ -448,7 +457,7 @@ public class CalendarBackendTest {
 		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
 		HttpClientResource httpClientResource = mockControl.createMock(HttpClientResource.class);
 		expect(httpClientResource.getHttpClient())
-			.andReturn(new DefaultHttpClient()).anyTimes();
+			.andReturn(httpClient).anyTimes();
 		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
 		
 		expectObmSyncCalendarChanges(

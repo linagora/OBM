@@ -39,10 +39,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.SystemDefaultHttpClient;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -58,24 +56,18 @@ public class SatelliteClientModule extends AbstractModule {
 
 	@Provides
 	private HttpClient provideHttpClient() {
-		return configureSsl(new SystemDefaultHttpClient());
-	}
-
-	private HttpClient configureSsl(HttpClient client) {
 		try {
 			SSLContext sslContext = buildSSLContext(TRUST_ALL_KEY_MANAGERS);
-
-			client
-				.getConnectionManager()
-				.getSchemeRegistry()
-				.register(new Scheme("https", 443, new SSLSocketFactory(sslContext, new AllowAllHostnameVerifier())));
+			return HttpClientBuilder.create()
+				.setSslcontext(sslContext)
+				.setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
+				.useSystemProperties()
+				.build();
 		} catch (KeyManagementException e) {
 			throw new IllegalArgumentException("Could not initialize a ssl context", e);
 		} catch (NoSuchAlgorithmException e) {
 			throw new IllegalArgumentException("Could not initialize a ssl context", e);
 		}
-
-		return client;
 	}
 
 	protected SSLContext buildSSLContext(KeyManager[] keyManagers) throws NoSuchAlgorithmException, KeyManagementException {

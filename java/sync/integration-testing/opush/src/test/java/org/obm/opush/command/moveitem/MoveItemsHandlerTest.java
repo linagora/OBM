@@ -39,6 +39,8 @@ import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
@@ -97,9 +99,11 @@ public class MoveItemsHandlerTest {
 	private int inboxCollectionId;
 	private String trashCollectionPath;
 	private int trashCollectionId;
+	private CloseableHttpClient httpClient;
 
 	@Before
 	public void init() throws Exception {
+		httpClient = HttpClientBuilder.create().build();
 		user = singleUserFixture.jaures;
 		greenMail.start();
 		mailbox = user.user.getLoginAtDomain();
@@ -129,6 +133,7 @@ public class MoveItemsHandlerTest {
 	public void shutdown() throws Exception {
 		opushServer.stop();
 		greenMail.stop();
+		httpClient.close();
 		Files.delete(configuration.dataDir);
 	}
 
@@ -141,7 +146,7 @@ public class MoveItemsHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		sendEmailsToImapServer("email body data");
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		MoveItemsResponse response = opClient.moveItems(
 				new Move(inboxCollectionId + emailId1, inboxCollectionId, trashCollectionId));
 		mocksControl.verify();
@@ -168,7 +173,7 @@ public class MoveItemsHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		sendEmailsToImapServer("email one", "email two");
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		MoveItemsResponse response = opClient.moveItems(
 				new Move(inboxCollectionId + emailId1, inboxCollectionId, trashCollectionId),
 				new Move(inboxCollectionId + emailId2, inboxCollectionId, trashCollectionId));
@@ -201,7 +206,7 @@ public class MoveItemsHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		sendEmailsToImapServer("email body data");
-		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 		MoveItemsResponse response = opClient.moveItems(
 				new Move(inboxCollectionId + unexistingEmailId1, inboxCollectionId, trashCollectionId));
 		mocksControl.verify();

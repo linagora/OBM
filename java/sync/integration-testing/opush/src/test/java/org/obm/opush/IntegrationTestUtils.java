@@ -46,6 +46,7 @@ import java.util.Properties;
 
 import javax.mail.Session;
 
+import org.apache.http.client.HttpClient;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.backend.IContentsExporter;
@@ -157,8 +158,9 @@ public class IntegrationTestUtils {
 		expectLastCall().anyTimes();
 	}
 
-	public static OPClient buildOpushClient(OpushUser user, int port) {
-		return new XMLOPClient(user.user.getLoginAtDomain(), 
+	public static OPClient buildOpushClient(OpushUser user, int port, HttpClient httpClient) {
+		return new XMLOPClient(httpClient, 
+				user.user.getLoginAtDomain(), 
 				user.password, 
 				user.deviceId, 
 				user.deviceType, 
@@ -166,8 +168,9 @@ public class IntegrationTestUtils {
 			);
 	}
 	
-	public static WBXMLOPClient buildWBXMLOpushClient(OpushUser user, int port, ProtocolVersion protocolVersion) {
+	public static WBXMLOPClient buildWBXMLOpushClient(OpushUser user, int port, ProtocolVersion protocolVersion, HttpClient httpClient) {
 		return new WBXMLOPClient(
+				httpClient,
 				user.user.getLoginAtDomain(), 
 				user.password, 
 				user.deviceId, 
@@ -177,8 +180,8 @@ public class IntegrationTestUtils {
 				protocolVersion);
 	}
 	
-	public static WBXMLOPClient buildWBXMLOpushClient(OpushUser user, int port) {
-		return buildWBXMLOpushClient(user, port, ProtocolVersion.V121);
+	public static WBXMLOPClient buildWBXMLOpushClient(OpushUser user, int port, HttpClient httpClient) {
+		return buildWBXMLOpushClient(user, port, ProtocolVersion.V121, httpClient);
 	}
 
 	public static String buildCalendarCollectionPath(OpushUser opushUser) {

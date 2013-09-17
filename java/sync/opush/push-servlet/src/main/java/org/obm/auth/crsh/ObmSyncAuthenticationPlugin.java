@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.auth.crsh;
 
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.crsh.auth.AuthenticationPlugin;
 import org.crsh.plugin.CRaSHPlugin;
 import org.obm.sync.auth.AuthFault;
@@ -52,7 +52,7 @@ public class ObmSyncAuthenticationPlugin extends CRaSHPlugin<AuthenticationPlugi
 	@Override
 	public boolean authenticate(String username, String password) throws Exception {
 		try {
-			return loginClientFactory.create(new DefaultHttpClient())
+			return loginClientFactory.create(HttpClientBuilder.create().build())
 					.authenticateGlobalAdmin(username, password);
 		} catch (AuthFault e) {
 			return false;

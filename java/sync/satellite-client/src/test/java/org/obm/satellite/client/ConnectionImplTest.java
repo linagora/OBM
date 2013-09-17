@@ -41,7 +41,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -69,6 +70,7 @@ public class ConnectionImplTest {
 	private ConnectionImpl testee;
 	private IMocksControl control;
 	private Configuration configuration;
+	private CloseableHttpClient httpClient;
 	private ObmDomain domain = ObmDomain
 			.builder()
 			.name("domain")
@@ -85,13 +87,15 @@ public class ConnectionImplTest {
 		server = createServer();
 		server.start();
 		serverPort = server.getConnectors()[0].getLocalPort();
-		testee = new ConnectionImpl(new DefaultHttpClient(), configuration, domain);
+		httpClient = HttpClientBuilder.create().build();
+		testee = new ConnectionImpl(httpClient, configuration, domain);
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		control.verify();
 		server.stop();
+		httpClient.close();
 	}
 
 	@Test
