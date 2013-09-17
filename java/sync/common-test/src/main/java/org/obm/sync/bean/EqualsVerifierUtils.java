@@ -61,7 +61,7 @@ public class EqualsVerifierUtils {
 
 	public static EqualsVerifier<?> createEqualsVerifier(Class<?> clazz) {
 		return EqualsVerifier.forClass(clazz)
-				.suppress(Warning.NONFINAL_FIELDS, Warning.STRICT_INHERITANCE).debug();
+				.suppress(Warning.NONFINAL_FIELDS, Warning.STRICT_INHERITANCE);
 	}
 
 	public static class RedBlack<T> {
