@@ -1,4 +1,33 @@
 <div id="banner">
+  <script type="text/javascript">
+    function introSteps() {
+      var steps = [];
+
+      {{#intro-steps}}
+      steps.push({
+        element: $('intro-{{id}}'),
+        intro: "{{{text}}}",
+        position: "{{position}}"
+      });
+      {{/intro-steps}}
+
+      return steps;
+    }
+
+    function showIntro() {
+      introJs().setOptions(
+          {
+            tooltipClass: "intro",
+            skipLabel: obm.vars.labels.intro.skip,
+            doneLabel: obm.vars.labels.intro.done,
+            nextLabel: obm.vars.labels.intro.next,
+            prevLabel: obm.vars.labels.intro.previous,
+            steps: introSteps()
+          }
+      ).start();
+    }
+  </script>
+
   <div style="float:left;">
     {{#template}}
     <a href="{{logo_url}}" id="obmLogo"><img src="{{logo_ico}}" alt="Logo OBM"/></a>
@@ -8,11 +37,11 @@
       {{#buttons}}
 
         {{#notifier}}
-        <li><a href="{{url}}" class="toplink">{{name}}</a> <a href="{{notifier_url}}"> <span id="{{notifier_id}}" class="notification_popup"></span></a></li>
+        <li><a href="{{url}}" class="toplink"><span {{>intro}}>{{name}}</span></a> <a href="{{notifier_url}}"> <span id="{{notifier_id}}" class="notification_popup"></span></a></li>
         {{/notifier}}
 
         {{^notifier}}
-          <li><a href="{{url}}" onclick="{{onclick}}" class="toplink" id="{{idmore}}">{{name}}</a></li>
+        <li><a href="{{url}}" onclick="{{onclick}}" class="toplink" id="{{idmore}}"><span {{>intro}}>{{name}}</span></a></li>
         {{/notifier}}
 
       {{/buttons}}
@@ -43,7 +72,7 @@
       <li style="font-size:13px;">
 
       <a href="#" onclick="showProfileMenu()">
-        {{login}}
+        <span {{>intro}}>{{login}}</span>
         <img src="{{user_infos.photo_url}}" style="width:25px;border:2px solid #AAA; border-radius:5px;margin-top:-5px;"/>
       </a>
       </li>

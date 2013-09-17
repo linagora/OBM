@@ -623,3 +623,13 @@ $l_resource_found_error = "ressource(s) de ce type trouvée(s), vous devez au pr
 $l_popin_message = "OBM 3 a un nouveau menu! Voulez-vous l'essayer ?";
 $l_popin_activation_button = "Essayer";
 $l_close_popin_button = "Je ne suis pas interressé.";
+
+$l_intro_next = "Suivant";
+$l_intro_previous = "Précédent";
+$l_intro_skip = "Passer";
+$l_intro_done = "Terminer";
+$l_intro_webmail = "Le bouton <span class='highlight'>Mail</span> vous permet de lire, envoyer et gérer vos e-mails en utilisant le webmail intégré.";
+$l_intro_calendar = "Le bouton <span class='highlight'>Agenda</span> affiche votre calendrier et vous permet de créer, modifier ou supprimer des événements.";
+$l_intro_contacts = "Le bouton <span class='highlight'>Contacts</span> vous permet de gérer vos contacts et vos carnets d'adresses.";
+$l_intro_moremenu = "Le bouton <span class='highlight'>Plus</span> est une liste déroulante qui contient tous les autres liens, y compris les sections Annuaire et Administration.";
+$l_intro_user = "Ceci est le menu <span class='highlight'>Utilisateur</span>. Vous y trouverez des liens pour changer vos paramètres ou votre mot de passe, gérer votre message d'absence, etc.";

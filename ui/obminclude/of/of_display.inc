@@ -1178,17 +1178,20 @@ function display_head($p_module, $standard=true) {
   <title>$l_obm_title - $p_module</title>
   $stylecss
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_print_obm?version=$obm_version\" media=\"print\" />
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"$resources_path/js/introjs/introjs.css\" />
   $dis_extra_css
   <script type=\"text/javascript\" src=\"$resources_path/js/q.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/mootools-1.2-more.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/clientcide.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/css3-mediaqueries.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/introjs/intro.js\" ></script>
   <script type=\"text/javascript\">
   //<![CDATA[
   var obm = Obm = {};
   obm.vars = new Object();
   obm.vars.labels = new Object();
+  obm.vars.labels.intro = new Object();
   obm.vars.images = new Object();
   obm.vars.regexp = new Object();
   obm.vars.consts = new Object();
@@ -1234,6 +1237,10 @@ function display_head($p_module, $standard=true) {
   obm.vars.labels.updateError = '".phpStringToJsString($GLOBALS['l_update_error'])."';
   obm.vars.labels.deleteError = '".phpStringToJsString($GLOBALS['l_delete_error'])."';
   obm.vars.labels.details = '".phpStringToJsString($GLOBALS['l_details'])."';
+  obm.vars.labels.intro.skip = '".phpStringToJsString($GLOBALS['l_intro_skip'])."';
+  obm.vars.labels.intro.done = '".phpStringToJsString($GLOBALS['l_intro_done'])."';
+  obm.vars.labels.intro.next = '".phpStringToJsString($GLOBALS['l_intro_next'])."';
+  obm.vars.labels.intro.previous = '".phpStringToJsString($GLOBALS['l_intro_previous'])."';
   $obm_vars
   // ]]>
   </script> 
@@ -1375,6 +1382,7 @@ function display_unified_menu($module) {
   global $ico_logout, $ico_login, $ico_obm, $ico_print, $ico_scope, $ico_big_user;
   global $l_logout, $l_profile, $l_scope_update, $l_waiting_events, $l_section_webmail, $l_module_calendar, $l_module_contact, $l_section_more;
   global $perm, $cright_write_admin;
+  global $l_intro_webmail, $l_intro_calendar, $l_intro_contacts, $l_intro_moremenu, $l_intro_user;
 
   $login = $obm['login'];
   $profil = $obm['profile'];
@@ -1425,6 +1433,7 @@ function display_unified_menu($module) {
   $data["user_infos"]["email"] = $email;
   $data["user_infos"]["profil"] = $profil;
   $data["user_infos"]["domain"] = $domain;
+  $data["user_infos"]["intro-element-id"] = "user";
 
   $data["user_infos"]["l_logout"] = $l_logout;
 
@@ -1455,7 +1464,8 @@ function display_unified_menu($module) {
         "url" => "$path/webmail/webmail_index.php",
         "notifier" => true,
         "notifier_url" => "$path/webmail/webmail_index.php?_task=mail&_mbox=INBOX",
-        "notifier_id" => "bannerUnreadMail"
+        "notifier_id" => "bannerUnreadMail",
+      	"intro-element-id" => "webmail"
       )
     );
   }
@@ -1466,7 +1476,8 @@ function display_unified_menu($module) {
       "url" => "$path/calendar/calendar_index.php",
       "notifier" => true,
       "notifier_url" => "$path/calendar/calendar_index.php?action=waiting_events",
-      "notifier_id" => "bannerWaitingEvent"
+      "notifier_id" => "bannerWaitingEvent",
+      "intro-element-id" => "calendar"
     )
   );
 
@@ -1474,7 +1485,8 @@ function display_unified_menu($module) {
     array(
       "name" => $l_module_contact,
       "url" => "$path/contact/contact_index.php",
-      "notifier" => false
+      "notifier" => false,
+      "intro-element-id" => "contacts"
     )
   );
 
@@ -1484,8 +1496,37 @@ function display_unified_menu($module) {
       "idmore" => "moremenu_button",
       "url" => "#",
       "notifier" => false,
-      "onclick" => "showAllInOneMenu()"
+      "onclick" => "showAllInOneMenu()",
+      "intro-element-id" => "moremenu"
     )
+  );
+
+  $data["intro-steps"] = array(
+    array(
+      "id" => "webmail",
+      "position" => "bottom",
+      "text" => $l_intro_webmail
+    ),
+    array(
+      "id" => "calendar",
+      "position" => "bottom",
+      "text" => $l_intro_calendar
+    ),
+    array(
+      "id" => "contacts",
+      "position" => "bottom",
+      "text" => $l_intro_contacts
+    ),
+    array(
+      "id" => "moremenu",
+      "position" => "bottom",
+      "text" => $l_intro_moremenu
+    ),
+    array(
+      "id" => "user",
+      "position" => "left",
+      "text" => $l_intro_user
+    ),
   );
 
   $data["sections"] = get_sections_data();

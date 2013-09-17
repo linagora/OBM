@@ -2409,3 +2409,8 @@ form.button-to input {
  * ------------------------------------------------------------------------- */
 
 #loginForm input, #loginForm select { width: 155px; }
+
+.intro .highlight {
+    font-style: italic;
+    font-weight: bold;
+}
