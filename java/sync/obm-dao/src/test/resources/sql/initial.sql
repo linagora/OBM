@@ -17113,7 +17113,8 @@ INSERT INTO UserObm (userobm_ext_id, userobm_domain_id, userobm_login, userobm_p
         (4, 1, 'user4','user4','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', '', NULL),
         (5, 2, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),
         (6, 2, 'user2','user2','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1),
-        (7, 2, 'user7','user7','PLAIN', 'user', 'Lastname', 'Firstname', '1000', '512', '1', '', NULL);
+        (7, 2, 'user7','user7','PLAIN', 'user', 'Lastname', 'Firstname', '1000', '512', '1', '', NULL),
+        (8, 2, 'user8','user8','PLAIN', 'user', 'Lastname', 'Firstname', '1000', '512', '0', 'user8', NULL);
         
 INSERT INTO userentity (userentity_entity_id, userentity_user_id)
     VALUES
@@ -17158,6 +17159,12 @@ INSERT INTO ugroup (group_domain_id, group_ext_id, group_name, group_desc)
     VALUES
         (2, 'group1-id', 'group1', 'group1-description'),
         (2, 'group2-id', 'group2', 'group2-description');
+
+INSERT INTO ugroup (group_domain_id, group_ext_id, group_name, group_email)
+    VALUES
+        (1, 'group1', 'group1', 'group1'),
+        (1, 'group2', 'group2', 'group2'),
+        (2, 'group3', 'group3', 'group3');
 
 INSERT INTO groupentity (groupentity_entity_id, groupentity_group_id)
     VALUES
@@ -17205,3 +17212,8 @@ INSERT INTO UserSystem (usersystem_login, usersystem_password, usersystem_homedi
     VALUES
         ('obmsatelliterequest', 'osrpassword', ''),
         ('cyrus', 'cyrus', '');
+
+INSERT INTO mailshare (mailshare_domain_id, mailshare_email)
+	VALUES
+		(1, 'mailshare1'),
+		(2, 'mailshare2');

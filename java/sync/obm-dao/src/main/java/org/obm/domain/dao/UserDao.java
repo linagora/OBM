@@ -37,6 +37,8 @@ import java.util.Map;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
+import com.google.common.collect.ImmutableSet;
+
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
@@ -70,5 +72,7 @@ public interface UserDao {
 	Map<String, String> loadUserProperties(int userObmId);
 
 	Integer userIdFromEmail(Connection con, String email, Integer domainId) throws SQLException;
+
+	ImmutableSet<String> getAllEmailsFrom(ObmDomain domain) throws SQLException;
 
 }

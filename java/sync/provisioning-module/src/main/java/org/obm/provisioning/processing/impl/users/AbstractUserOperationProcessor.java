@@ -31,11 +31,14 @@ package org.obm.provisioning.processing.impl.users;
 
 import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
 
+import java.sql.SQLException;
+
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusManager;
+import org.obm.domain.dao.PUserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.beans.BatchEntityType;
@@ -48,6 +51,9 @@ import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
 import org.obm.push.mail.IMAPException;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
 import com.google.inject.util.Providers;
 
@@ -61,6 +67,8 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 	protected CyrusImapService cyrusService;
 	@Inject
 	protected UserSystemDao userSystemDao;
+	@Inject
+	protected PUserDao pUserDao;
 	
 	protected AbstractUserOperationProcessor(HttpVerb verb) {
 		super(BatchEntityType.USER, verb);
@@ -84,6 +92,27 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 		}
 		catch (Exception e) {
 			throw new ProcessingException(String.format("Cannot parse ObmUser object from request body %s.", requestBody), e);
+		}
+	}
+	
+	protected void validateUserEmail(ObmUser user) {
+		if (!user.isEmailAvailable()) {
+			return;
+		}
+		try {
+			final ImmutableSet<String> userEmails = ImmutableSet.<String>builder()
+					.add(user.getEmail())
+					.addAll(user.getEmailAlias())
+					.build();
+			final ImmutableSet<String> allEmails = userDao.getAllEmailsFrom(user.getDomain());
+			
+			final SetView<String> matchingEmails = Sets.intersection(allEmails, userEmails);
+			if(!matchingEmails.isEmpty()) {
+				throw new ProcessingException(
+						String.format("Cannot create/modify user because similar emails have been found : %s", matchingEmails));
+			}
+		} catch (SQLException e) {
+			throw new ProcessingException(e);
 		}
 	}
 

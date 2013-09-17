@@ -365,7 +365,7 @@ public class PUserDaoJdbcImplTest implements H2TestClass {
 		dao.delete(obmUser(5, "5"));
 
 
-		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserObm")).isEqualTo(2);
+		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserObm")).isEqualTo(3);
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_UserEntity")).isEqualTo(2);
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_MailboxEntity")).isEqualTo(1);
 		assertThat(utils.getIntFromQuery("SELECT COUNT(*) FROM P_EntityRight")).isEqualTo(1);

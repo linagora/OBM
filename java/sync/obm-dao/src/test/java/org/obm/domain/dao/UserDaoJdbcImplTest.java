@@ -748,6 +748,12 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		assertThat(rs.getBoolean(1)).isTrue();
 	}
 
+	@Test
+	public void testGetAllEmailsFrom() throws SQLException {
+		ImmutableSet<String> allEmails = dao.getAllEmailsFrom(domain);
+		
+		assertThat(allEmails).containsOnly("group1", "group2", "mailshare1", "user1", "user2", "user3");
+	}
 
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId, String extId) {
 		return ObmUser

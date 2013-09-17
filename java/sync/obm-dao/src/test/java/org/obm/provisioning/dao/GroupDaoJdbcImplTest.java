@@ -667,9 +667,16 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
 						.description("group2-description")
 						.extId(GroupExtId.valueOf("group2-id"))
 						.build())
+				.add(Group
+						.builder()
+						.uid(Group.Id.valueOf(26))
+						.name("group3")
+						.email("group3")
+						.extId(GroupExtId.valueOf("group3"))
+						.build())
 				.build();
 
-		assertThat(groups).isEqualTo(expectedGroups);
+		assertThat(groups).containsOnly(expectedGroups.toArray(new Group[expectedGroups.size()]));
 	}
 
 	@Test

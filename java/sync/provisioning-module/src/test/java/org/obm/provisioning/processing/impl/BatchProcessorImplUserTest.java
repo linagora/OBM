@@ -47,6 +47,7 @@ import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 import org.obm.utils.ObmHelper;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -194,6 +195,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getAllEmailsFrom(domain)).andReturn(ImmutableSet.<String>of());
 		expect(userDao.create(user)).andReturn(userFromDao);
 		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(
 				usersGroup);
@@ -219,6 +221,50 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		mocksControl.verify();
 	}
 
+	@Test
+	public void testProcessCreateUserFailsWithExistingEmails() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/")
+								.verb(HttpVerb.POST)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"mails\":[\"john@domain\"]" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domain).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getAllEmailsFrom(domain)).andReturn(ImmutableSet.<String>of("john@domain"));
+
+		expect(batchDao.update(batchBuilder
+						.operation(
+								opBuilder
+										.status(BatchStatus.ERROR)
+										.error("org.obm.provisioning.exception.ProcessingException: Cannot create/modify user because similar emails have been found : [john@domain]")
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserAndCommit();
+
+		mocksControl.verify();
+	}
+	
 	private void expectSetDefaultRights(ObmUser user) throws Exception {
 		expect(profileDao.getUserProfile(user)).andReturn(profile);
 		expect(obmHelper.fetchEntityId("Calendar", 1)).andReturn(
@@ -292,6 +338,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getAllEmailsFrom(domain)).andReturn(ImmutableSet.<String>of());
 		expect(userDao.create(user)).andReturn(userFromDao);
 		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(null);
 		expectLastCall();
@@ -801,6 +848,66 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		mocksControl.verify();
 	}
+	
+	@Test
+	public void testProcessModifyUserFailsWithExistingEmails() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PUT)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"mails\":[\"john@domain\", \"alias1\"]" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.mailHost(
+						ObmHost.builder().name("Cyrus").ip("127.0.0.1").build())
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
+						domainWithImapAndLdap)).andReturn(userFromDao);
+		expect(userDao.getAllEmailsFrom(domain)).andReturn(ImmutableSet.<String>of("john@domain", "alias1@domain"));
+
+		expect(batchDao.update(batchBuilder
+				.operation(
+						opBuilder
+								.status(BatchStatus.ERROR)
+								.error("org.obm.provisioning.exception.ProcessingException: Cannot create/modify user because similar emails have been found : [john@domain]")
+								.timecommit(date).build())
+				.status(BatchStatus.SUCCESS).timecommit(date).build()))
+		.andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
 
 	@Test
 	public void testProcessModifyUserCannotChangeLogin() throws Exception {
@@ -1054,6 +1161,66 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 	}
 
 	@Test
+	public void testProcessPatchUserFailsWithExistingMail() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request.builder()
+								.resourcePath("/users/extIdUser1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PATCH)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"mails\":[\"john@domain\", \"alias1\"]" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domain).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser.Builder builder = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login("user1")
+				.password("secret")
+				.emailAndAliases("john@domain")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.mailHost(ObmHost.builder().name("host").build());
+
+		ObmUser userFromDao = builder.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domain))
+				.andReturn(userFromDao);
+		expect(userDao.getAllEmailsFrom(domain)).andReturn(ImmutableSet.<String>of("john@domain", "alias1@domain"));
+
+		expect(batchDao.update(batchBuilder
+				.operation(
+						opBuilder
+								.status(BatchStatus.ERROR)
+								.error("org.obm.provisioning.exception.ProcessingException: Cannot create/modify user because similar emails have been found : [john@domain]")
+								.timecommit(date).build())
+				.status(BatchStatus.SUCCESS).timecommit(date).build()))
+		.andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserPatchAndCommit();
+
+		mocksControl.verify();
+	}
+	
+	@Test
 	public void testProcessPatchUserCannotChangeArchivedState()
 			throws Exception {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
@@ -1224,7 +1391,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		mocksControl.verify();
 	}
-
+	
 	private void expectDeleteUserMailbox(final ObmUser user)
 			throws DaoException, IMAPException {
 		CyrusManager cyrusManager = expectCyrusBuild();

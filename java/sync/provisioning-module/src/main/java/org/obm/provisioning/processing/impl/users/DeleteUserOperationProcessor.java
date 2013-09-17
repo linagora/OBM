@@ -38,7 +38,6 @@ import java.util.Set;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
-import org.obm.domain.dao.PUserDao;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
@@ -58,8 +57,6 @@ import fr.aliacom.obm.common.user.UserExtId;
 public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor {
 	
 	private final static String DELETE_ACL = "lc";
-	@Inject
-	private PUserDao pUserDao;
 
 	@Inject
 	DeleteUserOperationProcessor() {

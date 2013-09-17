@@ -32,7 +32,6 @@ package org.obm.provisioning.processing.impl.users;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
-import org.obm.domain.dao.PUserDao;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
@@ -43,15 +42,12 @@ import org.obm.provisioning.processing.impl.OperationUtils;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
-import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
 public abstract class AbstractModifyUserOperationProcessor extends AbstractUserOperationProcessor {
-	@Inject
-	private PUserDao pUserDao;
 
 	private ObmUser existingUser;
 
@@ -95,6 +91,10 @@ public abstract class AbstractModifyUserOperationProcessor extends AbstractUserO
 		}
 		if (modifiedUser.isArchived() != existingUser.isArchived()) {
 			throw new ProcessingException("Cannot change user archived state");
+		}
+		if (!Objects.equal(modifiedUser.getEmail(), existingUser.getEmail()) ||
+			!Objects.equal(modifiedUser.getEmailAlias(), existingUser.getEmailAlias())) {
+			validateUserEmail(modifiedUser);
 		}
 	}
 

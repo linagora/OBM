@@ -65,6 +65,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -898,6 +899,46 @@ public class UserDaoJdbcImpl implements UserDao {
 		}
 		finally {
 			JDBCUtils.cleanup(connection, ps, null);
+		}
+	}
+
+	@Override
+	public ImmutableSet<String> getAllEmailsFrom(ObmDomain domain) throws SQLException {
+		Connection connection = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			connection = obmHelper.getConnection();
+			
+			ps = connection.prepareStatement(
+				"SELECT userobm_email as mail FROM UserObm " +
+				"INNER JOIN Domain ON Domain.domain_id = userobm_domain_id " +
+				"WHERE domain_id = ? " +
+				"UNION " +
+				"SELECT mailshare_email as mail FROM MailShare " +
+				"INNER JOIN Domain ON Domain.domain_id = mailshare_domain_id " +
+				"WHERE domain_id = ? " +
+				"UNION " +
+				"SELECT group_email as mail FROM UGroup " + 
+				"INNER JOIN Domain ON Domain.domain_id = group_domain_id " +
+				"WHERE domain_id = ?");
+
+			ps.setInt(1, domain.getId());
+			ps.setInt(2, domain.getId());
+			ps.setInt(3, domain.getId());
+			
+			rs = ps.executeQuery();
+			ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+			
+			while (rs.next()) {
+				builder.addAll(
+						ObmUser.retrieveEmailsFromObmDao(Strings.nullToEmpty(rs.getString("mail"))));
+			}
+			
+			return builder.build();
+		} finally {
+			JDBCUtils.cleanup(connection, ps, rs);
 		}
 	}
 }

@@ -35,7 +35,6 @@ import java.util.Set;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.EntityRightDao;
-import org.obm.domain.dao.PUserDao;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
@@ -70,8 +69,6 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 	private EntityRightDao entityRightDao;
 	@Inject
 	private ObmHelper obmHelper;
-	@Inject
-	private PUserDao pUserDao;
 
 	@Inject
 	CreateUserOperationProcessor() {
@@ -82,6 +79,9 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		ObmUser user = getUserFromRequestBody(operation, getDefaultObjectMapper(batch.getDomain()));
+		
+		validateUserEmail(user);
+		
 		ObmUser userFromDao = createUserInDao(user);
 
 		Group defaultGroup = getDefaultGroup(user.getDomain());

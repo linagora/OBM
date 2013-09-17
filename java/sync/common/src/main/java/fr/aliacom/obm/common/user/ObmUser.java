@@ -65,6 +65,14 @@ public class ObmUser {
 		return new Builder();
 	}
 
+	public static Iterable<String> retrieveEmailsFromObmDao(String emails) {
+		Iterable<String> emailAndAlias = Splitter
+				.on(EMAIL_FIELD_SEPARATOR)
+				.omitEmptyStrings()
+				.split(emails);
+		return emailAndAlias;
+	}
+
 	public static class Builder {
 		
 		private Integer uid;
@@ -333,10 +341,7 @@ public class ObmUser {
 			Preconditions.checkNotNull(emailAndAliases);
 			email = null;
 
-			Iterable<String> emailAndAlias = Splitter
-					.on(EMAIL_FIELD_SEPARATOR)
-					.omitEmptyStrings()
-					.split(emailAndAliases);
+			Iterable<String> emailAndAlias = retrieveEmailsFromObmDao(emailAndAliases);
 
 			for (String emailOrAlias: emailAndAlias) {
 				if (email == null) {
