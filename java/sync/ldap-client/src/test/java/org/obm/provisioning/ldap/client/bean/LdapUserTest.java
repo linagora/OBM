@@ -31,6 +31,7 @@ public class LdapUserTest {
 				.uid(666)
 				.login("Richard.Sorge")
 				.emailAndAliases("Richard.Sorge")
+				.emailAlias(ImmutableSet.of("alias1", "alias2"))
 				.firstName("Richard")
 				.lastName("Sorge")
 				.uidNumber(1895)
@@ -40,6 +41,7 @@ public class LdapUserTest {
 									ServiceProperty.builder().build(),
 									ObmHost.builder().build())
 								.name("gru.gov.ru")
+								.aliases(ImmutableSet.of("test1.org", "test2.org"))
 								.build())
 				.password("secret password")
 				.mailHost(
@@ -182,6 +184,15 @@ public class LdapUserTest {
 				.domain(LdapDomain.valueOf("gru.gov.ru"))
 				.loginShell("/bin/bash")
 				.mail("Richard.Sorge@gru.gov.ru")
+				.mailAlias(ImmutableSet.of(
+						"Richard.Sorge@test1.org",
+						"Richard.Sorge@test2.org",
+						"alias1@gru.gov.ru",
+						"alias1@test1.org",
+						"alias1@test2.org",
+						"alias2@gru.gov.ru",
+						"alias2@test1.org",
+						"alias2@test2.org"))
 				.build();
 		LdapUser ldapUser = ldapUserBuilder.fromObmUser(buildObmUser()).build();
 		assertThat(ldapUser).isEqualTo(expectedLdapUser);

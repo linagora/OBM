@@ -44,8 +44,10 @@ import org.obm.provisioning.ldap.client.Configuration;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
@@ -163,9 +165,20 @@ public class LdapUser {
 			this.hiddenUser = DEFAULT_HIDDEN_USER;
 			this.domain = LdapDomain.valueOf(obmUser.getDomain().getName());
 			this.mail = obmUser.getEmailAtDomain();
-			this.mailAlias.addAll(obmUser.getEmailAlias());
+			addAllMailAliases(obmUser);
 			this.loginShell = DEFAULT_LOGIN_SHELL;
 			return this;
+		}
+
+		private void addAllMailAliases(ObmUser obmUser) {
+			if (mail != null) {
+				mailAlias.addAll(Iterables.filter(obmUser.buildAllEmails(), new Predicate<String>() {
+					@Override
+					public boolean apply(String input) {
+						return !input.equals(mail);
+					}
+				}));
+			}
 		}
 	
 		private String buildDisplayName(ObmUser obmUser) {
