@@ -2443,7 +2443,7 @@ function get_trust_token($userInfo){
 
 	$obm_q = new DB_OBM ;
 	$deleteQuery = "DELETE FROM TrustToken WHERE login='".$userInfo['login']."'";
-	$insertQuery = "INSERT INTO TrustToken (login, email, password, token) VALUES ('".$userInfo['login']."', '".$userInfo['email']."', '".$userInfo['password']."', UUID())";
+	$insertQuery = "INSERT INTO TrustToken (user_id, login, token) VALUES ( '".$userInfo['id']."', '".$userInfo['login']."', UUID())";
 	$query = "SELECT token FROM TrustToken WHERE login='".$userInfo['login']."'";
 
 	display_debug_msg($query, $cdg_sql, 'get_trust_token()');

@@ -60,15 +60,19 @@ class obm_auth extends rcube_plugin
     $token = $_GET['obm_token'];
     $obm_q = new DB_OBM;
 
-    $query = 'SELECT email, password
+    $query = 'SELECT userobm_login, userobm_email, userobm_password, domain_name
               FROM TrustToken 
+              INNER JOIN Userobm ON user_id = userobm_id
+              INNER JOIN Domain ON userobm_domain_id = domain_id
               WHERE token=\''.$token.'\';';
               
     $obm_q->query($query);
 
     $obm_q->next_record();
-    $args['user'] = $obm_q->f('email');
-    $args['pass'] = $obm_q->f('password');
+
+    $user_login = $obm_q->f('userobm_login').'@'.$obm_q->f('domain_name');
+    $args['user'] = $user_login;
+    $args['pass'] = $obm_q->f('userobm_password');
     $args['cookiecheck'] = false;
     $args['valid'] = true;
   
