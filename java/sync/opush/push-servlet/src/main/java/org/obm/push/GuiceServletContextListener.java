@@ -54,10 +54,13 @@ public class GuiceServletContextListener implements ServletContextListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(GuiceServletContextListener.class);
 	private Injector injector;
-	
+
+    @Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 
 		try {
+			migrateEhCache();
+			
 			injector = createInjector();
 			if (injector == null) { 
 				failStartup("Could not create injector: createInjector() returned null"); 
@@ -65,7 +68,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 			XTrustProvider.install();
 			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
 			
-			migrateEhCache();
+			
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			failStartup(e.getMessage());
@@ -80,12 +83,19 @@ public class GuiceServletContextListener implements ServletContextListener {
         throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
     }
     
+    @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
+    	shutdown();
+	}
+
+	private void shutdown() {
     	LifecycleListenerHelper.shutdownListeners(injector);
     	TransactionManagerServices.getTransactionManager().shutdown();
-    }
+	}
     
-    private void migrateEhCache() {
-    	injector.getInstance(MigrationServiceImpl.class).migrate();
-    }
+	private void migrateEhCache() {
+		injector = EhCacheMigrationInjector.createMigrationInjector();
+		injector.getInstance(MigrationServiceImpl.class).migrate();
+		shutdown();
+	}
 }
