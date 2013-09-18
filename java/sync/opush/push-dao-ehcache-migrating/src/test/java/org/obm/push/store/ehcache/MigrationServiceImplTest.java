@@ -40,6 +40,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
+
 import org.apache.commons.io.IOUtils;
 import org.easymock.IMocksControl;
 import org.junit.After;
@@ -137,6 +139,11 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 			@Override
 			public long timeToLiveInSeconds() {
 				return 60;
+			}
+
+			@Override
+			public TransactionalMode transactionalMode() {
+				return TransactionalMode.XA;
 			}
 		};
 	}

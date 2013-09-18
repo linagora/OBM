@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -46,6 +48,7 @@ public interface EhCacheConfiguration {
 	 */
 	Percentage percentageAllowedToCache(String cacheName);
 	long timeToLiveInSeconds();
+	TransactionalMode transactionalMode();
 	
 	public static class Percentage {
 

@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
+
 import org.obm.push.utils.jvm.JvmUtils;
 
 import com.google.common.primitives.Ints;
@@ -78,5 +80,10 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 	@Override
 	public long timeToLiveInSeconds() {
 		return timeToLive;
+	}
+
+	@Override
+	public TransactionalMode transactionalMode() {
+		return TransactionalMode.XA;
 	}
 }
