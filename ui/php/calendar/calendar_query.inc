@@ -48,6 +48,7 @@ applicable to the OBM software.
 
 require_once(dirname(__file__)."/../contact/addressbook.php");
 require_once('obm_eventdiff.php');
+require_once('calendar_utils.php');
 
 function run_query_calendar_detail($calendar_id, $occurrence_date=null) {
   global $cdg_sql;
@@ -1694,6 +1695,7 @@ function search_user_by_name($lastname, $firstname) {
 //   - sel_entity_id : selected entities id
 ///////////////////////////////////////////////////////////////////////////////
 function check_calendar_conflict($calendar, $sel_entity_id) {
+  global $ccalendar_conflicts_limit;
 
   if ($calendar['opacity'] == 'TRANSPARENT') return false;
   if(!$sel_entity_id && $calendar['calendar_id']) {
@@ -1703,39 +1705,70 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
     }
   }
   $begin = clone $calendar['date_begin'];
-  $end = clone $calendar['date_end'];
-  $begin->setHour(0)->setMinute(0)->setSecond(0); 
-  $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
+  $begin->setHour(0)->setMinute(0)->setSecond(0);
+  $end = get_conflict_end_date($calendar);
+
   if (!empty($sel_entity_id['user'])) {
     $sel_entity_id['user'] = array_keys(OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read', $sel_entity_id['user']));
   }
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   if (sizeof($cal_entities) == 0) return false; // user doesn't have read permission on attendees
-  $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $occurrences = calendar_events_model($begin,$end,$cal_entities, $status);
+
+  $occurrences = calendar_events_model($begin,$end,$cal_entities, array('ACCEPTED', 'NEEDS-ACTION'));
   $of = &OccurrenceFactory::getInstance(); 
   if(!$calendar['all_day']) {
-    $occurrences = $of->getPeriodOccurrences($calendar['date_begin'], $calendar['date_end']);
+    $occurrences = $of->getPeriodOccurrences($calendar['date_begin'], $end);
   }
 
   if( !is_null($occurrences)) {
-    if(isset($calendar['calendar_id'])) {
-      $event_id = $calendar["calendar_id"];
+    $oc = array();
+    $event_id = isset($calendar['calendar_id']) ? $calendar["calendar_id"] : NULL;
+
+    if (!isset($calendar["repeat_kind"]) || $calendar["repeat_kind"] == "none") {
+      foreach($occurrences as $occurrence) {
+        if($occurrence->event->id != $event_id && $occurrence->event->isOpaque()) {
+          $oc[] = $occurrence;
+
+          if (count($oc) >= $ccalendar_conflicts_limit) {
+            break;
+          }
+        }
+      }
     } else {
-      $event_id = NULL;
-    }
-    foreach($occurrences as $occurrence) {
-      if($occurrence->event->id != $event_id && $occurrence->event->isOpaque()) {
-        $oc[] = $occurrence;
+      OccurrenceFactory::reset();
+
+      $event = new Event(0, $calendar["event_duration"], $calendar["title"], NULL, NULL, $calendar["privacy"], NULL, NULL, $calendar["all_day"], $calendar["repeat_kind"], $calendar["owner"], NULL, NULL, 'OPAQUE', NULL);
+
+      calendar_add_anonymous_occurrences($calendar["repeat_kind"], $calendar['date_begin'], $begin, $end, $calendar["repeatfrequency"], $event, $calendar["owner"], 'user', 'ACCEPTED', $calendar["repeat_days"]);
+
+      $virtualOccurences = $of->getPeriodOccurrences($calendar['date_begin'], $end);
+
+      foreach($virtualOccurences as $virtualOccurrence) {
+        foreach($occurrences as $occurrence) {
+          if($occurrence->event->id != $event_id
+              && $occurrence->event->isOpaque()
+              && $virtualOccurrence->date->compare($occurrence->end) < 0
+              && $virtualOccurrence->end->compare($occurrence->date) > 0) {
+            $oc[] = $occurrence;
+
+            if (count($oc) >= $ccalendar_conflicts_limit) {
+              break 2;
+            }
+          }
+          // The occurrences are sorted, so if we're past the date of our virtual occurrence, we can break
+          if ($occurrence->date->compare($virtualOccurrence->end) > 0) {
+            break;
+          }
+        }
       }
     }
+
     $occurrences = $oc;
-  }  
-  OccurrenceFactory::reset();
-  if (count($occurrences) == 0) {
-    return false;
   }
-  return $occurrences;
+
+  OccurrenceFactory::reset();
+
+  return count($occurrences) != 0 ? $occurrences : false;
 }
 
 

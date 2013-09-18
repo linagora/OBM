@@ -2751,9 +2751,11 @@ function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date,
 //   - $c_q    : conflict list (events)
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_dis_conflict($calendar, $conflicts) {
-  global $l_title, $l_location, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
+  global $l_title, $l_location, $l_conflicts_limit, $l_datebegin,$l_dateend, $l_user;
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
   global $l_private, $obm;
+  global $ccalendar_conflicts_limit;
+
   if (!empty($calendar['sel_user_id'])) {
     $readable['user'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $calendar['sel_user_id']));
   } else {
@@ -2841,7 +2843,7 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   $freebusy = html_freebusy_header();
   $block .= "
   <div class=\"detail extra\">
-  <h1>$l_conflicts</h1>
+  <h1>" . sprintf($l_conflicts_limit, $ccalendar_conflicts_limit) . "</h1>
   <h2><a href=\"#\" onclick=\"displayFreeBusyConflict('$duration', '$d', '$freeBusy_read_only')\">$GLOBALS[l_display_entites_freebusy]</a></h2>
   <table class=\"spreadSheet\">
   <thead>

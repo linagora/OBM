@@ -346,4 +346,7 @@ $prevent_public_agenda_sharing_by_email = false;
 // Backup desactivated mail of users
 $backup_desactived_mail = false;
 
+// Maximum number of conflicts to display, default is 10
+// $ccalendar_conflicts_limit = 10;
+
 </script>
