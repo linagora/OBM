@@ -209,6 +209,8 @@ $ccalendar_resource_overbooking = true;
 // onClick or onDblClick (default is onDblClick)
 $ccalendar_invocation_method = 'onDblClick';
 
+$ccalendar_conflicts_limit = 10;
+
 // Time : In how many parts we split up a day (Time management)
 $c_day_fraction = 8;
 

@@ -139,6 +139,7 @@ $l_one_day_per_page = "Un jour par page";
 $l_display_days = "Jours affichés";
 
 $l_conflicts = "Conflit(s) rencontré(s)";
+$l_conflicts_limit = "Conflit(s) rencontré(s) (affichage des %d premiers seulement)";
 $l_date = "Date";
 $l_user = "Utilisateur";
 $l_back_mono = "Revenir à ma vue";

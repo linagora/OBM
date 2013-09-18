@@ -89,6 +89,7 @@ $l_from = "from";
 $l_to = "to";
 $l_event_duration = "Meeting duration";
 $l_conflicts = "Conflict(s) found";
+$l_conflicts_limit = "Conflict(s) found (showing only the first %d)";
 $l_date = "Date";
 $l_user = "User";
 $l_meeting_legend = "Legend";
