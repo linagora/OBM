@@ -35,7 +35,7 @@
 		<appender-ref ref="TECHNICAL_LOG" />
 	</logger>
 	
-	<root level="ERROR">
+	<root level="WARN">
 		<appender-ref ref="PROD" />
 	</root>
 
