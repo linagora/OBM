@@ -34,7 +34,6 @@ package org.obm.push.store.ehcache;
 import java.io.Serializable;
 import java.util.List;
 
-import org.obm.annotations.transactional.Transactional;
 import org.obm.push.bean.SyncKeysKey;
 import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl.Key;
@@ -90,11 +89,10 @@ public class MigrationServiceImpl implements MigrationService {
 	}
 	
 	@Override
-	@Transactional
 	public void migrate() {
 		logger.warn("Starting EhCache migration");
 		migrateMonitoredCollection();
-		migrateSnashot();
+		migrateSnapshot();
 		migrateSyncedCollection();
 		migrateSyncKeys();
 		migrateUnsynchronizedItem();
@@ -118,9 +116,9 @@ public class MigrationServiceImpl implements MigrationService {
 		logEnd("MonitoredCollection");
 	}
 
-	@VisibleForTesting void migrateSnashot() {
+	@VisibleForTesting void migrateSnapshot() {
 		List<Object> keys = snapshotDaoEhcacheMigrationImpl.getKeys();
-		logStart("Snashot", keys.size());
+		logStart("Snapshot", keys.size());
 		
 		for (Object keyObject : keys) {
 			SnapshotKey key = (SnapshotKey) keyObject;
@@ -130,7 +128,7 @@ public class MigrationServiceImpl implements MigrationService {
 			snapshotDaoEhcacheMigrationImpl.remove(key);
 		}
 		
-		logEnd("Snashot");
+		logEnd("Snapshot");
 	}
 
 	@VisibleForTesting void migrateSyncedCollection() {
