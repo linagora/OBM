@@ -124,7 +124,7 @@ public class ObjectStoreManager {
 	private CacheConfiguration defaultCacheConfiguration(String name) {
 		CacheConfiguration cacheConfiguration = new CacheConfiguration()
 			.name(name)
-			.maxEntriesLocalDisk(100000)
+			.maxEntriesLocalDisk(UNLIMITED_CACHE_MEMORY)
 			.overflowToDisk(true)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(ehCacheConfiguration.transactionalMode());
