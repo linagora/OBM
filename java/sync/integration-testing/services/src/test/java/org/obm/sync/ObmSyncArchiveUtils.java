@@ -32,20 +32,30 @@
 package org.obm.sync;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
 
+import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
+import org.apache.commons.compress.archivers.jar.JarArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.compress.changes.ChangeSet;
+import org.apache.commons.compress.changes.ChangeSetPerformer;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.UnknownExtensionTypeException;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.CoordinateParseException;
 import org.jboss.shrinkwrap.resolver.api.ResolutionException;
-import org.obm.DependencyResolverHelper;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.obm.StaticConfigurationService;
 import org.obm.arquillian.GuiceWebXmlDescriptor;
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 
+import com.google.common.base.Function;
+import com.google.common.base.Throwables;
+import com.google.common.collect.FluentIterable;
 import com.google.inject.Module;
 
 public class ObmSyncArchiveUtils {
@@ -54,32 +64,12 @@ public class ObmSyncArchiveUtils {
 			throws IllegalArgumentException, IllegalStateException, ResolutionException,
 			CoordinateParseException, UnknownExtensionTypeException {
 
-		JavaArchive wholeObmSyncArchive = ShrinkWrap
-				.create(JavaArchive.class, "services-integration-testing-classes.jar")
-				.addAsManifestResource("MANIFEST.MF")
-				.addAsResource("bitronix-default-config.properties")
-				.addAsResource("ical4j.properties")
-				.addAsResource("logback.xml")
-				.addAsResource("Messages_en.properties")
-				.addAsResource("Messages_fr.properties")
-				.addClasses(LifecycleListener.class, LifecycleListenerHelper.class)
-				.addClasses(DependencyResolverHelper.projectObmDaoClasses())
-				.addClasses(DependencyResolverHelper.projectAnnotationsClasses())
-				.addClasses(DependencyResolverHelper.projectConfigurationClasses())
-				.addClasses(DependencyResolverHelper.projectDBCPClasses())
-				.addClasses(DependencyResolverHelper.projectICalendarClasses())
-				.addClasses(DependencyResolverHelper.projectMessageQueueClasses())
-				.addClasses(DependencyResolverHelper.projectUtilsClasses())
-				.addClasses(DependencyResolverHelper.projectLocatorClasses())
-				.addClasses(DependencyResolverHelper.projectServicesCommonClasses())
-				.addClasses(DependencyResolverHelper.projectCommonClasses())
-				.addClasses(DependencyResolverHelper.projectDatabaseMetadataClasses());
-			
+
 		return ShrinkWrap
 				.create(WebArchive.class)
 				.addAsWebInfResource(GuiceWebXmlDescriptor.webXml(guiceModule, H2GuiceServletContextListener.class), "web.xml")
-				.addAsLibraries(DependencyResolverHelper.projectDependencies(new File("pom.xml")))
-				.addAsLibraries(wholeObmSyncArchive)
+				.addAsLibraries(serviceModule())
+				.addAsLibraries(resolveArtifacts("com.h2database:h2"))
 				.addClasses(
 						ModuleUtils.class,
 						org.obm.Configuration.class,
@@ -90,6 +80,57 @@ public class ObmSyncArchiveUtils {
 						TestTransactionConfiguration.class,
 						H2DriverConfiguration.class,
 						H2GuiceServletContextListener.class);
+	}
+
+	private static File[] replaceServiceJar(File[] asFile) {
+		return FluentIterable.from(Arrays.asList(asFile))
+				.transform(new Function<File, File>() {
+			
+			@Override
+			public File apply(File input) {
+				if (input.getName().contains("services-module")) {
+					ZipFile servicesZip = null;
+					try {
+						File outputFile = File.createTempFile("services-module", ".jar");
+						servicesZip = new ZipFile(input);
+						
+						ChangeSet changeSet = new ChangeSet();
+						changeSet.add(new JarArchiveEntry("META-INF/MANIFEST.MF"), ClassLoader.getSystemClassLoader().getResourceAsStream("MANIFEST.MF"));
+						ChangeSetPerformer changeSetPerformer = new ChangeSetPerformer(changeSet);
+						JarArchiveOutputStream jarArchiveOutputStream = new JarArchiveOutputStream(
+								new FileOutputStream(outputFile));
+						changeSetPerformer.perform(servicesZip, jarArchiveOutputStream);
+						return outputFile;
+					} catch (IOException e) {
+						Throwables.propagate(e);
+					} finally {
+						try {
+							if (servicesZip != null) {
+								servicesZip.close();
+							}
+						} catch (IOException e) {
+							Throwables.propagate(e);
+						}
+					}
+				}
+				return input;
+			}
+		}).toArray(File.class);
+	}
+
+	private static File[] serviceModule() {
+		File[] asFile = resolveArtifacts("com.linagora.obm:services-module");
+		return replaceServiceJar(asFile);
+	}
+	
+	private static File[] resolveArtifacts(String artifactCoordinates) {
+		return Maven.resolver()
+				.offline()
+				.loadPomFromFile("pom.xml")
+				.resolve(artifactCoordinates)
+				.withClassPathResolution(true)
+				.withTransitivity()
+				.asFile();
 	}
 
 }

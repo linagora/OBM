@@ -29,44 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.arquillian;
+package org.obm.sync;
 
-import java.io.File;
-import java.util.Arrays;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.jboss.shrinkwrap.resolver.api.maven.MavenResolvedArtifact;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.dbcp.DatabaseModule;
+import org.obm.filter.SlowFilterRunner;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
+@RunWith(SlowFilterRunner.class)
+public class ObmSyncArchiveUtilsTest {
 
-public class ArtifactFilters {
-
-	public static File[] filterObmDependencies(MavenResolvedArtifact[] allObmSyncDependencies) {
-		return FluentIterable.from(Arrays.asList(
-				allObmSyncDependencies))
-				.filter(obmDependencyPredicate())
-				.transform(artifactAsFile()).toArray(File.class);
+	@Test
+	public void testBuildWebArchive() throws Exception {
+		WebArchive webArchive = ObmSyncArchiveUtils.buildWebArchive(DatabaseModule.class);
+		assertThat(webArchive).isNotNull();
 	}
 
-	private static Function<MavenResolvedArtifact, File> artifactAsFile() {
-		return new Function<MavenResolvedArtifact, File>() {
-			@Override
-			public File apply(MavenResolvedArtifact input) {
-				return input.asFile();
-			}
-		};
-	}
-
-	private static Predicate<MavenResolvedArtifact> obmDependencyPredicate() {
-		return new Predicate<MavenResolvedArtifact>() {
-
-			@Override
-			public boolean apply(MavenResolvedArtifact input) {
-				String groupId = input.getCoordinate().getGroupId();
-				return !(groupId.startsWith("com.linagora") || groupId.startsWith("org.obm"));
-			}
-		};
-	}
-	
 }

@@ -60,7 +60,6 @@
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>services-module</artifactId>
 			<version>${obm.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
@@ -97,6 +96,10 @@
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
 		</dependency>
 	</dependencies>
 </project>
