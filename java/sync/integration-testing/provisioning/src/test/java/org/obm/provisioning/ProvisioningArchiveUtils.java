@@ -32,53 +32,31 @@
 package org.obm.provisioning;
 
 import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import javax.servlet.ServletContextListener;
 
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.UnknownExtensionTypeException;
-import org.jboss.shrinkwrap.api.asset.Asset;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.CoordinateParseException;
 import org.jboss.shrinkwrap.resolver.api.ResolutionException;
-import org.obm.DependencyResolverHelper;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.obm.StaticConfigurationService;
+import org.obm.arquillian.GuiceWebXmlDescriptor;
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
-
-import com.google.inject.Module;
 
 public class ProvisioningArchiveUtils {
 
 	public static WebArchive buildWebArchive(File initialSqlScript)
 			throws IllegalArgumentException, IllegalStateException, ResolutionException,
-			CoordinateParseException, UnknownExtensionTypeException, URISyntaxException {
+			CoordinateParseException, UnknownExtensionTypeException {
 
-		JavaArchive wholeProvisioningModuleArchive = ShrinkWrap
-				.create(JavaArchive.class, "provisioning-integration-testing-classes.jar")
-				.addClasses(DependencyResolverHelper.projectAnnotationsClasses())
-				.addClasses(DependencyResolverHelper.projectConfigurationClasses())
-				.addClasses(DependencyResolverHelper.projectDBCPClasses())
-				.addClasses(DependencyResolverHelper.projectUtilsClasses())
-				.addClasses(DependencyResolverHelper.projectLdapClientClasses())
-				.addClasses(DependencyResolverHelper.projectCyrusClientClasses())
-				.addClasses(DependencyResolverHelper.projectSatelliteClientClasses())
-				.addClasses(DependencyResolverHelper.projectObmDaoClasses())
-				.addClasses(DependencyResolverHelper.projectProvisioningClasses())
-				.addClasses(DependencyResolverHelper.projectCommonClasses());
-			
-		URL pomXmlUrl = ClassLoader.getSystemResource("pom.xml");
 		return ShrinkWrap
 				.create(WebArchive.class)
-				.addAsWebInfResource(webXml(TestingProvisioningContextListener.class, TestingProvisioningModule.class), "web.xml")
-				.addAsResource(initialSqlScript, "dbInitialScript.sql")
-				.addAsLibraries(DependencyResolverHelper.projectDependencies(new File(pomXmlUrl.toURI())))
-				.addAsLibraries(wholeProvisioningModuleArchive)
+				.addAsWebInfResource(GuiceWebXmlDescriptor.webXml(TestingProvisioningModule.class, TestingProvisioningContextListener.class), "web.xml")
+				.addAsLibraries(provisioningModule())
+				.addAsLibraries(resolveArtifacts("com.h2database:h2"))
+				.addAsResource(initialSqlScript, "dbInitialScript.sql")		
 				.addClasses(
 						H2Initializer.class,
 						TestingProvisioningModule.class,
@@ -90,36 +68,21 @@ public class ProvisioningArchiveUtils {
 						TestTransactionConfiguration.class,
 						H2DriverConfiguration.class);
 	}
-
-	private static Asset webXml(
-			Class<? extends ServletContextListener> classContextListener,
-			Class<? extends Module> guiceModule) {
-		return new StringAsset(
-			"<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-			"<!DOCTYPE web-app PUBLIC \"-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN\" \"http://java.sun.com/dtd/web-app_2_3.dtd\">" +
-			"<web-app>" +
-			
-	        	"<display-name>OBM Provisioning integration testing</display-name>" +
-
-				"<listener>" +
-					"<listener-class>" + classContextListener.getName() + "</listener-class>" +
-				"</listener>" +
-                
-	            "<context-param>" +
-	            	"<param-name>guiceModule</param-name>" +
-	            	"<param-value>" + guiceModule.getName() +"</param-value>" +
-	        	"</context-param>" +
 	
-                "<filter>" +
-	                "<filter-name>guiceFilter</filter-name>" +
-	                "<filter-class>com.google.inject.servlet.GuiceFilter</filter-class>" +
-                "</filter>" +
-	                
-                "<filter-mapping>" +
-	                "<filter-name>guiceFilter</filter-name>" +
-	                "<url-pattern>/*</url-pattern>" +
-                "</filter-mapping>" +
-	                
-			"</web-app>");
+	private static File[] provisioningModule() {
+		return resolveArtifacts("com.linagora.obm:provisioning-module");
 	}
+
+	private static File[] resolveArtifacts(String artifactCoordinates) {
+		return Maven.resolver()
+				.offline()
+				.loadPomFromFile("pom.xml")
+				.importRuntimeDependencies()
+				.resolve(artifactCoordinates)
+				.withClassPathResolution(true)
+				.withTransitivity()
+				.asFile();
+	}
+
+	
 }

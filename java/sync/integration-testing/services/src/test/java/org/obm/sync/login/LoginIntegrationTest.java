@@ -176,7 +176,7 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 		assertThat(token.getUserLogin()).isEqualToIgnoringCase("user1");
 		assertThat(token.getUserSettings()).isEqualTo(null);
 		assertThat(token.getUserWithDomain()).isEqualToIgnoringCase("user1@domain.org");
-		assertThat(token.getVersion()).isEqualTo(new MavenVersion("2", "5", "0"));
+		assertThat(token.getVersion()).isEqualTo(new MavenVersion("2", "9", "4"));
 		assertThat(token.isRootAccount()).isFalse();
 	}
 }

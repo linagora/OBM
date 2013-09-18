@@ -50,7 +50,6 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.arquillian.ArtifactFilters;
 import org.obm.arquillian.GuiceWebXmlDescriptor;
 import org.obm.arquillian.SlowGuiceArquillianRunner;
 import org.obm.filter.Slow;
@@ -77,14 +76,15 @@ public class StartupTest {
 			.addPackages(true, "org.obm.locator")
 			.addAsWebInfResource(GuiceWebXmlDescriptor.webXml(ArquillianLocatorModule.class, H2GuiceServletContextListener.class), "web.xml")
 			.addAsLibraries(
-					ArtifactFilters.filterObmDependencies(Maven
+					Maven
 					.resolver()
 					.offline()
-					.loadPomFromClassLoaderResource("pom.xml")
+					.loadPomFromFile("pom.xml")
 					.importDependencies(ScopeType.PROVIDED, ScopeType.COMPILE)
 					.resolve()
+					.withClassPathResolution(true)
 					.withTransitivity()
-					.asResolvedArtifact()));
+					.asFile());
 	}
 	
 }
