@@ -37,6 +37,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
+import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
+
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
@@ -108,6 +110,11 @@ public class StaticConfigurationService implements ConfigurationService {
 		@Override
 		public long timeToLiveInSeconds() {
 			return 60;
+		}
+
+		@Override
+		public TransactionalMode transactionalMode() {
+			return TransactionalMode.XA;
 		}
 	}
 

@@ -33,6 +33,8 @@ package org.obm.push.store.ehcache;
 
 import java.util.concurrent.TimeUnit;
 
+import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
+
 import org.obm.configuration.utils.IniFile;
 import org.obm.configuration.utils.TimeUnitMapper;
 import org.obm.push.utils.jvm.JvmUtils;
@@ -46,13 +48,15 @@ public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 	public final static String TIME_TO_LIVE_UNIT = "timeToLiveUnit";
 	public final static String TIME_TO_LIVE = "timeToLive";
 	public final static int DEFAULT_TIME_TO_LIVE = 2592000; // One month in seconds 60 * 60 * 24 * 30
+	public final static TransactionalMode TRANSACTIONAL_MODE = TransactionalMode.XA;
 
 	private static final String configFilePath = "/etc/opush/ehcache_conf.ini";
 	private final IniFile iniFile;
 	private final TimeUnitMapper timeUnitMapper;
 	
 	@Inject
-	@VisibleForTesting EhCacheConfigurationFileImpl(IniFile.Factory factory, TimeUnitMapper timeUnitMapper) {
+	@VisibleForTesting
+	protected EhCacheConfigurationFileImpl(IniFile.Factory factory, TimeUnitMapper timeUnitMapper) {
 		iniFile = factory.build(configFilePath);
 		this.timeUnitMapper = timeUnitMapper;
 	}
@@ -91,5 +95,10 @@ public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 
 	private int getTimeToLive() {
 		return iniFile.getIntValue(TIME_TO_LIVE, DEFAULT_TIME_TO_LIVE);
+	}
+
+	@Override
+	public TransactionalMode transactionalMode() {
+		return TRANSACTIONAL_MODE;
 	}
 }

@@ -40,6 +40,8 @@ import java.util.List;
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
 
+import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
+
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -93,6 +95,11 @@ public class SyncKeysDaoEhcacheImplTest {
 			@Override
 			public long timeToLiveInSeconds() {
 				return 60;
+			}
+
+			@Override
+			public TransactionalMode transactionalMode() {
+				return TransactionalMode.XA;
 			}
 		};
 	}
