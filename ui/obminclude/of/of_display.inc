@@ -1384,6 +1384,7 @@ function display_unified_menu($module) {
   global $perm, $cright_write_admin;
   global $l_intro_webmail, $l_intro_calendar, $l_intro_contacts, $l_intro_moremenu, $l_intro_user;
 
+  $uid = $obm["uid"];
   $login = $obm['login'];
   $profil = $obm['profile'];
   $p = isset($GLOBALS["l_perm_$profil"]) ? $GLOBALS["l_perm_$profil"] : $profil;
@@ -1409,7 +1410,7 @@ function display_unified_menu($module) {
   }
 
   if(!isset($user_photo_id)){
-    $user_infos = get_user_info($obm["uid"]);
+    $user_infos = get_user_info($uid);
     $user_photo_id = $user_infos["photo_id"];
     $common_name = $user_infos["commonname"];
     $email = $user_infos["email"];
@@ -1501,33 +1502,40 @@ function display_unified_menu($module) {
     )
   );
 
-  $data["intro-steps"] = array(
-    array(
-      "id" => "webmail",
-      "position" => "bottom",
-      "text" => $l_intro_webmail
-    ),
-    array(
-      "id" => "calendar",
-      "position" => "bottom",
-      "text" => $l_intro_calendar
-    ),
-    array(
-      "id" => "contacts",
-      "position" => "bottom",
-      "text" => $l_intro_contacts
-    ),
-    array(
-      "id" => "moremenu",
-      "position" => "bottom",
-      "text" => $l_intro_moremenu
-    ),
-    array(
-      "id" => "user",
-      "position" => "left",
-      "text" => $l_intro_user
-    ),
-  );
+  $seenTopbarIntro = get_one_user_pref($uid, "seen_topbar_intro");
+
+  if (!isset($seenTopbarIntro[$uid]) || $seenTopbarIntro[$uid]["value"] != "yes") {
+    update_user_pref($uid, "seen_topbar_intro", "yes");
+
+    $data["show_intro"] = true;
+    $data["intro-steps"] = array(
+        array(
+            "id" => "webmail",
+            "position" => "bottom",
+            "text" => $l_intro_webmail
+        ),
+        array(
+            "id" => "calendar",
+            "position" => "bottom",
+            "text" => $l_intro_calendar
+        ),
+        array(
+            "id" => "contacts",
+            "position" => "bottom",
+            "text" => $l_intro_contacts
+        ),
+        array(
+            "id" => "moremenu",
+            "position" => "bottom",
+            "text" => $l_intro_moremenu
+        ),
+        array(
+            "id" => "user",
+            "position" => "left",
+            "text" => $l_intro_user
+        ),
+    );
+  }
 
   $data["sections"] = get_sections_data();
 

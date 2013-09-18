@@ -1,4 +1,5 @@
 <div id="banner">
+  {{#show_intro}}
   <script type="text/javascript">
     function introSteps() {
       var steps = [];
@@ -26,7 +27,10 @@
           }
       ).start();
     }
+
+    window.setTimeout(showIntro, 500);
   </script>
+  {{/show_intro}}
 
   <div style="float:left;">
     {{#template}}
