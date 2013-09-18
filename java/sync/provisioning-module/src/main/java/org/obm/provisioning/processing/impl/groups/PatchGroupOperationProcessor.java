@@ -42,7 +42,7 @@ import org.obm.provisioning.json.GroupJsonDeserializer;
 
 import com.google.inject.Inject;
 
-public final class PatchGroupOperationProcessor extends AbstractModifyGroupOperationProcessor {
+public class PatchGroupOperationProcessor extends AbstractModifyGroupOperationProcessor {
 
 	@Inject
 	PatchGroupOperationProcessor() {

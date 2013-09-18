@@ -62,7 +62,7 @@ public abstract class AbstractModifyGroupOperationProcessor extends AbstractGrou
 
 	@Override
 	@Transactional
-	public final void process(Operation operation, Batch batch) throws ProcessingException {
+	public void process(Operation operation, Batch batch) throws ProcessingException {
 		final ObmDomain domain = batch.getDomain();
 		GroupExtId extId = getGroupExtIdFromRequest(operation);
 

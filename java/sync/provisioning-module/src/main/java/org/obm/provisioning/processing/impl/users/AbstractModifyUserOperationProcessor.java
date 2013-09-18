@@ -67,7 +67,7 @@ public abstract class AbstractModifyUserOperationProcessor extends AbstractUserO
 
 	@Override
 	@Transactional
-	public final void process(Operation operation, Batch batch) throws ProcessingException {
+	public void process(Operation operation, Batch batch) throws ProcessingException {
 		final UserExtId extId = OperationUtils.getUserExtIdFromRequest(operation);
 		final ObmDomain domain = batch.getDomain();
 		existingUser = getUserFromDao(extId, domain);

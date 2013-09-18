@@ -34,7 +34,7 @@ import org.obm.provisioning.beans.HttpVerb;
 
 import com.google.inject.Inject;
 
-public final class PutGroupOperationProcessor extends AbstractModifyGroupOperationProcessor {
+public class PutGroupOperationProcessor extends AbstractModifyGroupOperationProcessor {
 
 	@Inject
 	PutGroupOperationProcessor() {
