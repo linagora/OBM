@@ -47,7 +47,6 @@
 		<jsoup.version>1.7.2</jsoup.version>
 		<guice.version>3.0</guice.version>
 		<apache-mime4j.version>0.7.2</apache-mime4j.version>
-		<apache-commons-compress.version>1.5</apache-commons-compress.version>
 		<btm.version>2.2.0-SNAPSHOT</btm.version>
 		<parboiled.version>1.1.6</parboiled.version>
 		<jersey.version>1.17.1</jersey.version>
@@ -188,7 +187,6 @@
 					<artifactId>maven-eclipse-plugin</artifactId>
 					<version>${plugin.eclipse.version}</version>
 					<configuration>
-						<buildOutputDirectory>eclipse-build</buildOutputDirectory>
 						<downloadJavadocs>true</downloadJavadocs>
 						<downloadSources>true</downloadSources>
 						<projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
@@ -766,6 +764,11 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<groupId>com.linagora.obm</groupId>
 				<artifactId>common-test</artifactId>
 				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-compress</artifactId>
+				<version>1.5</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
