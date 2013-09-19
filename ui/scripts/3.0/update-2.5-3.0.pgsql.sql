@@ -2,7 +2,8 @@
 UPDATE ObmInfo SET obminfo_value='2.5.x->3.0.0' WHERE obminfo_name='db_version';
 -- -----------------------------------------------------------------------------
 
-ALTER TABLE trusttoken ADD COLUMN user_id integer;
+ALTER TABLE trusttoken ADD COLUMN userobm_id integer NOT NULL;
+ALTER TABLE trusttoken DROP COLUMN login;
 
 INSERT INTO userobmpref (userobmpref_option, userobmpref_value)
 SELECT 'set_top_bar', 'yes' 

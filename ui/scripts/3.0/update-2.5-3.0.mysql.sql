@@ -2,7 +2,8 @@
 UPDATE ObmInfo SET obminfo_value='2.5.x->3.0.0' WHERE obminfo_name='db_version';
 -- -----------------------------------------------------------------------------
 
-ALTER TABLE TrustToken ADD COLUMN user_id int;
+ALTER TABLE TrustToken ADD COLUMN userobm_id int(8) NOT NULL;
+ALTER TABLE TrustToken DROP COLUMN login;
 
 INSERT INTO UserObmPref (userobmpref_option, userobmpref_value)
 SELECT 'set_top_bar', 'yes' FROM Dual

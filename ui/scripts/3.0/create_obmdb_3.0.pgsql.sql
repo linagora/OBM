@@ -7260,10 +7260,8 @@ CREATE TABLE token (
 CREATE TABLE trusttoken (
     id integer NOT NULL,
     token character(36) NOT NULL,
-    login character varying(80) NOT NULL,
+    userobm_id integer NOT NULL,
     time_created timestamp without time zone DEFAULT now(),
-    email text DEFAULT NULL,
-    password character varying(255) DEFAULT NULL
 );
 
 

@@ -1581,7 +1581,7 @@ function run_icalendar_obmsync_insert($ics){
   $obmSyncRootPath = "http://".$obmSyncServer[0]["ip"].":8080";
   $loginPath = "/obm-sync/services/login/trustedLogin";
   $username = $userInfo["login"];
-  $password = get_trust_token($username); // This is a trusted login, we'll use the trust token
+  $password = get_trust_token($userInfo);
   $origin= $GLOBALS['c_origin_web'];
 
   $loginUrl = $obmSyncRootPath.$loginPath."?login=".$username."&password=".$password."&origin=".$origin;

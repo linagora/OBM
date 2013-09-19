@@ -2441,10 +2441,12 @@ function get_user_info($id='') {
 function get_trust_token($userInfo){
 	global $cdg_sql;
 
+  $uid = get_user_id($userInfo['login']);
+
 	$obm_q = new DB_OBM ;
-	$deleteQuery = "DELETE FROM TrustToken WHERE login='".$userInfo['login']."'";
-	$insertQuery = "INSERT INTO TrustToken (user_id, login, token) VALUES ( '".$userInfo['id']."', '".$userInfo['login']."', UUID())";
-	$query = "SELECT token FROM TrustToken WHERE login='".$userInfo['login']."'";
+	$deleteQuery = "DELETE FROM TrustToken WHERE userobm_id='".$uid."'";
+	$insertQuery = "INSERT INTO TrustToken (userobm_id, token) VALUES ( '".$uid."', UUID())";
+	$query = "SELECT token FROM TrustToken WHERE userobm_id='".$uid."'";
 
 	display_debug_msg($query, $cdg_sql, 'get_trust_token()');
 	

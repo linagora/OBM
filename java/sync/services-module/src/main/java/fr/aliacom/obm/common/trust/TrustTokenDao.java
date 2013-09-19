@@ -49,17 +49,17 @@ public class TrustTokenDao {
 		this.obmHelper = obmHelper;
 	}
 
-	public TrustToken getTrustToken(String user) throws SQLException {
+	public TrustToken getTrustToken(String login) throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		String query = "SELECT token, time_created FROM TrustToken WHERE login=?";
+		String query = "SELECT token, time_created FROM TrustToken AS t INNER JOIN UserObm AS u ON t.userobm_id = u.userobm_id WHERE userobm_login=?";
 
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(query);
-			ps.setString(1, user);
-			
+			ps.setString(1, login);
+
 			rs = ps.executeQuery();
 
 			if (rs.next()) {

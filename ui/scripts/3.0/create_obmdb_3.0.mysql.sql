@@ -4161,10 +4161,8 @@ DROP TABLE IF EXISTS `TrustToken`;
 CREATE TABLE `TrustToken` (
   `id` int(8) NOT NULL AUTO_INCREMENT,
   `token` char(36) NOT NULL,
-  `login` varchar(80) NOT NULL,
+  `userobm_id` int(8) NOT NULL,
   `time_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `email` text DEFAULT NULL,
-  `password` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `token` (`token`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
