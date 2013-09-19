@@ -55,7 +55,7 @@ function generate_token(){
 
 	$userInfo = get_user_info($obm['uid']);
 
-	if( isset($userInfo['email']) ){
+	if( isset($userInfo['email']) && !empty($userInfo['email'])){
 		$token = get_trust_token($userInfo);
 	} else {
 		$url_redirect = $path."/calendar/calendar_index.php";

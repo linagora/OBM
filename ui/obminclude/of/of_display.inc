@@ -1446,31 +1446,44 @@ function display_unified_menu($module) {
   $data["printer"]["ico"] = $ico_print;
 
   $data[] = array("buttons");
-  $data["buttons"] = array (
+  $data["buttons"] = array();
+
+  if (isset($email) && !empty($email)) {
+    array_push( $data["buttons"],
+      array(
+        "name" => $l_section_webmail,
+        "url" => "$path/webmail/webmail_index.php",
+        "notifier" => true,
+        "notifier_url" => "$path/webmail/webmail_index.php?_task=mail&_mbox=INBOX",
+        "notifier_id" => "bannerUnreadMail"
+      )
+    );
+  }
+
+  array_push( $data["buttons"],
     array(
-      "name" => $l_section_webmail, 
-      "url" => "$path/webmail/webmail_index.php", 
-      "notifier" => true, 
-      "notifier_url" => "$path/webmail/webmail_index.php?_task=mail&_mbox=INBOX",
-      "notifier_id" => "bannerUnreadMail"
-    ),
-    array(
-      "name" => $l_module_calendar, 
-      "url" => "$path/calendar/calendar_index.php", 
-      "notifier" => true, 
-      "notifier_url" => "$path/calendar/calendar_index.php?action=waiting_events", 
+      "name" => $l_module_calendar,
+      "url" => "$path/calendar/calendar_index.php",
+      "notifier" => true,
+      "notifier_url" => "$path/calendar/calendar_index.php?action=waiting_events",
       "notifier_id" => "bannerWaitingEvent"
-    ),
+    )
+  );
+
+  array_push( $data["buttons"],
     array(
-      "name" => $l_module_contact, 
-      "url" => "$path/contact/contact_index.php", 
+      "name" => $l_module_contact,
+      "url" => "$path/contact/contact_index.php",
       "notifier" => false
-    ),
+    )
+  );
+
+  array_push( $data["buttons"],
     array(
       "name" => $l_section_more, 
       "idmore" => "moremenu_button",
-      "url" => "#", 
-      "notifier" => false, 
+      "url" => "#",
+      "notifier" => false,
       "onclick" => "showAllInOneMenu()"
     )
   );
