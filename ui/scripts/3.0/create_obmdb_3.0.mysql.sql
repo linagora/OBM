@@ -4166,7 +4166,7 @@ CREATE TABLE `TrustToken` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `token` (`token`),
   KEY `TrustToken_userobm_id_fkey`,
-  CONSTRAINT `TrustToken_userobm_id_fkey` FOREIGN KEY (`userobm_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `TrustToken_userobm_id_fkey` FOREIGN KEY (`userobm_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

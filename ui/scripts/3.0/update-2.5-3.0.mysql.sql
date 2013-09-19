@@ -8,7 +8,7 @@ ALTER TABLE TrustToken DROP COLUMN login;
 
 ALTER TABLE TrustToken ADD COLUMN userobm_id int(8) NOT NULL;
 ALTER TABLE TrustToken
-  ADD CONSTRAINT `TrustToken_userobm_id_fkey` FOREIGN KEY (`userobm_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
+  ADD CONSTRAINT `TrustToken_userobm_id_fkey` FOREIGN KEY (`userobm_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 INSERT INTO UserObmPref (userobmpref_option, userobmpref_value)
 SELECT 'set_top_bar', 'yes' FROM Dual
