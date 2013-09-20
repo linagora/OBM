@@ -688,6 +688,26 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	}
 
 	@Test
+	public void testGetArchivedUserByExtId() throws Exception {
+		ObmUser user = sampleUserBuilder(7, 32, "7")
+				.archived(true)
+				.domain(domain2)
+				.build();
+
+		assertThat(dao.getByExtId(UserExtId.valueOf("7"), domain2)).isEqualTo(user);
+	}
+
+	@Test
+	public void testGetArchivedUserByExtIdWithGroups() throws Exception {
+		ObmUser user = sampleUserBuilder(7, 32, "7")
+				.archived(true)
+				.domain(domain2)
+				.build();
+
+		assertThat(dao.getByExtIdWithGroups(UserExtId.valueOf("7"), domain2)).isEqualTo(user);
+	}
+
+	@Test
 	public void testListAlsoListsArchivedUsers() throws Exception {
 		List<ObmUser> users = ImmutableList.of(
 				sampleUserBuilder(1, 7, "5")
