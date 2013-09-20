@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013 Linagora
+ * Copyright (C) 2011-2012  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -40,35 +40,33 @@ import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 
-import javax.net.ssl.SSLContext;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
+@RunWith(SlowFilterRunner.class)
+public class Pkcs12HttpClientBuilderTest {
 
-public class SSLContextFactoryTest {
-
+	@SuppressWarnings("unused")
 	@Test(expected=IllegalArgumentException.class)
 	public void testRequirePKCS12() {
-		SSLContextFactory.create(null, "password".toCharArray());
+		new Pkcs12HttpClientBuilder(null, "password".toCharArray());
 	}
 	
+	@SuppressWarnings("unused")
 	@Test(expected=IllegalArgumentException.class)
 	public void testRequirePKCS12Password() {
-		SSLContextFactory.create(new ByteArrayInputStream("test".getBytes()), null);
+		new Pkcs12HttpClientBuilder(new ByteArrayInputStream("test".getBytes()), null);
 	}
 	
 	@Test(expected=EOFException.class)
-	public void testKeyStoreFailsIfNotPKCS12() throws Throwable {
+	public void testKeyStoreFailsIfNotPKCS12() throws Exception {
 		InputStream pkcs12Stream = IOUtils.toInputStream("I'm not a pkcs12 key store");
 		char[] pkcs12Password = "toto".toCharArray();
 		
-		try {
-			SSLContextFactory.create(pkcs12Stream, pkcs12Password);
-		} catch (RuntimeException e) {
-			assertThat(e.getCause()).isNotNull();
-			throw e.getCause();
-		}
+		Pkcs12HttpClientBuilder testee = new Pkcs12HttpClientBuilder(pkcs12Stream, pkcs12Password);
+		testee.loadPKCS12KeyStore(pkcs12Stream, pkcs12Password);
 	}
 	
 	@Test
@@ -76,21 +74,12 @@ public class SSLContextFactoryTest {
 		InputStream pkcs12Stream = ClassLoader.getSystemClassLoader().getResourceAsStream("pkcs_pwd_toto.p12");
 		char[] pkcs12Password = "toto".toCharArray();
 		
-		KeyStore keyStore = SSLContextFactory.loadPKCS12KeyStore(pkcs12Stream, pkcs12Password);
+		Pkcs12HttpClientBuilder testee = new Pkcs12HttpClientBuilder(pkcs12Stream, pkcs12Password);
+		KeyStore keyStore = testee.loadPKCS12KeyStore(pkcs12Stream, pkcs12Password);
 		
 		InputStream pkcs12InnerX509 = ClassLoader.getSystemClassLoader().getResourceAsStream("pkcs_inner_x509.crt");
 		Certificate pkcs12InnerCertificate = CertificateFactory.getInstance("x509").generateCertificate(pkcs12InnerX509);
 		assertThat(keyStore.getType()).isEqualToIgnoringCase("pkcs12");
 		assertThat(keyStore.getCertificate("client2")).isEqualTo(pkcs12InnerCertificate);
-	}
-	
-	@Test
-	public void testCorrectSSLContextFactoryCall() {
-		InputStream pkcs12Stream = ClassLoader.getSystemClassLoader().getResourceAsStream("pkcs_pwd_toto.p12");
-		char[] pkcs12Password = "toto".toCharArray();
-		
-		SSLContext sslContext = SSLContextFactory.create(pkcs12Stream, pkcs12Password);
-		
-		assertThat(sslContext).isNotNull();
 	}
 }

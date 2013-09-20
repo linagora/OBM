@@ -37,9 +37,6 @@ import java.io.IOException;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,18 +50,17 @@ import org.w3c.dom.Document;
 public class OPClientTest {
 	
 	private OPClient opClient;
-	private CloseableHttpClient httpClient;
 
 	@Before
 	public void setUp() {
-		httpClient = HttpClientBuilder.create().build();
+		HttpClientBuilder httpClientBuilder = new PoolingHttpClientBuilder();
 		String loginAtDomain = "log@domain";
 		String password = "pwd";
 		DeviceId devId = new DeviceId("devId");
 		String devType = "devType";
 		String userAgent = "userAgent";
 		String url = "url";
-		opClient = new OPClient(httpClient, loginAtDomain, password, devId, devType, userAgent, url, ProtocolVersion.V121) {
+		opClient = new OPClient(httpClientBuilder, loginAtDomain, password, devId, devType, userAgent, url, ProtocolVersion.V121) {
 			
 			@Override
 			public Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart) throws TransformerException,
@@ -72,11 +68,6 @@ public class OPClientTest {
 				throw new RuntimeException("this testing OPClient cannot performs request");
 			}
 		};
-	}
-	
-	@After
-	public void teardown() throws IOException {
-		httpClient.close();
 	}
 	
 	@Test

@@ -100,12 +100,12 @@ public abstract class OPClient {
 	public abstract Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart)
 			throws TransformerException, WBXmlException, IOException, HttpRequestException;
 	
-	protected OPClient(HttpClient httpClient, String loginAtDomain, String password,
+	protected OPClient(HttpClientBuilder httpClientBuilder, String loginAtDomain, String password,
 			DeviceId devId, String devType, String userAgent, String url, ProtocolVersion protocolVersion) {
 
 		setProtocolVersion(protocolVersion);
 		this.ai = new AccountInfos(loginAtDomain, password, devId, devType, url, userAgent);
-		this.hc = httpClient;
+		this.hc = httpClientBuilder.build();
 	}
 
 	private <T> T run(IEasCommand<T> cmd) throws Exception {

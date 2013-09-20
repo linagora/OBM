@@ -41,8 +41,6 @@ import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Date;
 
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
@@ -94,11 +92,9 @@ public class SmartReplyHandlerTest {
 	private MailFolder inboxFolder;
 	private MailFolder sentFolder;
 	private ServerId serverId;
-	private CloseableHttpClient httpClient;
 
 	@Before
 	public void setUp() throws Exception {
-		httpClient = HttpClientBuilder.create().build();
 		user = singleUserFixture.jaures;
 		greenMail.start();
 		greenMailUser = greenMail.setUser(user.user.getLoginAtDomain(), user.password);
@@ -120,7 +116,6 @@ public class SmartReplyHandlerTest {
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
-		httpClient.close();
 		Files.delete(configuration.dataDir);
 	}
 
@@ -219,6 +214,6 @@ public class SmartReplyHandlerTest {
 	}
 
 	private OPClient opClient() {
-		return buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
+		return buildWBXMLOpushClient(user, opushServer.getPort());
 	}
 }

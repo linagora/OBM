@@ -42,7 +42,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
@@ -57,10 +56,10 @@ import org.xml.sax.SAXException;
 
 public class XMLOPClient extends OPClient {
 
-	public XMLOPClient(HttpClient httpClient, String loginAtDomain, String password, DeviceId devId,
+	public XMLOPClient(String loginAtDomain, String password, DeviceId devId,
 			String devType, String userAgent, int port) {
 		
-		super(httpClient, loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(port), ProtocolVersion.V121);
+		super(new PoolingHttpClientBuilder(), loginAtDomain, password, devId, devType, userAgent, buildServiceUrl(port), ProtocolVersion.V121);
 	}
 
 	private ByteArrayEntity getRequestEntity(Document doc) throws UnsupportedEncodingException, TransformerException {

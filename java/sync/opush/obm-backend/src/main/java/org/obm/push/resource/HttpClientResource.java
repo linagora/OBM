@@ -31,28 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.resource;
 
-import java.io.IOException;
-
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.CloseableHttpClient;
-
-import com.google.common.base.Throwables;
 
 public class HttpClientResource extends ObmBackendResource {
 
-	private final CloseableHttpClient httpClient;
+	private final HttpClient httpClient;
 
-	public HttpClientResource(CloseableHttpClient httpClient) {
+	public HttpClientResource(HttpClient httpClient) {
 		this.httpClient = httpClient;
 	}
 	
 	@Override
 	public void close() {
-		try {
-			httpClient.close();
-		} catch (IOException e) {
-			Throwables.propagate(e);
-		}
+		httpClient.getConnectionManager().shutdown();
 	}
 
 	public HttpClient getHttpClient() {

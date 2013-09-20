@@ -49,8 +49,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
@@ -104,21 +102,18 @@ public class GetItemEstimateHandlerTest {
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
 	private List<OpushUser> fakeTestUsers;
-	private CloseableHttpClient httpClient;
 
 	@Before
 	public void init() {
 		fakeTestUsers = Arrays.asList(singleUserFixture.jaures);
 
 		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
-		httpClient = HttpClientBuilder.create().build();
 	}
 	
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
 		Files.delete(configuration.dataDir);
-		httpClient.close();
 	}
 
 	@Test
@@ -129,7 +124,7 @@ public class GetItemEstimateHandlerTest {
 		Set<Integer> existingCollections = Sets.newHashSet(collectionId);
 		mockAccessAndStateThenStart(existingCollections, syncKey, expectedSyncState);
 		
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		
 		GetItemEstimateSingleFolderResponse response =
 				opClient.getItemEstimateOnMailFolder(syncKey, collectionId);
@@ -147,7 +142,7 @@ public class GetItemEstimateHandlerTest {
 		Set<Integer> existingCollections = Collections.<Integer>emptySet();
 		mockAccessAndStateThenStart(existingCollections, syncKey, expectedSyncState);
 		
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		
 		GetItemEstimateSingleFolderResponse response =
 				opClient.getItemEstimateOnMailFolder(syncKey, unexistingCollectionId);
@@ -165,7 +160,7 @@ public class GetItemEstimateHandlerTest {
 		Set<Integer> existingCollections = Sets.newHashSet(collectionId);
 		mockAccessAndStateThenStart(existingCollections, invalidSyncKey, expectedSyncState);
 		
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		
 		GetItemEstimateSingleFolderResponse response =
 				opClient.getItemEstimateOnMailFolder(invalidSyncKey, collectionId);
@@ -201,7 +196,7 @@ public class GetItemEstimateHandlerTest {
 		mocksControl.replay();
 		opushServer.start();
 		
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		
 		GetItemEstimateSingleFolderResponse response =
 				opClient.getItemEstimateOnMailFolder(syncKey, collectionId);

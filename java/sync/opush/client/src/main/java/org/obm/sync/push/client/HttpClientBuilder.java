@@ -29,44 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.auth.crsh;
+package org.obm.sync.push.client;
 
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.crsh.auth.AuthenticationPlugin;
-import org.crsh.plugin.CRaSHPlugin;
-import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.login.LoginClient;
+import org.apache.http.client.HttpClient;
 
-import com.google.inject.Inject;
+public interface HttpClientBuilder {
 
-public class ObmSyncAuthenticationPlugin extends CRaSHPlugin<AuthenticationPlugin> implements
-		AuthenticationPlugin {
-
-	private final LoginClient.Factory loginClientFactory;
-
-	@Inject
-	private ObmSyncAuthenticationPlugin(LoginClient.Factory loginClientFactory) {
-		this.loginClientFactory = loginClientFactory;
-	}
-	
-	@Override
-	public boolean authenticate(String username, String password) throws Exception {
-		try {
-			return loginClientFactory.create(new DefaultHttpClient())
-					.authenticateGlobalAdmin(username, password);
-		} catch (AuthFault e) {
-			return false;
-		}
-	}
-	
-	@Override
-	public AuthenticationPlugin getImplementation() {
-		return this;
-	}
-	
-	@Override
-	public String getName() {
-		return "obm-sync";
-	}
+	HttpClient build();
 	
 }

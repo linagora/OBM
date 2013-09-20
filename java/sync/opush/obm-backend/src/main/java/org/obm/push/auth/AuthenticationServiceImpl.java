@@ -34,7 +34,7 @@ package org.obm.push.auth;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
@@ -113,7 +113,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 	
 	private HttpClientResource setHttpClientRequestAttribute(HttpServletRequest request) {
-		HttpClientResource httpClientResource = new HttpClientResource(HttpClientBuilder.create().build());
+		HttpClientResource httpClientResource = new HttpClientResource(new DefaultHttpClient());
 		request.setAttribute(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
 		return httpClientResource;
 	}

@@ -38,10 +38,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.spushnik.bean.CheckResult;
@@ -49,9 +45,12 @@ import org.obm.push.spushnik.bean.CheckStatus;
 import org.obm.push.spushnik.bean.Credentials;
 import org.obm.push.spushnik.service.CredentialsService;
 import org.obm.push.wbxml.WBXMLTools;
+import org.obm.sync.push.client.HttpClientBuilder;
 import org.obm.sync.push.client.HttpRequestException;
 import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.SSLContextFactory;
+import org.obm.sync.push.client.Pkcs12HttpClientBuilder;
+import org.obm.sync.push.client.PoolingHttpClientBuilder;
+import org.obm.sync.push.client.SSLHttpClientBuilder;
 import org.obm.sync.push.client.WBXMLOPClient;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -76,7 +75,7 @@ public abstract class Scenario {
 		try {
 			credentialsService.validate(credentials);
 			
-			OPClient client = new WBXMLOPClient(chooseHttpClient(credentials, serviceUrl),
+			OPClient client = new WBXMLOPClient(chooseHttpClientBuilder(credentials, serviceUrl),
 				credentials.getLoginAtDomain(), credentials.getPassword(),
 				DEVICE_ID, DEV_TYPE, USER_AGENT, serviceUrl, new WBXMLTools(), ProtocolVersion.V121);
 		
@@ -86,30 +85,16 @@ public abstract class Scenario {
 		}
 	}
 
-	@VisibleForTesting HttpClient chooseHttpClient(Credentials credentials, String serviceUrl) {
+	@VisibleForTesting HttpClientBuilder chooseHttpClientBuilder(Credentials credentials, String serviceUrl) {
 		Preconditions.checkNotNull(credentials);
 		Preconditions.checkNotNull(serviceUrl);
-		PoolingHttpClientConnectionManager connectionManager = buildConnectionManager();
 		if (serviceDoesNotNeedSSL(serviceUrl)) {
-			return HttpClientBuilder.create().setConnectionManager(connectionManager).build();
+			return new PoolingHttpClientBuilder();
 		}
 		if (serviceNeedsClientCertificate(credentials)) {
-			return HttpClientBuilder.create()
-					.setConnectionManager(connectionManager)
-					.setSslcontext(SSLContextFactory.create(getPkcs12Stream(credentials), credentials.getPkcs12Password()))
-					.build();
+			return new Pkcs12HttpClientBuilder(getPkcs12Stream(credentials), credentials.getPkcs12Password());
 		}
-		return HttpClientBuilder.create().setConnectionManager(connectionManager)
-				.setSslcontext(SSLContextFactory.TRUST_ALL)
-				.setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
-				.build();
-	}
-
-	private PoolingHttpClientConnectionManager buildConnectionManager() {
-		PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-		connectionManager.setMaxTotal(100);
-		connectionManager.setDefaultMaxPerRoute(100);
-		return connectionManager;
+		return new SSLHttpClientBuilder();
 	}
 
 	private boolean serviceNeedsClientCertificate(Credentials credentials) {

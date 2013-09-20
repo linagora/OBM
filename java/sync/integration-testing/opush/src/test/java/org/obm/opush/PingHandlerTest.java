@@ -56,8 +56,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
@@ -116,11 +114,9 @@ public class PingHandlerTest {
 	
 	private List<OpushUser> fakeTestUsers;
 	private int pingOnCollectionId;
-	private CloseableHttpClient httpClient;
 
 	@Before
 	public void init() {
-		httpClient = HttpClientBuilder.create().build();
 		fakeTestUsers = Arrays.asList(singleUserFixture.jaures);
 		pingOnCollectionId = 1432;
 
@@ -130,7 +126,6 @@ public class PingHandlerTest {
 	@After
 	public void shutdown() throws Exception {
 		opushServer.stop();
-		httpClient.close();
 		Files.delete(configuration.dataDir);
 	}
 
@@ -153,7 +148,7 @@ public class PingHandlerTest {
 
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		
 		Document document = DOMUtils.parse(
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
@@ -191,7 +186,7 @@ public class PingHandlerTest {
 
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		
 		ThreadPoolExecutor threadPoolExecutor = 
 				new ThreadPoolExecutor(20, 20, 1,TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
@@ -218,7 +213,7 @@ public class PingHandlerTest {
 
 		opushServer.start();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		Document document = buildPingCommand(20);
 		Stopwatch stopwatch = Stopwatch.createStarted();
 		
@@ -238,7 +233,7 @@ public class PingHandlerTest {
 		Document document = buildPingCommand(20);
 		Stopwatch stopwatch = Stopwatch.createStarted();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		Document response = opClient.postXml("Ping", document, "Ping", null, false);
 		
 		checkExecutionTime(5, 6, stopwatch);
@@ -254,7 +249,7 @@ public class PingHandlerTest {
 
 		Document document = buildPingCommand(20);
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		Document response = opClient.postXml("Ping", document, "Ping", null, false);
 		
 		checkFolderSyncRequiredResponse(response);
@@ -292,7 +287,7 @@ public class PingHandlerTest {
 		Document document = buildPingCommand(heartbeatInterval);
 		Stopwatch stopwatch = Stopwatch.createStarted();
 
-		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort());
 		Document response = opClient.postXml("Ping", document, "Ping", null, false);
 		
 		checkExecutionTime(delta, expected, stopwatch);
