@@ -36,6 +36,7 @@ import org.crsh.ssh.SSHPlugin;
 import org.obm.auth.crsh.ObmSyncAuthenticationPlugin;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
+import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +59,12 @@ public class OpushCrashModule extends AbstractModule {
 		Multibinder<CRaSHPlugin<?>> pluginBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<CRaSHPlugin<?>>(){});
 		pluginBinder.addBinding().to(ObmSyncAuthenticationPlugin.class);
 		bind(CRaSHBootstrap.class).asEagerSingleton();
+		
+		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
+		lifecycleListeners.addBinding().to(CRaSHBootstrap.class);
 	}
 
-	public static class CRaSHBootstrap {
+	public static class CRaSHBootstrap implements LifecycleListener {
 
 		private final RemoteConsoleConfiguration configuration;
 		private final Bootstrap bootstrap;
@@ -79,6 +83,11 @@ public class OpushCrashModule extends AbstractModule {
 				logger.debug("CRaSH remote shell started on port : " + configuration.port());
 				bootstrap.start();
 			}
+		}
+
+		@Override
+		public void shutdown() throws Exception {
+			bootstrap.destroy();
 		}
 
 	}
