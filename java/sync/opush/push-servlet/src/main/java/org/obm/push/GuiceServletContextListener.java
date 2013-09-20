@@ -47,6 +47,7 @@ import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.spi.Message;
+import com.linagora.crsh.guice.CrashGuiceSupport.Bootstrap;
 
 public class GuiceServletContextListener implements ServletContextListener { 
 
@@ -72,14 +73,27 @@ public class GuiceServletContextListener implements ServletContextListener {
 		return Guice.createInjector(new OpushModule());
 	}
 
-    private void failStartup(String message) { 
-        throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
-    }
-    
-    public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    	injector.getInstance(org.obm.push.store.ehcache.ObjectStoreManager.class).shutdown();
-    	injector.getInstance(org.obm.push.jaxb.store.ehcache.ObjectStoreManager.class).shutdown();
-    	TransactionManagerServices.getTransactionManager().shutdown();
-    }
+	private void failStartup(String message) { 
+		throw new CreationException(Collections.nCopies(1, new Message(this, message))); 
+	}
+
+	public void contextDestroyed(ServletContextEvent servletContextEvent) {
+    	shutdown();
+	}
+
+	private void shutdown() {
+		injector.getInstance(org.obm.push.store.ehcache.ObjectStoreManager.class).shutdown();
+		injector.getInstance(org.obm.push.jaxb.store.ehcache.ObjectStoreManager.class).shutdown();
+		TransactionManagerServices.getTransactionManager().shutdown();
+		shutdownCRaSH();
+	}
+
+	private void shutdownCRaSH() {
+		try {
+			injector.getInstance(Bootstrap.class).destroy();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
     
 }
