@@ -133,7 +133,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			ps = con.prepareStatement("DELETE FROM opush_sync_state WHERE device_id=? AND collection_id=?");
 			ps.setInt(1, devDbId);
 			ps.setInt(2, collectionId);
-			Stopwatch stopwatch = Stopwatch.createStarted();
+			Stopwatch stopwatch = new Stopwatch().start();
 			ps.executeUpdate();
 
 			logger.warn("mappings & states cleared for sync of collection {} of device {}",

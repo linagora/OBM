@@ -68,7 +68,7 @@ public abstract class CalendarDaoTest {
 	public void setUp() {
 		eventExtId = new EventExtId("123");
 		msEventUid = new MSEventUid("456");
-		hashedExtId = Hashing.sha1().hashUnencodedChars(eventExtId.getExtId()).asBytes();
+		hashedExtId = Hashing.sha1().hashString(eventExtId.getExtId()).asBytes();
 		user = Factory.create().createUser("user@domain.org", "user@domain.org", "displayName");
 		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121);
 	}

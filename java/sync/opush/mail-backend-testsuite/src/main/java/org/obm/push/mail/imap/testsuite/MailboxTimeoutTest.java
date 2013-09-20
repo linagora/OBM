@@ -83,11 +83,12 @@ public abstract class MailboxTimeoutTest {
 	
 	@Test(expected=ImapTimeoutException.class)
 	public void fetchTooSlow() throws InterruptedException {
+		Stopwatch stopwatch = new Stopwatch();
 		String inboxPath = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, IMAP_INBOX_NAME);
 		//This one is for warming the stack
 		mailboxService.fetchUIDNext(udr, inboxPath);
 		greenMail.lockGreenmailAndReleaseAfter(20);
-		Stopwatch stopwatch = Stopwatch.createStarted();
+		stopwatch.start();
 		try {
 			mailboxService.fetchUIDNext(udr, inboxPath);
 		} finally {

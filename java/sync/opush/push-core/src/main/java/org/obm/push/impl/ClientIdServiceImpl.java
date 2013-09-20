@@ -50,9 +50,9 @@ public class ClientIdServiceImpl implements ClientIdService {
 	@Override
 	public String hash(UserDataRequest udr, String clientId) {
 		return Hashing.sha1().newHasher()
-				.putUnencodedChars(udr.getCredentials().getUser().getLoginAtDomain())
-				.putUnencodedChars(udr.getDevType())
-				.putUnencodedChars(clientId)
+				.putString(udr.getCredentials().getUser().getLoginAtDomain())
+				.putString(udr.getDevType())
+				.putString(clientId)
 				.hash()
 				.toString();
 	}
