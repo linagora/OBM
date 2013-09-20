@@ -9794,6 +9794,12 @@ ALTER TABLE ONLY trusttoken
 
 
 --
+-- Name: trusttoken_userobm_id_fkey; Type: CONSTRAINT; Schema: public; Owner: obm; Tablespace:
+--
+ALTER TABLE ONLY trusttoken
+    ADD CONSTRAINT trusttoken_userobm_id_fkey FOREIGN KEY (userobm_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+--
 -- Name: ugroup_group_gid_key; Type: CONSTRAINT; Schema: public; Owner: obm; Tablespace: 
 --
 
