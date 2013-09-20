@@ -7261,7 +7261,7 @@ CREATE TABLE trusttoken (
     id integer NOT NULL,
     token character(36) NOT NULL,
     userobm_id integer NOT NULL,
-    time_created timestamp without time zone DEFAULT now(),
+    time_created timestamp without time zone DEFAULT now()
 );
 
 
