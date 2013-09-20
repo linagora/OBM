@@ -156,19 +156,19 @@ public class WindowingStepdefs {
 		this.elementsLeft -= retrievedElements.sumOfChanges();
 	}
 	
-	@Then("user get (\\d+) elements")
+	@Then("user get (\\d+) elements$")
 	public void assertRetrievedElement(int elements) {
 		assertThat(retrievedElements).isEqualTo(generateEmails(this.elementsLeft, elements));
 	}
 	
-	@Then("there is (\\d+) elements left in store")
+	@Then("there is (\\d+) elements left in store$")
 	public void assertElementsInStore(int elements) {
 		assertThat(windowingService.hasPendingElements(windowingIndexKey, syncKey)).isEqualTo(elements > 0);
 		EmailChanges pendingChanges = windowingService.popNextPendingElements(windowingIndexKey, Integer.MAX_VALUE, syncKey);
 		assertThat(pendingChanges).isEqualTo(generateEmails(elements));
 	}
 	
-	@When("user get (\\d+) elements in (\\d+) iterations")
+	@When("user get (\\d+) elements in (\\d+) iterations$")
 	public void retreiveUntilPendingElementAssertion(int elements, int iterations) {
 		assertThat(retreivingChangesSum).isEqualTo(elements);
 		assertThat(retreivingChangesIteration).isEqualTo(iterations);
