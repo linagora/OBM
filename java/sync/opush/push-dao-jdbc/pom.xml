@@ -83,6 +83,12 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
+		    <groupId>com.google.guiceberry</groupId>
+		    <artifactId>guiceberry</artifactId>
+		    <version>3.1.0</version>
+		    <scope>test</scope>
+		</dependency>
+		<dependency>
                        <groupId>org.codehaus.btm</groupId>
                        <artifactId>btm</artifactId>
                        <scope>test</scope>
