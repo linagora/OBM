@@ -474,7 +474,6 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expectSuccessfulAuthenticationAndFullAuthorization();
 
 		expect(batchDao.create(isA(Batch.class))).andReturn(batch);
-		expect(batchDao.get(batchId(1), domain)).andReturn(batch);
 		batchDao.addOperation(eq(batch), isA(Operation.class));
 		expectLastCall();
 		expect(batchDao.get(batchId(1), domain)).andReturn(batch);

@@ -29,7 +29,6 @@ import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
-import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
 
@@ -134,8 +133,7 @@ public class BatchResource {
 			} else {
 				return Response.ok(
 						new BatchAlreadyCommitedException(
-								new ProcessingException(
-										String.format("Not commiting batch %s in status %s.", batch.getId(), batch.getStatus())))
+										String.format("Not commiting batch %s in status %s.", batch.getId(), batch.getStatus()))
 						).build();
 			}
 		}
@@ -144,23 +142,13 @@ public class BatchResource {
 	}
 
 	@Path("{batchId}/users")
-	public Class<UserWriteResource> users(@Context Batch batch) {
-		assertBatchIsIdle(batch);
-
+	public Class<UserWriteResource> users() {
 		return UserWriteResource.class;
 	}
 
 	@Path("{batchId}/groups")
-	public Class<GroupWriteResource> groups(@Context Batch batch) {
-		assertBatchIsIdle(batch);
-
+	public Class<GroupWriteResource> groups() {
 		return GroupWriteResource.class;
-	}
-
-	private void assertBatchIsIdle(Batch batch) {
-		if (!BatchStatus.IDLE.equals(batch.getStatus())) {
-			throw new WebApplicationException(Status.CONFLICT);
-		}
 	}
 
 }

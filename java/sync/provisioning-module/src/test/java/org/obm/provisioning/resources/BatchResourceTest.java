@@ -53,6 +53,7 @@ import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
 
 import com.google.inject.Inject;
+import com.jayway.restassured.http.ContentType;
 
 @Slow
 @RunWith(SlowGuiceRunner.class)
@@ -404,11 +405,33 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 		expect()
 			.statusCode(Status.OK.getStatusCode())
 			.content(containsString(  "{"
-						+ "\"message\":\"org.obm.provisioning.exception.ProcessingException: Not commiting batch 13 in status SUCCESS.\","
+						+ "\"message\":\"Not commiting batch 13 in status SUCCESS.\","
 						+ "\"type\":\"org.obm.provisioning.resources.BatchAlreadyCommitedException\""
 					+ "}")).
 		when()
 			.put("/batches/13");
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testAddOperationToAlreadyCommitedBatch() throws Exception {
+		expectDomain();
+		expectSuccessfulAuthenticationAndFullAuthorization();
+		expect(batchDao.get(batchId(13), domain)).andReturn(commitedBatch);
+		mocksControl.replay();
+
+		given()
+			.auth().basic("username@domain", "password")
+			.content(obmUserToJsonString()).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.CONFLICT.getStatusCode())
+			.content(containsString(  "{"
+					+ "\"message\":\"Not adding operation to batch 13 in status SUCCESS.\","
+					+ "\"type\":\"org.obm.provisioning.resources.BatchAlreadyCommitedException\""
+				+ "}")).
+		when()
+			.post("/batches/13/users");
 
 		mocksControl.verify();
 	}

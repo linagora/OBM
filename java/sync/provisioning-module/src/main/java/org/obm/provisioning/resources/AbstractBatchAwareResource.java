@@ -81,6 +81,13 @@ public abstract class AbstractBatchAwareResource {
 	}
 
 	protected Response addBatchOperation(String entity, HttpVerb httpVerb, BatchEntityType entityType) throws DaoException {
+		if (!BatchStatus.IDLE.equals(batch.getStatus())) {
+			return Response.status(Status.CONFLICT).entity(
+					new BatchAlreadyCommitedException(
+							String.format("Not adding operation to batch %s in status %s.", batch.getId(), batch.getStatus()))
+					).build();
+		}
+
 		Operation operation = Operation
 				.builder()
 				.entityType(entityType)
