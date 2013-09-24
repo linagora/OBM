@@ -34,17 +34,17 @@ package org.obm.push.store.ehcache;
 public interface EhCacheStatistics {
 
 	/**
-	 * @return disk gets count for a short time before this call
+	 * @return disk gets average per second for a short time before this call
 	 */
 	long shortTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
 
 	/**
-	 * @return disk gets count for a medium time before this call
+	 * @return disk gets average per second for a medium time before this call
 	 */
 	long mediumTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
 
 	/**
-	 * @return disk gets count for a long time before this call
+	 * @return disk gets average per second for a long time before this call
 	 */
 	long longTimeDiskGets(String storeName) throws StatisticsNotAvailableException;
 
