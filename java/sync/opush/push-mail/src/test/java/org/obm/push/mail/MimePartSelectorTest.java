@@ -41,6 +41,8 @@ import java.util.List;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.mail.mime.ContentType;
@@ -52,7 +54,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 
-
+@RunWith(SlowFilterRunner.class)
 public class MimePartSelectorTest {
 
 	private MimePartSelector mimeMessageSelector;
@@ -71,7 +73,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 	
 		replay(mimeMessage);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH,
 				Lists.newArrayList(bodyPreference(MSEmailBodyType.PlainText)), mimeMessage);
 		verify(mimeMessage);
 	
@@ -88,7 +90,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
 	
 		replay(mimeMessage);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH,
 				Lists.newArrayList(bodyPreference(MSEmailBodyType.HTML)), mimeMessage);
 		verify(mimeMessage);
 	
@@ -104,7 +106,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.findMainMessage(contentType("text/rtf"))).andReturn(expectedMimePart);
 	
 		replay(mimeMessage);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH,
 				Lists.newArrayList(bodyPreference(MSEmailBodyType.RTF)), mimeMessage);
 		verify(mimeMessage);
 	
@@ -119,7 +121,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.getMimePart()).andReturn(expectedMimePart);
 	
 		replay(mimeMessage);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH,
 				Lists.newArrayList(bodyPreference(MSEmailBodyType.MIME)), mimeMessage);
 		verify(mimeMessage);
 	
@@ -136,7 +138,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(mimePart);
 	
 		replay(mimeMessage);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(ImmutableList.<BodyPreference>of(), mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, ImmutableList.<BodyPreference>of(), mimeMessage);
 		verify(mimeMessage);
 	
 		assertThat(mimePartSelector.getMimePart()).isSameAs(mimePart);
@@ -152,7 +154,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
 	
 		replay(mimeMessage);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(ImmutableList.<BodyPreference>of(), mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, ImmutableList.<BodyPreference>of(), mimeMessage);
 		verify(mimeMessage);
 	
 		assertThat(mimePartSelector.getMimePart()).isSameAs(mimePart);
@@ -168,7 +170,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
 	
 		replay(mimeMessage);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(null, mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, null, mimeMessage);
 		verify(mimeMessage);
 	
 		assertThat(mimePartSelector.getMimePart()).isSameAs(mimePart);
@@ -184,7 +186,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null);
 		
 		replay(mimeMessage);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(ImmutableList.<BodyPreference>of(), mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, ImmutableList.<BodyPreference>of(), mimeMessage);
 		verify(mimeMessage);
 	
 		assertThat(mimePartSelector.getMimePart()).isSameAs(mimeMessage);
@@ -199,14 +201,13 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(null).anyTimes();
 	
 		replay(mimeMessage);
-		FetchInstruction instruction = mimeMessageSelector.select(ImmutableList.of(bodyPreference(MSEmailBodyType.PlainText)), mimeMessage);
+		FetchInstruction instruction = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, ImmutableList.of(bodyPreference(MSEmailBodyType.PlainText)), mimeMessage);
 		verify(mimeMessage);
 	
 		assertThat(instruction.getMimePart()).isSameAs(mimeMessage);
 		assertThat(instruction.getBodyType()).isEqualTo(MSEmailBodyType.MIME);
 		assertThat(instruction.getTruncation()).isEqualTo(32*1024);
 	}
-
 	
 	@Test
 	public void testSelectSeveralBodyPreferences() {
@@ -222,7 +223,7 @@ public class MimePartSelectorTest {
 		List<BodyPreference> bodyPreferences = 
 				Lists.newArrayList(
 						bodyPreference(MSEmailBodyType.RTF), bodyPreference(MSEmailBodyType.HTML));
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(bodyPreferences, mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, bodyPreferences, mimeMessage);
 		verify(mimeMessage);
 		
 		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(expectedMimePart);
@@ -242,7 +243,7 @@ public class MimePartSelectorTest {
 						bodyPreference(MSEmailBodyType.RTF), 
 						bodyPreference(MSEmailBodyType.HTML), 
 						bodyPreference(MSEmailBodyType.MIME));
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(bodyPreferences, expectedMimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, bodyPreferences, expectedMimeMessage);
 		verify(expectedMimeMessage);
 	
 		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(expectedMimeMessage);
@@ -266,7 +267,7 @@ public class MimePartSelectorTest {
 				bodyType(MSEmailBodyType.PlainText).truncationSize(10).allOrNone(true).build();
 	
 		replay(mimeMessage, expectedMimePart);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(Lists.newArrayList(bodyPreference), mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, Lists.newArrayList(bodyPreference), mimeMessage);
 		verify(mimeMessage, expectedMimePart);
 	
 		assertThat(mimePartSelector.getMimePart()).isSameAs(expectedMimePart);
@@ -285,7 +286,7 @@ public class MimePartSelectorTest {
 				bodyType(MSEmailBodyType.PlainText).truncationSize(50).allOrNone(true).build();
 	
 		replay(mimeMessage, expectedMimePart);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(Lists.newArrayList(bodyPreference), mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, Lists.newArrayList(bodyPreference), mimeMessage);
 		verify(mimeMessage, expectedMimePart);
 	
 		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(expectedMimePart);
@@ -304,7 +305,7 @@ public class MimePartSelectorTest {
 				bodyType(MSEmailBodyType.PlainText).allOrNone(true).build();
 	
 		replay(mimeMessage, expectedMimePart);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(Lists.newArrayList(bodyPreference), mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, Lists.newArrayList(bodyPreference), mimeMessage);
 		verify(mimeMessage, expectedMimePart);
 	
 		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(expectedMimePart);
@@ -323,7 +324,7 @@ public class MimePartSelectorTest {
 				bodyType(MSEmailBodyType.PlainText).allOrNone(false).build();
 	
 		replay(mimeMessage, expectedMimePart);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(Lists.newArrayList(bodyPreference), mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, Lists.newArrayList(bodyPreference), mimeMessage);
 		verify(mimeMessage, expectedMimePart);
 	
 		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(expectedMimePart);
@@ -342,7 +343,7 @@ public class MimePartSelectorTest {
 				bodyType(MSEmailBodyType.PlainText).truncationSize(10).allOrNone(false).build();
 	
 		replay(mimeMessage, expectedMimePart);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(Lists.newArrayList(bodyPreference), mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, Lists.newArrayList(bodyPreference), mimeMessage);
 		verify(mimeMessage, expectedMimePart);
 	
 		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(expectedMimePart);
@@ -376,7 +377,7 @@ public class MimePartSelectorTest {
 				plainTextBodyPreference, 
 				htmlBodyPreference);
 			replay(mimeMessage, plainTextMimePart, expectedMimePart);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(bodyPreferences, mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, bodyPreferences, mimeMessage);
 		verify(mimeMessage, plainTextMimePart, expectedMimePart);
 	
 		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(expectedMimePart);
@@ -395,7 +396,7 @@ public class MimePartSelectorTest {
 		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
 	
 		replay(mimeMessage, expectedMimePart, mimeMessageRawPart);
-		FetchInstruction mimePartSelector = mimeMessageSelector.select(bodyPreferences(MSEmailBodyType.HTML, MSEmailBodyType.MIME), mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, bodyPreferences(MSEmailBodyType.HTML, MSEmailBodyType.MIME), mimeMessage);
 		verify(mimeMessage, expectedMimePart, mimeMessageRawPart);
 	
 		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(expectedMimePart);
@@ -404,9 +405,17 @@ public class MimePartSelectorTest {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void selectBetterFitNoFetchInstructionEntry() {
-		new MimePartSelector().selectBetterFit(
+		new MimePartSelector().selectBetterFit(BodyPreferencePolicy.ANY_MATCH,
 				ImmutableList.<FetchInstruction>of(), 
 				bodyPreferences(MSEmailBodyType.HTML));
+	}
+	
+	@Test
+	public void selectBetterFitNoFetchInstructionEntryStrictPolicy() {
+		FetchInstruction fetchInstruction = new MimePartSelector().selectBetterFit(BodyPreferencePolicy.STRICT_MATCH,
+				ImmutableList.<FetchInstruction>of(), 
+				bodyPreferences(MSEmailBodyType.HTML));
+		assertThat(fetchInstruction).isNull();
 	}
 	
 	@Test
@@ -414,7 +423,7 @@ public class MimePartSelectorTest {
 		MimePart mimePart = EasyMock.createNiceMock(MimePart.class);
 		FetchInstruction onlyFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
 		FetchInstruction actual = 
-			new MimePartSelector().selectBetterFit(
+			new MimePartSelector().selectBetterFit(BodyPreferencePolicy.ANY_MATCH,
 				ImmutableList.of(onlyFetchInstruction), 
 				bodyPreferences());
 		assertThat(actual).isSameAs(onlyFetchInstruction);
@@ -426,7 +435,7 @@ public class MimePartSelectorTest {
 		FetchInstruction htmlFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
 		FetchInstruction mimeFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.MIME).mimePart(mimePart).build();
 		FetchInstruction actual = 
-			new MimePartSelector().selectBetterFit(
+			new MimePartSelector().selectBetterFit(BodyPreferencePolicy.ANY_MATCH,
 				ImmutableList.of(htmlFetchInstruction, mimeFetchInstruction),
 				bodyPreferences());
 		assertThat(actual).isSameAs(htmlFetchInstruction);
@@ -438,7 +447,7 @@ public class MimePartSelectorTest {
 		FetchInstruction htmlFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
 		FetchInstruction mimeFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.MIME).mimePart(mimePart).build();
 		FetchInstruction actual = 
-			new MimePartSelector().selectBetterFit(
+			new MimePartSelector().selectBetterFit(BodyPreferencePolicy.ANY_MATCH,
 				ImmutableList.of(mimeFetchInstruction, htmlFetchInstruction),
 				bodyPreferences());
 		assertThat(actual).isSameAs(htmlFetchInstruction);
@@ -451,7 +460,7 @@ public class MimePartSelectorTest {
 		FetchInstruction plainFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.PlainText).mimePart(mimePart).build();
 		FetchInstruction rtfFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.RTF).mimePart(mimePart).build();
 		FetchInstruction actual =
-			new MimePartSelector().selectBetterFit(
+			new MimePartSelector().selectBetterFit(BodyPreferencePolicy.ANY_MATCH,
 				ImmutableList.of(plainFetchInstruction, htmlFetchInstruction, rtfFetchInstruction),
 				bodyPreferences(MSEmailBodyType.RTF, MSEmailBodyType.PlainText, MSEmailBodyType.HTML));
 		assertThat(actual).isSameAs(rtfFetchInstruction);
@@ -465,7 +474,7 @@ public class MimePartSelectorTest {
 		FetchInstruction htmlFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.HTML).mimePart(mimePart).build();
 
 		FetchInstruction actual =
-			new MimePartSelector().selectBetterFit(
+			new MimePartSelector().selectBetterFit(BodyPreferencePolicy.ANY_MATCH,
 				ImmutableList.of(transformedHtmlFetchInstruction, htmlFetchInstruction),
 				bodyPreferences(MSEmailBodyType.HTML));
 		assertThat(actual).isSameAs(htmlFetchInstruction);
@@ -479,7 +488,7 @@ public class MimePartSelectorTest {
 		FetchInstruction htmlFetchInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.PlainText).mimePart(mimePart).build();
 
 		FetchInstruction actual =
-			new MimePartSelector().selectBetterFit(
+			new MimePartSelector().selectBetterFit(BodyPreferencePolicy.ANY_MATCH,
 				ImmutableList.of(transformedHtmlFetchInstruction, htmlFetchInstruction),
 				bodyPreferences(MSEmailBodyType.HTML, MSEmailBodyType.PlainText));
 		assertThat(actual).isSameAs(htmlFetchInstruction);
@@ -562,5 +571,82 @@ public class MimePartSelectorTest {
 		FetchInstruction htmlInstruction = FetchInstruction.builder().bodyType(MSEmailBodyType.PlainText).mimePart(mimePart).build();
 		int actual = MimePartSelector.betterFitComparator(bodyPreferences(MSEmailBodyType.HTML, MSEmailBodyType.PlainText)).compare(transformedInstruction, htmlInstruction);
 		assertThat(actual).isPositive();
+	}
+	
+	@Test
+	public void testSelectPlainTextStrictBodyPreference() {
+		MimePart expectedMimePart = MimePartImpl.builder().contentType("text/plain").build();
+	
+		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
+		expect(mimeMessage.getMimePart()).andReturn(null);
+		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(expectedMimePart);
+	
+		replay(mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.STRICT_MATCH,
+				Lists.newArrayList(bodyPreference(MSEmailBodyType.PlainText)), mimeMessage);
+		verify(mimeMessage);
+	
+		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(expectedMimePart);
+	}
+
+	@Test
+	public void testSelectHtmlStrictBodyPreference() {
+		MimePart expectedMimePart = MimePartImpl.builder().contentType("text/html").build();
+	
+		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
+		expect(mimeMessage.getMimePart()).andReturn(null);
+		expect(mimeMessage.findMainMessage(contentType("text/html"))).andReturn(expectedMimePart);
+	
+		replay(mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.STRICT_MATCH,
+				Lists.newArrayList(bodyPreference(MSEmailBodyType.HTML)), mimeMessage);
+		verify(mimeMessage);
+	
+		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(expectedMimePart);
+	}
+
+	@Test
+	public void testSelectRtfStrictBodyPreference() {
+		MimePart expectedMimePart = MimePartImpl.builder().contentType("text/rtf").build();
+	
+		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
+		expect(mimeMessage.getMimePart()).andReturn(null);
+		expect(mimeMessage.findMainMessage(contentType("text/rtf"))).andReturn(expectedMimePart);
+	
+		replay(mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.STRICT_MATCH,
+				Lists.newArrayList(bodyPreference(MSEmailBodyType.RTF)), mimeMessage);
+		verify(mimeMessage);
+	
+		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(expectedMimePart);
+	}
+
+	@Test
+	public void testSelectMimeStrictBodyPreference() {
+		MimePart expectedMimePart = MimePartImpl.builder().contentType("text/plain").build();
+	
+		MimeMessage mimeMessage = EasyMock.createStrictMock(MimeMessage.class);
+		expect(mimeMessage.getMimePart()).andReturn(expectedMimePart);
+	
+		replay(mimeMessage);
+		FetchInstruction mimePartSelector = mimeMessageSelector.select(BodyPreferencePolicy.STRICT_MATCH,
+				Lists.newArrayList(bodyPreference(MSEmailBodyType.MIME)), mimeMessage);
+		verify(mimeMessage);
+	
+		assertThat(mimePartSelector.getMimePart()).isNotNull().isSameAs(mimeMessage);
+	}
+
+	@Test
+	public void testSelectNoMatchingMimePartStrictBodyPreference() {
+		
+		MimeMessage mimeMessage = EasyMock.createMock(MimeMessage.class);
+		expect(mimeMessage.getMimePart()).andReturn(null);
+		expect(mimeMessage.findMainMessage(contentType("text/plain"))).andReturn(null).anyTimes();
+	
+		replay(mimeMessage);
+		FetchInstruction instruction = mimeMessageSelector.select(BodyPreferencePolicy.STRICT_MATCH, ImmutableList.of(bodyPreference(MSEmailBodyType.PlainText)), mimeMessage);
+		verify(mimeMessage);
+	
+		assertThat(instruction).isNull();
 	}
 }

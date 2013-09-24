@@ -68,28 +68,37 @@ public class MimePartSelector {
 							.truncationSize(DEFAULT_TRUNCATION_SIZE).build())
 					.build();
 	
-	public FetchInstruction select(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+	public FetchInstruction select(BodyPreferencePolicy bodyPreferencePolicy, List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		logger.debug("BodyPreferences {} MimeMessage {}", bodyPreferences, mimeMessage.getMimePart());
 		
-		List<BodyPreference> safeBodyPreferences = Objects.firstNonNull(bodyPreferences, ImmutableList.<BodyPreference>of());
-		List<FetchInstruction> fetchInstructions = fetchIntructions(safeBodyPreferences, mimeMessage);
-		return selectBetterFit(fetchInstructions, safeBodyPreferences);
+		List<BodyPreference> safeBodyPreferences = bodyPreferencesMatchingPolicy(bodyPreferencePolicy, bodyPreferences);
+		List<FetchInstruction> fetchInstructions = fetchIntructions(bodyPreferencePolicy, safeBodyPreferences, mimeMessage);
+		return selectBetterFit(bodyPreferencePolicy, fetchInstructions, safeBodyPreferences);
 	}
 
-	private List<FetchInstruction> fetchIntructions(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
-		List<FetchInstruction> fetchInstructions = findMatchingInstructions(bodyPreferences, mimeMessage);
+	private List<BodyPreference> bodyPreferencesMatchingPolicy(BodyPreferencePolicy bodyPreferencePolicy, List<BodyPreference> bodyPreferences) {
+		if (BodyPreferencePolicy.STRICT_MATCH.equals(bodyPreferencePolicy)) {
+			return bodyPreferences;
+		}
+		return Objects.firstNonNull(bodyPreferences, ImmutableList.<BodyPreference>of());
+	}
+
+	private List<FetchInstruction> fetchIntructions(BodyPreferencePolicy bodyPreferencePolicy, List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+		List<FetchInstruction> fetchInstructions = findMatchingInstructions(bodyPreferencePolicy, bodyPreferences, mimeMessage);
 		if (!fetchInstructions.isEmpty()) {
 			return fetchInstructions;
-		} else {
-			return findMatchingInstructions(DEFAULT_BODY_PREFERENCES, mimeMessage);
+		} else if (BodyPreferencePolicy.ANY_MATCH.equals(bodyPreferencePolicy)){
+			return findMatchingInstructions(bodyPreferencePolicy, DEFAULT_BODY_PREFERENCES, mimeMessage);
 		}
+		return fetchInstructions;
 	}
-	
 
-
-	@VisibleForTesting FetchInstruction selectBetterFit(
-			List<FetchInstruction> fetchInstructions,
-			final List<BodyPreference> bodyPreferences) {
+	@VisibleForTesting FetchInstruction selectBetterFit(BodyPreferencePolicy bodyPreferencePolicy, 
+			List<FetchInstruction> fetchInstructions, final List<BodyPreference> bodyPreferences) {
+		
+		if (BodyPreferencePolicy.STRICT_MATCH.equals(bodyPreferencePolicy) && fetchInstructions.isEmpty()) {
+			return null;
+		}
 		Preconditions.checkArgument(!fetchInstructions.isEmpty());
 		return Ordering
 				.from(betterFitComparator(bodyPreferences))
@@ -130,11 +139,11 @@ public class MimePartSelector {
 		};
 	}
 	
-	private List<FetchInstruction> findMatchingInstructions(List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
+	private List<FetchInstruction> findMatchingInstructions(BodyPreferencePolicy bodyPreferencePolicy, List<BodyPreference> bodyPreferences, MimeMessage mimeMessage) {
 		List<FetchInstruction> fetchInstructions = Lists.newArrayList();
 		for (BodyPreference bodyPreference: bodyPreferences) {
 			if (isContentType(bodyPreference)) {
-				fetchInstructions.addAll(findMatchingInstruction(mimeMessage, bodyPreference));
+				fetchInstructions.addAll(findMatchingInstruction(bodyPreferencePolicy, mimeMessage, bodyPreference));
 			} else {
 				fetchInstructions.add(buildFetchInstruction(FetchInstruction.builder(), mimeMessage, bodyPreference));
 			}
@@ -142,9 +151,9 @@ public class MimePartSelector {
 		return fetchInstructions;
 	}
 
-	private List<FetchInstruction> findMatchingInstruction(MimeMessage mimeMessage, BodyPreference bodyPreference) {
+	private List<FetchInstruction> findMatchingInstruction(BodyPreferencePolicy bodyPreferencePolicy, MimeMessage mimeMessage, BodyPreference bodyPreference) {
 		List<FetchInstruction> fetchInstructions = Lists.newArrayList();
-		for (FetchHints hints: listContentTypes(bodyPreference.getType())) {
+		for (FetchHints hints: listContentTypes(bodyPreferencePolicy, bodyPreference.getType())) {
 			MimePart mimePart =  mimeMessage.findMainMessage(hints.getContentType());
 			if (isOptionsMatching(mimePart, bodyPreference)) {
 				fetchInstructions.add(buildFetchInstruction(hints.getInstruction(), mimePart, bodyPreference));
@@ -173,24 +182,29 @@ public class MimePartSelector {
 			.build();
 	}
 
-	private List<FetchHints> listContentTypes(MSEmailBodyType bodyType) {
+	private List<FetchHints> listContentTypes(BodyPreferencePolicy bodyPreferencePolicy, MSEmailBodyType bodyType) {
 		switch (bodyType) {
 		case HTML:
+			if (BodyPreferencePolicy.ANY_MATCH.equals(bodyPreferencePolicy)) {
+				return Arrays.asList(
+							FetchHints.builder()
+								.contentType(toContentType(MSEmailBodyType.HTML)).build(),
+							FetchHints.builder()
+								.contentType(toContentType(MSEmailBodyType.PlainText))
+								.instruction(FetchInstruction.builder().mailTransformation(MailTransformation.TEXT_PLAIN_TO_TEXT_HTML))
+								.build());
+			}
 			return Arrays.asList(
-						FetchHints.builder()
-							.contentType(toContentType(MSEmailBodyType.HTML)).build(),
-						FetchHints.builder()
-							.contentType(toContentType(MSEmailBodyType.PlainText))
-							.instruction(FetchInstruction.builder().mailTransformation(MailTransformation.TEXT_PLAIN_TO_TEXT_HTML))
-							.build());
+					FetchHints.builder()
+						.contentType(toContentType(MSEmailBodyType.HTML)).build());
 		case PlainText:
 			return Arrays.asList(
 					FetchHints.builder()
-					.contentType(toContentType(MSEmailBodyType.PlainText)).build());
+						.contentType(toContentType(MSEmailBodyType.PlainText)).build());
 		case RTF:
 			return Arrays.asList(
 					FetchHints.builder()
-					.contentType(toContentType(MSEmailBodyType.RTF)).build());
+						.contentType(toContentType(MSEmailBodyType.RTF)).build());
 		default:
 			throw new IllegalArgumentException("Unexpected MSEmailBodyType");
 		}

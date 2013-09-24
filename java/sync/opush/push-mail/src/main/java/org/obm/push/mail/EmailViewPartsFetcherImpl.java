@@ -151,7 +151,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	}
 
 	private FetchInstruction getFetchInstruction(MimeMessage mimeMessage) {
-		return new MimePartSelector().select(bodyPreferences, mimeMessage);
+		return new MimePartSelector().select(BodyPreferencePolicy.ANY_MATCH, bodyPreferences, mimeMessage);
 	}
 	
 	private void fetchBody(Builder emailViewBuilder, FetchInstruction fetchInstruction, 

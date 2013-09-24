@@ -54,13 +54,14 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.push.bean.BodyPreference;
-import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.ItemNotFoundException;
+import org.obm.push.mail.BodyPreferencePolicy;
 import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
@@ -68,9 +69,9 @@ import org.obm.push.mail.MailTestsUtils;
 import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.MimePartSelector;
 import org.obm.push.mail.bean.Address;
-import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.EmailMetadata;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.MessageSet;
@@ -440,7 +441,7 @@ public abstract class MailboxFetchAPITest {
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
 		
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
-		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
+		FetchInstruction fetchInstruction = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
 		InputStream mimePartData = mailboxService.fetchMimePartStream(udr, inbox, sentEmail.getUid(), fetchInstruction.getMimePart().getAddress());
 		String data = CharStreams.toString(new InputStreamReader(mimePartData));
@@ -463,7 +464,7 @@ public abstract class MailboxFetchAPITest {
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
 		
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
-		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
+		FetchInstruction fetchInstruction = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
 		InputStream mimePartData = mailboxService.fetchPartialMimePartStream(udr, inbox, sentEmail.getUid(), 
 				fetchInstruction.getMimePart().getAddress(), fetchInstruction.getTruncation());
@@ -485,7 +486,7 @@ public abstract class MailboxFetchAPITest {
 		List<BodyPreference> bodyPreferences = Lists.newArrayList(bodyPreference);
 		
 		MimePartSelector mimeMessageSelector = new MimePartSelector();
-		FetchInstruction fetchInstruction = mimeMessageSelector.select(bodyPreferences, Iterables.getOnlyElement(mimeMessages));
+		FetchInstruction fetchInstruction = mimeMessageSelector.select(BodyPreferencePolicy.ANY_MATCH, bodyPreferences, Iterables.getOnlyElement(mimeMessages));
 		
 		InputStream mimePartData = mailboxService.fetchMimePartStream(udr, inbox, sentEmail.getUid(), fetchInstruction.getMimePart().getAddress());
 		String data = CharStreams.toString(new InputStreamReader(mimePartData));
