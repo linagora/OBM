@@ -146,7 +146,7 @@ class ehcache extends CRaSHCommand {
   }
 
   private String diskAccessColumnLabel(def config) {
-     "DISK ACCESSES\n" + 
+     "DISK HITS /s\n" + 
      fixRight(config.statsShortSamplingTimeInSeconds() + "s|", 3) +  
      fixRight(config.statsMediumSamplingTimeInSeconds() + "s|", 5) +
      fixRight(config.statsLongSamplingTimeInSeconds() + "s", 5)

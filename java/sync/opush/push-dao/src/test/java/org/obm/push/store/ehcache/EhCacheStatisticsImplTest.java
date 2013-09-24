@@ -47,6 +47,8 @@ import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Stopwatch;
+
 import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -382,16 +384,15 @@ public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 			restartedTestee.manager.shutdown();
 		}
 	}
-	
+
 	@Test
 	public void testLongTimeDiskGetsWhenAccessDuringManySample() throws Exception {
-		int oneSampleInSeconds = 2;
-		int waitBetweenReadsInSeconds = 1;
-		int totalReadTimeInSeconds = 5;
+		int totalReadTimeInSeconds = 3;
+		int waitBetweenReadsInMs = 500;
 
 		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
 			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(oneSampleInSeconds)
+			.withStatsShortSamplingTimeInSeconds(1)
 			.withStatsLongSamplingTimeInSeconds(totalReadTimeInSeconds));
 			
 		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(5, testee);
@@ -399,19 +400,137 @@ public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 		try {
 			startStatisticsSampling(restartedTestee);
 			Thread.sleep(100); // First read must be in first sample
-			readAllElementsInCacheWithWait(restartedTestee, waitBetweenReadsInSeconds);
+			readAllElementsInCacheWithWait(restartedTestee, waitBetweenReadsInMs);
 			commitThenCloseTransaction();
-			assertThat(restartedTestee.longTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(5);
+			Thread.sleep(waitBetweenReadsInMs); // Wait the last sample to be finished
+			assertThat(restartedTestee.longTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(2);
+		} finally {
+			restartedTestee.manager.shutdown();
+		}
+	}
+	
+	@Test
+	public void testLongTimeDiskGetsWhenAccessDuringManySampleRoundDown() throws Exception {
+		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
+			.withMaxMemoryInMB(10)
+			.withStatsShortSamplingTimeInSeconds(1)
+			.withStatsLongSamplingTimeInSeconds(3));
+			
+		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(5, testee);
+		
+		try {
+			Cache store = restartedTestee.manager.getStore(STATS_ENABLED_CACHE);
+
+			startStatisticsSampling(restartedTestee);
+			Thread.sleep(100); // First read must be in first sample
+			store.get(store.getKeys().get(0));
+			commitThenCloseTransaction();
+			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
+			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
+			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
+			assertThat(restartedTestee.longTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
+		} finally {
+			restartedTestee.manager.shutdown();
+		}
+	}
+	
+	@Test
+	public void testLongTimeDiskGetsWhenAccessDuringManySampleRoundUp() throws Exception {
+		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
+			.withMaxMemoryInMB(10)
+			.withStatsShortSamplingTimeInSeconds(1)
+			.withStatsLongSamplingTimeInSeconds(3));
+			
+		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(5, testee);
+		
+		try {
+			Cache store = restartedTestee.manager.getStore(STATS_ENABLED_CACHE);
+
+			startStatisticsSampling(restartedTestee);
+			Thread.sleep(100); // First read must be in first sample
+			store.get(store.getKeys().get(0));
+			store.get(store.getKeys().get(1));
+			commitThenCloseTransaction();
+			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
+			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
+			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
+			assertThat(restartedTestee.longTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(1);
+		} finally {
+			restartedTestee.manager.shutdown();
+		}
+	}
+	
+	/*
+	 * Using EHCache statistics, a PUT always performs a disk
+	 * GET (even if there is enough free memory available).
+	 * 
+	 * The GET is took in stats as soon as the PUT is performed.
+	 * The PUT is took in stats only at the commit time.
+	 * 
+	 * If a sample finish during a commit, all GETs are took in stats
+	 * but not all PUTs so the sample is wrong. 
+	 * Compute samples between a right one and a wrong one can give a 
+	 * negative diff value that we don't want to show because it's not the reality. 
+	 */
+	@Test
+	public void testShortTimeDiskGetsWhenSampleFinishDuringCommit() throws Exception {
+		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
+			.withMaxMemoryInMB(10)
+			.withStatsShortSamplingTimeInSeconds(1));
+
+		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(2, testee);
+		
+		try {
+			Cache store = restartedTestee.manager.getStore(STATS_ENABLED_CACHE);
+
+			startStatisticsSampling(restartedTestee);
+			Stopwatch watch = new Stopwatch().start();
+			Thread.sleep(100); // First read must be in first sample
+			
+			int putIndex = 0;
+			while (watch.elapsed(TimeUnit.MILLISECONDS) < 900) {
+				store.put(new Element("a" + putIndex, "b" + putIndex));
+				putIndex++;
+			}
+			Thread.sleep(100);
+			commitThenCloseTransaction();
+			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
+			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
+		} finally {
+			restartedTestee.manager.shutdown();
+		}
+	}
+	
+	@Test
+	public void testShortTimeDiskGetsDoesNotCountHitForTTL() throws Exception {
+		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
+			.withMaxMemoryInMB(10)
+			.withStatsShortSamplingTimeInSeconds(1)
+			.withTimeToLive(1));
+
+		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(2, testee);
+		
+		try {
+			Cache store = restartedTestee.manager.getStore(STATS_ENABLED_CACHE);
+			startStatisticsSampling(restartedTestee);
+
+			Element element = new Element("a", "b");
+			store.put(element);
+			Thread.sleep(TimeUnit.SECONDS.toMillis(2));
+			assertThat(store.get(element.getObjectKey())).isNull();
+
+			commitThenCloseTransaction();
+			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
 		} finally {
 			restartedTestee.manager.shutdown();
 		}
 	}
 
-	private void readAllElementsInCacheWithWait(EhCacheStatisticsImpl testee, int waitInSeconds) throws Exception {
+	private void readAllElementsInCacheWithWait(EhCacheStatisticsImpl testee, int waitInMs) throws Exception {
 		Cache cache = testee.manager.getStore(STATS_ENABLED_CACHE);
 		for (Object key : cache.getKeys()) {
 			cache.get(key);
-			Thread.sleep(TimeUnit.SECONDS.toMillis(waitInSeconds));
+			Thread.sleep(waitInMs);
 		}
 	}
 	

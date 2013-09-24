@@ -116,7 +116,7 @@ public class EhCacheStatisticsImplMockTest extends StoreManagerConfigurationTest
 				.puts(timestamp(1), timestamp(1), timestamp(1), timestamp(1), timestamp(1))
 				.removes(timestamp(1), timestamp(1), timestamp(1), timestamp(1), timestamp(1))
 				.build();
-		assertThat(testee.computeSamplesDiff(diskStatsHistory, 5)).isEqualTo(11);
+		assertThat(testee.computeSamplesDiff(diskStatsHistory, 5)).isEqualTo(2);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -138,7 +138,7 @@ public class EhCacheStatisticsImplMockTest extends StoreManagerConfigurationTest
 				.puts(timestamp(1), timestamp(1), timestamp(1), timestamp(2), timestamp(3))
 				.removes(timestamp(0), timestamp(0), timestamp(0), timestamp(0), timestamp(3))
 				.build();
-		assertThat(testee.computeSamplesDiff(diskStatsHistory, 4)).isEqualTo(8);
+		assertThat(testee.computeSamplesDiff(diskStatsHistory, 4)).isEqualTo(2);
 	}
 
 	@SuppressWarnings("unchecked")
