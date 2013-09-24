@@ -37,7 +37,7 @@ import org.obm.push.mail.conversation.EmailView;
 
 public interface EmailViewPartsFetcher {
 
-	EmailView fetch(long uid) throws EmailViewPartsFetcherException;
+	EmailView fetch(long uid, BodyPreferencePolicy bodyPreferencePolicy) throws EmailViewPartsFetcherException;
 	
 	ICalendar fetchInvitation(long uid) throws EmailViewPartsFetcherException;
 }

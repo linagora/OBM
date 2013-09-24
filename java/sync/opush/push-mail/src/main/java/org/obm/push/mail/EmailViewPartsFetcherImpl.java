@@ -96,7 +96,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	}
 
 	@Override
-	public EmailView fetch(long uid) throws EmailViewPartsFetcherException {
+	public EmailView fetch(long uid, BodyPreferencePolicy bodyPreferencePolicy) throws EmailViewPartsFetcherException {
 		try {
 			EmailMetadata emailViewResponse = mailboxService.fetchEmailMetadata(udr, collectionPath, uid);
 			Builder emailViewBuilder = EmailView.builder()
@@ -105,7 +105,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 					.envelope(emailViewResponse.getEnvelope());
 			
 			MimeMessage mimeMessage = emailViewResponse.getMimeMessage();
-			FetchInstruction fetchInstruction = getFetchInstruction(mimeMessage);
+			FetchInstruction fetchInstruction = getFetchInstruction(bodyPreferencePolicy, mimeMessage);
 			if (fetchInstruction != null) {
 				fetchBody(emailViewBuilder, fetchInstruction, uid);
 				fetchAttachments(emailViewBuilder, fetchInstruction, uid);
@@ -150,10 +150,10 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 		}
 	}
 
-	private FetchInstruction getFetchInstruction(MimeMessage mimeMessage) {
-		return new MimePartSelector().select(BodyPreferencePolicy.ANY_MATCH, bodyPreferences, mimeMessage);
+	private FetchInstruction getFetchInstruction(BodyPreferencePolicy bodyPreferencePolicy, MimeMessage mimeMessage) {
+		return new MimePartSelector().select(bodyPreferencePolicy, bodyPreferences, mimeMessage);
 	}
-	
+
 	private void fetchBody(Builder emailViewBuilder, FetchInstruction fetchInstruction, 
 			long uid) throws MailException, IOException, EmailViewPartsFetcherException {
 		
