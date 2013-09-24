@@ -295,8 +295,7 @@ Obm.CalendarManager = new Class({
     this.oldEvent.time = evt.event.time;
     this.oldEvent.event.duration = evt.event.duration;
     if (evt.kind == 'all_day') {
-      var elementIndex = parseInt(evt.event.index,10);
-      var current = new Obm.DateTime(elementIndex*1000);
+      var current = new Obm.DateTime(evt.event.time*1000);
       var beginDay = current.getTime();
       for(var i=0;i<evt.size;i++) {
         current.setTime(beginDay);
