@@ -31,71 +31,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.util.Map;
+import com.google.common.collect.ImmutableSet;
 
-import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
+public interface EhCacheStores {
 
-import com.google.common.collect.Maps;
-
-public class MailEhCacheConfiguration implements EhCacheConfiguration {
-	private Map<String, Integer> stores = Maps.newHashMap();
+	public static final String MONITORED_COLLECTION_STORE = "monitoredCollectionService";
+	public static final String SYNCED_COLLECTION_STORE = "syncedCollectionStoreService";
+	public static final String UNSYNCHRONIZED_ITEM_STORE = "unsynchronizedItemService";
+	public static final String MAIL_SNAPSHOT_STORE = "mailSnapshotStore";
+	public static final String MAIL_WINDOWING_INDEX_STORE = "mailWindowingIndexStore";
+	public static final String MAIL_WINDOWING_CHUNKS_STORE = "mailWindowingChunksStore";
+	public static final String SYNC_KEYS_STORE = "syncKeysStore";
 	
-	public MailEhCacheConfiguration() {
-		stores.put(ObjectStoreManager.MONITORED_COLLECTION_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.SYNCED_COLLECTION_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.UNSYNCHRONIZED_ITEM_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.MAIL_SNAPSHOT_STORE, Integer.valueOf(70));
-		stores.put(ObjectStoreManager.MAIL_WINDOWING_INDEX_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.MAIL_WINDOWING_CHUNKS_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.SYNC_KEYS_STORE, Integer.valueOf(5));
-	}
-	
-	@Override
-	public int maxMemoryInMB() {
-		return 10;
-	}
-
-	@Override
-	public Percentage percentageAllowedToCache(String cacheName) {
-		Integer defaultValue = stores.get(cacheName);
-		if (defaultValue != null) {
-			return Percentage.of(defaultValue);
-		}
-		return Percentage.UNDEFINED;
-	}
-
-	@Override
-	public int statsSampleToRecordCount() {
-		return 10;
-	}
-
-	@Override
-	public int statsShortSamplingTimeInSeconds() {
-		return 1;
-	}
-	
-	@Override
-	public int statsMediumSamplingTimeInSeconds() {
-		return 10;
-	}
-	
-	@Override
-	public int statsLongSamplingTimeInSeconds() {
-		return 60;
-	}
-
-	@Override
-	public int statsSamplingTimeStopInMinutes() {
-		return 10;
-	}
-
-	@Override
-	public long timeToLiveInSeconds() {
-		return 60;
-	}
-
-	@Override
-	public TransactionalMode transactionalMode() {
-		return TransactionalMode.XA;
-	}
+	public static final ImmutableSet<String> STORES = ImmutableSet.of(
+			MONITORED_COLLECTION_STORE,
+			SYNCED_COLLECTION_STORE,
+			UNSYNCHRONIZED_ITEM_STORE,
+			MAIL_SNAPSHOT_STORE,
+			MAIL_WINDOWING_INDEX_STORE,
+			MAIL_WINDOWING_CHUNKS_STORE,
+			SYNC_KEYS_STORE);
 }

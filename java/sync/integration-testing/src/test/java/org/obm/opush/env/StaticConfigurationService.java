@@ -34,6 +34,7 @@ package org.obm.opush.env;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
@@ -43,10 +44,12 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.opush.env.Configuration.Mail;
+import org.obm.push.EhCacheStoresPercentageLoader;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfiguration;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
 
 public class StaticConfigurationService implements ConfigurationService {
 
@@ -92,9 +95,11 @@ public class StaticConfigurationService implements ConfigurationService {
 	public static class EhCache implements EhCacheConfiguration {
 
 		private final org.obm.opush.env.Configuration.EhCache configuration;
+		private Map<String, Percentage> percentageByStoreMap = Maps.newHashMap();
 
 		public EhCache(org.obm.opush.env.Configuration.EhCache configuration) {
 			this.configuration = configuration;
+			percentageByStoreMap = EhCacheStoresPercentageLoader.loadStoresPercentage();
 		}
 
 		@Override
@@ -104,6 +109,10 @@ public class StaticConfigurationService implements ConfigurationService {
 
 		@Override
 		public Percentage percentageAllowedToCache(String cacheName) {
+			Percentage defaultValue = percentageByStoreMap.get(cacheName);
+			if (defaultValue != null) {
+				return defaultValue;
+			}
 			return configuration.percentageAllowedToCache;
 		}
 

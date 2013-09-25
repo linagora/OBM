@@ -94,6 +94,13 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-dao</artifactId>
+			<version>${obm.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
 			<version>${obm.version}</version>

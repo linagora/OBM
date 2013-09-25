@@ -37,6 +37,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import net.sf.ehcache.Cache;
@@ -45,7 +46,6 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
-import net.sf.ehcache.config.InvalidConfigurationException;
 import net.sf.ehcache.statistics.extended.ExtendedStatistics.Operation;
 import net.sf.ehcache.statistics.extended.ExtendedStatistics.Statistic;
 import net.sf.ehcache.store.StoreOperationOutcomes.GetOutcome;
@@ -57,6 +57,7 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.slf4j.Logger;
 import org.terracotta.statistics.archive.Timestamped;
 
@@ -145,12 +146,73 @@ public class EhCacheSettingsTest extends StoreManagerConfigurationTest {
 		newCacheManager.shutdown();
 	}
 
-	@SuppressWarnings("unused")
-	@Test(expected=InvalidConfigurationException.class)
+	@Test(expected=IllegalArgumentException.class)
+	public void testWhenSumIsUnderOneHundredPercent() {
+		TestingEhCacheConfiguration configWhenLessThanOneHundred = new TestingEhCacheConfiguration()
+			.withPercentageAllowedToCache(60);
+		Map<String, Percentage> stores = configWhenLessThanOneHundred.getStores();
+		stores.remove(ObjectStoreManager.MAIL_SNAPSHOT_STORE);
+		stores.put(ObjectStoreManager.MAIL_SNAPSHOT_STORE, Percentage.of(1));
+		
+		ObjectStoreManager objectStoreManager = null;
+		try {
+			objectStoreManager = new ObjectStoreManager(configurationService, configWhenLessThanOneHundred, logger);
+		} finally {
+			if (objectStoreManager != null) {
+				objectStoreManager.shutdown();
+			}
+		}
+	}
+
+	@Test(expected=IllegalArgumentException.class)
 	public void testWhenSumIsOverOneHundredPercent() {
 		TestingEhCacheConfiguration configWhenMoreThanOneHundred = new TestingEhCacheConfiguration()
 			.withPercentageAllowedToCache(60);
-		new ObjectStoreManager(configurationService, configWhenMoreThanOneHundred, logger);
+		Map<String, Percentage> stores = configWhenMoreThanOneHundred.getStores();
+		stores.remove(ObjectStoreManager.MAIL_SNAPSHOT_STORE);
+		stores.put(ObjectStoreManager.MAIL_SNAPSHOT_STORE, Percentage.of(101));
+		
+		ObjectStoreManager objectStoreManager = null;
+		try {
+			objectStoreManager = new ObjectStoreManager(configurationService, configWhenMoreThanOneHundred, logger);
+		} finally {
+			if (objectStoreManager != null) {
+				objectStoreManager.shutdown();
+			}
+		}
+	}
+	
+	@Test
+	public void testWhenSumEqualsOneHundredPercentDefaultConfiguration() {
+		TestingEhCacheConfiguration configWhenEqualsOneHundred = new TestingEhCacheConfiguration()
+			.withPercentageAllowedToCache(60);
+		
+		ObjectStoreManager objectStoreManager = null;
+		try {
+			objectStoreManager = new ObjectStoreManager(configurationService, configWhenEqualsOneHundred, logger);
+		} finally {
+			if (objectStoreManager != null) {
+				objectStoreManager.shutdown();
+			}
+		}
+	}
+	
+	@Test
+	public void testWhenSumEqualsOneHundredPercent() {
+		TestingEhCacheConfiguration configWhenEqualsOneHundred = new TestingEhCacheConfiguration()
+			.withPercentageAllowedToCache(60);
+		Map<String, Percentage> stores = configWhenEqualsOneHundred.getStores();
+		Percentage removed = stores.remove(ObjectStoreManager.MAIL_SNAPSHOT_STORE);
+		stores.put(ObjectStoreManager.MAIL_SNAPSHOT_STORE, removed);
+		
+		ObjectStoreManager objectStoreManager = null;
+		try {
+			objectStoreManager = new ObjectStoreManager(configurationService, configWhenEqualsOneHundred, logger);
+		} finally {
+			if (objectStoreManager != null) {
+				objectStoreManager.shutdown();
+			}
+		}
 	}
 	
 	@Test

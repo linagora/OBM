@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013  Linagora
+ * Copyright (C) 2011-2012  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,73 +29,36 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store.ehcache;
+package org.obm.push;
 
 import java.util.Map;
 
-import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
+import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
+import org.obm.push.store.ehcache.EhCacheStores;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 
-public class MailEhCacheConfiguration implements EhCacheConfiguration {
-	private Map<String, Integer> stores = Maps.newHashMap();
-	
-	public MailEhCacheConfiguration() {
-		stores.put(ObjectStoreManager.MONITORED_COLLECTION_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.SYNCED_COLLECTION_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.UNSYNCHRONIZED_ITEM_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.MAIL_SNAPSHOT_STORE, Integer.valueOf(70));
-		stores.put(ObjectStoreManager.MAIL_WINDOWING_INDEX_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.MAIL_WINDOWING_CHUNKS_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.SYNC_KEYS_STORE, Integer.valueOf(5));
-	}
-	
-	@Override
-	public int maxMemoryInMB() {
-		return 10;
-	}
+public class EhCacheStoresPercentageLoader {
 
-	@Override
-	public Percentage percentageAllowedToCache(String cacheName) {
-		Integer defaultValue = stores.get(cacheName);
-		if (defaultValue != null) {
-			return Percentage.of(defaultValue);
-		}
-		return Percentage.UNDEFINED;
-	}
+	private static final int NUMBER_OF_STORES = EhCacheStores.STORES.size();
+	private static final int ONE_HUNDRED = 100;
+	private static final int AVERAGE_VALUE = ONE_HUNDRED / NUMBER_OF_STORES;
 
-	@Override
-	public int statsSampleToRecordCount() {
-		return 10;
-	}
-
-	@Override
-	public int statsShortSamplingTimeInSeconds() {
-		return 1;
-	}
-	
-	@Override
-	public int statsMediumSamplingTimeInSeconds() {
-		return 10;
-	}
-	
-	@Override
-	public int statsLongSamplingTimeInSeconds() {
-		return 60;
-	}
-
-	@Override
-	public int statsSamplingTimeStopInMinutes() {
-		return 10;
-	}
-
-	@Override
-	public long timeToLiveInSeconds() {
-		return 60;
-	}
-
-	@Override
-	public TransactionalMode transactionalMode() {
-		return TransactionalMode.XA;
+	public static Map<String, Percentage> loadStoresPercentage() {
+		
+		return Maps.newHashMap(Maps.toMap(EhCacheStores.STORES, 
+				new Function<String, Percentage>() {
+					private int decrementStoreCount = NUMBER_OF_STORES;
+					
+					@Override
+					public Percentage apply(String name) {
+						decrementStoreCount--;
+						if (decrementStoreCount == 0) { // Last store takes remaining percentage 
+							return Percentage.of(ONE_HUNDRED - AVERAGE_VALUE * (NUMBER_OF_STORES - 1));
+						}
+						return Percentage.of(AVERAGE_VALUE);
+					}
+				}));
 	}
 }
