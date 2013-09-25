@@ -46,6 +46,8 @@ public class JdbcDaoModule extends AbstractModule{
 
 	@Override
 	protected void configure() {
+		install(new org.obm.dbcp.DatabaseModule());
+
 		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
 		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
 		bind(HeartbeatDao.class).to(HeartbeatDaoJdbcDaoImpl.class);

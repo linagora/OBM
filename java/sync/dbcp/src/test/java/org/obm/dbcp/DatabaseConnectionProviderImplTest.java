@@ -72,8 +72,8 @@ public class DatabaseConnectionProviderImplTest {
 	}
 
 	@After
-	public void tearDown() throws Exception {
-		dbConnProvider.shutdown();
+	public void tearDown() {
+		dbConnProvider.cleanup();
 		control.verify();
 	}
 
@@ -152,5 +152,5 @@ public class DatabaseConnectionProviderImplTest {
 		control.replay();
 
 		dbConnProvider.setConnectionReadOnlyIfNecessary(connection);
-	}	
+	}
 }

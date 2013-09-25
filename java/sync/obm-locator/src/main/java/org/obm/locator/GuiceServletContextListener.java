@@ -38,7 +38,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.obm.sync.LifecycleListenerHelper;
 import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +83,6 @@ public class GuiceServletContextListener implements ServletContextListener {
 	}
 
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
-		LifecycleListenerHelper.shutdownListeners(injector);
 	}
 
 }
