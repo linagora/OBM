@@ -31,13 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
+import java.util.Map;
+
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.SyncPermsConfigurationService;
+import org.obm.push.EhCacheStoresPercentageLoader;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfiguration;
+
+import com.google.common.base.Objects;
 
 public class OpushStaticConfigurationService extends StaticConfigurationService {
 
@@ -86,9 +91,11 @@ public class OpushStaticConfigurationService extends StaticConfigurationService 
 	public static class EhCache implements EhCacheConfiguration {
 
 		private final Configuration.EhCache configuration;
+		private final Map<String, Percentage> percentageByStoreMap;
 
 		public EhCache(Configuration.EhCache configuration) {
 			this.configuration = configuration;
+			percentageByStoreMap = EhCacheStoresPercentageLoader.loadStoresPercentage();
 		}
 
 		@Override
@@ -98,10 +105,7 @@ public class OpushStaticConfigurationService extends StaticConfigurationService 
 
 		@Override
 		public Percentage percentageAllowedToCache(String cacheName) {
-			if(configuration.percentageAllowedToCache != null) {
-				return Percentage.of(configuration.percentageAllowedToCache);
-			}
-			return Percentage.UNDEFINED;
+			return Objects.firstNonNull(percentageByStoreMap.get(cacheName), Percentage.UNDEFINED);
 		}
 
 		@Override

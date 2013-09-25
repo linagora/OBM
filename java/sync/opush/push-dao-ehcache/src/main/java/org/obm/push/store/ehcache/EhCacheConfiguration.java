@@ -100,6 +100,11 @@ public interface EhCacheConfiguration {
 			Preconditions.checkState(isDefined(), "cannot call get() on undefined percentage");
 			return String.valueOf(percentage) + "%";
 		}
+
+		public int getIntValue() {
+			Preconditions.checkState(isDefined(), "cannot call get() on undefined percentage");
+			return percentage;
+		}
 		
 		public int applyTo(int to) {
 			Preconditions.checkState(isDefined(), "undefined percentage");
