@@ -29,30 +29,27 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.impl;
+package org.obm.push.impl.ehcache;
 
+import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.obm.push.ContinuationTransactionMap;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Device;
 import org.obm.push.exception.ElementNotFoundException;
-import org.obm.push.store.ehcache.AbstractEhcacheDao;
-import org.obm.push.store.ehcache.ObjectStoreManager;
+import org.obm.push.store.ehcache.NonTransactionalObjectStoreManager;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 
-public class ContinuationTransactionMapImpl extends AbstractEhcacheDao implements ContinuationTransactionMap {
+public class ContinuationTransactionMapImpl implements ContinuationTransactionMap {
 
+	protected final Cache store;
+	
 	@Inject  
-	@VisibleForTesting ContinuationTransactionMapImpl(ObjectStoreManager objectStoreManager) {
-		super(objectStoreManager);
-	}
-
-	@Override
-	protected String getStoreName() {
-		return ObjectStoreManager.PENDING_CONTINUATIONS;
+	@VisibleForTesting ContinuationTransactionMapImpl(NonTransactionalObjectStoreManager nonTransactionalObjectStoreManager) {
+		store = nonTransactionalObjectStoreManager.getStore(NonTransactionalObjectStoreManager.PENDING_CONTINUATIONS);
 	}
 	
 	@Override

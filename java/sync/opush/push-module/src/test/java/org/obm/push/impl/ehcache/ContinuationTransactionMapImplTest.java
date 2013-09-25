@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.impl;
+package org.obm.push.impl.ehcache;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -54,7 +54,8 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.exception.ElementNotFoundException;
-import org.obm.push.store.ehcache.ObjectStoreManager;
+import org.obm.push.impl.PushContinuation;
+import org.obm.push.store.ehcache.NonTransactionalObjectStoreManager;
 
 public class ContinuationTransactionMapImplTest {
 	
@@ -77,28 +78,28 @@ public class ContinuationTransactionMapImplTest {
 	@Test
 	public void testGetContinuationForDevice() throws ElementNotFoundException {
 		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
+		NonTransactionalObjectStoreManager nonTransactionalObjectStoreManager = mockObjectStoreManager(cache);
 		
 		PushContinuation expectedContinuation = mockContinuation();
 		cache.putIfAbsent(new Element(device, expectedContinuation));
 		
-		replay(objectStoreManager, expectedContinuation);
+		replay(nonTransactionalObjectStoreManager, expectedContinuation);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
+		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(nonTransactionalObjectStoreManager);
 		IContinuation continuationForDevice = continuationTransactionMap.getContinuationForDevice(device);
 		
-		verify(objectStoreManager, expectedContinuation);
+		verify(nonTransactionalObjectStoreManager, expectedContinuation);
 		assertThat(continuationForDevice).isEqualTo(expectedContinuation);
 	}
 	
 	@Test (expected=ElementNotFoundException.class)
 	public void testGetContinuationForDeviceElementNotFound() throws ElementNotFoundException {
 		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
+		NonTransactionalObjectStoreManager nonTransactionalObjectStoreManager = mockObjectStoreManager(cache);
 		
-		replay(objectStoreManager);
+		replay(nonTransactionalObjectStoreManager);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
+		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(nonTransactionalObjectStoreManager);
 		continuationTransactionMap.getContinuationForDevice(device);
 	}
 	
@@ -106,18 +107,18 @@ public class ContinuationTransactionMapImplTest {
 	@Test
 	public void testPutContinuationForDevice() {
 		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
+		NonTransactionalObjectStoreManager nonTransactionalObjectStoreManager = mockObjectStoreManager(cache);
 		
 		PushContinuation expectedContinuation = mockContinuation();
 		cache.putIfAbsent(new Element(device, expectedContinuation));
 		Element expectedElement = new Element(device, expectedContinuation);
 		
-		replay(objectStoreManager, expectedContinuation);
+		replay(nonTransactionalObjectStoreManager, expectedContinuation);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
+		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(nonTransactionalObjectStoreManager);
 		Element element = continuationTransactionMap.putContinuationForDevice(device, expectedContinuation);
 		
-		verify(objectStoreManager, expectedContinuation);
+		verify(nonTransactionalObjectStoreManager, expectedContinuation);
 		assertThat(element).isEqualTo(expectedElement);
 		assertThat(cache.getKeys()).containsOnly(device);
 	}
@@ -126,16 +127,16 @@ public class ContinuationTransactionMapImplTest {
 	@Test
 	public void testPutContinuationForDeviceNoCachedElement() {
 		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
+		NonTransactionalObjectStoreManager nonTransactionalObjectStoreManager = mockObjectStoreManager(cache);
 		
 		PushContinuation expectedContinuation = mockContinuation();
 		
-		replay(objectStoreManager, expectedContinuation);
+		replay(nonTransactionalObjectStoreManager, expectedContinuation);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
+		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(nonTransactionalObjectStoreManager);
 		Element element = continuationTransactionMap.putContinuationForDevice(device, expectedContinuation);
 		
-		verify(objectStoreManager, expectedContinuation);
+		verify(nonTransactionalObjectStoreManager, expectedContinuation);
 		assertThat(element).isNull();
 		assertThat(cache.getKeys()).containsOnly(device);
 	}
@@ -144,17 +145,17 @@ public class ContinuationTransactionMapImplTest {
 	@Test
 	public void testDelete() {
 		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
+		NonTransactionalObjectStoreManager nonTransactionalObjectStoreManager = mockObjectStoreManager(cache);
 		
 		PushContinuation expectedContinuation = mockContinuation();
 		cache.putIfAbsent(new Element(device, expectedContinuation));
 		
-		replay(objectStoreManager, expectedContinuation);
+		replay(nonTransactionalObjectStoreManager, expectedContinuation);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
+		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(nonTransactionalObjectStoreManager);
 		continuationTransactionMap.delete(device);
 		
-		verify(objectStoreManager, expectedContinuation);
+		verify(nonTransactionalObjectStoreManager, expectedContinuation);
 		assertThat(cache.getKeys()).isEmpty();
 	}
 	
@@ -162,16 +163,16 @@ public class ContinuationTransactionMapImplTest {
 	@Test
 	public void testDeleteNotCachedElement() {
 		Cache cache = buildCache();
-		ObjectStoreManager objectStoreManager = mockObjectStoreManager(cache);
+		NonTransactionalObjectStoreManager nonTransactionalObjectStoreManager = mockObjectStoreManager(cache);
 		
 		PushContinuation expectedContinuation = mockContinuation();
 		
-		replay(objectStoreManager, expectedContinuation);
+		replay(nonTransactionalObjectStoreManager, expectedContinuation);
 
-		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(objectStoreManager);
+		ContinuationTransactionMapImpl continuationTransactionMap = new ContinuationTransactionMapImpl(nonTransactionalObjectStoreManager);
 		continuationTransactionMap.delete(device);
 		
-		verify(objectStoreManager, expectedContinuation);
+		verify(nonTransactionalObjectStoreManager, expectedContinuation);
 		assertThat(cache.getKeys()).isEmpty();
 	}
 
@@ -189,12 +190,12 @@ public class ContinuationTransactionMapImplTest {
 			.name(PENDING_CONTINUATIONS);
 	}
 	
-	private ObjectStoreManager mockObjectStoreManager(Cache cache) {
-		ObjectStoreManager objectStoreManager = createMock(ObjectStoreManager.class);
-		expect(objectStoreManager.getStore(PENDING_CONTINUATIONS))
+	private NonTransactionalObjectStoreManager mockObjectStoreManager(Cache cache) {
+		NonTransactionalObjectStoreManager nonTransactionalObjectStoreManager = createMock(NonTransactionalObjectStoreManager.class);
+		expect(nonTransactionalObjectStoreManager.getStore(PENDING_CONTINUATIONS))
 			.andReturn(cache).anyTimes();
 		
-		return objectStoreManager;
+		return nonTransactionalObjectStoreManager;
 	}
 
 	private Cache buildCache() {

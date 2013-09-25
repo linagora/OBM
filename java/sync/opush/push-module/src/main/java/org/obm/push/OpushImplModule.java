@@ -54,7 +54,7 @@ import org.obm.push.calendar.EventServiceImpl;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.handler.BackendWindowingServiceImpl;
 import org.obm.push.impl.ContinuationServiceImpl;
-import org.obm.push.impl.ContinuationTransactionMapImpl;
+import org.obm.push.impl.ehcache.ContinuationTransactionMapImpl;
 import org.obm.push.protocol.data.ASTimeZoneConverter;
 import org.obm.push.protocol.data.ASTimeZoneConverterImpl;
 import org.obm.push.protocol.data.Base64ASTimeZoneDecoder;

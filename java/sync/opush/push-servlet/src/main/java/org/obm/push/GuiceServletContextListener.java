@@ -87,6 +87,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 
 	private void shutdown() {
 		injector.getInstance(org.obm.push.store.ehcache.ObjectStoreManager.class).shutdown();
+		injector.getInstance(org.obm.push.store.ehcache.NonTransactionalObjectStoreManager.class).shutdown();
 		injector.getInstance(org.obm.push.jaxb.store.ehcache.ObjectStoreManager.class).shutdown();
 		injector.getInstance(ObjectStoreManagerMigration.class).shutdown();
 		TransactionManagerServices.getTransactionManager().shutdown();
