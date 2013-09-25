@@ -34,12 +34,19 @@ package org.obm.push.store.ehcache;
 import java.util.List;
 
 import net.sf.ehcache.Cache;
-import net.sf.ehcache.statistics.extended.ExtendedStatistics.Statistic;
+import net.sf.ehcache.statistics.extended.ExtendedStatistics;
+import net.sf.ehcache.statistics.extended.ExtendedStatistics.Result;
 import net.sf.ehcache.store.StoreOperationOutcomes.GetOutcome;
+import net.sf.ehcache.store.StoreOperationOutcomes.PutOutcome;
+import net.sf.ehcache.store.StoreOperationOutcomes.RemoveOutcome;
 
 import org.terracotta.statistics.archive.Timestamped;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -92,9 +99,16 @@ public class EhCacheStatisticsImpl implements EhCacheStatistics {
 	}
 
 	private History getCacheDiskStatsHistory(String cacheName) {
-		Cache cache = getCacheOrException(cacheName);
-		Statistic<Long> diskStats = cache.getStatistics().getExtended().diskGet().component(GetOutcome.HIT).count();
-		return new History(diskStats.history());
+		ExtendedStatistics cacheStats = getCacheOrException(cacheName).getStatistics().getExtended();
+		Result diskGetStats = cacheStats.diskGet().component(GetOutcome.HIT);
+		Result diskPutStats = cacheStats.diskPut().compound(ImmutableSet.of(PutOutcome.ADDED, PutOutcome.UPDATED));
+		Result diskRemoveStats = cacheStats.diskRemove().component(RemoveOutcome.SUCCESS);
+		
+		return History.builder()
+				.gets(diskGetStats.count().history())
+				.puts(diskPutStats.count().history())
+				.removes(diskRemoveStats.count().history())
+				.build();
 	}
 
 	private Cache getCacheOrException(String storeName) {
@@ -106,32 +120,106 @@ public class EhCacheStatisticsImpl implements EhCacheStatistics {
 	}
 	
 	public static class History {
+		
+		public static Builder builder() {
+			return new Builder();
+		}
+		
+		public static class Builder {
+			
+			private ImmutableList.Builder<Timestamped<Long>> gets;
+			private ImmutableList.Builder<Timestamped<Long>> puts;
+			private ImmutableList.Builder<Timestamped<Long>> removes;
+			
+			public Builder() {
+				gets = ImmutableList.builder();
+				puts = ImmutableList.builder();
+				removes = ImmutableList.builder();
+			}
+			
+			public Builder gets(List<Timestamped<Long>> getHistory) {
+				this.gets.addAll(getHistory);
+				return this;
+			}
+			public Builder gets(Timestamped<Long>...getHistory) {
+				this.gets.addAll(Iterators.forArray(getHistory));
+				return this;
+			}
+			
+			public Builder puts(List<Timestamped<Long>> putHistory) {
+				this.puts.addAll(putHistory);
+				return this;
+			}
 
-		private final List<Timestamped<Long>> history;
+			public Builder puts(Timestamped<Long>...putHistory) {
+				this.puts.addAll(Iterators.forArray(putHistory));
+				return this;
+			}
+			
+			public Builder removes(List<Timestamped<Long>> removeHistory) {
+				this.removes.addAll(removeHistory);
+				return this;
+			}
+			
+			public Builder removes(Timestamped<Long>...removeHistory) {
+				this.removes.addAll(Iterators.forArray(removeHistory));
+				return this;
+			}
+			
+			public History build() {
+				ImmutableList<Timestamped<Long>> getHistory = gets.build();
+				ImmutableList<Timestamped<Long>> putHistory = puts.build();
+				ImmutableList<Timestamped<Long>> removeHistory = removes.build();
+				Preconditions.checkState(
+						getHistory.size() == putHistory.size() &&
+						getHistory.size() == removeHistory.size(), "Histories have different size");
+				return new History(getHistory, putHistory, removeHistory);
+			}
+		}
+		
+		private final ImmutableList<Timestamped<Long>> getHistory;
+		private final ImmutableList<Timestamped<Long>> putHistory;
+		private final ImmutableList<Timestamped<Long>> removeHistory;
 
-		public History(List<Timestamped<Long>> history) {
-			this.history = history;
+		private History(
+				ImmutableList<Timestamped<Long>> getHistory, 
+				ImmutableList<Timestamped<Long>> putHistory, 
+				ImmutableList<Timestamped<Long>> removeHistory) {
+			this.getHistory = getHistory;
+			this.putHistory = putHistory;
+			this.removeHistory = removeHistory;
 		}
 
 		public long getLastSampleCount() {
-			return history.get(getLastIndex()).getSample();
+			Long getSample = getHistory.get(lastIndexOf(getHistory)).getSample();
+			Long putSample = putHistory.get(lastIndexOf(putHistory)).getSample();
+			Long removeSample = removeHistory.get(lastIndexOf(removeHistory)).getSample();
+			
+			return getSample - putSample - removeSample;
 		}
 
 		public long getReferenceSampleCount(int samplingTimeInSeconds) {
-			int lastIndex = getLastIndex();
+			int getHistoryLastIndex = lastIndexOf(getHistory);
+			
 			int requiredSampleCount = requiredSampleCount(samplingTimeInSeconds);
-			if (lastIndex == 0 || requiredSampleCount == history.size()) {
+			if (getHistoryLastIndex == 0 || requiredSampleCount == getHistory.size()) {
 				return 0;
 			}
-			return history.get(lastIndex - requiredSampleCount).getSample();
+			
+			int referenceIndex = getHistoryLastIndex - requiredSampleCount;
+			Long getSample = getHistory.get(referenceIndex).getSample();
+			Long putSample = putHistory.get(referenceIndex).getSample();
+			Long removeSample = removeHistory.get(referenceIndex).getSample();
+			
+			return getSample - putSample - removeSample;
 		}
 
 		public boolean hasEnoughSamples(int samplingTimeInSeconds) {
-			return history != null && history.size() >= requiredSampleCount(samplingTimeInSeconds);
+			return getHistory != null && getHistory.size() >= requiredSampleCount(samplingTimeInSeconds);
 		}
 
-		private int getLastIndex() {
-			return history.size() - 1;
+		private int lastIndexOf(List<Timestamped<Long>> of) {
+			return of.size() - 1;
 		}
 
 		private int requiredSampleCount(int samplingTimeInSeconds) {

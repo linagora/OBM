@@ -43,6 +43,7 @@ import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
 import net.sf.ehcache.config.MemoryUnit;
 import net.sf.ehcache.statistics.StatisticsGateway;
+import net.sf.ehcache.statistics.extended.ExtendedStatistics.Operation;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.obm.annotations.transactional.TransactionProvider;
@@ -98,13 +99,13 @@ public class ObjectStoreManager implements LifecycleListener {
 		configureCachesStatistics(singletonManager);
 	}
 
-	private void configureCachesStatistics(CacheManager singletonManager2) {
-		for (String cacheName : singletonManager2.getCacheNames()) {
-			StatisticsGateway stats = singletonManager2.getCache(cacheName).getStatistics();
+	private void configureCachesStatistics(CacheManager singletonManager) {
+		for (String cacheName : singletonManager.getCacheNames()) {
+			StatisticsGateway stats = singletonManager.getCache(cacheName).getStatistics();
 			stats.setStatisticsTimeToDisable(ehCacheConfiguration.statsSamplingTimeStopInMinutes(), TimeUnit.MINUTES);
-			stats.getExtended().diskGet().setHistory(
-					ehCacheConfiguration.statsSampleToRecordCount(), 
-					EhCacheConfiguration.STATS_SAMPLING_IN_SECONDS, TimeUnit.SECONDS);
+			configureStatisticsHistory(stats.getExtended().diskGet());
+			configureStatisticsHistory(stats.getExtended().diskPut());
+			configureStatisticsHistory(stats.getExtended().diskRemove());
 		}
 	}
 
@@ -112,7 +113,12 @@ public class ObjectStoreManager implements LifecycleListener {
 		transactionProvider.get();
 	}
 	
-	@Override
+	private void configureStatisticsHistory(Operation<?> history) {
+		history.setHistory(
+				ehCacheConfiguration.statsSampleToRecordCount(), 
+				EhCacheConfiguration.STATS_SAMPLING_IN_SECONDS, TimeUnit.SECONDS);
+	}
+
 	public void shutdown() {
 		this.singletonManager.shutdown();
 	}
@@ -149,7 +155,7 @@ public class ObjectStoreManager implements LifecycleListener {
 			.name(name)
 			.maxEntriesLocalDisk(UNLIMITED_CACHE_MEMORY)
 			.overflowToDisk(true)
-			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
+			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LRU)
 			.transactionalMode(ehCacheConfiguration.transactionalMode());
 		
 		Percentage percentageAllowedToCache = ehCacheConfiguration.percentageAllowedToCache(name);
