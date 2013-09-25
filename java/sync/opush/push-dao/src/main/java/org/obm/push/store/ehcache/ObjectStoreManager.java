@@ -43,6 +43,7 @@ import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
 import net.sf.ehcache.config.MemoryUnit;
 import net.sf.ehcache.statistics.StatisticsGateway;
+import net.sf.ehcache.statistics.extended.ExtendedStatistics.Operation;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.obm.configuration.ConfigurationService;
@@ -84,7 +85,7 @@ public class ObjectStoreManager implements EhCacheStores {
 		configurationLogger.info("EhCache transaction timeout in seconds : {}", transactionTimeoutInSeconds);
 		configurationLogger.info("EhCache transaction persistent mode : {}", usePersistentCache);
 		configurationLogger.info("EhCache data directory : {}", dataDirectory);
-		configurationLogger.info("EhCache maxBytesLocalHeap : {}", ehCacheConfiguration.maxMemoryInMB());
+		configurationLogger.info("EhCache maxBytesLocalHeap in MB : {}", ehCacheConfiguration.maxMemoryInMB());
 		
 		storesPercentage = loadStoresPercentage();
 		checkGlobalPercentage();
@@ -128,10 +129,16 @@ public class ObjectStoreManager implements EhCacheStores {
 		for (String cacheName : singletonManager2.getCacheNames()) {
 			StatisticsGateway stats = singletonManager2.getCache(cacheName).getStatistics();
 			stats.setStatisticsTimeToDisable(ehCacheConfiguration.statsSamplingTimeStopInMinutes(), TimeUnit.MINUTES);
-			stats.getExtended().diskGet().setHistory(
-					ehCacheConfiguration.statsSampleToRecordCount(), 
-					EhCacheConfiguration.STATS_SAMPLING_IN_SECONDS, TimeUnit.SECONDS);
+			configureStatisticsHistory(stats.getExtended().diskGet());
+			configureStatisticsHistory(stats.getExtended().diskPut());
+			configureStatisticsHistory(stats.getExtended().diskRemove());
 		}
+	}
+
+	private void configureStatisticsHistory(Operation<?> history) {
+		history.setHistory(
+				ehCacheConfiguration.statsSampleToRecordCount(), 
+				EhCacheConfiguration.STATS_SAMPLING_IN_SECONDS, TimeUnit.SECONDS);
 	}
 
 	public void shutdown() {
@@ -158,7 +165,7 @@ public class ObjectStoreManager implements EhCacheStores {
 			.name(name)
 			.maxEntriesLocalDisk(UNLIMITED_CACHE_MEMORY)
 			.overflowToDisk(true)
-			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
+			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LRU)
 			.transactionalMode(ehCacheConfiguration.transactionalMode());
 		
 		Percentage percentageAllowedToCache = storesPercentage.get(name);

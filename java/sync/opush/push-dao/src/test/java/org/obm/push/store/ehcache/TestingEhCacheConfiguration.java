@@ -52,7 +52,7 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 	private Map<String, Percentage> stores = Maps.newHashMap();
 
 	public TestingEhCacheConfiguration() {
-		percentageAllowedToCache = null;
+		percentageAllowedToCache = 10;
 		maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
 		timeToLive = 60;
 		statsShortSamplingTimeInSeconds = 1;
