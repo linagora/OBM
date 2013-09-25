@@ -70,6 +70,13 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-dao-ehcache</artifactId>
+			<version>${obm.version}</version>
+			<type>test-jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache-core-migrating</artifactId>
 			<version>2.4.8</version>

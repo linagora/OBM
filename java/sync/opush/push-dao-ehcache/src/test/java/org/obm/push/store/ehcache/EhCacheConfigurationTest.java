@@ -102,4 +102,26 @@ public class EhCacheConfigurationTest {
 	public void testCalculateWhenRoundedUp() {
 		assertThat(Percentage.of(99).applyTo(10)).isEqualTo(10);
 	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testPercentageGetIntValueWhenUndefined() {
+		assertThat(Percentage.UNDEFINED.getIntValue());
+	}
+	
+	@Test
+	public void testPercentageGetIntValueWhenZero() {
+		assertThat(Percentage.of(0).isDefined()).isTrue();
+		assertThat(Percentage.of(0).getIntValue()).isEqualTo(0);
+	}
+	
+	@Test
+	public void testPercentageGetIntValueWhenFiftyFive() {
+		assertThat(Percentage.of(55).isDefined()).isTrue();
+		assertThat(Percentage.of(55).getIntValue()).isEqualTo(55);
+	}
+	
+	@Test
+	public void testPercentageGetIntValueGetWhenOneHundred() {
+		assertThat(Percentage.of(100).getIntValue()).isEqualTo(100);
+	}
 }
