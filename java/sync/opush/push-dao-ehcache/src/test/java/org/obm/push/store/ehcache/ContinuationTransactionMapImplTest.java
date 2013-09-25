@@ -41,29 +41,30 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
-import org.obm.annotations.transactional.TransactionProvider;
+import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
+import org.obm.filter.Slow;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.dao.testsuite.ContinuationTransactionMapTest;
 import org.slf4j.Logger;
 
 import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
+@RunWith(SlowFilterRunner.class) @Slow
 public class ContinuationTransactionMapImplTest extends ContinuationTransactionMapTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
 
-	private ObjectStoreManager objectStoreManager;
+	private NonTransactionalObjectStoreManager objectStoreManager;
 	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
 		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
 
-		TestingEhCacheConfiguration config = new TestingEhCacheConfiguration();
-		objectStoreManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+		objectStoreManager = new NonTransactionalObjectStoreManager(configurationService, logger);
 		continuationTransactionMap = new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
 		
 		transactionManager = TransactionManagerServices.getTransactionManager();

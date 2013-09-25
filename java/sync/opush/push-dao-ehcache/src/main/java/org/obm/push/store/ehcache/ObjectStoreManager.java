@@ -38,7 +38,6 @@ import java.util.concurrent.TimeUnit;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
 import net.sf.ehcache.config.MemoryUnit;
@@ -70,7 +69,6 @@ public class ObjectStoreManager implements LifecycleListener {
 	public static final String MAIL_WINDOWING_INDEX_STORE = "mailWindowingIndexStore";
 	public static final String MAIL_WINDOWING_CHUNKS_STORE = "mailWindowingChunksStore";
 	public static final String SYNC_KEYS_STORE = "syncKeysStore";
-	public static final String PENDING_CONTINUATIONS = "pendingContinuation";
 	
 	private final static int UNLIMITED_CACHE_MEMORY = 0;
 	
@@ -136,17 +134,7 @@ public class ObjectStoreManager implements LifecycleListener {
 			.cache(timeToLiveConfiguration(defaultCacheConfiguration(MAIL_WINDOWING_CHUNKS_STORE), usePersistentCache))
 			.cache(timeToLiveConfiguration(defaultCacheConfiguration(MAIL_WINDOWING_INDEX_STORE), usePersistentCache))
 			.cache(timeToLiveConfiguration(defaultCacheConfiguration(SYNC_KEYS_STORE), usePersistentCache))
-			.cache(pendingContinuationConfiguration(PENDING_CONTINUATIONS))
 			.defaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
-	}
-	
-	private CacheConfiguration pendingContinuationConfiguration(String name) {
-		return new CacheConfiguration()
-			.name(name)
-			.maxEntriesLocalHeap(UNLIMITED_CACHE_MEMORY)
-			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
-			.transactionalMode(TransactionalMode.OFF)
-			.eternal(false);
 	}
 
 	@SuppressWarnings("deprecation")
