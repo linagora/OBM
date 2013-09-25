@@ -66,9 +66,8 @@ import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSAttachementData;
-import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollectionOptions;
@@ -101,10 +100,12 @@ import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.bean.WindowingIndexKey;
+import org.obm.push.mail.conversation.EmailView;
+import org.obm.push.mail.conversation.EmailViewAttachment;
 import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import org.obm.push.service.AuthenticationService;
-import org.obm.push.service.EventService;
 import org.obm.push.service.SmtpSender;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.tnefconverter.TNEFConverterException;
@@ -149,13 +150,14 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final Mime4jUtils mime4jUtils;
 	private final ConfigurationService configurationService;
 	private final AuthenticationService authenticationService;
-	private final EventService eventService;
 	private final MSEmailFetcher msEmailFetcher;
+	private final TransformersFactory transformersFactory;
 	private final SnapshotService snapshotService;
 	private final EmailChangesFetcher emailChangesFetcher;
 	private final MailBackendSyncDataFactory mailBackendSyncDataFactory;
 	private final WindowingService windowingService;
 	private final SmtpSender smtpSender;
+
 
 
 	@Inject
@@ -165,8 +167,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			SnapshotService snapshotService,
 			EmailChangesFetcher emailChangesFetcher,
 			MappingService mappingService,
-			EventService eventService,
 			MSEmailFetcher msEmailFetcher,
+			TransformersFactory transformersFactory,
 			Provider<CollectionPath.Builder> collectionPathBuilderProvider,
 			MailBackendSyncDataFactory mailBackendSyncDataFactory,
 			WindowingService windowingService,
@@ -179,8 +181,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		this.authenticationService = authenticationService;
 		this.snapshotService = snapshotService;
 		this.emailChangesFetcher = emailChangesFetcher;
-		this.eventService = eventService;
 		this.msEmailFetcher = msEmailFetcher;
+		this.transformersFactory = transformersFactory;
 		this.mailBackendSyncDataFactory = mailBackendSyncDataFactory;
 		this.windowingService = windowingService;
 		this.smtpSender = smtpSender;
@@ -529,13 +531,11 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			}
 			
 			Long uid = getEmailUidFromServerId(serverId);
-			Set<Long> uids = new HashSet<Long>();
-			uids.add(uid);
-			List<MSEmail> mail = fetchMails(udr, collectionId, collectionPath, uids);
+			Map<MSEmailBodyType, EmailView> emailViews = fetchMailInHTMLThenText(udr, collectionId, collectionPath, uid);
 
-			if (mail.size() > 0) {
+			if (emailViews.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
-				ReplyEmail replyEmail = new ReplyEmail(configurationService, mime4jUtils, getUserEmail(udr), mail.get(0), message,
+				ReplyEmail replyEmail = new ReplyEmail(configurationService, mime4jUtils, getUserEmail(udr), emailViews, message,
 						ImmutableMap.<String, MSAttachementData>of());
 				send(udr, replyEmail, saveInSent);
 				mailboxService.setAnsweredFlag(udr, collectionPath, MessageSet.singleton(uid));
@@ -556,6 +556,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (ImapMessageNotFoundException e) {
 			throw new ItemNotFoundException(e);
+		} catch (EmailViewPartsFetcherException e) {
+			throw new ProcessingEmailException(e);
 		} 
 	}
 
@@ -567,21 +569,18 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			Integer collectionIdInt = Integer.parseInt(collectionId);
 			String collectionPath = mappingService.getCollectionPathFor(collectionIdInt);
 			Long uid = getEmailUidFromServerId(serverId);
-			Set<Long> uids = new HashSet<Long>();
-			uids.add(uid);
 
-			List<MSEmail> mail = fetchMails(udr, collectionIdInt, collectionPath, uids);
-			if (mail.size() > 0) {
+			Map<MSEmailBodyType, EmailView> emailViews = fetchMailInHTMLThenText(udr, collectionIdInt, collectionPath, uid);
+			if (emailViews.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
-				MSEmail originMail = mail.get(0);
 				
 				Map<String, MSAttachementData> originalMailAttachments = new HashMap<String, MSAttachementData>();
 				if (!mime4jUtils.isAttachmentsExist(message)) {
-					loadAttachments(originalMailAttachments, udr, originMail);
+					loadAttachments(originalMailAttachments, udr, emailViews);
 				}
 				
 				ForwardEmail forwardEmail = 
-						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(udr), originMail, message, originalMailAttachments);
+						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(udr), emailViews, message, originalMailAttachments);
 				send(udr, forwardEmail, saveInSent);
 				try{
 					mailboxService.setAnsweredFlag(udr, collectionPath, MessageSet.singleton(uid));
@@ -605,35 +604,48 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 			throw new ProcessingEmailException(e);
 		} catch (IOException e) {
 			throw new ProcessingEmailException(e);
+		} catch (EmailViewPartsFetcherException e) {
+			throw new ProcessingEmailException(e);
 		} 
 	}
 	
-	private List<MSEmail> fetchMails(UserDataRequest udr, Integer collectionId, 
-			String collectionPath, Collection<Long> uids) throws MailException {
+	@VisibleForTesting Map<MSEmailBodyType, EmailView> fetchMailInHTMLThenText(UserDataRequest udr, Integer collectionId, 
+			String collectionPath, Long uid) throws EmailViewPartsFetcherException {
 		
-		MailMessageLoader mailLoader = new MailMessageLoader(mailboxService, eventService);
-		return fetchMails(mailLoader, udr, collectionId, collectionPath, uids);
+		Map<MSEmailBodyType, EmailView> emailViews = Maps.newHashMap();
+		EmailView emailViewHTML = fetchBodyType(udr, collectionId, collectionPath, uid, MSEmailBodyType.HTML);
+		if (emailViewHTML != null) {
+			emailViews.put(MSEmailBodyType.HTML, emailViewHTML);
+			return emailViews;
+		}
+		EmailView emailViewPlainText = fetchBodyType(udr, collectionId, collectionPath, uid, MSEmailBodyType.PlainText);
+		if (emailViewPlainText != null) {
+			emailViews.put(MSEmailBodyType.PlainText, emailViewPlainText);
+		}
+		return emailViews;
+		
 	}
 
-	@VisibleForTesting List<MSEmail> fetchMails(MailMessageLoader mailMessageLoader,
-			UserDataRequest udr, Integer collectionId, 
-			String collectionPath, Collection<Long> uids) throws MailException {
+	private EmailView fetchBodyType(UserDataRequest udr, Integer collectionId, String collectionPath, Long uid, MSEmailBodyType bodyType)
+			throws EmailViewPartsFetcherException {
 		
-		List<MSEmail> fetchedEmails = new LinkedList<MSEmail>();
-		
-		for (Long uid: uids) {
-			MSEmail fetchedEmail = mailMessageLoader.fetch(collectionPath, collectionId, uid, udr);
-			if (fetchedEmail != null) {
-				fetchedEmails.add(fetchedEmail);
-			}
-		}
-		return fetchedEmails;
+		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = 
+				new EmailViewPartsFetcherImpl(transformersFactory, mailboxService, 
+						ImmutableList.of(BodyPreference.builder().bodyType(bodyType).build()), 
+						udr, collectionPath, collectionId);
+		return emailViewPartsFetcherImpl.fetch(uid, BodyPreferencePolicy.STRICT_MATCH);
 	}
 	
 	private void loadAttachments(Map<String, MSAttachementData> attachments, 
-			UserDataRequest udr, MSEmail originMail) throws ProcessingEmailException {
+			UserDataRequest udr, Map<MSEmailBodyType, EmailView> emailViews) throws ProcessingEmailException {
 		
-		for (MSAttachement msAttachement: originMail.getAttachements()) {
+		Collection<EmailView> values = emailViews.values();
+		if (values == null || values.isEmpty()) {
+			return;
+		}
+		
+		EmailView emailView = FluentIterable.from(values).first().get();
+		for (EmailViewAttachment msAttachement: emailView.getAttachments()) {
 			try {
 				MSAttachementData msAttachementData = getAttachment(udr, msAttachement.getFileReference());
 				attachments.put(msAttachement.getDisplayName(), msAttachementData);
@@ -709,13 +721,13 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	}
 
 	@Override
-	public MSEmail getEmail(UserDataRequest udr, Integer collectionId, String serverId) throws CollectionNotFoundException, ProcessingEmailException {
+	public UidMSEmail getEmail(UserDataRequest udr, Integer collectionId, String serverId) throws CollectionNotFoundException, ProcessingEmailException {
 		try {
 			String collectionName = mappingService.getCollectionPathFor(collectionId);
 			Long uid = getEmailUidFromServerId(serverId);
 			Set<Long> uids = new HashSet<Long>();
 			uids.add(uid);
-			List<MSEmail> emails = fetchMails(udr, collectionId, collectionName, uids);
+			List<UidMSEmail> emails = msEmailFetcher.fetch(udr, collectionId, collectionName, uids, null);
 			if (emails.size() > 0) {
 				return emails.get(0);
 			}
@@ -725,6 +737,8 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		} catch (DaoException e) {
 			throw new ProcessingEmailException(e);
 		} catch (OpushLocatorException e) {
+			throw new ProcessingEmailException(e);
+		} catch (EmailViewPartsFetcherException e) {
 			throw new ProcessingEmailException(e);
 		}
 	}

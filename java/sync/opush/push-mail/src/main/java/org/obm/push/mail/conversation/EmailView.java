@@ -60,7 +60,7 @@ public class EmailView {
 		private Envelope envelope;
 		private InputStream bodyMimePartData;
 		private int estimatedDataSize;
-		private List<EmailViewAttachment> attachments;
+		private ImmutableList.Builder<EmailViewAttachment> attachments;
 		private ICalendar iCalendar;
 		private EmailViewInvitationType invitationType;
 		private MSEmailBodyType bodyType;
@@ -68,6 +68,7 @@ public class EmailView {
 		private Boolean truncated;
 		
 		private Builder() {
+			attachments = ImmutableList.<EmailViewAttachment>builder();
 		}
 		
 		public Builder flags(Collection<Flag> flags) {
@@ -97,7 +98,7 @@ public class EmailView {
 		
 		public Builder attachments(List<EmailViewAttachment> attachments) {
 			if (attachments != null) {
-				this.attachments = ImmutableList.<EmailViewAttachment>builder().addAll(attachments).build();
+				this.attachments.addAll(attachments);
 			}
 			return this;
 		}
@@ -147,7 +148,7 @@ public class EmailView {
 				throw new EmailViewBuildException("The truncated field is required");
 			}
 			return new EmailView(uid, flags, envelope, bodyMimePartData, 
-					estimatedDataSize, attachments, iCalendar, invitationType, bodyType,
+					estimatedDataSize, attachments.build(), iCalendar, invitationType, bodyType,
 					charset, truncated);
 		}
 	}

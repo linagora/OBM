@@ -36,7 +36,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.BinaryBody;
@@ -54,25 +53,29 @@ import org.easymock.EasyMock;
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.MSAttachement;
-import org.obm.push.bean.MSEmail;
-import org.obm.push.bean.MSEmailBody;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MethodAttachment;
+import org.obm.push.bean.ms.MSEmail;
+import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.utils.SerializableInputStream;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.Sets;
 
 public class MSMailTestsUtils {
 
 	private static Mime4jUtils mime4jUtils = new Mime4jUtils();
 	
 	public static MSEmail createMSEmailPlainText(String content, Charset charset) {
-		MSEmail original = new MSEmail();
-		MSEmailBody msEmailBody = new MSEmailBody();
-		msEmailBody.setCharset(charset.name());
-		msEmailBody.addConverted(MSEmailBodyType.PlainText, content);
-		original.setBody(msEmailBody);
-		return original;
+		return MSEmail.builder()
+				.header(MSEmailHeader.builder()
+						.build())
+				.body(MSEmailBody.builder()
+						.charset(charset)
+						.bodyType(MSEmailBodyType.PlainText)
+						.mimeData(new SerializableInputStream(content))
+						.build())
+				.build();
 	}
 
 	public static MSEmail createMSEmailPlainText(String content) {
@@ -89,30 +92,15 @@ public class MSMailTestsUtils {
 	}
 	
 	public static MSEmail createMSEmailHtmlText(String content) {
-		MSEmail original = new MSEmail();
-		MSEmailBody msEmailBody = new MSEmailBody();
-		msEmailBody.addConverted(MSEmailBodyType.HTML, htmlBold(content));
-		original.setBody(msEmailBody);
-		return original;
-	}
-	
-	public static MSEmail createMSEmailMultipartAlt(String content) {
-		MSEmail original = new MSEmail();
-		MSEmailBody msEmailBody = new MSEmailBody();
-		msEmailBody.addConverted(MSEmailBodyType.PlainText, content);
-		msEmailBody.addConverted(MSEmailBodyType.HTML, htmlBold(content));
-		original.setBody(msEmailBody);
-		return original;
-	}
-	
-	public static MSEmail createMSEmailMultipartMixed(String content) {
-		MSEmail original = createMSEmailMultipartAlt(content);
-		
-		Set<MSAttachement> attached = Sets.newHashSet();
-		attached.add(attach("/test/file.png"));
-		attached.add(attach("/test/file2.png"));
-		original.setAttachements(attached);
-		return original;
+		return MSEmail.builder()
+				.header(MSEmailHeader.builder()
+						.build())
+				.body(MSEmailBody.builder()
+						.charset(Charsets.UTF_8)
+						.bodyType(MSEmailBodyType.HTML)
+						.mimeData(new SerializableInputStream(htmlBold(content)))
+						.build())
+				.build();
 	}
 
 	public static MSAttachement attach(String file){

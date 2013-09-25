@@ -33,8 +33,8 @@ package org.obm.push.mail;
 
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.MSAttachementData;
-import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.exception.activesync.AttachementNotFoundException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
@@ -52,7 +52,7 @@ public interface MailBackend extends PIMBackend {
 			boolean saveInSent, String collectionId, String serverId)
 			throws ProcessingEmailException, CollectionNotFoundException;
 
-	MSEmail getEmail(UserDataRequest udr, Integer collectionId, String serverId)
+	UidMSEmail getEmail(UserDataRequest udr, Integer collectionId, String serverId)
 			throws CollectionNotFoundException, ProcessingEmailException;
 
 	MSAttachementData getAttachment(UserDataRequest udr, String attachmentId)

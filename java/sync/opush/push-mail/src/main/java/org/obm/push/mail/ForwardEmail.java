@@ -31,22 +31,25 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.MSAttachementData;
-import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.exception.NotQuotableEmailException;
 
 public class ForwardEmail extends ReplyEmail {
 
 	public ForwardEmail(ConfigurationService configuration, Mime4jUtils mime4jUtils, 
-			String defaultFrom, MSEmail mailForwarded, Message message, Map<String, MSAttachementData> originalMailAttachments) 
-					throws MimeException, NotQuotableEmailException {
+			String defaultFrom, Map<MSEmailBodyType, EmailView> mailsForwarded, Message message, Map<String, MSAttachementData> originalMailAttachments) 
+					throws MimeException, NotQuotableEmailException, UnsupportedEncodingException, IOException {
 		
-		super(configuration, mime4jUtils, defaultFrom, mailForwarded, message, originalMailAttachments);
+		super(configuration, mime4jUtils, defaultFrom, mailsForwarded, message, originalMailAttachments);
 	}
 	
 }

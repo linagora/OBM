@@ -37,6 +37,7 @@ import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfigurationService;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.BinaryBody;
@@ -50,7 +51,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAttachementData;
-import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.exception.NotQuotableEmailException;
 
 import com.google.common.collect.ImmutableMap;
@@ -69,7 +71,7 @@ public class ReplyEmailTest {
 	
 	@Test
 	public void testJira2362() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin");
 		Message reply = loadMimeMessage("jira-2362.eml");
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -85,7 +87,7 @@ public class ReplyEmailTest {
 
 	@Test
 	public void testReplyCopyOfAddress() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin");
 		Message reply = loadMimeMessage("plainText.eml");
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -100,7 +102,7 @@ public class ReplyEmailTest {
 	@Test
 	public void testReplyEncodingShouldBeUTF8() throws IOException, MimeException, NotQuotableEmailException {
 		Message reply = loadMimeMessage("plainText.eml");
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainTextASCII("origin");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMapASCII("origin");
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
 				ImmutableMap.<String, MSAttachementData>of());
@@ -111,7 +113,7 @@ public class ReplyEmailTest {
 
 	@Test
 	public void testReplyTextToText() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin\nCordialement");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin\nCordialement");
 		Message reply = MSMailTestsUtils.createMessagePlainText(mime4jUtils,"response text");
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -128,7 +130,7 @@ public class ReplyEmailTest {
 
 	@Test
 	public void testReplyTextToHtml() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailHtmlText("<b>origin</b>\n<b>Cordialement</b>");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createHtmlMap("<b>origin</b>\n<b>Cordialement</b>");
 		Message reply = MSMailTestsUtils.createMessagePlainText(mime4jUtils,"response text");
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -148,10 +150,10 @@ public class ReplyEmailTest {
 				"</BODY>" + LINEBREAK +
 				"</HTML>");
 	}
-	
+
 	@Test
 	public void testReplyTextToTextWithAttachment() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin\nCordialement");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin\nCordialement");
 		Message reply = loadMimeMessage("MAIL-WITH-ATTACHMENT.eml");
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -171,7 +173,7 @@ public class ReplyEmailTest {
 	public void testReplyTextToTextFormated() throws IOException, MimeException, NotQuotableEmailException {
 		String replyText = "\nresponse text\r\r\rEnvoyé à partir de mon SuperPhone\n\n\n";
 		String replyTextExpected = "\r\nresponse text\r\n\r\n\r\nEnvoyé à partir de mon SuperPhone\r\n\r\n\r\n"; 
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin\nCordialement");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin\nCordialement");
 		Message reply = MSMailTestsUtils.createMessagePlainText(mime4jUtils,replyText);
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -189,7 +191,7 @@ public class ReplyEmailTest {
 	
 	@Test
 	public void testReplyHtmlToHtml() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailHtmlText("origin\nCordialement");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createHtmlMap("origin\nCordialement");
 		Message reply = MSMailTestsUtils.createMessageHtml(mime4jUtils,"response text");
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -207,7 +209,7 @@ public class ReplyEmailTest {
 	
 	@Test
 	public void testReplyTextToBoth() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailMultipartAlt("origin\nCordialement");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextAndHTMLMap("origin\nCordialement");
 		Message reply = MSMailTestsUtils.createMessagePlainText(mime4jUtils,"response text");
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -224,7 +226,7 @@ public class ReplyEmailTest {
 
 	@Test
 	public void testReplyHtmlToBoth() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailMultipartAlt("origin\nCordialement");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextAndHTMLMap("origin\nCordialement");
 		Message reply = MSMailTestsUtils.createMessageHtml(mime4jUtils, "<b>response html</b>");
 
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -242,7 +244,7 @@ public class ReplyEmailTest {
 
 	@Test
 	public void testReplyBothToText() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin\nCordialement");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin\nCordialement");
 		Message reply = MSMailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response text", "response html");
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -266,7 +268,7 @@ public class ReplyEmailTest {
 	
 	@Test
 	public void testReplyBothToHtml() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailHtmlText("origin\nCordialement");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createHtmlMap("origin\nCordialement");
 		Message reply = MSMailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response text", "response html");
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -283,7 +285,7 @@ public class ReplyEmailTest {
 	
 	@Test
 	public void testReplyBothToBoth() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailMultipartAlt("origin\nCordialement");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextAndHTMLMap("origin\nCordialement");
 		Message reply = MSMailTestsUtils.createMessageTextAndHtml(mime4jUtils, "response text","response html");
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -307,7 +309,7 @@ public class ReplyEmailTest {
 	
 	@Test
 	public void testReplyTextToMixed() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailMultipartMixed("origin\nCordialement");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextAndHTMLMap("origin\nCordialement");
 		Message reply = MSMailTestsUtils.createMessagePlainText(mime4jUtils, "response text");
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -324,7 +326,7 @@ public class ReplyEmailTest {
 	
 	@Test
 	public void testReplyMixedToText() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin\nCordialement");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin\nCordialement");
 		byte[] dataToSend = new byte[]{0,1,2,3,4};
 		Message reply = MSMailTestsUtils.createMessageMultipartMixed(mime4jUtils, "response text", dataToSend);
 
@@ -354,7 +356,7 @@ public class ReplyEmailTest {
 	
 	@Test
 	public void testTerminationSequenceEndLineInHTMLReplyEmail() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin");
 		Message reply = loadMimeMessage("jira-2362.eml");
 		
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -395,7 +397,7 @@ public class ReplyEmailTest {
 
 	@Test
 	public void testReplyCopyDate() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin");
 		Message reply = loadMimeMessage("plainText.eml");
 		Date expectedDate = reply.getDate();
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,
@@ -407,7 +409,7 @@ public class ReplyEmailTest {
 
 	@Test
 	public void testReplyCopyReplyTo() throws IOException, MimeException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin");
 		Message reply = loadMimeMessage("plainText.eml");
 		AddressList expectedReplyTo = reply.getReplyTo();
 		ReplyEmail replyEmail = new ReplyEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, reply,

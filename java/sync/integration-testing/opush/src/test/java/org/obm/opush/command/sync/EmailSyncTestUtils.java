@@ -123,7 +123,6 @@ public class EmailSyncTestUtils {
 		for (ItemChange change : itemChanges) {
 			for (ItemChange expected : expectedChanges) {
 				if (change.getServerId().equals(expected.getServerId())) {
-					assertThat(change.isMSEmail()).isEqualTo(expected.isMSEmail());
 					assertThat(change.isNew()).isEqualTo(expected.isNew());
 				}
 			}

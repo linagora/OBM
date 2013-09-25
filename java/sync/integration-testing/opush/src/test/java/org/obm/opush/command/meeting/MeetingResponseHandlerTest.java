@@ -67,10 +67,14 @@ import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.ms.MSEmail;
+import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ICalendarConverterException;
@@ -88,6 +92,7 @@ import org.obm.push.protocol.bean.MeetingHandlerResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
+import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.push.wbxml.WBXmlException;
 import org.obm.sync.push.client.HttpRequestException;
@@ -95,6 +100,7 @@ import org.obm.sync.push.client.OPClient;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -375,7 +381,23 @@ public class MeetingResponseHandlerTest {
 			throws CollectionNotFoundException, ProcessingEmailException {
 		
 		expect(mailBackend.getEmail(anyObject(UserDataRequest.class), anyInt(), anyObject(String.class)))
-			.andReturn(new MSEmail());
+			.andReturn(UidMSEmail.uidBuilder()
+					.uid(1)
+					.email(msEmail())
+					.build());
+	}
+	
+	private MSEmail msEmail() {
+		return MSEmail.builder()
+			.header(MSEmailHeader.builder().build())
+			.body(MSEmailBody.builder()
+					.mimeData(new SerializableInputStream())
+					.bodyType(MSEmailBodyType.MIME)
+					.estimatedDataSize(0)
+					.charset(Charsets.UTF_8)
+					.truncated(false)
+					.build())
+			.build();
 	}
 
 	private void expectMailbackendGettingInvitation(MailBackend mailBackend)

@@ -47,15 +47,13 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
+import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAttachementData;
-import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.exception.NotQuotableEmailException;
 
 import com.google.common.collect.ImmutableMap;
-
-
-import org.obm.filter.SlowFilterRunner;
 
 @RunWith(SlowFilterRunner.class)
 public class ForwardEmailTest {
@@ -69,7 +67,7 @@ public class ForwardEmailTest {
 	
 	@Test
 	public void testForwardMessageMixedMultiPartWithAttachment() throws MimeException, IOException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin");
 		Message message = loadMimeMessage("MAIL-WITH-ATTACHMENT.eml");
 		
 		ForwardEmail forwardEmail = 
@@ -93,7 +91,7 @@ public class ForwardEmailTest {
 	
 	@Test
 	public void testForwardMessageAlternativeMultiPart() throws MimeException, IOException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin");
 		Message message = loadMimeMessage("OBMFULL-2958.eml");
 		
 		ForwardEmail forwardEmail = 
@@ -110,7 +108,7 @@ public class ForwardEmailTest {
 	
 	@Test
 	public void testForwardMessageWithAddingOriginalMailAttachments() throws MimeException, IOException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin");
 		Message message = loadMimeMessage("OBMFULL-2958.eml");
 		
 		String text = "It\'s my attachment";
@@ -140,7 +138,7 @@ public class ForwardEmailTest {
 	
 	@Test
 	public void testForwardSampleBodyMessageWithAddingOriginalMailAttachments() throws MimeException, IOException, NotQuotableEmailException {
-		MSEmail original = MSMailTestsUtils.createMSEmailPlainText("origin");
+		Map<MSEmailBodyType, EmailView> original = EmailViewTestsUtils.createPlainTextMap("origin");
 		Message message = loadMimeMessage("plainText.eml");
 		
 		String text = "It\'s my attachment";

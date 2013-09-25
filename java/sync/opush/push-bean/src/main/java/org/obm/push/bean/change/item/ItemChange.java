@@ -34,7 +34,7 @@ package org.obm.push.bean.change.item;
 import java.io.Serializable;
 
 import org.obm.push.bean.IApplicationData;
-import org.obm.push.bean.MSEmail;
+import org.obm.push.bean.ms.MSEmail;
 
 import com.google.common.base.Objects;
 

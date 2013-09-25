@@ -80,10 +80,11 @@ import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.mail.MailBackendSyncData.MailBackendSyncDataFactory;
-import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.bean.WindowingIndexKey;
+import org.obm.push.mail.transformer.Transformer.TransformersFactory;
 import org.obm.push.service.SmtpSender;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
@@ -109,6 +110,7 @@ public class MailBackendImplTest {
 	private SnapshotService snapshotService;
 	private EmailChangesFetcher serverEmailChangesBuilder;
 	private MSEmailFetcher msEmailFetcher;
+	private TransformersFactory transformersFactory;
 	private MailBackendSyncDataFactory mailBackendSyncDataFactory;
 	private WindowingService windowingService;
 	private SmtpSender smtpSender;
@@ -133,13 +135,14 @@ public class MailBackendImplTest {
 		mappingService = control.createMock(MappingService.class);
 		serverEmailChangesBuilder = control.createMock(EmailChangesFetcher.class);
 		msEmailFetcher = control.createMock(MSEmailFetcher.class);
+		transformersFactory = control.createMock(TransformersFactory.class);
 		mailBackendSyncDataFactory = control.createMock(MailBackendSyncDataFactory.class);
 		windowingService = control.createMock(WindowingService.class);
 		smtpSender = control.createMock(SmtpSender.class);
 		expect(mappingService.getCollectionPathFor(collectionId)).andReturn(collectionPath).anyTimes();
 		
 		
-		testee = new MailBackendImpl(mailboxService, null, null, null, snapshotService, serverEmailChangesBuilder, mappingService, null, msEmailFetcher, null, mailBackendSyncDataFactory,
+		testee = new MailBackendImpl(mailboxService, null, null, null, snapshotService, serverEmailChangesBuilder, mappingService, msEmailFetcher, transformersFactory, null, mailBackendSyncDataFactory,
 				windowingService, smtpSender);
 	}
 	
@@ -505,23 +508,6 @@ public class MailBackendImplTest {
 		control.verify();
 		
 		assertThat(itemEstimateSize).isEqualTo(3);
-	}
-
-	@Test
-	public void testFetchEmailCallsServiceWithExpectedParameters() {
-		List<Long> emailsToFetchUids = ImmutableList.of(15l);
-		
-		org.obm.push.bean.MSEmail msEmail = control.createMock(org.obm.push.bean.MSEmail.class);
-		MailMessageLoader mailLoader = control.createMock(MailMessageLoader.class);
-		expect(mailLoader.fetch(collectionPath, collectionId, 15l, udr))
-			.andReturn(msEmail);
-		
-		control.replay();
-		List<org.obm.push.bean.MSEmail> fetchMails = 
-				testee.fetchMails(mailLoader, udr, collectionId, collectionPath, emailsToFetchUids);
-		control.verify();
-		
-		assertThat(fetchMails).containsOnly(msEmail);
 	}
 	
 	@Test

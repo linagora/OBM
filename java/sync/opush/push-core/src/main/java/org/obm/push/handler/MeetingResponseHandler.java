@@ -37,11 +37,11 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.AttendeeStatus;
-import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MeetingResponse;
 import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.ICalendarConverterException;
@@ -157,7 +157,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		ItemChangeMeetingResponse.Builder builder = ItemChangeMeetingResponse.builder()
 				.reqId(item.getReqId());
 		try {
-			MSEmail email = retrieveMailWithMeetingRequest(udr, item);
+			UidMSEmail email = retrieveMailWithMeetingRequest(udr, item);
 		
 			if (email != null) {
 				handleEmail(udr, item, builder);
@@ -230,11 +230,10 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 		}
 	}
 	
-	private MSEmail retrieveMailWithMeetingRequest(UserDataRequest udr, MeetingResponse item)
-		throws CollectionNotFoundException, ProcessingEmailException {
+	private UidMSEmail retrieveMailWithMeetingRequest(UserDataRequest udr, MeetingResponse item)
+			throws CollectionNotFoundException, ProcessingEmailException {
 
-		MSEmail email = mailBackend.getEmail(udr, item.getCollectionId(), item.getReqId());
-		return email;
+		return mailBackend.getEmail(udr, item.getCollectionId(), item.getReqId());
 	}
 	
 }

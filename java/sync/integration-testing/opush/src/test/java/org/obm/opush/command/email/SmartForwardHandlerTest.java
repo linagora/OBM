@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command.email;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.appendToINBOX;
@@ -48,6 +49,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.Configuration;
+import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
@@ -57,9 +60,10 @@ import org.obm.opush.IntegrationTestUtils;
 import org.obm.opush.MailBackendTestModule;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
-import org.obm.Configuration;
-import org.obm.ConfigurationModule.PolicyConfigurationProvider;
+import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.ServerId;
+import org.obm.push.bean.UserDataRequest;
+import org.obm.push.service.EventService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.client.user.UserClient;
@@ -266,6 +270,72 @@ public class SmartForwardHandlerTest {
 			.contains("Heu ?");
 	}
 
+	@Test
+	public void testForwardedMailWithICSAttachmentShowsAttachment() throws Exception {
+		appendToINBOX(greenMailUser, "eml/iCSAsAttachment.eml");
+		assertThat(sentFolder.getMessageCount()).isEqualTo(0);
+		assertThat(inboxFolder.getMessages().size()).isEqualTo(1);
+		
+		mocksControl.replay();
+		opushServer.start();
+		boolean success = opClient().emailForward(loadEmail("eml/textPlain.eml"), inboxCollectionId, serverId);
+		mocksControl.verify();
+		
+		assertThat(success).isTrue();
+		assertThat(sentFolder.getMessageCount()).isEqualTo(1);
+		assertThat(inboxFolder.getMessages().size()).isEqualTo(2);
+		assertThat(CharStreams.toString(new InputStreamReader(
+				inboxFolder.getMessages().get(1).getMimeMessage().getInputStream())))
+			.contains("Mail content")
+			.contains("attachment.ics");
+	}
+	
+	@Test
+	public void testForwardedInvitationDoesntShowAttachment() throws Exception {
+		appendToINBOX(greenMailUser, "eml/invitation.eml");
+		assertThat(sentFolder.getMessageCount()).isEqualTo(0);
+		assertThat(inboxFolder.getMessages().size()).isEqualTo(1);
+		EventService eventService = classToInstanceMap.get(EventService.class);
+		expect(eventService.parseEventFromICalendar(anyObject(UserDataRequest.class), anyObject(String.class)))
+			.andReturn(new MSEvent()).anyTimes();
+		
+		mocksControl.replay();
+		opushServer.start();
+		boolean success = opClient().emailForward(loadEmail("eml/textPlain.eml"), inboxCollectionId, serverId);
+		mocksControl.verify();
+		
+		assertThat(success).isTrue();
+		assertThat(sentFolder.getMessageCount()).isEqualTo(1);
+		assertThat(inboxFolder.getMessages().size()).isEqualTo(2);
+		assertThat(CharStreams.toString(new InputStreamReader(
+				inboxFolder.getMessages().get(1).getMimeMessage().getInputStream())))
+			.contains("Mail content")
+			.doesNotContain("meeting.ics");
+	}
+	
+	@Test
+	public void testForwardedCancelInvitationDoesntShowAttachment() throws Exception {
+		appendToINBOX(greenMailUser, "eml/cancelInvitation.eml");
+		assertThat(sentFolder.getMessageCount()).isEqualTo(0);
+		assertThat(inboxFolder.getMessages().size()).isEqualTo(1);
+		EventService eventService = classToInstanceMap.get(EventService.class);
+		expect(eventService.parseEventFromICalendar(anyObject(UserDataRequest.class), anyObject(String.class)))
+			.andReturn(new MSEvent()).anyTimes();
+		
+		mocksControl.replay();
+		opushServer.start();
+		boolean success = opClient().emailForward(loadEmail("eml/textPlain.eml"), inboxCollectionId, serverId);
+		mocksControl.verify();
+		
+		assertThat(success).isTrue();
+		assertThat(sentFolder.getMessageCount()).isEqualTo(1);
+		assertThat(inboxFolder.getMessages().size()).isEqualTo(2);
+		assertThat(CharStreams.toString(new InputStreamReader(
+				inboxFolder.getMessages().get(1).getMimeMessage().getInputStream())))
+			.contains("Mail content")
+			.doesNotContain("meeting.ics");
+	}
+	
 	private OPClient opClient() {
 		return buildWBXMLOpushClient(user, opushServer.getPort(), httpClient);
 	}

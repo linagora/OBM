@@ -140,7 +140,7 @@ public class MailboxBackendTest {
 		smtpSender = mocks.createMock(SmtpSender.class);
 		
 		mailBackendImpl = new MailBackendImpl(mailboxService, null, null, null, snapshotService,
-				null, mappingService, null, msEmailFetcher, null, null, windowingService, smtpSender);
+				null, mappingService, msEmailFetcher, null, null, null, windowingService, smtpSender);
 	}
 	
 	@Test(expected=ItemNotFoundException.class)

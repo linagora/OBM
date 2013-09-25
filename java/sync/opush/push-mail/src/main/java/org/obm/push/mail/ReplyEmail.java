@@ -32,8 +32,10 @@
 package org.obm.push.mail;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +55,8 @@ import org.apache.james.mime4j.message.MessageImpl;
 import org.minig.imap.impl.LineTerminationCorrecter;
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.MSAttachementData;
-import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.exception.NotQuotableEmailException;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -78,14 +80,14 @@ public class ReplyEmail extends SendEmail {
 
 	private final Map<String, MSAttachementData> originalMailAttachments;
 	
-	public ReplyEmail(ConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, MSEmail originMail, 
-			Message message, Map<String, MSAttachementData> originalMailAttachments) throws MimeException, NotQuotableEmailException {
+	public ReplyEmail(ConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, Map<MSEmailBodyType, EmailView> originMails, 
+			Message message, Map<String, MSAttachementData> originalMailAttachments) throws MimeException, NotQuotableEmailException, UnsupportedEncodingException, IOException {
 		
 		super(defaultFrom, message);
 		this.configuration = configuration;
 		this.mime4jUtils = mime4jUtils;
 		this.originalMailAttachments = originalMailAttachments;
-		setNewMessage(quoteAndAppendRepliedMail(originMail));
+		setNewMessage(quoteAndAppendRepliedMail(originMails));
 	}
 
 	private void setNewMessage(Message newMessage) throws MimeException {
@@ -100,11 +102,11 @@ public class ReplyEmail extends SendEmail {
 		setMessage(newMessage);
 	}
 	
-	private Message quoteAndAppendRepliedMail(MSEmail originMail) 
-			throws NotQuotableEmailException, MimeException {
+	private Message quoteAndAppendRepliedMail(Map<MSEmailBodyType, EmailView> originMails) 
+			throws NotQuotableEmailException, MimeException, UnsupportedEncodingException, IOException {
 		
-		String originalEmail = originMail.getBody().getValue(MSEmailBodyType.PlainText);
-		String originalEmailAsHtml = originMail.getBody().getValue(MSEmailBodyType.HTML);
+		String originalEmail = getBodyValue(MSEmailBodyType.PlainText, originMails);
+		String originalEmailAsHtml = getBodyValue(MSEmailBodyType.HTML, originMails);
 
 		if (nothingToQuote(originalEmail, originalEmailAsHtml)) {
 			return originalMessage; 
@@ -128,6 +130,14 @@ public class ReplyEmail extends SendEmail {
 		return message;
 	}
 	
+	private String getBodyValue(MSEmailBodyType bodyType, Map<MSEmailBodyType, EmailView> originMails) throws UnsupportedEncodingException, IOException {
+		EmailView originalPlainTextEmail = originMails.get(bodyType);
+		if (originalPlainTextEmail != null) {
+			return CharStreams.toString(new InputStreamReader(originalPlainTextEmail.getBodyMimePartData(), originalPlainTextEmail.getCharset()));
+		}
+		return null;
+	}
+
 	private boolean isTextOverHtml(String originalEmailAsHtml) {
 		return mime4jUtils.isMessagePlainText(originalMessage) && originalEmailAsHtml != null;
 	}

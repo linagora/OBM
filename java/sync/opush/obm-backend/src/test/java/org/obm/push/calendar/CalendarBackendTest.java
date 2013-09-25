@@ -76,10 +76,8 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.MSEmail;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
-import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
@@ -1471,8 +1469,6 @@ public class CalendarBackendTest {
 		MSEventUid msEventUid = new MSEventUid(eventExtIdString);
 		MSEvent msEvent = new MSEvent();
 		msEvent.setUid(msEventUid);
-		MSEmail invitation  = new MSEmail();
-		invitation.setInvitation(msEvent, MSMessageClass.NOTE);
 
 		EventExtId eventExtId = new EventExtId(eventExtIdString);
 		expect(eventService.getEventExtIdFor(msEventUid, device))
@@ -1521,8 +1517,6 @@ public class CalendarBackendTest {
 		MSEventUid msEventUid = new MSEventUid("1");
 		MSEvent msEvent = new MSEvent();
 		msEvent.setUid(msEventUid);
-		MSEmail invitation  = new MSEmail();
-		invitation.setInvitation(msEvent, MSMessageClass.NOTE);
 
 		EventExtId eventExtId = new EventExtId("1");
 

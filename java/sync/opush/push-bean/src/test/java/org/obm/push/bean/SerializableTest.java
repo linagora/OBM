@@ -48,6 +48,8 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.change.SyncCommand;
+import org.obm.push.bean.ms.MSEmail;
+import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestCategory;
@@ -167,11 +169,16 @@ public class SerializableTest {
 	
 	@Test
 	public void testMSEmail() throws IOException {
-		MSEmail msEmail = new MSEmail();
-		msEmail.setBody(new MSEmailBody());
-		msEmail.setFrom(new MSAddress("toto", "toto@titi.com"));
-		msEmail.setAttachements(ImmutableSet.of(new MSAttachement()));
-		msEmail.setMimeData(new ByteArrayInputStream(new byte[0]));
+		MSEmail msEmail = MSEmail.builder()
+				.header(MSEmailHeader.builder()
+						.from(new MSAddress("toto", "toto@titi.com"))
+						.build())
+				.body(MSEmailBody.builder()
+						.charset(Charsets.UTF_8)
+						.bodyType(MSEmailBodyType.PlainText)
+						.mimeData(new SerializableInputStream("content"))
+						.build())
+				.build();
 		objectOutputStream.writeObject(msEmail);
 	}
 
