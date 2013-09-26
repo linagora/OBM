@@ -34,6 +34,7 @@ package org.obm.sync;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
@@ -43,10 +44,14 @@ import javax.servlet.ServletContextListener;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
+import com.google.inject.internal.Errors;
 import com.google.inject.spi.Message;
 
 public class GuiceServletContextListener implements ServletContextListener { 
@@ -101,6 +106,17 @@ public class GuiceServletContextListener implements ServletContextListener {
 	}
 
 	public void contextDestroyed(ServletContextEvent servletContextEvent) { 
-		LifecycleListenerHelper.shutdownListeners(injector);
+		if (injector != null) {
+			Set<LifecycleListener> listeners = injector.getInstance(Key.get(new TypeLiteral<Set<LifecycleListener>>() {}));
+			Errors errors = new Errors();
+			for (LifecycleListener listener: listeners) {
+				try {
+					listener.shutdown();
+				} catch (Throwable t) {
+					errors.addMessage(new Message(ImmutableList.of(), "Error during listener shutdown", t));
+				}
+			}
+			errors.throwConfigurationExceptionIfErrorsExist();
+		}
 	}
 }

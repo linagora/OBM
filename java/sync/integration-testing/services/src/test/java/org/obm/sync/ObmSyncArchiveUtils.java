@@ -62,7 +62,7 @@ public class ObmSyncArchiveUtils {
 				.addAsResource("logback.xml")
 				.addAsResource("Messages_en.properties")
 				.addAsResource("Messages_fr.properties")
-				.addClasses(LifecycleListener.class, LifecycleListenerHelper.class)
+				.addClasses(LifecycleListener.class)
 				.addClasses(DependencyResolverHelper.projectObmDaoClasses())
 				.addClasses(DependencyResolverHelper.projectAnnotationsClasses())
 				.addClasses(DependencyResolverHelper.projectConfigurationClasses())

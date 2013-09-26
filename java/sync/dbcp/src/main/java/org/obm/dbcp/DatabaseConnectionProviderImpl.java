@@ -49,7 +49,6 @@ import org.obm.push.technicallog.bean.KindToBeLogged;
 import org.obm.push.technicallog.bean.ResourceType;
 import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.obm.push.utils.JDBCUtils;
-import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +62,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvider, LifecycleListener {
+public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvider {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -164,6 +163,10 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		return transactional == null || transactional.readOnly();
 	}
 
+	public void cleanup() {
+		poolingDataSource.close();
+	}
+
 	@Override
 	public Object getJdbcObject(String type, String value) throws SQLException {
 		if (databaseConfiguration.getDatabaseSystem() == DatabaseFlavour.PGSQL) {
@@ -190,8 +193,4 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		return driverConfiguration.getIntegerCastType();
 	}
 
-	@Override
-	public void shutdown() throws Exception {
-		poolingDataSource.close();
-	}
 }

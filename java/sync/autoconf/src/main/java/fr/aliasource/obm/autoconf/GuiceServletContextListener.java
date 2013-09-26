@@ -45,7 +45,6 @@ import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseModule;
-import org.obm.sync.LifecycleListenerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,13 +60,12 @@ public class GuiceServletContextListener implements ServletContextListener{
 
 	private static final String GLOBAL_CONFIGURATION_FILE = ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH;
 	private static final String APPLICATION_NAME = "obm-autoconf";
-	private Injector injector;
 
 	@Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
                 
         try {   
-        	injector = createInjector();
+        	Injector injector = createInjector();
             if (injector == null) { 
                 failStartup("Could not create injector: createInjector() returned null");             
             }               
@@ -112,7 +110,6 @@ public class GuiceServletContextListener implements ServletContextListener{
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    	LifecycleListenerHelper.shutdownListeners(injector);
     }
 
 }
