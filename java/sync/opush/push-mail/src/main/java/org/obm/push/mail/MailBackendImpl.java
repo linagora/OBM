@@ -633,7 +633,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 				new EmailViewPartsFetcherImpl(transformersFactory, mailboxService, 
 						ImmutableList.of(BodyPreference.builder().bodyType(bodyType).build()), 
 						udr, collectionPath, collectionId);
-		return emailViewPartsFetcherImpl.fetch(uid, BodyPreferencePolicy.STRICT_MATCH);
+		return emailViewPartsFetcherImpl.fetch(uid, new StrictMatchBodyPreferencePolicy());
 	}
 	
 	private void loadAttachments(Map<String, MSAttachementData> attachments, 

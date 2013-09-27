@@ -71,7 +71,7 @@ public class MSEmailFetcher {
 				new EmailViewPartsFetcherImpl(transformersFactory, mailboxService, bodyPreferences, udr, collectionPath, collectionId);
 		
 		for (Long uid: uids) {
-			EmailView emailView = emailViewPartsFetcherImpl.fetch(uid, BodyPreferencePolicy.ANY_MATCH);
+			EmailView emailView = emailViewPartsFetcherImpl.fetch(uid, new AnyMatchBodyPreferencePolicy());
 			if (emailView != null) {
 				msEmails.add(msEmailConverter.convert(emailView, udr));
 			}
