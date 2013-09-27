@@ -81,6 +81,7 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.HierarchyChangesException;
 import org.obm.push.exception.OpushLocatorException;
@@ -612,22 +613,20 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	@VisibleForTesting Map<MSEmailBodyType, EmailView> fetchMailInHTMLThenText(UserDataRequest udr, Integer collectionId, 
 			String collectionPath, Long uid) throws EmailViewPartsFetcherException {
 		
-		Map<MSEmailBodyType, EmailView> emailViews = Maps.newHashMap();
-		EmailView emailViewHTML = fetchBodyType(udr, collectionId, collectionPath, uid, MSEmailBodyType.HTML);
-		if (emailViewHTML != null) {
-			emailViews.put(MSEmailBodyType.HTML, emailViewHTML);
-			return emailViews;
+		ImmutableMap.Builder<MSEmailBodyType, EmailView> emailViews = ImmutableMap.builder();
+		try {
+			emailViews.put(MSEmailBodyType.HTML, fetchBodyType(udr, collectionId, collectionPath, uid, MSEmailBodyType.HTML));
+		} catch (EmailViewBuildException e) {
+			try {
+				emailViews.put(MSEmailBodyType.PlainText, fetchBodyType(udr, collectionId, collectionPath, uid, MSEmailBodyType.PlainText));
+			} catch (EmailViewBuildException e2) {
+			}
 		}
-		EmailView emailViewPlainText = fetchBodyType(udr, collectionId, collectionPath, uid, MSEmailBodyType.PlainText);
-		if (emailViewPlainText != null) {
-			emailViews.put(MSEmailBodyType.PlainText, emailViewPlainText);
-		}
-		return emailViews;
-		
+		return emailViews.build();
 	}
 
 	private EmailView fetchBodyType(UserDataRequest udr, Integer collectionId, String collectionPath, Long uid, MSEmailBodyType bodyType)
-			throws EmailViewPartsFetcherException {
+			throws EmailViewPartsFetcherException, EmailViewBuildException {
 		
 		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = 
 				new EmailViewPartsFetcherImpl(transformersFactory, mailboxService, 

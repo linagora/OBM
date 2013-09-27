@@ -39,9 +39,12 @@ import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.transformer.Transformer.TransformersFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
@@ -50,6 +53,8 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class MSEmailFetcher {
+
+	private static final Logger logger = LoggerFactory.getLogger(MSEmailFetcher.class);
 
 	private final TransformersFactory transformersFactory;
 	private final MailboxService mailboxService;
@@ -71,9 +76,11 @@ public class MSEmailFetcher {
 				new EmailViewPartsFetcherImpl(transformersFactory, mailboxService, bodyPreferences, udr, collectionPath, collectionId);
 		
 		for (Long uid: uids) {
-			EmailView emailView = emailViewPartsFetcherImpl.fetch(uid, new AnyMatchBodyPreferencePolicy());
-			if (emailView != null) {
+			try {
+				EmailView emailView = emailViewPartsFetcherImpl.fetch(uid, new AnyMatchBodyPreferencePolicy());
 				msEmails.add(msEmailConverter.convert(emailView, udr));
+			} catch (EmailViewBuildException e) {
+				logger.error(e.getMessage(), e);
 			}
 		}
 		return msEmails;

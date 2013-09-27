@@ -65,6 +65,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.EmailMetadata;
@@ -919,7 +920,7 @@ public class EmailViewPartsFetcherImplTest {
 					anyLong(),
 					anyObject(MimeAddress.class),
 					anyInt()))
-				.andReturn(messageFixture.bodyData).once();
+				.andReturn(messageFixture.bodyData).anyTimes();
 		} else {
 			expect(mailboxService.fetchMimePartStream(
 					anyObject(UserDataRequest.class),
@@ -1151,5 +1152,29 @@ public class EmailViewPartsFetcherImplTest {
 		control.verify();
 		assertThat(emailView).isNotNull();
 		assertThat(emailView.getBodyType()).isEqualTo(MSEmailBodyType.RTF);
+	}
+	
+	@Test(expected=EmailViewBuildException.class)
+	public void testFetch() throws Exception {
+		messageFixture.bodyType = MSEmailBodyType.PlainText;
+		EmailViewPartsFetcherImpl emailViewPartsFetcherImpl = newFetcherFromExpectedFixture(messageFixtureToMailboxServiceMock(buildEmptyMimeMessageFromFixture()));
+		
+		control.replay();
+		try {
+			emailViewPartsFetcherImpl.fetch(1, new StrictMatchBodyPreferencePolicy());
+		} finally {
+			control.verify();
+		}
+	}
+
+	private MimeMessage buildEmptyMimeMessageFromFixture() {
+		
+		MimeMessage mimeMessage = control.createMock(MimeMessage.class);
+		expect(mimeMessage.getMimePart()).andReturn(null);
+		expect(mimeMessage.findMainMessage(anyObject(ContentType.class))).andReturn(null).anyTimes();
+		expect(mimeMessage.findRootMimePartInTree()).andReturn(mimeMessage).anyTimes();
+		expect(mimeMessage.listLeaves(true, true)).andReturn(ImmutableList.<MimePart> of()).anyTimes();
+
+		return mimeMessage;
 	}
 }

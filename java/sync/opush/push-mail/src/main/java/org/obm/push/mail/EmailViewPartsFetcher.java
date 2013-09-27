@@ -32,12 +32,13 @@
 package org.obm.push.mail;
 
 import org.obm.icalendar.ICalendar;
+import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.mail.conversation.EmailView;
 
 public interface EmailViewPartsFetcher {
 
-	EmailView fetch(long uid, BodyPreferencePolicy bodyPreferencePolicy) throws EmailViewPartsFetcherException;
+	EmailView fetch(long uid, BodyPreferencePolicy bodyPreferencePolicy) throws EmailViewPartsFetcherException, EmailViewBuildException;
 	
 	ICalendar fetchInvitation(long uid) throws EmailViewPartsFetcherException;
 }

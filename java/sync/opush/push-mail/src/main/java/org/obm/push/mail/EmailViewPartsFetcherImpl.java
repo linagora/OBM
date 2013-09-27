@@ -96,7 +96,7 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 	}
 
 	@Override
-	public EmailView fetch(long uid, BodyPreferencePolicy bodyPreferencePolicy) throws EmailViewPartsFetcherException {
+	public EmailView fetch(long uid, BodyPreferencePolicy bodyPreferencePolicy) throws EmailViewPartsFetcherException, EmailViewBuildException {
 		try {
 			EmailMetadata emailViewResponse = mailboxService.fetchEmailMetadata(udr, collectionPath, uid);
 			Builder emailViewBuilder = EmailView.builder()
@@ -119,9 +119,6 @@ public class EmailViewPartsFetcherImpl implements EmailViewPartsFetcher {
 			throw new EmailViewPartsFetcherException(e);
 		} catch (ParserException e) {
 			throw new EmailViewPartsFetcherException(e);
-		} catch (EmailViewBuildException e) {
-			logger.error(e.getMessage(), e);
-			return null;
 		}
 	}
 
