@@ -5,9 +5,21 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
   <display-name>Thunderbird Autoconfiguration</display-name>
-    <listener>
-        <listener-class>fr.aliasource.obm.autoconf.GuiceServletContextListener</listener-class>     
-    </listener>
+
+  <filter>
+    <filter-name>guiceFilter</filter-name>
+    <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>guiceFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <listener>
+    <listener-class>fr.aliasource.obm.autoconf.GuiceServletContextListener</listener-class>
+  </listener>
+
   <session-config>
     <!-- Default to 5 minute session timeouts -->
     <session-timeout>5</session-timeout>
