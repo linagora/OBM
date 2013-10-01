@@ -5032,12 +5032,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $l_users / $GLOBALS[l_contacts]
       </th>
       <td class=\"autocompleteField\">
-      <select id=\"userSearchSource\" class=\"autocompleteSource\" name=\"\" style=\"float: right;\" onchange=\"set_autocomplete_container(this.value);\">
-        <option value=\"$path/user/user_index.php?from=calendar\">$GLOBALS[l_users]</option>
-        <optgroup label=\"$GLOBALS[l_addressbook]\">
-          $addressbook_options
-        </optgroup>
-      </select>
       <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
       <input type='hidden' id='userSearchContainer' value='sel_user_id'/>
       </td>
