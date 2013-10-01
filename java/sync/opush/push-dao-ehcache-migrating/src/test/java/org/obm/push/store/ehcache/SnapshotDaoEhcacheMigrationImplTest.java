@@ -41,6 +41,7 @@ import net.sf.ehcache.migrating.Element;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -51,6 +52,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.Snapshot;
 import org.slf4j.Logger;
 
+@Ignore
 @RunWith(SlowFilterRunner.class) @Slow
 public class SnapshotDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 

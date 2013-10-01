@@ -38,17 +38,16 @@ import org.obm.configuration.utils.TimeUnitMapper;
 
 import com.google.inject.Inject;
 
-
 public class EhCacheConfigurationMigrationImpl extends EhCacheConfigurationFileImpl {
 
-	@Inject
-	private EhCacheConfigurationMigrationImpl(Factory factory, TimeUnitMapper timeUnitMapper) {
-		super(factory, timeUnitMapper);
-	}
-	
+    @Inject
+    private EhCacheConfigurationMigrationImpl(Factory factory, TimeUnitMapper timeUnitMapper) {
+            super(factory, timeUnitMapper);
+    }
 
-	@Override
-	public TransactionalMode transactionalMode() {
-		return TransactionalMode.OFF;
-	}
+
+    @Override
+    public TransactionalMode transactionalMode() {
+            return TransactionalMode.OFF;
+    }
 }
