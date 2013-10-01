@@ -709,6 +709,108 @@ obm.AutoComplete.ExtSearch = new Class({
   }
 });
 
+/**
+ * A parallel search system. Multiple autocomplete requests can be issued at the
+ * same time. This class guarantees that the order in the 'urls' parameter
+ * of the constructor will be respected in the results (that is, pulling data
+ * from URL1 and URL2 will mean autocomplete suggestions from URL1 will appear
+ * before autocomplete suggestions from URL2).
+ */
+obm.AutoComplete.ParallelExtSearch = new Class({
+  Extends: obm.AutoComplete.Search,
+
+  initialize: function(urls, formFieldName, findSelectedBox, inputField, options) {
+    this.parent('', formFieldName, inputField, options);
+    this.urls = urls;
+    this.findSelectedBox = findSelectedBox;
+  },
+
+  // @Override
+  newRequest: function() {
+    if (this.inputField.value.clean().length < this.options.chars) {
+      this.currentValue = this.inputField.value;
+      this.textChangedFunc();
+    } else if (this.inputField.value != this.currentValue && this.inputField.value != this.options.defaultText) {
+      this.currentValue = this.inputField.value;
+      this.textChangedFunc();
+      this.requestId++;
+      var promises = this.buildRequestPromises();
+      Q.all(promises).
+        then(this.onSuccess.bind(this)).
+        catch(this.onFailure.bind(this)).
+        done();
+    }
+  },
+
+  // Returns a promise to execute an autocomplete request at a given URL.
+  buildRequest: function(url) {
+      var deferred = Q.defer();
+      new Request.JSON({
+        url:        url,
+        secure:     false,
+        onFailure:  this.onDeferredFailure.bindWithEvent(this, [deferred]),
+        onComplete: this.onDeferredNewRequestSuccess.bindWithEvent(this, [this.requestId, deferred]),
+      }).post({
+        pattern:        this.currentValue,
+        limit:          (this.options.results*3),
+        filter_pattern: this.options.filter_pattern,
+        filter_entity:  this.options.filter_entity,
+        restriction:    this.options.restriction,
+        extension:      this.options.extension});
+      return deferred.promise;
+  },
+
+  // Returns a list of promises to launch a request, one for each URL.
+  buildRequestPromises: function() {
+    return this.urls.map(function(url) {
+      return this.buildRequest(url);
+    }.bind(this));
+  },
+
+  onDeferredFailure: function(response, deferred) {
+    deferred.reject(response);
+  },
+
+  onDeferredNewRequestSuccess: function(response, reqId, deferred) {
+    deferred.resolve({response: response, requestId: reqId});
+  },
+
+  onSuccess: function(results) {
+    this.resetResultBox();
+    if (!this.hasCorrectReqIds(results)) {
+      return;
+    }
+    this.parseResults(results);
+    this.drawView();
+    this.updateInfo();
+    this.showResultBox();
+  },
+
+  hasCorrectReqIds: function(results) {
+    var reqId = this.requestId;
+    return results.every(function(result) {
+      return reqId == result['requestId'];
+    });
+  },
+
+  parseResults: function(results) {
+    var totalNbr = 0;
+    results.each(function(result) {
+      var response = result['response'];
+
+      response.datas.each(this.processResultItem.bind(this));
+      totalNbr += response.length;
+    }.bind(this));
+    this.totalNbr = totalNbr;
+    this.view.setElementNb(this.totalNbr);
+  },
+
+  // @Override
+  addResultValue: function(element, extension, data) {
+    this.addResultValueToBox(element, extension, this.findSelectedBox(data));
+  }
+});
+
 obm.AutoComplete.ShareCalendarSearch = new Class({
   Extends: obm.AutoComplete.Search,
 
