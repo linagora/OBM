@@ -68,7 +68,7 @@ public class ObjectStoreManagerMigration implements LifecycleListener {
 	private final CacheManager singletonManager;
 
 	@Inject ObjectStoreManagerMigration(ConfigurationService configurationService,
-			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
+			@Named(LoggerModule.MIGRATION)Logger configurationLogger) {
 		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds();
 		boolean usePersistentCache = configurationService.usePersistentCache();
 		String dataDirectory = configurationService.getDataDirectory();
@@ -91,7 +91,7 @@ public class ObjectStoreManagerMigration implements LifecycleListener {
 		long now = System.currentTimeMillis();
 		for (String fileName : files) {
 			String fullName = dataDirectory + File.separator + fileName;
-			configurationLogger.info("Updating {} last modified value", fullName);
+			configurationLogger.info("touch {}", fullName);
 			new File(fullName).setLastModified(now);
 		}
 	}

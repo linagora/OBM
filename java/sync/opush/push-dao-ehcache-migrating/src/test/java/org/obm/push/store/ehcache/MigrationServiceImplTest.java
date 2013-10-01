@@ -108,8 +108,10 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		windowingDaoChunkEhcacheMigrationImpl = new WindowingDaoChunkEhcacheMigrationImpl(objectStoreManagerMigration);
 		windowingDaoIndexEhcacheMigrationImpl = new WindowingDaoIndexEhcacheMigrationImpl(objectStoreManagerMigration);
 		windowingDaoEhcacheImpl = new WindowingDaoEhcacheImpl(objectStoreManager);
-		
-		migrationServiceImpl = new MigrationServiceImpl(monitoredCollectionDaoEhcacheMigrationImpl, monitoredCollectionDaoEhcacheImpl,
+
+		migrationServiceImpl = new MigrationServiceImpl(logger,
+				objectStoreManager, objectStoreManagerMigration,
+				monitoredCollectionDaoEhcacheMigrationImpl, monitoredCollectionDaoEhcacheImpl,
 				snapshotDaoEhcacheMigrationImpl, snapshotDaoEhcacheImpl,
 				syncedCollectionDaoEhcacheMigrationImpl, syncedCollectionDaoEhcacheImpl,
 				syncKeysDaoEhcacheMigrationImpl, syncKeysDaoEhcacheImpl,
@@ -156,7 +158,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateMonitoredCollection();
 		
 		assertThat(monitoredCollectionDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(monitoredCollectionDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(monitoredCollectionDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -166,7 +168,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateSnapshot();
 		
 		assertThat(snapshotDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(snapshotDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(snapshotDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -176,7 +178,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateSyncedCollection();
 		
 		assertThat(syncedCollectionDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(syncedCollectionDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(syncedCollectionDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -186,7 +188,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateSyncKeys();
 		
 		assertThat(syncKeysDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(syncKeysDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(syncKeysDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -196,7 +198,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateUnsynchronizedItem();
 		
 		assertThat(unsynchronizedItemDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(unsynchronizedItemDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(unsynchronizedItemDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -206,7 +208,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateWindowingChunk();
 		
 		assertThat(windowingDaoEhcacheImpl.getChunksStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(windowingDaoChunkEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(windowingDaoChunkEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -216,6 +218,6 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateWindowingIndex();
 		
 		assertThat(windowingDaoEhcacheImpl.getIndexStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(windowingDaoIndexEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(windowingDaoIndexEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 }
