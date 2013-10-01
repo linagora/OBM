@@ -3416,7 +3416,7 @@ function json_search_users($user,$results) {
     } else {
       $extra = '';
     }
-    $users[] = "{id:'data-user-$id', label:'$label', extra:'$extra'}";
+    $users[] = "{id:'data-user-$id', label:'$label', extra:'$extra', type: 'user'}";
   }
   $display['json'] = "{length:".$results['length'].", datas:[".implode(',',$users)."]}";
 }

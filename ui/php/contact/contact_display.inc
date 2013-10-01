@@ -2127,7 +2127,7 @@ function json_search_contact($contact ,$results) {
   $contacts = array();
   if (is_array($results)) {
     foreach($results as $c) {
-      $contacts[] = "{id:'data-contact-$c->id', label : '".phpStringToJsString($c->displayname)."', extra: '".phpStringToJsString($c->email_address)."'}";
+      $contacts[] = "{id:'data-contact-$c->id', label : '".phpStringToJsString($c->displayname)."', extra: '".phpStringToJsString($c->email_address)."', type: 'contact'}";
     }
   }
   $display['json'] = "{length:".sizeof($results).", datas:[".implode(',',$contacts)."]}";
