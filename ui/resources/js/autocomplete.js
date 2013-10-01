@@ -396,30 +396,35 @@ obm.AutoComplete.Search = new Class({
 
   // parse a response of a request and add results to cache
   parseResponse: function(response) {
-    response.datas.each(function(data) {
-      var res = new Element('div').setProperty('id','item_'+data.id)
-                                  .adopt(
-                                    new Element('span')
-                                      .setProperty('id','item_'+data.id+'_label')
-                                      .appendText(data.label)
-                                  ).adopt(
-                                     new Element('em')
-                                       .appendText(data.extra)                                   
-                                  );
-      var item_id = res.getProperty('id');
-      var div_id = this.name + '-' +item_id.substr(('item_').length,item_id.length);
-      if ($(div_id)) { res.addClass("selected"); }
-      this.cache.addElement(res);
-      if($type(data.extension)) {
-        res.addEvent('mouseover', function() {this.selectElement(res);}.bindWithEvent(this))
-           .addEvent('mousedown', function() {this.validateResultValue(res,data.extension);}.bindWithEvent(this));
-      } else {
-        res.addEvent('mouseover', function() {this.selectElement(res);}.bindWithEvent(this))
-           .addEvent('mousedown', function() {this.validateResultValue(res);}.bindWithEvent(this));
-      }
-    }.bind(this));
+    response.datas.each(this.processResultItem.bind(this));
     this.totalNbr = response.length;
     this.view.setElementNb(this.totalNbr);
+  },
+
+  processResultItem: function(data) {
+    var res = new Element('div').setProperty('id','item_'+data.id)
+                                .adopt(
+                                  new Element('span')
+                                    .setProperty('id','item_'+data.id+'_label')
+                                    .appendText(data.label)
+                                ).adopt(
+                                   new Element('em')
+                                     .appendText(data.extra)
+                                );
+    if (data['type'] != null) {
+      res.addClass(data['type'] + "_suggestion");
+    }
+    var item_id = res.getProperty('id');
+    var div_id = this.name + '-' +item_id.substr(('item_').length,item_id.length);
+    if ($(div_id)) { res.addClass("selected"); }
+    this.cache.addElement(res);
+    if($type(data.extension)) {
+      res.addEvent('mouseover', function() {this.selectElement(res);}.bindWithEvent(this))
+         .addEvent('mousedown', function() {this.validateResultValue(res, data.extension, data);}.bindWithEvent(this));
+    } else {
+      res.addEvent('mouseover', function() {this.selectElement(res);}.bindWithEvent(this))
+         .addEvent('mousedown', function() {this.validateResultValue(res, null, data);}.bindWithEvent(this));
+    }
   },
 
   ///////////////////////////////////////////////////////////////////////////
