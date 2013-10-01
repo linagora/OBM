@@ -103,7 +103,8 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		windowingDaoChunkEhcacheMigrationImpl = new WindowingDaoChunkEhcacheMigrationImpl(objectStoreManagerMigration);
 		windowingDaoIndexEhcacheMigrationImpl = new WindowingDaoIndexEhcacheMigrationImpl(objectStoreManagerMigration);
 		windowingDaoEhcacheImpl = new WindowingDaoEhcacheImpl(objectStoreManager);
-		migrationServiceImpl = new MigrationServiceImpl(monitoredCollectionDaoEhcacheMigrationImpl, monitoredCollectionDaoEhcacheImpl,
+		migrationServiceImpl = new MigrationServiceImpl(objectStoreManager, objectStoreManagerMigration,
+				monitoredCollectionDaoEhcacheMigrationImpl, monitoredCollectionDaoEhcacheImpl,
 				snapshotDaoEhcacheMigrationImpl, snapshotDaoEhcacheImpl,
 				syncedCollectionDaoEhcacheMigrationImpl, syncedCollectionDaoEhcacheImpl,
 				syncKeysDaoEhcacheMigrationImpl, syncKeysDaoEhcacheImpl,
@@ -148,7 +149,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateMonitoredCollection();
 		
 		assertThat(monitoredCollectionDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(monitoredCollectionDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(monitoredCollectionDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -158,7 +159,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateSnashot();
 		
 		assertThat(snapshotDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(snapshotDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(snapshotDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -168,7 +169,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateSyncedCollection();
 		
 		assertThat(syncedCollectionDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(syncedCollectionDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(syncedCollectionDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -178,7 +179,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateSyncKeys();
 		
 		assertThat(syncKeysDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(syncKeysDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(syncKeysDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -188,7 +189,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateUnsynchronizedItem();
 		
 		assertThat(unsynchronizedItemDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(unsynchronizedItemDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(unsynchronizedItemDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -198,7 +199,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateWindowingChunk();
 		
 		assertThat(windowingDaoEhcacheImpl.getChunksStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(windowingDaoChunkEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(windowingDaoChunkEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
 	}
 
 	@Test
@@ -208,6 +209,28 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		migrationServiceImpl.migrateWindowingIndex();
 		
 		assertThat(windowingDaoEhcacheImpl.getIndexStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
-		assertThat(windowingDaoIndexEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);
+		assertThat(windowingDaoIndexEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
+	}
+	
+	@Test
+	public void testCheckMigrationFilesDeletion() {
+		File[] files = { new File(dataDir + File.separator + ObjectStoreManagerMigration.MAIL_SNAPSHOT_STORE + ".data"), 
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.MAIL_SNAPSHOT_STORE + ".index"), 
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.MAIL_WINDOWING_CHUNKS_STORE + ".data"),
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.MAIL_WINDOWING_CHUNKS_STORE + ".index"),
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.MAIL_WINDOWING_INDEX_STORE + ".data"),
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.MAIL_WINDOWING_INDEX_STORE + ".index"),
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.MONITORED_COLLECTION_STORE + ".data"),
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.MONITORED_COLLECTION_STORE + ".index"),
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.SYNCED_COLLECTION_STORE + ".data"),
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.SYNCED_COLLECTION_STORE + ".index"),
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.SYNC_KEYS_STORE + ".data"),
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.SYNC_KEYS_STORE + ".index"),
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.UNSYNCHRONIZED_ITEM_STORE + ".data"),
+				new File(dataDir + File.separator + ObjectStoreManagerMigration.UNSYNCHRONIZED_ITEM_STORE + ".index") };
+		
+		assertThat(dataDir.listFiles()).contains(files);
+		migrationServiceImpl.migrate();
+		assertThat(dataDir.listFiles()).doesNotContain(files);
 	}
 }

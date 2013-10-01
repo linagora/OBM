@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,53 +29,33 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store.ehcache;
+package org.obm.push;
 
-import java.io.File;
-import java.util.List;
+import org.obm.push.store.ehcache.EhCacheConfiguration;
+import org.obm.push.store.ehcache.EhCacheConfigurationMigrationImpl;
 
-import net.sf.ehcache.migrating.Cache;
-import net.sf.ehcache.migrating.Element;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.util.Modules;
 
-public abstract class AbstractEhcacheDaoMigration {
-	
-	protected final ObjectStoreManagerMigration objectStoreManagerMigration;
-	protected final Cache store;
-	
-	protected AbstractEhcacheDaoMigration(ObjectStoreManagerMigration objectStoreManagerMigration) {
-		this.objectStoreManagerMigration = objectStoreManagerMigration;
-		this.store = this.objectStoreManagerMigration.getStore( getStoreName() );
-	}
-	
-	protected abstract String getStoreName();
-	
-	public List<Object> getKeys() {
-		return store.getKeys();
-	}
-	
-	public Element get(Object key) {
-		return store.get(key);
-	}
+public class EhCacheMigrationInjector {
 
-	public void remove(Object key) {
-		store.remove(key);
-	}
-	
-	public boolean hasElementToMigrate() {
-		return !store.getKeys().isEmpty();
-	}
+    public static Injector createMigrationInjector() {
+        return Guice.createInjector(new AbstractModule() {
 
-	public File destroyMigrationData() {
-		File dataDiskFile = new File(store.getCacheManager().getDiskStorePath() + File.separatorChar + getStoreName() + ".data");
-		File indexDiskFile = new File(store.getCacheManager().getDiskStorePath() + File.separatorChar + getStoreName() + ".index");
-		if (indexDiskFile.delete()) {
-			if (dataDiskFile.delete()) {
-			} else {
-				throw new IllegalStateException("Could not delete migration data file: " + dataDiskFile.getAbsolutePath());
-			}
-		} else {
-			throw new IllegalStateException("Could not delete migration index file: " + indexDiskFile.getAbsolutePath());
-		}
-		return dataDiskFile;
-	}
+            @Override
+            protected void configure() {
+                install(Modules.override(new OpushModule()).with(
+                    new AbstractModule() {
+
+                        @Override
+                        protected void configure() {
+                            bind(EhCacheConfiguration.class).to(EhCacheConfigurationMigrationImpl.class);
+                        }
+                    })
+                );
+            }
+        });
+    }
 }

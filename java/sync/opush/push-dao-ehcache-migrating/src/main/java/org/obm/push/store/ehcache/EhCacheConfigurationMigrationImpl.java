@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,51 +31,23 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.io.File;
-import java.util.List;
+import org.obm.configuration.utils.IniFile.Factory;
+import org.obm.configuration.utils.TimeUnitMapper;
 
-import net.sf.ehcache.migrating.Cache;
-import net.sf.ehcache.migrating.Element;
+import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 
-public abstract class AbstractEhcacheDaoMigration {
-	
-	protected final ObjectStoreManagerMigration objectStoreManagerMigration;
-	protected final Cache store;
-	
-	protected AbstractEhcacheDaoMigration(ObjectStoreManagerMigration objectStoreManagerMigration) {
-		this.objectStoreManagerMigration = objectStoreManagerMigration;
-		this.store = this.objectStoreManagerMigration.getStore( getStoreName() );
-	}
-	
-	protected abstract String getStoreName();
-	
-	public List<Object> getKeys() {
-		return store.getKeys();
-	}
-	
-	public Element get(Object key) {
-		return store.get(key);
-	}
+import com.google.inject.Inject;
 
-	public void remove(Object key) {
-		store.remove(key);
-	}
-	
-	public boolean hasElementToMigrate() {
-		return !store.getKeys().isEmpty();
-	}
+public class EhCacheConfigurationMigrationImpl extends EhCacheConfigurationFileImpl {
 
-	public File destroyMigrationData() {
-		File dataDiskFile = new File(store.getCacheManager().getDiskStorePath() + File.separatorChar + getStoreName() + ".data");
-		File indexDiskFile = new File(store.getCacheManager().getDiskStorePath() + File.separatorChar + getStoreName() + ".index");
-		if (indexDiskFile.delete()) {
-			if (dataDiskFile.delete()) {
-			} else {
-				throw new IllegalStateException("Could not delete migration data file: " + dataDiskFile.getAbsolutePath());
-			}
-		} else {
-			throw new IllegalStateException("Could not delete migration index file: " + indexDiskFile.getAbsolutePath());
-		}
-		return dataDiskFile;
-	}
+    @Inject
+    private EhCacheConfigurationMigrationImpl(Factory factory, TimeUnitMapper timeUnitMapper) {
+            super(factory, timeUnitMapper);
+    }
+
+
+    @Override
+    public TransactionalMode transactionalMode() {
+            return TransactionalMode.OFF;
+    }
 }

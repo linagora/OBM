@@ -190,6 +190,7 @@ public class TransactionalInterceptor implements MethodInterceptor {
 		Class<?> targetClass = methodInvocation.getThis().getClass().getSuperclass();
 
 		if (method.isAnnotationPresent(Transactional.class)) {
+			logger.debug("transaction founded on {}", method.getName());
 			return method.getAnnotation(Transactional.class);
 		} else if (targetClass.isAnnotationPresent(Transactional.class)) {
 			return targetClass.getAnnotation(Transactional.class);
