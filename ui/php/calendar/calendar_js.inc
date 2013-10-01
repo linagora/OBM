@@ -321,13 +321,6 @@ function add_displayed_attendee(check, attendee, uid, kind, container) {
   }
 }
 
-function set_autocomplete_container(entity) {
-  obm.vars.consts.autocomplete_ext.setSelectedBox('sel_user_id');
-  if (entity.match('contact_index.php')) {
-    obm.vars.consts.autocomplete_ext.setSelectedBox('sel_contact_id');
-  }
-}
-
 /////////////////////////////////////////////////////////////////////////////
 function check_calendar_pdf_options() {
   if ($('cal_first_hour')) {
