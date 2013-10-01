@@ -585,7 +585,6 @@ public class Ical4jHelperTest {
 
 
 	@Test
-	@SuppressWarnings("null")
 	public void testOrganizerInAttendess() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("organizerInAttendee.ics");
 		CalendarBuilder builder = new CalendarBuilder();
@@ -606,7 +605,6 @@ public class Ical4jHelperTest {
 	}
 	
 	@Test
-	@SuppressWarnings("null")
 	public void testOrganizerNotInAttendess() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("organizerNotInAttendee.ics");
 		CalendarBuilder builder = new CalendarBuilder();

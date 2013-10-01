@@ -136,7 +136,6 @@ public class LdapGroup {
 			return new LdapGroup(configuration.getGroupBaseDn(domain), objectClasses, cn, gidNumber, mailAccess, mail, domain);
 		}
 
-		@SuppressWarnings("null")
 		public Builder fromObmGroup(Group group,  ObmDomain domain) {
 			Preconditions.checkArgument(group.getGid() > 0, "The GID number is mandatory");
 			Preconditions.checkArgument(domain != null, "The domain name is mandatory");
