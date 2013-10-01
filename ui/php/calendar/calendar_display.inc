@@ -5055,9 +5055,27 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       </table>
       </fieldset>
       <p class=\"LC\"></p>";
-      $user_complete = "obm.vars.consts.autocomplete_ext = new obm.AutoComplete.ExtSearch(
-        function() { return \$('userSearchSource').value+'&action=ext_search'; },
-        'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
+
+      $user_complete = "obm.vars.consts.autocomplete_ext = new obm.AutoComplete.ParallelExtSearch(
+        ['$path/user/user_index.php?action=ext_search&from=calendar',
+          '$path/contact/contact_index.php?action=ext_search'],
+        'sel_user_id',
+        function (item) {
+          var selectedBoxId;
+          if (item['type'] === 'user') {
+            selectedBoxId = 'sel_user_id';
+          }
+          else if (item['type'] === 'contact') {
+            selectedBoxId = 'sel_contact_id';
+          }
+          else {
+            throw new Error('Unknown entity type: ' + item['type']);
+          }
+          return $(selectedBoxId);
+        },
+        'userSearch',
+        {filter_entity:'calendar',filter_pattern:'access'});";
+
   } else {
     $block_user = "<fieldset class=\"detail infos H\">
       <div class='elementRow' id='sel_user_id-data-user-$obm[uid]'>
