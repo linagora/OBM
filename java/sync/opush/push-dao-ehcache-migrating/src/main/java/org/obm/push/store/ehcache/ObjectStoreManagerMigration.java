@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -73,7 +75,25 @@ public class ObjectStoreManagerMigration implements LifecycleListener {
 		configurationLogger.info("EhCache transaction timeout in seconds : {}", transactionTimeoutInSeconds);
 		configurationLogger.info("EhCache transaction persistent mode : {}", usePersistentCache);
 		configurationLogger.info("EhCache data directory : {}", dataDirectory);
+		touchIndexFiles(dataDirectory, configurationLogger);
 		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache, dataDirectory));
+	}
+
+	private void touchIndexFiles(String dataDirectory, Logger configurationLogger) {
+		String[] files = new File(dataDirectory).list(new FilenameFilter() {
+			
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(".index");
+			}
+		});
+		
+		long now = System.currentTimeMillis();
+		for (String fileName : files) {
+			String fullName = dataDirectory + File.separator + fileName;
+			configurationLogger.info("Updating {} last modified value", fullName);
+			new File(fullName).setLastModified(now);
+		}
 	}
 
 	public void shutdown() {
