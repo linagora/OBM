@@ -1735,6 +1735,35 @@ ul.autocompleter-choices span.autocompleter-queried {
 ul.autocompleter-choices li.autocompleter-selected span.autocompleter-queried {
   color: #9FCFFF;
 }
+
+.user_suggestion .icon-container {
+  width: 16px;
+  min-width: 16px;
+  max-width: 16px;
+  background-image: url(../images/ico_user.gif);
+  background-repeat: no-repeat;
+  background-position: 0px center;
+  display: table-cell;
+}
+
+.contact_suggestion .icon-container {
+  width: 16px;
+  min-width: 16px;
+  max-width: 16px;
+  background-image: url(../images/ico_contact.gif);
+  background-repeat: no-repeat;
+  background-position: 0px center;
+  display: table-cell;
+}
+
+.contact_suggestion .suggestion-data-container, .user_suggestion .suggestion-data-container {
+  display: table-cell;
+}
+
+.contact_suggestion.suggestion-container, .user_suggestion.suggestion-container {
+  display: table-row;
+}
+
 /* ------------------------------------------------------------------------- */ 
 /* Update tools specific styles */
 /* ------------------------------------------------------------------------- */
