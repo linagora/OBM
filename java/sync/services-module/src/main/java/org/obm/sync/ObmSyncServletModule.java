@@ -43,6 +43,8 @@ public class ObmSyncServletModule extends ServletModule {
 	@Override
 	public void configureServlets() {
 		super.configureServlets();
+
+		serve("/services").with(SyncServlet.class);
 		serve("/services/*").with(SyncServlet.class);
 		serve("/resources/*").with(ResourceServlet.class);
 		serve("/freebusy/*").with(FreeBusyServlet.class);
