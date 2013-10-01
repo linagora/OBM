@@ -402,15 +402,19 @@ obm.AutoComplete.Search = new Class({
   },
 
   processResultItem: function(data) {
-    var res = new Element('div').setProperty('id','item_'+data.id)
-                                .adopt(
-                                  new Element('span')
-                                    .setProperty('id','item_'+data.id+'_label')
-                                    .appendText(data.label)
-                                ).adopt(
-                                   new Element('em')
-                                     .appendText(data.extra)
-                                );
+    var res = new Element('div').addClass('suggestion-container').setProperty('id','item_'+data.id)
+                      .adopt(
+                        new Element('div').addClass('icon-container'))
+                      .adopt(
+                        new Element('div').addClass('suggestion-data-container')
+                        .adopt(
+                          new Element('span')
+                          .setProperty('id','item_'+data.id+'_label')
+                          .appendText(data.label))
+                        .adopt(
+                          new Element('em')
+                          .appendText(data.extra))
+                      );
     if (data['type'] != null) {
       res.addClass(data['type'] + "_suggestion");
     }
