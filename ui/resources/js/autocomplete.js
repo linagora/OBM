@@ -558,7 +558,14 @@ obm.AutoComplete.Search = new Class({
   // (un)choose elements
 
   // add an element to the box containing selected elements (selectedBox)
-  addResultValue: function(element, extension) {
+  addResultValue: function(element, extension, data) {
+    // data is not used here, but is useful for ParallelExtSearch
+    this.addResultValueToBox(element, extension, this.selectedBox);
+  },
+
+  // avoids code duplication in ParallelExtSearch, where the selectedBox is
+  // dynamic
+  addResultValueToBox: function(element, extension, selectedBox) {
     var item_id = element.getProperty('id');
     var id = item_id.substr(('item_').length,item_id.length);
     var div_id = this.name + '-' + id;
@@ -567,7 +574,7 @@ obm.AutoComplete.Search = new Class({
       element.addClass("selected");
       var result = new Element('div').addClass('elementRow');
       result.setProperties({'id': div_id});
-      result.injectInside(this.selectedBox);
+      result.injectInside(selectedBox);
       new Element('a').adopt(
                         new Element('img')
                           .setProperty('src',obm.vars.images.del)
