@@ -1184,6 +1184,7 @@ function display_head($p_module, $standard=true) {
   <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/utils.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/obm.js?version=$obm_version\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/q.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/autocomplete.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/dropdown.js?version=$obm_version\" ></script>
   $js_include
