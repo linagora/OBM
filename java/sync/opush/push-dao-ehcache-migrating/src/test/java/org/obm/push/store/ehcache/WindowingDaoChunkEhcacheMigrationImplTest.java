@@ -58,7 +58,7 @@ import org.slf4j.Logger;
 @RunWith(SlowFilterRunner.class) @Slow
 public class WindowingDaoChunkEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
-	private ObjectStoreManagerMigration objectStoreManagerMigration;
+	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private WindowingDaoChunkEhcacheMigrationImpl windowingDaoChunkEhcacheMigrationImpl;
 	private User user;
 	private DeviceId deviceId;
@@ -66,7 +66,7 @@ public class WindowingDaoChunkEhcacheMigrationImplTest extends StoreManagerConfi
 	@Before
 	public void init() throws IOException {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
+		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
 		this.windowingDaoChunkEhcacheMigrationImpl = new WindowingDaoChunkEhcacheMigrationImpl(objectStoreManagerMigration);
 		this.user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.deviceId = new DeviceId("DevId");

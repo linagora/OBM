@@ -39,10 +39,10 @@ import net.sf.ehcache.migrating.Element;
 
 public abstract class AbstractEhcacheDaoMigration {
 	
-	protected final ObjectStoreManagerMigration objectStoreManagerMigration;
+	protected final MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	protected final Cache store;
 	
-	protected AbstractEhcacheDaoMigration(ObjectStoreManagerMigration objectStoreManagerMigration) {
+	protected AbstractEhcacheDaoMigration(MigrationSourceObjectStoreManager objectStoreManagerMigration) {
 		this.objectStoreManagerMigration = objectStoreManagerMigration;
 		this.store = this.objectStoreManagerMigration.getStore( getStoreName() );
 	}

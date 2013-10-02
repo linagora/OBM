@@ -38,12 +38,12 @@ import com.google.inject.Singleton;
 public class SnapshotDaoEhcacheMigrationImpl extends AbstractEhcacheDaoMigration {
 
 	@Inject  SnapshotDaoEhcacheMigrationImpl(
-			ObjectStoreManagerMigration objectStoreManagerMigration) {
+			MigrationSourceObjectStoreManager objectStoreManagerMigration) {
 		super(objectStoreManagerMigration);
 	}
 
 	@Override
 	protected String getStoreName() {
-		return ObjectStoreManagerMigration.MAIL_SNAPSHOT_STORE;
+		return MigrationSourceObjectStoreManager.MAIL_SNAPSHOT_STORE;
 	}
 }
