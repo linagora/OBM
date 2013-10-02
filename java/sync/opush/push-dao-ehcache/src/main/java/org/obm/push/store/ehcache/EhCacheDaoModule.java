@@ -49,6 +49,7 @@ public class EhCacheDaoModule extends AbstractModule {
 	protected void configure() {
 		bind(EhCacheConfiguration.class).to(EhCacheConfigurationFileImpl.class);
 		bind(EhCacheStatistics.class).to(EhCacheStatisticsImpl.class);
+		bind(StoreManager.class).to(ObjectStoreManager.class);
 
 		bind(MonitoredCollectionDao.class).to(MonitoredCollectionDaoEhcacheImpl.class);
 		bind(SyncedCollectionDao.class).to(SyncedCollectionDaoEhcacheImpl.class);
@@ -59,7 +60,7 @@ public class EhCacheDaoModule extends AbstractModule {
 		bind(SyncKeysDao.class).to(SyncKeysDaoEhcacheImpl.class);
 
 		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		lifecycleListeners.addBinding().to(ObjectStoreManager.class);
+		lifecycleListeners.addBinding().to(StoreManager.class);
 		lifecycleListeners.addBinding().to(NonTransactionalObjectStoreManager.class);
 	}
 

@@ -49,7 +49,6 @@ import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.sync.LifecycleListener;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.slf4j.Logger;
 
@@ -62,7 +61,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class ObjectStoreManager implements LifecycleListener, EhCacheStores  {
+public class ObjectStoreManager implements StoreManager, EhCacheStores {
 
 	public static final String STORE_NAME = ObjectStoreManager.class.getName();
 	
@@ -149,6 +148,7 @@ public class ObjectStoreManager implements LifecycleListener, EhCacheStores  {
 				EhCacheConfiguration.STATS_SAMPLING_IN_SECONDS, TimeUnit.SECONDS);
 	}
 
+	@Override
 	public void shutdown() {
 		this.singletonManager.shutdown();
 	}
@@ -209,6 +209,7 @@ public class ObjectStoreManager implements LifecycleListener, EhCacheStores  {
 		return new CacheConfiguration().name(storeName);
 	}
 
+	@Override
 	public Cache getStore(String storeName) {
 		return this.singletonManager.getCache(storeName);
 	}

@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
@@ -64,7 +65,7 @@ public class MigrationServiceImpl implements MigrationService {
 	private final WindowingDaoIndexEhcacheMigrationImpl windowingDaoIndexEhcacheMigrationImpl;
 	private final WindowingDaoEhcacheImpl windowingDaoEhcacheImpl;
 
-	private final ObjectStoreManager objectStoreManager;
+	private final StoreManager objectStoreManager;
 	private final ObjectStoreManagerMigration objectStoreManagerMigration;
 
 	private final ImmutableList<AbstractEhcacheDaoMigration> migrationCaches;
@@ -72,7 +73,7 @@ public class MigrationServiceImpl implements MigrationService {
 	@Inject
 	@VisibleForTesting MigrationServiceImpl(
 			@Named(LoggerModule.MIGRATION)Logger logger,
-			ObjectStoreManager objectStoreManager,
+			StoreManager objectStoreManager,
 			ObjectStoreManagerMigration objectStoreManagerMigration,
 			MonitoredCollectionDaoEhcacheMigrationImpl monitoredCollectionDaoEhcacheMigrationImpl, MonitoredCollectionDaoEhcacheImpl monitoredCollectionDaoEhcacheImpl,
 			SnapshotDaoEhcacheMigrationImpl snapshotDaoEhcacheMigrationImpl, SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl,
@@ -130,17 +131,21 @@ public class MigrationServiceImpl implements MigrationService {
 	}
 
 	private void migrateCaches() {
-		logger.warn("EHCACHE MIGRATION - START MIGRATION");
-		migrateMonitoredCollection();
-		migrateSnapshot();
-		migrateSyncedCollection();
-		migrateSyncKeys();
-		migrateUnsynchronizedItem();
-		migrateWindowingChunk();
-		migrateWindowingIndex();
-		logger.warn("EHCACHE MIGRATION - SHUTDOWN CACHE MANAGER");
-		objectStoreManager.shutdown();
-		logger.warn("EHCACHE MIGRATION - END MIGRATION");
+		try {
+			logger.warn("EHCACHE MIGRATION - START MIGRATION");
+			migrateMonitoredCollection();
+			migrateSnapshot();
+			migrateSyncedCollection();
+			migrateSyncKeys();
+			migrateUnsynchronizedItem();
+			migrateWindowingChunk();
+			migrateWindowingIndex();
+			logger.warn("EHCACHE MIGRATION - SHUTDOWN CACHE MANAGER");
+			objectStoreManager.shutdown();
+			logger.warn("EHCACHE MIGRATION - END MIGRATION");
+		} catch (Exception e) {
+			Throwables.propagate(e);
+		}
 	}
 
 	protected List<Object> getKeys(AbstractEhcacheDaoMigration cacheToReadFrom) {
