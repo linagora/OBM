@@ -63,14 +63,14 @@ public class MigrationServiceImpl implements MigrationService {
 	private final WindowingDaoIndexEhcacheMigrationImpl windowingDaoIndexEhcacheMigrationImpl;
 	private final WindowingDaoEhcacheImpl windowingDaoEhcacheImpl;
 
-	private final ObjectStoreManager objectStoreManager;
+	private final StoreManager objectStoreManager;
 	private final ObjectStoreManagerMigration objectStoreManagerMigration;
 
 	private final ImmutableList<AbstractEhcacheDaoMigration> migrationCaches;
 
 	@Inject
 	@VisibleForTesting MigrationServiceImpl(
-			ObjectStoreManager objectStoreManager,
+			StoreManager objectStoreManager,
 			ObjectStoreManagerMigration objectStoreManagerMigration,
 			MonitoredCollectionDaoEhcacheMigrationImpl monitoredCollectionDaoEhcacheMigrationImpl, MonitoredCollectionDaoEhcacheImpl monitoredCollectionDaoEhcacheImpl,
 			SnapshotDaoEhcacheMigrationImpl snapshotDaoEhcacheMigrationImpl, SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl,

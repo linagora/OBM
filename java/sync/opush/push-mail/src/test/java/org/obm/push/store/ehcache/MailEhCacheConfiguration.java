@@ -41,13 +41,13 @@ public class MailEhCacheConfiguration implements EhCacheConfiguration {
 	private Map<String, Integer> stores = Maps.newHashMap();
 	
 	public MailEhCacheConfiguration() {
-		stores.put(ObjectStoreManager.MONITORED_COLLECTION_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.SYNCED_COLLECTION_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.UNSYNCHRONIZED_ITEM_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.MAIL_SNAPSHOT_STORE, Integer.valueOf(70));
-		stores.put(ObjectStoreManager.MAIL_WINDOWING_INDEX_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.MAIL_WINDOWING_CHUNKS_STORE, Integer.valueOf(5));
-		stores.put(ObjectStoreManager.SYNC_KEYS_STORE, Integer.valueOf(5));
+		stores.put(EhCacheStores.MONITORED_COLLECTION_STORE, Integer.valueOf(5));
+		stores.put(EhCacheStores.SYNCED_COLLECTION_STORE, Integer.valueOf(5));
+		stores.put(EhCacheStores.UNSYNCHRONIZED_ITEM_STORE, Integer.valueOf(5));
+		stores.put(EhCacheStores.MAIL_SNAPSHOT_STORE, Integer.valueOf(70));
+		stores.put(EhCacheStores.MAIL_WINDOWING_INDEX_STORE, Integer.valueOf(5));
+		stores.put(EhCacheStores.MAIL_WINDOWING_CHUNKS_STORE, Integer.valueOf(5));
+		stores.put(EhCacheStores.SYNC_KEYS_STORE, Integer.valueOf(5));
 	}
 	
 	@Override

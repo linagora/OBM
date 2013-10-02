@@ -50,7 +50,7 @@ import org.obm.push.mail.EmailChanges;
 import org.obm.push.mail.WindowingService;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.WindowingIndexKey;
-import org.obm.push.store.ehcache.ObjectStoreManager;
+import org.obm.push.store.ehcache.StoreManager;
 
 import bitronix.tm.TransactionManagerServices;
 
@@ -74,7 +74,7 @@ public class WindowingStepdefs {
 	
 	private final WindowingService windowingService;
 	private final TransactionManager tm;
-	private final ObjectStoreManager storeManager;
+	private final StoreManager storeManager;
 
 	private WindowingIndexKey windowingIndexKey;
 	private SyncKey syncKey;
@@ -90,7 +90,7 @@ public class WindowingStepdefs {
 	
 	
 	@Inject
-	public WindowingStepdefs(WindowingService windowingService, ObjectStoreManager storeManager) {
+	public WindowingStepdefs(WindowingService windowingService, StoreManager storeManager) {
 		this.windowingService = windowingService;
 		this.storeManager = storeManager;
 		this.tm = TransactionManagerServices.getTransactionManager();

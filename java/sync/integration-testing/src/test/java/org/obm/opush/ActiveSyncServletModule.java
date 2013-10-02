@@ -123,7 +123,7 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 
 				@Override
 				public void contextDestroyed(ServletContextEvent sce) {
-					injector.getInstance(org.obm.push.store.ehcache.ObjectStoreManager.class).shutdown();
+					injector.getInstance(org.obm.push.store.ehcache.StoreManager.class).shutdown();
 					injector.getInstance(org.obm.push.store.ehcache.NonTransactionalObjectStoreManager.class).shutdown();
 					injector.getInstance(org.obm.push.jaxb.store.ehcache.ObjectStoreManager.class).shutdown();
 					TransactionManagerServices.getTransactionManager().shutdown();

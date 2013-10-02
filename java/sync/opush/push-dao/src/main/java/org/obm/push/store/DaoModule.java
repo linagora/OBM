@@ -36,6 +36,8 @@ import org.obm.push.store.ehcache.EhCacheConfigurationFileImpl;
 import org.obm.push.store.ehcache.EhCacheStatistics;
 import org.obm.push.store.ehcache.EhCacheStatisticsImpl;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl;
+import org.obm.push.store.ehcache.ObjectStoreManager;
+import org.obm.push.store.ehcache.StoreManager;
 import org.obm.push.store.ehcache.SyncedCollectionDaoEhcacheImpl;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 import org.obm.push.store.jdbc.CalendarDaoJdbcImpl;
@@ -65,6 +67,7 @@ public class DaoModule extends AbstractModule{
 		bind(DateProvider.class).to(TransactionDateProvider.class);
 		bind(EhCacheConfiguration.class).to(EhCacheConfigurationFileImpl.class);
 		bind(EhCacheStatistics.class).to(EhCacheStatisticsImpl.class);
+		bind(StoreManager.class).to(ObjectStoreManager.class);
 	}
 
 }

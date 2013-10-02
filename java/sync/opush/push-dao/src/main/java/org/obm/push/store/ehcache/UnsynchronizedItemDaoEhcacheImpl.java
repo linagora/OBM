@@ -58,13 +58,13 @@ public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao impleme
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
-	@Inject UnsynchronizedItemDaoEhcacheImpl(ObjectStoreManager objectStoreManager) {
+	@Inject UnsynchronizedItemDaoEhcacheImpl(StoreManager objectStoreManager) {
 		super(objectStoreManager);
 	}
 	
 	@Override
 	protected String getStoreName() {
-		return ObjectStoreManager.UNSYNCHRONIZED_ITEM_STORE;
+		return EhCacheStores.UNSYNCHRONIZED_ITEM_STORE;
 	}
 
 	@Override

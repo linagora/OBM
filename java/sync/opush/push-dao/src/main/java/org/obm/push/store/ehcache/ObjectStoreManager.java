@@ -60,7 +60,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class ObjectStoreManager implements EhCacheStores {
+public class ObjectStoreManager implements StoreManager, EhCacheStores {
 
 	public static final String STORE_NAME = ObjectStoreManager.class.getName();
 	
@@ -141,6 +141,7 @@ public class ObjectStoreManager implements EhCacheStores {
 				EhCacheConfiguration.STATS_SAMPLING_IN_SECONDS, TimeUnit.SECONDS);
 	}
 
+	@Override
 	public void shutdown() {
 		this.singletonManager.shutdown();
 	}
@@ -201,6 +202,7 @@ public class ObjectStoreManager implements EhCacheStores {
 		return new CacheConfiguration().name(storeName);
 	}
 
+	@Override
 	public Cache getStore(String storeName) {
 		return this.singletonManager.getCache(storeName);
 	}
