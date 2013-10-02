@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,21 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import org.obm.sync.LifecycleListener;
+
 import net.sf.ehcache.Cache;
 
-public abstract class AbstractEhcacheDao {
-	
-	protected final StoreManager objectStoreManager;
-	protected final Cache store;
-	
-	protected AbstractEhcacheDao(StoreManager objectStoreManager) {
-		this.objectStoreManager = objectStoreManager;
-		this.store = this.objectStoreManager.getStore( getStoreName() );
-	}
-	
-	protected abstract String getStoreName();
-	
-	public Cache getStore() {
-		return store;
-	}
+public interface StoreManager extends LifecycleListener {
+
+	Cache getStore(String storeName);
+
 }

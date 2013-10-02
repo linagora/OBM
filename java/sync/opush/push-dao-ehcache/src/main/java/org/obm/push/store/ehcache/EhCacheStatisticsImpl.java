@@ -55,11 +55,11 @@ import com.google.inject.Singleton;
 @Singleton
 public class EhCacheStatisticsImpl implements EhCacheStatistics {
 
-	@VisibleForTesting final ObjectStoreManager manager;
+	@VisibleForTesting final StoreManager manager;
 	@VisibleForTesting final EhCacheConfiguration config;
 
 	@Inject
-	@VisibleForTesting EhCacheStatisticsImpl(EhCacheConfiguration config, ObjectStoreManager manager) {
+	@VisibleForTesting EhCacheStatisticsImpl(EhCacheConfiguration config, StoreManager manager) {
 		this.config = config;
 		this.manager = manager;
 	}
