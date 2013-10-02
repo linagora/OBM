@@ -35,19 +35,22 @@ import java.util.Map;
 
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 
 public class MailEhCacheConfiguration implements EhCacheConfiguration {
-	private Map<String, Integer> stores = Maps.newHashMap();
+	
+	private Map<String, Percentage> stores;
 	
 	public MailEhCacheConfiguration() {
-		stores.put(EhCacheStores.MONITORED_COLLECTION_STORE, Integer.valueOf(5));
-		stores.put(EhCacheStores.SYNCED_COLLECTION_STORE, Integer.valueOf(5));
-		stores.put(EhCacheStores.UNSYNCHRONIZED_ITEM_STORE, Integer.valueOf(5));
-		stores.put(EhCacheStores.MAIL_SNAPSHOT_STORE, Integer.valueOf(70));
-		stores.put(EhCacheStores.MAIL_WINDOWING_INDEX_STORE, Integer.valueOf(5));
-		stores.put(EhCacheStores.MAIL_WINDOWING_CHUNKS_STORE, Integer.valueOf(5));
-		stores.put(EhCacheStores.SYNC_KEYS_STORE, Integer.valueOf(5));
+		stores = ImmutableMap.<String, Percentage>builder()
+				.put(EhCacheStores.MONITORED_COLLECTION_STORE, Percentage.of(5))
+				.put(EhCacheStores.SYNCED_COLLECTION_STORE, Percentage.of(5))
+				.put(EhCacheStores.UNSYNCHRONIZED_ITEM_STORE, Percentage.of(5))
+				.put(EhCacheStores.MAIL_SNAPSHOT_STORE, Percentage.of(70))
+				.put(EhCacheStores.MAIL_WINDOWING_INDEX_STORE, Percentage.of(5))
+				.put(EhCacheStores.MAIL_WINDOWING_CHUNKS_STORE, Percentage.of(5))
+				.put(EhCacheStores.SYNC_KEYS_STORE, Percentage.of(5))
+				.build();
 	}
 	
 	@Override
@@ -57,11 +60,16 @@ public class MailEhCacheConfiguration implements EhCacheConfiguration {
 
 	@Override
 	public Percentage percentageAllowedToCache(String cacheName) {
-		Integer defaultValue = stores.get(cacheName);
+		Percentage defaultValue = stores.get(cacheName);
 		if (defaultValue != null) {
-			return Percentage.of(defaultValue);
+			return defaultValue;
 		}
 		return Percentage.UNDEFINED;
+	}
+	
+	@Override
+	public Map<String, Percentage> percentageAllowedToCaches() {
+		return stores;
 	}
 
 	@Override

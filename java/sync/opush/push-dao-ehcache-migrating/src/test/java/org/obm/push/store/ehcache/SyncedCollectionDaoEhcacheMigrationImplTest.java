@@ -65,7 +65,7 @@ import bitronix.tm.TransactionManagerServices;
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncedCollectionDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
-	private ObjectStoreManagerMigration objectStoreManagerMigration;
+	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private SyncedCollectionDaoEhcacheMigrationImpl syncedCollectionDaoEhcacheMigrationImpl;
 	private Credentials credentials;
 	private TransactionManager transactionManager;
@@ -75,7 +75,7 @@ public class SyncedCollectionDaoEhcacheMigrationImplTest extends StoreManagerCon
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
+		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
 		this.syncedCollectionDaoEhcacheMigrationImpl = new SyncedCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");

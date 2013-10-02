@@ -68,7 +68,7 @@ public class SyncKeysDaoEhcacheMigrationImplTest {
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 	
-	private ObjectStoreManagerMigration objectStoreManagerMigration;
+	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private SyncKeysDaoEhcacheMigrationImpl syncKeysDaoEhcacheMigrationImpl;
 	private BitronixTransactionManager transactionManager;
 	
@@ -77,7 +77,7 @@ public class SyncKeysDaoEhcacheMigrationImplTest {
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		objectStoreManagerMigration = new ObjectStoreManagerMigration(initConfigurationServiceMock(), logger);
+		objectStoreManagerMigration = new MigrationSourceObjectStoreManager(initConfigurationServiceMock(), logger);
 		syncKeysDaoEhcacheMigrationImpl = new SyncKeysDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 	}
 	

@@ -84,7 +84,6 @@ import org.obm.push.service.impl.MappingServiceImpl;
 import org.obm.push.service.impl.PushPublishAndSubscribeImpl;
 import org.obm.push.state.IStateMachine;
 import org.obm.push.state.StateMachine;
-import org.obm.push.store.DaoMigrationModule;
 import org.obm.push.store.DaoModule;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.MonitoredCollectionDao;
@@ -127,7 +126,6 @@ public class OpushImplModule extends AbstractModule {
 		install(new TransactionalModule());
 		install(new TechnicalLoggingModule());
 		install(new DaoModule());
-		install(new DaoMigrationModule());
 		install(new DatabaseModule());
 		install(qosModule());
 		install(new OpushServletModule());

@@ -33,13 +33,20 @@ package org.obm.push.store.ehcache;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map.Entry;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import net.sf.ehcache.event.CacheEventListenerAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -49,29 +56,14 @@ public class MigrationServiceImpl implements MigrationService {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private final MonitoredCollectionDaoEhcacheMigrationImpl monitoredCollectionDaoEhcacheMigrationImpl;
-	private final MonitoredCollectionDaoEhcacheImpl monitoredCollectionDaoEhcacheImpl;
-	private final SnapshotDaoEhcacheMigrationImpl snapshotDaoEhcacheMigrationImpl;
-	private final SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl;
-	private final SyncedCollectionDaoEhcacheMigrationImpl syncedCollectionDaoEhcacheMigrationImpl;
-	private final SyncedCollectionDaoEhcacheImpl syncedCollectionDaoEhcacheImpl;
-	private final SyncKeysDaoEhcacheMigrationImpl syncKeysDaoEhcacheMigrationImpl;
-	private final SyncKeysDaoEhcacheImpl syncKeysDaoEhcacheImpl;
-	private final UnsynchronizedItemDaoEhcacheMigrationImpl unsynchronizedItemDaoEhcacheMigrationImpl;
-	private final UnsynchronizedItemDaoEhcacheImpl unsynchronizedItemDaoEhcacheImpl;
-	private final WindowingDaoChunkEhcacheMigrationImpl windowingDaoChunkEhcacheMigrationImpl;
-	private final WindowingDaoIndexEhcacheMigrationImpl windowingDaoIndexEhcacheMigrationImpl;
-	private final WindowingDaoEhcacheImpl windowingDaoEhcacheImpl;
-
 	private final StoreManager objectStoreManager;
-	private final ObjectStoreManagerMigration objectStoreManagerMigration;
-
-	private final ImmutableList<AbstractEhcacheDaoMigration> migrationCaches;
+	private final MigrationSourceObjectStoreManager objectStoreManagerMigration;
+	private final ImmutableMap<AbstractEhcacheDaoMigration, Cache> migrationCaches;
 
 	@Inject
 	@VisibleForTesting MigrationServiceImpl(
 			StoreManager objectStoreManager,
-			ObjectStoreManagerMigration objectStoreManagerMigration,
+			MigrationSourceObjectStoreManager objectStoreManagerMigration,
 			MonitoredCollectionDaoEhcacheMigrationImpl monitoredCollectionDaoEhcacheMigrationImpl, MonitoredCollectionDaoEhcacheImpl monitoredCollectionDaoEhcacheImpl,
 			SnapshotDaoEhcacheMigrationImpl snapshotDaoEhcacheMigrationImpl, SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl,
 			SyncedCollectionDaoEhcacheMigrationImpl syncedCollectionDaoEhcacheMigrationImpl, SyncedCollectionDaoEhcacheImpl syncedCollectionDaoEhcacheImpl,
@@ -80,28 +72,16 @@ public class MigrationServiceImpl implements MigrationService {
 			WindowingDaoChunkEhcacheMigrationImpl windowingDaoChunkEhcacheMigrationImpl, WindowingDaoIndexEhcacheMigrationImpl windowingDaoIndexEhcacheMigrationImpl, WindowingDaoEhcacheImpl windowingDaoEhcacheImpl) {
 		this.objectStoreManager = objectStoreManager;
 		this.objectStoreManagerMigration = objectStoreManagerMigration;
-		this.monitoredCollectionDaoEhcacheMigrationImpl = monitoredCollectionDaoEhcacheMigrationImpl;
-		this.monitoredCollectionDaoEhcacheImpl = monitoredCollectionDaoEhcacheImpl;
-		this.snapshotDaoEhcacheMigrationImpl = snapshotDaoEhcacheMigrationImpl;
-		this.snapshotDaoEhcacheImpl = snapshotDaoEhcacheImpl;
-		this.syncedCollectionDaoEhcacheMigrationImpl = syncedCollectionDaoEhcacheMigrationImpl;
-		this.syncedCollectionDaoEhcacheImpl = syncedCollectionDaoEhcacheImpl;
-		this.syncKeysDaoEhcacheMigrationImpl = syncKeysDaoEhcacheMigrationImpl;
-		this.syncKeysDaoEhcacheImpl = syncKeysDaoEhcacheImpl;
-		this.unsynchronizedItemDaoEhcacheMigrationImpl = unsynchronizedItemDaoEhcacheMigrationImpl;
-		this.unsynchronizedItemDaoEhcacheImpl = unsynchronizedItemDaoEhcacheImpl;
-		this.windowingDaoChunkEhcacheMigrationImpl = windowingDaoChunkEhcacheMigrationImpl;
-		this.windowingDaoIndexEhcacheMigrationImpl = windowingDaoIndexEhcacheMigrationImpl;
-		this.windowingDaoEhcacheImpl = windowingDaoEhcacheImpl;
 		
-		migrationCaches = ImmutableList.of(
-				monitoredCollectionDaoEhcacheMigrationImpl,
-				snapshotDaoEhcacheMigrationImpl,
-				syncedCollectionDaoEhcacheMigrationImpl,
-				syncKeysDaoEhcacheMigrationImpl,
-				unsynchronizedItemDaoEhcacheMigrationImpl,
-				windowingDaoChunkEhcacheMigrationImpl,
-				windowingDaoIndexEhcacheMigrationImpl);
+		migrationCaches = ImmutableMap.<AbstractEhcacheDaoMigration, Cache>builder()
+				.put(monitoredCollectionDaoEhcacheMigrationImpl, monitoredCollectionDaoEhcacheImpl.getStore())
+				.put(snapshotDaoEhcacheMigrationImpl, snapshotDaoEhcacheImpl.getStore())
+				.put(syncedCollectionDaoEhcacheMigrationImpl, syncedCollectionDaoEhcacheImpl.getStore())
+				.put(syncKeysDaoEhcacheMigrationImpl, syncKeysDaoEhcacheImpl.getStore())
+				.put(unsynchronizedItemDaoEhcacheMigrationImpl, unsynchronizedItemDaoEhcacheImpl.getStore())
+				.put(windowingDaoChunkEhcacheMigrationImpl, windowingDaoEhcacheImpl.getChunksStore())
+				.put(windowingDaoIndexEhcacheMigrationImpl, windowingDaoEhcacheImpl.getIndexStore())
+				.build();
 	}
 	
 	@Override
@@ -117,7 +97,7 @@ public class MigrationServiceImpl implements MigrationService {
 	}
 
 	private boolean needMigration() {
-		return Iterables.any(migrationCaches, new Predicate<AbstractEhcacheDaoMigration>() {
+		return Iterables.any(migrationCaches.keySet(), new Predicate<AbstractEhcacheDaoMigration>() {
 
 				@Override
 				public boolean apply(AbstractEhcacheDaoMigration input) {
@@ -128,13 +108,10 @@ public class MigrationServiceImpl implements MigrationService {
 
 	private void migrateCaches() {
 		logger.warn("EHCACHE MIGRATION - START MIGRATION");
-		migrateMonitoredCollection();
-		migrateSnashot();
-		migrateSyncedCollection();
-		migrateSyncKeys();
-		migrateUnsynchronizedItem();
-		migrateWindowingChunk();
-		migrateWindowingIndex();
+		for(Entry<AbstractEhcacheDaoMigration, Cache> caches : migrationCaches.entrySet()) {
+			migrateCache(caches.getKey(), caches.getValue());
+			caches.getValue().dispose();
+		}
 		logger.warn("EHCACHE MIGRATION - SHUTDOWN CACHE MANAGER");
 		objectStoreManager.shutdown();
 		logger.warn("EHCACHE MIGRATION - END MIGRATION");
@@ -148,101 +125,62 @@ public class MigrationServiceImpl implements MigrationService {
 		logger.warn("EHCACHE MIGRATION - START REMOVING ORGINAL CACHES");
 		logger.warn("EHCACHE MIGRATION - SHUTDOWN MIGRATION CACHE MANAGER");
 		objectStoreManagerMigration.shutdown();
-		for (AbstractEhcacheDaoMigration migrationCache : migrationCaches) {
+		for (AbstractEhcacheDaoMigration migrationCache : migrationCaches.keySet()) {
 			logger.warn("EHCACHE MIGRATION - Deleting migration data : " + migrationCache.destroyMigrationData());
 		}
 		logger.warn("EHCACHE MIGRATION - END REMOVING ORGINAL CACHES");
 	}
 
-	@VisibleForTesting void migrateMonitoredCollection() {
-		List<Object> keys = getKeys(monitoredCollectionDaoEhcacheMigrationImpl);
-		logStart("MonitoredCollection", keys.size());
+	@VisibleForTesting void migrateCache(AbstractEhcacheDaoMigration cacheToReadFrom, Cache cacheToWriteTo) {
+		List<Object> keys = getKeys(cacheToReadFrom);
+		logStart(cacheToReadFrom.getStoreName(), keys.size());
+		
+		CacheEventListenerAdapterExtension listener = new CacheEventListenerAdapterExtension();
+		cacheToWriteTo.getCacheEventNotificationService().registerListener(listener);
 		
 		for (Object key : keys) {
-			Serializable value = monitoredCollectionDaoEhcacheMigrationImpl.get(key).getValue();
-			monitoredCollectionDaoEhcacheImpl.getStore().put(new net.sf.ehcache.Element(key, value));
+			Serializable value = cacheToReadFrom.get(key).getValue();
+			cacheToWriteTo.put(new net.sf.ehcache.Element(key, value));
 		}
 		
-		logEnd("MonitoredCollection");
-	}
-
-	@VisibleForTesting void migrateSnashot() {
-		List<Object> keys = getKeys(snapshotDaoEhcacheMigrationImpl);
-		logStart("Snashot", keys.size());
-
-		for (Object key : keys) {
-			Serializable value = snapshotDaoEhcacheMigrationImpl.get(key).getValue();
-			snapshotDaoEhcacheImpl.getStore().put(new net.sf.ehcache.Element(key, value));
-		}
-		
-		logEnd("Snapshot");
-	}
-
-	@VisibleForTesting void migrateSyncedCollection() {
-		List<Object> keys = getKeys(syncedCollectionDaoEhcacheMigrationImpl);
-		logStart("SyncedCollection", keys.size());
-
-		for (Object key : keys) {
-			Serializable value = syncedCollectionDaoEhcacheMigrationImpl.get(key).getValue();
-			syncedCollectionDaoEhcacheImpl.getStore().put(new net.sf.ehcache.Element(key, value));
-		}
-		
-		logEnd("SyncedCollection");
-	}
-
-	@VisibleForTesting void migrateSyncKeys() {
-		List<Object> keys = getKeys(syncKeysDaoEhcacheMigrationImpl);
-		logStart("SyncKeys", keys.size());
-
-		for (Object key : keys) {
-			Serializable value = syncKeysDaoEhcacheMigrationImpl.get(key).getValue();
-			syncKeysDaoEhcacheImpl.getStore().put(new net.sf.ehcache.Element(key, value));
-		}
-		
-		logEnd("SyncKeys");
-	}
-
-	@VisibleForTesting void migrateUnsynchronizedItem() {
-		List<Object> keys = getKeys(unsynchronizedItemDaoEhcacheMigrationImpl);
-		logStart("UnsynchronizedItem", keys.size());
-
-		for (Object key : keys) {
-			Serializable value = unsynchronizedItemDaoEhcacheMigrationImpl.get(key).getValue();
-			unsynchronizedItemDaoEhcacheImpl.getStore().put(new net.sf.ehcache.Element(key, value));
-		}
-		
-		logEnd("UnsynchronizedItem");
-	}
-
-	@VisibleForTesting void migrateWindowingChunk() {
-		List<Object> keys = getKeys(windowingDaoChunkEhcacheMigrationImpl);
-		logStart("WindowingChunk", keys.size());
-
-		for (Object key : keys) {
-			Serializable value = windowingDaoChunkEhcacheMigrationImpl.get(key).getValue();
-			windowingDaoEhcacheImpl.getChunksStore().put(new net.sf.ehcache.Element(key, value));
-		}
-
-		logEnd("WindowingChunk");
-	}
-
-	@VisibleForTesting void migrateWindowingIndex() {
-		List<Object> keys = getKeys(windowingDaoIndexEhcacheMigrationImpl);
-		logStart("WindowingIndex", keys.size());
-
-		for (Object key : keys) {
-			Serializable value = windowingDaoIndexEhcacheMigrationImpl.get(key).getValue();
-			windowingDaoEhcacheImpl.getIndexStore().put(new net.sf.ehcache.Element(key, value));
-		}
-		
-		logEnd("WindowingIndex");
+		logger.warn("{}: items {} put {} evicted {} expired {} update {}", cacheToWriteTo.getName(), 
+				keys.size(), listener.put, listener.evicted, listener.expired, listener.update);
+		logEnd(cacheToWriteTo.getName());
 	}
 	
 	private void logStart(String cacheName, int size) {
-		logger.warn("Starting migration of {}, number of keys: {}", cacheName, size);
+		logger.warn("EHCACHE MIGRATION - Starting {}, number of keys: {}", cacheName, size);
 	}
 	
 	private void logEnd(String cacheName) {
-		logger.warn("Migration of {} done", cacheName);
+		logger.warn("EHCACHE MIGRATION - Done {}", cacheName);
+	}
+
+	private final class CacheEventListenerAdapterExtension extends CacheEventListenerAdapter {
+		
+		public int put;
+		public int update;
+		public int evicted;
+		public int expired;
+		
+		@Override
+		public void notifyElementPut(Ehcache cache, Element element) throws CacheException {
+			put++;
+		}
+		
+		@Override
+		public void notifyElementUpdated(Ehcache cache, Element element) throws CacheException {
+			update++;
+		}
+		
+		@Override
+		public void notifyElementEvicted(Ehcache cache, Element element) {
+			evicted++;
+		}
+		
+		@Override
+		public void notifyElementExpired(Ehcache cache, Element element) {
+			expired++;
+		}
 	}
 }

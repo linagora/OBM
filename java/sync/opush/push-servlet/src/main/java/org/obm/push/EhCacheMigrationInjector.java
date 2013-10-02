@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import org.obm.push.store.ehcache.EhCacheConfiguration;
-import org.obm.push.store.ehcache.EhCacheConfigurationMigrationImpl;
+import org.obm.push.store.ehcache.MigrationService;
+import org.obm.push.store.ehcache.MigrationServiceImpl;
+import org.obm.push.store.ehcache.StoreManager;
+import org.obm.push.store.ehcache.MigrationTargetObjectStoreManager;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -51,7 +53,8 @@ public class EhCacheMigrationInjector {
 
                         @Override
                         protected void configure() {
-                            bind(EhCacheConfiguration.class).to(EhCacheConfigurationMigrationImpl.class);
+                    		bind(MigrationService.class).to(MigrationServiceImpl.class);
+                            bind(StoreManager.class).to(MigrationTargetObjectStoreManager.class);
                         }
                     })
                 );

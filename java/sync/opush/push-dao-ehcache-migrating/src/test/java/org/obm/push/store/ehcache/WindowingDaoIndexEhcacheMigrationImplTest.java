@@ -62,7 +62,7 @@ import bitronix.tm.TransactionManagerServices;
 @RunWith(SlowFilterRunner.class) @Slow
 public class WindowingDaoIndexEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
-	private ObjectStoreManagerMigration objectStoreManagerMigration;
+	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private WindowingDaoChunkEhcacheMigrationImpl windowingDaoChunkEhcacheMigrationImpl;
 	private TransactionManager transactionManager;
 	private User user;
@@ -73,7 +73,7 @@ public class WindowingDaoIndexEhcacheMigrationImplTest extends StoreManagerConfi
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
+		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
 		this.windowingDaoChunkEhcacheMigrationImpl = new WindowingDaoChunkEhcacheMigrationImpl(objectStoreManagerMigration);
 		this.user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.deviceId = new DeviceId("DevId");

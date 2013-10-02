@@ -49,7 +49,6 @@ import org.obm.push.configuration.RemoteConsoleConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfiguration;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 
 public class StaticConfigurationService implements ConfigurationService {
 
@@ -95,7 +94,7 @@ public class StaticConfigurationService implements ConfigurationService {
 	public static class EhCache implements EhCacheConfiguration {
 
 		private final org.obm.opush.env.Configuration.EhCache configuration;
-		private Map<String, Percentage> percentageByStoreMap = Maps.newHashMap();
+		private final Map<String, Percentage> percentageByStoreMap;
 
 		public EhCache(org.obm.opush.env.Configuration.EhCache configuration) {
 			this.configuration = configuration;
@@ -114,6 +113,11 @@ public class StaticConfigurationService implements ConfigurationService {
 				return defaultValue;
 			}
 			return configuration.percentageAllowedToCache;
+		}
+		
+		@Override
+		public Map<String, Percentage> percentageAllowedToCaches() {
+			return percentageByStoreMap;
 		}
 
 		@Override

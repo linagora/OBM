@@ -61,7 +61,7 @@ import com.google.common.collect.ImmutableSet;
 @RunWith(SlowFilterRunner.class) @Slow
 public class UnsynchronizedItemDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
-	private ObjectStoreManagerMigration objectStoreManagerMigration;
+	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private UnsynchronizedItemDaoEhcacheMigrationImpl unsynchronizedItemDaoEhcacheMigrationImpl;
 	private TransactionManager transactionManager;
 	
@@ -70,7 +70,7 @@ public class UnsynchronizedItemDaoEhcacheMigrationImplTest extends StoreManagerC
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
+		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
 		this.unsynchronizedItemDaoEhcacheMigrationImpl = new UnsynchronizedItemDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 	}
 	

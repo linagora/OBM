@@ -31,19 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.util.Arrays;
-import java.util.List;
+import static org.obm.push.store.ehcache.ObjectStoreManager.UNLIMITED_CACHE_MEMORY;
+import static org.obm.push.store.ehcache.ObjectStoreManager.checkGlobalPercentage;
+
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
 import net.sf.ehcache.config.MemoryUnit;
-import net.sf.ehcache.statistics.StatisticsGateway;
-import net.sf.ehcache.statistics.extended.ExtendedStatistics.Operation;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.obm.configuration.ConfigurationService;
@@ -51,72 +50,36 @@ import org.obm.configuration.module.LoggerModule;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.slf4j.Logger;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class ObjectStoreManager implements StoreManager, EhCacheStores {
+public class MigrationTargetObjectStoreManager implements StoreManager, EhCacheStores {
 
-	public static final String STORE_NAME = ObjectStoreManager.class.getName();
-	
-	private final Map<String, Percentage> storesPercentage;
-	
-	public final static int UNLIMITED_CACHE_MEMORY = 0;
-	
-	@VisibleForTesting final CacheManager singletonManager;
+	public static final String STORE_NAME = MigrationTargetObjectStoreManager.class.getName();
+
+	private static final TransactionalMode TRANSACTIONAL_MODE = TransactionalMode.OFF;
+
+	private final CacheManager singletonManager;
 	private final EhCacheConfiguration ehCacheConfiguration;
-
+	private final Map<String, Percentage> storesPercentage;
 	private final Logger configurationLogger;
 
-	@Inject ObjectStoreManager(
+	@Inject MigrationTargetObjectStoreManager(
 			ConfigurationService configurationService,
 			EhCacheConfiguration ehCacheConfiguration,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		this.ehCacheConfiguration = ehCacheConfiguration;
 		this.configurationLogger = configurationLogger;
-		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds();
-		boolean usePersistentCache = configurationService.usePersistentCache();
 		String dataDirectory = configurationService.getDataDirectory();
-		configurationLogger.info("EhCache transaction timeout in seconds : {}", transactionTimeoutInSeconds);
-		configurationLogger.info("EhCache transaction persistent mode : {}", usePersistentCache);
+		configurationLogger.info("EhCache transaction mode : {}", TRANSACTIONAL_MODE);
 		configurationLogger.info("EhCache data directory : {}", dataDirectory);
+		configurationLogger.info("EhCache migration version in use");
 		configurationLogger.info("EhCache maxBytesLocalHeap in MB : {}", ehCacheConfiguration.maxMemoryInMB());
-		
+
 		storesPercentage = checkGlobalPercentage(ehCacheConfiguration.percentageAllowedToCaches());
-		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache, dataDirectory));
-		configureCachesStatistics(singletonManager);
-	}
-
-	public static Map<String, Percentage> checkGlobalPercentage(Map<String, Percentage> storesPercentage) {
-		int globalPercentage = 0;
-		for (Percentage percentage : storesPercentage.values()) {
-			if (percentage.isDefined()) {
-				globalPercentage += percentage.getIntValue();
-			}
-		}
-
-		if (globalPercentage != 100) {
-			throw new IllegalArgumentException("Global stores percentage must be equal to 100, got : " + globalPercentage);
-		}
-		return storesPercentage;
-	}
-
-	private void configureCachesStatistics(CacheManager singletonManager2) {
-		for (String cacheName : singletonManager2.getCacheNames()) {
-			StatisticsGateway stats = singletonManager2.getCache(cacheName).getStatistics();
-			stats.setStatisticsTimeToDisable(ehCacheConfiguration.statsSamplingTimeStopInMinutes(), TimeUnit.MINUTES);
-			configureStatisticsHistory(stats.getExtended().diskGet());
-			configureStatisticsHistory(stats.getExtended().diskPut());
-			configureStatisticsHistory(stats.getExtended().diskRemove());
-		}
-	}
-
-	private void configureStatisticsHistory(Operation<?> history) {
-		history.setHistory(
-				ehCacheConfiguration.statsSampleToRecordCount(), 
-				EhCacheConfiguration.STATS_SAMPLING_IN_SECONDS, TimeUnit.SECONDS);
+		this.singletonManager = new CacheManager(ehCacheConfiguration(dataDirectory));
 	}
 
 	@Override
@@ -124,29 +87,30 @@ public class ObjectStoreManager implements StoreManager, EhCacheStores {
 		this.singletonManager.shutdown();
 	}
 	
-	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds, boolean usePersistentCache, String dataDirectory) {
+	private Configuration ehCacheConfiguration(String dataDirectory) {
 		Configuration configuration = new Configuration()
 			.name(STORE_NAME)
 			.maxBytesLocalHeap(ehCacheConfiguration.maxMemoryInMB(), MemoryUnit.MEGABYTES)
 			.diskStore(new DiskStoreConfiguration().path(dataDirectory))
-			.updateCheck(false)
-			.defaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
+			.updateCheck(false);
 		
 		for (String name : STORES) {
-			configuration.cache(timeToLiveConfiguration(defaultCacheConfiguration(name), usePersistentCache));
+			configuration.cache(cacheConfiguration(name));
 		}
 		return configuration;
 	}
 
 	@SuppressWarnings("deprecation")
-	private CacheConfiguration defaultCacheConfiguration(String name) {
+	private CacheConfiguration cacheConfiguration(String name) {
 		CacheConfiguration cacheConfiguration = new CacheConfiguration()
 			.name(name)
 			.maxEntriesLocalDisk(UNLIMITED_CACHE_MEMORY)
+			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.FIFO)
+			.transactionalMode(TRANSACTIONAL_MODE)
 			.overflowToDisk(true)
-			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LRU)
-			.transactionalMode(ehCacheConfiguration.transactionalMode());
-		
+			.diskPersistent(true)
+			.eternal(true);
+
 		Percentage percentageAllowedToCache = storesPercentage.get(name);
 		if (percentageAllowedToCache.isDefined()) {
 			configurationLogger.info(percentageAllowedToCache.get() + " allocated for the cache:" + name);
@@ -157,40 +121,8 @@ public class ObjectStoreManager implements StoreManager, EhCacheStores {
 		return cacheConfiguration;
 	}
 
-	@SuppressWarnings("deprecation")
-	private CacheConfiguration timeToLiveConfiguration(CacheConfiguration configuration, boolean usePersistentCache) {
-		return configuration.timeToLiveSeconds(ehCacheConfiguration.timeToLiveInSeconds())
-				.diskPersistent(usePersistentCache);
-	}
-	
-	@VisibleForTesting Cache createNewStore(String storeName) {
-		Cache store = getStore(storeName);
-		if (store == null) {
-			store = createStore(storeName);
-			this.singletonManager.addCache(store);
-		}
-		return store;
-	}
-
-	private Cache createStore(String storeName) {
-		return new Cache(createStoreConfiguration(storeName));
-	}
-
-	private CacheConfiguration createStoreConfiguration(String storeName) {
-		return new CacheConfiguration().name(storeName);
-	}
-
 	@Override
 	public Cache getStore(String storeName) {
 		return this.singletonManager.getCache(storeName);
 	}
-
-	public void removeStore(String storeName) {
-		this.singletonManager.removeCache(storeName);
-	}
-
-	public List<String> listStores() {
-		return Arrays.asList(this.singletonManager.getCacheNames());
-	}
-
 }

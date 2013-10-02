@@ -67,7 +67,7 @@ import com.google.common.collect.ImmutableSet;
 @RunWith(SlowFilterRunner.class) @Slow
 public class MonitoredCollectionDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
-	private ObjectStoreManagerMigration objectStoreManagerMigration;
+	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private MonitoredCollectionDaoEhcacheMigrationImpl monitoredCollectionStoreServiceMigrationImpl;
 	private Credentials credentials;
 	private TransactionManager transactionManager;
@@ -77,7 +77,7 @@ public class MonitoredCollectionDaoEhcacheMigrationImplTest extends StoreManager
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
+		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
 		this.monitoredCollectionStoreServiceMigrationImpl = new MonitoredCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");

@@ -61,7 +61,7 @@ import bitronix.tm.TransactionManagerServices;
 @RunWith(SlowFilterRunner.class) @Slow
 public class SnapshotDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
-	private ObjectStoreManagerMigration objectStoreManagerMigration;
+	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private SnapshotDaoEhcacheMigrationImpl snapshotDaoEhcacheMigrationImpl;
 	private TransactionManager transactionManager;
 	private DeviceId deviceId;
@@ -71,7 +71,7 @@ public class SnapshotDaoEhcacheMigrationImplTest extends StoreManagerConfigurati
 		this.transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
+		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
 		this.snapshotDaoEhcacheMigrationImpl = new SnapshotDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 		this.deviceId = new DeviceId("DevId");
 	}
