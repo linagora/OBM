@@ -64,13 +64,13 @@ public class SyncKeysDaoEhcacheMigrationImplTest {
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 	
-	private ObjectStoreManagerMigration objectStoreManagerMigration;
+	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private SyncKeysDaoEhcacheMigrationImpl syncKeysDaoEhcacheMigrationImpl;
 	
 	@Before
 	public void init() throws IOException {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		objectStoreManagerMigration = new ObjectStoreManagerMigration(initConfigurationServiceMock(), logger);
+		objectStoreManagerMigration = new MigrationSourceObjectStoreManager(initConfigurationServiceMock(), logger);
 		syncKeysDaoEhcacheMigrationImpl = new SyncKeysDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 	}
 	

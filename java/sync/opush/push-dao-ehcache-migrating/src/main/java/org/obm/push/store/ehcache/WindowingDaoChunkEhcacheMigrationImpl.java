@@ -38,12 +38,12 @@ import com.google.inject.Singleton;
 public class WindowingDaoChunkEhcacheMigrationImpl extends AbstractEhcacheDaoMigration {
 
 	@Inject  WindowingDaoChunkEhcacheMigrationImpl(
-			ObjectStoreManagerMigration objectStoreManagerMigration) {
+			MigrationSourceObjectStoreManager objectStoreManagerMigration) {
 		super(objectStoreManagerMigration);
 	}
 
 	@Override
 	protected String getStoreName() {
-		return ObjectStoreManagerMigration.MAIL_WINDOWING_CHUNKS_STORE;
+		return MigrationSourceObjectStoreManager.MAIL_WINDOWING_CHUNKS_STORE;
 	}
 }

@@ -53,9 +53,6 @@ import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -67,7 +64,7 @@ public class ObjectStoreManager implements StoreManager, EhCacheStores {
 	
 	private final Map<String, Percentage> storesPercentage;
 	
-	private final static int UNLIMITED_CACHE_MEMORY = 0;
+	public final static int UNLIMITED_CACHE_MEMORY = 0;
 	
 	@VisibleForTesting final CacheManager singletonManager;
 	private final EhCacheConfiguration ehCacheConfiguration;
@@ -90,42 +87,23 @@ public class ObjectStoreManager implements StoreManager, EhCacheStores {
 		configurationLogger.info("EhCache max local heap in MB: {}", ehCacheConfiguration.maxMemoryInMB());
 
 		forceInitializeTransactionManager(transactionProvider);
-		storesPercentage = loadStoresPercentage();
-		checkGlobalPercentage();
+		storesPercentage = checkGlobalPercentage(ehCacheConfiguration.percentageAllowedToCaches());
 		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache, dataDirectory));
 		configureCachesStatistics(singletonManager);
 	}
 
-	private void checkGlobalPercentage() {
+	public static Map<String, Percentage> checkGlobalPercentage(Map<String, Percentage> storesPercentage) {
 		int globalPercentage = 0;
 		for (Percentage percentage : storesPercentage.values()) {
 			if (percentage.isDefined()) {
 				globalPercentage += percentage.getIntValue();
 			}
 		}
-		
+
 		if (globalPercentage != 100) {
-			throw new IllegalArgumentException("Global stores percentage must be equal to 100, but got : " + globalPercentage);
+			throw new IllegalArgumentException("Global stores percentage must be equal to 100, got : " + globalPercentage);
 		}
-	}
-
-	private ImmutableMap<String, Percentage> loadStoresPercentage() {
-		return Maps.toMap(STORES, 
-				new Function<String, Percentage>() {
-			
-					@Override
-					public Percentage apply(String name) {
-						return loadStorePercentage(name);
-					}
-				});
-	}
-
-	private Percentage loadStorePercentage(String name) {
-		Percentage percentageAllowedToCache = ehCacheConfiguration.percentageAllowedToCache(name);
-		if (percentageAllowedToCache.isDefined()) {
-			return percentageAllowedToCache;
-		}
-		throw new IllegalArgumentException("Store " + name + " has no percentage defined in configuration");
+		return storesPercentage;
 	}
 
 	private void configureCachesStatistics(CacheManager singletonManager) {

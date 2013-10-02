@@ -117,6 +117,11 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 		}
 		return Percentage.of(percentageAllowedToCache);
 	}
+	
+	@Override
+	public Map<String, Percentage> percentageAllowedToCaches() {
+		return stores;
+	}
 
 	@Override
 	public long timeToLiveInSeconds() {

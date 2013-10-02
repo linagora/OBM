@@ -38,12 +38,12 @@ import com.google.inject.Singleton;
 public class UnsynchronizedItemDaoEhcacheMigrationImpl extends AbstractEhcacheDaoMigration {
 
 	@Inject  UnsynchronizedItemDaoEhcacheMigrationImpl(
-			ObjectStoreManagerMigration objectStoreManagerMigration) {
+			MigrationSourceObjectStoreManager objectStoreManagerMigration) {
 		super(objectStoreManagerMigration);
 	}
 
 	@Override
 	protected String getStoreName() {
-		return ObjectStoreManagerMigration.UNSYNCHRONIZED_ITEM_STORE;
+		return MigrationSourceObjectStoreManager.UNSYNCHRONIZED_ITEM_STORE;
 	}
 }

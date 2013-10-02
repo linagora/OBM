@@ -38,12 +38,12 @@ import com.google.inject.Singleton;
 public class WindowingDaoIndexEhcacheMigrationImpl extends AbstractEhcacheDaoMigration {
 
 	@Inject  WindowingDaoIndexEhcacheMigrationImpl(
-			ObjectStoreManagerMigration objectStoreManagerMigration) {
+			MigrationSourceObjectStoreManager objectStoreManagerMigration) {
 		super(objectStoreManagerMigration);
 	}
 
 	@Override
 	protected String getStoreName() {
-		return ObjectStoreManagerMigration.MAIL_WINDOWING_INDEX_STORE;
+		return MigrationSourceObjectStoreManager.MAIL_WINDOWING_INDEX_STORE;
 	}
 }
