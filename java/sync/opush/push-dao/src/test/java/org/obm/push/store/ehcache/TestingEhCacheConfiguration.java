@@ -39,7 +39,6 @@ import org.obm.push.EhCacheStoresPercentageLoader;
 import org.obm.push.utils.jvm.JvmUtils;
 
 import com.google.common.collect.Maps;
-import com.google.common.primitives.Ints;
 
 public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 
@@ -53,7 +52,7 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 
 	public TestingEhCacheConfiguration() {
 		percentageAllowedToCache = 10;
-		maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
+		maxMemoryInMB = JvmUtils.maxRuntimeJvmMemoryInMB() / 2;
 		timeToLive = 60;
 		statsShortSamplingTimeInSeconds = 1;
 		stores = EhCacheStoresPercentageLoader.loadStoresPercentage();
