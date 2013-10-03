@@ -1126,6 +1126,7 @@ function display_head($p_module, $standard=true) {
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css?version=$obm_version\" />
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_print_obm?version=$obm_version\" media=\"print\" />
   $dis_extra_css
+  <script type=\"text/javascript\" src=\"$resources_path/js/q.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/mootools-1.2-more.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/clientcide.js?version=$obm_version\" ></script>
@@ -1184,7 +1185,6 @@ function display_head($p_module, $standard=true) {
   <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/utils.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/obm.js?version=$obm_version\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/q.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/autocomplete.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/dropdown.js?version=$obm_version\" ></script>
   $js_include
