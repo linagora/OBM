@@ -39,6 +39,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
@@ -47,9 +48,9 @@ import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Stopwatch;
-
 import bitronix.tm.TransactionManagerServices;
+
+import com.google.common.base.Stopwatch;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
@@ -287,6 +288,7 @@ public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 		}
 	}
 	
+	@Ignore
 	@Test
 	public void testShortTimeDiskGetsWhenGetAfterUpdateInAnotherTransaction() throws Exception {
 		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()

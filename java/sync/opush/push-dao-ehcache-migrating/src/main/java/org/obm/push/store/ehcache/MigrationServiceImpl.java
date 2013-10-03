@@ -163,7 +163,6 @@ public class MigrationServiceImpl implements MigrationService {
 		
 		logger.warn("{}: items {} put {} evicted {} expired {} update {}", cacheToWriteTo.getName(), 
 				keys.size(), listener.put, listener.evicted, listener.expired, listener.update);
-		logEnd(cacheToWriteTo.getName());
 	}
 	
 	private void logStart(String cacheName, int size) {
