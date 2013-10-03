@@ -34,11 +34,13 @@ package org.obm.push.store.ehcache;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 
@@ -54,6 +56,10 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
@@ -248,5 +254,38 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		assertThat(dataDir.listFiles()).contains(files);
 		migrationServiceImpl.migrate();
 		assertThat(dataDir.listFiles()).doesNotContain(files);
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testAssertMigrationHasSucceedOrDieWhenMoreKeys() {
+		String targetName = "store name";
+		List<Object> sourceKeyList = windowingDaoIndexEhcacheMigrationImpl.getKeys();
+		List<Object> targetKeyList = ImmutableList.copyOf(Iterables.concat(
+				windowingDaoIndexEhcacheMigrationImpl.getKeys(), Lists.newArrayList(new Object())));
+
+		migrationServiceImpl.assertMigrationHasSucceedOrDie(targetName, targetKeyList, sourceKeyList);
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void testAssertMigrationHasSucceedOrDieWhenLessKeys() {
+		String targetName = "store name";
+		List<Object> sourceKeyList = windowingDaoIndexEhcacheMigrationImpl.getKeys();
+		List<Object> targetKeyList = ImmutableList.copyOf(Iterables.skip(
+				windowingDaoIndexEhcacheMigrationImpl.getKeys(), 1));
+		
+		migrationServiceImpl.assertMigrationHasSucceedOrDie(targetName, targetKeyList, sourceKeyList);
+	}
+	
+	@Test
+	public void testAssertMigrationHasSucceedOrDieWhenSameKeys() {
+		String targetName = "store name";
+		List<Object> sourceKeyList = windowingDaoIndexEhcacheMigrationImpl.getKeys();
+		List<Object> targetKeyList = ImmutableList.copyOf(windowingDaoIndexEhcacheMigrationImpl.getKeys());
+		
+		try {
+			migrationServiceImpl.assertMigrationHasSucceedOrDie(targetName, targetKeyList, sourceKeyList);
+		} catch (Exception e) {
+			fail("no exception expected", e);
+		}
 	}
 }
