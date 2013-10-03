@@ -741,7 +741,6 @@ obm.AutoComplete.ParallelExtSearch = new Class({
       var promises = this.buildRequestPromises();
       Q.all(promises).
         then(this.onSuccess.bind(this)).
-        catch(this.onFailure.bind(this)).
         done();
     }
   },
