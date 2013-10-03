@@ -134,6 +134,24 @@ public class MigrationServiceImpl implements MigrationService {
 	@VisibleForTesting void migrateCache(AbstractEhcacheDaoMigration cacheToReadFrom, Cache cacheToWriteTo) {
 		List<Object> keys = getKeys(cacheToReadFrom);
 		logStart(cacheToReadFrom.getStoreName(), keys.size());
+		migrateCacheWithKeys(cacheToReadFrom, cacheToWriteTo, keys);
+		assertMigrationHasSucceedOrDie(cacheToWriteTo, keys);
+		logEnd(cacheToWriteTo.getName());
+	}
+
+	private void assertMigrationHasSucceedOrDie(Cache cacheToWriteTo, List<Object> keys) {
+		if (cacheToWriteTo.getKeys().size() != keys.size()) {
+			logger.error(
+					"EHCACHE MIGRATION - Failed for the cache [{}], keys to migrate [{}] done [{}]. " +
+					"Try to allow more memory to the cache into the configuration file {}", 
+					cacheToWriteTo.getName(), keys.size(), cacheToWriteTo.getKeys().size(), 
+					EhCacheConfigurationFileImpl.CONFIG_FILE_PATH);
+			throw new IllegalStateException("Error during migration");
+		}
+	}
+
+	private void migrateCacheWithKeys(AbstractEhcacheDaoMigration cacheToReadFrom, Cache cacheToWriteTo,
+			List<Object> keys) {
 		
 		CacheEventListenerAdapterExtension listener = new CacheEventListenerAdapterExtension();
 		cacheToWriteTo.getCacheEventNotificationService().registerListener(listener);
