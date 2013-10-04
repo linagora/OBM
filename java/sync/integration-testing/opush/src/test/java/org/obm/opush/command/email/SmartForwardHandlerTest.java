@@ -289,6 +289,26 @@ public class SmartForwardHandlerTest {
 			.contains("Mail content")
 			.contains("attachment.ics");
 	}
+
+	@Test
+	public void testForwardedExternalMailWithICSAttachmentShowsAttachment() throws Exception {
+		appendToINBOX(greenMailUser, "eml/externalICSAsAttachment.eml");
+		assertThat(sentFolder.getMessageCount()).isEqualTo(0);
+		assertThat(inboxFolder.getMessages().size()).isEqualTo(1);
+		
+		mocksControl.replay();
+		opushServer.start();
+		boolean success = opClient().emailForward(loadEmail("eml/textPlain.eml"), inboxCollectionId, serverId);
+		mocksControl.verify();
+		
+		assertThat(success).isTrue();
+		assertThat(sentFolder.getMessageCount()).isEqualTo(1);
+		assertThat(inboxFolder.getMessages().size()).isEqualTo(2);
+		assertThat(CharStreams.toString(new InputStreamReader(
+				inboxFolder.getMessages().get(1).getMimeMessage().getInputStream())))
+			.contains("Mail content")
+			.contains("meeting.ics");
+	}
 	
 	@Test
 	public void testForwardedInvitationDoesntShowAttachment() throws Exception {

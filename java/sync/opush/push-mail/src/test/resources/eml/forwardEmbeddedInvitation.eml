@@ -96,8 +96,9 @@ Content-Type: text/html;
 --Apple-Mail-E1568EF9-5A98-4F3B-973E-383291606FA2
 Content-Disposition: attachment;
 	filename=meeting.ics
-Content-Type: application/ics;
+Content-Type: text/calendar;
 	name=meeting.ics
+	method=REQUEST
 Content-Transfer-Encoding: base64
 
 QkVHSU46VkNBTEVOREFSDQpQUk9ESUQ6LS8vQWxpYXNvdXJjZSBHcm91cGUgTElOQUdPUkEvL09C
