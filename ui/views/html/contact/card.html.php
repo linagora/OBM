@@ -199,10 +199,10 @@
               <dd>
                 <?php echo nl2br(htmlspecialchars($contact->comment)) ?>
                 <?php if(!empty($contact->comment2)) { ?>
-                  <br/><?php echo nl2br(htmlspecialchars($contact->comment2)) ?></dl>
+                  <br/><?php echo nl2br(htmlspecialchars($contact->comment2)) ?>
                 <?php } ?>
                 <?php if(!empty($contact->comment3)) { ?>
-                  <br/><?php echo nl2br(htmlspecialchars($contact->comment3)) ?></dl>
+                  <br/><?php echo nl2br(htmlspecialchars($contact->comment3)) ?>
                 <?php } ?>
               </dd>
             </dl>
