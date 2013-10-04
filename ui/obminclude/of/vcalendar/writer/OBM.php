@@ -212,7 +212,9 @@ class Vcalendar_Writer_OBM {
     $entities['user'][] = $GLOBALS['obm']['uid'];
     $entities['user'] = array_unique($entities['user']);
     $event['ext_id'] = $vevent->get('uid');
-    $event['owner'] = $this->parseOrganizer($vevent->get('organizer'));
+    $organizer = $this->parseOrganizer($vevent->get('organizer'));
+    $event['owner'] = $organizer;
+    $event['organizer'] = $organizer;
     $event['title'] = addslashes($vevent->get('summary'));
     $dtstart = $vevent->get('dtstart');
     $event['date_begin'] = $dtstart;
