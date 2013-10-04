@@ -40,6 +40,7 @@ Obm.Contact.AddressBook = new Class ({
       update: $('dataContainer'),
       onComplete: $('spinner').hide.bind($('spinner')),
       onRequest: $('spinner').show.bind($('spinner')),
+      onSuccess: this._updateSearchCount.bind(this),
       onFailure: function (response) {
         Obm.Error.parseStatus(this);
       }
@@ -69,6 +70,11 @@ Obm.Contact.AddressBook = new Class ({
     }.bind(this);
     
     this.addressbook = $('addressBookContainer').getElement('.current');
+  },
+
+  _updateSearchCount: function() {
+    var resultCount = $('dataContainer').getElements('tr').length;
+    $('count_addressbook_search').set('text', resultCount);
   },
 
   selectContact: function(elem) {
