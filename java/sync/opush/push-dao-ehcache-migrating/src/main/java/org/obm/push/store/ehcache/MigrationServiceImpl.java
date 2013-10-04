@@ -140,11 +140,15 @@ public class MigrationServiceImpl implements MigrationService {
 	}
 
 	private void assertMigrationHasSucceedOrDie(Cache cacheToWriteTo, List<Object> keys) {
-		if (cacheToWriteTo.getKeys().size() != keys.size()) {
+		assertMigrationHasSucceedOrDie(cacheToWriteTo.getName(), cacheToWriteTo.getKeys(), keys);
+	}
+
+	@VisibleForTesting void assertMigrationHasSucceedOrDie(String targetName, List<Object> targetKeyList, List<Object> sourceKeyList) {
+		if (targetKeyList.size() != sourceKeyList.size()) {
 			logger.error(
 					"EHCACHE MIGRATION - Failed for the cache [{}], keys to migrate [{}] done [{}]. " +
 					"Try to allow more memory to the cache into the configuration file {}", 
-					cacheToWriteTo.getName(), keys.size(), cacheToWriteTo.getKeys().size(), 
+					targetName, sourceKeyList.size(), targetKeyList.size(), 
 					EhCacheConfigurationFileImpl.CONFIG_FILE_PATH);
 			throw new IllegalStateException("Error during migration");
 		}
