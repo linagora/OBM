@@ -74,6 +74,11 @@ Obm.Contact.AddressBook = new Class ({
     this.addressbook = $('addressBookContainer').getElement('.current');
   },
 
+  _updateSearchCount: function() {
+    var resultCount = $('dataContainer').getElements('tr').length;
+    $('count_addressbook_search').set('text', resultCount);
+  },
+
   selectContact: function(elem) {
     if(elem.hasClass('current')) {
       this.hideContact();
