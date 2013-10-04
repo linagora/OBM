@@ -206,7 +206,7 @@ public class EhCacheConfigurationFileImplTest {
 
 	@Test
 	public void testStatsSampleToRecordCount() {
-		expect(iniFile.getIntValue("statsSampleToRecordCount", 10)).andReturn(5);
+		expect(iniFile.getIntValue("statsSampleToRecordCount", 180)).andReturn(5);
 
 		control.replay();
 		assertThat(testee().statsSampleToRecordCount()).isEqualTo(5);

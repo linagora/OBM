@@ -63,7 +63,7 @@ public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 	public final static String TIME_TO_LIVE = "timeToLive";
 	public final static int DEFAULT_TIME_TO_LIVE = 2592000; // One month in seconds 60 * 60 * 24 * 30
 	public final static TransactionalMode TRANSACTIONAL_MODE = TransactionalMode.XA;
-	public final static int DEFAULT_STATS_SAMPLE_COUNT = 10;
+	public final static int DEFAULT_STATS_SAMPLE_COUNT = 180;
 	public final static int DEFAULT_STATS_SHORT_SAMPLE_TIME = 1;
 	public final static int DEFAULT_STATS_MEDIUM_SAMPLE_TIME = 10;
 	public final static int DEFAULT_STATS_LONG_SAMPLE_TIME = 60;
