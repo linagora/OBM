@@ -43,22 +43,22 @@ import com.google.inject.util.Modules;
 
 public class EhCacheMigrationInjector {
 
-    public static Injector createMigrationInjector() {
-        return Guice.createInjector(new AbstractModule() {
+	public static Injector createMigrationInjector() {
+		return Guice.createInjector(new AbstractModule() {
 
-            @Override
-            protected void configure() {
-                install(Modules.override(new OpushModule()).with(
-                    new AbstractModule() {
+			@Override
+			protected void configure() {
+				install(Modules.override(new OpushModule()).with(
+						new AbstractModule() {
 
-                        @Override
-                        protected void configure() {
-                    		bind(MigrationService.class).to(MigrationServiceImpl.class);
-                            bind(StoreManager.class).to(MigrationTargetObjectStoreManager.class);
-                        }
-                    })
-                );
-            }
-        });
-    }
+							@Override
+							protected void configure() {
+								bind(MigrationService.class).to(MigrationServiceImpl.class);
+								bind(StoreManager.class).to(MigrationTargetObjectStoreManager.class);
+							}
+						}
+				));
+			}
+		});
+	}
 }
