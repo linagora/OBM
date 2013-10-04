@@ -39,7 +39,6 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
@@ -288,7 +287,6 @@ public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 		}
 	}
 	
-	@Ignore
 	@Test
 	public void testShortTimeDiskGetsWhenGetAfterUpdateInAnotherTransaction() throws Exception {
 		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
@@ -301,11 +299,14 @@ public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 			startStatisticsSampling(restartedTestee);
 			readAllElementsInCache(restartedTestee);
 			commitThenCloseTransaction();
+			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
+			
 			TransactionManagerServices.getTransactionManager().begin();
 			putXElements(2, restartedTestee);
 			readAllElementsInCache(restartedTestee);
 			commitThenCloseTransaction();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
+			
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
 		} finally {
 			restartedTestee.manager.shutdown();
