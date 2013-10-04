@@ -41,8 +41,8 @@ import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.event.CacheEventListenerAdapter;
 
+import org.obm.configuration.module.LoggerModule;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
@@ -50,11 +50,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class MigrationServiceImpl implements MigrationService {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger;
 	
 	private final StoreManager objectStoreManager;
 	private final MigrationSourceObjectStoreManager objectStoreManagerMigration;
@@ -62,6 +63,7 @@ public class MigrationServiceImpl implements MigrationService {
 
 	@Inject
 	@VisibleForTesting MigrationServiceImpl(
+			@Named(LoggerModule.MIGRATION)Logger logger,
 			StoreManager objectStoreManager,
 			MigrationSourceObjectStoreManager objectStoreManagerMigration,
 			MonitoredCollectionDaoEhcacheMigrationImpl monitoredCollectionDaoEhcacheMigrationImpl, MonitoredCollectionDaoEhcacheImpl monitoredCollectionDaoEhcacheImpl,
@@ -70,6 +72,7 @@ public class MigrationServiceImpl implements MigrationService {
 			SyncKeysDaoEhcacheMigrationImpl syncKeysDaoEhcacheMigrationImpl, SyncKeysDaoEhcacheImpl syncKeysDaoEhcacheImpl,
 			UnsynchronizedItemDaoEhcacheMigrationImpl unsynchronizedItemDaoEhcacheMigrationImpl, UnsynchronizedItemDaoEhcacheImpl unsynchronizedItemDaoEhcacheImpl,
 			WindowingDaoChunkEhcacheMigrationImpl windowingDaoChunkEhcacheMigrationImpl, WindowingDaoIndexEhcacheMigrationImpl windowingDaoIndexEhcacheMigrationImpl, WindowingDaoEhcacheImpl windowingDaoEhcacheImpl) {
+		this.logger = logger;
 		this.objectStoreManager = objectStoreManager;
 		this.objectStoreManagerMigration = objectStoreManagerMigration;
 		
@@ -87,12 +90,14 @@ public class MigrationServiceImpl implements MigrationService {
 	@Override
 	public void migrate() {
 		if (needMigration()) {
-			logger.warn("EHCACHE MIGRATION - START");
+			logger.warn("=========================================");
+			logger.warn("================== START ================");
+			logger.warn("=========================================");
 			migrateCaches();
 			cleanOriginalCaches();
-			logger.warn("EHCACHE MIGRATION - END SUCCESSFULY");
-		} else {
-			logger.warn("EHCACHE MIGRATION - NO MIGRATION");
+			logger.warn("=========================================");
+			logger.warn("============= END SUCCESSFULLY ===========");
+			logger.warn("=========================================");
 		}
 	}
 
@@ -107,14 +112,12 @@ public class MigrationServiceImpl implements MigrationService {
 	}
 
 	private void migrateCaches() {
-		logger.warn("EHCACHE MIGRATION - START MIGRATION");
 		for(Entry<AbstractEhcacheDaoMigration, Cache> caches : migrationCaches.entrySet()) {
 			migrateCache(caches.getKey(), caches.getValue());
 			caches.getValue().dispose();
 		}
-		logger.warn("EHCACHE MIGRATION - SHUTDOWN CACHE MANAGER");
+		logger.warn("Target cache manager shutdown");
 		objectStoreManager.shutdown();
-		logger.warn("EHCACHE MIGRATION - END MIGRATION");
 	}
 
 	protected List<Object> getKeys(AbstractEhcacheDaoMigration cacheToReadFrom) {
@@ -122,13 +125,13 @@ public class MigrationServiceImpl implements MigrationService {
 	}
 
 	private void cleanOriginalCaches() {
-		logger.warn("EHCACHE MIGRATION - START REMOVING ORGINAL CACHES");
-		logger.warn("EHCACHE MIGRATION - SHUTDOWN MIGRATION CACHE MANAGER");
+		logger.warn("Source cache manager shutdown");
 		objectStoreManagerMigration.shutdown();
+		logger.warn("Removing source migration files");
 		for (AbstractEhcacheDaoMigration migrationCache : migrationCaches.keySet()) {
-			logger.warn("EHCACHE MIGRATION - Deleting migration data : " + migrationCache.destroyMigrationData());
+			logger.warn("Removing {}", migrationCache.destroyMigrationData());
 		}
-		logger.warn("EHCACHE MIGRATION - END REMOVING ORGINAL CACHES");
+		logger.warn("Removing source migration files - DONE");
 	}
 
 	@VisibleForTesting void migrateCache(AbstractEhcacheDaoMigration cacheToReadFrom, Cache cacheToWriteTo) {
@@ -146,10 +149,9 @@ public class MigrationServiceImpl implements MigrationService {
 	@VisibleForTesting void assertMigrationHasSucceedOrDie(String targetName, List<Object> targetKeyList, List<Object> sourceKeyList) {
 		if (targetKeyList.size() != sourceKeyList.size()) {
 			logger.error(
-					"EHCACHE MIGRATION - Failed for the cache [{}], keys to migrate [{}] done [{}]. " +
-					"Try to allow more memory to the cache into the configuration file {}", 
-					targetName, sourceKeyList.size(), targetKeyList.size(), 
-					EhCacheConfigurationFileImpl.CONFIG_FILE_PATH);
+					"Migration failed for the cache [{}], keys to migrate [{}] done [{}]. " +
+					"See the documentation at http://obm.org/wiki/migration for details", 
+					targetName, sourceKeyList.size(), targetKeyList.size());
 			throw new IllegalStateException("Error during migration");
 		}
 	}
@@ -170,11 +172,11 @@ public class MigrationServiceImpl implements MigrationService {
 	}
 	
 	private void logStart(String cacheName, int size) {
-		logger.warn("EHCACHE MIGRATION - Starting {}, number of keys: {}", cacheName, size);
+		logger.warn("Starting {}, number of keys: {}", cacheName, size);
 	}
 	
 	private void logEnd(String cacheName) {
-		logger.warn("EHCACHE MIGRATION - Done {}", cacheName);
+		logger.warn("Done {}", cacheName);
 	}
 
 	private final class CacheEventListenerAdapterExtension extends CacheEventListenerAdapter {

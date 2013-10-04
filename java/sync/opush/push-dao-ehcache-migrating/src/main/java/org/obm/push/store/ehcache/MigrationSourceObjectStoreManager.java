@@ -67,7 +67,7 @@ public class MigrationSourceObjectStoreManager {
 	private final CacheManager singletonManager;
 
 	@Inject MigrationSourceObjectStoreManager(ConfigurationService configurationService,
-			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
+			@Named(LoggerModule.MIGRATION)Logger configurationLogger) {
 		String dataDirectory = configurationService.getDataDirectory();
 		configurationLogger.info("EhCache migration transaction mode : {}", TRANSACTIONAL_MODE);
 		configurationLogger.info("EhCache migration data directory : {}", dataDirectory);
@@ -89,7 +89,7 @@ public class MigrationSourceObjectStoreManager {
 		long now = System.currentTimeMillis();
 		for (String fileName : files) {
 			String fullName = dataDirectory + File.separator + fileName;
-			configurationLogger.info("EHCACHE MIGRATION - touch {}", fullName);
+			configurationLogger.info("touch {}", fullName);
 			new File(fullName).setLastModified(now);
 		}
 	}

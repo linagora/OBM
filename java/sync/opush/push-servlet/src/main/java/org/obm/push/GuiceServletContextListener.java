@@ -83,15 +83,15 @@ public class GuiceServletContextListener implements ServletContextListener {
 	}
 
 	public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    	shutdown();
+		shutdown();
 	}
 
 	private void migrateEhCache() {
-    	injector = EhCacheMigrationInjector.createMigrationInjector();
-    	injector.getInstance(MigrationServiceImpl.class).migrate();
+		injector = EhCacheMigrationInjector.createMigrationInjector();
+		injector.getInstance(MigrationServiceImpl.class).migrate();
 		injector.getInstance(MigrationSourceObjectStoreManager.class).shutdown();
 		shutdown();
-    }
+	}
 
 	private void shutdown() {
 		injector.getInstance(org.obm.push.store.ehcache.StoreManager.class).shutdown();

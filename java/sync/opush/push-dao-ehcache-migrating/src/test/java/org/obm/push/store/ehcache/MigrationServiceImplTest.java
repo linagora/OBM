@@ -109,7 +109,8 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		windowingDaoChunkEhcacheMigrationImpl = new WindowingDaoChunkEhcacheMigrationImpl(objectStoreManagerMigration);
 		windowingDaoIndexEhcacheMigrationImpl = new WindowingDaoIndexEhcacheMigrationImpl(objectStoreManagerMigration);
 		windowingDaoEhcacheImpl = new WindowingDaoEhcacheImpl(objectStoreManager);
-		migrationServiceImpl = new MigrationServiceImpl(objectStoreManager, objectStoreManagerMigration,
+		migrationServiceImpl = new MigrationServiceImpl(logger,
+				objectStoreManager, objectStoreManagerMigration,
 				monitoredCollectionDaoEhcacheMigrationImpl, monitoredCollectionDaoEhcacheImpl,
 				snapshotDaoEhcacheMigrationImpl, snapshotDaoEhcacheImpl,
 				syncedCollectionDaoEhcacheMigrationImpl, syncedCollectionDaoEhcacheImpl,
