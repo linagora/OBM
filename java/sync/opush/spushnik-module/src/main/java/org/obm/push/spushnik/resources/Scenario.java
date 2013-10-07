@@ -41,7 +41,6 @@ import javax.ws.rs.QueryParam;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.spushnik.bean.CheckResult;
@@ -89,27 +88,22 @@ public abstract class Scenario {
 	@VisibleForTesting HttpClient chooseHttpClient(Credentials credentials, String serviceUrl) {
 		Preconditions.checkNotNull(credentials);
 		Preconditions.checkNotNull(serviceUrl);
-		PoolingHttpClientConnectionManager connectionManager = buildConnectionManager();
+		HttpClientBuilder httpClientBuilder = 
+				HttpClientBuilder.create()
+					.setMaxConnTotal(5)
+					.setMaxConnPerRoute(5);
 		if (serviceDoesNotNeedSSL(serviceUrl)) {
-			return HttpClientBuilder.create().setConnectionManager(connectionManager).build();
+			return httpClientBuilder.build();
 		}
 		if (serviceNeedsClientCertificate(credentials)) {
-			return HttpClientBuilder.create()
-					.setConnectionManager(connectionManager)
+			return httpClientBuilder
 					.setSslcontext(SSLContextFactory.create(getPkcs12Stream(credentials), credentials.getPkcs12Password()))
 					.build();
 		}
-		return HttpClientBuilder.create().setConnectionManager(connectionManager)
+		return httpClientBuilder
 				.setSslcontext(SSLContextFactory.TRUST_ALL)
 				.setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
 				.build();
-	}
-
-	private PoolingHttpClientConnectionManager buildConnectionManager() {
-		PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-		connectionManager.setMaxTotal(100);
-		connectionManager.setDefaultMaxPerRoute(100);
-		return connectionManager;
 	}
 
 	private boolean serviceNeedsClientCertificate(Credentials credentials) {
