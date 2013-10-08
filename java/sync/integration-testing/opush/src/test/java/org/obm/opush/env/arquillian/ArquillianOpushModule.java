@@ -29,36 +29,29 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.env;
+package org.obm.opush.env.arquillian;
 
-import org.easymock.IMocksControl;
-import org.obm.Configuration;
-import org.obm.ConfigurationModule.PolicyConfigurationProvider;
-import org.obm.configuration.SyncPermsConfigurationService;
-import org.obm.guice.AbstractOverrideModule;
-import org.obm.opush.env.OpushStaticConfigurationService.EhCache;
-import org.obm.opush.env.OpushStaticConfigurationService.RemoteConsole;
-import org.obm.opush.env.OpushStaticConfigurationService.SyncPerms;
-import org.obm.push.configuration.RemoteConsoleConfiguration;
-import org.obm.push.store.ehcache.EhCacheConfiguration;
+import org.obm.opush.env.AbstractOpushEnv;
 
-import com.google.inject.name.Names;
+import com.google.common.base.Throwables;
 
-public final class OpushConfigurationModule extends AbstractOverrideModule {
-
-	private final Configuration configuration;
-
-	public OpushConfigurationModule(Configuration configuration, IMocksControl mocksControl) {
-		super(mocksControl);
-		this.configuration = configuration;
+public abstract class ArquillianOpushModule  extends AbstractOpushEnv {
+	
+	public ArquillianOpushModule() {
+		super();
 	}
 	
 	@Override
-	protected void configureImpl() {
-		bind(SyncPermsConfigurationService.class).toInstance(new SyncPerms(configuration.syncPerms));
-		bind(RemoteConsoleConfiguration.class).toInstance(new RemoteConsole(configuration.remoteConsole));
-		bind(EhCacheConfiguration.class).toInstance(new EhCache(configuration.ehCache));
-		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toProvider(bindWithMock(PolicyConfigurationProvider.class));
+	protected void onModuleInstalled() {
+		try {
+			super.onModuleInstalled();
+
+			expectedBehaviour();
+			mocksControl.replay();
+		} catch (Exception e) {
+			Throwables.propagate(e);
+		}
 	}
-	
+
+	protected abstract void expectedBehaviour() throws Exception;
 }
