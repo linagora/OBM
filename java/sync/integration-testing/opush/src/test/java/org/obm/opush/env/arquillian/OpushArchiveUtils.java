@@ -29,36 +29,45 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush.env;
+package org.obm.opush.env.arquillian;
 
-import org.easymock.IMocksControl;
-import org.obm.Configuration;
-import org.obm.ConfigurationModule.PolicyConfigurationProvider;
-import org.obm.configuration.SyncPermsConfigurationService;
-import org.obm.guice.AbstractOverrideModule;
-import org.obm.opush.env.OpushStaticConfigurationService.EhCache;
-import org.obm.opush.env.OpushStaticConfigurationService.RemoteConsole;
-import org.obm.opush.env.OpushStaticConfigurationService.SyncPerms;
-import org.obm.push.configuration.RemoteConsoleConfiguration;
-import org.obm.push.store.ehcache.EhCacheConfiguration;
+import java.io.File;
 
-import com.google.inject.name.Names;
+import javax.servlet.ServletContextListener;
 
-public final class OpushConfigurationModule extends AbstractOverrideModule {
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.UnknownExtensionTypeException;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.CoordinateParseException;
+import org.jboss.shrinkwrap.resolver.api.ResolutionException;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.obm.arquillian.GuiceWebXmlDescriptor;
 
-	private final Configuration configuration;
+import com.google.inject.Module;
 
-	public OpushConfigurationModule(Configuration configuration, IMocksControl mocksControl) {
-		super(mocksControl);
-		this.configuration = configuration;
+public class OpushArchiveUtils {
+
+	public static WebArchive buildWebArchive(Class<? extends Module> guiceModule, Class<? extends ServletContextListener> servletContextListener)
+			throws IllegalArgumentException, IllegalStateException, ResolutionException,
+			CoordinateParseException, UnknownExtensionTypeException {
+
+
+		return ShrinkWrap
+				.create(WebArchive.class)
+				.addAsWebInfResource(GuiceWebXmlDescriptor.webXml(guiceModule, servletContextListener), "web.xml")
+				.addAsLibraries(resolveArtifacts("com.linagora.obm.opush:push-servlet"))
+				.addAsLibraries(resolveArtifacts("javax.transaction:jta"))
+				.addClasses(servletContextListener);
 	}
-	
-	@Override
-	protected void configureImpl() {
-		bind(SyncPermsConfigurationService.class).toInstance(new SyncPerms(configuration.syncPerms));
-		bind(RemoteConsoleConfiguration.class).toInstance(new RemoteConsole(configuration.remoteConsole));
-		bind(EhCacheConfiguration.class).toInstance(new EhCache(configuration.ehCache));
-		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toProvider(bindWithMock(PolicyConfigurationProvider.class));
+
+	private static File[] resolveArtifacts(String artifactCoordinates) {
+		return Maven.resolver()
+				.offline()
+				.loadPomFromFile("pom.xml")
+				.resolve(artifactCoordinates)
+				.withClassPathResolution(true)
+				.withTransitivity()
+				.asFile();
 	}
-	
+
 }

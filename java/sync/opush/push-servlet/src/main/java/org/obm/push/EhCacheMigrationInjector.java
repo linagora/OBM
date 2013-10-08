@@ -41,17 +41,18 @@ import org.obm.sync.LifecycleListener;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.util.Modules;
 
 public class EhCacheMigrationInjector {
 
-	public static Injector createMigrationInjector() {
+	public static Injector createMigrationInjector(final Module module) {
 		return Guice.createInjector(new AbstractModule() {
 
 			@Override
 			protected void configure() {
-				install(Modules.override(new OpushModule()).with(
+				install(Modules.override(module).with(
 					new AbstractModule() {
 
 						@Override
