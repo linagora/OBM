@@ -353,4 +353,64 @@ public class ObmUserTest {
 				"user1@obmsync.test", "user1@obm.org", "user1@rasta.rocket",
 				"user2@one.org", "user3@two.org");
 	}
+	
+	@Test
+	public void testBuildMailsDefinition() {
+		String mails = Joiner.on(EMAIL_FIELD_SEPARATOR)
+				.join("user1", "user1@alias1", "user1@alias2");
+		
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login("login")
+				.domain(domain)
+				.emailAndAliases(mails)
+				.build();
+
+		assertThat(obmUser.buildMailsDefinition()).containsOnly(
+				"user1@*", "user1@alias1", "user1@alias2");
+	}
+	
+	@Test
+	public void testBuildMailsDefinitionWithNoAppendingNeeded() {
+		String mails = Joiner.on(EMAIL_FIELD_SEPARATOR)
+				.join("user1@domain", "user1@alias1");
+		
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login("login")
+				.domain(domain)
+				.emailAndAliases(mails)
+				.build();
+
+		assertThat(obmUser.buildMailsDefinition()).containsOnly(
+				"user1@domain", "user1@alias1");
+	}
+	
+	@Test
+	public void testBuildMailsDefinitionWithTwoAppendingNeeded() {
+		String mails = Joiner.on(EMAIL_FIELD_SEPARATOR)
+				.join("user1", "user1@alias", "user2");
+		
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login("login")
+				.domain(domain)
+				.emailAndAliases(mails)
+				.build();
+
+		assertThat(obmUser.buildMailsDefinition()).containsOnly(
+				"user1@*", "user2@*", "user1@alias");
+	}
+	
+	@Test
+	public void testBuildMailsDefinitionWithNoAliases() {
+		
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login("login")
+				.domain(domain)
+				.build();
+
+		assertThat(obmUser.buildMailsDefinition()).isEmpty();
+	}
 }

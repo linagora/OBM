@@ -47,6 +47,7 @@ import static org.obm.provisioning.bean.UserJsonFields.KIND;
 import static org.obm.provisioning.bean.UserJsonFields.LASTNAME;
 import static org.obm.provisioning.bean.UserJsonFields.LOGIN;
 import static org.obm.provisioning.bean.UserJsonFields.MAILS;
+import static org.obm.provisioning.bean.UserJsonFields.EFFECTIVEMAILS;
 import static org.obm.provisioning.bean.UserJsonFields.MAIL_QUOTA;
 import static org.obm.provisioning.bean.UserJsonFields.MAIL_SERVER;
 import static org.obm.provisioning.bean.UserJsonFields.HIDDEN;
@@ -74,6 +75,7 @@ import org.obm.provisioning.bean.GroupIdentifier;
 import org.obm.sync.host.ObmHost;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -85,9 +87,6 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 	@Override
 	public void serialize(ObmUser value, JsonGenerator jgen, SerializerProvider provider)
 			throws IOException, JsonProcessingException {
-		Set<String> mails = Sets.newHashSet();
-		mails.add(value.getEmailAtDomain());
-		mails.addAll(value.getEmailAlias());
 		
 		jgen.writeStartObject();
 		jgen.writeObjectField(ID.asSpecificationValue(), value.getExtId());
@@ -116,7 +115,8 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeBooleanField(ARCHIVED.asSpecificationValue(), value.isArchived());
 		jgen.writeStringField(MAIL_QUOTA.asSpecificationValue(), String.valueOf(value.getMailQuotaAsInt()));
 		jgen.writeStringField(MAIL_SERVER.asSpecificationValue(), getMailHostName(value));
-		jgen.writeObjectField(MAILS.asSpecificationValue(), mails);
+		jgen.writeObjectField(MAILS.asSpecificationValue(), Iterables.toArray(value.buildMailsDefinition(), String.class));
+		jgen.writeObjectField(EFFECTIVEMAILS.asSpecificationValue(), Iterables.toArray(value.buildAllEmails(), String.class));
 		jgen.writeBooleanField(HIDDEN.asSpecificationValue(), value.isHidden());
 		jgen.writeObjectField(TIMECREATE.asSpecificationValue(), value.getTimeCreate());
 		jgen.writeObjectField(TIMEUPDATE.asSpecificationValue(), value.getTimeUpdate());

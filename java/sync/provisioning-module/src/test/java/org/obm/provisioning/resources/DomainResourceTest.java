@@ -133,7 +133,7 @@ public class DomainResourceTest extends CommonDomainEndPointEnvTest {
 					"\"id\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
 					"\"name\":\"domain\"," +
 					"\"label\":null," +
-					"\"aliases\":[]" +
+					"\"aliases\":[\"domain.com\"]" +
 				"}");
 	}
 

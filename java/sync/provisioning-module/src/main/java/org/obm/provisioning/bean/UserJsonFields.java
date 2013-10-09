@@ -42,7 +42,8 @@ public enum UserJsonFields {
 	PASSWORD("password"), KIND("kind"), TITLE("title"), DESCRIPTION("description"), COMPANY("company"), SERVICE("service"),
 	DIRECTION("direction"), ADDRESSES("addresses"), TOWN("town"), ZIPCODE("zipcode"), BUSINESS_ZIPCODE("business_zipcode"),
 	COUNTRY("country"), PHONES("phones"), MOBILE("mobile"), FAXES("faxes"), MAIL_QUOTA("mail_quota"), MAIL_SERVER("mail_server"),
-	ARCHIVED("archived"), HIDDEN("hidden"), MAILS("mails"), TIMECREATE("timecreate"), TIMEUPDATE("timeupdate"), GROUPS("groups");
+	ARCHIVED("archived"), HIDDEN("hidden"), MAILS("mails"), EFFECTIVEMAILS("effectiveMails"), TIMECREATE("timecreate"),
+	TIMEUPDATE("timeupdate"), GROUPS("groups");
 	
 	private String value;
 	

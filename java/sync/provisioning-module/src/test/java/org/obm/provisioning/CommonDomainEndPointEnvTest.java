@@ -178,6 +178,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					ServiceProperty.IMAP,
 					ObmHost.builder().name("host").build())
 			.host(ServiceProperty.LDAP, ObmHost.builder().ip("1.2.3.4").build())
+			.alias("domain.com")
 			.build();
 
 	protected static final ProfileName profileName = ProfileName
@@ -373,7 +374,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"archived\":false," +
 					"\"mail_quota\":\"1234\"," +
 					"\"mail_server\":\"host\"," +
-					"\"mails\":[\"john@domain\"]," +
+					"\"mails\":[\"john@domain\",\"jo@*\",\"john@alias\"]," +
+					"\"effectiveMails\":[\"john@domain\",\"jo@domain\",\"jo@domain.com\",\"john@alias\"]," +
 					"\"hidden\":true," +
 					"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
 					"\"timeupdate\":\"2013-06-11T13:00:00.000+0000\"," +
@@ -409,7 +411,8 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"archived\":false," +
 				"\"mail_quota\":\"1234\"," +
 				"\"mail_server\":\"host\"," +
-				"\"mails\":[\"john@domain\"]," +
+				"\"mails\":[\"john@domain\",\"jo@*\",\"john@alias\"]," +
+				"\"effectiveMails\":[\"john@domain\",\"jo@domain\",\"jo@domain.com\",\"john@alias\"]," +
 				"\"hidden\":true," +
 				"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
 				"\"timeupdate\":\"2013-06-11T13:00:00.000+0000\"," +
@@ -492,7 +495,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"archived\":false," +
 					"\"mail_quota\":\"0\"," +
 					"\"mail_server\":null," +
-					"\"mails\":[null]," +
+					"\"mails\":[]," +
+					"\"effectiveMails\":[]," +
 					"\"hidden\":false," +
 					"\"timecreate\":null," +
 					"\"timeupdate\":null," +
@@ -530,7 +534,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				.mailQuota(1234)
 				.mailHost(ObmHost.builder().name("host").build())
 				.hidden(true)
-				.emailAndAliases("john@domain")
+				.emailAndAliases("john@domain\r\njo\r\njohn@alias")
 				.timeCreate(TIMECREATE)
 				.timeUpdate(TIMEUPDATE)
 				.groups(fakeGroups())

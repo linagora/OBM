@@ -60,6 +60,7 @@ public class ObmUser {
 	public static final int MAXIMUM_SUPPORTED_ADDRESSES = 3;
 	public static final int MAXIMUM_SUPPORTED_FAXES = 2;
 	public static final int MAXIMUM_SUPPORTED_PHONES = 2;
+	public static final String PATTERN_AT_STAR = "@*";
 
 	public static Builder builder() {
 		return new Builder();
@@ -638,20 +639,24 @@ public class ObmUser {
 	}
 
 	public String getEmailAtDomain() {
-		return appendDomainToEmailIfRequired(email);
+		return appendDomainToEmailIfRequired(email, domain.getName());
 	}
 	
 	public String getLoginAtDomain() {
 		return login + "@" + domain.getName();
 	}
-
-	private String appendDomainToEmailIfRequired(String emailAddress) {
-		return appendDomainToEmailIfRequired(emailAddress, domain.getName());
-	}
 	
 	private String appendDomainToEmailIfRequired(String emailAddress, String domainName) {
+		return appendPatternToEmailIfRequired(emailAddress, "@" + domainName);
+	}
+
+	private String appendAtStarToEmailIfRequired(String emailAddress) {
+		return appendPatternToEmailIfRequired(emailAddress, PATTERN_AT_STAR);
+	}
+
+	private String appendPatternToEmailIfRequired(String emailAddress, String pattern) {
 		if(emailAddress != null && !emailAddress.contains("@")) {
-			return emailAddress + "@" + domainName;
+			return emailAddress + pattern;
 		}
 		return emailAddress;
 	}
@@ -665,7 +670,10 @@ public class ObmUser {
 	}
 
 	private Set<String> emailAndAliases() {
-		return Sets.union(ImmutableSet.of(email), emailAlias);
+		if (isEmailAvailable()) {
+			return Sets.union(ImmutableSet.of(email), emailAlias);
+		}
+		return ImmutableSet.of();
 	}
 	
 	public Iterable<String> buildAllEmails() {
@@ -677,9 +685,21 @@ public class ObmUser {
 					public String apply(List<String> input) {
 						return appendDomainToEmailIfRequired(input.get(0), input.get(1));
 					}
+				})
+				.toSet();
+	}
+
+	public Iterable<String> buildMailsDefinition() {
+		return FluentIterable
+				.from(emailAndAliases())
+				.transform(new Function<String, String>() {
+					@Override
+					public String apply(String input) {
+						return appendAtStarToEmailIfRequired(input);
+					}
 				});
 	}
-	
+
 	public Set<String> getAddresses() {
 		return Sets.newHashSet(address1, address2, address3);
 	}

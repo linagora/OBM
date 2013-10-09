@@ -113,6 +113,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 					ObmHost.builder().name("NewCyrus").ip("127.0.0.1").build())
 			.host(ServiceProperty.LDAP,
 					ObmHost.builder().name("OpenLDAP").ip("127.0.0.1").build())
+			.alias("domain.com")
 			.build();
 
 	@Test

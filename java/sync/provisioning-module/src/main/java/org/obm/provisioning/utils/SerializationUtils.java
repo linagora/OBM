@@ -51,6 +51,7 @@ import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
@@ -110,6 +111,15 @@ public class SerializationUtils {
 		return textValues;
 	}
 	
+	private static Collection<String> getMailsTokenTextValues(JsonNode value) {
+		return Collections2.transform(getCurrentTokenTextValues(value), new Function<String, String>() {
+			@Override
+			public String apply(String input) {
+				return input.replace(ObmUser.PATTERN_AT_STAR, "");
+			}
+		});
+	}
+	
 	public static void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields, ObmUser.Builder toBuild) {
 		JsonNode value = jsonNode.findValue(jsonFields.asSpecificationValue());
 
@@ -160,7 +170,9 @@ public class SerializationUtils {
 				toBuild.login(value.asText());
 				break;
 			case MAILS:
-				toBuild.mails(getCurrentTokenTextValues(value));
+				toBuild.mails(getMailsTokenTextValues(value));
+				break;
+			case EFFECTIVEMAILS:
 				break;
 			case MAIL_QUOTA:
 				toBuild.mailQuota(Integer.parseInt(value.asText()));
