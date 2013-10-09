@@ -108,7 +108,7 @@ public class ConnectionImpl implements Connection {
 	@Override
 	public void setQuota(ImapPath path, Quota quota) {
 		if (quota.isLimited()) {
-			storeClient.setQuota(path.format(), quota.getLimit());
+			storeClient.setQuota(path.format(), quota.getLimit() * 1024); // Cyrus uses Kb
 		} else {
 			storeClient.removeQuota(path.format());
 		}

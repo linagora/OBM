@@ -44,24 +44,23 @@ import org.obm.push.minig.imap.StoreClient;
 @RunWith(SlowGuiceRunner.class)
 public class ConnectionImplTest {
 	private IMocksControl control;
+	private StoreClient storeClient;
+	private Connection connection;
 
 	@Before
 	public void setUp() {
 		control = createControl();
+		storeClient = control.createMock(StoreClient.class);
+		connection = new ConnectionImpl(storeClient);
 	}
 	
 	@Test
 	public void testCreateUserMailboxes() {
-		StoreClient mockClient = control.createMock(StoreClient.class);
-		
-				
-		expect(mockClient.create("user/ident4@vm.obm.org", "partition")).andReturn(true);
-		expect(mockClient.create("user/ident4/Trash@vm.obm.org", "partition")).andReturn(true);
-		
+		expect(storeClient.create("user/ident4@vm.obm.org", "partition")).andReturn(true);
+		expect(storeClient.create("user/ident4/Trash@vm.obm.org", "partition")).andReturn(true);
 		control.replay();
 	
-		Connection conn = new ConnectionImpl(mockClient);
-		conn.createUserMailboxes(Partition.valueOf("partition"),
+		connection.createUserMailboxes(Partition.valueOf("partition"),
 				ImapPath.builder().user("ident4").domain("vm.obm.org").build(),
 				ImapPath.builder().user("ident4").domain("vm.obm.org").pathFragment("Trash").build()
 				);
@@ -70,19 +69,24 @@ public class ConnectionImplTest {
 
 	@Test
 	public void testCreateUserMailboxesNoPartition() {
-		StoreClient mockClient = control.createMock(StoreClient.class);
-		
-				
-		expect(mockClient.create("user/ident4@vm.obm.org")).andReturn(true);
-		expect(mockClient.create("user/ident4/Trash@vm.obm.org")).andReturn(true);
-		
+		expect(storeClient.create("user/ident4@vm.obm.org")).andReturn(true);
+		expect(storeClient.create("user/ident4/Trash@vm.obm.org")).andReturn(true);
 		control.replay();
 	
-		Connection conn = new ConnectionImpl(mockClient);
-		conn.createUserMailboxes(
+		connection.createUserMailboxes(
 				ImapPath.builder().user("ident4").domain("vm.obm.org").build(),
 				ImapPath.builder().user("ident4").domain("vm.obm.org").pathFragment("Trash").build()
 				);
+		control.verify();
+	}
+
+	@Test
+	public void testSetQuotaSendsQuotaInKb() {
+		expect(storeClient.setQuota("user/user@obm.org", 102400)).andReturn(true);
+		control.replay();
+
+		connection.setQuota(ImapPath.builder().user("user").domain("obm.org").build(), Quota.valueOf(100));
+
 		control.verify();
 	}
 
