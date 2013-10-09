@@ -178,7 +178,7 @@ public class DomainDao {
 	}
 	
 	private Iterable<String> aliasToIterable(String aliases) {
-		return aliases == null ? ImmutableSet.<String>of() : Splitter.on("\r\n").split(aliases);
+		return aliases == null ? ImmutableSet.<String>of() : Splitter.on("\r\n").omitEmptyStrings().split(aliases);
 	}
 	
 	private ObmDomain domainFromCursor(ResultSet rs) throws SQLException {

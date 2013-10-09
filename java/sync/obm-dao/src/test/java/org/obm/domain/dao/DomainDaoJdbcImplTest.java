@@ -201,6 +201,20 @@ public class DomainDaoJdbcImplTest implements H2TestClass {
 					.build()
 					);
 	}
+	
+	@Test
+	public void testCreateWithEmptyAliasThenGet() throws DaoException, DomainNotFoundException {
+		final ObmDomainUuid uuid = ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66");
+		Builder domainBuilder = ObmDomain.builder()
+			.uuid(uuid)
+			.name("mydomain")
+			.label("my domain")
+			.alias("")
+			.global(false);
+		dao.create(domainBuilder.build());
+		final ObmDomain domainFromDao = dao.findDomainByUuid(uuid);
+		assertThat(domainFromDao.getAliases()).isEmpty();
+	}
 
 	@Test
 	public void testCreateWithAliasesThenList() throws DaoException {
