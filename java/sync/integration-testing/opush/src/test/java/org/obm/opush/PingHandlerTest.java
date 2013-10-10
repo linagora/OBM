@@ -148,7 +148,6 @@ public class PingHandlerTest {
 	}
 
 	@Test
-	@Ignore("OBMFULL-5442")
 	public void testNoChange() throws Exception {
 		prepareMockNoChange();
 
