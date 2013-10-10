@@ -118,7 +118,53 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	}
 	
 	private EhCacheConfiguration buildNonTransactionalConfig() {
-		return new TestingEhCacheConfiguration().withTransactionMode(TransactionalMode.OFF);
+		return new EhCacheConfiguration() {
+
+			@Override
+			public TransactionalMode transactionalMode() {
+				return TransactionalMode.OFF;
+			}
+			
+			@Override
+			public int maxMemoryInMB() {
+				return 10;
+			}
+	
+			@Override
+			public Percentage percentageAllowedToCache(String cacheName) {
+				return Percentage.UNDEFINED;
+			}
+	
+			@Override
+			public long timeToLiveInSeconds() {
+				return 60;
+			}
+			
+			@Override
+			public int statsSampleToRecordCount() {
+				return 10;
+			}
+
+			@Override
+			public int statsShortSamplingTimeInSeconds() {
+				return 1;
+			}
+			
+			@Override
+			public int statsMediumSamplingTimeInSeconds() {
+				return 10;
+			}
+			
+			@Override
+			public int statsLongSamplingTimeInSeconds() {
+				return 60;
+			}
+
+			@Override
+			public int statsSamplingTimeStopInMinutes() {
+				return 10;
+			}
+		};
 	}
 	
 	private void copyCacheFilesInTemporaryFolder() throws Exception {

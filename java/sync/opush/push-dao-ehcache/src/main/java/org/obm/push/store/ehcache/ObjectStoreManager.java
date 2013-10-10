@@ -33,7 +33,6 @@ package org.obm.push.store.ehcache;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import net.sf.ehcache.Cache;
@@ -54,19 +53,22 @@ import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class ObjectStoreManager implements LifecycleListener, EhCacheStores  {
+public class ObjectStoreManager implements LifecycleListener {
 
 	public static final String STORE_NAME = ObjectStoreManager.class.getName();
 	
-	private final Map<String, Percentage> storesPercentage;
+	public static final String MONITORED_COLLECTION_STORE = "monitoredCollectionService";
+	public static final String SYNCED_COLLECTION_STORE = "syncedCollectionStoreService";
+	public static final String UNSYNCHRONIZED_ITEM_STORE = "unsynchronizedItemService";
+	public static final String MAIL_SNAPSHOT_STORE = "mailSnapshotStore";
+	public static final String MAIL_WINDOWING_INDEX_STORE = "mailWindowingIndexStore";
+	public static final String MAIL_WINDOWING_CHUNKS_STORE = "mailWindowingChunksStore";
+	public static final String SYNC_KEYS_STORE = "syncKeysStore";
 	
 	private final static int UNLIMITED_CACHE_MEMORY = 0;
 	
@@ -91,42 +93,8 @@ public class ObjectStoreManager implements LifecycleListener, EhCacheStores  {
 		configurationLogger.info("EhCache max local heap in MB: {}", ehCacheConfiguration.maxMemoryInMB());
 
 		forceInitializeTransactionManager(transactionProvider);
-		storesPercentage = loadStoresPercentage();
-		checkGlobalPercentage();
 		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache, dataDirectory));
 		configureCachesStatistics(singletonManager);
-	}
-
-	private void checkGlobalPercentage() {
-		int globalPercentage = 0;
-		for (Percentage percentage : storesPercentage.values()) {
-			if (percentage.isDefined()) {
-				globalPercentage += percentage.getIntValue();
-			}
-		}
-		
-		if (globalPercentage != 100) {
-			throw new IllegalArgumentException("Global stores percentage must be equal to 100, but got : " + globalPercentage);
-		}
-	}
-
-	private ImmutableMap<String, Percentage> loadStoresPercentage() {
-		return Maps.toMap(STORES, 
-				new Function<String, Percentage>() {
-			
-					@Override
-					public Percentage apply(String name) {
-						return loadStorePercentage(name);
-					}
-				});
-	}
-
-	private Percentage loadStorePercentage(String name) {
-		Percentage percentageAllowedToCache = ehCacheConfiguration.percentageAllowedToCache(name);
-		if (percentageAllowedToCache.isDefined()) {
-			return percentageAllowedToCache;
-		}
-		throw new IllegalArgumentException("Store " + name + " has no percentage defined in configuration");
 	}
 
 	private void configureCachesStatistics(CacheManager singletonManager) {
@@ -154,17 +122,19 @@ public class ObjectStoreManager implements LifecycleListener, EhCacheStores  {
 	}
 	
 	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds, boolean usePersistentCache, String dataDirectory) {
-		Configuration configuration = new Configuration()
+		return new Configuration()
 			.name(STORE_NAME)
 			.maxBytesLocalHeap(ehCacheConfiguration.maxMemoryInMB(), MemoryUnit.MEGABYTES)
 			.diskStore(new DiskStoreConfiguration().path(dataDirectory))
 			.updateCheck(false)
+			.cache(timeToLiveConfiguration(defaultCacheConfiguration(UNSYNCHRONIZED_ITEM_STORE), usePersistentCache))
+			.cache(timeToLiveConfiguration(defaultCacheConfiguration(SYNCED_COLLECTION_STORE), usePersistentCache))
+			.cache(timeToLiveConfiguration(defaultCacheConfiguration(MONITORED_COLLECTION_STORE), usePersistentCache))
+			.cache(timeToLiveConfiguration(defaultCacheConfiguration(MAIL_SNAPSHOT_STORE), usePersistentCache))
+			.cache(timeToLiveConfiguration(defaultCacheConfiguration(MAIL_WINDOWING_CHUNKS_STORE), usePersistentCache))
+			.cache(timeToLiveConfiguration(defaultCacheConfiguration(MAIL_WINDOWING_INDEX_STORE), usePersistentCache))
+			.cache(timeToLiveConfiguration(defaultCacheConfiguration(SYNC_KEYS_STORE), usePersistentCache))
 			.defaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
-		
-		for (String name : STORES) {
-			configuration.cache(timeToLiveConfiguration(defaultCacheConfiguration(name), usePersistentCache));
-		}
-		return configuration;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -176,7 +146,7 @@ public class ObjectStoreManager implements LifecycleListener, EhCacheStores  {
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LRU)
 			.transactionalMode(ehCacheConfiguration.transactionalMode());
 		
-		Percentage percentageAllowedToCache = storesPercentage.get(name);
+		Percentage percentageAllowedToCache = ehCacheConfiguration.percentageAllowedToCache(name);
 		if (percentageAllowedToCache.isDefined()) {
 			configurationLogger.info(percentageAllowedToCache.get() + " allocated for the cache:" + name);
 			cacheConfiguration.setMaxBytesLocalHeap(percentageAllowedToCache.get());

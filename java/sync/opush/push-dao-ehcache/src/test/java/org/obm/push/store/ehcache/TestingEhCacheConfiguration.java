@@ -31,14 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.util.Map;
-
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 
-import org.obm.push.EhCacheStoresPercentageLoader;
 import org.obm.push.utils.jvm.JvmUtils;
 
-import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 
 public class TestingEhCacheConfiguration implements EhCacheConfiguration {
@@ -49,16 +45,12 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 	private int statsShortSamplingTimeInSeconds;
 	private int statsMediumSamplingTimeInSeconds;
 	private int statsLongSamplingTimeInSeconds;
-	private Map<String, Percentage> stores = Maps.newHashMap();
-	private TransactionalMode transactionalMode;
 
 	public TestingEhCacheConfiguration() {
-		percentageAllowedToCache = null;
-		maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
-		timeToLive = 60;
-		statsShortSamplingTimeInSeconds = 1;
-		stores = EhCacheStoresPercentageLoader.loadStoresPercentage();
-		transactionalMode = TransactionalMode.XA;
+		this.percentageAllowedToCache = 10;
+		this.maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
+		this.timeToLive = 60;
+		this.statsShortSamplingTimeInSeconds = 1;
 	}
 	
 	public TestingEhCacheConfiguration withPercentageAllowedToCache(Integer percentageAllowedToCache) {
@@ -91,15 +83,6 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 		return this;
 	}
 
-	public TestingEhCacheConfiguration withTransactionMode(TransactionalMode mode) {
-		this.transactionalMode = mode;
-		return this;
-	}
-
-	public Map<String, Percentage> getStores() {
-		return stores;
-	}
-	
 	@Override
 	public int maxMemoryInMB() {
 		return maxMemoryInMB;
@@ -107,11 +90,6 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 
 	@Override
 	public Percentage percentageAllowedToCache(String cacheName) {
-		Percentage defaultValue = stores.get(cacheName);
-		if (defaultValue != null) {
-			return defaultValue;
-		}
-		
 		if (percentageAllowedToCache == null) {
 			return Percentage.UNDEFINED;
 		}
@@ -125,7 +103,7 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 
 	@Override
 	public TransactionalMode transactionalMode() {
-		return transactionalMode;
+		return TransactionalMode.XA;
 	}
 	
 	@Override
