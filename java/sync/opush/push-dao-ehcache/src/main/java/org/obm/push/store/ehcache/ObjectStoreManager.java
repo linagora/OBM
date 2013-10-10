@@ -137,7 +137,7 @@ public class ObjectStoreManager implements LifecycleListener {
 			.maxEntriesLocalDisk(100000)
 			.overflowToDisk(true)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
-			.transactionalMode(ehCacheConfiguration.transactionalMode());
+			.transactionalMode(TransactionalMode.XA);
 		
 		Percentage percentageAllowedToCache = ehCacheConfiguration.percentageAllowedToCache(name);
 		if (percentageAllowedToCache.isDefined()) {

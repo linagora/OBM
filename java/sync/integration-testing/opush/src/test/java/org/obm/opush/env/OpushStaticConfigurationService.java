@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
-import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
-
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.SyncPermsConfigurationService;
@@ -107,11 +105,6 @@ public class OpushStaticConfigurationService extends StaticConfigurationService 
 		@Override
 		public long timeToLiveInSeconds() {
 			return configuration.timeToLiveInSeconds;
-		}
-
-		@Override
-		public TransactionalMode transactionalMode() {
-			return TransactionalMode.XA;
 		}
 	}
 }
