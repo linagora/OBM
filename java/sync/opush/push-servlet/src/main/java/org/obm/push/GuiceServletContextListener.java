@@ -48,7 +48,6 @@ import bitronix.tm.TransactionManagerServices;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Module;
 import com.google.inject.spi.Message;
 
 public class GuiceServletContextListener implements ServletContextListener { 
@@ -76,11 +75,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 	} 
 
 	private Injector createInjector() {
-		return Guice.createInjector(opushModule());
-	}
-
-	protected Module opushModule() {
-		return new OpushModule();
+		return Guice.createInjector(new OpushModule());
 	}
 
     private void failStartup(String message) { 
@@ -97,9 +92,9 @@ public class GuiceServletContextListener implements ServletContextListener {
     	TransactionManagerServices.getTransactionManager().shutdown();
 	}
 
-	private void migrateEhCache() {
-		injector = EhCacheMigrationInjector.createMigrationInjector(opushModule());
+    private void migrateEhCache() {
+		injector = EhCacheMigrationInjector.createMigrationInjector();
 		injector.getInstance(MigrationServiceImpl.class).migrate();
 		shutdown();
-	}
+    }
 }

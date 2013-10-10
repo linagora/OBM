@@ -67,9 +67,9 @@ import com.google.inject.util.Modules;
 public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	protected final ClassToInstanceAgregateView<Object> mockMap;
-	protected final IMocksControl mocksControl;
-	protected final Configuration configuration;
+	private final ClassToInstanceAgregateView<Object> mockMap;
+	private final IMocksControl mocksControl;
+	private final Configuration configuration;
 	private final TransactionConfiguration transactionConfiguration;
 	
 	public AbstractOpushEnv() {

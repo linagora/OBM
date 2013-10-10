@@ -36,9 +36,9 @@ import org.obm.Configuration;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.guice.AbstractOverrideModule;
-import org.obm.opush.env.OpushStaticConfigurationService.EhCache;
 import org.obm.opush.env.OpushStaticConfigurationService.RemoteConsole;
 import org.obm.opush.env.OpushStaticConfigurationService.SyncPerms;
+import org.obm.opush.env.OpushStaticConfigurationService.EhCache;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfiguration;
 
