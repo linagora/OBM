@@ -68,7 +68,7 @@ public class SyncedCollectionDaoEhcacheImpl extends AbstractEhcacheDao implement
 		Key key = buildKey(credentials, device, collectionId);
 		Element element = store.get(key);
 		if (element != null) {
-			return (AnalysedSyncCollection) element.getObjectValue();
+			return (AnalysedSyncCollection) element.getValue();
 		} else {
 			return null;
 		}

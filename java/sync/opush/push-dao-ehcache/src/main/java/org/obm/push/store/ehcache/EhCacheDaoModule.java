@@ -38,10 +38,8 @@ import org.obm.push.store.SyncKeysDao;
 import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.store.WindowingDao;
-import org.obm.sync.LifecycleListener;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
 
 public class EhCacheDaoModule extends AbstractModule {
 
@@ -54,9 +52,6 @@ public class EhCacheDaoModule extends AbstractModule {
 		bind(SnapshotDao.class).to(SnapshotDaoEhcacheImpl.class);
 		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
 		bind(SyncKeysDao.class).to(SyncKeysDaoEhcacheImpl.class);
-
-		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		lifecycleListeners.addBinding().to(ObjectStoreManager.class);
 	}
 
 }

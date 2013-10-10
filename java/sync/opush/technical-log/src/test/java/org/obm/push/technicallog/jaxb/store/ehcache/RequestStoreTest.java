@@ -40,15 +40,12 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.util.List;
 
 import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
@@ -61,17 +58,6 @@ import org.obm.push.technicallog.jaxb.store.ehcache.RequestStore;
 public class RequestStoreTest {
 	
 	public final static String STORE_NAME = "request";
-	private CacheManager cacheManager;
-	
-	@Before
-	public void setUp() {
-		cacheManager = new CacheManager();
-	}
-	
-	@After
-	public void tearDown() {
-		cacheManager.shutdown();
-	}
 	
 	@Test
 	public void testGetRequest() throws Exception {
@@ -213,14 +199,13 @@ public class RequestStoreTest {
 
 	private Cache buildCache() {
 		Cache cache = new Cache(cacheConfigurationForRequest());
-		cache.setCacheManager(cacheManager);
 		cache.initialise();
 		return cache;
 	}
 	
 	private CacheConfiguration cacheConfigurationForRequest() {
 		return new CacheConfiguration()
-			.maxEntriesLocalHeap(0)
+			.maxElementsInMemory(0)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(TransactionalMode.OFF)
 			.eternal(false)

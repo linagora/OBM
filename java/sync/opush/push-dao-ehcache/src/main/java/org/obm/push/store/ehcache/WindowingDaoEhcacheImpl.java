@@ -90,7 +90,7 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 						ChunkKey chunkKey = new ChunkKey(key, index.getIndex());
 						Element emailChanges = chunksStore.get(chunkKey);
 						chunksStore.remove(chunkKey);
-						return (EmailChanges) emailChanges.getObjectValue();
+						return (EmailChanges) emailChanges.getValue();
 					}
 
 					private void udpateIndex(final WindowingIndexKey key, WindowingIndex index) {
@@ -146,7 +146,7 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 	
 	private WindowingIndex getWindowingIndex(WindowingIndexKey key) {
 		Element indexElement = indexStore.get(key);
-		return (WindowingIndex) (indexElement != null ? indexElement.getObjectValue() : null);
+		return (WindowingIndex) (indexElement != null ? indexElement.getValue() : null);
 	}
 
 	@Override

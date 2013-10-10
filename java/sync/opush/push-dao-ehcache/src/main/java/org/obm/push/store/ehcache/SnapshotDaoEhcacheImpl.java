@@ -72,7 +72,7 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 		Element element = store.get(key);
 		logger.debug("Get snapshot with key {} : {}", key, element);
 		if (element != null) {
-			return (Snapshot) element.getObjectValue();
+			return (Snapshot) element.getValue();
 		}
 		return null;
 	}

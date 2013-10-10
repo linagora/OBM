@@ -64,7 +64,7 @@ public class MonitoredCollectionDaoEhcacheImpl extends AbstractEhcacheDao implem
 		Key key = buildKey(credentials, device);
 		Element element = store.get(key);
 		if (element != null) {
-			return (Set<AnalysedSyncCollection>) element.getObjectValue();
+			return (Set<AnalysedSyncCollection>) element.getValue();
 		} else {
 			return ImmutableSet.<AnalysedSyncCollection>of();
 		}
