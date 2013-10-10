@@ -139,31 +139,6 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 			public long timeToLiveInSeconds() {
 				return 60;
 			}
-			
-			@Override
-			public int statsSampleToRecordCount() {
-				return 10;
-			}
-
-			@Override
-			public int statsShortSamplingTimeInSeconds() {
-				return 1;
-			}
-			
-			@Override
-			public int statsMediumSamplingTimeInSeconds() {
-				return 10;
-			}
-			
-			@Override
-			public int statsLongSamplingTimeInSeconds() {
-				return 60;
-			}
-
-			@Override
-			public int statsSamplingTimeStopInMinutes() {
-				return 10;
-			}
 		};
 	}
 	

@@ -38,8 +38,6 @@ import com.google.common.base.Preconditions;
 
 public interface EhCacheConfiguration {
 
-	static final int STATS_SAMPLING_IN_SECONDS = 1; 
-	
 	/**
 	 * @return Global ehcache heap memory allowed
 	 */
@@ -51,31 +49,6 @@ public interface EhCacheConfiguration {
 	Percentage percentageAllowedToCache(String cacheName);
 	long timeToLiveInSeconds();
 	TransactionalMode transactionalMode();
-	
-	/**
-	 * @return maximum history sample size to record
-	 */
-	int statsSampleToRecordCount();
-
-	/**
-	 * @return number of seconds taken by the short statistics sample
-	 */
-	int statsShortSamplingTimeInSeconds();
-
-	/**
-	 * @return number of seconds taken by the medium statistics sample
-	 */
-	int statsMediumSamplingTimeInSeconds();
-	
-	/**
-	 * @return number of seconds taken by the long statistics sample
-	 */
-	int statsLongSamplingTimeInSeconds();
-
-	/**
-	 * @return number of minutes until statistics sampling stop
-	 */
-	int statsSamplingTimeStopInMinutes();
 	
 	public static class Percentage {
 
@@ -99,12 +72,6 @@ public interface EhCacheConfiguration {
 		public String get() {
 			Preconditions.checkState(isDefined(), "cannot call get() on undefined percentage");
 			return String.valueOf(percentage) + "%";
-		}
-		
-		public int applyTo(int to) {
-			Preconditions.checkState(isDefined(), "undefined percentage");
-			Preconditions.checkArgument(to >= 0, "must be a positive value");
-			return Math.round((to / 100f) * percentage);
 		}
 
 		

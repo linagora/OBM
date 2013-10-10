@@ -46,11 +46,6 @@ public class Configuration {
 		public int maxMemoryInMB = 10;
 		public int timeToLiveInSeconds = 60;
 		public Integer percentageAllowedToCache = null;
-		public int statsSampleToRecordCount = 10;
-		public int statsShortSamplingTimeInSeconds = 1;
-		public int statsMediumSamplingTimeInSeconds = 10;
-		public int statsLongSamplingTimeInSeconds = 60;
-		public int statsSamplingTimeStopInMinutes = 10;
 	}
 	
 	public static class SyncPerms {
