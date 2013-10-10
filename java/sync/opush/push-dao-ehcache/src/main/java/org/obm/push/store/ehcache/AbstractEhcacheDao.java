@@ -35,10 +35,10 @@ import net.sf.ehcache.Cache;
 
 public abstract class AbstractEhcacheDao {
 	
-	protected final StoreManager objectStoreManager;
+	protected final ObjectStoreManager objectStoreManager;
 	protected final Cache store;
 	
-	protected AbstractEhcacheDao(StoreManager objectStoreManager) {
+	protected AbstractEhcacheDao(ObjectStoreManager objectStoreManager) {
 		this.objectStoreManager = objectStoreManager;
 		this.store = this.objectStoreManager.getStore( getStoreName() );
 	}

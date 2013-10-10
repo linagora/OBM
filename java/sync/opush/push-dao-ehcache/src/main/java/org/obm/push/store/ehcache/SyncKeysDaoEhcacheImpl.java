@@ -47,13 +47,13 @@ import com.google.inject.Singleton;
 @Singleton
 public class SyncKeysDaoEhcacheImpl extends AbstractEhcacheDao implements SyncKeysDao {
 
-	@Inject SyncKeysDaoEhcacheImpl(StoreManager objectStoreManager) {
+	@Inject  SyncKeysDaoEhcacheImpl(ObjectStoreManager objectStoreManager) {
 		super(objectStoreManager);
 	}
 	
 	@Override
 	protected String getStoreName() {
-		return EhCacheStores.SYNC_KEYS_STORE;
+		return ObjectStoreManager.SYNC_KEYS_STORE;
 	}
 
 	@Override
