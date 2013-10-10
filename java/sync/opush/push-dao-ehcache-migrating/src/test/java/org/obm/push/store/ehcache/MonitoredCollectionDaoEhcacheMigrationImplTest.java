@@ -41,7 +41,6 @@ import net.sf.ehcache.migrating.Element;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -59,7 +58,6 @@ import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableSet;
 
-@Ignore
 @RunWith(SlowFilterRunner.class) @Slow
 public class MonitoredCollectionDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 

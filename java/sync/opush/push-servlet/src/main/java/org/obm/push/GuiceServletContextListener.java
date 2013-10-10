@@ -68,6 +68,7 @@ public class GuiceServletContextListener implements ServletContextListener {
 			XTrustProvider.install();
 			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
 			
+			
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			failStartup(e.getMessage());
@@ -91,10 +92,10 @@ public class GuiceServletContextListener implements ServletContextListener {
     	LifecycleListenerHelper.shutdownListeners(injector);
     	TransactionManagerServices.getTransactionManager().shutdown();
 	}
-
-    private void migrateEhCache() {
+    
+	private void migrateEhCache() {
 		injector = EhCacheMigrationInjector.createMigrationInjector();
 		injector.getInstance(MigrationServiceImpl.class).migrate();
 		shutdown();
-    }
+	}
 }

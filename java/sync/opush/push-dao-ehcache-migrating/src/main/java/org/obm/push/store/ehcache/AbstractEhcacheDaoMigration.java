@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.io.File;
+import java.io.Serializable;
 import java.util.List;
 
 import net.sf.ehcache.migrating.Cache;
@@ -53,29 +53,11 @@ public abstract class AbstractEhcacheDaoMigration {
 		return store.getKeys();
 	}
 	
-	public Element get(Object key) {
+	public Element get(Serializable key) {
 		return store.get(key);
 	}
-
-	public void remove(Object key) {
-		store.remove(key);
-	}
 	
-	public boolean hasElementToMigrate() {
-		return !store.getKeys().isEmpty();
-	}
-
-	public File destroyMigrationData() {
-		File dataDiskFile = new File(store.getCacheManager().getDiskStorePath() + File.separatorChar + getStoreName() + ".data");
-		File indexDiskFile = new File(store.getCacheManager().getDiskStorePath() + File.separatorChar + getStoreName() + ".index");
-		if (indexDiskFile.delete()) {
-			if (dataDiskFile.delete()) {
-			} else {
-				throw new IllegalStateException("Could not delete migration data file: " + dataDiskFile.getAbsolutePath());
-			}
-		} else {
-			throw new IllegalStateException("Could not delete migration index file: " + indexDiskFile.getAbsolutePath());
-		}
-		return dataDiskFile;
+	public void remove(Serializable key) {
+		store.remove(key);
 	}
 }
