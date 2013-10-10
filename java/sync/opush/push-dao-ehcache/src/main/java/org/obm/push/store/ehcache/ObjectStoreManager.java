@@ -134,7 +134,7 @@ public class ObjectStoreManager implements LifecycleListener {
 	private CacheConfiguration defaultCacheConfiguration(String name) {
 		CacheConfiguration cacheConfiguration = new CacheConfiguration()
 			.name(name)
-			.maxEntriesLocalDisk(UNLIMITED_CACHE_MEMORY)
+			.maxEntriesLocalDisk(100000)
 			.overflowToDisk(true)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(ehCacheConfiguration.transactionalMode());
