@@ -5,12 +5,6 @@ import net.sf.ehcache.store.StoreOperationOutcomes.GetOutcome
 @Usage("Ehcache commands")
 class ehcache extends CRaSHCommand {
 
-  @Usage("Internal usage")
-  @Command
-  public Date date() {
-     return new Date()
-  }
-
   @Usage("Show ehcache dashboard")
   @Command
   public void dashboard() {
@@ -27,7 +21,7 @@ class ehcache extends CRaSHCommand {
                             row() {
                                 label("Refreshing each " + config.statsShortSamplingTimeInSeconds() + " second(s), last refresh at ")
                                 eval {
-                                   execute("ehcache date")
+                                   execute("date")
                                 }
                             }
                         }
