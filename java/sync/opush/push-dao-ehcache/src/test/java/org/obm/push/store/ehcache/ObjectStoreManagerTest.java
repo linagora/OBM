@@ -90,7 +90,7 @@ public class ObjectStoreManagerTest {
 
 	@Test
 	public void loadStores() {
-		assertThat(opushCacheManager.listStores()).hasSize(7);
+		assertThat(opushCacheManager.listStores()).hasSize(8);
 	}
 	
 	@Test
@@ -104,7 +104,7 @@ public class ObjectStoreManagerTest {
 		assertThat(opushCacheManager.getStore("test 1")).isNotNull();
 		assertThat(opushCacheManager.getStore("test 3")).isNotNull();
 		assertThat(opushCacheManager.getStore("test 2")).isNull();
-		assertThat(opushCacheManager.listStores()).hasSize(9);
+		assertThat(opushCacheManager.listStores()).hasSize(10);
 	}
 	
 	@Test
@@ -121,6 +121,6 @@ public class ObjectStoreManagerTest {
 		opushCacheManager.createNewStore("test 1");
 		
 		assertThat(opushCacheManager.getStore("test 1")).isNotNull();
-		assertThat(opushCacheManager.listStores()).hasSize(8);
+		assertThat(opushCacheManager.listStores()).hasSize(9);
 	}
 }

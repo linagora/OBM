@@ -60,7 +60,6 @@ public class EhCacheDaoModule extends AbstractModule {
 
 		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
 		lifecycleListeners.addBinding().to(ObjectStoreManager.class);
-		lifecycleListeners.addBinding().to(NonTransactionalObjectStoreManager.class);
 	}
 
 }

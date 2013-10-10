@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.obm.push.ContinuationTransactionMap;
@@ -41,13 +40,16 @@ import org.obm.push.bean.Device;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 
-public class ContinuationTransactionMapImpl<T> implements ContinuationTransactionMap<T> {
+public class ContinuationTransactionMapImpl<T> extends AbstractEhcacheDao implements ContinuationTransactionMap<T> {
 
-	protected final Cache store;
-	
 	@Inject  
-	@VisibleForTesting ContinuationTransactionMapImpl(NonTransactionalObjectStoreManager nonTransactionalObjectStoreManager) {
-		store = nonTransactionalObjectStoreManager.getStore(NonTransactionalObjectStoreManager.PENDING_CONTINUATIONS);
+	@VisibleForTesting ContinuationTransactionMapImpl(ObjectStoreManager objectStoreManager) {
+		super(objectStoreManager);
+	}
+
+	@Override
+	protected String getStoreName() {
+		return ObjectStoreManager.PENDING_CONTINUATIONS;
 	}
 	
 	@Override

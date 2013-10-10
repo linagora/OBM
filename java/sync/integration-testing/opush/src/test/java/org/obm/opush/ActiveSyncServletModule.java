@@ -51,8 +51,6 @@ import org.obm.push.OpushModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.LifecycleListenerHelper;
 
-import bitronix.tm.TransactionManagerServices;
-
 import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -132,7 +130,6 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 				@Override
 				public void contextDestroyed(ServletContextEvent sce) {
 					LifecycleListenerHelper.shutdownListeners(injector);
-					TransactionManagerServices.getTransactionManager().shutdown();
 				}
 			};
 		}
