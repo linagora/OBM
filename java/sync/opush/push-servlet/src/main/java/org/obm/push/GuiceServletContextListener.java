@@ -37,7 +37,6 @@ import java.util.TimeZone;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.obm.push.store.ehcache.MigrationServiceImpl;
 import org.obm.sync.LifecycleListenerHelper;
 import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
@@ -64,8 +63,6 @@ public class GuiceServletContextListener implements ServletContextListener {
 			} 
 			XTrustProvider.install();
 			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-			
-			migrateEhCache();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			failStartup(e.getMessage());
@@ -84,8 +81,5 @@ public class GuiceServletContextListener implements ServletContextListener {
     	LifecycleListenerHelper.shutdownListeners(injector);
     	TransactionManagerServices.getTransactionManager().shutdown();
     }
-    
-    private void migrateEhCache() {
-    	injector.getInstance(MigrationServiceImpl.class).migrate();
-    }
+
 }

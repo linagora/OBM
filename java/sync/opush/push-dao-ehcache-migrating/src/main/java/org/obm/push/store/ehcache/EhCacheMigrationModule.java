@@ -40,8 +40,6 @@ public class EhCacheMigrationModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind(MigrationService.class).to(MigrationServiceImpl.class);
-		
 		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
 		lifecycleListeners.addBinding().to(ObjectStoreManagerMigration.class);
 	}
