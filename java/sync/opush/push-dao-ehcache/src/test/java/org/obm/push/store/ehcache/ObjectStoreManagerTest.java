@@ -37,6 +37,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.IOException;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.Element;
+
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -53,6 +56,8 @@ import org.slf4j.LoggerFactory;
 
 import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
+
+import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class ObjectStoreManagerTest {
@@ -86,6 +91,43 @@ public class ObjectStoreManagerTest {
 	public void shutdown() {
 		opushCacheManager.shutdown();
 		transactionManager.shutdown();
+	}
+
+	@Test
+	public void persistentCachesAreRestoredAfterRestart() throws Exception {
+		Element el1 = new Element("key1", "value1");
+		Element el2 = new Element("key2", "value2");
+		Iterable<String> persistentStoreNames = ImmutableList.of(
+				ObjectStoreManager.SYNCED_COLLECTION_STORE,
+				ObjectStoreManager.MONITORED_COLLECTION_STORE,
+				ObjectStoreManager.SYNCED_COLLECTION_STORE,
+				ObjectStoreManager.UNSYNCHRONIZED_ITEM_STORE,
+				ObjectStoreManager.MAIL_SNAPSHOT_STORE,
+				ObjectStoreManager.MAIL_WINDOWING_INDEX_STORE,
+				ObjectStoreManager.MAIL_WINDOWING_CHUNKS_STORE,
+				ObjectStoreManager.SYNC_KEYS_STORE);
+
+		TransactionManagerServices.getTransactionManager().begin();
+		for (String persistentStoreName : persistentStoreNames) {
+			Cache cache = opushCacheManager.createNewStore(persistentStoreName);
+			cache.put(el1);
+			cache.put(el2);
+		}
+		TransactionManagerServices.getTransactionManager().commit();
+		TransactionManagerServices.getTransactionManager().shutdown();
+		opushCacheManager.shutdown();
+
+		TransactionManagerServices.getTransactionManager().begin();
+		ObjectStoreManager newCacheManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+		for (String persistentStoreName : persistentStoreNames) {
+			Cache loadedCache = newCacheManager.createNewStore(persistentStoreName);
+			assertThat(loadedCache.get(el1.getObjectKey())).isEqualTo(el1);
+			assertThat(loadedCache.get(el2.getObjectKey())).isEqualTo(el2);
+		}
+		
+		TransactionManagerServices.getTransactionManager().commit();
+		TransactionManagerServices.getTransactionManager().shutdown();
+		newCacheManager.shutdown();
 	}
 
 	@Test
@@ -123,4 +165,5 @@ public class ObjectStoreManagerTest {
 		assertThat(opushCacheManager.getStore("test 1")).isNotNull();
 		assertThat(opushCacheManager.listStores()).hasSize(9);
 	}
+
 }
