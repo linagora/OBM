@@ -190,7 +190,7 @@ public class EhCacheSettingsTest {
 	public void testTimeToLiveStillAlive() throws Exception {
 		TestingEhCacheConfiguration config = new TestingEhCacheConfiguration()
 			.withTimeToLive(1);
-
+		
 		ObjectStoreManager cacheManager = 
 				new ObjectStoreManager(configurationService, config, logger, transactionProvider);
 	
