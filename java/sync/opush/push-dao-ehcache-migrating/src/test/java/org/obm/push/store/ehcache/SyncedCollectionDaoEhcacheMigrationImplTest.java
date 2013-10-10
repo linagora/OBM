@@ -36,6 +36,10 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
+
 import net.sf.ehcache.migrating.Element;
 
 import org.easymock.EasyMock;
@@ -45,7 +49,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -56,15 +59,20 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl.Key;
 import org.slf4j.Logger;
 
+import bitronix.tm.TransactionManagerServices;
+
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncedCollectionDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManagerMigration objectStoreManagerMigration;
 	private SyncedCollectionDaoEhcacheMigrationImpl syncedCollectionDaoEhcacheMigrationImpl;
 	private Credentials credentials;
+	private TransactionManager transactionManager;
 	
 	@Before
-	public void init() throws IOException {
+	public void init() throws NotSupportedException, SystemException, IOException {
+		this.transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
 		this.syncedCollectionDaoEhcacheMigrationImpl = new SyncedCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
@@ -73,8 +81,10 @@ public class SyncedCollectionDaoEhcacheMigrationImplTest extends StoreManagerCon
 	}
 	
 	@After
-	public void cleanup() throws IllegalStateException, SecurityException {
+	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
+		transactionManager.rollback();
 		objectStoreManagerMigration.shutdown();
+		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 //	Credentials credentials, Device device, AnalysedSyncCollection collection
@@ -130,6 +140,6 @@ public class SyncedCollectionDaoEhcacheMigrationImplTest extends StoreManagerCon
 	}
 	
 	private Device getFakeDeviceId(){
-		return new Device(1, "DevType", new DeviceId("DevId"), null, ProtocolVersion.V121);
+		return new Device(1, "DevType", new DeviceId("DevId"), null, null);
 	}
 }

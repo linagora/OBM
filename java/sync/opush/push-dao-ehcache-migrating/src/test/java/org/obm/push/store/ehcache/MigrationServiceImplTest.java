@@ -55,12 +55,16 @@ import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bitronix.tm.BitronixTransactionManager;
+import bitronix.tm.TransactionManagerServices;
+
 @RunWith(SlowFilterRunner.class) @Slow
 public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 
 	private Logger logger;
 	private ObjectStoreManagerMigration objectStoreManagerMigration;
 	private ObjectStoreManager objectStoreManager;
+	private BitronixTransactionManager transactionManager;
 	private MigrationServiceImpl migrationServiceImpl;
 	private MonitoredCollectionDaoEhcacheMigrationImpl monitoredCollectionDaoEhcacheMigrationImpl;
 	private MonitoredCollectionDaoEhcacheImpl monitoredCollectionDaoEhcacheImpl;
@@ -84,11 +88,12 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	public void init() throws Exception {
 		logger = LoggerFactory.getLogger(getClass());
 		ConfigurationService configurationService = initConfigurationServiceMock();
-		EhCacheConfiguration config = buildNonTransactionalConfig();
+		EhCacheConfiguration config = buildConfig();
 		
 		IMocksControl control = createControl();
 		TransactionProvider transactionProvider = control.createMock(TransactionProvider.class);
-		expect(transactionProvider.get()).andReturn(null).anyTimes();
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		expect(transactionProvider.get()).andReturn(transactionManager).anyTimes();
 		control.replay();
 		
 		copyCacheFilesInTemporaryFolder();
@@ -108,6 +113,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		windowingDaoChunkEhcacheMigrationImpl = new WindowingDaoChunkEhcacheMigrationImpl(objectStoreManagerMigration);
 		windowingDaoIndexEhcacheMigrationImpl = new WindowingDaoIndexEhcacheMigrationImpl(objectStoreManagerMigration);
 		windowingDaoEhcacheImpl = new WindowingDaoEhcacheImpl(objectStoreManager);
+		transactionManager.begin();
 		
 		migrationServiceImpl = new MigrationServiceImpl(monitoredCollectionDaoEhcacheMigrationImpl, monitoredCollectionDaoEhcacheImpl,
 				snapshotDaoEhcacheMigrationImpl, snapshotDaoEhcacheImpl,
@@ -117,14 +123,9 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 				windowingDaoChunkEhcacheMigrationImpl, windowingDaoIndexEhcacheMigrationImpl, windowingDaoEhcacheImpl);
 	}
 	
-	private EhCacheConfiguration buildNonTransactionalConfig() {
+	private EhCacheConfiguration buildConfig() {
 		return new EhCacheConfiguration() {
 
-			@Override
-			public TransactionalMode transactionalMode() {
-				return TransactionalMode.OFF;
-			}
-			
 			@Override
 			public int maxMemoryInMB() {
 				return 10;
@@ -138,6 +139,11 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 			@Override
 			public long timeToLiveInSeconds() {
 				return 60;
+			}
+
+			@Override
+			public TransactionalMode transactionalMode() {
+				return TransactionalMode.XA;
 			}
 		};
 	}
@@ -165,7 +171,9 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	}
 
 	@After
-	public void shutdown() {
+	public void shutdown() throws Exception {
+		transactionManager.rollback();
+		transactionManager.shutdown();
 		objectStoreManagerMigration.shutdown();
 		objectStoreManager.shutdown();
 	}
@@ -184,7 +192,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	public void testMigrateSnapshot() {
 		int expectedSize = snapshotDaoEhcacheMigrationImpl.getKeys().size();
 		
-		migrationServiceImpl.migrateSnapshot();
+		migrationServiceImpl.migrateSnashot();
 		
 		assertThat(snapshotDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
 		assertThat(snapshotDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(0);

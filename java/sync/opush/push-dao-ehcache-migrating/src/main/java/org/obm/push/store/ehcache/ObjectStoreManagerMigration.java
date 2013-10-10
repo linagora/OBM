@@ -100,7 +100,7 @@ public class ObjectStoreManagerMigration implements LifecycleListener {
 			.maxElementsOnDisk(100000)
 			.overflowToDisk(true)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
-			.transactionalMode(TransactionalMode.OFF);
+			.transactionalMode(TransactionalMode.XA);
 	}
 	
 	private CacheConfiguration eternal(CacheConfiguration configuration, boolean eternal) {

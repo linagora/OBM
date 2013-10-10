@@ -36,6 +36,10 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
+
 import net.sf.ehcache.migrating.Element;
 
 import org.easymock.EasyMock;
@@ -51,15 +55,20 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.Snapshot;
 import org.slf4j.Logger;
 
+import bitronix.tm.TransactionManagerServices;
+
 @RunWith(SlowFilterRunner.class) @Slow
 public class SnapshotDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
 	private ObjectStoreManagerMigration objectStoreManagerMigration;
 	private SnapshotDaoEhcacheMigrationImpl snapshotDaoEhcacheMigrationImpl;
+	private TransactionManager transactionManager;
 	private DeviceId deviceId;
 	
 	@Before
-	public void init() throws IOException {
+	public void init() throws NotSupportedException, SystemException, IOException {
+		this.transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
 		this.snapshotDaoEhcacheMigrationImpl = new SnapshotDaoEhcacheMigrationImpl(objectStoreManagerMigration);
@@ -67,8 +76,10 @@ public class SnapshotDaoEhcacheMigrationImplTest extends StoreManagerConfigurati
 	}
 	
 	@After
-	public void cleanup() throws IllegalStateException, SecurityException {
+	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
+		transactionManager.rollback();
 		objectStoreManagerMigration.shutdown();
+		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

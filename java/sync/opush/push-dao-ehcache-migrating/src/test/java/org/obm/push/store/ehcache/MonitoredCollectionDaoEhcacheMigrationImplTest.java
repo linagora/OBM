@@ -36,6 +36,10 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
+
 import net.sf.ehcache.migrating.Element;
 
 import org.easymock.EasyMock;
@@ -45,7 +49,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -56,6 +59,8 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl.Key;
 import org.slf4j.Logger;
 
+import bitronix.tm.TransactionManagerServices;
+
 import com.google.common.collect.ImmutableSet;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -64,9 +69,12 @@ public class MonitoredCollectionDaoEhcacheMigrationImplTest extends StoreManager
 	private ObjectStoreManagerMigration objectStoreManagerMigration;
 	private MonitoredCollectionDaoEhcacheMigrationImpl monitoredCollectionStoreServiceMigrationImpl;
 	private Credentials credentials;
+	private TransactionManager transactionManager;
 	
 	@Before
-	public void init() throws IOException {
+	public void init() throws NotSupportedException, SystemException, IOException {
+		this.transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
 		this.monitoredCollectionStoreServiceMigrationImpl = new MonitoredCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
@@ -75,8 +83,10 @@ public class MonitoredCollectionDaoEhcacheMigrationImplTest extends StoreManager
 	}
 	
 	@After
-	public void cleanup() throws IllegalStateException, SecurityException {
+	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
+		transactionManager.rollback();
 		objectStoreManagerMigration.shutdown();
+		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test
@@ -131,6 +141,6 @@ public class MonitoredCollectionDaoEhcacheMigrationImplTest extends StoreManager
 	}
 	
 	private Device getFakeDeviceId(){
-		return new Device(1, "DevType", new DeviceId("DevId"), null, ProtocolVersion.V121);
+		return new Device(1, "DevType", new DeviceId("DevId"), null, null);
 	}
 }

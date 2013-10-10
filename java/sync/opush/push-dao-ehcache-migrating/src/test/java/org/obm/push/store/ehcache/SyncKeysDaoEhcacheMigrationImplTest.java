@@ -37,6 +37,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+
 import net.sf.ehcache.migrating.Element;
 
 import org.easymock.EasyMock;
@@ -54,6 +57,9 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncKeysKey;
 import org.slf4j.Logger;
 
+import bitronix.tm.BitronixTransactionManager;
+import bitronix.tm.TransactionManagerServices;
+
 import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -64,9 +70,12 @@ public class SyncKeysDaoEhcacheMigrationImplTest {
 	
 	private ObjectStoreManagerMigration objectStoreManagerMigration;
 	private SyncKeysDaoEhcacheMigrationImpl syncKeysDaoEhcacheMigrationImpl;
+	private BitronixTransactionManager transactionManager;
 	
 	@Before
-	public void init() throws IOException {
+	public void init() throws NotSupportedException, SystemException, IOException {
+		transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		objectStoreManagerMigration = new ObjectStoreManagerMigration(initConfigurationServiceMock(), logger);
 		syncKeysDaoEhcacheMigrationImpl = new SyncKeysDaoEhcacheMigrationImpl(objectStoreManagerMigration);
@@ -83,8 +92,10 @@ public class SyncKeysDaoEhcacheMigrationImplTest {
 	}
 	
 	@After
-	public void cleanup() throws IllegalStateException, SecurityException {
+	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
+		transactionManager.rollback();
 		objectStoreManagerMigration.shutdown();
+		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

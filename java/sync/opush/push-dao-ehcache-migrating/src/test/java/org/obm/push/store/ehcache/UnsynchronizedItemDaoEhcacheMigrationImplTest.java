@@ -36,6 +36,10 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.List;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
+
 import net.sf.ehcache.migrating.Element;
 
 import org.easymock.EasyMock;
@@ -50,6 +54,8 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl.Key_2_4_2_4;
 import org.slf4j.Logger;
 
+import bitronix.tm.TransactionManagerServices;
+
 import com.google.common.collect.ImmutableSet;
 
 @RunWith(SlowFilterRunner.class) @Slow
@@ -57,17 +63,22 @@ public class UnsynchronizedItemDaoEhcacheMigrationImplTest extends StoreManagerC
 
 	private ObjectStoreManagerMigration objectStoreManagerMigration;
 	private UnsynchronizedItemDaoEhcacheMigrationImpl unsynchronizedItemDaoEhcacheMigrationImpl;
+	private TransactionManager transactionManager;
 	
 	@Before
-	public void init() throws IOException {
+	public void init() throws NotSupportedException, SystemException, IOException {
+		this.transactionManager = TransactionManagerServices.getTransactionManager();
+		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
 		this.unsynchronizedItemDaoEhcacheMigrationImpl = new UnsynchronizedItemDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 	}
 	
 	@After
-	public void cleanup() throws IllegalStateException, SecurityException {
+	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
+		transactionManager.rollback();
 		objectStoreManagerMigration.shutdown();
+		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test
