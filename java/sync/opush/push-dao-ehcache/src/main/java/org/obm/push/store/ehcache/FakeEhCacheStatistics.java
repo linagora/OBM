@@ -31,6 +31,26 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-public class StatisticsNotAvailableException extends Exception {
+public class FakeEhCacheStatistics implements EhCacheStatistics {
+
+	@Override
+	public int shortTimeDiskGets(String storeName) throws StatisticsNotAvailableException {
+		return 1;
+	}
+
+	@Override
+	public int mediumTimeDiskGets(String storeName) throws StatisticsNotAvailableException {
+		return 5;
+	}
+
+	@Override
+	public int longTimeDiskGets(String storeName) throws StatisticsNotAvailableException {
+		throw new StatisticsNotAvailableException();
+	}
+
+	@Override
+	public int memorySizeInBytes(String storeName) {
+		return 600000;
+	}
 
 }
