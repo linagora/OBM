@@ -61,14 +61,14 @@ import org.slf4j.Logger;
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncedCollectionDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
-	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
+	private ObjectStoreManagerMigration objectStoreManagerMigration;
 	private SyncedCollectionDaoEhcacheMigrationImpl syncedCollectionDaoEhcacheMigrationImpl;
 	private Credentials credentials;
 	
 	@Before
 	public void init() throws IOException {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
 		this.syncedCollectionDaoEhcacheMigrationImpl = new SyncedCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");

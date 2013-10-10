@@ -38,12 +38,12 @@ import com.google.inject.Singleton;
 public class MonitoredCollectionDaoEhcacheMigrationImpl extends AbstractEhcacheDaoMigration {
 
 	@Inject  MonitoredCollectionDaoEhcacheMigrationImpl(
-			MigrationSourceObjectStoreManager objectStoreManagerMigration) {
+			ObjectStoreManagerMigration objectStoreManagerMigration) {
 		super(objectStoreManagerMigration);
 	}
 
 	@Override
 	protected String getStoreName() {
-		return MigrationSourceObjectStoreManager.MONITORED_COLLECTION_STORE;
+		return ObjectStoreManagerMigration.MONITORED_COLLECTION_STORE;
 	}
 }

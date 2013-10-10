@@ -37,12 +37,12 @@ import com.google.inject.Singleton;
 @Singleton
 public class SyncKeysDaoEhcacheMigrationImpl extends AbstractEhcacheDaoMigration {
 
-	@Inject  SyncKeysDaoEhcacheMigrationImpl(MigrationSourceObjectStoreManager objectStoreManager) {
+	@Inject  SyncKeysDaoEhcacheMigrationImpl(ObjectStoreManagerMigration objectStoreManager) {
 		super(objectStoreManager);
 	}
 	
 	@Override
 	protected String getStoreName() {
-		return MigrationSourceObjectStoreManager.SYNC_KEYS_STORE;
+		return ObjectStoreManagerMigration.SYNC_KEYS_STORE;
 	}
 }

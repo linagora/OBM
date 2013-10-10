@@ -107,11 +107,6 @@ public class OpushStaticConfigurationService extends StaticConfigurationService 
 		public Percentage percentageAllowedToCache(String cacheName) {
 			return Objects.firstNonNull(percentageByStoreMap.get(cacheName), Percentage.UNDEFINED);
 		}
-		
-		@Override
-		public Map<String, Percentage> percentageAllowedToCaches() {
-			return percentageByStoreMap;
-		}
 
 		@Override
 		public long timeToLiveInSeconds() {

@@ -46,8 +46,6 @@ import org.obm.push.mail.WindowingService;
 import org.obm.push.mail.WindowingServiceImpl;
 import org.obm.push.store.WindowingDao;
 import org.obm.push.store.ehcache.EhCacheConfiguration;
-import org.obm.push.store.ehcache.ObjectStoreManager;
-import org.obm.push.store.ehcache.StoreManager;
 import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +73,6 @@ public class WindowingModule extends AbstractModule {
 		bind(WindowingService.class).to(WindowingServiceImpl.class);
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(configurationLogger);
 		bind(EhCacheConfiguration.class).toInstance(new EhCache(configuration.ehCache));
-		bind(StoreManager.class).to(ObjectStoreManager.class);
 	}		
 
 	protected Configuration configuration() {

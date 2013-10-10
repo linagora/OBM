@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
 public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 
 	private Logger logger;
-	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
+	private ObjectStoreManagerMigration objectStoreManagerMigration;
 	private ObjectStoreManager objectStoreManager;
 	private MigrationServiceImpl migrationServiceImpl;
 	private MonitoredCollectionDaoEhcacheMigrationImpl monitoredCollectionDaoEhcacheMigrationImpl;
@@ -92,7 +92,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		control.replay();
 		
 		copyCacheFilesInTemporaryFolder();
-		objectStoreManagerMigration = new MigrationSourceObjectStoreManager(configurationService, logger);
+		objectStoreManagerMigration = new ObjectStoreManagerMigration(configurationService, logger);
 		objectStoreManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
 		
 		monitoredCollectionDaoEhcacheMigrationImpl = new MonitoredCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
@@ -155,8 +155,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	public void testMigrateMonitoredCollection() {
 		int expectedSize = monitoredCollectionDaoEhcacheMigrationImpl.getKeys().size();
 		
-		migrationServiceImpl.migrateCache(
-				monitoredCollectionDaoEhcacheMigrationImpl, monitoredCollectionDaoEhcacheImpl.getStore());
+		migrationServiceImpl.migrateMonitoredCollection();
 		
 		assertThat(monitoredCollectionDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
 		assertThat(monitoredCollectionDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
@@ -165,9 +164,8 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	@Test
 	public void testMigrateSnapshot() {
 		int expectedSize = snapshotDaoEhcacheMigrationImpl.getKeys().size();
-
-		migrationServiceImpl.migrateCache(
-				snapshotDaoEhcacheMigrationImpl, snapshotDaoEhcacheImpl.getStore());
+		
+		migrationServiceImpl.migrateSnapshot();
 		
 		assertThat(snapshotDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
 		assertThat(snapshotDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
@@ -176,9 +174,8 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	@Test
 	public void testMigrateSyncedCollection() {
 		int expectedSize = syncedCollectionDaoEhcacheMigrationImpl.getKeys().size();
-
-		migrationServiceImpl.migrateCache(
-				syncedCollectionDaoEhcacheMigrationImpl, syncedCollectionDaoEhcacheImpl.getStore());
+		
+		migrationServiceImpl.migrateSyncedCollection();
 		
 		assertThat(syncedCollectionDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
 		assertThat(syncedCollectionDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
@@ -187,9 +184,8 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	@Test
 	public void testMigrateSyncKeys() {
 		int expectedSize = syncKeysDaoEhcacheMigrationImpl.getKeys().size();
-
-		migrationServiceImpl.migrateCache(
-				syncKeysDaoEhcacheMigrationImpl, syncKeysDaoEhcacheImpl.getStore());
+		
+		migrationServiceImpl.migrateSyncKeys();
 		
 		assertThat(syncKeysDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
 		assertThat(syncKeysDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
@@ -198,9 +194,8 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	@Test
 	public void testMigrateUnsynchronizedItem() {
 		int expectedSize = unsynchronizedItemDaoEhcacheMigrationImpl.getKeys().size();
-
-		migrationServiceImpl.migrateCache(
-				unsynchronizedItemDaoEhcacheMigrationImpl, unsynchronizedItemDaoEhcacheImpl.getStore());
+		
+		migrationServiceImpl.migrateUnsynchronizedItem();
 		
 		assertThat(unsynchronizedItemDaoEhcacheImpl.getStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
 		assertThat(unsynchronizedItemDaoEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
@@ -209,9 +204,8 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	@Test
 	public void testMigrateWindowingChunk() {
 		int expectedSize = windowingDaoChunkEhcacheMigrationImpl.getKeys().size();
-
-		migrationServiceImpl.migrateCache(
-				windowingDaoChunkEhcacheMigrationImpl, windowingDaoEhcacheImpl.getChunksStore());
+		
+		migrationServiceImpl.migrateWindowingChunk();
 		
 		assertThat(windowingDaoEhcacheImpl.getChunksStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
 		assertThat(windowingDaoChunkEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
@@ -220,33 +214,10 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	@Test
 	public void testMigrateWindowingIndex() {
 		int expectedSize = windowingDaoIndexEhcacheMigrationImpl.getKeys().size();
-
-		migrationServiceImpl.migrateCache(
-				windowingDaoIndexEhcacheMigrationImpl, windowingDaoEhcacheImpl.getIndexStore());
+		
+		migrationServiceImpl.migrateWindowingIndex();
 		
 		assertThat(windowingDaoEhcacheImpl.getIndexStore().getKeys().size()).isGreaterThan(0).isEqualTo(expectedSize);
 		assertThat(windowingDaoIndexEhcacheMigrationImpl.getKeys().size()).isEqualTo(expectedSize);
-	}
-	
-	@Test
-	public void testCheckMigrationFilesDeletion() {
-		File[] files = { new File(dataDir + File.separator + MigrationSourceObjectStoreManager.MAIL_SNAPSHOT_STORE + ".data"), 
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.MAIL_SNAPSHOT_STORE + ".index"), 
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.MAIL_WINDOWING_CHUNKS_STORE + ".data"),
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.MAIL_WINDOWING_CHUNKS_STORE + ".index"),
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.MAIL_WINDOWING_INDEX_STORE + ".data"),
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.MAIL_WINDOWING_INDEX_STORE + ".index"),
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.MONITORED_COLLECTION_STORE + ".data"),
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.MONITORED_COLLECTION_STORE + ".index"),
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.SYNCED_COLLECTION_STORE + ".data"),
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.SYNCED_COLLECTION_STORE + ".index"),
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.SYNC_KEYS_STORE + ".data"),
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.SYNC_KEYS_STORE + ".index"),
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.UNSYNCHRONIZED_ITEM_STORE + ".data"),
-				new File(dataDir + File.separator + MigrationSourceObjectStoreManager.UNSYNCHRONIZED_ITEM_STORE + ".index") };
-		
-		assertThat(dataDir.listFiles()).contains(files);
-		migrationServiceImpl.migrate();
-		assertThat(dataDir.listFiles()).doesNotContain(files);
 	}
 }

@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
@@ -41,8 +40,6 @@ import org.obm.configuration.utils.TimeUnitMapper;
 import org.obm.push.utils.jvm.JvmUtils;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 
@@ -58,14 +55,14 @@ public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 	public final static int DEFAULT_STATS_LONG_SAMPLE_TIME = 60;
 	public final static int DEFAULT_STATS_SAMPLE_TIME_STOP = 10;
 
-	public static final String CONFIG_FILE_PATH = "/etc/opush/ehcache_conf.ini";
+	private static final String configFilePath = "/etc/opush/ehcache_conf.ini";
 	private final IniFile iniFile;
 	private final TimeUnitMapper timeUnitMapper;
 	
 	@Inject
 	@VisibleForTesting
 	protected EhCacheConfigurationFileImpl(IniFile.Factory factory, TimeUnitMapper timeUnitMapper) {
-		iniFile = factory.build(CONFIG_FILE_PATH);
+		iniFile = factory.build(configFilePath);
 		this.timeUnitMapper = timeUnitMapper;
 	}
 	
@@ -133,25 +130,5 @@ public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 	@Override
 	public int statsLongSamplingTimeInSeconds() {
 		return iniFile.getIntValue("statsLongSamplingTimeInSeconds", DEFAULT_STATS_LONG_SAMPLE_TIME);
-	}
-
-	@Override
-	public Map<String, Percentage> percentageAllowedToCaches() {
-		return Maps.toMap(EhCacheStores.STORES, 
-			new Function<String, Percentage>() {
-		
-				@Override
-				public Percentage apply(String name) {
-					return loadStorePercentage(name);
-				}
-		});
-	}
-
-	private Percentage loadStorePercentage(String name) {
-		Percentage percentageAllowedToCache = percentageAllowedToCache(name);
-		if (percentageAllowedToCache.isDefined()) {
-			return percentageAllowedToCache;
-		}
-		throw new IllegalArgumentException("Store " + name + " has no percentage defined in configuration");
 	}
 }

@@ -33,6 +33,8 @@ package org.obm.push.store.ehcache;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
+import java.util.List;
 
 import net.sf.ehcache.migrating.Cache;
 import net.sf.ehcache.migrating.CacheManager;
@@ -52,10 +54,8 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 @Singleton
-public class MigrationSourceObjectStoreManager implements LifecycleListener {
+public class ObjectStoreManagerMigration implements LifecycleListener {
 
-	private static final TransactionalMode TRANSACTIONAL_MODE = TransactionalMode.OFF;
-	
 	public static final String MONITORED_COLLECTION_STORE = "monitoredCollectionService";
 	public static final String SYNCED_COLLECTION_STORE = "syncedCollectionStoreService";
 	public static final String UNSYNCHRONIZED_ITEM_STORE = "unsynchronizedItemService";
@@ -63,19 +63,20 @@ public class MigrationSourceObjectStoreManager implements LifecycleListener {
 	public static final String MAIL_WINDOWING_INDEX_STORE = "mailWindowingIndexStore";
 	public static final String MAIL_WINDOWING_CHUNKS_STORE = "mailWindowingChunksStore";
 	public static final String SYNC_KEYS_STORE = "syncKeysStore";
-
-	private static final int MAX_ENTRIES_IN_MEMORY = 1000;
+	
+	private final static int MAX_ELEMENT_IN_MEMORY = 5000;
 	private final CacheManager singletonManager;
 
-	@Inject MigrationSourceObjectStoreManager(ConfigurationService configurationService,
+	@Inject ObjectStoreManagerMigration(ConfigurationService configurationService,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
+		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds();
+		boolean usePersistentCache = configurationService.usePersistentCache();
 		String dataDirectory = configurationService.getDataDirectory();
-		configurationLogger.info("EhCache migration transaction mode : {}", TRANSACTIONAL_MODE);
-		configurationLogger.info("EhCache migration data directory : {}", dataDirectory);
-		configurationLogger.info("EhCache migration unlimited version in use");
-		
+		configurationLogger.info("EhCache transaction timeout in seconds : {}", transactionTimeoutInSeconds);
+		configurationLogger.info("EhCache transaction persistent mode : {}", usePersistentCache);
+		configurationLogger.info("EhCache data directory : {}", dataDirectory);
 		touchIndexFiles(dataDirectory, configurationLogger);
-		this.singletonManager = new CacheManager(ehCacheConfiguration(dataDirectory));
+		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache, dataDirectory));
 	}
 
 	private void touchIndexFiles(String dataDirectory, Logger configurationLogger) {
@@ -90,7 +91,7 @@ public class MigrationSourceObjectStoreManager implements LifecycleListener {
 		long now = System.currentTimeMillis();
 		for (String fileName : files) {
 			String fullName = dataDirectory + File.separator + fileName;
-			configurationLogger.info("EHCACHE MIGRATION - touch {}", fullName);
+			configurationLogger.info("Updating {} last modified value", fullName);
 			new File(fullName).setLastModified(now);
 		}
 	}
@@ -99,30 +100,60 @@ public class MigrationSourceObjectStoreManager implements LifecycleListener {
 		this.singletonManager.shutdown();
 	}
 	
-	private Configuration ehCacheConfiguration(String dataDirectory) {
+	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds, boolean usePersistentCache, String dataDirectory) {
 		return new Configuration()
 			.diskStore(new DiskStoreConfiguration().path(dataDirectory))
 			.updateCheck(false)
-			.cache(cacheConfiguration().name(UNSYNCHRONIZED_ITEM_STORE))
-			.cache(cacheConfiguration().name(SYNCED_COLLECTION_STORE))
-			.cache(cacheConfiguration().name(MONITORED_COLLECTION_STORE))
-			.cache(cacheConfiguration().name(MAIL_SNAPSHOT_STORE))
-			.cache(cacheConfiguration().name(MAIL_WINDOWING_CHUNKS_STORE))
-			.cache(cacheConfiguration().name(MAIL_WINDOWING_INDEX_STORE))
-			.cache(cacheConfiguration().name(SYNC_KEYS_STORE));
+			.cache(eternal(defaultCacheConfiguration().name(UNSYNCHRONIZED_ITEM_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(SYNCED_COLLECTION_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MONITORED_COLLECTION_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MAIL_SNAPSHOT_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MAIL_WINDOWING_CHUNKS_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MAIL_WINDOWING_INDEX_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(SYNC_KEYS_STORE), usePersistentCache))
+			.defaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
 	}
 	
-	private CacheConfiguration cacheConfiguration() {
+	private CacheConfiguration defaultCacheConfiguration() {
 		return new CacheConfiguration()
-			.maxElementsInMemory(MAX_ENTRIES_IN_MEMORY)
-			.maxElementsOnDisk(ObjectStoreManager.UNLIMITED_CACHE_MEMORY)
+			.maxElementsInMemory(1000)
+			.maxElementsOnDisk(100000)
 			.overflowToDisk(true)
-			.diskPersistent(true)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(TransactionalMode.OFF);
 	}
 	
+	private CacheConfiguration eternal(CacheConfiguration configuration, boolean eternal) {
+		return configuration.eternal(eternal).diskPersistent(eternal);
+	}
+	
+	public Cache createNewStore(String storeName) {
+		Cache store = getStore(storeName);
+		if (store == null) {
+			store = createStore(storeName);
+			this.singletonManager.addCache(store);
+		}
+		return store;
+	}
+
+	private Cache createStore(String storeName) {
+		return new Cache(createStoreConfiguration(storeName));
+	}
+
+	private CacheConfiguration createStoreConfiguration(String storeName) {
+		return new CacheConfiguration(storeName, MAX_ELEMENT_IN_MEMORY);
+	}
+
 	public Cache getStore(String storeName) {
 		return this.singletonManager.getCache(storeName);
 	}
+
+	public void removeStore(String storeName) {
+		this.singletonManager.removeCache(storeName);
+	}
+
+	public List<String> listStores() {
+		return Arrays.asList(this.singletonManager.getCacheNames());
+	}
+
 }

@@ -51,5 +51,4 @@ public interface EhCacheStores {
 			MAIL_WINDOWING_INDEX_STORE,
 			MAIL_WINDOWING_CHUNKS_STORE,
 			SYNC_KEYS_STORE);
-	
 }

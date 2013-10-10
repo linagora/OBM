@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.util.Map;
-
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 
 import com.google.common.base.Objects;
@@ -51,12 +49,6 @@ public interface EhCacheConfiguration {
 	 * @return percentage related to the global heap memory allowed for the given cache
 	 */
 	Percentage percentageAllowedToCache(String cacheName);
-
-	/**
-	 * @return percentage related to the global heap memory allowed for each caches
-	 */
-	Map<String, Percentage> percentageAllowedToCaches();
-
 	long timeToLiveInSeconds();
 	TransactionalMode transactionalMode();
 	

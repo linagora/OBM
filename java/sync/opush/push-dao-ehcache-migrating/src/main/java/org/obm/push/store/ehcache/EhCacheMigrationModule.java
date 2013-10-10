@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,18 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import org.obm.sync.LifecycleListener;
 
-@Singleton
-public class SyncedCollectionDaoEhcacheMigrationImpl extends AbstractEhcacheDaoMigration {
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 
-	@Inject  SyncedCollectionDaoEhcacheMigrationImpl(ObjectStoreManagerMigration objectStoreManagerMigration) {
-		super(objectStoreManagerMigration);
-	}
+public class EhCacheMigrationModule extends AbstractModule {
 
 	@Override
-	protected String getStoreName() {
-		return EhCacheStores.SYNCED_COLLECTION_STORE;
+	protected void configure() {
+		bind(MigrationService.class).to(MigrationServiceImpl.class);
+		
+		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
+		lifecycleListeners.addBinding().to(ObjectStoreManagerMigration.class);
 	}
+
 }

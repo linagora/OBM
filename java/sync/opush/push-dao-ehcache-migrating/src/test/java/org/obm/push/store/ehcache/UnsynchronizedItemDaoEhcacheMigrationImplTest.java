@@ -57,13 +57,13 @@ import com.google.common.collect.ImmutableSet;
 @RunWith(SlowFilterRunner.class) @Slow
 public class UnsynchronizedItemDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
-	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
+	private ObjectStoreManagerMigration objectStoreManagerMigration;
 	private UnsynchronizedItemDaoEhcacheMigrationImpl unsynchronizedItemDaoEhcacheMigrationImpl;
 	
 	@Before
 	public void init() throws IOException {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		this.objectStoreManagerMigration = new ObjectStoreManagerMigration( super.initConfigurationServiceMock(), logger);
 		this.unsynchronizedItemDaoEhcacheMigrationImpl = new UnsynchronizedItemDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 	}
 	
