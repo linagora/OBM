@@ -58,20 +58,9 @@ public class WindowingDaoEhcacheImpl implements WindowingDao {
 	private final Cache chunksStore;
 	private final Cache indexStore;
 	
-	@Inject 
-	@VisibleForTesting WindowingDaoEhcacheImpl(ObjectStoreManager objectStoreManager) {
+	@Inject WindowingDaoEhcacheImpl(ObjectStoreManager objectStoreManager) {
 		chunksStore = objectStoreManager.getStore(ObjectStoreManager.MAIL_WINDOWING_CHUNKS_STORE);
 		indexStore = objectStoreManager.getStore(ObjectStoreManager.MAIL_WINDOWING_INDEX_STORE);
-	}
-
-	@Override
-	public Cache getChunksStore() {
-		return chunksStore;
-	}
-
-	@Override
-	public Cache getIndexStore() {
-		return indexStore;
 	}
 
 	@Override

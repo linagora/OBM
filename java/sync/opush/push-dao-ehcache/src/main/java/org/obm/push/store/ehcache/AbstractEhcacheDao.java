@@ -44,8 +44,4 @@ public abstract class AbstractEhcacheDao {
 	}
 	
 	protected abstract String getStoreName();
-	
-	public Cache getStore() {
-		return store;
-	}
 }
