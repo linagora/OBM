@@ -32,7 +32,7 @@
 package fr.aliacom.obm.services.constant;
 
 import org.obm.configuration.ConfigurationServiceImpl;
-import org.obm.configuration.utils.IniFile;
+import org.obm.push.utils.IniFile;
 import org.obm.sync.auth.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

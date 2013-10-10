@@ -40,7 +40,7 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 
 import org.obm.configuration.module.LoggerModule;
-import org.obm.configuration.utils.IniFile;
+import org.obm.push.utils.IniFile;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;

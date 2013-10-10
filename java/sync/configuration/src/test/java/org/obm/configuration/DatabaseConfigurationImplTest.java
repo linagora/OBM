@@ -39,7 +39,7 @@ import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.configuration.utils.IniFile;
+import org.obm.push.utils.IniFile;
 
 import com.google.common.collect.ImmutableMap;
 

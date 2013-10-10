@@ -30,7 +30,7 @@
 package org.obm.cyrus.imap;
 
 import org.obm.configuration.EmailConfigurationImpl;
-import org.obm.configuration.utils.IniFile;
+import org.obm.push.utils.IniFile;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

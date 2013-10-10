@@ -32,7 +32,7 @@
 
 package org.obm.configuration;
 
-import org.obm.configuration.utils.IniFile;
+import org.obm.push.utils.IniFile;
 
 import com.google.common.annotations.VisibleForTesting;
 

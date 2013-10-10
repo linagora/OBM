@@ -34,15 +34,15 @@ package org.obm.push.store.ehcache;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.push.store.ehcache.EhCacheConfigurationFileImpl.*;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.configuration.utils.IniFile;
-import org.obm.configuration.utils.IniFile.Factory;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
+import org.obm.push.utils.IniFile;
+import org.obm.push.utils.IniFile.Factory;
 
 @RunWith(SlowFilterRunner.class)
 public class EhCacheConfigurationFileImplTest {

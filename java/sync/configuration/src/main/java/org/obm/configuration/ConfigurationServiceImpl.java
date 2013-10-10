@@ -39,11 +39,11 @@ import java.util.concurrent.TimeUnit;
 import javax.naming.ConfigurationException;
 
 import org.obm.configuration.resourcebundle.Control;
-import org.obm.configuration.utils.IniFile;
-import org.obm.configuration.utils.TimeUnitMapper;
+import org.obm.push.utils.IniFile;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 
 public class ConfigurationServiceImpl implements ConfigurationService {
@@ -90,15 +90,19 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		}
 	}
 	
+	private final ImmutableMap<String, TimeUnit> timeUnits;
+
 	private final String applicationName;
-	private final TimeUnitMapper timeUnitMapper;
 	protected final IniFile iniFile;
 
 	@VisibleForTesting 
 	protected ConfigurationServiceImpl(IniFile globalConfigurationIniFile, String applicationName) {
 		this.iniFile = globalConfigurationIniFile;
 		this.applicationName = applicationName;
-		this.timeUnitMapper = new TimeUnitMapper();
+		this.timeUnits = ImmutableMap.of("milliseconds", TimeUnit.MILLISECONDS,
+								"seconds", TimeUnit.SECONDS,
+								"minutes", TimeUnit.MINUTES,
+								"hours", TimeUnit.HOURS);
 	}
 
 	@Override
@@ -132,7 +136,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public TimeUnit getLocatorCacheTimeUnit() {
 		String key = iniFile.getStringValue(LOCATOR_CACHE_TIMEUNIT_KEY);
-		return timeUnitMapper.getTimeUnitOrDefault(key, TimeUnit.MINUTES);
+		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
 
 	private int getTransactionTimeout() {
@@ -141,9 +145,19 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private TimeUnit getTransactionTimeoutUnit() {
 		String key = iniFile.getStringValue(TRANSACTION_TIMEOUT_UNIT_KEY);
-		return timeUnitMapper.getTimeUnitOrDefault(key, TimeUnit.MINUTES);
+		return getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
 
+	private TimeUnit getTimeUnitOrDefault(String key, TimeUnit defaultUnit) {
+		if (key != null) {
+			TimeUnit unit = timeUnits.get(key.toLowerCase());
+			if (unit != null) {
+				return unit;
+			}
+		}
+		return defaultUnit;
+	}
+	
 	@Override
 	public int transactionTimeoutInSeconds() {
 		TimeUnit transactionTimeoutUnit = getTransactionTimeoutUnit();

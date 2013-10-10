@@ -36,9 +36,9 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import org.joda.time.Duration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.configuration.utils.IniFile.Factory;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.Policy;
+import org.obm.push.utils.IniFile.Factory;
 
 @RunWith(SlowFilterRunner.class)
 public class PolicyConfigurationServiceFileImplTest {

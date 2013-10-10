@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.configuration;
 
-import org.obm.configuration.utils.IniFile;
+import org.obm.push.utils.IniFile;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
