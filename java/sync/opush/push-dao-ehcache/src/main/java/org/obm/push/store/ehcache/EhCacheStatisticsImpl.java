@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 import net.sf.ehcache.Cache;
@@ -97,13 +95,7 @@ public class EhCacheStatisticsImpl implements EhCacheStatistics {
 	@VisibleForTesting long computeSamplesDiff(History diskStatsHistory, int samplingTimeInSeconds) {
 		long lastSampleCount = diskStatsHistory.getLastSampleCount();
 		long referenceSampleCount = diskStatsHistory.getReferenceSampleCount(samplingTimeInSeconds);
-		BigDecimal diskGetCount = BigDecimal.valueOf(lastSampleCount - referenceSampleCount);
-		long diskGetAverage = diskGetCount.divide(BigDecimal.valueOf(samplingTimeInSeconds), RoundingMode.HALF_UP).longValue();
-		return fixDuringCommitSample(diskGetAverage);
-	}
-
-	private long fixDuringCommitSample(long diskGetAverage) {
-		return Math.max(diskGetAverage, 0);
+		return lastSampleCount - referenceSampleCount;
 	}
 
 	private History getCacheDiskStatsHistory(String cacheName) {
