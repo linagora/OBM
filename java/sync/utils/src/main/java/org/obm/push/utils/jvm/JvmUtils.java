@@ -31,11 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils.jvm;
 
-import com.google.common.primitives.Ints;
-
 public class JvmUtils {
 
-	public static int maxRuntimeJvmMemoryInMB() {
-		return Ints.checkedCast(Runtime.getRuntime().maxMemory() / (1024 * 1024));
+	public static long maxRuntimeJvmMemoryInMB() {
+		return Runtime.getRuntime().maxMemory() / (1024 * 1024);
 	}
 }

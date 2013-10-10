@@ -42,28 +42,17 @@ import org.obm.push.utils.jvm.JvmUtils;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 
 public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 
-	public final static int DEFAULT_MAX_MEMORY_IN_MB = JvmUtils.maxRuntimeJvmMemoryInMB() / 2;
-	public final static ImmutableMap<String, Integer> DEFAULT_PERCENTAGE_ALLOW_TO_CACHES = ImmutableMap.<String, Integer> builder()
-			.put(EhCacheStores.MAIL_SNAPSHOT_STORE, 30)
-			.put(EhCacheStores.MONITORED_COLLECTION_STORE, 5)
-			.put(EhCacheStores.SYNCED_COLLECTION_STORE, 5)
-			.put(EhCacheStores.UNSYNCHRONIZED_ITEM_STORE, 25)
-			.put(EhCacheStores.MAIL_WINDOWING_INDEX_STORE, 5)
-			.put(EhCacheStores.MAIL_WINDOWING_CHUNKS_STORE, 25)
-			.put(EhCacheStores.SYNC_KEYS_STORE, 5)
-			.build();
 	public final static String TIME_TO_LIVE_UNIT = "timeToLiveUnit";
 	public final static String TIME_TO_LIVE = "timeToLive";
 	public final static int DEFAULT_TIME_TO_LIVE = Ints.checkedCast(TimeUnit.DAYS.toSeconds(30));
 	public final static TransactionalMode TRANSACTIONAL_MODE = TransactionalMode.XA;
-	public final static int DEFAULT_STATS_SAMPLE_COUNT = 180;
+	public final static int DEFAULT_STATS_SAMPLE_COUNT = 10;
 	public final static int DEFAULT_STATS_SHORT_SAMPLE_TIME = 1;
 	public final static int DEFAULT_STATS_MEDIUM_SAMPLE_TIME = 10;
 	public final static int DEFAULT_STATS_LONG_SAMPLE_TIME = 60;
@@ -89,14 +78,14 @@ public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 		if (value > 0) {
 			return value;
 		}
-		return DEFAULT_MAX_MEMORY_IN_MB;
+		throw new IllegalStateException("illegal maxMemoryInMB value");
 	}
 
 	@Override
 	public Percentage percentageAllowedToCache(String cacheName) {
 		Integer value = iniFile.getIntegerValue(cacheName, null);
 		if (value == null || value == 0) {
-			return Percentage.of(DEFAULT_PERCENTAGE_ALLOW_TO_CACHES.get(cacheName));
+			return Percentage.UNDEFINED;
 		}
 		return Percentage.of(value);
 	}

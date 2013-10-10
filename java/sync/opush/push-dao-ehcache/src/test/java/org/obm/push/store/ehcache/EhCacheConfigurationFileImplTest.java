@@ -46,7 +46,6 @@ import org.obm.configuration.utils.IniFile.Factory;
 import org.obm.configuration.utils.TimeUnitMapper;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
-import org.obm.push.utils.jvm.JvmUtils;
 
 @RunWith(SlowFilterRunner.class)
 public class EhCacheConfigurationFileImplTest {
@@ -69,22 +68,30 @@ public class EhCacheConfigurationFileImplTest {
 		return new EhCacheConfigurationFileImpl(factory, timeUnitMapper);
 	}
 
-	@Test
-	public void testMaxMemoryInMBWhenZero() {
+	@Test(expected=IllegalStateException.class)
+	public void testMaxMemoryInMBWhenZero() throws Exception {
 		expect(iniFile.getIntValue("maxMemoryInMB", -1)).andReturn(0);
 		
 		control.replay();
-		assertThat(testee().maxMemoryInMB()).isEqualTo(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
-		control.verify();
+		try {
+			testee().maxMemoryInMB();
+		} catch (Exception e) {
+			control.verify();
+			throw e;
+		}
 	}
 
-	@Test
-	public void testMaxMemoryInMBWhenNegative() {
+	@Test(expected=IllegalStateException.class)
+	public void testMaxMemoryInMBWhenNegative() throws Exception {
 		expect(iniFile.getIntValue("maxMemoryInMB", -1)).andReturn(-1);
 		
 		control.replay();
-		assertThat(testee().maxMemoryInMB()).isEqualTo(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
-		control.verify();
+		try {
+			testee().maxMemoryInMB();
+		} catch (Exception e) {
+			control.verify();
+			throw e;
+		}
 	}
 
 	@Test(expected=IllegalStateException.class)
@@ -111,10 +118,10 @@ public class EhCacheConfigurationFileImplTest {
 
 	@Test
 	public void testPercentageWhenUndefined() {
-		expect(iniFile.getIntegerValue("mailSnapshotStore", null)).andReturn(null);
+		expect(iniFile.getIntegerValue("cacheName", null)).andReturn(null);
 		
 		control.replay();
-		assertThat(testee().percentageAllowedToCache("mailSnapshotStore")).isEqualTo(Percentage.of(30));
+		assertThat(testee().percentageAllowedToCache("cacheName")).isEqualTo(Percentage.UNDEFINED);
 		control.verify();
 	}
 
@@ -163,11 +170,11 @@ public class EhCacheConfigurationFileImplTest {
 	}
 
 	@Test
-	public void testPercentageWhenZeroIsDefaultValue() {
-		expect(iniFile.getIntegerValue("mailSnapshotStore", null)).andReturn(0);
+	public void testPercentageWhenZeroIsUndefined() {
+		expect(iniFile.getIntegerValue("cacheName", null)).andReturn(0);
 		
 		control.replay();
-		assertThat(testee().percentageAllowedToCache("mailSnapshotStore")).isEqualTo(Percentage.of(30));
+		assertThat(testee().percentageAllowedToCache("cacheName")).isEqualTo(Percentage.UNDEFINED);
 		control.verify();
 	}
 	
@@ -206,7 +213,7 @@ public class EhCacheConfigurationFileImplTest {
 
 	@Test
 	public void testStatsSampleToRecordCount() {
-		expect(iniFile.getIntValue("statsSampleToRecordCount", 180)).andReturn(5);
+		expect(iniFile.getIntValue("statsSampleToRecordCount", 10)).andReturn(5);
 
 		control.replay();
 		assertThat(testee().statsSampleToRecordCount()).isEqualTo(5);
