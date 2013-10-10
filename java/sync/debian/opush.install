@@ -2,6 +2,5 @@ opush/config-sample/sync_perms.ini /usr/share/o-push/debian-conf
 opush/config-sample/ldap_conf.ini /usr/share/o-push/debian-conf
 opush/config-sample/mail_conf.ini /usr/share/o-push/debian-conf
 opush/config-sample/remote_console.ini /usr/share/o-push/debian-conf
-opush/config-sample/ehcache_conf.ini /usr/share/o-push/debian-conf
 opush/config-sample/policy.ini /usr/share/o-push/debian-conf
 debian/lintian/opush usr/share/lintian/overrides

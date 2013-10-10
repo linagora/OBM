@@ -72,13 +72,6 @@ cp "${TEMPLATE}" "${NEWFILE}"
 ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
 ucfr opush "${CONFIG}"
 
-NEWFILE=${TEMPDIR}/ehcache_conf.ini
-CONFIG=/etc/opush/ehcache_conf.ini
-TEMPLATE=/usr/share/o-push/debian-conf/ehcache_conf.ini
-cp "${TEMPLATE}" "${NEWFILE}"
-ucf --three-way --debconf-ok "$NEWFILE" "$CONFIG"
-ucfr opush "${CONFIG}"
-
 NEWFILE=${TEMPDIR}/policy.ini
 CONFIG=/etc/opush/policy.ini
 TEMPLATE=/usr/share/o-push/debian-conf/policy.ini
