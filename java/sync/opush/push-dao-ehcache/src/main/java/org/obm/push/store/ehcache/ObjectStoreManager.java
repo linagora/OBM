@@ -40,17 +40,14 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.DiskStoreConfiguration;
-import net.sf.ehcache.config.MemoryUnit;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.LifecycleListener;
-import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.slf4j.Logger;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -70,27 +67,18 @@ public class ObjectStoreManager implements LifecycleListener {
 	public static final String PENDING_CONTINUATIONS = "pendingContinuation";
 	
 	private final static int UNLIMITED_CACHE_MEMORY = 0;
-	
-	@VisibleForTesting final CacheManager singletonManager;
-	private final EhCacheConfiguration ehCacheConfiguration;
+	private final static int MAX_ELEMENT_IN_MEMORY = 5000;
+	private final CacheManager singletonManager;
 
-	private final Logger configurationLogger;
-
-	@Inject ObjectStoreManager(
-			ConfigurationService configurationService,
-			EhCacheConfiguration ehCacheConfiguration,
+	@Inject ObjectStoreManager(ConfigurationService configurationService,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger,
 			TransactionProvider transactionProvider) {
-		this.ehCacheConfiguration = ehCacheConfiguration;
-		this.configurationLogger = configurationLogger;
 		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds();
 		boolean usePersistentCache = configurationService.usePersistentCache();
 		String dataDirectory = configurationService.getDataDirectory();
 		configurationLogger.info("EhCache transaction timeout in seconds : {}", transactionTimeoutInSeconds);
 		configurationLogger.info("EhCache transaction persistent mode : {}", usePersistentCache);
 		configurationLogger.info("EhCache data directory : {}", dataDirectory);
-		configurationLogger.info("EhCache max local heap in MB: {}", ehCacheConfiguration.maxMemoryInMB());
-
 		forceInitializeTransactionManager(transactionProvider);
 		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds, usePersistentCache, dataDirectory));
 	}
@@ -107,23 +95,21 @@ public class ObjectStoreManager implements LifecycleListener {
 	private Configuration ehCacheConfiguration(int transactionTimeoutInSeconds, boolean usePersistentCache, String dataDirectory) {
 		return new Configuration()
 			.name(STORE_NAME)
-			.maxBytesLocalHeap(ehCacheConfiguration.maxMemoryInMB(), MemoryUnit.MEGABYTES)
 			.diskStore(new DiskStoreConfiguration().path(dataDirectory))
 			.updateCheck(false)
-			.cache(eternal(defaultCacheConfiguration(UNSYNCHRONIZED_ITEM_STORE), usePersistentCache))
-			.cache(eternal(defaultCacheConfiguration(SYNCED_COLLECTION_STORE), usePersistentCache))
-			.cache(eternal(defaultCacheConfiguration(MONITORED_COLLECTION_STORE), usePersistentCache))
-			.cache(eternal(defaultCacheConfiguration(MAIL_SNAPSHOT_STORE), usePersistentCache))
-			.cache(eternal(defaultCacheConfiguration(MAIL_WINDOWING_CHUNKS_STORE), usePersistentCache))
-			.cache(eternal(defaultCacheConfiguration(MAIL_WINDOWING_INDEX_STORE), usePersistentCache))
-			.cache(eternal(defaultCacheConfiguration(SYNC_KEYS_STORE), usePersistentCache))
-			.cache(pendingContinuationConfiguration(PENDING_CONTINUATIONS))
+			.cache(eternal(defaultCacheConfiguration().name(UNSYNCHRONIZED_ITEM_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(SYNCED_COLLECTION_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MONITORED_COLLECTION_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MAIL_SNAPSHOT_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MAIL_WINDOWING_CHUNKS_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(MAIL_WINDOWING_INDEX_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration().name(SYNC_KEYS_STORE), usePersistentCache))
+			.cache(pendingContinuationConfiguration().name(PENDING_CONTINUATIONS))
 			.defaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
 	}
 	
-	private CacheConfiguration pendingContinuationConfiguration(String name) {
+	private CacheConfiguration pendingContinuationConfiguration() {
 		return new CacheConfiguration()
-			.name(name)
 			.maxEntriesLocalHeap(UNLIMITED_CACHE_MEMORY)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(TransactionalMode.OFF)
@@ -131,22 +117,13 @@ public class ObjectStoreManager implements LifecycleListener {
 	}
 
 	@SuppressWarnings("deprecation")
-	private CacheConfiguration defaultCacheConfiguration(String name) {
-		CacheConfiguration cacheConfiguration = new CacheConfiguration()
-			.name(name)
+	private CacheConfiguration defaultCacheConfiguration() {
+		return new CacheConfiguration()
+			.maxEntriesLocalHeap(1000)
 			.maxEntriesLocalDisk(100000)
 			.overflowToDisk(true)
 			.memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
 			.transactionalMode(TransactionalMode.XA);
-		
-		Percentage percentageAllowedToCache = ehCacheConfiguration.percentageAllowedToCache(name);
-		if (percentageAllowedToCache.isDefined()) {
-			configurationLogger.info(percentageAllowedToCache.get() + " allocated for the cache:" + name);
-			cacheConfiguration.setMaxBytesLocalHeap(percentageAllowedToCache.get());
-		} else {
-			configurationLogger.info("No space allocation is defined for the cache:" + name);
-		}
-		return cacheConfiguration;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -154,7 +131,7 @@ public class ObjectStoreManager implements LifecycleListener {
 		return configuration.eternal(eternal).diskPersistent(eternal);
 	}
 	
-	@VisibleForTesting Cache createNewStore(String storeName) {
+	public Cache createNewStore(String storeName) {
 		Cache store = getStore(storeName);
 		if (store == null) {
 			store = createStore(storeName);
@@ -168,7 +145,7 @@ public class ObjectStoreManager implements LifecycleListener {
 	}
 
 	private CacheConfiguration createStoreConfiguration(String storeName) {
-		return new CacheConfiguration().name(storeName);
+		return new CacheConfiguration(storeName, MAX_ELEMENT_IN_MEMORY);
 	}
 
 	public Cache getStore(String storeName) {

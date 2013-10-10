@@ -38,9 +38,7 @@ import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.env.OpushStaticConfigurationService.RemoteConsole;
 import org.obm.opush.env.OpushStaticConfigurationService.SyncPerms;
-import org.obm.opush.env.OpushStaticConfigurationService.EhCache;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
-import org.obm.push.store.ehcache.EhCacheConfiguration;
 
 import com.google.inject.name.Names;
 
@@ -57,7 +55,6 @@ public final class OpushConfigurationModule extends AbstractOverrideModule {
 	protected void configureImpl() {
 		bind(SyncPermsConfigurationService.class).toInstance(new SyncPerms(configuration.syncPerms));
 		bind(RemoteConsoleConfiguration.class).toInstance(new RemoteConsole(configuration.remoteConsole));
-		bind(EhCacheConfiguration.class).toInstance(new EhCache(configuration.ehCache));
 		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toProvider(bindWithMock(PolicyConfigurationProvider.class));
 	}
 	

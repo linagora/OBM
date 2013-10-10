@@ -42,11 +42,6 @@ import com.google.common.collect.ImmutableSet;
 
 public class Configuration {
 
-	public static class EhCache {
-		public int maxMemoryInMB = 10;
-		public Integer percentageAllowedToCache = null;
-	}
-	
 	public static class SyncPerms {
 		public String blacklist = "";
 		public boolean allowUnknownDevice = true;
@@ -93,7 +88,6 @@ public class Configuration {
 	public Mail mail = new Mail();
 	public Transaction transaction = new Transaction();
 	public RemoteConsole remoteConsole = new RemoteConsole();
-	public EhCache ehCache = new EhCache();
 	public File dataDir;
 	public String locatorUrl = null;
 	public String obmUiBaseUrl = null;

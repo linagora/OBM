@@ -66,8 +66,7 @@ public class SyncedCollectionDaoEhcacheImplTest extends SyncedCollectionDaoTest 
 		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
 		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
 
-		TestingEhCacheConfiguration config = new TestingEhCacheConfiguration();
-		objectStoreManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+		objectStoreManager = new ObjectStoreManager(configurationService, logger, transactionProvider);
 		syncedCollectionDao = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
 		
 		transactionManager = TransactionManagerServices.getTransactionManager();
