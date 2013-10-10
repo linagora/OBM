@@ -110,13 +110,13 @@ public class ObjectStoreManager implements LifecycleListener {
 			.maxBytesLocalHeap(ehCacheConfiguration.maxMemoryInMB(), MemoryUnit.MEGABYTES)
 			.diskStore(new DiskStoreConfiguration().path(dataDirectory))
 			.updateCheck(false)
-			.cache(timeToLiveConfiguration(defaultCacheConfiguration(UNSYNCHRONIZED_ITEM_STORE), usePersistentCache))
-			.cache(timeToLiveConfiguration(defaultCacheConfiguration(SYNCED_COLLECTION_STORE), usePersistentCache))
-			.cache(timeToLiveConfiguration(defaultCacheConfiguration(MONITORED_COLLECTION_STORE), usePersistentCache))
-			.cache(timeToLiveConfiguration(defaultCacheConfiguration(MAIL_SNAPSHOT_STORE), usePersistentCache))
-			.cache(timeToLiveConfiguration(defaultCacheConfiguration(MAIL_WINDOWING_CHUNKS_STORE), usePersistentCache))
-			.cache(timeToLiveConfiguration(defaultCacheConfiguration(MAIL_WINDOWING_INDEX_STORE), usePersistentCache))
-			.cache(timeToLiveConfiguration(defaultCacheConfiguration(SYNC_KEYS_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration(UNSYNCHRONIZED_ITEM_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration(SYNCED_COLLECTION_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration(MONITORED_COLLECTION_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration(MAIL_SNAPSHOT_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration(MAIL_WINDOWING_CHUNKS_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration(MAIL_WINDOWING_INDEX_STORE), usePersistentCache))
+			.cache(eternal(defaultCacheConfiguration(SYNC_KEYS_STORE), usePersistentCache))
 			.cache(pendingContinuationConfiguration(PENDING_CONTINUATIONS))
 			.defaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
 	}
@@ -150,9 +150,8 @@ public class ObjectStoreManager implements LifecycleListener {
 	}
 
 	@SuppressWarnings("deprecation")
-	private CacheConfiguration timeToLiveConfiguration(CacheConfiguration configuration, boolean usePersistentCache) {
-		return configuration.timeToLiveSeconds(ehCacheConfiguration.timeToLiveInSeconds())
-				.diskPersistent(usePersistentCache);
+	private CacheConfiguration eternal(CacheConfiguration configuration, boolean eternal) {
+		return configuration.eternal(eternal).diskPersistent(eternal);
 	}
 	
 	@VisibleForTesting Cache createNewStore(String storeName) {
