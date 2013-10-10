@@ -41,6 +41,8 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheStatisticsImpl.History;
 import org.terracotta.statistics.archive.Timestamped;
 
+import com.google.common.collect.ImmutableList;
+
 @RunWith(SlowFilterRunner.class)
 public class EhCacheStatisticsImplMockTest {
 
@@ -55,111 +57,57 @@ public class EhCacheStatisticsImplMockTest {
 		testee = new EhCacheStatisticsImpl(config, cacheManager);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Test(expected=IllegalStateException.class)
-	public void testComputeSamplesDiffWhenGetHasDifferentSizeThanPut() {
-		History.builder()
-			.gets(timestamp(5))
-			.puts()
-			.removes(timestamp(5))
-			.build();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test(expected=IllegalStateException.class)
-	public void testComputeSamplesDiffWhenGetHasDifferentSizeThanRemove() {
-		History.builder()
-			.gets(timestamp(5))
-			.puts(timestamp(5))
-			.removes()
-			.build();
-	}
-
-	@SuppressWarnings("unchecked")
 	@Test(expected=IndexOutOfBoundsException.class)
 	public void testComputeSamplesDiffWhenNotEnoughSampleOfOne() {
-		History diskStatsHistory = History.builder()
-				.gets()
-				.puts()
-				.removes()
-				.build();
+		History diskStatsHistory = new History(ImmutableList.<Timestamped<Long>>of());
 		testee.computeSamplesDiff(diskStatsHistory, 1);
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Test(expected=IndexOutOfBoundsException.class)
 	public void testComputeSamplesDiffWhenNotEnoughSampleOfFive() {
-		History diskStatsHistory = History.builder()
-				.gets(timestamp(1), timestamp(2), timestamp(5), timestamp(9))
-				.puts(timestamp(1), timestamp(2), timestamp(5), timestamp(9))
-				.removes(timestamp(1), timestamp(2), timestamp(5), timestamp(9))
-				.build();
+		History diskStatsHistory = new History(ImmutableList.of(
+				timestamp(1), timestamp(2), timestamp(5), timestamp(9)));
 		testee.computeSamplesDiff(diskStatsHistory, 5);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testComputeSamplesDiffWhenJustEnoughSampleOfOne() {
-		History diskStatsHistory = History.builder()
-				.gets(timestamp(10))
-				.puts(timestamp(5))
-				.removes(timestamp(2))
-				.build();
-		assertThat(testee.computeSamplesDiff(diskStatsHistory, 1)).isEqualTo(3);
+		History diskStatsHistory = new History(ImmutableList.of(timestamp(10)));
+		assertThat(testee.computeSamplesDiff(diskStatsHistory, 1)).isEqualTo(10);
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Test
 	public void testComputeSamplesDiffWhenJustEnoughSampleOf5() {
-		History diskStatsHistory = History.builder()
-				.gets(timestamp(1), timestamp(2), timestamp(5), timestamp(9), timestamp(13))
-				.puts(timestamp(1), timestamp(1), timestamp(1), timestamp(1), timestamp(1))
-				.removes(timestamp(1), timestamp(1), timestamp(1), timestamp(1), timestamp(1))
-				.build();
-		assertThat(testee.computeSamplesDiff(diskStatsHistory, 5)).isEqualTo(11);
+		History diskStatsHistory = new History(ImmutableList.of(
+				timestamp(1), timestamp(2), timestamp(5), timestamp(9), timestamp(13)));
+		assertThat(testee.computeSamplesDiff(diskStatsHistory, 5)).isEqualTo(13);
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Test
 	public void testComputeSamplesDiffWhenMoreSamplesOfOne() {
-		History diskStatsHistory = History.builder()
-				.gets(timestamp(1), timestamp(2), timestamp(5), timestamp(9))
-				.puts(timestamp(1), timestamp(1), timestamp(1), timestamp(1))
-				.removes(timestamp(1), timestamp(2), timestamp(3), timestamp(4))
-				.build();
-		assertThat(testee.computeSamplesDiff(diskStatsHistory, 1)).isEqualTo(3);
+		History diskStatsHistory = new History(ImmutableList.of(
+				timestamp(1), timestamp(2), timestamp(5), timestamp(9), timestamp(13)));
+		assertThat(testee.computeSamplesDiff(diskStatsHistory, 1)).isEqualTo(4);
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Test
 	public void testComputeSamplesDiffWhenMoreSamplesOfFour() {
-		History diskStatsHistory = History.builder()
-				.gets(timestamp(0), timestamp(2), timestamp(5), timestamp(9), timestamp(13))
-				.puts(timestamp(1), timestamp(1), timestamp(1), timestamp(2), timestamp(3))
-				.removes(timestamp(0), timestamp(0), timestamp(0), timestamp(0), timestamp(3))
-				.build();
-		assertThat(testee.computeSamplesDiff(diskStatsHistory, 4)).isEqualTo(8);
+		History diskStatsHistory = new History(ImmutableList.of(
+				timestamp(1), timestamp(2), timestamp(5), timestamp(9), timestamp(13)));
+		assertThat(testee.computeSamplesDiff(diskStatsHistory, 4)).isEqualTo(12);
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Test
 	public void testComputeSamplesDiffWhenNoAccessOfOne() {
-		History diskStatsHistory = History.builder()
-				.gets(timestamp(10), timestamp(10))
-				.puts(timestamp(0), timestamp(0))
-				.removes(timestamp(0), timestamp(0))
-				.build();
+		History diskStatsHistory = new History(ImmutableList.of(
+				timestamp(10), timestamp(10)));
 		assertThat(testee.computeSamplesDiff(diskStatsHistory, 1)).isEqualTo(0);
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Test
 	public void testComputeSamplesDiffWhenNoAccessOfThree() {
-		History diskStatsHistory = History.builder()
-				.gets(timestamp(5), timestamp(10), timestamp(10), timestamp(10), timestamp(10))
-				.puts(timestamp(0), timestamp(0), timestamp(0), timestamp(0), timestamp(0))
-				.removes(timestamp(0), timestamp(0), timestamp(0), timestamp(0), timestamp(0))
-				.build();
+		History diskStatsHistory = new History(ImmutableList.of(
+				timestamp(5), timestamp(10), timestamp(10), timestamp(10), timestamp(10)));
 		assertThat(testee.computeSamplesDiff(diskStatsHistory, 3)).isEqualTo(0);
 	}
 

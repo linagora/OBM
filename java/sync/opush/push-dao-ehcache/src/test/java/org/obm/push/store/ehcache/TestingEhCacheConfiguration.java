@@ -47,7 +47,7 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 	private int statsLongSamplingTimeInSeconds;
 
 	public TestingEhCacheConfiguration() {
-		this.percentageAllowedToCache = 10;
+		this.percentageAllowedToCache = null;
 		this.maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
 		this.timeToLive = 60;
 		this.statsShortSamplingTimeInSeconds = 1;

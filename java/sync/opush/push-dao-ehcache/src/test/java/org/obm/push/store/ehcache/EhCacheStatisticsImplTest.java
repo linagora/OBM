@@ -141,7 +141,7 @@ public class EhCacheStatisticsImplTest {
 	}
 	
 	@Test
-	public void testShortTimeDiskGetsWhenGetOnly() throws Exception {
+	public void testShortTimeDiskGetsWhenAccesses() throws Exception {
 		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
 			.withMaxMemoryInMB(10)
 			.withStatsShortSamplingTimeInSeconds(1));
@@ -150,233 +150,6 @@ public class EhCacheStatisticsImplTest {
 		
 		try {
 			startStatisticsSampling(restartedTestee);
-			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
-			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(2);
-		} finally {
-			restartedTestee.manager.shutdown();
-		}
-	}
-	
-	@Test
-	public void testShortTimeDiskGetsWhenGetOnNonExistingKey() throws Exception {
-		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
-			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(1));
-			
-		try {
-			startStatisticsSampling(testee);
-			putXElements(2, testee);
-			testee.manager.getStore(STATS_ENABLED_CACHE).get("nonExistingKey");
-			transactionManager.commit();
-			waitForStatisticsSamples(testee.config.statsShortSamplingTimeInSeconds());
-			assertThat(testee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
-		} finally {
-			testee.manager.shutdown();
-		}
-	}
-	
-	/*
-	 * This test is wrong, only remove should returns 0 disk access.
-	 * But EHCache tells that there were 4 GETs and 2 REMOVEs
-	 */
-	@Test
-	public void testShortTimeDiskGetsWhenNoGetButRemove() throws Exception {
-		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
-			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(1));
-		
-		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(2, testee);
-		
-		try {
-			startStatisticsSampling(restartedTestee);
-			removeAllElementsInCache(restartedTestee);
-			transactionManager.commit();
-			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(2);
-		} finally {
-			restartedTestee.manager.shutdown();
-		}
-	}
-	
-	@Test
-	public void testShortTimeDiskGetsWhenRemoveOnNonExistingKey() throws Exception {
-		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
-			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(1));
-			
-		try {
-			startStatisticsSampling(testee);
-			putXElements(2, testee);
-			testee.manager.getStore(STATS_ENABLED_CACHE).remove("nonExistingKey");
-			transactionManager.commit();
-			waitForStatisticsSamples(testee.config.statsShortSamplingTimeInSeconds());
-			assertThat(testee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
-		} finally {
-			testee.manager.shutdown();
-		}
-	}
-	
-	@Test
-	public void testShortTimeDiskGetsWhenGetThenRemove() throws Exception {
-		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
-			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(1));
-			
-		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(2, testee);
-		
-		try {
-			startStatisticsSampling(restartedTestee);
-			readAllElementsInCache(restartedTestee);
-			removeAllElementsInCache(restartedTestee);
-			transactionManager.commit();
-			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(2);
-		} finally {
-			restartedTestee.manager.shutdown();
-		}
-	}
-	
-	@Test
-	public void testShortTimeDiskGetsWhenRemoveThenGet() throws Exception {
-		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
-			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(1));
-			
-		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(2, testee);
-		
-		try {
-			startStatisticsSampling(restartedTestee);
-			removeAllElementsInCache(restartedTestee);
-			transactionManager.commit();
-			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			transactionManager.begin();
-			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
-			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
-		} finally {
-			restartedTestee.manager.shutdown();
-		}
-	}
-	
-	@Test
-	public void testShortTimeDiskGetsWhenGetThenRemoveInAnotherTransaction() throws Exception {
-		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
-			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(1));
-			
-		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(2, testee);
-		
-		try {
-			startStatisticsSampling(restartedTestee);
-			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
-			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			transactionManager.begin();
-			removeAllElementsInCache(restartedTestee);
-			transactionManager.commit();
-			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
-		} finally {
-			restartedTestee.manager.shutdown();
-		}
-	}
-
-	@Test
-	public void testShortTimeDiskGetsWhenGetAfterUpdate() throws Exception {
-		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
-			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(1));
-			
-		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(2, testee);
-		
-		try {
-			startStatisticsSampling(restartedTestee);
-			readAllElementsInCache(restartedTestee);
-			putXElements(2, restartedTestee);
-			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
-			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(2);
-		} finally {
-			restartedTestee.manager.shutdown();
-		}
-	}
-	
-	@Test
-	public void testShortTimeDiskGetsWhenGetAfterUpdateInAnotherTransaction() throws Exception {
-		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
-			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(1));
-			
-		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(2, testee);
-		
-		try {
-			startStatisticsSampling(restartedTestee);
-			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
-			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			
-			transactionManager.begin();
-			putXElements(2, restartedTestee);
-			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
-			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			
-			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
-		} finally {
-			restartedTestee.manager.shutdown();
-		}
-	}
-	
-	@Test
-	public void testShortTimeDiskGetsWhenPutOnly() throws Exception {
-		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
-			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(1));
-			
-		try {
-			startStatisticsSampling(testee);
-			putXElements(2, testee);
-			transactionManager.commit();
-			waitForStatisticsSamples(testee.config.statsShortSamplingTimeInSeconds());
-			assertThat(testee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
-		} finally {
-			testee.manager.shutdown();
-		}
-	}
-	
-	@Test
-	public void testShortTimeDiskGetsWhenPutThenGet() throws Exception {
-		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
-			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(1));
-			
-		try {
-			startStatisticsSampling(testee);
-			putXElements(5, testee);
-			readAllElementsInCache(testee);
-			transactionManager.commit();
-			waitForStatisticsSamples(testee.config.statsShortSamplingTimeInSeconds());
-			assertThat(testee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
-		} finally {
-			testee.manager.shutdown();
-		}
-	}
-	
-	@Test
-	public void testShortTimeDiskGetsWhenGetOnDiskAndInHeap() throws Exception {
-		EhCacheStatisticsImpl testee = testeeWithConfig(new TestingEhCacheConfiguration()
-			.withMaxMemoryInMB(10)
-			.withStatsShortSamplingTimeInSeconds(1));
-
-		EhCacheStatisticsImpl restartedTestee = putXElementsThenRestartWithSameConfig(2, testee);
-		
-		try {
-			startStatisticsSampling(restartedTestee);
-			putXElements(3, 5, restartedTestee);
 			readAllElementsInCache(restartedTestee);
 			transactionManager.commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
@@ -421,7 +194,6 @@ public class EhCacheStatisticsImplTest {
 		
 		try {
 			startStatisticsSampling(restartedTestee);
-			Thread.sleep(100); // First read must be in first sample
 			readAllElementsInCacheWithWait(restartedTestee, waitBetweenReadsInSeconds);
 			transactionManager.commit();
 			assertThat(restartedTestee.longTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(5);
@@ -444,31 +216,19 @@ public class EhCacheStatisticsImplTest {
 			cache.get(key);
 		}
 	}
-	
-	private void removeAllElementsInCache(EhCacheStatisticsImpl testee) {
-		testee.manager.getStore(STATS_ENABLED_CACHE).removeAll();
-	}
 
 	private EhCacheStatisticsImpl putXElementsThenRestartWithSameConfig(int elementsCount, EhCacheStatisticsImpl testee)
 			throws Exception {
 		
 		EhCacheConfiguration previousConfigReference = testee.config;
-		putXElements(elementsCount, testee);
+		
+		for (int putCount = 0; putCount < elementsCount; putCount++) {
+			testee.manager.getStore(STATS_ENABLED_CACHE).put(new Element("a" + putCount, "b" + putCount));
+		}
 		transactionManager.commit();
 		testee.manager.shutdown();
 
 		return testeeWithConfig(previousConfigReference);
-	}
-
-	private void putXElements(int elementsCount, EhCacheStatisticsImpl testee) {
-		putXElements(0, elementsCount, testee);
-	}
-
-	private void putXElements(int startIndex, int elementsCount, EhCacheStatisticsImpl testee) {
-		int putUntil = elementsCount + startIndex;
-		for (int putCount = startIndex; putCount < putUntil; putCount++) {
-			testee.manager.getStore(STATS_ENABLED_CACHE).put(new Element("a" + putCount, "b" + putCount));
-		}
 	}
 
 	private void startStatisticsSampling(EhCacheStatisticsImpl testee) {
