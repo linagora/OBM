@@ -44,7 +44,6 @@ public class Configuration {
 
 	public static class EhCache {
 		public int maxMemoryInMB = 10;
-		public int timeToLiveInSeconds = 60;
 		public Integer percentageAllowedToCache = null;
 	}
 	

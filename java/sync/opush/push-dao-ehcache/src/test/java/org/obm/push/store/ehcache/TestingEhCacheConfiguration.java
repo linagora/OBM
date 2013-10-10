@@ -39,12 +39,10 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 
 	private int maxMemoryInMB;
 	private Integer percentageAllowedToCache;
-	private long timeToLive;
 
 	public TestingEhCacheConfiguration() {
 		this.percentageAllowedToCache = 10;
 		this.maxMemoryInMB = Ints.checkedCast(JvmUtils.maxRuntimeJvmMemoryInMB() / 2);
-		this.timeToLive = 60;
 	}
 	
 	public TestingEhCacheConfiguration withPercentageAllowedToCache(Integer percentageAllowedToCache) {
@@ -57,11 +55,6 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 		return this;
 	}
 
-	public TestingEhCacheConfiguration withTimeToLive(long timeToLive) {
-		this.timeToLive = timeToLive;
-		return this;
-	}
-	
 	@Override
 	public int maxMemoryInMB() {
 		return maxMemoryInMB;
@@ -73,10 +66,5 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 			return Percentage.UNDEFINED;
 		}
 		return Percentage.of(percentageAllowedToCache);
-	}
-
-	@Override
-	public long timeToLiveInSeconds() {
-		return timeToLive;
 	}
 }

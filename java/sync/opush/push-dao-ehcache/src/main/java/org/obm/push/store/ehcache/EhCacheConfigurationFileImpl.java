@@ -31,30 +31,20 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.util.concurrent.TimeUnit;
-
 import org.obm.configuration.utils.IniFile;
-import org.obm.configuration.utils.TimeUnitMapper;
 import org.obm.push.utils.jvm.JvmUtils;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 
 public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 
-	public final static String TIME_TO_LIVE_UNIT = "timeToLiveUnit";
-	public final static String TIME_TO_LIVE = "timeToLive";
-	public final static int DEFAULT_TIME_TO_LIVE = Ints.checkedCast(TimeUnit.DAYS.toSeconds(30));
-
 	private static final String configFilePath = "/etc/opush/ehcache_conf.ini";
 	private final IniFile iniFile;
-	private final TimeUnitMapper timeUnitMapper;
 	
 	@Inject
-	@VisibleForTesting EhCacheConfigurationFileImpl(IniFile.Factory factory, TimeUnitMapper timeUnitMapper) {
+	@VisibleForTesting EhCacheConfigurationFileImpl(IniFile.Factory factory) {
 		iniFile = factory.build(configFilePath);
-		this.timeUnitMapper = timeUnitMapper;
 	}
 	
 	@Override
@@ -76,20 +66,5 @@ public class EhCacheConfigurationFileImpl implements EhCacheConfiguration {
 			return Percentage.UNDEFINED;
 		}
 		return Percentage.of(value);
-	}
-
-	@Override
-	public long timeToLiveInSeconds() {
-		TimeUnit timeToLiveUnit = getTimeToLiveUnit();
-		long timeToLiveInSeconds = timeToLiveUnit.toSeconds(getTimeToLive());
-		return Ints.checkedCast(timeToLiveInSeconds);
-	}
-
-	private TimeUnit getTimeToLiveUnit() {
-		return timeUnitMapper.getTimeUnitOrDefault(iniFile.getStringValue(TIME_TO_LIVE_UNIT), TimeUnit.SECONDS);
-	}
-
-	private int getTimeToLive() {
-		return iniFile.getIntValue(TIME_TO_LIVE, DEFAULT_TIME_TO_LIVE);
 	}
 }

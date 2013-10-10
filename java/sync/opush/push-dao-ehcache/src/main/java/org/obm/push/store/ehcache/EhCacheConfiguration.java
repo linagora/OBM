@@ -45,7 +45,6 @@ public interface EhCacheConfiguration {
 	 * @return percentage related to the global heap memory allowed for the given cache
 	 */
 	Percentage percentageAllowedToCache(String cacheName);
-	long timeToLiveInSeconds();
 	
 	public static class Percentage {
 
