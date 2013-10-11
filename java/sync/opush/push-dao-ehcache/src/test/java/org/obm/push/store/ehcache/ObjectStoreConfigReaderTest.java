@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -32,13 +32,13 @@
 package org.obm.push.store.ehcache;
 
 import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.IOException;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.config.CacheConfiguration;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.easymock.IMocksControl;
 import org.junit.After;
@@ -51,28 +51,30 @@ import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import bitronix.tm.BitronixTransactionManager;
 import bitronix.tm.TransactionManagerServices;
 
-@RunWith(SlowFilterRunner.class) @Slow
-public class ObjectStoreManagerTest {
+@Slow
+@RunWith(SlowFilterRunner.class)
+public class ObjectStoreConfigReaderTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
 	
+	private static final int MAX_MEMORY_IN_MB = 64;
+	
 	private TransactionProvider transactionProvider;
-	private ObjectStoreManager opushCacheManager;
-	private EhCacheConfiguration config;
 	private ConfigurationService configurationService;
+	private TestingEhCacheConfiguration config;
+	private ObjectStoreManager opushCacheManager;
 	private Logger logger;
 	private BitronixTransactionManager transactionManager;
 
-	
 	@Before
-	public void init() throws IOException {
-		logger = LoggerFactory.getLogger(getClass());
+	public void setup() throws IOException {
+		logger = createNiceMock(Logger.class);
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		
 		IMocksControl control = createControl();
@@ -82,80 +84,39 @@ public class ObjectStoreManagerTest {
 		
 		configurationService = new EhCacheConfigurationService().mock(tempFolder);
 		config = new TestingEhCacheConfiguration();
+		config.withMaxMemoryInMB(MAX_MEMORY_IN_MB);
 		opushCacheManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
 	}
-
+	
 	@After
-	public void shutdown() {
+	public void tearDown() {
 		opushCacheManager.shutdown();
 		transactionManager.shutdown();
 	}
-
+	
 	@Test
-	public void loadStores() {
-		assertThat(opushCacheManager.listStores()).hasSize(7);
+	public void testGetRunningMaxMemoryInMB() {
+		ObjectStoreConfigReader objectStoreConfigReader = new ObjectStoreConfigReader(opushCacheManager);
+		assertThat(objectStoreConfigReader.getRunningMaxMemoryInMB()).isEqualTo(MAX_MEMORY_IN_MB);
 	}
 	
 	@Test
-	public void createNewThreeCachesAndRemoveOne() {
-		opushCacheManager.createNewStore("test 1");
-		opushCacheManager.createNewStore("test 2");
-		opushCacheManager.createNewStore("test 3");
-		
-		opushCacheManager.removeStore("test 2");
-
-		assertThat(opushCacheManager.getStore("test 1")).isNotNull();
-		assertThat(opushCacheManager.getStore("test 3")).isNotNull();
-		assertThat(opushCacheManager.getStore("test 2")).isNull();
-		assertThat(opushCacheManager.listStores()).hasSize(9);
+	public void testGetRunningStoresMaxMemoryInMB() {
+		ObjectStoreConfigReader objectStoreConfigReader = new ObjectStoreConfigReader(opushCacheManager);
+		Map<String, Long> runningStores = objectStoreConfigReader.getRunningStoresMaxMemoryInMB();
+		assertThat(runningStores).hasSize(EhCacheStores.STORES.size());
+		for (Entry<String, Long> entry : runningStores.entrySet()) {
+			assertThat(entry.getValue()).isGreaterThan(0);
+		}
 	}
 	
 	@Test
-	public void createAndRemoveCache() {
-		opushCacheManager.createNewStore("test 1");
-		opushCacheManager.removeStore("test 1");
-
-		assertThat(opushCacheManager.getStore("test 1")).isNull();
-	}
-
-	@Test
-	public void createTwoIdenticalCache() {
-		opushCacheManager.createNewStore("test 1");
-		opushCacheManager.createNewStore("test 1");
-		
-		assertThat(opushCacheManager.getStore("test 1")).isNotNull();
-		assertThat(opushCacheManager.listStores()).hasSize(8);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testRequiredStoreOnUnknownStore() {
-		opushCacheManager.requiredStore("unknown");
-	}
-	
-	@Test
-	public void testRequiredStore() {
-		String storeName = "test";
-		Cache expectedStore = opushCacheManager.createNewStore(storeName);
-		Cache store = opushCacheManager.requiredStore(storeName);
-		assertThat(store).isEqualTo(expectedStore);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testRequiredStoreConfigurationOnUnknownStore() {
-		opushCacheManager.requiredStoreConfiguration("unknown");
-	}
-	
-	@Test
-	public void testRequiredStoreConfiguration() {
-		String storeName = "test";
-		Cache expectedStore = opushCacheManager.createNewStore(storeName);
-		CacheConfiguration configuration = opushCacheManager.requiredStoreConfiguration(storeName);
-		assertThat(configuration).isEqualTo(expectedStore.getCacheConfiguration());
-	}
-	
-	@Test
-	public void testCreateConfigReader() {
-		ObjectStoreConfigReader configReader = opushCacheManager.createConfigReader();
-		assertThat(configReader.storeManager).isEqualTo(opushCacheManager);
+	public void testGetRunningStoresPercentages() {
+		ObjectStoreConfigReader objectStoreConfigReader = new ObjectStoreConfigReader(opushCacheManager);
+		Map<String, Percentage> runningStores = objectStoreConfigReader.getRunningStoresPercentages();
+		assertThat(runningStores).hasSize(EhCacheStores.STORES.size());
+		for (Entry<String, Percentage> entry : runningStores.entrySet()) {
+			assertThat(entry.getValue().getIntValue()).isGreaterThan(0);
+		}
 	}
 }
