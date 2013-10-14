@@ -196,7 +196,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
-		expect(userDao.getAllEmailsFrom(domain)).andReturn(ImmutableSet.<String>of());
+		expect(userDao.getAllEmailsFrom(domain, user.getExtId())).andReturn(ImmutableSet.<String>of());
 		expect(userDao.create(user)).andReturn(userFromDao);
 		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(
 				usersGroup);
@@ -248,7 +248,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
-		expect(userDao.getAllEmailsFrom(domain)).andReturn(ImmutableSet.<String>of("john@domain"));
+		expect(userDao.getAllEmailsFrom(domain, UserExtId.valueOf("extIdUser1"))).andReturn(ImmutableSet.of("john@domain"));
 
 		expect(batchDao.update(batchBuilder
 						.operation(
@@ -339,7 +339,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
-		expect(userDao.getAllEmailsFrom(domain)).andReturn(ImmutableSet.<String>of());
+		expect(userDao.getAllEmailsFrom(domain, user.getExtId())).andReturn(ImmutableSet.<String>of());
 		expect(userDao.create(user)).andReturn(userFromDao);
 		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(null);
 		expectLastCall();
@@ -891,7 +891,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
 						domainWithImapAndLdap)).andReturn(userFromDao);
-		expect(userDao.getAllEmailsFrom(domain)).andReturn(ImmutableSet.<String>of("john@domain", "alias1@domain"));
+		expect(userDao.getAllEmailsFrom(domain, UserExtId.valueOf("extIdUser1"))).andReturn(ImmutableSet.of("john@domain", "alias1@domain"));
 
 		expect(batchDao.update(batchBuilder
 				.operation(
@@ -1202,7 +1202,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domain))
 				.andReturn(userFromDao);
-		expect(userDao.getAllEmailsFrom(domain)).andReturn(ImmutableSet.<String>of("john@domain", "alias1@domain"));
+		expect(userDao.getAllEmailsFrom(domain, UserExtId.valueOf("extIdUser1"))).andReturn(ImmutableSet.of("john@domain", "alias1@domain"));
 
 		expect(batchDao.update(batchBuilder
 				.operation(

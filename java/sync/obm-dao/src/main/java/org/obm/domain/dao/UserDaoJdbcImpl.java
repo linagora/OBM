@@ -62,6 +62,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -903,7 +904,9 @@ public class UserDaoJdbcImpl implements UserDao {
 	}
 
 	@Override
-	public ImmutableSet<String> getAllEmailsFrom(ObmDomain domain) throws SQLException {
+	public ImmutableSet<String> getAllEmailsFrom(ObmDomain domain, UserExtId toIgnore) throws SQLException {
+		Preconditions.checkArgument(toIgnore != null);
+		
 		Connection connection = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -915,6 +918,7 @@ public class UserDaoJdbcImpl implements UserDao {
 				"SELECT userobm_email as mail FROM UserObm " +
 				"INNER JOIN Domain ON Domain.domain_id = userobm_domain_id " +
 				"WHERE domain_id = ? " +
+				"AND userobm_ext_id != ? " +
 				"UNION " +
 				"SELECT mailshare_email as mail FROM MailShare " +
 				"INNER JOIN Domain ON Domain.domain_id = mailshare_domain_id " +
@@ -925,8 +929,9 @@ public class UserDaoJdbcImpl implements UserDao {
 				"WHERE domain_id = ?");
 
 			ps.setInt(1, domain.getId());
-			ps.setInt(2, domain.getId());
+			ps.setString(2, toIgnore.getExtId());
 			ps.setInt(3, domain.getId());
+			ps.setInt(4, domain.getId());
 			
 			rs = ps.executeQuery();
 			ImmutableSet.Builder<String> builder = ImmutableSet.builder();

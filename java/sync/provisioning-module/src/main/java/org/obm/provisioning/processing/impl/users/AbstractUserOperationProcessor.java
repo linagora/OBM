@@ -32,6 +32,7 @@ package org.obm.provisioning.processing.impl.users;
 import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
 
 import java.sql.SQLException;
+import java.util.Set;
 
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -104,7 +105,7 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 					.add(user.getEmail())
 					.addAll(user.getEmailAlias())
 					.build();
-			final ImmutableSet<String> allEmails = userDao.getAllEmailsFrom(user.getDomain());
+			final Set<String> allEmails = userDao.getAllEmailsFrom(user.getDomain(), user.getExtId());
 			
 			final SetView<String> matchingEmails = Sets.intersection(allEmails, userEmails);
 			if(!matchingEmails.isEmpty()) {

@@ -750,9 +750,14 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 
 	@Test
 	public void testGetAllEmailsFrom() throws SQLException {
-		ImmutableSet<String> allEmails = dao.getAllEmailsFrom(domain);
+		ImmutableSet<String> allEmails = dao.getAllEmailsFrom(domain, UserExtId.valueOf("1"));
 		
-		assertThat(allEmails).containsOnly("group1", "group2", "mailshare1", "user1", "user2", "user3");
+		assertThat(allEmails).containsOnly("group1", "group2", "mailshare1", "user2", "user3");
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetAllEmailsFromWithNullToIgnoreExtId() throws SQLException {
+		dao.getAllEmailsFrom(domain, null);
 	}
 
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId, String extId) {
