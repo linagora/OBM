@@ -71,6 +71,8 @@ import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.PropertyFactoryImpl;
 import net.fortuna.ical4j.model.PropertyList;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.WeekDay;
 import net.fortuna.ical4j.model.WeekDayList;
@@ -117,6 +119,7 @@ import net.fortuna.ical4j.model.property.Trigger;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.model.property.XProperty;
+import net.fortuna.ical4j.util.TimeZones;
 
 import org.apache.commons.lang.StringUtils;
 import org.obm.icalendar.ical4jwrapper.EventDate;
@@ -157,6 +160,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -194,9 +198,16 @@ public class Ical4jHelper {
 			.build();
 	private static final BiMap<Clazz, EventPrivacy> CLASSIFICATION_TO_PRIVACY = PRIVACY_TO_CLASSIFICATION.inverse();
 	
+	private static final ImmutableSet<String> UTC_TZID_STRINGS = ImmutableSet.of(
+			TimeZones.GMT_ID, // "Etc/GMT"
+			TimeZones.UTC_ID, // "Etc/UTC"
+			TimeZones.IBM_UTC_ID // "GMT"
+		);
+
 	private final DateProvider dateProvider;
 	private final Factory eventExtIdFactory;
 	private final AttendeeService attendeeService;
+	private final TimeZoneRegistry tzRegistry;
 	
 	@Inject
 	@VisibleForTesting
@@ -204,6 +215,7 @@ public class Ical4jHelper {
 		this.dateProvider = obmHelper;
 		this.eventExtIdFactory = eventExtIdFactory;
 		this.attendeeService = attendeeService;
+		this.tzRegistry = TimeZoneRegistryFactory.getInstance().createRegistry();
 	}
 
 	public String buildIcsInvitationRequest(Ical4jUser iCal4jUser, Event event, AccessToken token) {
@@ -1003,7 +1015,20 @@ public class Ical4jHelper {
 	}
 
 	private void appendDtStartAsDateTimeToICS(PropertyList prop, Event event) {
-		prop.add(new DtStart(new DateTime(event.getStartDate()), true));
+		String timezoneName = Objects.firstNonNull(event.getTimezoneName(), TimeZones.GMT_ID);
+		net.fortuna.ical4j.model.TimeZone zone = tzRegistry.getTimeZone(timezoneName);
+		DateTime icalDate = new DateTime();
+		icalDate.setTime(event.getStartDate().getTime());
+
+		if (UTC_TZID_STRINGS.contains(timezoneName)) {
+			icalDate.setUtc(true);
+		} else {
+			icalDate.setTimeZone(zone);
+		}
+
+		DtStart dts = new DtStart(zone);
+		dts.setDate(icalDate);
+		prop.add(dts);
 	}
 
 	private void appendLastModified(PropertyList prop, Event event) {
