@@ -13,3 +13,6 @@ dist/
 *.log
 *.tlog
 message-queue/data/
+data/
+*.iml
+.idea/

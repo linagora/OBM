@@ -380,5 +380,5 @@ public interface ICalendar {
 	 * Returns the events using the resource in a range of three months before
 	 * and six months after the date parameter.
 	 */
-	Collection<Event> getResourceEvents(String resourceEmail, Date date) throws ServerFault;
+	Collection<Event> getResourceEvents(String resourceEmail, Date date, SyncRange syncRange) throws ServerFault;
 }

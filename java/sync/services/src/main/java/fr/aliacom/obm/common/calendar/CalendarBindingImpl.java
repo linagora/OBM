@@ -93,6 +93,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -822,20 +823,32 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional(readOnly=true)
-	public Collection<Event> getResourceEvents(String resourceEmail, Date date)
-			throws ServerFault {
+	public Collection<Event> getResourceEvents(String resourceEmail, Date date, SyncRange syncRange) throws ServerFault {
 		try {
 			ResourceInfo resourceInfo = calendarDao.getResource(resourceEmail);
 			if (resourceInfo == null) {
 				throw new ResourceNotFoundException(String.format("No such resource %s", resourceEmail));
 			}
-			Date threeMonthsBefore = new org.joda.time.DateTime(date).minus(Months.THREE).toDate();
-			Date sixMonthsAfter = new org.joda.time.DateTime(date).plus(Months.SIX).toDate();
-			SyncRange syncRange = new SyncRange(sixMonthsAfter, threeMonthsBefore);
-			return calendarDao.getResourceEvents(resourceInfo, syncRange);
+			final Date newDate = date;
+
+			return calendarDao.getResourceEvents(
+					resourceInfo,
+					Optional.fromNullable(syncRange).or(
+							new Supplier<SyncRange>() {
+							@Override
+							public SyncRange get() {
+								return defaultSyncRange(newDate);
+							}
+					}));
 		} catch (FindException ex) {
 			throw new ServerFault(ex);
 		}
+	}
+	
+	private SyncRange defaultSyncRange(Date date) {
+		return new SyncRange(
+				new org.joda.time.DateTime(date).minus(Months.THREE).toDate(),
+				new org.joda.time.DateTime(date).plus(Months.SIX).toDate());
 	}
 	
 	@Override

@@ -45,7 +45,9 @@ import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.GuiceServletContextListener;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.services.ICalendar;
+import org.obm.sync.utils.DateHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +84,7 @@ public class ResourceServlet extends HttpServlet {
 		
 		try {
 			response.setContentType("text/calendar;charset=UTF-8");
-			String resourceICS = getResourceICS(resourceEmail);
+			String resourceICS = getResourceICS(resourceEmail, extractSyncRange(request));
 			
 			if (resourceICS == null) {
 				response.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -113,10 +115,20 @@ public class ResourceServlet extends HttpServlet {
 		}
 		return resourceEmail;
 	}
+	
+	private SyncRange extractSyncRange(HttpServletRequest request) {
+		Date after = DateHelper.asDate(request.getParameter("syncRangeAfter"), null);
+		
+		if (after == null) {
+			return null;
+		}
+		
+		return new SyncRange(null, after);
+	}
 
 	@VisibleForTesting
-	String getResourceICS(String resourceEmail) throws ServerFault {
-		Collection<Event> resourceEvents = calendarBinding.getResourceEvents(resourceEmail, new Date());
+	String getResourceICS(String resourceEmail, SyncRange syncRange) throws ServerFault {
+		Collection<Event> resourceEvents = calendarBinding.getResourceEvents(resourceEmail, new Date(), syncRange);
 		
 		if (Iterables.isEmpty(resourceEvents)) {
 			return null;

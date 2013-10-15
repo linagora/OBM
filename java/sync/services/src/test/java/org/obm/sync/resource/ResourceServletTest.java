@@ -62,9 +62,11 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventExtId.Factory;
 import org.obm.sync.calendar.SimpleAttendeeService;
+import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.AttendeeService;
 import org.obm.sync.services.ICalendar;
+import org.obm.sync.utils.DateHelper;
 
 import com.google.inject.Injector;
 
@@ -122,14 +124,14 @@ public class ResourceServletTest {
 		int collectionSize = 5;
 		collectionEvents = ToolBox.getFakeEventCollection(collectionSize);
 		expect(
-				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class)))
+				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class), anyObject(SyncRange.class)))
 				.andReturn(collectionEvents);
 
 		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding };
 		replay(mocks);
 		resourceServlet.init(servletConfig);
 
-		String ics = resourceServlet.getResourceICS("resource@domain");
+		String ics = resourceServlet.getResourceICS("resource@domain", new SyncRange(null, null));
 		Assertions.assertThat(helper.parseICS(ics, iCalUser, 0)).isNotNull().hasSize(collectionSize);
 		verify(mocks);
 	}
@@ -139,7 +141,7 @@ public class ResourceServletTest {
 		int collectionSize = 5;
 		collectionEvents = ToolBox.getFakeEventCollection(collectionSize);
 		expect(
-				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class)))
+				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class), anyObject(SyncRange.class)))
 				.andReturn(collectionEvents);
 
 		String uid = "/resource@domain";
@@ -148,6 +150,7 @@ public class ResourceServletTest {
 
 		expect(request.getPathInfo()).andReturn(uid);
 
+		expect(request.getParameter("syncRangeAfter")).andReturn(null);
 		response.setContentType("text/calendar;charset=UTF-8");
 		response.setStatus(eq(HttpServletResponse.SC_OK));
 		expectLastCall();
@@ -188,9 +191,10 @@ public class ResourceServletTest {
 		String uid = "/resource@domain";
 		expect(request.getPathInfo()).andReturn(uid);
 		expect(
-				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class)))
+				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class), anyObject(SyncRange.class)))
 				.andThrow(new ResourceNotFoundException("Resource with id doesn't exist"));
 
+		expect(request.getParameter("syncRangeAfter")).andReturn(null);
 		response.setContentType("text/calendar;charset=UTF-8");
 		response.setStatus(eq(HttpServletResponse.SC_NOT_FOUND));
 		response.flushBuffer();
@@ -207,12 +211,14 @@ public class ResourceServletTest {
 
 	@Test
 	public void testDoGetResourceHasNoEvents() throws Exception{
-		expect(calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class))).andReturn(Collections.<Event>emptyList());
+		expect(calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class), anyObject(SyncRange.class)))
+			.andReturn(Collections.<Event>emptyList());
 
 		String uid = "/resource@domain";
 
 		expect(request.getPathInfo()).andReturn(uid);
 
+		expect(request.getParameter("syncRangeAfter")).andReturn(null);
 		response.setContentType("text/calendar;charset=UTF-8");
 		expectLastCall();
 		response.setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
@@ -220,6 +226,38 @@ public class ResourceServletTest {
 
 		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request, response };
 
+		replay(mocks);
+
+		resourceServlet.init(servletConfig);
+		resourceServlet.doGet(request, response);
+
+		verify(mocks);
+	}
+	
+	@Test
+	public void testDoGetResourceWithSyncAfter() throws Exception {
+		int collectionSize = 5;
+		collectionEvents = ToolBox.getFakeEventCollection(collectionSize);
+		expect(
+				calendarBinding.getResourceEvents(
+						eq("resource@domain"),
+						anyObject(Date.class),
+						eq(new SyncRange(null, DateHelper.asDate("1381838400")))))
+				.andReturn(collectionEvents);
+
+		String uid = "/resource@domain";
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter writer = new PrintWriter(stringWriter);
+
+		expect(request.getPathInfo()).andReturn(uid);
+		expect(request.getParameter("syncRangeAfter")).andReturn("1381838400");
+		response.setContentType("text/calendar;charset=UTF-8");
+		response.setStatus(eq(HttpServletResponse.SC_OK));
+		expectLastCall();
+		expect(response.getWriter()).andReturn(writer);
+		
+		Object[] mocks = { servletConfig, servletContext, injector, calendarBinding, request, response };
+		
 		replay(mocks);
 
 		resourceServlet.init(servletConfig);
