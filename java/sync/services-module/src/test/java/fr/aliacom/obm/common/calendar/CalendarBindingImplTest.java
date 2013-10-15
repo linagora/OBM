@@ -2698,7 +2698,7 @@ public class CalendarBindingImplTest {
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, mockDao,
 				null, null, null, null, null, attendeeService);
-		Collection<Event> events = calendarService.getResourceEvents(resourceEmail, date);
+		Collection<Event> events = calendarService.getResourceEvents(resourceEmail, date, syncRange);
 		assertThat(events).isEqualTo(expectedEvents);
 
 		verify(mocks);
@@ -2717,11 +2717,38 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, mockDao,
 				null, null, null, null, null, attendeeService);
 		try {
-			calendarService.getResourceEvents(resourceEmail, new Date());
+			calendarService.getResourceEvents(resourceEmail, new Date(), new SyncRange(null, null));
 		}
 		finally {
 			verify(mocks);
 		}
+	}
+	
+	@Test
+	public void testGetResourceEventsWithNullRange() throws ServerFault, FindException {
+		String resourceEmail = "resource@domain";
+		Event mockEvent1 = createMock(Event.class);
+		Event mockEvent2 = createMock(Event.class);
+		Collection<Event> expectedEvents = Lists.newArrayList(mockEvent1, mockEvent2);
+
+		Date date = new Date();
+		SyncRange defaultRange = new SyncRange(
+				new org.joda.time.DateTime(date).minus(Months.THREE).toDate(),
+				new org.joda.time.DateTime(date).plus(Months.SIX).toDate());
+		CalendarDao mockDao = createMock(CalendarDao.class);
+		ResourceInfo mockResource = createMock(ResourceInfo.class);
+		expect(mockDao.getResource(resourceEmail)).andReturn(mockResource);
+		expect(mockDao.getResourceEvents(mockResource, defaultRange)).andReturn(expectedEvents);
+
+		Object[] mocks = { mockEvent1, mockEvent2, mockDao, mockResource };
+
+		replay(mocks);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, mockDao,
+				null, null, null, null, null, attendeeService);
+		Collection<Event> events = calendarService.getResourceEvents(resourceEmail, date, null);
+		verify(mocks);
+
+		assertThat(events).isEqualTo(expectedEvents);
 	}
 	
 	@Test

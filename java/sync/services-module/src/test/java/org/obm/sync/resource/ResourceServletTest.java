@@ -54,9 +54,11 @@ import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventExtId.Factory;
 import org.obm.sync.calendar.SimpleAttendeeService;
+import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.AttendeeService;
 import org.obm.sync.services.ICalendar;
+import org.obm.sync.utils.DateHelper;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.calendar.ResourceNotFoundException;
@@ -99,12 +101,12 @@ public class ResourceServletTest {
 		int collectionSize = 5;
 		collectionEvents = ToolBox.getFakeEventCollection(collectionSize);
 		expect(
-				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class)))
+				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class), anyObject(SyncRange.class)))
 				.andReturn(collectionEvents);
 
 		control.replay();
 
-		String ics = resourceServlet.getResourceICS("resource@domain");
+		String ics = resourceServlet.getResourceICS("resource@domain", new SyncRange(null, null));
 		assertThat(helper.parseICS(ics, iCalUser, 0)).isNotNull().hasSize(collectionSize);
 		control.verify();
 	}
@@ -114,7 +116,7 @@ public class ResourceServletTest {
 		int collectionSize = 5;
 		collectionEvents = ToolBox.getFakeEventCollection(collectionSize);
 		expect(
-				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class)))
+				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class), anyObject(SyncRange.class)))
 				.andReturn(collectionEvents);
 
 		String uid = "/resource@domain";
@@ -123,6 +125,7 @@ public class ResourceServletTest {
 
 		expect(request.getPathInfo()).andReturn(uid);
 
+		expect(request.getParameter("syncRangeAfter")).andReturn(null);
 		response.setContentType("text/calendar;charset=UTF-8");
 		response.setStatus(eq(HttpServletResponse.SC_OK));
 		expectLastCall();
@@ -156,9 +159,10 @@ public class ResourceServletTest {
 		String uid = "/resource@domain";
 		expect(request.getPathInfo()).andReturn(uid);
 		expect(
-				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class)))
+				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class), anyObject(SyncRange.class)))
 				.andThrow(new ResourceNotFoundException("Resource with id doesn't exist"));
 
+		expect(request.getParameter("syncRangeAfter")).andReturn(null);
 		response.setContentType("text/calendar;charset=UTF-8");
 		response.setStatus(eq(HttpServletResponse.SC_NOT_FOUND));
 		response.flushBuffer();
@@ -172,12 +176,14 @@ public class ResourceServletTest {
 
 	@Test
 	public void testDoGetResourceHasNoEvents() throws Exception{
-		expect(calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class))).andReturn(Collections.<Event>emptyList());
+		expect(calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class), anyObject(SyncRange.class)))
+			.andReturn(Collections.<Event>emptyList());
 
 		String uid = "/resource@domain";
 
 		expect(request.getPathInfo()).andReturn(uid);
 
+		expect(request.getParameter("syncRangeAfter")).andReturn(null);
 		response.setContentType("text/calendar;charset=UTF-8");
 		expectLastCall();
 		response.setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
@@ -187,6 +193,33 @@ public class ResourceServletTest {
 
 		resourceServlet.doGet(request, response);
 
+		control.verify();
+	}
+	
+	@Test
+	public void testDoGetResourceWithSyncAfter() throws Exception {
+		int collectionSize = 5;
+		collectionEvents = ToolBox.getFakeEventCollection(collectionSize);
+		expect(
+				calendarBinding.getResourceEvents(
+						eq("resource@domain"),
+						anyObject(Date.class),
+						eq(new SyncRange(null, DateHelper.asDate("1381838400")))))
+				.andReturn(collectionEvents);
+
+		String uid = "/resource@domain";
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter writer = new PrintWriter(stringWriter);
+
+		expect(request.getPathInfo()).andReturn(uid);
+		expect(request.getParameter("syncRangeAfter")).andReturn("1381838400");
+		response.setContentType("text/calendar;charset=UTF-8");
+		response.setStatus(eq(HttpServletResponse.SC_OK));
+		expectLastCall();
+		expect(response.getWriter()).andReturn(writer);
+		
+		control.replay();
+		resourceServlet.doGet(request, response);
 		control.verify();
 	}
 

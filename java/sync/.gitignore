@@ -15,3 +15,5 @@ dist/
 bin/
 message-queue/data/
 data/
+*.iml
+.idea/

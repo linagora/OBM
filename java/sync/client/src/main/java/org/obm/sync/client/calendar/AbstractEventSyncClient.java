@@ -529,7 +529,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public Collection<Event> getResourceEvents(String resourceEmail, Date date) throws ServerFault {
+	public Collection<Event> getResourceEvents(String resourceEmail, Date date, SyncRange syncRange) throws ServerFault {
 		throw new UnsupportedOperationException();
 	}
 
