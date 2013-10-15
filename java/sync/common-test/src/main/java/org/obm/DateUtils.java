@@ -34,8 +34,21 @@ package org.obm;
 import java.util.Date;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 public class DateUtils {
+
+	/**
+	 * Creates a Date object with the timezone offset for tzid applied. It must be in the format
+	 * of ISO8601 with separators. Do not add a "Z" at the end, this will be done by the function.
+	 *
+	 * @param refDate		A String containing the reference date
+	 * @param tzid			The timezone to return the date in
+	 * @return				The converted date
+	 */
+	public static Date dateInZone(String dateAsString, String tzid) {
+		return new DateTime(dateAsString, DateTimeZone.forID(tzid)).toDate();
+	}
 
 	public static Date date(String dateAsString) {
 		return new DateTime(dateAsString).toDate();
