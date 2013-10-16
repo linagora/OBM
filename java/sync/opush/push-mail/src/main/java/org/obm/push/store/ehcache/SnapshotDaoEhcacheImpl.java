@@ -54,8 +54,8 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
-	@Inject  SnapshotDaoEhcacheImpl(StoreManager objectStoreManager) {
-		super(objectStoreManager);
+	@Inject  SnapshotDaoEhcacheImpl(StoreManager objectStoreManager, CacheEvictionListener cacheEvictionListener) {
+		super(objectStoreManager, cacheEvictionListener);
 	}
 	
 	@Override

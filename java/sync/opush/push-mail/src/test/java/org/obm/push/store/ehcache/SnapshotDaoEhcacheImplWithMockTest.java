@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -39,6 +40,8 @@ import static org.powermock.api.easymock.PowerMock.replayAll;
 import static org.powermock.api.easymock.PowerMock.verifyAll;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.event.CacheEventListener;
+import net.sf.ehcache.event.RegisteredEventListeners;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,7 +58,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import com.google.common.collect.ImmutableList;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Cache.class, ObjectStoreManager.class})
+@PrepareForTest({Cache.class, ObjectStoreManager.class, RegisteredEventListeners.class})
 public class SnapshotDaoEhcacheImplWithMockTest {
 
 	@Test
@@ -71,6 +74,12 @@ public class SnapshotDaoEhcacheImplWithMockTest {
 		ObjectStoreManager objectStoreManager = createObjectStoreManager();
 		
 		Cache cache = createCache();
+		RegisteredEventListeners registeredEventListeners = createMock(RegisteredEventListeners.class);
+		expect(registeredEventListeners.registerListener(anyObject(CacheEventListener.class)))
+			.andReturn(true);
+		expect(cache.getCacheEventNotificationService())
+			.andReturn(registeredEventListeners).anyTimes();
+		
 		expect(cache.get(buildKey))
 			.andReturn(null);
 		
@@ -79,7 +88,7 @@ public class SnapshotDaoEhcacheImplWithMockTest {
 
 		replayAll();
 		
-		SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager);
+		SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager, null);
 		Snapshot snapshot = snapshotDaoEhcacheImpl.get(deviceId, syncKey, collectionId);
 		
 		verifyAll();
@@ -99,6 +108,11 @@ public class SnapshotDaoEhcacheImplWithMockTest {
 		ObjectStoreManager objectStoreManager = createObjectStoreManager();
 		
 		Cache cache = createCache();
+		RegisteredEventListeners registeredEventListeners = createMock(RegisteredEventListeners.class);
+		expect(registeredEventListeners.registerListener(anyObject(CacheEventListener.class)))
+			.andReturn(true);
+		expect(cache.getCacheEventNotificationService())
+			.andReturn(registeredEventListeners).anyTimes();
 		
 		Email email = Email.builder()
 				.uid(1)
@@ -124,7 +138,7 @@ public class SnapshotDaoEhcacheImplWithMockTest {
 
 		replayAll();
 		
-		SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager);
+		SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager, null);
 		Snapshot snapshot = snapshotDaoEhcacheImpl.get(deviceId, syncKey, collectionId);
 		
 		verifyAll();
@@ -144,6 +158,11 @@ public class SnapshotDaoEhcacheImplWithMockTest {
 		ObjectStoreManager objectStoreManager = createObjectStoreManager();
 		
 		Cache cache = createCache();
+		RegisteredEventListeners registeredEventListeners = createMock(RegisteredEventListeners.class);
+		expect(registeredEventListeners.registerListener(anyObject(CacheEventListener.class)))
+			.andReturn(true);
+		expect(cache.getCacheEventNotificationService())
+			.andReturn(registeredEventListeners).anyTimes();
 		
 		Email email = Email.builder()
 				.uid(1)
@@ -169,7 +188,7 @@ public class SnapshotDaoEhcacheImplWithMockTest {
 
 		replayAll();
 		
-		SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager);
+		SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager, null);
 		snapshotDaoEhcacheImpl.put(snapshot);
 		
 		verifyAll();
@@ -182,6 +201,11 @@ public class SnapshotDaoEhcacheImplWithMockTest {
 		ObjectStoreManager objectStoreManager = createObjectStoreManager();
 		
 		Cache cache = createCache();
+		RegisteredEventListeners registeredEventListeners = createMock(RegisteredEventListeners.class);
+		expect(registeredEventListeners.registerListener(anyObject(CacheEventListener.class)))
+			.andReturn(true);
+		expect(cache.getCacheEventNotificationService())
+			.andReturn(registeredEventListeners).anyTimes();
 		
 		SnapshotKey snapshotKey = SnapshotKey.builder()
 					.deviceId(deviceId)
@@ -198,7 +222,7 @@ public class SnapshotDaoEhcacheImplWithMockTest {
 
 		replayAll();
 		
-		SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager);
+		SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager, null);
 		snapshotDaoEhcacheImpl.deleteAll(deviceId);
 		
 		verifyAll();
@@ -210,7 +234,6 @@ public class SnapshotDaoEhcacheImplWithMockTest {
 	}
 	
 	private Cache createCache() {
-		Cache cache = createMock(Cache.class);
-		return cache;
+		return createMock(Cache.class);
 	}
 }

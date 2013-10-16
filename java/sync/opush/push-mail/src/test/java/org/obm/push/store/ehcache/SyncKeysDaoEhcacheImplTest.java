@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import static org.easymock.EasyMock.createMock;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.File;
@@ -75,7 +76,8 @@ public class SyncKeysDaoEhcacheImplTest {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		EhCacheConfiguration config = new MailEhCacheConfiguration();
 		this.objectStoreManager = new ObjectStoreManager(initConfigurationServiceMock(), config, logger);
-		syncKeysDaoEhcacheImpl = new SyncKeysDaoEhcacheImpl(objectStoreManager);
+		CacheEvictionListener cacheEvictionListener = createMock(CacheEvictionListener.class);
+		syncKeysDaoEhcacheImpl = new SyncKeysDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 	}
 	
 	private ConfigurationService initConfigurationServiceMock() throws IOException {

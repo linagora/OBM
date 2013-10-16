@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store;
 
+import org.obm.push.store.ehcache.CacheEvictionListener;
+import org.obm.push.store.ehcache.CacheEvictionListenerImpl;
 import org.obm.push.store.ehcache.EhCacheConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfigurationFileImpl;
 import org.obm.push.store.ehcache.EhCacheStatistics;
@@ -68,6 +70,7 @@ public class DaoModule extends AbstractModule{
 		bind(EhCacheConfiguration.class).to(EhCacheConfigurationFileImpl.class);
 		bind(EhCacheStatistics.class).to(EhCacheStatisticsImpl.class);
 		bind(StoreManager.class).to(ObjectStoreManager.class);
+		bind(CacheEvictionListener.class).to(CacheEvictionListenerImpl.class);
 	}
 
 }

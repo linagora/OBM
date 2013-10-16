@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import static org.easymock.EasyMock.createMock;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.File;
@@ -78,7 +79,8 @@ public class SnapshotDaoEhcacheImplTest {
 		transactionManager.begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		this.objectStoreManager = new ObjectStoreManager(initConfigurationServiceMock(), new MailEhCacheConfiguration(), logger);
-		snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager);
+		CacheEvictionListener cacheEvictionListener = createMock(CacheEvictionListener.class);
+		snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 	}
 	
 	private ConfigurationService initConfigurationServiceMock() throws IOException {

@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import static org.easymock.EasyMock.createMock;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -70,7 +71,8 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		EhCacheConfiguration config = new TestingEhCacheConfiguration();
 		this.objectStoreManager = new ObjectStoreManager(super.mockConfigurationService(), config, logger);
-		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
+		CacheEvictionListener cacheEvictionListener = createMock(CacheEvictionListener.class);
+		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");
 		this.transactionManager = TransactionManagerServices.getTransactionManager();

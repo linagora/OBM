@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,66 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import java.util.List;
+import net.sf.ehcache.event.CacheEventListener;
 
-import net.sf.ehcache.Element;
-
-import org.obm.push.bean.DeviceId;
-import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.SyncKeysKey;
-import org.obm.push.store.SyncKeysDao;
-
-import com.google.common.collect.Lists;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
-@Singleton
-public class SyncKeysDaoEhcacheImpl extends AbstractEhcacheDao implements SyncKeysDao {
-
-	@Inject SyncKeysDaoEhcacheImpl(StoreManager objectStoreManager, CacheEvictionListener cacheEvictionListener) {
-		super(objectStoreManager, cacheEvictionListener);
-	}
+public interface CacheEvictionListener extends CacheEventListener {
 	
-	@Override
-	protected String getStoreName() {
-		return EhCacheStores.SYNC_KEYS_STORE;
-	}
-
-	@Override
-	public List<SyncKey> get(DeviceId deviceId, int collectionId) {
-		SyncKeysKey key = SyncKeysKey.builder()
-			.deviceId(deviceId)
-			.collectionId(collectionId)
-			.build();
-		Element element = store.get(key);
-		if (element != null) {
-			return (List<SyncKey>) element.getObjectValue();
-		}
-		return null;
-	}
-
-	@Override
-	public void put(DeviceId deviceId, int collectionId, SyncKey syncKey) {
-		SyncKeysKey key = SyncKeysKey.builder()
-				.deviceId(deviceId)
-				.collectionId(collectionId)
-				.build();
-		
-		List<SyncKey> syncKeys = get(deviceId, collectionId);
-		if (syncKeys != null) {
-			syncKeys.add(syncKey);
-			store.replace(new Element(key, syncKeys));
-		} else {
-			syncKeys = Lists.newArrayList(syncKey);
-			store.put(new Element(key, syncKeys));
-		}
-	}
-
-	@Override
-	public void delete(DeviceId deviceId, int collectionId) {
-		store.remove(SyncKeysKey.builder()
-				.deviceId(deviceId)
-				.collectionId(collectionId)
-				.build());
-	}
 }

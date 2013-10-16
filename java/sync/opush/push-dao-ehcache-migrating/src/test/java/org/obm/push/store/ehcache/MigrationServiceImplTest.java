@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.fest.assertions.api.Assertions.fail;
 
@@ -41,7 +43,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,29 +87,30 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	
 	@Before
 	public void init() throws Exception {
-		logger = EasyMock.createNiceMock(Logger.class);
+		logger = createNiceMock(Logger.class);
 		ConfigurationService configurationService = initConfigurationServiceMock();
 		
 		copyCacheFilesInTemporaryFolder();
 		objectStoreManagerMigration = new MigrationSourceObjectStoreManager(configurationService, logger);
 		objectStoreManager = new ObjectStoreManager(configurationService, new TestingEhCacheConfiguration(), logger);
+		CacheEvictionListener cacheEvictionListener = createMock(CacheEvictionListener.class);
 		
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
 		
 		monitoredCollectionDaoEhcacheMigrationImpl = new MonitoredCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
-		monitoredCollectionDaoEhcacheImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager);
+		monitoredCollectionDaoEhcacheImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		snapshotDaoEhcacheMigrationImpl = new SnapshotDaoEhcacheMigrationImpl(objectStoreManagerMigration);
-		snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager);
+		snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		syncedCollectionDaoEhcacheMigrationImpl = new SyncedCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
-		syncedCollectionDaoEhcacheImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
+		syncedCollectionDaoEhcacheImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		syncKeysDaoEhcacheMigrationImpl = new SyncKeysDaoEhcacheMigrationImpl(objectStoreManagerMigration);
-		syncKeysDaoEhcacheImpl = new SyncKeysDaoEhcacheImpl(objectStoreManager);
+		syncKeysDaoEhcacheImpl = new SyncKeysDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		unsynchronizedItemDaoEhcacheMigrationImpl = new UnsynchronizedItemDaoEhcacheMigrationImpl(objectStoreManagerMigration);
-		unsynchronizedItemDaoEhcacheImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
+		unsynchronizedItemDaoEhcacheImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		windowingDaoChunkEhcacheMigrationImpl = new WindowingDaoChunkEhcacheMigrationImpl(objectStoreManagerMigration);
 		windowingDaoIndexEhcacheMigrationImpl = new WindowingDaoIndexEhcacheMigrationImpl(objectStoreManagerMigration);
-		windowingDaoEhcacheImpl = new WindowingDaoEhcacheImpl(objectStoreManager);
+		windowingDaoEhcacheImpl = new WindowingDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		migrationServiceImpl = new MigrationServiceImpl(logger,
 				objectStoreManager, objectStoreManagerMigration,
 				monitoredCollectionDaoEhcacheMigrationImpl, monitoredCollectionDaoEhcacheImpl,
