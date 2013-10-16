@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import static org.easymock.EasyMock.createMock;
+
 import java.io.IOException;
 
 import javax.transaction.NotSupportedException;
@@ -68,7 +70,8 @@ public class SnapshotDaoEhcacheImplTest extends SnapshotDaoTest {
 
 		TestingEhCacheConfiguration config = new TestingEhCacheConfiguration();
 		objectStoreManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
-		snapshotDao = new SnapshotDaoEhcacheImpl(objectStoreManager);
+		CacheEvictionListener cacheEvictionListener = createMock(CacheEvictionListener.class);
+		snapshotDao = new SnapshotDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();

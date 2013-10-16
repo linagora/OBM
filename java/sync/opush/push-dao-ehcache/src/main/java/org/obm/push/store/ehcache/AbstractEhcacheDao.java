@@ -38,9 +38,10 @@ public abstract class AbstractEhcacheDao {
 	protected final StoreManager objectStoreManager;
 	protected final Cache store;
 	
-	protected AbstractEhcacheDao(StoreManager objectStoreManager) {
+	protected AbstractEhcacheDao(StoreManager objectStoreManager, CacheEvictionListener cacheEvictionListener) {
 		this.objectStoreManager = objectStoreManager;
 		this.store = this.objectStoreManager.getStore( getStoreName() );
+		this.store.getCacheEventNotificationService().registerListener(cacheEvictionListener);
 	}
 	
 	protected abstract String getStoreName();

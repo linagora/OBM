@@ -45,6 +45,8 @@ import org.obm.opush.env.OpushStaticConfigurationService.EhCache;
 import org.obm.push.mail.WindowingService;
 import org.obm.push.mail.WindowingServiceImpl;
 import org.obm.push.store.WindowingDao;
+import org.obm.push.store.ehcache.CacheEvictionListener;
+import org.obm.push.store.ehcache.CacheEvictionListenerImpl;
 import org.obm.push.store.ehcache.EhCacheConfiguration;
 import org.obm.push.store.ehcache.ObjectStoreManager;
 import org.obm.push.store.ehcache.StoreManager;
@@ -76,6 +78,7 @@ public class WindowingModule extends AbstractModule {
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(configurationLogger);
 		bind(EhCacheConfiguration.class).toInstance(new EhCache(configuration.ehCache));
 		bind(StoreManager.class).to(ObjectStoreManager.class);
+		bind(CacheEvictionListener.class).to(CacheEvictionListenerImpl.class);
 	}		
 
 	protected Configuration configuration() {

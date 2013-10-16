@@ -47,8 +47,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class SyncedCollectionDaoEhcacheImpl extends AbstractEhcacheDao implements SyncedCollectionDao {
 
-	@Inject  SyncedCollectionDaoEhcacheImpl(StoreManager objectStoreManager) {
-		super(objectStoreManager);
+	@Inject  SyncedCollectionDaoEhcacheImpl(StoreManager objectStoreManager, CacheEvictionListener cacheEvictionListener) {
+		super(objectStoreManager, cacheEvictionListener);
 	}
 
 	@Override

@@ -58,6 +58,7 @@ public class EhCacheDaoModule extends AbstractModule {
 		bind(SnapshotDao.class).to(SnapshotDaoEhcacheImpl.class);
 		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
 		bind(SyncKeysDao.class).to(SyncKeysDaoEhcacheImpl.class);
+		bind(CacheEvictionListener.class).to(CacheEvictionListenerImpl.class);
 
 		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
 		lifecycleListeners.addBinding().to(StoreManager.class);

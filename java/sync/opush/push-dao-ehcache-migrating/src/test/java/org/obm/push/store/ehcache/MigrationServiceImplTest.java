@@ -100,20 +100,21 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		copyCacheFilesInTemporaryFolder();
 		objectStoreManagerMigration = new MigrationSourceObjectStoreManager(configurationService, logger);
 		objectStoreManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+		CacheEvictionListener cacheEvictionListener = new CacheEvictionListenerImpl();
 		
 		monitoredCollectionDaoEhcacheMigrationImpl = new MonitoredCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
-		monitoredCollectionDaoEhcacheImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager);
+		monitoredCollectionDaoEhcacheImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		snapshotDaoEhcacheMigrationImpl = new SnapshotDaoEhcacheMigrationImpl(objectStoreManagerMigration);
-		snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager);
+		snapshotDaoEhcacheImpl = new SnapshotDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		syncedCollectionDaoEhcacheMigrationImpl = new SyncedCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
-		syncedCollectionDaoEhcacheImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager);
+		syncedCollectionDaoEhcacheImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		syncKeysDaoEhcacheMigrationImpl = new SyncKeysDaoEhcacheMigrationImpl(objectStoreManagerMigration);
-		syncKeysDaoEhcacheImpl = new SyncKeysDaoEhcacheImpl(objectStoreManager);
+		syncKeysDaoEhcacheImpl = new SyncKeysDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		unsynchronizedItemDaoEhcacheMigrationImpl = new UnsynchronizedItemDaoEhcacheMigrationImpl(objectStoreManagerMigration);
-		unsynchronizedItemDaoEhcacheImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager);
+		unsynchronizedItemDaoEhcacheImpl = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		windowingDaoChunkEhcacheMigrationImpl = new WindowingDaoChunkEhcacheMigrationImpl(objectStoreManagerMigration);
 		windowingDaoIndexEhcacheMigrationImpl = new WindowingDaoIndexEhcacheMigrationImpl(objectStoreManagerMigration);
-		windowingDaoEhcacheImpl = new WindowingDaoEhcacheImpl(objectStoreManager);
+		windowingDaoEhcacheImpl = new WindowingDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 
 		migrationServiceImpl = new MigrationServiceImpl(logger,
 				objectStoreManager, objectStoreManagerMigration,

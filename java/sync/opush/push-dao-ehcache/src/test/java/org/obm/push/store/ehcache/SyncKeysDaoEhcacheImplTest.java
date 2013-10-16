@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import static org.easymock.EasyMock.createMock;
+
 import java.io.IOException;
 
 import javax.transaction.NotSupportedException;
@@ -69,7 +71,8 @@ public class SyncKeysDaoEhcacheImplTest extends SyncKeysDaoTest {
 
 		TestingEhCacheConfiguration config = new TestingEhCacheConfiguration();
 		objectStoreManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
-		syncKeysDao = new SyncKeysDaoEhcacheImpl(objectStoreManager);
+		CacheEvictionListener cacheEvictionListener = createMock(CacheEvictionListener.class);
+		syncKeysDao = new SyncKeysDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		
 		transactionManager = TransactionManagerServices.getTransactionManager();
 		transactionManager.begin();
