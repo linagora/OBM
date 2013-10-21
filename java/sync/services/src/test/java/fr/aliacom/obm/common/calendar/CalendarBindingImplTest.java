@@ -82,6 +82,8 @@ import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.sync.NotAllowedException;
+import org.obm.sync.addition.CommitedElement;
+import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -2670,6 +2672,7 @@ public class CalendarBindingImplTest {
 		ObmUser user = ToolBox.getDefaultObmUser();
 		String calendar = user.getEmail();
 		String attendeeEmail = "test@obm.org";
+		String clientId = "123";
 
 		UserAttendee userAttendee = UserAttendee.builder().email(calendar).build();
 		ContactAttendee contactAttendee = ContactAttendee.builder().email(attendeeEmail).build();
@@ -2680,13 +2683,15 @@ public class CalendarBindingImplTest {
 		Event exception = createEventException(attendees, DateUtils.date("2012-01-01T00:00:00"));
 		Event exception2 = createEventException(ImmutableList.of(ToolBox.getFakeAttendee(calendar)), DateUtils.date("2012-02-01T00:00:00"));
 		
+		event.setEntityId(6);
 		event.setInternalEvent(true); 
 		exception.setInternalEvent(true); 
 		exception2.setInternalEvent(true);
 		event.addEventException(exception);
 		event.addEventException(exception2);
 		event.getRecurrence().setKind(RecurrenceKind.daily);
-		
+
+		mockCommitedOperationNewEvent(event, clientId);
 		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).anyTimes();
 		expect(helperService.canWriteOnCalendar(token, attendeeEmail)).andReturn(false).anyTimes();
 		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user).anyTimes();
@@ -2700,10 +2705,6 @@ public class CalendarBindingImplTest {
 		messageQueueService.writeIcsInvitationRequest(token, event);
 		expectLastCall();
 		
-		AccessToken accessToken = mockAccessToken(calendar, user.getDomain());
-		CommitedOperationDao commitedOperationDao = createMock(CommitedOperationDao.class);
-		String clientId = "123";
-		expect(commitedOperationDao.findAsEvent(accessToken, clientId)).andReturn(event).once();
 		
 		mocksControl.replay();
 		
@@ -2719,6 +2720,7 @@ public class CalendarBindingImplTest {
 		ObmUser user = ToolBox.getDefaultObmUserWithEmails("main@obm.org", "alias1@obm.org", userEventAlias, "alias3@obm.org");
 		String userEmail = user.getEmail();
 		String attendeeEmail = "test@obm.org";
+		String clientId = "123";
 		
 		UserAttendee userAttendee = UserAttendee.builder().email(userEmail).build();
 		ContactAttendee contactAttendee = ContactAttendee.builder().email(attendeeEmail).build();
@@ -2728,9 +2730,12 @@ public class CalendarBindingImplTest {
 		List<Attendee> toStoreAttendees = ImmutableList.of(ToolBox.getFakeAttendee(userEmail), ToolBox.getFakeAttendee(attendeeEmail));
 		Event incommingEvent = createEvent(incommingAttendees);
 		incommingEvent.setInternalEvent(true);
+		incommingEvent.setEntityId(7);
 		Event toStoreEvent = createEvent(toStoreAttendees);
 		toStoreEvent.setInternalEvent(true);
+		toStoreEvent.setEntityId(7);
 		
+		mockCommitedOperationNewEvent(incommingEvent, clientId);
 		expect(helperService.canWriteOnCalendar(token, userEmail)).andReturn(true).anyTimes();
 		expect(helperService.canWriteOnCalendar(token, attendeeEmail)).andReturn(false).anyTimes();
 		expect(userService.getUserFromCalendar(userEmail, user.getDomain().getName())).andReturn(user).anyTimes();
@@ -2743,11 +2748,6 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.findEventById(token, null)).andReturn(toStoreEvent);
 		messageQueueService.writeIcsInvitationRequest(token, toStoreEvent);
 		expectLastCall();
-		
-		AccessToken accessToken = mockAccessToken(userEmail, user.getDomain());
-		CommitedOperationDao commitedOperationDao = createMock(CommitedOperationDao.class);
-		String clientId = "123";
-		expect(commitedOperationDao.findAsEvent(accessToken, clientId)).andReturn(incommingEvent).once();
 		
 		mocksControl.replay();
 		
@@ -2762,6 +2762,7 @@ public class CalendarBindingImplTest {
 		ObmUser user = ToolBox.getDefaultObmUser();
 		String userEmail = user.getEmail();
 		String attendeeEmail = "2" + user.getEmail();
+		String clientId = "123";
 		
 		UserAttendee userAttendee = UserAttendee.builder().email(userEmail).build();
 		ContactAttendee contactAttendee = ContactAttendee.builder().email(attendeeEmail).build();
@@ -2769,8 +2770,10 @@ public class CalendarBindingImplTest {
 		
 		List<Attendee> nonTypedAttendees = ImmutableList.of(ToolBox.getFakeAttendee(userEmail), ToolBox.getFakeAttendee(attendeeEmail));
 		Event event = createEvent(nonTypedAttendees);
-		event.setInternalEvent(false); 
+		event.setInternalEvent(false);
+		event.setEntityId(5);
 		
+		mockCommitedOperationNewEvent(event, clientId);
 		expect(helperService.canWriteOnCalendar(token, userEmail)).andReturn(true).anyTimes();
 		expect(helperService.canWriteOnCalendar(token, attendeeEmail)).andReturn(false).anyTimes();
 		expect(userService.getUserFromCalendar(userEmail, user.getDomain().getName())).andReturn(user).anyTimes();
@@ -2781,10 +2784,37 @@ public class CalendarBindingImplTest {
 		messageQueueService.writeIcsInvitationReply(token, event, user);
 		expectLastCall();
 		
+		mocksControl.replay();
+		
+		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService);
+		binding.createEvent(token, userEmail, event, false, clientId);
+		
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testCreateExternalEventAlreadyCommited() throws Exception {
+		ObmUser user = ToolBox.getDefaultObmUser();
+		String userEmail = user.getEmail();
+		String attendeeEmail = "2" + user.getEmail();
 		String clientId = "123";
-		AccessToken accessToken = mockAccessToken(userEmail, user.getDomain());
-		CommitedOperationDao commitedOperationDao = createMock(CommitedOperationDao.class);
-		expect(commitedOperationDao.findAsEvent(accessToken, clientId)).andReturn(null).once();
+		
+		UserAttendee userAttendee = UserAttendee.builder().email(userEmail).build();
+		ContactAttendee contactAttendee = ContactAttendee.builder().email(attendeeEmail).build();
+		AttendeeService attendeeService = mocksControl.createMock(AttendeeService.class);
+		
+		List<Attendee> nonTypedAttendees = ImmutableList.of(ToolBox.getFakeAttendee(userEmail), ToolBox.getFakeAttendee(attendeeEmail));
+		Event event = createEvent(nonTypedAttendees);
+		event.setInternalEvent(false);
+		event.setEntityId(5);
+		
+		mockCommitedOperationExistingEvent(event, clientId);
+		expect(helperService.canWriteOnCalendar(token, userEmail)).andReturn(true).anyTimes();
+		expect(helperService.canWriteOnCalendar(token, attendeeEmail)).andReturn(false).anyTimes();
+		expect(userService.getUserFromCalendar(userEmail, user.getDomain().getName())).andReturn(user).anyTimes();
+		expect(attendeeService.findUserAttendee(null, userEmail, user.getDomain())).andReturn(userAttendee);
+		expect(attendeeService.findContactAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid()))
+			.andReturn(contactAttendee);
 		
 		mocksControl.replay();
 		
@@ -2799,6 +2829,7 @@ public class CalendarBindingImplTest {
 		ObmUser user = ToolBox.getDefaultObmUser();
 		String userEmail = user.getEmail();
 		String attendeeEmail = "2" + user.getEmail();
+		String clientId = "123";
 		
 		UserAttendee userAttendee = UserAttendee.builder().email(userEmail).build();
 		ContactAttendee contactAttendee = ContactAttendee.builder().email(attendeeEmail).build();
@@ -2809,6 +2840,7 @@ public class CalendarBindingImplTest {
 		Event exception = createEventException(nonTypedAttendees, DateUtils.date("2012-01-01T00:00:00"));
 		Event exception2 = createEventException(ImmutableList.of(ToolBox.getFakeAttendee(userEmail)), DateUtils.date("2012-02-01T00:00:00"));
 		
+		event.setEntityId(4);
 		event.setInternalEvent(false); 
 		exception.setInternalEvent(false); 
 		exception2.setInternalEvent(false);
@@ -2816,6 +2848,7 @@ public class CalendarBindingImplTest {
 		event.addEventException(exception2);
 		event.getRecurrence().setKind(RecurrenceKind.daily);
 		
+		mockCommitedOperationNewEvent(event, clientId);
 		expect(helperService.canWriteOnCalendar(token, userEmail)).andReturn(true).anyTimes();
 		expect(helperService.canWriteOnCalendar(token, attendeeEmail)).andReturn(false).anyTimes();
 		expect(userService.getUserFromCalendar(userEmail, user.getDomain().getName())).andReturn(user).anyTimes();
@@ -2826,11 +2859,6 @@ public class CalendarBindingImplTest {
 		messageQueueService.writeIcsInvitationReply(token, event, user);
 		expectLastCall();
 		
-		String clientId = "123";
-		AccessToken accessToken = mockAccessToken(userEmail, user.getDomain());
-		CommitedOperationDao commitedOperationDao = createMock(CommitedOperationDao.class);
-		expect(commitedOperationDao.findAsEvent(accessToken, clientId)).andReturn(null).once();
-		
 		mocksControl.replay();
 		
 		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService);
@@ -2840,22 +2868,23 @@ public class CalendarBindingImplTest {
 	}
 	
 	@Test
-	public void testCreateEventAlreadyCommited() throws Exception {
+	public void testCreateInternalEventAlreadyCommited() throws Exception {
 		ObmUser defaultUser = ToolBox.getDefaultObmUser();
-		
 		String calendar = "cal1";
 		EventExtId extId = new EventExtId("extId");
 		boolean notification = false;
+		String clientId = "123";
 		
 		Attendee calOwner = ToolBox.getFakeAttendee(defaultUser.getEmail());
 		calOwner.setParticipation(Participation.declined());
 		
 		Event event = new Event();
 		event.setType(EventType.VEVENT);
-		event.setInternalEvent(false);
+		event.setInternalEvent(true);
 		event.setExtId(extId);
 		event.setSequence(0);
 		event.addAttendee(calOwner);
+		event.setEntityId(4);
 		
 		AccessToken accessToken = mockAccessToken(calendar, defaultUser.getDomain());
 		HelperService helper = mockRightsHelper(calendar, accessToken);
@@ -2869,9 +2898,7 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.findEventByExtId(accessToken, defaultUser, event.getExtId())).andReturn(null).once();
 		
 		CommitedOperationDao commitedOperationDao = createMock(CommitedOperationDao.class);
-		String clientId = "123";
-		expect(commitedOperationDao.findAsEvent(accessToken, clientId))
-			.andReturn(event).once();
+		expect(commitedOperationDao.findAsEvent(accessToken, clientId)).andReturn(event).once();
 		
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler, commitedOperationDao);
 		
@@ -3558,5 +3585,57 @@ public class CalendarBindingImplTest {
 		binding.storeEvent(token, calendar, event, false, null);
 
 		mocksControl.verify();
+	}
+	
+	@Test
+	public void testCommitOperationNullClientId() throws Exception {
+		Event event = new Event();
+		String clientId = null;
+		
+		mocksControl.replay();
+		binding.commitOperation(token, event, clientId);
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testCommitOperationEmptyClientId() throws Exception {
+		Event event = new Event();
+		String clientId = "";
+		
+		mocksControl.replay();
+		binding.commitOperation(token, event, clientId);
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testCommitOperation() throws Exception {
+		Event event = new Event();
+		event.setEntityId(9);
+		String clientId = "0123456789012345678901234567890123456789";
+		
+		commitedOperationDao.store(token, CommitedElement.builder()
+				.entityId(event.getEntityId())
+				.clientId(clientId)
+				.kind(Kind.VEVENT)
+				.build());
+		expectLastCall();
+		
+		mocksControl.replay();
+		binding.commitOperation(token, event, clientId);
+		mocksControl.verify();
+	}
+
+	private void mockCommitedOperationNewEvent(Event event, String clientId) throws Exception {
+		expect(commitedOperationDao.findAsEvent(token, clientId)).andReturn(null).once();
+		commitedOperationDao.store(token, CommitedElement.builder()
+				.entityId(event.getEntityId())
+				.clientId(clientId)
+				.kind(Kind.VEVENT)
+				.build());
+		expectLastCall().once();
+	}
+
+	private void mockCommitedOperationExistingEvent(Event event, String clientId) throws Exception {
+		expect(commitedOperationDao.findAsEvent(token, clientId)).andReturn(event).once();
 	}
 }
