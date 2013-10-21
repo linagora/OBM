@@ -35,7 +35,7 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.auth.Credentials.Builder;
-import org.obm.sync.server.auth.AuthentificationServiceFactory;
+import org.obm.sync.server.auth.impl.DatabaseAuthentificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,14 +50,14 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 public class LoginBindingImpl extends AbstractLoginBackend implements LoginBackend {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	private final AuthentificationServiceFactory authenticationServiceFactory;
+	private final DatabaseAuthentificationService databaseAuthentificationService;
 	private final ObmSyncConfigurationService configurationService;
 
 	@Inject
-	protected LoginBindingImpl(SessionManagement sessionManagement, AuthentificationServiceFactory authenticationServiceFactory,
+	protected LoginBindingImpl(SessionManagement sessionManagement, DatabaseAuthentificationService databaseAuthentificationService,
 			ObmSyncConfigurationService configurationService) {
 		super(sessionManagement);
-		this.authenticationServiceFactory = authenticationServiceFactory;
+		this.databaseAuthentificationService = databaseAuthentificationService;
 		this.configurationService = configurationService;
 	}
 
@@ -79,7 +79,7 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 		} else {
 			builder.password(password);
 		}
-		return authenticationServiceFactory.get().doAuth(builder.build());
+		return databaseAuthentificationService.doAuth(builder.build());
 	}
 	
 }
