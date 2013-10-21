@@ -100,7 +100,7 @@ public class DomainDaoTest {
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).isEmpty();
 		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
-		assertThat(d.isGlobal()).isEqualTo(false);
+		assertThat(d.isGlobal()).isFalse();
 	}
 	
 	@Test
@@ -114,7 +114,7 @@ public class DomainDaoTest {
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias");
 		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
-		assertThat(d.isGlobal()).isEqualTo(false);
+		assertThat(d.isGlobal()).isFalse();
 	}
 	
 	@Test
@@ -128,7 +128,19 @@ public class DomainDaoTest {
 		assertThat(d.getUuid().get()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias1", "alias2", "alias3");
 		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
-		assertThat(d.isGlobal()).isEqualTo(false);
+		assertThat(d.isGlobal()).isFalse();
+	}
+	
+	@Test
+	public void testFindDomainByNameGlobalDomain() throws Exception {
+		ObmDomain d = findGlobalDomain();
+		
+		assertThat(d).isNotNull();
+		assertThat(d.getId()).isEqualTo(1);
+		assertThat(d.getName()).isEqualTo("domain");
+		assertThat(d.getUuid().get()).isEqualTo("uuid");
+		assertThat(d.getAliases()).isEmpty();
+		assertThat(d.isGlobal()).isTrue();
 	}
 	
 	private ObmDomain findDomain(String aliases) throws Exception {
@@ -136,8 +148,22 @@ public class DomainDaoTest {
 		Connection con = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
 		
-		expectFindDomainCalls(con, rs, domainName, aliases);
+		expectFindDomainCalls(con, rs, domainName, aliases, false);
 		expectFindDomainHostsCalls(con, rs);
+		
+		mocksControl.replay();
+		
+		return domainDao.findDomainByName(domainName);
+	}
+	
+	private ObmDomain findGlobalDomain() throws Exception {
+		String domainName = "domain";
+		Connection con = mocksControl.createMock(Connection.class);
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+		
+		expectFindDomainCalls(con, rs, domainName, null, true);
+		expectFindDomainHostsCalls(con, rs);
+		
 		mocksControl.replay();
 		
 		return domainDao.findDomainByName(domainName);
@@ -171,7 +197,7 @@ public class DomainDaoTest {
 		expect(rs.getInt("host_domain_id")).andReturn(1);
 	}
 
-	private void expectFindDomainCalls(Connection con, ResultSet rs, String domainName, String aliases) throws Exception {
+	private void expectFindDomainCalls(Connection con, ResultSet rs, String domainName, String aliases, boolean isGlobal) throws Exception {
 		PreparedStatement statement = mocksControl.createMock(PreparedStatement.class);
 
 		expect(dbcp.getConnection()).andReturn(con);
@@ -197,7 +223,6 @@ public class DomainDaoTest {
 		expect(rs.getString("domain_alias")).andReturn(aliases);
 		expect(rs.getString("domain_label")).andReturn("label");
 		expect(rs.getString("domain_name")).andReturn(domainName);
-		expect(rs.getBoolean("domain_global")).andReturn(false);
+		expect(rs.getBoolean("domain_global")).andReturn(isGlobal);
 	}
-
 }

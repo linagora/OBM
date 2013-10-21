@@ -53,7 +53,7 @@ public class ObmDomain implements Serializable {
 		private ObmDomainUuid uuid;
 		private ImmutableSet.Builder<String> aliases;
 		private String label;
-		private boolean global;
+		private Boolean global;
 		private ImmutableMultimap.Builder<ServiceProperty, ObmHost> hosts;
 		
 		private Builder() {
@@ -125,6 +125,8 @@ public class ObmDomain implements Serializable {
 		}
 
 		public ObmDomain build() {
+			global = Objects.firstNonNull(global, false);
+			
 			return new ObmDomain(id, name, uuid, label, aliases.build(), hosts.build(), global);
 		}
 	}

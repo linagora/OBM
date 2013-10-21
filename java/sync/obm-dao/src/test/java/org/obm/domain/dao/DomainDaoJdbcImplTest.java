@@ -250,4 +250,18 @@ public class DomainDaoJdbcImplTest implements H2TestClass {
 					.build()
 				);
 	}
+	
+	@Test
+	public void testFindDomainByNameIsGlobal() {
+		ObmDomain domain = dao.findDomainByName("global.virt");
+
+		assertThat(domain.isGlobal()).isTrue();
+	}
+	
+	@Test
+	public void testFindDomainByNameIsNotGlobal() {
+		ObmDomain domain = dao.findDomainByName("test.tlse.lng");
+
+		assertThat(domain.isGlobal()).isFalse();
+	}
 }
