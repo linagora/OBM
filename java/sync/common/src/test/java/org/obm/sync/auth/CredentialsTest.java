@@ -45,7 +45,7 @@ public class CredentialsTest {
 	
 	@Test
 	public void nullDomain() {
-		Credentials credentials = Credentials.builder().login(LOGIN).password(PASSWORD).build();
+		Credentials credentials = Credentials.builder().login(LOGIN).hashedPassword(false).password(PASSWORD).build();
 		assertThat(credentials.getLogin().getLogin()).isEqualTo(LOGIN);
 		assertThat(credentials.getLogin().getDomain()).isNull();
 	}
@@ -61,15 +61,19 @@ public class CredentialsTest {
 		Credentials.builder().domain(DOMAIN).build();
 	}
 	
-	
 	@Test(expected=IllegalStateException.class)
 	public void buildWithoutPassword() {
 		Credentials.builder().login(LOGIN).domain(DOMAIN).build();
 	}
 	
+	@Test(expected=IllegalStateException.class)
+	public void buildWithoutHashedPassword() {
+		Credentials.builder().login(LOGIN).domain(DOMAIN).password(PASSWORD).build();
+	}
+	
 	@Test
 	public void buildWithEverything() {
-		Credentials credentials = Credentials.builder().login(LOGIN).domain(DOMAIN).password(PASSWORD).build();
+		Credentials credentials = Credentials.builder().login(LOGIN).domain(DOMAIN).hashedPassword(false).password(PASSWORD).build();
 		assertThat(credentials.getLogin().getLogin()).isEqualTo(LOGIN);
 		assertThat(credentials.getLogin().getDomain()).isEqualTo(DOMAIN);
 		assertThat(credentials.getPassword()).isEqualTo(PASSWORD);
@@ -79,7 +83,7 @@ public class CredentialsTest {
 	
 	@Test
 	public void buildWithFullLogin() {
-		Credentials credentials = Credentials.builder().login(FULL_LOGIN).password(PASSWORD).build();
+		Credentials credentials = Credentials.builder().login(FULL_LOGIN).hashedPassword(false).password(PASSWORD).build();
 		assertThat(credentials.getLogin().getLogin()).isEqualTo(LOGIN);
 		assertThat(credentials.getLogin().getDomain()).isEqualTo(DOMAIN);
 		assertThat(credentials.getPassword()).isEqualTo(PASSWORD);
@@ -88,7 +92,7 @@ public class CredentialsTest {
 	
 	@Test
 	public void buildWithHashedPassword() {
-		Credentials credentials = Credentials.builder().login(LOGIN).domain(DOMAIN).hashedPassword(PASSWORD).build();
+		Credentials credentials = Credentials.builder().login(LOGIN).domain(DOMAIN).hashedPassword(true).password(PASSWORD).build();
 		assertThat(credentials.getLogin().getLogin()).isEqualTo(LOGIN);
 		assertThat(credentials.getLogin().getDomain()).isEqualTo(DOMAIN);
 		assertThat(credentials.getPassword()).isEqualTo(PASSWORD);
@@ -97,7 +101,7 @@ public class CredentialsTest {
 	
 	@Test
 	public void creationByFullLoginAndMatchingDomain() {
-		Credentials credentials = Credentials.builder().login(FULL_LOGIN).domain(DOMAIN).password(PASSWORD).build();
+		Credentials credentials = Credentials.builder().login(FULL_LOGIN).domain(DOMAIN).hashedPassword(false).password(PASSWORD).build();
 		assertThat(credentials.getLogin().getLogin()).isEqualTo(LOGIN);
 		assertThat(credentials.getLogin().getDomain()).isEqualTo(DOMAIN);
 		assertThat(credentials.getPassword()).isEqualTo(PASSWORD);
@@ -106,12 +110,12 @@ public class CredentialsTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void creationByFullLoginAndDifferentDomain() {
-		Credentials.builder().login(FULL_LOGIN).domain("differentdomain").password(PASSWORD).build();
+		Credentials.builder().login(FULL_LOGIN).domain("differentdomain").hashedPassword(false).password(PASSWORD).build();
 	}
 	
 	@Test
 	public void creationByLoginObject() {
-		Credentials credentials = Credentials.builder().login(Login.builder().login(LOGIN).domain(DOMAIN).build()).password(PASSWORD).build();
+		Credentials credentials = Credentials.builder().login(Login.builder().login(LOGIN).domain(DOMAIN).build()).hashedPassword(false).password(PASSWORD).build();
 		assertThat(credentials.getLogin().getLogin()).isEqualTo(LOGIN);
 		assertThat(credentials.getLogin().getDomain()).isEqualTo(DOMAIN);
 		assertThat(credentials.getPassword()).isEqualTo(PASSWORD);
