@@ -97,4 +97,25 @@ public class ObmDomainTest {
 		
 		assertThat(domain.getNames()).containsOnly("name", "alias1", "alias3");
 	}
+
+	@Test
+	public void testGlobalDefaultValue() {
+		ObmDomain domain = ObmDomain.builder().name("name").build();
+		
+		assertThat(domain.isGlobal()).isFalse();
+	}
+
+	@Test
+	public void testIsGlobal() {
+		ObmDomain domain = ObmDomain.builder().name("name").global(true).build();
+		
+		assertThat(domain.isGlobal()).isTrue();
+	}
+
+	@Test
+	public void testIsNotGlobal() {
+		ObmDomain domain = ObmDomain.builder().name("name").global(false).build();
+		
+		assertThat(domain.isGlobal()).isFalse();
+	}
 }
