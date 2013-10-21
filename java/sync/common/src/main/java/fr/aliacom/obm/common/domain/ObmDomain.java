@@ -47,6 +47,7 @@ public class ObmDomain implements Serializable {
 		private String name;
 		private String uuid;
 		private ImmutableSet.Builder<String> aliases;
+		private Boolean global;
 		
 		private Builder() {
 			aliases = ImmutableSet.builder();
@@ -81,8 +82,15 @@ public class ObmDomain implements Serializable {
 			return this;
 		}
 		
+		public Builder global(boolean global) {
+			this.global = global;
+			return this;
+		}
+		
 		public ObmDomain build() {
-			return new ObmDomain(id, name, uuid, aliases.build());
+			global = Objects.firstNonNull(global, false);
+			
+			return new ObmDomain(id, name, uuid, aliases.build(), global);
 		}
 		
 	}
@@ -95,12 +103,14 @@ public class ObmDomain implements Serializable {
 	private final String name;
 	private final String uuid;
 	private final Set<String> aliases;
+	private final boolean global;
 	
-	private ObmDomain(int id, String name, String uuid, Set<String> aliases) {
+	private ObmDomain(int id, String name, String uuid, Set<String> aliases, boolean global) {
 		this.id = id;
 		this.name = name;
 		this.uuid = uuid;
 		this.aliases = aliases;
+		this.global = global;
 	}
 
 	public String getName() {
@@ -123,9 +133,13 @@ public class ObmDomain implements Serializable {
 		return Sets.union(ImmutableSet.of(name), aliases);
 	}
 	
+	public boolean isGlobal() {
+		return global;
+	}
+	
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(id, name, uuid);
+		return Objects.hashCode(id, name, uuid, global);
 	}
 
 	@Override
@@ -135,7 +149,8 @@ public class ObmDomain implements Serializable {
 			
 			return Objects.equal(this.id, that.id)
 				&& Objects.equal(this.name, that.name)
-				&& Objects.equal(this.uuid, that.uuid);
+				&& Objects.equal(this.uuid, that.uuid)
+				&& Objects.equal(this.global, that.global);
 		}
 		
 		return false;
@@ -147,6 +162,7 @@ public class ObmDomain implements Serializable {
 			.add("id", id)
 			.add("name", name)
 			.add("uuid", uuid)
+			.add("global", global)
 			.toString();
 	}
 

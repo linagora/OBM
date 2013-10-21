@@ -63,7 +63,7 @@ public class DomainDao {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		String uq = "SELECT domain_id, domain_uuid, domain_alias FROM Domain WHERE domain_name = ? "
+		String uq = "SELECT domain_id, domain_uuid, domain_global, domain_alias FROM Domain WHERE domain_name = ? "
 				+ " OR domain_alias = ? OR domain_alias LIKE ? OR domain_alias LIKE ? OR domain_alias LIKE ? ";
 		try {
 			con = obmHelper.getConnection();
@@ -82,7 +82,8 @@ public class DomainDao {
 						.id(rs.getInt("domain_id"))
 						.uuid(rs.getString("domain_uuid"))
 						.name(domainName)
-						.aliases(aliases == null ? ImmutableSet.<String>of() : Splitter.on("\r\n").split(aliases))
+						.aliases(aliasToIterable(aliases))
+						.global(rs.getBoolean("domain_global"))
 						.build();
 			}
 		} catch (SQLException e) {
@@ -92,5 +93,8 @@ public class DomainDao {
 		}
 		return null;
 	}
-	
+
+	private Iterable<String> aliasToIterable(String aliases) {
+		return aliases == null ? ImmutableSet.<String>of() : Splitter.on("\r\n").omitEmptyStrings().split(aliases);
+	}
 }

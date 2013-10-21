@@ -42,9 +42,11 @@ import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.sync.date.DateProvider;
 
@@ -52,7 +54,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.mysql.jdbc.PreparedStatement;
 
-
+@RunWith(SlowFilterRunner.class)
 public class DomainDaoTest {
 	
 	private static class Env extends AbstractModule {
@@ -96,6 +98,7 @@ public class DomainDaoTest {
 		assertThat(d.getName()).isEqualTo("domain");
 		assertThat(d.getUuid()).isEqualTo("uuid");
 		assertThat(d.getAliases()).isEmpty();
+		assertThat(d.isGlobal()).isFalse();
 	}
 	
 	@Test
@@ -107,6 +110,7 @@ public class DomainDaoTest {
 		assertThat(d.getName()).isEqualTo("domain");
 		assertThat(d.getUuid()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias");
+		assertThat(d.isGlobal()).isFalse();
 	}
 	
 	@Test
@@ -118,6 +122,19 @@ public class DomainDaoTest {
 		assertThat(d.getName()).isEqualTo("domain");
 		assertThat(d.getUuid()).isEqualTo("uuid");
 		assertThat(d.getAliases()).containsExactly("alias1", "alias2", "alias3");
+		assertThat(d.isGlobal()).isFalse();
+	}
+	
+	@Test
+	public void testFindDomainByNameGlobalDomain() throws Exception {
+		ObmDomain d = findGlobalDomain();
+		
+		assertThat(d).isNotNull();
+		assertThat(d.getId()).isEqualTo(1);
+		assertThat(d.getName()).isEqualTo("domain");
+		assertThat(d.getUuid()).isEqualTo("uuid");
+		assertThat(d.getAliases()).isEmpty();
+		assertThat(d.isGlobal()).isTrue();
 	}
 	
 	private ObmDomain findDomain(String aliases) throws Exception {
@@ -131,6 +148,24 @@ public class DomainDaoTest {
 		expect(rs.getString("domain_uuid")).andReturn("uuid");
 		expect(rs.getInt("domain_id")).andReturn(1);
 		expect(rs.getString("domain_alias")).andReturn(aliases);
+		expect(rs.getBoolean("domain_global")).andReturn(false);
+		mocksControl.replay();
+		
+		return domainDao.findDomainByName(domainName);
+	}
+	
+	private ObmDomain findGlobalDomain() throws Exception {
+		String domainName = "domain";
+		Connection con = mocksControl.createMock(Connection.class);
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+		
+		expectFindDomainCalls(con, rs, domainName);
+		
+		expect(dbcp.getConnection()).andReturn(con);
+		expect(rs.getString("domain_uuid")).andReturn("uuid");
+		expect(rs.getInt("domain_id")).andReturn(1);
+		expect(rs.getString("domain_alias")).andReturn(null);
+		expect(rs.getBoolean("domain_global")).andReturn(true);
 		mocksControl.replay();
 		
 		return domainDao.findDomainByName(domainName);
@@ -156,5 +191,4 @@ public class DomainDaoTest {
 		con.close();
 		expectLastCall();
 	}
-
 }
