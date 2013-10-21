@@ -159,12 +159,24 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 
 	@Override
 	public boolean authenticateGlobalAdmin(String login, String password) throws AuthFault {
-		ImmutableMultimap<String, String> params = ImmutableMultimap.<String, String>of(
+		ImmutableMultimap<String, String> params = ImmutableMultimap.of(
 				"login", login, "password", password, "origin", origin);
 
 		AccessToken token = newAccessToken(login, configurationService.getGlobalDomain(), origin);
 		
 		Document doc = execute(token, "/login/authenticateGlobalAdmin", params);
+		exceptionFactory.checkLoginExpection(doc);
+		return Boolean.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
+	}
+
+	@Override
+	public boolean authenticateAdmin(String login, String password, String domainName) throws AuthFault {
+		ImmutableMultimap<String, String> params = ImmutableMultimap.of(
+				"login", login, "password", password, "origin", origin, "domainName", domainName);
+
+		AccessToken token = newAccessToken(login, configurationService.getGlobalDomain(), origin);
+		
+		Document doc = execute(token, "/login/authenticateAdmin", params);
 		exceptionFactory.checkLoginExpection(doc);
 		return Boolean.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
 	}
