@@ -301,6 +301,7 @@ public class CalendarDaoJdbcImplTest {
 		
 		ResultSet resultSet = mocksControl.createMock(ResultSet.class);
 		expect(resultSet.getInt("event_id")).andReturn(12);
+		expect(resultSet.getInt("evententity_entity_id")).andReturn(8);
 		expect(resultSet.getTimestamp("event_timecreate")).andReturn(Timestamp.valueOf("2012-05-04 11:50:01"));
 		expect(resultSet.getTimestamp("event_timeupdate")).andReturn(Timestamp.valueOf("2012-05-04 11:55:12"));
 		expect(resultSet.getString("event_timezone")).andReturn("America/San_Francisco");
@@ -336,6 +337,7 @@ public class CalendarDaoJdbcImplTest {
 		
 		Event expectedEvent = new Event();
 		expectedEvent.setUid(new EventObmId(12));
+		expectedEvent.setEntityId(8);
 		expectedEvent.setTimeCreate(date("2012-05-04T11:50:01+00"));
 		expectedEvent.setTimeUpdate(date("2012-05-04T11:55:12+00"));
 		expectedEvent.setTimezoneName("America/San_Francisco");
