@@ -405,6 +405,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Event e = new Event();
 		int id = evrs.getInt("event_id");
 		e.setUid(new EventObmId(id));
+		e.setEntityId(EntityId.valueOf(evrs.getInt("evententity_entity_id")));
 		e.setTimeUpdate(JDBCUtils.getDate(evrs, "event_timeupdate"));
 		e.setTimeCreate(JDBCUtils.getDate(evrs, "event_timecreate"));
 		e.setTimezoneName(evrs.getString("event_timezone"));
