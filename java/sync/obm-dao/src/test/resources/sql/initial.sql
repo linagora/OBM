@@ -17074,6 +17074,11 @@ INSERT INTO profile (profile_domain_id, profile_name)
         (2, 'editor'),
         (3, 'superadmin');
 
+INSERT INTO profilemodule (profilemodule_domain_id, profilemodule_profile_id, profilemodule_module_name, profilemodule_right)
+    VALUES
+        (2, 1, 'domain', 31),
+        (2, 2, 'domain', 0);
+        
 INSERT INTO profileproperty (profileproperty_profile_id, profileproperty_name, profileproperty_value)
     VALUES
         (1, 'level', '0'),

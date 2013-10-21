@@ -48,6 +48,8 @@ import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
+import org.obm.provisioning.dao.ProfileDao;
+import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.host.ObmHost;
@@ -85,6 +87,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 			bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
 			bind(UserDao.class).to(UserDaoJdbcImpl.class);
 			bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
+			bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
 		}
 
 	}
@@ -255,7 +258,8 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.password("secure")
 				.profileName(ProfileName.valueOf("user"))
 				.lastName("Doe")
-				.domain(domain);
+				.domain(domain)
+				.publicFreeBusy(true);
 
 		ObmUser createdUser = dao.create(userBuilder.build());
 
@@ -353,6 +357,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.entityId(createdUser.getEntityId())
 				.uidNumber(UserDao.FIRST_UID)
 				.gidNumber(UserDao.DEFAULT_GID)
+				.publicFreeBusy(true)
 				.build()).isEqualTo(createdUser);
 	}
 
@@ -415,7 +420,8 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.mailQuota(500)
 				.uidNumber(123)
 				.gidNumber(456)
-				.domain(domain);
+				.domain(domain)
+				.publicFreeBusy(true);
 
 		ObmUser createdUser = dao.create(userBuilder.build());
 
@@ -454,6 +460,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.emailAndAliases("")
 				.mailHost(null)
 				.profileName(ProfileName.valueOf("admin"))
+				.admin(true)
 				.build();
 
 		assertThat(dao.update(user)).isEqualTo(user);
@@ -464,6 +471,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = sampleUserBuilder(1, 3, "1")
 				.firstName("John")
 				.lastName("Doe")
+				.publicFreeBusy(true)
 				.build();
 
 		dao.update(user);
@@ -702,6 +710,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = sampleUserBuilder(7, 32, "7")
 				.archived(true)
 				.domain(domain2)
+				.publicFreeBusy(true)
 				.build();
 
 		assertThat(dao.getByExtIdWithGroups(UserExtId.valueOf("7"), domain2)).isEqualTo(user);
@@ -719,6 +728,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				sampleUserBuilder(2, 8, "6")
 					.uid(6)
 					.profileName(ProfileName.valueOf("admin"))
+					.admin(true)
 					.mailHost(mailHost)
 					.emailAndAliases("user2")
 					.domain(domain2)
@@ -774,7 +784,8 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.uidNumber(1000)
 				.gidNumber(512)
 				.countryCode("0")
-				.extId(UserExtId.valueOf(extId));
+				.extId(UserExtId.valueOf(extId))
+				.publicFreeBusy(true);
 	}
 	private ObmUser sampleUser(int id, int entityId, String extId) {
 		return sampleUserBuilder(id, entityId, extId)

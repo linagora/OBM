@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013  Linagora
+ * Copyright (C) 2011-2012  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,35 +29,36 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.domain.dao;
 
-package org.obm.provisioning.dao;
+import org.obm.provisioning.dao.BatchDao;
+import org.obm.provisioning.dao.BatchDaoJdbcImpl;
+import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.GroupDaoJdbcImpl;
+import org.obm.provisioning.dao.OperationDao;
+import org.obm.provisioning.dao.OperationDaoJdbcImpl;
+import org.obm.provisioning.dao.PermissionDao;
+import org.obm.provisioning.dao.PermissionDaoHardcodedImpl;
+import org.obm.provisioning.dao.ProfileDao;
+import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
+import org.obm.sync.date.DateProvider;
+import org.obm.utils.ObmHelper;
 
-import java.util.Set;
+import com.google.inject.AbstractModule;
 
-import org.obm.provisioning.ProfileId;
-import org.obm.provisioning.ProfileName;
-import org.obm.provisioning.beans.ProfileEntry;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+public class DaoModule extends AbstractModule {
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
-import fr.aliacom.obm.common.profile.Profile;
-import fr.aliacom.obm.common.user.ObmUser;
-
-public interface ProfileDao {
-
-	ProfileName getProfileName(ObmDomainUuid domainUuid, ProfileId profileId) throws DaoException, ProfileNotFoundException;
-	
-	ProfileName getUserProfileName(String login, ObmDomainUuid domainUuid) throws DaoException, UserNotFoundException;
-
-	Set<ProfileEntry> getProfileEntries(ObmDomainUuid domainUuid) throws DaoException;
-
-	Profile get(ProfileId id, ObmDomain domain) throws DaoException;
-
-	Profile getUserProfile(ObmUser user) throws DaoException, UserNotFoundException;
-
-	boolean isAdminProfile(String profileName) throws DaoException;
-
+	@Override
+	protected void configure() {
+		bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
+		bind(BatchDao.class).to(BatchDaoJdbcImpl.class);
+		bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
+		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
+		bind(DateProvider.class).to(ObmHelper.class);
+		bind(PermissionDao.class).to(PermissionDaoHardcodedImpl.class);
+		bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
+		bind(EntityRightDao.class).to(EntityRightDaoJdbcImpl.class);
+		bind(PUserDao.class).to(PUserDaoJdbcImpl.class);
+		bind(PGroupDao.class).to(PGroupDaoJdbcImpl.class);
+	}
 }

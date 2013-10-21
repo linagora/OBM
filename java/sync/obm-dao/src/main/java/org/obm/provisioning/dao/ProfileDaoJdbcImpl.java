@@ -50,6 +50,7 @@ import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.Right;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -68,6 +69,7 @@ import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
 import fr.aliacom.obm.common.profile.Profile;
 import fr.aliacom.obm.common.profile.Profile.AccessRestriction;
 import fr.aliacom.obm.common.profile.Profile.AdminRealm;
+import fr.aliacom.obm.common.profile.ProfileModuleRightsService;
 import fr.aliacom.obm.common.user.ObmUser;
 
 @Singleton
@@ -81,6 +83,7 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 	private static final String DEFAULT_RIGHT = "default_right";
 	private static final String MAX_MAIL_QUOTA = "mail_quota_max";
 	private static final String DEFAULT_MAIL_QUOTA = "mail_quota_default";
+	@VisibleForTesting static final String DOMAIN_MODULE_NAME = "domain";
 
 	/**
 	 * Modules, in order, appearing in the "default rights" profile property
@@ -94,10 +97,12 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 	};
 
 	private DatabaseConnectionProvider connectionProvider;
+	private ProfileModuleRightsService profileModuleRightsService;
 
 	@Inject
-	private ProfileDaoJdbcImpl(DatabaseConnectionProvider connectionProvider) {
+	private ProfileDaoJdbcImpl(DatabaseConnectionProvider connectionProvider, ProfileModuleRightsService profileModuleRightsService) {
 		this.connectionProvider = connectionProvider;
+		this.profileModuleRightsService = profileModuleRightsService;
 	}
 
 	@Override
@@ -244,6 +249,37 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		}
+	}
+	
+	@Override
+	public boolean isAdminProfile(String profileName) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = connectionProvider.getConnection();
+			ps = con.prepareStatement(
+					"SELECT profilemodule_right " +
+					"FROM ProfileModule " +
+					"INNER JOIN Profile ON profile_id=profilemodule_profile_id " +
+					"WHERE profilemodule_module_name = ? " +
+					"AND profile_name = ?");
+
+			ps.setString(1, DOMAIN_MODULE_NAME);
+			ps.setString(2, profileName);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return profileModuleRightsService.isAdmin(rs.getInt("profilemodule_right"));
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(con, ps, rs);
+		}
+
+		return false;
 	}
 
 	private ProfileId getUserProfileId(ObmUser user) throws SQLException, UserNotFoundException {

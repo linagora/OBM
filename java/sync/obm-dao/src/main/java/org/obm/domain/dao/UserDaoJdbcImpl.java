@@ -47,6 +47,7 @@ import java.util.Set;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.utils.JDBCUtils;
@@ -75,7 +76,6 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.ObmUser.Builder;
 import fr.aliacom.obm.common.user.UserExtId;
 
 @Singleton
@@ -121,8 +121,8 @@ public class UserDaoJdbcImpl implements UserDao {
 			"userobm_userupdate, " +
 			"userobm_uid, " +
 			"userobm_gid, " +
-			"defpref.userobmpref_value, " +
-			"userpref.userobmpref_value, " +
+			"defpref.userobmpref_value AS defpref_userobmpref_value, " +
+			"userpref.userobmpref_value AS userpref_userobmpref_value, " +
 			"userentity_entity_id, " +
 			"host_name, " +
 			"host_fqdn, " +
@@ -148,15 +148,17 @@ public class UserDaoJdbcImpl implements UserDao {
 	private final GroupDao groupDao;
 	private final AddressBookDao addressBookDao;
 	private final UserPatternDao userPatternDao;
+	private final ProfileDao profileDao;
 	
 	@Inject
 	@VisibleForTesting
-	UserDaoJdbcImpl(ObmHelper obmHelper, ObmInfoDao obmInfoDao, AddressBookDao addressBookDao, UserPatternDao userPatternDao, GroupDao groupDao) {
+	UserDaoJdbcImpl(ObmHelper obmHelper, ObmInfoDao obmInfoDao, AddressBookDao addressBookDao, UserPatternDao userPatternDao, GroupDao groupDao, ProfileDao profileDao) {
 		this.obmHelper = obmHelper;
 		this.obmInfoDao = obmInfoDao;
 		this.addressBookDao = addressBookDao;
 		this.userPatternDao = userPatternDao;
 		this.groupDao = groupDao;
+		this.profileDao = profileDao;
 	}
 	
 	public Map<String, String> loadUserProperties(int userObmId) {
@@ -330,52 +332,57 @@ public class UserDaoJdbcImpl implements UserDao {
 	}
 
 	private ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs, ObmUser creator, ObmUser updator, Set<Group> groups) throws SQLException {
-		String extId = rs.getString("userobm_ext_id");
 
-		Builder builder = ObmUser.builder()
-				.uid(rs.getInt(1))
-				.login(rs.getString("userobm_login"))
-				.emailAndAliases(nullToEmpty(rs.getString(2)))
-				.domain(domain)
-				.firstName(emptyToNull(rs.getString("userobm_firstname")))
-				.lastName(emptyToNull(rs.getString("userobm_lastname")))
-				.publicFreeBusy(computePublicFreeBusy(5, rs))
-				.commonName(emptyToNull(rs.getString("userobm_commonname")))
-				.extId(extId != null ? UserExtId.builder().extId(extId).build() : null)
-				.entityId(EntityId.valueOf(rs.getInt("userentity_entity_id")))
-				.password(Strings.emptyToNull(rs.getString("userobm_password")))
-				.profileName(ProfileName.builder().name(rs.getString("userobm_perms")).build())
-				.kind(rs.getString("userobm_kind"))
-				.title(emptyToNull(rs.getString("userobm_title")))
-				.description(rs.getString("userobm_description"))
-				.company(rs.getString("userobm_company"))
-				.service(rs.getString("userobm_service"))
-				.direction(rs.getString("userobm_direction"))
-				.address1(rs.getString("userobm_address1"))
-				.address2(rs.getString("userobm_address2"))
-				.address3(rs.getString("userobm_address3"))
-				.town(rs.getString("userobm_town"))
-				.zipCode(rs.getString("userobm_zipcode"))
-				.expresspostal(rs.getString("userobm_expresspostal"))
-				.countryCode(rs.getString("userobm_country_iso3166"))
-				.phone(emptyToNull(rs.getString("userobm_phone")))
-				.phone2(emptyToNull(rs.getString("userobm_phone2")))
-				.mobile(emptyToNull(rs.getString("userobm_mobile")))
-				.fax(emptyToNull(rs.getString("userobm_fax")))
-				.fax2(emptyToNull(rs.getString("userobm_fax2")))
-				.mailQuota(rs.getInt("userobm_mail_quota"))
-				.mailHost(hostFromCursor(rs))
-				.archived(rs.getBoolean("userobm_archive"))
-				.hidden(rs.getInt("userobm_hidden") == HIDDEN_TRUE)
-				.timeCreate(JDBCUtils.getDate(rs, "userobm_timecreate"))
-				.timeUpdate(JDBCUtils.getDate(rs, "userobm_timeupdate"))
-				.uidNumber(JDBCUtils.getInteger(rs, "userobm_uid"))
-				.gidNumber(JDBCUtils.getInteger(rs, "userobm_gid"))
-				.createdBy(creator)
-				.updatedBy(updator)
-				.groups(Objects.firstNonNull(groups, Collections.EMPTY_SET));
+		try {
+			String extId = rs.getString("userobm_ext_id");
+			return ObmUser.builder()
+					.uid(rs.getInt("userobm_id"))
+					.login(rs.getString("userobm_login"))
+					.admin(profileDao.isAdminProfile(rs.getString("userobm_perms")))
+					.emailAndAliases(nullToEmpty(rs.getString("userobm_email")))
+					.domain(domain)
+					.firstName(emptyToNull(rs.getString("userobm_firstname")))
+					.lastName(emptyToNull(rs.getString("userobm_lastname")))
+					.publicFreeBusy(computePublicFreeBusy(rs))
+					.commonName(emptyToNull(rs.getString("userobm_commonname")))
+					.extId(extId != null ? UserExtId.builder().extId(extId).build() : null)
+					.entityId(EntityId.valueOf(rs.getInt("userentity_entity_id")))
+					.password(Strings.emptyToNull(rs.getString("userobm_password")))
+					.profileName(ProfileName.builder().name(rs.getString("userobm_perms")).build())
+					.kind(rs.getString("userobm_kind"))
+					.title(emptyToNull(rs.getString("userobm_title")))
+					.description(rs.getString("userobm_description"))
+					.company(rs.getString("userobm_company"))
+					.service(rs.getString("userobm_service"))
+					.direction(rs.getString("userobm_direction"))
+					.address1(rs.getString("userobm_address1"))
+					.address2(rs.getString("userobm_address2"))
+					.address3(rs.getString("userobm_address3"))
+					.town(rs.getString("userobm_town"))
+					.zipCode(rs.getString("userobm_zipcode"))
+					.expresspostal(rs.getString("userobm_expresspostal"))
+					.countryCode(rs.getString("userobm_country_iso3166"))
+					.phone(emptyToNull(rs.getString("userobm_phone")))
+					.phone2(emptyToNull(rs.getString("userobm_phone2")))
+					.mobile(emptyToNull(rs.getString("userobm_mobile")))
+					.fax(emptyToNull(rs.getString("userobm_fax")))
+					.fax2(emptyToNull(rs.getString("userobm_fax2")))
+					.mailQuota(rs.getInt("userobm_mail_quota"))
+					.mailHost(hostFromCursor(rs))
+					.archived(rs.getBoolean("userobm_archive"))
+					.hidden(rs.getInt("userobm_hidden") == HIDDEN_TRUE)
+					.timeCreate(JDBCUtils.getDate(rs, "userobm_timecreate"))
+					.timeUpdate(JDBCUtils.getDate(rs, "userobm_timeupdate"))
+					.uidNumber(JDBCUtils.getInteger(rs, "userobm_uid"))
+					.gidNumber(JDBCUtils.getInteger(rs, "userobm_gid"))
+					.createdBy(creator)
+					.updatedBy(updator)
+					.groups(Objects.firstNonNull(groups, Collections.EMPTY_SET))
+					.build();
+		} catch (DaoException e) {
+			throw new SQLException(e);
+		}
 
-		return builder.build();
 	}
 
 	private ObmHost hostFromCursor(ResultSet rs) throws SQLException {
@@ -434,11 +441,11 @@ public class UserDaoJdbcImpl implements UserDao {
 		return obmUser;
 	}
 
-	private boolean computePublicFreeBusy(int idx, ResultSet rs)
+	private boolean computePublicFreeBusy(ResultSet rs)
 	throws SQLException {
 		boolean user = true;
-		boolean def = !"no".equalsIgnoreCase(rs.getString(idx));
-		String userPref = rs.getString(idx + 1);
+		boolean def = !"no".equalsIgnoreCase(rs.getString("defpref_userobmpref_value"));
+		String userPref = rs.getString("userpref_userobmpref_value");
 		if (rs.wasNull()) {
 			user = def;
 		} else {

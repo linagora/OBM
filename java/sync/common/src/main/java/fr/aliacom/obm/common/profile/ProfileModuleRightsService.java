@@ -29,35 +29,16 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package fr.aliacom.obm.common.profile;
 
-package org.obm.provisioning.dao;
+import com.google.inject.Singleton;
 
-import java.util.Set;
+@Singleton
+public class ProfileModuleRightsService {
 
-import org.obm.provisioning.ProfileId;
-import org.obm.provisioning.ProfileName;
-import org.obm.provisioning.beans.ProfileEntry;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
-
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
-import fr.aliacom.obm.common.profile.Profile;
-import fr.aliacom.obm.common.user.ObmUser;
-
-public interface ProfileDao {
-
-	ProfileName getProfileName(ObmDomainUuid domainUuid, ProfileId profileId) throws DaoException, ProfileNotFoundException;
+	private static final int ADMIN_RIGHTS = 0x1F; // binary value: 11111, db value: 31
 	
-	ProfileName getUserProfileName(String login, ObmDomainUuid domainUuid) throws DaoException, UserNotFoundException;
-
-	Set<ProfileEntry> getProfileEntries(ObmDomainUuid domainUuid) throws DaoException;
-
-	Profile get(ProfileId id, ObmDomain domain) throws DaoException;
-
-	Profile getUserProfile(ObmUser user) throws DaoException, UserNotFoundException;
-
-	boolean isAdminProfile(String profileName) throws DaoException;
-
+	public boolean isAdmin(int right) {
+		return (right & ADMIN_RIGHTS) == ADMIN_RIGHTS;
+	}
 }

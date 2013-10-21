@@ -175,6 +175,27 @@ CREATE TABLE userentity (
     userentity_user_id integer NOT NULL
 );
 
+CREATE TABLE profile (
+    profile_id integer PRIMARY KEY AUTO_INCREMENT,
+    profile_domain_id integer NOT NULL,
+    profile_timeupdate timestamp,
+    profile_timecreate timestamp,
+    profile_userupdate integer,
+    profile_usercreate integer,
+    profile_name character varying(64)
+);
+
+CREATE TABLE profilemodule (
+    profilemodule_id integer NOT NULL,
+    profilemodule_domain_id integer NOT NULL,
+    profilemodule_profile_id integer,
+    profilemodule_module_name character varying(64) DEFAULT ''::character varying NOT NULL,
+    profilemodule_right integer
+);
+ALTER TABLE profilemodule ADD CONSTRAINT profilemodule_pkey PRIMARY KEY (profilemodule_id);
+CREATE SEQUENCE profilemodule_profilemodule_id_seq INCREMENT BY 1 CACHE 1;
+ALTER TABLE profilemodule ALTER COLUMN profilemodule_id SET DEFAULT nextval('profilemodule_profilemodule_id_seq');
+
 INSERT INTO domain (domain_name, domain_uuid, domain_label, domain_global) 
 	VALUES 
 	('test.tlse.lng', 'ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6', 'test.tlse.lng', false),

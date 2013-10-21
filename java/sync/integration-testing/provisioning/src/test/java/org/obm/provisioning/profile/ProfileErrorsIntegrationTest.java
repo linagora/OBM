@@ -59,28 +59,28 @@ public class ProfileErrorsIntegrationTest {
 	
 	@Test
 	@RunAsClient
-	public void testGetProfilesWhenNoTable(@ArquillianResource URL baseURL) {
+	public void testGetProfilesWhenNoTableEntry(@ArquillianResource URL baseURL) {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
 		given()
 			.auth().basic("admin0@global.virt", "admin0").
 		expect()
-			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/profiles/");
 	}
 	
 	@Test
 	@RunAsClient
-	public void testGetProfileNameWhenNoTable(@ArquillianResource URL baseURL) {
+	public void testGetProfileNameWhenNoTableEntry(@ArquillianResource URL baseURL) {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
 		given()
 			.auth().basic("admin0@global.virt", "admin0").
 		expect()
-			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
 			.get("/profiles/1");
 	}

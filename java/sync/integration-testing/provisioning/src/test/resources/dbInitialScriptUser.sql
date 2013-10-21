@@ -229,6 +229,27 @@ CREATE TABLE of_usergroup (
     of_usergroup_user_id integer NOT NULL
 );
 
+CREATE TABLE profile (
+    profile_id integer PRIMARY KEY AUTO_INCREMENT,
+    profile_domain_id integer NOT NULL,
+    profile_timeupdate timestamp,
+    profile_timecreate timestamp,
+    profile_userupdate integer,
+    profile_usercreate integer,
+    profile_name character varying(64)
+);
+
+CREATE TABLE profilemodule (
+    profilemodule_id integer NOT NULL,
+    profilemodule_domain_id integer NOT NULL,
+    profilemodule_profile_id integer,
+    profilemodule_module_name character varying(64) DEFAULT ''::character varying NOT NULL,
+    profilemodule_right integer
+);
+ALTER TABLE profilemodule ADD CONSTRAINT profilemodule_pkey PRIMARY KEY (profilemodule_id);
+CREATE SEQUENCE profilemodule_profilemodule_id_seq INCREMENT BY 1 CACHE 1;
+ALTER TABLE profilemodule ALTER COLUMN profilemodule_id SET DEFAULT nextval('profilemodule_profilemodule_id_seq');
+
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (1, 1), (2, 2), (3, 3);
 
 INSERT INTO domain (domain_name, domain_uuid, domain_label, domain_global) 

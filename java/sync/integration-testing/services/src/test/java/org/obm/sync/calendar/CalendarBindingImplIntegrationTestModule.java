@@ -34,6 +34,7 @@ package org.obm.sync.calendar;
 import javax.servlet.ServletContext;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.domain.dao.DaoModule;
 import org.obm.sync.DatabaseMetadataModule;
 import org.obm.sync.DatabaseModule;
 import org.obm.sync.MessageQueueModule;
@@ -60,6 +61,7 @@ public class CalendarBindingImplIntegrationTestModule extends AbstractModule {
 				new MessageQueueModule(),
 				new TransactionalModule(),
 				new DatabaseModule(),
+				new DaoModule(),
 				new SolrJmsModule(),
 				new DatabaseMetadataModule());
 		try {

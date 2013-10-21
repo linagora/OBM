@@ -483,4 +483,36 @@ public class ObmUserTest {
 
 		assertThat(user.isArchived()).isFalse();
 	}
+
+	@Test
+	public void testAdminDefaultValue() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login("login")
+				.domain(ObmDomain.builder().build())
+				.build();
+		assertThat(obmUser.isAdmin()).isFalse();
+	}
+
+	@Test
+	public void testIsAdmin() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login("login")
+				.domain(ObmDomain.builder().build())
+				.admin(true)
+				.build();
+		assertThat(obmUser.isAdmin()).isTrue();
+	}
+
+	@Test
+	public void testIsNotAdmin() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login("login")
+				.domain(ObmDomain.builder().build())
+				.admin(false)
+				.build();
+		assertThat(obmUser.isAdmin()).isFalse();
+	}
 }

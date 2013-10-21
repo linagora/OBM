@@ -326,5 +326,19 @@ public class ProfileDaoJdbcImplTest implements H2TestClass {
 
 		assertThat(dao.getUserProfile(user)).isEqualTo(profile);
 	}
-
+	
+	@Test
+	public void testIsAdminProfile() throws Exception {
+		assertThat(dao.isAdminProfile("admin")).isTrue();
+	}
+	
+	@Test
+	public void testIsNotAdminProfile() throws Exception {
+		assertThat(dao.isAdminProfile("user")).isFalse();
+	}
+	
+	@Test
+	public void testIsNotAdminProfileWhenUnknown() throws Exception {
+		assertThat(dao.isAdminProfile("editor")).isFalse();
+	}
 }

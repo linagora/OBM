@@ -96,6 +96,17 @@ CREATE TABLE profile (
     profile_name character varying(64)
 );
 
+CREATE TABLE profilemodule (
+    profilemodule_id integer NOT NULL,
+    profilemodule_domain_id integer NOT NULL,
+    profilemodule_profile_id integer,
+    profilemodule_module_name character varying(64) DEFAULT ''::character varying NOT NULL,
+    profilemodule_right integer
+);
+ALTER TABLE profilemodule ADD CONSTRAINT profilemodule_pkey PRIMARY KEY (profilemodule_id);
+CREATE SEQUENCE profilemodule_profilemodule_id_seq INCREMENT BY 1 CACHE 1;
+ALTER TABLE profilemodule ALTER COLUMN profilemodule_id SET DEFAULT nextval('profilemodule_profilemodule_id_seq');
+
 CREATE TABLE userobm (
     userobm_id integer PRIMARY KEY AUTO_INCREMENT,
     userobm_domain_id integer NOT NULL,

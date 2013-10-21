@@ -53,6 +53,7 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.ProfileDao;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailLogin;
 import org.obm.sync.dao.EntityId;
@@ -87,6 +88,7 @@ public class UserDaoTest {
 			bindWithMock(AddressBookDao.class);
 			bindWithMock(UserPatternDao.class);
 			bindWithMock(GroupDao.class);
+			bindWithMock(ProfileDao.class);
 		}
 
 		private <T> void bindWithMock(Class<T> cls) {
@@ -107,14 +109,16 @@ public class UserDaoTest {
 	private UserPatternDao userPatternDao;
 	@Inject
 	private GroupDao groupDao;
+	@Inject
+	private ProfileDao profileDao;
 
 	private UserDaoJdbcImpl userDao;
 
 	@Before
 	public void setUp() {
 		userDao = createMockBuilder(UserDaoJdbcImpl.class)
-					.withConstructor(ObmHelper.class, ObmInfoDao.class, AddressBookDao.class, UserPatternDao.class, GroupDao.class)
-					.withArgs(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao)
+					.withConstructor(ObmHelper.class, ObmInfoDao.class, AddressBookDao.class, UserPatternDao.class, GroupDao.class, ProfileDao.class)
+					.withArgs(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao, profileDao)
 					.addMockedMethod("userIdFromEmailQuery")
 					.addMockedMethod("userIdFromLogin")
 					.createMock(mocksControl);
@@ -172,7 +176,7 @@ public class UserDaoTest {
 		
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao, profileDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, login.get(), domain, null);
@@ -188,7 +192,7 @@ public class UserDaoTest {
 		String domain = "obm.com";
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao, profileDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, loginFromDb, domain, null);
@@ -207,7 +211,7 @@ public class UserDaoTest {
 		
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao, profileDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, loginFromDb, domainFromDb, null);
@@ -226,7 +230,7 @@ public class UserDaoTest {
 				.join("rasta.rocket", "tEst.cOm", "obm.org");
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao, profileDao);
 		
 		expectEmailQueryCalls(connection, rs, 1);
 		expectMatchingUserOfEmailQuery(rs, 1, loginFromDb, domainFromDb, domainFromDbAliases);
@@ -242,7 +246,7 @@ public class UserDaoTest {
 		DomainName domain = new DomainName("test.com");
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao, profileDao);
 		
 		expectEmailQueryCalls(connection, rs, 0);
 		
@@ -257,7 +261,7 @@ public class UserDaoTest {
 		String domain = "test.com";
 		Connection connection = mocksControl.createMock(Connection.class);
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao, profileDao);
 		
 		expectEmailQueryCalls(connection, rs, 4);
 		expectMatchingUserOfEmailQuery(rs, 1, "useraa", domain, null);
@@ -297,13 +301,17 @@ public class UserDaoTest {
 	
 	@Test
 	public void testObmUserFromResultSet() throws Exception {
+		String profileName = "admin";
+		expect(profileDao.isAdminProfile(profileName)).andReturn(true);
+		
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
-		expect(rs.getInt(1)).andReturn(5);
+		expect(rs.getInt("userobm_id")).andReturn(5);
 		expect(rs.getString("userobm_login")).andReturn("login");
 		expect(rs.getString("userobm_ext_id")).andReturn("extid");
-		expect(rs.getString(2)).andReturn("useremail" + UserDao.DB_INNER_FIELD_SEPARATOR + "useremail2");
-		expect(rs.getString(5)).andReturn("yes");
-		expect(rs.getString(6)).andReturn(null);
+		expect(rs.getString("userobm_perms")).andReturn(profileName);
+		expect(rs.getString("userobm_email")).andReturn("useremail" + UserDao.DB_INNER_FIELD_SEPARATOR + "useremail2");
+		expect(rs.getString("defpref_userobmpref_value")).andReturn("yes");
+		expect(rs.getString("userpref_userobmpref_value")).andReturn(null);
 		expect(rs.wasNull()).andReturn(true);
 		expect(rs.getString("userobm_firstname")).andReturn("firstname2");
 		expect(rs.getString("userobm_lastname")).andReturn("lastname2");
@@ -357,6 +365,7 @@ public class UserDaoTest {
 			.uid(5)
 			.entityId(EntityId.valueOf(6))
 			.login("login")
+			.admin(true)
 			.domain(domain)
 			.emailAndAliases(Joiner.on(ObmUser.EMAIL_FIELD_SEPARATOR).join("useremail", "useremail2"))
 			.firstName("firstname2")

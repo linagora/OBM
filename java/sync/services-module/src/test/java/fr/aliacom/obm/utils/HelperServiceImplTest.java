@@ -53,6 +53,8 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
+import org.obm.provisioning.dao.ProfileDao;
+import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.date.DateProvider;
@@ -87,6 +89,7 @@ public class HelperServiceImplTest {
 			bind(UserService.class).to(UserServiceImpl.class);
 			bind(UserDao.class).to(UserDaoJdbcImpl.class);
 			bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
+			bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
 		}
 
 		private <T> void bindWithMock(Class<T> cls) {

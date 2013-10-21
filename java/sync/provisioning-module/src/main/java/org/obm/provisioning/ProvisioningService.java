@@ -14,27 +14,11 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.obm.cyrus.imap.CyrusClientModule;
-import org.obm.domain.dao.EntityRightDao;
-import org.obm.domain.dao.EntityRightDaoJdbcImpl;
-import org.obm.domain.dao.PGroupDao;
-import org.obm.domain.dao.PGroupDaoJdbcImpl;
-import org.obm.domain.dao.PUserDao;
-import org.obm.domain.dao.PUserDaoJdbcImpl;
+import org.obm.domain.dao.DaoModule;
 import org.obm.domain.dao.UserSystemDao;
-import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.conf.SystemUserLdapConfiguration;
-import org.obm.provisioning.dao.BatchDao;
-import org.obm.provisioning.dao.BatchDaoJdbcImpl;
-import org.obm.provisioning.dao.GroupDao;
-import org.obm.provisioning.dao.GroupDaoJdbcImpl;
-import org.obm.provisioning.dao.OperationDao;
-import org.obm.provisioning.dao.OperationDaoJdbcImpl;
-import org.obm.provisioning.dao.PermissionDao;
-import org.obm.provisioning.dao.PermissionDaoHardcodedImpl;
-import org.obm.provisioning.dao.ProfileDao;
-import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.json.BatchJsonSerializer;
 import org.obm.provisioning.json.ExceptionJsonSerializer;
@@ -62,8 +46,6 @@ import org.obm.provisioning.resources.ProfileResource;
 import org.obm.provisioning.resources.UserResource;
 import org.obm.provisioning.resources.UserWriteResource;
 import org.obm.satellite.client.SatelliteClientModule;
-import org.obm.sync.date.DateProvider;
-import org.obm.utils.ObmHelper;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
@@ -105,27 +87,14 @@ public class ProvisioningService extends ServletModule {
 			.with(GuiceProvisioningJerseyServlet.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
 
 		bindRestResources();
-		bindDao();
-		
+
+		install(new DaoModule());
 		install(new BatchProcessingModule());
 		install(new LdapModule());
 		install(new SatelliteClientModule());
 		install(new CyrusClientModule());
 		install(new ShiroAopModule());
 		install(new AuthorizingModule(servletContext));
-	}
-
-	private void bindDao() {
-		bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
-		bind(BatchDao.class).to(BatchDaoJdbcImpl.class);
-		bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
-		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
-		bind(DateProvider.class).to(ObmHelper.class);
-		bind(PermissionDao.class).to(PermissionDaoHardcodedImpl.class);
-		bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
-		bind(EntityRightDao.class).to(EntityRightDaoJdbcImpl.class);
-		bind(PUserDao.class).to(PUserDaoJdbcImpl.class);
-		bind(PGroupDao.class).to(PGroupDaoJdbcImpl.class);
 	}
 
 	private void bindRestResources() {

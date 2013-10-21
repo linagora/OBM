@@ -80,6 +80,7 @@ public class ObmUser {
 		private EntityId entityId;
 		private UserExtId extId;
 		private String login;
+		private Boolean admin;
 		private String commonName;
 		private String lastName;
 		private String firstName;
@@ -190,6 +191,10 @@ public class ObmUser {
 		}
 		public Builder login(String login) {
 			this.login = login;
+			return this;
+		}
+		public Builder admin(boolean admin) {
+			this.admin = admin;
 			return this;
 		}
 		public Builder commonName(String commonName) {
@@ -405,6 +410,7 @@ public class ObmUser {
 			Preconditions.checkState(uid != null || extId != null);
 			Preconditions.checkState(login != null);
 			Preconditions.checkState(domain != null);
+			admin = Objects.firstNonNull(admin, false);
 
 			// The DB model uses 0 in the mail quota column to mean "no quota"
 			// ObmUser uses null internally to mean "no quota"
@@ -416,7 +422,7 @@ public class ObmUser {
 			hidden = Objects.firstNonNull(hidden, false);
 
 			return new ObmUser(
-					uid, entityId, login, extId, commonName, lastName, firstName,
+					uid, entityId, login, extId, admin, commonName, lastName, firstName,
 					email, emailAlias.build(), hidden,
 					address1, address2, address3, expresspostal, mobile, service, title, town,
 					zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
@@ -430,6 +436,7 @@ public class ObmUser {
 	private final EntityId entityId;
 	private final String login;
 	private final UserExtId extId;
+	private final boolean admin;
 	private final String commonName;
 	private final String lastName;
 	private final String firstName;
@@ -476,7 +483,7 @@ public class ObmUser {
 	
 	private Set<Group> groups;
 
-	public ObmUser(Integer uid, EntityId entityId, String login, UserExtId extId, String commonName,
+	public ObmUser(Integer uid, EntityId entityId, String login, UserExtId extId, boolean admin, String commonName,
 			String lastName, String firstName, String email,
 			Set<String> emailAlias, boolean hidden,
 			String address1, String address2,
@@ -492,6 +499,7 @@ public class ObmUser {
 		this.entityId = entityId;
 		this.login = login;
 		this.extId = extId;
+		this.admin = admin;
 		this.commonName = commonName;
 		this.lastName = lastName;
 		this.firstName = firstName;
@@ -546,6 +554,10 @@ public class ObmUser {
 
 	public UserExtId getExtId() {
 		return extId;
+	}
+	
+	public boolean isAdmin() {
+		return admin;
 	}
 	
 	public String getCommonName() {
@@ -778,7 +790,7 @@ public class ObmUser {
 
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(uid, entityId, login, extId, commonName, lastName, firstName, email,
+		return Objects.hashCode(uid, entityId, login, extId, admin, commonName, lastName, firstName, email,
 				emailAlias, hidden, address1, address2, address3, expresspostal, mobile,
 				service, title, town, zipCode,	description, createdBy, updatedBy, domain, publicFreeBusy, profileName, kind, company,
 				direction, countryCode, phone, phone2, fax, fax2, mailQuota, archived, mailHost, password, uidNumber, gidNumber, groups);
@@ -792,6 +804,7 @@ public class ObmUser {
 				&& Objects.equal(this.entityId, that.entityId)
 				&& Objects.equal(this.login, that.login)
 				&& Objects.equal(this.extId, that.extId)
+				&& Objects.equal(this.admin, that.admin)
 				&& Objects.equal(this.commonName, that.commonName)
 				&& Objects.equal(this.lastName, that.lastName)
 				&& Objects.equal(this.firstName, that.firstName)
@@ -839,6 +852,7 @@ public class ObmUser {
 			.add("entityId", entityId)
 			.add("login", login)
 			.add("extId", extId)
+			.add("admin", admin)
 			.add("commonName", commonName)
 			.add("lastName", lastName)
 			.add("firstName", firstName)

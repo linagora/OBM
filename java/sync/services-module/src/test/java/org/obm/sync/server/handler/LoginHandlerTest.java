@@ -72,6 +72,8 @@ import org.obm.domain.dao.UserPatternDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.ProfileDao;
+import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.sync.ObmSmtpConf;
 import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
@@ -323,6 +325,7 @@ public class LoginHandlerTest {
 			bindMock(UserPatternDao.class);
 			bind(UserDao.class).to(UserDaoJdbcImpl.class);
 			bindMock(GroupDao.class);
+			bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
 
 			expect(domainService.findDomainByName(isA(String.class))).andAnswer(new IAnswer<ObmDomain>() {
 				@Override

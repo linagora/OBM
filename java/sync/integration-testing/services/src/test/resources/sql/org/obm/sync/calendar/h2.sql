@@ -567,6 +567,38 @@ CREATE TABLE commitedoperation (
 ALTER TABLE commitedoperation ADD CONSTRAINT commitedoperation_pkey PRIMARY KEY (commitedoperation_hash_client_id);
 
 --
+-- Table profile 
+--
+
+CREATE TABLE profile (
+    profile_id integer NOT NULL,
+    profile_domain_id integer NOT NULL,
+    profile_timeupdate timestamp,
+    profile_timecreate timestamp,
+    profile_userupdate integer,
+    profile_usercreate integer,
+    profile_name character varying(64) DEFAULT NULL
+);
+ALTER TABLE profile ADD CONSTRAINT profile_pkey PRIMARY KEY (profile_id);
+CREATE SEQUENCE profile_profile_id_seq INCREMENT BY 1 CACHE 1;
+ALTER TABLE profile ALTER COLUMN profile_id SET DEFAULT nextval('profile_profile_id_seq');
+
+--
+-- Table profilemodule 
+--
+
+CREATE TABLE profilemodule (
+    profilemodule_id integer NOT NULL,
+    profilemodule_domain_id integer NOT NULL,
+    profilemodule_profile_id integer,
+    profilemodule_module_name character varying(64) DEFAULT ''::character varying NOT NULL,
+    profilemodule_right integer
+);
+ALTER TABLE profilemodule ADD CONSTRAINT profilemodule_pkey PRIMARY KEY (profilemodule_id);
+CREATE SEQUENCE profilemodule_profilemodule_id_seq INCREMENT BY 1 CACHE 1;
+ALTER TABLE profilemodule ALTER COLUMN profilemodule_id SET DEFAULT nextval('profilemodule_profilemodule_id_seq');
+
+--
 -- Cascades
 --
 ALTER TABLE contactentity
@@ -692,6 +724,9 @@ ALTER TABLE resource
     ADD CONSTRAINT resource_usercreate_userobm_id_fkey FOREIGN KEY (resource_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 ALTER TABLE resource
     ADD CONSTRAINT resource_userupdate_userobm_id_fkey FOREIGN KEY (resource_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+ALTER TABLE profilemodule
+    ADD CONSTRAINT profilemodule_profile_id_profile_id_fkey FOREIGN KEY (profilemodule_profile_id) REFERENCES profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 --
 -- Data inserts

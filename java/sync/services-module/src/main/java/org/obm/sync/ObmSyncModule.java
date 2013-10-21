@@ -39,6 +39,7 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
+import org.obm.domain.dao.DaoModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
 import org.obm.provisioning.ProvisioningService;
@@ -70,6 +71,7 @@ public class ObmSyncModule extends AbstractModule {
 		install(new MessageQueueModule());
 		install(new TransactionalModule());
 		install(new DatabaseModule());
+		install(new DaoModule());
 		install(new SolrJmsModule());
 		install(new HealthCheckModule());
 		install(new HealthCheckDefaultHandlersModule());

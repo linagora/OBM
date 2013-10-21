@@ -29,35 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package fr.aliacom.obm.common.profile;
 
-package org.obm.provisioning.dao;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.Set;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.filter.SlowFilterRunner;
 
-import org.obm.provisioning.ProfileId;
-import org.obm.provisioning.ProfileName;
-import org.obm.provisioning.beans.ProfileEntry;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+@RunWith(SlowFilterRunner.class)
+public class ProfileModuleRightsServiceTest {
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
-import fr.aliacom.obm.common.profile.Profile;
-import fr.aliacom.obm.common.user.ObmUser;
+	private ProfileModuleRightsService testee;
 
-public interface ProfileDao {
-
-	ProfileName getProfileName(ObmDomainUuid domainUuid, ProfileId profileId) throws DaoException, ProfileNotFoundException;
+	@Before
+	public void setup() {
+		testee = new ProfileModuleRightsService();
+	}
 	
-	ProfileName getUserProfileName(String login, ObmDomainUuid domainUuid) throws DaoException, UserNotFoundException;
+	@Test
+	public void testIsAdmin() {
+		assertThat(testee.isAdmin(31)).isTrue();
+	}
 
-	Set<ProfileEntry> getProfileEntries(ObmDomainUuid domainUuid) throws DaoException;
-
-	Profile get(ProfileId id, ObmDomain domain) throws DaoException;
-
-	Profile getUserProfile(ObmUser user) throws DaoException, UserNotFoundException;
-
-	boolean isAdminProfile(String profileName) throws DaoException;
-
+	@Test
+	public void testIsNotAdmin() {
+		assertThat(testee.isAdmin(7)).isFalse();
+	}
 }

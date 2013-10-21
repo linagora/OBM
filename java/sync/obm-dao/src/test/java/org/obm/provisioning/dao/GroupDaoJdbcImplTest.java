@@ -92,6 +92,7 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
             bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
             bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
             bind(UserDao.class).to(UserDaoJdbcImpl.class);
+            bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
         }
 
     }
