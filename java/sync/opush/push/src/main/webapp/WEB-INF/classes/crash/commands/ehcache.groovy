@@ -215,7 +215,7 @@ class ehcache extends CRaSHCommand {
              if (runningStoresMaxMemoryInMB[storeName] != 0) {
                label(percentageBar(runningStoresMaxMemoryInMB[storeName], storeMemorySizeInBytes))
              } else {
-               label(percentageBar(100, storeMemorySizeInBytes))
+               label(percentageBar(storePercentage.applyTo(config.maxMemoryInMB()), storeMemorySizeInBytes))
              }
           }
        }
