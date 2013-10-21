@@ -58,9 +58,11 @@ import fr.aliacom.obm.utils.ObmHelper;
 public class UserDao {
 
 	public static final String DB_INNER_FIELD_SEPARATOR = "\r\n";
+	@VisibleForTesting static final String DOMAIN_MODULE_NAME = "domain";
+	@VisibleForTesting static final int ADMIN_RIGHTS = Integer.parseInt("11111", 2);
 	
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
-	private static final String USER_FIELDS = " userobm_id, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname, userobm_login, userentity_entity_id";
+	private static final String USER_FIELDS = " userobm_id, userobm_perms, userobm_email, userobm_firstname, userobm_lastname, defpref.userobmpref_value, userpref.userobmpref_value, userobm_commonname, userobm_login, userentity_entity_id";
 	private final ObmHelper obmHelper;
 	
 	@Inject
@@ -210,7 +212,7 @@ public class UserDao {
 			ps.setString(2, login);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				obmUser = createUserFromResultSet(domain, rs);
+				obmUser = createUserFromResultSet(domain, rs, con);
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
@@ -220,10 +222,11 @@ public class UserDao {
 		return obmUser;
 	}
 
-	@VisibleForTesting ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs) throws SQLException {
+	@VisibleForTesting ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs, Connection con) throws SQLException {
 		return ObmUser.builder()
 				.uid(rs.getInt(1))
 				.login(rs.getString("userobm_login"))
+				.admin(isAdminProfile(con, rs.getString("userobm_perms")))
 				.emailAndAliases(rs.getString(2))
 				.domain(domain)
 				.firstName(rs.getString("userobm_firstname"))
@@ -234,6 +237,33 @@ public class UserDao {
 				.build();
 	}
 	
+	private boolean isAdminProfile(Connection con, String profileName) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			ps = con.prepareStatement(
+					"SELECT profilemodule_right " +
+					"FROM ProfileModule " +
+					"INNER JOIN Profile ON profile_id=profilemodule_profile_id " +
+					"WHERE profilemodule_module_name = ? " +
+					"AND profile_name = ?");
+
+			ps.setString(1, DOMAIN_MODULE_NAME);
+			ps.setString(2, profileName);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return rs.getInt("profilemodule_right") == ADMIN_RIGHTS;
+			}
+		}
+		finally {
+			obmHelper.cleanup(null, ps, rs);
+		}
+
+		return false;
+	}
+
 	public ObmUser findUserById(int id, ObmDomain domain) {
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -253,7 +283,7 @@ public class UserDao {
 			ps.setInt(2, id);
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				obmUser = createUserFromResultSet(domain, rs);
+				obmUser = createUserFromResultSet(domain, rs, con);
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
