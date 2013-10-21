@@ -79,7 +79,6 @@ import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.calendar.UserAttendee;
-import org.obm.sync.dao.EntityId;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.services.AttendeeService;
@@ -91,6 +90,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -656,30 +656,34 @@ public class CalendarBindingImpl implements ICalendar {
 		try {
 			convertAttendees(event, calendar, token.getDomain());
 			assignDelegationRightsOnAttendees(token, event);
-			Event ev = null;
-			ev = commitedOperationDao.findAsEvent(token, clientId);
-			if (ev == null) {
-				if (event.isInternalEvent()) {
-					ev = createInternalEvent(token, calendar, event, notification);
-				} else {
-					ev = createExternalEvent(token, calendar, event, notification);
-				}
+			
+			Event ev = commitedOperationDao.findAsEvent(token, clientId);
+			if (ev != null) {
+				return ev;
 			}
 			
-			EntityId entityId = ev.getEntityId();
-			if (clientId != null && entityId != null) {
-				commitedOperationDao.store(token, 
-						CommitedElement.builder()
-							.clientId(clientId)
-							.entityId(entityId)
-							.kind(Kind.VEVENT)
-							.build());
+			if (event.isInternalEvent()) {
+				ev = createInternalEvent(token, calendar, event, notification);
+			} else {
+				ev = createExternalEvent(token, calendar, event, notification);
 			}
+			commitOperation(token, event, clientId);
 			
 			return ev;
 		} catch (SQLException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
+		}
+	}
+
+	@VisibleForTesting void commitOperation(AccessToken token, Event event, String clientId) throws SQLException, ServerFault {
+		if (!Strings.isNullOrEmpty(clientId)) {
+			commitedOperationDao.store(token, 
+					CommitedElement.builder()
+						.clientId(clientId)
+						.entityId(event.getEntityId())
+						.kind(Kind.VEVENT)
+						.build());
 		}
 	}
 
