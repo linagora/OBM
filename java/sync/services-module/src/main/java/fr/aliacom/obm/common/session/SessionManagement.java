@@ -40,7 +40,6 @@ import org.obm.domain.dao.UserDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Credentials;
-import org.obm.sync.auth.Credentials.Builder;
 import org.obm.sync.auth.Login;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
@@ -212,13 +211,11 @@ public class SessionManagement {
 	}
 
 	private Credentials buildCredentials(Login login, String password, boolean isPasswordHashed) {
-		Builder credentialsBuilder = Credentials.builder().login(login);
-		if (isPasswordHashed) {
-			credentialsBuilder.hashedPassword(password);
-		} else {
-			credentialsBuilder.password(password);
-		}
-		return credentialsBuilder.build();
+		return Credentials.builder()
+				.login(login)
+				.hashedPassword(isPasswordHashed)
+				.password(password)
+				.build();
 	}
 
 	private void logNoDomain(String domainName) {

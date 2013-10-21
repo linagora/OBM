@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.auth;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 public class Credentials {
 
@@ -44,10 +44,9 @@ public class Credentials {
 		
 		private Login.Builder loginBuilder;
 		private String password;
-		private boolean hashedPassword;
+		private Boolean hashedPassword;
 
 		private Builder() {
-			hashedPassword = false;
 			loginBuilder = Login.builder();
 		}
 		
@@ -66,20 +65,20 @@ public class Credentials {
 			return this;
 		}
 		
-		public Builder password(String password) {
-			this.password = password;
-			this.hashedPassword = false;
+		public Builder hashedPassword(boolean hashedPassword) {
+			this.hashedPassword = hashedPassword;
 			return this;
 		}
 		
-		public Builder hashedPassword(String password) {
+		public Builder password(String password) {
 			this.password = password;
-			this.hashedPassword = true;
 			return this;
 		}
 		
 		public Credentials build() {
 			Preconditions.checkState(password != null, "'password' is mandatory");
+			Preconditions.checkState(hashedPassword != null, "'hashedPassword' is mandatory");
+			
 			return new Credentials(loginBuilder.build(), password, hashedPassword);
 		}
 
