@@ -2899,6 +2899,12 @@ public class CalendarBindingImplTest {
 		
 		CommitedOperationDao commitedOperationDao = createMock(CommitedOperationDao.class);
 		expect(commitedOperationDao.findAsEvent(accessToken, clientId)).andReturn(event).once();
+		commitedOperationDao.store(accessToken, CommitedElement.builder()
+				.entityId(event.getEntityId())
+				.clientId(clientId)
+				.kind(Kind.VEVENT)
+				.build());
+		expectLastCall().once();
 		
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler, commitedOperationDao);
 		
@@ -3586,6 +3592,61 @@ public class CalendarBindingImplTest {
 
 		mocksControl.verify();
 	}
+
+	@Test
+	public void testClientIdCreateEventDeleteItThenCreateAgain() throws Exception {
+		ObmUser user = ToolBox.getDefaultObmUser();
+		String calendar = user.getEmail();
+		boolean notify = false;
+		String clientId = "123";
+
+		Event event1 = new Event();
+		event1.setOwner(calendar);
+		event1.setInternalEvent(true);
+		event1.addAttendee(UserAttendee.builder().email(calendar).asOrganizer().build());
+		event1.setExtId(new EventExtId("ExtId"));
+		event1.setEntityId(8);
+		Event event2 = event1.clone();
+		event2.setEntityId(event1.getEntityId() +1);
+		event2.setUid(new EventObmId(6));
+		Event event3 = event1.clone();
+		event3.setEntityId(event1.getEntityId() +2);
+		event3.setUid(new EventObmId(7));
+
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).anyTimes();
+		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user).anyTimes();
+		expect(userService.getUserFromLogin(calendar, user.getDomain().getName())).andReturn(user);
+		
+		// FIRST CREATION
+		expect(calendarDao.findEventByExtId(token, user, event1.getExtId())).andReturn(null);
+		expect(calendarDao.createEvent(token, calendar, event1, true)).andReturn(event2);
+		expect(calendarDao.findEventById(token, event2.getObmId())).andReturn(event2);
+		messageQueueService.writeIcsInvitationRequest(token, event2);
+		expectLastCall();
+		mockCommitedOperationNewEvent(event2, clientId);
+		
+		// DELETION
+		expect(calendarDao.findEventById(token, event2.getObmId())).andReturn(event2);
+		expect(calendarDao.removeEventById(token, event2.getObmId(), EventType.VEVENT, 1)).andReturn(event2);
+		messageQueueService.writeIcsInvitationCancel(token, event2);
+		expectLastCall();
+
+		// SECOND CREATION
+		expect(calendarDao.findEventByExtId(token, user, event1.getExtId())).andReturn(null);
+		expect(calendarDao.createEvent(token, calendar, event1, true)).andReturn(event3);
+		expect(calendarDao.findEventById(token, event3.getObmId())).andReturn(event3);
+		messageQueueService.writeIcsInvitationRequest(token, event3);
+		expectLastCall();
+		mockCommitedOperationNewEvent(event3, clientId);
+		
+		mocksControl.replay();
+
+		binding.createEvent(token, calendar, event1, notify, clientId);
+		binding.removeEventById(token, calendar, event2.getObmId(), 0, notify);
+		binding.createEvent(token, calendar, event1, notify, clientId);
+
+		mocksControl.verify();
+	}
 	
 	@Test
 	public void testCommitOperationNullClientId() throws Exception {
@@ -3637,5 +3698,11 @@ public class CalendarBindingImplTest {
 
 	private void mockCommitedOperationExistingEvent(Event event, String clientId) throws Exception {
 		expect(commitedOperationDao.findAsEvent(token, clientId)).andReturn(event).once();
+		commitedOperationDao.store(token, CommitedElement.builder()
+				.entityId(event.getEntityId())
+				.clientId(clientId)
+				.kind(Kind.VEVENT)
+				.build());
+		expectLastCall().once();
 	}
 }

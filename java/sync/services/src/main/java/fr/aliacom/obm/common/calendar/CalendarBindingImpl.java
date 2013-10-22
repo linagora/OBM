@@ -660,17 +660,15 @@ public class CalendarBindingImpl implements ICalendar {
 			assignDelegationRightsOnAttendees(token, event);
 			
 			Event ev = commitedOperationDao.findAsEvent(token, clientId);
-			if (ev != null) {
-				return ev;
+			if (ev == null) {
+				if (event.isInternalEvent()) {
+					ev = createInternalEvent(token, calendar, event, notification);
+				} else {
+					ev = createExternalEvent(token, calendar, event, notification);
+				}
 			}
-			
-			if (event.isInternalEvent()) {
-				ev = createInternalEvent(token, calendar, event, notification);
-			} else {
-				ev = createExternalEvent(token, calendar, event, notification);
-			}
-			commitOperation(token, event, clientId);
-			
+
+			commitOperation(token, ev, clientId);
 			return ev;
 		} catch (SQLException e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
