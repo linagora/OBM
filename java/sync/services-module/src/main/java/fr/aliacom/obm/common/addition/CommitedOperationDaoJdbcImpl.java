@@ -79,19 +79,57 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 		PreparedStatement ps = null;
 		try {
 			con = obmHelper.getConnection();
-			ps = con
-			.prepareStatement("INSERT INTO CommitedOperation "
-					+ "(commitedoperation_hash_client_id, commitedoperation_entity_id, commitedoperation_kind) "
-					+ "VALUES (?, ?, ?) ");
-			int idx = 1;
-			ps.setString(idx++, commitedElement.getClientId());
-			ps.setInt(idx++, commitedElement.getEntityId().getId());
-			ps.setObject(idx++, getJdbcObject(commitedElement.getKind()));
 
+			if (operationIsAlreadyRecorded(con, commitedElement)) {
+				ps = prepareUpdateStatement(con, commitedElement);
+			} else {
+				ps = prepareInsertStatement(con, commitedElement);
+			}
 			ps.executeUpdate();
 		} finally {
 			obmHelper.cleanup(con, ps, null);
 		}
+	}
+
+	private boolean operationIsAlreadyRecorded(Connection con, CommitedElement commitedElement) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ps = con.prepareStatement(
+					"SELECT commitedoperation_hash_client_id " +
+					"FROM CommitedOperation " +
+					"WHERE commitedoperation_hash_client_id = ? ");
+
+			ps.setString(1, commitedElement.getClientId());
+			
+			rs = ps.executeQuery();
+			return rs.next();
+		} finally {
+			obmHelper.cleanup(null, ps, rs);
+		}
+	}
+
+	private PreparedStatement prepareInsertStatement(Connection con, CommitedElement commitedElement) throws SQLException {
+		PreparedStatement ps = con.prepareStatement(
+				"INSERT INTO CommitedOperation " +
+				"(commitedoperation_hash_client_id, commitedoperation_entity_id, commitedoperation_kind) " +
+				"VALUES (?, ?, ?) ");
+		int idx = 1;
+		ps.setString(idx++, commitedElement.getClientId());
+		ps.setInt(idx++, commitedElement.getEntityId().getId());
+		ps.setObject(idx++, getJdbcObject(commitedElement.getKind()));
+		return ps;
+	}
+
+	private PreparedStatement prepareUpdateStatement(Connection con, CommitedElement commitedElement) throws SQLException {
+		PreparedStatement ps = con.prepareStatement(
+				"UPDATE CommitedOperation " +
+				"SET commitedoperation_entity_id=? " +
+				"WHERE commitedoperation_hash_client_id=? ");
+		int idx = 1;
+		ps.setInt(idx++, commitedElement.getEntityId().getId());
+		ps.setString(idx++, commitedElement.getClientId());
+		return ps;
 	}
 
 	@Override

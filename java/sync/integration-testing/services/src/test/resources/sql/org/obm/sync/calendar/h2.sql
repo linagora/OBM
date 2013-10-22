@@ -7,6 +7,7 @@ CREATE DOMAIN vcomponent AS VARCHAR(32);
 CREATE DOMAIN vopacity AS VARCHAR(32);
 CREATE DOMAIN vpartstat AS VARCHAR(32);
 CREATE DOMAIN vrole AS VARCHAR(32);
+CREATE DOMAIN vkind AS VARCHAR(32);
 
 --
 -- Table userobm
@@ -556,6 +557,16 @@ CREATE TABLE calendarentity (
 );
 
 --
+-- Table commitedoperation
+--
+CREATE TABLE commitedoperation (
+    commitedoperation_hash_client_id character varying(44) NOT NULL,
+    commitedoperation_entity_id integer NOT NULL,
+    commitedoperation_kind vkind NOT NULL
+);
+ALTER TABLE commitedoperation ADD CONSTRAINT commitedoperation_pkey PRIMARY KEY (commitedoperation_hash_client_id);
+
+--
 -- Cascades
 --
 ALTER TABLE contactentity
@@ -570,6 +581,9 @@ ALTER TABLE userentity
 ALTER TABLE userentity
     ADD CONSTRAINT userentity_user_id_user_id_fkey FOREIGN KEY (userentity_user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+
+ALTER TABLE commitedoperation
+    ADD CONSTRAINT commitedoperation_entity_id_fkey FOREIGN KEY (commitedoperation_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 ALTER TABLE serviceproperty

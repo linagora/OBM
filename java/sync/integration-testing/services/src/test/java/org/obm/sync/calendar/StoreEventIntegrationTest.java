@@ -44,6 +44,7 @@ import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
+import org.obm.sync.auth.EventNotFoundException;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
@@ -94,6 +95,54 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 
 		calendarClient.createEvent(token, calendar, event, false, null);
 		calendarClient.createEvent(token, calendar, event, false, null);
+	}
+
+	@Test
+	@RunAsClient
+	public void testClientIdCreateTwiceEvent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
+		String calendar = "user1@domain.org";
+		Event event = newEvent(calendar, "user1", "firstExtIdOfCreateTwiceEvent");
+		boolean notif = false;
+		String clientId = "0123456789012345678901234567890123456789";
+
+		AccessToken token = loginClient.login(calendar, "user1");
+
+		calendarClient.createEvent(token, calendar, event, notif, clientId);
+		Event newEventCreation = event.clone();
+		newEventCreation.setExtId(new EventExtId("other ExtId"));
+		calendarClient.createEvent(token, calendar, newEventCreation, notif, clientId);
+
+		Event eventFromServer = calendarClient.getEventFromExtId(token, calendar, event.getExtId());
+		Exception getEventWithSecondExtIdException = new Exception();
+		try {
+			calendarClient.getEventFromExtId(token, calendar, newEventCreation.getExtId());
+		} catch (Exception e) {
+			getEventWithSecondExtIdException = e;
+		}
+		assertThat(eventFromServer).usingComparator(ignoreDatabaseElementsComparator()).isEqualTo(event);
+		assertThat(getEventWithSecondExtIdException).isInstanceOf(EventNotFoundException.class);
+	}
+
+	@Test
+	@RunAsClient
+	public void testClientIdCreateEventDeleteItThenCreateAgain(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		configureTest(baseUrl);
+		String calendar = "user1@domain.org";
+		Event event = newEvent(calendar, "user1", "extIdOfCreateEventDeleteItThenCreateAgain");
+		boolean notif = false;
+		String clientId = "0123456789012345678901234567890123456788";
+
+		AccessToken token = loginClient.login(calendar, "user1");
+
+		EventObmId firstId = calendarClient.createEvent(token, calendar, event, notif, clientId);
+		Event firstEvent = calendarClient.getEventFromId(token, calendar, firstId);
+		calendarClient.removeEventById(token, calendar, firstId, 0, notif);
+		EventObmId secondId = calendarClient.createEvent(token, calendar, event, notif, clientId);
+		Event secondEvent = calendarClient.getEventFromId(token, calendar, secondId);
+
+		assertThat(firstEvent.getObmId()).isNotNull();
+		assertThat(secondEvent.getObmId()).isNotNull().isNotEqualTo(firstEvent.getObmId());
 	}
 
 	private Event newEvent(String calendar, String owner, String extId) {
