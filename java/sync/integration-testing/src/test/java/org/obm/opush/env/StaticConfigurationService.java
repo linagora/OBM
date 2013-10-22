@@ -70,6 +70,11 @@ public class StaticConfigurationService implements ConfigurationService {
 			return configuration.port;
 		}
 
+		@Override
+		public String authoritativeDomain() {
+			return DEFAULT_AUTHORITATIVE_DOMAIN;
+		}
+
 	}
 
 	public static class SyncPerms implements SyncPermsConfigurationService {
