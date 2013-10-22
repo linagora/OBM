@@ -34,6 +34,7 @@ package org.obm.auth.crsh;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.crsh.auth.AuthenticationPlugin;
 import org.crsh.plugin.CRaSHPlugin;
+import org.obm.push.configuration.RemoteConsoleConfiguration;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginClient;
 
@@ -44,17 +45,19 @@ public class ObmSyncAuthenticationPlugin extends CRaSHPlugin<AuthenticationPlugi
 	implements AuthenticationPlugin<String> {
 
 	private final LoginClient.Factory loginClientFactory;
+	private final RemoteConsoleConfiguration consoleConfiguration;
 
 	@Inject
-	private ObmSyncAuthenticationPlugin(LoginClient.Factory loginClientFactory) {
+	private ObmSyncAuthenticationPlugin(LoginClient.Factory loginClientFactory, RemoteConsoleConfiguration consoleConfiguration) {
 		this.loginClientFactory = loginClientFactory;
+		this.consoleConfiguration = consoleConfiguration;
 	}
 	
 	@Override
 	public boolean authenticate(String username, String password) throws Exception {
 		try {
 			return loginClientFactory.create(new DefaultHttpClient())
-					.authenticateGlobalAdmin(username, password);
+					.authenticateAdmin(username, password, consoleConfiguration.authoritativeDomain());
 		} catch (AuthFault e) {
 			return false;
 		}
