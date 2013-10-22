@@ -31,16 +31,53 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.configuration;
 
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-public interface RemoteConsoleConfiguration {
+import org.easymock.IMocksControl;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.configuration.utils.IniFile;
+import org.obm.filter.SlowFilterRunner;
 
-	public static final boolean DEFAULT_ENABLE = true;
-	public static final int DEFAULT_PORT = 5665; 
-	public static final String DEFAULT_AUTHORITATIVE_DOMAIN = "global.virt";
+@RunWith(SlowFilterRunner.class)
+public class RemoteConsoleConfigurationFileImplTest {
+
+	private IMocksControl control;
+	private IniFile iniFile;
+	private IniFile.Factory fileFactory;
+
+	@Before
+	public void setup() {
+		control = createControl();
+		iniFile = control.createMock(IniFile.class);
+		fileFactory = control.createMock(IniFile.Factory.class);
+		expect(fileFactory.build(RemoteConsoleConfigurationFileImpl.CONFIG_FILE_PATH))
+			.andReturn(iniFile);
+	}
 	
-	boolean enable();
+	@Test
+	public void testAuthoritativeDomainDefaultValue() {
+		expect(iniFile.getStringValue("console.authentication.domain", RemoteConsoleConfiguration.DEFAULT_AUTHORITATIVE_DOMAIN))
+			.andReturn(RemoteConsoleConfiguration.DEFAULT_AUTHORITATIVE_DOMAIN);
+		
+		control.replay();
+		RemoteConsoleConfigurationFileImpl testee = new RemoteConsoleConfigurationFileImpl(fileFactory);
+		assertThat(testee.authoritativeDomain()).isEqualTo(RemoteConsoleConfiguration.DEFAULT_AUTHORITATIVE_DOMAIN);
+		control.verify();
+	}
 	
-	int port();
+	@Test
+	public void testAuthoritativeDomain() {
+		String myDomain = "myDomain";
+		expect(iniFile.getStringValue("console.authentication.domain", RemoteConsoleConfiguration.DEFAULT_AUTHORITATIVE_DOMAIN))
+			.andReturn(myDomain);
 	
-	String authoritativeDomain();
+		control.replay();
+		RemoteConsoleConfigurationFileImpl testee = new RemoteConsoleConfigurationFileImpl(fileFactory);
+		assertThat(testee.authoritativeDomain()).isEqualTo(myDomain);
+		control.verify();
+	}
 }
