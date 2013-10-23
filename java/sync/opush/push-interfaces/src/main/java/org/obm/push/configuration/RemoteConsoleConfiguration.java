@@ -36,11 +36,9 @@ public interface RemoteConsoleConfiguration {
 
 	public static final boolean DEFAULT_ENABLE = true;
 	public static final int DEFAULT_PORT = 5665; 
-	public static final String DEFAULT_AUTHORITATIVE_DOMAIN = "global.virt";
 	
 	boolean enable();
 	
 	int port();
 	
-	String authoritativeDomain();
 }
