@@ -33,20 +33,19 @@ package org.obm.push.configuration;
 
 import org.obm.configuration.utils.IniFile;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class RemoteConsoleConfigurationFileImpl implements RemoteConsoleConfiguration {
 
-	@VisibleForTesting static final String CONFIG_FILE_PATH = "/etc/opush/remote_console.ini";
+	private static final String configFilePath = "/etc/opush/remote_console.ini";
 	private final IniFile iniFile;
 	
 	
 	@Inject
-	@VisibleForTesting RemoteConsoleConfigurationFileImpl(IniFile.Factory factory) {
-		iniFile = factory.build(CONFIG_FILE_PATH);
+	private RemoteConsoleConfigurationFileImpl(IniFile.Factory factory) {
+		iniFile = factory.build(configFilePath);
 	}
 	
 	@Override
@@ -57,11 +56,6 @@ public class RemoteConsoleConfigurationFileImpl implements RemoteConsoleConfigur
 	@Override
 	public int port() {
 		return iniFile.getIntValue("console.ssh.port", DEFAULT_PORT);
-	}
-
-	@Override
-	public String authoritativeDomain() {
-		return iniFile.getStringValue("console.authentication.domain", DEFAULT_AUTHORITATIVE_DOMAIN);
 	}
 
 }
