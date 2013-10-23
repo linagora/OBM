@@ -37,7 +37,6 @@ import static org.easymock.EasyMock.isA;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -277,32 +276,9 @@ public class UserDaoTest {
 	
 	@Test
 	public void testObmUserFromResultSet() throws Exception {
-		Connection con = mocksControl.createMock(Connection.class);
-		
-		PreparedStatement preparedStatement = mocksControl.createMock(PreparedStatement.class);
-		expect(con.prepareStatement(isA(String.class)))
-			.andReturn(preparedStatement);
-		preparedStatement.setString(1, UserDao.DOMAIN_MODULE_NAME);
-		expectLastCall();
-		preparedStatement.setString(2, "admin");
-		expectLastCall();
-		
-		ResultSet profileRS = mocksControl.createMock(ResultSet.class);
-		expect(profileRS.next())
-			.andReturn(true);
-		expect(profileRS.getInt("profilemodule_right"))
-			.andReturn(UserDao.ADMIN_RIGHTS);
-		expect(preparedStatement.executeQuery())
-			.andReturn(profileRS );
-		profileRS.close();
-		expectLastCall();
-		preparedStatement.close();
-		expectLastCall();
-		
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(5);
 		expect(rs.getString("userobm_login")).andReturn("login");
-		expect(rs.getString("userobm_perms")).andReturn("admin");
 		expect(rs.getString(2)).andReturn("useremail" + UserDao.DB_INNER_FIELD_SEPARATOR + "useremail2");
 		expect(rs.getString(5)).andReturn("yes");
 		expect(rs.getString(6)).andReturn(null);
@@ -315,14 +291,13 @@ public class UserDaoTest {
 		ObmDomain domain = ObmDomain.builder().id(1).name("obm.org").build();
 
 		mocksControl.replay();
-		ObmUser obmUser = userDao.createUserFromResultSet(domain, rs, con);
+		ObmUser obmUser = userDao.createUserFromResultSet(domain, rs);
 		mocksControl.verify();
 
 		ObmUser expectedObmUser = ObmUser.builder()
 			.uid(5)
 			.entityId(6)
 			.login("login")
-			.admin(true)
 			.domain(domain)
 			.emailAndAliases(Joiner.on(ObmUser.EMAIL_FIELD_SEPARATOR).join("useremail", "useremail2"))
 			.firstName("firstname2")
