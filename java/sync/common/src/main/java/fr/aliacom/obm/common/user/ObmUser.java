@@ -60,7 +60,6 @@ public class ObmUser {
 		private int uid;
 		private int entityId;
 		private String login;
-		private Boolean admin;
 		private String commonName;
 		private String lastName;
 		private String firstName;
@@ -104,10 +103,6 @@ public class ObmUser {
 		}
 		public Builder login(String login) {
 			this.login = login;
-			return this;
-		}
-		public Builder admin(boolean admin) {
-			this.admin = admin;
 			return this;
 		}
 		public Builder commonName(String commonName) {
@@ -217,9 +212,8 @@ public class ObmUser {
 			Preconditions.checkNotNull(uid);
 			Preconditions.checkNotNull(login);
 			Preconditions.checkNotNull(domain);
-			admin = Objects.firstNonNull(admin, false);
 			
-			return new ObmUser(uid, entityId, login, admin, commonName, lastName, firstName, email, emailAlias,
+			return new ObmUser(uid, entityId, login, commonName, lastName, firstName, email, emailAlias,
 					address1, address2, address3, expresspostal, homePhone, mobile, service, title, town,
 					workFax, workPhone, zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy);
@@ -230,7 +224,6 @@ public class ObmUser {
 	private final int uid;
 	private final int entityId;
 	private final String login;
-	private final boolean admin;
 	private final String commonName;
 	private final String lastName;
 	private final String firstName;
@@ -260,7 +253,7 @@ public class ObmUser {
 	private final ObmDomain domain;
 	private final boolean publicFreeBusy;
 
-	private ObmUser(int uid, int entityId, String login, boolean admin, String commonName,
+	private ObmUser(int uid, int entityId, String login, String commonName,
 			String lastName, String firstName, String email,
 			Set<String> emailAlias, String address1, String address2,
 			String address3, String expresspostal, String homePhone,
@@ -272,7 +265,6 @@ public class ObmUser {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
-		this.admin = admin;
 		this.commonName = commonName;
 		this.lastName = lastName;
 		this.firstName = firstName;
@@ -311,10 +303,6 @@ public class ObmUser {
 		return login;
 	}
 
-	public boolean isAdmin() {
-		return admin;
-	}
-	
 	public String getCommonName() {
 		return commonName;
 	}
@@ -448,7 +436,7 @@ public class ObmUser {
 	
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(uid, entityId, login, admin, commonName, lastName, firstName, email,
+		return Objects.hashCode(uid, entityId, login, commonName, lastName, firstName, email,
 				emailAlias, address1, address2, address3, expresspostal, homePhone, mobile,
 				service, title, town, workFax, workPhone, zipCode,	description, timeCreate,
 				timeUpdate, createdBy, updatedBy, domain, publicFreeBusy);
@@ -461,7 +449,6 @@ public class ObmUser {
 			return Objects.equal(this.uid, that.uid)
 				&& Objects.equal(this.entityId, that.entityId)
 				&& Objects.equal(this.login, that.login)
-				&& Objects.equal(this.admin, that.admin)
 				&& Objects.equal(this.commonName, that.commonName)
 				&& Objects.equal(this.lastName, that.lastName)
 				&& Objects.equal(this.firstName, that.firstName)
@@ -496,7 +483,6 @@ public class ObmUser {
 			.add("uid", uid)
 			.add("entityId", entityId)
 			.add("login", login)
-			.add("admin", admin)
 			.add("commonName", commonName)
 			.add("lastName", lastName)
 			.add("firstName", firstName)
