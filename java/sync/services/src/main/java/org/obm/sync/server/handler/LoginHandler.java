@@ -90,8 +90,6 @@ public class LoginHandler implements ISyncHandler {
 			login(request, responder);
 		} else if ("authenticateGlobalAdmin".equals(method)) {
 			authenticateGlobalAdmin(request, responder);
-		} else if ("authenticateAdmin".equals(method)) {
-			authenticateAdmin(request, responder);
 		} else if ("trustedLogin".equals(method)) {
 			trustedLogin(request, responder);
 		} else if ("doLogout".equals(method)) {
@@ -117,18 +115,7 @@ public class LoginHandler implements ISyncHandler {
 			responder.sendError("Authentication refused : " + e.getMessage());
 		}
 	}
-
-	private void authenticateAdmin(Request request, XmlResponder responder) {
-		try {
-			responder.sendBoolean(binding.authenticateAdmin(
-					getLogin(request), getPassword(request), getOrigin(request), getDomainName(request), isPasswordHashed(request)));
-		} catch (IllegalArgumentException e) {
-			responder.sendError("Authentication refused : " + e.getMessage());
-		} catch (IllegalStateException e) {
-			responder.sendError("Authentication refused : " + e.getMessage());
-		}
-	}
-
+	
 	private void doLogout(Request request) {
 		request.destroySession();
 		binding.logout(request.getParameter("sid"));
@@ -189,10 +176,6 @@ public class LoginHandler implements ISyncHandler {
 	
 	private String getPassword(Request request) {
 		return request.getParameter("password");
-	}
-	
-	private String getDomainName(Request request) {
-		return request.getParameter("domainName");
 	}
 
 	private Boolean isPasswordHashed(Request request) {
