@@ -41,41 +41,24 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.auth.Credentials;
-import org.obm.sync.server.auth.AuthentificationServiceFactory;
-import org.obm.sync.server.auth.IAuthentificationService;
 import org.obm.sync.server.auth.impl.DatabaseAuthentificationService;
 
-import fr.aliacom.obm.common.domain.DomainDao;
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 @RunWith(SlowFilterRunner.class)
 public class LoginBindingImplTest {
 
 	private IMocksControl control;
-	private IAuthentificationService authentificationService;
-	private AuthentificationServiceFactory authentificationServiceFactory;
+	private LoginBindingImpl loginBindingImpl;
 	private DatabaseAuthentificationService databaseAuthentificationService;
 	private ObmSyncConfigurationService configurationService;
-	private DomainDao domainDao;
-	private UserDao userDao;
-	private LoginBindingImpl loginBindingImpl;
 
 	@Before
 	public void setup() {
 		control = createControl();
-		authentificationService = control.createMock(IAuthentificationService.class);
-		authentificationServiceFactory = control.createMock(AuthentificationServiceFactory.class);
-		expect(authentificationServiceFactory.get()).andReturn(authentificationService).anyTimes();
-		
-		configurationService = control.createMock(ObmSyncConfigurationService.class);
 		databaseAuthentificationService = control.createMock(DatabaseAuthentificationService.class);
-		domainDao = control.createMock(DomainDao.class);
-		userDao = control.createMock(UserDao.class);
-		
-		loginBindingImpl = new LoginBindingImpl(null, authentificationServiceFactory, databaseAuthentificationService, configurationService, domainDao, userDao);
+		configurationService = control.createMock(ObmSyncConfigurationService.class);
+		loginBindingImpl = new LoginBindingImpl(null, databaseAuthentificationService, configurationService);
 	}
 	
 	@Test
@@ -90,7 +73,6 @@ public class LoginBindingImplTest {
 			Credentials.builder()
 				.login(login)
 				.domain(domain)
-				.hashedPassword(false)
 				.password(password)
 				.build()))
 			.andReturn(true);
@@ -98,141 +80,7 @@ public class LoginBindingImplTest {
 		control.replay();
 		boolean authenticated = loginBindingImpl.authenticateGlobalAdmin(login, password, "origin", false);
 		control.verify();
-		               
-		assertThat(authenticated).isTrue();
-	}
-
-	@Test
-	public void testAuthenticateAdminOnGlobalDomain() {
-		String domainName = "global.virt";
-		ObmDomain obmDomain = ObmDomain.builder()
-				.name(domainName)
-				.id(1)
-				.alias(domainName)
-				.uuid("1")
-				.global(true)
-				.build();
-		expect(domainDao.findDomainByName(domainName))
-			.andReturn(obmDomain);
-		
-		String login = "admin0";
-		expect(userDao.findUserByLogin(login, obmDomain))
-			.andReturn(ObmUser.builder()
-				.uid(1)
-				.login(domainName)
-				.domain(obmDomain)
-				.admin(true)
-				.build());
-		
-		String password = "admin";
-		expect(databaseAuthentificationService.doAuth(
-			Credentials.builder()
-				.login(login)
-				.domain(domainName)
-				.hashedPassword(false)
-				.password(password)
-				.build()))
-			.andReturn(true);
-		
-		control.replay();
-		boolean authenticated = loginBindingImpl.authenticateAdmin(login, "admin", "origin", domainName, false);
-		control.verify();
 		
 		assertThat(authenticated).isTrue();
-	}
-	
-	@Test
-	public void testAuthenticateAdminOnGlobalDomainNoAdminRights() {
-		String domainName = "global.virt";
-		ObmDomain obmDomain = ObmDomain.builder()
-				.name(domainName)
-				.id(1)
-				.alias(domainName)
-				.uuid("1")
-				.global(true)
-				.build();
-		expect(domainDao.findDomainByName(domainName))
-			.andReturn(obmDomain);
-		
-		String login = "admin0";
-		expect(userDao.findUserByLogin(login, obmDomain))
-			.andReturn(ObmUser.builder()
-				.uid(1)
-				.login(domainName)
-				.domain(obmDomain)
-				.admin(false)
-				.build());
-		
-		control.replay();
-		boolean authenticated = loginBindingImpl.authenticateAdmin(login, "admin", "origin", domainName, false);
-		control.verify();
-		
-		assertThat(authenticated).isFalse();
-	}
-	
-	@Test
-	public void testAuthenticateAdminOnOtherDomain() {
-		String domainName = "domain";
-		ObmDomain obmDomain = ObmDomain.builder()
-				.name(domainName)
-				.id(1)
-				.alias(domainName)
-				.uuid("1")
-				.build();
-		expect(domainDao.findDomainByName(domainName))
-			.andReturn(obmDomain);
-		
-		String login = "admin0";
-		expect(userDao.findUserByLogin(login, obmDomain))
-			.andReturn(ObmUser.builder()
-				.uid(1)
-				.login(domainName)
-				.domain(obmDomain)
-				.admin(true)
-				.build());
-		
-		String password = "admin";
-		expect(authentificationService.doAuth(
-			Credentials.builder()
-				.login(login)
-				.domain(domainName)
-				.hashedPassword(false)
-				.password(password)
-				.build()))
-			.andReturn(true);
-		
-		control.replay();
-		boolean authenticated = loginBindingImpl.authenticateAdmin(login, password, "origin", domainName, false);
-		control.verify();
-		
-		assertThat(authenticated).isTrue();
-	}
-	
-	@Test
-	public void testAuthenticateAdminOnOtherDomainNoAdminRights() {
-		String domainName = "domain";
-		ObmDomain obmDomain = ObmDomain.builder()
-				.name(domainName)
-				.id(1)
-				.alias(domainName)
-				.uuid("1")
-				.build();
-		expect(domainDao.findDomainByName(domainName))
-			.andReturn(obmDomain);
-		
-		String login = "admin0";
-		expect(userDao.findUserByLogin(login, obmDomain))
-			.andReturn(ObmUser.builder()
-				.uid(1)
-				.login(domainName)
-				.domain(obmDomain)
-				.admin(false)
-				.build());
-		
-		control.replay();
-		boolean authenticated = loginBindingImpl.authenticateAdmin(login, "admin", "origin", domainName, false);
-		control.verify();
-		
-		assertThat(authenticated).isFalse();
 	}
 }
