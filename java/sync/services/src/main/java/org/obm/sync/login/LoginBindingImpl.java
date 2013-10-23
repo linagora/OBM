@@ -34,7 +34,7 @@ package org.obm.sync.login;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.Credentials;
-import org.obm.sync.server.auth.AuthentificationServiceFactory;
+import org.obm.sync.auth.Credentials.Builder;
 import org.obm.sync.server.auth.impl.DatabaseAuthentificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,37 +43,22 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
-import fr.aliacom.obm.common.domain.DomainDao;
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.session.SessionManagement;
-import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 @Singleton
 public class LoginBindingImpl extends AbstractLoginBackend implements LoginBackend {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	private final AuthentificationServiceFactory authentificationServiceFactory;
 	private final DatabaseAuthentificationService databaseAuthentificationService;
 	private final ObmSyncConfigurationService configurationService;
-	private final DomainDao domainDao;
-	private final UserDao userDao;
 
 	@Inject
-	protected LoginBindingImpl(SessionManagement sessionManagement,
-			AuthentificationServiceFactory authentificationServiceFactory,
-			DatabaseAuthentificationService databaseAuthentificationService,
-			ObmSyncConfigurationService configurationService,
-			DomainDao domainDao,
-			UserDao userDao) {
-		
+	protected LoginBindingImpl(SessionManagement sessionManagement, DatabaseAuthentificationService databaseAuthentificationService,
+			ObmSyncConfigurationService configurationService) {
 		super(sessionManagement);
-		this.authentificationServiceFactory = authentificationServiceFactory;
 		this.databaseAuthentificationService = databaseAuthentificationService;
 		this.configurationService = configurationService;
-		this.domainDao = domainDao;
-		this.userDao = userDao;
 	}
 
 	@Override
@@ -88,39 +73,13 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 	@Transactional(readOnly=true)
 	public boolean authenticateGlobalAdmin(String user, String password, String origin, boolean isPasswordHashed) {
 		logger.info("trying global admin authentication with login '{}' from '{}'", user, origin);
-		Credentials credentials = Credentials.builder()
-			.login(user)
-			.domain(configurationService.getGlobalDomain())
-			.hashedPassword(isPasswordHashed)
-			.password(password)
-			.build();
-		
-		return databaseAuthentificationService.doAuth(credentials);
-	}
-
-	@Transactional(readOnly=true)
-	public boolean authenticateAdmin(String user, String password, String origin, String domainName, boolean isPasswordHashed) {
-		logger.info("trying {} admin authentication with login '{}' from '{}'", new String[] { domainName, user, origin });
-		ObmDomain domain = domainDao.findDomainByName(domainName);
-		Credentials credentials = Credentials.builder()
-			.login(user)
-			.domain(domain.getName())
-			.hashedPassword(isPasswordHashed)
-			.password(password)
-			.build();
-		
-		return authenticateAdmin(domain, credentials);
-	}
-
-	private boolean authenticateAdmin(ObmDomain domain, Credentials credentials) {
-		ObmUser user = userDao.findUserByLogin(credentials.getLogin().getLogin(), domain);
-		if (user == null || !user.isAdmin()) {
-			return false;
+		Builder builder = Credentials.builder().login(user).domain(configurationService.getGlobalDomain());
+		if (isPasswordHashed) {
+			builder.hashedPassword(password);
+		} else {
+			builder.password(password);
 		}
-		
-		if (!domain.isGlobal()) {
-			return authentificationServiceFactory.get().doAuth(credentials);
-		}
-		return databaseAuthentificationService.doAuth(credentials);
+		return databaseAuthentificationService.doAuth(builder.build());
 	}
+	
 }
