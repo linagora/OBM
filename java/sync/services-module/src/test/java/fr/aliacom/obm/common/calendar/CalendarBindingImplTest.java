@@ -186,6 +186,8 @@ public class CalendarBindingImplTest {
 	private ICalendarFactory calendarFactory;
 	@Inject
 	private EventExtId.Factory eventExtIdFactory;
+	@Inject
+	private EventNotificationService eventNotifier;
 	
 	private AccessToken token;
 	
@@ -1758,42 +1760,28 @@ public class CalendarBindingImplTest {
 	public void testRemoveEventByExtIdIsDeclined() throws Exception {
 		String calendar = "user@test";
 		ObmUser user = ToolBox.getDefaultObmUser();
-		AccessToken token = ToolBox.mockAccessToken();
+		Attendee attendee = UserAttendee.builder().participation(Participation.accepted()).email(user.getEmailAtDomain()).build();
 
 		Event daoEvent = new Event();
 		daoEvent.setInternalEvent(false);
-
-		Attendee attendee = UserAttendee.builder().participation(Participation.accepted()).email(user.getEmailAtDomain()).build();
-		
 		daoEvent.addAttendee(attendee);
 		daoEvent.setOwner(calendar);
 
-		UserService userService = createMock(UserService.class);
-		expect(userService.getUserFromCalendar(user.getEmailAtDomain(), "test.tlse.lng"))
-				.andReturn(user).atLeastOnce();
+		expect(helperService.canWriteOnCalendar(token, user.getEmailAtDomain())).andReturn(true);
+		expect(userService.getUserFromCalendar(user.getEmailAtDomain(), "test.tlse.lng")).andReturn(user).atLeastOnce();
+		expect(userService.getUserFromLogin(daoEvent.getOwner(), "test.tlse.lng")).andReturn(user);
 
-		CalendarDao calendarDao = createMock(CalendarDao.class);
-		expect(calendarDao.findEventByExtId(token, user, daoEvent.getExtId())).andReturn(
-				daoEvent).once();
+		expect(calendarDao.findEventByExtId(token, user, daoEvent.getExtId())).andReturn(daoEvent);
+		expect(calendarDao.removeEventByExtId(token, user, daoEvent.getExtId(), 1)).andReturn(daoEvent);
 
-		HelperService rightsHelper = createMock(HelperService.class);
-		expect(rightsHelper.canWriteOnCalendar(token, user.getEmailAtDomain())).andReturn(true)
-				.once();
+		messageQueueService.writeIcsInvitationReply(token, daoEvent, user);
+		expectLastCall();
+		eventNotifier.notifyUpdatedParticipationAttendees(daoEvent, user, Participation.declined(), token);
+		expectLastCall();
 
-		expect(userService.getUserFromLogin(daoEvent.getOwner(), "test.tlse.lng"))
-		.andReturn(user).once();
-
-		expect(calendarDao.removeEventByExtId(token, user, daoEvent.getExtId(), 1)).andReturn(
-				daoEvent).once();
-
-		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
-		eventChangeHandler.updateParticipation(daoEvent, user, Participation.declined(), true, token);
-
-		replay(token, userService, rightsHelper, calendarDao,eventChangeHandler);
-
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
-				userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
-		Event removedEvent = calendarService.removeEventByExtId(token, calendar, daoEvent.getExtId(), 0, true);
+		mocksControl.replay();
+		Event removedEvent = binding.removeEventByExtId(token, calendar, daoEvent.getExtId(), 0, true);
+		mocksControl.verify();
 
 		Attendee calendarOwnerAsAttendee = removedEvent.findAttendeeFromEmail(attendee.getEmail());
 		assertThat(calendarOwnerAsAttendee.getParticipation()).isEqualTo(Participation.declined());
