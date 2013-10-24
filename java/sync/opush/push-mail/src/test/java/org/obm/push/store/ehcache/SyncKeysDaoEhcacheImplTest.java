@@ -54,25 +54,24 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncKeysKey;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncKeysDaoEhcacheImplTest {
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+	@Rule
+	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
 	
 	private ObjectStoreManager objectStoreManager;
 	private SyncKeysDaoEhcacheImpl syncKeysDaoEhcacheImpl;
-	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
-		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+		transactionManagerRule.getTransactionManager().begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		EhCacheConfiguration config = new MailEhCacheConfiguration();
 		this.objectStoreManager = new ObjectStoreManager(initConfigurationServiceMock(), config, logger);
@@ -92,9 +91,8 @@ public class SyncKeysDaoEhcacheImplTest {
 	
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		transactionManager.rollback();
+		transactionManagerRule.getTransactionManager().rollback();
 		objectStoreManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

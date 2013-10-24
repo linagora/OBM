@@ -38,7 +38,6 @@ import java.util.List;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import net.sf.ehcache.migrating.Element;
 
@@ -57,21 +56,17 @@ import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl.WindowingIndex;
 import org.slf4j.Logger;
 
-import bitronix.tm.TransactionManagerServices;
-
 @RunWith(SlowFilterRunner.class) @Slow
 public class WindowingDaoIndexEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
 	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private WindowingDaoChunkEhcacheMigrationImpl windowingDaoChunkEhcacheMigrationImpl;
-	private TransactionManager transactionManager;
 	private User user;
 	private DeviceId deviceId;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
-		this.transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+		transactionManagerRule.getTransactionManager().begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
 		this.windowingDaoChunkEhcacheMigrationImpl = new WindowingDaoChunkEhcacheMigrationImpl(objectStoreManagerMigration);
@@ -81,9 +76,8 @@ public class WindowingDaoIndexEhcacheMigrationImplTest extends StoreManagerConfi
 	
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		transactionManager.rollback();
+		transactionManagerRule.getTransactionManager().rollback();
 		objectStoreManagerMigration.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

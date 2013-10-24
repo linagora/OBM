@@ -39,21 +39,24 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.base.Stopwatch;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 
+	@Rule 
+	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	private static final String STATS_ENABLED_CACHE = ObjectStoreManager.MAIL_SNAPSHOT_STORE;
 	
 	private Logger logger;
@@ -67,8 +70,7 @@ public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 	}
 
 	public void commitThenCloseTransaction() throws Exception {
-		TransactionManagerServices.getTransactionManager().commit();
-		TransactionManagerServices.getTransactionManager().shutdown();
+		transactionManagerRule.getTransactionManager().commit();
 	}
 	
 	@Test(expected=StatisticsNotAvailableException.class)
@@ -233,7 +235,7 @@ public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 			removeAllElementsInCache(restartedTestee);
 			commitThenCloseTransaction();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			TransactionManagerServices.getTransactionManager().begin();
+			transactionManagerRule.getTransactionManager().begin();
 			readAllElementsInCache(restartedTestee);
 			commitThenCloseTransaction();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
@@ -256,7 +258,7 @@ public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 			readAllElementsInCache(restartedTestee);
 			commitThenCloseTransaction();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			TransactionManagerServices.getTransactionManager().begin();
+			transactionManagerRule.getTransactionManager().begin();
 			removeAllElementsInCache(restartedTestee);
 			commitThenCloseTransaction();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
@@ -301,7 +303,7 @@ public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 			commitThenCloseTransaction();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			
-			TransactionManagerServices.getTransactionManager().begin();
+			transactionManagerRule.getTransactionManager().begin();
 			putXElements(2, restartedTestee);
 			readAllElementsInCache(restartedTestee);
 			commitThenCloseTransaction();
@@ -583,7 +585,7 @@ public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 	}
 
 	private EhCacheStatisticsImpl testeeWithConfig(EhCacheConfiguration config) throws Exception {
-		TransactionManagerServices.getTransactionManager().begin();
+		transactionManagerRule.getTransactionManager().begin();
 		cacheManager = new ObjectStoreManager(configurationService, config, logger);
 		return new EhCacheStatisticsImpl(config, cacheManager);
 	}

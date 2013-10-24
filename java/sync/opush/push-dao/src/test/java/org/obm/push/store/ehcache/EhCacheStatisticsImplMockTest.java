@@ -35,15 +35,21 @@ import static org.easymock.EasyMock.createMock;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheStatisticsImpl.History;
+import org.obm.transaction.TransactionManagerRule;
 import org.terracotta.statistics.archive.Timestamped;
 
 @RunWith(SlowFilterRunner.class)
 public class EhCacheStatisticsImplMockTest extends StoreManagerConfigurationTest {
 
+
+	@Rule 
+	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	private ObjectStoreManager cacheManager;
 	private TestingEhCacheConfiguration config;
 	private EhCacheStatisticsImpl testee;

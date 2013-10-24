@@ -101,6 +101,7 @@
     		<module>qos-filter</module>
     		<module>ui-testing</module>
 	        <module>healthcheck-api</module>
+		<module>transaction-test</module>
   </modules>
 
 	<build>
@@ -674,6 +675,12 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
 				<version>1.3.172</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>transaction-test</artifactId>
+				<version>${obm.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>

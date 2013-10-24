@@ -38,11 +38,11 @@ import java.io.IOException;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -50,18 +50,19 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.ImmutableList;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurationTest  {
 
+	@Rule 
+	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	private ObjectStoreManager objectStoreManager;
 	private UnsynchronizedItemDaoEhcacheImpl unSynchronizedItemImpl;
-	private TransactionManager transactionManager;
 	
 	public UnsynchronizedItemDaoEhcacheImplTest() {
 		super();
@@ -69,8 +70,7 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
-		this.transactionManager = TransactionManagerServices.getTransactionManager();
-		this.transactionManager.begin();
+		this.transactionManagerRule.getTransactionManager().begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		EhCacheConfiguration config = new TestingEhCacheConfiguration();
 		this.objectStoreManager = new ObjectStoreManager(super.mockConfigurationService(), config, logger);
@@ -80,9 +80,8 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends StoreManagerConfigurat
 	
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		this.transactionManager.rollback();
+		this.transactionManagerRule.getTransactionManager().rollback();
 		this.objectStoreManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

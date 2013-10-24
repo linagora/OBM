@@ -41,7 +41,7 @@ import org.obm.configuration.ConfigurationService;
 
 public class StoreManagerConfigurationTest {
 
-	@Rule 
+	@Rule
 	public TemporaryFolder temporaryFolder =  new TemporaryFolder();
 	
 	protected ConfigurationService mockConfigurationService() throws IOException {

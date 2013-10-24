@@ -40,20 +40,23 @@ import java.util.Map.Entry;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.TransactionManagerServices;
 
 @Slow
 @RunWith(SlowFilterRunner.class)
 public class ObjectStoreConfigReaderTest extends StoreManagerConfigurationTest {
 
+	@Rule 
+	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	private static final int MAX_MEMORY_IN_MB = 64;
 	
 	private ConfigurationService configurationService;
@@ -73,7 +76,6 @@ public class ObjectStoreConfigReaderTest extends StoreManagerConfigurationTest {
 	@After
 	public void tearDown() {
 		opushCacheManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

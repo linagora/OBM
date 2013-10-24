@@ -38,7 +38,6 @@ import java.util.List;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import net.sf.ehcache.migrating.Element;
 
@@ -60,20 +59,16 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl.Key;
 import org.slf4j.Logger;
 
-import bitronix.tm.TransactionManagerServices;
-
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncedCollectionDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
 	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private SyncedCollectionDaoEhcacheMigrationImpl syncedCollectionDaoEhcacheMigrationImpl;
 	private Credentials credentials;
-	private TransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
-		this.transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+		transactionManagerRule.getTransactionManager().begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
 		this.syncedCollectionDaoEhcacheMigrationImpl = new SyncedCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
@@ -83,9 +78,8 @@ public class SyncedCollectionDaoEhcacheMigrationImplTest extends StoreManagerCon
 	
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		transactionManager.rollback();
+		transactionManagerRule.getTransactionManager().rollback();
 		objectStoreManagerMigration.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 //	Credentials credentials, Device device, AnalysedSyncCollection collection

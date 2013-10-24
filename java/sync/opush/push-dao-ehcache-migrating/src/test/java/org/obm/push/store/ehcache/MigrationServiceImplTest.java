@@ -52,9 +52,6 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
 
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -65,7 +62,6 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	private Logger logger;
 	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private ObjectStoreManager objectStoreManager;
-	private BitronixTransactionManager transactionManager;
 	private MigrationServiceImpl migrationServiceImpl;
 	private MonitoredCollectionDaoEhcacheMigrationImpl monitoredCollectionDaoEhcacheMigrationImpl;
 	private MonitoredCollectionDaoEhcacheImpl monitoredCollectionDaoEhcacheImpl;
@@ -95,8 +91,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		objectStoreManager = new ObjectStoreManager(configurationService, new TestingEhCacheConfiguration(), logger);
 		CacheEvictionListener cacheEvictionListener = createMock(CacheEvictionListener.class);
 		
-		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+		transactionManagerRule.getTransactionManager().begin();
 		
 		monitoredCollectionDaoEhcacheMigrationImpl = new MonitoredCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 		monitoredCollectionDaoEhcacheImpl = new MonitoredCollectionDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
@@ -145,8 +140,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 
 	@After
 	public void shutdown() throws Exception {
-		transactionManager.rollback();
-		transactionManager.shutdown();
+		transactionManagerRule.getTransactionManager().rollback();
 		objectStoreManagerMigration.shutdown();
 		objectStoreManager.shutdown();
 	}

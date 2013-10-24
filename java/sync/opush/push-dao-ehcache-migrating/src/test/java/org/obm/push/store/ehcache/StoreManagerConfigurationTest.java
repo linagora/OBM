@@ -38,9 +38,13 @@ import org.easymock.EasyMock;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.obm.configuration.ConfigurationService;
+import org.obm.transaction.TransactionManagerRule;
 
 public class StoreManagerConfigurationTest {
 
+	@Rule
+	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	@Rule 
 	public TemporaryFolder temporaryFolder =  new TemporaryFolder();
 	protected File dataDir;

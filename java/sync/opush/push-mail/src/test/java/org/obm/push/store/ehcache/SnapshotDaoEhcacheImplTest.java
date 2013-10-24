@@ -58,10 +58,8 @@ import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.bean.SnapshotKey;
 import org.obm.push.utils.DateUtils;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class SnapshotDaoEhcacheImplTest {
@@ -69,14 +67,15 @@ public class SnapshotDaoEhcacheImplTest {
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 	
+	@Rule
+	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	private ObjectStoreManager objectStoreManager;
 	private SnapshotDaoEhcacheImpl snapshotDaoEhcacheImpl;
-	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
-		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+		transactionManagerRule.getTransactionManager().begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		this.objectStoreManager = new ObjectStoreManager(initConfigurationServiceMock(), new MailEhCacheConfiguration(), logger);
 		CacheEvictionListener cacheEvictionListener = createMock(CacheEvictionListener.class);
@@ -96,9 +95,8 @@ public class SnapshotDaoEhcacheImplTest {
 
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		transactionManager.rollback();
+		transactionManagerRule.getTransactionManager().rollback();
 		objectStoreManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

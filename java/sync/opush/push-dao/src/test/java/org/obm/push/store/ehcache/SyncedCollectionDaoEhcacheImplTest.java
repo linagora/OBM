@@ -42,6 +42,7 @@ import javax.transaction.SystemException;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -54,18 +55,18 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfigurationTest {
 
+	@Rule 
+	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	private ObjectStoreManager objectStoreManager;
 	private SyncedCollectionDaoEhcacheImpl syncedCollectionStoreServiceImpl;
 	private Credentials credentials;
-	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
@@ -76,14 +77,12 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 		this.syncedCollectionStoreServiceImpl = new SyncedCollectionDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		User user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.credentials = new Credentials(user, "password");
-		this.transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+		transactionManagerRule.getTransactionManager().begin();
 	}
-	
+
 	@After
 	public void cleanup() throws Exception {
-		transactionManager.commit();
-		transactionManager.shutdown();
+		transactionManagerRule.getTransactionManager().commit();
 		objectStoreManager.shutdown();
 	}
 	

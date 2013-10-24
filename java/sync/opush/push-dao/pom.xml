@@ -86,6 +86,11 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>transaction-test</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 		    <groupId>com.google.guiceberry</groupId>
 		    <artifactId>guiceberry</artifactId>
 		    <version>3.1.0</version>

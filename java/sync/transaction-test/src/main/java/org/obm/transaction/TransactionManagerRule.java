@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,52 +29,50 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.annotations.transactional;
+package org.obm.transaction;
 
-import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
-import org.obm.configuration.TransactionConfiguration;
-import org.obm.configuration.module.LoggerModule;
-import org.slf4j.Logger;
+import org.junit.rules.ExternalResource;
+import org.junit.rules.TemporaryFolder;
 
 import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.Configuration;
 import bitronix.tm.TransactionManagerServices;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+public class TransactionManagerRule extends ExternalResource {
 
-@Singleton
-public class TransactionProvider implements Provider<TransactionManager> {
-	
-	private BitronixTransactionManager transactionManager;
+	private TemporaryFolder temporaryFolder;
+	private BitronixTransactionManager tm;
 
-	@Inject
-	public TransactionProvider(TransactionConfiguration configuration,
-			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) throws SystemException {
-		int transactionTimeOutInSecond = configuration.getTimeOutInSecond();
-		configurationLogger.info("Transaction timeout in seconds : {}", transactionTimeOutInSecond);
-		configureBitronix(configuration);
-		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.setTransactionTimeout(transactionTimeOutInSecond);
-	}
-
-	private void configureBitronix(TransactionConfiguration configuration) {
-		Configuration btConfiguration = TransactionManagerServices.getConfiguration();
-		if (configuration.enableJournal()) {
-			btConfiguration.setLogPart1Filename(configuration.getJournalPart1Path().getAbsolutePath());
-			btConfiguration.setLogPart2Filename(configuration.getJournalPart2Path().getAbsolutePath());	
-		} else {
-			btConfiguration.setJournal("null");
-		}
-		btConfiguration.setDefaultTransactionTimeout(configuration.getTimeOutInSecond());
+	public TransactionManagerRule() {
 	}
 	
 	@Override
-	public BitronixTransactionManager get() {
-		return transactionManager;
+	protected void before() throws Throwable {
+		temporaryFolder = new TemporaryFolder();
+		temporaryFolder.create();
+		tm = setupTransactionManager(temporaryFolder);
 	}
+	
+	@Override
+	protected void after() {
+		tm.shutdown();
+		temporaryFolder.delete();
+	}
+	
+	public BitronixTransactionManager getTransactionManager() {
+		return tm;
+	}
+	
+	public static BitronixTransactionManager setupTransactionManager(TemporaryFolder temporaryFolder) throws IOException {
+		File transactionJournalDir = temporaryFolder.newFolder();
+		TransactionManagerServices.getConfiguration()
+			.setServerId(UUID.randomUUID().toString())
+			.setLogPart1Filename(transactionJournalDir.getCanonicalPath() + "/journal1")
+			.setLogPart2Filename(transactionJournalDir.getCanonicalPath() + "/journal2");
+		return TransactionManagerServices.getTransactionManager();
+	}
+	
 }

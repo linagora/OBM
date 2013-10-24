@@ -42,6 +42,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.transaction.TransactionException;
 import net.sf.ehcache.transaction.TransactionTimeoutException;
 
@@ -51,6 +52,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.TestConfigurationModule;
@@ -58,8 +60,6 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.exception.EhcacheRollbackException;
-
-import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.ImmutableList;
 import com.google.guiceberry.GuiceBerryModule;
@@ -81,6 +81,8 @@ public class EhcacheTransactionalModeTest {
 	@Rule public final JUnitGuiceRule guiceBerry = new JUnitGuiceRule(Module.class);
 
 	@Inject private TestClass xaCacheInstance;
+	
+	@Inject private TransactionProvider transactionProvider;
 	
 	public static class TestClass {
 
@@ -118,7 +120,7 @@ public class EhcacheTransactionalModeTest {
 
 	@Before
 	public void init() {
-		this.manager = new CacheManager();
+		this.manager = new CacheManager(new Configuration().name("cm"+getClass().getName()));
 	    this.xaCache = new Cache(
 	            new CacheConfiguration(XA_CACHE_NAME, 1000)
 	                .transactionalMode(CacheConfiguration.TransactionalMode.XA));
@@ -128,7 +130,7 @@ public class EhcacheTransactionalModeTest {
 	@After
 	public void removeCache() {
 		manager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
+		transactionProvider.get().shutdown();
 	}
 	
 	@Test

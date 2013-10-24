@@ -48,6 +48,7 @@ import net.sf.ehcache.config.MemoryUnit;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
@@ -55,15 +56,17 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.obm.push.utils.jvm.JvmUtils;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.ImmutableMap;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class ObjectStoreConfigUpdaterTest extends StoreManagerConfigurationTest {
 
+	@Rule 
+	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	private int initialMaxMemory = 200;
 	private ObjectStoreConfigUpdater testee;
 
@@ -78,7 +81,6 @@ public class ObjectStoreConfigUpdaterTest extends StoreManagerConfigurationTest 
 	@After
 	public void shutdown() {
 		testee.storeManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test(expected=IllegalArgumentException.class)

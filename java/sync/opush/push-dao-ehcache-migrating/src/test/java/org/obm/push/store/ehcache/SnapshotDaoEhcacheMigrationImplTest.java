@@ -38,7 +38,6 @@ import java.util.List;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import net.sf.ehcache.migrating.Element;
 
@@ -56,20 +55,16 @@ import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.mail.bean.SnapshotKey;
 import org.slf4j.Logger;
 
-import bitronix.tm.TransactionManagerServices;
-
 @RunWith(SlowFilterRunner.class) @Slow
 public class SnapshotDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
 	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private SnapshotDaoEhcacheMigrationImpl snapshotDaoEhcacheMigrationImpl;
-	private TransactionManager transactionManager;
 	private DeviceId deviceId;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
-		this.transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+		transactionManagerRule.getTransactionManager().begin();
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
 		this.snapshotDaoEhcacheMigrationImpl = new SnapshotDaoEhcacheMigrationImpl(objectStoreManagerMigration);
@@ -78,9 +73,8 @@ public class SnapshotDaoEhcacheMigrationImplTest extends StoreManagerConfigurati
 	
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		transactionManager.rollback();
+		transactionManagerRule.getTransactionManager().rollback();
 		objectStoreManagerMigration.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

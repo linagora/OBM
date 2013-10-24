@@ -38,9 +38,9 @@ import java.util.UUID;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 
 import org.fest.util.Files;
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
@@ -52,7 +52,7 @@ import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.store.ehcache.StoreManager;
 
-import bitronix.tm.TransactionManagerServices;
+import bitronix.tm.BitronixTransactionManager;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ContiguousSet;
@@ -72,8 +72,11 @@ public class WindowingStepdefs {
 	@Inject
 	private ConfigurationService configurationService;
 	
+	@Inject 
+	private TransactionProvider transactionProvider;
+	
 	private final WindowingService windowingService;
-	private final TransactionManager tm;
+	private BitronixTransactionManager tm;
 	private final StoreManager storeManager;
 
 	private WindowingIndexKey windowingIndexKey;
@@ -87,17 +90,17 @@ public class WindowingStepdefs {
 	private int elementsLeft;
 	private int retreivingChangesIteration;
 	private int retreivingChangesSum;
-	
+
 	
 	@Inject
 	public WindowingStepdefs(WindowingService windowingService, StoreManager storeManager) {
 		this.windowingService = windowingService;
 		this.storeManager = storeManager;
-		this.tm = TransactionManagerServices.getTransactionManager();
 	}
 	
 	@Before
 	public void setup() throws NotSupportedException, SystemException {
+		tm = transactionProvider.get();
 		tm.begin();
 		collectionId = 5;
 		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
@@ -110,7 +113,7 @@ public class WindowingStepdefs {
 	public void shutdown() throws IllegalStateException, SecurityException, SystemException {
 		tm.rollback();
 		storeManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
+		tm.shutdown();
 		Files.delete(new File(configurationService.getDataDirectory()));
 	}
 	

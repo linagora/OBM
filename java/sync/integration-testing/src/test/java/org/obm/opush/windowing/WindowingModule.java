@@ -33,7 +33,10 @@ package org.obm.opush.windowing;
 
 import java.util.concurrent.TimeUnit;
 
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.opush.env.Configuration;
 import org.obm.opush.env.StaticConfigurationService;
@@ -66,6 +69,8 @@ public class WindowingModule extends AbstractModule {
 	protected void configure() {
 		Configuration configuration = configuration();
 		bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
+		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
+		bind(TransactionProvider.class).asEagerSingleton();
 		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
 		bind(WindowingService.class).to(WindowingServiceImpl.class);
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(configurationLogger);

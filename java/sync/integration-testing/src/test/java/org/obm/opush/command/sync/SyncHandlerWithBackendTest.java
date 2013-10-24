@@ -64,6 +64,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
@@ -124,8 +125,6 @@ import org.obm.sync.push.client.beans.Folder;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
 
-import bitronix.tm.TransactionManagerServices;
-
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -158,7 +157,8 @@ public class SyncHandlerWithBackendTest {
 	@Inject SyncDecoder decoder;
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	@Inject SnapshotService snapshotService;
-
+	@Inject TransactionProvider transactionProvider;
+	
 	private ItemTrackingDao itemTrackingDao;
 	private CollectionDao collectionDao;
 	private DateService dateService;
@@ -573,7 +573,7 @@ public class SyncHandlerWithBackendTest {
 	}
 
 	@Test
-	public void testFecthDeletedMail() throws Exception {
+	public void testFetchDeletedMail() throws Exception {
 		GreenMailUtil.sendTextEmail(mailbox, mailbox, "subject", "body", greenMail.getSmtp().getServerSetup());
 		greenMail.waitForIncomingEmail(1);
 		
@@ -647,7 +647,7 @@ public class SyncHandlerWithBackendTest {
 	}
 
 	private void initializeEmptySnapshotForSyncKey(SyncKey firstAllocatedSyncKey) throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-		TransactionManagerServices.getTransactionManager().begin();
+		transactionProvider.get().begin();
 		snapshotService.storeSnapshot(Snapshot.builder()
 				.syncKey(firstAllocatedSyncKey)
 				.collectionId(inboxCollectionId)
@@ -655,7 +655,7 @@ public class SyncHandlerWithBackendTest {
 				.uidNext(1l)
 				.filterType(FilterType.THREE_DAYS_BACK)
 				.build());
-		TransactionManagerServices.getTransactionManager().commit();
+		transactionProvider.get().commit();
 	}
 	
 	@Test

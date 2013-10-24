@@ -45,8 +45,6 @@ import org.obm.configuration.TestConfigurationModule;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 
-import bitronix.tm.TransactionManagerServices;
-
 import com.google.guiceberry.GuiceBerryModule;
 import com.google.guiceberry.junit4.GuiceBerryRule;
 import com.google.inject.AbstractModule;
@@ -81,6 +79,12 @@ public class HornetQTransactionalModeTest {
 	
 	@Inject private TestClass xaMessageQueueInstance;
 	@Inject private MessageConsumer consumer;	
+	@Inject private TransactionProvider transactionProvider; 
+	
+	@After
+	public void teardown() {
+		transactionProvider.get().shutdown();
+	}
 	
 	public static class TestClass {
 
@@ -98,11 +102,6 @@ public class HornetQTransactionalModeTest {
 		}
 		
 		
-	}
-	
-	@After
-	public void shutdown() {
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
 	@Test

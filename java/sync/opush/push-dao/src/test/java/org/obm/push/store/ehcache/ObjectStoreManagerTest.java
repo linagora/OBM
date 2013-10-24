@@ -41,19 +41,22 @@ import net.sf.ehcache.config.CacheConfiguration;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.TransactionManagerServices;
 
 @Slow
 @RunWith(SlowFilterRunner.class)
 public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
+	@Rule 
+	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	private ObjectStoreManager opushCacheManager;
 	private EhCacheConfiguration config;
 	private ConfigurationService configurationService;
@@ -71,7 +74,6 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 	@After
 	public void shutdown() {
 		opushCacheManager.shutdown();
-		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 
 	public void loadStores() {
