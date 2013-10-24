@@ -1366,30 +1366,26 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e);
 		}
 	}
-	
 
-	private boolean changeParticipationInternal(AccessToken token,
-            String calendar, EventExtId extId,
-            Participation participation, int sequence, boolean notification)
-            throws FindException, SQLException {
-    
-	    ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain().getName());
-	    Event currentEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
-	    boolean changed = false;
-	    if (currentEvent != null) {
-	             changed = applyParticipationChange(token, extId, participation,
-	                            sequence, calendarOwner, currentEvent);
-	    }
-	    
-	    Event newEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
-	    if (newEvent != null) {
-	            eventChangeHandler.updateParticipation(newEvent, calendarOwner, participation, notification, token);
-	    } else {
-	            logger.error("event with extId : "+ extId + " is no longer in database, ignoring notification");
-	    }
-	    return changed;
+	private boolean changeParticipationInternal(AccessToken token, String calendar, EventExtId extId, Participation participation,
+			int sequence, boolean notification) throws FindException, SQLException {
+
+		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain().getName());
+		Event currentEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
+		boolean changed = false;
+		if (currentEvent != null) {
+			changed = applyParticipationChange(token, extId, participation, sequence, calendarOwner, currentEvent);
+		}
+
+		Event newEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
+		if (newEvent != null) {
+			eventChangeHandler.updateParticipation(newEvent, calendarOwner, participation, notification, token);
+		} else {
+			logger.error("event with extId : " + extId + " is no longer in database, ignoring notification");
+		}
+		return changed;
 	}
-	
+
 	@Override
 	@Transactional
 	public boolean changeParticipationState(AccessToken token, String calendar,
