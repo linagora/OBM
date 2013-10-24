@@ -46,6 +46,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -122,7 +123,7 @@ public class SyncedCollectionDaoEhcacheImplTest extends StoreManagerConfiguratio
 	}
 	
 	private Device getFakeDeviceId(){
-		return new Device(1, "DevType", new DeviceId("DevId"), null, null);
+		return new Device(1, "DevType", new DeviceId("DevId"), null, ProtocolVersion.V121);
 	}
 	
 }
