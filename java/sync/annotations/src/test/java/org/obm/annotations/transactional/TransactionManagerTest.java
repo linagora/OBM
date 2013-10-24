@@ -43,22 +43,25 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.transaction.TransactionManagerRule;
 
 import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class)
 public class TransactionManagerTest {
 
+	@Rule public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	private BitronixTransactionManager tm;
 
 	@Before
 	public void setUp() {
-		tm = TransactionManagerServices.getTransactionManager();
+		tm = transactionManagerRule.getTransactionManager();
 	}
 	
 	@After

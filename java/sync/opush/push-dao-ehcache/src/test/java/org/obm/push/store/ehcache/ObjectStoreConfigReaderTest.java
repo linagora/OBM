@@ -52,16 +52,15 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 @Slow
 @RunWith(SlowFilterRunner.class)
 public class ObjectStoreConfigReaderTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
+	@Rule public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
 	
 	private static final int MAX_MEMORY_IN_MB = 64;
 	
@@ -70,16 +69,14 @@ public class ObjectStoreConfigReaderTest {
 	private TestingEhCacheConfiguration config;
 	private ObjectStoreManager opushCacheManager;
 	private Logger logger;
-	private BitronixTransactionManager transactionManager;
 
 	@Before
 	public void setup() throws IOException {
 		logger = createNiceMock(Logger.class);
-		transactionManager = TransactionManagerServices.getTransactionManager();
 		
 		IMocksControl control = createControl();
 		transactionProvider = control.createMock(TransactionProvider.class);
-		expect(transactionProvider.get()).andReturn(transactionManager).anyTimes();
+		expect(transactionProvider.get()).andReturn(transactionManagerRule.getTransactionManager()).anyTimes();
 		control.replay();
 		
 		configurationService = new EhCacheConfigurationService().mock(tempFolder);
@@ -91,7 +88,6 @@ public class ObjectStoreConfigReaderTest {
 	@After
 	public void tearDown() {
 		opushCacheManager.shutdown();
-		transactionManager.shutdown();
 	}
 	
 	@Test

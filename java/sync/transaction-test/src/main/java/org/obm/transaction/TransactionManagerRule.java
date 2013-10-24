@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,35 +29,50 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store.ehcache;
+package org.obm.transaction;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
-import org.easymock.EasyMock;
-import org.junit.Rule;
+import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
-import org.obm.configuration.ConfigurationService;
-import org.obm.transaction.TransactionManagerRule;
 
-public class StoreManagerConfigurationTest {
+import bitronix.tm.BitronixTransactionManager;
+import bitronix.tm.TransactionManagerServices;
 
-	@Rule
-	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
-	
-	@Rule 
-	public TemporaryFolder temporaryFolder =  new TemporaryFolder();
-	protected File dataDir;
-	
-	protected ConfigurationService initConfigurationServiceMock() throws IOException {
-		dataDir = temporaryFolder.newFolder();
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true).anyTimes();
-		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
-		EasyMock.replay(configurationService);
-		
-		return configurationService;
+public class TransactionManagerRule extends ExternalResource {
+
+	private TemporaryFolder temporaryFolder;
+	private BitronixTransactionManager tm;
+
+	public TransactionManagerRule() {
 	}
-
+	
+	@Override
+	protected void before() throws Throwable {
+		temporaryFolder = new TemporaryFolder();
+		temporaryFolder.create();
+		tm = setupTransactionManager(temporaryFolder);
+	}
+	
+	@Override
+	protected void after() {
+		tm.shutdown();
+		temporaryFolder.delete();
+	}
+	
+	public BitronixTransactionManager getTransactionManager() {
+		return tm;
+	}
+	
+	public static BitronixTransactionManager setupTransactionManager(TemporaryFolder temporaryFolder) throws IOException {
+		File transactionJournalDir = temporaryFolder.newFolder();
+		TransactionManagerServices.getConfiguration()
+			.setServerId(UUID.randomUUID().toString())
+			.setLogPart1Filename(transactionJournalDir.getCanonicalPath() + "/journal1")
+			.setLogPart2Filename(transactionJournalDir.getCanonicalPath() + "/journal2");
+		return TransactionManagerServices.getTransactionManager();
+	}
+	
 }

@@ -50,12 +50,10 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.store.SyncedCollectionDao;
 
-import com.google.inject.Inject;
-
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class SyncedCollectionDaoTest {
 
-	@Inject protected SyncedCollectionDao syncedCollectionDao;
+	protected SyncedCollectionDao syncedCollectionDao;
 	
 	private User user;
 	private Device device;

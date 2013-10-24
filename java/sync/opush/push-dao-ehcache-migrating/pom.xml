@@ -87,6 +87,11 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>transaction-test</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>jta</artifactId>
 			<scope>test</scope>

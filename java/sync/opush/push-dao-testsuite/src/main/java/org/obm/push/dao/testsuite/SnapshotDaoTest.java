@@ -45,12 +45,10 @@ import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.store.SnapshotDao;
 import org.obm.push.utils.DateUtils;
 
-import com.google.inject.Inject;
-
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class SnapshotDaoTest {
 
-	@Inject protected SnapshotDao snapshotDao;
+	protected SnapshotDao snapshotDao;
 	
 	@Test
 	public void getNull() {

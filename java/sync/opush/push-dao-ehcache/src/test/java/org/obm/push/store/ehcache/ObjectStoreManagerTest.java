@@ -51,33 +51,30 @@ import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class ObjectStoreManagerTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
+	@Rule public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
 	
-	private TransactionProvider transactionProvider;
 	private ObjectStoreManager opushCacheManager;
 	private EhCacheConfiguration config;
 	private ConfigurationService configurationService;
 	private Logger logger;
-	private BitronixTransactionManager transactionManager;
+	private TransactionProvider transactionProvider;
 
 	
 	@Before
 	public void init() throws IOException {
 		logger = LoggerFactory.getLogger(getClass());
-		transactionManager = TransactionManagerServices.getTransactionManager();
 		
 		IMocksControl control = createControl();
 		transactionProvider = control.createMock(TransactionProvider.class);
-		expect(transactionProvider.get()).andReturn(transactionManager).anyTimes();
+		expect(transactionProvider.get()).andReturn(transactionManagerRule.getTransactionManager()).anyTimes();
 		control.replay();
 		
 		configurationService = new EhCacheConfigurationService().mock(tempFolder);
@@ -88,7 +85,6 @@ public class ObjectStoreManagerTest {
 	@After
 	public void shutdown() {
 		opushCacheManager.shutdown();
-		transactionManager.shutdown();
 	}
 
 	@Test

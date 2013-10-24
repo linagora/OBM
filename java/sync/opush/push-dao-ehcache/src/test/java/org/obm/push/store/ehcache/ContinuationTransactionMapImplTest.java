@@ -46,18 +46,17 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.dao.testsuite.ContinuationTransactionMapTest;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class ContinuationTransactionMapImplTest extends ContinuationTransactionMapTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
 
+	@Rule public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	private NonTransactionalObjectStoreManager objectStoreManager;
-	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
@@ -67,14 +66,12 @@ public class ContinuationTransactionMapImplTest extends ContinuationTransactionM
 		objectStoreManager = new NonTransactionalObjectStoreManager(configurationService, logger);
 		continuationTransactionMap = new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
 		
-		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+		transactionManagerRule.getTransactionManager().begin();
 	}
 	
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		transactionManager.rollback();
+		transactionManagerRule.getTransactionManager().rollback();
 		objectStoreManager.shutdown();
-		transactionManager.shutdown();
 	}
 }

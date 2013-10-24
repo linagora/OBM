@@ -122,6 +122,7 @@
 		<module>cyrus-client</module>
 		<module>satellite-client</module>
 		<module>obm-dao</module>
+		<module>transaction-test</module>
   </modules>
 
 	<build>
@@ -769,6 +770,12 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-compress</artifactId>
 				<version>1.5</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>transaction-test</artifactId>
+				<version>${obm.version}</version>
+				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

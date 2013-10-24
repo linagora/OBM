@@ -42,6 +42,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.transaction.TransactionException;
 import net.sf.ehcache.transaction.TransactionTimeoutException;
 
@@ -118,7 +119,7 @@ public class EhcacheTransactionalModeTest {
 
 	@Before
 	public void init() {
-		this.manager = new CacheManager();
+		this.manager = new CacheManager(new Configuration().name("cm"+getClass().getName()));
 	    this.xaCache = new Cache(
 	            new CacheConfiguration(XA_CACHE_NAME, 1000)
 	                .transactionalMode(CacheConfiguration.TransactionalMode.XA));

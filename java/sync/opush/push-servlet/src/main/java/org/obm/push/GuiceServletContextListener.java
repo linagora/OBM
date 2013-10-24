@@ -43,8 +43,6 @@ import org.obm.sync.XTrustProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bitronix.tm.TransactionManagerServices;
-
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -94,7 +92,6 @@ public class GuiceServletContextListener implements ServletContextListener {
 
 	private void shutdown() {
     	LifecycleListenerHelper.shutdownListeners(injector);
-    	TransactionManagerServices.getTransactionManager().shutdown();
 	}
 
 	private void migrateEhCache() {

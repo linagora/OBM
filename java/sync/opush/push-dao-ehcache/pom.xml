@@ -100,6 +100,11 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>transaction-test</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm</artifactId>
 			<scope>test</scope>

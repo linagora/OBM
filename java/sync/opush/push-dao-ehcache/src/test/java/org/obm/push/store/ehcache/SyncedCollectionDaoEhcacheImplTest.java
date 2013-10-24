@@ -49,18 +49,16 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.dao.testsuite.SyncedCollectionDaoTest;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class SyncedCollectionDaoEhcacheImplTest extends SyncedCollectionDaoTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
+	@Rule public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
 
 	private ObjectStoreManager objectStoreManager;
-	private BitronixTransactionManager transactionManager;
 	
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
@@ -73,14 +71,12 @@ public class SyncedCollectionDaoEhcacheImplTest extends SyncedCollectionDaoTest 
 		CacheEvictionListener cacheEvictionListener = createMock(CacheEvictionListener.class);
 		syncedCollectionDao = new SyncedCollectionDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		
-		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+		transactionManagerRule.getTransactionManager().begin();
 	}
 	
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		transactionManager.rollback();
+		transactionManagerRule.getTransactionManager().rollback();
 		objectStoreManager.shutdown();
-		transactionManager.shutdown();
 	}
 }

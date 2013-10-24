@@ -41,7 +41,6 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,11 +50,9 @@ import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.base.Stopwatch;
 
@@ -64,31 +61,25 @@ public class EhCacheStatisticsImplTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
 
+	@Rule public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
+	
 	private static final String STATS_ENABLED_CACHE = ObjectStoreManager.MAIL_SNAPSHOT_STORE;
 	
 	private Logger logger;
 	private ConfigurationService configurationService;
 	private TransactionProvider transactionProvider;
-	private BitronixTransactionManager transactionManager;
 	private ObjectStoreManager cacheManager;
-
 
 	@Before
 	public void init() throws Exception {
 		logger = LoggerFactory.getLogger(getClass());
-		transactionManager = TransactionManagerServices.getTransactionManager();
 		
 		IMocksControl control = createControl();
 		transactionProvider = control.createMock(TransactionProvider.class);
-		expect(transactionProvider.get()).andReturn(transactionManager).anyTimes();
+		expect(transactionProvider.get()).andReturn(transactionManagerRule.getTransactionManager()).anyTimes();
 		control.replay();
 		
 		configurationService = new EhCacheConfigurationService().mock(tempFolder);
-	}
-
-	@After
-	public void shutdown() {
-		transactionManager.shutdown();
 	}
 	
 	@Test(expected=StatisticsNotAvailableException.class)
@@ -98,7 +89,7 @@ public class EhCacheStatisticsImplTest {
 			.withStatsShortSamplingTimeInSeconds(1));
 		
 		try {
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			testee.shortTimeDiskGets(STATS_ENABLED_CACHE);
 		} finally {
 			testee.manager.shutdown();
@@ -112,7 +103,7 @@ public class EhCacheStatisticsImplTest {
 			.withStatsShortSamplingTimeInSeconds(10));
 		
 		try {
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			testee.shortTimeDiskGets(STATS_ENABLED_CACHE);
 		} catch(StatisticsNotAvailableException e) {
 			// expected
@@ -134,7 +125,7 @@ public class EhCacheStatisticsImplTest {
 		
 		try {
 			startStatisticsSampling(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
 		} finally {
@@ -153,7 +144,7 @@ public class EhCacheStatisticsImplTest {
 		try {
 			startStatisticsSampling(restartedTestee);
 			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(2);
 		} finally {
@@ -171,7 +162,7 @@ public class EhCacheStatisticsImplTest {
 			startStatisticsSampling(testee);
 			putXElements(2, testee);
 			testee.manager.getStore(STATS_ENABLED_CACHE).get("nonExistingKey");
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(testee.config.statsShortSamplingTimeInSeconds());
 			assertThat(testee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
 		} finally {
@@ -194,7 +185,7 @@ public class EhCacheStatisticsImplTest {
 		try {
 			startStatisticsSampling(restartedTestee);
 			removeAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(2);
 		} finally {
@@ -212,7 +203,7 @@ public class EhCacheStatisticsImplTest {
 			startStatisticsSampling(testee);
 			putXElements(2, testee);
 			testee.manager.getStore(STATS_ENABLED_CACHE).remove("nonExistingKey");
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(testee.config.statsShortSamplingTimeInSeconds());
 			assertThat(testee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
 		} finally {
@@ -232,7 +223,7 @@ public class EhCacheStatisticsImplTest {
 			startStatisticsSampling(restartedTestee);
 			readAllElementsInCache(restartedTestee);
 			removeAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(2);
 		} finally {
@@ -251,11 +242,11 @@ public class EhCacheStatisticsImplTest {
 		try {
 			startStatisticsSampling(restartedTestee);
 			removeAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			transactionManager.begin();
+			transactionManagerRule.getTransactionManager().begin();
 			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
 		} finally {
@@ -274,11 +265,11 @@ public class EhCacheStatisticsImplTest {
 		try {
 			startStatisticsSampling(restartedTestee);
 			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
-			transactionManager.begin();
+			transactionManagerRule.getTransactionManager().begin();
 			removeAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
 		} finally {
@@ -299,7 +290,7 @@ public class EhCacheStatisticsImplTest {
 			readAllElementsInCache(restartedTestee);
 			putXElements(2, restartedTestee);
 			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(2);
 		} finally {
@@ -318,13 +309,13 @@ public class EhCacheStatisticsImplTest {
 		try {
 			startStatisticsSampling(restartedTestee);
 			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			
-			transactionManager.begin();
+			transactionManagerRule.getTransactionManager().begin();
 			putXElements(2, restartedTestee);
 			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
@@ -342,7 +333,7 @@ public class EhCacheStatisticsImplTest {
 		try {
 			startStatisticsSampling(testee);
 			putXElements(2, testee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(testee.config.statsShortSamplingTimeInSeconds());
 			assertThat(testee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
 		} finally {
@@ -360,7 +351,7 @@ public class EhCacheStatisticsImplTest {
 			startStatisticsSampling(testee);
 			putXElements(5, testee);
 			readAllElementsInCache(testee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(testee.config.statsShortSamplingTimeInSeconds());
 			assertThat(testee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
 		} finally {
@@ -380,7 +371,7 @@ public class EhCacheStatisticsImplTest {
 			startStatisticsSampling(restartedTestee);
 			putXElements(3, 5, restartedTestee);
 			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(2);
 		} finally {
@@ -399,7 +390,7 @@ public class EhCacheStatisticsImplTest {
 		try {
 			startStatisticsSampling(restartedTestee);
 			readAllElementsInCache(restartedTestee);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
@@ -424,7 +415,7 @@ public class EhCacheStatisticsImplTest {
 			startStatisticsSampling(restartedTestee);
 			Thread.sleep(100); // First read must be in first sample
 			readAllElementsInCacheWithWait(restartedTestee, waitBetweenReadsInMs);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			Thread.sleep(waitBetweenReadsInMs); // Wait the last sample to be finished
 			assertThat(restartedTestee.longTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(2);
 		} finally {
@@ -447,7 +438,7 @@ public class EhCacheStatisticsImplTest {
 			startStatisticsSampling(restartedTestee);
 			Thread.sleep(100); // First read must be in first sample
 			store.get(store.getKeys().get(0));
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
@@ -473,7 +464,7 @@ public class EhCacheStatisticsImplTest {
 			Thread.sleep(100); // First read must be in first sample
 			store.get(store.getKeys().get(0));
 			store.get(store.getKeys().get(1));
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
@@ -516,7 +507,7 @@ public class EhCacheStatisticsImplTest {
 				putIndex++;
 			}
 			Thread.sleep(100);
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			waitForStatisticsSamples(restartedTestee.config.statsShortSamplingTimeInSeconds());
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
 		} finally {
@@ -542,7 +533,7 @@ public class EhCacheStatisticsImplTest {
 			Thread.sleep(TimeUnit.SECONDS.toMillis(2));
 			assertThat(store.get(element.getObjectKey())).isNull();
 
-			transactionManager.commit();
+			transactionManagerRule.getTransactionManager().commit();
 			assertThat(restartedTestee.shortTimeDiskGets(STATS_ENABLED_CACHE)).isEqualTo(0);
 		} finally {
 			restartedTestee.manager.shutdown();
@@ -573,7 +564,7 @@ public class EhCacheStatisticsImplTest {
 		
 		EhCacheConfiguration previousConfigReference = testee.config;
 		putXElements(elementsCount, testee);
-		transactionManager.commit();
+		transactionManagerRule.getTransactionManager().commit();
 		testee.manager.shutdown();
 
 		return testeeWithConfig(previousConfigReference);
@@ -603,7 +594,7 @@ public class EhCacheStatisticsImplTest {
 	}
 
 	private EhCacheStatisticsImpl testeeWithConfig(EhCacheConfiguration config) throws Exception {
-		transactionManager.begin();
+		transactionManagerRule.getTransactionManager().begin();
 		cacheManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
 		return new EhCacheStatisticsImpl(config, cacheManager);
 	}

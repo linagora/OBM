@@ -49,21 +49,19 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.dao.testsuite.UnsynchronizedItemDaoTest;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 @RunWith(SlowFilterRunner.class) @Slow
 public class UnsynchronizedItemDaoEhcacheImplTest extends UnsynchronizedItemDaoTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
+	@Rule public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
 
 	private ObjectStoreManager objectStoreManager;
-	private BitronixTransactionManager transactionManager;
 
 	@Before
-	public void init() throws NotSupportedException, SystemException, IOException {
+	public void init() throws IOException, NotSupportedException, SystemException {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
 		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
@@ -73,14 +71,12 @@ public class UnsynchronizedItemDaoEhcacheImplTest extends UnsynchronizedItemDaoT
 		CacheEvictionListener cacheEvictionListener = createMock(CacheEvictionListener.class);
 		unsynchronizedItemDao = new UnsynchronizedItemDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		
-		transactionManager = TransactionManagerServices.getTransactionManager();
-		transactionManager.begin();
+		transactionManagerRule.getTransactionManager().begin();
 	}
 	
 	@After
 	public void cleanup() throws IllegalStateException, SecurityException, SystemException {
-		transactionManager.rollback();
+		transactionManagerRule.getTransactionManager().rollback();
 		objectStoreManager.shutdown();
-		transactionManager.shutdown();
 	}
 }

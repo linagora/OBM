@@ -61,10 +61,8 @@ import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.obm.push.utils.jvm.JvmUtils;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
-
-import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -72,6 +70,7 @@ import com.google.common.collect.ImmutableMap;
 public class ObjectStoreConfigUpdaterTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
+	@Rule public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
 	
 	private int initialMaxMemory = 200;
 	private ObjectStoreConfigUpdater testee;
@@ -81,16 +80,14 @@ public class ObjectStoreConfigUpdaterTest {
 	private TestingEhCacheConfiguration config;
 	private ObjectStoreManager opushCacheManager;
 	private Logger logger;
-	private BitronixTransactionManager transactionManager;
 
 	@Before
 	public void init() throws IOException {
 		logger = createNiceMock(Logger.class);
-		transactionManager = TransactionManagerServices.getTransactionManager();
 		
 		IMocksControl control = createControl();
 		transactionProvider = control.createMock(TransactionProvider.class);
-		expect(transactionProvider.get()).andReturn(transactionManager).anyTimes();
+		expect(transactionProvider.get()).andReturn(transactionManagerRule.getTransactionManager()).anyTimes();
 		control.replay();
 		
 		configurationService = new EhCacheConfigurationService().mock(tempFolder);
@@ -102,7 +99,6 @@ public class ObjectStoreConfigUpdaterTest {
 	@After
 	public void shutdown() {
 		opushCacheManager.shutdown();
-		transactionManager.shutdown();
 	}
 	
 	@Test(expected=IllegalArgumentException.class)

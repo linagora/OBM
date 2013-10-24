@@ -56,12 +56,11 @@ import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Range;
-import com.google.inject.Inject;
 
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class WindowingDaoTest {
 
-	@Inject protected WindowingDao windowingDao;
+	protected WindowingDao windowingDao;
 
 	private User user;
 	private Device device;

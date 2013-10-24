@@ -52,6 +52,7 @@ import net.sf.ehcache.statistics.extended.ExtendedStatistics.Statistic;
 import net.sf.ehcache.store.StoreOperationOutcomes.GetOutcome;
 
 import org.easymock.IMocksControl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -63,12 +64,12 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terracotta.statistics.archive.Timestamped;
 
 import bitronix.tm.BitronixTransactionManager;
-import bitronix.tm.TransactionManagerServices;
 
 import com.google.common.collect.ImmutableList;
 
@@ -80,24 +81,42 @@ public class EhCacheSettingsTest {
 	private ConfigurationService configurationService;
 	private EhCacheConfiguration config;
 	private TransactionProvider transactionProvider;
-	private BitronixTransactionManager transactionManager;
 	private Logger logger;
+	private BitronixTransactionManager tm;
 
 	
 	@Before
 	public void init() throws IOException {
 		logger = LoggerFactory.getLogger(getClass());
-		transactionManager = TransactionManagerServices.getTransactionManager();
 		
 		IMocksControl control = createControl();
 		transactionProvider = control.createMock(TransactionProvider.class);
-		expect(transactionProvider.get()).andReturn(transactionManager).anyTimes();
+		expect(transactionProvider.get()).andDelegateTo(new TransactionProvider() {
+			
+			@Override
+			public void shutdown() throws Exception {
+				tm.shutdown();
+			}
+			
+			@Override
+			public BitronixTransactionManager get() {
+				return tm;
+			}
+		}).anyTimes();
+		
 		control.replay();
 		
 		configurationService = new EhCacheConfigurationService().mock(tempFolder);
 		config = new TestingEhCacheConfiguration();
+
+		tm = TransactionManagerRule.setupTransactionManager(tempFolder);
 	}
 
+	@After
+	public void teardown() {
+		tm.shutdown();
+	}
+	
 	@Ignore("ehCache always respond false to isElementInMemory")
 	@Test
 	public void overflowToDisk() throws Exception {
@@ -110,7 +129,7 @@ public class EhCacheSettingsTest {
 		byte[] arrayOf300KB = new byte[300 * 1024];
 		Arrays.fill(arrayOf300KB, (byte) 65);
 		
-		transactionManager.begin();
+		tm.begin();
 		Cache cache = cacheManager.getStore("mailSnapshotStore");
 		cache.put(new Element("key1", arrayOf300KB));
 		cache.put(new Element("key2", arrayOf300KB));
@@ -122,8 +141,7 @@ public class EhCacheSettingsTest {
 		assertThat(cache.isElementInMemory("key2")).isTrue();
 		assertThat(cache.isElementInMemory("key1")).isFalse();
 		assertThat(cache.isElementOnDisk("key1")).isTrue();
-		transactionManager.commit();
-		transactionManager.shutdown();
+		tm.commit();
 		cacheManager.shutdown();
 	}
 
@@ -143,16 +161,19 @@ public class EhCacheSettingsTest {
 
 		ObjectStoreManager beforeCacheManager = 
 				new ObjectStoreManager(configurationService, config, logger, transactionProvider);
-		transactionManager.begin();
+		tm.begin();
 		for (String persistentStoreName : persistentStoreNames) {
 			Cache cache = beforeCacheManager.getStore(persistentStoreName);
 			cache.put(el1);
 			cache.put(el2);
 		}
-		transactionManager.commit();
+		tm.commit();
 		beforeCacheManager.shutdown();
+		tm.shutdown();
 
-		transactionManager.begin();
+		tm = TransactionManagerRule.setupTransactionManager(tempFolder);
+		tm.begin();
+		
 		ObjectStoreManager newCacheManager = 
 				new ObjectStoreManager(configurationService, config, logger, transactionProvider);
 		for (String persistentStoreName : persistentStoreNames) {
@@ -161,8 +182,7 @@ public class EhCacheSettingsTest {
 			assertThat(loadedCache.get(el2.getObjectKey())).isEqualTo(el2);
 		}
 		
-		transactionManager.commit();
-		transactionManager.shutdown();
+		tm.commit();
 		newCacheManager.shutdown();
 	}
 
@@ -250,15 +270,14 @@ public class EhCacheSettingsTest {
 	
 		try {
 			Element el1 = new Element("key1", "value1");
-			TransactionManagerServices.getTransactionManager().begin();
+			tm.begin();
 			Cache cache = cacheManager.getStore("mailSnapshotStore");
 			cache.put(el1);
 		
 			Thread.sleep(2000);
 			assertThat(cache.get(el1.getObjectKey())).isNull();
 		} finally {
-			TransactionManagerServices.getTransactionManager().commit();
-			TransactionManagerServices.getTransactionManager().shutdown();
+			tm.commit();
 			cacheManager.shutdown();
 		}
 	}
@@ -273,15 +292,14 @@ public class EhCacheSettingsTest {
 	
 		try {
 			Element element = new Element("key1", "value1");
-			TransactionManagerServices.getTransactionManager().begin();
+			tm.begin();
 			Cache cache = cacheManager.getStore("mailSnapshotStore");
 			cache.put(element);
 		
 			Thread.sleep(20);
 			assertThat(cache.get(element.getObjectKey())).isNotNull();
 		} finally {
-			TransactionManagerServices.getTransactionManager().commit();
-			TransactionManagerServices.getTransactionManager().shutdown();
+			tm.commit();
 			cacheManager.shutdown();
 		}
 	}

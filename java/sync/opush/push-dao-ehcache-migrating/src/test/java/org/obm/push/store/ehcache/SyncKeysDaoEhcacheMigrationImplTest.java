@@ -53,6 +53,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncKeysKey;
+import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableList;
@@ -63,6 +64,9 @@ public class SyncKeysDaoEhcacheMigrationImplTest {
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+	@Rule
+	public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
 	
 	private MigrationSourceObjectStoreManager objectStoreManagerMigration;
 	private SyncKeysDaoEhcacheMigrationImpl syncKeysDaoEhcacheMigrationImpl;

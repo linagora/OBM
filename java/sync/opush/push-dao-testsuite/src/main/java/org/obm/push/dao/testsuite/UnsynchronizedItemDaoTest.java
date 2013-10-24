@@ -43,12 +43,11 @@ import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.store.UnsynchronizedItemDao;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Inject;
 
 @RunWith(SlowGuiceRunner.class) @Slow
 public abstract class UnsynchronizedItemDaoTest {
 
-	@Inject protected UnsynchronizedItemDao unsynchronizedItemDao;
+	protected UnsynchronizedItemDao unsynchronizedItemDao;
 	
 	@Test
 	public void list() {
