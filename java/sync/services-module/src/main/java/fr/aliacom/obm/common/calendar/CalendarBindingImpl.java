@@ -303,7 +303,7 @@ public class CalendarBindingImpl implements ICalendar {
 			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
 			ObmUser owner = userService.getUserFromLogin(ev.getOwner(), token.getDomain().getName());
 			if (owner != null) {
-				if (owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
+				if (ev.isInternalEvent() && owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
 					cancelEvent(token, calendar, notification, eventId, ev);
 				} else {
 					changeParticipationInternal(
@@ -366,25 +366,23 @@ public class CalendarBindingImpl implements ICalendar {
 		
 		try {
 			ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
-			final Event ev = calendarDao.findEventByExtId(token, calendarUser, extId);
-
+			Event ev = calendarDao.findEventByExtId(token, calendarUser, extId);
 			if (ev == null) {
 				logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] not removed, it doesn't exist");
 				return ev;
+			}
+			
+			ObmUser owner = userService.getUserFromLogin(ev.getOwner(), token.getDomain().getName());
+			if (owner == null) {
+				logger.info(LogUtils.prefix(token) + "error, trying to remove an event without any owner : " + ev.getTitle());
+				return ev;
+			}
+			
+			if (ev.isInternalEvent() && owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
+				return cancelEventByExtId(token, calendarUser, ev, notification);
 			} else {
-				ObmUser owner = userService.getUserFromLogin(ev.getOwner(), token.getDomain().getName());
-				
-				if (owner == null) {
-					logger.info(LogUtils.prefix(token) + "error, trying to remove an event without any owner : " + ev.getTitle());
-					return ev;
-				}
-				
-				if (owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
-					return cancelEventByExtId(token, calendarUser, ev, notification);
-				} else {
-					changeParticipationInternal(token, calendar, ev.getExtId(), Participation.declined(), sequence, notification);
-					return calendarDao.findEventByExtId(token, calendarUser, extId);
-				}
+				changeParticipationInternal(token, calendar, ev.getExtId(), Participation.declined(), sequence, notification);
+				return calendarDao.findEventByExtId(token, calendarUser, extId);
 			}
 		} catch (Throwable e) {
 			Throwables.propagateIfInstanceOf(e, NotAllowedException.class);
