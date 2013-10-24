@@ -1757,34 +1757,239 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testRemoveEventByExtIdIsDeclined() throws Exception {
+	public void testRemoveEventByExtIdWhenOwnerInInternal() throws Exception {
 		String calendar = "user@test";
-		ObmUser user = ToolBox.getDefaultObmUser();
-		Attendee attendee = UserAttendee.builder().participation(Participation.accepted()).email(user.getEmailAtDomain()).build();
+		ObmUser userOwner = ToolBox.getDefaultObmUser();
+		ObmUser userAttendee = ToolBox.getDefaultObmUserWithEmails("other@test");
+		Attendee organizer = ContactAttendee.builder()
+				.asOrganizer()
+				.email(userOwner.getEmail()).participation(Participation.accepted()).build();
+		Attendee attendee = UserAttendee.builder()
+				.asAttendee()
+				.email(userAttendee.getEmail()).participation(Participation.accepted()).build();
 
-		Event daoEvent = new Event();
-		daoEvent.setInternalEvent(false);
-		daoEvent.addAttendee(attendee);
-		daoEvent.setOwner(calendar);
+		Event event = new Event();
+		event.setType(EventType.VEVENT);
+		event.setInternalEvent(true);
+		event.addAttendees(ImmutableSet.of(organizer, attendee));
+		event.setOwner(organizer.getEmail());
+		event.setUid(new EventObmId(546));
+		event.setExtId(new EventExtId("132"));
 
-		expect(helperService.canWriteOnCalendar(token, user.getEmailAtDomain())).andReturn(true);
-		expect(userService.getUserFromCalendar(user.getEmailAtDomain(), "test.tlse.lng")).andReturn(user).atLeastOnce();
-		expect(userService.getUserFromLogin(daoEvent.getOwner(), "test.tlse.lng")).andReturn(user);
+		expect(helperService.canWriteOnCalendar(token, userOwner.getEmail())).andReturn(true);
+		expect(userService.getUserFromCalendar(userOwner.getEmail(),"test.tlse.lng")).andReturn(userOwner).anyTimes();
+		expect(userService.getUserFromLogin(event.getOwner(),"test.tlse.lng")).andReturn(userOwner);
 
-		expect(calendarDao.findEventByExtId(token, user, daoEvent.getExtId())).andReturn(daoEvent);
-		expect(calendarDao.removeEventByExtId(token, user, daoEvent.getExtId(), 1)).andReturn(daoEvent);
+		expect(calendarDao.findEventByExtId(token, userOwner, event.getExtId())).andReturn(event);
+		expect(calendarDao.removeEventByExtId(token, userOwner, event.getExtId(), 1)).andReturn(event);
 
-		messageQueueService.writeIcsInvitationReply(token, daoEvent, user);
+		messageQueueService.writeIcsInvitationCancel(token, event);
 		expectLastCall();
-		eventNotifier.notifyUpdatedParticipationAttendees(daoEvent, user, Participation.declined(), token);
+		eventNotifier.notifyDeletedEvent(event, token);
 		expectLastCall();
 
 		mocksControl.replay();
-		Event removedEvent = binding.removeEventByExtId(token, calendar, daoEvent.getExtId(), 0, true);
+		binding.removeEventByExtId(token, calendar, event.getExtId(), 0, true);
 		mocksControl.verify();
+	}
 
-		Attendee calendarOwnerAsAttendee = removedEvent.findAttendeeFromEmail(attendee.getEmail());
-		assertThat(calendarOwnerAsAttendee.getParticipation()).isEqualTo(Participation.declined());
+	@Test
+	public void testRemoveEventByExtIdWhenAttendeeInInternal() throws Exception {
+		String calendar = "user@test";
+		ObmUser userAttendee = ToolBox.getDefaultObmUser();
+		ObmUser userOwner = ToolBox.getDefaultObmUserWithEmails("other@test");
+		Attendee organizer = ContactAttendee.builder()
+				.asOrganizer()
+				.email(userOwner.getEmail()).participation(Participation.accepted()).build();
+		Attendee attendee = UserAttendee.builder()
+				.asAttendee()
+				.email(userAttendee.getEmail()).participation(Participation.accepted()).build();
+
+		Event originalEvent = new Event();
+		originalEvent.setType(EventType.VEVENT);
+		originalEvent.setInternalEvent(true);
+		originalEvent.addAttendees(ImmutableSet.of(organizer, attendee));
+		originalEvent.setOwner(organizer.getEmail());
+		originalEvent.setUid(new EventObmId(546));
+		originalEvent.setExtId(new EventExtId("132"));
+		Event changedParticipationEvent = originalEvent.clone();
+		changedParticipationEvent
+			.findAttendeeFromEmail(userAttendee.getEmail())
+			.setParticipation(Participation.declined());
+
+		expect(helperService.canWriteOnCalendar(token, userAttendee.getEmail())).andReturn(true);
+		expect(userService.getUserFromCalendar(userAttendee.getEmail(),"test.tlse.lng")).andReturn(userAttendee).anyTimes();
+		expect(userService.getUserFromLogin(originalEvent.getOwner(),"test.tlse.lng")).andReturn(userOwner);
+
+		expect(calendarDao.findEventByExtId(token, userAttendee, originalEvent.getExtId()))
+			.andReturn(originalEvent).times(2);
+		expect(calendarDao.changeParticipation(token, userAttendee, originalEvent.getExtId(), Participation.declined()))
+			.andReturn(true);
+		expect(calendarDao.findEventByExtId(token, userAttendee, originalEvent.getExtId()))
+			.andReturn(changedParticipationEvent).times(2);
+
+		messageQueueService.writeIcsInvitationReply(token, changedParticipationEvent, userAttendee);
+		expectLastCall();
+		eventNotifier.notifyUpdatedParticipationAttendees(changedParticipationEvent, userAttendee,Participation.declined(), token);
+		expectLastCall();
+
+		mocksControl.replay();
+		binding.removeEventByExtId(token, calendar, originalEvent.getExtId(), 0, true);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testRemoveEventByExtIdWhenAttendeeInExternal() throws Exception {
+		String calendar = "user@test";
+		ObmUser user = ToolBox.getDefaultObmUser();
+
+		Attendee organizer = ContactAttendee.builder()
+				.asOrganizer()
+				.email("contact@domain").participation(Participation.accepted()).build();
+		Attendee attendee = UserAttendee.builder()
+				.asAttendee()
+				.email(user.getEmailAtDomain()).participation(Participation.accepted()).build();
+
+		Event event = new Event();
+		event.setType(EventType.VEVENT);
+		event.setInternalEvent(false);
+		event.addAttendees(ImmutableSet.of(organizer, attendee));
+		event.setOwner(organizer.getEmail());
+		event.setUid(new EventObmId(546));
+		event.setExtId(new EventExtId("132"));
+
+		expect(helperService.canWriteOnCalendar(token, user.getEmailAtDomain())).andReturn(true);
+		expect(userService.getUserFromCalendar(user.getEmailAtDomain(),"test.tlse.lng")).andReturn(user).anyTimes();
+		expect(userService.getUserFromLogin(event.getOwner(),"test.tlse.lng")).andReturn(user);
+
+		expect(calendarDao.findEventByExtId(token, user, event.getExtId())).andReturn(event);
+		expect(calendarDao.removeEventByExtId(token, user, event.getExtId(), 1)).andReturn(event);
+
+		messageQueueService.writeIcsInvitationReply(token, event, user);
+		expectLastCall();
+		eventNotifier.notifyUpdatedParticipationAttendees(event, user,Participation.declined(), token);
+		expectLastCall();
+
+		mocksControl.replay();
+		binding.removeEventByExtId(token, calendar, event.getExtId(), 0, true);
+		mocksControl.verify();
+	}
+
+
+	@Test
+	public void testRemoveEventByIdWhenOwnerInInternal() throws Exception {
+		String calendar = "user@test";
+		ObmUser userOwner = ToolBox.getDefaultObmUser();
+		ObmUser userAttendee = ToolBox.getDefaultObmUserWithEmails("other@test");
+		Attendee organizer = ContactAttendee.builder()
+				.asOrganizer()
+				.email(userOwner.getEmail()).participation(Participation.accepted()).build();
+		Attendee attendee = UserAttendee.builder()
+				.asAttendee()
+				.email(userAttendee.getEmail()).participation(Participation.accepted()).build();
+
+		Event event = new Event();
+		event.setType(EventType.VEVENT);
+		event.setInternalEvent(true);
+		event.addAttendees(ImmutableSet.of(organizer, attendee));
+		event.setOwner(organizer.getEmail());
+		event.setUid(new EventObmId(546));
+		event.setExtId(new EventExtId("132"));
+
+		expect(helperService.canWriteOnCalendar(token, userOwner.getEmail())).andReturn(true);
+		expect(userService.getUserFromCalendar(userOwner.getEmail(),"test.tlse.lng")).andReturn(userOwner).anyTimes();
+		expect(userService.getUserFromLogin(event.getOwner(),"test.tlse.lng")).andReturn(userOwner);
+
+		expect(calendarDao.findEventById(token, event.getObmId())).andReturn(event);
+		expect(calendarDao.removeEventById(token, event.getObmId(), event.getType(), 1)).andReturn(event);
+
+		messageQueueService.writeIcsInvitationCancel(token, event);
+		expectLastCall();
+		eventNotifier.notifyDeletedEvent(event, token);
+		expectLastCall();
+
+		mocksControl.replay();
+		binding.removeEventById(token, calendar, event.getObmId(), 0, true);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testRemoveEventByIdWhenAttendeeInInternal() throws Exception {
+		String calendar = "user@test";
+		ObmUser userAttendee = ToolBox.getDefaultObmUser();
+		ObmUser userOwner = ToolBox.getDefaultObmUserWithEmails("other@test");
+		Attendee organizer = ContactAttendee.builder()
+				.asOrganizer()
+				.email(userOwner.getEmail()).participation(Participation.accepted()).build();
+		Attendee attendee = UserAttendee.builder()
+				.asAttendee()
+				.email(userAttendee.getEmail()).participation(Participation.accepted()).build();
+
+		Event originalEvent = new Event();
+		originalEvent.setType(EventType.VEVENT);
+		originalEvent.setInternalEvent(true);
+		originalEvent.addAttendees(ImmutableSet.of(organizer, attendee));
+		originalEvent.setOwner(organizer.getEmail());
+		originalEvent.setUid(new EventObmId(546));
+		originalEvent.setExtId(new EventExtId("132"));
+		Event changedParticipationEvent = originalEvent.clone();
+		changedParticipationEvent
+			.findAttendeeFromEmail(userAttendee.getEmail())
+			.setParticipation(Participation.declined());
+
+		expect(helperService.canWriteOnCalendar(token, userAttendee.getEmail())).andReturn(true);
+		expect(userService.getUserFromCalendar(userAttendee.getEmail(),"test.tlse.lng")).andReturn(userAttendee).anyTimes();
+		expect(userService.getUserFromLogin(originalEvent.getOwner(),"test.tlse.lng")).andReturn(userOwner);
+
+		expect(calendarDao.findEventById(token, originalEvent.getObmId())).andReturn(originalEvent);
+		expect(calendarDao.findEventByExtId(token, userAttendee, originalEvent.getExtId())).andReturn(originalEvent);
+		expect(calendarDao.changeParticipation(token, userAttendee, originalEvent.getExtId(), Participation.declined())).andReturn(true);
+		expect(calendarDao.findEventByExtId(token, userAttendee, originalEvent.getExtId())).andReturn(changedParticipationEvent);
+
+		messageQueueService.writeIcsInvitationReply(token, changedParticipationEvent, userAttendee);
+		expectLastCall();
+		eventNotifier.notifyUpdatedParticipationAttendees(changedParticipationEvent, userAttendee,Participation.declined(), token);
+		expectLastCall();
+
+		mocksControl.replay();
+		binding.removeEventById(token, calendar, originalEvent.getObmId(), 0, true);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testRemoveEventByIdWhenAttendeeInExternal() throws Exception {
+		String calendar = "user@test";
+		ObmUser user = ToolBox.getDefaultObmUser();
+		Attendee organizer = ContactAttendee.builder()
+				.asOrganizer()
+				.email("contact@domain").participation(Participation.accepted()).build();
+		Attendee attendee = UserAttendee.builder()
+				.asAttendee()
+				.email(user.getEmail()).participation(Participation.accepted()).build();
+
+		Event event = new Event();
+		event.setType(EventType.VEVENT);
+		event.setInternalEvent(false);
+		event.addAttendees(ImmutableSet.of(organizer, attendee));
+		event.setOwner(organizer.getEmail());
+		event.setUid(new EventObmId(546));
+		event.setExtId(new EventExtId("132"));
+
+		expect(helperService.canWriteOnCalendar(token, user.getEmail())).andReturn(true);
+		expect(userService.getUserFromCalendar(user.getEmail(),"test.tlse.lng")).andReturn(user).anyTimes();
+		expect(userService.getUserFromLogin(event.getOwner(),"test.tlse.lng")).andReturn(user);
+
+		expect(calendarDao.findEventById(token, event.getObmId())).andReturn(event);
+		expect(calendarDao.removeEventById(token, event.getObmId(), event.getType(), 1)).andReturn(event);
+
+		messageQueueService.writeIcsInvitationReply(token, event, user);
+		expectLastCall();
+		eventNotifier.notifyUpdatedParticipationAttendees(event, user,Participation.declined(), token);
+		expectLastCall();
+
+		mocksControl.replay();
+		binding.removeEventById(token, calendar, event.getObmId(), 0, true);
+		mocksControl.verify();
 	}
 
 	@Test
