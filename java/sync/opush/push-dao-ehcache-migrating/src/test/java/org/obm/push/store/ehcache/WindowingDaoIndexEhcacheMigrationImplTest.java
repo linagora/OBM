@@ -41,7 +41,6 @@ import net.sf.ehcache.migrating.Element;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
@@ -54,8 +53,6 @@ import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl.WindowingIndex;
 import org.slf4j.Logger;
 
-
-@Ignore
 @RunWith(SlowFilterRunner.class) @Slow
 public class WindowingDaoIndexEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
