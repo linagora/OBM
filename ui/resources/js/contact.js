@@ -193,13 +193,6 @@ Obm.Contact.AddressBook = new Class ({
 
   deleteContact: function(id, name) {
     if(confirm(obm.vars.labels.confirmDeleteContact+' \''+name+'\' ?')){
-      //FIXME
-      //this.addressBookRequest.addEvent('success', function() {
-      //  showOkMessage(obm.vars.labels.deleteOk);
-      //});      
-      this.dataRequest.addEvent('complete', function() {
-        window.location.href =  obm.vars.consts.obmUrl + '/contact/contact_index.php';
-      });
       this.dataRequest.write({ajax:1, action:'deleteContact', 'id':id, searchpattern : this.addressbook.retrieve('search'), contactfilter : document.getElement('input[id=contactfilter]').get('value')});
     }
   },
