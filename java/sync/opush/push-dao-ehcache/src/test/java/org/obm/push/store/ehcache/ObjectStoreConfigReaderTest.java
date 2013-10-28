@@ -34,7 +34,7 @@ package org.obm.push.store.ehcache;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.Map;

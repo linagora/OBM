@@ -32,7 +32,7 @@
 package fr.aliacom.obm.common.user;
 
 import static fr.aliacom.obm.common.user.ObmUser.EMAIL_FIELD_SEPARATOR;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;

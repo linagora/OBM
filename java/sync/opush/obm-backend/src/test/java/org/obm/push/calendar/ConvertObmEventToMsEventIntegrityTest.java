@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 import static org.obm.push.calendar.ObmEventToMSEventConverter.ACTIVESYNC_DEFAULT_FREQUENCY;
 

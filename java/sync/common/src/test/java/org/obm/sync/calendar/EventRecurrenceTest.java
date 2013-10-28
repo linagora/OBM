@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

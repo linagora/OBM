@@ -29,7 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.domain;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

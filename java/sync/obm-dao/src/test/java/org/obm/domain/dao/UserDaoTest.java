@@ -34,7 +34,7 @@ import static org.easymock.EasyMock.createMockBuilder;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -390,6 +390,6 @@ public class UserDaoTest {
 			.gidNumber(1000)
 			.build();
 		
-		assertThat(obmUser).isEqualsToByComparingFields(expectedObmUser);
+		assertThat(obmUser).isEqualToComparingFieldByField(expectedObmUser);
 	}
 }

@@ -42,7 +42,7 @@ import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.field.address.LenientAddressBuilder;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

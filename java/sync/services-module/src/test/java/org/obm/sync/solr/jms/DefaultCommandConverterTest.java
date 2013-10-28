@@ -32,7 +32,7 @@ package org.obm.sync.solr.jms;
 import static org.easymock.EasyMock.*;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.locator.store.LocatorService;

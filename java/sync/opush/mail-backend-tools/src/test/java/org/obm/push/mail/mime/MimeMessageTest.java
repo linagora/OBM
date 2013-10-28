@@ -32,11 +32,11 @@
 package org.obm.push.mail.mime;
 
 import static org.easymock.EasyMock.createMock;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public class MimeMessageTest {

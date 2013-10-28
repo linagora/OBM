@@ -35,13 +35,12 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-import org.fest.assertions.data.MapEntry;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -93,8 +92,8 @@ public class ContactDaoTest {
 		contactDao.loadEmailInContact(contacts, rs);
 		verify(rs);
 		
-		assertThat(contact2.getEmails()).contains(
-				MapEntry.entry("INTERNET;X-OBM-Ref1", EmailAddress.loginAtDomain("user@domain")));
+		assertThat(contact2.getEmails())
+			.containsEntry("INTERNET;X-OBM-Ref1", EmailAddress.loginAtDomain("user@domain"));
 	}
 
 	@Test
@@ -117,9 +116,9 @@ public class ContactDaoTest {
 		contactDao.loadEmailInContact(contacts, rs);
 		verify(rs);
 		
-		assertThat(contact2.getEmails()).contains(
-				MapEntry.entry("INTERNET;X-OBM-Ref1", EmailAddress.loginAtDomain("user@domain")),
-				MapEntry.entry("INTERNET;X-OBM-Ref2", EmailAddress.loginAtDomain("user2@domain")));
+		assertThat(contact2.getEmails())
+			.containsEntry("INTERNET;X-OBM-Ref1", EmailAddress.loginAtDomain("user@domain"))
+			.containsEntry("INTERNET;X-OBM-Ref2", EmailAddress.loginAtDomain("user2@domain"));
 	}
 
 	@Test
@@ -142,8 +141,8 @@ public class ContactDaoTest {
 		contactDao.loadEmailInContact(contacts, rs);
 		verify(rs);
 		
-		assertThat(contact2.getEmails()).contains(
-				MapEntry.entry("INTERNET;X-OBM-Ref1", EmailAddress.loginAtDomain("user2@domain")));
+		assertThat(contact2.getEmails())
+			.containsEntry("INTERNET;X-OBM-Ref1", EmailAddress.loginAtDomain("user2@domain"));
 	}
 
 	@Test

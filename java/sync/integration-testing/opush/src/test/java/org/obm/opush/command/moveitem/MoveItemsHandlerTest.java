@@ -32,7 +32,7 @@
 package org.obm.opush.command.moveitem;
 
 import static org.easymock.EasyMock.expect;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 

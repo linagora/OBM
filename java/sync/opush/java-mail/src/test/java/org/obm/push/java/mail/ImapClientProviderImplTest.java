@@ -33,7 +33,7 @@ package org.obm.push.java.mail;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;

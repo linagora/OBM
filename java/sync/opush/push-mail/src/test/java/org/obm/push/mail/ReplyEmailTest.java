@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.push.mail.MSMailTestsUtils.loadMimeMessage;
 import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfigurationService;
 

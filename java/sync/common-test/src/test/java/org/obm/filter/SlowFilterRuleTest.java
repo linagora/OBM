@@ -32,7 +32,7 @@
 package org.obm.filter;
 
 import static org.easymock.EasyMock.*;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.annotation.Annotation;
 

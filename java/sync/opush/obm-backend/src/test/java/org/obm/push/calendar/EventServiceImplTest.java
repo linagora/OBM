@@ -43,7 +43,7 @@ import java.io.InputStream;
 import java.util.Date;
 
 import org.easymock.IMocksControl;
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.icalendar.Ical4jHelper;

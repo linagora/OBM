@@ -34,7 +34,7 @@ package org.obm.push.utils.stream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
