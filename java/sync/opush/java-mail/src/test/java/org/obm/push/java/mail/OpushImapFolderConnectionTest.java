@@ -40,7 +40,7 @@ import static org.easymock.EasyMock.verify;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import com.sun.mail.imap.IMAPFolder;

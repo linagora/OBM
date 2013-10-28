@@ -32,7 +32,7 @@
 package org.obm.push.calendar;
 
 import static org.easymock.EasyMock.createMock;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -43,7 +43,7 @@ import java.util.Properties;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;

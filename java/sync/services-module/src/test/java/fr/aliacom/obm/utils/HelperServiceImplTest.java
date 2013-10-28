@@ -32,12 +32,12 @@
 package fr.aliacom.obm.utils;
 
 import static org.easymock.EasyMock.createControl;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 
 import org.easymock.IMocksControl;
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

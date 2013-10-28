@@ -34,7 +34,7 @@ package org.obm.push.mail.imap.testsuite;
 import java.util.Date;
 import java.util.Set;
 
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

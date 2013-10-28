@@ -31,7 +31,7 @@ package org.obm.sync.metadata;
 
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.easymock.IMocksControl;

@@ -33,7 +33,7 @@ package org.obm.push;
 
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
 import org.easymock.IMocksControl;

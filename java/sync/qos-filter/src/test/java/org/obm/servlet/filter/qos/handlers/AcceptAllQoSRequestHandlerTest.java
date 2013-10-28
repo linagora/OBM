@@ -30,7 +30,7 @@
 package org.obm.servlet.filter.qos.handlers;
 
 import static org.easymock.EasyMock.createMock;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

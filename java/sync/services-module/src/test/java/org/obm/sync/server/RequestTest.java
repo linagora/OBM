@@ -34,7 +34,7 @@ package org.obm.sync.server;
 import javax.servlet.http.HttpServletRequest;
 
 import org.easymock.EasyMock;
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public class RequestTest {
