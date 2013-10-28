@@ -30,7 +30,7 @@
 package org.obm.sync.calendar;
 
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.obm.DateUtils.date;
+import static org.obm.sync.calendar.CalendarUtils.newEvent;
 
 import java.net.URL;
 
@@ -143,24 +143,5 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 
 		assertThat(firstEvent.getObmId()).isNotNull();
 		assertThat(secondEvent.getObmId()).isNotNull().isNotEqualTo(firstEvent.getObmId());
-	}
-
-	private Event newEvent(String calendar, String owner, String extId) {
-		Event event = new Event();
-
-		event.setTitle("Title_" + extId);
-		event.setOwner(owner);
-		event.setOwnerDisplayName(owner);
-		event.setCategory("");
-		event.setDescription("");
-		event.setLocation("");
-		event.setPriority(0);
-		event.setInternalEvent(true);
-		event.setOwnerEmail(calendar);
-		event.setExtId(new EventExtId(extId));
-		event.setStartDate(date("2013-06-01T12:00:00"));
-		event.addAttendee(UnidentifiedAttendee.builder().email(calendar).participation(Participation.accepted()).asOrganizer().build());
-
-		return event;
 	}
 }
