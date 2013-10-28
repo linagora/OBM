@@ -33,10 +33,9 @@ package org.obm.sync;
 
 import java.io.Serializable;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-
 import org.apache.commons.io.FileUtils;
+import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
+import org.hornetq.core.remoting.impl.netty.TransportConstants;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule;
 import org.obm.configuration.DatabaseConfiguration;
@@ -50,25 +49,20 @@ import org.obm.sync.solr.SolrRequest;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
 
-import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
 import com.linagora.obm.sync.HornetQConfiguration;
-import com.linagora.obm.sync.Producer;
 
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class ModuleUtils {
 
-	public static Module buildDummyConfigurationModule() {
+	public static Module buildDummyConfigurationModule(final Configuration configuration) {
 		return new AbstractModule() {
 
 			@Override
 			protected void configure() {
-				final Configuration configuration = new Configuration();
-				configuration.locatorUrl = "localhost";
-				configuration.dataDir = Files.createTempDir();
 				Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
 				lifecycleListeners.addBinding().toInstance(new LifecycleListener() {
 					@Override
@@ -104,7 +98,7 @@ public class ModuleUtils {
 		};
 	}
 	
-	public static Module buildDummyJmsModule() {
+	public static Module buildDummySolrModule() {
 		return new AbstractModule() {
 
 			@Override
@@ -122,23 +116,32 @@ public class ModuleUtils {
 						};
 					}
 				});
-				bind(Producer.class).toInstance(new Producer(null, null) {
+			}
+		};
+	}
 
-					@Override
-					public void write(String message) throws JMSException {
-						// do nothing
-					}
-
-					@Override
-					public void send(Message message) throws JMSException {
-						// do nothing
-					}
-
-					@Override
-					public void close() throws JMSException {
-						// do nothing
-					}
-				});
+	public static Module buildSocketJMSModule(final Configuration configuration) {
+		return new AbstractModule() {
+			
+			@Override
+			protected void configure() {
+				String jmsDataDirectory = configuration.dataDir + "/" + "jms/data";
+				bind(org.hornetq.core.config.Configuration.class).toInstance(
+						HornetQConfiguration.configuration()
+						.enablePersistence(true)
+						.enableSecurity(false)
+						.largeMessagesDirectory(jmsDataDirectory + "/large-messages")
+						.bindingsDirectory(jmsDataDirectory + "/bindings")
+						.journalDirectory(jmsDataDirectory + "/journal")
+						.connector(HornetQConfiguration.Connector.HornetQInVMCore)
+						.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
+						.acceptor(HornetQConfiguration.acceptorBuilder()
+							.name("obmAcceptor")
+							.factory(NettyAcceptorFactory.class)
+							.param(TransportConstants.HOST_PROP_NAME, "127.0.0.1")
+							.param(TransportConstants.PORT_PROP_NAME, 5446)
+							.build())
+						.build());
 			}
 		};
 	}

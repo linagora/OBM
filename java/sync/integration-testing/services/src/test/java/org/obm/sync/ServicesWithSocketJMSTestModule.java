@@ -29,51 +29,37 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.calendar;
+package org.obm.sync;
 
 import javax.servlet.ServletContext;
 
-import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.domain.dao.DaoModule;
-import org.obm.sync.DatabaseMetadataModule;
-import org.obm.sync.DatabaseModule;
-import org.obm.sync.MessageQueueModule;
-import org.obm.sync.ModuleUtils;
-import org.obm.sync.ObmSyncServicesModule;
-import org.obm.sync.ObmSyncServletModule;
-import org.obm.sync.SolrJmsModule;
+import org.obm.Configuration;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
-public class CalendarBindingImplIntegrationTestModule extends AbstractModule {
-	
-	public CalendarBindingImplIntegrationTestModule(@SuppressWarnings("unused") ServletContext servletContext) {
-	}
+public class ServicesWithSocketJMSTestModule extends AbstractModule {
 
+	private final ServletContext servletContext;
+
+	public ServicesWithSocketJMSTestModule(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
+		
 	@Override
 	protected void configure() {
-		OverriddenModuleBuilder override = Modules.override(
-				new ObmSyncServletModule(),
-				new ObmSyncServicesModule(),
-				new MessageQueueModule(),
-				new TransactionalModule(),
-				new DatabaseModule(),
-				new DaoModule(),
-				new SolrJmsModule(),
-				new DatabaseMetadataModule());
+		ServicesTestModule servicesModule = new ServicesTestModule(servletContext);
+		OverriddenModuleBuilder override = Modules.override(servicesModule);
 		try {
-			install(override.with(overrideModule()));
+			install(override.with(overrideModule(servicesModule.configuration)));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public Module overrideModule() {
-		return Modules.combine(
-				ModuleUtils.buildDummyConfigurationModule(),
-				ModuleUtils.buildDummyJmsModule());
+	public Module overrideModule(Configuration configuration) {
+		return ModuleUtils.buildSocketJMSModule(configuration);
 	}
 }
