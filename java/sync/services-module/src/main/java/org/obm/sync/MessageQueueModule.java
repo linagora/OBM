@@ -51,6 +51,10 @@ import com.linagora.obm.sync.QueueManager;
 
 public class MessageQueueModule extends AbstractModule {
 
+	public static final String TOPIC_NAME_CONTACT = "contactChanges";
+	public static final String TOPIC_NAME_CALENDAR = "calendarChanges";
+	public static final String TOPIC_NAME_EVENT = "eventChanges";
+	
 	private static final String EVENT_CHANGES_TOPIC = "/topic/eventChanges";
 	
 	public MessageQueueModule() {
@@ -88,9 +92,9 @@ public class MessageQueueModule extends AbstractModule {
 					.connector(HornetQConfiguration.Connector.HornetQInVMCore)
 					.binding("ConnectionFactory")
 					.build())
-			.topic("eventChanges", EVENT_CHANGES_TOPIC)
-			.topic("calendarChanges", SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName())
-			.topic("contactChanges", SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName())
+			.topic(TOPIC_NAME_EVENT, EVENT_CHANGES_TOPIC)
+			.topic(TOPIC_NAME_CALENDAR, SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName())
+			.topic(TOPIC_NAME_CONTACT, SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName())
 			.build();
 	}
 	

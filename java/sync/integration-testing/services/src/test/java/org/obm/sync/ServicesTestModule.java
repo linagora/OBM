@@ -29,28 +29,35 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.calendar;
+package org.obm.sync;
 
 import javax.servlet.ServletContext;
 
+import org.obm.Configuration;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.domain.dao.DaoModule;
 import org.obm.sync.DatabaseMetadataModule;
 import org.obm.sync.DatabaseModule;
 import org.obm.sync.MessageQueueModule;
-import org.obm.sync.ModuleUtils;
 import org.obm.sync.ObmSyncServicesModule;
 import org.obm.sync.ObmSyncServletModule;
 import org.obm.sync.SolrJmsModule;
 
+import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
 import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
-public class CalendarBindingImplIntegrationTestModule extends AbstractModule {
+public class ServicesTestModule extends AbstractModule {
 	
-	public CalendarBindingImplIntegrationTestModule(@SuppressWarnings("unused") ServletContext servletContext) {
+	public final Configuration configuration;
+
+	public ServicesTestModule(@SuppressWarnings("unused") ServletContext servletContext) {
+		configuration = new Configuration();
+		configuration.obmUiBaseUrl = "localhost";
+		configuration.locatorUrl = "localhost";
+		configuration.dataDir = Files.createTempDir();
 	}
 
 	@Override
@@ -73,8 +80,8 @@ public class CalendarBindingImplIntegrationTestModule extends AbstractModule {
 
 	public Module overrideModule() {
 		return Modules.combine(
-				ModuleUtils.buildDummyConfigurationModule(),
+				ModuleUtils.buildDummyConfigurationModule(configuration),
 				ModuleUtils.buildDummySmtpModule(),
-				ModuleUtils.buildDummyJmsModule());
+				ModuleUtils.buildDummySolrModule());
 	}
 }
