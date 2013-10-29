@@ -501,13 +501,35 @@ class Perm {
       $is_peer_self = ($user_entity_id === $peer_entity_id);
       $is_peer_self_or_new_entity = ($peer_entity_id === null);
       if (!$is_peer_self && !$is_peer_self_or_new_entity) {
-        return self::user_profile_can_edit_peer_profile($user_profile, $peer_profile);
+        $can_edit_peer_profile = self::user_profile_can_edit_peer_profile($user_profile, $peer_profile);
+        if ($user_profile['name'] === 'admin_delegue') {
+          return $can_edit_peer_profile && self::has_delegation_over_peer($user_entity_id, $peer_entity_id);
+        }
+        else {
+          return $can_edit_peer_profile;
+        }
       }
       else {
         return true;
       }
   }
 
+  function has_delegation_over_peer($user_entity_id, $peer_entity_id) {
+    $obm_q = new DB_OBM;
+    $obm_q->query("SELECT userobm_delegation_target FROM userobm WHERE userobm_id=$user_entity_id");
+    if ($obm_q->next_record()) {
+      $delegation_target = $obm_q->f("userobm_delegation_target");
+      if (empty($delegation_target)) {
+        return false;
+      }
+      $obm_q->query("SELECT userobm_delegation FROM userobm WHERE userobm_id=$peer_entity_id");
+      if ($obm_q->next_record()) {
+        $delegation = $obm_q->f("userobm_delegation");
+        return strpos($delegation, $delegation_target);
+      }
+    }
+    return false;
+  }
 
   function user_profile_can_edit_peer_profile($user_profile, $peer_profile) {
     $user_privilege = array_key_exists('level', $user_profile) ? $user_profile['level'] : $user_profile['properties']['level'];
