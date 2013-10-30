@@ -33,8 +33,53 @@ package org.obm.sync.calendar;
 
 import static org.obm.DateUtils.date;
 
+import java.util.Comparator;
+
+import com.google.common.base.Objects;
+
 public class CalendarUtils {
 
+	public static Comparator<? super Event> ignoreDatabaseElementsComparator() {
+		return new Comparator<Event>() {
+	
+			@Override
+			public int compare(Event one, Event two) {
+				boolean equalityIgnoringDatabaseElements = 
+					Objects.equal(one.getTitle(), two.getTitle())
+					&& Objects.equal(one.getDescription(), two.getDescription())
+					&& Objects.equal(one.getExtId(), two.getExtId())
+					&& Objects.equal(one.getPrivacy(), two.getPrivacy())
+					&& Objects.equal(one.getMeetingStatus(), two.getMeetingStatus())
+					&& Objects.equal(one.getOwner(), two.getOwner())
+					&& Objects.equal(one.getOwnerDisplayName(), two.getOwnerDisplayName())
+					&& Objects.equal(one.getOwnerEmail(), two.getOwnerEmail())
+					&& Objects.equal(one.getCreatorDisplayName(), two.getCreatorDisplayName())
+					&& Objects.equal(one.getCreatorEmail(), two.getCreatorEmail())
+					&& Objects.equal(one.getLocation(), two.getLocation())
+					&& Objects.equal(one.getStartDate(), two.getStartDate())
+					&& Objects.equal(one.getDuration(), two.getDuration())
+					&& Objects.equal(one.getAlert(), two.getAlert())
+					&& Objects.equal(one.getCategory(), two.getCategory())
+					&& Objects.equal(one.getPriority(), two.getPriority())
+					&& Objects.equal(one.isAllday(), two.isAllday())
+					&& Objects.equal(one.getAttendees(), two.getAttendees())
+					&& Objects.equal(one.getRecurrence(), two.getRecurrence())
+					&& Objects.equal(one.getType(), two.getType())
+					&& Objects.equal(one.getOpacity(), two.getOpacity())
+					&& Objects.equal(one.getEntityId(), two.getEntityId())
+					&& Objects.equal(one.getTimezoneName(), two.getTimezoneName())
+					&& Objects.equal(one.getRecurrenceId(), two.getRecurrenceId())
+					&& Objects.equal(one.isInternalEvent(), two.isInternalEvent())
+					&& Objects.equal(one.getSequence(), two.getSequence());
+					
+				if (equalityIgnoringDatabaseElements) {
+					return 0;
+				}
+				return 1;
+			}
+		};
+	}
+	
 	public static Event newEvent(String calendar, String owner, String extId) {
 		Event event = new Event();
 

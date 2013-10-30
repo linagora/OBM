@@ -63,7 +63,7 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 
 		Event eventFromServer = calendarClient.getEventFromExtId(token, calendar, event.getExtId());
 
-		assertThat(eventFromServer).usingComparator(ignoreDatabaseElementsComparator()).isEqualTo(event);
+		assertThat(eventFromServer).usingComparator(CalendarUtils.ignoreDatabaseElementsComparator()).isEqualTo(event);
 	}
 
 	@Test
@@ -81,7 +81,7 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 
 		Event eventFromServer = calendarClient.getEventFromExtId(token, calendar, event.getExtId());
 
-		assertThat(eventFromServer).usingComparator(ignoreDatabaseElementsComparator()).isEqualTo(event);
+		assertThat(eventFromServer).usingComparator(CalendarUtils.ignoreDatabaseElementsComparator()).isEqualTo(event);
 	}
 
 	@Test(expected = EventAlreadyExistException.class)
@@ -120,7 +120,7 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 		} catch (Exception e) {
 			getEventWithSecondExtIdException = e;
 		}
-		assertThat(eventFromServer).usingComparator(ignoreDatabaseElementsComparator()).isEqualTo(event);
+		assertThat(eventFromServer).usingComparator(CalendarUtils.ignoreDatabaseElementsComparator()).isEqualTo(event);
 		assertThat(getEventWithSecondExtIdException).isInstanceOf(EventNotFoundException.class);
 	}
 
