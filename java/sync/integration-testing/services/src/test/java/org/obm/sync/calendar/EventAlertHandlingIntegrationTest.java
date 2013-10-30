@@ -41,28 +41,42 @@ import java.util.List;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
+import org.obm.guice.GuiceModule;
 import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.ObmSyncIntegrationTest;
+import org.obm.sync.ServicesClientModule;
+import org.obm.sync.ServicesClientModule.ClientTestConfiguration;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.client.calendar.CalendarClient;
+import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.items.EventChanges;
 
 import com.google.common.collect.Iterables;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
+@GuiceModule(ServicesClientModule.class)
 public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
+	private String calendar;
+
+	@Before
+	public void setUp() {
+		calendar = "user1@domain.org";
+	}
+	
 	@Test
 	@RunAsClient
 	public void testCreateEventCreatesAlert(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String calendar = "user1@domain.org";
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		AccessToken token = injector.getInstance(LoginClient.class).login(calendar, "user1");
+		
 		Event event = newEventWithAlert(calendar, "1", 30);
-
-		AccessToken token = loginClient.login(calendar, "user1");
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, event, false, null);
 		Event eventFromServer = calendarClient.getEventFromId(token, calendar, eventObmId);
 
@@ -72,15 +86,16 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testCreateEventInDelegationCreatesAlertForBothUsers(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, "2", 30);
-
-		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		
+		Event event = newEventWithAlert(calendar, "2", 30);
+		AccessToken user1Token = loginClient.login(calendar, "user1");
 		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
-		EventObmId eventObmId = calendarClient.createEvent(user2Token, user1Calendar, event, false, null);
-		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, user1Calendar, eventObmId);
-		Event eventFromServerAsUser2 = calendarClient.getEventFromId(user2Token, user1Calendar, eventObmId);
+		EventObmId eventObmId = calendarClient.createEvent(user2Token, calendar, event, false, null);
+		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, calendar, eventObmId);
+		Event eventFromServerAsUser2 = calendarClient.getEventFromId(user2Token, calendar, eventObmId);
 
 		assertThat(eventFromServerAsUser1.getAlert()).isEqualTo(30);
 		assertThat(eventFromServerAsUser2.getAlert()).isEqualTo(30);
@@ -89,11 +104,11 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testModifyEventModifiesAlert(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String calendar = "user1@domain.org";
-		Event event = newEventWithAlert(calendar, "3", 30);
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		AccessToken token = injector.getInstance(LoginClient.class).login(calendar, "user1");
 
-		AccessToken token = loginClient.login(calendar, "user1");
+		Event event = newEventWithAlert(calendar, "3", 30);
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, event, false, null);
 
 		event.setAlert(60);
@@ -107,19 +122,20 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testModifyEventInDelegationModifiesAlertForBothUsers(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, "4", 30);
-
-		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		
+		Event event = newEventWithAlert(calendar, "4", 30);
+		AccessToken user1Token = loginClient.login(calendar, "user1");
 		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
-		EventObmId eventObmId = calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+		EventObmId eventObmId = calendarClient.createEvent(user1Token, calendar, event, false, null);
 
 		event.setAlert(60);
-		calendarClient.modifyEvent(user2Token, user1Calendar, event, false, false);
+		calendarClient.modifyEvent(user2Token, calendar, event, false, false);
 
-		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, user1Calendar, eventObmId);
-		Event eventFromServerAsUser2 = calendarClient.getEventFromId(user2Token, user1Calendar, eventObmId);
+		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, calendar, eventObmId);
+		Event eventFromServerAsUser2 = calendarClient.getEventFromId(user2Token, calendar, eventObmId);
 
 		assertThat(eventFromServerAsUser1.getAlert()).isEqualTo(60);
 		assertThat(eventFromServerAsUser2.getAlert()).isEqualTo(60);
@@ -128,16 +144,17 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetEventFromId(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, "5", 30);
-
-		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		
+		Event event = newEventWithAlert(calendar, "5", 30);
+		AccessToken user1Token = loginClient.login(calendar, "user1");
 		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
-		EventObmId eventObmId = calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+		EventObmId eventObmId = calendarClient.createEvent(user1Token, calendar, event, false, null);
 
-		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, user1Calendar, eventObmId);
-		Event eventFromServerAsUser2 = calendarClient.getEventFromId(user2Token, user1Calendar, eventObmId);
+		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, calendar, eventObmId);
+		Event eventFromServerAsUser2 = calendarClient.getEventFromId(user2Token, calendar, eventObmId);
 
 		assertThat(eventFromServerAsUser1.getAlert()).isEqualTo(30);
 		assertThat(eventFromServerAsUser2.getAlert()).isEqualTo(30);
@@ -146,18 +163,19 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSync(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, "6", 30);
-
-		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		
+		Event event = newEventWithAlert(calendar, "6", 30);
+		AccessToken user1Token = loginClient.login(calendar, "user1");
 		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
-		Date lastSync = calendarClient.getSync(user1Token, user1Calendar, null).getLastSync();
+		Date lastSync = calendarClient.getSync(user1Token, calendar, null).getLastSync();
 
-		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+		calendarClient.createEvent(user1Token, calendar, event, false, null);
 
-		EventChanges eventChangesFromServerAsUser1 = calendarClient.getSync(user1Token, user1Calendar, lastSync);
-		EventChanges eventChangesFromServerAsUser2 = calendarClient.getSync(user2Token, user1Calendar, lastSync);
+		EventChanges eventChangesFromServerAsUser1 = calendarClient.getSync(user1Token, calendar, lastSync);
+		EventChanges eventChangesFromServerAsUser2 = calendarClient.getSync(user2Token, calendar, lastSync);
 
 		assertThat(Iterables.getFirst(eventChangesFromServerAsUser1.getUpdated(), null).getAlert()).isEqualTo(30);
 		assertThat(Iterables.getFirst(eventChangesFromServerAsUser2.getUpdated(), null).getAlert()).isEqualTo(30);
@@ -166,18 +184,19 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSyncWithSortedChanges(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, "7", 30);
-
-		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		
+		Event event = newEventWithAlert(calendar, "7", 30);
+		AccessToken user1Token = loginClient.login(calendar, "user1");
 		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
-		Date lastSync = calendarClient.getSync(user1Token, user1Calendar, null).getLastSync();
+		Date lastSync = calendarClient.getSync(user1Token, calendar, null).getLastSync();
 
-		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+		calendarClient.createEvent(user1Token, calendar, event, false, null);
 
-		EventChanges eventChangesFromServerAsUser1 = calendarClient.getSyncWithSortedChanges(user1Token, user1Calendar, lastSync, null);
-		EventChanges eventChangesFromServerAsUser2 = calendarClient.getSyncWithSortedChanges(user2Token, user1Calendar, lastSync, null);
+		EventChanges eventChangesFromServerAsUser1 = calendarClient.getSyncWithSortedChanges(user1Token, calendar, lastSync, null);
+		EventChanges eventChangesFromServerAsUser2 = calendarClient.getSyncWithSortedChanges(user2Token, calendar, lastSync, null);
 
 		assertThat(Iterables.getFirst(eventChangesFromServerAsUser1.getUpdated(), null).getAlert()).isEqualTo(30);
 		assertThat(Iterables.getFirst(eventChangesFromServerAsUser2.getUpdated(), null).getAlert()).isEqualTo(30);
@@ -186,17 +205,18 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetEventFromExtId(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, "8", 30);
-
-		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		
+		Event event = newEventWithAlert(calendar, "8", 30);
+		AccessToken user1Token = loginClient.login(calendar, "user1");
 		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
 
-		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+		calendarClient.createEvent(user1Token, calendar, event, false, null);
 
-		Event eventFromServerAsUser1 = calendarClient.getEventFromExtId(user1Token, user1Calendar, event.getExtId());
-		Event eventFromServerAsUser2 = calendarClient.getEventFromExtId(user2Token, user1Calendar, event.getExtId());
+		Event eventFromServerAsUser1 = calendarClient.getEventFromExtId(user1Token, calendar, event.getExtId());
+		Event eventFromServerAsUser2 = calendarClient.getEventFromExtId(user2Token, calendar, event.getExtId());
 
 		assertThat(eventFromServerAsUser1.getAlert()).isEqualTo(30);
 		assertThat(eventFromServerAsUser2.getAlert()).isEqualTo(30);
@@ -205,18 +225,19 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetListEventsFromIntervalDate(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, "9", 30, "2013-07-01T12:00:00Z");
-
-		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		
+		Event event = newEventWithAlert(calendar, "9", 30, "2013-07-01T12:00:00Z");
+		AccessToken user1Token = loginClient.login(calendar, "user1");
 		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
 		Date start = date("2013-07-01T11:00:00Z"), end = date("2013-07-01T13:00:00Z");
 
-		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+		calendarClient.createEvent(user1Token, calendar, event, false, null);
 
-		List<Event> eventsFromServerAsUser1 = calendarClient.getListEventsFromIntervalDate(user1Token, user1Calendar, start, end);
-		List<Event> eventsFromServerAsUser2 = calendarClient.getListEventsFromIntervalDate(user2Token, user1Calendar, start, end);
+		List<Event> eventsFromServerAsUser1 = calendarClient.getListEventsFromIntervalDate(user1Token, calendar, start, end);
+		List<Event> eventsFromServerAsUser2 = calendarClient.getListEventsFromIntervalDate(user2Token, calendar, start, end);
 
 		assertThat(eventsFromServerAsUser1.get(0).getAlert()).isEqualTo(30);
 		assertThat(eventsFromServerAsUser2.get(0).getAlert()).isEqualTo(30);
@@ -225,18 +246,19 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_ModifyEvent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, "10", 30);
-
-		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		
+		Event event = newEventWithAlert(calendar, "10", 30);
+		AccessToken user1Token = loginClient.login(calendar, "user1");
 		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
 
-		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+		calendarClient.createEvent(user1Token, calendar, event, false, null);
 
 		event.setTitle("ModifiedTitle");
 
-		Event eventFromServerAsUser2 = calendarClient.modifyEvent(user2Token, user1Calendar, event, false, false);
+		Event eventFromServerAsUser2 = calendarClient.modifyEvent(user2Token, calendar, event, false, false);
 
 		assertThat(eventFromServerAsUser2.getAlert()).isEqualTo(30);
 	}
@@ -244,16 +266,17 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithReadOnlyAccessDoesntInheritAlertFromEventOwner(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, "11", 30);
-
-		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		
+		Event event = newEventWithAlert(calendar, "11", 30);
+		AccessToken user1Token = loginClient.login(calendar, "user1");
 		AccessToken user3Token = loginClient.login("user3@domain.org", "user3");
-		EventObmId eventObmId = calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+		EventObmId eventObmId = calendarClient.createEvent(user1Token, calendar, event, false, null);
 
-		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, user1Calendar, eventObmId);
-		Event eventFromServerAsUser3 = calendarClient.getEventFromId(user3Token, user1Calendar, eventObmId);
+		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, calendar, eventObmId);
+		Event eventFromServerAsUser3 = calendarClient.getEventFromId(user3Token, calendar, eventObmId);
 
 		assertThat(eventFromServerAsUser1.getAlert()).isEqualTo(30);
 		assertThat(eventFromServerAsUser3.getAlert()).isNull();
@@ -262,18 +285,19 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSyncEventDate(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
-		String user1Calendar = "user1@domain.org";
-		Event event = newEventWithAlert(user1Calendar, "12", 30, "2013-07-01T12:00:00Z");
-
-		AccessToken user1Token = loginClient.login(user1Calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		
+		Event event = newEventWithAlert(calendar, "12", 30, "2013-07-01T12:00:00Z");
+		AccessToken user1Token = loginClient.login(calendar, "user1");
 		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
 		Date start = date("2013-07-01T11:00:00Z");
 
-		calendarClient.createEvent(user1Token, user1Calendar, event, false, null);
+		calendarClient.createEvent(user1Token, calendar, event, false, null);
 
-		EventChanges eventChangesFromServerAsUser1 = calendarClient.getSyncEventDate(user1Token, user1Calendar, start);
-		EventChanges eventChangesFromServerAsUser2 = calendarClient.getSyncEventDate(user2Token, user1Calendar, start);
+		EventChanges eventChangesFromServerAsUser1 = calendarClient.getSyncEventDate(user1Token, calendar, start);
+		EventChanges eventChangesFromServerAsUser2 = calendarClient.getSyncEventDate(user2Token, calendar, start);
 
 		assertThat(Iterables.getFirst(eventChangesFromServerAsUser1.getUpdated(), null).getAlert()).isEqualTo(30);
 		assertThat(Iterables.getFirst(eventChangesFromServerAsUser2.getUpdated(), null).getAlert()).isEqualTo(30);
