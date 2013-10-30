@@ -52,6 +52,7 @@ import org.obm.arquillian.GuiceWebXmlDescriptor;
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
+import org.obm.sync.calendar.CalendarBindingImplIntegrationTestModule;
 
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
@@ -60,6 +61,16 @@ import com.google.inject.Module;
 
 public class ObmSyncArchiveUtils {
 
+	public static WebArchive createDeployment() {
+		return createDeployment(CalendarBindingImplIntegrationTestModule.class);
+	}
+
+	public static WebArchive createDeployment(Class<? extends Module> moduleClass) {
+		return buildWebArchive(moduleClass)
+				.addClasses(moduleClass)
+				.addAsResource("sql/org/obm/sync/calendar/h2.sql", H2GuiceServletContextListener.INITIAL_DB_SCRIPT);
+	}
+	
 	public static WebArchive buildWebArchive(Class<? extends Module> guiceModule)
 			throws IllegalArgumentException, IllegalStateException, ResolutionException,
 			CoordinateParseException, UnknownExtensionTypeException {

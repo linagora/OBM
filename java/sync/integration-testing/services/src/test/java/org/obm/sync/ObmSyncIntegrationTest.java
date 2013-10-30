@@ -32,11 +32,7 @@ package org.obm.sync;
 import java.io.IOException;
 
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
-import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
-import org.obm.sync.calendar.CalendarBindingImplIntegrationTestModule;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -51,13 +47,5 @@ public abstract class ObmSyncIntegrationTest {
 	public void teardown() throws IOException {
 		injector.getInstance(CloseableHttpClient.class).close();
 	}
-
-	@DeployForEachTests
-	@Deployment(managed=false, name=ARCHIVE) 
-	public static WebArchive createDeployment() {
-		return ObmSyncArchiveUtils
-				.buildWebArchive(CalendarBindingImplIntegrationTestModule.class)
-				.addAsResource("sql/org/obm/sync/calendar/h2.sql", H2GuiceServletContextListener.INITIAL_DB_SCRIPT)
-				.addClasses(CalendarBindingImplIntegrationTestModule.class);
-	}
+	
 }
