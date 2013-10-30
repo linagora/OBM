@@ -32,84 +32,46 @@ package org.obm.sync.client;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URL;
-import java.util.List;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.cookie.Cookie;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
+import org.obm.guice.GuiceModule;
 import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.ObmSyncIntegrationTest;
+import org.obm.sync.ServicesClientModule;
+import org.obm.sync.ServicesClientModule.ClientTestConfiguration;
+import org.obm.sync.ServicesClientModule.CookiesFromClient;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.client.impl.AbstractClientImpl;
-import org.obm.sync.client.impl.SyncClientException;
-import org.obm.sync.locators.Locator;
-import org.slf4j.Logger;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
+import org.obm.sync.client.book.BookClient;
+import org.obm.sync.client.calendar.CalendarClient;
+import org.obm.sync.client.login.LoginClient;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
+@GuiceModule(ServicesClientModule.class)
 public class ClientIntegrationTest extends ObmSyncIntegrationTest {
 
-	private CookiesFromClient cookiesFromClient;
-
-	@Before
-	public void setUp() {
-		super.setUp();
-		cookiesFromClient = new CookiesFromClient(exceptionFactory, logger, httpClient);
-	}
-	
 	@Test
 	@RunAsClient
 	public void testClientKeepsCookie(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		configureTest(baseUrl);
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CookiesFromClient cookiesFromClient = injector.getInstance(CookiesFromClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		
 		AccessToken token = loginClient.login("user1@domain.org", "user1");
 		String sid = cookiesFromClient.getSid();
 		
-		calendarClient.listCalendars(token);
+		injector.getInstance(CalendarClient.class).listCalendars(token);
 		assertThat(sid).isEqualTo(cookiesFromClient.getSid());
 
-		bookClient.listAllBooks(token);
+		injector.getInstance(BookClient.class).listAllBooks(token);
 		assertThat(sid).isEqualTo(cookiesFromClient.getSid());
 
 		loginClient.logout(token);
 		assertThat(sid).isEqualTo(cookiesFromClient.getSid());
-	}
-	
-	protected class CookiesFromClient extends AbstractClientImpl {
-
-		public CookiesFromClient(SyncClientException exceptionFactory,
-				Logger obmSyncLogger, HttpClient httpClient) {
-			super(exceptionFactory, obmSyncLogger, httpClient);
-		}
-
-		@Override
-		protected Locator getLocator() {
-			return locator;
-		}
-		
-		public String getSid() {
-			return FluentIterable.from(getCookies())
-				.firstMatch(new Predicate<Cookie>() {
-
-					@Override
-					public boolean apply(Cookie input) {
-						return input.getName().equals("JSESSIONID");
-					}
-				})
-				.get()
-				.getValue();
-		}
-
-		private List<Cookie> getCookies() {
-			return cookieStore.getCookies();
-		}
 	}
 }
