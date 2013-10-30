@@ -148,7 +148,7 @@ public class ImportICalendarIntegrationTest extends ObmSyncIntegrationTest {
 		assertThat(importCount).isEqualTo(4);
 		assertThat(eventsInDB.getDeletedEvents()).isEmpty();
 		assertThat(eventsInDB.getUpdated())
-			.usingElementComparator(ignoreDatabaseElementsComparator())
+			.usingElementComparator(CalendarUtils.ignoreDatabaseElementsComparator())
 			.containsOnly(event1, event2, event3, event4);
 	}
 }
