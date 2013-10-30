@@ -5951,25 +5951,38 @@ function dis_calendar_meeting_form($current_view, $calendar) {
       $GLOBALS[l_users] / $GLOBALS[l_contacts]
       </th>
       <td class=\"autocompleteField\">
-      <select id=\"userSearchSource\" class=\"autocompleteSource\" name=\"\" style=\"float: right;\">
-        <option value=\"$path/user/user_index.php?from=calendar\">$GLOBALS[l_users]</option>
-        <option value=\"$path/contact/contact_index.php?from=calendar\">$GLOBALS[l_contacts]</option>
-        <optgroup label=\"$GLOBALS[l_addressbook]\">
-          $addressbook_options
-        </optgroup>
-      </select>
       <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
       </td>
       </tr>
       <tr>
       <th>&nbsp;</th>    
-      <td id=\"sel_user_id\" class=\"autocompleteResult\">$dis_sel_user</td>
+      <td class=\"autocompleteResult\">
+        <span class='legend'>$GLOBALS[l_user]</span>
+        <div id='sel_user_id'>$dis_sel_user</div>
+        <span class='legend'>$GLOBALS[l_contact]</span>
+        <div id='sel_contact_id'>$dis_sel_contact</div>
+      </td>
       </tr>";
 
-    $user_js = "
-    new obm.AutoComplete.ExtSearch(
-        function() { return \$('userSearchSource').value+'&action=ext_search'; },
-        'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});
+    $user_js = "new obm.AutoComplete.ParallelExtSearch(
+        ['$path/user/user_index.php?action=ext_search&from=calendar',
+          '$path/contact/contact_index.php?action=ext_search'],
+        'sel_user_id',
+        function (item) {
+          var selectedBoxId;
+          if (item['type'] === 'user') {
+            selectedBoxId = 'sel_user_id';
+          }
+          else if (item['type'] === 'contact') {
+            selectedBoxId = 'sel_contact_id';
+          }
+          else {
+            throw new Error('Unknown entity type: ' + item['type']);
+          }
+          return $(selectedBoxId);
+        },
+        'userSearch',
+        {filter_entity:'calendar',filter_pattern:'access'});
     new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
 
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
