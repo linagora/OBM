@@ -54,24 +54,29 @@ import org.obm.push.utils.DateUtils;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.ServicesClientModule;
-import org.obm.sync.ServicesClientModule.ClientTestConfiguration;
+import org.obm.sync.ServicesClientModule.ArquillianLocatorService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.items.EventChanges;
 
+import com.google.inject.Inject;
+
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class) @Slow
 @GuiceModule(ServicesClientModule.class)
 public class ImportICalendarIntegrationTest extends ObmSyncIntegrationTest {
+
+	@Inject ArquillianLocatorService locatorService;
+	@Inject CalendarClient calendarClient;
+	@Inject LoginClient loginClient;
 	
 	@Test @RunAsClient
 	public void testImportICS(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		locatorService.configure(baseUrl);
 		InputStream icsData = ClassLoader.getSystemClassLoader().getResourceAsStream("importICalendar.sample.ics");
 		String calendar = "user1@domain.org";
 
-		AccessToken accessToken = injector.getInstance(LoginClient.class).login(calendar, "user1");
+		AccessToken accessToken = loginClient.login(calendar, "user1");
 		int importCount = calendarClient.importICalendar(accessToken, calendar, IOUtils.toString(icsData), UUID.randomUUID().toString());
 		EventChanges eventsInDB = calendarClient.getSync(accessToken, calendar, DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		

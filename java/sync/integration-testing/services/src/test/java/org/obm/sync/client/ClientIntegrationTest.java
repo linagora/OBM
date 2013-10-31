@@ -47,32 +47,38 @@ import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.ServicesClientModule;
-import org.obm.sync.ServicesClientModule.ClientTestConfiguration;
+import org.obm.sync.ServicesClientModule.ArquillianLocatorService;
 import org.obm.sync.ServicesClientModule.CookiesFromClient;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginClient;
 
+import com.google.inject.Inject;
+
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
 public class ClientIntegrationTest extends ObmSyncIntegrationTest {
 
+	@Inject ArquillianLocatorService locatorService;
+	@Inject CalendarClient calendarClient;
+	@Inject BookClient bookClient;
+	@Inject LoginClient loginClient;
+	@Inject CookiesFromClient cookiesFromClient;
+	
 	@Test
 	@RunAsClient
 	public void testClientKeepsCookie(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CookiesFromClient cookiesFromClient = injector.getInstance(CookiesFromClient.class);
-		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		locatorService.configure(baseUrl);
 		
 		AccessToken token = loginClient.login("user1@domain.org", "user1");
 		String sid = cookiesFromClient.getSid();
 		
-		injector.getInstance(CalendarClient.class).listCalendars(token);
+		calendarClient.listCalendars(token);
 		assertThat(sid).isEqualTo(cookiesFromClient.getSid());
 
-		injector.getInstance(BookClient.class).listAllBooks(token);
+		bookClient.listAllBooks(token);
 		assertThat(sid).isEqualTo(cookiesFromClient.getSid());
 
 		loginClient.logout(token);
