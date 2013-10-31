@@ -36,7 +36,7 @@ import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
 import org.apache.solr.common.SolrInputDocument;

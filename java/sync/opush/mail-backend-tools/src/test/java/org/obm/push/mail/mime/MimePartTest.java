@@ -32,7 +32,7 @@
 package org.obm.push.mail.mime;
 
 import static org.easymock.EasyMock.createMock;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.InputStream;
 

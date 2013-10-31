@@ -34,7 +34,7 @@ package org.obm.sync.calendar;
 import java.util.Collection;
 import java.util.EnumSet;
 
-import org.assertj.core.api.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

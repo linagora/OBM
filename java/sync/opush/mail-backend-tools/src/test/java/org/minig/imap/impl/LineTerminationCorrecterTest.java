@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.minig.imap.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.CharArrayReader;
 import java.io.IOException;

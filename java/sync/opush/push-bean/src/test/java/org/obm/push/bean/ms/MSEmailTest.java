@@ -33,7 +33,7 @@ package org.obm.push.bean.ms;
 
 import java.io.ByteArrayInputStream;
 
-import org.assertj.core.api.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;

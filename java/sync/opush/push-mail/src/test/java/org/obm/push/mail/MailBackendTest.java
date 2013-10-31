@@ -35,7 +35,7 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.mail.MSMailTestsUtils.loadEmail;
 import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfigurationService;
 

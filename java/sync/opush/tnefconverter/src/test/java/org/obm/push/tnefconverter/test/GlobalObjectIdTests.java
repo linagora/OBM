@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.tnefconverter.test;
 
-import static org.assertj.core.api.Assertions.assertThat; 
+import static org.fest.assertions.api.Assertions.assertThat; 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 

@@ -42,7 +42,7 @@ import javax.mail.search.NotTerm;
 import javax.mail.search.ReceivedDateTerm;
 import javax.mail.search.SearchTerm;
 
-import org.assertj.core.api.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

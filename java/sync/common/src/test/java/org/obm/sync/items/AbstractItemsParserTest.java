@@ -33,7 +33,7 @@ package org.obm.sync.items;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.assertj.core.api.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.utils.DOMUtils;

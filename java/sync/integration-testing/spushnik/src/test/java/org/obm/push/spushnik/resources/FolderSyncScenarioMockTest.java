@@ -33,7 +33,7 @@ package org.obm.push.spushnik.resources;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.spushnik.SpushnikTestUtils.buildServiceUrl;
 
 import java.util.Properties;

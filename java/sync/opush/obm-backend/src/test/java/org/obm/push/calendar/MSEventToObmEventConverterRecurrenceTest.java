@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -39,7 +39,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.TimeZone;
 
-import org.assertj.core.api.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;

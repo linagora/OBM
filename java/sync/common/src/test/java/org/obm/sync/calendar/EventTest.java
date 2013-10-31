@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
 import java.util.ArrayList;
@@ -1656,6 +1656,6 @@ public class EventTest {
 		
 		Attendee newEventOrganizer = event.withOrganizerIfNone(organizer).findOrganizer();
 		
-		assertThat(newEventOrganizer).isEqualTo(organizer).isEqualToComparingFieldByField(organizer);
+		assertThat(newEventOrganizer).isEqualTo(organizer).isEqualsToByComparingFields(organizer);
 	}
 }

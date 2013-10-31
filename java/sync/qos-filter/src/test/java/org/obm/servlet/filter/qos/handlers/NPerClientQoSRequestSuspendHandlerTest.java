@@ -34,7 +34,7 @@ package org.obm.servlet.filter.qos.handlers;
 import static org.easymock.EasyMock.createStrictControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

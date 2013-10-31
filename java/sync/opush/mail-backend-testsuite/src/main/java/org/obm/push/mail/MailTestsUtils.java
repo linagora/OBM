@@ -42,7 +42,7 @@ import java.nio.charset.Charset;
 import javax.mail.FolderClosedException;
 import javax.net.SocketFactory;
 
-import org.assertj.core.api.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.obm.push.mail.bean.EmailReader;

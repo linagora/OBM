@@ -36,7 +36,7 @@ import static org.easymock.EasyMock.anyLong;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationPushTestUtils.mockMonitoredCollectionDao;
 import static org.obm.opush.IntegrationTestUtils.buildCalendarCollectionPath;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;

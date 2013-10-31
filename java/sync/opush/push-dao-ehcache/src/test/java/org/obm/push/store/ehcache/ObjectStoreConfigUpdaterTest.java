@@ -34,7 +34,7 @@ package org.obm.push.store.ehcache;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.push.store.ehcache.EhCacheStores.MAIL_SNAPSHOT_STORE;
 import static org.obm.push.store.ehcache.EhCacheStores.MAIL_WINDOWING_CHUNKS_STORE;
 import static org.obm.push.store.ehcache.EhCacheStores.MAIL_WINDOWING_INDEX_STORE;

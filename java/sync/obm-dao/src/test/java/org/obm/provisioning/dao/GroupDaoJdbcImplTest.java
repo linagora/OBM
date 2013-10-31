@@ -30,7 +30,7 @@
 
 package org.obm.provisioning.dao;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.ResultSet;
 import java.util.Set;
@@ -388,12 +388,12 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
          Group modifiedReturnedGroup = dao.update(domain1, modifiedGroup);
 
          assertThat(modifiedGroup)
-             .isEqualToComparingOnlyGivenFields(modifiedReturnedGroup,
+             .isLenientEqualsToByAcceptingFields(modifiedReturnedGroup,
                                                  "name", "description", "extId");
 
          Group retrievedGroup = dao.get(domain1, extId);
          assertThat(modifiedGroup)
-             .isEqualToComparingOnlyGivenFields(retrievedGroup,
+             .isLenientEqualsToByAcceptingFields(retrievedGroup,
                                                  "name", "description", "extId");
     }
 

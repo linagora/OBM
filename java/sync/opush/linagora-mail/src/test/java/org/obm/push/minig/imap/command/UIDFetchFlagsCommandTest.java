@@ -31,7 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.minig.imap.command;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.data.MapEntry.entry;
 
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +63,7 @@ public class UIDFetchFlagsCommandTest {
 		UIDFetchFlagsCommand uidFetchFlagsCommand = new UIDFetchFlagsCommand(MessageSet.singleton(12l));
 		uidFetchFlagsCommand.handleResponses(responses("* 98 FETCH (FLAGS (\\Seen) UID 12)"));
 		Map<Long, FlagsList> receivedData = uidFetchFlagsCommand.getReceivedData();
-		assertThat(receivedData).hasSize(1).containsEntry(12l, new FlagsList(Arrays.asList(Flag.SEEN)));
+		assertThat(receivedData).hasSize(1).contains(entry(12l, new FlagsList(Arrays.asList(Flag.SEEN))) );
 	}
 	
 	@Test
@@ -73,7 +74,7 @@ public class UIDFetchFlagsCommandTest {
 						"* 98 FETCH (FLAGS (\\Seen) UID 12)", 
 						"* 98 FETCH (FLAGS (\\Seen) UID 13)"));
 		Map<Long, FlagsList> receivedData = uidFetchFlagsCommand.getReceivedData();
-		assertThat(receivedData).hasSize(1).containsEntry(12l, new FlagsList(Arrays.asList(Flag.SEEN)));
+		assertThat(receivedData).hasSize(1).contains(entry(12l, new FlagsList(Arrays.asList(Flag.SEEN))));
 	}
 	
 	@Test
@@ -84,7 +85,7 @@ public class UIDFetchFlagsCommandTest {
 						"* 98 FETCH (FLAGS (\\Seen) UID 12)", 
 						"* 98 FETCH (FLAGS (\\Seen) UID 12)"));
 		Map<Long, FlagsList> receivedData = uidFetchFlagsCommand.getReceivedData();
-		assertThat(receivedData).hasSize(1).containsEntry(12l, new FlagsList(Arrays.asList(Flag.SEEN)));
+		assertThat(receivedData).hasSize(1).contains(entry(12l, new FlagsList(Arrays.asList(Flag.SEEN))));
 	}
 	
 	private List<IMAPResponse> responses(String... lines) {

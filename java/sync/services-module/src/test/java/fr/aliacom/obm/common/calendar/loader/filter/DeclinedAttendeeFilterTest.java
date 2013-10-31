@@ -1,6 +1,6 @@
 package fr.aliacom.obm.common.calendar.loader.filter;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
 import java.util.Map;

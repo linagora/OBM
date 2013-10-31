@@ -31,12 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils.index;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.fest.assertions.data.MapEntry;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -120,23 +121,25 @@ public class IndexUtilsTest {
 	public void testMapWithOneElement() {
 		List<IntIndexed> emptyList = ImmutableList.of(new IntIndexed(5));
 		Map<Integer, IntIndexed> mapByIndexes = IndexUtils.mapByIndexes(emptyList);
-		assertThat(mapByIndexes).hasSize(1).containsEntry(5, new IntIndexed(5));
+		assertThat(mapByIndexes).hasSize(1).contains(
+				MapEntry.entry(5, new IntIndexed(5)));
 	}
 
 	@Test
 	public void testMapWithOneNegativeElement() {
 		List<IntIndexed> emptyList = ImmutableList.of(new IntIndexed(-5));
 		Map<Integer, IntIndexed> mapByIndexes = IndexUtils.mapByIndexes(emptyList);
-		assertThat(mapByIndexes).hasSize(1).containsEntry(-5, new IntIndexed(-5));
+		assertThat(mapByIndexes).hasSize(1).contains(
+				MapEntry.entry(-5, new IntIndexed(-5)));
 	}
 	
 	@Test
 	public void testMapWithTwoElement() {
 		List<IntIndexed> emptyList = ImmutableList.of(new IntIndexed(5), new IntIndexed(-5));
 		Map<Integer, IntIndexed> mapByIndexes = IndexUtils.mapByIndexes(emptyList);
-		assertThat(mapByIndexes).hasSize(2)
-			.containsEntry(5, new IntIndexed(5))
-			.containsEntry(-5, new IntIndexed(-5));
+		assertThat(mapByIndexes).hasSize(2).contains(
+				MapEntry.entry(5, new IntIndexed(5)),
+				MapEntry.entry(-5, new IntIndexed(-5)));
 	}
 	
 	@Test
@@ -144,18 +147,19 @@ public class IndexUtilsTest {
 		List<IntIndexed> emptyList = ImmutableList.of(
 				new IntIndexed(5), new IntIndexed(-5), new IntIndexed(10), new IntIndexed(20), new IntIndexed(150));
 		Map<Integer, IntIndexed> mapByIndexes = IndexUtils.mapByIndexes(emptyList);
-		assertThat(mapByIndexes).hasSize(5)
-				.containsEntry(5, new IntIndexed(5))
-				.containsEntry(-5, new IntIndexed(-5))
-				.containsEntry(10, new IntIndexed(10))
-				.containsEntry(20, new IntIndexed(20))
-				.containsEntry(150, new IntIndexed(150));
+		assertThat(mapByIndexes).hasSize(5).contains(
+				MapEntry.entry(5, new IntIndexed(5)),
+				MapEntry.entry(-5, new IntIndexed(-5)),
+				MapEntry.entry(10, new IntIndexed(10)),
+				MapEntry.entry(20, new IntIndexed(20)),
+				MapEntry.entry(150, new IntIndexed(150)));
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testMapWithTwoSameIndexes() {
 		List<IntIndexed> emptyList = ImmutableList.of(new IntIndexed(5), new IntIndexed(5));
 		Map<Integer, IntIndexed> mapByIndexes = IndexUtils.mapByIndexes(emptyList);
-		assertThat(mapByIndexes).hasSize(1).containsEntry(5, new IntIndexed(5));
+		assertThat(mapByIndexes).hasSize(1).contains(
+				MapEntry.entry(5, new IntIndexed(5)));
 	}
 }

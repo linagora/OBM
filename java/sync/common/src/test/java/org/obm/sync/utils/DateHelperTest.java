@@ -35,7 +35,7 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
-import org.assertj.core.api.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

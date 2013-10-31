@@ -32,7 +32,7 @@
 package org.obm.dbcp;
 
 import static org.easymock.EasyMock.createControl;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

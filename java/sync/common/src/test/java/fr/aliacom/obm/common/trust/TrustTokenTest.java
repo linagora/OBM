@@ -29,7 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.trust;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.fest.assertions.api.Assertions.*;
 
 import java.util.Date;
 

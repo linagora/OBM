@@ -47,7 +47,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.assertj.core.api.Assertions;
+import org.fest.assertions.api.Assertions;
 import org.hornetq.core.config.Configuration;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;

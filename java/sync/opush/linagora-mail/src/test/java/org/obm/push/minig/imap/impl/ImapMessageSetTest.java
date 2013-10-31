@@ -32,7 +32,7 @@
 
 package org.obm.push.minig.imap.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collection;

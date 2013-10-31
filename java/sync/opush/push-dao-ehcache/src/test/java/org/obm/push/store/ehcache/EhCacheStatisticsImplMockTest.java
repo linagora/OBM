@@ -32,7 +32,7 @@
 package org.obm.push.store.ehcache;
 
 import static org.easymock.EasyMock.createMock;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Rule;
