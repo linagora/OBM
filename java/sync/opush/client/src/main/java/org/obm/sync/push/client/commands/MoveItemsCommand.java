@@ -38,6 +38,7 @@ import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.MoveItemsResponse;
 import org.obm.sync.push.client.MoveItemsResponse.MoveResult;
+import org.obm.sync.push.client.ResponseTransformer;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
@@ -102,4 +103,16 @@ public class MoveItemsCommand extends AbstractCommand<MoveItemsResponse> {
 		return new MoveItemsResponse(moveResults, MoveItemsStatus.fromSpecificationValue(status));
 	}
 
+	@Override
+	protected ResponseTransformer<MoveItemsResponse> responseTransformer() {
+		return new MoveItemsResponseTransformer();
+	}
+	
+	private class MoveItemsResponseTransformer implements ResponseTransformer<MoveItemsResponse> {
+
+		@Override
+		public MoveItemsResponse parse(Document document) {
+			return parseResponse(document);
+		}
+	}
 }

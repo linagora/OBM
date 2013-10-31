@@ -29,53 +29,11 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.push.client.commands;
+package org.obm.sync.push.client;
 
-import java.io.IOException;
-
-import org.obm.push.bean.SyncKey;
-import org.obm.push.protocol.FolderSyncProtocol;
-import org.obm.push.protocol.bean.FolderSyncResponse;
-import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.ResponseTransformer;
-import org.obm.sync.push.client.beans.AccountInfos;
-import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
-/**
- * Performs a FolderSync AS command with the given sync key
- */
-public class FolderSync extends AbstractCommand<FolderSyncResponse> {
+public interface ResponseTransformer<T> {
 
-	private static final String TEMPLATE_NAME = "FolderSyncRequest.xml";
-	
-	public FolderSync(final SyncKey syncKey) throws SAXException, IOException {
-		super(NS.FolderHierarchy, "FolderSync", new TemplateDocument(TEMPLATE_NAME) {
-			@Override
-			protected void customize(Document document, AccountInfos accountInfos) {
-				Element sk = DOMUtils.getUniqueElement(document.getDocumentElement(), "SyncKey");
-				sk.setTextContent(syncKey.getSyncKey());
-			}
-		});		
-	}
-
-	@Override
-	protected FolderSyncResponse parseResponse(Document responseDocument) {
-		return new FolderSyncProtocol().decodeResponse(responseDocument);
-	}
-
-	@Override
-	protected ResponseTransformer<FolderSyncResponse> responseTransformer() {
-		return new FolderSyncResponseTransformer();
-	}
-	
-	private class FolderSyncResponseTransformer implements ResponseTransformer<FolderSyncResponse> {
-
-		@Override
-		public FolderSyncResponse parse(Document document) {
-			return parseResponse(document);
-		}
-	}
+	T parse(Document document);
 }

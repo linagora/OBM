@@ -36,6 +36,7 @@ import java.io.IOException;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.push.client.ResponseTransformer;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 import org.obm.sync.push.client.beans.NS;
@@ -72,5 +73,18 @@ public class GetItemEstimateEmailFolderCommand extends AbstractCommand<GetItemEs
 	@Override
 	protected GetItemEstimateSingleFolderResponse parseResponse(Document responseDocument) {
 		return new GetItemEstimateSingleFolderResponse.XmlParser().parse(responseDocument.getDocumentElement());
+	}
+
+	@Override
+	protected ResponseTransformer<GetItemEstimateSingleFolderResponse> responseTransformer() {
+		return new GetItemEstimateSingleFolderResponseResponseTransformer();
+	}
+	
+	private class GetItemEstimateSingleFolderResponseResponseTransformer implements ResponseTransformer<GetItemEstimateSingleFolderResponse> {
+
+		@Override
+		public GetItemEstimateSingleFolderResponse parse(Document document) {
+			return parseResponse(document);
+		}
 	}
 }
