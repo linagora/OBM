@@ -39,19 +39,15 @@ import java.net.URL;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
 import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
-import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
 import org.obm.push.utils.DateUtils;
-import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.ServicesClientModule;
 import org.obm.sync.ServicesClientModule.ClientTestConfiguration;
@@ -161,11 +157,5 @@ public class ImportICalendarIntegrationTest extends ObmSyncIntegrationTest {
 		assertThat(eventsInDB.getUpdated())
 			.usingElementComparator(CalendarUtils.ignoreDatabaseElementsComparator())
 			.containsOnly(event1, event2, event3, event4);
-	}
-	
-	@DeployForEachTests
-	@Deployment(managed=false, name=ARCHIVE)
-	public static WebArchive createDeployment() {
-		return ObmSyncArchiveUtils.createDeployment();
 	}
 }
