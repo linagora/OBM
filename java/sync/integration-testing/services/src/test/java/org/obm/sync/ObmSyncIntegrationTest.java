@@ -31,6 +31,7 @@ package org.obm.sync;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Comparator;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -47,6 +48,7 @@ import org.obm.locator.store.LocatorService;
 import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
 import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
 import org.obm.sync.calendar.CalendarBindingImplIntegrationTestModule;
+import org.obm.sync.calendar.Event;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.impl.SyncClientException;
@@ -54,6 +56,8 @@ import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Objects;
 
 public abstract class ObmSyncIntegrationTest {
 
@@ -140,6 +144,47 @@ public abstract class ObmSyncIntegrationTest {
 			@Override
 			public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
 				return baseURL.toExternalForm();
+			}
+		};
+	}
+
+	protected Comparator<? super Event> ignoreDatabaseElementsComparator() {
+		return new Comparator<Event>() {
+	
+			@Override
+			public int compare(Event one, Event two) {
+				boolean equalityIgnoringDatabaseElements = 
+					Objects.equal(one.getTitle(), two.getTitle())
+					&& Objects.equal(one.getDescription(), two.getDescription())
+					&& Objects.equal(one.getExtId(), two.getExtId())
+					&& Objects.equal(one.getPrivacy(), two.getPrivacy())
+					&& Objects.equal(one.getMeetingStatus(), two.getMeetingStatus())
+					&& Objects.equal(one.getOwner(), two.getOwner())
+					&& Objects.equal(one.getOwnerDisplayName(), two.getOwnerDisplayName())
+					&& Objects.equal(one.getOwnerEmail(), two.getOwnerEmail())
+					&& Objects.equal(one.getCreatorDisplayName(), two.getCreatorDisplayName())
+					&& Objects.equal(one.getCreatorEmail(), two.getCreatorEmail())
+					&& Objects.equal(one.getLocation(), two.getLocation())
+					&& Objects.equal(one.getStartDate(), two.getStartDate())
+					&& Objects.equal(one.getDuration(), two.getDuration())
+					&& Objects.equal(one.getAlert(), two.getAlert())
+					&& Objects.equal(one.getCategory(), two.getCategory())
+					&& Objects.equal(one.getPriority(), two.getPriority())
+					&& Objects.equal(one.isAllday(), two.isAllday())
+					&& Objects.equal(one.getAttendees(), two.getAttendees())
+					&& Objects.equal(one.getRecurrence(), two.getRecurrence())
+					&& Objects.equal(one.getType(), two.getType())
+					&& Objects.equal(one.getOpacity(), two.getOpacity())
+					&& Objects.equal(one.getEntityId(), two.getEntityId())
+					&& Objects.equal(one.getTimezoneName(), two.getTimezoneName())
+					&& Objects.equal(one.getRecurrenceId(), two.getRecurrenceId())
+					&& Objects.equal(one.isInternalEvent(), two.isInternalEvent())
+					&& Objects.equal(one.getSequence(), two.getSequence());
+					
+				if (equalityIgnoringDatabaseElements) {
+					return 0;
+				}
+				return 1;
 			}
 		};
 	}
