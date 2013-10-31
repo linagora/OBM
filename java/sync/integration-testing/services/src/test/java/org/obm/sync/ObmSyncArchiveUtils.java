@@ -52,6 +52,7 @@ import org.obm.arquillian.GuiceWebXmlDescriptor;
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
+import org.obm.sync.calendar.CalendarBindingImplIntegrationTestModule;
 
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
@@ -61,7 +62,7 @@ import com.google.inject.Module;
 public class ObmSyncArchiveUtils {
 
 	public static WebArchive createDeployment() {
-		return createDeployment(ServicesTestModule.class);
+		return createDeployment(CalendarBindingImplIntegrationTestModule.class);
 	}
 
 	public static WebArchive createDeployment(Class<? extends Module> moduleClass) {
