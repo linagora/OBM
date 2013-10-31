@@ -17,8 +17,8 @@ set_db_to_gmt() {
 }
 
 create_obm_schema() {
-        cd /usr/share/obm-storage/update-install/scripts/2.5
-        bash ./install_obmdb_2.5.sh filldata
+        cd /usr/share/obm-storage/update-install/scripts/creation
+        bash ./install_obmdb.sh filldata
         cd -
 }
 

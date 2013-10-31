@@ -29,8 +29,8 @@
 
 obmconf="/etc/obm/obm-rpm.conf"
 REP_DOC="/usr/share/doc"
-REP_SCRIPTS_OBM="/usr/share/obm/scripts/2.5"
-SCRIPT_INSTALL="$REP_SCRIPTS_OBM/install_obmdb_2.5.sh"
+REP_SCRIPTS_OBM="/usr/share/obm/scripts/creation"
+SCRIPT_INSTALL="$REP_SCRIPTS_OBM/install_obmdb.sh"
 SCRIPT_UPDATE="$REP_SCRIPTS_OBM/update-$FROM_VER-$TO_VER.sh"
 LIB_ADMIN_MY="/usr/bin/myadmin.lib"
 
