@@ -41,30 +41,25 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
-import org.obm.guice.GuiceModule;
 import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.ObmSyncIntegrationTest;
-import org.obm.sync.ServicesClientModule;
-import org.obm.sync.ServicesClientModule.ClientTestConfiguration;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.MavenVersion;
-import org.obm.sync.client.login.LoginClient;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
-@GuiceModule(ServicesClientModule.class)
 public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
 	public void testDoLoginSuccess(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-
-		AccessToken token = injector.getInstance(LoginClient.class).login("user1@domain.org", "user1");
+		configureTest(baseUrl);
+		String calendar = "user1@domain.org";
+		AccessToken token = loginClient.login(calendar, "user1");
 		
 		assertThat(token).isNotNull();
 		assertThatTokenIsWellFormed(token);
@@ -73,9 +68,9 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testDoLoginIsCaseInsensitiveWithDBAuth(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-
-		AccessToken token = injector.getInstance(LoginClient.class).login("UseR1@domain.org", "user1");
+		configureTest(baseUrl);
+		String calendar = "UseR1@domain.org";
+		AccessToken token = loginClient.login(calendar, "user1");
 		
 		assertThat(token).isNotNull();
 		assertThatTokenIsWellFormed(token);
@@ -84,9 +79,9 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testDoLoginWithoutDomainSuccess(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-
-		AccessToken token = injector.getInstance(LoginClient.class).login("user1", "user1");
+		configureTest(baseUrl);
+		String calendar = "user1";
+		AccessToken token = loginClient.login(calendar, "user1");
 		
 		assertThat(token).isNotNull();
 		assertThatTokenIsWellFormed(token);
@@ -95,9 +90,9 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testDoLoginWithoutDomainIsCaseInsensitiveWithDBAuth(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-
-		AccessToken token = injector.getInstance(LoginClient.class).login("UseR1", "user1");
+		configureTest(baseUrl);
+		String calendar = "UseR1";
+		AccessToken token = loginClient.login(calendar, "user1");
 		
 		assertThat(token).isNotNull();
 		assertThatTokenIsWellFormed(token);
@@ -106,10 +101,10 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	@Test(expected=AuthFault.class)
 	@RunAsClient
 	public void testDoLoginFailsWithWrongLogin(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-
+		configureTest(baseUrl);
+		String calendar = "user@domain.org";
 		try {
-			injector.getInstance(LoginClient.class).login("user@domain.org", "user1");
+			loginClient.login(calendar, "user1");
 		} catch(AuthFault e) {
 			assertThat(e.getMessage()).contains("Login failed for user 'user@domain.org'");
 			throw e;
@@ -119,10 +114,10 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	@Test(expected=AuthFault.class)
 	@RunAsClient
 	public void testDoLoginFailsWithWrongPassword(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-
+		configureTest(baseUrl);
+		String calendar = "user1";
 		try {
-			injector.getInstance(LoginClient.class).login("user1", "user");
+			loginClient.login(calendar, "user");
 		} catch(AuthFault e) {
 			assertThat(e.getMessage()).contains("Login failed for user 'user1'");
 			throw e;
@@ -132,9 +127,9 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testDoLoginSuccessForUser2onDomain1(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-
-		AccessToken token = injector.getInstance(LoginClient.class).login("user2@domain.org", "user2");
+		configureTest(baseUrl);
+		String calendar = "user2@domain.org";
+		AccessToken token = loginClient.login(calendar, "user2");
 		
 		assertThat(token).isNotNull();
 	}
@@ -142,10 +137,10 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	@Test(expected=AuthFault.class)
 	@RunAsClient
 	public void testDoLoginFailsForUser2WithoutDomain(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-
+		configureTest(baseUrl);
+		String calendar = "user2";
 		try {
-			injector.getInstance(LoginClient.class).login("user2", "user2");
+			loginClient.login(calendar, "user2");
 		} catch(AuthFault e) {
 			assertThat(e.getMessage()).contains("Login failed for user 'user2'");
 			throw e;
@@ -155,9 +150,9 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testDoLoginSuccessForUser2onDomain2(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-
-		AccessToken token = injector.getInstance(LoginClient.class).login("user2@domain2.org", "user2");
+		configureTest(baseUrl);
+		String calendar = "user2@domain2.org";
+		AccessToken token = loginClient.login(calendar, "user2");
 		
 		assertThat(token).isNotNull();
 	}

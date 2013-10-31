@@ -37,41 +37,28 @@ import java.net.URL;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.filter.Slow;
-import org.obm.guice.GuiceModule;
 import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.sync.ObmSyncIntegrationTest;
-import org.obm.sync.ServicesClientModule;
-import org.obm.sync.ServicesClientModule.ClientTestConfiguration;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
-import org.obm.sync.client.calendar.CalendarClient;
-import org.obm.sync.client.login.LoginClient;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
-@GuiceModule(ServicesClientModule.class)
 public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 
-	private String calendar;
-
-	@Before
-	public void setUp() {
-		calendar = "user1@domain.org";
-	}
-	
 	@Test
 	@RunAsClient
 	public void testStoreEventCreatesEventIfNotPresent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		AccessToken token = injector.getInstance(LoginClient.class).login(calendar, "user1");
-
+		configureTest(baseUrl);
+		String calendar = "user1@domain.org";
 		Event event = newEvent(calendar, "user1", "testStoreEventCreatesEventIfNotPresent");
+
+		AccessToken token = loginClient.login(calendar, "user1");
+
 		calendarClient.storeEvent(token, calendar, event, false, null);
 
 		Event eventFromServer = calendarClient.getEventFromExtId(token, calendar, event.getExtId());
@@ -82,11 +69,12 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testStoreEventModifiesEventIfPresent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		AccessToken token = injector.getInstance(LoginClient.class).login(calendar, "user1");
-
+		configureTest(baseUrl);
+		String calendar = "user1@domain.org";
 		Event event = newEvent(calendar, "user1", "testStoreEventModifiesEventIfPresent");
+
+		AccessToken token = loginClient.login(calendar, "user1");
+
 		calendarClient.createEvent(token, calendar, event, false, null);
 		event.setTitle("ModifiedTitle");
 		calendarClient.storeEvent(token, calendar, event, false, null);
@@ -99,11 +87,11 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 	@Test(expected = EventAlreadyExistException.class)
 	@RunAsClient
 	public void testCreateEventFailsIfPresent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		AccessToken token = injector.getInstance(LoginClient.class).login(calendar, "user1");
-
+		configureTest(baseUrl);
+		String calendar = "user1@domain.org";
 		Event event = newEvent(calendar, "user1", "testCreateEventFailsIfPresent");
+
+		AccessToken token = loginClient.login(calendar, "user1");
 
 		calendarClient.createEvent(token, calendar, event, false, null);
 		calendarClient.createEvent(token, calendar, event, false, null);
@@ -112,13 +100,13 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testClientIdCreateTwiceEvent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		AccessToken token = injector.getInstance(LoginClient.class).login(calendar, "user1");
-		
+		configureTest(baseUrl);
+		String calendar = "user1@domain.org";
 		Event event = newEvent(calendar, "user1", "firstExtIdOfCreateTwiceEvent");
 		boolean notif = false;
 		String clientId = "0123456789012345678901234567890123456789";
+
+		AccessToken token = loginClient.login(calendar, "user1");
 
 		calendarClient.createEvent(token, calendar, event, notif, clientId);
 		Event newEventCreation = event.clone();
@@ -139,13 +127,13 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testClientIdCreateEventDeleteItThenCreateAgain(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		AccessToken token = injector.getInstance(LoginClient.class).login(calendar, "user1");
-		
+		configureTest(baseUrl);
+		String calendar = "user1@domain.org";
 		Event event = newEvent(calendar, "user1", "extIdOfCreateEventDeleteItThenCreateAgain");
 		boolean notif = false;
 		String clientId = "0123456789012345678901234567890123456788";
+
+		AccessToken token = loginClient.login(calendar, "user1");
 
 		EventObmId firstId = calendarClient.createEvent(token, calendar, event, notif, clientId);
 		Event firstEvent = calendarClient.getEventFromId(token, calendar, firstId);
