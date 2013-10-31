@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
-import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 import javax.jms.TopicConnection;
@@ -46,65 +45,67 @@ import org.hornetq.jms.client.HornetQTopic;
 import org.obm.sync.MessageQueueModule;
 import org.obm.sync.ServicesClientModule;
 
-import com.google.common.base.Throwables;
+import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.linagora.obm.sync.HornetQConfiguration;
 
 public class ServicesClientWithJMSModule extends AbstractModule {
 	
-	private HornetQConnectionFactory connectionFactory;
+	private final HornetQConnectionFactory connectionFactory;
+	
+	public ServicesClientWithJMSModule() {
+		connectionFactory = HornetQJMSClient.createConnectionFactoryWithoutHA(JMSFactoryType.CF, 
+				HornetQConfiguration.connectorBuilder()
+					.name("jmsClient")
+					.factory(NettyConnectorFactory.class)
+					.param(TransportConstants.HOST_PROP_NAME, "127.0.0.1")
+					.param(TransportConstants.PORT_PROP_NAME, 5446)
+					.build());
+	}
 	
 	@Override
 	protected void configure() {
 		install(new ServicesClientModule());
-		connectionFactory = HornetQJMSClient.createConnectionFactoryWithoutHA(JMSFactoryType.CF, 
-			HornetQConfiguration.connectorBuilder()
-				.name("jmsClient")
-				.factory(NettyConnectorFactory.class)
-				.param(TransportConstants.HOST_PROP_NAME, "127.0.0.1")
-				.param(TransportConstants.PORT_PROP_NAME, 5446)
-				.build());
+		bind(HornetQConnectionFactory.class).toInstance(connectionFactory);
+		bind(MessageConsumerResourcesManager.class);
 	}
 	
-	@Provides @Singleton
-	MessageConsumerWithResourcesCloser consumer() {
-		try {
-			HornetQTopic topic = new HornetQTopic(MessageQueueModule.TOPIC_NAME_EVENT);
-			final TopicConnection connection = connectionFactory.createTopicConnection(); 
-			connection.setClientID("durable");
-			
-			final TopicSession topicSession = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
-			connection.start();
-			
-			return new MessageConsumerWithResourcesCloser(topicSession.createConsumer(topic)) {
-
-				@Override
-				public void closeResources() throws Exception {
-					topicSession.close();
-					connection.close();
-				}
-				
-			};
-		} catch (JMSException e) {
-			Throwables.propagate(e);
-		}
-		throw new IllegalStateException("No consumer can be provided");
-	}
-	
-	public static abstract class MessageConsumerWithResourcesCloser {
+	@Singleton
+	public static class MessageConsumerResourcesManager {
 		
-		private final MessageConsumer consumer;
+		private final HornetQConnectionFactory connectionFactory;
+		private final HornetQTopic topic;
+		private MessageConsumer consumer;
+		private TopicConnection connection;
+		private TopicSession topicSession;
 
-		public MessageConsumerWithResourcesCloser(MessageConsumer consumer) {
-			this.consumer = consumer;
+		@Inject
+		private MessageConsumerResourcesManager(HornetQConnectionFactory connectionFactory) {
+			this.connectionFactory = connectionFactory;
+			this.topic = new HornetQTopic(MessageQueueModule.TOPIC_NAME_EVENT);
 		}
 
 		public MessageConsumer getConsumer() {
 			return consumer;
 		}
 		
-		public abstract void closeResources() throws Exception;
+		public void start() throws Exception {
+			Preconditions.checkState(topicSession == null && connection == null, "consumer is already started");
+			connection = connectionFactory.createTopicConnection(); 
+			connection.setClientID("durable");
+			
+			topicSession = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
+			connection.start();
+			
+			consumer = topicSession.createConsumer(topic);
+		}
+
+		public void close() throws Exception {
+			Preconditions.checkState(topicSession != null && connection != null, "consumer is not started");
+			topicSession.close();
+			connection.close();
+		}
 	}
 }

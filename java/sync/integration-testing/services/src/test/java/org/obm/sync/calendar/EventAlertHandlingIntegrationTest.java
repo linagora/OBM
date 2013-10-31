@@ -53,19 +53,26 @@ import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.ServicesClientModule;
-import org.obm.sync.ServicesClientModule.ClientTestConfiguration;
+import org.obm.sync.ServicesClientModule.ArquillianLocatorService;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.items.EventChanges;
 
 import com.google.common.collect.Iterables;
+import com.google.inject.Inject;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
 public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 
+	@Inject ArquillianLocatorService locatorService;
+	@Inject CalendarClient calendarClient;
+	@Inject BookClient bookClient;
+	@Inject LoginClient loginClient;
+	
 	private String calendar;
 
 	@Before
@@ -76,9 +83,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testCreateEventCreatesAlert(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		AccessToken token = injector.getInstance(LoginClient.class).login(calendar, "user1");
+		locatorService.configure(baseUrl);
+		AccessToken token = loginClient.login(calendar, "user1");
 		
 		Event event = newEventWithAlert(calendar, "1", 30);
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, event, false, null);
@@ -90,9 +96,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testCreateEventInDelegationCreatesAlertForBothUsers(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "2", 30);
 		AccessToken user1Token = loginClient.login(calendar, "user1");
@@ -108,9 +112,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testModifyEventModifiesAlert(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		AccessToken token = injector.getInstance(LoginClient.class).login(calendar, "user1");
+		locatorService.configure(baseUrl);
+		AccessToken token = loginClient.login(calendar, "user1");
 
 		Event event = newEventWithAlert(calendar, "3", 30);
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, event, false, null);
@@ -126,9 +129,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testModifyEventInDelegationModifiesAlertForBothUsers(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "4", 30);
 		AccessToken user1Token = loginClient.login(calendar, "user1");
@@ -148,9 +149,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetEventFromId(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "5", 30);
 		AccessToken user1Token = loginClient.login(calendar, "user1");
@@ -167,9 +166,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSync(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "6", 30);
 		AccessToken user1Token = loginClient.login(calendar, "user1");
@@ -188,9 +185,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSyncWithSortedChanges(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "7", 30);
 		AccessToken user1Token = loginClient.login(calendar, "user1");
@@ -209,9 +204,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetEventFromExtId(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "8", 30);
 		AccessToken user1Token = loginClient.login(calendar, "user1");
@@ -229,9 +222,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetListEventsFromIntervalDate(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "9", 30, "2013-07-01T12:00:00Z");
 		AccessToken user1Token = loginClient.login(calendar, "user1");
@@ -250,9 +241,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_ModifyEvent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "10", 30);
 		AccessToken user1Token = loginClient.login(calendar, "user1");
@@ -270,9 +259,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithReadOnlyAccessDoesntInheritAlertFromEventOwner(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "11", 30);
 		AccessToken user1Token = loginClient.login(calendar, "user1");
@@ -289,9 +276,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testUserWithDelegationInheritsAlertFromEventOwner_GetSyncEventDate(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
-		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
-		LoginClient loginClient = injector.getInstance(LoginClient.class);
+		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "12", 30, "2013-07-01T12:00:00Z");
 		AccessToken user1Token = loginClient.login(calendar, "user1");
