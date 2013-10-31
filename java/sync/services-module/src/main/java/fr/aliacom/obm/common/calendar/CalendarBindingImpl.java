@@ -304,7 +304,7 @@ public class CalendarBindingImpl implements ICalendar {
 			ObmUser owner = userService.getUserFromLogin(ev.getOwner(), token.getDomain().getName());
 			if (owner != null) {
 				if (ev.isInternalEvent() && owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
-					cancelEventById(token, calendar, notification, ev);
+					cancelEvent(token, calendar, notification, eventId, ev);
 				} else {
 					changeParticipationInternal(
 							token, calendar, ev.getExtId(), Participation.declined(), sequence, notification);
@@ -324,45 +324,23 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private Event cancelEventById(AccessToken token, String calendar,
-			boolean notification, Event toRemoveEvent) throws SQLException,
+	private void cancelEvent(AccessToken token, String calendar,
+			boolean notification, EventObmId uid, Event ev) throws SQLException,
 			FindException, EventNotFoundException, ServerFault {
 		
-		return cancelEvent(token, calendar, notification, toRemoveEvent, new RemoveEventFunction() {
-			
-			@Override
-			public Event remove(AccessToken token, Event event) throws SQLException, EventNotFoundException, ServerFault {
-				return calendarDao.removeEventById(token, event.getObmId(), event.getType(), event.getSequence() + 1);
-			}
-		});
+		Event removed = calendarDao.removeEventById(token, uid, ev.getType(), ev.getSequence() + 1);
+		logger.info(LogUtils.prefix(token) + "Calendar : event[" + uid + "] removed");
+		notifyOnRemoveEvent(token, calendar, removed, notification);
 	}
 
-	private Event cancelEventByExtId(AccessToken token, final ObmUser obmUser, Event event, boolean notification)
-			throws FindException, SQLException, EventNotFoundException, ServerFault {
-		
-		return cancelEvent(token, obmUser.getEmailAtDomain(), notification, event, new RemoveEventFunction() {
-
-			@Override
-			public Event remove(AccessToken token, Event event) throws SQLException, EventNotFoundException, ServerFault {
-				return calendarDao.removeEventByExtId(token, obmUser, event.getExtId(), event.getSequence() + 1);
-			}
-		});
-	}
-
-	private Event cancelEvent(AccessToken token, String calendar, boolean notification, Event toRemoveEvent,
-			RemoveEventFunction removeEventFunction)
-			throws FindException, SQLException, EventNotFoundException, ServerFault {
-		
-		Event removedEvent = removeEventFunction.remove(token, toRemoveEvent);
-		logger.info(LogUtils.prefix(token) + String.format("Calendar : event[uid:%s, extId:%s] removed",
-				toRemoveEvent.getUid().serializeToString(), toRemoveEvent.getExtId().getExtId()));
-		changeCalendarOwnerParticipation(calendar, removedEvent, Participation.declined());
-		notifyOnRemoveEvent(token, calendar, removedEvent, notification);
-		return removedEvent;
-	}
-	
-	public interface RemoveEventFunction {
-		Event remove(AccessToken token, Event event) throws SQLException, EventNotFoundException, ServerFault;
+	private Event cancelEventByExtId(AccessToken token, ObmUser obmUser, Event event, boolean notification) throws SQLException, FindException {
+		EventExtId extId = event.getExtId();
+		Event removed = calendarDao.removeEventByExtId(token, obmUser, extId, event.getSequence() + 1);
+		logger.info(LogUtils.prefix(token) + "Calendar : event[" + extId + "] removed");
+		String obmUserEmail = obmUser.getEmailAtDomain();
+		changeCalendarOwnerParticipation(obmUserEmail, removed, Participation.declined());
+		notifyOnRemoveEvent(token, obmUserEmail, removed, notification);
+		return removed;
 	}
 
 	private void notifyOnRemoveEvent(AccessToken token, String calendar, Event event, boolean notification) throws FindException {

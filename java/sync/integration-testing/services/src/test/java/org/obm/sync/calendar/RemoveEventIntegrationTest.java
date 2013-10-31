@@ -120,7 +120,7 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 			.contains(
 				"UID:testRemoveEventByIdWhenOwnerInInternal\r\n")
 			.contains(
-				"ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=DECLINED;RSVP=TRUE;CN=Firstname Lastna\r\n" +
+				"ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=ACCEPTED;RSVP=TRUE;CN=Firstname Lastna\r\n" +
 				" me;ROLE=OPT-PARTICIPANT:mailto:user1@domain.org\r\n" +
 				"DTSTART:20130601T100000Z\r\n" +
 				"DURATION:PT0S\r\n" +
