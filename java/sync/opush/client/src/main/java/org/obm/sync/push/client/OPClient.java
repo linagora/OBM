@@ -32,6 +32,7 @@
 package org.obm.sync.push.client;
 
 import java.io.IOException;
+import java.util.concurrent.Future;
 
 import javax.xml.transform.TransformerException;
 
@@ -41,6 +42,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.fluent.Async;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicHeader;
 import org.obm.push.ProtocolVersion;
@@ -100,6 +102,9 @@ public abstract class OPClient {
 	public abstract Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart)
 			throws TransformerException, WBXmlException, IOException, HttpRequestException;
 	
+	public abstract <T> Future<T> postASyncXml(Async async, String namespace, Document doc, String cmd, String policyKey, boolean multipart, ResponseTransformer<T> documentHandler)
+			throws TransformerException, WBXmlException, IOException, HttpRequestException;
+	
 	protected OPClient(HttpClient httpClient, String loginAtDomain, String password,
 			DeviceId devId, String devType, String userAgent, String url, ProtocolVersion protocolVersion) {
 
@@ -110,6 +115,10 @@ public abstract class OPClient {
 
 	private <T> T run(IEasCommand<T> cmd) throws Exception {
 		return cmd.run(ai, this, hc);
+	}
+
+	private <T> Future<T> runASync(Async async, IEasCommand<T> cmd) throws Exception {
+		return cmd.runASync(ai, this, async);
 	}
 
 	public OptionsResponse options() throws Exception {
@@ -215,6 +224,10 @@ public abstract class OPClient {
 
 	public PingResponse ping(PingProtocol pingProtocol, String inboxCollectionIdAsString, long heartbeat) throws Exception {
 		return run(new PingCommand(pingProtocol, inboxCollectionIdAsString, heartbeat));
+	}
+
+	public Future<PingResponse> pingASync(Async async, PingProtocol pingProtocol, String inboxCollectionIdAsString, long heartbeat) throws Exception {
+		return runASync(async, new PingCommand(pingProtocol, inboxCollectionIdAsString, heartbeat));
 	}
 	
 	public Document postXml(String namespace, Document doc, String cmd)

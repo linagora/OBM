@@ -34,9 +34,11 @@ package org.obm.sync.push.client;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.concurrent.Future;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.http.client.fluent.Async;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.After;
@@ -69,6 +71,12 @@ public class OPClientTest {
 			@Override
 			public Document postXml(String namespace, Document doc, String cmd, String policyKey, boolean multipart) throws TransformerException,
 					WBXmlException, IOException, HttpRequestException {
+				throw new RuntimeException("this testing OPClient cannot performs request");
+			}
+
+			@Override
+			public <T> Future<T> postASyncXml(Async async, String namespace, Document doc, String cmd, String policyKey, boolean multipart, ResponseTransformer<T> documentHandler)
+					throws TransformerException, WBXmlException, IOException, HttpRequestException {
 				throw new RuntimeException("this testing OPClient cannot performs request");
 			}
 		};

@@ -31,11 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
+import java.util.concurrent.Future;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.fluent.Async;
 import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.message.BasicHeader;
 import org.obm.sync.push.client.IEasCommand;
@@ -75,5 +78,10 @@ public class Options implements IEasCommand<OptionsResponse> {
 				request.releaseConnection();
 			}
 		}
+	}
+
+	@Override
+	public Future<OptionsResponse> runASync(AccountInfos ai, OPClient opc, Async async) throws Exception {
+		throw new RuntimeException("Not implements for Options");
 	}
 }

@@ -37,6 +37,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.push.client.ResponseTransformer;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.Folder;
 import org.obm.sync.push.client.beans.NS;
@@ -91,4 +92,16 @@ public class Sync extends AbstractCommand<SyncResponse> {
 		return decoder.decodeSyncResponse(responseDocument);
 	}
 
+	@Override
+	protected ResponseTransformer<SyncResponse> responseTransformer() {
+		return new SyncResponseTransformer();
+	}
+	
+	private class SyncResponseTransformer implements ResponseTransformer<SyncResponse> {
+
+		@Override
+		public SyncResponse parse(Document document) {
+			return parseResponse(document);
+		}
+	}
 }

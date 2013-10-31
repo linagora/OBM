@@ -39,6 +39,7 @@ import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.push.client.ItemOperationFetchResponse;
 import org.obm.sync.push.client.ItemOperationResponse;
+import org.obm.sync.push.client.ResponseTransformer;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
@@ -107,4 +108,16 @@ public class ItemOperationFetchCommand extends AbstractCommand<ItemOperationResp
 		return new ItemOperationResponse(fetchResponses, ItemOperationsStatus.fromSpecificationValue(status));
 	}
 
+	@Override
+	protected ResponseTransformer<ItemOperationResponse> responseTransformer() {
+		return new ItemOperationResponseTransformer();
+	}
+	
+	private class ItemOperationResponseTransformer implements ResponseTransformer<ItemOperationResponse> {
+
+		@Override
+		public ItemOperationResponse parse(Document document) {
+			return parseResponse(document);
+		}
+	}
 }
