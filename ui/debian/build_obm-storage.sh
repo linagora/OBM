@@ -6,9 +6,7 @@ set -e
 CURDIR=$1
 BUILD_DEB_DIR="${CURDIR}/debian"
 BUILD_DEB_DIR_STORAGE="${BUILD_DEB_DIR}/obm-storage"
-INSTALL_DIR_SQL="${BUILD_DEB_DIR_STORAGE}/usr/share/dbconfig-common/data/obm-storage/install"
 INSTALL_DIR_SCRIPT="${BUILD_DEB_DIR_STORAGE}/usr/share/dbconfig-common/scripts/obm-storage/install"
-INSTALL_DIR_ADMINSQL="${BUILD_DEB_DIR_STORAGE}/usr/share/dbconfig-common/data/obm-storage/install-dbadmin"
 UPGRADE_SCRIPTS_DIR_MYSQL="${BUILD_DEB_DIR_STORAGE}/usr/share/dbconfig-common/scripts/obm-storage/upgrade/mysql"
 UPGRADE_SCRIPTS_DIR_PGSQL="${BUILD_DEB_DIR_STORAGE}/usr/share/dbconfig-common/scripts/obm-storage/upgrade/pgsql"
 UPGRADE_SQL_DIR_MYSQL="${BUILD_DEB_DIR_STORAGE}/usr/share/dbconfig-common/data/obm-storage/upgrade/mysql"
