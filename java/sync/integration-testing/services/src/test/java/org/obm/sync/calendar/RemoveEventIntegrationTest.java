@@ -62,17 +62,16 @@ import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
 import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
-import org.obm.sync.ServicesClientModule.ArquillianLocatorService;
+import org.obm.sync.ServicesClientModule.ClientTestConfiguration;
 import org.obm.sync.ServicesTestModule;
 import org.obm.sync.ServicesWithSocketJMSTestModule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
-import org.obm.sync.calendar.ServicesClientWithJMSModule.MessageConsumerResourcesManager;
+import org.obm.sync.calendar.ServicesClientWithJMSModule.MessageConsumerWithResourcesCloser;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginClient;
 
 import com.google.common.collect.Lists;
-import com.google.inject.Inject;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
@@ -81,35 +80,33 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 
 	private static final int TIMEOUT = 5000;
 
-	@Inject ArquillianLocatorService locatorService;
-	@Inject CalendarClient calendarClient;
-	@Inject LoginClient loginClient;
-	@Inject MessageConsumerResourcesManager messageConsumerResourcesManager;
-	
+	private MessageConsumerWithResourcesCloser consumerWithResourcesCloser;
 	private StoreMessageReceivedListener storeMessageReceivedListener;
+
 	private String userCalendar;
 
 	@Before
 	public void setup() throws Exception {
+		consumerWithResourcesCloser = injector.getInstance(MessageConsumerWithResourcesCloser.class);
 		storeMessageReceivedListener = new StoreMessageReceivedListener();
-		messageConsumerResourcesManager.start();
-		messageConsumerResourcesManager.getConsumer().setMessageListener(storeMessageReceivedListener);
+		consumerWithResourcesCloser.getConsumer().setMessageListener(storeMessageReceivedListener);
 		userCalendar = "user1@domain.org";
 	}
 	
 	@After
 	public void tearDown() throws Exception {
 		super.teardown();
-		messageConsumerResourcesManager.close();
+		consumerWithResourcesCloser.closeResources();
 	}
 	
 	@Test
 	@RunAsClient
 	public void testRemoveEventByIdWhenOwnerInInternal(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		locatorService.configure(baseUrl);
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
 		
 		Event event = newEvent(userCalendar, "user1", "testRemoveEventByIdWhenOwnerInInternal");
-		AccessToken token = loginClient.login(userCalendar, "user1");
+		AccessToken token = injector.getInstance(LoginClient.class).login(userCalendar, "user1");
 		Event storedEvent = calendarClient.storeEvent(token, userCalendar, event, false, null);
 
 		calendarClient.removeEventById(token, userCalendar, storedEvent.getObmId(), 0, true);
@@ -134,7 +131,9 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testRemoveEventByIdWhenAttendeeInInternal(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		locatorService.configure(baseUrl);
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
 
 		String organizerCalendar = "user2@domain.org";
 		Event event = newEvent(organizerCalendar, "user2", "testRemoveEventByIdWhenAttendeeInInternal");
@@ -174,7 +173,9 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testRemoveEventByIdWhenAttendeeInExternal(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		locatorService.configure(baseUrl);
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
 
 		String organizerCalendar = "organizer@external.org";
 		Event event = newEvent(userCalendar, "user1", "testRemoveEventByIdWhenAttendeeInExternal");
@@ -220,7 +221,9 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testRemoveEventByExtIdWhenOwnerInInternal(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		locatorService.configure(baseUrl);
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
 		
 		Event event = newEvent(userCalendar, "user1", "testRemoveEventByExtIdWhenOwnerInInternal");
 		AccessToken token = loginClient.login(userCalendar, "user1");
@@ -248,7 +251,9 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testRemoveEventByExtIdWhenAttendeeInInternal(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		locatorService.configure(baseUrl);
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
 
 		String organizerCalendar = "user2@domain.org";
 		Event event = newEvent(organizerCalendar, "user2", "testRemoveEventByExtIdWhenAttendeeInInternal");
@@ -288,7 +293,9 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testRemoveEventByExtIdWhenAttendeeInExternal(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
-		locatorService.configure(baseUrl);
+		injector.getInstance(ClientTestConfiguration.class).configure(baseUrl);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		LoginClient loginClient = injector.getInstance(LoginClient.class);
 
 		String organizerCalendar = "organizer@external.org";
 		Event event = newEvent(userCalendar, "user1", "testRemoveEventByExtIdWhenAttendeeInExternal");

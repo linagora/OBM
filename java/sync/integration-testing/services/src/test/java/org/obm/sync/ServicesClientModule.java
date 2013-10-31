@@ -42,7 +42,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.obm.Configuration;
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.module.LoggerModule;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
@@ -55,18 +54,17 @@ import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.google.inject.name.Names;
 
 public class ServicesClientModule extends AbstractModule {
 
 	protected ObmSyncConfiguration configuration;
 	protected CloseableHttpClient httpClient;
+	protected Locator locator;
 	protected SyncClientException exceptionFactory;
 	protected Logger logger;
 	protected BasicCookieStore cookieStore;
@@ -79,47 +77,75 @@ public class ServicesClientModule extends AbstractModule {
 		cookieStore = new BasicCookieStore();
 		httpClient = HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build();
 		
-		bind(String.class).annotatedWith(Names.named("origin")).toInstance("integration-testing");
-		bind(Logger.class).annotatedWith(Names.named(LoggerModule.OBM_SYNC)).toInstance(logger);
-		bind(ConfigurationService.class).toInstance(configuration);
 		bind(CloseableHttpClient.class).toInstance(httpClient);
-		bind(LocatorService.class).to(ArquillianLocatorService.class);
+		bind(ClientTestConfiguration.class).toInstance(new ClientTestConfiguration() {
+			
+			@Override
+			public void configure(URL baseUrl) {
+				LocatorService locatorService = arquillianLocatorService(baseUrl);
+				locator = new Locator(configuration, locatorService) {};
+			}
+		});
 	}
 
 	@Provides
-	CookiesFromClient createCookies(Locator locator) {
+	CookiesFromClient createCookies() {
 		return new CookiesFromClient(exceptionFactory, locator, cookieStore, logger, httpClient);
 	}
 	
 	@Provides @Singleton
-	BookClient createBookClient(BookClient.Factory bookClientFactory) {
+	BookClient createBookClient() {
+		BookClient.Factory bookClientFactory = new BookClientFactory(exceptionFactory, locator, logger);
 		return bookClientFactory.create(httpClient);
 	}
 	
 	@Provides @Singleton
-	CalendarClient createCalendarClient(CalendarClient.Factory calendarClientFactory) {
+	CalendarClient createCalendarClient() {
+		CalendarClient.Factory calendarClientFactory = new CalendarClientFactory(exceptionFactory, locator, logger);
 		return calendarClientFactory.create(httpClient);
 	}
 
 	@Provides @Singleton
-	LoginClient createLoginClient(LoginClient.Factory loginClientFactory) {
+	LoginClient createLoginClient() {
+		LoginClient.Factory loginClientFactory = new LoginClientFactory("integration-testing", configuration, exceptionFactory, locator, logger);
 		return loginClientFactory.create(httpClient);
 	}
 	
-	@Singleton
-	public static class ArquillianLocatorService implements LocatorService {
-		
-		private URL baseUrl;
-		
-		public void configure(URL baseUrl) {
-			this.baseUrl = baseUrl;
+	private class LoginClientFactory extends LoginClient.Factory {
+
+		protected LoginClientFactory(String origin,
+				ConfigurationService configurationService,
+				SyncClientException syncClientException, Locator locator,
+				Logger obmSyncLogger) {
+			super(origin, configurationService, syncClientException, locator, obmSyncLogger);
 		}
-		
-		@Override
-		public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
-			Preconditions.checkState(baseUrl != null, "Your test must configure the locator first");
-			return baseUrl.toExternalForm();
+	}
+	
+	private class CalendarClientFactory extends CalendarClient.Factory {
+
+		protected CalendarClientFactory(
+				SyncClientException syncClientException, Locator locator,
+				Logger obmSyncLogger) {
+			super(syncClientException, locator, obmSyncLogger);
 		}
+	}
+	
+	private class BookClientFactory extends BookClient.Factory {
+
+		protected BookClientFactory(SyncClientException syncClientException,
+				Locator locator, Logger obmSyncLogger) {
+			super(syncClientException, locator, obmSyncLogger);
+		}
+	}
+	
+	private LocatorService arquillianLocatorService(final URL baseURL) {
+		return new LocatorService() {
+			
+			@Override
+			public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
+				return baseURL.toExternalForm();
+			}
+		};
 	}
 	
 	public static class CookiesFromClient extends AbstractClientImpl {
@@ -155,5 +181,9 @@ public class ServicesClientModule extends AbstractModule {
 		private List<Cookie> getCookies() {
 			return cookieStore.getCookies();
 		}
+	}
+	
+	public static interface ClientTestConfiguration {
+		void configure(URL baseUrl);
 	}
 }

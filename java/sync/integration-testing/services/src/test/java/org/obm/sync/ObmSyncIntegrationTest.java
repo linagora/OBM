@@ -35,16 +35,17 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.After;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 public abstract class ObmSyncIntegrationTest {
 
 	public static final String ARCHIVE = "ObmSyncIntegrationTestArchive";
 
-	@Inject CloseableHttpClient closeableHttpClient;
-	
+	@Inject protected Injector injector;
+
 	@After
 	public void teardown() throws IOException {
-		closeableHttpClient.close();
+		injector.getInstance(CloseableHttpClient.class).close();
 	}
 	
 }

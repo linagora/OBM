@@ -55,7 +55,7 @@ import org.obm.sync.NotAllowedException;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.ServicesClientModule;
-import org.obm.sync.ServicesClientModule.ArquillianLocatorService;
+import org.obm.sync.ServicesClientModule.ClientTestConfiguration;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -70,8 +70,6 @@ import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.exception.ContactNotFoundException;
-
-import com.google.inject.Inject;
 
 @Slow
 @RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
@@ -93,11 +91,7 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 			"hac integer nonummy. Suspendisse ultricies, congue etiam tellus, erat libero, nulla eleifend, mauris " +
 			"pellentesque. Suspendisse integer praesent vel, integer gravida mauris, fringilla vehicula lacinia non";
 
-	@Inject ArquillianLocatorService locatorService;
-	@Inject CalendarClient calendarClient;
-	@Inject BookClient bookClient;
-	@Inject LoginClient loginClient;
-	
+	private AccessToken token;
 	private String calendar;
 
 	@Before
@@ -110,8 +104,9 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 	public void testAutoTruncateOnEventCreation(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseURL)
 			throws ServerFault, EventAlreadyExistException, NotAllowedException, EventNotFoundException, AuthFault {
 
-		locatorService.configure(baseURL);
-		AccessToken token = loginClient.login(calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseURL);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		token = injector.getInstance(LoginClient.class).login(calendar, "user1");
 		
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, getFakeBigFieldsEvent(calendar), false, null);
 		Event eventFromServer = calendarClient.getEventFromId(token, calendar, eventObmId);
@@ -124,10 +119,11 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 	public void testAutoTruncateOnEventModification(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseURL)
 			throws ServerFault, NotAllowedException, EventNotFoundException, AuthFault, EventAlreadyExistException {
 
-		locatorService.configure(baseURL);
-		AccessToken token = loginClient.login(calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseURL);
+		CalendarClient calendarClient = injector.getInstance(CalendarClient.class);
+		token = injector.getInstance(LoginClient.class).login(calendar, "user1");
 		
-		Event event = getFakeBigFieldsEvent(calendar);
+		final Event event = getFakeBigFieldsEvent(calendar);
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, event, false, null);
 		calendarClient.modifyEvent(token, calendar, event, false, false);
 		Event eventFromServer = calendarClient.getEventFromId(token, calendar, eventObmId);
@@ -159,8 +155,9 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 	@RunAsClient
 	public void testAutoTruncateOnContactCreation(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseURL)
 			throws NoPermissionException, ServerFault, ContactNotFoundException, AuthFault {
-		locatorService.configure(baseURL);
-		AccessToken token = loginClient.login(calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseURL);
+		BookClient bookClient = injector.getInstance(BookClient.class);
+		token = injector.getInstance(LoginClient.class).login(calendar, "user1");
 		
 		Contact contact = bookClient.createContact(token, ADDRESSBOOK_ID, getFakeBigFieldsContact(), null);
 		Contact contactFromServer = bookClient.getContactFromId(token, ADDRESSBOOK_ID, contact.getUid());
@@ -173,8 +170,9 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 	public void testAutoTruncateOnContactModification(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseURL)
 			throws NoPermissionException, ServerFault, ContactNotFoundException, AuthFault {
 		
-		locatorService.configure(baseURL);
-		AccessToken token = loginClient.login(calendar, "user1");
+		injector.getInstance(ClientTestConfiguration.class).configure(baseURL);
+		BookClient bookClient = injector.getInstance(BookClient.class);
+		token = injector.getInstance(LoginClient.class).login(calendar, "user1");
 		
 		final Contact contact = getFakeBigFieldsContact();
 		Contact createdContact = bookClient.createContact(token, ADDRESSBOOK_ID, contact, null);
