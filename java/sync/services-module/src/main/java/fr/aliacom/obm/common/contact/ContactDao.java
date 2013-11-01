@@ -1068,7 +1068,7 @@ public class ContactDao {
 			contactIds.insertValues(st, 1);
 			rs = st.executeQuery();
 			while (rs.next()) {
-				Contact c = entityContact.get(rs.getInt(1));
+				Contact c = entityContact.get(EntityId.valueOf(rs.getInt(1)));
 				Address p = new Address(rs.getString(3), rs.getString(4), rs
 						.getString(5), rs.getString(6), getCountryName(token,
 								con, rs.getString(7)), rs.getString(8));
@@ -1092,7 +1092,7 @@ public class ContactDao {
 			contactIds.insertValues(st, 1);
 			rs = st.executeQuery();
 			while (rs.next()) {
-				Contact c = entityContact.get(rs.getInt(1));
+				Contact c = entityContact.get(EntityId.valueOf(rs.getInt(1)));
 				String label = rs.getString(2);
 				String url = rs.getString(3);
 				if (c.getCalUri() ==  null && label.toLowerCase().startsWith("caluri")) {
@@ -1119,7 +1119,7 @@ public class ContactDao {
 			contactIds.insertValues(st, 1);
 			rs = st.executeQuery();
 			while (rs.next()) {
-				Contact c = entityContact.get(rs.getInt(1));
+				Contact c = entityContact.get(EntityId.valueOf(rs.getInt(1)));
 				InstantMessagingId p = new InstantMessagingId(rs.getString(4),
 						rs.getString(3));
 				c.addIMIdentifier(rs.getString(2), p);
@@ -1142,7 +1142,7 @@ public class ContactDao {
 			phoneIds.insertValues(st, 1);
 			rs = st.executeQuery();
 			while (rs.next()) {
-				Contact c = entityContact.get(rs.getInt(1));
+				Contact c = entityContact.get(EntityId.valueOf(rs.getInt(1)));
 				Phone p = new Phone(rs.getString(3));
 				c.addPhone(rs.getString(2), p);
 			}
