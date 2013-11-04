@@ -85,6 +85,7 @@ public class ObmSyncServicesModule extends AbstractModule {
         bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
         
         bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
+        bind(ObmSmtpService.class).to(JavamailObmSmtpService.class);
         bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
         bind(ICalendar.class).to(CalendarBindingImpl.class);
         ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader

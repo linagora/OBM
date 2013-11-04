@@ -29,36 +29,61 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common;
+package org.obm.sync;
 
-import java.util.List;
+import java.util.Properties;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
+import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMessage.RecipientType;
 
-import org.obm.sync.ObmSmtpService;
+import org.obm.locator.LocatorClientException;
 import org.obm.sync.auth.AccessToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-public class MailService {
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	private final ObmSmtpService provider;
+@Singleton
+public class JavamailObmSmtpService implements ObmSmtpService {
 
+	private static final Logger logger = LoggerFactory.getLogger(JavamailObmSmtpService.class);
+	
+	private final ObmSmtpConf conf;
+	
 	@Inject
-	private MailService(ObmSmtpService provider) {
-		this.provider = provider;
+	private JavamailObmSmtpService(ObmSmtpConf obmSmtpConf) {
+		conf = obmSmtpConf;
 	}
 	
-	public void sendMessage(List<InternetAddress> to, MimeMessage message, AccessToken token) throws MessagingException {
-		message.setRecipients(RecipientType.TO, to.toArray(new InternetAddress[0]));
-		provider.sendEmail(message, token);
-	}
+	@Override
+	public void sendEmail(MimeMessage message, AccessToken token) throws MessagingException {
+		Transport transport = null;
+		
+		try {
+			Session session = buildSession(token.getDomain());
+			
+			transport = session.getTransport("smtp");
+			transport.connect();
+			transport.sendMessage(message, message.getAllRecipients());
+		} catch (LocatorClientException e) {
+			logger.error("Couldn't send the message", e);
+		} finally {
+			if (transport != null) {
+				transport.close();
+			}
+		} 
+    }
 	
-	public void sendMessage(InternetAddress to, MimeMessage message, AccessToken token) throws MessagingException {
-		message.setRecipients(RecipientType.TO, new InternetAddress[]{to});
-		provider.sendEmail(message, token);
+	private Session buildSession(ObmDomain domain) throws LocatorClientException {
+		Properties properties = new Properties();
+		properties.put("mail.smtp.host", conf.getServerAddr(domain.getName()));	
+		properties.put("mail.smtp.port", conf.getServerPort(domain.getName()));
+		Session session = Session.getDefaultInstance(properties);
+		return session;
 	}
 }

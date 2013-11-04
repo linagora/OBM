@@ -75,6 +75,7 @@ import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.sync.ObmSmtpConf;
+import org.obm.sync.ObmSmtpService;
 import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
 import org.obm.sync.server.template.ITemplateLoader;
@@ -317,6 +318,7 @@ public class LoginHandlerTest {
 			bindMock(UserService.class);
 			bindMock(ConfigurationService.class);
 			bindMock(ObmSmtpConf.class);
+			bindMock(ObmSmtpService.class);
 			bindMock(ITemplateLoader.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 			bind(ObmSyncConfigurationService.class).toInstance(new ObmSyncConfigurationServiceImpl.Factory().create("discarded", "obm-sync"));
