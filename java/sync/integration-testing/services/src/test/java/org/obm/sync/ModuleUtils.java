@@ -35,6 +35,8 @@ import java.io.Serializable;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.io.FileUtils;
 import org.obm.Configuration;
@@ -46,6 +48,7 @@ import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.solr.SolrRequest;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
@@ -138,6 +141,23 @@ public class ModuleUtils {
 					public void close() throws JMSException {
 						// do nothing
 					}
+				});
+			}
+		};
+	}
+
+	public static Module buildDummySmtpModule() {
+		return new AbstractModule() {
+
+			@Override
+			protected void configure() {
+				bind(ObmSmtpService.class).toInstance(new ObmSmtpService() {
+					
+					@Override
+					public void sendEmail(MimeMessage message, AccessToken token) throws MessagingException {
+						// do nothing
+					}
+					
 				});
 			}
 		};

@@ -74,6 +74,7 @@ public class CalendarBindingImplIntegrationTestModule extends AbstractModule {
 	public Module overrideModule() {
 		return Modules.combine(
 				ModuleUtils.buildDummyConfigurationModule(),
+				ModuleUtils.buildDummySmtpModule(),
 				ModuleUtils.buildDummyJmsModule());
 	}
 }
