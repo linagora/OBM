@@ -114,11 +114,12 @@ public interface EhCacheConfiguration {
 			return percentage;
 		}
 		
-		public long applyTo(long to) {
+		public int applyTo(int to) {
 			Preconditions.checkState(isDefined(), "undefined percentage");
 			Preconditions.checkArgument(to >= 0, "must be a positive value");
-			return Math.round((to / 100d) * percentage);
+			return Math.round((to / 100f) * percentage);
 		}
+
 		
 		@Override
 		public final int hashCode(){
