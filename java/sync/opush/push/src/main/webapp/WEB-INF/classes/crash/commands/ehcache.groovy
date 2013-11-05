@@ -74,8 +74,7 @@ class ehcache extends CRaSHCommand {
   @Command
   public Object conf(
             @Usage("Update the maximum ehcache memory")   @Option(names=["update-max"]) Boolean isUpdateMax,
-            @Usage("Update percentage allowed to stores") @Option(names=["update-percentages"]) Boolean isUpdatePercentages,
-            @Usage("Dump running configuration") @Option(names=["dump"]) Boolean dump) {
+            @Usage("Update percentage allowed to stores") @Option(names=["update-percentages"]) Boolean isUpdatePercentages) {
 
     if (isUpdateMax && isUpdatePercentages) {
        return "Sorry, only one option can be given"
@@ -83,8 +82,6 @@ class ehcache extends CRaSHCommand {
        confUpdateMaxMemory()
     } else if (isUpdatePercentages) {
        confUpdateStorePercentages()
-    } else if (dump) {
-       dumpRunningConfiguration()
     } else {
        confValues()
     }
@@ -168,20 +165,6 @@ class ehcache extends CRaSHCommand {
     }
   }
 
-  public void dumpRunningConfiguration() {
-    def manager = getSingleton("org.obm.push.store.ehcache.ObjectStoreManager")
-    def runningConfig= manager.createConfigReader()
-    out.println("### EHCACHE MEMORY SETTINGS")
-    out.println("maxMemoryInMB=" + runningConfig.getRunningMaxMemoryInMB())
-
-    out.println()
-    out.println("### BY CACHE, IN PERCENT (optional parameters)")    
-    def runningStoresPercentages = runningConfig.getRunningStoresPercentages()
-    for(String storeName : manager.listStores()) {
-      out.println(storeName + "=" + runningStoresPercentages[storeName].getIntValue())
-    }
-  }
-  
   @Usage("Show statistic about ehcache usage")
   @Command
   public Object stats() {
