@@ -36,9 +36,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.IOException;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.config.CacheConfiguration;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,8 +47,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 
-@Slow
-@RunWith(SlowFilterRunner.class)
+@RunWith(SlowFilterRunner.class) @Slow
 public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 
 	@Rule 
@@ -109,37 +105,5 @@ public class ObjectStoreManagerTest extends StoreManagerConfigurationTest {
 		
 		assertThat(opushCacheManager.getStore("test 1")).isNotNull();
 		assertThat(opushCacheManager.listStores()).hasSize(8);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testRequiredStoreOnUnknownStore() {
-		opushCacheManager.requiredStore("unknown");
-	}
-	
-	@Test
-	public void testRequiredStore() {
-		String storeName = "test";
-		Cache expectedStore = opushCacheManager.createNewStore(storeName);
-		Cache store = opushCacheManager.requiredStore(storeName);
-		assertThat(store).isEqualTo(expectedStore);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testRequiredStoreConfigurationOnUnknownStore() {
-		opushCacheManager.requiredStoreConfiguration("unknown");
-	}
-	
-	@Test
-	public void testRequiredStoreConfiguration() {
-		String storeName = "test";
-		Cache expectedStore = opushCacheManager.createNewStore(storeName);
-		CacheConfiguration configuration = opushCacheManager.requiredStoreConfiguration(storeName);
-		assertThat(configuration).isEqualTo(expectedStore.getCacheConfiguration());
-	}
-	
-	@Test
-	public void testCreateConfigReader() {
-		ObjectStoreConfigReader configReader = opushCacheManager.createConfigReader();
-		assertThat(configReader.storeManager).isEqualTo(opushCacheManager);
 	}
 }

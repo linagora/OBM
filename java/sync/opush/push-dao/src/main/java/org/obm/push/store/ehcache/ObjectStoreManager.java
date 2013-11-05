@@ -192,24 +192,5 @@ public class ObjectStoreManager implements StoreManager, EhCacheStores {
 	public List<String> listStores() {
 		return Arrays.asList(this.singletonManager.getCacheNames());
 	}
-	
-	public Configuration getConfiguration() {
-		return this.singletonManager.getConfiguration();
-	}
-	
-	public CacheConfiguration requiredStoreConfiguration(String storeName) {
-		return requiredStore(storeName).getCacheConfiguration();
-	}
 
-	public Cache requiredStore(String storeName) {
-		Cache store = getStore(storeName);
-		if (store == null) {
-			throw new IllegalArgumentException("Cannot found the store: " + storeName);
-		}
-		return store;
-	}
-
-	public ObjectStoreConfigReader createConfigReader() {
-		return new ObjectStoreConfigReader(this);
-	}
 }
