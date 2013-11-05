@@ -37,9 +37,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.config.CacheConfiguration;
-
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -121,37 +118,5 @@ public class ObjectStoreManagerTest {
 		
 		assertThat(opushCacheManager.getStore("test 1")).isNotNull();
 		assertThat(opushCacheManager.listStores()).hasSize(8);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testRequiredStoreOnUnknownStore() {
-		opushCacheManager.requiredStore("unknown");
-	}
-	
-	@Test
-	public void testRequiredStore() {
-		String storeName = "test";
-		Cache expectedStore = opushCacheManager.createNewStore(storeName);
-		Cache store = opushCacheManager.requiredStore(storeName);
-		assertThat(store).isEqualTo(expectedStore);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testRequiredStoreConfigurationOnUnknownStore() {
-		opushCacheManager.requiredStoreConfiguration("unknown");
-	}
-	
-	@Test
-	public void testRequiredStoreConfiguration() {
-		String storeName = "test";
-		Cache expectedStore = opushCacheManager.createNewStore(storeName);
-		CacheConfiguration configuration = opushCacheManager.requiredStoreConfiguration(storeName);
-		assertThat(configuration).isEqualTo(expectedStore.getCacheConfiguration());
-	}
-	
-	@Test
-	public void testCreateConfigReader() {
-		ObjectStoreConfigReader configReader = opushCacheManager.createConfigReader();
-		assertThat(configReader.storeManager).isEqualTo(opushCacheManager);
 	}
 }

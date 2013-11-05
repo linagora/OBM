@@ -71,44 +71,25 @@ class ehcache extends CRaSHCommand {
   @Usage("Show ehcache configuration")
   @Command
   public Object conf() {
-    def ui = new UIBuilder()
     def manager = getSingleton("org.obm.push.store.ehcache.ObjectStoreManager")
-    def fileConfig = getSingleton("org.obm.push.store.ehcache.EhCacheConfiguration")
-    def fileMaxMemoryInMB = fileConfig.maxMemoryInMB()
+    def config = getSingleton("org.obm.push.store.ehcache.EhCacheConfiguration")
+    def maxMemoryInMB = config.maxMemoryInMB()
 
-    def runningConfig= manager.createConfigReader()
-    def runningMaxMemoryInMB = runningConfig.getRunningMaxMemoryInMB()
-    def runningStoresPercentages = runningConfig.getRunningStoresPercentages()
-    def runningStoresMaxMemoryInMB = runningConfig.getRunningStoresMaxMemoryInMB()
-
-    def undefinedLabelOr = {storePercentage, action -> storePercentage.isDefined() ? action(storePercentage) : ui.label("Undefined") }
-    def buildFileAbsoluteLabel = { storePercentage -> ui.label(storePercentage.applyTo(fileMaxMemoryInMB)) }
-    def buildPercentageLabel = { storePercentage -> ui.label(storePercentage.get()) }
-
-    return ui.table(separator: dashed, rightCellPadding: 2) {
-      header(bold: true) {
-         label("")
-         label("FILE in MB")
-         label("FILE in %")
-         label("RUNNING in MB")
-         label("RUNNING in %")
-      }
-      row(bold: true, foreground: blue) {
-         label("Memory allowed to ehcache ")
-         label(fileMaxMemoryInMB)
-         label("")
-         label(runningMaxMemoryInMB)
-         label("")
+    return new UIBuilder().table(separator: dashed, rightCellPadding: 2) {
+      row() {
+         label("Memory allowed to ehcache ", bold: true, foreground: blue)
+         label(maxMemoryInMB + " MB")
       }
 
       for(String storeName : manager.listStores()) {
-          def fileStorePercentage = fileConfig.percentageAllowedToCache(storeName)
+          def storePercentage = config.percentageAllowedToCache(storeName)
           row() {
-             label(storeName, foreground: blue)
-             undefinedLabelOr(fileStorePercentage, buildFileAbsoluteLabel)
-             undefinedLabelOr(fileStorePercentage, buildPercentageLabel)
-             label(runningStoresMaxMemoryInMB[storeName])
-             undefinedLabelOr(runningStoresPercentages[storeName], buildPercentageLabel)
+             label(storeName + " ", foreground: blue)
+             if (storePercentage.isDefined()) {
+                label(storePercentage.applyTo(maxMemoryInMB) + "MB (" + storePercentage.get() + ")")
+             } else {
+                label("Undefined")
+             }
           }
       }
     }
