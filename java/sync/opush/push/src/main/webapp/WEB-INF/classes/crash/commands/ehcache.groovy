@@ -1,8 +1,6 @@
 import org.crsh.text.ui.UIBuilder
 import java.util.concurrent.TimeUnit
 import net.sf.ehcache.store.StoreOperationOutcomes.GetOutcome
-import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage
-import org.obm.push.utils.jvm.JvmUtils
 
 @Usage("Ehcache commands")
 class ehcache extends CRaSHCommand {
@@ -72,22 +70,7 @@ class ehcache extends CRaSHCommand {
 
   @Usage("Show ehcache configuration")
   @Command
-  public Object conf(
-            @Usage("Update the maximum ehcache memory")   @Option(names=["update-max"]) Boolean isUpdateMax,
-            @Usage("Update percentage allowed to stores") @Option(names=["update-percentages"]) Boolean isUpdatePercentages) {
-
-    if (isUpdateMax && isUpdatePercentages) {
-       return "Sorry, only one option can be given"
-    } else if (isUpdateMax) {
-       confUpdateMaxMemory()
-    } else if (isUpdatePercentages) {
-       confUpdateStorePercentages()
-    } else {
-       confValues()
-    }
-  }
-
-  private Object confValues() {
+  public Object conf() {
     def ui = new UIBuilder()
     def manager = getSingleton("org.obm.push.store.ehcache.ObjectStoreManager")
     def fileConfig = getSingleton("org.obm.push.store.ehcache.EhCacheConfiguration")
@@ -131,51 +114,12 @@ class ehcache extends CRaSHCommand {
     }
   }
 
-  public void confUpdateMaxMemory() {
-    def manager = getSingleton("org.obm.push.store.ehcache.ObjectStoreManager")
-    def jvmXmx = JvmUtils.maxRuntimeJvmMemoryInMB()
-
-    manager.createConfigUpdater().updateMaxMemoryInMB(
-                readInteger("Give the new ehcache max memory in MiB (JVM has $jvmXmx MiB)"))
-
-    out.println("DONE")
-  }
-
-  public void confUpdateStorePercentages() {
-    def manager = getSingleton("org.obm.push.store.ehcache.ObjectStoreManager")
-
-    def newPercentagesMap = manager.listStores().collectEntries( [:] ) {
-       storeName -> [storeName, Percentage.of(readInteger(storeName))]
-    }
-
-    try {
-       manager.createConfigUpdater().updateStoresMaxMemory(newPercentagesMap)
-       out.println("DONE")
-    } catch(e) {
-       out.println("ERROR: " + e.getMessage())
-       out.println("New values were: " +newPercentagesMap)
-    }
-  }
-
-  private int readInteger(String message) {
-    try {
-       readLine(message + ": ").toInteger()
-    } catch(e) {
-       throw new Exception("An integer was expected", e)
-    }
-  }
-
   @Usage("Show statistic about ehcache usage")
   @Command
   public Object stats() {
     def manager = getSingleton("org.obm.push.store.ehcache.ObjectStoreManager")
     def config = getSingleton("org.obm.push.store.ehcache.EhCacheConfiguration")
     def stats = getSingleton("org.obm.push.store.ehcache.EhCacheStatistics")
-    
-    def runningConfig= manager.createConfigReader()
-    def runningStoresPercentages = runningConfig.getRunningStoresPercentages()
-    def runningStoresMaxMemoryInMB = runningConfig.getRunningStoresMaxMemoryInMB()
-
 
     UIBuilder ui = new UIBuilder()
     ui.table(separator: dashed, rightCellPadding: 2) {
@@ -187,7 +131,7 @@ class ehcache extends CRaSHCommand {
        }
        for(String storeName : manager.listStores()) {
           def storeMemorySizeInBytes = stats.memorySizeInBytes(storeName)
-          def storePercentage = runningStoresPercentages[storeName]
+          def storePercentage = config.percentageAllowedToCache(storeName)
           if (!storePercentage.isDefined()) {
               continue
           }
@@ -195,11 +139,7 @@ class ehcache extends CRaSHCommand {
              label(storeName)
              storeStats(ui, storeName, stats)
              label(fixRight(byteString(storeMemorySizeInBytes), 6))
-             if (runningStoresMaxMemoryInMB[storeName] != 0) {
-               label(percentageBar(runningStoresMaxMemoryInMB[storeName], storeMemorySizeInBytes))
-             } else {
-               label(percentageBar(100, storeMemorySizeInBytes))
-             }
+             label(percentageBar(storePercentage.applyTo(config.maxMemoryInMB()), storeMemorySizeInBytes))
           }
        }
     }

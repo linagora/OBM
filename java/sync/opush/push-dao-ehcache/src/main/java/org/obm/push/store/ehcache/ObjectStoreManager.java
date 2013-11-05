@@ -137,8 +137,7 @@ public class ObjectStoreManager implements StoreManager, EhCacheStores {
 			.maxBytesLocalHeap(ehCacheConfiguration.maxMemoryInMB(), MemoryUnit.MEGABYTES)
 			.diskStore(new DiskStoreConfiguration().path(dataDirectory))
 			.updateCheck(false)
-			.defaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds)
-			.dynamicConfig(true);
+			.defaultTransactionTimeoutInSeconds(transactionTimeoutInSeconds);
 		
 		for (String name : STORES) {
 			configuration.cache(timeToLiveConfiguration(defaultCacheConfiguration(name), usePersistentCache));
@@ -219,9 +218,5 @@ public class ObjectStoreManager implements StoreManager, EhCacheStores {
 
 	public ObjectStoreConfigReader createConfigReader() {
 		return new ObjectStoreConfigReader(this);
-	}
-	
-	public ObjectStoreConfigUpdater createConfigUpdater() {
-		return new ObjectStoreConfigUpdater(this);
 	}
 }
