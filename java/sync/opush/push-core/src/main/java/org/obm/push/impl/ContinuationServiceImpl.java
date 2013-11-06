@@ -56,8 +56,9 @@ public class ContinuationServiceImpl implements ContinuationService {
 	}
 
 	@Override
-	public void suspend(UserDataRequest userDataRequest, IContinuation continuation, long secondsTimeout) {
-		logger.debug("suspend {} {}", userDataRequest.getDevice(), secondsTimeout);
+	public void suspend(UserDataRequest userDataRequest, IContinuation continuation, long secondsTimeout, String cancellingStatus) {
+		logger.debug("suspend {} {} {}", userDataRequest.getDevice(), secondsTimeout, cancellingStatus);
+		continuation.error(cancellingStatus);
 		
 		boolean hasPreviousElement = continuationTransactionMap.putContinuationForDevice(userDataRequest.getDevice(), continuation);
 		if (hasPreviousElement) {
@@ -81,13 +82,12 @@ public class ContinuationServiceImpl implements ContinuationService {
 	}
 
 	@Override
-	public void cancel(Device device, String error) {
+	public void cancel(Device device) {
 		try {
-			logger.debug("cancel {} {}", device, error);
+			logger.debug("cancel {} {}", device);
 			
 			IContinuation continuation = continuationTransactionMap.getContinuationForDevice(device);
 			continuationTransactionMap.delete(device);
-			continuation.error(error);
 			continuation.resume();
 		} catch (ElementNotFoundException e) {
 			logger.debug("cancel device {} not found", device);

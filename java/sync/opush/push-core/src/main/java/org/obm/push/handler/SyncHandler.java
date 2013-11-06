@@ -48,8 +48,8 @@ import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Device;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.ServerId;
@@ -153,7 +153,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			SyncRequest syncRequest = syncProtocol.decodeRequest(doc);
 			AnalysedSyncRequest analyzedSyncRequest = syncProtocol.analyzeRequest(udr, syncRequest);
 			
-			continuationService.cancel(udr.getDevice(), SyncStatus.NEED_RETRY.asSpecificationValue());
+			continuationService.cancel(udr.getDevice());
 			SyncClientCommands clientCommands = processClientCommands(udr, analyzedSyncRequest.getSync());
 			if (analyzedSyncRequest.getSync().getWaitInSecond() > 0) {
 				registerWaitingSync(continuation, udr, analyzedSyncRequest.getSync());
@@ -227,8 +227,6 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			}
 		}
 		
-		continuation.error(SyncStatus.NEED_RETRY.asSpecificationValue());
-		
 		continuation.setLastContinuationHandler(this);
 		monitoredCollectionService.put(udr.getCredentials(), udr.getDevice(), syncRequest.getCollections());
 		CollectionChangeListener l = new CollectionChangeListener(udr, continuation, syncRequest.getCollections());
@@ -236,7 +234,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 		continuation.setListenerRegistration(reg);
 		continuation.setCollectionChangeListener(l);
 		
-		continuationService.suspend(udr, continuation, syncRequest.getWaitInSecond());
+		continuationService.suspend(udr, continuation, syncRequest.getWaitInSecond(), SyncStatus.NEED_RETRY.asSpecificationValue());
 	}
 
 	private Date doUpdates(UserDataRequest udr, AnalysedSyncCollection request, SyncClientCommands clientCommands, 

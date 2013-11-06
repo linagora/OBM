@@ -31,14 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.impl;
 
-import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 
 import java.util.Properties;
 
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.ContinuationTransactionMap;
@@ -55,38 +54,54 @@ import org.obm.push.bean.UserDataRequest;
 public class ContinuationServiceImplTest {
 	
 	private Device device;
+	private IMocksControl control;
 
 	@Before
 	public void setUp() {
+		control = createControl();
 		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121);
 	}
 	
 	@Test
 	public void testSuspend() {
+		String error = "ERROR";
+		UserDataRequest userDataRequest = getFakeUserDataRequest();
+		
 		IContinuation continuation = mockContinuation();
+		continuation.suspend(userDataRequest, 0);
+		expectLastCall();
+		continuation.error(error);
+		expectLastCall();
 		
 		ContinuationTransactionMap<IContinuation> continuationTransactionMap = mockContinuationTransactionMap();
 		expect(continuationTransactionMap.putContinuationForDevice(device, continuation)).andReturn(false);
 		
-		replay(continuationTransactionMap);
+		control.replay();
 		
-		continuationService(continuationTransactionMap).suspend(getFakeUserDataRequest(), continuation, 0);
+		continuationService(continuationTransactionMap).suspend(userDataRequest, continuation, 0, error);
 		
-		verify(continuationTransactionMap);
+		control.verify();
 	}
 	
 	@Test
 	public void testSuspendOnAlreadyCachedContinuation() {
+		String error = "ERROR";
+		UserDataRequest userDataRequest = getFakeUserDataRequest();
+		
 		IContinuation continuation = mockContinuation();
+		continuation.suspend(userDataRequest, 0);
+		expectLastCall();
+		continuation.error(error);
+		expectLastCall();
 		
 		ContinuationTransactionMap<IContinuation> continuationTransactionMap = mockContinuationTransactionMap();
 		expect(continuationTransactionMap.putContinuationForDevice(device, continuation)).andReturn(true);
 		
-		replay(continuationTransactionMap);
+		control.replay();
 		
-		continuationService(continuationTransactionMap).suspend(getFakeUserDataRequest(), continuation, 0);
+		continuationService(continuationTransactionMap).suspend(userDataRequest, continuation, 0, error);
 		
-		verify(continuationTransactionMap);
+		control.verify();
 	}
 	
 	private UserDataRequest getFakeUserDataRequest() {
@@ -107,20 +122,17 @@ public class ContinuationServiceImplTest {
 		continuationTransactionMap.delete(device);
 		expectLastCall();
 		
-		replay(continuationTransactionMap, continuation);
+		control.replay();
 		
 		continuationService(continuationTransactionMap).resume(device);
 		
-		verify(continuationTransactionMap, continuation);
+		control.verify();
 	}
 	
 	@Test
 	public void testCancel() throws ElementNotFoundException {
-		String error = "ERROR";
 		IContinuation continuation = mockContinuation();
 		continuation.resume();
-		expectLastCall();
-		continuation.error(error);
 		expectLastCall();
 		
 		ContinuationTransactionMap<IContinuation> continuationTransactionMap = mockContinuationTransactionMap();
@@ -129,20 +141,20 @@ public class ContinuationServiceImplTest {
 		continuationTransactionMap.delete(device);
 		expectLastCall();
 		
-		replay(continuationTransactionMap, continuation);
+		control.replay();
 		
-		continuationService(continuationTransactionMap).cancel(device, error);
+		continuationService(continuationTransactionMap).cancel(device);
 		
-		verify(continuationTransactionMap, continuation);
+		control.verify();
 	}
 
 	private ContinuationTransactionMap<IContinuation> mockContinuationTransactionMap() {
-		ContinuationTransactionMap<IContinuation> continuationTransactionMap = createMock(ContinuationTransactionMap.class);
+		ContinuationTransactionMap<IContinuation> continuationTransactionMap = control.createMock(ContinuationTransactionMap.class);
 		return continuationTransactionMap;
 	}
 
 	private IContinuation mockContinuation() {
-		IContinuation continuation = createMock(IContinuation.class);
+		IContinuation continuation = control.createMock(IContinuation.class);
 		return continuation;
 	}
 

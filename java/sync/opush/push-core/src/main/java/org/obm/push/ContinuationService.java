@@ -37,9 +37,9 @@ import org.obm.push.bean.UserDataRequest;
 
 public interface ContinuationService {
 	
-	void suspend(UserDataRequest userDataRequest, IContinuation continuation, long secondsTimeout);
+	void suspend(UserDataRequest userDataRequest, IContinuation continuation, long secondsTimeout, String cancellingStatus);
 	
 	void resume(Device device);
 	
-	void cancel(Device device, String error);
+	void cancel(Device device);
 }
