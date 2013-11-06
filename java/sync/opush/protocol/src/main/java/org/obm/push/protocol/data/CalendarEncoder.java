@@ -56,7 +56,9 @@ import org.obm.push.utils.DateUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 
 public class CalendarEncoder extends Encoder {
@@ -152,18 +154,19 @@ public class CalendarEncoder extends Encoder {
 		
 		if (ev.getRecurrence() != null) {
 			encodeRecurrence(p, ev, sdf, timeZone);
-			encodeExceptions(device, ev, p, ev.getExceptions(), sdf);
 		}
 
 		s(p, ASCalendar.SENSITIVITY.asASValue(), ev.getSensitivity().asIntString());
 		s(p, ASCalendar.BUSY_STATUS.asASValue(), ev.getBusyStatus().asIntString());
-
 		if (ev.getAllDayEvent()) {
 			s(p, ASCalendar.ALL_DAY_EVENT.asASValue(), (ev.getAllDayEvent() ? "1" : "0"));
 		} else {
 			s(p, ASCalendar.ALL_DAY_EVENT.asASValue(), "0");
 		}
-
+		
+		List<MSEventException> exceptions = Objects.firstNonNull(ev.getExceptions(), ImmutableList.<MSEventException>of());
+		encodeExceptions(device, ev, p, exceptions, sdf);
+		
 		if (device.checkHint("hint.loadAttendees", true)
 				&& ev.getAttendees().size() > 1) {
 			s(p, ASCalendar.MEETING_STATUS.asASValue(), CalendarMeetingStatus.IS_A_MEETING

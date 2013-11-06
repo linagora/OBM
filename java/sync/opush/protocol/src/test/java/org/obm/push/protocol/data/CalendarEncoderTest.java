@@ -33,6 +33,7 @@
 package org.obm.push.protocol.data;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
@@ -57,6 +58,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventException;
+import org.obm.push.bean.MSEventExceptionBuilder;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
 import org.obm.push.bean.RecurrenceType;
@@ -423,6 +425,9 @@ public class CalendarEncoderTest {
 		expected.append("<Calendar:RecurrenceInterval>1</Calendar:RecurrenceInterval>");
 		expected.append("<Calendar:RecurrenceDayOfMonth>15</Calendar:RecurrenceDayOfMonth>");
 		expected.append("</Calendar:Recurrence>");
+		expected.append("<Calendar:Sensitivity>0</Calendar:Sensitivity>");
+		expected.append("<Calendar:BusyStatus>0</Calendar:BusyStatus>");
+		expected.append("<Calendar:AllDayEvent>0</Calendar:AllDayEvent>");
 		expected.append("<Calendar:Exceptions>");
 		expected.append("<Calendar:Exception>");
 		expected.append("<Calendar:MeetingStatus>0</Calendar:MeetingStatus>");
@@ -439,9 +444,6 @@ public class CalendarEncoderTest {
 		expected.append("<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>");
 		expected.append("</Calendar:Exception>");
 		expected.append("</Calendar:Exceptions>");
-		expected.append("<Calendar:Sensitivity>0</Calendar:Sensitivity>");
-		expected.append("<Calendar:BusyStatus>0</Calendar:BusyStatus>");
-		expected.append("<Calendar:AllDayEvent>0</Calendar:AllDayEvent>");
 		expected.append("<Calendar:MeetingStatus>0</Calendar:MeetingStatus>");
 		expected.append("<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>");
 		expected.append("</ApplicationData>");
@@ -482,6 +484,9 @@ public class CalendarEncoderTest {
 		expected.append("<Calendar:RecurrenceInterval>1</Calendar:RecurrenceInterval>");
 		expected.append("<Calendar:RecurrenceDayOfMonth>15</Calendar:RecurrenceDayOfMonth>");
 		expected.append("</Calendar:Recurrence>");
+		expected.append("<Calendar:Sensitivity>0</Calendar:Sensitivity>");
+		expected.append("<Calendar:BusyStatus>0</Calendar:BusyStatus>");
+		expected.append("<Calendar:AllDayEvent>0</Calendar:AllDayEvent>");
 		expected.append("<Calendar:Exceptions>");
 		expected.append("<Calendar:Exception>");
 		expected.append("<Calendar:MeetingStatus>0</Calendar:MeetingStatus>");
@@ -499,13 +504,131 @@ public class CalendarEncoderTest {
 		expected.append("<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>");
 		expected.append("</Calendar:Exception>");
 		expected.append("</Calendar:Exceptions>");
-		expected.append("<Calendar:Sensitivity>0</Calendar:Sensitivity>");
-		expected.append("<Calendar:BusyStatus>0</Calendar:BusyStatus>");
-		expected.append("<Calendar:AllDayEvent>0</Calendar:AllDayEvent>");
 		expected.append("<Calendar:MeetingStatus>0</Calendar:MeetingStatus>");
 		expected.append("<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>");
 		expected.append("</ApplicationData>");
 		assertThat(actual).isEqualTo(expected.toString());
+	}
+
+	@Test
+	public void testEncodeWhenNullExceptions() throws Exception {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.DAILY);
+		recurrence.setInterval(1);
+
+		MSEvent msEvent = getFakeMSEvent(defaultTimeZone);
+		msEvent.setAllDayEvent(true);
+		msEvent.setStartTime(date("2014-01-01T14:00:00"));
+		msEvent.setEndTime(date("2014-01-01T18:00:00"));
+		msEvent.setRecurrence(recurrence);
+		msEvent.setExceptions(null);
+		
+		assertThat(encodeMSEventAsString(msEvent)).isEqualTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<ApplicationData xmlns=\"test\">" +
+					"<Calendar:TimeZone>" + AS_GMT + "</Calendar:TimeZone>" +
+					"<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>" +
+					"<Calendar:StartTime>20140101T140000Z</Calendar:StartTime>" +
+					"<Calendar:UID>FAC000123D</Calendar:UID>" +
+					"<Calendar:EndTime>20140101T180000Z</Calendar:EndTime>" +
+					"<AirSyncBase:Body>" +
+					"<AirSyncBase:Type>1</AirSyncBase:Type>" +
+					"<AirSyncBase:EstimatedDataSize>0</AirSyncBase:EstimatedDataSize>" +
+					"</AirSyncBase:Body>" +
+					"<Calendar:Recurrence>" +
+						"<Calendar:RecurrenceType>0</Calendar:RecurrenceType>" +
+						"<Calendar:RecurrenceInterval>1</Calendar:RecurrenceInterval>" +
+					"</Calendar:Recurrence>" +
+					"<Calendar:Sensitivity>0</Calendar:Sensitivity>" +
+					"<Calendar:BusyStatus>0</Calendar:BusyStatus>" +
+					"<Calendar:AllDayEvent>1</Calendar:AllDayEvent>" +
+					"<Calendar:MeetingStatus>0</Calendar:MeetingStatus>" +
+					"<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>" +
+				"</ApplicationData>");
+	}
+	
+	@Test
+	public void testEncodeWhenEmptyExceptions() throws Exception {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.DAILY);
+		recurrence.setInterval(1);
+		
+		MSEvent msEvent = getFakeMSEvent(defaultTimeZone);
+		msEvent.setAllDayEvent(true);
+		msEvent.setStartTime(date("2014-01-01T14:00:00"));
+		msEvent.setEndTime(date("2014-01-01T18:00:00"));
+		msEvent.setRecurrence(recurrence);
+		msEvent.setExceptions(ImmutableList.<MSEventException>of());
+		
+		assertThat(encodeMSEventAsString(msEvent)).isEqualTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+						"<ApplicationData xmlns=\"test\">" +
+						"<Calendar:TimeZone>" + AS_GMT + "</Calendar:TimeZone>" +
+						"<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>" +
+						"<Calendar:StartTime>20140101T140000Z</Calendar:StartTime>" +
+						"<Calendar:UID>FAC000123D</Calendar:UID>" +
+						"<Calendar:EndTime>20140101T180000Z</Calendar:EndTime>" +
+						"<AirSyncBase:Body>" +
+						"<AirSyncBase:Type>1</AirSyncBase:Type>" +
+						"<AirSyncBase:EstimatedDataSize>0</AirSyncBase:EstimatedDataSize>" +
+						"</AirSyncBase:Body>" +
+						"<Calendar:Recurrence>" +
+						"<Calendar:RecurrenceType>0</Calendar:RecurrenceType>" +
+						"<Calendar:RecurrenceInterval>1</Calendar:RecurrenceInterval>" +
+						"</Calendar:Recurrence>" +
+						"<Calendar:Sensitivity>0</Calendar:Sensitivity>" +
+						"<Calendar:BusyStatus>0</Calendar:BusyStatus>" +
+						"<Calendar:AllDayEvent>1</Calendar:AllDayEvent>" +
+						"<Calendar:MeetingStatus>0</Calendar:MeetingStatus>" +
+						"<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>" +
+				"</ApplicationData>");
+	}
+	
+	@Test
+	public void testTagOrderIsRecurrenceThenAllDayEventThenExceptions() throws Exception {
+		MSRecurrence recurrence = new MSRecurrence();
+		recurrence.setType(RecurrenceType.DAILY);
+		recurrence.setInterval(1);
+
+		MSEvent msEvent = getFakeMSEvent(defaultTimeZone);
+		msEvent.setAllDayEvent(true);
+		msEvent.setStartTime(date("2014-01-01T14:00:00"));
+		msEvent.setEndTime(date("2014-01-01T18:00:00"));
+		msEvent.setRecurrence(recurrence);
+		msEvent.setExceptions(ImmutableList.of(new MSEventExceptionBuilder()
+					.withDeleted(true)
+					.withExceptionStartTime(date("2014-03-01T14:00:00"))
+					.build()));
+		
+		assertThat(encodeMSEventAsString(msEvent)).isEqualTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<ApplicationData xmlns=\"test\">" +
+					"<Calendar:TimeZone>" + AS_GMT + "</Calendar:TimeZone>" +
+					"<Calendar:DTStamp>19700101T010000Z</Calendar:DTStamp>" +
+					"<Calendar:StartTime>20140101T140000Z</Calendar:StartTime>" +
+					"<Calendar:UID>FAC000123D</Calendar:UID>" +
+					"<Calendar:EndTime>20140101T180000Z</Calendar:EndTime>" +
+					"<AirSyncBase:Body>" +
+					"<AirSyncBase:Type>1</AirSyncBase:Type>" +
+					"<AirSyncBase:EstimatedDataSize>0</AirSyncBase:EstimatedDataSize>" +
+					"</AirSyncBase:Body>" +
+					"<Calendar:Recurrence>" +
+						"<Calendar:RecurrenceType>0</Calendar:RecurrenceType>" +
+						"<Calendar:RecurrenceInterval>1</Calendar:RecurrenceInterval>" +
+					"</Calendar:Recurrence>" +
+					"<Calendar:Sensitivity>0</Calendar:Sensitivity>" +
+					"<Calendar:BusyStatus>0</Calendar:BusyStatus>" +
+					"<Calendar:AllDayEvent>1</Calendar:AllDayEvent>" +
+					"<Calendar:Exceptions>" +
+						"<Calendar:Exception>" +
+							"<Calendar:ExceptionIsDeleted>1</Calendar:ExceptionIsDeleted>" +
+							"<Calendar:MeetingStatus>5</Calendar:MeetingStatus>" +
+							"<Calendar:ExceptionStartTime>20140301T140000Z</Calendar:ExceptionStartTime>" +
+						"</Calendar:Exception>" +
+					"</Calendar:Exceptions>" +
+					"<Calendar:MeetingStatus>0</Calendar:MeetingStatus>" +
+					"<AirSyncBase:NativeBodyType>1</AirSyncBase:NativeBodyType>" +
+				"</ApplicationData>");
 	}
 	
 	private MSEventException getFakeMSEventException(TimeZone timeZone) {
