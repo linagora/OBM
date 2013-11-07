@@ -31,11 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
-import java.util.concurrent.Future;
-
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.fluent.Async;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.ByteArrayEntity;
 import org.obm.push.ProtocolVersion;
@@ -71,11 +68,6 @@ public abstract class SmartEmailCommand implements IEasCommand<Boolean> {
 				.returnResponse()
 				.getStatusLine()
 				.getStatusCode() == HttpStatus.SC_OK;
-	}
-
-	@Override
-	public Future<Boolean> runASync(AccountInfos ai, OPClient opc, Async async) throws Exception {
-		throw new RuntimeException("Not implements for SmartEmailCommand");
 	}
 
 	protected abstract String getCommandName();

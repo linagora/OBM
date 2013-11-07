@@ -37,7 +37,6 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.protocol.FolderSyncProtocol;
 import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.ResponseTransformer;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
@@ -64,18 +63,5 @@ public class FolderSync extends AbstractCommand<FolderSyncResponse> {
 	@Override
 	protected FolderSyncResponse parseResponse(Document responseDocument) {
 		return new FolderSyncProtocol().decodeResponse(responseDocument);
-	}
-
-	@Override
-	protected ResponseTransformer<FolderSyncResponse> responseTransformer() {
-		return new FolderSyncResponseTransformer();
-	}
-	
-	private class FolderSyncResponseTransformer implements ResponseTransformer<FolderSyncResponse> {
-
-		@Override
-		public FolderSyncResponse parse(Document document) {
-			return parseResponse(document);
-		}
 	}
 }

@@ -37,13 +37,10 @@ import org.obm.push.bean.ProvisionPolicyStatus;
 import org.obm.push.bean.ProvisionStatus;
 import org.obm.sync.push.client.ProvisionResponse;
 import org.obm.sync.push.client.ProvisionResponse.Builder;
-import org.obm.sync.push.client.ResponseTransformer;
 import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import com.google.common.base.Throwables;
 
 public abstract class Provision extends AbstractCommand<ProvisionResponse> {
 
@@ -90,21 +87,4 @@ public abstract class Provision extends AbstractCommand<ProvisionResponse> {
 		return null;
 	}
 
-	@Override
-	protected ResponseTransformer<ProvisionResponse> responseTransformer() {
-		return new ProvisionResponseTransformer();
-	}
-	
-	private class ProvisionResponseTransformer implements ResponseTransformer<ProvisionResponse> {
-
-		@Override
-		public ProvisionResponse parse(Document document) {
-			try {
-				return parseResponse(document);
-			} catch (TransformerException e) {
-				Throwables.propagate(e);
-			}
-			return null;
-		}
-	}
 }

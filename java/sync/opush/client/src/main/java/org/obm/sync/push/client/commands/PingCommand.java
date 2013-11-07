@@ -37,7 +37,6 @@ import org.obm.push.protocol.PingProtocol;
 import org.obm.push.protocol.bean.PingResponse;
 import org.obm.push.protocol.data.PingRequestFields;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.ResponseTransformer;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
@@ -66,16 +65,4 @@ public class PingCommand extends AbstractCommand<PingResponse> {
 		return pingProtocol.decodeResponse(document);
 	}
 
-	@Override
-	protected ResponseTransformer<PingResponse> responseTransformer() {
-		return new PingResponseTransformer();
-	}
-	
-	private class PingResponseTransformer implements ResponseTransformer<PingResponse> {
-
-		@Override
-		public PingResponse parse(Document document) {
-			return parseResponse(document);
-		}
-	}
 }

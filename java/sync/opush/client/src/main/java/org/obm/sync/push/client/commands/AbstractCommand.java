@@ -31,13 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client.commands;
 
-import java.util.concurrent.Future;
-
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.fluent.Async;
 import org.obm.sync.push.client.IEasCommand;
 import org.obm.sync.push.client.OPClient;
-import org.obm.sync.push.client.ResponseTransformer;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
@@ -66,10 +62,4 @@ public abstract class AbstractCommand<T> implements IEasCommand<T> {
 
 	protected abstract T parseResponse(Document responseDocument) throws Exception;
 
-	@Override
-	public Future<T> runASync(AccountInfos ai, OPClient opc, Async async) throws Exception {
-		return opc.postASyncXml(async, namespace, documentProvider.get(ai), cmd, null, false, responseTransformer());
-	}
-	
-	protected abstract ResponseTransformer<T> responseTransformer();
 }

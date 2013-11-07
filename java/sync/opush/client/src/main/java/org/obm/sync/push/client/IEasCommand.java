@@ -31,15 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.push.client;
 
-import java.util.concurrent.Future;
-
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.fluent.Async;
 import org.obm.sync.push.client.beans.AccountInfos;
 
 public interface IEasCommand<T> {
 
 	T run(AccountInfos ai, OPClient opc, HttpClient hc) throws Exception;
 	
-	Future<T> runASync(AccountInfos ai, OPClient opc, Async async) throws Exception;
 }

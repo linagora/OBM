@@ -37,7 +37,6 @@ import org.obm.push.protocol.MeetingProtocol;
 import org.obm.push.protocol.bean.MeetingHandlerResponse;
 import org.obm.push.protocol.data.MeetingRequestFields;
 import org.obm.push.utils.DOMUtils;
-import org.obm.sync.push.client.ResponseTransformer;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.NS;
 import org.w3c.dom.Document;
@@ -63,16 +62,4 @@ public class MeetingResponseCommand extends AbstractCommand<MeetingHandlerRespon
 		return new MeetingProtocol().decodeResponse(document);
 	}
 
-	@Override
-	protected ResponseTransformer<MeetingHandlerResponse> responseTransformer() {
-		return new MeetingHandlerResponseTransformer();
-	}
-	
-	private class MeetingHandlerResponseTransformer implements ResponseTransformer<MeetingHandlerResponse> {
-
-		@Override
-		public MeetingHandlerResponse parse(Document document) {
-			return parseResponse(document);
-		}
-	}
 }

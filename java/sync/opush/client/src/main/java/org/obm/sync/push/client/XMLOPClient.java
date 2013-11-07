@@ -34,7 +34,6 @@ package org.obm.sync.push.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.concurrent.Future;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.transform.TransformerException;
@@ -44,7 +43,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.fluent.Async;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
@@ -121,10 +119,5 @@ public class XMLOPClient extends OPClient {
 			request.releaseConnection();
 		}
 	}
-
-	@Override
-	public <T> Future<T> postASyncXml(Async async, String namespace, Document doc, String cmd, String policyKey, boolean multipart, ResponseTransformer<T> documentHandler)
-			throws TransformerException, WBXmlException, IOException, HttpRequestException {
-		throw new RuntimeException("Not implements for XMLOPClient");
-	}
+	
 }

@@ -33,7 +33,6 @@ package org.obm.sync.push.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.transform.TransformerException;
@@ -44,12 +43,8 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.fluent.Async;
-import org.apache.http.client.fluent.Executor;
-import org.apache.http.client.fluent.Request;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.message.BasicHeader;
@@ -61,7 +56,6 @@ import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
 import org.w3c.dom.Document;
 
-import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
 
 
@@ -94,120 +88,20 @@ public class WBXMLOPClient extends OPClient {
 
 		DOMUtils.logDom(doc);
 
-		Request request = buildRequest(namespace, doc, cmd, policyKey, multipart);
-		
-		HttpResponse response = Executor.newInstance(hc).execute(request).returnResponse();
-		return parseResponse(response);
-	}
-
-	@Override
-	public <T> Future<T> postASyncXml(Async async, String namespace, Document doc, String cmd, String policyKey, boolean multipart, 
-				final ResponseTransformer<T> responseTransformer)
-			throws TransformerException, WBXmlException, IOException, HttpRequestException {
-
-		DOMUtils.logDom(doc);
-
-		Request request = buildRequest(namespace, doc, cmd, policyKey, multipart);
-
-		return async.execute(request, new ResponseHandler<T>() {
-			@Override
-			public T handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
-				Document document = new DocumentResponseHandler().handleResponse(response);
-				return responseTransformer.parse(document);
-			}
-		});
-	}
-	
-	private class DocumentResponseHandler implements ResponseHandler<Document> {
-
-		@Override
-		public Document handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
-			try {
-				return parseResponse(response);
-			} catch (HttpRequestException e) {
-				Throwables.propagate(e);
-			} catch (TransformerException e) {
-				Throwables.propagate(e);
-			}
-			return null;
-		}
-	}
-
-	private Document parseResponse(HttpResponse response) throws HttpRequestException, IOException, TransformerException {
-		Document xml = null;
-		StatusLine statusLine = response.getStatusLine();
-		Header[] hs = response.getAllHeaders();
-		for (Header h : hs) {
-			logger.error("head[" + h.getName() + "] => "
-					+ h.getValue());
-		}
-		int statusCode = statusLine.getStatusCode();
-		HttpEntity entity = response.getEntity();
-		if (statusCode != HttpStatus.SC_OK) {
-			logger.error("method failed:{}\n{}\n",  statusLine, entity);
-			throw new HttpRequestException(statusCode);
-		} else {
-			byte[] responseBytes = getResponse(response);
-			if (response.getFirstHeader("Content-Type") != null
-					&& response.getFirstHeader("Content-Type").getValue()
-							.contains("application/vnd.ms-sync.multipart")) {
-				byte[] all = responseBytes;
-				int idx = 0;
-				byte[] buffer = new byte[4];
-				for (int i = 0; i < buffer.length; i++) {
-					buffer[i] = all[idx++];
-				}
-				int nbPart = byteArrayToInt(buffer);
-
-				for (int p = 0; p < nbPart; p++) {
-					for (int i = 0; i < buffer.length; i++) {
-						buffer[i] = all[idx++];
-					}
-					int start = byteArrayToInt(buffer);
-
-					for (int i = 0; i < buffer.length; i++) {
-						buffer[i] = all[idx++];
-					}
-					int length = byteArrayToInt(buffer);
-
-					byte[] value = new byte[length];
-					for (int j = 0; j < length; j++) {
-						value[j] = all[start++];
-					}
-					if (p == 0) {
-						xml = wbxmlTools.toXml(value);
-						DOMUtils.logDom(xml);
-					} else {
-						String file = new String(value);
-						logger.info("File: " + file);
-					}
-
-				}
-			} else if (entity.getContentLength() > 0) {
-				try {
-					xml = wbxmlTools.toXml(responseBytes);
-					DOMUtils.logDom(xml);
-				} finally {
-					EntityUtils.consume(entity);
-				}
-			}
-		}
-		return xml;
-	}
-
-	private Request buildRequest(String namespace, Document doc, String cmd, String policyKey, boolean multipart) throws WBXmlException, IOException {
 		ByteArrayEntity requestEntity = getRequestEntity(namespace, doc);
 		
-		Request request = Request.Post(buildUrl(ai.getUrl(), ai.getLogin(),
-				ai.getDevId(), ai.getDevType(), cmd))
-			.addHeader(new BasicHeader("Content-Type", requestEntity.getContentType().getValue()))
-			.addHeader(new BasicHeader("Authorization", ai.authValue()))
-			.addHeader(new BasicHeader("User-Agent", ai.getUserAgent()))
-			.addHeader(new BasicHeader("Ms-Asprotocolversion", protocolVersion.asSpecificationValue()))
-			.addHeader(new BasicHeader("Accept", "*/*"))
-			.addHeader(new BasicHeader("Accept-Language", "fr-fr"))
-			.addHeader(new BasicHeader("Connection", "keep-alive"))
-			.body(requestEntity);
+		HttpPost request = new HttpPost(buildUrl(ai.getUrl(), ai.getLogin(),
+				ai.getDevId(), ai.getDevType(), cmd));
+		request.setHeaders(new Header[] { 
+				new BasicHeader("Content-Type", requestEntity.getContentType().getValue()),
+				new BasicHeader("Authorization", ai.authValue()),
+				new BasicHeader("User-Agent", ai.getUserAgent()),
+				new BasicHeader("Ms-Asprotocolversion", protocolVersion.asSpecificationValue()),
+				new BasicHeader("Accept", "*/*"),
+				new BasicHeader("Accept-Language", "fr-fr"),
+				new BasicHeader("Connection", "keep-alive")
+				});
+		request.setEntity(requestEntity);
 		
 		if (multipart) {
 			request.addHeader(new BasicHeader("MS-ASAcceptMultiPart", "T"));
@@ -217,7 +111,71 @@ public class WBXMLOPClient extends OPClient {
 		if (policyKey != null) {
 			request.addHeader(new BasicHeader("X-MS-PolicyKey", policyKey));
 		}
-		return request;
+
+		Document xml = null;
+		try {
+			HttpResponse response = hc.execute(request);
+			StatusLine statusLine = response.getStatusLine();
+			Header[] hs = response.getAllHeaders();
+			for (Header h : hs) {
+				logger.error("head[" + h.getName() + "] => "
+						+ h.getValue());
+			}
+			int statusCode = statusLine.getStatusCode();
+			HttpEntity entity = response.getEntity();
+			if (statusCode != HttpStatus.SC_OK) {
+				logger.error("method failed:{}\n{}\n",  statusLine, entity);
+				throw new HttpRequestException(statusCode);
+			} else {
+				byte[] responseBytes = getResponse(response);
+				if (response.getFirstHeader("Content-Type") != null
+						&& response.getFirstHeader("Content-Type").getValue()
+								.contains("application/vnd.ms-sync.multipart")) {
+					byte[] all = responseBytes;
+					int idx = 0;
+					byte[] buffer = new byte[4];
+					for (int i = 0; i < buffer.length; i++) {
+						buffer[i] = all[idx++];
+					}
+					int nbPart = byteArrayToInt(buffer);
+
+					for (int p = 0; p < nbPart; p++) {
+						for (int i = 0; i < buffer.length; i++) {
+							buffer[i] = all[idx++];
+						}
+						int start = byteArrayToInt(buffer);
+
+						for (int i = 0; i < buffer.length; i++) {
+							buffer[i] = all[idx++];
+						}
+						int length = byteArrayToInt(buffer);
+
+						byte[] value = new byte[length];
+						for (int j = 0; j < length; j++) {
+							value[j] = all[start++];
+						}
+						if (p == 0) {
+							xml = wbxmlTools.toXml(value);
+							DOMUtils.logDom(xml);
+						} else {
+							String file = new String(value);
+							logger.info("File: " + file);
+						}
+
+					}
+				} else if (entity.getContentLength() > 0) {
+					try {
+						xml = wbxmlTools.toXml(responseBytes);
+						DOMUtils.logDom(xml);
+					} finally {
+						EntityUtils.consume(entity);
+					}
+				}
+			}
+		} finally {
+			request.releaseConnection();
+		}
+		return xml;
 	}
 
 	private byte[] getResponse(HttpResponse response) throws IOException {
