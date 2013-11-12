@@ -6,3 +6,5 @@ java/.classpath
 .settings
 .includepath
 java/sync/integration-testing/data/
+.idea/
+*.iml

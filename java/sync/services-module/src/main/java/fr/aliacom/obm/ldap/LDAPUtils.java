@@ -136,9 +136,9 @@ public class LDAPUtils {
 		SearchResult result = null;
 		SearchControls controls = new SearchControls();
 		controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+		NamingEnumeration<SearchResult> results = null;
 		try {
-			NamingEnumeration<SearchResult> results = ctx.search(baseDn,
-					filter, controls);
+			results = ctx.search(baseDn, filter, controls);
 			if (results.hasMoreElements()) {
 				result = results.nextElement();
 				if (logger.isDebugEnabled()) {
@@ -148,6 +148,14 @@ public class LDAPUtils {
 			}
 		} catch (NamingException ne) {
 			logger.error("no entry found in directory", ne);
+		} finally {
+			if (results != null) {
+				try {
+					results.close();
+				} catch (NamingException e) {
+					logger.error("Cannot close NamingEnumeration", e);
+				}
+			}
 		}
 		return result;
 	}
