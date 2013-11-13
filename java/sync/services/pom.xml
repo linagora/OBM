@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>2.5.5-rc1</version>
+		<version>2.5.5-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>services</artifactId>
 	<packaging>war</packaging>
 	<name>obm-sync services</name>
 	<url>http://www.obm.org/</url>
-	<version>2.5.5-rc1</version>
+	<version>2.5.5-SNAPSHOT</version>
 
 	<licenses>
 		<license>
@@ -97,7 +97,7 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
-			<version>2.5.5-rc1</version>
+			<version>2.5.5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
