@@ -5,7 +5,7 @@
 	<groupId>com.linagora.obm</groupId>
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
-	<version>2.5.5-SNAPSHOT</version>
+	<version>2.5.5-rc1</version>
 	<name>obm-sync and opush 2.4 parent project</name>
 
 	<inceptionYear>2000</inceptionYear>
@@ -20,7 +20,7 @@
 
 
 	<properties>
-		<obm.version>2.5.5-SNAPSHOT</obm.version>
+		<obm.version>2.5.5-rc1</obm.version>
 
 		<postgresql.version>9.2-1002.jdbc4</postgresql.version>
 		<mysql-connector-java.version>5.1.24</mysql-connector-java.version>
