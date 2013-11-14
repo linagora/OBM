@@ -1404,11 +1404,6 @@ function display_unified_menu($module) {
   if (($update_state) && $cgp_show['module']['tools'] && ($perm->check_right('tools', $cright_write_admin))) {
     $dis_scope = true;
   }
-  $dis_printer = false;
-  if ($display['print_url'] != '') {
-    $printer_url = str_replace("&amp;", "&", $display['print_url']);
-    $dis_printer = true;
-  }
 
   if(!isset($user_photo_id)){
     $user_infos = get_user_info($uid);
@@ -1450,11 +1445,6 @@ function display_unified_menu($module) {
   $data["scope"]["url"] = "$path/tools/tools_index.php?action=update_index";
   $data["scope"]["ico"] = $ico_scope;
   $data["scope"]["title"] =$l_scope_update;
-
-  $data[] = array("printer");
-  $data["printer"]["dis_printer"] = $dis_printer;
-  $data["printer"]["url"] = $printer_url;
-  $data["printer"]["ico"] = $ico_print;
 
   $data[] = array("buttons");
   $data["buttons"] = array();

@@ -227,7 +227,7 @@ function dis_calendar_view_bar($current_view, $calendar) {
   global $l_cal_range, $l_cal_view;
   global $l_view_agenda_desc,  $l_view_planning_desc, $l_view_list_desc;
   global $l_view_week_desc, $l_view_day_desc, $l_view_month_desc;
-  global $path;
+  global $path, $display, $ico_print, $l_print;
 
   $p_kind = $current_view->get_cal_view();
   $p_range = $current_view->get_cal_range();
@@ -252,6 +252,8 @@ function dis_calendar_view_bar($current_view, $calendar) {
     $week_view = "href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_range=week\"";
     $month_view = "href=\"$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?cal_range=month\"";
   }
+  
+  $printer = "<div class=\"LF\"><a href=\"#\" onclick=\"popup('calendar_index.php?action=pdf_export_form&output_target=print');\" ><img src=\"$ico_print\" alt=\"Print\" id='print' />$l_print</a></div>";
 
   $block = "
   <div id=\"calendarToolbar\">
@@ -271,6 +273,7 @@ function dis_calendar_view_bar($current_view, $calendar) {
       <a $week_view><img id='ico_week_view' title=\"$l_view_week_desc\" src=\"$ico_week_view\" alt=\"$l_week\" /></a>
       <a $month_view><img id='ico_month_view' title=\"$l_view_month_desc\" src=\"$ico_month_view\" alt=\"$l_month\" /></a>
     </div>
+    $printer
     $search_form
   </div>
   <p class=\"LC\"></p>
