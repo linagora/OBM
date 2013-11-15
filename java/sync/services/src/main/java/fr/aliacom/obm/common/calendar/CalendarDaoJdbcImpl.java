@@ -1184,20 +1184,25 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			Set<Event> parentOfDeclinedRecurrentEvent,
 			List<Event> changedEvents, Date touchDateForFakeExDates) {
 		for (Event parentEvent : parentOfDeclinedRecurrentEvent) {
-			int i = changedEvents.indexOf(parentEvent);
-			boolean isPresent = i > -1;
-			Event event;
-			if (!isPresent) {
+			Event eventToTouch = getParentEventInChangesByUid(parentEvent.getUid(), changedEvents);
+			if (eventToTouch == null) {
 				changedEvents.add(parentEvent);
-				event = parentEvent;
-			} else {
-				event = changedEvents.get(i);
+				eventToTouch = parentEvent;
 			}
 			// Do a 'touch' on the event since we added a "fake"
 			// exdate (to force the client to remove declined
 			// exceptions)
-			event.setTimeUpdate(touchDateForFakeExDates);
+			eventToTouch.setTimeUpdate(touchDateForFakeExDates);
 		}
+	}
+
+	private Event getParentEventInChangesByUid(EventObmId id, List<Event> changedEvents) {
+		for(Event event: changedEvents) {
+			if (event.getUid().equals(id)) {
+				return event;
+			}
+		}
+		return null;
 	}
 
 	private void replaceDeclinedEventExceptionByException(ObmUser calendarUser,
