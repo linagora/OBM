@@ -200,6 +200,8 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(udr.getDevice(), responder, SyncStatus.INVALID_SYNC_KEY, continuation, e);
 		} catch (ImapTimeoutException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
+		} catch (RuntimeException e) {
+			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} 
 	}
 
@@ -410,7 +412,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 	private SyncCollectionResponse computeSyncState(UserDataRequest udr,
 			SyncClientCommands clientCommands, AnalysedSyncCollection syncCollectionRequest)
 			throws DaoException, CollectionNotFoundException, InvalidServerId,
-			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, HierarchyChangedException {
+			UnexpectedObmSyncServerException, ProcessingEmailException, ConversionException, HierarchyChangedException  {
 
 		PIMDataType dataType = syncCollectionRequest.getDataType();
 		SyncCollectionResponse.Builder builder = SyncCollectionResponse.builder()
