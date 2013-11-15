@@ -31,11 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command.sync;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 import static org.obm.opush.IntegrationPushTestUtils.mockHierarchyChangesOnlyInbox;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
@@ -678,7 +678,8 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
-		mockEmailSyncWithHierarchyChangedException(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId));
+		mockEmailSyncThrowsException(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), 
+				new HierarchyChangedException(new NotAllowedException("Not allowed")));
 		mocksControl.replay();
 		opushServer.start();
 
@@ -690,7 +691,29 @@ public class SyncHandlerTest {
 		assertThat(syncEmailResponse.getStatus()).isEqualTo(SyncStatus.HIERARCHY_CHANGED);
 	}
 
-	private void mockEmailSyncWithHierarchyChangedException(SyncKey syncKey, Set<Integer> syncEmailCollectionsIds)
+	@Test
+	public void testSyncOnIllegalArgumentException() throws Exception {
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey syncEmailSyncKey = new SyncKey("1");
+		int syncEmailCollectionId = 4;
+		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
+		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
+		mockUsersAccess(classToInstanceMap, fakeTestUsers);
+		mockHierarchyChangesOnlyInbox(classToInstanceMap);
+		mockEmailSyncThrowsException(syncEmailSyncKey, Sets.newHashSet(syncEmailCollectionId), 
+				new IllegalArgumentException("Illegal"));
+		mocksControl.replay();
+		opushServer.start();
+
+		OPClient opClient = buildWBXMLOpushClient(singleUserFixture.jaures, opushServer.getPort(), httpClient);
+		opClient.folderSync(initialSyncKey);
+		SyncResponse syncEmailResponse = opClient.syncEmail(decoder, syncEmailSyncKey, syncEmailCollectionId, FilterType.THREE_DAYS_BACK, 100);
+
+		assertThat(syncEmailResponse).isNotNull();
+		assertThat(syncEmailResponse.getStatus()).isEqualTo(SyncStatus.SERVER_ERROR);
+	}
+
+	private void mockEmailSyncThrowsException(SyncKey syncKey, Set<Integer> syncEmailCollectionsIds, Throwable throwable)
 			throws DaoException, ConversionException, FilterTypeChangedException {
 		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
 		mockEmailSyncedCollectionDao(syncedCollectionDao);
@@ -712,8 +735,7 @@ public class SyncHandlerTest {
 				anyObject(AnalysedSyncCollection.class),
 				anyObject(SyncClientCommands.class),
 				anyObject(SyncKey.class)))
-				.andThrow(new HierarchyChangedException(new NotAllowedException("Not allowed")));
-
+				.andThrow(throwable);
 	}
 
 	@Test
