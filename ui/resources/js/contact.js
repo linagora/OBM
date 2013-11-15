@@ -38,9 +38,11 @@ Obm.Contact.AddressBook = new Class ({
       secure : false,
       evalScripts : true,
       update: $('dataContainer'),
-      onComplete: $('spinner').hide.bind($('spinner')),
+      onComplete: function() {
+        $('spinner').hide.bind($('spinner'));
+        this._updateSearchCount();
+      }.bind(this),
       onRequest: $('spinner').show.bind($('spinner')),
-      onSuccess: this._updateSearchCount.bind(this),
       onFailure: function (response) {
         Obm.Error.parseStatus(this);
       }
