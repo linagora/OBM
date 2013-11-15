@@ -41,12 +41,18 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.book.InstantMessagingId;
 import org.obm.sync.book.Phone;
 import org.obm.sync.book.Website;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Converts between OBM & MS Exchange contact models
  */
 public class ContactConverter {
 
+	private static final Logger logger = LoggerFactory.getLogger(ContactConverter.class);
+	
 	/**
 	 * OBM to PDA
 	 */
@@ -283,9 +289,13 @@ public class ContactConverter {
 		}
 	}
 
-	private void addEmail(Contact oc, String label, String email) {
+	@VisibleForTesting void addEmail(Contact oc, String label, String email) {
 		if (email != null) {
-			oc.addEmail(label, EmailAddress.loginAtDomain(email));
+			if (EmailAddress.isEmailAddress(email)) {
+				oc.addEmail(label, EmailAddress.loginAtDomain(email));
+			} else {
+				logger.warn("Invalid email address {} for contact firstname: {} lastname: {}", email, oc.getFirstname(), oc.getLastname());
+			}
 		}
 	}
 
