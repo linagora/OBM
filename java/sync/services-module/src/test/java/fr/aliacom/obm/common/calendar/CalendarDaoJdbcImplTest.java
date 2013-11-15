@@ -152,7 +152,7 @@ public class CalendarDaoJdbcImplTest {
 		
 		assertThat(result).containsOnly(firstRecurrentEvent);
 	}
-	
+
 	@Test
 	public void touchParentOfDeclinedRecurrentEventsMustNotIncludeDuplicatesWhenMovedExceptionsDiffer() {
 		Date date = date("2004-12-14T22:00:00");
@@ -185,6 +185,36 @@ public class CalendarDaoJdbcImplTest {
 		calendarDaoJdbcImpl.touchParentOfDeclinedRecurrentEvents(parentOfDeclinedRecurrentEvent, result, date);
 		
 		assertThat(result).containsOnly(firstRecurrentEvent);
+	}
+
+	@Test
+	public void touchParentOfDeclinedRecurrentEventsMustCheckExistenceWithUid() {
+		Date date = date("2004-12-14T22:00:00");
+		
+		Event firstRecurrentEvent = new Event();
+		firstRecurrentEvent.setUid(new EventObmId(1));
+		firstRecurrentEvent.setTitle("firstRecurrentEvent");
+
+		Event secondRecurrentEvent = new Event();
+		secondRecurrentEvent.setUid(new EventObmId(1));
+		secondRecurrentEvent.setTitle("newTitle");
+		
+		Event firstRecurrentEvent2 = new Event();
+		firstRecurrentEvent2.setUid(new EventObmId(2));
+		firstRecurrentEvent2.setTitle("firstRecurrentEvent");
+
+		Event secondRecurrentEvent2 = new Event();
+		secondRecurrentEvent2.setUid(new EventObmId(2));
+		secondRecurrentEvent2.setTitle("newTitle");
+
+		ArrayList<Event> result = Lists.newArrayList();
+		result.add(secondRecurrentEvent);
+		result.add(secondRecurrentEvent2);
+		Set<Event> parentOfDeclinedRecurrentEvent = ImmutableSet.of(firstRecurrentEvent, firstRecurrentEvent2);
+		
+		calendarDaoJdbcImpl.touchParentOfDeclinedRecurrentEvents(parentOfDeclinedRecurrentEvent, result, date);
+		
+		assertThat(result).containsOnly(secondRecurrentEvent, secondRecurrentEvent2);
 	}
 
 	@Test
