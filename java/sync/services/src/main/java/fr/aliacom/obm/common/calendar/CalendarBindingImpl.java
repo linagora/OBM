@@ -1717,7 +1717,7 @@ public class CalendarBindingImpl implements ICalendar {
 		return calendarFactory.createIcal4jUserFromObmUser(user);
 	}
 	
-	private void convertAttendeesOnEvent(Event event, ObmUser owner) throws ServerFault {
+	@VisibleForTesting void convertAttendeesOnEvent(Event event, ObmUser owner) throws ServerFault {
 		List<Attendee> typedAttendees = Lists.newArrayList();
 
 		Attendee ownerAttendee = findRequiredOwnerAttendee(event, owner);
@@ -1766,13 +1766,8 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 	
 	private Attendee findTypedAttendee(Attendee attendee, ObmUser owner) {
-		Attendee userAttendee = findUserAttendee(attendee, owner);
-		if (userAttendee != null) {
-			return userAttendee;
-		}
-		
-		// User not found, we'll fallback to a contact and create it if needed
-		return findContactAttendee(attendee, owner);
+		return attendeeService.findAttendee(
+				attendee.getDisplayName(), attendee.getEmail(), true, owner.getDomain(), owner.getUid());
 	}
 
 	private Attendee findUserAttendee(Attendee attendee, ObmUser owner) {
@@ -1782,7 +1777,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private Attendee findContactAttendee(Attendee attendee, ObmUser owner) {
 		return attendeeService.findContactAttendee(attendee.getDisplayName(), attendee.getEmail(), true, owner.getDomain(), owner.getUid());
 	}
-	
+
 	private void convertAttendees(Event event, String calendar, ObmDomain domain) throws ServerFault {
 		try {
 			convertAttendees(event, userService.getUserFromCalendar(calendar, domain.getName()));

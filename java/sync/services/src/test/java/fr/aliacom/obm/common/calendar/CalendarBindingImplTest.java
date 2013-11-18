@@ -103,9 +103,11 @@ import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.Participation.State;
 import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.RecurrenceKind;
+import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.calendar.SyncRange;
+import org.obm.sync.calendar.UnidentifiedAttendee;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.items.EventChanges;
@@ -2931,8 +2933,7 @@ public class CalendarBindingImplTest {
 		// times(3) = 1 for the event, 1 for each exception 
 		expect(attendeeService.findUserAttendee(null, calendar, user.getDomain())).andReturn(userAttendee).times(3);
 		// times(2) = 1 for the event, 1 for the first exception
-		expect(attendeeService.findUserAttendee(null, attendeeEmail, user.getDomain())).andReturn(null).times(2);
-		expect(attendeeService.findContactAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid())).andReturn(contactAttendee).times(2);
+		expect(attendeeService.findAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid())).andReturn(contactAttendee).times(2);
 		expect(calendarDao.createEvent(token, calendar, event, true)).andReturn(event);
 		expect(calendarDao.findEventById(token, null)).andReturn(event);
 		messageQueueService.writeIcsInvitationRequest(token, event);
@@ -2973,8 +2974,7 @@ public class CalendarBindingImplTest {
 		expect(helperService.canWriteOnCalendar(token, attendeeEmail)).andReturn(false).anyTimes();
 		expect(userService.getUserFromCalendar(userEmail, user.getDomain().getName())).andReturn(user).anyTimes();
 		expect(attendeeService.findUserAttendee(null, userEventAlias, user.getDomain())).andReturn(userAttendee);
-		expect(attendeeService.findUserAttendee(null, attendeeEmail, user.getDomain())).andReturn(null);
-		expect(attendeeService.findContactAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid()))
+		expect(attendeeService.findAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid()))
 			.andReturn(contactAttendee);
 		
 		expect(calendarDao.createEvent(token, userEmail, toStoreEvent, true)).andReturn(toStoreEvent);
@@ -3917,6 +3917,94 @@ public class CalendarBindingImplTest {
 		mocksControl.replay();
 		binding.commitOperation(token, event, clientId);
 		mocksControl.verify();
+	}
+
+	@Test
+	public void convertUnidentifiedAttendee() throws ServerFault {
+		Event event = new Event();
+		event.setInternalEvent(true);
+		ObmUser owner = ToolBox.getDefaultObmUser();
+		Attendee ownerAttendee = UnidentifiedAttendee.builder().displayName("user").email("user@test").build();
+		Attendee userAttendee = UnidentifiedAttendee.builder().displayName("user").email("user@obm.org").build();
+		Attendee contactAttendee = UnidentifiedAttendee.builder().displayName("contact").email("contact@obm.org").build();
+		Attendee resourceAttendee = UnidentifiedAttendee.builder().displayName("resource").email("resource@obm.org").build();
+		event.addAttendees(ImmutableSet.of(ownerAttendee, userAttendee, contactAttendee, resourceAttendee));
+
+		AttendeeService attendeeService = mocksControl.createMock(AttendeeService.class);
+
+		expect(attendeeService.findUserAttendee("user", "user@test", owner.getDomain()))
+			.andReturn(UserAttendee.builder().displayName("name").email("user@test").build());
+
+		expect(attendeeService.findAttendee("user", "user@obm.org", true, owner.getDomain(), owner.getUid()))
+			.andReturn(UserAttendee.builder().displayName("name").email("user@obm.org").build());
+
+		expect(attendeeService.findAttendee("contact", "contact@obm.org", true, owner.getDomain(), owner.getUid()))
+			.andReturn(ContactAttendee.builder().displayName("contact").email("contact@obm.org").build());
+
+		expect(attendeeService.findAttendee("resource", "resource@obm.org", true, owner.getDomain(), owner.getUid()))
+			.andReturn(ResourceAttendee.builder().displayName("resource").email("resource@obm.org").build());
+
+		mocksControl.replay();
+		CalendarBindingImpl binding =
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
+		binding.convertAttendeesOnEvent(event, owner);
+		mocksControl.verify();
+
+		assertThat(event.getAttendees()).containsOnly(
+				UserAttendee.builder().displayName("name").email("user@test").build(),
+				UserAttendee.builder().displayName("name").email("user@obm.org").build(),
+				ContactAttendee.builder().displayName("contact").email("contact@obm.org").build(),
+				ResourceAttendee.builder().displayName("resource").email("resource@obm.org").build());
+	}
+
+	@Test
+	public void convertUnidentifiedAttendeeToContactForExternalEvent() throws ServerFault {
+		Event event = new Event();
+		event.setInternalEvent(false);
+		ObmUser owner = ToolBox.getDefaultObmUser();
+		Attendee ownerAttendee = UnidentifiedAttendee.builder().displayName("user").email("user@test").build();
+		Attendee userAttendee = UnidentifiedAttendee.builder().displayName("user").email("user@obm.org").build();
+		Attendee contactAttendee = UnidentifiedAttendee.builder().displayName("contact").email("contact@obm.org").build();
+		Attendee resourceAttendee = UnidentifiedAttendee.builder().displayName("resource").email("resource@obm.org").build();
+		event.addAttendees(ImmutableSet.of(ownerAttendee, userAttendee, contactAttendee, resourceAttendee));
+
+		AttendeeService attendeeService = mocksControl.createMock(AttendeeService.class);
+
+		expect(attendeeService.findUserAttendee("user", "user@test", owner.getDomain()))
+			.andReturn(UserAttendee.builder().displayName("name").email("user@test").build());
+
+		expect(attendeeService.findContactAttendee("user", "user@obm.org", true, owner.getDomain(), owner.getUid()))
+			.andReturn(ContactAttendee.builder().displayName("user").email("user@obm.org").build());
+
+		expect(attendeeService.findContactAttendee("contact", "contact@obm.org", true, owner.getDomain(), owner.getUid()))
+			.andReturn(ContactAttendee.builder().displayName("contact").email("contact@obm.org").build());
+
+		expect(attendeeService.findContactAttendee("resource", "resource@obm.org", true, owner.getDomain(), owner.getUid()))
+			.andReturn(ContactAttendee.builder().displayName("resource").email("resource@obm.org").build());
+
+		mocksControl.replay();
+		CalendarBindingImpl binding =
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
+		binding.convertAttendeesOnEvent(event, owner);
+		mocksControl.verify();
+
+		assertThat(event.getAttendees()).containsOnly(
+				UserAttendee.builder().displayName("name").email("user@test").build(),
+				ContactAttendee.builder().displayName("name").email("user@obm.org").build(),
+				ContactAttendee.builder().displayName("contact").email("contact@obm.org").build(),
+				ContactAttendee.builder().displayName("resource").email("resource@obm.org").build());
+	}
+
+	@Test(expected=ServerFault.class)
+	public void convertUnidentifiedAttendeeThrowServerFaultIfNoFoundOwner() throws ServerFault {
+		Event event = new Event();
+		ObmUser owner = ToolBox.getDefaultObmUser();
+		Attendee userAttendee = UnidentifiedAttendee.builder().displayName("user").email("user@obm.org").build();
+		Attendee contactAttendee = UnidentifiedAttendee.builder().displayName("contact").email("contact@obm.org").build();
+		Attendee resourceAttendee = UnidentifiedAttendee.builder().displayName("resource").email("resource@obm.org").build();
+		event.addAttendees(ImmutableSet.of(userAttendee, contactAttendee, resourceAttendee));
+
+		binding.convertAttendeesOnEvent(event, owner);
 	}
 
 	private void mockCommitedOperationNewEvent(Event event, String clientId) throws Exception {
