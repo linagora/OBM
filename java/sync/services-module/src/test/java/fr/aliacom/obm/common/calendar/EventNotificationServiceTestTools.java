@@ -44,6 +44,7 @@ import org.easymock.LogicalOperator;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.ParticipationRole;
+import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.UserAttendee;
 
 public class EventNotificationServiceTestTools {
@@ -94,6 +95,16 @@ public class EventNotificationServiceTestTools {
 				.build();
 	}
 
+	static Attendee createRequiredResource(String email, Participation state) {
+		return ResourceAttendee
+				.builder()
+				.email(email)
+				.participationRole(ParticipationRole.REQ)
+				.participation(state)
+				.canWriteOnCalendar(false)
+				.build();
+	}
+	
 	static List<Attendee> createRequiredAttendees(String prefix, String suffix, Participation state, int start, int number) {
 		ArrayList<Attendee> result = new ArrayList<Attendee>();
 		for (int i = 0; i < number; ++i) {

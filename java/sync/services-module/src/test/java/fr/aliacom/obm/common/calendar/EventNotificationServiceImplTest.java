@@ -37,6 +37,7 @@ import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.after;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.compareCollections;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.createRequiredAttendee;
+import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.createRequiredResource;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.createRequiredAttendees;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.longAfter;
 import static org.easymock.EasyMock.anyObject;
@@ -46,6 +47,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1167,7 +1169,38 @@ public class EventNotificationServiceImplTest {
 
 			Assert.assertSame(attendee2, actual.iterator().next());
 		}
-		
+
+		@Test
+		public void testComputeUpdateNotificationGroupsFilterResourcesAndOwner() {
+			List<Attendee> previousAtts = ImmutableList.of(
+					createRequiredAttendee("owner", Participation.accepted()),
+					createRequiredAttendee("old@testing.org", Participation.accepted()),
+					createRequiredResource("kept@testing.org", Participation.accepted()),
+					createRequiredResource("removed@testing.org", Participation.accepted()));
+			List<Attendee> currentAtts = ImmutableList.of(
+					createRequiredAttendee("owner", Participation.accepted()),
+					createRequiredResource("kept@testing.org", Participation.needsAction()),
+					createRequiredResource("added@testing.org", Participation.needsAction()),
+					createRequiredResource("owner", Participation.needsAction()));
+
+			Event previous = new Event();
+			previous.setOwnerEmail("owner");
+			Event current = new Event();
+			current.setOwnerEmail("owner");
+
+			EventNotificationServiceImpl eventNotificationService = new EventNotificationServiceImpl(
+					null, null, null, null, null);
+
+			previous.setAttendees(previousAtts);
+			current.setAttendees(currentAtts);
+
+			Map<AttendeeStateValue, Set<Attendee>> groups = eventNotificationService
+					.computeUpdateNotificationGroups(previous, current);
+
+			assertThat(groups.get(AttendeeStateValue.KEPT)).isEmpty();
+			assertThat(groups.get(AttendeeStateValue.ADDED)).isEmpty();
+			assertThat(groups.get(AttendeeStateValue.REMOVED)).containsOnly(createRequiredAttendee("old@testing.org", Participation.accepted()));
+		}
 	}
 	
 }
