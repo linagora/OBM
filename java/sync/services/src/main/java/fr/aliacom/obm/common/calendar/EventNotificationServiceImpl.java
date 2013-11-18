@@ -46,6 +46,7 @@ import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.CalendarUserType;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
@@ -101,7 +102,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 		String ics = ical4jHelper.buildIcsInvitationRequest(buildIcal4jUser, event, token);
 		Attendee owner = event.findOwner();
 		
-		Collection<Attendee> attendees = filterOwner(event, ensureAttendeeUnicity(event.getAttendees()));
+		Collection<Attendee> attendees = filterAttendees(event, ensureAttendeeUnicity(event.getAttendees()));
 		if (eventCreationInvolveNotification(event)) {
 			notifyCreate(user, attendees, event, ics, token);
 		}
@@ -120,7 +121,7 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 
 			Attendee owner = event.findOwner();
 
-			Collection<Attendee> attendees = filterOwner(event,
+			Collection<Attendee> attendees = filterAttendees(event,
 					ensureAttendeeUnicity(event.getAttendees()));
 			Map<Participation, Set<Attendee>> attendeeGroups = computeParticipationGroups(attendees);
 			Set<Attendee> notify = Sets.union(
@@ -368,27 +369,31 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 					AttendeeStateValue.ADDED, emptyAttendeesSet);
 		}
 		
-		ImmutableSet<Attendee> previousAttendees = ImmutableSet.copyOf(filterOwner(previous, previous.getAttendees()));
-		ImmutableSet<Attendee> currentAttendees = ImmutableSet.copyOf(filterOwner(current, current.getAttendees()));
+		ImmutableSet<Attendee> previousAttendees = ImmutableSet.copyOf(
+				filterAttendees(previous, previous.getAttendees()));
+		ImmutableSet<Attendee> currentAttendees = ImmutableSet.copyOf(
+				filterAttendees(current, current.getAttendees()));
 		SetView<Attendee> removedAttendees = Sets.difference(previousAttendees, currentAttendees);
 		SetView<Attendee> addedAttendees = Sets.difference(currentAttendees, previousAttendees);
 		Set<Attendee> keptAttendees = Sets.difference(currentAttendees, addedAttendees);
-		
+
 		return ImmutableMap.of(
 				AttendeeStateValue.REMOVED, removedAttendees,
 				AttendeeStateValue.KEPT, keptAttendees,
 				AttendeeStateValue.ADDED, addedAttendees);
 	}
 	
-	private Collection<Attendee> filterOwner(final Event event, Collection<Attendee> attendees) {
+	private Collection<Attendee> filterAttendees(final Event event, Collection<Attendee> attendees) {
 		return Collections2.filter(attendees, new Predicate<Attendee>() {
 			@Override
-			public boolean apply(Attendee at) {
-				return !at.getEmail().equalsIgnoreCase(event.getOwnerEmail());
+			public boolean apply(Attendee attendee) {
+				final boolean isOwner = attendee.getEmail().equalsIgnoreCase(event.getOwnerEmail());
+				final boolean isAResource = attendee.getCalendarUserType().equals(CalendarUserType.RESOURCE);
+				return !isOwner && !isAResource;
 			}
 		});
 	}
-	
+
 	private Map<Participation, Set<Attendee>> computeParticipationGroups(Collection<Attendee> attendees) {
 		Set<Attendee> acceptedAttendees = Sets.newLinkedHashSet();
 		Set<Attendee> needActionAttendees = Sets.newLinkedHashSet();
