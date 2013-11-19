@@ -1,0 +1,3 @@
+sql/org/obm/sync/calendar/listresources/publicRights.sql
+sql/org/obm/sync/calendar/listresources/groupRights.sql
+sql/org/obm/sync/calendar/listresources/userRights.sql

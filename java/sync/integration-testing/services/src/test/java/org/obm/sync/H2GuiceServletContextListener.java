@@ -32,46 +32,74 @@
 package org.obm.sync;
 
 import java.io.IOException;
-import java.net.URL;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.ServletContextEvent;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.utils.DBUtils;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.Resources;
 
 public class H2GuiceServletContextListener extends GuiceServletContextListener {
 
 	public static final String INITIAL_DB_SCRIPT = "dbInitialScript.sql";
-	
+	public static final String ADDITIONAL_DB_SCRIPTS_FILE = "additionalDbScripts";
+
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 		super.contextInitialized(servletContextEvent);
+
 		initializeH2Database();
 	}
 
 	private void initializeH2Database() {
+		Connection connection = null;
+		PreparedStatement ps = null;
+
 		try {
-			Connection connection = getH2Connection();
-			connection.prepareStatement(getInitialDBScript()).executeUpdate();
-		} catch (SQLException e) {
+			connection = getH2Connection();
+			ps = connection.prepareStatement(readResourceAsString(INITIAL_DB_SCRIPT));
+
+			ps.executeUpdate();
+			ps.close();
+
+			for (String script : getAdditionalDBScripts()) {
+				ps = connection.prepareStatement(readResourceAsString(script));
+
+				ps.executeUpdate();
+				ps.close();
+			}
+		} catch (Exception e) {
 			Throwables.propagate(e);
-		} catch (IOException e) {
-			Throwables.propagate(e);
+		} finally {
+			DBUtils.cleanup(null, ps, null); // Cannot close the connection as this will kill the DB
 		}
 	}
 
-	private String getInitialDBScript() throws IOException {
-		URL initialDbScriptUrl = Resources.getResource(INITIAL_DB_SCRIPT);
-		return Resources.toString(initialDbScriptUrl, Charsets.UTF_8);
+	private List<String> getAdditionalDBScripts() throws Exception {
+		try {
+			return Resources
+					.asCharSource(Resources.getResource(ADDITIONAL_DB_SCRIPTS_FILE), Charsets.UTF_8)
+					.readLines();
+		}
+		catch (IllegalArgumentException e) {
+			return ImmutableList.of();
+		}
+	}
+
+	private String readResourceAsString(String resource) throws IOException {
+		return Resources.toString(Resources.getResource(resource), Charsets.UTF_8);
 	}
 
 	private Connection getH2Connection() throws SQLException {
 		return injector.getInstance(DatabaseConnectionProvider.class).getConnection();
 	}
-	
+
 }

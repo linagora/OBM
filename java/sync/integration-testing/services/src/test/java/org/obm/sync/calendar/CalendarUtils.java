@@ -79,7 +79,36 @@ public class CalendarUtils {
 			}
 		};
 	}
-	
+
+	public static CalendarInfo makeTestUserCalendarInfo(String suffix, boolean read, boolean write) {
+		return makeCalendarInfo("user" + suffix, "Firstname", "Lastname_" + suffix, read, write);
+	}
+
+	public static CalendarInfo makeCalendarInfo(String uid, String firstname, String lastname, boolean read, boolean write) {
+		CalendarInfo info = new CalendarInfo();
+
+		info.setUid(uid);
+		info.setFirstname(firstname);
+		info.setLastname(lastname);
+		info.setRead(read);
+		info.setWrite(write);
+
+		return info;
+	}
+
+	public static ResourceInfo makeTestResourceInfo(int id, String suffix, boolean read, boolean write) {
+		return ResourceInfo
+				.builder()
+				.id(id)
+				.name("res" + suffix)
+				.description("description of res" + suffix)
+				.mail("res-" + suffix + "@domain.org")
+				.domainName("domain.org")
+				.read(read)
+				.write(write)
+				.build();
+	}
+
 	public static Event newEvent(String calendar, String owner, String extId) {
 		Event event = new Event();
 
