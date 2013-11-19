@@ -95,6 +95,25 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		);
 	}
 
+	@Test
+	@RunAsClient
+	public void testGetResourceMetadata(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		ResourceInfo[] resources = calendarClient.getResourceMetadata(user1Token, new String[] {
+				"res-a@domain.org",
+				"res-b@domain.org"
+		});
+
+		loginClient.logout(user1Token);
+
+		assertThat(resources).containsOnly(
+				makeTestResourceInfo(1, "a", true, true),
+				makeTestResourceInfo(2, "b", true, false)
+		);
+	}
+
 	@DeployForEachTests
 	@Deployment(managed = false, name = ARCHIVE)
 	public static WebArchive createDeployment() {

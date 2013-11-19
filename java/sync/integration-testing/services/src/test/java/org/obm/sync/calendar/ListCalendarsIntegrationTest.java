@@ -54,6 +54,7 @@ import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.ServicesClientModule;
 import org.obm.sync.ServicesClientModule.ArquillianLocatorService;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginClient;
 
@@ -106,6 +107,56 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 				makeTestUserCalendarInfo("s", true, false),
 				makeTestUserCalendarInfo("t", true, false)
 		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testGetCalendarMetadata(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.getCalendarMetadata(user1Token, new String[] {
+				"usera@domain.org",
+				"userb@domain.org",
+				"userc@domain.org"
+		});
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsOnly(
+				makeTestUserCalendarInfo("a", true, true),
+				makeTestUserCalendarInfo("b", true, true),
+				makeTestUserCalendarInfo("c", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testGetCalendarMetadataOnOwnCalendar(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.getCalendarMetadata(user1Token, new String[] {
+				USER1_EMAIL,
+				"userc@domain.org"
+		});
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsOnly(
+				makeCalendarInfo("user1", "Firstname", "Lastname", true, true),
+				makeTestUserCalendarInfo("c", true, false)
+		);
+	}
+
+	@RunAsClient
+	@Test(expected = ServerFault.class)
+	public void testGetCalendarMetadataWithNoCalendars(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+
+		calendarClient.getCalendarMetadata(user1Token, new String[] {});
 	}
 
 	@DeployForEachTests
