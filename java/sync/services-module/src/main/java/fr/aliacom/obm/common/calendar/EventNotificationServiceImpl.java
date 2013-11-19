@@ -46,9 +46,9 @@ import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
-import org.obm.sync.calendar.CalendarUserType;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.Participation;
+import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
 import org.obm.sync.server.mailer.EventChangeMailer;
 import org.slf4j.Logger;
@@ -56,7 +56,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableSet;
@@ -384,14 +386,15 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 	}
 	
 	private Collection<Attendee> filterAttendees(final Event event, Collection<Attendee> attendees) {
-		return Collections2.filter(attendees, new Predicate<Attendee>() {
-			@Override
-			public boolean apply(Attendee attendee) {
-				final boolean isOwner = attendee.getEmail().equalsIgnoreCase(event.getOwnerEmail());
-				final boolean isAResource = attendee.getCalendarUserType().equals(CalendarUserType.RESOURCE);
-				return !isOwner && !isAResource;
-			}
-		});
+		return FluentIterable.from(attendees)
+					.filter(new Predicate<Attendee>() {
+						@Override
+						public boolean apply(Attendee attendee) {
+							return !attendee.getEmail().equalsIgnoreCase(event.getOwnerEmail());
+						}
+					})
+					.filter(Predicates.not(Predicates.instanceOf(ResourceAttendee.class)))
+					.toSet();
 	}
 
 	private Map<Participation, Set<Attendee>> computeParticipationGroups(Collection<Attendee> attendees) {
