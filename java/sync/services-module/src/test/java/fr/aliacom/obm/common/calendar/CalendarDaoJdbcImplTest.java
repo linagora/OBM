@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.calendar;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
@@ -38,7 +39,6 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
 import java.sql.Connection;
@@ -63,6 +63,8 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
+import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jRecurrenceHelper;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.auth.AccessToken;
@@ -99,7 +101,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 public class CalendarDaoJdbcImplTest {
 
 	public static class Env extends AbstractModule {
-		private IMocksControl mocksControl = createControl();
+		private final IMocksControl mocksControl = createControl();
 		
 		@Override
 		protected void configure() {
@@ -113,6 +115,7 @@ public class CalendarDaoJdbcImplTest {
 			bindWithMock(SolrManager.class);
 			bind(AttendeeService.class).to(SimpleAttendeeService.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
+			bind(Ical4jRecurrenceHelper.class).to(Ical4jHelper.class);
 		}
 		
 		private <T> void bindWithMock(Class<T> cls) {

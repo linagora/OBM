@@ -56,7 +56,7 @@ import net.fortuna.ical4j.model.DateTime;
 import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.domain.dao.UserDao;
-import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jRecurrenceHelper;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.push.utils.jdbc.AbstractSQLCollectionHelper;
@@ -221,13 +221,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	private final UserDao userDao;
 	private final ObmHelper obmHelper;
 
-	private final Ical4jHelper ical4jHelper;
+	private final Ical4jRecurrenceHelper ical4jHelper;
 
 	private final Factory solrHelperFactory;
 
 
 	@Inject
-	@VisibleForTesting CalendarDaoJdbcImpl(UserDao userDao, SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper, Ical4jHelper ical4jHelper) {
+	@VisibleForTesting CalendarDaoJdbcImpl(UserDao userDao, SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper, Ical4jRecurrenceHelper ical4jHelper) {
 		this.userDao = userDao;
 		this.solrHelperFactory = solrHelperFactory;
 		this.obmHelper = obmHelper;

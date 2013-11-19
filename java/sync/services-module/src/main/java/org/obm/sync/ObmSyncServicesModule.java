@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import org.obm.configuration.module.LoggerModule;
+import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jRecurrenceHelper;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.date.DateProvider;
@@ -105,5 +107,6 @@ public class ObmSyncServicesModule extends AbstractModule {
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
 		bind(DateProvider.class).to(ObmHelper.class);
 		bind(AttendeeService.class).to(AttendeeServiceJdbcImpl.class);
+		bind(Ical4jRecurrenceHelper.class).to(Ical4jHelper.class);
     }
 }

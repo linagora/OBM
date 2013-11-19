@@ -168,7 +168,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
-public class Ical4jHelper {
+public class Ical4jHelper implements Ical4jRecurrenceHelper {
 	
 	private static final String MAILTO = "mailto:";
 	private static final int MAX_FOLD_LENGTH = 74;
@@ -1078,12 +1078,14 @@ public class Ical4jHelper {
 		}
 	}
 
+	@Override
 	public Date isInIntervalDate(Event event, Date start, Date end,
 			Set<Date> dateExce) {
 		return isInIntervalDate(event.getRecurrence(), event.getStartDate(), start,
 				end, dateExce);
 	}
 
+	@Override
 	public Date isInIntervalDate(EventRecurrence recurrence,
 			Date eventDate, Date start, Date end, Set<Date> dateExce) {
 		List<Date> dates = dateInInterval(recurrence, eventDate, start, end, dateExce);
@@ -1097,6 +1099,7 @@ public class Ical4jHelper {
 
 	}
 
+	@Override
 	public List<Date> dateInInterval(EventRecurrence recurrence,
 			Date eventDate, Date start, Date end, Set<Date> dateExce) {
 		List<Date> ret = new LinkedList<Date>();
