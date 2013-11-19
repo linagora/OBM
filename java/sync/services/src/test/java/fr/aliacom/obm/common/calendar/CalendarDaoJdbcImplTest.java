@@ -60,6 +60,8 @@ import org.junit.Test;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.icalendar.Ical4jHelper;
+import org.obm.icalendar.Ical4jRecurrenceHelper;
 import org.obm.locator.store.LocatorService;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.push.utils.DateUtils;
@@ -96,7 +98,7 @@ import fr.aliacom.obm.common.user.UserDao;
 public class CalendarDaoJdbcImplTest {
 
 	private static class Env extends AbstractModule {
-		private IMocksControl mocksControl = createControl();
+		private final IMocksControl mocksControl = createControl();
 		
 		@Override
 		protected void configure() {
@@ -110,6 +112,7 @@ public class CalendarDaoJdbcImplTest {
 			bindWithMock(SolrManager.class);
 			bind(AttendeeService.class).to(SimpleAttendeeService.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
+			bind(Ical4jRecurrenceHelper.class).to(Ical4jHelper.class);
 		}
 		
 		private <T> void bindWithMock(Class<T> cls) {
