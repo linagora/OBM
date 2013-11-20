@@ -64,7 +64,7 @@ import fr.aliacom.obm.common.user.UserServiceImpl;
 public class HelperServiceImplTest {
 
 	private static class Env extends AbstractModule {
-		private IMocksControl mocksControl = createControl();
+		private final IMocksControl mocksControl = createControl();
 
 		@Override
 		protected void configure() {
@@ -94,7 +94,7 @@ public class HelperServiceImplTest {
 	@Before
 	public void setUp() {
 		accessToken = new AccessToken(1, "o-push");
-		helperService = new HelperServiceImpl(null, null, userService);
+		helperService = new HelperServiceImpl(null, userService);
 	}
 
 	@Test
@@ -148,31 +148,31 @@ public class HelperServiceImplTest {
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testEventBelongsToCalendarWhenNoCalendar() {
-		new HelperServiceImpl(null, null, null).eventBelongsToCalendar(new Event(), null);
+		new HelperServiceImpl(null, null).eventBelongsToCalendar(new Event(), null);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testEventBelongsToCalendarWhenEmptyCalendar() {
-		new HelperServiceImpl(null, null, null).eventBelongsToCalendar(new Event(), "");
+		new HelperServiceImpl(null, null).eventBelongsToCalendar(new Event(), "");
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testEventBelongsToCalendarWhenNoEvent() {
-		new HelperServiceImpl(null, null, null).eventBelongsToCalendar(null, "user@domain.org");
+		new HelperServiceImpl(null, null).eventBelongsToCalendar(null, "user@domain.org");
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testEventBelongsToCalendarWhenNoOwnerEmail() {
 		Event event = new Event();
 		event.setOwnerEmail(null);
-		new HelperServiceImpl(null, null, null).eventBelongsToCalendar(event, "user@domain.org");
+		new HelperServiceImpl(null, null).eventBelongsToCalendar(event, "user@domain.org");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testEventBelongsToCalendarWhenEmptyOwnerEmail() {
 		Event event = new Event();
 		event.setOwnerEmail("");
-		new HelperServiceImpl(null, null, null).eventBelongsToCalendar(event, "user@domain.org");
+		new HelperServiceImpl(null, null).eventBelongsToCalendar(event, "user@domain.org");
 	}
 
 	@Test
@@ -180,7 +180,7 @@ public class HelperServiceImplTest {
 		Event event = new Event();
 		event.setOwnerEmail("aguy@domain.org");
 		
-		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(null, null, null);
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(null, null);
 		boolean eventBelongsToCalendar = helperServiceImpl.eventBelongsToCalendar(event, "user@domain.org");
 
 		Assertions.assertThat(eventBelongsToCalendar).isFalse();
@@ -191,7 +191,7 @@ public class HelperServiceImplTest {
 		Event event = new Event();
 		event.setOwnerEmail("user@domain.org");
 		
-		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(null, null, null);
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(null, null);
 		boolean eventBelongsToCalendar = helperServiceImpl.eventBelongsToCalendar(event, "user@domain.org");
 
 		Assertions.assertThat(eventBelongsToCalendar).isTrue();

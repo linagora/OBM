@@ -136,7 +136,7 @@ import fr.aliacom.obm.utils.HelperService;
 public class CalendarBindingImplTest {
 
 	private static class Env extends AbstractModule {
-		private IMocksControl mocksControl = createControl();
+		private final IMocksControl mocksControl = createControl();
 		
 		@Override
 		protected void configure() {
@@ -253,6 +253,7 @@ public class CalendarBindingImplTest {
 		};
 		
 		String[] calendarEmailsWithStrippedEmail = {
+				beriaInfo.getMail(),
 				hooverInfo.getMail(),
 				stripEmail(hooverInfo.getMail()),
 				mccarthyInfo.getMail(),
@@ -266,15 +267,13 @@ public class CalendarBindingImplTest {
 		};
 		
 		CalendarInfo[] calendarInfosFromDao = {
+				beriaInfo,
 				hooverInfo,
 				mccarthyInfo,
 		};
 			
 		AccessToken accessToken = mockAccessToken();
 		HelperService rightsHelper = createMock(HelperService.class);
-		
-		rightsHelper.constructEmailFromList(eq(defaultUser.getEmail()), eq(defaultUser.getDomain().getName()));
-		expectLastCall().andReturn(defaultUser.getEmail());
 		
 		UserService userService = createMock(UserService.class);
 		userService.getUserFromAccessToken(eq(accessToken));
@@ -338,9 +337,6 @@ public class CalendarBindingImplTest {
 		
 		AccessToken accessToken = mockAccessToken();
 		HelperService rightsHelper = createMock(HelperService.class);
-		
-		rightsHelper.constructEmailFromList(eq(defaultUser.getLogin()), eq(defaultUser.getDomain().getName()));
-		expectLastCall().andReturn(defaultUser.getEmail());
 		
 		UserService userService = createMock(UserService.class);
 		userService.getUserFromAccessToken(eq(accessToken));

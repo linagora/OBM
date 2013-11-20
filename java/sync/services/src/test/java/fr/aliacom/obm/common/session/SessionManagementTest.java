@@ -57,13 +57,11 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.services.constant.SpecialAccounts;
-import fr.aliacom.obm.utils.HelperService;
 
 
 public class SessionManagementTest {
 
 	private SessionManagement sessionManagement;
-	private HelperService helperService;
 	private SpecialAccounts specialAccounts;
 	private ObmSyncConfigurationService configurationService;
 	private UserDao userDao;
@@ -76,7 +74,6 @@ public class SessionManagementTest {
 	
 	private final static String DOMAIN = "test.tlse.lng";
 	private final static String LOGIN = "user";
-	private final static String EMAIL = "user@test";
 	private final static String LOGINATDOMAIN = "user@test.tlse.lng";
 	private final static String TRUSTEDIP = "1.2.3.4";
 
@@ -88,10 +85,9 @@ public class SessionManagementTest {
 		userDao = control.createMock(UserDao.class);
 		configurationService = control.createMock(ObmSyncConfigurationService.class);
 		specialAccounts = control.createMock(SpecialAccounts.class);
-		helperService = control.createMock(HelperService.class);
 		authenticationService = control.createMock(IAuthentificationService.class);
 		sessionManagement = createMockBuilder(SessionManagement.class)
-				.withConstructor(authentificationServiceFactory, domainService, userDao, configurationService, specialAccounts, helperService)
+				.withConstructor(authentificationServiceFactory, domainService, userDao, configurationService, specialAccounts)
 				.addMockedMethod("getObmSyncVersion")
 				.createMock(control);
 		obmDomain = ToolBox.getDefaultObmDomain();
@@ -186,7 +182,6 @@ public class SessionManagementTest {
 		expect(domainService.findDomainByName(DOMAIN)).andReturn(obmDomain);
 		expect(configurationService.getLemonLdapIps()).andReturn(ImmutableSet.of(TRUSTEDIP));
 		expect(userDao.findUserByLogin(LOGIN, obmDomain)).andReturn(obmUser);
-		expect(helperService.constructEmailFromList(EMAIL, DOMAIN)).andReturn(EMAIL);
 		expect(sessionManagement.getObmSyncVersion()).andReturn(new MavenVersion("2", "5", "0"));
 		expect(userDao.loadUserProperties(isA(AccessToken.class))).andReturn(ImmutableMap.<String, String>of());
 		control.replay();
@@ -207,7 +202,6 @@ public class SessionManagementTest {
 		expect(specialAccounts.isRootAccount(LOGINATDOMAIN, null)).andReturn(false);
 		expect(specialAccounts.isAnyUserAccount(null)).andReturn(true);
 		expect(userDao.findUserByLogin(LOGIN, obmDomain)).andReturn(obmUser);
-		expect(helperService.constructEmailFromList(EMAIL, DOMAIN)).andReturn(EMAIL);
 		expect(sessionManagement.getObmSyncVersion()).andReturn(new MavenVersion("2", "5", "0"));
 		expect(userDao.loadUserProperties(isA(AccessToken.class))).andReturn(ImmutableMap.<String, String>of());
 		

@@ -63,7 +63,6 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.services.constant.SpecialAccounts;
-import fr.aliacom.obm.utils.HelperService;
 import fr.aliacom.obm.utils.LogUtils;
 
 /**
@@ -73,7 +72,7 @@ import fr.aliacom.obm.utils.LogUtils;
 @Singleton
 public class SessionManagement {
 
-	private ConcurrentMap<String, AccessToken> sessions;
+	private final ConcurrentMap<String, AccessToken> sessions;
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(SessionManagement.class);
@@ -84,17 +83,15 @@ public class SessionManagement {
 	private final DomainService domainService;
 	private final ObmSyncConfigurationService configuration;
 	private final SpecialAccounts specialAccounts;
-	private final HelperService helperService;
 
 	@Inject
 	@VisibleForTesting SessionManagement(AuthentificationServiceFactory authentificationServiceFactory,
 			DomainService domainService, UserDao userDao, ObmSyncConfigurationService configurationService,
-			SpecialAccounts specialAccounts, HelperService helperService) {
+			SpecialAccounts specialAccounts) {
 
 		this.userManagementDAO = userDao;
 		this.configuration = configurationService;
 		this.specialAccounts = specialAccounts;
-		this.helperService = helperService;
 		this.conversationUidGenerator = new AtomicInteger();
 		this.sessions = configureSessionCache();
 		this.domainService = domainService;
@@ -282,9 +279,7 @@ public class SessionManagement {
 		token.setDomain(obmDomain);
 		token.setUserDisplayName(databaseUser.getDisplayName());
 		token.setUserLogin(userLogin);
-
-		String userEmail = helperService.constructEmailFromList(databaseUser.getEmail(), obmDomain.getName());
-		token.setUserEmail(userEmail);
+		token.setUserEmail(databaseUser.getEmail());
 
 		token.setSessionId(newSessionId());
 		token.setConversationUid(conversationUidGenerator.incrementAndGet());
