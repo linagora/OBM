@@ -50,7 +50,6 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.UserService;
 
@@ -61,19 +60,12 @@ public class HelperServiceImpl implements HelperService {
 	private static final String HEX_DIGITS = "0123456789abcdef";
 
 	private final HelperDao helperDao;
-	private final CalendarDaoJdbcImpl calendarDaoJdbcImpl;
 	private final UserService userService;
 	
 	@Inject
-	protected HelperServiceImpl(HelperDao helperDao, CalendarDaoJdbcImpl calendarDaoJdbcImpl, UserService userService) {
+	protected HelperServiceImpl(HelperDao helperDao, UserService userService) {
 		this.helperDao = helperDao;
-		this.calendarDaoJdbcImpl = calendarDaoJdbcImpl;
 		this.userService = userService;
-	}
-
-	@Override
-	public String constructEmailFromList(String listofmail, String domain) {
-		return calendarDaoJdbcImpl.constructEmailFromList(listofmail, domain);
 	}
 
 	@Override

@@ -1248,25 +1248,40 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return query;
 	}
 
-	private String buildPublicAndUserAndGroupCalendarsQuery(String publicQuery, String groupQuery, String userQuery) {
-		return String.format("SELECT userobm_login, userobm_firstname, userobm_lastname, userobm_email, "
-				+ "MAX(entityright_read), MAX(entityright_write) "
-				+ "FROM (%s UNION %s UNION %s) calendars_union "
-				+ "GROUP BY userobm_login, userobm_firstname, userobm_lastname, userobm_email",
-				publicQuery, groupQuery, userQuery);
+	private String buildOwnCalendarQuery() {
+		return "SELECT ?, ?, ?, ?, 1, 1";
 	}
-	
+
+	private String buildPublicAndUserAndGroupCalendarsQuery(String publicQuery, String groupQuery, String userQuery) {
+		return buildCalendarsQuery(String.format("%s UNION %s UNION %s", publicQuery, groupQuery, userQuery));
+	}
+
+	private String buildPublicAndUserAndGroupAndOwnCalendarsQuery(String publicQuery, String groupQuery, String userQuery, String ownQuery) {
+		return buildCalendarsQuery(String.format("%s UNION %s UNION %s UNION %s", publicQuery, groupQuery, userQuery, ownQuery));
+	}
+
+	private String buildCalendarsQuery(String unions) {
+		return String.format(
+			"SELECT userobm_login, userobm_firstname, userobm_lastname, userobm_email, MAX(entityright_read), MAX(entityright_write) " +
+			"FROM (%s) calendars_union " +
+			"GROUP BY userobm_login, userobm_firstname, userobm_lastname, userobm_email", unions);
+	}
+
 	private Collection<CalendarInfo> listUserAndPublicCalendars(ObmUser user, Collection<String> emails) throws FindException {
+		boolean useOwnEmail = true;
 		StringSQLCollectionHelper helper = null;
 
 		if (emails != null && !emails.isEmpty()) {
 			helper = new WildcardStringSQLCollectionHelper(emails);
+			useOwnEmail = emails.contains(user.getEmailAtDomain());
 		}
-		
+
 		String publicQuery = buildPublicCalendarsQuery(emails);
 		String userQuery = buildUserCalendarsQuery(emails);
 		String groupQuery = buildGroupCalendarsQuery(emails);
-		String query = buildPublicAndUserAndGroupCalendarsQuery(publicQuery, groupQuery, userQuery);
+		String query = !useOwnEmail ?
+				buildPublicAndUserAndGroupCalendarsQuery(publicQuery, groupQuery, userQuery):
+				buildPublicAndUserAndGroupAndOwnCalendarsQuery(publicQuery, groupQuery, userQuery, buildOwnCalendarQuery());
 
 		Connection con = null;
 		ResultSet rs = null;
@@ -1299,6 +1314,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.setInt(pos++, user.getUid());
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
+			}
+
+			// For our own calendar query
+			if (useOwnEmail) {
+				ps.setString(pos++, user.getLogin());
+				ps.setString(pos++, user.getFirstName());
+				ps.setString(pos++, user.getLastName());
+				ps.setString(pos++, user.getEmailAtDomain());
 			}
 
 			rs = ps.executeQuery();

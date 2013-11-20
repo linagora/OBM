@@ -41,7 +41,6 @@ public interface HelperService {
 
 	boolean canWriteOnCalendar(AccessToken writer, String targetCalendar);
 	boolean canReadCalendar(AccessToken writer, String targetCalendar);
-	String constructEmailFromList(String listofmail, String domain);
 	boolean attendeesContainsUser(List<Attendee> attendees, AccessToken token);
 	String getMD5Diggest(String plaintext);
 	boolean eventBelongsToCalendar(Event event, String calendar);

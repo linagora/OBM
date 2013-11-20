@@ -132,19 +132,6 @@ public class CalendarBindingImpl implements ICalendar {
 	private final ICalendarFactory calendarFactory;
 	private final AttendeeService attendeeService;
 	
-
-	private CalendarInfo makeOwnCalendarInfo(ObmUser user) {
-		CalendarInfo myself = new CalendarInfo();
-		myself.setMail(helperService.constructEmailFromList(user.getEmailAtDomain(), user
-				.getDomain().getName()));
-		myself.setUid(user.getLogin());
-		myself.setFirstname(user.getFirstName());
-		myself.setLastname(user.getLastName());
-		myself.setRead(true);
-		myself.setWrite(true);
-		return myself;
-	}
-	
 	@Inject
 	protected CalendarBindingImpl(EventChangeHandler eventChangeHandler,
 			DomainService domainService, UserService userService,
@@ -210,12 +197,11 @@ public class CalendarBindingImpl implements ICalendar {
 			
 			// Create a new list using Arrays.asList(calendars), since asList returns an unmodifiable list
 			List<String> calendarEmails = new ArrayList<String>();
-			boolean hasUserEmail = false;
 			String userEmail = user.getEmailAtDomain();
 			for (String calendarEmail : calendars) {
 				// We'll add the user manually later
 				if (calendarEmail.equals(userEmail)) {
-					hasUserEmail = true;
+					calendarEmails.add(userEmail);
 					continue;
 				}
 				int atPosition = calendarEmail.indexOf('@');
@@ -238,12 +224,6 @@ public class CalendarBindingImpl implements ICalendar {
 				calendarInfos = new HashSet<CalendarInfo>();
             }
 
-			if (hasUserEmail) {
-				// Add the calendar of the current user if needed, since the user's permissions over her own calendars
-				// will not be listed in the database
-				CalendarInfo myself = makeOwnCalendarInfo(user);
-				calendarInfos.add(myself);
-			}
 			CalendarInfo[] ret = calendarInfos.toArray(new CalendarInfo[0]);
 			logger.info(LogUtils.prefix(token) + "Returning " + ret.length
 					+ " calendar infos.");
@@ -283,13 +263,8 @@ public class CalendarBindingImpl implements ICalendar {
 		return rights;
 	}
 
-	private Collection<CalendarInfo> listCalendarsImpl(AccessToken token)
-			throws FindException {
-		ObmUser user = userService.getUserFromAccessToken(token);
-		Collection<CalendarInfo> calendarInfos = calendarDao.listCalendars(user);
-		CalendarInfo myself = makeOwnCalendarInfo(user);
-		calendarInfos.add(myself);
-		return calendarInfos;
+	private Collection<CalendarInfo> listCalendarsImpl(AccessToken token) throws FindException {
+		return calendarDao.listCalendars(userService.getUserFromAccessToken(token));
 	}
 
 	@Override
