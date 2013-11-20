@@ -1264,7 +1264,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return String.format(
 			"SELECT userobm_login, userobm_firstname, userobm_lastname, userobm_email, MAX(entityright_read), MAX(entityright_write) " +
 			"FROM (%s) calendars_union " +
-			"GROUP BY userobm_login, userobm_firstname, userobm_lastname, userobm_email", unions);
+			"GROUP BY userobm_login, userobm_firstname, userobm_lastname, userobm_email " +
+			"ORDER BY userobm_lastname, userobm_firstname ASC", unions);
 	}
 
 	private Collection<CalendarInfo> listUserAndPublicCalendars(ObmUser user, Collection<String> emails) throws FindException {
@@ -1286,7 +1287,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
-		Set<CalendarInfo> caldendarInfo = new HashSet<CalendarInfo>();
+		List<CalendarInfo> caldendarInfo = Lists.newArrayList();
 		String domainName = user.getDomain().getName();
 		
 		try {

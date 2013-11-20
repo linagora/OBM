@@ -84,7 +84,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 
 		loginClient.logout(user1Token);
 
-		assertThat(calendars).containsOnly(
+		assertThat(calendars).containsExactly(
 				makeCalendarInfo("user1", "Firstname", "Lastname", true, true),
 				makeTestUserCalendarInfo("a", true, true),
 				makeTestUserCalendarInfo("b", true, true),
@@ -123,7 +123,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 
 		loginClient.logout(user1Token);
 
-		assertThat(calendars).containsOnly(
+		assertThat(calendars).containsExactly(
 				makeTestUserCalendarInfo("a", true, true),
 				makeTestUserCalendarInfo("b", true, true),
 				makeTestUserCalendarInfo("c", true, false)
@@ -143,7 +143,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 
 		loginClient.logout(user1Token);
 
-		assertThat(calendars).containsOnly(
+		assertThat(calendars).containsExactly(
 				makeCalendarInfo("user1", "Firstname", "Lastname", true, true),
 				makeTestUserCalendarInfo("c", true, false)
 		);
