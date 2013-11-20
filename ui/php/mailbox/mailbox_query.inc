@@ -75,14 +75,20 @@ function check_mailbox_update_rights($params) {
         $mailbox_delegation = $obm_q->f("userobm_delegation");
   
         // Check delegation update right
+        if (empty($mailbox_delegation)) {
+          return false;
+        }
+
         if (! of_delegation_check_update_rights($params, $mailbox_delegation, $mailbox_delegation)) {
 	        $err['msg'] .= $l_error_delegation;
 	        return false;
+        } else {
+          return true;
         }
       }
     }
   }
-  return true;
+  return false;
 }
 
 

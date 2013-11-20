@@ -80,9 +80,9 @@ if (($action == "index") || ($action == "")) {
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
   $peer_profile_id = get_user_profile_id($params['entity_id']);
-  if((Obm_Acl::isAllowed($obm['uid'], 'mailbox', $params['entity_id'], "admin") || check_mailbox_update_rights($params))
-      && Perm::user_can_update_peer($obm['uid'], $profiles[$obm['profile']],
-       $params['entity_id'], $profiles[$peer_profile_id])) {
+  if((Obm_Acl::isAllowed($obm['uid'], 'mailbox', $params['entity_id'], "admin")
+      || check_mailbox_update_rights($params))
+      || Perm::user_can_update_peer($obm['uid'], $profiles[$obm['profile']], $params['entity_id'], $profiles[$peer_profile_id])) {
     $display["detail"] = dis_mailbox_right_dis_admin($params["entity_id"]);
   } else {
     $err['msg'] = $l_insufficient_permission;
