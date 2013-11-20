@@ -82,7 +82,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 
 		loginClient.logout(user1Token);
 
-		assertThat(resources).containsOnly(
+		assertThat(resources).containsExactly(
 				makeTestResourceInfo(1, "a", true, true),
 				makeTestResourceInfo(2, "b", true, false),
 				makeTestResourceInfo(3, "c", true, false),
@@ -108,7 +108,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 
 		loginClient.logout(user1Token);
 
-		assertThat(resources).containsOnly(
+		assertThat(resources).containsExactly(
 				makeTestResourceInfo(1, "a", true, true),
 				makeTestResourceInfo(2, "b", true, false)
 		);

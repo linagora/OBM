@@ -1390,11 +1390,11 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	private String buildPublicAndUserAndGroupResourcesQuery(String publicQuery, String groupQuery, String userQuery) {
-		return String.format("SELECT resource_id, resource_name, resource_email, resource_description, "
-				+ "SUM(entityright_read), SUM(entityright_write) "
-				+ "FROM (%s UNION %s UNION %s) resource_union "
-				+ "GROUP BY resource_id, resource_name, resource_email, resource_description",
-				publicQuery, groupQuery, userQuery);
+		return String.format(
+			"SELECT resource_id, resource_name, resource_email, resource_description, SUM(entityright_read), SUM(entityright_write) " +
+			"FROM (%s UNION %s UNION %s) resource_union " +
+			"GROUP BY resource_id, resource_name, resource_email, resource_description " +
+			"ORDER BY resource_name ASC", publicQuery, groupQuery, userQuery);
 	}
 
 	private Collection<ResourceInfo> listUserAndPublicResources(ObmUser user, Collection<String> emails) throws FindException {
@@ -1410,7 +1410,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
-		Set<ResourceInfo> resourceInfo = new HashSet<ResourceInfo>();
+		List<ResourceInfo> resourceInfo = Lists.newArrayList();
 		String domainName = user.getDomain().getName();
 		try {
 			con = obmHelper.getConnection();
