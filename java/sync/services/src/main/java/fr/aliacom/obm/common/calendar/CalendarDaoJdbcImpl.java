@@ -1261,24 +1261,33 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return "SELECT ?, ?, ?, ?, 1, 1";
 	}
 
-	private String buildPublicAndUserAndGroupCalendarsQuery(String publicQuery, String groupQuery, String userQuery) {
-		return buildCalendarsQuery(String.format("%s UNION %s UNION %s", publicQuery, groupQuery, userQuery));
+	private String buildPublicAndUserAndGroupCalendarsQuery(String publicQuery, String groupQuery, String userQuery, Integer limit, Integer offset) {
+		return buildCalendarsQuery(String.format("%s UNION %s UNION %s", publicQuery, groupQuery, userQuery), limit, offset);
 	}
 
-	private String buildPublicAndUserAndGroupAndOwnCalendarsQuery(String publicQuery, String groupQuery, String userQuery, String ownQuery) {
-		return buildCalendarsQuery(String.format("%s UNION %s UNION %s UNION %s", publicQuery, groupQuery, userQuery, ownQuery));
+	private String buildPublicAndUserAndGroupAndOwnCalendarsQuery(String publicQuery, String groupQuery, String userQuery, String ownQuery, Integer limit, Integer offset) {
+		return buildCalendarsQuery(String.format("%s UNION %s UNION %s UNION %s", publicQuery, groupQuery, userQuery, ownQuery), limit, offset);
 	}
 
-	private String buildCalendarsQuery(String unions) {
-		return String.format(
+	@VisibleForTesting
+	String buildCalendarsQuery(String unions, Integer limit, Integer offset) {
+		Preconditions.checkArgument(limit == null || limit >= 0, "limit must be a positive integer");
+		Preconditions.checkArgument(limit == null || (offset != null && offset >= 0), "offset must be a positive integer");
+
+		String query = String.format(
 			"SELECT userobm_login, userobm_firstname, userobm_lastname, userobm_email, MAX(entityright_read), MAX(entityright_write) " +
 			"FROM (%s) calendars_union " +
 			"GROUP BY userobm_login, userobm_firstname, userobm_lastname, userobm_email " +
-			"ORDER BY userobm_lastname, userobm_firstname ASC", unions);
+			"ORDER BY userobm_lastname, userobm_firstname ASC ", unions);
+
+		if (limit != null) {
+			query += String.format("LIMIT %d OFFSET %d", limit, offset);
+		}
+
+		return query;
 	}
 
-	private Collection<CalendarInfo> listUserAndPublicCalendars(ObmUser user, Collection<String> emails) throws FindException {
-		boolean useOwnEmail = true;
+	private Collection<CalendarInfo> listUserAndPublicCalendars(ObmUser user, Collection<String> emails, Integer limit, Integer offset) throws FindException {
 		StringSQLCollectionHelper helper = null;
 
 		if (emails != null && !emails.isEmpty()) {
@@ -1290,8 +1299,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		String userQuery = buildUserCalendarsQuery(emails);
 		String groupQuery = buildGroupCalendarsQuery(emails);
 		String query = !useOwnEmail ?
-				buildPublicAndUserAndGroupCalendarsQuery(publicQuery, groupQuery, userQuery):
-				buildPublicAndUserAndGroupAndOwnCalendarsQuery(publicQuery, groupQuery, userQuery, buildOwnCalendarQuery());
+				buildPublicAndUserAndGroupCalendarsQuery(publicQuery, groupQuery, userQuery, limit, offset):
+				buildPublicAndUserAndGroupAndOwnCalendarsQuery(publicQuery, groupQuery, userQuery, buildOwnCalendarQuery(), limit, offset);
 
 		Connection con = null;
 		ResultSet rs = null;
@@ -1350,8 +1359,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Collection<CalendarInfo> listCalendars(ObmUser user) throws FindException {
-		return listUserAndPublicCalendars(user, null);
+	public Collection<CalendarInfo> listCalendars(ObmUser user, Integer limit, Integer offset) throws FindException {
+		return listUserAndPublicCalendars(user, null, limit, offset);
 	}
 
 	@Override
@@ -1471,7 +1480,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public Collection<CalendarInfo> getCalendarMetadata(ObmUser user, Collection<String> calendarEmails) throws FindException {
-		return this.listUserAndPublicCalendars(user, calendarEmails);
+		return this.listUserAndPublicCalendars(user, calendarEmails, null, 0);
 	}
 
 	@Override

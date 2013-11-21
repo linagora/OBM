@@ -71,13 +71,14 @@ import org.obm.sync.utils.DateHelper;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Multimap;
 
 public abstract class AbstractEventSyncClient extends AbstractClientImpl implements ICalendar {
 
-	private CalendarItemsParser respParser;
-	private CalendarItemsWriter ciw;
-	private String type;
+	private final CalendarItemsParser respParser;
+	private final CalendarItemsWriter ciw;
+	private final String type;
 	private final Locator locator;
 
 	public AbstractEventSyncClient(String type, SyncClientException syncClientException, 
@@ -230,9 +231,23 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		return DOMUtils.getElementText(doc.getDocumentElement(), "value");
 	}
 
-	@Override
+	@VisibleForTesting
 	public CalendarInfo[] listCalendars(AccessToken token) throws ServerFault {
+		return listCalendars(token, null, null);
+	}
+
+	@Override
+	public CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
+
+		if (limit != null) {
+			params.put("limit", String.valueOf(limit));
+
+			if (offset != null) {
+				params.put("offset", String.valueOf(offset));
+			}
+		}
+
 		Document doc = execute(token, type + "/listCalendars", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseInfos(doc);
