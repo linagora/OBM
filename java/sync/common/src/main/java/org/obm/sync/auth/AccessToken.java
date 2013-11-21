@@ -31,12 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.auth;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.obm.sync.ServerCapability;
-import org.obm.sync.calendar.CalendarInfo;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.UserSettings;
@@ -55,7 +53,6 @@ public class AccessToken {
 
 	private Map<String, String> isoCodeToNameCache;
 	private Map<String, String> serviceProps;
-	private Collection<CalendarInfo> calendarRights;
 	private UserSettings userSettings;
 	private Map<ServerCapability, String> serverCapabilities;
 
@@ -140,14 +137,6 @@ public class AccessToken {
 
 	public void setServiceProperties(Map<String, String> props) {
 		this.serviceProps = props;
-	}
-
-	public Collection<CalendarInfo> getCalendarRights() {
-		return calendarRights;
-	}
-
-	public void setCalendarRights(Collection<CalendarInfo> calendarRights) {
-		this.calendarRights = calendarRights;
 	}
 
 	public void setVersion(MavenVersion version) {
