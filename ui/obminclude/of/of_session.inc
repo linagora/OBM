@@ -503,7 +503,7 @@ class Perm {
       if (!$is_peer_self && !$is_peer_self_or_new_entity) {
         $can_edit_peer_profile = self::user_profile_can_edit_peer_profile($user_profile, $peer_profile);
         if ($user_profile['name'] === 'admin_delegue') {
-          return $can_edit_peer_profile && self::has_delegation_over_peer($user_entity_id, $peer_entity_id);
+          return self::has_delegation_over_peer($user_entity_id, $peer_entity_id);
         }
         else {
           return $can_edit_peer_profile;

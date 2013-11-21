@@ -846,7 +846,7 @@ function update_user_action() {
   if ($id > 0) {
     $u = get_user_info($id);
     if (Perm::user_can_update_peer($obm['uid'], $profiles[$obm['profile']], $id, $profiles[$u['perms']])
-        && check_user_update_rights($params, $u)) {
+        || check_user_update_rights($params, $u)) {
       // Detail Consult
       $actions['user']['detailconsult']['Url'] = "$path/user/user_index.php?action=detailconsult&amp;user_id=$id";
       $actions['user']['detailconsult']['Condition'][] = 'insert';
