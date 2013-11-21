@@ -156,7 +156,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Transactional(readOnly=true)
 	public CalendarInfo[] listCalendars(AccessToken token) throws ServerFault {
 		try {
-			Collection<CalendarInfo> calendarInfos = getRights(token);
+			Collection<CalendarInfo> calendarInfos = listCalendarsImpl(token);
 			CalendarInfo[] ret = calendarInfos.toArray(new CalendarInfo[0]);
 			logger.info(LogUtils.prefix(token) + "Returning " + ret.length
 					+ " calendar infos.");
@@ -252,15 +252,6 @@ public class CalendarBindingImpl implements ICalendar {
 		ResourceInfo[] ret = new ResourceInfo[resourceInfo.size()];
 		resourceInfo.toArray(ret);
 		return ret;
-	}
-
-	private Collection<CalendarInfo> getRights(AccessToken t) throws FindException {
-		Collection<CalendarInfo> rights = t.getCalendarRights();
-		if (rights == null) {
-			rights = listCalendarsImpl(t);
-			t.setCalendarRights(rights);
-		}
-		return rights;
 	}
 
 	private Collection<CalendarInfo> listCalendarsImpl(AccessToken token) throws FindException {

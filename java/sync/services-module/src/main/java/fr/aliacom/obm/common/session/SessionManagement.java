@@ -313,7 +313,6 @@ public class SessionManagement {
 		at.setUserEmail(u.getUserEmail());
 		at.setIsoCodeToNameCache(u.getIsoCodeToNameCache());
 		at.setServiceProperties(u.getServiceProperties());
-		at.setCalendarRights(u.getCalendarRights());
 		at.setVersion(u.getVersion());
 		at.setRootAccount(u.isRootAccount());
 		at.setConversationUid(u.getConversationUid());

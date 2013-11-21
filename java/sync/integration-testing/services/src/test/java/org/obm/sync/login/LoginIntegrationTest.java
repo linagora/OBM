@@ -172,7 +172,6 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 	}
 	
 	private void assertThatTokenIsWellFormed(AccessToken token) {
-		assertThat(token.getCalendarRights()).isNull();
 		assertThat(token.getConversationUid()).isEqualTo(0);
 		assertThat(token.getDomain()).isEqualTo(
 				ObmDomain.builder()
