@@ -111,6 +111,80 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Test
 	@RunAsClient
+	public void testListCalendarsWithLimit(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, 5, 0);
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsExactly(
+				makeCalendarInfo("user1", "Firstname", "Lastname", true, true),
+				makeTestUserCalendarInfo("a", true, true),
+				makeTestUserCalendarInfo("b", true, true),
+				makeTestUserCalendarInfo("c", true, false),
+				makeTestUserCalendarInfo("d", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithLimitAndOffset(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, 2, 2);
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsExactly(
+				makeTestUserCalendarInfo("b", true, true),
+				makeTestUserCalendarInfo("c", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsPagination(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, 5, 0);
+
+		assertThat(calendars).containsExactly(
+				makeCalendarInfo("user1", "Firstname", "Lastname", true, true),
+				makeTestUserCalendarInfo("a", true, true),
+				makeTestUserCalendarInfo("b", true, true),
+				makeTestUserCalendarInfo("c", true, false),
+				makeTestUserCalendarInfo("d", true, false)
+		);
+
+		calendars = calendarClient.listCalendars(user1Token, 5, 5);
+
+		assertThat(calendars).containsExactly(
+				makeTestUserCalendarInfo("e", true, false),
+				makeTestUserCalendarInfo("f", true, false),
+				makeTestUserCalendarInfo("g", true, false),
+				makeTestUserCalendarInfo("h", true, false),
+				makeTestUserCalendarInfo("i", true, false)
+		);
+
+		calendars = calendarClient.listCalendars(user1Token, 5, 10);
+
+		assertThat(calendars).containsExactly(
+				makeTestUserCalendarInfo("j", true, false),
+				makeTestUserCalendarInfo("k", true, true),
+				makeTestUserCalendarInfo("l", true, true),
+				makeTestUserCalendarInfo("m", true, false),
+				makeTestUserCalendarInfo("n", true, false)
+		);
+
+		loginClient.logout(user1Token);
+	}
+
+	@Test
+	@RunAsClient
 	public void testGetCalendarMetadata(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 

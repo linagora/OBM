@@ -67,6 +67,7 @@ import org.obm.sync.utils.DateHelper;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -106,8 +107,8 @@ import fr.aliacom.obm.utils.LogUtils;
 @Singleton
 public class EventHandler extends SecureSyncHandler {
 
-	private CalendarBindingImpl binding;
-	private CalendarItemsParser cip;
+	private final CalendarBindingImpl binding;
+	private final CalendarItemsParser cip;
 
 	@Inject
 	public EventHandler(SessionManagement sessionManagement, CalendarBindingImpl calendarBindingImpl, CalendarItemsParser cip) {
@@ -153,7 +154,7 @@ public class EventHandler extends SecureSyncHandler {
 		} else if (method.equals("getEventFromId")) {
 			return getEventFromId(at, request, responder);
 		} else if (method.equals("listCalendars")) {
-			return listCalendars(at, responder);
+			return listCalendars(at, request, responder);
 		} else if (method.equals("listResources")) {
 			return listResources(at, responder);
 		} else if (method.equals("listCategories")) {
@@ -346,9 +347,8 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendKeyList(kl);
 	}
 
-	private String listCalendars(AccessToken at, XmlResponder responder) throws ServerFault {
-		CalendarInfo[] lc = binding.listCalendars(at);
-		return responder.sendCalendarInformations(lc);
+	private String listCalendars(AccessToken at, Request req, XmlResponder responder) throws ServerFault {
+		return responder.sendCalendarInformations(binding.listCalendars(at, getLimit(req), getOffset(req)));
 	}
 
 	private String listResources(AccessToken at, XmlResponder responder) throws ServerFault {
@@ -583,5 +583,17 @@ public class EventHandler extends SecureSyncHandler {
 		Event event = binding.storeEvent(at, getCalendar(request), getEvent(request), getNotificationOption(request), getClientId(request));
 
 		return responder.sendEvent(event);
+	}
+
+	private Integer getLimit(Request request) {
+		String limit = request.getParameter("limit");
+
+		return Strings.isNullOrEmpty(limit) ? null : Integer.valueOf(limit);
+	}
+
+	private int getOffset(Request request) {
+		String offset = request.getParameter("offset");
+
+		return Strings.isNullOrEmpty(offset) ? 0 : Integer.parseInt(offset);
 	}
 }

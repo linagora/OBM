@@ -59,9 +59,15 @@ import org.obm.sync.items.EventChanges;
 public interface ICalendar {
 
 	/**
-	 * List all Calendars on which authenticated user as some rights
+	 * List all Calendars on which authenticated user as some rights.
+	 * 
+	 * @param token The {@link AccessToken} of the user doing the request.
+	 * @param limit The maximum number of results to return, can be {@code null} if all results should be returned.
+	 * @param offset The number of results to skip. Passing {@code null} will return results from the first.
+	 * 
+	 * @return An {@code array} of {@link CalendarInfo} objects containing the requested information.
 	 */
-	CalendarInfo[] listCalendars(AccessToken token) throws ServerFault;
+	CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset) throws ServerFault;
 
 
 	/**

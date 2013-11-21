@@ -31,12 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.calendar;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -511,7 +511,7 @@ public class CalendarBackendTest {
 	}
 
 	private void expectObmSyncCalendarChanges(CalendarInfo...calendarInfos) throws ServerFault {
-		expect(calendarClient.listCalendars(token))
+		expect(calendarClient.listCalendars(token, null, null))
 			.andReturn(calendarInfos).once();
 	}
 

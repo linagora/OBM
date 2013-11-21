@@ -60,6 +60,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 
 import fr.aliacom.obm.ToolBox;
@@ -431,7 +432,72 @@ public class AbstractEventSyncClientTest {
 		
 		client.purge(token, CALENDAR);
 	}
-	
+
+	@Test
+	public void testListCalendarsSendsOnlySid() throws Exception {
+		Document doc = mockEmptyCalendarInfosDocument();
+		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId");
+
+		expect(responder.execute(token, "/calendar/listCalendars", params)).andReturn(doc).once();
+		control.replay();
+
+		client.listCalendars(token);
+
+		control.verify();
+	}
+
+	@Test
+	public void testListCalendarsWithLimitAndOffsetSendsLimitAndOffset() throws Exception {
+		Document doc = mockEmptyCalendarInfosDocument();
+		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "limit", "10", "offset", "5");
+
+		expect(responder.execute(token, "/calendar/listCalendars", params)).andReturn(doc).once();
+		control.replay();
+
+		client.listCalendars(token, 10, 5);
+
+		control.verify();
+	}
+
+	@Test
+	public void testListCalendarsWithNoLimitSendsSidOnly() throws Exception {
+		Document doc = mockEmptyCalendarInfosDocument();
+		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId");
+
+		expect(responder.execute(token, "/calendar/listCalendars", params)).andReturn(doc).once();
+		control.replay();
+
+		client.listCalendars(token, null, 5);
+
+		control.verify();
+	}
+
+	@Test
+	public void testListCalendarsWithPatternSendsPatternAndSid() throws Exception {
+		Document doc = mockEmptyCalendarInfosDocument();
+		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "pattern", "p");
+
+		expect(responder.execute(token, "/calendar/listCalendars", params)).andReturn(doc).once();
+		control.replay();
+
+		client.listCalendars(token, null, 5, "p");
+
+		control.verify();
+	}
+
+	@Test
+	public void testListCalendarsWithPatternAndLimitAndOffsetSendsAll() throws Exception {
+		Document doc = mockEmptyCalendarInfosDocument();
+		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "limit", "10", "offset", "5", "pattern", "p");
+
+		expect(responder.execute(token, "/calendar/listCalendars", params)).andReturn(doc).once();
+		control.replay();
+
+		client.listCalendars(token, 10, 5, "p");
+
+		control.verify();
+	}
+
 	private Document mockErrorDocument(Class<? extends Exception> exceptionClass, String message) {
 		Document doc = control.createMock(Document.class);
 		Element root = control.createMock(Element.class);
@@ -444,7 +510,20 @@ public class AbstractEventSyncClientTest {
 		
 		return doc;
 	}
-	
+
+	private Document mockEmptyCalendarInfosDocument() {
+		Document doc = control.createMock(Document.class);
+		Element root = control.createMock(Element.class);
+		NodeList list = control.createMock(NodeList.class);
+
+		expect(doc.getDocumentElement()).andReturn(root).anyTimes();
+		expect(root.getNodeName()).andReturn("calendar-infos").anyTimes();
+		expect(doc.getElementsByTagName(eq("info"))).andReturn(list).anyTimes();
+		expect(list.getLength()).andReturn(0).anyTimes();
+
+		return doc;
+	}
+
 	private void mockTextElement(Element root, String elementName, String text) {
 		NodeList list = control.createMock(NodeList.class);
 		Element element = control.createMock(Element.class);

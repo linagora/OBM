@@ -154,19 +154,19 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional(readOnly=true)
-	public CalendarInfo[] listCalendars(AccessToken token) throws ServerFault {
+	public CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset) throws ServerFault {
 		try {
-			Collection<CalendarInfo> calendarInfos = listCalendarsImpl(token);
-			CalendarInfo[] ret = calendarInfos.toArray(new CalendarInfo[0]);
-			logger.info(LogUtils.prefix(token) + "Returning " + ret.length
-					+ " calendar infos.");
-			return ret;
+			Collection<CalendarInfo> calendarInfos = calendarDao.listCalendars(userService.getUserFromAccessToken(token), limit, offset);
+
+			logger.info(LogUtils.prefix(token) + "Returning " + calendarInfos.size() + " calendar infos.");
+
+			return calendarInfos.toArray(new CalendarInfo[0]);
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
-			throw new ServerFault(e.getMessage());
+
+			throw new ServerFault(e);
 		}
 	}
-
 
 	@Override
 	@Transactional(readOnly = true)
@@ -252,10 +252,6 @@ public class CalendarBindingImpl implements ICalendar {
 		ResourceInfo[] ret = new ResourceInfo[resourceInfo.size()];
 		resourceInfo.toArray(ret);
 		return ret;
-	}
-
-	private Collection<CalendarInfo> listCalendarsImpl(AccessToken token) throws FindException {
-		return calendarDao.listCalendars(userService.getUserFromAccessToken(token));
 	}
 
 	@Override

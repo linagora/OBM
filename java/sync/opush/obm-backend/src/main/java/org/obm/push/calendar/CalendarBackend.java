@@ -192,7 +192,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		Builder builder = PathsToCollections.builder();
 		AccessToken token = getAccessToken(udr);
 		try {
-			CalendarInfo[] cals = getCalendarClient(udr).listCalendars(token);
+			CalendarInfo[] cals = getCalendarClient(udr).listCalendars(token, null, null);
 			for (CalendarInfo ci : cals) {
 				CollectionPath collectionPath = collectionPathOfCalendar(udr, ci.getUid());
 				builder.put(collectionPath, OpushCollection.builder()
