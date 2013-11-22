@@ -105,7 +105,12 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 				makeTestUserCalendarInfo("q", true, true),
 				makeTestUserCalendarInfo("r", true, false),
 				makeTestUserCalendarInfo("s", true, false),
-				makeTestUserCalendarInfo("t", true, false)
+				makeTestUserCalendarInfo("t", true, false),
+				makeCalendarInfo("testuser1", "Test", "User", true, false),
+				makeCalendarInfo("testuser2", "Test", "User", true, false),
+				makeCalendarInfo("testuser3", "Test", "User", true, false),
+				makeCalendarInfo("testuser4", "Test", "User", true, false),
+				makeCalendarInfo("testuser5", "Test", "User", true, false)
 		);
 	}
 
@@ -231,6 +236,197 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
 
 		calendarClient.getCalendarMetadata(user1Token, new String[] {});
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithPatternMatchesLogin(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "testuser");
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsExactly(
+				makeCalendarInfo("testuser1", "Test", "User", true, false),
+				makeCalendarInfo("testuser2", "Test", "User", true, false),
+				makeCalendarInfo("testuser3", "Test", "User", true, false),
+				makeCalendarInfo("testuser4", "Test", "User", true, false),
+				makeCalendarInfo("testuser5", "Test", "User", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithPatternMatchesLoginICase(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "TESTUS");
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsExactly(
+				makeCalendarInfo("testuser1", "Test", "User", true, false),
+				makeCalendarInfo("testuser2", "Test", "User", true, false),
+				makeCalendarInfo("testuser3", "Test", "User", true, false),
+				makeCalendarInfo("testuser4", "Test", "User", true, false),
+				makeCalendarInfo("testuser5", "Test", "User", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithPatternMatchesLastname(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "Lastname_r");
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsExactly(
+				makeTestUserCalendarInfo("r", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithPatternMatchesLastnameICase(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "TeSTlasT");
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsExactly(
+				makeCalendarInfo("testuser1", "Test", "User", true, false),
+				makeCalendarInfo("testuser2", "Test", "User", true, false),
+				makeCalendarInfo("testuser3", "Test", "User", true, false),
+				makeCalendarInfo("testuser4", "Test", "User", true, false),
+				makeCalendarInfo("testuser5", "Test", "User", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithPatternMatchesFirstname(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "TestFirs");
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsExactly(
+				makeCalendarInfo("testuser1", "Test", "User", true, false),
+				makeCalendarInfo("testuser2", "Test", "User", true, false),
+				makeCalendarInfo("testuser3", "Test", "User", true, false),
+				makeCalendarInfo("testuser4", "Test", "User", true, false),
+				makeCalendarInfo("testuser5", "Test", "User", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithPatternMatchesFirstnameICase(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "testfirST");
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsExactly(
+				makeCalendarInfo("testuser1", "Test", "User", true, false),
+				makeCalendarInfo("testuser2", "Test", "User", true, false),
+				makeCalendarInfo("testuser3", "Test", "User", true, false),
+				makeCalendarInfo("testuser4", "Test", "User", true, false),
+				makeCalendarInfo("testuser5", "Test", "User", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithPatternWhenMatchingOwnCalendarOnly(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "user1");
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsExactly(
+				makeCalendarInfo("user1", "Firstname", "Lastname", true, true)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithPatternWhenAlsoMatchingOwnCalendar(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login("userc@domain.org", "userc");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, 3, 0, "Firstname");
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsExactly(
+				makeTestUserCalendarInfo("a", true, true),
+				makeTestUserCalendarInfo("b", true, true),
+				makeTestUserCalendarInfo("c", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithPatternLimitAndOffset(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, 2, 1, "testuser");
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).containsExactly(
+				makeCalendarInfo("testuser2", "Test", "User", true, false),
+				makeCalendarInfo("testuser3", "Test", "User", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithBadPattern(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "iwontmatch");
+
+		loginClient.logout(user1Token);
+
+		assertThat(calendars).isEmpty();
+	}
+
+	@Test(expected = ServerFault.class)
+	@RunAsClient
+	public void testListCalendarsWithNegativeLimit(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+
+		calendarClient.listCalendars(user1Token, -1, 0, null);
+	}
+
+	@Test(expected = ServerFault.class)
+	@RunAsClient
+	public void testListCalendarsWithNegativeOffset(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+
+		calendarClient.listCalendars(user1Token, 10, -1, null);
 	}
 
 	@DeployForEachTests

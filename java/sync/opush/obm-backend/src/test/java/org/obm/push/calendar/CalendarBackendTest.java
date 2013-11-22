@@ -511,7 +511,7 @@ public class CalendarBackendTest {
 	}
 
 	private void expectObmSyncCalendarChanges(CalendarInfo...calendarInfos) throws ServerFault {
-		expect(calendarClient.listCalendars(token, null, null))
+		expect(calendarClient.listCalendars(token, null, null, null))
 			.andReturn(calendarInfos).once();
 	}
 

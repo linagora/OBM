@@ -34,8 +34,10 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 
 public class SQLUtils {
+
 	/**
 	 * Utility method building an AND condition for user emails.<br />
 	 * The condition is the OR of all user emails using LIKE matching mode.
@@ -60,4 +62,13 @@ public class SQLUtils {
 		
 		return builder.toString();
 	}
+
+	public static String selectUsersMatchingPatternCondition(String pattern) {
+		if (Strings.isNullOrEmpty(pattern)) {
+			return "";
+		}
+
+		return "AND (LOWER(userobm_login) LIKE ? OR LOWER(userobm_lastname) LIKE ? OR LOWER(userobm_firstname) LIKE ?) ";
+	}
+
 }

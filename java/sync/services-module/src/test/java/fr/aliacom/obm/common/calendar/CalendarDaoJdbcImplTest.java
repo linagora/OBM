@@ -100,6 +100,15 @@ import fr.aliacom.obm.common.user.ObmUser;
 @RunWith(SlowGuiceRunner.class)
 public class CalendarDaoJdbcImplTest {
 
+	private static final ObmUser PATTERN_MATCHING_USER = ObmUser
+			.builder()
+			.uid(1)
+			.login("login")
+			.lastName("lastname")
+			.firstName("firstname")
+			.domain(ToolBox.getDefaultObmDomain())
+			.build();
+
 	public static class Env extends AbstractModule {
 		private final IMocksControl mocksControl = createControl();
 		
@@ -456,6 +465,71 @@ public class CalendarDaoJdbcImplTest {
 	@Test
 	public void testBuildCalendarsQueryConsidersLimitAndOffset() {
 		assertThat(calendarDaoJdbcImpl.buildCalendarsQuery("", 10, 5)).contains("LIMIT 10 OFFSET 5");
+	}
+
+	@Test
+	public void testUserMatchesPatternWithNullUser() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(null, "pattern")).isTrue();
+	}
+
+	@Test
+	public void testUserMatchesPatternWithNullPattern() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, null)).isTrue();
+	}
+
+	@Test
+	public void testUserMatchesPatternWithEmptyPattern() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "")).isTrue();
+	}
+
+	@Test
+	public void testUserMatchesPatternWhenNothingMatches() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "user")).isFalse();
+	}
+
+	@Test
+	public void testUserMatchesPatternWhenMatchingLogin() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "log")).isTrue();
+	}
+
+	@Test
+	public void testUserMatchesPatternWhenExactlyMatchingLogin() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "login")).isTrue();
+	}
+
+	@Test
+	public void testUserMatchesPatternWhenMatchingLoginICase() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "LOg")).isTrue();
+	}
+
+	@Test
+	public void testUserMatchesPatternWhenMatchingLastname() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "lastna")).isTrue();
+	}
+
+	@Test
+	public void testUserMatchesPatternWhenExactlyMatchingLastname() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "lastname")).isTrue();
+	}
+
+	@Test
+	public void testUserMatchesPatternWhenMatchingLastnameICase() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "lAStnAM")).isTrue();
+	}
+
+	@Test
+	public void testUserMatchesPatternWhenMatchingFirstname() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "first")).isTrue();
+	}
+
+	@Test
+	public void testUserMatchesPatternWhenExactlyMatchingFirstname() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "firstname")).isTrue();
+	}
+
+	@Test
+	public void testUserMatchesPatternWhenMatchingFirstnameICase() {
+		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "FIRst")).isTrue();
 	}
 
 }
