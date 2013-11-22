@@ -66,10 +66,11 @@ public interface ICalendar {
 	 * @param token The {@link AccessToken} of the user doing the request.
 	 * @param limit The maximum number of results to return, can be {@code null} if all results should be returned.
 	 * @param offset The number of results to skip. Passing {@code null} will return results from the first.
+	 * @param pattern An optional pattern matched against user's login, lastname and firstname. Can be {@code null}.
 	 * 
 	 * @return An {@code array} of {@link CalendarInfo} objects containing the requested information.
 	 */
-	CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset) throws ServerFault;
+	CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault;
 
 
 	/**

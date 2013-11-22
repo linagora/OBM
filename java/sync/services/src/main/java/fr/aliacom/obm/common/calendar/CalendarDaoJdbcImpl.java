@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.calendar;
 
+import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -101,6 +103,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -133,8 +136,9 @@ import fr.aliacom.obm.utils.RFC2445;
 @AutoTruncate
 public class CalendarDaoJdbcImpl implements CalendarDao {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(CalendarDaoJdbcImpl.class);
+	private static final int PATTERN_MATCHING_FIELDS_COUNT = 3;
+
+	private static final Logger logger = LoggerFactory.getLogger(CalendarDaoJdbcImpl.class);
 
 	// event_ext_id | character varying(255) | default ''::character varying
 	// event_owner | integer |
@@ -1214,7 +1218,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		}
 	}
 	
-	private String buildUserCalendarsQuery(Collection<String> calendarEmails) {
+	private String buildUserCalendarsQuery(Collection<String> calendarEmails, String pattern) {
 		String query = "select userobm_login, userobm_firstname, userobm_lastname, userobm_email, entityright_read, entityright_write "
 				+ "from EntityRight "
 				+ "inner join UserEntity u1 on entityright_consumer_id=u1.userentity_entity_id "
@@ -1223,12 +1227,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "where u1.userentity_user_id=? and (entityright_read=1 or entityright_write=1) "
 				+ "and userobm_email is not null and userobm_email != '' and userobm_archive != 1 "
 				+ "and userobm_id != ? "
-				+ SQLUtils.selectCalendarsCondition(calendarEmails);
+				+ SQLUtils.selectCalendarsCondition(calendarEmails)
+				+ SQLUtils.selectUsersMatchingPatternCondition(pattern);
 				
 		return query;
 	}
 
-	private String buildPublicCalendarsQuery(Collection<String> calendarEmails) {
+	private String buildPublicCalendarsQuery(Collection<String> calendarEmails, String pattern) {
 		String query = "select userobm_login, userobm_firstname, userobm_lastname, userobm_email, entityright_read, entityright_write "
 				+ "from EntityRight "
 				+ "inner join CalendarEntity u2 on u2.calendarentity_entity_id=entityright_entity_id "
@@ -1237,12 +1242,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "and userobm_email is not null and userobm_email != '' and userobm_archive != 1 "
 				+ "and userobm_domain_id= ? "
 				+ "and userobm_id != ? "
-				+ SQLUtils.selectCalendarsCondition(calendarEmails);
+				+ SQLUtils.selectCalendarsCondition(calendarEmails)
+				+ SQLUtils.selectUsersMatchingPatternCondition(pattern);
 		
 		return query;
 	}
 
-	private String buildGroupCalendarsQuery(Collection<String> calendarEmails) {
+	private String buildGroupCalendarsQuery(Collection<String> calendarEmails, String pattern) {
 		String query = "select userobm_login, userobm_firstname, userobm_lastname, userobm_email, entityright_read, entityright_write "
 				+ "from EntityRight "
 				+ "inner join GroupEntity u1 on entityright_consumer_id=u1.groupentity_entity_id "
@@ -1252,7 +1258,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "where of_usergroup_user_id=? "
 				+ "and userobm_email is not null and userobm_email != '' and userobm_archive != 1 "
 				+ "and userobm_id != ? "
-				+ SQLUtils.selectCalendarsCondition(calendarEmails);
+				+ SQLUtils.selectCalendarsCondition(calendarEmails)
+				+ SQLUtils.selectUsersMatchingPatternCondition(pattern);
 		
 		return query;
 	}
@@ -1287,17 +1294,18 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return query;
 	}
 
-	private Collection<CalendarInfo> listUserAndPublicCalendars(ObmUser user, Collection<String> emails, Integer limit, Integer offset) throws FindException {
+	private Collection<CalendarInfo> listUserAndPublicCalendars(ObmUser user, Collection<String> emails, Integer limit, Integer offset, String pattern) throws FindException {
 		StringSQLCollectionHelper helper = null;
+		boolean useOwnEmail = userMatchesPattern(user, pattern);
 
 		if (emails != null && !emails.isEmpty()) {
 			helper = new WildcardStringSQLCollectionHelper(emails);
 			useOwnEmail = emails.contains(user.getEmail());
 		}
 
-		String publicQuery = buildPublicCalendarsQuery(emails);
-		String userQuery = buildUserCalendarsQuery(emails);
-		String groupQuery = buildGroupCalendarsQuery(emails);
+		String publicQuery = buildPublicCalendarsQuery(emails, pattern);
+		String userQuery = buildUserCalendarsQuery(emails, pattern);
+		String groupQuery = buildGroupCalendarsQuery(emails, pattern);
 		String query = !useOwnEmail ?
 				buildPublicAndUserAndGroupCalendarsQuery(publicQuery, groupQuery, userQuery, limit, offset):
 				buildPublicAndUserAndGroupAndOwnCalendarsQuery(publicQuery, groupQuery, userQuery, buildOwnCalendarQuery(), limit, offset);
@@ -1320,6 +1328,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
+			pos = setPatternParametersInStatement(ps, pos, pattern);
 
 			// For the group query
 			ps.setInt(pos++, user.getUid());
@@ -1327,6 +1336,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
+			pos = setPatternParametersInStatement(ps, pos, pattern);
 
 			// For the user query
 			ps.setInt(pos++, user.getUid());
@@ -1334,6 +1344,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
+			pos = setPatternParametersInStatement(ps, pos, pattern);
 
 			// For our own calendar query
 			if (useOwnEmail) {
@@ -1358,9 +1369,30 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 		return caldendarInfo;
 	}
 
+	@VisibleForTesting
+	boolean userMatchesPattern(ObmUser user, String pattern) {
+		if (user == null || Strings.isNullOrEmpty(pattern)) {
+			return true;
+		}
+
+		return startsWithIgnoreCase(user.getLogin(), pattern)
+				|| startsWithIgnoreCase(user.getLastName(), pattern)
+				|| startsWithIgnoreCase(user.getFirstName(), pattern);
+	}
+
+	private int setPatternParametersInStatement(PreparedStatement ps, int pos, String pattern) throws SQLException {
+		if (!Strings.isNullOrEmpty(pattern)) {
+			for (int i = 0; i < PATTERN_MATCHING_FIELDS_COUNT; i++) {
+				ps.setString(pos++, pattern.toLowerCase() + '%');
+			}
+		}
+
+		return pos;
+	}
+
 	@Override
-	public Collection<CalendarInfo> listCalendars(ObmUser user, Integer limit, Integer offset) throws FindException {
-		return listUserAndPublicCalendars(user, null, limit, offset);
+	public Collection<CalendarInfo> listCalendars(ObmUser user, Integer limit, Integer offset, String pattern) throws FindException {
+		return listUserAndPublicCalendars(user, null, limit, offset, pattern);
 	}
 
 	@Override
@@ -1480,7 +1512,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	public Collection<CalendarInfo> getCalendarMetadata(ObmUser user, Collection<String> calendarEmails) throws FindException {
-		return this.listUserAndPublicCalendars(user, calendarEmails, null, 0);
+		return this.listUserAndPublicCalendars(user, calendarEmails, null, null, null);
 	}
 
 	@Override

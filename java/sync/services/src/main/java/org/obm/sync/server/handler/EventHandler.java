@@ -384,7 +384,7 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String listCalendars(AccessToken at, Request req, XmlResponder responder) throws ServerFault {
-		return responder.sendCalendarInformations(binding.listCalendars(at, getLimit(req), getOffset(req)));
+		return responder.sendCalendarInformations(binding.listCalendars(at, getLimit(req), getOffset(req), getPattern(req)));
 	}
 
 	private String listResources(AccessToken at, XmlResponder responder) throws ServerFault {
@@ -631,5 +631,9 @@ public class EventHandler extends SecureSyncHandler {
 		String offset = request.getParameter("offset");
 
 		return Strings.isNullOrEmpty(offset) ? 0 : Integer.parseInt(offset);
+	}
+
+	private String getPattern(Request request) {
+		return request.getParameter("pattern");
 	}
 }

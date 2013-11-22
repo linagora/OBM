@@ -72,6 +72,7 @@ import org.slf4j.Logger;
 import org.w3c.dom.Document;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.common.collect.Multimap;
 
 public abstract class AbstractEventSyncClient extends AbstractClientImpl implements ICalendar {
@@ -236,8 +237,13 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		return listCalendars(token, null, null);
 	}
 
-	@Override
+	@VisibleForTesting
 	public CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset) throws ServerFault {
+		return listCalendars(token, limit, offset, null);
+	}
+
+	@Override
+	public CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 
 		if (limit != null) {
@@ -246,6 +252,9 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 			if (offset != null) {
 				params.put("offset", String.valueOf(offset));
 			}
+		}
+		if (!Strings.isNullOrEmpty(pattern)) {
+			params.put("pattern", pattern);
 		}
 
 		Document doc = execute(token, type + "/listCalendars", params);

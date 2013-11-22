@@ -156,9 +156,9 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional(readOnly=true)
-	public CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset) throws ServerFault {
+	public CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
 		try {
-			Collection<CalendarInfo> calendarInfos = calendarDao.listCalendars(userService.getUserFromAccessToken(token), limit, offset);
+			Collection<CalendarInfo> calendarInfos = calendarDao.listCalendars(userService.getUserFromAccessToken(token), limit, offset, pattern);
 
 			logger.info(LogUtils.prefix(token) + "Returning " + calendarInfos.size() + " calendar infos.");
 

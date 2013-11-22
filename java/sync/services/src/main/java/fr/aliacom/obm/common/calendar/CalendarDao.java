@@ -98,7 +98,7 @@ public interface CalendarDao {
 	EventChanges getSync(AccessToken token, ObmUser calendarUser,
 			Date lastSync, SyncRange syncRange, EventType typeFilter, boolean onEventDate);
 
-	Collection<CalendarInfo> listCalendars(ObmUser user, Integer limit, Integer offset) throws FindException;
+	Collection<CalendarInfo> listCalendars(ObmUser user, Integer limit, Integer offset, String pattern) throws FindException;
 
 	Collection<ResourceInfo> listResources(ObmUser user) throws FindException;
 
