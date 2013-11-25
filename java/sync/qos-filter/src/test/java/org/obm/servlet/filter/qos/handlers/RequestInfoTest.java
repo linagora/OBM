@@ -135,4 +135,38 @@ public class RequestInfoTest
 		info.removeOneRequest();
 	}
 	
+	@Test
+	public void testGetRequestCountWhenNone() {
+		RequestInfo<String> info = RequestInfo.create("key");
+		assertThat(info.getPendingRequestCount()).isEqualTo(0);
+	}
+	
+	@Test
+	public void testGetRequestCountOnlyRunning() {
+		RequestInfo<String> info = RequestInfo.create("key");
+		RequestInfo<String> twoRunnings = info
+				.oneMoreRequest()
+				.oneMoreRequest();
+		assertThat(twoRunnings.getPendingRequestCount()).isEqualTo(2);
+	}
+	
+	@Test
+	public void testGetRequestCountOnlyContinuation() {
+		RequestInfo<String> info = RequestInfo.create("key");
+		RequestInfo<String> twoContinuations = info
+				.appendContinuationId(new ContinuationId(1l))
+				.appendContinuationId(new ContinuationId(2l));
+		assertThat(twoContinuations.getPendingRequestCount()).isEqualTo(2);
+	}
+	
+	@Test
+	public void testGetRequestCountBoth() {
+		RequestInfo<String> info = RequestInfo.create("key");
+		RequestInfo<String> twoContinuations = info
+				.oneMoreRequest()
+				.appendContinuationId(new ContinuationId(1l))
+				.appendContinuationId(new ContinuationId(2l))
+				.oneMoreRequest();
+		assertThat(twoContinuations.getPendingRequestCount()).isEqualTo(4);
+	}
 }
