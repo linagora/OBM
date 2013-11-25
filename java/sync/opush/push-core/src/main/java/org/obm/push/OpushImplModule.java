@@ -92,6 +92,7 @@ public class OpushImplModule extends AbstractModule {
 	 * Opush must accepts only one requests per client to prevent lock timeout on same resources
 	 */
 	private static final int MAX_REQUESTS_PER_CLIENT = 1;
+
 	private static final String APPLICATION_ORIGIN = "o-push";
 	private GlobalAppConfiguration<ConfigurationService> globalAppConfiguration;
 	
