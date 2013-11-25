@@ -126,4 +126,38 @@ public class VMArgumentsUtilsTest {
 		String value = VMArgumentsUtils.stringArgumentValue(argument);
 		assertThat(value).isEmpty();
 	}
+	
+	@Test
+	public void testIntegerArgumentValue() {
+		String argument = "arg";
+		String expectedValue = "5";
+		System.setProperty(argument, expectedValue);
+		Integer value = VMArgumentsUtils.integerArgumentValue(argument);
+		assertThat(value).isEqualTo(5);
+	}
+	
+	@Test
+	public void testIntegerArgumentValueNotAnInteger() {
+		String argument = "arg";
+		String expectedValue = "a5b";
+		System.setProperty(argument, expectedValue);
+		Integer value = VMArgumentsUtils.integerArgumentValue(argument);
+		assertThat(value).isNull();
+	}
+	
+	@Test
+	public void testIntegerArgumentValueEmpty() {
+		String argument = "arg";
+		String expectedValue = "";
+		System.setProperty(argument, expectedValue);
+		Integer value = VMArgumentsUtils.integerArgumentValue(argument);
+		assertThat(value).isNull();
+	}
+	
+	@Test
+	public void testIntegerArgumentValueUnknown() {
+		String argument = "arg";
+		Integer value = VMArgumentsUtils.integerArgumentValue(argument);
+		assertThat(value).isNull();
+	}
 }

@@ -55,4 +55,18 @@ public class VMArgumentsUtils {
 		logger.debug("VM argument value for {} : {}", argument, property);
 		return property;
 	}
+
+	public static Integer integerArgumentValue(String argument) {
+		String value = stringArgumentValue(argument);
+		if (value == null) {
+			return null;
+		}
+		
+		try {
+			return Integer.valueOf(value);
+		} catch (NumberFormatException e) {
+			logger.warn("{} is not an integer, found: {}", argument, value);
+			return null;
+		}
+	}
 }
