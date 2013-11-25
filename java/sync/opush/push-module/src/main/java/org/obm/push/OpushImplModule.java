@@ -33,6 +33,7 @@ package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
+import org.obm.configuration.VMArgumentsUtils;
 import org.obm.dbcp.DatabaseModule;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
@@ -99,11 +100,12 @@ import org.obm.servlet.filter.qos.QoSFilterModule;
 import org.obm.servlet.filter.qos.QoSRequestHandler;
 import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler;
-import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestSuspendHandler;
+import org.obm.servlet.filter.qos.handlers.RejectCeilRequestHandler;
 import org.obm.sync.ObmSyncHttpClientModule;
 import org.obm.sync.calendar.SimpleAttendeeService;
 import org.obm.sync.services.AttendeeService;
 
+import com.google.common.base.Objects;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
@@ -117,7 +119,9 @@ public class OpushImplModule extends AbstractModule {
 	 * Opush must accepts only one requests per client to prevent lock timeout on same resources
 	 */
 	private static final int MAX_REQUESTS_PER_CLIENT = 1;
-
+	private static final int REJECTING_CEIL_PER_CLIENT = Objects.firstNonNull( 
+			VMArgumentsUtils.integerArgumentValue("qosRejectingCeilPerClient"), 6);
+	
 	private static final String APPLICATION_NAME = "opush";
 	private static final String APPLICATION_ORIGIN = "o-push";
 	
@@ -188,7 +192,8 @@ public class OpushImplModule extends AbstractModule {
 			protected void configure() {
 				bind(new TypeLiteral<BusinessKeyProvider<Integer>>(){}).to(OpushQoSKeyProvider.class);
 				bind(Integer.class).annotatedWith(Names.named(NPerClientQoSRequestHandler.MAX_REQUESTS_PER_CLIENT_PARAM)).toInstance(MAX_REQUESTS_PER_CLIENT);
-				bind(QoSRequestHandler.class).to(new TypeLiteral<NPerClientQoSRequestSuspendHandler<Integer>>(){});
+				bind(Integer.class).annotatedWith(Names.named(RejectCeilRequestHandler.REJECTING_CEIL_PER_CLIENT_PARAM)).toInstance(REJECTING_CEIL_PER_CLIENT);
+				bind(QoSRequestHandler.class).to(new TypeLiteral<RejectCeilRequestHandler<Integer>>(){});
 				install(new QoSFilterModule());
 			}
 		};
