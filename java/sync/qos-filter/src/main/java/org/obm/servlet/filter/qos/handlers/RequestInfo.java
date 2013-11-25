@@ -115,6 +115,10 @@ public class RequestInfo<K extends Serializable> implements Serializable {
 		return continuationIds;
 	}
 
+	public int getPendingRequestCount() {
+		return numberOfRunningRequests + continuationIds.size();
+	}
+
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(continuationIds, numberOfRunningRequests, key);
@@ -140,5 +144,4 @@ public class RequestInfo<K extends Serializable> implements Serializable {
 			.toString();
 	}
 	
-
 }
