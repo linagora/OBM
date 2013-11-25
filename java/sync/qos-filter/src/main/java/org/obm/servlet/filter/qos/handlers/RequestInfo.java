@@ -53,9 +53,9 @@ public class RequestInfo<K extends Serializable> implements Serializable {
 		return new RequestInfo<K>(key, 0, ImmutableList.<ContinuationId>of());
 	}
 	
-	private List<ContinuationId> continuationIds;
-	private long timestamp;
-	private int numberOfRunningRequests;
+	private final List<ContinuationId> continuationIds;
+	private final long timestamp;
+	private final int numberOfRunningRequests;
 	private final K key;
 
 	/**
