@@ -139,7 +139,7 @@ public class IniFile {
 	public Boolean getNullableBooleanValue(String prop, Boolean defaultValue) {
 		String valueString = getStringValue(prop);
 		if (valueString != null)  {
-			return Boolean.valueOf(valueString).booleanValue();
+			return Boolean.parseBoolean(valueString);
 		} else {
 			return defaultValue;
 		}
