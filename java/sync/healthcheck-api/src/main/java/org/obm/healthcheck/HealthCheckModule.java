@@ -41,8 +41,8 @@ import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 public class HealthCheckModule extends ServletModule {
 
-	public static String HEALTHCHECK_URL_PREFIX = "/healthcheck";
-	public static String HEALTHCHECK_URL_PATTERN = HEALTHCHECK_URL_PREFIX + "/*";
+	public final static String HEALTHCHECK_URL_PREFIX = "/healthcheck";
+	public final static String HEALTHCHECK_URL_PATTERN = HEALTHCHECK_URL_PREFIX + "/*";
 	
 	@Override
 	protected void configureServlets() {

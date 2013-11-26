@@ -64,7 +64,7 @@ public enum UserJsonFields {
 		throw new IllegalArgumentException();
 	}
 	
-	public static Set<UserJsonFields> fields;
+	public final static Set<UserJsonFields> fields;
 	
 	static {
 		Builder<UserJsonFields> builder = ImmutableSet.builder();

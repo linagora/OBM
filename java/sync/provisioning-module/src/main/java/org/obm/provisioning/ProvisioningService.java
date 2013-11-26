@@ -66,9 +66,9 @@ import fr.aliacom.obm.common.user.UserExtId;
 
 public class ProvisioningService extends ServletModule {
 
-	public static String PROVISIONING_ROOT_PATH = "provisioning/v1";
-	public static String PROVISIONING_URL_PREFIX = "/" + PROVISIONING_ROOT_PATH;
-	public static String PROVISIONING_URL_PATTERN = PROVISIONING_URL_PREFIX + "/*";
+	public final static String PROVISIONING_ROOT_PATH = "provisioning/v1";
+	public final static String PROVISIONING_URL_PREFIX = "/" + PROVISIONING_ROOT_PATH;
+	public final static String PROVISIONING_URL_PATTERN = PROVISIONING_URL_PREFIX + "/*";
 
 	private ServletContext servletContext;
 
