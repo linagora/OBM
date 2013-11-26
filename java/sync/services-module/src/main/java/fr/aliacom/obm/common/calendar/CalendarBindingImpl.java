@@ -605,9 +605,7 @@ public class CalendarBindingImpl implements ICalendar {
 				return event;
 			} else {
 				Event after = calendarDao.modifyEvent(token,  calendar, event, updateAttendees, false);
-				if (after != null) {
-					logger.info(LogUtils.prefix(token) + "Calendar : External event[" + after.getTitle() + "] modified");
-				}
+				logger.info(LogUtils.prefix(token) + "Calendar : External event[" + after.getTitle() + "] modified");
 				notifyOrganizerForExternalEvent(token, calendar, after, notification);
 				return after;
 			}
