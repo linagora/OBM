@@ -78,10 +78,9 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 		InputStream in = response.getStreamData();
 		if (in != null) {
 			// -1 pattern of the day to remove "\0" at end of stream
-			byte[] dest = new byte[0];
 			try {
 				byte[] byteData = FileUtils.streamBytes(in, true);
-				dest = new byte[byteData.length - 1];
+				byte[] dest = new byte[byteData.length - 1];
 				System.arraycopy(byteData, 0, dest, 0, dest.length);
 				
 				if (data == null) {

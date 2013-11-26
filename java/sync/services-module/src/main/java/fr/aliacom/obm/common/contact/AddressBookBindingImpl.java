@@ -186,7 +186,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	private ContactChanges getContactsChanges(AccessToken token, Date timestamp) throws ServerFault, SQLException {
 		ContactUpdates contactUpdates = contactDao.findUpdatedContacts(timestamp, token);
 
-		ContactUpdates userUpdates = new ContactUpdates();
+		ContactUpdates userUpdates;
 		if (configuration.syncUsersAsAddressBook()) {
 			userUpdates = userDao.findUpdatedUsers(timestamp, token);
 		} else {
