@@ -51,7 +51,6 @@ import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
@@ -307,13 +306,6 @@ public class AddressBookBindingImpl implements IAddressBook {
 		} catch (SQLException e) {
 			throw new ServerFault(e.getMessage());
 		}
-	}
-
-	@Override
-	@Transactional(readOnly=true)
-	public KeyList getContactTwinKeys(AccessToken token, Contact contact) {
-		List<String> keys = contactDao.findContactTwinKeys(token, contact);
-		return new KeyList(keys);
 	}
 
 	@Override

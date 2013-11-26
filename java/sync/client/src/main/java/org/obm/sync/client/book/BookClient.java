@@ -41,7 +41,6 @@ import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
-import org.obm.sync.base.KeyList;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookItemsParser;
 import org.obm.sync.book.BookItemsWriter;
@@ -131,14 +130,6 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Document doc = execute(token, "/book/getContactFromId", params);
 		exceptionFactory.checkContactNotFoundException(doc);
 		return bookItemsParser.parseContact(doc.getDocumentElement());
-	}
-
-	@Override
-	public KeyList getContactTwinKeys(AccessToken token, Contact contact) {
-		Multimap<String, String> params = initParams(token);
-		params.put("contact", bookItemsWriter.getContactAsString(contact));
-		Document doc = execute(token, "/book/getContactTwinKeys", params);
-		return bookItemsParser.parseKeyList(doc);
 	}
 
 	@Override

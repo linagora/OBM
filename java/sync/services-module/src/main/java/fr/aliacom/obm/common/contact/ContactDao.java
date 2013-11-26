@@ -1209,19 +1209,6 @@ public class ContactDao {
 	}
 
 	/**
-	 * Return id of contacts that look similar (used by funambol)
-	 */
-	public List<String> findContactTwinKeys(AccessToken at, Contact contact) {
-		List<String> ret = new LinkedList<String>();
-
-		List<Contact> contacts = searchSimilar(at, contact);
-		for (Contact c : contacts) {
-			ret.add(c.getUid().toString());
-		}
-		return ret;
-	}
-
-	/**
 	 * Return country iso3166 searched by country name
 	 */
 	private String getCountryIso3166(Connection con, String countryName) {
@@ -1297,131 +1284,6 @@ public class ContactDao {
 			+ "userobmpref_option  NOT IN (SELECT userobmpref_option FROM UserObmPref WHERE userobmpref_user_id ="
 			+ obmId + "))))";
 		return q;
-	}
-
-	/**
-	 * Search contacts that look "similar" to the given contact. Used by Funis
-	 * to find duplicates
-	 */
-	public List<Contact> searchSimilar(AccessToken at, Contact c) {
-		String q = "SELECT "
-			+ CONTACT_SELECT_FIELDS
-			+ ", now() as last_sync FROM Contact "
-			+ "INNER JOIN AddressBook a ON a.id=contact_addressbook_id "
-			+ "INNER JOIN AddressbookEntity ON addressbookentity_addressbook_id=a.id "
-			+ "INNER JOIN ContactEntity ON contactentity_contact_id=contact_id ";
-
-		if (c.getEmails().size() > 0) {
-			q += "LEFT JOIN Email ON email_entity_id=contactentity_entity_id ";
-		}
-
-		if (c.getPhones().containsKey("CELL;VOICE;X-OBM-Ref1")) {
-			q += "LEFT JOIN Phone ON (phone_entity_id=contactentity_entity_id AND phone_label='CELL;VOICE;X-OBM-Ref1') ";
-		}
-
-		q += "LEFT JOIN EntityRight urights ON "
-			+ "(urights.entityright_entity_id=addressbookentity_entity_id AND "
-			+ "urights.entityright_consumer_id=(select userentity_entity_id FROM UserEntity WHERE userentity_user_id=?)) "
-			+ "LEFT JOIN EntityRight grights ON grights.entityright_entity_id=addressbookentity_entity_id "
-			+ "AND grights.entityright_consumer_id IN ("
-			+ MY_GROUPS_QUERY
-			+ ") "
-			+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
-			+ "WHERE "
-			+ "((contact_archive != 1 AND contact_usercreate=?) OR "
-			+ "(contact_archive != 1) OR "
-			+ "(contact_archive != 1 AND (urights.entityright_read=1 OR grights.entityright_read=1 OR prights.entityright_read=1))) ";
-
-		if (c.getFirstname() != null && c.getFirstname().length() > 0) {
-			q += " AND lower(contact_firstname) = ? ";
-		}
-		if (c.getLastname() != null && c.getLastname().length() > 0) {
-			q += " AND lower(contact_lastname) = ? ";
-		}
-
-		if (c.getEmails().size() > 0) {
-			q += "AND (email_address IS NULL ";
-			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i < c.getEmails().size(); i++) {
-				builder.append(" OR lower(email_address) = ? ");
-			}
-			q += builder.toString();
-			q += ") ";
-		}
-		if (c.getPhones().containsKey("CELL;VOICE;X-OBM-Ref1")) {
-			q += "AND (phone_number IS NULL OR phone_number=?) ";
-		}
-
-		int idx = 1;
-		List<Contact> found = new LinkedList<Contact>();
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			con = obmHelper.getConnection();
-			ps = con.prepareStatement(q);
-
-			// userentity_user_id
-			ps.setInt(idx++, at.getObmId());
-			// my groups
-			ps.setInt(idx++, at.getObmId());
-
-			ps.setInt(idx++, at.getObmId());
-
-			// values
-			if (c.getFirstname() != null && c.getFirstname().length() > 0) {
-				ps.setString(idx++, c.getFirstname().toLowerCase());
-			}
-
-			if (c.getLastname() != null && c.getLastname().length() > 0) {
-				ps.setString(idx++, c.getLastname().toLowerCase());
-			}
-
-			for (String s : c.getEmails().keySet()) {
-				ps.setString(idx++, c.getEmails().get(s).get()
-						.toLowerCase());
-			}
-
-			if (c.getPhones().containsKey("CELL;VOICE;X-OBM-Ref1")) {
-				ps.setString(idx++, c.getPhones().get("CELL;VOICE;X-OBM-Ref1")
-						.getNumber());
-			}
-
-			rs = ps.executeQuery();
-			Map<EntityId, Contact> entityContact = new HashMap<EntityId, Contact>();
-
-			while (rs.next()) {
-				int entity = rs.getInt("contactentity_entity_id");
-				if (!entityContact.containsKey(entity)) {
-					Contact ct = contactFromCursor(rs);
-					entityContact.put(ct.getEntityId(), ct);
-					found.add(ct);
-				}
-			}
-			rs.close();
-			rs = null;
-
-			if (!entityContact.isEmpty()) {
-				loadPhones(con, entityContact);
-				loadIMIdentifiers(con, entityContact);
-				loadWebsites(con, entityContact);
-				loadAddresses(at, con, entityContact);
-				loadEmails(con, entityContact);
-				loadBirthday(con, entityContact);
-				loadAnniversary(con, entityContact);
-			}
-
-		} catch (Throwable se) {
-			logger.error(se.getMessage(), se);
-		} finally {
-			obmHelper.cleanup(con, ps, rs);
-		}
-
-		logger.info("[" + at.getUserLogin() + "] searchSimilar for '"
-				+ c.getLastname() + "' returned " + found.size()
-				+ " contact(s)");
-
-		return found;
 	}
 
 	public List<AddressBook> findAddressBooks(AccessToken at) throws SQLException {
@@ -1555,7 +1417,7 @@ public class ContactDao {
 			int i = 0;
 			while (rs.next() && i < limit) {
 				int entity = rs.getInt("contactentity_entity_id");
-				if (!entityContact.containsKey(entity)) {
+				if (!entityContact.containsKey(EntityId.valueOf(entity))) {
 					Contact ct = contactFromCursor(rs);
 					entityContact.put(ct.getEntityId(), ct);
 					ret.add(ct);
