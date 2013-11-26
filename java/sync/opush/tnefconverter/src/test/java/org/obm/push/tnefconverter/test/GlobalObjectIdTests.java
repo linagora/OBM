@@ -31,16 +31,30 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.tnefconverter.test;
 
-import static org.assertj.core.api.Assertions.assertThat; 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
+import org.easymock.IMocksControl;
+
+import static org.easymock.EasyMock.*;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.tnefconverter.ScheduleMeeting.GlobalObjectId;
 
 import com.google.common.io.BaseEncoding;
 
 public class GlobalObjectIdTests {
+
+	private IMocksControl control;
+
+	@Before
+	public void setup() {
+		control = createControl();
+	}
 
 	@Test
 	public void testDecompress1() throws Exception {
@@ -111,7 +125,67 @@ public class GlobalObjectIdTests {
 		GlobalObjectId globalObjectId = new GlobalObjectId(new ByteArrayInputStream(hexToBytes("CC556677")), 49152);
 		assertThat(globalObjectId.getUid()).isEqualTo("CC556677");
 	}
-	
+
+	@SuppressWarnings("unused")
+	@Test(expected = IOException.class)
+	public void testFirstSkip() throws IOException {
+
+		InputStream mockInputStream = control.createMock(InputStream.class);
+		for (int idByte : GlobalObjectId.GLOBAL_OBJECT_ID_ARRAY_ID) {
+			expect(mockInputStream.read()).andReturn(idByte).once();
+		}
+		expect(mockInputStream.read()).andReturn(0).atLeastOnce();
+		expect(mockInputStream.skip(8)).andReturn(0l).once();
+		control.replay();
+		try {
+			new GlobalObjectId(mockInputStream, 49152);
+		} finally {
+			control.verify();
+		}
+	}
+
+	@SuppressWarnings("unused")
+	@Test(expected = IOException.class)
+	public void testSecondSkip() throws IOException {
+
+		InputStream mockInputStream = control.createMock(InputStream.class);
+		for (int idByte : GlobalObjectId.GLOBAL_OBJECT_ID_ARRAY_ID) {
+			expect(mockInputStream.read()).andReturn(idByte).once();
+		}
+		expect(mockInputStream.read()).andReturn(0).atLeastOnce();
+		expect(mockInputStream.skip(8)).andReturn(8l).once();
+		expect(mockInputStream.skip(anyInt())).andReturn(0l).once();
+		control.replay();
+		try {
+			new GlobalObjectId(mockInputStream, 49152);
+		} finally {
+			control.verify();
+		}
+	}
+
+	@SuppressWarnings("unused")
+	@Test(expected = IOException.class)
+	public void testThirdSkip() throws IOException {
+
+		InputStream mockInputStream = control.createMock(InputStream.class);
+		for (int idByte : GlobalObjectId.GLOBAL_OBJECT_ID_ARRAY_ID) {
+			expect(mockInputStream.read()).andReturn(idByte).once();
+		}
+		expect(mockInputStream.read()).andReturn(0).atLeastOnce();
+		expect(mockInputStream.skip(8)).andReturn(8l).once();
+		expect(mockInputStream.skip(8)).andReturn(8l).once();
+		mockInputStream.reset();
+		expectLastCall();
+		expect(mockInputStream.skip(anyInt())).andReturn(0l).once();
+		control.replay();
+		try {
+			new GlobalObjectId(mockInputStream, 49152);
+		} finally {
+			control.verify();
+		}
+	}
+
+
 	private static byte[] hexToBytes(String hexa) {
 		return BaseEncoding.base16().decode(hexa);
 	}

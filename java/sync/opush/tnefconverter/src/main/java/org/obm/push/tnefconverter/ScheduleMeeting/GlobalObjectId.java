@@ -38,6 +38,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
@@ -47,7 +48,8 @@ import com.google.common.io.ByteStreams;
  */
 public class GlobalObjectId {
 
-	private static final int[] GLOBAL_OBJECT_ID_ARRAY_ID = 
+	@VisibleForTesting
+	public static final int[] GLOBAL_OBJECT_ID_ARRAY_ID =
 		{ 0x04, 0x00, 0x00, 0x00, 0x82, 0x00, 0xE0, 0x00, 0x74, 0xC5, 0xB7, 0x10, 0x1A, 0x82, 0xE0, 0x08};
 	
 	private String uid;
@@ -77,9 +79,13 @@ public class GlobalObjectId {
 		// Creation Time (8 bytes): The date and time that this Global Object ID
 		// was generated.
 		// Creation Time is a FILETIME structure, as specified in [MS-DTYP].
-		obj.skip(8);
+		if (obj.skip(8) != 8) {
+			throw new IOException("Didn't skip enough bytes");
+		}
 		// X (8 bytes): Reserved, MUST be all zeroes.
-		obj.skip(8);
+		if (obj.skip(8) != 8) {
+			throw new IOException("Didn't skip enough bytes");
+		}
 
 		size = readDataSize(obj);
 
@@ -90,7 +96,9 @@ public class GlobalObjectId {
 			StringBuilder uidBuilder = new StringBuilder(
 					"040000008200E00074C5B7101A82E00800000000");
 			obj.reset();
-			obj.skip(20);
+			if (obj.skip(20) != 20) {
+				throw new IOException("Skipped less than 20 bytes");
+			}
 			uidBuilder.append(bytesToHex(obj));
 			this.uid = uidBuilder.toString();
 		} else {
