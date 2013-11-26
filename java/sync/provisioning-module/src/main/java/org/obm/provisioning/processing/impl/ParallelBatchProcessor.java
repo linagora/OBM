@@ -67,7 +67,7 @@ public class ParallelBatchProcessor implements BatchProcessor {
 					delegate.process(toProcess);
 				}
 				catch (Exception e) {
-					logger.error(String.format("Error processing batch %d.", toProcess.getId()), e);
+					logger.error(String.format("Error processing batch %s.", toProcess.getId()), e);
 				}
 			}
 
