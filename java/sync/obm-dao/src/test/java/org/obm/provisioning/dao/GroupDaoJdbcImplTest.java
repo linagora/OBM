@@ -439,6 +439,11 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
         dao.addSubgroup(domain1, parent.getExtId(), parent.getExtId());
     }
 
+    @Test(expected = GroupRecursionException.class)
+    public void testAddSubgroupDeepRecursion() throws Exception {
+        dao.addSubgroup(domain1, GroupExtId.valueOf(new String("r-direct-child1")), GroupExtId.valueOf(new String("r-direct-parent")));
+    }
+
     @Test
     public void testAddUserSubgroup() throws Exception {
         GroupExtId parentId = GroupExtId.valueOf("addusersubgroup-group-parent");

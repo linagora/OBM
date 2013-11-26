@@ -100,7 +100,7 @@ public class LocatorCache implements LocatorService {
 		Key key = new Key(serviceSlashProperty, loginAtDomain);
 		try {
 			String value = store.get(key);
-			if (value == DEFAULT_VALUE) {
+			if (DEFAULT_VALUE.equals(value)) {
 				throw new LocatorClientException("No host for { " + key.toString() + " }");
 			}
 			return value;

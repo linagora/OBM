@@ -745,7 +745,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 
             while (rs.next()) {
                 String extId = rs.getString("group_ext_id");
-                if (extId == ancestorId.getId()) {
+                if (extId.equals(ancestorId.getId())) {
                     // Found a parent with the requested id
                     return ancestorId;
                 }

@@ -991,7 +991,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private Event inheritAlertFromOwnerIfNotSet(Integer userId, Integer ownerId, Event event) {
-		if (event.getAlert() == null && userId != ownerId) {
+		if (event.getAlert() == null && !Objects.equals(userId, ownerId)) {
 			event.setAlert(calendarDao.getEventAlertForUser(event.getObmId(), ownerId));
 		}
 
