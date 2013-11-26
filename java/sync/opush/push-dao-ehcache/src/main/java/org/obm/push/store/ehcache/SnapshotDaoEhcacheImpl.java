@@ -88,7 +88,7 @@ public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements Snapsh
 		store.put(new Element(key, snapshot));
 	}
 
-	private class SnapshotHasDeviceIdPredicate implements Predicate<SnapshotKey> {
+	private static class SnapshotHasDeviceIdPredicate implements Predicate<SnapshotKey> {
 
 		private final DeviceId deviceId;
 		

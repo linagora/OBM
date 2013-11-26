@@ -236,7 +236,7 @@ public class EmailChanges implements Serializable {
 		}
 	}
 
-	private final class EntryProducer implements Function<Email, EmailPartitionEntry> {
+	private final static class EntryProducer implements Function<Email, EmailPartitionEntry> {
 
 		private final EmailPartitionEntry.Type type;
 

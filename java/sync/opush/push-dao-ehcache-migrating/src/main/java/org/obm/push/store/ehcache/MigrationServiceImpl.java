@@ -184,7 +184,7 @@ public class MigrationServiceImpl implements MigrationService {
 		logger.warn("Done {}", cacheName);
 	}
 
-	private final class CacheEventListenerAdapterExtension extends CacheEventListenerAdapter {
+	private final static class CacheEventListenerAdapterExtension extends CacheEventListenerAdapter {
 		
 		public int put;
 		public int update;

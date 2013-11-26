@@ -148,7 +148,7 @@ public abstract class MonitoringThread implements Runnable {
 		return collections.getLastSync();
 	}
 	
-	protected class ChangedCollectionsException extends Exception {
+	protected static class ChangedCollectionsException extends Exception {
 		public ChangedCollectionsException(Throwable cause) {
 			super(cause);
 		}

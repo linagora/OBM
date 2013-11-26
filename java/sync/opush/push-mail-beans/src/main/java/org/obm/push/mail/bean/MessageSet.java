@@ -72,7 +72,7 @@ public class MessageSet implements Serializable, Iterable<Long> {
 
 		private static final long serialVersionUID = 6147381614923874187L;
 		
-		private final class LowerEndpointComparator implements Comparator<Range<Long>>, Serializable {
+		private final static class LowerEndpointComparator implements Comparator<Range<Long>>, Serializable {
 			
 			private static final long serialVersionUID = 7213017303156595630L;
 			

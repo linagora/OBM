@@ -47,7 +47,7 @@ import com.google.common.collect.Sets;
 
 public class EmailChangesComputerImpl implements EmailChangesComputer {
 	
-	private class EmailKeyFunction implements Function<Email, Long> {
+	private static class EmailKeyFunction implements Function<Email, Long> {
 		@Override
 		public Long apply(Email input) {
 			return Long.valueOf(input.getUid());
@@ -58,7 +58,7 @@ public class EmailChangesComputerImpl implements EmailChangesComputer {
 		return Maps.<Long, Email> uniqueIndex(before, new EmailKeyFunction());
 	}
 
-	private class EmailEquivalence extends Equivalence<Email> {
+	private static class EmailEquivalence extends Equivalence<Email> {
 		@Override
 		protected boolean doEquivalent(Email a, Email b) {
 			return Objects.equal(a, b);
@@ -70,7 +70,7 @@ public class EmailChangesComputerImpl implements EmailChangesComputer {
 		}
 	}
 	
-	private class RightValueDifferenceFunction implements Function<ValueDifference<Email>, Email> {
+	private static class RightValueDifferenceFunction implements Function<ValueDifference<Email>, Email> {
 		@Override
 		public Email apply(ValueDifference<Email> input) {
 			return input.rightValue();

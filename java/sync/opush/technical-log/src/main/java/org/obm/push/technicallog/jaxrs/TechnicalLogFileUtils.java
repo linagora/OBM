@@ -100,7 +100,7 @@ public class TechnicalLogFileUtils {
 		return logsList;
 	}
 	
-	private class LogFileComparator implements Comparator<LogFile> {
+	private static class LogFileComparator implements Comparator<LogFile> {
 
 		@Override
 		public int compare(LogFile o1, LogFile o2) {

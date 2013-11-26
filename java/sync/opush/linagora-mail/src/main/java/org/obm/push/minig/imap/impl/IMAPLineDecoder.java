@@ -80,7 +80,7 @@ public class IMAPLineDecoder implements ProtocolDecoder {
 		}
 	}
 
-	private class ImapLineContext {
+	private static class ImapLineContext {
 
 		private final IoBuffer buf;
 
