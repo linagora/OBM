@@ -110,6 +110,9 @@ public class PasswordHandler {
 		} else if (algorithm.startsWith("MD5")) {
 			label = (salt.length > 0) ? "{SMD5}" : "{MD5}";
 		}
+		else {
+			throw new IllegalArgumentException(String.format("Unknown algorithm: %s", algorithm));
+		}
 
 		msgDigest.reset();
 		msgDigest.update(password.getBytes());

@@ -156,8 +156,9 @@ public class CalendarItemsWriter extends AbstractItemsWriter {
 		Element at = DOMUtils.createElement(attendees, "attendee");
 		at.setAttribute("email", attendee.getEmail());
 		Participation participation = attendee.getParticipation();
-		at.setAttribute("state", (participation != null ? participation.toString() : Participation.needsAction().toString()));
-		appendCommentFromParticipationFor(at, participation);
+		Participation nonNullParticipation = participation != null ? participation : Participation.needsAction();
+		at.setAttribute("state", nonNullParticipation.toString());
+		appendCommentFromParticipationFor(at, nonNullParticipation);
 	}
 
 	private void appendCommentFromParticipationFor(Element at,

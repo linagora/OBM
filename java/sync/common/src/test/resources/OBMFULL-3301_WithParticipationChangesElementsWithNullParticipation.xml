@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<calendar-changes lastSync="1330953989000" xmlns="http://www.obm.org/xsd/sync/calendar-changes.xsd">
+	<removed/>
+	<updated/>
+	<participationChanges>
+		<participation extId="123" id="1">
+		<attendees>
+		<attendee email="john@doe" state="NEEDS-ACTION"/>
+		<attendee email="jane@doe" state="NEEDS-ACTION" comment="this is a new comment"/>
+		</attendees>
+		</participation>
+		<participation extId="456" id="2" recurrenceId="789">
+		<attendees>
+		<attendee email="john@doe" state="NEEDS-ACTION"/>
+		<attendee email="jane@doe" state="NEEDS-ACTION" comment="this is a new comment"/>
+		</attendees>
+		</participation>
+	</participationChanges>
+</calendar-changes>

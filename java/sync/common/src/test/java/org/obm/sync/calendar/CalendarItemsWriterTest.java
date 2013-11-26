@@ -112,7 +112,7 @@ private CalendarItemsWriter writer;
 
 	@Test
 	public void testGetXMLDocumentFromEventChangesWithUpdatedElements() throws SAXException, IOException, TransformerException {
-		Event updatedEvent = getFakeEvent();
+		Event updatedEvent = getFakeEvent(Participation.needsAction());
 		Event eventException = updatedEvent.getOccurrence(updatedEvent.getStartDate());
 		updatedEvent.addEventException(eventException);
 
@@ -144,8 +144,22 @@ private CalendarItemsWriter writer;
 	}
 
 	@Test
+	public void testGetXMLDocumentFromEventChangesWithParticipationChangesElementsWithNullParticipation() throws SAXException, IOException, TransformerException {
+		List<ParticipationChanges> participationUpdated = getFakeListOfParticipationChangesWithNullParticipation();
+		
+		EventChanges eventChanges = EventChanges.builder()
+				.lastSync(lastSync)
+				.participationChanges(participationUpdated)
+				.build();
+
+		String expectedXML = loadXmlFile("OBMFULL-3301_WithParticipationChangesElementsWithNullParticipation.xml");
+		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	@Test
 	public void testGetXMLDocumentFromEvent() throws SAXException, IOException, TransformerException {
-		Event event = getFakeEvent();
+		Event event = getFakeEvent(Participation.needsAction());
 
 		String expectedXML = loadXmlFile("OBMFULL-3301_SimpleEvent.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(event);
@@ -154,7 +168,7 @@ private CalendarItemsWriter writer;
 
 	@Test
 	public void testGetXMLDocumentFromListOfEvent() throws SAXException, IOException, TransformerException {
-		Event event = getFakeEvent();
+		Event event = getFakeEvent(Participation.needsAction());
 		Event eventClone = event.clone();
 		List<Event> events = Lists.newArrayList(event, eventClone);
 
@@ -184,7 +198,7 @@ private CalendarItemsWriter writer;
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
-	private Event getFakeEvent() {
+	private Event getFakeEvent(Participation participation) {
 		Event ev = new Event();
 		ev.setInternalEvent(true);
 		Calendar cal = new GregorianCalendar();
@@ -204,7 +218,7 @@ private CalendarItemsWriter writer;
 				.builder()
 				.displayName("John Do")
 				.email("john@do.fr")
-				.participation(Participation.needsAction())
+				.participation(participation)
 				.participationRole(ParticipationRole.CHAIR)
 				.asOrganizer()
 				.build();
@@ -252,8 +266,39 @@ private CalendarItemsWriter writer;
 		return participationUpdated;
 	}
 
+	private List<ParticipationChanges> getFakeListOfParticipationChangesWithNullParticipation() {
+		ParticipationChanges participationChanges1 = ParticipationChanges.builder()
+			.eventExtId("123")
+			.eventObmId(1)
+			.attendees(getFakeListOfAttendeeWithNullParticipation())
+			.build();
+		
+		ParticipationChanges participationChanges2 = ParticipationChanges.builder()
+			.eventExtId("456")
+			.eventObmId(2)
+			.recurrenceId("789")
+			.attendees(getFakeListOfAttendeeWithNullParticipation())
+			.build();
+
+		List<ParticipationChanges> participationUpdated = Lists.newArrayList(participationChanges1, participationChanges2);
+		return participationUpdated;
+	}
+
+
 	private List<Attendee> getFakeListOfAttendee() {
 		Attendee john = UserAttendee.builder().email("john@doe").participation(Participation.accepted()).build();
+		Attendee jane = UserAttendee
+				.builder().email("jane@doe")
+				.participation(Participation.builder().state(State.NEEDSACTION).comment("this is a new comment").build())
+				.build();
+
+		List<Attendee> attendees = Lists.newArrayList(john, jane);
+		
+		return attendees;
+	}
+
+	private List<Attendee> getFakeListOfAttendeeWithNullParticipation() {
+		Attendee john = UserAttendee.builder().email("john@doe").build();
 		Attendee jane = UserAttendee
 				.builder().email("jane@doe")
 				.participation(Participation.builder().state(State.NEEDSACTION).comment("this is a new comment").build())
