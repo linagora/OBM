@@ -526,8 +526,10 @@ public class UnixCrypt extends Object {
 	 *         encrypted password.
 	 */
 	public static final String crypt(String salt, String original) {
+		StringBuilder saltPadding = new StringBuilder(salt);
 		while (salt.length() < 2)
-			salt += "A";
+			saltPadding.append('A');
+		salt = saltPadding.toString();
 
 		StringBuffer buffer = new StringBuffer("             ");
 

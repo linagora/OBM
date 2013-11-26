@@ -1341,9 +1341,11 @@ public class ContactDao {
 
 		if (c.getEmails().size() > 0) {
 			q += "AND (email_address IS NULL ";
+			StringBuilder builder = new StringBuilder();
 			for (int i = 0; i < c.getEmails().size(); i++) {
-				q += " OR lower(email_address) = ? ";
+				builder.append(" OR lower(email_address) = ? ");
 			}
+			q += builder.toString();
 			q += ") ";
 		}
 		if (c.getPhones().containsKey("CELL;VOICE;X-OBM-Ref1")) {

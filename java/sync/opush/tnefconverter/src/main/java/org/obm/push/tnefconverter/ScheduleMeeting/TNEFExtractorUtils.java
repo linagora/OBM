@@ -96,26 +96,6 @@ public class TNEFExtractorUtils {
 		return 0;
 	}
 
-	public static String getMAPIPropString(Message tnefMsg, int id) {
-		try {
-			MAPIProp prop = tnefMsg.getMAPIProps().getProp(id);
-			String v = null;
-			if (prop != null) {
-				MAPIValue[] vals = prop.getValues();
-				if (vals != null) {
-					v = "";
-					for (int i = 0; i < vals.length; i++) {
-						if (vals[i] != null)
-							v += clear(toString(vals[i].getValue()), true);
-					}
-				}
-			}
-			return v;
-		} catch (IOException e) {
-		}
-		return null;
-	}
-	
 	public static RawInputStream getMAPIPropInputStream(Message tnefMsg,
 			int id) {
 		try {
