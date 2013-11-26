@@ -109,7 +109,7 @@ public class EncoderFactory {
 				} else if (data instanceof MSEmailMetadata) {
 					return emailMetadataEncoder.get().encodedApplicationData(data);
 				}
-				throw null;
+				return null;
 			default:
 				throw new IllegalArgumentException();
 			}
