@@ -55,7 +55,7 @@ import com.google.inject.name.Named;
 public class LocatorCache implements LocatorService {
 
 	private static final Logger logger = LoggerFactory.getLogger(LocatorClientImpl.class);
-	private static final String DEFAULT_VALUE = new String();
+	private static final String DEFAULT_VALUE = "";
 	
 	private final LoadingCache<Key, String> store;
 	private final LocatorClientImpl locatorClientImpl;
