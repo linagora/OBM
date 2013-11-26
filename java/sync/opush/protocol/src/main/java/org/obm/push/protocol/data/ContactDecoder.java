@@ -193,7 +193,7 @@ public class ContactDecoder extends Decoder implements IDataDecoder {
 				"Data")));
 		//NOKIA create contact with \r\n in body
 		if(contact.getData() != null){
-			contact.getData().trim();
+			contact.setData(contact.getData().trim());
 		}
 
 		Element body = DOMUtils.getUniqueElement(syncData, "Body");
