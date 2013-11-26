@@ -57,6 +57,7 @@ import org.obm.sync.services.IAddressBook;
 import org.obm.sync.utils.DateHelper;
 import org.xml.sax.SAXException;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -140,8 +141,18 @@ public class AddressBookHandler extends SecureSyncHandler {
 		responder.sendKeyList(ret);
 	}
 
-	private BookType type(Request request) {
-		return BookType.valueOf(request.getParameter("book"));
+	@VisibleForTesting
+	BookType type(Request request) {
+		String bookParam = request.getParameter("book");
+		if (bookParam == null) {
+			return null;
+		}
+		try {
+			return BookType.valueOf(bookParam);
+		}
+		catch(IllegalArgumentException ex) {
+			return null;
+		}
 	}
 
 	private void getContactFromId(AccessToken at, Request request, XmlResponder responder) 
@@ -291,7 +302,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 	private Integer getBookId(Request request) {
 		String bookId = p(request, "bookId");
 		if (bookId == null) {
-			if (isUsersBookType(request)) {
+			boolean isUsersBookType = isUsersBookType(request);
+			if (isUsersBookType) {
 				return contactConfiguration.getAddressBookUserId();
 			} else {
 				return null;
@@ -300,11 +312,9 @@ public class AddressBookHandler extends SecureSyncHandler {
 		return Integer.valueOf(bookId);
 	}
 
-	private Boolean isUsersBookType(Request request) {
+	private boolean isUsersBookType(Request request) {
 		BookType bookType = type(request);
-		if (bookType == null) {
-			return null;
-		}
+		
 		if (bookType == BookType.users) {
 			return true;
 		} else {
