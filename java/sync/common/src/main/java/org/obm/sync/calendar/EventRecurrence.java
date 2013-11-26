@@ -46,7 +46,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializable {
+public class EventRecurrence implements Cloneable, Anonymizable<EventRecurrence>, Serializable {
 
 	private static final int UNSPECIFIED_FREQUENCY_VALUE = 0;
 	private RecurrenceDays days;

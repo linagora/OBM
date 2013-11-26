@@ -59,7 +59,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializable {
+public class Event implements Indexed<Integer>, Anonymizable<Event>, Cloneable, Serializable {
 
 	public static final int SECONDS_IN_A_DAY = 3600 * 24;
 	public static final int DATABASE_TITLE_MAX_LENGTH = 255;
