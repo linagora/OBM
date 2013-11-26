@@ -31,6 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.ldap;
 
+import java.util.Random;
+
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * This class provides us with the ability to encrypt passwords when sent over
  * the network stream
@@ -593,12 +597,18 @@ public class UnixCrypt extends Object {
 	 *         encrypted password.
 	 */
 	public static final String crypt(String original) {
-		java.util.Random randomGenerator = new java.util.Random();
+		Random randomGenerator = new Random();
+		return crypt(original, randomGenerator);
+	}
+
+	@VisibleForTesting
+	static final String crypt(String original, Random randomGenerator) {
 		int numSaltChars = saltChars.length;
 
 		String salt = "";
-		salt += saltChars[Math.abs(randomGenerator.nextInt()) % numSaltChars];
-		salt += saltChars[Math.abs(randomGenerator.nextInt()) % numSaltChars];
+		// Abs'ing Integer.MIN_VALUE is equal to Integer.MIN_VALUE, don't do that
+		salt += saltChars[Math.abs(Math.max(randomGenerator.nextInt(), Integer.MIN_VALUE + 1)) % numSaltChars];
+		salt += saltChars[Math.abs(Math.max(randomGenerator.nextInt(), Integer.MIN_VALUE + 1)) % numSaltChars];
 
 		return crypt(salt, original);
 	}
