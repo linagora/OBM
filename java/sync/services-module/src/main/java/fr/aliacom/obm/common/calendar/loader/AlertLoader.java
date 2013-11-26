@@ -111,7 +111,7 @@ public class AlertLoader {
 		int alertDuration = rs.getInt("eventalert_duration");
 		Integer alert;
 		if (alertDuration >= 0) {
-			alert = new Integer(alertDuration);
+			alert = Integer.valueOf(alertDuration);
 		}
 		else {
 			alert = null;

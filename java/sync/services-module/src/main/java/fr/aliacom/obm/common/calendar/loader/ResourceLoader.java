@@ -38,7 +38,7 @@ public class ResourceLoader {
 
 		public Builder ids(int... ids) {
 			for (int id : ids) {
-				this.ids.add(new Integer(id));
+				this.ids.add(Integer.valueOf(id));
 			}
 			return this;
 		}
