@@ -32,6 +32,7 @@
 package fr.aliacom.obm.common.calendar;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.DateTime;
 
 import org.apache.commons.lang.StringUtils;
+import org.jboss.util.Objects;
 import org.joda.time.Months;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.icalendar.ICalendarFactory;
@@ -567,7 +569,7 @@ public class CalendarBindingImpl implements ICalendar {
 		return treeMap;
 	}
 	
-	private static class RecurrenceIdComparator implements Comparator<Event> {
+	private static class RecurrenceIdComparator implements Serializable, Comparator<Event> {
 		public int compare(Event first, Event second) {
 			return Ordering.natural().nullsFirst().compare(first.getRecurrenceId(), second.getRecurrenceId());
 		}

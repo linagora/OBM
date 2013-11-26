@@ -109,7 +109,7 @@ public class LocatorCache implements LocatorService {
 		}
 	}
 	
-	private class Key implements Serializable {
+	private static class Key implements Serializable {
 		private final String serviceSlashProperty;
 		private final String loginAtDomain;
 		

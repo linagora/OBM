@@ -31,12 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
 
 import com.google.common.base.Strings;
 
-public class ComparatorUsingEventHasImportantChanges implements Comparator<Event> {
+public class ComparatorUsingEventHasImportantChanges implements Comparator<Event>, Serializable {
 
 	private final static int SAME = 0;
 	private final static int NOT_SAME = -1;
