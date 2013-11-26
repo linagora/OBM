@@ -34,6 +34,8 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import com.google.common.base.Joiner;
+
 /**
  * A SAX-based parser for the WAP Binary XML Content Format (WBXML).
  * <p>
@@ -329,7 +331,7 @@ public class WbxmlParser {
 			return readStrT();
 		}
 		if (idx < 0 || tab == null || idx >= tab.length || tab[idx] == null) {
-			throw new SAXException("id " + id + " idx "+idx+" undef. tab: " + tab);
+			throw new SAXException("id " + id + " idx "+idx+" undef. tab: " + Joiner.on(",").join(tab));
 		}
 
 		String ret = tab[idx];
