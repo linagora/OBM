@@ -73,7 +73,7 @@ public class XMLInputStreamSplitter implements Iterable<String> {
 	}
 	
 	private String endingRootTagName(String rootTag) {
-		return new String("" + OPENING_TAG_SYMBOL + ENDING_TAG_SYMBOL + rootTag + CLOSING_TAG_SYMBOL);
+		return "" + OPENING_TAG_SYMBOL + ENDING_TAG_SYMBOL + rootTag + CLOSING_TAG_SYMBOL;
 	}
 
 	private String readUntilEndingRootTag(String endingRootTag)
