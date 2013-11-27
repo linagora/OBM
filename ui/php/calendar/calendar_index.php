@@ -2287,6 +2287,7 @@ function update_calendar_action($writable_calendars) {
   global $actions, $params, $path, $obm;
   if (!$writable_calendars) {
       unset($actions['calendar']['new']);
+      unset($actions['calendar']['new_meeting']);
   }
   $id = $params['calendar_id'];
   if($id) {
