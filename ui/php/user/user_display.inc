@@ -607,14 +607,14 @@ $dis_delegation";
 // Parameters:
 //   - $user[]   : user search criteria
 ///////////////////////////////////////////////////////////////////////////////
-function dis_user_search_list($user, $strongest_profile_level=null, $user_can_manage_peers=null) {
+function dis_user_search_list($user, $user_results_limit, $strongest_profile_level=null, $user_can_manage_peers=null) {
   global $l_found, $l_no_found;
   global $display, $obm;
 
   $popup = $user['popup'];
   $filter_entity = $user['filter_entity'];
   
-  $obm_q = run_query_user_search($user, $strongest_profile_level, $user_can_manage_peers);
+  $obm_q = run_query_user_search($user, $user_results_limit, $strongest_profile_level, $user_can_manage_peers);
 
   $prefs = get_display_pref($obm['uid'], 'user');
   $nb_user = $obm_q->num_rows_total();
@@ -3845,7 +3845,7 @@ function dis_user_wait_list($user) {
   $popup = $user['popup'];
   $filter_entity = $user['filter_entity'];
   
-  $obm_q = run_query_user_search($user);
+  $obm_q = run_query_user_search($user, null);
 
   $prefs = get_display_pref($obm['uid'], 'user');
   $nb_user = $obm_q->num_rows_total();

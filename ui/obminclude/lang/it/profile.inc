@@ -253,4 +253,4 @@ $l_help_level = "Un utente con questo profilo non potrà modificare solo gli ute
 $l_profile_exists = "Questo nome di profilo è già utilizzato";
 $l_profile_name_empty = "Introduci un nome di profilo : da 1 a 64 caratteri alfanumerici o '_' '.' '-' !";
 $l_access_restriction = "Sicurezza connessioni"; 
-
+$l_user_results_limit = "Maximum number of results in the user search";

@@ -3780,7 +3780,7 @@ function get_all_profiles($cached = true) {
     $obm_q->query($query);
     while($obm_q->next_record()) {
       $ids[] = $obm_q->f('profile_id');
-      $profiles[$obm_q->f('profile_name')] = array('id' => $obm_q->f('profile_id'), 'name' => $obm_q->f('profile_name'), 'section' => array(), 'module' => array(), 'properties' => array());
+      $profiles[$obm_q->f('profile_name')] = array('id' => $obm_q->f('profile_id'), 'name' => $obm_q->f('profile_name'), 'section' => array(), 'module' => array(), 'properties' => array('user_results_limit' => null));
     }
     $ids = implode(',',$ids);
 

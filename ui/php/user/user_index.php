@@ -91,6 +91,7 @@ page_close();
 // get Profile list (name and id)
 $params['profiles'] = get_all_profiles(false);
 
+$user_results_limit = get_user_results_limit($obm['profile']);
 $params = get_user_params_mail_server_id($params);
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
@@ -98,7 +99,7 @@ $params = get_user_params_mail_server_id($params);
 if ($action == 'ext_get_ids') {
   $display['search'] = html_user_search_form($params);
   if ($_SESSION['set_display'] == 'yes') {
-    $display['result'] = dis_user_search_list($params);
+    $display['result'] = dis_user_search_list($params, $user_results_limit);
   } else {
     $display['msg'] .= display_info_msg($l_no_display);
   }
@@ -107,7 +108,7 @@ if ($action == 'ext_get_ids') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['search'] = html_user_search_form($params);
   if ($_SESSION['set_display'] == 'yes') {
-    $display['result'] = dis_user_search_list($params);
+    $display['result'] = dis_user_search_list($params, $user_results_limit);
   } else {
     $display['msg'] .= display_info_msg($l_no_display);
   }
@@ -116,7 +117,7 @@ if ($action == 'ext_get_ids') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['search'] = html_user_search_form($params);
   if ($_SESSION['set_display'] == 'yes') {
-    $display['result'] = dis_user_search_list($params);
+    $display['result'] = dis_user_search_list($params, $user_results_limit);
   } else {
     $display['msg'] .= display_info_msg($l_no_display);
   }
@@ -124,7 +125,7 @@ if ($action == 'ext_get_ids') {
 } elseif ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['search'] = html_user_search_form($params);
-  $display['result'] = dis_user_search_list($params);
+  $display['result'] = dis_user_search_list($params, $user_results_limit);
 
 } elseif ($action == 'ext_search') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -402,7 +403,7 @@ if ($action == 'ext_get_ids') {
   $_SESSION['set_rows'] = 250;   
 
   list($strongest_profile_level, $user_can_manage_peers) = get_user_profile_level($obm);
-  $display['result'] = dis_user_search_list($params, $strongest_profile_level, $user_can_manage_peers);
+  $display['result'] = dis_user_search_list($params, $user_results_limit, $strongest_profile_level, $user_can_manage_peers);
   $_SESSION['set_rows'] = $setrows;  
 } else if ($action == 'edit_batch_values') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -839,6 +840,13 @@ function get_user_action() {
 ///////////////////////////////////////////////////////////////////////////////
 // User Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
+
+function get_user_results_limit($profile) {
+    global $profiles;
+    $limit = $profiles[$profile]['properties']['user_results_limit'];
+    return $limit;
+}
+
 function update_user_action() {
   global $params, $actions, $path, $cgp_user, $obm, $profiles;
 
