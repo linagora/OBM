@@ -52,7 +52,7 @@ require_once($obminclude . '/of/of_session.inc');
 //   - $sql_order_dir : direction for order clause (asc, desc)
 //   - $filter_entity : if and which filter_entity to set (eg calendar readable)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_search($user, $strongest_profile_level=null, $user_can_manage_peers=null) {
+function run_query_user_search($user, $user_results_limit, $strongest_profile_level=null, $user_can_manage_peers=null) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
   global $cgp_archive_only;
   
@@ -90,7 +90,10 @@ function run_query_user_search($user, $strongest_profile_level=null, $user_can_m
   $service = $obm_q->escape($user['service']);
 
   $db_type = $obm_q->type;
-  $limit = sql_limit($db_type);
+  $user_results_limit_as_int = $user_results_limit != null && is_numeric($user_results_limit) ?
+      $user_results_limit :
+      null;
+  $limit = $user_results_limit_as_int != null ? "LIMIT $user_results_limit_as_int " : "";
   $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
   $dateexp = sql_date_format($db_type, 'userobm_account_dateexp', 'dateexp');
   $diff = "#DAYDIFF(now(),userobm_account_dateexp)";
@@ -2980,7 +2983,7 @@ function check_user_wait($user){
   $user['status'] = 'INIT';
   $user['delegation'] = $obm['delegation_target'];
 
-  $obm_q = run_query_user_search($user);  
+  $obm_q = run_query_user_search($user, null);
   
   if ($obm_q->num_rows() > 0){
     $rep = true;

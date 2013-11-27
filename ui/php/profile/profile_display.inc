@@ -450,6 +450,15 @@ function dis_property_value($property, $value, $update=false) {
   }
 }
 
+function dis_property_user_results_limit_value($value, $update) {
+  if($update) {
+    if(is_array($value)) $value = implode(',',$value);
+    return "<div><input name='property[user_results_limit]' id='userResultsLimitInput' value='".htmlspecialchars($value)."'/></div>";
+  } else {
+    return $value ? $value : '';
+  }
+}
+
 /**
  * dis_property_level_value 
  * 

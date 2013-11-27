@@ -45,6 +45,7 @@ $c_profile_properties = array(
     'level_managepeers' ,
     'access_restriction' ,
     'access_exceptions' ,
+    'user_results_limit',
     'admin_realm',
     'default_right', 
     'mail_quota_max', 
@@ -92,7 +93,6 @@ function run_query_profile_details($id) {
     INNER JOIN ProfileProperty ON profileproperty_profile_id = profile_id
     WHERE profile_id = #INT($id) $multidomain";
   $obm_q->query($query);
-  $profile['property'] = array();
   foreach($c_profile_properties as $property) {
     $profile['property'][$property] = false;
   }
