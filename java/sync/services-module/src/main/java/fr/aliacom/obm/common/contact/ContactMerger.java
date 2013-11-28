@@ -111,11 +111,11 @@ public class ContactMerger {
 		mergeMap(actualC.getAddresses(), updateC.getAddresses());
 		mergeMap(actualC.getImIdentifiers(), updateC.getImIdentifiers());
 		
-		HashSet<Website> websites = mergeWebSite(actualC, updateC);
+		Set<Website> websites = mergeWebSite(actualC, updateC);
 		updateC.setWebsites(websites);
 	}	
 	
-	private HashSet<Website> mergeWebSite(Contact actualC, Contact updateC) {
+	private Set<Website> mergeWebSite(Contact actualC, Contact updateC) {
 		HashSet<Website> websites = new HashSet<Website>();
 		websites.addAll(updateC.getWebsites());
 		for (Website website: actualC.getWebsites()) {

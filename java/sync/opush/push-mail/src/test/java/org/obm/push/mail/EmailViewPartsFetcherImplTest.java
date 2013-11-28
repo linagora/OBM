@@ -1023,7 +1023,7 @@ public class EmailViewPartsFetcherImplTest {
 		return new Address("");
 	}
 
-	private ArrayList<BodyPreference> bodyPreferences() {
+	private List<BodyPreference> bodyPreferences() {
 		BodyPreference.Builder builder = BodyPreference.builder()
 			.bodyType(messageFixture.bodyType);
 		if (messageFixture.estimatedDataSize != 0) {

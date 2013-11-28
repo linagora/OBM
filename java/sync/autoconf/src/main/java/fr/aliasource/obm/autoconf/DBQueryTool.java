@@ -36,6 +36,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,8 +60,8 @@ public class DBQueryTool {
 	 * 
 	 * @return a Map<service_name, fqdn> with service in ('imap', 'smtp')
 	 */
-	HashMap<String, String> getDBInformation(String login, String domainName) {
-		HashMap<String, String> ret = new HashMap<String, String>();
+	Map<String, String> getDBInformation(String login, String domainName) {
+		Map<String, String> ret = new HashMap<String, String>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection con = null;

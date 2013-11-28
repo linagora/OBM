@@ -33,7 +33,7 @@ package org.obm.push.backend;
 
 import java.util.Comparator;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.ChangedCollections;
@@ -80,7 +80,7 @@ public class CollectionChangeListener implements
 
 	@Override
 	public boolean monitorOneOf(ChangedCollections changedCollections) {
-		TreeSet<String> collectionPathSet = convertSetToComparePath(changedCollections);
+		SortedSet<String> collectionPathSet = convertSetToComparePath(changedCollections);
 		return !Sets.intersection(
 				Sets.newHashSet(Iterables.transform(getMonitoredCollections(), new Function<AnalysedSyncCollection, String>() {
 					@Override
@@ -91,9 +91,9 @@ public class CollectionChangeListener implements
 				, collectionPathSet).isEmpty();
 	}
 
-	private TreeSet<String> convertSetToComparePath(ChangedCollections changedCollections) {
+	private SortedSet<String> convertSetToComparePath(ChangedCollections changedCollections) {
 		
-		TreeSet<String> collectionPathSet = Sets.newTreeSet(new Comparator<String>() {
+		SortedSet<String> collectionPathSet = Sets.newTreeSet(new Comparator<String>() {
 
 			@Override
 			public int compare(String o1, String o2) {

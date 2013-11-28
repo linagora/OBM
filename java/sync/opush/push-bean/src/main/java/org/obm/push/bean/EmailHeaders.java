@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -63,7 +63,7 @@ public class EmailHeaders implements Iterable<EmailHeader> {
 		}
 	}
 	
-	private final HashSet<EmailHeader> headers;
+	private final Set<EmailHeader> headers;
 
 	private EmailHeaders(List<EmailHeader> headers) {
 		this.headers = Sets.newHashSet(headers);

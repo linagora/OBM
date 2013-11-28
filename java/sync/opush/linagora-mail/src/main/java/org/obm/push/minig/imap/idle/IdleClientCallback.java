@@ -34,6 +34,7 @@ package org.obm.push.minig.imap.idle;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.imap.idle.IIdleCallback;
@@ -51,7 +52,7 @@ public class IdleClientCallback implements IResponseCallback {
 	private static final Logger logger = LoggerFactory
 			.getLogger(IdleClientCallback.class);
 	
-	private final LinkedList<IMAPResponse> responses;
+	private final List<IMAPResponse> responses;
 	private IIdleCallback observer;
 	private final IdleResponseParser rParser;
 	private final IMAPResponseParser imrParser;

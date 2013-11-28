@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliasource.obm.autoconf.impl;
 
-import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.naming.Binding;
 import javax.naming.Context;
@@ -44,13 +44,13 @@ import javax.naming.NamingException;
 
 public class MemoryContext implements Context {
 
-	private final HashMap<String, Object> store;
+	private final Map<String, Object> store;
 	private final String ctxName;
 
 	/**
 	 * @param string
 	 */
-	public MemoryContext(String ctxName, HashMap<String, Object> store) {
+	public MemoryContext(String ctxName, Map<String, Object> store) {
 		this.ctxName = ctxName;
 		this.store = store;
 	}

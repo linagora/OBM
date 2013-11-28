@@ -84,7 +84,7 @@ public class Contact implements Serializable {
 	private String calUri;
 	
 	private Map<String, Phone> phones;
-	private HashSet<Website> websites;
+	private Set<Website> websites;
 	private Map<String, EmailAddress> emails;
 	private Map<String, InstantMessagingId> imIdentifiers;
 	private Map<String, Address> addresses;
@@ -195,7 +195,7 @@ public class Contact implements Serializable {
 	}
 
 	@DatabaseEntity
-	public HashSet<Website> getWebsites() {
+	public Set<Website> getWebsites() {
 		return websites;
 	}
 	
@@ -365,7 +365,7 @@ public class Contact implements Serializable {
 		return labels;
 	}
 	
-	public void setWebsites(HashSet<Website> websites) {
+	public void setWebsites(Set<Website> websites) {
 		this.websites = websites;
 	}
 

@@ -34,6 +34,7 @@ package org.obm.push.impl;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.obm.push.backend.ICollectionChangeListener;
@@ -142,7 +143,7 @@ public class PushPublishAndSubscribeImpl implements PushPublishAndSubscribe {
 	}
 
 	private void addPushNotification(
-			final LinkedList<PushNotification> pushNotifyList,
+			final List<PushNotification> pushNotifyList,
 			final ICollectionChangeListener ccl) {
 		if (monitoringService != null) {
 			monitoringService.stopMonitoring();

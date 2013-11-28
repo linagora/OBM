@@ -55,7 +55,9 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import net.fortuna.ical4j.data.ParserException;
@@ -2642,7 +2644,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		
-		TreeMap<Event, Event> treeMap = calendarService.buildTreeMap(events);
+		SortedMap<Event, Event> treeMap = calendarService.buildSortedMap(events);
 		assertThat(treeMap).isEmpty();
 	}
 	
@@ -2651,7 +2653,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService = 
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		
-		TreeMap<Event, Event> treeMap = calendarService.buildTreeMap(null);
+		SortedMap<Event, Event> treeMap = calendarService.buildSortedMap(null);
 		assertThat(treeMap).isEmpty();
 	}
 	
@@ -2664,7 +2666,7 @@ public class CalendarBindingImplTest {
 		Event thirdException = createEventException(attendees, eventDate.plusDays(3).toDate());
 		
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
-		TreeMap<Event, Event> treeMap = calendarService.buildTreeMap(ImmutableSet.of(firstException, secondException, thirdException));
+		SortedMap<Event, Event> treeMap = calendarService.buildSortedMap(ImmutableSet.of(firstException, secondException, thirdException));
 		
 		assertThat(treeMap.keySet()).containsExactly(firstException, secondException, thirdException);
 	}

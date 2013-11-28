@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils.jdbc;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.obm.push.utils.index.IndexUtils;
 import org.obm.push.utils.index.Indexed;
@@ -43,8 +43,8 @@ public class LongIndexedSQLCollectionHelper extends LongSQLCollectionHelper {
 		super(indexedItemsAsLongs(indexedItems));
 	}
 
-	private static ArrayList<Long> indexedItemsAsLongs(Collection<? extends Indexed<Long>> indexedItems) {
-		ArrayList<Long> listIndexes = IndexUtils.listIndexes(indexedItems);
+	private static List<Long> indexedItemsAsLongs(Collection<? extends Indexed<Long>> indexedItems) {
+		List<Long> listIndexes = IndexUtils.listIndexes(indexedItems);
 		return listIndexes;
 	}
 	

@@ -394,7 +394,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Cloneable, 
 		return event;
 	}
 
-	private LinkedList<Attendee> copyAttendees() {
+	private List<Attendee> copyAttendees() {
 		LinkedList<Attendee> copyOfAttendees = Lists.newLinkedList();
 		for(Attendee attendee: attendees) {
 			copyOfAttendees.add(attendee.clone());
@@ -630,7 +630,7 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Cloneable, 
 		return Lists.newArrayList(differences);
 	}
 
-	private HashSet<Event> generateOccurrencesMatchingEventExceptions(EventRecurrence recurrence) {
+	private Set<Event> generateOccurrencesMatchingEventExceptions(EventRecurrence recurrence) {
 		HashSet<Event> occurrences = com.google.common.collect.Sets.newHashSet(this.getEventsExceptions());
 		for (Event exception: recurrence.getEventExceptions()) {
 			if (!occurrences.contains(exception)) {

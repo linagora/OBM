@@ -40,7 +40,7 @@ import com.google.common.collect.Iterables;
 
 public class ClassToInstanceAgregateView<V> implements Iterable<V> {
 
-	private final ArrayList<ClassToInstanceMap<V>> maps;
+	private final List<ClassToInstanceMap<V>> maps;
 
 	public ClassToInstanceAgregateView() {
 		maps = new ArrayList<ClassToInstanceMap<V>>();

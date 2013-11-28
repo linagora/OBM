@@ -33,6 +33,7 @@ package fr.aliacom.obm.services.constant;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -48,7 +49,7 @@ public class SpecialAccounts {
 			.getLogger(SpecialAccounts.class);
 
 	private Map<String, String> rootAccounts;
-	private ArrayList<String> anyUserAccounts;
+	private List<String> anyUserAccounts;
 	private Map<String, String> appliAccounts;
 
 	@Inject

@@ -36,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.obm.push.protocol.bean.ASTimeZone;
@@ -140,8 +141,8 @@ public class Decoder {
 		return new TZDecoder().decode(b64);
 	}
 
-	public ArrayList<String> parseDOMStringCollection(Element node,
-			String elementName, ArrayList<String> default_value) {
+	public List<String> parseDOMStringCollection(Element node,
+			String elementName, List<String> default_value) {
 		if (node != null) {
 			return new ArrayList<String>(Arrays.asList(DOMUtils.getTexts(node,
 					elementName)));
@@ -150,7 +151,7 @@ public class Decoder {
 		return default_value;
 	}
 
-	public ArrayList<String> parseDOMStringCollection(Element node,
+	public List<String> parseDOMStringCollection(Element node,
 			String elementName) {
 		return parseDOMStringCollection(node, elementName, null);
 	}

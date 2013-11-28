@@ -43,7 +43,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import net.fortuna.ical4j.data.ParserException;
@@ -506,7 +508,7 @@ public class CalendarBindingImpl implements ICalendar {
 		ensureNewAttendeesWithDelegationAreAcceptedOnEvent(before, event);
 		
 		Set<Event> eventExceptions = event.getEventsExceptions();
-		TreeMap<Event, Event> beforeExceptions = buildTreeMap(before.getEventsExceptions());
+		SortedMap<Event, Event> beforeExceptions = buildSortedMap(before.getEventsExceptions());
 		
 		for (Event eventException : eventExceptions) {
 			ensureNewAttendeesWithDelegationAreAcceptedOnEvent(beforeExceptions.get(eventException), eventException);
@@ -549,7 +551,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@VisibleForTesting void inheritsParticipationOnExceptions(Event before, Event event) {
 		Set<Event> beforeExceptions = before.getEventsExceptions();
-		TreeMap<Event, Event> eventExceptions = buildTreeMap(event.getEventsExceptions());
+		SortedMap<Event, Event> eventExceptions = buildSortedMap(event.getEventsExceptions());
 		
 		for (Event beforeException : beforeExceptions) {
 			if (eventExceptions.containsKey(beforeException)) {
@@ -558,11 +560,11 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	@VisibleForTesting TreeMap<Event, Event> buildTreeMap(Set<Event> events) {
+	@VisibleForTesting SortedMap<Event, Event> buildSortedMap(Set<Event> events) {
 		if (events == null) {
 			return new TreeMap<Event, Event>();
 		}
-		TreeMap<Event, Event> treeMap = Maps.<Event, Event, Event>newTreeMap(new RecurrenceIdComparator());
+		SortedMap<Event, Event> treeMap = Maps.<Event, Event, Event>newTreeMap(new RecurrenceIdComparator());
 		for (Event event : events) {
 			treeMap.put(event, event);
 		}

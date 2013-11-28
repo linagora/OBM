@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.book;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.transform.TransformerException;
 
@@ -136,7 +136,7 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		}
 	}
 
-	private void addWebsite(final Element root, final HashSet<Website> websites) {
+	private void addWebsite(final Element root, final Set<Website> websites) {
 		final Element e = DOMUtils.createElement(root, "websites");
 		for (final Website website: websites) {
 			Element c = DOMUtils.createElement(e, "site");

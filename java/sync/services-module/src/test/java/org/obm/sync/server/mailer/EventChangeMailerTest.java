@@ -108,24 +108,24 @@ public abstract class EventChangeMailerTest {
 	private EventChangeMailer eventChangeMailer;
 	protected abstract EventChangeMailer newEventChangeMailer();
 	protected abstract Locale getLocale();
-	protected abstract ArrayList<String> getInvitationPlainMessage();
-	protected abstract ArrayList<String> getInvitationHtmlMessage();
-	protected abstract ArrayList<String> getUpdatePlainMessage();
-	protected abstract ArrayList<String> getUpdateHtmlMessage();
-	protected abstract ArrayList<String> getCancelPlainMessage();
-	protected abstract ArrayList<String> getCancelHtmlMessage();
-	protected abstract ArrayList<String> getRecurrentInvitationPlainMessage();
-	protected abstract ArrayList<String> getRecurrentInvitationHtmlMessage();
-	protected abstract ArrayList<String> getRecurrentUpdatePlainMessage();
-	protected abstract ArrayList<String> getRecurrentUpdateHtmlMessage();
-	protected abstract ArrayList<String> getNonRecurrentToRecurrentUpdatePlainMessage();
-	protected abstract ArrayList<String> getNonRecurrentToRecurrentUpdateHtmlMessage();
-	protected abstract ArrayList<String> getRecurrentToNonRecurrentUpdatePlainMessage();
-	protected abstract ArrayList<String> getRecurrentToNonRecurrentUpdateHtmlMessage();
-	protected abstract ArrayList<String> getRecurrentCancelPlainMessage();
-	protected abstract ArrayList<String> getRecurrentCancelHtmlMessage();
-	protected abstract ArrayList<String> getChangeParticipationPlainMessage();
-	protected abstract ArrayList<String> getChangeParticipationHtmlMessage();
+	protected abstract List<String> getInvitationPlainMessage();
+	protected abstract List<String> getInvitationHtmlMessage();
+	protected abstract List<String> getUpdatePlainMessage();
+	protected abstract List<String> getUpdateHtmlMessage();
+	protected abstract List<String> getCancelPlainMessage();
+	protected abstract List<String> getCancelHtmlMessage();
+	protected abstract List<String> getRecurrentInvitationPlainMessage();
+	protected abstract List<String> getRecurrentInvitationHtmlMessage();
+	protected abstract List<String> getRecurrentUpdatePlainMessage();
+	protected abstract List<String> getRecurrentUpdateHtmlMessage();
+	protected abstract List<String> getNonRecurrentToRecurrentUpdatePlainMessage();
+	protected abstract List<String> getNonRecurrentToRecurrentUpdateHtmlMessage();
+	protected abstract List<String> getRecurrentToNonRecurrentUpdatePlainMessage();
+	protected abstract List<String> getRecurrentToNonRecurrentUpdateHtmlMessage();
+	protected abstract List<String> getRecurrentCancelPlainMessage();
+	protected abstract List<String> getRecurrentCancelHtmlMessage();
+	protected abstract List<String> getChangeParticipationPlainMessage();
+	protected abstract List<String> getChangeParticipationHtmlMessage();
 	protected abstract String getNewEventSubject();
 	protected abstract String getNewRecurrentEventSubject();
 	protected abstract String getCancelEventSubject();
@@ -146,7 +146,7 @@ public abstract class EventChangeMailerTest {
 
 	private Event event;
 	private Event recurrentEvent;
-	private ArrayList<String> icsToCheck;
+	private List<String> icsToCheck;
 
 	private final static String RECIPIENTS =
 			"Ronan LANORE <rlanore@linagora.com>, " +
@@ -179,7 +179,7 @@ public abstract class EventChangeMailerTest {
 		return new EventChangeMailer(mailService, constantService, templateLoader, logger);
 	}
 	
-	private ArrayList<String> getRawMessageWithSubject(String subject) {
+	private List<String> getRawMessageWithSubject(String subject) {
 		return Lists.newArrayList(
 				"From: Obm User <user@test>",
 				"To: Ronan LANORE <rlanore@linagora.com>, Guillaume",
@@ -187,7 +187,7 @@ public abstract class EventChangeMailerTest {
 		);
 	}
 	
-	private ArrayList<String> getCommonICSFields() {
+	private List<String> getCommonICSFields() {
 		return Lists.newArrayList(
 				"BEGIN:VCALENDAR",
 				"CALSCALE:GREGORIAN",
@@ -205,7 +205,7 @@ public abstract class EventChangeMailerTest {
 		);
 	}
 	
-	private ArrayList<String> getNoAllowedTimeFormat() {
+	private List<String> getNoAllowedTimeFormat() {
 		return Lists.newArrayList(
 				"11:00:00",
 				"11:45:00",
@@ -485,7 +485,7 @@ public abstract class EventChangeMailerTest {
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
-		ArrayList<String> rawMessage = getRawMessageWithSubject(getChangeParticipationSubject());
+		List<String> rawMessage = getRawMessageWithSubject(getChangeParticipationSubject());
 		rawMessage.remove("From: Obm User <user@test>");
 		rawMessage.add("From: Matthieu BAECHLER <mbaechler@linagora.com>");
 		checkRawMessage(parts, rawMessage);

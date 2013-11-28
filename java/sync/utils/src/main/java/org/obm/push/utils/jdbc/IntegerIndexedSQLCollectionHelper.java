@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils.jdbc;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.obm.push.utils.index.IndexUtils;
 import org.obm.push.utils.index.Indexed;
@@ -43,8 +43,8 @@ public class IntegerIndexedSQLCollectionHelper extends IntegerSQLCollectionHelpe
 		super(indexedItemsAsIntegers(indexedItems));
 	}
 
-	private static ArrayList<Integer> indexedItemsAsIntegers(Collection<? extends Indexed<Integer>> indexedItems) {
-		ArrayList<Integer> listIndexes = IndexUtils.listIndexes(indexedItems);
+	private static List<Integer> indexedItemsAsIntegers(Collection<? extends Indexed<Integer>> indexedItems) {
+		List<Integer> listIndexes = IndexUtils.listIndexes(indexedItems);
 		return listIndexes;
 	}
 	

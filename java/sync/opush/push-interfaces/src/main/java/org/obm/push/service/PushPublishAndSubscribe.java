@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.service;
 
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.obm.push.backend.ICollectionChangeListener;
@@ -45,7 +45,7 @@ public interface PushPublishAndSubscribe {
 		PushPublishAndSubscribe create(PIMBackend backend, IContentsExporter iContentsExporter, IStateMachine iStateMachine);
 	}
 	
-	LinkedList<PushNotification> listPushNotification(
+	List<PushNotification> listPushNotification(
 			Set<ICollectionChangeListener> ccls);
 
 	void emit(Set<ICollectionChangeListener> ccls);

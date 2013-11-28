@@ -1,6 +1,6 @@
 package org.obm.sync.server.mailer;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import com.google.common.collect.Lists;
@@ -17,7 +17,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 		return Locale.FRENCH;
 	}
 
-	private ArrayList<String> getPlainMessage(String header) {
+	private List<String> getPlainMessage(String header) {
 		return Lists.newArrayList(
 				header,
 				"du            : 8 nov. 2010 11:00", 
@@ -29,7 +29,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 		);
 	}
 
-	private ArrayList<String> getHtmlMessage(String header) {
+	private List<String> getHtmlMessage(String header) {
 		return Lists.newArrayList(
 				header,
 				"Du 8 nov. 2010 11:00", 
@@ -41,7 +41,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 		);
 	}
 
-	private ArrayList<String> getRecurrentPlainMessage(String header) {
+	private List<String> getRecurrentPlainMessage(String header) {
 		return Lists.newArrayList(
 				header,
 				"du            : 8 nov. 2010", 
@@ -54,7 +54,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 		);
 	}
 
-	private ArrayList<String> getRecurrentHtmlMessage(String header) {
+	private List<String> getRecurrentHtmlMessage(String header) {
 		return Lists.newArrayList(
 				header,
 				"Du 8 nov. 2010", 
@@ -69,17 +69,17 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 
 
 	@Override
-	protected ArrayList<String> getInvitationPlainMessage() {
+	protected List<String> getInvitationPlainMessage() {
 		return getPlainMessage("NOUVEAU RENDEZ-VOUS");
 	}
 
 	@Override
-	protected ArrayList<String> getInvitationHtmlMessage() {
+	protected List<String> getInvitationHtmlMessage() {
 		return getHtmlMessage("Invitation à un événement");
 	}
 
 	@Override
-	protected ArrayList<String> getUpdatePlainMessage() {
+	protected List<String> getUpdatePlainMessage() {
 		return Lists.newArrayList(
 				"RENDEZ-VOUS MODIFIÉ !",
 				"du 8 nov. 2010 11:00",
@@ -94,7 +94,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 	}
 
 	@Override
-	protected ArrayList<String> getUpdateHtmlMessage() {
+	protected List<String> getUpdateHtmlMessage() {
 		return Lists.newArrayList(
 				"Invitation à un évènement : mise à jour",
 				"du 8 nov. 2010 11:00",
@@ -109,27 +109,27 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 	}
 
 	@Override
-	protected ArrayList<String> getCancelPlainMessage() {
+	protected List<String> getCancelPlainMessage() {
 		return getPlainMessage("RENDEZ-VOUS ANNULÉ");
 	}
 
 	@Override
-	protected ArrayList<String> getCancelHtmlMessage() {
+	protected List<String> getCancelHtmlMessage() {
 		return getHtmlMessage("Annulation d'un événement");
 	}
 
 	@Override
-	protected ArrayList<String> getRecurrentInvitationPlainMessage() {
+	protected List<String> getRecurrentInvitationPlainMessage() {
 		return getRecurrentPlainMessage("NOUVEAU RENDEZ-VOUS RÉCURRENT");
 	}
 
 	@Override
-	protected ArrayList<String> getRecurrentInvitationHtmlMessage() {
+	protected List<String> getRecurrentInvitationHtmlMessage() {
 		return getRecurrentHtmlMessage("Invitation à un événement récurrent");
 	}
 
 	@Override
-	protected ArrayList<String> getRecurrentUpdatePlainMessage() {
+	protected List<String> getRecurrentUpdatePlainMessage() {
 		return Lists.newArrayList(
 				"RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
 				"du 8 nov. 2010", 
@@ -146,7 +146,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 	}
 
 	@Override
-	protected ArrayList<String> getRecurrentUpdateHtmlMessage() {
+	protected List<String> getRecurrentUpdateHtmlMessage() {
 		return Lists.newArrayList(
 				"Invitation à un évènement récurrent : mise à jour",
 				"du 8 nov. 2010", 
@@ -163,7 +163,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 	}
 	
 	@Override
-	protected ArrayList<String> getNonRecurrentToRecurrentUpdatePlainMessage() {
+	protected List<String> getNonRecurrentToRecurrentUpdatePlainMessage() {
 		return Lists.newArrayList(
 				"RENDEZ-VOUS RÉCURRENT MODIFIÉ !",
 				"du 8 nov. 2010", 
@@ -181,7 +181,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 	}
 
 	@Override
-	protected ArrayList<String> getNonRecurrentToRecurrentUpdateHtmlMessage() {
+	protected List<String> getNonRecurrentToRecurrentUpdateHtmlMessage() {
 		return Lists.newArrayList(
 				"Invitation à un évènement récurrent : mise à jour",
 				"du 8 nov. 2010", 
@@ -199,7 +199,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 	}
 	
 	@Override
-	protected ArrayList<String> getRecurrentToNonRecurrentUpdatePlainMessage() {
+	protected List<String> getRecurrentToNonRecurrentUpdatePlainMessage() {
 		return Lists.newArrayList(
 				"RENDEZ-VOUS MODIFIÉ !",
 				"du 8 nov. 2010 11:00",
@@ -214,7 +214,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 	}
 
 	@Override
-	protected ArrayList<String> getRecurrentToNonRecurrentUpdateHtmlMessage() {
+	protected List<String> getRecurrentToNonRecurrentUpdateHtmlMessage() {
 		return Lists.newArrayList(
 				"Invitation à un évènement : mise à jour",
 				"du 8 nov. 2010 11:00",
@@ -229,17 +229,17 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 	}
 	
 	@Override
-	protected ArrayList<String> getRecurrentCancelPlainMessage() {
+	protected List<String> getRecurrentCancelPlainMessage() {
 		return getRecurrentPlainMessage("RENDEZ-VOUS RÉCURRENT ANNULÉ");
 	}
 
 	@Override
-	protected ArrayList<String> getRecurrentCancelHtmlMessage() {
+	protected List<String> getRecurrentCancelHtmlMessage() {
 		return getRecurrentHtmlMessage("Annulation d'un événement récurrent");
 	}
 
 	@Override
-	protected ArrayList<String> getChangeParticipationPlainMessage() {
+	protected List<String> getChangeParticipationPlainMessage() {
 		return Lists.newArrayList(
 				"PARTICIPATION : MISE A JOUR",
 				"Matthieu BAECHLER a accepté",
@@ -249,7 +249,7 @@ public class EventChangeMailerFRTest extends EventChangeMailerTest {
 	}
 	
 	@Override
-	protected ArrayList<String> getChangeParticipationHtmlMessage() {
+	protected List<String> getChangeParticipationHtmlMessage() {
 		return Lists.newArrayList(
 				"Participation : mise à jour ",
 				"Matthieu BAECHLER a accepté",

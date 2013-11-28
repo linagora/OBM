@@ -34,7 +34,6 @@ package org.obm.push.minig.imap.sieve;
 
 import java.io.InputStream;
 import java.net.SocketAddress;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -146,7 +145,7 @@ public class SieveClientSupport {
 		return cmd.getReceivedData();
 	}
 
-	public void setResponses(ArrayList<SieveResponse> copy) {
+	public void setResponses(List<SieveResponse> copy) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("in setResponses on "
 					+ Integer.toHexString(hashCode()));

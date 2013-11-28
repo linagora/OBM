@@ -33,7 +33,6 @@ package org.obm.push.utils.index;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -77,14 +76,14 @@ public class IndexUtilsTest {
 	@Test
 	public void testEmptyList() {
 		ImmutableList<Indexed<Integer>> emptyList = ImmutableList.of();
-		ArrayList<Integer> listIndexes = IndexUtils.listIndexes(emptyList);
+		List<Integer> listIndexes = IndexUtils.listIndexes(emptyList);
 		assertThat(listIndexes).isEmpty();
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void testNullList() {
 		@SuppressWarnings("unused")
-		ArrayList<Integer> listIndexes = IndexUtils.listIndexes((List<Indexed<Integer>>)null);
+		List<Integer> listIndexes = IndexUtils.listIndexes((List<Indexed<Integer>>)null);
 	}
 	
 	@Test(expected=NullPointerException.class)
@@ -92,14 +91,14 @@ public class IndexUtilsTest {
 		List<IntIndexed> list = Lists.newArrayList();
 		list.add(null);
 		@SuppressWarnings("unused")
-		ArrayList<Integer> listIndexes = IndexUtils.listIndexes(list);
+		List<Integer> listIndexes = IndexUtils.listIndexes(list);
 	}
 
 	@Test
 	public void testSimpleList() {
 		ImmutableList<IntIndexed> emptyList = 
 				ImmutableList.of(new IntIndexed(0), new IntIndexed(1), new IntIndexed(2));
-		ArrayList<Integer> listIndexes = IndexUtils.listIndexes(emptyList);
+		List<Integer> listIndexes = IndexUtils.listIndexes(emptyList);
 		assertThat(listIndexes).containsOnly(0, 1, 2);
 	}
 	

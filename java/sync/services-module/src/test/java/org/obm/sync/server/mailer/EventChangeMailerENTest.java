@@ -1,6 +1,7 @@
 package org.obm.sync.server.mailer;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import com.google.common.collect.Lists;
@@ -17,7 +18,7 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 		return Locale.ENGLISH;
 	}	
 
-	private ArrayList<String> getPlainMessage(String header) {
+	private List<String> getPlainMessage(String header) {
 		return Lists.newArrayList(
 				header,
 				"from          : Nov 8, 2010 11:00 AM", 
@@ -68,17 +69,17 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 	}	
 
 	@Override
-	protected ArrayList<String> getInvitationPlainMessage() {
+	protected List<String> getInvitationPlainMessage() {
 		return getPlainMessage("NEW APPOINTMENT");
 	}
 
 	@Override
-	protected ArrayList<String> getInvitationHtmlMessage() {
+	protected List<String> getInvitationHtmlMessage() {
 		return getHtmlMessage("New appointment");
 	}
 
 	@Override
-	protected ArrayList<String> getUpdatePlainMessage() {
+	protected List<String> getUpdatePlainMessage() {
 		return Lists.newArrayList(
 				"APPOINTMENT UPDATED !",
 				"from Nov 8, 2010 11:00 AM",
@@ -93,7 +94,7 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 	}
 
 	@Override
-	protected ArrayList<String> getUpdateHtmlMessage() {
+	protected List<String> getUpdateHtmlMessage() {
 		return Lists.newArrayList(
 				"Appointment updated",
 				"from Nov 8, 2010 11:00 AM",
@@ -108,7 +109,7 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 	}
 
 	@Override
-	protected ArrayList<String> getCancelPlainMessage() {
+	protected List<String> getCancelPlainMessage() {
 		return getPlainMessage("APPOINTMENT CANCELED");
 	}
 

@@ -34,6 +34,7 @@ package org.obm.push.minig.imap.impl;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.obm.push.mail.IMAPException;
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ public class StoreClientCallback implements IResponseCallback {
 			.getLogger(StoreClientCallback.class);
 
 	IMAPResponseParser rParser;
-	private final LinkedList<IMAPResponse> responses;
+	private final List<IMAPResponse> responses;
 	private ClientSupport client;
 
 	public StoreClientCallback() {

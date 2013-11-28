@@ -378,7 +378,7 @@ public class ResponseWindowingTest {
 				.build();
 	}
 	
-	private ArrayList<ItemChange> buildItemChangeList(int nbChanges, String serverIdPrefix, int offset) {
+	private List<ItemChange> buildItemChangeList(int nbChanges, String serverIdPrefix, int offset) {
 		ArrayList<ItemChange> changes = Lists.newArrayList();
 		for (int i = 0; i < nbChanges; ++i) {
 			changes.add(

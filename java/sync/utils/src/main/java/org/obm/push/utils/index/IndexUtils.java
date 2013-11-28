@@ -33,6 +33,7 @@ package org.obm.push.utils.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Function;
@@ -42,9 +43,9 @@ public class IndexUtils {
 
 	public static 
 		<T extends Number, I extends Indexed<T>, C extends Collection<I>> 
-			ArrayList<T> listIndexes(C objects) {
+			List<T> listIndexes(C objects) {
 		
-		ArrayList<T> indexes = new ArrayList<T>();
+		List<T> indexes = new ArrayList<T>();
 		for (Indexed<T> object: objects) {
 			indexes.add(object.getIndex());
 		}

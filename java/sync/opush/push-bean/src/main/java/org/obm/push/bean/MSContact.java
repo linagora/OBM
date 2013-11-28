@@ -116,7 +116,7 @@ public class MSContact implements IApplicationData, Serializable {
 		return categories;
 	}
 
-	public void setCategories(ArrayList<String> categories) {
+	public void setCategories(List<String> categories) {
 		this.categories = categories;
 	}
 
@@ -124,7 +124,7 @@ public class MSContact implements IApplicationData, Serializable {
 		return children;
 	}
 
-	public void setChildren(ArrayList<String> children) {
+	public void setChildren(List<String> children) {
 		this.children = children;
 	}
 

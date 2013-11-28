@@ -33,8 +33,8 @@ package fr.aliasource.obm.autoconf;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +63,7 @@ public class TemplateLoader {
 	}
 
 	public Document applyTemplate(LDAPAttributeSet attributeSet,
-			HashMap<String, String> servicesHostNames) throws IOException {
+			Map<String, String> servicesHostNames) throws IOException {
 		try {
 			Document doc = DOMUtils.parse(new FileInputStream(configXml));
 			generateXMLConfig(doc, attributeSet, servicesHostNames);
@@ -75,14 +75,14 @@ public class TemplateLoader {
 	}
 
 	private void generateXMLConfig(Document doc, LDAPAttributeSet attributeSet,
-			HashMap<String, String> servicesHostNames) {
+			Map<String, String> servicesHostNames) {
 
 		Element root = doc.getDocumentElement();
 		replaceInNode(attributeSet, servicesHostNames, root);
 	}
 
 	private void replaceInNode(LDAPAttributeSet attributeSet,
-			HashMap<String, String> servicesHostNames, Element root) {
+			Map<String, String> servicesHostNames, Element root) {
 		NodeList nl = root.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node n = nl.item(i);
@@ -144,7 +144,7 @@ public class TemplateLoader {
 	
 	@SuppressWarnings("rawtypes")
 	private String doAttributeExpansion(LDAPAttributeSet attributeSet,
-			HashMap<String, String> servicesHostNames, String line) {
+			Map<String, String> servicesHostNames, String line) {
 		if (attributeSet != null) {
 			Iterator iterator = attributeSet.iterator();
 			while (iterator.hasNext()) {
