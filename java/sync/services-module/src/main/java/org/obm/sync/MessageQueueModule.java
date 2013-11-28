@@ -77,6 +77,7 @@ public class MessageQueueModule extends AbstractModule {
 				.largeMessagesDirectory(dataDirectory + "/large-messages")
 				.bindingsDirectory(dataDirectory + "/bindings")
 				.journalDirectory(dataDirectory + "/journal")
+				.pagingDirectory(dataDirectory + "/paging")
 				.connector(HornetQConfiguration.Connector.HornetQInVMCore)
 				.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
 				.acceptor(HornetQConfiguration.Acceptor.Stomp)

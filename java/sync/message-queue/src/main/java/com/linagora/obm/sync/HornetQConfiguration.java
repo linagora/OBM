@@ -43,6 +43,7 @@ import org.hornetq.core.remoting.impl.invm.InVMConnectorFactory;
 import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
 import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.core.server.JournalType;
+import org.hornetq.core.settings.impl.AddressSettings;
 import org.hornetq.jms.server.config.ConnectionFactoryConfiguration;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.hornetq.jms.server.config.JMSQueueConfiguration;
@@ -122,6 +123,8 @@ public class HornetQConfiguration {
 	
 	public static class ConfigurationBuilder {
 		
+		private static final long DEFAULT_MAX_SIZE_BEFORE_PAGING = 10485760L;
+		private static final long DEFAULT_PAGING_SIZE = 1048576L;
 		private Boolean persistenceEnabled;
 		private Boolean securityEnabled;
 		private List<TransportConfiguration> connectors;
@@ -129,6 +132,7 @@ public class HornetQConfiguration {
 		private String largeMessagesDirectory;
 		private String bindingsDirectory;
 		private String journalDirectory;
+		private String pagingDirectory;
 		
 		private ConfigurationBuilder() {
 			connectors = Lists.newArrayList();
@@ -157,6 +161,11 @@ public class HornetQConfiguration {
 		
 		public ConfigurationBuilder journalDirectory(String journalDirectory) {
 			this.journalDirectory = journalDirectory;
+			return this;
+		}
+		
+		public ConfigurationBuilder pagingDirectory(String pagingDirectory) {
+			this.pagingDirectory = pagingDirectory;
 			return this;
 		}
 
@@ -195,6 +204,13 @@ public class HornetQConfiguration {
 			}
 			if (journalDirectory != null) {
 				configurationImpl.setJournalDirectory(journalDirectory);
+			}
+			if (pagingDirectory != null) {
+				configurationImpl.setPagingDirectory(pagingDirectory);
+				AddressSettings addressSettings = new AddressSettings();
+				addressSettings.setMaxSizeBytes(DEFAULT_MAX_SIZE_BEFORE_PAGING);
+				addressSettings.setPageSizeBytes(DEFAULT_PAGING_SIZE);
+				configurationImpl.setAddressesSettings(ImmutableMap.of("#", addressSettings));
 			}
 			configurationImpl.setConnectorConfigurations(listAsMap(connectors));
 			configurationImpl.setAcceptorConfigurations(ImmutableSet.copyOf(acceptors));
