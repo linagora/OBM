@@ -35,7 +35,7 @@ import java.math.BigInteger;
 
 public final class StringUtils {
 
-	public static final String stripChar(String s, char strip) {
+	public static String stripChar(String s, char strip) {
 		StringBuilder sb = new StringBuilder(s.length());
 
 		char[] chars = s.toCharArray();
@@ -48,7 +48,7 @@ public final class StringUtils {
 		return sb.toString();
 	}
 
-	public static final String stripAddressForbiddenChars(String s) {
+	public static String stripAddressForbiddenChars(String s) {
 		StringBuilder sb = new StringBuilder(s.length());
 
 		char[] chars = s.toCharArray();

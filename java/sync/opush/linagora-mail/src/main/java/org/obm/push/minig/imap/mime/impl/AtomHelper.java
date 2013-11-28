@@ -45,7 +45,7 @@ public final class AtomHelper {
 	private final static Logger logger = LoggerFactory
 			.getLogger(AtomHelper.class);
 
-	public static final String getFullResponse(String resp, InputStream followUp) {
+	public static String getFullResponse(String resp, InputStream followUp) {
 		String orig = resp;
 		byte[] envelData = null;
 		ByteArrayOutputStream out = new ByteArrayOutputStream(4096);

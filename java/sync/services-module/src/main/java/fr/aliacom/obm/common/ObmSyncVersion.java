@@ -39,7 +39,7 @@ import org.obm.sync.auth.MavenVersion;
 // DO NOT FORGET TO EDIT THIS FILE BEFORE TAG !
 public final class ObmSyncVersion {
 
-	public static final MavenVersion current() throws ObmSyncVersionNotFoundException {
+	public static MavenVersion current() throws ObmSyncVersionNotFoundException {
 		Package p = ObmSyncVersion.class.getPackage();
 		String version = p.getImplementationVersion();
 		if (version == null) {

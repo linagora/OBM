@@ -82,12 +82,12 @@ public final class DeletedEvent {
 	}
 
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		return Objects.hashCode(id, extId);
 	}
 	
 	@Override
-	public final boolean equals(Object object) {
+	public boolean equals(Object object) {
 		if (object instanceof DeletedEvent) {
 			DeletedEvent that = (DeletedEvent) object;
 			return Objects.equal(this.extId, that.extId)

@@ -179,7 +179,7 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 	}
 
 	@Override
-	public final boolean equals(Object other) {
+	public boolean equals(Object other) {
 		if (other instanceof EventChanges) {
 			EventChanges otherChanges = (EventChanges) other;
 			return Objects.equal(this.lastSync, otherChanges.lastSync)
@@ -191,7 +191,7 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 	}
 
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		return Objects.hashCode(this.lastSync, this.deletedEvents, this.participationUpdated,
 				this.updatedEvents);
 	}

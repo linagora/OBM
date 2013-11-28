@@ -99,12 +99,12 @@ public final class BodyPreference implements Serializable {
 	}
 	
 	@Override
-	public final int hashCode(){
+	public int hashCode(){
 		return Objects.hashCode(truncationSize, type, allOrNone);
 	}
 	
 	@Override
-	public final boolean equals(Object object){
+	public boolean equals(Object object){
 		if (object instanceof BodyPreference) {
 			BodyPreference that = (BodyPreference) object;
 			return Objects.equal(this.truncationSize, that.truncationSize)

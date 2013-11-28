@@ -124,7 +124,7 @@ public final class ParticipationChanges implements Serializable {
 	}
 	
 	@Override
-	public final boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 		if (obj instanceof ParticipationChanges) {
 			ParticipationChanges other = (ParticipationChanges) obj;
 			return Objects.equal(eventId, other.eventId)
@@ -136,7 +136,7 @@ public final class ParticipationChanges implements Serializable {
 	}
 	
 	@Override
-	public final int hashCode() {
+	public int hashCode() {
 		return Objects.hashCode(eventId, eventExtId, recurrenceId, attendees);
 	}
 	
