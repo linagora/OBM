@@ -52,7 +52,7 @@ import com.google.inject.name.Named;
 @Singleton
 public class LazyTransactionProvider implements TransactionProvider {
 	
-	private Supplier<BitronixTransactionManager> transactionManagerSupplier;
+	private final Supplier<BitronixTransactionManager> transactionManagerSupplier;
 	private BitronixTransactionManager transactionManager;
 
 	@Inject

@@ -46,12 +46,12 @@ import com.sun.mail.imap.IMAPStore;
 
 public class CountingImapStore extends ImapStoreImpl {
 
-	private ImapConnectionCounter counter;
+	private final ImapConnectionCounter counter;
 
 	@Singleton
 	public static class Factory implements ImapStore.Factory {
 
-		private ImapConnectionCounter counter;
+		private final ImapConnectionCounter counter;
 		private final EmailConfiguration emailConfiguration;
 		private final ImapMailBoxUtils imapMailBoxUtils;
 

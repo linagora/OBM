@@ -53,8 +53,8 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 public class ObmEventToMSEventByICSLoopConverter implements ObmEventToMSEventConverter {
 
 
-	private Ical4jHelper ical4j;
-	private ObmEventToMSEventConverter obmEventToMSEventConverter;
+	private final Ical4jHelper ical4j;
+	private final ObmEventToMSEventConverter obmEventToMSEventConverter;
 	
 	public ObmEventToMSEventByICSLoopConverter(Ical4jHelper ical4j) {
 		obmEventToMSEventConverter = new ObmEventToMSEventConverterImpl();

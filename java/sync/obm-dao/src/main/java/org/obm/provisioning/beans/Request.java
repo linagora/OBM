@@ -51,7 +51,7 @@ public class Request {
 
 		private String resourcePath;
 		private HttpVerb verb;
-		private ImmutableMap.Builder<String, String> params;
+		private final ImmutableMap.Builder<String, String> params;
 		private String body;
 
 		private Builder() {
@@ -91,10 +91,10 @@ public class Request {
 		}
 	}
 
-	private String resourcePath;
-	private HttpVerb verb;
-	private Map<String, String> params;
-	private String body;
+	private final String resourcePath;
+	private final HttpVerb verb;
+	private final Map<String, String> params;
+	private final String body;
 
 	private Request(String resourcePath, HttpVerb verb, Map<String, String> params, String body) {
 		this.resourcePath = resourcePath;

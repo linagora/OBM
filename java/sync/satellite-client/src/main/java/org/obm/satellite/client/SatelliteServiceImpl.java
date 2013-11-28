@@ -40,7 +40,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 @Singleton
 public class SatelliteServiceImpl implements SatelliteService {
 
-	private HttpClient client;
+	private final HttpClient client;
 
 	@Inject
 	private SatelliteServiceImpl(HttpClient client) {

@@ -35,9 +35,9 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class AuthorizationException extends Exception {
 
-		private String login;
-		private ObmDomain domain;
-		private Boolean technicalError;
+		private final String login;
+		private final ObmDomain domain;
+		private final Boolean technicalError;
 
 		public AuthorizationException(String login, ObmDomain domain, Boolean technicalError, Throwable cause) {
 			super(String.format("Unable to get authorizations for user %s at domain %s", login, domain.getName()), cause);

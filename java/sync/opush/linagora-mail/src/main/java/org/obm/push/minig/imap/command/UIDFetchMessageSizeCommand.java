@@ -46,7 +46,7 @@ public class UIDFetchMessageSizeCommand extends Command<List<Integer>> {
 	private final static String IMAP_COMMAND = "UID FETCH";
 	private final static String UID_FETCH_SUB_COMMAND = "UID RFC822.SIZE";
 	private final static String UID_FETCH_SUB_RESPONSE_PREFIX = "RFC822.SIZE ";
-	private long uid;
+	private final long uid;
 
 	public UIDFetchMessageSizeCommand(long uid) {
 		this.uid = uid;

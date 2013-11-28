@@ -44,7 +44,7 @@ import fr.aliacom.obm.common.session.SessionManagement;
 public abstract class SecureSyncHandler implements ISyncHandler {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	private SessionManagement sessions;
+	private final SessionManagement sessions;
 
 	protected SecureSyncHandler(SessionManagement sessionManagement) {
 		sessions = sessionManagement;

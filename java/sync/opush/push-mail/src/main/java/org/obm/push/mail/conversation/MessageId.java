@@ -34,7 +34,7 @@ package org.obm.push.mail.conversation;
 
 public class MessageId implements Comparable<MessageId>{
 
-	private long imapId;
+	private final long imapId;
 	private String smtpId;
 	private boolean read;
 	private boolean starred;

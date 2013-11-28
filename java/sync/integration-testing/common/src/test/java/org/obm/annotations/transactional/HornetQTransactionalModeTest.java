@@ -62,7 +62,7 @@ public class HornetQTransactionalModeTest {
 
 	public static class Module extends AbstractModule {
 		
-		private MessageQueueModule messageQueueModule;
+		private final MessageQueueModule messageQueueModule;
 
 		public Module() throws Exception {
 			messageQueueModule = new MessageQueueModule();

@@ -52,7 +52,7 @@ public class FreeBusyRequest {
 	private String owner;
 	private Date start;
 	private Date end;
-	private List<Attendee> attendees;
+	private final List<Attendee> attendees;
 
 	public FreeBusyRequest() {
 		attendees = new LinkedList<Attendee>();

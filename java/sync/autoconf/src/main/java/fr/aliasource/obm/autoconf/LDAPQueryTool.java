@@ -43,7 +43,7 @@ import com.novell.ldap.LDAPSearchResults;
 public class LDAPQueryTool {
 	private static final Logger logger = LoggerFactory.getLogger(LDAPQueryTool.class);
 
-	private DirectoryConfig dc;
+	private final DirectoryConfig dc;
 
 	public LDAPQueryTool(DirectoryConfig dc) {
 		this.dc = dc;

@@ -44,8 +44,8 @@ import javax.naming.NamingException;
 
 public class MemoryContext implements Context {
 
-	private HashMap<String, Object> store;
-	private String ctxName;
+	private final HashMap<String, Object> store;
+	private final String ctxName;
 
 	/**
 	 * @param string

@@ -39,7 +39,7 @@ public final class ListInfo {
 	private String name;
 
 	private boolean selectable;
-	private boolean createSubfolder;
+	private final boolean createSubfolder;
 
 	public ListInfo(String name, boolean selectable, boolean noInferiors) {
 		super();

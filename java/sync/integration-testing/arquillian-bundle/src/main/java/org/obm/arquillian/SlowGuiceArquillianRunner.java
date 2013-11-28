@@ -40,8 +40,8 @@ import org.obm.guice.GuiceRunnerDelegation;
 
 public class SlowGuiceArquillianRunner extends Arquillian {
 
-	private SlowFilterRunnerDelegation slowRunnerDelegate;
-	private GuiceRunnerDelegation guiceRunnerDelegate;
+	private final SlowFilterRunnerDelegation slowRunnerDelegate;
+	private final GuiceRunnerDelegation guiceRunnerDelegate;
 
 	public SlowGuiceArquillianRunner(Class<?> klass) throws InitializationError {
 		super(klass);

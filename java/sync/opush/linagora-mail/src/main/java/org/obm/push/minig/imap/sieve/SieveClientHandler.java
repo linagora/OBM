@@ -47,9 +47,9 @@ public class SieveClientHandler extends IoHandlerAdapter {
 	private static final Logger logger = LoggerFactory
 			.getLogger(SieveClientHandler.class);
 
-	private SieveResponseParser srp = new SieveResponseParser();
+	private final SieveResponseParser srp = new SieveResponseParser();
 
-	private SieveClientSupport cs;
+	private final SieveClientSupport cs;
 
 	private IoFilter getSieveFilter() {
 		ProtocolCodecFactory pcf = new SieveCodecFactory();

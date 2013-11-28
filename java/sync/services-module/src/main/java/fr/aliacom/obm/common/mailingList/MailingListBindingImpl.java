@@ -53,7 +53,7 @@ public class MailingListBindingImpl implements IMailingList {
 	private static final Logger logger = LoggerFactory
 			.getLogger(MailingListBindingImpl.class);
 
-	private MailingListHome mailingListHome;
+	private final MailingListHome mailingListHome;
 	
 	@Inject
 	protected MailingListBindingImpl(MailingListHome mailingListHome) {

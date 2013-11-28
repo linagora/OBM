@@ -37,9 +37,9 @@ import java.io.Serializable;
 public class QuotaInfo implements Serializable{
 
 	private static final long serialVersionUID = 7172033843599691627L;
-	private boolean enable;
-	private int usage;
-	private int limit;
+	private final boolean enable;
+	private final int usage;
+	private final int limit;
 	
 	public QuotaInfo(){
 		this.enable = false;

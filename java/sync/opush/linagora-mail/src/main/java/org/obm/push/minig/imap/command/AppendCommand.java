@@ -45,9 +45,9 @@ import com.google.common.base.Charsets;
 public class AppendCommand extends Command<Boolean> {
 
 	private final static String IMAP_COMMAND = "APPEND";
-	private Reader in;
-	private String mailbox;
-	private FlagsList flags;
+	private final Reader in;
+	private final String mailbox;
+	private final FlagsList flags;
 
 	public AppendCommand(String mailbox, Reader message, FlagsList flags) {
 		this.mailbox = mailbox;

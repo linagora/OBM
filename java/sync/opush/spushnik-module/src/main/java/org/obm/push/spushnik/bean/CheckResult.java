@@ -49,7 +49,7 @@ public class CheckResult {
 	
 	public static class Builder {
 		private CheckStatus checkStatus;
-		private Set<String> messages;
+		private final Set<String> messages;
 		
 		private Builder() {
 			messages = Sets.newHashSet();

@@ -57,7 +57,7 @@ import com.google.common.collect.Sets;
 public class UIDFetchFastCommand extends Command<Collection<FastFetch>> {
 
 	private final static String IMAP_COMMAND = "UID FETCH";
-	private ImapMessageSet imapMessageSet;
+	private final ImapMessageSet imapMessageSet;
 	DateFormat df;
 
 	public UIDFetchFastCommand(MessageSet messages) {

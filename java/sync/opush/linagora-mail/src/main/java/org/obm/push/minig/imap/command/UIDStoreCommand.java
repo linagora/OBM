@@ -40,9 +40,9 @@ import org.obm.push.minig.imap.impl.ImapMessageSet;
 public class UIDStoreCommand extends Command<Boolean> {
 
 	private final static String IMAP_COMMAND = "UID STORE";
-	private ImapMessageSet imapMessageSet;
-	private FlagsList fl;
-	private boolean set;
+	private final ImapMessageSet imapMessageSet;
+	private final FlagsList fl;
+	private final boolean set;
 
 	public UIDStoreCommand(MessageSet messages, FlagsList fl, boolean set) {
 		this.imapMessageSet = ImapMessageSet.wrap(messages);

@@ -87,7 +87,7 @@ import fr.aliacom.obm.utils.HelperService;
 public class AttendeeServiceJdbcImplTest {
 
 	public static class Env extends AbstractModule {
-		private IMocksControl mocksControl = createControl();
+		private final IMocksControl mocksControl = createControl();
 		
 		@Override
 		protected void configure() {

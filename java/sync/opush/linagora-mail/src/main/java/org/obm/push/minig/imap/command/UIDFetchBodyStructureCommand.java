@@ -49,7 +49,7 @@ import com.google.common.collect.ImmutableList;
 public class UIDFetchBodyStructureCommand extends Command<Collection<MimeMessage>> {
 
 	private final static String IMAP_COMMAND = "UID FETCH";
-	private ImapMessageSet imapMessageSet;
+	private final ImapMessageSet imapMessageSet;
 	private final BodyStructureParser bodyStructureParser;
 	private String bodyStructure;
 

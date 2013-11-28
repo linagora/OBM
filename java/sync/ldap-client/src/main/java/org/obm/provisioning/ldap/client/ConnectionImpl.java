@@ -82,8 +82,8 @@ public class ConnectionImpl implements Connection {
 	private final Configuration configuration;
 	
 	private LdapConnection connection;
-	private AtomicInteger requestCounter;
-	private LdapConnectionConfig connectionConfig;
+	private final AtomicInteger requestCounter;
+	private final LdapConnectionConfig connectionConfig;
 
 	protected ConnectionImpl(Configuration configuration, LdapConnectionConfig connectionConfig) throws org.obm.provisioning.ldap.client.exception.LdapException, ConnectionException {
 		this.configuration = configuration;

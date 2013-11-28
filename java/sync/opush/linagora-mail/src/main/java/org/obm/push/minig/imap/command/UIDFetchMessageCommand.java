@@ -47,7 +47,7 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 
 	private final static String IMAP_COMMAND = "UID FETCH";
 	private final static String IMAP_SUB_COMMAND = "UID BODY.PEEK[]";
-	private long uid;
+	private final long uid;
 
 	public UIDFetchMessageCommand(long uid) {
 		this.uid = uid;

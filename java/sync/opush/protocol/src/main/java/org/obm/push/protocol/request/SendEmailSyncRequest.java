@@ -123,15 +123,15 @@ public class SendEmailSyncRequest implements ActiveSyncRequest {
 		}
 	}
 	
-	private Map<String, String> parameters;
-	private InputStream inputStream;
-	private Map<String, String> headers;
-	private DeviceId deviceId;
-	private String deviceType;
-	private String userAgent;
-	private String command;
-	private String msPolicyKey;
-	private String mSASProtocolVersion;
+	private final Map<String, String> parameters;
+	private final InputStream inputStream;
+	private final Map<String, String> headers;
+	private final DeviceId deviceId;
+	private final String deviceType;
+	private final String userAgent;
+	private final String command;
+	private final String msPolicyKey;
+	private final String mSASProtocolVersion;
 	
 	private SendEmailSyncRequest(Map<String, String> parameters, 
 		InputStream inputStream, 

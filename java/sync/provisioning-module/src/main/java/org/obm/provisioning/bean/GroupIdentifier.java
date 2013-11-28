@@ -66,8 +66,8 @@ public class GroupIdentifier {
 		}
 	}
 
-	private GroupExtId id;
-	private String url;
+	private final GroupExtId id;
+	private final String url;
 	
 	private GroupIdentifier(GroupExtId id, String url) {
 		this.id = id;

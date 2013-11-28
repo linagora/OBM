@@ -36,14 +36,14 @@ import com.google.common.base.CharMatcher;
 class EncoderHandler extends DefaultHandler {
 	
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	private WbxmlEncoder we;
-	private ByteArrayOutputStream buf;
-	private String defaultNamespace;
+	private final WbxmlEncoder we;
+	private final ByteArrayOutputStream buf;
+	private final String defaultNamespace;
 	private String currentXmlns;
 	private StringBuilder currentCharacter;
 
-	private Stack<String> stackedStarts;
-	private Stack<Boolean> currentNodeHasSubnodes;
+	private final Stack<String> stackedStarts;
+	private final Stack<Boolean> currentNodeHasSubnodes;
 	
 	public EncoderHandler(WbxmlEncoder we, ByteArrayOutputStream buf,
 			String defaultNamespace) throws IOException {

@@ -154,9 +154,9 @@ public class GreenMailExternalProcess extends JavaExternalProcess {
 			System.out.println(STARTED_TAG);
 		}
 		
-		private GreenMail greenMail;
-		private String mailbox;
-		private String password;
+		private final GreenMail greenMail;
+		private final String mailbox;
+		private final String password;
 		
 		private GreenMailStandalone(String[] args) {
 			Preconditions.checkArgument(args.length == 2, String.format(

@@ -68,7 +68,7 @@ import freemarker.template.TemplateException;
 public class ErrorMailer extends AbstractMailer {
 
 	private final static int INTERVAL_BETWEEN_NOTIFICATION = 6;
-	private ConcurrentMap<String, Date> lastNotificationDateByUser;
+	private final ConcurrentMap<String, Date> lastNotificationDateByUser;
 	
 	@Inject
 	protected ErrorMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader) {

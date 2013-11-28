@@ -48,8 +48,8 @@ public final class DatabaseMetadataServiceImpl implements DatabaseMetadataServic
 	private static final Logger logger = LoggerFactory
 			.getLogger(DatabaseMetadataServiceImpl.class);
 	
-	private LoadingCache<String, TableDescription> cache;
-	private DatabaseMetadataDao metadataDao;
+	private final LoadingCache<String, TableDescription> cache;
+	private final DatabaseMetadataDao metadataDao;
 	
 	@Inject
 	@VisibleForTesting DatabaseMetadataServiceImpl(DatabaseMetadataDao metadataDao) {

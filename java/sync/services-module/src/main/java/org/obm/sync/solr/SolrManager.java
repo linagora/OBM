@@ -66,7 +66,7 @@ public class SolrManager implements LifecycleListener {
 	private boolean solrAvailable;
 	private Timer checker;
 	private int solrCheckingInterval;
-	private CommandConverter commandConverter;
+	private final CommandConverter commandConverter;
 	private CommonsHttpSolrServer failingSolrServer;
 
 	private final Connection jmsConnection;

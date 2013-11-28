@@ -40,7 +40,7 @@ public class XMLSplitterIterator implements Iterator<String> {
 	
 	private Boolean hasMoreElement;
 	private String nextElement;
-	private XMLInputStreamSplitter splitter;
+	private final XMLInputStreamSplitter splitter;
 
 	public XMLSplitterIterator(XMLInputStreamSplitter splitter) {
 		this.splitter = splitter;

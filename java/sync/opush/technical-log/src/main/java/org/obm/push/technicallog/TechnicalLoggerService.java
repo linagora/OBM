@@ -54,8 +54,8 @@ public class TechnicalLoggerService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(TechnicalLoggerService.class);
 
-	private Logger technicalLogger;
-	private RequestStore requestStore;
+	private final Logger technicalLogger;
+	private final RequestStore requestStore;
 	
 	@Inject
 	@VisibleForTesting TechnicalLoggerService(@Named(TechnicalLoggingModule.TECHNICAL_LOG)Logger technicalLogger, RequestStore requestStore) {

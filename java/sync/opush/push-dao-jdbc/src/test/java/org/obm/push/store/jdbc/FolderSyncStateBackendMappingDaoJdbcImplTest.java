@@ -53,7 +53,7 @@ public class FolderSyncStateBackendMappingDaoJdbcImplTest extends FolderSyncStat
 	
 	public static class Env extends DaoTestModule {
 		
-		private Iterator<Date> dateProviderValues;
+		private final Iterator<Date> dateProviderValues;
 
 		public Env() {
 			dateProviderValues = FolderSyncStateBackendMappingDaoTest.EXPECTED_DATE_VALUES.iterator();

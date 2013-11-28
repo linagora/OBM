@@ -44,7 +44,7 @@ import org.junit.Ignore;
 @Ignore("It's necessary to do again all tests")
 public class SieveLoginTests extends SieveTestCase {
 
-	private SieveClient sc = null;
+	private final SieveClient sc = null;
 	
 	public void testConstructor() {
 		SieveClient sc = null;

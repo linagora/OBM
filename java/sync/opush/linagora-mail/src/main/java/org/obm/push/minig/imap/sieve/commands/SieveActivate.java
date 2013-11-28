@@ -41,7 +41,7 @@ import org.obm.push.minig.imap.sieve.SieveResponse;
 
 public class SieveActivate extends SieveCommand<Boolean> {
 
-	private String name;
+	private final String name;
 
 	public SieveActivate(String name) {
 		this.name = name;

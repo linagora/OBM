@@ -41,7 +41,7 @@ import com.google.inject.Singleton;
 
 public class CountingMinigStoreClient extends MinigStoreClientImpl {
 
-	private ImapConnectionCounter counter;
+	private final ImapConnectionCounter counter;
 
 	@Singleton
 	public static class Factory implements MinigStoreClient.Factory {

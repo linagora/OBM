@@ -41,7 +41,7 @@ import com.google.common.base.Charsets;
 
 public class Messages {
 
-	private ResourceBundle bundle;
+	private final ResourceBundle bundle;
 
 	public Messages(ConfigurationService configurationservice, Locale locale) {
 		bundle = configurationservice.getResourceBundle(locale);

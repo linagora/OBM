@@ -41,7 +41,7 @@ import org.obm.push.utils.xml.XmlCharacterFilter;
 
 public class HeadersParser {
 
-	private Map<String, String> parsedHeaders;
+	private final Map<String, String> parsedHeaders;
 	private String currentLine;
 	private StringBuilder currentValue;
 	private String currentKey;

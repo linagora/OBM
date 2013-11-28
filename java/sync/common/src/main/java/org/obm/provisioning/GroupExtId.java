@@ -38,7 +38,7 @@ import com.google.common.base.Objects;
  * Represents a group external id
  */
 public class GroupExtId {
-    private String id;
+    private final String id;
 
     public static GroupExtId valueOf(String id) {
         return new GroupExtId(id);

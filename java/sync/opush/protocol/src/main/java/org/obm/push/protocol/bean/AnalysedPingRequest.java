@@ -49,7 +49,7 @@ public class AnalysedPingRequest implements Serializable {
 	
 	public static class Builder {
 		private Long heartbeatInterval;
-		private ImmutableSet.Builder<AnalysedSyncCollection> syncCollectionBuilder;
+		private final ImmutableSet.Builder<AnalysedSyncCollection> syncCollectionBuilder;
 		
 		private Builder() {
 			super();

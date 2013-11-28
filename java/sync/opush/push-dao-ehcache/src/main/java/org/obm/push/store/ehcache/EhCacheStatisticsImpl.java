@@ -135,9 +135,9 @@ public class EhCacheStatisticsImpl implements EhCacheStatistics {
 		
 		public static class Builder {
 			
-			private ImmutableList.Builder<Timestamped<Long>> gets;
-			private ImmutableList.Builder<Timestamped<Long>> puts;
-			private ImmutableList.Builder<Timestamped<Long>> removes;
+			private final ImmutableList.Builder<Timestamped<Long>> gets;
+			private final ImmutableList.Builder<Timestamped<Long>> puts;
+			private final ImmutableList.Builder<Timestamped<Long>> removes;
 			
 			public Builder() {
 				gets = ImmutableList.builder();

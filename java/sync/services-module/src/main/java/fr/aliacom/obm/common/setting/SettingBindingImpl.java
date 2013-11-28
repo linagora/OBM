@@ -55,7 +55,7 @@ public class SettingBindingImpl implements ISetting {
 	private static final Logger logger = LoggerFactory
 			.getLogger(SettingBindingImpl.class);
 
-	private SettingDao settingDao;
+	private final SettingDao settingDao;
 
 	private final UserService userService;
 

@@ -53,8 +53,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class HostLocationServlet extends HttpServlet {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
-	private LocatorDbHelper locatorDbHelper;
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final LocatorDbHelper locatorDbHelper;
 	
 	@Inject
 	protected HostLocationServlet(LocatorDbHelper locatorDbHelper) {

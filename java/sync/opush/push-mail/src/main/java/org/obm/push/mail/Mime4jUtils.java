@@ -78,8 +78,8 @@ public class Mime4jUtils {
 	public final static String SUBTYPE_MULTIPART_MIXED = "mixed";
 	public final static String TYPE_MULTIPART_MIXED = "multipart/mixed";
 	
-	private MessageBuilder messageBuilder;
-	private MessageWriter messageWriter;
+	private final MessageBuilder messageBuilder;
+	private final MessageWriter messageWriter;
 
 	public Mime4jUtils() {
 		MessageServiceFactoryImpl messageServiceFactory = new MessageServiceFactoryImpl();

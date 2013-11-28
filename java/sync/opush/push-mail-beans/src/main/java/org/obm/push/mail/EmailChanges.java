@@ -61,9 +61,9 @@ public class EmailChanges implements Serializable {
 	
 	public static class Builder {
 	
-		private Set<Email> additions;
-		private Set<Email> changes;
-		private Set<Email> deletions;
+		private final Set<Email> additions;
+		private final Set<Email> changes;
+		private final Set<Email> deletions;
 		
 		private Builder() {
 			super();

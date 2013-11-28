@@ -49,8 +49,8 @@ public class CyrusManagerImpl implements CyrusManager {
 
 	public static class Factory implements CyrusManager.Factory {
 
-		private Connection.Factory connectionFactory;
-		private StoreClient.Factory storeClientFactory;
+		private final Connection.Factory connectionFactory;
+		private final StoreClient.Factory storeClientFactory;
 
 		@Inject
 		public Factory(Connection.Factory connectionFactory, StoreClient.Factory storeClientFactory) {
@@ -67,7 +67,7 @@ public class CyrusManagerImpl implements CyrusManager {
 		
 	}
 
-	private Connection conn;
+	private final Connection conn;
 
 	private CyrusManagerImpl(Connection conn) {
 		this.conn = conn;

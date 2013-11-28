@@ -51,7 +51,7 @@ import fr.aliacom.obm.utils.LogUtils;
  */
 public class UserHandler extends SecureSyncHandler {
 
-	private CalendarBindingImpl binding;
+	private final CalendarBindingImpl binding;
 
 	@Inject
 	public UserHandler(SessionManagement sessionManagement, CalendarBindingImpl calendarBindingImpl) {

@@ -153,7 +153,7 @@ public abstract class SyncCollectionCommands<T extends SyncCollectionCommand> im
 	}
 	
 	public abstract static class Builder<T extends SyncCollectionCommand, C extends SyncCollectionCommands<?>> {
-		private ImmutableList.Builder<T> commandsBuilder;
+		private final ImmutableList.Builder<T> commandsBuilder;
 
 		private Builder() {
 			super();

@@ -48,7 +48,7 @@ public class UIDFetchFlagsCommand extends Command<Map<Long, FlagsList>> {
 
 	private final static String IMAP_COMMAND = "UID FETCH";
 	private final static String IMAP_SUB_COMMAND = "UID FLAGS";
-	private ImapMessageSet imapMessageSet;
+	private final ImapMessageSet imapMessageSet;
 
 	public UIDFetchFlagsCommand(MessageSet messages) {
 		this.imapMessageSet = ImapMessageSet.wrap(messages);

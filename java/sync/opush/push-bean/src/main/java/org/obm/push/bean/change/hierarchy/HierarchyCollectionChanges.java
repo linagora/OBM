@@ -44,8 +44,8 @@ public class HierarchyCollectionChanges {
 	}
 	
 	public static class Builder {
-		private List<CollectionChange> changes;
-		private List<CollectionDeletion> deletions;
+		private final List<CollectionChange> changes;
+		private final List<CollectionDeletion> deletions;
 
 		private Builder() {
 			changes = Lists.newArrayList();

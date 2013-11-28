@@ -49,7 +49,7 @@ public class H2Initializer {
 
 	public static final String INITIAL_DB_SCRIPT = "dbInitialScript.sql";
 	
-	private DatabaseConnectionProvider connectionProvider;
+	private final DatabaseConnectionProvider connectionProvider;
 
 	@Inject
 	private H2Initializer(DatabaseConnectionProvider connectionProvider) {

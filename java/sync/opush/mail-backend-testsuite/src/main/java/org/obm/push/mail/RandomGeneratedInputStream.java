@@ -42,7 +42,7 @@ public class RandomGeneratedInputStream extends InputStream {
 	private static final int CRLF_SECOND_PART_END_LINE = 75;
 	private static final int CHARACTERS = 66;
 	
-	private long length;
+	private final long length;
 	private int cpt;
 
 	public RandomGeneratedInputStream(long length) {

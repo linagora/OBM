@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class CharsetMappings {
 
-	private Map<Integer, String> mibEnumToCharset;
+	private final Map<Integer, String> mibEnumToCharset;
 
 	public CharsetMappings() {
 		this.mibEnumToCharset = new HashMap<Integer, String>();

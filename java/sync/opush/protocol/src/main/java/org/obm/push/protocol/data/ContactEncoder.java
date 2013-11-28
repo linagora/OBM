@@ -46,7 +46,7 @@ import com.google.inject.Inject;
 
 public class ContactEncoder {
 
-	private SimpleDateFormat sdf;
+	private final SimpleDateFormat sdf;
 
 	@Inject
 	protected ContactEncoder() {

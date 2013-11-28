@@ -75,8 +75,8 @@ public class FreeBusyServlet extends HttpServlet {
 	private enum FreeBusyQueryType { LOCAL, REMOTE }
 	
 	private static final long serialVersionUID = -3887606350629311688L;
-	private Logger logger = LoggerFactory.getLogger(FreeBusyServlet.class);
-	private LocalFreeBusyProvider localFreeBusyProvider;
+	private final Logger logger = LoggerFactory.getLogger(FreeBusyServlet.class);
+	private final LocalFreeBusyProvider localFreeBusyProvider;
 	private Collection<RemoteFreeBusyProvider> remoteFreeBusyProviders;
 
 	@Inject

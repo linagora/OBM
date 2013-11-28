@@ -47,7 +47,7 @@ public class UIDSearchCommand extends Command<MessageSet> {
 	// Mon, 7 Feb 1994 21:52:25 -0800
 
 	private final static String IMAP_COMMAND = "UID SEARCH";
-	private SearchQuery sq;
+	private final SearchQuery sq;
 
 	public UIDSearchCommand(SearchQuery sq) {
 		this.sq = sq;

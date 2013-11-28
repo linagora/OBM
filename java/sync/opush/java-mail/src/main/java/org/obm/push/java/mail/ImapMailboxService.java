@@ -103,7 +103,7 @@ public class ImapMailboxService implements MailboxService {
 	private final ImapMailBoxUtils imapMailBoxUtils;
 	private final ICollectionPathHelper collectionPathHelper;
 	
-	private OpushImapFolderConnection opushImapFolderConnection;
+	private final OpushImapFolderConnection opushImapFolderConnection;
 	
 	@Inject
 	/* package */ ImapMailboxService(EmailConfiguration emailConfiguration, 

@@ -57,8 +57,8 @@ import fr.aliacom.obm.common.contact.UserDao;
 public class LDAPAuthService implements IAuthentificationService {
 
 	private static Logger logger =  LoggerFactory.getLogger(LDAPAuthService.class);
-	private LDAPAuthConfig authConfig;
-	private LDAPDirectory directory;
+	private final LDAPAuthConfig authConfig;
+	private final LDAPDirectory directory;
 	private final UserDao userDao;
 
 	@Inject

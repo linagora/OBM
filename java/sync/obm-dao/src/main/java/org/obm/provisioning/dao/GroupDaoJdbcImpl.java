@@ -75,7 +75,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
     /** The first group_gid to use. UI code assumes 1000 here */
     private final int firstGidUser = 1000;
 
-    private DatabaseConnectionProvider connectionProvider;
+    private final DatabaseConnectionProvider connectionProvider;
     private final UserDao userDao;
     private final ObmHelper obmHelper;
 

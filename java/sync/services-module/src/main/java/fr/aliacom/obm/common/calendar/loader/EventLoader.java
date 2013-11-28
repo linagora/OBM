@@ -36,8 +36,8 @@ public class EventLoader {
 		private Connection conn;
 		private String domainName;
 		private Calendar cal;
-		private Set<EventObmId> ids;
-		private Set<Integer> usingResources;
+		private final Set<EventObmId> ids;
+		private final Set<Integer> usingResources;
 		private EventObmId withAlertsFor;
 		private boolean withExceptions;
 		private SyncRange occurringBetween;
@@ -196,17 +196,17 @@ public class EventLoader {
 					"c.userobm_lastname AS creatorLastName",
 					"c.userobm_commonname AS creatorCommonName",
 					"c.userobm_email AS creatorEmail" });
-	private Connection conn;
-	private String domainName;
-	private Calendar cal;
-	private Set<EventObmId> ids;
-	private Date updatedAfter;
-	private Date updatedOrOccuringAfter;
-	private SyncRange occurringBetween;
-	private Set<Integer> usingResources;
-	private boolean withExceptions;
-	private EventObmId withAlertsFor;
-	private List<EventFilter> eventFilters;
+	private final Connection conn;
+	private final String domainName;
+	private final Calendar cal;
+	private final Set<EventObmId> ids;
+	private final Date updatedAfter;
+	private final Date updatedOrOccuringAfter;
+	private final SyncRange occurringBetween;
+	private final Set<Integer> usingResources;
+	private final boolean withExceptions;
+	private final EventObmId withAlertsFor;
+	private final List<EventFilter> eventFilters;
 
 	private EventLoader(Connection conn, String domainName, Calendar cal, Set<EventObmId> ids,
 			Date updatedAfter, Date updatedOrOccuringAfter, SyncRange occurringBetween,

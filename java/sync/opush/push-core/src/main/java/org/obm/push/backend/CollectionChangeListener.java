@@ -47,9 +47,9 @@ import com.google.common.collect.Sets;
 public class CollectionChangeListener implements
 		ICollectionChangeListener {
 
-	private UserDataRequest udr;
-	private Set<AnalysedSyncCollection> monitoredCollections;
-	private IContinuation continuation;
+	private final UserDataRequest udr;
+	private final Set<AnalysedSyncCollection> monitoredCollections;
+	private final IContinuation continuation;
 
 	public CollectionChangeListener(UserDataRequest udr,
 			IContinuation c, 

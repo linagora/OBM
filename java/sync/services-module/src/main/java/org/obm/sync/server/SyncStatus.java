@@ -51,9 +51,9 @@ public class SyncStatus {
 
 	private static final String TITLE = "OBM Sync Status";
 
-	private Logger logger =  LoggerFactory.getLogger(getClass());
+	private final Logger logger =  LoggerFactory.getLogger(getClass());
 
-	private Map<String, ISyncHandler> handlers;
+	private final Map<String, ISyncHandler> handlers;
 
 	@Inject
 	public SyncStatus(SyncHandlers handlers) {

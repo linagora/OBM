@@ -47,7 +47,7 @@ public class ContentType {
 	public static class Builder implements org.obm.push.bean.Builder<ContentType> {
 		private String primaryType = null;
 		private String subType = null;
-		private BodyParams.Builder bodyParamsBuilder;
+		private final BodyParams.Builder bodyParamsBuilder;
 		private String contentDisposition;
 		
 		private Builder() {

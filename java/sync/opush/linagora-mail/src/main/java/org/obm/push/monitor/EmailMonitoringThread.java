@@ -88,13 +88,13 @@ public class EmailMonitoringThread implements MonitoringService {
 	 * SynchronizedSet, all accesses should be synchronized
 	 */
 	protected MailboxService emailManager;
-	private UserDataRequest udr;
-	private String collectionPath;
+	private final UserDataRequest udr;
+	private final String collectionPath;
 	private Boolean remainConnected;  
 	private IdleClient store;
 	private final LinagoraImapClientProvider imapClientProvider;
 	private final PushMonitoringManager pushMonitorManager;
-	private String mailBoxName;
+	private final String mailBoxName;
 
 	public EmailMonitoringThread(
 			PushMonitoringManager pushMonitorManager,

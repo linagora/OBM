@@ -52,7 +52,7 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
 
 public class ObmSyncModule extends AbstractModule {
 	
-	private ServletContext servletContext;
+	private final ServletContext servletContext;
 	
 	public ObmSyncModule(ServletContext servletContext) {
 		this.servletContext = servletContext;

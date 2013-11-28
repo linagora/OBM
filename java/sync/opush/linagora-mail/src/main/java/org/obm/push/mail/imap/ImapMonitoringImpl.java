@@ -91,7 +91,7 @@ public class ImapMonitoringImpl implements MailMonitoringBackend {
 	private class Manager implements PushMonitoringManager {
 
 		private final Set<ICollectionChangeListener> registeredListeners;
-		private PushPublishAndSubscribe pushPublishAndSubscribe;
+		private final PushPublishAndSubscribe pushPublishAndSubscribe;
 
 		public Manager(Set<ICollectionChangeListener> registeredListeners) {
 			this.registeredListeners = registeredListeners;

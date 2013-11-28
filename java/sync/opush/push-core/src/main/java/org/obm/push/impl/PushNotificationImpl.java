@@ -36,7 +36,7 @@ import org.obm.push.service.PushNotification;
 
 public class PushNotificationImpl implements PushNotification {
 
-	private ICollectionChangeListener listener;
+	private final ICollectionChangeListener listener;
 
 	public PushNotificationImpl(ICollectionChangeListener listener) {
 		super();

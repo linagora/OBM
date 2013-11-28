@@ -54,8 +54,8 @@ import fr.aliasource.obm.utils.DOMUtils;
 public class TemplateLoader {
 	private static final Logger logger = LoggerFactory.getLogger(TemplateLoader.class);
 
-	private String configXml;
-	private ConstantService constants;
+	private final String configXml;
+	private final ConstantService constants;
 
 	public TemplateLoader(String configXml, ConstantService constants) {
 		this.configXml = configXml;

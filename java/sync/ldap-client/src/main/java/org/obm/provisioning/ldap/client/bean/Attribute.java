@@ -37,8 +37,8 @@ public class Attribute<T> {
 		return new Attribute<A>(name, value);
 	}
 
-	private String name;
-	private T value;
+	private final String name;
+	private final T value;
 
 	public Attribute(String name, T value) {
 		this.name = name;

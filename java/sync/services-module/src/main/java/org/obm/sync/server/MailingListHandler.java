@@ -48,8 +48,8 @@ import fr.aliacom.obm.common.session.SessionManagement;
 @Singleton
 public class MailingListHandler extends SecureSyncHandler {
 
-	private MailingListBindingImpl binding;
-	private MailingListItemsParser parser;
+	private final MailingListBindingImpl binding;
+	private final MailingListItemsParser parser;
 
 	@Inject
 	private MailingListHandler(SessionManagement sessionManagement, MailingListBindingImpl mailingListBindingImpl, MailingListItemsParser mailingListItemsParser) {

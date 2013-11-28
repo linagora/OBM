@@ -49,7 +49,7 @@ public class UserSystemDaoJdbcImpl implements UserSystemDao {
 
 	private static final String FIELDS = "usersystem_id, usersystem_login, usersystem_password";
 
-	private DatabaseConnectionProvider dbcp;
+	private final DatabaseConnectionProvider dbcp;
 
 	@Inject
 	private UserSystemDaoJdbcImpl(DatabaseConnectionProvider dbcp) {

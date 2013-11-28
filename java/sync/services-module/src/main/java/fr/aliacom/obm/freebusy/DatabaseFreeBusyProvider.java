@@ -53,9 +53,9 @@ import fr.aliacom.obm.common.user.UserService;
  */
 @Singleton
 public class DatabaseFreeBusyProvider implements LocalFreeBusyProvider {
-	private Ical4jHelper ical4jHelper;
-	private CalendarDao calendarDao;
-	private UserService userService;
+	private final Ical4jHelper ical4jHelper;
+	private final CalendarDao calendarDao;
+	private final UserService userService;
 
 	@Inject
 	/* package */DatabaseFreeBusyProvider(

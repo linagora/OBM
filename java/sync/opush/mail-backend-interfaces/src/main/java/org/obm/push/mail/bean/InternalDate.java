@@ -38,7 +38,7 @@ public class InternalDate extends Date {
 
 	private static final long serialVersionUID = -8557645090248136216L;
 
-	private long uid;
+	private final long uid;
 
 	public InternalDate(long uid, Date date){
 		super(date.getTime());

@@ -46,7 +46,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class MailErrorsMessages {
 
-	private ResourceBundle bundle;
+	private final ResourceBundle bundle;
 	
 	@Inject
 	private MailErrorsMessages(ConfigurationService configurationService) {

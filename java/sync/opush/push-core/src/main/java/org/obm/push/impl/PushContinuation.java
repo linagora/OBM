@@ -81,8 +81,8 @@ public class PushContinuation implements IContinuation {
 	private final static String KEY_ID_REQUEST = "key_id_request";
 	private final static String KEY_LAST_CONTINUATION_HANDLER = "key_last_continuation_handler";
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
-	private Continuation c;
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Continuation c;
 	
 	private PushContinuation(Continuation continuation) {
 		this.c = continuation;

@@ -42,7 +42,7 @@ public class FreeBusy {
 	private Date start;
 	private Date end;
 	private Attendee att;
-	private Set<FreeBusyInterval> freeBusyIntervals;
+	private final Set<FreeBusyInterval> freeBusyIntervals;
 
 	public FreeBusy() {
 		this.freeBusyIntervals = new HashSet<FreeBusyInterval>();

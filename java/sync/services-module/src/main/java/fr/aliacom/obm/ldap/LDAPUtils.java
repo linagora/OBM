@@ -47,11 +47,11 @@ import org.slf4j.LoggerFactory;
 
 public class LDAPUtils {
 
-	private Logger logger =  LoggerFactory.getLogger(LDAPUtils.class);
+	private final Logger logger =  LoggerFactory.getLogger(LDAPUtils.class);
 
-	private String baseDn;
+	private final String baseDn;
 
-	private Hashtable<String, String> env;
+	private final Hashtable<String, String> env;
 
 	public LDAPUtils(String uri, String rootDn, String rootPw, String baseDn) {
 		this.baseDn = baseDn;

@@ -46,11 +46,11 @@ public class SyncCollectionChange implements Serializable {
 
 	private static final long serialVersionUID = -3115614124120167390L;
 	
-	private String serverId;
-	private String clientId;
-	private SyncCommand command;
-	private PIMDataType type;
-	private IApplicationData data;
+	private final String serverId;
+	private final String clientId;
+	private final SyncCommand command;
+	private final PIMDataType type;
+	private final IApplicationData data;
 	
 	public SyncCollectionChange(String serverId, String clientId,
 			SyncCommand command, IApplicationData data, PIMDataType type) {

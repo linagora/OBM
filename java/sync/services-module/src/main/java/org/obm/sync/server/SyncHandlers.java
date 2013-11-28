@@ -48,7 +48,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class SyncHandlers {
 
-	private Map<String, ISyncHandler> handlers;
+	private final Map<String, ISyncHandler> handlers;
 
 	@Inject
 	private SyncHandlers(CalendarHandler calendarHandler, 

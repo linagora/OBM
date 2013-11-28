@@ -37,8 +37,8 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class PermissionsNotFoundException extends Exception {
 
-	private ProfileName profile;
-	private ObmDomain domain;
+	private final ProfileName profile;
+	private final ObmDomain domain;
 
 	public PermissionsNotFoundException(ProfileName profile, ObmDomain domain) {
 		super(String.format("No permissions found for profile %s on domain %s", profile.getName(), domain.getName()));

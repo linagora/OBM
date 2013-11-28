@@ -43,7 +43,7 @@ public class WbxmlEncoder {
 	private SAXParser parser;
 	private Map<String, Integer> stringTable;
 	private ByteArrayOutputStream buf;
-	private String defaultNamespace;
+	private final String defaultNamespace;
 
 	/**
 	 * The constructor creates an internal document handler. The given parser is

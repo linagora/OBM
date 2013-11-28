@@ -64,13 +64,13 @@ public class WbxmlParser {
 	private String[] attrStartTable;
 	private String[] attrValueTable;
 	private String[] tagTable;
-	private Map<Integer, String[]> tagsTables;
-	private Map<Integer, String[]> attrStarTables;
-	private Map<Integer, String[]> attrValueTables;
+	private final Map<Integer, String[]> tagsTables;
+	private final Map<Integer, String[]> attrStarTables;
+	private final Map<Integer, String[]> attrValueTables;
 	private char[] stringTable;
 
 	private int publicIdentifierId;
-	private Vector<String> stack = new Vector<String>();
+	private final Vector<String> stack = new Vector<String>();
 
 	private String docCharset;
 

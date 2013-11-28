@@ -43,7 +43,7 @@ import com.google.inject.Singleton;
 
 public class CountingStoreClient extends StoreClientImpl {
 
-	private ImapConnectionCounter counter;
+	private final ImapConnectionCounter counter;
 
 	@Singleton
 	public static class Factory extends StoreClientImpl.Factory {

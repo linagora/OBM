@@ -46,7 +46,7 @@ import com.google.common.collect.Iterables;
 
 public class Request {
 
-	private HttpServletRequest req;
+	private final HttpServletRequest req;
 
 	private String handlerName;
 

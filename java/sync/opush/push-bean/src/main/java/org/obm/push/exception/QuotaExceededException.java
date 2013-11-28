@@ -34,7 +34,7 @@ package org.obm.push.exception;
 
 public class QuotaExceededException extends Exception {
 
-	private int quota;
+	private final int quota;
 	private final byte[] loadedData; 
 	
 	public QuotaExceededException(String message, int quota, byte[] loadedData) {

@@ -56,8 +56,8 @@ public class SyncClientCommands {
 	
 	public static class Builder {
 		
-		private List<Add> adds;
-		private List<Change> changes;
+		private final List<Add> adds;
+		private final List<Change> changes;
 
 		private Builder() {
 			adds = Lists.newArrayList();
@@ -194,8 +194,8 @@ public class SyncClientCommands {
 		}
 	}
 	
-	private List<Add> adds;
-	private List<Change> changes;
+	private final List<Add> adds;
+	private final List<Change> changes;
 
 	private SyncClientCommands(List<Add> adds, List<Change> changes) {
 		this.adds = adds;

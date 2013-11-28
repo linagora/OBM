@@ -38,8 +38,8 @@ import org.obm.push.backend.IListenerRegistration;
 
 public class ListenerRegistration implements IListenerRegistration {
 
-	private ICollectionChangeListener ccl;
-	private Set<ICollectionChangeListener> registered;
+	private final ICollectionChangeListener ccl;
+	private final Set<ICollectionChangeListener> registered;
 
 	public ListenerRegistration(ICollectionChangeListener ccl,
 			Set<ICollectionChangeListener> registered) {

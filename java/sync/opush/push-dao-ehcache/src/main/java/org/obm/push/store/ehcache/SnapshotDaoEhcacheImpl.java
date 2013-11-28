@@ -51,7 +51,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class SnapshotDaoEhcacheImpl extends AbstractEhcacheDao implements SnapshotDao {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Inject  SnapshotDaoEhcacheImpl(StoreManager objectStoreManager, CacheEvictionListener cacheEvictionListener) {
 		super(objectStoreManager, cacheEvictionListener);

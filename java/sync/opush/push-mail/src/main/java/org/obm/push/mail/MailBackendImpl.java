@@ -146,7 +146,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 							EmailConfiguration.IMAP_SENT_NAME, FolderType.DEFAULT_SENT_EMAIL_FOLDER,
 							EmailConfiguration.IMAP_TRASH_NAME, FolderType.DEFAULT_DELETED_ITEMS_FOLDER);
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final MailboxService mailboxService;
 	private final Mime4jUtils mime4jUtils;
@@ -161,7 +161,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	private final SmtpSender smtpSender;
 
 
-	private EmailConfiguration emailConfiguration;
+	private final EmailConfiguration emailConfiguration;
 
 
 	@Inject

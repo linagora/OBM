@@ -61,7 +61,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 public class DomainDaoTest {
 	
 	public static class Env extends AbstractModule {
-		private IMocksControl mocksControl = createControl();
+		private final IMocksControl mocksControl = createControl();
 
 		@Override
 		protected void configure() {

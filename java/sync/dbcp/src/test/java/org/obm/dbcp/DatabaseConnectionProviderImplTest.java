@@ -63,6 +63,7 @@ import com.google.common.collect.ImmutableSet;
 @RunWith(SlowFilterRunner.class)
 public class DatabaseConnectionProviderImplTest {
 	
+
 	private DatabaseConnectionProviderImpl testee;
 	private ITransactionAttributeBinder transactionAttributeBinder;
 	private DatabaseConfiguration databaseConfiguration;

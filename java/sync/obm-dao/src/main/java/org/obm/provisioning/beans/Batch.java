@@ -113,7 +113,7 @@ public class Batch {
 		private Date timecreate;
 		private Date timecommit;
 		private ObmDomain domain;
-		private Map<Operation.Id, Operation> operations;
+		private final Map<Operation.Id, Operation> operations;
 
 		private Builder() {
 			operations = Maps.newLinkedHashMap();
@@ -175,12 +175,12 @@ public class Batch {
 
 	}
 
-	private Id id;
-	private BatchStatus status;
-	private Date timecreate;
-	private Date timecommit;
-	private ObmDomain domain;
-	private List<Operation> operations;
+	private final Id id;
+	private final BatchStatus status;
+	private final Date timecreate;
+	private final Date timecommit;
+	private final ObmDomain domain;
+	private final List<Operation> operations;
 
 	private Batch(Id id, BatchStatus status, Date timecreate, Date timecommit, ObmDomain domain, List<Operation> operations) {
 		this.id = id;

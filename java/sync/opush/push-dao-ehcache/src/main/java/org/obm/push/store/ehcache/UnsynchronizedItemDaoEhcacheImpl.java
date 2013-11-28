@@ -56,7 +56,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class UnsynchronizedItemDaoEhcacheImpl extends AbstractEhcacheDao implements UnsynchronizedItemDao {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Inject UnsynchronizedItemDaoEhcacheImpl(StoreManager objectStoreManager, CacheEvictionListener cacheEvictionListener) {
 		super(objectStoreManager, cacheEvictionListener);

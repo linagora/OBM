@@ -65,8 +65,8 @@ public class UserIdentifier {
 		}
 	}
 	
-	private UserExtId id;
-	private String url;
+	private final UserExtId id;
+	private final String url;
 	
 	private UserIdentifier(UserExtId id, String url) {
 		this.id = id;

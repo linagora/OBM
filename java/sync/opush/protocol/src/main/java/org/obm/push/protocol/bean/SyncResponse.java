@@ -52,7 +52,7 @@ public class SyncResponse {
 	
 	public static class Builder {
 		
-		private ImmutableList.Builder<SyncCollectionResponse> responsesBuilder;
+		private final ImmutableList.Builder<SyncCollectionResponse> responsesBuilder;
 		private SyncStatus status;
 		
 		private Builder() {

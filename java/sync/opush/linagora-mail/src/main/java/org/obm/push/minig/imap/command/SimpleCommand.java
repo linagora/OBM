@@ -35,7 +35,7 @@ package org.obm.push.minig.imap.command;
 
 public abstract class SimpleCommand<T> extends Command<T> {
 
-	private String command;
+	private final String command;
 
 	protected SimpleCommand(String cmd) {
 		this.command = cmd;

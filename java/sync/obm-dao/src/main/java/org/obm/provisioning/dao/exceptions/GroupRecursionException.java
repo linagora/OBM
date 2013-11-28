@@ -35,7 +35,7 @@ package org.obm.provisioning.dao.exceptions;
 import org.obm.provisioning.GroupExtId;
 
 public class GroupRecursionException extends Exception {
-    private GroupExtId extId, parentId;
+    private final GroupExtId extId, parentId;
 
     public GroupRecursionException(GroupExtId extId, GroupExtId parentId) {
         super("The group " + extId.getId() +

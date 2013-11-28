@@ -48,7 +48,7 @@ import com.google.common.base.Joiner;
  *            the type of the collection elements to insert.
  */
 public abstract class AbstractSQLCollectionHelper<V> {
-	private Collection<V> values;
+	private final Collection<V> values;
 
 	public AbstractSQLCollectionHelper(Collection<V> values) {
 		this.values = values;

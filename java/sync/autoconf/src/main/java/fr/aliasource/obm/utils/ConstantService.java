@@ -55,7 +55,7 @@ public class ConstantService {
 		return cs;
 	}
 
-	private Properties props;
+	private final Properties props;
 
 	private ConstantService() {
 		props = new Properties();

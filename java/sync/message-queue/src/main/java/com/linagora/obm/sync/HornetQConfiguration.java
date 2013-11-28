@@ -127,8 +127,8 @@ public class HornetQConfiguration {
 		private static final long DEFAULT_PAGING_SIZE = 1048576L;
 		private Boolean persistenceEnabled;
 		private Boolean securityEnabled;
-		private List<TransportConfiguration> connectors;
-		private List<TransportConfiguration> acceptors;
+		private final List<TransportConfiguration> connectors;
+		private final List<TransportConfiguration> acceptors;
 		private String largeMessagesDirectory;
 		private String bindingsDirectory;
 		private String journalDirectory;
@@ -237,7 +237,7 @@ public class HornetQConfiguration {
 	public static class AcceptorConfigurationBuilder {
 		
 		private Class<? extends AcceptorFactory> factory;
-		private Map<String, Object> params;
+		private final Map<String, Object> params;
 		private String name;
 		
 		private AcceptorConfigurationBuilder() {
@@ -273,7 +273,7 @@ public class HornetQConfiguration {
 	public static class ConnectorConfigurationBuilder {
 		
 		private Class<? extends ConnectorFactory> factory;
-		private Map<String, Object> params;
+		private final Map<String, Object> params;
 		private String name;
 		
 		private ConnectorConfigurationBuilder() {

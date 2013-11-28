@@ -51,10 +51,10 @@ public class ObmDomain implements Serializable {
 		private Integer id;
 		private String name;
 		private ObmDomainUuid uuid;
-		private ImmutableSet.Builder<String> aliases;
+		private final ImmutableSet.Builder<String> aliases;
 		private String label;
 		private Boolean global;
-		private ImmutableMultimap.Builder<ServiceProperty, ObmHost> hosts;
+		private final ImmutableMultimap.Builder<ServiceProperty, ObmHost> hosts;
 		
 		private Builder() {
 			aliases = ImmutableSet.builder();

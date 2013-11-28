@@ -68,10 +68,10 @@ public class Profile {
 		private Boolean managePeers;
 		private AccessRestriction accessRestriction;
 		private String accessExceptions;
-		private ImmutableSet.Builder<AdminRealm> adminRealms;
+		private final ImmutableSet.Builder<AdminRealm> adminRealms;
 		private Integer maxMailQuota;
 		private Integer defaultMailQuota;
-		private ImmutableMap.Builder<Module, ModuleCheckBoxStates> defaultCheckBoxStates;
+		private final ImmutableMap.Builder<Module, ModuleCheckBoxStates> defaultCheckBoxStates;
 
 		private Builder() {
 			defaultCheckBoxStates = ImmutableMap.builder();

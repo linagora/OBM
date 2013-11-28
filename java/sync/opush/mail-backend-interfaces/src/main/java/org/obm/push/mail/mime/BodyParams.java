@@ -50,7 +50,7 @@ public class BodyParams implements Iterable<BodyParam> {
 	
 	public static class Builder {
 	
-		private Map<String, BodyParam> params;
+		private final Map<String, BodyParam> params;
 		
 		private Builder() {
 			params = Maps.newHashMap();

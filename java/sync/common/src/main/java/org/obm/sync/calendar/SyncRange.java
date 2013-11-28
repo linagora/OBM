@@ -37,8 +37,8 @@ import com.google.common.base.Objects;
 
 public class SyncRange {
 	
-	private Date before;
-	private Date after;
+	private final Date before;
+	private final Date after;
 
 	public SyncRange(Date before, Date after) {
 		super();

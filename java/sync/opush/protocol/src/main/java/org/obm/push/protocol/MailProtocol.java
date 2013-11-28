@@ -56,7 +56,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class MailProtocol {
 	
-	private EmailConfiguration emailConfiguration;
+	private final EmailConfiguration emailConfiguration;
 	
 	@Inject
 	/*package*/ MailProtocol(EmailConfiguration emailConfiguration) {

@@ -76,11 +76,11 @@ public class Base64QueryString extends AbstractActiveSyncRequest {
 	
 	private final InputStream stream;
 	
-	private byte[] data;
-	private String protocolVersion;
-	private String deviceType;
+	private final byte[] data;
+	private final String protocolVersion;
+	private final String deviceType;
 	private DeviceId deviceId;
-	private int cmdCode;
+	private final int cmdCode;
 	private int policyKey;
 	
 	private String attachmentName;

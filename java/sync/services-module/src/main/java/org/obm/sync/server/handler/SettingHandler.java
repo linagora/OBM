@@ -55,7 +55,7 @@ import fr.aliacom.obm.common.setting.SettingBindingImpl;
 @Singleton
 public class SettingHandler extends SecureSyncHandler {
 
-	private SettingBindingImpl binding;
+	private final SettingBindingImpl binding;
 
 	@Inject
 	private SettingHandler(SessionManagement sessionManagement, SettingBindingImpl settingBindingImpl) {

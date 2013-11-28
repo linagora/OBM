@@ -58,11 +58,11 @@ public class SieveClientSupport {
 	private static final Logger logger = LoggerFactory
 			.getLogger(SieveClientSupport.class);
 
-	private Semaphore lock;
+	private final Semaphore lock;
 	private IoSession session;
-	private List<SieveResponse> lastResponses;
-	private SieveAuthenticate authenticate;
-	private NioSocketConnector socketConnector;
+	private final List<SieveResponse> lastResponses;
+	private final SieveAuthenticate authenticate;
+	private final NioSocketConnector socketConnector;
 
 	public SieveClientSupport(String login, String password) {
 		this.socketConnector = new NioSocketConnector();

@@ -47,7 +47,7 @@ public class PingResponse {
 	
 	public static class Builder {
 		private PingStatus pingStatus;
-		private ImmutableSet.Builder<SyncCollectionResponse> syncCollectionBuilder;
+		private final ImmutableSet.Builder<SyncCollectionResponse> syncCollectionBuilder;
 		
 		private Builder() {
 			super();

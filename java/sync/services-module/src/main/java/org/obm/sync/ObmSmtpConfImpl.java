@@ -41,7 +41,7 @@ import com.google.inject.Singleton;
 public class ObmSmtpConfImpl implements ObmSmtpConf {
 	
 	private static final int SMTP_DEFAULT_PORT = 25;
-	private LocatorService locatorService;
+	private final LocatorService locatorService;
 	
 	@Inject
 	private ObmSmtpConfImpl(LocatorService locatorService) {

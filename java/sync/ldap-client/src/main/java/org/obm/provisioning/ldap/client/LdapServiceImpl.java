@@ -39,7 +39,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class LdapServiceImpl implements LdapService {
 
-	private LdapManager.Factory ldapManagerFactory;
+	private final LdapManager.Factory ldapManagerFactory;
 	
 	@Inject
 	public LdapServiceImpl(LdapManager.Factory ldapManagerFactory) {

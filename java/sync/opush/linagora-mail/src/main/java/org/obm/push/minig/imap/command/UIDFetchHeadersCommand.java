@@ -53,8 +53,8 @@ public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 
 	private final static String IMAP_COMMAND = "UID FETCH";
 	private final static String IMAP_SUB_COMMAND = "UID BODY.PEEK[HEADER.FIELDS";
-	private ImapMessageSet imapMessageSet;
-	private String[] headers;
+	private final ImapMessageSet imapMessageSet;
+	private final String[] headers;
 
 	public UIDFetchHeadersCommand(Collection<Long> uid, String[] headers) {
 		MessageSet messageSet = MessageSet.builder().addAll(uid).build();

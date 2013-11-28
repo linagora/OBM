@@ -52,7 +52,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	
-	private Factory deviceFactory;
+	private final Factory deviceFactory;
 
 	@Inject
 	private DeviceDaoJdbcImpl(DatabaseConnectionProvider dbcp, Device.Factory deviceFactory) {

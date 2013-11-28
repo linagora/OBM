@@ -40,8 +40,8 @@ public class ClientInformations {
 
 	public static class Parser {
 		
-		private Pattern thunderbirdStringSplitter;
-		private Pattern connectorVersionPattern;
+		private final Pattern thunderbirdStringSplitter;
+		private final Pattern connectorVersionPattern;
 
 		public static class ParserException extends Exception {
 			public ParserException() {

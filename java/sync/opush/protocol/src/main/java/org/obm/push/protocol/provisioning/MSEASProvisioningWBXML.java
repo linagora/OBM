@@ -43,7 +43,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class MSEASProvisioningWBXML extends Policy {
 
-	private ProtocolVersion protocolVersion;
+	private final ProtocolVersion protocolVersion;
 
 	public MSEASProvisioningWBXML(ProtocolVersion protocolVersion) {
 		this.protocolVersion = protocolVersion;

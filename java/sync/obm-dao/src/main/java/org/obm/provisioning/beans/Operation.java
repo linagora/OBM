@@ -167,13 +167,13 @@ public class Operation {
 		}
 	}
 
-	private Id id;
-	private BatchStatus status;
-	private BatchEntityType entityType;
-	private Request request;
-	private String error;
-	private Date timecreate;
-	private Date timecommit;
+	private final Id id;
+	private final BatchStatus status;
+	private final BatchEntityType entityType;
+	private final Request request;
+	private final String error;
+	private final Date timecreate;
+	private final Date timecommit;
 
 	private Operation(Id id, BatchStatus status, BatchEntityType entityType, Request request, String error, Date timecreate, Date timecommit) {
 		this.id = id;

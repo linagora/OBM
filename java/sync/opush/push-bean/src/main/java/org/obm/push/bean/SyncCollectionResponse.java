@@ -109,8 +109,8 @@ public class SyncCollectionResponse extends AbstractSyncCollection<SyncCollectio
 
 	}
 	
-	private SyncStatus status;
-	private boolean moreAvailable;
+	private final SyncStatus status;
+	private final boolean moreAvailable;
 	
 	private SyncCollectionResponse(PIMDataType dataType, SyncKey syncKey, int collectionId,
 			SyncStatus status, boolean moreAvailable, SyncCollectionCommands.Response responses) {

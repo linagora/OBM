@@ -66,8 +66,8 @@ public class EqualsVerifierUtils {
 
 	public static class RedBlack<T> {
 		
-		private T red;
-		private T black;
+		private final T red;
+		private final T black;
 		
 		public RedBlack(T red, T black) {
 			this.red = red;

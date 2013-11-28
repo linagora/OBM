@@ -40,7 +40,7 @@ public class Dn {
 		return new Dn(dn);
 	}
 
-	private String dn;
+	private final String dn;
 
 	private Dn(String dn) {
 		this.dn = dn;

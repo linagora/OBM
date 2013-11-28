@@ -50,7 +50,7 @@ import com.google.inject.Inject;
 public class TableDescriptionTest {
 	public static class Env extends AbstractModule {
 
-		private IMocksControl control = createControl();
+		private final IMocksControl control = createControl();
 		
 		@Override
 		protected void configure() {

@@ -44,8 +44,8 @@ import com.google.common.cache.LoadingCache;
 
 public class KeyByRequestProvider implements	 BusinessKeyProvider<String> {
 	
-	private AtomicInteger counter = new AtomicInteger();
-	private LoadingCache<HttpServletRequest, String> requestKeyMapping;
+	private final AtomicInteger counter = new AtomicInteger();
+	private final LoadingCache<HttpServletRequest, String> requestKeyMapping;
 
 	public KeyByRequestProvider() {
 		requestKeyMapping = CacheBuilder.newBuilder().build(new CacheLoader<HttpServletRequest, String>() {

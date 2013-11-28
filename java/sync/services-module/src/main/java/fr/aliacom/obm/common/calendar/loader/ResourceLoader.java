@@ -21,8 +21,8 @@ import com.google.common.collect.Sets;
 public class ResourceLoader {
 
 	public static class Builder {
-		private Set<Integer> ids;
-		private Set<String> emails;
+		private final Set<Integer> ids;
+		private final Set<String> emails;
 		private Connection conn;
 
 		private Builder() {
@@ -62,9 +62,9 @@ public class ResourceLoader {
 		return new Builder();
 	}
 
-	private Connection conn;
-	private Set<Integer> ids;
-	private Set<String> emails;
+	private final Connection conn;
+	private final Set<Integer> ids;
+	private final Set<String> emails;
 
 	private ResourceLoader(Connection conn, Set<Integer> ids, Set<String> emails) {
 		this.conn = conn;

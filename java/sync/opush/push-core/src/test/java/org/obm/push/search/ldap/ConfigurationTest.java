@@ -55,7 +55,7 @@ import com.google.common.collect.ImmutableMap;
 @RunWith(SlowFilterRunner.class)
 public class ConfigurationTest {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private static final String FILE = "/etc/opush/ldap_conf.ini";
 	private static final String KEY_URL = "search.ldap.url";

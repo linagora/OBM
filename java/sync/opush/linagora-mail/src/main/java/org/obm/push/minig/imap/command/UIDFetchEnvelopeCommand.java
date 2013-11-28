@@ -63,7 +63,7 @@ import com.google.common.collect.ImmutableList;
 public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 
 	private final static String IMAP_COMMAND = "UID FETCH";
-	private ImapMessageSet imapMessageSet;
+	private final ImapMessageSet imapMessageSet;
 
 	public UIDFetchEnvelopeCommand(MessageSet messages) {
 		this.imapMessageSet = ImapMessageSet.wrap(messages);

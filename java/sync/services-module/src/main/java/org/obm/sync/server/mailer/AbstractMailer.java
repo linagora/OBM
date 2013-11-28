@@ -59,7 +59,7 @@ public abstract class AbstractMailer {
 	protected MailService mailService;
 	protected ITemplateLoader templateLoader;
 		
-	private ObmSyncConfigurationService constantService;
+	private final ObmSyncConfigurationService constantService;
 	
 	public static class NotificationException extends RuntimeException {
 		private static final long serialVersionUID = -7984056189522385977L;

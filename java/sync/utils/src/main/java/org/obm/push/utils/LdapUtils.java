@@ -53,8 +53,8 @@ public class LdapUtils {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private DirContext ctx;
-	private String baseDn;
+	private final DirContext ctx;
+	private final String baseDn;
 
 	public LdapUtils(DirContext ctx, String baseDn) {
 		this.ctx = ctx;

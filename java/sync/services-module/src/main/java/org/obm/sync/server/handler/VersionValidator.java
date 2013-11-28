@@ -43,9 +43,9 @@ import com.google.inject.Singleton;
 @Singleton
 public class VersionValidator {
 
-	private Version obmConnectorRequiredVersion;
-	private int linagoraVersion; 
-	private ClientInformations.Parser parser;
+	private final Version obmConnectorRequiredVersion;
+	private final int linagoraVersion; 
+	private final ClientInformations.Parser parser;
 
 	@Inject
 	protected VersionValidator(ClientInformations.Parser parser) {

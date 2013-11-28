@@ -42,7 +42,7 @@ import org.obm.push.utils.JDBCUtils;
 
 public class PGroupDaoJdbcImpl implements PGroupDao {
 
-	private DatabaseConnectionProvider dbcp;
+	private final DatabaseConnectionProvider dbcp;
 
 	@Inject
 	public PGroupDaoJdbcImpl(DatabaseConnectionProvider dbcp) {

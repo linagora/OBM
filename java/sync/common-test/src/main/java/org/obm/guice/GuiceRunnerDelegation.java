@@ -64,9 +64,9 @@ public class GuiceRunnerDelegation {
 	}
 
 	public static class GuiceStatement extends Statement { 
-		private Class<? extends Module> module;
-		private Object target;
-		private Statement next;
+		private final Class<? extends Module> module;
+		private final Object target;
+		private final Statement next;
 
 		public GuiceStatement(Class<? extends Module> module, Object target, Statement next) {
 			this.module = module;

@@ -41,7 +41,7 @@ public class UIDNextCommand extends Command<Long> {
 	private final static String IMAP_COMMAND = "UIDNEXT";
 	private final static String STATUS_COMMAND = "STATUS";
 	
-	private String mailbox;
+	private final String mailbox;
 
 	public UIDNextCommand(String mailbox) {
 		this.mailbox = mailbox;

@@ -55,7 +55,7 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 	private static final String EMAIL_CALENDAR_ENCODING_PARAMETER = "email-calendar-encoding";
 	private static final CalendarEncoding DEFAULT_EMAIL_CALENDAR_ENCODING = CalendarEncoding.Auto;
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	public static class Factory extends ConfigurationServiceImpl.Factory {
 		

@@ -38,7 +38,7 @@ import com.google.common.base.Preconditions;
 
 public class ItemChangeBuilder implements Builder<ItemChange> {
 	
-	private ItemChange itemChange;
+	private final ItemChange itemChange;
 	private boolean newIsDefined;
 	
 	public ItemChangeBuilder() {

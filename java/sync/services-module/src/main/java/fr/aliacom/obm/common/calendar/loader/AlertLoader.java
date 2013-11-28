@@ -54,9 +54,9 @@ public class AlertLoader {
 		return new Builder();
 	}
 
-	private Connection conn;
-	private Map<EventObmId, Event> eventsById;
-	private EventObmId userId;
+	private final Connection conn;
+	private final Map<EventObmId, Event> eventsById;
+	private final EventObmId userId;
 
 	private AlertLoader(Connection conn, Map<EventObmId, Event> eventsById, EventObmId userId) {
 		this.conn = conn;

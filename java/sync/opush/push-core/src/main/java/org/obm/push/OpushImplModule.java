@@ -98,7 +98,7 @@ public class OpushImplModule extends AbstractModule {
 			VMArgumentsUtils.integerArgumentValue("qosRejectingCeilPerClient"), 6);
 	
 	private static final String APPLICATION_ORIGIN = "o-push";
-	private GlobalAppConfiguration<ConfigurationService> globalAppConfiguration;
+	private final GlobalAppConfiguration<ConfigurationService> globalAppConfiguration;
 	
 	public OpushImplModule(GlobalAppConfiguration<ConfigurationService> globalAppConfiguration) {
 		this.globalAppConfiguration = globalAppConfiguration;

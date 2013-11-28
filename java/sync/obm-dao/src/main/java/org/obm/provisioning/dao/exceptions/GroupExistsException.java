@@ -35,7 +35,7 @@ package org.obm.provisioning.dao.exceptions;
 import org.obm.provisioning.GroupExtId;
 
 public class GroupExistsException extends Exception {
-    private GroupExtId extId;
+    private final GroupExtId extId;
 
     public GroupExistsException(GroupExtId extId) {
         super("The Group " + extId + " already exists");

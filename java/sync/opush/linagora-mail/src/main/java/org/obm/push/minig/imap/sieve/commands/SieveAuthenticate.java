@@ -43,9 +43,9 @@ import org.obm.push.minig.imap.sieve.SieveResponse;
 
 public class SieveAuthenticate extends SieveCommand<Boolean> {
 
-	private String login;
-	private String password;
-	private byte[] encoded;
+	private final String login;
+	private final String password;
+	private final byte[] encoded;
 
 	public SieveAuthenticate(String login, String password) {
 		this.login = login;

@@ -42,7 +42,7 @@ public class UIDValidityCommand extends Command<Long> {
 	private final static String IMAP_COMMAND = "UIDVALIDITY";
 	private final static String STATUS_COMMAND = "STATUS";
 	
-	private String mailbox;
+	private final String mailbox;
 
 	public UIDValidityCommand(String mailbox) {
 		this.mailbox = mailbox;

@@ -39,7 +39,7 @@ import org.obm.filter.SlowFilterRunner;
 
 public class SlowGuiceRunner extends SlowFilterRunner {
 
-	private GuiceRunnerDelegation guiceRunnerDelegation;
+	private final GuiceRunnerDelegation guiceRunnerDelegation;
 
 	public SlowGuiceRunner(Class<?> klass) throws InitializationError {
 		super(klass);

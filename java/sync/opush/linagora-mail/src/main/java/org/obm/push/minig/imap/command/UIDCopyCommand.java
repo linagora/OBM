@@ -39,8 +39,8 @@ import org.obm.push.minig.imap.impl.ImapMessageSet;
 public class UIDCopyCommand extends Command<MessageSet> {
 
 	private final static String IMAP_COMMAND = "UID COPY";
-	private ImapMessageSet imapMessageSet;
-	private String destMailbox;
+	private final ImapMessageSet imapMessageSet;
+	private final String destMailbox;
 
 	public UIDCopyCommand(MessageSet messages, String destMailbox) {
 		this.imapMessageSet = ImapMessageSet.wrap(messages);

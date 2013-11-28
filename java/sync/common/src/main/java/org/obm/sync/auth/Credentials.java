@@ -42,7 +42,7 @@ public class Credentials {
 	
 	public static class Builder {
 		
-		private Login.Builder loginBuilder;
+		private final Login.Builder loginBuilder;
 		private String password;
 		private Boolean hashedPassword;
 

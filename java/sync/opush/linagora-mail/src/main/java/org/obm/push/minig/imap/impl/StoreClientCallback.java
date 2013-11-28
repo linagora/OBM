@@ -45,7 +45,7 @@ public class StoreClientCallback implements IResponseCallback {
 			.getLogger(StoreClientCallback.class);
 
 	IMAPResponseParser rParser;
-	private LinkedList<IMAPResponse> responses;
+	private final LinkedList<IMAPResponse> responses;
 	private ClientSupport client;
 
 	public StoreClientCallback() {

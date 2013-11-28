@@ -37,7 +37,7 @@ import java.util.List;
 
 public class SieveMessage {
 	
-	private List<String> lines;
+	private final List<String> lines;
 	
 	public SieveMessage() {
 		lines = new LinkedList<String>();

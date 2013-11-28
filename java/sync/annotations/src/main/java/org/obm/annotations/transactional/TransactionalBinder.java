@@ -43,7 +43,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class TransactionalBinder implements ITransactionAttributeBinder {
 	private final TransactionProvider transactionProvider;
-	private Map<Transaction, Transactional> transactionAttributeCache;
+	private final Map<Transaction, Transactional> transactionAttributeCache;
 
 	@Inject
 	public TransactionalBinder(TransactionProvider transactionProvider) {

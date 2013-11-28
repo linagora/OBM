@@ -5,13 +5,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 public class ResourceInfo {
-	private int id;
-	private String name;
-	private String mail;
-	private String description;
-	private boolean read;
-	private boolean write;
-	private String domainName;
+	private final int id;
+	private final String name;
+	private final String mail;
+	private final String description;
+	private final boolean read;
+	private final boolean write;
+	private final String domainName;
 
 	public static class Builder {
 		private int id;

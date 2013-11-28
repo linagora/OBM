@@ -99,8 +99,8 @@ import fr.aliacom.obm.utils.HelperService;
 @RunWith(SlowGuiceRunner.class)
 public class LoginHandlerTest {
 
-	private ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
-	private ServletOutputStream servletOutputStream = new ServletOutputStream() {
+	private final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
+	private final ServletOutputStream servletOutputStream = new ServletOutputStream() {
 		@Override
 		public void write(int b) throws IOException {
 			resultStream.write(b);
@@ -289,7 +289,7 @@ public class LoginHandlerTest {
 	}
 
 	public static class Env extends AbstractModule {
-		private IMocksControl control = createControl();
+		private final IMocksControl control = createControl();
 		
 		private <T> T bindMock(Class<T> cls) {
 			T mock = control.createMock(cls);

@@ -14,7 +14,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class DeclinedAttendeeFilter implements EventFilter {
-	private Attendee declinedAttendee;
+	private final Attendee declinedAttendee;
 
 	public DeclinedAttendeeFilter(Attendee declinedAttendee) {
 		this.declinedAttendee = declinedAttendee;

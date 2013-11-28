@@ -55,9 +55,9 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 	
 	public static class Builder {
 		
-		private ImmutableSet.Builder<DeletedEvent> deletes;
-		private ImmutableSet.Builder<Event> updates;
-		private ImmutableSet.Builder<ParticipationChanges> participationChanges;
+		private final ImmutableSet.Builder<DeletedEvent> deletes;
+		private final ImmutableSet.Builder<Event> updates;
+		private final ImmutableSet.Builder<ParticipationChanges> participationChanges;
 		private Date lastSync;
 
 		private Builder() {

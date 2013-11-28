@@ -90,8 +90,8 @@ public class Group {
         private GroupExtId extId;
         private String name;
         private String description;
-        private ImmutableSet.Builder<ObmUser> users;
-        private ImmutableSet.Builder<Group> subgroups;
+        private final ImmutableSet.Builder<ObmUser> users;
+        private final ImmutableSet.Builder<Group> subgroups;
 
         private Builder() {
             this.users = ImmutableSet.builder();

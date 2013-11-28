@@ -47,7 +47,7 @@ public class ModuleCheckBoxStates {
 	public static class Builder {
 
 		private Module module;
-		private ImmutableMap.Builder<Right, CheckBoxState> checkBoxStates;
+		private final ImmutableMap.Builder<Right, CheckBoxState> checkBoxStates;
 
 		private Builder() {
 			this.checkBoxStates = ImmutableMap.builder();

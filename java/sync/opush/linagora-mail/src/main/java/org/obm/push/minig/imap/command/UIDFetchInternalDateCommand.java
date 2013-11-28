@@ -51,7 +51,7 @@ public class UIDFetchInternalDateCommand extends Command<Collection<InternalDate
 
 	private final static String IMAP_COMMAND = "UID FETCH";
 	private final static String IMAP_SUB_COMMAND = "UID INTERNALDATE";
-	private ImapMessageSet imapMessageSet;
+	private final ImapMessageSet imapMessageSet;
 	DateFormat df;
 
 	public UIDFetchInternalDateCommand(Collection<Long> uid) {

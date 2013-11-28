@@ -46,7 +46,7 @@ public class PingRequest {
 	
 	public static class Builder {
 		private Long heartbeatInterval;
-		private ImmutableSet.Builder<SyncCollectionRequest> syncCollectionBuilder;
+		private final ImmutableSet.Builder<SyncCollectionRequest> syncCollectionBuilder;
 		
 		private Builder() {
 			super();

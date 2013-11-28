@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 
 public class ClientHandler extends IoHandlerAdapter {
 	
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final IResponseCallback callback;
 	private SocketConnector socketConnector;
 

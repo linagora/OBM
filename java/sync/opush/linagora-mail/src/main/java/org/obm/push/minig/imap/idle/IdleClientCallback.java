@@ -51,10 +51,10 @@ public class IdleClientCallback implements IResponseCallback {
 	private static final Logger logger = LoggerFactory
 			.getLogger(IdleClientCallback.class);
 	
-	private LinkedList<IMAPResponse> responses;
+	private final LinkedList<IMAPResponse> responses;
 	private IIdleCallback observer;
-	private IdleResponseParser rParser;
-	private IMAPResponseParser imrParser;
+	private final IdleResponseParser rParser;
+	private final IMAPResponseParser imrParser;
 	private ClientSupport cs;
 	private Boolean isStart;
 

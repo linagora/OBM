@@ -38,7 +38,7 @@ import org.obm.push.minig.imap.StoreClient;
 
 public class ConnectionImpl implements Connection {
 
-	private StoreClient storeClient;
+	private final StoreClient storeClient;
 
 	public static class Factory implements Connection.Factory {
 		@Override

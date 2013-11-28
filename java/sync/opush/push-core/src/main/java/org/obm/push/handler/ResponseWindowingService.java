@@ -68,7 +68,7 @@ public class ResponseWindowingService {
 	}
 	
 	private static class WindowLogic<T extends ASItem> {
-		private Logger logger = LoggerFactory.getLogger(getClass());
+		private final Logger logger = LoggerFactory.getLogger(getClass());
 		private final Store<T> store;
 		private final ChangesMergePolicy<T> changesMergePolicy;
 		

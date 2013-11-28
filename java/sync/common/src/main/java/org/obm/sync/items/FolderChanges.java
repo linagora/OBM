@@ -93,7 +93,7 @@ public class FolderChanges {
 	
 	private Set<Folder> updated;
 	private Set<Folder> removed;
-	private Date lastSync;
+	private final Date lastSync;
 
 	public FolderChanges(Set<Folder> updated, Set<Folder> removed, Date lastSync) {
 		this.updated = updated;

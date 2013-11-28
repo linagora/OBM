@@ -43,8 +43,8 @@ public class MinaIMAPMessage {
 
 	private final static Logger logger = LoggerFactory.getLogger(MinaIMAPMessage.class);
 
-	private List<byte[]> frags;
-	private String messageLine;
+	private final List<byte[]> frags;
+	private final String messageLine;
 	public MinaIMAPMessage(String line) {
 		this.messageLine = line;
 		this.frags = new LinkedList<byte[]>();

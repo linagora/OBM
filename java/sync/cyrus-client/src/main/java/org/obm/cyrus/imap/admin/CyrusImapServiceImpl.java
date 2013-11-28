@@ -39,7 +39,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class CyrusImapServiceImpl implements CyrusImapService {
 
-	private CyrusManager.Factory managerFactory;
+	private final CyrusManager.Factory managerFactory;
 	
 	@Inject
 	public CyrusImapServiceImpl(CyrusManager.Factory managerFactory) {

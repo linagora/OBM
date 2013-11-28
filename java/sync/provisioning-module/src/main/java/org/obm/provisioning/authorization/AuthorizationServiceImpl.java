@@ -49,9 +49,9 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 @Singleton
 public class AuthorizationServiceImpl implements AuthorizationService {
 
-	private ProfileDao profileDao;
-	private PermissionDao permissionDao;
-	private DomainDao domainDao;
+	private final ProfileDao profileDao;
+	private final PermissionDao permissionDao;
+	private final DomainDao domainDao;
 	
 	@Inject
 	private AuthorizationServiceImpl(ProfileDao profileDao, PermissionDao roleDao, DomainDao domainDao) {

@@ -50,7 +50,7 @@ public class ContinuationIdStore {
 
 	public static class ContinuationId {
 
-		private long id;
+		private final long id;
 		
 		@VisibleForTesting ContinuationId(long id) {
 			this.id = id;
@@ -79,8 +79,8 @@ public class ContinuationIdStore {
 		
 	}
 	
-	private ConcurrentMap<ContinuationId, Continuation> continuationStore;
-	private AtomicLong atomicLong;
+	private final ConcurrentMap<ContinuationId, Continuation> continuationStore;
+	private final AtomicLong atomicLong;
 	private final QoSContinuationSupport continuationSupport;
 	
 	@Inject

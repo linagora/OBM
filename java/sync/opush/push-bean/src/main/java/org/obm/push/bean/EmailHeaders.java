@@ -63,7 +63,7 @@ public class EmailHeaders implements Iterable<EmailHeader> {
 		}
 	}
 	
-	private HashSet<EmailHeader> headers;
+	private final HashSet<EmailHeader> headers;
 
 	private EmailHeaders(List<EmailHeader> headers) {
 		this.headers = Sets.newHashSet(headers);

@@ -77,7 +77,7 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 public class AddressBookBindingImplTest {
 
 	public static class Env extends AbstractModule {
-		private IMocksControl mocksControl = createControl();
+		private final IMocksControl mocksControl = createControl();
 
 		@Override
 		protected void configure() {

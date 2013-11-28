@@ -128,9 +128,9 @@ public class AttendeeLoader {
 	// An attendee can be either an OBM user, a contact or a resource
 	private final static int ENTITY_TYPE_COUNT = 3;
 
-	private Connection conn;
-	private Map<EventObmId, Event> eventsById;
-	private String domainName;
+	private final Connection conn;
+	private final Map<EventObmId, Event> eventsById;
+	private final String domainName;
 
 	public AttendeeLoader(Connection conn, String domainName, Map<EventObmId, Event> eventsById) {
 		this.conn = conn;

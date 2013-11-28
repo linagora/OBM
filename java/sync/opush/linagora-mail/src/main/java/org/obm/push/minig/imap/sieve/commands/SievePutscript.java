@@ -45,7 +45,7 @@ import org.obm.push.utils.FileUtils;
 
 public class SievePutscript extends SieveCommand<Boolean> {
 
-	private String name;
+	private final String name;
 	private byte[] data;
 
 	public SievePutscript(String name, InputStream scriptContent) {

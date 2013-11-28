@@ -36,19 +36,19 @@ package fr.aliacom.obm.ldap;
  */
 public class LDAPDirectory {
 
-	private String uri;
+	private final String uri;
 
-	private String userPattern;
+	private final String userPattern;
 
-	private String rootDN;
+	private final String rootDN;
 
-	private String rootPW;
+	private final String rootPW;
 
-	private String matchField;
+	private final String matchField;
 
-	private String baseDN;
+	private final String baseDN;
 
-	private String obmDomain;
+	private final String obmDomain;
 
 	public LDAPDirectory(String uri, String userPattern, String rootDN,
 			String rootPW, String baseDN, String matchField, String obmDomain) {

@@ -24,7 +24,7 @@ public class EventExceptionLoader {
 		private Connection conn;
 		private String domainName;
 		private Calendar cal;
-		private Map<EventObmId, Event> parentEventsById;
+		private final Map<EventObmId, Event> parentEventsById;
 		private EventObmId withAlertsFor;
 
 		public Builder() {
@@ -117,11 +117,11 @@ public class EventExceptionLoader {
 					"c.userobm_email AS creatorEmail",
 					"ev_ex.eventexception_parent_id AS parent_id" });
 
-	private Connection conn;
-	private String domainName;
-	private Calendar cal;
-	private Map<EventObmId, Event> parentEventsById;
-	private EventObmId withAlertsFor;
+	private final Connection conn;
+	private final String domainName;
+	private final Calendar cal;
+	private final Map<EventObmId, Event> parentEventsById;
+	private final EventObmId withAlertsFor;
 
 	public EventExceptionLoader(Connection conn, String domainName, Calendar cal,
 			Map<EventObmId, Event> parentEventsById, EventObmId withAlertsFor) {

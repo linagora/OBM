@@ -43,7 +43,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public class PUserDaoJdbcImpl implements PUserDao {
 
-	private DatabaseConnectionProvider dbcp;
+	private final DatabaseConnectionProvider dbcp;
 
 	@Inject
 	public PUserDaoJdbcImpl(DatabaseConnectionProvider dbcp) {

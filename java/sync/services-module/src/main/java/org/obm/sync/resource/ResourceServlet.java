@@ -61,9 +61,9 @@ import fr.aliacom.obm.common.calendar.ResourceNotFoundException;
 @Singleton
 public class ResourceServlet extends HttpServlet {
 
-	private Logger logger = LoggerFactory.getLogger(ResourceServlet.class);
-	private ICalendar calendarBinding;
-	private Ical4jHelper ical4jHelper;
+	private final Logger logger = LoggerFactory.getLogger(ResourceServlet.class);
+	private final ICalendar calendarBinding;
+	private final Ical4jHelper ical4jHelper;
 
 	@Inject
 	@VisibleForTesting ResourceServlet(ICalendar calendarBinding, Ical4jHelper ical4jHelper) {

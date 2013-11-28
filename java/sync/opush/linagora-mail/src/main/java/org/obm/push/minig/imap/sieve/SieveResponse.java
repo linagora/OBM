@@ -34,7 +34,7 @@ package org.obm.push.minig.imap.sieve;
 
 public class SieveResponse {
 
-	private String data;
+	private final String data;
 
 	public SieveResponse(String data) {
 		this.data = data;

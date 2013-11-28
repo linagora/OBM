@@ -53,10 +53,10 @@ public class SieveClient {
 	private static final Logger logger = LoggerFactory
 			.getLogger(SieveClient.class);
 	
-	private String login;
-	private SieveClientSupport cs;
-	private String host;
-	private int port;
+	private final String login;
+	private final SieveClientSupport cs;
+	private final String host;
+	private final int port;
 	
 	public SieveClient(String hostname, int port, String loginAtDomain,
 			String password) {

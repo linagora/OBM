@@ -34,7 +34,7 @@ import fr.aliacom.obm.common.user.UserService;
 public class DatabaseFreeBusyProviderTest {
 
 	public static class Env extends AbstractModule {
-		private IMocksControl mocksControl = createControl();
+		private final IMocksControl mocksControl = createControl();
 		
 		@Override
 		protected void configure() {

@@ -53,7 +53,7 @@ public class TemplateLoaderFreeMarkerImpl implements ITemplateLoader {
 	private static final Logger logger = LoggerFactory
 			.getLogger(CalendarBindingImpl.class);
 
-	private ObmSyncConfigurationService constantService;
+	private final ObmSyncConfigurationService constantService;
 
 	@Inject
 	public TemplateLoaderFreeMarkerImpl(ObmSyncConfigurationService constantService) {

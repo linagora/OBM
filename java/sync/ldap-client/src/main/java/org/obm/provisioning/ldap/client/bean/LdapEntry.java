@@ -44,7 +44,7 @@ public class LdapEntry {
 
 	public static class Builder {
 		private Dn dn;
-		private ImmutableList.Builder<Attribute<?>> attributes;
+		private final ImmutableList.Builder<Attribute<?>> attributes;
 
 		private Builder() {
 			attributes = ImmutableList.builder();
@@ -71,8 +71,8 @@ public class LdapEntry {
 		return new Builder();
 	}
 
-	private Dn dn;
-	private ImmutableList<Attribute<?>> attributes;
+	private final Dn dn;
+	private final ImmutableList<Attribute<?>> attributes;
 
 	private LdapEntry(Dn dn, ImmutableList<Attribute<?>> attributes) {
 		this.dn = dn;

@@ -39,7 +39,7 @@ import org.junit.runners.model.InitializationError;
 
 public class SlowFilterRunner extends BlockJUnit4ClassRunner {
 
-	private SlowFilterRunnerDelegation delegate;
+	private final SlowFilterRunnerDelegation delegate;
 
 	public SlowFilterRunner(Class<?> klass) throws InitializationError {
 		super(klass);

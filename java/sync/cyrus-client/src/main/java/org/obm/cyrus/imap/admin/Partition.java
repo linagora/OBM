@@ -33,7 +33,7 @@ package org.obm.cyrus.imap.admin;
 
 public class Partition {
 
-	private String name;
+	private final String name;
 
 	public static Partition valueOf(String name) {
 		return new Partition(name);

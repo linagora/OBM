@@ -60,9 +60,9 @@ public class ExceptionLoader {
 		return new Builder();
 	}
 
-	private Connection conn;
-	private Calendar cal;
-	private Map<EventObmId, Event> parentEventsById;
+	private final Connection conn;
+	private final Calendar cal;
+	private final Map<EventObmId, Event> parentEventsById;
 
 	public ExceptionLoader(Connection conn, Calendar cal, Map<EventObmId, Event> parentEventsById) {
 		this.conn = conn;

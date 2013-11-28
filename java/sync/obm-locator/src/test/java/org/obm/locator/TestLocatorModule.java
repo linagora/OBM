@@ -50,8 +50,8 @@ import com.google.inject.util.Modules;
 
 public class TestLocatorModule extends AbstractModule {
 
-	private Configuration configuration;
-	private TestTransactionConfiguration transactionConfiguration;
+	private final Configuration configuration;
+	private final TestTransactionConfiguration transactionConfiguration;
 
 	public TestLocatorModule() {
 		configuration = new Configuration();

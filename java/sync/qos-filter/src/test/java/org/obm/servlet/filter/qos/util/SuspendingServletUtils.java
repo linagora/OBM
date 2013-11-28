@@ -42,7 +42,7 @@ import com.google.common.collect.Queues;
 public class SuspendingServletUtils {
 
 	private final SuspendingServlet suspendingServlet;
-	private ArrayDeque<Continuation> continuationQueue;
+	private final ArrayDeque<Continuation> continuationQueue;
 
 	public SuspendingServletUtils(SuspendingServlet suspendingServlet) {
 		this.suspendingServlet = suspendingServlet;

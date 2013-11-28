@@ -18,7 +18,7 @@ import org.obm.sync.utils.DisplayNameUtils;
 import org.obm.sync.utils.MailUtils;
 
 public class EventBuilder {
-	private Calendar cal;
+	private final Calendar cal;
 	
 	public EventBuilder(Calendar cal) {
 		this.cal = cal;

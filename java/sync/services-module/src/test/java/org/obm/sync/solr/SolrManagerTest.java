@@ -93,7 +93,7 @@ public class SolrManagerTest {
 	private Command<Integer> pingCommand;
 	private QueueManager queueManager;
 	private ConfigurationService configurationService;
-	private CommandConverter converter = new CommandConverter() {
+	private final CommandConverter converter = new CommandConverter() {
 		@Override
 		public <T extends Serializable> SolrRequest convert(Command<T> command) throws Exception {
 			return pingRequest;

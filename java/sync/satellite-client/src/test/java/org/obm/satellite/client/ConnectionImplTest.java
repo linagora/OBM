@@ -71,7 +71,7 @@ public class ConnectionImplTest {
 	private IMocksControl control;
 	private Configuration configuration;
 	private CloseableHttpClient httpClient;
-	private ObmDomain domain = ObmDomain
+	private final ObmDomain domain = ObmDomain
 			.builder()
 			.name("domain")
 			.host(ServiceProperty.IMAP, ObmHost.builder().ip("localhost").name("localIMAP").build())

@@ -52,19 +52,19 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public class LdapManagerImpl implements LdapManager {
 
-	private Connection conn;
-	private Provider<LdapUser.Builder> userBuilderProvider;
-	private Provider<LdapGroup.Builder> groupBuilderProvider;
-	private Provider<LdapUserMembership.Builder> userMembershipBuilderProvider;
+	private final Connection conn;
+	private final Provider<LdapUser.Builder> userBuilderProvider;
+	private final Provider<LdapGroup.Builder> groupBuilderProvider;
+	private final Provider<LdapUserMembership.Builder> userMembershipBuilderProvider;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Singleton
 	public static class Factory implements LdapManager.Factory {
-		private Provider<LdapUser.Builder> userBuilderProvider;
-		private Provider<LdapGroup.Builder> groupBuilderProvider;
-		private Provider<LdapUserMembership.Builder> userMembershipBuilderProvider;
-		private Connection.Factory connectionFactory;
+		private final Provider<LdapUser.Builder> userBuilderProvider;
+		private final Provider<LdapGroup.Builder> groupBuilderProvider;
+		private final Provider<LdapUserMembership.Builder> userMembershipBuilderProvider;
+		private final Connection.Factory connectionFactory;
 
 		@Inject
 		public Factory(Provider<LdapUser.Builder> userBuilderProvider, Provider<LdapGroup.Builder> groupBuilderProvider,

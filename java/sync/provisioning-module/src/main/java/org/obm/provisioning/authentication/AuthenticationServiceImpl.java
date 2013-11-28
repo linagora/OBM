@@ -43,8 +43,8 @@ import fr.aliacom.obm.common.user.ObmUser;
 @Singleton
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-	private UserDao userDao;
-	private DomainDao domainDao;
+	private final UserDao userDao;
+	private final DomainDao domainDao;
 
 	@Inject
 	private AuthenticationServiceImpl(UserDao userDao, DomainDao domainDao) {

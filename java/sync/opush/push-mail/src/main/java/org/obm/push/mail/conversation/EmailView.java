@@ -60,7 +60,7 @@ public class EmailView {
 		private Envelope envelope;
 		private InputStream bodyMimePartData;
 		private int estimatedDataSize;
-		private ImmutableList.Builder<EmailViewAttachment> attachments;
+		private final ImmutableList.Builder<EmailViewAttachment> attachments;
 		private ICalendar iCalendar;
 		private EmailViewInvitationType invitationType;
 		private MSEmailBodyType bodyType;

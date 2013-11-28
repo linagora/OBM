@@ -49,7 +49,7 @@ public final class SieveCodecFactory implements ProtocolCodecFactory {
 	private static final Logger logger = LoggerFactory
 			.getLogger(SieveClientSupport.class);
 
-	private ProtocolDecoder decoder = new ProtocolDecoderAdapter() {
+	private final ProtocolDecoder decoder = new ProtocolDecoderAdapter() {
 
 		@Override
 		public void decode(IoSession arg0, IoBuffer arg1,
@@ -69,7 +69,7 @@ public final class SieveCodecFactory implements ProtocolCodecFactory {
 		}
 	};
 
-	private ProtocolEncoder encoder = new ProtocolEncoderAdapter() {
+	private final ProtocolEncoder encoder = new ProtocolEncoderAdapter() {
 
 		@Override
 		public void encode(IoSession arg0, Object arg1,

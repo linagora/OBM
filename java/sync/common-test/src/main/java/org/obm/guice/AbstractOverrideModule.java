@@ -41,7 +41,7 @@ import com.google.inject.AbstractModule;
 
 public abstract class AbstractOverrideModule extends AbstractModule {
 
-	private ClassToInstanceMap<Object> mockMap;
+	private final ClassToInstanceMap<Object> mockMap;
 	private final IMocksControl mocksControl;
 
 	public AbstractOverrideModule(IMocksControl mocksControl) {

@@ -70,7 +70,7 @@ public class ProvisioningService extends ServletModule {
 	public final static String PROVISIONING_URL_PREFIX = "/" + PROVISIONING_ROOT_PATH;
 	public final static String PROVISIONING_URL_PATTERN = PROVISIONING_URL_PREFIX + "/*";
 
-	private ServletContext servletContext;
+	private final ServletContext servletContext;
 
 	public ProvisioningService(ServletContext servletContext) {
 		this.servletContext = servletContext;

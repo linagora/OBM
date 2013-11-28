@@ -80,9 +80,9 @@ public class ActiveSyncServlet extends HttpServlet {
 	private static final String MS_SERVER_ACTIVESYNC = "14.1";
 	private static final String MS_ASPROTOCOL_VERSIONS = "12.0,12.1";
 	
-	private Handlers handlers;
-	private SessionService sessionService;
-	private DeviceService deviceService;
+	private final Handlers handlers;
+	private final SessionService sessionService;
+	private final DeviceService deviceService;
 	
 	private final ResponderImpl.Factory responderFactory;
 	private final IBackend backend;

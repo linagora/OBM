@@ -39,12 +39,12 @@ import fr.aliasource.obm.utils.ConstantService;
 public class DirectoryConfig {
 	private static final Logger logger = LoggerFactory.getLogger(DirectoryConfig.class);
 
-	private Integer ldapPort;
-	private String ldapSearchBase;
-	private String[] ldapAtts;
-	private String ldapFilter;
-	private String searchWithDomain ;
-	private String ldapHost;
+	private final Integer ldapPort;
+	private final String ldapSearchBase;
+	private final String[] ldapAtts;
+	private final String ldapFilter;
+	private final String searchWithDomain ;
+	private final String ldapHost;
 	private String configXml;
 
 	public DirectoryConfig(String login, String domain ,ConstantService cs) {

@@ -53,7 +53,7 @@ public final class ParticipationChanges implements Serializable {
 		private EventObmId eventObmId;
 		private EventExtId eventExtId;
 		private RecurrenceId recurrenceId;
-		private ImmutableSet.Builder<Attendee> attendees;
+		private final ImmutableSet.Builder<Attendee> attendees;
 		
 		private Builder() {
 			super();

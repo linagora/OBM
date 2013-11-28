@@ -35,7 +35,7 @@ import javax.inject.Inject;
 
 public class TestUtils {
 
-	private H2InMemoryDatabase db;
+	private final H2InMemoryDatabase db;
 
 	@Inject
 	public TestUtils(H2InMemoryDatabase db) {

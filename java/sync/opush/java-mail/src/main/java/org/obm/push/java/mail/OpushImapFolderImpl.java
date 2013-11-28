@@ -361,20 +361,20 @@ public class OpushImapFolderImpl implements OpushImapFolder {
 		return folder.getUIDValidity();
 	}
 
-	private Iterable<FetchProfile.Item> fetchBodyStructureProfileItems = ImmutableSet.of(
+	private final Iterable<FetchProfile.Item> fetchBodyStructureProfileItems = ImmutableSet.of(
 			FetchProfile.Item.CONTENT_INFO,
 			IMAPFolder.FetchProfileItem.SIZE	
 	);
 	
-	private Iterable<FetchProfile.Item> fetchFlagsProfileItems = ImmutableSet.of(
+	private final Iterable<FetchProfile.Item> fetchFlagsProfileItems = ImmutableSet.of(
 			FetchProfile.Item.FLAGS
 	);
 	
-	private Iterable<FetchProfile.Item> fetchEnvelopeProfileItems = ImmutableSet.of(
+	private final Iterable<FetchProfile.Item> fetchEnvelopeProfileItems = ImmutableSet.of(
 			FetchProfile.Item.ENVELOPE
 	);
 	
-	private Iterable<? extends FetchProfile.Item> fetchSizeProfileItems = ImmutableSet.of(
+	private final Iterable<? extends FetchProfile.Item> fetchSizeProfileItems = ImmutableSet.of(
 			IMAPFolder.FetchProfileItem.SIZE
 	);
 	

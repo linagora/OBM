@@ -85,7 +85,7 @@ public class ObmUser {
 		private String lastName;
 		private String firstName;
 		private String email;
-		private ImmutableSet.Builder<String> emailAlias;
+		private final ImmutableSet.Builder<String> emailAlias;
 		private Boolean hidden;
 		
 		private String address1;
@@ -125,7 +125,7 @@ public class ObmUser {
 		private Integer uidNumber;
 		private Integer gidNumber;
 		
-		private ImmutableSet.Builder<Group> groups;
+		private final ImmutableSet.Builder<Group> groups;
 
 		private Builder() {
 			emailAlias = ImmutableSet.builder();
@@ -481,7 +481,7 @@ public class ObmUser {
 	private final Integer uidNumber;
 	private final Integer gidNumber;
 	
-	private Set<Group> groups;
+	private final Set<Group> groups;
 
 	public ObmUser(Integer uid, EntityId entityId, String login, UserExtId extId, boolean admin, String commonName,
 			String lastName, String firstName, String email,

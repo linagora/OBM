@@ -47,7 +47,7 @@ import com.google.inject.Inject;
 
 public class TaskEncoder extends Encoder {
 	
-	private SimpleDateFormat sdf;
+	private final SimpleDateFormat sdf;
 	
 	@Inject
 	private TaskEncoder() {

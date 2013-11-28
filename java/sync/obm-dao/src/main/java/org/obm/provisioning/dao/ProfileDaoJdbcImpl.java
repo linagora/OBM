@@ -96,8 +96,8 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 		Module.CONTACTS
 	};
 
-	private DatabaseConnectionProvider connectionProvider;
-	private ProfileModuleRightsService profileModuleRightsService;
+	private final DatabaseConnectionProvider connectionProvider;
+	private final ProfileModuleRightsService profileModuleRightsService;
 
 	@Inject
 	private ProfileDaoJdbcImpl(DatabaseConnectionProvider connectionProvider, ProfileModuleRightsService profileModuleRightsService) {

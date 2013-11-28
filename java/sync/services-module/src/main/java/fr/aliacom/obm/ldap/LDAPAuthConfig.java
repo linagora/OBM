@@ -40,7 +40,7 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
  */
 public class LDAPAuthConfig {
 
-	private LDAPDirectory dir;
+	private final LDAPDirectory dir;
 
 	@Inject
 	private LDAPAuthConfig(ObmSyncConfigurationService obmSyncConfiguration) {

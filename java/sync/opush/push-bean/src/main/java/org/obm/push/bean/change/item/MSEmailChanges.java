@@ -45,8 +45,8 @@ public class MSEmailChanges {
 	}
 	
 	public static class Builder {
-		private List<ItemChange> changes;
-		private List<ItemDeletion> deletions;
+		private final List<ItemChange> changes;
+		private final List<ItemDeletion> deletions;
 
 		private Builder() {
 			changes = Lists.newArrayList();

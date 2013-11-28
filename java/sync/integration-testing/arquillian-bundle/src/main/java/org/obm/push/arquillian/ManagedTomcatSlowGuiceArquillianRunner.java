@@ -42,8 +42,8 @@ import org.obm.guice.GuiceRunnerDelegation;
 
 public class ManagedTomcatSlowGuiceArquillianRunner extends Arquillian {
 
-	private SlowFilterRunnerDelegation slowRunnerDelegate;
-	private GuiceRunnerDelegation guiceRunnerDelegate;
+	private final SlowFilterRunnerDelegation slowRunnerDelegate;
+	private final GuiceRunnerDelegation guiceRunnerDelegate;
 
 	public ManagedTomcatSlowGuiceArquillianRunner(Class<?> klass) throws InitializationError {
 		super(klass);

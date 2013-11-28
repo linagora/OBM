@@ -118,7 +118,7 @@ public class LdapUser {
 		private String mailBoxServer;
 		private String mailAccess;
 		private String mail;
-		private ImmutableSet.Builder<String> mailAlias;
+		private final ImmutableSet.Builder<String> mailAlias;
 		private boolean hiddenUser;
 		private LdapDomain domain;
 		

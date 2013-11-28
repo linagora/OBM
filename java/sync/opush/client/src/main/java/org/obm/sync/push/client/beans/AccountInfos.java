@@ -38,13 +38,13 @@ import com.google.common.base.Objects;
 import com.google.common.io.BaseEncoding;
 
 public final class AccountInfos {
-	private String login;
-	private String password;
+	private final String login;
+	private final String password;
 	private String userId;
-	private DeviceId devId;
-	private String devType;
-	private String url;
-	private String userAgent;
+	private final DeviceId devId;
+	private final String devType;
+	private final String url;
+	private final String userAgent;
 
 	public AccountInfos(String login, String password, DeviceId devId,
 			String devType, String url, String userAgent) {
