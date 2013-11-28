@@ -38,6 +38,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.transport.socket.SocketConnector;
 import org.obm.push.mail.imap.IMAPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ public class ClientHandler extends IoHandlerAdapter {
 	
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private final IResponseCallback callback;
+	private SocketConnector socketConnector;
 
 	private IoFilter getIoFilter() {
 		ProtocolCodecFactory pcf = new IMAPCodecFactory();
@@ -71,6 +73,7 @@ public class ClientHandler extends IoHandlerAdapter {
 	}
 
 	public void sessionClosed(IoSession session) throws Exception {
+		socketConnector.dispose();
 		callback.disconnected();
 	}
 
@@ -79,6 +82,10 @@ public class ClientHandler extends IoHandlerAdapter {
 			throws Exception {
 		logger.error(cause.getMessage(),cause);
 		callback.exceptionCaught(new IMAPException(cause.getMessage(),cause));
+	}
+
+	public void setConnector(SocketConnector socketConnector) {
+		this.socketConnector = socketConnector;
 	}
 	
 	

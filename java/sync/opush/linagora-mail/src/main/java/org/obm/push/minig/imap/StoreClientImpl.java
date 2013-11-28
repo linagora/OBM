@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.mina.transport.socket.SocketConnector;
 import org.obm.annotations.technicallogging.KindToBeLogged;
 import org.obm.annotations.technicallogging.ResourceType;
 import org.obm.annotations.technicallogging.TechnicalLogging;
@@ -63,6 +64,7 @@ import org.obm.push.minig.imap.impl.ClientHandler;
 import org.obm.push.minig.imap.impl.ClientSupport;
 import org.obm.push.minig.imap.impl.IResponseCallback;
 import org.obm.push.minig.imap.impl.MailThread;
+import org.obm.push.minig.imap.impl.SessionFactoryImpl;
 import org.obm.push.minig.imap.impl.StoreClientCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +72,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 public class StoreClientImpl implements StoreClient {
@@ -78,10 +81,12 @@ public class StoreClientImpl implements StoreClient {
 	public static class Factory implements StoreClient.Factory {
 		
 		protected final EmailConfiguration emailConfiguration;
+		private final Provider<SocketConnector> socketConnectorProvider;
 
 		@Inject
-		protected Factory(EmailConfiguration emailConfiguration) {
+		protected Factory(EmailConfiguration emailConfiguration, Provider<SocketConnector> socketConnectorProvider) {
 			this.emailConfiguration = emailConfiguration;
+			this.socketConnectorProvider = socketConnectorProvider;
 		}
 		
 		public StoreClientImpl create(String hostname, String login, String password) {
@@ -92,7 +97,8 @@ public class StoreClientImpl implements StoreClient {
 		protected ClientSupport createClientSupport() {
 			IResponseCallback cb = new StoreClientCallback();
 			ClientHandler handler = new ClientHandler(cb);
-			ClientSupport clientSupport = new ClientSupport(handler, emailConfiguration.imapTimeoutInMilliseconds());
+			SessionFactoryImpl sessionFactory = new SessionFactoryImpl(socketConnectorProvider, handler, emailConfiguration.imapTimeoutInMilliseconds());
+			ClientSupport clientSupport = new ClientSupport(sessionFactory, emailConfiguration.imapTimeoutInMilliseconds());
 			cb.setClient(clientSupport);
 			return clientSupport;
  		}

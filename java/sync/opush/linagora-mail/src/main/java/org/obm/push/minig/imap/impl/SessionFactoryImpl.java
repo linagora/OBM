@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,38 +29,61 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.minig.imap.impl;
 
+import java.net.SocketAddress;
+
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.SocketConnector;
-import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.imap.LinagoraMailboxService;
-import org.obm.push.mail.imap.MessageInputStreamProvider;
-import org.obm.push.mail.imap.MessageInputStreamProviderImpl;
-import org.obm.push.mail.imap.MinigStoreClient;
-import org.obm.push.mail.imap.MinigStoreClientImpl;
-import org.obm.push.mail.imap.idle.IdleClient;
-import org.obm.push.minig.imap.IdleClientImpl;
-import org.obm.push.minig.imap.StoreClient;
-import org.obm.push.minig.imap.StoreClientImpl;
-import org.obm.push.resource.ResourcesService;
-import org.obm.push.resource.LinagoraMailResourcesService;
+import org.obm.push.mail.ImapTimeoutException;
+import org.obm.push.mail.imap.IMAPException;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+import com.google.inject.Provider;
 
-public class LinagoraImapModule extends AbstractModule {
+public class SessionFactoryImpl implements SessionFactory {
+	
+	private final ClientHandler handler;
+	private final int imapTimeoutInMilliseconds;
+	private final Provider<SocketConnector> connectorFactory;
+
+	public SessionFactoryImpl(Provider<SocketConnector> connectorFactory, ClientHandler handler, int imapTimeoutInMilliseconds) {
+		this.connectorFactory = connectorFactory;
+		this.handler = handler;
+		this.imapTimeoutInMilliseconds = imapTimeoutInMilliseconds;
+	}
 	
 	@Override
-	protected void configure() {
-		bind(MinigStoreClient.Factory.class).to(MinigStoreClientImpl.Factory.class);
-		bind(StoreClient.Factory.class).to(StoreClientImpl.Factory.class);
-		bind(MailboxService.class).to(LinagoraMailboxService.class);
-		bind(MessageInputStreamProvider.class).to(MessageInputStreamProviderImpl.class);
-		bind(IdleClient.Factory.class).to(IdleClientImpl.Factory.class);
-		bind(SocketConnector.class).to(NioSocketConnector.class);
-		
-		Multibinder<ResourcesService> resources = Multibinder.newSetBinder(binder(), ResourcesService.class);
-		resources.addBinding().to(LinagoraMailResourcesService.class);
+	public IoSession connect(SocketAddress address) throws IMAPException {
+		SocketConnector socketConnector = connectorFactory.get();
+		socketConnector.setHandler(handler);
+		handler.setConnector(socketConnector);
+		try {
+			ConnectFuture future = socketConnector.connect(address);
+			boolean joinSuccess = future.awaitUninterruptibly(imapTimeoutInMilliseconds);
+			if (!joinSuccess) {
+				future.cancel();
+				throw new ImapTimeoutException();
+			}
+			if (!future.isConnected()) {
+				// This method call will throw the original exception
+				future.getSession();
+				// This should never occur
+				throw new IMAPException("Cannot log into imap server");
+			} else {
+				return future.getSession();
+			}
+		} catch (RuntimeException e) {
+			cleanup(socketConnector);
+			throw e;
+		} catch(IMAPException e) {
+			cleanup(socketConnector);
+			throw e;
+		}
 	}
+
+	private void cleanup(SocketConnector socketConnector) {
+		socketConnector.dispose();
+	}
+	
 }

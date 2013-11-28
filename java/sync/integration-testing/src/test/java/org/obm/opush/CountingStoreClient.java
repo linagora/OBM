@@ -31,12 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import org.apache.mina.transport.socket.SocketConnector;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.minig.imap.StoreClientImpl;
 import org.obm.push.minig.imap.impl.ClientSupport;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 public class CountingStoreClient extends StoreClientImpl {
@@ -49,8 +51,8 @@ public class CountingStoreClient extends StoreClientImpl {
 		private final ImapConnectionCounter counter;
 
 		@Inject
-		private Factory(ImapConnectionCounter counter, EmailConfiguration emailConfiguration) {
-			super(emailConfiguration);
+		private Factory(ImapConnectionCounter counter, EmailConfiguration emailConfiguration, Provider<SocketConnector> socketConnectorProvider) {
+			super(emailConfiguration, socketConnectorProvider);
 			this.counter = counter;
 		}
 		
