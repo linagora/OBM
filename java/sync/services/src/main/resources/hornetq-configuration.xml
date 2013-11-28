@@ -8,6 +8,7 @@
     <large-messages-directory>/var/lib/obm-sync/jms/data/large-messages</large-messages-directory>
     <bindings-directory>/var/lib/obm-sync/jms/data/bindings</bindings-directory>
     <journal-directory>/var/lib/obm-sync/jms/data/journal</journal-directory>
+    <paging-directory>/var/lib/obm-sync/jms/data/paging</paging-directory>
 
 	<connectors>
 		<connector name="in-vm">
@@ -36,5 +37,12 @@
 			<param key="port" value="61613" />
 		</acceptor>
 	</acceptors>
+
+   <address-settings>
+      <address-setting match="#">
+         <max-size-bytes>10485760</max-size-bytes>
+         <page-size-bytes>1048576</page-size-bytes>
+      </address-setting>
+   </address-settings>
 
 </configuration>
