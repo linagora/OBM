@@ -31,11 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.contacts;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import org.obm.sync.book.Folder;
 
-public class ComparatorUsingFolderName implements Comparator<Folder> {
+public class ComparatorUsingFolderName implements Comparator<Folder>, Serializable {
 
 	private final String defaultFolderName;
 

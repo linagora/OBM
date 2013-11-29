@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -50,7 +51,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class ASTimeZoneConverterImpl implements ASTimeZoneConverter {
 	
-	private final static class TimeZoneComparator implements Comparator<String> {
+	private final static class TimeZoneComparator implements Comparator<String>, Serializable {
 		@Override
 		public int compare(String left, String right) {
 			if (TIME_ZONE_PREFERENCES.contains(right) && !TIME_ZONE_PREFERENCES.contains(left)) {

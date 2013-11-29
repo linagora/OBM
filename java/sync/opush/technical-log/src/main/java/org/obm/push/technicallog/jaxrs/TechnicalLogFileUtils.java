@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -100,7 +101,7 @@ public class TechnicalLogFileUtils {
 		return logsList;
 	}
 	
-	private static class LogFileComparator implements Comparator<LogFile> {
+	private static class LogFileComparator implements Comparator<LogFile>, Serializable {
 
 		@Override
 		public int compare(LogFile o1, LogFile o2) {
