@@ -331,7 +331,7 @@ public class WbxmlParser {
 			return readStrT();
 		}
 		if (idx < 0 || tab == null || idx >= tab.length || tab[idx] == null) {
-			throw new SAXException("id " + id + " idx "+idx+" undef. tab: " + Joiner.on(",").join(tab));
+			throw new SAXException("id " + id + " idx "+idx+" undef. tab: " + (tab != null ? Joiner.on(",").join(tab) : "null"));
 		}
 
 		String ret = tab[idx];
