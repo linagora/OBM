@@ -41,6 +41,8 @@ import org.obm.push.minig.imap.sieve.SieveCommand;
 import org.obm.push.minig.imap.sieve.SieveResponse;
 import org.obm.push.minig.imap.sieve.SieveScript;
 
+import com.google.common.base.Charsets;
+
 public class SieveListscripts extends SieveCommand<List<SieveScript>> {
 
 	public SieveListscripts() {
@@ -50,7 +52,7 @@ public class SieveListscripts extends SieveCommand<List<SieveScript>> {
 	@Override
 	protected List<SieveArg> buildCommand() {
 		List<SieveArg> args = new ArrayList<SieveArg>(1);
-		args.add(new SieveArg("LISTSCRIPTS".getBytes(), false));
+		args.add(new SieveArg("LISTSCRIPTS".getBytes(Charsets.UTF_8), false));
 		return args;
 	}
 

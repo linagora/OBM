@@ -61,6 +61,7 @@ import org.apache.html.dom.HTMLDocumentImpl;
 import org.apache.xalan.processor.TransformerFactoryImpl;
 import org.cyberneko.html.parsers.DOMFragmentParser;
 import org.cyberneko.html.parsers.DOMParser;
+import org.obm.push.utils.stream.UTF8Utils;
 import org.obm.push.utils.xml.XmlCharacterFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +78,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 
@@ -385,21 +387,21 @@ public final class DOMUtils {
 			throws TransformerException {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		serialize(doc, byteArrayOutputStream, false);
-		return new String(byteArrayOutputStream.toByteArray());
+		return new String(byteArrayOutputStream.toByteArray(), Charsets.UTF_8);
 	}
 	
 	public static String prettySerialize(Element element)
 			throws TransformerException {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		serialize(element, byteArrayOutputStream, true);
-		return new String(byteArrayOutputStream.toByteArray());
+		return new String(byteArrayOutputStream.toByteArray(), Charsets.UTF_8);
 	}
 	
 	public static String prettySerialize(Document doc)
 			throws TransformerException {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		serialize(doc, byteArrayOutputStream, true);
-		return new String(byteArrayOutputStream.toByteArray());
+		return new String(byteArrayOutputStream.toByteArray(), Charsets.UTF_8);
 	}
 	
 	public static void serialize(Document doc, OutputStream out, boolean pretty, XMLVersion xmlVersion) throws TransformerException {
@@ -424,7 +426,7 @@ public final class DOMUtils {
 		if (logger.isDebugEnabled()) {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			serialize(doc, out, true);
-			logger.debug(out.toString());
+			logger.debug(UTF8Utils.asString(out));
 		}
 	}
 
@@ -504,7 +506,7 @@ public final class DOMUtils {
 	
 	public static Element createElementAndText(Element parent, String elementName, InputStream inputStream) throws IOException {
 		return createElementAndText(parent, elementName, 
-				CharStreams.toString(new InputStreamReader(inputStream)));
+				CharStreams.toString(new InputStreamReader(inputStream, Charsets.UTF_8)));
 	}
 	
 	public static Element createElementAndCDataSection(Element parent, String elementName, String text) {

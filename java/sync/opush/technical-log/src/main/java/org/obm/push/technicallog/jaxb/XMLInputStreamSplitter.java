@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 
 public class XMLInputStreamSplitter implements Iterable<String> {
@@ -52,7 +53,7 @@ public class XMLInputStreamSplitter implements Iterable<String> {
 	
 	public XMLInputStreamSplitter(InputStream inputStream) {
 		Preconditions.checkNotNull(inputStream);
-		bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+		bufferedReader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8));
 	}
 	
 	public String readNextXML() throws IOException, EndOfStreamException  {

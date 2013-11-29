@@ -36,6 +36,8 @@ import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.codec.binary.Base64;
 
+import com.google.common.base.Charsets;
+
 public class PasswordHandler {
 
 	PasswordHandler() {
@@ -77,7 +79,7 @@ public class PasswordHandler {
 		byte[] salt = hs[1];
 
 		msgDigest.reset();
-		msgDigest.update(password.getBytes());
+		msgDigest.update(password.getBytes(Charsets.UTF_8));
 		msgDigest.update(salt);
 
 		byte[] pwhash = msgDigest.digest();
@@ -115,7 +117,7 @@ public class PasswordHandler {
 		}
 
 		msgDigest.reset();
-		msgDigest.update(password.getBytes());
+		msgDigest.update(password.getBytes(Charsets.UTF_8));
 		msgDigest.update(salt);
 
 		byte[] pwhash = msgDigest.digest();

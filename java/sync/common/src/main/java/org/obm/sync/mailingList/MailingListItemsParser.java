@@ -39,14 +39,16 @@ import java.util.List;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
-import org.obm.sync.items.AbstractItemsParser;
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.items.AbstractItemsParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.google.common.base.Charsets;
 
 public class MailingListItemsParser extends AbstractItemsParser {
 
@@ -56,7 +58,7 @@ public class MailingListItemsParser extends AbstractItemsParser {
 	public MailingList parseMailingList(String parameter) throws SAXException,
 			IOException, FactoryConfigurationError {
 		Document doc = DOMUtils.parse(new ByteArrayInputStream(parameter
-				.getBytes()));
+				.getBytes(Charsets.UTF_8)));
 
 		Element root = doc.getDocumentElement();
 		return parseMailingList(root);
@@ -117,7 +119,7 @@ public class MailingListItemsParser extends AbstractItemsParser {
 	public List<MLEmail> parseMailingListEmails(String mailingListEmails) {
 		try {
 			Document doc = DOMUtils.parse(new ByteArrayInputStream(
-					mailingListEmails.getBytes()));
+					mailingListEmails.getBytes(Charsets.UTF_8)));
 			return parseEmails(doc.getDocumentElement());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

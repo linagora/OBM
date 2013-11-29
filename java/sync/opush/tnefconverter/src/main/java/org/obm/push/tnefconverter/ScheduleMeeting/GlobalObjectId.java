@@ -38,6 +38,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
 
@@ -112,7 +113,7 @@ public class GlobalObjectId {
 		for (int i = 0; i < dataSize; i++) {
 			b[i] = (byte) obj.read();
 		}
-		String uidLabel = new String(b);
+		String uidLabel = new String(b, Charsets.UTF_8);
 		size -= dataSize;
 		return uidLabel;
 	}

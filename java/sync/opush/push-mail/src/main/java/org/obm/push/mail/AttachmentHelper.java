@@ -36,6 +36,8 @@ import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 
+import com.google.common.base.Charsets;
+
 public class AttachmentHelper {
 
 	public final static String COLLECTION_ID = "collectionId";
@@ -47,7 +49,7 @@ public class AttachmentHelper {
 	public static String getAttachmentId(String collectionId, String messageId,
 			String mimePartAddress, String contentType,
 			String contentTransferEncoding) {
-		String ct = Base64.encodeBase64String(contentType.getBytes());
+		String ct = Base64.encodeBase64String(contentType.getBytes(Charsets.UTF_8));
 		String ret = collectionId + "_" + messageId + "_" + mimePartAddress
 				+ "_" + ct;
 		if (contentTransferEncoding != null
@@ -67,9 +69,9 @@ public class AttachmentHelper {
 		data.put(COLLECTION_ID, tab[0]);
 		data.put(MESSAGE_ID, tab[1]);
 		data.put(MIME_PART_ADDRESS, tab[2]);
-		data.put(CONTENT_TYPE, new String(Base64.decodeBase64(tab[3])));
+		data.put(CONTENT_TYPE, new String(Base64.decodeBase64(tab[3]), Charsets.UTF_8));
 		if(tab.length >=5){
-			data.put(CONTENT_TRANSFERE_ENCODING, new String(Base64.decodeBase64(tab[4])));
+			data.put(CONTENT_TRANSFERE_ENCODING, new String(Base64.decodeBase64(tab[4]), Charsets.UTF_8));
 		}
 		return data;
 	}

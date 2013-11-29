@@ -52,6 +52,8 @@ import org.parboiled.support.ParsingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+
 public class BodyStructureParser {
 
 	private final static Logger logger = LoggerFactory
@@ -406,7 +408,7 @@ public class BodyStructureParser {
 		FileOutputStream fileOutputStream = null;
 		try {
 			fileOutputStream = new FileOutputStream("/tmp/log");
-			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, Charsets.UTF_8);
 			outputStreamWriter.write(runner.getLog().toString());
 			outputStreamWriter.close();
 		} catch (FileNotFoundException e) {

@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Inject;
@@ -119,7 +120,7 @@ public class FreeBusyServlet extends HttpServlet {
 		try {
 			String ics = findFreeBusyIcs(fbr, providers);
 			if (ics != null) {
-				response.getOutputStream().write(ics.getBytes());
+				response.getOutputStream().write(ics.getBytes(Charsets.UTF_8));
 				response.setStatus(HttpServletResponse.SC_OK);
 			} else {
 				logger.warn("FreeBusyServlet : freebusy could not be generated for '{}' requested by '{}'.",

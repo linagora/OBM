@@ -40,6 +40,8 @@ import org.obm.push.bean.DeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+
 public class Base64QueryString extends AbstractActiveSyncRequest {
 
 	/**
@@ -110,7 +112,7 @@ public class Base64QueryString extends AbstractActiveSyncRequest {
 			byte[] devId = new byte[data[i]];
 			System.arraycopy(data, i + 1, devId, 0, data[i]); // i==4
 			i += data[i] + 1; // i is now on policy key size
-			deviceId = new DeviceId(new String(Base64.encodeBase64(devId)));
+			deviceId = new DeviceId(new String(Base64.encodeBase64(devId), Charsets.UTF_8));
 		}
 
 		policyKey = 0;
@@ -118,7 +120,8 @@ public class Base64QueryString extends AbstractActiveSyncRequest {
 			policyKey = policyKey + (data[i++] << 24) + (data[i++] << 16)
 					+ (data[i++] << 8) + (data[i++]);
 		}
-		deviceType = new String(data, i + 1, data[i]);
+		String type = new String(data, i + 1, data[i], Charsets.UTF_8);
+		deviceType = type;
 		i += data[i] + 1;
 
 		String decodedData = 	"<protocolVersion>" + protocolVersion + "</protocolVersion>" +
@@ -162,37 +165,37 @@ public class Base64QueryString extends AbstractActiveSyncRequest {
 		}
 		switch (tag) {
 		case AttachmentName:
-			this.attachmentName = new String(value);
+			this.attachmentName = new String(value, Charsets.UTF_8);
 			break;
 		case CollectionId:
-			this.collectionId = new String(value);
-			break; 
+			this.collectionId = new String(value, Charsets.UTF_8);
+			break;
 		case CollectionName:
-			this.collectionName = new String(value);
-			break; 
+			this.collectionName = new String(value, Charsets.UTF_8);
+			break;
 		case ItemId:
-			this.itemId = new String(value);
-			break; 
+			this.itemId = new String(value, Charsets.UTF_8);
+			break;
 		case LongId:
-			this.longId = new String(value);
-			break; 
+			this.longId = new String(value, Charsets.UTF_8);
+			break;
 		case ParentId:
-			this.parentId = new String(value);
-			break; 
+			this.parentId = new String(value, Charsets.UTF_8);
+			break;
 		case Occurrence:
-			this.occurrence = new String(value);
-			break; 
+			this.occurrence = new String(value, Charsets.UTF_8);
+			break;
 		case Options:
-			if(value.length>0){
-				if(value[0] == 0x01){
+			if (value.length > 0) {
+				if (value[0] == 0x01) {
 					this.saveInSent = "T";
-				} else if(value[0] == 0x02){
+				} else if (value[0] == 0x02) {
 					this.acceptMultiPart = "T";
 				}
 			}
-			break; 
+			break;
 		case User:
-			break; 
+			break;
 		default:
 			break;
 		}

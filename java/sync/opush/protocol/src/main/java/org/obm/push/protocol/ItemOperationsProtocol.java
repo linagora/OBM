@@ -56,6 +56,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -215,7 +216,7 @@ public class ItemOperationsProtocol implements ActiveSyncProtocol<ItemOperations
 			Element properties = DOMUtils.createElement(fetchResp, "Properties");
 			DOMUtils.createElementAndText(properties, "AirSyncBase:ContentType", fetchAttachmentResult.getContentType());
 			if (!isMultipart) {
-				DOMUtils.createElementAndText(properties, "Data", new String(fetchAttachmentResult.getAttch()));
+				DOMUtils.createElementAndText(properties, "Data", new String(fetchAttachmentResult.getAttch(), Charsets.UTF_8));
 			} else {
 				DOMUtils.createElementAndText(properties, "Part", "1");
 			}

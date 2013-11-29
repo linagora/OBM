@@ -216,9 +216,10 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 		byte[] envelope = parser.getLastReadToken();
 
 		pos = parser.consumeToken(pos, envelope);
-		String date = new String(parser.getLastReadToken());
+
 		Date d = null;
 		try {
+			String date = new String(parser.getLastReadToken(), Charsets.UTF_8);
 			d = DateParser.parse(date);
 		} catch (ParseException e) {
 		}
@@ -280,7 +281,7 @@ public class UIDFetchEnvelopeCommand extends Command<Collection<UIDEnvelope>> {
 			String displayName = null;
 			if (parser.getLastTokenType() == TokenType.STRING) {
 				displayName = EncodedWord.decode(
-						new String(parser.getLastReadToken())).toString();
+						new String(parser.getLastReadToken(), Charsets.UTF_8)).toString();
 			}
 			p = parser.consumeToken(p, parts);
 			p = parser.consumeToken(p, parts);

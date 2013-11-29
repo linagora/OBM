@@ -50,6 +50,8 @@ import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+
 public class EmailTnefHandler implements ContentHandler {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -62,7 +64,7 @@ public class EmailTnefHandler implements ContentHandler {
 			byte[] bb = FileUtils.streamBytes(arg1, false);
 			try {
 				if ("base64".equalsIgnoreCase(arg0.getTransferEncoding())) {
-					bb = Base64.decodeBase64(new String(bb));
+					bb = Base64.decodeBase64(new String(bb, Charsets.UTF_8));
 					arg1 = new ByteArrayInputStream(bb);
 				}
 				TNEFInputStream tnef = new TNEFInputStream(arg1);

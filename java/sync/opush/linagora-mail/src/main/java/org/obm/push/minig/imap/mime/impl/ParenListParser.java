@@ -35,6 +35,8 @@ package org.obm.push.minig.imap.mime.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+
 public class ParenListParser {
 	
 	protected byte[] lastReadToken;
@@ -110,7 +112,7 @@ public class ParenListParser {
 				size++;
 			}
 			int bytes = Integer
-					.parseInt(new String(substring(s, cur + 1, size)));
+						.parseInt(new String(substring(s, cur + 1, size), Charsets.UTF_8));
 			int atomStart = size + 1;
 			// +1 pattern, don't ask
 			if (charAt(s, atomStart) == '}') {

@@ -39,6 +39,8 @@ import org.obm.push.minig.imap.sieve.SieveArg;
 import org.obm.push.minig.imap.sieve.SieveCommand;
 import org.obm.push.minig.imap.sieve.SieveResponse;
 
+import com.google.common.base.Charsets;
+
 /**
  * cyrus 2.3.X only :'(
  */
@@ -47,7 +49,7 @@ public class SieveUnauthenticate extends SieveCommand<Boolean> {
 	@Override
 	protected List<SieveArg> buildCommand() {
 		List<SieveArg> args = new ArrayList<SieveArg>(1);
-		args.add(new SieveArg("UNAUTHENTICATE".getBytes(), false));
+		args.add(new SieveArg("UNAUTHENTICATE".getBytes(Charsets.UTF_8), false));
 		return args;
 	}
 

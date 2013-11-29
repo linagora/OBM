@@ -40,6 +40,8 @@ import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+
 public final class AtomHelper {
 
 	private final static Logger logger = LoggerFactory
@@ -50,7 +52,7 @@ public final class AtomHelper {
 		byte[] envelData = null;
 		ByteArrayOutputStream out = new ByteArrayOutputStream(4096);
 		try {
-			out.write(orig.getBytes());
+			out.write(orig.getBytes(Charsets.UTF_8));
 			if (followUp != null) {
 				FileUtils.transfer(followUp, out, true);
 			}

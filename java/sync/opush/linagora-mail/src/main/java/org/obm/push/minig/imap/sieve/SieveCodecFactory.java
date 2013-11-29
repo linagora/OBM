@@ -44,6 +44,8 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+
 public final class SieveCodecFactory implements ProtocolCodecFactory {
 	
 	private static final Logger logger = LoggerFactory
@@ -61,7 +63,7 @@ public final class SieveCodecFactory implements ProtocolCodecFactory {
 			// copy.flip();
 			byte[] data = copy.array();
 			if (logger.isDebugEnabled()) {
-				logger.debug("decoded: " + new String(data));
+				logger.debug("decoded: " + new String(data, Charsets.UTF_8));
 			}
 			SieveMessage sm = new SieveMessage();
 			sm.addLine(new String(data));

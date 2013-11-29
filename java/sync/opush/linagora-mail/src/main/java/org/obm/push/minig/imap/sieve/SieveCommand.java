@@ -38,13 +38,15 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+
 public abstract class SieveCommand<T> {
 
 	protected static final Logger logger = LoggerFactory
 			.getLogger(SieveCommand.class);
 	
 	protected T retVal;
-	private static final byte[] CRLF = "\r\n".getBytes();
+	private static final byte[] CRLF = "\r\n".getBytes(Charsets.UTF_8);
 
 	public void execute(IoSession session) {
 
@@ -53,7 +55,7 @@ public abstract class SieveCommand<T> {
 		for (int i = 0; i < cmd.size(); i++) {
 			SieveArg arg = cmd.get(i);
 			if (!arg.isLiteral()) {
-				StringBuilder sb = new StringBuilder(new String(arg.getRaw()));
+				StringBuilder sb = new StringBuilder(new String(arg.getRaw(), Charsets.UTF_8));
 				if (i < cmd.size() - 1 && cmd.get(i + 1).isLiteral()) {
 					SieveArg next = cmd.get(i + 1);
 					sb.append(" {");
@@ -61,7 +63,7 @@ public abstract class SieveCommand<T> {
 					sb.append("+}");
 				}
 
-				session.write(sb.toString().getBytes());
+				session.write(sb.toString().getBytes(Charsets.UTF_8));
 			} else {
 				session.write(arg.getRaw());
 			}

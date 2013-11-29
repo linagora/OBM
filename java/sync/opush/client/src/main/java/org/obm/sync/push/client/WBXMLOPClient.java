@@ -61,6 +61,7 @@ import org.obm.push.wbxml.WBXMLTools;
 import org.obm.push.wbxml.WBXmlException;
 import org.w3c.dom.Document;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.io.ByteStreams;
 
@@ -178,7 +179,7 @@ public class WBXMLOPClient extends OPClient {
 						xml = wbxmlTools.toXml(value);
 						DOMUtils.logDom(xml);
 					} else {
-						String file = new String(value);
+						String file = new String(value, Charsets.UTF_8);
 						logger.info("File: " + file);
 					}
 

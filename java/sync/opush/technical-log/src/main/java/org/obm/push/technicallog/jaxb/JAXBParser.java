@@ -43,6 +43,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.obm.push.technicallog.bean.jaxb.JAXBBean;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
 public class JAXBParser {
@@ -63,7 +64,7 @@ public class JAXBParser {
 	public static List<JAXBBean> unmarshal(InputStream inputStream) throws JAXBException {
 		List<JAXBBean> beans = Lists.newArrayList();
 		for (String xmlPart : new XMLInputStreamSplitter(inputStream)) {
-			beans.add(unmarshal(JAXBBean.class, new ByteArrayInputStream(xmlPart.getBytes())));
+			beans.add(unmarshal(JAXBBean.class, new ByteArrayInputStream(xmlPart.getBytes(Charsets.UTF_8))));
 		}
 		
 		return beans;

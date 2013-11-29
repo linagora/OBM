@@ -43,6 +43,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 
+import org.obm.push.utils.stream.UTF8Utils;
+
 /**
  * File manipulation functions
  * 
@@ -119,7 +121,7 @@ public class FileUtils {
 		try {
 			transfer(in, out, closeIn);
 			dump.println("-- stream dump start --");
-			dump.println(out.toString());
+			dump.println(UTF8Utils.asString(out));
 			dump.println("-- stream dump end --");
 		} catch (Throwable t) {
 			throw new IOException(t);

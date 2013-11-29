@@ -35,8 +35,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.eclipse.jetty.http.HttpStatus;
-import org.obm.push.backend.IContinuation;
 import org.obm.push.backend.ErrorsManager;
+import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
@@ -49,6 +49,8 @@ import org.obm.push.protocol.bean.MailRequest;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Charsets;
 
 public abstract class MailRequestHandler implements IRequestHandler {
 
@@ -100,7 +102,7 @@ public abstract class MailRequestHandler implements IRequestHandler {
 	private void process(UserDataRequest udr, MailRequest mailRequest) {
 		try {
 			if (mailDataLogger.isInfoEnabled()) {
-				mailDataLogger.info("Mail content : \n" + new String(mailRequest.getMailContent()));
+				mailDataLogger.info("Mail content : \n" + new String(mailRequest.getMailContent(), Charsets.UTF_8));
 			}
 			doTheJob(mailRequest, udr);
 

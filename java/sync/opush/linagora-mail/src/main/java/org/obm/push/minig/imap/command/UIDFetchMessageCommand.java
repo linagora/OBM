@@ -99,6 +99,6 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 	
 	@Override
 	public void setDataInitialValue() {
-		data = new ByteArrayInputStream("".getBytes());
+		data = new ByteArrayInputStream(new byte[]{});
 	}
 }

@@ -58,6 +58,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Charsets;
+
 public final class DOMUtils {
 	private static final Logger logger = LoggerFactory.getLogger(ConstantService.class);
 	private static TransformerFactory fac;
@@ -261,7 +263,7 @@ public final class DOMUtils {
 		if (logger.isDebugEnabled()) {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			serialize(doc, out, true);
-			logger.debug(out.toString());
+			logger.debug(new String(out.toByteArray(), Charsets.UTF_8));
 		}
 	}
 

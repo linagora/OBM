@@ -41,6 +41,8 @@ import org.obm.push.minig.imap.sieve.SieveArg;
 import org.obm.push.minig.imap.sieve.SieveCommand;
 import org.obm.push.minig.imap.sieve.SieveResponse;
 
+import com.google.common.base.Charsets;
+
 public class SieveAuthenticate extends SieveCommand<Boolean> {
 
 	private final String login;
@@ -69,14 +71,14 @@ public class SieveAuthenticate extends SieveCommand<Boolean> {
 	protected List<SieveArg> buildCommand() {
 		List<SieveArg> ret = new ArrayList<SieveArg>(2);
 
-		ret.add(new SieveArg("AUTHENTICATE \"PLAIN\"".getBytes(), false));
+		ret.add(new SieveArg("AUTHENTICATE \"PLAIN\"".getBytes(Charsets.UTF_8), false));
 		ret.add(new SieveArg(encoded, true));
 
 		return ret;
 	}
 
 	private byte[] encodeAuthString(String login, String password) {
-		byte[] log = login.getBytes();
+		byte[] log = login.getBytes(Charsets.UTF_8);
 		byte[] pass = password.getBytes();
 		byte[] data = new byte[log.length * 2 + pass.length + 2];
 		int i = 0;

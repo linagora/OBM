@@ -38,6 +38,7 @@ import javax.xml.transform.TransformerException;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DOMUtils.XMLVersion;
+import org.obm.push.utils.stream.UTF8Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -108,7 +109,7 @@ public class DOMDumper {
 	private void log(Logger logger, Document doc, XMLVersion xmlVersion) throws TransformerException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		DOMUtils.serialize(doc, out, true, xmlVersion);
-		logger.info(out.toString());
+		logger.info(UTF8Utils.asString(out));
 	}
 	
 }

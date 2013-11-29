@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -130,7 +131,7 @@ public class Decoder {
 
 	public TimeZone parseDOMTimeZone(Element node, TimeZone default_value) {
 		if (node != null) {
-			byte[] nodeInBase64 = node.getTextContent().getBytes();
+			byte[] nodeInBase64 = node.getTextContent().getBytes(Charsets.UTF_8);
 			ASTimeZone asTimeZone = base64asTimeZoneDecoder.decode(nodeInBase64);
 			return asTimeZoneConverter.convert(asTimeZone);
 		}

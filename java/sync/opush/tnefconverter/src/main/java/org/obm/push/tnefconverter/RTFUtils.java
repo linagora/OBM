@@ -46,6 +46,8 @@ import org.obm.push.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+
 public class RTFUtils {
 
 	private static final Logger logger = LoggerFactory
@@ -65,7 +67,7 @@ public class RTFUtils {
 
 				String rtfDecompressed = FileUtils.streamString(cin, true);
 				ret = extractRtfText(new ByteArrayInputStream(rtfDecompressed
-						.getBytes()));
+						.getBytes(Charsets.UTF_8)));
 			}
 		} catch (Exception e) {
 			logger.error("error extracting compressed rtf", e);
@@ -79,7 +81,7 @@ public class RTFUtils {
 			CompressedRTFInputStream cin = new CompressedRTFInputStream(in);
 			String rtfDecompressed = FileUtils.streamString(cin, true);
 			ret = extractRtfText(new ByteArrayInputStream(rtfDecompressed
-					.getBytes()));
+					.getBytes(Charsets.UTF_8)));
 		} catch (Exception e) {
 			logger.error("error extracting compressed rtf", e);
 		}

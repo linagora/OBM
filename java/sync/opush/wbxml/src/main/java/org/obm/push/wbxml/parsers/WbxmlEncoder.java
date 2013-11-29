@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Charsets;
+
 /**
  * Converts XML to WBXML using a sax content handler
  */
@@ -110,7 +112,7 @@ public class WbxmlEncoder {
 
 	void writeStrI(OutputStream out, String s) throws IOException {
 		out.write(Wbxml.STR_I);
-		out.write(s.getBytes());
+		out.write(s.getBytes(Charsets.UTF_8));
 		out.write(0);
 	}
 

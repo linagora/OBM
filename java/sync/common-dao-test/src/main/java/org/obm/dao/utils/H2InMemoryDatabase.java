@@ -46,6 +46,7 @@ import org.h2.tools.RunScript;
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.Closer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -119,7 +120,7 @@ public class H2InMemoryDatabase {
 		Reader reader = null;
 		InputStream stream = closer.register(getClass().getClassLoader().getResourceAsStream(schema));
 		try {
-			reader = closer.register(new InputStreamReader(stream));
+			reader = closer.register(new InputStreamReader(stream, Charsets.UTF_8));
 			RunScript.execute(getConnection(), reader);
 		}
 		finally {

@@ -47,6 +47,7 @@ import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 
 public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
@@ -121,7 +122,7 @@ public class UIDFetchHeadersCommand extends Command<Collection<IMAPHeaders>> {
 		InputStream in = response.getStreamData();
 		if (in != null) {
 			try {
-				InputStreamReader reader = new InputStreamReader(in);
+				InputStreamReader reader = new InputStreamReader(in, Charsets.UTF_8);
 				rawHeaders = new HeadersParser().parseRawHeaders(reader);
 			} catch (IOException e) {
 				logger.error("Error reading headers stream", e);

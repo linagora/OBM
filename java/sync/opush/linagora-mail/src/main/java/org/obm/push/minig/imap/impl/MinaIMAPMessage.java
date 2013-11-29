@@ -39,6 +39,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+
 public class MinaIMAPMessage {
 
 	private final static Logger logger = LoggerFactory.getLogger(MinaIMAPMessage.class);
@@ -67,7 +69,7 @@ public class MinaIMAPMessage {
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("addline cur.len" + cur.length + " prev.len "
-					+ prev.length + " cur: " + new String(cur) + " prev: "
+					+ prev.length + " cur: " + new String(cur, Charsets.UTF_8) + " prev: "
 					+ new String(prev));
 		}
 

@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
@@ -72,7 +73,7 @@ public class HelperServiceImpl implements HelperService {
 	public String getMD5Diggest(String plaintext) {
 		try {
 			MessageDigest mg = MessageDigest.getInstance("MD5");
-			mg.update(plaintext.getBytes());
+			mg.update(plaintext.getBytes(Charsets.UTF_8));
 			return toHexString(mg.digest());
 		} catch (NoSuchAlgorithmException e) {
 			logger.error(e.getMessage(), e);

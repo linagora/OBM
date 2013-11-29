@@ -43,6 +43,7 @@ import org.obm.push.technicallog.bean.jaxb.Resource;
 import org.obm.push.technicallog.jaxb.JAXBParser;
 import org.obm.push.technicallog.jaxb.store.ehcache.RequestNotFoundException;
 import org.obm.push.technicallog.jaxb.store.ehcache.RequestStore;
+import org.obm.push.utils.stream.UTF8Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +69,7 @@ public class TechnicalLoggerService {
 			try {
 				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 				JAXBParser.marshal(jaxbBean, byteArrayOutputStream);
-				technicalLogger.trace(byteArrayOutputStream.toString());
+				technicalLogger.trace(UTF8Utils.asString(byteArrayOutputStream));
 			} catch (JAXBException e) {
 				logger.error("JAXB serialization failed", e);
 			}

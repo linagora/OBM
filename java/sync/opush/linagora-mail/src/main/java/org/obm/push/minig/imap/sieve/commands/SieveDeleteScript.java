@@ -39,6 +39,8 @@ import org.obm.push.minig.imap.sieve.SieveArg;
 import org.obm.push.minig.imap.sieve.SieveCommand;
 import org.obm.push.minig.imap.sieve.SieveResponse;
 
+import com.google.common.base.Charsets;
+
 public class SieveDeleteScript extends SieveCommand<Boolean> {
 
 	private final String name;
@@ -51,7 +53,7 @@ public class SieveDeleteScript extends SieveCommand<Boolean> {
 	@Override
 	protected List<SieveArg> buildCommand() {
 		List<SieveArg> args = new ArrayList<SieveArg>(1);
-		args.add(new SieveArg(("DELETESCRIPT \""+name+"\"").getBytes(), false));
+		args.add(new SieveArg(("DELETESCRIPT \""+name+"\"").getBytes(Charsets.UTF_8), false));
 		return args;
 	}
 

@@ -45,6 +45,8 @@ import javax.naming.directory.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+
 public class LDAPUtils {
 
 	private final Logger logger =  LoggerFactory.getLogger(LDAPUtils.class);
@@ -95,7 +97,7 @@ public class LDAPUtils {
 			byte[] hashedPassword) {
 		boolean ret = false;
 		try {
-			ret = new PasswordHandler().verify(new String(hashedPassword),
+			ret = new PasswordHandler().verify(new String(hashedPassword, Charsets.UTF_8),
 					userPassword);
 		} catch (NoSuchAlgorithmException nsae) {
 			logger.error("Cannot match encrypted password", nsae);

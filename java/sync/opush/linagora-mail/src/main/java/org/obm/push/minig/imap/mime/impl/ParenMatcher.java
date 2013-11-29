@@ -32,6 +32,8 @@
 
 package org.obm.push.minig.imap.mime.impl;
 
+import com.google.common.base.Charsets;
+
 public class ParenMatcher {
 
 	private static char charAt(byte[] bytes, int i) {
@@ -65,7 +67,7 @@ public class ParenMatcher {
 					size++;
 				}
 				int bytes = Integer.parseInt(new String(substring(bs,
-						currentPosition + 1, size)));
+							currentPosition + 1, size), Charsets.UTF_8));
 				// 2 times for '}' added by another minig crap
 				if (charAt(bs, size) == '}') {
 					size++;

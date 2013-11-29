@@ -43,6 +43,8 @@ import org.obm.push.minig.imap.sieve.SieveCommand;
 import org.obm.push.minig.imap.sieve.SieveResponse;
 import org.obm.push.utils.FileUtils;
 
+import com.google.common.base.Charsets;
+
 public class SievePutscript extends SieveCommand<Boolean> {
 
 	private final String name;
@@ -65,7 +67,7 @@ public class SievePutscript extends SieveCommand<Boolean> {
 	protected List<SieveArg> buildCommand() {
 		List<SieveArg> args = new ArrayList<SieveArg>(1);
 		args
-				.add(new SieveArg(("PUTSCRIPT \"" + name + "\"").getBytes(),
+				.add(new SieveArg(("PUTSCRIPT \"" + name + "\"").getBytes(Charsets.UTF_8),
 						false));
 		args.add(new SieveArg(data, true));
 		return args;
