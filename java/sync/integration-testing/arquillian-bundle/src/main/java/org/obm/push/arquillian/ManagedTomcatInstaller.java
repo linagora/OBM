@@ -62,7 +62,10 @@ public final class ManagedTomcatInstaller {
 	public static void install() {
 		if (!TOMCAT_TEMPORARY_MAIN_FOLDER.exists()) {
 			try {
-				TOMCAT_TEMPORARY_MAIN_FOLDER.mkdir();
+				if (TOMCAT_TEMPORARY_MAIN_FOLDER.mkdir()) {
+					throw new IOException(String.format("Unable to create directory %s",
+							TOMCAT_TEMPORARY_MAIN_FOLDER.getAbsolutePath()));
+				}
 				
 				uncompressTomcat();
 				copyTomcatUsers();
@@ -74,21 +77,27 @@ public final class ManagedTomcatInstaller {
 		}
 	}
 	
-	private static void replaceFilesByFolders() {
+	private static void replaceFilesByFolders() throws IOException {
 		replaceFileByFolder("work");
 		replaceFileByFolder("temp");
 		replaceFileByFolder("logs");
 	}
 	
-	private static void replaceFileByFolder(String fileName) {
+	private static void replaceFileByFolder(String fileName) throws IOException {
 		File file = new File(TOMCAT_TEMPORARY_VERSION_FOLDER, fileName);
 		if (!file.exists()) {
 			file.mkdir();
 			return;
 		}
 		if (!file.isDirectory()) {
-			file.delete();
-			file.mkdir();
+			if (!file.delete()) {
+				throw new IOException(String.format("Unable to delete file %s",
+						file.getAbsolutePath()));
+			}
+			if (!file.mkdir()) {
+				throw new IOException(String.format("Unable to create directory %s",
+						file.getAbsolutePath()));
+			}
 		}
 	}
 
@@ -96,7 +105,9 @@ public final class ManagedTomcatInstaller {
 		URL resource = Resources.getResource(TOMCAT_USERS_RESOURCE);
 		File tomcatUsers = new File(TOMCAT_TEMPORARY_VERSION_FOLDER, "conf/tomcat-users.xml");
 		if (tomcatUsers.exists()) {
-			tomcatUsers.delete();
+			if (!tomcatUsers.delete()) {
+				throw new IOException(String.format("Unable to delete path %s", tomcatUsers.getAbsolutePath()));
+			}
 		}
 		FileOutputStream outputStream = new FileOutputStream(tomcatUsers);
 		try {
@@ -153,7 +164,10 @@ public final class ManagedTomcatInstaller {
 				File outputFile = new File(parent, entry.getName());
 				if (entry.isDirectory()) {
 					if (!outputFile.exists()) {
-						outputFile.mkdir();
+						if (!outputFile.mkdir()) {
+							throw new IOException(String.format("Unable to create directory %s",
+									outputFile.getAbsolutePath()));
+						}
 					}
 				} else {
 					FileOutputStream outputFileStream = new FileOutputStream(outputFile);

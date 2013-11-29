@@ -91,7 +91,9 @@ public class MigrationSourceObjectStoreManager implements LifecycleListener {
 		for (String fileName : files) {
 			String fullName = dataDirectory + File.separator + fileName;
 			configurationLogger.info("touch {}", fullName);
-			new File(fullName).setLastModified(now);
+			if (!new File(fullName).setLastModified(now)) {
+				configurationLogger.error("Couldn't touch {}", fullName);
+			}
 		}
 	}
 
