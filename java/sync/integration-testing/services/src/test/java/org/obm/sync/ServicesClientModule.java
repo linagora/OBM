@@ -49,7 +49,7 @@ import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.impl.AbstractClientImpl;
-import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.impl.SyncClientAssert;
 import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ public class ServicesClientModule extends AbstractModule {
 
 	protected ObmSyncConfiguration configuration;
 	protected CloseableHttpClient httpClient;
-	protected SyncClientException exceptionFactory;
+	protected SyncClientAssert exceptionFactory;
 	protected Logger logger;
 	protected BasicCookieStore cookieStore;
 
@@ -75,7 +75,7 @@ public class ServicesClientModule extends AbstractModule {
 	protected void configure() {
 		logger = LoggerFactory.getLogger(ObmSyncIntegrationTest.class);
 		configuration = new ObmSyncConfiguration(new Configuration(), new Configuration.ObmSync());
-		exceptionFactory = new SyncClientException();
+		exceptionFactory = new SyncClientAssert();
 		cookieStore = new BasicCookieStore();
 		httpClient = HttpClientBuilder.create().setDefaultCookieStore(cookieStore).build();
 		
@@ -127,7 +127,7 @@ public class ServicesClientModule extends AbstractModule {
 		private final Locator locator;
 		private final CookieStore cookieStore;
 
-		public CookiesFromClient(SyncClientException exceptionFactory, Locator locator,
+		public CookiesFromClient(SyncClientAssert exceptionFactory, Locator locator,
 				CookieStore cookieStore, Logger obmSyncLogger, HttpClient httpClient) {
 			super(exceptionFactory, obmSyncLogger, httpClient);
 			this.locator = locator;

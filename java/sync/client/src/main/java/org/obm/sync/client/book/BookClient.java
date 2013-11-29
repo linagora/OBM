@@ -48,7 +48,7 @@ import org.obm.sync.book.BookItemsWriter;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.client.impl.AbstractClientImpl;
-import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.impl.SyncClientAssert;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
@@ -73,12 +73,12 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		private final BookItemsParser bookItemsParser;
 		private final BookItemsWriter bookItemsWriter;
 		private final Locator locator;
-		private final SyncClientException syncClientException;
+		private final SyncClientAssert syncClientAssert;
 		private final Logger obmSyncLogger;
 		
 		@Inject
-		protected Factory(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-			this.syncClientException = syncClientException;
+		protected Factory(SyncClientAssert syncClientAssert, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+			this.syncClientAssert = syncClientAssert;
 			this.locator = locator;
 			this.obmSyncLogger = obmSyncLogger;
 			this.bookItemsParser = new BookItemsParser();
@@ -86,7 +86,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		}
 		
 		public BookClient create(HttpClient httpClient) {
-			return new BookClient(syncClientException, locator, obmSyncLogger, bookItemsParser, bookItemsWriter, httpClient);
+			return new BookClient(syncClientAssert, locator, obmSyncLogger, bookItemsParser, bookItemsWriter, httpClient);
 		}
 		
 	}
@@ -95,7 +95,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	private final BookItemsWriter bookItemsWriter;
 	private final Locator locator;
 
-	private BookClient(SyncClientException syncClientException,
+	private BookClient(SyncClientAssert syncClientException,
 			Locator locator,
 			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger,
 			BookItemsParser bookItemsParser,

@@ -53,7 +53,7 @@ import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceId;
-import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.impl.SyncClientAssert;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -82,7 +82,7 @@ public class AbstractEventSyncClientTest {
 		responder = control.createMock(Responder.class);
 		token = ToolBox.mockAccessToken(control);
 		logger = control.createMock(Logger.class);
-		client = new AbstractEventSyncClient("/calendar", new SyncClientException(), null, logger, null) {
+		client = new AbstractEventSyncClient("/calendar", new SyncClientAssert(), null, logger, null) {
 			@Override
 			protected Document execute(AccessToken token, String action, Multimap<String, String> parameters) {
 				return responder.execute(token, action, parameters);

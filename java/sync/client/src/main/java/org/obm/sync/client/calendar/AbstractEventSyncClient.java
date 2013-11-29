@@ -61,7 +61,7 @@ import org.obm.sync.calendar.RecurrenceId;
 import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.client.impl.AbstractClientImpl;
-import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.impl.SyncClientAssert;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.services.ICalendar;
@@ -80,12 +80,12 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	private final String type;
 	private final Locator locator;
 
-	public AbstractEventSyncClient(String type, SyncClientException syncClientException, 
+	public AbstractEventSyncClient(String type, SyncClientAssert syncClientAssert, 
 			Locator locator, 
 			Logger obmSyncLogger, 
 			HttpClient httpClient) {
 		
-		super(syncClientException, obmSyncLogger, httpClient);
+		super(syncClientAssert, obmSyncLogger, httpClient);
 		this.locator = locator;
 		respParser = new CalendarItemsParser();
 		this.type = type;

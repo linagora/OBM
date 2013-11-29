@@ -38,7 +38,7 @@ import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
-import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.impl.SyncClientAssert;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.services.ISetting;
 import org.obm.sync.setting.ForwardingSettings;
@@ -57,31 +57,31 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 	@Singleton
 	public static class Factory {
 
-		private final SyncClientException syncClientException;
+		private final SyncClientAssert syncClientAssert;
 		private final Locator locator;
 		private final Logger obmSyncLogger;
 
 		@Inject
-		private Factory(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-			this.syncClientException = syncClientException;
+		private Factory(SyncClientAssert syncClientAssert, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+			this.syncClientAssert = syncClientAssert;
 			this.locator = locator;
 			this.obmSyncLogger = obmSyncLogger;
 		}
 		
 		public SettingClient create(HttpClient httpClient) {
-			return new SettingClient(syncClientException, locator, obmSyncLogger, httpClient);
+			return new SettingClient(syncClientAssert, locator, obmSyncLogger, httpClient);
 		}
 	}
 	
 	private final SettingItemsParser respParser;
 	private final Locator locator;
 
-	private SettingClient(SyncClientException syncClientException, 
+	private SettingClient(SyncClientAssert syncClientAssert, 
 			Locator locator, 
 			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
 			HttpClient httpClient) {
 		
-		super(syncClientException, obmSyncLogger, httpClient);
+		super(syncClientAssert, obmSyncLogger, httpClient);
 		this.locator = locator;
 		this.respParser = new SettingItemsParser();
 	}

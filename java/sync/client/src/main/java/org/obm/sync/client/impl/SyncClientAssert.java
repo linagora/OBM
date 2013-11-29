@@ -42,7 +42,7 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.w3c.dom.Document;
 
-public class SyncClientException {
+public class SyncClientAssert {
 
 	public void checkServerFaultException(Document doc) throws ServerFault {
 		if (documentIsError(doc)) {

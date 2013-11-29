@@ -77,7 +77,7 @@ public class AbstractClientImplTest {
 	private TestServlet testServlet;
 	private ImmutableMultimap<String, String> params;
 	private IMocksControl control;
-	private SyncClientException syncClientException;
+	private SyncClientAssert syncClientAssert;
 	private Logger logger;
 	private CloseableHttpClient httpClient;
 	private Locator locator;
@@ -89,11 +89,11 @@ public class AbstractClientImplTest {
 	@Before
 	public void setup() throws Exception {
 		control = createControl();
-		syncClientException = control.createMock(SyncClientException.class);
+		syncClientAssert = control.createMock(SyncClientAssert.class);
 		logger = control.createMock(Logger.class);
 		locator = control.createMock(Locator.class);
 		httpClient = HttpClientBuilder.create().build();
-		client = new TestClient(syncClientException, logger, httpClient);
+		client = new TestClient(syncClientAssert, logger, httpClient);
 		
 		testServlet = new TestServlet();
 		server = new Server(0);
@@ -160,7 +160,7 @@ public class AbstractClientImplTest {
 	
 	private final class TestClient extends AbstractClientImpl {
 		private TestClient(
-				SyncClientException exceptionFactory, Logger obmSyncLogger,
+				SyncClientAssert exceptionFactory, Logger obmSyncLogger,
 				HttpClient httpClient) {
 			super(exceptionFactory, obmSyncLogger, httpClient);
 		}

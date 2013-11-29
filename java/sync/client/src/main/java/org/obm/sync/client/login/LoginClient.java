@@ -45,7 +45,7 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.client.exception.SIDNotFoundException;
 import org.obm.sync.client.impl.AbstractClientImpl;
-import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.impl.SyncClientAssert;
 import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
@@ -67,26 +67,26 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 
 		protected final String origin;
 		protected final ConfigurationService configurationService;
-		protected final SyncClientException syncClientException;
+		protected final SyncClientAssert syncClientAssert;
 		protected final Locator locator;
 		protected final Logger obmSyncLogger;
 
 		@Inject
 		protected Factory(@Named("origin")String origin,
 				ConfigurationService configurationService,
-				SyncClientException syncClientException, 
+				SyncClientAssert syncClientAssert, 
 				Locator locator, 
 				@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
 			
 			this.origin = origin;
 			this.configurationService = configurationService;
-			this.syncClientException = syncClientException;
+			this.syncClientAssert = syncClientAssert;
 			this.locator = locator;
 			this.obmSyncLogger = obmSyncLogger;
 		}
 		
 		public LoginClient create(HttpClient httpClient) {
-			return new LoginClient(origin, configurationService, syncClientException, locator, obmSyncLogger, httpClient);
+			return new LoginClient(origin, configurationService, syncClientAssert, locator, obmSyncLogger, httpClient);
 		}
 	}
 	
@@ -96,12 +96,12 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 
 	protected LoginClient(@Named("origin")String origin,
 			ConfigurationService configurationService,
-			SyncClientException syncClientException, 
+			SyncClientAssert syncClientAssert, 
 			Locator locator, 
 			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
 			HttpClient httpClient) {
 		
-		super(syncClientException, obmSyncLogger, httpClient);
+		super(syncClientAssert, obmSyncLogger, httpClient);
 		this.origin = origin;
 		this.configurationService = configurationService;
 		this.locator = locator;

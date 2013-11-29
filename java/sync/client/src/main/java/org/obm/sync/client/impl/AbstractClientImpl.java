@@ -72,12 +72,12 @@ public abstract class AbstractClientImpl {
 	
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	private final Logger obmSyncLogger;
-	protected final SyncClientException exceptionFactory;
+	protected final SyncClientAssert exceptionFactory;
 	protected final HttpClient httpClient;
 	
 	protected abstract Locator getLocator();
 
-	public AbstractClientImpl(SyncClientException exceptionFactory, Logger obmSyncLogger, HttpClient httpClient) {
+	public AbstractClientImpl(SyncClientAssert exceptionFactory, Logger obmSyncLogger, HttpClient httpClient) {
 		super();
 		this.exceptionFactory = exceptionFactory;
 		this.obmSyncLogger = obmSyncLogger;

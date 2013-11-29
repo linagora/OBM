@@ -33,7 +33,7 @@ package org.obm.sync.client.calendar;
 
 import org.apache.http.client.HttpClient;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.impl.SyncClientAssert;
 import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
 
@@ -46,28 +46,28 @@ public class CalendarClient extends AbstractEventSyncClient {
 	@Singleton
 	public static class Factory {
 
-		private final SyncClientException syncClientException;
+		private final SyncClientAssert syncClientAssert;
 		private final Locator locator;
 		private final Logger obmSyncLogger;
 
 		@Inject
-		protected Factory(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-			this.syncClientException = syncClientException;
+		protected Factory(SyncClientAssert syncClientAssert, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+			this.syncClientAssert = syncClientAssert;
 			this.locator = locator;
 			this.obmSyncLogger = obmSyncLogger;
 		}
 		
 		public CalendarClient create(HttpClient httpClient) {
-			return new CalendarClient(syncClientException, locator, obmSyncLogger, httpClient);
+			return new CalendarClient(syncClientAssert, locator, obmSyncLogger, httpClient);
 		}
 	}
 	
-	private CalendarClient(SyncClientException syncClientException, 
+	private CalendarClient(SyncClientAssert syncClientAssert, 
 			Locator locator, 
 			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
 			HttpClient httpClient) {
 		
-		super("/calendar", syncClientException, locator, obmSyncLogger, httpClient);
+		super("/calendar", syncClientAssert, locator, obmSyncLogger, httpClient);
 	}
 
 }

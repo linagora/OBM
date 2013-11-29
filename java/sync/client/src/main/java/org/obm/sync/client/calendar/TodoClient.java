@@ -33,7 +33,7 @@ package org.obm.sync.client.calendar;
 
 import org.apache.http.client.HttpClient;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.impl.SyncClientAssert;
 import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
 
@@ -46,28 +46,28 @@ public class TodoClient extends AbstractEventSyncClient {
 	@Singleton
 	public static class Factory {
 
-		private final SyncClientException syncClientException;
+		private final SyncClientAssert syncClientAssert;
 		private final Locator locator;
 		private final Logger obmSyncLogger;
 
 		@Inject
-		private Factory(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-			this.syncClientException = syncClientException;
+		private Factory(SyncClientAssert syncClientAssert, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+			this.syncClientAssert = syncClientAssert;
 			this.locator = locator;
 			this.obmSyncLogger = obmSyncLogger;
 		}
 		
 		public TodoClient create(HttpClient httpClient) {
-			return new TodoClient(syncClientException, locator, obmSyncLogger, httpClient);
+			return new TodoClient(syncClientAssert, locator, obmSyncLogger, httpClient);
 		}
 	}
 	
-	private TodoClient(SyncClientException syncClientException, 
+	private TodoClient(SyncClientAssert syncClientAssert, 
 			Locator locator, 
 			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
 			HttpClient httpClient) {
 		
-		super("/todo", syncClientException, locator, obmSyncLogger, httpClient);
+		super("/todo", syncClientAssert, locator, obmSyncLogger, httpClient);
 	}
 	
 }

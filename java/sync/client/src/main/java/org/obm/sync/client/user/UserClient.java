@@ -38,7 +38,7 @@ import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
-import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.impl.SyncClientAssert;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.services.IUser;
 import org.slf4j.Logger;
@@ -56,37 +56,37 @@ public class UserClient extends AbstractClientImpl implements IUser {
 
 		protected final String origin;
 		protected final ConfigurationService configurationService;
-		protected final SyncClientException syncClientException;
+		protected final SyncClientAssert syncClientAssert;
 		protected final Locator locator;
 		protected final Logger obmSyncLogger;
 
 		@Inject
 		protected Factory(@Named("origin")String origin,
 				ConfigurationService configurationService,
-				SyncClientException syncClientException, 
+				SyncClientAssert syncClientAssert, 
 				Locator locator, 
 				@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
 			
 			this.origin = origin;
 			this.configurationService = configurationService;
-			this.syncClientException = syncClientException;
+			this.syncClientAssert = syncClientAssert;
 			this.locator = locator;
 			this.obmSyncLogger = obmSyncLogger;
 		}
 		
 		public UserClient create(HttpClient httpClient) {
-			return new UserClient(syncClientException, locator, obmSyncLogger, httpClient);
+			return new UserClient(syncClientAssert, locator, obmSyncLogger, httpClient);
 		}
 	}
 	
 	private final Locator locator;
 
-	private UserClient(SyncClientException syncClientException, 
+	private UserClient(SyncClientAssert syncClientAssert, 
 			Locator locator, 
 			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
 			HttpClient httpClient) {
 		
-		super(syncClientException, obmSyncLogger, httpClient);
+		super(syncClientAssert, obmSyncLogger, httpClient);
 		this.locator = locator;
 	}
 

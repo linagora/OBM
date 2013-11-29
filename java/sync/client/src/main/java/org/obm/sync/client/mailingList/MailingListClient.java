@@ -38,7 +38,7 @@ import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
-import org.obm.sync.client.impl.SyncClientException;
+import org.obm.sync.client.impl.SyncClientAssert;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
@@ -58,19 +58,19 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 	@Singleton
 	public static class Factory {
 
-		private final SyncClientException syncClientException;
+		private final SyncClientAssert syncClientAssert;
 		private final Locator locator;
 		private final Logger obmSyncLogger;
 
 		@Inject
-		private Factory(SyncClientException syncClientException, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
-			this.syncClientException = syncClientException;
+		private Factory(SyncClientAssert syncClientAssert, Locator locator, @Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
+			this.syncClientAssert = syncClientAssert;
 			this.locator = locator;
 			this.obmSyncLogger = obmSyncLogger;
 		}
 
 		public MailingListClient create(HttpClient httpClient) {
-			return new MailingListClient(syncClientException, locator, obmSyncLogger, httpClient);
+			return new MailingListClient(syncClientAssert, locator, obmSyncLogger, httpClient);
 		}
 	}
 	
@@ -78,12 +78,12 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 	private final MailingListItemsWriter mlWriter;
 	private final Locator locator;
 
-	private MailingListClient(SyncClientException syncClientException, 
+	private MailingListClient(SyncClientAssert syncClientAssert, 
 			Locator locator, 
 			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
 			HttpClient httpClient) {
 		
-		super(syncClientException, obmSyncLogger, httpClient);
+		super(syncClientAssert, obmSyncLogger, httpClient);
 		this.locator = locator;
 		this.mlParser = new MailingListItemsParser();
 		this.mlWriter = new MailingListItemsWriter();
