@@ -31,7 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-public class EmailHeader {
+import java.io.Serializable;
+
+public class EmailHeader implements Serializable {
 
 	public enum Common {
 		
