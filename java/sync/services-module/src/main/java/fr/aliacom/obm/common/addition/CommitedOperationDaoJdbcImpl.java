@@ -115,10 +115,18 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 				"(commitedoperation_hash_client_id, commitedoperation_entity_id, commitedoperation_kind) " +
 				"VALUES (?, ?, ?) ");
 		int idx = 1;
-		ps.setString(idx++, commitedElement.getClientId());
-		ps.setInt(idx++, commitedElement.getEntityId().getId());
-		ps.setObject(idx++, getJdbcObject(commitedElement.getKind()));
-		return ps;
+		try {
+			ps.setString(idx++, commitedElement.getClientId());
+			ps.setInt(idx++, commitedElement.getEntityId().getId());
+			ps.setObject(idx++, getJdbcObject(commitedElement.getKind()));
+			return ps;
+		} catch (SQLException e) {
+			ps.close();
+			throw e;
+		} catch (RuntimeException e) {
+			ps.close();
+			throw e;
+		}
 	}
 
 	private PreparedStatement prepareUpdateStatement(Connection con, CommitedElement commitedElement) throws SQLException {
@@ -126,10 +134,18 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 				"UPDATE CommitedOperation " +
 				"SET commitedoperation_entity_id=? " +
 				"WHERE commitedoperation_hash_client_id=? ");
-		int idx = 1;
-		ps.setInt(idx++, commitedElement.getEntityId().getId());
-		ps.setString(idx++, commitedElement.getClientId());
-		return ps;
+		try {
+			int idx = 1;
+			ps.setInt(idx++, commitedElement.getEntityId().getId());
+			ps.setString(idx++, commitedElement.getClientId());
+			return ps;
+		} catch (SQLException e) {
+			ps.close();
+			throw e;
+		} catch (RuntimeException e) {
+			ps.close();
+			throw e;
+		}
 	}
 
 	@Override

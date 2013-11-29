@@ -136,10 +136,15 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 		select.setInt(1, serverId.getItemId());
 		select.setInt(2, itemSyncState.getId());
 		ResultSet resultSet = select.executeQuery();
-		if (resultSet.next()) {
-			return resultSet.getBoolean("addition");
-		} else {
-			return false;
+		try {
+			if (resultSet.next()) {
+				return resultSet.getBoolean("addition");
+			} else {
+				return false;
+			}
+		}
+		finally {
+			resultSet.close();
 		}
 	}
 }

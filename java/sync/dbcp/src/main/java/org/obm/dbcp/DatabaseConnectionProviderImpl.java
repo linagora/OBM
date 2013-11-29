@@ -114,7 +114,13 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 		String gmtTimezoneQuery = driverConfiguration.getGMTTimezoneQuery();
 		if (!Strings.isNullOrEmpty(gmtTimezoneQuery)) {
 			PreparedStatement ps = connection.prepareStatement(gmtTimezoneQuery);
-			ps.executeUpdate();
+			try {
+				ps.executeUpdate();
+			}
+			catch (SQLException ex) {
+				ps.close();
+				throw ex;
+			}
 		}
 	}
 

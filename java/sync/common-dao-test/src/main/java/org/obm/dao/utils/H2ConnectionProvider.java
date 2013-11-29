@@ -34,8 +34,10 @@ package org.obm.dao.utils;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.push.utils.JDBCUtils;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
@@ -63,11 +65,17 @@ public class H2ConnectionProvider implements DatabaseConnectionProvider {
 
 	@Override
 	public int lastInsertId(Connection con) throws SQLException {
-		ResultSet result = con.createStatement().executeQuery("CALL SCOPE_IDENTITY()");
-		if (result.next()) {
-			return result.getInt(1);
+		Statement stat = con.createStatement();
+		ResultSet result = null;
+		try {
+			result = stat.executeQuery("CALL SCOPE_IDENTITY()");
+			if (result.next()) {
+				return result.getInt(1);
+			}
+			throw new IllegalStateException();
+		} finally {
+			JDBCUtils.cleanup(null, stat, result);
 		}
-		throw new IllegalStateException();
 	}
 
 	@Override

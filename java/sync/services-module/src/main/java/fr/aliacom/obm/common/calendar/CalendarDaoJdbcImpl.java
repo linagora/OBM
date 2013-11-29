@@ -319,13 +319,15 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				")";
 
 		PreparedStatement ps = con.prepareStatement(evQ);
-		fillEventStatement(ps, ev, editor, 1);
-		ps.executeUpdate();
+		try {
+			fillEventStatement(ps, ev, editor, 1);
+			ps.executeUpdate();
+		}
+		finally {
+			ps.close();
+		}
 		EventObmId id = new EventObmId(obmHelper.lastInsertId(con));
 		ev.setUid(id);
-
-		ps.close();
-
 		LinkedEntity linkEntity = obmHelper.linkEntity(con, "EventEntity", "event_id", id.getObmId());
 		ev.setEntityId(linkEntity.getEntityId());
 
@@ -1885,45 +1887,55 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "WHERE event_id=?";
 
 		ps = con.prepareStatement(upQ);
-		ps.setInt(1, at.getObmId());
-		ps.setObject(2, obmHelper.getDBCP()
-				.getJdbcObject(ObmHelper.VCOMPONENT, ev.getType().toString()));
-		ps.setString(3, ev.getTimezoneName() != null ? ev.getTimezoneName()
-				: "Europe/Paris");
-		ps.setObject(4, obmHelper.getDBCP()
-				.getJdbcObject(ObmHelper.VOPACITY, ev.getOpacity().toString()));
-		ps.setString(5, ev.getTitle());
-		ps.setString(6, ev.getLocation());
-		Integer cat = catIdFromString(con, ev.getCategory(), at.getDomain().getId());
-		if (cat != null) {
-			ps.setInt(7, cat);
-		} else {
-			ps.setNull(7, Types.INTEGER);
+		try {
+			ps.setInt(1, at.getObmId());
+			ps.setObject(2, obmHelper.getDBCP()
+					.getJdbcObject(ObmHelper.VCOMPONENT, ev.getType().toString()));
+			ps.setString(3, ev.getTimezoneName() != null ? ev.getTimezoneName()
+					: "Europe/Paris");
+			ps.setObject(4, obmHelper.getDBCP()
+					.getJdbcObject(ObmHelper.VOPACITY, ev.getOpacity().toString()));
+			ps.setString(5, ev.getTitle());
+			ps.setString(6, ev.getLocation());
+			Integer cat = catIdFromString(con, ev.getCategory(), at.getDomain().getId());
+			if (cat != null) {
+				ps.setInt(7, cat);
+			} else {
+				ps.setNull(7, Types.INTEGER);
+			}
+			ps.setInt(8, ev.getPriority());
+			// do not allow making a private event become public from sync
+			// ps.setInt(9, old.getPrivacy() != 1 ? ev.getPrivacy() : old
+			// .getPrivacy());
+			ps.setInt(9, ev.getPrivacy().toInteger());
+			ps.setTimestamp(10, new Timestamp(ev.getStartDate().getTime()));
+			ps.setInt(11, ev.getDuration());
+			ps.setBoolean(12, ev.isAllday());
+			EventRecurrence er = ev.getRecurrence();
+			ps.setString(13, er.getKind().toString());
+			ps.setInt(14, er.getFrequence());
+			ps.setString(15, new RecurrenceDaysSerializer().serialize(er.getDays()));
+			if (er.getEnd() != null) {
+				ps.setTimestamp(16, new Timestamp(er.getEnd().getTime()));
+			} else {
+				ps.setNull(16, Types.TIMESTAMP);
+			}
+			ps.setNull(17, Types.TIMESTAMP);
+			ps.setNull(18, Types.VARCHAR);
+			ps.setString(19, ev.getDescription());
+			ps.setString(20, at.getOrigin());
+			ps.setInt(21, sequence);
+			ps.setInt(22, ev.getObmId().getObmId());
+			return ps;
 		}
-		ps.setInt(8, ev.getPriority());
-		// do not allow making a private event become public from sync
-		// ps.setInt(9, old.getPrivacy() != 1 ? ev.getPrivacy() : old
-		// .getPrivacy());
-		ps.setInt(9, ev.getPrivacy().toInteger());
-		ps.setTimestamp(10, new Timestamp(ev.getStartDate().getTime()));
-		ps.setInt(11, ev.getDuration());
-		ps.setBoolean(12, ev.isAllday());
-		EventRecurrence er = ev.getRecurrence();
-		ps.setString(13, er.getKind().toString());
-		ps.setInt(14, er.getFrequence());
-		ps.setString(15, new RecurrenceDaysSerializer().serialize(er.getDays()));
-		if (er.getEnd() != null) {
-			ps.setTimestamp(16, new Timestamp(er.getEnd().getTime()));
-		} else {
-			ps.setNull(16, Types.TIMESTAMP);
+		catch (SQLException e) {
+			ps.close();
+			throw e;
 		}
-		ps.setNull(17, Types.TIMESTAMP);
-		ps.setNull(18, Types.VARCHAR);
-		ps.setString(19, ev.getDescription());
-		ps.setString(20, at.getOrigin());
-		ps.setInt(21, sequence);
-		ps.setInt(22, ev.getObmId().getObmId());
-		return ps;
+		catch (RuntimeException e) {
+			ps.close();
+			throw e;
+		}
 	}
 
 	private void removeEventExceptions(Connection con, EventObmId idEventParent)

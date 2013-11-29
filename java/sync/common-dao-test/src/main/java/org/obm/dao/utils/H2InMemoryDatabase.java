@@ -144,14 +144,23 @@ public class H2InMemoryDatabase {
 
 	private PreparedStatement prepareStatement(Connection connection, String sql, Object... parameters) throws SQLException {
 		PreparedStatement statement = connection.prepareStatement(sql);
-
-		// Populate parameters in prepared statement
-		// This should infer the actual SQL type of each parameter automatically
-		if (parameters != null) {
-			for (int i = 0; i < parameters.length; i++)
-				statement.setObject(i + 1, parameters[i]);
+		try {
+			// Populate parameters in prepared statement
+			// This should infer the actual SQL type of each parameter automatically
+			if (parameters != null) {
+				for (int i = 0; i < parameters.length; i++)
+					statement.setObject(i + 1, parameters[i]);
+			}
+			return statement;
 		}
-		return statement;
+		catch (SQLException e) {
+			statement.close();
+			throw e;
+		}
+		catch (RuntimeException e) {
+			statement.close();
+			throw e;
+		}
 	}
 
 	/**

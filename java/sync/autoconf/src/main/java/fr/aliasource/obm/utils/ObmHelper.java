@@ -76,19 +76,19 @@ public class ObmHelper {
 		if (rs != null) {
 			try {
 				rs.close();
-			} catch (SQLException e) {
+			} catch (Throwable t) {
 			}
 		}
 		if (st != null) {
 			try {
 				st.close();
-			} catch (SQLException e) {
+			} catch (Throwable t) {
 			}
 		}
 		if (con != null) {
 			try {
 				con.close();
-			} catch (SQLException e) {
+			} catch (Throwable t) {
 			}
 		}
 	}

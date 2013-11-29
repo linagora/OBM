@@ -2,7 +2,6 @@ package org.obm.utils;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.slf4j.Logger;
@@ -23,22 +22,22 @@ public class DBUtils {
 		if (rs != null) {
 			try {
 				rs.close();
-			} catch (SQLException e) {
-				logger.warn("Error closing ResultSet", e);
+			} catch (Throwable t) {
+				logger.warn("Error closing ResultSet", t);
 			}
 		}
 		if (stat != null) {
 			try {
 				stat.close();
-			} catch (SQLException e) {
-				logger.warn("Error closing Statement", e);
+			} catch (Throwable t) {
+				logger.warn("Error closing Statement", t);
 			}
 		}
 		if (conn != null) {
 			try {
 				conn.close();
-			} catch (SQLException e) {
-				logger.warn("Error closing Connection", e);
+			} catch (Throwable t) {
+				logger.warn("Error closing Connection", t);
 			}
 		}
 	}
