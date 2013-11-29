@@ -49,7 +49,7 @@ public class StreamMailTestsUtils {
 	}
 	
 	public static ByteArrayInputStream newInputStreamFromString(String content, Charset charset) {
-		return new ByteArrayInputStream(new String(content).getBytes(charset));
+		return new ByteArrayInputStream(content.getBytes(charset));
 	}
 	
 	public static ByteArrayInputStream newInputStreamFromString(String content) {
