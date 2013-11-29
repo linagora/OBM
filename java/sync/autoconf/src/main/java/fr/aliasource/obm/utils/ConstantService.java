@@ -59,10 +59,21 @@ public class ConstantService {
 
 	private ConstantService() {
 		props = new Properties();
+		FileInputStream fis = null;
 		try {
-			props.load(new FileInputStream(ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH));
+			fis = new FileInputStream(ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH);
+			props.load(fis);
 		} catch (IOException e) {
 			logger.error("Problem while trying to read obm_conf.ini", e);
+		}
+		finally {
+			if (fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					logger.error("Problem while trying to close obm_conf.ini", e);
+				}
+			}
 		}
 	}
 

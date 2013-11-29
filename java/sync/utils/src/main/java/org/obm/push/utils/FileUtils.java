@@ -66,7 +66,17 @@ public class FileUtils {
 		InputStream in = null;
 		OutputStream out = null;
 		in = new FileInputStream(src);
-		out = new FileOutputStream(dest);
+		try {
+			out = new FileOutputStream(dest);
+		}
+		catch (IOException e) {
+			in.close();
+			throw e;
+		}
+		catch (RuntimeException e) {
+			in.close();
+			throw e;
+		}
 		transfer(in, out, true);
 	}
 

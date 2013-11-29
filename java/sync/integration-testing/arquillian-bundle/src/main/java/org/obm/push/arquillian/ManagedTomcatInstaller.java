@@ -99,7 +99,11 @@ public final class ManagedTomcatInstaller {
 			tomcatUsers.delete();
 		}
 		FileOutputStream outputStream = new FileOutputStream(tomcatUsers);
-		IOUtils.copy(resource.openStream(), outputStream);
+		try {
+			IOUtils.copy(resource.openStream(), outputStream);
+		} finally {
+			outputStream.close();
+		}
 	}
 
 	private static void copyTomcatManager() throws IOException, ArchiveException {
@@ -120,31 +124,54 @@ public final class ManagedTomcatInstaller {
 	private static File uncompressBZ2File(InputStream inputStream) throws IOException {
 		File tarFile = File.createTempFile("uncompress", "bz2");
 		FileOutputStream outputStream = new FileOutputStream(tarFile);
-		BZip2CompressorInputStream bzInputStream = new BZip2CompressorInputStream(inputStream);
-		IOUtils.copy(bzInputStream, outputStream);
-		
-		outputStream.close();
-		bzInputStream.close();
+		BZip2CompressorInputStream bzInputStream = null;
+		try {
+			bzInputStream = new BZip2CompressorInputStream(inputStream);
+			IOUtils.copy(bzInputStream, outputStream);
+
+		} finally {
+			try {
+				outputStream.close();
+			} finally {
+				if (bzInputStream != null) {
+					bzInputStream.close();
+				}
+			}
+		}
 		return tarFile;
 	}
 	
 	private static void uncompressTarFile(File parent, File inputFile) throws FileNotFoundException, IOException, ArchiveException {
-		FileInputStream inputStream = new FileInputStream(inputFile); 
-		ArchiveInputStream archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR, inputStream);
-		
-	    ArchiveEntry entry = null; 
-	    while ((entry = archiveInputStream.getNextEntry()) != null) {
-	        File outputFile = new File(parent, entry.getName());
-	        if (entry.isDirectory()) {
-	            if (!outputFile.exists()) {
-	            	outputFile.mkdir();
-	            }
-	        } else {
-	        	FileOutputStream outputFileStream = new FileOutputStream(outputFile); 
-	            IOUtils.copy(archiveInputStream, outputFileStream);
-	            outputFileStream.close();
-	        }
-	    }
-	    archiveInputStream.close(); 
+		FileInputStream inputStream = new FileInputStream(inputFile);
+		ArchiveInputStream archiveInputStream = null;
+		try {
+			archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(
+					ArchiveStreamFactory.TAR, inputStream);
+
+			ArchiveEntry entry = null;
+			while ((entry = archiveInputStream.getNextEntry()) != null) {
+				File outputFile = new File(parent, entry.getName());
+				if (entry.isDirectory()) {
+					if (!outputFile.exists()) {
+						outputFile.mkdir();
+					}
+				} else {
+					FileOutputStream outputFileStream = new FileOutputStream(outputFile);
+					try {
+						IOUtils.copy(archiveInputStream, outputFileStream);
+					} finally {
+						outputFileStream.close();
+					}
+				}
+			}
+		} finally {
+			try {
+				if (archiveInputStream != null) {
+					archiveInputStream.close();
+				}
+			} finally {
+				inputStream.close();
+			}
+		}
 	}
 }
