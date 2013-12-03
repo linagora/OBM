@@ -29,34 +29,14 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.locator;
 
-package org.obm.configuration;
-
-import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-public interface ConfigurationService {
-
-	String getObmUIBaseUrl();
-
-	String getObmSyncUrl(String obmSyncHost);
-
-	ResourceBundle getResourceBundle(Locale locale);
+public interface EmbeddedServer {
 	
-	String getActiveSyncServletUrl();
-
-	Charset getDefaultEncoding();
-
-	int transactionTimeoutInSeconds();
-
-	boolean usePersistentCache();
-
-	int trustTokenTimeoutInSeconds();
+	void start() throws Exception;
 	
-	int solrCheckingInterval();
-
-	String getDataDirectory();
-
-	String getGlobalDomain();
+	void stop() throws Exception;
+	
+	int getPort();
+	
 }
