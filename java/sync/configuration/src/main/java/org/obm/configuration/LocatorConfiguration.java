@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013 Linagora
+ * Copyright (C) 2011-2012  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,49 +29,21 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.locator;
 
-import org.obm.Configuration;
-import org.obm.StaticConfigurationService;
-import org.obm.configuration.ConfigurationModule;
-import org.obm.configuration.GlobalAppConfiguration;
-import org.obm.configuration.TestTransactionConfiguration;
-import org.obm.dbcp.DatabaseConfigurationFixtureH2;
-import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.H2DriverConfiguration;
+package org.obm.configuration;
 
-import com.google.common.io.Files;
-import com.google.inject.AbstractModule;
-import com.google.inject.util.Modules;
+import java.util.concurrent.TimeUnit;
 
-public class ArquillianLocatorModule extends AbstractModule {
+import javax.naming.ConfigurationException;
 
-	private Configuration configuration;
-	private TestTransactionConfiguration transactionConfiguration;
-
-	public ArquillianLocatorModule() {
-		configuration = new Configuration();
-		configuration.dataDir = Files.createTempDir();
-		transactionConfiguration = new TestTransactionConfiguration();
-	}
+public interface LocatorConfiguration {
 	
-	@Override
-	protected void configure() {
-		install(
-			Modules.override(new LocatorModule())
-				.with(new AbstractModule() {
-					@Override
-					protected void configure() {
-						install(
-							new ConfigurationModule(GlobalAppConfiguration.builder()
-									.mainConfiguration(new StaticConfigurationService(configuration))
-									.locatorConfiguration(new StaticConfigurationService.Locator(configuration.locator))
-									.databaseConfiguration(new DatabaseConfigurationFixtureH2())
-									.transactionConfiguration(transactionConfiguration)
-									.build()));
-						bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
-					}
-				})
-			);
-	}
+	String getLocatorUrl() throws ConfigurationException;
+	
+	int getLocatorClientTimeoutInSeconds();
+	
+	int getLocatorCacheTimeout();
+	
+	TimeUnit getLocatorCacheTimeUnit();
+
 }

@@ -37,14 +37,48 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
+import javax.naming.ConfigurationException;
+
 import org.obm.Configuration.Mail;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.configuration.LocatorConfiguration;
 
 import com.google.common.base.Throwables;
 
 public class StaticConfigurationService implements ConfigurationService {
 
+	public static class Locator implements LocatorConfiguration {
+
+		private final org.obm.Configuration.Locator configuration;
+
+		public Locator(org.obm.Configuration.Locator configuration) {
+			this.configuration = configuration;
+		}
+		
+		@Override
+		public String getLocatorUrl() throws ConfigurationException {
+			return configuration.url;
+		}
+
+		@Override
+		public int getLocatorClientTimeoutInSeconds() {
+			return configuration.clientTimeout;
+		}
+
+		@Override
+		public int getLocatorCacheTimeout() {
+			return configuration.cacheTimeout;
+		}
+
+		@Override
+		public TimeUnit getLocatorCacheTimeUnit() {
+			return configuration.cacheTimeUnit;
+		}
+		
+		
+	}
+	
 	public static class Email implements EmailConfiguration {
 
 		private final Mail configuration;
@@ -117,11 +151,6 @@ public class StaticConfigurationService implements ConfigurationService {
 	}
 
 	@Override
-	public String getLocatorUrl() {
-		return configuration.locatorUrl;
-	}
-
-	@Override
 	public String getObmUIBaseUrl() {
 		return configuration.obmUiBaseUrl;
 	}
@@ -129,16 +158,6 @@ public class StaticConfigurationService implements ConfigurationService {
 	@Override
 	public String getObmSyncUrl(String obmSyncHost) {
 		return obmSyncHost + configuration.obmSyncServices;
-	}
-
-	@Override
-	public int getLocatorCacheTimeout() {
-		return configuration.locatorCacheTimeout;
-	}
-
-	@Override
-	public TimeUnit getLocatorCacheTimeUnit() {
-		return configuration.locatorCacheTimeUnit;
 	}
 
 	@Override

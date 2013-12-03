@@ -45,6 +45,7 @@ public class ConfigurationModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(ConfigurationService.class).toInstance(globalAppConfiguration.getConfigurationService());
+		bind(LocatorConfiguration.class).toInstance(globalAppConfiguration.getLocatorConfiguration());
 		bind(DatabaseConfiguration.class).toInstance(globalAppConfiguration.getDatabaseConfiguration());
 		bind(TransactionConfiguration.class).toInstance(globalAppConfiguration.getTransactionConfiguration());
 	}
