@@ -56,7 +56,7 @@ public class ServicesTestModule extends AbstractModule {
 	public ServicesTestModule(@SuppressWarnings("unused") ServletContext servletContext) {
 		configuration = new Configuration();
 		configuration.obmUiBaseUrl = "localhost";
-		configuration.locatorUrl = "localhost";
+		configuration.locator.url = "localhost";
 		configuration.dataDir = Files.createTempDir();
 	}
 

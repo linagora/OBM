@@ -46,13 +46,15 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.primitives.Ints;
 
-public class ConfigurationServiceImpl implements ConfigurationService {
+public class ConfigurationServiceImpl implements ConfigurationService, LocatorConfiguration {
 
 	private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 
 	private static final String LOCATOR_CACHE_TIMEUNIT_KEY = "locator-cache-timeunit";
 	private static final String LOCATOR_CACHE_TIMEOUT_KEY = "locator-cache-timeout";
 	private static final int LOCATOR_CACHE_TIMEOUT_DEFAULT = 30;
+	private static final String LOCATOR_CLIENT_TIMEOUT_KEY = "locator-client-timeout-seconds";
+	private static final int LOCATOR_CLIENT_TIMEOUT_DEFAULT = 5;
 
 	private static final String TRANSACTION_TIMEOUT_UNIT_KEY = "transaction-timeout-unit";
 	private static final String TRANSACTION_TIMEOUT_KEY = "transaction-timeout";
@@ -124,6 +126,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		return "http://" + obmSyncHost + ":" + OBM_SYNC_PORT + "/" + OBM_SYNC_APP_NAME;
 	}
 
+	@Override
+	public int getLocatorClientTimeoutInSeconds() {
+		return iniFile.getIntValue(LOCATOR_CLIENT_TIMEOUT_KEY, LOCATOR_CLIENT_TIMEOUT_DEFAULT);
+	}
+	
 	@Override
 	public int getLocatorCacheTimeout() {
 		return iniFile.getIntValue(LOCATOR_CACHE_TIMEOUT_KEY, LOCATOR_CACHE_TIMEOUT_DEFAULT);

@@ -35,23 +35,14 @@ package org.obm.configuration;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
-
-import javax.naming.ConfigurationException;
 
 public interface ConfigurationService {
 	
 	String GLOBAL_OBM_CONFIGURATION_PATH = "/etc/obm/obm_conf.ini";
 
-	String getLocatorUrl() throws ConfigurationException;
-
 	String getObmUIBaseUrl();
 
 	String getObmSyncUrl(String obmSyncHost);
-
-	int getLocatorCacheTimeout();
-
-	TimeUnit getLocatorCacheTimeUnit();
 
 	ResourceBundle getResourceBundle(Locale locale);
 	

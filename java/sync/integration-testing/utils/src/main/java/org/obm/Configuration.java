@@ -66,6 +66,13 @@ public class Configuration {
 		public int maxMessageSize = 1024;
 		public int fetchBlockSize = 1 << 20;
 	}
+	
+	public static class Locator {
+		public String url = null;
+		public int clientTimeout = 5;
+		public int cacheTimeout = 10;
+		public TimeUnit cacheTimeUnit = TimeUnit.SECONDS;
+	}
 
 	public static class Transaction {
 		public int timeoutInSeconds = 10;
@@ -100,12 +107,10 @@ public class Configuration {
 	public Transaction transaction = new Transaction();
 	public RemoteConsole remoteConsole = new RemoteConsole();
 	public EhCache ehCache = new EhCache();
+	public Locator locator = new Locator();
 	public File dataDir;
-	public String locatorUrl = null;
 	public String obmUiBaseUrl = null;
 	public String obmSyncServices = "services";
-	public int locatorCacheTimeout = 10;
-	public TimeUnit locatorCacheTimeUnit = TimeUnit.SECONDS;
 	public String activeSyncServletUrl = null;
 	public Charset defautEncoding = Charsets.UTF_8;
 	public int trustTokenTimeoutInSeconds = 10;
