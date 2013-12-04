@@ -51,13 +51,9 @@
 			<artifactId>easymock</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.btm</groupId>
+			<groupId>be.bitronix.btm</groupId>
 			<artifactId>btm</artifactId>
 		</dependency>
-		 <dependency>
-                        <groupId>org.codehaus.btm</groupId>
-                        <artifactId>btm-jdbc4</artifactId>
-                </dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
