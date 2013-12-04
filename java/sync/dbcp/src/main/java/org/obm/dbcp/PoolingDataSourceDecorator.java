@@ -49,8 +49,6 @@ import com.google.inject.name.Named;
 @Singleton
 public class PoolingDataSourceDecorator {
 
-	private static final String VALIDATION_QUERY = "SELECT 666";
-
 	private final DatabaseDriverConfiguration driverConfiguration;
 	private final PoolingDataSource poolingDataSource;
 	
@@ -78,7 +76,7 @@ public class PoolingDataSourceDecorator {
 		poolingDataSource.setAllowLocalTransactions(true);
 		poolingDataSource.getDriverProperties().putAll(
 				driverConfiguration.getDriverProperties(databaseConfiguration));
-		poolingDataSource.setTestQuery(VALIDATION_QUERY);
+		poolingDataSource.setEnableJdbc4ConnectionTest(true);
 		poolingDataSource.setShareTransactionConnections(true);
 	}
 
