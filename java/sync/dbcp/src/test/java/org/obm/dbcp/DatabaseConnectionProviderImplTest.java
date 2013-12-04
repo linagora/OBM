@@ -32,13 +32,14 @@
 
 package org.obm.dbcp;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.easymock.IMocksControl;
@@ -49,108 +50,243 @@ import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
 import org.obm.filter.SlowFilterRunner;
+import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableSet;
 
 @RunWith(SlowFilterRunner.class)
 public class DatabaseConnectionProviderImplTest {
-
-	private IMocksControl control = createControl();
-	private DatabaseConnectionProviderImpl dbConnProvider;
+	
+	private DatabaseConnectionProviderImpl testee;
 	private ITransactionAttributeBinder transactionAttributeBinder;
-	private Transactional transactional;
-	private Connection connection;
-
+	private DatabaseConfiguration databaseConfiguration;
+	private IMocksControl control;
+	private Logger logger;
+	private DatabaseDriverConfigurationProvider databaseDriverConfigurationProvider;
+	
 	@Before
 	public void setUp() {
+		control = createControl();
+		
+		logger = control.createMock(Logger.class);
+		logger.info(anyObject(String.class), anyObject(Object.class));
+		expectLastCall().anyTimes();
+		logger.info(anyObject(String.class), anyObject(Object.class), anyObject(Object.class));
+		expectLastCall().anyTimes();
+		
 		transactionAttributeBinder = control.createMock(ITransactionAttributeBinder.class);
-		transactional = control.createMock(Transactional.class);
-		connection = control.createMock(Connection.class);
-
-		dbConnProvider = new DatabaseConnectionProviderImpl(transactionAttributeBinder, new DatabaseConfigurationFixturePostgreSQL(), new PostgresDriverConfiguration(), createNiceMock(Logger.class));
+		databaseConfiguration = new DatabaseConfigurationFixturePostgreSQL();
+		databaseDriverConfigurationProvider = new DatabaseDriverConfigurationProvider(ImmutableSet.<DatabaseDriverConfiguration>of(new PostgresDriverConfiguration()), databaseConfiguration);
 	}
-
+	
 	@After
 	public void tearDown() throws Exception {
-		dbConnProvider.shutdown();
+		if (testee != null) {
+			testee.shutdown();
+		}
 		control.verify();
 	}
-
-	@Test(expected = SQLException.class)
-	public void testGetConnection() throws SQLException {
+	
+	@Test(expected=SQLException.class)
+	public void testGetConnectionWhenNoConnectionAvailable() throws SQLException {
 		control.replay();
-
-		dbConnProvider.getConnection();
+		databaseConnectionProvider(poolingDataSource());
+		testee.getConnection();
+	}
+	
+	@Test(expected=SQLException.class)
+	public void testGetConnectionExceptionOnFirstStatement() throws Exception {
+		PreparedStatement preparedStatement = control.createMock(PreparedStatement.class);
+		expect(preparedStatement.executeUpdate())
+			.andThrow(new SQLException());
+		
+		Connection connection = control.createMock(Connection.class);
+		expect(connection.prepareStatement(anyObject(String.class)))
+			.andReturn(preparedStatement);
+		boolean readOnly = true;
+		expect(connection.isReadOnly())
+			.andReturn(readOnly);
+		connection.close();
+		expectLastCall();
+		
+		DatabaseDriverConfiguration databaseDriverConfiguration = databaseDriverConfigurationProvider.get();
+		PoolingDataSourceDecorator poolingDataSource = control.createMock(PoolingDataSourceDecorator.class);
+		expect(poolingDataSource.getConnection())
+			.andReturn(connection);
+		expect(poolingDataSource.getDatabaseDriverConfiguration())
+			.andReturn(databaseDriverConfiguration).anyTimes();
+		poolingDataSource.close();
+		expectLastCall();
+		
+		Transactional transactional = control.createMock(Transactional.class);
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction())
+			.andReturn(transactional).once();
+		expect(transactional.readOnly())
+			.andReturn(readOnly).once();
+		
+		control.replay();
+		databaseConnectionProvider(poolingDataSource);
+		testee.getConnection();
+	}
+	
+	@Test
+	public void testGetConnection() throws Exception {
+		PreparedStatement preparedStatement = control.createMock(PreparedStatement.class);
+		expect(preparedStatement.executeUpdate())
+			.andReturn(0);
+		
+		Connection connection = control.createMock(Connection.class);
+		expect(connection.prepareStatement(anyObject(String.class)))
+			.andReturn(preparedStatement);
+		boolean readOnly = true;
+		expect(connection.isReadOnly())
+			.andReturn(readOnly);
+		
+		DatabaseDriverConfiguration databaseDriverConfiguration = databaseDriverConfigurationProvider.get();
+		PoolingDataSourceDecorator poolingDataSource = control.createMock(PoolingDataSourceDecorator.class);
+		expect(poolingDataSource.getConnection())
+			.andReturn(connection);
+		expect(poolingDataSource.getDatabaseDriverConfiguration())
+			.andReturn(databaseDriverConfiguration).anyTimes();
+		poolingDataSource.close();
+		expectLastCall();
+		
+		Transactional transactional = control.createMock(Transactional.class);
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction())
+			.andReturn(transactional).once();
+		expect(transactional.readOnly())
+			.andReturn(readOnly).once();
+		
+		control.replay();
+		databaseConnectionProvider(poolingDataSource);
+		testee.getConnection();
 	}
 
 	@Test
 	public void testIsReadOnlyTransactionWhenTrue() throws TransactionException {
+		Transactional transactional = control.createMock(Transactional.class);
 		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
 		expect(transactional.readOnly()).andReturn(true).once();
+		
 		control.replay();
-
-		assertThat(dbConnProvider.isReadOnlyTransaction()).isTrue();
+		databaseConnectionProvider(poolingDataSource());
+		assertThat(testee.isReadOnlyTransaction()).isTrue();
 	}
 
 	@Test
 	public void testIsReadOnlyTransactionWhenFalse() throws TransactionException {
+		Transactional transactional = control.createMock(Transactional.class);
 		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
 		expect(transactional.readOnly()).andReturn(false).once();
+		
 		control.replay();
-
-		assertThat(dbConnProvider.isReadOnlyTransaction()).isFalse();
+		databaseConnectionProvider(poolingDataSource());
+		assertThat(testee.isReadOnlyTransaction()).isFalse();
 	}
 
 	@Test
 	public void testIsReadOnlyTransactionWhenNoTransactional() throws TransactionException {
 		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(null).once();
+		
 		control.replay();
-
-		assertThat(dbConnProvider.isReadOnlyTransaction()).isTrue();
+		databaseConnectionProvider(poolingDataSource());
+		assertThat(testee.isReadOnlyTransaction()).isTrue();
 	}
 
 	@Test
 	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadOnlyButConnectionReadWrite() throws TransactionException, SQLException {
-		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
-		expect(transactional.readOnly()).andReturn(true).once();
-		expect(connection.isReadOnly()).andReturn(false).once();
+		Connection connection = control.createMock(Connection.class);
+		Transactional transactional = control.createMock(Transactional.class);
+		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction())
+			.andReturn(transactional).once();
+		expect(transactional.readOnly())
+			.andReturn(true).once();
+		expect(connection.isReadOnly())
+			.andReturn(false).once();
 		connection.setReadOnly(true);
 		expectLastCall().once();
+		
 		control.replay();
-
-		dbConnProvider.setConnectionReadOnlyIfNecessary(connection);
+		databaseConnectionProvider(poolingDataSource());
+		testee.setConnectionReadOnlyIfNecessary(connection);
 	}
 
 	@Test
 	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadWriteButConnectionReadOnly() throws TransactionException, SQLException {
+		Connection connection = control.createMock(Connection.class);
+		Transactional transactional = control.createMock(Transactional.class);
 		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
 		expect(transactional.readOnly()).andReturn(false).once();
 		expect(connection.isReadOnly()).andReturn(true).once();
 		connection.setReadOnly(false);
 		expectLastCall().once();
+		
 		control.replay();
+		databaseConnectionProvider(poolingDataSource());
+		testee.setConnectionReadOnlyIfNecessary(connection);
+	}
+	
+	@Test
+	public void testGetJdbcObjectWhenH2() throws SQLException {
+		databaseConfiguration = new DatabaseConfigurationFixtureH2();
+		databaseDriverConfigurationProvider = new DatabaseDriverConfigurationProvider(ImmutableSet.<DatabaseDriverConfiguration>of(new H2DriverConfiguration()), databaseConfiguration);
+		
+		control.replay();
+		databaseConnectionProvider(poolingDataSource());
+		Object aTree = testee.getJdbcObject("type", "aChristmasTree");
+		assertThat(aTree).isEqualTo("aChristmasTree");
+	}
+	
+	@Test
+	public void testGetJdbcObjectWhenPGSQL() throws SQLException {
+		PGobject expectedObject = new PGobject();
+		expectedObject.setType("type");
+		expectedObject.setValue("value");
+		
+		control.replay();
+		databaseConnectionProvider(poolingDataSource());
+		Object value = testee.getJdbcObject("type", "value");
+		assertThat(value).isEqualTo(expectedObject);
+	}
 
-		dbConnProvider.setConnectionReadOnlyIfNecessary(connection);
+	private void databaseConnectionProvider(PoolingDataSourceDecorator poolingDataSource) {
+		testee = new DatabaseConnectionProviderImpl(
+				transactionAttributeBinder, poolingDataSource);
+	}
+
+	private PoolingDataSourceDecorator poolingDataSource() {
+		return new PoolingDataSourceDecorator(databaseDriverConfigurationProvider, databaseConfiguration, logger);
 	}
 
 	@Test
 	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadOnlyAndConnectionReadOnly() throws TransactionException, SQLException {
+		Connection connection = control.createMock(Connection.class);
+		Transactional transactional = control.createMock(Transactional.class);
 		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
 		expect(transactional.readOnly()).andReturn(true).once();
 		expect(connection.isReadOnly()).andReturn(true).once();
+		
 		control.replay();
-
-		dbConnProvider.setConnectionReadOnlyIfNecessary(connection);
+		databaseConnectionProvider(poolingDataSource());
+		testee.setConnectionReadOnlyIfNecessary(connection);
 	}
 
 	@Test
 	public void testSetConnectionReadOnlyIfNecessaryOnTransactionReadWriteAndConnectionReadWrite() throws TransactionException, SQLException {
+		Connection connection = control.createMock(Connection.class);
+		Transactional transactional = control.createMock(Transactional.class);
 		expect(transactionAttributeBinder.getTransactionalInCurrentTransaction()).andReturn(transactional).once();
 		expect(transactional.readOnly()).andReturn(false).once();
 		expect(connection.isReadOnly()).andReturn(false).once();
+		
 		control.replay();
-
-		dbConnProvider.setConnectionReadOnlyIfNecessary(connection);
+		databaseConnectionProvider(poolingDataSource());
+		testee.setConnectionReadOnlyIfNecessary(connection);
 	}	
 }
