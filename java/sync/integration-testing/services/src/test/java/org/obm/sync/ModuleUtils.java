@@ -43,7 +43,9 @@ import org.obm.Configuration;
 import org.obm.ConfigurationModule;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.locator.LocatorClientException;
@@ -75,7 +77,9 @@ public class ModuleUtils {
 					}
 				});
 				install(new ConfigurationModule(configuration, new TestTransactionConfiguration()));
-				bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
+				Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
+				databaseDrivers.addBinding().to(H2DriverConfiguration.class);
+				bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 				bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 				bind(ObmSyncConfigurationService.class).toInstance(new ObmSyncStaticConfigurationService.
 						ObmSyncConfiguration(configuration, new Configuration.ObmSync()));

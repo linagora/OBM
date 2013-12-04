@@ -54,6 +54,7 @@ import org.obm.domain.dao.UserPatternDaoJdbcImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.sun.jersey.guice.JerseyServletModule;
 
@@ -72,7 +73,8 @@ public class TestingProvisioningModule extends ProvisioningService {
 		
 		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
 		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
-		bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
+		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
+		databaseDrivers.addBinding().to(H2DriverConfiguration.class);
 		bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 		bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
 		bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);

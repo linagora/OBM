@@ -101,5 +101,11 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-dao-test</artifactId>
+			<version>${obm.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

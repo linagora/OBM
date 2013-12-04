@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.dbcp;
 
-import static org.easymock.EasyMock.createControl;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.easymock.EasyMock.createControl;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -45,8 +45,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.slf4j.Logger;
+
+import com.google.common.collect.ImmutableSet;
 
 public class DatabaseConnectionProviderInitTest {
 
@@ -70,8 +73,9 @@ public class DatabaseConnectionProviderInitTest {
 	}
 	
 	private DatabaseConnectionProviderImpl newDatabaseConnectionProviderImpl(DatabaseConfiguration databaseConfiguration) {
+		DatabaseDriverConfigurationProvider databaseDriverConfigurationFactory = new DatabaseDriverConfigurationProvider(ImmutableSet.<DatabaseDriverConfiguration>of(h2Driver), databaseConfiguration);
 		return testee = new DatabaseConnectionProviderImpl(
-				transactionAttributeBinder, databaseConfiguration, h2Driver, logger);
+				transactionAttributeBinder, new PoolingDataSourceDecorator(databaseDriverConfigurationFactory, databaseConfiguration, logger));
 	}
 
 	@Test

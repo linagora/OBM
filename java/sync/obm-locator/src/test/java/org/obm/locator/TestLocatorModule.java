@@ -37,12 +37,15 @@ import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
+import org.obm.dao.utils.H2ConnectionProvider;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.locator.server.ContainerModule;
 
 import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.util.Modules;
 
 public class TestLocatorModule extends AbstractModule {
@@ -69,6 +72,9 @@ public class TestLocatorModule extends AbstractModule {
 							bind(LocatorConfiguration.class).toInstance(new StaticConfigurationService.Locator(configuration.locator));
 							bind(TransactionConfiguration.class).toInstance(transactionConfiguration);
 							bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
+							Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
+							databaseDrivers.addBinding().to(H2DriverConfiguration.class);
+							bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 						}
 					})
 			);

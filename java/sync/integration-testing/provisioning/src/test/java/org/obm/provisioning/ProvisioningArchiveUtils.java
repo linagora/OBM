@@ -42,6 +42,8 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.obm.StaticConfigurationService;
 import org.obm.arquillian.GuiceWebXmlDescriptor;
 import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.dao.utils.H2ConnectionProvider;
+import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 
@@ -66,7 +68,9 @@ public class ProvisioningArchiveUtils {
 						DatabaseConfigurationFixtureH2.class,
 						StaticConfigurationService.class,
 						TestTransactionConfiguration.class,
-						H2DriverConfiguration.class);
+						H2DriverConfiguration.class,
+						H2ConnectionProvider.class,
+						H2InMemoryDatabase.class);
 	}
 	
 	private static File[] provisioningModule() {
