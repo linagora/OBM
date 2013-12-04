@@ -72,9 +72,9 @@ public class DatabaseConnectionProviderInitTest {
 	}
 	
 	private DatabaseConnectionProviderImpl newDatabaseConnectionProviderImpl(DatabaseConfiguration databaseConfiguration) {
+		DatabaseDriverConfigurationFactory databaseDriverConfigurationFactory = new DatabaseDriverConfigurationFactory(ImmutableSet.<DatabaseDriverConfiguration>of(h2Driver), databaseConfiguration);
 		return testee = new DatabaseConnectionProviderImpl(
-				ImmutableSet.<DatabaseDriverConfiguration>of(h2Driver), 
-				transactionAttributeBinder, databaseConfiguration, logger);
+				transactionAttributeBinder, new PoolingDataSourceDecorator(databaseDriverConfigurationFactory, databaseConfiguration, logger));
 	}
 
 	@Test
