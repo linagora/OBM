@@ -32,6 +32,8 @@ package org.obm.sync.solr.jms;
 import java.io.Serializable;
 import java.util.EnumMap;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.solr.ContactIndexer;
@@ -48,12 +50,18 @@ import com.google.inject.Singleton;
 public class DefaultCommandConverter implements CommandConverter {
 	private final LocatorService locatorService;
 	private final EnumMap<SolrService, IndexerFactory<? extends Serializable>> solrServiceToFactoryMap;
+	private final HttpClient solrHttpClient;
 	
 	@Inject
 	@VisibleForTesting
 	public DefaultCommandConverter(LocatorService locatorService, ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory) {
 		this.locatorService = locatorService;
 		
+		MultiThreadedHttpConnectionManager cnxManager = new MultiThreadedHttpConnectionManager();
+		cnxManager.getParams().setDefaultMaxConnectionsPerHost(10);
+		cnxManager.getParams().setMaxTotalConnections(100);
+		solrHttpClient = new HttpClient(cnxManager);
+	
 		solrServiceToFactoryMap = new EnumMap<SolrService, IndexerFactory<? extends Serializable>>(SolrService.class);
 		solrServiceToFactoryMap.put(SolrService.EVENT_SERVICE, eventIndexerFactory);
 		solrServiceToFactoryMap.put(SolrService.CONTACT_SERVICE, contactIndexerFactory);
@@ -69,7 +77,7 @@ public class DefaultCommandConverter implements CommandConverter {
 		}
 		
 		String solrLocation = locatorService.getServiceLocation(solrService.getName(), command.getDomain().getName());
-		CommonsHttpSolrServer server = new CommonsHttpSolrServer("http://" + solrLocation + ":8080/" + solrService.getName());
+		CommonsHttpSolrServer server = new CommonsHttpSolrServer("http://" + solrLocation + ":8080/" + solrService.getName(), solrHttpClient);
 		
 		return command.asSolrRequest(server, factory);
 	}
