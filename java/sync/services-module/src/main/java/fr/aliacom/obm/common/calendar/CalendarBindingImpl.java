@@ -51,7 +51,6 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.DateTime;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.util.Objects;
 import org.joda.time.Months;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.icalendar.ICalendarFactory;
@@ -92,6 +91,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
@@ -989,8 +989,8 @@ public class CalendarBindingImpl implements ICalendar {
 		return events;
 	}
 
-	private Event inheritAlertFromOwnerIfNotSet(Integer userId, Integer ownerId, Event event) {
-		if (event.getAlert() == null && !Objects.equals(userId, ownerId)) {
+	@VisibleForTesting Event inheritAlertFromOwnerIfNotSet(Integer userId, Integer ownerId, Event event) {
+		if (event.getAlert() == null && !Objects.equal(userId, ownerId)) {
 			event.setAlert(calendarDao.getEventAlertForUser(event.getObmId(), ownerId));
 		}
 

@@ -4005,6 +4005,67 @@ public class CalendarBindingImplTest {
 		binding.convertAttendeesOnEvent(event, owner);
 	}
 
+	@Test
+	public void inheritAlertFromOwnerIfNotSetWithUserDifferentFromOwner() {
+		EventObmId eventUid = new EventObmId(1);
+		Event event = new Event();
+		event.setUid(eventUid);
+		Integer userId = Integer.valueOf(2);
+		Integer ownerId = Integer.valueOf(3);
+		expect(calendarDao.getEventAlertForUser(eventUid, ownerId)).andReturn(Integer.valueOf(666));
+
+		Event expectedEvent = new Event();
+		expectedEvent.setUid(eventUid);
+		expectedEvent.setAlert(Integer.valueOf(666));
+		this.mocksControl.replay();
+
+		assertThat(binding.inheritAlertFromOwnerIfNotSet(userId, ownerId, event)).isEqualTo(
+				expectedEvent);
+
+		this.mocksControl.verify();
+	}
+
+	@Test
+	public void inheritAlertFromOwnerIfNotSetWithSameUserAsOwner() {
+		EventObmId eventUid = new EventObmId(1);
+		Event event = new Event();
+		event.setUid(eventUid);
+		// Use new Integer() and not valueOf() to make sure userId and ownerId
+		// are distinct
+		Integer userId = new Integer(2);
+		Integer ownerId = new Integer(2);
+
+		Event expectedEvent = new Event();
+		expectedEvent.setUid(eventUid);
+		this.mocksControl.replay();
+
+		assertThat(binding.inheritAlertFromOwnerIfNotSet(userId, ownerId, event)).isEqualTo(
+				expectedEvent);
+
+		this.mocksControl.verify();
+	}
+
+	@Test
+	public void inheritAlertFromOwnerWithNonNullAlert() {
+		EventObmId eventUid = new EventObmId(1);
+		Event event = new Event();
+		event.setUid(eventUid);
+		event.setAlert(Integer.valueOf(42));
+		Integer userId = Integer.valueOf(2);
+		Integer ownerId = Integer.valueOf(3);
+
+		Event expectedEvent = new Event();
+		expectedEvent.setUid(eventUid);
+		expectedEvent.setAlert(Integer.valueOf(42));
+		this.mocksControl.replay();
+
+		assertThat(binding.inheritAlertFromOwnerIfNotSet(userId, ownerId, event)).isEqualTo(
+				expectedEvent);
+
+		this.mocksControl.verify();
+	}
+
+
 	private void mockCommitedOperationNewEvent(Event event, String clientId) throws Exception {
 		expect(commitedOperationDao.findAsEvent(token, clientId)).andReturn(null).once();
 		commitedOperationDao.store(token, CommitedElement.builder()
