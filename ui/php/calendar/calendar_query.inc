@@ -985,9 +985,12 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
   $priority = sql_parse_int( $calendar['priority']);
   $description = sql_parse_text($calendar['description']);
   $location = sql_parse_text($calendar['location']);
-  ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
+  $all_day = ($calendar['all_day'] == 1) ? 'TRUE' : 'FALSE';
   $datebegin = $calendar['date_begin'];
-  $event_duration = event_duration($datebegin, $calendar['event_duration'], $calendar['all_day'] == 1);
+  if ($all_day == 'TRUE') {
+    $datebegin->setHour(0)->setMinute(0)->setSecond(0);
+  }
+  $event_duration = event_duration($datebegin, $calendar['event_duration'], $all_day == 'TRUE');
   $privacy = $calendar['privacy'];
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
