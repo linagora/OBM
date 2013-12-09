@@ -18,6 +18,7 @@ MVN_BIN := /usr/bin/mvn -Duser.home=$(HOME) $(MVN_BUILD_OPTIONS)
 ROOT_INSTALL_DIR = /usr/share/$(cdbs_curpkg)
 FAKEROOT_INSTALL_DIR = debian/$(cdbs_curpkg)$(ROOT_INSTALL_DIR)
 FAKEROOT_TOMCAT_CONFIG_DIR = debian/$(cdbs_curpkg)/usr/share/obm-tomcat/applis
+FAKEROOT_LOCATOR_CONFIG_DIR = debian/$(cdbs_curpkg)/usr/share/obm-locator
 
 # Template for the Tomcat webapp file
 define WEBAPP_FILE
@@ -50,7 +51,10 @@ install/obm-sync::
 	rm -f $(INSTALL_DIR)/WEB-INF/lib/jta-1.1.jar
 
 install/obm-locator::
-	cp -r $(CURDIR)/obm-locator/target/obm-locator $(CURDIR)/debian/obm-locator/var/lib/jetty/webapps/
+	mkdir -p $(FAKEROOT_LOCATOR_CONFIG_DIR) 
+	cp $(CURDIR)/obm-locator/target/obm-locator.jar $(CURDIR)/debian/obm-locator/usr/share/obm-locator/
+	cp -a $(CURDIR)/obm-locator/obm-locator.debian.sh $(CURDIR)/debian/obm-locator/usr/share/obm-locator/obm-locator.sh
+	cp -r $(CURDIR)/obm-locator/target/lib $(CURDIR)/debian/obm-locator/usr/share/obm-locator/
 
 install/opush::
 	cp -r $(CURDIR)/opush/push/target/opush $(CURDIR)/debian/opush/var/lib/jetty/webapps/

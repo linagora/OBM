@@ -1,4 +1,4 @@
-var/lib/jetty/webapps/obm-locator
+usr/share/obm-locator
 var/log/obm-locator
 etc/obm-locator
 var/lib/obm-locator
