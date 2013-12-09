@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.locator;
+package org.obm.locator.server.servlet;
 
 import java.io.IOException;
 import java.util.Set;

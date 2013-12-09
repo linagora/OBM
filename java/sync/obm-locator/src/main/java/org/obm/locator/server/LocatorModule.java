@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.locator;
+package org.obm.locator.server;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
@@ -40,6 +40,7 @@ import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseModule;
+import org.obm.locator.server.servlet.LocatorServletModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -62,6 +62,11 @@ public class StaticConfigurationService implements ConfigurationService {
 		}
 
 		@Override
+		public int getLocatorPort() {
+			return configuration.port;
+		}
+
+		@Override
 		public int getLocatorClientTimeoutInSeconds() {
 			return configuration.clientTimeout;
 		}

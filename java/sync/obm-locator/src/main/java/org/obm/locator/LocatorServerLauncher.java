@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,60 +31,34 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.locator;
 
-import java.util.Collections;
 import java.util.TimeZone;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.obm.sync.LifecycleListenerHelper;
-import org.obm.sync.XTrustProvider;
+import org.obm.locator.server.ContainerModule;
+import org.obm.locator.server.LocatorServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.spi.Message;
 
-public class GuiceServletContextListener implements ServletContextListener {
+public class LocatorServerLauncher {
 
-	private static final Logger logger = LoggerFactory.getLogger(GuiceServletContextListener.class);
+	public static final Logger logger = LoggerFactory.getLogger("OBM-LOCATOR");
 
-	protected Injector injector;
-
-	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		try {
-			injector = createInjector(servletContextEvent.getServletContext());
-			if (injector == null) {
-				failStartup("Could not create injector: createInjector() returned null");
-			}
-			XTrustProvider.install();
-			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			failStartup(e.getMessage());
-		}
+	public static void main(String... args) throws Exception {
+		/********************************************************************
+		 * EVERY CHANGES DONE THERE CAN SILENTLY BREAK THE LOCATOR START UP *
+		 *******************************************************************/
+		Injector injector = Guice.createInjector(new ContainerModule());
+		LocatorServer locatorServer = new LocatorServerLauncher().start(injector);
+		locatorServer.join();
 	}
 
-	private Injector createInjector(final ServletContext servletContext) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		return Guice.createInjector(applicationModule(servletContext));
-	}
+	public LocatorServer start(Injector injector) throws Exception {
+		TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
 
-	private Module applicationModule(ServletContext servletContext) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-		String guiceModuleClassName = servletContext.getInitParameter("guiceModule");
-		return (Module) Class.forName(guiceModuleClassName).newInstance();
+		LocatorServer server = injector.getInstance(LocatorServer.class);
+		server.start();
+		return server;
 	}
-
-	
-	private void failStartup(String message) {
-		throw new CreationException(Collections.nCopies(1, new Message(this, message)));
-	}
-
-	public void contextDestroyed(ServletContextEvent servletContextEvent) {
-		LifecycleListenerHelper.shutdownListeners(injector);
-	}
-
 }

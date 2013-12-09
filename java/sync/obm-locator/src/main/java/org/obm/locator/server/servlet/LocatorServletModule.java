@@ -29,49 +29,17 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.locator;
+package org.obm.locator.server.servlet;
 
-import java.io.IOException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.SQLException;
 
-import javax.servlet.ServletContextEvent;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
+import com.google.inject.servlet.ServletModule;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
-import com.google.common.io.Resources;
+public class LocatorServletModule extends ServletModule{
 
-public class H2GuiceServletContextListener extends GuiceServletContextListener {
-
-	public static final String INITIAL_DB_SCRIPT = "db-schema.sql";
-	
-	@Override
-	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		super.contextInitialized(servletContextEvent);
-		initializeH2Database();
-	}
-
-	private void initializeH2Database() {
-		try {
-			Connection connection = getH2Connection();
-			connection.prepareStatement(getInitialDBScript()).executeUpdate();
-		} catch (SQLException e) {
-			Throwables.propagate(e);
-		} catch (IOException e) {
-			Throwables.propagate(e);
-		}
-	}
-
-	private String getInitialDBScript() throws IOException {
-		URL initialDbScriptUrl = Resources.getResource(INITIAL_DB_SCRIPT);
-		return Resources.toString(initialDbScriptUrl, Charsets.UTF_8);
-	}
-
-	private Connection getH2Connection() throws SQLException {
-		return injector.getInstance(DatabaseConnectionProvider.class).getConnection();
-	}
-	
+	 @Override
+	    protected void configureServlets() {
+	        super.configureServlets();
+	        serve("/obm-locator/location/*").with(HostLocationServlet.class);
+	    }
 }

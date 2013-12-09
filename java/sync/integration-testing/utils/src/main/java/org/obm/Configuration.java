@@ -69,6 +69,7 @@ public class Configuration {
 	
 	public static class Locator {
 		public String url = null;
+		public int port = 8084;
 		public int clientTimeout = 5;
 		public int cacheTimeout = 10;
 		public TimeUnit cacheTimeUnit = TimeUnit.SECONDS;

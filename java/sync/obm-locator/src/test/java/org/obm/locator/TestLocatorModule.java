@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,16 +31,46 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.locator;
 
+import org.obm.Configuration;
+import org.obm.StaticConfigurationService;
+import org.obm.configuration.LocatorConfiguration;
+import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.configuration.TransactionConfiguration;
+import org.obm.dao.utils.DaoTestModule;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.H2DriverConfiguration;
+import org.obm.locator.server.ContainerModule;
 
-import com.google.inject.servlet.ServletModule;
+import com.google.common.io.Files;
+import com.google.inject.AbstractModule;
+import com.google.inject.util.Modules;
 
-public class LocatorServletModule extends ServletModule{
+public class TestLocatorModule extends AbstractModule {
 
-	 @Override
-	    protected void configureServlets() {
-	        super.configureServlets();
+	private Configuration configuration;
+	private TestTransactionConfiguration transactionConfiguration;
 
-	        serve("/location/*").with(HostLocationServlet.class);
-
-	    }
+	public TestLocatorModule() {
+		configuration = new Configuration();
+		configuration.locator.port = 0;
+		configuration.dataDir = Files.createTempDir();
+		transactionConfiguration = new TestTransactionConfiguration();
+	}
+	
+	@Override
+	protected void configure() {
+		install(
+			Modules.override(new ContainerModule())
+				.with(
+					new DaoTestModule(),
+					new AbstractModule() {
+						@Override
+						protected void configure() {
+							bind(LocatorConfiguration.class).toInstance(new StaticConfigurationService.Locator(configuration.locator));
+							bind(TransactionConfiguration.class).toInstance(transactionConfiguration);
+							bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
+						}
+					})
+			);
+	}
 }

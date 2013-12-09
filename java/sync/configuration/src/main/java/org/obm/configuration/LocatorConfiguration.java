@@ -39,6 +39,8 @@ import javax.naming.ConfigurationException;
 public interface LocatorConfiguration {
 	
 	String getLocatorUrl() throws ConfigurationException;
+
+	int getLocatorPort();
 	
 	int getLocatorClientTimeoutInSeconds();
 	

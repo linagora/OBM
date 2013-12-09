@@ -33,58 +33,61 @@ package org.obm.locator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
-import org.apache.http.client.utils.URIBuilder;
-import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.arquillian.GuiceWebXmlDescriptor;
-import org.obm.arquillian.SlowGuiceArquillianRunner;
+import org.obm.dao.utils.H2InMemoryDatabase;
+import org.obm.dao.utils.H2InMemoryDatabaseRule;
+import org.obm.dao.utils.H2TestClass;
 import org.obm.filter.Slow;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
+import org.obm.locator.server.LocatorServer;
 
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 @Slow
-@RunWith(SlowGuiceArquillianRunner.class)
-public class StartupTest {
+@RunWith(SlowGuiceRunner.class)
+@GuiceModule(TestLocatorModule.class)
+public class StartupTest implements H2TestClass {
 
+	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "db-schema.sql");
+	@Inject H2InMemoryDatabase db;
+
+	@Override
+	public H2InMemoryDatabase getDb() {
+		return db;
+	}
+	
+	@Inject Injector injector;
+	
+	private LocatorServer locatorServer;
+	private String webAppUrl;
+	
+	@Before
+	public void setUp() throws Exception {
+		locatorServer = new LocatorServerLauncher().start(injector);
+		locatorServer.start();
+		webAppUrl = "http://localhost:" + locatorServer.getPort() + "/obm-locator/";
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		locatorServer.stop();
+		db.closeConnections();
+	}
+	
 	@Test
 	@RunAsClient
-	public void testStartup(@ArquillianResource URL webAppUrl) throws URISyntaxException, ClientProtocolException, IOException {
-		Response result = Request.Get(new URIBuilder(webAppUrl.toURI())
-						.setPath(webAppUrl.getPath() + "location/host/sync/obm_sync/login@test-domain")
-						.build())
-				.execute();
+	public void testStartup() throws Exception {
+		Response result = Request.Get(webAppUrl + "location/host/sync/obm_sync/login@test-domain").execute();
 		assertThat(result.returnContent().asString()).isEqualTo("12.23.34.45\n");
 	}
 
-	@Deployment
-	public static WebArchive buildWar() {
-		return ShrinkWrap.create(WebArchive.class)
-			.addAsResource("db-schema.sql", H2GuiceServletContextListener.INITIAL_DB_SCRIPT)
-			.addPackages(true, "org.obm.locator")
-			.addAsWebInfResource(GuiceWebXmlDescriptor.webXml(ArquillianLocatorModule.class, H2GuiceServletContextListener.class), "web.xml")
-			.addAsLibraries(
-					Maven
-					.resolver()
-					.offline()
-					.loadPomFromFile("pom.xml")
-					.importDependencies(ScopeType.PROVIDED, ScopeType.COMPILE)
-					.resolve()
-					.withClassPathResolution(true)
-					.withTransitivity()
-					.asFile());
-	}
-	
 }
