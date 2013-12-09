@@ -923,7 +923,7 @@ Obm.CalendarManager = new Class({
    } else {
      this.current = null;
    }
-   obm.vars.consts.nbDisplayedDays = 30;
+   obm.vars.consts.nbDisplayedDays = 35;
    obm.vars.consts.calendarRange = 'month';
    this.refresh();
   },
