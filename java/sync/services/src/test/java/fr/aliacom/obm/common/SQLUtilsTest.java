@@ -74,4 +74,21 @@ public class SQLUtilsTest {
 		);
 	}
 
+	@Test
+	public void testSelectResourcesMatchingPatternCondition_NullPattern() {
+		assertThat(SQLUtils.selectResourcesMatchingPatternCondition(null)).isEmpty();
+	}
+
+	@Test
+	public void testSelectResourcesMatchingPatternCondition_EmptyPattern() {
+		assertThat(SQLUtils.selectResourcesMatchingPatternCondition("")).isEmpty();
+	}
+
+	@Test
+	public void testSelectResourcesMatchingPatternCondition() {
+		assertThat(SQLUtils.selectResourcesMatchingPatternCondition("resource")).isEqualTo(
+			"AND (LOWER(r.resource_name) LIKE ? OR LOWER(r.resource_description) LIKE ?) "
+		);
+	}
+
 }

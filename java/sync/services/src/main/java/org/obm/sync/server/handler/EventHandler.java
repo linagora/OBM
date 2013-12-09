@@ -159,7 +159,7 @@ public class EventHandler extends SecureSyncHandler {
 		} else if (method.equals("listCalendars")) {
 			return listCalendars(at, request, responder);
 		} else if (method.equals("listResources")) {
-			return listResources(at, responder);
+			return listResources(at, request, responder);
 		} else if (method.equals("listCategories")) {
 			return listCategories(at, responder);
 		} else if (method.equals("getEventTwinKeys")) {
@@ -387,9 +387,8 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendCalendarInformations(binding.listCalendars(at, getLimit(req), getOffset(req), getPattern(req)));
 	}
 
-	private String listResources(AccessToken at, XmlResponder responder) throws ServerFault {
-		ResourceInfo[] resourceInfo = binding.listResources(at);
-		return responder.sendResourceInformation(resourceInfo);
+	private String listResources(AccessToken at, Request req, XmlResponder responder) throws ServerFault {
+		return responder.sendResourceInformation(binding.listResources(at, getLimit(req), getOffset(req), getPattern(req)));
 	}
 
 	private String getEventFromId(AccessToken at, Request request, XmlResponder responder)

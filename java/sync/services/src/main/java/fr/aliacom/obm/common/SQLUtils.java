@@ -71,4 +71,12 @@ public class SQLUtils {
 		return "AND (LOWER(userobm_login) LIKE ? OR LOWER(userobm_lastname) LIKE ? OR LOWER(userobm_firstname) LIKE ?) ";
 	}
 
+	public static String selectResourcesMatchingPatternCondition(String pattern) {
+		if (Strings.isNullOrEmpty(pattern)) {
+			return "";
+		}
+
+		return "AND (LOWER(r.resource_name) LIKE ? OR LOWER(r.resource_description) LIKE ?) ";
+	}
+
 }

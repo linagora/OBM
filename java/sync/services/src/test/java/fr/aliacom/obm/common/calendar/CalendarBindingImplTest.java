@@ -1199,15 +1199,13 @@ public class CalendarBindingImplTest {
 		expect(userService.getUserFromAccessToken(accessToken)).andReturn(defaultUser);
 
 		CalendarDao calendarDao = createMock(CalendarDao.class);
-		expect(calendarDao.listResources(defaultUser)).andReturn(resourceInfo);
+		expect(calendarDao.listResources(defaultUser, null, 0, null)).andReturn(resourceInfo);
 
 		Object[] mocks = { accessToken, calendarDao, userService };
 		replay(mocks);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService,
-				calendarDao, null, commitedOperationDao, null, null, null, attendeeService);
-		Assert.assertArrayEquals(new ResourceInfo[] { resource1, resource2 },
-				calendarService.listResources(accessToken));
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, null, null, null, attendeeService);
+		Assert.assertArrayEquals(new ResourceInfo[] { resource1, resource2 }, calendarService.listResources(accessToken, null, 0, null));
 
 		verify(mocks);
 	}

@@ -136,7 +136,8 @@ import fr.aliacom.obm.utils.RFC2445;
 @AutoTruncate
 public class CalendarDaoJdbcImpl implements CalendarDao {
 
-	private static final int PATTERN_MATCHING_FIELDS_COUNT = 3;
+	private static final int USERS_PATTERN_MATCHING_FIELDS_COUNT = 3;
+	private static final int RESOURCES_PATTERN_MATCHING_FIELDS_COUNT = 2;
 
 	private static final Logger logger = LoggerFactory.getLogger(CalendarDaoJdbcImpl.class);
 
@@ -1328,7 +1329,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
-			pos = setPatternParametersInStatement(ps, pos, pattern);
+			pos = setPatternParametersInStatement(ps, pos, pattern, USERS_PATTERN_MATCHING_FIELDS_COUNT);
 
 			// For the group query
 			ps.setInt(pos++, user.getUid());
@@ -1336,7 +1337,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
-			pos = setPatternParametersInStatement(ps, pos, pattern);
+			pos = setPatternParametersInStatement(ps, pos, pattern, USERS_PATTERN_MATCHING_FIELDS_COUNT);
 
 			// For the user query
 			ps.setInt(pos++, user.getUid());
@@ -1344,7 +1345,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
-			pos = setPatternParametersInStatement(ps, pos, pattern);
+			pos = setPatternParametersInStatement(ps, pos, pattern, USERS_PATTERN_MATCHING_FIELDS_COUNT);
 
 			// For our own calendar query
 			if (useOwnEmail) {
@@ -1380,9 +1381,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				|| startsWithIgnoreCase(user.getFirstName(), pattern);
 	}
 
-	private int setPatternParametersInStatement(PreparedStatement ps, int pos, String pattern) throws SQLException {
+	private int setPatternParametersInStatement(PreparedStatement ps, int pos, String pattern, int nbMatchingFields) throws SQLException {
 		if (!Strings.isNullOrEmpty(pattern)) {
-			for (int i = 0; i < PATTERN_MATCHING_FIELDS_COUNT; i++) {
+			for (int i = 0; i < nbMatchingFields; i++) {
 				ps.setString(pos++, pattern.toLowerCase() + '%');
 			}
 		}
@@ -1396,66 +1397,85 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Collection<ResourceInfo> listResources(ObmUser user) throws FindException {
-		return listUserAndPublicResources(user, null);
+	public Collection<ResourceInfo> listResources(ObmUser user, Integer limit, Integer offset, String pattern) throws FindException {
+		return listUserAndPublicResources(user, null, limit, offset, pattern);
 	}
 
-	private String buildUserResourcesQuery(StringSQLCollectionHelper helper) {
-		String query = "SELECT resource_id, resource_name, resource_email, "
-				+ "resource_description, e.entityright_read, e.entityright_write "
-			+ "FROM Resource r "
-				+ "INNER JOIN ResourceEntity re ON r.resource_id=re.resourceentity_resource_id "
-				+ "INNER JOIN EntityRight e ON re.resourceentity_entity_id =e.entityright_entity_id "
-				+ "INNER JOIN UserEntity ue ON e.entityright_consumer_id=ue.userentity_entity_id "
-			+ "WHERE ue.userentity_user_id=? ";
+	private String buildUserResourcesQuery(StringSQLCollectionHelper helper, String pattern) {
+		String query = 
+			"SELECT resource_id, resource_name, resource_email, resource_description, e.entityright_read, e.entityright_write " +
+			"FROM Resource r " +
+			"INNER JOIN ResourceEntity re ON r.resource_id=re.resourceentity_resource_id " +
+			"INNER JOIN EntityRight e ON re.resourceentity_entity_id =e.entityright_entity_id " +
+			"INNER JOIN UserEntity ue ON e.entityright_consumer_id=ue.userentity_entity_id " +
+			"WHERE ue.userentity_user_id=? "
+			+ SQLUtils.selectResourcesMatchingPatternCondition(pattern);
+
 		if (helper != null)
 			query +=" AND r.resource_email IN (" + helper.asPlaceHolders() + ")";
+
 		return query;
 	}
 
-	private String buildPublicResourcesQuery(StringSQLCollectionHelper helper) {
-		String query = "SELECT resource_id, resource_name, resource_email, "
-				+ "resource_description, e.entityright_read, e.entityright_write "
-			+ "FROM Resource r "
-				+ "INNER JOIN ResourceEntity re ON r.resource_id=re.resourceentity_resource_id "
-				+ "INNER JOIN EntityRight e ON re.resourceentity_entity_id =e.entityright_entity_id "
-				+ "WHERE e.entityright_consumer_id IS NULL ";
+	private String buildPublicResourcesQuery(StringSQLCollectionHelper helper, String pattern) {
+		String query = 
+			"SELECT resource_id, resource_name, resource_email, resource_description, e.entityright_read, e.entityright_write " +
+			"FROM Resource r " +
+			"INNER JOIN ResourceEntity re ON r.resource_id=re.resourceentity_resource_id " +
+			"INNER JOIN EntityRight e ON re.resourceentity_entity_id =e.entityright_entity_id " +
+			"WHERE e.entityright_consumer_id IS NULL "
+			+ SQLUtils.selectResourcesMatchingPatternCondition(pattern);
+
 		if (helper != null)
 			query +=" AND r.resource_email IN (" + helper.asPlaceHolders() + ")";
+
 		return query;
 	}
 
-	private String buildGroupResourcesQuery(StringSQLCollectionHelper helper) {
-		String query = "SELECT resource_id, resource_name, resource_email, "
-			+ "resource_description, e.entityright_read, e.entityright_write "
-		+ "FROM Resource r "
-			+ "INNER JOIN ResourceEntity re ON r.resource_id=re.resourceentity_resource_id "
-			+ "INNER JOIN EntityRight e ON re.resourceentity_entity_id =e.entityright_entity_id "
-			+ "INNER JOIN GroupEntity ge ON e.entityright_consumer_id=ge.groupentity_entity_id "
-			+ "INNER JOIN of_usergroup ug ON ge.groupentity_group_id=ug.of_usergroup_group_id "
-		+ "WHERE ug.of_usergroup_user_id=? ";
+	private String buildGroupResourcesQuery(StringSQLCollectionHelper helper, String pattern) {
+		String query = 
+			"SELECT resource_id, resource_name, resource_email, resource_description, e.entityright_read, e.entityright_write " +
+			"FROM Resource r " +
+			"INNER JOIN ResourceEntity re ON r.resource_id=re.resourceentity_resource_id " +
+			"INNER JOIN EntityRight e ON re.resourceentity_entity_id =e.entityright_entity_id " +
+			"INNER JOIN GroupEntity ge ON e.entityright_consumer_id=ge.groupentity_entity_id " +
+			"INNER JOIN of_usergroup ug ON ge.groupentity_group_id=ug.of_usergroup_group_id " +
+			"WHERE ug.of_usergroup_user_id=? "
+			+ SQLUtils.selectResourcesMatchingPatternCondition(pattern);
+
 		if (helper != null)
 			query +=" AND r.resource_email IN (" + helper.asPlaceHolders() + ")";
+
 		return query;
 	}
 
-	private String buildPublicAndUserAndGroupResourcesQuery(String publicQuery, String groupQuery, String userQuery) {
-		return String.format(
+	@VisibleForTesting
+	String buildPublicAndUserAndGroupResourcesQuery(String publicQuery, String groupQuery, String userQuery, Integer limit, Integer offset) {
+		Preconditions.checkArgument(limit == null || limit >= 0, "limit must be a positive integer");
+		Preconditions.checkArgument(limit == null || (offset != null && offset >= 0), "offset must be a positive integer");
+
+		String query = String.format(
 			"SELECT resource_id, resource_name, resource_email, resource_description, SUM(entityright_read), SUM(entityright_write) " +
 			"FROM (%s UNION %s UNION %s) resource_union " +
 			"GROUP BY resource_id, resource_name, resource_email, resource_description " +
-			"ORDER BY resource_name ASC", publicQuery, groupQuery, userQuery);
+			"ORDER BY resource_name ASC ", publicQuery, groupQuery, userQuery);
+
+		if (limit != null) {
+			query += String.format("LIMIT %d OFFSET %d", limit, offset);
+		}
+
+		return query;
 	}
 
-	private Collection<ResourceInfo> listUserAndPublicResources(ObmUser user, Collection<String> emails) throws FindException {
+	private Collection<ResourceInfo> listUserAndPublicResources(ObmUser user, Collection<String> emails, Integer limit, Integer offset, String pattern) throws FindException {
 		StringSQLCollectionHelper helper = null;
 		if (emails != null && !emails.isEmpty()) {
 			helper = new StringSQLCollectionHelper(emails);
 		}
-		String publicQuery = buildPublicResourcesQuery(helper);
-		String userQuery = buildUserResourcesQuery(helper);
-		String groupQuery = buildGroupResourcesQuery(helper);
-		String query = buildPublicAndUserAndGroupResourcesQuery(publicQuery, groupQuery, userQuery);
+		String publicQuery = buildPublicResourcesQuery(helper, pattern);
+		String userQuery = buildUserResourcesQuery(helper, pattern);
+		String groupQuery = buildGroupResourcesQuery(helper, pattern);
+		String query = buildPublicAndUserAndGroupResourcesQuery(publicQuery, groupQuery, userQuery, limit, offset);
 
 		Connection con = null;
 		ResultSet rs = null;
@@ -1472,6 +1492,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
+			pos = setPatternParametersInStatement(ps, pos, pattern, RESOURCES_PATTERN_MATCHING_FIELDS_COUNT);
 
 			// For the group query
 			ps.setInt(pos, user.getUid());
@@ -1479,6 +1500,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
+			pos = setPatternParametersInStatement(ps, pos, pattern, RESOURCES_PATTERN_MATCHING_FIELDS_COUNT);
 
 			// For the user query
 			ps.setInt(pos, user.getUid());
@@ -1486,6 +1508,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			if (helper != null) {
 				pos = helper.insertValues(ps, pos);
 			}
+			pos = setPatternParametersInStatement(ps, pos, pattern, RESOURCES_PATTERN_MATCHING_FIELDS_COUNT);
 
 			rs = ps.executeQuery();
 
@@ -1518,7 +1541,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	@Override
 	public Collection<ResourceInfo> getResourceMetadata(ObmUser user, Collection<String> resourceEmails)
 			throws FindException {
-		return this.listUserAndPublicResources(user, resourceEmails);
+		return this.listUserAndPublicResources(user, resourceEmails, null, null, null);
 	}
 
 	private CalendarInfo makeCalendarInfo(ResultSet rs, String domainName) throws SQLException {
