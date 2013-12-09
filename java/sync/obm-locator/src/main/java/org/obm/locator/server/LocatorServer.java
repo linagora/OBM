@@ -29,23 +29,16 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.locator.server;
 
-package org.obm.configuration;
-
-import java.util.concurrent.TimeUnit;
-
-import javax.naming.ConfigurationException;
-
-public interface LocatorConfiguration {
+public interface LocatorServer {
 	
-	String getLocatorUrl() throws ConfigurationException;
+	void start() throws Exception;
+	
+	void stop() throws Exception;
 
-	int getLocatorPort();
+	void join() throws Exception;
 	
-	int getLocatorClientTimeoutInSeconds();
+	int getPort();
 	
-	int getLocatorCacheTimeout();
-	
-	TimeUnit getLocatorCacheTimeUnit();
-
 }

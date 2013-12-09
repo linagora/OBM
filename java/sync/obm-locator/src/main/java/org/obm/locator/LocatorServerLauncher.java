@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,23 +29,34 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+package org.obm.locator;
 
-package org.obm.configuration;
+import java.util.TimeZone;
 
-import java.util.concurrent.TimeUnit;
+import org.obm.locator.server.ContainerModule;
+import org.obm.locator.server.LocatorServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.naming.ConfigurationException;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
-public interface LocatorConfiguration {
-	
-	String getLocatorUrl() throws ConfigurationException;
+public class LocatorServerLauncher {
 
-	int getLocatorPort();
-	
-	int getLocatorClientTimeoutInSeconds();
-	
-	int getLocatorCacheTimeout();
-	
-	TimeUnit getLocatorCacheTimeUnit();
+	public static final Logger logger = LoggerFactory.getLogger("OBM-LOCATOR");
+
+	public static void main(String... args) throws Exception {
+		Injector injector = Guice.createInjector(new ContainerModule());
+		LocatorServer locatorServer = new LocatorServerLauncher().start(injector);
+		locatorServer.join();
+	}
+
+	public LocatorServer start(Injector injector) throws Exception {
+		TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+
+		LocatorServer server = injector.getInstance(LocatorServer.class);
+		server.start();
+		return server;
+	}
 
 }

@@ -176,6 +176,11 @@ public class StaticConfigurationService implements ConfigurationService {
 		public String getLocatorUrl() throws ConfigurationException {
 			return configuration.url;
 		}
+		
+		@Override
+		public int getLocatorPort() {
+			return configuration.port;
+		}
 
 		@Override
 		public int getLocatorClientTimeoutInSeconds() {

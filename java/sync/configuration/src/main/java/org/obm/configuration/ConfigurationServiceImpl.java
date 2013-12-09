@@ -74,7 +74,7 @@ public class ConfigurationServiceImpl implements ConfigurationService, LocatorCo
 	private final static String EXTERNAL_URL_KEY = "external-url";
 
 	private final static String LOCATOR_HOST_KEY = "host";
-	private final static String LOCATOR_PORT = "8084";
+	private final static int LOCATOR_PORT = 8084;
 	private final static String LOCATOR_APP_NAME = "obm-locator";
 
 	private final static String OBM_SYNC_PORT = "8080";
@@ -103,6 +103,11 @@ public class ConfigurationServiceImpl implements ConfigurationService, LocatorCo
 					"Missing host key in configuration");
 		}
 		return "http://" + locatorHost + ":" + LOCATOR_PORT + "/" + LOCATOR_APP_NAME + "/";
+	}
+	
+	@Override
+	public int getLocatorPort() {
+		return LOCATOR_PORT;
 	}
 
 	@Override

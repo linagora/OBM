@@ -29,8 +29,10 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.locator;
+package org.obm.locator.server;
 
+
+import org.obm.locator.server.servlet.HostLocationServlet;
 
 import com.google.inject.servlet.ServletModule;
 
@@ -40,7 +42,7 @@ public class LocatorServletModule extends ServletModule{
 	    protected void configureServlets() {
 	        super.configureServlets();
 
-	        serve("/*").with(HostLocationServlet.class);
+	        serve("/obm-locator/*").with(HostLocationServlet.class);
 
 	    }
 }

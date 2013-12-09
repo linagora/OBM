@@ -56,7 +56,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
-import org.obm.filter.Slow;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.obm.transaction.TransactionManagerRule;
@@ -67,7 +66,7 @@ import bitronix.tm.BitronixTransactionManager;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class) @Slow
+@RunWith(SlowFilterRunner.class)// @Slow
 public class EhCacheSettingsTest extends StoreManagerConfigurationTest {
 
 	private ConfigurationService configurationService;
@@ -403,14 +402,13 @@ public class EhCacheSettingsTest extends StoreManagerConfigurationTest {
 		
 		Cache afterRestartStore = storeAcceptingXElementsInMemory(maxElementsInMemory);
 		Operation<GetOutcome> diskGet = afterRestartStore.getStatistics().getExtended().diskGet();
-		Statistic<Long> diskGetStats = diskGet.component(GetOutcome.HIT).count();
 		diskGet.setHistory(10, samplingTime, TimeUnit.MILLISECONDS);
+		Statistic<Long> diskGetStats = diskGet.component(GetOutcome.HIT).count();
+		diskGetStats.history(); // TOUCH TO START RECORDING
 		for (int readCount = 0; readCount < untilCount; readCount ++) {
-			diskGetStats.history(); // TOUCH TO CONTINUE RECORDING
 			assertThat(afterRestartStore.get("a" + readCount).getObjectValue()).isEqualTo("b" + readCount);
-			Thread.sleep(10);
 		}
-		Thread.sleep(samplingTime / 2);
+		Thread.sleep(samplingTime);
 		
 		List<Timestamped<Long>> history = diskGetStats.history();
 		assertThat(history).hasSize(1);
