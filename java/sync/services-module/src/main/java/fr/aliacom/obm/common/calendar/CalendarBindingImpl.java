@@ -170,20 +170,16 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ResourceInfo[] listResources(AccessToken token) throws ServerFault {
+	public ResourceInfo[] listResources(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
 		try {
-			Collection<ResourceInfo> resourceInfo = getResources(token);
-			logger.info(String.format("%s Returning %d resource info", LogUtils.prefix(token),
-					resourceInfo.size()));
+			Collection<ResourceInfo> resourceInfo = calendarDao.listResources(userService.getUserFromAccessToken(token), limit, offset, pattern);
+
+			logger.info(String.format("%s Returning %d resource info", LogUtils.prefix(token), resourceInfo.size()));
+
 			return resourceInfo.toArray(new ResourceInfo[resourceInfo.size()]);
 		} catch (Exception e) {
 			throw new ServerFault(e);
 		}
-	}
-
-	private Collection<ResourceInfo> getResources(AccessToken token) throws FindException {
-		ObmUser user = userService.getUserFromAccessToken(token);
-		return calendarDao.listResources(user);
 	}
 
 	@Override

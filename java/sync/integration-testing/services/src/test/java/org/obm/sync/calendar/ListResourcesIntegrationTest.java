@@ -53,6 +53,7 @@ import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.ServicesClientModule;
 import org.obm.sync.ServicesClientModule.ArquillianLocatorService;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginClient;
 
@@ -112,6 +113,180 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 				makeTestResourceInfo(1, "a", true, true),
 				makeTestResourceInfo(2, "b", true, false)
 		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListResourcesWithLimit(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		ResourceInfo[] resources = calendarClient.listResources(user1Token, 2, 0);
+
+		loginClient.logout(user1Token);
+
+		assertThat(resources).containsExactly(
+				makeTestResourceInfo(1, "a", true, true),
+				makeTestResourceInfo(2, "b", true, false)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListResourcesWithLimitAndOffset(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		ResourceInfo[] resources = calendarClient.listResources(user1Token, 2, 2);
+
+		loginClient.logout(user1Token);
+
+		assertThat(resources).containsExactly(
+				makeTestResourceInfo(3, "c", true, false),
+				makeTestResourceInfo(4, "d", true, true)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListResourcesPagination(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		ResourceInfo[] resources = calendarClient.listResources(user1Token, 3, 0);
+
+		assertThat(resources).containsExactly(
+				makeTestResourceInfo(1, "a", true, true),
+				makeTestResourceInfo(2, "b", true, false),
+				makeTestResourceInfo(3, "c", true, false)
+		);
+
+		resources = calendarClient.listResources(user1Token, 3, 3);
+
+		assertThat(resources).containsExactly(
+				makeTestResourceInfo(4, "d", true, true),
+				makeTestResourceInfo(5, "e", true, false),
+				makeTestResourceInfo(6, "f", true, false)
+		);
+
+		resources = calendarClient.listResources(user1Token, 3, 6);
+
+		assertThat(resources).containsExactly(
+				makeTestResourceInfo(7, "g", true, true),
+				makeTestResourceInfo(8, "h", true, false),
+				makeTestResourceInfo(9, "i", true, false)
+		);
+
+		loginClient.logout(user1Token);
+	}
+
+	@Test(expected = ServerFault.class)
+	@RunAsClient
+	public void testListResourcesWithNegativeLimit(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+
+		calendarClient.listResources(user1Token, -1, 0, null);
+	}
+
+	@Test(expected = ServerFault.class)
+	@RunAsClient
+	public void testListResourcesWithNegativeOffset(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+
+		calendarClient.listResources(user1Token, 10, -1, null);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListResourcesWithPatternMatchesName(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		ResourceInfo[] resources = calendarClient.listResources(user1Token, null, 0, "resd");
+
+		loginClient.logout(user1Token);
+
+		assertThat(resources).containsExactly(
+				makeTestResourceInfo(4, "d", true, true)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListResourcesWithPatternMatchesNameICase(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		ResourceInfo[] resources = calendarClient.listResources(user1Token, null, 0, "rESd");
+
+		loginClient.logout(user1Token);
+
+		assertThat(resources).containsExactly(
+				makeTestResourceInfo(4, "d", true, true)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListResourcesWithPatternMatchesDescription(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		ResourceInfo[] resources = calendarClient.listResources(user1Token, null, 0, "description of resa");
+
+		loginClient.logout(user1Token);
+
+		assertThat(resources).containsExactly(
+				makeTestResourceInfo(1, "a", true, true)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListResourcesWithPatternMatchesDescriptionICase(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		ResourceInfo[] resources = calendarClient.listResources(user1Token, null, 0, "descRIPTION oF ReSa");
+
+		loginClient.logout(user1Token);
+
+		assertThat(resources).containsExactly(
+				makeTestResourceInfo(1, "a", true, true)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListResourcesWithPatternLimitAndOffset(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		ResourceInfo[] resources = calendarClient.listResources(user1Token, 2, 1, "res");
+
+		loginClient.logout(user1Token);
+
+		assertThat(resources).containsExactly(
+				makeTestResourceInfo(2, "b", true, true),
+				makeTestResourceInfo(3, "c", true, true)
+		);
+	}
+
+	@Test
+	@RunAsClient
+	public void testListCalendarsWithBadPattern(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		ResourceInfo[] resources = calendarClient.listResources(user1Token, 2, 1, "iwontmatch");
+
+		loginClient.logout(user1Token);
+
+		assertThat(resources).isEmpty();
 	}
 
 	@DeployForEachTests

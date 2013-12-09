@@ -442,31 +442,6 @@ public class CalendarDaoJdbcImplTest {
 		expectLastCall();
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testBuildCalendarsQueryWithNegativeOffset() {
-		calendarDaoJdbcImpl.buildCalendarsQuery("", 1, -1);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testBuildCalendarsQueryWithNullOffset() {
-		calendarDaoJdbcImpl.buildCalendarsQuery("", 1, null);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testBuildCalendarsQueryWithNegativeLimit() {
-		calendarDaoJdbcImpl.buildCalendarsQuery("", -1, 0);
-	}
-
-	@Test
-	public void testBuildCalendarsQueryIgnoresNullLimit() {
-		assertThat(calendarDaoJdbcImpl.buildCalendarsQuery("", null, 0)).doesNotContain("LIMIT");
-	}
-
-	@Test
-	public void testBuildCalendarsQueryConsidersLimitAndOffset() {
-		assertThat(calendarDaoJdbcImpl.buildCalendarsQuery("", 10, 5)).contains("LIMIT 10 OFFSET 5");
-	}
-
 	@Test
 	public void testUserMatchesPatternWithNullUser() {
 		assertThat(calendarDaoJdbcImpl.userMatchesPattern(null, "pattern")).isTrue();
@@ -530,6 +505,56 @@ public class CalendarDaoJdbcImplTest {
 	@Test
 	public void testUserMatchesPatternWhenMatchingFirstnameICase() {
 		assertThat(calendarDaoJdbcImpl.userMatchesPattern(PATTERN_MATCHING_USER, "FIRst")).isTrue();
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testBuildCalendarsQueryWithNegativeOffset() {
+		calendarDaoJdbcImpl.buildCalendarsQuery("", 1, -1);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testBuildCalendarsQueryWithNullOffset() {
+		calendarDaoJdbcImpl.buildCalendarsQuery("", 1, null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testBuildCalendarsQueryWithNegativeLimit() {
+		calendarDaoJdbcImpl.buildCalendarsQuery("", -1, 0);
+	}
+
+	@Test
+	public void testBuildCalendarsQueryIgnoresNullLimit() {
+		assertThat(calendarDaoJdbcImpl.buildCalendarsQuery("", null, 0)).doesNotContain("LIMIT");
+	}
+
+	@Test
+	public void testBuildCalendarsQueryConsidersLimitAndOffset() {
+		assertThat(calendarDaoJdbcImpl.buildCalendarsQuery("", 10, 5)).contains("LIMIT 10 OFFSET 5");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testBuildPublicAndUserAndGroupResourcesQueryNegativeLimit() {
+		calendarDaoJdbcImpl.buildPublicAndUserAndGroupResourcesQuery("", "", "", -1, 0);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testBuildPublicAndUserAndGroupResourcesQueryWithNullOffset() {
+		calendarDaoJdbcImpl.buildPublicAndUserAndGroupResourcesQuery("", "", "", 1, null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testBuildPublicAndUserAndGroupResourcesQueryWithNegativeOffset() {
+		calendarDaoJdbcImpl.buildPublicAndUserAndGroupResourcesQuery("", "", "", 1, -1);
+	}
+
+	@Test
+	public void testBuildPublicAndUserAndGroupResourcesQueryIgnoresNullLimit() {
+		assertThat(calendarDaoJdbcImpl.buildPublicAndUserAndGroupResourcesQuery("", "", "", null, null)).doesNotContain("LIMIT");
+	}
+
+	@Test
+	public void testBuildPublicAndUserAndGroupResourcesQueryConsidersLimitAndOffset() {
+		assertThat(calendarDaoJdbcImpl.buildPublicAndUserAndGroupResourcesQuery("", "", "", 10, 5)).contains("LIMIT 10 OFFSET 5");
 	}
 
 }

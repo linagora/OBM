@@ -90,7 +90,7 @@ public interface CalendarDao {
 
 	Collection<CalendarInfo> listCalendars(ObmUser user, Integer limit, Integer offset, String pattern) throws FindException;
 
-	Collection<ResourceInfo> listResources(ObmUser user) throws FindException;
+	Collection<ResourceInfo> listResources(ObmUser user, Integer limit, Integer offset, String pattern) throws FindException;
 
 	Event modifyEvent(AccessToken at, String calendar, Event event, boolean updateAttendees, Boolean useObmUser) throws FindException, SQLException, EventNotFoundException, ServerFault;
 

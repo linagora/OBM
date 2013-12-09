@@ -498,6 +498,71 @@ public class AbstractEventSyncClientTest {
 		control.verify();
 	}
 
+	@Test
+	public void testListResourcesSendsOnlySid() throws Exception {
+		Document doc = mockEmptyResourceInfosDocument();
+		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId");
+
+		expect(responder.execute(token, "/calendar/listResources", params)).andReturn(doc).once();
+		control.replay();
+
+		client.listResources(token);
+
+		control.verify();
+	}
+
+	@Test
+	public void testListResourcesWithLimitAndOffsetSendsLimitAndOffset() throws Exception {
+		Document doc = mockEmptyResourceInfosDocument();
+		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "limit", "10", "offset", "5");
+
+		expect(responder.execute(token, "/calendar/listResources", params)).andReturn(doc).once();
+		control.replay();
+
+		client.listResources(token, 10, 5);
+
+		control.verify();
+	}
+
+	@Test
+	public void testListResourcesWithNoLimitSendsSidOnly() throws Exception {
+		Document doc = mockEmptyResourceInfosDocument();
+		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId");
+
+		expect(responder.execute(token, "/calendar/listResources", params)).andReturn(doc).once();
+		control.replay();
+
+		client.listResources(token, null, 5);
+
+		control.verify();
+	}
+
+	@Test
+	public void testListResourcesWithPatternSendsPatternAndSid() throws Exception {
+		Document doc = mockEmptyResourceInfosDocument();
+		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "pattern", "p");
+
+		expect(responder.execute(token, "/calendar/listResources", params)).andReturn(doc).once();
+		control.replay();
+
+		client.listResources(token, null, 5, "p");
+
+		control.verify();
+	}
+
+	@Test
+	public void testListResourcesWithPatternAndLimitAndOffsetSendsAll() throws Exception {
+		Document doc = mockEmptyResourceInfosDocument();
+		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "limit", "10", "offset", "5", "pattern", "p");
+
+		expect(responder.execute(token, "/calendar/listResources", params)).andReturn(doc).once();
+		control.replay();
+
+		client.listResources(token, 10, 5, "p");
+
+		control.verify();
+	}
+
 	private Document mockErrorDocument(Class<? extends Exception> exceptionClass, String message) {
 		Document doc = control.createMock(Document.class);
 		Element root = control.createMock(Element.class);
@@ -508,6 +573,19 @@ public class AbstractEventSyncClientTest {
 		mockTextElement(root, "message", message);
 		mockTextElement(root, "type", exceptionClass.getName());
 		
+		return doc;
+	}
+
+	private Document mockEmptyResourceInfosDocument() {
+		Document doc = control.createMock(Document.class);
+		Element root = control.createMock(Element.class);
+		NodeList list = control.createMock(NodeList.class);
+
+		expect(doc.getDocumentElement()).andReturn(root).anyTimes();
+		expect(root.getNodeName()).andReturn("resourceInfoGroup").anyTimes();
+		expect(doc.getElementsByTagName(eq("resourceInfo"))).andReturn(list).anyTimes();
+		expect(list.getLength()).andReturn(0).anyTimes();
+
 		return doc;
 	}
 

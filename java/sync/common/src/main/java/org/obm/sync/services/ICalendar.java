@@ -73,8 +73,15 @@ public interface ICalendar {
 
 	/**
 	 * List all resources on which authenticated user as some rights
+	 * 
+	 * @param token The {@link AccessToken} of the user doing the request.
+	 * @param limit The maximum number of results to return, can be {@code null} if all results should be returned.
+	 * @param offset The number of results to skip. Passing {@code null} will return results from the first.
+	 * @param pattern An optional pattern matched against user's login, lastname and firstname. Can be {@code null}.
+	 * 
+	 * @return An {@code array} of {@link ResourceInfo} objects containing the requested information.
 	 */
-	ResourceInfo[] listResources(AccessToken token) throws ServerFault;
+	ResourceInfo[] listResources(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault;
 
 	/**
 	 * Returns calendar metadata for a list of given calendars.

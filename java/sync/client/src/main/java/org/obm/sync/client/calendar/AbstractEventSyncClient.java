@@ -260,9 +260,31 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		return respParser.parseInfos(doc);
 	}
 
-	@Override
+	@VisibleForTesting
 	public ResourceInfo[] listResources(AccessToken token) throws ServerFault {
+		return listResources(token, null, null);
+	}
+
+	@VisibleForTesting
+	public ResourceInfo[] listResources(AccessToken token, Integer limit, Integer offset) throws ServerFault {
+		return listResources(token, limit, offset, null);
+	}
+
+	@Override
+	public ResourceInfo[] listResources(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
+
+		if (limit != null) {
+			params.put("limit", String.valueOf(limit));
+
+			if (offset != null) {
+				params.put("offset", String.valueOf(offset));
+			}
+		}
+		if (!Strings.isNullOrEmpty(pattern)) {
+			params.put("pattern", pattern);
+		}
+
 		Document doc = execute(token, type + "/listResources", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseResourceInfo(doc);
