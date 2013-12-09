@@ -48,41 +48,39 @@ EOF
   openssl pkcs12  -password pass:password -export -in /etc/obm-locator/${host}_cert.pem -inkey /etc/obm-locator/${host}_key.pem -out /etc/obm-locator/locator.p12 -passin pass:password -name "locator"
 }
 
+createLocatorUser() {
+  if ! id locator > /dev/null 2>&1 ; then
+    adduser --system --home /usr/share/locator --no-create-home --group locator
+  fi
+}
+
+setOwnerToRequiredDir() {
+  if [ -d "$1" ]; then
+     chown -R locator:adm "$1"
+  else 
+     echo "error : $1 must exist."
+     exit 1
+  fi
+}
+
 if is_initial_configuration "$@"; then
   gencertif
 fi
 
-rm -rf /var/lib/obm-locator/org.*
-
 #DEBHELPER#
 
-if [ -d /var/log/obm-locator ]; then
-  chown -R jetty:adm /var/log/obm-locator
-else 
-  echo "error : /var/log/obm-locator must exist."
-  exit 1
-fi
+createLocatorUser
+setOwnerToRequiredDir "/var/log/obm-locator"
+setOwnerToRequiredDir "/var/lib/obm-locator"
+setOwnerToRequiredDir "/usr/share/obm-locator"
 
-if [ -d /var/lib/obm-locator ]; then
-  chown -R jetty:adm /var/lib/obm-locator
+if [ -f /etc/init.d/obm-locator ]; then
+  echo "The file /etc/init.d/obm-locator already exists, do not replace it\n"
 else
-  echo "error : /var/lib/obm-locator must exist."
-  exit 1
+  cp -a /usr/share/obm-locator/obm-locator.sh /etc/init.d/obm-locator
 fi
 
-invoke-rc.d jetty status 3>1
-jetty_status=$?
-
-if [ $jetty_status -eq 0 ]; then
-	invoke-rc.d jetty restart	 3>1
-elif [ $jetty_status -ne 3 ]; then
-	echo "Jetty not correctly shutdown.\nPlease restart it manually to start using the obm-locator webapp.\n"
-else
-	invoke-rc.d jetty start 3>1
-fi
-[ -f /etc/init.d/obm-locator ] && rm -f /etc/init.d/obm-locator
-
-ln -s /etc/init.d/jetty /etc/init.d/obm-locator
+invoke-rc.d obm-locator restart	 3>1
 
 exit 0
 

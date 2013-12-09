@@ -1,15 +1,7 @@
 #!/bin/bash
 set -e
 
-invoke-rc.d jetty status
-jetty_status=$?
-
-if [[ $jetty_status -eq 0 && -f /etc/init.d/jetty ]]; then
-	invoke-rc.d jetty restart	
-elif [ $jetty_status -ne 3 ]; then
-	echo "Jetty not correctly shutdown.\nPlease restart it manually to stop using the obm-locator webapp.\n"
-fi
-
+service obm-locator stop > /dev/null
 [ -f /etc/init.d/obm-locator ] && unlink /etc/init.d/obm-locator
 
 exit 0

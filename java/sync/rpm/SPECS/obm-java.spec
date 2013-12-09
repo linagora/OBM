@@ -73,7 +73,6 @@ Summary: Locator for Open Business Management
 Group:	Development/Tools
 Requires: java-devel >= 1.6.0
 Requires: obm-config
-Requires(post): obm-jetty-common-libs = %{version}-%{release}
 
 %description -n obm-locator
 This package is a J2E web service, which can be queried to retrieve
@@ -172,11 +171,16 @@ cp opush/spushnik/target/spushnik.war $RPM_BUILD_ROOT/%{jetty_home}/webapps/
 
 # obm-locator
 
-mkdir -p $RPM_BUILD_ROOT/%{jetty_home}/webapps/obm-locator
+mkdir -p $RPM_BUILD_ROOT/var/run/obm-locator
+mkdir -p $RPM_BUILD_ROOT/usr/share/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/obm-locator
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/obm-locator
-cp -r obm-locator/target/obm-locator/* $RPM_BUILD_ROOT/%{jetty_home}/webapps/obm-locator/
+cp -r obm-locator/target/obm-locator.jar $RPM_BUILD_ROOT/usr/share/obm-locator/
+cp -r obm-locator/target/lib $RPM_BUILD_ROOT/usr/share/obm-locator/
+cp -r obm-locator/obm-locator-start.sh $RPM_BUILD_ROOT/usr/share/obm-locator/
+mkdir -p $RPM_BUILD_ROOT%{_initrddir}
+cp -a obm-locator/obm-locator.centos.sh $RPM_BUILD_ROOT%{_initrddir}/obm-locator
 
 # obm-autoconf
 
@@ -228,9 +232,13 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 
 %files -n obm-locator
 %defattr(-,root,root,-)
-%{jetty_home}/webapps/obm-locator
-%attr(0775,jetty,jetty) %{_localstatedir}/log/obm-locator
-%attr(0775,jetty,jetty) %{_localstatedir}/lib/obm-locator
+%{_datarootdir}/obm-locator
+%{_initrddir}/obm-locator
+%attr(0775,locator,root) %{_localstatedir}/log/obm-locator
+%attr(0775,locator,root) %{_localstatedir}/lib/obm-locator
+%attr(0775,locator,root) %{_localstatedir}/run/obm-locator
+%attr(0775,locator,root) %{_datarootdir}/obm-locator/obm-locator-start.sh
+%attr(0775,root,root) %{_initrddir}/obm-locator
 
 %files -n obm-autoconf
 %defattr(-,root,root,-)
@@ -244,6 +252,30 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %files -n obm-jetty-common-libs
 %defattr(-,root,root,-)
 %{jetty_home}/lib/ext/*.jar
+
+
+%pre -n obm-locator
+# Create locator user if it doesn't exist
+id locator >/dev/null 2>&1
+if [ "$?" = "1" ]; then
+  useradd --system --gid adm locator
+fi
+
+# If the locator exists as a jetty webapp,
+# stop jetty to release exclusives resources
+if [ -e %{jetty_home}/webapps/obm-locator ]; then
+    /sbin/service jetty6 stop >/dev/null 2>&1 || :
+fi
+
+%pre -n opush
+/sbin/service jetty6 stop >/dev/null 2>&1 || :
+
+%post -n obm-locator
+chown -R locator:adm %{_localstatedir}/log/obm-locator
+chown -R locator:adm %{_localstatedir}/lib/obm-locator
+chown -R locator:adm %{_localstatedir}/run/obm-locator
+/sbin/service obm-locator restart >/dev/null 2>&1 || :
+/sbin/service jetty6 start >/dev/null 2>&1 || :
 
 %post -n opush
 [ ! -f %{_sysconfdir}/opush/logback.xml ] && echo "<included/>" > %{_sysconfdir}/opush/logback.xml
@@ -259,14 +291,6 @@ fi
 /sbin/service jetty6 restart >/dev/null 2>&1 || :
 
 %postun -n spushnik
-if [ "$1" -ge "1" ] ; then
-    /sbin/service jetty6 restart >/dev/null 2>&1 || :
-fi
-
-%post -n obm-locator
-/sbin/service jetty6 restart >/dev/null 2>&1 || :
-
-%postun -n obm-locator
 if [ "$1" -ge "1" ] ; then
     /sbin/service jetty6 restart >/dev/null 2>&1 || :
 fi
