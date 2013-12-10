@@ -129,7 +129,6 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	protected GlobalAppConfiguration<ConfigurationService> globalConfiguration() {
 		return GlobalAppConfiguration.builder()
 					.mainConfiguration(new StaticConfigurationService(configuration))
-					.locatorConfiguration(new StaticConfigurationService.Locator(configuration.locator))
 					.databaseConfiguration(databaseConfiguration())
 					.transactionConfiguration(transactionConfiguration)
 					.build();

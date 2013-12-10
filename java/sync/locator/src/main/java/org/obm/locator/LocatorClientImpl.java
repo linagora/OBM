@@ -30,22 +30,19 @@
 package org.obm.locator;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
-import java.util.concurrent.TimeUnit;
+import java.net.URL;
+import java.util.List;
 
 import javax.naming.ConfigurationException;
 
-import org.apache.http.client.fluent.Request;
-import org.obm.configuration.LocatorConfiguration;
+import org.apache.commons.io.IOUtils;
+import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.locator.store.LocatorService;
 import org.slf4j.Logger;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -53,17 +50,13 @@ import com.google.inject.name.Named;
 @Singleton
 public class LocatorClientImpl implements LocatorService {
 
-	private static final char RESPONSE_SEPARATOR = '\n';
 	private final String locatorUrl;
-	private final int timeoutInMS;
 
 	@Inject
-	@VisibleForTesting LocatorClientImpl(LocatorConfiguration locatorConfigurationService,
+	private LocatorClientImpl(ConfigurationService obmConfigurationService,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) throws ConfigurationException {
-		locatorUrl = ensureTrailingSlash( locatorConfigurationService.getLocatorUrl() );
-		timeoutInMS = Ints.checkedCast(TimeUnit.SECONDS.toMillis(locatorConfigurationService.getLocatorClientTimeoutInSeconds()));
-		configurationLogger.info("Locator client service url : {}", locatorUrl);
-		configurationLogger.info("Locator client timeout : {} seconds", locatorConfigurationService.getLocatorClientTimeoutInSeconds());
+		locatorUrl = ensureTrailingSlash( obmConfigurationService.getLocatorUrl() );
+		configurationLogger.info("Locator service url : {}", locatorUrl);
 	}
 
 	private String ensureTrailingSlash(String url) {
@@ -75,18 +68,18 @@ public class LocatorClientImpl implements LocatorService {
 	
 	@Override
 	public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
+		String url = buildFullServiceUrl(serviceSlashProperty, loginAtDomain);
+		InputStream is = null;
 		try {
-			String response = Request.Get(buildFullServiceUrl(serviceSlashProperty, loginAtDomain))
-				.connectTimeout(timeoutInMS)
-				.socketTimeout(timeoutInMS)
-				.execute().returnContent().asString();
-			return Iterables.get(Splitter.on(RESPONSE_SEPARATOR).split(response), 0);
+			is = new URL(url).openStream();
+			List<String> lines = IOUtils.readLines(is, "utf-8");
+			return lines.get(0);
 		} catch (MalformedURLException e) {
-			throw new LocatorClientException(e.getMessage(), e);
-		} catch (SocketTimeoutException e) {
 			throw new LocatorClientException(e.getMessage(), e);
 		} catch (IOException e) {
 			throw new LocatorClientException(e.getMessage(), e);
+		} finally {
+			IOUtils.closeQuietly(is);
 		}
 	}
 	

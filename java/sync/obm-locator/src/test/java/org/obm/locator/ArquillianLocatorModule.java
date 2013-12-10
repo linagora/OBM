@@ -65,7 +65,6 @@ public class ArquillianLocatorModule extends AbstractModule {
 						install(
 							new ConfigurationModule(GlobalAppConfiguration.builder()
 									.mainConfiguration(new StaticConfigurationService(configuration))
-									.locatorConfiguration(new StaticConfigurationService.Locator(configuration.locator))
 									.databaseConfiguration(new DatabaseConfigurationFixtureH2())
 									.transactionConfiguration(transactionConfiguration)
 									.build()));

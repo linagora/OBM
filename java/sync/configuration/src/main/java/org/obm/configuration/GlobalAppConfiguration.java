@@ -40,7 +40,6 @@ public class GlobalAppConfiguration<MainConfigurationType extends ConfigurationS
 	public static class Builder<MainConfigurationType extends ConfigurationService> {
 		
 		private MainConfigurationType configurationService;
-		private LocatorConfiguration locatorConfiguration;
 		private DatabaseConfiguration databaseConfiguration;
 		private TransactionConfiguration transactionConfiguration;
 
@@ -48,11 +47,6 @@ public class GlobalAppConfiguration<MainConfigurationType extends ConfigurationS
 		
 		public Builder<MainConfigurationType> mainConfiguration(MainConfigurationType configurationService) {
 			this.configurationService = configurationService;
-			return this;
-		}
-		
-		public Builder<MainConfigurationType> locatorConfiguration(LocatorConfiguration locatorConfiguration) {
-			this.locatorConfiguration = locatorConfiguration;
 			return this;
 		}
 		
@@ -67,33 +61,25 @@ public class GlobalAppConfiguration<MainConfigurationType extends ConfigurationS
 		}
 		
 		public GlobalAppConfiguration<MainConfigurationType> build() {
-			return new GlobalAppConfiguration<MainConfigurationType>(configurationService, 
-					locatorConfiguration, databaseConfiguration, transactionConfiguration);
+			return new GlobalAppConfiguration<MainConfigurationType>(configurationService, databaseConfiguration, transactionConfiguration);
 		}
 		
 	}
 	
 	private final MainConfigurationType configurationService;
-	private final LocatorConfiguration locatorConfiguration;
 	private final DatabaseConfiguration databaseConfiguration;
 	private final TransactionConfiguration transactionConfiguration;
 
 	private GlobalAppConfiguration(MainConfigurationType configurationService, 
-			LocatorConfiguration locatorConfiguration, 
 			DatabaseConfiguration databaseConfiguration, 
 			TransactionConfiguration transactionConfiguration) {
 				this.configurationService = configurationService;
-				this.locatorConfiguration = locatorConfiguration;
 				this.databaseConfiguration = databaseConfiguration;
 				this.transactionConfiguration = transactionConfiguration;
 	}
 
 	public MainConfigurationType getConfigurationService() {
 		return configurationService;
-	}
-	
-	public LocatorConfiguration getLocatorConfiguration() {
-		return locatorConfiguration;
 	}
 	
 	public DatabaseConfiguration getDatabaseConfiguration() {
