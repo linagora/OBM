@@ -64,11 +64,6 @@ password = "aliasource"
 ; Size of JDBC connection pool (default: 10)
 ;database-max-connection-pool-size = 10
 
-; Locator infos
-;locator-cache-timeunit=minutes
-;locator-cache-timeout=30
-;locator-client-timeout-seconds=5
-
 ; Default language
 lang = fr
 

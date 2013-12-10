@@ -36,7 +36,6 @@ import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
-import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.push.service.OpushSyncPermsConfigurationService;
@@ -48,7 +47,6 @@ public class ConfigurationModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(ConfigurationService.class).to(ConfigurationServiceImpl.class);
-		bind(LocatorConfiguration.class).to(ConfigurationServiceImpl.class);
 		bind(TransactionConfiguration.class).to(DefaultTransactionConfiguration.class);
 		bind(DatabaseConfiguration.class).to(DatabaseConfigurationImpl.class);
 		bind(SyncPermsConfigurationService.class).to(OpushSyncPermsConfigurationService.class);
