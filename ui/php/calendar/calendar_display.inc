@@ -8199,6 +8199,114 @@ function dis_calendar_day_list_pdf($calendar, $current_view, $calendar_entity) {
 
 }
 
+/**
+ * Calendar Month PDF
+ * view planning
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+function dis_calendar_month_planning_pdf($calendar, $current_view, $calendar_entity) {
+  global $ccalendar_first_hour, $ccalendar_last_hour, $ccalendar_weekstart;
+  global $ccalendar_weekstart, $ccalendar_first_hour;
+
+  $date = clone $current_view->get_date();
+  $date->setDay(1)->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addMonth(1)->setHour(0)->setMinute(0)->setSecond(0);
+
+  $status = array('ACCEPTED');
+  $category_filter = $current_view->get_category_filter();
+
+  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
+
+  while($date->compare($end) < 0) {
+    $columns[$date->getTimestamp()] = array();
+    $date->addDay(1);
+  }
+
+  $time_unit = 60 / $_SESSION['set_cal_interval']; 
+
+  // events per columns
+  foreach($occurrences as $occurrence) {
+    $iso = clone $occurrence->date;
+    $iso->setHour(0)->setMinute(0)->setSecond(0);
+    if($occurrence->event->all_day == 1) {
+      $columns[$iso->getTimestamp()]['allday'][] = $occurrence;
+    } else {
+      $begin = clone $occurrence->date;
+      $begin->setMinute($begin->getMinute() - ($begin->getMinute()%$time_unit))->setSecond(0);
+      while($begin->compare($occurrence->end->getTimestamp()) < 0) {
+        $columns[$iso->getTimestamp()][$begin->getIso()][] = $occurrence;
+        $begin->addMinute($time_unit);
+      }
+    }
+  }
+
+  $updated = array();
+  foreach($columns as $date => $column){
+    $updated[$date] = check_conflict($column);
+  }
+  $pdf = new CalendarMonthPlanningPdf($current_view, 'month', $updated, $calendar_entity, $calendar);
+  $pdf->drawCalendar();
+  $pdf->download(); 
+}
+
+
+/**
+ * Calendar Week PDF
+ * view planning
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+function dis_calendar_week_planning_pdf($calendar, $current_view, $calendar_entity) {
+  global $ccalendar_first_hour, $ccalendar_weekstart;
+
+  $date = clone $current_view->get_date();
+  $date->setWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(7);
+  $category_filter = $current_view->get_category_filter();
+  $status = array('ACCEPTED');
+
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
+  $pdf = new CalendarPdfList($current_view, 'week', $calendar, $calendar_entity, $occurrences);
+  $pdf->drawCalendar();
+  $pdf->download();
+}
+
+
+/**
+ * Calendar Day PDF
+ * view planning
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+
+function dis_calendar_day_planning_pdf($calendar, $current_view, $calendar_entity) {
+  global $ccalendar_first_hour;
+
+  $date = clone $current_view->get_date();
+  $date->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(1);
+
+  $category_filter = $current_view->get_category_filter();
+  $status = array('ACCEPTED');
+
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
+
+  $pdf = new CalendarPdfList($current_view, 'day', $calendar, $calendar_entity, $occurrences);
+  $pdf->drawCalendar();
+  $pdf->download();
+
+}
+
 
 /**
  * Calculate events conflicts 
@@ -9586,6 +9694,128 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
 }
 
 
+Class CalendarMonthPlanningPdf Extends CalendarPdf {
+
+  private static $GRID_LINE_COLOR = '#B5B5B5';
+  private static $FONT_COLOR = '#111111';
+  private static $FONT_COLOR_SECONDARY = '#368397';
+  private static $FILL_EVENT_COLOR = '#368397';
+  private static $LINE_WIDTH = 0.6;
+  private static $MARGIN_LEFT = 45;
+  private static $NB_COL_PER_PAGE = 35;
+
+  function __construct($current_view, $range, $events, $calendar_entity, $calendar) {
+
+    parent::__construct($current_view, $calendar, $calendar_entity);
+    $this->max_length_details = array("A4-LANDSCAPE" => array(6 => 185, 8 => 135, 10 => 107),
+                                      "A4" => array(6 => 96, 8 => 70, 10 => 55));
+
+    $this->calendar_x0 = $this->content_x0;
+    $this->calendar_y0 = $this->content_y0;
+    $this->calendar_x1 = $this->content_x1;
+    $this->calendar_y1 = $this->content_y1 - 2 * $this->margin; 
+
+    $this->margin_left = self::$MARGIN_LEFT;
+    $this->col_width = ($this->calendar_x1 - $this->calendar_x0 - margin_left) / self::$NB_COL_PER_PAGE;
+    $this->col_height = $this->col_width;
+    $this->calendar_entity = $calendar_entity;
+    $this->events = $events;
+
+    $date = $this->current_view->get_date();
+    $this->display_date = $date->localize(constant("Of_Date::OBM_DATE_".strtoupper($range)));
+
+    $this->onedayperpage = $calendar['onedayperpage'];
+    $this->addPage(true, false);
+  }
+
+  function drawGrid() {
+    $this->page->setLineColor(new Zend_Pdf_Color_Html(self::$GRID_LINE_COLOR)); 
+    $this->page->drawRectangle(
+      $this->calendar_x0 + $this->margin_left + $this->day_x,
+      $this->calendar_y1 - $this->users_y, 
+      $this->calendar_x0 + $this->col_width + $this->margin_left + $this->day_x,
+      $this->calendar_y1 - $this->col_height - $this->users_y,
+      Zend_Pdf_Page::SHAPE_DRAW_STROKE);
+  }
+
+  function drawEvents($events, $user) {
+    if($events && $this->containsEventsForId($events, $user["id"]) == true) {
+      $this->page->setFillColor(new Zend_Pdf_Color_Html(self::$FILL_EVENT_COLOR));
+      $this->page->drawRectangle(
+      $this->calendar_x0 + $this->margin_left + $this->day_x + 0.5,
+      $this->calendar_y1 - $this->users_y - 0.5, 
+      $this->calendar_x0 + $this->col_width + $this->margin_left + $this->day_x - 0.5,
+      $this->calendar_y1 - $this->col_height - $this->users_y + 0.5,
+        Zend_Pdf_Page::SHAPE_DRAW_FILL); 
+    }
+  }
+
+  function containsEventsForId($events, $id) {
+    foreach($events as $event) {
+      if($event->event->owner == $id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function drawHeaders() {
+    $current_date = new Of_Date();
+    $this->_day_x = 0;
+
+    foreach($this->events as $date => $column) {
+      $current_date->setTimestamp($date);
+      $this_date_l = $current_date->localize(Of_Date::WEEKDAY_NARROW);
+      $this_day_l = $current_date->localize(Of_Date::DAY);
+      $this->page->setFillColor(new Zend_Pdf_Color_Html(self::$FONT_COLOR));
+      $this->page->drawText(
+        $this_date_l,
+        $this->calendar_x0 + $this->day_x + $this->margin_left + $this->col_width / 3,
+        $this->calendar_y1 - $this->col_height / 2,
+        'UTF-8');
+      $this->page->setFillColor(new Zend_Pdf_Color_Html(self::$FONT_COLOR_SECONDARY));
+      $this->page->drawText(
+        $this_day_l,
+        $this->calendar_x0 + $this->day_x + $this->margin_left + $this->col_width / 3,
+        $this->calendar_y1 - $this->col_height - $this->col_height / 2 ,
+          'UTF-8');
+        $this->day_x += $this->col_width;
+    }
+  }
+
+  function drawCalendar() {
+    $current_date = new Of_Date();
+    $this->page->setLineWidth(self::$LINE_WIDTH);
+    $users = $this->calendar_entity["user"];
+    $this->users_y = $this->col_height * 2;
+
+    $this->drawHeaders();
+
+    foreach($users as $user) {
+      $this->day_x = 0; 
+      $this->drawUsersName($user);
+      foreach($this->events as $date => $column) {
+        $current_date->setTimestamp($date);
+        $this->drawGrid();
+        $this->drawEvents($this->events[$current_date->getTimeStamp()], $user);
+        $this->day_x += $this->col_width;
+      }
+
+      $this->users_y += $this->col_height;
+    }
+  }
+
+  function drawUsersName($user) {
+    $this->page->setFillColor(new Zend_Pdf_Color_Html(self::$FONT_COLOR));
+    $username = $this->truncateToWidth($user["name"], self::$MARGIN_LEFT);
+    $this->page->drawText(
+      $username,
+      $this->calendar_x0 - $this->margin_left / 2,
+      $this->calendar_y1 - $this->col_height / 2 - $this->users_y,
+      'UTF-8');
+  }
+}
+
 /**
  * CalendarPdfList Class
  * 
@@ -9981,6 +10211,10 @@ Class CalendarPdfList Extends CalendarPdf{
   }
  
 } 
+
+
+
+
 /**
  * Generate email field  
  * 
