@@ -83,7 +83,7 @@ public class LocatorClientImplTest {
 		server.start();
 		expect(configurationService.getLocatorUrl()).andReturn(
 				"http://127.0.0.1:" + server.getPort() + "/" + BlockingContainerModule.BLOCKING_SERVLET_NAME);
-		expect(configurationService.getLocatorClientTimeoutInSeconds()).andReturn(2).times(2);
+		expect(configurationService.getLocatorClientTimeoutInSeconds()).andReturn(2);
 		control.replay();
 		
 		client = new LocatorClientImpl(configurationService, LoggerFactory.getLogger(LocatorClientImplTest.class));
