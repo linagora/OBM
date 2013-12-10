@@ -34,29 +34,40 @@ package org.obm.push.minig.imap;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
+import org.apache.mina.transport.socket.SocketConnector;
 import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.imap.idle.IIdleCallback;
 import org.obm.push.mail.imap.idle.IdleClient;
 import org.obm.push.minig.imap.idle.IdleClientCallback;
 import org.obm.push.minig.imap.impl.ClientHandler;
 import org.obm.push.minig.imap.impl.ClientSupport;
+import org.obm.push.minig.imap.impl.SessionFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 public class IdleClientImpl implements IdleClient {
 
+	private static final int NO_TIMEOUT = Integer.MAX_VALUE;
 	private static final Logger logger = LoggerFactory.getLogger(IdleClientImpl.class);
 	
 	@Singleton
 	public static class Factory implements IdleClient.Factory {
 
+		private Provider<SocketConnector> socketProvider;
+
+		@Inject
+		private Factory(Provider<SocketConnector> socketProvider) {
+			this.socketProvider = socketProvider;
+		}
+		
 		@Override
 		public IdleClient create(String hostname, int port, String loginAtDomain, String password) {
-			return new IdleClientImpl(hostname, port, loginAtDomain, password);
+			return new IdleClientImpl(hostname, port, loginAtDomain, password, socketProvider);
 		}
 		
 	}
@@ -68,16 +79,16 @@ public class IdleClientImpl implements IdleClient {
 	private final ClientSupport cs;
 	private final IdleClientCallback icb;
 
-	@Inject
 	@VisibleForTesting IdleClientImpl(String hostname, int port, String loginAtDomain,
-			String password) {
+			String password, Provider<SocketConnector> socketProvider) {
 		this.login = loginAtDomain;
 		this.password = password;
 		this.hostname = hostname;
 		this.port = port;
 		icb = new IdleClientCallback();
 		ClientHandler handler = new ClientHandler(icb);
-		cs = new ClientSupport(handler, null);
+		SessionFactoryImpl sessionFactory = new SessionFactoryImpl(socketProvider, handler, NO_TIMEOUT);
+		cs = new ClientSupport(sessionFactory, NO_TIMEOUT);
 		icb.setClient(cs);
 	}
 

@@ -46,12 +46,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLException;
 
-import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.future.WriteFuture;
-import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.EmailMetadata;
@@ -108,39 +105,34 @@ import org.obm.push.minig.imap.tls.MinigTLSFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+
 public class ClientSupport {
 
 	private final static Logger logger = LoggerFactory.getLogger(ClientSupport.class);
 	
-	private final Integer imapTimeoutInMilliseconds;
-	private IoSession session;
-	private Semaphore lock;
-	private List<IMAPResponse> lastResponses;
-	private TagProducer tagsProducer;
-	private MinigTLSFilter sslFilter;
-	private NioSocketConnector socketConnector;
+	private final int imapTimeoutInMilliseconds;
+	private final TagProducer tagsProducer;
+	private final List<IMAPResponse> lastResponses;
+	private final SessionFactory sessionFactory;
 
-	/**
-	 * @param imapTimeoutInMilliseconds null means no timeout
-	 */
-	public ClientSupport(IoHandler handler, Integer imapTimeoutInMilliseconds) {
-		this.socketConnector = new NioSocketConnector();
-		this.socketConnector.setHandler(handler);
+	@VisibleForTesting IoSession session;
+	@VisibleForTesting Semaphore lock;
+	private MinigTLSFilter sslFilter;
+
+	public ClientSupport(SessionFactory sessionFactory, int imapTimeoutInMilliseconds) {
+		this.sessionFactory = sessionFactory;
 		this.lock = new Semaphore(1);
 		this.tagsProducer = new TagProducer();
 		this.imapTimeoutInMilliseconds = imapTimeoutInMilliseconds;
-		this.lastResponses = Collections
-				.synchronizedList(new LinkedList<IMAPResponse>());
+		this.lastResponses = Collections.synchronizedList(new LinkedList<IMAPResponse>());
 	}
 
 	private void lock() {
 		try {
-			if (imapTimeoutInMilliseconds != null) {
-				boolean success = lock.tryAcquire(imapTimeoutInMilliseconds, TimeUnit.MILLISECONDS);
-				assertTimeout(success);
-			} else {
-				lock.acquire();
-			}
+			boolean success = lock.tryAcquire(imapTimeoutInMilliseconds, TimeUnit.MILLISECONDS);
+			assertTimeout(success);
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 			throw new RuntimeException("InterruptedException !!");
@@ -150,45 +142,56 @@ public class ClientSupport {
 
 	public void login(String login, String password, SocketAddress address,
 			Boolean activateTLS) throws IMAPException {
-		if (session != null && session.isConnected()) {
+		if (isConnected()) {
 			throw new IllegalStateException(
 					"Already connected. Disconnect first.");
 		}
 
 		lock(); // waits for "* OK IMAP4rev1 server...
-		
-		ConnectFuture cf = socketConnector.connect(address);
-		join(cf);
-		if (!cf.isConnected()) {
-			lock.release();
-			// This method call will throws the original exception  
-			cf.getSession();
-			// This should never occur
-			throw new IMAPException("Cannot log into imap server");
-		}
-		session = cf.getSession();
-		logger.debug("Connection established");
-		if (activateTLS) {
-			boolean tlsActivated = run(new StartTLSCommand());
-			if (tlsActivated) {
-				activateSSL();
-			} else {
-				logger.debug("TLS not supported by IMAP server.");
+		try {
+			session = sessionFactory.connect(address);
+			logger.debug("Connection established");
+			if (activateTLS) {
+				logger.debug("try to enable tls for connection");
+				configureSessionForTls();
 			}
+			logger.debug("Sending {} login informations.", login);
+			if (!run(new LoginCommand(login, password))) {
+				throw new IMAPException("Cannot log into imap server");
+			}
+		} catch (RuntimeException e) {
+			cleanupClientState();
+			throw e;
+		} catch (IMAPException e) {
+			cleanupClientState();
+			throw e;
 		}
-		logger.debug("Sending " + login + " login informations.");
-		if (!run(new LoginCommand(login, password))) {
-			throw new IMAPException("Cannot log into imap server");
+	}
+
+	private void configureSessionForTls() {
+		boolean tlsActivated = run(new StartTLSCommand());
+		if (tlsActivated) {
+			activateSSL();
+		} else {
+			logger.debug("TLS not supported by IMAP server.");
+		}
+	}
+
+	private void cleanupClientState() {
+		try {
+			if (session != null) {
+				boolean immediatly = true;
+				session.close(immediatly);
+				session = null;				
+			}
+		} finally {
+			lock.release();
 		}
 	}
 
 	private void join(IoFuture future) {
-		if (imapTimeoutInMilliseconds != null) {
-			boolean joinSuccess = future.awaitUninterruptibly(imapTimeoutInMilliseconds);
-			assertTimeout(joinSuccess);
-		} else {
-			future.awaitUninterruptibly();
-		}
+		boolean joinSuccess = future.awaitUninterruptibly(imapTimeoutInMilliseconds);
+		assertTimeout(joinSuccess);
 	}
 
 	private void assertTimeout(boolean joinSuccess) {
@@ -209,20 +212,23 @@ public class ClientSupport {
 	}
 
 	public void logout() {
-		if (session != null) {
-			if (sslFilter != null) {
-				try {
-					sslFilter.stopSsl(session);
-				} catch (SSLException e) {
-					logger.error("error stopping ssl", e);
-				} catch (IllegalStateException ei) {
-					logger.error("imap connection is already stop");
+		lock();
+		try {
+			if (session != null) {
+				if (sslFilter != null) {
+					try {
+						sslFilter.stopSsl(session);
+					} catch (SSLException e) {
+						logger.error("error stopping ssl", e);
+					} catch (IllegalStateException ei) {
+						logger.error("imap connection is already stop");
+					}
 				}
+				join(session.close(false));
 			}
-			join(session.close(false));
-			session = null;
+		} finally {
+			cleanupClientState();
 		}
-		socketConnector.dispose();
 	}
 
 	private <T> T run(ICommand<T> cmd) {
@@ -233,12 +239,16 @@ public class ClientSupport {
 		// where we might wait for cyrus welcome text.
 		lock();
 		try {
+			Preconditions.checkState(isConnected());
 			WriteFuture writeFuture = cmd.execute(session, tagsProducer, lock);
 			join(writeFuture);
 			if (writeFuture.isWritten()) {
 				lock(); // this one should wait until this.setResponses is called
 				cmd.responseReceived(lastResponses);
 			}
+		} catch (ImapTimeoutException e) {
+			cleanupClientState();
+			throw e;
 		} finally {
 			lock.release();
 		}
@@ -406,7 +416,7 @@ public class ClientSupport {
 	}
 	
 	public boolean isConnected() {
-		return session.isConnected();
+		return session != null && session.isConnected();
 	}
 	
 	public long uidNext(String mailbox) {

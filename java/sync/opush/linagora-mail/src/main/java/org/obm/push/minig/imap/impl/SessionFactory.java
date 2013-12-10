@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,65 +29,15 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
-
 package org.obm.push.minig.imap.impl;
 
-import org.apache.mina.core.filterchain.IoFilter;
-import org.apache.mina.core.service.IoHandlerAdapter;
+import java.net.SocketAddress;
+
 import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.codec.ProtocolCodecFactory;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.transport.socket.SocketConnector;
 import org.obm.push.mail.IMAPException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class ClientHandler extends IoHandlerAdapter {
+public interface SessionFactory {
+
+	IoSession connect(SocketAddress address) throws IMAPException;
 	
-	private Logger logger = LoggerFactory.getLogger(getClass());
-	private final IResponseCallback callback;
-	private SocketConnector socketConnector;
-
-	private IoFilter getIoFilter() {
-		ProtocolCodecFactory pcf = new IMAPCodecFactory();
-		return new ProtocolCodecFilter(pcf);
-	}
-
-	public ClientHandler(IResponseCallback callback) {
-		this.callback = callback;
-	}
-
-	public void sessionCreated(IoSession session) throws Exception {
-		session.getFilterChain().addLast("codec", getIoFilter());
-	}
-
-	public void sessionOpened(IoSession session) throws Exception {
-		callback.connected();
-	}
-
-	public void messageReceived(IoSession session, Object message)
-			throws Exception {
-		MinaIMAPMessage msg = (MinaIMAPMessage) message;
-		callback.imapResponse(msg);
-	}
-
-	public void sessionClosed(IoSession session) throws Exception {
-		socketConnector.dispose();
-		callback.disconnected();
-	}
-
-	@Override
-	public void exceptionCaught(IoSession session, Throwable cause)
-			throws Exception {
-		logger.error(cause.getMessage(),cause);
-		callback.exceptionCaught(new IMAPException(cause.getMessage(),cause));
-	}
-
-	public void setConnector(SocketConnector socketConnector) {
-		this.socketConnector = socketConnector;
-	}
-	
-	
-
 }

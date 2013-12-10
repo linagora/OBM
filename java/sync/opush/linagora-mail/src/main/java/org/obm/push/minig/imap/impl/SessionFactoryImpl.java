@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,58 +29,61 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.opush;
+package org.obm.push.minig.imap.impl;
 
+import java.net.SocketAddress;
+
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.SocketConnector;
-import org.obm.configuration.EmailConfiguration;
-import org.obm.push.mail.bean.ListResult;
-import org.obm.push.minig.imap.StoreClientImpl;
-import org.obm.push.minig.imap.impl.ClientSupport;
+import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.exception.ImapTimeoutException;
 
-import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.Singleton;
 
-public class CountingStoreClient extends StoreClientImpl {
-
-	private ImapConnectionCounter counter;
-
-	@Singleton
-	public static class Factory extends StoreClientImpl.Factory {
-
-		private final ImapConnectionCounter counter;
-
-		@Inject
-		private Factory(ImapConnectionCounter counter, EmailConfiguration emailConfiguration, Provider<SocketConnector> socketConnectorProvider) {
-			super(emailConfiguration, socketConnectorProvider);
-			this.counter = counter;
-		}
-		
-		@Override
-		public CountingStoreClient create(String hostname, String login, String password) {
-			return new CountingStoreClient(counter, hostname, emailConfiguration.imapPort(),
-					login, password, emailConfiguration.mailboxNameCheckPolicy(), super.createClientSupport());
-		}
-		
-	}
+public class SessionFactoryImpl implements SessionFactory {
 	
-	private CountingStoreClient(ImapConnectionCounter counter, String hostname, int port,
-			String login, String password, EmailConfiguration.MailboxNameCheckPolicy mailboxNameCheckPolicy, ClientSupport clientSupport) {
-		super(hostname, port, login, password, mailboxNameCheckPolicy, clientSupport);
-		this.counter = counter;
+	private final ClientHandler handler;
+	private final int imapTimeoutInMilliseconds;
+	private final Provider<SocketConnector> connectorFactory;
+
+	public SessionFactoryImpl(Provider<SocketConnector> connectorFactory, ClientHandler handler, int imapTimeoutInMilliseconds) {
+		this.connectorFactory = connectorFactory;
+		this.handler = handler;
+		this.imapTimeoutInMilliseconds = imapTimeoutInMilliseconds;
 	}
 	
 	@Override
-	protected boolean selectMailboxImpl(String mailbox) {
-		boolean selected = super.selectMailboxImpl(mailbox);
-		counter.selectCounter.incrementAndGet();
-		return selected;
+	public IoSession connect(SocketAddress address) throws IMAPException {
+		SocketConnector socketConnector = connectorFactory.get();
+		socketConnector.setHandler(handler);
+		handler.setConnector(socketConnector);
+		try {
+			ConnectFuture future = socketConnector.connect(address);
+			boolean joinSuccess = future.awaitUninterruptibly(imapTimeoutInMilliseconds);
+			if (!joinSuccess) {
+				future.cancel();
+				throw new ImapTimeoutException();
+			}
+			if (!future.isConnected()) {
+				// This method call will throw the original exception
+				future.getSession();
+				// This should never occur
+				throw new IMAPException("Cannot log into imap server");
+			} else {
+				return future.getSession();
+			}
+		} catch (RuntimeException e) {
+			cleanup(socketConnector);
+			throw e;
+		} catch(IMAPException e) {
+			cleanup(socketConnector);
+			throw e;
+		}
+	}
+
+	private void cleanup(SocketConnector socketConnector) {
+		socketConnector.dispose();
 	}
 	
-	@Override
-	public ListResult listAll() {
-		ListResult listAll = super.listAll();
-		counter.listMailboxesCounter.incrementAndGet();
-		return listAll;
-	}
 }
