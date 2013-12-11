@@ -8209,14 +8209,13 @@ function dis_calendar_day_list_pdf($calendar, $current_view, $calendar_entity) {
  */
 function dis_calendar_month_planning_pdf($calendar, $current_view, $calendar_entity) {
   global $ccalendar_first_hour, $ccalendar_last_hour, $ccalendar_weekstart;
-  global $ccalendar_weekstart, $ccalendar_first_hour;
 
   $date = clone $current_view->get_date();
   $date->setDay(1)->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addMonth(1)->setHour(0)->setMinute(0)->setSecond(0);
 
-  $status = array('ACCEPTED');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   $category_filter = $current_view->get_category_filter();
 
   $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
@@ -8289,7 +8288,7 @@ function dis_calendar_week_planning_pdf($calendar, $current_view, $calendar_enti
  */
 
 function dis_calendar_day_planning_pdf($calendar, $current_view, $calendar_entity) {
-  global $ccalendar_first_hour;
+  global $ccalendar_weekstart;
 
   $date = clone $current_view->get_date();
   $date->setHour(0)->setMinute(0)->setSecond(0);
@@ -8297,11 +8296,31 @@ function dis_calendar_day_planning_pdf($calendar, $current_view, $calendar_entit
   $end->addDay(1);
 
   $category_filter = $current_view->get_category_filter();
-  $status = array('ACCEPTED');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
+  $occurrences = calendar_events_model($date,$end, $calendar_entity, $status, $category_filter);
+  $id = $date->getTimestamp();
+  $columns[$id] = array();
 
-  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
+  $time_unit = 60 / $_SESSION['set_cal_interval']; 
+  foreach($occurrences as $occurrence) {
+    if($occurrence->event->all_day == 1) {
+      $columns[$id]['allday'][] = $occurrence;
+    } else {
+      $begin = clone $occurrence->date;
+      $begin->setMinute($begin->getMinute() - ($begin->getMinute()%$time_unit))->setSecond(0);
+      while($begin->compare($occurrence->end->getTimestamp()) < 0) {
+        $columns[$id][$begin->getIso()][] = $occurrence;
+        $begin->addMinute($time_unit);
+      }
+    }
+  }
 
-  $pdf = new CalendarPdfList($current_view, 'day', $calendar, $calendar_entity, $occurrences);
+  $updated = array();
+  foreach($columns as $date => $column){
+    $updated[$date] = check_conflict($column);
+  }
+
+  $pdf = new CalendarDayPlanningPdf($current_view, 'day', $updated, $calendar_entity, $calendar);
   $pdf->drawCalendar();
   $pdf->download();
 
@@ -9690,6 +9709,255 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
 
     return false;
   
+  }
+}
+
+Class CalendarDayPlanningPdf Extends CalendarPdf {
+
+  private static $GRID_LINE_COLOR = '#DEDEDE';
+  private static $FONT_COLOR = '#111111';
+  private static $FONT_COLOR_IN_EVENT = '#FFFFFF';
+  private static $FILL_EVENT_COLOR = '#636466';
+  private static $LINE_WIDTH = 0.5;
+  private static $ALL_DAY_TITLE = 'All day';
+
+  function __construct($current_view, $range, $updated, $calendar_entity, $calendar) {
+    global $ccalendar_first_hour, $ccalendar_last_hour;  
+
+    parent::__construct($current_view, $calendar, $calendar_entity);
+    $this->max_length_details = array("A4-LANDSCAPE" => array(6 => 185, 8 => 135, 10 => 107),
+                                      "A4" => array(6 => 96, 8 => 70, 10 => 55));
+    $this->calendar_x0 = $this->content_x0;
+    $this->calendar_y0 = $this->content_y0;
+    $this->calendar_x1 = $this->content_x1;
+    $this->calendar_y1 = $this->content_y1 - 2 * $this->margin; 
+
+    $this->nb_users = sizeof($this->calendar_entity["user"]); 
+
+    $this->hour_column_width = ($this->calendar_x1 - $this->calendar_x0) / 16;
+    $this->col_width = ($this->calendar_x1 - $this->calendar_x0 - $this->hour_column_width) / $this->nb_users;
+
+    $this->calendar_first_hour = $ccalendar_first_hour;
+    $this->calendar_last_hour = $ccalendar_last_hour;
+    $this->calendar_nb_hours = $this->calendar_last_hour - $this->calendar_first_hour;
+    $this->col_height = ($this->calendar_y1 - $this->calendar_y0) / ($this->calendar_nb_hours * 2 * 2);
+
+    $this->calendar_entity = $calendar_entity;
+    $this->updated = $updated;
+    $this->range = $range;
+
+    $date = $this->current_view->get_date();
+    $this->display_date = $date->localize(constant("Of_Date::OBM_DATE_".strtoupper($range)));
+
+    $this->onedayperpage = $calendar['onedayperpage'];
+    $this->addPage(true, false);
+  }
+
+  function getEventDuration($event) {
+    if($event->event->all_day == true) {
+      return self::$ALL_DAY_TITLE;
+    } else {
+      $start = $event->date->localize(Of_Date::TIME_SHORT);
+      $end = $event->end->localize(Of_Date::TIME_SHORT);
+      return "$start - $end";
+    }
+  }
+
+  function drawEventTitle($event_title, $hours_y) {
+    $this->page->setFillColor(new Zend_Pdf_Color_Html(self::$FONT_COLOR));
+    $this->page->drawText(
+      $this->truncateToWidth($event_title, $this->col_width / 2),
+      $this->calendar_x0 + $this->users_x + $this->hour_column_width,
+      $this->calendar_y1 - $hours_y - $this->col_height / (4 * 2),
+      'UTF-8');
+  }
+
+  function drawEventDuration($event_duration, $hours_y) {
+    $this->page->setFillColor(new Zend_Pdf_Color_Html(self::$FONT_COLOR_IN_EVENT));
+    $this->page->drawText(
+      $event_duration,
+      $this->calendar_x0 + $this->users_x + $this->hour_column_width + $this->col_width / 1.5,
+      $this->calendar_y1 - $hours_y - $this->col_height / (4 * 2), 
+      'UTF-8');
+  }
+
+  function drawEventRectangle($hours_y) {
+    $this->page->setFillColor(new Zend_Pdf_Color_Html(self::$FILL_EVENT_COLOR));
+    $this->page->drawRectangle(
+      $this->calendar_x0 + $this->users_x + $this->hour_column_width + $this->col_width / 2,
+      $this->calendar_y1 - $hours_y + $this->col_height / 2,
+      $this->calendar_x0 + $this->users_x + $this->hour_column_width + $this->col_width,
+      $this->calendar_y1 - $hours_y - $this->col_height / 2,
+      Zend_Pdf_Page::SHAPE_DRAW_FILL);
+  }
+
+  function drawEvents($events, $user, $current_date) {
+    if (!events) {
+      return;
+    }
+    $eventsToDraw = $this->getEventToDraw($events, $user["id"], $current_date);
+    $this->drawEventsElement($eventsToDraw);
+  }
+
+  function drawEventsElement($eventsToDraw) {
+    if (!$eventsToDraw) {
+      return;
+    }
+    $hours_y = $this->hours_y;
+    $added_to_hours_y = 0;
+    $i = sizeof($eventsToDraw);
+    foreach($eventsToDraw as $eventToDraw) {
+      $this->drawEventTitle($eventToDraw->event->title, $hours_y);
+      $this->drawEventRectangle($hours_y);
+      $event_duration = $this->getEventDuration($eventToDraw);
+      $this->drawEventDuration($event_duration, $hours_y);
+      $i--;
+      if($i > 0) {
+        $hours_y += $this->col_height;
+        $added_to_hours_y += $this->col_height;
+      }
+    }
+    if ($added_to_hours_y > $this->max_added_to_hours_y) {
+      $this->max_added_to_hours_y = $added_to_hours_y;
+    }
+  }
+
+  function getEventToDraw($events, $id, $date) {
+    $eventsToDraw = array();
+    foreach($events as $event) {
+      if (
+        $event->event->all_day == false && 
+        $event->event->owner == $id &&
+        $event->date->getHour() == $date->getHour() &&
+        $event->date->getMinute() == $date->getMinute()
+      ) {
+        $eventsToDraw[] = $event;
+      }
+    }
+    return $eventsToDraw;
+  }
+
+  function getAlldayEventsToDraw($events, $id) {
+    $eventsToDraw = array();
+    foreach($events as $event) {
+      if ($event->event->owner == $id && $event->event->all_day == true) {
+        $eventsToDraw[] = $event;
+      }
+    }
+    return $eventsToDraw; 
+  }
+
+  function drawCurrentHour($date) {
+    $current_hour = $date->localize(Of_Date::TIME_SHORT);
+    $this->page->setFillColor(new Zend_Pdf_Color_Html(self::$FONT_COLOR));
+    $this->page->drawText(
+      $current_hour,
+      $this->calendar_x0,
+      $this->calendar_y1 - $this->hours_y - $this->col_height / (4 * 2),
+      'UTF-8');
+  }
+
+  function drawHorizontalGrid() {
+    $this->page->setLineColor(new Zend_Pdf_Color_Html(self::$GRID_LINE_COLOR));
+    $this->page->drawLine(
+      $this->calendar_x0,
+      $this->calendar_y1 - $this->hours_y - $this->max_added_to_hours_y - $this->col_height / 2,
+      $this->calendar_x1,
+      $this->calendar_y1 - $this->hours_y - $this->max_added_to_hours_y - $this->col_height / 2); 
+
+  }
+
+  function drawVerticalUsersGrid() {
+    for($i = 1; $i <= $this->nb_users; $i++) {
+      $this->page->drawLine(
+        $this->calendar_x0 + $this->col_width * $i + $this->hour_column_width,
+        $this->calendar_y1 - $this->hours_y + $this->col_height * 1.5,
+        $this->calendar_x0 + $this->col_width * $i + $this->hour_column_width,
+        $this->calendar_y1 - $this->hours_y - $this->col_height / 2);
+    }
+  }
+
+  function drawVerticalHoursGrid() {
+    $this->page->setLineColor(new Zend_Pdf_Color_Html(self::$GRID_LINE_COLOR));
+    $this->page->drawLine(
+      $this->calendar_x0 + $this->hour_column_width,
+      $this->calendar_y1 - $this->hours_y + $this->col_height * 1.5,
+      $this->calendar_x0 + $this->hour_column_width,
+      $this->calendar_y1 - $this->hours_y - $this->col_height / 2);
+  }
+
+  function drawGrid() {
+    $this->drawHorizontalGrid();
+    $this->drawVerticalUsersGrid(); 
+    $this->drawVerticalHoursGrid();
+  }
+
+  function drawHeaders($users) {
+    $this->users_x = 0;
+    foreach($users as $user) { 
+      $this->page->setFillColor(new Zend_Pdf_Color_Html(self::$FONT_COLOR));
+      $username = $this->truncateToWidth($user["name"], $this->col_width / 2);
+      $this->page->drawText(
+        $username,
+        $this->calendar_x0 + $this->hour_column_width + $this->users_x + $this->col_width / 3,
+        $this->calendar_y1,
+        'UTF-8');
+      $this->users_x += $this->col_width;
+    }
+    $this->page->setLineColor(new Zend_Pdf_Color_Html(self::$GRID_LINE_COLOR));
+    $this->page->drawLine(
+      $this->calendar_x0,
+      $this->calendar_y1 - $this->col_height + $this->col_height / 2,
+      $this->calendar_x1,
+      $this->calendar_y1 - $this->col_height + $this->col_height / 2);
+    $this->hours_y = $this->col_height; 
+  }
+
+  function drawAlldayEvents($events, $users, $date) {
+    $this->users_x = 0;
+    foreach($users as $user) {
+      $AlldayEvents = $this->getAlldayEventsToDraw($events, $user["id"]);
+      $this->drawEventsElement($AlldayEvents);
+      $this->users_x += $this->col_width;
+    }
+    $this->hours_y += $this->max_added_to_hours_y;
+    $this->drawGrid();
+    $this->hours_y += $this->col_height;
+  }
+
+  function drawNotAllDayEvents($events, $users, $current_date, $target_date) {
+    while ($current_date->getHour() <= $target_date->getHour()) {
+      $this->users_x = 0;
+      $this->max_added_to_hours_y = 0; 
+
+      if($current_date->getMinute() == 0) {
+        $this->drawCurrentHour($current_date);
+      }
+      foreach($users as $user) {
+        $this->drawEvents($events, $user, $current_date);
+        $this->users_x += $this->col_width;
+      }
+      $this->hours_y += $this->max_added_to_hours_y;
+      $this->drawGrid();
+      $this->hours_y += $this->col_height;
+
+      $current_date->addMinute(30);
+    }
+  }
+
+  function drawCalendar() {
+    $current_date = new Of_Date();
+    $current_date->setHour($this->calendar_first_hour)->setMinute(0)->setSecond(0);
+    $target_date = new Of_Date();
+    $target_date->setHour($this->calendar_last_hour)->setMinute(0)->setSecond(0);
+    $this->page->setLineWidth(self::$LINE_WIDTH);
+
+    $users = $this->calendar_entity["user"];
+    $events = array_shift(array_values($this->updated)); 
+
+    $this->drawHeaders($users);
+    $this->drawAlldayEvents($events, $users, $current_date);
+    $this->drawNotAllDayEvents($events, $users, $current_date, $target_date);
   }
 }
 
