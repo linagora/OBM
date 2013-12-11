@@ -285,10 +285,6 @@ function run_query_project_allocation_and_time($p_id) {
       on timetask_projecttask_id = projecttask_id
       and timetask_user_id = userobm_id
     WHERE projectuser_project_id $p_id $multidomain
-      AND ( (projectuser_projectedtime != 0
-             AND projectuser_projectedtime is not null)
-          OR (projectuser_missingtime != 0
-             AND projectuser_missingtime is not null) )
     GROUP BY userobm_id, projecttask_id, projected_time, missing_time
 ";
 
