@@ -4555,7 +4555,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_no_end_repeat;
   global $l_daily, $l_weekly, $l_monthlybydate,$l_monthlybyday,$l_yearly;
   global $l_carac,$l_module_calendar;
-  global $l_none, $l_none_f, $l_force,$l_repeat_update,$l_groups,$l_force_disabled;
+  global $l_none, $l_none_f, $l_force,$l_repeat_update,$l_groups,$l_force_disabled, $l_module_resourcegroup;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
   global $l_alerts, $l_alerts_time, $l_color;
@@ -5297,6 +5297,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       return false;\">
      <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
+    $resource_group_add_button = "
+    <a href=\"javascript: return false;\"
+    onclick=\"popup('$path/resourcegroup/resourcegroup_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_group_id','');
+    return false;\">
+    <img src=\"$ico_add\" alt=\"[Add]\" />
+    </a>";
 
     $block_resource = "
     <fieldset class=\"detail infos\">
@@ -5316,10 +5322,25 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <th>&nbsp;</th>    
     <td id=\"sel_resource_id\">$dis_sel_resource</td>
     </tr>
+
+    <th>
+    $l_module_resourcegroup
+    $resource_group_add_button
+    </th>
+    <td>
+      <input type=\"text\" name=\"\" value=\"\" id=\"resourceGroupSearch\" autocomplete=\"off\" />
+    </td>
+    </tr>
+    <tr>
+    <th>&nbsp;</th>
+    <td id=\"sel_resource_group_id\">$dis_sel_group</td>
+    </tr>
+
     $dis_show_resource_calendar
     </table>
     </fieldset>";
     $resource_complete = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&form=event', 'sel_resource_id', 'resourceSearch',{filter_entity:'Resource', filter_pattern:'access'});";
+    $resource_group_complete = "new obm.AutoComplete.Search('$path/resourcegroup/resourcegroup_index.php?action=ext_search', 'sel_resource_group_id', 'resourceGroupSearch');";
   }
 
   if ($force_disabled) {
@@ -5650,6 +5671,7 @@ $date_edit_occurrence
     obm.initialize.chain(function () {
       $user_complete
       $resource_complete
+      $resource_group_complete
       $group_complete
       $document_complete
     });

@@ -3034,6 +3034,32 @@ function of_usergroup_get_group_users($g_id, $info=false, $uids='', $order='') {
   return $users;
 }
 
+function of_resourcegroup_get_group_resources($g_id) {
+  global $cdg_sql;
+
+  if ($g_id <= 0) {
+    return false;
+  }
+
+  $g_id = sql_parse_id ( $g_id, true );
+
+  $query =
+    " SELECT resourcegroup_resource_id
+      FROM ResourceGroup
+      LEFT JOIN Resource ON resourcegroup_resource_id = resource_id
+      WHERE resourcegroup_rgroup_id $g_id";
+
+  $obm_q = new DB_OBM ();
+  display_debug_msg ( $query, $cdg_sql, 'of_resourcegroup_get_group_resources()' );
+  $obm_q->query ( $query );
+
+  $resources = array ();
+  while ( $obm_q->next_record () ) {
+    $resources [] = $obm_q->f ( 'resourcegroup_resource_id' );
+  }
+
+  return $resources;
+}
 
 /**
  * Update one group internal user mapping

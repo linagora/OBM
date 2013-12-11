@@ -285,7 +285,7 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   $params['sel_user_id']= (is_array($params['sel_user_id']))?$params['sel_user_id']:array();
   $entities['group'] = $params['sel_group_id'];
-  $entities['resource'] = $params['sel_resource_id'];
+  $entities['resource'] = run_query_calendar_merge_resource_groups($params['sel_resource_group_id'], $params['sel_resource_id']);
   $entities['user'] = run_query_calendar_merge_groups($params['sel_group_id'],$params['sel_user_id']);
   if (count($entities,COUNT_RECURSIVE) <= 3) {
     $entities['user']  = array($obm['uid']);
@@ -427,7 +427,7 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   $params['sel_user_id']= (is_array($params['sel_user_id']))?$params['sel_user_id']:array();
   $entities['group'] = $params['sel_group_id'];
-  $entities['resource'] = $params['sel_resource_id'];
+  $entities['resource'] = run_query_calendar_merge_resource_groups($params['sel_resource_group_id'], $params['sel_resource_id']);
   $entities['user'] = run_query_calendar_merge_groups($params['sel_group_id'],$params['sel_user_id']);
   if (count($entities,COUNT_RECURSIVE) <= 3) {
     $entities['user']  = array($obm['uid']);
@@ -442,7 +442,11 @@ if ($action == 'search') {
     $params['repeat_kind'] = 'none';
   }
 
-  if (check_user_defined_rules() && check_calendar_access($params["calendar_id"]) && check_calendar_data_form($params) && check_upload_errors()) {
+  if (check_user_defined_rules()
+      && check_calendar_access($params["calendar_id"])
+      && check_calendar_data_form($params)
+      && check_access_entity($entities['user'], $entities['resource'])
+      && check_upload_errors()) {
     try {
       $c = get_calendar_event_info($params['calendar_id'],false); 
       $conflicts = check_calendar_conflict($params, $entities);

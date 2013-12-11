@@ -873,16 +873,25 @@ function run_query_calendar_delete_event_entity($calendar, $users = null) {
  * @return void
  */
 function run_query_calendar_merge_groups($groups, $users) {
+  return run_query_calendar_merge($groups, $users, of_usergroup_get_group_users);
+}
+
+function run_query_calendar_merge_resource_groups($groups, $resources) {
+  return run_query_calendar_merge($groups, $resources, of_resourcegroup_get_group_resources);
+}
+
+function run_query_calendar_merge($groups, $users, $get_children) {
   $users = (is_array($users)?$users:array());
+
   if (is_array($groups)) {
     foreach($groups as $group_id) {
-      $users = array_merge($users, of_usergroup_get_group_users($group_id));
+      $users = array_merge($users, $get_children($group_id));
     }
     $users = array_unique($users);
   }
+
   return $users;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Insert one event
