@@ -39,6 +39,7 @@ applicable to the OBM software.
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
+require_once(dirname(__file__)."/../share/share_display.inc");
 
 //---------------------------------------------------------------------------//
 // Fields that appear in result lists                                        //
@@ -539,6 +540,7 @@ function dis_resource_right_dis_admin($id) {
   $name = $infos['name'];
   $display['title'] = $name;
   $block = of_right_dis_admin('resource', $id);
+  $block .= html_share_calendar($id, $name, 'resource');
 
   return $block;
 }
