@@ -209,6 +209,7 @@ class Vcalendar_Writer_ICS {
         if(!$userInfo['email']) $userInfo['email'] = $this->noreply ; 
         $value =  'MAILTO:'.$this->parseText($userInfo['email']);
         $params[] = 'CUTYPE=INDIVIDUAL';
+        $params[] = 'RSVP=TRUE';
         $params[] = 'CN='.$this->parseText($userInfo['firstname'].' '.$userInfo['lastname']);
         $params[] = 'PARTSTAT='.$partstat;
         $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
@@ -248,6 +249,7 @@ class Vcalendar_Writer_ICS {
         }
         $contactInfo = $this->attendees['contact'][$attendee['id']];          
         $params[] = 'CUTYPE=INDIVIDUAL';
+        $params[] = 'RSVP=TRUE';
         if(!$contactInfo['entity'][ $attendee['id'] ]['email_address'])$contactInfo['entity'][ $attendee['id'] ]['email_address'] = $this->noreply ;
         $value = 'MAILTO:'.$this->parseText($contactInfo['entity'][ $attendee['id'] ]['email_address']);
         break;
