@@ -273,7 +273,7 @@ public class XmlResponder {
 		return res;
 	}
 
-	public String sendResourceInformation(ResourceInfo[] resourceInfo) {
+	public String sendResourceInformation(Collection<ResourceInfo> resourceInfo) {
 		String res = "";
 		try {
 			Document doc = DOMUtils.createDoc(

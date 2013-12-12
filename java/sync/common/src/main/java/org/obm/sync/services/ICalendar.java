@@ -81,9 +81,9 @@ public interface ICalendar {
 	 * @param offset The number of results to skip. Passing {@code null} will return results from the first.
 	 * @param pattern An optional pattern matched against user's login, lastname and firstname. Can be {@code null}.
 	 * 
-	 * @return An {@code array} of {@link ResourceInfo} objects containing the requested information.
+	 * @return A {@link Collection} of {@link ResourceInfo} objects containing the requested information.
 	 */
-	ResourceInfo[] listResources(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault;
+	Collection<ResourceInfo> listResources(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault;
 
 	/**
 	 * Returns calendar metadata for a list of given calendars.
@@ -104,7 +104,7 @@ public interface ICalendar {
 	 * @param resources
 	 * 			  the OBM emails associated to the resources we want to retrieve.
 	 */
-	ResourceInfo[] getResourceMetadata(AccessToken token, String[] resources)
+	Collection<ResourceInfo> getResourceMetadata(AccessToken token, String[] resources)
 			throws ServerFault;
 
 	/**

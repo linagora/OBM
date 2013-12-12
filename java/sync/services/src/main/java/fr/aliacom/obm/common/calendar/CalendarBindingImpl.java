@@ -98,6 +98,7 @@ import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -172,13 +173,13 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ResourceInfo[] listResources(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
+	public Collection<ResourceInfo> listResources(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
 		try {
 			Collection<ResourceInfo> resourceInfo = calendarDao.listResources(userService.getUserFromAccessToken(token), limit, offset, pattern);
 
 			logger.info(String.format("%s Returning %d resource info", LogUtils.prefix(token), resourceInfo.size()));
 
-			return resourceInfo.toArray(new ResourceInfo[resourceInfo.size()]);
+			return resourceInfo;
 		} catch (Exception e) {
 			throw new ServerFault(e);
 		}
@@ -234,21 +235,18 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional(readOnly=true)
-	public ResourceInfo[] getResourceMetadata(AccessToken token, String[] resourceEmails) throws ServerFault {
+	public Collection<ResourceInfo> getResourceMetadata(AccessToken token, String[] resourceEmails) throws ServerFault {
 		if (resourceEmails == null || resourceEmails.length == 0) {
-			return new ResourceInfo[0];
+			return ImmutableList.of();
 		}
 
 		ObmUser user = userService.getUserFromAccessToken(token);
-		Collection<ResourceInfo> resourceInfo;
+
 		try {
-			resourceInfo = calendarDao.getResourceMetadata(user, Arrays.asList(resourceEmails));
+			return calendarDao.getResourceMetadata(user, Arrays.asList(resourceEmails));
 		} catch (FindException e) {
 			throw new ServerFault(e);
 		}
-		ResourceInfo[] ret = new ResourceInfo[resourceInfo.size()];
-		resourceInfo.toArray(ret);
-		return ret;
 	}
 
 	@Override
