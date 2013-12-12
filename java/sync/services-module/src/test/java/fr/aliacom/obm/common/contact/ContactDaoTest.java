@@ -31,46 +31,47 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
-import org.obm.filter.SlowFilterRunner;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.SlowGuiceRunner;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.dao.EntityId;
-import org.obm.sync.solr.SolrHelper.Factory;
+import org.obm.sync.solr.SolrHelper;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
 
-@RunWith(SlowFilterRunner.class)
+@GuiceModule(ContactDaoTest.Env.class)
+@RunWith(SlowGuiceRunner.class)
 public class ContactDaoTest {
 
+	@Inject
 	private ContactDao contactDao;
+
+	@Inject
+	private IMocksControl control;
 
 	@Before
 	public void setUp() {
-		ContactConfiguration contactConfiguration = null;
-		CalendarDao calendarDao = null;
-		Factory solrHelperFactory = null;
-		ObmHelper obmHelper = null;
-		EventExtId.Factory eventExtIdFactory = null;
-		contactDao = new ContactDao(contactConfiguration, calendarDao,
-				solrHelperFactory, obmHelper, eventExtIdFactory);
+		control.reset();
 	}
 
 	@Test
@@ -83,14 +84,14 @@ public class ContactDaoTest {
 				EntityId.valueOf(2), contact2,
 				EntityId.valueOf(3), contact3);
 
-		ResultSet rs = createMock(ResultSet.class);
+		ResultSet rs = control.createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);
 		expect(rs.getString(2)).andReturn("INTERNET;X-OBM-Ref1");
 		expect(rs.getString(3)).andReturn("user@domain");
 
-		replay(rs);
+		control.replay();
 		contactDao.loadEmailInContact(contacts, rs);
-		verify(rs);
+		control.verify();
 		
 		assertThat(contact2.getEmails())
 			.containsEntry("INTERNET;X-OBM-Ref1", EmailAddress.loginAtDomain("user@domain"));
@@ -107,14 +108,14 @@ public class ContactDaoTest {
 				EntityId.valueOf(2), contact2,
 				EntityId.valueOf(3), contact3);
 
-		ResultSet rs = createMock(ResultSet.class);
+		ResultSet rs = control.createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);
 		expect(rs.getString(2)).andReturn("INTERNET;X-OBM-Ref1");
 		expect(rs.getString(3)).andReturn("user@domain");
 
-		replay(rs);
+		control.replay();
 		contactDao.loadEmailInContact(contacts, rs);
-		verify(rs);
+		control.verify();
 		
 		assertThat(contact2.getEmails())
 			.containsEntry("INTERNET;X-OBM-Ref1", EmailAddress.loginAtDomain("user@domain"))
@@ -132,14 +133,14 @@ public class ContactDaoTest {
 				EntityId.valueOf(2), contact2,
 				EntityId.valueOf(3), contact3);
 
-		ResultSet rs = createMock(ResultSet.class);
+		ResultSet rs = control.createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);
 		expect(rs.getString(2)).andReturn("INTERNET;X-OBM-Ref1");
 		expect(rs.getString(3)).andReturn("user2@domain");
 
-		replay(rs);
+		control.replay();
 		contactDao.loadEmailInContact(contacts, rs);
-		verify(rs);
+		control.verify();
 		
 		assertThat(contact2.getEmails())
 			.containsEntry("INTERNET;X-OBM-Ref1", EmailAddress.loginAtDomain("user2@domain"));
@@ -155,14 +156,14 @@ public class ContactDaoTest {
 				EntityId.valueOf(2), contact2,
 				EntityId.valueOf(3), contact3);
 
-		ResultSet rs = createMock(ResultSet.class);
+		ResultSet rs = control.createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);
 		expect(rs.getString(2)).andReturn("INTERNET;X-OBM-Ref1");
 		expect(rs.getString(3)).andReturn(null);
 
-		replay(rs);
+		control.replay();
 		contactDao.loadEmailInContact(contacts, rs);
-		verify(rs);
+		control.verify();
 		
 		assertThat(contact2.getEmails()).isEmpty();
 	}
@@ -177,14 +178,14 @@ public class ContactDaoTest {
 				EntityId.valueOf(2), contact2,
 				EntityId.valueOf(3), contact3);
 
-		ResultSet rs = createMock(ResultSet.class);
+		ResultSet rs = control.createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);
 		expect(rs.getString(2)).andReturn("INTERNET;X-OBM-Ref1");
 		expect(rs.getString(3)).andReturn("");
 
-		replay(rs);
+		control.replay();
 		contactDao.loadEmailInContact(contacts, rs);
-		verify(rs);
+		control.verify();
 		
 		assertThat(contact2.getEmails()).isEmpty();
 	}
@@ -199,16 +200,38 @@ public class ContactDaoTest {
 				EntityId.valueOf(2), contact2,
 				EntityId.valueOf(3), contact3);
 
-		ResultSet rs = createMock(ResultSet.class);
+		ResultSet rs = control.createMock(ResultSet.class);
 		expect(rs.getInt(1)).andReturn(2);
 		expect(rs.getString(2)).andReturn("INTERNET;X-OBM-Ref1");
 		expect(rs.getString(3)).andReturn("loginonly");
 
-		replay(rs);
+		control.replay();
 		contactDao.loadEmailInContact(contacts, rs);
-		verify(rs);
+		control.verify();
 		
 		assertThat(contact2.getEmails()).isEmpty();
+	}
+
+	public static class Env extends AbstractModule {
+		private final IMocksControl control = createControl();
+
+		private <T> T bindMock(Class<T> cls) {
+			T mock = control.createMock(cls);
+
+			bind(cls).toInstance(mock);
+
+			return mock;
+		}
+
+		@Override
+		protected void configure() {
+			bind(IMocksControl.class).toInstance(control);
+			bindMock(ContactConfiguration.class);
+			bindMock(CalendarDao.class);
+			bindMock(SolrHelper.Factory.class);
+			bindMock(ObmHelper.class);
+			bindMock(EventExtId.Factory.class);
+		}
 	}
 
 }
