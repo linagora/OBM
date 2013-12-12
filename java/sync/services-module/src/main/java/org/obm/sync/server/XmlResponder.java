@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -76,12 +77,12 @@ import fr.aliacom.obm.common.user.UserSettings;
 
 public class XmlResponder {
 
-	private HttpServletResponse resp;
-	private Logger logger =  LoggerFactory.getLogger(getClass());
-	private CalendarItemsWriter ciw;
-	private BookItemsWriter biw;
-	private SettingItemsWriter siw;
-	private MailingListItemsWriter mliw;
+	private final HttpServletResponse resp;
+	private final Logger logger =  LoggerFactory.getLogger(getClass());
+	private final CalendarItemsWriter ciw;
+	private final BookItemsWriter biw;
+	private final SettingItemsWriter siw;
+	private final MailingListItemsWriter mliw;
 
 	public XmlResponder(HttpServletResponse resp) {
 		this.resp = resp;
@@ -253,7 +254,7 @@ public class XmlResponder {
 		return emitResponse(ciw.getXMLDocumentFrom(eventChanges));
 	}
 
-	public String sendCalendarInformations(CalendarInfo[] lc) {
+	public String sendCalendarInformations(Collection<CalendarInfo> lc) {
 		String res = "";
 		try {
 			Document doc = DOMUtils.createDoc(

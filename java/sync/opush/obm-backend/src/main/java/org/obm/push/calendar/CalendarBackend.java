@@ -32,6 +32,7 @@
 package org.obm.push.calendar;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -192,7 +193,7 @@ public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICal
 		Builder builder = PathsToCollections.builder();
 		AccessToken token = getAccessToken(udr);
 		try {
-			CalendarInfo[] cals = getCalendarClient(udr).listCalendars(token, null, null, null);
+			Collection<CalendarInfo> cals = getCalendarClient(udr).listCalendars(token, null, null, null);
 			for (CalendarInfo ci : cals) {
 				CollectionPath collectionPath = collectionPathOfCalendar(udr, ci.getUid());
 				builder.put(collectionPath, OpushCollection.builder()

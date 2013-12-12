@@ -66,9 +66,9 @@ public interface ICalendar {
 	 * @param offset The number of results to skip. Passing {@code null} will return results from the first.
 	 * @param pattern An optional pattern matched against user's login, lastname and firstname. Can be {@code null}.
 	 * 
-	 * @return An {@code array} of {@link CalendarInfo} objects containing the requested information.
+	 * @return A {@link Collection} of {@link CalendarInfo} objects containing the requested information.
 	 */
-	CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault;
+	Collection<CalendarInfo> listCalendars(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault;
 
 
 	/**
@@ -91,7 +91,7 @@ public interface ICalendar {
 	 * @param calendars
 	 * 			  the OBM emails associated to the calendars we want to retrieve.
 	 */
-	CalendarInfo[] getCalendarMetadata(AccessToken token, String[] calendars)
+	Collection<CalendarInfo> getCalendarMetadata(AccessToken token, String[] calendars)
 			throws ServerFault;
 
 	/**

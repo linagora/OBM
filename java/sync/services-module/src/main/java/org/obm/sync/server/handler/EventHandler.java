@@ -46,7 +46,6 @@ import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
-import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.CalendarItemsParser;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
@@ -210,11 +209,8 @@ public class EventHandler extends SecureSyncHandler {
 		}
 	} 
 
-	private String getCalendarMetadata(AccessToken at, Request request,
-			XmlResponder responder) throws ServerFault {
-		String[] calendarEmails = request.getParameterValues("calendar");
-		CalendarInfo[] lc = binding.getCalendarMetadata(at, calendarEmails);
-		return responder.sendCalendarInformations(lc);
+	private String getCalendarMetadata(AccessToken at, Request request, XmlResponder responder) throws ServerFault {
+		return responder.sendCalendarInformations(binding.getCalendarMetadata(at, request.getParameterValues("calendar")));
 	}
 
 	private String getResourceMetadata(AccessToken at, Request request,

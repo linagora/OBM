@@ -36,6 +36,7 @@ import static org.obm.sync.calendar.CalendarUtils.makeCalendarInfo;
 import static org.obm.sync.calendar.CalendarUtils.makeTestUserCalendarInfo;
 
 import java.net.URL;
+import java.util.Collection;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -80,7 +81,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token);
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token);
 
 		loginClient.logout(user1Token);
 
@@ -120,7 +121,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, 5, 0);
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, 5, 0);
 
 		loginClient.logout(user1Token);
 
@@ -139,7 +140,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, 2, 2);
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, 2, 2);
 
 		loginClient.logout(user1Token);
 
@@ -155,7 +156,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, 5, 0);
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, 5, 0);
 
 		assertThat(calendars).containsExactly(
 				makeCalendarInfo("user1", "Firstname", "Lastname", true, true),
@@ -194,7 +195,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.getCalendarMetadata(user1Token, new String[] {
+		Collection<CalendarInfo> calendars = calendarClient.getCalendarMetadata(user1Token, new String[] {
 				"usera@domain.org",
 				"userb@domain.org",
 				"userc@domain.org"
@@ -215,7 +216,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.getCalendarMetadata(user1Token, new String[] {
+		Collection<CalendarInfo> calendars = calendarClient.getCalendarMetadata(user1Token, new String[] {
 				USER1_EMAIL,
 				"userc@domain.org"
 		});
@@ -244,7 +245,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "testuser");
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, null, 0, "testuser");
 
 		loginClient.logout(user1Token);
 
@@ -263,7 +264,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "TESTUS");
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, null, 0, "TESTUS");
 
 		loginClient.logout(user1Token);
 
@@ -282,7 +283,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "Lastname_r");
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, null, 0, "Lastname_r");
 
 		loginClient.logout(user1Token);
 
@@ -297,7 +298,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "TeSTlasT");
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, null, 0, "TeSTlasT");
 
 		loginClient.logout(user1Token);
 
@@ -316,7 +317,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "TestFirs");
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, null, 0, "TestFirs");
 
 		loginClient.logout(user1Token);
 
@@ -335,7 +336,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "testfirST");
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, null, 0, "testfirST");
 
 		loginClient.logout(user1Token);
 
@@ -354,7 +355,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "user1");
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, null, 0, "user1");
 
 		loginClient.logout(user1Token);
 
@@ -369,7 +370,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login("userc@domain.org", "userc");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, 3, 0, "Firstname");
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, 3, 0, "Firstname");
 
 		loginClient.logout(user1Token);
 
@@ -386,7 +387,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, 2, 1, "testuser");
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, 2, 1, "testuser");
 
 		loginClient.logout(user1Token);
 
@@ -402,7 +403,7 @@ public class ListCalendarsIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		CalendarInfo[] calendars = calendarClient.listCalendars(user1Token, null, 0, "iwontmatch");
+		Collection<CalendarInfo> calendars = calendarClient.listCalendars(user1Token, null, 0, "iwontmatch");
 
 		loginClient.logout(user1Token);
 

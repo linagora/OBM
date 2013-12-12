@@ -154,13 +154,13 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional(readOnly=true)
-	public CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
+	public Collection<CalendarInfo> listCalendars(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
 		try {
 			Collection<CalendarInfo> calendarInfos = calendarDao.listCalendars(userService.getUserFromAccessToken(token), limit, offset, pattern);
 
 			logger.info(LogUtils.prefix(token) + "Returning " + calendarInfos.size() + " calendar infos.");
 
-			return calendarInfos.toArray(new CalendarInfo[0]);
+			return calendarInfos;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 
@@ -184,7 +184,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional(readOnly=true)
-	public CalendarInfo[] getCalendarMetadata(AccessToken token, String[] calendars) throws ServerFault {
+	public Collection<CalendarInfo> getCalendarMetadata(AccessToken token, String[] calendars) throws ServerFault {
 		try {
 			ObmUser user = userService.getUserFromAccessToken(token);
 
@@ -220,10 +220,9 @@ public class CalendarBindingImpl implements ICalendar {
 				calendarInfos = new HashSet<CalendarInfo>();
             }
 
-			CalendarInfo[] ret = calendarInfos.toArray(new CalendarInfo[0]);
-			logger.info(LogUtils.prefix(token) + "Returning " + ret.length
-					+ " calendar infos.");
-			return ret;
+			logger.info(LogUtils.prefix(token) + "Returning " + calendarInfos.size() + " calendar infos.");
+
+			return calendarInfos;
 		} catch (Throwable e) {
 			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
 			throw new ServerFault(e.getMessage());

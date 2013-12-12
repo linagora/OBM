@@ -45,7 +45,6 @@ import static org.easymock.EasyMock.isNull;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reportMatcher;
 import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -55,7 +54,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -258,11 +256,11 @@ public class CalendarBindingImplTest {
 				stripEmail(mccarthyInfo.getMail()),
 		};
 		
-		CalendarInfo[] expectedCalendarInfos = {
+		Collection<CalendarInfo> expectedCalendarInfos = ImmutableSet.of(
 				beriaInfo,
 				hooverInfo,
-				mccarthyInfo,
-		};
+				mccarthyInfo
+		);
 		
 		CalendarInfo[] calendarInfosFromDao = {
 				beriaInfo,
@@ -287,8 +285,8 @@ public class CalendarBindingImplTest {
 		Object[] mocks = {accessToken, userService, calendarDao, rightsHelper};
 		
 		replay(mocks);
-		CalendarInfo[] result = calendarService.getCalendarMetadata(accessToken, calendarEmails);
-		assertEquals(new HashSet<CalendarInfo>(Arrays.asList(expectedCalendarInfos)), new HashSet<CalendarInfo>(Arrays.asList(result)));
+		Collection<CalendarInfo> result = calendarService.getCalendarMetadata(accessToken, calendarEmails);
+		assertThat(expectedCalendarInfos).containsExactlyElementsOf(result);
 	}
 	
 	@Test
@@ -321,10 +319,10 @@ public class CalendarBindingImplTest {
 				stripEmail(mccarthyInfo.getMail())
 		};
 		
-		CalendarInfo[] expectedCalendarInfos = {
+		Collection<CalendarInfo> expectedCalendarInfos = ImmutableSet.of(
 				hooverInfo,
-				mccarthyInfo,
-		};
+				mccarthyInfo
+		);
 		
 		CalendarInfo[] calendarInfosFromDao = {
 				hooverInfo,
@@ -350,8 +348,8 @@ public class CalendarBindingImplTest {
 		Object[] mocks = {accessToken, userService, calendarDao, rightsHelper};
 		
 		replay(mocks);
-		CalendarInfo[] result = calendarService.getCalendarMetadata(accessToken, calendarEmails);
-		assertEquals(new HashSet<CalendarInfo>(Arrays.asList(expectedCalendarInfos)), new HashSet<CalendarInfo>(Arrays.asList(result)));
+		Collection<CalendarInfo> result = calendarService.getCalendarMetadata(accessToken, calendarEmails);
+		assertThat(expectedCalendarInfos).containsExactlyElementsOf(result);
 	}
 
 	@Test
