@@ -32,6 +32,7 @@
 package org.obm.sync.calendar;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +51,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class CalendarItemsParser extends AbstractItemsParser {
@@ -236,11 +238,11 @@ public class CalendarItemsParser extends AbstractItemsParser {
 
 	}
 
-	public CalendarInfo[] parseInfos(Document doc) {
+	public Collection<CalendarInfo> parseInfos(Document doc) {
 		NodeList infosList = doc.getElementsByTagName("info");
-		CalendarInfo[] infos = new CalendarInfo[infosList.getLength()];
+		List<CalendarInfo> infos = Lists.newArrayList();
 		for (int i = 0; i < infosList.getLength(); i++) {
-			infos[i] = parseInfo((Element) infosList.item(i));
+			infos.add(parseInfo((Element) infosList.item(i)));
 		}
 		return infos;
 	}

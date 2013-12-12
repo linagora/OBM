@@ -233,17 +233,17 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@VisibleForTesting
-	public CalendarInfo[] listCalendars(AccessToken token) throws ServerFault {
+	public Collection<CalendarInfo> listCalendars(AccessToken token) throws ServerFault {
 		return listCalendars(token, null, null);
 	}
 
 	@VisibleForTesting
-	public CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset) throws ServerFault {
+	public Collection<CalendarInfo> listCalendars(AccessToken token, Integer limit, Integer offset) throws ServerFault {
 		return listCalendars(token, limit, offset, null);
 	}
 
 	@Override
-	public CalendarInfo[] listCalendars(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
+	public Collection<CalendarInfo> listCalendars(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 
 		if (limit != null) {
@@ -585,7 +585,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public CalendarInfo[] getCalendarMetadata(AccessToken token,
+	public Collection<CalendarInfo> getCalendarMetadata(AccessToken token,
 			String[] calendars) throws ServerFault {
 		final Multimap<String, String> params = initParams(token);
 		for (String calendar : calendars)
