@@ -104,6 +104,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -147,8 +149,8 @@ public class ContactDao {
 
 	};
 
-	@Inject
 	@VisibleForTesting
+	@Inject
 	ContactDao(ContactConfiguration contactConfiguration, CalendarDao calendarDao,
 			SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper, EventExtId.Factory eventExtIdFactory) {
 		this.contactConfiguration = contactConfiguration;
@@ -1343,104 +1345,109 @@ public class ContactDao {
 	private List<Contact> searchContact(AccessToken at, Collection<AddressBook> addrBooks, Connection con, String query, int limit, Integer offset) 
 			throws MalformedURLException, SQLException, LocatorClientException {
 		
-		List<Contact> ret = new LinkedList<Contact>();
-		Set<Integer> evtIds = new HashSet<Integer>();
+		Set<Integer> contactIds = new HashSet<Integer>();
 
+		if (addrBooks.size() > 0) {
+			SolrHelper solrHelper = solrHelperFactory.createClient(at);
+			CommonsHttpSolrServer solrServer = solrHelper.getSolrContact();
+			StringBuilder sb = new StringBuilder();
+			sb.append("-is:archive ");
+			sb.append("+addressbookId:(");
+			int idx = 0;
+			for (AddressBook book : addrBooks) {
+				if (idx > 0) {
+					sb.append(" OR ");
+				}
+				sb.append(book.getUid());
+				idx++;
+			}
+			sb.append(")");
+			if (query != null && !"".equals(query)) {
+				sb.append(" +(displayname:(");
+				sb.append(query.toLowerCase());
+				sb.append("*) OR firstname:(");
+				sb.append(query.toLowerCase());
+				sb.append("*) OR lastname:(");
+				sb.append(query.toLowerCase());
+				sb.append("*) OR email:(");
+				sb.append(query.toLowerCase());
+				sb.append("*))");
+			}
+			SolrQuery params = new SolrQuery();
+			params.setQuery(sb.toString());
+			params.setIncludeScore(true);
+			params.setRows(limit);
+			params.setStart(offset);
+
+			try {
+				QueryResponse resp = solrServer.query(params);
+
+				SolrDocumentList results = resp.getResults();
+				if (logger.isDebugEnabled()) {
+					logger.debug("SOLR query time for " + results.size()
+							+ " results: " + resp.getElapsedTime() + "ms.");
+				}
+
+				for (int i = 0; i < limit && i < results.size(); i++) {
+					SolrDocument doc = results.get(i);
+					Map<String, Object> payload = doc.getFieldValueMap();
+					contactIds.add((Integer) payload.get("id"));
+				}
+			} catch (SolrServerException e) {
+				logger.error("Error querying server for '" + sb.toString()
+						+ " url: "
+						+ ClientUtils.toQueryString(params, false), e);
+			}
+		}
+
+		ContactResults contactResults = loadContactsFromDB(contactIds, con, limit);
+
+		if (!contactResults.contactMap.isEmpty()) {
+			loadPhones(con, contactResults.contactMap);
+			loadIMIdentifiers(con, contactResults.contactMap);
+			loadWebsites(con, contactResults.contactMap);
+			loadAddresses(at, con, contactResults.contactMap);
+			loadEmails(con, contactResults.contactMap);
+			loadBirthday(con, contactResults.contactMap);
+			loadAnniversary(con, contactResults.contactMap);
+		}
+
+		return contactResults.contactList;
+	}
+
+	@VisibleForTesting
+	ContactResults loadContactsFromDB(Set<Integer> contactIds, Connection con, int limit) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			if (addrBooks.size() > 0) {
-				SolrHelper solrHelper = solrHelperFactory.createClient(at);
-				CommonsHttpSolrServer solrServer = solrHelper.getSolrContact();
-				StringBuilder sb = new StringBuilder();
-				sb.append("-is:archive ");
-				sb.append("+addressbookId:(");
-				int idx = 0;
-				for (AddressBook book : addrBooks) {
-					if (idx > 0) {
-						sb.append(" OR ");
-					}
-					sb.append(book.getUid());
-					idx++;
-				}
-				sb.append(")");
-				if (query != null && !"".equals(query)) {
-					sb.append(" +(displayname:(");
-					sb.append(query.toLowerCase());
-					sb.append("*) OR firstname:(");
-					sb.append(query.toLowerCase());
-					sb.append("*) OR lastname:(");
-					sb.append(query.toLowerCase());
-					sb.append("*) OR email:(");
-					sb.append(query.toLowerCase());
-					sb.append("*))");
-				}
-				SolrQuery params = new SolrQuery();
-				params.setQuery(sb.toString());
-				params.setIncludeScore(true);
-				params.setRows(limit);
-				params.setStart(offset);
-
-				try {
-					QueryResponse resp = solrServer.query(params);
-
-					SolrDocumentList results = resp.getResults();
-					if (logger.isDebugEnabled()) {
-						logger.debug("SOLR query time for " + results.size()
-								+ " results: " + resp.getElapsedTime() + "ms.");
-					}
-
-					for (int i = 0; i < limit && i < results.size(); i++) {
-						SolrDocument doc = results.get(i);
-						Map<String, Object> payload = doc.getFieldValueMap();
-						evtIds.add((Integer) payload.get("id"));
-					}
-				} catch (SolrServerException e) {
-					logger.error("Error querying server for '" + sb.toString()
-							+ " url: "
-							+ ClientUtils.toQueryString(params, false), e);
-				}
-			}
-
-			IntegerSQLCollectionHelper eventIds = new IntegerSQLCollectionHelper(evtIds);
+			IntegerSQLCollectionHelper contactIdsHelper = new IntegerSQLCollectionHelper(contactIds);
 			String q = "SELECT "
 				+ CONTACT_SELECT_FIELDS
 				+ ", now() as last_sync FROM Contact, ContactEntity WHERE "
 				+ "contactentity_contact_id=contact_id AND contact_archive != 1 AND contact_id IN ("
-				+ eventIds.asPlaceHolders() + ") ORDER BY contact_lastname";
+				+ contactIdsHelper.asPlaceHolders() + ") ORDER BY contact_lastname";
 
 			ps = con.prepareStatement(q);
-			eventIds.insertValues(ps, 1);
+			contactIdsHelper.insertValues(ps, 1);
 			rs = ps.executeQuery();
-			Map<EntityId, Contact> entityContact = new HashMap<EntityId, Contact>();
+			Map<EntityId, Contact> entityIdToContact = Maps.newHashMap();
+			List<Contact> contacts = Lists.newLinkedList();
 
 			int i = 0;
 			while (rs.next() && i < limit) {
 				int entity = rs.getInt("contactentity_entity_id");
-				if (!entityContact.containsKey(EntityId.valueOf(entity))) {
+				if (!entityIdToContact.containsKey(EntityId.valueOf(entity))) {
 					Contact ct = contactFromCursor(rs);
-					entityContact.put(ct.getEntityId(), ct);
-					ret.add(ct);
+					entityIdToContact.put(ct.getEntityId(), ct);
+					contacts.add(ct);
 					i++;
 				}
 			}
 			rs.close();
-			rs = null;
-
-			if (!entityContact.isEmpty()) {
-				loadPhones(con, entityContact);
-				loadIMIdentifiers(con, entityContact);
-				loadWebsites(con, entityContact);
-				loadAddresses(at, con, entityContact);
-				loadEmails(con, entityContact);
-				loadBirthday(con, entityContact);
-				loadAnniversary(con, entityContact);
-			}
-
+			return new ContactResults(contacts, entityIdToContact);
 		} finally {
 			obmHelper.cleanup(null, ps, rs);
 		}
-		return ret;
 	}
 
 	public List<Contact> searchContactsInAddressBooksList(AccessToken at, Collection<AddressBook> addrBooks, String query, int limit, Integer offset) 
@@ -1712,4 +1719,14 @@ public class ContactDao {
 		}
 	}
 
+	@VisibleForTesting
+	static class ContactResults {
+		public List<Contact> contactList;
+		public Map<EntityId, Contact> contactMap;
+		
+		public ContactResults(List<Contact> contactList, Map<EntityId, Contact> contactMap) {
+			this.contactList = contactList;
+			this.contactMap = contactMap;
+		}
+	}
 }
