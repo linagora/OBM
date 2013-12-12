@@ -34,10 +34,14 @@ package fr.aliacom.obm.common.contact;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Set;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -49,11 +53,13 @@ import org.obm.guice.SlowGuiceRunner;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
@@ -65,6 +71,8 @@ public class ContactDaoTest {
 
 	@Inject
 	private ContactDao contactDao;
+	@Inject
+	private ObmHelper mockObmHelper;
 
 	@Inject
 	private IMocksControl control;
@@ -210,6 +218,125 @@ public class ContactDaoTest {
 		control.verify();
 		
 		assertThat(contact2.getEmails()).isEmpty();
+	}
+
+	@Test
+	public void testLoadContactsFromDB() throws SQLException {
+		String query =
+				"SELECT contact_id, contact_firstname, contact_lastname, "+
+						"contactentity_entity_id, contact_aka, contact_company, contact_title, "+
+						"contact_service, contact_birthday_id, contact_anniversary_id, contact_middlename, " +
+						"contact_suffix, contact_manager, contact_assistant, contact_spouse, " +
+						"contact_addressbook_id, contact_comment, contact_commonname, now() as last_sync "+
+				"FROM Contact, ContactEntity "+
+				"WHERE contactentity_contact_id=contact_id AND "+
+					"contact_archive != 1 AND "+
+					"contact_id IN (?, ?) "+
+				"ORDER BY contact_lastname";
+
+		int limit = 3;
+		Set<Integer> evtIds = Sets.newHashSet(1, 2);
+
+		Connection mockConn = control.createMock(Connection.class);
+		PreparedStatement mockStatement = control.createMock(PreparedStatement.class);
+		ResultSet mockRS = control.createMock(ResultSet.class);
+		expect(mockConn.prepareStatement(query)).andReturn(mockStatement).once();
+		mockStatement.setInt(1, 1);
+		expectLastCall();
+		mockStatement.setInt(2, 2);
+		expectLastCall();
+		expect(mockStatement.executeQuery()).andReturn(mockRS).once();
+
+		expect(mockRS.next()).andReturn(true).once();
+		expect(mockRS.getInt("contactentity_entity_id")).andReturn(10).once();
+		expect(mockRS.getInt(1)).andReturn(1).once();
+		expect(mockRS.getString(2)).andReturn("John").once();
+		expect(mockRS.getString(3)).andReturn("Doe").once();
+		expect(mockRS.getInt(4)).andReturn(10).once();
+		expect(mockRS.getString(5)).andReturn("aka john.doe").once();
+		expect(mockRS.getString(6)).andReturn("John Doe Inc.").once();
+		expect(mockRS.getString(7)).andReturn("Like a boss").once();
+		expect(mockRS.getString(8)).andReturn("8th directorate").once();
+		expect(mockRS.getInt(9)).andReturn(100).once();
+		expect(mockRS.wasNull()).andReturn(false);
+		expect(mockRS.getInt(10)).andReturn(200).once();
+		expect(mockRS.getString(11)).andReturn("Archibald").once();
+		expect(mockRS.getString(12)).andReturn("Jr.").once();
+		expect(mockRS.getString(13)).andReturn("God").once();
+		expect(mockRS.getString(14)).andReturn("Anabelle").once();
+		expect(mockRS.getString(15)).andReturn("Michelle").once();
+		expect(mockRS.getInt(16)).andReturn(300).once();
+		expect(mockRS.wasNull()).andReturn(false);
+		expect(mockRS.getString(17)).andReturn("Anonymous coward").once();
+		expect(mockRS.getString(18)).andReturn("Bossman").once();
+
+		expect(mockRS.next()).andReturn(true).once();
+		expect(mockRS.getInt("contactentity_entity_id")).andReturn(11).once();
+		expect(mockRS.getInt(1)).andReturn(2).once();
+		expect(mockRS.getString(2)).andReturn("Jane").once();
+		expect(mockRS.getString(3)).andReturn("Done").once();
+		expect(mockRS.getInt(4)).andReturn(11).once();
+		expect(mockRS.getString(5)).andReturn(null).once();
+		expect(mockRS.getString(6)).andReturn(null).once();
+		expect(mockRS.getString(7)).andReturn(null).once();
+		expect(mockRS.getString(8)).andReturn(null).once();
+		expect(mockRS.getInt(9)).andReturn(0).once();
+		expect(mockRS.wasNull()).andReturn(true);
+		expect(mockRS.getInt(10)).andReturn(201).once();
+		expect(mockRS.getString(11)).andReturn(null).once();
+		expect(mockRS.getString(12)).andReturn(null).once();
+		expect(mockRS.getString(13)).andReturn(null).once();
+		expect(mockRS.getString(14)).andReturn(null).once();
+		expect(mockRS.getString(15)).andReturn(null).once();
+		expect(mockRS.getInt(16)).andReturn(0).once();
+		expect(mockRS.wasNull()).andReturn(true);
+		expect(mockRS.getString(17)).andReturn(null).once();
+		expect(mockRS.getString(18)).andReturn(null).once();
+
+		expect(mockRS.next()).andReturn(true).once();
+		expect(mockRS.getInt("contactentity_entity_id")).andReturn(11).once();
+
+		expect(mockRS.next()).andReturn(false).once();
+
+		mockRS.close();
+		expectLastCall();
+
+		mockObmHelper.cleanup(null, mockStatement, mockRS);
+		expectLastCall();
+		control.replay();
+
+		Contact johnDoe = new Contact();
+		johnDoe.setUid(1);
+		johnDoe.setFirstname("John");
+		johnDoe.setLastname("Doe");
+		johnDoe.setEntityId(EntityId.valueOf(10));
+		johnDoe.setAka("aka john.doe");
+		johnDoe.setCompany("John Doe Inc.");
+		johnDoe.setTitle("Like a boss");
+		johnDoe.setService("8th directorate");
+		johnDoe.setBirthdayId(new EventObmId(100));
+		johnDoe.setAnniversaryId(new EventObmId(200));
+		johnDoe.setMiddlename("Archibald");
+		johnDoe.setSuffix("Jr.");
+		johnDoe.setManager("God");
+		johnDoe.setAssistant("Anabelle");
+		johnDoe.setSpouse("Michelle");
+		johnDoe.setFolderId(300);
+		johnDoe.setComment("Anonymous coward");
+		johnDoe.setCommonname("Bossman");
+
+		Contact janeDone = new Contact();
+		janeDone.setUid(2);
+		janeDone.setFirstname("Jane");
+		janeDone.setLastname("Done");
+		janeDone.setFolderId(0);
+		janeDone.setEntityId(EntityId.valueOf(11));
+
+		ContactDao.ContactResults contactResults = contactDao.loadContactsFromDB(evtIds, mockConn,
+				limit);
+
+		assertThat(contactResults.contactList).containsExactly(johnDoe, janeDone);
+		control.verify();
 	}
 
 	public static class Env extends AbstractModule {
