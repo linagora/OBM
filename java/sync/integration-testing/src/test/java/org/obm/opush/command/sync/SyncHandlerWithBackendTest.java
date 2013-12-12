@@ -35,6 +35,7 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.reportMatcher;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 import static org.obm.opush.IntegrationPushTestUtils.mockNextGeneratedSyncKey;
@@ -59,6 +60,7 @@ import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
 import org.easymock.IMocksControl;
+import org.easymock.internal.matchers.Equals;
 import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
@@ -92,6 +94,7 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.SyncCommand;
+import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
@@ -114,7 +117,9 @@ import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventMeetingStatus;
 import org.obm.sync.calendar.EventObmId;
+import org.obm.sync.calendar.EventPrivacy;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginClient;
@@ -122,6 +127,7 @@ import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.Folder;
+import org.obm.sync.push.client.commands.SyncWithDataCommand;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
 
@@ -155,6 +161,7 @@ public class SyncHandlerWithBackendTest {
 	@Inject MailboxService mailboxService;
 	@Inject EventService eventService;
 	@Inject SyncDecoder decoder;
+	@Inject SyncWithDataCommand.Factory syncWithDataCommandFactory;
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	@Inject SnapshotService snapshotService;
 	@Inject TransactionProvider transactionProvider;
@@ -1051,5 +1058,149 @@ public class SyncHandlerWithBackendTest {
 		assertThat(syncResponse.getStatus()).isEqualTo(SyncStatus.OK);
 		assertThat(getCollectionWithId(syncResponse, calendarCollectionIdAsString).getStatus()).isEqualTo(SyncStatus.OK);
 		assertThat(getCollectionWithId(syncResponse, inboxCollectionIdAsString).getStatus()).isEqualTo(SyncStatus.OK);
+	}
+
+	@Test
+	public void testEventSensitivityNotModifiedByDevices() throws Exception {
+		SyncKey initialSyncKey = SyncKey.INITIAL_FOLDER_SYNC_KEY;
+		SyncKey firstAllocatedSyncKey = new SyncKey("123");
+		SyncKey secondAllocatedSyncKey = new SyncKey("456");
+		SyncKey thirdAllocatedSyncKey = new SyncKey("789");
+		int firstAllocatedStateId = 3;
+		int secondAllocatedStateId = 4;
+		int thirdAllocatedStateId = 5;
+		
+		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
+		mockNextGeneratedSyncKey(classToInstanceMap, firstAllocatedSyncKey, 
+				secondAllocatedSyncKey, thirdAllocatedSyncKey);
+		
+		Date initialDate = DateUtils.getEpochPlusOneSecondCalendar().getTime();
+		ItemSyncState firstAllocatedState = ItemSyncState.builder()
+				.syncDate(initialDate)
+				.syncKey(firstAllocatedSyncKey)
+				.id(firstAllocatedStateId)
+				.build();
+		Date secondDate = date("2012-10-10T16:22:53");
+		ItemSyncState secondAllocatedState = ItemSyncState.builder()
+				.syncDate(secondDate)
+				.syncKey(secondAllocatedSyncKey)
+				.id(secondAllocatedStateId)
+				.build();
+		ItemSyncState thirdAllocatedState = ItemSyncState.builder()
+				.syncDate(secondDate)
+				.syncKey(thirdAllocatedSyncKey)
+				.id(thirdAllocatedStateId)
+				.build();
+		expect(dateService.getEpochPlusOneSecondDate()).andReturn(initialDate).anyTimes();
+		
+		expectCollectionDaoPerformInitialSync(initialSyncKey, firstAllocatedState, calendarCollectionId);
+		expectCollectionDaoPerformSync(firstAllocatedSyncKey, firstAllocatedState, secondAllocatedState, calendarCollectionId);
+		expectCollectionDaoPerformSync(secondAllocatedSyncKey, secondAllocatedState, thirdAllocatedState, calendarCollectionId);
+
+		EventExtId eventExtId = new EventExtId("1");
+		EventObmId eventObmId = new EventObmId(1);
+		Event event = new Event();
+		event.setUid(eventObmId);
+		event.setTitle("event");
+		event.setExtId(eventExtId);
+		event.setOwner(user.user.getEmail());
+		event.setOwnerEmail(user.user.getEmail());
+		event.setStartDate(secondDate);
+		event.setMeetingStatus(EventMeetingStatus.IS_NOT_A_MEETING);
+		event.setPrivacy(EventPrivacy.CONFIDENTIAL);
+		
+		// First Sync
+		expect(calendarClient.getFirstSyncEventDate(eq(user.accessToken), eq(user.user.getLoginAtDomain()), anyObject(Date.class)))
+			.andReturn(EventChanges.builder()
+					.lastSync(secondDate)
+					.updates(Lists.newArrayList(event))
+					.build());
+		expect(calendarClient.getUserEmail(user.accessToken))
+			.andReturn(user.user.getLoginAtDomain()).anyTimes();
+		
+		TimeZone timeZone = TimeZone.getTimeZone("GMT");
+		Calendar calendar = DateUtils.getEpochCalendar(timeZone);
+		MSEventUid msEventUid = new MSEventUid("1");
+		MSEvent msEvent = new MSEvent();
+		msEvent.setUid(msEventUid);
+		msEvent.setSubject("event");
+		msEvent.setSensitivity(CalendarSensitivity.CONFIDENTIAL);
+		msEvent.setBusyStatus(CalendarBusyStatus.FREE);
+		msEvent.setAllDayEvent(false);
+		msEvent.setDtStamp(calendar.getTime());
+		msEvent.setTimeZone(timeZone);
+		msEvent.setStartTime(secondDate);
+		msEvent.setEndTime(secondDate);
+		expect(eventService.convertEventToMSEvent(anyObject(UserDataRequest.class), eq(event)))
+			.andReturn(msEvent);
+		
+		String serverId = calendarCollectionIdAsString + ":" + msEvent.getUid().serializeToString();
+		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, 
+				new ServerId(serverId)))
+			.andReturn(false);
+		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
+		expectLastCall().anyTimes();
+
+		// Second Sync
+		expect(eventService.getEventExtIdFor(msEventUid, user.device))
+			.andReturn(eventExtId);
+		expect(calendarClient.getEventFromId(user.accessToken, user.user.getEmail(), eventObmId))
+			.andReturn(event);
+		// We check that the Privacy of the Event is not modified on update (only this field, other may vary
+		expect(calendarClient.modifyEvent(eq(user.accessToken), eq(user.user.getEmail()), eventPrivacyEq(event), eq(true), eq(true)))
+			.andReturn(event);
+		expect(calendarClient.getSyncEventDate(eq(user.accessToken), eq(user.user.getLoginAtDomain()), anyObject(Date.class)))
+			.andReturn(EventChanges.builder()
+					.lastSync(secondDate)
+					.build());
+		
+		mocksControl.replay();
+		opushServer.start();
+		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
+		sendTwoEmailsToImapServer();
+		opClient.syncEmail(decoder, initialSyncKey, calendarCollectionIdAsString, FilterType.THREE_DAYS_BACK, ONE_WINDOWS_SIZE);
+		SyncResponse syncResponse = opClient.syncEmail(decoder, firstAllocatedSyncKey, calendarCollectionIdAsString, FilterType.THREE_DAYS_BACK, ONE_WINDOWS_SIZE);
+		
+		msEvent.setSensitivity(CalendarSensitivity.PERSONAL);
+		String clientId = syncResponse.getProcessedClientIds().get(serverId);
+		SyncResponse updatedSyncResponse = opClient.syncWithCommand(syncWithDataCommandFactory, user.device, secondAllocatedSyncKey, 
+				calendarCollectionIdAsString, SyncCommand.CHANGE, serverId, clientId, msEvent);
+		
+		mocksControl.verify();
+
+		SyncCollectionResponse collectionResponse = getCollectionWithId(syncResponse, calendarCollectionIdAsString);
+		SyncCollectionResponse updatedCollectionResponse = getCollectionWithId(updatedSyncResponse, calendarCollectionIdAsString);
+
+		assertEqualsWithoutApplicationData(collectionResponse.getItemChanges(), 
+				ImmutableList.of(
+					new ItemChangeBuilder()
+						.serverId(serverId)
+						.withNewFlag(true)
+						.build()));
+		assertEqualsWithoutApplicationData(updatedCollectionResponse.getItemChanges(), 
+				ImmutableList.<ItemChange> of());
+	}
+	
+	private static Event eventPrivacyEq(Event value) {
+		reportMatcher(new EventPrivacyEquals(value));
+		return null;
+	}
+
+	/*
+	 * Checks only Event.privacy attribute 
+	 */
+	private static class EventPrivacyEquals extends Equals {
+
+		public EventPrivacyEquals(Object expected) {
+			super(expected);
+		}
+		
+		@Override
+		public boolean matches(final Object actual) {
+			if (this.getExpected() == null) {
+				return actual == null;
+			}
+			return ((Event) getExpected()).getPrivacy().equals(((Event) actual).getPrivacy());
+		}
 	}
 }

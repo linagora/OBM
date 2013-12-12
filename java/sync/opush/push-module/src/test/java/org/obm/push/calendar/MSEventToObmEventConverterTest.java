@@ -52,6 +52,7 @@ import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.MSAttendee;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventBuilder;
+import org.obm.push.bean.MSEventCommon;
 import org.obm.push.bean.MSEventException;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSRecurrence;
@@ -1424,6 +1425,33 @@ public class MSEventToObmEventConverterTest {
 		assertThat(eventExceptions).isEmpty();
 	}
 
+	@Test
+	public void testConvertSensitivityToPrivacyKeepingOldValueWithoutPreviousValue() {
+		MSEventCommon msEventCommon = new MSEvent();
+		msEventCommon.setSensitivity(CalendarSensitivity.CONFIDENTIAL);
+		
+		EventPrivacy eventPrivacy = converter.convertSensitivityToPrivacyKeepingOldValue(msEventCommon, null);
+		assertThat(eventPrivacy).isEqualTo(
+				MSEventToObmEventConverterImpl.SENSITIVITY_TO_PRIVACY.get(msEventCommon.getSensitivity()));
+	}
+
+	@Test
+	public void testConvertSensitivityToPrivacyKeepingOldValueWithPreviousValue() {
+		MSEventCommon msEventCommon = new MSEvent();
+		msEventCommon.setSensitivity(CalendarSensitivity.CONFIDENTIAL);
+		
+		Event eventFromDB = new Event();
+		eventFromDB.setPrivacy(EventPrivacy.PUBLIC);
+		EventPrivacy eventPrivacy = converter.convertSensitivityToPrivacyKeepingOldValue(msEventCommon, eventFromDB);
+		assertThat(eventPrivacy).isEqualTo(eventFromDB.getPrivacy());
+	}
+
+	@Test
+	public void testConvertSensitivityToPrivacyKeepingOldValueDefaultValue() {
+		EventPrivacy eventPrivacy = converter.convertSensitivityToPrivacyKeepingOldValue(new MSEvent(), null);
+		assertThat(eventPrivacy).isEqualTo(EventPrivacy.PUBLIC);
+	}
+	
 	@Test
 	public void testConvertExceptionAttributeDeletedFalse() throws ConversionException {
 		MSEventException msEventException = new MSEventException();

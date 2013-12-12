@@ -85,7 +85,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	
 	private static final int EVENT_CATEGORIES_MAX = 300;
 	
-	private static final Map<CalendarSensitivity, EventPrivacy> SENSITIVITY_TO_PRIVACY =
+	public static final Map<CalendarSensitivity, EventPrivacy> SENSITIVITY_TO_PRIVACY =
 			new ImmutableMap.Builder<CalendarSensitivity, EventPrivacy>()
 				.put(CalendarSensitivity.NORMAL, EventPrivacy.PUBLIC)
 				.put(CalendarSensitivity.PERSONAL, EventPrivacy.PUBLIC)
@@ -161,7 +161,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		EventOpacity busyStatus = convertBusyStatusToOpacity(msEvent);
 		convertedEvent.setOpacity(busyStatus);
 
-		EventPrivacy eventPrivacy = convertSensitivityToPrivacy(msEvent);
+		EventPrivacy eventPrivacy = convertSensitivityToPrivacyKeepingOldValue(msEvent, eventFromDB);
 		convertedEvent.setPrivacy(eventPrivacy);
 		
 		Date dtStamp = convertDtStamp(eventFromDB, msEvent);
@@ -340,7 +340,10 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 				.build();
 	}	
 	
-	private EventPrivacy convertSensitivityToPrivacy(MSEventCommon msEvent) {
+	@VisibleForTesting EventPrivacy convertSensitivityToPrivacyKeepingOldValue(MSEventCommon msEvent, Event eventFromDB) {
+		if (eventFromDB != null) {
+			return eventFromDB.getPrivacy();
+		}
 		if (msEvent.getSensitivity() != null) {
 			return Objects.firstNonNull(SENSITIVITY_TO_PRIVACY.get(msEvent.getSensitivity()), EventPrivacy.PUBLIC);
 		}
@@ -350,7 +353,7 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	private EventPrivacy convertSensitivityToPrivacy(Event parentEvent, MSEventCommon msEvent) {
 		EventPrivacy eventPrivacy = EventPrivacy.PUBLIC;
 		if (msEvent.getSensitivity() != null) {
-			eventPrivacy = convertSensitivityToPrivacy(msEvent);
+			eventPrivacy = convertSensitivityToPrivacyKeepingOldValue(msEvent, parentEvent);
 		} else {
 			if (parentEvent.getPrivacy() != null) {
 				eventPrivacy = parentEvent.getPrivacy();
