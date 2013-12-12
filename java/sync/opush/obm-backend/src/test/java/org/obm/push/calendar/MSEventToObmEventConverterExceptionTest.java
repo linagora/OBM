@@ -1022,7 +1022,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 	
 	@Test
-	public void testConvertAttributeSensitivityNormal() throws ConversionException {
+	public void testConvertAttributeSensitivityNormalKeepParentValue() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1038,11 +1038,12 @@ public class MSEventToObmEventConverterExceptionTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Event exception = exceptionOf(converted);
-		assertThat(exception.getPrivacy()).isEqualTo(EventPrivacy.PUBLIC);
+		assertThat(exception.getPrivacy()).isEqualTo(
+				MSEventToObmEventConverterImpl.SENSITIVITY_TO_PRIVACY.get(msEvent.getSensitivity()));
 	}
 	
 	@Test
-	public void testConvertAttributeSensitivityConfidential() throws ConversionException {
+	public void testConvertAttributeSensitivityConfidentialKeepParentValue() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1062,7 +1063,7 @@ public class MSEventToObmEventConverterExceptionTest {
 	}
 
 	@Test
-	public void testConvertAttributeSensitivityPersonal() throws ConversionException {
+	public void testConvertAttributeSensitivityPersonalKeepParentValue() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1078,11 +1079,12 @@ public class MSEventToObmEventConverterExceptionTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Event exception = exceptionOf(converted);
-		assertThat(exception.getPrivacy()).isEqualTo(EventPrivacy.PUBLIC);
+		assertThat(exception.getPrivacy()).isEqualTo(
+				MSEventToObmEventConverterImpl.SENSITIVITY_TO_PRIVACY.get(msEvent.getSensitivity()));
 	}
 
 	@Test
-	public void testConvertAttributeSensitivityPrivate() throws ConversionException {
+	public void testConvertAttributeSensitivityPrivateKeepParentValue() throws ConversionException {
 		MSEventException msEventException = new MSEventExceptionBuilder()
 				.withMeetingStatus(CalendarMeetingStatus.MEETING_RECEIVED)
 				.withDtStamp(date("2004-12-11T11:15:10Z"))
@@ -1098,7 +1100,8 @@ public class MSEventToObmEventConverterExceptionTest {
 		Event converted = convertToOBMEvent(msEvent);
 		
 		Event exception = exceptionOf(converted);
-		assertThat(exception.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
+		assertThat(exception.getPrivacy()).isEqualTo(
+				MSEventToObmEventConverterImpl.SENSITIVITY_TO_PRIVACY.get(msEvent.getSensitivity()));
 	}
 
 	@Test
@@ -1434,6 +1437,7 @@ public class MSEventToObmEventConverterExceptionTest {
 				.withExceptions(Lists.newArrayList(exceptions))
 				.withMeetingStatus(CalendarMeetingStatus.IS_A_MEETING)
 				.withTimeZone(DateTimeZone.UTC.toTimeZone())
+				.withSensitivity(CalendarSensitivity.CONFIDENTIAL)
 				.build();
 
 		return msEvent;
