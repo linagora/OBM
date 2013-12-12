@@ -261,17 +261,17 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@VisibleForTesting
-	public ResourceInfo[] listResources(AccessToken token) throws ServerFault {
+	public Collection<ResourceInfo> listResources(AccessToken token) throws ServerFault {
 		return listResources(token, null, null);
 	}
 
 	@VisibleForTesting
-	public ResourceInfo[] listResources(AccessToken token, Integer limit, Integer offset) throws ServerFault {
+	public Collection<ResourceInfo> listResources(AccessToken token, Integer limit, Integer offset) throws ServerFault {
 		return listResources(token, limit, offset, null);
 	}
 
 	@Override
-	public ResourceInfo[] listResources(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
+	public Collection<ResourceInfo> listResources(AccessToken token, Integer limit, Integer offset, String pattern) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 
 		if (limit != null) {
@@ -563,7 +563,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 	}
 
 	@Override
-	public ResourceInfo[] getResourceMetadata(AccessToken token,
+	public Collection<ResourceInfo> getResourceMetadata(AccessToken token,
 			String[] resources) throws ServerFault {
 		Multimap<String, String> params = initParams(token);
 		for (String resource : resources) {

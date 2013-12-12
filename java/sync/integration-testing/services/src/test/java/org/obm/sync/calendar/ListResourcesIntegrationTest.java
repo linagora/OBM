@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.sync.calendar.CalendarUtils.makeTestResourceInfo;
 
 import java.net.URL;
+import java.util.Collection;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -79,7 +80,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		ResourceInfo[] resources = calendarClient.listResources(user1Token);
+		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token);
 
 		loginClient.logout(user1Token);
 
@@ -102,7 +103,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		ResourceInfo[] resources = calendarClient.getResourceMetadata(user1Token, new String[] {
+		Collection<ResourceInfo> resources = calendarClient.getResourceMetadata(user1Token, new String[] {
 				"res-a@domain.org",
 				"res-b@domain.org"
 		});
@@ -121,7 +122,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		ResourceInfo[] resources = calendarClient.listResources(user1Token, 2, 0);
+		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, 2, 0);
 
 		loginClient.logout(user1Token);
 
@@ -137,7 +138,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		ResourceInfo[] resources = calendarClient.listResources(user1Token, 2, 2);
+		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, 2, 2);
 
 		loginClient.logout(user1Token);
 
@@ -153,7 +154,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		ResourceInfo[] resources = calendarClient.listResources(user1Token, 3, 0);
+		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, 3, 0);
 
 		assertThat(resources).containsExactly(
 				makeTestResourceInfo(1, "a", true, true),
@@ -206,7 +207,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		ResourceInfo[] resources = calendarClient.listResources(user1Token, null, 0, "resd");
+		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, null, 0, "resd");
 
 		loginClient.logout(user1Token);
 
@@ -221,7 +222,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		ResourceInfo[] resources = calendarClient.listResources(user1Token, null, 0, "rESd");
+		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, null, 0, "rESd");
 
 		loginClient.logout(user1Token);
 
@@ -236,7 +237,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		ResourceInfo[] resources = calendarClient.listResources(user1Token, null, 0, "description of resa");
+		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, null, 0, "description of resa");
 
 		loginClient.logout(user1Token);
 
@@ -251,7 +252,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		ResourceInfo[] resources = calendarClient.listResources(user1Token, null, 0, "descRIPTION oF ReSa");
+		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, null, 0, "descRIPTION oF ReSa");
 
 		loginClient.logout(user1Token);
 
@@ -266,7 +267,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		ResourceInfo[] resources = calendarClient.listResources(user1Token, 2, 1, "res");
+		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, 2, 1, "res");
 
 		loginClient.logout(user1Token);
 
@@ -282,7 +283,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
-		ResourceInfo[] resources = calendarClient.listResources(user1Token, 2, 1, "iwontmatch");
+		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, 2, 1, "iwontmatch");
 
 		loginClient.logout(user1Token);
 

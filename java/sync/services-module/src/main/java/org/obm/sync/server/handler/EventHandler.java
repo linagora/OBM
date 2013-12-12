@@ -56,7 +56,6 @@ import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.Participation.State;
 import org.obm.sync.calendar.RecurrenceId;
-import org.obm.sync.calendar.ResourceInfo;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.server.Request;
@@ -213,11 +212,8 @@ public class EventHandler extends SecureSyncHandler {
 		return responder.sendCalendarInformations(binding.getCalendarMetadata(at, request.getParameterValues("calendar")));
 	}
 
-	private String getResourceMetadata(AccessToken at, Request request,
-			XmlResponder responder) throws ServerFault {
-		String[] resourceEmails = request.getParameterValues("resource");
-		ResourceInfo[] ri = binding.getResourceMetadata(at, resourceEmails);
-		return responder.sendResourceInformation(ri);
+	private String getResourceMetadata(AccessToken at, Request request, XmlResponder responder) throws ServerFault {
+		return responder.sendResourceInformation(binding.getResourceMetadata(at, request.getParameterValues("resource")));
 	}
 
 	private String parseFreeBusyToICS(

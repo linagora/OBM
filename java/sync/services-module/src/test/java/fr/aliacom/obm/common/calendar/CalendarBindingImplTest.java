@@ -377,9 +377,8 @@ public class CalendarBindingImplTest {
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService,
 				calendarDao, null, commitedOperationDao, null, null, null, attendeeService);
-		Assert.assertArrayEquals(new ResourceInfo[] { resource1, resource2 },
-				calendarService.getResourceMetadata(accessToken,
-						resources));
+		assertThat(ImmutableList.of(resource1, resource2))
+			.containsExactlyElementsOf(calendarService.getResourceMetadata(accessToken, resources));
 
 		verify(mocks);
 	}
@@ -393,9 +392,8 @@ public class CalendarBindingImplTest {
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null,
 				null, null, null, null, null, null, attendeeService);
-		Assert.assertArrayEquals(new ResourceInfo[0],
-				calendarService.getResourceMetadata(accessToken,
-						new String[0]));
+		assertThat(calendarService.getResourceMetadata(accessToken, new String[0])).isEmpty();
+
 
 		verify(mocks);
 	}
@@ -1201,7 +1199,8 @@ public class CalendarBindingImplTest {
 		replay(mocks);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, null, null, null, attendeeService);
-		Assert.assertArrayEquals(new ResourceInfo[] { resource1, resource2 }, calendarService.listResources(accessToken, null, 0, null));
+		assertThat(ImmutableList.of(resource1, resource2))
+			.containsExactlyElementsOf(calendarService.listResources(accessToken, null, 0, null));
 
 		verify(mocks);
 	}
@@ -3690,7 +3689,7 @@ public class CalendarBindingImplTest {
 	}
 
 	private ResourceInfo buildResourceInfo2() {
-		return ResourceInfo.builder().id(1).name("resource2").mail("res-2@domain.com").read(true).write(false).domainName("domain").build();
+		return ResourceInfo.builder().id(2).name("resource2").mail("res-2@domain.com").read(true).write(false).domainName("domain").build();
 	}
 
 	@Test
