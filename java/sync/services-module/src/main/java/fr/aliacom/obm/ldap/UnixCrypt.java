@@ -531,7 +531,7 @@ public class UnixCrypt extends Object {
 	 */
 	public static final String crypt(String salt, String original) {
 		StringBuilder saltPadding = new StringBuilder(salt);
-		while (salt.length() < 2)
+		while (saltPadding.length() < 2)
 			saltPadding.append('A');
 		salt = saltPadding.toString();
 

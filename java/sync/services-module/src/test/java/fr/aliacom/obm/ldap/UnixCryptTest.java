@@ -61,6 +61,16 @@ public class UnixCryptTest {
 	}
 
 	@Test
+	public void testCryptWithSalt() {
+		assertThat(UnixCrypt.crypt("salt", "original")).isEqualTo("sainhiUTfgxXY");
+	}
+
+	@Test
+	public void testCryptWithEmptySalt() {
+		assertThat(UnixCrypt.crypt("", "original")).isEqualTo("AAMvmqciWpZ1w");
+	}
+
+	@Test
 	public void testCryptMinIntegerValue() {
 		Random random = control.createMock(Random.class);
 		expect(random.nextInt()).andReturn(Integer.MIN_VALUE).once();
