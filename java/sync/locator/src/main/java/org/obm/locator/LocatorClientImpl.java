@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.naming.ConfigurationException;
 
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.fluent.Request;
 import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.module.LoggerModule;
@@ -54,6 +55,7 @@ import com.google.inject.name.Named;
 public class LocatorClientImpl implements LocatorService {
 
 	private static final char RESPONSE_SEPARATOR = '\n';
+	private static final int HTTP_CODE_NOT_FOUND = 404;
 	private final String locatorUrl;
 	private final int timeoutInMS;
 
@@ -76,11 +78,19 @@ public class LocatorClientImpl implements LocatorService {
 	@Override
 	public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
 		try {
-			String response = Request.Get(buildFullServiceUrl(serviceSlashProperty, loginAtDomain))
+			String responseBody = Request.Get(buildFullServiceUrl(serviceSlashProperty, loginAtDomain))
 				.connectTimeout(timeoutInMS)
 				.socketTimeout(timeoutInMS)
 				.execute().returnContent().asString();
-			return Iterables.get(Splitter.on(RESPONSE_SEPARATOR).split(response), 0);
+			return Iterables.get(Splitter.on(RESPONSE_SEPARATOR).split(responseBody), 0);
+		}
+		catch (HttpResponseException e) {
+			if (e.getStatusCode() == HTTP_CODE_NOT_FOUND) {
+				return null;
+			}
+			else {
+				throw new LocatorClientException(String.format("HTTP error %d: %s", e.getStatusCode(), e.getMessage()), e);
+			}
 		} catch (MalformedURLException e) {
 			throw new LocatorClientException(e.getMessage(), e);
 		} catch (SocketTimeoutException e) {
