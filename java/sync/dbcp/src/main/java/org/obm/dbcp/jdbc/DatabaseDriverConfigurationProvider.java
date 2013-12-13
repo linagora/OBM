@@ -29,15 +29,13 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.dbcp;
+package org.obm.dbcp.jdbc;
 
 import java.util.Set;
 
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
-import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.inject.Inject;
@@ -50,7 +48,7 @@ public class DatabaseDriverConfigurationProvider implements Provider<DatabaseDri
 	private final Supplier<DatabaseDriverConfiguration> databaseDriverMemoize;
 
 	@Inject
-	@VisibleForTesting DatabaseDriverConfigurationProvider(final Set<DatabaseDriverConfiguration> drivers, final DatabaseConfiguration databaseConfiguration) {
+	private DatabaseDriverConfigurationProvider(final Set<DatabaseDriverConfiguration> drivers, final DatabaseConfiguration databaseConfiguration) {
 		databaseDriverMemoize = Suppliers.memoize(new Supplier<DatabaseDriverConfiguration>() {
 			@Override
 			public DatabaseDriverConfiguration get() {

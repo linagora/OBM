@@ -41,7 +41,9 @@ import java.sql.Statement;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.push.technicallog.bean.KindToBeLogged;
 import org.obm.push.technicallog.bean.ResourceType;
@@ -51,10 +53,14 @@ import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bitronix.tm.resource.ResourceConfigurationException;
+import bitronix.tm.resource.jdbc.PoolingDataSource;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvider, LifecycleListener {
@@ -62,19 +68,44 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final ITransactionAttributeBinder transactionAttributeBinder;
+	
+	private final DatabaseConfiguration databaseConfiguration;
+
 	private final DatabaseDriverConfiguration driverConfiguration;
-	private final PoolingDataSourceDecorator poolingDataSource;
+
+	private final PoolingDataSource poolingDataSource;
+
+	private static final String VALIDATION_QUERY = "SELECT 666";
 
 	@Inject
 	public DatabaseConnectionProviderImpl(
 			ITransactionAttributeBinder transactionAttributeBinder,
-			PoolingDataSourceDecorator poolingDataSource) {
+			DatabaseConfiguration databaseConfiguration,
+			DatabaseDriverConfiguration driverConfiguration,
+			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		this.transactionAttributeBinder = transactionAttributeBinder;
+		this.databaseConfiguration = databaseConfiguration;
+		this.driverConfiguration = driverConfiguration;
 
+		configurationLogger.info("Database system : {}", databaseConfiguration.getDatabaseSystem());
+		configurationLogger.info("Database name {} on host {}", databaseConfiguration.getDatabaseName(), databaseConfiguration.getDatabaseHost());
+		configurationLogger.info("Database connection min pool size : {}", databaseConfiguration.getDatabaseMinConnectionPoolSize());
+		configurationLogger.info("Database connection pool size : {}", databaseConfiguration.getDatabaseMaxConnectionPoolSize());
+		configurationLogger.info("Database login : {}", databaseConfiguration.getDatabaseLogin());
 		logger.info("Starting OBM connection pool...");
 
-		this.poolingDataSource = poolingDataSource;
-		driverConfiguration = poolingDataSource.getDatabaseDriverConfiguration();
+		poolingDataSource = new PoolingDataSource();
+		poolingDataSource.setClassName(driverConfiguration.getDataSourceClassName());
+		poolingDataSource.setUniqueName(driverConfiguration.getFlavour().name());
+		if (databaseConfiguration.getDatabaseMinConnectionPoolSize() != null) {
+			poolingDataSource.setMinPoolSize(databaseConfiguration.getDatabaseMinConnectionPoolSize());
+		}
+		poolingDataSource.setMaxPoolSize(databaseConfiguration.getDatabaseMaxConnectionPoolSize());
+		poolingDataSource.setAllowLocalTransactions(true);
+		poolingDataSource.getDriverProperties().putAll(
+				driverConfiguration.getDriverProperties(databaseConfiguration));
+		poolingDataSource.setTestQuery(VALIDATION_QUERY);
+		poolingDataSource.setShareTransactionConnections(true);
 	}
 
 	public int lastInsertId(Connection con) throws SQLException {
@@ -96,16 +127,12 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	@Override
 	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.JDBC_CONNECTION)
 	public Connection getConnection() throws SQLException {
-		Connection connection = null;
 		try {
-			connection = poolingDataSource.getConnection();
+			Connection connection = poolingDataSource.getConnection();
 			setConnectionReadOnlyIfNecessary(connection);
 			setTimeZoneToUTC(connection);
 			return connection;
-		} catch (Throwable e) {
-			if (connection != null) {
-				JDBCUtils.cleanup(connection, null, null);
-			}
+		} catch (ResourceConfigurationException e) {
 			throw new SQLException(e);
 		}
 	}
@@ -139,7 +166,7 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 
 	@Override
 	public Object getJdbcObject(String type, String value) throws SQLException {
-		if (DatabaseFlavour.PGSQL.equals(driverConfiguration.getFlavour())) {
+		if (databaseConfiguration.getDatabaseSystem() == DatabaseFlavour.PGSQL) {
 			try {
 				Object o = Class.forName("org.postgresql.util.PGobject")
 						.newInstance();

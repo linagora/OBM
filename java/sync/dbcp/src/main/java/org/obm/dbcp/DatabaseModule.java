@@ -32,6 +32,7 @@
 package org.obm.dbcp;
 
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.DatabaseDriverConfigurationProvider;
 import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
 import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
 import org.obm.sync.LifecycleListener;
