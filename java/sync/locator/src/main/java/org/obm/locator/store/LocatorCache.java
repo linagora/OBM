@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -55,9 +56,8 @@ import com.google.inject.name.Named;
 public class LocatorCache implements LocatorService {
 
 	private static final Logger logger = LoggerFactory.getLogger(LocatorClientImpl.class);
-	private static final String DEFAULT_VALUE = "";
 	
-	private final LoadingCache<Key, String> store;
+	private final LoadingCache<Key, Optional<String>> store;
 	private final LocatorClientImpl locatorClientImpl;
 
 	@Inject
@@ -71,17 +71,17 @@ public class LocatorCache implements LocatorService {
 		this.store = createStore(locatorCacheTimeout, locatorCacheTimeUnit); 
 	}
 
-	private LoadingCache<Key, String> createStore(int duration, TimeUnit unit) {
+	private LoadingCache<Key, Optional<String>> createStore(int duration, TimeUnit unit) {
 		return CacheBuilder.newBuilder().expireAfterWrite(duration, unit)
-				.build(new CacheLoader<Key, String>() {
+				.build(new CacheLoader<Key, Optional<String>>() {
 
 					@Override
-					public String load(Key key) throws Exception {
+					public Optional<String> load(Key key) throws Exception {
 						 String value = getServiceLocation(key);
 						 if (value != null) {
-							 return value;
+							 return Optional.of(value);
 						 }
-						 return DEFAULT_VALUE;
+						 return Optional.absent();
 					}
 				});
 	}
@@ -99,11 +99,11 @@ public class LocatorCache implements LocatorService {
 	public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
 		Key key = new Key(serviceSlashProperty, loginAtDomain);
 		try {
-			String value = store.get(key);
-			if (DEFAULT_VALUE.equals(value)) {
+			Optional<String> value = store.get(key);
+			if (!value.isPresent()) {
 				throw new LocatorClientException("No host for { " + key.toString() + " }");
 			}
-			return value;
+			return value.get();
 		} catch (ExecutionException e) {
 			throw new LocatorClientException("No host for { " + key.toString() + " }");
 		}
