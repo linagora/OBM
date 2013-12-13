@@ -841,12 +841,7 @@ Obm.CalendarManager = new Class({
    *  Show next month events
    */
   nextMonth: function() {
-   var nextMonth = new Date(
-     obm.vars.consts.currentMonth.getFullYear(),
-     obm.vars.consts.currentMonth.getMonth(),
-     1);
-   nextMonth.setMonth(nextMonth.getMonth() + 1);
-   obm.vars.consts.currentMonth = new Obm.DateTime(nextMonth.getTime());
+   obm.vars.consts.currentMonth.setMonth(obm.vars.consts.currentMonth.getMonth() + 1)
    this.current.setTime(obm.vars.consts.currentMonth.getTime());
    this.refresh();
   },
