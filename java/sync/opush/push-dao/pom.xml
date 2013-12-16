@@ -97,8 +97,13 @@
 		    <scope>test</scope>
 		</dependency>
 		<dependency>
-                       <groupId>be.bitronix.btm</groupId>
+                       <groupId>org.codehaus.btm</groupId>
                        <artifactId>btm</artifactId>
+                       <scope>test</scope>
+                </dependency>
+		<dependency>
+                       <groupId>org.codehaus.btm</groupId>
+                       <artifactId>btm-jdbc4</artifactId>
                        <scope>test</scope>
                 </dependency>
                 <dependency>

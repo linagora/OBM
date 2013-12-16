@@ -21,7 +21,7 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>be.bitronix.btm</groupId>
+			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm</artifactId>
 		</dependency>
 	</dependencies>

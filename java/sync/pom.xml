@@ -46,7 +46,7 @@
 		<jsoup.version>1.7.2</jsoup.version>
 		<guice.version>3.0</guice.version>
 		<apache-mime4j.version>0.7.2</apache-mime4j.version>
-		<btm.version>3.0.0-1a33e59482fd29f6993ef3dfb5fab12efa0b24d2</btm.version>
+		<btm.version>2.2.0-SNAPSHOT</btm.version>
 		<parboiled.version>1.1.4</parboiled.version>
 		<jersey.version>1.17.1</jersey.version>
 		<resteasy.version>2.3.5.Final</resteasy.version>
@@ -317,6 +317,17 @@ org.eclipse.jdt.core.compiler.source=1.6
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>cglib</groupId>
+				<artifactId>cglib</artifactId>
+				<version>${cglib.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>asm</groupId>
+						<artifactId>asm</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
                                 <groupId>cglib</groupId>
                                 <artifactId>cglib-nodep</artifactId>
                                 <version>${cglib.version}</version>
@@ -476,16 +487,27 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
-				<groupId>be.bitronix.btm</groupId>
-				<artifactId>btm</artifactId>
-				<version>${btm.version}</version>
+            	<groupId>org.codehaus.btm</groupId>
+                <artifactId>btm</artifactId>
+                <version>${btm.version}</version>
 				<exclusions>
 					<exclusion>
-						<groupId>cglib</groupId>
-						<artifactId>cglib</artifactId>
+						<groupId>org.codehaus.btm</groupId>
+						<artifactId>btm-jdbc3-stubs</artifactId>
 					</exclusion>
 				</exclusions>
-			</dependency>
+	        </dependency>
+			<dependency>
+            	<groupId>org.codehaus.btm</groupId>
+                <artifactId>btm-jdbc4</artifactId>
+                <version>${btm.version}</version>
+				<exclusions>
+                	<exclusion>
+                    	<groupId>org.codehaus.btm</groupId>
+                        <artifactId>btm-jdbc4-stubs</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>

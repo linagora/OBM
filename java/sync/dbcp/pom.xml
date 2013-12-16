@@ -71,9 +71,13 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>be.bitronix.btm</groupId>
+			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm</artifactId>
 		</dependency>
+		<dependency>
+                        <groupId>org.codehaus.btm</groupId>
+                        <artifactId>btm-jdbc4</artifactId>
+                </dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
