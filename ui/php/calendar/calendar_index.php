@@ -135,7 +135,6 @@ require_once('obm_eventdiff.php');
 require_once('event_observer.php');
 require_once('event_resource_mail_observer.php');
 require_once('../contact/addressbook.php');
-require_once(dirname(__file__)."/../share/share_index.inc");
 
 if ($params['new_sel'] && (($action != 'insert') && ($action != 'update'))) {
   $current_view->set_users($params['sel_user_id']);
@@ -1435,8 +1434,51 @@ if (!$params['ajax']) {
   json_ok_msg("$l_view : $l_insert_ok");
   echo "({".$display['json'].",$msg})";
   exit();
-} else {
-    handle_share_action($action, $params, $obm, $msg);
+} elseif ($action == 'share') {
+///////////////////////////////////////////////////////////////////////////////
+  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' ) || check_calendar_update_rights($params) ) {
+    $token = get_calendar_entity_share($params['entity_id'],$params['entity_type'],$params['type']);
+    $loginAtDomain = $obm['login']."@".$obm['domain_name'];
+    dis_calendar_share_public($token, $loginAtDomain);
+    json_ok_msg("$l_share_calendar : $l_share_ok");
+  } else {
+    json_error_msg("$l_rights : $l_of_right_err_user");
+  }
+  if(is_null($msg))
+    echo "({".$display['json']."})";
+  else
+    echo "({".$display['json'].",$msg})";
+  exit();
+
+} elseif ($action == 'share_reinit') {
+///////////////////////////////////////////////////////////////////////////////
+  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' ) || check_calendar_update_rights($params)) {
+    run_query_calendar_delete_token($params['entity_id'],$params['entity_type'],$params['type']);
+    json_ok_msg("$l_share_calendar : $l_reinit_ok");
+  } else {
+    json_error_msg("$l_rights : $l_of_right_err_user");
+  }
+  echo "({".$display['json'].",$msg})";
+  exit();
+
+} elseif ($action == 'send_url') {
+///////////////////////////////////////////////////////////////////////////////
+  if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'admin' ) || check_calendar_update_rights($params)) {
+  	$format = $params['format'];
+    $params['others_attendees'][]=$params['mail'];
+    $entity = get_user_info($params['entity_id']);
+    $entity['token'] = get_calendar_entity_share($params['entity_id'],$params['entity_type'],$params['type']);
+    run_query_insert_others_attendees($params);
+    $sharemail = new shareCalendarMailer();
+    $sharemail->addRecipient($params['mail']);
+    $sharemail->send("userShare$format",array($entity));
+    json_ok_msg("$l_share_calendar : $l_mail_ok");
+  } else {
+    json_error_msg("$l_rights : $l_of_right_err_user");
+  }
+  echo "({".$display['json'].",$msg})";
+  exit();
+
 }
 
 display_page($display);

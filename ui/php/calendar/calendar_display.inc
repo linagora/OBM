@@ -50,7 +50,6 @@ applicable to the OBM software.
 ///////////////////////////////////////////////////////////////////////////////
 
 require_once(dirname(__file__)."/../document/document_display.inc");
-require_once(dirname(__file__)."/../share/share_display.inc");
 
 function dis_calendar_calendar_view($calendar, &$current_view) {
   global $display, $path, $ccalendar_max_users, $obm;
@@ -6787,7 +6786,7 @@ function dis_calendar_right_dis_admin($id='') {
     $hide_user = false;
   }
   $block .= of_right_dis_admin('calendar', $id, $hide_user);
-  $block .= html_share_calendar($id, $name, 'user');
+  $block .= html_share_calendar($id,$name);
   if ($GLOBALS['c_calendar_display_my_rights']) $block .= html_calendar_my_rights();
 
   return $block;
@@ -8251,6 +8250,138 @@ function check_conflict($column){
   }
 
   return $return;
+}
+
+function html_share_calendar($id,$name) {
+  global $l_html, $l_share_ics, $l_public, $l_private, $l_share_mail_search;
+  global $ico_popup_close, $ico_html, $ico_ical; 
+  global $prevent_public_agenda_sharing_by_url, $prevent_public_agenda_sharing_by_email;
+  $entity_type = "user";
+
+  if ($id == $GLOBALS['obm']['uid']) {
+    $user = "<h1>".$GLOBALS['l_my_share_calendar']."</h1>";
+  } else {
+    $user = "<h1>".$GLOBALS['l_user_share_calendar']." $name</h1>";
+  }
+  
+  $url_display_css = $mail_display_css = $tr_display_css = 'display:visible;';
+  if ( $prevent_public_agenda_sharing_by_url == true ) $url_display_css = 'display:none;';                                                                  
+  if ( $prevent_public_agenda_sharing_by_email == true ) $mail_display_css = 'display:none;';                                                               
+  if ( $prevent_public_agenda_sharing_by_email == true && $prevent_public_agenda_sharing_by_url == true ) $tr_display_css = 'display:none;';
+
+  //$params = get_calendar_entity_share($id,$entity_type);
+  $share_pop_up = html_share_popup($params['accept_public']); 
+  //get the Calendar public freebusy preferences of the current user
+  $user_pref = get_one_user_pref($id, 'set_public_fb');
+  $block = "
+      $user
+      <table class=\"spreadSheet share\">
+        <thead>
+          <tr>
+            <th>
+            </th>
+            <th>
+              $l_share_ics
+            </th>
+            <th>
+              $l_html
+            </th>
+            <th>
+            </th>
+          </tr>
+        </thead>
+        <tbody> ";
+  
+  // test if the OBM freebusy information charing is permitted for the current user
+  if($user_pref[$id]['value'] == 'yes'){
+  	$block .= "
+    	      <tr>
+              <th>$GLOBALS[l_share_freebusy]
+              <div class=\"sharedesc\">
+                  <a id=\"tooltip_freebusy\" class=\"shareTip\">$GLOBALS[l_know_more]</a>
+                </div>
+              </th>
+              <td>
+                <a href=\"javascript: getShareUrl('freebusy','Ics');\" title=\"$GLOBALS[l_share_calendar_freebusy]\"><img src=\"$GLOBALS[ico_ref]\"></a>
+                <a href=\"javascript: sendSharePopup('freebusy','Freebusy');\" title=\"$GLOBALS[l_send_calendar_freebusy]\"><img src=\"$GLOBALS[ico_mailforward]\"></a>
+              </td><td></td><td></td>
+            </tr>";
+  }
+  $block .="
+          <tr style=\"$tr_display_css\">
+            <th>
+              $GLOBALS[l_share_calendar_public]
+              <div class=\"sharedesc\">
+                <a id=\"tooltip_public\" class=\"shareTip\">$GLOBALS[l_know_more]</a>
+              </div>
+            </th>
+            <td>
+              <a href=\"javascript: getShareUrl('public','Ics');\" title=\"$GLOBALS[l_share_calendar_public]\" style=\"$url_display_css\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('public','Ics');\" title=\"$GLOBALS[l_send_calendar_public]\" style=\"$mail_display_css\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+            </td>
+            <td>
+              <a href=\"javascript: getShareUrl('public','Html');\" title=\"$GLOBALS[l_share_calendar_public]\" style=\"$url_display_css\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('public','Html');\" title=\"$GLOBALS[l_send_calendar_public]\" style=\"$mail_display_css\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+            </td>
+            <td>
+              <a href=\"javascript: reinitSharePopup('public');\"><label>$GLOBALS[l_share_reinit_public]</label></a>
+            </td>
+          </tr>
+          <tr>
+            <th>
+              $GLOBALS[l_share_calendar_private]
+              <div class=\"sharedesc\">
+                <a id=\"tooltip_private\" class=\"shareTip\">$GLOBALS[l_know_more]</a>
+              </div>
+            </th>
+            <td>
+              <a href=\"javascript: getShareUrl('private','Ics');\" title=\"$GLOBALS[l_share_calendar_private]\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('private','Ics');\" title=\"$GLOBALS[l_send_calendar_private]\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+            </td>
+            <td>
+              <a href=\"javascript: getShareUrl('private','Html');\" title=\"$GLOBALS[l_share_calendar_private]\"><img src=\"$GLOBALS[ico_ref]\"></a>
+              <a href=\"javascript: sendSharePopup('private','Html');\" title=\"$GLOBALS[l_send_calendar_private]\"><img src=\"$GLOBALS[ico_mailforward]\"></a>               
+            </td>
+            <td>
+              <a href=\"javascript: reinitSharePopup('private');\"><label>$GLOBALS[l_share_reinit_private]</label></a>               
+            </td>
+          </tr>";
+  
+  $block .="
+        </tbody>
+      </table>
+      <input id=\"share_entity_id\" type=\"hidden\" value=\"$id\"/>
+      <input id=\"share_entity_type\" type=\"hidden\" value=\"$entity_type\"/>
+      <script>
+        window.addEvent('domready', function() {
+          $('tooltip_public').store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_public]</label>\");
+          $('tooltip_private').store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_private]</label>\");
+          new Obm.Tip($('tooltip_public'), {fixed:false, click:false}, 'shareTip');
+          new Obm.Tip($('tooltip_private'), {fixed:false, click:false}, 'shareTip');
+          var freebusyContainer = $('tooltip_freebusy');
+          if ( freebusyContainer ) {
+            freebusyContainer.store('tip:text',\"<label>$GLOBALS[l_desc_share_adresse_freebusy]</label>\");
+            new Obm.Tip(freebusyContainer, {fixed:false, click:false}, 'shareTip');
+          }
+
+        });
+      </script>
+      $share_pop_up
+    ";
+  return $block;
+}
+
+function html_share_popup($token) {
+  global $cgp_host, $ico_popup_close;
+  global $l_share_public;
+
+  $disp_url = "<div id=\"lnk_public_url\"></div>";
+
+  $block = "
+    <div id=\"calendarSharePopup\">
+    </div>
+  ";
+  return $block;
 }
 
 /**

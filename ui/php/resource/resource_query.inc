@@ -48,9 +48,6 @@ applicable to the OBM software.
 //   - $sql_order_dir : direction for order clause (asc, desc)
 //   - $filter_entity : if and which restriction to set (eg resource (who can read))
 ///////////////////////////////////////////////////////////////////////////////
-
-require_once(dirname(__file__)."/../share/share_query.inc");
-
 function run_query_resource_search($resource) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
