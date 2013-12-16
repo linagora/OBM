@@ -73,15 +73,14 @@ public class LdapUtils {
 	 * @return
 	 * @throws NamingException
 	 */
-	public List<Map<String, List<String>>> getAttributes(String filter,
-			String query, String[] attributes) throws NamingException {
+	public List<Map<String, List<String>>> getAttributes(String filter, String query, String[] attributes) throws NamingException {
 		SearchControls constraints = new SearchControls();
 		constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 		String attrList[] = attributes;
 		constraints.setReturningAttributes(attrList);
-		NamingEnumeration<SearchResult> results = ctx.search(baseDn, filter.replace("%q",
-				query).replace("**", "*"), constraints);
+		NamingEnumeration<SearchResult> results = ctx.search(baseDn, filter.replace("%q", query).replace("**", "*"), constraints);
 		List<Map<String, List<String>>> matched = new LinkedList<Map<String, List<String>>>();
+		NamingEnumeration<? extends Attribute> ae = null;
 		try {
 			while (results.hasMore()) {
 				SearchResult si = results.next();
@@ -89,7 +88,7 @@ public class LdapUtils {
 				if (attrs == null) {
 					continue;
 				}
-				NamingEnumeration<? extends Attribute> ae = attrs.getAll();
+				ae = attrs.getAll();
 				Map<String, List<String>> ret = new HashMap<String, List<String>>();
 				while (ae.hasMoreElements()) {
 					Attribute attr = ae.next();
@@ -111,6 +110,21 @@ public class LdapUtils {
 			logger.error("Too much entries returned by the query, " +
 					"results truncated by server, " +
 					"check openldap sizelimit parameter", e);
+		} finally {
+			if (results != null) {
+				try {
+					results.close();
+				} catch (NamingException e) {
+					logger.error("Cannot close results NamingEnumeration", e);
+				}
+			}
+			if (ae != null) {
+				try {
+					ae.close();
+				} catch (NamingException e) {
+					logger.error("Cannot close attributes NamingEnumeration", e);
+				}
+			}
 		}
 		return matched;
 	}
