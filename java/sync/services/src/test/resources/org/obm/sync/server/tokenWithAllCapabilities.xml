@@ -9,5 +9,6 @@
 		<server-capability name="CALENDAR_HANDLER_SUPPORTS_NOTALLOWEDEXCEPTION">true</server-capability>
 		<server-capability name="CONFIDENTIAL_EVENTS">true</server-capability>
 		<server-capability name="CALENDAR_HANDLER_SUPPORTS_STOREEVENT">true</server-capability>
+		<server-capability name="CALENDAR_HANDLER_SUPPORTS_PAGINATION">true</server-capability>
 	</server-capabilities>
 </token>
