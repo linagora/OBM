@@ -2278,7 +2278,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
 				+ "INNER JOIN UserObm c ON e.event_usercreate=c.userobm_id "
 				+ "WHERE e.event_ext_id=? " 
-				+ "AND u.userobm_login=?";
+				+ "AND u.userobm_login=? "
+				+ "AND eventexception_date IS NULL";
 
 		PreparedStatement evps = null;
 		ResultSet evrs = null;
