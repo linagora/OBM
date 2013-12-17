@@ -20,6 +20,7 @@ CATALINA_OPTS="${CATALINA_OPTS} -XX:+AggressiveOpts"
 CATALINA_OPTS="${CATALINA_OPTS} -XX:+UseFastAccessorMethods"
 CATALINA_OPTS="${CATALINA_OPTS} -XX:+HeapDumpOnOutOfMemoryError"
 CATALINA_OPTS="${CATALINA_OPTS} -XX:HeapDumpPath=/var/log/obm-tomcat/"
+CATALINA_OPTS="${CATALINA_OPTS} -XX:+UseConcMarkSweepGC"
 
 test -d /root/yjp && {
     export LD_LIBRARY_PATH="/root/yjp/bin/linux-x86-32"
