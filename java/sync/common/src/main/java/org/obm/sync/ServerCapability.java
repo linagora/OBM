@@ -29,6 +29,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
+import org.obm.sync.calendar.EventPrivacy;
+
 
 public enum ServerCapability {
 	/**
@@ -44,5 +46,9 @@ public enum ServerCapability {
 	/**
 	 * Used to advertise support for the storeEvent endpoint.
 	 */
-	CALENDAR_HANDLER_SUPPORTS_STOREEVENT
+	CALENDAR_HANDLER_SUPPORTS_STOREEVENT,
+	/**
+	 * Used to advertise support for pagination in list* endpoints.
+	 */
+	CALENDAR_HANDLER_SUPPORTS_PAGINATION
 }
