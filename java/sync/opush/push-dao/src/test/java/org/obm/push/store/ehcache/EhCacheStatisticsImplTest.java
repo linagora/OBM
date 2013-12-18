@@ -39,6 +39,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 
+@Ignore("OBMFULL-5663")
 @RunWith(SlowFilterRunner.class) @Slow
 public class EhCacheStatisticsImplTest extends StoreManagerConfigurationTest {
 
