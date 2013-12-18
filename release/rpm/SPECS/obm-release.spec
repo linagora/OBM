@@ -48,5 +48,8 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/yum.repos.d/*
 
 %changelog
+* Wed Dec 18 2013 Jeremie Kornobis <jkornobis@linagora.com> - 2.6-1
+  2.6 release.
+
 * Wed Aug 28 2012 Erwan Queffelec <equeffelec@linagora.com> - 2.4-1
 	Initial release.
