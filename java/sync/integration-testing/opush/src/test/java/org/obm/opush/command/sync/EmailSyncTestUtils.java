@@ -48,7 +48,6 @@ import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
@@ -70,7 +69,6 @@ import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -165,9 +163,6 @@ public class EmailSyncTestUtils {
 			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException,
 			ConversionException, FilterTypeChangedException, HierarchyChangedException {
 		
-		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		mockEmailSyncedCollectionDao(syncedCollectionDao);
-		
 		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
 		mockEmailUnsynchronizedItemDao(unsynchronizedItemDao);
 
@@ -200,19 +195,6 @@ public class EmailSyncTestUtils {
 				anyObject(List.class));
 		expectLastCall().anyTimes();
 	}
-
-	public static void mockEmailSyncedCollectionDao(SyncedCollectionDao syncedCollectionDao) {
-		expect(syncedCollectionDao.get(
-				anyObject(Credentials.class), 
-				anyObject(Device.class),
-				anyInt())).andReturn(null).anyTimes();
-		syncedCollectionDao.put(
-				anyObject(Credentials.class), 
-				anyObject(Device.class),
-				anyObject(AnalysedSyncCollection.class));
-		expectLastCall().once().anyTimes();
-	}
-	
 
 	public static void mockItemTrackingDao(ItemTrackingDao itemTrackingDao) throws DaoException {
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));

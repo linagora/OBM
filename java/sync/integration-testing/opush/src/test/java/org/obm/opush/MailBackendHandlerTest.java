@@ -82,7 +82,6 @@ import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
@@ -170,9 +169,8 @@ public class MailBackendHandlerTest {
 			.build();
 		
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
-		mockDao(serverId, syncState, 1);
+		mockDao(serverId, syncState);
 		
-		bindCollectionIdToPath(serverId, syncKey);
 		bindChangedToDelta(delta);
 		
 		mocksControl.replay();
@@ -194,18 +192,6 @@ public class MailBackendHandlerTest {
 		assertThat(imapConnectionCounter.listMailboxesCounter.get()).isEqualTo(1);
 	}
 
-	private void bindCollectionIdToPath(int syncEmailCollectionId, SyncKey syncKey) {
-		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		expect(syncedCollectionDao.get(user.credentials, user.device, syncEmailCollectionId))
-		.andReturn(AnalysedSyncCollection.builder()
-				.collectionId(syncEmailCollectionId)
-				.syncKey(syncKey)
-				.build()).anyTimes();
-		
-		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(AnalysedSyncCollection.class));
-		expectLastCall().anyTimes();
-	}
-
 	private void bindChangedToDelta(DataDelta delta) throws Exception {
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
 		expect(contentsExporter.getChanged(
@@ -217,20 +203,10 @@ public class MailBackendHandlerTest {
 			.andReturn(delta).once();
 	}
 
-	private void mockDao(int serverId, ItemSyncState syncState, Integer collectionId) throws Exception {
+	private void mockDao(int serverId, ItemSyncState syncState) throws Exception {
 		mockUnsynchronizedItemDao(syncState.getSyncKey());
-		mockSyncedCollectionDaoToReturnSyncCollection(serverId, collectionId, syncState.getSyncKey());
 		mockCollectionDao(serverId, syncState);
 		mockItemTrackingDao();
-	}
-	
-	private void mockSyncedCollectionDaoToReturnSyncCollection(int serverId, Integer collectionId, SyncKey syncKey) {
-		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		expect(syncedCollectionDao.get(user.credentials, user.device, serverId))
-		.andReturn(AnalysedSyncCollection.builder()
-				.collectionId(collectionId)
-				.syncKey(syncKey)
-				.build());
 	}
 
 	private void mockUnsynchronizedItemDao(SyncKey syncKey) {

@@ -31,15 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectSyncState;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockCollectionDaoForEmailSync;
-import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncedCollectionDao;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailUnsynchronizedItemDao;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockItemTrackingDao;
 
@@ -213,9 +212,6 @@ public class GetItemEstimateHandlerTest {
 
 	private void mockEmailSyncWithHierarchyChangedException(SyncKey syncKey, Set<Integer> syncEmailCollectionsIds)
 			throws DaoException, ConversionException, FilterTypeChangedException {
-		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		mockEmailSyncedCollectionDao(syncedCollectionDao);
-		
 		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
 		mockEmailUnsynchronizedItemDao(unsynchronizedItemDao);
 

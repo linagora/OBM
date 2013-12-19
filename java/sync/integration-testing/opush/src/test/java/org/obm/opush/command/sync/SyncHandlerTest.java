@@ -53,7 +53,6 @@ import static org.obm.opush.command.sync.EmailSyncTestUtils.getCollectionWithId;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.lookupInbox;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockCollectionDaoForEmailSync;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
-import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncedCollectionDao;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailUnsynchronizedItemDao;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockItemTrackingDao;
 import static org.obm.push.bean.FilterType.THREE_DAYS_BACK;
@@ -124,7 +123,6 @@ import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
@@ -269,9 +267,6 @@ public class SyncHandlerTest {
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
-		
-		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		mockEmailSyncedCollectionDao(syncedCollectionDao);
 		
 		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
 		mockEmailUnsynchronizedItemDao(unsynchronizedItemDao);
@@ -469,7 +464,6 @@ public class SyncHandlerTest {
 		ItemSyncState firstItemSyncState = ItemSyncState.builder().syncKey(initialSyncKey).syncDate(initialUpdateStateDate).build();
 		
 		IntegrationUserAccessUtils.mockUsersAccess(classToInstanceMap, fakeTestUsers);
-		EmailSyncTestUtils.mockEmailSyncedCollectionDao(classToInstanceMap.get(SyncedCollectionDao.class));
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expect(collectionDao.getCollectionPath(collectionId)).andReturn(collectionPath).times(2);
@@ -534,8 +528,6 @@ public class SyncHandlerTest {
 				anyObject(SyncKey.class), anyObject(Date.class))).andReturn(secondRequestSyncState).times(2);
 		collectionDao.resetCollection(user.device, collectionId);
 		expectLastCall();
-		
-		EmailSyncTestUtils.mockEmailSyncedCollectionDao(classToInstanceMap.get(SyncedCollectionDao.class));
 		
 		mocksControl.replay();
 		opushServer.start();
@@ -715,9 +707,6 @@ public class SyncHandlerTest {
 
 	private void mockEmailSyncThrowsException(SyncKey syncKey, Set<Integer> syncEmailCollectionsIds, Throwable throwable)
 			throws DaoException, ConversionException, FilterTypeChangedException {
-		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		mockEmailSyncedCollectionDao(syncedCollectionDao);
-		
 		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
 		mockEmailUnsynchronizedItemDao(unsynchronizedItemDao);
 

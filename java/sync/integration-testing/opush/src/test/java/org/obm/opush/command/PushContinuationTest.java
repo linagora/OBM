@@ -167,16 +167,7 @@ public class PushContinuationTest {
 	}
 
 	private void expectSyncWithoutChanges() {
-		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
 		Credentials credentials = new Credentials(user.user, user.password);
-		expect(syncedCollectionDao.get(credentials, user.device, inboxCollectionId))
-			.andReturn(AnalysedSyncCollection.builder()
-				.collectionId(inboxCollectionId)
-				.syncKey(INCOMING_SYNC_KEY)
-				.build()).anyTimes();
-		
-		syncedCollectionDao.put(eq(credentials), eq(user.device), anyObject(AnalysedSyncCollection.class));
-		expectLastCall().anyTimes();
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expect(collectionDao.getCollectionPath(inboxCollectionId))

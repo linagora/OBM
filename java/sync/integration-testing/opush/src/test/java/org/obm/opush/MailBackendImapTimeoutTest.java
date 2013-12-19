@@ -91,7 +91,6 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.HeartbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
-import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.DateUtils;
@@ -176,27 +175,6 @@ public class MailBackendImapTimeoutTest {
 	private void bindCollectionIdToPath() throws Exception {
 		expect(collectionDao.getCollectionPath(inboxCollectionId)).andReturn(inboxCollectionPath).anyTimes();
 		expect(collectionDao.getCollectionPath(trashCollectionId)).andReturn(trashCollectionPath).anyTimes();
-		
-		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		AnalysedSyncCollection syncCollection = AnalysedSyncCollection.builder()
-				.collectionId(inboxCollectionId)
-				.collectionPath(inboxCollectionIdAsString)
-				.dataType(PIMDataType.EMAIL)
-				.syncKey(new SyncKey("123"))
-				.build();
-		expect(syncedCollectionDao.get(user.credentials, user.device, inboxCollectionId))
-			.andReturn(syncCollection).anyTimes();
-		AnalysedSyncCollection trashCollection = AnalysedSyncCollection.builder()
-				.collectionId(trashCollectionId)
-				.collectionPath(trashCollectionPath)
-				.dataType(PIMDataType.EMAIL)
-				.syncKey(new SyncKey("456"))
-				.build();
-		expect(syncedCollectionDao.get(user.credentials, user.device, trashCollectionId))
-			.andReturn(trashCollection).anyTimes();
-		
-		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(AnalysedSyncCollection.class));
-		expectLastCall().anyTimes();
 	}
 
 	@After

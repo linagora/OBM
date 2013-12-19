@@ -68,10 +68,8 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
-import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
-import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.Resource;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollectionResponse;
@@ -88,7 +86,6 @@ import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
@@ -163,23 +160,6 @@ public class MailBackendGetChangedTest {
 	private void bindCollectionIdToPath() throws Exception {
 		expect(collectionDao.getCollectionPath(inboxCollectionId)).andReturn(inboxCollectionPath).anyTimes();
 		expect(collectionDao.getCollectionPath(trashCollectionId)).andReturn(trashCollectionPath).anyTimes();
-		
-		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		expect(syncedCollectionDao.get(user.credentials, user.device, inboxCollectionId))
-		.andReturn(AnalysedSyncCollection.builder()
-				.collectionId(inboxCollectionId)
-				.dataType(PIMDataType.EMAIL)
-				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
-				.build()).anyTimes();
-		expect(syncedCollectionDao.get(user.credentials, user.device, trashCollectionId))
-		.andReturn(AnalysedSyncCollection.builder()
-				.collectionId(trashCollectionId)
-				.dataType(PIMDataType.EMAIL)
-				.syncKey(SyncKey.INITIAL_FOLDER_SYNC_KEY)
-				.build()).anyTimes();
-	
-		syncedCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(AnalysedSyncCollection.class));
-		expectLastCall().anyTimes();
 	}
 
 	@After

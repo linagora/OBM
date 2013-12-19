@@ -79,7 +79,6 @@ import org.obm.opush.IntegrationTestUtils;
 import org.obm.opush.PendingQueriesLock;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
-import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.bean.Device;
@@ -111,7 +110,6 @@ import org.obm.push.store.CollectionDao;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.DeviceDao.PolicyStatus;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.book.AddressBook;
@@ -209,38 +207,15 @@ public class SyncHandlerWithBackendTest {
 		bookClient = classToInstanceMap.get(BookClient.class);
 		eventService = classToInstanceMap.get(EventService.class);
 
-		bindCollectionIdToPath(user);
+		bindCollectionIdToPath();
 		
 		expect(policyConfigurationProvider.get()).andReturn("fakeConfiguration");
 	}
 
-	private void bindCollectionIdToPath(OpushUser userToBind) throws Exception {
+	private void bindCollectionIdToPath() throws Exception {
 		expect(collectionDao.getCollectionPath(inboxCollectionId)).andReturn(inboxCollectionPath).anyTimes();
 		expect(collectionDao.getCollectionPath(calendarCollectionId)).andReturn(calendarCollectionPath).anyTimes();
 		expect(collectionDao.getCollectionPath(contactCollectionId)).andReturn(contactCollectionPath).anyTimes();
-		
-		SyncedCollectionDao syncedCollectionDao = classToInstanceMap.get(SyncedCollectionDao.class);
-		expect(syncedCollectionDao.get(userToBind.credentials, userToBind.device, inboxCollectionId))
-			.andReturn(AnalysedSyncCollection.builder()
-					.collectionId(inboxCollectionId)
-					.collectionPath(inboxCollectionPath)
-					.syncKey(new SyncKey("123"))
-					.build()).anyTimes();
-		expect(syncedCollectionDao.get(userToBind.credentials, userToBind.device, calendarCollectionId))
-			.andReturn(AnalysedSyncCollection.builder()
-					.collectionId(calendarCollectionId)
-					.collectionPath(calendarCollectionPath)
-					.syncKey(new SyncKey("123"))
-					.build()).anyTimes();
-		expect(syncedCollectionDao.get(userToBind.credentials, userToBind.device, contactCollectionId))
-			.andReturn(AnalysedSyncCollection.builder()
-					.collectionId(contactCollectionId)
-					.collectionPath(contactCollectionPath)
-					.syncKey(new SyncKey("123"))
-					.build()).anyTimes();
-		
-		syncedCollectionDao.put(eq(userToBind.credentials), eq(userToBind.device), anyObject(AnalysedSyncCollection.class));
-		expectLastCall().anyTimes();
 	}
 
 	@After
@@ -1007,7 +982,7 @@ public class SyncHandlerWithBackendTest {
 		OpushUser user = singleUserFixture.buildUser(complexPassword);
 		String userEmail = user.user.getLoginAtDomain();
 		greenMail.setUser(userEmail, complexPassword);
-		bindCollectionIdToPath(user);
+		bindCollectionIdToPath();
 
 		SyncKey firstAllocatedSyncKey = new SyncKey("123");
 		SyncKey secondAllocatedSyncKey = new SyncKey("456");
