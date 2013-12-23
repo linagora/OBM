@@ -802,8 +802,8 @@ public class CalendarBindingImpl implements ICalendar {
 	
 	private SyncRange defaultSyncRange(Date date) {
 		return new SyncRange(
-				new org.joda.time.DateTime(date).minus(Months.THREE).toDate(),
-				new org.joda.time.DateTime(date).plus(Months.SIX).toDate());
+				new org.joda.time.DateTime(date).plus(Months.SIX).toDate(),
+				new org.joda.time.DateTime(date).minus(Months.THREE).toDate());
 	}
 	
 	@Override

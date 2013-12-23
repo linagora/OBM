@@ -2726,8 +2726,8 @@ public class CalendarBindingImplTest {
 
 		Date date = new Date();
 		SyncRange defaultRange = new SyncRange(
-				new org.joda.time.DateTime(date).minus(Months.THREE).toDate(),
-				new org.joda.time.DateTime(date).plus(Months.SIX).toDate());
+				new org.joda.time.DateTime(date).plus(Months.SIX).toDate(),
+				new org.joda.time.DateTime(date).minus(Months.THREE).toDate());
 		CalendarDao mockDao = createMock(CalendarDao.class);
 		ResourceInfo mockResource = createMock(ResourceInfo.class);
 		expect(mockDao.getResource(resourceEmail)).andReturn(mockResource);
