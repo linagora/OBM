@@ -38,6 +38,7 @@ public class EventBuilder {
 		e.setLocation(rs.getString("event_location"));
 		cal.setTimeInMillis(rs.getTimestamp("event_date").getTime());
 		e.setStartDate(cal.getTime());
+		e.setTimezoneName(rs.getString("event_timezone"));
 		e.setDuration(JDBCUtils.convertNegativeIntegerToZero(rs, "event_duration"));
 		e.setPriority(rs.getInt("event_priority"));
 		e.setPrivacy(EventPrivacy.valueOf(rs.getInt("event_privacy")));
