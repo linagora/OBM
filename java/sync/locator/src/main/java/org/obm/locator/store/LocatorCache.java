@@ -38,6 +38,7 @@ import org.obm.configuration.module.LoggerModule;
 import org.obm.locator.LocatorCacheException;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
+import org.obm.locator.ServiceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,21 +88,24 @@ public class LocatorCache implements LocatorService {
 	}
 
 	private String getServiceLocation(Key key) {
-    	try {
-			return locatorClientImpl.getServiceLocation(key.getServiceSlashProperty(), key.getLoginAtDomain());
-    	} catch (LocatorClientException e) {
+		try {
+			return locatorClientImpl.getServiceLocation(key.getServiceSlashProperty(),
+					key.getLoginAtDomain());
+		} catch (ServiceNotFoundException e) {
+			return null;
+		} catch (LocatorClientException e) {
 			logger.error(e.getMessage());
 			throw new LocatorCacheException("No host for { " + key.toString() + " }", e);
 		}
 	}
-	
+
 	@Override
 	public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
 		Key key = new Key(serviceSlashProperty, loginAtDomain);
 		try {
 			Optional<String> value = store.get(key);
 			if (!value.isPresent()) {
-				throw new LocatorClientException("No host for { " + key.toString() + " }");
+				throw new ServiceNotFoundException("No host for { " + key.toString() + " }");
 			}
 			return value.get();
 		} catch (ExecutionException e) {

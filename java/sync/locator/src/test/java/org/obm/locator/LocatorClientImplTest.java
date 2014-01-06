@@ -135,8 +135,9 @@ public class LocatorClientImplTest {
 		client.getServiceLocation("service/prop", "login@domain");
 	}
 	
+	@Test(expected=ServiceNotFoundException.class)
 	public void testHttpStatusNotFound() throws Throwable { 
 		blockingServlet.unlockNextRequestWithResponse("ko", HttpStatus.SC_NOT_FOUND);
-		assertThat(client.getServiceLocation("service/prop", "login@domain")).isNull();
+		client.getServiceLocation("service/prop", "login@domain");
 	}
 }

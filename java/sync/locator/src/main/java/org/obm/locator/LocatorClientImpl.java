@@ -86,7 +86,8 @@ public class LocatorClientImpl implements LocatorService {
 		}
 		catch (HttpResponseException e) {
 			if (e.getStatusCode() == HTTP_CODE_NOT_FOUND) {
-				return null;
+				throw new ServiceNotFoundException(String.format("Service %s for %s not found",
+						serviceSlashProperty, loginAtDomain));
 			}
 			else {
 				throw new LocatorClientException(String.format("HTTP error %d: %s", e.getStatusCode(), e.getMessage()), e);
