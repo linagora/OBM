@@ -6280,7 +6280,6 @@ function dis_calendar_free_interval($current_view, $calendar) {
 	  } 
     }
   }
-  
 
   $resources = array();
   if(is_array($entities_resources)) {
@@ -6362,10 +6361,10 @@ function dis_calendar_free_interval($current_view, $calendar) {
         $busy = false;
         $tips = array();
         if (is_array($ocs)) {
-          foreach($ocs as $oc) {
+          foreach($ocs as $index => $oc) {
             if($oc->date->compare($e) >= 0) break;
             if($oc->end->compare($d) <= 0) unset($ocs[$index]);
-            if ($oc->date->compare($e) < 0 && $oc->end->compare($d) > 0) {
+            elseif ($oc->date->compare($e) < 0 && $oc->end->compare($d) > 0) {
               array_push($tips, $oc);
               $busy = true;
             }
@@ -6390,27 +6389,6 @@ function dis_calendar_free_interval($current_view, $calendar) {
 
       }
 
-      // Contacts
-   /*   foreach($contacts as $contact => $evts) {
-        if (is_array($evts)) {
-          $busy = false;
-          foreach($evts as $evt) {
-            if ($evt->start->compare($e) < 0 && $evt->end->compare($d) > 0 && $evt->getTransparency() == 'OPAQUE') {
-              $busy = true;
-            }
-          }
-          if ($busy) {
-            $is_busy = true;
-            array_push($busy_time_slots, $slots);
-            $td_id = "contact_".$contact."_".$d->getTimestamp();
-            $c[$contact] .= "<td class='timeSlot' id='$td_id' title=\"$GLOBALS[l_occupied]\"><div class='haveEvent'></div></td>";
-          } else {
-            $c[$contact] .= "<td class='timeSlot'></td>";
-          }
-        }  else {
-          $c[$contact] .= "<td class='timeSlotNoCalendar' title=\"$GLOBALS[l_calendar_not_available]\"></td>";
-        }
-      }*/
 		foreach($contacts as $id => &$ocs) {		
 			$busy = false;
 			$tips = array();
@@ -6437,10 +6415,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
 			} else {
 			  $c[$id] .= "<td class='timeSlotNoCalendar' title=\"$GLOBALS[l_calendar_not_available]\"></td>";
 			}
-		  }
-      
-      
-      
+		}
 
       // "all attendees" bar
       if ($is_busy) {
