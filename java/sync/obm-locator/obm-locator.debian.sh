@@ -4,8 +4,6 @@
 # Provides:          obm-locator
 # Required-Start:    $remote_fs $syslog $network
 # Required-Stop:     $remote_fs $syslog $network
-# Should-Start:      $named
-# Should-Stop:       $named
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: OBM component that help to locate other OBM services

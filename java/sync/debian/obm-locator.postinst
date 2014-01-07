@@ -78,6 +78,7 @@ if [ -f /etc/init.d/obm-locator ]; then
   echo "The file /etc/init.d/obm-locator already exists, do not replace it\n"
 else
   cp -a /usr/share/obm-locator/obm-locator.sh /etc/init.d/obm-locator
+  insserv obm-locator
 fi
 
 invoke-rc.d obm-locator restart	 3>1

@@ -1,4 +1,18 @@
 #!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides:          obm-locator
+# Required-Start:    $remote_fs $syslog $network
+# Required-Stop:     $remote_fs $syslog $network
+# Should-Start:      $named
+# Should-Stop:       $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: OBM component that help to locate other OBM services
+# chkconfig: - 70 50
+# Description:       OBM locator is a webserver offering a http endpoint 
+#                    to locate ip address of others remote services
+### END INIT INFO
 
 # Source function library.
 . /etc/init.d/functions
