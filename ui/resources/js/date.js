@@ -261,6 +261,11 @@ Obm.DateTime = new Class({
     return this;
   },
 
+  addHours: function(hours) {
+    this.setHours(this.getHours() + hours);
+    return this;
+  },
+
   toDateString: function() {
     return this.outputDate.toDateString();
   },
