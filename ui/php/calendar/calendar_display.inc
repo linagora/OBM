@@ -6684,7 +6684,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
       obm.vars.consts.begin_timestamp = d.getTime()/1000;
     }
 
-    obm.calendarFreeBusy = new Obm.CalendarFreeBusy($js_time_slots, $unit, '$GLOBALS[ccalendar_first_hour]');
+    obm.calendarFreeBusy = new Obm.CalendarFreeBusy($js_time_slots, $unit, '$GLOBALS[ccalendar_first_hour]', '$GLOBALS[ccalendar_last_hour]');
     obm.calendarFreeBusy.busySlots = $js_busy_time_slots;
     obm.calendarFreeBusy.entities = new Array(); 
     obm.calendarFreeBusy.entities.sel_user_id = $js_entities_user;

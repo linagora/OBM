@@ -6,7 +6,7 @@ Obm.CalendarFreeBusy = new Class({
   /*
    * Initialize attributes
    */
-  initialize: function(time_slots, unit, first_hour) {
+  initialize: function(time_slots, unit, day_first_hour, day_last_hour) {
     this.eventStartDate = new Obm.DateTime(obm.vars.consts.begin_timestamp*1000);
     this.unit = unit;
     this.stepSize = 40/this.unit;
@@ -23,10 +23,108 @@ Obm.CalendarFreeBusy = new Class({
       $('fbcContainer').setStyle('width', $(document.body).offsetWidth - 100 +'px');
     }
 
-    this.firstHour = first_hour;
+    // first hour of a day displayed on the grid (eg, 08:00) - events before this time
+    // are not shown
+    this.firstHour = day_first_hour;
+    // last hour of a day displayed on the grid (eg, 20:00) - events after this
+    // time are not shown
+    this.lastHour = day_last_hour;
     this.duration = 1;
   },
 
+  getEventEndDate: function() {
+    var endDate = new Obm.DateTime(this.eventStartDate).addHours(this.duration);
+    return endDate;
+  },
+
+  /**
+   * Normalizes a datetime so that it fits in a time slot (makes sure its hours
+   * are between firstHour and lastHour). It is an "almost displayable" date,
+   * because it may return a date set at lastHour (if the hours of the dateTime
+   * parameters are >= to lastHour), and there is no time slot at this point.
+   */
+  getAlmostDisplayableDateTime: function(dateTime) {
+    var hours = dateTime.getHours();
+    var minutes = dateTime.getMinutes();
+
+    var dateHours;
+    var dateMinutes;
+
+    if (hours < this.firstHour) {
+      dateHours = this.firstHour;
+      dateMinutes = 0;
+    }
+    else if (hours > this.lastHour) {
+      dateHours = this.lastHour;
+      dateMinutes = 0;
+    }
+    else {
+      dateHours = hours;
+      dateMinutes = minutes;
+    }
+    var displayableDateTime = new Obm.DateTime(dateTime);
+    displayableDateTime.setHours(dateHours);
+    displayableDateTime.setMinutes(dateMinutes);
+    return displayableDateTime;
+  },
+
+  /**
+   * Converts a date time to a position in the time slot array, or returns
+   * null
+   */
+  dateTimeToTimeSlot: function(dateTime) {
+    var timestampInSeconds = dateTime.getTime() / 1000;
+    var maybeTimeSlot = this.ts.indexOf(timestampInSeconds.toString());
+    return maybeTimeSlot != -1 ? maybeTimeSlot : null;
+  },
+
+  /**
+   * Counts the (absolute) number of time slots between two dates. Throws an
+   * error if things don't work out.
+   */
+  timeSlotCountBetween: function(dateTime1, dateTime2) {
+    var isDateTime2GreaterThanDateTime1 = dateTime2.getTime() > dateTime1.getTime();
+
+    var earlierDateTime;
+    var laterDateTime;
+    if (isDateTime2GreaterThanDateTime1) {
+      earlierDateTime = dateTime1;
+      laterDateTime = dateTime2;
+    }
+    else {
+      earlierDateTime = dateTime2;
+      laterDateTime = dateTime1;
+    }
+
+    var displayableEarlierDateTime = this.getAlmostDisplayableDateTime(earlierDateTime);
+    var almostDisplaybleLaterDateTime = this.getAlmostDisplayableDateTime(laterDateTime);
+    if (displayableEarlierDateTime.getTime() == almostDisplaybleLaterDateTime.getTime()) {
+      return 0;
+    }
+    var hoursToAdd;
+    var displayableLaterDateTime;
+    // If the normalized later date time comes just after the last available time slot,
+    // substract one hour, we'll make up for it later
+    if (almostDisplaybleLaterDateTime.getHours() == this.lastHour) {
+      hoursToAdd = 1;
+      displayableLaterDateTime = new Obm.DateTime(almostDisplaybleLaterDateTime).addHours(-1);
+    }
+    else {
+      displayableLaterDateTime = almostDisplaybleLaterDateTime;
+      hoursToAdd = 0;
+    }
+    var earlierTimeSlot = this.dateTimeToTimeSlot(displayableEarlierDateTime);
+    if (earlierTimeSlot == null) {
+      throw new Error("No time slot available for the date time " + earlierDateTime.format("c") + " (normalized as " + displayableEarlierDateTime.format("c") + ")");
+    }
+    var laterTimeSlot = this.dateTimeToTimeSlot(displayableLaterDateTime);
+    if (laterTimeSlot == null) {
+      throw new Error("No time slot available for the date time " + laterDateTime.format("c") + " (normalized as " + displayableLaterDateTime.format("c") + ")");
+    }
+    // Number of time slots we need to compensate
+    var timeSlotsToAdd = hoursToAdd * this.unit;
+    return (laterTimeSlot - earlierTimeSlot) + timeSlotsToAdd;
+  },
 
   /*
    * build panel 
@@ -35,8 +133,9 @@ Obm.CalendarFreeBusy = new Class({
   buildFreeBusyPanel: function(duration, readOnly) {
     this.duration = duration;
     $('duration').value = this.duration*3600;
-    this.meeting_slots = Math.ceil(this.duration*this.unit)//this.ts.indexOf(''+(obm.vars.consts.begin_timestamp+this.duration*3600))-this.ts.indexOf(''+obm.vars.consts.begin_timestamp);
 
+    var eventEndDate = this.getEventEndDate();
+    this.meeting_slots = this.timeSlotCountBetween(eventEndDate, this.eventStartDate);
     // /!\ meeting width must be set BEFORE slider 
     if (Browser.Engine.trident) {
       $('calendarFreeBusyMeeting').setStyle('width', this.stepSize*this.meeting_slots-(this.meeting_slots/2)+'px');
