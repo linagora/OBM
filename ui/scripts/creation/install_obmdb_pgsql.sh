@@ -42,14 +42,14 @@ EOF"
 fi
 
 psql -U ${user} -h ${host} ${db} -f \
-create_obmdb_2.5.pgsql.sql > /tmp/data_insert.log 2>&1
+create_obmdb.pgsql.sql > /tmp/data_insert.log 2>&1
 grep -i error /tmp/data_insert.log && {
     echo "error in pg script"
     exit 1
 }
 
 psql -U ${user} -h ${host} ${db} -f \
-obmdb_default_values_2.5.sql >> /tmp/data_insert.log 2>&1
+obmdb_default_values.sql >> /tmp/data_insert.log 2>&1
 grep -i error /tmp/data_insert.log && {
     echo "error in pg script"
     exit 1
@@ -57,7 +57,7 @@ grep -i error /tmp/data_insert.log && {
 
 echo "  Dictionnary data insertion"
 psql -U ${user} -h ${host} ${db} -f \
-data-${obm_lang}/obmdb_ref_2.5.sql >> /tmp/data_insert.log 2>&1
+data-${obm_lang}/obmdb_ref.sql >> /tmp/data_insert.log 2>&1
 grep -i error /tmp/data_insert.log && {
     echo "error in pg script"
     exit 1
@@ -65,7 +65,7 @@ grep -i error /tmp/data_insert.log && {
 
 echo "  Company Naf Code data insertion"
 psql -U ${user} -h ${host} ${db} -f \
-data-${obm_lang}/obmdb_nafcode_2.5.sql >> /tmp/data_insert.log 2>&1
+data-${obm_lang}/obmdb_nafcode.sql >> /tmp/data_insert.log 2>&1
 grep -i error /tmp/data_insert.log && {
     echo "error in pg script"
     exit 1
@@ -73,7 +73,7 @@ grep -i error /tmp/data_insert.log && {
 
 echo "  Default preferences data insertion"
 psql -U ${user} -h ${host} ${db} -f \
-obmdb_prefs_values_2.5.sql >> /tmp/data_insert.log 2>&1
+obmdb_prefs_values.sql >> /tmp/data_insert.log 2>&1
 grep -i error /tmp/data_insert.log && {
     echo "error in pg script"
     exit 1
@@ -85,9 +85,6 @@ UPDATE UserObmPref SET userobmpref_value='${obm_lang}' WHERE userobmpref_option=
 EOF
 
 psql -U ${user} -h ${host} ${db} -f \
-  "updates/update-2.5.0~1.pgsql.sql" >> /tmp/data_insert.log 2>&1
-
-psql -U ${user} -h ${host} ${db} -f \
-  "updates/update-2.5.1~1.pgsql.sql" >> /tmp/data_insert.log 2>&1
+  "../2.6/updates/update-2.6.0~1.pgsql.sql" >> /tmp/data_insert.log 2>&1
 
 echo "DONE."

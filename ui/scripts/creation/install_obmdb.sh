@@ -1,7 +1,7 @@
 #!/bin/bash
 ###############################################################################
-# OBM - File : install_obmdb_2.5.sh                                           #
-#     - Desc : OBM Database 2.5 installation script                           #
+# OBM - File : install_obmdb.sh                                               #
+#     - Desc : OBM Database installation script                               #
 ###############################################################################
 
 installation_type=$1
@@ -32,10 +32,10 @@ echo "install lang = $OBM_LANG"
 locate_php_interp
 
 echo "*** Document repository creation"
-./install_document_2.5.sh
+./install_document.sh
 
 if [ -z $installation_type ] || [ $installation_type != 'filldata' ]; then
-	./install_obmdb_${DBTYPE}_2.5.sh ${DB} ${U} ${P} ${OBM_LANG} "full"
+	./install_obmdb_${DBTYPE}.sh ${DB} ${U} ${P} ${OBM_LANG} "full"
 else
-	./install_obmdb_${DBTYPE}_2.5.sh ${DB} ${U} ${P} ${OBM_LANG} "filldata"
+	./install_obmdb_${DBTYPE}.sh ${DB} ${U} ${P} ${OBM_LANG} "filldata"
 fi

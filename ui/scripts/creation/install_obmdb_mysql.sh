@@ -23,7 +23,7 @@ if [ $obm_installation_type = "full" ]; then
 fi
 
 echo "  Create new $db database model"
-mysql -u $user -p$pw $db < create_obmdb_2.5.mysql.sql
+mysql -u $user -p$pw $db < create_obmdb.mysql.sql
 test $? -eq 0 || {
     echo "error running mysql script"
     exit 1
@@ -31,7 +31,7 @@ test $? -eq 0 || {
 echo "*** Database filling"
 
 # Default data insertion
-mysql --default-character-set='UTF8' -u $user -p$pw $db < obmdb_default_values_2.5.sql
+mysql --default-character-set='UTF8' -u $user -p$pw $db < obmdb_default_values.sql
 test $? -eq 0 || {
     echo "error running mysql script"
     exit 1
@@ -39,7 +39,7 @@ test $? -eq 0 || {
 
 # Dictionnary data insertion
 echo "  Dictionnary data insertion"
-mysql --default-character-set='UTF8' -u $user -p$pw $db < data-$obm_lang/obmdb_ref_2.5.sql
+mysql --default-character-set='UTF8' -u $user -p$pw $db < data-$obm_lang/obmdb_ref.sql
 test $? -eq 0 || {
     echo "error running mysql script"
     exit 1
@@ -47,7 +47,7 @@ test $? -eq 0 || {
 
 # Company Naf Code data insertion
 echo "  Company Naf Code data insertion"
-mysql --default-character-set='UTF8' -u $user -p$pw $db < data-$obm_lang/obmdb_nafcode_2.5.sql
+mysql --default-character-set='UTF8' -u $user -p$pw $db < data-$obm_lang/obmdb_nafcode.sql
 test $? -eq 0 || {
     echo "error running mysql script"
     exit 1
@@ -55,7 +55,7 @@ test $? -eq 0 || {
 
 # Preferences data insertion & Update default lang to .ini value
 echo "  Default preferences data insertion"
-mysql --default-character-set='UTF8' -u $user -p$pw $db < obmdb_prefs_values_2.5.sql
+mysql --default-character-set='UTF8' -u $user -p$pw $db < obmdb_prefs_values.sql
 test $? -eq 0 || {
     echo "error running mysql script"
     exit 1
@@ -64,9 +64,7 @@ test $? -eq 0 || {
 echo "UPDATE UserObmPref set userobmpref_value='$obm_lang' where userobmpref_option='set_lang'" | mysql -u $user -p$pw $db 
 
 mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
-  < "updates/update-2.5.0~1.mysql.sql" >> /tmp/data_insert.log 2>&1
+  < "../2.6/updates/update-2.6.0~1.mysql.sql" >> /tmp/data_insert.log 2>&1
 
-mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
-  < "updates/update-2.5.1~1.mysql.sql" >> /tmp/data_insert.log 2>&1
 
 echo "DONE."
