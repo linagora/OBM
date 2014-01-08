@@ -2,6 +2,21 @@
 Obm.DateTime = new Class({
   
   initialize: function(ms) {
+    if (ms instanceof Obm.DateTime) {
+      this.initializeFromDatetime(ms);
+    }
+    else {
+      this.initializeFromDate(ms);
+    }
+  },
+
+  initializeFromDatetime: function(ms) {
+    this.inputDate = new Date(ms.inputDate.getTime());
+    this.offset = ms.offset;
+    this.outputDate = new Date(ms.outputDate.getTime());
+  },
+
+  initializeFromDate: function(ms) {
     this.inputDate = new Date(ms);
     this.offset = obm.timeZoneParser.getTimeZoneOffset(this.inputDate.getTime());
     var time = this.inputDate.getTime() + this.inputDate.getTimezoneOffset() * 60 * 1000 + this.offset; 
