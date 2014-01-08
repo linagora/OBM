@@ -6,7 +6,7 @@
 
 installation_type=$1
 
-source `dirname $0`/obm-sh.lib
+source `dirname $0`/../common/sh/obm.sh
 
 
 get_val dbtype
