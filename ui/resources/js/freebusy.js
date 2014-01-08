@@ -7,7 +7,7 @@ Obm.CalendarFreeBusy = new Class({
    * Initialize attributes
    */
   initialize: function(time_slots, unit, first_hour) {
-    this.d = new Obm.DateTime(obm.vars.consts.begin_timestamp*1000);
+    this.eventStartDate = new Obm.DateTime(obm.vars.consts.begin_timestamp*1000);
     this.unit = unit;
     this.stepSize = 40/this.unit;
     this.external_contact_count = 0;
@@ -208,7 +208,7 @@ Obm.CalendarFreeBusy = new Class({
    * Show next week
    */
   showNext: function() {
-    this.d.setDate(this.d.getDate()+7);
+    this.eventStartDate.setDate(this.eventStartDate.getDate()+7);
     this.refresh();
   },
 
@@ -217,7 +217,7 @@ Obm.CalendarFreeBusy = new Class({
    * Show previous week
    */
   showPrev: function() {
-    this.d.setDate(this.d.getDate()-7)
+    this.eventStartDate.setDate(this.eventStartDate.getDate()-7)
     this.refresh();
   },
 
@@ -227,7 +227,7 @@ Obm.CalendarFreeBusy = new Class({
    */
   refresh: function() {
     var data = new Object();
-    data.date_begin = obm.calendarFreeBusy.d.format('c');
+    data.date_begin = obm.calendarFreeBusy.eventStartDate.format('c');
     data.sel_user_id = obm.calendarFreeBusy.entities.sel_user_id;
     data.sel_resource_id = obm.calendarFreeBusy.entities.sel_resource_id;
     data.sel_resource_group_id = obm.calendarFreeBusy.entities.sel_resource_group_id;
