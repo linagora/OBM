@@ -33,12 +33,7 @@ package org.obm.opush;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 
-import java.util.Set;
-
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.PIMDataType;
@@ -53,7 +48,6 @@ import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.mail.MailBackend;
 import org.obm.push.state.SyncKeyFactory;
-import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 
@@ -139,13 +133,4 @@ public class IntegrationPushTestUtils {
 				.isNew(true)
 				.build();
 	}
-	
-	public static void mockMonitoredCollectionDao(MonitoredCollectionDao monitoredCollectionDao) {
-		monitoredCollectionDao.put(
-				anyObject(Credentials.class), 
-				anyObject(Device.class), 
-				anyObject(Set.class));
-		expectLastCall().anyTimes();
-	}
-	
 }

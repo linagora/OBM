@@ -31,13 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyLong;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.obm.opush.IntegrationPushTestUtils.mockMonitoredCollectionDao;
 import static org.obm.opush.IntegrationTestUtils.buildCalendarCollectionPath;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
@@ -89,7 +88,6 @@ import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.HeartbeatDao;
-import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -333,8 +331,6 @@ public class PingHandlerTest {
 	}
 
 	private void mockForPingNeeds() throws DaoException {
-		MonitoredCollectionDao monitoredCollectionDao = classToInstanceMap.get(MonitoredCollectionDao.class);
-		mockMonitoredCollectionDao(monitoredCollectionDao);
 		HeartbeatDao heartbeatDao = classToInstanceMap.get(HeartbeatDao.class);
 		mockHeartbeatDao(heartbeatDao);
 	}

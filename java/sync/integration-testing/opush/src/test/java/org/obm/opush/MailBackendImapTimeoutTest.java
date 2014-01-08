@@ -31,11 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 import static org.obm.opush.IntegrationPushTestUtils.mockNextGeneratedSyncKey;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
@@ -43,7 +42,6 @@ import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Set;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -61,7 +59,6 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.SlowGuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
-import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderSyncStatus;
@@ -90,7 +87,6 @@ import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.HeartbeatDao;
-import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.DateUtils;
@@ -130,7 +126,6 @@ public class MailBackendImapTimeoutTest {
 	private FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao;
 	private UnsynchronizedItemDao unsynchronizedItemDao;
 	private HeartbeatDao heartbeatDao;
-	private MonitoredCollectionDao monitoredCollectionDao;
 	private DateService dateService;
 
 	private GreenMailUser greenMailUser;
@@ -164,7 +159,6 @@ public class MailBackendImapTimeoutTest {
 		folderSyncStateBackendMappingDao = classToInstanceMap.get(FolderSyncStateBackendMappingDao.class);
 		unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
 		heartbeatDao = classToInstanceMap.get(HeartbeatDao.class);
-		monitoredCollectionDao = classToInstanceMap.get(MonitoredCollectionDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
 
 		bindCollectionIdToPath();
@@ -386,9 +380,6 @@ public class MailBackendImapTimeoutTest {
 				.build();
 		
 		heartbeatDao.updateLastHeartbeat(user.device, heartbeat);
-		expectLastCall();
-		
-		monitoredCollectionDao.put(eq(user.credentials), eq(user.device), anyObject(Set.class));
 		expectLastCall();
 		
 		expect(collectionDao.lastKnownState(user.device, inboxCollectionId))

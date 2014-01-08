@@ -41,7 +41,6 @@ import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -83,8 +82,6 @@ import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.HeartbeatDao;
-import org.obm.push.store.MonitoredCollectionDao;
-import org.obm.push.store.SyncedCollectionDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
@@ -207,9 +204,5 @@ public class PushContinuationTest {
 				.syncKey(NEW_SYNC_KEY)
 				.syncDate(DateUtils.getCurrentDate())
 				.build());
-		
-		MonitoredCollectionDao monitoredCollectionDao = classToInstanceMap.get(MonitoredCollectionDao.class);
-		monitoredCollectionDao.put(eq(new Credentials(user.user, user.password)), eq(user.device), anyObject(Set.class));
-		expectLastCall();
 	}
 }

@@ -40,12 +40,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.obm.opush.env.arquillian.AuthenticatedArquillianModule;
-import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.Credentials;
 import org.obm.push.store.HeartbeatDao;
-import org.obm.push.store.MonitoredCollectionDao;
-
-import com.google.common.collect.ImmutableSet;
 
 public class EhCacheMigrationTestModule  extends AuthenticatedArquillianModule {
 	
@@ -53,7 +48,6 @@ public class EhCacheMigrationTestModule  extends AuthenticatedArquillianModule {
 	protected void expectedBehaviour() throws Exception {
 		super.expectedBehaviour();
 		expectHeartbeatDao();
-		expectMonitoredCollectionDao();
 		copyCacheFilesInDataFolder();
 	}
 	
@@ -61,12 +55,6 @@ public class EhCacheMigrationTestModule  extends AuthenticatedArquillianModule {
 		HeartbeatDao heartbeatDao = mockMap.get(HeartbeatDao.class);
 		expect(heartbeatDao.findLastHeartbeat(device))
 			.andReturn(Long.valueOf(1));
-	}
-	
-	private void expectMonitoredCollectionDao() {
-		MonitoredCollectionDao monitoredCollectionDao = mockMap.get(MonitoredCollectionDao.class);
-		expect(monitoredCollectionDao.list(new Credentials(user, password), device))
-			.andReturn(ImmutableSet.<AnalysedSyncCollection> of());
 	}
 	
 	private void copyCacheFilesInDataFolder() throws Exception {
