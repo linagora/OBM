@@ -136,6 +136,9 @@ Obm.CalendarFreeBusy = new Class({
 
     var eventEndDate = this.getEventEndDate();
     this.meeting_slots = this.timeSlotCountBetween(eventEndDate, this.eventStartDate);
+
+    var dateStartSlot = this.dateTimeToTimeSlot(this.getAlmostDisplayableDateTime(eventEndDate));
+    $('calendarFreeBusyMeeting').setStyle('left', (this.stepSize * dateStartSlot) + 'px');
     // /!\ meeting width must be set BEFORE slider 
     if (Browser.Engine.trident) {
       $('calendarFreeBusyMeeting').setStyle('width', this.stepSize*this.meeting_slots-(this.meeting_slots/2)+'px');
