@@ -67,19 +67,16 @@ import org.obm.push.bean.GetItemEstimateStatus;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncKey;
-import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.exception.DaoException;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.imap.ImapHostManager;
 import com.icegreen.greenmail.store.MailFolder;
@@ -103,7 +100,6 @@ public class MailBackendGetItemEstimateTest {
 	@Inject SyncDecoder decoder;
 	@Inject PolicyConfigurationProvider policyConfigurationProvider;
 	
-	private UnsynchronizedItemDao unsynchronizedItemDao;
 	private ItemTrackingDao itemTrackingDao;
 	private CollectionDao collectionDao;
 	private DateService dateService;
@@ -133,7 +129,6 @@ public class MailBackendGetItemEstimateTest {
 		inboxCollectionId = 1234;
 		inboxCollectionIdAsString = String.valueOf(inboxCollectionId);
 		
-		unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
 		itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
@@ -161,7 +156,6 @@ public class MailBackendGetItemEstimateTest {
 		mockUsersAccess(classToInstanceMap, Arrays.asList(user));
 		
 		expect(collectionDao.findItemStateForKey(invalidSyncKey)).andReturn(null);
-		expectUnsynchronizedItemToNeverHavePendingAdds(invalidSyncKey);
 
 		mocksControl.replay();
 		
@@ -195,7 +189,6 @@ public class MailBackendGetItemEstimateTest {
 
 		expect(dateService.getCurrentDate()).andReturn(DateUtils.getCurrentDate()).once();
 		expect(collectionDao.findItemStateForKey(lastSyncKey)).andReturn(lastSyncState).once();
-		expectUnsynchronizedItemToNeverHavePendingAdds(lastSyncKey);
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
@@ -241,7 +234,6 @@ public class MailBackendGetItemEstimateTest {
 
 		expect(dateService.getCurrentDate()).andReturn(DateUtils.getCurrentDate()).once();
 		expect(collectionDao.findItemStateForKey(lastSyncKey)).andReturn(lastSyncState).once();
-		expectUnsynchronizedItemToNeverHavePendingAdds(lastSyncKey);
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
@@ -287,7 +279,6 @@ public class MailBackendGetItemEstimateTest {
 
 		expect(dateService.getCurrentDate()).andReturn(DateUtils.getCurrentDate()).once();
 		expect(collectionDao.findItemStateForKey(lastSyncKey)).andReturn(lastSyncState).once();
-		expectUnsynchronizedItemToNeverHavePendingAdds(lastSyncKey);
 		itemTrackingDao.markAsSynced(anyObject(ItemSyncState.class), anyObject(Set.class));
 		expectLastCall().anyTimes();
 		
@@ -340,11 +331,6 @@ public class MailBackendGetItemEstimateTest {
 		
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId1))).andReturn(false);
 		expect(itemTrackingDao.isServerIdSynced(firstAllocatedState, new ServerId(inboxCollectionId + emailId2))).andReturn(false);
-	}
-
-	private void expectUnsynchronizedItemToNeverHavePendingAdds(SyncKey syncKey) {
-		expect(unsynchronizedItemDao.listItemsToAdd(syncKey))
-				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
 	}
 
 	private void expectCollectionDaoPerformSync(SyncKey requestSyncKey, ItemSyncState allocatedState, ItemSyncState newItemSyncState)

@@ -31,11 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command.sync;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
@@ -69,15 +69,12 @@ import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.protocol.bean.SyncResponse;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.auth.AuthFault;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 public class EmailSyncTestUtils {
@@ -163,9 +160,6 @@ public class EmailSyncTestUtils {
 			throws DaoException, CollectionNotFoundException, ProcessingEmailException, UnexpectedObmSyncServerException,
 			ConversionException, FilterTypeChangedException, HierarchyChangedException {
 		
-		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
-		mockEmailUnsynchronizedItemDao(unsynchronizedItemDao);
-
 		IContentsExporter contentsExporterBackend = classToInstanceMap.get(IContentsExporter.class);
 		mockContentsExporter(contentsExporterBackend, delta);
 
@@ -175,25 +169,6 @@ public class EmailSyncTestUtils {
 		
 		ItemTrackingDao itemTrackingDao = classToInstanceMap.get(ItemTrackingDao.class);
 		mockItemTrackingDao(itemTrackingDao);
-	}
-	
-	public static void mockEmailUnsynchronizedItemDao(UnsynchronizedItemDao unsynchronizedItemDao) {
-		expect(unsynchronizedItemDao.listItemsToAdd(
-				anyObject(SyncKey.class)))
-			.andReturn(ImmutableSet.<ItemChange>of()).anyTimes();
-		unsynchronizedItemDao.clearItemsToAdd(
-				anyObject(SyncKey.class));
-		expectLastCall().anyTimes();
-		expect(unsynchronizedItemDao.listItemsToRemove(
-				anyObject(SyncKey.class)))
-			.andReturn(ImmutableList.<ItemDeletion>of()).anyTimes();
-		unsynchronizedItemDao.clearItemsToRemove(
-				anyObject(SyncKey.class));
-		expectLastCall().anyTimes();
-		unsynchronizedItemDao.storeItemsToRemove(
-				anyObject(SyncKey.class),
-				anyObject(List.class));
-		expectLastCall().anyTimes();
 	}
 
 	public static void mockItemTrackingDao(ItemTrackingDao itemTrackingDao) throws DaoException {

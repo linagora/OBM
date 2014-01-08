@@ -53,7 +53,6 @@ import static org.obm.opush.command.sync.EmailSyncTestUtils.getCollectionWithId;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.lookupInbox;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockCollectionDaoForEmailSync;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailSyncClasses;
-import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailUnsynchronizedItemDao;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockItemTrackingDao;
 import static org.obm.push.bean.FilterType.THREE_DAYS_BACK;
 
@@ -123,7 +122,6 @@ import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -268,9 +266,6 @@ public class SyncHandlerTest {
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockUsersAccess(classToInstanceMap, fakeTestUsers);
 		
-		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
-		mockEmailUnsynchronizedItemDao(unsynchronizedItemDao);
-
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
 		expect(contentsExporter.getChanged(
 				anyObject(UserDataRequest.class),
@@ -467,8 +462,6 @@ public class SyncHandlerTest {
 		
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expect(collectionDao.getCollectionPath(collectionId)).andReturn(collectionPath).times(2);
-		
-		EmailSyncTestUtils.mockEmailUnsynchronizedItemDao(classToInstanceMap.get(UnsynchronizedItemDao.class));
 		expect(collectionDao.findItemStateForKey(initialSyncKey)).andReturn(null);
 		expect(collectionDao.findItemStateForKey(secondSyncKey)).andReturn(null).times(2);
 		expect(collectionDao.updateState(anyObject(Device.class), anyInt(), anyObject(SyncKey.class), anyObject(Date.class)))
@@ -509,8 +502,6 @@ public class SyncHandlerTest {
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(secondSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
-		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
-		expectUnsynchronizedItemToNeverExceedWindowSize(unsynchronizedItemDao, secondSyncKey);
 		IContentsExporter contentsExporter = classToInstanceMap.get(IContentsExporter.class);
 		expect(contentsExporter.getChanged(
 				anyObject(UserDataRequest.class),
@@ -543,19 +534,6 @@ public class SyncHandlerTest {
 		checkMailFolderHasNoChange(syncWithoutOptions, inbox.getCollectionId());
 	}
 
-	private void expectUnsynchronizedItemToNeverExceedWindowSize(
-			UnsynchronizedItemDao unsynchronizedItemDao, SyncKey syncKey) {
-		
-		expect(unsynchronizedItemDao.listItemsToAdd(syncKey))
-				.andReturn(ImmutableList.<ItemChange>of()).anyTimes();
-		expect(unsynchronizedItemDao.listItemsToRemove(syncKey))
-				.andReturn(ImmutableList.<ItemDeletion>of()).anyTimes();
-		unsynchronizedItemDao.clearItemsToAdd(syncKey);
-		expectLastCall().anyTimes();
-		unsynchronizedItemDao.clearItemsToRemove(syncKey);
-		expectLastCall().anyTimes();
-	}
-	
 	private FolderSyncState newSyncState(SyncKey syncEmailSyncKey) {
 		return FolderSyncState.builder()
 				.syncKey(syncEmailSyncKey)
@@ -707,8 +685,6 @@ public class SyncHandlerTest {
 
 	private void mockEmailSyncThrowsException(SyncKey syncKey, Set<Integer> syncEmailCollectionsIds, Throwable throwable)
 			throws DaoException, ConversionException, FilterTypeChangedException {
-		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
-		mockEmailUnsynchronizedItemDao(unsynchronizedItemDao);
 
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers, syncEmailCollectionsIds);

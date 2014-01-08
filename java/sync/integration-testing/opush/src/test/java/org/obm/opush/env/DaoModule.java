@@ -40,7 +40,6 @@ import org.obm.push.store.FolderSnapshotDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.HeartbeatDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.store.ehcache.CacheEvictionListener;
 import org.obm.push.store.ehcache.CacheEvictionListenerImpl;
 import org.obm.sync.date.DateProvider;
@@ -56,7 +55,6 @@ public class DaoModule extends AbstractOverrideModule {
 		bindWithMock(CollectionDao.class);
 		bindWithMock(DeviceDao.class);
 		bindWithMock(HeartbeatDao.class);
-		bindUnsynchronizedItemDao();
 		bindWithMock(CalendarDao.class);
 		bindWithMock(ItemTrackingDao.class);
 		bindWithMock(FolderSyncStateBackendMappingDao.class);
@@ -65,7 +63,4 @@ public class DaoModule extends AbstractOverrideModule {
 		bind(CacheEvictionListener.class).to(CacheEvictionListenerImpl.class);
 	}
 
-	protected void bindUnsynchronizedItemDao() {
-		bindWithMock(UnsynchronizedItemDao.class);
-	}
 }

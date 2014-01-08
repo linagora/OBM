@@ -39,7 +39,6 @@ import static org.obm.opush.IntegrationTestUtils.expectSyncState;
 import static org.obm.opush.IntegrationTestUtils.expectUserCollectionsNeverChange;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockCollectionDaoForEmailSync;
-import static org.obm.opush.command.sync.EmailSyncTestUtils.mockEmailUnsynchronizedItemDao;
 import static org.obm.opush.command.sync.EmailSyncTestUtils.mockItemTrackingDao;
 
 import java.util.Arrays;
@@ -81,8 +80,6 @@ import org.obm.push.mail.exception.FilterTypeChangedException;
 import org.obm.push.state.StateMachine;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.SyncedCollectionDao;
-import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
 import org.obm.sync.push.client.OPClient;
@@ -212,8 +209,6 @@ public class GetItemEstimateHandlerTest {
 
 	private void mockEmailSyncWithHierarchyChangedException(SyncKey syncKey, Set<Integer> syncEmailCollectionsIds)
 			throws DaoException, ConversionException, FilterTypeChangedException {
-		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
-		mockEmailUnsynchronizedItemDao(unsynchronizedItemDao);
 
 		CollectionDao collectionDao = classToInstanceMap.get(CollectionDao.class);
 		expectUserCollectionsNeverChange(collectionDao, fakeTestUsers, syncEmailCollectionsIds);

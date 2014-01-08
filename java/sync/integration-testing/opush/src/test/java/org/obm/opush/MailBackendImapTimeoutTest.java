@@ -73,7 +73,6 @@ import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
-import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.calendar.CalendarBackend;
 import org.obm.push.contacts.ContactsBackend;
 import org.obm.push.exception.DaoException;
@@ -87,7 +86,6 @@ import org.obm.push.service.DateService;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.store.HeartbeatDao;
-import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.task.TaskBackend;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -97,7 +95,6 @@ import org.obm.sync.push.client.OPClient;
 import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 import org.obm.sync.push.client.commands.MoveItemsCommand.Move;
 
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.imap.ImapHostManager;
 import com.icegreen.greenmail.user.GreenMailUser;
@@ -124,7 +121,6 @@ public class MailBackendImapTimeoutTest {
 	
 	private CollectionDao collectionDao;
 	private FolderSyncStateBackendMappingDao folderSyncStateBackendMappingDao;
-	private UnsynchronizedItemDao unsynchronizedItemDao;
 	private HeartbeatDao heartbeatDao;
 	private DateService dateService;
 
@@ -157,7 +153,6 @@ public class MailBackendImapTimeoutTest {
 		
 		collectionDao = classToInstanceMap.get(CollectionDao.class);
 		folderSyncStateBackendMappingDao = classToInstanceMap.get(FolderSyncStateBackendMappingDao.class);
-		unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
 		heartbeatDao = classToInstanceMap.get(HeartbeatDao.class);
 		dateService = classToInstanceMap.get(DateService.class);
 
@@ -287,9 +282,6 @@ public class MailBackendImapTimeoutTest {
 		
 		expect(collectionDao.findItemStateForKey(syncKey))
 			.andReturn(syncState);
-		
-		expect(unsynchronizedItemDao.listItemsToAdd(syncKey))
-			.andReturn(ImmutableList.<ItemChange> of());
 		
 		expect(dateService.getCurrentDate()).andReturn(syncState.getSyncDate());
 		

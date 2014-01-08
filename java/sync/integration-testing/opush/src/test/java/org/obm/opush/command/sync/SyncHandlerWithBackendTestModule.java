@@ -36,9 +36,6 @@ import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.ModuleUtils;
 import org.obm.opush.env.AbstractOpushGreenMailEnv;
 import org.obm.opush.env.BackendsModule;
-import org.obm.opush.env.DaoModule;
-import org.obm.push.store.UnsynchronizedItemDao;
-import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl;
 
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
@@ -88,23 +85,6 @@ public class SyncHandlerWithBackendTestModule extends AbstractOpushGreenMailEnv 
 
 		@Override
 		protected void bindContactsBackend() {
-		}
-	}
-
-	@Override
-	protected DaoModule dao() {
-		return new ContactDaoModule(getMocksControl());
-	}
-	
-	private class ContactDaoModule extends DaoModule {
-
-		public ContactDaoModule(IMocksControl mocksControl) {
-			super(mocksControl);
-		}
-
-		@Override
-		protected void bindUnsynchronizedItemDao() {
-			bind(UnsynchronizedItemDao.class).to(UnsynchronizedItemDaoEhcacheImpl.class);
 		}
 	}
 }

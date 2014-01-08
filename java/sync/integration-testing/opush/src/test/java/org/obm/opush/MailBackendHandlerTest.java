@@ -76,13 +76,11 @@ import org.obm.push.bean.change.client.SyncClientCommands;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemChangesBuilder;
-import org.obm.push.bean.change.item.ItemDeletion;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.protocol.data.SyncDecoder;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.SerializableInputStream;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -90,8 +88,6 @@ import org.obm.sync.push.client.OPClient;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.imap.AuthorizationException;
@@ -204,27 +200,8 @@ public class MailBackendHandlerTest {
 	}
 
 	private void mockDao(int serverId, ItemSyncState syncState) throws Exception {
-		mockUnsynchronizedItemDao(syncState.getSyncKey());
 		mockCollectionDao(serverId, syncState);
 		mockItemTrackingDao();
-	}
-
-	private void mockUnsynchronizedItemDao(SyncKey syncKey) {
-		UnsynchronizedItemDao unsynchronizedItemDao = classToInstanceMap.get(UnsynchronizedItemDao.class);
-		expect(unsynchronizedItemDao.listItemsToAdd(syncKey))
-			.andReturn(ImmutableSet.<ItemChange> of()).anyTimes();
-		
-		unsynchronizedItemDao.clearItemsToAdd(syncKey);
-		expectLastCall().anyTimes();
-		
-		expect(unsynchronizedItemDao.listItemsToRemove(syncKey))
-			.andReturn(ImmutableSet.<ItemDeletion>of()).anyTimes();
-		
-		unsynchronizedItemDao.clearItemsToRemove(syncKey);
-		expectLastCall().anyTimes();
-		
-		unsynchronizedItemDao.storeItemsToRemove(syncKey, Lists.<ItemDeletion>newArrayList());
-		expectLastCall().anyTimes();
 	}
 	
 	private void mockCollectionDao(int serverId, ItemSyncState syncState) throws Exception {
