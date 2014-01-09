@@ -20,6 +20,7 @@ import org.obm.sync.calendar.SyncRange;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -27,6 +28,7 @@ import com.google.common.collect.Sets;
 import fr.aliacom.obm.common.calendar.EventUtils;
 import fr.aliacom.obm.common.calendar.loader.filter.DeclinedAttendeeFilter;
 import fr.aliacom.obm.common.calendar.loader.filter.EventFilter;
+import fr.aliacom.obm.common.calendar.loader.filter.EventsByIdFilter;
 import fr.aliacom.obm.utils.DBUtils;
 import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 
@@ -40,6 +42,7 @@ public class EventLoader {
 		private Set<Integer> usingResources;
 		private EventObmId withAlertsFor;
 		private boolean withExceptions;
+		private boolean withoutMovedExceptions;
 		private SyncRange occurringBetween;
 		private Date updatedAfter;
 		private Date updatedOrOccuringAfter;
@@ -84,6 +87,11 @@ public class EventLoader {
 			return this;
 		}
 
+		public Builder withoutMovedExceptions(boolean withoutMovedExceptions) {
+			this.withoutMovedExceptions = withoutMovedExceptions;
+			return this;
+		}
+
 		// Excludes events when the attendees has a status of declined in the event and ALL of its exceptions
 		public Builder withoutDeclinedAttendee(Attendee withoutDeclinedAttendee) {
 			this.withoutDeclinedAttendee = withoutDeclinedAttendee;
@@ -101,7 +109,6 @@ public class EventLoader {
 			this.ids.addAll(ids);
 			return this;
 		}
-
 
 		public Builder usingResources(int... usingResources) {
 			for (int resourceId : usingResources) {
@@ -147,7 +154,7 @@ public class EventLoader {
 				filters.add(new DeclinedAttendeeFilter(this.withoutDeclinedAttendee));
 			}
 			return new EventLoader(conn, domainName, cal, ids, updatedAfter,
-					updatedOrOccuringAfter, occurringBetween, usingResources, withExceptions,
+					updatedOrOccuringAfter, occurringBetween, usingResources, withExceptions, withoutMovedExceptions,
 					withAlertsFor, filters);
 		}
 	}
@@ -205,12 +212,13 @@ public class EventLoader {
 	private SyncRange occurringBetween;
 	private Set<Integer> usingResources;
 	private boolean withExceptions;
+	private boolean withoutMovedExceptions;
 	private EventObmId withAlertsFor;
 	private List<EventFilter> eventFilters;
 
 	private EventLoader(Connection conn, String domainName, Calendar cal, Set<EventObmId> ids,
 			Date updatedAfter, Date updatedOrOccuringAfter, SyncRange occurringBetween,
-			Set<Integer> usingResources, boolean withExceptions, EventObmId withAlertsFor,
+			Set<Integer> usingResources, boolean withExceptions, boolean withoutMovedExceptions, EventObmId withAlertsFor,
 			List<EventFilter> eventFilters) {
 		this.conn = conn;
 		this.domainName = domainName;
@@ -221,6 +229,7 @@ public class EventLoader {
 		this.occurringBetween = occurringBetween;
 		this.usingResources = usingResources;
 		this.withExceptions = withExceptions;
+		this.withoutMovedExceptions = withoutMovedExceptions;
 		this.withAlertsFor = withAlertsFor;
 		this.eventFilters = eventFilters;
 	}
@@ -239,11 +248,40 @@ public class EventLoader {
 			rs = stat.executeQuery();
 			Map<EventObmId, Event> eventsById = buildEvents(rs);
 			loadObjectGraph(eventsById);
+			addPostBuildFilters(eventsById);
 			Map<EventObmId, Event> filteredEventsById = filterEvents(eventsById);
 			computeIsInternal(filteredEventsById);
 			return filteredEventsById;
 		} finally {
 			DBUtils.cleanup(stat, rs);
+		}
+	}
+
+	private void addPostBuildFilters(Map<EventObmId, Event> eventsById) throws SQLException {
+		if (withoutMovedExceptions) {
+			Set<Integer> idsToFilter = getExistingEventExceptionChildIds(eventsById);
+			this.eventFilters.add(new EventsByIdFilter(idsToFilter));
+		}
+	}
+
+	private Set<Integer> getExistingEventExceptionChildIds(Map<EventObmId, Event> eventsById) throws SQLException {
+		ResultSet rs = null;
+		PreparedStatement st = null;
+		EventObmIdSQLCollectionHelper eventIds = new EventObmIdSQLCollectionHelper(eventsById.keySet());
+
+		try {
+			st = conn.prepareStatement("SELECT eventexception_child_id FROM EventException WHERE eventexception_child_id IN (" + eventIds.asPlaceHolders() + ")");
+			eventIds.insertValues(st, 1);
+			rs = st.executeQuery();
+			ImmutableSet.Builder<Integer> builder = ImmutableSet.builder();
+			while(rs.next()) {
+				builder.add(rs.getInt("eventexception_child_id"));
+			}
+			return builder.build();
+		} catch (SQLException ex) {
+			throw ex;
+		} finally {
+			DBUtils.cleanup(null, st, rs);
 		}
 	}
 
@@ -320,9 +358,8 @@ public class EventLoader {
 	}
 
 	private String buildQuery(EventObmIdSQLCollectionHelper idsHelper, IntegerSQLCollectionHelper resourcesHelper) {
-		String eventQuery = String.format("SELECT %s " + "FROM Event e "
+		String eventQuery = String.format("SELECT DISTINCT %s " + "FROM Event e "
 				+ "LEFT JOIN EventCategory1 ec1 ON e.event_category1_id=eventcategory1_id "
-				+ "LEFT JOIN EventException ev_ex ON e.event_id = ev_ex.eventexception_child_id "
 				+ "INNER JOIN Domain d ON event_domain_id=d.domain_id "
 				+ "INNER JOIN EventEntity ee ON ee.evententity_event_id=event_id "
 				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
@@ -335,40 +372,11 @@ public class EventLoader {
 		}
 		List<String> parentEventfilters = buildParentEventFilters(idsHelper, resourcesHelper);
 		eventQuery += filtersToWhere(parentEventfilters);
-		
-		String query;
-		if (resourcesHelper == null) {
-			query = eventQuery;
-		}
-		else {
-			List<String> parentEventWithExceptionFilters = buildFiltersFromCriteria(idsHelper, resourcesHelper);
-			String eventWithExceptionUsingResourcesQuery = String.format("SELECT %s "
-				+ "FROM Event e "
-				+ "LEFT JOIN EventCategory1 ec1 ON e.event_category1_id=ec1.eventcategory1_id "
-				+ "INNER JOIN EventException ev_ex ON e.event_id = ev_ex.eventexception_parent_id "
-				+ "INNER JOIN Domain d ON event_domain_id=domain_id "
-				+ "INNER JOIN EventEntity ee ON evententity_event_id=event_id "
-				+ "INNER JOIN UserObm o ON e.event_owner=o.userobm_id "
-				+ "INNER JOIN UserObm c ON e.event_usercreate=c.userobm_id "
-				+ "INNER JOIN EventLink att ON eventexception_child_id=att.eventlink_event_id "
-				+ "INNER JOIN ResourceEntity re ON att.eventlink_entity_id=re.resourceentity_entity_id "
-				+ "%s",
-				EVENT_FIELDS, filtersToWhere(parentEventWithExceptionFilters));
-			query = String.format("SELECT DISTINCT * "
-				+ "FROM ("
-				+ "%s "
-				+ "UNION "
-				+ "%s) resourceQuery ",
-				eventQuery,
-				eventWithExceptionUsingResourcesQuery
-				);
-		}
-		return query;
+		return eventQuery;
 	}
 
 	private List<String> buildParentEventFilters(EventObmIdSQLCollectionHelper idsHelper, IntegerSQLCollectionHelper resourcesHelper) {
 		List<String> filters = buildFiltersFromCriteria(idsHelper, resourcesHelper);
-		filters.add("ev_ex.eventexception_child_id IS NULL");
 		return filters;
 	}
 
@@ -412,9 +420,6 @@ public class EventLoader {
 			throws SQLException {
 		int pos = 1;
 		pos = setSubQueryParameters(stat, pos, idsHelper, resourcesHelper);
-		if (resourcesHelper != null)  {
-			setSubQueryParameters(stat, pos, idsHelper, resourcesHelper);
-		}
 	}
 	
 	private int setSubQueryParameters(PreparedStatement stat, int pos,
