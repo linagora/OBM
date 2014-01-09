@@ -33,17 +33,15 @@ package org.obm.push.java.mail;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 
 import com.sun.mail.iap.ProtocolException;
 import com.sun.mail.iap.Response;
 
 
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.java.mail.UIDCopyMessage;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UIDCopyMessageTest {
 
 	@Test

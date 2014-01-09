@@ -32,15 +32,13 @@ package org.obm.provisioning.beans;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.provisioning.beans.Operation.Id;
 
 import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.ToolBox;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BatchTest {
 
 	@Test(expected = IllegalStateException.class)

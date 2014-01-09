@@ -45,10 +45,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class JDBCUtilsTest {
 
 	@Test

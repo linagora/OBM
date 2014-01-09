@@ -18,8 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.exception.ObmUserNotFoundException;
 
@@ -28,7 +26,7 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 
-@RunWith(SlowFilterRunner.class)
+
 public class FreeBusyServletTest {
 
 	private IMocksControl mocksControl;

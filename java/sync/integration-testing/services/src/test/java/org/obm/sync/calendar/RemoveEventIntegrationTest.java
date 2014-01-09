@@ -56,9 +56,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
+import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
 import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
@@ -74,8 +73,7 @@ import org.obm.sync.client.login.LoginClient;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
-@Slow
-@RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
+@RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientWithJMSModule.class)
 public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 

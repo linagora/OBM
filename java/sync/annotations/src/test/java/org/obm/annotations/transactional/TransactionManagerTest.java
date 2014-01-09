@@ -45,14 +45,11 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.transaction.TransactionManagerRule;
 
 import bitronix.tm.BitronixTransactionManager;
 
-@RunWith(SlowFilterRunner.class)
+
 public class TransactionManagerTest {
 
 	@Rule public TransactionManagerRule transactionManagerRule = new TransactionManagerRule();
@@ -122,7 +119,7 @@ public class TransactionManagerTest {
 		tm.rollback();
 	}
 
-	@Test @Slow
+	@Test
 	public void testSet2sTimeout() throws Exception {
 		tm.setTransactionTimeout(2);
 		tm.begin();

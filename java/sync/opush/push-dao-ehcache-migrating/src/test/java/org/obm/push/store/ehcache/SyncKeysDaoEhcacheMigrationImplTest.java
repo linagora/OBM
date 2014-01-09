@@ -45,10 +45,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncKeysKey;
@@ -57,7 +54,6 @@ import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class) @Slow
 public class SyncKeysDaoEhcacheMigrationImplTest {
 
 	@Rule

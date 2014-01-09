@@ -40,13 +40,13 @@ import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 @GuiceModule(TableDescriptionTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class TableDescriptionTest {
 	public static class Env extends AbstractModule {
 

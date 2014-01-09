@@ -39,14 +39,14 @@ import org.apache.directory.api.ldap.model.entry.ModificationOperation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.ldap.client.EmbeddedLdapModule;
 import org.obm.provisioning.ldap.client.bean.LdapGroup.Cn;
 
 import com.google.inject.Inject;
 
 @GuiceModule(EmbeddedLdapModule.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class LdapGroupTest {
 	
 	@Inject LdapGroup.Builder ldapGroupBuilder;

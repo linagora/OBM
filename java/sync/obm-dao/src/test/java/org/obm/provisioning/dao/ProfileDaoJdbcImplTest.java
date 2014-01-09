@@ -11,9 +11,8 @@ import org.obm.dao.utils.DaoTestModule;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseRule;
 import org.obm.dao.utils.H2TestClass;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.ProfileEntry;
@@ -35,8 +34,7 @@ import fr.aliacom.obm.common.profile.Profile.AdminRealm;
 import fr.aliacom.obm.common.profile.Profile.Builder;
 import fr.aliacom.obm.common.user.ObmUser;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(ProfileDaoJdbcImplTest.Env.class)
 public class ProfileDaoJdbcImplTest implements H2TestClass {
 

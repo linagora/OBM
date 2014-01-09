@@ -35,11 +35,9 @@ import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Email;
 
-@RunWith(SlowFilterRunner.class)
+
 public class EmailEqualsTest {
 	
 	@Test

@@ -36,15 +36,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.UserAttendee;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSEventToObmEventConverterImplTest {
 	
 	@Test

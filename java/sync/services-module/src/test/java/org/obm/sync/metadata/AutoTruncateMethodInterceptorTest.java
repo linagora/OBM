@@ -43,7 +43,7 @@ import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.annotations.database.DatabaseField;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.sync.dao.TableDescription;
 
 import com.google.inject.AbstractModule;
@@ -52,7 +52,7 @@ import com.google.inject.matcher.Matchers;
 
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(AutoTruncateMethodInterceptorTest.Env.class)
 public class AutoTruncateMethodInterceptorTest {
 

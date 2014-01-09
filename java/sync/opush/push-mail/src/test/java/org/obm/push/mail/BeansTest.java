@@ -33,8 +33,6 @@ package org.obm.push.mail;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.FetchInstruction;
 import org.obm.push.mail.conversation.EmailViewAttachment;
 import org.obm.push.mail.mime.BodyParam;
@@ -43,7 +41,7 @@ import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

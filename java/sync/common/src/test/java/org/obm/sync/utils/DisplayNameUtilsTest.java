@@ -34,13 +34,11 @@ package org.obm.sync.utils;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.obm.sync.utils.DisplayNameUtils;
 
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class DisplayNameUtilsTest {
 	
 	@Test

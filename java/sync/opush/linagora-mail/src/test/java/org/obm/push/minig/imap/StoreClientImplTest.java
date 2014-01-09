@@ -39,15 +39,13 @@ import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration.MailboxNameCheckPolicy;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.minig.imap.impl.ClientSupport;
 
-@RunWith(SlowFilterRunner.class)
+
 public class StoreClientImplTest {
 
 	private static final int port = 12651;

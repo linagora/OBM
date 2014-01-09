@@ -29,9 +29,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.it;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -50,9 +50,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
 import org.obm.servlet.filter.qos.util.AsyncServletRequestUtils;
 import org.obm.servlet.filter.qos.util.BlockingServletUtils;
@@ -63,9 +62,8 @@ import org.obm.servlet.filter.qos.util.server.QoSFilterTestModule;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-@Slow
 @GuiceModule(TwoPerClientQoSRequestHandlerTest.Configuration.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class TwoPerClientQoSRequestHandlerTest {
 	
 	public static class Configuration extends NPerClientQosConfiguration {

@@ -52,7 +52,7 @@ import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.sync.auth.ServerFault;
@@ -83,7 +83,7 @@ import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
 
 @GuiceModule(AttendeeServiceJdbcImplTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class AttendeeServiceJdbcImplTest {
 
 	public static class Env extends AbstractModule {

@@ -34,15 +34,13 @@ package org.obm.push.minig.imap.command;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class AbstractListCommandTest {
 
 	@Test

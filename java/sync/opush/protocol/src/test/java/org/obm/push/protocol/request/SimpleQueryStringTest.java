@@ -40,10 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SimpleQueryStringTest {
 
 	@Test

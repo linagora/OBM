@@ -33,13 +33,11 @@ package org.obm.servlet.filter.qos;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.servlet.filter.qos.handlers.RequestInfo;
 import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

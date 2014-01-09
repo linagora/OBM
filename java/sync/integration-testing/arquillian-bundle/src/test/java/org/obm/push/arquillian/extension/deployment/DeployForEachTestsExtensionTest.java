@@ -41,11 +41,9 @@ import org.jboss.arquillian.test.spi.TestClass;
 import org.jboss.arquillian.test.spi.event.suite.After;
 import org.jboss.arquillian.test.spi.event.suite.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.arquillian.extension.deployment.DeployForEachTestsExtension.Handler;
 
-@RunWith(SlowFilterRunner.class)
+
 public class DeployForEachTestsExtensionTest {
 
 	private IMocksControl control;

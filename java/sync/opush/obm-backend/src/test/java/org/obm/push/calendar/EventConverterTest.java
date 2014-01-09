@@ -50,7 +50,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -78,7 +78,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 @GuiceModule(ConversionModule.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class EventConverterTest {
 
 	@Inject EventConverterImpl eventConverter;

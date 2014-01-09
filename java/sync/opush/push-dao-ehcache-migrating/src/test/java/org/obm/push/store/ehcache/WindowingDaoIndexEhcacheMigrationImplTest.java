@@ -42,9 +42,6 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
@@ -53,7 +50,6 @@ import org.obm.push.mail.bean.WindowingIndexKey;
 import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl.WindowingIndex;
 import org.slf4j.Logger;
 
-@RunWith(SlowFilterRunner.class) @Slow
 public class WindowingDaoIndexEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
 	private MigrationSourceObjectStoreManager objectStoreManagerMigration;

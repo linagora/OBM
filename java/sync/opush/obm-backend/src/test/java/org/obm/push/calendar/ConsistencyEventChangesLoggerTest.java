@@ -43,8 +43,6 @@ import java.io.InputStream;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.calendar.ConsistencyEventChangesLogger;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.CalendarItemsParser;
@@ -61,7 +59,7 @@ import org.w3c.dom.Document;
 import com.google.common.collect.ImmutableList;
 
 
-@RunWith(SlowFilterRunner.class)
+
 public class ConsistencyEventChangesLoggerTest {
 
 	private Logger logger;

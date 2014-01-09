@@ -57,9 +57,8 @@ import org.junit.runner.RunWith;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.bean.FilterType;
@@ -85,7 +84,7 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 @GuiceModule(MailBackendTestModule.class)
 public class MailBackendGetItemEstimateTest {
 

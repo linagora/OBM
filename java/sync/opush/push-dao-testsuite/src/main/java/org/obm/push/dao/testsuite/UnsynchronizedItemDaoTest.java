@@ -35,8 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
@@ -44,7 +43,7 @@ import org.obm.push.store.UnsynchronizedItemDao;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 public abstract class UnsynchronizedItemDaoTest {
 
 	protected UnsynchronizedItemDao unsynchronizedItemDao;

@@ -42,7 +42,7 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseRule;
 import org.obm.dao.utils.H2TestClass;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -51,7 +51,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(DaoTestModule.class)
 public class UserPatternDaoJdbcImplTest implements H2TestClass {
 

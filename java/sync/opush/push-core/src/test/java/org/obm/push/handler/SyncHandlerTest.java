@@ -39,8 +39,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.ContentsImporter;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
@@ -56,7 +54,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.SyncCommand;
 import org.obm.push.bean.change.client.SyncClientCommands;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SyncHandlerTest {
 
 	private User user;

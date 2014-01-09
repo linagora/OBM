@@ -44,12 +44,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.OpushLocatorException;
@@ -68,9 +67,8 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
-@Slow
 @GuiceModule(org.obm.push.minig.imap.MailEnvModule.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class UIDFetchFlagsTest {
 
 	@Inject LinagoraImapClientProvider clientProvider;

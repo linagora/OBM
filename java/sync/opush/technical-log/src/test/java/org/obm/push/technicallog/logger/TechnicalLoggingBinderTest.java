@@ -43,8 +43,6 @@ import java.util.Properties;
 import org.aopalliance.intercept.MethodInvocation;
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Credentials;
@@ -59,7 +57,7 @@ import org.obm.push.technicallog.bean.jaxb.Request;
 import org.obm.push.technicallog.bean.jaxb.Resource;
 import org.obm.push.technicallog.bean.jaxb.Transaction;
 
-@RunWith(SlowFilterRunner.class)
+
 public class TechnicalLoggingBinderTest {
 	
 	@Test

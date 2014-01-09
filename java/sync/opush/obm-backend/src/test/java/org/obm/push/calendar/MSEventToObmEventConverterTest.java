@@ -43,8 +43,6 @@ import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarBusyStatus;
 import org.obm.push.bean.CalendarMeetingStatus;
@@ -76,7 +74,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSEventToObmEventConverterTest {
 
 	private MSEventToObmEventConverterImpl converter;

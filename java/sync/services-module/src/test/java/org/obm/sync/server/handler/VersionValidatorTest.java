@@ -35,9 +35,7 @@ package org.obm.sync.server.handler;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ClientInformations;
 import org.obm.sync.auth.ClientInformations.Parser;
@@ -45,7 +43,7 @@ import org.obm.sync.auth.LightningVersion;
 import org.obm.sync.auth.OBMConnectorVersionException;
 import org.obm.sync.auth.Version;
 
-@RunWith(SlowFilterRunner.class)
+
 public class VersionValidatorTest {
 	
 	private Parser createMockParser(Version connectorVersion, LightningVersion lightningVersion) {

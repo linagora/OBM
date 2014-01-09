@@ -42,14 +42,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.servlet.filter.qos.QoSAction;
 import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.RequestDoneFunction;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.StartRequestFunction;
 
-@RunWith(SlowFilterRunner.class)
+
 public class NPerClientQoSRequestSuspendHandlerTest {
 	
 	private IMocksControl control;

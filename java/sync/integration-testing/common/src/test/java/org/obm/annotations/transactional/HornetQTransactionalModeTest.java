@@ -46,18 +46,16 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.TestConfigurationModule;
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.sync.LifecycleListener;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.linagora.obm.sync.Producer;
 
-@Slow
 @GuiceModule(HornetQTransactionalModeTest.Module.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class HornetQTransactionalModeTest {
 
 	public static class Module extends AbstractModule {

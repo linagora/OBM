@@ -31,15 +31,13 @@ package org.obm.provisioning.beans;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BeansTest {
 
     private EqualsVerifierUtils equalsVerifierUtilsTest;

@@ -32,11 +32,9 @@ package org.obm.utils;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.dao.EntityId;
 
-@RunWith(SlowFilterRunner.class)
+
 public class LinkedEntityTest {
 
 	@Test

@@ -50,7 +50,7 @@ import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
@@ -69,7 +69,7 @@ import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserServiceImpl;
 
 @GuiceModule(HelperServiceImplTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class HelperServiceImplTest {
 
 	public static class Env extends AbstractModule {

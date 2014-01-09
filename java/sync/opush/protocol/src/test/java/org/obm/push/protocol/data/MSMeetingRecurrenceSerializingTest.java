@@ -39,9 +39,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
@@ -55,7 +53,7 @@ import org.w3c.dom.Node;
 
 import com.google.common.collect.Lists;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSMeetingRecurrenceSerializingTest {
 
 	private SerializingTest serializingTest;

@@ -44,9 +44,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.env.DefaultOpushModule;
 import org.obm.sync.push.client.OPClient;
@@ -56,7 +55,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 @GuiceModule(DefaultOpushModule.class)
 public class OptionsHandlerTest {
 

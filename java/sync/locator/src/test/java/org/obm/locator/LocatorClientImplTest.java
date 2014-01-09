@@ -46,14 +46,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.LocatorConfiguration;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(LocatorClientImplTest.Module.class)
 public class LocatorClientImplTest {
 

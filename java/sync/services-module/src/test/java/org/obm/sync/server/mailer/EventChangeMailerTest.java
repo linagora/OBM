@@ -64,8 +64,6 @@ import org.easymock.Capture;
 import org.jsoup.Jsoup;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
@@ -99,7 +97,7 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
-@RunWith(SlowFilterRunner.class)
+
 public abstract class EventChangeMailerTest {
 
 	protected static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");

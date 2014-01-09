@@ -53,9 +53,8 @@ import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.domain.dao.UserPatternDaoJdbcImpl;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.Group.Builder;
 import org.obm.provisioning.Group.Id;
@@ -76,8 +75,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(GroupDaoJdbcImplTest.Env.class)
 public class GroupDaoJdbcImplTest implements H2TestClass {
 

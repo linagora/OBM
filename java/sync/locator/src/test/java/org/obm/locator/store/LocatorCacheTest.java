@@ -35,17 +35,14 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.LocatorConfiguration;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 import org.slf4j.Logger;
 
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
-@RunWith(SlowFilterRunner.class)
+
 public class LocatorCacheTest {
 
 	private String loginAtDomain;
@@ -93,8 +90,7 @@ public class LocatorCacheTest {
 		Assert.assertTrue(false);
 	}
 	
-	@Test(expected=UncheckedExecutionException.class) @Slow
-	public void testExceptionIsTriggeredWhenLoadingValueInCache() throws LocatorClientException, InterruptedException {
+	@Test(expected=UncheckedExecutionException.class)	public void testExceptionIsTriggeredWhenLoadingValueInCache() throws LocatorClientException, InterruptedException {
 		String obmSyncService = "obm-sync";
 
 		LocatorConfiguration configurationService = mockLocatorCacheWithExpiration(3, TimeUnit.SECONDS);
@@ -157,14 +153,14 @@ public class LocatorCacheTest {
 		Assert.assertEquals(returnOpushValue, opushValue);
 	}
 	
-	@Test @Slow
+	@Test
 	public void testCacheExpireWithRegularKeys() throws LocatorClientException, InterruptedException {
 		String obmSyncService = "obm-sync";
 		
 		assertCacheExpireWithServiceKey(obmSyncService); 
 	}
 
-	@Test @Slow
+	@Test
 	public void testCacheExpireWithNullLoginAtDomainKey() throws LocatorClientException, InterruptedException {
 		loginAtDomain = null;
 		String serviceKey = "obm-sync";
@@ -172,14 +168,14 @@ public class LocatorCacheTest {
 		assertCacheExpireWithServiceKey(serviceKey); 
 	}
 	
-	@Test @Slow
+	@Test
 	public void testCacheExpireWithNullServiceKey() throws LocatorClientException, InterruptedException {
 		String nullServiceKey = null;
 		
 		assertCacheExpireWithServiceKey(nullServiceKey); 
 	}
 	
-	@Test @Slow
+	@Test
 	public void testCacheExpireWithNullKeys() throws LocatorClientException, InterruptedException {
 		loginAtDomain = null;
 		String nullServiceKey = null;

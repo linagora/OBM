@@ -41,14 +41,12 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.filter.SlowFilterRunner;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
 
-@RunWith(SlowFilterRunner.class)
+
 public class GuiceServletContextListenerTest {
 
 	private IMocksControl mocksControl;

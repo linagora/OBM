@@ -33,12 +33,10 @@ package org.obm.sync.calendar;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class RecurrenceDaysParserTest {
 	@Test
 	public void testParse() {

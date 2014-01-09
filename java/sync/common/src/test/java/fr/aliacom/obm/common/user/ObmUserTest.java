@@ -34,8 +34,6 @@ package fr.aliacom.obm.common.user;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.provisioning.ProfileName;
 
 import com.google.common.collect.ImmutableSet;
@@ -45,7 +43,7 @@ import com.google.common.collect.Sets;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ObmUserTest {
 	
 	private static final UserExtId userExtId = UserExtId.builder().extId("extId").build();

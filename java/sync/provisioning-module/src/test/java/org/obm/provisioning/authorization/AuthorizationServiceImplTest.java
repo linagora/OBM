@@ -41,9 +41,8 @@ import org.easymock.IMocksControl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.domain.dao.DomainDao;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.PermissionDao;
 import org.obm.provisioning.dao.ProfileDao;
@@ -58,8 +57,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(AuthorizationServiceImplTest.Env.class)
 public class AuthorizationServiceImplTest {
 	

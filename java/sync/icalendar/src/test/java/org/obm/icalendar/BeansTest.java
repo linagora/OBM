@@ -33,15 +33,13 @@ package org.obm.icalendar;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
 
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

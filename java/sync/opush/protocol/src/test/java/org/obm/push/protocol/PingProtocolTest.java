@@ -37,8 +37,6 @@ import javax.xml.transform.TransformerException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.PingStatus;
 import org.obm.push.bean.SyncCollectionRequest;
@@ -51,7 +49,7 @@ import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableSet;
 
-@RunWith(SlowFilterRunner.class)
+
 public class PingProtocolTest {
 	
 	private PingProtocol pingProtocol;

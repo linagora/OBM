@@ -32,14 +32,15 @@
 package org.obm.provisioning.ldap.client.bean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class LdapEntryTest {
 
 	@Test

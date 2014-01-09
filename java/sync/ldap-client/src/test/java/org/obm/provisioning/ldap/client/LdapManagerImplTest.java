@@ -39,7 +39,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.bean.LdapUser.Uid;
@@ -52,7 +52,7 @@ import com.google.inject.Provider;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class LdapManagerImplTest {
 
 	IMocksControl control;

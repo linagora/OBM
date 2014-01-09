@@ -53,8 +53,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.Slow;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.ICollectionPathHelper;
@@ -75,7 +74,7 @@ import org.obm.push.service.OpushLocatorService;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 public abstract class MailboxMemoryAPITest {
 	
 	@Inject MailboxService mailboxService;

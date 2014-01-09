@@ -46,7 +46,6 @@ import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
@@ -54,13 +53,12 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
-import org.obm.filter.SlowFilterRunner;
 import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableSet;
 
-@RunWith(SlowFilterRunner.class)
+
 public class DatabaseConnectionProviderImplTest {
 	
 

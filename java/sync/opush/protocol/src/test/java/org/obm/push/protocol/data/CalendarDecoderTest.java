@@ -47,8 +47,6 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.chrono.GregorianChronology;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.IApplicationData;
@@ -60,7 +58,7 @@ import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.type.UnsignedShort;
 import org.w3c.dom.Document;
 
-@RunWith(SlowFilterRunner.class)
+
 public class CalendarDecoderTest {
 	
 	private CalendarDecoder decoder;

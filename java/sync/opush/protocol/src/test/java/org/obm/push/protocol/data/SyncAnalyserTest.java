@@ -41,8 +41,6 @@ import java.util.Properties;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.ICollectionPathHelper;
@@ -69,7 +67,7 @@ import org.w3c.dom.Document;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SyncAnalyserTest {
 	
 	private Device device;

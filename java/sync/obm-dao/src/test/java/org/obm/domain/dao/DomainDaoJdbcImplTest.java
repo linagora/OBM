@@ -39,7 +39,7 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseRule;
 import org.obm.dao.utils.H2TestClass;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.host.ObmHost;
@@ -53,7 +53,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomain.Builder;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(DomainDaoJdbcImplTest.Env.class)
 public class DomainDaoJdbcImplTest implements H2TestClass {
 

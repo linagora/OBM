@@ -45,16 +45,14 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.provisioning.ProvisioningArchiveUtils;
-import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
+import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
 
 import com.jayway.restassured.RestAssured;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-@Slow
-@RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
+@RunWith(ManagedTomcatGuiceArquillianRunner.class)
 public class ProfileErrorsIntegrationTest {
 	
 	@Test

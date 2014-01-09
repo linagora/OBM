@@ -34,13 +34,11 @@ package org.obm.provisioning.bean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.UserExtId;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UserIdentifierTest {
 
 	private static final ObmDomainUuid domainUuid = ObmDomainUuid.of("ecdea37f-038e-46d3-9e43-82ec5f6e9bfd");

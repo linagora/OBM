@@ -8,7 +8,7 @@ import org.apache.directory.api.ldap.model.entry.ModificationOperation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.ldap.client.EmbeddedLdapModule;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
@@ -20,7 +20,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
 @GuiceModule(EmbeddedLdapModule.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class LdapUserTest {
 
 	@Inject LdapUser.Builder ldapUserBuilder;

@@ -53,7 +53,7 @@ import org.obm.dao.utils.H2TestClass;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +62,7 @@ import com.google.inject.Inject;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(DatabaseConnectionProviderIntegrationTest.Env.class)
 public class DatabaseConnectionProviderIntegrationTest implements H2TestClass {
 

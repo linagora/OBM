@@ -33,12 +33,10 @@ package org.obm.push;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UserTest {
 
 	@Test

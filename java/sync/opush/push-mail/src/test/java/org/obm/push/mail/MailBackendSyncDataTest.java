@@ -46,8 +46,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -69,7 +67,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MailBackendSyncDataTest {
 
 	private UserDataRequest udr;

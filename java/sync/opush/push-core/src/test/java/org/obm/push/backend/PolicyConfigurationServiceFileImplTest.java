@@ -35,12 +35,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.joda.time.Duration;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.utils.IniFile.Factory;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.Policy;
 
-@RunWith(SlowFilterRunner.class)
+
 public class PolicyConfigurationServiceFileImplTest {
 
 	@Test

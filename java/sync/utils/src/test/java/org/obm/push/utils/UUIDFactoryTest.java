@@ -38,14 +38,11 @@ import java.util.UUID;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.UUIDFactory;
 
 import com.google.common.collect.Lists;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UUIDFactoryTest {
 	
 	@Test
@@ -59,7 +56,7 @@ public class UUIDFactoryTest {
 	}
 	
 	@Ignore("too slow : https://github.com/alexruiz/fest-assert-2.x/issues/122")
-	@Test @Slow
+	@Test
 	public void testNotSameUUIDForMillionsGeneration() {
 		int generationCount = 1000000;
 

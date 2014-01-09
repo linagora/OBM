@@ -36,14 +36,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Set;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Acl.Rights;
 
 import com.google.common.collect.Sets;
 
 
-@RunWith(SlowFilterRunner.class)
+
 public class AclTest {
 
 	@Test

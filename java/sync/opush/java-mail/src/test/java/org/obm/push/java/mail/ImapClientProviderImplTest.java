@@ -39,9 +39,7 @@ import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -49,7 +47,7 @@ import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ImapClientProviderImplTest {
 	
 	private User user;

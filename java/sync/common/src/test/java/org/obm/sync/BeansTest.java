@@ -35,8 +35,6 @@ import nl.jqno.equalsverifier.Warning;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.auth.Login;
@@ -77,7 +75,7 @@ import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

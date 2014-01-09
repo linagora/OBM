@@ -51,7 +51,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
 import org.obm.push.service.OpushLocatorService;
 
@@ -62,7 +62,7 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
 @GuiceModule(JavaxMailTest.EnvModule.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class JavaxMailTest {
 
 	public static class EnvModule extends AbstractModule {

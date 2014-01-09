@@ -41,8 +41,6 @@ import java.util.Properties;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -53,7 +51,7 @@ import org.obm.push.bean.UserDataRequest;
 
 import com.google.common.collect.Maps;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ObmBackendResourcesServiceTest {
 
 	private User user;

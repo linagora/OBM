@@ -40,9 +40,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
-@RunWith(SlowFilterRunner.class)
+
 public class DateUtilsTest {
 
 	@Test

@@ -41,7 +41,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.sync.book.BookType;
 import org.obm.sync.server.Request;
 
@@ -51,7 +51,7 @@ import fr.aliacom.obm.common.contact.AddressBookBindingImpl;
 import fr.aliacom.obm.common.session.SessionManagement;
 
 @GuiceModule(AddressBookHandlerTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class AddressBookHandlerTest {
 
 	@Inject

@@ -50,9 +50,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.ImapConnectionCounter;
 import org.obm.opush.IntegrationTestUtils;
@@ -77,7 +76,7 @@ import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 @GuiceModule(MailBackendTestModule.class)
 public class ItemOperationHandlerTest {
 

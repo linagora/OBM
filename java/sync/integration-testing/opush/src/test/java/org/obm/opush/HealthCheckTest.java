@@ -47,16 +47,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.env.DefaultOpushModule;
 
 import com.google.inject.Inject;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(DefaultOpushModule.class)
 public class HealthCheckTest {
 	

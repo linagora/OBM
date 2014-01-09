@@ -38,8 +38,7 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -57,7 +56,7 @@ import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Range;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 public abstract class WindowingDaoTest {
 
 	protected WindowingDao windowingDao;

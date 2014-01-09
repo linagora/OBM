@@ -37,9 +37,10 @@ import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.after;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.compareCollections;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.createRequiredAttendee;
-import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.createRequiredResource;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.createRequiredAttendees;
+import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.createRequiredResource;
 import static fr.aliacom.obm.common.calendar.EventNotificationServiceTestTools.longAfter;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
@@ -47,7 +48,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,12 +58,10 @@ import java.util.TimeZone;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.obm.filter.SlowFilterRule;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
@@ -94,9 +92,6 @@ import fr.aliacom.obm.utils.HelperService;
 	EventNotificationServiceImplTest.UpdateParticipationTests.class,
 	EventNotificationServiceImplTest.ComputeAttendeesDiffsTests.class})
 public class EventNotificationServiceImplTest {
-	
-	@Rule
-	public SlowFilterRule slowFilterRule = new SlowFilterRule();
 	
 	private static final String ICS_DATA_ADD = "ics data add attendee";
 	private static final String ICS_DATA_REMOVE = "ics data remove attendee";

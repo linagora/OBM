@@ -56,11 +56,8 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
@@ -70,7 +67,6 @@ import bitronix.tm.BitronixTransactionManager;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class) @Slow
 public class EhCacheSettingsTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();

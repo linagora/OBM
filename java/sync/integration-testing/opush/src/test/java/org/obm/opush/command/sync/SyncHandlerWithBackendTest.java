@@ -72,9 +72,8 @@ import org.obm.Configuration;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.ImapConnectionCounter;
 import org.obm.opush.IntegrationTestUtils;
@@ -145,7 +144,7 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
 @GuiceModule(SyncHandlerWithBackendTestModule.class)
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 public class SyncHandlerWithBackendTest {
 
 	private final static int ONE_WINDOWS_SIZE = 1;

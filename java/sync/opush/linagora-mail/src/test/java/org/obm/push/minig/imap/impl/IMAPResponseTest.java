@@ -36,12 +36,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.ByteArrayInputStream;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
 import com.google.common.base.Charsets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class IMAPResponseTest {
 
 	@Test

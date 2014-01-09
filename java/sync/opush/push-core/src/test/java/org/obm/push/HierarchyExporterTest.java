@@ -41,8 +41,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.FolderBackend;
 import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.backend.PIMBackend;
@@ -68,7 +66,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class HierarchyExporterTest {
 
 	private User user;

@@ -41,8 +41,6 @@ import java.util.Properties;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
@@ -63,7 +61,7 @@ import org.obm.push.store.HeartbeatDao;
 import org.obm.push.store.MonitoredCollectionDao;
 import org.obm.push.utils.DateUtils;
 
-@RunWith(SlowFilterRunner.class)
+
 public class PingAnalyserTest {
 	
 	private Device device;

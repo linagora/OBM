@@ -41,8 +41,6 @@ import javax.xml.parsers.FactoryConfigurationError;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.StoreName;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.XMLValidationException;
@@ -52,7 +50,7 @@ import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SearchProtocolTest {
 
 	private SearchProtocol searchProtocol;

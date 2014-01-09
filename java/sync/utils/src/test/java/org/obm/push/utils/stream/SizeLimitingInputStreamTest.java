@@ -36,12 +36,10 @@ import java.io.IOException;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
 import com.google.common.io.ByteStreams;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SizeLimitingInputStreamTest {
 
 	@Test

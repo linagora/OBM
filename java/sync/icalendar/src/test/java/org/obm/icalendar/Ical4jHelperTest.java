@@ -101,10 +101,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.UserEmailParserUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
@@ -146,7 +143,7 @@ import com.google.common.io.CharStreams;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-@RunWith(SlowFilterRunner.class)
+
 public class Ical4jHelperTest {
 
 	private static class StringLengthLessThan extends TypeSafeMatcher<String> {
@@ -411,7 +408,7 @@ public class Ical4jHelperTest {
 		assertFalse(event1.isAllday());
 	}
 
-	@Test @Slow
+	@Test
 	public void testGetDuration() {
 
 		Calendar cal = getCalendarPrecisionOfSecond();
@@ -551,7 +548,7 @@ public class Ical4jHelperTest {
 		);
 	}
 
-	@Test @Slow
+	@Test
 	public void testGetRecurence() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("getRecurence.ics");
 		CalendarBuilder builder = new CalendarBuilder();
@@ -571,7 +568,7 @@ public class Ical4jHelperTest {
 	}
 
 	
-	@Test @Slow
+	@Test
 	public void testGetAttendees() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("attendee.ics");
 		CalendarBuilder builder = new CalendarBuilder();
@@ -624,7 +621,7 @@ public class Ical4jHelperTest {
 		assertTrue(organizer.isOrganizer());
 	}
 	
-	@Test @Slow
+	@Test
 	public void testIsInternal() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("eventInternal.ics");
 		CalendarBuilder builder = new CalendarBuilder();
@@ -637,7 +634,7 @@ public class Ical4jHelperTest {
 
 	}
 
-	@Test @Slow
+	@Test
 	public void testCreated() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("eventComplet.ics");
 		CalendarBuilder builder = new CalendarBuilder();
@@ -649,7 +646,7 @@ public class Ical4jHelperTest {
 		assertEquals(1244470973000L, event.getTimeCreate().getTime());
 	}
 
-	@Test @Slow
+	@Test
 	public void testLastModified() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("eventComplet.ics");
 		CalendarBuilder builder = new CalendarBuilder();
@@ -662,7 +659,7 @@ public class Ical4jHelperTest {
 
 	}
 
-	@Test @Slow
+	@Test
 	public void testLastModifiedNull() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("eventNewComplet.ics");
 		CalendarBuilder builder = new CalendarBuilder();
@@ -675,7 +672,7 @@ public class Ical4jHelperTest {
 
 	}
 
-	@Test @Slow
+	@Test
 	public void testIsExternalObm() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("eventExternalObm.ics");
 		CalendarBuilder builder = new CalendarBuilder();
@@ -688,7 +685,7 @@ public class Ical4jHelperTest {
 
 	}
 
-	@Test @Slow
+	@Test
 	public void testIsExternal() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("eventExternal.ics");
 		CalendarBuilder builder = new CalendarBuilder();
@@ -1048,7 +1045,7 @@ public class Ical4jHelperTest {
 		assertThat(er.getExceptions()).hasSize(2);
 	}
 
-	@Test @Slow
+	@Test
 	public void testParserAttendee() throws IOException, ParserException {
 		String ics = getICSAsString("bugGn.ics");
 		List<Event> event = ical4jHelper.parseICS(ics, getDefaultObmUser(), 0);
@@ -1068,7 +1065,7 @@ public class Ical4jHelperTest {
 		return CharStreams.toString(new InputStreamReader(getStreamICS(filename)));
 	}
 	
-	@Test @Slow
+	@Test
 	public void testParsingICSFileOf200kio() throws IOException, ParserException {
 		final String ics = getICSAsString("bellemin-calendrierobm.ics");
 		
@@ -1079,7 +1076,7 @@ public class Ical4jHelperTest {
 		assertEquals(221, events.size());
 	}
 	
-	@Test @Slow
+	@Test
 	public void testParsingICSFiles() throws IOException, ParserException {
 		final String[] icsFiles = {"cdespino.ics", "dkaplan.ics"};
 		
@@ -1465,7 +1462,7 @@ public class Ical4jHelperTest {
 		assertThat(icsRequest).contains(UNTIL);
 	}
 
-	@Test @Slow
+	@Test
 	public void executeParsingTestLotusNotesICS() throws IOException, ParserException {
 		String icsFilename = "OBMFULL-2891.ics";
 		List<Event> events = testIcsParsing(icsFilename);
@@ -1476,7 +1473,7 @@ public class Ical4jHelperTest {
 		return ical4jHelper.parseICS(getICSAsString(icsFilename), getDefaultObmUser(), 0);
 	}
 	
-	@Test @Slow
+	@Test
 	public void executeJIRA2940() throws IOException, ParserException {
 		String icsFilename = "OBMFULL-2940.ics";
 		List<Event> events = testIcsParsing(icsFilename);

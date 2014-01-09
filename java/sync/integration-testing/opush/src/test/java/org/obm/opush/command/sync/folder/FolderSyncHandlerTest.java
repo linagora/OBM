@@ -53,9 +53,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
 import org.obm.opush.SingleUserFixture.OpushUser;
@@ -77,7 +76,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 @GuiceModule(FolderSyncHandlerTestModule.class)
 public class FolderSyncHandlerTest {
 

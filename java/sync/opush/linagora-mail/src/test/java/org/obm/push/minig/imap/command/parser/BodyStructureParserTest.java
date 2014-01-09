@@ -39,16 +39,13 @@ import static org.obm.push.mail.imap.MimeMessageTestUtils.checkMimeTree;
 import java.util.HashMap;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.mail.mime.MimePart;
 
 import com.google.common.collect.ImmutableMap;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BodyStructureParserTest {
 
 	private MimeMessageImpl parseStringAsBodyStructure(String bs) {
@@ -131,7 +128,7 @@ public class BodyStructureParserTest {
 				result);
 	}
 	
-	@Test @Slow
+	@Test
 	public void testBugzilla1502Adrien() {
 		String bs = "(" +
 				"(\"TEXT\" \"HTML\" (\"CHARSET\" \"UTF-8\") NIL NIL \"QUOTED-PRINTABLE\" 489 6 NIL NIL NIL NIL)" +
@@ -156,7 +153,7 @@ public class BodyStructureParserTest {
 				result);
 	}
 	
-	@Test @Slow
+	@Test
 	public void testBs02() {
 		String bs = 
 			"((\"TEXT\" \"PLAIN\" (\"CHARSET\" \"ISO-8859-1\" \"FORMAT\" \"flowed\") NIL NIL \"7BIT\" 235 5 NIL NIL NIL)" +
@@ -188,7 +185,7 @@ public class BodyStructureParserTest {
 				result);
 	}
 	
-	@Test @Slow
+	@Test
 	public void testBs03() {
 		String bs = 
 			"(" +
@@ -281,7 +278,7 @@ public class BodyStructureParserTest {
 				result);
 	}
 	
-	@Test @Slow
+	@Test
 	public void testrfc2231ParamEncoding() {
 		String bs = 
 			"((\"TEXT\" \"HTML\" (\"CHARSET\" \"UTF-8\") NIL NIL \"7BIT\" 148 0 NIL NIL NIL NIL)" +
@@ -341,7 +338,7 @@ public class BodyStructureParserTest {
 			  
 	}
 	
-	@Test @Slow
+	@Test
 	public void testM1() {
 		String bs = "(" +
 				"(\"TEXT\" \"PLAIN\" " +
@@ -377,7 +374,7 @@ public class BodyStructureParserTest {
 				
 	}
 	
-	@Test @Slow
+	@Test
 	public void bugJaures() {
 		String bs = "(" +
 				"(\"TEXT\" \"PLAIN\" (\"CHARSET\" \"us-ascii\") NIL \"Notification\" \"7BIT\" 503 14 NIL NIL NIL NIL)" +
@@ -412,7 +409,7 @@ public class BodyStructureParserTest {
 				result);
 	}
 
-	@Test @Slow
+	@Test
 	public void testBugToulouse1() {
 		String bs = 
 			"(" +
@@ -476,7 +473,7 @@ public class BodyStructureParserTest {
 				
 	}
 	
-	@Test @Slow
+	@Test
 	public void testTorture() {
 		String bs = 
 			"(" +

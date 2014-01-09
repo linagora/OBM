@@ -58,8 +58,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
-import org.obm.arquillian.SlowGuiceArquillianRunner;
-import org.obm.filter.Slow;
+import org.obm.arquillian.GuiceArquillianRunner;
 import org.obm.guice.GuiceModule;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture;
@@ -72,8 +71,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Inject;
 
-@Slow
-@RunWith(SlowGuiceArquillianRunner.class)
+@RunWith(GuiceArquillianRunner.class)
 @GuiceModule(ScenarioTestModule.class)
 public class FolderSyncScenarioTest {
 

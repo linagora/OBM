@@ -40,16 +40,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mortbay.util.IO;
 import org.mortbay.util.ajax.JSON;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.healthcheck.AbstractHealthCheckTest;
 import org.obm.healthcheck.HealthCheckTestEnvOneHandler;
 
 import com.google.common.collect.ImmutableMap;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(HealthCheckTestEnvOneHandler.class)
 public class HealthCheckServletOneHandlerTest extends AbstractHealthCheckTest {
 

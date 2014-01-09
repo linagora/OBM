@@ -42,8 +42,6 @@ import java.util.List;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailBodyType;
@@ -63,7 +61,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-@RunWith(SlowFilterRunner.class)
+
 public class EmailChangesFetcherImplTest {
 
 	private int collectionId;

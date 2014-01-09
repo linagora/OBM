@@ -34,13 +34,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collections;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.host.ObmHost;
 
 import com.google.common.collect.ImmutableSet;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SerializationUtilsTest {
 
 	private static final ObmHost HOST_1 = ObmHost

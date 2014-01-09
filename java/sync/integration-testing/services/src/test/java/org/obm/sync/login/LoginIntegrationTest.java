@@ -42,9 +42,8 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
+import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
 import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
@@ -60,8 +59,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-@Slow
-@RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
+@RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
 public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 

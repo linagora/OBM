@@ -33,15 +33,13 @@ package org.obm.push.minig.imap.command;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UIDStoreCommandTest {
 
 	@Test

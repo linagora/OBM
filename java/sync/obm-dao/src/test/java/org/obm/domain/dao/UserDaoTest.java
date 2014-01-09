@@ -50,7 +50,7 @@ import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.ProfileDao;
@@ -71,7 +71,7 @@ import fr.aliacom.obm.common.user.UserExtId;
 
 
 @GuiceModule(UserDaoTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class UserDaoTest {
 
 	public static class Env extends AbstractModule {

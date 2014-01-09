@@ -32,15 +32,13 @@
 package org.obm.sync;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.base.EmailLogin;
 
 import com.google.common.testing.SerializableTester;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SerializableTest {
 
 	@Test

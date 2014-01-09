@@ -46,8 +46,6 @@ import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestInstanceType;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequestIntDBusyStatus;
@@ -65,7 +63,7 @@ import org.w3c.dom.Document;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Iterables;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSMeetingRequestDecoderTest {
 
 	private MSMeetingRequestDecoder decoder;

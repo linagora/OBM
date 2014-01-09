@@ -56,11 +56,8 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,8 +66,7 @@ import org.terracotta.statistics.archive.Timestamped;
 import bitronix.tm.BitronixTransactionManager;
 
 @Ignore("OBMFULL-5663")
-@Slow
-@RunWith(SlowFilterRunner.class)
+
 public class EhCacheSettingsTimeDependentTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();

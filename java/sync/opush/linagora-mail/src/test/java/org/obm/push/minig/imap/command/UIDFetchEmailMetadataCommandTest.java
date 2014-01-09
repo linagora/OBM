@@ -39,8 +39,6 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.EmailMetadata;
@@ -57,7 +55,7 @@ import org.obm.push.minig.imap.impl.IMAPResponse;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UIDFetchEmailMetadataCommandTest {
 
 	private BodyStructureParser bodyStructureParser;

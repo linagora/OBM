@@ -43,7 +43,6 @@ import static org.easymock.EasyMock.expectLastCall;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
@@ -53,11 +52,10 @@ import org.obm.sync.calendar.Participation;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
 
-import org.obm.filter.SlowFilterRunner;
 
 import com.google.common.collect.Iterables;
 
-@RunWith(SlowFilterRunner.class)
+
 public class EventChangeHandlerTest {
 
 

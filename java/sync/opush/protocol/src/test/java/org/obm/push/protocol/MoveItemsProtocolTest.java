@@ -35,14 +35,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.MoveItemsRequest;
 import org.obm.push.protocol.bean.MoveItemsResponse;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MoveItemsProtocolTest {
 	
 	private MoveItemsProtocol moveItemsProtocol;

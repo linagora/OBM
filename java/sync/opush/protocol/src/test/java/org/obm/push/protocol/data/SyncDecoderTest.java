@@ -36,8 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSContact;
@@ -59,7 +57,7 @@ import org.w3c.dom.Element;
 
 import com.google.common.collect.Iterables;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SyncDecoderTest {
 
 	public static final int DEFAULT_WINDOW_SIZE = 100;

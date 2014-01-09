@@ -43,16 +43,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.dao.testsuite.SnapshotDaoTest;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 
-@RunWith(SlowFilterRunner.class) @Slow
 public class SnapshotDaoEhcacheImplTest extends SnapshotDaoTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();

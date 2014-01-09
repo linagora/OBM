@@ -54,9 +54,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.SingleUserFixture.OpushUser;
 import org.obm.push.bean.FilterType;
@@ -100,7 +99,7 @@ import com.icegreen.greenmail.imap.ImapHostManager;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 @GuiceModule(MailBackendImapTimeoutTestModule.class)
 public class MailBackendImapTimeoutTest {
 

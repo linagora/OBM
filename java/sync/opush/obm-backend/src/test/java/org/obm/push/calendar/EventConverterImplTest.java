@@ -35,12 +35,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 
-@RunWith(SlowFilterRunner.class)
+
 public class EventConverterImplTest {
 
 	private EventConverterImpl testee;

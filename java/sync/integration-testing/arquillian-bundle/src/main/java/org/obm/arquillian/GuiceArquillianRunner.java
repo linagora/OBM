@@ -33,30 +33,16 @@ import java.util.List;
 
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.rules.MethodRule;
-import org.junit.rules.TestRule;
 import org.junit.runners.model.InitializationError;
-import org.obm.filter.SlowFilterRunnerDelegation;
 import org.obm.guice.GuiceRunnerDelegation;
 
-public class SlowGuiceArquillianRunner extends Arquillian {
+public class GuiceArquillianRunner extends Arquillian {
 
-	private final SlowFilterRunnerDelegation slowRunnerDelegate;
 	private final GuiceRunnerDelegation guiceRunnerDelegate;
 
-	public SlowGuiceArquillianRunner(Class<?> klass) throws InitializationError {
+	public GuiceArquillianRunner(Class<?> klass) throws InitializationError {
 		super(klass);
-		slowRunnerDelegate = new SlowFilterRunnerDelegation();
 		guiceRunnerDelegate = new GuiceRunnerDelegation();
-	}
-
-	@Override
-	protected List<TestRule> getTestRules(Object target) {
-		return slowRunnerDelegate.getTestRules(super.getTestRules(target));
-	}
-	
-	@Override
-	protected List<TestRule> classRules() {
-		return slowRunnerDelegate.classRules(super.classRules());
 	}
 
 	@Override

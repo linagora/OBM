@@ -41,9 +41,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
@@ -54,8 +53,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 

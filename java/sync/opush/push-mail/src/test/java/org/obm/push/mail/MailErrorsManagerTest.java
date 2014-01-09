@@ -44,8 +44,6 @@ import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.field.address.ParseException;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.User;
@@ -55,7 +53,7 @@ import org.obm.sync.date.DateProvider;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MailErrorsManagerTest {
 
 	private DateProvider dateProvider;

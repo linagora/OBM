@@ -49,9 +49,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.servlet.filter.qos.handlers.BusinessKeyProvider;
 import org.obm.servlet.filter.qos.util.AsyncServletRequestUtils;
 import org.obm.servlet.filter.qos.util.SuspendingServletUtils;
@@ -62,9 +61,8 @@ import org.obm.servlet.filter.qos.util.server.SuspendingServlet;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-@Slow
 @GuiceModule(OnePerClientQoSSuspendRequestAndContinuationHandlerTest.Configuration.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class OnePerClientQoSSuspendRequestAndContinuationHandlerTest {
 	
 	public static class Configuration extends NPerClientQosSuspendConfiguration {

@@ -62,7 +62,7 @@ import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jRecurrenceHelper;
 import org.obm.locator.store.LocatorService;
@@ -97,7 +97,7 @@ import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
 
 @GuiceModule(CalendarDaoJdbcImplTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class CalendarDaoJdbcImplTest {
 
 	private static final ObmUser PATTERN_MATCHING_USER = ObmUser

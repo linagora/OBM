@@ -48,8 +48,6 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.mail.conversation.EmailView;
@@ -57,7 +55,7 @@ import org.obm.push.mail.exception.NotQuotableEmailException;
 
 import com.google.common.collect.ImmutableMap;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ReplyEmailTest {
 
 	private static final String LINEBREAK = "\r\n";

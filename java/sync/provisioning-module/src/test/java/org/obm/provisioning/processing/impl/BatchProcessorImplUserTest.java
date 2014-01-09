@@ -21,7 +21,7 @@ import org.obm.domain.dao.PUserDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
@@ -59,7 +59,7 @@ import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(BatchProcessorImplUserTest.Env.class)
 public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 

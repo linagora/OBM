@@ -37,8 +37,6 @@ import static org.obm.DateUtils.date;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.EmailChanges.Builder;
 import org.obm.push.mail.EmailChanges.Splitter;
 import org.obm.push.mail.bean.Email;
@@ -46,7 +44,7 @@ import org.obm.push.mail.bean.Email;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
-@RunWith(SlowFilterRunner.class)
+
 public class EmailChangesTest {
 
 	@Rule

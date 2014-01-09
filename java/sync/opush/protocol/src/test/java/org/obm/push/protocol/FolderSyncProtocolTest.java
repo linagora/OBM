@@ -35,8 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.FolderSyncStatus;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
@@ -45,7 +43,7 @@ import org.obm.push.protocol.bean.FolderSyncResponse;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
-@RunWith(SlowFilterRunner.class)
+
 public class FolderSyncProtocolTest {
 	
 	private FolderSyncProtocol folderSyncProtocol;

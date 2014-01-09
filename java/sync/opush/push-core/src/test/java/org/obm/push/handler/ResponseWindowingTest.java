@@ -41,9 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.SyncKey;
@@ -58,7 +56,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ResponseWindowingTest {
 
 	@Test(expected=NullPointerException.class)

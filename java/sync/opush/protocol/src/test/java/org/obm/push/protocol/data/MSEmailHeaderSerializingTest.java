@@ -38,9 +38,7 @@ import java.util.Date;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
@@ -52,7 +50,7 @@ import org.w3c.dom.Node;
 
 import com.google.common.base.Charsets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSEmailHeaderSerializingTest {
 
 	private SimpleDateFormat sdf;

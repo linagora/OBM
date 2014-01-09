@@ -44,7 +44,7 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseRule;
 import org.obm.dao.utils.H2TestClass;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
@@ -65,7 +65,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.ObmUser.Builder;
 import fr.aliacom.obm.common.user.UserExtId;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(UserDaoJdbcImplTest.Env.class)
 public class UserDaoJdbcImplTest implements H2TestClass {
 

@@ -42,8 +42,6 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.IntEncoder;
@@ -53,7 +51,7 @@ import org.obm.push.utils.type.UnsignedShort;
 import com.google.common.base.Charsets;
 import com.google.common.primitives.Bytes;
 
-@RunWith(SlowFilterRunner.class)
+
 public class TimeZoneEncoderImplTest {
 
 	private static final int SPEC_TIMEZONE_LENGHT = 172;

@@ -34,14 +34,12 @@ package org.obm.push.utils;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.IntEncoder;
 import org.obm.push.utils.IntEncoder.Capacity;
 
-@RunWith(SlowFilterRunner.class)
+
 public class IntEncoderTest {
 
 	private IntEncoder intEncoder;

@@ -43,9 +43,7 @@ import org.assertj.core.api.Assertions;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.CalendarMeetingStatus;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventBuilder;
@@ -62,7 +60,7 @@ import org.obm.sync.calendar.RecurrenceKind;
 
 import com.google.common.collect.Sets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSEventToObmEventConverterRecurrenceTest {
 
 	private MSEventToObmEventConverterImpl converter;

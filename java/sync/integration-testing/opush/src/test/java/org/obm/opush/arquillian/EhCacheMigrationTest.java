@@ -48,14 +48,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.arquillian.SlowGuiceArquillianRunner;
-import org.obm.filter.Slow;
+import org.obm.arquillian.GuiceArquillianRunner;
 import org.obm.opush.env.arquillian.AuthenticatedArquillianModule;
 import org.obm.opush.env.arquillian.OpushArchiveUtils;
 import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
 
-@Slow
-@RunWith(SlowGuiceArquillianRunner.class)
+@RunWith(GuiceArquillianRunner.class)
 public class EhCacheMigrationTest {
 	
 	private CloseableHttpClient httpClient;

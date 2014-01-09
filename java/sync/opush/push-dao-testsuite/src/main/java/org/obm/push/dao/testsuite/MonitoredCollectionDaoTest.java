@@ -40,8 +40,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
@@ -55,7 +54,7 @@ import org.obm.push.store.MonitoredCollectionDao;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 public abstract class MonitoredCollectionDaoTest {
 
 	@Inject protected MonitoredCollectionDao monitoredCollectionDao;

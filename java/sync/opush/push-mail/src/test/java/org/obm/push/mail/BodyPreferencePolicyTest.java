@@ -35,12 +35,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.mail.mime.MimePart;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BodyPreferencePolicyTest {
 	
 	@Test

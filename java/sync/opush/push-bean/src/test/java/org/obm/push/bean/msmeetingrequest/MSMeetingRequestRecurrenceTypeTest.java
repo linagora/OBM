@@ -34,10 +34,8 @@ package org.obm.push.bean.msmeetingrequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSMeetingRequestRecurrenceTypeTest {
 
 	@Test

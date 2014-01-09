@@ -42,10 +42,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfigurationImpl;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.exception.QuotaExceededException;
 import org.obm.push.protocol.bean.MailRequest;
 import org.obm.push.protocol.request.ActiveSyncRequest;
@@ -53,7 +51,7 @@ import org.obm.push.protocol.request.SendEmailSyncRequest;
 
 import com.google.common.collect.ImmutableMap;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MailProtocolTest {
 	
 	@Test

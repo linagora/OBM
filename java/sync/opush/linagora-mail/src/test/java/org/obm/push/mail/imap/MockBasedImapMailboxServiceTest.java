@@ -39,10 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
@@ -51,7 +48,7 @@ import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 import org.obm.push.minig.imap.StoreClient;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MockBasedImapMailboxServiceTest {
 
 	private UserDataRequest udr;
@@ -108,7 +105,7 @@ public class MockBasedImapMailboxServiceTest {
 		assertThat(parsedMailbox).isEqualTo(EmailConfiguration.IMAP_INBOX_NAME);
 	}
 
-	@Test @Slow
+	@Test
 	public void testParseINBOXWithOtherFolderEndingByINBOX() throws Exception {
 		String folderEndingByINBOX = "userFolder" + EmailConfiguration.IMAP_INBOX_NAME;
 

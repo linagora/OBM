@@ -43,16 +43,14 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.utils.IniFile;
 import org.obm.configuration.utils.IniFile.Factory;
-import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableMap;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ConfigurationTest {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());

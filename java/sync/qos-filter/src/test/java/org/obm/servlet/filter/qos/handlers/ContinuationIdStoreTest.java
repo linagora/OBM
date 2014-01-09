@@ -46,13 +46,11 @@ import org.easymock.IMocksControl;
 import org.eclipse.jetty.continuation.Continuation;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.servlet.filter.qos.QoSContinuationSupport;
 import org.obm.servlet.filter.qos.QoSContinuationSupportJettyUtils;
 import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ContinuationIdStoreTest {
 
 	private ContinuationIdStore store;

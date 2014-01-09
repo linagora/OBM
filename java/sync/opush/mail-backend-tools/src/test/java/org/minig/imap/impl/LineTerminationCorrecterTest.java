@@ -38,10 +38,8 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class LineTerminationCorrecterTest {
 	
 	@Test

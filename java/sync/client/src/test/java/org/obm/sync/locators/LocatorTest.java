@@ -38,12 +38,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.locator.store.LocatorService;
 
-@RunWith(SlowFilterRunner.class)
+
 public class LocatorTest {
 
 	private IMocksControl mocksControl;

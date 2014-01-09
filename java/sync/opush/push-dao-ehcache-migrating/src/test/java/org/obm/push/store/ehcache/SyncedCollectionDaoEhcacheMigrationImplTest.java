@@ -42,9 +42,6 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.Credentials;
@@ -56,7 +53,6 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.store.ehcache.MonitoredCollectionDaoEhcacheImpl.Key;
 import org.slf4j.Logger;
 
-@RunWith(SlowFilterRunner.class) @Slow
 public class SyncedCollectionDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
 	private MigrationSourceObjectStoreManager objectStoreManagerMigration;

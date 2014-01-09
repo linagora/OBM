@@ -51,8 +51,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.Slow;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.ICollectionPathHelper;
@@ -91,7 +90,7 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 public abstract class MailboxFetchAPITest {
 
 	@Inject MailboxService mailboxService;

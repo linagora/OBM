@@ -1,11 +1,9 @@
 package org.obm.sync.calendar;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.assertj.core.api.Assertions;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ResourceInfoTest {
 
 	@Test

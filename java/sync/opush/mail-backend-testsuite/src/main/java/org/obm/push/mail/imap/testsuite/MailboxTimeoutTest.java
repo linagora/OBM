@@ -40,8 +40,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
@@ -54,7 +53,7 @@ import com.google.common.base.Stopwatch;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 public abstract class MailboxTimeoutTest {
 
 	@Inject MailboxService mailboxService;

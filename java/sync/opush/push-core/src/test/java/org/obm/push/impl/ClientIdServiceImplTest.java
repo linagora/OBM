@@ -35,15 +35,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ClientIdServiceImplTest {
 
 	private UserDataRequest udr;

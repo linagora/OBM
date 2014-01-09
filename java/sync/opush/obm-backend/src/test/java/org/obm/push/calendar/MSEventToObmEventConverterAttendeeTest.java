@@ -36,9 +36,7 @@ import java.util.Date;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarMeetingStatus;
@@ -54,7 +52,7 @@ import org.obm.sync.calendar.ParticipationRole;
 
 import com.google.common.collect.Sets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSEventToObmEventConverterAttendeeTest {
 
 	private MSEventToObmEventConverterImpl converter;

@@ -34,15 +34,13 @@ package org.obm.push.minig.imap.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.Snapshot;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MessageSetUtilsTest {
 	
 	@Test(expected=NullPointerException.class)

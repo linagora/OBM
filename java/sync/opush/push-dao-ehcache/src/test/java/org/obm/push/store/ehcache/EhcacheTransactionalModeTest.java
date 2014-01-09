@@ -57,18 +57,16 @@ import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.TestConfigurationModule;
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.exception.EhcacheRollbackException;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
-@Slow
 @GuiceModule(EhcacheTransactionalModeTest.Module.class)
-@RunWith(SlowGuiceRunner.class) 
+@RunWith(GuiceRunner.class) 
 public class EhcacheTransactionalModeTest {
 
 	public static class Module extends AbstractModule {

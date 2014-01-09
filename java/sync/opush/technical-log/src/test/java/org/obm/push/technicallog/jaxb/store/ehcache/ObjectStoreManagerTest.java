@@ -38,12 +38,9 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.technicallog.jaxb.store.ehcache.ObjectStoreManager;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ObjectStoreManagerTest {
 
 	private ObjectStoreManager opushCacheManager;
@@ -65,7 +62,7 @@ public class ObjectStoreManagerTest {
 		assertThat(stores).hasSize(1);
 	}
 	
-	@Test @Slow
+	@Test
 	public void createNewThreeCaches() {
 		opushCacheManager.getStore("test 1");
 		opushCacheManager.getStore("test 2");

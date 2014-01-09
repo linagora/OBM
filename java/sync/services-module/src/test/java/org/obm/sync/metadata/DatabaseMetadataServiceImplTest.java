@@ -41,7 +41,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.sync.dao.TableDescription;
 
 import com.google.common.util.concurrent.UncheckedExecutionException;
@@ -49,7 +49,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 @GuiceModule(DatabaseMetadataServiceImplTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class DatabaseMetadataServiceImplTest {
 
 	public static class Env extends AbstractModule {

@@ -35,11 +35,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.dbcp.DatabaseModule;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ObmSyncArchiveUtilsTest {
 
 	@Test

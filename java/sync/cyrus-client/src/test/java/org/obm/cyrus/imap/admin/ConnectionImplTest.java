@@ -38,10 +38,10 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.minig.imap.StoreClient;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class ConnectionImplTest {
 	private IMocksControl control;
 	private StoreClient storeClient;

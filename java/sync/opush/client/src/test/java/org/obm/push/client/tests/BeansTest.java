@@ -33,8 +33,6 @@ package org.obm.push.client.tests;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.push.client.beans.AccountInfos;
 import org.obm.sync.push.client.beans.Folder;
@@ -42,7 +40,7 @@ import org.obm.sync.push.client.beans.GetItemEstimateSingleFolderResponse;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

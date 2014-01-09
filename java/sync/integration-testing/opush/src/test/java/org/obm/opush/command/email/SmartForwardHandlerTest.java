@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.command.email;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.appendToINBOX;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationTestUtils.loadEmail;
@@ -52,9 +52,8 @@ import org.junit.runner.RunWith;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.opush.ActiveSyncServletModule.OpushServer;
 import org.obm.opush.IntegrationTestUtils;
 import org.obm.opush.MailBackendTestModule;
@@ -77,7 +76,7 @@ import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 @GuiceModule(MailBackendTestModule.class)
 public class SmartForwardHandlerTest {
 

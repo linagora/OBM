@@ -42,8 +42,6 @@ import net.sf.ehcache.Element;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.technicallog.TechnicalLoggerService;
 import org.obm.push.technicallog.bean.ResourceType;
 import org.obm.push.technicallog.bean.jaxb.Request;
@@ -53,7 +51,7 @@ import org.obm.push.technicallog.jaxb.store.ehcache.RequestNotFoundException;
 import org.obm.push.technicallog.jaxb.store.ehcache.RequestStore;
 import org.slf4j.Logger;
 
-@RunWith(SlowFilterRunner.class)
+
 public class TechnicalLoggerServiceTest {
 
 	@Test

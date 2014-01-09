@@ -36,10 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collection;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class LeafPartsFinderTest {
 
 	@Test

@@ -41,8 +41,6 @@ import static org.easymock.EasyMock.verify;
 import org.aopalliance.intercept.MethodInvocation;
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.technicallog.bean.KindToBeLogged;
 import org.obm.push.technicallog.bean.ResourceType;
 import org.obm.push.technicallog.bean.TechnicalLogging;
@@ -54,7 +52,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.matcher.Matchers;
 
-@RunWith(SlowFilterRunner.class)
+
 public class TechnicalLoggingTest {
 	
 	public abstract static class AbstractTestClass {

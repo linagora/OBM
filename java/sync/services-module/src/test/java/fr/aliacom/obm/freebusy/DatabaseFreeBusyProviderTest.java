@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyInterval;
@@ -30,7 +30,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 
 @GuiceModule(DatabaseFreeBusyProviderTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class DatabaseFreeBusyProviderTest {
 
 	public static class Env extends AbstractModule {

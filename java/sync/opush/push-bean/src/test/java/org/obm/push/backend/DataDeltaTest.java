@@ -35,15 +35,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemDeletion;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class DataDeltaTest {
 
 	@Test

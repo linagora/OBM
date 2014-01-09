@@ -55,7 +55,7 @@ import org.junit.runner.RunWith;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.annotations.database.DatabaseField;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.InstantMessagingId;
@@ -73,7 +73,7 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(DatabaseTruncationServiceImplTest.Env.class)
 public class DatabaseTruncationServiceImplTest {
 

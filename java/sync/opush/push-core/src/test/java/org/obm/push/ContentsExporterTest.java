@@ -39,8 +39,6 @@ import static org.obm.DateUtils.date;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.AnalysedSyncCollection;
@@ -55,7 +53,7 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ContentsExporterTest {
 
 	private IMocksControl mocks;

@@ -40,8 +40,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.bean.Device;
@@ -57,7 +55,7 @@ import org.obm.push.store.CollectionDao;
 import com.google.common.collect.Lists;
 import com.google.inject.Provider;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MappingServiceImplTest {
 
 	@Test

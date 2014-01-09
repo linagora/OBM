@@ -44,16 +44,14 @@ import javax.mail.search.SearchTerm;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.obm.push.java.mail.OpushImapFolderImpl;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.utils.DateUtils;
 
 
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class OpushImapFolderImplTest {
 
 	private void assertNotDeletedTerm(SearchTerm searchTerm) {

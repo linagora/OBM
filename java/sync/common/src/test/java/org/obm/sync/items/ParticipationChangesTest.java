@@ -4,14 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.ContactAttendee;
 
 import com.google.common.collect.Sets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ParticipationChangesTest {
 
 	private static final String EXTID = "123";

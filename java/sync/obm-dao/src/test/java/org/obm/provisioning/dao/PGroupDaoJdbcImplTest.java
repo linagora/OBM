@@ -42,16 +42,14 @@ import org.obm.dao.utils.H2TestClass;
 import org.obm.dao.utils.TestUtils;
 import org.obm.domain.dao.PGroupDao;
 import org.obm.domain.dao.PGroupDaoJdbcImpl;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.Group;
 
 import com.google.inject.Inject;
 
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(PGroupDaoJdbcImplTest.Env.class)
 public class PGroupDaoJdbcImplTest implements H2TestClass {
 

@@ -44,16 +44,14 @@ import org.junit.runner.RunWith;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseRule;
 import org.obm.dao.utils.H2TestClass;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.locator.server.LocatorServer;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(TestLocatorModule.class)
 public class StartupTest implements H2TestClass {
 

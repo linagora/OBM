@@ -33,10 +33,8 @@ package org.obm.push.protocol.data;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class WCHAREncoderTest {
 
 	@Test(expected=NullPointerException.class)

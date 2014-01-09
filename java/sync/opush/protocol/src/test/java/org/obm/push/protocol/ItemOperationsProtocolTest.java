@@ -48,8 +48,6 @@ import javax.xml.parsers.FactoryConfigurationError;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -81,7 +79,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Charsets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ItemOperationsProtocolTest {
 
 	private ItemOperationsProtocol itemOperationsProtocol;

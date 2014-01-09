@@ -43,8 +43,6 @@ import org.hamcrest.core.StringContains;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -52,7 +50,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Charsets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class WBXMLToolsTest {
 	
 	private WBXMLTools wbxmlTools;

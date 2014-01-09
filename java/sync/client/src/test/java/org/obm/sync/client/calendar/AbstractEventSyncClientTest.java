@@ -40,8 +40,6 @@ import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -65,7 +63,7 @@ import com.google.common.collect.Multimap;
 
 import fr.aliacom.obm.ToolBox;
 
-@RunWith(SlowFilterRunner.class)
+
 public class AbstractEventSyncClientTest {
 
 	private static String CALENDAR = "calendar";

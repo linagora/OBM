@@ -34,13 +34,11 @@ package org.obm.push.bean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.obm.push.exception.activesync.InvalidServerId;
 
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ServerIdTest {
 
 	@SuppressWarnings("unused")

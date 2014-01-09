@@ -33,13 +33,11 @@ package org.obm.sync.auth;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 
 
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ConnectorVersionParserTest {
 
 	private void testVersion(Version obmConnectorVersion, int major, int minor, Integer release, Integer subRelease, String suffix) {

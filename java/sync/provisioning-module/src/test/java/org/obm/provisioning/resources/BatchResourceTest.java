@@ -39,9 +39,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
@@ -55,8 +54,7 @@ import org.obm.provisioning.processing.BatchTracker;
 import com.google.inject.Inject;
 import com.jayway.restassured.http.ContentType;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 

@@ -34,10 +34,8 @@ package org.obm.push.bean.change;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SyncCommandTest {
 
 	@Test

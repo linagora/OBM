@@ -51,7 +51,7 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.utils.DateUtils;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
@@ -72,7 +72,7 @@ import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(AddressBookBindingImplTest.Env.class)
 public class AddressBookBindingImplTest {
 

@@ -70,7 +70,7 @@ import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
@@ -96,7 +96,7 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
 import fr.aliacom.obm.utils.HelperService;
 
 @GuiceModule(LoginHandlerTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class LoginHandlerTest {
 
 	private final ByteArrayOutputStream resultStream = new ByteArrayOutputStream();

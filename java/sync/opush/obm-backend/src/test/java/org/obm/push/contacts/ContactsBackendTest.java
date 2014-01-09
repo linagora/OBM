@@ -54,9 +54,7 @@ import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
@@ -101,7 +99,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provider;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ContactsBackendTest {
 
 	private static final String COLLECTION_CONTACT_PREFIX = "obm:\\\\test@test\\contacts\\";

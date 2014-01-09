@@ -36,8 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.MeetingResponse;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
@@ -45,7 +43,7 @@ import org.obm.push.protocol.bean.MeetingHandlerResponse;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MeetingProtocolTest {
 	
 	private MeetingProtocol meetingProtocol;

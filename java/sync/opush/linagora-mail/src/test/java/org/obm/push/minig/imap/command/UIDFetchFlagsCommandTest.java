@@ -39,8 +39,6 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
@@ -49,7 +47,7 @@ import org.obm.push.minig.imap.impl.IMAPResponse;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UIDFetchFlagsCommandTest {
 
 	@Before

@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2013 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,22 +29,27 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.filter;
+package org.obm.push.arquillian;
 
 import java.util.List;
 
-import org.junit.rules.TestRule;
+import org.jboss.arquillian.junit.Arquillian;
+import org.junit.rules.MethodRule;
+import org.junit.runners.model.InitializationError;
+import org.obm.guice.GuiceRunnerDelegation;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
+public class ManagedTomcatGuiceArquillianRunner extends Arquillian {
 
-public class SlowFilterRunnerDelegation {
+	private final GuiceRunnerDelegation guiceRunnerDelegate;
 
-	public List<TestRule> getTestRules(List<TestRule> originalTestRules) {
-		return ImmutableList.copyOf(Iterables.concat(originalTestRules, ImmutableList.of(new SlowFilterRule())));
+	public ManagedTomcatGuiceArquillianRunner(Class<?> klass) throws InitializationError {
+		super(klass);
+		guiceRunnerDelegate = new GuiceRunnerDelegation();
+		ManagedTomcatInstaller.install();
 	}
-	
-	public List<TestRule> classRules(List<TestRule> originalClassRules) {
-		return ImmutableList.copyOf(Iterables.concat(originalClassRules, ImmutableList.of(new SlowFilterRule())));
+
+	@Override
+	protected List<MethodRule> rules(Object target) {
+		return guiceRunnerDelegate.rules(getTestClass(), super.rules(target));
 	}
 }

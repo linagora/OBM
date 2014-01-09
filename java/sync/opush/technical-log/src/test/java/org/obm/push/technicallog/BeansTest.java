@@ -33,8 +33,6 @@ package org.obm.push.technicallog;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.technicallog.bean.jaxb.LogFile;
 import org.obm.push.technicallog.bean.jaxb.Request;
 import org.obm.push.technicallog.bean.jaxb.Resource;
@@ -43,7 +41,7 @@ import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

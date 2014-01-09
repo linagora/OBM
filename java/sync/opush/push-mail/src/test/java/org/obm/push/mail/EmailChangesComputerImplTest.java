@@ -38,15 +38,13 @@ import java.util.Set;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Email;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class EmailChangesComputerImplTest {
 
 	@Test(expected=NullPointerException.class)

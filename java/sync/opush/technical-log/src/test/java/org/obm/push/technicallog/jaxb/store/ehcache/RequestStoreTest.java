@@ -50,14 +50,12 @@ import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.technicallog.bean.jaxb.Request;
 import org.obm.push.technicallog.jaxb.store.ehcache.ObjectStoreManager;
 import org.obm.push.technicallog.jaxb.store.ehcache.RequestNotFoundException;
 import org.obm.push.technicallog.jaxb.store.ehcache.RequestStore;
 
-@RunWith(SlowFilterRunner.class)
+
 public class RequestStoreTest {
 	
 	public final static String STORE_NAME = "request";

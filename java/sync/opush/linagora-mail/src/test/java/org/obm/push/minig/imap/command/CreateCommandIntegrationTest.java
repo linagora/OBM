@@ -38,9 +38,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.User;
@@ -56,9 +55,8 @@ import org.obm.push.minig.imap.StoreClient;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
 
-@Slow
 @GuiceModule(org.obm.push.minig.imap.MailEnvModule.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class CreateCommandIntegrationTest {
 
 	@Inject LinagoraImapClientProvider clientProvider;

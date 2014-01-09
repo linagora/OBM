@@ -47,7 +47,7 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
@@ -57,7 +57,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 @GuiceModule(DomainDaoTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class DomainDaoTest {
 	
 	public static class Env extends AbstractModule {

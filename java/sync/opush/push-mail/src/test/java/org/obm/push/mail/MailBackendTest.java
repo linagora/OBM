@@ -50,10 +50,8 @@ import java.util.Set;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfiguration.ExpungePolicy;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.backend.OpushCollection;
@@ -93,7 +91,7 @@ import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import com.google.inject.Provider;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MailBackendTest {
 
 	private static final String COLLECTION_MAIL_PREFIX = "obm:\\\\test@test\\email\\";

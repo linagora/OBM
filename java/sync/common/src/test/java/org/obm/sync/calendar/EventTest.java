@@ -45,8 +45,6 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Participation.State;
 
 import com.google.common.collect.ImmutableList;
@@ -56,7 +54,7 @@ import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.ToolBox;
 
-@RunWith(SlowFilterRunner.class)
+
 public class EventTest {
 
 	@Test

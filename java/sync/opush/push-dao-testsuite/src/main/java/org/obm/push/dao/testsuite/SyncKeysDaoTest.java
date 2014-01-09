@@ -37,15 +37,14 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.store.SyncKeysDao;
 
 import com.google.inject.Inject;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 public abstract class SyncKeysDaoTest {
 
 	@Inject protected SyncKeysDao syncKeysDao;

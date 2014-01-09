@@ -36,17 +36,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.UUIDFactory;
 
 import com.google.common.collect.Lists;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SyncKeyFactoryTest {
 
 	private SyncKeyFactory syncKeyFactory;
@@ -68,9 +64,8 @@ public class SyncKeyFactoryTest {
 		assertThat(randomSyncKey.getSyncKey()).isNotNull();
 		assertThat(randomSyncKey.getSyncKey()).isNotEmpty();
 	}
-	
-	@Ignore("too slow : https://github.com/alexruiz/fest-assert-2.x/issues/122")
-	@Test @Slow
+
+	@Test
 	public void testNotSameKeyForMillionsGeneration() {
 		int syncKeyGenerationCount = 1000000;
 

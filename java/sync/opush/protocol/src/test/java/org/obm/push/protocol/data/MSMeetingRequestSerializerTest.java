@@ -41,9 +41,7 @@ import javax.xml.parsers.FactoryConfigurationError;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSEventExtId;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
@@ -55,7 +53,7 @@ import org.obm.push.utils.IntEncoder;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSMeetingRequestSerializerTest {
 
 	private SimpleDateFormat protocolDateFormat;

@@ -44,15 +44,13 @@ import javax.xml.parsers.FactoryConfigurationError;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.Iterables;
 
-@RunWith(SlowFilterRunner.class)
+
 public class CalendarItemsParserTest {
 	
 	private CalendarItemsParser parser;

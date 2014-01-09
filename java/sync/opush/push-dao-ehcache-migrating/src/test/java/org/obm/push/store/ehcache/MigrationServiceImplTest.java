@@ -49,11 +49,8 @@ import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +58,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-@RunWith(SlowFilterRunner.class) @Slow
 public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 
 	private Logger logger;

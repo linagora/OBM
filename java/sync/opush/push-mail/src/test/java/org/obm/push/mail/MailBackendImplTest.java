@@ -51,9 +51,7 @@ import org.apache.james.mime4j.dom.Message;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.icalendar.ICalendar;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.Address;
@@ -94,7 +92,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MailBackendImplTest {
 
 	private UserDataRequest udr;

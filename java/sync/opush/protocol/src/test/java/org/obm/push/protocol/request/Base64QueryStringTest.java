@@ -37,10 +37,8 @@ import static org.easymock.EasyMock.*;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class Base64QueryStringTest {
 
 	@Test

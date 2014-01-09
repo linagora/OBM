@@ -6,8 +6,6 @@ import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.exceptions.PermissionsNotFoundException;
 
@@ -17,7 +15,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-@RunWith(SlowFilterRunner.class)
+
 public class PermissionDaoHardcodedImplTest {
 	
 	ObmDomain localDomain = ObmDomain.builder().name("dummydomain.obm.org")

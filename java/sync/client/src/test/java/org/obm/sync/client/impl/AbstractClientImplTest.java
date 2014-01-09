@@ -35,9 +35,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.client.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -54,11 +54,9 @@ import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
@@ -71,7 +69,7 @@ import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
 
 
-@RunWith(SlowFilterRunner.class)
+
 public class AbstractClientImplTest {
 
 	private TestServlet testServlet;

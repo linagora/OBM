@@ -49,9 +49,8 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.provisioning.ProvisioningArchiveUtils;
-import org.obm.push.arquillian.ManagedTomcatSlowGuiceArquillianRunner;
+import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
 
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
@@ -59,8 +58,7 @@ import com.jayway.restassured.http.ContentType;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 
-@Slow
-@RunWith(ManagedTomcatSlowGuiceArquillianRunner.class)
+@RunWith(ManagedTomcatGuiceArquillianRunner.class)
 public class GroupIntegrationTest {
 
 	@Test

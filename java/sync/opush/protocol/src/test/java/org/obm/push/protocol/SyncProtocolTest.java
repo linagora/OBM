@@ -48,7 +48,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
@@ -94,7 +94,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 @GuiceModule(ProtocolModuleTest.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class SyncProtocolTest {
 
 	@Inject EncoderFactory encoderFactory;

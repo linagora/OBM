@@ -34,13 +34,11 @@ package org.obm.push.bean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncCollectionRequest.Builder;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.exception.activesync.ASRequestStringFieldException;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SyncCollectionRequestTest {
 
 	private static final int DEFAULT_WINDOW_SIZE = 100;

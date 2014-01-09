@@ -53,10 +53,7 @@ import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.icalendar.ICalendar;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.BodyPreference;
@@ -93,7 +90,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 
-@RunWith(SlowFilterRunner.class)
+
 public class EmailViewPartsFetcherImplTest {
 
 	public static class MessageFixture {
@@ -542,7 +539,7 @@ public class EmailViewPartsFetcherImplTest {
 		assertThat(emailViewAttachment.getId()).isEqualTo("at_" + messageFixture.uid + "_0");
 	}
 	
-	@Test @Slow
+	@Test
 	public void testInvitation() throws Exception {
 		messageFixture.isAttachment = true;
 		messageFixture.isInvitation = true;

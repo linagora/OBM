@@ -34,9 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Date;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.sync.Right;
@@ -45,7 +43,7 @@ import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.profile.Profile.AccessRestriction;
 import fr.aliacom.obm.common.profile.Profile.AdminRealm;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ProfileTest {
 
 	private final Date date = DateUtils.date("2013-08-01T12:00:00");

@@ -35,15 +35,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.obm.push.bean.CalendarSensitivity;
 import org.obm.push.calendar.ObmEventToMSEventConverterImpl;
 import org.obm.sync.calendar.EventPrivacy;
 
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ObmEventToMsEventConverterSensitivityTest {
 
 	private ObmEventToMSEventConverterImpl converter;

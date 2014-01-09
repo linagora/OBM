@@ -40,8 +40,6 @@ import org.apache.commons.lang.NotImplementedException;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath.Builder;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.UserDataRequest;
@@ -54,7 +52,7 @@ import org.obm.push.service.impl.MappingService;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provider;
 
-@RunWith(SlowFilterRunner.class)
+
 public class OpushBackendTest {
 
 	private IMocksControl mocks;

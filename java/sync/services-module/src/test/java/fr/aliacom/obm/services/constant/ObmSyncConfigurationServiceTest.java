@@ -36,13 +36,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.utils.IniFile;
-import org.obm.filter.SlowFilterRunner;
 
 import fr.aliacom.obm.common.calendar.CalendarEncoding;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ObmSyncConfigurationServiceTest {
 
 	private ObmSyncConfigurationService service;

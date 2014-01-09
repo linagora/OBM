@@ -41,9 +41,8 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 
 import com.google.common.collect.ImmutableList;
@@ -51,8 +50,7 @@ import com.google.common.collect.ImmutableList;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class DomainResourceTest extends CommonDomainEndPointEnvTest {
 

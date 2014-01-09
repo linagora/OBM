@@ -41,8 +41,6 @@ import java.util.List;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.mail.mime.ContentType;
@@ -53,7 +51,7 @@ import org.obm.push.mail.mime.MimePartImpl;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MimePartSelectorTest {
 
 	private MimePartSelector mimeMessageSelector;

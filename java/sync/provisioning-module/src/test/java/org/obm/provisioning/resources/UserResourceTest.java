@@ -37,14 +37,11 @@ import javax.ws.rs.core.Response.Status;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 
-
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class UserResourceTest extends CommonDomainEndPointEnvTest {
 	

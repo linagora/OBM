@@ -40,14 +40,12 @@ import java.io.ObjectOutputStream;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 
 import com.google.common.io.ByteStreams;
 
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SerializableInputStreamTest {
 
 	@Test

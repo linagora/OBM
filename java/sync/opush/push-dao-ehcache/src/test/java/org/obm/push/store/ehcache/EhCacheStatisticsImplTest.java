@@ -46,11 +46,8 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +55,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 
 @Ignore("OBMFULL-5663")
-@RunWith(SlowFilterRunner.class) @Slow
 public class EhCacheStatisticsImplTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();

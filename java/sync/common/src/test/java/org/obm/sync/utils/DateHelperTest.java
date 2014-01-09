@@ -38,10 +38,8 @@ import junit.framework.TestCase;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class DateHelperTest extends TestCase{
 
 	@Test

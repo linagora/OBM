@@ -45,8 +45,6 @@ import javax.xml.transform.TransformerException;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils.XMLVersion;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,7 +55,7 @@ import org.xml.sax.SAXException;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Iterables;
 
-@RunWith(SlowFilterRunner.class)
+
 public class DOMUtilsTest {
 	
 	@Test

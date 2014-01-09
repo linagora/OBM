@@ -34,15 +34,13 @@ package org.obm.push.protocol.data;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.exception.activesync.ASRequestBooleanFieldException;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 import org.obm.push.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ActiveSyncDecoderTest {
 
 	@Test(expected=ASRequestIntegerFieldException.class)

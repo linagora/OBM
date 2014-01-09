@@ -34,13 +34,11 @@ package org.obm.push.bean.change.client;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.change.client.SyncClientCommands.Add;
 import org.obm.push.bean.change.client.SyncClientCommands.Update;
 
 @SuppressWarnings("unused")
-@RunWith(SlowFilterRunner.class)
+
 public class SyncClientCommandsTest {
 
 	@Test(expected=IllegalArgumentException.class)

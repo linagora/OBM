@@ -39,7 +39,7 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseRule;
 import org.obm.dao.utils.H2TestClass;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.sync.Right;
 import org.obm.sync.dao.EntityId;
@@ -47,7 +47,7 @@ import org.obm.sync.dao.EntityId;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(DaoTestModule.class)
 public class EntityRightDaoJdbcImplTest implements H2TestClass {
 

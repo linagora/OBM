@@ -42,9 +42,8 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseRule;
 import org.obm.dao.utils.H2TestClass;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.Batch.Builder;
 import org.obm.provisioning.beans.BatchEntityType;
@@ -60,8 +59,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(BatchDaoJdbcImplTest.Env.class)
 public class BatchDaoJdbcImplTest implements H2TestClass {
 

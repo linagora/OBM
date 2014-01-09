@@ -34,14 +34,12 @@ package org.obm.push.protocol.bean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncCollectionRequest;
 import org.obm.push.bean.SyncDefaultValues;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.exception.activesync.ASRequestIntegerFieldException;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SyncRequestTest implements SyncDefaultValues {
 
 	@Test

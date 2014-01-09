@@ -36,8 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.dao.EntityId;
 
 import com.google.common.base.Joiner;
@@ -45,7 +43,7 @@ import com.google.common.collect.ImmutableSet;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ObmUserTest {
 
 	private ObmDomain domain;

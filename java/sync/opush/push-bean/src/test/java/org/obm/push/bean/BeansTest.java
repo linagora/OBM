@@ -33,8 +33,6 @@ package org.obm.push.bean;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverResponse;
@@ -58,7 +56,7 @@ import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

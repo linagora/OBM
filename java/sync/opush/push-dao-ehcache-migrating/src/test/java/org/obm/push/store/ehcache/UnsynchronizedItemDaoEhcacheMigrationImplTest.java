@@ -42,9 +42,6 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.store.ehcache.UnsynchronizedItemDaoEhcacheImpl.Key_2_4_2_4;
@@ -52,7 +49,6 @@ import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableSet;
 
-@RunWith(SlowFilterRunner.class) @Slow
 public class UnsynchronizedItemDaoEhcacheMigrationImplTest extends StoreManagerConfigurationTest {
 
 	private MigrationSourceObjectStoreManager objectStoreManagerMigration;

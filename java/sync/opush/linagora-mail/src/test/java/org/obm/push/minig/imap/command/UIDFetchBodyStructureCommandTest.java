@@ -47,9 +47,6 @@ import java.util.Arrays;
 import org.easymock.Capture;
 import org.easymock.CaptureType;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;
@@ -57,7 +54,7 @@ import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UIDFetchBodyStructureCommandTest {
 
 	private static final String INPUT_LINE1 = 
@@ -72,7 +69,7 @@ public class UIDFetchBodyStructureCommandTest {
 		"ISO-8859-1''%44%69%70%6C%F4%6D%E9%73%20%64%65%70%75%69%73%20%32%30%30%31%2D%32%30%30%32%2E%7A%69%70)) NIL NIL) \"MIXED\" (\"BOUNDARY\" \"------------040903010203040509010609\") NIL NIL NIL)";
 
 	
-	@Test @Slow
+	@Test
 	public void testHandleResponses() {
 		BodyStructureParser resultCallback = createMock(BodyStructureParser.class);
 		Capture<String> result = new Capture<String>(CaptureType.FIRST);

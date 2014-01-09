@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.windowing;
 
+
 import org.junit.runner.RunWith;
 
 import cucumber.api.junit.Cucumber;

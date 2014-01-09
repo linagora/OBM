@@ -38,12 +38,10 @@ import org.apache.commons.codec.binary.Base64;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.IntEncoder;
 
-@RunWith(SlowFilterRunner.class)
+
 public class Base64ASTimeZoneDecoderImplTest {
 
 	private Base64ASTimeZoneDecoderImpl base64asTimeZoneDecoder;

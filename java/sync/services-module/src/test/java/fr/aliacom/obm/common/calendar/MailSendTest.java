@@ -48,15 +48,13 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.UserAttendee;
 
 import com.ctc.wstx.io.CharsetNames;
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MailSendTest {
 
 	private static final String ICS_METHOD = "REQUEST";

@@ -29,12 +29,25 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.filter;
+package org.obm.guice;
 
-public class SlowFilterConfiguration {
+import java.util.List;
 
-	public String getConfigurationValue(String key) {
-		return System.getProperty(key);
+import org.junit.rules.MethodRule;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.InitializationError;
+
+public class GuiceRunner extends BlockJUnit4ClassRunner {
+
+	private final GuiceRunnerDelegation guiceRunnerDelegation;
+
+	public GuiceRunner(Class<?> klass) throws InitializationError {
+		super(klass);
+		guiceRunnerDelegation = new GuiceRunnerDelegation();
 	}
 
+	@Override
+	protected List<MethodRule> rules(Object target) {
+		return guiceRunnerDelegation.rules(getTestClass(), super.rules(target));
+	}
 }

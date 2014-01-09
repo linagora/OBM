@@ -38,8 +38,6 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.Event;
@@ -48,7 +46,7 @@ import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.UserAttendee;
 
-@RunWith(SlowFilterRunner.class)
+
 public class EventUtilsTest {
 
 	private Event getSimpleEvent() {

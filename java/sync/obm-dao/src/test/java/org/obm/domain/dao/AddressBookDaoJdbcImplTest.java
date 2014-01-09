@@ -41,7 +41,7 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseRule;
 import org.obm.dao.utils.H2TestClass;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.AddressBook.Builder;
@@ -52,7 +52,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(DaoTestModule.class)
 public class AddressBookDaoJdbcImplTest implements H2TestClass {
 

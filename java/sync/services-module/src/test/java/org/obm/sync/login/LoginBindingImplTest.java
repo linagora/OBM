@@ -38,10 +38,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
 import org.obm.sync.server.auth.IAuthentificationService;
@@ -52,7 +50,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
-@RunWith(SlowFilterRunner.class)
+
 public class LoginBindingImplTest {
 
 	private IMocksControl control;

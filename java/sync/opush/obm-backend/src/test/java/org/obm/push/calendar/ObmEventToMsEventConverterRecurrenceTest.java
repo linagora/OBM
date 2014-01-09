@@ -38,12 +38,10 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSEventException;
 import org.obm.sync.calendar.Event;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ObmEventToMsEventConverterRecurrenceTest {
 
 	private ObmEventToMSEventConverterImpl converter;

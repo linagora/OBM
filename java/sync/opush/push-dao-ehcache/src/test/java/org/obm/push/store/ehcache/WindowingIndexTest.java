@@ -34,12 +34,10 @@ package org.obm.push.store.ehcache;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.store.ehcache.WindowingDaoEhcacheImpl.WindowingIndex;
 
-@RunWith(SlowFilterRunner.class)
+
 public class WindowingIndexTest {
 
 	@SuppressWarnings("unused")

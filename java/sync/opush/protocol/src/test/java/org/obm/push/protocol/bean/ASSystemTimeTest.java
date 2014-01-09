@@ -39,14 +39,11 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.ASSystemTime.FromDateBuilder;
 import org.obm.push.utils.type.UnsignedShort;
 
 public class ASSystemTimeTest {
 
-	@RunWith(SlowFilterRunner.class)
 	public static class TestBuilder {
 		
 		@Test(expected=IllegalStateException.class)
@@ -250,7 +247,6 @@ public class ASSystemTimeTest {
 		}
 	}
 
-	@RunWith(SlowFilterRunner.class)
 	public static class TestFromDateBuilder {
 			
 		private FromDateBuilder systemTimeBuilder;

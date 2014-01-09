@@ -41,8 +41,6 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 
 import com.google.common.collect.ImmutableMap;
@@ -53,7 +51,7 @@ import freemarker.template.Template;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateException;
 
-@RunWith(SlowFilterRunner.class)
+
 public class TemplateTest {
 	
 	private String applyTemplate(Template template,

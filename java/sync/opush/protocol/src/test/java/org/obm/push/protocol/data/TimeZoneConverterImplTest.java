@@ -39,14 +39,12 @@ import java.util.TimeZone;
 import org.assertj.core.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.protocol.data.TimeZoneConverterImpl;
 import org.obm.push.utils.type.UnsignedShort;
 
-@RunWith(SlowFilterRunner.class)
+
 public class TimeZoneConverterImplTest {
 
 	private static final int TIMEZONE_EACH_YEARS_SPEC_VALUE = 0;

@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.domain.dao.PGroupDao;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.Group.Id;
 import org.obm.provisioning.GroupExtId;
@@ -35,7 +35,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(BatchProcessorImplGroupTest.Env.class)
 public class BatchProcessorImplGroupTest extends BatchProcessorImplTestEnv {
 

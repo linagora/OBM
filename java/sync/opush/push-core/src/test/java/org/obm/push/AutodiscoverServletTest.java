@@ -47,8 +47,6 @@ import org.easymock.internal.MocksControl;
 import org.easymock.internal.MocksControl.MockType;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
@@ -61,7 +59,7 @@ import org.obm.push.resource.ResourcesService;
 
 import com.google.common.collect.Sets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class AutodiscoverServletTest {
 
 	private HttpServletRequest request;

@@ -33,13 +33,11 @@ package org.obm.push.spushnik.resources;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.spushnik.bean.CheckResult;
 import org.obm.push.spushnik.bean.Credentials;
 import org.obm.sync.push.client.OPClient;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ScenarioTest {
 
 	private Scenario testee;

@@ -41,13 +41,11 @@ import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.User.Factory;
 
 import com.google.common.collect.Maps;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UserDataRequestTest {
 
 	private User user;

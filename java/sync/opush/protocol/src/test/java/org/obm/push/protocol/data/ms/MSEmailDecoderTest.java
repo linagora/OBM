@@ -45,8 +45,6 @@ import javax.mail.internet.AddressException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmailBodyType;
@@ -62,7 +60,7 @@ import org.w3c.dom.Element;
 
 import com.google.common.base.Charsets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSEmailDecoderTest {
 
 	private MSMeetingRequestDecoder meetingRequestDecoder;

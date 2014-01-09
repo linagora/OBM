@@ -42,8 +42,6 @@ import javax.xml.transform.TransformerException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.ms.MSEmail;
@@ -56,7 +54,7 @@ import org.w3c.dom.Element;
 
 import com.google.common.base.Charsets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSEmailEncoderTest {
 	
 	private MSEmailEncoder msEmailEncoder;

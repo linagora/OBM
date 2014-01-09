@@ -37,14 +37,12 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.utils.IniFile;
-import org.obm.filter.SlowFilterRunner;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
-@RunWith(SlowFilterRunner.class)
+
 public class IniFileTest {
 
 	private Map<String, String> settings;

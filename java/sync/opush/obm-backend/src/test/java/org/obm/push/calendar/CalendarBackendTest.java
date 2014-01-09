@@ -57,8 +57,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.icalendar.ICalendar;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
@@ -126,7 +124,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.inject.Provider;
 
-@RunWith(SlowFilterRunner.class)
+
 public class CalendarBackendTest {
 
 	private User user;

@@ -33,8 +33,6 @@ package org.obm.provisioning.ldap.client.bean;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
@@ -42,7 +40,7 @@ import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

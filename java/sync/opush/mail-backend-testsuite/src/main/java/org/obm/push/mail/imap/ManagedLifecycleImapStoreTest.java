@@ -32,12 +32,8 @@
 package org.obm.push.mail.imap;
 
 import org.junit.Ignore;
-import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.filter.SlowFilterRunner;
 
 @Ignore("OBMFULL-4182")
-@RunWith(SlowFilterRunner.class) @Slow
 public class ManagedLifecycleImapStoreTest {
 
 //	@Rule

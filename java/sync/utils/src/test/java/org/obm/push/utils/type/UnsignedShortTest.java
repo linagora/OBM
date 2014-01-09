@@ -35,10 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UnsignedShortTest {
 
 	private static final int UNSIGNED_SHORT_BYTES_COUNT = 2;

@@ -34,8 +34,6 @@ package org.obm.push.protocol.bean;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.SyncCollectionCommands;
 import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncStatus;
@@ -46,7 +44,7 @@ import org.obm.push.bean.change.item.ItemChange;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SyncResponseTest {
 	
 	@Test

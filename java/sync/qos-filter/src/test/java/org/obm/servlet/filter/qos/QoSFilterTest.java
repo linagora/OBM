@@ -47,13 +47,11 @@ import org.easymock.IMocksControl;
 import org.eclipse.jetty.continuation.Continuation;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
 /**
  * Tests the {@link QoSFilter} class.
  */
-@RunWith(SlowFilterRunner.class)
+
 public class QoSFilterTest {
 	private QoSFilter testee;
 	private IMocksControl control;

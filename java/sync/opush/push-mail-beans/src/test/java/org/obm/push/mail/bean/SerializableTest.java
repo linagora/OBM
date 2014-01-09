@@ -38,14 +38,12 @@ import java.io.ObjectOutputStream;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.utils.DateUtils;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SerializableTest {
 
 	private ObjectOutputStream objectOutputStream;

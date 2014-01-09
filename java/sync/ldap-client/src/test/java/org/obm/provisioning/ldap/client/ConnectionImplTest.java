@@ -42,9 +42,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
@@ -69,9 +68,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-@Slow
 @GuiceModule(EmbeddedLdapModule.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class ConnectionImplTest {
 
 	@Inject ConnectionImpl.Factory connectionFactory;

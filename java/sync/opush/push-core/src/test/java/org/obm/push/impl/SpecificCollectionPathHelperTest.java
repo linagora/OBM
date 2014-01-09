@@ -35,9 +35,7 @@ import org.easymock.EasyMock;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
@@ -46,7 +44,7 @@ import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.CollectionPathException;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SpecificCollectionPathHelperTest {
 
 	private static final String SPECIFIC_MAILBOX_DRAFT = "specific\\mydraft";

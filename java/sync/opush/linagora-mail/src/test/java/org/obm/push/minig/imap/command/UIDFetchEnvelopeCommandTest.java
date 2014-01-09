@@ -35,9 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.MessageSet;
@@ -47,7 +45,7 @@ import org.obm.push.minig.imap.impl.MinaIMAPMessage;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UIDFetchEnvelopeCommandTest {
 
 	@Test

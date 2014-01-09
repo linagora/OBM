@@ -46,9 +46,7 @@ import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.calendar.Participation.State;
 import org.obm.sync.items.AbstractItemsWriter;
@@ -64,7 +62,7 @@ import com.google.common.io.CharStreams;
 /**
  * Serializes calendar related items to XML
  */
-@RunWith(SlowFilterRunner.class)
+
 public class CalendarItemsWriterTest extends AbstractItemsWriter {
 
 private CalendarItemsWriter writer;

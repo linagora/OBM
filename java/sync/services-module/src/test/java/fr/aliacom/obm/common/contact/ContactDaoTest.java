@@ -49,7 +49,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.EventExtId;
@@ -66,7 +66,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.calendar.CalendarDao;
 
 @GuiceModule(ContactDaoTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class ContactDaoTest {
 
 	@Inject

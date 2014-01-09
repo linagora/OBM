@@ -42,9 +42,8 @@ import org.obm.dao.utils.H2TestClass;
 import org.obm.dao.utils.TestUtils;
 import org.obm.domain.dao.PUserDao;
 import org.obm.domain.dao.PUserDaoJdbcImpl;
-import org.obm.filter.Slow;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 
 import com.google.inject.Inject;
 
@@ -52,8 +51,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
-@Slow
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 @GuiceModule(PUserDaoJdbcImplTest.Env.class)
 public class PUserDaoJdbcImplTest implements H2TestClass {
 

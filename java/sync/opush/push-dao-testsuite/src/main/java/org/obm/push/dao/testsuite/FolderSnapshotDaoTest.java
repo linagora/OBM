@@ -38,8 +38,7 @@ import java.util.Properties;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
@@ -52,7 +51,7 @@ import org.obm.push.store.FolderSnapshotDao;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 public abstract class FolderSnapshotDaoTest {
 
 	@Inject protected CollectionDao collectionDao;

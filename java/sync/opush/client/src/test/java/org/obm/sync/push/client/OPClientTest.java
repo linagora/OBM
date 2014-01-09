@@ -44,14 +44,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.wbxml.WBXmlException;
 import org.w3c.dom.Document;
 
-@RunWith(SlowFilterRunner.class)
+
 public class OPClientTest {
 	
 	private OPClient opClient;

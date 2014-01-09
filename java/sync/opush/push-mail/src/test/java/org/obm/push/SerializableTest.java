@@ -34,15 +34,13 @@ package org.obm.push;
 import static org.obm.DateUtils.date;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.mail.EmailChanges;
 import org.obm.push.mail.bean.Email;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.testing.SerializableTester;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SerializableTest {
 
 	@Test

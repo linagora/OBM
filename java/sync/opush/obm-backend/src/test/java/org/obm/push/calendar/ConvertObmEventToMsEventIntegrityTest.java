@@ -42,8 +42,6 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
 import org.obm.push.bean.CalendarBusyStatus;
@@ -74,7 +72,7 @@ import org.obm.sync.calendar.UserAttendee;
 
 import com.google.common.collect.Iterables;
 
-@RunWith(SlowFilterRunner.class)
+
 public abstract class ConvertObmEventToMsEventIntegrityTest {
 
 

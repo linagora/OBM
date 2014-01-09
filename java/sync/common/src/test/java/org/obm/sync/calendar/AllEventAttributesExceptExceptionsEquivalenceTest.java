@@ -39,12 +39,10 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 
 import com.google.common.collect.Lists;
 
-@RunWith(SlowFilterRunner.class)
+
 public class AllEventAttributesExceptExceptionsEquivalenceTest  {
 	
 	private Event getStubBeforeTimeUpdateEvent(){

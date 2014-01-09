@@ -33,8 +33,6 @@ package org.obm.opush;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.backend.CollectionPath;
 import org.obm.push.backend.OpushCollection;
 import org.obm.push.backend.PathsToCollections;
@@ -43,7 +41,7 @@ import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BeansTest {
 
 	private EqualsVerifierUtils equalsVerifierUtilsTest;

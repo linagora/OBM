@@ -35,8 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Date;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.provisioning.Group.Id;
 
 import com.google.common.collect.ImmutableSet;
@@ -44,7 +42,7 @@ import com.google.common.collect.ImmutableSet;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
-@RunWith(SlowFilterRunner.class)
+
 public class GroupTest {
 	
     private final static ObmUser testuser = ObmUser.builder()

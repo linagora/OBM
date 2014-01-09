@@ -46,8 +46,6 @@ import javax.xml.transform.TransformerException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
@@ -70,7 +68,7 @@ import org.w3c.dom.Document;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-@RunWith(SlowFilterRunner.class)
+
 public class CalendarEncoderTest {
 	private CalendarEncoder encoder;
 	private TimeZoneEncoder timeZoneEncoder;

@@ -36,12 +36,10 @@ import java.util.EnumSet;
 
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 
-import org.obm.filter.SlowFilterRunner;
 
-@RunWith(SlowFilterRunner.class)
+
 public class RecurrenceDaysTest {
 
 	@Test

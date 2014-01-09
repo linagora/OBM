@@ -74,7 +74,7 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
@@ -131,7 +131,7 @@ import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
 
 @GuiceModule(CalendarBindingImplTest.Env.class)
-@RunWith(SlowGuiceRunner.class)
+@RunWith(GuiceRunner.class)
 public class CalendarBindingImplTest {
 
 	public static class Env extends AbstractModule {

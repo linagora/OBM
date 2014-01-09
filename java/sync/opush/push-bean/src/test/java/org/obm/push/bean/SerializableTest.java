@@ -43,8 +43,6 @@ import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.change.SyncCommand;
@@ -64,7 +62,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.testing.SerializableTester;
 
-@RunWith(SlowFilterRunner.class)
+
 public class SerializableTest {
 
 	private ObjectOutputStream objectOutputStream;

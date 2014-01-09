@@ -40,8 +40,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Set;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MSImportance;
@@ -50,7 +48,7 @@ import org.obm.push.bean.msmeetingrequest.MSMeetingRequest;
 
 import com.google.common.collect.Sets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UidMSEmailTest {
 
 	@Test(expected=IllegalStateException.class)

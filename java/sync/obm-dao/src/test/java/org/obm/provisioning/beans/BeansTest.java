@@ -31,12 +31,10 @@ package org.obm.provisioning.beans;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.utils.LinkedEntity;
 
-@RunWith(SlowFilterRunner.class)
+
 public class BeansTest {
 
     private EqualsVerifierUtils equalsVerifierUtilsTest;

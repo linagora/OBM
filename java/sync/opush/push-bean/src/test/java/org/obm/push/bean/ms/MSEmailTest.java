@@ -36,8 +36,6 @@ import java.io.ByteArrayInputStream;
 import org.assertj.core.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MSEventExtId;
@@ -49,7 +47,7 @@ import org.obm.push.utils.SerializableInputStream;
 
 import com.google.common.base.Charsets;
 
-@RunWith(SlowFilterRunner.class)
+
 public class MSEmailTest {
 
 	@Test(expected=IllegalStateException.class)

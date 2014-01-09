@@ -35,8 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.filter.Slow;
-import org.obm.guice.SlowGuiceRunner;
+import org.obm.guice.GuiceRunner;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.SyncKey;
@@ -45,7 +44,7 @@ import org.obm.push.mail.bean.Snapshot;
 import org.obm.push.store.SnapshotDao;
 import org.obm.push.utils.DateUtils;
 
-@RunWith(SlowGuiceRunner.class) @Slow
+@RunWith(GuiceRunner.class)
 public abstract class SnapshotDaoTest {
 
 	protected SnapshotDao snapshotDao;

@@ -37,14 +37,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
 
-@RunWith(SlowFilterRunner.class)
+
 public class UIDFetchMessageCommandTest {
 	
 	@Test

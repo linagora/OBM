@@ -40,8 +40,6 @@ import java.util.Collections;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.ContentsExporter;
 import org.obm.push.backend.IContentsExporter;
 import org.obm.push.bean.AnalysedSyncCollection;
@@ -60,7 +58,7 @@ import org.obm.push.state.StateMachine;
 import org.obm.push.store.UnsynchronizedItemDao;
 import org.obm.push.utils.DateUtils;
 
-@RunWith(SlowFilterRunner.class)
+
 public class GetItemEstimateHandlerTest {
 	
 	private IMocksControl control;

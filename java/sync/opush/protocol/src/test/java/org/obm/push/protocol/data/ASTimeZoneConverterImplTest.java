@@ -40,8 +40,6 @@ import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.type.UnsignedShort;
@@ -49,7 +47,7 @@ import org.obm.push.utils.type.UnsignedShort;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ASTimeZoneConverterImplTest {
 
 	private ASTimeZoneConverterImpl asTimeZoneConverter;

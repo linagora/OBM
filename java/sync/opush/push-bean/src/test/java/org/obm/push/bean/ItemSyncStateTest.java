@@ -37,11 +37,9 @@ import java.util.Date;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.push.utils.DateUtils;
 
-@RunWith(SlowFilterRunner.class)
+
 public class ItemSyncStateTest {
 	
 	@Test(expected=IllegalArgumentException.class)
