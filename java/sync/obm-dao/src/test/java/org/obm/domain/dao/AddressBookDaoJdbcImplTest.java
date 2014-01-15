@@ -51,6 +51,7 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserLogin;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(DaoTestModule.class)
@@ -118,7 +119,7 @@ public class AddressBookDaoJdbcImplTest implements H2TestClass {
 				.builder()
 				.uid(9999)
 				.domain(ToolBox.getDefaultObmDomain())
-				.login("login")
+				.login(UserLogin.valueOf("login"))
 				.build();
 
 		dao.create(book, owner);

@@ -47,7 +47,8 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 public class ObmUserTest {
 	
 	private static final UserExtId userExtId = UserExtId.builder().extId("extId").build();
-
+	private static final UserLogin validLogin = UserLogin.valueOf("login");
+	
 	@Test(expected=IllegalStateException.class)
 	public void testLoginPrecondition() {
 		ObmUser
@@ -63,7 +64,7 @@ public class ObmUserTest {
 		ObmUser user = ObmUser
 			.builder()
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.domain(ObmDomain.builder().build())
 			.build();
 		
@@ -76,7 +77,7 @@ public class ObmUserTest {
 		ObmUser user = ObmUser
 			.builder()
 			.extId(userExtId)
-			.login("login")
+			.login(validLogin)
 			.domain(ObmDomain.builder().build())
 			.build();
 		
@@ -89,7 +90,7 @@ public class ObmUserTest {
 			.builder()
 			.uid(1)
 			.extId(userExtId)
-			.login("login")
+			.login(validLogin)
 			.build();
 	}
 	
@@ -98,7 +99,7 @@ public class ObmUserTest {
 		ObmUser
 			.builder()
 			.domain(ObmDomain.builder().build())
-			.login("login")
+			.login(validLogin)
 			.build();
 	}
 	
@@ -108,7 +109,7 @@ public class ObmUserTest {
 			.builder()
 			.domain(ObmDomain.builder().build())
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.addresses(Sets.newHashSet("1"))
 			.build();
 		
@@ -121,7 +122,7 @@ public class ObmUserTest {
 			.builder()
 			.domain(ObmDomain.builder().build())
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.addresses(Sets.newHashSet("1", "2"))
 			.build();
 		
@@ -134,7 +135,7 @@ public class ObmUserTest {
 			.builder()
 			.domain(ObmDomain.builder().build())
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.addresses(Sets.newHashSet("1", "2", "3"))
 			.build();
 		
@@ -147,7 +148,7 @@ public class ObmUserTest {
 			.builder()
 			.domain(ObmDomain.builder().build())
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.addresses(Sets.newHashSet("1", "2", "3", "4"))
 			.build();
 	}
@@ -158,7 +159,7 @@ public class ObmUserTest {
 			.builder()
 			.domain(ObmDomain.builder().build())
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.build();
 		
 		assertThat(user.getAddress1()).isEqualTo(null);
@@ -172,7 +173,7 @@ public class ObmUserTest {
 			.builder()
 			.domain(ObmDomain.builder().build())
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.addresses(null)
 			.build();
 	}
@@ -183,7 +184,7 @@ public class ObmUserTest {
 				.builder()
 				.domain(ObmDomain.builder().build())
 				.uid(1)
-				.login("login")
+				.login(validLogin)
 				.mails(Sets.newHashSet("1"))
 				.emailAlias(null)
 				.build();
@@ -195,7 +196,7 @@ public class ObmUserTest {
 				.builder()
 				.domain(ObmDomain.builder().build())
 				.uid(1)
-				.login("login")
+				.login(validLogin)
 				.mails(Sets.newHashSet("1"))
 				.groups(null)
 				.build();
@@ -207,7 +208,7 @@ public class ObmUserTest {
 				.builder()
 				.domain(ObmDomain.builder().build())
 				.uid(1)
-				.login("login")
+				.login(validLogin)
 				.mails(Sets.newHashSet("1"))
 				.emailAndAliases(null)
 				.build();
@@ -219,7 +220,7 @@ public class ObmUserTest {
 				.builder()
 				.domain(ObmDomain.builder().build())
 				.uid(1)
-				.login("login")
+				.login(validLogin)
 				.mails(Sets.newHashSet("1"))
 				.build();
 		
@@ -233,7 +234,7 @@ public class ObmUserTest {
 				.builder()
 				.domain(ObmDomain.builder().build())
 				.uid(1)
-				.login("login")
+				.login(validLogin)
 				.mails(Lists.newArrayList("1", "2"))
 				.build();
 		
@@ -247,7 +248,7 @@ public class ObmUserTest {
 				.builder()
 				.domain(ObmDomain.builder().build())
 				.uid(1)
-				.login("login")
+				.login(validLogin)
 				.build();
 		
 		assertThat(user.getEmail()).isNull();
@@ -260,7 +261,7 @@ public class ObmUserTest {
 				.builder()
 				.domain(ObmDomain.builder().build())
 				.uid(1)
-				.login("login")
+				.login(validLogin)
 				.mails(null)
 				.build();
 	}
@@ -271,7 +272,7 @@ public class ObmUserTest {
 			.builder()
 			.domain(ObmDomain.builder().build())
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.faxes(Sets.newHashSet("1", "2", "3"))
 			.build();
 	}
@@ -282,7 +283,7 @@ public class ObmUserTest {
 			.builder()
 			.domain(ObmDomain.builder().build())
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.faxes(ImmutableSet.of("1", "2"))
 			.build();
 
@@ -296,7 +297,7 @@ public class ObmUserTest {
 			.builder()
 			.domain(ObmDomain.builder().build())
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.faxes(ImmutableSet.of("1"))
 			.build();
 
@@ -310,7 +311,7 @@ public class ObmUserTest {
 			.builder()
 			.domain(ObmDomain.builder().build())
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.faxes(ImmutableSet.<String>of())
 			.build();
 
@@ -324,7 +325,7 @@ public class ObmUserTest {
 			.builder()
 			.domain(ObmDomain.builder().build())
 			.uid(1)
-			.login("login")
+			.login(validLogin)
 			.faxes(null)
 			.build();
 	}
@@ -335,7 +336,7 @@ public class ObmUserTest {
 				.builder()
 				.uid(1)
 				.extId(UserExtId.valueOf("JohnDoeExtId"))
-				.login("jdoe")
+				.login(validLogin)
 				.password("secure")
 				.profileName(ProfileName.valueOf("user"))
 				.lastName("Doe")
@@ -373,7 +374,7 @@ public class ObmUserTest {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(validLogin)
 				.domain(ToolBox.getDefaultObmDomain())
 				.mailQuota(0)
 				.build();
@@ -386,7 +387,7 @@ public class ObmUserTest {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(validLogin)
 				.domain(ToolBox.getDefaultObmDomain())
 				.mailQuota(123)
 				.build();
@@ -399,7 +400,7 @@ public class ObmUserTest {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(validLogin)
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();
 
@@ -411,7 +412,7 @@ public class ObmUserTest {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(validLogin)
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();
 
@@ -423,7 +424,7 @@ public class ObmUserTest {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(validLogin)
 				.domain(ToolBox.getDefaultObmDomain())
 				.mailQuota(123)
 				.build();
@@ -436,7 +437,7 @@ public class ObmUserTest {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(validLogin)
 				.domain(ToolBox.getDefaultObmDomain())
 				.mailQuota(0)
 				.build();
@@ -449,7 +450,7 @@ public class ObmUserTest {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(validLogin)
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();
 
@@ -461,7 +462,7 @@ public class ObmUserTest {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(validLogin)
 				.domain(ToolBox.getDefaultObmDomain())
 				.archived(true)
 				.build();
@@ -474,7 +475,7 @@ public class ObmUserTest {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(validLogin)
 				.domain(ToolBox.getDefaultObmDomain())
 				.archived(false)
 				.build();
@@ -486,7 +487,7 @@ public class ObmUserTest {
 	public void testAdminDefaultValue() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(1)
-				.login("login")
+				.login(validLogin)
 				.domain(ObmDomain.builder().build())
 				.build();
 		assertThat(obmUser.isAdmin()).isFalse();
@@ -496,7 +497,7 @@ public class ObmUserTest {
 	public void testIsAdmin() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(1)
-				.login("login")
+				.login(validLogin)
 				.domain(ObmDomain.builder().build())
 				.admin(true)
 				.build();
@@ -507,7 +508,7 @@ public class ObmUserTest {
 	public void testIsNotAdmin() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(1)
-				.login("login")
+				.login(validLogin)
 				.domain(ObmDomain.builder().build())
 				.admin(false)
 				.build();

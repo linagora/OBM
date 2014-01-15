@@ -74,6 +74,7 @@ import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserLogin;
 
 
 public class BeansTest {
@@ -121,7 +122,8 @@ public class BeansTest {
 				AddressBook.class,
 				ModuleCheckBoxStates.class,
 				Profile.class,
-				EntityId.class);
+				EntityId.class,
+				UserLogin.class);
 	}
 	
 	@Test
@@ -130,7 +132,7 @@ public class BeansTest {
 			.createEqualsVerifier(ObmUser.class)
 			.withPrefabValues(ObmUser.class, 
 					ObmUser.builder()
-						.login("creator")
+						.login(UserLogin.valueOf("creator"))
 						.uid(1)
 						.emailAndAliases("createdBy@obm.org")
 						.domain(ObmDomain.builder()
@@ -139,7 +141,7 @@ public class BeansTest {
 							.build())
 						.build(), 
 					ObmUser.builder()
-						.login("updater")
+						.login(UserLogin.valueOf("updater"))
 						.uid(1)
 						.emailAndAliases("updatedBy@obm.org")
 						.domain(ObmDomain.builder()

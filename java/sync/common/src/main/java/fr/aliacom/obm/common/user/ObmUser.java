@@ -79,7 +79,7 @@ public class ObmUser {
 		private Integer uid;
 		private EntityId entityId;
 		private UserExtId extId;
-		private String login;
+		private UserLogin login;
 		private Boolean admin;
 		private String commonName;
 		private String lastName;
@@ -189,7 +189,7 @@ public class ObmUser {
 			this.extId = extId;
 			return this;
 		}
-		public Builder login(String login) {
+		public Builder login(UserLogin login) {
 			this.login = login;
 			return this;
 		}
@@ -434,7 +434,7 @@ public class ObmUser {
 	
 	private final Integer uid;
 	private final EntityId entityId;
-	private final String login;
+	private final UserLogin login;
 	private final UserExtId extId;
 	private final boolean admin;
 	private final String commonName;
@@ -483,7 +483,7 @@ public class ObmUser {
 	
 	private final Set<Group> groups;
 
-	public ObmUser(Integer uid, EntityId entityId, String login, UserExtId extId, boolean admin, String commonName,
+	public ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, String commonName,
 			String lastName, String firstName, String email,
 			Set<String> emailAlias, boolean hidden,
 			String address1, String address2,
@@ -549,7 +549,7 @@ public class ObmUser {
 	}
 
 	public String getLogin() {
-		return login;
+		return login.getStringValue();
 	}
 
 	public UserExtId getExtId() {

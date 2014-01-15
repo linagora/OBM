@@ -48,6 +48,7 @@ import org.obm.sync.server.auth.impl.DatabaseAuthentificationService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 
@@ -118,7 +119,7 @@ public class LoginBindingImplTest {
 		expect(userDao.findUserByLogin(login, obmDomain))
 			.andReturn(ObmUser.builder()
 				.uid(1)
-				.login(domainName)
+				.login(UserLogin.valueOf(login))
 				.domain(obmDomain)
 				.admin(true)
 				.build());
@@ -157,7 +158,7 @@ public class LoginBindingImplTest {
 		expect(userDao.findUserByLogin(login, obmDomain))
 			.andReturn(ObmUser.builder()
 				.uid(1)
-				.login(domainName)
+				.login(UserLogin.valueOf(login))
 				.domain(obmDomain)
 				.admin(false)
 				.build());
@@ -185,7 +186,7 @@ public class LoginBindingImplTest {
 		expect(userDao.findUserByLogin(login, obmDomain))
 			.andReturn(ObmUser.builder()
 				.uid(1)
-				.login(domainName)
+				.login(UserLogin.valueOf(login))
 				.domain(obmDomain)
 				.admin(true)
 				.build());
@@ -223,7 +224,7 @@ public class LoginBindingImplTest {
 		expect(userDao.findUserByLogin(login, obmDomain))
 			.andReturn(ObmUser.builder()
 				.uid(1)
-				.login(domainName)
+				.login(UserLogin.valueOf(login))
 				.domain(obmDomain)
 				.admin(false)
 				.build());

@@ -77,6 +77,7 @@ import com.google.inject.Singleton;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserLogin;
 
 @Singleton
 public class UserDaoJdbcImpl implements UserDao {
@@ -337,7 +338,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			String extId = rs.getString("userobm_ext_id");
 			return ObmUser.builder()
 					.uid(rs.getInt("userobm_id"))
-					.login(rs.getString("userobm_login"))
+					.login(UserLogin.valueOf(rs.getString("userobm_login")))
 					.admin(profileDao.isAdminProfile(rs.getString("userobm_perms")))
 					.emailAndAliases(nullToEmpty(rs.getString("userobm_email")))
 					.domain(domain)

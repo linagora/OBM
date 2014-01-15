@@ -50,11 +50,14 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserLogin;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(DaoTestModule.class)
 public class UserPatternDaoJdbcImplTest implements H2TestClass {
 
+	private final UserLogin jdoeLogin = UserLogin.valueOf("jdoe");
+	
 	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
 	@Inject H2InMemoryDatabase db;
 
@@ -71,7 +74,7 @@ public class UserPatternDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(jdoeLogin)
 				.lastName("Doe")
 				.firstName("John")
 				.commonName("J. Doe")
@@ -92,7 +95,7 @@ public class UserPatternDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(jdoeLogin)
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();
 		Set<String> patterns = ImmutableSet.of("jdoe");
@@ -105,7 +108,7 @@ public class UserPatternDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(jdoeLogin)
 				.lastName("Doe")
 				.firstName("John")
 				.commonName("J. Doe")
@@ -133,7 +136,7 @@ public class UserPatternDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("jdoe")
+				.login(jdoeLogin)
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();
 

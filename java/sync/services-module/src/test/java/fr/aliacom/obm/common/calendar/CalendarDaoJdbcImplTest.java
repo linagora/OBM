@@ -95,6 +95,7 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserLogin;
 
 @GuiceModule(CalendarDaoJdbcImplTest.Env.class)
 @RunWith(GuiceRunner.class)
@@ -103,7 +104,7 @@ public class CalendarDaoJdbcImplTest {
 	private static final ObmUser PATTERN_MATCHING_USER = ObmUser
 			.builder()
 			.uid(1)
-			.login("login")
+			.login(UserLogin.valueOf("login"))
 			.lastName("lastname")
 			.firstName("firstname")
 			.domain(ToolBox.getDefaultObmDomain())

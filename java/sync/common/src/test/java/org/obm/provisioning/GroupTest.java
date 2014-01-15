@@ -41,13 +41,14 @@ import com.google.common.collect.ImmutableSet;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserLogin;
 
 
 public class GroupTest {
 	
     private final static ObmUser testuser = ObmUser.builder()
                               .uid(2)
-                              .login("testuser")
+                              .login(UserLogin.valueOf("testuser"))
                               .domain(ObmDomain.builder().id(3).build())
                               .build();
     

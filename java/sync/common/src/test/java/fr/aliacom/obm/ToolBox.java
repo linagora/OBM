@@ -64,6 +64,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.ObmUser.Builder;
+import fr.aliacom.obm.common.user.UserLogin;
 
 public class ToolBox {
 
@@ -134,7 +135,7 @@ public class ToolBox {
 		return ObmUser.builder()
 			.uid(1)
 			.entityId(EntityId.valueOf(2))
-			.login("user")
+			.login(UserLogin.valueOf("user"))
 			.domain(getDefaultObmDomain())
 			.emailAndAliases("user@test")
 			.firstName("Obm")

@@ -27,6 +27,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserService;
 
 @GuiceModule(DatabaseFreeBusyProviderTest.Env.class)
@@ -63,7 +64,7 @@ public class DatabaseFreeBusyProviderTest {
 	
 	private final static String DOMAIN = "domain";
 	private final static String ICS = "ics";
-	private final static String OWNER_LOGIN = "owner";
+	private final static UserLogin OWNER_LOGIN = UserLogin.valueOf("owner");
 	private final static String OWNER_EMAIL = "owner@domain";
 	private final static String ATTENDEE_EMAIL = "attendee@domain";
 

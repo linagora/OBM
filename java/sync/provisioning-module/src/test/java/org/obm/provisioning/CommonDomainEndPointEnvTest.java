@@ -97,6 +97,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserLogin;
 
 public abstract class CommonDomainEndPointEnvTest {
 
@@ -299,7 +300,7 @@ public abstract class CommonDomainEndPointEnvTest {
 
 	protected void expectSuccessfulAuthentication(String login, String password) {
 		ObmUser user = ObmUser.builder()
-						.login(login)
+						.login(UserLogin.valueOf(login))
 						.password(password)
 						.domain(domain)
 						.lastName(login)
@@ -508,7 +509,7 @@ public abstract class CommonDomainEndPointEnvTest {
 		return ObmUser.builder()
 				.domain(domain)
 				.extId(userExtId("extId"))
-				.login("user1")
+				.login(UserLogin.valueOf("user1"))
 				.password("password")
 				.lastName("Doe")
 				.profileName(ProfileName.valueOf("Utilisateurs"))

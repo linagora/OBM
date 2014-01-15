@@ -68,6 +68,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserLogin;
 
 
 @GuiceModule(UserDaoTest.Env.class)
@@ -364,7 +365,7 @@ public class UserDaoTest {
 		ObmUser expectedObmUser = ObmUser.builder()
 			.uid(5)
 			.entityId(EntityId.valueOf(6))
-			.login("login")
+			.login(UserLogin.valueOf("login"))
 			.admin(true)
 			.domain(domain)
 			.emailAndAliases(Joiner.on(ObmUser.EMAIL_FIELD_SEPARATOR).join("useremail", "useremail2"))

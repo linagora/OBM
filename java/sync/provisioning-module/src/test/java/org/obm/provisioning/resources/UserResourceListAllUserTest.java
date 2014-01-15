@@ -51,6 +51,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserLogin;
 
 
 @RunWith(GuiceRunner.class)
@@ -158,7 +159,7 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	private ObmUser fakeUser(int id) {
 		return ObmUser
 				.builder()
-				.login("user" + id)
+				.login(UserLogin.valueOf("user" + id))
 				.uid(id)
 				.extId(UserExtId.builder().extId("ExtId" + id).build())
 				.lastName("Lastname")

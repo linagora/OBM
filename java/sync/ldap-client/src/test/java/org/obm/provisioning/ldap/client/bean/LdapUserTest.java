@@ -18,18 +18,21 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserLogin;
 
 @GuiceModule(EmbeddedLdapModule.class)
 @RunWith(GuiceRunner.class)
 public class LdapUserTest {
 
+	private final UserLogin validLogin = UserLogin.valueOf("Richard.Sorge");
+	
 	@Inject LdapUser.Builder ldapUserBuilder;
 	@Inject LdapUser.Builder ldapUserBuilder2;
 
 	private ObmUser buildObmUser() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
-				.login("Richard.Sorge")
+				.login(validLogin)
 				.emailAndAliases("Richard.Sorge")
 				.emailAlias(ImmutableSet.of("alias1", "alias2"))
 				.firstName("Richard")
@@ -55,7 +58,7 @@ public class LdapUserTest {
 	private ObmUser buildObmUserNoUidNumber() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
-				.login("Richard.Sorge")
+				.login(validLogin)
 				.emailAndAliases("Richard.Sorge")
 				.firstName("Richard")
 				.lastName("Sorge")
@@ -78,7 +81,7 @@ public class LdapUserTest {
 	private ObmUser buildObmUserNoGidNumber() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
-				.login("Richard.Sorge")
+				.login(validLogin)
 				.emailAndAliases("Richard.Sorge")
 				.firstName("Richard")
 				.lastName("Sorge")
@@ -101,7 +104,7 @@ public class LdapUserTest {
 	private ObmUser buildObmUserNoEmail() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
-				.login("Richard.Sorge")
+				.login(validLogin)
 				.firstName("Richard")
 				.lastName("Sorge")
 				.uidNumber(1895)
@@ -120,7 +123,7 @@ public class LdapUserTest {
 	private ObmUser buildObmUserNoDomainName() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
-				.login("Richard.Sorge")
+				.login(validLogin)
 				.emailAndAliases("Richard.Sorge")
 				.firstName("Richard")
 				.lastName("Sorge")
@@ -143,7 +146,7 @@ public class LdapUserTest {
 	private ObmUser buildObmUserNoMailHostIP() {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
-				.login("Richard.Sorge")
+				.login(validLogin)
 				.emailAndAliases("Richard.Sorge")
 				.firstName("Richard")
 				.lastName("Sorge")

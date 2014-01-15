@@ -127,6 +127,7 @@ import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
 
@@ -1261,7 +1262,7 @@ public class CalendarBindingImplTest {
 		ObmUser obmUser = ObmUser.builder()
 			.uid(1)
 			.entityId(EntityId.valueOf(2))
-			.login("user")
+			.login(UserLogin.valueOf("user"))
 			.domain(defaultUser.getDomain())
 			.emailAndAliases(email)
 			.build();
@@ -2317,7 +2318,7 @@ public class CalendarBindingImplTest {
 	public void testGetSyncDoesNotMoveConfidentialEvents() throws FindException, ServerFault, NotAllowedException {
 		String calendar = "user@test.tlse.lng";
 		ObmUser user =
-				ObmUser.builder().uid(1).entityId(EntityId.valueOf(2)).login("user").domain(ToolBox.getDefaultObmDomain())
+				ObmUser.builder().uid(1).entityId(EntityId.valueOf(2)).login(UserLogin.valueOf("user")).domain(ToolBox.getDefaultObmDomain())
 				.emailAndAliases("user@test.tlse.lng").firstName("Obm").lastName("User")
 				.build();
 
@@ -3523,7 +3524,7 @@ public class CalendarBindingImplTest {
 	public void testGetSyncWithSortedChangesInheritsAlertFromEventOwnerIfNotSet() throws Exception {
 		String calendar = "user";
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		ObmUser calendarUser = ObmUser.builder().login(UserLogin.valueOf(calendar)).uid(2).domain(domain).build();
 		Event event = new Event();
 		EventChanges eventChanges = EventChanges.builder().updates(Sets.newHashSet(event)).lastSync(new Date()).build();
 
@@ -3544,7 +3545,7 @@ public class CalendarBindingImplTest {
 	public void testGetSyncWithSortedChangesDoesntInheritAlertFromEventOwnerIfNotInDelegation() throws Exception {
 		String calendar = "user";
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		ObmUser calendarUser = ObmUser.builder().login(UserLogin.valueOf(calendar)).uid(2).domain(domain).build();
 		Event event = new Event();
 		EventChanges eventChanges = EventChanges.builder().updates(Sets.newHashSet(event)).lastSync(new Date()).build();
 
@@ -3565,7 +3566,7 @@ public class CalendarBindingImplTest {
 	public void testGetSyncWithSortedChangesDoesntInheritAlertFromEventOwnerIfSet() throws Exception {
 		String calendar = "user";
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		ObmUser calendarUser = ObmUser.builder().login(UserLogin.valueOf(calendar)).uid(2).domain(domain).build();
 		Event event = new Event();
 
 		event.setAlert(10);
@@ -3588,7 +3589,7 @@ public class CalendarBindingImplTest {
 	public void testGetEventFromIdInheritsAlertFromEventOwnerIfNotSet() throws Exception {
 		String calendar = "user";
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		ObmUser calendarUser = ObmUser.builder().login(UserLogin.valueOf(calendar)).uid(2).domain(domain).build();
 		Event event = new Event();
 		EventObmId eventId = new EventObmId(1);
 
@@ -3630,7 +3631,7 @@ public class CalendarBindingImplTest {
 	public void testGetEventFromIdDoesntInheritAlertFromEventOwnerIfSet() throws Exception {
 		String calendar = "user";
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		ObmUser calendarUser = ObmUser.builder().login(UserLogin.valueOf(calendar)).uid(2).domain(domain).build();
 		Event event = new Event();
 		EventObmId eventId = new EventObmId(1);
 
@@ -3653,7 +3654,7 @@ public class CalendarBindingImplTest {
 	public void testGetEventFromExtIdInheritsAlertFromEventOwnerIfNotSet() throws Exception {
 		String calendar = "user";
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		ObmUser calendarUser = ObmUser.builder().login(UserLogin.valueOf(calendar)).uid(2).domain(domain).build();
 		Event event = new Event();
 		EventExtId eventId = new EventExtId("1");
 
@@ -3678,7 +3679,7 @@ public class CalendarBindingImplTest {
 		Event event = new Event();
 		EventExtId eventId = new EventExtId("1");
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		ObmUser calendarUser = ObmUser.builder().login(UserLogin.valueOf(calendar)).uid(2).domain(domain).build();
 
 		event.setOwner(calendar);
 
@@ -3698,7 +3699,7 @@ public class CalendarBindingImplTest {
 	public void testGetEventFromExtIdDoesntInheritAlertFromEventOwnerIfSet() throws Exception {
 		String calendar = "user";
 		ObmDomain domain = ToolBox.getDefaultObmDomain();
-		ObmUser calendarUser = ObmUser.builder().login(calendar).uid(2).domain(domain).build();
+		ObmUser calendarUser = ObmUser.builder().login(UserLogin.valueOf(calendar)).uid(2).domain(domain).build();
 		Event event = new Event();
 		EventExtId eventId = new EventExtId("1");
 

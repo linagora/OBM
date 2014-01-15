@@ -44,6 +44,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserSettings;
 
 public class ServicesToolBox {
@@ -60,7 +61,7 @@ public class ServicesToolBox {
 		return ObmUser.builder()
 			.uid(1)
 			.entityId(EntityId.valueOf(2))
-			.login("user")
+			.login(UserLogin.valueOf("user"))
 			.domain(getDefaultObmDomain())
 			.emailAndAliases("user@test")
 			.firstName("Obm")
@@ -72,7 +73,7 @@ public class ServicesToolBox {
 		return ObmUser.builder()
 			.uid(1)
 			.entityId(EntityId.valueOf(2))
-			.login("user")
+			.login(UserLogin.valueOf("user"))
 			.domain(getDefaultObmDomain())
 			.emailAndAliases(email)
 			.firstName(firstName)

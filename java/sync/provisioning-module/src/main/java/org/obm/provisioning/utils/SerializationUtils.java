@@ -59,6 +59,7 @@ import com.google.common.collect.Lists;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserLogin;
 
 public class SerializationUtils {
 	
@@ -167,7 +168,7 @@ public class SerializationUtils {
 				toBuild.lastName(value.asText());
 				break;
 			case LOGIN:
-				toBuild.login(value.asText());
+				toBuild.login(UserLogin.valueOf(value.asText()));
 				break;
 			case MAILS:
 				toBuild.mails(getMailsTokenTextValues(value));

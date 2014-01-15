@@ -58,6 +58,7 @@ import fr.aliacom.obm.common.profile.Profile;
 import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserLogin;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(BatchProcessorImplUserTest.Env.class)
@@ -116,6 +117,8 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 			.alias("domain.com")
 			.build();
 
+	private final UserLogin user1Login = UserLogin.valueOf("user1");
+	
 	@Test
 	public void testProcessCreateUserWithInvalidJSONData() throws Exception {
 		Operation.Builder opBuilder = Operation
@@ -176,7 +179,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.domain(domain).status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 
-		final ObmUser user = ObmUser.builder().login("user1").lastName("user1")
+		final ObmUser user = ObmUser.builder().login(user1Login).lastName("user1")
 				.password("secret").emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1")).domain(domain)
@@ -184,7 +187,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		final ObmUser userFromDao = ObmUser
 				.builder()
 				.uid(1)
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -320,14 +323,14 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.domain(domain).status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 
-		ObmUser user = ObmUser.builder().login("user1").lastName("user1")
+		ObmUser user = ObmUser.builder().login(user1Login).lastName("user1")
 				.password("secret").emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1")).domain(domain)
 				.mailHost(ObmHost.builder().name("host").build()).build();
 		ObmUser userFromDao = ObmUser
 				.builder()
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -409,11 +412,11 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 
-		ObmUser user = ObmUser.builder().login("user1").lastName("user1")
+		ObmUser user = ObmUser.builder().login(user1Login).lastName("user1")
 				.password("secret").profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domainWithSmtpIn).build();
-		ObmUser userFromDao = ObmUser.builder().uid(1).login("user1")
+		ObmUser userFromDao = ObmUser.builder().uid(1).login(user1Login)
 				.password("secret").profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domainWithSmtpIn).build();
@@ -534,11 +537,11 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
-		final ObmUser user = ObmUser.builder().login("user1").lastName("user1")
+		final ObmUser user = ObmUser.builder().login(user1Login).lastName("user1")
 				.password("secret").profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domainWithImapAndLdap).build();
-		final ObmUser userFromDao = ObmUser.builder().uid(1).login("user1")
+		final ObmUser userFromDao = ObmUser.builder().uid(1).login(user1Login)
 				.password("secret").profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1")).domain(domain).build();
 
@@ -624,7 +627,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.domain(domain).status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
-		final ObmUser user = ObmUser.builder().login("user1")
+		final ObmUser user = ObmUser.builder().login(user1Login)
 				.password("secret").profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1")).domain(domain).build();
 
@@ -675,7 +678,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
 		final ObmUser user = ObmUser
 				.builder()
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
@@ -732,7 +735,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
 		final ObmUser user = ObmUser
 				.builder()
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
@@ -787,7 +790,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.operation(opBuilder.build());
 		final ObmUser user = ObmUser
 				.builder()
-				.login("user1")
+				.login(UserLogin.valueOf("user1"))
 				.password("secret")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
@@ -852,7 +855,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
-				.login("user1")
+				.login(user1Login)
 				.lastName("user1")
 				.password("secret")
 				.emailAndAliases("john@domain")
@@ -866,7 +869,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -932,7 +935,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -994,7 +997,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -1056,7 +1059,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -1119,7 +1122,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -1175,7 +1178,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -1243,7 +1246,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -1298,7 +1301,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
-				.login("user1")
+				.login(user1Login)
 				.lastName("user1")
 				.password("secret")
 				.emailAndAliases("john@domain")
@@ -1355,7 +1358,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -1413,7 +1416,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.builder()
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
-				.login("user1")
+				.login(user1Login)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))

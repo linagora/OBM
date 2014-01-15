@@ -34,6 +34,7 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserLogin;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(BatchProcessorImplGroupTest.Env.class)
@@ -392,9 +393,7 @@ public class BatchProcessorImplGroupTest extends BatchProcessorImplTestEnv {
 		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
 		final Group groupFromDao = Group.builder().name("group1").extId(extId)
 				.build();
-		final ObmUser userFromDao = ObmUser.builder()
-				.extId(UserExtId.valueOf("extIdUser1")).domain(domain)
-				.login("log").build();
+		final ObmUser userFromDao = userFromDao();
 
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
 		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domain))
@@ -419,6 +418,12 @@ public class BatchProcessorImplGroupTest extends BatchProcessorImplTestEnv {
 		processor.process(batchBuilder.build());
 
 		mocksControl.verify();
+	}
+
+	private ObmUser userFromDao() {
+		return ObmUser.builder()
+				.extId(UserExtId.valueOf("extIdUser1")).domain(domain)
+				.login(UserLogin.valueOf("log")).build();
 	}
 
 	private void expectLdapAddUserToAllParentsOfGroup(Group group,
@@ -470,9 +475,7 @@ public class BatchProcessorImplGroupTest extends BatchProcessorImplTestEnv {
 		final GroupExtId extId = GroupExtId.valueOf("extIdGroup1");
 		final Group groupFromDao = Group.builder().name("group1").extId(extId)
 				.build();
-		final ObmUser userFromDao = ObmUser.builder()
-				.extId(UserExtId.valueOf("extIdUser1")).domain(domain)
-				.login("log").build();
+		final ObmUser userFromDao = userFromDao();
 
 		expect(dateProvider.getDate()).andReturn(date).anyTimes();
 		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domain))

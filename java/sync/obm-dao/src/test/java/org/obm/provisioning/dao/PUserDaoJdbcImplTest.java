@@ -50,6 +50,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserLogin;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(PUserDaoJdbcImplTest.Env.class)
@@ -530,7 +531,7 @@ public class PUserDaoJdbcImplTest implements H2TestClass {
 
 	private ObmUser obmUser(int id, String extId) {
 		return ObmUser.builder()
-				.login("dummy")
+				.login(UserLogin.valueOf("dummy"))
 				.uid(id)
 				.extId(UserExtId.valueOf(extId))
 				.domain(ObmDomain.builder().build())

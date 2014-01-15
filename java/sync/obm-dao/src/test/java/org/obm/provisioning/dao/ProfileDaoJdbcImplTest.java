@@ -33,6 +33,7 @@ import fr.aliacom.obm.common.profile.Profile.AccessRestriction;
 import fr.aliacom.obm.common.profile.Profile.AdminRealm;
 import fr.aliacom.obm.common.profile.Profile.Builder;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserLogin;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(ProfileDaoJdbcImplTest.Env.class)
@@ -190,7 +191,7 @@ public class ProfileDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(666)
-				.login("lucifer")
+				.login(UserLogin.valueOf("lucifer"))
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();
 
@@ -270,7 +271,7 @@ public class ProfileDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
-				.login("user1")
+				.login(UserLogin.valueOf("user1"))
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();
 		Profile profile = Profile
