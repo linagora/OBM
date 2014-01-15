@@ -36,11 +36,7 @@ function html_share_calendar($id,$name,$entity_type) {
   global $ico_popup_close, $ico_html, $ico_ical;
   global $prevent_public_agenda_sharing_by_url, $prevent_public_agenda_sharing_by_email;
 
-  if ($id == $GLOBALS['obm']['uid']) {
-    $user = "<h1>".$GLOBALS['l_my_share_calendar']."</h1>";
-  } else {
-    $user = "<h1>".$GLOBALS['l_user_share_calendar']." $name</h1>";
-  }
+  $user = "<h1>".$GLOBALS['l_my_share_calendar']."</h1>";
 
   $url_display_css = $mail_display_css = $tr_display_css = 'display:visible;';
   if ( $prevent_public_agenda_sharing_by_url == true ) $url_display_css = 'display:none;';
