@@ -78,6 +78,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 @Singleton
 public class UserDaoJdbcImpl implements UserDao {
@@ -342,15 +343,17 @@ public class UserDaoJdbcImpl implements UserDao {
 					.admin(profileDao.isAdminProfile(rs.getString("userobm_perms")))
 					.emailAndAliases(nullToEmpty(rs.getString("userobm_email")))
 					.domain(domain)
-					.firstName(emptyToNull(rs.getString("userobm_firstname")))
-					.lastName(emptyToNull(rs.getString("userobm_lastname")))
+					.identity(UserIdentity.builder()
+						.kind(rs.getString("userobm_kind"))
+						.firstName(emptyToNull(rs.getString("userobm_firstname")))
+						.lastName(emptyToNull(rs.getString("userobm_lastname")))
+						.commonName(emptyToNull(rs.getString("userobm_commonname")))
+						.build())
 					.publicFreeBusy(computePublicFreeBusy(rs))
-					.commonName(emptyToNull(rs.getString("userobm_commonname")))
 					.extId(extId != null ? UserExtId.builder().extId(extId).build() : null)
 					.entityId(EntityId.valueOf(rs.getInt("userentity_entity_id")))
 					.password(Strings.emptyToNull(rs.getString("userobm_password")))
 					.profileName(ProfileName.builder().name(rs.getString("userobm_perms")).build())
-					.kind(rs.getString("userobm_kind"))
 					.title(emptyToNull(rs.getString("userobm_title")))
 					.description(rs.getString("userobm_description"))
 					.company(rs.getString("userobm_company"))

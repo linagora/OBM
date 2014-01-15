@@ -65,6 +65,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.ObmUser.Builder;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 public class ToolBox {
 
@@ -138,8 +139,10 @@ public class ToolBox {
 			.login(UserLogin.valueOf("user"))
 			.domain(getDefaultObmDomain())
 			.emailAndAliases("user@test")
-			.firstName("Obm")
-			.lastName("User");
+			.identity(UserIdentity.builder()
+				.firstName("Obm")
+				.lastName("User")
+				.build());
 	}
 
 	public static Attendee getFakeAttendee(String userEmail) {

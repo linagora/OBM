@@ -52,6 +52,7 @@ import com.google.inject.Provider;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 @RunWith(GuiceRunner.class)
 public class LdapManagerImplTest {
@@ -74,8 +75,9 @@ public class LdapManagerImplTest {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(1895)
 				.login(UserLogin.valueOf("richard.sorge"))
-				.firstName("Richard")
-				.lastName("Sorge")
+				.identity(UserIdentity.builder()
+					.firstName("Richard")
+					.lastName("Sorge").build())
 				.domain(ObmDomain.builder().host(ServiceProperty.builder().build(), ObmHost.builder().build()).build())
 				.build();
 
@@ -104,8 +106,9 @@ public class LdapManagerImplTest {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(1895)
 				.login(UserLogin.valueOf("richard.sorge"))
-				.firstName("Richard")
-				.lastName("Sorge")
+				.identity(UserIdentity.builder()
+					.firstName("Richard")
+					.lastName("Sorge").build())
 				.domain(ObmDomain
 						.builder()
 						.host(ServiceProperty.builder().build(),

@@ -65,12 +65,20 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.ObmUser.Builder;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(UserDaoJdbcImplTest.Env.class)
 public class UserDaoJdbcImplTest implements H2TestClass {
 
 	private final UserLogin validLogin = UserLogin.valueOf("login");
+	private final UserIdentity validIdentity = UserIdentity.builder().lastName("lastname").build();
+	private final UserIdentity johnIdentity = UserIdentity.builder()
+			.kind("Mr")
+			.lastName("Doe")
+			.firstName("John")
+			.commonName("J. Doe")
+			.build();
 	
 	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
 	@Inject H2InMemoryDatabase db;
@@ -144,7 +152,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = ObmUser
 				.builder()
 				.login(validLogin)
-				.lastName("lastname")
+				.identity(validIdentity)
 				.domain(domain)
 				.extId(extId)
 				.createdBy(creator)
@@ -165,7 +173,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		Builder userBuilder = ObmUser
 				.builder()
 				.login(validLogin)
-				.lastName("lastname")
+				.identity(validIdentity)
 				.domain(domain)
 				.extId(extId)
 				.createdBy(creator);
@@ -190,7 +198,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		Builder userBuilder = ObmUser
 				.builder()
 				.login(validLogin)
-				.lastName("lastname")
+				.identity(validIdentity)
 				.domain(domain)
 				.extId(extId)
 				.createdBy(creator);
@@ -208,7 +216,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = ObmUser
 				.builder()
 				.login(validLogin)
-				.lastName("lastname")
+				.identity(validIdentity)
 				.domain(domain)
 				.extId(UserExtId.valueOf("testExtId"))
 				.createdBy(creator)
@@ -227,7 +235,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		Builder userBuilder = ObmUser
 				.builder()
 				.login(validLogin)
-				.lastName("lastname")
+				.identity(validIdentity)
 				.domain(domain)
 				.extId(UserExtId.valueOf("testExtId"))
 				.createdBy(creator);
@@ -260,7 +268,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.login(validLogin)
 				.password("secure")
 				.profileName(ProfileName.valueOf("user"))
-				.lastName("Doe")
+				.identity(validIdentity)
 				.domain(domain)
 				.publicFreeBusy(true);
 
@@ -283,9 +291,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.login(validLogin)
 				.password("secure")
 				.profileName(ProfileName.valueOf("user"))
-				.lastName("Doe")
-				.firstName("John")
-				.commonName("J. Doe")
+				.identity(johnIdentity)
 				.address1("1 OBM Street")
 				.address2("2 OBM Street")
 				.address3("3 OBM Street")
@@ -303,7 +309,6 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.direction("LGS")
 				.title("Software Dev")
 				.emailAndAliases("jdoe\r\njohn.doe")
-				.kind("Mr")
 				.mailHost(mailHost)
 				.mailQuota(500)
 				.domain(domain);
@@ -325,9 +330,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.login(validLogin)
 				.password("secure")
 				.profileName(ProfileName.valueOf("user"))
-				.lastName("Doe")
-				.firstName("John")
-				.commonName("J. Doe")
+				.identity(johnIdentity)
 				.address1("1 OBM Street")
 				.address2("2 OBM Street")
 				.address3("3 OBM Street")
@@ -345,7 +348,6 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.direction("LGS")
 				.title("Software Dev")
 				.emailAndAliases("jdoe\r\njohn.doe")
-				.kind("Mr")
 				.mailHost(mailHost)
 				.mailQuota(500)
 				.hidden(true)
@@ -372,7 +374,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.login(validLogin)
 				.password("secure")
 				.profileName(ProfileName.valueOf("user"))
-				.lastName("Doe")
+				.identity(validIdentity)
 				.domain(domain);
 
 		ObmUser createdUser = dao.create(userBuilder.build());
@@ -398,9 +400,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.login(validLogin)
 				.password("secure")
 				.profileName(ProfileName.valueOf("user"))
-				.lastName("Doe")
-				.firstName("John")
-				.commonName("J. Doe")
+				.identity(johnIdentity)
 				.address1("1 OBM Street")
 				.address2("2 OBM Street")
 				.address3("3 OBM Street")
@@ -418,7 +418,6 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.direction("LGS")
 				.title("Software Dev")
 				.emailAndAliases("jdoe\r\njohn.doe")
-				.kind("Mr")
 				.mailHost(mailHost)
 				.mailQuota(500)
 				.uidNumber(123)
@@ -449,8 +448,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	@Test
 	public void testUpdate() throws SQLException, UserNotFoundException {
 		ObmUser user = sampleUserBuilder(1, 3, "1")
-				.firstName("John")
-				.lastName("Doe")
+				.identity(johnIdentity)
 				.hidden(true)
 				.build();
 
@@ -472,8 +470,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	@Test
 	public void testGetAfterUpdate() throws SQLException, UserNotFoundException {
 		ObmUser user = sampleUserBuilder(1, 3, "1")
-				.firstName("John")
-				.lastName("Doe")
+				.identity(johnIdentity)
 				.publicFreeBusy(true)
 				.build();
 
@@ -533,9 +530,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	@Test
 	public void testUpdateInsertsEmtpyStringsForNamePartsIfNull() throws Exception {
 		ObmUser user = sampleUserBuilder(1, 3, "1")
-				.firstName(null)
-				.lastName(null)
-				.commonName(null)
+				.identity(UserIdentity.empty())
 				.build();
 
 		ObmUser updatedUser = dao.update(user);
@@ -553,9 +548,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.builder()
 				.extId(UserExtId.valueOf("extIdJDoe"))
 				.login(UserLogin.valueOf("jdoe"))
-				.lastName("Doe")
-				.firstName("John")
-				.commonName("J. Doe")
+				.identity(johnIdentity)
 				.domain(domain)
 				.build();
 
@@ -578,9 +571,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.builder()
 				.extId(UserExtId.valueOf("extIdJDoe"))
 				.login(validLogin)
-				.lastName("Doe")
-				.firstName("John")
-				.commonName("J. Doe")
+				.identity(johnIdentity)
 				.domain(domain)
 				.build();
 
@@ -597,9 +588,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.builder()
 				.extId(UserExtId.valueOf("extIdJDoe"))
 				.login(validLogin)
-				.lastName("Doe")
-				.firstName("John")
-				.commonName("J. Doe")
+				.identity(johnIdentity)
 				.domain(domain)
 				.build();
 
@@ -779,8 +768,10 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.login(UserLogin.valueOf("user" + id))
 				.uid(id)
 				.entityId(EntityId.valueOf(entityId))
-				.lastName("Lastname")
-				.firstName("Firstname")
+				.identity(UserIdentity.builder()
+					.lastName("Lastname")
+					.firstName("Firstname")
+					.build())
 				.domain(domain)
 				.profileName(ProfileName.valueOf("user"))
 				.password("user" + id)

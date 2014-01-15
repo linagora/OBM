@@ -60,6 +60,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 public class SerializationUtils {
 	
@@ -121,7 +122,7 @@ public class SerializationUtils {
 		});
 	}
 	
-	public static void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields, ObmUser.Builder toBuild) {
+	public static void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields, ObmUser.Builder toBuild, UserIdentity.Builder userIdentityBuilder) {
 		JsonNode value = jsonNode.findValue(jsonFields.asSpecificationValue());
 
 		if (isNullOrNullNode(value)) {
@@ -136,7 +137,7 @@ public class SerializationUtils {
 				toBuild.expresspostal(value.asText());
 				break;
 			case COMMONNAME:
-				toBuild.commonName(value.asText());
+				userIdentityBuilder.commonName(value.asText());
 				break;
 			case COMPANY:
 				toBuild.company(value.asText());
@@ -154,7 +155,7 @@ public class SerializationUtils {
 				toBuild.faxes(getCurrentTokenTextValues(value));
 				break;
 			case FIRSTNAME:
-				toBuild.firstName(value.asText());
+				userIdentityBuilder.firstName(value.asText());
 				break;
 			case GROUPS:
 				break;
@@ -162,10 +163,10 @@ public class SerializationUtils {
 				toBuild.extId(UserExtId.builder().extId(value.asText()).build());
 				break;
 			case KIND:
-				toBuild.kind(value.asText());
+				userIdentityBuilder.kind(value.asText());
 				break;
 			case LASTNAME:
-				toBuild.lastName(value.asText());
+				userIdentityBuilder.lastName(value.asText());
 				break;
 			case LOGIN:
 				toBuild.login(UserLogin.valueOf(value.asText()));

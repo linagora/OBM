@@ -128,6 +128,7 @@ import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
 
@@ -2319,7 +2320,8 @@ public class CalendarBindingImplTest {
 		String calendar = "user@test.tlse.lng";
 		ObmUser user =
 				ObmUser.builder().uid(1).entityId(EntityId.valueOf(2)).login(UserLogin.valueOf("user")).domain(ToolBox.getDefaultObmDomain())
-				.emailAndAliases("user@test.tlse.lng").firstName("Obm").lastName("User")
+				.emailAndAliases("user@test.tlse.lng")
+				.identity(UserIdentity.builder().firstName("Obm").lastName("User").build())
 				.build();
 
 		Date timeCreate = new DateTime(1974, Calendar.SEPTEMBER, 4, 14, 0).toDate();

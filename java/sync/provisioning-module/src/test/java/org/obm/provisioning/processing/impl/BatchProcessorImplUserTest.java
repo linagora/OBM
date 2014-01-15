@@ -59,6 +59,7 @@ import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(BatchProcessorImplUserTest.Env.class)
@@ -118,6 +119,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 			.build();
 
 	private final UserLogin user1Login = UserLogin.valueOf("user1");
+	private final UserIdentity user1Name = UserIdentity.builder().lastName("user1").build();
 	
 	@Test
 	public void testProcessCreateUserWithInvalidJSONData() throws Exception {
@@ -179,7 +181,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.domain(domain).status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 
-		final ObmUser user = ObmUser.builder().login(user1Login).lastName("user1")
+		final ObmUser user = ObmUser.builder().login(user1Login).identity(user1Name)
 				.password("secret").emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1")).domain(domain)
@@ -323,7 +325,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.domain(domain).status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 
-		ObmUser user = ObmUser.builder().login(user1Login).lastName("user1")
+		ObmUser user = ObmUser.builder().login(user1Login).identity(user1Name)
 				.password("secret").emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1")).domain(domain)
@@ -412,7 +414,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expectDomain();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 
-		ObmUser user = ObmUser.builder().login(user1Login).lastName("user1")
+		ObmUser user = ObmUser.builder().login(user1Login).identity(user1Name)
 				.password("secret").profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domainWithSmtpIn).build();
@@ -537,7 +539,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 		Date date = DateUtils.date("2013-08-01T12:00:00");
-		final ObmUser user = ObmUser.builder().login(user1Login).lastName("user1")
+		final ObmUser user = ObmUser.builder().login(user1Login).identity(user1Name)
 				.password("secret").profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domainWithImapAndLdap).build();
@@ -856,7 +858,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
 				.login(user1Login)
-				.lastName("user1")
+				.identity(user1Name)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -1187,7 +1189,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.mailHost(
 						ObmHost.builder().name("host").ip("127.0.0.1").build());
 
-		ObmUser user = builder.lastName("user1").build();
+		ObmUser user = builder.identity(user1Name).build();
 
 		ObmUser userFromDao = builder.build();
 
@@ -1302,7 +1304,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.uid(1)
 				.entityId(EntityId.valueOf(1))
 				.login(user1Login)
-				.lastName("user1")
+				.identity(user1Name)
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
@@ -1362,7 +1364,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
-				.lastName("user1lastname")
+				.identity(user1Name)
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domainWithImapAndLdap)
 				.mailHost(
@@ -1420,7 +1422,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password("secret")
 				.emailAndAliases("john@domain")
 				.profileName(ProfileName.valueOf("user"))
-				.lastName("user1lastname")
+				.identity(user1Name)
 				.extId(UserExtId.valueOf("extIdUser1"))
 				.domain(domainWithImapAndLdap)
 				.mailHost(

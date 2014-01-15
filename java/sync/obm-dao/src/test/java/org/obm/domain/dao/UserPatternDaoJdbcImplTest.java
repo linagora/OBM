@@ -51,6 +51,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(DaoTestModule.class)
@@ -75,9 +76,11 @@ public class UserPatternDaoJdbcImplTest implements H2TestClass {
 				.builder()
 				.uid(1)
 				.login(jdoeLogin)
-				.lastName("Doe")
-				.firstName("John")
-				.commonName("J. Doe")
+				.identity(UserIdentity.builder()
+					.lastName("Doe")
+					.firstName("John")
+					.commonName("J. Doe")
+					.build())
 				.emailAndAliases("jdoe\r\njohn.doe")
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();
@@ -109,9 +112,11 @@ public class UserPatternDaoJdbcImplTest implements H2TestClass {
 				.builder()
 				.uid(1)
 				.login(jdoeLogin)
-				.lastName("Doe")
-				.firstName("John")
-				.commonName("J. Doe")
+				.identity(UserIdentity.builder()
+					.lastName("Doe")
+					.firstName("John")
+					.commonName("J. Doe")
+					.build())
 				.emailAndAliases("jdoe\r\njohn.doe")
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();

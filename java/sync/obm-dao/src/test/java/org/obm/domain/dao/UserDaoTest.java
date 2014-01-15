@@ -69,6 +69,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 
 @GuiceModule(UserDaoTest.Env.class)
@@ -369,9 +370,11 @@ public class UserDaoTest {
 			.admin(true)
 			.domain(domain)
 			.emailAndAliases(Joiner.on(ObmUser.EMAIL_FIELD_SEPARATOR).join("useremail", "useremail2"))
-			.firstName("firstname2")
-			.lastName("lastname2")
-			.commonName("commonname")
+			.identity(UserIdentity.builder()
+				.firstName("firstname2")
+				.lastName("lastname2")
+				.commonName("commonname")
+				.build())
 			.extId(UserExtId.builder().extId("extid").build())
 			.publicFreeBusy(true)
 			.password("password")

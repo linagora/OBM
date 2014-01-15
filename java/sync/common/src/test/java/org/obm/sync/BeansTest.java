@@ -75,6 +75,7 @@ import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 
 public class BeansTest {
@@ -123,7 +124,8 @@ public class BeansTest {
 				ModuleCheckBoxStates.class,
 				Profile.class,
 				EntityId.class,
-				UserLogin.class);
+				UserLogin.class,
+				UserIdentity.class);
 	}
 	
 	@Test

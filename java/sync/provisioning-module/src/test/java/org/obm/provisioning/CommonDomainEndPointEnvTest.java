@@ -98,6 +98,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 public abstract class CommonDomainEndPointEnvTest {
 
@@ -303,8 +304,10 @@ public abstract class CommonDomainEndPointEnvTest {
 						.login(UserLogin.valueOf(login))
 						.password(password)
 						.domain(domain)
-						.lastName(login)
-						.firstName(login)
+						.identity(UserIdentity.builder()
+								.lastName(login)
+								.firstName(login)
+								.build())
 						.extId(UserExtId
 								.builder()
 								.extId(uuidFactory.randomUUID().toString())
@@ -511,11 +514,13 @@ public abstract class CommonDomainEndPointEnvTest {
 				.extId(userExtId("extId"))
 				.login(UserLogin.valueOf("user1"))
 				.password("password")
-				.lastName("Doe")
+				.identity(UserIdentity.builder()
+						.kind("kind")
+						.lastName("Doe")
+						.firstName("Jesus")
+						.commonName("John Doe")
+						.build())
 				.profileName(ProfileName.valueOf("Utilisateurs"))
-				.firstName("Jesus")
-				.commonName("John Doe")
-				.kind("kind")
 				.title("title")
 				.description("description")
 				.company("company")

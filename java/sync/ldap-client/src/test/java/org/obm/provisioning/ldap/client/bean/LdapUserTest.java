@@ -19,12 +19,17 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 @GuiceModule(EmbeddedLdapModule.class)
 @RunWith(GuiceRunner.class)
 public class LdapUserTest {
 
 	private final UserLogin validLogin = UserLogin.valueOf("Richard.Sorge");
+	private final UserIdentity richardSorgeIdentity = UserIdentity.builder()
+			.firstName("Richard")
+			.lastName("Sorge")
+			.build();
 	
 	@Inject LdapUser.Builder ldapUserBuilder;
 	@Inject LdapUser.Builder ldapUserBuilder2;
@@ -35,8 +40,7 @@ public class LdapUserTest {
 				.login(validLogin)
 				.emailAndAliases("Richard.Sorge")
 				.emailAlias(ImmutableSet.of("alias1", "alias2"))
-				.firstName("Richard")
-				.lastName("Sorge")
+				.identity(richardSorgeIdentity)
 				.uidNumber(1895)
 				.gidNumber(1066)
 				.domain(
@@ -60,8 +64,7 @@ public class LdapUserTest {
 				.uid(666)
 				.login(validLogin)
 				.emailAndAliases("Richard.Sorge")
-				.firstName("Richard")
-				.lastName("Sorge")
+				.identity(richardSorgeIdentity)
 				.gidNumber(1066)
 				.domain(
 						ObmDomain.builder().host(
@@ -83,8 +86,7 @@ public class LdapUserTest {
 				.uid(666)
 				.login(validLogin)
 				.emailAndAliases("Richard.Sorge")
-				.firstName("Richard")
-				.lastName("Sorge")
+				.identity(richardSorgeIdentity)
 				.uidNumber(1895)
 				.domain(
 						ObmDomain.builder().host(
@@ -105,8 +107,7 @@ public class LdapUserTest {
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
 				.login(validLogin)
-				.firstName("Richard")
-				.lastName("Sorge")
+				.identity(richardSorgeIdentity)
 				.uidNumber(1895)
 				.gidNumber(1066)
 				.domain(
@@ -125,8 +126,7 @@ public class LdapUserTest {
 				.uid(666)
 				.login(validLogin)
 				.emailAndAliases("Richard.Sorge")
-				.firstName("Richard")
-				.lastName("Sorge")
+				.identity(richardSorgeIdentity)
 				.uidNumber(1895)
 				.gidNumber(1066)
 				.domain(
@@ -148,8 +148,7 @@ public class LdapUserTest {
 				.uid(666)
 				.login(validLogin)
 				.emailAndAliases("Richard.Sorge")
-				.firstName("Richard")
-				.lastName("Sorge")
+				.identity(richardSorgeIdentity)
 				.uidNumber(1895)
 				.gidNumber(1066)
 				.domain(

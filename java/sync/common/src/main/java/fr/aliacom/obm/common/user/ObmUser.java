@@ -39,7 +39,6 @@ import org.obm.provisioning.Group;
 import org.obm.provisioning.ProfileName;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.host.ObmHost;
-import org.obm.sync.utils.DisplayNameUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -81,9 +80,7 @@ public class ObmUser {
 		private UserExtId extId;
 		private UserLogin login;
 		private Boolean admin;
-		private String commonName;
-		private String lastName;
-		private String firstName;
+		private UserIdentity identity;
 		private String email;
 		private final ImmutableSet.Builder<String> emailAlias;
 		private Boolean hidden;
@@ -110,7 +107,6 @@ public class ObmUser {
 
 		private String password;
 		private ProfileName profileName;
-		private String kind;
 		private String company;
 		private String direction;
 		private String countryCode;
@@ -138,15 +134,12 @@ public class ObmUser {
 					.email(user.email)
 					.emailAlias(user.emailAlias)
 					.domain(user.domain)
-					.firstName(user.firstName)
-					.lastName(user.lastName)
+					.identity(user.identity)
 					.publicFreeBusy(user.publicFreeBusy)
-					.commonName(user.commonName)
 					.extId(user.extId)
 					.entityId(user.entityId)
 					.password(user.password)
 					.profileName(user.profileName)
-					.kind(user.kind)
 					.title(user.title)
 					.description(user.description)
 					.company(user.company)
@@ -193,20 +186,12 @@ public class ObmUser {
 			this.login = login;
 			return this;
 		}
+		public Builder identity(UserIdentity identity) {
+			this.identity = identity;
+			return this;
+		}
 		public Builder admin(boolean admin) {
 			this.admin = admin;
-			return this;
-		}
-		public Builder commonName(String commonName) {
-			this.commonName = commonName;
-			return this;
-		}
-		public Builder lastName(String lastName) {
-			this.lastName = lastName;
-			return this;
-		}
-		public Builder firstName(String firstName) {
-			this.firstName = firstName;
 			return this;
 		}
 		public Builder address1(String address1) {
@@ -275,10 +260,6 @@ public class ObmUser {
 		}
 		public Builder profileName(ProfileName profileName) {
 			this.profileName = profileName;
-			return this;
-		}
-		public Builder kind(String kind) {
-			this.kind = kind;
 			return this;
 		}
 		public Builder company(String company) {
@@ -421,12 +402,14 @@ public class ObmUser {
 			archived = Objects.firstNonNull(archived, false);			
 			hidden = Objects.firstNonNull(hidden, false);
 
+			UserIdentity identity = Objects.firstNonNull(this.identity, UserIdentity.empty());
+
 			return new ObmUser(
-					uid, entityId, login, extId, admin, commonName, lastName, firstName,
+					uid, entityId, login, extId, admin, identity,
 					email, emailAlias.build(), hidden,
 					address1, address2, address3, expresspostal, mobile, service, title, town,
 					zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
-					domain, publicFreeBusy, profileName, kind, company, direction, countryCode,
+					domain, publicFreeBusy, profileName, company, direction, countryCode,
 					phone, phone2, fax, fax2, mailQuota, mailHost, archived, password, uidNumber, gidNumber, groups.build());
 		}
 		
@@ -437,9 +420,7 @@ public class ObmUser {
 	private final UserLogin login;
 	private final UserExtId extId;
 	private final boolean admin;
-	private final String commonName;
-	private final String lastName;
-	private final String firstName;
+	private final UserIdentity identity;
 	private final String email;
 	private final Set<String> emailAlias;
 	private final boolean hidden;
@@ -466,7 +447,6 @@ public class ObmUser {
 
 	private final String password;
 	private final ProfileName profileName;
-	private final String kind;
 	private final String company;
 	private final String direction;
 	private final String countryCode;
@@ -483,8 +463,8 @@ public class ObmUser {
 	
 	private final Set<Group> groups;
 
-	public ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, String commonName,
-			String lastName, String firstName, String email,
+	private ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, UserIdentity identity,
+			String email,
 			Set<String> emailAlias, boolean hidden,
 			String address1, String address2,
 			String address3, String expresspostal,
@@ -492,7 +472,7 @@ public class ObmUser {
 			String zipCode,
 			String description, Date timeCreate, Date timeUpdate,
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
-			boolean publicFreeBusy, ProfileName profileName, String kind, String company,
+			boolean publicFreeBusy, ProfileName profileName, String company,
 			String direction, String countryCode, String phone, String phone2, String fax, String fax2,
 			Integer mailQuota, ObmHost mailHost, boolean archived, String password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
 		this.uid = uid;
@@ -500,9 +480,7 @@ public class ObmUser {
 		this.login = login;
 		this.extId = extId;
 		this.admin = admin;
-		this.commonName = commonName;
-		this.lastName = lastName;
-		this.firstName = firstName;
+		this.identity = identity;
 		this.email = email;
 		this.emailAlias = emailAlias;
 		this.hidden = hidden;
@@ -523,7 +501,6 @@ public class ObmUser {
 		this.domain = domain;
 		this.publicFreeBusy = publicFreeBusy;
 		this.profileName = profileName;
-		this.kind = kind;
 		this.company = company;
 		this.direction = direction;
 		this.countryCode = countryCode;
@@ -560,16 +537,20 @@ public class ObmUser {
 		return admin;
 	}
 	
+	public UserIdentity getIdentity() {
+		return identity;
+	}
+	
 	public String getCommonName() {
-		return commonName;
+		return identity.getCommonName();
 	}
 	
 	public String getLastName() {
-		return lastName;
+		return identity.getLastName();
 	}
 
 	public String getFirstName() {
-		return firstName;
+		return identity.getFirstName();
 	}
 
 	public Set<String> getEmailAlias() {
@@ -674,7 +655,7 @@ public class ObmUser {
 	}
 
 	public String getDisplayName(){
-		return DisplayNameUtils.getDisplayName(commonName, firstName, lastName);
+		return identity.getDisplayName();
 	}
 	
 	public void addAlias(String alias) {
@@ -721,7 +702,7 @@ public class ObmUser {
 	}
 
 	public String getKind() {
-		return kind;
+		return identity.getKind();
 	}
 
 	public String getCompany() {
@@ -790,9 +771,9 @@ public class ObmUser {
 
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(uid, entityId, login, extId, admin, commonName, lastName, firstName, email,
+		return Objects.hashCode(uid, entityId, login, extId, admin, identity, email,
 				emailAlias, hidden, address1, address2, address3, expresspostal, mobile,
-				service, title, town, zipCode,	description, createdBy, updatedBy, domain, publicFreeBusy, profileName, kind, company,
+				service, title, town, zipCode,	description, createdBy, updatedBy, domain, publicFreeBusy, profileName, company,
 				direction, countryCode, phone, phone2, fax, fax2, mailQuota, archived, mailHost, password, uidNumber, gidNumber, groups);
 	}
 	
@@ -805,9 +786,7 @@ public class ObmUser {
 				&& Objects.equal(this.login, that.login)
 				&& Objects.equal(this.extId, that.extId)
 				&& Objects.equal(this.admin, that.admin)
-				&& Objects.equal(this.commonName, that.commonName)
-				&& Objects.equal(this.lastName, that.lastName)
-				&& Objects.equal(this.firstName, that.firstName)
+				&& Objects.equal(this.identity, that.identity)
 				&& Objects.equal(this.email, that.email)
 				&& Objects.equal(this.emailAlias, that.emailAlias)
 				&& Objects.equal(this.hidden, that.hidden)
@@ -826,7 +805,6 @@ public class ObmUser {
 				&& Objects.equal(this.domain, that.domain)
 				&& Objects.equal(this.publicFreeBusy, that.publicFreeBusy)
 				&& Objects.equal(this.profileName, that.profileName)
-				&& Objects.equal(this.kind, that.kind)
 				&& Objects.equal(this.company, that.company)
 				&& Objects.equal(this.direction, that.direction)
 				&& Objects.equal(this.countryCode, that.countryCode)
@@ -853,9 +831,7 @@ public class ObmUser {
 			.add("login", login)
 			.add("extId", extId)
 			.add("admin", admin)
-			.add("commonName", commonName)
-			.add("lastName", lastName)
-			.add("firstName", firstName)
+			.add("identity", identity)
 			.add("email", email)
 			.add("emailAlias", emailAlias)
 			.add("hidden", hidden)
@@ -876,7 +852,6 @@ public class ObmUser {
 			.add("domain", domain)
 			.add("publicFreeBusy", publicFreeBusy)
 			.add("profileName", profileName)
-			.add("kind", kind)
 			.add("company", company)
 			.add("direction", direction)
 			.add("countryCode", countryCode)

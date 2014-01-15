@@ -52,6 +52,7 @@ import com.google.common.collect.ImmutableList;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 
 @RunWith(GuiceRunner.class)
@@ -162,9 +163,11 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 				.login(UserLogin.valueOf("user" + id))
 				.uid(id)
 				.extId(UserExtId.builder().extId("ExtId" + id).build())
-				.lastName("Lastname")
-				.firstName("Firstname")
-				.commonName("")
+				.identity(UserIdentity.builder()
+						.lastName("Lastname")
+						.firstName("Firstname")
+						.commonName("")
+					.build())
 				.domain(domain)
 				.emailAndAliases("user" + id)
 				.publicFreeBusy(true)

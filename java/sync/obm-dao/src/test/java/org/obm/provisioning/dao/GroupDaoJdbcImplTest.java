@@ -75,6 +75,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(GroupDaoJdbcImplTest.Env.class)
@@ -133,9 +134,11 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
         return ObmUser.builder()
                       .uid(uid)
                       .login(UserLogin.valueOf("user" + stringUid))
-                      .commonName("")
-                      .lastName("")
-                      .firstName("")
+                      .identity(UserIdentity.builder()
+	                      .commonName("")
+	                      .lastName("")
+	                      .firstName("")
+	                      .build())
                       .entityId(EntityId.valueOf(uid))
                       .extId(UserExtId.valueOf("user" + stringUid))
                       .emailAndAliases("user" + stringUid + "@test.tlse.lng")
