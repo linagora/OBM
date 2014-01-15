@@ -211,13 +211,15 @@ function performMeeting() {
 
 /////////////////////////////////////////////////////////////////////////////
 function checkAvailability() {
+  var allDay = $('cba_all_day').checked;
+
   var begin = getFieldDate($('tf_date_begin').value, false);
-  begin.setHours(parseInt($('sel_time_begin').value, 10));
-  begin.setMinutes(parseInt($('sel_min_begin').value, 10));
+  begin.setHours(allDay ? 0 : parseInt($('sel_time_begin').value, 10));
+  begin.setMinutes(allDay ? 0 : parseInt($('sel_min_begin').value, 10));
 
   var end = getFieldDate($('tf_date_end').value, false);
-  end.setHours(parseInt($('sel_time_end').value, 10));
-  end.setMinutes(parseInt($('sel_min_end').value, 10));
+  end.setHours(allDay ? 23 : parseInt($('sel_time_end').value, 10));
+  end.setMinutes(allDay ? 59 : parseInt($('sel_min_end').value, 10));
 
   if (begin.getTime() > end.getTime()) {
     alert('$l_err_begin_end');

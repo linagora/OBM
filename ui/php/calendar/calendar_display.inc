@@ -6678,9 +6678,12 @@ function dis_calendar_free_interval($current_view, $calendar) {
     if ($('sel_time_begin') && $('sel_min_begin')) {
       // New event form
       // get date begin, date end, duration
+      var allDay = $('cba_all_day').checked;
       var d = new Obm.DateTime(obm.vars.consts.begin_timestamp*1000);
-      d.setHours(parseInt($('sel_time_begin').value, 10));
-      d.setMinutes(parseInt($('sel_min_begin').value, 10));
+
+      d.setHours(allDay ? 0 : parseInt($('sel_time_begin').value, 10));
+      d.setMinutes(allDay ? 0 : parseInt($('sel_min_begin').value, 10));
+
       obm.vars.consts.begin_timestamp = d.getTime()/1000;
     }
 
