@@ -3306,10 +3306,11 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
   $opacity = $calendar['opacity'];
   $show_user_calendar = $calendar['show_user_calendar'] ? 'true' : 'false';
   $show_resource_calendar = $calendar['show_resource_calendar'] ? 'true' : 'false';
+  $allResources = run_query_calendar_merge_resource_groups($calendar['sel_resource_group_id'], $calendar['sel_resource_id']);
   
   $user_ids = is_array($calendar['sel_user_id']) ? "'".implode(',', $calendar['sel_user_id'])."'" : 'NULL';
   $contact_ids = is_array($calendar['sel_contact_id']) ? "'".implode(',', $calendar['sel_contact_id'])."'" : 'NULL';
-  $resource_ids = is_array($calendar['sel_resource_id']) ? "'".implode(',', $calendar['sel_resource_id'])."'" : 'NULL';
+  $resource_ids = is_array($allResources) ? "'" . implode(',', $allResources) . "'" : 'NULL';
   $group_ids = is_array($calendar['sel_group_id']) ? "'".implode(',', $calendar['sel_group_id'])."'" : 'NULL';
   $document_ids = is_array($calendar['sel_document_id']) ? "'".implode(',', $calendar['sel_document_id'])."'" : 'NULL';
   $organizer = $calendar['organizer'] ? $calendar['organizer'] : "0";
