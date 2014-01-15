@@ -62,6 +62,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.ObmUser.Builder;
 import fr.aliacom.obm.common.user.UserExtId;
@@ -78,6 +79,15 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 			.lastName("Doe")
 			.firstName("John")
 			.commonName("J. Doe")
+			.build();
+	private final UserAddress johnAddress = UserAddress.builder()
+			.addressPart("1 OBM Street")
+			.addressPart("2 OBM Street")
+			.addressPart("3 OBM Street")
+			.town("OBMCity")
+			.countryCode("OB")
+			.zipCode("OBMZip")
+			.expressPostal("OBMExpressPostal")
 			.build();
 	
 	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
@@ -292,13 +302,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.password("secure")
 				.profileName(ProfileName.valueOf("user"))
 				.identity(johnIdentity)
-				.address1("1 OBM Street")
-				.address2("2 OBM Street")
-				.address3("3 OBM Street")
-				.town("OBMCity")
-				.countryCode("OB")
-				.zipCode("OBMZip")
-				.expresspostal("OBMExpressPostal")
+				.address(johnAddress)
 				.phone("+OBM 123456")
 				.phone2("+OBM 789")
 				.mobile("+OBMMobile 123")
@@ -331,13 +335,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.password("secure")
 				.profileName(ProfileName.valueOf("user"))
 				.identity(johnIdentity)
-				.address1("1 OBM Street")
-				.address2("2 OBM Street")
-				.address3("3 OBM Street")
-				.town("OBMCity")
-				.countryCode("OB")
-				.zipCode("OBMZip")
-				.expresspostal("OBMExpressPostal")
+				.address(johnAddress)
 				.phone("+OBM 123456")
 				.phone2("+OBM 789")
 				.mobile("+OBMMobile 123")
@@ -401,13 +399,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.password("secure")
 				.profileName(ProfileName.valueOf("user"))
 				.identity(johnIdentity)
-				.address1("1 OBM Street")
-				.address2("2 OBM Street")
-				.address3("3 OBM Street")
-				.town("OBMCity")
-				.countryCode("OB")
-				.zipCode("OBMZip")
-				.expresspostal("OBMExpressPostal")
+				.address(johnAddress)
 				.phone("+OBM 123456")
 				.phone2("+OBM 789")
 				.mobile("+OBMMobile 123")
@@ -777,7 +769,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.password("user" + id)
 				.uidNumber(1000)
 				.gidNumber(512)
-				.countryCode("0")
+				.address(UserAddress.builder().countryCode("0").build())
 				.extId(UserExtId.valueOf(extId))
 				.publicFreeBusy(true);
 	}

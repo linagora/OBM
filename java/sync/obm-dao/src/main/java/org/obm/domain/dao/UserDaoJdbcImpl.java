@@ -76,6 +76,7 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
@@ -359,13 +360,15 @@ public class UserDaoJdbcImpl implements UserDao {
 					.company(rs.getString("userobm_company"))
 					.service(rs.getString("userobm_service"))
 					.direction(rs.getString("userobm_direction"))
-					.address1(rs.getString("userobm_address1"))
-					.address2(rs.getString("userobm_address2"))
-					.address3(rs.getString("userobm_address3"))
-					.town(rs.getString("userobm_town"))
-					.zipCode(rs.getString("userobm_zipcode"))
-					.expresspostal(rs.getString("userobm_expresspostal"))
-					.countryCode(rs.getString("userobm_country_iso3166"))
+					.address(UserAddress.builder()
+								.addressPart(rs.getString("userobm_address1"))
+								.addressPart(rs.getString("userobm_address2"))
+								.addressPart(rs.getString("userobm_address3"))
+								.town(rs.getString("userobm_town"))
+								.zipCode(rs.getString("userobm_zipcode"))
+								.expressPostal(rs.getString("userobm_expresspostal"))
+								.countryCode(rs.getString("userobm_country_iso3166"))
+								.build())
 					.phone(emptyToNull(rs.getString("userobm_phone")))
 					.phone2(emptyToNull(rs.getString("userobm_phone2")))
 					.mobile(emptyToNull(rs.getString("userobm_mobile")))

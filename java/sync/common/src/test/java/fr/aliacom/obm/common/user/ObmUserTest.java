@@ -103,70 +103,6 @@ public class ObmUserTest {
 			.build();
 	}
 	
-	@Test
-	public void testOneAddressBuilder() {
-		ObmUser user = ObmUser
-			.builder()
-			.domain(ObmDomain.builder().build())
-			.uid(1)
-			.login(validLogin)
-			.addresses(Sets.newHashSet("1"))
-			.build();
-		
-		assertThat(user.getAddresses()).containsOnly("1", null, null);
-	}
-	
-	@Test
-	public void testTwoAddressBuilder() {
-		ObmUser user = ObmUser
-			.builder()
-			.domain(ObmDomain.builder().build())
-			.uid(1)
-			.login(validLogin)
-			.addresses(Sets.newHashSet("1", "2"))
-			.build();
-		
-		assertThat(user.getAddresses()).containsOnly("1", "2", null);
-	}
-	
-	@Test
-	public void testThreeAddressBuilder() {
-		ObmUser user = ObmUser
-			.builder()
-			.domain(ObmDomain.builder().build())
-			.uid(1)
-			.login(validLogin)
-			.addresses(Sets.newHashSet("1", "2", "3"))
-			.build();
-		
-		assertThat(user.getAddresses()).containsOnly("1", "2", "3");
-	}
-	
-	@Test(expected=IllegalStateException.class)
-	public void testOutOfRangeAddressBuilder() {
-		ObmUser
-			.builder()
-			.domain(ObmDomain.builder().build())
-			.uid(1)
-			.login(validLogin)
-			.addresses(Sets.newHashSet("1", "2", "3", "4"))
-			.build();
-	}
-	
-	@Test
-	public void testEmptyAddressBuilder() {
-		ObmUser user = ObmUser
-			.builder()
-			.domain(ObmDomain.builder().build())
-			.uid(1)
-			.login(validLogin)
-			.build();
-		
-		assertThat(user.getAddress1()).isEqualTo(null);
-		assertThat(user.getAddress2()).isEqualTo(null);
-		assertThat(user.getAddress3()).isEqualTo(null);
-	}
-	
 	@Test(expected=NullPointerException.class)
 	public void testNullAddressBuilder() {
 		ObmUser
@@ -174,7 +110,7 @@ public class ObmUserTest {
 			.domain(ObmDomain.builder().build())
 			.uid(1)
 			.login(validLogin)
-			.addresses(null)
+			.address(null)
 			.build();
 	}
 	
@@ -345,13 +281,15 @@ public class ObmUserTest {
 					.firstName("John")
 					.commonName("J. Doe")
 					.build())
-				.address1("1 OBM Street")
-				.address2("2 OBM Street")
-				.address3("3 OBM Street")
-				.town("OBMCity")
-				.countryCode("OB")
-				.zipCode("OBMZip")
-				.expresspostal("OBMExpressPostal")
+				.address(UserAddress.builder()
+					.addressPart("1 OBM Street")
+					.addressPart("2 OBM Street")
+					.addressPart("3 OBM Street")
+					.town("OBMCity")
+					.countryCode("OB")
+					.zipCode("OBMZip")
+					.expressPostal("OBMExpressPostal")
+					.build())
 				.phone("+OBM 123456")
 				.phone2("+OBM 789")
 				.mobile("+OBMMobile 123")

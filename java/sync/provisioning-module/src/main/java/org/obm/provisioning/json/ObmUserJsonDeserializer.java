@@ -50,6 +50,7 @@ import com.google.inject.Provider;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserIdentity;
 
 public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
@@ -57,18 +58,21 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 	private final Provider<ObmDomain> domainProvider;
 	private final ObmUser.Builder userBuilder;
 	private final UserIdentity.Builder userIdentityBuilder;
+	private final UserAddress.Builder userAddressBuilder;
 
 	@Inject
 	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider) {
 		this.domainProvider = domainProvider;
 		this.userBuilder = ObmUser.builder();
 		this.userIdentityBuilder = UserIdentity.builder();
+		this.userAddressBuilder = UserAddress.builder();
 	}
 
 	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ObmUser fromUser) {
 		this(domainProvider);
 		this.userBuilder.from(fromUser);
 		this.userIdentityBuilder.from(fromUser.getIdentity());
+		this.userAddressBuilder.from(fromUser.getAddress());
 	}
 
 	@Override
@@ -77,10 +81,11 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		ObmDomain domain = domainProvider.get();
 
 		for (UserJsonFields field : UserJsonFields.fields) {
-			addFieldValueToBuilder(jsonNode, field, userBuilder, userIdentityBuilder);
+			addFieldValueToBuilder(jsonNode, field, userBuilder, userIdentityBuilder, userAddressBuilder);
 		}
 
 		userBuilder.identity(userIdentityBuilder.build());
+		userBuilder.address(userAddressBuilder.build());
 		
 		ObmHost mailHost = getMailHostValue(jsonNode, domain);
 

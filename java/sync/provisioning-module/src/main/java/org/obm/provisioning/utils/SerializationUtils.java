@@ -58,6 +58,7 @@ import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
@@ -122,7 +123,8 @@ public class SerializationUtils {
 		});
 	}
 	
-	public static void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields, ObmUser.Builder toBuild, UserIdentity.Builder userIdentityBuilder) {
+	public static void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields, 
+			ObmUser.Builder toBuild, UserIdentity.Builder userIdentityBuilder, UserAddress.Builder addressBuilder) {
 		JsonNode value = jsonNode.findValue(jsonFields.asSpecificationValue());
 
 		if (isNullOrNullNode(value)) {
@@ -131,10 +133,10 @@ public class SerializationUtils {
 
 		switch (jsonFields) {
 			case ADDRESSES:
-				toBuild.addresses(getCurrentTokenTextValues(value));
+				addressBuilder.addressParts(getCurrentTokenTextValues(value));
 				break;
 			case BUSINESS_ZIPCODE:
-				toBuild.expresspostal(value.asText());
+				addressBuilder.expressPostal(value.asText());
 				break;
 			case COMMONNAME:
 				userIdentityBuilder.commonName(value.asText());
@@ -143,7 +145,7 @@ public class SerializationUtils {
 				toBuild.company(value.asText());
 				break;
 			case COUNTRY:
-				toBuild.countryCode(value.asText());
+				addressBuilder.countryCode(value.asText());
 				break;
 			case DESCRIPTION:
 				toBuild.description(value.asText());
@@ -209,10 +211,10 @@ public class SerializationUtils {
 				toBuild.title(value.asText());
 				break;
 			case TOWN:
-				toBuild.town(value.asText());
+				addressBuilder.town(value.asText());
 				break;
 			case ZIPCODE:
-				toBuild.zipCode(value.asText());
+				addressBuilder.zipCode(value.asText());
 				break;
 			case HIDDEN:
 				toBuild.hidden(value.asBoolean());

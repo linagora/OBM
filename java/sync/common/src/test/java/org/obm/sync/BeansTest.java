@@ -73,6 +73,7 @@ import fr.aliacom.obm.common.resource.Resource;
 import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
@@ -125,7 +126,8 @@ public class BeansTest {
 				Profile.class,
 				EntityId.class,
 				UserLogin.class,
-				UserIdentity.class);
+				UserIdentity.class,
+				UserAddress.class);
 	}
 	
 	@Test

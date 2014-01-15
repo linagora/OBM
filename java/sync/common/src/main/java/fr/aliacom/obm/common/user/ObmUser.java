@@ -56,7 +56,6 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 public class ObmUser {
 	
 	public static final String EMAIL_FIELD_SEPARATOR = "\r\n";
-	public static final int MAXIMUM_SUPPORTED_ADDRESSES = 3;
 	public static final int MAXIMUM_SUPPORTED_FAXES = 2;
 	public static final int MAXIMUM_SUPPORTED_PHONES = 2;
 	public static final String PATTERN_AT_STAR = "@*";
@@ -81,20 +80,14 @@ public class ObmUser {
 		private UserLogin login;
 		private Boolean admin;
 		private UserIdentity identity;
+		private UserAddress address;
 		private String email;
 		private final ImmutableSet.Builder<String> emailAlias;
 		private Boolean hidden;
 		
-		private String address1;
-		private String address2;
-		private String address3;
-
-		private String expresspostal;
 		private String mobile;
 		private String service;
 		private String title;
-		private String town;
-		private String zipCode;
 		private String description;
 
 		private Date timeCreate;
@@ -109,7 +102,6 @@ public class ObmUser {
 		private ProfileName profileName;
 		private String company;
 		private String direction;
-		private String countryCode;
 		private String phone;
 		private String phone2;
 		private String fax;
@@ -135,6 +127,7 @@ public class ObmUser {
 					.emailAlias(user.emailAlias)
 					.domain(user.domain)
 					.identity(user.identity)
+					.address(user.address)
 					.publicFreeBusy(user.publicFreeBusy)
 					.extId(user.extId)
 					.entityId(user.entityId)
@@ -145,13 +138,6 @@ public class ObmUser {
 					.company(user.company)
 					.service(user.service)
 					.direction(user.direction)
-					.address1(user.address1)
-					.address2(user.address2)
-					.address3(user.address3)
-					.town(user.town)
-					.zipCode(user.zipCode)
-					.expresspostal(user.expresspostal)
-					.countryCode(user.countryCode)
 					.phone(user.phone)
 					.phone2(user.phone2)
 					.mobile(user.mobile)
@@ -194,22 +180,6 @@ public class ObmUser {
 			this.admin = admin;
 			return this;
 		}
-		public Builder address1(String address1) {
-			this.address1 = address1;
-			return this;
-		}
-		public Builder address2(String address2) {
-			this.address2 = address2;
-			return this;
-		}
-		public Builder address3(String address3) {
-			this.address3 = address3;
-			return this;
-		}
-		public Builder expresspostal(String expresspostal) {
-			this.expresspostal = expresspostal;
-			return this;
-		}
 		public Builder mobile(String mobile) {
 			this.mobile = mobile;
 			return this;
@@ -220,14 +190,6 @@ public class ObmUser {
 		}
 		public Builder title(String title) {
 			this.title = title;
-			return this;
-		}
-		public Builder town(String town) {
-			this.town = town;
-			return this;
-		}
-		public Builder zipCode(String zipCode) {
-			this.zipCode = zipCode;
 			return this;
 		}
 		public Builder description(String description) {
@@ -268,10 +230,6 @@ public class ObmUser {
 		}
 		public Builder direction(String direction) {
 			this.direction = direction;
-			return this;
-		}
-		public Builder countryCode(String countryCode) {
-			this.countryCode = countryCode;
 			return this;
 		}
 		public Builder phone(String phone) {
@@ -363,12 +321,9 @@ public class ObmUser {
 			return this;
 		}
 		
-		public Builder addresses(Iterable<String> addresses) {
-			Preconditions.checkNotNull(addresses);
-			Preconditions.checkState(Iterables.size(addresses) <= MAXIMUM_SUPPORTED_ADDRESSES);
-			address1 = Iterables.get(addresses, 0, null);
-			address2 = Iterables.get(addresses, 1, null);
-			address3 = Iterables.get(addresses, 2, null);
+		public Builder address(UserAddress address) {
+			Preconditions.checkNotNull(address);
+			this.address = address;
 			return this;
 		}
 
@@ -403,13 +358,14 @@ public class ObmUser {
 			hidden = Objects.firstNonNull(hidden, false);
 
 			UserIdentity identity = Objects.firstNonNull(this.identity, UserIdentity.empty());
+			UserAddress address = Objects.firstNonNull(this.address, UserAddress.empty());
 
 			return new ObmUser(
 					uid, entityId, login, extId, admin, identity,
 					email, emailAlias.build(), hidden,
-					address1, address2, address3, expresspostal, mobile, service, title, town,
-					zipCode, description, timeCreate, timeUpdate, createdBy, updatedBy,
-					domain, publicFreeBusy, profileName, company, direction, countryCode,
+					address, mobile, service, title, 
+					description, timeCreate, timeUpdate, createdBy, updatedBy,
+					domain, publicFreeBusy, profileName, company, direction,
 					phone, phone2, fax, fax2, mailQuota, mailHost, archived, password, uidNumber, gidNumber, groups.build());
 		}
 		
@@ -421,20 +377,14 @@ public class ObmUser {
 	private final UserExtId extId;
 	private final boolean admin;
 	private final UserIdentity identity;
+	private final UserAddress address;
 	private final String email;
 	private final Set<String> emailAlias;
 	private final boolean hidden;
 	
-	private final String address1;
-	private final String address2;
-	private final String address3;
-
-	private final String expresspostal;
 	private final String mobile;
 	private final String service;
 	private final String title;
-	private final String town;
-	private final String zipCode;
 	private final String description;
 
 	private final Date timeCreate;
@@ -449,7 +399,6 @@ public class ObmUser {
 	private final ProfileName profileName;
 	private final String company;
 	private final String direction;
-	private final String countryCode;
 	private final String phone;
 	private final String phone2;
 	private final String fax;
@@ -466,14 +415,12 @@ public class ObmUser {
 	private ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, UserIdentity identity,
 			String email,
 			Set<String> emailAlias, boolean hidden,
-			String address1, String address2,
-			String address3, String expresspostal,
-			String mobile, String service, String title, String town,
-			String zipCode,
+			UserAddress address,
+			String mobile, String service, String title,
 			String description, Date timeCreate, Date timeUpdate,
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName, String company,
-			String direction, String countryCode, String phone, String phone2, String fax, String fax2,
+			String direction, String phone, String phone2, String fax, String fax2,
 			Integer mailQuota, ObmHost mailHost, boolean archived, String password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
 		this.uid = uid;
 		this.entityId = entityId;
@@ -484,15 +431,10 @@ public class ObmUser {
 		this.email = email;
 		this.emailAlias = emailAlias;
 		this.hidden = hidden;
-		this.address1 = address1;
-		this.address2 = address2;
-		this.address3 = address3;
-		this.expresspostal = expresspostal;
+		this.address = address;
 		this.mobile = mobile;
 		this.service = service;
 		this.title = title;
-		this.town = town;
-		this.zipCode = zipCode;
 		this.description = description;
 		this.timeCreate = timeCreate;
 		this.timeUpdate = timeUpdate;
@@ -503,7 +445,6 @@ public class ObmUser {
 		this.profileName = profileName;
 		this.company = company;
 		this.direction = direction;
-		this.countryCode = countryCode;
 		this.phone = phone;
 		this.phone2 = phone2;
 		this.fax = fax;
@@ -560,21 +501,25 @@ public class ObmUser {
 	public boolean isHidden() {
 		return hidden;
 	}
-
+	
+	public UserAddress getAddress() {
+		return address;
+	}
+	
 	public String getAddress1() {
-		return address1;
+		return address.getAddress1();
 	}
 
 	public String getAddress2() {
-		return address2;
+		return address.getAddress2();
 	}
 
 	public String getAddress3() {
-		return address3;
+		return address.getAddress3();
 	}
 
 	public String getExpresspostal() {
-		return expresspostal;
+		return address.getExpressPostal();
 	}
 
 
@@ -591,12 +536,12 @@ public class ObmUser {
 	}
 
 	public String getTown() {
-		return town;
+		return address.getTown();
 	}
 
 
 	public String getZipCode() {
-		return zipCode;
+		return address.getZipCode();
 	}
 
 	public String getDescription() {
@@ -694,7 +639,7 @@ public class ObmUser {
 	}
 
 	public Set<String> getAddresses() {
-		return Sets.newHashSet(address1, address2, address3);
+		return ImmutableSet.copyOf(address.getAddressParts());
 	}
 	
 	public ProfileName getProfileName() {
@@ -714,7 +659,7 @@ public class ObmUser {
 	}
 
 	public String getCountryCode() {
-		return countryCode;
+		return address.getCountryCode();
 	}
 
 	public String getPhone() {
@@ -772,9 +717,9 @@ public class ObmUser {
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(uid, entityId, login, extId, admin, identity, email,
-				emailAlias, hidden, address1, address2, address3, expresspostal, mobile,
-				service, title, town, zipCode,	description, createdBy, updatedBy, domain, publicFreeBusy, profileName, company,
-				direction, countryCode, phone, phone2, fax, fax2, mailQuota, archived, mailHost, password, uidNumber, gidNumber, groups);
+				emailAlias, hidden, address, mobile,
+				service, title, description, createdBy, updatedBy, domain, publicFreeBusy, profileName, company,
+				direction, phone, phone2, fax, fax2, mailQuota, archived, mailHost, password, uidNumber, gidNumber, groups);
 	}
 	
 	@Override
@@ -790,15 +735,10 @@ public class ObmUser {
 				&& Objects.equal(this.email, that.email)
 				&& Objects.equal(this.emailAlias, that.emailAlias)
 				&& Objects.equal(this.hidden, that.hidden)
-				&& Objects.equal(this.address1, that.address1)
-				&& Objects.equal(this.address2, that.address2)
-				&& Objects.equal(this.address3, that.address3)
-				&& Objects.equal(this.expresspostal, that.expresspostal)
+				&& Objects.equal(this.address, that.address)
 				&& Objects.equal(this.mobile, that.mobile)
 				&& Objects.equal(this.service, that.service)
 				&& Objects.equal(this.title, that.title)
-				&& Objects.equal(this.town, that.town)
-				&& Objects.equal(this.zipCode, that.zipCode)
 				&& Objects.equal(this.description, that.description)
 				&& Objects.equal(this.createdBy, that.createdBy)
 				&& Objects.equal(this.updatedBy, that.updatedBy)
@@ -807,7 +747,6 @@ public class ObmUser {
 				&& Objects.equal(this.profileName, that.profileName)
 				&& Objects.equal(this.company, that.company)
 				&& Objects.equal(this.direction, that.direction)
-				&& Objects.equal(this.countryCode, that.countryCode)
 				&& Objects.equal(this.phone, that.phone)
 				&& Objects.equal(this.phone2, that.phone2)
 				&& Objects.equal(this.fax, that.fax)
@@ -835,15 +774,10 @@ public class ObmUser {
 			.add("email", email)
 			.add("emailAlias", emailAlias)
 			.add("hidden", hidden)
-			.add("address1", address1)
-			.add("address2", address2)
-			.add("address3", address3)
-			.add("expresspostal", expresspostal)
+			.add("address", address)
 			.add("mobile", mobile)
 			.add("service", service)
 			.add("title", title)
-			.add("town", town)
-			.add("zipCode", zipCode)
 			.add("description", description)
 			.add("timeCreate", timeCreate)
 			.add("timeUpdate", timeUpdate)
@@ -854,7 +788,6 @@ public class ObmUser {
 			.add("profileName", profileName)
 			.add("company", company)
 			.add("direction", direction)
-			.add("countryCode", countryCode)
 			.add("phone", phone)
 			.add("phone2", phone2)
 			.add("fax", fax)
@@ -867,4 +800,5 @@ public class ObmUser {
 			.add("groups", groups)
 			.toString();
 	}
+
 }

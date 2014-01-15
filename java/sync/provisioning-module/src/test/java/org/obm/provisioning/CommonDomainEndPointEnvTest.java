@@ -96,6 +96,7 @@ import com.sun.jersey.guice.JerseyServletModule;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
@@ -526,12 +527,14 @@ public abstract class CommonDomainEndPointEnvTest {
 				.company("company")
 				.service("service")
 				.direction("direction")
-				.address1("address1")
-				.address2("address2")
-				.town("town")
-				.zipCode("zipcode")
-				.expresspostal("1234")
-				.countryCode("1234")
+				.address(UserAddress.builder()
+						.addressPart("address1")
+						.addressPart("address2")
+						.town("town")
+						.zipCode("zipcode")
+						.expressPostal("1234")
+						.countryCode("1234")
+						.build())
 				.phone("phone")
 				.phone2("phone2")
 				.mobile("mobile")

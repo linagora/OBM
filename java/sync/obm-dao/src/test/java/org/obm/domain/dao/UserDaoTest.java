@@ -67,6 +67,7 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
@@ -380,7 +381,7 @@ public class UserDaoTest {
 			.password("password")
 			.mailQuota(100)
 			.profileName(ProfileName.builder().name("user").build())
-			.countryCode("0")
+			.address(UserAddress.builder().countryCode("0").build())
 			.mailHost(ObmHost
 					.builder()
 					.id(1)
