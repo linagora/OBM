@@ -137,8 +137,6 @@ Obm.CalendarFreeBusy = new Class({
     var eventEndDate = this.getEventEndDate();
     this.meeting_slots = this.timeSlotCountBetween(eventEndDate, this.eventStartDate);
 
-    var dateStartSlot = this.dateTimeToTimeSlot(this.getAlmostDisplayableDateTime(eventEndDate));
-    $('calendarFreeBusyMeeting').setStyle('left', (this.stepSize * dateStartSlot) + 'px');
     // /!\ meeting width must be set BEFORE slider 
     if (Browser.Engine.trident) {
       $('calendarFreeBusyMeeting').setStyle('width', this.stepSize*this.meeting_slots-(this.meeting_slots/2)+'px');
@@ -464,7 +462,7 @@ Obm.CalendarFreeBusy = new Class({
    * Initialize meeting position
    */
   initPosition: function() {
-    this.currentPosition = this.ts.indexOf(''+obm.vars.consts.begin_timestamp);
+    this.currentPosition = this.dateTimeToTimeSlot(this.getAlmostDisplayableDateTime(this.eventStartDate));
     this.slider.set(this.currentPosition);
     this.autoScroll.toElement($('calendarFreeBusyMeeting'));
   }
