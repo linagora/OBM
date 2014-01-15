@@ -71,6 +71,7 @@ $l_create_using_userpattern = "Create using a pattern";
 $l_no_display = "Fill in the search fields and press < Find > to retrieve the users";
 $l_found = "users found";
 $l_no_found = "No user matching the query has been found  !";
+$l_user_results_limit_message = "%d user(s) found, only %d have been displayed in accordance to the profile configuration";
 $l_reset_ok = "User preferences reseted to default values";
 $l_can_delete = "The user can be deleted.";
 $l_cant_delete = "The user cannot be deleted !";

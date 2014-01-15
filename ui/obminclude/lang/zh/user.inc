@@ -71,6 +71,7 @@ $l_create_using_userpattern = "创建使用模式"; //"Create using a pattern"
 $l_no_display = "输入搜索字段并点击<查找>来搜索用户"; //"Fill in the search fields and press < Find > to retrieve the users"
 $l_found = "个已找到的用户"; //"users found"
 $l_no_found = "未发现与查询匹配的用户！"; //"No user matching the query has been found  !"
+$l_user_results_limit_message = "%d user(s) found, only %d have been displayed in accordance to the profile configuration";
 $l_reset_ok = "重置用户首选项为默认值"; //"User preferences reseted to default values"
 $l_can_delete = "该用户可以被删除。"; //"The user can be deleted."
 $l_cant_delete = "该用户无法被删除！"; //"The user cannot be deleted !"
