@@ -30,6 +30,7 @@ $l_delete_userobmphoto = "Elimina foto utente";
 $l_no_display = "Riempi i campi di ricerca e premi <CERCA> per ottenere l'elenco degli utenti";
 $l_found = "utenti trovati.";
 $l_no_found = "Nessun utente trovato!";
+$l_user_results_limit_message = "%d user(s) found, only %d have been displayed in accordance to the profile configuration";
 $l_reset_ok = "Preferenze utente reimpostate";
 $l_login_error = "Nome utente non valido!";
 $l_password_error = "Password non valida!";

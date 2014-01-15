@@ -608,7 +608,7 @@ $dis_delegation";
 //   - $user[]   : user search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_search_list($user, $user_results_limit, $strongest_profile_level=null, $user_can_manage_peers=null) {
-  global $l_found, $l_no_found;
+  global $l_found, $l_no_found, $l_user_results_limit_message;
   global $display, $obm;
 
   $popup = $user['popup'];
@@ -621,7 +621,11 @@ function dis_user_search_list($user, $user_results_limit, $strongest_profile_lev
   if ($nb_user == 0) {
     $display['msg'] .= display_warn_msg($l_no_found);
   } else {
-    $display['msg'] .= display_info_msg("$nb_user $l_found");
+    if ($nb_user < $user_results_limit) {
+      $display['msg'] .= display_info_msg("$nb_user $l_found");
+    } else {
+      $display['msg'] .= display_info_msg(sprintf($l_user_results_limit_message, $nb_user, $user_results_limit));
+    }
     $block = html_user_search_list($obm_q, $prefs, $user, $popup);
   }
 

@@ -254,3 +254,4 @@ $l_profile_exists = "Questo nome di profilo è già utilizzato";
 $l_profile_name_empty = "Introduci un nome di profilo : da 1 a 64 caratteri alfanumerici o '_' '.' '-' !";
 $l_access_restriction = "Sicurezza connessioni"; 
 $l_user_results_limit = "Maximum number of results in the user search";
+$l_help_user_results_limit = "Restricts the maximum number of results in the user search to a given limit, leave blank for no limit";

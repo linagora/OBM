@@ -83,6 +83,7 @@ $l_do_batch_processing = "Lansați procesarea loturilor";
 $l_no_display = "Completați spațiile și apăsați butonul  <Caută > pentru a obține lista utilizatorilor corespunzătoare.";
 $l_found = "utilizatori găsiți";
 $l_no_found = "Niciun utilizator nu corespunde acestor criterii!";
+$l_user_results_limit_message = "%d user(s) found, only %d have been displayed in accordance to the profile configuration";
 $l_reset_ok = "Preferințele utilizatorului au fost impostate la valorile predefinite"; 
 $l_can_delete = "Utilizatorul poate fi șters.";
 $l_cant_delete = "Utilizatorul nu poate fi șters!";
