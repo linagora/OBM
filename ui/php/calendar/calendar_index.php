@@ -334,7 +334,7 @@ if ($action == 'search') {
           }
 
           if ($params['show_user_calendar']) $current_view->set_users($params['sel_user_id']);
-          if ($params['show_resource_calendar'])  $current_view->set_resources($params['sel_resource_id']);
+          if ($params['show_resource_calendar'])  $current_view->set_resources($entities['resource']);
 
           $current_view->set_date($params["date_begin"]);
           $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=$event_id";
@@ -493,7 +493,7 @@ if ($action == 'search') {
         }
 
         if ($params['show_user_calendar']) $current_view->set_users($params['sel_user_id']);
-        if ($params['show_resource_calendar'])  $current_view->set_resources($params['sel_resource_id']);
+        if ($params['show_resource_calendar'])  $current_view->set_resources($entities['resource']);
         $detailurl = basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&amp;calendar_id=".htmlspecialchars($id);
         $detail = "<a class='B' href='$detailurl'>".phpStringToJsString($GLOBALS[l_details])."</a>";
         if($GLOBALS['display']['warm_add_organizer'] == true){
