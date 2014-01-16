@@ -78,6 +78,7 @@ import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserPhones;
+import fr.aliacom.obm.common.user.UserWork;
 
 
 public class BeansTest {
@@ -129,7 +130,8 @@ public class BeansTest {
 				UserLogin.class,
 				UserIdentity.class,
 				UserAddress.class,
-				UserPhones.class);
+				UserPhones.class,
+				UserWork.class);
 	}
 	
 	@Test

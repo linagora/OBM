@@ -80,12 +80,11 @@ public class ObmUser {
 		private UserIdentity identity;
 		private UserAddress address;
 		private UserPhones phones;
+		private UserWork work;
 		private String email;
 		private final ImmutableSet.Builder<String> emailAlias;
 		private Boolean hidden;
 		
-		private String service;
-		private String title;
 		private String description;
 
 		private Date timeCreate;
@@ -98,8 +97,6 @@ public class ObmUser {
 
 		private String password;
 		private ProfileName profileName;
-		private String company;
-		private String direction;
 		private Integer mailQuota;
 		private ObmHost mailHost;
 		private Boolean archived;
@@ -127,11 +124,8 @@ public class ObmUser {
 					.entityId(user.entityId)
 					.password(user.password)
 					.profileName(user.profileName)
-					.title(user.title)
 					.description(user.description)
-					.company(user.company)
-					.service(user.service)
-					.direction(user.direction)
+					.work(user.work)
 					.phones(user.phones)
 					.mailQuota(user.mailQuota)
 					.mailHost(user.mailHost)
@@ -170,14 +164,6 @@ public class ObmUser {
 			this.admin = admin;
 			return this;
 		}
-		public Builder service(String service) {
-			this.service = service;
-			return this;
-		}
-		public Builder title(String title) {
-			this.title = title;
-			return this;
-		}
 		public Builder description(String description) {
 			this.description = description;
 			return this;
@@ -210,12 +196,8 @@ public class ObmUser {
 			this.profileName = profileName;
 			return this;
 		}
-		public Builder company(String company) {
-			this.company = company;
-			return this;
-		}
-		public Builder direction(String direction) {
-			this.direction = direction;
+		public Builder work(UserWork work) {
+			this.work = work;
 			return this;
 		}
 		public Builder phones(UserPhones phones) {
@@ -318,13 +300,14 @@ public class ObmUser {
 			UserIdentity identity = Objects.firstNonNull(this.identity, UserIdentity.empty());
 			UserAddress address = Objects.firstNonNull(this.address, UserAddress.empty());
 			UserPhones phones = Objects.firstNonNull(this.phones, UserPhones.empty());
+			UserWork work = Objects.firstNonNull(this.work, UserWork.empty());
 
 			return new ObmUser(
 					uid, entityId, login, extId, admin, identity,
 					email, emailAlias.build(), hidden,
-					address, phones, service, title, 
+					address, phones, work,  
 					description, timeCreate, timeUpdate, createdBy, updatedBy,
-					domain, publicFreeBusy, profileName, company, direction,
+					domain, publicFreeBusy, profileName,
 					mailQuota, mailHost, archived, password, uidNumber, gidNumber, groups.build());
 		}
 		
@@ -338,12 +321,11 @@ public class ObmUser {
 	private final UserIdentity identity;
 	private final UserAddress address;
 	private final UserPhones phones;
+	private final UserWork work;
 	private final String email;
 	private final Set<String> emailAlias;
 	private final boolean hidden;
 	
-	private final String service;
-	private final String title;
 	private final String description;
 
 	private final Date timeCreate;
@@ -356,8 +338,6 @@ public class ObmUser {
 
 	private final String password;
 	private final ProfileName profileName;
-	private final String company;
-	private final String direction;
 	private final Integer mailQuota;
 	private final ObmHost mailHost;
 	private final boolean archived;
@@ -370,12 +350,10 @@ public class ObmUser {
 	private ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, UserIdentity identity,
 			String email,
 			Set<String> emailAlias, boolean hidden,
-			UserAddress address, UserPhones phones,
-			String service, String title,
+			UserAddress address, UserPhones phones, UserWork work,
 			String description, Date timeCreate, Date timeUpdate,
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
-			boolean publicFreeBusy, ProfileName profileName, String company,
-			String direction,
+			boolean publicFreeBusy, ProfileName profileName,
 			Integer mailQuota, ObmHost mailHost, boolean archived, String password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
 		this.uid = uid;
 		this.entityId = entityId;
@@ -388,8 +366,7 @@ public class ObmUser {
 		this.hidden = hidden;
 		this.address = address;
 		this.phones = phones;
-		this.service = service;
-		this.title = title;
+		this.work = work;
 		this.description = description;
 		this.timeCreate = timeCreate;
 		this.timeUpdate = timeUpdate;
@@ -398,8 +375,6 @@ public class ObmUser {
 		this.domain = domain;
 		this.publicFreeBusy = publicFreeBusy;
 		this.profileName = profileName;
-		this.company = company;
-		this.direction = direction;
 		this.mailQuota = mailQuota;
 		this.mailHost = mailHost;
 		this.archived = archived;
@@ -481,12 +456,16 @@ public class ObmUser {
 		return phones.getMobile();
 	}
 
+	public UserWork getWork() {
+		return work;
+	}
+	
 	public String getService() {
-		return service;
+		return work.getService();
 	}
 
 	public String getTitle() {
-		return title;
+		return work.getTitle();
 	}
 
 	public String getTown() {
@@ -605,11 +584,11 @@ public class ObmUser {
 	}
 
 	public String getCompany() {
-		return company;
+		return work.getCompany();
 	}
 
 	public String getDirection() {
-		return direction;
+		return work.getDirection();
 	}
 
 	public String getCountryCode() {
@@ -671,9 +650,9 @@ public class ObmUser {
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(uid, entityId, login, extId, admin, identity, email,
-				emailAlias, hidden, address, phones,
-				service, title, description, createdBy, updatedBy, domain, publicFreeBusy, profileName, company,
-				direction, mailQuota, archived, mailHost, password, uidNumber, gidNumber, groups);
+				emailAlias, hidden, address, phones, work,
+				description, createdBy, updatedBy, domain, publicFreeBusy, profileName,
+				mailQuota, archived, mailHost, password, uidNumber, gidNumber, groups);
 	}
 	
 	@Override
@@ -691,16 +670,13 @@ public class ObmUser {
 				&& Objects.equal(this.hidden, that.hidden)
 				&& Objects.equal(this.address, that.address)
 				&& Objects.equal(this.phones, that.phones)
-				&& Objects.equal(this.service, that.service)
-				&& Objects.equal(this.title, that.title)
+				&& Objects.equal(this.work, that.work)
 				&& Objects.equal(this.description, that.description)
 				&& Objects.equal(this.createdBy, that.createdBy)
 				&& Objects.equal(this.updatedBy, that.updatedBy)
 				&& Objects.equal(this.domain, that.domain)
 				&& Objects.equal(this.publicFreeBusy, that.publicFreeBusy)
 				&& Objects.equal(this.profileName, that.profileName)
-				&& Objects.equal(this.company, that.company)
-				&& Objects.equal(this.direction, that.direction)
 				&& Objects.equal(this.mailQuota, that.mailQuota)
 				&& Objects.equal(this.mailHost, that.mailHost)
 				&& Objects.equal(this.archived, that.archived)
@@ -726,8 +702,7 @@ public class ObmUser {
 			.add("hidden", hidden)
 			.add("address", address)
 			.add("phones", phones)
-			.add("service", service)
-			.add("title", title)
+			.add("work", work)
 			.add("description", description)
 			.add("timeCreate", timeCreate)
 			.add("timeUpdate", timeUpdate)
@@ -736,8 +711,6 @@ public class ObmUser {
 			.add("domain", domain)
 			.add("publicFreeBusy", publicFreeBusy)
 			.add("profileName", profileName)
-			.add("company", company)
-			.add("direction", direction)
 			.add("mailQuota", mailQuota)
 			.add("mailHost", mailHost)
 			.add("archived", archived)

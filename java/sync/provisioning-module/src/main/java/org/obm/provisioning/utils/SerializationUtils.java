@@ -63,6 +63,7 @@ import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserPhones;
+import fr.aliacom.obm.common.user.UserWork;
 
 public class SerializationUtils {
 	
@@ -126,7 +127,7 @@ public class SerializationUtils {
 	
 	public static void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields, 
 			ObmUser.Builder toBuild, UserIdentity.Builder userIdentityBuilder, UserAddress.Builder addressBuilder,
-			UserPhones.Builder phonesBuilder) {
+			UserPhones.Builder phonesBuilder, UserWork.Builder userWorkBuilder) {
 		JsonNode value = jsonNode.findValue(jsonFields.asSpecificationValue());
 
 		if (isNullOrNullNode(value)) {
@@ -144,7 +145,7 @@ public class SerializationUtils {
 				userIdentityBuilder.commonName(value.asText());
 				break;
 			case COMPANY:
-				toBuild.company(value.asText());
+				userWorkBuilder.company(value.asText());
 				break;
 			case COUNTRY:
 				addressBuilder.countryCode(value.asText());
@@ -153,7 +154,7 @@ public class SerializationUtils {
 				toBuild.description(value.asText());
 				break;
 			case DIRECTION:
-				toBuild.direction(value.asText());
+				userWorkBuilder.direction(value.asText());
 				break;
 			case FAXES:
 				phonesBuilder.faxes(getCurrentTokenTextValues(value));
@@ -201,7 +202,7 @@ public class SerializationUtils {
 				toBuild.profileName(ProfileName.valueOf(value.asText()));
 				break;
 			case SERVICE:
-				toBuild.service(value.asText());
+				userWorkBuilder.service(value.asText());
 				break;
 			case TIMECREATE:
 				toBuild.timeCreate(date(value.asText()));
@@ -210,7 +211,7 @@ public class SerializationUtils {
 				toBuild.timeUpdate(date(value.asText()));
 				break;
 			case TITLE:
-				toBuild.title(value.asText());
+				userWorkBuilder.title(value.asText());
 				break;
 			case TOWN:
 				addressBuilder.town(value.asText());

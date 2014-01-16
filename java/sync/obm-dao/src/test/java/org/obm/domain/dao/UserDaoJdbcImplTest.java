@@ -68,6 +68,7 @@ import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserPhones;
+import fr.aliacom.obm.common.user.UserWork;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(UserDaoJdbcImplTest.Env.class)
@@ -99,6 +100,14 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 			.addFax("+OBMFax 789")
 			.build();
 
+	private final UserWork validJob = UserWork.builder()
+			.company("Linagora")
+			.service("OBMDev")
+			.direction("LGS")
+			.title("Software Dev")
+			.build();
+
+	
 	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
 	@Inject H2InMemoryDatabase db;
 
@@ -313,10 +322,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.identity(johnIdentity)
 				.address(johnAddress)
 				.phones(validPhones)
-				.company("Linagora")
-				.service("OBMDev")
-				.direction("LGS")
-				.title("Software Dev")
+				.work(validJob)
 				.emailAndAliases("jdoe\r\njohn.doe")
 				.mailHost(mailHost)
 				.mailQuota(500)
@@ -342,10 +348,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.identity(johnIdentity)
 				.address(johnAddress)
 				.phones(validPhones)
-				.company("Linagora")
-				.service("OBMDev")
-				.direction("LGS")
-				.title("Software Dev")
+				.work(validJob)
 				.emailAndAliases("jdoe\r\njohn.doe")
 				.mailHost(mailHost)
 				.mailQuota(500)
@@ -402,10 +405,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.identity(johnIdentity)
 				.address(johnAddress)
 				.phones(validPhones)
-				.company("Linagora")
-				.service("OBMDev")
-				.direction("LGS")
-				.title("Software Dev")
+				.work(validJob)
 				.emailAndAliases("jdoe\r\njohn.doe")
 				.mailHost(mailHost)
 				.mailQuota(500)

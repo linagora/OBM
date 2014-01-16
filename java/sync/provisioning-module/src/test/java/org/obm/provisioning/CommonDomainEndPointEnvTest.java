@@ -101,6 +101,7 @@ import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserPhones;
+import fr.aliacom.obm.common.user.UserWork;
 
 public abstract class CommonDomainEndPointEnvTest {
 
@@ -523,11 +524,13 @@ public abstract class CommonDomainEndPointEnvTest {
 						.commonName("John Doe")
 						.build())
 				.profileName(ProfileName.valueOf("Utilisateurs"))
-				.title("title")
+				.work(UserWork.builder()
+						.title("title")
+						.company("company")
+						.service("service")
+						.direction("direction")
+						.build())
 				.description("description")
-				.company("company")
-				.service("service")
-				.direction("direction")
 				.address(UserAddress.builder()
 						.addressPart("address1")
 						.addressPart("address2")

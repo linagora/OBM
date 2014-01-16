@@ -53,6 +53,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserPhones;
+import fr.aliacom.obm.common.user.UserWork;
 
 public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 
@@ -61,6 +62,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 	private final UserIdentity.Builder userIdentityBuilder;
 	private final UserAddress.Builder userAddressBuilder;
 	private final UserPhones.Builder userPhonesBuilder;
+	private final UserWork.Builder userWorkBuilder;
 
 	@Inject
 	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider) {
@@ -69,6 +71,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		this.userIdentityBuilder = UserIdentity.builder();
 		this.userAddressBuilder = UserAddress.builder();
 		this.userPhonesBuilder = UserPhones.builder();
+		this.userWorkBuilder = UserWork.builder();
 	}
 
 	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ObmUser fromUser) {
@@ -77,6 +80,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		this.userIdentityBuilder.from(fromUser.getIdentity());
 		this.userAddressBuilder.from(fromUser.getAddress());
 		this.userPhonesBuilder.from(fromUser.getPhones());
+		this.userWorkBuilder.from(fromUser.getWork());
 	}
 
 	@Override
@@ -85,12 +89,14 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		ObmDomain domain = domainProvider.get();
 
 		for (UserJsonFields field : UserJsonFields.fields) {
-			addFieldValueToBuilder(jsonNode, field, userBuilder, userIdentityBuilder, userAddressBuilder, userPhonesBuilder);
+			addFieldValueToBuilder(jsonNode, field, userBuilder, userIdentityBuilder, 
+					userAddressBuilder, userPhonesBuilder, userWorkBuilder);
 		}
 
 		userBuilder.identity(userIdentityBuilder.build());
 		userBuilder.address(userAddressBuilder.build());
 		userBuilder.phones(userPhonesBuilder.build());
+		userBuilder.work(userWorkBuilder.build());
 		
 		ObmHost mailHost = getMailHostValue(jsonNode, domain);
 

@@ -81,6 +81,7 @@ import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserPhones;
+import fr.aliacom.obm.common.user.UserWork;
 
 @Singleton
 public class UserDaoJdbcImpl implements UserDao {
@@ -356,11 +357,13 @@ public class UserDaoJdbcImpl implements UserDao {
 					.entityId(EntityId.valueOf(rs.getInt("userentity_entity_id")))
 					.password(Strings.emptyToNull(rs.getString("userobm_password")))
 					.profileName(ProfileName.builder().name(rs.getString("userobm_perms")).build())
-					.title(emptyToNull(rs.getString("userobm_title")))
+					.work(UserWork.builder()
+						.title(emptyToNull(rs.getString("userobm_title")))
+						.company(rs.getString("userobm_company"))
+						.service(rs.getString("userobm_service"))
+						.direction(rs.getString("userobm_direction"))
+						.build())
 					.description(rs.getString("userobm_description"))
-					.company(rs.getString("userobm_company"))
-					.service(rs.getString("userobm_service"))
-					.direction(rs.getString("userobm_direction"))
 					.address(UserAddress.builder()
 								.addressPart(rs.getString("userobm_address1"))
 								.addressPart(rs.getString("userobm_address2"))
