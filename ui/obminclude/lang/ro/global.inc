@@ -446,6 +446,7 @@ $l_of_right_err_auth = "Privilegii insuficiente pentru a modifica drepturile!";
 $l_of_right_err_empty = "Lipsește numele obiectului de afișat!";
 $l_of_right_err_user = "Drepturi insuficiente asupra acestor utilizatori!";
 $l_of_right_err_resource = "Drepuri insuficiente asupra resurselor!";
+$l_of_right_err_share_resource = "You are not allowed to share the calendar of this resource if it has not at least the public read right. Please upgrade its rights.";
 $l_waiting_events = "Eveniment(e) în așteptare";
 $l_unfilled = "Zile necompletate";
 $l_my_calendar = "Agendă personală";

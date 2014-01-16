@@ -477,6 +477,7 @@ $l_of_right_err_auth = "更新权限的权限不够！"; //"Insufficient rights 
 $l_of_right_err_empty = "缺少对象引用！"; //"The object reference is missing!"
 $l_of_right_err_user = "访问用户的权限不够！"; //"Insufficient rights on users !"
 $l_of_right_err_resource = "访问资源的权限不够！"; //"Insufficient rights on resources !"
+$l_of_right_err_share_resource = "You are not allowed to share the calendar of this resource if it has not at least the public read right. Please upgrade its rights.";
 $l_waiting_events = "等待事件"; //"Waiting event(s)"
 $l_unfilled = "日期未填"; //"Day(s) unfilled"
 $l_my_calendar = "我的日历"; //"My calendar"
