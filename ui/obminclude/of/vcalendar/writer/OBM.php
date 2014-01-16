@@ -365,7 +365,6 @@ class Vcalendar_Writer_OBM {
       $data['event']['owner'] = $GLOBALS['obm']['uid'];
     }    
     $data['event']['calendar_id'] = $id;
-    $data['event']['organizer'] = $GLOBALS['obm']['uid'];
     run_query_calendar_event_update($data['event'], $data['entities'], $id, true);
     $this->updateStates($data['states'], $id);
     $alert = $vevent->get('x-obm-alert');
