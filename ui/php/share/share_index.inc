@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 function handle_share_action($action, $params, $obm, $msg) {
     global $l_share_calendar, $l_share_ok, $l_reinit_ok, $l_mail_ok;
-    global $l_rights, $l_of_right_err_user;
+    global $l_rights, $l_of_right_err_user, $l_of_right_err_share_resource;
     global $display;
 
     $message = null;
@@ -54,7 +54,11 @@ function handle_share_action($action, $params, $obm, $msg) {
         }
     }
     catch (InsufficientRightsException $ex) {
-        json_error_msg("$l_rights : $l_of_right_err_user");
+        if ($params['entity_type'] = 'resource') {
+          json_error_msg("$l_rights : $l_of_right_err_share_resource");
+        } else {
+          json_error_msg("$l_rights : $l_of_right_err_user");
+        }
     }
     catch (UnknownEntityTypeException $ex) {
         http_response_code(400);
@@ -77,18 +81,18 @@ function has_right_to_share($obm, $params) {
     switch($params['entity_type']) {
     case 'resource':
         $entity_type = 'resource';
-        break;
+        // OBMFULL-5624 When sharing a resource calendar in OBM, $obm['uid'] = 0 by default and we use an externalToken.
+        // We have decided to block resource calendar sharing if the resource has not the public read access.
+        // Otherwise an error message warns the resource admin of the impossibility to share the resource calendar.
+        // We do this because right now of_acl.php is unmanageable.
+        return OBM_Acl::areAllowed(0, $entity_type, array($params['entity_id']), 'read');
     case 'user':
-        $entity_type = 'calendar';
-        break;
     case 'calendar':
         $entity_type = 'calendar';
-        break;
+        return OBM_Acl::areAllowed($obm['uid'], $entity_type, array($params['entity_id']), 'admin' ) || check_calendar_update_rights($params); 
     default:
         throw new UnknownEntityTypeException();
     }
-
-    return OBM_Acl::areAllowed($obm['uid'], $entity_type,array($params['entity_id']), 'admin' ) || check_calendar_update_rights($params);
 }
 
 function assert_has_right_to_share($obm, $params) {

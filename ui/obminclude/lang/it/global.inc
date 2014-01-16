@@ -281,6 +281,7 @@ $l_section_webmail = "Webmail";
 $l_this_week = "Questa settimana";
 $l_err_fill = "Il campo deve essere riempito";
 $l_of_right_err_empty = "Il riferimento dell'oggetto da visualizzare è assente!";
+$l_of_right_err_share_resource = "You are not allowed to share the calendar of this resource if it has not at least the public read right. Please upgrade its rights.";
 $l_code = "Codice";
 $l_module_statistic = "Statistiche";
 $l_displayname = "Nome completo";

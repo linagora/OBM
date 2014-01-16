@@ -481,6 +481,7 @@ $l_of_right_err_auth = "Insufficient rights to update rights!";
 $l_of_right_err_empty = "The object reference is missing!";
 $l_of_right_err_user = "Insufficient rights on users !";
 $l_of_right_err_resource = "Insufficient rights on resources !";
+$l_of_right_err_share_resource = "You are not allowed to share the calendar of this resource if it has not at least the public read right. Please upgrade its rights.";
 $l_waiting_events = "Waiting event(s)";
 $l_unfilled = "Day(s) unfilled";
 $l_my_calendar = "My calendar";

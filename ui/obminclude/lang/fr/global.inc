@@ -554,6 +554,7 @@ $l_of_right_err_auth = "Droits insuffisants pour exécuter la modification des d
 $l_of_right_err_empty = "La référence de l'objet à afficher est manquante !";
 $l_of_right_err_user = "Droits insuffisants sur des utilisateurs !";
 $l_of_right_err_resource = "Droits insuffisants sur des ressources !";
+$l_of_right_err_share_resource = "Le partage de l'agenda d'une resource nécessite le droit d'accès public de lecture sur celle-ci. Veuillez mettre à jour les droits d'accès de cette resource.";
 
 //---------------------------------------------------------------------------//
 // Home page portlets
