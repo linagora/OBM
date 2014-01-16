@@ -1,7 +1,7 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
 <<<<<<< HEAD
- * Copyright (C) 2011-2012  Linagora
+ * Copyright (C) 2011-2014  Linagora
 =======
  * Copyright (C) 2013 Linagora
 >>>>>>> dbb8bd3... - [OBMFULL-5147] write test for Http Post body params encoding
