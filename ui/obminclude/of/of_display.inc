@@ -531,7 +531,7 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call (module formatting fields)
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_index($url, $dis_data_entity) {
-    global $path, $params, $ctu_sql_limit;
+    global $path, $params, $ctu_sql_limit, $obm;
     global $cak_prev, $cak_next, $cak_page_prev, $cak_page_next, $cak_begin, $cak_end;
     global $set_rows_default,$module, $l_select_all, $l_unselect_all;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
@@ -559,7 +559,8 @@ class OBM_DISPLAY {
     }
 
     if ($_SESSION['set_rows'] < 1) $_SESSION['set_rows'] = $set_rows_default;
-    $nb_rows = $this->data_set->num_rows_total();
+    $user_results_limit = get_user_results_limit($obm['profile']);
+    $nb_rows = min($user_results_limit, $this->data_set->num_rows_total());
     // If we delete all contacts of the last page, we must go to $page-1 (list)
     if ($lpage > 1) {
       if ($nb_rows < (($lpage-1)*$_SESSION['set_rows'])+1) {
