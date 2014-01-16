@@ -56,8 +56,6 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 public class ObmUser {
 	
 	public static final String EMAIL_FIELD_SEPARATOR = "\r\n";
-	public static final int MAXIMUM_SUPPORTED_FAXES = 2;
-	public static final int MAXIMUM_SUPPORTED_PHONES = 2;
 	public static final String PATTERN_AT_STAR = "@*";
 
 	public static Builder builder() {
@@ -81,11 +79,11 @@ public class ObmUser {
 		private Boolean admin;
 		private UserIdentity identity;
 		private UserAddress address;
+		private UserPhones phones;
 		private String email;
 		private final ImmutableSet.Builder<String> emailAlias;
 		private Boolean hidden;
 		
-		private String mobile;
 		private String service;
 		private String title;
 		private String description;
@@ -102,10 +100,6 @@ public class ObmUser {
 		private ProfileName profileName;
 		private String company;
 		private String direction;
-		private String phone;
-		private String phone2;
-		private String fax;
-		private String fax2;
 		private Integer mailQuota;
 		private ObmHost mailHost;
 		private Boolean archived;
@@ -138,11 +132,7 @@ public class ObmUser {
 					.company(user.company)
 					.service(user.service)
 					.direction(user.direction)
-					.phone(user.phone)
-					.phone2(user.phone2)
-					.mobile(user.mobile)
-					.fax(user.fax)
-					.fax2(user.fax2)
+					.phones(user.phones)
 					.mailQuota(user.mailQuota)
 					.mailHost(user.mailHost)
 					.archived(user.archived)
@@ -178,10 +168,6 @@ public class ObmUser {
 		}
 		public Builder admin(boolean admin) {
 			this.admin = admin;
-			return this;
-		}
-		public Builder mobile(String mobile) {
-			this.mobile = mobile;
 			return this;
 		}
 		public Builder service(String service) {
@@ -232,36 +218,8 @@ public class ObmUser {
 			this.direction = direction;
 			return this;
 		}
-		public Builder phone(String phone) {
-			this.phone = phone;
-			return this;
-		}
-		public Builder phone2(String phone2) {
-			this.phone2 = phone2;
-			return this;
-		}
-		public Builder phones(Iterable<String> phones) {
-			Preconditions.checkNotNull(phones);
-			Preconditions.checkState(Iterables.size(phones) <= MAXIMUM_SUPPORTED_PHONES);
-
-			phone = Iterables.get(phones, 0, null);
-			phone2 = Iterables.get(phones, 1, null);
-			return this;
-		}
-		public Builder fax(String fax) {
-			this.fax = fax;
-			return this;
-		}
-		public Builder fax2(String fax2) {
-			this.fax2 = fax2;
-			return this;
-		}
-		public Builder faxes(Iterable<String> faxes) {
-			Preconditions.checkNotNull(faxes);
-			Preconditions.checkState(Iterables.size(faxes) <= MAXIMUM_SUPPORTED_FAXES);
-
-			fax = Iterables.get(faxes, 0, null);
-			fax2 = Iterables.get(faxes, 1, null);
+		public Builder phones(UserPhones phones) {
+			this.phones = phones;
 			return this;
 		}
 		public Builder mailQuota(Integer mailQuota) {
@@ -359,14 +317,15 @@ public class ObmUser {
 
 			UserIdentity identity = Objects.firstNonNull(this.identity, UserIdentity.empty());
 			UserAddress address = Objects.firstNonNull(this.address, UserAddress.empty());
+			UserPhones phones = Objects.firstNonNull(this.phones, UserPhones.empty());
 
 			return new ObmUser(
 					uid, entityId, login, extId, admin, identity,
 					email, emailAlias.build(), hidden,
-					address, mobile, service, title, 
+					address, phones, service, title, 
 					description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName, company, direction,
-					phone, phone2, fax, fax2, mailQuota, mailHost, archived, password, uidNumber, gidNumber, groups.build());
+					mailQuota, mailHost, archived, password, uidNumber, gidNumber, groups.build());
 		}
 		
 	}
@@ -378,11 +337,11 @@ public class ObmUser {
 	private final boolean admin;
 	private final UserIdentity identity;
 	private final UserAddress address;
+	private final UserPhones phones;
 	private final String email;
 	private final Set<String> emailAlias;
 	private final boolean hidden;
 	
-	private final String mobile;
 	private final String service;
 	private final String title;
 	private final String description;
@@ -399,10 +358,6 @@ public class ObmUser {
 	private final ProfileName profileName;
 	private final String company;
 	private final String direction;
-	private final String phone;
-	private final String phone2;
-	private final String fax;
-	private final String fax2;
 	private final Integer mailQuota;
 	private final ObmHost mailHost;
 	private final boolean archived;
@@ -415,12 +370,12 @@ public class ObmUser {
 	private ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, UserIdentity identity,
 			String email,
 			Set<String> emailAlias, boolean hidden,
-			UserAddress address,
-			String mobile, String service, String title,
+			UserAddress address, UserPhones phones,
+			String service, String title,
 			String description, Date timeCreate, Date timeUpdate,
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName, String company,
-			String direction, String phone, String phone2, String fax, String fax2,
+			String direction,
 			Integer mailQuota, ObmHost mailHost, boolean archived, String password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
 		this.uid = uid;
 		this.entityId = entityId;
@@ -432,7 +387,7 @@ public class ObmUser {
 		this.emailAlias = emailAlias;
 		this.hidden = hidden;
 		this.address = address;
-		this.mobile = mobile;
+		this.phones = phones;
 		this.service = service;
 		this.title = title;
 		this.description = description;
@@ -445,10 +400,6 @@ public class ObmUser {
 		this.profileName = profileName;
 		this.company = company;
 		this.direction = direction;
-		this.phone = phone;
-		this.phone2 = phone2;
-		this.fax = fax;
-		this.fax2 = fax2;
 		this.mailQuota = mailQuota;
 		this.mailHost = mailHost;
 		this.archived = archived;
@@ -522,9 +473,12 @@ public class ObmUser {
 		return address.getExpressPostal();
 	}
 
-
+	public UserPhones getPhones() {
+		return phones;
+	}
+	
 	public String getMobile() {
-		return mobile;
+		return phones.getMobile();
 	}
 
 	public String getService() {
@@ -663,19 +617,19 @@ public class ObmUser {
 	}
 
 	public String getPhone() {
-		return phone;
+		return phones.getPhone1();
 	}
 
 	public String getPhone2() {
-		return phone2;
+		return phones.getPhone2();
 	}
 
 	public String getFax() {
-		return fax;
+		return phones.getFax1();
 	}
 
 	public String getFax2() {
-		return fax2;
+		return phones.getFax2();
 	}
 
 	public Integer getMailQuota() {
@@ -717,9 +671,9 @@ public class ObmUser {
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(uid, entityId, login, extId, admin, identity, email,
-				emailAlias, hidden, address, mobile,
+				emailAlias, hidden, address, phones,
 				service, title, description, createdBy, updatedBy, domain, publicFreeBusy, profileName, company,
-				direction, phone, phone2, fax, fax2, mailQuota, archived, mailHost, password, uidNumber, gidNumber, groups);
+				direction, mailQuota, archived, mailHost, password, uidNumber, gidNumber, groups);
 	}
 	
 	@Override
@@ -736,7 +690,7 @@ public class ObmUser {
 				&& Objects.equal(this.emailAlias, that.emailAlias)
 				&& Objects.equal(this.hidden, that.hidden)
 				&& Objects.equal(this.address, that.address)
-				&& Objects.equal(this.mobile, that.mobile)
+				&& Objects.equal(this.phones, that.phones)
 				&& Objects.equal(this.service, that.service)
 				&& Objects.equal(this.title, that.title)
 				&& Objects.equal(this.description, that.description)
@@ -747,10 +701,6 @@ public class ObmUser {
 				&& Objects.equal(this.profileName, that.profileName)
 				&& Objects.equal(this.company, that.company)
 				&& Objects.equal(this.direction, that.direction)
-				&& Objects.equal(this.phone, that.phone)
-				&& Objects.equal(this.phone2, that.phone2)
-				&& Objects.equal(this.fax, that.fax)
-				&& Objects.equal(this.fax2, that.fax2)
 				&& Objects.equal(this.mailQuota, that.mailQuota)
 				&& Objects.equal(this.mailHost, that.mailHost)
 				&& Objects.equal(this.archived, that.archived)
@@ -775,7 +725,7 @@ public class ObmUser {
 			.add("emailAlias", emailAlias)
 			.add("hidden", hidden)
 			.add("address", address)
-			.add("mobile", mobile)
+			.add("phones", phones)
 			.add("service", service)
 			.add("title", title)
 			.add("description", description)
@@ -788,10 +738,6 @@ public class ObmUser {
 			.add("profileName", profileName)
 			.add("company", company)
 			.add("direction", direction)
-			.add("phone", phone)
-			.add("phone2", phone2)
-			.add("fax", fax)
-			.add("fax2", fax2)
 			.add("mailQuota", mailQuota)
 			.add("mailHost", mailHost)
 			.add("archived", archived)

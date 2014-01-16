@@ -78,8 +78,9 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserExtId;
-import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPhones;
 
 @Singleton
 public class UserDaoJdbcImpl implements UserDao {
@@ -369,11 +370,13 @@ public class UserDaoJdbcImpl implements UserDao {
 								.expressPostal(rs.getString("userobm_expresspostal"))
 								.countryCode(rs.getString("userobm_country_iso3166"))
 								.build())
-					.phone(emptyToNull(rs.getString("userobm_phone")))
-					.phone2(emptyToNull(rs.getString("userobm_phone2")))
-					.mobile(emptyToNull(rs.getString("userobm_mobile")))
-					.fax(emptyToNull(rs.getString("userobm_fax")))
-					.fax2(emptyToNull(rs.getString("userobm_fax2")))
+					.phones(UserPhones.builder()
+								.addPhone(emptyToNull(rs.getString("userobm_phone")))
+								.addPhone(emptyToNull(rs.getString("userobm_phone2")))
+								.mobile(emptyToNull(rs.getString("userobm_mobile")))
+								.addFax(emptyToNull(rs.getString("userobm_fax")))
+								.addFax(emptyToNull(rs.getString("userobm_fax2")))
+								.build())
 					.mailQuota(rs.getInt("userobm_mail_quota"))
 					.mailHost(hostFromCursor(rs))
 					.archived(rs.getBoolean("userobm_archive"))

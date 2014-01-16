@@ -52,6 +52,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserPhones;
 
 public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 
@@ -59,6 +60,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 	private final ObmUser.Builder userBuilder;
 	private final UserIdentity.Builder userIdentityBuilder;
 	private final UserAddress.Builder userAddressBuilder;
+	private final UserPhones.Builder userPhonesBuilder;
 
 	@Inject
 	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider) {
@@ -66,6 +68,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		this.userBuilder = ObmUser.builder();
 		this.userIdentityBuilder = UserIdentity.builder();
 		this.userAddressBuilder = UserAddress.builder();
+		this.userPhonesBuilder = UserPhones.builder();
 	}
 
 	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ObmUser fromUser) {
@@ -73,6 +76,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		this.userBuilder.from(fromUser);
 		this.userIdentityBuilder.from(fromUser.getIdentity());
 		this.userAddressBuilder.from(fromUser.getAddress());
+		this.userPhonesBuilder.from(fromUser.getPhones());
 	}
 
 	@Override
@@ -81,11 +85,12 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		ObmDomain domain = domainProvider.get();
 
 		for (UserJsonFields field : UserJsonFields.fields) {
-			addFieldValueToBuilder(jsonNode, field, userBuilder, userIdentityBuilder, userAddressBuilder);
+			addFieldValueToBuilder(jsonNode, field, userBuilder, userIdentityBuilder, userAddressBuilder, userPhonesBuilder);
 		}
 
 		userBuilder.identity(userIdentityBuilder.build());
 		userBuilder.address(userAddressBuilder.build());
+		userBuilder.phones(userPhonesBuilder.build());
 		
 		ObmHost mailHost = getMailHostValue(jsonNode, domain);
 

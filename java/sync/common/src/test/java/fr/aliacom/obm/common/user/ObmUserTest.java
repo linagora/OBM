@@ -36,7 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 import org.obm.provisioning.ProfileName;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -202,69 +201,7 @@ public class ObmUserTest {
 				.build();
 	}
 
-	@Test(expected = IllegalStateException.class)
-	public void testThreeFaxesBuilder() {
-		ObmUser
-			.builder()
-			.domain(ObmDomain.builder().build())
-			.uid(1)
-			.login(validLogin)
-			.faxes(Sets.newHashSet("1", "2", "3"))
-			.build();
-	}
 
-	@Test
-	public void testTwoFaxesBuilder() {
-		ObmUser user = ObmUser
-			.builder()
-			.domain(ObmDomain.builder().build())
-			.uid(1)
-			.login(validLogin)
-			.faxes(ImmutableSet.of("1", "2"))
-			.build();
-
-		assertThat(user.getFax()).isEqualTo("1");
-		assertThat(user.getFax2()).isEqualTo("2");
-	}
-
-	@Test
-	public void testOneFaxBuilder() {
-		ObmUser user = ObmUser
-			.builder()
-			.domain(ObmDomain.builder().build())
-			.uid(1)
-			.login(validLogin)
-			.faxes(ImmutableSet.of("1"))
-			.build();
-
-		assertThat(user.getFax()).isEqualTo("1");
-		assertThat(user.getFax2()).isNull();
-	}
-
-	@Test
-	public void testNoFaxBuilder() {
-		ObmUser user = ObmUser
-			.builder()
-			.domain(ObmDomain.builder().build())
-			.uid(1)
-			.login(validLogin)
-			.faxes(ImmutableSet.<String>of())
-			.build();
-
-		assertThat(user.getFax()).isNull();
-		assertThat(user.getFax2()).isNull();
-	}
-
-	@Test(expected = NullPointerException.class)
-	public void testBuilderWithNullFaxes() {
-		ObmUser
-			.builder()
-			.domain(ObmDomain.builder().build())
-			.uid(1)
-			.login(validLogin)
-			.faxes(null)
-			.build();
-	}
 
 	@Test
 	public void testFrom() {
@@ -290,11 +227,13 @@ public class ObmUserTest {
 					.zipCode("OBMZip")
 					.expressPostal("OBMExpressPostal")
 					.build())
-				.phone("+OBM 123456")
-				.phone2("+OBM 789")
-				.mobile("+OBMMobile 123")
-				.fax("+OBMFax 123456")
-				.fax2("+OBMFax 789")
+				.phones(UserPhones.builder()
+					.addPhone( "+OBM 123456")
+					.addPhone("+OBM 789")
+					.mobile("+OBMMobile 123")
+					.addFax("+OBMFax 123456")
+					.addFax("+OBMFax 789")
+					.build())
 				.company("Linagora")
 				.service("OBMDev")
 				.direction("LGS")

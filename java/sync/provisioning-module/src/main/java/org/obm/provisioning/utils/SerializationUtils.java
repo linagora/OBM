@@ -60,8 +60,9 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserExtId;
-import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPhones;
 
 public class SerializationUtils {
 	
@@ -124,7 +125,8 @@ public class SerializationUtils {
 	}
 	
 	public static void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields, 
-			ObmUser.Builder toBuild, UserIdentity.Builder userIdentityBuilder, UserAddress.Builder addressBuilder) {
+			ObmUser.Builder toBuild, UserIdentity.Builder userIdentityBuilder, UserAddress.Builder addressBuilder,
+			UserPhones.Builder phonesBuilder) {
 		JsonNode value = jsonNode.findValue(jsonFields.asSpecificationValue());
 
 		if (isNullOrNullNode(value)) {
@@ -154,7 +156,7 @@ public class SerializationUtils {
 				toBuild.direction(value.asText());
 				break;
 			case FAXES:
-				toBuild.faxes(getCurrentTokenTextValues(value));
+				phonesBuilder.faxes(getCurrentTokenTextValues(value));
 				break;
 			case FIRSTNAME:
 				userIdentityBuilder.firstName(value.asText());
@@ -187,13 +189,13 @@ public class SerializationUtils {
 				toBuild.archived(value.asBoolean());
 				break;
 			case MOBILE:
-				toBuild.mobile(value.asText());
+				phonesBuilder.mobile(value.asText());
 				break;
 			case PASSWORD:
 				toBuild.password(value.asText());
 				break;
 			case PHONES:
-				toBuild.phones(getCurrentTokenTextValues(value));
+				phonesBuilder.phones(getCurrentTokenTextValues(value));
 				break;
 			case PROFILE:
 				toBuild.profileName(ProfileName.valueOf(value.asText()));

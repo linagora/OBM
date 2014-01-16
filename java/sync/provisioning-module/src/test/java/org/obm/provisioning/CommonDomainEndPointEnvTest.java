@@ -98,8 +98,9 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserExtId;
-import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPhones;
 
 public abstract class CommonDomainEndPointEnvTest {
 
@@ -535,11 +536,13 @@ public abstract class CommonDomainEndPointEnvTest {
 						.expressPostal("1234")
 						.countryCode("1234")
 						.build())
-				.phone("phone")
-				.phone2("phone2")
-				.mobile("mobile")
-				.fax("fax")
-				.fax2("fax2")
+				.phones(UserPhones.builder()
+					.addPhone("phone")
+					.addPhone("phone2")
+					.mobile("mobile")
+					.addFax("fax")
+					.addFax("fax2")
+					.build())
 				.mailQuota(1234)
 				.mailHost(ObmHost.builder().name("host").build())
 				.hidden(true)

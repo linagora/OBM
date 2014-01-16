@@ -62,11 +62,12 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserAddress;
-import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.ObmUser.Builder;
+import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPhones;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(UserDaoJdbcImplTest.Env.class)
@@ -90,6 +91,14 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 			.expressPostal("OBMExpressPostal")
 			.build();
 	
+	private final UserPhones validPhones = UserPhones.builder()
+			.addPhone("+OBM 123456")
+			.addPhone("+OBM 789")
+			.mobile("+OBMMobile 123")
+			.addFax("+OBMFax 123456")
+			.addFax("+OBMFax 789")
+			.build();
+
 	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
 	@Inject H2InMemoryDatabase db;
 
@@ -303,11 +312,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.profileName(ProfileName.valueOf("user"))
 				.identity(johnIdentity)
 				.address(johnAddress)
-				.phone("+OBM 123456")
-				.phone2("+OBM 789")
-				.mobile("+OBMMobile 123")
-				.fax("+OBMFax 123456")
-				.fax2("+OBMFax 789")
+				.phones(validPhones)
 				.company("Linagora")
 				.service("OBMDev")
 				.direction("LGS")
@@ -336,11 +341,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.profileName(ProfileName.valueOf("user"))
 				.identity(johnIdentity)
 				.address(johnAddress)
-				.phone("+OBM 123456")
-				.phone2("+OBM 789")
-				.mobile("+OBMMobile 123")
-				.fax("+OBMFax 123456")
-				.fax2("+OBMFax 789")
+				.phones(validPhones)
 				.company("Linagora")
 				.service("OBMDev")
 				.direction("LGS")
@@ -400,11 +401,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.profileName(ProfileName.valueOf("user"))
 				.identity(johnIdentity)
 				.address(johnAddress)
-				.phone("+OBM 123456")
-				.phone2("+OBM 789")
-				.mobile("+OBMMobile 123")
-				.fax("+OBMFax 123456")
-				.fax2("+OBMFax 789")
+				.phones(validPhones)
 				.company("Linagora")
 				.service("OBMDev")
 				.direction("LGS")

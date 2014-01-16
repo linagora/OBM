@@ -75,8 +75,9 @@ import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserExtId;
-import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPhones;
 
 
 public class BeansTest {
@@ -127,7 +128,8 @@ public class BeansTest {
 				EntityId.class,
 				UserLogin.class,
 				UserIdentity.class,
-				UserAddress.class);
+				UserAddress.class,
+				UserPhones.class);
 	}
 	
 	@Test
