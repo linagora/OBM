@@ -844,7 +844,7 @@ function get_user_action() {
 function get_user_results_limit($profile) {
     global $profiles;
     $limit = $profiles[$profile]['properties']['user_results_limit'];
-    return $limit;
+    return $limit ? $limit : PHP_INT_MAX;
 }
 
 function update_user_action() {

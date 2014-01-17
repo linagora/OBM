@@ -559,8 +559,13 @@ class OBM_DISPLAY {
     }
 
     if ($_SESSION['set_rows'] < 1) $_SESSION['set_rows'] = $set_rows_default;
-    $user_results_limit = get_user_results_limit($obm['profile']);
-    $nb_rows = min($user_results_limit, $this->data_set->num_rows_total());
+    $nb_rows = 0;
+    if (function_exists('get_user_results_limit')) {
+      $user_results_limit = get_user_results_limit($obm['profile']);
+      $nb_rows = min($user_results_limit, $this->data_set->num_rows_total());
+    } else {
+      $nb_rows = $this->data_set->num_rows_total(); 
+    }
     // If we delete all contacts of the last page, we must go to $page-1 (list)
     if ($lpage > 1) {
       if ($nb_rows < (($lpage-1)*$_SESSION['set_rows'])+1) {
