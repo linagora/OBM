@@ -20,6 +20,9 @@ JAVA_HOME="/usr/lib/jvm/java"
 # You can pass some parameters to java here if you wish to
 #JAVA_OPTS="-Xminf0.1 -Xmaxf0.3"
 
+#Default to Concurrent Mark And Sweep GC
+JAVA_OPTS="$JAVA_OPTS -XX:+UseConcMarkSweepGC"
+
 # Use JAVA_OPTS to set java.library.path 
 JAVA_OPTS="$JAVA_OPTS -DSTART=etc/start.config -Djetty.lib=/usr/share/jetty6/lib "
 
