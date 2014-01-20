@@ -274,6 +274,7 @@
               <textarea name='comment3'><?php echo $contact->comment3 ?></textarea>
             </fieldset>
             <p class='LC C'>
+              <input type='hidden' name='company_id' value='<?php echo $contact->company_id ?>'  />
               <input type='hidden' name='action' value='storeContact'  />
               <input type='hidden' name='id' value='<?php echo $contact->id ?>'  />
               <input type='submit' value='<?php echo __('Save') ?>' />
