@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -44,6 +43,9 @@ import org.obm.push.protocol.bean.ASTimeZone;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -51,7 +53,9 @@ import com.google.inject.Singleton;
 @Singleton
 public class ASTimeZoneConverterImpl implements ASTimeZoneConverter {
 	
-	private final static class TimeZoneComparator implements Comparator<String>, Serializable {
+	private static final String UTC = "UTC";
+
+	private final class TimeZoneComparator implements Comparator<String> {
 		@Override
 		public int compare(String left, String right) {
 			if (TIME_ZONE_PREFERENCES.contains(right) && !TIME_ZONE_PREFERENCES.contains(left)) {
@@ -65,7 +69,7 @@ public class ASTimeZoneConverterImpl implements ASTimeZoneConverter {
 	}
 
 	@VisibleForTesting static final Collection<String> TIME_ZONE_PREFERENCES =
-			Lists.newArrayList("Europe/Paris", "Europe/London",
+			Lists.newArrayList(UTC, "Europe/Paris", "Europe/London",
 					"America/New_York", "America/Los_Angeles", "Australia/Sydney");
 	
 	private final TimeZoneConverter timeZoneConverter;
@@ -77,15 +81,14 @@ public class ASTimeZoneConverterImpl implements ASTimeZoneConverter {
 	
 	@Override
 	public TimeZone convert(ASTimeZone asTimeZone) {
-		Iterable<String> availableIDs = getAvailableTimeZoneIDs(asTimeZone);
-		if (availableIDs != null) {
-			if (asTimeZone.useDaylightTime()) {
-				return findTimeZone(asTimeZone, availableIDs);
-			} else {
-				return getFirstTimeZoneWithoutDST(availableIDs);
-			}
+		return Iterables.getFirst(matchJavaTimeZones(asTimeZone), TimeZone.getTimeZone(UTC));
+	}
+
+	@VisibleForTesting Iterable<TimeZone> matchJavaTimeZones(ASTimeZone asTimeZone) {
+		if (asTimeZone.useDaylightTime()) {
+			return findTimeZones(asTimeZone);
 		}
-		return null;
+		return getTimeZonesWithoutDST(asTimeZone);
 	}
 	
 	private Iterable<String> getAvailableTimeZoneIDs(ASTimeZone asTimeZone) {
@@ -100,25 +103,26 @@ public class ASTimeZoneConverterImpl implements ASTimeZoneConverter {
 		return minutes*60*1000;
 	}
 
-	private TimeZone findTimeZone(ASTimeZone asTimeZone,
-			Iterable<String> availableIDs) {
-		for (String availableID : availableIDs) {
+	private Iterable<TimeZone> findTimeZones(ASTimeZone asTimeZone) {
+		Builder<TimeZone> timezones = ImmutableList.builder();
+		for (String availableID : getAvailableTimeZoneIDs(asTimeZone)) {
 			TimeZone timeZone = TimeZone.getTimeZone(availableID);
 			ASTimeZone timeZoneConverted = timeZoneConverter.convert(timeZone, Locale.US);
 			if (timeZoneConverted.equalsDiscardingNames(asTimeZone)) {
-				return timeZone;
+				timezones.add(timeZone);
 			}
 		}
-		return null;
+		return timezones.build();
 	}
 	
-	private TimeZone getFirstTimeZoneWithoutDST(Iterable<String> availableIDs) {
-		for (String availableID : availableIDs) {
+	private Iterable<TimeZone> getTimeZonesWithoutDST(ASTimeZone asTimeZone) {
+		Builder<TimeZone> timezones = ImmutableList.builder();
+		for (String availableID : getAvailableTimeZoneIDs(asTimeZone)) {
 			TimeZone timeZone = TimeZone.getTimeZone(availableID);
 			if (!timeZone.useDaylightTime()) {
-				return timeZone;
+				timezones.add(timeZone);
 			}
 		}
-		return null;
+		return timezones.build();
 	}
 }

@@ -31,12 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.protocol.data;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TimeZone;
 
-import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,6 +46,7 @@ import org.obm.push.protocol.bean.ASSystemTime;
 import org.obm.push.protocol.bean.ASTimeZone;
 import org.obm.push.utils.type.UnsignedShort;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 @RunWith(SlowFilterRunner.class)
@@ -64,7 +66,7 @@ public class ASTimeZoneConverterImplTest {
 
 		TimeZone expectedTimeZone = asTimeZoneConverter.convert(asTimeZone);
 
-		Assertions.assertThat(expectedTimeZone.getID()).isEqualTo(timeZone.getID());
+		assertThat(expectedTimeZone).isEqualTo(timeZone);
 	}
 	
 	@Test
@@ -73,7 +75,7 @@ public class ASTimeZoneConverterImplTest {
 
 		TimeZone expectedTimeZone = asTimeZoneConverter.convert(gs2LosAngelesTimeZone());
 
-		Assertions.assertThat(expectedTimeZone.getID()).isEqualTo(timeZone.getID());
+		assertThat(expectedTimeZone).isEqualTo(timeZone);
 	}
 
 	private ASTimeZone gs2LosAngelesTimeZone() {
@@ -127,33 +129,49 @@ public class ASTimeZoneConverterImplTest {
 		assertTimezoneIdsAreCorrect(map);
 	}
 	
-	@Test
-	public void testConvertSpecialTimeZones() {
-		Map<String, String> tzi = Maps.newHashMap();
-		tzi.put("Europe/Madrid", "Europe/Paris");
-		tzi.put("Asia/Tel_Aviv", "Asia/Jerusalem");
-		tzi.put("Asia/Amman", "Asia/Amman");
-		tzi.put("America/Asuncion", "America/Asuncion");
-		tzi.put("America/Adak", "America/Adak");
-		
-		Map<String, TimeZone> map = Maps.newHashMap();
-		for (Entry<String, String> entry : tzi.entrySet()) {
-			TimeZone timeZone = TimeZone.getTimeZone(entry.getKey());
-			ASTimeZone asTimeZone = toASTimeZone(timeZone);
-
-			TimeZone expectedTimeZone = asTimeZoneConverter.convert(asTimeZone);
-			map.put(entry.getValue(), expectedTimeZone);
-		}
-		assertTimezoneIdsAreCorrect(map);
-	}
-	
 	private void assertTimezoneIdsAreCorrect(Map<String, TimeZone> map) {
 		for (java.util.Map.Entry<String, TimeZone> e: map.entrySet()) {
-			Assertions.assertThat(e.getValue().getID()).isEqualTo(e.getKey());
+			assertThat(e.getValue().getID()).isEqualTo(e.getKey());
+		}
+	}
+	
+	@Test
+	public void testConvertSpecialTimeZones() {
+		List<TimeZone> expectedTimeZones = ImmutableList.<TimeZone> builder()
+			.add(TimeZone.getTimeZone("Europe/Madrid"))
+			.add(TimeZone.getTimeZone("Europe/Paris"))
+			.add(TimeZone.getTimeZone("Asia/Tel_Aviv"))
+			.add(TimeZone.getTimeZone("Asia/Jerusalem"))
+			.add(TimeZone.getTimeZone("Asia/Amman"))
+			.add(TimeZone.getTimeZone("America/Asuncion"))
+			.add(TimeZone.getTimeZone("America/Adak"))
+			.build();
+		
+		for (TimeZone timeZone : expectedTimeZones) {
+			ASTimeZone asTimeZone = toASTimeZone(timeZone);
+			assertTimezoneElementsAreCorrect(timeZone, asTimeZoneConverter.matchJavaTimeZones(asTimeZone));
+		}
+	}
+	
+	private void assertTimezoneElementsAreCorrect(TimeZone tzReference, Iterable<TimeZone> convertedTimeZones) {
+		assertThat(convertedTimeZones).contains(tzReference);
+		for (TimeZone otherMatchingTz: convertedTimeZones) {
+			assertThat(tzReference.getDSTSavings()).isEqualTo(otherMatchingTz.getDSTSavings());
+			assertThat(tzReference.getRawOffset()).isEqualTo(otherMatchingTz.getRawOffset());
 		}
 	}
 	
 	private ASTimeZone toASTimeZone(TimeZone timeZone) {
 		return new TimeZoneConverterImpl().convert(timeZone, Locale.US);
+	}
+	
+	@Test
+	public void testConvertDefaultValue() {
+		TimeZone timeZone = TimeZone.getTimeZone("No/Matching");
+		ASTimeZone asTimeZone = toASTimeZone(timeZone);
+
+		TimeZone expectedTimeZone = asTimeZoneConverter.convert(asTimeZone);
+
+		assertThat(expectedTimeZone).isEqualTo(TimeZone.getTimeZone("UTC"));
 	}
 }
