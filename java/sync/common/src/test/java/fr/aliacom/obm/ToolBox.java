@@ -32,6 +32,7 @@
 package fr.aliacom.obm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -57,15 +58,15 @@ import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.dao.EntityId;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.ObmUser.Builder;
-import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
 
 public class ToolBox {
 
@@ -128,8 +129,12 @@ public class ToolBox {
 	}
 	
 	public static ObmUser getDefaultObmUserWithEmails(String...userEmails) {
-		String formatedUserEmails = Joiner.on(ObmUser.EMAIL_FIELD_SEPARATOR).join(userEmails);
-		return buildCommonObmUser().emailAndAliases(formatedUserEmails).build();
+		return buildCommonObmUser()
+				.emails(UserEmails.builder()
+							.addresses(Arrays.asList(userEmails))
+							.domain(getDefaultObmDomain())
+							.build())
+				.build();
 	}
 
 	private static Builder buildCommonObmUser() {
@@ -138,7 +143,10 @@ public class ToolBox {
 			.entityId(EntityId.valueOf(2))
 			.login(UserLogin.valueOf("user"))
 			.domain(getDefaultObmDomain())
-			.emailAndAliases("user@test")
+			.emails(UserEmails.builder()
+					.addAddress("user@test")
+					.domain(getDefaultObmDomain())
+					.build())
 			.identity(UserIdentity.builder()
 				.firstName("Obm")
 				.lastName("User")

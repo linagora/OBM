@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 package org.obm.sync.host;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.obm.sync.host.ObmHost;
@@ -55,5 +56,12 @@ public class ObmHostTest {
 	@Test
 	public void testBuildWhenNullIpGiven() {
 		ObmHost.builder().ip(null).build();
+	}
+	
+	@Test
+	public void localhostIs127_0_0_1() {
+		ObmHost expected = ObmHost.builder().ip("127.0.0.1").build();
+		ObmHost host = ObmHost.builder().localhost().build();
+		assertThat(host).isEqualToComparingFieldByField(expected).isEqualTo(expected);
 	}
 }

@@ -64,6 +64,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.ObmUser.Builder;
 import fr.aliacom.obm.common.user.UserAddress;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
@@ -107,6 +108,29 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 			.title("Software Dev")
 			.build();
 
+	private final ObmDomain domain = ObmDomain
+			.builder()
+			.id(1)
+			.uuid(ObmDomainUuid.of("3af47236-3638-458e-9c3e-5eebbaa8f9ae"))
+			.name("domain")
+			.build();
+	
+	private final ObmHost mailHost = ObmHost
+			.builder()
+			.id(1)
+			.name("mail")
+			.fqdn("mail.tlse.lng")
+			.ip("1.2.3.4")
+			.domainId(domain.getId())
+			.build();
+	
+	private final UserEmails johnEmails = UserEmails.builder()
+			.addAddress("jdoe")
+			.addAddress("john.doe")
+			.server(mailHost)
+			.quota(500)
+			.domain(domain)
+			.build();
 	
 	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
 	@Inject H2InMemoryDatabase db;
@@ -134,25 +158,11 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	@Inject
 	private UserDaoJdbcImpl dao;
 
-	private final ObmDomain domain = ObmDomain
-			.builder()
-			.id(1)
-			.uuid(ObmDomainUuid.of("3af47236-3638-458e-9c3e-5eebbaa8f9ae"))
-			.name("domain")
-			.build();
 	private final ObmDomain domain2 = ObmDomain
 			.builder()
 			.id(2)
 			.uuid(ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf"))
 			.name("test2.tlse.lng")
-			.build();
-	private final ObmHost mailHost = ObmHost
-			.builder()
-			.id(1)
-			.name("mail")
-			.fqdn("mail.tlse.lng")
-			.ip("1.2.3.4")
-			.domainId(domain.getId())
 			.build();
 
 	@Test
@@ -323,9 +333,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.address(johnAddress)
 				.phones(validPhones)
 				.work(validJob)
-				.emailAndAliases("jdoe\r\njohn.doe")
-				.mailHost(mailHost)
-				.mailQuota(500)
+				.emails(johnEmails)
 				.domain(domain);
 
 		ObmUser createdUser1 = dao.create(userBuilder.extId(UserExtId.valueOf("JohnDoeExtI1")).build());
@@ -349,9 +357,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.address(johnAddress)
 				.phones(validPhones)
 				.work(validJob)
-				.emailAndAliases("jdoe\r\njohn.doe")
-				.mailHost(mailHost)
-				.mailQuota(500)
+				.emails(johnEmails)
 				.hidden(true)
 				.domain(domain);
 
@@ -406,9 +412,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.address(johnAddress)
 				.phones(validPhones)
 				.work(validJob)
-				.emailAndAliases("jdoe\r\njohn.doe")
-				.mailHost(mailHost)
-				.mailQuota(500)
+				.emails(johnEmails)
 				.uidNumber(123)
 				.gidNumber(456)
 				.domain(domain)
@@ -447,8 +451,6 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	@Test
 	public void testUpdateClearingEmailingForUser() throws SQLException, UserNotFoundException {
 		ObmUser user = sampleUserBuilder(1, 3, "1")
-				.emailAndAliases("")
-				.mailHost(null)
 				.profileName(ProfileName.valueOf("admin"))
 				.admin(true)
 				.build();
@@ -609,16 +611,18 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.builder()
 				.extId(UserExtId.valueOf("JohnDoeExtId"))
 				.login(validLogin)
-				.email("jdoe")
-				.mailHost(mailHost)
+				.emails(UserEmails.builder()
+					.addAddress("jdoe")
+					.server(mailHost)
+					.domain(domain)
+					.build())
 				.domain(domain);
 
 		ObmUser createdUser = dao.create(userBuilder.build());
 
 		dao.update(userBuilder
 				.uid(createdUser.getUid())
-				.mailHost(null)
-				.email(null)
+				.emails(UserEmails.builder().domain(domain).build())
 				.build());
 
 		ResultSet rs = db.execute("SELECT userobm_mail_perms FROM UserObm WHERE userobm_id = ?", createdUser.getUid());
@@ -633,8 +637,11 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.builder()
 				.extId(UserExtId.valueOf("JohnDoeExtId"))
 				.login(validLogin)
-				.email("jdoe")
-				.mailHost(mailHost)
+				.emails(UserEmails.builder()
+					.addAddress("jdoe")
+					.server(mailHost)
+					.domain(domain)
+					.build())
 				.domain(domain);
 
 		ObmUser createdUser = dao.create(userBuilder.build());
@@ -656,8 +663,11 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 
 		dao.update(userBuilder
 				.uid(createdUser.getUid())
-				.mailHost(mailHost)
-				.email("jdoe")
+				.emails(UserEmails.builder()
+					.addAddress("jdoe")
+					.server(mailHost)
+					.domain(domain)
+					.build())
 				.build());
 
 		ResultSet rs = db.execute("SELECT userobm_mail_perms FROM UserObm WHERE userobm_id = ?", createdUser.getUid());
@@ -702,16 +712,22 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		List<ObmUser> users = ImmutableList.of(
 				sampleUserBuilder(1, 7, "5")
 					.uid(5)
-					.mailHost(mailHost)
-					.emailAndAliases("user1")
+					.emails(UserEmails.builder()
+						.addAddress("user1")
+						.server(mailHost)
+						.domain(domain2)
+						.build())
 					.domain(domain2)
 					.build(),
 				sampleUserBuilder(2, 8, "6")
 					.uid(6)
 					.profileName(ProfileName.valueOf("admin"))
 					.admin(true)
-					.mailHost(mailHost)
-					.emailAndAliases("user2")
+					.emails(UserEmails.builder()
+						.addAddress("user2")
+						.server(mailHost)
+						.domain(domain2)
+						.build())
 					.domain(domain2)
 					.build(),
 				sampleUserBuilder(7, 32, "7")
@@ -746,6 +762,45 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		assertThat(allEmails).containsOnly("group1", "group2", "mailshare1", "user2", "user3");
 	}
 	
+
+	@Test
+	public void testQuota0ToNullableIsNull() {
+		assertThat(dao.quotaToNullable(0)).isNull();
+	}
+
+	@Test
+	public void testQuota500ToNullableIsNotNull() {
+		assertThat(dao.quotaToNullable(500)).isEqualTo(500);
+	}
+	
+	@Test
+	public void testNullToIntQuotaIs0() {
+		ObmUser user = ObmUser.builder()
+				.uid(1)
+				.login(UserLogin.valueOf("login"))
+				.domain(domain)
+				.emails(UserEmails.builder()
+					.quota(null)
+					.domain(domain)
+					.build())
+				.build();
+		assertThat(dao.getQuotaAsInt0(user)).isEqualTo(0);
+	}
+
+	@Test
+	public void test500ToIntQuotaIs500() {
+		ObmUser user = ObmUser.builder()
+				.uid(1)
+				.login(UserLogin.valueOf("login"))
+				.domain(domain)
+				.emails(UserEmails.builder()
+					.quota(500)
+					.domain(domain)
+					.build())
+				.build();
+		assertThat(dao.getQuotaAsInt0(user)).isEqualTo(500);
+	}
+	
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetAllEmailsFromWithNullToIgnoreExtId() throws SQLException {
 		dao.getAllEmailsFrom(domain, null);
@@ -772,14 +827,17 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	}
 	private ObmUser sampleUser(int id, int entityId, String extId) {
 		return sampleUserBuilder(id, entityId, extId)
-				.mailHost(mailHost)
-				.emailAndAliases("user" + id)
+				.emails(UserEmails.builder()
+						.addAddress("user" + id)
+						.server(mailHost)
+						.domain(domain)
+						.build())
 				.build();
 	}
 
 	private ObmUser sampleUserWithoutMail(int id, int entityId, String extId) {
 		return sampleUserBuilder(id, entityId, extId)
-				.emailAndAliases("")
 				.build();
 	}
+	
 }

@@ -36,9 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 import org.obm.provisioning.ProfileName;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
@@ -114,38 +111,13 @@ public class ObmUserTest {
 	}
 	
 	@Test(expected=NullPointerException.class)
-	public void testNullEmailAlias() {
-		ObmUser
-				.builder()
-				.domain(ObmDomain.builder().build())
-				.uid(1)
-				.login(validLogin)
-				.mails(Sets.newHashSet("1"))
-				.emailAlias(null)
-				.build();
-	}
-	
-	@Test(expected=NullPointerException.class)
 	public void testNullGroups() {
 		ObmUser
 				.builder()
 				.domain(ObmDomain.builder().build())
 				.uid(1)
 				.login(validLogin)
-				.mails(Sets.newHashSet("1"))
 				.groups(null)
-				.build();
-	}
-	
-	@Test(expected=NullPointerException.class)
-	public void testNullEmailAndAliases() {
-		ObmUser
-				.builder()
-				.domain(ObmDomain.builder().build())
-				.uid(1)
-				.login(validLogin)
-				.mails(Sets.newHashSet("1"))
-				.emailAndAliases(null)
 				.build();
 	}
 	
@@ -156,7 +128,10 @@ public class ObmUserTest {
 				.domain(ObmDomain.builder().build())
 				.uid(1)
 				.login(validLogin)
-				.mails(Sets.newHashSet("1"))
+				.emails(UserEmails.builder()
+					.addAddress("1")
+					.domain(ObmDomain.builder().build())
+					.build())
 				.build();
 		
 		assertThat(user.getEmail()).isEqualTo("1");
@@ -170,7 +145,11 @@ public class ObmUserTest {
 				.domain(ObmDomain.builder().build())
 				.uid(1)
 				.login(validLogin)
-				.mails(Lists.newArrayList("1", "2"))
+				.emails(UserEmails.builder()
+					.addAddress("1")
+					.addAddress("2")
+					.domain(ObmDomain.builder().build())
+					.build())
 				.build();
 		
 		assertThat(user.getEmail()).isEqualTo("1");
@@ -190,18 +169,6 @@ public class ObmUserTest {
 		assertThat(user.getEmailAlias()).isEmpty();
 	}
 	
-	@Test(expected=NullPointerException.class)
-	public void testNullMailBuilder() {
-		ObmUser
-				.builder()
-				.domain(ObmDomain.builder().build())
-				.uid(1)
-				.login(validLogin)
-				.mails(null)
-				.build();
-	}
-
-
 
 	@Test
 	public void testFrom() {
@@ -240,8 +207,12 @@ public class ObmUserTest {
 					.direction("LGS")
 					.title("Software Dev")
 					.build())
-				.emailAndAliases("jdoe\r\njohn.doe")
-				.mailQuota(500)
+				.emails(UserEmails.builder()
+					.addAddress("jdoe")
+					.addAddress("john.doe")
+					.quota(500)
+					.domain(ToolBox.getDefaultObmDomain())
+					.build())
 				.archived(true)
 				.domain(ToolBox.getDefaultObmDomain())
 				.hidden(true)
@@ -251,26 +222,16 @@ public class ObmUserTest {
 	}
 
 	@Test
-	public void testQuota0() {
-		ObmUser user = ObmUser
-				.builder()
-				.uid(1)
-				.login(validLogin)
-				.domain(ToolBox.getDefaultObmDomain())
-				.mailQuota(0)
-				.build();
-
-		assertThat(user.getMailQuota()).isNull();
-	}
-
-	@Test
 	public void testQuotaNonNullQuota() {
 		ObmUser user = ObmUser
 				.builder()
 				.uid(1)
 				.login(validLogin)
 				.domain(ToolBox.getDefaultObmDomain())
-				.mailQuota(123)
+				.emails(UserEmails.builder()
+					.quota(123)
+					.domain(ToolBox.getDefaultObmDomain())
+					.build())
 				.build();
 
 		assertThat(user.getMailQuota()).isEqualTo(123);
@@ -286,44 +247,6 @@ public class ObmUserTest {
 				.build();
 
 		assertThat(user.getMailQuota()).isNull();
-	}
-
-	@Test
-	public void testGetMailQuotaAsIntNoQuota() {
-		ObmUser user = ObmUser
-				.builder()
-				.uid(1)
-				.login(validLogin)
-				.domain(ToolBox.getDefaultObmDomain())
-				.build();
-
-		assertThat(user.getMailQuotaAsInt()).isEqualTo(0);
-	}
-
-	@Test
-	public void testGetMailQuotaAsIntNonNullQuota() {
-		ObmUser user = ObmUser
-				.builder()
-				.uid(1)
-				.login(validLogin)
-				.domain(ToolBox.getDefaultObmDomain())
-				.mailQuota(123)
-				.build();
-
-		assertThat(user.getMailQuotaAsInt()).isEqualTo(123);
-	}
-
-	@Test
-	public void testGetMailQuotaAsInt0() {
-		ObmUser user = ObmUser
-				.builder()
-				.uid(1)
-				.login(validLogin)
-				.domain(ToolBox.getDefaultObmDomain())
-				.mailQuota(0)
-				.build();
-
-		assertThat(user.getMailQuotaAsInt()).isEqualTo(0);
 	}
 
 	@Test

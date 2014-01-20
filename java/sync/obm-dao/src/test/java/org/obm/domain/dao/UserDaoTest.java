@@ -68,6 +68,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
@@ -312,7 +313,7 @@ public class UserDaoTest {
 		expect(rs.getString("userobm_login")).andReturn("login");
 		expect(rs.getString("userobm_ext_id")).andReturn("extid");
 		expect(rs.getString("userobm_perms")).andReturn(profileName);
-		expect(rs.getString("userobm_email")).andReturn("useremail" + UserDao.DB_INNER_FIELD_SEPARATOR + "useremail2");
+		expect(rs.getString("userobm_email")).andReturn("useremail\r\nuseremail2");
 		expect(rs.getString("defpref_userobmpref_value")).andReturn("yes");
 		expect(rs.getString("userpref_userobmpref_value")).andReturn(null);
 		expect(rs.wasNull()).andReturn(true);
@@ -370,7 +371,6 @@ public class UserDaoTest {
 			.login(UserLogin.valueOf("login"))
 			.admin(true)
 			.domain(domain)
-			.emailAndAliases(Joiner.on(ObmUser.EMAIL_FIELD_SEPARATOR).join("useremail", "useremail2"))
 			.identity(UserIdentity.builder()
 				.firstName("firstname2")
 				.lastName("lastname2")
@@ -379,17 +379,22 @@ public class UserDaoTest {
 			.extId(UserExtId.builder().extId("extid").build())
 			.publicFreeBusy(true)
 			.password("password")
-			.mailQuota(100)
+			.emails(UserEmails.builder()
+				.quota(100)
+				.server(ObmHost
+						.builder()
+						.id(1)
+						.name("host")
+						.ip("ip")
+						.fqdn("fqdn")
+						.domainId(domain.getId())
+						.build())
+				.addAddress("useremail")
+				.addAddress( "useremail2")
+				.domain(domain)
+				.build())
 			.profileName(ProfileName.builder().name("user").build())
 			.address(UserAddress.builder().countryCode("0").build())
-			.mailHost(ObmHost
-					.builder()
-					.id(1)
-					.name("host")
-					.ip("ip")
-					.fqdn("fqdn")
-					.domainId(domain.getId())
-					.build())
 			.hidden(true)
 			.uidNumber(1001)
 			.gidNumber(1000)

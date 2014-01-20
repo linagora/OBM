@@ -1679,7 +1679,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private Attendee findRequiredOwnerAttendee(Event event, ObmUser owner) throws ServerFault {
-		for (String emails : owner.buildAllEmails()) {
+		for (String emails : owner.expandAllEmailDomainTuples()) {
 			Attendee attendeeFromEmailAlias = event.findAttendeeFromEmail(emails);
 			if (attendeeFromEmailAlias != null) {
 				return attendeeFromEmailAlias;

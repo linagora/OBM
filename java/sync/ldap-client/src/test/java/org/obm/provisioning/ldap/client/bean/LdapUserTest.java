@@ -18,6 +18,7 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
 
@@ -31,74 +32,78 @@ public class LdapUserTest {
 			.lastName("Sorge")
 			.build();
 	
+	private final UserEmails.Builder richardSorgeEmailsBuilder = UserEmails.builder()
+			.addAddress("Richard.Sorge")
+			.server(ObmHost.builder()
+						.ip("255.255.255.0")
+						.build());
+	
 	@Inject LdapUser.Builder ldapUserBuilder;
 	@Inject LdapUser.Builder ldapUserBuilder2;
 
 	private ObmUser buildObmUser() {
+		ObmDomain domain = ObmDomain.builder()
+			.host(
+				ServiceProperty.builder().build(),
+				ObmHost.builder().build())
+			.name("gru.gov.ru")
+			.aliases(ImmutableSet.of("test1.org", "test2.org"))
+			.build();
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
 				.login(validLogin)
-				.emailAndAliases("Richard.Sorge")
-				.emailAlias(ImmutableSet.of("alias1", "alias2"))
+				.emails(UserEmails.builder()
+						.addAddress("Richard.Sorge")
+						.addAddress("alias1")
+						.addAddress("alias2")
+						.server(ObmHost.builder()
+								.ip("255.255.255.0")
+								.build())
+						.domain(domain)
+						.build())
 				.identity(richardSorgeIdentity)
 				.uidNumber(1895)
 				.gidNumber(1066)
-				.domain(
-						ObmDomain.builder().host(
-									ServiceProperty.builder().build(),
-									ObmHost.builder().build())
-								.name("gru.gov.ru")
-								.aliases(ImmutableSet.of("test1.org", "test2.org"))
-								.build())
+				.domain(domain)
 				.password("secret password")
-				.mailHost(
-						ObmHost.builder()
-						.ip("255.255.255.0")
-						.build())
 				.build();
 		return obmUser;
 	}
 
 	private ObmUser buildObmUserNoUidNumber() {
+		ObmDomain domain = ObmDomain.builder()
+			.host(
+				ServiceProperty.builder().build(),
+				ObmHost.builder().build())
+			.name("gru.gov.ru")
+			.build();
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
 				.login(validLogin)
-				.emailAndAliases("Richard.Sorge")
+				.emails(richardSorgeEmailsBuilder.domain(domain).build())
 				.identity(richardSorgeIdentity)
 				.gidNumber(1066)
-				.domain(
-						ObmDomain.builder().host(
-									ServiceProperty.builder().build(),
-									ObmHost.builder().build())
-								.name("gru.gov.ru")
-								.build())
+				.domain(domain)
 				.password("secret password")
-				.mailHost(
-						ObmHost.builder()
-						.ip("255.255.255.0")
-						.build())
 				.build();
 		return obmUser;
 	}
 
 	private ObmUser buildObmUserNoGidNumber() {
+		ObmDomain domain = ObmDomain.builder()
+			.host(
+				ServiceProperty.builder().build(),
+				ObmHost.builder().build())
+			.name("gru.gov.ru")
+			.build();
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
 				.login(validLogin)
-				.emailAndAliases("Richard.Sorge")
+				.emails(richardSorgeEmailsBuilder.domain(domain).build())
 				.identity(richardSorgeIdentity)
 				.uidNumber(1895)
-				.domain(
-						ObmDomain.builder().host(
-									ServiceProperty.builder().build(),
-									ObmHost.builder().build())
-								.name("gru.gov.ru")
-								.build())
+				.domain(domain)
 				.password("secret password")
-				.mailHost(
-						ObmHost.builder()
-						.ip("255.255.255.0")
-						.build())
 				.build();
 		return obmUser;
 	}
@@ -122,45 +127,45 @@ public class LdapUserTest {
 	}
 
 	private ObmUser buildObmUserNoDomainName() {
+		ObmDomain domain = ObmDomain.builder()
+			.host(
+				ServiceProperty.builder().build(),
+				ObmHost.builder().build())
+			.build();
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
 				.login(validLogin)
-				.emailAndAliases("Richard.Sorge")
+				.emails(richardSorgeEmailsBuilder.domain(domain).build())
 				.identity(richardSorgeIdentity)
 				.uidNumber(1895)
 				.gidNumber(1066)
-				.domain(
-						ObmDomain.builder().host(
-									ServiceProperty.builder().build(),
-									ObmHost.builder().build())
-								.build())
+				.domain(domain)
 				.password("secret password")
-				.mailHost(
-						ObmHost.builder()
-						.ip("255.255.255.0")
-						.build())
 				.build();
 		return obmUser;
 	}
 
 	private ObmUser buildObmUserNoMailHostIP() {
+		ObmDomain domain = ObmDomain.builder()
+			.host(
+				ServiceProperty.builder().build(),
+				ObmHost.builder().build())
+			.name("gru.gov.ru")
+			.build();
 		ObmUser obmUser = ObmUser.builder()
 				.uid(666)
 				.login(validLogin)
-				.emailAndAliases("Richard.Sorge")
+				.emails(UserEmails.builder()
+					.addAddress("Richard.Sorge")
+					.server(ObmHost.builder().build())
+					.domain(domain)
+					.build())
 				.identity(richardSorgeIdentity)
 				.uidNumber(1895)
 				.gidNumber(1066)
-				.domain(
-						ObmDomain.builder().host(
-									ServiceProperty.builder().build(),
-									ObmHost.builder().build())
-								.name("gru.gov.ru")
-								.build())
+				.domain(domain)
 				.password("secret password")
-				.mailHost(
-						ObmHost.builder()
-						.build())
+				
 				.build();
 		return obmUser;
 	}

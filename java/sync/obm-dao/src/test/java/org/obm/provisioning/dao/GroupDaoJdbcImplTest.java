@@ -73,6 +73,7 @@ import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
@@ -141,7 +142,10 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
 	                      .build())
                       .entityId(EntityId.valueOf(uid))
                       .extId(UserExtId.valueOf("user" + stringUid))
-                      .emailAndAliases("user" + stringUid + "@test.tlse.lng")
+                      .emails(UserEmails.builder()
+						.addAddress("user" + stringUid + "@test.tlse.lng")
+						.domain(domain1)
+						.build())
                       .publicFreeBusy(true)
                       .domain(domain1)
                       .build();

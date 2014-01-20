@@ -172,7 +172,7 @@ public class LdapUser {
 
 		private void addAllMailAliases(ObmUser obmUser) {
 			if (mail != null) {
-				mailAlias.addAll(Iterables.filter(obmUser.buildAllEmails(), new Predicate<String>() {
+				mailAlias.addAll(Iterables.filter(obmUser.expandAllEmailDomainTuples(), new Predicate<String>() {
 					@Override
 					public boolean apply(String input) {
 						return !input.equals(mail);

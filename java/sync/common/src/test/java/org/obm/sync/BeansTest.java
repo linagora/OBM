@@ -65,6 +65,8 @@ import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
+import com.google.common.collect.ImmutableList;
+
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
@@ -74,6 +76,7 @@ import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.trust.TrustToken;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
@@ -135,27 +138,54 @@ public class BeansTest {
 	}
 	
 	@Test
+	public void testUserEmails() {
+		EqualsVerifierUtils
+			.createEqualsVerifier(UserEmails.class)
+			.withPrefabValues(ImmutableList.class,
+				ImmutableList.of("addr1", "addr2"),
+				ImmutableList.of("addr3", "addr4"))
+			.verify();
+	}
+	
+	@Test
 	public void testObmUser() {
+		ObmDomain obmDotOrgDomain = ObmDomain.builder()
+			.id(3)
+			.name("obm.org")
+			.build();
+		ObmDomain ibmDotComDomain = ObmDomain.builder()
+			.id(5)
+			.name("ibm.com")
+			.build();
 		EqualsVerifierUtils
 			.createEqualsVerifier(ObmUser.class)
 			.withPrefabValues(ObmUser.class, 
 					ObmUser.builder()
 						.login(UserLogin.valueOf("creator"))
 						.uid(1)
-						.emailAndAliases("createdBy@obm.org")
-						.domain(ObmDomain.builder()
-							.id(3)
-							.name("obm.org")
+						.emails(UserEmails.builder()
+							.addAddress("createdBy@obm.org")
+							.domain(obmDotOrgDomain)
 							.build())
+						.domain(obmDotOrgDomain)
 						.build(), 
 					ObmUser.builder()
 						.login(UserLogin.valueOf("updater"))
 						.uid(1)
-						.emailAndAliases("updatedBy@obm.org")
-						.domain(ObmDomain.builder()
-							.id(3)
-							.name("obm.org")
+						.emails(UserEmails.builder()
+							.addAddress("updatedBy@ibm.com")
+							.domain(ibmDotComDomain)
 							.build())
+						.domain(ibmDotComDomain)
+						.build())
+			.withPrefabValues(UserEmails.class,
+					UserEmails.builder()
+						.addAddress("createdBy@obm.org")
+						.domain(obmDotOrgDomain)
+						.build(),
+					UserEmails.builder()
+						.addAddress("updatedBy@ibm.com")
+						.domain(ibmDotComDomain)
 						.build())
 			.verify();
 	}

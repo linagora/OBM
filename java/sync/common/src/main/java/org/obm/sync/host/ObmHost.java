@@ -92,6 +92,11 @@ public class ObmHost implements Serializable{
 			return this;
 		}
 		
+		public Builder localhost() {
+			this.ip = "127.0.0.1";
+			return this;
+		}
+		
 		public ObmHost build() {
 			return new ObmHost(id, domainId, name, fqdn, ip);
 		}

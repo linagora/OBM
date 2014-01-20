@@ -79,6 +79,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.resource.Resource;
 import fr.aliacom.obm.common.resource.ResourceDao;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
@@ -179,7 +180,10 @@ public class AttendeeServiceJdbcImplTest {
 				.entityId(EntityId.valueOf(2))
 				.login(UserLogin.valueOf("johndoe@test.tlse.lng"))
 				.domain(userDomain)
-				.emailAndAliases("johndoe@test.tlse.lng")
+				.emails(UserEmails.builder()
+					.addAddress("johndoe@test.tlse.lng")
+					.domain(userDomain)
+					.build())
 				.build();
 	}
 	

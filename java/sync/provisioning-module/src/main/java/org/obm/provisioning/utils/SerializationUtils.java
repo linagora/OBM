@@ -52,6 +52,7 @@ import org.obm.sync.serviceproperty.ServiceProperty;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
@@ -59,6 +60,7 @@ import com.google.common.collect.Lists;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
@@ -66,6 +68,8 @@ import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
 
 public class SerializationUtils {
+	
+	private static final String PATTERN_AT_STAR = "@*";
 	
 	public static final ServiceProperty IMAP_SERVICE_PROPERTY = ServiceProperty
 			.builder()
@@ -120,14 +124,14 @@ public class SerializationUtils {
 		return Collections2.transform(getCurrentTokenTextValues(value), new Function<String, String>() {
 			@Override
 			public String apply(String input) {
-				return input.replace(ObmUser.PATTERN_AT_STAR, "");
+				return input.replace(PATTERN_AT_STAR, "");
 			}
 		});
 	}
 	
 	public static void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields, 
 			ObmUser.Builder toBuild, UserIdentity.Builder userIdentityBuilder, UserAddress.Builder addressBuilder,
-			UserPhones.Builder phonesBuilder, UserWork.Builder userWorkBuilder) {
+			UserPhones.Builder phonesBuilder, UserWork.Builder userWorkBuilder, UserEmails.Builder emailsBuilder) {
 		JsonNode value = jsonNode.findValue(jsonFields.asSpecificationValue());
 
 		if (isNullOrNullNode(value)) {
@@ -177,12 +181,12 @@ public class SerializationUtils {
 				toBuild.login(UserLogin.valueOf(value.asText()));
 				break;
 			case MAILS:
-				toBuild.mails(getMailsTokenTextValues(value));
+				emailsBuilder.addresses(getMailsTokenTextValues(value));
 				break;
 			case EFFECTIVEMAILS:
 				break;
 			case MAIL_QUOTA:
-				toBuild.mailQuota(Integer.parseInt(value.asText()));
+				emailsBuilder.quota(Integer.parseInt(value.asText()));
 				break;
 			case MAIL_SERVER:
 				break;
@@ -252,4 +256,24 @@ public class SerializationUtils {
 	private static boolean isNullOrNullNode(JsonNode at) {
 		return at == null || at.isNull();
 	}
+
+
+	public static String[] serializeUserEmailAddresses(UserEmails emails) {
+		return FluentIterable
+				.from(emails.getAddresses())
+				.transform(new Function<String, String>() {
+					@Override
+					public String apply(String input) {
+						return appendSuffixToEmailIfRequired(input, PATTERN_AT_STAR);
+					}
+				}).toArray(String.class);
+	}
+
+	private static String appendSuffixToEmailIfRequired(String emailAddress, String pattern) {
+		if (!emailAddress.contains("@")) {
+			return emailAddress + pattern;
+		}
+		return emailAddress;
+	}
+	
 }

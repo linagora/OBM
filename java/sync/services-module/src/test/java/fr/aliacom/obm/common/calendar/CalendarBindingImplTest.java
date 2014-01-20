@@ -127,6 +127,7 @@ import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserService;
@@ -1265,7 +1266,10 @@ public class CalendarBindingImplTest {
 			.entityId(EntityId.valueOf(2))
 			.login(UserLogin.valueOf("user"))
 			.domain(defaultUser.getDomain())
-			.emailAndAliases(email)
+			.emails(UserEmails.builder()
+				.addAddress(email)
+				.domain(defaultUser.getDomain())
+				.build())
 			.build();
 
 		Event eventFromIcs = new Event();
@@ -2319,10 +2323,16 @@ public class CalendarBindingImplTest {
 	public void testGetSyncDoesNotMoveConfidentialEvents() throws FindException, ServerFault, NotAllowedException {
 		String calendar = "user@test.tlse.lng";
 		ObmUser user =
-				ObmUser.builder().uid(1).entityId(EntityId.valueOf(2)).login(UserLogin.valueOf("user")).domain(ToolBox.getDefaultObmDomain())
-				.emailAndAliases("user@test.tlse.lng")
-				.identity(UserIdentity.builder().firstName("Obm").lastName("User").build())
-				.build();
+				ObmUser.builder().uid(1)
+					.entityId(EntityId.valueOf(2))
+					.login(UserLogin.valueOf("user"))
+					.domain(ToolBox.getDefaultObmDomain())
+					.emails(UserEmails.builder()
+						.addAddress("user@test.tlse.lng")
+						.domain(ToolBox.getDefaultObmDomain())
+						.build())
+					.identity(UserIdentity.builder().firstName("Obm").lastName("User").build())
+					.build();
 
 		Date timeCreate = new DateTime(1974, Calendar.SEPTEMBER, 4, 14, 0).toDate();
 		Date lastSync = new DateTime(1973, Calendar.SEPTEMBER, 4, 14, 0).toDate();

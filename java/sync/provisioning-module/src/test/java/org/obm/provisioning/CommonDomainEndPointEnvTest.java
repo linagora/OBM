@@ -97,6 +97,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
@@ -546,10 +547,15 @@ public abstract class CommonDomainEndPointEnvTest {
 					.addFax("fax")
 					.addFax("fax2")
 					.build())
-				.mailQuota(1234)
-				.mailHost(ObmHost.builder().name("host").build())
 				.hidden(true)
-				.emailAndAliases("john@domain\r\njo\r\njohn@alias")
+				.emails(UserEmails.builder()
+						.quota(1234)
+						.server(ObmHost.builder().name("host").build())
+						.addAddress("john@domain")
+						.addAddress("jo")
+						.addAddress("john@alias")
+						.domain(domain)
+					.build())
 				.timeCreate(TIMECREATE)
 				.timeUpdate(TIMEUPDATE)
 				.groups(fakeGroups())

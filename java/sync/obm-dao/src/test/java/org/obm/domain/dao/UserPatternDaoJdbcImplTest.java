@@ -50,6 +50,7 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
 
@@ -81,7 +82,11 @@ public class UserPatternDaoJdbcImplTest implements H2TestClass {
 					.firstName("John")
 					.commonName("J. Doe")
 					.build())
-				.emailAndAliases("jdoe\r\njohn.doe")
+				.emails(UserEmails.builder()
+					.addAddress("jdoe")
+					.addAddress("john.doe")
+					.domain(ToolBox.getDefaultObmDomain())
+					.build())
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();
 		Set<String> patterns = ImmutableSet.of(
@@ -117,7 +122,11 @@ public class UserPatternDaoJdbcImplTest implements H2TestClass {
 					.firstName("John")
 					.commonName("J. Doe")
 					.build())
-				.emailAndAliases("jdoe\r\njohn.doe")
+				.emails(UserEmails.builder()
+					.addAddress("jdoe")
+					.addAddress("john.doe")
+					.domain(ToolBox.getDefaultObmDomain())
+					.build())
 				.domain(ToolBox.getDefaultObmDomain())
 				.build();
 

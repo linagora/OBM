@@ -39,18 +39,18 @@ import static org.obm.provisioning.bean.UserJsonFields.COMPANY;
 import static org.obm.provisioning.bean.UserJsonFields.COUNTRY;
 import static org.obm.provisioning.bean.UserJsonFields.DESCRIPTION;
 import static org.obm.provisioning.bean.UserJsonFields.DIRECTION;
+import static org.obm.provisioning.bean.UserJsonFields.EFFECTIVEMAILS;
 import static org.obm.provisioning.bean.UserJsonFields.FAXES;
 import static org.obm.provisioning.bean.UserJsonFields.FIRSTNAME;
 import static org.obm.provisioning.bean.UserJsonFields.GROUPS;
+import static org.obm.provisioning.bean.UserJsonFields.HIDDEN;
 import static org.obm.provisioning.bean.UserJsonFields.ID;
 import static org.obm.provisioning.bean.UserJsonFields.KIND;
 import static org.obm.provisioning.bean.UserJsonFields.LASTNAME;
 import static org.obm.provisioning.bean.UserJsonFields.LOGIN;
 import static org.obm.provisioning.bean.UserJsonFields.MAILS;
-import static org.obm.provisioning.bean.UserJsonFields.EFFECTIVEMAILS;
 import static org.obm.provisioning.bean.UserJsonFields.MAIL_QUOTA;
 import static org.obm.provisioning.bean.UserJsonFields.MAIL_SERVER;
-import static org.obm.provisioning.bean.UserJsonFields.HIDDEN;
 import static org.obm.provisioning.bean.UserJsonFields.MOBILE;
 import static org.obm.provisioning.bean.UserJsonFields.PASSWORD;
 import static org.obm.provisioning.bean.UserJsonFields.PHONES;
@@ -72,8 +72,10 @@ import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.bean.GroupIdentifier;
+import org.obm.provisioning.utils.SerializationUtils;
 import org.obm.sync.host.ObmHost;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -113,16 +115,17 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeStringField(MOBILE.asSpecificationValue(), value.getMobile());
 		writeObjectsField(jgen, FAXES.asSpecificationValue(), value.getFax(), value.getFax2());
 		jgen.writeBooleanField(ARCHIVED.asSpecificationValue(), value.isArchived());
-		jgen.writeStringField(MAIL_QUOTA.asSpecificationValue(), String.valueOf(value.getMailQuotaAsInt()));
+		jgen.writeStringField(MAIL_QUOTA.asSpecificationValue(), String.valueOf(Objects.firstNonNull(value.getMailQuota(), 0)));
 		jgen.writeStringField(MAIL_SERVER.asSpecificationValue(), getMailHostName(value));
-		jgen.writeObjectField(MAILS.asSpecificationValue(), Iterables.toArray(value.buildMailsDefinition(), String.class));
-		jgen.writeObjectField(EFFECTIVEMAILS.asSpecificationValue(), Iterables.toArray(value.buildAllEmails(), String.class));
+		jgen.writeObjectField(MAILS.asSpecificationValue(), SerializationUtils.serializeUserEmailAddresses(value.getUserEmails()));
+		jgen.writeObjectField(EFFECTIVEMAILS.asSpecificationValue(), Iterables.toArray(value.expandAllEmailDomainTuples(), String.class));
 		jgen.writeBooleanField(HIDDEN.asSpecificationValue(), value.isHidden());
 		jgen.writeObjectField(TIMECREATE.asSpecificationValue(), value.getTimeCreate());
 		jgen.writeObjectField(TIMEUPDATE.asSpecificationValue(), value.getTimeUpdate());
 		jgen.writeObjectField(GROUPS.asSpecificationValue(), extractGroupIdentifiers(value.getGroups(), value.getDomain()));
 		jgen.writeEndObject();
 	}
+
 	
 	private String getMailHostName(ObmUser user) {
 		ObmHost host = user.getMailHost();

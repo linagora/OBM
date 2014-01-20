@@ -38,6 +38,9 @@ import org.obm.sync.host.ObmHost;
 
 import com.google.common.collect.ImmutableSet;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.UserEmails;
+
 
 public class SerializationUtilsTest {
 
@@ -70,6 +73,53 @@ public class SerializationUtilsTest {
 	@Test
 	public void testFindMailHostForUserWhenNoHostNameDefined() {
 		assertThat(SerializationUtils.findMailHostForUser(null, ImmutableSet.of(HOST_2))).isEqualTo(HOST_2);
+	}
+
+	@Test
+	public void testBuildMailsDefinition() {
+		UserEmails emails = UserEmails.builder()
+			.addAddress("user1")
+			.addAddress("user1@alias1")
+			.addAddress("user1@alias2")
+			.domain(ObmDomain.builder().name("obm.org").build())
+			.build();
+
+		assertThat(SerializationUtils.serializeUserEmailAddresses(emails))
+			.containsExactly("user1@*", "user1@alias1", "user1@alias2");
+	}
+	
+	@Test
+	public void testBuildMailsDefinitionWithNoAppendingNeeded() {
+		UserEmails emails = UserEmails.builder()
+				.addAddress("user1@domain")
+				.addAddress("user1@alias1")
+				.domain(ObmDomain.builder().name("obm.org").build())
+				.build();
+
+		assertThat(SerializationUtils.serializeUserEmailAddresses(emails))
+			.containsExactly("user1@domain", "user1@alias1");
+	}
+	
+	@Test
+	public void testBuildMailsDefinitionWithTwoAppendingNeeded() {
+		UserEmails emails = UserEmails.builder()
+				.addAddress("user1")
+				.addAddress("user1@alias")
+				.addAddress("user2")
+				.domain(ObmDomain.builder().name("obm.org").build())
+				.build();
+
+		assertThat(SerializationUtils.serializeUserEmailAddresses(emails))
+			.containsExactly("user1@*", "user1@alias", "user2@*");
+	}
+	
+	@Test
+	public void testBuildMailsDefinitionWithNoAliases() {
+		UserEmails emails = UserEmails.builder()
+				.domain(ObmDomain.builder().name("obm.org").build())
+				.build();
+
+		assertThat(SerializationUtils.serializeUserEmailAddresses(emails)).isEmpty();
 	}
 
 }

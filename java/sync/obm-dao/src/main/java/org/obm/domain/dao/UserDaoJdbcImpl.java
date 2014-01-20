@@ -77,6 +77,7 @@ import com.google.inject.Singleton;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
@@ -248,9 +249,8 @@ public class UserDaoJdbcImpl implements UserDao {
 	}
 
 	private boolean compareEmailLogin(EmailLogin login, String emailsToCompare) {
-		if (login != null && emailsToCompare != null) {
-			Iterable<String> emails = Splitter.on(DB_INNER_FIELD_SEPARATOR).split(emailsToCompare);			
-			for (String email: emails) {
+		if (login != null) {
+			for (String email: deserializeEmails(emailsToCompare)) {
 				if (login.equals(getEmailLogin(email))) {
 					return true;
 				}
@@ -335,16 +335,18 @@ public class UserDaoJdbcImpl implements UserDao {
 
 		return createUserFromResultSet(domain, rs, creator, updator, groups);
 	}
-
+	
 	private ObmUser createUserFromResultSet(ObmDomain domain, ResultSet rs, ObmUser creator, ObmUser updator, Set<Group> groups) throws SQLException {
 
 		try {
 			String extId = rs.getString("userobm_ext_id");
+			int quota = rs.getInt("userobm_mail_quota");
+			
+			
 			return ObmUser.builder()
 					.uid(rs.getInt("userobm_id"))
 					.login(UserLogin.valueOf(rs.getString("userobm_login")))
 					.admin(profileDao.isAdminProfile(rs.getString("userobm_perms")))
-					.emailAndAliases(nullToEmpty(rs.getString("userobm_email")))
 					.domain(domain)
 					.identity(UserIdentity.builder()
 						.kind(rs.getString("userobm_kind"))
@@ -380,8 +382,12 @@ public class UserDaoJdbcImpl implements UserDao {
 								.addFax(emptyToNull(rs.getString("userobm_fax")))
 								.addFax(emptyToNull(rs.getString("userobm_fax2")))
 								.build())
-					.mailQuota(rs.getInt("userobm_mail_quota"))
-					.mailHost(hostFromCursor(rs))
+					.emails(UserEmails.builder()
+						.quota(quotaToNullable(quota))
+						.server(hostFromCursor(rs))
+						.addresses(deserializeEmails(rs.getString("userobm_email")))
+						.domain(domain)
+						.build())
 					.archived(rs.getBoolean("userobm_archive"))
 					.hidden(rs.getInt("userobm_hidden") == HIDDEN_TRUE)
 					.timeCreate(JDBCUtils.getDate(rs, "userobm_timecreate"))
@@ -398,6 +404,20 @@ public class UserDaoJdbcImpl implements UserDao {
 
 	}
 
+	private Iterable<String> deserializeEmails(String emails) {
+		return Splitter
+				.on(DB_INNER_FIELD_SEPARATOR)
+				.omitEmptyStrings()
+				.split(nullToEmpty(emails));
+	}
+	
+	private String serializeEmails(ObmUser user) {
+		return Joiner
+				.on(DB_INNER_FIELD_SEPARATOR)
+				.skipNulls()
+				.join(user.getEmails());
+	}
+	
 	private ObmHost hostFromCursor(ResultSet rs) throws SQLException {
 		int id = rs.getInt("userobm_mail_server_id");
 
@@ -694,7 +714,7 @@ public class UserDaoJdbcImpl implements UserDao {
 								.concat(Collections.singleton(user.getEmail()),
 										user.getEmailAlias())));
 				ps.setInt(idx++, user.getMailHost().getId());
-				ps.setInt(idx++, user.getMailQuotaAsInt());
+				ps.setInt(idx++, getQuotaAsInt0(user));
 				ps.setInt(idx++, 1);
 			} else {
 				ps.setString(idx++, "");
@@ -841,14 +861,9 @@ public class UserDaoJdbcImpl implements UserDao {
 			ps.setString(idx++, user.getDescription());
 
 			if (user.getEmail() != null && user.getMailHost() != null) {
-				ps.setString(idx++, Joiner
-						.on(DB_INNER_FIELD_SEPARATOR)
-						.skipNulls()
-						.join(Iterables
-								.concat(Collections.singleton(user.getEmail()),
-										user.getEmailAlias())));
+				ps.setString(idx++, serializeEmails(user));
 				ps.setInt(idx++, user.getMailHost().getId());
-				ps.setInt(idx++, user.getMailQuotaAsInt());
+				ps.setInt(idx++, getQuotaAsInt0(user));
 				ps.setInt(idx++, 1);
 			} else {
 				ps.setString(idx++, "");
@@ -873,6 +888,15 @@ public class UserDaoJdbcImpl implements UserDao {
 		}
 	}
 
+	@VisibleForTesting int getQuotaAsInt0(ObmUser user) {
+		return Objects.firstNonNull(user.getMailQuota(), 0);
+	}
+
+	@VisibleForTesting Integer quotaToNullable(int quota) {
+		return quota != 0 ? quota : null;
+	}
+
+	
 	@Override
 	public void delete(ObmUser user) throws SQLException, UserNotFoundException {
 		Connection connection = null;
@@ -957,8 +981,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			ImmutableSet.Builder<String> builder = ImmutableSet.builder();
 			
 			while (rs.next()) {
-				builder.addAll(
-						ObmUser.retrieveEmailsFromObmDao(Strings.nullToEmpty(rs.getString("mail"))));
+				builder.addAll(deserializeEmails(rs.getString("mail")));
 			}
 			
 			return builder.build();

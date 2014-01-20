@@ -50,6 +50,7 @@ import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
@@ -169,7 +170,10 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 						.commonName("")
 					.build())
 				.domain(domain)
-				.emailAndAliases("user" + id)
+				.emails(UserEmails.builder()
+					.addAddress("user" + id)
+					.domain(domain)
+					.build())
 				.publicFreeBusy(true)
 				.build();
 	}

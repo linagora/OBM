@@ -40,34 +40,16 @@ import org.obm.provisioning.ProfileName;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.host.ObmHost;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class ObmUser {
 	
-	public static final String EMAIL_FIELD_SEPARATOR = "\r\n";
-	public static final String PATTERN_AT_STAR = "@*";
-
 	public static Builder builder() {
 		return new Builder();
-	}
-
-	public static Iterable<String> retrieveEmailsFromObmDao(String emails) {
-		Iterable<String> emailAndAlias = Splitter
-				.on(EMAIL_FIELD_SEPARATOR)
-				.omitEmptyStrings()
-				.split(emails);
-		return emailAndAlias;
 	}
 
 	public static class Builder {
@@ -81,8 +63,7 @@ public class ObmUser {
 		private UserAddress address;
 		private UserPhones phones;
 		private UserWork work;
-		private String email;
-		private final ImmutableSet.Builder<String> emailAlias;
+		private UserEmails emails;
 		private Boolean hidden;
 		
 		private String description;
@@ -97,8 +78,6 @@ public class ObmUser {
 
 		private String password;
 		private ProfileName profileName;
-		private Integer mailQuota;
-		private ObmHost mailHost;
 		private Boolean archived;
 
 		private Integer uidNumber;
@@ -107,15 +86,13 @@ public class ObmUser {
 		private final ImmutableSet.Builder<Group> groups;
 
 		private Builder() {
-			emailAlias = ImmutableSet.builder();
 			groups = ImmutableSet.builder();
 		}
 
 		public Builder from(ObmUser user) {
 			return uid(user.uid)
 					.login(user.login)
-					.email(user.email)
-					.emailAlias(user.emailAlias)
+					.emails(user.emails)
 					.domain(user.domain)
 					.identity(user.identity)
 					.address(user.address)
@@ -127,8 +104,6 @@ public class ObmUser {
 					.description(user.description)
 					.work(user.work)
 					.phones(user.phones)
-					.mailQuota(user.mailQuota)
-					.mailHost(user.mailHost)
 					.archived(user.archived)
 					.hidden(user.hidden)
 					.timeCreate(user.timeCreate)
@@ -204,12 +179,8 @@ public class ObmUser {
 			this.phones = phones;
 			return this;
 		}
-		public Builder mailQuota(Integer mailQuota) {
-			this.mailQuota = mailQuota;
-			return this;
-		}
-		public Builder mailHost(ObmHost mailHost) {
-			this.mailHost = mailHost;
+		public Builder emails(UserEmails emails) {
+			this.emails = emails;
 			return this;
 		}
 
@@ -222,40 +193,7 @@ public class ObmUser {
 			this.password = password;
 			return this;
 		}
-		public Builder emailAndAliases(String emailAndAliases) {
-			Preconditions.checkNotNull(emailAndAliases);
-			email = null;
 
-			Iterable<String> emailAndAlias = retrieveEmailsFromObmDao(emailAndAliases);
-
-			for (String emailOrAlias: emailAndAlias) {
-				if (email == null) {
-					email = emailOrAlias;	
-				} else {
-					emailAlias.add(emailOrAlias);
-				}			
-			}
-			return this;
-		}
-
-		public Builder email(String email) {
-			this.email = email;
-			return this;
-		}
-
-		public Builder emailAlias(Iterable<String> emailAlias) {
-			Preconditions.checkNotNull(emailAlias);
-			this.emailAlias.addAll(emailAlias);
-			return this;
-		}
-
-		public Builder mails(Iterable<String> mails) {
-			Preconditions.checkNotNull(mails);
-			email = Iterables.getFirst(mails, null);
-			emailAlias.addAll(Iterables.skip(mails, 1));
-			return this;
-		}
-		
 		public Builder hidden(boolean hidden) {
 			this.hidden = hidden;
 			return this;
@@ -286,14 +224,8 @@ public class ObmUser {
 			Preconditions.checkState(uid != null || extId != null);
 			Preconditions.checkState(login != null);
 			Preconditions.checkState(domain != null);
+
 			admin = Objects.firstNonNull(admin, false);
-
-			// The DB model uses 0 in the mail quota column to mean "no quota"
-			// ObmUser uses null internally to mean "no quota"
-			if (mailQuota != null && mailQuota == 0) {
-				mailQuota = null;
-			}
-
 			archived = Objects.firstNonNull(archived, false);			
 			hidden = Objects.firstNonNull(hidden, false);
 
@@ -301,14 +233,14 @@ public class ObmUser {
 			UserAddress address = Objects.firstNonNull(this.address, UserAddress.empty());
 			UserPhones phones = Objects.firstNonNull(this.phones, UserPhones.empty());
 			UserWork work = Objects.firstNonNull(this.work, UserWork.empty());
-
+			UserEmails emails = Objects.firstNonNull(this.emails, UserEmails.builder().domain(domain).build());
+			
 			return new ObmUser(
 					uid, entityId, login, extId, admin, identity,
-					email, emailAlias.build(), hidden,
-					address, phones, work,  
+					hidden, address, phones, work, emails,
 					description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName,
-					mailQuota, mailHost, archived, password, uidNumber, gidNumber, groups.build());
+					archived, password, uidNumber, gidNumber, groups.build());
 		}
 		
 	}
@@ -322,8 +254,7 @@ public class ObmUser {
 	private final UserAddress address;
 	private final UserPhones phones;
 	private final UserWork work;
-	private final String email;
-	private final Set<String> emailAlias;
+	private final UserEmails emails;
 	private final boolean hidden;
 	
 	private final String description;
@@ -338,8 +269,6 @@ public class ObmUser {
 
 	private final String password;
 	private final ProfileName profileName;
-	private final Integer mailQuota;
-	private final ObmHost mailHost;
 	private final boolean archived;
 
 	private final Integer uidNumber;
@@ -348,21 +277,18 @@ public class ObmUser {
 	private final Set<Group> groups;
 
 	private ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, UserIdentity identity,
-			String email,
-			Set<String> emailAlias, boolean hidden,
-			UserAddress address, UserPhones phones, UserWork work,
+			boolean hidden, UserAddress address, UserPhones phones, UserWork work, UserEmails emails,
 			String description, Date timeCreate, Date timeUpdate,
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName,
-			Integer mailQuota, ObmHost mailHost, boolean archived, String password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
+			boolean archived, String password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
 		this.extId = extId;
 		this.admin = admin;
 		this.identity = identity;
-		this.email = email;
-		this.emailAlias = emailAlias;
+		this.emails = emails;
 		this.hidden = hidden;
 		this.address = address;
 		this.phones = phones;
@@ -375,8 +301,6 @@ public class ObmUser {
 		this.domain = domain;
 		this.publicFreeBusy = publicFreeBusy;
 		this.profileName = profileName;
-		this.mailQuota = mailQuota;
-		this.mailHost = mailHost;
 		this.archived = archived;
 		this.password = password;
 		this.uidNumber = uidNumber;
@@ -420,8 +344,8 @@ public class ObmUser {
 		return identity.getFirstName();
 	}
 
-	public Set<String> getEmailAlias() {
-		return emailAlias;
+	public List<String> getEmailAlias() {
+		return emails.getAliases();
 	}
 	
 	public boolean isHidden() {
@@ -506,71 +430,33 @@ public class ObmUser {
 	}
 	
 	public String getEmail() {
-		return email;
+		return emails.getPrimaryAddress();
 	}
 
 	public String getEmailAtDomain() {
-		return appendDomainToEmailIfRequired(email, domain.getName());
+		return emails.getFullyQualifiedPrimaryAddress();
+	}
+
+	public Iterable<String> expandAllEmailDomainTuples() {
+		return emails.expandAllEmailDomainTuples();
 	}
 	
 	public String getLoginAtDomain() {
 		return login + "@" + domain.getName();
 	}
-	
-	private String appendDomainToEmailIfRequired(String emailAddress, String domainName) {
-		return appendPatternToEmailIfRequired(emailAddress, "@" + domainName);
-	}
-
-	private String appendAtStarToEmailIfRequired(String emailAddress) {
-		return appendPatternToEmailIfRequired(emailAddress, PATTERN_AT_STAR);
-	}
-
-	private String appendPatternToEmailIfRequired(String emailAddress, String pattern) {
-		if(emailAddress != null && !emailAddress.contains("@")) {
-			return emailAddress + pattern;
-		}
-		return emailAddress;
-	}
 
 	public String getDisplayName(){
 		return identity.getDisplayName();
 	}
-	
-	public void addAlias(String alias) {
-		emailAlias.add(alias);
-	}
 
-	private Set<String> emailAndAliases() {
-		if (isEmailAvailable()) {
-			return Sets.union(ImmutableSet.of(email), emailAlias);
-		}
-		return ImmutableSet.of();
+	public UserEmails getUserEmails() {
+		return emails;
 	}
 	
-	public Iterable<String> buildAllEmails() {
-		return FluentIterable
-				.from(Sets.cartesianProduct(
-						ImmutableList.of(emailAndAliases(), domain.getNames())))
-				.transform(new Function<List<String>, String>() {
-					@Override
-					public String apply(List<String> input) {
-						return appendDomainToEmailIfRequired(input.get(0), input.get(1));
-					}
-				})
-				.toSet();
+	public List<String> getEmails() {
+		return emails.getAddresses();
 	}
-
-	public Iterable<String> buildMailsDefinition() {
-		return FluentIterable
-				.from(emailAndAliases())
-				.transform(new Function<String, String>() {
-					@Override
-					public String apply(String input) {
-						return appendAtStarToEmailIfRequired(input);
-					}
-				});
-	}
-
+	
 	public Set<String> getAddresses() {
 		return ImmutableSet.copyOf(address.getAddressParts());
 	}
@@ -612,15 +498,11 @@ public class ObmUser {
 	}
 
 	public Integer getMailQuota() {
-		return mailQuota;
-	}
-
-	public int getMailQuotaAsInt() {
-		return mailQuota != null ? mailQuota : 0;
+		return emails.getQuota();
 	}
 
 	public ObmHost getMailHost() {
-		return mailHost;
+		return emails.getServer();
 	}
 
 	public boolean isArchived() {
@@ -644,15 +526,15 @@ public class ObmUser {
 	}
 
 	public boolean isEmailAvailable() {
-		return !Strings.isNullOrEmpty(email) || !Iterables.isEmpty(emailAlias);
+		return emails.isEmailAvailable();
 	}
 
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(uid, entityId, login, extId, admin, identity, email,
-				emailAlias, hidden, address, phones, work,
+		return Objects.hashCode(uid, entityId, login, extId, admin, identity, emails,
+				hidden, address, phones, work,
 				description, createdBy, updatedBy, domain, publicFreeBusy, profileName,
-				mailQuota, archived, mailHost, password, uidNumber, gidNumber, groups);
+				archived, password, uidNumber, gidNumber, groups);
 	}
 	
 	@Override
@@ -665,8 +547,7 @@ public class ObmUser {
 				&& Objects.equal(this.extId, that.extId)
 				&& Objects.equal(this.admin, that.admin)
 				&& Objects.equal(this.identity, that.identity)
-				&& Objects.equal(this.email, that.email)
-				&& Objects.equal(this.emailAlias, that.emailAlias)
+				&& Objects.equal(this.emails, that.emails)
 				&& Objects.equal(this.hidden, that.hidden)
 				&& Objects.equal(this.address, that.address)
 				&& Objects.equal(this.phones, that.phones)
@@ -677,8 +558,6 @@ public class ObmUser {
 				&& Objects.equal(this.domain, that.domain)
 				&& Objects.equal(this.publicFreeBusy, that.publicFreeBusy)
 				&& Objects.equal(this.profileName, that.profileName)
-				&& Objects.equal(this.mailQuota, that.mailQuota)
-				&& Objects.equal(this.mailHost, that.mailHost)
 				&& Objects.equal(this.archived, that.archived)
 				&& Objects.equal(this.password, that.password)
 				&& Objects.equal(this.uidNumber, that.uidNumber)
@@ -697,8 +576,7 @@ public class ObmUser {
 			.add("extId", extId)
 			.add("admin", admin)
 			.add("identity", identity)
-			.add("email", email)
-			.add("emailAlias", emailAlias)
+			.add("emails", emails)
 			.add("hidden", hidden)
 			.add("address", address)
 			.add("phones", phones)
@@ -711,8 +589,6 @@ public class ObmUser {
 			.add("domain", domain)
 			.add("publicFreeBusy", publicFreeBusy)
 			.add("profileName", profileName)
-			.add("mailQuota", mailQuota)
-			.add("mailHost", mailHost)
 			.add("archived", archived)
 			.add("uidNumber", uidNumber)
 			.add("gidNumber", gidNumber)
