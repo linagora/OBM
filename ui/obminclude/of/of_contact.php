@@ -514,12 +514,37 @@ class OBM_Contact implements OBM_ISearchable {
     $ret = OBM_Contact::get($contact->id);
 
     // Indexing Contact
-    self::solrStore($ret);
+
+    $ret->getCompanyAkaAndSolrStore();
 
     return $ret;
   }
 
-  public function solrStore($contact) {
+  public function getCompanyAkaAndSolrStore() {
+    $company_aka = $this->_getCompanyAka();
+    self::solrStore($this, $company_aka);
+  }
+
+  private function _getCompanyAka() {
+      $company_id = $this->company_id;
+      if (is_null($company_id)) {
+          return;
+      }
+      $obm_q = new DB_OBM;
+      $query = "SELECT company_aka FROM company WHERE company_id=".$obm_q->escape($company_id);
+
+      $record = $obm_q->query($query);
+      $aka = null;
+      if ($obm_q->next_record()) {
+          $aka = $obm_q->f('company_aka');
+      }
+      else {
+          error_log("No company with id $company_id");
+      }
+      return $aka;
+  }
+
+  public function solrStore($contact, $company_aka) {
 
     $doc = new Apache_Solr_Document();
 
@@ -603,6 +628,7 @@ class OBM_Contact implements OBM_ISearchable {
     else {
       $doc->setField('hasACalendar', "false");
     }
+    $doc->setField('companyAka', $company_aka);
 
     OBM_IndexingService::store('contact', array($doc));
   }

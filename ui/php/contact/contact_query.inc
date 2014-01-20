@@ -700,7 +700,7 @@ function run_query_contact_update($contact) {
   OBM_AddressBook::timestamp($contact['addressbook']);
 
   // Indexing Contact
-  OBM_Contact::solrStore(OBM_Contact::get($id));
+  OBM_Contact::get($id)->getCompanyAkaAndSolrStore();
 
   return $retour;
 }

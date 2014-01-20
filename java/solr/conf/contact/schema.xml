@@ -32,6 +32,7 @@
 
     <field name="company" type="text" indexed="true" stored="false" multiValued="true" /> 
     <field name="companyId" type="integer" indexed="true" stored="false" multiValued="false" /> 
+    <field name="companyAka" type="text" indexed="true" stored="false" multiValued="false" />
     <field name="commonname" type="text" indexed="true" stored="false"  multiValued="false" /> 
     <field name="lastname" type="text" indexed="true" stored="false"  multiValued="false" /> 
     <field name="firstname" type="text" indexed="true" stored="false" multiValued="false" /> 
@@ -90,6 +91,7 @@
   <copyField source="aka" dest="dsf"/>
   <copyField source="email" dest="dsf"/>
   <copyField source="company" dest="dsf"/>
+  <copyField source="companyAka" dest="dsf"/>
 
   <copyField source="street" dest="address"/>
   <copyField source="town" dest="address"/>
