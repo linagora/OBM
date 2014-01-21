@@ -782,6 +782,8 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Cloneable, 
 			.add("super", super.toString())
 			.add("title", title)
 			.add("uid", uid)
+			.add("extid", extId)
+			.add("internal", internalEvent)
 			.add("date", startDate)
 			.toString();
 	}
