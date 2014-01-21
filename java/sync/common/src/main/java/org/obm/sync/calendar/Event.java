@@ -780,6 +780,8 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Serializabl
 			.add("super", super.toString())
 			.add("title", title)
 			.add("uid", uid)
+			.add("extid", extId)
+			.add("internal", internalEvent)
 			.add("date", startDate)
 			.toString();
 	}

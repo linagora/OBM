@@ -410,13 +410,20 @@ public class CalendarBindingImpl implements ICalendar {
 		throw new NotAllowedException("User " + token.getUserLogin() + " has no " + right + " rights on calendar " + calendar + ".");
 	}
 
+	private void throwNotAllowedException(AccessToken token, String calendar, Right right, Event event) throws NotAllowedException {
+		String message = String.format("User with token %s has no %s right on calendar %s for event %s with attendees %s",
+				token, right, calendar, event, event.getAttendees());
+				
+		throw new NotAllowedException(message);
+	}
+
 	@VisibleForTesting void assertEventCanBeModified(AccessToken token, ObmUser calendarUser, Event event) throws NotAllowedException {
 		String calendar = calendarUser.getEmail();
 		
 		assertUserCanWriteOnCalendar(token, calendar);
 		
 		if (!helperService.eventBelongsToCalendar(event, calendar) && !eventBelongsToUser(event, token)) {
-			throwNotAllowedException(token, calendar, Right.WRITE);
+			throwNotAllowedException(token, calendar, Right.WRITE, event);
 		}
 	}
 	

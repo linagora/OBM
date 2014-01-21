@@ -36,6 +36,8 @@ import java.util.Map;
 
 import org.obm.sync.ServerCapability;
 
+import com.google.common.base.Objects;
+
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.UserSettings;
 
@@ -189,5 +191,13 @@ public class AccessToken {
 
 	public void setServerCapabilities(Map<ServerCapability, String> serverCapabilities) {
 		this.serverCapabilities = serverCapabilities;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("login", userLogin)
+				.add("email", userEmail)
+				.toString();
 	}
 }
