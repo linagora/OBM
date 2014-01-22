@@ -103,7 +103,8 @@ def index_contact(domain, domain_name, solr):
 		contact_comment2,
 		contact_comment3,
 		contact_origin,
-		contact_company
+		contact_company,
+		comp.company_aka
 		FROM Contact 
 		LEFT JOIN AddressBook ON contact_addressbook_id=id
 		LEFT JOIN Company ON contact_company_id=company_id
@@ -111,6 +112,7 @@ def index_contact(domain, domain_name, solr):
 		LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
 		LEFT JOIN Event e1 ON contact_birthday_id=e1.event_id
 		LEFT JOIN Event e2 ON contact_anniversary_id=e2.event_id
+		LEFT JOIN Company comp ON contact_company_id=comp.company_id
 		WHERE contact_domain_id='"""+str(domain)+"""'""")
 	rows = cur.fetchall()
 	print "INFO: Add "+str(len(rows))+" contacts"
@@ -207,6 +209,7 @@ def index_contact(domain, domain_name, solr):
 		contact.appendChild(solr_set_field(doc, 'comment2',      rows[i][35]))
 		contact.appendChild(solr_set_field(doc, 'comment3',      rows[i][36]))
 		contact.appendChild(solr_set_field(doc, 'from',          rows[i][37]))
+		contact.appendChild(solr_set_field(doc, 'companyAka',    rows[i][39]))
 		add.appendChild(contact)
 		doc.appendChild(add)
 		solr_add_document(doc, solr, 'contact')
