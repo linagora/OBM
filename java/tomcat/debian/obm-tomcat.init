@@ -16,6 +16,9 @@ export JAVA_HOME=/usr/lib/jvm/java-6-sun
 test -d /usr/lib/jvm/java-1.6.0-openjdk-amd64 && {
     JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk-amd64
 }
+test -d /usr/lib/jvm/java-1.6.0-openjdk-i386 && {
+    JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk-i386
+}
 test -d /usr/lib/jvm/java-1.6.0-openjdk && {
     JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk
 }
