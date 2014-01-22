@@ -34,7 +34,17 @@ applicable to the OBM software.
 include_once('obminclude/lib/Solr/Service.php');
 include_once('obminclude/of/of_indexingService.inc');
 
+require_once 'obminclude/Patchwork/PHP/Shim/Normalizer.php';
+require_once 'obminclude/Normalizer.php';
+require_once 'obminclude/Patchwork/Utf8.php';
+
+use \Patchwork;
+
 class  OBM_Search {
+
+  private static function normalize($str) {
+      return \Patchwork\Utf8::toAscii($str);//iconv("UTF-8", "ASCII//TRANSLIT", $str);
+  }
 
   public static function search($core, $pattern, $offset, $limit, $options) {
     global $obm, $cdg_solr, $display;
@@ -52,8 +62,9 @@ class  OBM_Search {
           // replace compound word in pattern
           $pattern = preg_replace("/(?<=[a-zA-Z])-(?=[a-zA-Z])/"," + ", $pattern);
           $pattern = preg_replace("/(\w*)\*/e", "strtolower('$1').'*'", $pattern);
-          $response = $solr->search($pattern, $offset, $limit, $options);
-          display_debug_solr($pattern, $cdg_solr, "OBM_Search::search($core)");
+          $normalized_pattern = self::normalize($pattern);
+          $response = $solr->search($normalized_pattern, $offset, $limit, $options);
+          display_debug_solr($normalized_pattern, $cdg_solr, "OBM_Search::search($core)");
           if($response->response->numFound > 0) {
             foreach ($response->response->docs as $doc) { 
               array_push($result, $doc->id);
