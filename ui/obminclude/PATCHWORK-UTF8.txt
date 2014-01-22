@@ -1,0 +1,12 @@
+=======================
+Patchwork\Utf8 for PHP
+=======================
+
+The obminclude/Normalizer.php file and obminclude/Patchwork directory and its
+contents are part of Patchwork\Utf8, an "Extensive, portable and performant
+handling of UTF-8 and grapheme clusters for PHP" according to the home page.
+
+It can be found here: https://github.com/nicolas-grekas/Patchwork-UTF8 
+
+Patchwork\Utf8 is dual licensed under the Apache License v2.0 and GNU General
+Public License v2.0.
