@@ -43,7 +43,7 @@ use \Patchwork;
 class  OBM_Search {
 
   private static function normalize($str) {
-      return \Patchwork\Utf8::toAscii($str);//iconv("UTF-8", "ASCII//TRANSLIT", $str);
+      return \Patchwork\Utf8::toAscii($str);
   }
 
   public static function search($core, $pattern, $offset, $limit, $options) {
