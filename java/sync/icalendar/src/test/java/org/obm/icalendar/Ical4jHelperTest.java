@@ -585,7 +585,6 @@ public class Ical4jHelperTest {
 
 
 	@Test
-	@SuppressWarnings("null")
 	public void testOrganizerInAttendess() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("organizerInAttendee.ics");
 		CalendarBuilder builder = new CalendarBuilder();
@@ -606,7 +605,6 @@ public class Ical4jHelperTest {
 	}
 	
 	@Test
-	@SuppressWarnings("null")
 	public void testOrganizerNotInAttendess() throws IOException, ParserException {
 		InputStream icsStream = getStreamICS("organizerNotInAttendee.ics");
 		CalendarBuilder builder = new CalendarBuilder();
@@ -1165,7 +1163,7 @@ public class Ical4jHelperTest {
 		String cancelIcs = ical4jHelper.buildIcsInvitationCancel(ical4jUser, event, token);
 		String replyIcs = ical4jHelper.buildIcsInvitationReply(event, ical4jUser, token);
 
-		String expectedStartDate = "DTSTART;TZID=Europe/Paris:19700116T114834";
+		String expectedStartDate = "DTSTART:19700116T104834Z";
 		String expectedDuration = "DURATION:PT1H";
 		String notExpectedDEndDate = "DTEND";
 
@@ -1221,7 +1219,7 @@ public class Ical4jHelperTest {
 		event.setTimezoneName("Europe/Paris");
 		expected = "DTSTART;TZID=Europe/Paris:20130303T030303";
 
-		ics = ical4jHelper.buildIcs(user, Lists.newArrayList(event), token);
+		ics = ical4jHelper.buildIcsWithTimeZoneOnDtStart(user, Lists.newArrayList(event), token);
 		assertThat(ics).contains(expected);
 	}
 
@@ -1237,7 +1235,7 @@ public class Ical4jHelperTest {
 		event.setTimezoneName("Asia/Jerusalem");
 		expected = "DTSTART;TZID=Asia/Jerusalem:20130404T040404";
 
-		ics = ical4jHelper.buildIcs(user, Lists.newArrayList(event), token);
+		ics = ical4jHelper.buildIcsWithTimeZoneOnDtStart(user, Lists.newArrayList(event), token);
 		assertThat(ics).contains(expected);
 	}
 
@@ -1676,6 +1674,23 @@ public class Ical4jHelperTest {
 		stream.close();
 
 		String ics = ical4jHelper.buildIcs(obmUser, events, token);
+		assertThat(stripTimestamps(ics)).isEqualTo(expectedICSWithoutTimestamp);
+	}
+
+	@Test
+	public void testBuildICSWithTimeZoneOnDtStart() throws IOException {
+		Event normalEvent = buildEvent();
+		Event eventWithExceptions = buildRecurrentEventWithExceptions();
+		Collection<Event> events = Lists.newArrayList(normalEvent, eventWithExceptions);
+
+		Ical4jUser obmUser = buildObmUser(normalEvent.findOrganizer());
+		AccessToken token = new AccessToken(0, "OBM");
+
+		InputStream stream = getStreamICS("eventsWithExceptionsDtStartWithTimeZone.ics");
+		String expectedICSWithoutTimestamp = stripTimestamps(IOUtils.toString(stream));
+		stream.close();
+
+		String ics = ical4jHelper.buildIcsWithTimeZoneOnDtStart(obmUser, events, token);
 		assertThat(stripTimestamps(ics)).isEqualTo(expectedICSWithoutTimestamp);
 	}
 	
