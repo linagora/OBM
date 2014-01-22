@@ -90,7 +90,7 @@ Summary:        web interface for Open Business Management
 Group:          Development/Tools
 Requires:       %{name}-config = %{version}-%{release}
 Requires(post):        vixie-cron
-Requires:       php >= 5.2, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap
+Requires:       php >= 5.3, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap
 
 %description    core
 This package contains the web interface for OBM. It has no dependency on the
@@ -151,7 +151,7 @@ Summary:        web interface configuration for OBM
 Group:          Development/Tools
 
 Requires:       %{name}-core = %{version}-%{release}
-Requires: 	php >= 5.2, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap, php-mbstring, curl >= 7.20
+Requires:       php >= 5.3, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap, php-mbstring, curl >= 7.20
 Requires(pre):  httpd
 
 %description    ui
