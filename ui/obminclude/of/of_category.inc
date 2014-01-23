@@ -1738,8 +1738,15 @@ function of_userdata_query_update($entity, $ent_id, $params, $clear=true) {
       $cats = $params["$cat_name"];
       if (is_array($cats)) {
 	foreach($cats as $cat_id) {
-	  $ret = of_category_user_query_insert_link($entity, $cat_name, $ent_id, $cat_id, $check);
-	}
+      $category_id = null;
+      if (is_array($cat_id)) {
+        $category_id = $cat_id['id'];
+      }
+      else {
+        $category_id = $cat_id;
+      }
+      $ret = of_category_user_query_insert_link($entity, $cat_name, $ent_id, $category_id, $check);
+    }
       } else if ($cats > 0) {
 	$ret = of_category_user_query_insert_link($entity, $cat_name, $ent_id, $cats, $check);
       }
