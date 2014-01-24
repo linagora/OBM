@@ -919,8 +919,8 @@ input.datePicker {
 
 /* the div that holds the date picker calendar */
 #datepicker {
-  width: 17em;
-  min-height: 16em;
+  width: 19em;
+  min-height: 17em;
   background-color: #fff;
   border-radius: 0 8px 8px 8px;
   box-shadow: 0 0 2px #777;
@@ -928,13 +928,22 @@ input.datePicker {
 }
 
 #datepicker h1 {
-  margin: 3px;
-  font-size: 120%;
+  font-size: 110%;
   font-weight: bold;
+  margin:3px 0 3px 0;
+  padding: 0;
 }
 
-#datepicker a {
-  margin-left: 5px;
+#datepicker .leftarrows{
+  float: left;
+}
+
+#datepicker .rightarrows{
+  float: right;
+}
+
+#datepicker .leftarrows a, #datepicker .rightarrows a{
+  padding: 0 2px 0 2px;
 }
 
 #datepicker table, .miniCalendar {
