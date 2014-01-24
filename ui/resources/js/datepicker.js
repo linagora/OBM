@@ -36,7 +36,8 @@ function displayDatePicker(dateField, displayBelowThisObject, dtFormat) {
 //    dateFormat = obm.vars.regexp.dateFormat;
 
   var x = displayBelowThisObject.getPosition().x;
-  var y = displayBelowThisObject.getPosition().y + displayBelowThisObject.getSize().y ;
+  var topMargin = 3;
+  var y = displayBelowThisObject.getPosition().y + displayBelowThisObject.getSize().y + topMargin;
 
   drawDatePicker(targetDateField, x, y);
 }
@@ -101,22 +102,32 @@ function refreshDatePicker(dateField, year, month, day)
   var previousMonth = getDateMonthAndYear(thisDay, -1);
   var nextMonth = getDateMonthAndYear(thisDay, +1);
   var title = new Element('h1').adopt(
-    new Element('a').setProperty('href','javascript: void(0);')
-     .addEvent('click',refreshDatePicker.pass([dateField,year - 1,month]))
-     .appendText('<<'))
-   .adopt(
-      new Element('a').setProperty('href','javascript: void(0);')
-       .addEvent('click',refreshDatePicker.pass([dateField,previousMonth.year,previousMonth.month]))
-       .appendText('<'))
+    new Element('span').setProperty('class', 'leftarrows')
+      .adopt(
+        new Element('a').setProperty('href','javascript: void(0);')
+        .addEvent('click',refreshDatePicker.pass([dateField,year - 1,month]))
+        .appendText('<<')
+      )
+      .adopt(
+        new Element('a').setProperty('href','javascript: void(0);')
+        .addEvent('click',refreshDatePicker.pass([dateField,previousMonth.year,previousMonth.month]))
+        .appendText('<')
+      )
+    )
    .appendText(obm.vars.labels.months[thisDay.getMonth()] + ' ' + thisDay.getFullYear())
    .adopt(
-     new Element('a').setProperty('href','javascript: void(0);')
-       .addEvent('click',refreshDatePicker.pass([dateField,nextMonth.year,nextMonth.month]))
-       .appendText('>'))
-   .adopt(
-     new Element('a').setProperty('href','javascript: void(0);')
-       .addEvent('click',refreshDatePicker.pass([dateField,year + 1,month]))
-       .appendText('>>'));
+      new Element('span').setProperty('class', 'rightarrows')
+        .adopt(
+          new Element('a').setProperty('href','javascript: void(0);')
+          .addEvent('click',refreshDatePicker.pass([dateField,nextMonth.year,nextMonth.month]))
+          .appendText('>')
+        )
+        .adopt(
+          new Element('a').setProperty('href','javascript: void(0);')
+          .addEvent('click',refreshDatePicker.pass([dateField,year + 1,month]))
+          .appendText('>>')
+        )
+    );
   
   var labels = new Element('tr');
   for(i = 0; i < obm.vars.labels.dayShort.length; i++) {
