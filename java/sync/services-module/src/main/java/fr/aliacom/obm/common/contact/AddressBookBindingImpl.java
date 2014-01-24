@@ -66,6 +66,7 @@ import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -266,6 +267,40 @@ public class AddressBookBindingImpl implements IAddressBook {
 			throw new ServerFault(ex.getMessage());
 		} catch (EventNotFoundException ex) {
 			throw new ServerFault(ex.getMessage());
+		}
+	}
+
+	@VisibleForTesting Contact updateContact(AccessToken token, Integer addressBookId, Contact contact)
+		throws ServerFault, NoPermissionException, ContactNotFoundException {
+
+		try {
+			assertIsNotAddressBookOfOBMUsers(addressBookId);
+
+			Contact previous = contactDao.findContact(token, contact.getUid());
+
+			assertHasRightsOnAddressBook(token, previous.getFolderId());
+
+			contact.setEntityId(previous.getEntityId());
+			contact.setFolderId(previous.getFolderId());
+
+			return contactDao.updateContact(token, contact);
+		} catch (SQLException ex) {
+			throw new ServerFault(ex.getMessage());
+		} catch (FindException ex) {
+			throw new ServerFault(ex.getMessage());
+		} catch (EventNotFoundException ex) {
+			throw new ServerFault(ex.getMessage());
+		}
+	}
+
+	@Override
+	@Transactional
+	public Contact storeContact(AccessToken at, Integer addressBookId, Contact contact, String clientId)
+			throws NoPermissionException, ServerFault, ContactNotFoundException {
+		if ( contact.getUid() == null ) {
+			return createContact(at, addressBookId, contact, clientId);
+		} else {
+			return updateContact(at, addressBookId, contact);
 		}
 	}
 

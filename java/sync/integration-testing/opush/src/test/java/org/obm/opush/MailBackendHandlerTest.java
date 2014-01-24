@@ -31,11 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.opush.IntegrationTestUtils.buildWBXMLOpushClient;
 import static org.obm.opush.IntegrationUserAccessUtils.mockUsersAccess;
 
@@ -47,8 +47,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.easymock.IMocksControl;
 import org.assertj.core.api.Assertions;
+import org.easymock.IMocksControl;
 import org.fest.util.Files;
 import org.junit.After;
 import org.junit.Before;
@@ -72,7 +72,6 @@ import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.change.client.SyncClientCommands;
-import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemChangesBuilder;
 import org.obm.push.bean.ms.MSEmail;
