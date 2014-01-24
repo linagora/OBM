@@ -38,6 +38,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 import javax.naming.NoPermissionException;
@@ -56,6 +57,7 @@ import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
+import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.items.AddressBookChangesResponse;
@@ -64,6 +66,7 @@ import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
@@ -458,6 +461,103 @@ public class AddressBookBindingImplTest {
 		mocksControl.replay();
 		
 		binding.modifyContact(token, USERS_ADDRESS_BOOK_ID, new Contact());
+	}
+
+	@Test
+	public void testUpdateContact() throws Exception {
+		int addressBookId = 1;
+		int entityId = 2;
+		Contact oldContact = new Contact(), newContact = new Contact();
+		
+		oldContact.setUid(1);
+		oldContact.setFolderId(addressBookId);
+		oldContact.setEntityId(entityId);
+
+		newContact.setUid(1);
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.findContact(token, oldContact.getUid())).andReturn(oldContact).once();
+		expect(contactDao.hasRightsOnAddressBook(token, oldContact.getFolderId())).andReturn(true).once();
+		expect(contactDao.updateContact(token, oldContact)).andReturn(newContact).once();
+		mocksControl.replay();
+
+		Contact updatedContact = binding.updateContact(token, addressBookId, newContact);
+		
+		assertThat(updatedContact).isEqualTo(newContact);
+		assertThat(newContact.getFolderId()).isEqualTo(1);
+		assertThat(newContact.getEntityId()).isEqualTo(2);
+	}
+
+	@Test(expected = NoPermissionException.class)
+	public void testUpdateContactWithoutPermission() throws Exception {
+		int addressBookId = 1;
+		Contact oldContact = new Contact(), newContact = new Contact();
+		
+		oldContact.setUid(1);
+		oldContact.setFolderId(addressBookId);
+
+		newContact.setUid(1);
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.findContact(token, oldContact.getUid())).andReturn(oldContact).once();
+		expect(contactDao.hasRightsOnAddressBook(token, oldContact.getFolderId())).andReturn(false).once();
+		mocksControl.replay();
+
+		binding.updateContact(token, addressBookId, newContact);
+	}
+
+	@Test(expected = NoPermissionException.class)
+	public void testUpdateContactInAddressBookOfOBMUsers() throws Exception {
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		mocksControl.replay();
+		
+		binding.updateContact(token, USERS_ADDRESS_BOOK_ID, new Contact());
+	}
+
+	
+	@Test
+	public void testStoreContactCreation() throws Exception {
+		Contact contact = new Contact();
+		int addressBookId = 1;
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.hasRightsOnAddressBook(token, addressBookId)).andReturn(true);
+		expect(contactDao.createContactInAddressBook(token, contact, addressBookId)).andReturn(contact).once();
+		expect(commitedOperationDao.findAsContact(token, null)).andReturn(null).once();
+		mocksControl.replay();
+		Contact createdContact = binding.storeContact(token, addressBookId, contact, null);
+		
+		assertThat(createdContact).isNotNull();
+	}
+	
+	@Test
+	public void testStoreContactUpdate() throws Exception {
+		int addressBookId = 1;
+		Contact oldContact = new Contact(), newContact = new Contact();
+		
+		Map<String, EmailAddress> emails = ImmutableMap.of("work", EmailAddress.loginAtDomain("equeffelec@linagora.com"));
+		
+		oldContact.setUid(1);
+		oldContact.setFolderId(addressBookId);
+		oldContact.setFirstname("Erwan");
+		oldContact.setEmails(emails);
+
+		newContact.setUid(1);
+		newContact.setFirstname("Michaël");
+		newContact.setLastname("Bailly");
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
+		expect(contactDao.findContact(token, oldContact.getUid())).andReturn(oldContact).once();
+		expect(contactDao.hasRightsOnAddressBook(token, oldContact.getFolderId())).andReturn(true).once();
+		expect(contactDao.updateContact(token, newContact)).andReturn(newContact).once();
+		mocksControl.replay();
+
+		Contact modifiedContact = binding.storeContact(token, addressBookId, newContact, null);
+		
+		assertThat(modifiedContact).isEqualTo(newContact);
+		assertThat(modifiedContact.getFirstname()).isEqualTo("Michaël");
+		assertThat(modifiedContact.getLastname()).isEqualTo("Bailly");
+		assertThat(modifiedContact.getEmails()).isEmpty();
 	}
 
 	@Test

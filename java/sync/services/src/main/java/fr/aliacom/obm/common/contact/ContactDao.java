@@ -248,8 +248,7 @@ public class ContactDao {
 		return upd;
 	}
 
-	private void loadBirthday(Connection con,
-			Map<Integer, Contact> entityContact) {
+	private void loadBirthday(Connection con, Map<Integer, Contact> entityContact) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Set<EventObmId> bdayIds = new HashSet<EventObmId>();
@@ -283,8 +282,7 @@ public class ContactDao {
 		}
 	}
 
-	private void loadAnniversary(Connection con,
-			Map<Integer, Contact> entityContact) {
+	private void loadAnniversary(Connection con, Map<Integer, Contact> entityContact) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Set<EventObmId> bdayIds = new HashSet<EventObmId>();
@@ -486,8 +484,8 @@ public class ContactDao {
 		return b.toString();
 	}
 
-	private EventObmId createOrUpdateDate(AccessToken at, Connection con,
-			Contact c, Date date, String idField) throws SQLException, FindException, EventNotFoundException, ServerFault {
+	private EventObmId createOrUpdateDate(AccessToken at, Connection con, Contact c, Date date, String idField)
+			throws SQLException, FindException, EventNotFoundException, ServerFault {
 		EventObmId dateId = null;
 		if (c.getUid() != null && c.getUid().intValue() != 0) {
 			dateId = getDateIdForContact(con, c, idField);
@@ -513,10 +511,8 @@ public class ContactDao {
 	}
 
 
-	private EventObmId retrieveAndModifyEventForContactDate(AccessToken at,
-			Connection con, Date date, EventObmId dateId)
-			throws EventNotFoundException, ServerFault, SQLException,
-			FindException {
+	private EventObmId retrieveAndModifyEventForContactDate(AccessToken at, Connection con, Date date, EventObmId dateId)
+			throws EventNotFoundException, ServerFault, SQLException, FindException {
 		logger.info("eventId != null");
 		Event e = calendarDao.findEventById(at, dateId);
 		e.setStartDate(date);
@@ -525,8 +521,8 @@ public class ContactDao {
 	}
 
 
-	private EventObmId createEventForContactDate(AccessToken at,
-			Connection con, Contact c, Date date) throws SQLException,
+	private EventObmId createEventForContactDate(AccessToken at, Connection con, Contact c, Date date)
+			throws SQLException,
 			FindException, ServerFault {
 		logger.info("eventId == null");
 		Event e = calendarDao.createEvent(con, at, at.getUserWithDomain(),
@@ -560,62 +556,104 @@ public class ContactDao {
 		return null;
 	}
 
-	private void createOrUpdateIMIdentifiers(Connection con, int entityId,
-			Map<String, InstantMessagingId> imIdentifiers) throws SQLException {
+	private void createOrUpdateIMIdentifiers(Connection con, Integer entityId, Map<String, InstantMessagingId> imIdentifiers)
+			throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			StringSQLCollectionHelper imIds = new StringSQLCollectionHelper(imIdentifiers.keySet());
-			ps = con
-			.prepareStatement("DELETE FROM IM WHERE im_entity_id=? AND im_label IN ("
-					+ imIds.asPlaceHolders() + ")");
+			ps = con.prepareStatement(
+				"DELETE FROM IM WHERE im_entity_id=? AND im_label IN (" + imIds.asPlaceHolders() + ")");
 			ps.setInt(1, entityId);
 			imIds.insertValues(ps, 2);
 			ps.executeUpdate();
-
 			ps.close();
-			ps = con
-			.prepareStatement("INSERT INTO IM (im_entity_id, im_label, im_protocol, im_address) "
-					+ "VALUES (?, ?, ?, ?)");
-			for (Entry<String, InstantMessagingId> entry: imIdentifiers.entrySet()) {
-				ps.setInt(1, entityId);
-				ps.setString(2, entry.getKey());
-				ps.setString(3, entry.getValue().getProtocol());
-				ps.setString(4, entry.getValue().getId());
-				ps.addBatch();
-			}
-			ps.executeBatch();
+
+			ps = insertImIdenfifiers(con, entityId, imIdentifiers);
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
 	}
 
-	private void createOrUpdateWebsites(final Connection con, final Contact c) throws SQLException {
+	private void removeAndCreateIMIdentifiers(Connection con, Integer entityId, Map<String, InstantMessagingId> imIdentifiers)
+			throws SQLException {
 		PreparedStatement ps = null;
 		try {
-			StringSQLCollectionHelper labels = new StringSQLCollectionHelper(c.listWebSitesLabel());
-			ps = con.prepareStatement("DELETE FROM Website WHERE website_entity_id=? AND website_label IN (" + 
-					labels.asPlaceHolders() + ")");
-			ps.setInt(1, c.getEntityId());
+			ps = con.prepareStatement(
+				"DELETE FROM IM " +
+				"WHERE im_entity_id=?");
+			ps.setInt(1, entityId);
+			ps.executeUpdate();
+			ps.close();
+			
+			ps = insertImIdenfifiers(con, entityId, imIdentifiers);
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+	}
+
+	private PreparedStatement insertImIdenfifiers(Connection con, Integer entityId, Map<String, InstantMessagingId> imIdentifiers)
+			throws SQLException {
+		PreparedStatement ps;
+		ps = con.prepareStatement(
+			"INSERT INTO IM (im_entity_id, im_label, im_protocol, im_address) " +
+			"VALUES (?, ?, ?, ?)");
+		for (Entry<String, InstantMessagingId> entry: imIdentifiers.entrySet()) {
+			ps.setInt(1, entityId);
+			ps.setString(2, entry.getKey());
+			ps.setString(3, entry.getValue().getProtocol());
+			ps.setString(4, entry.getValue().getId());
+			ps.addBatch();
+		}
+		ps.executeBatch();
+		return ps;
+	}
+
+	private void createOrUpdateWebsites(final Connection con, final Contact contact) throws SQLException {
+		PreparedStatement ps = null;
+		try {
+			StringSQLCollectionHelper labels = new StringSQLCollectionHelper(contact.listWebSitesLabel());
+			ps = con.prepareStatement(
+				"DELETE FROM Website " +
+				"WHERE website_entity_id=? AND website_label IN (" + labels.asPlaceHolders() + ")");
+			ps.setInt(1, contact.getEntityId());
 			labels.insertValues(ps, 2);
 			ps.executeUpdate();
 
-			ps.close();
-			ps = con.prepareStatement("INSERT INTO Website (website_entity_id, website_label, website_url) VALUES (?, ?, ?)");
-
-			final String label = "CALURI;X-OBM-Ref1";
-			insertWebSite(con, c.getEntityId(), label, c.getCalUri());
-			for (final Website website: c.getWebsites()) {
-				if (!website.isCalendarUrl() || !website.getLabel().equalsIgnoreCase(label)) {
-					insertWebSite(con, c.getEntityId(), website.getLabel(),  website.getUrl());
-				}
-			}
+			insertWebSites(con, contact);
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
 
 	}
 
-	private void insertWebSite(Connection con, int entityId, String label, String url) throws SQLException {
+	private void removeAndCreateWebsites(final Connection con, final Contact contact) throws SQLException {
+		PreparedStatement ps = null;
+		try {
+			ps = con.prepareStatement(
+				"DELETE FROM Website " +
+				"WHERE website_entity_id=?");
+			ps.setInt(1, contact.getEntityId());
+			ps.executeUpdate();
+
+			insertWebSites(con, contact);
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+
+	}
+
+	private void insertWebSites(final Connection con, final Contact contact)
+			throws SQLException {
+		final String label = "CALURI;X-OBM-Ref1";
+		insertWebSite(con, contact.getEntityId(), label, contact.getCalUri());
+		for (final Website website: contact.getWebsites()) {
+			if (!website.isCalendarUrl() || !website.getLabel().equalsIgnoreCase(label)) {
+				insertWebSite(con, contact.getEntityId(), website.getLabel(),  website.getUrl());
+			}
+		}
+	}
+
+	private void insertWebSite(Connection con, Integer entityId, String label, String url) throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			ps = con.prepareStatement("INSERT INTO Website (website_entity_id, website_label, website_url) VALUES (?, ?, ?)");
@@ -630,100 +668,175 @@ public class ContactDao {
 		}
 	}
 
-	private void createOrUpdateAddresses(Connection con, int entityId,
-			Map<String, Address> addresses) throws SQLException {
+	private void createOrUpdateAddresses(Connection con, Integer entityId, Map<String, Address> addresses)
+			throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			StringSQLCollectionHelper labels = new StringSQLCollectionHelper(addresses.keySet());
-			ps = con
-			.prepareStatement("DELETE FROM Address WHERE address_entity_id=? and address_label IN ("
-					+ labels.asPlaceHolders() + ")");
+			ps = con.prepareStatement(
+				"DELETE FROM Address " +
+				"WHERE address_entity_id=? and address_label IN (" + labels.asPlaceHolders() + ")");
 			ps.setInt(1, entityId);
 			labels.insertValues(ps, 2);
 			ps.executeUpdate();
-
 			ps.close();
-			ps = con
-			.prepareStatement("INSERT INTO Address (address_entity_id, address_label, "
-					+ "address_street, address_zipcode, address_town, address_expresspostal, address_country, address_state) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-			for (Entry<String, Address> entry: addresses.entrySet()) {
-				Address ad = entry.getValue();
-				ps.setInt(1, entityId);
-				ps.setString(2, entry.getKey());
-				ps.setString(3, ad.getStreet());
-				ps.setString(4, ad.getZipCode());
-				ps.setString(5, ad.getTown());
-				ps.setString(6, ad.getExpressPostal());
-				ps.setString(7, getCountryIso3166(con, ad.getCountry()));
-				ps.setString(8, ad.getState());
-				ps.addBatch();
-			}
-			ps.executeBatch();
+
+			ps = insertAddresses(con, entityId, addresses);
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
 
 	}
 
+	private void removeAndCreateAddresses(Connection con, Integer entityId, Map<String, Address> addresses)
+			throws SQLException {
+		PreparedStatement ps = null;
+		try {
+			ps = con.prepareStatement(
+				"DELETE FROM Address " +
+				"WHERE address_entity_id=?");
+			ps.setInt(1, entityId);
+			ps.executeUpdate();
+			ps.close();
 
-	private void createOrUpdateEmails(Connection con, int entityId,
-			Map<String, EmailAddress> emails) throws SQLException {
+			ps = insertAddresses(con, entityId, addresses);
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+
+	}
+
+	private PreparedStatement insertAddresses(Connection con, Integer entityId, Map<String, Address> addresses)
+			throws SQLException {
+		PreparedStatement ps;
+		ps = con.prepareStatement(
+				"INSERT INTO Address (address_entity_id, address_label, "
+				+ "address_street, address_zipcode, address_town,"
+				+ "address_expresspostal, address_country, address_state) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+		for (Entry<String, Address> entry: addresses.entrySet()) {
+			Address ad = entry.getValue();
+			ps.setInt(1, entityId);
+			ps.setString(2, entry.getKey());
+			ps.setString(3, ad.getStreet());
+			ps.setString(4, ad.getZipCode());
+			ps.setString(5, ad.getTown());
+			ps.setString(6, ad.getExpressPostal());
+			ps.setString(7, getCountryIso3166(con, ad.getCountry()));
+			ps.setString(8, ad.getState());
+			ps.addBatch();
+		}
+		ps.executeBatch();
+		return ps;
+	}
+
+	private void createOrUpdateEmails(Connection con, Integer entityId, Map<String, EmailAddress> emails)
+			throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			StringSQLCollectionHelper emailStrings = new StringSQLCollectionHelper(emails.keySet());
-			ps = con
-			.prepareStatement("DELETE FROM Email WHERE email_entity_id=? AND email_label IN ("
-					+ emailStrings.asPlaceHolders() + ")");
+			ps = con.prepareStatement(
+				"DELETE FROM Email " +
+				"WHERE email_entity_id=? AND email_label IN (" + emailStrings.asPlaceHolders() + ")");
 			ps.setInt(1, entityId);
 			emailStrings.insertValues(ps, 2);
 			ps.executeUpdate();
-
 			ps.close();
-			ps = con
-			.prepareStatement("INSERT INTO Email (email_entity_id, email_label, email_address) "
-					+ "VALUES (?, ?, ?)");
-			for (Entry<String, EmailAddress> entry: emails.entrySet()) {
-				ps.setInt(1, entityId);
-				ps.setString(2, entry.getKey());
-				ps.setString(3, entry.getValue().get());
-				ps.addBatch();
-			}
-			ps.executeBatch();
+
+			ps = insertEmails(con, entityId, emails);
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
 	}
 
-	private void createOrUpdatePhones(Connection con, int entityId,
-			Map<String, Phone> phones) throws SQLException {
+	private void removeAndCreateEmails(Connection con, Integer entityId, Map<String, EmailAddress> emails)
+			throws SQLException {
+		PreparedStatement ps = null;
+		try {
+			ps = con.prepareStatement(
+				"DELETE FROM Email " +
+				"WHERE email_entity_id=?");
+			ps.setInt(1, entityId);
+			ps.executeUpdate();
+			ps.close();
+
+			ps = insertEmails(con, entityId, emails);
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+	}
+
+	private PreparedStatement insertEmails(Connection con, Integer entityId, Map<String, EmailAddress> emails)
+			throws SQLException {
+		PreparedStatement ps;
+		ps = con.prepareStatement(
+			"INSERT INTO Email (email_entity_id, email_label, email_address) " +
+			"VALUES (?, ?, ?)");
+		for (Entry<String, EmailAddress> entry: emails.entrySet()) {
+			ps.setInt(1, entityId);
+			ps.setString(2, entry.getKey());
+			ps.setString(3, entry.getValue().get());
+			ps.addBatch();
+		}
+		ps.executeBatch();
+		return ps;
+	}
+
+	private void createOrUpdatePhones(Connection con, Integer entityId, Map<String, Phone> phones)
+			throws SQLException {
 		PreparedStatement ps = null;
 		try {
 			StringSQLCollectionHelper labels = new StringSQLCollectionHelper(phones.keySet());
-			ps = con
-			.prepareStatement("DELETE FROM Phone WHERE phone_entity_id=? and phone_label IN ("
-					+ labels.asPlaceHolders() + ")");
+			ps = con.prepareStatement(
+				"DELETE FROM Phone " +
+				"WHERE phone_entity_id=? and phone_label IN (" + labels.asPlaceHolders() + ")");
 			ps.setInt(1, entityId);
 			labels.insertValues(ps, 2);
 			ps.executeUpdate();
-
 			ps.close();
-			ps = con
-			.prepareStatement("INSERT INTO Phone (phone_entity_id, phone_label, phone_number) "
-					+ "VALUES (?, ?, ?)");
-			for (Entry<String, Phone> entry: phones.entrySet()) {
-				ps.setInt(1, entityId);
-				ps.setString(2, entry.getKey());
-				ps.setString(3, entry.getValue().getNumber());
-				ps.addBatch();
-			}
-			ps.executeBatch();
+
+			ps = insertPhones(con, entityId, phones);
 		} finally {
 			obmHelper.cleanup(null, ps, null);
 		}
 
 	}
 
+	private void removeAndCreatePhones(Connection con, Integer entityId, Map<String, Phone> phones)
+			throws SQLException {
+		PreparedStatement ps = null;
+		try {
+			ps = con.prepareStatement(
+				"DELETE FROM Phone " +
+				"WHERE phone_entity_id=?");
+			ps.setInt(1, entityId);
+			ps.executeUpdate();
+			ps.close();
+
+			ps = insertPhones(con, entityId, phones);
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+
+	}
+
+	private PreparedStatement insertPhones(Connection con, Integer entityId, Map<String, Phone> phones)
+			throws SQLException {
+		PreparedStatement ps;
+		ps = con.prepareStatement(
+			"INSERT INTO Phone (phone_entity_id, phone_label, phone_number) " +
+			"VALUES (?, ?, ?)");
+		for (Entry<String, Phone> entry: phones.entrySet()) {
+			ps.setInt(1, entityId);
+			ps.setString(2, entry.getKey());
+			ps.setString(3, entry.getValue().getNumber());
+			ps.addBatch();
+		}
+		ps.executeBatch();
+		return ps;
+	}
+
+	
 	private int chooseAddressBookFromContact(Connection con, AccessToken at, Contact c) throws SQLException {
 		return chooseAddressBookFromContact(con, at.getObmId(), c);
 	}
@@ -751,7 +864,7 @@ public class ContactDao {
 	}
 
 	private int insertIntoContact(Connection con, AccessToken at, Contact c, int addressBookId)
-	throws SQLException {
+			throws SQLException {
 		PreparedStatement ps = null;
 		try {
 
@@ -879,6 +992,76 @@ public class ContactDao {
 		return c;
 	}
 
+	@AutoTruncate
+	public Contact updateContact(AccessToken token, @DatabaseEntity Contact contact) throws SQLException, FindException, EventNotFoundException, ServerFault {
+
+		String q = "UPDATE Contact SET "
+			+ "contact_commonname=?, contact_firstname=?, "
+			+ "contact_lastname=?, contact_origin=?, contact_userupdate=?, "
+			+ "contact_aka=?, contact_title=?, contact_service=?, contact_company=?, contact_comment=?, "
+			+ "contact_suffix=?, contact_manager=?, contact_middlename=?, contact_assistant=?, contact_spouse=?, contact_anniversary_id=?, contact_birthday_id=? "
+			+ "WHERE contact_id=? ";
+		logger.info("update contact with id=" + contact.getUid() + " entityId=" + contact.getEntityId());
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		try {
+			con = obmHelper.getConnection();
+
+			EventObmId anniversaryId = createOrUpdateDate(token, con, contact, contact.getAnniversary(), ANNIVERSARY_FIELD);
+			contact.setAnniversaryId(anniversaryId);
+
+			EventObmId birthdayId = createOrUpdateDate(token, con, contact, contact.getBirthday(), BIRTHDAY_FIELD);
+			contact.setBirthdayId(birthdayId);
+
+			ps = con.prepareStatement(q);
+
+			int idx = 1;
+			ps.setString(idx++, contact.getCommonname());
+			ps.setString(idx++, contact.getFirstname());
+			ps.setString(idx++, contact.getLastname());
+			ps.setString(idx++, token.getOrigin());
+			ps.setInt(idx++, token.getObmId());
+
+			ps.setString(idx++, contact.getAka());
+			ps.setString(idx++, contact.getTitle());
+			ps.setString(idx++, contact.getService());
+			ps.setString(idx++, contact.getCompany());
+			ps.setString(idx++, contact.getComment());
+
+			ps.setString(idx++, contact.getSuffix());
+			ps.setString(idx++, contact.getManager());
+			ps.setString(idx++, contact.getMiddlename());
+			ps.setString(idx++, contact.getAssistant());
+			ps.setString(idx++, contact.getSpouse());
+			if (contact.getAnniversaryId() == null) {
+				ps.setNull(idx++, Types.INTEGER);
+			} else {
+				ps.setInt(idx++, contact.getAnniversaryId().getObmId());
+			}
+			if (contact.getBirthdayId() == null) {
+				ps.setNull(idx++, Types.INTEGER);
+			} else {
+				ps.setInt(idx++, contact.getBirthdayId().getObmId());
+			}
+
+			ps.setInt(idx++, contact.getUid());
+			ps.executeUpdate();
+
+			removeAndCreateAddresses(con, contact.getEntityId(), contact.getAddresses());
+			removeAndCreateEmails(con, contact.getEntityId(), contact.getEmails());
+			removeAndCreatePhones(con, contact.getEntityId(), contact.getPhones());
+			removeAndCreateWebsites(con, contact);
+			removeAndCreateIMIdentifiers(con, contact.getEntityId(), contact.getImIdentifiers());
+		} finally {
+			obmHelper.cleanup(con, ps, null);
+		}
+
+		indexContact(token, contact);
+
+		return contact;
+	}
+	
 	public boolean hasRightsOnAddressBook(AccessToken token, int addressBookId) {
 		String q = "SELECT owner = ? or ur.entityright_write = 1 or gr.entityright_write = 1 or pr.entityright_write = 1 " +
 				"FROM AddressBook " +

@@ -101,6 +101,8 @@ public class AddressBookHandler extends SecureSyncHandler {
 			createContact(token, request, responder);
 		} else if ("createContactInBook".equals(method)) {
 			createContact(token, request, responder);
+		} else if ("storeContact".equals(method)) {
+			storeContact(token, request, responder);
 		} else if ("modifyContact".equals(method)) {
 			modifyContact(token, request, responder);
 		} else if ("removeContact".equals(method)) {
@@ -162,6 +164,24 @@ public class AddressBookHandler extends SecureSyncHandler {
 		responder.sendContact(ret);
 	}
 
+	private void storeContact(AccessToken at, Request request, XmlResponder responder) 
+			throws NoPermissionException, ServerFault, ContactNotFoundException {
+		
+		try {
+			Integer addressBookId = getBookId(request);
+			Contact contact = getContactFromParams(request);
+			String clientId = getClientId(request);
+			Contact ret = binding.storeContact(at, addressBookId, contact, clientId);
+			responder.sendContact(ret);
+		} catch (SAXException e) {
+			throw new ServerFault(e);
+		} catch (IOException e) {
+			throw new ServerFault(e);
+		} catch (FactoryConfigurationError e) {
+			throw new ServerFault(e);
+		}
+	}
+	
 	private void modifyContact(AccessToken at, Request request, XmlResponder responder) 
 			throws NoPermissionException, ServerFault, ContactNotFoundException {
 		

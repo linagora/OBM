@@ -95,11 +95,17 @@ public interface IAddressBook {
 			throws ServerFault, NoPermissionException;
 
 	/**
-	 * modify existing contact with data provided if possible.
+	 * modify existing contact with data provided if possible. (PATCH)
 	 */
 	Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact) 
 			throws ServerFault, NoPermissionException, ContactNotFoundException;
 
+	/**
+	 * create or update the contact. (PUT)
+	 */
+	Contact storeContact(AccessToken token, Integer addressBookId, Contact contact, String clientId)
+			throws ServerFault, NoPermissionException, ContactNotFoundException;
+	
 	/**
 	 * remove the contact with specified uid 
 	 */
@@ -154,5 +160,4 @@ public interface IAddressBook {
 	ContactChanges firstListContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault;
 
 	List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit, Integer offset) throws ServerFault;
-	
 }

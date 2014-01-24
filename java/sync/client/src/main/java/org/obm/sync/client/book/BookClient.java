@@ -182,13 +182,12 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	}
 	
 	@Override
-	public Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact) 
+	public Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact)
 			throws ServerFault, NoPermissionException, ContactNotFoundException {
-		
+
 		Multimap<String, String> params = initParams(token);
 		params.put("bookId", String.valueOf(addressBookId));
-		String ct = bookItemsWriter.getContactAsString(contact);
-		params.put("contact", ct);
+		params.put("contact", bookItemsWriter.getContactAsString(contact));
 		Document doc = execute(token, "/book/modifyContact", params);
 		exceptionFactory.checkModifyContactException(doc);
 		return bookItemsParser.parseContact(doc.getDocumentElement());
@@ -317,6 +316,17 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	protected Locator getLocator() {
 		return locator;
+	}
+
+	@Override
+	public Contact storeContact(AccessToken token, Integer addressBookId, Contact contact, String clientId)
+			throws NoPermissionException, ServerFault, ContactNotFoundException {
+		Multimap<String, String> params = initParams(token);
+		params.put("bookId", String.valueOf(addressBookId));
+		params.put("contact", bookItemsWriter.getContactAsString(contact));
+		Document doc = execute(token, "/book/storeContact", params);
+		exceptionFactory.checkModifyContactException(doc);
+		return bookItemsParser.parseContact(doc.getDocumentElement());
 	}
 	
 }
