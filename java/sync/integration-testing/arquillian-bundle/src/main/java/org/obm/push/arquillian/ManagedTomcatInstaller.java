@@ -62,7 +62,7 @@ public final class ManagedTomcatInstaller {
 	public static void install() {
 		if (!TOMCAT_TEMPORARY_MAIN_FOLDER.exists()) {
 			try {
-				if (TOMCAT_TEMPORARY_MAIN_FOLDER.mkdir()) {
+				if (!TOMCAT_TEMPORARY_MAIN_FOLDER.mkdir()) {
 					throw new IOException(String.format("Unable to create directory %s",
 							TOMCAT_TEMPORARY_MAIN_FOLDER.getAbsolutePath()));
 				}
