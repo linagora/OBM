@@ -54,5 +54,9 @@ public enum ServerCapability {
 	/**
 	 * Advertise support for anonymized events
 	 */
-	SERVER_SIDE_ANONYMIZATION
+	SERVER_SIDE_ANONYMIZATION,
+  /**
+	 * Used to advertise support for the storeContact endpoint.
+	 */
+	ADDRESS_BOOK_HANDLER_SUPPORTS_STORECONTACT
 }
