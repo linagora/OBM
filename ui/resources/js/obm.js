@@ -591,6 +591,18 @@ function showMessage(klass, message) {
   showMessageWithTimeout(klass, message, 3000);
 }
 
+function showResourceInformation(checkbox){
+  var information = $('resource_rights_information');
+
+  if (checkbox.checked) {
+    information.setStyle('color', '#333');
+    information.addClass('resource_rights_information');
+  } else {
+    information.setStyle('color', 'transparent');
+    information.removeClass('resource_rights_information');
+  }
+}
+
 function overListBoxFix(overObject, forceDisplay) {
   
   if (navigator.userAgent.toLowerCase().indexOf("msie") == -1)

@@ -1669,3 +1669,13 @@ h1.hoursTitle{
 .rights a {
   font-weight:bold;
 }
+
+.resource_rights_information {
+  background-image: url('../images/hatch.gif');
+  width:auto;
+  background-color: #DDD;
+  font-size: 11px;
+  font-style: normal;
+  text-align: center !important;
+  padding: 5px;
+}

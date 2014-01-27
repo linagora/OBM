@@ -438,3 +438,5 @@ $l_motivation = "Motivation";
 $l_without_comment = "Répondre sans commentaire";
 $l_with_comment = "Répondre avec commentaire";
 $l_remainingChar = "caractères restants";
+
+$l_resource_rights_information = "Nécessite le droit de lecture sur le(s) ressource(s) sélectionnée(s)";
