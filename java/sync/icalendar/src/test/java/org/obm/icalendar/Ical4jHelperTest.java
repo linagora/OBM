@@ -92,7 +92,6 @@ import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Repeat;
 import net.fortuna.ical4j.model.property.Transp;
 import net.fortuna.ical4j.model.property.Trigger;
-import net.fortuna.ical4j.util.TimeZones;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
@@ -1165,7 +1164,7 @@ public class Ical4jHelperTest {
 		String cancelIcs = ical4jHelper.buildIcsInvitationCancel(ical4jUser, event, token);
 		String replyIcs = ical4jHelper.buildIcsInvitationReply(event, ical4jUser, token);
 
-		String expectedStartDate = "DTSTART;TZID=Europe/Paris:19700116T114834";
+		String expectedStartDate = "DTSTART:19700116T104834Z";
 		String expectedDuration = "DURATION:PT1H";
 		String notExpectedDEndDate = "DTEND";
 
@@ -1175,70 +1174,6 @@ public class Ical4jHelperTest {
 			.doesNotContain(notExpectedDEndDate);
 		assertThat(replyIcs).contains(expectedDuration).contains(expectedStartDate)
 			.doesNotContain(notExpectedDEndDate);
-	}
-
-	@Test
-	public void testDateTimezoneUTC() {
-		final Event event = buildEvent();
-		final Ical4jUser user = buildObmUser(event.findOrganizer());
-		final AccessToken token = new AccessToken(0, "OBM");
-		String ics, expected;
-
-		// A UTC alias
-		event.setStartDate(DateUtils.date("2013-01-01T01:01:01"));
-		event.setTimezoneName(TimeZones.GMT_ID);
-		expected = "DTSTART:20130101T010101Z";
-
-		ics = ical4jHelper.buildIcs(user, Lists.newArrayList(event), token);
-		assertThat(ics).contains(expected);
-	}
-
-	@Test
-	public void testDateTimezoneNull() {
-		final Event event = buildEvent();
-		final Ical4jUser user = buildObmUser(event.findOrganizer());
-		final AccessToken token = new AccessToken(0, "OBM");
-		String ics, expected;
-
-		// null timezoneName (uses UTC)
-		event.setStartDate(DateUtils.date("2013-02-02T02:02:02"));
-		event.setTimezoneName(null);
-		expected = "DTSTART:20130202T020202Z";
-
-		ics = ical4jHelper.buildIcs(user, Lists.newArrayList(event), token);
-		assertThat(ics).contains(expected);
-	}
-
-	@Test
-	public void testDateTimezoneParis() {
-		final Event event = buildEvent();
-		final Ical4jUser user = buildObmUser(event.findOrganizer());
-		final AccessToken token = new AccessToken(0, "OBM");
-		String ics, expected;
-
-		// Paris
-		event.setStartDate(DateUtils.dateInZone("2013-03-03T03:03:03", "Europe/Paris"));
-		event.setTimezoneName("Europe/Paris");
-		expected = "DTSTART;TZID=Europe/Paris:20130303T030303";
-
-		ics = ical4jHelper.buildIcs(user, Lists.newArrayList(event), token);
-		assertThat(ics).contains(expected);
-	}
-
-	@Test
-	public void testDateTimezoneJerusalem() {
-		final Event event = buildEvent();
-		final Ical4jUser user = buildObmUser(event.findOrganizer());
-		final AccessToken token = new AccessToken(0, "OBM");
-		String ics, expected;
-
-		// A different Timezone
-		event.setStartDate(DateUtils.dateInZone("2013-04-04T04:04:04", "Asia/Jerusalem"));
-		event.setTimezoneName("Asia/Jerusalem");
-		expected = "DTSTART;TZID=Asia/Jerusalem:20130404T040404";
-
-		ics = ical4jHelper.buildIcs(user, Lists.newArrayList(event), token);
-		assertThat(ics).contains(expected);
 	}
 
 	private Event buildEvent() {
