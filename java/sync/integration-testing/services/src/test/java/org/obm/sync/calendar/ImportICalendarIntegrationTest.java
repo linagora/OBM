@@ -50,6 +50,7 @@ import org.obm.guice.GuiceModule;
 import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
 import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
 import org.obm.push.utils.DateUtils;
+import org.obm.sync.IntegrationTestUtils;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.ServicesClientModule;
@@ -163,7 +164,7 @@ public class ImportICalendarIntegrationTest extends ObmSyncIntegrationTest {
 		assertThat(importCount).isEqualTo(4);
 		assertThat(eventsInDB.getDeletedEvents()).isEmpty();
 		assertThat(eventsInDB.getUpdated())
-			.usingElementComparator(CalendarUtils.ignoreDatabaseElementsComparator())
+			.usingElementComparator(IntegrationTestUtils.ignoreDatabaseElementsComparator())
 			.containsOnly(event1, event2, event3, event4);
 	}
 	

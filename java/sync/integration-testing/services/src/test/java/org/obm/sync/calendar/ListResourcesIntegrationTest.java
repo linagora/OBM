@@ -32,7 +32,7 @@
 package org.obm.sync.calendar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.obm.sync.calendar.CalendarUtils.makeTestResourceInfo;
+import static org.obm.sync.IntegrationTestUtils.makeTestResourceInfo;
 
 import java.net.URL;
 import java.util.Collection;

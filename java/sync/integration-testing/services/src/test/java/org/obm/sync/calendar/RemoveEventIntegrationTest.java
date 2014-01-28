@@ -31,7 +31,7 @@ package org.obm.sync.calendar;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
-import static org.obm.sync.calendar.CalendarUtils.newEvent;
+import static org.obm.sync.IntegrationTestUtils.newEvent;
 
 import java.net.URL;
 import java.util.List;

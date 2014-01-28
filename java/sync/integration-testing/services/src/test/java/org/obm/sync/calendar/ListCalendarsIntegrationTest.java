@@ -32,8 +32,8 @@
 package org.obm.sync.calendar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.obm.sync.calendar.CalendarUtils.makeCalendarInfo;
-import static org.obm.sync.calendar.CalendarUtils.makeTestUserCalendarInfo;
+import static org.obm.sync.IntegrationTestUtils.makeCalendarInfo;
+import static org.obm.sync.IntegrationTestUtils.makeTestUserCalendarInfo;
 
 import java.net.URL;
 import java.util.Collection;

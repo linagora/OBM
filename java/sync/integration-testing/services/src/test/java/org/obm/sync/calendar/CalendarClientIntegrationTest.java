@@ -30,7 +30,7 @@
 package org.obm.sync.calendar;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.obm.sync.calendar.CalendarUtils.newEvent;
+import static org.obm.sync.IntegrationTestUtils.newEvent;
 
 import java.net.URL;
 
@@ -45,6 +45,7 @@ import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
 import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
 import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
+import org.obm.sync.IntegrationTestUtils;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.ServicesClientModule;
@@ -52,7 +53,6 @@ import org.obm.sync.ServicesClientModule.ArquillianLocatorService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
-import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginClient;
 
@@ -60,11 +60,10 @@ import com.google.inject.Inject;
 
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
-public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
+public class CalendarClientIntegrationTest extends ObmSyncIntegrationTest {
 
 	@Inject ArquillianLocatorService locatorService;
 	@Inject CalendarClient calendarClient;
-	@Inject BookClient bookClient;
 	@Inject LoginClient loginClient;
 	
 	private String calendar;
@@ -85,7 +84,7 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 
 		Event eventFromServer = calendarClient.getEventFromExtId(token, calendar, event.getExtId());
 
-		assertThat(eventFromServer).usingComparator(CalendarUtils.ignoreDatabaseElementsComparator()).isEqualTo(event);
+		assertThat(eventFromServer).usingComparator(IntegrationTestUtils.ignoreDatabaseElementsComparator()).isEqualTo(event);
 	}
 
 	@Test
@@ -101,7 +100,7 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 
 		Event eventFromServer = calendarClient.getEventFromExtId(token, calendar, event.getExtId());
 
-		assertThat(eventFromServer).usingComparator(CalendarUtils.ignoreDatabaseElementsComparator()).isEqualTo(event);
+		assertThat(eventFromServer).usingComparator(IntegrationTestUtils.ignoreDatabaseElementsComparator()).isEqualTo(event);
 	}
 
 	@Test(expected = EventAlreadyExistException.class)
@@ -138,7 +137,7 @@ public class StoreEventIntegrationTest extends ObmSyncIntegrationTest {
 		} catch (Exception e) {
 			getEventWithSecondExtIdException = e;
 		}
-		assertThat(eventFromServer).usingComparator(CalendarUtils.ignoreDatabaseElementsComparator()).isEqualTo(event);
+		assertThat(eventFromServer).usingComparator(IntegrationTestUtils.ignoreDatabaseElementsComparator()).isEqualTo(event);
 		assertThat(getEventWithSecondExtIdException).isInstanceOf(EventNotFoundException.class);
 	}
 
