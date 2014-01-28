@@ -3,7 +3,7 @@
 <<<<<<< HEAD
  * Copyright (C) 2011-2014  Linagora
 =======
- * Copyright (C) 2013 Linagora
+ * Copyright (C) 2013-2014 Linagora
 >>>>>>> dbb8bd3... - [OBMFULL-5147] write test for Http Post body params encoding
  *
  * This program is free software: you can redistribute it and/or 
