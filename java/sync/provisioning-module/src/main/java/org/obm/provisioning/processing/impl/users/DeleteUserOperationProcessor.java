@@ -55,7 +55,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 
 public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor {
-	
+
 	private final static String DELETE_ACL = "lc";
 
 	@Inject
@@ -81,8 +81,10 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 			archiveUserInDao(userFromDao);
 			archiveUserInPTables(userFromDao);
 		}
-		
-		deleteUserInLdap(userFromDao);
+
+		if (!userFromDao.isArchived()) {
+			deleteUserInLdap(userFromDao);
+		}
 	}
 
 	private void archiveUserInDao(ObmUser user) {
@@ -95,7 +97,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 
 	private void deleteUserInLdap(ObmUser user) {
 		LdapManager ldapManager = buildLdapManager(user.getDomain());
-		
+
 		try {
 			Group defaultGroup = getDefaultGroup(user.getDomain());
 			ldapManager.removeUserFromDefaultGroup(user.getDomain(), defaultGroup, user);
@@ -108,7 +110,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 			ldapManager.shutdown();
 		}
 	}
-	
+
 	private void deleteUserFromGroupsExceptDefaultOneInLdap(LdapManager ldapManager, Group defaultGroup, ObmUser user) throws SQLException {
 		Set<Group> groups = groupDao.getAllGroupsForUserExtId(user.getDomain(), user.getExtId());
 		for (Group group: groups) {
@@ -129,7 +131,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 
 	private void deleteUserMailBoxes(ObmUser user) {
 		CyrusManager cyrusManager = null;
-		
+
 		try {
 			cyrusManager = buildCyrusManager(user);
 			cyrusManager.setAcl(user, CYRUS, Acl.builder().user(user.getLogin()).rights(DELETE_ACL).build());
@@ -153,7 +155,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 			throw new ProcessingException(e);
 		}
 	}
-	
+
 	private void archiveUserInPTables(ObmUser user) throws ProcessingException {
 		try {
 			pUserDao.archive(user);

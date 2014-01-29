@@ -265,7 +265,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		mocksControl.verify();
 	}
-	
+
 	private void expectSetDefaultRights(ObmUser user) throws Exception {
 		expect(profileDao.getUserProfile(user)).andReturn(profile);
 		expect(obmHelper.fetchEntityId("Calendar", 1)).andReturn(
@@ -769,6 +769,61 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 	}
 
 	@Test
+	public void testProcessDeleteArchivedUserWithoutLdapEntry() throws Exception,
+			DaoException, BatchNotFoundException, UserNotFoundException,
+			IMAPException, DomainNotFoundException {
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						Request.builder().resourcePath("/users/extIdUser1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.param(Request.EXPUNGE_KEY, "true")
+								.verb(HttpVerb.DELETE).build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domain).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+		final ObmUser user = ObmUser
+				.builder()
+				.login("user1")
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.archived(true)
+				.mailHost(
+						ObmHost.builder().name("host").ip("127.0.0.1").build())
+				.email("user1@domain").build();
+
+		UserExtId extId = UserExtId.valueOf("extIdUser1");
+		Date batchCommitDate = DateUtils.date("2013-08-01T12:00:00");
+
+		expect(userDao.getByExtId(extId, domain)).andReturn(user);
+		userDao.delete(user);
+		expectLastCall();
+		expectDeleteUserMailbox(user);
+
+		expect(dateProvider.getDate()).andReturn(batchCommitDate).anyTimes();
+
+		Batch batch =  batchBuilder
+			.operation(
+					opBuilder.status(BatchStatus.SUCCESS)
+							.timecommit(batchCommitDate).build())
+			.status(BatchStatus.SUCCESS).timecommit(batchCommitDate).build();
+
+		expect(batchDao.update(batch)).andReturn(batch);
+		expectPUserDaoDelete(user);
+
+		mocksControl.replay();
+
+		processor.process(batchBuilder.build());
+
+		mocksControl.verify();
+	}
+
+	@Test
 	public void testProcessModifyUser() throws Exception {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
 		Operation.Builder opBuilder = Operation
@@ -848,7 +903,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testProcessModifyUserFailsWithExistingEmails() throws Exception {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
@@ -1219,7 +1274,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testProcessPatchUserCannotChangeArchivedState()
 			throws Exception {
@@ -1391,7 +1446,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		mocksControl.verify();
 	}
-	
+
 	private void expectDeleteUserMailbox(final ObmUser user)
 			throws DaoException, IMAPException {
 		CyrusManager cyrusManager = expectCyrusBuild();
