@@ -574,13 +574,13 @@ if [ "$1" = "1" ]; then
   /usr/sbin/osenmod postfixSmtpInMaps
   /usr/sbin/osenmod postfixAccess
   if [ -e /etc/obm/certs/obm_cert.pem ] ; then
-    /etc/init.d/obmSatellite start
+    /etc/init.d/obm-satellite start
   fi
 fi
 %{_sbindir}/alternatives --set mta /usr/sbin/sendmail.postfix || :
 
 if [ "$1" = "2" ]; then
-  /etc/init.d/obmSatellite restart
+  /etc/init.d/obm-satellite restart
 fi
 
 
@@ -611,7 +611,7 @@ if [ "$1" = "1" ] ; then
   #We need a certificate before starting
   if [ -e /etc/obm/certs/obm_cert.pem ] ; then
     echo -n "[obm-cyrus] starting obm-satellite cyrus module..."
-    /etc/init.d/obmSatellite start
+    /etc/init.d/obm-satellite start
   fi
 fi
 
@@ -647,7 +647,7 @@ if [ "$1" = "2" ]; then
     echo "DONE."
   fi
   echo -n "[obm-cyrus] restarting obm-satellite cyrus module..."
-  /etc/init.d/obmSatellite restart
+  /etc/init.d/obm-satellite restart
 fi
 
 
