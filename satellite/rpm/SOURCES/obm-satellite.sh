@@ -38,7 +38,7 @@ CMD_INIT_OBM_SATELITE="/etc/init.d/obm-satellite"
 
 # check if the file exist
 
-if [ -s "${REP_RUN}/obm/obmSatellite.pid" ]; then
+if [ -s "${REP_RUN}/obm-satellite.pid" ]; then
 	$CMD_INIT_OBM_SATELITE restart
 else
 	$CMD_INIT_OBM_SATELITE start

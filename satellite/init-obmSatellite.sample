@@ -9,14 +9,14 @@
 #              by some OBM modules
 # processname: obmSatellite.pl
 # config: /path/to/obm/auto/obmSatellite/obmSatellite.cf
-# pidfile: /var/run/obmSatellite.pid
+# pidfile: /var/run/obm-satellite.pid
 
 OBMPATH="/usr/share/obm-satellite"
 
 daemon_path="$OBMPATH/obmSatellite.pl"
 
-daemon_dir="/var/run/obm"
-daemon_pid=$daemon_dir"/obmSatellite.pid"
+daemon_dir="/var/run"
+daemon_pid=$daemon_dir"/obm-satellite.pid"
 
 if [ ! -d $daemon_dir ]; then
     /bin/mkdir $daemon_dir

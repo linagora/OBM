@@ -5,17 +5,17 @@
 # Required-Stop:     $local_fs $remote_fs
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: obmSatellite initscript
+# Short-Description: obm-satellite initscript
 ### END INIT INFO
 
 # Author: Sylvain Garcia <sylvain.garcia@aliasource.fr>
 #
 
-DESC="obmSatellite service"
+DESC="obm-satellite service"
 NAME=init-obmsatellite
 DAEMON=/usr/share/obm-satellite/obmSatellite.pl
 DAEMON_ARGS="--options args"
-PIDFILE=/var/run/obm/obmSatellite.pid
+PIDFILE=/var/run/obm-satellite.pid
 SCRIPTNAME=/etc/init.d/$NAME
 DAEMON_NAME="obmSatellite.pl"
 
@@ -96,15 +96,15 @@ do_status() {
   if [ -e $PIDFILE ]; then
     PID=$(cat $PIDFILE)
   else
-    log_failure_msg "ObmSatellite is not running."
+    log_failure_msg "obm-satellite is not running."
     exit 3
   fi
 
   if [ -n $PID ]; then
-    log_success_msg "ObmSatellite is running (pid $PID)."
+    log_success_msg "obm-satellite is running (pid $PID)."
     exit 0
   else
-    log_failure_msg "ObmSatellite is not running."
+    log_failure_msg "obm-satellite is not running."
     exit 3
   fi
 
