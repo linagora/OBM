@@ -23,7 +23,7 @@ use constant SOCKET_TIMEOUT => 30;
 use constant SSL_PROTOCOL_VERSION => 'SSLv2/3';
 use constant SSL_OBM_CERT => '/etc/obm/certs/obm_cert.pem';
 use constant SSL_CA_CERT => '/var/lib/obm-ca/cacert.pem';
-use constant PID_DIR => '/var/run/obm';
+use constant PID_DIR => '/var/run/';
 use constant HTTP_AUTHENTICATION_VALID_USER => 'obmsatelliterequest';
 use constant HTTP_AUTHENTICATION_LDAP_FILTER => '(&(uid=%u)(objectclass=obmSystemUser))';
 use constant OBM_CONF => '/etc/obm/obm_conf.ini';
@@ -45,7 +45,7 @@ sub _configure {
     $self->_configureSSL();
 
     # PID file
-    $self->{'server'}->{'pid_file'} = PID_DIR.'/'.$self->{'server'}->{'name'}.'.pid';
+    $self->{'server'}->{'pid_file'} = PID_DIR.'/'.'obm-satellite.pid';
 
     # Log
     $self->{'logFile'} = LOG_DIR.'/'.$self->{'server'}->{'name'}.'.log';
