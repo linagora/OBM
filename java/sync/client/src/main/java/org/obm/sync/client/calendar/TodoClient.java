@@ -32,6 +32,8 @@
 package org.obm.sync.client.calendar;
 
 import org.apache.http.client.HttpClient;
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.client.impl.SyncClientAssert;
 import org.obm.sync.locators.Locator;
@@ -41,6 +43,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+@Watch(Group.EXTERNAL_SERVICE)
 public class TodoClient extends AbstractEventSyncClient {
 
 	@Singleton

@@ -32,6 +32,8 @@
 package org.obm.sync.client.user;
 
 import org.apache.http.client.HttpClient;
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
@@ -48,6 +50,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+@Watch(Group.EXTERNAL_SERVICE)
 public class UserClient extends AbstractClientImpl implements IUser {
 	
 	@Singleton

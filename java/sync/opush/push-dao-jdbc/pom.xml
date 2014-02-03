@@ -24,6 +24,10 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
+			<artifactId>breakdown-duration</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>annotations</artifactId>
 		</dependency>
 		<dependency>

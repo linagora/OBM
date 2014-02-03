@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.locators;
 
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.DomainConfiguration;
 import org.obm.configuration.VMArgumentsUtils;
 import org.obm.locator.LocatorClientException;
@@ -42,6 +44,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
+@Watch(Group.EXTERNAL_SERVICE)
 public class Locator {
 
 	protected static final String OBM_SYNC_SERVICE = "sync/obm_sync";

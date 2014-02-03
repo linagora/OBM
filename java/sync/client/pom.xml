@@ -23,6 +23,10 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
+			<artifactId>breakdown-duration</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
 			<scope>test</scope>
 		</dependency>

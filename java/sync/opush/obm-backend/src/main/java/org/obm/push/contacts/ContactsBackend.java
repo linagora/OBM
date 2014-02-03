@@ -38,6 +38,8 @@ import java.util.Set;
 
 import javax.naming.NoPermissionException;
 
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.push.backend.BackendWindowingService;
 import org.obm.push.backend.BackendWindowingService.BackendChangesProvider;
@@ -99,6 +101,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
+@Watch(Group.CONTACTS)
 public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	
 	private final ContactConfiguration contactConfiguration;

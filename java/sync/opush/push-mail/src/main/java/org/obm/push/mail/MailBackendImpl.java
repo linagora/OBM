@@ -81,6 +81,8 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.configuration.OpushConfiguration;
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
@@ -134,6 +136,7 @@ import com.google.inject.Singleton;
 import com.sun.mail.util.QPDecoderStream;
 
 @Singleton
+@Watch(Group.EMAIL)
 public class MailBackendImpl extends OpushBackend implements MailBackend {
 
 	private static final ImmutableList<String> SPECIAL_FOLDERS = 

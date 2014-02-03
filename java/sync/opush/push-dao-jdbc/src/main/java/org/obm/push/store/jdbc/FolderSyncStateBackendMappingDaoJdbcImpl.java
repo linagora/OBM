@@ -40,6 +40,8 @@ import java.util.Date;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.PIMDataType;
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.utils.DateUtils;
@@ -50,12 +52,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
+@Watch(Group.SQL)
 public class FolderSyncStateBackendMappingDaoJdbcImpl extends AbstractJdbcImpl implements FolderSyncStateBackendMappingDao {
 
 	private final DateProvider dateProvider;
 
 	@Inject
-	private FolderSyncStateBackendMappingDaoJdbcImpl(DatabaseConnectionProvider dbcp, DateProvider dateProvider) {
+	/* allow cglib proxy */ FolderSyncStateBackendMappingDaoJdbcImpl(DatabaseConnectionProvider dbcp, DateProvider dateProvider) {
 		super(dbcp);
 		this.dateProvider = dateProvider;
 	}

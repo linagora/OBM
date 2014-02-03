@@ -40,6 +40,8 @@ import java.util.Set;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.ItemTrackingDao;
 import org.obm.push.store.jdbc.OpushJDBCUtils;
@@ -48,10 +50,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
+@Watch(Group.SQL)
 public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTrackingDao {
 	
 	@Inject
-	private ItemTrackingDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
+	/* allow cglib proxy */ ItemTrackingDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
 		super(dbcp);
 	}
 	

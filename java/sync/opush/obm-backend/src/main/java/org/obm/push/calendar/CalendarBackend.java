@@ -40,6 +40,8 @@ import java.util.Set;
 
 import net.fortuna.ical4j.data.ParserException;
 
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.icalendar.Ical4jUser.Factory;
@@ -114,6 +116,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
+@Watch(Group.EVENT)
 public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICalendarBackend {
 
 

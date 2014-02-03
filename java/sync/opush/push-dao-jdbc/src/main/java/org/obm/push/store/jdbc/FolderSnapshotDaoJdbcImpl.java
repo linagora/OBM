@@ -39,6 +39,8 @@ import java.util.List;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.Device;
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.FolderSnapshotDao;
 import org.obm.push.store.jdbc.OpushJDBCUtils;
@@ -48,10 +50,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
+@Watch(Group.SQL)
 public class FolderSnapshotDaoJdbcImpl extends AbstractJdbcImpl implements FolderSnapshotDao {
 
 	@Inject
-	private FolderSnapshotDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
+	/* allow cglib proxy */ FolderSnapshotDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
 		super(dbcp);
 	}
 	

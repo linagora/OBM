@@ -49,6 +49,8 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncKey;
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
@@ -62,6 +64,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
+@Watch(Group.SQL)
 public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements CollectionDao {
 
 	private static final String SYNC_STATE_ITEM_TABLE = "opush_sync_state";
@@ -72,7 +75,7 @@ public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements Collectio
 			Joiner.on(',').join("id", "sync_key");
 	
 	@Inject
-	protected CollectionDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
+	/* allow cglib proxy */ CollectionDaoJdbcImpl(DatabaseConnectionProvider dbcp) {
 		super(dbcp);
 	}
 

@@ -34,6 +34,8 @@ package org.obm.sync.client.setting;
 import java.util.Map;
 
 import org.apache.http.client.HttpClient;
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
@@ -52,6 +54,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+@Watch(Group.EXTERNAL_SERVICE)
 public class SettingClient extends AbstractClientImpl implements ISetting {
 
 	@Singleton

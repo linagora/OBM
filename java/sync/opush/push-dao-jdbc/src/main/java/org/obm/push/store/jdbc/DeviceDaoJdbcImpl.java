@@ -42,6 +42,8 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.Device.Factory;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.DeviceDao;
 import org.obm.push.store.jdbc.OpushJDBCUtils;
@@ -50,12 +52,13 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
+@Watch(Group.SQL)
 public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 	
 	private final Factory deviceFactory;
 
 	@Inject
-	private DeviceDaoJdbcImpl(DatabaseConnectionProvider dbcp, Device.Factory deviceFactory) {
+	/* allow cglib proxy */ DeviceDaoJdbcImpl(DatabaseConnectionProvider dbcp, Device.Factory deviceFactory) {
 		super(dbcp);
 		this.deviceFactory = deviceFactory;
 	}

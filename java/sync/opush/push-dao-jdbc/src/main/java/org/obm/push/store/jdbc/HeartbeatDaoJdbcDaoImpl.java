@@ -38,6 +38,8 @@ import java.sql.SQLException;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.Device;
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.HeartbeatDao;
 import org.obm.push.store.jdbc.OpushJDBCUtils;
@@ -46,10 +48,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
+@Watch(Group.SQL)
 public class HeartbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements HeartbeatDao{
 
 	@Inject
-	private HeartbeatDaoJdbcDaoImpl(DatabaseConnectionProvider dbcp) {
+	/* allow cglib proxy */ HeartbeatDaoJdbcDaoImpl(DatabaseConnectionProvider dbcp) {
 		super(dbcp);
 	}
 

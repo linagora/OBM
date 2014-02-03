@@ -34,6 +34,8 @@ package org.obm.sync.client.login;
 import javax.inject.Singleton;
 
 import org.apache.http.client.HttpClient;
+import org.obm.breakdownduration.bean.Group;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.DomainConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
@@ -57,6 +59,7 @@ import com.google.inject.name.Named;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
+@Watch(Group.EXTERNAL_SERVICE)
 public class LoginClient extends AbstractClientImpl implements LoginService {
 
 	@Singleton
