@@ -50,6 +50,7 @@ import org.obm.push.service.AuthenticationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -64,7 +65,7 @@ public class AuthenticationFilter implements Filter {
 	private final HttpErrorResponder httpErrorResponder;
 	
 	@Inject
-	private AuthenticationFilter(AuthenticationService authenticationService, 
+	@VisibleForTesting AuthenticationFilter(AuthenticationService authenticationService, 
 			LoggerService loggerService, 
 			HttpErrorResponder httpErrorResponder) {
 		
@@ -93,8 +94,9 @@ public class AuthenticationFilter implements Filter {
 		} catch (AuthenticationException e) {
 			logger.info(e.getMessage());
 			httpErrorResponder.returnHttpUnauthorized(httpRequest, httpResponse);
+		} finally {
+			loggerService.closeSession();
 		}
-
 	}
 
 	private Credentials authentication(HttpServletRequest request) throws AuthenticationException {

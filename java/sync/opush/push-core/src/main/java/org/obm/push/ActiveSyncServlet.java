@@ -182,8 +182,6 @@ public class ActiveSyncServlet extends HttpServlet {
 		} catch (AuthenticationException e) {
 			logger.info(e.getMessage());
 			httpErrorResponder.returnHttpUnauthorized(request, response);
-		} finally {
-			loggerService.closeSession();
 		}
 	}
 
