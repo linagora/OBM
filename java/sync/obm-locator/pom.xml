@@ -120,12 +120,6 @@
                                 <artifactId>mysql-connector-java</artifactId>
                                 <scope>runtime</scope>
                         </dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>common-dao-test</artifactId>
-			<version>${obm.version}</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
