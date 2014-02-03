@@ -43,6 +43,8 @@ du              : <?php echo $start; ?>
 
 au              : <?php echo $end; ?>
 
+fuseau horaire  : <?php echo $timezone; ?>
+
 sujet           : <?php echo $title; ?>
 
 lieu            : <?php echo $location; ?>

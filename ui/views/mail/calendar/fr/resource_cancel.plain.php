@@ -46,6 +46,8 @@ du              : <?php echo $start; ?>
 
 au              : <?php echo $end; ?>
 
+fuseau horaire  : <?php echo $timezone; ?>
+
 lieu            : <?php echo $location; ?>
 
 organisateur    : <?php echo $organizer; ?>

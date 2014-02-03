@@ -36,6 +36,6 @@ Message automatique envoyé par OBM
 PARTICIPATION AU RENDEZ-VOUS
 ------------------------------------------------------------------
 
-L'administrateur de la ressource "<?php echo $target; ?>" a <?php echo $targetState; ?> sa participation pour l'événement "<?php echo $title; ?>" prévu du <?php echo $start; ?> au <?php echo $end; ?>.
+L'administrateur de la ressource "<?php echo $target; ?>" a <?php echo $targetState; ?> sa participation pour l'événement "<?php echo $title; ?>" prévu du <?php echo $start; ?> au <?php echo $end; ?> (<?php echo $timezone; ?>).
 
 Commentaire : <?php echo $targetComment; ?>.

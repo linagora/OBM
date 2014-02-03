@@ -39,8 +39,7 @@ applicable to the OBM software.
     </tr>
     <tr style="height:25px;">
         <td colspan="2">
-Le rendez-vous <?php echo $title; ?>, initialement prévu du <?php echo $old_startDate; ?> au <?php echo $old_endDate; ?> de <?php echo $old_startTime ?> à <?php echo $old_endTime ?> (lieu : <?php echo $old_location; ?>),
-a été modifié : </td>
+Le rendez-vous <?php echo $title; ?>, initialement prévu du <?php echo $old_startDate; ?> au <?php echo $old_endDate; ?> de <?php echo $old_startTime ?> à <?php echo $old_endTime ?> (lieu : <?php echo $old_location; ?>), a été modifié : </td>
     </tr>
     <tr>
         <td style="text-align:right;width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;"><?php echo $title; ?></td>
@@ -53,7 +52,10 @@ a été modifié : </td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Heure</td><td style="font-weight:bold;"><?php echo $startTime." - ".$endTime ; ?></td>
-    </tr>    
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Fuseau horaire</td><td style="font-weight:bold;"><?php echo $timezone; ?></td>
+    </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Type de récurrence</td><td style="font-weight:bold;"><?php echo $repeat_kind; ?></td>
     </tr>

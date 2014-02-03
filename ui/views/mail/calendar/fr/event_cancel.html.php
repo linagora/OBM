@@ -50,6 +50,9 @@ applicable to the OBM software.
         <td style="text-align:right;padding-right:1em;">Au</td><td style="font-weight:bold;"><?php echo $end; ?></td>
     </tr>
     <tr>
+        <td style="text-align:right;padding-right:1em;">Fuseau horaire</td><td style="font-weight:bold;"><?php echo $timezone; ?></td>
+    </tr>
+    <tr>
         <td style="text-align:right;padding-right:1em;">Lieu</td><td style="font-weight:bold;"><?php echo $location; ?></td>
     </tr>
     <tr>

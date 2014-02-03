@@ -44,6 +44,8 @@ to          : <?php echo $endDate; ?>
 
 time        : <?php echo $startTime." - ".$endTime ; ?>
 
+timezone    : <?php echo $timezone; ?>
+
 recurrence  : <?php echo $repeat_kind; ?>
 
 subject     : <?php echo $title; ?>

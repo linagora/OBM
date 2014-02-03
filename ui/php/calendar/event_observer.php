@@ -59,6 +59,7 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
   private $privacy;
   private $date_begin;
   private $date_end;
+  private $timezone;
   private $duration;
   private $priority;
   private $color;
@@ -524,6 +525,7 @@ class OBM_EventFactory extends OBM_ASubject {
     $event->sequence = $this->db->f('event_sequence');
     $event->owner = new OBM_EventAttendee($this->db->f('owner_id'), null, $this->db->f('owner_firstname').' '.$this->db->f('owner_lastname'), '') ;
     $event->creator = new OBM_EventAttendee($this->db->f('creator_id'), null, $this->db->f('creator_firstname').' '.$this->db->f('creator_lastname'), '') ;
+    $event->timezone = $this->db->f('event_timezone');
     $event->opacity = $this->db->f('event_opacity');
     $event->location = $this->db->f('event_location');
     $event->category1 = $this->db->f('event_category1_id');
@@ -1011,7 +1013,7 @@ class OBM_EventDebugObserver implements OBM_IObserver {
                                     'repeat_kind', 'repeatfrequency', 
                                     'repeat_end', 'date_exception',
                                     'description', 'event_duration', 
-                                    'repeat_days', 'user', 'resource', 'contact',
+                                    'repeat_days', 'user', 'resource', 'contact', 'timezone'
                                     );
 
   public function update($old, $new) {

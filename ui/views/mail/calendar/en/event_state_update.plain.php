@@ -42,6 +42,8 @@ subject         : <?php echo $title; ?>
 
 when            : <?php echo $start; ?>
 
+timezone        : <?php echo $timezone; ?>
+
 organizer       : <?php echo $organizer; ?>
 
 attendee(s)     : <?php echo $attendees; ?>

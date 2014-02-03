@@ -388,7 +388,8 @@ class CalendarMailer extends OBM_Mailer {
       $prefix.'targetState'=> __($target->state),
       $prefix.'attendees'  => $list_attendees,
       $prefix.'targetComment'  => $target->comment,
-      $prefix.'exceptions' => $eventExceptions
+      $prefix.'exceptions' => $eventExceptions,
+      $prefix.'timezone'   => $event->timezone
     );
   }
 

@@ -42,6 +42,8 @@ from        : <?php echo $start; ?>
 
 to          : <?php echo $end; ?>
 
+timezone    : <?php echo $timezone; ?>
+
 subject     : <?php echo $title; ?>
 
 location    : <?php echo $location; ?>

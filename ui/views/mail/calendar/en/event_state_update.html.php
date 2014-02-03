@@ -49,6 +49,9 @@ applicable to the OBM software.
         <td style="text-align:right;padding-right:1em;">When</td><td style="font-weight:bold;"><?php echo $start; ?></td>
     </tr>
     <tr>
+      <td style="text-align:right;padding-right:1em;">Timezone</td><td style="font-weight:bold;"><?php echo $timezone; ?></td>
+    </tr>
+    <tr>
         <td style="text-align:right;padding-right:1em;">Organizer</td><td style="font-weight:bold;"><?php echo $organizer; ?></td>
     </tr>
     <tr>
