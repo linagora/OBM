@@ -412,7 +412,15 @@ public class HornetQConfiguration {
 			if (factoryType != null) {
 				configuration.setFactoryType(factoryType);
 			}
+			configureReconnect(configuration);
 			return configuration;
+		}
+
+		private void configureReconnect(ConnectionFactoryConfigurationImpl configuration) {
+			configuration.setMaxRetryInterval(6000);
+			configuration.setReconnectAttempts(1000);
+			configuration.setRetryInterval(1000);
+			configuration.setRetryIntervalMultiplier(1.5d);
 		}
 
 	}
