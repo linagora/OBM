@@ -38,9 +38,28 @@ applicable to the OBM software.
         </th>
     </tr>
     <tr>
-        <td colspan="2">The appointment <?php echo $location; ?>, initially scheduled on <?php echo $start; ?> to <?php echo $end; ?> (location: <?php echo $location; ?>),
-has been deleted.</td>
+        <td colspan="2">This appointment has been deleted:</td>
     </tr>
+    <tr>
+       <td style="text-align:right; width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;"><?php echo $title; ?></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">From</td><td style="font-weight:bold;"><?php echo $start; ?></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;"><?php echo $end; ?></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">Timezone</td><td style="font-weight:bold;"><?php echo $timezone; ?></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;"><?php echo $location; ?></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">Organized by</td><td style="font-weight:bold;"><?php echo $organizer; ?></td>
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">Created by</td><td style="font-weight:bold;"><?php echo $creator; ?></td>
     <tr>
         <td colspan="2">
           <strong>NB : </strong>If you are using the Thunderbird extension or ActiveSync, you must synchronize to view this deletion.

@@ -49,6 +49,9 @@ applicable to the OBM software.
         <td style="text-align:right;padding-right:1em;">Quand</td><td style="font-weight:bold;"><?php echo $start; ?></td>
     </tr>
     <tr>
+        <td style="text-align:right;padding-right:1em;">Fuseau horaire</td><td style="font-weight:bold;"><?php echo $timezone; ?></td>
+    </tr>
+    <tr>
         <td style="text-align:right;padding-right:1em;">Organisateur</td><td style="font-weight:bold;"><?php echo $organizer; ?></td>
     </tr>
     <tr>

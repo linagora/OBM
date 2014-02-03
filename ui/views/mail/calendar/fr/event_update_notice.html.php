@@ -38,8 +38,7 @@ applicable to the OBM software.
         </th>
     </tr>
     <tr>
-        <td colspan="2">Le rendez-vous <strong><?php echo $title; ?></strong>, initialement prévu du <?php echo $old_start; ?> au <?php echo $old_end; ?>, (lieu : <?php echo $old_location; ?>),
-a été modifié :</td>
+        <td colspan="2">Le rendez-vous <strong><?php echo $title; ?></strong>, initialement prévu du <?php echo $old_start; ?> au <?php echo $old_end; ?>, (lieu : <?php echo $old_location; ?>), a été modifié :</td>
     </tr>
     <tr>
         <td style="text-align:right; width:20%;padding-right:1em;">Sujet</td><td style="font-weight:bold;"><?php echo $title; ?></td>
@@ -49,6 +48,9 @@ a été modifié :</td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Au</td><td style="font-weight:bold;"><?php echo $end; ?></td>
+    </tr>
+    <tr>
+        <td style="text-align:right;padding-right:1em;">Fuseau horaire</td><td style="font-weight:bold;"><?php echo $timezone; ?></td>
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Lieu</td><td style="font-weight:bold;"><?php echo $location; ?></td>

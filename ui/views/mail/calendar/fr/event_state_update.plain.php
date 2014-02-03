@@ -42,6 +42,8 @@ sujet           : <?php echo $title; ?>
 
 quand           : <?php echo $start; ?>
 
+fuseau horaire  : <?php echo $timezone; ?>
+
 organisateur    : <?php echo $organizer; ?>
 
 participant(s)  : <?php echo $attendees; ?>

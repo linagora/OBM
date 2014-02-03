@@ -51,7 +51,10 @@ applicable to the OBM software.
     </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Time</td><td style="font-weight:bold;"><?php echo $startTime." - ".$endTime ; ?></td>
-    </tr>    
+    </tr>
+    <tr>
+      <td style="text-align:right;padding-right:1em;">Timezone</td><td style="font-weight:bold;"><?php echo $timezone; ?></td>
+    </tr>
     <tr>
         <td style="text-align:right;padding-right:1em;">Recurrence kind</td><td style="font-weight:bold;"><?php echo $repeat_kind; ?></td>
     </tr>

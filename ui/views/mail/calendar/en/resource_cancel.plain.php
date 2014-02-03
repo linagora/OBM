@@ -46,6 +46,8 @@ from            : <?php echo $start; ?>
 
 to              : <?php echo $end; ?>
 
+timezone        : <?php echo $timezone; ?>
+
 location        : <?php echo $location; ?>
 
 organizer       : <?php echo $organizer; ?>

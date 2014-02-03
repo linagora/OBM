@@ -53,6 +53,9 @@ applicable to the OBM software.
         <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;"><?php echo $end; ?></td>
     </tr>
     <tr>
+      <td style="text-align:right;padding-right:1em;">Timezone</td><td style="font-weight:bold;"><?php echo $timezone; ?></td>
+    </tr>
+    <tr>
         <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;"><?php echo $location; ?></td>
     </tr>
     <tr>

@@ -44,6 +44,8 @@ au              : <?php echo $endDate; ?>
 
 heure           : <?php echo $startTime." - ".$endTime ; ?>
 
+fuseau horaire  : <?php echo $timezone; ?>
+
 récurrence      : <?php echo $repeat_kind; ?>
 
 sujet           : <?php echo $title; ?>

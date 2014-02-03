@@ -39,19 +39,21 @@ RENDEZ-VOUS MODIFIÉ !
 Le rendez-vous <?php echo $title; ?>, initialement prévu du <?php echo $old_start; ?> au <?php echo $old_end; ?>, (lieu : <?php echo $old_location; ?>),
 a été modifié :
 
-from        : <?php echo $start; ?>
+du              : <?php echo $start; ?>
 
-to          : <?php echo $end; ?>
+au              : <?php echo $end; ?>
 
-subject     : <?php echo $title; ?>
+fuseau horaire  : <?php echo $timezone; ?>
 
-location    : <?php echo $location; ?>
+sujet           : <?php echo $title; ?>
 
-organizer   : <?php echo $organizer; ?>
+lieu            : <?php echo $location; ?>
 
-created by  : <?php echo $creator; ?>
+organisateur    : <?php echo $organizer; ?>
 
-attendee(s) : <?php echo $attendees; ?>
+créé par        : <?php echo $creator; ?>
+
+participant(s)  : <?php echo $attendees; ?>
 
 ::NB : Si vous êtes utilisateur du connecteur Thunderbird ou de la synchronisation ActiveSync, vous devez synchroniser pour visualiser ces modifications.
 

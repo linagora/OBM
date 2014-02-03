@@ -36,14 +36,15 @@ Message automatique envoyé par OBM
 RENDEZ-VOUS RÉCURRENT MODIFIÉ !
 ------------------------------------------------------------------
 
-Le rendez-vous <?php echo $title; ?>, initialement prévu du <?php echo $old_startDate; ?> au <?php echo $old_endDate; ?> de <?php echo $old_startTime ?> à <?php echo $old_endTime ?>  (lieu : <?php echo $old_location; ?>),
-a été modifié :
+Le rendez-vous <?php echo $title; ?>, initialement prévu du <?php echo $old_startDate; ?> au <?php echo $old_endDate; ?> de <?php echo $old_startTime ?> à <?php echo $old_endTime ?>  (lieu : <?php echo $old_location; ?>), a été modifié :
 
 du              : <?php echo $startDate; ?>
 
 au              : <?php echo $endDate; ?>
 
 heure           : <?php echo $startTime." - ".$endTime ; ?>
+
+fuseau horaire  : <?php echo $timezone; ?>
 
 recurrence      : <?php echo $repeat_kind; ?>
 
