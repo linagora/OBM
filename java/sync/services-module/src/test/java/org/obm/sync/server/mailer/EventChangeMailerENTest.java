@@ -21,9 +21,10 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 	private List<String> getPlainMessage(String header) {
 		return Lists.newArrayList(
 				header,
-				"from          : Nov 8, 2010 11:00 AM", 
+				"from          : Nov 8, 2010 11:00 AM",
 				"to            : Nov 8, 2010 11:45 AM",
-				"subject       : Sprint planning OBM", 
+				"subject       : Sprint planning OBM",
+				"timezone      : Europe/Paris",
 				"location      : A random location",
 				"organizer     : Raphael ROUGERON",
 				"created by    : Emmanuel SURLEAU"
@@ -33,10 +34,11 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 	private ArrayList<String> getHtmlMessage(String header) {
 		return Lists.newArrayList(
 				header,
-				"From Nov 8, 2010 11:00 AM", 
-				"To Nov 8, 2010 11:45 AM", 
-				"Subject Sprint planning OBM", 
-				"Location A random location", 
+				"From Nov 8, 2010 11:00 AM",
+				"To Nov 8, 2010 11:45 AM",
+				"Timezone Europe/Paris",
+				"Subject Sprint planning OBM",
+				"Location A random location",
 				"Organizer Raphael ROUGERON",
 				"Created by Emmanuel SURLEAU"
 		);
@@ -45,11 +47,12 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 	private ArrayList<String> getRecurrentPlainMessage(String header) {
 		return Lists.newArrayList(
 				header,
-				"from          : Nov 8, 2010", 
+				"from          : Nov 8, 2010",
 				"to            : Nov 23, 2012",
 				"time          : 11:00 AM - 11:45 AM",
+				"timezone      : Europe/Paris",
 				"recurrence    : Every 2 weeks [Monday, Wednesday, Thursday]",
-				"subject       : Sprint planning OBM", 
+				"subject       : Sprint planning OBM",
 				"location      : A random location",
 				"organizer     : Raphael ROUGERON"
 		);
@@ -58,12 +61,13 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 	private ArrayList<String> getRecurrentHtmlMessage(String header) {
 		return Lists.newArrayList(
 				header,
-				"From Nov 8, 2010", 
-				"To Nov 23, 2012", 
-				"Subject Sprint planning OBM", 
+				"From Nov 8, 2010",
+				"To Nov 23, 2012",
+				"Subject Sprint planning OBM",
 				"Location A random location",
 				"Organizer Raphael ROUGERON",
 				"Time 11:00 AM - 11:45 AM",
+				"Timezone Europe/Paris",
 				"Recurrence kind Every 2 weeks [Monday, Wednesday, Thursday]"
 		);
 	}	
@@ -84,9 +88,10 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 				"APPOINTMENT UPDATED !",
 				"from Nov 8, 2010 11:00 AM",
 				"to Nov 8, 2010 11:45 AM",
-				"from          : Nov 8, 2010 12:00 PM", 
+				"from          : Nov 8, 2010 12:00 PM",
 				"to            : Nov 8, 2010 1:00 PM",
-				"subject       : Sprint planning OBM", 
+				"timezone      : Europe/Paris",
+				"subject       : Sprint planning OBM",
 				"location      : A random location",
 				"organizer     : Raphael ROUGERON",
 				"created by    : Emmanuel SURLEAU"
@@ -99,9 +104,10 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 				"Appointment updated",
 				"from Nov 8, 2010 11:00 AM",
 				"to Nov 8, 2010 11:45 AM",
-				"From Nov 8, 2010 12:00 PM", 
-				"To Nov 8, 2010 1:00 PM", 
-				"Subject Sprint planning OBM", 
+				"From Nov 8, 2010 12:00 PM",
+				"To Nov 8, 2010 1:00 PM",
+				"Timezone Europe/Paris",
+				"Subject Sprint planning OBM",
 				"Location A random location",
 				"Organizer Raphael ROUGERON",
 				"Created by Emmanuel SURLEAU"
@@ -132,14 +138,15 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 	protected ArrayList<String> getRecurrentUpdatePlainMessage() {
 		return Lists.newArrayList(
 				"RECURRENT APPOINTMENT UPDATED !",
-				"from Nov 8, 2010", 
+				"from Nov 8, 2010",
 				"to \"No end date\"",
-				"from          : Nov 8, 2010", 
+				"from          : Nov 8, 2010",
 				"to            : Nov 23, 2012",
 				"at 11:00 AM - 11:45 AM",
 				"time          : 12:00 PM - 1:00 PM",
+				"timezone      : Europe/Paris",
 				"recurrence    : Every 2 weeks [Monday, Wednesday, Thursday]",
-				"subject       : Sprint planning OBM", 
+				"subject       : Sprint planning OBM",
 				"location      : A random location",
 				"organizer     : Raphael ROUGERON"
 		);
@@ -149,11 +156,12 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 	protected ArrayList<String> getRecurrentUpdateHtmlMessage() {
 		return Lists.newArrayList(
 				"Recurrent appointment updated",
-				"from Nov 8, 2010", 
+				"from Nov 8, 2010",
 				"to \"No end date\"",
-				"From Nov 8, 2010", 
-				"To Nov 23, 2012", 
-				"Subject Sprint planning OBM", 
+				"From Nov 8, 2010",
+				"To Nov 23, 2012",
+				"Timezone Europe/Paris",
+				"Subject Sprint planning OBM",
 				"Location A random location",
 				"Organizer Raphael ROUGERON",
 				"at 11:00 AM - 11:45 AM",
@@ -166,15 +174,16 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 	protected ArrayList<String> getNonRecurrentToRecurrentUpdatePlainMessage() {
 		return Lists.newArrayList(
 				"RECURRENT APPOINTMENT UPDATED !",
-				"from Nov 8, 2010", 
-				"to Nov 8, 2010", 				
-				"from          : Nov 8, 2010", 
+				"from Nov 8, 2010",
+				"to Nov 8, 2010",
+				"from          : Nov 8, 2010",
 				"to            : Nov 23, 2012",
 				"at 11:00 AM - 11:45 AM",
 				"time          : 11:00 AM - 11:45 AM",
+				"timezone      : Europe/Paris",
 				"recurrence kind : Without recurrence",
 				"recurrence    : Every 2 weeks [Monday, Wednesday, Thursday]",
-				"subject       : Sprint planning OBM", 
+				"subject       : Sprint planning OBM",
 				"location      : A random location",
 				"organizer     : Raphael ROUGERON"
 		);
@@ -184,15 +193,16 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 	protected ArrayList<String> getNonRecurrentToRecurrentUpdateHtmlMessage() {
 		return Lists.newArrayList(
 				"Recurrent appointment updated",
-				"from Nov 8, 2010", 
-				"to Nov 8, 2010", 
-				"From Nov 8, 2010", 
-				"To Nov 23, 2012", 
-				"Subject Sprint planning OBM", 
+				"from Nov 8, 2010",
+				"to Nov 8, 2010",
+				"From Nov 8, 2010",
+				"To Nov 23, 2012",
+				"Subject Sprint planning OBM",
 				"Location A random location",
 				"Organizer Raphael ROUGERON",
 				"at 11:00 AM - 11:45 AM",
 				"Time 11:00 AM - 11:45 AM",
+				"Timezone Europe/Paris",
 				"recurrence kind : Without recurrence",
 				"Recurrence kind Every 2 weeks [Monday, Wednesday, Thursday]"
 		);
@@ -204,9 +214,10 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 				"APPOINTMENT UPDATED !",
 				"from Nov 8, 2010 11:00 AM",
 				"to Nov 8, 2010 11:45 AM",
-				"from          : Nov 8, 2010 11:00 AM", 
+				"from          : Nov 8, 2010 11:00 AM",
 				"to            : Nov 8, 2010 11:45 AM",
-				"subject       : Sprint planning OBM", 
+				"timezone      : Europe/Paris",
+				"subject       : Sprint planning OBM",
 				"location      : A random location",
 				"organizer     : Raphael ROUGERON",
 				"created by    : Emmanuel SURLEAU"
@@ -219,9 +230,10 @@ public class EventChangeMailerENTest extends EventChangeMailerTest {
 				"Appointment updated",
 				"from Nov 8, 2010 11:00 AM",
 				"to Nov 8, 2010 11:45 AM",
-				"From Nov 8, 2010 11:00 AM", 
-				"To Nov 8, 2010 11:45 AM", 
-				"Subject Sprint planning OBM", 
+				"From Nov 8, 2010 11:00 AM",
+				"To Nov 8, 2010 11:45 AM",
+				"Timezone Europe/Paris",
+				"Subject Sprint planning OBM",
 				"Location A random location",
 				"Organizer Raphael ROUGERON",
 				"Created by Emmanuel SURLEAU"

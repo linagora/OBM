@@ -17,6 +17,9 @@
         <td style="text-align:right;padding-right:1em;">Au</td><td style="font-weight:bold;">${new.end?string.medium_short}</td>
     </tr>
     <tr>
+        <td style="text-align:right;padding-right:1em;">Fuseau horaire</td><td style="font-weight:bold;">${new.timezone}</td>
+    </tr>
+    <tr>
         <td style="text-align:right;padding-right:1em;">Lieu</td><td style="font-weight:bold;">${new.location}</td>
     </tr>
     <tr>

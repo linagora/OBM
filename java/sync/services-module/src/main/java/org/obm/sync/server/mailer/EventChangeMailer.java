@@ -491,6 +491,7 @@ public class EventChangeMailer extends AbstractMailer {
 				.put("location", Strings.nullToEmpty(event.getLocation()))
 				.put("organizer", Strings.nullToEmpty(event.getOwnerDisplayName()))
 				.put("creator", Strings.nullToEmpty(event.getCreatorDisplayName()))
+				.put("timezone", Strings.nullToEmpty(event.getTimezoneName()))
 				.put("attendees", attendees);
 		return datamodel;
 	}
@@ -712,7 +713,8 @@ public class EventChangeMailer extends AbstractMailer {
 			.put("participation", participation(participation, locale))
 			.put("comment", Strings.nullToEmpty(participation.getSerializedCommentToString()))
 			.put("subject", Strings.nullToEmpty(event.getTitle()))
-			.put("startDate", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME));
+			.put("startDate", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME))
+			.put("timezone", Strings.nullToEmpty(event.getTimezoneName()));
 		return datamodel;
 	}
 	

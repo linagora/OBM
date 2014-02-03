@@ -17,6 +17,9 @@
         <td style="text-align:right;padding-right:1em;">To</td><td style="font-weight:bold;">${end?string.medium_short}</td>
     </tr>
     <tr>
+        <td style="text-align:right;padding-right:1em;">Timezone</td><td style="font-weight:bold;">${timezone}</td>
+    </tr>
+    <tr>
         <td style="text-align:right;padding-right:1em;">Location</td><td style="font-weight:bold;">${location}</td>
     </tr>
     <tr>

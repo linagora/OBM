@@ -11,6 +11,8 @@ to            : ${recurrenceEnd}
 
 time          : ${startTime?string.short} - ${endTime?string.short}
 
+timezone      : ${timezone}
+
 recurrence    : ${recurrenceKind}
 
 subject       : ${subject}

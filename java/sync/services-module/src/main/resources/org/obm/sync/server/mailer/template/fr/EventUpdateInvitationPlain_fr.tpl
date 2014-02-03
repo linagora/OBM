@@ -9,6 +9,8 @@ du            : ${new.start?string.medium_short}
 
 au            : ${new.end?string.medium_short}
 
+fuseau horaire: ${new.timezone}
+
 sujet         : ${new.subject}
 
 lieu          : ${new.location}

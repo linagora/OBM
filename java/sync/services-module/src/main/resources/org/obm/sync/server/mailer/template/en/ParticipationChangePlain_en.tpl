@@ -3,7 +3,7 @@ This email was automatically sent by OBM
 ATTENDEE STATE UPDATED
 ------------------------------------------------------------------
 
-${user} has ${participation} the event ${subject} scheduled on ${startDate?string.medium_short}.
+${user} has ${participation} the event ${subject} scheduled on ${startDate?string.medium_short} (${timezone}).
 
 :: Comment :
 ${comment}
