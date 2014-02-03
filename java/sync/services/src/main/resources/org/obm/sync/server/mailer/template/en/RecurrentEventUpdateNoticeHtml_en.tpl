@@ -21,6 +21,9 @@ The recurrent appointment ${old.subject}, initially scheduled from ${old.start?d
         <td style="text-align:right;padding-right:1em;">Time</td><td style="font-weight:bold;">${new.startTime?string.short} - ${new.endTime?string.short}</td>
     </tr>
     <tr>
+        <td style="text-align:right;padding-right:1em;">Timezone</td><td style="font-weight:bold;">${new.timezone}</td>
+    </tr>
+    <tr>
         <td style="text-align:right;padding-right:1em;">Recurrence kind</td><td style="font-weight:bold;">${new.recurrenceKind}</td>
     </tr>
     <tr>

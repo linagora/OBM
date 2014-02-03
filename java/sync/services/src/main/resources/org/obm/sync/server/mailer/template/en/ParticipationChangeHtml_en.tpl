@@ -6,7 +6,7 @@
     </tr>
     <tr>
       <td colspan="2">
-		${user} has ${participation} the event ${subject} scheduled on ${startDate?string.medium_short}.
+		${user} has ${participation} the event ${subject} scheduled on ${startDate?string.medium_short} (${timezone}).
       </td>
     </tr>
     <tr>

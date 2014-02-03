@@ -480,17 +480,18 @@ public class EventChangeMailer extends AbstractMailer {
 			.put("host", this.baseUrl)
 			.put("calendarId", event.getObmId().serializeToString());
 	}
-	
+
 	private Builder<Object, Object> buildDefaultEventDataModel(Event event,
 			Locale locale) {
 		Builder<Object, Object> datamodel = null;
 		String attendees = buildAttendeesFromEvent(event.getAttendees(), locale);
-		
+
 		datamodel = ImmutableMap.builder()
 				.put("subject", Strings.nullToEmpty(event.getTitle()))
 				.put("location", Strings.nullToEmpty(event.getLocation()))
 				.put("organizer", Strings.nullToEmpty(event.getOwnerDisplayName()))
 				.put("creator", Strings.nullToEmpty(event.getCreatorDisplayName()))
+				.put("timezone", Strings.nullToEmpty(event.getTimezoneName()))
 				.put("attendees", attendees);
 		return datamodel;
 	}
@@ -712,7 +713,8 @@ public class EventChangeMailer extends AbstractMailer {
 			.put("participation", participation(participation, locale))
 			.put("comment", Strings.nullToEmpty(participation.getSerializedCommentToString()))
 			.put("subject", Strings.nullToEmpty(event.getTitle()))
-			.put("startDate", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME));
+			.put("startDate", new SimpleDate(event.getStartDate(), TemplateDateModel.DATETIME))
+			.put("timezone", Strings.nullToEmpty(event.getTimezoneName()));
 		return datamodel;
 	}
 	

@@ -9,6 +9,8 @@ from          : ${start?string.medium_short}
 
 to            : ${end?string.medium_short}
 
+timezone      : ${timezone}
+
 subject       : ${subject}
 
 location      : ${location}

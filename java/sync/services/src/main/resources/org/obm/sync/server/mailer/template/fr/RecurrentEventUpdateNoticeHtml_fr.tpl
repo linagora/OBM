@@ -21,6 +21,9 @@ a été modifié :</td>
         <td style="text-align:right;padding-right:1em;">Heure</td><td style="font-weight:bold;">${new.startTime?string.short} - ${new.endTime?string.short}</td>
     </tr>
     <tr>
+        <td style="text-align:right;padding-right:1em;">Fuseau horaire</td><td style="font-weight:bold;">${new.timezone}</td>
+    </tr>
+    <tr>
         <td style="text-align:right;padding-right:1em;">Type de récurrence</td><td style="font-weight:bold;">${new.recurrenceKind}</td>
     </tr>
     <tr>

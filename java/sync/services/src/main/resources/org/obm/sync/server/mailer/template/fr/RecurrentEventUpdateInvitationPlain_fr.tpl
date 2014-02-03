@@ -11,6 +11,8 @@ au            : ${new.recurrenceEnd}
 
 heure         : ${new.startTime?string.short} - ${new.endTime?string.short}
 
+fuseau horaire: ${new.timezone}
+
 recurrence    : ${new.recurrenceKind}
 
 sujet         : ${new.subject}
