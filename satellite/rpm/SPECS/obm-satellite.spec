@@ -117,6 +117,11 @@ install -p -m 755 mods-available/backupEntity $RPM_BUILD_ROOT%{_sysconfdir}/obm-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%pre            -n obm-satellite
+if [ $1 = 2 ] ; then
+/sbin/service obm-satellite stop >/dev/null 2>&1
+fi
+
 %post           -n obm-satellite
 /sbin/chkconfig --add obm-satellite
 
