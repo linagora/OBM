@@ -9,10 +9,6 @@
         <entries>
             <entry name="ConnectionFactory"/>
         </entries>
-	<retry-interval>1000</retry-interval>
-	<retry-interval-multiplier>1.5</retry-interval-multiplier>
-	<max-retry-interval>60000</max-retry-interval>
-	<reconnect-attempts>1000</reconnect-attempts>
     </connection-factory>
 
 	<topic name="eventChanges">
