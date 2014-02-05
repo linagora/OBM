@@ -133,6 +133,10 @@ public class SolrManager {
 		}
 	}
 
+	@VisibleForTesting void stop() throws JMSException {
+		jmsConnection.close();
+	}
+	
 	@VisibleForTesting
 	protected void setSolrCheckingInterval(int solrCheckingInterval) {
 		this.solrCheckingInterval = solrCheckingInterval;

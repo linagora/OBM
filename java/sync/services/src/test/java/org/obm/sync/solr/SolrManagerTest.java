@@ -111,6 +111,7 @@ public class SolrManagerTest {
 	
 	@After
 	public void tearDown() throws Exception {
+		manager.stop();
 		queueManager.stop();
 	}
 	
