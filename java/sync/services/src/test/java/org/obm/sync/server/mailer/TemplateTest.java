@@ -75,6 +75,7 @@ public class TemplateTest {
 			put("creator", "Emmanuel Surleau").
 			put("host", "obm.matthieu.lng").
 			put("attendees", "attendee").
+			put("timezone", "Europe/Paris").
 			put("calendarId", 12).build();
 		return datamodel;
 	}
