@@ -134,6 +134,10 @@ public class SolrManager implements LifecycleListener {
 		}
 	}
 
+	@VisibleForTesting void stop() throws JMSException {
+		jmsConnection.close();
+	}
+	
 	@VisibleForTesting
 	protected void setSolrCheckingInterval(int solrCheckingInterval) {
 		this.solrCheckingInterval = solrCheckingInterval;

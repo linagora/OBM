@@ -121,6 +121,7 @@ public class SolrHelperFactoryTest {
 
 	@After
 	public void tearDown() throws Exception {
+		manager.stop();
 		queueManager.stop();
 	}
 
