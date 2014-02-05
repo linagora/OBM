@@ -9,4 +9,4 @@ ignored=$(su - postgres -c "dropdb ${db}" >/dev/null 2>&1)
 su - postgres -c "createdb  -O ${user} --encoding=UTF-8 ${db}"
 
 echo "Filling ${db} database"
-PGPASSWORD="$pw" psql -U ${user} -h localhost ${db} -f "roundcube/SQL/postgres.initial.sql"
+PGPASSWORD="$pw" psql -U ${user} -h localhost ${db} -f "/usr/share/obm/www/webmail/SQL/postgres.initial.sql"

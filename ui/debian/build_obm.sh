@@ -39,7 +39,7 @@ cp -r ${CURDIR}/app ${BUILD_DEB_DIR_CORE}/usr/share/obm/www
 cp -r ${CURDIR}/lib ${BUILD_DEB_DIR_CORE}/usr/share/obm/www
 cp ${CURDIR}/utils/timezone-generator.php ${BUILD_DEB_DIR_CORE}/usr/share/obm-ui
 cp ${CURDIR}/utils/purge_contacts.py ${BUILD_DEB_DIR_CORE}/usr/share/obm-ui
-cp -r ${CURDIR}/webmail ${BUILD_DEB_DIR_CORE}/usr/share/obm/www
+cp -r ${CURDIR}/php/webmail ${BUILD_DEB_DIR_CORE}/usr/share/obm/www
 
 exit 0
 
