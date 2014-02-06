@@ -355,7 +355,18 @@ class CAS_Auth extends Auth {
 
   function auth_validate_callback() {
     global $obm;
-    $login = phpCAS::getUser();
+
+    if(empty($cas_server_login_attribute)) {
+      $tmpLogin = phpCAS::getUser();
+    }
+    else {
+      $tmpLogin = phpCAS::getAttribute($cas_server_login_attribute);
+      if(empty($tmpLogin)) {
+        $tmpLogin = phpCAS::getUser();
+      }
+    }
+    $login = $tmpLogin;
+
     // NTLM authentication hack - prerequisite: login do not contain \
     if (ereg("[\\]", $login)){$tmp = split("[\\]", $login);$login = $tmp[1];}
 
