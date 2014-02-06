@@ -129,6 +129,7 @@ if [ "$CHECKDB" = "${RC_DBNAME}" ] ; then
        echo "${RC_DBNAME} database already exist, skipping."
 else
        echo "Installing ${RC_DBNAME} database."
+       fix_my_perms ${RC_DBNAME} ${OBM_DBUSER} ${OBM_PASSWD}
        pushd $REP_SCRIPTS_OBM 1>/dev/null
        $SCRIPT_RC_INSTALL
        popd 1>/dev/null
