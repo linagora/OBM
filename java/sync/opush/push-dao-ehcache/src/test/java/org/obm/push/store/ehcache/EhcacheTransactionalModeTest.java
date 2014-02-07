@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import static org.easymock.EasyMock.createNiceMock;
+
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -51,19 +53,21 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.StaticConfigurationService;
 import org.obm.annotations.transactional.LazyTransactionProvider;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.configuration.TestConfigurationModule;
-import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.push.exception.EhcacheRollbackException;
+import org.slf4j.Logger;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import com.google.inject.name.Names;
 
 @GuiceModule(EhcacheTransactionalModeTest.Module.class)
 @RunWith(GuiceRunner.class) 
@@ -72,9 +76,12 @@ public class EhcacheTransactionalModeTest {
 	public static class Module extends AbstractModule {
 		@Override
 		protected void configure() {
-			TransactionConfiguration transactionConfiguration = new TestTransactionConfiguration();
+			org.obm.Configuration.Transaction transactionConfiguration = new org.obm.Configuration.Transaction();
+			transactionConfiguration.timeoutInSeconds = 3600;
 			install(new TransactionalModule());
-			install(new TestConfigurationModule(transactionConfiguration));
+			bind(TransactionConfiguration.class).toInstance(
+					new StaticConfigurationService.Transaction(transactionConfiguration));
+			bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(createNiceMock(Logger.class));
 		}
 	}
 

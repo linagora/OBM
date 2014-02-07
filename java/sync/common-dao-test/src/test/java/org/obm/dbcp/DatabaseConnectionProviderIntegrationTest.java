@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.dbcp;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 
@@ -40,11 +41,12 @@ import org.easymock.IMocksControl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.Configuration;
+import org.obm.StaticConfigurationService;
 import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionalBinder;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dao.utils.H2InMemoryDatabase;
@@ -82,6 +84,9 @@ public class DatabaseConnectionProviderIntegrationTest implements H2TestClass {
 		
 		@Override
 		protected void configure() {
+			Configuration.Transaction transactionConfiguration = new Configuration.Transaction();
+			transactionConfiguration.timeoutInSeconds = 3600;
+			
 			bind(IMocksControl.class).toInstance(control);
 			bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
@@ -89,7 +94,7 @@ public class DatabaseConnectionProviderIntegrationTest implements H2TestClass {
 			Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
 			databaseDrivers.addBinding().to(MyDriverConfiguration.class);
 			
-			bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
+			bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(transactionConfiguration));
 			install(new TransactionalModule());
 			
 			bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(configurationLogger);

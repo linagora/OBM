@@ -38,7 +38,6 @@ import org.obm.StaticConfigurationService;
 import org.obm.annotations.transactional.LazyTransactionProvider;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.opush.env.OpushStaticConfigurationService.EhCache;
@@ -70,8 +69,9 @@ public class WindowingModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		Configuration configuration = configuration();
+		configuration.transaction.timeoutInSeconds = 3600;
 		bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
-		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
+		bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(configuration.transaction));
 		bind(TransactionProvider.class).to(LazyTransactionProvider.class);
 		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
 		bind(WindowingService.class).to(WindowingServiceImpl.class);

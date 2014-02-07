@@ -42,7 +42,6 @@ import org.hornetq.core.remoting.impl.netty.TransportConstants;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule;
 import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -76,7 +75,7 @@ public class ModuleUtils {
 						FileUtils.deleteDirectory(configuration.dataDir);						
 					}
 				});
-				install(new ConfigurationModule(configuration, new TestTransactionConfiguration()));
+				install(new ConfigurationModule(configuration));
 				Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
 				databaseDrivers.addBinding().to(H2DriverConfiguration.class);
 				bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);

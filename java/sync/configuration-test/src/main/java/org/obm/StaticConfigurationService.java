@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Locale;
@@ -43,11 +44,41 @@ import org.obm.Configuration.Mail;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.LocatorConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 
 import com.google.common.base.Throwables;
 
 public class StaticConfigurationService implements ConfigurationService {
 
+	public static class Transaction implements TransactionConfiguration {
+		
+		private final org.obm.Configuration.Transaction configuration;
+		
+		public Transaction(org.obm.Configuration.Transaction configuration) {
+			this.configuration = configuration;
+		}
+		
+		@Override
+		public boolean enableJournal() {
+			return configuration.enableJournal;
+		}
+		
+		@Override
+		public File getJournalPart1Path() {
+			return configuration.journal1;
+		}
+		
+		@Override
+		public File getJournalPart2Path() {
+			return configuration.journal2;
+		}
+		
+		@Override
+		public int getTimeOutInSecond() {
+			return configuration.timeoutInSeconds;
+		}
+	}
+	
 	public static class Locator implements LocatorConfiguration {
 
 		private final org.obm.Configuration.Locator configuration;

@@ -33,9 +33,10 @@ package org.obm.provisioning;
 
 import javax.servlet.ServletContext;
 
+import org.obm.Configuration;
+import org.obm.StaticConfigurationService;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
@@ -68,11 +69,14 @@ public class TestingProvisioningModule extends ProvisioningService {
 	protected void configureServlets() {
 		super.configureServlets();
 
+		Configuration.Transaction transaction = new Configuration.Transaction();
+		transaction.timeoutInSeconds = 3600;
+		
 		install(new TransactionalModule());
 		install(new JerseyServletModule());
 		
 		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
+		bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(transaction));
 		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
 		databaseDrivers.addBinding().to(H2DriverConfiguration.class);
 		bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);

@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.annotations.transactional;
 
+import static org.easymock.EasyMock.createNiceMock;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
@@ -43,15 +44,18 @@ import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.configuration.TestConfigurationModule;
-import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.Configuration;
+import org.obm.StaticConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.sync.LifecycleListener;
+import org.slf4j.Logger;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
+import com.google.inject.name.Names;
 import com.linagora.obm.sync.Producer;
 
 @GuiceModule(HornetQTransactionalModeTest.Module.class)
@@ -68,10 +72,12 @@ public class HornetQTransactionalModeTest {
 		
 		@Override
 		protected void configure() {
-			TransactionConfiguration transactionConfiguration = new TestTransactionConfiguration();
+			Configuration.Transaction transaction = new Configuration.Transaction();
+			transaction.timeoutInSeconds = 3600;
 			install(new TransactionalModule());
-			install(new TestConfigurationModule(transactionConfiguration));
 			install(messageQueueModule);
+			bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(transaction));
+			bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(createNiceMock(Logger.class));
 		}
 	}
 	

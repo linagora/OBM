@@ -58,6 +58,7 @@ public class ServicesTestModule extends AbstractModule {
 		configuration.obmUiBaseUrl = "localhost";
 		configuration.locator.url = "localhost";
 		configuration.dataDir = Files.createTempDir();
+		configuration.transaction.timeoutInSeconds = 3600;
 	}
 
 	@Override

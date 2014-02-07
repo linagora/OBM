@@ -46,8 +46,6 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
-import org.obm.configuration.TestTransactionConfiguration;
-import org.obm.configuration.TransactionConfiguration;
 import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.ActiveSyncServletModule;
 import org.obm.push.bean.ChangedCollections;
@@ -70,14 +68,13 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	protected final ClassToInstanceAgregateView<Object> mockMap;
 	protected final IMocksControl mocksControl;
 	protected final Configuration configuration;
-	private final TransactionConfiguration transactionConfiguration;
 	
 	public AbstractOpushEnv() {
 		mockMap = new ClassToInstanceAgregateView<Object>();
 		mocksControl = createControl();
 		configuration = new Configuration();
 		configuration.dataDir = Files.createTempDir();
-		transactionConfiguration = new TestTransactionConfiguration();
+		configuration.transaction.timeoutInSeconds = 3600;
 	}
 
 	@Provides
@@ -131,7 +128,7 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 					.mainConfiguration(new StaticConfigurationService(configuration))
 					.locatorConfiguration(new StaticConfigurationService.Locator(configuration.locator))
 					.databaseConfiguration(databaseConfiguration())
-					.transactionConfiguration(transactionConfiguration)
+					.transactionConfiguration(new StaticConfigurationService.Transaction(configuration.transaction))
 					.build();
 	}
 	

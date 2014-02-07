@@ -28,6 +28,11 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>configuration-test</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>arquillian-bundle</artifactId>
 			<version>${obm.version}</version>
@@ -46,12 +51,6 @@
                 <dependency>
                         <groupId>com.linagora.obm</groupId>
                         <artifactId>dbcp</artifactId>
-                        <version>${obm.version}</version>
-                        <type>test-jar</type>
-                </dependency>
-                <dependency>
-                        <groupId>com.linagora.obm</groupId>
-                        <artifactId>configuration</artifactId>
                         <version>${obm.version}</version>
                         <type>test-jar</type>
                 </dependency>

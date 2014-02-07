@@ -34,7 +34,6 @@ package org.obm.locator;
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.LocatorConfiguration;
-import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.dao.utils.H2ConnectionProvider;
@@ -51,13 +50,15 @@ import com.google.inject.util.Modules;
 public class TestLocatorModule extends AbstractModule {
 
 	private final Configuration configuration;
-	private final TestTransactionConfiguration transactionConfiguration;
+	private final TransactionConfiguration transactionConfiguration;
 
 	public TestLocatorModule() {
 		configuration = new Configuration();
 		configuration.locator.port = 0;
 		configuration.dataDir = Files.createTempDir();
-		transactionConfiguration = new TestTransactionConfiguration();
+		Configuration.Transaction transaction = new Configuration.Transaction();
+		transaction.timeoutInSeconds = 3600;
+		transactionConfiguration = new StaticConfigurationService.Transaction(transaction);
 	}
 	
 	@Override

@@ -44,7 +44,8 @@ import javax.transaction.TransactionManager;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
-import org.obm.configuration.TestTransactionConfiguration;
+import org.obm.Configuration;
+import org.obm.StaticConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
 
 import com.google.inject.AbstractModule;
@@ -159,9 +160,13 @@ public class TransactionalTest {
 
 			@Override
 			protected void configure() {
+				Configuration.Transaction transactionConfiguration = new Configuration.Transaction();
+				transactionConfiguration.timeoutInSeconds = 3600;
+
 				bind(TransactionProvider.class).toInstance(provider);
 				bind(ITransactionAttributeBinder.class).to(TransactionalBinder.class);
-				bind(TransactionConfiguration.class).to(TestTransactionConfiguration.class);
+				bind(TransactionConfiguration.class).toInstance(
+						new StaticConfigurationService.Transaction(transactionConfiguration));
 				TransactionalInterceptor transactionalInterceptor = new TransactionalInterceptor();
 				bindInterceptor(Matchers.any(), 
 						Matchers.annotatedWith(Transactional.class), 

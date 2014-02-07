@@ -104,6 +104,7 @@
 		<module>message-queue</module>
 		<module>opush</module>	
 		<module>configuration</module>
+		<module>configuration-test</module>
 		<module>obm-locator</module>
 		<module>utils</module>
 		<module>dbcp</module>

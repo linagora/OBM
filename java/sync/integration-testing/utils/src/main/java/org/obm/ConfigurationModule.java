@@ -32,7 +32,6 @@
 package org.obm;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 
 import com.google.inject.AbstractModule;
@@ -47,13 +46,7 @@ public final class ConfigurationModule extends AbstractModule {
 
 	public ConfigurationModule(Configuration configuration) {
 		this.configurationService = new StaticConfigurationService(configuration);
-		this.transactionConfiguration = new DefaultTransactionConfiguration.Factory()
-			.create(configuration.applicationName, configurationService);
-	}
-	
-	public ConfigurationModule(Configuration configuration, TransactionConfiguration transactionConfiguration) {
-		this.configurationService = new StaticConfigurationService(configuration);
-		this.transactionConfiguration= transactionConfiguration;
+		this.transactionConfiguration = new StaticConfigurationService.Transaction(configuration.transaction);
 	}
 	
 	@Override
