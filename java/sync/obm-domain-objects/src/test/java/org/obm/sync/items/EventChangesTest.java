@@ -49,7 +49,7 @@ import org.obm.sync.calendar.EventPrivacy;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
-import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.user.Users;
 
 public class EventChangesTest {
 
@@ -191,7 +191,7 @@ public class EventChangesTest {
 				.updates(Sets.newHashSet(publicEvent, privateAnonymizedEvent))
 				.build();
 
-		assertThat(eventChanges.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(expectedChanges);
+		assertThat(eventChanges.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(expectedChanges);
 	}
 
 	@Test

@@ -60,13 +60,6 @@
 		</dependency>
         <dependency>
             <groupId>com.linagora.obm</groupId>
-            <artifactId>obm-domain-objects</artifactId>
-            <version>${obm.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>com.linagora.obm</groupId>
             <artifactId>dbcp</artifactId>
             <version>${obm.version}</version>
         </dependency>
@@ -100,6 +93,12 @@
             <groupId>com.linagora.obm</groupId>
             <artifactId>obm-domain-objects</artifactId>
             <version>${obm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.linagora.obm</groupId>
+            <artifactId>obm-domain-objects-test</artifactId>
+            <version>${obm.version}</version>
+	    <scope>test</scope>
         </dependency>
    	</dependencies>
 

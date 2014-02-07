@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 import org.obm.provisioning.ProfileName;
 
-import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.domain.Domains;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 
@@ -211,10 +211,10 @@ public class ObmUserTest {
 					.addAddress("jdoe")
 					.addAddress("john.doe")
 					.quota(500)
-					.domain(ToolBox.getDefaultObmDomain())
+					.domain(Domains.linagora)
 					.build())
 				.archived(true)
-				.domain(ToolBox.getDefaultObmDomain())
+				.domain(Domains.linagora)
 				.hidden(true)
 				.build();
 
@@ -227,10 +227,10 @@ public class ObmUserTest {
 				.builder()
 				.uid(1)
 				.login(validLogin)
-				.domain(ToolBox.getDefaultObmDomain())
+				.domain(Domains.linagora)
 				.emails(UserEmails.builder()
 					.quota(123)
-					.domain(ToolBox.getDefaultObmDomain())
+					.domain(Domains.linagora)
 					.build())
 				.build();
 
@@ -243,7 +243,7 @@ public class ObmUserTest {
 				.builder()
 				.uid(1)
 				.login(validLogin)
-				.domain(ToolBox.getDefaultObmDomain())
+				.domain(Domains.linagora)
 				.build();
 
 		assertThat(user.getMailQuota()).isNull();
@@ -255,7 +255,7 @@ public class ObmUserTest {
 				.builder()
 				.uid(1)
 				.login(validLogin)
-				.domain(ToolBox.getDefaultObmDomain())
+				.domain(Domains.linagora)
 				.build();
 
 		assertThat(user.isArchived()).isFalse();
@@ -267,7 +267,7 @@ public class ObmUserTest {
 				.builder()
 				.uid(1)
 				.login(validLogin)
-				.domain(ToolBox.getDefaultObmDomain())
+				.domain(Domains.linagora)
 				.archived(true)
 				.build();
 
@@ -280,7 +280,7 @@ public class ObmUserTest {
 				.builder()
 				.uid(1)
 				.login(validLogin)
-				.domain(ToolBox.getDefaultObmDomain())
+				.domain(Domains.linagora)
 				.archived(false)
 				.build();
 

@@ -96,6 +96,7 @@
 
 	<modules>
 		<module>obm-domain-objects</module>
+		<module>obm-domain-objects-test</module>
 		<module>client</module>
 		<module>services-module</module>
 		<module>services-webapp</module>

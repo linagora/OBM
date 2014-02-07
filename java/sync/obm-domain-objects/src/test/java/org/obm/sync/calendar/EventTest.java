@@ -52,7 +52,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.user.Users;
 
 
 public class EventTest {
@@ -656,8 +656,16 @@ public class EventTest {
 	}
 
 	private Event createEventWithNegativeExceptions(Date eventDate, int sequence, Date... negativeExceptions) {
-		Event event = ToolBox.getFakeDailyRecurrentEvent(eventDate, sequence);
-		event.getRecurrence().setExceptions(Arrays.asList(negativeExceptions));
+		Event event = new Event();
+		event.setStartDate(eventDate);
+		event.setSequence(sequence);
+		event.setExtId(new EventExtId("extId"));
+
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setExceptions(Arrays.asList(negativeExceptions));
+		
+		event.setRecurrence(recurrence);
 		return event;
 	}
 
@@ -1309,7 +1317,7 @@ public class EventTest {
 	public void testAnonymizePublicEvent() {
 		Event publicEvent = createNonRecurrentEventWithMostFields();
 
-		assertThat(publicEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(publicEvent);
+		assertThat(publicEvent.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(publicEvent);
 	}
 
 	@Test
@@ -1317,7 +1325,7 @@ public class EventTest {
 		Event confidentialEvent = createNonRecurrentEventWithMostFields();
 		confidentialEvent.setPrivacy(EventPrivacy.CONFIDENTIAL);
 
-		assertThat(confidentialEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(confidentialEvent);
+		assertThat(confidentialEvent.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(confidentialEvent);
 	}
 
 	@Test
@@ -1327,7 +1335,7 @@ public class EventTest {
 
 		Event privateAnonymizedEvent = createPrivateAnonymizedEvent();
 
-		assertThat(privateEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(privateAnonymizedEvent);
+		assertThat(privateEvent.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(privateAnonymizedEvent);
 	}
 
 	@Test
@@ -1335,7 +1343,7 @@ public class EventTest {
 		Event privateEvent = createNonRecurrentEventWithMostFields();
 		privateEvent.setPrivacy(EventPrivacy.PRIVATE);
 
-		assertThat(privateEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser()).isAnonymized()).isTrue();
+		assertThat(privateEvent.anonymizePrivateItems(Users.userAtLinagora).isAnonymized()).isTrue();
 	}
 
 	@Test
@@ -1352,7 +1360,7 @@ public class EventTest {
 
 		publicEvent.setRecurrence(recurrence);
 
-		assertThat(publicEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(publicEvent);
+		assertThat(publicEvent.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(publicEvent);
 	}
 
 	@Test
@@ -1382,7 +1390,7 @@ public class EventTest {
 
 		privateAnonymizedEvent.setRecurrence(anonymizedRecurrence);
 
-		assertThat(privateEvent.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(privateAnonymizedEvent);
+		assertThat(privateEvent.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(privateAnonymizedEvent);
 	}
 
 	@Test

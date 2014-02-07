@@ -47,7 +47,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.user.Users;
 
 public class EventRecurrenceTest {
 
@@ -270,7 +270,7 @@ public class EventRecurrenceTest {
 				publicEventException2));
 		recurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
 
-		Assertions.assertThat(recurrence.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(recurrence);
+		Assertions.assertThat(recurrence.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(recurrence);
 	}
 
 	@Test
@@ -328,7 +328,7 @@ public class EventRecurrenceTest {
 				privateAnonymizedEventException2));
 		anonymizedRecurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
 
-		Assertions.assertThat(recurrence.anonymizePrivateItems(ToolBox.getDefaultObmUser())).isEqualTo(anonymizedRecurrence);
+		Assertions.assertThat(recurrence.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(anonymizedRecurrence);
 	}
 
 	private EventRecurrence getOneDailyEventRecurence() {

@@ -39,7 +39,7 @@ import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.sync.Right;
 
-import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.domain.Domains;
 import fr.aliacom.obm.common.profile.Profile.AccessRestriction;
 import fr.aliacom.obm.common.profile.Profile.AdminRealm;
 
@@ -54,7 +54,7 @@ public class ProfileTest {
 				.builder()
 				.id(ProfileId.valueOf("1"))
 				.name(ProfileName.valueOf("profile"))
-				.domain(ToolBox.getDefaultObmDomain())
+				.domain(Domains.linagora)
 				.level(0)
 				.managePeers(true)
 				.adminRealms(AdminRealm.USER, AdminRealm.DOMAIN)
@@ -73,7 +73,7 @@ public class ProfileTest {
 
 		assertThat(profile.getId().getId()).isEqualTo(1);
 		assertThat(profile.getName().getName()).isEqualTo("profile");
-		assertThat(profile.getDomain()).isEqualTo(ToolBox.getDefaultObmDomain());
+		assertThat(profile.getDomain()).isEqualTo(Domains.linagora);
 		assertThat(profile.getTimecreate()).isEqualTo(date);
 		assertThat(profile.getTimeupdate()).isEqualTo(date);
 		assertThat(profile.getLevel()).isEqualTo(0);
@@ -91,7 +91,7 @@ public class ProfileTest {
 		Profile
 			.builder()
 			.name(ProfileName.valueOf("profile"))
-			.domain(ToolBox.getDefaultObmDomain())
+			.domain(Domains.linagora)
 			.level(0)
 			.timecreate(date)
 			.timeupdate(date)
@@ -103,7 +103,7 @@ public class ProfileTest {
 		Profile
 			.builder()
 			.id(ProfileId.valueOf("1"))
-			.domain(ToolBox.getDefaultObmDomain())
+			.domain(Domains.linagora)
 			.level(0)
 			.timecreate(date)
 			.timeupdate(date)
@@ -128,7 +128,7 @@ public class ProfileTest {
 			.builder()
 			.id(ProfileId.valueOf("1"))
 			.name(ProfileName.valueOf("profile"))
-			.domain(ToolBox.getDefaultObmDomain())
+			.domain(Domains.linagora)
 			.timecreate(date)
 			.timeupdate(date)
 			.build();

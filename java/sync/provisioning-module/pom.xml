@@ -125,10 +125,9 @@
         </dependency>
         <dependency>
             <groupId>com.linagora.obm</groupId>
-            <artifactId>obm-domain-objects</artifactId>
+            <artifactId>obm-domain-objects-test</artifactId>
             <version>${obm.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
+	    <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.linagora.obm</groupId>
