@@ -32,6 +32,7 @@
 
 package org.obm.dbcp.jdbc;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 import org.obm.configuration.DatabaseConfiguration;
@@ -82,5 +83,10 @@ public class H2DriverConfiguration implements DatabaseDriverConfiguration {
 	@Override
 	public String getIntegerCastType() {
 		return "INTEGER";
+	}
+	
+	@Override
+	public Object getJDBCObject(String type, String value) throws SQLException {
+		return value;
 	}
 }

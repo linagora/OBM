@@ -32,6 +32,7 @@
 
 package org.obm.dbcp.jdbc;
 
+import java.sql.SQLException;
 import java.util.Map;
 
 import org.obm.configuration.DatabaseConfiguration;
@@ -101,5 +102,10 @@ public class MySQLDriverConfiguration implements DatabaseDriverConfiguration {
 	@Override
 	public String getIntegerCastType() {
 		return "UNSIGNED INTEGER";
+	}
+	
+	@Override
+	public Object getJDBCObject(String type, String value) throws SQLException {
+		return value;
 	}
 }

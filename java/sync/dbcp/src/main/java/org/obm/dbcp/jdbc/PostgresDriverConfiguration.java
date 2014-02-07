@@ -32,6 +32,8 @@
 
 package org.obm.dbcp.jdbc;
 
+import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.util.Map;
 
 import org.obm.configuration.DatabaseConfiguration;
@@ -83,5 +85,19 @@ public class PostgresDriverConfiguration implements DatabaseDriverConfiguration 
 	@Override
 	public String getIntegerCastType() {
 		return "INTEGER";
+	}
+	
+	@Override
+	public Object getJDBCObject(String type, String value) throws SQLException {
+		try {
+			Object o = Class.forName("org.postgresql.util.PGobject").newInstance();
+			Method setType = o.getClass().getMethod("setType", String.class);
+			Method setValue = o.getClass().getMethod("setValue", String.class);
+			setType.invoke(o, type);
+			setValue.invoke(o, value);
+			return o;
+		} catch (Throwable e) {
+			throw new SQLException(e.getMessage(), e);
+		}
 	}
 }
