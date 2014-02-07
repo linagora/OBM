@@ -31,10 +31,7 @@ obmconf="/etc/obm/obm-rpm.conf"
 REP_DOC="/usr/share/doc"
 REP_SCRIPTS_OBM="/usr/share/obm/scripts/creation"
 SCRIPT_INSTALL="$REP_SCRIPTS_OBM/install_obmdb.sh"
-SCRIPT_RC_INSTALL="$REP_SCRIPTS_OBM/install_roundcubedb_2.4.sh"
-SCRIPT_UPDATE="$REP_SCRIPTS_OBM/update-$FROM_VER-$TO_VER.sh"
 LIB_ADMIN_MY="/usr/bin/myadmin.lib"
-RC_DBNAME="roundcubemail"
 
 echo "================= OBM MySQL configuration =================="
 echo
@@ -121,18 +118,6 @@ else
         $SCRIPT_INSTALL
         popd 1>/dev/null
 
-fi
-
-# Check if roundcube database already exist
-CHECKDB=`${MYSQL_CMD} -e "SHOW DATABASES"| grep ^${RC_DBNAME}$`
-if [ "$CHECKDB" = "${RC_DBNAME}" ] ; then
-       echo "${RC_DBNAME} database already exist, skipping."
-else
-       echo "Installing ${RC_DBNAME} database."
-       fix_my_perms ${RC_DBNAME} ${OBM_DBUSER} ${OBM_PASSWD}
-       pushd $REP_SCRIPTS_OBM 1>/dev/null
-       $SCRIPT_RC_INSTALL
-       popd 1>/dev/null
 fi
 
 echo
