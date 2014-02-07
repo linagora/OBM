@@ -92,7 +92,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>common</artifactId>
+			<artifactId>obm-domain-objects</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>

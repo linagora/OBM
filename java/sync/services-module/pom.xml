@@ -60,12 +60,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>common</artifactId>
+			<artifactId>obm-domain-objects</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>common</artifactId>
+			<artifactId>obm-domain-objects</artifactId>
 			<version>${obm.version}</version>
 			<classifier>tests</classifier>
 			<scope>test</scope>

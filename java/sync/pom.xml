@@ -95,7 +95,7 @@
 	</pluginRepositories>
 
 	<modules>
-		<module>common</module>
+		<module>obm-domain-objects</module>
 		<module>client</module>
 		<module>services-module</module>
 		<module>services-webapp</module>
