@@ -139,14 +139,13 @@
             <artifactId>obm-dao</artifactId>
             <version>${obm.version}</version>
         </dependency>
-	<dependency>
-		<groupId>com.linagora.obm</groupId>
-		<artifactId>dbcp</artifactId>
-		<version>${obm.version}</version>
-		<type>test-jar</type>
-		<scope>test</scope>
-	</dependency>
-		    <dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-dao-test</artifactId>
+			<version>${obm.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
 			<version>${obm.version}</version>

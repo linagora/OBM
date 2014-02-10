@@ -51,7 +51,6 @@ import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
 import org.postgresql.util.PGobject;
 import org.slf4j.Logger;
@@ -229,17 +228,6 @@ public class DatabaseConnectionProviderImplTest {
 		control.replay();
 		databaseConnectionProvider(poolingDataSource());
 		testee.setConnectionReadOnlyIfNecessary(connection);
-	}
-	
-	@Test
-	public void testGetJdbcObjectWhenH2() throws SQLException {
-		databaseConfiguration = new DatabaseConfigurationFixtureH2();
-		databaseDriverConfigurationProvider = new DatabaseDriverConfigurationProvider(ImmutableSet.<DatabaseDriverConfiguration>of(new H2DriverConfiguration()), databaseConfiguration);
-		
-		control.replay();
-		databaseConnectionProvider(poolingDataSource());
-		Object aTree = testee.getJdbcObject("type", "aChristmasTree");
-		assertThat(aTree).isEqualTo("aChristmasTree");
 	}
 	
 	@Test

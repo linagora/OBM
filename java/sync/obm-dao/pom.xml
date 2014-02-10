@@ -63,13 +63,6 @@
             <artifactId>dbcp</artifactId>
             <version>${obm.version}</version>
         </dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>dbcp</artifactId>
-			<version>${obm.version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
