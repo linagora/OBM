@@ -64,10 +64,10 @@ test $? -eq 0 || {
 echo "UPDATE UserObmPref set userobmpref_value='$obm_lang' where userobmpref_option='set_lang'" | mysql -u $user -p$pw $db 
 
 mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
-  < "../2.6/updates/update-2.6.0~1.mysql.sql" >> /tmp/data_insert.log 2>&1
-
+  < "../2.5/updates/update-2.5.7~1.mysql.sql" >> /tmp/data_insert.log 2>&1
 
 mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
-  < "updates/update-2.5.7~1.mysql.sql" >> /tmp/data_insert.log 2>&1
+  < "../2.6/updates/update-2.6.0~1.mysql.sql" >> /tmp/data_insert.log 2>&1
+
 
 echo "DONE."
