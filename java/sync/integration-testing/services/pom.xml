@@ -63,12 +63,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>services-module</artifactId>
-			<version>${obm.version}</version>
-			<type>test-jar</type>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
 			<artifactId>client</artifactId>
 			<version>${obm.version}</version>
 			<scope>test</scope>
