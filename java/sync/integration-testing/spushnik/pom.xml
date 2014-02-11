@@ -44,7 +44,6 @@
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>spushnik-module</artifactId>
 			<version>${obm.version}</version>
-			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
