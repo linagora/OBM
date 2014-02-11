@@ -52,7 +52,7 @@ public class EmbeddedLdapModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
-		bind(Configuration.class).to(StaticConfiguration.class);
+		bind(Configuration.class).toInstance(new LdapConfiguration("cn=directory manager", "secret", 0));
 	}
 	
 	@Provides @Singleton

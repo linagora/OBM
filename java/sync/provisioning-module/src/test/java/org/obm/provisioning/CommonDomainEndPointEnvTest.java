@@ -74,8 +74,8 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.ldap.client.Configuration;
+import org.obm.provisioning.ldap.client.LdapConfiguration;
 import org.obm.provisioning.ldap.client.LdapService;
-import org.obm.provisioning.ldap.client.StaticConfiguration;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
 import org.obm.push.utils.UUIDFactory;
@@ -146,7 +146,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(DateProvider.class).toInstance(mocksControl.createMock(DateProvider.class));
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
 					bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
-					bind(Configuration.class).to(StaticConfiguration.class);
+					bind(Configuration.class).toInstance(new LdapConfiguration("cn=directory manager", "secret", 0));
 					bind(LdapService.class).toInstance(mocksControl.createMock(LdapService.class));
 					bind(BatchTracker.class).toInstance(mocksControl.createMock(BatchTracker.class));
 				}

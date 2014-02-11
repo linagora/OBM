@@ -902,7 +902,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testRestartOnRequestCounterReached() {
-		MyConnection myConnection = new MyConnection(new OneRequestCounterConfiguration(), getNetworkConfiguration());
+		MyConnection myConnection = new MyConnection(new LdapConfiguration("cn=directory manager", "secret", 1), getNetworkConfiguration());
 
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
@@ -945,12 +945,5 @@ public class ConnectionImplTest {
 		}
 	}
 	
-	private class OneRequestCounterConfiguration extends StaticConfiguration {
 
-		@Override
-		public int maxRequests() {
-			return 1;
-		}
-		
-	}
 }

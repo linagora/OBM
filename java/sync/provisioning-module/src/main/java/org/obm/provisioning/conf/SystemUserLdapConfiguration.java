@@ -29,84 +29,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.conf;
 
-import org.apache.directory.api.ldap.model.exception.LdapInvalidDnException;
-import org.apache.directory.api.ldap.model.message.SearchScope;
-import org.apache.directory.api.ldap.model.name.Dn;
-import org.obm.provisioning.ldap.client.Configuration;
-import org.obm.provisioning.ldap.client.bean.LdapDomain;
-import org.obm.provisioning.ldap.client.bean.LdapGroup;
-import org.obm.provisioning.ldap.client.bean.LdapUser;
-
-import com.google.common.base.Throwables;
+import org.obm.provisioning.ldap.client.LdapConfiguration;
 
 import fr.aliacom.obm.common.system.ObmSystemUser;
 
-public class SystemUserLdapConfiguration implements Configuration {
-
-	private final ObmSystemUser ldapSystemUser;
+public class SystemUserLdapConfiguration extends LdapConfiguration {
 
 	public SystemUserLdapConfiguration(ObmSystemUser systemUser) {
-		this.ldapSystemUser = systemUser;
+		super(String.format("uid=%s,ou=sysusers,dc=local", systemUser.getLogin()), systemUser.getPassword(), 1);
 	}
-
-	@Override
-	public int maxRequests() {
-		return 1;
-	}
-
-	@Override
-	public Dn getBindDn() {
-		try {
-			return new Dn(String.format("uid=%s,ou=sysusers,dc=local", ldapSystemUser.getLogin()));
-		}
-		catch (LdapInvalidDnException e) {
-			throw Throwables.propagate(e);
-		}
-	}
-
-	@Override
-	public String getBindPassword() {
-		return ldapSystemUser.getPassword();
-	}
-
-	@Override
-	public Dn getUserBaseDn(LdapDomain domain) {
-		try {
-			return new Dn(String.format("ou=users,dc=%s,dc=local", domain.get()));
-		}
-		catch (LdapInvalidDnException e) {
-			throw Throwables.propagate(e);
-		}
-	}
-
-	@Override
-	public String buildUserFilter(LdapUser.Uid userId) {
-		return "(uid=" + userId.get() + ")";
-	}
-
-	@Override
-	public SearchScope getUserSearchScope() {
-		return SearchScope.ONELEVEL;
-	}
-
-	@Override
-	public Dn getGroupBaseDn(LdapDomain domain) {
-		try {
-			return new Dn(String.format("ou=groups,dc=%s,dc=local", domain.get())); // TODO: This si dependant on the Domain
-		}
-		catch (LdapInvalidDnException e) {
-			throw Throwables.propagate(e);
-		}
-	}
-
-	@Override
-	public String buildGroupFilter(LdapGroup.Cn groupCn) {
-		return "(cn=" + groupCn.get() + ")";
-	}
-
-	@Override
-	public SearchScope getGroupSearchScope() {
-		return SearchScope.ONELEVEL;
-	}
-
 }
