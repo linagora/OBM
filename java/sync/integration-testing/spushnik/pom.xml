@@ -77,7 +77,6 @@
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>opush-integration-testing</artifactId>
 			<version>${obm.version}</version>
-			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
