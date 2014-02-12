@@ -38,11 +38,14 @@ import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.SyncPermsConfigurationService;
-import org.obm.push.EhCacheStoresPercentageLoader;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfiguration;
+import org.obm.push.store.ehcache.EhCacheStores;
+import org.obm.push.utils.ShareAmount;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
 
 public class OpushStaticConfigurationService extends StaticConfigurationService {
 
@@ -100,7 +103,14 @@ public class OpushStaticConfigurationService extends StaticConfigurationService 
 
 		public EhCache(Configuration.EhCache configuration) {
 			this.configuration = configuration;
-			percentageByStoreMap = EhCacheStoresPercentageLoader.loadStoresPercentage();
+			this.percentageByStoreMap = Maps.transformValues(
+					ShareAmount.forEntries(EhCacheStores.STORES).amount(100),
+					new Function<Integer, Percentage>() {
+						@Override
+						public Percentage apply(Integer input) {
+							return Percentage.of(input);
+						}
+					});
 		}
 
 		@Override

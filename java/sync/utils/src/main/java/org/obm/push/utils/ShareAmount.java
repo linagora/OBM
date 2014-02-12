@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,36 +29,58 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.push.utils;
 
+import java.util.Collection;
 import java.util.Map;
 
-import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
-import org.obm.push.store.ehcache.EhCacheStores;
-
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
-public class EhCacheStoresPercentageLoader {
+public class ShareAmount<T> {
 
-	private static final int NUMBER_OF_STORES = EhCacheStores.STORES.size();
-	private static final int ONE_HUNDRED = 100;
-	private static final int AVERAGE_VALUE = ONE_HUNDRED / NUMBER_OF_STORES;
+	private Collection<T> entries;
 
-	public static Map<String, Percentage> loadStoresPercentage() {
-		
-		return Maps.newHashMap(Maps.toMap(EhCacheStores.STORES, 
-				new Function<String, Percentage>() {
-					private int decrementStoreCount = NUMBER_OF_STORES;
-					
+	public static <T> ShareAmount<T> forEntries(Collection<T> entries) {
+		Preconditions.checkNotNull(entries);
+		Preconditions.checkArgument(!entries.isEmpty());
+		return new ShareAmount<T>(entries);
+	}
+	
+	private ShareAmount(Collection<T> entries) {
+		this.entries = entries;
+	}
+
+	public Map<T, Integer> amount(final int amount) {
+		return Maps.newHashMap(Maps.toMap(entries, 
+				new Function<T, Integer>() {
+					int amountLeft = amount;
+					int entriesLeft = entries.size();
+			
 					@Override
-					public Percentage apply(String name) {
-						decrementStoreCount--;
-						if (decrementStoreCount == 0) { // Last store takes remaining percentage 
-							return Percentage.of(ONE_HUNDRED - AVERAGE_VALUE * (NUMBER_OF_STORES - 1));
+					public Integer apply(T entry) {
+						try {
+							int ceiledAverage = ceiledAverage(amountLeft, entriesLeft);
+							if (amountLeft >= ceiledAverage) {
+								amountLeft -= ceiledAverage;
+								return ceiledAverage;
+							} else {
+								int returnValue = amountLeft;
+								amountLeft = 0;
+								return returnValue;
+							}
+						} finally {
+							entriesLeft--;
 						}
-						return Percentage.of(AVERAGE_VALUE);
 					}
 				}));
+	}
+
+	private int ceiledAverage(int amount, int entriesCount) {
+		return Double.valueOf(
+					Math.ceil(
+						Double.valueOf(amount) / entriesCount))
+				.intValue();
 	}
 }

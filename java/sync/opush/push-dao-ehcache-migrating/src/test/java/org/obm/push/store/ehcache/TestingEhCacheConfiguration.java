@@ -1,3 +1,4 @@
+package org.obm.push.store.ehcache;
 /* ***** BEGIN LICENSE BLOCK *****
  * 
  * Copyright (C) 2013-2014  Linagora
@@ -29,7 +30,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.store.ehcache;
+
 
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 	private int statsShortSamplingTimeInSeconds;
 	private int statsMediumSamplingTimeInSeconds;
 	private int statsLongSamplingTimeInSeconds;
-	private Map<String, Percentage> stores;
+	private Map<String, Percentage> stores = Maps.newHashMap();
 	private TransactionalMode transactionalMode;
 
 	public TestingEhCacheConfiguration() {
@@ -57,15 +58,14 @@ public class TestingEhCacheConfiguration implements EhCacheConfiguration {
 		maxMemoryInMB = JvmUtils.maxRuntimeJvmMemoryInMB() / 2;
 		timeToLive = 60;
 		statsShortSamplingTimeInSeconds = 1;
-		stores = Maps.newHashMap(
-					Maps.transformValues(
-						ShareAmount.forEntries(EhCacheStores.STORES).amount(100),
-						new Function<Integer, Percentage>() {
-							@Override
-							public Percentage apply(Integer input) {
-								return Percentage.of(input);
-							}
-						}));
+		stores = Maps.transformValues(
+				ShareAmount.forEntries(EhCacheStores.STORES).amount(100),
+				new Function<Integer, Percentage>() {
+					@Override
+					public Percentage apply(Integer input) {
+						return Percentage.of(input);
+					}
+				});
 		transactionalMode = TransactionalMode.XA;
 	}
 	

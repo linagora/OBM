@@ -75,13 +75,6 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-dao-ehcache</artifactId>
-			<version>${obm.version}</version>
-			<type>test-jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>arquillian-bundle</artifactId>
 			<version>${obm.version}</version>
