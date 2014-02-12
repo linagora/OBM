@@ -36,11 +36,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>java-mail</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-dao-jdbc</artifactId>
 			<version>${obm.version}</version>
 		</dependency>

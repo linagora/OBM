@@ -35,29 +35,22 @@ import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
-import org.obm.configuration.VMArgumentsUtils;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
-import org.obm.push.java.mail.ImapModule;
 import org.obm.push.store.ehcache.EhCacheDaoModule;
 import org.obm.push.store.jdbc.JdbcDaoModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
 
 public class OpushModule extends AbstractModule {
 
-	private final static String JAVA_MAIL_MODULE = "javaMail";
 	private static final String APPLICATION_NAME = "opush";
 	private static final String GLOBAL_CONFIGURATION_FILE = ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH;
 
-	private static final Logger logger = LoggerFactory.getLogger(LoggerModule.CONFIGURATION);
 	private final GlobalAppConfiguration<ConfigurationService> globalConfiguration;
 	private Module databaseModule;
 	
@@ -82,7 +75,7 @@ public class OpushModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
-		installImapModule();
+		install(new LinagoraImapModule());
 		install(new OpushImplModule(globalConfiguration));
 		install(new OpushMailModule());
 		install(new ObmBackendModule());
@@ -96,26 +89,4 @@ public class OpushModule extends AbstractModule {
 		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(false);
  	}
 
-	private void installImapModule() {
-		String imapModuleName = VMArgumentsUtils.stringArgumentValue(OptionalVMArguments.BACKEND_EMAIL_NAME);
-		install(imapModule(imapModuleName));
-	}
-	
-	private AbstractModule imapModule(String imapModuleName) {
-		if (Strings.isNullOrEmpty(imapModuleName)) {
-			return defaultImapModule();
-		}
-		
-		if (JAVA_MAIL_MODULE.equals(imapModuleName)) {
-			logger.debug("Using java mail imap module");
-			return new ImapModule();
-		}
-		
-		return defaultImapModule();
-	}
-	
-	private AbstractModule defaultImapModule() {
-		logger.debug("Using default imap module");
-		return new LinagoraImapModule();
-	}
 }

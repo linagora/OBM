@@ -34,11 +34,9 @@ package org.obm.opush.env;
 import org.easymock.IMocksControl;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.guice.AbstractOverrideModule;
-import org.obm.opush.CountingImapStore;
 import org.obm.opush.CountingMinigStoreClient;
 import org.obm.opush.CountingStoreClient;
 import org.obm.push.exception.OpushLocatorException;
-import org.obm.push.java.mail.ImapStore;
 import org.obm.push.mail.greenmail.GreenMailEmailConfiguration;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
 import org.obm.push.mail.greenmail.GreenMailSmtpProvider;
@@ -73,7 +71,6 @@ public class GreenMailEnvModule extends AbstractOverrideModule {
 		bindImapTimeout();
 		bind(SmtpProvider.class).to(GreenMailSmtpProvider.class);
 
-		bind(ImapStore.Factory.class).to(CountingImapStore.Factory.class);
 		bind(MinigStoreClient.Factory.class).to(CountingMinigStoreClient.Factory.class);
 		bind(StoreClient.Factory.class).to(CountingStoreClient.Factory.class);
 	}
