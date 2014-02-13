@@ -44,9 +44,6 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
-import org.obm.push.exception.OpushLocatorException;
-import org.obm.push.mail.IMAPException;
-import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.minig.imap.ImapTestUtils;
 import org.obm.push.minig.imap.StoreClient;
 
@@ -57,7 +54,7 @@ import com.icegreen.greenmail.util.GreenMail;
 @RunWith(GuiceRunner.class)
 public class UIDFetchMessageTest {
 
-	@Inject MinigStoreClient.Factory storeClientFactory;
+	@Inject StoreClient.Factory storeClientFactory;
 	@Inject GreenMail greenMail;
 	
 	private String mailbox;
@@ -73,10 +70,10 @@ public class UIDFetchMessageTest {
 		client = loggedClient();
 	}
 	
-	private StoreClient loggedClient() throws OpushLocatorException, IMAPException  {
-		MinigStoreClient newMinigStoreClient = storeClientFactory.create(greenMail.getImap().getBindTo(), mailbox, password);
-		newMinigStoreClient.login(false);
-		return newMinigStoreClient.getStoreClient();
+	private StoreClient loggedClient() throws Exception  {
+		StoreClient storeClient = storeClientFactory.create(greenMail.getImap().getBindTo(), mailbox, password);
+		storeClient.login(false);
+		return storeClient;
 	}
 
 	@After
@@ -149,7 +146,7 @@ public class UIDFetchMessageTest {
 		assertThat(IOUtils.toByteArray(uidFetchMessage)).isEmpty();
 	}
 
-	private InputStream uidFetchMessage(long uid) throws OpushLocatorException, IMAPException {
+	private InputStream uidFetchMessage(long uid) throws Exception {
 		StoreClient client = loggedClient();
 		client.select(EmailConfiguration.IMAP_INBOX_NAME);
 		return client.uidFetchMessage(uid);

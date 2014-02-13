@@ -45,7 +45,6 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.push.mail.Mime4jUtils;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
-import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.minig.imap.ImapTestUtils;
 import org.obm.push.minig.imap.StoreClient;
 
@@ -56,7 +55,7 @@ import com.icegreen.greenmail.util.GreenMail;
 @RunWith(GuiceRunner.class)
 public class UIDFetchPartTest {
 
-	@Inject MinigStoreClient.Factory storeClientFactory;
+	@Inject StoreClient.Factory storeClientFactory;
 	@Inject LinagoraImapClientProvider clientProvider;
 	@Inject GreenMail greenMail;
 	@Inject Mime4jUtils mime4jUtils;
@@ -79,9 +78,9 @@ public class UIDFetchPartTest {
 	}
 	
 	private StoreClient loggedClient() throws Exception  {
-		MinigStoreClient newMinigStoreClient = storeClientFactory.create(greenMail.getImap().getBindTo(), mailbox, password);
-		newMinigStoreClient.login(false);
-		return newMinigStoreClient.getStoreClient();
+		StoreClient storeClient = storeClientFactory.create(greenMail.getImap().getBindTo(), mailbox, password);
+		storeClient.login(false);
+		return storeClient;
 	}
 	
 	
