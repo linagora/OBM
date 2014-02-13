@@ -12,6 +12,7 @@ public class ExternalProcessMailEnvModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		install(new LinagoraImapModule());
+		install(new org.obm.push.mail.MailEnvModule(3600000));
 		install(new ExternalGreenMailModule());
 		
 		bind(ICollectionPathHelper.class).to(CollectionPathHelper.class);

@@ -81,12 +81,6 @@
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-exec</artifactId>
-			<version>1.1</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
 			<version>${obm.version}</version>
@@ -103,6 +97,11 @@
 			<artifactId>push-core</artifactId>
 			<version>${obm.version}</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>greenmail-imap-server</artifactId>
+			<version>${obm.version}</version>
 		</dependency>
 	</dependencies>
 </project>

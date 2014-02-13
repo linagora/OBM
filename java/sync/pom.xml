@@ -125,6 +125,7 @@
 		<module>satellite-client</module>
 		<module>obm-dao</module>
 		<module>transaction-test</module>
+		<module>greenmail-imap-server</module>
   </modules>
 
 	<build>
@@ -536,6 +537,11 @@ org.eclipse.jdt.core.compiler.source=1.6
 						<artifactId>cglib</artifactId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-exec</artifactId>
+				<version>1.1</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-codec</groupId>

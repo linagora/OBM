@@ -42,7 +42,6 @@ public class ExternalGreenMailModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		install(new ExternalGreenmailProviderModule());
-		install(new org.obm.push.mail.MailEnvModule(3600000));
 		bind(GreenMailPortProvider.class).to(GreenMailPortProviderImpl.class);
 	}
 	
