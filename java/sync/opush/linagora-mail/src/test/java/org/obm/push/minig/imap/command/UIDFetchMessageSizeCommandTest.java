@@ -34,8 +34,7 @@ package org.obm.push.minig.imap.command;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.obm.push.mail.MailException;
-import org.obm.push.minig.imap.command.UIDFetchMessageSizeCommand;
+import org.obm.push.exception.MailException;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 

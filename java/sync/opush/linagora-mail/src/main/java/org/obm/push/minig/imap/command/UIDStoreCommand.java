@@ -33,9 +33,10 @@
 package org.obm.push.minig.imap.command;
 
 import org.obm.push.mail.bean.FlagsList;
-import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
+
+import org.obm.push.mail.bean.MessageSet;
 
 public class UIDStoreCommand extends Command<Boolean> {
 

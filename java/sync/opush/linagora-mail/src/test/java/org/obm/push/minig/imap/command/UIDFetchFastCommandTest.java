@@ -34,10 +34,10 @@ package org.obm.push.minig.imap.command;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.collect.ImmutableList;
+import org.obm.push.mail.bean.MessageSet;
 
 
 public class UIDFetchFastCommandTest {

@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
+
 import org.obm.push.mail.bean.MessageSet;
 
 public class ImapMessageSetTest {

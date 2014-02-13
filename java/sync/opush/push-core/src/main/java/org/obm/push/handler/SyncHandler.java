@@ -82,10 +82,10 @@ import org.obm.push.exception.activesync.PartialException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ProtocolException;
 import org.obm.push.exception.activesync.ServerErrorException;
+import org.obm.push.exception.activesync.TimeoutException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.exception.FilterTypeChangedException;
-import org.obm.push.mail.exception.ImapTimeoutException;
 import org.obm.push.protocol.SyncProtocol;
 import org.obm.push.protocol.bean.AnalysedSyncRequest;
 import org.obm.push.protocol.bean.SyncRequest;
@@ -198,7 +198,7 @@ public class SyncHandler extends WbxmlRequestHandler implements IContinuationHan
 			sendError(udr.getDevice(), responder, SyncStatus.CONVERSATION_ERROR_OR_INVALID_ITEM, continuation, e);
 		} catch (InvalidSyncKeyException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.INVALID_SYNC_KEY, continuation, e);
-		} catch (ImapTimeoutException e) {
+		} catch (TimeoutException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);
 		} catch (RuntimeException e) {
 			sendError(udr.getDevice(), responder, SyncStatus.SERVER_ERROR, continuation, e);

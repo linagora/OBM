@@ -36,7 +36,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.obm.push.mail.IMAPException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.idle.IIdleCallback;
 import org.obm.push.mail.imap.idle.IdleLine;
 import org.obm.push.minig.imap.impl.ClientSupport;
@@ -82,7 +83,7 @@ public class IdleClientCallback implements IResponseCallback {
 	}
 
 	@Override
-	public void imapResponse(MinaIMAPMessage imapResponse) {
+	public void imapResponse(MinaIMAPMessage imapResponse) throws ImapTimeoutException {
 		if (isStart) {
 			if (observer != null) {
 				IdleLine rp = null;

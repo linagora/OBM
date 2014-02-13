@@ -36,7 +36,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.obm.push.mail.bean.MessageSet;
-import org.obm.push.mail.bean.MessageSet.Builder;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ContiguousSet;
@@ -52,7 +51,7 @@ public class ImapMessageSet {
 
 	public static ImapMessageSet parseMessageSet(String set) {
 		String[] parts = set.split(",");
-		Builder builder = MessageSet.builder();
+		MessageSet.Builder builder = MessageSet.builder();
 		for (String s : parts) {
 			if (!s.contains(":")) {
 				builder.add(Long.valueOf(s));

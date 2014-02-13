@@ -40,12 +40,12 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.obm.push.mail.bean.InternalDate;
-import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.obm.push.mail.bean.MessageSet;
 
 public class UIDFetchInternalDateCommand extends Command<Collection<InternalDate>> {
 

@@ -33,8 +33,6 @@ package org.obm.push;
 
 import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.obm.push.mail.imap.MinigStoreClient;
-import org.obm.push.mail.imap.MinigStoreClientImpl;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.push.minig.imap.StoreClientImpl;
 
@@ -44,7 +42,6 @@ public class LinagoraImapClientModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind(MinigStoreClient.Factory.class).to(MinigStoreClientImpl.Factory.class);
 		bind(StoreClient.Factory.class).to(StoreClientImpl.Factory.class);
 		bind(SocketConnector.class).to(NioSocketConnector.class);
 	}

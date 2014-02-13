@@ -49,7 +49,7 @@ import javax.net.ssl.SSLException;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.IoSession;
-import org.obm.push.mail.IMAPException;
+import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
@@ -62,7 +62,7 @@ import org.obm.push.mail.bean.NameSpaceInfo;
 import org.obm.push.mail.bean.QuotaInfo;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.bean.UIDEnvelope;
-import org.obm.push.mail.exception.ImapTimeoutException;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.minig.imap.command.AppendCommand;
 import org.obm.push.minig.imap.command.CapabilityCommand;
@@ -129,7 +129,7 @@ public class ClientSupport {
 		this.lastResponses = Collections.synchronizedList(new LinkedList<IMAPResponse>());
 	}
 
-	private void lock() {
+	private void lock() throws ImapTimeoutException {
 		try {
 			boolean success = lock.tryAcquire(imapTimeoutInMilliseconds, TimeUnit.MILLISECONDS);
 			assertTimeout(success);
@@ -141,7 +141,7 @@ public class ClientSupport {
 
 
 	public void login(String login, String password, SocketAddress address,
-			Boolean activateTLS) throws IMAPException {
+			Boolean activateTLS) throws IMAPException, ImapTimeoutException {
 		if (isConnected()) {
 			throw new IllegalStateException(
 					"Already connected. Disconnect first.");
@@ -168,7 +168,7 @@ public class ClientSupport {
 		}
 	}
 
-	private void configureSessionForTls() {
+	private void configureSessionForTls() throws ImapTimeoutException {
 		boolean tlsActivated = run(new StartTLSCommand());
 		if (tlsActivated) {
 			activateSSL();
@@ -189,12 +189,12 @@ public class ClientSupport {
 		}
 	}
 
-	private void join(IoFuture future) {
+	private void join(IoFuture future) throws ImapTimeoutException {
 		boolean joinSuccess = future.awaitUninterruptibly(imapTimeoutInMilliseconds);
 		assertTimeout(joinSuccess);
 	}
 
-	private void assertTimeout(boolean joinSuccess) {
+	private void assertTimeout(boolean joinSuccess) throws ImapTimeoutException {
 		if (!joinSuccess) {
 			throw new ImapTimeoutException();
 		}
@@ -211,7 +211,7 @@ public class ClientSupport {
 		}
 	}
 
-	public void logout() {
+	public void logout() throws ImapTimeoutException {
 		lock();
 		try {
 			if (session != null) {
@@ -231,7 +231,7 @@ public class ClientSupport {
 		}
 	}
 
-	private <T> T run(ICommand<T> cmd) {
+	private <T> T run(ICommand<T> cmd) throws ImapTimeoutException {
 		logger.debug(Integer.toHexString(hashCode()) + " CMD: "
 				+ cmd.getClass().getName() + " Permits: "
 				+ lock.availablePermits());
@@ -273,145 +273,145 @@ public class ClientSupport {
 		lock.release();
 	}
 
-	public boolean select(String mailbox) {
+	public boolean select(String mailbox) throws ImapTimeoutException {
 		return run(new SelectCommand(mailbox));
 	}
 	
-	public ListResult listSubscribed() {
+	public ListResult listSubscribed() throws ImapTimeoutException {
 	 	return run(new LsubCommand());
 	}
 	
-	public ListResult listAll() {
+	public ListResult listAll() throws ImapTimeoutException {
 		return run(new ListCommand());
 	}
 
-	public Set<String> capabilities() {
+	public Set<String> capabilities() throws ImapTimeoutException {
 		return run(new CapabilityCommand());
 	}
 
-	public boolean noop() {
+	public boolean noop() throws ImapTimeoutException {
 		return run(new NoopCommand());
 	}
 
-	public boolean create(String mailbox) {
+	public boolean create(String mailbox) throws ImapTimeoutException {
 		return run(new CreateCommand(mailbox));
 	}
 
-	public boolean create(String mailbox, String partition) {
+	public boolean create(String mailbox, String partition) throws ImapTimeoutException {
 		return run(new CreateCommand(mailbox, partition));
 	}
 
-	public boolean delete(String mailbox) {
+	public boolean delete(String mailbox) throws ImapTimeoutException {
 		return run(new DeleteCommand(mailbox));
 	}
 
-	public boolean rename(String mailbox, String newMailbox) {
+	public boolean rename(String mailbox, String newMailbox) throws ImapTimeoutException {
 		return run(new RenameCommand(mailbox, newMailbox));
 	}
 
-	public boolean subscribe(String mailbox) {
+	public boolean subscribe(String mailbox) throws ImapTimeoutException {
 		return run(new SubscribeCommand(mailbox));
 	}
 
-	public boolean unsubscribe(String mailbox) {
+	public boolean unsubscribe(String mailbox) throws ImapTimeoutException {
 		return run(new UnSubscribeCommand(mailbox));
 	}
 
-	public boolean append(String mailbox, Reader message, FlagsList fl) {
+	public boolean append(String mailbox, Reader message, FlagsList fl) throws ImapTimeoutException {
 		return run(new AppendCommand(mailbox, message, fl));
 	}
 	
-	public Set<Acl> getAcl(String mailbox) {
+	public Set<Acl> getAcl(String mailbox) throws ImapTimeoutException {
 		return run(new GetACLCommand(mailbox));
 	}
 	
-	public boolean setAcl(String mailbox, String identifier, String accessRights) {
+	public boolean setAcl(String mailbox, String identifier, String accessRights) throws ImapTimeoutException {
 		return run(new SetACLCommand(mailbox, identifier, accessRights));
 	}
 
-	public void expunge() {
+	public void expunge() throws ImapTimeoutException {
 		run(new ExpungeCommand());
 	}
 
-	public QuotaInfo quota(String mailbox) {
+	public QuotaInfo quota(String mailbox) throws ImapTimeoutException {
 		return run(new QuotaRootCommand(mailbox));
 	}
 	
-	public boolean removeQuota(String mailbox) {
+	public boolean removeQuota(String mailbox) throws ImapTimeoutException {
 		return run(new SetQuotaCommand(mailbox));
 	}
 
-	public boolean setQuota(String mailbox, long quotaInKb) {
+	public boolean setQuota(String mailbox, long quotaInKb) throws ImapTimeoutException {
 		return run(new SetQuotaCommand(mailbox, quotaInKb));
 	}
 
-	public InputStream uidFetchMessage(long uid) {
+	public InputStream uidFetchMessage(long uid) throws ImapTimeoutException {
 		return run(new UIDFetchMessageCommand(uid));
 	}
 
-	public MessageSet uidSearch(SearchQuery sq) {
+	public MessageSet uidSearch(SearchQuery sq) throws ImapTimeoutException {
 		return run(new UIDSearchCommand(sq));
 	}
 
-	public Collection<MimeMessage> uidFetchBodyStructure(MessageSet messages) {
+	public Collection<MimeMessage> uidFetchBodyStructure(MessageSet messages) throws ImapTimeoutException {
 		return run(new UIDFetchBodyStructureCommand(new BodyStructureParser(), messages));
 	}
 
 	public Collection<IMAPHeaders> uidFetchHeaders(Collection<Long> uids,
-			String[] headers) {
+			String[] headers) throws ImapTimeoutException {
 		return run(new UIDFetchHeadersCommand(uids, headers));
 	}
 
-	public Collection<UIDEnvelope> uidFetchEnvelope(MessageSet messages) {
+	public Collection<UIDEnvelope> uidFetchEnvelope(MessageSet messages) throws ImapTimeoutException {
 		return run(new UIDFetchEnvelopeCommand(messages));
 	}
 
-	public Map<Long, FlagsList> uidFetchFlags(MessageSet messages) {
+	public Map<Long, FlagsList> uidFetchFlags(MessageSet messages) throws ImapTimeoutException {
 		return run(new UIDFetchFlagsCommand(messages));
 	}
 
-	public Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) {
+	public Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) throws ImapTimeoutException {
 		return run(new UIDFetchInternalDateCommand(uids));
 	}
 	
-	public Collection<FastFetch> uidFetchFast(MessageSet messages) {
+	public Collection<FastFetch> uidFetchFast(MessageSet messages) throws ImapTimeoutException {
 		return run(new UIDFetchFastCommand(messages));
 	}
 
-	public MessageSet uidCopy(MessageSet messages, String destMailbox) {
+	public MessageSet uidCopy(MessageSet messages, String destMailbox) throws ImapTimeoutException {
 		return run(new UIDCopyCommand(messages, destMailbox));
 	}
 
-	public boolean uidStore(MessageSet messages, FlagsList fl, boolean set) {
+	public boolean uidStore(MessageSet messages, FlagsList fl, boolean set) throws ImapTimeoutException {
 		return run(new UIDStoreCommand(messages, fl, set));
 	}
 
-	public InputStream uidFetchPart(long uid, String address) {
+	public InputStream uidFetchPart(long uid, String address) throws ImapTimeoutException {
 		return run(new UIDFetchPartCommand(uid, address));
 	}
 	
-	public InputStream uidFetchPart(long uid, String address, long truncation) {
+	public InputStream uidFetchPart(long uid, String address, long truncation) throws ImapTimeoutException {
 		return run(new UIDFetchPartCommand(uid, address, truncation));
 	}
 
-	public EmailMetadata uidFetchEmailMetadata(long uid) {
+	public EmailMetadata uidFetchEmailMetadata(long uid) throws ImapTimeoutException {
 		return run(new UIDFetchEmailMetadataCommand(new BodyStructureParser(), uid));
 	}
 
-	public List<MailThread> uidThreads() {
+	public List<MailThread> uidThreads() throws ImapTimeoutException {
 		// UID THREAD REFERENCES UTF-8 NOT DELETED
 		return run(new UIDThreadCommand());
 	}
 
-	public NameSpaceInfo namespace() {
+	public NameSpaceInfo namespace() throws ImapTimeoutException {
 		return run(new NamespaceCommand());
 	}
 
-	public void startIdle() {
+	public void startIdle() throws ImapTimeoutException {
 		run(new StartIdleCommand());
 	}
 
-	public void stopIdle() {
+	public void stopIdle() throws ImapTimeoutException {
 		run(new StopIdleCommand());
 	}
 	
@@ -419,11 +419,11 @@ public class ClientSupport {
 		return session != null && session.isConnected();
 	}
 	
-	public long uidNext(String mailbox) {
+	public long uidNext(String mailbox) throws ImapTimeoutException {
 		return run(new UIDNextCommand(mailbox));
 	}
 	
-	public long uidValidity(String mailbox) {
+	public long uidValidity(String mailbox) throws ImapTimeoutException {
 		return run(new UIDValidityCommand(mailbox));
 	}
 }

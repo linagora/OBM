@@ -31,16 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.minig.imap;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.EmailConfiguration.MailboxNameCheckPolicy;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
+import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.minig.imap.impl.ClientSupport;
@@ -62,7 +62,7 @@ public class StoreClientImplTest {
 	}
 
 	@Test
-	public void testFirstSelect() {
+	public void testFirstSelect() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		
 		mocks.replay();
@@ -74,7 +74,7 @@ public class StoreClientImplTest {
 	}
 	
 	@Test
-	public void testSelectWhenServiceReturnsFalseWhenNullActive() {
+	public void testSelectWhenServiceReturnsFalseWhenNullActive() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(false);
 		storeClientImpl.activeMailbox = null;
 		
@@ -87,7 +87,7 @@ public class StoreClientImplTest {
 	}
 	
 	@Test
-	public void testSelectWhenServiceReturnsFalseWhenOtherActive() {
+	public void testSelectWhenServiceReturnsFalseWhenOtherActive() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(false);
 		storeClientImpl.activeMailbox = "Trash";
 		
@@ -100,7 +100,7 @@ public class StoreClientImplTest {
 	}
 	
 	@Test
-	public void testSelectWhenServiceReturnsTrue() {
+	public void testSelectWhenServiceReturnsTrue() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		
 		mocks.replay();
@@ -112,7 +112,7 @@ public class StoreClientImplTest {
 	}
 
 	@Test
-	public void testSelectWhenActiveMailboxIsNull() {
+	public void testSelectWhenActiveMailboxIsNull() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = null;
 		
@@ -125,7 +125,7 @@ public class StoreClientImplTest {
 	}
 
 	@Test
-	public void testSelectWhenActiveMailboxIsEmpty() {
+	public void testSelectWhenActiveMailboxIsEmpty() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = "";
 		
@@ -138,7 +138,7 @@ public class StoreClientImplTest {
 	}
 
 	@Test
-	public void testSelectWhenActiveMailboxIsDifferent() {
+	public void testSelectWhenActiveMailboxIsDifferent() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = "Trash";
 		
@@ -151,7 +151,7 @@ public class StoreClientImplTest {
 	}
 
 	@Test
-	public void testSelectWhenActiveMailboxIsShorterThanAsked() {
+	public void testSelectWhenActiveMailboxIsShorterThanAsked() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = "INBO";
 		
@@ -164,7 +164,7 @@ public class StoreClientImplTest {
 	}
 
 	@Test
-	public void testSelectWhenActiveMailboxIsLongerThanAsked() {
+	public void testSelectWhenActiveMailboxIsLongerThanAsked() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = "INBOXX";
 		
@@ -177,7 +177,7 @@ public class StoreClientImplTest {
 	}
 
 	@Test
-	public void testSelectWhenActiveMailboxIsASub() {
+	public void testSelectWhenActiveMailboxIsASub() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = "INBOX/sub";
 		
@@ -190,7 +190,7 @@ public class StoreClientImplTest {
 	}
 
 	@Test
-	public void testSelectWhenActiveMailboxIsAParent() {
+	public void testSelectWhenActiveMailboxIsAParent() throws Exception {
 		ListResult listResult = new ListResult(3);
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("INBOX/sub", true, false));
@@ -208,7 +208,7 @@ public class StoreClientImplTest {
 	}
 
 	@Test
-	public void testSelectWhenActiveMailboxIsSame() {
+	public void testSelectWhenActiveMailboxIsSame() throws Exception {
 		storeClientImpl.activeMailbox = "INBOX";
 		
 		mocks.replay();
@@ -286,19 +286,19 @@ public class StoreClientImplTest {
 	}
 	
 	@Test
-	public void testFindMailboxNameWithServerCaseForInbox() {
+	public void testFindMailboxNameWithServerCaseForInbox() throws Exception {
 		String found = storeClientImpl.findMailboxNameWithServerCase("INBOX");
 		assertThat(found).isEqualTo("INBOX");
 	}
 	
 	@Test
-	public void testFindMailboxNameWithServerCaseForInboxCaseSensitive() {
+	public void testFindMailboxNameWithServerCaseForInboxCaseSensitive() throws Exception {
 		String found = storeClientImpl.findMailboxNameWithServerCase("inBox");
 		assertThat(found).isEqualTo("INBOX");
 	}
 	
 	@Test
-	public void testFindMailboxNameWithServerCaseForLongerInbox() {
+	public void testFindMailboxNameWithServerCaseForLongerInbox() throws Exception {
 		ListResult listResult = new ListResult(3);
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
@@ -313,7 +313,7 @@ public class StoreClientImplTest {
 	}
 	
 	@Test
-	public void testFindMailboxNameWithServerCaseForShorterInbox() {
+	public void testFindMailboxNameWithServerCaseForShorterInbox() throws Exception {
 		ListResult listResult = new ListResult(3);
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
@@ -328,7 +328,7 @@ public class StoreClientImplTest {
 	}
 	
 	@Test
-	public void testFindMailboxNameWithServerCaseForTrash() {
+	public void testFindMailboxNameWithServerCaseForTrash() throws Exception {
 		ListResult listResult = new ListResult(3);
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
@@ -343,7 +343,7 @@ public class StoreClientImplTest {
 	}
 	
 	@Test
-	public void testFindMailboxNameWithServerCaseForTrashOtherCase() {
+	public void testFindMailboxNameWithServerCaseForTrashOtherCase() throws Exception {
 		ListResult listResult = new ListResult(3);
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
@@ -357,8 +357,8 @@ public class StoreClientImplTest {
 		assertThat(found).isEqualTo("TRASH");
 	}
 	
-	@Test(expected=CollectionNotFoundException.class)
-	public void testFindMailboxNameWithServerCaseForNotInResult() {
+	@Test(expected=MailboxNotFoundException.class)
+	public void testFindMailboxNameWithServerCaseForNotInResult() throws Exception {
 		ListResult listResult = new ListResult(3);
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
@@ -370,7 +370,7 @@ public class StoreClientImplTest {
 	}
 
 	@Test
-	public void testFindMailboxNameWithServerCaseWithNeverPolicy() {
+	public void testFindMailboxNameWithServerCaseWithNeverPolicy() throws Exception {
 		storeClientImpl = new StoreClientImpl(null, port, null, null, MailboxNameCheckPolicy.NEVER, clientSupport);
 		mocks.replay();
 
@@ -380,7 +380,7 @@ public class StoreClientImplTest {
 	}
 
 	@Test
-	public void testFindMailboxNameWithServerCaseForInboxWithNeverPolicy() {
+	public void testFindMailboxNameWithServerCaseForInboxWithNeverPolicy() throws Exception {
 		storeClientImpl = new StoreClientImpl(null, port, null, null, MailboxNameCheckPolicy.NEVER, clientSupport);
 		mocks.replay();
 

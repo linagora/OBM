@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
-import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.imap.MinigStoreClientImpl;
 import org.obm.push.minig.imap.StoreClient;

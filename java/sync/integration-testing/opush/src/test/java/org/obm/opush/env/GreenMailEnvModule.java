@@ -39,7 +39,6 @@ import org.obm.opush.CountingStoreClient;
 import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.mail.greenmail.GreenMailEmailConfiguration;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
-import org.obm.push.mail.greenmail.GreenMailSmtpProvider;
 import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.minig.imap.StoreClient;

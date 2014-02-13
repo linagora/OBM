@@ -35,7 +35,7 @@ package org.obm.push.minig.imap.command;
 import java.io.IOException;
 import java.io.Reader;
 
-import org.minig.imap.impl.LineTerminationCorrecter;
+import org.obm.push.mail.LineTerminationCorrecter;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.minig.imap.CommandIOException;
 import org.obm.push.minig.imap.impl.IMAPResponse;

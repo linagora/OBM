@@ -52,10 +52,10 @@ import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.exception.activesync.TimeoutException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.MailBackend;
-import org.obm.push.mail.exception.ImapTimeoutException;
 import org.obm.push.protocol.MeetingProtocol;
 import org.obm.push.protocol.bean.ItemChangeMeetingResponse;
 import org.obm.push.protocol.bean.MeetingHandlerRequest;
@@ -164,7 +164,7 @@ public class MeetingResponseHandler extends WbxmlRequestHandler {
 			} else {
 				builder.status(MeetingResponseStatus.INVALID_MEETING_RREQUEST);
 			}
-		} catch (ImapTimeoutException e) {
+		} catch (TimeoutException e) {
 			logger.error(e.getMessage(), e);
 			builder.status(MeetingResponseStatus.SERVER_ERROR);
 		}

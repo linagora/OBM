@@ -53,7 +53,6 @@ public class BeansTest {
 				ImmutableList.<Class<?>>builder()
 					.add(Email.class)
 					.add(Snapshot.class)
-					.add(MessageSet.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

@@ -33,6 +33,8 @@ package org.obm.cyrus.imap.admin;
 
 import java.util.List;
 
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.minig.imap.StoreClient;
 
@@ -53,7 +55,7 @@ public class ConnectionImpl implements Connection {
 	
 	@Override
 	public void createUserMailboxes(ImapPath... paths)
-			throws ImapOperationException, ConnectionException {
+			throws ImapOperationException, ConnectionException, ImapTimeoutException {
 		for (ImapPath path : paths) {
 			storeClient.create(path.format());
 		}
@@ -61,7 +63,7 @@ public class ConnectionImpl implements Connection {
 
 	@Override
 	public void createUserMailboxes(Partition partition, ImapPath... paths)
-			throws ImapOperationException, ConnectionException {
+			throws ImapOperationException, ConnectionException, ImapTimeoutException {
 		for (ImapPath path : paths) {
 			storeClient.create(path.format(), partition.getName());
 		}
@@ -75,7 +77,7 @@ public class ConnectionImpl implements Connection {
 
 	@Override
 	public void setAcl(ImapPath path, String identifier, Acl acl)
-			throws ImapOperationException, ConnectionException {
+			throws ImapOperationException, ConnectionException, ImapTimeoutException {
 		storeClient.setAcl(path.format(), identifier, acl.format());
 	}
 
@@ -87,8 +89,8 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void delete(ImapPath path) throws ImapOperationException,
-			ConnectionException {
+	public void delete(ImapPath path)
+			throws ImapOperationException, ConnectionException, ImapTimeoutException {
 		storeClient.delete(path.format());
 	}
 
@@ -106,7 +108,7 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void setQuota(ImapPath path, Quota quota) {
+	public void setQuota(ImapPath path, Quota quota) throws MailboxNotFoundException, ImapTimeoutException {
 		if (quota.isLimited()) {
 			storeClient.setQuota(path.format(), quota.getLimit() * 1024); // Cyrus uses Kb
 		} else {
@@ -115,12 +117,12 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void removeQuota(ImapPath path) {
+	public void removeQuota(ImapPath path) throws MailboxNotFoundException, ImapTimeoutException {
 		storeClient.removeQuota(path.format());
 	}
 
 	@Override
-	public void shutdown() {
+	public void shutdown() throws ImapTimeoutException {
 		storeClient.logout();
 	}
 

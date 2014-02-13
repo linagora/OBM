@@ -49,14 +49,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>jta</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.parboiled</groupId>
 			<artifactId>parboiled-java</artifactId>
 		</dependency>
@@ -65,12 +57,16 @@
 			<artifactId>guava</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.google.inject.extensions</groupId>
-			<artifactId>guice-multibindings</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.mina</groupId>
 			<artifactId>mina-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.james</groupId>
+			<artifactId>apache-mime4j-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -96,31 +92,15 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>mail-backend-testsuite</artifactId>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>greenmail-imap-server</artifactId>
 			<version>${obm.version}</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>mail-backend-interfaces</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>mail-backend-tools</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
 			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>greenmail-imap-server</artifactId>
-			<version>${obm.version}</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>

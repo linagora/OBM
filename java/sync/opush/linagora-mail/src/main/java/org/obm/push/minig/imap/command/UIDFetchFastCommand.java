@@ -43,12 +43,12 @@ import java.util.Set;
 
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.Flag;
-import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import org.obm.push.mail.bean.MessageSet;
 
 /**
  * FAST

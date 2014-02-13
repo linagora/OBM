@@ -36,11 +36,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.base.Splitter;
+import org.obm.push.mail.bean.MessageSet;
 
 public class UIDSearchCommand extends Command<MessageSet> {
 

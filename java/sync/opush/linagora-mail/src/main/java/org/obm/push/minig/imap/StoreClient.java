@@ -39,7 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.obm.push.mail.IMAPException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
@@ -52,6 +53,7 @@ import org.obm.push.mail.bean.NameSpaceInfo;
 import org.obm.push.mail.bean.QuotaInfo;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.minig.imap.impl.MailThread;
 
@@ -67,100 +69,101 @@ public interface StoreClient {
 	/**
 	 * Logs into the IMAP store
 	 */
-	void login(Boolean activateTLS) throws IMAPException;
+	void login(Boolean activateTLS) throws IMAPException, ImapTimeoutException;
 
 	/**
 	 * Logs out & disconnect from the IMAP server. The underlying network
 	 * connection is released.
-	 * 
+	 * @throws ImapTimeoutException 
 	 * @throws IMAPException
 	 */
-	void logout();
+	void logout() throws ImapTimeoutException;
 
 	/**
 	 * Opens the given IMAP folder. Only one folder quand be active at a time.
 	 * 
 	 * @param mailbox
 	 *            utf8 mailbox name.
+	 * @throws ImapTimeoutException 
 	 * @throws IMAPException
 	 */
-	boolean select(String mailbox);
+	boolean select(String mailbox) throws MailboxNotFoundException, ImapTimeoutException;
 
-	boolean create(String mailbox);
+	boolean create(String mailbox) throws ImapTimeoutException;
 	
-	boolean create(String mailbox, String partition);
+	boolean create(String mailbox, String partition) throws ImapTimeoutException;
 
-	boolean subscribe(String mailbox);
+	boolean subscribe(String mailbox) throws ImapTimeoutException;
 
-	boolean unsubscribe(String mailbox);
+	boolean unsubscribe(String mailbox) throws ImapTimeoutException;
 
-	boolean delete(String mailbox);
+	boolean delete(String mailbox) throws ImapTimeoutException;
 
-	boolean rename(String mailbox, String newMailbox);
+	boolean rename(String mailbox, String newMailbox) throws ImapTimeoutException;
 	
-	boolean setAcl(String mailbox, String identifier, String accessRights);
+	boolean setAcl(String mailbox, String identifier, String accessRights) throws ImapTimeoutException;
 
-	Set<Acl> getAcl(String mailbox);
+	Set<Acl> getAcl(String mailbox) throws ImapTimeoutException;
 	
 	/**
 	 * Issues the CAPABILITY command to the IMAP server
 	 * 
 	 * @return
 	 */
-	Set<String> capabilities();
+	Set<String> capabilities() throws ImapTimeoutException;
 
-	boolean noop();
+	boolean noop() throws ImapTimeoutException;
 
-	NameSpaceInfo namespace();
+	NameSpaceInfo namespace() throws ImapTimeoutException;
 	
-	boolean isConnected();
+	boolean isConnected() throws ImapTimeoutException;
 	
-	long uidNext(String mailbox);
+	long uidNext(String mailbox) throws MailboxNotFoundException, ImapTimeoutException;
 	
-	long uidValidity(String mailbox);
+	long uidValidity(String mailbox) throws MailboxNotFoundException, ImapTimeoutException;
 
-	void expunge();
+	void expunge() throws ImapTimeoutException;
 	
-	ListResult listSubscribed();
+	ListResult listSubscribed() throws ImapTimeoutException;
 	
-	ListResult listAll();
+	ListResult listAll() throws ImapTimeoutException;
 
-	boolean append(String mailbox, Reader message, FlagsList fl);
+	boolean append(String mailbox, Reader message, FlagsList fl) throws MailboxNotFoundException, ImapTimeoutException;
 	
-	QuotaInfo quota(String mailbox);
+	QuotaInfo quota(String mailbox) throws MailboxNotFoundException, ImapTimeoutException;
 
-	boolean removeQuota(String mailbox);
+	boolean removeQuota(String mailbox) throws MailboxNotFoundException, ImapTimeoutException;
 	
-	boolean setQuota(String mailbox, long quotaInKo);
+	boolean setQuota(String mailbox, long quotaInKo) throws MailboxNotFoundException, ImapTimeoutException;
 
-	InputStream uidFetchMessage(long uid);
+	InputStream uidFetchMessage(long uid) throws ImapTimeoutException;
 
-	MessageSet uidSearch(SearchQuery sq);
+	MessageSet uidSearch(SearchQuery sq) throws ImapTimeoutException;
 
-	Collection<MimeMessage> uidFetchBodyStructure(MessageSet messages);
+	Collection<MimeMessage> uidFetchBodyStructure(MessageSet messages) throws ImapTimeoutException;
 
-	Collection<IMAPHeaders> uidFetchHeaders(Collection<Long> uids, String[] headers);
+	Collection<IMAPHeaders> uidFetchHeaders(Collection<Long> uids, String[] headers) throws ImapTimeoutException;
 
-	Collection<UIDEnvelope> uidFetchEnvelope(MessageSet messages);
+	Collection<UIDEnvelope> uidFetchEnvelope(MessageSet messages) throws ImapTimeoutException;
 
-	Map<Long, FlagsList> uidFetchFlags(MessageSet messages);
+	Map<Long, FlagsList> uidFetchFlags(MessageSet messages) throws ImapTimeoutException;
 	
-	Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids);
+	Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) throws ImapTimeoutException;
 	
-	Collection<FastFetch> uidFetchFast(MessageSet messages);
+	Collection<FastFetch> uidFetchFast(MessageSet messages) throws ImapTimeoutException;
 
-	MessageSet uidCopy(MessageSet messages, String destMailbox);
+	MessageSet uidCopy(MessageSet messages, String destMailbox) throws MailboxNotFoundException, ImapTimeoutException;
 
-	boolean uidStore(MessageSet messages, FlagsList fl, boolean set);
+	boolean uidStore(MessageSet messages, FlagsList fl, boolean set) throws ImapTimeoutException;
 
-	InputStream uidFetchPart(long uid, String address, long truncation);
+	InputStream uidFetchPart(long uid, String address, long truncation) throws ImapTimeoutException;
 	
-	InputStream uidFetchPart(long uid, String address);
+	InputStream uidFetchPart(long uid, String address) throws ImapTimeoutException;
 
-	EmailMetadata uidFetchEmailMetadata(long uid);
+	EmailMetadata uidFetchEmailMetadata(long uid) throws ImapTimeoutException;
 
-	List<MailThread> uidThreads();
+	List<MailThread> uidThreads() throws ImapTimeoutException;
 
-	String findMailboxNameWithServerCase(String mailbox);
+	String findMailboxNameWithServerCase(String mailbox) throws MailboxNotFoundException, ImapTimeoutException;
 
 }

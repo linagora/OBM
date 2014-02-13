@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap.idle;
 
+import org.obm.push.exception.ImapTimeoutException;
+
 
 public interface IIdleCallback {
-	void receive(IdleLine line);
+	void receive(IdleLine line) throws ImapTimeoutException;
 	void disconnectedCallBack();
 }

@@ -36,8 +36,9 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.ldap.client.LdapManager;
-import org.obm.push.mail.IMAPException;
+import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.mail.bean.Acl;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.utils.DateUtils;
 import org.obm.satellite.client.Configuration;
 import org.obm.satellite.client.Connection;
@@ -59,8 +60,8 @@ import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
-import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(BatchProcessorImplUserTest.Env.class)
@@ -381,8 +382,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		mocksControl.verify();
 	}
 
-	private void expectCyrusCreateMailbox(final ObmUser user)
-			throws DaoException, IMAPException {
+	private void expectCyrusCreateMailbox(final ObmUser user) throws Exception {
 		CyrusManager cyrusManager = expectCyrusBuild();
 		cyrusManager.create(user);
 		expectLastCall().once();
@@ -676,9 +676,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 	}
 
 	@Test
-	public void testProcessDeleteUserWithTrueExpunge() throws SQLException,
-			DaoException, BatchNotFoundException, UserNotFoundException,
-			IMAPException, DomainNotFoundException {
+	public void testProcessDeleteUserWithTrueExpunge() throws Exception {
 		Operation.Builder opBuilder = Operation
 				.builder()
 				.id(operationId(1))
@@ -1498,8 +1496,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		mocksControl.verify();
 	}
 
-	private void expectDeleteUserMailbox(final ObmUser user)
-			throws DaoException, IMAPException {
+	private void expectDeleteUserMailbox(final ObmUser user) throws Exception {
 		CyrusManager cyrusManager = expectCyrusBuild();
 		cyrusManager.setAcl(user, "cyrus",
 				Acl.builder().user("user1").rights("lc").build());
@@ -1509,12 +1506,12 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expectCyrusShutDown(cyrusManager);
 	}
 
-	private void expectApplyQuota(CyrusManager cyrusManager, ObmUser user) {
+	private void expectApplyQuota(CyrusManager cyrusManager, ObmUser user) throws Exception {
 		cyrusManager.applyQuota(user);
 		expectLastCall();
 	}
 
-	private void expectCyrusShutDown(CyrusManager cyrusManager) {
+	private void expectCyrusShutDown(CyrusManager cyrusManager) throws ImapTimeoutException {
 		cyrusManager.shutdown();
 		expectLastCall().once();
 	}

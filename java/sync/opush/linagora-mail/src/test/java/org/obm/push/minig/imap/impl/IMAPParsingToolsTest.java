@@ -34,7 +34,6 @@ package org.obm.push.minig.imap.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.obm.push.minig.imap.impl.IMAPParsingTools;
 
 public class IMAPParsingToolsTest {
 

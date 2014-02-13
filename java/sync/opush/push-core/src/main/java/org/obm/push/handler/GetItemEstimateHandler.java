@@ -38,8 +38,8 @@ import org.obm.push.backend.IContentsExporter;
 import org.obm.push.backend.IContentsImporter;
 import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.AnalysedSyncCollection;
-import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.GetItemEstimateStatus;
+import org.obm.push.bean.ICollectionPathHelper;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.SyncCollectionResponse;
@@ -55,10 +55,10 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.HierarchyChangedException;
 import org.obm.push.exception.activesync.InvalidSyncKeyException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
+import org.obm.push.exception.activesync.TimeoutException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.exception.FilterTypeChangedException;
-import org.obm.push.mail.exception.ImapTimeoutException;
 import org.obm.push.protocol.GetItemEstimateProtocol;
 import org.obm.push.protocol.bean.Estimate;
 import org.obm.push.protocol.bean.GetItemEstimateRequest;
@@ -126,7 +126,7 @@ public class GetItemEstimateHandler extends WbxmlRequestHandler {
 			logger.error(e.getMessage(), e);
 		} catch (ConversionException e) {
 			logger.error(e.getMessage(), e);
-		} catch (ImapTimeoutException e) {
+		} catch (TimeoutException e) {
 			sendErrorResponse(responder, 
 					protocol.buildError(GetItemEstimateStatus.NEED_SYNC, null), e);
 		}

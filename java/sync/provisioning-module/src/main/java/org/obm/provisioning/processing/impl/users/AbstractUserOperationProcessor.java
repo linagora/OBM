@@ -50,7 +50,7 @@ import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
-import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.imap.IMAPException;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;

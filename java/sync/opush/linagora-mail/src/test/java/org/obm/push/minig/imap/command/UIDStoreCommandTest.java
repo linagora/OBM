@@ -35,9 +35,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
-import org.obm.push.mail.bean.MessageSet;
 
 import com.google.common.collect.ImmutableList;
+import org.obm.push.mail.bean.MessageSet;
 
 
 public class UIDStoreCommandTest {

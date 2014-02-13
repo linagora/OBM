@@ -46,8 +46,8 @@ import org.apache.mina.transport.socket.SocketConnector;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.mail.IMAPException;
-import org.obm.push.mail.exception.ImapTimeoutException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.mail.imap.IMAPException;
 
 import com.google.inject.Provider;
 
@@ -76,7 +76,7 @@ public class SessionFactoryImplTest {
 	}
 	
 	@Test
-	public void connect() throws IMAPException {
+	public void connect() throws Exception {
 		IoSession mockSession = createMock(IoSession.class);
 		ConnectFuture connectFuture = control.createMock(ConnectFuture.class);
 		expect(socketConnector.connect(ADDRESS)).andReturn(connectFuture);
@@ -90,7 +90,7 @@ public class SessionFactoryImplTest {
 	}
 	
 	@Test(expected=RuntimeException.class)
-	public void isConnectedFail() throws IMAPException {
+	public void isConnectedFail() throws Exception {
 		ConnectFuture connectFuture = control.createMock(ConnectFuture.class);
 		expect(socketConnector.connect(ADDRESS)).andReturn(connectFuture);
 		expect(connectFuture.awaitUninterruptibly(DEFAULT_IMAP_TIMEOUT)).andReturn(true);
@@ -110,7 +110,7 @@ public class SessionFactoryImplTest {
 	}
 	
 	@Test(expected=IMAPException.class)
-	public void isConnectedFailButNoException() throws IMAPException {
+	public void isConnectedFailButNoException() throws Exception {
 		ConnectFuture connectFuture = control.createMock(ConnectFuture.class);
 		expect(socketConnector.connect(ADDRESS)).andReturn(connectFuture);
 		expect(connectFuture.awaitUninterruptibly(DEFAULT_IMAP_TIMEOUT)).andReturn(true);
@@ -128,7 +128,7 @@ public class SessionFactoryImplTest {
 	}
 	
 	@Test(expected=ImapTimeoutException.class)
-	public void connectTimeout() throws IMAPException {
+	public void connectTimeout() throws Exception {
 		ConnectFuture connectFuture = control.createMock(ConnectFuture.class);
 		expect(socketConnector.connect(ADDRESS)).andReturn(connectFuture);
 		expect(connectFuture.awaitUninterruptibly(DEFAULT_IMAP_TIMEOUT)).andReturn(false);

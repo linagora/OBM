@@ -34,10 +34,11 @@ package org.obm.push.minig.imap.impl;
 import java.net.SocketAddress;
 
 import org.apache.mina.core.session.IoSession;
-import org.obm.push.mail.IMAPException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.mail.imap.IMAPException;
 
 public interface SessionFactory {
 
-	IoSession connect(SocketAddress address) throws IMAPException;
+	IoSession connect(SocketAddress address) throws IMAPException, ImapTimeoutException;
 	
 }

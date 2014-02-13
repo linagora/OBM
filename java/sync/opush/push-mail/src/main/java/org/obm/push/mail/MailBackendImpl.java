@@ -85,6 +85,8 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
 import org.obm.push.exception.HierarchyChangesException;
+import org.obm.push.exception.ImapMessageNotFoundException;
+import org.obm.push.exception.MailException;
 import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.exception.SendEmailException;
 import org.obm.push.exception.UnexpectedObmSyncServerException;

@@ -1,21 +1,18 @@
 package org.obm.push.minig.imap;
 
-import org.obm.push.LinagoraImapModule;
-import org.obm.push.bean.ICollectionPathHelper;
-import org.obm.push.impl.CollectionPathHelper;
+import org.obm.push.LinagoraImapClientModule;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
 public class MailEnvModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
-		install(new LinagoraImapModule());
+		install(new LinagoraImapClientModule());
 		install(new GreenMailProviderModule());
-		install(new org.obm.push.mail.MailEnvModule(3600000));
-		
-		bind(ICollectionPathHelper.class).to(CollectionPathHelper.class);
+		bind(Integer.class).annotatedWith(Names.named("imapTimeout")).toInstance(3600000);
 	}
 	
 }

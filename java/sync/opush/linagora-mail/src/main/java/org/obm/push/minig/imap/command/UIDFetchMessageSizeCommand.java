@@ -34,7 +34,7 @@ package org.obm.push.minig.imap.command;
 
 import java.util.List;
 
-import org.obm.push.mail.MailException;
+import org.obm.push.exception.MailException;
 import org.obm.push.minig.imap.impl.IMAPParsingTools;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 

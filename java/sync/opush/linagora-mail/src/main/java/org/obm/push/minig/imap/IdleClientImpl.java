@@ -35,7 +35,8 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.apache.mina.transport.socket.SocketConnector;
-import org.obm.push.mail.IMAPException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.imap.idle.IIdleCallback;
 import org.obm.push.mail.imap.idle.IdleClient;
 import org.obm.push.minig.imap.idle.IdleClientCallback;
@@ -92,24 +93,24 @@ public class IdleClientImpl implements IdleClient {
 		icb.setClient(cs);
 	}
 
-	public void login(Boolean activateTLS) throws IMAPException {
+	public void login(Boolean activateTLS) throws IMAPException, ImapTimeoutException {
 		logger.debug("login called");
 		SocketAddress sa = new InetSocketAddress(hostname, port);
 		cs.login(login, password, sa, activateTLS);
 	}
 
-	public void logout() {
+	public void logout() throws ImapTimeoutException {
 		cs.logout();
 	}
 
-	public void startIdle(IIdleCallback observer) {
+	public void startIdle(IIdleCallback observer) throws ImapTimeoutException {
 		if (!icb.isStart()) {
 			cs.startIdle();
 		}
 		icb.attachIdleCallback(observer);
 	}
 
-	public void stopIdle() {
+	public void stopIdle() throws ImapTimeoutException {
 		if (icb.isStart()) {
 			icb.detachIdleCallback();
 			cs.stopIdle();
@@ -123,7 +124,7 @@ public class IdleClientImpl implements IdleClient {
 	 * @param mailbox
 	 *            utf8 mailbox name.
 	 */
-	public boolean select(String mailbox) {
+	public boolean select(String mailbox) throws ImapTimeoutException {
 		return cs.select(mailbox);
 	}
 }

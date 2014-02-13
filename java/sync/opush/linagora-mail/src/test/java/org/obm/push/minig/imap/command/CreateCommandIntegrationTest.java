@@ -40,16 +40,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.ICollectionPathHelper;
-import org.obm.push.bean.User;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.OpushLocatorException;
-import org.obm.push.mail.IMAPException;
-import org.obm.push.mail.MailboxService;
+import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
-import org.obm.push.mail.imap.LinagoraImapClientProvider;
 import org.obm.push.minig.imap.StoreClient;
 
 import com.google.inject.Inject;
@@ -59,24 +52,20 @@ import com.icegreen.greenmail.util.GreenMail;
 @RunWith(GuiceRunner.class)
 public class CreateCommandIntegrationTest {
 
-	@Inject LinagoraImapClientProvider clientProvider;
-
-	@Inject ICollectionPathHelper collectionPathHelper;
-	@Inject MailboxService mailboxService;
+	@Inject StoreClient.Factory storeClientFactory;
 	@Inject GreenMail greenMail;
+	
 	private String mailbox;
 	private String password;
-	private UserDataRequest udr;
+	private StoreClient client;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		greenMail.start();
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMail.setUser(mailbox, password);
-		udr = new UserDataRequest(
-				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null);
+		client = loggedClient();
 	}
 	
 	@After
@@ -84,10 +73,14 @@ public class CreateCommandIntegrationTest {
 		greenMail.stop();
 	}
 	
+	private StoreClient loggedClient() throws Exception  {
+		StoreClient storeClient = storeClientFactory.create(greenMail.getImap().getBindTo(), mailbox, password);
+		storeClient.login(false);
+		return storeClient;
+	}
+	
 	@Test
-	public void testCreateMailboxWithAccent() throws Exception {
-		StoreClient client = loggedClient();
-
+	public void testCreateMailboxWithAccent() throws ImapTimeoutException {
 		boolean result = client.create("déplacements");
 		ListResult folders = client.listAll();
 		
@@ -98,9 +91,7 @@ public class CreateCommandIntegrationTest {
 	}
 	
 	@Test
-	public void testCreateMailboxMany() throws Exception {
-		StoreClient client = loggedClient();
-
+	public void testCreateMailboxMany() throws ImapTimeoutException {
 		boolean result1 = client.create("déplacements");
 		boolean result2 = client.create("another");
 		boolean result3 = client.create("another/déplacements");
@@ -115,9 +106,7 @@ public class CreateCommandIntegrationTest {
 	}
 	
 	@Test
-	public void testCreateMailboxChinese() throws Exception {
-		StoreClient client = loggedClient();
-
+	public void testCreateMailboxChinese() throws ImapTimeoutException {
 		boolean result = client.create("&Ti1W,YuwX1U-");
 		ListResult folders = client.listAll();
 		
@@ -129,9 +118,7 @@ public class CreateCommandIntegrationTest {
 	
 	@Ignore("Greenmail does not support partition")
 	@Test
-	public void testCreateMailboxWithPartition() throws Exception {
-		StoreClient client = loggedClient();
-
+	public void testCreateMailboxWithPartition() throws ImapTimeoutException {
 		boolean result = client.create("user/" + mailbox + "/SentBox", "my_partition");
 		ListResult folders = client.listAll();
 		
@@ -139,10 +126,6 @@ public class CreateCommandIntegrationTest {
 		assertThat(folders).containsOnly(
 				mailbox("INBOX"),
 				mailbox("SentBox"));
-	}
-	
-	private StoreClient loggedClient() throws OpushLocatorException, IMAPException  {
-		return clientProvider.getImapClient(udr);
 	}
 
 	private ListInfo mailbox(String mailbox) {

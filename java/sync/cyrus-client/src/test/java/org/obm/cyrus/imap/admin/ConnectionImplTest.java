@@ -39,6 +39,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.GuiceRunner;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.minig.imap.StoreClient;
 
 @RunWith(GuiceRunner.class)
@@ -55,7 +57,7 @@ public class ConnectionImplTest {
 	}
 	
 	@Test
-	public void testCreateUserMailboxes() {
+	public void testCreateUserMailboxes() throws ImapTimeoutException {
 		expect(storeClient.create("user/ident4@vm.obm.org", "partition")).andReturn(true);
 		expect(storeClient.create("user/ident4/Trash@vm.obm.org", "partition")).andReturn(true);
 		control.replay();
@@ -68,7 +70,7 @@ public class ConnectionImplTest {
 	}
 
 	@Test
-	public void testCreateUserMailboxesNoPartition() {
+	public void testCreateUserMailboxesNoPartition() throws ImapTimeoutException {
 		expect(storeClient.create("user/ident4@vm.obm.org")).andReturn(true);
 		expect(storeClient.create("user/ident4/Trash@vm.obm.org")).andReturn(true);
 		control.replay();
@@ -81,7 +83,7 @@ public class ConnectionImplTest {
 	}
 
 	@Test
-	public void testSetQuotaSendsQuotaInKb() {
+	public void testSetQuotaSendsQuotaInKb() throws ImapTimeoutException, MailboxNotFoundException {
 		expect(storeClient.setQuota("user/user@obm.org", 102400)).andReturn(true);
 		control.replay();
 

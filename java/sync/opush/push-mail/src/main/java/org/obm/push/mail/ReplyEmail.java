@@ -52,7 +52,6 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
-import org.minig.imap.impl.LineTerminationCorrecter;
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmailBodyType;

@@ -44,8 +44,8 @@ import java.util.Set;
 import org.apache.mina.transport.socket.SocketConnector;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfiguration.MailboxNameCheckPolicy;
-import org.obm.push.exception.activesync.CollectionNotFoundException;
-import org.obm.push.mail.IMAPException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
@@ -59,6 +59,7 @@ import org.obm.push.mail.bean.NameSpaceInfo;
 import org.obm.push.mail.bean.QuotaInfo;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.mail.bean.UIDEnvelope;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.minig.imap.impl.ClientHandler;
 import org.obm.push.minig.imap.impl.ClientSupport;
@@ -130,7 +131,7 @@ public class StoreClientImpl implements StoreClient {
 
 	@Override
 	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.IMAP_CONNECTION)
-	public void login(Boolean activateTLS) throws IMAPException {
+	public void login(Boolean activateTLS) throws IMAPException, ImapTimeoutException {
 		logger.debug("login attempt to {}:{} for {}", hostname, port, login);
 		SocketAddress sa = new InetSocketAddress(hostname, port);
 		clientSupport.login(login, password, sa, activateTLS);
@@ -138,7 +139,7 @@ public class StoreClientImpl implements StoreClient {
 
 	@Override
 	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onEndOfMethod=true, resourceType=ResourceType.IMAP_CONNECTION)
-	public void logout() {
+	public void logout() throws ImapTimeoutException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("logout attempt for " + login);
 		}
@@ -146,7 +147,7 @@ public class StoreClientImpl implements StoreClient {
 	}
 
 	@Override
-	public boolean select(String mailbox) {
+	public boolean select(String mailbox) throws MailboxNotFoundException, ImapTimeoutException {
 		if (hasToSelectMailbox(mailbox) && selectMailboxImpl(mailbox)) {
 			activeMailbox = mailbox;
 			return true;
@@ -170,157 +171,157 @@ public class StoreClientImpl implements StoreClient {
 		return Strings.isNullOrEmpty(activeMailbox);
 	}
 
-	protected boolean selectMailboxImpl(String mailbox) {
+	protected boolean selectMailboxImpl(String mailbox) throws MailboxNotFoundException, ImapTimeoutException {
 		return clientSupport.select(findMailboxNameWithServerCase(mailbox));
 	}
 
 	@Override
-	public boolean create(String mailbox) {
+	public boolean create(String mailbox) throws ImapTimeoutException {
 		return clientSupport.create(mailbox);
 	}
 	
 	@Override
-	public boolean create(String mailbox, String partition) {
+	public boolean create(String mailbox, String partition) throws ImapTimeoutException {
 		return clientSupport.create(mailbox, partition);
 	}
 
 	@Override
-	public boolean subscribe(String mailbox) {
+	public boolean subscribe(String mailbox) throws ImapTimeoutException {
 		return clientSupport.subscribe(mailbox);
 	}
 
 	@Override
-	public boolean unsubscribe(String mailbox) {
+	public boolean unsubscribe(String mailbox) throws ImapTimeoutException {
 		return clientSupport.unsubscribe(mailbox);
 	}
 
 	@Override
-	public boolean delete(String mailbox) {
+	public boolean delete(String mailbox) throws ImapTimeoutException {
 		return clientSupport.delete(mailbox);
 	}
 
 	@Override
-	public boolean rename(String mailbox, String newMailbox) {
+	public boolean rename(String mailbox, String newMailbox) throws ImapTimeoutException {
 		return clientSupport.rename(mailbox, newMailbox);
 	}
 
 	@Override
-	public Set<String> capabilities() {
+	public Set<String> capabilities() throws ImapTimeoutException {
 		return clientSupport.capabilities();
 	}
 
 	@Override
-	public boolean noop() {
+	public boolean noop() throws ImapTimeoutException {
 		return clientSupport.noop();
 	}
 	
 	@Override
-	public  ListResult listSubscribed() {
+	public  ListResult listSubscribed() throws ImapTimeoutException {
 		return clientSupport.listSubscribed();
 	}
 	
 	@Override
-	public  ListResult listAll() {
+	public  ListResult listAll() throws ImapTimeoutException {
 		return clientSupport.listAll();
 	}
 
 	@Override
-	public boolean append(String mailbox, Reader message, FlagsList fl) {
+	public boolean append(String mailbox, Reader message, FlagsList fl) throws MailboxNotFoundException, ImapTimeoutException {
 		return clientSupport.append(findMailboxNameWithServerCase(mailbox), message, fl);
 	}
 
 	@Override
-	public void expunge() {
+	public void expunge() throws ImapTimeoutException {
 		clientSupport.expunge();
 	}
 
 	@Override
-	public QuotaInfo quota(String mailbox) {
+	public QuotaInfo quota(String mailbox) throws MailboxNotFoundException, ImapTimeoutException {
 		return clientSupport.quota(findMailboxNameWithServerCase(mailbox));
 	}
 	
 	@Override
-	public boolean removeQuota(String mailbox) {
+	public boolean removeQuota(String mailbox) throws MailboxNotFoundException, ImapTimeoutException {
 		return clientSupport.removeQuota(findMailboxNameWithServerCase(mailbox));
 	}
 
 	@Override
-	public boolean setQuota(String mailbox, long quotaInKb) {
+	public boolean setQuota(String mailbox, long quotaInKb) throws MailboxNotFoundException, ImapTimeoutException {
 		return clientSupport.setQuota(findMailboxNameWithServerCase(mailbox), quotaInKb);
 	}
 
 	@Override
-	public InputStream uidFetchMessage(long uid) {
+	public InputStream uidFetchMessage(long uid) throws ImapTimeoutException {
 		return clientSupport.uidFetchMessage(uid);
 	}
 
 	@Override
-	public MessageSet uidSearch(SearchQuery sq) {
+	public MessageSet uidSearch(SearchQuery sq) throws ImapTimeoutException {
 		return clientSupport.uidSearch(sq);
 	}
 
 	@Override
-	public Collection<MimeMessage> uidFetchBodyStructure(MessageSet messages) {
+	public Collection<MimeMessage> uidFetchBodyStructure(MessageSet messages) throws ImapTimeoutException {
 		return clientSupport.uidFetchBodyStructure(messages);
 	}
 
 	@Override
-	public Collection<IMAPHeaders> uidFetchHeaders(Collection<Long> uids, String[] headers) {
+	public Collection<IMAPHeaders> uidFetchHeaders(Collection<Long> uids, String[] headers) throws ImapTimeoutException {
 		return clientSupport.uidFetchHeaders(uids, headers);
 	}
 
 	@Override
-	public Collection<UIDEnvelope> uidFetchEnvelope(MessageSet messages) {
+	public Collection<UIDEnvelope> uidFetchEnvelope(MessageSet messages) throws ImapTimeoutException {
 		return clientSupport.uidFetchEnvelope(messages);
 	}
 
 	@Override
-	public Map<Long, FlagsList> uidFetchFlags(MessageSet messages) {
+	public Map<Long, FlagsList> uidFetchFlags(MessageSet messages) throws ImapTimeoutException {
 		return clientSupport.uidFetchFlags(messages);
 	}
 	
 	@Override
-	public Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) {
+	public Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) throws ImapTimeoutException {
 		return clientSupport.uidFetchInternalDate(uids);
 	}
 	
 	@Override
-	public Collection<FastFetch> uidFetchFast(MessageSet messages) {
+	public Collection<FastFetch> uidFetchFast(MessageSet messages) throws ImapTimeoutException {
 		return clientSupport.uidFetchFast(messages);
 	}
 
 	@Override
-	public MessageSet uidCopy(MessageSet messages, String destMailbox) {
+	public MessageSet uidCopy(MessageSet messages, String destMailbox) throws MailboxNotFoundException, ImapTimeoutException {
 		return clientSupport.uidCopy(messages, findMailboxNameWithServerCase(destMailbox));
 	}
 
 	@Override
-	public boolean uidStore(MessageSet messages, FlagsList fl, boolean set) {
+	public boolean uidStore(MessageSet messages, FlagsList fl, boolean set) throws ImapTimeoutException {
 		return clientSupport.uidStore(messages, fl, set);
 	}
 
 	@Override
-	public InputStream uidFetchPart(long uid, String address, long truncation) {
+	public InputStream uidFetchPart(long uid, String address, long truncation) throws ImapTimeoutException {
 		return clientSupport.uidFetchPart(uid, address, truncation);
 	}
 	
 	@Override
-	public InputStream uidFetchPart(long uid, String address) {
+	public InputStream uidFetchPart(long uid, String address) throws ImapTimeoutException {
 		return clientSupport.uidFetchPart(uid, address);
 	}
 	
 	@Override
-	public EmailMetadata uidFetchEmailMetadata(long uid) {
+	public EmailMetadata uidFetchEmailMetadata(long uid) throws ImapTimeoutException {
 		return clientSupport.uidFetchEmailMetadata(uid);
 	}
 
 	@Override
-	public List<MailThread> uidThreads() {
+	public List<MailThread> uidThreads() throws ImapTimeoutException {
 		return clientSupport.uidThreads();
 	}
 
 	@Override
-	public NameSpaceInfo namespace() {
+	public NameSpaceInfo namespace() throws ImapTimeoutException {
 		return clientSupport.namespace();
 	}
 
@@ -330,17 +331,17 @@ public class StoreClientImpl implements StoreClient {
 	}
 	
 	@Override
-	public long uidNext(String mailbox) {
+	public long uidNext(String mailbox) throws MailboxNotFoundException, ImapTimeoutException {
 		return clientSupport.uidNext(findMailboxNameWithServerCase(mailbox));
 	}
 	
 	@Override
-	public long uidValidity(String mailbox) {
+	public long uidValidity(String mailbox) throws MailboxNotFoundException, ImapTimeoutException {
 		return clientSupport.uidValidity(findMailboxNameWithServerCase(mailbox));
 	}
 
 	@Override
-	public String findMailboxNameWithServerCase(String mailboxName) {
+	public String findMailboxNameWithServerCase(String mailboxName) throws MailboxNotFoundException, ImapTimeoutException {
 		if (isINBOXSpecificCase(mailboxName)) {
 			return EmailConfiguration.IMAP_INBOX_NAME;
 		}
@@ -357,7 +358,7 @@ public class StoreClientImpl implements StoreClient {
 					}
 				}
 
-				throw new CollectionNotFoundException("Cannot find IMAP folder for collection [ " + mailboxName + " ]");
+				throw new MailboxNotFoundException("Cannot find IMAP folder for collection [ " + mailboxName + " ]");
 		}
 
 		return mailboxName;
@@ -368,12 +369,12 @@ public class StoreClientImpl implements StoreClient {
 	}
 
 	@Override
-	public boolean setAcl(String mailbox, String identifier, String accessRights) {
+	public boolean setAcl(String mailbox, String identifier, String accessRights)  throws ImapTimeoutException {
 		return clientSupport.setAcl(mailbox, identifier, accessRights);
 	}
 
 	@Override
-	public Set<Acl> getAcl(String mailbox) {
+	public Set<Acl> getAcl(String mailbox)  throws ImapTimeoutException {
 		return clientSupport.getAcl(mailbox);
 	}
 }

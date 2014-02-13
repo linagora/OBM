@@ -39,7 +39,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.push.mail.MailException;
+import org.obm.push.exception.MailException;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.Envelope;

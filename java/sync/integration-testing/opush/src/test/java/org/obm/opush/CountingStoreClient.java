@@ -33,6 +33,8 @@ package org.obm.opush;
 
 import org.apache.mina.transport.socket.SocketConnector;
 import org.obm.configuration.EmailConfiguration;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.minig.imap.StoreClientImpl;
 import org.obm.push.minig.imap.impl.ClientSupport;
@@ -71,14 +73,14 @@ public class CountingStoreClient extends StoreClientImpl {
 	}
 	
 	@Override
-	protected boolean selectMailboxImpl(String mailbox) {
+	protected boolean selectMailboxImpl(String mailbox) throws MailboxNotFoundException, ImapTimeoutException {
 		boolean selected = super.selectMailboxImpl(mailbox);
 		counter.selectCounter.incrementAndGet();
 		return selected;
 	}
 	
 	@Override
-	public ListResult listAll() {
+	public ListResult listAll() throws ImapTimeoutException {
 		ListResult listAll = super.listAll();
 		counter.listMailboxesCounter.incrementAndGet();
 		return listAll;

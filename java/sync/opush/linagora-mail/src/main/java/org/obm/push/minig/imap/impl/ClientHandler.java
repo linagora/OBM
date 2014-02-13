@@ -39,7 +39,7 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.SocketConnector;
-import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.imap.IMAPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

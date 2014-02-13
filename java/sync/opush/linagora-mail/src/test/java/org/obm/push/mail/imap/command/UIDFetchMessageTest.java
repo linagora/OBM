@@ -32,7 +32,6 @@
 package org.obm.push.mail.imap.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
 import java.io.InputStream;
 
@@ -83,52 +82,52 @@ public class UIDFetchMessageTest {
 	
 	@Test
 	public void testUidFetchPartSimple() throws Exception {
-		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("plainText.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, ImapTestUtils.loadEmail("plainText.eml"));
 
 		InputStream fetchPart = uidFetchMessage(emailUid);
 		
-		assertThat(fetchPart).hasContentEqualTo(loadEmail("plainText.eml"));
+		assertThat(fetchPart).hasContentEqualTo(ImapTestUtils.loadEmail("plainText.eml"));
 	}
 	
 	@Test
 	public void testUidFetchPartAlternative() throws Exception {
-		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartAlternative.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, ImapTestUtils.loadEmail("multipartAlternative.eml"));
 
 		InputStream fetchPart = uidFetchMessage(emailUid);
 		
-		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartAlternative.eml"));
+		assertThat(fetchPart).hasContentEqualTo(ImapTestUtils.loadEmail("multipartAlternative.eml"));
 	}
 	
 	@Test
 	public void testUidFetchPartForwarded() throws Exception {
-		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartForwarded.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, ImapTestUtils.loadEmail("multipartForwarded.eml"));
 
 		InputStream fetchPart = uidFetchMessage(emailUid);
 		
-		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded.eml"));
+		assertThat(fetchPart).hasContentEqualTo(ImapTestUtils.loadEmail("multipartForwarded.eml"));
 	}
 	
 	@Test
 	public void testUidFetchPartMixed() throws Exception {
-		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartMixed.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, ImapTestUtils.loadEmail("multipartMixed.eml"));
 
 		InputStream fetchPart = uidFetchMessage(emailUid);
 		
-		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartMixed.eml"));
+		assertThat(fetchPart).hasContentEqualTo(ImapTestUtils.loadEmail("multipartMixed.eml"));
 	}
 	
 	@Test
 	public void testUidFetchPartRelated() throws Exception {
-		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartRelated.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, ImapTestUtils.loadEmail("multipartRelated.eml"));
 
 		InputStream fetchPart = uidFetchMessage(emailUid);
 		
-		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartRelated.eml"));
+		assertThat(fetchPart).hasContentEqualTo(ImapTestUtils.loadEmail("multipartRelated.eml"));
 	}
 
 	@Test
 	public void testUidFetchPartWrongUid() throws Exception {
-		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("plainText.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, ImapTestUtils.loadEmail("plainText.eml"));
 		long wrongUid = emailUid + 1;
 		
 		InputStream uidFetchMessage = uidFetchMessage(wrongUid);
@@ -139,7 +138,7 @@ public class UIDFetchMessageTest {
 	public void testUidFetchPartWrongSelectedMailbox() throws Exception {
 		String mailbox = "wrongmailbox";
 		client.create(mailbox);
-		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("plainText.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, ImapTestUtils.loadEmail("plainText.eml"));
 
 		client.select(mailbox);
 		InputStream uidFetchMessage = client.uidFetchMessage(emailUid);

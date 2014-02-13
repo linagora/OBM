@@ -31,25 +31,27 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
-import org.obm.push.mail.IMAPException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Acl;
+import org.obm.push.mail.imap.IMAPException;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
 public interface CyrusManager {
 
 	public interface Factory {
-		CyrusManager create(String hostname, String login, String password) throws IMAPException;
+		CyrusManager create(String hostname, String login, String password) throws IMAPException, ImapTimeoutException;
 	}
 
-	void create(ObmUser obmUser);
+	void create(ObmUser obmUser) throws ImapOperationException, ConnectionException, ImapTimeoutException;
 
-	void delete(ObmUser obmUser);
+	void delete(ObmUser obmUser) throws ImapOperationException, ConnectionException, ImapTimeoutException;
 
-	void setAcl(ObmUser obmUser, String identifier, Acl acl);
+	void setAcl(ObmUser obmUser, String identifier, Acl acl) throws ImapOperationException, ConnectionException, ImapTimeoutException;
 
-	void shutdown();
+	void shutdown() throws ImapTimeoutException;
 
-	void applyQuota(ObmUser obmUser);
+	void applyQuota(ObmUser obmUser) throws MailboxNotFoundException, ImapTimeoutException;
 
 }

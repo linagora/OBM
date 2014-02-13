@@ -23,6 +23,21 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>greenmail</groupId>
 			<artifactId>greenmail</artifactId>
 			<scope>compile</scope>
@@ -42,6 +57,11 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>configuration</artifactId>
+			<version>${obm.version}</version>
 		</dependency>
 	</dependencies>
 

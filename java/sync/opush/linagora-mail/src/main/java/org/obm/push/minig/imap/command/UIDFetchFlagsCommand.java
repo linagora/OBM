@@ -34,7 +34,7 @@ package org.obm.push.minig.imap.command;
 
 import java.util.Map;
 
-import org.obm.push.mail.MailException;
+import org.obm.push.exception.MailException;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;

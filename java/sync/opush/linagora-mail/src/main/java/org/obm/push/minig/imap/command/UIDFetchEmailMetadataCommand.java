@@ -32,7 +32,7 @@
 
 package org.obm.push.minig.imap.command;
 
-import org.obm.push.mail.MailException;
+import org.obm.push.exception.MailException;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.minig.imap.command.parser.BodyStructureParser;

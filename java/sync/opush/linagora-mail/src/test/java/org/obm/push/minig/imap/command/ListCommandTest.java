@@ -39,7 +39,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
-import org.obm.push.minig.imap.command.ListCommand;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.collect.Lists;

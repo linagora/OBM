@@ -36,7 +36,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.obm.push.mail.ImapMessageNotFoundException;
+import org.obm.push.exception.ImapMessageNotFoundException;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.utils.FileUtils;
 

@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.exception;
 
-import org.obm.push.mail.MailException;
+import org.obm.push.exception.MailException;
 
 public class NotQuotableEmailException extends MailException {
 

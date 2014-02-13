@@ -50,6 +50,7 @@ import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
+import org.obm.push.exception.MailException;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.conversation.EmailView;

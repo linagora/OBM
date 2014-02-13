@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
-import org.obm.push.mail.IMAPException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Acl;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.minig.imap.StoreClient;
 
 import com.google.inject.Inject;
@@ -59,7 +61,7 @@ public class CyrusManagerImpl implements CyrusManager {
 		}
 
 		@Override
-		public CyrusManagerImpl create(String hostname, String login, String password) throws IMAPException {
+		public CyrusManagerImpl create(String hostname, String login, String password) throws IMAPException, ImapTimeoutException {
 			StoreClient storeClient = storeClientFactory.create(hostname, login, password);
 			storeClient.login(false);
 			return new CyrusManagerImpl(connectionFactory.create(storeClient));
@@ -74,7 +76,7 @@ public class CyrusManagerImpl implements CyrusManager {
 	}
 
 	@Override
-	public void create(ObmUser obmUser) {
+	public void create(ObmUser obmUser) throws ImapOperationException, ConnectionException, ImapTimeoutException {
 		final String domain = obmUser.getDomain().getName();
 		String user = obmUser.getLogin();
 		Partition partition = Partition.fromObmDomain(domain);
@@ -90,14 +92,14 @@ public class CyrusManagerImpl implements CyrusManager {
 	}
 	
 	@Override
-	public void delete(ObmUser obmUser) {
+	public void delete(ObmUser obmUser) throws ImapOperationException, ConnectionException, ImapTimeoutException {
 		final String domain = obmUser.getDomain().getName();
 		String user = obmUser.getLogin();
 		conn.delete(ImapPath.builder().user(user).domain(domain).build());
 	}
 	
 	@Override
-	public void setAcl(ObmUser obmUser, String identifier, Acl acl) {
+	public void setAcl(ObmUser obmUser, String identifier, Acl acl) throws ImapOperationException, ConnectionException, ImapTimeoutException {
 		final String domain = obmUser.getDomain().getName();
 		String user = obmUser.getLogin();
 		conn.setAcl(
@@ -107,7 +109,7 @@ public class CyrusManagerImpl implements CyrusManager {
 	}
 
 	@Override
-	public void applyQuota(ObmUser obmUser) {
+	public void applyQuota(ObmUser obmUser) throws MailboxNotFoundException, ImapTimeoutException {
 		conn.setQuota(ImapPath
 				.builder()
 				.user(obmUser.getLogin())
@@ -116,7 +118,7 @@ public class CyrusManagerImpl implements CyrusManager {
 	}
 
 	@Override
-	public void shutdown() {
+	public void shutdown() throws ImapTimeoutException {
 		conn.shutdown();
 	}
 

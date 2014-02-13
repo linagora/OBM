@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
-import org.obm.push.mail.IMAPException;
+import org.obm.push.mail.imap.IMAPException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

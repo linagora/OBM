@@ -34,6 +34,7 @@ package org.obm.push.mail;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
+import org.obm.push.exception.MailException;
 
 public interface IEmailSync {
 

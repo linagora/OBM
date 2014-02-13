@@ -64,10 +64,10 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.exception.activesync.ProtocolException;
+import org.obm.push.exception.activesync.TimeoutException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
 import org.obm.push.mail.MailBackend;
-import org.obm.push.mail.exception.ImapTimeoutException;
 import org.obm.push.protocol.ItemOperationsProtocol;
 import org.obm.push.protocol.bean.ItemOperationsRequest;
 import org.obm.push.protocol.bean.ItemOperationsRequest.EmptyFolderContentsRequest;
@@ -134,7 +134,7 @@ public class ItemOperationsHandler extends WbxmlRequestHandler {
 			sendErrorResponse(responder, protocol, ItemOperationsStatus.SERVER_ERROR, e);
 		} catch (ProtocolException e) {
 			sendErrorResponse(responder, protocol, ItemOperationsStatus.SERVER_ERROR, e);
-		} catch (ImapTimeoutException e) {
+		} catch (TimeoutException e) {
 			sendErrorResponse(responder, protocol, ItemOperationsStatus.SERVER_ERROR, e);
 		}
 	}

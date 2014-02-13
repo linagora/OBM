@@ -31,7 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap.idle;
 
-import org.obm.push.mail.IMAPException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.mail.imap.IMAPException;
 
 public interface IdleClient {
 	
@@ -39,13 +40,13 @@ public interface IdleClient {
 		IdleClient create(String hostname, int port, String loginAtDomain, String password);
 	}
 	
-	void login(Boolean activateTLS) throws IMAPException;
+	void login(Boolean activateTLS) throws IMAPException, ImapTimeoutException;
 
-	void logout();
+	void logout() throws ImapTimeoutException;
 
-	void startIdle(IIdleCallback observer);
+	void startIdle(IIdleCallback observer) throws ImapTimeoutException;
 
-	void stopIdle();
+	void stopIdle() throws ImapTimeoutException;
 
-	boolean select(String mailbox);
+	boolean select(String mailbox) throws ImapTimeoutException;
 }

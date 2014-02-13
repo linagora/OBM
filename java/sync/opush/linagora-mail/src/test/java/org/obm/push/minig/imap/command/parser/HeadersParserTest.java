@@ -39,7 +39,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.junit.Test;
-import org.minig.imap.command.parser.HeadersParser;
+import org.obm.push.mail.mime.HeadersParser;
 
 import com.google.common.collect.Sets;
 

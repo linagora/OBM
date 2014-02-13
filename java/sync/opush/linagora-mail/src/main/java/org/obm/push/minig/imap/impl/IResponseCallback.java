@@ -32,7 +32,8 @@
 
 package org.obm.push.minig.imap.impl;
 
-import org.obm.push.mail.IMAPException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.mail.imap.IMAPException;
 
 public interface IResponseCallback {
 
@@ -40,7 +41,7 @@ public interface IResponseCallback {
 
 	void disconnected();
 
-	void imapResponse(MinaIMAPMessage imapResponse);
+	void imapResponse(MinaIMAPMessage imapResponse) throws ImapTimeoutException;
 
 	void setClient(ClientSupport cs);
 

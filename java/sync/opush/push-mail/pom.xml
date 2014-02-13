@@ -41,16 +41,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>mail-backend-interfaces</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>mail-backend-tools</artifactId>
-			<version>${obm.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-dao</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
@@ -59,6 +49,11 @@
 			<artifactId>icalendar</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
+                <dependency>
+                        <groupId>com.linagora.obm.opush</groupId>
+                        <artifactId>linagora-mail</artifactId>
+                        <version>${obm.version}</version>
+                </dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>tnefconverter</artifactId>
@@ -98,8 +93,10 @@
 			<artifactId>mail</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>greenmail</groupId>
-			<artifactId>greenmail</artifactId>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>greenmail-imap-server</artifactId>
+			<version>${obm.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.transaction</groupId>
@@ -109,7 +106,6 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>

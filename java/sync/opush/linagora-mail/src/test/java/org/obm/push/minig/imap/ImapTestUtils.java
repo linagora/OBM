@@ -31,10 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.minig.imap;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
-import org.obm.push.mail.MailException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.exception.MailException;
+import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
@@ -42,17 +46,22 @@ import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.Iterables;
+import com.google.common.io.ByteStreams;
 
 public class ImapTestUtils {
 	
-	private static long retrieveLastEmailUid(StoreClient client, String mailbox) throws MailException {
+	private static long retrieveLastEmailUid(StoreClient client, String mailbox)
+			throws MailException, MailboxNotFoundException, ImapTimeoutException {
+		
 		client.select(mailbox);
 		SearchQuery query = SearchQuery.builder().after(DateUtils.getEpochCalendar().getTime()).build();
 		MessageSet messages = client.uidSearch(query);
 		return Iterables.getLast(messages.asDiscreteValues());
 	}
 
-	public static long storeEmailToInbox(StoreClient client, InputStream email) throws MailException {
+	public static long storeEmailToInbox(StoreClient client, InputStream email)
+			throws MailException, MailboxNotFoundException, ImapTimeoutException {
+		
 		storeInFolder(client, emailReader(email), "INBOX");
 		return retrieveLastEmailUid(client, "INBOX");
 	}
@@ -62,7 +71,7 @@ public class ImapTestUtils {
 	}
 	
 	private static void storeInFolder(StoreClient client, Reader mailContent, String folderName) 
-			throws MailException {
+			throws MailException, MailboxNotFoundException, ImapTimeoutException {
 
 		try {
 			client.select(folderName);
@@ -70,5 +79,9 @@ public class ImapTestUtils {
 		} catch (CommandIOException e) {
 			throw new MailException(e);
 		}
+	}
+	
+	public static InputStream loadEmail(String name) throws IOException {
+		return new ByteArrayInputStream(ByteStreams.toByteArray(ClassLoader.getSystemResourceAsStream("eml/" + name)));
 	}
 }

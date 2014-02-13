@@ -45,7 +45,6 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
@@ -161,7 +160,7 @@ public class UIDFetchFlagsTest {
 		return expectedFlagsList;
 	}
 
-	private long messageWithFlagsToInbox(Flag... flags) throws OpushLocatorException {
+	private long messageWithFlagsToInbox(Flag... flags) throws Exception {
 		Reader emailStream = StreamMailTestsUtils.newReaderFromString("data");
 		client.select(EmailConfiguration.IMAP_INBOX_NAME);
 		client.append(EmailConfiguration.IMAP_INBOX_NAME, emailStream, list(flags));
@@ -170,7 +169,7 @@ public class UIDFetchFlagsTest {
 		return newEmailUid;
 	}
 	
-	private Collection<Flag> uidFetchFlags(long uid) {
+	private Collection<Flag> uidFetchFlags(long uid) throws Exception {
 		client.select(EmailConfiguration.IMAP_INBOX_NAME);
 		return client.uidFetchFlags(MessageSet.singleton(uid)).get(uid);
 	}

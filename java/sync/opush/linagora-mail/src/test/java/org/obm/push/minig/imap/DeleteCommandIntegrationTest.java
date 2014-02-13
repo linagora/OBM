@@ -39,16 +39,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.ICollectionPathHelper;
-import org.obm.push.bean.User;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.exception.OpushLocatorException;
-import org.obm.push.mail.IMAPException;
-import org.obm.push.mail.MailboxService;
+import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
-import org.obm.push.mail.imap.LinagoraImapClientProvider;
 
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
@@ -56,25 +49,21 @@ import com.icegreen.greenmail.util.GreenMail;
 @GuiceModule(org.obm.push.minig.imap.MailEnvModule.class)
 @RunWith(GuiceRunner.class)
 public class DeleteCommandIntegrationTest {
-	
-	@Inject LinagoraImapClientProvider clientProvider;
 
-	@Inject ICollectionPathHelper collectionPathHelper;
-	@Inject MailboxService mailboxService;
+	@Inject StoreClient.Factory storeClientFactory;
 	@Inject GreenMail greenMail;
+	
 	private String mailbox;
 	private String password;
-	private UserDataRequest udr;
+	private StoreClient client;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		greenMail.start();
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMail.setUser(mailbox, password);
-		udr = new UserDataRequest(
-				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null);
+		client = loggedClient();
 	}
 	
 	@After
@@ -82,10 +71,14 @@ public class DeleteCommandIntegrationTest {
 		greenMail.stop();
 	}
 	
+	private StoreClient loggedClient() throws Exception  {
+		StoreClient storeClient = storeClientFactory.create(greenMail.getImap().getBindTo(), mailbox, password);
+		storeClient.login(false);
+		return storeClient;
+	}
+	
 	@Test
-	public void testDeleteOneMailboxWithAccent() throws OpushLocatorException, IMAPException {
-		StoreClient client = loggedClient();
-		
+	public void testDeleteOneMailboxWithAccent() throws ImapTimeoutException {
 		client.create("déplacements");
 		boolean result = client.delete("déplacements");
 		ListResult folders = client.listAll();
@@ -96,9 +89,7 @@ public class DeleteCommandIntegrationTest {
 	}
 	
 	@Test
-	public void testDeleteTwoMailboxOfMany() throws OpushLocatorException, IMAPException {
-		StoreClient client = loggedClient();
-
+	public void testDeleteTwoMailboxOfMany() throws ImapTimeoutException {
 		client.create("déplacements");
 		client.create("another");
 		client.create("another/déplacements");
@@ -113,9 +104,7 @@ public class DeleteCommandIntegrationTest {
 	}
 	
 	@Test
-	public void testDeleteInexistantMailbox() throws OpushLocatorException, IMAPException {
-		StoreClient client = loggedClient();
-
+	public void testDeleteInexistantMailbox() throws ImapTimeoutException {
 		client.create("déplacements");
 		client.create("another");
 		client.create("another/déplacements");
@@ -128,10 +117,6 @@ public class DeleteCommandIntegrationTest {
 				mailbox("déplacements"),
 				mailbox("another"),
 				mailbox("another/déplacements"));
-	}
-	
-	private StoreClient loggedClient() throws OpushLocatorException, IMAPException  {
-		return clientProvider.getImapClient(udr);
 	}
 	
 	private ListInfo mailbox(String mailbox) {

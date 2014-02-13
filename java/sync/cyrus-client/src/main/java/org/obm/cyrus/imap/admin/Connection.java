@@ -33,6 +33,8 @@ package org.obm.cyrus.imap.admin;
 
 import java.util.List;
 
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.minig.imap.StoreClient;
 
@@ -43,27 +45,27 @@ public interface Connection {
 	}
 	
 	void createUserMailboxes(ImapPath... paths)
-			throws ImapOperationException, ConnectionException;
+			throws ImapOperationException, ConnectionException, ImapTimeoutException;
 
 	void createUserMailboxes(Partition partition, ImapPath... paths) 
-			throws ImapOperationException, ConnectionException;
+			throws ImapOperationException, ConnectionException, ImapTimeoutException;
 	
 	List<Acl> getAcl(ImapPath path) throws ImapOperationException, ConnectionException;
 	
-	void setAcl(ImapPath path, String identifier, Acl acl) throws ImapOperationException, ConnectionException;
+	void setAcl(ImapPath path, String identifier, Acl acl) throws ImapOperationException, ConnectionException, ImapTimeoutException;
 	
 	List<ImapPath> listMailboxes(String user) throws ImapOperationException, ConnectionException;
 	
-	void delete(ImapPath path) throws ImapOperationException, ConnectionException;
+	void delete(ImapPath path) throws ImapOperationException, ConnectionException, ImapTimeoutException;
 	
 	void rename(ImapPath source, ImapPath target, Partition partition) throws ImapOperationException, ConnectionException;
 	
 	Quota getQuota(ImapPath path);
 	
-	void setQuota(ImapPath path, Quota quota);
+	void setQuota(ImapPath path, Quota quota) throws MailboxNotFoundException, ImapTimeoutException;
 	
-	void removeQuota(ImapPath path);
+	void removeQuota(ImapPath path) throws MailboxNotFoundException, ImapTimeoutException;
 	
-	void shutdown();
+	void shutdown() throws ImapTimeoutException;
 	
 }

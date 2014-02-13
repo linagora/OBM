@@ -36,8 +36,8 @@ import java.net.SocketAddress;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.SocketConnector;
-import org.obm.push.mail.IMAPException;
-import org.obm.push.mail.exception.ImapTimeoutException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.mail.imap.IMAPException;
 
 import com.google.inject.Provider;
 
@@ -54,7 +54,7 @@ public class SessionFactoryImpl implements SessionFactory {
 	}
 	
 	@Override
-	public IoSession connect(SocketAddress address) throws IMAPException {
+	public IoSession connect(SocketAddress address) throws IMAPException, ImapTimeoutException {
 		SocketConnector socketConnector = connectorFactory.get();
 		socketConnector.setHandler(handler);
 		handler.setConnector(socketConnector);

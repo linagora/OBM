@@ -33,6 +33,8 @@ package org.obm.push.mail.greenmail;
 
 import java.util.Locale;
 
+import org.obm.configuration.EmailConfiguration;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -46,6 +48,7 @@ public class GreenMailProviderModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		bind(EmailConfiguration.class).to(GreenMailEmailConfiguration.class);
 	}
 
 	private ServerSetup getImapServerSetup() {

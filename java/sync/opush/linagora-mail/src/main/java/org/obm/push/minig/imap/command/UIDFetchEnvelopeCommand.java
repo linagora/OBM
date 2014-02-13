@@ -39,9 +39,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.minig.imap.EncodedWord;
-import org.minig.imap.impl.DateParser;
-import org.obm.push.mail.MailException;
+import org.obm.push.exception.MailException;
+import org.obm.push.mail.DateParser;
+import org.obm.push.mail.EncodedWord;
 import org.obm.push.mail.bean.Address;
 import org.obm.push.mail.bean.Envelope;
 import org.obm.push.mail.bean.MessageSet;
