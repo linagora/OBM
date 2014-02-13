@@ -36,31 +36,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.ICollectionPathHelper;
-import org.obm.push.bean.User;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.OpushLocatorException;
 import org.obm.push.mail.IMAPException;
 import org.obm.push.mail.MailException;
-import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
-import org.obm.push.mail.imap.LinagoraImapClientProvider;
-import org.obm.push.mail.imap.MailboxTestUtils;
+import org.obm.push.mail.imap.MinigStoreClient;
 import org.obm.push.minig.imap.StoreClient;
 
 import com.google.common.collect.Iterables;
@@ -71,29 +63,26 @@ import com.icegreen.greenmail.util.GreenMail;
 @RunWith(GuiceRunner.class)
 public class UIDFetchFlagsTest {
 
-	@Inject LinagoraImapClientProvider clientProvider;
-	@Inject MailboxService mailboxService;
-	@Inject ICollectionPathHelper collectionPathHelper;
-
+	@Inject MinigStoreClient.Factory storeClientFactory;
 	@Inject GreenMail greenMail;
+
 	private String mailbox;
 	private String password;
-	private UserDataRequest udr;
-	private Date beforeTest;
-	private MailboxTestUtils testUtils;
+	private StoreClient client;
 
 	@Before
-	public void setUp() {
-		beforeTest = DateUtils.date("1970-01-01T12:00:00");
+	public void setUp() throws Exception {
 		greenMail.start();
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMail.setUser(mailbox, password);
-		udr = new UserDataRequest(
-				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null);
-	    testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper,
-	    		greenMail.getSmtp().getServerSetup());
+		client = loggedClient();
+	}
+
+	private StoreClient loggedClient() throws OpushLocatorException, IMAPException  {
+		MinigStoreClient newMinigStoreClient = storeClientFactory.create(greenMail.getImap().getBindTo(), mailbox, password);
+		newMinigStoreClient.login(false);
+		return newMinigStoreClient.getStoreClient();
 	}
 	
 	@After
@@ -175,9 +164,8 @@ public class UIDFetchFlagsTest {
 		return expectedFlagsList;
 	}
 
-	private long messageWithFlagsToInbox(Flag... flags) throws OpushLocatorException, IMAPException {
+	private long messageWithFlagsToInbox(Flag... flags) throws OpushLocatorException {
 		Reader emailStream = StreamMailTestsUtils.newReaderFromString("data");
-		StoreClient client = loggedClient();
 		client.select(EmailConfiguration.IMAP_INBOX_NAME);
 		client.append(EmailConfiguration.IMAP_INBOX_NAME, emailStream, list(flags));
 		MessageSet uidSearch = client.uidSearch(SearchQuery.MATCH_ALL_EVEN_DELETED);
@@ -186,11 +174,7 @@ public class UIDFetchFlagsTest {
 	}
 	
 	private Collection<Flag> uidFetchFlags(long uid) throws MailException {
-		String inbox = testUtils.mailboxPath(EmailConfiguration.IMAP_INBOX_NAME);
-		return mailboxService.fetchFlags(udr, inbox, MessageSet.singleton(uid)).get(uid);
-	}
-	
-	private StoreClient loggedClient() throws OpushLocatorException, IMAPException  {
-		return clientProvider.getImapClient(udr);
+		client.select(EmailConfiguration.IMAP_INBOX_NAME);
+		return client.uidFetchFlags(MessageSet.singleton(uid)).get(uid);
 	}
 }

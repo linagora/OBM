@@ -52,17 +52,19 @@ import org.obm.guice.GuiceRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.ICollectionPathHelper;
+import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
 import org.obm.push.mail.MailException;
 import org.obm.push.mail.MailboxService;
-import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.Email;
+import org.obm.push.mail.bean.EmailReader;
 import org.obm.push.mail.bean.MailboxFolder;
 import org.obm.push.mail.bean.MailboxFolders;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.imap.MailboxTestUtils;
+import org.obm.push.mail.mime.MimeAddress;
 import org.obm.push.utils.DateUtils;
 
 import com.google.common.collect.Iterables;
@@ -374,6 +376,18 @@ public abstract class MailboxServiceTest {
 		Set<Email> emails = mailboxService.fetchEmails(udr, mailBoxPath, fromDate);
 		
 		assertThat(emails).hasSize(1);
+	}
+	
+	@Test
+	public void testUidFetchPartFindAttachment() throws Exception {
+		InputStream emailStream = loadEmail("multipartAlternative.eml");
+		mailboxService.storeInInbox(udr, new EmailReader(emailStream), false);
+		
+		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
+		
+		InputStream attachment = mailboxService.findAttachment(udr, inbox, 1l, new MimeAddress("3"));
+		
+		assertThat(attachment).hasContentEqualTo(loadEmail("multipartAlternative-part3.txt"));
 	}
 
 	private void consumeInputStream(Reader inputStream) throws IOException {

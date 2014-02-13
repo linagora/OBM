@@ -31,31 +31,22 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.imap.command;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.push.mail.MailTestsUtils.loadEmail;
 
 import java.io.InputStream;
-import java.util.Date;
 
-import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.DateUtils;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
-import org.obm.push.bean.Credentials;
-import org.obm.push.bean.ICollectionPathHelper;
-import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.User;
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.MailboxService;
 import org.obm.push.mail.Mime4jUtils;
-import org.obm.push.mail.bean.Email;
 import org.obm.push.mail.imap.LinagoraImapClientProvider;
-import org.obm.push.mail.imap.MailboxTestUtils;
-import org.obm.push.mail.mime.MimeAddress;
+import org.obm.push.mail.imap.MinigStoreClient;
+import org.obm.push.minig.imap.ImapTestUtils;
 import org.obm.push.minig.imap.StoreClient;
 
 import com.google.inject.Inject;
@@ -65,216 +56,200 @@ import com.icegreen.greenmail.util.GreenMail;
 @RunWith(GuiceRunner.class)
 public class UIDFetchPartTest {
 
+	@Inject MinigStoreClient.Factory storeClientFactory;
 	@Inject LinagoraImapClientProvider clientProvider;
-
-	@Inject ICollectionPathHelper collectionPathHelper;
-	@Inject MailboxService mailboxService;
 	@Inject GreenMail greenMail;
 	@Inject Mime4jUtils mime4jUtils;
+	
 	private String mailbox;
 	private String password;
-	private UserDataRequest udr;
-	private MailboxTestUtils testUtils;
-	private Date beforeTest;
+	private StoreClient client;
 
 	@Before
-	public void setUp() {
-		beforeTest = DateUtils.date("1970-01-01T12:00:00");
+	public void setUp() throws Exception {
 		greenMail.start();
 		mailbox = "to@localhost.com";
 		password = "password";
 		greenMail.setUser(mailbox, password);
-		udr = new UserDataRequest(
-				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null);
-		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper,
-	    		greenMail.getSmtp().getServerSetup());
+		client = loggedClient();
 	}
-	
 	@After
 	public void tearDown() {
 		greenMail.stop();
 	}
 	
+	private StoreClient loggedClient() throws Exception  {
+		MinigStoreClient newMinigStoreClient = storeClientFactory.create(greenMail.getImap().getBindTo(), mailbox, password);
+		newMinigStoreClient.login(false);
+		return newMinigStoreClient.getStoreClient();
+	}
+	
+	
 	@Test
 	public void testUidFetchPartSimple() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("plainText.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("plainText.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "1");
+		InputStream fetchPart = uidFetchPart(emailUid, "1");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("plainText-part1.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("plainText-part1.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartAlternativeText() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartAlternative.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "1");
+		InputStream fetchPart = uidFetchPart(emailUid, "1");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartAlternative-part1.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartAlternative-part1.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartAlternativeHtml() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartAlternative.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2");
+		InputStream fetchPart = uidFetchPart(emailUid, "2");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartAlternative-part2.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartAlternative-part2.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartAlternativeInvitation() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartAlternative.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "3");
+		InputStream fetchPart = uidFetchPart(emailUid, "3");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartAlternative-part3.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartAlternative-part3.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartMixedNestedAlternative() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartMixed.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartMixed.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "1");
+		InputStream fetchPart = uidFetchPart(emailUid, "1");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartMixed-part1.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartMixed-part1.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartMixedText() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartMixed.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartMixed.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "1.1");
+		InputStream fetchPart = uidFetchPart(emailUid, "1.1");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartMixed-part1-1.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartMixed-part1-1.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartMixedHtml() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartMixed.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartMixed.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "1.2");
+		InputStream fetchPart = uidFetchPart(emailUid, "1.2");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartMixed-part1-2.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartMixed-part1-2.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartMixedAttachment() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartMixed.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartMixed.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2");
+		InputStream fetchPart = uidFetchPart(emailUid, "2");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartMixed-part2.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartMixed-part2.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartRelatedFirstPart() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartRelated.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartRelated.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "1");
+		InputStream fetchPart = uidFetchPart(emailUid, "1");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartRelated-part1.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartRelated-part1.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartRelatedSecondPart() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartRelated.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartRelated.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2");
+		InputStream fetchPart = uidFetchPart(emailUid, "2");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartRelated-part2.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartRelated-part2.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartRelatedHtml() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartRelated.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartRelated.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2.1");
+		InputStream fetchPart = uidFetchPart(emailUid, "2.1");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartRelated-part2-1.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartRelated-part2-1.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartRelatedFile() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartRelated.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartRelated.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2.2");
+		InputStream fetchPart = uidFetchPart(emailUid, "2.2");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartRelated-part2-2.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartRelated-part2-2.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartForwardedFirstPart() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartForwarded.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartForwarded.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "1");
+		InputStream fetchPart = uidFetchPart(emailUid, "1");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part1.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part1.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartForwardedPreviousEmailPart() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartForwarded.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartForwarded.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2");
+		InputStream fetchPart = uidFetchPart(emailUid, "2");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartForwardedPreviousFirstPart() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartForwarded.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartForwarded.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2.1");
+		InputStream fetchPart = uidFetchPart(emailUid, "2.1");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2-1.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2-1.txt"));
 	}
 
 	@Test
 	public void testUidFetchPartMultipartForwardedPreviousSecondPart() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartForwarded.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartForwarded.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2.2");
+		InputStream fetchPart = uidFetchPart(emailUid, "2.2");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2-2.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2-2.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartForwardedPreviousHtmlPart() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartForwarded.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartForwarded.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2.2.1");
+		InputStream fetchPart = uidFetchPart(emailUid, "2.2.1");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2-2-1.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2-2-1.txt"));
 	}
 	
 	@Test
 	public void testUidFetchPartMultipartForwardedPreviousFilePart() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartForwarded.eml"));
+		long emailUid = ImapTestUtils.storeEmailToInbox(client, loadEmail("multipartForwarded.eml"));
 
-		InputStream fetchPart = uidFetchPart(sentEmail.getUid(), "2.2.2");
+		InputStream fetchPart = uidFetchPart(emailUid, "2.2.2");
 		
-		Assertions.assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2-2-2.txt"));
-	}
-	
-	@Test
-	public void testUidFetchPartFindAttachment() throws Exception {
-		Email sentEmail = testUtils.sendEmailToInbox(loadEmail("multipartAlternative.eml"));
-		String inbox = collectionPathHelper.buildCollectionPath(udr, PIMDataType.EMAIL, EmailConfiguration.IMAP_INBOX_NAME);
-		
-		InputStream attachment = mailboxService.findAttachment(udr, inbox, sentEmail.getUid(), new MimeAddress("3"));
-		
-		Assertions.assertThat(attachment).hasContentEqualTo(loadEmail("multipartAlternative-part3.txt"));
+		assertThat(fetchPart).hasContentEqualTo(loadEmail("multipartForwarded-part2-2-2.txt"));
 	}
 	
 	private InputStream uidFetchPart(long uid, String partToFetch) throws Exception {
 		StoreClient client = loggedClient();
 		client.select(EmailConfiguration.IMAP_INBOX_NAME);
 		return client.uidFetchPart(uid, partToFetch);
-	}
-	
-	private StoreClient loggedClient() throws Exception {
-		return clientProvider.getImapClient(udr);
 	}
 }
