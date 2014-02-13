@@ -50,8 +50,8 @@
 			<version>${obm.version}</version>
 		</dependency>
                 <dependency>
-                        <groupId>com.linagora.obm.opush</groupId>
-                        <artifactId>linagora-mail</artifactId>
+                        <groupId>com.linagora.obm</groupId>
+                        <artifactId>linagora-imap</artifactId>
                         <version>${obm.version}</version>
                 </dependency>
 		<dependency>

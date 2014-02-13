@@ -126,6 +126,7 @@
 		<module>obm-dao</module>
 		<module>transaction-test</module>
 		<module>greenmail-imap-server</module>
+		<module>linagora-imap</module>
   </modules>
 
 	<build>
