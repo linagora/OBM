@@ -20,8 +20,29 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>icalendar</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>greenmail-imap-server</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>linagora-imap</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-bean</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-dao</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-dao-mail</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
@@ -33,23 +54,12 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-dao-mail</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-dao</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>icalendar</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>linagora-imap</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>tnefconverter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>columba</groupId>
+			<artifactId>ristretto-core</artifactId>
+			<version>1.1.2-LINAGORA</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
@@ -58,6 +68,23 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava-testlib</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>jta</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -70,33 +97,6 @@
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava-testlib</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>columba</groupId>
-			<artifactId>ristretto-core</artifactId>
-			<version>1.1.2-LINAGORA</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>greenmail-imap-server</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>jta</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
 		</dependency>
 	</dependencies>
 	<build>

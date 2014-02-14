@@ -16,12 +16,18 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-core</artifactId>
+			<groupId>com.linagora</groupId>
+			<artifactId>crsh.shell.embed.guice</artifactId>
+			<version>0.3</version>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-mail</artifactId>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>healthcheck-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
@@ -29,7 +35,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-dao-jdbc</artifactId>
+			<artifactId>push-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
@@ -40,18 +46,12 @@
 			<artifactId>push-dao-ehcache-migrating</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>healthcheck-api</artifactId>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-dao-jdbc</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora</groupId>
-			<artifactId>crsh.shell.embed.guice</artifactId>
-			<version>0.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.crsh</groupId>
-			<artifactId>crsh.shell.ssh</artifactId>
-			<version>1.2.7</version>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-mail</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -62,9 +62,9 @@
 			<artifactId>assertj-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>common-test</artifactId>
-			<scope>test</scope>
+			<groupId>org.crsh</groupId>
+			<artifactId>crsh.shell.ssh</artifactId>
+			<version>1.2.7</version>
 		</dependency>
 	</dependencies>
 

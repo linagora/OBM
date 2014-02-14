@@ -41,8 +41,24 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.excilys.ebi.gatling.highcharts</groupId>
-			<artifactId>gatling-charts-highcharts</artifactId>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>protocol</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-bean</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>wbxml</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.excilys.ebi.gatling</groupId>
@@ -53,16 +69,8 @@
 			<artifactId>gatling-recorder</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.scala-lang</groupId>
-			<artifactId>scala-library</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
+			<groupId>com.excilys.ebi.gatling.highcharts</groupId>
+			<artifactId>gatling-charts-highcharts</artifactId>
 		</dependency>
 		<dependency><!-- Required by Guava when used with Scala -->
 			<groupId>com.google.code.findbugs</groupId>
@@ -71,10 +79,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.scalatest</groupId>
-			<artifactId>scalatest_2.9.3</artifactId>
-			<version>1.9.1</version>
-			<scope>test</scope>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -87,24 +97,14 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>wbxml</artifactId>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-bean</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>protocol</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>push-mail</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>common-test</artifactId>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_2.9.3</artifactId>
+			<version>1.9.1</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

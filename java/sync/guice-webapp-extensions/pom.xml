@@ -29,11 +29,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
-			<artifactId>guice-servlet</artifactId>
+			<artifactId>guice-multibindings</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
-			<artifactId>guice-multibindings</artifactId>
+			<artifactId>guice-servlet</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -21,17 +21,38 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.hornetq</groupId>
-			<artifactId>hornetq-server</artifactId>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>guice-webapp-extensions</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.jms</groupId>
+			<artifactId>jms</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.hornetq</groupId>
-			<artifactId>hornetq-jms-server</artifactId>
+			<artifactId>hornetq-core-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.hornetq</groupId>
@@ -39,21 +60,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.hornetq</groupId>
-			<artifactId>hornetq-core-client</artifactId>
+			<artifactId>hornetq-jms-server</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>javax.jms</groupId>
-			<artifactId>jms</artifactId>
+			<groupId>org.hornetq</groupId>
+			<artifactId>hornetq-server</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
-			<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jul-to-slf4j</artifactId>
 		</dependency>
@@ -62,22 +75,9 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>common-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>guice-webapp-extensions</artifactId>
 		</dependency>
 	</dependencies>
 </project>

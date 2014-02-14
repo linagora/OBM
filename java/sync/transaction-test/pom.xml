@@ -16,13 +16,13 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>be.bitronix.btm</groupId>
+			<artifactId>btm</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>be.bitronix.btm</groupId>
-			<artifactId>btm</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -23,9 +23,13 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>utils</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.freeutils</groupId>
@@ -52,25 +56,20 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>utils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
-			<artifactId>common-test</artifactId>
-			<scope>test</scope>
+			<groupId>org.apache.james</groupId>
+			<artifactId>apache-mime4j-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.james</groupId>
-			<artifactId>apache-mime4j-core</artifactId>
+			<artifactId>apache-mime4j-dom</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.james</groupId>
 			<artifactId>apache-mime4j-storage</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.james</groupId>
-			<artifactId>apache-mime4j-dom</artifactId>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -81,8 +80,9 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

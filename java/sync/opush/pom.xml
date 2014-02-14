@@ -54,12 +54,7 @@
 		<dependencies>
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>push-bean</artifactId>
-				<version>${obm.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>wbxml</artifactId>
+				<artifactId>obm-backend</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
@@ -69,7 +64,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>obm-backend</artifactId>
+				<artifactId>push-bean</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
@@ -84,11 +79,6 @@
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>push-dao-jdbc</artifactId>
-				<version>${obm.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.linagora.obm.opush</groupId>
 				<artifactId>push-dao-ehcache</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
@@ -99,7 +89,22 @@
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
+				<artifactId>push-dao-jdbc</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.opush</groupId>
+				<artifactId>push-dao-mail</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.opush</groupId>
 				<artifactId>push-dao-testsuite</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.opush</groupId>
+				<artifactId>push-interfaces</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
@@ -114,7 +119,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>push-dao-mail</artifactId>
+				<artifactId>spushnik-module</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
@@ -129,18 +134,13 @@
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>push-interfaces</artifactId>
+				<artifactId>wbxml</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>backport-util-concurrent</groupId>
 				<artifactId>backport-util-concurrent</artifactId>
 				<version>${backport-util-concurrent.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>spushnik-module</artifactId>
-				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.mail</groupId>

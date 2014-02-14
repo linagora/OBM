@@ -96,54 +96,48 @@
 	</pluginRepositories>
 
 	<modules>
-		<module>obm-domain-objects</module>
-		<module>obm-domain-objects-test</module>
-		<module>client</module>
-		<module>services-module</module>
-		<module>services-webapp</module>
-		<module>locator</module>
-		<module>message-queue</module>
-		<module>opush</module>	
-		<module>configuration</module>
-		<module>configuration-test</module>
-		<module>obm-locator</module>
-		<module>utils</module>
-		<module>dbcp</module>
 		<module>annotations</module>
 		<module>autoconf</module>
+		<module>client</module>
 		<module>common-test</module>
 		<module>common-dao-test</module>
-		<module>integration-testing</module>
-		<module>webapp-common-dependencies</module>
-		<module>icalendar</module>
-		<module>qos-filter</module>
-		<module>healthcheck-api</module>
+		<module>configuration</module>
+		<module>configuration-test</module>
+		<module>cyrus-client</module>
+		<module>dbcp</module>
+		<module>greenmail-imap-server</module>
 		<module>guice-webapp-extensions</module>
+		<module>healthcheck-api</module>
+		<module>icalendar</module>
+		<module>integration-testing</module>
+		<module>ldap-client</module>
+		<module>linagora-imap</module>
+		<module>locator</module>
+		<module>message-queue</module>
+		<module>obm-dao</module>
+		<module>obm-domain-objects</module>
+		<module>obm-domain-objects-test</module>
+		<module>obm-locator</module>
+		<module>opush</module>	
 		<module>provisioning-module</module>
 		<module>provisioning-client</module>
-		<module>ldap-client</module>
-		<module>cyrus-client</module>
+		<module>qos-filter</module>
 		<module>satellite-client</module>
-		<module>obm-dao</module>
+		<module>services-module</module>
+		<module>services-webapp</module>
 		<module>transaction-test</module>
-		<module>greenmail-imap-server</module>
-		<module>linagora-imap</module>
+		<module>utils</module>
+		<module>webapp-common-dependencies</module>
   </modules>
 
 	<build>
 		<pluginManagement>
 			
 			<plugins>
-				<plugin>
+ 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
- 					<version>${plugin.surefire.version}</version>
-					<configuration>
-						<redirectTestOutputToFile>true</redirectTestOutputToFile>
-						<includes>
-							<include>**/*.java</include>
-						</includes>
-					</configuration>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>2.5</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -157,7 +151,16 @@
                                                 <maxmem>256m</maxmem>
 					</configuration>
 				</plugin>
-
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>${plugin.dependency.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>2.7</version>
+				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-eclipse-plugin</artifactId>
@@ -265,7 +268,16 @@ org.eclipse.jdt.core.compiler.source=1.6
 						</additionalConfig>
 					</configuration>
 				</plugin>
-				
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>2.4</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>${plugin.jar.version}</version>
+				</plugin>
 				<plugin>
 					<groupId>org.mortbay.jetty</groupId>
 					<artifactId>maven-jetty-plugin</artifactId>
@@ -284,36 +296,6 @@ org.eclipse.jdt.core.compiler.source=1.6
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>${plugin.jar.version}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-war-plugin</artifactId>
-					<version>${plugin.war.version}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-dependency-plugin</artifactId>
-					<version>${plugin.dependency.version}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-clean-plugin</artifactId>
-					<version>2.5</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-deploy-plugin</artifactId>
-					<version>2.7</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-install-plugin</artifactId>
-					<version>2.4</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>2.6</version>
 				</plugin>
@@ -321,6 +303,22 @@ org.eclipse.jdt.core.compiler.source=1.6
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>3.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+ 					<version>${plugin.surefire.version}</version>
+					<configuration>
+						<redirectTestOutputToFile>true</redirectTestOutputToFile>
+						<includes>
+							<include>**/*.java</include>
+						</includes>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>${plugin.war.version}</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -335,7 +333,7 @@ org.eclipse.jdt.core.compiler.source=1.6
 
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
+			<dependency> <!-- keep bom ordered and at the top of the dependencies -->
 				<groupId>org.jboss.shrinkwrap.descriptors</groupId>
 				<artifactId>shrinkwrap-descriptors-bom</artifactId>
 				<version>2.0.0-alpha-5</version>
@@ -364,153 +362,156 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<type>pom</type>
 			</dependency>
 			<dependency>
-				<groupId>org.jboss.arquillian.container</groupId>
-				<artifactId>arquillian-jetty-embedded-6.1</artifactId>
-				<version>1.0.0.CR2</version>
-				<scope>test</scope>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>annotations</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.h2database</groupId>
-				<artifactId>h2</artifactId>
-				<version>1.3.172</version>
-				<scope>test</scope>
+				<groupId>com.linagora.obm.integration-testing</groupId>
+				<artifactId>arquillian-bundle</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.ow2.asm</groupId>
-				<artifactId>asm</artifactId>
-				<version>${asm.version}</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>client</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.ow2.asm</groupId>
-				<artifactId>asm-util</artifactId>
-				<version>${asm.version}</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>common-dao-test</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.ow2.asm</groupId>
-				<artifactId>asm-analysis</artifactId>
-				<version>${asm.version}</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>common-test</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.ow2.asm</groupId>
-				<artifactId>asm-tree</artifactId>
-				<version>${asm.version}</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>cyrus-client</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.mina</groupId>
-				<artifactId>mina-core</artifactId>
-				<version>2.0.7</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>configuration</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.parboiled</groupId>
-				<artifactId>parboiled-java</artifactId>
-				<version>${parboiled.version}</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>configuration-test</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>net.sf.ehcache.internal</groupId>
-				<artifactId>ehcache-core</artifactId>
-				<version>2.7.2</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>dbcp</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-nop</artifactId>
-				<version>${slf4j.version}</version>
-				<scope>test</scope>
-				<optional>true</optional>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>greenmail-imap-server</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-simple</artifactId>
-				<version>${slf4j.version}</version>
-				<scope>test</scope>
-				<optional>true</optional>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>guice-webapp-extensions</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
-				<version>${slf4j.version}</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>healthcheck-api</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>jcl-over-slf4j</artifactId>
-				<version>${slf4j.version}</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>icalendar</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>${slf4j.version}</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>ldap-client</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>jul-to-slf4j</artifactId>
-				<version>${slf4j.version}</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>linagora-imap</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>servlet-api</artifactId>
-				<version>${servlet-api.version}</version>
-				<scope>provided</scope>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>locator</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-continuation</artifactId>
-				<version>7.6.12.v20130726</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>message-queue</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-http</artifactId>
-				<version>7.6.12.v20130726</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>obm-dao</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>jetty</artifactId>
-				<version>6.1.26</version>
-				<scope>test</scope>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>obm-domain-objects</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>javax.mail</groupId>
-				<artifactId>mail</artifactId>
-				<version>${mail.version}</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>obm-domain-objects-test</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.freemarker</groupId>
-				<artifactId>freemarker</artifactId>
-				<version>${freemarker.version}</version>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>provisioning-module</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>postgresql</groupId>
-				<artifactId>postgresql</artifactId>
-				<version>${postgresql.version}</version>
-				<scope>provided</scope>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>qos-filter</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>mysql</groupId>
-				<artifactId>mysql-connector-java</artifactId>
-				<version>${mysql-connector-java.version}</version>
-				<scope>provided</scope>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>satellite-client</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jsoup</groupId>
-				<artifactId>jsoup</artifactId>
-				<version>${jsoup.version}</version>
-				<scope>test</scope>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>services-module</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.mnode.ical4j</groupId>
-				<artifactId>ical4j</artifactId>
-				<version>1.0.4</version>
-				<exclusions>
-					<exclusion>
-						<groupId>commons-logging</groupId>
-						<artifactId>commons-logging</artifactId>
-					</exclusion>
-				</exclusions>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>transaction-test</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>javax.transaction</groupId>
-				<artifactId>jta</artifactId>
-				<version>${jta.version}</version>
-				<scope>provided</scope>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>utils</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.integration-testing</groupId>
+				<artifactId>utils-integration-testing</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.opush</groupId>
+				<artifactId>client-opush</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.opush</groupId>
+				<artifactId>push-servlet</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.opush</groupId>
+				<artifactId>technical-log-bean</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>be.bitronix.btm</groupId>
 				<artifactId>btm</artifactId>
@@ -521,81 +522,6 @@ org.eclipse.jdt.core.compiler.source=1.6
 						<artifactId>cglib</artifactId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-exec</artifactId>
-				<version>1.1</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-codec</groupId>
-				<artifactId>commons-codec</artifactId>
-				<version>1.8</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-lang</groupId>
-				<artifactId>commons-lang</artifactId>
-				<version>${commons-lang.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.jms</groupId>
-				<artifactId>jms</artifactId>
-				<version>${jms.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty</artifactId>
-				<version>${netty.version}</version>
-			</dependency>			
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>${junit.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.easymock</groupId>
-				<artifactId>easymock</artifactId>
-				<version>${easymock.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.powermock</groupId>
-				<artifactId>powermock-api-easymock</artifactId>
-				<version>${powermock.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.powermock</groupId>
-				<artifactId>powermock-module-junit4</artifactId>
-				<version>${powermock.version}</version>
-				<scope>test</scope>
-			</dependency>
-            		<dependency>
-                		<groupId>org.assertj</groupId>
-                		<artifactId>assertj-core</artifactId>
-                		<version>${assertj.version}</version>
-                		<scope>test</scope>
-            		</dependency>
-			<dependency>
-				<groupId>org.hornetq</groupId>
-				<artifactId>hornetq-server</artifactId>
-				<version>${hornetq.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.hornetq</groupId>
-				<artifactId>hornetq-jms-server</artifactId>
-				<version>${hornetq.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.hornetq</groupId>
-				<artifactId>hornetq-jms-client</artifactId>
-				<version>${hornetq.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.hornetq</groupId>
-				<artifactId>hornetq-core-client</artifactId>
-				<version>${hornetq.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
@@ -624,19 +550,15 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<version>${guice.version}</version>
  	  		</dependency>
 			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpclient</artifactId>
-				<version>${httpclient.version}</version>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>1.3.172</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>fluent-hc</artifactId>
-				<version>${httpclient.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpmime</artifactId>
-				<version>${httpclient.version}</version>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>1.8</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -644,39 +566,9 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<version>${commons-io.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.james</groupId>
-				<artifactId>apache-mime4j-core</artifactId>
-				<version>${apache-mime4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.james</groupId>
-				<artifactId>apache-mime4j-storage</artifactId>
-				<version>${apache-mime4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.james</groupId>
-				<artifactId>apache-mime4j-dom</artifactId>
-				<version>${apache-mime4j.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.sourceforge.nekohtml</groupId>
-				<artifactId>nekohtml</artifactId>
-				<version>1.9.18</version>
-			</dependency>
-			<dependency>
-				<groupId>xerces</groupId>
-				<artifactId>xercesImpl</artifactId>
-				<version>2.11.0</version>
-			</dependency>
-			<dependency>
-				<groupId>xml-apis</groupId>
-				<artifactId>xml-apis</artifactId>
-				<version>1.4.01</version>
-			</dependency>
-			<dependency>
-				<groupId>joda-time</groupId>
-				<artifactId>joda-time</artifactId>
-				<version>2.3</version>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>${commons-lang.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>greenmail</groupId>
@@ -685,15 +577,9 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>xmlunit</groupId>
-				<artifactId>xmlunit</artifactId>
-				<version>1.5</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.scala-lang</groupId>
-				<artifactId>scala-library</artifactId>
-				<version>${scala.version}</version>
+				<groupId>info.cukes</groupId>
+				<artifactId>cucumber-guice</artifactId>
+				<version>${cucumber.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>info.cukes</groupId>
@@ -708,14 +594,58 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>info.cukes</groupId>
-				<artifactId>cucumber-guice</artifactId>
-				<version>${cucumber.version}</version>
+				<groupId>io.netty</groupId>
+				<artifactId>netty</artifactId>
+				<version>${netty.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>common-test</artifactId>
-				<version>${obm.version}</version>
+				<groupId>javax.jms</groupId>
+				<artifactId>jms</artifactId>
+				<version>${jms.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>${mail.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>${servlet-api.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.transaction</groupId>
+				<artifactId>jta</artifactId>
+				<version>${jta.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>2.3</version>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>${mysql-connector-java.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.ehcache.internal</groupId>
+				<artifactId>ehcache-core</artifactId>
+				<version>2.7.2</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sourceforge.nekohtml</groupId>
+				<artifactId>nekohtml</artifactId>
+				<version>1.9.18</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -723,149 +653,218 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<version>1.5</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>transaction-test</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-exec</artifactId>
+				<version>1.1</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>dbcp</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>fluent-hc</artifactId>
+				<version>${httpclient.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>configuration</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${httpclient.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>configuration-test</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpmime</artifactId>
+				<version>${httpclient.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>guice-webapp-extensions</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.apache.james</groupId>
+				<artifactId>apache-mime4j-core</artifactId>
+				<version>${apache-mime4j.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm.integration-testing</groupId>
-				<artifactId>arquillian-bundle</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.apache.james</groupId>
+				<artifactId>apache-mime4j-dom</artifactId>
+				<version>${apache-mime4j.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>services-module</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.apache.james</groupId>
+				<artifactId>apache-mime4j-storage</artifactId>
+				<version>${apache-mime4j.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>utils</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.apache.mina</groupId>
+				<artifactId>mina-core</artifactId>
+				<version>2.0.7</version>
+			</dependency>
+            		<dependency>
+                		<groupId>org.assertj</groupId>
+                		<artifactId>assertj-core</artifactId>
+                		<version>${assertj.version}</version>
+                		<scope>test</scope>
+            		</dependency>
+			<dependency>
+				<groupId>org.easymock</groupId>
+				<artifactId>easymock</artifactId>
+				<version>${easymock.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>client</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-continuation</artifactId>
+				<version>7.6.12.v20130726</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm.integration-testing</groupId>
-				<artifactId>utils-integration-testing</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-http</artifactId>
+				<version>7.6.12.v20130726</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>greenmail-imap-server</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.freemarker</groupId>
+				<artifactId>freemarker</artifactId>
+				<version>${freemarker.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>push-servlet</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.hornetq</groupId>
+				<artifactId>hornetq-core-client</artifactId>
+				<version>${hornetq.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>client-opush</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.hornetq</groupId>
+				<artifactId>hornetq-jms-client</artifactId>
+				<version>${hornetq.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>locator</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.hornetq</groupId>
+				<artifactId>hornetq-jms-server</artifactId>
+				<version>${hornetq.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>technical-log-bean</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.hornetq</groupId>
+				<artifactId>hornetq-server</artifactId>
+				<version>${hornetq.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>obm-domain-objects</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.jboss.arquillian.container</groupId>
+				<artifactId>arquillian-jetty-embedded-6.1</artifactId>
+				<version>1.0.0.CR2</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>obm-domain-objects-test</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.jsoup</groupId>
+				<artifactId>jsoup</artifactId>
+				<version>${jsoup.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>annotations</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.mnode.ical4j</groupId>
+				<artifactId>ical4j</artifactId>
+				<version>1.0.4</version>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>common-dao-test</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty</artifactId>
+				<version>6.1.26</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>message-queue</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.ow2.asm</groupId>
+				<artifactId>asm</artifactId>
+				<version>${asm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>linagora-imap</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.ow2.asm</groupId>
+				<artifactId>asm-analysis</artifactId>
+				<version>${asm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>icalendar</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.ow2.asm</groupId>
+				<artifactId>asm-tree</artifactId>
+				<version>${asm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>ldap-client</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.ow2.asm</groupId>
+				<artifactId>asm-util</artifactId>
+				<version>${asm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>cyrus-client</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.parboiled</groupId>
+				<artifactId>parboiled-java</artifactId>
+				<version>${parboiled.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>qos-filter</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-api-easymock</artifactId>
+				<version>${powermock.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>satellite-client</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-module-junit4</artifactId>
+				<version>${powermock.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>obm-dao</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-library</artifactId>
+				<version>${scala.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>provisioning-module</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${slf4j.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm</groupId>
-				<artifactId>healthcheck-api</artifactId>
-				<version>${obm.version}</version>
+				<groupId>org.slf4j</groupId>
+				<artifactId>jul-to-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-log4j12</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-nop</artifactId>
+				<version>${slf4j.version}</version>
+				<scope>test</scope>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>${slf4j.version}</version>
+				<scope>test</scope>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>${postgresql.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>xerces</groupId>
+				<artifactId>xercesImpl</artifactId>
+				<version>2.11.0</version>
+			</dependency>
+			<dependency>
+				<groupId>xml-apis</groupId>
+				<artifactId>xml-apis</artifactId>
+				<version>1.4.01</version>
+			</dependency>
+			<dependency>
+				<groupId>xmlunit</groupId>
+				<artifactId>xmlunit</artifactId>
+				<version>1.5</version>
+				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

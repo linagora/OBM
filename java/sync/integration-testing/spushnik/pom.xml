@@ -17,17 +17,20 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>spushnik-module</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.integration-testing</groupId>
+			<artifactId>arquillian-bundle</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.integration-testing</groupId>
+			<artifactId>opush-integration-testing</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -41,16 +44,13 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>spushnik-module</artifactId>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>spushnik-module</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.integration-testing</groupId>
-			<artifactId>arquillian-bundle</artifactId>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.arquillian.container</groupId>
@@ -58,17 +58,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>jetty-plus</artifactId>
-			<version>${arquillian.jetty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty-naming</artifactId>
 			<version>${arquillian.jetty.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.integration-testing</groupId>
-			<artifactId>opush-integration-testing</artifactId>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty-plus</artifactId>
+			<version>${arquillian.jetty.version}</version>
 		</dependency>
 	</dependencies>
 </project>
