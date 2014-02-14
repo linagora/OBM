@@ -49,19 +49,16 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
-			<version>${obm.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-dao-test</artifactId>
-			<version>${obm.version}</version>
 			<scope>test</scope>
 		</dependency>
         <dependency>
             <groupId>com.linagora.obm</groupId>
             <artifactId>dbcp</artifactId>
-            <version>${obm.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -80,18 +77,15 @@
         <dependency>
             <groupId>com.linagora.obm</groupId>
             <artifactId>utils</artifactId>
-            <version>${obm.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.linagora.obm</groupId>
-            <artifactId>obm-domain-objects</artifactId>
-            <version>${obm.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.linagora.obm</groupId>
-            <artifactId>obm-domain-objects-test</artifactId>
-            <version>${obm.version}</version>
-	    <scope>test</scope>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>obm-domain-objects</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>obm-domain-objects-test</artifactId>
+			<scope>test</scope>
         </dependency>
    	</dependencies>
 

@@ -89,28 +89,22 @@
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>wbxml</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-bean</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>protocol</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-mail</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
-			<version>${obm.version}</version>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 

@@ -31,7 +31,6 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
-			<version>${obm.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -46,7 +45,6 @@
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>client-opush</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>

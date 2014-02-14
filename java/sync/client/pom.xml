@@ -24,12 +24,10 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>locator</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>technical-log-bean</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -42,12 +40,10 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>obm-domain-objects</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>obm-domain-objects-test</artifactId>
-			<version>${obm.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -77,7 +73,6 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
-			<version>${obm.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

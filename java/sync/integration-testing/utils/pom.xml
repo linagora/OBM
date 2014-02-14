@@ -25,27 +25,26 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration-test</artifactId>
-			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>arquillian-bundle</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
-                <dependency>
-                        <groupId>com.linagora.obm</groupId>
-                        <artifactId>services-module</artifactId>
-                        <version>${obm.version}</version>
-                </dependency>
-                <dependency>
-                        <groupId>com.linagora.obm</groupId>
-                        <artifactId>client</artifactId>
-                        <version>${obm.version}</version>
-                </dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>services-module</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>client</artifactId>
+		</dependency>
 	</dependencies>
 </project>

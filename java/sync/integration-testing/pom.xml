@@ -24,4 +24,24 @@
                 <module>provisioning</module>
 	</modules>
 	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.linagora.obm.integration-testing</groupId>
+				<artifactId>services-integration-testing</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.integration-testing</groupId>
+				<artifactId>opush-integration-testing</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.opush</groupId>
+				<artifactId>spushnik-module</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
 </project>

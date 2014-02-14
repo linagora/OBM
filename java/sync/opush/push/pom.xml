@@ -24,7 +24,6 @@
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-servlet</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>

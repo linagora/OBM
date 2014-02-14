@@ -20,17 +20,14 @@
         <dependency>
             <groupId>com.linagora.obm</groupId>
             <artifactId>dbcp</artifactId>
-            <version>${obm.version}</version>
         </dependency>
         <dependency>
             <groupId>com.linagora.obm</groupId>
             <artifactId>annotations</artifactId>
-            <version>${obm.version}</version>
         </dependency>
         <dependency>
             <groupId>com.linagora.obm</groupId>
             <artifactId>configuration</artifactId>
-            <version>${obm.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

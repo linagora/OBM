@@ -47,7 +47,6 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -56,12 +55,10 @@
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-bean</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>guice-webapp-extensions</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
@@ -70,7 +67,7 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
-			<version>${obm.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
                        <groupId>be.bitronix.btm</groupId>
@@ -89,7 +86,6 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>annotations</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 	</dependencies>
 </project>

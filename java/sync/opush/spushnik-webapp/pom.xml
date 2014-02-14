@@ -19,7 +19,6 @@
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>spushnik-module</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 	</dependencies>
 

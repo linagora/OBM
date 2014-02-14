@@ -18,17 +18,14 @@
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>technical-log-bean</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-bean</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-interfaces</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
@@ -46,7 +43,6 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
-			<version>${obm.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -92,7 +88,6 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>guice-webapp-extensions</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 	</dependencies>
 

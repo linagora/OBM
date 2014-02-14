@@ -43,17 +43,14 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration-test</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-servlet</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>client-opush</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
@@ -72,7 +69,6 @@
 		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>arquillian-bundle</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.arquillian.container</groupId>
@@ -91,7 +87,6 @@
 		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>utils-integration-testing</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>info.cukes</groupId>
@@ -115,7 +110,6 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>greenmail-imap-server</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 	</dependencies>
 </project>

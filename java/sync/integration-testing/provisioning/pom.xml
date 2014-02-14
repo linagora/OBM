@@ -47,7 +47,6 @@
 		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>arquillian-bundle</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.jboss.arquillian.container</groupId>
@@ -57,17 +56,14 @@
 		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>utils-integration-testing</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>services-integration-testing</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>provisioning-module</artifactId>
-			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.transaction</groupId>
@@ -91,8 +87,6 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-dao-test</artifactId>
-			<version>${obm.version}</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
