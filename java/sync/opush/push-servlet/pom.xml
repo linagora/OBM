@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
@@ -21,7 +22,7 @@
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-mail</artifactId>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>obm-backend</artifactId>
@@ -42,11 +43,11 @@
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>healthcheck-api</artifactId>
 		</dependency>
-		<dependency>	
+		<dependency>
 			<groupId>com.linagora</groupId>
-	        <artifactId>crsh.shell.embed.guice</artifactId>
-	        <version>0.3</version>
-        </dependency>
+			<artifactId>crsh.shell.embed.guice</artifactId>
+			<version>0.3</version>
+		</dependency>
 		<dependency>
 			<groupId>org.crsh</groupId>
 			<artifactId>crsh.shell.ssh</artifactId>

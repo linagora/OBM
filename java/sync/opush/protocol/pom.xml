@@ -47,9 +47,9 @@
 			<artifactId>push-dao</artifactId>
 		</dependency>
 		<dependency>
-                        <groupId>com.linagora.obm</groupId>
-                        <artifactId>configuration</artifactId>
-                </dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>configuration</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
@@ -62,7 +62,6 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>

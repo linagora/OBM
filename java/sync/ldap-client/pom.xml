@@ -55,23 +55,23 @@
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 		</dependency>
-        <dependency>
-		    <groupId>org.apache.directory.api</groupId>
-		    <artifactId>api-all</artifactId>
-		    <version>1.0.0-M17</version>
-        </dependency>
-        <dependency>
-		    <groupId>opendj-server</groupId>
-		    <artifactId>opendj-server</artifactId>
-		    <version>2.4.6</version>
-		    <scope>test</scope>
-        </dependency>
-        <dependency>
-		    <groupId>com.sleepycat</groupId>
-		    <artifactId>je</artifactId>
-		    <version>5.0.73</version>
-		    <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.directory.api</groupId>
+			<artifactId>api-all</artifactId>
+			<version>1.0.0-M17</version>
+		</dependency>
+		<dependency>
+			<groupId>opendj-server</groupId>
+			<artifactId>opendj-server</artifactId>
+			<version>2.4.6</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sleepycat</groupId>
+			<artifactId>je</artifactId>
+			<version>5.0.73</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>

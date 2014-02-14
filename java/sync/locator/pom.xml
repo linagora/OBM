@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-                </dependency>
+		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -55,30 +55,30 @@
 			<artifactId>easymock</artifactId>
 		</dependency>
 		<dependency>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
 			<scope>test</scope>
-                </dependency>
-                <dependency>
-                        <groupId>org.mortbay.jetty</groupId>
-                        <artifactId>jetty</artifactId>
-                </dependency>
+		</dependency>
 		<dependency>
-                        <groupId>com.google.inject</groupId>
-                        <artifactId>guice</artifactId>
-                </dependency>
-                <dependency>
-                        <groupId>com.google.inject.extensions</groupId>
-                        <artifactId>guice-servlet</artifactId>
-                </dependency>
-                <dependency>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpclient</artifactId>
-                </dependency>
-                <dependency>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>fluent-hc</artifactId>
-                </dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject.extensions</groupId>
+			<artifactId>guice-servlet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>

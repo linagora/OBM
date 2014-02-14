@@ -43,10 +43,10 @@
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>icalendar</artifactId>
 		</dependency>
-                <dependency>
-                        <groupId>com.linagora.obm</groupId>
-                        <artifactId>linagora-imap</artifactId>
-                </dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>linagora-imap</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>tnefconverter</artifactId>

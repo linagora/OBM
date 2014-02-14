@@ -14,7 +14,7 @@
 	<url>http://www.obm.org/</url>
 
 	<dependencies>
- 		<dependency>
+		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
 			<scope>test</scope>
@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-servlet</artifactId>
-   		</dependency>
+		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-access</artifactId>

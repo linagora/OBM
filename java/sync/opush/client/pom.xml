@@ -21,7 +21,7 @@
 	</licenses>
 
 	<dependencies>
- 		<dependency>
+		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-bean</artifactId>
 		</dependency>
