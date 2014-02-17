@@ -21,6 +21,7 @@
 
 	<properties>
 		<obm.version>2.6.0-SNAPSHOT</obm.version>
+		<opush.version>2.6.0-SNAPSHOT</opush.version>
 
 		<postgresql.version>9.2-1002.jdbc4</postgresql.version>
 		<mysql-connector-java.version>5.1.26</mysql-connector-java.version>
@@ -499,17 +500,17 @@ org.eclipse.jdt.core.compiler.source=1.6
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
 				<artifactId>client-opush</artifactId>
-				<version>${obm.version}</version>
+				<version>${opush.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
 				<artifactId>push-servlet</artifactId>
-				<version>${obm.version}</version>
+				<version>${opush.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
 				<artifactId>technical-log-bean</artifactId>
-				<version>${obm.version}</version>
+				<version>${opush.version}</version>
 			</dependency>
 
 			<dependency>
