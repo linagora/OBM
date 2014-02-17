@@ -44,6 +44,9 @@ import org.obm.push.resource.HttpClientResource;
 import org.obm.push.resource.ResourceCloseOrder;
 import org.obm.push.resource.ResourcesUtils;
 import org.obm.push.service.AuthenticationService;
+import org.obm.push.technicallog.bean.KindToBeLogged;
+import org.obm.push.technicallog.bean.ResourceType;
+import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.login.LoginClient;
@@ -117,7 +120,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		request.setAttribute(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
 		return httpClientResource;
 	}
-	
+
+	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.HTTP_CLIENT)
 	private AccessTokenResource login(HttpClient httpClient, String userId, String password) throws Exception {
 		AccessToken accessToken = loginClientFactory.create(httpClient)
 				.authenticate(userFactory.getLoginAtDomain(userId), password);

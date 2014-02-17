@@ -36,9 +36,6 @@ import javax.inject.Singleton;
 import org.apache.http.client.HttpClient;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.push.technicallog.bean.KindToBeLogged;
-import org.obm.push.technicallog.bean.ResourceType;
-import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -108,7 +105,6 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 	
 	@Override
-	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.HTTP_CLIENT)
 	public AccessToken login(String loginAtDomain, String password) throws AuthFault {
 		Multimap<String, String> params = ArrayListMultimap.create();
 		params.put("login", loginAtDomain);
@@ -182,7 +178,6 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 	
 	@Override
-	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onEndOfMethod=true, resourceType=ResourceType.HTTP_CLIENT)
 	public void logout(AccessToken at) {
 		try {
 			Multimap<String, String> params = ArrayListMultimap.create();
