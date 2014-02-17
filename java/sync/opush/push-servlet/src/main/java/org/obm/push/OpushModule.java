@@ -36,11 +36,11 @@ import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.dbcp.DatabaseModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
 import org.obm.push.store.ehcache.EhCacheDaoModule;
 import org.obm.push.store.jdbc.JdbcDaoModule;
+import org.obm.push.store.jdbc.OpushDatabaseModule;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -55,7 +55,7 @@ public class OpushModule extends AbstractModule {
 	private Module databaseModule;
 	
 	public OpushModule() {
-		this(buildConfiguration(), new DatabaseModule());
+		this(buildConfiguration(), new OpushDatabaseModule());
 	}
 	
 	public OpushModule(GlobalAppConfiguration<ConfigurationService> globalConfiguration, Module databaseModule) {
@@ -84,8 +84,7 @@ public class OpushModule extends AbstractModule {
 		install(new HealthCheckModule());
 		install(new HealthCheckDefaultHandlersModule());
 		install(new EhCacheDaoModule());
-		install(new JdbcDaoModule());
-		install(databaseModule);
+		install(new JdbcDaoModule(databaseModule));
 		bind(Boolean.class).annotatedWith(Names.named("enable-push")).toInstance(false);
  	}
 

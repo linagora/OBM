@@ -41,11 +41,19 @@ import org.obm.push.store.ItemTrackingDao;
 import org.obm.sync.date.DateProvider;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 
 public class JdbcDaoModule extends AbstractModule{
 
+	private final Module databaseModule;
+
+	public JdbcDaoModule(Module databaseModule) {
+		this.databaseModule = databaseModule;
+	}
+
 	@Override
 	protected void configure() {
+		install(databaseModule);
 		bind(CollectionDao.class).to(CollectionDaoJdbcImpl.class);
 		bind(DeviceDao.class).to(DeviceDaoJdbcImpl.class);
 		bind(HeartbeatDao.class).to(HeartbeatDaoJdbcDaoImpl.class);

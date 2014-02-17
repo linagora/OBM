@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013-2014 Linagora
+ * Copyright (C) 2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,32 +29,46 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.dbcp;
+package org.obm.push.store.jdbc;
 
-import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
-import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
-import org.obm.sync.LifecycleListener;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+import org.obm.annotations.transactional.ITransactionAttributeBinder;
+import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.DatabaseModule;
+import org.obm.dbcp.PoolingDataSourceDecorator;
+import org.obm.push.technicallog.bean.KindToBeLogged;
+import org.obm.push.technicallog.bean.ResourceType;
+import org.obm.push.technicallog.bean.TechnicalLogging;
 
-public class DatabaseModule extends AbstractModule {
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-	@Override
-	protected void configure() {
-		bindDatabaseConnectionProvider();
-		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
-		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
-		databaseDrivers.addBinding().to(MySQLDriverConfiguration.class);
-		databaseDrivers.addBinding().to(PostgresDriverConfiguration.class);
+public class OpushDatabaseModule extends DatabaseModule {
 
-		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		lifecycleListeners.addBinding().to(DatabaseConnectionProviderImpl.class);
-
-	}
 	
+	@Override
 	protected void bindDatabaseConnectionProvider() {
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+		bind(DatabaseConnectionProvider.class).to(TechnicalLogDatabaseConnectionProvider.class);
+	}
+
+	@Singleton
+	public static class TechnicalLogDatabaseConnectionProvider extends DatabaseConnectionProviderImpl {
+
+		@Inject 
+		TechnicalLogDatabaseConnectionProvider(
+				ITransactionAttributeBinder transactionAttributeBinder,
+				PoolingDataSourceDecorator poolingDataSource) {
+			super(transactionAttributeBinder, poolingDataSource);
+		}
+
+		@Override
+		@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.JDBC_CONNECTION)
+		public Connection getConnection() throws SQLException {
+			return super.getConnection();
+		}
+		
 	}
 }

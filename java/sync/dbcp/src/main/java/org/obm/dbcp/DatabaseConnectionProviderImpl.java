@@ -41,9 +41,6 @@ import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.annotations.transactional.TransactionException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.push.technicallog.bean.KindToBeLogged;
-import org.obm.push.technicallog.bean.ResourceType;
-import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
@@ -92,7 +89,6 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	}
 
 	@Override
-	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.JDBC_CONNECTION)
 	public Connection getConnection() throws SQLException {
 		Connection connection = null;
 		try {
