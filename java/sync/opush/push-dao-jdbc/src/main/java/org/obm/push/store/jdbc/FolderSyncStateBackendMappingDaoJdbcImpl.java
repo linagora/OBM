@@ -43,7 +43,7 @@ import org.obm.push.bean.PIMDataType;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.utils.DateUtils;
-import org.obm.push.utils.JDBCUtils;
+import org.obm.push.store.jdbc.OpushJDBCUtils;
 import org.obm.sync.date.DateProvider;
 
 import com.google.inject.Inject;
@@ -77,12 +77,12 @@ public class FolderSyncStateBackendMappingDaoJdbcImpl extends AbstractJdbcImpl i
 
 			rs = ps.executeQuery();
 			if (rs.next()) {
-				return JDBCUtils.getDate(rs, 1);
+				return OpushJDBCUtils.getDate(rs, 1);
 			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 		return null;
 	}
@@ -104,7 +104,7 @@ public class FolderSyncStateBackendMappingDaoJdbcImpl extends AbstractJdbcImpl i
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, null);
+			OpushJDBCUtils.cleanup(con, ps, null);
 		}
 	}
 }

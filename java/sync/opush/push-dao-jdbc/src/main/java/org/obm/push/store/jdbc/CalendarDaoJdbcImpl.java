@@ -41,7 +41,6 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.CalendarDao;
-import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.calendar.EventExtId;
 
@@ -71,7 +70,7 @@ public class CalendarDaoJdbcImpl extends AbstractJdbcImpl implements CalendarDao
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 		String msg = String.format("No ExtId mapping found for Uid:{%s} and Device:{%s}", msEventUid.serializeToString(), device.getDatabaseId());
 		throw new EventNotFoundException(msg);
@@ -95,7 +94,7 @@ public class CalendarDaoJdbcImpl extends AbstractJdbcImpl implements CalendarDao
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 		return null;
 	}
@@ -117,7 +116,7 @@ public class CalendarDaoJdbcImpl extends AbstractJdbcImpl implements CalendarDao
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, null);
+			OpushJDBCUtils.cleanup(con, ps, null);
 		}
 	}
 }

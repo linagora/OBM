@@ -41,13 +41,9 @@ import java.util.Date;
 
 import javax.transaction.UserTransaction;
 
-import org.obm.push.technicallog.bean.KindToBeLogged;
-import org.obm.push.technicallog.bean.ResourceType;
-import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 
@@ -67,25 +63,46 @@ public class JDBCUtils {
 	}
 
 	public static final void cleanup(Connection con, Statement ps, ResultSet rs) {
+		cleanup(con, ps, rs, connectionCloser);
+	}
+	
+	public static final void cleanup(Connection con, Statement ps, ResultSet rs,
+			ConnectionCloser connectionCloser) {
+		
 		Throwable resultSetFailure = closeResultSetThenGetFailure(rs);
 		Throwable statementFailure = closeStatementThenGetFailure(ps);
-		Throwable connectionFailure = closeConnectionThenGetFailure(con);
+		Throwable connectionFailure = connectionCloser.closeConnectionThenGetFailure(con);
 		throwFirstNotNull(resultSetFailure, statementFailure, connectionFailure);
 	}
+	
+	public static interface ConnectionCloser {
+		Throwable closeConnectionThenGetFailure(Connection connection);
+	}
 
-	@VisibleForTesting static void throwFirstNotNull(Throwable...failures) {
+	/*
+	 * This connection closer is there only to make the static method overridable
+	 */
+	private static ConnectionCloser connectionCloser = new ConnectionCloser() {
+		
+		@Override
+		public Throwable closeConnectionThenGetFailure(Connection connection) {
+			return JDBCUtils.closeConnectionThenGetFailure(connection);
+		}
+	};
+	
+	public static void throwFirstNotNull(Throwable...failures) {
 		for (Throwable failure : failures) {
 			throwRuntimeIfNotNull(failure);
 		}
 	}
 
-	@VisibleForTesting static void throwRuntimeIfNotNull(Throwable failure) {
+	public static void throwRuntimeIfNotNull(Throwable failure) {
 		if (failure != null) {
 			Throwables.propagate(failure);
 		}
 	}
 
-	@VisibleForTesting static Throwable closeResultSetThenGetFailure(ResultSet rs) {
+	public static Throwable closeResultSetThenGetFailure(ResultSet rs) {
 		if (rs != null) {
 			try {
 				rs.close();
@@ -97,7 +114,7 @@ public class JDBCUtils {
 		return null;
 	}
 
-	@VisibleForTesting static Throwable closeStatementThenGetFailure(Statement ps) {
+	public static Throwable closeStatementThenGetFailure(Statement ps) {
 		if (ps != null) {
 			try {
 				ps.close();
@@ -108,12 +125,11 @@ public class JDBCUtils {
 		}
 		return null;
 	}
-
-	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onEndOfMethod=true, resourceType=ResourceType.JDBC_CONNECTION)
-	@VisibleForTesting static Throwable closeConnectionThenGetFailure(Connection con) {
-		if (con != null) {
+	
+	public static Throwable closeConnectionThenGetFailure(Connection connection) {
+		if (connection != null) {
 			try {
-				con.close();
+				connection.close();
 			} catch (Throwable se) {
 				logger.error(se.getMessage(), se);
 				return se;

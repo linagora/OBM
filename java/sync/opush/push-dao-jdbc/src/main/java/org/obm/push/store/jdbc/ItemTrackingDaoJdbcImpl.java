@@ -42,7 +42,7 @@ import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.utils.JDBCUtils;
+import org.obm.push.store.jdbc.OpushJDBCUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -88,7 +88,7 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 	}
 
@@ -127,7 +127,7 @@ public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTra
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 	}
 	

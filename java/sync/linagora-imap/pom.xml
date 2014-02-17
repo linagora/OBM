@@ -43,6 +43,10 @@
 			<artifactId>configuration</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>technical-log-bean</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>greenmail-imap-server</artifactId>
 			<scope>test</scope>

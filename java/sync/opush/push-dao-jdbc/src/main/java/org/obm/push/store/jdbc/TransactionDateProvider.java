@@ -35,7 +35,7 @@ import java.sql.Statement;
 import java.util.Date;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.push.utils.JDBCUtils;
+import org.obm.push.store.jdbc.OpushJDBCUtils;
 import org.obm.sync.date.DateProvider;
 
 import com.google.common.base.Throwables;
@@ -63,11 +63,11 @@ public class TransactionDateProvider extends AbstractJdbcImpl implements DatePro
 			
 			rs.next();
 			
-			return JDBCUtils.getDate(rs, rs.getMetaData().getColumnName(1));
+			return OpushJDBCUtils.getDate(rs, rs.getMetaData().getColumnName(1));
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		} finally {
-			JDBCUtils.cleanup(con, st, rs);
+			OpushJDBCUtils.cleanup(con, st, rs);
 		}
 	}
 

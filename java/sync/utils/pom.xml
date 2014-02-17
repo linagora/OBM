@@ -33,10 +33,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>technical-log-bean</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>

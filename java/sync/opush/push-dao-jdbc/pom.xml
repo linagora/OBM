@@ -53,6 +53,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>technical-log-bean</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>push-dao</artifactId>
 		</dependency>
 		<dependency>
@@ -76,7 +80,6 @@
 		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>jta</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

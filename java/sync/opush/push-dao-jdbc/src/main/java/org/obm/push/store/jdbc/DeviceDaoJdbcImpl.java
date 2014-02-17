@@ -44,7 +44,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.User;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.DeviceDao;
-import org.obm.push.utils.JDBCUtils;
+import org.obm.push.store.jdbc.OpushJDBCUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -87,7 +87,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 		return null;
 	}
@@ -118,7 +118,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 	}
 	
@@ -145,7 +145,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, null);
+			OpushJDBCUtils.cleanup(con, ps, null);
 		}
 		logger.info(user + " isn't authorized to synchronize in OBM-UI");
 		return false;
@@ -177,7 +177,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 		return null;
 	}
@@ -223,7 +223,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 	}
 
@@ -241,7 +241,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 	}
 
@@ -268,7 +268,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 	}
 
@@ -293,7 +293,7 @@ public class DeviceDaoJdbcImpl extends AbstractJdbcImpl implements DeviceDao {
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 	}
 }

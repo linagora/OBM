@@ -41,7 +41,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.bean.Device;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.FolderSnapshotDao;
-import org.obm.push.utils.JDBCUtils;
+import org.obm.push.store.jdbc.OpushJDBCUtils;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -74,7 +74,7 @@ public class FolderSnapshotDaoJdbcImpl extends AbstractJdbcImpl implements Folde
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, null);
+			OpushJDBCUtils.cleanup(con, ps, null);
 		}
 	}
 
@@ -98,7 +98,7 @@ public class FolderSnapshotDaoJdbcImpl extends AbstractJdbcImpl implements Folde
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 		return collectionIds;
 	}
@@ -124,7 +124,7 @@ public class FolderSnapshotDaoJdbcImpl extends AbstractJdbcImpl implements Folde
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 		return collectionIds;
 	}
@@ -151,7 +151,7 @@ public class FolderSnapshotDaoJdbcImpl extends AbstractJdbcImpl implements Folde
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 		return null;
 	}
@@ -178,7 +178,7 @@ public class FolderSnapshotDaoJdbcImpl extends AbstractJdbcImpl implements Folde
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 		return null;
 	}
@@ -206,7 +206,7 @@ public class FolderSnapshotDaoJdbcImpl extends AbstractJdbcImpl implements Folde
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
-			JDBCUtils.cleanup(con, ps, rs);
+			OpushJDBCUtils.cleanup(con, ps, rs);
 		}
 		return null;
 	}

@@ -29,76 +29,63 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
+
 package org.obm.push.store.jdbc;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Date;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.push.bean.Device;
-import org.obm.push.exception.DaoException;
-import org.obm.push.store.HeartbeatDao;
-import org.obm.push.store.jdbc.OpushJDBCUtils;
+import javax.transaction.UserTransaction;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import org.obm.push.technicallog.bean.KindToBeLogged;
+import org.obm.push.technicallog.bean.ResourceType;
+import org.obm.push.technicallog.bean.TechnicalLogging;
+import org.obm.push.utils.JDBCUtils;
+import org.obm.push.utils.JDBCUtils.ConnectionCloser;
 
-@Singleton
-public class HeartbeatDaoJdbcDaoImpl extends AbstractJdbcImpl implements HeartbeatDao{
+public class OpushJDBCUtils {
 
-	@Inject
-	private HeartbeatDaoJdbcDaoImpl(DatabaseConnectionProvider dbcp) {
-		super(dbcp);
-	}
-
-	@Override
-	public Long findLastHeartbeat(Device device) throws DaoException {
-		final Integer devDbId = device.getDatabaseId();
-		
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = dbcp.getConnection();
-			ps = con.prepareStatement("SELECT last_heartbeat FROM opush_ping_heartbeat WHERE device_id=?");
-			ps.setInt(1, devDbId);
-
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				return rs.getLong("last_heartbeat");
-			}
-		} catch (SQLException e) {
-			throw new DaoException(e);
-		} finally {
-			OpushJDBCUtils.cleanup(con, ps, null);
-		}
-		return null;
-	}
-
-	@Override
-	public void updateLastHeartbeat(Device device, long heartbeat) throws DaoException {
-		final Integer devDbId = device.getDatabaseId();
-		Connection con = null;
-		PreparedStatement ps = null;
-		try {
-			con = dbcp.getConnection();
-			ps = con.prepareStatement("DELETE FROM opush_ping_heartbeat WHERE device_id=? ");
-			ps.setInt(1, devDbId);
-			ps.executeUpdate();
-
-			ps.close();
-			ps = con.prepareStatement("INSERT INTO opush_ping_heartbeat (device_id, last_heartbeat) VALUES (?, ?)");
-			ps.setInt(1, devDbId);
-			ps.setLong(2, heartbeat);
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			throw new DaoException(e);
-		} finally {
-			OpushJDBCUtils.cleanup(con, ps, null);
-		}
+	public static final void cleanup(Connection con, Statement ps, ResultSet rs) {
+		JDBCUtils.cleanup(con, ps, rs, technicalLogConnectionCloser);
 	}
 	
+	private static ConnectionCloser technicalLogConnectionCloser = new ConnectionCloser() {
+		
+		@Override
+		@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onEndOfMethod=true, resourceType=ResourceType.JDBC_CONNECTION)
+		public Throwable closeConnectionThenGetFailure(Connection connection) {
+			return JDBCUtils.closeConnectionThenGetFailure(connection);
+		}
+	};
+	
+	public static final void rollback(Connection con) {
+		JDBCUtils.rollback(con);
+	}
+
+	public static void rollback(UserTransaction ut) {
+		JDBCUtils.rollback(ut);
+	}
+
+	public static Date getDate(ResultSet rs, String fieldName) throws SQLException {
+		return JDBCUtils.getDate(rs, fieldName);
+	}
+
+	public static Date getDate(ResultSet rs, Integer fieldNumber) throws SQLException {
+		return JDBCUtils.getDate(rs, fieldNumber);
+	}
+
+	public static java.sql.Date getDateWithoutTime(Date lastSync) {
+		return JDBCUtils.getDateWithoutTime(lastSync);
+	}
+
+	public static int convertNegativeIntegerToZero(ResultSet rs, String fieldName) throws SQLException {
+		return JDBCUtils.convertNegativeIntegerToZero(rs, fieldName);
+	}
+
+	public static Integer getInteger(ResultSet rs, String fieldName) throws SQLException {
+		return JDBCUtils.getInteger(rs, fieldName);
+	}
 }
