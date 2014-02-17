@@ -33,7 +33,7 @@
 require_once dirname(__FILE__) . '/../../obminclude/of/of_date.inc';
 
 function get_conflict_end_date($calendar) {
-  if ($calendar["repeat_kind"] != "none") {
+  if ($calendar["repeat_kind"] != null && $calendar["repeat_kind"] != "none") {
     $endPlusAYear = clone $calendar["date_end"];
     $endPlusAYear->addYear(1);
 
