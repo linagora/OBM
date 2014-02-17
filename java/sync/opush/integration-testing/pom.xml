@@ -3,32 +3,34 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.linagora.obm</groupId>
+		<groupId>com.linagora.obm.opush</groupId>
 		<artifactId>parent</artifactId>
 		<version>2.6.0-SNAPSHOT</version>
 	</parent>
 
-	<groupId>com.linagora.obm.integration-testing</groupId>
+	<groupId>com.linagora.obm.opush.integration-testing</groupId>
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
-	<name>OBM parent integration testing</name>
+	<name>OPush parent integration testing</name>
 	<url>http://www.obm.org/</url>
 	<version>2.6.0-SNAPSHOT</version>
 
 	<modules>
-		<module>utils</module>
-		<module>common</module>
-		<module>arquillian-bundle</module>
-		<module>services</module>
-		<module>provisioning</module>
+		<module>opush</module>
+		<module>spushnik</module>
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.linagora.obm.integration-testing</groupId>
-				<artifactId>services-integration-testing</artifactId>
-				<version>${obm.version}</version>
+				<groupId>com.linagora.obm.opush.integration-testing</groupId>
+				<artifactId>opush-integration-testing</artifactId>
+				<version>${opush.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.opush.integration-testing</groupId>
+				<artifactId>spushnik-integration-testing</artifactId>
+				<version>${opush.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

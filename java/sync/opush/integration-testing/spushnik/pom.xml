@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.linagora.obm.integration-testing</groupId>
+		<groupId>com.linagora.obm.opush.integration-testing</groupId>
 		<artifactId>parent</artifactId>
 		<version>2.6.0-SNAPSHOT</version>
 	</parent>
@@ -17,15 +17,15 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.linagora.obm.opush</groupId>
-			<artifactId>spushnik-module</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>arquillian-bundle</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.integration-testing</groupId>
+			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>spushnik-module</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush.integration-testing</groupId>
 			<artifactId>opush-integration-testing</artifactId>
 		</dependency>
 		<dependency>

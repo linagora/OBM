@@ -29,6 +29,7 @@
 		<module>push</module>
 		<module>wbxml</module>
 		<module>client</module>
+		<module>integration-testing</module>
 		<module>technical-log</module>
 		<module>technical-log-bean</module>
 		<module>push-dao</module>
@@ -52,6 +53,11 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>com.linagora.obm.opush</groupId>
+				<artifactId>client-opush</artifactId>
+				<version>${opush.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
 				<artifactId>obm-backend</artifactId>
@@ -115,6 +121,11 @@
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
 				<artifactId>push-mail-beans</artifactId>
+				<version>${opush.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.opush</groupId>
+				<artifactId>push-servlet</artifactId>
 				<version>${opush.version}</version>
 			</dependency>
 			<dependency>

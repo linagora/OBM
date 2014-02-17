@@ -499,16 +499,6 @@ org.eclipse.jdt.core.compiler.source=1.6
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>client-opush</artifactId>
-				<version>${opush.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>push-servlet</artifactId>
-				<version>${opush.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.linagora.obm.opush</groupId>
 				<artifactId>technical-log-bean</artifactId>
 				<version>${opush.version}</version>
 			</dependency>
