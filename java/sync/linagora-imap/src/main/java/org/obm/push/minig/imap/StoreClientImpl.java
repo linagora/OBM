@@ -67,9 +67,6 @@ import org.obm.push.minig.imap.impl.IResponseCallback;
 import org.obm.push.minig.imap.impl.MailThread;
 import org.obm.push.minig.imap.impl.SessionFactoryImpl;
 import org.obm.push.minig.imap.impl.StoreClientCallback;
-import org.obm.push.technicallog.bean.KindToBeLogged;
-import org.obm.push.technicallog.bean.ResourceType;
-import org.obm.push.technicallog.bean.TechnicalLogging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +127,6 @@ public class StoreClientImpl implements StoreClient {
 	}
 
 	@Override
-	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onStartOfMethod=true, resourceType=ResourceType.IMAP_CONNECTION)
 	public void login(Boolean activateTLS) throws IMAPException, ImapTimeoutException {
 		logger.debug("login attempt to {}:{} for {}", hostname, port, login);
 		SocketAddress sa = new InetSocketAddress(hostname, port);
@@ -138,7 +134,6 @@ public class StoreClientImpl implements StoreClient {
 	}
 
 	@Override
-	@TechnicalLogging(kindToBeLogged=KindToBeLogged.RESOURCE, onEndOfMethod=true, resourceType=ResourceType.IMAP_CONNECTION)
 	public void logout() throws ImapTimeoutException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("logout attempt for " + login);
