@@ -6,7 +6,7 @@
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
 	<version>2.6.0-SNAPSHOT</version>
-	<name>obm-sync and opush 2.4 parent project</name>
+	<name>OBM Java parent project</name>
 
 	<inceptionYear>2000</inceptionYear>
 	<organization>
@@ -21,12 +21,12 @@
 
 	<properties>
 		<obm.version>2.6.0-SNAPSHOT</obm.version>
-		<opush.version>2.6.0-SNAPSHOT</opush.version>
 
 		<postgresql.version>9.2-1002.jdbc4</postgresql.version>
 		<mysql-connector-java.version>5.1.26</mysql-connector-java.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
 		<hornetq.version>2.3.1.Final</hornetq.version>
 		<junit.version>4.11</junit.version>
 		<easymock.version>3.1</easymock.version>
@@ -51,13 +51,8 @@
 		<btm.version>3.0.0-1a33e59482fd29f6993ef3dfb5fab12efa0b24d2</btm.version>
 		<parboiled.version>1.1.6</parboiled.version>
 		<jersey.version>1.17.1</jersey.version>
-		<resteasy.version>3.0.4.Final</resteasy.version>
-		<scala.version>2.9.3</scala.version>
-		<scala-maven-plugin.version>3.1.0</scala-maven-plugin.version>
-		<gatling.version>1.5.2</gatling.version>
 		<cglib.version>3.0</cglib.version>
 		<asm.version>4.1</asm.version>
-		<cucumber.version>1.1.5</cucumber.version>
 		<shiro.version>1.2.2</shiro.version>
 		<version.shrinkwrap.resolvers>2.0.0</version.shrinkwrap.resolvers>
 		<arquillian.version>1.1.1.Final</arquillian.version>
@@ -280,22 +275,6 @@ org.eclipse.jdt.core.compiler.source=1.6
 					<version>${plugin.jar.version}</version>
 				</plugin>
 				<plugin>
-					<groupId>org.mortbay.jetty</groupId>
-					<artifactId>maven-jetty-plugin</artifactId>
-					<version>6.1.26</version>
-					<configuration>
-						<scanIntervalSeconds>10</scanIntervalSeconds>
-						<stopKey>foo</stopKey>
-						<stopPort>9999</stopPort>
-						<connectors>
-							<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-								<port>8083</port>
-								<maxIdleTime>60000</maxIdleTime>
-							</connector>
-						</connectors>
-					</configuration>
-				</plugin>
-				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>2.6</version>
@@ -498,12 +477,6 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.linagora.obm.opush</groupId>
-				<artifactId>technical-log-bean</artifactId>
-				<version>${opush.version}</version>
-			</dependency>
-
-			<dependency>
 				<groupId>be.bitronix.btm</groupId>
 				<artifactId>btm</artifactId>
 				<version>${btm.version}</version>
@@ -565,23 +538,6 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<groupId>greenmail</groupId>
 				<artifactId>greenmail</artifactId>
 				<version>1.3.1b-mbaechler-18</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>info.cukes</groupId>
-				<artifactId>cucumber-guice</artifactId>
-				<version>${cucumber.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>info.cukes</groupId>
-				<artifactId>cucumber-java</artifactId>
-				<version>${cucumber.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>info.cukes</groupId>
-				<artifactId>cucumber-junit</artifactId>
-				<version>${cucumber.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -701,11 +657,6 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<version>7.6.12.v20130726</version>
 			</dependency>
 			<dependency>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-http</artifactId>
-				<version>7.6.12.v20130726</version>
-			</dependency>
-			<dependency>
 				<groupId>org.freemarker</groupId>
 				<artifactId>freemarker</artifactId>
 				<version>${freemarker.version}</version>
@@ -795,11 +746,6 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<artifactId>powermock-module-junit4</artifactId>
 				<version>${powermock.version}</version>
 				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.scala-lang</groupId>
-				<artifactId>scala-library</artifactId>
-				<version>${scala.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
