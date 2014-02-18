@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,33 +29,45 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.breakdownduration;
 
-import org.eclipse.jetty.continuation.ContinuationFilter;
-import org.obm.breakdownduration.BreakdownDurationFilter;
-import org.obm.servlet.filter.qos.QoSFilter;
+import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
-import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.obm.breakdownduration.bean.Watch;
 
-public class OpushServletModule extends ServletModule {
+import com.google.common.base.Stopwatch;
+import com.google.inject.Inject;
 
-	private static final String AUTODISCOVER_SERVLET_PATH = "/Autodiscover/*";
-	private static final String ACTIVE_SYNC_SERVLET_PATH = "/ActiveSyncServlet/*";
+public class BreakdownDurationInterceptor implements MethodInterceptor {
 
+	@Inject BreakdownDurationLoggerService breakdownLogger;
+	
 	@Override
-	protected void configureServlets() {
-		super.configureServlets();
+	public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+		Watch watch = getClassAnnotation(methodInvocation);
+		if (watch == null) {
+			return methodInvocation.proceed();
+		}
+		
+		Stopwatch stopwatch = Stopwatch.createStarted();
+		try {
+			breakdownLogger.startRecordingNode(watch.value());
+			return methodInvocation.proceed();
+		} finally {
+			breakdownLogger.endRecordingNode(stopwatch.stop().elapsed(TimeUnit.MILLISECONDS));
+		}
+	}
 
-		serve(ACTIVE_SYNC_SERVLET_PATH).with(ActiveSyncServlet.class);
-		serve(AUTODISCOVER_SERVLET_PATH).with(AutodiscoverServlet.class);
+	private Watch getClassAnnotation(MethodInvocation methodInvocation) {
+		Method method = methodInvocation.getMethod();
 
-		bind(ContinuationFilter.class).in(Singleton.class);
-		filter("/*").through(ContinuationFilter.class);
-		filter("/*").through(PushContinuationFilter.class);
-		filter("/*").through(AuthenticationFilter.class);
-		filter(ACTIVE_SYNC_SERVLET_PATH).through(ActiveSyncRequestFilter.class);
-		filter(ACTIVE_SYNC_SERVLET_PATH).through(QoSFilter.class);
-		filter(ACTIVE_SYNC_SERVLET_PATH).through(BreakdownDurationFilter.class);
+		Class<?> declaringClass = method.getDeclaringClass();
+		if (declaringClass.isAnnotationPresent(Watch.class)) {
+			return declaringClass.getAnnotation(Watch.class);
+		}
+		return null;
 	}
 }

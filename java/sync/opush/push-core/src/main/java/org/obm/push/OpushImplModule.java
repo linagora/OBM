@@ -32,6 +32,7 @@
 package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.breakdownduration.BreakdownDurationModule;
 import org.obm.configuration.ConfigurationModule;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.VMArgumentsUtils;
@@ -109,6 +110,7 @@ public class OpushImplModule extends AbstractModule {
 		install(new ConfigurationModule<OpushConfiguration>(opushConfiguration, OpushConfiguration.class));
 		install(new TransactionalModule());
 		install(new TechnicalLoggingModule());
+		install(new BreakdownDurationModule());
 		install(qosModule());
 		install(new OpushServletModule());
 		install(new OpushConfigurationModule());

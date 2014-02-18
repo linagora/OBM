@@ -136,6 +136,11 @@
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
+				<artifactId>breakdown-duration</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
 				<artifactId>client</artifactId>
 				<version>${obm.version}</version>
 			</dependency>

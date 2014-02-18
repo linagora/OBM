@@ -94,6 +94,7 @@
 	<modules>
 		<module>annotations</module>
 		<module>autoconf</module>
+		<module>breakdown-duration</module>
 		<module>client</module>
 		<module>common-test</module>
 		<module>common-dao-test</module>
@@ -349,6 +350,11 @@ org.eclipse.jdt.core.compiler.source=1.6
 			<dependency>
 				<groupId>com.linagora.obm.integration-testing</groupId>
 				<artifactId>arquillian-bundle</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>breakdown-duration</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>

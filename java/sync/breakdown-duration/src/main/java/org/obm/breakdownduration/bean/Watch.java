@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,33 +29,17 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.breakdownduration.bean;
 
-import org.eclipse.jetty.continuation.ContinuationFilter;
-import org.obm.breakdownduration.BreakdownDurationFilter;
-import org.obm.servlet.filter.qos.QoSFilter;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
+@Target({ ElementType.TYPE })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Watch {
+    
+    Group value();
 
-public class OpushServletModule extends ServletModule {
-
-	private static final String AUTODISCOVER_SERVLET_PATH = "/Autodiscover/*";
-	private static final String ACTIVE_SYNC_SERVLET_PATH = "/ActiveSyncServlet/*";
-
-	@Override
-	protected void configureServlets() {
-		super.configureServlets();
-
-		serve(ACTIVE_SYNC_SERVLET_PATH).with(ActiveSyncServlet.class);
-		serve(AUTODISCOVER_SERVLET_PATH).with(AutodiscoverServlet.class);
-
-		bind(ContinuationFilter.class).in(Singleton.class);
-		filter("/*").through(ContinuationFilter.class);
-		filter("/*").through(PushContinuationFilter.class);
-		filter("/*").through(AuthenticationFilter.class);
-		filter(ACTIVE_SYNC_SERVLET_PATH).through(ActiveSyncRequestFilter.class);
-		filter(ACTIVE_SYNC_SERVLET_PATH).through(QoSFilter.class);
-		filter(ACTIVE_SYNC_SERVLET_PATH).through(BreakdownDurationFilter.class);
-	}
 }

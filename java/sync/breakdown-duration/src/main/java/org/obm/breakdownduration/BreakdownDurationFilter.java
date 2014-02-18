@@ -29,33 +29,68 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.breakdownduration;
 
-import org.eclipse.jetty.continuation.ContinuationFilter;
-import org.obm.breakdownduration.BreakdownDurationFilter;
-import org.obm.servlet.filter.qos.QoSFilter;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
+import org.obm.breakdownduration.bean.Group;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Stopwatch;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
 
-public class OpushServletModule extends ServletModule {
+@Singleton
+public class BreakdownDurationFilter implements Filter {
 
-	private static final String AUTODISCOVER_SERVLET_PATH = "/Autodiscover/*";
-	private static final String ACTIVE_SYNC_SERVLET_PATH = "/ActiveSyncServlet/*";
+	private final BreakdownDurationLoggerService breakdownDurationLoggerService;
+
+	@Inject
+	@VisibleForTesting BreakdownDurationFilter(BreakdownDurationLoggerService breakdownDurationLoggerService) {
+		this.breakdownDurationLoggerService = breakdownDurationLoggerService;
+	}
+	
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+	}
 
 	@Override
-	protected void configureServlets() {
-		super.configureServlets();
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		
+		Stopwatch stopwatch = Stopwatch.createStarted();
+		try {
+			startRecordingRequest();
+			chain.doFilter(request, response);
+		} finally {
+			endRecordingRequest(stopwatch);
+		}
+	}
+	
+	private void startRecordingRequest() {
+		breakdownDurationLoggerService.enableRecording();
+		breakdownDurationLoggerService.startRecordingNode(Group.REQUEST);
+	}
 
-		serve(ACTIVE_SYNC_SERVLET_PATH).with(ActiveSyncServlet.class);
-		serve(AUTODISCOVER_SERVLET_PATH).with(AutodiscoverServlet.class);
+	private void endRecordingRequest(Stopwatch stopwatch) {
+		try {
+			breakdownDurationLoggerService.endRecordingNode(stopwatch.elapsed(TimeUnit.MILLISECONDS));
+			breakdownDurationLoggerService.disableRecording();
+			breakdownDurationLoggerService.log();
+		} finally {
+			breakdownDurationLoggerService.cleanSession();
+		}
+	}
 
-		bind(ContinuationFilter.class).in(Singleton.class);
-		filter("/*").through(ContinuationFilter.class);
-		filter("/*").through(PushContinuationFilter.class);
-		filter("/*").through(AuthenticationFilter.class);
-		filter(ACTIVE_SYNC_SERVLET_PATH).through(ActiveSyncRequestFilter.class);
-		filter(ACTIVE_SYNC_SERVLET_PATH).through(QoSFilter.class);
-		filter(ACTIVE_SYNC_SERVLET_PATH).through(BreakdownDurationFilter.class);
+	@Override
+	public void destroy() {
 	}
 }
