@@ -48,6 +48,8 @@ import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.common.addition.CommitedOperationDaoJdbcImpl;
 import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
+import fr.aliacom.obm.common.contact.ContactDao;
+import fr.aliacom.obm.common.contact.ContactDaoJdbcImpl;
 
 public class DatabaseModule extends AbstractModule {
 
@@ -55,6 +57,7 @@ public class DatabaseModule extends AbstractModule {
 	protected void configure() {
 		install(new org.obm.dbcp.DatabaseModule());
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
+		bind(ContactDao.class).to(ContactDaoJdbcImpl.class);
 		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
 		bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
 		bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);

@@ -65,12 +65,12 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.calendar.CalendarDao;
 
-@GuiceModule(ContactDaoTest.Env.class)
+@GuiceModule(ContactDaoJdbcImplTest.Env.class)
 @RunWith(GuiceRunner.class)
-public class ContactDaoTest {
+public class ContactDaoJdbcImplTest {
 
 	@Inject
-	private ContactDao contactDao;
+	private ContactDaoJdbcImpl contactDao;
 	@Inject
 	private ObmHelper mockObmHelper;
 
@@ -332,7 +332,7 @@ public class ContactDaoTest {
 		janeDone.setFolderId(0);
 		janeDone.setEntityId(EntityId.valueOf(11));
 
-		ContactDao.ContactResults contactResults = contactDao.loadContactsFromDB(evtIds, mockConn,
+		ContactDaoJdbcImpl.ContactResults contactResults = contactDao.loadContactsFromDB(evtIds, mockConn,
 				limit);
 
 		assertThat(contactResults.contactList).containsExactly(johnDoe, janeDone);

@@ -74,6 +74,7 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.contact.ContactDao;
+import fr.aliacom.obm.common.contact.ContactDaoJdbcImpl;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.resource.Resource;
@@ -143,7 +144,7 @@ public class AttendeeServiceJdbcImplTest {
 				.withArgs(obmHelper, null, null, null, null, null)
 				.addMockedMethod("findUser")
 				.createMock(mocksControl);
-		contactDao = createMockBuilder(ContactDao.class)
+		contactDao = createMockBuilder(ContactDaoJdbcImpl.class)
 				.withConstructor(ContactConfiguration.class, CalendarDao.class, SolrHelper.Factory.class, ObmHelper.class, EventExtId.Factory.class)
 				.withArgs(contactConfiguration, calendarDao, solrHelperFactory, obmHelper, eventExtIdFactory)
 				.addMockedMethod("findAttendeeContactFromEmailForUser")
