@@ -52,6 +52,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfiguration.ExpungePolicy;
 import org.obm.push.backend.CollectionPath;
@@ -62,6 +63,7 @@ import org.obm.push.backend.PathsToCollections;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.BodyPreference;
+import org.obm.push.bean.BreakdownGroups;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -81,8 +83,6 @@ import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.UidMSEmail;
 import org.obm.push.configuration.OpushConfiguration;
-import org.obm.breakdownduration.bean.Group;
-import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
@@ -136,7 +136,7 @@ import com.google.inject.Singleton;
 import com.sun.mail.util.QPDecoderStream;
 
 @Singleton
-@Watch(Group.EMAIL)
+@Watch(BreakdownGroups.EMAIL)
 public class MailBackendImpl extends OpushBackend implements MailBackend {
 
 	private static final ImmutableList<String> SPECIAL_FOLDERS = 

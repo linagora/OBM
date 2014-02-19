@@ -37,20 +37,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.push.bean.Device;
-import org.obm.breakdownduration.bean.Group;
 import org.obm.breakdownduration.bean.Watch;
+import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.push.bean.BreakdownGroups;
+import org.obm.push.bean.Device;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.FolderSnapshotDao;
-import org.obm.push.store.jdbc.OpushJDBCUtils;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-@Watch(Group.SQL)
+@Watch(BreakdownGroups.SQL)
 public class FolderSnapshotDaoJdbcImpl extends AbstractJdbcImpl implements FolderSnapshotDao {
 
 	@Inject

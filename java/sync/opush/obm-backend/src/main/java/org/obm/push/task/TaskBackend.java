@@ -34,9 +34,11 @@ package org.obm.push.task;
 import java.util.Date;
 import java.util.List;
 
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.backend.DataDelta;
 import org.obm.push.backend.PIMBackend;
 import org.obm.push.bean.AnalysedSyncCollection;
+import org.obm.push.bean.BreakdownGroups;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemSyncState;
@@ -54,6 +56,7 @@ import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 
+@Watch(BreakdownGroups.TASKS)
 public class TaskBackend implements PIMBackend {
 
 	@Override

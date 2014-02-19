@@ -37,11 +37,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.breakdownduration.BreakdownDurationLoggerService;
-import org.obm.breakdownduration.BreakdownDurationModule;
 import org.obm.breakdownduration.BreakdownDurationLoggerService.Node;
 import org.obm.breakdownduration.BreakdownDurationLoggerService.Root;
-import org.obm.breakdownduration.bean.Group;
 import org.obm.breakdownduration.bean.Watch;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
@@ -83,7 +80,7 @@ public class BreakdownDurationInterceptorTest {
 
 		Node head = getTreeHead();
 		assertThat(head.children).isEmpty();
-		assertThat(head.group).isEqualTo(Group.SQL);
+		assertThat(head.group.name()).isEqualTo("SQL");
 		assertThat(head.timeElapsedInMs).isGreaterThan(9);
 	}
 
@@ -93,7 +90,7 @@ public class BreakdownDurationInterceptorTest {
 
 		Node head = getTreeHead();
 		assertThat(head.children).isEmpty();
-		assertThat(head.group).isEqualTo(Group.SQL);
+		assertThat(head.group.name()).isEqualTo("SQL");
 		assertThat(head.timeElapsedInMs).isGreaterThan(190);
 	}
 
@@ -104,7 +101,7 @@ public class BreakdownDurationInterceptorTest {
 		} catch (Exception e) {
 			Node head = getTreeHead();
 			assertThat(head.children).isEmpty();
-			assertThat(head.group).isEqualTo(Group.SQL);
+			assertThat(head.group.name()).isEqualTo("SQL");
 			assertThat(head.timeElapsedInMs).isGreaterThan(90);
 			throw e;
 		}
@@ -116,12 +113,12 @@ public class BreakdownDurationInterceptorTest {
 
 		Node head = getTreeHead();
 		assertThat(head.children).hasSize(1);
-		assertThat(head.group).isEqualTo(Group.EMAIL);
+		assertThat(head.group.name()).isEqualTo("EMAIL");
 		assertThat(head.timeElapsedInMs).isGreaterThan(55);
 		assertThat(head.children).hasSize(1);
 		Node childSQL = head.children.get(0);
 		assertThat(childSQL.children).isEmpty();
-		assertThat(childSQL.group).isEqualTo(Group.SQL);
+		assertThat(childSQL.group.name()).isEqualTo("SQL");
 		assertThat(childSQL.timeElapsedInMs).isGreaterThan(9);
 	}
 
@@ -130,17 +127,17 @@ public class BreakdownDurationInterceptorTest {
 		annotatedEmailClass.aMethodCallingSQLThenExternalClass();
 
 		Node head = getTreeHead();
-		assertThat(head.group).isEqualTo(Group.EMAIL);
+		assertThat(head.group.name()).isEqualTo("EMAIL");
 		assertThat(head.timeElapsedInMs).isGreaterThan(340);
 		assertThat(head.children).hasSize(1);
 		
 		Node childSQL = head.children.get(0);
-		assertThat(childSQL.group).isEqualTo(Group.SQL);
+		assertThat(childSQL.group.name()).isEqualTo("SQL");
 		assertThat(childSQL.timeElapsedInMs).isGreaterThan(90);
 		assertThat(childSQL.children).hasSize(1);
 		Node childExternal = childSQL.children.get(0);
 		assertThat(childExternal.children).isEmpty();
-		assertThat(childExternal.group).isEqualTo(Group.EXTERNAL_SERVICE);
+		assertThat(childExternal.group.name()).isEqualTo("EXTERNAL_SERVICE");
 		assertThat(childExternal.timeElapsedInMs).isGreaterThan(190);
 	}
 	
@@ -149,28 +146,28 @@ public class BreakdownDurationInterceptorTest {
 		annotatedEmailClass.aMethodCallingFiveTimesSQLClass();
 		
 		Node head = getTreeHead();
-		assertThat(head.group).isEqualTo(Group.EMAIL);
+		assertThat(head.group.name()).isEqualTo("EMAIL");
 		assertThat(head.timeElapsedInMs).isGreaterThan(45);
 		assertThat(head.children).hasSize(5);
 		Node firstSQL = head.children.get(0);
 		assertThat(firstSQL.children).isEmpty();
-		assertThat(firstSQL.group).isEqualTo(Group.SQL);
+		assertThat(firstSQL.group.name()).isEqualTo("SQL");
 		assertThat(firstSQL.timeElapsedInMs).isGreaterThan(9);
 		Node secondSQL = head.children.get(0);
 		assertThat(secondSQL.children).isEmpty();
-		assertThat(secondSQL.group).isEqualTo(Group.SQL);
+		assertThat(secondSQL.group.name()).isEqualTo("SQL");
 		assertThat(secondSQL.timeElapsedInMs).isGreaterThan(9);
 		Node thirdSQL = head.children.get(0);
 		assertThat(thirdSQL.children).isEmpty();
-		assertThat(thirdSQL.group).isEqualTo(Group.SQL);
+		assertThat(thirdSQL.group.name()).isEqualTo("SQL");
 		assertThat(thirdSQL.timeElapsedInMs).isGreaterThan(9);
 		Node fourthSQL = head.children.get(0);
 		assertThat(fourthSQL.children).isEmpty();
-		assertThat(fourthSQL.group).isEqualTo(Group.SQL);
+		assertThat(fourthSQL.group.name()).isEqualTo("SQL");
 		assertThat(fourthSQL.timeElapsedInMs).isGreaterThan(9);
 		Node fifthSQL = head.children.get(0);
 		assertThat(fifthSQL.children).isEmpty();
-		assertThat(fifthSQL.group).isEqualTo(Group.SQL);
+		assertThat(fifthSQL.group.name()).isEqualTo("SQL");
 		assertThat(fifthSQL.timeElapsedInMs).isGreaterThan(9);
 	}
 	
@@ -180,25 +177,25 @@ public class BreakdownDurationInterceptorTest {
 		
 		Node head = getTreeHead();
 		assertThat(head.children).hasSize(3);
-		assertThat(head.group).isEqualTo(Group.EMAIL);
+		assertThat(head.group.name()).isEqualTo("EMAIL");
 		assertThat(head.timeElapsedInMs).isGreaterThan(220);
 		Node childExternal = head.children.get(0);
 		assertThat(childExternal.children).isEmpty();
-		assertThat(childExternal.group).isEqualTo(Group.EXTERNAL_SERVICE);
+		assertThat(childExternal.group.name()).isEqualTo("EXTERNAL_SERVICE");
 		assertThat(childExternal.timeElapsedInMs).isGreaterThan(190);
 		Node childSQL = head.children.get(1);
 		assertThat(childSQL.children).isEmpty();
-		assertThat(childSQL.group).isEqualTo(Group.SQL);
+		assertThat(childSQL.group.name()).isEqualTo("SQL");
 		assertThat(childSQL.timeElapsedInMs).isGreaterThan(9);
 		Node childContact = head.children.get(2);
 		assertThat(childContact.children).isEmpty();
-		assertThat(childContact.group).isEqualTo(Group.CONTACTS);
+		assertThat(childContact.group.name()).isEqualTo("CONTACTS");
 		assertThat(childContact.timeElapsedInMs).isGreaterThan(19);
 	}
 
 	public static class CustomException extends Exception {}
 
-	@Watch(Group.SQL)
+	@Watch("SQL")
 	public static class AnnotatedSQLClass {
 
 		private final AnnotatedExternalClass annotatedExternalClass;
@@ -232,7 +229,7 @@ public class BreakdownDurationInterceptorTest {
 		}
 	}
 
-	@Watch(Group.EMAIL)
+	@Watch("EMAIL")
 	public static class AnnotatedEmailClass {
 
 		private final AnnotatedSQLClass annotatedSQLClass;
@@ -276,7 +273,7 @@ public class BreakdownDurationInterceptorTest {
 		}
 	}
 
-	@Watch(Group.EXTERNAL_SERVICE)
+	@Watch("EXTERNAL_SERVICE")
 	public static class AnnotatedExternalClass {
 
 		@Inject
@@ -287,7 +284,7 @@ public class BreakdownDurationInterceptorTest {
 		}
 	}
 	
-	@Watch(Group.CONTACTS)
+	@Watch("CONTACTS")
 	public static class AnnotatedContactClass {
 		
 		@Inject

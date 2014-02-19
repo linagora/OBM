@@ -42,9 +42,6 @@ import javax.servlet.ServletResponse;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.breakdownduration.BreakdownDurationFilter;
-import org.obm.breakdownduration.BreakdownDurationLoggerService;
-import org.obm.breakdownduration.bean.Group;
 
 
 public class BreakdownDurationFilterTest {
@@ -95,7 +92,7 @@ public class BreakdownDurationFilterTest {
 	public void cleanSessionWhenExceptionDuringStartNode() throws Exception {
 		loggerService.enableRecording();
 		expectLastCall();
-		loggerService.startRecordingNode(Group.REQUEST);
+		loggerService.startRecordingNode("REQUEST");
 		expectLastCall().andThrow(new CustomRuntimeException());
 		loggerService.endRecordingNode(anyInt());
 		expectLastCall();
@@ -119,7 +116,7 @@ public class BreakdownDurationFilterTest {
 	public void cleanSessionWhenExceptionDuringEndNode() throws Exception {
 		loggerService.enableRecording();
 		expectLastCall();
-		loggerService.startRecordingNode(Group.REQUEST);
+		loggerService.startRecordingNode("REQUEST");
 		expectLastCall();
 		loggerService.endRecordingNode(anyInt());
 		expectLastCall().andThrow(new CustomRuntimeException());
@@ -139,7 +136,7 @@ public class BreakdownDurationFilterTest {
 	public void cleanSessionWhenExceptionDuringDisable() throws Exception {
 		loggerService.enableRecording();
 		expectLastCall();
-		loggerService.startRecordingNode(Group.REQUEST);
+		loggerService.startRecordingNode("REQUEST");
 		expectLastCall();
 		loggerService.endRecordingNode(anyInt());
 		expectLastCall();
@@ -161,7 +158,7 @@ public class BreakdownDurationFilterTest {
 	public void cleanSessionWhenExceptionDuringLog() throws Exception {
 		loggerService.enableRecording();
 		expectLastCall();
-		loggerService.startRecordingNode(Group.REQUEST);
+		loggerService.startRecordingNode("REQUEST");
 		expectLastCall();
 		loggerService.endRecordingNode(anyInt());
 		expectLastCall();

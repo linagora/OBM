@@ -37,22 +37,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.push.bean.BreakdownGroups;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.PIMDataType;
-import org.obm.breakdownduration.bean.Group;
-import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.FolderSyncStateBackendMappingDao;
 import org.obm.push.utils.DateUtils;
-import org.obm.push.store.jdbc.OpushJDBCUtils;
 import org.obm.sync.date.DateProvider;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-@Watch(Group.SQL)
+@Watch(BreakdownGroups.SQL)
 public class FolderSyncStateBackendMappingDaoJdbcImpl extends AbstractJdbcImpl implements FolderSyncStateBackendMappingDao {
 
 	private final DateProvider dateProvider;

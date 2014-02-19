@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2014 Linagora
+ * Copyright (C) 2011-2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,17 +29,16 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.breakdownduration.bean;
+package org.obm.push.bean;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target({ ElementType.TYPE })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Watch {
-    
-    String value();
+public class BreakdownGroups {
+	
+	public static final String EMAIL = "EMAIL";
+	public static final String EVENT = "EVENT";
+	public static final String CONTACTS = "CONTACTS";
+	public static final String TASKS = "TASKS";
+	public static final String SQL = "SQL";
+	public static final String CASSANDRA = "CASSANDRA";
+	public static final String JSON = "JSON";
 
 }

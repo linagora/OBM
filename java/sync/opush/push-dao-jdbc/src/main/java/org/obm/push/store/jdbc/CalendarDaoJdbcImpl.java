@@ -36,11 +36,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.push.bean.BreakdownGroups;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEventUid;
-import org.obm.breakdownduration.bean.Group;
-import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.CalendarDao;
 import org.obm.sync.auth.EventNotFoundException;
@@ -48,7 +48,7 @@ import org.obm.sync.calendar.EventExtId;
 
 import com.google.inject.Inject;
 
-@Watch(Group.SQL)
+@Watch(BreakdownGroups.SQL)
 public class CalendarDaoJdbcImpl extends AbstractJdbcImpl implements CalendarDao {
 
 	@Inject

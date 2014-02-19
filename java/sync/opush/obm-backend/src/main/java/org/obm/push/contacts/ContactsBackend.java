@@ -38,7 +38,6 @@ import java.util.Set;
 
 import javax.naming.NoPermissionException;
 
-import org.obm.breakdownduration.bean.Group;
 import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.push.backend.BackendWindowingService;
@@ -50,6 +49,7 @@ import org.obm.push.backend.PIMBackend;
 import org.obm.push.backend.PathsToCollections;
 import org.obm.push.backend.PathsToCollections.Builder;
 import org.obm.push.bean.AnalysedSyncCollection;
+import org.obm.push.bean.BreakdownGroups;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -101,7 +101,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
-@Watch(Group.CONTACTS)
+@Watch(BreakdownGroups.CONTACTS)
 public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	
 	private final ContactConfiguration contactConfiguration;

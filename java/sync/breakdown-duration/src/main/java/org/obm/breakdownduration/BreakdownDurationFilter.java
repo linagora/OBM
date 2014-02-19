@@ -41,8 +41,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.obm.breakdownduration.bean.Group;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import com.google.inject.Inject;
@@ -51,6 +49,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class BreakdownDurationFilter implements Filter {
 
+	private static final String GROUP_REQUEST = "REQUEST";
 	private final BreakdownDurationLoggerService breakdownDurationLoggerService;
 
 	@Inject
@@ -77,7 +76,7 @@ public class BreakdownDurationFilter implements Filter {
 	
 	private void startRecordingRequest() {
 		breakdownDurationLoggerService.enableRecording();
-		breakdownDurationLoggerService.startRecordingNode(Group.REQUEST);
+		breakdownDurationLoggerService.startRecordingNode(GROUP_REQUEST);
 	}
 
 	private void endRecordingRequest(Stopwatch stopwatch) {

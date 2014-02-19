@@ -37,20 +37,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
 
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.push.bean.BreakdownGroups;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.ServerId;
-import org.obm.breakdownduration.bean.Group;
-import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.ItemTrackingDao;
-import org.obm.push.store.jdbc.OpushJDBCUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-@Watch(Group.SQL)
+@Watch(BreakdownGroups.SQL)
 public class ItemTrackingDaoJdbcImpl extends AbstractJdbcImpl implements ItemTrackingDao {
 	
 	@Inject

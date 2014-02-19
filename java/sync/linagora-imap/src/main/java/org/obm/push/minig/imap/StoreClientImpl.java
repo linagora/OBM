@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.mina.transport.socket.SocketConnector;
-import org.obm.breakdownduration.bean.Group;
 import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfiguration.MailboxNameCheckPolicy;
@@ -78,7 +77,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
-@Watch(Group.IMAP)
+@Watch("IMAP")
 public class StoreClientImpl implements StoreClient {
 
 	@Singleton

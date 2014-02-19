@@ -89,9 +89,9 @@ public class BreakdownDurationLoggerService {
 		recordingEnabled.set(false);
 	}
 
-	public void startRecordingNode(Group group) {
+	public void startRecordingNode(String group) {
 		if (recordingEnabled.get()) {
-			treeBuilder.get().beginNewNode(group);
+			treeBuilder.get().beginNewNode(Group.of(group));
 		}
 	}
 
@@ -124,7 +124,7 @@ public class BreakdownDurationLoggerService {
 		private final Map<Group, Node> elements;
 		
 		public GroupMerger() {
-			this.elements = Maps.newEnumMap(Group.class);
+			this.elements = Maps.newHashMap();
 		}
 
 		public GroupMerger(Iterable<Node> nodes) {

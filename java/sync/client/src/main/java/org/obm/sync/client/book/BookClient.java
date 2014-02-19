@@ -37,10 +37,10 @@ import java.util.List;
 import javax.naming.NoPermissionException;
 
 import org.apache.http.client.HttpClient;
-import org.obm.breakdownduration.bean.Group;
 import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.BreakdownGroups;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
@@ -66,7 +66,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-@Watch(Group.EXTERNAL_SERVICE)
+@Watch(BreakdownGroups.CLIENT_CONTACTS)
 public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Singleton

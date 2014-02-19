@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2014 Linagora
+ * Copyright (C) 2011-2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,17 +29,19 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.breakdownduration.bean;
+package org.obm.sync;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target({ ElementType.TYPE })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Watch {
-    
-    String value();
+public class BreakdownGroups {
+	
+	private static final String UNIFIED_CLIENT_NAME = "OBM";
+	
+	public static final String CLIENT_USER = UNIFIED_CLIENT_NAME;
+	public static final String CLIENT_LOGIN = UNIFIED_CLIENT_NAME;
+	public static final String CLIENT_CONTACTS = UNIFIED_CLIENT_NAME;
+	public static final String CLIENT_CALENDAR = UNIFIED_CLIENT_NAME;
+	public static final String CLIENT_TASK = UNIFIED_CLIENT_NAME;
+	public static final String CLIENT_MAILING_LIST = UNIFIED_CLIENT_NAME;
+	public static final String CLIENT_SETTING = UNIFIED_CLIENT_NAME;
+	public static final String CLIENT_LOCATOR = UNIFIED_CLIENT_NAME;
 
 }

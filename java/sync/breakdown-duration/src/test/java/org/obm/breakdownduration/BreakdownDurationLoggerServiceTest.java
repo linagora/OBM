@@ -36,8 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.breakdownduration.BreakdownDurationLoggerService;
-import org.obm.breakdownduration.bean.Group;
 
 
 public class BreakdownDurationLoggerServiceTest {
@@ -56,7 +54,7 @@ public class BreakdownDurationLoggerServiceTest {
 	
 	@Test
 	public void testRecordingNotEnabled() {
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST);
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST");
 		breakdownDurationLoggerImpl.endRecordingNode(1000);
 		
 		assertThat(breakdownDurationLoggerImpl.buildLog()).isNullOrEmpty();
@@ -66,7 +64,7 @@ public class BreakdownDurationLoggerServiceTest {
 	public void testRecordingEnabledButDisabled() {
 		breakdownDurationLoggerImpl.enableRecording();
 		breakdownDurationLoggerImpl.disableRecording();
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST);
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST");
 		breakdownDurationLoggerImpl.endRecordingNode(1000);
 		
 		assertThat(breakdownDurationLoggerImpl.buildLog()).isNullOrEmpty();
@@ -81,7 +79,7 @@ public class BreakdownDurationLoggerServiceTest {
 	@Test
 	public void testBuildLogOneNode() {
 		breakdownDurationLoggerImpl.enableRecording();
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST);
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST");
 		breakdownDurationLoggerImpl.endRecordingNode(1000);
 		
 		assertThat(breakdownDurationLoggerImpl.buildLog()).isEqualTo("REQUEST:1000");
@@ -90,8 +88,8 @@ public class BreakdownDurationLoggerServiceTest {
 	@Test
 	public void testBuildLogOneLevel() {
 		breakdownDurationLoggerImpl.enableRecording();
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST);
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL);
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST");
+		breakdownDurationLoggerImpl.startRecordingNode("SQL");
 		breakdownDurationLoggerImpl.endRecordingNode(52);
 		breakdownDurationLoggerImpl.endRecordingNode(100);
 		
@@ -132,20 +130,20 @@ public class BreakdownDurationLoggerServiceTest {
 	@Test
 	public void testBuildLogComplexTree() {
 		breakdownDurationLoggerImpl.enableRecording();
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST); // REQUEST
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL 1
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST"); // REQUEST
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL 1
 		breakdownDurationLoggerImpl.endRecordingNode(51); // SQL 1
-		breakdownDurationLoggerImpl.startRecordingNode(Group.EMAIL); // EMAIL
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL 2
+		breakdownDurationLoggerImpl.startRecordingNode("EMAIL"); // EMAIL
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL 2
 		breakdownDurationLoggerImpl.endRecordingNode(52); // SQL 2
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL 3
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL 3
 		breakdownDurationLoggerImpl.endRecordingNode(53); // SQL 3
-		breakdownDurationLoggerImpl.startRecordingNode(Group.EXTERNAL_SERVICE); // EXTERNAL_SERVICE
+		breakdownDurationLoggerImpl.startRecordingNode("EXTERNAL_SERVICE"); // EXTERNAL_SERVICE
 		breakdownDurationLoggerImpl.endRecordingNode(20);
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL 4
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL 4
 		breakdownDurationLoggerImpl.endRecordingNode(54);  // SQL 4
 		breakdownDurationLoggerImpl.endRecordingNode(300); // EMAIL
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL 5
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL 5
 		breakdownDurationLoggerImpl.endRecordingNode(55); // SQL 5
 		breakdownDurationLoggerImpl.endRecordingNode(1000);
 		
@@ -164,15 +162,15 @@ public class BreakdownDurationLoggerServiceTest {
 	@Test
 	public void testBuildLogMeldChildGroupEqualsToParentGroup() {
 		breakdownDurationLoggerImpl.enableRecording();
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST); // REQUEST
-		breakdownDurationLoggerImpl.startRecordingNode(Group.EMAIL); // EMAIL
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL 1
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST"); // REQUEST
+		breakdownDurationLoggerImpl.startRecordingNode("EMAIL"); // EMAIL
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL 1
 		breakdownDurationLoggerImpl.endRecordingNode(51); // SQL 1
-		breakdownDurationLoggerImpl.startRecordingNode(Group.EMAIL); // EMAIL 2
-		breakdownDurationLoggerImpl.startRecordingNode(Group.EMAIL); // EMAIL 3
+		breakdownDurationLoggerImpl.startRecordingNode("EMAIL"); // EMAIL 2
+		breakdownDurationLoggerImpl.startRecordingNode("EMAIL"); // EMAIL 3
 		breakdownDurationLoggerImpl.endRecordingNode(3); // EMAIL 3
 		breakdownDurationLoggerImpl.endRecordingNode(5); // EMAIL 2
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL 2
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL 2
 		breakdownDurationLoggerImpl.endRecordingNode(52); // SQL 2
 		breakdownDurationLoggerImpl.endRecordingNode(300); // EMAIL
 		breakdownDurationLoggerImpl.endRecordingNode(1000);
@@ -190,11 +188,11 @@ public class BreakdownDurationLoggerServiceTest {
 	@Test
 	public void testBuildLogIgnoreTimelessNodes() {
 		breakdownDurationLoggerImpl.enableRecording();
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST); // REQUEST
-		breakdownDurationLoggerImpl.startRecordingNode(Group.EMAIL); // EMAIL
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL 1
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST"); // REQUEST
+		breakdownDurationLoggerImpl.startRecordingNode("EMAIL"); // EMAIL
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL 1
 		breakdownDurationLoggerImpl.endRecordingNode(0); // SQL 1
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL 2
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL 2
 		breakdownDurationLoggerImpl.endRecordingNode(0); // SQL 2
 		breakdownDurationLoggerImpl.endRecordingNode(300); // EMAIL
 		breakdownDurationLoggerImpl.endRecordingNode(1000);
@@ -209,10 +207,10 @@ public class BreakdownDurationLoggerServiceTest {
 	@Test
 	public void testMergeSubTree() {
 		breakdownDurationLoggerImpl.enableRecording();
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST); // REQUEST
-		breakdownDurationLoggerImpl.startRecordingNode(Group.EMAIL); // EMAIL
-		breakdownDurationLoggerImpl.startRecordingNode(Group.EMAIL); // EMAIL 2
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST"); // REQUEST
+		breakdownDurationLoggerImpl.startRecordingNode("EMAIL"); // EMAIL
+		breakdownDurationLoggerImpl.startRecordingNode("EMAIL"); // EMAIL 2
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL
 		breakdownDurationLoggerImpl.endRecordingNode(50); // SQL
 		breakdownDurationLoggerImpl.endRecordingNode(150); // EMAIL 2
 		breakdownDurationLoggerImpl.endRecordingNode(300); // EMAIL
@@ -230,9 +228,9 @@ public class BreakdownDurationLoggerServiceTest {
 	@Test
 	public void testDuplicateOnRoot() {
 		breakdownDurationLoggerImpl.enableRecording();
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST); // REQUEST 1
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST"); // REQUEST 1
 		breakdownDurationLoggerImpl.endRecordingNode(300); // REQUEST 1
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST); // REQUEST 2
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST"); // REQUEST 2
 		breakdownDurationLoggerImpl.endRecordingNode(1000); // REQUEST 2
 		
 		assertThat(breakdownDurationLoggerImpl.buildLog()).isEqualTo(
@@ -242,8 +240,8 @@ public class BreakdownDurationLoggerServiceTest {
 	@Test
 	public void testZeroChildNotShown() {
 		breakdownDurationLoggerImpl.enableRecording();
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST); // REQUEST
-		breakdownDurationLoggerImpl.startRecordingNode(Group.EMAIL); // EMAIL
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST"); // REQUEST
+		breakdownDurationLoggerImpl.startRecordingNode("EMAIL"); // EMAIL
 		breakdownDurationLoggerImpl.endRecordingNode(0); // EMAIL
 		breakdownDurationLoggerImpl.endRecordingNode(1000); // REQUEST
 		
@@ -254,13 +252,13 @@ public class BreakdownDurationLoggerServiceTest {
 	@Test
 	public void testMergeCousins() {
 		breakdownDurationLoggerImpl.enableRecording();
-		breakdownDurationLoggerImpl.startRecordingNode(Group.REQUEST); // REQUEST
-		breakdownDurationLoggerImpl.startRecordingNode(Group.EMAIL); // EMAIL 1
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL 1
+		breakdownDurationLoggerImpl.startRecordingNode("REQUEST"); // REQUEST
+		breakdownDurationLoggerImpl.startRecordingNode("EMAIL"); // EMAIL 1
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL 1
 		breakdownDurationLoggerImpl.endRecordingNode(10); // SQL 1
 		breakdownDurationLoggerImpl.endRecordingNode(20); // EMAIL 1
-		breakdownDurationLoggerImpl.startRecordingNode(Group.EMAIL); // EMAIL 2
-		breakdownDurationLoggerImpl.startRecordingNode(Group.SQL); // SQL 2
+		breakdownDurationLoggerImpl.startRecordingNode("EMAIL"); // EMAIL 2
+		breakdownDurationLoggerImpl.startRecordingNode("SQL"); // SQL 2
 		breakdownDurationLoggerImpl.endRecordingNode(5); // SQL 2
 		breakdownDurationLoggerImpl.endRecordingNode(30); // EMAIL 2
 		breakdownDurationLoggerImpl.endRecordingNode(1000); // REQUEST

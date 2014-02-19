@@ -40,7 +40,6 @@ import java.util.Set;
 
 import net.fortuna.ical4j.data.ParserException;
 
-import org.obm.breakdownduration.bean.Group;
 import org.obm.breakdownduration.bean.Watch;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
@@ -55,6 +54,7 @@ import org.obm.push.backend.PathsToCollections;
 import org.obm.push.backend.PathsToCollections.Builder;
 import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.AttendeeStatus;
+import org.obm.push.bean.BreakdownGroups;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.IApplicationData;
@@ -116,7 +116,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
-@Watch(Group.EVENT)
+@Watch(BreakdownGroups.EVENT)
 public class CalendarBackend extends ObmSyncBackend implements org.obm.push.ICalendarBackend {
 
 

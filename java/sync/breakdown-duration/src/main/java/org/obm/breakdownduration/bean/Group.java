@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,7 +31,40 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.breakdownduration.bean;
 
-public enum Group {
+import com.google.common.base.Objects;
+
+public class Group {
+
+	private final String name;
+
+	public static Group of(String name) {
+		return new Group(name);
+	}
 	
-	EMAIL, EVENT, CONTACTS, TASKS, SQL, CASSANDRA, IMAP, EXTERNAL_SERVICE, REQUEST, JSON;
+	public Group(String name) {
+		this.name = name;
+	}
+	
+	public String name() {
+		return name;
+	}
+	
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(name);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof Group) {
+			Group that = (Group) object;
+			return Objects.equal(this.name, that.name);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
 }

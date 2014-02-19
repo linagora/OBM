@@ -43,14 +43,14 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import org.obm.breakdownduration.bean.Watch;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.push.bean.BreakdownGroups;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.SyncKey;
-import org.obm.breakdownduration.bean.Group;
-import org.obm.breakdownduration.bean.Watch;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.store.CollectionDao;
@@ -64,7 +64,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-@Watch(Group.SQL)
+@Watch(BreakdownGroups.SQL)
 public class CollectionDaoJdbcImpl extends AbstractJdbcImpl implements CollectionDao {
 
 	private static final String SYNC_STATE_ITEM_TABLE = "opush_sync_state";
