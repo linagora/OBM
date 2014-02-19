@@ -1755,13 +1755,19 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
       calendar_add_anonymous_occurrences($calendar["repeat_kind"], $calendar['date_begin'], $begin, $end, $calendar["repeatfrequency"], $event, $calendar["owner"], 'user', 'ACCEPTED', $calendar["repeat_days"]);
 
       $virtualOccurences = $of->getPeriodOccurrences($calendar['date_begin'], $end);
+      $negativeExceptions = array_map(
+        function($date_exception) {
+          return $date_exception->getDateIso();
+        },
+        $calendar['date_exception']);
 
       foreach($virtualOccurences as $virtualOccurrence) {
         foreach($occurrences as $occurrence) {
           if($occurrence->event->id != $event_id
               && $occurrence->event->isOpaque()
               && $virtualOccurrence->date->compare($occurrence->end) < 0
-              && $virtualOccurrence->end->compare($occurrence->date) > 0) {
+              && $virtualOccurrence->end->compare($occurrence->date) > 0
+              && !in_array($occurrence->date->getDateIso(), $negativeExceptions)) {
             $oc[] = $occurrence;
 
             if (count($oc) >= $ccalendar_conflicts_limit) {
@@ -1783,7 +1789,6 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 
   return count($occurrences) != 0 ? $occurrences : false;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurrence of each event,
