@@ -3820,7 +3820,7 @@ function run_query_calendar_import_template($xml) {
     
   foreach ($columns as $column) {
     $value = (string) $xml->{$column};
-    $$column = ($value == '') ? 'NULL' : "'$value'";
+    $$column = ($value == '') ? 'NULL' : "'".$obm_q->escape($value)."'";
   }
   
   if (!is_null($xml->properties->extended_desc)) {
@@ -3830,7 +3830,8 @@ function run_query_calendar_import_template($xml) {
   $entities = array();
   foreach (array('user', 'group', 'resource', 'contact', 'document') as $type) {
     $varname = $type.'_ids';
-    $entities[$type] = ($$varname == 'NULL') ? array() : explode(',', $$varname);
+    $value = (string) $xml->{$varname};
+    $entities[$type] = ($value == '') ? array() : explode(',', $value);
   }
   check_template_entities_acl($entities);
   
@@ -3865,16 +3866,16 @@ function run_query_calendar_import_template($xml) {
       eventtemplate_document_ids,
       eventtemplate_organizer)
       VALUES (
-      ".$obm_q->escape($name).",
+      $name,
       NOW(),
       NOW(),
-      '$obm[uid]',
+      $obm[uid],
       $owner,
-      ".$obm_q->escape($title).",
-      ".$obm_q->escape($date).",
-      ".$obm_q->escape($description).",
+      $title,
+      $date,
+      $description,
       '$properties',
-      ".$obm_q->escape($location).",
+      $location,
       $category1_id,
       $priority,
       $privacy,
@@ -3887,7 +3888,7 @@ function run_query_calendar_import_template($xml) {
       $allow_documents,
       $alert,
       $endrepeat,
-      '$obm[domain_id]',
+      $obm[domain_id],
       $user_ids,
       $contact_ids,
       $resource_ids,
