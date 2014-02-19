@@ -171,4 +171,8 @@ public class PushContinuation implements IContinuation {
 		return (IContinuationHandler) c.getAttribute(KEY_LAST_CONTINUATION_HANDLER);
 	}
 
+	@Override
+	public boolean needsContinuationHandling() {
+		return isError() || getCollectionChangeListener() != null;
+	}
 }

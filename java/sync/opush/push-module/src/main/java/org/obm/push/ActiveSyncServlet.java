@@ -147,11 +147,10 @@ public class ActiveSyncServlet extends HttpServlet {
 			}
 			
 			logger.debug(
-					"query = {}, initial = {}, resume = {}, m = {}, num = {}",
-					request.getQueryString(), continuation.isInitial(),
-							continuation.isResumed(), request.getMethod(), continuation.getReqId());
+					"query = {}, m = {}, num = {}",
+					request.getQueryString(), request.getMethod(), continuation.getReqId());
 
-			if (continuation.isResumed() || !continuation.isInitial()) {
+			if (continuation.needsContinuationHandling()) {
 				handleContinuation(request, response, continuation);
 				return;
 			}
@@ -208,6 +207,8 @@ public class ActiveSyncServlet extends HttpServlet {
 			ph.sendError(udr.getDevice(), responder, c.getErrorStatus(), c);
 		} else if (ccl != null) {
 			ph.sendResponseWithoutHierarchyChanges(udr, responder, c);
+		} else {
+			throw new IllegalStateException("Looks like this continuation can't be handled");
 		}
 	}
 	

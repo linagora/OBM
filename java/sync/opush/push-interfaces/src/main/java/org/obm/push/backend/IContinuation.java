@@ -63,4 +63,6 @@ public interface IContinuation {
 	void setLastContinuationHandler(IContinuationHandler iContinuationHandler);
 	
 	IContinuationHandler getLastContinuationHandler();
+	
+	boolean needsContinuationHandling();
 }
