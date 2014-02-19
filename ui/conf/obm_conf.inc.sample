@@ -104,7 +104,7 @@ $cgp_sess_db = false;
 // set this to a file to enable debug (eg. "/tmp/obm-cas.log")
 //$cas_debug="";
 // Attribute containing the user login in the CAS response, for when it's not in the default attribute
-// $cas_cas_server_login_attribute = '';
+//$cas_server_login_attribute = '';
 //$auth_kind='ldap';
 
 // encyption used to store password : 'PLAIN', 'MD5SUM' or 'CRYPT'
