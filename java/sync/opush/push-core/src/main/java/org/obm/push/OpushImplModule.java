@@ -106,7 +106,7 @@ public class OpushImplModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		install(new ConfigurationModule(globalAppConfiguration));
+		install(new ConfigurationModule<ConfigurationService>(globalAppConfiguration, ConfigurationService.class));
 		install(new TransactionalModule());
 		install(new TechnicalLoggingModule());
 		install(qosModule());

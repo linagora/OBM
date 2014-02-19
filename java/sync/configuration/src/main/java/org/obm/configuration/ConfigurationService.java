@@ -36,7 +36,7 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-public interface ConfigurationService {
+public interface ConfigurationService extends DomainConfiguration {
 	
 	String GLOBAL_OBM_CONFIGURATION_PATH = "/etc/obm/obm_conf.ini";
 
@@ -64,11 +64,7 @@ public interface ConfigurationService {
 	
 	String getLdapBindPassword();
 
-	String getGlobalDomain();
-
 	String getObmUIBaseUrl();
-	
-	String getObmSyncUrl(String obmSyncHost);
 	
 	String getActiveSyncServletUrl();
 }

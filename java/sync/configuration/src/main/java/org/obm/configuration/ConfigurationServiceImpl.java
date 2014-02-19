@@ -58,7 +58,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	private static final String SOLR_CHECKING_INTERVAL_KEY = "solr-checking-interval";
 	private static final int SOLR_CHECKING_INTERVAL_DEFAULT = 10;
 
-	@VisibleForTesting static final String GLOBAL_DOMAIN = "global.virt";
 	private final static String ASCMD = "Microsoft-Server-ActiveSync";
 	private final static String EXTERNAL_URL_KEY = "external-url";
 	private final static String OBM_SYNC_PORT = "8080";

@@ -60,7 +60,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.LocatorConfigurationImpl;
@@ -318,7 +317,6 @@ public class LoginHandlerTest {
 			bindMock(HelperService.class);
 			bindMock(SettingsService.class);
 			bindMock(UserService.class);
-			bindMock(ConfigurationService.class);
 			bindMock(ObmSmtpConf.class);
 			bindMock(ObmSmtpService.class);
 			bindMock(ITemplateLoader.class);

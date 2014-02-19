@@ -88,7 +88,7 @@ public class GuiceServletContextListener implements ServletContextListener{
             			serve("/autoconfiguration/*").with(AutoconfService.class);
             		}
             	});
-            	install(new ConfigurationModule(globalConfiguration));
+            	install(new ConfigurationModule<ConfigurationService>(globalConfiguration, ConfigurationService.class));
             	install(new DatabaseModule());
             	bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
             	bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));

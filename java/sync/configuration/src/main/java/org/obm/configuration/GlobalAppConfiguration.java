@@ -31,23 +31,23 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.configuration;
 
-public class GlobalAppConfiguration<MainConfigurationType extends ConfigurationService> {
+public class GlobalAppConfiguration<MainConfigurationType extends DomainConfiguration> {
 
-	public static <T extends ConfigurationService> Builder<T> builder() {
+	public static <T extends DomainConfiguration> Builder<T> builder() {
 		return new Builder<T>();
 	}
 	
-	public static class Builder<MainConfigurationType extends ConfigurationService> {
+	public static class Builder<MainConfigurationType extends DomainConfiguration> {
 		
-		private MainConfigurationType configurationService;
+		private MainConfigurationType configuration;
 		private LocatorConfiguration locatorConfiguration;
 		private DatabaseConfiguration databaseConfiguration;
 		private TransactionConfiguration transactionConfiguration;
 
 		private Builder() {}
 		
-		public Builder<MainConfigurationType> mainConfiguration(MainConfigurationType configurationService) {
-			this.configurationService = configurationService;
+		public Builder<MainConfigurationType> mainConfiguration(MainConfigurationType configuration) {
+			this.configuration = configuration;
 			return this;
 		}
 		
@@ -67,29 +67,29 @@ public class GlobalAppConfiguration<MainConfigurationType extends ConfigurationS
 		}
 		
 		public GlobalAppConfiguration<MainConfigurationType> build() {
-			return new GlobalAppConfiguration<MainConfigurationType>(configurationService, 
+			return new GlobalAppConfiguration<MainConfigurationType>(configuration, 
 					locatorConfiguration, databaseConfiguration, transactionConfiguration);
 		}
 		
 	}
 	
-	private final MainConfigurationType configurationService;
+	private final MainConfigurationType configuration;
 	private final LocatorConfiguration locatorConfiguration;
 	private final DatabaseConfiguration databaseConfiguration;
 	private final TransactionConfiguration transactionConfiguration;
 
-	private GlobalAppConfiguration(MainConfigurationType configurationService, 
+	private GlobalAppConfiguration(MainConfigurationType configuration, 
 			LocatorConfiguration locatorConfiguration, 
 			DatabaseConfiguration databaseConfiguration, 
 			TransactionConfiguration transactionConfiguration) {
-				this.configurationService = configurationService;
+				this.configuration = configuration;
 				this.locatorConfiguration = locatorConfiguration;
 				this.databaseConfiguration = databaseConfiguration;
 				this.transactionConfiguration = transactionConfiguration;
 	}
 
-	public MainConfigurationType getConfigurationService() {
-		return configurationService;
+	public MainConfigurationType getConfiguration() {
+		return configuration;
 	}
 	
 	public LocatorConfiguration getLocatorConfiguration() {

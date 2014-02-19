@@ -35,15 +35,15 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.obm.configuration.ConfigurationService;
-
 import com.google.common.base.Charsets;
+
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class Messages {
 
 	private final ResourceBundle bundle;
 
-	public Messages(ConfigurationService configurationservice, Locale locale) {
+	public Messages(ObmSyncConfigurationService configurationservice, Locale locale) {
 		bundle = configurationservice.getResourceBundle(locale);
 	}
 	

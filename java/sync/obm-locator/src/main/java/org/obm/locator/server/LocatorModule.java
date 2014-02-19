@@ -58,13 +58,13 @@ public class LocatorModule extends AbstractModule {
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
 		
 		install(new DatabaseModule());
-		install(new ConfigurationModule(buildConfiguration()));
+		install(new ConfigurationModule<ConfigurationService>(buildConfiguration(), ConfigurationService.class));
 		install(new TransactionalModule());
 		install(new LocatorServletModule());
 	}
 
 	private GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
-		return GlobalAppConfiguration.builder()
+		return GlobalAppConfiguration.<ConfigurationService>builder()
 					.mainConfiguration(new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME))
 					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
 					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME)))

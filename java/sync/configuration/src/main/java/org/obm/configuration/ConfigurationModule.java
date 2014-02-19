@@ -33,18 +33,21 @@ package org.obm.configuration;
 
 import com.google.inject.AbstractModule;
 
-public class ConfigurationModule extends AbstractModule {
+public class ConfigurationModule<MainConfigurationType extends DomainConfiguration> extends AbstractModule {
 	
-	private final GlobalAppConfiguration<?> globalAppConfiguration;
+	private final GlobalAppConfiguration<MainConfigurationType> globalAppConfiguration;
+	private Class<MainConfigurationType> mainConfigurationTypeClass;
 
-	public ConfigurationModule(GlobalAppConfiguration<?> globalAppConfiguration) {
+	public ConfigurationModule(GlobalAppConfiguration<MainConfigurationType> globalAppConfiguration, Class<MainConfigurationType> mainConfigurationTypeClass) {
 		super();
 		this.globalAppConfiguration = globalAppConfiguration;
+		this.mainConfigurationTypeClass = mainConfigurationTypeClass;
 	}
-
+	
 	@Override
 	protected void configure() {
-		bindWhenDefined(ConfigurationService.class, globalAppConfiguration.getConfigurationService());
+		bindWhenDefined(mainConfigurationTypeClass, globalAppConfiguration.getConfiguration());
+		bindWhenDefined(DomainConfiguration.class, globalAppConfiguration.getConfiguration());
 		bindWhenDefined(LocatorConfiguration.class, globalAppConfiguration.getLocatorConfiguration());
 		bindWhenDefined(DatabaseConfiguration.class, globalAppConfiguration.getDatabaseConfiguration());
 		bindWhenDefined(TransactionConfiguration.class, globalAppConfiguration.getTransactionConfiguration());

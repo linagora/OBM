@@ -43,7 +43,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.auth.AccessToken;
@@ -56,6 +55,7 @@ import com.linagora.obm.sync.QueueManager;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class SolrHelperFactoryTest {
 
@@ -67,7 +67,7 @@ public class SolrHelperFactoryTest {
 	private SolrHelper.Factory factory;
 	private SolrManager manager;
 	private QueueManager queueManager;
-	private ConfigurationService configurationService;
+	private ObmSyncConfigurationService configurationService;
 
 	private static JMSConfiguration jmsConfiguration() {
 		return 
@@ -101,7 +101,7 @@ public class SolrHelperFactoryTest {
 		contact = new Contact();
 		accessToken = ToolBox.mockAccessToken();
 		locatorClient = createMock(LocatorService.class);
-		configurationService = createMock(ConfigurationService.class);
+		configurationService = createMock(ObmSyncConfigurationService.class);
 		contactIndexerFactory = createMockBuilder(ContactIndexer.Factory.class).addMockedMethod("createIndexer", CommonsHttpSolrServer.class, ObmDomain.class, Contact.class).createMock();
 		contactIndexer = createMockBuilder(ContactIndexer.class).createMock();
 		

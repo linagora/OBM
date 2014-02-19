@@ -65,8 +65,8 @@ public class ObmSyncModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		final GlobalAppConfiguration<ObmSyncConfigurationService> globalConfiguration = buildConfiguration();
-		bind(ObmSyncConfigurationService.class).toInstance(globalConfiguration.getConfigurationService());
-		install(new ConfigurationModule(globalConfiguration));
+		bind(ObmSyncConfigurationService.class).toInstance(globalConfiguration.getConfiguration());
+		install(new ConfigurationModule<ObmSyncConfigurationService> (globalConfiguration, ObmSyncConfigurationService.class));
 		install(new ObmSyncServletModule());
 		install(new ObmSyncServicesModule());
 		install(new MessageQueueModule());

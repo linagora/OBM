@@ -31,26 +31,28 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Locale;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.utils.IniFile;
 import org.obm.configuration.utils.IniFile.Factory;
 
 import com.google.common.collect.ImmutableMap;
 
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
+
 
 public class MessagesTest {
 
-	private ConfigurationServiceImpl configurationService;
+	private ObmSyncConfigurationService configurationService;
 
 	@Before
 	public void setLocale() {
@@ -60,7 +62,7 @@ public class MessagesTest {
 		Factory factory = control.createMock(IniFile.Factory.class);
 		expect(factory.build(anyObject(String.class))).andReturn(iniFile);
 		control.replay();
-		configurationService = new ConfigurationServiceImpl.Factory().create("fakeConfPath", "appName");
+		configurationService = new ObmSyncConfigurationServiceImpl.Factory().create("fakeConfPath", "appName");
 		Locale.setDefault(Locale.US);
 	}
 

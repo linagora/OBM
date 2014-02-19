@@ -43,7 +43,6 @@ import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.obm.configuration.ConfigurationService;
 import org.obm.sync.LifecycleListener;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
@@ -56,6 +55,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
+
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 @Singleton
 public class SolrManager implements LifecycleListener {
@@ -80,7 +81,7 @@ public class SolrManager implements LifecycleListener {
 
 	@Inject
 	@VisibleForTesting
-	protected SolrManager(ConfigurationService configurationService, QueueManager queueManager, CommandConverter commandConverter) throws JMSException {
+	protected SolrManager(ObmSyncConfigurationService configurationService, QueueManager queueManager, CommandConverter commandConverter) throws JMSException {
 		this.commandConverter = commandConverter;
 		solrCheckingInterval = configurationService.solrCheckingInterval() * 1000;
 		queueNameToProducerMap = new EnumMap<SolrJmsQueue, Producer>(SolrJmsQueue.class);

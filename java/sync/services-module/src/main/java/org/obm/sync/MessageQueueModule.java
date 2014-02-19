@@ -37,7 +37,6 @@ import javax.jms.Session;
 
 import org.hornetq.core.config.Configuration;
 import org.hornetq.jms.server.config.JMSConfiguration;
-import org.obm.configuration.ConfigurationService;
 import org.obm.sync.solr.jms.SolrJmsQueue;
 
 import com.google.common.base.Throwables;
@@ -48,6 +47,8 @@ import com.google.inject.multibindings.Multibinder;
 import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
+
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class MessageQueueModule extends AbstractModule {
 
@@ -69,7 +70,7 @@ public class MessageQueueModule extends AbstractModule {
 	}
 	
 	@Provides @Singleton
-	public static Configuration hornetQConfiguration(ConfigurationService configurationService) {
+	public static Configuration hornetQConfiguration(ObmSyncConfigurationService configurationService) {
 		String dataDirectory = configurationService.getDataDirectory() + "/" + "jms/data";
 		return HornetQConfiguration.configuration()
 				.enablePersistence(true)

@@ -66,7 +66,7 @@ public class OpushModule extends AbstractModule {
 	
 	private static GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
 		ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
-		return 	GlobalAppConfiguration.builder()
+		return 	GlobalAppConfiguration.<ConfigurationService>builder()
 					.mainConfiguration(configurationService)
 					.locatorConfiguration(new LocatorConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
 					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))

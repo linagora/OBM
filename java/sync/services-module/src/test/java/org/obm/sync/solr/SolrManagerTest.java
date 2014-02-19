@@ -53,7 +53,6 @@ import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.configuration.ConfigurationService;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
@@ -81,6 +80,7 @@ import com.linagora.obm.sync.QueueManager;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 
 public class SolrManagerTest {
@@ -92,7 +92,7 @@ public class SolrManagerTest {
 	private SolrRequest pingRequest;
 	private Command<Integer> pingCommand;
 	private QueueManager queueManager;
-	private ConfigurationService configurationService;
+	private ObmSyncConfigurationService configurationService;
 	private final CommandConverter converter = new CommandConverter() {
 		@Override
 		public <T extends Serializable> SolrRequest convert(Command<T> command) throws Exception {
@@ -130,7 +130,7 @@ public class SolrManagerTest {
 		queueManager = new QueueManager(hornetQConfiguration(), jmsConfiguration());
 		queueManager.start();
 		
-		configurationService = createMock(ConfigurationService.class);
+		configurationService = createMock(ObmSyncConfigurationService.class);
 		server = createMockBuilder(CommonsHttpSolrServer.class).addMockedMethod("ping").createStrictMock();
 		
 		expect(configurationService.solrCheckingInterval()).andReturn(10);
