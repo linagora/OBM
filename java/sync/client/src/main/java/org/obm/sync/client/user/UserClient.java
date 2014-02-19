@@ -32,7 +32,6 @@
 package org.obm.sync.client.user;
 
 import org.apache.http.client.HttpClient;
-import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
@@ -55,20 +54,17 @@ public class UserClient extends AbstractClientImpl implements IUser {
 	public static class Factory {
 
 		protected final String origin;
-		protected final ConfigurationService configurationService;
 		protected final SyncClientAssert syncClientAssert;
 		protected final Locator locator;
 		protected final Logger obmSyncLogger;
 
 		@Inject
 		protected Factory(@Named("origin")String origin,
-				ConfigurationService configurationService,
 				SyncClientAssert syncClientAssert, 
 				Locator locator, 
 				@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
 			
 			this.origin = origin;
-			this.configurationService = configurationService;
 			this.syncClientAssert = syncClientAssert;
 			this.locator = locator;
 			this.obmSyncLogger = obmSyncLogger;
