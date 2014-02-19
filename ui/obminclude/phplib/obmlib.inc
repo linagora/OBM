@@ -354,7 +354,7 @@ class CAS_Auth extends Auth {
   }
 
   function auth_validate_callback() {
-    global $obm;
+    global $obm, $cas_server_login_attribute;
 
     if(empty($cas_server_login_attribute)) {
       $tmpLogin = phpCAS::getUser();
