@@ -39,6 +39,7 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
+import org.obm.configuration.LocatorConfigurationImpl;
 import org.obm.domain.dao.DaoModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
@@ -84,7 +85,7 @@ public class ObmSyncModule extends AbstractModule {
 		ObmSyncConfigurationServiceImpl configurationService = new ObmSyncConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
 		return GlobalAppConfiguration.<ObmSyncConfigurationService>builder()
 					.mainConfiguration(configurationService)
-					.locatorConfiguration(configurationService)
+					.locatorConfiguration(new LocatorConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
 					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
 					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, configurationService))
 					.build();

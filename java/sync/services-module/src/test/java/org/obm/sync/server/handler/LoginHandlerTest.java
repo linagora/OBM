@@ -63,6 +63,7 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.LocatorConfiguration;
+import org.obm.configuration.LocatorConfigurationImpl;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.AddressBookDao;
@@ -323,7 +324,7 @@ public class LoginHandlerTest {
 			bindMock(ITemplateLoader.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 			ObmSyncConfigurationServiceImpl configurationServiceImpl = new ObmSyncConfigurationServiceImpl.Factory().create("discarded", "obm-sync");
-			bind(LocatorConfiguration.class).toInstance(configurationServiceImpl);
+			bind(LocatorConfiguration.class).toInstance(new LocatorConfigurationImpl.Factory().create("discarded"));
 			bind(ObmSyncConfigurationService.class).toInstance(configurationServiceImpl);
 			bindMock(ObmInfoDao.class);
 			bindMock(AddressBookDao.class);

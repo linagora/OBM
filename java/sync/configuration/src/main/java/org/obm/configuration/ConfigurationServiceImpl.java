@@ -36,8 +36,6 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
-import javax.naming.ConfigurationException;
-
 import org.obm.configuration.resourcebundle.Control;
 import org.obm.configuration.utils.IniFile;
 import org.obm.configuration.utils.TimeUnitMapper;
@@ -46,15 +44,9 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.primitives.Ints;
 
-public class ConfigurationServiceImpl implements ConfigurationService, LocatorConfiguration {
+public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
-
-	private static final String LOCATOR_CACHE_TIMEUNIT_KEY = "locator-cache-timeunit";
-	private static final String LOCATOR_CACHE_TIMEOUT_KEY = "locator-cache-timeout";
-	private static final int LOCATOR_CACHE_TIMEOUT_DEFAULT = 30;
-	private static final String LOCATOR_CLIENT_TIMEOUT_KEY = "locator-client-timeout-seconds";
-	private static final int LOCATOR_CLIENT_TIMEOUT_DEFAULT = 5;
 
 	private static final String TRANSACTION_TIMEOUT_UNIT_KEY = "transaction-timeout-unit";
 	private static final String TRANSACTION_TIMEOUT_KEY = "transaction-timeout";
@@ -66,19 +58,12 @@ public class ConfigurationServiceImpl implements ConfigurationService, LocatorCo
 	private static final String SOLR_CHECKING_INTERVAL_KEY = "solr-checking-interval";
 	private static final int SOLR_CHECKING_INTERVAL_DEFAULT = 10;
 
+	@VisibleForTesting static final String GLOBAL_DOMAIN = "global.virt";
 	private final static String ASCMD = "Microsoft-Server-ActiveSync";
-
 	private final static String EXTERNAL_URL_KEY = "external-url";
-
-	private final static String LOCATOR_HOST_KEY = "host";
-	private final static int LOCATOR_PORT = 8084;
-	private final static String LOCATOR_APP_NAME = "obm-locator";
-
 	private final static String OBM_SYNC_PORT = "8080";
 	private final static String OBM_SYNC_APP_NAME = "obm-sync/services";
-
-	private static final String GLOBAL_DOMAIN = "global.virt";
-
+	
 	public static class Factory {
 		
 		protected IniFile.Factory iniFileFactory;
@@ -101,50 +86,6 @@ public class ConfigurationServiceImpl implements ConfigurationService, LocatorCo
 		this.iniFile = globalConfigurationIniFile;
 		this.applicationName = applicationName;
 		this.timeUnitMapper = new TimeUnitMapper();
-	}
-
-	@Override
-	public String getLocatorUrl() throws ConfigurationException {
-		String locatorHost = iniFile.getStringValue(LOCATOR_HOST_KEY);
-		if (locatorHost == null) {
-			throw new ConfigurationException(
-					"Missing host key in configuration");
-		}
-		return "http://" + locatorHost + ":" + LOCATOR_PORT + "/" + LOCATOR_APP_NAME + "/";
-	}
-	
-	@Override
-	public int getLocatorPort() {
-		return LOCATOR_PORT;
-	}
-
-	@Override
-	public String getObmUIBaseUrl() {
-		String protocol = iniFile.getStringValue("external-protocol");
-		String hostname = getExternalUrl();
-		String path = iniFile.getStringValue("obm-prefix");
-		return protocol + "://" + hostname + path;
-	}
-
-	@Override
-	public String getObmSyncUrl(String obmSyncHost) {
-		return "http://" + obmSyncHost + ":" + OBM_SYNC_PORT + "/" + OBM_SYNC_APP_NAME;
-	}
-
-	@Override
-	public int getLocatorClientTimeoutInSeconds() {
-		return iniFile.getIntValue(LOCATOR_CLIENT_TIMEOUT_KEY, LOCATOR_CLIENT_TIMEOUT_DEFAULT);
-	}
-	
-	@Override
-	public int getLocatorCacheTimeout() {
-		return iniFile.getIntValue(LOCATOR_CACHE_TIMEOUT_KEY, LOCATOR_CACHE_TIMEOUT_DEFAULT);
-	}
-
-	@Override
-	public TimeUnit getLocatorCacheTimeUnit() {
-		String key = iniFile.getStringValue(LOCATOR_CACHE_TIMEUNIT_KEY);
-		return timeUnitMapper.getTimeUnitOrDefault(key, TimeUnit.MINUTES);
 	}
 
 	private int getTransactionTimeout() {
@@ -174,15 +115,6 @@ public class ConfigurationServiceImpl implements ConfigurationService, LocatorCo
 		return DEFAULT_ENCODING;
 	}
 
-	@Override
-	public String getActiveSyncServletUrl() {
-		return "https://" + getExternalUrl() + "/" + ASCMD;
-	}
-
-	private String getExternalUrl() {
-		return iniFile.getStringValue(EXTERNAL_URL_KEY);
-	}
-
 
 	@Override
 	public boolean usePersistentCache() {
@@ -202,12 +134,6 @@ public class ConfigurationServiceImpl implements ConfigurationService, LocatorCo
 	@Override
 	public String getDataDirectory() {
 		return "/var/lib/" + applicationName;
-	}
-
-
-	@Override
-	public String getGlobalDomain() {
-		return GLOBAL_DOMAIN;
 	}
 
 	@Override
@@ -242,5 +168,31 @@ public class ConfigurationServiceImpl implements ConfigurationService, LocatorCo
 		}
 		return null;
 	}
+	
+	@Override
+	public String getGlobalDomain() {
+		return GLOBAL_DOMAIN;
+	}
 
+	@Override
+	public String getObmUIBaseUrl() {
+		String protocol = iniFile.getStringValue("external-protocol");
+		String hostname = getExternalUrl();
+		String path = iniFile.getStringValue("obm-prefix");
+		return protocol + "://" + hostname + path;
+	}
+
+	@Override
+	public String getObmSyncUrl(String obmSyncHost) {
+		return "http://" + obmSyncHost + ":" + OBM_SYNC_PORT + "/" + OBM_SYNC_APP_NAME;
+	}
+
+	@Override
+	public String getActiveSyncServletUrl() {
+		return "https://" + getExternalUrl() + "/" + ASCMD;
+	}
+
+	private String getExternalUrl() {
+		return iniFile.getStringValue(EXTERNAL_URL_KEY);
+	}
 }

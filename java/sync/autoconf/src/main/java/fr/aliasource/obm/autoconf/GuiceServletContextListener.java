@@ -43,6 +43,7 @@ import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
+import org.obm.configuration.LocatorConfigurationImpl;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseModule;
 import org.obm.sync.LifecycleListenerHelper;
@@ -101,7 +102,7 @@ public class GuiceServletContextListener implements ServletContextListener{
 		ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
 		return 	GlobalAppConfiguration.<ConfigurationService>builder()
 					.mainConfiguration(configurationService)
-					.locatorConfiguration(configurationService)
+					.locatorConfiguration(new LocatorConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
 					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
 					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, configurationService))
 					.build();
