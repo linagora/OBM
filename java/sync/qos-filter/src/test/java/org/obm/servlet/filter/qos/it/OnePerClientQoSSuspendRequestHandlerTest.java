@@ -132,8 +132,8 @@ public class OnePerClientQoSSuspendRequestHandlerTest {
 		control.replay();
 
 		Future<StatusLine> request1 = async.asyncHttpGet();
-		List<Future<StatusLine>> requests = async.asyncHttpGets(10);
 		blockingServletUtils.waitingServletRequestHandling();
+		List<Future<StatusLine>> requests = async.asyncHttpGets(10);
 		boolean requestHandlingNotified = blockingServletUtils.tryWaitingServletRequestHandling();
 		blockingServletUtils.unlockServerRequestsHandling(11);
 		StatusLine response1 = async.retrieveRequestStatus(request1);

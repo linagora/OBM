@@ -104,8 +104,7 @@ public class ActiveSyncServletTest {
 		expect(credentials.getUser()).andReturn(user).atLeastOnce();
 		
 		PushContinuation pushContinuation = mocksControl.createMock(PushContinuation.class);
-		expect(pushContinuation.isResumed()).andReturn(false).anyTimes();
-		expect(pushContinuation.isInitial()).andReturn(true).anyTimes();
+		expect(pushContinuation.needsContinuationHandling()).andReturn(false).anyTimes();
 		expect(pushContinuation.getReqId()).andReturn(requestId).anyTimes();
 		
 		request = mocksControl.createMock(HttpServletRequest.class);

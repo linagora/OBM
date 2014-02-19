@@ -150,7 +150,7 @@ public class PushContinuationTest {
 		Future<PingResponse> pingFuture = opClient.pingASync(async, pingProtocol, inboxCollectionIdAsString, HEARTBEAT);
 		
 		// We have to wait for Ping request really arrived in OPush
-		assertThat(pendingQueries.waitingClose(WAIT_TO_BE_STARTED_MAX_TIME, TimeUnit.SECONDS)).isTrue();
+		assertThat(pendingQueries.waitingStart(WAIT_TO_BE_STARTED_MAX_TIME, TimeUnit.SECONDS)).isTrue();
 		SyncResponse syncResponse = opClient.syncEmail(syncDecoder, INCOMING_SYNC_KEY, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 25);
 		
 		PingResponse pingResponse = pingFuture.get(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS);

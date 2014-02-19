@@ -46,13 +46,14 @@ import com.google.common.collect.Lists;
 
 public class AsyncServletRequestUtils {
 
+	private int count;
 	private final Async async;
 	private final String serviceUri;
 	
 	public AsyncServletRequestUtils(ExecutorService executorService, int port, String servletName) {
 		this.async = Async.newInstance().use(executorService);
 		this.serviceUri = "http://localhost:" + port + "/" + servletName;
-
+		this.count = 0;
 	}
 	
 	public List<Integer> codes(List<StatusLine> statusList) {
@@ -91,7 +92,8 @@ public class AsyncServletRequestUtils {
 	}
 
 	public Request httpGet() {
-		return Request.Get(serviceUri);
+		count += 1;
+		return Request.Get(serviceUri + "?" + count);
 	}
 	
 }

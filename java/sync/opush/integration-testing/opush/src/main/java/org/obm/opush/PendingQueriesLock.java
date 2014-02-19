@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,12 +44,14 @@ public class PendingQueriesLock {
 
 	private final AtomicInteger nbClient;
 	private final Semaphore lock;
+	private CountDownLatch countDownLatch;
 	private int nbLock;
 	
 	public PendingQueriesLock() {
 		nbLock = 0;
 		nbClient = new AtomicInteger(0);
 		lock = new Semaphore(1);
+		countDownLatch = new CountDownLatch(1);
 	}
 	
 	public synchronized void countDown() {
@@ -57,6 +60,14 @@ public class PendingQueriesLock {
 		if (nbLock == 0) {
 			lock.release();
 		}
+	}
+	
+	public void expectedQueriesBeforeUnlock(int count) {
+		countDownLatch = new CountDownLatch(count);
+	}
+	
+	public boolean waitingStart(long timeout, TimeUnit unit) throws InterruptedException {
+		return countDownLatch.await(timeout, unit);
 	}
 	
 	public boolean waitingClose(long timeout, TimeUnit unit) throws InterruptedException {
@@ -68,6 +79,7 @@ public class PendingQueriesLock {
 	}
 
 	public synchronized void start() {
+		countDownLatch.countDown();
 		nbLock += nbClient.get();
 		if (nbLock > 0) {
 			lock.tryAcquire();
