@@ -79,7 +79,7 @@ public class ObjectStoreManager implements StoreManager, EhCacheStores {
 		this.ehCacheConfiguration = ehCacheConfiguration;
 		this.configurationLogger = configurationLogger;
 		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds();
-		boolean usePersistentCache = configurationService.usePersistentCache();
+		boolean usePersistentCache = configurationService.usePersistentEhcacheStore();
 		String dataDirectory = configurationService.getDataDirectory();
 		configurationLogger.info("EhCache transaction timeout in seconds : {}", transactionTimeoutInSeconds);
 		configurationLogger.info("EhCache transaction persistent mode : {}", usePersistentCache);

@@ -44,7 +44,7 @@ public class EhCacheConfigurationService {
 		File dataDir = temporaryFolder.newFolder();
 		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
 		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true).anyTimes();
+		EasyMock.expect(configurationService.usePersistentEhcacheStore()).andReturn(true).anyTimes();
 		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
 		EasyMock.replay(configurationService);
 		

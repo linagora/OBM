@@ -33,26 +33,16 @@
 package org.obm.configuration;
 
 import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
-public interface ConfigurationService extends DomainConfiguration {
+public interface ConfigurationService extends DomainConfiguration, DataConfiguration {
 	
 	String GLOBAL_OBM_CONFIGURATION_PATH = "/etc/obm/obm_conf.ini";
 
-	ResourceBundle getResourceBundle(Locale locale);
-
 	Charset getDefaultEncoding();
-
-	int transactionTimeoutInSeconds();
-
-	boolean usePersistentCache();
 
 	int trustTokenTimeoutInSeconds();
 	
 	int solrCheckingInterval();
-
-	String getDataDirectory();
 
 	String getLdapServer();
 

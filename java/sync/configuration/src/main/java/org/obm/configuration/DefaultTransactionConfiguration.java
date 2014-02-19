@@ -43,33 +43,33 @@ public class DefaultTransactionConfiguration implements TransactionConfiguration
 			super();
 		}
 		
-		public DefaultTransactionConfiguration create(String applicationName, ConfigurationService configurationService) {
-			return new DefaultTransactionConfiguration(applicationName, configurationService);
+		public DefaultTransactionConfiguration create(String applicationName, DataConfiguration dataPolicyConfiguration) {
+			return new DefaultTransactionConfiguration(applicationName, dataPolicyConfiguration);
 		}
 	}
 
 	private final String applicationName;
-	private final ConfigurationService configurationService;
+	private final DataConfiguration dataPolicyConfiguration;
 	
 	@VisibleForTesting
-	DefaultTransactionConfiguration(String applicationName, ConfigurationService configurationService) {
+	DefaultTransactionConfiguration(String applicationName, DataConfiguration dataPolicyConfiguration) {
 		this.applicationName = applicationName;
-		this.configurationService = configurationService;
+		this.dataPolicyConfiguration = dataPolicyConfiguration;
 	}
 
 	@Override
 	public File getJournalPart1Path() {
-		return new File(String.format("%s/%s-btm1.tlog", configurationService.getDataDirectory(), applicationName));
+		return new File(String.format("%s/%s-btm1.tlog", dataPolicyConfiguration.getDataDirectory(), applicationName));
 	}
 
 	@Override
 	public File getJournalPart2Path() {
-		return new File(String.format("%s/%s-btm2.tlog", configurationService.getDataDirectory(), applicationName));
+		return new File(String.format("%s/%s-btm2.tlog", dataPolicyConfiguration.getDataDirectory(), applicationName));
 	}
 
 	@Override
 	public int getTimeOutInSecond() {
-		return configurationService.transactionTimeoutInSeconds();
+		return dataPolicyConfiguration.transactionTimeoutInSeconds();
 	}
 	
 	@Override

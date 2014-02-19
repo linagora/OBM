@@ -76,7 +76,7 @@ public class SyncKeysDaoEhcacheMigrationImplTest {
 		File dataDir = temporaryFolder.newFolder();
 		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
 		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2);
-		EasyMock.expect(configurationService.usePersistentCache()).andReturn(true);
+		EasyMock.expect(configurationService.usePersistentEhcacheStore()).andReturn(true);
 		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
 		EasyMock.replay(configurationService);
 		return configurationService;

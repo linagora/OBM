@@ -117,7 +117,7 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 	}
 	
 	@Override
-	public boolean usePersistentCache() {
+	public boolean usePersistentEhcacheStore() {
 		return false;
 	}
 

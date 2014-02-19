@@ -116,7 +116,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 
 	@Override
-	public boolean usePersistentCache() {
+	public boolean usePersistentEhcacheStore() {
 		return true;
 	}
 

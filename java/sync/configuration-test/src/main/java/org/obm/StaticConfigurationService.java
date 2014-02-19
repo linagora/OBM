@@ -163,7 +163,7 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 	}
 
 	@Override
-	public boolean usePersistentCache() {
+	public boolean usePersistentEhcacheStore() {
 		return configuration.transaction.usePersistentCache;
 	}
 
