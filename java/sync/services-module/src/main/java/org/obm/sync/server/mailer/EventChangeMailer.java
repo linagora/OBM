@@ -86,7 +86,9 @@ public class EventChangeMailer extends AbstractMailer {
 	private final CalendarEncoding calendarEncoding;
 	
 	@Inject
-	/* package */ EventChangeMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader,
+	/* package */ EventChangeMailer(MailService mailService, 
+			ObmSyncConfigurationService constantService,
+			ITemplateLoader templateLoader,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		super(mailService, constantService, templateLoader);
 		this.baseUrl = constantService.getObmUIBaseUrl();

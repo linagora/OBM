@@ -44,10 +44,15 @@ public class ConfigurationModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind(ConfigurationService.class).toInstance(globalAppConfiguration.getConfigurationService());
-		bind(LocatorConfiguration.class).toInstance(globalAppConfiguration.getLocatorConfiguration());
-		bind(DatabaseConfiguration.class).toInstance(globalAppConfiguration.getDatabaseConfiguration());
-		bind(TransactionConfiguration.class).toInstance(globalAppConfiguration.getTransactionConfiguration());
+		bindWhenDefined(ConfigurationService.class, globalAppConfiguration.getConfigurationService());
+		bindWhenDefined(LocatorConfiguration.class, globalAppConfiguration.getLocatorConfiguration());
+		bindWhenDefined(DatabaseConfiguration.class, globalAppConfiguration.getDatabaseConfiguration());
+		bindWhenDefined(TransactionConfiguration.class, globalAppConfiguration.getTransactionConfiguration());
 	}
 	
+	private <T> void bindWhenDefined(Class<T> classToBind, T instance) {
+		if (instance != null) {
+			bind(classToBind).toInstance(instance);
+		}
+	}
 }

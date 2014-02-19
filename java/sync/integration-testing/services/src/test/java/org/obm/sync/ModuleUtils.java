@@ -42,6 +42,7 @@ import org.hornetq.core.remoting.impl.netty.TransportConstants;
 import org.obm.Configuration;
 import org.obm.ConfigurationModule;
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.LocatorConfiguration;
 import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -80,8 +81,10 @@ public class ModuleUtils {
 				databaseDrivers.addBinding().to(H2DriverConfiguration.class);
 				bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 				bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
-				bind(ObmSyncConfigurationService.class).toInstance(new ObmSyncStaticConfigurationService.
-						ObmSyncConfiguration(configuration, new Configuration.ObmSync()));
+				ObmSyncStaticConfigurationService.ObmSyncConfiguration obmSyncConfiguration = 
+						new ObmSyncStaticConfigurationService.ObmSyncConfiguration(configuration, new Configuration.ObmSync());
+				bind(ObmSyncConfigurationService.class).toInstance(obmSyncConfiguration);
+				bind(LocatorConfiguration.class).toInstance(obmSyncConfiguration);
 				bind(LocatorService.class).toInstance(new LocatorService() {
 					
 					@Override

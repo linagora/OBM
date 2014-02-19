@@ -42,6 +42,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.obm.Configuration;
 import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -82,6 +83,7 @@ public class ServicesClientModule extends AbstractModule {
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance("integration-testing");
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.OBM_SYNC)).toInstance(logger);
 		bind(ConfigurationService.class).toInstance(configuration);
+		bind(LocatorConfiguration.class).toInstance(configuration);
 		bind(CloseableHttpClient.class).toInstance(httpClient);
 		bind(LocatorService.class).to(ArquillianLocatorService.class);
 	}

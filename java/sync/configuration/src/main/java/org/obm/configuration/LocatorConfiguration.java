@@ -47,5 +47,4 @@ public interface LocatorConfiguration {
 	int getLocatorCacheTimeout();
 	
 	TimeUnit getLocatorCacheTimeUnit();
-
 }

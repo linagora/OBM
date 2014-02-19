@@ -40,6 +40,7 @@ import java.util.Date;
 import org.easymock.IMocksControl;
 import org.obm.Configuration;
 import org.obm.DateUtils;
+import org.obm.StaticLocatorConfiguration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
@@ -126,7 +127,7 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	protected GlobalAppConfiguration<ConfigurationService> globalConfiguration() {
 		return GlobalAppConfiguration.builder()
 					.mainConfiguration(new StaticConfigurationService(configuration))
-					.locatorConfiguration(new StaticConfigurationService.Locator(configuration.locator))
+					.locatorConfiguration(new StaticLocatorConfiguration(configuration.locator))
 					.databaseConfiguration(databaseConfiguration())
 					.transactionConfiguration(new StaticConfigurationService.Transaction(configuration.transaction))
 					.build();

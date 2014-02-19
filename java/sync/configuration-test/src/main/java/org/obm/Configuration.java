@@ -113,12 +113,12 @@ public class Configuration {
 	public EhCache ehCache = new EhCache();
 	public Locator locator = new Locator();
 	public File dataDir;
-	public String obmUiBaseUrl = null;
-	public String obmSyncServices = "services";
-	public String activeSyncServletUrl = null;
 	public Charset defautEncoding = Charsets.UTF_8;
 	public int trustTokenTimeoutInSeconds = 10;
 	public int solrCheckingInterval = 10;
 	public String applicationName = "opush";
+	public String obmUiBaseUrl = null;
+	public String obmSyncServices = "services";
+	public String activeSyncServletUrl = null;
 
 }

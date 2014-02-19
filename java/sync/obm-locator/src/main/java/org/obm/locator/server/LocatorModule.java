@@ -64,12 +64,10 @@ public class LocatorModule extends AbstractModule {
 	}
 
 	private GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
-		ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
 		return GlobalAppConfiguration.builder()
-					.mainConfiguration(configurationService)
-					.locatorConfiguration(configurationService)
+					.mainConfiguration(new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME))
 					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
-					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, configurationService))
+					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME)))
 					.build();
 	}
 

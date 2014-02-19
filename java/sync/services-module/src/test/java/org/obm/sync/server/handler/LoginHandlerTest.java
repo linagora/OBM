@@ -29,6 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.createControl;
@@ -37,7 +38,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.getCurrentArguments;
 import static org.easymock.EasyMock.isA;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -62,6 +62,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.LocatorConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.AddressBookDao;
@@ -321,7 +322,9 @@ public class LoginHandlerTest {
 			bindMock(ObmSmtpService.class);
 			bindMock(ITemplateLoader.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
-			bind(ObmSyncConfigurationService.class).toInstance(new ObmSyncConfigurationServiceImpl.Factory().create("discarded", "obm-sync"));
+			ObmSyncConfigurationServiceImpl configurationServiceImpl = new ObmSyncConfigurationServiceImpl.Factory().create("discarded", "obm-sync");
+			bind(LocatorConfiguration.class).toInstance(configurationServiceImpl);
+			bind(ObmSyncConfigurationService.class).toInstance(configurationServiceImpl);
 			bindMock(ObmInfoDao.class);
 			bindMock(AddressBookDao.class);
 			bindMock(UserPatternDao.class);

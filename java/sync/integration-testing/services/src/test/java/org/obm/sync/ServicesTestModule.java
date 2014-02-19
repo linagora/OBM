@@ -36,12 +36,6 @@ import javax.servlet.ServletContext;
 import org.obm.Configuration;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.domain.dao.DaoModule;
-import org.obm.sync.DatabaseMetadataModule;
-import org.obm.sync.DatabaseModule;
-import org.obm.sync.MessageQueueModule;
-import org.obm.sync.ObmSyncServicesModule;
-import org.obm.sync.ObmSyncServletModule;
-import org.obm.sync.SolrJmsModule;
 
 import com.google.common.io.Files;
 import com.google.inject.AbstractModule;

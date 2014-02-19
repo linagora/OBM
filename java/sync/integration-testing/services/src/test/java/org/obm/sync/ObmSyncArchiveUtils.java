@@ -48,6 +48,7 @@ import org.jboss.shrinkwrap.resolver.api.CoordinateParseException;
 import org.jboss.shrinkwrap.resolver.api.ResolutionException;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.obm.StaticConfigurationService;
+import org.obm.StaticLocatorConfiguration;
 import org.obm.arquillian.GuiceWebXmlDescriptor;
 import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dao.utils.H2InMemoryDatabase;
@@ -87,6 +88,7 @@ public class ObmSyncArchiveUtils {
 						org.obm.ConfigurationModule.class,
 						DatabaseConfigurationFixtureH2.class,
 						StaticConfigurationService.class,
+						StaticLocatorConfiguration.class,
 						ObmSyncStaticConfigurationService.class,
 						H2DriverConfiguration.class,
 						H2ConnectionProvider.class,

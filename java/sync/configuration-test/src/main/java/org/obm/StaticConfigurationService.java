@@ -36,19 +36,15 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.concurrent.TimeUnit;
-
-import javax.naming.ConfigurationException;
 
 import org.obm.Configuration.Mail;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
-import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 
 import com.google.common.base.Throwables;
 
-public class StaticConfigurationService implements ConfigurationService {
+public class StaticConfigurationService extends StaticLocatorConfiguration implements ConfigurationService {
 
 	public static class Transaction implements TransactionConfiguration {
 		
@@ -77,42 +73,6 @@ public class StaticConfigurationService implements ConfigurationService {
 		public int getTimeOutInSecond() {
 			return configuration.timeoutInSeconds;
 		}
-	}
-	
-	public static class Locator implements LocatorConfiguration {
-
-		private final org.obm.Configuration.Locator configuration;
-
-		public Locator(org.obm.Configuration.Locator configuration) {
-			this.configuration = configuration;
-		}
-		
-		@Override
-		public String getLocatorUrl() throws ConfigurationException {
-			return configuration.url;
-		}
-
-		@Override
-		public int getLocatorPort() {
-			return configuration.port;
-		}
-
-		@Override
-		public int getLocatorClientTimeoutInSeconds() {
-			return configuration.clientTimeout;
-		}
-
-		@Override
-		public int getLocatorCacheTimeout() {
-			return configuration.cacheTimeout;
-		}
-
-		@Override
-		public TimeUnit getLocatorCacheTimeUnit() {
-			return configuration.cacheTimeUnit;
-		}
-		
-		
 	}
 	
 	public static class Email implements EmailConfiguration {
@@ -183,27 +143,13 @@ public class StaticConfigurationService implements ConfigurationService {
 	private final Configuration configuration;
 
 	public StaticConfigurationService(Configuration configuration) {
+		super(configuration.locator);
 		this.configuration = configuration;
-	}
-
-	@Override
-	public String getObmUIBaseUrl() {
-		return configuration.obmUiBaseUrl;
-	}
-
-	@Override
-	public String getObmSyncUrl(String obmSyncHost) {
-		return obmSyncHost + configuration.obmSyncServices;
 	}
 
 	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
 		return configuration.bundle;
-	}
-
-	@Override
-	public String getActiveSyncServletUrl() {
-		return configuration.activeSyncServletUrl;
 	}
 
 	@Override
@@ -242,11 +188,6 @@ public class StaticConfigurationService implements ConfigurationService {
 	}
 
 	@Override
-	public String getGlobalDomain() {
-		return "global.test";
-	}
-
-	@Override
 	public String getLdapServer() {
 		return null;
 	}
@@ -271,4 +212,23 @@ public class StaticConfigurationService implements ConfigurationService {
 		return null;
 	}
 
+	@Override
+	public String getGlobalDomain() {
+		return "global.test";
+	}
+
+	@Override
+	public String getObmUIBaseUrl() {
+		return configuration.obmUiBaseUrl;
+	}
+
+	@Override
+	public String getObmSyncUrl(String obmSyncHost) {
+		return obmSyncHost + configuration.obmSyncServices;
+	}
+
+	@Override
+	public String getActiveSyncServletUrl() {
+		return configuration.activeSyncServletUrl;
+	}
 }

@@ -40,7 +40,6 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.thread.QueuedThreadPool;
-import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.VMArgumentsUtils;
 import org.obm.locator.LocatorServerLauncher;
 import org.slf4j.Logger;
@@ -59,6 +58,7 @@ public class ContainerModule extends AbstractModule {
 	private static final int POOL_THREAD_SIZE = Objects.firstNonNull( 
 			VMArgumentsUtils.integerArgumentValue("obmLocatorPoolSize"), 50);
 
+	private final static int LOCATOR_PORT = 8084;
 	private static final int WAIT_TO_BE_STARTED_MAX_TIME = 10;
 	private static final int WAIT_TO_BE_STARTED_LATCH_COUNT = 1;
 	private final CountDownLatch serverStartedLatch = new CountDownLatch(WAIT_TO_BE_STARTED_LATCH_COUNT);
@@ -69,9 +69,9 @@ public class ContainerModule extends AbstractModule {
 	}
 
 	@Provides @Singleton
-	protected LocatorServer buildServer(LocatorConfiguration locatorConfiguration) {
+	protected LocatorServer buildServer() {
 		final SelectChannelConnector selectChannelConnector = new SelectChannelConnector();
-		selectChannelConnector.setPort(locatorConfiguration.getLocatorPort());
+		selectChannelConnector.setPort(LOCATOR_PORT);
 
 		final Server server = new Server();
 		server.setThreadPool(new QueuedThreadPool(POOL_THREAD_SIZE));

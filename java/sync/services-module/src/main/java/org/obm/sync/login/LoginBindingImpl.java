@@ -56,7 +56,7 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final AuthentificationServiceFactory authentificationServiceFactory;
 	private final DatabaseAuthentificationService databaseAuthentificationService;
-	private final ObmSyncConfigurationService configurationService;
+	private final ObmSyncConfigurationService obmSyncConfigurationService;
 	private final DomainDao domainDao;
 	private final UserDao userDao;
 
@@ -64,14 +64,14 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 	protected LoginBindingImpl(SessionManagement sessionManagement,
 			AuthentificationServiceFactory authentificationServiceFactory,
 			DatabaseAuthentificationService databaseAuthentificationService,
-			ObmSyncConfigurationService configurationService,
+			ObmSyncConfigurationService obmSyncConfigurationService,
 			DomainDao domainDao,
 			UserDao userDao) {
 		
 		super(sessionManagement);
 		this.authentificationServiceFactory = authentificationServiceFactory;
 		this.databaseAuthentificationService = databaseAuthentificationService;
-		this.configurationService = configurationService;
+		this.obmSyncConfigurationService = obmSyncConfigurationService;
 		this.domainDao = domainDao;
 		this.userDao = userDao;
 	}
@@ -90,7 +90,7 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 		logger.info("trying global admin authentication with login '{}' from '{}'", user, origin);
 		Credentials credentials = Credentials.builder()
 			.login(user)
-			.domain(configurationService.getGlobalDomain())
+			.domain(obmSyncConfigurationService.getGlobalDomain())
 			.hashedPassword(isPasswordHashed)
 			.password(password)
 			.build();

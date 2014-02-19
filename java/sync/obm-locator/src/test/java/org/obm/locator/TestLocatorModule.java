@@ -33,7 +33,6 @@ package org.obm.locator;
 
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
-import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.dao.utils.H2ConnectionProvider;
@@ -70,7 +69,6 @@ public class TestLocatorModule extends AbstractModule {
 					new AbstractModule() {
 						@Override
 						protected void configure() {
-							bind(LocatorConfiguration.class).toInstance(new StaticConfigurationService.Locator(configuration.locator));
 							bind(TransactionConfiguration.class).toInstance(transactionConfiguration);
 							bind(DatabaseDriverConfiguration.class).to(H2DriverConfiguration.class);
 							Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);

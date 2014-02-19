@@ -40,13 +40,7 @@ public interface ConfigurationService {
 	
 	String GLOBAL_OBM_CONFIGURATION_PATH = "/etc/obm/obm_conf.ini";
 
-	String getObmUIBaseUrl();
-
-	String getObmSyncUrl(String obmSyncHost);
-
 	ResourceBundle getResourceBundle(Locale locale);
-	
-	String getActiveSyncServletUrl();
 
 	Charset getDefaultEncoding();
 
@@ -60,8 +54,6 @@ public interface ConfigurationService {
 
 	String getDataDirectory();
 
-	String getGlobalDomain();
-	
 	String getLdapServer();
 
 	String getLdapBaseDn();
@@ -72,4 +64,11 @@ public interface ConfigurationService {
 	
 	String getLdapBindPassword();
 
+	String getGlobalDomain();
+
+	String getObmUIBaseUrl();
+	
+	String getObmSyncUrl(String obmSyncHost);
+	
+	String getActiveSyncServletUrl();
 }

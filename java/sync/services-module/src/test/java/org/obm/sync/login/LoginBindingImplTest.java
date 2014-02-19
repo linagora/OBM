@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.login;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -58,7 +58,7 @@ public class LoginBindingImplTest {
 	private IAuthentificationService authentificationService;
 	private AuthentificationServiceFactory authentificationServiceFactory;
 	private DatabaseAuthentificationService databaseAuthentificationService;
-	private ObmSyncConfigurationService configurationService;
+	private ObmSyncConfigurationService obmSyncConfigurationService;
 	private DomainDao domainDao;
 	private UserDao userDao;
 	private LoginBindingImpl loginBindingImpl;
@@ -70,18 +70,18 @@ public class LoginBindingImplTest {
 		authentificationServiceFactory = control.createMock(AuthentificationServiceFactory.class);
 		expect(authentificationServiceFactory.get()).andReturn(authentificationService).anyTimes();
 		
-		configurationService = control.createMock(ObmSyncConfigurationService.class);
+		obmSyncConfigurationService = control.createMock(ObmSyncConfigurationService.class);
 		databaseAuthentificationService = control.createMock(DatabaseAuthentificationService.class);
 		domainDao = control.createMock(DomainDao.class);
 		userDao = control.createMock(UserDao.class);
 		
-		loginBindingImpl = new LoginBindingImpl(null, authentificationServiceFactory, databaseAuthentificationService, configurationService, domainDao, userDao);
+		loginBindingImpl = new LoginBindingImpl(null, authentificationServiceFactory, databaseAuthentificationService, obmSyncConfigurationService, domainDao, userDao);
 	}
 	
 	@Test
 	public void testAuthenticateGlobalAdmin() {
 		String domain = "global.virt";
-		expect(configurationService.getGlobalDomain())
+		expect(obmSyncConfigurationService.getGlobalDomain())
 			.andReturn(domain);
 		
 		String login = "admin0";
