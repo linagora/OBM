@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.GroupDao;
@@ -201,10 +202,12 @@ public class UserDaoJdbcImpl implements UserDao {
 		try {
 			st = con.createStatement();
 
-			String request = "SELECT userobm_id, userobm_email, domain_name, domain_alias " +
+			// Don't use a PreparedStatement here, as they can't be load-balanced and this is a very frequent query
+			String request = String.format("SELECT userobm_id, userobm_email, domain_name, domain_alias " +
 					"FROM UserObm " +
 					"INNER JOIN Domain ON domain_id = userobm_domain_id " +
-					"WHERE UPPER(userobm_email) like UPPER('%" + login.get() + "%') AND userobm_archive != 1";
+					"WHERE UPPER(userobm_email) like UPPER('%s') AND userobm_archive != 1", StringEscapeUtils.escapeSql(
+							"%" + login.get().toString() + "%"));
 			
 			rs = st.executeQuery(request);
 			
