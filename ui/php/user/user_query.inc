@@ -1328,6 +1328,10 @@ function run_query_user_delete($p_id) {
     run_query_global_delete_document($photo_id);
   }
 
+  // Remove user's private group
+  $query = "DELETE FROM UGroup WHERE group_usercreate $id AND group_privacy=1";
+  $obm_q->query($query);
+
   // Remove user
   $query = "DELETE FROM UserObm
     WHERE userobm_id $id 
