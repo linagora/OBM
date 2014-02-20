@@ -369,3 +369,5 @@ $l_edit_occurrence = 'Edit this event';
 $l_edit_all_occurrences = 'Edit all event in the series';
 $l_is_occurrence_of_parent_event = 'This event is part of a series';
 $l_exception_already_set = "Synchronisation problem: please refresh your calendar";
+
+$l_resource_rights_information = "Read right on selected resource(s) is required";

@@ -567,3 +567,5 @@ $l_edit_occurrence = 'Chỉnh sửa sự kiện này';
 $l_edit_all_occurrences = 'Chỉnh sửa tất cả các sự kiện trong chuỗi';
 $l_is_occurrence_of_parent_event = 'Sự kiện này là một phần của một chuỗi sự kiện';
 $l_exception_already_set = "Vấn đề đồng bộ hóa: xin vui lòng làm mới lịch của bạn";
+
+$l_resource_rights_information = "Read right on selected resource(s) is required";

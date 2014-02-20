@@ -5157,11 +5157,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $dis_show_resource_calendar = "<tr>
      <th><label for=\"cba_show_resource_calendar\">$GLOBALS[l_show_resource_calendar]</label></th>
       <td>
-       <input type=\"checkbox\" id=\"cba_show_resource_calendar\" value=\"1\" $show_resource_calendar name=\"cba_show_resource_calendar\" onclick=\"showResourceInformation(this)\"/>
+       <input type=\"checkbox\" id=\"cba_show_resource_calendar\" value=\"1\" $show_resource_calendar name=\"cba_show_resource_calendar\"/>
        </td>
       </tr>
       <tr>
-       <th id=\"resource_rights_information\" colspan=\"2\" style=\"color:transparent;\">$GLOBALS[l_resource_rights_information]</th>
+       <th id=\"resource_rights_information\" colspan=\"2\" class=\"resource_rights_information\">$GLOBALS[l_resource_rights_information]</th>
       </tr>";
 
 
