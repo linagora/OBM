@@ -157,3 +157,5 @@ $l_consult_occurrence = "Consult this event";
 $l_consult_occurrence_message = "Consult only this event or the series ?";
 $l_consult_event_occurrence = "Consult recurring event"; 
 $l_consult_all_occurrences = "Consult series"; 
+
+$l_resource_rights_information = "Read right on selected resource(s) is required";

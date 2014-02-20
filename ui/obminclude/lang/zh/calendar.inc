@@ -713,3 +713,5 @@ $l_exception_already_set = "同步问题：请刷新您的日历";  //"Synchroni
 
 $l_view_invalid = "此视图无效，不能显示";
 $l_owner = "组织者/拥有者";
+
+$l_resource_rights_information = "Read right on selected resource(s) is required";
