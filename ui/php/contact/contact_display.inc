@@ -2004,10 +2004,15 @@ function dis_contact_vcard_export($contact) {
 // Display Export all private contacts to VCards
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_vcard_export_all($contacts) {
-  
+  $filtered_contacts = array_filter(
+    $contacts,
+    function($contact) {
+      return !$contact->archive;
+    });
+ 
   $vcards = array();
-	if (count($contacts)>0) {
-    foreach ($contacts as $c) {
+  if (count($filtered_contacts)>0) {
+    foreach ($filtered_contacts as $c) {
       $vcards[] = $c->toVcard()->__toString();
     }
   }
