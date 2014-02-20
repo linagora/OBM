@@ -338,19 +338,35 @@ class OBM_Contact implements OBM_ISearchable {
     }
     return $contacts;
   }
-  
+
+  private function isMarketIdInUserObm($marketId) {
+    $obm_q = new DB_OBM;
+    $query = "SELECT userobm_id FROM UserObm WHERE userobm_id = ".sql_parse_id($marketId);
+
+    $obm_q->query($query);
+    if ($obm_q->next_record()) {
+      return true;
+    }
+    return false;
+  }
+
   public static function insert($contact, $uid, $addressbook, $domain_id) {
   	global $cgp_show, $cdg_sql;
 
   	$comp_id = sql_parse_id($contact->company_id);
   	$dsrc    = sql_parse_id($contact->datasource_id);
   	$kind    = sql_parse_id($contact->kind);
-  	$market_id  = sql_parse_id($contact->market_id);
+  	$contact_market_id  = sql_parse_id($contact->market_id);
+  	$market_id = $contact_market_id && self::isMarketIdInUserObm($contact_market_id) ?
+  	  sql_parse_id($contact_market_id) : 'NULL';
+
   	$func    = sql_parse_id($contact->function);
 
   	$date = ($contact->date ? "'{$contact->date}'" : 'null');
+  	$obm_q = new DB_OBM;
 
-  	$query = "INSERT INTO Contact (contact_timeupdate,
+  	$query = "INSERT INTO Contact (
+  	      contact_timeupdate,
   	      contact_timecreate,
   	      contact_userupdate,
   	      contact_usercreate,
@@ -386,41 +402,40 @@ class OBM_Contact implements OBM_ISearchable {
   	    ) VALUES (
   	      NOW(),
   	      NOW(),
-  	$uid,
-  	$uid,
-  	$domain_id,
-  	$dsrc,
-  	$comp_id,
-  	      '{$contact->company}',
-  	$kind,
-  	$market_id,
-  	      '{$contact->lastname}',
-  	      '{$contact->firstname}',
-  	      '{$contact->commonname}',
-  	      '{$contact->mname}',
-  	      '{$contact->suffix}',
-  	      '{$contact->aka}',
-  	      '{$contact->sound}',
-  	      '{$contact->manager}',
-  	      '{$contact->assistant}',
-  	      '{$contact->spouse}',
-  	      '{$contact->category}',
-  	      '{$contact->service}',
-  	$func,
-  	      '{$contact->title}',
-  	{$contact->mailok},
-  	{$contact->newsletter},
-  	{$contact->archive},
-  	$date,
-  	      '{$contact->comment}',
-  	      '{$contact->comment2}',
-  	      '{$contact->comment3}',
+  	      $uid,
+  	      $uid,
+  	      $domain_id,
+  	      $dsrc,
+  	      $comp_id,
+  	      '".$obm_q->escape($contact->company)."',
+  	      $kind,
+  	      $market_id,
+  	      '".$obm_q->escape($contact->lastname)."',
+  	      '".$obm_q->escape($contact->firstname)."',
+  	      '".$obm_q->escape($contact->commonname)."',
+  	      '".$obm_q->escape($contact->mname)."',
+  	      '".$obm_q->escape($contact->suffix)."',
+  	      '".$obm_q->escape($contact->aka)."',
+  	      '".$obm_q->escape($contact->sound)."',
+  	      '".$obm_q->escape($contact->manager)."',
+  	      '".$obm_q->escape($contact->assistant)."',
+  	      '".$obm_q->escape($contact->spouse)."',
+  	      '".$obm_q->escape($contact->category)."',
+  	      '".$obm_q->escape($contact->service)."',
+  	      $func,
+  	      '".$obm_q->escape($contact->title)."',
+  	      {$contact->mailok},
+  	      {$contact->newsletter},
+  	      {$contact->archive},
+  	      $date,
+  	      '".$obm_q->escape($contact->comment)."',
+  	      '".$obm_q->escape($contact->comment2)."',
+  	      '".$obm_q->escape($contact->comment3)."',
   	      '{$GLOBALS['c_origin_web']}',
   	      '{$addressbook->id}'
   	    )";
 
   	display_debug_msg($query, $cdg_sql, 'OBM_Contact:create(1)');
-  	$obm_q = new DB_OBM;
   	$insertedContact = $obm_q->query($query);
 
   	$contact->id = $obm_q->lastid();
@@ -510,7 +525,6 @@ class OBM_Contact implements OBM_ISearchable {
     }
 
     OBM_AddressBook::timestamp($addressbook->id);
-    
     $ret = OBM_Contact::get($contact->id);
 
     // Indexing Contact
