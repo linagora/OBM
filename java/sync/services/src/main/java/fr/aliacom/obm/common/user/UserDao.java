@@ -38,6 +38,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailLogin;
@@ -107,11 +108,12 @@ public class UserDao {
 		try {
 			st = con.createStatement();
 
-			String request = "SELECT userobm_id, userobm_email, domain_name, domain_alias " +
+			// Don't use a PreparedStatement here, as they can't be load-balanced and this is a very frequent query
+			String request = String.format("SELECT userobm_id, userobm_email, domain_name, domain_alias " +
 					"FROM UserObm " +
 					"INNER JOIN Domain ON domain_id = userobm_domain_id " +
-					"WHERE UPPER(userobm_email) like UPPER('%" + login.get() + "%') AND userobm_archive != 1";
-			
+					"WHERE UPPER(userobm_email) like UPPER('%s') AND userobm_archive != 1", StringEscapeUtils.escapeSql(
+							"%" + login.get().toString() + "%"));
 			rs = st.executeQuery(request);
 			
 			while (rs.next()) {
