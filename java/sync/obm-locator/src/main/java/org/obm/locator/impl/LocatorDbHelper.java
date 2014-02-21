@@ -36,7 +36,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.DomainConfiguration;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.utils.JDBCUtils;
 import org.slf4j.Logger;
@@ -54,12 +54,12 @@ public class LocatorDbHelper {
 	private final DatabaseConnectionProvider dbcp;
 	private final static int MAX_CHAR_FOR_CAST = 8;
 
-	private final ConfigurationService configurationService;
+	private final DomainConfiguration domainConfiguration;
 	
 	@Inject
-	protected LocatorDbHelper(DatabaseConnectionProvider dbcp, ConfigurationService configurationService) {
+	protected LocatorDbHelper(DatabaseConnectionProvider dbcp, DomainConfiguration configurationService) {
 		this.dbcp = dbcp;
-		this.configurationService = configurationService;
+		this.domainConfiguration = configurationService;
 	}
 	
 	/**
@@ -112,7 +112,7 @@ public class LocatorDbHelper {
 	private String getDomainAsJdbcString(String loginAtDomain) {
 		int idx = loginAtDomain.indexOf("@");
 		String domain = loginAtDomain.substring(idx + 1);
-		if (domain.equals(configurationService.getGlobalDomain())) {
+		if (domain.equals(domainConfiguration.getGlobalDomain())) {
 			return "%";
 		}
 		return domain;

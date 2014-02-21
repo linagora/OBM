@@ -38,6 +38,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm.opush</groupId>
+			<artifactId>push-configuration</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm.opush</groupId>
 			<artifactId>technical-log-bean</artifactId>
 		</dependency>
 		<dependency>

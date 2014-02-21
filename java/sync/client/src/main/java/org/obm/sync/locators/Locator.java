@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.locators;
 
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.DomainConfiguration;
 import org.obm.configuration.VMArgumentsUtils;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -48,17 +48,17 @@ public class Locator {
 	protected static final String OBM_SYNC_HOST = "obmSyncHost";
 	
 	private final LocatorService locatorService;
-	private final ConfigurationService configurationService;
+	private final DomainConfiguration domainConfiguration;
 
 	@Inject
-	protected Locator(ConfigurationService configurationService, LocatorService locatorService) {
-		this.configurationService = configurationService;
+	protected Locator(DomainConfiguration domainConfiguration, LocatorService locatorService) {
+		this.domainConfiguration = domainConfiguration;
 		this.locatorService = locatorService;
 	}
 	
 	public String backendUrl(String loginAtDomain) throws LocatorClientException {
 		String obmSyncHost = getObmSyncHost(loginAtDomain);
-		return configurationService.getObmSyncUrl(obmSyncHost);
+		return domainConfiguration.getObmSyncUrl(obmSyncHost);
 	}
 	
 	@VisibleForTesting String getObmSyncHost(String loginAtDomain) throws LocatorClientException {

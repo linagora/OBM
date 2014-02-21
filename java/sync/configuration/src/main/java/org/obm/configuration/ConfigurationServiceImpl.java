@@ -46,7 +46,7 @@ import com.google.common.primitives.Ints;
 
 public class ConfigurationServiceImpl implements ConfigurationService {
 
-	private final Charset DEFAULT_ENCODING = Charsets.UTF_8;
+	private static final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 
 	private static final String TRANSACTION_TIMEOUT_UNIT_KEY = "transaction-timeout-unit";
 	private static final String TRANSACTION_TIMEOUT_KEY = "transaction-timeout";
@@ -58,7 +58,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	private static final String SOLR_CHECKING_INTERVAL_KEY = "solr-checking-interval";
 	private static final int SOLR_CHECKING_INTERVAL_DEFAULT = 10;
 
-	private final static String ASCMD = "Microsoft-Server-ActiveSync";
 	private final static String EXTERNAL_URL_KEY = "external-url";
 	private final static String OBM_SYNC_PORT = "8080";
 	private final static String OBM_SYNC_APP_NAME = "obm-sync/services";
@@ -184,11 +183,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public String getObmSyncUrl(String obmSyncHost) {
 		return "http://" + obmSyncHost + ":" + OBM_SYNC_PORT + "/" + OBM_SYNC_APP_NAME;
-	}
-
-	@Override
-	public String getActiveSyncServletUrl() {
-		return "https://" + getExternalUrl() + "/" + ASCMD;
 	}
 
 	private String getExternalUrl() {

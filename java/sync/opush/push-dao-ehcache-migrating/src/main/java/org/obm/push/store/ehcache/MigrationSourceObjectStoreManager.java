@@ -42,8 +42,8 @@ import net.sf.ehcache.migrating.config.Configuration;
 import net.sf.ehcache.migrating.config.DiskStoreConfiguration;
 import net.sf.ehcache.migrating.store.MemoryStoreEvictionPolicy;
 
-import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
 
@@ -67,9 +67,9 @@ public class MigrationSourceObjectStoreManager implements LifecycleListener {
 	private static final int MAX_ENTRIES_IN_MEMORY = 1000;
 	private final CacheManager singletonManager;
 
-	@Inject MigrationSourceObjectStoreManager(ConfigurationService configurationService,
+	@Inject MigrationSourceObjectStoreManager(OpushConfiguration opushConfiguration,
 			@Named(LoggerModule.MIGRATION)Logger configurationLogger) {
-		String dataDirectory = configurationService.getDataDirectory();
+		String dataDirectory = opushConfiguration.getDataDirectory();
 		configurationLogger.info("EhCache migration transaction mode : {}", TRANSACTIONAL_MODE);
 		configurationLogger.info("EhCache migration data directory : {}", dataDirectory);
 		configurationLogger.info("EhCache migration unlimited version in use");

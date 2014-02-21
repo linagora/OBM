@@ -36,9 +36,10 @@ import org.obm.Configuration;
 import org.obm.ConfigurationModule.PolicyConfigurationProvider;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.guice.AbstractOverrideModule;
-import org.obm.opush.env.OpushStaticConfigurationService.EhCache;
-import org.obm.opush.env.OpushStaticConfigurationService.RemoteConsole;
-import org.obm.opush.env.OpushStaticConfigurationService.SyncPerms;
+import org.obm.opush.env.OpushStaticConfiguration.EhCache;
+import org.obm.opush.env.OpushStaticConfiguration.RemoteConsole;
+import org.obm.opush.env.OpushStaticConfiguration.SyncPerms;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfiguration;
 
@@ -55,6 +56,7 @@ public final class OpushConfigurationModule extends AbstractOverrideModule {
 	
 	@Override
 	protected void configureImpl() {
+		bind(OpushConfiguration.class).toInstance(new OpushStaticConfiguration(configuration));
 		bind(SyncPermsConfigurationService.class).toInstance(new SyncPerms(configuration.syncPerms));
 		bind(RemoteConsoleConfiguration.class).toInstance(new RemoteConsole(configuration.remoteConsole));
 		bind(EhCacheConfiguration.class).toInstance(new EhCache(configuration.ehCache));

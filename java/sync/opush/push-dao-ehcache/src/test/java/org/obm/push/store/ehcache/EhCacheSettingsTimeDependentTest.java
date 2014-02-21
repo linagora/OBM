@@ -57,7 +57,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.configuration.ConfigurationService;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +71,7 @@ public class EhCacheSettingsTimeDependentTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
 	
-	private ConfigurationService configurationService;
+	private OpushConfiguration opushConfiguration;
 	private TransactionProvider transactionProvider;
 	private Logger logger;
 	private BitronixTransactionManager tm;
@@ -98,7 +98,7 @@ public class EhCacheSettingsTimeDependentTest {
 		
 		control.replay();
 		
-		configurationService = new EhCacheConfigurationService().mock(tempFolder);
+		opushConfiguration = new EhCacheOpushConfiguration().mock(tempFolder);
 
 		tm = TransactionManagerRule.setupTransactionManager(tempFolder);
 	}
@@ -114,7 +114,7 @@ public class EhCacheSettingsTimeDependentTest {
 			.withTimeToLive(1);
 		
 		ObjectStoreManager cacheManager = 
-				new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+				new ObjectStoreManager(opushConfiguration, config, logger, transactionProvider);
 	
 		try {
 			Element el1 = new Element("key1", "value1");
@@ -136,7 +136,7 @@ public class EhCacheSettingsTimeDependentTest {
 			.withTimeToLive(1);
 
 		ObjectStoreManager cacheManager = 
-				new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+				new ObjectStoreManager(opushConfiguration, config, logger, transactionProvider);
 	
 		try {
 			Element element = new Element("key1", "value1");
@@ -382,7 +382,7 @@ public class EhCacheSettingsTimeDependentTest {
 	private Cache storeAcceptingXElementsInMemory(int maxElementsInMemory) {
 		return new CacheManager(new Configuration()
 			.name("manager")
-			.diskStore(new DiskStoreConfiguration().path(configurationService.getDataDirectory()))
+			.diskStore(new DiskStoreConfiguration().path(opushConfiguration.getDataDirectory()))
 			.updateCheck(false)
 			.cache(new CacheConfiguration()
 				.name("storeName")

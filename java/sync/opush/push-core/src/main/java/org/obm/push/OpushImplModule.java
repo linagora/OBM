@@ -33,7 +33,6 @@ package org.obm.push;
 
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
-import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.VMArgumentsUtils;
 import org.obm.push.backend.BackendWindowingService;
@@ -43,6 +42,7 @@ import org.obm.push.backend.IHierarchyExporter;
 import org.obm.push.backend.PolicyConfigurationService;
 import org.obm.push.backend.PolicyConfigurationServiceFileImpl;
 import org.obm.push.bean.ICollectionPathHelper;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.configuration.OpushConfigurationModule;
 import org.obm.push.handler.BackendWindowingServiceImpl;
 import org.obm.push.impl.ClientIdServiceImpl;
@@ -98,15 +98,15 @@ public class OpushImplModule extends AbstractModule {
 			VMArgumentsUtils.integerArgumentValue("qosRejectingCeilPerClient"), 6);
 	
 	private static final String APPLICATION_ORIGIN = "o-push";
-	private final GlobalAppConfiguration<ConfigurationService> globalAppConfiguration;
+	private final GlobalAppConfiguration<OpushConfiguration> opushConfiguration;
 	
-	public OpushImplModule(GlobalAppConfiguration<ConfigurationService> globalAppConfiguration) {
-		this.globalAppConfiguration = globalAppConfiguration;
+	public OpushImplModule(GlobalAppConfiguration<OpushConfiguration> opushConfiguration) {
+		this.opushConfiguration = opushConfiguration;
 	}
 
 	@Override
 	protected void configure() {
-		install(new ConfigurationModule<ConfigurationService>(globalAppConfiguration, ConfigurationService.class));
+		install(new ConfigurationModule<OpushConfiguration>(opushConfiguration, OpushConfiguration.class));
 		install(new TransactionalModule());
 		install(new TechnicalLoggingModule());
 		install(qosModule());

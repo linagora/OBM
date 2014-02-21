@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 
@@ -44,7 +44,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.configuration.ConfigurationService;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class ObjectStoreManagerTest {
 	
 	private ObjectStoreManager opushCacheManager;
 	private EhCacheConfiguration config;
-	private ConfigurationService configurationService;
+	private OpushConfiguration opushConfiguration;
 	private Logger logger;
 	private TransactionProvider transactionProvider;
 
@@ -70,9 +70,9 @@ public class ObjectStoreManagerTest {
 		expect(transactionProvider.get()).andReturn(transactionManagerRule.getTransactionManager()).anyTimes();
 		control.replay();
 		
-		configurationService = new EhCacheConfigurationService().mock(tempFolder);
+		opushConfiguration = new EhCacheOpushConfiguration().mock(tempFolder);
 		config = new TestingEhCacheConfiguration();
-		opushCacheManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+		opushCacheManager = new ObjectStoreManager(opushConfiguration, config, logger, transactionProvider);
 	}
 
 	@After

@@ -41,7 +41,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
-import org.obm.configuration.ConfigurationService;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.dao.testsuite.ContinuationTransactionMapTest;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
@@ -57,9 +57,9 @@ public class ContinuationTransactionMapImplTest extends ContinuationTransactionM
 	@Before
 	public void init() throws NotSupportedException, SystemException, IOException {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
+		OpushConfiguration opushConfiguration = new EhCacheOpushConfiguration().mock(tempFolder);
 
-		objectStoreManager = new NonTransactionalObjectStoreManager(configurationService, logger);
+		objectStoreManager = new NonTransactionalObjectStoreManager(opushConfiguration, logger);
 		continuationTransactionMap = new ContinuationTransactionMapImpl<TestingContinuation>(objectStoreManager);
 		
 		transactionManagerRule.getTransactionManager().begin();

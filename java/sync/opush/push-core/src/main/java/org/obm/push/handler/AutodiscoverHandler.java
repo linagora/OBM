@@ -33,7 +33,6 @@ package org.obm.push.handler;
 
 import java.util.Locale;
 
-import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.autodiscover.AutodiscoverProtocolException;
 import org.obm.push.bean.autodiscover.AutodiscoverRequest;
@@ -43,6 +42,7 @@ import org.obm.push.bean.autodiscover.AutodiscoverResponseError;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseServer;
 import org.obm.push.bean.autodiscover.AutodiscoverResponseUser;
 import org.obm.push.bean.autodiscover.AutodiscoverStatus;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.exception.activesync.NoDocumentException;
 import org.obm.push.impl.DOMDumper;
 import org.obm.push.impl.Responder;
@@ -56,14 +56,14 @@ import com.google.inject.Singleton;
 public class AutodiscoverHandler extends XmlRequestHandler {
 	
 	private final AutodiscoverProtocol protocol;
-	private final ConfigurationService configurationService;
+	private final OpushConfiguration opushConfiguration;
 
 	@Inject AutodiscoverHandler(AutodiscoverProtocol autodiscoverProtocol, 
-			ConfigurationService configurationService, DOMDumper domDumper) {
+			OpushConfiguration opushConfiguration, DOMDumper domDumper) {
 		
 		super(domDumper);
 		this.protocol = autodiscoverProtocol;
-		this.configurationService = configurationService; 
+		this.opushConfiguration = opushConfiguration; 
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class AutodiscoverHandler extends XmlRequestHandler {
 	}
 	
 	private void buildActionsServer(AutodiscoverResponse.Builder autodiscoverResponseBuilder) {
-		String url = configurationService.getActiveSyncServletUrl();
+		String url = opushConfiguration.getActiveSyncServletUrl();
 		autodiscoverResponseBuilder.add(AutodiscoverResponseServer.builder()
 					.type("MobileSync")
 					.url(url)

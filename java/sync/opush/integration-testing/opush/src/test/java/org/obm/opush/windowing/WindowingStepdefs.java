@@ -42,11 +42,11 @@ import javax.transaction.TransactionManager;
 
 import org.fest.util.Files;
 import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.mail.EmailChanges;
 import org.obm.push.mail.WindowingService;
 import org.obm.push.mail.bean.Email;
@@ -69,7 +69,7 @@ import cucumber.api.java.en.When;
 public class WindowingStepdefs {
 
 	@Inject
-	private ConfigurationService configurationService;
+	private OpushConfiguration opushConfiguration;
 	
 	@Inject 
 	private TransactionProvider transactionProvider;
@@ -112,7 +112,7 @@ public class WindowingStepdefs {
 	public void shutdown() throws Exception {
 		tm.rollback();
 		storeManager.shutdown();
-		Files.delete(new File(configurationService.getDataDirectory()));
+		Files.delete(new File(opushConfiguration.getDataDirectory()));
 		transactionProvider.shutdown();
 	}
 	

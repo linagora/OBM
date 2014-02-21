@@ -34,7 +34,7 @@ package org.obm.sync.client.login;
 import javax.inject.Singleton;
 
 import org.apache.http.client.HttpClient;
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.DomainConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
@@ -63,36 +63,36 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	public static class Factory {
 
 		protected final String origin;
-		protected final ConfigurationService configurationService;
+		protected final DomainConfiguration domainConfiguration;
 		protected final SyncClientAssert syncClientAssert;
 		protected final Locator locator;
 		protected final Logger obmSyncLogger;
 
 		@Inject
 		protected Factory(@Named("origin")String origin,
-				ConfigurationService configurationService,
+				DomainConfiguration domainConfiguration,
 				SyncClientAssert syncClientAssert, 
 				Locator locator, 
 				@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger) {
 			
 			this.origin = origin;
-			this.configurationService = configurationService;
+			this.domainConfiguration = domainConfiguration;
 			this.syncClientAssert = syncClientAssert;
 			this.locator = locator;
 			this.obmSyncLogger = obmSyncLogger;
 		}
 		
 		public LoginClient create(HttpClient httpClient) {
-			return new LoginClient(origin, configurationService, syncClientAssert, locator, obmSyncLogger, httpClient);
+			return new LoginClient(origin, domainConfiguration, syncClientAssert, locator, obmSyncLogger, httpClient);
 		}
 	}
 	
 	private final Locator locator;
 	private final String origin;
-	private final ConfigurationService configurationService;
+	private final DomainConfiguration domainConfiguration;
 
 	protected LoginClient(@Named("origin")String origin,
-			ConfigurationService configurationService,
+			DomainConfiguration domainConfiguration,
 			SyncClientAssert syncClientAssert, 
 			Locator locator, 
 			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger, 
@@ -100,7 +100,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		
 		super(syncClientAssert, obmSyncLogger, httpClient);
 		this.origin = origin;
-		this.configurationService = configurationService;
+		this.domainConfiguration = domainConfiguration;
 		this.locator = locator;
 	}
 	
@@ -158,7 +158,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		ImmutableMultimap<String, String> params = ImmutableMultimap.of(
 				"login", login, "password", password, "origin", origin);
 
-		AccessToken token = newAccessToken(login, configurationService.getGlobalDomain(), origin);
+		AccessToken token = newAccessToken(login, domainConfiguration.getGlobalDomain(), origin);
 		
 		Document doc = execute(token, "/login/authenticateGlobalAdmin", params);
 		exceptionFactory.checkLoginExpection(doc);
@@ -170,7 +170,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		ImmutableMultimap<String, String> params = ImmutableMultimap.of(
 				"login", login, "password", password, "origin", origin, "domainName", domainName);
 
-		AccessToken token = newAccessToken(login, configurationService.getGlobalDomain(), origin);
+		AccessToken token = newAccessToken(login, domainConfiguration.getGlobalDomain(), origin);
 		
 		Document doc = execute(token, "/login/authenticateAdmin", params);
 		exceptionFactory.checkLoginExpection(doc);

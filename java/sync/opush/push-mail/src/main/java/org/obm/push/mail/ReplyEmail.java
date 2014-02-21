@@ -52,9 +52,9 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
-import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.exception.NotQuotableEmailException;
 import org.obm.push.utils.DOMUtils;
@@ -73,17 +73,17 @@ public class ReplyEmail extends SendEmail {
 	protected final static String EMAIL_LINEBREAKER = "\r\n";
 
 	private final Mime4jUtils mime4jUtils;
-	private final ConfigurationService configuration;
+	private final OpushConfiguration opushConfiguration;
 	private Entity originTextPlainPart;
 	private Entity originTextHtmlPart;
 
 	private final Map<String, MSAttachementData> originalMailAttachments;
 	
-	public ReplyEmail(ConfigurationService configuration, Mime4jUtils mime4jUtils, String defaultFrom, Map<MSEmailBodyType, EmailView> originMails, 
+	public ReplyEmail(OpushConfiguration opushConfiguration, Mime4jUtils mime4jUtils, String defaultFrom, Map<MSEmailBodyType, EmailView> originMails, 
 			Message message, Map<String, MSAttachementData> originalMailAttachments) throws MimeException, NotQuotableEmailException, UnsupportedEncodingException, IOException {
 		
 		super(defaultFrom, message);
-		this.configuration = configuration;
+		this.opushConfiguration = opushConfiguration;
 		this.mime4jUtils = mime4jUtils;
 		this.originalMailAttachments = originalMailAttachments;
 		setNewMessage(quoteAndAppendRepliedMail(originMails));
@@ -204,7 +204,7 @@ public class ReplyEmail extends SendEmail {
 
 		boolean alreadyAttachmentsExist = outgoingMessageContainsAttachments();
 		if (alreadyAttachmentsExist || originalMailAttachments.isEmpty()) {
-			Map<String, String> params = mime4jUtils.getContentTypeHeaderParams(configuration.getDefaultEncoding());
+			Map<String, String> params = mime4jUtils.getContentTypeHeaderParams(opushConfiguration.getDefaultEncoding());
 			newMessage.setBody(modifiedBodyText, mimeType, params);
 		} else {
 			Multipart mixedMultipart = this.mime4jUtils.createMultipartMixed();
@@ -212,7 +212,7 @@ public class ReplyEmail extends SendEmail {
 			mixedMultipart.addBodyPart(bodyPart);
 			copyOriginalMessageAttachmentsToMultipartMessage(mixedMultipart);
 			newMessage.setBody(mixedMultipart, Mime4jUtils.TYPE_MULTIPART_MIXED, 
-					mime4jUtils.getContentTypeHeaderMultipartParams(configuration.getDefaultEncoding()));
+					mime4jUtils.getContentTypeHeaderMultipartParams(opushConfiguration.getDefaultEncoding()));
 		}
 		return newMessage;
 	}
@@ -227,7 +227,7 @@ public class ReplyEmail extends SendEmail {
 		String mimeType = Mime4jUtils.TYPE_MULTIPART_PREFIX + newMultipart.getSubType();
 
 		MessageImpl newMessage = mime4jUtils.createMessage();
-		Map<String, String> params = mime4jUtils.getContentTypeHeaderMultipartParams(configuration.getDefaultEncoding());
+		Map<String, String> params = mime4jUtils.getContentTypeHeaderMultipartParams(opushConfiguration.getDefaultEncoding());
 		newMessage.setBody(newMultipart, mimeType, params);
 		return newMessage;
 	}
@@ -242,7 +242,7 @@ public class ReplyEmail extends SendEmail {
 				return multipart;
 			} else {
 				Map<String, String> contentTypeHeaderMultipartParams = 
-						mime4jUtils.getContentTypeHeaderMultipartParams(configuration.getDefaultEncoding());
+						mime4jUtils.getContentTypeHeaderMultipartParams(opushConfiguration.getDefaultEncoding());
 				
 				Multipart mixedMultipart = this.mime4jUtils.createMultipartMixed();
 				String mimeType = Mime4jUtils.TYPE_MULTIPART_PREFIX + multipart.getSubType();

@@ -60,7 +60,7 @@ public class WindowingDaoIndexEhcacheMigrationImplTest extends StoreManagerConfi
 	@Before
 	public void init() throws IOException {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initOpushConfigurationMock(), logger);
 		this.windowingDaoChunkEhcacheMigrationImpl = new WindowingDaoChunkEhcacheMigrationImpl(objectStoreManagerMigration);
 		this.user = Factory.create().createUser("login@domain", "email@domain", "displayName");
 		this.deviceId = new DeviceId("DevId");

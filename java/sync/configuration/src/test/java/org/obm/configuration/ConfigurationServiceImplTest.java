@@ -82,17 +82,4 @@ public class ConfigurationServiceImplTest {
 	public void testGetObmSyncUrl() {
 		assertThat(configurationServiceImpl.getObmSyncUrl("10.69.1.23")).isEqualTo("http://10.69.1.23:8080/obm-sync/services");
 	}
-	
-	@Test
-	public void testGetActiveSyncServletUrl() {
-		String externalUrl = "10.69.1.23";
-		expect(iniFile.getStringValue(LocatorConfigurationImpl.EXTERNAL_URL_KEY))
-			.andReturn(externalUrl);
-		
-		control.replay();
-		String activeSyncServletUrl = configurationServiceImpl.getActiveSyncServletUrl();
-		control.verify();
-		
-		assertThat(activeSyncServletUrl).isEqualTo("https://" + externalUrl + "/" + LocatorConfigurationImpl.ASCMD);
-	}
 }

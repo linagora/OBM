@@ -37,7 +37,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.obm.push.mail.MSMailTestsUtils.loadEmail;
-import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfigurationService;
+import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfiguration;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -153,7 +153,7 @@ public class MailBackendTest {
 		expectLastCall().once();
 				
 		MailBackend mailBackend = new MailBackendImpl(mailboxService, authenticationService, new Mime4jUtils(),
-				mockOpushConfigurationService(), null, null, mappingService, null, null,
+				mockOpushConfiguration(), null, null, mappingService, null, null,
 				collectionPathBuilderProvider, null, windowingService, smtpSender, emailConfiguration);
 
 		mocksControl.replay();

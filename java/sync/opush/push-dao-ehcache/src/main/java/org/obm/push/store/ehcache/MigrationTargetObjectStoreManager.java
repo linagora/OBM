@@ -45,8 +45,8 @@ import net.sf.ehcache.config.DiskStoreConfiguration;
 import net.sf.ehcache.config.MemoryUnit;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
-import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.slf4j.Logger;
 
@@ -67,12 +67,12 @@ public class MigrationTargetObjectStoreManager implements StoreManager, EhCacheS
 	private final Logger configurationLogger;
 
 	@Inject MigrationTargetObjectStoreManager(
-			ConfigurationService configurationService,
+			OpushConfiguration opushConfiguration,
 			EhCacheConfiguration ehCacheConfiguration,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		this.ehCacheConfiguration = ehCacheConfiguration;
 		this.configurationLogger = configurationLogger;
-		String dataDirectory = configurationService.getDataDirectory();
+		String dataDirectory = opushConfiguration.getDataDirectory();
 		configurationLogger.info("EhCache transaction mode : {}", TRANSACTIONAL_MODE);
 		configurationLogger.info("EhCache data directory : {}", dataDirectory);
 		configurationLogger.info("EhCache migration version in use");

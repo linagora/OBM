@@ -44,7 +44,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.configuration.ConfigurationService;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.dao.testsuite.SyncKeysDaoTest;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
@@ -63,11 +63,11 @@ public class SyncKeysDaoEhcacheImplTest extends SyncKeysDaoTest {
 	public void init() throws NotSupportedException, SystemException, IOException {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
 		TransactionProvider transactionProvider = EasyMock.createNiceMock(TransactionProvider.class);
-		ConfigurationService configurationService = new EhCacheConfigurationService().mock(tempFolder);
+		OpushConfiguration opushConfiguration = new EhCacheOpushConfiguration().mock(tempFolder);
 
 
 		TestingEhCacheConfiguration config = new TestingEhCacheConfiguration();
-		objectStoreManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+		objectStoreManager = new ObjectStoreManager(opushConfiguration, config, logger, transactionProvider);
 		CacheEvictionListener cacheEvictionListener = createMock(CacheEvictionListener.class);
 		syncKeysDao = new SyncKeysDaoEhcacheImpl(objectStoreManager, cacheEvictionListener);
 		transactionManagerRule.getTransactionManager().begin();

@@ -37,7 +37,7 @@ import java.io.IOException;
 import org.easymock.EasyMock;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
-import org.obm.configuration.ConfigurationService;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.transaction.TransactionManagerRule;
 
 public class StoreManagerConfigurationTest {
@@ -49,15 +49,15 @@ public class StoreManagerConfigurationTest {
 	public TemporaryFolder temporaryFolder =  new TemporaryFolder();
 	protected File dataDir;
 	
-	protected ConfigurationService initConfigurationServiceMock() throws IOException {
+	protected OpushConfiguration initOpushConfigurationMock() throws IOException {
 		dataDir = temporaryFolder.newFolder();
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
-		EasyMock.expect(configurationService.usePersistentEhcacheStore()).andReturn(true).anyTimes();
-		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
-		EasyMock.replay(configurationService);
+		OpushConfiguration opushConfiguration = EasyMock.createMock(OpushConfiguration.class);
+		EasyMock.expect(opushConfiguration.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
+		EasyMock.expect(opushConfiguration.usePersistentEhcacheStore()).andReturn(true).anyTimes();
+		EasyMock.expect(opushConfiguration.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
+		EasyMock.replay(opushConfiguration);
 		
-		return configurationService;
+		return opushConfiguration;
 	}
 
 }

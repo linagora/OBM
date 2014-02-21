@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.TimeUnit;
 
@@ -47,7 +47,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.configuration.ConfigurationService;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +64,7 @@ public class EhCacheStatisticsImplTest {
 	private static final String STATS_ENABLED_CACHE = ObjectStoreManager.MAIL_SNAPSHOT_STORE;
 	
 	private Logger logger;
-	private ConfigurationService configurationService;
+	private OpushConfiguration opushConfiguration;
 	private TransactionProvider transactionProvider;
 	private ObjectStoreManager cacheManager;
 
@@ -77,7 +77,7 @@ public class EhCacheStatisticsImplTest {
 		expect(transactionProvider.get()).andReturn(transactionManagerRule.getTransactionManager()).anyTimes();
 		control.replay();
 		
-		configurationService = new EhCacheConfigurationService().mock(tempFolder);
+		opushConfiguration = new EhCacheOpushConfiguration().mock(tempFolder);
 	}
 	
 	@Test(expected=StatisticsNotAvailableException.class)
@@ -593,7 +593,7 @@ public class EhCacheStatisticsImplTest {
 
 	private EhCacheStatisticsImpl testeeWithConfig(EhCacheConfiguration config) throws Exception {
 		transactionManagerRule.getTransactionManager().begin();
-		cacheManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+		cacheManager = new ObjectStoreManager(opushConfiguration, config, logger, transactionProvider);
 		return new EhCacheStatisticsImpl(config, cacheManager);
 	}
 }

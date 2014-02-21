@@ -57,7 +57,7 @@ public class SnapshotDaoEhcacheMigrationImplTest extends StoreManagerConfigurati
 	@Before
 	public void init() throws IOException {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initConfigurationServiceMock(), logger);
+		this.objectStoreManagerMigration = new MigrationSourceObjectStoreManager( super.initOpushConfigurationMock(), logger);
 		this.snapshotDaoEhcacheMigrationImpl = new SnapshotDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 		this.deviceId = new DeviceId("DevId");
 	}

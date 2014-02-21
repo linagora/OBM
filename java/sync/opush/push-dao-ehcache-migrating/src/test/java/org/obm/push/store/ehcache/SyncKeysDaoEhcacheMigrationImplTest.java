@@ -45,10 +45,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncKeysKey;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
 
@@ -68,18 +68,18 @@ public class SyncKeysDaoEhcacheMigrationImplTest {
 	@Before
 	public void init() throws IOException {
 		Logger logger = EasyMock.createNiceMock(Logger.class);
-		objectStoreManagerMigration = new MigrationSourceObjectStoreManager(initConfigurationServiceMock(), logger);
+		objectStoreManagerMigration = new MigrationSourceObjectStoreManager(initOpushConfigurationMock(), logger);
 		syncKeysDaoEhcacheMigrationImpl = new SyncKeysDaoEhcacheMigrationImpl(objectStoreManagerMigration);
 	}
 	
-	private ConfigurationService initConfigurationServiceMock() throws IOException {
+	private OpushConfiguration initOpushConfigurationMock() throws IOException {
 		File dataDir = temporaryFolder.newFolder();
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(2);
-		EasyMock.expect(configurationService.usePersistentEhcacheStore()).andReturn(true);
-		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
-		EasyMock.replay(configurationService);
-		return configurationService;
+		OpushConfiguration opushConfiguration = EasyMock.createMock(OpushConfiguration.class);
+		EasyMock.expect(opushConfiguration.transactionTimeoutInSeconds()).andReturn(2);
+		EasyMock.expect(opushConfiguration.usePersistentEhcacheStore()).andReturn(true);
+		EasyMock.expect(opushConfiguration.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
+		EasyMock.replay(opushConfiguration);
+		return opushConfiguration;
 	}
 	
 	@After

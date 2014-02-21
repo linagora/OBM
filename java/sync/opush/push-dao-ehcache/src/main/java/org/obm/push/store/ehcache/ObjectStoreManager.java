@@ -47,8 +47,8 @@ import net.sf.ehcache.statistics.extended.ExtendedStatistics.Operation;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.slf4j.Logger;
 
@@ -72,15 +72,15 @@ public class ObjectStoreManager implements StoreManager, EhCacheStores {
 	private final Logger configurationLogger;
 
 	@Inject ObjectStoreManager(
-			ConfigurationService configurationService,
+			OpushConfiguration opushConfiguration,
 			EhCacheConfiguration ehCacheConfiguration,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger,
 			TransactionProvider transactionProvider) {
 		this.ehCacheConfiguration = ehCacheConfiguration;
 		this.configurationLogger = configurationLogger;
-		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds();
-		boolean usePersistentCache = configurationService.usePersistentEhcacheStore();
-		String dataDirectory = configurationService.getDataDirectory();
+		int transactionTimeoutInSeconds = opushConfiguration.transactionTimeoutInSeconds();
+		boolean usePersistentCache = opushConfiguration.usePersistentEhcacheStore();
+		String dataDirectory = opushConfiguration.getDataDirectory();
 		configurationLogger.info("EhCache transaction timeout in seconds : {}", transactionTimeoutInSeconds);
 		configurationLogger.info("EhCache transaction persistent mode : {}", usePersistentCache);
 		configurationLogger.info("EhCache data directory : {}", dataDirectory);

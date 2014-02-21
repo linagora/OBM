@@ -38,8 +38,8 @@ import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
-import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
 
@@ -60,10 +60,10 @@ public class NonTransactionalObjectStoreManager implements LifecycleListener {
 	private final Logger configurationLogger;
 	
 	@Inject NonTransactionalObjectStoreManager(
-			ConfigurationService configurationService,
+			OpushConfiguration opushConfiguration,
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		this.configurationLogger = configurationLogger;
-		int transactionTimeoutInSeconds = configurationService.transactionTimeoutInSeconds();
+		int transactionTimeoutInSeconds = opushConfiguration.transactionTimeoutInSeconds();
 		this.singletonManager = new CacheManager(ehCacheConfiguration(transactionTimeoutInSeconds));
 	}
 

@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.store.ehcache;
 
-import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.expect;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,7 +50,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.configuration.ConfigurationService;
+import org.obm.push.configuration.OpushConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +85,7 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 	@Before
 	public void init() throws Exception {
 		logger = LoggerFactory.getLogger(getClass());
-		ConfigurationService configurationService = initConfigurationServiceMock();
+		OpushConfiguration opushConfiguration = initOpushConfigurationMock();
 		EhCacheConfiguration config = buildNonTransactionalConfig();
 		
 		IMocksControl control = createControl();
@@ -94,8 +94,8 @@ public class MigrationServiceImplTest extends StoreManagerConfigurationTest {
 		control.replay();
 		
 		copyCacheFilesInTemporaryFolder();
-		objectStoreManagerMigration = new MigrationSourceObjectStoreManager(configurationService, logger);
-		objectStoreManager = new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+		objectStoreManagerMigration = new MigrationSourceObjectStoreManager(opushConfiguration, logger);
+		objectStoreManager = new ObjectStoreManager(opushConfiguration, config, logger, transactionProvider);
 		CacheEvictionListener cacheEvictionListener = new CacheEvictionListenerImpl();
 		
 		monitoredCollectionDaoEhcacheMigrationImpl = new MonitoredCollectionDaoEhcacheMigrationImpl(objectStoreManagerMigration);

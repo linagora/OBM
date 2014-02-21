@@ -50,7 +50,6 @@ import org.apache.james.mime4j.storage.StorageOutputStream;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.MimeUtil;
 import org.easymock.EasyMock;
-import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.Address;
 import org.obm.push.bean.MSAttachement;
 import org.obm.push.bean.MSEmailBodyType;
@@ -58,6 +57,7 @@ import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.MethodAttachment;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.utils.SerializableInputStream;
 
 import com.google.common.base.Charsets;
@@ -182,11 +182,11 @@ public class MSMailTestsUtils {
 	}
 	
 
-	public static ConfigurationService mockOpushConfigurationService() {
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.getDefaultEncoding()).andReturn(Charsets.UTF_8).anyTimes();
-		EasyMock.replay(configurationService);
-		return configurationService;
+	public static OpushConfiguration mockOpushConfiguration() {
+		OpushConfiguration opushConfiguration = EasyMock.createMock(OpushConfiguration.class);
+		EasyMock.expect(opushConfiguration.getDefaultEncoding()).andReturn(Charsets.UTF_8).anyTimes();
+		EasyMock.replay(opushConfiguration);
+		return opushConfiguration;
 	}
 
 	public static InputStream loadEmail(String name) {

@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
@@ -39,6 +38,8 @@ import org.obm.configuration.LocatorConfigurationImpl;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
+import org.obm.push.configuration.OpushConfiguration;
+import org.obm.push.configuration.OpushConfigurationImpl;
 import org.obm.push.store.ehcache.EhCacheDaoModule;
 import org.obm.push.store.jdbc.JdbcDaoModule;
 import org.obm.push.store.jdbc.OpushDatabaseModule;
@@ -50,34 +51,34 @@ import com.google.inject.name.Names;
 public class OpushModule extends AbstractModule {
 
 	private static final String APPLICATION_NAME = "opush";
-	private static final String GLOBAL_CONFIGURATION_FILE = ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH;
 
-	private final GlobalAppConfiguration<ConfigurationService> globalConfiguration;
+	private final GlobalAppConfiguration<OpushConfiguration> opushConfiguration;
 	private Module databaseModule;
 	
 	public OpushModule() {
 		this(buildConfiguration(), new OpushDatabaseModule());
 	}
 	
-	public OpushModule(GlobalAppConfiguration<ConfigurationService> globalConfiguration, Module databaseModule) {
-		this.globalConfiguration = globalConfiguration;
+	public OpushModule(GlobalAppConfiguration<OpushConfiguration> opushConfiguration, Module databaseModule) {
+		this.opushConfiguration = opushConfiguration;
 		this.databaseModule = databaseModule;
 	}
 	
-	private static GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
-		ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
-		return 	GlobalAppConfiguration.<ConfigurationService>builder()
-					.mainConfiguration(configurationService)
-					.locatorConfiguration(new LocatorConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
-					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
-					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, configurationService))
+	private static GlobalAppConfiguration<OpushConfiguration> buildConfiguration() {
+		OpushConfigurationImpl mainConfiguration = 
+				new OpushConfigurationImpl.Factory().create(ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH, APPLICATION_NAME);
+		return 	GlobalAppConfiguration.<OpushConfiguration>builder()
+					.mainConfiguration(mainConfiguration)
+					.locatorConfiguration(new LocatorConfigurationImpl.Factory().create(ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH))
+					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH))
+					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, mainConfiguration))
 					.build();
 	}
 	
 	@Override
 	protected void configure() {
 		install(new LinagoraImapModule());
-		install(new OpushImplModule(globalConfiguration));
+		install(new OpushImplModule(opushConfiguration));
 		install(new OpushMailModule());
 		install(new ObmBackendModule());
 		install(new LoggerModule());

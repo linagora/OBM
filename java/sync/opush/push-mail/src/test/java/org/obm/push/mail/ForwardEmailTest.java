@@ -32,7 +32,7 @@
 package org.obm.push.mail;
 
 import static org.obm.push.mail.MSMailTestsUtils.loadMimeMessage;
-import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfigurationService;
+import static org.obm.push.mail.MSMailTestsUtils.mockOpushConfiguration;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -69,7 +69,7 @@ public class ForwardEmailTest {
 		Message message = loadMimeMessage("MAIL-WITH-ATTACHMENT.eml");
 		
 		ForwardEmail forwardEmail = 
-				new ForwardEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, message, 
+				new ForwardEmail(mockOpushConfiguration(), mime4jUtils, "from@linagora.test", original, message, 
 						ImmutableMap.<String, MSAttachementData>of());
 		
 		Message mimeMessage = forwardEmail.getMimeMessage();
@@ -93,7 +93,7 @@ public class ForwardEmailTest {
 		Message message = loadMimeMessage("OBMFULL-2958.eml");
 		
 		ForwardEmail forwardEmail = 
-				new ForwardEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, message, 
+				new ForwardEmail(mockOpushConfiguration(), mime4jUtils, "from@linagora.test", original, message, 
 						ImmutableMap.<String, MSAttachementData>of());
 		
 		Message mimeMessage = forwardEmail.getMimeMessage();
@@ -117,7 +117,7 @@ public class ForwardEmailTest {
 		ms.put("file.txt", msAttachementData);
 		
 		ForwardEmail forwardEmail = 
-				new ForwardEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, message, ms);
+				new ForwardEmail(mockOpushConfiguration(), mime4jUtils, "from@linagora.test", original, message, ms);
 
 		Message mimeMessage = forwardEmail.getMimeMessage();
 		String messageAsString = mime4jUtils.toString(mimeMessage.getBody());
@@ -147,7 +147,7 @@ public class ForwardEmailTest {
 		ms.put("file.txt", msAttachementData);
 		
 		ForwardEmail forwardEmail = 
-				new ForwardEmail(mockOpushConfigurationService(), mime4jUtils, "from@linagora.test", original, message, ms);
+				new ForwardEmail(mockOpushConfiguration(), mime4jUtils, "from@linagora.test", original, message, ms);
 		
 		Message mimeMessage = forwardEmail.getMimeMessage();
 		String messageAsString = mime4jUtils.toString(mimeMessage.getBody());

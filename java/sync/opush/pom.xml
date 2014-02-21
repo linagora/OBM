@@ -90,6 +90,7 @@
 		<module>push-mail</module>
 		<module>push-mail-beans</module>
 		<module>push-servlet</module>
+		<module>push-configuration</module>
 		<module>push-core</module>
 		<module>protocol</module>
 		<module>push-gatling</module>
@@ -236,6 +237,11 @@
 			<dependency>
 				<groupId>com.linagora.obm.opush</groupId>
 				<artifactId>push-bean</artifactId>
+				<version>${opush.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm.opush</groupId>
+				<artifactId>push-configuration</artifactId>
 				<version>${opush.version}</version>
 			</dependency>
 			<dependency>

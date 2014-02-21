@@ -42,7 +42,6 @@ import org.obm.Configuration;
 import org.obm.DateUtils;
 import org.obm.StaticConfigurationService;
 import org.obm.StaticLocatorConfiguration;
-import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
 import org.obm.configuration.EmailConfiguration;
@@ -50,6 +49,7 @@ import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.ActiveSyncServletModule;
 import org.obm.push.bean.ChangedCollections;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -124,9 +124,9 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	}
 
 	@Override
-	protected GlobalAppConfiguration<ConfigurationService> globalConfiguration() {
-		return GlobalAppConfiguration.<ConfigurationService>builder()
-					.mainConfiguration(new StaticConfigurationService(configuration))
+	protected GlobalAppConfiguration<OpushConfiguration>opushConfiguration() {
+		return GlobalAppConfiguration.<OpushConfiguration>builder()
+					.mainConfiguration(new OpushStaticConfiguration(configuration))
 					.locatorConfiguration(new StaticLocatorConfiguration(configuration.locator))
 					.databaseConfiguration(databaseConfiguration())
 					.transactionConfiguration(new StaticConfigurationService.Transaction(configuration.transaction))

@@ -38,7 +38,7 @@ import static org.easymock.EasyMock.expect;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.DomainConfiguration;
 import org.obm.locator.store.LocatorService;
 
 
@@ -46,15 +46,15 @@ public class LocatorTest {
 
 	private IMocksControl mocksControl;
 	private LocatorService locatorService;
-	private ConfigurationService configurationService;
+	private DomainConfiguration domainConfiguration;
 	private Locator locator;
 
 	@Before
 	public void setup() {
 		mocksControl = createControl();
 		locatorService = mocksControl.createMock(LocatorService.class);
-		configurationService = mocksControl.createMock(ConfigurationService.class);
-		locator = new Locator(configurationService, locatorService);
+		domainConfiguration = mocksControl.createMock(DomainConfiguration.class);
+		locator = new Locator(domainConfiguration, locatorService);
 		unsetObmSyncVMArgument();
 	}
 	

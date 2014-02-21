@@ -61,6 +61,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DomainConfiguration;
 import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.LocatorConfigurationImpl;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
@@ -317,6 +318,7 @@ public class LoginHandlerTest {
 			bindMock(HelperService.class);
 			bindMock(SettingsService.class);
 			bindMock(UserService.class);
+			bindMock(DomainConfiguration.class);
 			bindMock(ObmSmtpConf.class);
 			bindMock(ObmSmtpService.class);
 			bindMock(ITemplateLoader.class);

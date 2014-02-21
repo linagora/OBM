@@ -37,19 +37,19 @@ import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
-import org.obm.configuration.ConfigurationService;
 import org.obm.push.bean.MSAttachementData;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.mail.conversation.EmailView;
 import org.obm.push.mail.exception.NotQuotableEmailException;
 
 public class ForwardEmail extends ReplyEmail {
 
-	public ForwardEmail(ConfigurationService configuration, Mime4jUtils mime4jUtils, 
+	public ForwardEmail(OpushConfiguration opushConfiguration, Mime4jUtils mime4jUtils, 
 			String defaultFrom, Map<MSEmailBodyType, EmailView> mailsForwarded, Message message, Map<String, MSAttachementData> originalMailAttachments) 
 					throws MimeException, NotQuotableEmailException, UnsupportedEncodingException, IOException {
 		
-		super(configuration, mime4jUtils, defaultFrom, mailsForwarded, message, originalMailAttachments);
+		super(opushConfiguration, mime4jUtils, defaultFrom, mailsForwarded, message, originalMailAttachments);
 	}
 	
 }

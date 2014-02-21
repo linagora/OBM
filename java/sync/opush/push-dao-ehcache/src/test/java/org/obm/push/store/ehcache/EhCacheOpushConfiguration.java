@@ -36,19 +36,19 @@ import java.io.IOException;
 
 import org.easymock.EasyMock;
 import org.junit.rules.TemporaryFolder;
-import org.obm.configuration.ConfigurationService;
+import org.obm.push.configuration.OpushConfiguration;
 
-public class EhCacheConfigurationService {
+public class EhCacheOpushConfiguration {
 	
-	public ConfigurationService mock(TemporaryFolder temporaryFolder) throws IOException {
+	public OpushConfiguration mock(TemporaryFolder temporaryFolder) throws IOException {
 		File dataDir = temporaryFolder.newFolder();
-		ConfigurationService configurationService = EasyMock.createMock(ConfigurationService.class);
-		EasyMock.expect(configurationService.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
-		EasyMock.expect(configurationService.usePersistentEhcacheStore()).andReturn(true).anyTimes();
-		EasyMock.expect(configurationService.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
-		EasyMock.replay(configurationService);
+		OpushConfiguration opushConfiguration = EasyMock.createMock(OpushConfiguration.class);
+		EasyMock.expect(opushConfiguration.transactionTimeoutInSeconds()).andReturn(200).anyTimes();
+		EasyMock.expect(opushConfiguration.usePersistentEhcacheStore()).andReturn(true).anyTimes();
+		EasyMock.expect(opushConfiguration.getDataDirectory()).andReturn(dataDir.getCanonicalPath()).anyTimes();
+		EasyMock.replay(opushConfiguration);
 		
-		return configurationService;
+		return opushConfiguration;
 	}
 
 }

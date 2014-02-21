@@ -36,7 +36,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
-import org.obm.configuration.ConfigurationService;
+import org.obm.push.configuration.OpushConfiguration;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -49,8 +49,8 @@ public class MailErrorsMessages {
 	private final ResourceBundle bundle;
 	
 	@Inject
-	private MailErrorsMessages(ConfigurationService configurationService) {
-		bundle = configurationService.getResourceBundle(Locale.getDefault());
+	private MailErrorsMessages(OpushConfiguration opushConfiguration) {
+		bundle = opushConfiguration.getResourceBundle(Locale.getDefault());
 	}
 	
 	private String getString(String key, Object... arguments) {

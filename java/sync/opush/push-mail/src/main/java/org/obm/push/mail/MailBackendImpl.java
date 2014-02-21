@@ -52,7 +52,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
-import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.EmailConfiguration.ExpungePolicy;
 import org.obm.push.backend.CollectionPath;
@@ -81,6 +80,7 @@ import org.obm.push.bean.change.hierarchy.HierarchyCollectionChanges;
 import org.obm.push.bean.change.item.ItemChange;
 import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.UidMSEmail;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.EmailViewBuildException;
 import org.obm.push.exception.EmailViewPartsFetcherException;
@@ -152,7 +152,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	
 	private final MailboxService mailboxService;
 	private final Mime4jUtils mime4jUtils;
-	private final ConfigurationService configurationService;
+	private final OpushConfiguration opushConfiguration;
 	private final AuthenticationService authenticationService;
 	private final MSEmailFetcher msEmailFetcher;
 	private final TransformersFactory transformersFactory;
@@ -169,7 +169,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 	@Inject
 	/* package */ MailBackendImpl(MailboxService mailboxService, 
 			AuthenticationService authenticationService, 
-			Mime4jUtils mime4jUtils, ConfigurationService configurationService,
+			Mime4jUtils mime4jUtils, OpushConfiguration opushConfiguration,
 			SnapshotService snapshotService,
 			EmailChangesFetcher emailChangesFetcher,
 			MappingService mappingService,
@@ -184,7 +184,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 		super(mappingService, collectionPathBuilderProvider);
 		this.mailboxService = mailboxService;
 		this.mime4jUtils = mime4jUtils;
-		this.configurationService = configurationService;
+		this.opushConfiguration = opushConfiguration;
 		this.authenticationService = authenticationService;
 		this.snapshotService = snapshotService;
 		this.emailChangesFetcher = emailChangesFetcher;
@@ -545,7 +545,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 
 			if (emailViews.size() > 0) {
 				Message message = mime4jUtils.parseMessage(mailContent);
-				ReplyEmail replyEmail = new ReplyEmail(configurationService, mime4jUtils, getUserEmail(udr), emailViews, message,
+				ReplyEmail replyEmail = new ReplyEmail(opushConfiguration, mime4jUtils, getUserEmail(udr), emailViews, message,
 						ImmutableMap.<String, MSAttachementData>of());
 				send(udr, replyEmail, saveInSent);
 				mailboxService.setAnsweredFlag(udr, collectionPath, MessageSet.singleton(uid));
@@ -590,7 +590,7 @@ public class MailBackendImpl extends OpushBackend implements MailBackend {
 				}
 				
 				ForwardEmail forwardEmail = 
-						new ForwardEmail(configurationService, mime4jUtils, getUserEmail(udr), emailViews, message, originalMailAttachments);
+						new ForwardEmail(opushConfiguration, mime4jUtils, getUserEmail(udr), emailViews, message, originalMailAttachments);
 				send(udr, forwardEmail, saveInSent);
 				try{
 					mailboxService.setAnsweredFlag(udr, collectionPath, MessageSet.singleton(uid));

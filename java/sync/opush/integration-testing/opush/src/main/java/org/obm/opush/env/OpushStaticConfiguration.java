@@ -31,13 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 
 import org.obm.Configuration;
-import org.obm.StaticConfigurationService;
+import org.obm.StaticLocatorConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfiguration;
 import org.obm.push.store.ehcache.EhCacheStores;
@@ -45,12 +50,16 @@ import org.obm.push.utils.ShareAmount;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 
-public class OpushStaticConfigurationService extends StaticConfigurationService {
+public class OpushStaticConfiguration extends StaticLocatorConfiguration implements OpushConfiguration {
 
-	public OpushStaticConfigurationService(Configuration configuration) {
-		super(configuration);
+	private final Configuration configuration;
+
+	public OpushStaticConfiguration(Configuration configuration) {
+		super(configuration.locator);
+		this.configuration = configuration;
 	}
 
 	public static class RemoteConsole implements RemoteConsoleConfiguration {
@@ -162,5 +171,50 @@ public class OpushStaticConfigurationService extends StaticConfigurationService 
 		public int statsSamplingTimeStopInMinutes() {
 			return configuration.statsSamplingTimeStopInMinutes;
 		}
+	}
+	
+	@Override
+	public Charset getDefaultEncoding() {
+		return configuration.defautEncoding;
+	}
+
+	@Override
+	public int transactionTimeoutInSeconds() {
+		return configuration.transaction.timeoutInSeconds;
+	}
+
+	@Override
+	public String getDataDirectory() {
+		try {
+			return configuration.dataDir.getCanonicalPath();
+		} catch (IOException e) {
+			Throwables.propagate(e);
+		}
+		throw new IllegalStateException();
+	}
+	
+	@Override
+	public boolean usePersistentEhcacheStore() {
+		return configuration.transaction.usePersistentCache;
+	}
+
+	@Override
+	public ResourceBundle getResourceBundle(Locale locale) {
+		return configuration.bundle;
+	}
+
+	@Override
+	public String getGlobalDomain() {
+		return "global.test";
+	}
+
+	@Override
+	public String getActiveSyncServletUrl() {
+		return configuration.activeSyncServletUrl;
+	}
+
+	@Override
+	public String getObmSyncUrl(String obmSyncHost) {
+		return obmSyncHost + configuration.obmSyncServices;
 	}
 }

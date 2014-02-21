@@ -57,7 +57,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.obm.annotations.transactional.TransactionProvider;
-import org.obm.configuration.ConfigurationService;
+import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.obm.transaction.TransactionManagerRule;
 import org.slf4j.Logger;
@@ -71,7 +71,7 @@ public class EhCacheSettingsTest {
 
 	@Rule public TemporaryFolder tempFolder =  new TemporaryFolder();
 	
-	private ConfigurationService configurationService;
+	private OpushConfiguration opushConfiguration;
 	private EhCacheConfiguration config;
 	private TransactionProvider transactionProvider;
 	private Logger logger;
@@ -99,7 +99,7 @@ public class EhCacheSettingsTest {
 		
 		control.replay();
 		
-		configurationService = new EhCacheConfigurationService().mock(tempFolder);
+		opushConfiguration = new EhCacheOpushConfiguration().mock(tempFolder);
 		config = new TestingEhCacheConfiguration();
 
 		tm = TransactionManagerRule.setupTransactionManager(tempFolder);
@@ -117,7 +117,7 @@ public class EhCacheSettingsTest {
 			.withMaxMemoryInMB(1)
 			.withPercentageAllowedToCache(null);
 		ObjectStoreManager cacheManager = 
-				new ObjectStoreManager(configurationService, configOneMBMax, logger, transactionProvider);
+				new ObjectStoreManager(opushConfiguration, configOneMBMax, logger, transactionProvider);
 		
 		byte[] arrayOf300KB = new byte[300 * 1024];
 		Arrays.fill(arrayOf300KB, (byte) 65);
@@ -153,7 +153,7 @@ public class EhCacheSettingsTest {
 				ObjectStoreManager.SYNC_KEYS_STORE);
 
 		ObjectStoreManager beforeCacheManager = 
-				new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+				new ObjectStoreManager(opushConfiguration, config, logger, transactionProvider);
 		tm.begin();
 		for (String persistentStoreName : persistentStoreNames) {
 			Cache cache = beforeCacheManager.getStore(persistentStoreName);
@@ -168,7 +168,7 @@ public class EhCacheSettingsTest {
 		tm.begin();
 		
 		ObjectStoreManager newCacheManager = 
-				new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+				new ObjectStoreManager(opushConfiguration, config, logger, transactionProvider);
 		for (String persistentStoreName : persistentStoreNames) {
 			Cache loadedCache = newCacheManager.getStore(persistentStoreName);
 			assertThat(loadedCache.get(el1.getObjectKey())).isEqualTo(el1);
@@ -190,7 +190,7 @@ public class EhCacheSettingsTest {
 		ObjectStoreManager objectStoreManager = null;
 		try {
 			objectStoreManager = 
-					new ObjectStoreManager(configurationService, configWhenLessThanOneHundred, logger, transactionProvider);
+					new ObjectStoreManager(opushConfiguration, configWhenLessThanOneHundred, logger, transactionProvider);
 		} finally {
 			if (objectStoreManager != null) {
 				objectStoreManager.shutdown();
@@ -210,7 +210,7 @@ public class EhCacheSettingsTest {
 		ObjectStoreManager objectStoreManager = null;
 		try {
 			objectStoreManager = 
-					new ObjectStoreManager(configurationService, configWhenMoreThanOneHundred, logger, transactionProvider);
+					new ObjectStoreManager(opushConfiguration, configWhenMoreThanOneHundred, logger, transactionProvider);
 		} finally {
 			if (objectStoreManager != null) {
 				objectStoreManager.shutdown();
@@ -226,7 +226,7 @@ public class EhCacheSettingsTest {
 		ObjectStoreManager objectStoreManager = null;
 		try {
 			objectStoreManager = 
-					new ObjectStoreManager(configurationService, configWhenEqualsOneHundred, logger, transactionProvider);
+					new ObjectStoreManager(opushConfiguration, configWhenEqualsOneHundred, logger, transactionProvider);
 		} finally {
 			if (objectStoreManager != null) {
 				objectStoreManager.shutdown();
@@ -245,7 +245,7 @@ public class EhCacheSettingsTest {
 		ObjectStoreManager objectStoreManager = null;
 		try {
 			objectStoreManager = 
-					new ObjectStoreManager(configurationService, configWhenEqualsOneHundred, logger, transactionProvider);
+					new ObjectStoreManager(opushConfiguration, configWhenEqualsOneHundred, logger, transactionProvider);
 		} finally {
 			if (objectStoreManager != null) {
 				objectStoreManager.shutdown();
@@ -256,7 +256,7 @@ public class EhCacheSettingsTest {
 	@Test
 	public void statsDiskHitRatioWhenNoOperation() {
 		ObjectStoreManager cacheManager = 
-				new ObjectStoreManager(configurationService, config, logger, transactionProvider);
+				new ObjectStoreManager(opushConfiguration, config, logger, transactionProvider);
 		Cache store = cacheManager.createNewStore("storeName");
 		
 		assertThat(store.getStatistics().localDiskHitCount()).isEqualTo(0l);
@@ -352,7 +352,7 @@ public class EhCacheSettingsTest {
 	private Cache storeAcceptingXElementsInMemory(int maxElementsInMemory) {
 		return new CacheManager(new Configuration()
 			.name("manager")
-			.diskStore(new DiskStoreConfiguration().path(configurationService.getDataDirectory()))
+			.diskStore(new DiskStoreConfiguration().path(opushConfiguration.getDataDirectory()))
 			.updateCheck(false)
 			.cache(new CacheConfiguration()
 				.name("storeName")
