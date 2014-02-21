@@ -50,6 +50,7 @@ import org.obm.guice.AbstractOverrideModule;
 import org.obm.opush.ActiveSyncServletModule;
 import org.obm.push.bean.ChangedCollections;
 import org.obm.push.configuration.OpushConfiguration;
+import org.obm.opush.env.OpushConfigurationFixture;
 import org.obm.push.exception.DaoException;
 import org.obm.push.store.CollectionDao;
 import org.obm.push.utils.collection.ClassToInstanceAgregateView;
@@ -68,12 +69,12 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	protected final ClassToInstanceAgregateView<Object> mockMap;
 	protected final IMocksControl mocksControl;
-	protected final Configuration configuration;
+	protected final OpushConfigurationFixture configuration;
 	
 	public AbstractOpushEnv() {
 		mockMap = new ClassToInstanceAgregateView<Object>();
 		mocksControl = createControl();
-		configuration = new Configuration();
+		configuration = new OpushConfigurationFixture();
 		configuration.dataDir = Files.createTempDir();
 		configuration.transaction.timeoutInSeconds = 3600;
 	}
@@ -124,7 +125,7 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 	}
 
 	@Override
-	protected GlobalAppConfiguration<OpushConfiguration>opushConfiguration() {
+	protected GlobalAppConfiguration<org.obm.push.configuration.OpushConfiguration>opushConfiguration() {
 		return GlobalAppConfiguration.<OpushConfiguration>builder()
 					.mainConfiguration(new OpushStaticConfiguration(configuration))
 					.locatorConfiguration(new StaticLocatorConfiguration(configuration.locator))
@@ -196,13 +197,18 @@ public abstract class AbstractOpushEnv extends ActiveSyncServletModule {
 		return new AbstractModule() {
 			@Override
 			protected void configure() {
-				bind(EmailConfiguration.class).toInstance(new StaticConfigurationService.Email(configuration.mail));
+				bind(EmailConfiguration.class).toInstance(new OpushStaticConfiguration.Email(configuration.mail));
 			}
 		};
 	}
 	
 	@Provides
 	public Configuration configurationProvider() {
+		return configuration;
+	}
+	
+	@Provides
+	public OpushConfigurationFixture opushConfigurationFixtureProvider() {
 		return configuration;
 	}
 	

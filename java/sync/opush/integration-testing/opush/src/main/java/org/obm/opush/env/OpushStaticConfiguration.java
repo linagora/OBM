@@ -41,6 +41,7 @@ import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
 
 import org.obm.Configuration;
 import org.obm.StaticLocatorConfiguration;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.SyncPermsConfigurationService;
 import org.obm.push.configuration.OpushConfiguration;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
@@ -57,16 +58,81 @@ public class OpushStaticConfiguration extends StaticLocatorConfiguration impleme
 
 	private final Configuration configuration;
 
-	public OpushStaticConfiguration(Configuration configuration) {
+	public OpushStaticConfiguration(OpushConfigurationFixture configuration) {
 		super(configuration.locator);
 		this.configuration = configuration;
 	}
 
+	public static class Email implements EmailConfiguration {
+
+		private final OpushConfigurationFixture.Mail configuration;
+
+		public Email(OpushConfigurationFixture.Mail configuration) {
+			this.configuration = configuration;
+		}
+
+		@Override
+		public boolean loginWithDomain() {
+			return configuration.loginWithDomain;
+		}
+
+		@Override
+		public int imapTimeoutInMilliseconds() {
+			return configuration.timeoutInMilliseconds;
+		}
+
+		@Override
+		public ExpungePolicy expungePolicy() {
+			return ExpungePolicy.ALWAYS;
+		}
+		
+		@Override
+		public int imapPort() {
+			return configuration.imapPort;
+		}
+
+		@Override
+		public String imapMailboxTrash() {
+			return EmailConfiguration.IMAP_TRASH_NAME;
+		}
+
+		@Override
+		public String imapMailboxSent() {
+			return EmailConfiguration.IMAP_SENT_NAME;
+		}
+
+		@Override
+		public String imapMailboxDraft() {
+			return EmailConfiguration.IMAP_DRAFTS_NAME;
+		}
+
+		@Override
+		public int getMessageMaxSize() {
+			return configuration.maxMessageSize;
+		}
+
+		@Override
+		public int getImapFetchBlockSize() {
+			return configuration.fetchBlockSize;
+		}
+
+		@Override
+		public boolean activateTls() {
+			return configuration.activateTls;
+		}
+
+		@Override
+		public MailboxNameCheckPolicy mailboxNameCheckPolicy() {
+			return MailboxNameCheckPolicy.ALWAYS;
+		}
+
+	}
+	
 	public static class RemoteConsole implements RemoteConsoleConfiguration {
 
-		private final Configuration.RemoteConsole configuration;
+		private final OpushConfigurationFixture.RemoteConsole configuration;
 
-		public RemoteConsole(Configuration.RemoteConsole configuration) {
+		public RemoteConsole(OpushConfigurationFixture.RemoteConsole configuration) {
 			this.configuration = configuration;
 		}
 
@@ -88,9 +154,9 @@ public class OpushStaticConfiguration extends StaticLocatorConfiguration impleme
 	
 	public static class SyncPerms implements SyncPermsConfigurationService {
 
-		private final Configuration.SyncPerms configuration;
+		private final OpushConfigurationFixture.SyncPerms configuration;
 
-		public SyncPerms(Configuration.SyncPerms configuration) {
+		public SyncPerms(OpushConfigurationFixture.SyncPerms configuration) {
 			this.configuration = configuration;
 		}
 
@@ -107,10 +173,10 @@ public class OpushStaticConfiguration extends StaticLocatorConfiguration impleme
 
 	public static class EhCache implements EhCacheConfiguration {
 
-		private final Configuration.EhCache configuration;
+		private final OpushConfigurationFixture.EhCache configuration;
 		private final Map<String, Percentage> percentageByStoreMap;
 
-		public EhCache(Configuration.EhCache configuration) {
+		public EhCache(OpushConfigurationFixture.EhCache configuration) {
 			this.configuration = configuration;
 			this.percentageByStoreMap = Maps.transformValues(
 					ShareAmount.forEntries(EhCacheStores.STORES).amount(100),

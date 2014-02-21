@@ -37,9 +37,7 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.obm.Configuration.Mail;
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 
 import com.google.common.base.Throwables;
@@ -75,71 +73,6 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 		}
 	}
 	
-	public static class Email implements EmailConfiguration {
-
-		private final Mail configuration;
-
-		public Email(Mail configuration) {
-			this.configuration = configuration;
-		}
-
-		@Override
-		public boolean loginWithDomain() {
-			return configuration.loginWithDomain;
-		}
-
-		@Override
-		public int imapTimeoutInMilliseconds() {
-			return configuration.timeoutInMilliseconds;
-		}
-
-		@Override
-		public ExpungePolicy expungePolicy() {
-			return ExpungePolicy.ALWAYS;
-		}
-		
-		@Override
-		public int imapPort() {
-			return configuration.imapPort;
-		}
-
-		@Override
-		public String imapMailboxTrash() {
-			return EmailConfiguration.IMAP_TRASH_NAME;
-		}
-
-		@Override
-		public String imapMailboxSent() {
-			return EmailConfiguration.IMAP_SENT_NAME;
-		}
-
-		@Override
-		public String imapMailboxDraft() {
-			return EmailConfiguration.IMAP_DRAFTS_NAME;
-		}
-
-		@Override
-		public int getMessageMaxSize() {
-			return configuration.maxMessageSize;
-		}
-
-		@Override
-		public int getImapFetchBlockSize() {
-			return configuration.fetchBlockSize;
-		}
-
-		@Override
-		public boolean activateTls() {
-			return configuration.activateTls;
-		}
-
-		@Override
-		public MailboxNameCheckPolicy mailboxNameCheckPolicy() {
-			return MailboxNameCheckPolicy.ALWAYS;
-		}
-
-	}
-
 	private final Configuration configuration;
 
 	public StaticConfigurationService(Configuration configuration) {

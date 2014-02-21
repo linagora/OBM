@@ -33,12 +33,12 @@ package org.obm.opush.windowing;
 
 import java.util.concurrent.TimeUnit;
 
-import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.annotations.transactional.LazyTransactionProvider;
 import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.opush.env.OpushConfigurationFixture;
 import org.obm.opush.env.OpushStaticConfiguration;
 import org.obm.opush.env.OpushStaticConfiguration.EhCache;
 import org.obm.push.configuration.OpushConfiguration;
@@ -69,7 +69,7 @@ public class WindowingModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
-		Configuration configuration = configuration();
+		OpushConfigurationFixture configuration = configuration();
 		configuration.transaction.timeoutInSeconds = 3600;
 		bind(OpushConfiguration.class).toInstance(new OpushStaticConfiguration(configuration));
 		bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(configuration.transaction));
@@ -82,8 +82,8 @@ public class WindowingModule extends AbstractModule {
 		bind(CacheEvictionListener.class).to(CacheEvictionListenerImpl.class);
 	}		
 
-	protected Configuration configuration() {
-		Configuration configuration = new Configuration();
+	protected OpushConfigurationFixture configuration() {
+		OpushConfigurationFixture configuration = new OpushConfigurationFixture();
 		configuration.transaction.timeoutInSeconds = Ints.checkedCast(TimeUnit.MINUTES.toSeconds(10));
 		configuration.dataDir = Files.createTempDir();
 		return configuration;

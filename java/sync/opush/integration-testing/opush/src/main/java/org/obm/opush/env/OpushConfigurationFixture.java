@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,35 +31,43 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.opush.env;
 
-import org.easymock.IMocksControl;
-import org.obm.ConfigurationModule.PolicyConfigurationProvider;
-import org.obm.configuration.SyncPermsConfigurationService;
-import org.obm.guice.AbstractOverrideModule;
-import org.obm.opush.env.OpushStaticConfiguration.EhCache;
-import org.obm.opush.env.OpushStaticConfiguration.RemoteConsole;
-import org.obm.opush.env.OpushStaticConfiguration.SyncPerms;
-import org.obm.push.configuration.OpushConfiguration;
-import org.obm.push.configuration.RemoteConsoleConfiguration;
-import org.obm.push.store.ehcache.EhCacheConfiguration;
+import org.obm.Configuration;
 
-import com.google.inject.name.Names;
-
-public final class OpushConfigurationModule extends AbstractOverrideModule {
-
-	private final OpushConfigurationFixture configuration;
-
-	public OpushConfigurationModule(OpushConfigurationFixture configuration, IMocksControl mocksControl) {
-		super(mocksControl);
-		this.configuration = configuration;
+public class OpushConfigurationFixture extends Configuration {
+	
+	public static class EhCache {
+		public int maxMemoryInMB = 10;
+		public int timeToLiveInSeconds = 60;
+		public Integer percentageAllowedToCache = null;
+		public int statsSampleToRecordCount = 10;
+		public int statsShortSamplingTimeInSeconds = 1;
+		public int statsMediumSamplingTimeInSeconds = 10;
+		public int statsLongSamplingTimeInSeconds = 60;
+		public int statsSamplingTimeStopInMinutes = 10;
 	}
 	
-	@Override
-	protected void configureImpl() {
-		bind(OpushConfiguration.class).toInstance(new OpushStaticConfiguration(configuration));
-		bind(SyncPermsConfigurationService.class).toInstance(new SyncPerms(configuration.syncPerms));
-		bind(RemoteConsoleConfiguration.class).toInstance(new RemoteConsole(configuration.remoteConsole));
-		bind(EhCacheConfiguration.class).toInstance(new EhCache(configuration.ehCache));
-		bind(String.class).annotatedWith(Names.named("opushPolicyConfigurationFile")).toProvider(bindWithMock(PolicyConfigurationProvider.class));
+	public static class Mail {
+		public boolean activateTls = false;
+		public boolean loginWithDomain = true;
+		public int timeoutInMilliseconds = 5000;
+		public int imapPort = 143;
+		public int maxMessageSize = 1024;
+		public int fetchBlockSize = 1 << 20;
+	}	
+	
+	public static class RemoteConsole {
+		public boolean enable = true;
+		public int port = 0; //random
 	}
+
+	public static class SyncPerms {
+		public String blacklist = "";
+		public boolean allowUnknownDevice = true;
+	}
+
+	public SyncPerms syncPerms = new SyncPerms();
+	public Mail mail = new Mail();
+	public RemoteConsole remoteConsole = new RemoteConsole();
+	public EhCache ehCache = new EhCache();
 	
 }

@@ -42,31 +42,6 @@ import com.google.common.collect.ImmutableSet;
 
 public class Configuration {
 
-	public static class EhCache {
-		public int maxMemoryInMB = 10;
-		public int timeToLiveInSeconds = 60;
-		public Integer percentageAllowedToCache = null;
-		public int statsSampleToRecordCount = 10;
-		public int statsShortSamplingTimeInSeconds = 1;
-		public int statsMediumSamplingTimeInSeconds = 10;
-		public int statsLongSamplingTimeInSeconds = 60;
-		public int statsSamplingTimeStopInMinutes = 10;
-	}
-	
-	public static class SyncPerms {
-		public String blacklist = "";
-		public boolean allowUnknownDevice = true;
-	}
-
-	public static class Mail {
-		public boolean activateTls = false;
-		public boolean loginWithDomain = true;
-		public int timeoutInMilliseconds = 5000;
-		public int imapPort = 143;
-		public int maxMessageSize = 1024;
-		public int fetchBlockSize = 1 << 20;
-	}
-	
 	public static class Locator {
 		public String url = null;
 		public int port = 8084;
@@ -83,11 +58,6 @@ public class Configuration {
 		public boolean enableJournal = false;
 	}
 
-	public static class RemoteConsole {
-		public boolean enable = true;
-		public int port = 0; //random
-	}
-	
 	public static class ObmSync {
 		public String defaultTemplateFolder;
 		public String overrideTemplateFolder;
@@ -106,11 +76,7 @@ public class Configuration {
 	}
 	
 	public ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.FRANCE);
-	public SyncPerms syncPerms = new SyncPerms();
-	public Mail mail = new Mail();
 	public Transaction transaction = new Transaction();
-	public RemoteConsole remoteConsole = new RemoteConsole();
-	public EhCache ehCache = new EhCache();
 	public Locator locator = new Locator();
 	public File dataDir;
 	public Charset defautEncoding = Charsets.UTF_8;
