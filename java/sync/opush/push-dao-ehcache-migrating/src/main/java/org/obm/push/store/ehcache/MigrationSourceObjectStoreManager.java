@@ -42,7 +42,7 @@ import net.sf.ehcache.migrating.config.Configuration;
 import net.sf.ehcache.migrating.config.DiskStoreConfiguration;
 import net.sf.ehcache.migrating.store.MemoryStoreEvictionPolicy;
 
-import org.obm.configuration.module.LoggerModule;
+import org.obm.push.configuration.LoggerModule;
 import org.obm.push.configuration.OpushConfiguration;
 import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;

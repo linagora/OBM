@@ -41,7 +41,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.annotations.transactional.Transactional;
-import org.obm.configuration.module.LoggerModule;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.ICollectionChangeListener;
 import org.obm.push.backend.IContinuation;
@@ -49,6 +48,7 @@ import org.obm.push.backend.IListenerRegistration;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.configuration.LoggerModule;
 import org.obm.push.exception.AuthenticationException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.handler.IContinuationHandler;

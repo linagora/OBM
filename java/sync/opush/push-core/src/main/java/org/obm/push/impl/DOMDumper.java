@@ -35,7 +35,7 @@ import java.io.ByteArrayOutputStream;
 
 import javax.xml.transform.TransformerException;
 
-import org.obm.configuration.module.LoggerModule;
+import org.obm.push.configuration.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.push.utils.DOMUtils.XMLVersion;
 import org.obm.push.utils.stream.UTF8Utils;

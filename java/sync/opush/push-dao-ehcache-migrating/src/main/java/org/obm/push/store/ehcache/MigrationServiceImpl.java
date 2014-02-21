@@ -41,7 +41,7 @@ import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.event.CacheEventListenerAdapter;
 
-import org.obm.configuration.module.LoggerModule;
+import org.obm.push.configuration.LoggerModule;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;

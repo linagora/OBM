@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,23 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.configuration.module;
+package org.obm.push.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
-public class LoggerModule extends AbstractModule {
+public class LoggerModule extends org.obm.configuration.module.LoggerModule {
 
-	public static final String CONFIGURATION = "CONFIGURATION";
-	public static final String OBM_SYNC = "OBM-SYNC";
+	public static final String AUTH = "AUTHENTICATION";
+	public static final String TRIMMED_REQUEST = "REQUEST.TRIMMED";
+	public static final String FULL_REQUEST = "REQUEST.FULL";
+	public static final String MAIL_DATA = "MAIL.DATA";
+	public static final String MIGRATION = "MIGRATION";
 
 	@Override
 	protected void configure() {
-		bind(Logger.class).annotatedWith(Names.named(CONFIGURATION)).toInstance(LoggerFactory.getLogger(CONFIGURATION));
-		bind(Logger.class).annotatedWith(Names.named(OBM_SYNC)).toInstance(LoggerFactory.getLogger(OBM_SYNC));
+		super.configure();
+		bind(Logger.class).annotatedWith(Names.named(AUTH)).toInstance(LoggerFactory.getLogger(AUTH));
+		bind(Logger.class).annotatedWith(Names.named(TRIMMED_REQUEST)).toInstance(LoggerFactory.getLogger(TRIMMED_REQUEST));
+		bind(Logger.class).annotatedWith(Names.named(FULL_REQUEST)).toInstance(LoggerFactory.getLogger(FULL_REQUEST));
+		bind(Logger.class).annotatedWith(Names.named(MAIL_DATA)).toInstance(LoggerFactory.getLogger(MAIL_DATA));
+		bind(Logger.class).annotatedWith(Names.named(MIGRATION)).toInstance(LoggerFactory.getLogger(MIGRATION));
 	}
+
 	
 }

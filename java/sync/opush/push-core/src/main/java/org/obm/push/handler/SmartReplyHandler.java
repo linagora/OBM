@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import org.obm.configuration.module.LoggerModule;
 import org.obm.push.backend.ErrorsManager;
 import org.obm.push.bean.UserDataRequest;
+import org.obm.push.configuration.LoggerModule;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
