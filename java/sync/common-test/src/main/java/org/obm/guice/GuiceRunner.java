@@ -42,8 +42,12 @@ public class GuiceRunner extends BlockJUnit4ClassRunner {
 	private final GuiceRunnerDelegation guiceRunnerDelegation;
 
 	public GuiceRunner(Class<?> klass) throws InitializationError {
+		this(klass, new GuiceRunnerDelegation());
+	}
+	
+	protected GuiceRunner(Class<?> klass, GuiceRunnerDelegation guiceRunnerDelegation) throws InitializationError {
 		super(klass);
-		guiceRunnerDelegation = new GuiceRunnerDelegation();
+		this.guiceRunnerDelegation = guiceRunnerDelegation;
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2013-2014 Linagora
+ * Copyright (C) 2011-2014  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -23,34 +23,82 @@
  *
  * You should have received a copy of the GNU Affero General Public License and
  * its applicable Additional Terms for OBM along with this program. If not, see
- * <http://www.gnu.org/licenses/> for the GNU Affero General Public License
+ * <http://www.gnu.org/licenses/> for the GNU Affero General   Public License
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.dao.utils;
+package org.obm;
 
-import org.obm.MethodExternalResource;
+import org.junit.rules.MethodRule;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.Statement;
 
+/**
+ * A base class for Rules (like TemporaryFolder) that set up an external
+ * resource before a test (a file, socket, server, database connection, etc.),
+ * and guarantee to tear it down afterward:
+ *
+ * <pre>
+ * public static class UsesExternalResource {
+ *  Server myServer= new Server();
+ *
+ *  &#064;Rule
+ *  public ExternalResource resource= new ExternalResource() {
+ *      &#064;Override
+ *      protected void before() throws Throwable {
+ *          myServer.connect();
+ *         };
+ *
+ *      &#064;Override
+ *      protected void after() {
+ *          myServer.disconnect();
+ *         };
+ *     };
+ *
+ *  &#064;Test
+ *  public void testFoo() {
+ *      new Client().run(myServer);
+ *     }
+ * }
+ * </pre>
+ *
+ * @since 4.7
+ */
+public abstract class MethodExternalResource implements MethodRule {
 
-public class H2InMemoryDatabaseRule extends MethodExternalResource {
-
-	private final String schema;
-	private final H2TestClass h2testClass;
-
-	public H2InMemoryDatabaseRule(H2TestClass h2testClass, String schema) {
-		this.h2testClass = h2testClass;
-		this.schema = schema;
-	}
-	
 	@Override
+	public Statement apply(Statement base, FrameworkMethod method, Object target) {
+		return statement(base);
+	}
+
+	private Statement statement(final Statement base) {
+		return new Statement() {
+			@Override
+			public void evaluate() throws Throwable {
+				before();
+				try {
+					base.evaluate();
+				} finally {
+					after();
+				}
+			}
+		};
+	}
+
+	/**
+	 * Override to set up your specific external resource.
+	 *
+	 * @throws if setup fails (which will disable {@code after}
+	 */
+	@SuppressWarnings("unused")
 	protected void before() throws Throwable {
-		h2testClass.getDb().resetDatabase();
-		if (schema != null)
-			h2testClass.getDb().importSchema(schema);
+		// do nothing
 	}
 
-	@Override
+	/**
+	 * Override to tear down your specific external resource.
+	 */
 	protected void after() {
-		h2testClass.getDb().closeConnections();
+		// do nothing
 	}
 }

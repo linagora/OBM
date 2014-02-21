@@ -56,17 +56,23 @@ public class GuiceRunnerDelegation {
 			public Statement apply(Statement base, FrameworkMethod method, Object target) {
 				GuiceModule moduleAnnotation = testClass.getJavaClass().getAnnotation(GuiceModule.class);
 				if (moduleAnnotation != null) {
-					return new GuiceStatement(moduleAnnotation.value(), target, base);
+					return buildGuiceStatement(base, target, moduleAnnotation);
 				}
 				return base;
 			}
+
 		};
 	}
 
+	protected GuiceStatement buildGuiceStatement(Statement base, Object target, GuiceModule moduleAnnotation) {
+		return new GuiceStatement(moduleAnnotation.value(), target, base);
+	}
+
 	public static class GuiceStatement extends Statement { 
-		private final Class<? extends Module> module;
-		private final Object target;
-		private final Statement next;
+		
+		protected final Class<? extends Module> module;
+		protected final Object target;
+		protected final Statement next;
 
 		public GuiceStatement(Class<? extends Module> module, Object target, Statement next) {
 			this.module = module;
@@ -76,8 +82,12 @@ public class GuiceRunnerDelegation {
 
 		@Override
 		public void evaluate() throws Throwable {
-			Guice.createInjector(module.newInstance()).injectMembers(target);
+			Guice.createInjector(instantiateModule()).injectMembers(target);
 			next.evaluate();
+		}
+
+		protected Module instantiateModule() throws InstantiationException, IllegalAccessException {
+			return module.newInstance();
 		}
 	}
 }
