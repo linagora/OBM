@@ -1674,6 +1674,7 @@ h1.hoursTitle{
   background-image: url('../images/hatch.gif');
   width:auto;
   background-color: #DDD;
+  color:#333;
   font-size: 11px;
   font-style: normal;
   text-align: center !important;
