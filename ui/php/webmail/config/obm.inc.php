@@ -112,3 +112,34 @@ if ( file_exists($external_config_file) && is_readable($external_config_file) ) 
   require_once($external_config_file);
 }
 
+// Default LDAP addressbook configuration
+
+$rcmail_config['address_book_type'] = array('sql', 'ldap');
+$rcmail_config['autocomplete_addressbooks'] = array('sql', 'obm');
+
+$rcmail_config['ldap_public'] ['obm'] = array(
+  'name'          => 'OBM',
+  'hosts'         => array('127.0.0.1'),
+  'port'          => 389,
+  'use_tls'       => false,
+  'user_specific' => false,
+  'base_dn'       => 'dc=local',
+  'bind_dn'       => '',
+  'bind_pass'     => '',
+  'search_base_dn' => '',
+  'search_filter'  => '(&(objectClass=posixAccount)(uid=%u))',
+  'writable'      => false,
+  'ldap_version'  => 3,
+  'search_fields' => array('mail', 'cn'),
+  'name_field'    => 'cn',
+  'hidden'        => false,
+  'email_field'   => 'mail',
+  'surname_field' => 'sn',
+  'firstname_field' => 'gn',
+  'sort'          => 'cn',
+  'scope'         => 'sub',
+  'filter'        => '(&(mail=*)(|(objectClass=obmUser)(objectClass=obmGroup)(objectClass=obmMailShare)))',
+  'fuzzy_search'  => true,
+  'sizelimit'     => '0',
+  'timelimit'     => '0'
+);
