@@ -41,25 +41,27 @@ import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import org.obm.locator.LocatorClientException;
 import org.obm.sync.Messages;
+import org.obm.sync.ObmSmtpConf;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.server.template.ITemplateLoader;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 import fr.aliacom.obm.common.MailService;
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 public abstract class AbstractMailer {
 
-	
-	protected final Session session;
-	protected MailService mailService;
-	protected ITemplateLoader templateLoader;
-		
-	private ObmSyncConfigurationService constantService;
+	private final ObmSmtpConf conf;
+	private final ObmSyncConfigurationService constantService;
+	protected final MailService mailService;
+	protected final ITemplateLoader templateLoader;
 	
 	public static class NotificationException extends RuntimeException {
 		private static final long serialVersionUID = -7984056189522385977L;
@@ -69,11 +71,20 @@ public abstract class AbstractMailer {
 		}
 	}
 	
-	protected AbstractMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader) {
+	protected AbstractMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader,
+				ObmSmtpConf conf) {
 		this.mailService = mailService;
 		this.constantService = constantService;
 		this.templateLoader = templateLoader;
-		session = Session.getDefaultInstance(new Properties());
+		this.conf = conf;
+	}
+	
+	@VisibleForTesting Session buildSession(ObmDomain domain) throws LocatorClientException {
+		Properties properties = new Properties();
+		properties.put("mail.smtp.host", conf.getServerAddr(domain.getName()));	
+		properties.put("mail.smtp.port", conf.getServerPort(domain.getName()));
+		Session session = Session.getInstance(properties);
+		return session;
 	}
 	
 	protected Address getSystemAddress(AccessToken at) throws AddressException {

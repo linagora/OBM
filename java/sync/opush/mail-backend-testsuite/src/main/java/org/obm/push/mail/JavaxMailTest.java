@@ -119,7 +119,7 @@ public class JavaxMailTest {
 
 	private Store getConnectedUserImapStore(String host, int port)
 			throws NoSuchProviderException, MessagingException {
-		Session session = Session.getDefaultInstance(new Properties());
+		Session session = Session.getInstance(new Properties());
 		Store imapStore = session.getStore("imap");
 		imapStore.connect(host, port, mailbox, password);
 		return imapStore;

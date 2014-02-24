@@ -116,7 +116,7 @@ public class MailSendTest {
 	}
 	
 	private String writeEventMail(EventMail eventMail) throws IOException, MessagingException {
-		MimeMessage mail = eventMail.buildMimeMail(Session.getDefaultInstance(new Properties()));
+		MimeMessage mail = eventMail.buildMimeMail(Session.getInstance(new Properties()));
 		ByteArrayOutputStream mailByteStream = new ByteArrayOutputStream();
 		
 		mail.writeTo(mailByteStream);

@@ -43,10 +43,12 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.mail.MessagingException;
+import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.obm.configuration.module.LoggerModule;
+import org.obm.sync.ObmSmtpConf;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -87,8 +89,8 @@ public class EventChangeMailer extends AbstractMailer {
 	
 	@Inject
 	/* package */ EventChangeMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader,
-			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
-		super(mailService, constantService, templateLoader);
+			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger, ObmSmtpConf smtpConf) {
+		super(mailService, constantService, templateLoader, smtpConf);
 		this.baseUrl = constantService.getObmUIBaseUrl();
 		this.calendarEncoding = constantService.getEmailCalendarEncoding();
 		configurationLogger.info("OBM web interface URL : {}", baseUrl);
@@ -329,14 +331,16 @@ public class EventChangeMailer extends AbstractMailer {
 		}
 	}
 
-	private void sendNotificationMessage(EventMail mail, List<InternetAddress>  addresses, AccessToken token) throws MessagingException, IOException{
+	private void sendNotificationMessage(EventMail mail, List<InternetAddress>  addresses, AccessToken token) throws MessagingException, IOException {
+		Session session = buildSession(token.getDomain());
 		MimeMessage mimeMail = mail.buildMimeMail(session);
-		mailService.sendMessage(addresses, mimeMail, token);
+		mailService.sendMessage(addresses, mimeMail, session);
 	}
 	
 	private void sendNotificationMessage(EventMail mail, InternetAddress address, AccessToken token) throws MessagingException, IOException{
+		Session session = buildSession(token.getDomain());
 		MimeMessage mimeMail = mail.buildMimeMail(session);
-		mailService.sendMessage(address, mimeMail, token);
+		mailService.sendMessage(address, mimeMail, session);
 	}
 	
 	private String participation(Participation participation, Locale locale){
@@ -732,9 +736,5 @@ public class EventChangeMailer extends AbstractMailer {
 		} else {
 			return getMessages(locale).updatedEventTitle(owner, title);
 		}
-	}
-
-	/* package */ void setMailService(MailService mailService) {
-		this.mailService = mailService;
 	}
 }

@@ -207,7 +207,7 @@ public class IntegrationTestUtils {
 
 	public static void appendToINBOX(GreenMailUser greenMailUser, String emailPath) throws Exception {
 		Properties props = new Properties();
-		Session session = Session.getDefaultInstance(props, null);
+		Session session = Session.getInstance(props);
 		javax.mail.internet.MimeMessage mimeMessage = new javax.mail.internet.MimeMessage(session, streamEmail(emailPath));
 		greenMailUser.deliver(mimeMessage);
 	}

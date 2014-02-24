@@ -42,10 +42,12 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.MessagingException;
+import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.obm.sync.ObmSmtpConf;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.server.handler.ErrorMail;
 import org.obm.sync.server.template.ITemplateLoader;
@@ -71,8 +73,9 @@ public class ErrorMailer extends AbstractMailer {
 	private ConcurrentMap<String, Date> lastNotificationDateByUser;
 	
 	@Inject
-	protected ErrorMailer(MailService mailService, ObmSyncConfigurationService constantService, ITemplateLoader templateLoader) {
-		super(mailService, constantService, templateLoader);
+	protected ErrorMailer(MailService mailService, ObmSyncConfigurationService constantService, 
+			ITemplateLoader templateLoader, ObmSmtpConf smtpConf) {
+		super(mailService, constantService, templateLoader, smtpConf);
 		Cache<String, Date> cache = CacheBuilder.newBuilder().expireAfterWrite(INTERVAL_BETWEEN_NOTIFICATION, TimeUnit.HOURS)
 				.build(new CacheLoader<String, Date>() {
 					@Override
@@ -134,8 +137,9 @@ public class ErrorMailer extends AbstractMailer {
 	}
 	
 	private void sendNotificationMessage(ErrorMail mail, List<InternetAddress>  addresses, AccessToken token) throws MessagingException {
+		Session session = buildSession(token.getDomain());
 		MimeMessage mimeMail = mail.buildMimeMail(session);
-		mailService.sendMessage(addresses, mimeMail, token);
+		mailService.sendMessage(addresses, mimeMail, session);
 	}
 	
 	private String applyOBMConnectorVersionOnTemplate(String templateName, String version, Locale locale, TimeZone timezone)
