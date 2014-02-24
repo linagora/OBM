@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.mailer;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.createControl;
@@ -38,7 +39,6 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,6 +49,7 @@ import java.util.ResourceBundle;
 import java.util.TimeZone;
 
 import javax.mail.MessagingException;
+import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -56,6 +57,7 @@ import org.easymock.Capture;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.sync.ObmSmtpConf;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
@@ -75,11 +77,15 @@ public class ErrorMailerTest {
 	private AccessToken at;
 	private ITemplateLoader templateLoader;
 	private IMocksControl control;
+	private ObmSmtpConf smtpConf;
 
 	@Before
 	public void setup() {
 		control = createControl();
 		at = getMockAccessToken();
+		smtpConf = control.createMock(ObmSmtpConf.class);
+		expect(smtpConf.getServerAddr(anyObject(String.class))).andReturn("1.2.3.4").anyTimes();
+		expect(smtpConf.getServerPort(anyObject(String.class))).andReturn(234).anyTimes();
 		templateLoader = new ITemplateLoader() {
 			@Override
 			public Template getTemplate(String templateName, Locale locale, TimeZone timezone)
@@ -120,9 +126,9 @@ public class ErrorMailerTest {
 		mailService.sendMessage(
 				eq(expectedRecipients),
 				capture(capturedMessage),
-				anyObject(AccessToken.class));
+				anyObject(Session.class));
 		expectLastCall();
-		ErrorMailer errorMailer = new ErrorMailer(mailService, constantService, templateLoader);
+		ErrorMailer errorMailer = new ErrorMailer(mailService, constantService, templateLoader, smtpConf);
 
 		control.replay();
 		errorMailer.notifyConnectorVersionError(at, "1.1.1", Locale.FRENCH, TIMEZONE);
@@ -157,12 +163,12 @@ public class ErrorMailerTest {
 		mailService.sendMessage(
 				eq(expectedRecipients), 
 				anyObject(MimeMessage.class),
-				anyObject(AccessToken.class));
+				anyObject(Session.class));
 		expectLastCall().once();
 		
 		control.replay();
 
-		ErrorMailer errorMailer = new ErrorMailer(mailService, constantService, templateLoader);
+		ErrorMailer errorMailer = new ErrorMailer(mailService, constantService, templateLoader, smtpConf);
 
 		errorMailer.notifyConnectorVersionError(at, "1.1.1", Locale.FRENCH, TIMEZONE);
 		errorMailer.notifyConnectorVersionError(at, "1.1.1", Locale.FRENCH, TIMEZONE);

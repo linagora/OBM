@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.mailer;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.createControl;
@@ -39,7 +40,6 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
 import java.io.ByteArrayOutputStream;
@@ -55,6 +55,7 @@ import java.util.TimeZone;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -66,9 +67,8 @@ import org.easymock.IMocksControl;
 import org.jsoup.Jsoup;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.filter.SlowFilterRunner;
 import org.obm.icalendar.Ical4jHelper;
+import org.obm.sync.ObmSmtpConf;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Comment;
@@ -101,7 +101,6 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
-@RunWith(SlowFilterRunner.class)
 public abstract class EventChangeMailerTest {
 
 	protected static final TimeZone TIMEZONE = TimeZone.getTimeZone("Europe/Paris");
@@ -109,24 +108,24 @@ public abstract class EventChangeMailerTest {
 	private EventChangeMailer eventChangeMailer;
 	protected abstract EventChangeMailer newEventChangeMailer();
 	protected abstract Locale getLocale();
-	protected abstract ArrayList<String> getInvitationPlainMessage();
-	protected abstract ArrayList<String> getInvitationHtmlMessage();
-	protected abstract ArrayList<String> getUpdatePlainMessage();
-	protected abstract ArrayList<String> getUpdateHtmlMessage();
-	protected abstract ArrayList<String> getCancelPlainMessage();
-	protected abstract ArrayList<String> getCancelHtmlMessage();
-	protected abstract ArrayList<String> getRecurrentInvitationPlainMessage();
-	protected abstract ArrayList<String> getRecurrentInvitationHtmlMessage();
-	protected abstract ArrayList<String> getRecurrentUpdatePlainMessage();
-	protected abstract ArrayList<String> getRecurrentUpdateHtmlMessage();
-	protected abstract ArrayList<String> getNonRecurrentToRecurrentUpdatePlainMessage();
-	protected abstract ArrayList<String> getNonRecurrentToRecurrentUpdateHtmlMessage();
-	protected abstract ArrayList<String> getRecurrentToNonRecurrentUpdatePlainMessage();
-	protected abstract ArrayList<String> getRecurrentToNonRecurrentUpdateHtmlMessage();
-	protected abstract ArrayList<String> getRecurrentCancelPlainMessage();
-	protected abstract ArrayList<String> getRecurrentCancelHtmlMessage();
-	protected abstract ArrayList<String> getChangeParticipationPlainMessage();
-	protected abstract ArrayList<String> getChangeParticipationHtmlMessage();
+	protected abstract List<String> getInvitationPlainMessage();
+	protected abstract List<String> getInvitationHtmlMessage();
+	protected abstract List<String> getUpdatePlainMessage();
+	protected abstract List<String> getUpdateHtmlMessage();
+	protected abstract List<String> getCancelPlainMessage();
+	protected abstract List<String> getCancelHtmlMessage();
+	protected abstract List<String> getRecurrentInvitationPlainMessage();
+	protected abstract List<String> getRecurrentInvitationHtmlMessage();
+	protected abstract List<String> getRecurrentUpdatePlainMessage();
+	protected abstract List<String> getRecurrentUpdateHtmlMessage();
+	protected abstract List<String> getNonRecurrentToRecurrentUpdatePlainMessage();
+	protected abstract List<String> getNonRecurrentToRecurrentUpdateHtmlMessage();
+	protected abstract List<String> getRecurrentToNonRecurrentUpdatePlainMessage();
+	protected abstract List<String> getRecurrentToNonRecurrentUpdateHtmlMessage();
+	protected abstract List<String> getRecurrentCancelPlainMessage();
+	protected abstract List<String> getRecurrentCancelHtmlMessage();
+	protected abstract List<String> getChangeParticipationPlainMessage();
+	protected abstract List<String> getChangeParticipationHtmlMessage();
 	protected abstract String getNewEventSubject();
 	protected abstract String getNewRecurrentEventSubject();
 	protected abstract String getCancelEventSubject();
@@ -139,6 +138,7 @@ public abstract class EventChangeMailerTest {
 	protected IMocksControl control;
 	protected MailService mailService;
 	protected DateProvider dateProvider;
+	private ObmSmtpConf smtpConf;
 	private AccessToken accessToken;
 	private ObmUser obmUser;
 	private Ical4jHelper ical4jHelper;
@@ -149,6 +149,7 @@ public abstract class EventChangeMailerTest {
 	private Event event;
 	private Event recurrentEvent;
 	private ArrayList<String> icsToCheck;
+
 
 	private final static String RECIPIENTS =
 			"Ronan LANORE <rlanore@linagora.com>, " +
@@ -180,7 +181,7 @@ public abstract class EventChangeMailerTest {
 		
 		replay(constantService);
 
-		return new EventChangeMailer(mailService, constantService, templateLoader, logger);
+		return new EventChangeMailer(mailService, constantService, templateLoader, logger, smtpConf);
 	}
 	
 	private ArrayList<String> getRawMessageWithSubject(String subject) {
@@ -228,7 +229,11 @@ public abstract class EventChangeMailerTest {
 		attendeeService = new SimpleAttendeeService();
 		ical4jHelper = new Ical4jHelper(dateProvider, null, attendeeService);
 		accessToken = new AccessToken(1, "unitTest");
+		accessToken.setDomain(ServicesToolBox.getDefaultObmDomain());
 		obmUser = ServicesToolBox.getDefaultObmUser();
+		smtpConf = control.createMock(ObmSmtpConf.class);
+		expect(smtpConf.getServerAddr(anyObject(String.class))).andReturn("1.2.3.4").anyTimes();
+		expect(smtpConf.getServerPort(anyObject(String.class))).andReturn(234).anyTimes();
 
 		eventChangeMailer = newEventChangeMailer();
 		event = buildTestEvent();
@@ -292,7 +297,7 @@ public abstract class EventChangeMailerTest {
 		mailService.sendMessage(
 				EventNotificationServiceTestTools.compareCollections(addressList), 
 				capture(capturedMessage),
-				anyObject(AccessToken.class));
+				anyObject(Session.class));
 		expectLastCall().atLeastOnce();
 		
 		return capturedMessage;
@@ -845,7 +850,7 @@ public abstract class EventChangeMailerTest {
 
 		control.replay();
 		
-		EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null, logger);
+		EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null, logger, smtpConf);
 
 		eventChangeMailer.buildUpdateParticipationDatamodel(event, obmUser, status, getLocale());
 		
