@@ -31,47 +31,26 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import java.util.Properties;
-
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 
-import org.obm.locator.LocatorClientException;
-import org.obm.sync.auth.AccessToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import fr.aliacom.obm.common.domain.ObmDomain;
 
 @Singleton
 public class JavamailObmSmtpService implements ObmSmtpService {
 
-	private static final Logger logger = LoggerFactory.getLogger(JavamailObmSmtpService.class);
-	
-	private final ObmSmtpConf conf;
-	
 	@Inject
-	private JavamailObmSmtpService(ObmSmtpConf obmSmtpConf) {
-		conf = obmSmtpConf;
+	private JavamailObmSmtpService() {
 	}
-	
-	@Override
-	public void sendEmail(MimeMessage message, AccessToken token) throws MessagingException {
-		try {
-			sendEmail(message, buildSession(token.getDomain()));
-		} catch (LocatorClientException e) {
-			logger.error("Couldn't send the message", e);
-		}
-    }
 
 	@Override
 	public void sendEmail(MimeMessage message, Session session) throws MessagingException {
-		Transport transport = session.getTransport("smtp"); 
+
+		Transport transport = session.getTransport("smtp");
+
 		try {
 			transport.connect();
 			transport.sendMessage(message, message.getAllRecipients());
@@ -80,11 +59,4 @@ public class JavamailObmSmtpService implements ObmSmtpService {
 		}
 	}
 	
-	private Session buildSession(ObmDomain domain) throws LocatorClientException {
-		Properties properties = new Properties();
-		properties.put("mail.smtp.host", conf.getServerAddr(domain.getName()));	
-		properties.put("mail.smtp.port", conf.getServerPort(domain.getName()));
-		Session session = Session.getDefaultInstance(properties);
-		return session;
-	}
 }

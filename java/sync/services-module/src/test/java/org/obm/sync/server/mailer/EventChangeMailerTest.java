@@ -47,6 +47,7 @@ import java.util.TimeZone;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -59,6 +60,7 @@ import org.jsoup.Jsoup;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.icalendar.Ical4jHelper;
+import org.obm.sync.ObmSmtpConf;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Comment;
@@ -133,6 +135,7 @@ public abstract class EventChangeMailerTest {
 	private ObmUser obmUser;
 	private Ical4jHelper ical4jHelper;
 	private AttendeeService attendeeService;
+	private ObmSmtpConf smtpConf;
 	
 	protected Logger logger;
 
@@ -169,7 +172,7 @@ public abstract class EventChangeMailerTest {
 		
 		replay(constantService);
 
-		return new EventChangeMailer(mailService, constantService, templateLoader, logger);
+		return new EventChangeMailer(mailService, constantService, templateLoader, logger, smtpConf);
 	}
 	
 	private List<String> getRawMessageWithSubject(String subject) {
@@ -217,7 +220,11 @@ public abstract class EventChangeMailerTest {
 		attendeeService = new SimpleAttendeeService();
 		ical4jHelper = new Ical4jHelper(dateProvider, null, attendeeService);
 		accessToken = new AccessToken(1, "unitTest");
+		accessToken.setDomain(ServicesToolBox.getDefaultObmDomain());
 		obmUser = ServicesToolBox.getDefaultObmUser();
+		smtpConf = control.createMock(ObmSmtpConf.class);
+		expect(smtpConf.getServerAddr(anyObject(String.class))).andReturn("1.2.3.4").anyTimes();
+		expect(smtpConf.getServerPort(anyObject(String.class))).andReturn(234).anyTimes();
 
 		eventChangeMailer = newEventChangeMailer();
 		event = buildTestEvent();
@@ -281,7 +288,7 @@ public abstract class EventChangeMailerTest {
 		mailService.sendMessage(
 				EventNotificationServiceTestTools.compareCollections(addressList), 
 				capture(capturedMessage),
-				anyObject(AccessToken.class));
+				anyObject(Session.class));
 		expectLastCall().atLeastOnce();
 		
 		return capturedMessage;
@@ -834,7 +841,7 @@ public abstract class EventChangeMailerTest {
 
 		control.replay();
 		
-		EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null, logger);
+		EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null, logger, smtpConf);
 
 		eventChangeMailer.buildUpdateParticipationDatamodel(event, obmUser, status, getLocale());
 		
