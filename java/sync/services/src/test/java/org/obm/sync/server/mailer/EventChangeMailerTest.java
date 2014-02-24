@@ -33,12 +33,12 @@ package org.obm.sync.server.mailer;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.capture;
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
 
@@ -62,6 +62,7 @@ import javax.mail.util.SharedByteArrayInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
+import org.easymock.IMocksControl;
 import org.jsoup.Jsoup;
 import org.junit.Before;
 import org.junit.Test;
@@ -135,6 +136,7 @@ public abstract class EventChangeMailerTest {
 	protected abstract String getChangeParticipationSubject();
 	protected abstract String getNotice();
 
+	protected IMocksControl control;
 	protected MailService mailService;
 	protected DateProvider dateProvider;
 	private AccessToken accessToken;
@@ -153,6 +155,7 @@ public abstract class EventChangeMailerTest {
 			"Guillaume ALAUX <galaux@linagora.com>, " +
 			"Matthieu BAECHLER <mbaechler@linagora.com>, " +
 			"Blandine DESCAMPS <blandine.descamps@linagora.com>";
+
 
 	protected EventChangeMailer getLocaleEventChangeMailer(Locale locale) {
 		ITemplateLoader templateLoader = new ITemplateLoader() {
@@ -174,7 +177,8 @@ public abstract class EventChangeMailerTest {
 		expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
 		expect(constantService.getResourceBundle(locale)).andReturn(ResourceBundle.getBundle("Messages", locale)).atLeastOnce();
 		expect(constantService.getEmailCalendarEncoding()).andReturn(null).atLeastOnce();
-		replay(constantService, dateProvider);
+		
+		replay(constantService);
 
 		return new EventChangeMailer(mailService, constantService, templateLoader, logger);
 	}
@@ -217,8 +221,9 @@ public abstract class EventChangeMailerTest {
 
 	@Before
 	public void setup() {
-		dateProvider = createMock(DateProvider.class);
-		mailService = createMock(MailService.class);
+		control = createControl();
+		dateProvider = control.createMock(DateProvider.class);
+		mailService = control.createMock(MailService.class);
 		logger = createNiceMock(Logger.class);
 		attendeeService = new SimpleAttendeeService();
 		ical4jHelper = new Ical4jHelper(dateProvider, null, attendeeService);
@@ -290,7 +295,6 @@ public abstract class EventChangeMailerTest {
 				anyObject(AccessToken.class));
 		expectLastCall().atLeastOnce();
 		
-		replay(mailService);
 		return capturedMessage;
 	}
 	
@@ -414,13 +418,15 @@ public abstract class EventChangeMailerTest {
 	@Test
 	public void testAcceptedCreation() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
-
+		
+		control.replay();
+		
 		eventChangeMailer.notifyAcceptedNewUsers(
 				obmUser, event.getAttendees(),
 				event, getLocale(),
 				TIMEZONE, accessToken);
 
-		verify(mailService);
+		control.verify();
 
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkNotificationStructure(mimeMessage);
@@ -439,12 +445,14 @@ public abstract class EventChangeMailerTest {
 	public void testAcceptedCreationRecurrentEvent() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		eventChangeMailer.notifyAcceptedNewUsers(
 				obmUser, recurrentEvent.getAttendees(),
 				recurrentEvent, getLocale(),
 				TIMEZONE, accessToken);
 
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkNotificationStructure(mimeMessage);
@@ -463,6 +471,8 @@ public abstract class EventChangeMailerTest {
 	public void testAcceptedParticipationChangeEvent() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients("Raphael ROUGERON <rrougeron@linagora.com>");
 
+		control.replay();
+		
 		List<Attendee> attendees = event.getAttendees();
 		Attendee updatedAttendee = attendees.get(2);
 		updatedAttendee.setParticipation(Participation.accepted());
@@ -481,7 +491,7 @@ public abstract class EventChangeMailerTest {
 				updatedAttendeeStatus, getLocale(),
 				TIMEZONE, ics, accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -509,6 +519,8 @@ public abstract class EventChangeMailerTest {
 	public void testCancelation() throws AddressException, MessagingException, UnsupportedEncodingException, IOException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), event, accessToken);
 		eventChangeMailer.notifyRemovedUsers(
 				ServicesToolBox.getDefaultObmUser(), event.getAttendees(),
@@ -516,7 +528,7 @@ public abstract class EventChangeMailerTest {
 				TIMEZONE, ics,
 				accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -538,6 +550,8 @@ public abstract class EventChangeMailerTest {
 	public void testCancelationRecurrentEvent() throws AddressException, MessagingException, UnsupportedEncodingException, IOException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), recurrentEvent, accessToken);
 		eventChangeMailer.notifyRemovedUsers(
 				ServicesToolBox.getDefaultObmUser(), recurrentEvent.getAttendees(),
@@ -545,7 +559,7 @@ public abstract class EventChangeMailerTest {
 				TIMEZONE, ics,
 				accessToken);
 
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -567,6 +581,8 @@ public abstract class EventChangeMailerTest {
 	public void testNeedActionCreation() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), event, accessToken);
 		eventChangeMailer.notifyNeedActionNewUsers(
 				ServicesToolBox.getDefaultObmUser(),event.getAttendees(),
@@ -574,7 +590,7 @@ public abstract class EventChangeMailerTest {
 				TIMEZONE, ics,
 				accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -596,6 +612,8 @@ public abstract class EventChangeMailerTest {
 	public void testNeedActionCreationRecurrentEvent() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), recurrentEvent, accessToken);
 		eventChangeMailer.notifyNeedActionNewUsers(
 				ServicesToolBox.getDefaultObmUser(), recurrentEvent.getAttendees(),
@@ -603,7 +621,7 @@ public abstract class EventChangeMailerTest {
 				TIMEZONE, ics,
 				accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -625,6 +643,8 @@ public abstract class EventChangeMailerTest {
 	public void testNeedActionUpdate() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+
 		Event before = buildTestEvent();
 		Event after = before.clone();
 		after.setStartDate(date("2010-11-08T12:00:00"));
@@ -641,7 +661,7 @@ public abstract class EventChangeMailerTest {
 				getLocale(), TIMEZONE,
 				ics, accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -667,6 +687,8 @@ public abstract class EventChangeMailerTest {
 	public void testNeedActionUpdateRecurrentEvent() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		Event before = buildTestRecurrentEvent();
 		Event after = before.clone();
 		before.getRecurrence().setEnd(null);
@@ -684,7 +706,7 @@ public abstract class EventChangeMailerTest {
 				getLocale(), TIMEZONE,
 				ics, accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -711,6 +733,8 @@ public abstract class EventChangeMailerTest {
 	public void testNotifyAcceptedUpdateUsers() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		Event before = buildTestEvent();
 		Event after = before.clone();
 		after.setStartDate(date("2010-11-08T12:00:00"));
@@ -725,7 +749,7 @@ public abstract class EventChangeMailerTest {
 				getLocale(), TIMEZONE,
 				"", accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -744,6 +768,8 @@ public abstract class EventChangeMailerTest {
 	public void testNotifyAcceptedUpdateUsersWithRecurrentEvent() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		Event before = buildTestRecurrentEvent();
 		Event after = before.clone();
 		before.getRecurrence().setEnd(null);
@@ -759,7 +785,7 @@ public abstract class EventChangeMailerTest {
 				getLocale(), TIMEZONE,
 				"", accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -778,6 +804,8 @@ public abstract class EventChangeMailerTest {
 	public void testNotifyAcceptedUpdateUsersCanWriteOnCalendar() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		Event before = buildTestEvent();
 		Event after = before.clone();
 		after.setStartDate(date("2010-11-08T12:00:00"));
@@ -792,7 +820,7 @@ public abstract class EventChangeMailerTest {
 				getLocale(), TIMEZONE,
 				accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkNotificationStructure(mimeMessage);
@@ -810,22 +838,26 @@ public abstract class EventChangeMailerTest {
 		Participation status = Participation.accepted();
 		status.setComment(new Comment(null));
 
-		ObmSyncConfigurationService constantService = createMock(ObmSyncConfigurationService.class);
+		ObmSyncConfigurationService constantService = control.createMock(ObmSyncConfigurationService.class);
 		expect(constantService.getObmUIBaseUrl()).andReturn("baseUrl").once();
 		expect(constantService.getResourceBundle(getLocale())).andReturn(ResourceBundle.getBundle("Messages", getLocale())).atLeastOnce();
 		expect(constantService.getEmailCalendarEncoding()).andReturn(null).atLeastOnce();
 
-		replay(constantService);
-
+		control.replay();
+		
 		EventChangeMailer eventChangeMailer = new EventChangeMailer(null, constantService, null, logger);
 
 		eventChangeMailer.buildUpdateParticipationDatamodel(event, obmUser, status, getLocale());
+		
+		control.verify();
 	}
 	
 	@Test
 	public void testNonRecurrentToRecurrentNotification() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		Event after = buildTestRecurrentEvent();
 		after.setSequence(4);
 		Event before = after.clone();
@@ -838,7 +870,7 @@ public abstract class EventChangeMailerTest {
 				getLocale(), TIMEZONE,
 				ics, accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -858,6 +890,8 @@ public abstract class EventChangeMailerTest {
 	public void testNonRecurrentToRecurrentNotifyNeedActionUpdateUsers() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		Event after = buildTestRecurrentEvent();
 		Event before = after.clone();
 		before.setRecurrence(new EventRecurrence());
@@ -869,7 +903,7 @@ public abstract class EventChangeMailerTest {
 				getLocale(), TIMEZONE,
 				ics, accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -886,6 +920,8 @@ public abstract class EventChangeMailerTest {
 	public void testRecurrentToNonRecurrentNotification() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		Event before = buildTestRecurrentEvent();
 		Event after = before.clone();
 		after.setRecurrence(new EventRecurrence());
@@ -897,7 +933,7 @@ public abstract class EventChangeMailerTest {
 				getLocale(), TIMEZONE,
 				ics, accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
@@ -914,6 +950,8 @@ public abstract class EventChangeMailerTest {
 	public void testRecurrentToNonRecurrentNotifyNeedActionUpdateUsers() throws UnsupportedEncodingException, IOException, MessagingException {
 		Capture<MimeMessage> capturedMessage = expectMailServiceSendMessageWithRecipients(RECIPIENTS);
 
+		control.replay();
+		
 		Event before = buildTestRecurrentEvent();
 		Event after = before.clone();
 		after.setRecurrence(new EventRecurrence());
@@ -925,7 +963,7 @@ public abstract class EventChangeMailerTest {
 				getLocale(), TIMEZONE,
 				ics, accessToken);
 		
-		verify(mailService);
+		control.verify();
 		
 		MimeMessage mimeMessage = capturedMessage.getValue();
 		InvitationParts parts = checkInvitationStructure(mimeMessage);
