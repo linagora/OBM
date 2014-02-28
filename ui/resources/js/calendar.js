@@ -1636,13 +1636,9 @@ Obm.CalendarEvent = new Class({
    */
   setColor: function(color) {
     if(color) {
-      if (this.kind == 'all_day') {
-        this.content.setStyle('backgroundColor',color.body);
-        this.dragHandler.setStyle('backgroundColor',color.body);
-      } else {
-        this.content.setStyle('backgroundColor',color.body);
-        this.dragHandler.setStyle('backgroundColor',color.header);
-      }
+      this.content.setStyle('background',color.body);
+      var dragHandlerBackgroundColor = this.kind == 'all_day' ? color.body : color.header;
+      this.dragHandler.setStyle('background', dragHandlerBackgroundColor);
     } else {
       this.content.setStyle('backgroundColor','');
       this.dragHandler.setStyle('backgroundColor','');
