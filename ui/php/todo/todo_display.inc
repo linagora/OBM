@@ -321,7 +321,7 @@ function html_todo_consult($todo_q, $users) {
   $date = of_date_format($todo_q->f('event_date'));
   $datecreate = of_date_format($todo_q->f('timecreate'));
   //  $date = ($date != 0) ? of_date_format($date) : $l_no_date;
-  $description = $todo_q->f('event_description');
+  $description = nl2br($todo_q->f('event_description'));
 
   foreach ($users as $u_id => $one_user) {
     $percent = '';
