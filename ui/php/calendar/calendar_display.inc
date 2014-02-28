@@ -2286,11 +2286,12 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
                 $today_events[] = "<li>$l_private $ad</li>";
               } else {
                 if($category != '') {
-                  $style = "color:#fff;background-color:rgb(".$cats_color[$category].")";
-                  $day_content .= "<td style=\"border:0;width:auto;height:auto;$style;\"></td>";
+                  $background_color = $cats_color[$category];
                 } else {
-                  $style = '';
-                }                
+                  $background_color = '99, 100, 102';
+                }
+                $style = "color:#fff;background:rgb(".$background_color.")";
+                $day_content .= "<td style=\"border:0;width:auto;height:auto;$style;\"></td>";
                 if ($location != '') {
                   $today_events[] = "<li style=\"$style\">".$title." ($location) $ad</li>";
                 } else {
@@ -2314,7 +2315,7 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
               </div>";            
             $line[$line_id] .= "<td onclick=\"window.location.href='".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&date=$iso'\" class=\"eventOwner\"
                onmouseover=\"toggleInfo(this,'$id-$day',1); return true;\"
-               onmouseout=\"toggleInfo(this,'$id-$day',0); return true;\">$day_content</td>";
+               onmouseout=\"toggleInfo(this,'$id-$day',0); return true;\" style=\"$style\">$day_content</td>";
           } else {
             $line[$line_id] .= "<td onclick=\"window.location.href='".basename($_SERVER['SCRIPT_NAME'])."?cal_range=day&date=$iso'\"></td>";
           }
