@@ -70,6 +70,9 @@ mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
   < "../2.5/updates/update-2.5.7~2.mysql.sql" >> /tmp/data_insert.log 2>&1
 
 mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
+  < "../2.5/updates/update-2.5.8~1.mysql.sql" >> /tmp/data_insert.log 2>&1
+
+mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
   < "../2.6/updates/update-2.6.0~1.mysql.sql" >> /tmp/data_insert.log 2>&1
 
 

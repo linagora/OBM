@@ -51,7 +51,6 @@ $l_name_error = "Nume de domeniu invalid!";
 $l_can_delete = "Domeniul poate fi șters.";
 $l_cant_delete = "Domeniul nu poate fi șters!";
 $l_cant_add_domain_single = "Imposibil de creat un nou domeniu, OBM este configurat în modalitatea mono domeniu (singleNameSpace)! Atenție, trecerea în multi-domeniu necesită o intervenție importantă a sistemului.";
-$l_max_users = "# utilizatori max";
 $l_max_resources = "# resurse max";
 $l_max_mailshares = "# căsuțe poștale condivize max";
 $l_mail_quota = "Cotă mail";

@@ -38,7 +38,6 @@ $l_warn_delete = "CAUTION : Domain are not free.";
 $l_cant_delete = "The domain cannot be deleted !"; 
 $l_cant_add_domain_single = "Only one domain can be created when OBM is configured in mono domain mode (singleNameSpace) ! Beware, going multi-domain mode needs an important system work";
 $l_update_state = "Update status";
-$l_max_users = "# users max";
 $l_max_resources = "# resources max";
 $l_max_mailshares = "# mailshares max";
 $l_mail_quota = "Email quota";

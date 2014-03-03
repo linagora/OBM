@@ -41,7 +41,6 @@ INSERT INTO UserEntity (userentity_entity_id, userentity_user_id) SELECT MAX(ent
 -- -----------------------------------------------------------------------------
 DELETE FROM DomainProperty;
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default, domainproperty_readonly) VALUES ('update_state','integer', 1, 1);
-INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_users','integer', 0);
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_mailshares','integer', 0);
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_resources','integer', 0);
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('mail_quota','integer', 0);
