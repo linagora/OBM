@@ -42,7 +42,6 @@ $l_cant_delete = "Le domaine ne peut pas être supprimé !";
 $l_cant_add_domain_single = "Impossible de créer un nouveau domaine, OBM est configuré en mode mono domaine (singleNameSpace) ! Attention, le passage en multi-domaine nécessite une intervention système importante.";
 $l_mailshares_quota_error = "Le quota par défaut ne peux pas être supèrieur au quota maximum";
 
-$l_max_users = "# utilisateurs max";
 $l_max_resources = "# ressources max";
 $l_max_mailshares = "# dossiers partagés max";
 $l_mail_quota = "Quota mail";

@@ -24,7 +24,6 @@ $l_obm_sync = "";
 $l_samba_home = ""; 
 $l_delete = ""; 
 $l_name_error = ""; 
-$l_max_users = ""; 
 $l_address3 = ""; 
 $l_link_user_mailserver = ""; 
 $l_alias_user_used = ""; 

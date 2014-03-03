@@ -36,7 +36,6 @@ $l_warn_delete = "LƯU Ý: Tên miền không được tự do.";
 $l_cant_delete = "Không thể xóa miền này!"; 
 $l_cant_add_domain_single = "Chỉ có một miền có thể được tạo khi OBM được cấu hình trong chế độ mono miền (singleNameSpace)! Hãy coi chừng, chế độ đa lĩnh vực cần một hệ thống công việc quan trọng";
 $l_update_state = "Cập nhật trạng thái";
-$l_max_users = "# Tối đa người dùng";
 $l_max_resources = "# Tối đa tài nguyên";
 $l_max_mailshares = "# Tối đa mailshares";
 $l_mail_quota = "Hạn mức Email";

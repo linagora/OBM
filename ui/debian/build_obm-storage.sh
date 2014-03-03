@@ -112,6 +112,7 @@ cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.0~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.1~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.5.1~1
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.7~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.5.7~1
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.7~2.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.5.7~2
+cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.8~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/2.5.8~1
 
 #PGSQL UPGRADE
 #upgrade Pgsql OBM 2.2.1
@@ -189,5 +190,6 @@ cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.0~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.1~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.5.1~1
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.7~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.5.7~1
 cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.7~2.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.5.7~2
+cp ${OBM_UPDATE_SCRIPTS_25}/update-2.5.8~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/2.5.8~1
 
 exit 0

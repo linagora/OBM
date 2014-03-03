@@ -84,7 +84,6 @@ $l_obm_sync = "OBM sync";
 $l_samba_home = "Percorso di default della home utente (%u verra sostituito dal username)";
 $l_delete = "Eliminare Dominio";
 $l_name_error = "Nome di dominio non valido!";
-$l_max_users = "# utenti max";
 $l_address3 = "$l_address 3";
 $l_link_user_mailserver = "Il server di posta ha degli utenti di dominio";
 $l_alias_user_used = "Impossibile modificare o eliminare gli alias utilizzati negli indirizzi mail.";

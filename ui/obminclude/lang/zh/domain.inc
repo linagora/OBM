@@ -37,7 +37,6 @@ $l_warn_delete = "警告: 该域正在使用中。"; //"CAUTION : Domain are not
 $l_cant_delete = "该域无法被删除！";  //"The domain cannot be deleted !"
 $l_cant_add_domain_single = "当OBM配置处于单域模式（singleNameSpace）时只能创建一个域！要注意，多域模式需要一个重要的系统工作"; //"Only one domain can be created when OBM is configured in mono domain mode (singleNameSpace) ! Beware, going multi-domain mode needs an important system work"
 $l_update_state = "更新状态"; //"Update status"
-$l_max_users = "# 用户的最大值"; //"# users max"
 $l_max_resources = "# 资源的最大值"; //"# resources max"
 $l_max_mailshares = "# mailshares最大值"; //"# mailshares max"
 $l_mail_quota = "邮箱配额最大值"; //"# mailshares max"
