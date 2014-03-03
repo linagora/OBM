@@ -396,7 +396,7 @@ function html_calendar_displayed_calendars($p_view, $calendar_entity) {
   }
 
   $block .= "
-  <div class=\"portlet\" id=\"calendarLegend\">
+  <div class=\"portlet\" id=\"calendarDisplayed\">
   <h1>$l_legend</h1>
   <form action=\"\" id=\"calendarSelectForm\" onsubmit=\"return false;\">
   <script type=\"text/javascript\">
