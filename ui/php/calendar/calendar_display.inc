@@ -8782,20 +8782,26 @@ Class CalendarPdf{
    * draw pdf legend at bottom left
    */
   function setLegend(){
-    $i=0;
+    $i = 0;
+    $j = 0;
+    $legend_width = 88;
     foreach($this->calendar_entity as $users) {
       foreach($users as $user){
         $username = $this->truncateToWidth($user["name"],$x1-($x0+4));
         $class = $this->class[$user["class"]];
         $this->page->setFillColor(new Zend_Pdf_Color_Html($class["title"]));
-        $x0 = $this->content_x0 +$i;
-        $y0 = $this->content_y0;
-        $x1 = $x0 + 90;
+        if ($x0 + 100 > $this->content_x1 ) {
+          $i = 0;
+          $j += 2 * $this->font_height + $this->line_gap;
+        }
+        $x0 = $this->content_x0 + $i;
+        $y0 = $this->content_y0 - $j;
+        $x1 = $x0 + $legend_width;
         $y1 = $y0 + $this->font_height;
         $this->page->drawRectangle($x0+2 , $y0, $x1, $y1+2,Zend_Pdf_Page::SHAPE_DRAW_FILL);
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
         $this->page->drawText($username, $x0+4, $y0+$this->line_gap, 'UTF-8');
-        $i+=90;
+        $i += $legend_width;
       }
     }
   }
