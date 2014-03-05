@@ -49,7 +49,7 @@ Description: Transitional package for opush
 
 Package: obm-locator
 Architecture: all
-Depends: obm-conf, sun-java6-jdk, openssl, obm-jetty, obm-jetty-common-libs
+Depends: obm-conf, sun-java6-jdk, openssl
 Description: Locator for Open Business Management
  This package is a J2E web service, which allows can be queried to retrieve
  the location of an OBM component.
