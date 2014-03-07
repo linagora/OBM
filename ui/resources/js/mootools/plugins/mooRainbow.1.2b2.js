@@ -395,6 +395,7 @@ var MooRainbow = new Class({
 	doLayout: function() {
 		var id = this.options.id, prefix = this.options.prefix;
 		var idPrefix = id + ' .' + prefix;
+		var overlayIdPrefix = id + ' img.' + prefix;
 
 		this.layout = new Element('div', {
 			'styles': {'display': 'block', 'position': 'absolute'},
@@ -510,7 +511,7 @@ var MooRainbow = new Class({
 		
 		this.rePosition();
 
-		var overlays = $$('#' + idPrefix + 'overlay');
+		var overlays = $$('#' + overlayIdPrefix + 'overlay');
 		this.layout.overlay = overlays[0];
 		this.layout.overlay2 = overlays[1];
 		this.layout.cursor = document.getElement('#' + idPrefix + 'cursor');
