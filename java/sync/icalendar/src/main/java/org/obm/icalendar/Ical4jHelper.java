@@ -1306,11 +1306,12 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 			er.setEnd(recur.getUntil());
 			er.setFrequence(Math.max(recur.getInterval(), 1)); // getInterval() returns -1 if no interval is defined
 
+			RecurrenceKind recurrenceKind;
 			if (er.getDays().isEmpty()) {
 				if (Recur.DAILY.equals(frequency)) {
-					er.setKind(RecurrenceKind.daily);
+					recurrenceKind = RecurrenceKind.daily;
 				} else if (Recur.WEEKLY.equals(frequency)) {
-					er.setKind(RecurrenceKind.weekly);
+					recurrenceKind = RecurrenceKind.weekly;
 				} else if (Recur.MONTHLY.equals(frequency)) {
 					WeekDayList wdl = recur.getDayList();
 
@@ -1318,20 +1319,30 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 						WeekDay day = (WeekDay) wdl.get(0);
 						GregorianCalendar cal = getEventStartCalendar(event);
 
-						er.setKind(RecurrenceKind.monthlybyday);
+						recurrenceKind = RecurrenceKind.monthlybyday;
 						cal.set(GregorianCalendar.DAY_OF_WEEK, WeekDay.getCalendarDay(day));
 						cal.set(GregorianCalendar.DAY_OF_WEEK_IN_MONTH, day.getOffset());
 						event.setStartDate(cal.getTime());
 					} else {
-						er.setKind(RecurrenceKind.monthlybydate);
+						recurrenceKind = RecurrenceKind.monthlybydate;
 					}
 
 				} else if (Recur.YEARLY.equals(frequency)) {
-					er.setKind(RecurrenceKind.yearly);
+					recurrenceKind = RecurrenceKind.yearly;
+				}
+				else {
+					if (frequency == null) {
+						logger.warn("Got invalid recurrence rule without frequency");
+					}
+					else {
+						logger.warn(String.format("Unable to handle recurrence rule frequency %s", frequency));
+					}
+					recurrenceKind = null;
 				}
 			} else {
-				er.setKind(RecurrenceKind.weekly);
+				recurrenceKind = RecurrenceKind.weekly;
 			}
+			er.setKind(recurrenceKind);
 		}
 
 		event.setRecurrence(er);
