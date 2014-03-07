@@ -1546,7 +1546,7 @@ public class Ical4jHelperTest {
 		return ical4jHelper.parseICS(ics, getDefaultObmUser(), 0);
 	}
 	
-	@Test @Slow
+	@Test
 	public void executeJIRA2940() throws IOException, ParserException {
 		String icsFilename = "OBMFULL-2940.ics";
 		ICSParsingResults parsingResults = testIcsParsing(icsFilename);
