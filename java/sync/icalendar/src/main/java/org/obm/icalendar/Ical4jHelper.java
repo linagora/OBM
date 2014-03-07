@@ -1390,15 +1390,9 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 			recurrenceKind = RecurrenceKind.yearly;
 		}
 		else {
-			if (frequency == null) {
-				throw new ICSConversionException(
-						"Got invalid recurrence rule without frequency");
-			}
-			else {
-				logger.warn(String.format("Unable to handle recurrence rule frequency %s",
-						frequency));
-			}
-			recurrenceKind = null;
+			throw new ICSConversionException(
+					String.format("Unable to handle recurrence rule frequency %s",
+							frequency));
 		}
 		return recurrenceKind;
 	}
@@ -1415,7 +1409,8 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		return eventStartCalendar.getTime();
 	}
 
-	private Date computeLastOccurrence(CalendarComponent component, RecurrenceKind parsedRecurrenceKind) {
+	private Date computeLastOccurrence(CalendarComponent component,
+			RecurrenceKind parsedRecurrenceKind) throws ICSConversionException {
 		RRule rrule = (RRule) component.getProperty(Property.RRULE);
 		Date until = rrule.getRecur().getUntil();
 		int count = rrule.getRecur().getCount();
@@ -1423,9 +1418,12 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		Date lastOccurrence;
 		if (until != null) {
 			if (count != -1) {
-				logger.warn("Found invalid recurrence containing both UNTIL and COUNT, will retain UNTIL");
+				throw new ICSConversionException(
+						"Found invalid recurrence containing both UNTIL and COUNT");
 			}
-			lastOccurrence = until;
+			else {
+				lastOccurrence = until;
+			}
 		}
 		else if (count != -1) {
 			lastOccurrence = computeLastOccurrenceUsingCount(component, parsedRecurrenceKind);
