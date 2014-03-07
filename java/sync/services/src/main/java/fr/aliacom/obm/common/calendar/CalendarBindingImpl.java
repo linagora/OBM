@@ -47,13 +47,16 @@ import java.util.TreeMap;
 
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.component.CalendarComponent;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.Months;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.icalendar.ICSParsingResults;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.icalendar.Reject;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.Right;
 import org.obm.sync.addition.CommitedElement;
@@ -1167,7 +1170,9 @@ public class CalendarBindingImpl implements ICalendar {
 			throws Exception, ServerFault {
 		String fixedIcs = fixIcsAttendees(ics);
 		String calendar = getDefaultCalendarFromToken(token);
-		List<Event> events = ical4jHelper.parseICS(fixedIcs, createIcal4jUserFrom(token), token.getObmId());
+		ICSParsingResults parsingResults = ical4jHelper.parseICS(fixedIcs, createIcal4jUserFrom(token), token.getObmId());
+		List<Event> events = parsingResults.getParsedEvents();
+		logRejects(parsingResults);
 		for (Event event: events) {
 			try {
 				EventObmId id = getEventObmIdFromExtId(token, calendar, event.getExtId());
@@ -1177,6 +1182,19 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 		}
 		return events;
+	}
+
+	private void logRejects(ICSParsingResults icsParsingResults) {
+		logRejects(icsParsingResults.getRejectedEvents());
+		logRejects(icsParsingResults.getRejectedTodos());
+	}
+
+	private <T extends CalendarComponent> void logRejects(Collection<Reject<T>> rejects) {
+		for (Reject<T> reject : rejects) {
+			String formattedICS = this.ical4jHelper.calendarComponentToString(reject.getItem());
+			logger.warn(String.format("Unable to parse the following ICS component due to %s: %s",
+					reject.getReason(), formattedICS));
+		}
 	}
 
 	private String fixIcsAttendees(String ics) {
@@ -1507,7 +1525,8 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 
 		int countEvent = 0;
-		List<Event> events = parseICSEvent(token, ics, calendarUser.getUid());
+		ICSParsingResults parsingResults = parseICSEvent(token, ics, calendarUser.getUid());
+		List<Event> events = parsingResults.getParsedEvents();
 		LoadingCache<Attendee, Optional<ObmUser>> cache = newObmUserCache(token.getDomain().getName());
 
 		for (final Event event: events) {
@@ -1525,6 +1544,7 @@ public class CalendarBindingImpl implements ICalendar {
 				countEvent += 1;
 			}
 		}
+		this.logRejects(parsingResults);
 		return countEvent;
 	}
 
@@ -1588,7 +1608,7 @@ public class CalendarBindingImpl implements ICalendar {
 		return false;
 	}
 
-	private List<Event> parseICSEvent(final AccessToken token, final String icsToString, Integer ownerId) throws ImportICalendarException {
+	private ICSParsingResults parseICSEvent(final AccessToken token, final String icsToString, Integer ownerId) throws ImportICalendarException {
 		try {
 			return ical4jHelper.parseICS(icsToString, createIcal4jUserFrom(token), ownerId);
 		} catch (IOException e) {

@@ -32,12 +32,15 @@
 package org.obm.push.calendar;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.component.VEvent;
 
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.icalendar.ParsingResults;
+import org.obm.icalendar.Reject;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.User;
@@ -66,7 +69,14 @@ public class ObmEventToMSEventByICSLoopConverter implements ObmEventToMSEventCon
 		try {
 			Ical4jUser ical4jUser = convertIcal4jUser(user);
 			String eventAsICS = ical4j.parseEvent(eventToConvert, ical4jUser, new AccessToken(0, "unit testing"));
-			List<Event> eventsFromICS = ical4j.parseICSEvent(eventAsICS, ical4jUser, 0);
+			ParsingResults<Event, VEvent> parsingResults = ical4j.parseICSEvent(eventAsICS, ical4jUser, 0);
+			if (!parsingResults.getRejectedItems().isEmpty()) {
+				Reject<VEvent> reject = Iterables.getFirst(parsingResults.getRejectedItems(), null);
+				throw new ConversionException(String.format("Unable to convert ICS due to %s: %s",
+						reject.getReason(),
+						ical4j.calendarComponentToString(reject.getItem())));
+			}
+			Collection<Event> eventsFromICS = parsingResults.getParsedItems();
 			Event eventFromICS = Iterables.getOnlyElement(eventsFromICS);
 			return obmEventToMSEventConverter.convert(eventFromICS, uid, user);
 		} catch (ParserException e) {
