@@ -1303,7 +1303,6 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 			}
 
 			er.setDays(new RecurrenceDays(recurrenceDays));
-			er.setEnd(recur.getUntil());
 			er.setFrequence(Math.max(recur.getInterval(), 1)); // getInterval() returns -1 if no interval is defined
 
 			RecurrenceKind recurrenceKind;
@@ -1318,6 +1317,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 				recurrenceKind = RecurrenceKind.weekly;
 			}
 			er.setKind(recurrenceKind);
+			er.setEnd(computeLastOccurrence(component, recurrenceKind));
 		}
 
 		event.setRecurrence(er);
@@ -1367,6 +1367,60 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		eventStartCalendar.set(GregorianCalendar.DAY_OF_WEEK, WeekDay.getCalendarDay(day));
 		eventStartCalendar.set(GregorianCalendar.DAY_OF_WEEK_IN_MONTH, day.getOffset());
 		return eventStartCalendar.getTime();
+	}
+
+	private Date computeLastOccurrence(CalendarComponent component, RecurrenceKind parsedRecurrenceKind) {
+		RRule rrule = (RRule) component.getProperty(Property.RRULE);
+		Date until = rrule.getRecur().getUntil();
+		int count = rrule.getRecur().getCount();
+
+		Date lastOccurrence;
+		if (until != null) {
+			if (count != -1) {
+				logger.warn("Found invalid recurrence containing both UNTIL and COUNT, will retain UNTIL");
+			}
+			lastOccurrence = until;
+		}
+		else if (count != -1) {
+			lastOccurrence = computeLastOccurrenceUsingCount(component, parsedRecurrenceKind);
+		}
+		else {
+			lastOccurrence = null;
+		}
+		return lastOccurrence;
+	}
+
+	private Date computeLastOccurrenceUsingCount(CalendarComponent component, RecurrenceKind parsedRecurrenceKind) {
+		org.joda.time.DateTime dtStart = new org.joda.time.DateTime(((DtStart)component.getProperty(Property.DTSTART)).getDate());
+		RRule rrule = (RRule) component.getProperty(Property.RRULE);
+		int interval = rrule.getRecur().getInterval() != -1 ? rrule.getRecur().getInterval() : 1;
+		// Substract 1 from count as the first occurrence is dtstart
+		int timeUnitCount = (rrule.getRecur().getCount() - 1) * interval;
+
+		org.joda.time.DateTime lastOccurrence = null;
+		switch (parsedRecurrenceKind) {
+		case none:
+			break;
+		case daily:
+			lastOccurrence = dtStart.plusDays(timeUnitCount);
+			break;
+		case weekly:
+			lastOccurrence = dtStart.plusWeeks(timeUnitCount);
+			break;
+		case monthlybydate:
+			lastOccurrence = dtStart.plusMonths(timeUnitCount);
+			break;
+		case monthlybyday:
+			lastOccurrence = dtStart.plusMonths(timeUnitCount);
+			break;
+		case yearly:
+			lastOccurrence = dtStart.plusYears(timeUnitCount);
+			break;
+		case yearlybyday:
+			lastOccurrence = dtStart.plusYears(timeUnitCount);
+			break;
+		}
+		return lastOccurrence != null ? lastOccurrence.toDate() : null;
 	}
 
 	private void appendNegativeExceptions(Event event, PropertyList exdates) {
