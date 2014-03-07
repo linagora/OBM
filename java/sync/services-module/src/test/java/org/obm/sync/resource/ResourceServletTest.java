@@ -52,6 +52,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.DateUtils;
+import org.obm.icalendar.ICSParsingResults;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.calendar.Event;
@@ -111,7 +112,10 @@ public class ResourceServletTest {
 		control.replay();
 
 		String ics = resourceServlet.getResourceICS("resource@domain", new SyncRange(null, null));
-		assertThat(helper.parseICS(ics, iCalUser, 0)).isNotNull().hasSize(collectionSize);
+		ICSParsingResults parsingResults = helper.parseICS(ics, iCalUser, 0);
+		assertThat(parsingResults.getParsedEvents()).hasSize(collectionSize);
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 		control.verify();
 	}
 
@@ -141,7 +145,10 @@ public class ResourceServletTest {
 
 		control.verify();
 		String ics = stringWriter.toString();
-		assertThat(helper.parseICS(ics, iCalUser, 0)).isNotNull().hasSize(collectionSize);
+		ICSParsingResults parsingResults = helper.parseICS(ics, iCalUser, 0);
+		assertThat(parsingResults.getParsedEvents()).hasSize(collectionSize);
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 	}
 
 	@Test

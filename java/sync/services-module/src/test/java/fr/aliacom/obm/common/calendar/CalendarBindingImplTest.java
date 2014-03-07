@@ -59,6 +59,8 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VToDo;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.IArgumentMatcher;
@@ -75,9 +77,12 @@ import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
+import org.obm.icalendar.ICSParsingResults;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.icalendar.ParsingResults;
+import org.obm.icalendar.Reject;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
@@ -128,8 +133,8 @@ import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserEmails;
-import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
 
@@ -1210,7 +1215,14 @@ public class CalendarBindingImplTest {
 
 	private Ical4jHelper mockIcal4jHelper(Integer ownerId, Ical4jUser ical4jUser, String icsData, Event eventWithOwnerAttendee) throws IOException, ParserException{
 		Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-		expect(ical4jHelper.parseICS(icsData, ical4jUser, ownerId)).andReturn(ImmutableList.of(eventWithOwnerAttendee)).once();
+
+		List<Reject<VEvent>> emptyRejectList = ImmutableList.of();
+		ParsingResults<Event, VEvent> eventParsingResults = new ParsingResults<Event, VEvent>(
+				ImmutableList.of(eventWithOwnerAttendee), emptyRejectList);
+		ParsingResults<Event, VToDo> todoParsingResults = new ParsingResults<Event, VToDo>();
+
+		expect(ical4jHelper.parseICS(icsData, ical4jUser, ownerId)).andReturn(
+				new ICSParsingResults(eventParsingResults, todoParsingResults)).once();
 		return ical4jHelper;
 	}
 
