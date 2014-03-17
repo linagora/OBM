@@ -1350,17 +1350,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 			er.setDays(new RecurrenceDays(recurrenceDays));
 			er.setFrequence(Math.max(recur.getInterval(), 1)); // getInterval() returns -1 if no interval is defined
 
-			RecurrenceKind recurrenceKind;
-			if (er.getDays().isEmpty()) {
-				recurrenceKind = computeRecurrenceKind(recur);
-				if (recurrenceKind == RecurrenceKind.monthlybyday) {
-					GregorianCalendar eventStartCalendar = getEventStartCalendar(event);
-					event.setStartDate(computeStartDateForMonthlyByDayEvent(recur,
-							eventStartCalendar));
-				}
-			} else {
-				recurrenceKind = RecurrenceKind.weekly;
-			}
+			RecurrenceKind recurrenceKind = computeRecurrenceKindOrDefault(event, er, recur);
 			er.setKind(recurrenceKind);
 			er.setEnd(computeLastOccurrence(component, recurrenceKind));
 		}
@@ -1368,6 +1358,22 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		event.setRecurrence(er);
 
 		appendNegativeExceptions(event, component.getProperties(Property.EXDATE));
+	}
+
+	private RecurrenceKind computeRecurrenceKindOrDefault(Event event, EventRecurrence er,
+			Recur recur) throws ICSConversionException {
+		RecurrenceKind recurrenceKind;
+		if (er.getDays().isEmpty()) {
+			recurrenceKind = computeRecurrenceKind(recur);
+			if (recurrenceKind == RecurrenceKind.monthlybyday) {
+				GregorianCalendar eventStartCalendar = getEventStartCalendar(event);
+				event.setStartDate(computeStartDateForMonthlyByDayEvent(recur,
+						eventStartCalendar));
+			}
+		} else {
+			recurrenceKind = RecurrenceKind.weekly;
+		}
+		return recurrenceKind;
 	}
 
 	private RecurrenceKind computeRecurrenceKind(Recur recur) throws ICSConversionException {
