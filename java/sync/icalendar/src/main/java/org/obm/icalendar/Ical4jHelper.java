@@ -236,19 +236,9 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 	}
 
 	public String calendarComponentToString(CalendarComponent component) {
-		Writer writer = new StringWriter();
 		Calendar calendar = new Calendar();
 		calendar.getComponents().add(component);
-		CalendarOutputter calendarOutputter = new CalendarOutputter(true, MAX_FOLD_LENGTH);
-		try {
-			calendarOutputter.output(calendar, writer);
-			return writer.toString();
-		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
-		} catch (ValidationException e) {
-			logger.error(e.getMessage(), e);
-		}
-		return null;
+		return this.foldingWriterToString(calendar);
 	}
 
 	private String foldingWriterToString(final Calendar calendar) {
