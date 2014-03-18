@@ -32,7 +32,7 @@ case "$1" in
                 db_set obm-conf/module_obmldap false
                 db_go || true
                 db_get obm-conf/module_obmldap
-                sed -i -e "s#^obm-ldap =.*#obm-ldap = ${RET}#" /etc/obm/obm_conf.ini || true
+                sed -i -e "s#^obm-ldap *=.*#obm-ldap = ${RET}#" /etc/obm/obm_conf.ini || true
 
 	;;	
 esac
