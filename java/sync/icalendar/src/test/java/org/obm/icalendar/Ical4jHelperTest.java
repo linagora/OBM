@@ -40,11 +40,6 @@ import static org.easymock.EasyMock.isNull;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.fest.assertions.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -372,10 +367,10 @@ public class Ical4jHelperTest {
 		er.setDays(new RecurrenceDays(RecurrenceDay.Sunday, RecurrenceDay.Tuesday, RecurrenceDay.Thursday,
 				RecurrenceDay.Saturday));
 		Set<WeekDay> swd = ical4jHelper.getListDay(er);
-		assertTrue(swd.contains(WeekDay.SU));
-		assertTrue(swd.contains(WeekDay.TU));
-		assertTrue(swd.contains(WeekDay.TH));
-		assertTrue(swd.contains(WeekDay.SA));
+		assertThat(swd).contains(WeekDay.SU);
+		assertThat(swd).contains(WeekDay.TU);
+		assertThat(swd).contains(WeekDay.TH);
+		assertThat(swd).contains(WeekDay.SA);
 		ical4jHelper.getListDay(er);
 	}
 
@@ -399,7 +394,7 @@ public class Ical4jHelperTest {
 		AccessToken token = new AccessToken(0, null);
 		token.setUserEmail("adrien@zz.com");
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, cache);
-		assertTrue(event.isAllday());
+		assertThat(event.isAllday()).isTrue();
 
 		cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) - 1);
 		dtStart = new DtStart(new DateTime(cal.getTime()));
@@ -409,7 +404,7 @@ public class Ical4jHelperTest {
 		vEvent.getProperties().add(dtStart);
 		vEvent.getProperties().add(dtEnd);
 		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, cache);
-		assertFalse(event1.isAllday());
+		assertThat(event1.isAllday()).isFalse();
 	}
 
 	@Test @Slow
@@ -428,7 +423,7 @@ public class Ical4jHelperTest {
 		vEvent.getProperties().add(dtStart);
 		vEvent.getProperties().add(dtEnd);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertEquals(172800, event.getDuration());
+		assertThat(event.getDuration()).isEqualTo(172800);
 
 	}
 
@@ -437,7 +432,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(Clazz.PUBLIC);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertEquals(EventPrivacy.PUBLIC, event.getPrivacy());
+		assertThat(event.getPrivacy()).isEqualTo(EventPrivacy.PUBLIC);
 	}
 
 	@Test
@@ -445,7 +440,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(Clazz.PRIVATE);
 		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertEquals(EventPrivacy.PRIVATE, event1.getPrivacy());
+		assertThat(event1.getPrivacy()).isEqualTo(EventPrivacy.PRIVATE);
 	}
 
 	@Test
@@ -453,7 +448,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(Clazz.CONFIDENTIAL);
 		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertEquals(EventPrivacy.CONFIDENTIAL, event1.getPrivacy());
+		assertThat(event1.getPrivacy()).isEqualTo(EventPrivacy.CONFIDENTIAL);
 	}
 
 	@Test
@@ -461,14 +456,14 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(new Clazz("other"));
 		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertEquals(EventPrivacy.PUBLIC, event1.getPrivacy());
+		assertThat(event1.getPrivacy()).isEqualTo(EventPrivacy.PUBLIC);
 	}
 
 	@Test
 	public void testGetPrivacyIsPublicWhenNull() throws ICSConversionException {
 		VEvent vEvent = new VEvent();
 		Event event1 = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertEquals(EventPrivacy.PUBLIC, event1.getPrivacy());
+		assertThat(event1.getPrivacy()).isEqualTo(EventPrivacy.PUBLIC);
 	}
 	
 	@Test
@@ -479,7 +474,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(orga);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertEquals("Adrien Poupard", event.getOwner());
+		assertThat(event.getOwner()).isEqualTo("Adrien Poupard");
 	}
 
 	@Test
@@ -489,7 +484,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getProperties().add(orga);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertEquals("adrien@zz.com", event.getOwner());
+		assertThat(event.getOwner()).isEqualTo("adrien@zz.com");
 	}
 
 	@Test
@@ -503,7 +498,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertNull(event.getAlert());
+		assertThat(event.getAlert()).isNull();
 	}
 	
 	@Test
@@ -516,9 +511,8 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertFalse(
-				new Integer(-1).equals(event.getAlert())
-		);
+		System.out.println("alert: " + event.getAlert());
+		assertThat(event.getAlert()).isNotEqualTo(-1);
 	}
 	
 	@Test
@@ -532,7 +526,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertNull(event.getAlert());
+		assertThat(event.getAlert()).isNull();
 	}
 	
 	@Test
@@ -547,9 +541,7 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertFalse(
-				new Integer(-1).equals(event.getAlert())
-		);
+		assertThat(event.getAlert()).isNotEqualTo(-1);
 	}
 
 	@Test @Slow
@@ -562,12 +554,11 @@ public class Ical4jHelperTest {
 		VEvent vEvent = (VEvent) vEvents.get(0);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
 		EventRecurrence er = event.getRecurrence();
-		assertNotNull(er);
-		assertEquals(1, er.getFrequence());
-		assertEquals(EnumSet.of(RecurrenceDay.Monday, RecurrenceDay.Tuesday,
-				RecurrenceDay.Wednesday, RecurrenceDay.Thursday, RecurrenceDay.Friday),
-				er.getDays());
-		assertEquals(RecurrenceKind.weekly, er.getKind());
+		assertThat(er).isNotNull();
+		assertThat(er.getFrequence()).isEqualTo(1);
+		assertThat(er.getDays()).isEqualTo(EnumSet.of(RecurrenceDay.Monday, RecurrenceDay.Tuesday,
+				RecurrenceDay.Wednesday, RecurrenceDay.Thursday, RecurrenceDay.Friday));
+		assertThat(er.getKind()).isEqualTo(RecurrenceKind.weekly);
 		assertThat(er.getExceptions()).hasSize(1);
 	}
 
@@ -581,10 +572,11 @@ public class Ical4jHelperTest {
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertEquals(3, event.getAttendees().size());
+		assertThat(event.getAttendees()).hasSize(3);
 	}
 
 
+	@SuppressWarnings("null")
 	@Test
 	public void testOrganizerInAttendess() throws IOException, ParserException, ICSConversionException {
 		InputStream icsStream = getStreamICS("organizerInAttendee.ics");
@@ -600,11 +592,12 @@ public class Ical4jHelperTest {
 				organizer = att;
 			}
 		}
-		assertNotNull(organizer);
-		assertEquals("adrien@zz.com", organizer.getEmail());
-		assertTrue(organizer.isOrganizer());
+		assertThat(organizer).isNotNull();
+		assertThat(organizer.getEmail()).isEqualTo("adrien@zz.com");
+		assertThat(organizer.isOrganizer()).isTrue();
 	}
 	
+	@SuppressWarnings("null")
 	@Test
 	public void testOrganizerNotInAttendess() throws IOException, ParserException, ICSConversionException {
 		InputStream icsStream = getStreamICS("organizerNotInAttendee.ics");
@@ -620,9 +613,9 @@ public class Ical4jHelperTest {
 				organizer = att;
 			}
 		}
-		assertNotNull(organizer);
-		assertEquals("adrien@zz.com", organizer.getEmail());
-		assertTrue(organizer.isOrganizer());
+		assertThat(organizer).isNotNull();
+		assertThat(organizer.getEmail()).isEqualTo("adrien@zz.com");
+		assertThat(organizer.isOrganizer()).isTrue();
 	}
 	
 	@Test @Slow
@@ -634,7 +627,7 @@ public class Ical4jHelperTest {
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertTrue(event.isInternalEvent());
+		assertThat(event.isInternalEvent()).isTrue();
 
 	}
 
@@ -647,7 +640,7 @@ public class Ical4jHelperTest {
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertEquals(1244470973000L, event.getTimeCreate().getTime());
+		assertThat(event.getTimeCreate().getTime()).isEqualTo(1244470973000L);
 	}
 
 	@Test @Slow
@@ -659,7 +652,7 @@ public class Ical4jHelperTest {
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertEquals(1244470995000L, event.getTimeUpdate().getTime());
+		assertThat(event.getTimeUpdate().getTime()).isEqualTo(1244470995000L);
 
 	}
 
@@ -672,7 +665,7 @@ public class Ical4jHelperTest {
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertNull(event.getTimeUpdate());
+		assertThat(event.getTimeUpdate()).isNull();
 
 	}
 
@@ -685,7 +678,7 @@ public class Ical4jHelperTest {
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertFalse(event.isInternalEvent());
+		assertThat(event.isInternalEvent()).isFalse();
 
 	}
 
@@ -698,7 +691,7 @@ public class Ical4jHelperTest {
 				Component.VEVENT);
 		VEvent vEvent = (VEvent) vEvents.get(0);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		assertFalse(event.isInternalEvent());
+		assertThat(event.isInternalEvent()).isFalse();
 
 	}
 
@@ -734,7 +727,7 @@ public class Ical4jHelperTest {
 		DateTime expectedExceptionTwo = new DateTime(exceptionTwo);
 		
 		ExDate ret = ical4jHelper.getExDate(event);
-		assertEquals(2, ret.getDates().size());
+		assertThat(ret.getDates()).hasSize(2);
 		assertThat(ret.getDates()).containsOnly(expectedExceptionOne, expectedExceptionTwo);
 		assertThat(ret.getDates().isUtc());
 	}
@@ -752,7 +745,7 @@ public class Ical4jHelperTest {
 		event.setRecurrence(er);
 
 		ExDate exDate = ical4jHelper.getExDate(event);
-		assertNull(exDate);
+		assertThat(exDate).isNull();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -792,7 +785,7 @@ public class Ical4jHelperTest {
 		final Event event = new Event();
 		event.setAlert(30);
 		final VAlarm valarm = ical4jHelper.getVAlarm(event.getAlert());
-		assertEquals(30, valarm.getTrigger().getDuration().getSeconds());
+		assertThat(valarm.getTrigger().getDuration().getSeconds()).isEqualTo(30);
 	}
 
 	@Test
@@ -805,7 +798,7 @@ public class Ical4jHelperTest {
 		endDate.setValue("19980118T230000");
 		
 		ical4jHelper.appendAllDay(event, startDate, endDate);
-		assertFalse(event.isAllday());
+		assertThat(event.isAllday()).isFalse();
 	}
 	
 	@Test
@@ -818,7 +811,7 @@ public class Ical4jHelperTest {
 		endDate.setDate(new net.fortuna.ical4j.model.Date());
 		
 		ical4jHelper.appendAllDay(event, startDate, endDate);
-		assertTrue(event.isAllday());
+		assertThat(event.isAllday()).isTrue();
 	}
 
 	@Test
@@ -830,7 +823,7 @@ public class Ical4jHelperTest {
 		vevent.getProperties().add(startDate);
 
 		ical4jHelper.appendAllDay(event, vevent);
-		assertTrue(event.isAllday());
+		assertThat(event.isAllday()).isTrue();
 	}
 
 	@Test
@@ -839,7 +832,7 @@ public class Ical4jHelperTest {
 				DateUtils.date("2004-12-14T21:39:45Z"),
 				DateUtils.date("2004-12-15T21:39:45Z"));
 		final Event event = createEventByDuration(allDayDuration);
-		assertTrue(event.isAllday());
+		assertThat(event.isAllday()).isTrue();
 	}
 
 	private Event createEventByDuration(Duration duration) {
@@ -856,7 +849,7 @@ public class Ical4jHelperTest {
 				DateUtils.date("2004-12-14T21:39:45Z"),
 				DateUtils.date("2004-12-17T21:39:45Z"));
 		final Event event = createEventByDuration(allDayDuration);
-		assertTrue(event.isAllday());
+		assertThat(event.isAllday()).isTrue();
 	}
 	
 	@Test
@@ -865,7 +858,7 @@ public class Ical4jHelperTest {
 				DateUtils.date("2004-12-14T21:39:45Z"),
 				DateUtils.date("2004-12-21T21:39:45Z"));
 		final Event event = createEventByDuration(allDayDuration);
-		assertFalse(event.isAllday());
+		assertThat(event.isAllday()).isFalse();
 	}
 
 	@Test
@@ -874,7 +867,7 @@ public class Ical4jHelperTest {
 				DateUtils.date("2004-12-14T21:39:45Z"),
 				DateUtils.date("2004-12-14T22:39:45Z"));
 		final Event event = createEventByDuration(allDayDuration);
-		assertFalse(event.isAllday());
+		assertThat(event.isAllday()).isFalse();
 	}
 	
 	@Test
@@ -883,7 +876,7 @@ public class Ical4jHelperTest {
 				DateUtils.date("2004-12-14T21:40:00Z"),
 				DateUtils.date("2004-12-15T21:30:00Z"));
 		final Event event = createEventByDuration(allDayDuration);
-		assertFalse(event.isAllday());
+		assertThat(event.isAllday()).isFalse();
 	}
 
 	@Test
@@ -892,25 +885,25 @@ public class Ical4jHelperTest {
 				DateUtils.date("2004-12-14T21:39:45Z"),
 				DateUtils.date("2004-12-14T21:40:45Z"));
 		final Event event = createEventByDuration(allDayDuration);
-		assertFalse(event.isAllday());
+		assertThat(event.isAllday()).isFalse();
 	}
 	
 	@Test
 	public void testGetPublicClazz() {
 		Clazz clazz = ical4jHelper.getClazz(EventPrivacy.PUBLIC);
-		assertEquals(Clazz.PUBLIC, clazz);
+		assertThat(clazz).isEqualTo(Clazz.PUBLIC);
 	}
 
 	@Test
 	public void testGetPrivateClazz() {
 		Clazz clazz = ical4jHelper.getClazz(EventPrivacy.PRIVATE);
-		assertEquals(Clazz.PRIVATE, clazz);
+		assertThat(clazz).isEqualTo(Clazz.PRIVATE);
 	}
 
 	@Test
 	public void testGetConfidentialClazz() {
 		Clazz clazz = ical4jHelper.getClazz(EventPrivacy.CONFIDENTIAL);
-		assertEquals(Clazz.CONFIDENTIAL, clazz);
+		assertThat(clazz).isEqualTo(Clazz.CONFIDENTIAL);
 	}
 	
 	@Test
@@ -920,10 +913,8 @@ public class Ical4jHelperTest {
 		event.setOwnerEmail("adrien@zz.com");
 		Organizer orga = ical4jHelper.getOrganizer(event.getOwner(),
 				event.getOwnerEmail());
-		assertEquals("mailto:adrien@zz.com", orga.getValue());
-		assertEquals("Adrien Poupard", orga.getParameter(Parameter.CN)
-				.getValue());
-
+		assertThat(orga.getValue()).isEqualTo("mailto:adrien@zz.com");
+		assertThat(orga.getParameter(Parameter.CN).getValue()).isEqualTo("Adrien Poupard");
 	}
 
 	@Test
@@ -931,11 +922,11 @@ public class Ical4jHelperTest {
 		Event event = new Event();
 		event.setOpacity(EventOpacity.OPAQUE);
 		Transp t = ical4jHelper.getTransp(event.getOpacity());
-		assertEquals(Transp.OPAQUE, t);
+		assertThat(t).isEqualTo(Transp.OPAQUE);
 
 		event.setOpacity(EventOpacity.TRANSPARENT);
 		t = ical4jHelper.getTransp(event.getOpacity());
-		assertEquals(Transp.TRANSPARENT, t);
+		assertThat(t).isEqualTo(Transp.TRANSPARENT);
 
 	}
 
@@ -946,8 +937,7 @@ public class Ical4jHelperTest {
 		event.setStartDate(cal.getTime());
 		event.setDuration(3600);
 		DtEnd dtend = ical4jHelper.getDtEnd(event.getStartDate(), event.getDuration());
-		assertEquals(cal.getTime().getTime() + 3600000, dtend.getDate()
-				.getTime());
+		assertThat(dtend.getDate().getTime()).isEqualTo(cal.getTime().getTime() + 3600000);
 	}
 
 	@Test
@@ -958,7 +948,7 @@ public class Ical4jHelperTest {
 		
 		DtStart dtstart = ical4jHelper.getDtStart(event.getStartDate());
 		
-		assertEquals(cal.getTime().getTime(), dtstart.getDate().getTime());
+		assertThat(dtstart.getDate().getTime()).isEqualTo(cal.getTime().getTime());
 	}
 
 	@Test
@@ -970,7 +960,7 @@ public class Ical4jHelperTest {
 
 		DtStart dtstart = ical4jHelper.getDtStart(event.getStartDate());
 
-		assertEquals(dtstart.getDate().getTime(), event.getStartDate().getTime());
+		assertThat(event.getStartDate().getTime()).isEqualTo(dtstart.getDate().getTime());
 	}
 
 	@Test
@@ -984,7 +974,7 @@ public class Ical4jHelperTest {
 				.build();
 
 		Role role = ical4jHelper.getRole(at);
-		assertEquals(role, Role.CHAIR);
+		assertThat(role).isEqualTo(Role.CHAIR);
 	}
 
 	@Test
@@ -995,7 +985,7 @@ public class Ical4jHelperTest {
 				.build();
 
 		Cn cn = ical4jHelper.getCn(at);
-		assertEquals("adrien", cn.getValue());
+		assertThat(cn.getValue()).isEqualTo("adrien");
 	}
 
 	@Test
@@ -1009,9 +999,10 @@ public class Ical4jHelperTest {
 				.build();
 
 		PartStat ps = ical4jHelper.getPartStat(at);
-		assertEquals(ps, PartStat.ACCEPTED);
+		assertThat(ps).isEqualTo(PartStat.ACCEPTED);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetRRule() {
 		Calendar cal = getCalendarPrecisionOfSecond();
@@ -1035,15 +1026,15 @@ public class Ical4jHelperTest {
 
 		RRule rule = ical4jHelper.getRRule(event);
 		Recur recur = rule.getRecur();
-		assertTrue(recur.getDayList().contains(WeekDay.MO));
-		assertTrue(recur.getDayList().contains(WeekDay.TU));
-		assertTrue(recur.getDayList().contains(WeekDay.WE));
-		assertTrue(recur.getDayList().contains(WeekDay.TH));
-		assertTrue(recur.getDayList().contains(WeekDay.FR));
+		assertThat(recur.getDayList()).contains(WeekDay.MO);
+		assertThat(recur.getDayList()).contains(WeekDay.TU);
+		assertThat(recur.getDayList()).contains(WeekDay.WE);
+		assertThat(recur.getDayList()).contains(WeekDay.TH);
+		assertThat(recur.getDayList()).contains(WeekDay.FR);
 
-		assertNull(er.getEnd());
+		assertThat(er.getEnd()).isNull();
 
-		assertEquals(er.getFrequence(), 1);
+		assertThat(er.getFrequence()).isEqualTo(1);
 		er.setKind(RecurrenceKind.weekly);
 
 		assertThat(er.getExceptions()).hasSize(2);
@@ -1053,9 +1044,9 @@ public class Ical4jHelperTest {
 	public void testParserAttendee() throws IOException, ParserException {
 		String ics = IOUtils.toString(getStreamICS("bugGn.ics"));
 		ICSParsingResults parsingResults = ical4jHelper.parseICS(ics, getDefaultObmUser(), 0);
-		assertEquals(parsingResults.getParsedEvents().size(), 1);
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getParsedEvents()).hasSize(1);
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 	}
 
 	private InputStream getStreamICS(String filename) {
@@ -1073,11 +1064,11 @@ public class Ical4jHelperTest {
 		
 		ICSParsingResults parsingResults = ical4jHelper.parseICS(ics, getDefaultObmUser(), 0);
 		for (final Event event: parsingResults.getParsedEvents()) {
-			assertNotNull(event.getTitle());
+			assertThat(event.getTitle()).isNotNull();
 		}
-		assertEquals(221, parsingResults.getParsedEvents().size());
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getParsedEvents()).hasSize(221);
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 	}
 	
 	@Test @Slow
@@ -1088,7 +1079,7 @@ public class Ical4jHelperTest {
 			final String ics = IOUtils.toString(getStreamICS(icsFile));
 			ical4jHelper.parseICS(ics, getDefaultObmUser(), 0);	
 		}
-		assertTrue(true);
+		assertThat(true).isTrue();
 	}
 
 	@Test
@@ -1111,10 +1102,10 @@ public class Ical4jHelperTest {
 		verify(eventExtIdFactory);
 		
 		for (final Event event: parsingResults.getParsedItems()) {
-			assertNotNull(event.getExtId());
+			assertThat(event.getExtId()).isNotNull();
 		}
 		
-		assertEquals(10, parsingResults.getParsedItems().size());
+		assertThat(parsingResults.getParsedItems()).hasSize(10);
 	}
 	
 	@Test
@@ -1535,8 +1526,8 @@ public class Ical4jHelperTest {
 		String icsFilename = "OBMFULL-2891.ics";
 		ICSParsingResults parsingResults = testIcsParsing(icsFilename);
 		assertThat(parsingResults.getParsedEvents()).isNotEmpty();
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 	}
 
 	private ICSParsingResults testIcsParsing(String icsFilename) throws IOException,
@@ -1551,16 +1542,16 @@ public class Ical4jHelperTest {
 		String icsFilename = "OBMFULL-2940.ics";
 		ICSParsingResults parsingResults = testIcsParsing(icsFilename);
 		assertThat(parsingResults.getParsedEvents()).isNotEmpty();
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 	}
 	
 	@Test
 	public void testDefaultParticipation() throws IOException, ParserException {
 		String icsFilename = "default-part-stat.ics";
 		ICSParsingResults parsingResults = testIcsParsing(icsFilename);
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 		Event event = Iterables.getOnlyElement(parsingResults.getParsedEvents());
 		assertThat(event.getAttendees()).hasSize(2);
 		Attendee userc = event.getAttendees().get(1);
@@ -1572,8 +1563,8 @@ public class Ical4jHelperTest {
 		String icsFilename = "OBMFULL-2963sorted.ics";
 		ICSParsingResults parsingResults = testIcsParsing(icsFilename);
 
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 		List<Event> events = parsingResults.getParsedEvents();
 		assertThat(events).hasSize(2);
 
@@ -1588,8 +1579,8 @@ public class Ical4jHelperTest {
 		String icsFilename = "OBMFULL-2963unsorted.ics";
 		ICSParsingResults parsingResults = testIcsParsing(icsFilename);
 
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 		List<Event> events = parsingResults.getParsedEvents();
 		assertThat(events).hasSize(2);
 
@@ -1605,8 +1596,8 @@ public class Ical4jHelperTest {
 		ICSParsingResults parsingResults = testIcsParsing(icsFilename);
 
 		assertThat(parsingResults.getParsedEvents()).isEmpty();
-		assertEquals(4, parsingResults.getRejectedEvents().size());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getRejectedEvents()).hasSize(4);
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 	}
 	
 	@Test
@@ -1620,8 +1611,8 @@ public class Ical4jHelperTest {
 				UserAttendee.builder().email("usera@obm.lng.org").build(),
 				UserAttendee.builder().email("userb@obm.lng.org").build(),
 				UserAttendee.builder().email("userc@obm.lng.org").build());
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 	}
 	
 	@Test
@@ -1634,8 +1625,8 @@ public class Ical4jHelperTest {
 		assertThat(events.get(0).getAttendees()).containsOnly(
 				UserAttendee.builder().email("usera@obm.lng.org").build(),
 				UserAttendee.builder().email("userb@obm.lng.org").build());
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 	}
 
 	@Test
@@ -1731,8 +1722,8 @@ public class Ical4jHelperTest {
 		List<Event> events = parsingResults.getParsedEvents();
 		assertThat(events).hasSize(1);
 		assertThat(events.get(0).getExtId().getExtId()).isEqualTo("abc");
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 	}
 
 	@Test
@@ -2141,8 +2132,8 @@ public class Ical4jHelperTest {
 		verify(attendeeService);
 
 		assertThat(parsingResults.getParsedEvents()).hasSize(4);
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
 	}
 
 	@Test
@@ -2197,8 +2188,8 @@ public class Ical4jHelperTest {
 		event4.addAttendee(UserAttendee.builder().email(organizerEmail).participation(Participation.declined()).build());
 
 		assertThat(events).containsOnly(event1, event2, event3, event4);
-		assertTrue(parsingResults.getRejectedEvents().isEmpty());
-		assertTrue(parsingResults.getRejectedTodos().isEmpty());
+		assertThat(parsingResults.getRejectedEvents()).isEmpty();
+		assertThat(parsingResults.getRejectedTodos()).isEmpty();
   }
 	
 	@Test
