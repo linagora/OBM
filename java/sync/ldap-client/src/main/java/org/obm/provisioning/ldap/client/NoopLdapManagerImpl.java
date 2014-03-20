@@ -27,60 +27,75 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.processing.impl;
+package org.obm.provisioning.ldap.client;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
+import org.obm.provisioning.Group;
+import org.obm.provisioning.ldap.client.exception.ConnectionException;
 
-import org.apache.directory.ldap.client.api.LdapConnectionConfig;
-import org.obm.provisioning.CommonDomainEndPointEnvTest;
-import org.obm.provisioning.ldap.client.LdapManager;
-import org.obm.provisioning.ldap.client.LdapService;
-import org.obm.provisioning.processing.BatchProcessor;
-import org.obm.provisioning.processing.BatchTracker;
-import org.obm.sync.date.DateProvider;
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.util.Modules;
+public class NoopLdapManagerImpl implements LdapManager {
 
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
+	private final static NoopLdapManagerImpl DEFAULT_INSTANCE = new NoopLdapManagerImpl();
 
-public class BatchProcessorImplTestEnv extends CommonDomainEndPointEnvTest {
-
-	public static class Env extends AbstractModule {
-
-		@Override
-		protected void configure() {
-			install(Modules.override(new CommonDomainEndPointEnvTest.Env())
-					.with(new AbstractModule() {
-
-						@Override
-						protected void configure() {
-							bind(BatchProcessor.class).to(
-									BatchProcessorImpl.class);
-							bind(BatchTracker.class).to(BatchTrackerImpl.class);
-						}
-
-					}));
-		}
+	public static LdapManager of() {
+		return DEFAULT_INSTANCE;
 	}
 
-	@Inject
-	protected BatchProcessor processor;
-	@Inject
-	protected DateProvider dateProvider;
-	@Inject
-	private LdapService ldapService;
-	@Inject
-	protected ObmSyncConfigurationService configurationService;
+	private NoopLdapManagerImpl() {
+	}
 
-	protected LdapManager expectLdapBuild() {
-		expect(configurationService.isLdapModuleEnabled()).andReturn(true);
-		LdapManager ldapManager = mocksControl.createMock(LdapManager.class);
+	@Override
+	public void createUser(ObmUser obmUser) {
+	}
 
-		expect(ldapService.buildManager(isA(LdapConnectionConfig.class)))
-				.andReturn(ldapManager);
-		return ldapManager;
+	@Override
+	public void deleteUser(ObmUser obmUser) {
+	}
+
+	@Override
+	public void modifyUser(ObmUser obmUser, ObmUser oldObmUser) {
+	}
+
+	@Override
+	public void deleteGroup(ObmDomain domain, Group group) {
+	}
+
+	@Override
+	public void addUserToGroup(ObmDomain domain, Group group, ObmUser userToAdd) {
+	}
+
+	@Override
+	public void addUserToDefaultGroup(ObmDomain domain, Group defaultGroup, ObmUser userToAdd) {
+	}
+
+	@Override
+	public void removeUserFromGroup(ObmDomain domain, Group group, ObmUser userToRemove) {
+	}
+
+	@Override
+	public void removeUserFromDefaultGroup(ObmDomain domain, Group defaultGroup,
+			ObmUser userToRemove) {
+	}
+
+	@Override
+	public void addSubgroupToGroup(ObmDomain domain, Group group, Group subgroup) {
+	}
+
+	@Override
+	public void removeSubgroupFromGroup(ObmDomain domain, Group group, Group subgroup) {
+	}
+
+	@Override
+	public void modifyGroup(ObmDomain domain, Group group, Group oldGroup) {
+	}
+
+	@Override
+	public void createGroup(Group group, ObmDomain domain) {
+	}
+
+	@Override
+	public void shutdown() throws ConnectionException {
 	}
 }

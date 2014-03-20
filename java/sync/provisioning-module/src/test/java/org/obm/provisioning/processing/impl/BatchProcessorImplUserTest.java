@@ -62,6 +62,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(BatchProcessorImplUserTest.Env.class)
@@ -117,6 +118,16 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 					ObmHost.builder().name("NewCyrus").localhost().build())
 			.host(ServiceProperty.LDAP,
 					ObmHost.builder().name("OpenLDAP").localhost().build())
+			.alias("domain.com")
+			.build();
+
+	private final ObmDomain domainWithImapWithoutLdap = ObmDomain
+			.builder()
+			.name("domain")
+			.id(1)
+			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
+			.host(ServiceProperty.IMAP,
+					ObmHost.builder().name("host").ip("127.0.0.1").localhost().build())
 			.alias("domain.com")
 			.build();
 
@@ -218,6 +229,83 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expectLastCall();
 		expectSetDefaultRights(userFromDao);
 		expectLdapCreateUser(userFromDao, usersGroup);
+		expectCyrusCreateMailbox(userFromDao);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+		expectPUserDaoInsert(userFromDao);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testProcessCreateUserWithNoLdap() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/")
+								.verb(HttpVerb.POST)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"mails\":[\"john@domain\"]" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapWithoutLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		final ObmUser user = ObmUser.builder().login(user1Login).identity(user1Name)
+				.password("secret")
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("host").ip("127.0.0.1").build())
+					.domain(domainWithImapWithoutLdap)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1")).domain(domainWithImapWithoutLdap)
+				.build();
+		final ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.login(user1Login)
+				.password("secret")
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("host").localhost().build())
+					.domain(domainWithImapWithoutLdap)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapWithoutLdap)
+				.build();
+
+		expectDomain(domainWithImapWithoutLdap);
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getAllEmailsFrom(domainWithImapWithoutLdap, user.getExtId())).andReturn(ImmutableSet.<String>of());
+		expect(userDao.create(user)).andReturn(userFromDao);
+		expect(groupDao.getByGid(domainWithImapWithoutLdap, UserDao.DEFAULT_GID)).andReturn(
+				usersGroup);
+		groupDao.addUser(domainWithImapWithoutLdap, usersGroup.getUid(), userFromDao);
+		expectLastCall();
+		expect(configurationService.isLdapModuleEnabled()).andReturn(false);
+		expectSetDefaultRights(userFromDao);
 		expectCyrusCreateMailbox(userFromDao);
 
 		expect(

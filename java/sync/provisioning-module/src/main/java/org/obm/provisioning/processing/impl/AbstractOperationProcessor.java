@@ -40,6 +40,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
+import org.obm.provisioning.ldap.client.NoopLdapManagerImpl;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
@@ -49,6 +50,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationProcessor {
 
@@ -58,12 +60,19 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 	protected UserDao userDao;
 	@Inject
 	protected GroupDao groupDao;
+	@Inject
+	private ObmSyncConfigurationService configurationService;
 
 	protected AbstractOperationProcessor(BatchEntityType entityType, HttpVerb verb) {
 		super(entityType, verb);
 	}
 
 	protected LdapManager buildLdapManager(ObmDomain domain) {
+		return configurationService.isLdapModuleEnabled() ?
+				buildRealLdapManager(domain) : NoopLdapManagerImpl.of();
+	}
+	
+	private LdapManager buildRealLdapManager(ObmDomain domain) {
 		LdapConnectionConfig connectionConfig = new LdapConnectionConfig();
 		ObmHost ldapHost = Iterables.getFirst(domain.getHosts().get(ServiceProperty.LDAP), null);
 

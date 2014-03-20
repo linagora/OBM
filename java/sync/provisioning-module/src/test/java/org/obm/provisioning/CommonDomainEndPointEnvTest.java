@@ -103,6 +103,7 @@ import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public abstract class CommonDomainEndPointEnvTest {
 
@@ -149,6 +150,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(Configuration.class).toInstance(new LdapConfiguration("cn=directory manager", "secret", 0));
 					bind(LdapService.class).toInstance(mocksControl.createMock(LdapService.class));
 					bind(BatchTracker.class).toInstance(mocksControl.createMock(BatchTracker.class));
+					bind(ObmSyncConfigurationService.class).toInstance(mocksControl.createMock(ObmSyncConfigurationService.class));
 				}
 			}));
 		}

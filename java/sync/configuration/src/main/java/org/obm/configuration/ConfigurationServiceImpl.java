@@ -185,6 +185,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		return "http://" + obmSyncHost + ":" + OBM_SYNC_PORT + "/" + OBM_SYNC_APP_NAME;
 	}
 
+	@Override
+	public boolean isLdapModuleEnabled() {
+		return this.iniFile.getBooleanValue("obm-ldap");
+	}
+
 	private String getExternalUrl() {
 		return iniFile.getStringValue(EXTERNAL_URL_KEY);
 	}

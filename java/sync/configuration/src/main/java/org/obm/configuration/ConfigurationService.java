@@ -55,4 +55,6 @@ public interface ConfigurationService extends DomainConfiguration, DataConfigura
 	String getLdapBindPassword();
 
 	String getObmUIBaseUrl();
+
+	boolean isLdapModuleEnabled();
 }
