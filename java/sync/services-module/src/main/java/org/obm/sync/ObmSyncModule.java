@@ -34,12 +34,6 @@ package org.obm.sync;
 import javax.servlet.ServletContext;
 
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.configuration.ConfigurationModule;
-import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.DatabaseConfigurationImpl;
-import org.obm.configuration.DefaultTransactionConfiguration;
-import org.obm.configuration.GlobalAppConfiguration;
-import org.obm.configuration.LocatorConfigurationImpl;
 import org.obm.domain.dao.DaoModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
@@ -47,9 +41,6 @@ import org.obm.provisioning.ProvisioningService;
 
 import com.google.inject.AbstractModule;
 import com.sun.jersey.guice.JerseyServletModule;
-
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
 
 public class ObmSyncModule extends AbstractModule {
 	
@@ -59,14 +50,8 @@ public class ObmSyncModule extends AbstractModule {
 		this.servletContext = servletContext;
 	}
 
-	private static final String APPLICATION_NAME = "sync";
-	private static final String GLOBAL_CONFIGURATION_FILE = ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH;
-	
 	@Override
 	protected void configure() {
-		final GlobalAppConfiguration<ObmSyncConfigurationService> globalConfiguration = buildConfiguration();
-		bind(ObmSyncConfigurationService.class).toInstance(globalConfiguration.getConfiguration());
-		install(new ConfigurationModule<ObmSyncConfigurationService> (globalConfiguration, ObmSyncConfigurationService.class));
 		install(new ObmSyncServletModule());
 		install(new ObmSyncServicesModule());
 		install(new MessageQueueModule());
@@ -81,13 +66,4 @@ public class ObmSyncModule extends AbstractModule {
 		install(new JerseyServletModule());
 	}
 
-	private GlobalAppConfiguration<ObmSyncConfigurationService> buildConfiguration() {
-		ObmSyncConfigurationServiceImpl configurationService = new ObmSyncConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
-		return GlobalAppConfiguration.<ObmSyncConfigurationService>builder()
-					.mainConfiguration(configurationService)
-					.locatorConfiguration(new LocatorConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
-					.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
-					.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, configurationService))
-					.build();
-	}
 }

@@ -46,6 +46,7 @@ import org.obm.provisioning.resources.ProfileResource;
 import org.obm.provisioning.resources.UserResource;
 import org.obm.provisioning.resources.UserWriteResource;
 import org.obm.satellite.client.SatelliteClientModule;
+import org.obm.sync.ObmSyncConfigurationModule;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
@@ -88,6 +89,7 @@ public class ProvisioningService extends ServletModule {
 
 		bindRestResources();
 
+		install(new ObmSyncConfigurationModule());
 		install(new DaoModule());
 		install(new BatchProcessingModule());
 		install(new LdapModule());

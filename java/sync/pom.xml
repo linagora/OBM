@@ -119,6 +119,7 @@
 		<module>provisioning-client</module>
 		<module>qos-filter</module>
 		<module>satellite-client</module>
+		<module>services-configuration-module</module>
 		<module>services-module</module>
 		<module>services-webapp</module>
 		<module>transaction-test</module>
@@ -459,6 +460,11 @@ org.eclipse.jdt.core.compiler.source=1.6
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
 				<artifactId>satellite-client</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>services-configuration-module</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
