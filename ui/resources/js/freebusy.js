@@ -44,28 +44,14 @@ Obm.CalendarFreeBusy = new Class({
    * parameters are >= to lastHour), and there is no time slot at this point.
    */
   getAlmostDisplayableDateTime: function(dateTime) {
-    var hours = dateTime.getHours();
-    var minutes = dateTime.getMinutes();
+    var firstSlotTimestampInSeconds = parseInt(this.ts[0], 10);
+    var lastSlotTimestampInSeconds = parseInt(this.ts[this.ts.length - 1], 10);
 
-    var dateHours;
-    var dateMinutes;
-
-    if (hours < this.firstHour) {
-      dateHours = this.firstHour;
-      dateMinutes = 0;
-    }
-    else if (hours > this.lastHour) {
-      dateHours = this.lastHour;
-      dateMinutes = 0;
-    }
-    else {
-      dateHours = hours;
-      dateMinutes = minutes;
-    }
-    var displayableDateTime = new Obm.DateTime(dateTime);
-    displayableDateTime.setHours(dateHours);
-    displayableDateTime.setMinutes(dateMinutes);
-    return displayableDateTime;
+    var dateTimeTimestampInSeconds = dateTime.getTime() / 1000;
+    var normalizedDateTimeTimestampInSeconds = Math.min(
+            Math.max(dateTimeTimestampInSeconds, firstSlotTimestampInSeconds),
+            lastSlotTimestampInSeconds);
+    return new Date(normalizedDateTimeTimestampInSeconds * 1000);
   },
 
   /**
