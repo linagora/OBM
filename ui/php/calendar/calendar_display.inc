@@ -2841,7 +2841,6 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
     $freeBusy_read_only = true;
   }
 
-  $freebusy = html_freebusy_header();
   $block .= "
   <div class=\"detail extra\">
   <h1>" . sprintf($l_conflicts_limit, $ccalendar_conflicts_limit) . "</h1>
@@ -2864,7 +2863,6 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
    <input type='hidden' id='sel_time_begin' value='$time_begin' />
    <input type='hidden' id='sel_min_begin' value='$min_begin' />
   </div>
-  $freebusy
   </div>";
 
   return $block;
@@ -5549,7 +5547,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $template_popup = html_calendar_template_name_popup();
 
   $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
-  $freebusy = html_freebusy_header();
 
   // --- HTML Template --------------------------------------------------------
   $block = "
@@ -5668,7 +5665,6 @@ $date_edit_occurrence
   $dis_attendees_notification
   <fieldset class=\"buttons\">$dis_button $hidden_repeat</fieldset>
   </form>
-  $freebusy
 
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
@@ -6157,7 +6153,6 @@ function dis_calendar_meeting_form($current_view, $calendar) {
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[0]";
 
   $GLOBALS['js']['vars']['consts']['calendarUrl'] = $GLOBALS[path].'/calendar/'.basename($_SERVER['SCRIPT_NAME']);
-  $freebusy = html_freebusy_header();
 
   // --- HTML Template --------------------------------------------------------
   $block = "
@@ -6185,7 +6180,6 @@ function dis_calendar_meeting_form($current_view, $calendar) {
     $dis_button
   </fieldset>    
   </form>
-  $freebusy
 
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
@@ -6729,7 +6723,6 @@ function html_freebusy_header() {
     <div id='fbc' class='freeBusyContent'></div>
   </div>";
   return $block;
-
 }
 
 
