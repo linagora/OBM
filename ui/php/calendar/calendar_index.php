@@ -1350,7 +1350,7 @@ if ($action == 'search') {
 $_SESSION['cal_current_view'] = serialize($current_view);
 
 if (!$params['ajax']) {
-  $display['head'] = display_head($l_calendar);
+  $display['head'] = display_head($l_calendar).html_freebusy_header();
   $display['header'] = display_menu($module);
   $display['end'] = display_end();
   if ($display['search'] == '') {
