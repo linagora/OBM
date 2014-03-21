@@ -511,7 +511,6 @@ public class Ical4jHelperTest {
 		VEvent vEvent = new VEvent();
 		vEvent.getAlarms().add(va);
 		Event event = ical4jHelper.convertVEventToEvent(getDefaultObmUser(), vEvent, 0, newCache());
-		System.out.println("alert: " + event.getAlert());
 		assertThat(event.getAlert()).isNotEqualTo(-1);
 	}
 	
