@@ -15,13 +15,6 @@
             "parentId": null
         },
         {
-            "id": "JavaVersionStatus",
-            "name": "OPush JVM Version Check",
-            "description": "Checks that OPush server(s) run on the proper JVM version",
-            "url": null,
-            "parentId": null
-        },
-        {
             "id": "OpushFolderSyncStatus",
             "name": "Opush Folder Sync Check",
             "description": "Checks that a simple folder sync scenario runs on opush service",
