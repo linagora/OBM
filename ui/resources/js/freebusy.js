@@ -117,7 +117,7 @@ Obm.CalendarFreeBusy = new Class({
    * Build meeting slider, meeting resizer
    */
   buildFreeBusyPanel: function(duration, readOnly) {
-    this.duration = duration;
+    this.duration = parseInt(duration, 10);
     $('duration').value = this.duration*3600;
 
     var eventEndDate = this.getEventEndDate();
