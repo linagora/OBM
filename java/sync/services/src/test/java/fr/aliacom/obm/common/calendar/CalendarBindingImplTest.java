@@ -59,8 +59,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.component.VToDo;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.IArgumentMatcher;
@@ -77,12 +75,9 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.filter.SlowFilterRunner;
-import org.obm.icalendar.ICSParsingResults;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
-import org.obm.icalendar.ParsingResults;
-import org.obm.icalendar.Reject;
 import org.obm.opush.env.JUnitGuiceRule;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.addition.CommitedElement;
@@ -1214,14 +1209,7 @@ public class CalendarBindingImplTest {
 
 	private Ical4jHelper mockIcal4jHelper(Integer ownerId, Ical4jUser ical4jUser, String icsData, Event eventWithOwnerAttendee) throws IOException, ParserException{
 		Ical4jHelper ical4jHelper = createMock(Ical4jHelper.class);
-
-		List<Reject<VEvent>> emptyRejectList = ImmutableList.of();
-		ParsingResults<Event, VEvent> eventParsingResults = new ParsingResults<Event, VEvent>(
-				ImmutableList.of(eventWithOwnerAttendee), emptyRejectList);
-		ParsingResults<Event, VToDo> todoParsingResults = new ParsingResults<Event, VToDo>();
-
-		expect(ical4jHelper.parseICS(icsData, ical4jUser, ownerId)).andReturn(
-				new ICSParsingResults(eventParsingResults, todoParsingResults)).once();
+		expect(ical4jHelper.parseICS(icsData, ical4jUser, ownerId)).andReturn(ImmutableList.of(eventWithOwnerAttendee)).once();
 		return ical4jHelper;
 	}
 

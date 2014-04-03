@@ -156,12 +156,12 @@ import com.google.common.base.Throwables;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.BiMap;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -234,13 +234,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		calendar.getProperties().add(Method.REQUEST);
 		return foldingWriterToString(calendar);
 	}
-
-	public String calendarComponentToString(CalendarComponent component) {
-		Calendar calendar = new Calendar();
-		calendar.getComponents().add(component);
-		return this.foldingWriterToString(calendar);
-	}
-
+	
 	private String foldingWriterToString(final Calendar calendar) {
 		Writer writer =  new StringWriter();
 		CalendarOutputter calendarOutputter = new CalendarOutputter(true, MAX_FOLD_LENGTH);
@@ -334,18 +328,19 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		return freeBusy;
 	}
 
-	public ICSParsingResults parseICS(String ics, Ical4jUser ical4jUser, Integer ownerId) 
+	public List<Event> parseICS(String ics, Ical4jUser ical4jUser, Integer ownerId) 
 		throws IOException, ParserException {
 		
 		Calendar calendar = buildCalendar(ics);
 		Cache<String, Optional<Attendee>> cache = newAttendeeCache();
 
 		if (calendar != null) {
-			return new ICSParsingResults(
+			return ImmutableList.copyOf(
+					Iterables.concat(
 							getEvents(calendar, ical4jUser, ownerId, cache),
-							getTodos(ical4jUser, calendar, ownerId, cache));
+							getTodos(ical4jUser, calendar, ownerId, cache)));
 		}
-		return new ICSParsingResults();
+		return ImmutableList.<Event>of();
 	}
 
 	private Calendar buildCalendar(String ics) throws IOException, ParserException {
@@ -355,92 +350,65 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 	}
 
 
-	public ParsingResults<Event, VEvent> parseICSEvent(String ics, Ical4jUser ical4jUser, Integer ownerId) throws IOException, ParserException {
+	public List<Event> parseICSEvent(String ics, Ical4jUser ical4jUser, Integer ownerId) throws IOException, ParserException {
 		Calendar calendar = buildCalendar(ics);
 		Cache<String, Optional<Attendee>> cache = newAttendeeCache();
 
 		if (calendar != null) {
-			return getEvents(calendar, ical4jUser, ownerId, cache);
+			return ImmutableList.copyOf(getEvents(calendar, ical4jUser, ownerId, cache));
 		}
-		return new ParsingResults<Event, VEvent>();
+		return ImmutableList.<Event>of();
 	}
 
 	private Cache<String, Optional<Attendee>> newAttendeeCache() {
 		return CacheBuilder.newBuilder().build();
 	}
 	
-	private ParsingResults<Event, VToDo> getTodos(Ical4jUser ical4jUser, Calendar calendar, Integer ownerId, Cache<String, Optional<Attendee>> cache) {
+	private Collection<Event> getTodos(Ical4jUser ical4jUser, Calendar calendar, Integer ownerId, Cache<String, Optional<Attendee>> cache) {
 		List<Event> todos = Lists.newArrayList();
 		ComponentList comps = getComponents(calendar, Component.VTODO);
-		List<Reject<VToDo>> rejects = Lists.newArrayList();
 		for (Object obj: comps) {
 			VToDo vTodo = (VToDo) obj;
-			try {
-				Event event = convertVTodoToEvent(ical4jUser, vTodo, ownerId, cache);
-				todos.add(event);
-			}
-			catch (ICSConversionException ex) {
-				rejects.add(new Reject<VToDo>(vTodo, ex.getMessage()));
-			}
+			Event event = convertVTodoToEvent(ical4jUser, vTodo, ownerId, cache);
+			todos.add(event);
 		}
-		return new ParsingResults<Event, VToDo>(todos, rejects);
+		return todos;
 	}
 
-	private ParsingResults<Event, VEvent> getEvents(Calendar calendar, Ical4jUser ical4jUser, Integer ownerId, Cache<String, Optional<Attendee>> cache) {
+	private Collection<Event> getEvents(Calendar calendar, Ical4jUser ical4jUser, Integer ownerId, Cache<String, Optional<Attendee>> cache) {
 		Map<EventExtId, Event> mapEvents = Maps.newHashMap();
 		Multimap<EventExtId, Event> mapExceptionEvents = HashMultimap.create();
 		ComponentList comps = getComponents(calendar, Component.VEVENT);
-		List<Reject<VEvent>> rejects = Lists.newArrayList();
-		final Map<EventExtId, VEvent> mapVEvents = Maps.newHashMap();
 		for (Object obj: comps) {
 			VEvent vEvent = (VEvent) obj;
-			try{
-				Event event = convertVEventToEvent(ical4jUser, vEvent, ownerId, cache);
-				if (event.getRecurrenceId() == null) {
-					mapEvents.put(event.getExtId(), event);
-				} else {
-					mapExceptionEvents.put(event.getExtId(), event);
-				}
-				mapVEvents.put(event.getExtId(), vEvent);
-			}
-			catch(ICSConversionException ex) {
-				rejects.add(new Reject<VEvent>(vEvent, ex.getMessage()));
+			Event event = convertVEventToEvent(ical4jUser, vEvent, ownerId, cache);
+			if(event.getRecurrenceId() == null) {
+				mapEvents.put(event.getExtId(), event);
+			} else {
+				mapExceptionEvents.put(event.getExtId(), event);
 			}
 		}
-		ParsingResults<Event, Event> eventsWithExceptionResults = addEventExceptionToDefinedParentEvent(
-				mapEvents, mapExceptionEvents);
-		rejects.addAll(Collections2.transform(eventsWithExceptionResults.getRejectedItems(),
-				new Function<Reject<Event>, Reject<VEvent>>() {
-
-					@Override
-					public Reject<VEvent> apply(Reject<Event> rejectedException) {
-						return new Reject<VEvent>(mapVEvents.get(rejectedException.getItem()),
-								rejectedException.getReason());
-					}
-
-				}));
-		return new ParsingResults<Event, VEvent>(eventsWithExceptionResults.getParsedItems(),
-				rejects);
+		return addEventExceptionToDefinedParentEvent(mapEvents, mapExceptionEvents);
 	}
 
-	private ParsingResults<Event, Event> addEventExceptionToDefinedParentEvent(
+	private Collection<Event> addEventExceptionToDefinedParentEvent(
 			Map<EventExtId, Event> mapEvents,
 			Multimap<EventExtId, Event> mapExceptionEvents) {
 
 		Collection<Entry<EventExtId, Collection<Event>>> mapExceptionEventsEntries = mapExceptionEvents.asMap().entrySet();
-		List<Reject<Event>> rejects = Lists.newArrayList();
+
 		for (Entry<EventExtId, Collection<Event>> entry : mapExceptionEventsEntries) {
 			Event parentEvent = mapEvents.get(entry.getKey());
-			Collection<Event> eventExceptions = entry.getValue();
+			Collection<Event> eventsException = entry.getValue();
 			if (parentEvent != null) {
-				addOrReplaceExceptions(parentEvent.getRecurrence(), eventExceptions);
+				addOrReplaceExceptions(parentEvent.getRecurrence(), eventsException);
 			} else {
-				for (Event eventException : eventExceptions) {
-					rejects.add(new Reject<Event>(eventException, "Parent event to this exception event not found"));
-				}
+				logger.warn(
+						"Drop following events exception while parsing ICS file because parent was not defined: {}",
+						eventsException);
 			}
 		}
-		return new ParsingResults<Event, Event>(mapEvents.values(), rejects);
+		return mapEvents.values();
 	}
 
 	private void addOrReplaceExceptions(EventRecurrence recurrenceTarget, Collection<Event> eventsToAdd) {
@@ -450,8 +418,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		recurrenceTarget.getEventExceptions().addAll(eventsToAdd);
 	}
 	
-	/* package */ Event convertVEventToEvent(Ical4jUser ical4jUser, VEvent vEvent, Integer ownerId, Cache<String, Optional<Attendee>> cache)
-			throws ICSConversionException {
+	/* package */ Event convertVEventToEvent(Ical4jUser ical4jUser, VEvent vEvent, Integer ownerId, Cache<String, Optional<Attendee>> cache) {
 		Event event = new Event();
 		event.setType(EventType.VEVENT);
 		appendSummary(event, vEvent.getSummary());
@@ -478,8 +445,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		return event;
 	}
 
-	/* package */ Event convertVTodoToEvent(Ical4jUser ical4jUser, VToDo vTodo, Integer ownerId, Cache<String, Optional<Attendee>> cache)
-			throws ICSConversionException {
+	/* package */ Event convertVTodoToEvent(Ical4jUser ical4jUser, VToDo vTodo, Integer ownerId, Cache<String, Optional<Attendee>> cache) {
 		Event event = new Event();
 		event.setType(EventType.VTODO);
 		appendSummary(event, vTodo.getSummary());
@@ -1314,8 +1280,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		return false;
 	}
 
-	private void appendRecurence(Event event, CalendarComponent component)
-			throws ICSConversionException {
+	private void appendRecurence(Event event, CalendarComponent component) {
 		EventRecurrence er = new EventRecurrence();
 		RRule rrule = (RRule) component.getProperty(Property.RRULE);
 		EnumSet<RecurrenceDay> recurrenceDays = EnumSet.noneOf(RecurrenceDay.class);
@@ -1338,129 +1303,40 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 			}
 
 			er.setDays(new RecurrenceDays(recurrenceDays));
+			er.setEnd(recur.getUntil());
 			er.setFrequence(Math.max(recur.getInterval(), 1)); // getInterval() returns -1 if no interval is defined
 
-			RecurrenceKind recurrenceKind = computeRecurrenceKindOrDefault(event, er, recur);
-			er.setKind(recurrenceKind);
-			er.setEnd(computeLastOccurrence(component, recurrenceKind));
+			if (er.getDays().isEmpty()) {
+				if (Recur.DAILY.equals(frequency)) {
+					er.setKind(RecurrenceKind.daily);
+				} else if (Recur.WEEKLY.equals(frequency)) {
+					er.setKind(RecurrenceKind.weekly);
+				} else if (Recur.MONTHLY.equals(frequency)) {
+					WeekDayList wdl = recur.getDayList();
+
+					if (wdl.size() > 0) {
+						WeekDay day = (WeekDay) wdl.get(0);
+						GregorianCalendar cal = getEventStartCalendar(event);
+
+						er.setKind(RecurrenceKind.monthlybyday);
+						cal.set(GregorianCalendar.DAY_OF_WEEK, WeekDay.getCalendarDay(day));
+						cal.set(GregorianCalendar.DAY_OF_WEEK_IN_MONTH, day.getOffset());
+						event.setStartDate(cal.getTime());
+					} else {
+						er.setKind(RecurrenceKind.monthlybydate);
+					}
+
+				} else if (Recur.YEARLY.equals(frequency)) {
+					er.setKind(RecurrenceKind.yearly);
+				}
+			} else {
+				er.setKind(RecurrenceKind.weekly);
+			}
 		}
 
 		event.setRecurrence(er);
 
 		appendNegativeExceptions(event, component.getProperties(Property.EXDATE));
-	}
-
-	private RecurrenceKind computeRecurrenceKindOrDefault(Event event, EventRecurrence er,
-			Recur recur) throws ICSConversionException {
-		RecurrenceKind recurrenceKind;
-		if (er.getDays().isEmpty()) {
-			recurrenceKind = computeRecurrenceKind(recur);
-			if (recurrenceKind == RecurrenceKind.monthlybyday) {
-				GregorianCalendar eventStartCalendar = getEventStartCalendar(event);
-				event.setStartDate(computeStartDateForMonthlyByDayEvent(recur,
-						eventStartCalendar));
-			}
-		} else {
-			recurrenceKind = RecurrenceKind.weekly;
-		}
-		return recurrenceKind;
-	}
-
-	private RecurrenceKind computeRecurrenceKind(Recur recur) throws ICSConversionException {
-		String frequency = recur.getFrequency();
-		RecurrenceKind recurrenceKind;
-		if (Recur.DAILY.equals(frequency)) {
-			recurrenceKind = RecurrenceKind.daily;
-		} else if (Recur.WEEKLY.equals(frequency)) {
-			recurrenceKind = RecurrenceKind.weekly;
-		} else if (Recur.MONTHLY.equals(frequency)) {
-			WeekDayList wdl = recur.getDayList();
-
-			if (wdl.size() > 0) {
-				recurrenceKind = RecurrenceKind.monthlybyday;
-			} else {
-				recurrenceKind = RecurrenceKind.monthlybydate;
-			}
-
-		} else if (Recur.YEARLY.equals(frequency)) {
-			recurrenceKind = RecurrenceKind.yearly;
-		}
-		else {
-			throw new ICSConversionException(
-					String.format("Unable to handle recurrence rule frequency %s",
-							frequency));
-		}
-		return recurrenceKind;
-	}
-
-	private Date computeStartDateForMonthlyByDayEvent(Recur recur,
-			GregorianCalendar eventStartCalendar) {
-		WeekDayList wdl = recur.getDayList();
-
-		// The weekday list is guaranteed non-empty for a monthly by day event
-		WeekDay day = (WeekDay) wdl.get(0);
-
-		eventStartCalendar.set(GregorianCalendar.DAY_OF_WEEK, WeekDay.getCalendarDay(day));
-		eventStartCalendar.set(GregorianCalendar.DAY_OF_WEEK_IN_MONTH, day.getOffset());
-		return eventStartCalendar.getTime();
-	}
-
-	private Date computeLastOccurrence(CalendarComponent component,
-			RecurrenceKind parsedRecurrenceKind) throws ICSConversionException {
-		RRule rrule = (RRule) component.getProperty(Property.RRULE);
-		Date until = rrule.getRecur().getUntil();
-		int count = rrule.getRecur().getCount();
-
-		Date lastOccurrence;
-		if (until != null) {
-			if (count != -1) {
-				throw new ICSConversionException(
-						"Found invalid recurrence containing both UNTIL and COUNT");
-			}
-			else {
-				lastOccurrence = until;
-			}
-		}
-		else if (count != -1) {
-			lastOccurrence = computeLastOccurrenceUsingCount(component, parsedRecurrenceKind);
-		}
-		else {
-			lastOccurrence = null;
-		}
-		return lastOccurrence;
-	}
-
-	private Date computeLastOccurrenceUsingCount(CalendarComponent component, RecurrenceKind parsedRecurrenceKind) {
-		org.joda.time.DateTime dtStart = new org.joda.time.DateTime(((DtStart)component.getProperty(Property.DTSTART)).getDate());
-		RRule rrule = (RRule) component.getProperty(Property.RRULE);
-		int interval = rrule.getRecur().getInterval() != -1 ? rrule.getRecur().getInterval() : 1;
-		// Substract 1 from count as the first occurrence is dtstart
-		int timeUnitCount = (rrule.getRecur().getCount() - 1) * interval;
-
-		org.joda.time.DateTime lastOccurrence = null;
-		switch (parsedRecurrenceKind) {
-		case none:
-			break;
-		case daily:
-			lastOccurrence = dtStart.plusDays(timeUnitCount);
-			break;
-		case weekly:
-			lastOccurrence = dtStart.plusWeeks(timeUnitCount);
-			break;
-		case monthlybydate:
-			lastOccurrence = dtStart.plusMonths(timeUnitCount);
-			break;
-		case monthlybyday:
-			lastOccurrence = dtStart.plusMonths(timeUnitCount);
-			break;
-		case yearly:
-			lastOccurrence = dtStart.plusYears(timeUnitCount);
-			break;
-		case yearlybyday:
-			lastOccurrence = dtStart.plusYears(timeUnitCount);
-			break;
-		}
-		return lastOccurrence != null ? lastOccurrence.toDate() : null;
 	}
 
 	private void appendNegativeExceptions(Event event, PropertyList exdates) {

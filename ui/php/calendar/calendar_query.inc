@@ -5585,7 +5585,8 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
               // Repeat events
               $event_start = clone $date;
               $event_start->setHour(0)->setMinute(0)->setSecond(0);
-              $event_end = compute_recurrence_end($vevent, $end);
+              $event_end = ($rrule['until'] != null && $end->compare($rrule['until']) > 0)? clone $rrule['until']: clone $end; 
+              $event_end->setHour(0)->setMinute(0)->setSecond(0)->addSecond(1);
               switch($rrule['freq']) {
                 case 'daily' :
                   calendar_daily_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $partstat);
@@ -5624,79 +5625,6 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
   }
 
   return $of->getOccurrences(); 
-}
-
-function compute_recurrence_end($vevent, $display_period_end_date) {
-  $rrule = $vevent->getRrule();
-  if ($rrule == null) {
-    return null;
-  }
-  $last_occurrence = null;
-  if ($rrule['until'] != null) {
-    if ($rrule['count'] != null) {
-      error_log("Got event with invalid recurrence rule: contains both UNTIL and COUNT");
-    }
-    $last_occurrence = $rrule['until'];
-  }
-  elseif ($rrule['count'] != null) {
-    $last_occurrence = compute_last_occurrence_from_count($vevent);
-  }
-  $recurrence_end = $last_occurrence != null ? $last_occurrence->addTimestamp($vevent->getDuration()) : null;
-  $recurrence_end_within_display_period = $recurrence_end != null && $display_period_end_date->compare($until) > 0 ?
-    $recurrence_end :
-    clone $display_period_end_date;
-  return $recurrence_end_within_display_period;
-}
-
-function get_freq($rrule) {
-  $freq = $rrule['freq'];
-  if ($freq == null) {
-    error_log("Got an invalid recurrence rule without a freq: ".print_r($rrule, true));
-    return null;
-  }
-  if (!in_array($freq, array('secondly', 'minutely', 'hourly', 'daily', 'weekly', 'monthly', 'yearly'))) {
-    error_log("Got unknown freq type '".$freq."' in recurrence rule: ".print_r($rrule, true));
-    return null;
-  }
-  return $freq;
-}
-
-function compute_last_occurrence_from_count($vevent) {
-  $rrule = $vevent->getRrule();
-  $freq = get_freq($rrule);
-  if ($freq == null) {
-    return null;
-  }
-  $count = (int)$rrule['count'];
-  $interval = $rrule['interval'] != null ? (int)$rrule['interval'] : 1;
-  $event_dtstart = clone $vevent->start;
-  $last_occurrence = null;
-  # Decrease count as DTSTART count as the first occurrence
-  $time_unit_count = $interval * ($count - 1);
-  switch ($freq) {
-    case 'secondly':
-      $last_occurrence = $event_dtstart->addSecond($time_unit_count);
-      break;
-    case 'minutely':
-      $last_occurrence = $event_dtstart->addMinute($time_unit_count);
-      break;
-    case 'hourly':
-      $last_occurrence = $event_dtstart->addHour($time_unit_count);
-      break;
-    case 'daily':
-      $last_occurrence = $event_dtstart->addDay($time_unit_count);
-      break;
-    case 'weekly':
-      $last_occurrence = $event_dtstart->addWeek($time_unit_count);
-      break;
-    case 'monthly':
-      $last_occurrence = $event_dtstart->addMonth($time_unit_count);
-      break;
-    case 'yearly':
-      $last_occurrence = $event_dtstart->addYear($time_unit_count);
-      break;
-  }
-  return $last_occurrence;
 }
 
 function calendar_add_anonymous_occurrences($repeatkind, $date, $event_start, $event_end, $repeatfrequence, $event, $entity_id, $entity, $entity_state, $repeatdays = null) {
