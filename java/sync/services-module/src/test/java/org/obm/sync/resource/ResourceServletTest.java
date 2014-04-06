@@ -38,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -45,9 +46,12 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.fortuna.ical4j.util.TimeZones;
+
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.DateUtils;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.calendar.Event;
@@ -223,4 +227,52 @@ public class ResourceServletTest {
 		control.verify();
 	}
 
+	@Test
+	public void testStartdateTimezone() throws Exception {
+		Collection<Event> collectionEvents = new ArrayList<Event>();
+		Event event = new Event();
+		Date date = DateUtils.dateInZone("2013-01-01T01:01:01", "Asia/Jerusalem");
+
+		event.setExtId(new EventExtId("fake_extId_paris"));
+		event.setStartDate(date);
+		event.setDuration(3600);
+		event.setTimezoneName("Asia/Jerusalem");
+		collectionEvents.add(event);
+
+		String expected = "DTSTART;TZID=Asia/Jerusalem:20130101T010101";
+
+		expect(
+				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class), anyObject(SyncRange.class)))
+				.andReturn(collectionEvents);
+
+		control.replay();
+
+		String ics = resourceServlet.getResourceICS("resource@domain", new SyncRange(null, null));
+		assertThat(ics).contains(expected);
+		control.verify();
+	}
+	@Test
+	public void testStartdateUTC() throws Exception {
+		Collection<Event> collectionEvents = new ArrayList<Event>();
+		Event event = new Event();
+		Date date = DateUtils.date("2013-01-01T01:01:01Z");
+
+		event = new Event();
+		event.setExtId(new EventExtId("fake_extId_utc"));
+		event.setStartDate(date);
+		event.setDuration(3600);
+		event.setTimezoneName(TimeZones.UTC_ID);
+		collectionEvents.add(event);
+
+		String expected = "DTSTART:20130101T010101Z";
+
+		expect(
+				calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class), anyObject(SyncRange.class)))
+				.andReturn(collectionEvents);
+
+		control.replay();
+		String ics = resourceServlet.getResourceICS("resource@domain", new SyncRange(null, null));
+		assertThat(ics).contains(expected);
+		control.verify();
+	}
 }
