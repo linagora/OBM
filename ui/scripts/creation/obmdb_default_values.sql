@@ -13,7 +13,7 @@
 
 -- Update DB version
 DELETE FROM ObmInfo where obminfo_name='db_version';
-INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('db_version', '2.6.0');
+INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('db_version', '3.0.0');
 DELETE FROM ObmInfo where obminfo_name='remote_access';
 INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('remote_access', '0');
 DELETE FROM ObmInfo where obminfo_name='update_lock';
