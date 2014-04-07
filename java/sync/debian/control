@@ -6,7 +6,6 @@ Build-Depends: cdbs, maven, debhelper (>= 5.0), java-sdk, java-compiler
 Standards-Version: 3.8.3
 Homepage: http://www.obm.org
 
-
 Package: obm-sync
 Architecture: all
 Pre-Depends: obm-conf, obm-tomcat, obm-tomcat-common-libs
@@ -49,17 +48,6 @@ Package: obm-tomcat-common-libs
 Architecture: all
 Pre-Depends: obm-tomcat
 Description: Tomcat common libs for Open Business Management
- This package contains the library used by obm webapps deployed in tomcat.
- .
- OBM is a global groupware, messaging and CRM application. It is intended to
- be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
- simple contact database. OBM also features integration with PDAs, smartphones,
- Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
-
-Package: obm-jetty-common-libs
-Architecture: all
-Pre-Depends: obm-jetty
-Description: Jetty common libs for Open Business Management
  This package contains the library used by obm webapps deployed in tomcat.
  .
  OBM is a global groupware, messaging and CRM application. It is intended to

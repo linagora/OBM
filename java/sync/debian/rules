@@ -59,6 +59,3 @@ install/obm-locator::
 install/obm-tomcat-common-libs::
 	cp $(CURDIR)/webapp-common-dependencies/target/tomcat/*.jar $(CURDIR)/debian/obm-tomcat-common-libs/usr/share/tomcat/lib/
 
-install/obm-jetty-common-libs::
-	cp $(CURDIR)/webapp-common-dependencies/target/jetty/*.jar $(CURDIR)/debian/obm-jetty-common-libs/usr/share/jetty/lib/
-

@@ -4,7 +4,6 @@
 %global _binary_payload w9.gzdio
 %global _source_payload w9.gzdio
 
-%global jetty_home /usr/share/jetty6
 Name: obm-sync
 Version: %{obm_version}
 Release: %{obm_release}%{?dist}
@@ -82,19 +81,6 @@ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
 simple contact database. OBM also features integration with PDAs, smartphones,
 Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
-%package -n obm-jetty-common-libs
-Summary: Jetty common libs for Open Business Management
-Group:  Development/Tools
-Requires: obm-jetty
-
-%description -n obm-jetty-common-libs
-This package contains the library used by obm webapps deployed in tomcat.
-
-OBM is a global groupware, messaging and CRM application. It is intended to
-be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
-simple contact database. OBM also features integration with PDAs, smartphones,
-Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
-
 %prep
 %setup -q -n obm-java-%{version}
 
@@ -145,13 +131,8 @@ rm -f $RPM_BUILD_ROOT%{_datadir}/obm-autoconf/WEB-INF/lib/logback*.jar
 rm -f $RPM_BUILD_ROOT%{_datadir}/obm-autoconf/WEB-INF/lib/jta-1.1.jar
 cp %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/obm-tomcat/applis/
 
-
-# obm-jetty-common-libs
-mkdir -p $RPM_BUILD_ROOT/%{jetty_home}/lib/ext
-cp -p webapp-common-dependencies/target/jetty/*.jar \
-  $RPM_BUILD_ROOT/%{jetty_home}/lib/ext
-
 # obm-tomcat-common-libs
+
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/tomcat/lib
 cp -p webapp-common-dependencies/target/tomcat/*.jar \
   $RPM_BUILD_ROOT%{_datadir}/tomcat/lib/
@@ -183,11 +164,6 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %defattr(-,root,root,-)
 %{_datadir}/tomcat/lib/*.jar
 
-%files -n obm-jetty-common-libs
-%defattr(-,root,root,-)
-%{jetty_home}/lib/ext/*.jar
-
-
 %pre -n obm-locator
 # Create locator user if it doesn't exist
 id locator >/dev/null 2>&1
@@ -195,18 +171,11 @@ if [ "$?" = "1" ]; then
   useradd --system --gid adm locator
 fi
 
-# If the locator exists as a jetty webapp,
-# stop jetty to release exclusives resources
-if [ -e %{jetty_home}/webapps/obm-locator ]; then
-    /sbin/service jetty6 stop >/dev/null 2>&1 || :
-fi
-
 %post -n obm-locator
 chown -R locator:adm %{_localstatedir}/log/obm-locator
 chown -R locator:adm %{_localstatedir}/lib/obm-locator
 chown -R locator:adm %{_localstatedir}/run/obm-locator
 /sbin/service obm-locator restart >/dev/null 2>&1 || :
-/sbin/service jetty6 start >/dev/null 2>&1 || :
 
 %post -n obm-sync
 if [ "$1" = "1" ]; then
