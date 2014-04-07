@@ -20,33 +20,6 @@ Description: synchronization application for Open Business Management
  simple contact database. OBM also features integration with PDAs, smartphones,
  Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
-Package: opush
-Architecture: all
-Depends: obm-conf, obm-jetty-common-libs
-Provides: obm-opush
-Replaces: obm-opush ( << 2.3.3-1 )
-Conflicts: obm-opush ( << 2.3.3-1 )
-Description: Active Sync server for Open Business Management
- This package synchronizes a Jetty web application to synchronize OBM data with
- PDA and smartphones.
- .
- OBM is a global groupware, messaging and CRM application. It is intended to
- be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
- simple contact database. OBM also features integration with PDAs, smartphones,
- Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
-
-Package: obm-opush
-Architecture: all
-Depends: opush
-Description: Transitional package for opush
- This is a transitional package for opush, and can be safely removed
- after the installation is complete.
- .
- OBM is a global groupware, messaging and CRM application. It is intended to
- be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
- simple contact database. OBM also features integration with PDAs, smartphones,
- Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
-
 Package: obm-locator
 Architecture: all
 Depends: obm-conf, openssl
@@ -88,17 +61,6 @@ Architecture: all
 Pre-Depends: obm-jetty
 Description: Jetty common libs for Open Business Management
  This package contains the library used by obm webapps deployed in tomcat.
- .
- OBM is a global groupware, messaging and CRM application. It is intended to
- be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
- simple contact database. OBM also features integration with PDAs, smartphones,
- Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
-
-Package: spushnik
-Architecture: all
-Depends: obm-jetty-common-libs
-Description: Opush probe
- This package contains a Java webapp probe able to check the status of an Opush server instance.
  .
  OBM is a global groupware, messaging and CRM application. It is intended to
  be an Exchange Or Notes/Domino Mail replacement, but can also be used as a

@@ -8,7 +8,7 @@ Homepage: http://www.obm.org
 
 Package: obm-full
 Architecture: all
-Depends: obm-filter (= ${binary:Version}), obm-satellite (= ${binary:Version}), obm-sync (= ${binary:Version}), opush (= ${binary:Version}), obm-storage (= ${binary:Version}), obm-ldap (= ${binary:Version}), obm-ui (= ${binary:Version}) , obm-cyrus (= ${binary:Version}) , obm-postfix (= ${binary:Version}), obm-services (= ${binary:Version}), obm-locator (= ${binary:Version}), obm-solr (= ${binary:Version}), ${misc:Depends}
+Depends: obm-filter (= ${binary:Version}), obm-satellite (= ${binary:Version}), obm-sync (= ${binary:Version}), obm-storage (= ${binary:Version}), obm-ldap (= ${binary:Version}), obm-ui (= ${binary:Version}) , obm-cyrus (= ${binary:Version}) , obm-postfix (= ${binary:Version}), obm-services (= ${binary:Version}), obm-locator (= ${binary:Version}), obm-solr (= ${binary:Version}), ${misc:Depends}
 Description: Open Business Management, a groupware solution (metapackage)
  This package is a metapackage that, when installed, guarantees that you have
  all the different components of OBM installed. Removing this package won't
@@ -89,7 +89,7 @@ Architecture: all
 Depends:  obm-core (= ${binary:Version}), obm-certs (= ${binary:Version}), php5, apache2, libapache2-mod-php5, php5-pgsql | php5-mysql, php5-gd, php5-imap, php-db, obm-munin-master, ${misc:Depends}
 Recommends: php5-imagick
 Description: web interface configuration for OBM
- This package configures Apache to serve OBM components (obm-ui, obm-storage, opush).
+ This package configures Apache to serve OBM components (obm-ui, obm-storage).
  .
  OBM is a global groupware, messaging and CRM application. It is intended to
  be an Exchange Or Notes/Domino Mail replacement, but can also be used as a

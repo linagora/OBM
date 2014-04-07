@@ -1,8 +1,0 @@
-var/lib/jetty/webapps
-etc/opush
-usr/share
-usr/share/o-push/debian-conf
-var/run/opush
-var/log/opush
-var/lib/opush
-
