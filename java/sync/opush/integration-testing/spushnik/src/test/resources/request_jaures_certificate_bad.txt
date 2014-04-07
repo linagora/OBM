@@ -1,1 +1,0 @@
-{"loginAtDomain":"jaures@sfio.fr","password":"jaures","pkcs12Password":"toto","pkcs12":"bm90X2FfY2VydGlmaWNhdGU="}

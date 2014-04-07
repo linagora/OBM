@@ -1,1 +1,0 @@
-{"loginAtDomain":"jaures@sfio.fr","password":"jaures","pkcs12":null}

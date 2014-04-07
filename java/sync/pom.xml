@@ -115,7 +115,6 @@
 		<module>obm-domain-objects</module>
 		<module>obm-domain-objects-test</module>
 		<module>obm-locator</module>
-		<module>opush</module>	
 		<module>provisioning-module</module>
 		<module>provisioning-client</module>
 		<module>qos-filter</module>
