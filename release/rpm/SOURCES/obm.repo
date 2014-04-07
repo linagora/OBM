@@ -1,23 +1,23 @@
 [obm-release]
 name=obm-release
-baseurl=http://packages.obm.org/rpm/26/next/latest/$releasever
-enabled=1
+baseurl=http://packages.obm.org/rpm/30/release/$releasever
+enabled=0
 gpgcheck=0
 
 [obm-contrib]
 name=obm-contrib
-baseurl=http://packages.obm.org/rpm/26/next/contrib/$releasever
+baseurl=http://packages.obm.org/rpm/30/next/contrib/$releasever
 enabled=1
 gpgcheck=0
 
 [obm-stable]
 name=obm-stable
-baseurl=http://packages.obm.org/rpm/26/stable/latest/$releasever
+baseurl=http://packages.obm.org/rpm/30/stable/latest/$releasever
 enabled=1
 gpgcheck=0
 
 [obm-next]
 name=obm-next
-baseurl=http://packages.obm.org/rpm/26/next/latest/$releasever
+baseurl=http://packages.obm.org/rpm/30/next/latest/$releasever
 enabled=0
 gpgcheck=0
