@@ -86,3 +86,40 @@ $rcmail_config['identities_level'] = 0;
 // Supported values: Andale Mono, Arial, Arial Black, Book Antiqua, Courier New,
 // Georgia, Helvetica, Impact, Tahoma, Terminal, Times New Roman, Trebuchet MS, Verdana
 $rcmail_config['default_font'] = '';
+
+// Example LDAP configuration. If your LDAP server isn't on the same machine,
+// replace 127.0.0.1 in the hosts property by the address of your host.
+$rcmail_config['ldap_public'] ['obm'] = array(
+  'name'          => 'OBM',
+  'hosts'         => array('127.0.0.1'),
+  'port'          => 389,
+  'use_tls'       => false,
+  'user_specific' => false,
+  'base_dn'       => 'dc=local',
+  'bind_dn'       => '',
+  'bind_pass'     => '',
+  'search_base_dn' => '',
+  'search_filter'  => '(&(objectClass=posixAccount)(uid=%u))',
+  'writable'      => false,
+  'ldap_version'  => 3,
+  'search_fields' => array('mail', 'cn'),
+  'name_field'    => 'cn',
+  'hidden'        => false,
+  'email_field'   => 'mail',
+  'surname_field' => 'sn',
+  'firstname_field' => 'gn',
+  'sort'          => 'cn',
+  'scope'         => 'sub',
+  'filter'        => '(&(mail=*)(|(objectClass=obmUser)(objectClass=obmGroup)(objectClass=obmMailShare)))',
+  'fuzzy_search'  => true,
+  'sizelimit'     => '0',
+  'timelimit'     => '0'
+);
+
+// The following makes use of the above LDAP configuration in address books and
+// autocomplete
+$rcmail_config['address_book_type'] = array('sql', 'ldap');
+$rcmail_config['autocomplete_addressbooks'] = array('sql', 'obm');
+
+// Make the HTML editor the default in roundcube
+$rcmail_config['htmleditor'] = 1;
