@@ -85,9 +85,6 @@ UPDATE UserObmPref SET userobmpref_value='${obm_lang}' WHERE userobmpref_option=
 EOF
 
 psql -U ${user} -h ${host} ${db} -f \
-  "../2.5/updates/update-2.4.2.9~0.pgsql.sql" >> /tmp/data_insert.log 2>&1
-
-psql -U ${user} -h ${host} ${db} -f \
   "../2.5/updates/update-2.5.7~1.pgsql.sql" >> /tmp/data_insert.log 2>&1
 
 psql -U ${user} -h ${host} ${db} -f \
