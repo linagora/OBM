@@ -1153,19 +1153,16 @@ function display_head($p_module, $standard=true) {
   ."</div></h2>";
   
   if (show_topmenupopin()) {
-		// load Mustache Engine
-		$m = new Mustache_Engine(array(
-			'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__) . "/mustache"),
-			'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__) . '/mustache/partials'),
-		));
-		// we create the data for mustache
-		$data_mustache['popinmessage'] = $l_popin_message;
-		$data_mustache['button_msg'] = $l_popin_activation_button;
-		$data_mustache['quit_msg'] = $l_close_popin_button;
-
-		// Render the popin mustache template with the correct data : $data_mustache
-		$block = $m->render('popintopbar',$data_mustache);
-		$supportOBMBanner .= $block;  
+		$supportOBMBanner .= "
+      <div class=\"popintopbar\">
+      <form class=\"search\" id=\"popintopbar-form\" method=\"get\" action=\"\">
+        <input type=\"hidden\" name=\"action_popin\" value=\"change_topmenu\" />
+        <label><span class=\"popintopbar-message\">$l_popin_message &nbsp;&nbsp;</span></label>
+        <label><input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_popin_activation_button\" />&nbsp;&nbsp;</label>
+        <label><span class=\"popintopbar-message\"><a href=\"obm.php?action_popin=stop_popin\"><img src=\"../images/themes/default/images/ico_close.gif\" alt=\"close\" title=\"$l_close_popin_button\" /></a></span></label>
+      </form>
+    </div>
+    "; 
 	}
   
   
@@ -1531,7 +1528,7 @@ function display_unified_menu($module) {
         ),
         array(
             "id" => "user",
-            "position" => "left",
+            "position" => "right",
             "text" => $l_intro_user
         ),
     );
