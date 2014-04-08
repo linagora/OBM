@@ -179,6 +179,8 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 	private static final String X_OBM_DOMAIN = "X-OBM-DOMAIN";
 	private static final String X_OBM_DOMAIN_UUID = "X-OBM-DOMAIN-UUID";
 	private static final String XOBMORIGIN = "X-OBM-ORIGIN";
+	private static final boolean DTSTART_WITHOUT_TIMEZONE = false;
+	private static final boolean DTSTART_WITH_TIMEZONE = true;
 
 	private static Logger logger = LoggerFactory.getLogger(Ical4jHelper.class);
 	private static final BiMap<RecurrenceDay, WeekDay> RECURRENCE_DAY_TO_WEEK_DAY = new ImmutableBiMap.Builder<RecurrenceDay, WeekDay>()
@@ -221,11 +223,11 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 
 	public String buildIcsInvitationRequest(Ical4jUser iCal4jUser, Event event, AccessToken token) {
 		Calendar calendar = initCalendar();
-		VEvent vEvent = buildIcsInvitationVEvent(iCal4jUser, event, token);
+		VEvent vEvent = buildIcsInvitationVEvent(iCal4jUser, event, token, DTSTART_WITHOUT_TIMEZONE);
 		calendar.getComponents().add(vEvent);
 		if (event.isRecurrent()) {
 			for (Event ee : event.getRecurrence().getEventExceptions()) {
-				VEvent eventExt = buildIcsInvitationVEventException(ee);
+				VEvent eventExt = buildIcsInvitationVEventException(ee, DTSTART_WITHOUT_TIMEZONE);
 				appendUidToICS(eventExt.getProperties(), ee, event.getExtId());
 				calendar.getComponents().add(eventExt);
 			}
@@ -251,24 +253,29 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 	public String buildIcsInvitationReply(final Event event, final Ical4jUser replyICal4jUser, AccessToken token) {
 		Method method = Method.REPLY;
 		final Attendee replyAttendee = event.findAttendeeFromEmail(replyICal4jUser.getEmail());
-		final Calendar calendar = buildVEvent(replyICal4jUser, event, replyAttendee,method, token);
+		final Calendar calendar = buildVEvent(replyICal4jUser, event, replyAttendee,method, token, DTSTART_WITHOUT_TIMEZONE);
 		calendar.getProperties().add(method);
 		return foldingWriterToString(calendar);
 	}
 	
 	public String buildIcsInvitationCancel(Ical4jUser iCal4jUser, Event event, AccessToken token) {
 		Method method = Method.CANCEL;
-		Calendar calendar = buildVEvent(iCal4jUser, event, null, method, token);
+		Calendar calendar = buildVEvent(iCal4jUser, event, null, method, token, DTSTART_WITHOUT_TIMEZONE);
 		calendar.getProperties().add(method);
 		return foldingWriterToString(calendar);
 	}
 	
 	public String buildIcs(Ical4jUser iCal4jUser, Collection<Event> events, AccessToken token) {
-		Calendar calendar = this.buildVEvents(iCal4jUser, events, null, null, token);
+		Calendar calendar = this.buildVEvents(iCal4jUser, events, null, null, token, DTSTART_WITHOUT_TIMEZONE);
+		return foldingWriterToString(calendar);
+	}
+	
+	public String buildIcsWithTimeZoneOnDtStart(Ical4jUser iCal4jUser, Collection<Event> events, AccessToken token) {
+		Calendar calendar = this.buildVEvents(iCal4jUser, events, null, null, token, DTSTART_WITH_TIMEZONE);
 		return foldingWriterToString(calendar);
 	}
 
-	private VEvent buildIcsInvitationVEventDefaultValue(Event event) {
+	private VEvent buildIcsInvitationVEventDefaultValue(Event event, boolean dtStartWithTimeZone) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 		appendDtstamp(event, vEvent);
@@ -277,7 +284,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		appendSequence(prop, event);
 		appendAttendeesToICS(prop, event.getAttendees());
 		appendCategoryToICS(prop, event);
-		appendEventDates(prop, event);
+		appendEventDates(prop, event, dtStartWithTimeZone);
 		appendDescriptionToICS(prop, event);
 		appendLocationToICS(prop, event);
 		appendTranspToICS(prop, event);
@@ -293,12 +300,12 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		return vEvent;
 	}
 
-	private VEvent buildIcsInvitationVEventException(Event event) {
-		return buildIcsInvitationVEventDefaultValue(event);
+	private VEvent buildIcsInvitationVEventException(Event event, boolean dtStartWithTimeZone) {
+		return buildIcsInvitationVEventDefaultValue(event, dtStartWithTimeZone);
 	}
 	
-	private VEvent buildIcsInvitationVEvent(Ical4jUser iCal4jUser, Event event, AccessToken token) {
-		VEvent vEvent = buildIcsInvitationVEventDefaultValue(event);
+	private VEvent buildIcsInvitationVEvent(Ical4jUser iCal4jUser, Event event, AccessToken token, boolean dtStartWithTimeZone) {
+		VEvent vEvent = buildIcsInvitationVEventDefaultValue(event, dtStartWithTimeZone);
 		PropertyList prop = vEvent.getProperties();
 		appendUidToICS(prop, event, null);
 		appendXObmDomainProperties(iCal4jUser, prop);
@@ -683,7 +690,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		Calendar calendar = initCalendar();
 
 		for (Event event : listEvent) {
-			VEvent vEvent = getVEvent(iCal4jUser, event, null, null, token);
+			VEvent vEvent = getVEvent(iCal4jUser, event, null, null, token, DTSTART_WITHOUT_TIMEZONE);
 			calendar.getComponents().add(vEvent);
 		}
 		return calendar.toString();
@@ -691,7 +698,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 
 	public String parseEvent(Event event, Ical4jUser iCal4jUser, AccessToken token) {
 		if (EventType.VEVENT.equals(event.getType())) {
-			Calendar c = buildVEvent(iCal4jUser, event, null, null, token);
+			Calendar c = buildVEvent(iCal4jUser, event, null, null, token, DTSTART_WITHOUT_TIMEZONE);
 			return c.toString();
 		} else if (EventType.VTODO.equals(event.getType())) {
 			Calendar c = buildVTodo(event, iCal4jUser);
@@ -713,19 +720,19 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		return calendar;
 	}
 
-	private Calendar buildVEvent(Ical4jUser iCal4jUser, Event event, Attendee replyAttendee, Method method, AccessToken token) {
-		return buildVEvents(iCal4jUser, Arrays.asList(event), replyAttendee, method, token);
+	private Calendar buildVEvent(Ical4jUser iCal4jUser, Event event, Attendee replyAttendee, Method method, AccessToken token, boolean dtStartWithTimeZone) {
+		return buildVEvents(iCal4jUser, Arrays.asList(event), replyAttendee, method, token, dtStartWithTimeZone);
 	}
 
-	private Calendar buildVEvents(Ical4jUser iCal4jUser, Collection<Event> events, Attendee replyAttendee, Method method, AccessToken token) {
+	private Calendar buildVEvents(Ical4jUser iCal4jUser, Collection<Event> events, Attendee replyAttendee, Method method, AccessToken token, boolean dtStartWithTimeZone) {
 		Calendar calendar = initCalendar();
 		for (Event event : events) {
-			VEvent vEvent = getVEvent(iCal4jUser, event, replyAttendee, method, token);
+			VEvent vEvent = getVEvent(iCal4jUser, event, replyAttendee, method, token, dtStartWithTimeZone);
 			calendar.getComponents().add(vEvent);
 			if (event.isRecurrent()) {
 				for (Event ee : event.getRecurrence().getEventExceptions()) {
 					VEvent eventExt = getVEvent(null, ee, event.getExtId(), event, replyAttendee,
-							method, token);
+							method, token, dtStartWithTimeZone);
 					calendar.getComponents().add(eventExt);
 				}
 			}
@@ -733,11 +740,11 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		return calendar;
 	}
 
-	private VEvent getVEvent(Ical4jUser iCal4jUser, Event event, Attendee replyAttendee, Method method, AccessToken token) {
-		return getVEvent(iCal4jUser, event, null, null, replyAttendee, method, token);
+	private VEvent getVEvent(Ical4jUser iCal4jUser, Event event, Attendee replyAttendee, Method method, AccessToken token, boolean dtStartWithTimeZone) {
+		return getVEvent(iCal4jUser, event, null, null, replyAttendee, method, token, dtStartWithTimeZone);
 	}
 
-	private VEvent getVEvent(Ical4jUser iCal4jUser, Event event, EventExtId parentExtID, Event parent, Attendee replyAttendee, Method method, AccessToken token) {
+	private VEvent getVEvent(Ical4jUser iCal4jUser, Event event, EventExtId parentExtID, Event parent, Attendee replyAttendee, Method method, AccessToken token, boolean dtStartWithTimeZone) {
 		VEvent vEvent = new VEvent();
 		PropertyList prop = vEvent.getProperties();
 
@@ -757,7 +764,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 			appendReplyCommentToICS(prop, replyAttendee);
 		}
 		appendCategoryToICS(prop, event);
-		appendEventDates(prop, event);
+		appendEventDates(prop, event, dtStartWithTimeZone);
 		appendDescriptionToICS(prop, event);
 		appendLocationToICS(prop, event);
 		appendTranspToICS(prop, event);
@@ -996,12 +1003,16 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 
 	}
 
-	private void appendEventDates(PropertyList prop, Event event) {
+	private void appendEventDates(PropertyList prop, Event event, boolean dtStartWithTimeZone) {
 		if(event.isAllday()) {
 			appendDtStartAsDateToICS(prop, event);
 			appendDtEndAsDateToICS(prop, event);
 		} else {
-			appendDtStartAsDateTimeToICS(prop, event);
+			if (dtStartWithTimeZone) {
+				appendDtStartAsDateTimeToICSWithTimeZone(prop, event);
+			} else {
+				appendDtStartAsDateTimeToICS(prop, event);
+			}
 			appendDurationToICS(prop, event);
 		}
 	}
@@ -1014,7 +1025,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		prop.add(new DtStart(new EventDate(event.getStartDate(), TimeZone.getTimeZone(event.getTimezoneName())), true));
 	}
 
-	private void appendDtStartAsDateTimeToICS(PropertyList prop, Event event) {
+	private void appendDtStartAsDateTimeToICSWithTimeZone(PropertyList prop, Event event) {
 		String timezoneName = Objects.firstNonNull(event.getTimezoneName(), TimeZones.GMT_ID);
 		net.fortuna.ical4j.model.TimeZone zone = tzRegistry.getTimeZone(timezoneName);
 		DateTime icalDate = new DateTime();
@@ -1030,6 +1041,11 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		dts.setDate(icalDate);
 		prop.add(dts);
 	}
+	
+	private void appendDtStartAsDateTimeToICS(PropertyList prop, Event event) {
+		prop.add(new DtStart(new DateTime(event.getStartDate()), true));
+	}
+
 
 	private void appendLastModified(PropertyList prop, Event event) {
 		if(event.getTimeUpdate() != null) {

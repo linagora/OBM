@@ -133,6 +133,6 @@ public class ResourceServlet extends HttpServlet {
 			return null;
 		}
 		
-		return this.ical4jHelper.buildIcs(null, resourceEvents, null);
+		return this.ical4jHelper.buildIcsWithTimeZoneOnDtStart(null, resourceEvents, null);
 	}
 }

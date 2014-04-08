@@ -179,7 +179,7 @@ public class ResourceServletTest {
 	}
 
 	@Test
-	public void testDoGetResourceHasNoEvents() throws Exception{
+	public void testDoGetResourceHasNoEvents() throws Exception {
 		expect(calendarBinding.getResourceEvents(eq("resource@domain"), anyObject(Date.class), anyObject(SyncRange.class)))
 			.andReturn(Collections.<Event>emptyList());
 
@@ -251,6 +251,7 @@ public class ResourceServletTest {
 		assertThat(ics).contains(expected);
 		control.verify();
 	}
+	
 	@Test
 	public void testStartdateUTC() throws Exception {
 		Collection<Event> collectionEvents = new ArrayList<Event>();
