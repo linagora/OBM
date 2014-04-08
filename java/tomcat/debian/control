@@ -10,7 +10,7 @@ Homepage: http://www.obm.org
 
 Package: obm-tomcat
 Architecture: all
-Depends: default-jdk | sun-java6-jdk, libapr1, obm-munin-node, ${misc:Depends}
+Depends: openjdk-7-jdk | sun-java6-jdk, libapr1, obm-munin-node, ${misc:Depends}
 Description: the Tomcat web application server for Open Business Management
  This package contains the 6.0.20 version of the Apache Tomcat application
  server for OBM.
