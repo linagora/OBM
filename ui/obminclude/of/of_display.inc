@@ -1159,7 +1159,7 @@ function display_head($p_module, $standard=true) {
         <input type=\"hidden\" name=\"action_popin\" value=\"change_topmenu\" />
         <label><span class=\"popintopbar-message\">$l_popin_message &nbsp;&nbsp;</span></label>
         <label><input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_popin_activation_button\" />&nbsp;&nbsp;</label>
-        <label><span class=\"popintopbar-message\"><a href=\"obm.php?action_popin=stop_popin\"><img src=\"../images/themes/default/images/ico_close.gif\" alt=\"close\" title=\"$l_close_popin_button\" /></a></span></label>
+        <label><span class=\"popintopbar-message\"><a href=\"../obm.php?action_popin=stop_popin\"><img src=\"../images/themes/default/images/ico_close.gif\" alt=\"close\" title=\"$l_close_popin_button\" /></a></span></label>
       </form>
     </div>
     "; 
