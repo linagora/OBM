@@ -599,13 +599,17 @@ function showErrorMessageCustomTimeout(message, timeout) {
 }
 
 function showMessageWithTimeout(klass, message, timeout) {
+  showMessageWithoutTimeout(klass, message);
+  setTimeout(function () {content.innerHTML = ''; content.setStyle('display','none');}, timeout);
+}
+
+function showMessageWithoutTimeout(klass, message) {
   var content = $('ajaxMessage');
   content.setStyle('display','block');
   new Element('p').addClass('message')
                   .addClass(klass)
                   .set('html', message)
                   .injectInside(content);
-  setTimeout(function () {content.innerHTML = ''; content.setStyle('display','none');}, timeout);
 }
 
 function showMessage(klass, message) {

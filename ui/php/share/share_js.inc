@@ -60,7 +60,7 @@ function sendUrl(type,format) {
           if(response.error == 0){
             showMessage('valid',response.message);
           } else {
-            showMessage('error',response.message);
+            showMessageWithoutTimeout('error',response.message);
           }
         }
     }).post({entity_type : type_id.value, entity_id : id.value, type : type, mail:mail, action : 'send_url', format : format, ajax : 1});
