@@ -855,7 +855,7 @@ form {
   width: 100%;
   height: 1.5em;
   position:relative;
-  margin-bottom: -1.5em;
+  margin-bottom: 0em;
   display: none;
 }
 
