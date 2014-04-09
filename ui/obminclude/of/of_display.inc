@@ -1087,7 +1087,7 @@ function display_head($p_module, $standard=true) {
   global $css_print_obm, $ico_delete, $ico_update, $output_target,$l_transparent;
   global $l_autocomplete_field, $l_fatal_server_err, $gwt_js_include, $path, $params;
   global $ico_html, $ico_ical;
-  global $obm_version;
+  global $obm_version, $obm;
 
   $css = $css_obm;
 
@@ -1135,7 +1135,7 @@ function display_head($p_module, $standard=true) {
     }
   }
 
-  if ( $_SESSION['set_top_bar'] && $_SESSION['set_theme'] == "default" ) {
+  if ( $_SESSION['set_top_bar'] == 'yes' && $_SESSION['set_theme'] == "default") {
     $stylecss .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$resources_path/themes/default/styles/topbar.css\" />";
   } else {
     $stylecss .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css?version=$obm_version\" />";
