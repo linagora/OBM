@@ -5,7 +5,7 @@
 %global _source_payload w9.gzdio
 
 Name:           obm-release
-Version:        2.4
+Version:        2.5
 Release:        1
 Summary:        Open Business Management repository configuration
 Group:          System Environment/Base
