@@ -8,6 +8,15 @@ set -e
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 export JAVA_HOME=/usr/lib/jvm/java
+test -d /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.51.x86_64  && {
+    JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.51.x86_64
+}
+test -d /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.51.i686 && {
+    JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.51.x86_64.i686
+}
+test -d /usr/lib/jvm/java-openjdk && {
+    JAVA_HOME=/usr/lib/jvm/java-openjdk
+}
 
 if [ -r /etc/sysconfig/i18n ]; then
   . /etc/sysconfig/i18n
