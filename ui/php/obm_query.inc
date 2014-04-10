@@ -357,9 +357,10 @@ function is_global_admin($user_id) {
   $obm_q = new DB_OBM;
 
   $query = "
-    SELECT userobm_id, userobm_perms, userobm_domain_id
+    SELECT userobm_id, userobm_perms, userobm_domain_id, domain_id, domain_name
     FROM UserObm
-    WHERE userobm_domain_id = 1
+    INNER JOIN Domain ON domain_id = userobm_domain_id
+    WHERE domain_name = 'global.virt'
     AND userobm_perms = 'admin'
   ;";
 
