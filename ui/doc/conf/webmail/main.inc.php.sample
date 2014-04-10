@@ -121,5 +121,6 @@ $rcmail_config['ldap_public'] ['obm'] = array(
 $rcmail_config['address_book_type'] = array('sql', 'ldap');
 $rcmail_config['autocomplete_addressbooks'] = array('sql', 'obm');
 
-// Make the HTML editor the default in roundcube
-$rcmail_config['htmleditor'] = 1;
+// The html editor is enabled by default. Uncomment this line if you would like
+// to disable it.
+// $rcmail_config['htmleditor'] = 0;

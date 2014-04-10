@@ -102,6 +102,8 @@ if ( $auth_kind && $auth_kind == "CAS" ) {
   $rcmail_config["plugins"][] = "obm_auth";
 }
 
+// Enable the html editor by default
+$rcmail_config['htmleditor'] = 1;
 
 
 // include external configuration file if it exists
