@@ -52,4 +52,10 @@ public class JavaInformationHandler implements HealthCheckHandler {
 		return System.getProperty("java.vendor");
 	}
 	
+	@GET
+	@Path("vmname")
+	public String getVMName() {
+		return System.getProperty("java.vm.name");
+	}
+	
 }

@@ -54,12 +54,13 @@ public class HealthCheckServletDefaultHandlersTest extends AbstractHealthCheckTe
 		HttpResponse response = get("/");
 		ImmutableMap<String, String> javaVersion = ImmutableMap.of("method", "GET", "path", "/java/version");
 		ImmutableMap<String, String> javaVendor = ImmutableMap.of("method", "GET", "path", "/java/vendor");
+		ImmutableMap<String, String> javaVMName = ImmutableMap.of("method", "GET", "path", "/java/vmname");
 		
 		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
 		
 		Object[] result = (Object[]) JSON.parse(IO.toString(response.getEntity().getContent()));
 		
-		assertThat(result).containsOnly(javaVendor, javaVersion);
+		assertThat(result).containsOnly(javaVendor, javaVersion, javaVMName);
 	}
 
 	@Test

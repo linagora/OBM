@@ -54,4 +54,8 @@ public class JavaInformationHandlerTest {
 		assertThat(handler.getVendor()).isEqualTo(System.getProperty("java.vendor"));
 	}
 
+	@Test
+	public void testGetVMName() {
+		assertThat(handler.getVMName()).isEqualTo(System.getProperty("java.vm.name"));
+	}
 }
