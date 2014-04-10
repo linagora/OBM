@@ -352,5 +352,27 @@ function run_query_contract_range($user_id) {
   return $res;
 }
 
+//////////////////////////////////////////////////////////////////////////////*/
+function is_global_admin($user_id) {
+  $obm_q = new DB_OBM;
+
+  $query = "
+    SELECT userobm_id, userobm_perms, userobm_domain_id
+    FROM UserObm
+    WHERE userobm_domain_id = 1
+    AND userobm_perms = 'admin'
+  ;";
+
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    if ( $obm_q->f("userobm_id") == $user_id ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 
 </script>

@@ -100,7 +100,7 @@ page_close();
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // If home page has a redirection
-if ($c_home_redirect != '' && !$params['error'] && $_GET['redirect'] != 'false' && $obm['login'] != 'admin0') {
+if ($c_home_redirect != '' && !$params['error'] && $_GET['redirect'] != 'false' && !is_global_admin($obm['uid'])) {
   header('Status: 301 OK');
   header("Location: $c_home_redirect");
   exit();
