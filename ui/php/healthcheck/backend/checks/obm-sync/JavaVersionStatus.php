@@ -34,26 +34,46 @@ require_once dirname(__FILE__) . '/../AbstractMultiDomainStatus.php';
 
 class JavaVersionStatus extends AbstractMultiDomainStatus {
   
-  const EXPECTED_JAVA_VERSION = "1.6";
+  const EXPECTED_SUN_JAVA_VERSION = "1.6";
+  const EXPECTED_OPENJDK_JAVA_VERSION = "1.7";
+  const OPENJDK_VM_NAME = "OpenJDK";
   const JAVA_VERSION_URL = "http://%HOST%:8080/obm-sync/healthcheck/java/version";
+  const JAVA_VMNAME_URL = "http://%HOST%:8080/obm-sync/healthcheck/java/vmname";
   
   public function executeForDomain($domain) {
     $servers = of_domain_get_domain_syncserver($domain["id"]);
     
     foreach ($servers as $server) {
       $host = $server[0];
-      $url = str_replace("%HOST%", $host["ip"], self::JAVA_VERSION_URL);
-      $curl = CheckHelper::curlGet($url);
+      $urlvmname = str_replace("%HOST%", $host["ip"], self::JAVA_VMNAME_URL);
+      $curlvmname = CheckHelper::curlGet($urlvmname);
+
+      if ($curlvmname["code"] == 200) {
+        $urlversion = str_replace("%HOST%", $host["ip"], self::JAVA_VERSION_URL);
+        $curlversion = CheckHelper::curlGet($urlversion);
       
-      if ($curl["code"] == 200) {
-        $version = $curl["success"];
-        $versionOk = strpos($version, self::EXPECTED_JAVA_VERSION) === 0;
-        
-        return $versionOk ? new CheckResult(CheckStatus::OK) : new CheckResult(CheckStatus::ERROR, array("OBM-Sync server at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' runs Java version '" . $version . "', expecting '" . self::EXPECTED_JAVA_VERSION . "'."));
+        if ($curlversion["code"] == 200) {
+          $vmname = $curlvmname["success"];
+          $version = $curlversion["success"];
+          return self::checkJavaVersion($vmname, $version);
+        }
       }
       
       return new CheckResult(CheckStatus::WARNING, array("OBM-Sync server at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' isn't reachable"));
     }
   }
-  
+ 
+  private static function checkJavaVersion($vmname, $version) {
+    if (strpos($vmname, self::OPENJDK_VM_NAME) !== false) {
+      $versionOk = strpos($version, self::EXPECTED_OPENJDK_JAVA_VERSION) === 0;
+      return self::checkResult($versionOk, $version, self::EXPECTED_OPENJDK_JAVA_VERSION);
+    } 
+        
+    $versionOk = strpos($version, self::EXPECTED_SUN_JAVA_VERSION) === 0;
+    return self::checkResult($versionOk, $version, self::EXPECTED_SUN_JAVA_VERSION);
+  } 
+
+  private static function checkResult($versionOk, $version, $expectedVersion) {
+      return $versionOk ? new CheckResult(CheckStatus::OK) : new CheckResult(CheckStatus::ERROR, array("OBM-Sync server at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' runs Java version '" . $version . "', expecting '" . $expectedVersion . "'."));
+  }
 }
