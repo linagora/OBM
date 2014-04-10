@@ -1185,7 +1185,7 @@ public class Ical4jHelperTest {
 		String ics, expected;
 
 		// A UTC alias
-		event.setStartDate(DateUtils.date("2013-01-01T01:01:01"));
+		event.setStartDate(DateUtils.dateInZone("2013-01-01T01:01:01", "GMT"));
 		event.setTimezoneName(TimeZones.GMT_ID);
 		expected = "DTSTART:20130101T010101Z";
 
@@ -1201,7 +1201,7 @@ public class Ical4jHelperTest {
 		String ics, expected;
 
 		// null timezoneName (uses UTC)
-		event.setStartDate(DateUtils.date("2013-02-02T02:02:02"));
+		event.setStartDate(DateUtils.dateInZone("2013-02-02T02:02:02", "UTC"));
 		event.setTimezoneName(null);
 		expected = "DTSTART:20130202T020202Z";
 
