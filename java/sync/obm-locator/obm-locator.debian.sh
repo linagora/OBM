@@ -49,23 +49,19 @@ LOCATOR_USER=locator
 JAVA_OPTIONS="-Xmx100m -Djava.awt.headless=true"
 export JAVA_OPTIONS
 
-# The first existing directory is used for JAVA_HOME
-# Should contain a list of space separated directories.
-JDK_DIRS="
-          /usr/lib/jvm/default-java \
-          /usr/lib/jvm/java-6-sun \
-          /usr/lib/jvm/java-6-openjdk \
-         "
+# Set JAVA_HOME if not already set
+if [ -z "$JAVA_HOME" ]; then
+    test -d /usr/lib/jvm/java-6-un && {
+        JAVA_HOME=/usr/lib/jvm/java-6-sun
+    }
+fi
+if [ -z "$JAVA_HOME" ]; then
+    JAVA_HOME="/usr/lib/jvm/java-7-openjdk-"`dpkg --print-architecture`
+fi
 
 # Timeout in seconds for the shutdown of all webapps
 LOCATOR_SHUTDOWN=10
 
-# Look for the right JVM to use
-for jdir in $JDK_DIRS; do
-        if [ -d "$jdir" -a -z "${JAVA_HOME}" ]; then
-                JAVA_HOME="$jdir"
-        fi
-done
 export JAVA_HOME
 export JAVA="$JAVA_HOME/bin/java"
 LOCATOR_COMMAND="$JAVA -- -jar $START_JAR"

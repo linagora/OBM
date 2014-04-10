@@ -21,7 +21,7 @@ Description: synchronization application for Open Business Management
 
 Package: obm-locator
 Architecture: all
-Depends: obm-conf, openssl
+Depends: openjdk-7-jdk | sun-java6-jdk, obm-conf, openssl
 Description: Locator for Open Business Management
  This package is a J2E web service, which allows can be queried to retrieve
  the location of an OBM component.
