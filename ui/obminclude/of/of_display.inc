@@ -2142,7 +2142,7 @@ function get_module_data($section, $module) {
     $module_data["section_name"] = $section;
 
     $module_data["links"] = array();
-    $exclusions = array($GLOBALS['l_module_calendar'], $GLOBALS['l_module_contact'], $GLOBALS['l_module_planning']);
+    $exclusions = array($GLOBALS['l_module_calendar'], $GLOBALS['l_module_contact'], $GLOBALS['l_module_planning'], $GLOBALS['l_module_webmail']);
 
     foreach ($section_link as $mod) {
       if (!in_array($modules[$mod]['Name'], $exclusions)) {
