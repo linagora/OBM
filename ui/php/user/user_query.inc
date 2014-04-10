@@ -2152,7 +2152,7 @@ function check_user_data_form($p_id, &$user) {
     $height = $image_info['1'];
     $size  = $user['img_size'];
     if ($width > $max_width || $height > $max_height || $size > $max_size) {
-      $err['msg'] = $l_image_size_error;
+      $err['msg'] = sprintf($l_image_size_error, $max_width, $max_height, $max_size/1024);
       $err['field'] = 'file';
       return false;
     }

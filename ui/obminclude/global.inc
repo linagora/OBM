@@ -247,9 +247,9 @@ $c_imagetype = array('1' => 'GIF',
                      '3' => 'PNG');
 
 // Max image size
-$c_max_image_size = array('width' => '96',
-                          'height' => '96',
-                          'size' => '100000');
+$c_max_image_size = array('width' => '128',
+                          'height' => '128',
+                          'size' => '102400');
 
 // Page layout
 $c_pagelayout_portrait = 'portrait';
