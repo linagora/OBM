@@ -329,6 +329,10 @@ form {
 .spreadLove a {  color: #368397; font-weight: bolder; }
 .spreadLove .supportUs { padding-top: 3px; }
 
+.spreadLove i{
+  font-size: 0.8em;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* Banner */

@@ -1147,9 +1147,9 @@ function display_head($p_module, $standard=true) {
   }
 
   $supportOBMBanner = "<h2 class=\"spreadLove\"><div>"
-  .__("You are using the open-source and free version of <a href=\"http://www.obm.org/\">OBM</a> developped and supported by <a href=\"http://www.linagora.com/\">Linagora</a>.")
+  .__("You are using the \"Libre &amp; Free\" version of <a href=\"http://www.obm.org/\">OBM</a> powered by <a href=\"http://www.linagora.com/\">Linagora</a> <i>©2007-2014</i>")
   ."</div><div class=\"supportUs\">"
-  .__("Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro.obm.org/\">enterprise offer</a>.")
+  .__("Contribute to OBM by subscribing a <a href=\"http://pro.obm.org/\">Support Offer</a>.")
   ."</div></h2>";
   
   if (show_topmenupopin()) {
