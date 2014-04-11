@@ -1150,26 +1150,26 @@ function display_head($p_module, $standard=true) {
     $headers_e .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
   }
 
-  $supportOBMBanner = "<h2 class=\"spreadLove\"><div>"
-  .__("You are using the \"Libre &amp; Free\" version of <a href=\"http://www.obm.org/\">OBM</a> powered by <a href=\"http://www.linagora.com/\">Linagora</a> <i>©2007-2014</i>")
-  ."</div><div class=\"supportUs\">"
-  .__("Contribute to OBM by subscribing a <a href=\"http://pro.obm.org/\">Support Offer</a>.")
-  ."</div></h2>";
-  
-  if (show_topmenupopin()) {
-		$supportOBMBanner .= "
-      <div class=\"popintopbar\">
-      <form class=\"search\" id=\"popintopbar-form\" method=\"get\" action=\"\">
-        <input type=\"hidden\" name=\"action_popin\" value=\"change_topmenu\" />
-        <label><span class=\"popintopbar-message\">$l_popin_message &nbsp;&nbsp;</span></label>
-        <label><input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_popin_activation_button\" />&nbsp;&nbsp;</label>
-        <label><span class=\"popintopbar-message\"><a href=\"../obm.php?action_popin=stop_popin\"><img src=\"../images/themes/default/images/ico_close.gif\" alt=\"close\" title=\"$l_close_popin_button\" /></a></span></label>
-      </form>
-    </div>
-    "; 
-	}
-  
-  
+  if (!$params['popup']) {
+    if (show_topmenupopin()) {
+      $supportOBMBanner .= "
+        <div class=\"popintopbar\">
+        <form class=\"search\" id=\"popintopbar-form\" method=\"get\" action=\"\">
+          <input type=\"hidden\" name=\"action_popin\" value=\"change_topmenu\" />
+          <label><span class=\"popintopbar-message\">$l_popin_message &nbsp;&nbsp;</span></label>
+          <label><input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_popin_activation_button\" />&nbsp;&nbsp;</label>
+          <label><span class=\"popintopbar-message\"><a href=\"../obm.php?action_popin=stop_popin\"><img src=\"../images/themes/default/images/ico_close.gif\" alt=\"close\" title=\"$l_close_popin_button\" /></a></span></label>
+        </form>
+      </div>
+      ";
+    } else {
+      $supportOBMBanner = "<h2 class=\"spreadLove\"><div>"
+      .__("You are using the open-source and free version of <a href=\"http://www.obm.org/\">OBM</a> developped and supported by <a href=\"http://www.linagora.com/\">Linagora</a>.")
+      ."</div><div class=\"supportUs\">"
+      .__("Contribute to the product R&amp;D by subscribing to an <a href=\"http://pro.obm.org/\">enterprise offer</a>.")
+      ."</div></h2>";
+    }
+  }
 
   return "$headers_e
 <html xmlns=\"http://www.w3.org/1999/xhtml\">     
