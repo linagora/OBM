@@ -72,13 +72,20 @@ if (!$version && $opts['version']) {
         '0.2-alpha'  => 2008040500,
         '0.2-beta'   => 2008060900,
         '0.2-stable' => 2008092100,
+        '0.2.1'      => 2008092100,
+        '0.2.2'      => 2008092100,
         '0.3-stable' => 2008092100,
         '0.3.1'      => 2009090400,
         '0.4-beta'   => 2009103100,
+        '0.4'        => 2010042300,
+        '0.4.1'      => 2010042300,
         '0.4.2'      => 2010042300,
         '0.5-beta'   => 2010100600,
         '0.5'        => 2010100600,
         '0.5.1'      => 2010100600,
+        '0.5.2'      => 2010100600,
+        '0.5.3'      => 2010100600,
+        '0.5.4'      => 2010100600,
         '0.6-beta'   => 2011011200,
         '0.6'        => 2011011200,
         '0.7-beta'   => 2011092800,
@@ -180,13 +187,46 @@ function update_db_schema($package, $version, $file)
 
 function fix_table_names($sql)
 {
-    global $DB;
+    global $DB, $RC, $dir;
+    static $tables;
+    static $sequences;
 
-    foreach (array('users','identities','contacts','contactgroups','contactgroupmembers','session','cache','cache_index','cache_index','cache_messages','dictionary','searches','system') as $table) {
-        $real_table = $DB->table_name($table);
-        if ($real_table != $table) {
-            $sql = preg_replace("/([^a-z0-9_])$table([^a-z0-9_])/i", "\\1$real_table\\2", $sql);
+    $prefix = $RC->config->get('db_prefix');
+    $engine = $DB->db_provider;
+
+    if (empty($prefix)) {
+        return $sql;
+    }
+
+    if ($tables === null) {
+        $tables    = array();
+        $sequences = array();
+
+        // read complete schema (initial) file
+        $filename = "$dir/../$engine.initial.sql";
+        $schema    = @file_get_contents($filename);
+
+        // find table names
+        if (preg_match_all('/CREATE TABLE (\[dbo\]\.|IF NOT EXISTS )?[`"\[\]]*([^`"\[\] \r\n]+)/i', $schema, $matches)) {
+            foreach ($matches[2] as $table) {
+                $tables[$table] = $prefix . $table;
+            }
         }
+        // find sequence names
+        if ($engine == 'postgres' && preg_match_all('/CREATE SEQUENCE (IF NOT EXISTS )?"?([^" \n\r]+)/i', $schema, $matches)) {
+            foreach ($matches[2] as $sequence) {
+                $sequences[$sequence] = $prefix . $sequence;
+            }
+        }
+    }
+
+    // replace table names
+    foreach ($tables as $table => $real_table) {
+        $sql = preg_replace("/([^a-zA-Z0-9_])$table([^a-zA-Z0-9_])/", "\\1$real_table\\2", $sql);
+    }
+    // replace sequence names
+    foreach ($sequences as $sequence => $real_sequence) {
+        $sql = preg_replace("/([^a-zA-Z0-9_])$sequence([^a-zA-Z0-9_])/", "\\1$real_sequence\\2", $sql);
     }
 
     return $sql;

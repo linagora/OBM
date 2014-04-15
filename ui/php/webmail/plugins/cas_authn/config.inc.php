@@ -17,12 +17,12 @@
 //$rcmail_config['cas_proxy'] = true;
 
 // phpCAS debug file
-$rcmail_config['cas_debug'] = false;
-$rcmail_config['cas_debug_file'] = '/tmp/cas_debug.log';
+$config['cas_debug'] = false;
+$config['cas_debug_file'] = '/tmp/cas_debug.log';
 
 // directory where PGTs will be temporarily stored. Will only be used if
 //     cas_proxy is set to true.
-$rcmail_config['cas_pgt_dir'] = '/tmp';
+$config['cas_pgt_dir'] = '/tmp';
 
 // name of the IMAP service. Will only be used if cas_proxy is set to true.
 //     This service name must be authorized to be used with the CAS server.

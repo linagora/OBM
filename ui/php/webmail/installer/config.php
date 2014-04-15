@@ -9,9 +9,6 @@ if (!class_exists('rcube_install') || !is_object($RCI)) {
 <input type="hidden" name="_step" value="2" />
 <?php
 
-// also load the default config to fill in the fields
-$RCI->load_defaults();
-
 // register these boolean fields
 $RCI->bool_config_props = array(
   'ip_check' => 1,
@@ -27,24 +24,38 @@ $RCI->bool_config_props = array(
 $_SESSION['allowinstaller'] = true;
 
 if (!empty($_POST['submit'])) {
-  
-  echo '<p class="notice">Copy or download the following configurations and save them in two files';
-  echo ' (names above the text box) within the <tt>'.RCMAIL_CONFIG_DIR.'</tt> directory of your Roundcube installation.';
-  echo '</p>';
-  
-  $textbox = new html_textarea(array('rows' => 16, 'cols' => 60, 'class' => "configfile"));
-  
-  echo '<div><em>main.inc.php (<a href="index.php?_getfile=main">download</a>)</em></div>';
-  echo $textbox->show(($_SESSION['main.inc.php'] = $RCI->create_config('main')));
-  
-  echo '<div style="margin-top:1em"><em>db.inc.php (<a href="index.php?_getfile=db">download</a>)</em></div>';
-  echo $textbox->show($_SESSION['db.inc.php'] = $RCI->create_config('db'));
+  $_SESSION['config'] = $RCI->create_config();
+
+  if ($RCI->save_configfile($_SESSION['config'])) {
+     echo '<p class="notice">The config file was saved successfully into <tt>'.RCMAIL_CONFIG_DIR.'</tt> directory of your Roundcube installation.';
+
+     if ($RCI->legacy_config) {
+        echo '<br/><br/>Afterwards, please <b>remove</b> the old configuration files <tt>main.inc.php</tt> and <tt>db.inc.php</tt> from the config directory.';
+     }
+
+     echo '</p>';
+  }
+  else {
+    echo '<p class="notice">Copy or download the following configuration and save it';
+    echo ' as <tt><b>config.inc.php</b></tt> within the <tt>'.RCUBE_CONFIG_DIR.'</tt> directory of your Roundcube installation.<br/>';
+    echo ' Make sure that there are no characters outside the <tt>&lt;?php ?&gt;</tt> brackets when saving the file.';
+    echo '&nbsp;<input type="button" onclick="location.href=\'index.php?_getconfig=1\'" value="Download" />';
+
+    if ($RCI->legacy_config) {
+       echo '<br/><br/>Afterwards, please <b>remove</b> the old configuration files <tt>main.inc.php</tt> and <tt>db.inc.php</tt> from the config directory.';
+    }
+
+    echo '</p>';
+
+    $textbox = new html_textarea(array('rows' => 16, 'cols' => 60, 'class' => "configfile"));
+    echo $textbox->show(($_SESSION['config']));
+  }
 
   echo '<p class="hint">Of course there are more options to configure.
-    Have a look at the config files or visit <a href="http://trac.roundcube.net/wiki/Howto_Config">Howto_Config</a> to find out.</p>';
+    Have a look at the defaults.inc.php file or visit <a href="http://trac.roundcube.net/wiki/Howto_Config" target="_blank">Howto_Config</a> to find out.</p>';
 
   echo '<p><input type="button" onclick="location.href=\'./index.php?_step=3\'" value="CONTINUE" /></p>';
-  
+
   // echo '<style type="text/css"> .configblock { display:none } </style>';
   echo "\n<hr style='margin-bottom:1.6em' />\n";
 }
@@ -290,6 +301,18 @@ echo '<label for="cfgdbpass">Database password (omit for sqlite)</label><br />';
 
 ?>
 </dd>
+
+<dt class="propname">db_prefix</dt>
+<dd>
+<?php
+
+$input_prefix = new html_inputfield(array('name' => '_db_prefix', 'size' => 20, 'id' => "cfgdbprefix"));
+echo $input_prefix->show($RCI->getprop('db_prefix'));
+
+?>
+<div>Optional prefix that will be added to database object names (tables and sequences).</div>
+</dd>
+
 </dl>
 </fieldset>
 
@@ -636,7 +659,7 @@ $select_param_folding->add('Full RFC 2231 (Roundcube, Thunderbird)', '0');
 $select_param_folding->add('RFC 2047/2231 (MS Outlook, OE)', '1');
 $select_param_folding->add('Full RFC 2047 (deprecated)', '2');
 
-echo $select_param_folding->show(intval($RCI->getprop('mime_param_folding')));
+echo $select_param_folding->show(strval($RCI->getprop('mime_param_folding')));
 
 ?>
 <div>How to encode attachment long/non-ascii names</div>

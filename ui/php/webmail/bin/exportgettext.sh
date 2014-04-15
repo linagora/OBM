@@ -1,7 +1,6 @@
 #!/usr/bin/env php
 <?php
 /*
-
  +-----------------------------------------------------------------------+
  | bin/exportgettext.sh                                                  |
  |                                                                       |
@@ -14,9 +13,6 @@
  +-----------------------------------------------------------------------+
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
-
- $Id$
-
 */
 
 define('INSTALL_PATH', realpath(dirname(__FILE__) . '/..') . '/' );
@@ -54,6 +50,7 @@ $langcode_map = array(
 	'km_KH' => 'km',
 	'ms_MY' => 'ms',
 	'mr_IN' => 'mr',
+	'ml_IN' => 'ml',
 	'pl_PL' => 'pl',
 	'si_LK' => 'si',
 	'sl_SI' => 'sl',
@@ -205,7 +202,7 @@ EOF;
 		$msgid = $is_pot ? $msgstr : ($GLOBALS['en_US'][$label] ?: $label);
 		$messages[$msgid][] = $label;
 	}
-	
+
 	foreach ($messages as $msgid => $labels) {
 		$out .= "\n";
 		foreach ($labels as $label)

@@ -5,7 +5,7 @@
  | localization/<lang>/messages.inc                                      |
  |                                                                       |
  | Localization file of the Roundcube Webmail client                     |
- | Copyright (C) 2005-2013, The Roundcube Dev Team                       |
+ | Copyright (C) 2005-2014, The Roundcube Dev Team                       |
  |                                                                       |
  | Licensed under the GNU General Public License version 3 or            |
  | any later version with exceptions for skins & plugins.                |
@@ -15,8 +15,6 @@
 
  For translation see https://www.transifex.com/projects/p/roundcube-webmail/resource/messages/
 */
-
-$messages = array();
 $messages['errortitle']  = 'An error occured.';
 $messages['loginfailed']  = 'Login failed.';
 $messages['cookiesdisabled'] = 'Your browser does not accept cookies.';
@@ -34,7 +32,8 @@ $messages['invalidrequest'] = 'Invalid request! No data was saved.';
 $messages['invalidhost'] = 'Invalid server name.';
 $messages['nomessagesfound'] = 'No messages found in this mailbox.';
 $messages['loggedout'] = 'You have successfully terminated the session. Good bye!';
-$messages['mailboxempty'] = 'Mailbox is empty.';
+$messages['mailboxempty'] = 'Mailbox is empty';
+$messages['nomessages'] = 'No messages';
 $messages['refreshing'] = 'Refreshing...';
 $messages['loading'] = 'Loading...';
 $messages['uploading'] = 'Uploading file...';
@@ -46,6 +45,8 @@ $messages['messagesent'] = 'Message sent successfully.';
 $messages['savingmessage'] = 'Saving message...';
 $messages['messagesaved'] = 'Message saved to Drafts.';
 $messages['successfullysaved'] = 'Successfully saved.';
+$messages['savingresponse'] = 'Saving response text...';
+$messages['deleteresponseconfirm'] = 'Do you really want to delete this response text?';
 $messages['addedsuccessfully'] = 'Contact successfully added to address book.';
 $messages['contactexists'] = 'A contact with this e-mail address already exists.';
 $messages['contactnameexists'] = 'A contact with the same name already exists.';
@@ -82,6 +83,7 @@ $messages['norecipientwarning'] = 'Please enter at least one recipient.';
 $messages['nosubjectwarning']  = 'The "Subject" field is empty. Would you like to enter one now?';
 $messages['nobodywarning'] = 'Send this message without any text?';
 $messages['notsentwarning'] = 'Your message has not been sent. Do you want to discard it?';
+$messages['restoresavedcomposedata'] = 'A previously composed but unsent message was found.\n\nSubject: $subject\nSaved: $date\n\nDo you want to restore this message?';
 $messages['noldapserver'] = 'Please select an LDAP server to search.';
 $messages['nosearchname'] = 'Please enter a contact name or email address.';
 $messages['notuploadedwarning'] = 'Not all attachments have been uploaded yet. Please wait or cancel the upload.';
@@ -101,13 +103,16 @@ $messages['converting'] = 'Removing formatting...';
 $messages['messageopenerror'] = 'Could not load message from server.';
 $messages['fileuploaderror'] = 'File upload failed.';
 $messages['filesizeerror'] = 'The uploaded file exceeds the maximum size of $size.';
-$messages['copysuccess'] = 'Successfully copied $nr addresses.';
-$messages['copyerror'] = 'Could not copy any addresses.';
+$messages['copysuccess'] = 'Successfully copied $nr contacts.';
+$messages['movesuccess'] = 'Successfully moved $nr contacts.';
+$messages['copyerror'] = 'Could not copy any contacts.';
+$messages['moveerror'] = 'Could not move any contacts.';
 $messages['sourceisreadonly'] = 'This address book is read-only.';
 $messages['errorsavingcontact'] = 'Could not save the contact address.';
 $messages['movingmessage'] = 'Moving message(s)...';
 $messages['copyingmessage'] = 'Copying message(s)...';
 $messages['copyingcontact'] = 'Copying contact(s)...';
+$messages['movingcontact'] = 'Moving contact(s)...';
 $messages['deletingmessage'] = 'Deleting message(s)...';
 $messages['markingmessage'] = 'Marking message(s)...';
 $messages['addingmember'] = 'Adding contact(s) to the group...';
@@ -126,6 +131,8 @@ $messages['importwait'] = 'Importing, please wait...';
 $messages['importformaterror'] = 'Import failed! The uploaded file is not a valid import data file.';
 $messages['importconfirm'] = '<b>Successfully imported $inserted contacts</b>';
 $messages['importconfirmskipped'] = '<b>Skipped $skipped existing entries</b>';
+$messages['importmessagesuccess'] = 'Successfully imported $nr messages';
+$messages['importmessageerror'] = 'Import failed! The uploaded file is not a valid message or mailbox file';
 $messages['opnotpermitted'] = 'Operation not permitted!';
 $messages['nofromaddress'] = 'Missing e-mail address in selected identity.';
 $messages['editorwarning'] = 'Switching to the plain text editor will cause all text formatting to be lost. Do you wish to continue?';
@@ -139,7 +146,7 @@ $messages['smtperror'] = 'SMTP Error: $msg';
 $messages['emailformaterror'] = 'Incorrect e-mail address: $email';
 $messages['toomanyrecipients'] = 'Too many recipients. Reduce the number of recipients to $max.';
 $messages['maxgroupmembersreached'] = 'The number of group members exceeds the maximum of $max.';
-$messages['internalerror'] = 'An internal error occured. Please try again.';
+$messages['internalerror'] = 'An internal error occurred. Please try again.';
 $messages['contactdelerror'] = 'Could not delete contact(s).';
 $messages['contactdeleted'] = 'Contact(s) deleted successfully.';
 $messages['contactrestoreerror'] = 'Could not restore deleted contact(s).';
@@ -167,5 +174,4 @@ $messages['parentnotwritable'] = 'Unable to create/move folder into selected par
 $messages['messagetoobig'] = 'The message part is too big to process it.';
 $messages['attachmentvalidationerror'] = 'WARNING! This attachment is suspicious because its type doesn\'t match the type declared in the message. If you do not trust the sender, you shouldn\'t open it in the browser because it may contain malicious contents.<br/><br/><em>Expected: $expected; found: $detected</em>';
 $messages['noscriptwarning'] = 'Warning: This webmail service requires Javascript! In order to use it please enable Javascript in your browser\'s settings.';
-
 ?>

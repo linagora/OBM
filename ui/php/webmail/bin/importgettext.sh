@@ -1,7 +1,6 @@
 #!/usr/bin/env php
 <?php
 /*
-
  +-----------------------------------------------------------------------+
  | bin/importgettext.sh                                                  |
  |                                                                       |
@@ -14,9 +13,6 @@
  +-----------------------------------------------------------------------+
  | Author: Thomas Bruederli <roundcube@gmail.com>                        |
  +-----------------------------------------------------------------------+
-
- $Id$
-
 */
 
 define('INSTALL_PATH', realpath(dirname(__FILE__) . '/..') . '/' );
@@ -39,7 +35,7 @@ else if (is_file($srcdir)) {
 foreach ($out as $outfn => $texts) {
 	$lang = preg_match('!/([a-z]{2}(_[A-Z]{2})?)[./]!', $outfn, $m) ? $m[1] : '';
 	$varname = strpos($outfn, 'messages.inc') !== false ? 'messages' : 'labels';
-	
+
 	$header = <<<EOF
 <?php
 
@@ -60,18 +56,18 @@ $%s = array();
 
 EOF;
 
-    $author = preg_replace('/\s*<Unknown>/i', '', $texts['_translator']);
+	$author = preg_replace('/\s*<Unknown>/i', '', $texts['_translator']);
 	$output = sprintf($header, $lang, $varname.'.inc', date('Y'), $author, $varname);
 
 	foreach ($texts as $label => $value) {
-	    if (is_array($value)) { var_dump($outfn, $label, $value); exit; }
+		if (is_array($value)) { var_dump($outfn, $label, $value); exit; }
 		if ($label[0] != '_' && strlen($value))
 			$output .= sprintf("\$%s['%s'] = '%s';\n", $varname, $label, strtr(addcslashes($value, "'"), array("\r" => '', "\n" => '\n')));
 	}
 
 	$output .= "\n";
 	$dir = dirname($outfn);
-	@mkdir($dir, 664, true);
+	@mkdir($dir, 0755, true);
 	if (file_put_contents($outfn, $output))
 		echo "-> $outfn\n";
 }
@@ -129,9 +125,10 @@ function import_file($fn)
 				foreach ($dests as $dest) {
 					list($file, $label) = explode(':', $dest);
 					$out[$file][$label] = $msgstr;
+					$out[$file]['_translator'] = $translator;
 				}
 			}
-			
+
 			$msgid = null;
 			$msgstr = '';
 			$dests = array();
@@ -167,7 +164,7 @@ function import_file($fn)
 			$out[$file]['_translator'] = $translator;
 		}
 	}
-	
+
 	return $language ? $out : array();
 }
 

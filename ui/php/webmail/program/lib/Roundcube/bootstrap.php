@@ -26,26 +26,25 @@
  */
 
 $config = array(
-    'error_reporting'         => E_ALL &~ (E_NOTICE | E_STRICT),
+    'error_reporting'         => E_ALL & ~E_NOTICE & ~E_STRICT,
     // Some users are not using Installer, so we'll check some
     // critical PHP settings here. Only these, which doesn't provide
     // an error/warning in the logs later. See (#1486307).
     'mbstring.func_overload'  => 0,
-    'magic_quotes_runtime'    => 0,
-    'magic_quotes_sybase'     => 0, // #1488506
+    'magic_quotes_runtime'    => false,
+    'magic_quotes_sybase'     => false, // #1488506
 );
 
 // check these additional ini settings if not called via CLI
 if (php_sapi_name() != 'cli') {
     $config += array(
-        'suhosin.session.encrypt' => 0,
-        'session.auto_start'      => 0,
-        'file_uploads'            => 1,
+        'suhosin.session.encrypt' => false,
+        'file_uploads'            => true,
     );
 }
 
 foreach ($config as $optname => $optval) {
-    $ini_optval = filter_var(ini_get($optname), FILTER_VALIDATE_BOOLEAN);
+    $ini_optval = filter_var(ini_get($optname), is_bool($optval) ? FILTER_VALIDATE_BOOLEAN : FILTER_VALIDATE_INT);
     if ($optval != $ini_optval && @ini_set($optname, $optval) === false) {
         $error = "ERROR: Wrong '$optname' option value and it wasn't possible to set it to required value ($optval).\n"
             . "Check your PHP configuration (including php_admin_flag).";
@@ -55,11 +54,11 @@ foreach ($config as $optname => $optval) {
 }
 
 // framework constants
-define('RCUBE_VERSION', '0.9.4');
+define('RCUBE_VERSION', '1.0.0');
 define('RCUBE_CHARSET', 'UTF-8');
 
 if (!defined('RCUBE_LIB_DIR')) {
-    define('RCUBE_LIB_DIR', dirname(__FILE__).'/');
+    define('RCUBE_LIB_DIR', dirname(__FILE__).DIRECTORY_SEPARATOR);
 }
 
 if (!defined('RCUBE_INSTALL_PATH')) {
@@ -300,32 +299,6 @@ function is_ascii($str, $control_chars = true)
 {
     $regexp = $control_chars ? '/[^\x00-\x7F]/' : '/[^\x20-\x7E]/';
     return preg_match($regexp, $str) ? false : true;
-}
-
-
-/**
- * Remove single and double quotes from a given string
- *
- * @param string Input value
- *
- * @return string Dequoted string
- */
-function strip_quotes($str)
-{
-    return str_replace(array("'", '"'), '', $str);
-}
-
-
-/**
- * Remove new lines characters from given string
- *
- * @param string $str  Input value
- *
- * @return string Stripped string
- */
-function strip_newlines($str)
-{
-    return preg_replace('/[\r\n]/', '', $str);
 }
 
 

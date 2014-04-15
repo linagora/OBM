@@ -76,7 +76,7 @@ class enigma_driver_gnupg extends enigma_driver
 
         // Create Crypt_GPG object
         try {
-	        $this->gpg = new Crypt_GPG(array(
+            $this->gpg = new Crypt_GPG(array(
                 'homedir'   => $this->homedir,
 //                'debug'     => true,
           ));
@@ -89,20 +89,20 @@ class enigma_driver_gnupg extends enigma_driver
     function encrypt($text, $keys)
     {
 /*
-	    foreach ($keys as $key) {
-		    $this->gpg->addEncryptKey($key);
-	    }
-	    $enc = $this->gpg->encrypt($text);
-	    return $enc;
+        foreach ($keys as $key) {
+            $this->gpg->addEncryptKey($key);
+        }
+        $enc = $this->gpg->encrypt($text);
+        return $enc;
 */
     }
 
     function decrypt($text, $key, $passwd)
     {
-//	    $this->gpg->addDecryptKey($key, $passwd);
+//        $this->gpg->addDecryptKey($key, $passwd);
         try {
-    	    $dec = $this->gpg->decrypt($text);
-    	    return $dec;
+            $dec = $this->gpg->decrypt($text);
+            return $dec;
         }
         catch (Exception $e) {
             return $this->get_error_from_exception($e);
@@ -112,17 +112,17 @@ class enigma_driver_gnupg extends enigma_driver
     function sign($text, $key, $passwd)
     {
 /*
-	    $this->gpg->addSignKey($key, $passwd);
-	    $signed = $this->gpg->sign($text, Crypt_GPG::SIGN_MODE_DETACHED);
-	    return $signed;
+        $this->gpg->addSignKey($key, $passwd);
+        $signed = $this->gpg->sign($text, Crypt_GPG::SIGN_MODE_DETACHED);
+        return $signed;
 */
     }
 
     function verify($text, $signature)
     {
         try {
-    	    $verified = $this->gpg->verify($text, $signature);
-      	    return $this->parse_signature($verified[0]);
+            $verified = $this->gpg->verify($text, $signature);
+            return $this->parse_signature($verified[0]);
         }
         catch (Exception $e) {
             return $this->get_error_from_exception($e);
@@ -141,11 +141,11 @@ class enigma_driver_gnupg extends enigma_driver
             return $this->get_error_from_exception($e);
         }
     }
-    
+
     public function list_keys($pattern='')
     {
         try {
-    	    $keys = $this->gpg->getKeys($pattern);
+            $keys = $this->gpg->getKeys($pattern);
             $result = array();
 //print_r($keys);
             foreach ($keys as $idx => $key) {
@@ -153,13 +153,13 @@ class enigma_driver_gnupg extends enigma_driver
                 unset($keys[$idx]);
             }
 //print_r($result);
-      	    return $result;
+            return $result;
         }
         catch (Exception $e) {
             return $this->get_error_from_exception($e);
         }
     }
-    
+
     public function get_key($keyid)
     {
         $list = $this->list_keys($keyid);
@@ -167,7 +167,7 @@ class enigma_driver_gnupg extends enigma_driver
         if (is_array($list))
             return array_shift($list);
 
-        // error        
+        // error
         return $list;
     }
 
@@ -178,14 +178,12 @@ class enigma_driver_gnupg extends enigma_driver
     public function del_key($keyid)
     {
 //        $this->get_key($keyid);
-        
-        
     }
-    
+
     public function del_privkey($keyid)
     {
         try {
-    	    $this->gpg->deletePrivateKey($keyid);
+            $this->gpg->deletePrivateKey($keyid);
             return true;
         }
         catch (Exception $e) {
@@ -196,14 +194,14 @@ class enigma_driver_gnupg extends enigma_driver
     public function del_pubkey($keyid)
     {
         try {
-    	    $this->gpg->deletePublicKey($keyid);
+            $this->gpg->deletePublicKey($keyid);
             return true;
         }
         catch (Exception $e) {
             return $this->get_error_from_exception($e);
         }
     }
-    
+
     /**
      * Converts Crypt_GPG exception into Enigma's error object
      *
@@ -281,7 +279,7 @@ class enigma_driver_gnupg extends enigma_driver
 
             $ekey->users[$idx] = $id;
         }
-        
+
         $ekey->name = trim($ekey->users[0]->name . ' <' . $ekey->users[0]->email . '>');
 
         foreach ($key->getSubKeys() as $idx => $subkey) {
@@ -297,9 +295,9 @@ class enigma_driver_gnupg extends enigma_driver
 
                 $ekey->subkeys[$idx] = $skey;
         };
-        
+
         $ekey->id = $ekey->subkeys[0]->id;
-        
+
         return $ekey;
     }
 }
