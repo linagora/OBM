@@ -112,23 +112,23 @@ SELECT userobm_id, 'set_top_bar', 'no' FROM userobm;
 -- Roundcube Webmail initial database structure
 
 --
--- Sequence "user_ids"
--- Name: user_ids; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Sequence "rc_users_seq"
+-- Name: rc_users_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE rc_user_ids
+CREATE SEQUENCE rc_users_seq
     INCREMENT BY 1
     NO MAXVALUE
     NO MINVALUE
     CACHE 1;
 
 --
--- Table "users"
--- Name: users; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_users"
+-- Name: rc_users; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE rc_users (
-    user_id integer DEFAULT nextval('rc_user_ids'::text) PRIMARY KEY,
+    user_id integer DEFAULT nextval('rc_users_seq'::text) PRIMARY KEY,
     username varchar(128) DEFAULT '' NOT NULL,
     mail_host varchar(128) DEFAULT '' NOT NULL,
     created timestamp with time zone DEFAULT now() NOT NULL,
@@ -140,14 +140,14 @@ CREATE TABLE rc_users (
 
 
 --
--- Table "session"
--- Name: session; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_session"
+-- Name: rc_session; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE "rc_session" (
     sess_id varchar(128) DEFAULT '' PRIMARY KEY,
     created timestamp with time zone DEFAULT now() NOT NULL,
-    Changed timestamp with time zone DEFAULT now() NOT NULL,
+    changed timestamp with time zone DEFAULT now() NOT NULL,
     ip varchar(41) NOT NULL,
     vars text NOT NULL
 );
@@ -156,11 +156,11 @@ CREATE INDEX rc_session_changed_idx ON rc_session (changed);
 
 
 --
--- Sequence "identity_ids"
--- Name: identity_ids; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Sequence "rc_identities_seq"
+-- Name: rc_identities_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE rc_identity_ids
+CREATE SEQUENCE rc_identities_seq
     START WITH 1
     INCREMENT BY 1
     NO MAXVALUE
@@ -168,12 +168,12 @@ CREATE SEQUENCE rc_identity_ids
     CACHE 1;
 
 --
--- Table "identities"
--- Name: identities; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_identities"
+-- Name: rc_identities; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE rc_identities (
-    identity_id integer DEFAULT nextval('rc_identity_ids'::text) PRIMARY KEY,
+    identity_id integer DEFAULT nextval('rc_identities_seq'::text) PRIMARY KEY,
     user_id integer NOT NULL
         REFERENCES rc_users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     changed timestamp with time zone DEFAULT now() NOT NULL,
@@ -193,11 +193,11 @@ CREATE INDEX rc_identities_email_idx ON rc_identities (email, del);
 
 
 --
--- Sequence "contact_ids"
--- Name: contact_ids; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Sequence "rc_contacts_seq"
+-- Name: rc_contacts_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE rc_contact_ids
+CREATE SEQUENCE rc_contacts_seq
     START WITH 1
     INCREMENT BY 1
     NO MAXVALUE
@@ -205,12 +205,12 @@ CREATE SEQUENCE rc_contact_ids
     CACHE 1;
 
 --
--- Table "contacts"
--- Name: contacts; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_contacts"
+-- Name: rc_contacts; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE rc_contacts (
-    contact_id integer DEFAULT nextval('rc_contact_ids'::text) PRIMARY KEY,
+    contact_id integer DEFAULT nextval('rc_contacts_seq'::text) PRIMARY KEY,
     user_id integer NOT NULL
         REFERENCES rc_users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     changed timestamp with time zone DEFAULT now() NOT NULL,
@@ -226,23 +226,23 @@ CREATE TABLE rc_contacts (
 CREATE INDEX rc_contacts_user_id_idx ON rc_contacts (user_id, del);
 
 --
--- Sequence "contactgroups_ids"
--- Name: contactgroups_ids; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Sequence "rc_contactgroups_seq"
+-- Name: rc_contactgroups_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE rc_contactgroups_ids
+CREATE SEQUENCE rc_contactgroups_seq
     INCREMENT BY 1
     NO MAXVALUE
     NO MINVALUE
     CACHE 1;
 
 --
--- Table "contactgroups"
--- Name: contactgroups; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_contactgroups"
+-- Name: rc_contactgroups; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE rc_contactgroups (
-    contactgroup_id integer DEFAULT nextval('rc_contactgroups_ids'::text) PRIMARY KEY,
+    contactgroup_id integer DEFAULT nextval('rc_contactgroups_seq'::text) PRIMARY KEY,
     user_id integer NOT NULL
         REFERENCES rc_users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     changed timestamp with time zone DEFAULT now() NOT NULL,
@@ -253,8 +253,8 @@ CREATE TABLE rc_contactgroups (
 CREATE INDEX rc_contactgroups_user_id_idx ON rc_contactgroups (user_id, del);
 
 --
--- Table "contactgroupmembers"
--- Name: contactgroupmembers; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_contactgroupmembers"
+-- Name: rc_contactgroupmembers; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE rc_contactgroupmembers (
@@ -269,8 +269,8 @@ CREATE TABLE rc_contactgroupmembers (
 CREATE INDEX rc_contactgroupmembers_contact_id_idx ON rc_contactgroupmembers (contact_id);
 
 --
--- Table "cache"
--- Name: cache; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_cache"
+-- Name: rc_cache; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE "rc_cache" (
@@ -278,48 +278,64 @@ CREATE TABLE "rc_cache" (
         REFERENCES rc_users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     cache_key varchar(128) DEFAULT '' NOT NULL,
     created timestamp with time zone DEFAULT now() NOT NULL,
+    expires timestamp with time zone DEFAULT NULL,
     data text NOT NULL
 );
 
 CREATE INDEX rc_cache_user_id_idx ON "rc_cache" (user_id, cache_key);
-CREATE INDEX rc_cache_created_idx ON "rc_cache" (created);
+CREATE INDEX rc_cache_expires_idx ON "rc_cache" (expires);
 
 --
--- Table "cache_index"
--- Name: cache_index; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_cache_shared"
+-- Name: rc_cache_shared; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE "rc_cache_shared" (
+    cache_key varchar(255) NOT NULL,
+    created timestamp with time zone DEFAULT now() NOT NULL,
+    expires timestamp with time zone DEFAULT NULL,
+    data text NOT NULL
+);
+
+CREATE INDEX rc_cache_shared_cache_key_idx ON "rc_cache_shared" (cache_key);
+CREATE INDEX rc_cache_shared_expires_idx ON "rc_cache_shared" (expires);
+
+--
+-- Table "rc_cache_index"
+-- Name: rc_cache_index; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE rc_cache_index (
     user_id integer NOT NULL
         REFERENCES rc_users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     mailbox varchar(255) NOT NULL,
-    changed timestamp with time zone DEFAULT now() NOT NULL,
+    expires timestamp with time zone DEFAULT NULL,
     valid smallint NOT NULL DEFAULT 0,
     data text NOT NULL,
     PRIMARY KEY (user_id, mailbox)
 );
 
-CREATE INDEX rc_cache_index_changed_idx ON rc_cache_index (changed);
+CREATE INDEX rc_cache_index_expires_idx ON rc_cache_index (expires);
 
 --
--- Table "cache_thread"
--- Name: cache_thread; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_cache_thread"
+-- Name: rc_cache_thread; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE rc_cache_thread (
     user_id integer NOT NULL
         REFERENCES rc_users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     mailbox varchar(255) NOT NULL,
-    changed timestamp with time zone DEFAULT now() NOT NULL,
+    expires timestamp with time zone DEFAULT NULL,
     data text NOT NULL,
     PRIMARY KEY (user_id, mailbox)
 );
 
-CREATE INDEX rc_cache_thread_changed_idx ON rc_cache_thread (changed);
+CREATE INDEX rc_cache_thread_expires_idx ON rc_cache_thread (expires);
 
 --
--- Table "cache_messages"
--- Name: cache_messages; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_cache_messages"
+-- Name: rc_cache_messages; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE rc_cache_messages (
@@ -327,17 +343,17 @@ CREATE TABLE rc_cache_messages (
         REFERENCES rc_users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     mailbox varchar(255) NOT NULL,
     uid integer NOT NULL,
-    changed timestamp with time zone DEFAULT now() NOT NULL,
+    expires timestamp with time zone DEFAULT NULL,
     data text NOT NULL,
     flags integer NOT NULL DEFAULT 0,
     PRIMARY KEY (user_id, mailbox, uid)
 );
 
-CREATE INDEX rc_cache_messages_changed_idx ON rc_cache_messages (changed);
+CREATE INDEX rc_cache_messages_expires_idx ON rc_cache_messages (expires);
 
 --
--- Table "dictionary"
--- Name: dictionary; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_dictionary"
+-- Name: rc_dictionary; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE rc_dictionary (
@@ -349,23 +365,23 @@ CREATE TABLE rc_dictionary (
 );
 
 --
--- Sequence "searches_ids"
--- Name: searches_ids; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Sequence "rc_searches_seq"
+-- Name: rc_searches_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE rc_search_ids
+CREATE SEQUENCE rc_searches_seq
     INCREMENT BY 1
     NO MAXVALUE
     NO MINVALUE
     CACHE 1;
 
 --
--- Table "searches"
--- Name: searches; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_searches"
+-- Name: rc_searches; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE rc_searches (
-    search_id integer DEFAULT nextval('rc_search_ids'::text) PRIMARY KEY,
+    search_id integer DEFAULT nextval('rc_searches_seq'::text) PRIMARY KEY,
     user_id integer NOT NULL
         REFERENCES rc_users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
     "type" smallint DEFAULT 0 NOT NULL,
@@ -376,8 +392,8 @@ CREATE TABLE rc_searches (
 
 
 --
--- Table "system"
--- Name: system; Type: TABLE; Schema: public; Owner: postgres
+-- Table "rc_system"
+-- Name: rc_system; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE "rc_system" (
@@ -385,9 +401,7 @@ CREATE TABLE "rc_system" (
     value text
 );
 
-INSERT INTO rc_system (name, value) VALUES ('roundcube-version', '2013011700');
-
-
+INSERT INTO rc_system (name, value) VALUES ('roundcube-version', '2013061000');
 
 ------------------------------------------------------------------------
 -- Write that the 2.5->3.0 is completed

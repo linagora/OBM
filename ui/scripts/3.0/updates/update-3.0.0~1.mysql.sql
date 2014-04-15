@@ -102,7 +102,7 @@ SELECT userobm_id, 'set_top_bar', 'no' FROM UserObm;
 
 /*!40014  SET FOREIGN_KEY_CHECKS=0 */;
 
--- Table structure for table `session`
+-- Table structure for table `rc_session`
 
 CREATE TABLE `rc_session` (
  `sess_id` varchar(128) NOT NULL,
@@ -115,7 +115,7 @@ CREATE TABLE `rc_session` (
 ) /*!40000 ENGINE=INNODB */ /*!40101 CHARACTER SET utf8 COLLATE utf8_general_ci */;
 
 
--- Table structure for table `users`
+-- Table structure for table `rc_users`
 
 CREATE TABLE `rc_users` (
  `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -130,66 +130,79 @@ CREATE TABLE `rc_users` (
 ) /*!40000 ENGINE=INNODB */ /*!40101 CHARACTER SET utf8 COLLATE utf8_general_ci */;
 
 
--- Table structure for table `cache`
+-- Table structure for table `rc_cache`
 
 CREATE TABLE `rc_cache` (
  `user_id` int(10) UNSIGNED NOT NULL,
- `cache_key` varchar(128) /*!40101 CHARACTER SET ascii COLLATE ascii_general_ci */ NOT NULL ,
+ `cache_key` varchar(128) /*!40101 CHARACTER SET ascii COLLATE ascii_general_ci */ NOT NULL,
  `created` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+ `expires` datetime DEFAULT NULL,
  `data` longtext NOT NULL,
  CONSTRAINT `user_id_fk_cache` FOREIGN KEY (`user_id`)
    REFERENCES `rc_users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
- INDEX `created_index` (`created`),
+ INDEX `expires_index` (`expires`),
  INDEX `user_cache_index` (`user_id`,`cache_key`)
 ) /*!40000 ENGINE=INNODB */ /*!40101 CHARACTER SET utf8 COLLATE utf8_general_ci */;
 
 
--- Table structure for table `cache_index`
+-- Table structure for table `rc_cache_shared`
+
+CREATE TABLE `rc_cache_shared` (
+ `cache_key` varchar(255) /*!40101 CHARACTER SET ascii COLLATE ascii_general_ci */ NOT NULL,
+ `created` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+ `expires` datetime DEFAULT NULL,
+ `data` longtext NOT NULL,
+ INDEX `expires_index` (`expires`),
+ INDEX `cache_key_index` (`cache_key`)
+) /*!40000 ENGINE=INNODB */ /*!40101 CHARACTER SET utf8 COLLATE utf8_general_ci */;
+
+
+-- Table structure for table `rc_cache_index`
 
 CREATE TABLE `rc_cache_index` (
  `user_id` int(10) UNSIGNED NOT NULL,
  `mailbox` varchar(255) BINARY NOT NULL,
- `changed` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+ `expires` datetime DEFAULT NULL,
  `valid` tinyint(1) NOT NULL DEFAULT '0',
  `data` longtext NOT NULL,
  CONSTRAINT `user_id_fk_cache_index` FOREIGN KEY (`user_id`)
    REFERENCES `rc_users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
- INDEX `changed_index` (`changed`),
+ INDEX `expires_index` (`expires`),
  PRIMARY KEY (`user_id`, `mailbox`)
 ) /*!40000 ENGINE=INNODB */ /*!40101 CHARACTER SET utf8 COLLATE utf8_general_ci */;
 
 
--- Table structure for table `cache_thread`
+-- Table structure for table `rc_cache_thread`
 
 CREATE TABLE `rc_cache_thread` (
  `user_id` int(10) UNSIGNED NOT NULL,
  `mailbox` varchar(255) BINARY NOT NULL,
- `changed` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+ `expires` datetime DEFAULT NULL,
  `data` longtext NOT NULL,
  CONSTRAINT `user_id_fk_cache_thread` FOREIGN KEY (`user_id`)
    REFERENCES `rc_users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
- INDEX `changed_index` (`changed`),
+ INDEX `expires_index` (`expires`),
  PRIMARY KEY (`user_id`, `mailbox`)
 ) /*!40000 ENGINE=INNODB */ /*!40101 CHARACTER SET utf8 COLLATE utf8_general_ci */;
 
 
--- Table structure for table `cache_messages`
+-- Table structure for table `rc_cache_messages`
 
 CREATE TABLE `rc_cache_messages` (
  `user_id` int(10) UNSIGNED NOT NULL,
  `mailbox` varchar(255) BINARY NOT NULL,
  `uid` int(11) UNSIGNED NOT NULL DEFAULT '0',
- `changed` datetime NOT NULL DEFAULT '1000-01-01 00:00:00',
+ `expires` datetime DEFAULT NULL,
  `data` longtext NOT NULL,
  `flags` int(11) NOT NULL DEFAULT '0',
  CONSTRAINT `user_id_fk_cache_messages` FOREIGN KEY (`user_id`)
    REFERENCES `rc_users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
- INDEX `changed_index` (`changed`),
+ INDEX `expires_index` (`expires`),
  PRIMARY KEY (`user_id`, `mailbox`, `uid`)
 ) /*!40000 ENGINE=INNODB */ /*!40101 CHARACTER SET utf8 COLLATE utf8_general_ci */;
 
 
--- Table structure for table `contacts`
+-- Table structure for table `rc_contacts`
 
 CREATE TABLE `rc_contacts` (
  `contact_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -208,7 +221,7 @@ CREATE TABLE `rc_contacts` (
  INDEX `user_contacts_index` (`user_id`,`del`)
 ) /*!40000 ENGINE=INNODB */ /*!40101 CHARACTER SET utf8 COLLATE utf8_general_ci */;
 
--- Table structure for table `contactgroups`
+-- Table structure for table `rc_contactgroups`
 
 CREATE TABLE `rc_contactgroups` (
   `contactgroup_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -235,7 +248,7 @@ CREATE TABLE `rc_contactgroupmembers` (
 ) /*!40000 ENGINE=INNODB */;
 
 
--- Table structure for table `identities`
+-- Table structure for table `rc_identities`
 
 CREATE TABLE `rc_identities` (
  `identity_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -258,7 +271,7 @@ CREATE TABLE `rc_identities` (
 ) /*!40000 ENGINE=INNODB */ /*!40101 CHARACTER SET utf8 COLLATE utf8_general_ci */;
 
 
--- Table structure for table `dictionary`
+-- Table structure for table `rc_dictionary`
 
 CREATE TABLE `rc_dictionary` (
   `user_id` int(10) UNSIGNED DEFAULT NULL,
@@ -270,7 +283,7 @@ CREATE TABLE `rc_dictionary` (
 ) /*!40000 ENGINE=INNODB */ /*!40101 CHARACTER SET utf8 COLLATE utf8_general_ci */;
 
 
--- Table structure for table `searches`
+-- Table structure for table `rc_searches`
 
 CREATE TABLE `rc_searches` (
  `search_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -285,7 +298,7 @@ CREATE TABLE `rc_searches` (
 ) /*!40000 ENGINE=INNODB */ /*!40101 CHARACTER SET utf8 COLLATE utf8_general_ci */;
 
 
--- Table structure for table `system`
+-- Table structure for table `rc_system`
 
 CREATE TABLE `rc_system` (
  `name` varchar(64) NOT NULL,
@@ -295,7 +308,7 @@ CREATE TABLE `rc_system` (
 
 /*!40014 SET FOREIGN_KEY_CHECKS=1 */;
 
-INSERT INTO rc_system (name, value) VALUES ('roundcube-version', '2013011700');
+INSERT INTO rc_system (name, value) VALUES ('roundcube-version', '2013061000');
 
 
 
