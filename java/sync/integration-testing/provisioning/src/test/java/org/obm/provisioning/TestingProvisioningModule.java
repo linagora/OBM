@@ -55,37 +55,48 @@ import org.obm.domain.dao.UserPatternDaoJdbcImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import com.google.inject.util.Modules;
 import com.sun.jersey.guice.JerseyServletModule;
 
-public class TestingProvisioningModule extends ProvisioningService {
+public class TestingProvisioningModule extends AbstractModule {
+
+	private Module module;
 
 	public TestingProvisioningModule(ServletContext servletContext) {
-		super(servletContext);
+		module = Modules.override(new ProvisioningService(servletContext)).with(new OverridingModule());
+	}
+	
+	@Override
+	protected void configure() {
+		install(module);
 	}
 
-	@Override
-	protected void configureServlets() {
-		super.configureServlets();
-
-		Configuration.Transaction transaction = new Configuration.Transaction();
-		transaction.timeoutInSeconds = 3600;
+	public static class OverridingModule extends AbstractModule {
 		
-		install(new TransactionalModule());
-		install(new JerseyServletModule());
-		
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(transaction));
-		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
-		databaseDrivers.addBinding().to(H2DriverConfiguration.class);
-		bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
-		bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
-		bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
-		bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
-		bind(UserDao.class).to(UserDaoJdbcImpl.class);
-		
-		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION))
-			.toInstance(LoggerFactory.getLogger(ProvisioningService.class));
+		@Override
+		protected void configure() {
+			Configuration.Transaction transaction = new Configuration.Transaction();
+			transaction.timeoutInSeconds = 3600;
+	
+			install(new TransactionalModule());
+			install(new JerseyServletModule());
+			
+			bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
+			bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(transaction));
+			Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
+			databaseDrivers.addBinding().to(H2DriverConfiguration.class);
+			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
+			bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
+			bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
+			bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
+			bind(UserDao.class).to(UserDaoJdbcImpl.class);
+			
+			bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION))
+				.toInstance(LoggerFactory.getLogger(ProvisioningService.class));
+		}
 	}
 }
