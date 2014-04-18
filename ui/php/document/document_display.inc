@@ -1269,6 +1269,8 @@ function dis_document_file($doc_q) {
   $name = $doc_q->f("document_name");  
   $kind = $doc_q->f("document_kind");
 
+  ob_end_clean();
+
   // If document is a link we transfer to the link
   if ($kind == $cdoc_kind_link) {
     header("location: $name");
@@ -1296,7 +1298,6 @@ function dis_document_file($doc_q) {
       
       while ( !feof($handle) ) {
         echo fread($handle, 4096);
-        ob_flush();
       } 
       fclose ($handle); 
       exit();
