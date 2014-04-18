@@ -2200,5 +2200,8 @@ function mb_chunk_split($str, $len, $glue) {
   }
 }
 
+function is_global_admin() {
+  return $GLOBALS["obm"]["domain_global"];
+}
 
 </script>

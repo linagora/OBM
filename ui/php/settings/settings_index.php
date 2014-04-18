@@ -358,6 +358,14 @@ if ($params['form_user_pref']) {
 if(function_exists('hook_settings_custom_fields')) {
   $customFields = hook_settings_custom_fields();
 }
+
+$topbar_display_block = is_global_admin() ? "" : "<tr id='settings_new_topbar'>
+  <th>$l_set_topbar</th>
+  <td>
+    <span class=\"NW\"><input type=\"checkbox\" class=\"box\" id=\"topbar\" name=\"topbar\" value=\"yes\" $topbar $disable_checkbox/></span>
+  </td>
+</tr>";
+
 $display['detail'] .= "
 <!--User preferences current config -->
 
@@ -372,12 +380,7 @@ $display['detail'] .= "
       <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_ico\" $me_ico />$l_me_ico</label></span>
       <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_both\" $me_both />$l_me_both</label></span>
     </td>
-  </tr><tr id='settings_new_topbar'>
-    <th>$l_set_topbar</th>
-    <td>
-      <span class=\"NW\"><input type=\"checkbox\" class=\"box\" id=\"topbar\" name=\"topbar\" value=\"yes\" $topbar $disable_checkbox/></span>
-    </td>
-  </tr><tr id='settings_autoDispay'>
+  </tr>$topbar_display_block<tr id='settings_autoDispay'>
     <th><label for=\"lbl_auto_display\">$l_auto_display</label></th>
     <td>
       <input type=\"checkbox\" class=\"box\" id=\"lbl_auto_display\" name=\"display\" value=\"yes\" ";

@@ -1048,6 +1048,10 @@ function display_outframe(&$display) {
 ///////////////////////////////////////////////////////////////////////////////
 
 function show_topmenupopin() {
+  if (is_global_admin()) {
+    return false;
+  }
+
 	if ($_SESSION['set_top_bar'] != 'yes') {
 		if (!isset($_SESSION['displayed_popin']) OR $_SESSION['displayed_popin'] != 1) {
 				return true;
