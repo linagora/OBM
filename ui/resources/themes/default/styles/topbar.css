@@ -776,7 +776,7 @@ form {
 }
 
 #portletsHandler:hover {
-  box-shadow: 1px 1px 4px #999;
+  cursor: pointer;
 }
 
 .portlet {
