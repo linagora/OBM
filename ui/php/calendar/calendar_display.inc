@@ -552,11 +552,11 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
     new obm.AutoComplete.Search('$GLOBALS[path]/contact/contact_index.php?action=ext_search_mail&fromMyContacts=1&withCalendar=1', 'sel_ent', 'contactSearch')";
 
   $block_entity = "
+  $block_group
   <form action=\"".basename($_SERVER['SCRIPT_NAME'])."\" method=\"get\">
   $block_user
   $block_resource
   $block_contact
-  $block_group
   $sel_ent
   <div id=\"sel_ent\">
   </div>
@@ -615,16 +615,16 @@ function html_calendar_select_calendar_entity($new_action, $current_view, $calen
   <div class=\"portlet\" id=\"calendarSelection\">
     <h1>$l_selection</h1>
     <div>
-    $block_entity
-    <div class='C'>
-    $dis_back_myview
-    </div>
     <form action=\"\">
     <fieldset class=\"detail extra\">
     <legend>$l_category_filter</legend>
       $sel_cat1 
     </fieldset>
     </form>
+    $block_entity
+    <div class='C'>
+    $dis_back_myview
+    </div>
     <fieldset class=\"detail extra\">
     <legend>$l_add</legend>
     $link_add_shared_calendar
