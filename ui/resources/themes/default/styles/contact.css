@@ -9,7 +9,6 @@
 #contactPanel {
   font-family: sans-serif;
   width: 100%;
-  border: 1px solid #ccc;
   border-spacing: 0;
 }
 
@@ -29,21 +28,12 @@
   overflow: hidden;
   font-weight: bold;
   text-align: middle;
-  background-color: #FAFAFA;
-  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
   vertical-align: middle;
   color: #111;
   font-size: 12px;
   line-height: 12px;
 }
-.contactPanelHeader thead tr+tr, .contactPanelHeader thead tr+tr td{
-  background-color: #FFF;
-}
-}
+
 .contactPanelHeader input{
   border-radius: 8px;
 }
@@ -51,12 +41,6 @@
 
 .contactPanelHeader thead td.toolbar, .contactPanelHeader thead th.toolbar {
   text-align: left;
-  background-color: #FAFAFA;
-  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
   height: 25px;
   overflow: visible;
 }
@@ -66,9 +50,8 @@
 }
 
 #addressBookContainer tbody td a:hover, #dataGrid tbody tr.even:hover,  #dataGrid tbody tr.odd:hover {
-  background-color: #E2F0FF;
   cursor: pointer;
-  color: #333;
+  color: #000;
 }
 
 #addressBookContainer tbody td .dropDownMenu ul a:hover {
@@ -77,8 +60,17 @@
 }
 
 #addressBookContainer td.current, #dataGrid tr.current {
-  background-color: #E2F0FF;
-  color: #000 !important;
+  background-color: #368397;
+  background: -moz-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -o-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -webkit-linear-gradient(top, #3F99AF 0%,#368397 100%) #368397;
+  background: -ms-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  color: #fff !important;
+}
+
+#addressBookContainer td.current a, #dataGrid tr.current a{
+  color: #fff !important;
 }
 
 
@@ -92,9 +84,8 @@
 /* Address Book column styling */
 
 #addressBookGrid {
-  border-right: 2px solid #d2d6da;
+  border-right: 2px solid #eee;
   width: 15em;
-  background-color: #F4F4F4; 
 }
 
 #addressBookGrid input.consult {
@@ -206,17 +197,21 @@
 
 #dataContainer tr.even {
   line-height: 2.5em;
-  background-color: #F4F4F4;
   height: 2.5em;
 }
 
 #dataGrid tr.current {
-  background-color: #E2F0FF;
-  color: #333 !important;
+  background-color: #368397;
+  background: -moz-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -o-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -webkit-linear-gradient(top, #3F99AF 0%,#368397 100%) #368397;
+  background: -ms-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  color: #fff !important;
 }
 
 #dataContainer td, #dataContainer th{
-  border-right: 1px solid #CCC;
+  border-right: 1px solid #DDD;
   text-align: left;
   padding-left: 5px;
 }
@@ -234,7 +229,7 @@
   border-radius: 5px;  
   margin: 0 10px 2px 20px ;
   float: left;
-  border: 3px solid #CCC;
+  border: 3px solid #ddd;
   height: 96px;
   width: 96px;
 }
@@ -459,8 +454,13 @@ table.contactPanelHeader th, .contactPanelContainer table td {
 
 .contactPanelHeader td.filler {
   width: 15px;
-  /width: 0px;
 }  
+
+.contactPanelHeader thead tr td {
+  text-align: right;
+  vertical-align: middle !important;
+  padding-right: 10px;
+}
 
 .contactPanelContainer table td, .contactPanelContainer table th {
   overflow-x : hidden;
@@ -472,11 +472,6 @@ table.contactPanelHeader th, .contactPanelContainer table td {
 
 #websiteLayout dd {
   overflow:hidden;
-}
-
-#informationGrid{
-  background-color: #FAFAFA;
-
 }
 
 #informationGrid select.addressbookSelector {
