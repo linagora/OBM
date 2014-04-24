@@ -1378,7 +1378,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   $block .= "
   <div id='calendarHeader'>
     <table class='calendarTable'>
-      <colgroup style='background:#EFF0F2;text-align:right;'></colgroup>
+      <colgroup style='text-align:right;'></colgroup>
       <colgroup></colgroup>
       <tr>
         <td class='hourPanel'></td>

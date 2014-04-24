@@ -72,14 +72,12 @@
   border-bottom:1px solid #CCC;
   position:absolute;
   text-align:center;
-  background:#EFF0F2;
   height: 100%;
   vertical-align:middle;
 }
 
 .dayLabel {
   text-align:center;
-  background: #F4F4F4;
 }
 
 .dayCol {
@@ -105,7 +103,7 @@
 }
 
 .downlight {
-  background: #F0F0F0;
+  background: #fff;
 }
 
 .alldayCell {
@@ -131,7 +129,6 @@
 .hourPanel {
   width: 4.5em;
   color: #555;
-  background:#F4F4F4;
 }
 
 .hourLabel {
@@ -223,7 +220,6 @@
 .calendarTable {
   width:100%;
   border-collapse:collapse;
-  background:#FFF;
   table-layout:fixed;
 }
 
@@ -1264,11 +1260,11 @@ input[type="submit"][disabled] {
 }
 
 .sendPopup input.downlight{
-  background: #F0F0F0;
+  background: #FFF;
 }
 
 .sendPopup div.downlight{
-  background: #F0F0F0;
+  background: #FFF;
 }
 
 .sendPopup input[type="submit"]{
@@ -1341,10 +1337,6 @@ div.colorHint {
 	margin: 2px;
 }
 
-#display_tag_color {
-  background-color: #EFF0F2 ;
-}
-
 .tagLegend {
   color: #FFF;
   padding-left: 3px;
@@ -1412,7 +1404,6 @@ div.colorHint {
   border-right: none;
   border-top: none;
   border-left: none;
-  background-color: #F4F4F4;
 }
 
 .eventDetail tbody td {
@@ -1451,10 +1442,6 @@ table.planning li {
 
 table.planningRessource a {
   color: #636466;
-}
-
-table.planningRessource th {
-  background-color:#F4F4F4;
 }
 
 table.planningRessource td {

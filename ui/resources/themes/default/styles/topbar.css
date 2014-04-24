@@ -283,7 +283,6 @@ form {
 
 #mainContent {
   z-index:0;
-  background-color: #F4F4F4;
   padding: 5px 0 5px;
 }
 
@@ -347,7 +346,6 @@ form {
   min-width: 1002px;
   height: 33px;
   line-height: 37px;
-  background: #FAFAFA;
   box-shadow: 0px -1px 5px #BBB inset;
   border-bottom: 1px solid #EEE;
   z-index: 999;
@@ -716,12 +714,6 @@ form {
 #action	{
   width: 99.9%;
   list-style-type: none;  
-  background-color: #FFF;
-  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
   line-height: 30px;
   height: 25px;
   padding: 0;
@@ -729,23 +721,18 @@ form {
   font-weight: bold;
   font-size:12px;
   color: #368397;
-  background-color: #fff;
-  border-radius: 0 15px 0 0;
-  border-top: 1px solid #DDD;
-  border-left: 1px solid #DDD;
-  border-right: 1px solid #DDD;
-  border-bottom: 2px solid #DDD;
   margin-top: 3px;
 }
 
 #action li {
   display: inline;
   padding-left: 5px;
-  padding-bottom: 3px;
+  padding-top: 5px;
+  border-top: 2px solid #eee;
 }
 
 #action li.hover {
- border-bottom: 2px solid #368397;
+ border-top: 2px solid #368397;
 }
 
 #action a {  
@@ -779,9 +766,6 @@ form {
   background-color: none;
   padding-top: 4px;
   padding-left: 1px;
-  border:1px solid #DDD;
-  box-shadow: 1px 1px 4px #DDD;
-  border-radius:0 10px 10px 0;
   overflow: hidden;
   position: absolute;
   top:0;
@@ -797,9 +781,7 @@ form {
   margin: 0;
   margin-bottom: 8px;
   color: #368397;
-  box-shadow: 0 0 4px #DDD;
   border: 1px solid #ddd;
-  background-color: #FAFAFA;
   list-style-type: none; 
   border-radius: 5px;
   overflow: hidden;
@@ -807,9 +789,8 @@ form {
 }
 
 .portlet h1 {
-  font-weight: bold;
-  color: #646567;
-  background-color: #DDD;
+  color: #666;
+  background-color: #eee;
   border-radius: 4px;
   font-size:100%;
   text-align: left;
@@ -1193,7 +1174,7 @@ input.datePicker {
 }
 
 #datepicker table tbody td.downlight, .miniCalendar tbody td.downlight, .detail tbody td.downlight {
-  background-color: #eff0f2;
+  background-color: #fff;
 }
 
 #datepicker table tbody td.hover, .miniCalendar tbody td.hover, .detail tbody td.hover {
@@ -1399,10 +1380,6 @@ input.datePicker {
 
 .result tbody td {
   padding: 1px 0 1px 2px;
-}
-
-.result tbody tr {
-  background-color: #F4F4F4;
 }
 
 .result tbody tr.highlight {
@@ -1749,7 +1726,6 @@ input.datePicker {
 }
 
 .autoCompleteResultBox h2 {
- background-color: #EFF0F2;
  text-align: center;
  min-width: 18em;
  font-size: 80%;
@@ -1757,7 +1733,7 @@ input.datePicker {
 }
 
 input.downlight {
-  color: #ddd !important;
+  color: #999 !important;
 }
 
 input.validated {
@@ -1787,17 +1763,16 @@ span.hiddenLegend {
 
 table.planning {
   font-family: sans-serif;
-  background-color: #F4F4F4;
   border-collapse: collapse;
   border-spacing: 0;
   width: 98%;
   margin: auto;
 }
+
 table.planning th{
   font-size: 100%;
   text-align: center;
   padding-right: 2px;
-  background-color: #F4F4F4;
 }
 
 table.planning colgroup.main {
@@ -2243,15 +2218,8 @@ form.button-to input {
 /* ------------------------------------------------------------------------- */
 #advancedSearch .header {
   font-size: 13px;
-  border:2px solid #DDD;
-  border-bottom: none;
-  background-color: #FAFAFA;
-  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  margin-left:30%;
+  padding-bottom: 3px;
+  margin-left: 170px;
   min-height: 15px;
   border-radius: 5px 5px 0 0 ;
   -moz-border-radius-topleft: 5px;
@@ -2262,8 +2230,9 @@ form.button-to input {
 
 #advancedSearch .header span.title {
   font-size:100%;
-  color: #777;
+  color: #555;
   font-weight:bold;
+  margin-left: 30%;
 }
 
 #advancedSearch .header span.link a {
@@ -2279,21 +2248,9 @@ form.button-to input {
 #advancedSearch .content {
   padding-top: 5px;
   padding-bottom: 5px;
-  border:2px solid #DDD;
+  border-top:2px solid #DDD;
+  border-bottom:2px solid #DDD;
   color: #777;
-  background-color: #FAFAFA;
-  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  border-radius: 5px 0 5px 5px;
-  -moz-border-radius-topleft: 5px;
-  -moz-border-radius-bottomright: 5px;
-  -moz-border-radius-bottomleft: 5px;
-  -webkit-border-top-left-radius: 5px;
-  -webkit-border-bottom-right-radius: 5px;
-  -webkit-border-bottom-left-radius: 5px;
 }
 
 #advancedSearch input, select {
@@ -2301,14 +2258,8 @@ form.button-to input {
   padding: 2px 3px;
   margin-bottom: 2px;
   margin-left: 5px;
-  background-color: #FAFAFA;
-  border: 1px solid #DDD;
-  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
 }
+
 #advancedSearch input[type=submit]{
   border-width: 1px;
   border-color: #47ADC6 #368397 #296472;
