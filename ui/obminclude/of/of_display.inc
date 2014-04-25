@@ -1502,27 +1502,27 @@ function display_unified_menu($module) {
     $data["intro-steps"] = array(
         array(
             "id" => "webmail",
-            "position" => "bottom",
+            "position" => "right",
             "text" => $l_intro_webmail
         ),
         array(
             "id" => "calendar",
-            "position" => "bottom",
+            "position" => "right",
             "text" => $l_intro_calendar
         ),
         array(
             "id" => "contacts",
-            "position" => "bottom",
+            "position" => "right",
             "text" => $l_intro_contacts
         ),
         array(
             "id" => "moremenu",
-            "position" => "bottom",
+            "position" => "right",
             "text" => $l_intro_moremenu
         ),
         array(
             "id" => "user",
-            "position" => "right",
+            "position" => "left",
             "text" => $l_intro_user
         ),
     );
