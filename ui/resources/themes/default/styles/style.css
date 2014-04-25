@@ -2278,3 +2278,7 @@ form.button-to input {
   padding-top: 27px;
   font-weight: bold;
 }
+
+#print {
+  width: 25px;
+}
