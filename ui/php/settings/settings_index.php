@@ -377,7 +377,6 @@ $display['detail'] .= "
     <th>$l_set_menu</th>
     <td>
       <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_txt\" $me_txt />$l_me_txt</label></span>
-      <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_ico\" $me_ico />$l_me_ico</label></span>
       <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_both\" $me_both />$l_me_both</label></span>
     </td>
   </tr>$topbar_display_block<tr id='settings_autoDispay'>
