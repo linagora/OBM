@@ -49,7 +49,7 @@ applicable to the OBM software.
 // $resources_path = "$cgp_host/images"; 
 
 // Home page redirection
-//$c_home_redirect = "$cgp_host" . 'calendar/calendar_index.php';
+$c_home_redirect = "$cgp_host" . 'webmail/webmail_index.php';
 
 // Use specific langs (was $cgp_site_include)
 //$conf_lang = true;
