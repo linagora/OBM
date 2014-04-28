@@ -52,8 +52,13 @@ if(!isset($_SESSION['set_cal_first_hour'])) $_SESSION['set_cal_first_hour'] = $c
 if(!$_SESSION['set_cal_last_hour']) $_SESSION['set_cal_last_hour'] = $ccalendar_last_hour;
 
 if ($params['lang'] != '') {
-  $_SESSION['set_lang'] = $params['lang'];
-  update_user_pref($obm['uid'], 'set_lang', $_SESSION['set_lang']);
+  $lang_dir = dir("$path/../$obminclude/lang");
+  while ($entry=$lang_dir->read()) {
+    if ($params['lang'] == $entry) {
+      $_SESSION['set_lang'] = $params['lang'];
+      update_user_pref($obm['uid'], 'set_lang', $_SESSION['set_lang']);
+    }
+  }
 }
 if ($params['theme'] != '') {
   $_SESSION['set_theme'] = $params['theme'];
