@@ -301,35 +301,42 @@ form {
 
 .spreadLove {
   font-family: sans-serif;
-  border-bottom: 1px solid #777;
-  border-right: 1px solid #777;
-  border-bottom-right-radius: 15px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
   font-weight: normal;
   margin: 0;
-  padding: 5px;
   text-align: left;
-  background-color: #FFF;
-  background-image: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -o-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  background-image: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(0,0,0,0.08) 100%);
-  box-shadow: 0px 0px 10px #AAA;
+  color: #EEE;
+  background-color: #368397;
+  background: -moz-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -o-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  background: -webkit-linear-gradient(top, #3F99AF 0%,#368397 100%) #368397;
+  background: -ms-linear-gradient(center top , #3F99AF 0%, #368397 100%) #368397;
+  box-shadow: 0px 0px 3px #777;
+  text-shadow: 2px 2px 2px #777;
   position: absolute;
-  top: 33.5px;
+  top: 35px;
+  right: 0;
   height:auto;
-  line-height: 12px;
-  left: 0;
-  padding-left: 105px;
-  font-size: 0.9em;
+  line-height: 13px;
+  padding: 4px 8px 5px 10px;
+  font-size: 13px;
   z-index: 9;
 }
 
-.spreadLove a {  color: #368397; font-weight: bolder; }
+.spreadLove a {
+  color: #fff; 
+  font-weight: bold;
+}
+.spreadLove a:hover{
+
+  color: #F90;
+}
 .spreadLove .supportUs { padding-top: 3px; }
 
 .spreadLove i{
-  font-size: 0.8em;
+  font-size: 10px;
 }
 
 
@@ -346,8 +353,6 @@ form {
   min-width: 1002px;
   height: 33px;
   line-height: 37px;
-  box-shadow: 0px -1px 5px #BBB inset;
-  border-bottom: 1px solid #EEE;
   z-index: 999;
 }
 
