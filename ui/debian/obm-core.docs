@@ -1,4 +1,5 @@
+conf/hooks
+conf/modules
 conf/obm_conf.inc.sample
 conf/themes
-conf/modules
-conf/hooks
+conf/webmail.inc.php.sample

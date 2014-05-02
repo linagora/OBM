@@ -352,6 +352,7 @@ mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}
 cp -apR contrib cron obminclude php resources tests scripts locale views app lib \
 	$RPM_BUILD_ROOT%{_datadir}/%{name}
 cp conf/obm_conf.inc $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
+cp conf/webmail.inc.php.sample $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 # Fix permissions
 chmod 0664 \
 	$RPM_BUILD_ROOT%{_datadir}/%{name}/php/admin_code/admin_code_index.php \
@@ -495,6 +496,7 @@ fi
 %{_sysconfdir}/%{name}/hooks
 %{_sysconfdir}/%{name}/themes
 %{_sysconfdir}/%{name}/modules
+%{_sysconfdir}/%{name}/webmail.inc.php.sample
 %{_sysconfdir}/cron.d/obm-core
 
 %attr(770,-,apache) %dir %{_datadir}/%{name}/php/webmail/temp

@@ -34,6 +34,7 @@ if is_initial_configuration "$@"; then
   ln -s /etc/obm /usr/share/obm/www/conf
   
   cp /usr/share/obm/sample/obm_conf.inc.sample /etc/obm/obm_conf.inc
+  cp /usr/share/obm/sample/webmail.inc.php.sample /etc/obm/webmail.inc.php.sample
   
   if [ -e /usr/share/doc/obm-core/modules/module.inc.gz ]; then
     zcat /usr/share/doc/obm-core/modules/module.inc.gz > /etc/obm/modules/module.inc

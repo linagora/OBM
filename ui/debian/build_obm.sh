@@ -27,6 +27,7 @@ mkdir -p ${BUILD_DEB_DIR_CORE}/var/lib/obm/documents/9
 mkdir -p ${BUILD_DEB_DIR_CORE}/usr/share/obm-ui
 
 cp ${CURDIR}/conf/obm_conf.inc.sample ${BUILD_DEB_DIR_CORE}/usr/share/obm/sample
+cp ${CURDIR}/conf/webmail.inc.php.sample ${BUILD_DEB_DIR_CORE}/usr/share/obm/sample
 cp -r ${CURDIR}/contrib ${BUILD_DEB_DIR_CORE}/usr/share/obm/www
 cp -r ${CURDIR}/obminclude ${BUILD_DEB_DIR_CORE}/usr/share/obm/www
 cp -r ${CURDIR}/php ${BUILD_DEB_DIR_CORE}/usr/share/obm/www

@@ -9,7 +9,9 @@ fi
 
 if [ "$1" = "purge" ]; then
         rm -f /usr/share/obm/www/conf
-	rm -f /etc/obm/obm_conf.inc
+        rm -f /etc/obm/obm_conf.inc
+        rm -f /etc/obm/obm/webmail.inc.php
+        rm -f /etc/obm/obm/webmail.inc.php.sample
         rm -f /etc/obm/modules/module.inc
         rm -f /etc/obm/themes/login.html.sample
         # Remove my changes to the db.

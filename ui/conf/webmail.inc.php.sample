@@ -30,49 +30,49 @@ applicable to the OBM software.
 ******************************************************************************/
 
 ///////////////////////////////////////////////////////////////////////////////////////
-// OBM - File : main.inc.php.sample                                                  //
+// OBM - File : webmail.inc.php.sample                                               //
 //     - Desc : OBM This file override main.inc.php from webmail integrated in OBM   //
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // open messages in new window
-$rcmail_config['message_extwin'] = false;
+$config['message_extwin'] = false;
 
 // open message compose form in new window
-$rcmail_config['compose_extwin'] = false;
+$config['compose_extwin'] = false;
 
 // Use this charset as fallback for message decoding
-$rcmail_config['default_charset'] = 'ISO-8859-1';
+$config['default_charset'] = 'ISO-8859-1';
 
 // skin name: folder from skins/
-$rcmail_config['skin'] = 'larry';
+$config['skin'] = 'larry';
 
 // provide an URL where a user can get support for this Roundcube installation
 // PLEASE DO NOT LINK TO THE ROUNDCUBE.NET WEBSITE HERE!
-$rcmail_config['support_url'] = '';
+$config['support_url'] = '';
 
 // show up to X items in messages list view
-$rcmail_config['mail_pagesize'] = 50;
+$config['mail_pagesize'] = 50;
 
 // show up to X items in contacts list view
-$rcmail_config['addressbook_pagesize'] = 50;
+$config['addressbook_pagesize'] = 50;
 
 // display remote inline images
 // 0 - Never, always ask
 // 1 - Ask if sender is not in address book
 // 2 - Always show inline images
-$rcmail_config['show_images'] = 0;
+$config['show_images'] = 0;
 
 // use this timezone to display date/time
 // valid timezone identifers are listed here: php.net/manual/en/timezones.php
 // 'auto' will use the browser's timezone settings
-$rcmail_config['timezone'] = 'auto';
+$config['timezone'] = 'auto';
 
 // Show signature:
 // 0 - Never
 // 1 - Always
 // 2 - New messages only
 // 3 - Forwards and Replies only
-$rcmail_config['show_sig'] = 1;
+$config['show_sig'] = 1;
 
 // Set identities access level:
 // 0 - many identities with possibility to edit all params
@@ -80,16 +80,16 @@ $rcmail_config['show_sig'] = 1;
 // 2 - one identity with possibility to edit all params
 // 3 - one identity with possibility to edit all params but not email address
 // 4 - one identity with possibility to edit only signature
-$rcmail_config['identities_level'] = 0;
+$config['identities_level'] = 0;
 
 // Default font for composed HTML message.
 // Supported values: Andale Mono, Arial, Arial Black, Book Antiqua, Courier New,
 // Georgia, Helvetica, Impact, Tahoma, Terminal, Times New Roman, Trebuchet MS, Verdana
-$rcmail_config['default_font'] = '';
+$config['default_font'] = '';
 
 // Example LDAP configuration. If your LDAP server isn't on the same machine,
 // replace 127.0.0.1 in the hosts property by the address of your host.
-$rcmail_config['ldap_public'] ['obm'] = array(
+$config['ldap_public'] ['obm'] = array(
   'name'          => 'OBM',
   'hosts'         => array('127.0.0.1'),
   'port'          => 389,
@@ -118,9 +118,9 @@ $rcmail_config['ldap_public'] ['obm'] = array(
 
 // The following makes use of the above LDAP configuration in address books and
 // autocomplete
-$rcmail_config['address_book_type'] = array('sql', 'ldap');
-$rcmail_config['autocomplete_addressbooks'] = array('sql', 'obm');
+$config['address_book_type'] = array('sql', 'ldap');
+$config['autocomplete_addressbooks'] = array('sql', 'obm');
 
 // The html editor is enabled by default. Uncomment this line if you would like
 // to disable it.
-// $rcmail_config['htmleditor'] = 0;
+// $config['htmleditor'] = 0;
