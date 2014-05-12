@@ -18,7 +18,6 @@ Source1: solr.xml
 Source2: obm-solr.cron.d
 
 BuildArch:      noarch
-BuildRequires:  java-devel >= 1.6.0
 BuildRequires:  ant
 Requires(post): obm-tomcat-common-libs, python-psycopg2
 
