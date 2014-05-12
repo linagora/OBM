@@ -17,7 +17,6 @@ Source0: %{name}-%{version}.tar.gz
 Source1: obm-tomcat.init
 Source2: obm-tomcat-trigger.sh
 BuildArch:      noarch
-BuildRequires:  sun-javadb-core == 1.6 or java-1.7.0-openjdk >= 1.7
 BuildRequires:  ant
 Requires(post): chkconfig
 Requires(preun): chkconfig
