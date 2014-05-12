@@ -18,9 +18,9 @@ Source1: obm-sync.postinst
 Source2: obm-autoconf.xml
 
 BuildArch:      noarch
-BuildRequires:  java-devel >= 1.6.0
+BuildRequires:  java-1.7.0-openjdk-devel >= 1.7.0
 BuildRequires:  ant
-Requires: java-devel >= 1.6.0
+Requires: java-1.7.0-openjdk >= 1.7.0
 Requires(post): obm-tomcat-common-libs = %{version}-%{release}
 Requires: obm-config
 
@@ -40,7 +40,7 @@ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 %package -n obm-locator
 Summary: Locator for Open Business Management
 Group:	Development/Tools
-Requires: obm-jre
+Requires: java-1.7.0-openjdk >= 1.7.0
 Requires: obm-config
 
 %description -n obm-locator
@@ -52,41 +52,10 @@ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
 simple contact database. OBM also features integration with PDAs, smartphones,
 Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
-%package -n obm-jre
-Summary: Virtual JRE package
-Group: Development/Tools
-
-%description -n obm-jre
-Virtual package for JRE.
-
-%files -n obm-jre
-
-%package -n obm-openjdk
-Summary: OpenJDK dependency
-Group: Development/Tools
-Provides: obm-jre
-Requires: java-1.7.0-openjdk >= 1.7
-
-%description -n obm-openjdk
-OpenJDK virtual package.
-
-%files -n obm-openjdk
-
-%package -n obm-sunjdk
-Summary: SunJDK dependency
-Group: Development/Tools
-Provides: obm-jre
-Requires: jdk >= 1.6
-
-%description -n obm-sunjdk
-SunJDK virtual package.
-
-%files -n obm-sunjdk
-
 %package -n obm-autoconf
 Summary: Locator for Open Business Management
 Group:	Development/Tools
-Requires: java-devel >= 1.6.0
+Requires: java-1.7.0-openjdk >= 1.7.0
 Requires: obm-config
 Requires: obm-tomcat
 

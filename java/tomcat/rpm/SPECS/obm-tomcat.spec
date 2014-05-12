@@ -18,6 +18,8 @@ Source1: obm-tomcat.init
 Source2: obm-tomcat-trigger.sh
 BuildArch:      noarch
 BuildRequires:  ant
+# Require -devel because obm-tomcat uses jps
+Requires: java-1.7.0-openjdk-devel >= 1.7
 Requires(post): chkconfig
 Requires(preun): chkconfig
 Requires(preun): initscripts
