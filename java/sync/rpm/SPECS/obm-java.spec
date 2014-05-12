@@ -20,7 +20,6 @@ Source2: obm-autoconf.xml
 BuildArch:      noarch
 BuildRequires:  java-1.7.0-openjdk-devel >= 1.7.0
 BuildRequires:  ant
-Requires: java-1.7.0-openjdk >= 1.7.0
 Requires(post): obm-tomcat-common-libs = %{version}-%{release}
 Requires: obm-config
 
@@ -55,7 +54,6 @@ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 %package -n obm-autoconf
 Summary: Locator for Open Business Management
 Group:	Development/Tools
-Requires: java-1.7.0-openjdk >= 1.7.0
 Requires: obm-config
 Requires: obm-tomcat
 
