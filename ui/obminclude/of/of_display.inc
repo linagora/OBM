@@ -1484,7 +1484,6 @@ function display_unified_menu($module) {
       "idmore" => "moremenu_button",
       "url" => "#",
       "notifier" => false,
-      "onclick" => "showAllInOneMenu()",
       "intro-element-id" => "moremenu"
     )
   );

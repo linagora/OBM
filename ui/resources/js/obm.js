@@ -561,27 +561,6 @@ function popup(url,name,height,width) {
   return false;
 }
 
-function showAllInOneMenu(){
-  var positionMoreMenuButton = $('moremenu_button').getPosition().x;
-  var allinonemenu = $('allinonemenu');
-
-  if ( allinonemenu.isVisible() ){
-    allinonemenu.setStyle('display', 'none');
-  }else{
-    allinonemenu.setStyle('display', 'block');
-    allinonemenu.setStyle('left', positionMoreMenuButton);
-  }
-}
-
-function showProfileMenu(){
-  var profileMenu = $('profileMenu');
-  if ( profileMenu.isVisible() ){
-    profileMenu.setStyle('display', 'none');
-  } else {
-    profileMenu.setStyle('display', 'block');
-  }
-}
-
 function showOkMessage(message) {
   showMessage('ok',message);
 }
@@ -891,5 +870,51 @@ Obm.CalendarPopupManager = new Class({
     this.fireEvent('complete')
     this.removeEvents();
   }
+
+});
+
+/****************************************************************
+  *  Close new top bar div 
+****************************************************************/
+
+window.addEvent('domready', function() {
+  var allInOneMenu = $('allinonemenu');
+  var moreMenuButton = $('moremenu_button');
+  var positionMoreMenuButton = moreMenuButton.getPosition().x;
+  var profileButton = $('profile_button');
+  var profileMenu = $('profileMenu');
+
+  moreMenuButton.addEvent('click', function() {
+    var displayValue = 'block';
+
+    allInOneMenu.setStyle('left', positionMoreMenuButton);
+    profileMenu.setStyle('display', 'none');
+
+    if (allInOneMenu.isVisible()) {
+      displayValue = 'none';
+    }
+
+    allInOneMenu.setStyle('display', displayValue);
+  });
+
+  allInOneMenu.addEvent('mouseleave', function() {
+    allInOneMenu.setStyle('display', 'none');
+  });
+
+  profileButton.addEvent('click', function() {
+    var displayValue = 'block';
+
+    allInOneMenu.setStyle('display', 'none');
+
+    if (profileMenu.isVisible()) {
+      displayValue = 'none';
+    }
+
+    profileMenu.setStyle('display', displayValue);
+  });
+
+  profileMenu.addEvent('mouseleave', function() {
+    profileMenu.setStyle('display', 'none');
+  });
 
 });
