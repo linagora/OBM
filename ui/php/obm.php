@@ -100,7 +100,7 @@ page_close();
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // If home page has a redirection
-if ($c_home_redirect != '' && !$params['error'] && $_GET['redirect'] != 'false') {
+if ($c_home_redirect != '' && !$params['error'] && $_GET['redirect'] != 'false' && !is_global_admin()) {
   header('Status: 301 OK');
   header("Location: $c_home_redirect");
   exit();
@@ -630,7 +630,7 @@ function dis_portlets_menu() {
 
   foreach($cgp_show['section'] as $section => $value){
     //var_dump($value['url']);
-    $portlet_need = array('gw', 'admin', 'user', 'dic');
+    $portlet_need = array('admin', 'user');
     if( in_array($section, $portlet_need) && ( isset($value['url']) || $value['url'] != "./admin_ref/admin_ref_index.php?mode=html")){
       $portlet_title = "l_section_".$section;
       $block .= "
