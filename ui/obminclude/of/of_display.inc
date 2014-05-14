@@ -1494,32 +1494,35 @@ function display_unified_menu($module) {
     update_user_pref($uid, "seen_topbar_intro", "yes");
 
     $data["show_intro"] = true;
-    $data["intro-steps"] = array(
-        array(
-            "id" => "webmail",
-            "position" => "right",
-            "text" => $l_intro_webmail
-        ),
-        array(
-            "id" => "calendar",
-            "position" => "right",
-            "text" => $l_intro_calendar
-        ),
-        array(
-            "id" => "contacts",
-            "position" => "right",
-            "text" => $l_intro_contacts
-        ),
-        array(
-            "id" => "moremenu",
-            "position" => "right",
-            "text" => $l_intro_moremenu
-        ),
-        array(
-            "id" => "user",
-            "position" => "left",
-            "text" => $l_intro_user
-        ),
+    $data["intro-steps"] = array();
+
+    if ( !empty($data["user_infos"]["email"]) ) {
+      $data["intro-steps"][] = array(
+        "id" => "webmail",
+        "position" => "right",
+        "text" => $l_intro_webmail
+      );
+    }
+
+    $data["intro-steps"][] = array(
+      "id" => "calendar",
+      "position" => "right",
+      "text" => $l_intro_calendar
+    );
+    $data["intro-steps"][] = array(
+      "id" => "contacts",
+      "position" => "right",
+      "text" => $l_intro_contacts
+    );
+    $data["intro-steps"][] = array(
+      "id" => "moremenu",
+      "position" => "right",
+      "text" => $l_intro_moremenu
+    );
+    $data["intro-steps"][] = array(
+      "id" => "user",
+      "position" => "left",
+      "text" => $l_intro_user
     );
   }
 
