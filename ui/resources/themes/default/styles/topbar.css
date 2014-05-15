@@ -352,6 +352,7 @@ form {
   margin-bottom: 1em;
   height: 33px;
   line-height: 37px;
+  background:url(../images/structure/pattern.png) top left repeat #FFF;
   z-index: 999;
 }
 
