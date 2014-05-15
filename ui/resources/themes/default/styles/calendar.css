@@ -9,6 +9,10 @@
 /* ------------------------------------------------------------------------- */
 /* Calendar styles                                                           */
 /* ------------------------------------------------------------------------- */
+#display_tag_color {
+  background-color: #EFF0F2 ;
+}
+
 .waitingEventsContainer {
   height: 200px;
   overflow-x:hidden;
