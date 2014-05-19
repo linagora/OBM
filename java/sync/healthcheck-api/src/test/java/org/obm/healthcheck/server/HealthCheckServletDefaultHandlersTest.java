@@ -55,12 +55,13 @@ public class HealthCheckServletDefaultHandlersTest extends AbstractHealthCheckTe
 		ImmutableMap<String, String> javaVersion = ImmutableMap.of("method", "GET", "path", "/java/version");
 		ImmutableMap<String, String> javaVendor = ImmutableMap.of("method", "GET", "path", "/java/vendor");
 		ImmutableMap<String, String> javaVMName = ImmutableMap.of("method", "GET", "path", "/java/vmname");
+		ImmutableMap<String, String> javaEncoding = ImmutableMap.of("method", "GET", "path", "/java/encoding");
 		
 		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
 		
 		Object[] result = (Object[]) JSON.parse(IO.toString(response.getEntity().getContent()));
 		
-		assertThat(result).containsOnly(javaVendor, javaVersion, javaVMName);
+		assertThat(result).containsOnly(javaVendor, javaVersion, javaVMName, javaEncoding);
 	}
 
 	@Test
@@ -84,4 +85,11 @@ public class HealthCheckServletDefaultHandlersTest extends AbstractHealthCheckTe
 		assertThat(IO.toString(response.getEntity().getContent())).isEqualTo(System.getProperty("java.vendor"));
 	}
 	
+	@Test
+	public void testGetJavaEncoding() throws Exception {
+		HttpResponse response = get("/java/encoding");
+		
+		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpServletResponse.SC_OK);
+		assertThat(IO.toString(response.getEntity().getContent())).isEqualTo(System.getProperty("file.encoding"));
+	}
 }

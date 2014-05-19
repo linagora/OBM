@@ -58,4 +58,9 @@ public class JavaInformationHandlerTest {
 	public void testGetVMName() {
 		assertThat(handler.getVMName()).isEqualTo(System.getProperty("java.vm.name"));
 	}
+
+	@Test
+	public void testGetEncoding() {
+		assertThat(handler.getEncoding()).isEqualTo(System.getProperty("file.encoding"));
+	}
 }
