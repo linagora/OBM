@@ -56,4 +56,8 @@ public class JavaInformationHandlerTest {
 		assertThat(handler.getVendor()).isEqualTo(System.getProperty("java.vendor"));
 	}
 
+	@Test
+	public void testGetEncoding() {
+		assertThat(handler.getEncoding()).isEqualTo(System.getProperty("file.encoding"));
+	}
 }

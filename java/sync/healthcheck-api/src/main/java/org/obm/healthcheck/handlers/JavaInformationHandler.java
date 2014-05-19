@@ -52,4 +52,10 @@ public class JavaInformationHandler implements HealthCheckHandler {
 		return System.getProperty("java.vendor");
 	}
 	
+	@GET
+	@Path("encoding")
+	public String getEncoding() {
+		return System.getProperty("file.encoding");
+	}
+	
 }
