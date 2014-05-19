@@ -32,28 +32,39 @@
 
 require_once dirname(__FILE__) . '/../AbstractMultiDomainStatus.php';
 
-class JavaVersionStatus extends AbstractMultiDomainStatus {
+class EncodingStatus extends AbstractMultiDomainStatus {
 
-  const EXPECTED_JAVA_VERSION = "1.6";
-  const JAVA_VERSION_URL = "http://%HOST%:8082/opush/healthcheck/java/version";
+  const EXPECTED_ENCODING = "UTF-8";
+  const OPUSH_URL = "http://%HOST%:8082/opush/ActiveSyncServlet/";
+  const JAVA_ENCODING_URL = "http://%HOST%:8082/opush/healthcheck/java/encoding";
 
   public function executeForDomain($domain) {
     $servers = of_domain_get_domain_opushserver($domain["id"]);
 
     foreach ($servers as $server) {
       $host = $server[0];
-      $url = str_replace("%HOST%", $host["ip"], self::JAVA_VERSION_URL);
-      $curl = CheckHelper::curlGet($url);
+      $opushurl = str_replace("%HOST%", $host["ip"], self::OPUSH_URL);
+      $opushcurl = CheckHelper::curlGet($opushurl);
 
-      if ($curl["code"] == 200) {
-        $version = $curl["success"];
-        $versionOk = strpos($version, self::EXPECTED_JAVA_VERSION) === 0;
-
-        return $versionOk ? new CheckResult(CheckStatus::OK) : new CheckResult(CheckStatus::ERROR, array("OPush server at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' runs Java version '" . $version . "', expecting '" . self::EXPECTED_JAVA_VERSION . "'."));
+      if ($opushcurl["code"] == 200) {
+        return self::checkJavaEncoding($host, $domain);
       }
 
       return new CheckResult(CheckStatus::WARNING, array("OPush server at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' isn't reachable"));
     }
   }
 
+  private static function checkJavaEncoding($host, $domain) {
+    $url = str_replace("%HOST%", $host["ip"], self::JAVA_ENCODING_URL);
+    $curl = CheckHelper::curlGet($url);
+
+    if ($curl["code"] == 200) {
+      $encoding = $curl["success"];
+      $encodingOk = strpos($encoding, self::EXPECTED_ENCODING) === 0;
+
+      return $encodingOk ? new CheckResult(CheckStatus::OK) : new CheckResult(CheckStatus::ERROR, array("OPush server at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' runs encoding '" . $encoding . "', expecting '" . self::EXPECTED_ENCODING . "'."));
+    }
+
+    return new CheckResult(CheckStatus::WARNING, array("OPush server version at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' doesn't support this check"));
+  }
 }
