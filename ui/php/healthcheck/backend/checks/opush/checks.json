@@ -20,6 +20,13 @@
             "description": "Checks that a simple folder sync scenario runs on opush service",
             "url": "http://obm.org/content/spushnik",
             "parentId": null
+        },
+        {
+            "id": "EncodingStatus",
+            "name": "Opush Encoding Check",
+            "description": "Checks that the file encoding is properly configured.",
+            "url": null,
+            "parentId": null
         }
     ]
 }
