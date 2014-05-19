@@ -3,7 +3,7 @@
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/ant.mk
 
-JAVA_HOME := /usr/lib/jvm/default-java/
+JAVA_HOME := "/usr/lib/jvm/java-7-openjdk-"$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 ANT_HOME := /usr/share/ant
 
 DEB_ANT_INSTALL_TARGET := dist

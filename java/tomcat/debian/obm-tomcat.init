@@ -1,4 +1,5 @@
 #!/bin/bash
+#
 ### BEGIN INIT INFO
 # Provides:          obm-tomcat
 # Required-Start:    $local_fs $remote_fs
@@ -12,71 +13,87 @@
 set -e
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
-if [ -z "$JAVA_HOME" ]; then
-    test -d /usr/lib/jvm/java-6-sun && {
-        JAVA_HOME=/usr/lib/jvm/java-6-sun
-    }
-fi
-if [ -z "$JAVA_HOME" ]; then
-    JAVA_HOME="/usr/lib/jvm/java-7-openjdk-"`dpkg --print-architecture`
+NAME=obm-tomcat
+PIDFILE="/var/run/obm_tomcat.pid"
+TOMCAT_PATH=/usr/share/tomcat
+START_CMD=${TOMCAT_PATH}/bin/catalina.sh
+
+if [ `id -u` -ne 0 ]; then
+        echo "You need root privileges to run this script"
+        exit 1
 fi
 
+# Make sure obm-tomcat is started with system locale
 if [ -r /etc/default/locale ]; then
-  . /etc/default/locale
-  export LANG
+        . /etc/default/locale
+        export LANG
 fi
 
+. /lib/lsb/init-functions
 
-tomcat_pid=/var/run/obm_tomcat.pid
-tomcat_path=/usr/share/tomcat
-jps=$JAVA_HOME/bin/jps
+if [ -r /etc/default/rcS ]; then
+        . /etc/default/rcS
+fi
+
+if [ -z "$JAVA_HOME" ]; then
+	JAVA_HOME="/usr/lib/jvm/java-7-openjdk-"`dpkg --print-architecture`
+fi
+if [ -z "$SHUTDOWN_TIMEOUT" ]; then
+	SHUTDOWN_TIMEOUT=10
+fi
+
+JRE_HOME=${JAVA_HOME}
+export JRE_HOME
+export JAVA_HOME
 
 tomcat_running() {
-    test -f ${tomcat_pid} || return 1
-    supposed_pid=`cat ${tomcat_pid}`
-    ret=`$jps |grep -q ${supposed_pid}`
-    return $ret
+    start-stop-daemon --quiet --test --start --startas java --pidfile ${PIDFILE} > /dev/null
+    if [ $? -ne 0 ]; then
+        return 0
+    fi
+    return 1
 }
 
 start_tomcat() {
     tomcat_running && {
-        echo "OBM Tomcat already running."
+        log_warning_msg "OBM Tomcat already running."
         ret=0
         return $ret
     }
 
-    ${tomcat_path}/bin/catalina.sh start
+    ${START_CMD} start
 }
 
 stop_tomcat() {
     tomcat_running || {
-        echo "OBM Tomcat not running."
+        log_warning_msg "OBM Tomcat not running."
         ret=0
         return $ret
     }
 
-    start-stop-daemon --stop --quiet --oknodo --pidfile ${tomcat_pid}
-    echo -n "Waiting for OBM Tomcat shutdown."
-    count=0
+    start-stop-daemon --stop --quiet --oknodo --pidfile ${PIDFILE}
+    log_progress_msg "Waiting for OBM Tomcat shutdown."
+    timeout=${SHUTDOWN_TIMEOUT}
     while tomcat_running ; do
-	echo -n "."
-	sleep 0.5
-        count=$((${count}+1))
-        if [ ${count} -gt 10 ]; then
-          kill -9 `cat ${tomcat_pid}`
+        sleep 1
+        log_progress_msg "."
+	timeout=$((${timeout}-1))
+        if [ ${timeout} -eq 0 ]; then
+            log_progress_msg " (killing) "
+	    start-stop-daemon --stop --signal 15 --quiet --oknodo --pidfile ${PIDFILE}
         fi
     done
-    rm -f ${tomcat_pid}
-    echo ""
+    rm -f ${PIDFILE}
+    log_end_msg 0
 }
 
 status() {
 	if tomcat_running; then
-		echo "Tomcat is running"
+		log_success_msg "Tomcat is running"
                 ret=0
                 return $ret
 	else
-		echo "Tomcat is stopped"
+		log_success_msg "Tomcat is stopped"
                 ret=3
                 return $ret
 	fi
@@ -93,15 +110,15 @@ case "$1" in
     stop)
         stop_tomcat
         ;;
-	status)
-		status
-		;;
+    status)
+	status
+	;;
     restart)
         stop_tomcat
         start_tomcat
         ;;
-	*)
-		echo "Usage: $0 {start|stop|status|restart|reload}"
+    *)
+	log_success_msg "Usage: $0 {start|stop|status|restart|force-reload}"
 esac
 
 exit $ret

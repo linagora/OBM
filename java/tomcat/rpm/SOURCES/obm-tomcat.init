@@ -1,101 +1,110 @@
-#!/bin/bash
-# Tomcat init script
+#!/bin/sh
 #
-# chkconfig: 345 65 35
-# description: Tomcat automatic startup and shutdown for RHE
+### BEGIN INIT INFO
+# Provides:          obm-tomcat
+# Required-Start:    $local_fs $remote_fs
+# Required-Stop:     $local_fs $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: OBM Tomcat server
+# Description:       RHEL init script for the OBM Tomcat server
+### END INIT INFO
 
-set -e
+NAME=obm-tomcat
+PIDFILE=/var/run/obm_tomcat.pid
+TOMCAT_PATH=/usr/share/tomcat
+START_CMD=${TOMCAT_PATH}/bin/catalina.sh
 
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
-export JAVA_HOME=/usr/lib/jvm/java
-test -d /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.51.x86_64  && {
-    JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.51.x86_64
-}
-test -d /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.51.i686 && {
-    JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.51.x86_64.i686
-}
-test -d /usr/lib/jvm/java-openjdk && {
-    JAVA_HOME=/usr/lib/jvm/java-openjdk
-}
+# Source function library.
+. /etc/rc.d/init.d/functions
 
+if [ -z "$JAVA_HOME" ]; then
+	JAVA_HOME="/usr/lib/jvm/jre-1.7.0"
+fi
+if [ -z "$SHUTDOWN_TIMEOUT" ]; then
+	SHUTDOWN_TIMEOUT=10
+fi
 if [ -r /etc/sysconfig/i18n ]; then
   . /etc/sysconfig/i18n
   export LANG
 fi
 
+JRE_HOME=${JAVA_HOME}
+export JAVA_HOME
+export JRE_HOME
 
-tomcat_pid=/var/run/obm_tomcat.pid
-tomcat_path=/usr/share/tomcat
-jps=$JAVA_HOME/bin/jps
-
-tomcat_running() {
-    test -f ${tomcat_pid} || return 1
-    supposed_pid=`cat ${tomcat_pid}`
-    ret=`$jps |grep -q ${supposed_pid}`
-    return $ret
-}
-
-start_tomcat() {
-    tomcat_running && {
-        echo "OBM Tomcat already running."
-        ret=0
-        return $ret
-    }
-
-    ${tomcat_path}/bin/catalina.sh start
-}
-
-stop_tomcat() {
-    tomcat_running || {
-        echo "OBM Tomcat not running."
-        ret=0
-        return $ret
-    }
-
-    kill `cat ${tomcat_pid}`
-    echo -n "Waiting for OBM Tomcat shutdown."
-    count=0
-    while tomcat_running; do
-	echo -n "."
-	sleep 0.5
-        count=$((${count}+1))
-        if [ ${count} -gt 10 ]; then
-          kill -9 `cat ${tomcat_pid}`
+start() {
+    if [ -f $PIDFILE ] ; then
+                read kpid < $PIDFILE
+                if checkpid $kpid 2>&1; then
+                        echo "process already running"
+                        return 0
+                else
+                        echo "pid file found but no process running for pid $kpid, continuing"
+                fi
         fi
-    done
-    rm -f ${tomcat_pid}
-    echo ""
+
+        echo -n $"Starting $NAME: "
+	${START_CMD} start
+        
+        echo
+        return 0
 }
 
-status() {
-	if tomcat_running; then
-		echo "Tomcat is running"
-                ret=0
-                return $ret
-	else
-		echo "Tomcat is stopped"
-                ret=3
-                return $ret
-	fi
+stop() {
+        echo -n $"Stopping $NAME: "
+        count=0;
+
+        if [ -f $PIDFILE ]; then
+
+            read kpid < $PIDFILE
+            let kwait=$SHUTDOWN_TIMEOUT
+
+#           Try issuing SIGTERM
+
+            kill -15 $kpid
+            until [ `ps --pid $kpid 2> /dev/null | grep -c $kpid 2> /dev/null` -eq '0' ] || [ $count -gt $kwait ]
+            do
+                echo -n ".";
+                sleep 1
+                let count=$count+1;
+            done
+
+            if [ $count -gt $kwait ]; then
+                echo "killing processes which didn't stop after $SHUTDOWN_TIMEOUT seconds"
+                kill -9 $kpid
+            fi
+            rm -f $PIDFILE
+        fi
+        success
+        echo
 }
 
 case "$1" in
     start)
-        start_tomcat
+        start
         ;;
     
     stop)
-        stop_tomcat
+        stop
         ;;
-	status)
-		status
-		;;
+    status)
+	status -p $PIDFILE obm-tomcat
+        ;;
     restart)
-        stop_tomcat
-        start_tomcat
+        stop
+        start
         ;;
-	*)
-		echo "Usage: $0 {start|stop|status|restart|reload}"
+    condrestart|try-restart)
+        status -p $PIDFILE
+        if [ "$?" -eq 0 ] ; then
+		stop
+		sleep 2
+		start
+        fi
+        ;;
+    *)
+	echo "Usage: $0 {start|stop|status|restart|condrestart|try-restart}"
 esac
 
 exit $ret

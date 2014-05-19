@@ -1,5 +1,0 @@
-#!/bin/bash -e
-
-update-java-alternative -s java-6-sun >/dev/null 2>&1 || true
-#DEBHELPER#
-exit 0

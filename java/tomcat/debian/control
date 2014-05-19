@@ -2,7 +2,7 @@ Source: obm-tomcat
 Section: net
 Priority: optional
 Maintainer: Thomas Sarboni <tsarboni@linagora.com>
-Build-Depends-Indep: ant, ant-optional
+Build-Depends-Indep: ant, ant-optional, openjdk-7-jre-headless
 Build-Depends: cdbs, debhelper (>= 5.0)
 Standards-Version: 3.8.4
 Homepage: http://www.obm.org
@@ -10,7 +10,7 @@ Homepage: http://www.obm.org
 
 Package: obm-tomcat
 Architecture: all
-Depends: openjdk-7-jdk, libapr1, obm-munin-node, ${misc:Depends}
+Depends: openjdk-7-jre-headless, libapr1, obm-munin-node, ${misc:Depends}
 Description: the Tomcat web application server for Open Business Management
  This package contains the 6.0.20 version of the Apache Tomcat application
  server for OBM.
