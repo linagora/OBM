@@ -110,11 +110,6 @@ class obm_identities extends rcube_plugin {
       // already processed.
       unset($identMap[$mail]);
     }
-
-    // Now, go through the remaining identities, they have been deleted in OBM
-    foreach ($identMap as $rcident) {
-      $user->delete_identity($rcident["identity_id"]);
-    }
   }
 
   /**
