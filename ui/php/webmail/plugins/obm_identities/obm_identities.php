@@ -44,28 +44,6 @@ class obm_identities extends rcube_plugin {
     $this->add_hook('user_create', array($this, 'user_create'));
     $this->add_hook('user2email', array($this, 'user2email'));
     $this->add_hook('login_after', array($this, 'login_after'));
-
-    $this->add_hook('identity_create', array($this, 'identity_create'));
-    $this->add_hook('identity_update', array($this, 'hook_abort'));
-    $this->add_hook('identity_delete', array($this, 'hook_abort'));
-  }
-
-  /**
-   * Hook to create an identity. We only allow this during login
-   */
-  public function identity_create($args) {
-    if (!$args['login']) {
-      $args['abort'] = true;
-    }
-    return $args;
-  }
-
-  /**
-   * Aborts the hook that is calling this function
-   */
-  public function hook_abort($args) {
-    $args['abort'] = true;
-    return $args;
   }
 
   /**
@@ -201,11 +179,7 @@ class obm_identities extends rcube_plugin {
         $result[] = array(
           'email'        => rcube_utils::idn_to_ascii($email),
           'name'         => $this->db->f("userobm_commonname"),
-          'organization' => $this->db->f("userobm_company"),
-          'reply-to'     => '',
-          'bcc'          => '',
-          'signature'    => '',
-          'html_signature'    => 0
+          'organization' => $this->db->f("userobm_company")
         );
       } else {
         $result[] = $email;
