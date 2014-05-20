@@ -2113,6 +2113,11 @@ function get_sections_data() {
 function get_module_data($section, $module) {
   global $cme_txt, $cme_ico, $cme_both;
   global $path, $perm, $modules, $cgp_show, $sections;
+  global $obm;
+
+  $userInfo = get_user_info($obm['uid']);
+  $modulesRequiringEmail = array("webmail_pref", "mailforward", "vacation", "mailbox");
+  $userHasEmail = $userInfo["mail_perms"] == 1 && $userInfo["email"];
 
   if (($_SESSION['set_menu'] == $cme_ico) || ($_SESSION['set_menu'] == $cme_both))
     $fico = true;
@@ -2137,8 +2142,9 @@ function get_module_data($section, $module) {
     $exclusions = array($GLOBALS['l_module_calendar'], $GLOBALS['l_module_contact'], $GLOBALS['l_module_planning'], $GLOBALS['l_module_webmail']);
 
     foreach ($section_link as $mod) {
-      if (!in_array($modules[$mod]['Name'], $exclusions)) {
-        $link_name = $modules[$mod]['Name'];
+      $link_name = $modules[$mod]['Name'];
+
+      if (!in_array($link_name, $exclusions) && ($userHasEmail || !in_array($mod, $modulesRequiringEmail))) {
         $link_tooltip = ( !empty($modules[$mod]['Tooltip']) ) ? $modules[$mod]['Tooltip'] : $modules[$mod]['Name'];
         $link_url = $modules[$mod]['Url'];
 
