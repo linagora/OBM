@@ -48,7 +48,6 @@ class obm_identities extends rcube_plugin {
     $this->add_hook('identity_create', array($this, 'identity_create'));
     $this->add_hook('identity_update', array($this, 'hook_abort'));
     $this->add_hook('identity_delete', array($this, 'hook_abort'));
-    $this->add_hook('template_object_identityform', array($this, 'tmpl_identity_edit'));
   }
 
   /**
@@ -100,22 +99,6 @@ class obm_identities extends rcube_plugin {
    */
   public function user_create($args) {
     $args['language'] = $this->getLanguageForUser($args['user']);
-    return $args;
-  }
-
-  /**
-   * Hook for changing the edit identity template. Makes the form readonly.
-   */
-  public function tmpl_identity_edit($args) {
-    // Not really ideal changing the strings directly, but I guess thats how to
-    // do it. This should work regardless of the identities_level setting.
-    $fields = array("ff_name", "ff_email", "ff_organization", "ff_reply-to",
-                    "ff_bcc", "ff_standard", "ff_signature", "ff_html_signature");
-
-    foreach ($fields as $field) {
-      $args['content'] = $this->_disable_class($args['content'], $field);
-    }
-
     return $args;
   }
 
