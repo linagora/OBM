@@ -90,6 +90,7 @@ Group:          Development/Tools
 Requires:       %{name}-config = %{version}-%{release}
 Requires(post):        vixie-cron
 Requires:       php >= 5.2, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap
+Conflicts:	opush < 3
 
 %description    core
 This package contains the web interface for OBM. It has no dependency on the

@@ -63,6 +63,7 @@ Package: obm-core
 Architecture: all
 Pre-Depends: debconf
 Depends:  obm-conf (= ${binary:Version}), php5-cli, php5-pgsql | php5-mysql, tzdata, php5-curl, php-apc, ${misc:Depends}
+Conflicts: opush (<< 3)
 Description: web interface for Open Business Management
  This package contains the web interface for OBM. It has no dependency on the
  other services needed by OBM, such as obm-storage.
