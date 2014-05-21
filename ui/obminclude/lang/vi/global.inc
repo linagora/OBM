@@ -477,6 +477,7 @@ $l_of_right_err_auth = "Không đủ để Quyền để cập nhật quyền!";
 $l_of_right_err_empty = "Thiếu các đối tượng tham chiếu!";
 $l_of_right_err_user = "Không có đủ Quyền trên người sử dụng!";
 $l_of_right_err_resource = "Không có đủ quyền về các nguồn tài nguyên!";
+$l_of_right_err_share_resource = "Bạn không được phép chia lịch làm việc của những người này nếu nó không được cấp quyền cho tất cả cùng đọc. Vui lòng nâng cấp quyền cho nó.";
 $l_waiting_events = "Các sự kiện đang chờ";
 $l_unfilled = "Những ngày bỏ trống";
 $l_my_calendar = "Lịch của tôi";
@@ -531,3 +532,18 @@ $l_header_select_opushfrontendserver = "Chọn OPush frontend";
 $l_header_select_opushserver = "Chọn OPush server";
 $l_invalid_vcard = "Các tập tin vCard không hợp lệ.";
 $l_resource_found_error = "Tài nguyên của loại này được tìm thấy, trước tiên bạn nên gỡ bỏ chúng.";
+
+//  Thanh công cụ mới để kích hoạt popin
+$l_popin_message = " Hi ! Một thanh công cụ rất hữu ích, dùng thử ngay? ";
+$l_popin_activation_button = "Thanh công cụ mới";
+$l_close_popin_button = "Không hiển thị nữa.";
+
+$l_intro_next = "Tiếp";
+$l_intro_previous = "Trở lại";
+$l_intro_skip = "Bỏ qua";
+$l_intro_done = "Hoàn tất";
+$l_intro_webmail = "Chức năng này <span class='highlight'>Mail</span> cho phép bạn đọc, gửi và quản lý email của bạn thông qua webmail được tích hợp.";
+$l_intro_calendar = "Chức năng này <span class='highlight'>Calendar</span> hiển thị lịch làm việc của bạn và cho phép bạn tạo, chỉnh sửa và xóa các sự kiện.";
+$l_intro_contacts = "Chức năng này <span class='highlight'>Contacts</span> cho phép bạn quản lý liên lạc và danh bạ của bạn.";
+$l_intro_moremenu = "Chức năng này <span class='highlight'>More</span> là một trình đơn thả xuống( drop-down menu) bao gồm tất cả các liên kết của người dùng và nhà quản trị";
+$l_intro_user = "Đây là mục<span class='highlight'>User</span> menu. Bạn có thể sử dụng nó để chỉnh sửa, thay đổi các tùy chỉnh của bạn( Settings) hoặc mật khẩu, quản lý các thông báo nghỉ lễ hay vắng mặt của bạn, vv...";

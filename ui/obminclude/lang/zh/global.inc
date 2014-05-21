@@ -532,3 +532,18 @@ $l_header_select_opushfrontendserver = "选择OPush前台";
 $l_header_select_opushserver = "选择OPush服务器";
 $l_invalid_vcard = "这是一个无效的通讯录文件";
 $l_resource_found_error = "发现了这一类型的资源，你应该删除它";
+
+// New top bar activation popin
+$l_popin_message = "Hey ! New top bar is awesome, try it ?";
+$l_popin_activation_button = "New Top Bar";
+$l_close_popin_button = "Don't show this again.";
+
+$l_intro_next = "Next";
+$l_intro_previous = "Back";
+$l_intro_skip = "Skip";
+$l_intro_done = "Done";
+$l_intro_webmail = "The <span class='highlight'>Mail</span> button allows you to read, send and manage your emails using the integrated webmail.";
+$l_intro_calendar = "The <span class='highlight'>Calendar</span> button displays your calendar and allows you to create, modify or delete events.";
+$l_intro_contacts = "The <span class='highlight'>Contacts</span> button allows you to manage your contacts and address books.";
+$l_intro_moremenu = "The <span class='highlight'>More</span> button is a drop-down menu containing all the remaining links, including Users and  Administration sections.";
+$l_intro_user = "This is the <span class='highlight'>User</span> menu. You can use it to change your settings or password, manage your vacation message, etc.";

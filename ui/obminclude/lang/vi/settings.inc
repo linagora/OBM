@@ -55,3 +55,5 @@ $l_csvd_tab = "tab";
 $l_with_weekend = "Bao gồm cuối tuần";
 $l_without_weekend = "Không bao gồm cuối tuần";
 $l_set_public_fb = "Công khai thông tin rảnh / bận rộn của bạn";
+
+$l_set_topbar = "Kích hoạt thanh công cụ OBM Topbar.";
