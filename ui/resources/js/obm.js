@@ -692,7 +692,7 @@ function refreshUnreadMail(){
 
 function displayUnreadMail(count) {
   var elem = $('bannerUnreadMail');
-  if(count > 0){
+  if(count > 0 && $('webmail_iframe') == null){
     elem.set('text', count);
     elem.setStyle('display', 'inline-block');
     resizeForBadges(elem, count);
