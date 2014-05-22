@@ -102,7 +102,7 @@ page_close();
 // If home page has a redirection
 if ($c_home_redirect != '' && !$params['error'] && $_GET['redirect'] != 'false' && !is_global_admin()) {
   header('Status: 301 OK');
-  header("Location: $c_home_redirect" . (count($_GET) > 0 ? "?" . http_build_query($_GET) : ")");
+  header("Location: $c_home_redirect" . (count($_GET) > 0 ? "?" . http_build_query($_GET) : ""));
   exit();
 }
 
