@@ -62,6 +62,7 @@ $l_help_system = "Un hôte système est un hôte nécessaire au fonctionnement d
 $l_cant_delete = 'Cet hôte est lié à un ou plusieurs domaines et ne peux donc être supprimé';
 
 $l_imap = 'IMAP';
+$l_imap_archive = 'Archivage IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM Sync';

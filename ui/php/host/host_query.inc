@@ -68,6 +68,7 @@ function run_query_host_search($host) {
   $imap_frontend = $host['imap_frontend'];
   $monitor = $host['monitor'];
   $imap = $host['imap'];
+  $imap_archive = $host['imap_archive'];
   $backup_ftp = $host['backup_ftp'];
 
   $db_type = $obm_q->type;
@@ -120,6 +121,9 @@ function run_query_host_search($host) {
   if ($imap != '') {
     $where .= ' AND imap.service_id IS NOT NULL';
   }
+  if ($imap_archive != '') {
+    $where .= ' AND imap_archive.service_id IS NOT NULL';
+  }
   if ($backup_ftp != '') {
     $where .= ' AND backup_ftp.service_id IS NOT NULL';
   }
@@ -134,6 +138,7 @@ function run_query_host_search($host) {
       LEFT JOIN UserObm as B ON host_userupdate=B.userobm_id
       LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as imap_archive ON imap_archive.service_service = 'imap_archive' AND imap_archive.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
@@ -149,6 +154,7 @@ function run_query_host_search($host) {
   $query = "SELECT DISTINCT Host.*,
       samba.service_id as host_samba,
       imap.service_id as host_imap,
+      imap_archive.service_id as host_imap_archive,
       smtp_in.service_id as host_smtp_in,
       smtp_out.service_id as host_smtp_out,
       obm_sync.service_id as host_obm_sync,
@@ -203,6 +209,7 @@ function run_query_host_detail($id) {
       hostentity_entity_id as host_entity_id,
       samba.service_id as host_samba,
       imap.service_id as host_imap,
+      imap_archive.service_id as host_imap_archive,
       smtp_in.service_id as host_smtp_in,
       smtp_out.service_id as host_smtp_out,
       obm_sync.service_id as host_obm_sync,
@@ -226,6 +233,7 @@ function run_query_host_detail($id) {
       LEFT JOIN UserObm as uo ON host_id=uo.userobm_host_id
       LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as imap_archive ON imap_archive.service_service = 'imap_archive' AND imap_archive.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
@@ -272,6 +280,7 @@ function run_query_host_insert($host) {
   $imap_frontend = sql_parse_int($host['imap_frontend']);
   $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
+  $imap_archive = sql_parse_int($host['imap_archive']);
   $backup_ftp = sql_parse_int($host['backup_ftp']);
   $list = $host['web_list'];
   $desc = $host['desc'];
@@ -356,6 +365,9 @@ function run_query_host_insert($host) {
   if($imap > 0) {
     of_service_insert('imap', $entity_id); 
   }
+  if($imap_archive > 0) {
+    of_service_insert('imap_archive', $entity_id); 
+  }
   if($backup_ftp > 0) {
     of_service_insert('backup_ftp', $entity_id); 
     of_service_property_insert('backup_ftp', 'login', $entity_id, $host['backup_ftp_login']);
@@ -411,6 +423,7 @@ function run_query_host_update($host) {
   $imap_frontend = sql_parse_int($host['imap_frontend']);
   $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
+  $imap_archive = sql_parse_int($host['imap_archive']);
   $backup_ftp = sql_parse_int($host['backup_ftp']);
   $desc = $host['desc'];
   $multidomain = sql_multidomain('host');
@@ -489,6 +502,11 @@ function run_query_host_update($host) {
       of_service_insert('imap', $entity_id); 
     } else {
       of_service_delete('imap', $entity_id); 
+    }
+    if($imap_archive > 0) {
+      of_service_insert('imap_archive', $entity_id); 
+    } else {
+      of_service_delete('imap_archive', $entity_id); 
     }
     of_service_property_delete_all('backup_ftp', $entity_id);
     if($backup_ftp > 0) {
@@ -616,6 +634,7 @@ function get_host_info($id) {
   $query = "SELECT Host.*,
     samba.service_id as host_samba,
       imap.service_id as host_imap,
+      imap_archive.service_id as host_imap_archive,
       smtp_in.service_id as host_smtp_in,
       smtp_out.service_id as host_smtp_out,
       solr.service_id as host_solr,
@@ -630,6 +649,7 @@ function get_host_info($id) {
       INNER JOIN HostEntity ON hostentity_host_id = host_id
       LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as imap_archive ON imap_archive.service_service = 'imap_archive' AND imap_archive.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
@@ -659,6 +679,7 @@ function get_host_info($id) {
   $h['imap_frontend'] = $obm_q->f('host_imap_frontend');
   $h['monitor'] = $obm_q->f('host_monitor');
   $h['imap'] = $obm_q->f('host_imap');
+  $h['imap_archive'] = $obm_q->f('host_imap_archive');
   $h['backup_ftp'] = $obm_q->f('host_backup_ftp');
   $h['desc'] = $obm_q->f('host_description');
 

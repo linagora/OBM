@@ -48,6 +48,7 @@ $fieldnames['host_delegation'] = $l_delegation;
 $fieldnames['host_ip'] = $l_ip;
 $fieldnames['host_samba'] = $l_smb;
 $fieldnames['host_imap'] = $l_imap;
+$fieldnames['host_imap_archive'] = $l_imap_archive;
 $fieldnames['host_smtp_in'] = $l_smtp_in;
 $fieldnames['host_smtp_out'] = $l_smtp_out;
 $fieldnames['host_obm_sync'] = $l_obm_sync;
@@ -115,6 +116,15 @@ function dis_data_host(&$OD, $fieldname, $link_ok) {
     }
   }
 
+  else if ($fieldname == 'host_imap_archive') {
+  	$res['align'] = 'center';
+  	if ($OD->data_set->f($fieldname)) {
+  		$res['name'] = 'X';
+  	} else {
+  		$res['name'] = ' ';
+  	}
+  }
+  
   else if ($fieldname == 'host_samba') {
     $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
@@ -192,6 +202,7 @@ function html_host_search_form($host) {
   $opush_frontend = ($host['opush_frontend'] == '1' ? "checked = \"checked\"" : '');
   $ldap = ($host['ldap'] == '1' ? "checked = \"checked\"" : '');
   $imap = ($host['imap'] == '1' ? "checked = \"checked\"" : '');
+  $imap_archive = ($host['imap_archive'] == '1' ? "checked = \"checked\"" : '');
   $monitor = ($host['monitor'] == '1' ? "checked = \"checked\"" : '');
   $imap_frontend = ($host['imap_frontend'] == '1' ? "checked = \"checked\"" : '');
   $backup_ftp = ($host['backup_ftp'] == '1' ? "checked = \"checked\"" : '');
@@ -211,6 +222,9 @@ function html_host_search_form($host) {
     $block_mail = "
     <label>$GLOBALS[l_imap]<br />
       <input type=\"checkbox\" name=\"cb_imap\" value=\"1\" $imap />
+    </label>
+    <label>$GLOBALS[l_imap_archive]<br />
+      <input type=\"checkbox\" name=\"cb_imap_archive\" value=\"1\" $imap_archive />
     </label>
     <label>$GLOBALS[l_smtp_in]<br />
       <input type=\"checkbox\" name=\"cb_smtp_in\" value=\"1\" $smtp_in />
@@ -341,6 +355,7 @@ function html_host_search_list($obm_q, $pref_q, $host) {
   $ip = urlencode(stripslashes($host['ip']));
   $smb = $host['samba'];
   $imap = $host['imap'];
+  $imap_archive = $host['imap_archive'];
   $smtp_in = $host['smtp_in'];
   $smtp_out = $host['smtp_out'];
   $obm_sync = $host['obm_sync'];
@@ -348,7 +363,7 @@ function html_host_search_list($obm_q, $pref_q, $host) {
   $monitor = $host['monitor'];
 
 
-  $url = url_prepare("host_index.php?action=search&amp;tf_name=$name&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_samba=$smb&amp;cb_imap=$imap&amp;cb_smtp_in=$smtp_in&amp;cb_smtp_out=$smtp_out&amp;cb_obm_sync=$obm_sync&amp;cb_solr=$solr&amp;cb_monitor=$monitor$url_ext");
+  $url = url_prepare("host_index.php?action=search&amp;tf_name=$name&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_samba=$smb&amp;cb_imap=$imap&amp;cb_imap_archive=$imap_archive&amp;cb_smtp_in=$smtp_in&amp;cb_smtp_out=$smtp_out&amp;cb_obm_sync=$obm_sync&amp;cb_solr=$solr&amp;cb_monitor=$monitor$url_ext");
 
   $dis_host = new OBM_DISPLAY('DATA', $pref_q, $module);
 
@@ -422,6 +437,7 @@ function html_host_consult($host_q) {
   $ldap = $host_q->f('host_ldap');
   $samba = $host_q->f('host_samba');
   $imap = $host_q->f('host_imap');
+  $imap_archive = $host_q->f('host_imap_archive');
   $smtp_out = $host_q->f('host_smtp_out');
   $obm_sync = $host_q->f('host_obm_sync');
   $solr = $host_q->f('host_solr');
@@ -454,6 +470,7 @@ function html_host_consult($host_q) {
   if ($ldap) $ldap = $l_yes; else $ldap = $l_no;
   if ($samba) $samba = $l_yes; else $samba = $l_no;
   if ($imap) $imap = $l_yes; else $imap = $l_no;
+  if ($imap_archive) $imap_archive = $l_yes; else $imap_archive = $l_no;
   if ($smtp_in) $smtp_in = $l_yes; else $smtp_in = $l_no;
   if ($smtp_out) $smtp_out = $l_yes; else $smtp_out = $l_no;
   if ($obm_sync) $obm_sync = $l_yes; else $obm_sync = $l_no;
@@ -518,6 +535,10 @@ function html_host_consult($host_q) {
     <tr>
       <th>$GLOBALS[l_imap]</th>
       <td>$imap</td>
+    </tr>
+    <tr>
+      <th>$GLOBALS[l_imap_archive]</th>
+      <td>$imap_archive</td>
     </tr>
     <tr>
       <th>$GLOBALS[l_smtp_in]</th>
@@ -691,6 +712,7 @@ function html_host_form($action, $host_q, $host, $field='') {
     $fqdn = $host_q->f('host_fqdn');
     $samba = $host_q->f('host_samba');
     $imap = $host_q->f('host_imap');
+    $imap_archive = $host_q->f('host_imap_archive');
     $smtp_in = $host_q->f('host_smtp_in');
     $smtp_out = $host_q->f('host_smtp_out');
     $obm_sync = $host_q->f('host_obm_sync');
@@ -725,6 +747,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (isset($host['fqdn'])) { $fqdn = $host['fqdn']; }
   if (isset($host['samba'])) { $samba = $host['samba']; }
   if (isset($host['imap'])) { $imap = $host['imap']; }
+  if (isset($host['imap_archive'])) { $imap = $host['imap_archive']; }
   if (isset($host['smtp_in'])) { $smtp_in = $host['smtp_in']; }
   if (isset($host['smtp_out'])) { $smtp_out = $host['smtp_out']; }
   if (isset($host['obm_sync'])) { $obm_sync = $host['obm_sync']; }
@@ -755,6 +778,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   // Samba host checkbox checked value
   $samba_state  = ($samba ? 'checked' : '');
   $imap_state  = ($imap ? 'checked' : '');
+  $imap_archive_state  = ($imap_archive ? 'checked' : '');
   $smtp_in_state  = ($smtp_in ? 'checked' : '');
   $smtp_out_state  = ($smtp_out ? 'checked' : '');
   $obm_sync_state  = ($obm_sync ? 'checked' : '');
@@ -802,6 +826,11 @@ function html_host_form($action, $host_q, $host, $field='') {
       <th class=\"$class[imap]\"><label for=\"cb_imap\">$GLOBALS[l_imap]</label></th>
       <td>
         <input id=\"cb_imap\" name=\"cb_imap\" type=\"checkbox\" value=\"1\" $imap_state>
+      </td>
+    </tr><tr>
+      <th class=\"$class[imap_archive]\"><label for=\"cb_imap_archive\">$GLOBALS[l_imap_archive]</label></th>
+      <td>
+        <input id=\"cb_imap_archive\" name=\"cb_imap_archive\" type=\"checkbox\" value=\"1\" $imap_archive_state>
       </td>
     </tr><tr>
       <th class=\"$class[smtp_in]\"><label for=\"cb_smtp_in\">$GLOBALS[l_smtp_in]</label></th>
@@ -1051,6 +1080,7 @@ function dis_host_warn_insert($id, $h_q, $host) {
   $desc = $host['desc'];
   $fqdn = $host['fqdn'];
   $imap = $host['imap'];
+  $imap_archive = $host['imap_archive'];
   $smtp_in = $host['smtp_in'];
   $smtp_out = $host['smtp_out'];
   $obm_sync = $host['obm_sync'];
@@ -1074,6 +1104,7 @@ function dis_host_warn_insert($id, $h_q, $host) {
     <input type=\"hidden\" name=\"tf_delegation\" value=\"$delegation\" />
     <input type=\"hidden\" name=\"tf_ip\" value=\"$ip\" />
     <input type=\"hidden\" name=\"cb_imap\" value=\"$imap\" />
+    <input type=\"hidden\" name=\"cb_imap_archive\" value=\"$imap_archive\" />
     <input type=\"hidden\" name=\"cb_smtp_in\" value=\"$smtp_in\" />
     <input type=\"hidden\" name=\"cb_smtp_out\" value=\"$smtp_out\" />
     <input type=\"hidden\" name=\"cb_obm_sync\" value=\"$obm_sync\" />
