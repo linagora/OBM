@@ -21,6 +21,7 @@
 		<module>arquillian-bundle</module>
 		<module>services</module>
 		<module>provisioning</module>
+		<module>imap-archive</module>
 	</modules>
 
 	<dependencyManagement>
