@@ -14,6 +14,7 @@ $l_mail_servers = "邮件服务器"; //"Mail servers"
 $l_sync_servers = "同步服务器"; //"Synchronization servers"
 $l_solr_servers = "索引服务器"; //"Indexing servers"
 $l_imap_frontend_servers = "IMAP前端服务器"; //"IMAP frontend servers"
+$l_imap_archive_servers = "IMAP archive servers";
 $l_ldap_servers = "LDAP servers";
 $l_max_quota = "最大值"; //"Max value"
 
@@ -59,10 +60,11 @@ $l_alias_user_used = "无法更改或删除已应用于电子邮件地址中的�
 $l_fill_title = "您必须填写标题，然后提交。";  //"You have to fill in the Title before submitting."
 $l_domain_confirm_delete = "注意：您将删除域！此操作是不可逆的。\\n确定继续吗？"; "CAUTION : You will delete a domain ! This operation is irreversible.\\nContinue anyway ?"/
 $l_mailserver_warn = "您首先必须创建一个这种类型的主机";  //"You have to create a host of this kind first"
-$l_syncserver_warn = "您首先必须创建一个这种类型的主机"; //"You have to create an host of this kind first"
-$l_solrserver_warn = "您首先必须创建一个这种类型的主机"; //"You have to create an host of this kind first"
-$l_imapfrontendserver_warn = "您首先必须创建一个这种类型的主机"; // "You have to create an host of this kind first"
-$l_ldapserver_warn = "您首先必须创建一个这种类型的主机"; //"You have to create an host of this kind first"
+$l_syncserver_warn = "您首先必须创建一个这种类型的主机"; //"You have to create a host of this kind first"
+$l_solrserver_warn = "您首先必须创建一个这种类型的主机"; //"You have to create a host of this kind first"
+$l_imapfrontendserver_warn = "您首先必须创建一个这种类型的主机"; // "You have to create a host of this kind first"
+$l_imaparchiveserver_warn = "您首先必须创建一个这种类型的主机"; // "You have to create a host of this kind first"
+$l_ldapserver_warn = "您首先必须创建一个这种类型的主机"; //"You have to create a host of this kind first"
 
 $l_mailserver = "邮件服务器"; //"Mail server"
 $l_imap = 'IMAP';  //'IMAP'

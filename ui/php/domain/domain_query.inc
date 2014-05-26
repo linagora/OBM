@@ -189,6 +189,8 @@ function run_query_domain_insert($domain) {
       of_service_property_insert('mail','smtp_out', $entity_id, $domain['smtp_out']);
       of_service_property_insert('mail','imap_frontend', $entity_id, $domain['imap_frontend']);
     }
+    of_service_insert('imap_archive', $entity_id);
+    of_service_property_insert('imap_archive','imap_archive', $entity_id, $domain['imap_archive']);
     of_service_insert('sync', $entity_id);
     of_service_property_insert('sync','obm_sync', $entity_id, $domain['obm_sync']);
     of_service_insert('solr', $entity_id);
@@ -518,6 +520,7 @@ function run_query_domain_update($domain_id, $domain) {
     of_service_property_replace('mail','smtp_out', $entity_id, $domain['smtp_out']);
     of_service_property_replace('mail','imap_frontend', $entity_id, $domain['imap_frontend']);
   }  
+  of_service_property_replace('imap_archive','imap_archive', $entity_id, $domain['imap_archive']);
   of_service_property_replace('sync','obm_sync', $entity_id, $domain['obm_sync']);
   of_service_property_replace('solr','event', $entity_id, $domain['solr']);
   of_service_property_replace('solr','contact', $entity_id, $domain['solr']);
@@ -1330,6 +1333,51 @@ function get_domain_backupftpservers($domain_id= NULL) {
     $m[$id]['id'] = $id;
     $m[$id]['name'] = $obm_q->f('host_name');
     $m[$id]['backup_ftp'] = $obm_q->f('host_backup_ftp');
+  }
+
+  return $m;
+}
+
+/**
+ * Get the imap archive server list candidate for a domain
+ * where imap archive server host_domain_id matches or from domain 0)
+ * @param $role : restrict list to imap archive server role
+ * @param $domain_id : restrict list to imap archive server in this domain
+ *   if doma
+ * @return array with imap archive servers
+ **/
+function get_domain_imap_archive_servers($domain_id= NULL) {
+  global $cdg_sql;
+
+  if ($domain_id > 0) {
+    $domain_id = sql_parse_id($domain_id, true);
+    // For one domain specified (domain update), global or domain syncserver
+    $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
+  } else {
+    // New domain (no id specified), host from domain 0
+    $where_domain = "AND (domain_global = true)";
+  }
+  $where = " WHERE (imap_archive.service_id IS NOT NULL) ";
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT
+  Host.*,
+  imap_archive.service_id as host_imap_archive
+  FROM Host
+  INNER JOIN HostEntity ON hostentity_host_id = host_id
+  LEFT JOIN Domain ON domain_id = host_domain_id
+  LEFT JOIN Service as imap_archive ON imap_archive.service_service = 'imap_archive' AND imap_archive.service_entity_id = hostentity_entity_id
+  $where
+  $where_domain";
+  display_debug_msg($query, $cdg_sql, 'get_domain_imap_archive_servers()');
+  $obm_q->query($query);
+
+  $m = array();
+  while($obm_q->next_record()) {
+  $id = $obm_q->f('host_id');
+      $m[$id]['id'] = $id;
+      $m[$id]['name'] = $obm_q->f('host_name');
+      $m[$id]['imap_archive'] = $obm_q->f('host_imap_archive');
   }
 
   return $m;

@@ -413,6 +413,7 @@ $l_header_select_opushserver = "Select OPush server";
 $l_header_select_opushfrontendserver = "Select OPush frontend";
 $l_header_select_solrserver = "Select solr server";
 $l_header_select_imapfrontendserver = "Select IMAP frontend";
+$l_header_select_imap_archive_server = "Select IMAP archive";
 $l_header_select_ldapserver = "Select LDAP server";
 $l_header_upd_group = "Update groups";
 $l_header_convert_deal = "Convert to Deal";

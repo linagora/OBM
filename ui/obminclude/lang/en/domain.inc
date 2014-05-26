@@ -14,6 +14,7 @@ $l_mail_servers = "Mail servers";
 $l_sync_servers = "Synchronization servers";
 $l_solr_servers = "Indexing servers";
 $l_imap_frontend_servers = "IMAP frontend servers";
+$l_imap_archive_servers = "IMAP archive servers";
 $l_ldap_servers = "LDAP servers";
 $l_max_quota = "Max value";
 
@@ -60,12 +61,13 @@ $l_alias_user_used = "Cannot change or remove aliases used in email adress";
 $l_fill_title = "You have to fill in the Title before submitting."; 
 $l_domain_confirm_delete = "CAUTION : You will delete a domain ! This operation is irreversible.\\nContinue anyway ?";
 $l_mailserver_warn = "You have to create a host of this kind first"; 
-$l_syncserver_warn = "You have to create an host of this kind first";
-$l_solrserver_warn = "You have to create an host of this kind first";
-$l_imapfrontendserver_warn = "You have to create an host of this kind first";
-$l_opushserver_warn = "You have to create an host of this kind first";
-$l_opushfrontendserver_warn = "You have to create an host of this kind first";
-$l_ldapserver_warn = "You have to create an host of this kind first";
+$l_syncserver_warn = "You have to create a host of this kind first";
+$l_solrserver_warn = "You have to create a host of this kind first";
+$l_imapfrontendserver_warn = "You have to create a host of this kind first";
+$l_imaparchiveserver_warn = "You have to create a host of this kind first";
+$l_opushserver_warn = "You have to create a host of this kind first";
+$l_opushfrontendserver_warn = "You have to create a host of this kind first";
+$l_ldapserver_warn = "You have to create a host of this kind first";
 
 $l_mailserver = "Mail server";
 $l_imap = 'IMAP';

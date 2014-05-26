@@ -406,6 +406,7 @@ $l_header_add_mailserver = "添加邮件服务器"; //"Add mail server"
 $l_header_select_syncserver = "选择obm-sync服务器"; //"Select obm-sync server"
 $l_header_select_solrserver = "选择solr服务器"; //"Select solr server"
 $l_header_select_imapfrontendserver = "选择IMAP前端"; //"Select IMAP frontend"
+$l_header_select_imap_archive_server = "Select IMAP archive";
 $l_header_select_ldapserver = "Select LDAP server";
 $l_header_upd_group = "更新分组"; //"Update groups"
 $l_header_convert_deal = "转换交易"; //"Convert to Deal"
