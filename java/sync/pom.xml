@@ -109,6 +109,7 @@
 		<module>guice-webapp-extensions</module>
 		<module>healthcheck-api</module>
 		<module>icalendar</module>
+		<module>imap-archive</module>
 		<module>integration-testing</module>
 		<module>ldap-client</module>
 		<module>linagora-imap</module>
@@ -418,6 +419,11 @@ org.eclipse.jdt.core.compiler.source=1.6
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
 				<artifactId>icalendar</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>imap-archive</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
