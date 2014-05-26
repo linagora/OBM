@@ -349,6 +349,10 @@ $modules['backup'] = array('Name'=> $l_module_backup,
                   'Ico' => "$ico_backup",
                   'Url' => "$path/backup/backup_index.php",
                   'Right'=> $cright_read_admin);
+$modules['imap_archive'] = array('Name'=> $l_module_imap_archive,
+                  'Ico' => "$ico_backup",
+                  'Url' => "$path/imap_archive/imap_archive_index.php",
+                  'Right'=> $cright_read_admin);
 $modules['domain'] = array('Name'=> $l_module_domain,
 	       	   'Ico' => "$ico_ref",
                    'Url' => "$path/domain/domain_index.php",

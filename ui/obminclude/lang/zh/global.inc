@@ -368,6 +368,7 @@ $l_module_admin_ref = "信息库"; //"Referential"
 $l_module_admin = "连接"; //"Connections"
 $l_module_import = "导入"; //"Import"
 $l_module_backup = "备份"; //"Backup"
+$l_module_imap_archive = "IMAP Archive";
 $l_module_tools = "更新工具"; //"Update tools"
 $l_module_control = "控制台"; //"Dashboard"
 $l_module_mailserver = "邮件服务器"; //"Mail servers"

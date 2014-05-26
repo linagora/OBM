@@ -411,6 +411,7 @@ $l_module_control = "Tableau de bord système";
 $l_module_admin = "Connexions";
 $l_module_import = "Import";
 $l_module_backup = "Sauvegarde";
+$l_module_imap_archive = "Archivage IMAP";
 $l_module_samba = "Serveur Samba (Windows PDC)";
 $l_module_userpattern = "Modèle d'utilisateur";
 $l_module_profile = "Profils utilisateurs";

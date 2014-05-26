@@ -368,6 +368,7 @@ $l_module_admin_ref = "Tham chiếu";
 $l_module_admin = "Các kết nối";
 $l_module_import = "Nhập";
 $l_module_backup = "Sao lưu";
+$l_module_imap_archive = "IMAP Archive";
 $l_module_tools = "Cập nhật các công cụ";
 $l_module_control = "Trang tổng quan";
 $l_module_mailserver = "Mail servers";

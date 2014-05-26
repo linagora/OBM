@@ -372,6 +372,7 @@ $l_module_admin_ref = "Referential";
 $l_module_admin = "Connections";
 $l_module_import = "Import";
 $l_module_backup = "Backup";
+$l_module_imap_archive = "IMAP Archive";
 $l_module_tools = "Update tools";
 $l_module_control = "Dashboard";
 $l_module_mailserver = "Mail servers";
