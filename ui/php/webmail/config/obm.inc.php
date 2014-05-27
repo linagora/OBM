@@ -68,9 +68,8 @@ $config['session_lifetime'] = $rcSessionLifetime;
 // setup required OBM modules
 $config["plugins"][] = "multiple_smtp_server";
 $config["plugins"][] = "obm_addressbook";
-$config["plugins"][] = "unread";
 $config["plugins"][] = "obm_identities";
-$config["plugins"][] = "obm_messages_showfirstunread";
+$config["plugins"][] = "obm_unread";
 
 if ( $auth_kind && $auth_kind == "CAS" ) {
   $config["plugins"][] = "cas_authn";

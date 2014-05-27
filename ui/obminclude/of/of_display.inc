@@ -1450,9 +1450,9 @@ function display_unified_menu($module) {
     array_push( $data["buttons"],
       array(
         "name" => $l_section_webmail,
-        "url" => "$path/webmail/webmail_index.php",
+        "url" => "$path/webmail/webmail_index.php?_task=mail&_filter=ALL",
         "notifier" => true,
-        "notifier_url" => "$path/webmail/webmail_index.php?_task=mail&_mbox=INBOX",
+        "notifier_url" => "$path/webmail/webmail_index.php?_task=mail&_filter=UNSEEN&_mbox=INBOX",
         "notifier_id" => "bannerUnreadMail",
       	"intro-element-id" => "webmail"
       )
