@@ -89,7 +89,7 @@ if ( isset($params['login'])) {
 
 $login_action = '';
 
-$login = isset($params['login']) ? $params['login'] : '';
+$login = isset($params['login']) ? htmlentities($params['login']) : '';
 
 $captcha_formadd = OBM_captcha::getCaptchaHTML();
 
