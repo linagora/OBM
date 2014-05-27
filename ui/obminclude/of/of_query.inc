@@ -1102,7 +1102,7 @@ function of_delegation_dis_search_form($value) {
     $block = "
       <label>$l_delegation<br />
       <input type=\"text\" name=\"tf_delegation\" size=\"16\" maxlength=\"256\"
-      value=\"$value\" />
+      value=\"".htmlentities($value)."\" />
       </label>";
   }
 
@@ -1123,7 +1123,7 @@ function of_delegation_dis_block_consult($value) {
   if ($cgp_use['property']['delegation']) {
     $block = "<tr>
       <th>$l_delegation</th>
-      <td title=\"$value\">$value</td>
+      <td title=\"".htmlentities($value)."\">".htmlentities($value)."</td>
       </tr>";
   }
 
@@ -1147,7 +1147,7 @@ function of_delegation_dis_block_update($value, $class) {
     if ($delegation == '') {
       $delegation = $obm['delegation_target'];
     }
-    $input_delegation = "<input name=\"tf_delegation\" id='delegationField' size=\"32\" maxlength=\"256\" value=\"$delegation\" />";
+    $input_delegation = "<input name=\"tf_delegation\" id='delegationField' size=\"32\" maxlength=\"256\" value=\"".htmlentities($delegation)."\" />";
     $block = "
       <tr>
       <th class=\"$class\">$l_delegation</th>
