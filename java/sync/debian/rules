@@ -20,6 +20,7 @@ ROOT_INSTALL_DIR = /usr/share/$(cdbs_curpkg)
 FAKEROOT_INSTALL_DIR = debian/$(cdbs_curpkg)$(ROOT_INSTALL_DIR)
 FAKEROOT_TOMCAT_CONFIG_DIR = debian/$(cdbs_curpkg)/usr/share/obm-tomcat/applis
 FAKEROOT_LOCATOR_CONFIG_DIR = debian/$(cdbs_curpkg)/usr/share/obm-locator
+FAKEROOT_IMAP_ARCHIVE_CONFIG_DIR = debian/$(cdbs_curpkg)/usr/share/obm-imap-archive
 
 # Template for the Tomcat webapp file
 define WEBAPP_FILE
@@ -60,3 +61,8 @@ install/obm-locator::
 install/obm-tomcat-common-libs::
 	cp $(CURDIR)/webapp-common-dependencies/target/tomcat/*.jar $(CURDIR)/debian/obm-tomcat-common-libs/usr/share/tomcat/lib/
 
+install/obm-imap-archive::
+	mkdir -p $(FAKEROOT_IMAP_ARCHIVE_CONFIG_DIR) 
+	cp $(CURDIR)/imap-archive/target/imap-archive.jar $(CURDIR)/debian/obm-imap-archive/usr/share/obm-imap-archive/
+	cp -a $(CURDIR)/imap-archive/src/main/deb/imap-archive.sh $(CURDIR)/debian/obm-imap-archive/usr/share/obm-imap-archive/obm-imap-archive.sh
+	cp -r $(CURDIR)/imap-archive/target/lib $(CURDIR)/debian/obm-imap-archive/usr/share/obm-imap-archive/

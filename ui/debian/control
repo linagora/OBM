@@ -8,7 +8,7 @@ Homepage: http://www.obm.org
 
 Package: obm-full
 Architecture: all
-Depends: obm-filter (= ${binary:Version}), obm-satellite (= ${binary:Version}), obm-sync (= ${binary:Version}), obm-storage (= ${binary:Version}), obm-ldap (= ${binary:Version}), obm-ui (= ${binary:Version}) , obm-cyrus (= ${binary:Version}) , obm-postfix (= ${binary:Version}), obm-services (= ${binary:Version}), obm-locator (= ${binary:Version}), obm-solr (= ${binary:Version}), ${misc:Depends}
+Depends: obm-filter (= ${binary:Version}), obm-satellite (= ${binary:Version}), obm-sync (= ${binary:Version}), obm-storage (= ${binary:Version}), obm-ldap (= ${binary:Version}), obm-ui (= ${binary:Version}) , obm-cyrus (= ${binary:Version}) , obm-postfix (= ${binary:Version}), obm-services (= ${binary:Version}), obm-locator (= ${binary:Version}), obm-solr (= ${binary:Version}), obm-imap-archive (= ${binary:Version}), ${misc:Depends}
 Description: Open Business Management, a groupware solution (metapackage)
  This package is a metapackage that, when installed, guarantees that you have
  all the different components of OBM installed. Removing this package won't

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+createUser() {
+  if ! id imap-archive > /dev/null 2>&1 ; then
+    adduser --system --home /usr/share/obm-imap-archive --no-create-home --group imap-archive
+  fi
+}
+
+setOwnerToRequiredDir() {
+  if [ -d "$1" ]; then
+     chown -R imap-archive:adm "$1"
+  else 
+     echo "error : $1 must exist."
+     exit 1
+  fi
+}
+
+#DEBHELPER#
+
+createUser
+setOwnerToRequiredDir "/var/log/obm-imap-archive"
+setOwnerToRequiredDir "/var/lib/obm-imap-archive"
+setOwnerToRequiredDir "/usr/share/obm-imap-archive"
+
+if [ -f /etc/init.d/obm-imap-archive ]; then
+  echo "The file /etc/init.d/obm-imap-archive already exists, do not replace it\n"
+else
+  cp -a /usr/share/obm-imap-archive/obm-imap-archive.sh /etc/init.d/obm-imap-archive
+  insserv obm-imap-archive
+fi
+
+invoke-rc.d obm-imap-archive restart	 3>1
+
+exit 0
+

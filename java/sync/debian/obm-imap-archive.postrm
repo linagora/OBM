@@ -1,0 +1,7 @@
+#!/bin/bash
+
+service obm-imap-archive stop > /dev/null
+[ -f /etc/init.d/obm-imap-archive ] && unlink /etc/init.d/obm-imap-archive
+
+exit 0
+
