@@ -31,59 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive;
 
-import java.util.TimeZone;
-
-import org.obm.imap.archive.resources.StatusHandler;
-import org.obm.server.EmbeddedServerModule;
+import org.obm.imap.archive.ImapArchiveModule;
 import org.obm.server.ServerConfiguration;
-import org.obm.sync.XTrustProvider;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
-import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
-public class ImapArchiveModule extends AbstractModule {
-	
-	static {
-		XTrustProvider.install();
-		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-	}
-	
-	private final ServerConfiguration configuration;
-	
-	public ImapArchiveModule(ServerConfiguration configuration) {
-		this.configuration = configuration;
-	}
+public class TestImapArchiveModule extends AbstractModule {
 
 	@Override
-	public void configure() {
-		install(new EmbeddedServerModule(configuration));
-		install(new ImapArchiveServletModule());
-	}
-	
-	public static class ImapArchiveServletModule extends ServletModule {
-
-		public final static String URL_PREFIX = "/imap-archive/service/v1";
-		public final static String URL_PATTERN = URL_PREFIX + "/*";
-		
-		@Override
-		protected void configureServlets() {
-			bind(StatusHandler.class);
-			
-			serve(URL_PATTERN).with(GuiceJerseyServlet.class);
-		}
-
-		@Singleton
-		private static class GuiceJerseyServlet extends GuiceContainer {
-
-			@Inject
-			private GuiceJerseyServlet(Injector injector) {
-				super(injector);
-			}
-			
-		}
+	protected void configure() {
+		ServerConfiguration config = ServerConfiguration.defaultConfiguration();
+		install(new ImapArchiveModule(config));
 	}
 }

@@ -29,61 +29,46 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive;
+package org.obm.imap.archive.resources;
 
-import java.util.TimeZone;
+import static com.jayway.restassured.RestAssured.given;
 
-import org.obm.imap.archive.resources.StatusHandler;
-import org.obm.server.EmbeddedServerModule;
-import org.obm.server.ServerConfiguration;
-import org.obm.sync.XTrustProvider;
+import javax.ws.rs.core.Response.Status;
 
-import com.google.inject.AbstractModule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.obm.guice.GuiceModule;
+import org.obm.guice.GuiceRunner;
+import org.obm.imap.archive.TestImapArchiveModule;
+import org.obm.server.WebServer;
+
 import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
-import com.google.inject.servlet.ServletModule;
-import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
-public class ImapArchiveModule extends AbstractModule {
+@RunWith(GuiceRunner.class)
+@GuiceModule(TestImapArchiveModule.class)
+public class StatusHandlerTest {
+
+	@Inject WebServer server;
 	
-	static {
-		XTrustProvider.install();
-		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-	}
-	
-	private final ServerConfiguration configuration;
-	
-	public ImapArchiveModule(ServerConfiguration configuration) {
-		this.configuration = configuration;
+	@Before
+	public void setUp() throws Exception {
+		server.start();
 	}
 
-	@Override
-	public void configure() {
-		install(new EmbeddedServerModule(configuration));
-		install(new ImapArchiveServletModule());
+	@After
+	public void tearDown() throws Exception {
+		server.stop();
 	}
 	
-	public static class ImapArchiveServletModule extends ServletModule {
-
-		public final static String URL_PREFIX = "/imap-archive/service/v1";
-		public final static String URL_PATTERN = URL_PREFIX + "/*";
-		
-		@Override
-		protected void configureServlets() {
-			bind(StatusHandler.class);
-			
-			serve(URL_PATTERN).with(GuiceJerseyServlet.class);
-		}
-
-		@Singleton
-		private static class GuiceJerseyServlet extends GuiceContainer {
-
-			@Inject
-			private GuiceJerseyServlet(Injector injector) {
-				super(injector);
-			}
-			
-		}
+	@Test
+	public void testStatusOk() {
+		given()
+			.port(server.getHttpPort()).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/status");
 	}
 }
