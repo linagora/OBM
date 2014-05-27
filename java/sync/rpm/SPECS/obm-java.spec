@@ -51,6 +51,21 @@ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
 simple contact database. OBM also features integration with PDAs, smartphones,
 Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
+%package -n obm-imap-archive
+Summary: OBM component that perform email archiving
+Group:  Development/Tools
+Requires: java-1.7.0-openjdk >= 1.7.0
+Requires: obm-config
+
+%description -n obm-imap-archive
+obm-imap-archive is an http server exposing webservices to perform email archiving.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
+
+
 %package -n obm-autoconf
 Summary: Locator for Open Business Management
 Group:	Development/Tools
@@ -117,6 +132,17 @@ cp -r obm-locator/obm-locator-start.sh $RPM_BUILD_ROOT/usr/share/obm-locator/
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 cp -a obm-locator/obm-locator.centos.sh $RPM_BUILD_ROOT%{_initrddir}/obm-locator
 
+# obm-imap-archive
+
+mkdir -p $RPM_BUILD_ROOT/usr/share/obm-imap-archive
+mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/obm-imap-archive
+mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/obm-imap-archive
+cp -r imap-archive/target/imap-archive.jar $RPM_BUILD_ROOT/usr/share/obm-imap-archive/
+cp -r imap-archive/target/lib $RPM_BUILD_ROOT/usr/share/obm-imap-archive/
+cp -r imap-archive/src/main/rpm/imap-archive-start.sh $RPM_BUILD_ROOT/usr/share/obm-imap-archive/
+mkdir -p $RPM_BUILD_ROOT%{_initrddir}
+cp -a imap-archive/src/main/rpm/imap-archive.sh $RPM_BUILD_ROOT%{_initrddir}/obm-imap-archive
+
 # obm-autoconf
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/obm-autoconf
@@ -153,6 +179,15 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %attr(0775,locator,root) %{_datarootdir}/obm-locator/obm-locator-start.sh
 %attr(0775,root,root) %{_initrddir}/obm-locator
 
+%files -n obm-imap-archive
+%defattr(-,root,root,-)
+%{_datarootdir}/obm-imap-archive
+%{_initrddir}/obm-imap-archive
+%attr(0775,imap-archive,root) %{_localstatedir}/log/obm-imap-archive
+%attr(0775,imap-archive,root) %{_localstatedir}/lib/obm-imap-archive
+%attr(0775,root,root) %{_datarootdir}/obm-imap-archive
+%attr(0775,root,root) %{_initrddir}/obm-imap-archive
+
 %files -n obm-autoconf
 %defattr(-,root,root,-)
 %{_datadir}/obm-autoconf
@@ -174,6 +209,19 @@ chown -R locator:adm %{_localstatedir}/log/obm-locator
 chown -R locator:adm %{_localstatedir}/lib/obm-locator
 chown -R locator:adm %{_localstatedir}/run/obm-locator
 /sbin/service obm-locator restart >/dev/null 2>&1 || :
+
+%pre -n obm-imap-archive
+# Create imap-archive user if it doesn't exist
+id imap-archive >/dev/null 2>&1
+if [ "$?" = "1" ]; then
+  useradd --system --gid adm imap-archive
+fi
+
+%post -n obm-imap-archive
+chown -R imap-archive:adm %{_localstatedir}/log/obm-imap-archive
+chown -R imap-archive:adm %{_localstatedir}/lib/obm-imap-archive
+chown -R imap-archive:adm %{_localstatedir}/run/obm-imap-archive
+/sbin/service obm-imap-archive restart >/dev/null 2>&1 || :
 
 %post -n obm-sync
 if [ "$1" = "1" ]; then
