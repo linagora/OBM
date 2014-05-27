@@ -79,14 +79,14 @@ function run_query_host_search($host) {
 
   $where = '(1=1)';
   if ($name != '') {
-    $where .= " AND host_name $like '$name%'";
+    $where .= " AND host_name $like '".$obm_q->escape($name)."%'";
   }
   // If a delegation indication has been specified, get it
   if (trim($delegation) != '') {
-    $where .= " AND host_delegation $like '$delegation%'";
+    $where .= " AND host_delegation $like '".$obm_q->escape($delegation)."%'";
   }
   if ($ip != '') {
-    $where .= " AND host_ip $like '%$ip%'";
+    $where .= " AND host_ip $like '%".$obm_q->escape($ip)."%'";
   }
   if ($samba != '') {
     $where .= ' AND samba.service_id IS NOT NULL';
