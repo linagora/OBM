@@ -1839,11 +1839,11 @@ function update_user_pref($user_id, $option, $new_value='') {
   // if new field values = default values and user value exists, erase it
   if ($new_value == $default_value) {
 
+    $obm_q = new DB_OBM;
     $query = "DELETE FROM UserObmPref
       WHERE userobmpref_user_id ".sql_parse_id($user_id, true)."
-      AND userobmpref_option='$option'";
+      AND userobmpref_option='".$obm_q->escape($option)."'";
     display_debug_msg($query, $cdg_sql, 'update_user_pref()');
-    $obm_q = new DB_OBM; 
     $obm_q->query($query);
 
   } else {
@@ -1870,17 +1870,17 @@ function update_user_pref($user_id, $option, $new_value='') {
 function run_query_user_pref_insert($user_id, $option, $value) {
   global $cdg_sql;
   $user_id = sql_parse_id($user_id);
+  $obm_q = new DB_OBM;
   $query = "INSERT INTO UserObmPref (
     userobmpref_user_id,
     userobmpref_option,
     userobmpref_value)
     VALUES (
       $user_id,
-      '$option',
-      '$value')";
+      '".$obm_q->escape($option).".',
+      '".$obm_q->escape($value)."')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_user_pref_insert()');
-  $obm_q = new DB_OBM; 
   $obm_q->query($query);
 }
 
