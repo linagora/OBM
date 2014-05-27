@@ -1,6 +1,6 @@
-<?php
+<?PHP
 /******************************************************************************
-Copyright (C) 2014 Linagora
+Copyright (C) 2013-2014 Linagora
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU Affero General Public License as published by the Free
@@ -29,16 +29,24 @@ version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
 applicable to the OBM software.
 ******************************************************************************/
 
-class obm_messages_showfirstunread extends rcube_plugin {
+class obm_unread extends rcube_plugin {
 
-    public $task = 'mail';
+  function init() {
+    $this->add_hook('ready', array($this, 'ready'));
+  }
 
-    function init() {
-        $rcmail = rcmail::get_instance();
-        if ($rcmail->task == "mail" && !$rcmail->action) {
-            $this->include_script("obm_messages_showfirstunread.js");
-        }
+  function ready($args) {
+    $RCMAIL = rcmail::get_instance();
+    if ($args["task"] == "mail" && $args["action"] == "unread_plugin") {
+      // action to get the unread count
+      echo $RCMAIL->get_storage()->count('INBOX', 'UNSEEN', null);
+      exit();
     }
-}
 
-?>
+    $filter = get_input_value('_filter', RCUBE_INPUT_GET);
+    if ($args["task"] == "mail" && $filter) {
+      // request to filter the view for a specific type of messages
+      $_SESSION['search_filter'] = $filter;
+    }
+  }
+}
