@@ -51,7 +51,10 @@ public class ImapArchiveServerLauncher {
 		 * EVERY CHANGES DONE THERE CAN SILENTLY BREAK THE START UP *
 		 ******************************************************************/
 		Injector injector = Guice.createInjector(new ImapArchiveModule(
-				ServerConfiguration.builder().port(SERVER_PORT).build()));
+			ServerConfiguration.builder()
+				.port(SERVER_PORT)
+				.requestLoggerEnabled(true)
+				.build()));
 		WebServer webServer = injector.getInstance(WebServer.class);
 		
 		start(webServer).join();
