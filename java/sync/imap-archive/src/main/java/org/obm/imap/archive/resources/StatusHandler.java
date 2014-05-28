@@ -44,6 +44,7 @@ import com.google.inject.Singleton;
 
 @Singleton
 @Path("/status")
+@Produces(MediaType.APPLICATION_JSON)
 public class StatusHandler {
 
 	@Inject
@@ -51,7 +52,6 @@ public class StatusHandler {
 	private Application application;
 
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
 	public Response status() {
 		return Response.ok().build();
 	}

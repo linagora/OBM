@@ -33,7 +33,13 @@ package org.obm.imap.archive;
 
 import java.util.TimeZone;
 
+import org.obm.cyrus.imap.CyrusClientModule;
+import org.obm.domain.dao.UserSystemDao;
+import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.imap.archive.resources.StatusHandler;
+import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
+import org.obm.locator.store.LocatorCache;
+import org.obm.locator.store.LocatorService;
 import org.obm.server.EmbeddedServerModule;
 import org.obm.server.ServerConfiguration;
 import org.obm.sync.XTrustProvider;
@@ -62,6 +68,10 @@ public class ImapArchiveModule extends AbstractModule {
 	public void configure() {
 		install(new EmbeddedServerModule(configuration));
 		install(new ImapArchiveServletModule());
+		install(new CyrusClientModule());
+		
+		bind(LocatorService.class).to(LocatorCache.class);
+		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
 	}
 	
 	public static class ImapArchiveServletModule extends ServletModule {
@@ -72,6 +82,7 @@ public class ImapArchiveModule extends AbstractModule {
 		@Override
 		protected void configureServlets() {
 			bind(StatusHandler.class);
+			bind(CyrusStatusHandler.class);
 			
 			serve(URL_PATTERN).with(GuiceJerseyServlet.class);
 		}

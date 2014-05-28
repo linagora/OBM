@@ -29,46 +29,122 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.resources;
+package org.obm.imap.archive.resources.cyrus;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.easymock.EasyMock.expect;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.imap.archive.TestImapArchiveModules;
+import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.server.WebServer;
 
 import com.google.inject.Inject;
+import com.icegreen.greenmail.util.GreenMail;
+
+import fr.aliacom.obm.common.system.ObmSystemUser;
 
 @RunWith(GuiceRunner.class)
-@GuiceModule(TestImapArchiveModules.Simple.class)
-public class StatusHandlerTest {
-
+@GuiceModule(TestImapArchiveModules.WithGreenmail.class)
+public class CyrusStatusHandlerTest {
+	
 	@Inject WebServer server;
+	@Inject GreenMail imapServer;
+	@Inject UserSystemDao userSystemDao;
+	@Inject IMocksControl mocks;
+
+	private ObmSystemUser cyrus;
 	
 	@Before
-	public void setUp() throws Exception {
-		server.start();
+	public void setUp() {
+		cyrus = ObmSystemUser.builder()
+				.id(5)
+				.login("cyrus")
+				.password("cyrus")
+				.build();
+		
+		imapServer.start();
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		server.stop();
+		imapServer.stop();
 	}
 	
 	@Test
-	public void testStatusOk() {
+	public void testStatusIs200WhenImapIsUp() throws Exception {
+		imapServer.setUser(cyrus.getLogin(), cyrus.getPassword());
+		expect(userSystemDao.getByLogin(cyrus.getLogin())).andReturn(cyrus);
+		mocks.replay();
+		server.start();
+		
 		given()
 			.port(server.getHttpPort()).
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/status");
+			.get("/imap-archive/service/v1/cyrus/status");
+
+		mocks.verify();
+	}
+	
+	@Test
+	public void testStatusIs503WhenImapIsUpButCyrusUserNotFound() throws Exception {
+		expect(userSystemDao.getByLogin(cyrus.getLogin())).andThrow(new SystemUserNotFoundException());
+		mocks.replay();
+		server.start();
+		
+		given()
+			.port(server.getHttpPort()).
+		expect()
+			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/cyrus/status");
+		
+		mocks.verify();
+	}
+	
+	@Test
+	public void testStatusIs503WhenImapIsUpButLoginFails() throws Exception {
+		expect(userSystemDao.getByLogin(cyrus.getLogin())).andReturn(cyrus);
+		mocks.replay();
+		server.start();
+		
+		given()
+			.port(server.getHttpPort()).
+		expect()
+			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/cyrus/status");
+		
+		mocks.verify();
+	}
+	
+	@Test
+	public void testStatusIs503WhenImapIsDown() throws Exception {
+		expect(userSystemDao.getByLogin(cyrus.getLogin())).andReturn(cyrus);
+		mocks.replay();
+		server.start();
+		
+		imapServer.stop();
+		
+		given()
+			.port(server.getHttpPort()).
+		expect()
+			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/cyrus/status");
+		
+		mocks.verify();
 	}
 }

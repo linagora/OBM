@@ -31,16 +31,70 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive;
 
-import org.obm.imap.archive.ImapArchiveModule;
+import static org.easymock.EasyMock.createControl;
+
+import org.easymock.IMocksControl;
+import org.obm.domain.dao.UserSystemDao;
+import org.obm.guice.AbstractOverrideModule;
+import org.obm.locator.LocatorClientException;
+import org.obm.locator.store.LocatorService;
+import org.obm.push.mail.greenmail.GreenMailProviderModule;
 import org.obm.server.ServerConfiguration;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
+import com.google.inject.util.Modules;
 
-public class TestImapArchiveModule extends AbstractModule {
-
-	@Override
-	protected void configure() {
-		ServerConfiguration config = ServerConfiguration.defaultConfiguration();
-		install(new ImapArchiveModule(config));
+public class TestImapArchiveModules {
+	
+	public static class Simple extends AbstractModule {
+	
+		private final IMocksControl mocks = createControl();
+		
+		@Override
+		protected void configure() {
+			ServerConfiguration config = ServerConfiguration.defaultConfiguration();
+			bind(IMocksControl.class).toInstance(mocks);
+			install(Modules.override(new ImapArchiveModule(config)).with(
+				new LocalLocatorModule(),
+				new AbstractOverrideModule(mocks) {
+					
+					@Override
+					protected void configureImpl() {
+						bindWithMock(UserSystemDao.class);
+					}
+				}
+			));
+		}
 	}
+	
+	public static class WithGreenmail extends AbstractModule {
+
+		@Override
+		protected void configure() {
+			install(Modules.override(new Simple()).with(new AbstractModule() {
+
+				@Override
+				protected void configure() {
+					install(new GreenMailProviderModule());
+					bind(Integer.class).annotatedWith(Names.named("imapTimeout")).toInstance(3600);
+				}})
+			);
+		}
+	}
+	
+	public static class LocalLocatorModule extends AbstractModule {
+
+		@Override
+		protected void configure() {
+			bind(LocatorService.class).toInstance(new LocatorService() {
+				
+				@Override
+				public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
+					return "localhost";
+				}
+			});
+		}
+	}
+	
 }

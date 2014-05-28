@@ -29,46 +29,58 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.resources;
+package org.obm.imap.archive.resources.cyrus;
 
-import static com.jayway.restassured.RestAssured.given;
-
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.GuiceRunner;
-import org.obm.imap.archive.TestImapArchiveModules;
-import org.obm.server.WebServer;
+import org.obm.cyrus.imap.admin.CyrusImapService;
+import org.obm.domain.dao.UserSystemDao;
+import org.obm.locator.store.LocatorService;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-@RunWith(GuiceRunner.class)
-@GuiceModule(TestImapArchiveModules.Simple.class)
-public class StatusHandlerTest {
+import fr.aliacom.obm.common.system.ObmSystemUser;
 
-	@Inject WebServer server;
+@Singleton
+@Path("/cyrus/status")
+@Produces(MediaType.APPLICATION_JSON)
+public class CyrusStatusHandler {
+
+	@Inject
+	@Context
+	private Application application;
 	
-	@Before
-	public void setUp() throws Exception {
-		server.start();
-	}
+	private final LocatorService locator;
+	private final CyrusImapService cyrus;
+	private final UserSystemDao userSystemDao;
 
-	@After
-	public void tearDown() throws Exception {
-		server.stop();
+	@Inject
+	private CyrusStatusHandler(
+			LocatorService locator,
+			CyrusImapService cyrus,
+			UserSystemDao userSystemDao) {
+		this.locator = locator;
+		this.cyrus = cyrus;
+		this.userSystemDao = userSystemDao;
 	}
 	
-	@Test
-	public void testStatusOk() {
-		given()
-			.port(server.getHttpPort()).
-		expect()
-			.statusCode(Status.OK.getStatusCode()).
-		when()
-			.get("/imap-archive/service/v1/status");
+	@GET
+	public Response status() {
+		try {
+			ObmSystemUser cyrusUser = userSystemDao.getByLogin(ObmSystemUser.CYRUS);
+			String cyrusAddress = locator.getServiceLocation("mail/imap_frontend", "loginAtDomain");
+			cyrus.buildManager(cyrusAddress, cyrusUser.getLogin(), cyrusUser.getPassword());
+			return Response.ok().build();
+		} catch (Exception e) {
+			return Response.status(Status.SERVICE_UNAVAILABLE).build();
+		}
 	}
 }
