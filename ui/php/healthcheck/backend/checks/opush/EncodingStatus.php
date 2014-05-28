@@ -65,6 +65,6 @@ class EncodingStatus extends AbstractMultiDomainStatus {
       return $encodingOk ? new CheckResult(CheckStatus::OK) : new CheckResult(CheckStatus::ERROR, array("OPush server at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' runs encoding '" . $encoding . "', expecting '" . self::EXPECTED_ENCODING . "'."));
     }
 
-    return new CheckResult(CheckStatus::WARNING, array("OPush server version at '" . $host["ip"] . "' for domain '" . $domain["name"] . "' doesn't support this check"));
+    return new CheckResult(CheckStatus::WARNING, array("This check is only supported since Opush 3.0.1. The server located at '" . $host["ip"] . "' for the domain '" . $domain["name"] . "' doesn't support it"));
   }
 }
