@@ -53,6 +53,7 @@ import org.obm.utils.DBUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -285,7 +286,8 @@ public class AttendeeLoader {
 	}
 
 	private String getAttendeeEmail(ResultSet rs, String domainName) throws SQLException {
-		return MailUtils.extractFirstEmail(rs.getString("attendee_email"), domainName);
+		String emails = rs.getString("attendee_email");
+		return Strings.isNullOrEmpty(emails) ? null : MailUtils.extractFirstEmail(emails, domainName);
 	}
 
 	private ParticipationRole getAttendeeRequired(ResultSet rs) throws SQLException {
