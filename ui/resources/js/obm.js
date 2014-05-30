@@ -579,6 +579,7 @@ function showErrorMessageCustomTimeout(message, timeout) {
 
 function showMessageWithTimeout(klass, message, timeout) {
   showMessageWithoutTimeout(klass, message);
+  var content = $('ajaxMessage');
   setTimeout(function () {content.innerHTML = ''; content.setStyle('display','none');}, timeout);
 }
 
