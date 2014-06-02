@@ -30,6 +30,7 @@
 package org.obm.sync.login;
 
 import org.obm.annotations.transactional.Transactional;
+import org.obm.domain.dao.TrustTokenDao;
 import org.obm.sync.auth.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,6 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.session.SessionManagement;
 import fr.aliacom.obm.common.trust.TrustToken;
-import fr.aliacom.obm.common.trust.TrustTokenDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class TrustedLoginBindingImpl extends AbstractLoginBackend implements LoginBackend {

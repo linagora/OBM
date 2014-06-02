@@ -6367,7 +6367,7 @@ CREATE TABLE token (
 CREATE TABLE trusttoken (
     id integer NOT NULL,
     token character(36) NOT NULL,
-    login character varying(80) NOT NULL,
+    userobm_id integer NOT NULL,
     time_created timestamp DEFAULT now()
 );
 
@@ -8952,7 +8952,8 @@ ALTER TABLE trusttoken
 
 ALTER TABLE trusttoken
     ADD CONSTRAINT trusttoken_token_key UNIQUE (token);
-
+ALTER TABLE trusttoken
+    ADD CONSTRAINT trusttoken_userobm_id_fkey FOREIGN KEY (userobm_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 --
 -- Name: ugroup_group_gid_key; Type: CONSTRAINT; Schema: public; Owner: obm; Tablespace: 
@@ -17222,3 +17223,7 @@ INSERT INTO mailshare (mailshare_domain_id, mailshare_email)
 	VALUES
 		(1, 'mailshare1'),
 		(2, 'mailshare2');
+		
+INSERT INTO trusttoken (id, token, userobm_id, time_created)
+	VALUES  
+		(1, '7f6f35f8-10e1-4d40-8556-1583b6a12d10', 1, '2014-06-05 13:36:00');
