@@ -31,72 +31,84 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources.cyrus;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 
+import org.easymock.IMocksControl;
+import org.junit.Before;
+import org.junit.Test;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.locator.store.LocatorService;
-import org.obm.push.mail.imap.IMAPException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.system.ObmSystemUser;
 
-@Singleton
-@Path("/cyrus/status")
-@Produces(MediaType.APPLICATION_JSON)
-public class CyrusStatusHandler {
-
-	public static final Logger logger = LoggerFactory.getLogger(CyrusStatusHandler.class);
+public class CyrusStatusHandlerUnitTest {
 	
-	@Inject
-	@Context
-	private Application application;
-	
-	private final LocatorService locator;
-	private final CyrusImapService cyrus;
-	private final UserSystemDao userSystemDao;
+	private ObmSystemUser cyrusUser;
 
-	@Inject
-	@VisibleForTesting CyrusStatusHandler(
-			LocatorService locator,
-			CyrusImapService cyrus,
-			UserSystemDao userSystemDao) {
-		this.locator = locator;
-		this.cyrus = cyrus;
-		this.userSystemDao = userSystemDao;
+	private IMocksControl mocks;
+	private UserSystemDao userSystemDao;
+	private LocatorService locatorService;
+	private CyrusImapService cyrusImapService;
+
+	private CyrusStatusHandler testee;
+	
+	@Before
+	public void setUp() {
+		mocks = createControl();
+		cyrusImapService = mocks.createMock(CyrusImapService.class);
+		testee = new CyrusStatusHandler(locatorService, cyrusImapService, userSystemDao);
+		
+		cyrusUser = ObmSystemUser.builder()
+				.id(5)
+				.login("cyrus")
+				.password("cyrus")
+				.build();
 	}
-	
-	@GET
-	public Response status() {
+
+	@Test
+	public void testcanConnectToCyrusCallClose() throws Exception {
+		String host = "the host";
+		
+		CyrusManager cyrusManager = mocks.createMock(CyrusManager.class);
+		expect(cyrusImapService.buildManager(host, "cyrus", "cyrus")).andReturn(cyrusManager);
+		cyrusManager.close();
+		expectLastCall();
+		
+		mocks.replay();
+		boolean success = testee.canConnectToCyrus(cyrusUser, host);
+		mocks.verify();
+		
+		assertThat(success).isTrue();
+	}
+
+	@Test
+	public void testcanConnectToCyrusWhenNullCyrusManager() throws Exception {
+		String host = "the host";
+		expect(cyrusImapService.buildManager(host, "cyrus", "cyrus")).andReturn(null);
+		
+		mocks.replay();
+		boolean success = testee.canConnectToCyrus(cyrusUser, host);
+		mocks.verify();
+		
+		assertThat(success).isFalse();
+	}
+
+	@Test(expected=RuntimeException.class)
+	public void testcanConnectToCyrusLetsPropagateException() throws Exception {
+		String host = "the host";
+		expect(cyrusImapService.buildManager(host, "cyrus", "cyrus")).andThrow(new RuntimeException());
+		
+		mocks.replay();
 		try {
-			ObmSystemUser cyrusUser = userSystemDao.getByLogin(ObmSystemUser.CYRUS);
-			String cyrusAddress = locator.getServiceLocation("mail/imap_frontend", "loginAtDomain");
-			if (canConnectToCyrus(cyrusUser, cyrusAddress)) {
-				return Response.ok().build();
-			}
+			testee.canConnectToCyrus(cyrusUser, host);
 		} catch (Exception e) {
-			logger.error("The server cannot try to connect to cyrus", e);
+			mocks.verify();
+			throw e;
 		}
-		return Response.status(Status.SERVICE_UNAVAILABLE).build();
-	}
-
-	@VisibleForTesting boolean canConnectToCyrus(ObmSystemUser cyrusUser, String cyrusAddress) throws IMAPException {
-		try (CyrusManager cyrusManager = cyrus.buildManager(
-				cyrusAddress, cyrusUser.getLogin(), cyrusUser.getPassword())) {
-			return cyrusManager != null;
-		} 
 	}
 }
