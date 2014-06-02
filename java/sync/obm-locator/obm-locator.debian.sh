@@ -75,7 +75,7 @@ HOSTNAME=$(uname -n)
 ##################################################
 if [ -z "$JAVA_HOME" ]; then
         log_failure_msg "Could not start $DESC because no Java Development Kit"
-        log_failure_msg "(JDK) was found. Please download and install JDK 1.6 or higher"
+        log_failure_msg "(JDK) was found. Please download and install JDK 1.7 or higher"
         exit 0
 fi
 
