@@ -130,10 +130,7 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 	}
 
 	private void deleteUserMailBoxes(ObmUser user) {
-		CyrusManager cyrusManager = null;
-
-		try {
-			cyrusManager = buildCyrusManager(user);
+		try (CyrusManager cyrusManager = buildCyrusManager(user)) {
 			cyrusManager.setAcl(user, CYRUS, Acl.builder().user(user.getLogin()).rights(DELETE_ACL).build());
 			cyrusManager.delete(user);
 		} catch (Exception e) {
@@ -141,10 +138,6 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 					String.format(
 							"Cannot delete cyrus mailbox for user '%s' (%s).",
 							user.getLogin(), user.getExtId().getExtId()), e);
-		} finally {
-			if (cyrusManager != null) {
-				cyrusManager.shutdown();
-			}
 		}
 	}
 

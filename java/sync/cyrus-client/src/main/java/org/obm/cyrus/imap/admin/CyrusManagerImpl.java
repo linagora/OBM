@@ -118,7 +118,7 @@ public class CyrusManagerImpl implements CyrusManager {
 	}
 
 	@Override
-	public void shutdown() throws ImapTimeoutException {
+	public void close() throws ImapTimeoutException {
 		conn.shutdown();
 	}
 

@@ -143,10 +143,7 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 	}
 
 	private void createUserMailboxes(ObmUser user) {
-		CyrusManager cyrusManager = null;
-		
-		try {
-			cyrusManager = buildCyrusManager(user);
+		try (CyrusManager cyrusManager = buildCyrusManager(user)) {
 			cyrusManager.create(user);
 			cyrusManager.applyQuota(user);
 			cyrusManager.setAcl(
@@ -161,10 +158,6 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 					String.format(
 							"Cannot create cyrus mailbox for user '%s' (%s).",
 							user.getLogin(), user.getExtId()), e);
-		} finally {
-			if (cyrusManager != null) {
-				cyrusManager.shutdown();
-			}
 		}
 	}
 

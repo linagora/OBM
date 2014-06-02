@@ -99,17 +99,10 @@ public abstract class AbstractModifyUserOperationProcessor extends AbstractUserO
 	}
 
 	protected void updateUserMailbox(ObmUser user) {
-		CyrusManager cyrusManager = null;
-
-		try {
-			cyrusManager = buildCyrusManager(user);
+		try (CyrusManager cyrusManager = buildCyrusManager(user)) {
 			cyrusManager.applyQuota(user);
 		} catch (Exception e) {
 			throw new ProcessingException(String.format("Cannot update Cyrus mailbox for user '%s' (%s).", user.getLogin(), user.getExtId()), e);
-		} finally {
-			if (cyrusManager != null) {
-				cyrusManager.shutdown();
-			}
 		}
 	}
 

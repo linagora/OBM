@@ -38,7 +38,7 @@ import org.obm.push.mail.imap.IMAPException;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
-public interface CyrusManager {
+public interface CyrusManager extends AutoCloseable {
 
 	public interface Factory {
 		CyrusManager create(String hostname, String login, String password) throws IMAPException, ImapTimeoutException;
@@ -50,7 +50,7 @@ public interface CyrusManager {
 
 	void setAcl(ObmUser obmUser, String identifier, Acl acl) throws ImapOperationException, ConnectionException, ImapTimeoutException;
 
-	void shutdown() throws ImapTimeoutException;
+	void close() throws ImapTimeoutException;
 
 	void applyQuota(ObmUser obmUser) throws MailboxNotFoundException, ImapTimeoutException;
 

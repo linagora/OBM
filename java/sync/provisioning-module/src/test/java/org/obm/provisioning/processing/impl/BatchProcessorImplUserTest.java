@@ -1600,7 +1600,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 	}
 
 	private void expectCyrusShutDown(CyrusManager cyrusManager) throws ImapTimeoutException {
-		cyrusManager.shutdown();
+		cyrusManager.close();
 		expectLastCall().once();
 	}
 
