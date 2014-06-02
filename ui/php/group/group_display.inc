@@ -277,7 +277,7 @@ function html_group_search_form ($group) {
   if ($display_pref['group_name']['status'] != 0) {
     $block .= "
     <label>$l_name<br />
-      <input name=\"tf_name\" size=\"16\" maxlength=\"256\" value=\"".htmlentities($name)."\" />
+      <input name=\"tf_name\" size=\"16\" maxlength=\"256\" value=\"$name\" />
     </label>";
   }
   
@@ -291,20 +291,20 @@ function html_group_search_form ($group) {
   
   $block .= "
     <label>$l_group_user<br />
-      <input name=\"tf_user\" size=\"16\" maxlength=\"16\" value=\"".htmlentities($user)."\" />
+      <input name=\"tf_user\" size=\"16\" maxlength=\"16\" value=\"$user\" />
     </label>";
   
   if ($display_pref['group_email']['status'] != 0) {
     $block .= "
     <label>$l_email<br />
-      <input name=\"tf_email\" size=\"24\" maxlength=\"64\" value=\"".htmlentities($email)."\" />
+      <input name=\"tf_email\" size=\"24\" maxlength=\"64\" value=\"$email\" />
     </label>";
   }
   
   if ($display_pref['group_desc']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_desc]<br />
-      <input name=\"tf_desc\" size=\"24\" maxlength=\"128\" value=\"".htmlentities($desc)."\" />
+      <input name=\"tf_desc\" size=\"24\" maxlength=\"128\" value=\"$desc\" />
     </label>";
   }
   
