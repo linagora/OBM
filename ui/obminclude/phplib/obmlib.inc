@@ -191,10 +191,6 @@ class OBM_Challenge_Auth extends Auth {
     }
     $login = $params['login'];
     $password = stripslashes($params['password']);
-
-    $class = $this->database_class;
-    $this->db = new $class;
-
     //if(!$login && $_SERVER['PHP_AUTH_USER']) {
     //  $login = $_SERVER['PHP_AUTH_USER'];
     //  $password = $_SERVER['PHP_AUTH_PW'];
@@ -211,7 +207,7 @@ class OBM_Challenge_Auth extends Auth {
       if ((! isset($domain)) || ($domain == '')) {
         $domain = "$c_default_domain";
       }
-      $where_domain = "AND $domain_query = '".$this->db->escape($domain)."'";
+      $where_domain = "AND $domain_query = '$domain'";
 
     }
     if (isset($login)) {
@@ -234,6 +230,9 @@ class OBM_Challenge_Auth extends Auth {
       WHERE userobm_login = '$user_login'
         AND userobm_archive = 0
         $where_domain";
+    $class = $this->database_class;
+    $this->db = new $class;
+
     $this->db->query($query_login);
     while ($this->db->next_record()) {
       $uid  = $this->db->f("userobm_id");
