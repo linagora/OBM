@@ -37,6 +37,7 @@ import org.obm.sync.auth.AuthFault;
 public interface LoginService {
 
 	AccessToken login(String loginAtDomain, String password) throws AuthFault;
+	AccessToken trustedLogin(String loginAtDomain, String password) throws AuthFault;
 	AccessToken authenticate(String loginAtDomain, String password) throws AuthFault;
 	boolean authenticateGlobalAdmin(String login, String password) throws AuthFault;
 	boolean authenticateAdmin(String login, String password, String domainName) throws AuthFault;

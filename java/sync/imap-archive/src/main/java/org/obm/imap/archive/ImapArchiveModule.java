@@ -39,6 +39,7 @@ import org.obm.cyrus.imap.CyrusClientModule;
 import org.obm.dbcp.DatabaseModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
+import org.obm.imap.archive.authentication.AuthenticationFilter;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationModule;
 import org.obm.imap.archive.resources.StatusHandler;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
@@ -52,6 +53,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
@@ -63,6 +65,7 @@ public class ImapArchiveModule extends AbstractModule {
 	}
 	
 	private final ServerConfiguration configuration;
+	private static final String APPLICATION_ORIGIN = "imap-archive";
 	
 	public ImapArchiveModule(ServerConfiguration configuration) {
 		this.configuration = configuration;
@@ -80,6 +83,7 @@ public class ImapArchiveModule extends AbstractModule {
 		
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
+		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
 	}
 	
 	public static class ImapArchiveServletModule extends ServletModule {
@@ -92,6 +96,7 @@ public class ImapArchiveModule extends AbstractModule {
 			bind(StatusHandler.class);
 			bind(CyrusStatusHandler.class);
 			
+			filter(URL_PATTERN).through(AuthenticationFilter.class);
 			serve(URL_PATTERN).with(GuiceJerseyServlet.class);
 		}
 

@@ -100,7 +100,10 @@ public class CyrusStatusHandlerTest {
 		server.start();
 		
 		given()
-			.port(server.getHttpPort()).
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -112,7 +115,10 @@ public class CyrusStatusHandlerTest {
 		server.start();
 		
 		given()
-			.port(server.getHttpPort()).
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org").
 		expect()
 			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
 		when()
@@ -124,7 +130,10 @@ public class CyrusStatusHandlerTest {
 		server.start();
 		
 		given()
-			.port(server.getHttpPort()).
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org").
 		expect()
 			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
 		when()
@@ -138,7 +147,10 @@ public class CyrusStatusHandlerTest {
 		imapServer.stop();
 		
 		given()
-			.port(server.getHttpPort()).
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org").
 		expect()
 			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
 		when()

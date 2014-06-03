@@ -136,6 +136,21 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		token.setUserDisplayName(displayname);
 		return token;
 	}
+	
+	@Override
+	public AccessToken trustedLogin(String loginAtDomain, String password) throws AuthFault {
+		Multimap<String, String> params = ArrayListMultimap.create();
+		params.put("login", loginAtDomain);
+		params.put("password", password);
+		params.put("origin", origin);
+
+		AccessToken token = newAccessToken(loginAtDomain, origin);
+		
+		Document doc = execute(token, "/login/trustedLogin", params);
+		exceptionFactory.checkLoginExpection(doc);
+		
+		return fillToken(token, doc);
+	}
 
 	private MavenVersion getVersion(Element v) {
 		MavenVersion version = new MavenVersion();

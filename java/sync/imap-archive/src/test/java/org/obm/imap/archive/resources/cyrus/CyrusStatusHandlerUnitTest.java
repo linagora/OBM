@@ -75,7 +75,7 @@ public class CyrusStatusHandlerUnitTest {
 		String host = "the host";
 		
 		CyrusManager cyrusManager = mocks.createMock(CyrusManager.class);
-		expect(cyrusImapService.buildManager(host, "cyrus", "cyrus")).andReturn(cyrusManager);
+		expect(cyrusImapService.buildManager(host, cyrusUser.getLogin(), cyrusUser.getPassword())).andReturn(cyrusManager);
 		cyrusManager.close();
 		expectLastCall();
 		
@@ -89,7 +89,7 @@ public class CyrusStatusHandlerUnitTest {
 	@Test
 	public void testcanConnectToCyrusWhenNullCyrusManager() throws Exception {
 		String host = "the host";
-		expect(cyrusImapService.buildManager(host, "cyrus", "cyrus")).andReturn(null);
+		expect(cyrusImapService.buildManager(host, cyrusUser.getLogin(), cyrusUser.getPassword())).andReturn(null);
 		
 		mocks.replay();
 		boolean success = testee.canConnectToCyrus(cyrusUser, host);
@@ -101,7 +101,7 @@ public class CyrusStatusHandlerUnitTest {
 	@Test(expected=RuntimeException.class)
 	public void testcanConnectToCyrusLetsPropagateException() throws Exception {
 		String host = "the host";
-		expect(cyrusImapService.buildManager(host, "cyrus", "cyrus")).andThrow(new RuntimeException());
+		expect(cyrusImapService.buildManager(host, cyrusUser.getLogin(), cyrusUser.getPassword())).andThrow(new RuntimeException());
 		
 		mocks.replay();
 		try {

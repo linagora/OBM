@@ -31,11 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive;
 
+import org.apache.http.client.HttpClient;
+import org.obm.configuration.DomainConfiguration;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
 import org.obm.server.ServerConfiguration;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
+import org.obm.sync.client.impl.SyncClientAssert;
+import org.obm.sync.client.login.LoginClient;
+import org.obm.sync.locators.Locator;
+import org.slf4j.Logger;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
@@ -50,7 +58,8 @@ public class TestImapArchiveModules {
 			ServerConfiguration config = ServerConfiguration.defaultConfiguration();
 			install(Modules.override(new ImapArchiveModule(config)).with(
 				new DaoTestModule(),
-				new LocalLocatorModule()
+				new LocalLocatorModule(),
+				new ObmSyncModule()
 			));
 		}
 	}
@@ -83,5 +92,36 @@ public class TestImapArchiveModules {
 			});
 		}
 	}
-	
+    
+	public static class ObmSyncModule extends AbstractModule {
+
+	 	public class FakeLoginClient extends LoginClient {
+
+	 		protected FakeLoginClient(String origin, DomainConfiguration domainConfiguration, SyncClientAssert syncClientAssert, Locator locator, Logger obmSyncLogger, HttpClient httpClient) {
+ 	 			super(origin, domainConfiguration, syncClientAssert, locator, obmSyncLogger, httpClient);
+ 	 		}
+
+ 	 		@Override
+ 	 		public AccessToken trustedLogin(String loginAtDomain, String password) throws AuthFault {
+ 	 			return new AccessToken(1, "origin");
+ 	 		}
+ 	 	}
+
+ 	 	public class FakeLoginClientFactory extends LoginClient.Factory {
+
+ 	 		public FakeLoginClientFactory() {
+ 	 			super(null, null, null, null, null);
+ 	 		}
+
+ 	 		@Override
+ 	 		public LoginClient create(HttpClient httpClient) {
+ 	 			return new FakeLoginClient(origin, domainConfiguration, syncClientAssert, locator, obmSyncLogger, httpClient);
+ 	 		}
+ 	 	}
+
+ 	 	@Override
+ 	 	protected void configure() {
+ 	 		bind(LoginClient.Factory.class).toInstance(new FakeLoginClientFactory());
+ 	 	}
+	}
 }

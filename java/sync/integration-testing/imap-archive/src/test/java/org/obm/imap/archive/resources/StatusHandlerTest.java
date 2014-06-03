@@ -65,7 +65,10 @@ public class StatusHandlerTest {
 	@Test
 	public void testStatusOk() {
 		given()
-			.port(server.getHttpPort()).
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()

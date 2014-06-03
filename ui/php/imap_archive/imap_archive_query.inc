@@ -59,11 +59,13 @@ function connect_to_imap_archive_service(){
   $imapArchiveRootPath = "http://".$imapArchiveServer[0]["ip"].":8085";
   $loginPath = "/imap-archive/service/v1/status";
   $username = $userInfo["login"];
+  $domainName = $userInfo["domain_name"];
   $password = get_trust_token($userInfo);
   $origin= $GLOBALS['c_origin_web'];
 
   $params = array("login" => $username,
     "password" => $password,
+    "domain_name" => $domainName,
     "origin" => $origin);
   if ($userInfo["password_type"] == "MD5SUM") {
       $loginUrl .= "&isPasswordHashed=true";
@@ -86,10 +88,8 @@ function connect_to_imap_archive_service(){
   if ($code == 200) {
     return array(1, null);
   }
-  if($errno){
-    error_log("Couldn't login to IMAP archive server (".$errno.")");
-    return array(0, $l_could_not_login_imap_archive_server);
-  }
+  error_log("Couldn't login to IMAP archive server (".$errno.")");
+  return array(0, $l_could_not_login_imap_archive_server);
 
 }
 ?>

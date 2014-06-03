@@ -32,9 +32,11 @@ package org.obm.sync.login;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.domain.dao.TrustTokenDao;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.Login;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
@@ -48,7 +50,7 @@ public class TrustedLoginBindingImpl extends AbstractLoginBackend implements Log
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Inject
-	public TrustedLoginBindingImpl(SessionManagement sessionManagement, TrustTokenDao trustTokenDao, ObmSyncConfigurationService configurationService) {
+	@VisibleForTesting TrustedLoginBindingImpl(SessionManagement sessionManagement, TrustTokenDao trustTokenDao, ObmSyncConfigurationService configurationService) {
 		super(sessionManagement);
 
 		this.trustTokenDao = trustTokenDao;
@@ -62,9 +64,9 @@ public class TrustedLoginBindingImpl extends AbstractLoginBackend implements Log
 			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
 
 		TrustToken trustToken = null;
-		
+		Login login = Login.builder().login(user).build();
 		try {
-			trustToken = trustTokenDao.getTrustToken(user);
+			trustToken = trustTokenDao.getTrustToken(login.getLogin());
 		}
 		catch (Exception e) {
 			logger.error("Failed to locate trust token in database.", e);
