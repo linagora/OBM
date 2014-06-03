@@ -45,8 +45,9 @@ public class H2InMemoryDatabaseRule extends MethodExternalResource {
 	@Override
 	protected void before() throws Throwable {
 		h2testClass.getDb().resetDatabase();
-		if (schema != null)
+		if (schema != null) {
 			h2testClass.getDb().importSchema(schema);
+		}
 	}
 
 	@Override
