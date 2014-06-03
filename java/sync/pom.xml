@@ -30,7 +30,7 @@
 		<hornetq.version>2.3.1.Final</hornetq.version>
 		<junit.version>4.11</junit.version>
 		<easymock.version>3.1</easymock.version>
-		<assertj.version>1.4.0</assertj.version>
+		<assertj.version>1.6.1</assertj.version>
 		<guava.version>15.0</guava.version>
 		<powermock.version>1.5.1</powermock.version>
 		<httpclient.version>4.3</httpclient.version>

@@ -37,7 +37,6 @@ import static org.obm.DateUtils.dateUTC;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.EnumSet;
 import java.util.GregorianCalendar;
 
 import javax.xml.parsers.FactoryConfigurationError;
@@ -371,7 +370,7 @@ public class CalendarItemsParserTest {
 		Event ev = parser.parseEvent(doc.getDocumentElement());
 		
 		assertThat(ev.getRecurrence().getKind()).isEqualTo(RecurrenceKind.none);
-		assertThat(ev.getRecurrence().getDays()).isEqualTo(EnumSet.noneOf(RecurrenceDay.class));
+		assertThat(ev.getRecurrence().getDays()).isEqualTo(new RecurrenceDays());
 	}
 
 	@Test
@@ -435,7 +434,7 @@ public class CalendarItemsParserTest {
 		assertThat(evEx.getOwnerEmail()).isEqualTo("test2@par.lng");
 		assertThat(evEx.getSequence()).isEqualTo(1);
 		assertThat(evEx.getAttendees().size()).isEqualTo(2);
-		assertThat(ev.getRecurrence().getDays()).isEqualTo(EnumSet.noneOf(RecurrenceDay.class));
+		assertThat(ev.getRecurrence().getDays()).isEqualTo(new RecurrenceDays());
 	}
 
 
