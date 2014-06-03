@@ -41,7 +41,7 @@ import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.imap.archive.authentication.AuthenticationFilter;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationModule;
-import org.obm.imap.archive.resources.StatusHandler;
+import org.obm.imap.archive.resources.RootHandler;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
@@ -93,7 +93,7 @@ public class ImapArchiveModule extends AbstractModule {
 		
 		@Override
 		protected void configureServlets() {
-			bind(StatusHandler.class);
+			bind(RootHandler.class);
 			bind(CyrusStatusHandler.class);
 			
 			filter(URL_PATTERN).through(AuthenticationFilter.class);

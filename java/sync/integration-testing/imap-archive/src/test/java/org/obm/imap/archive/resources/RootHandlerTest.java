@@ -48,7 +48,7 @@ import com.google.inject.Inject;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(TestImapArchiveModules.Simple.class)
-public class StatusHandlerTest {
+public class RootHandlerTest {
 
 	@Inject WebServer server;
 	

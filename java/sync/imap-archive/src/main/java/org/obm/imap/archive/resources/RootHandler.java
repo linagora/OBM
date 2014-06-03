@@ -43,15 +43,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-@Path("/status")
+@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
-public class StatusHandler {
+public class RootHandler {
 
 	@Inject
 	@Context
 	private Application application;
 
 	@GET
+	@Path("/status")
 	public Response status() {
 		return Response.ok().build();
 	}
