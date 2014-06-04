@@ -56,4 +56,9 @@ public class RootHandler {
 	public Response status() {
 		return Response.ok().build();
 	}
+	
+	@Path("domains/{domain}/")
+	public Class<DomainsResource> domains() {
+		return DomainsResource.class;
+	}
 }

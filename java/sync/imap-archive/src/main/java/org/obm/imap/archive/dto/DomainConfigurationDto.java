@@ -29,65 +29,58 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.resources;
+package org.obm.imap.archive.dto;
 
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import java.util.UUID;
 
-import javax.ws.rs.core.Response.Status;
+import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.DomainConfiguration.DayOfWeek;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.GuiceRunner;
-import org.obm.imap.archive.TestImapArchiveModules;
-import org.obm.server.WebServer;
+public class DomainConfigurationDto {
 
-import com.google.inject.Inject;
-import com.jayway.restassured.http.ContentType;
-
-@RunWith(GuiceRunner.class)
-@GuiceModule(TestImapArchiveModules.Simple.class)
-public class RootHandlerTest {
-
-	@Inject WebServer server;
-	
-	@Before
-	public void setUp() throws Exception {
-		server.start();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		server.stop();
+	public static DomainConfigurationDto from(DomainConfiguration configuration) {
+		DomainConfigurationDto dto = new DomainConfigurationDto();
+		dto.domainId = configuration.getDomainId();
+		dto.enabled = configuration.isEnabled();
+		dto.repeatKind = configuration.getRepeatKind() != null ? configuration.getRepeatKind().name() : null;
+		dto.dayOfWeek = from(configuration.getDayOfWeek());
+		dto.dayOfMonth = configuration.getDayOfMonth() != null ? configuration.getDayOfMonth().getDayIndex() : null;
+		dto.dayOfYear = configuration.getDayOfYear() != null ? configuration.getDayOfYear().getDayOfYear() : null;
+		dto.hour = configuration.getHour();
+		dto.minute = configuration.getMinute();
+		return dto;
 	}
 	
-	@Test
-	public void testStatusOk() {
-		given()
-			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
-			.param("domain_name", "mydomain.org").
-		expect()
-			.statusCode(Status.OK.getStatusCode()).
-		when()
-			.get("/imap-archive/service/v1/status");
+	private static Integer from(DayOfWeek dayOfWeek) {
+		if (dayOfWeek == null) {
+			return null;
+		}
+		switch (dayOfWeek) {
+		case MONDAY:
+			return 1;
+		case TUESDAY:
+			return 2;
+		case WEDNESDAY:
+			return 3;
+		case THURSDAY:
+			return 4;
+		case FRIDAY:
+			return 5;
+		case SATURDAY:
+			return 6;
+		case SUNDAY:
+			return 7;
+		}
+		throw new IllegalArgumentException(dayOfWeek.name() + " can't be converted to Integer");
 	}
 	
-
-	@Test
-	public void getDomainConfigurationShouldReturnADefaultConfiguration() {
-		given()
-			.port(server.getHttpPort()).
-		expect()
-			.contentType(ContentType.JSON)
-			.body("domainId", equalTo("7387f73e-4068-4598-aed5-3447b734f29b"),
-				"activated", equalTo(false))
-			.statusCode(Status.OK.getStatusCode()).
-		when()
-			.get("/imap-archive/service/v1/domains/7387f73e-4068-4598-aed5-3447b734f29b/configuration");
-	}
+	public UUID domainId;
+	public Boolean enabled;
+	public String repeatKind;
+	public Integer dayOfWeek;
+	public Integer dayOfMonth;
+	public Integer dayOfYear;
+	public Integer hour;
+	public Integer minute;
+	
 }

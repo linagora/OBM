@@ -29,65 +29,48 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.resources;
+package org.obm.imap.archive.dto;
 
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.ws.rs.core.Response.Status;
+import java.util.UUID;
 
-import org.junit.After;
-import org.junit.Before;
+import org.joda.time.LocalTime;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.GuiceRunner;
-import org.obm.imap.archive.TestImapArchiveModules;
-import org.obm.server.WebServer;
+import org.obm.imap.archive.beans.ArchiveRecurrence;
+import org.obm.imap.archive.beans.DayOfMonth;
+import org.obm.imap.archive.beans.DayOfYear;
+import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
+import org.obm.imap.archive.beans.DomainConfiguration.DayOfWeek;
 
-import com.google.inject.Inject;
-import com.jayway.restassured.http.ContentType;
 
-@RunWith(GuiceRunner.class)
-@GuiceModule(TestImapArchiveModules.Simple.class)
-public class RootHandlerTest {
-
-	@Inject WebServer server;
-	
-	@Before
-	public void setUp() throws Exception {
-		server.start();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		server.stop();
-	}
-	
-	@Test
-	public void testStatusOk() {
-		given()
-			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
-			.param("domain_name", "mydomain.org").
-		expect()
-			.statusCode(Status.OK.getStatusCode()).
-		when()
-			.get("/imap-archive/service/v1/status");
-	}
-	
+public class DomainConfigurationDtoTest {
 
 	@Test
-	public void getDomainConfigurationShouldReturnADefaultConfiguration() {
-		given()
-			.port(server.getHttpPort()).
-		expect()
-			.contentType(ContentType.JSON)
-			.body("domainId", equalTo("7387f73e-4068-4598-aed5-3447b734f29b"),
-				"activated", equalTo(false))
-			.statusCode(Status.OK.getStatusCode()).
-		when()
-			.get("/imap-archive/service/v1/domains/7387f73e-4068-4598-aed5-3447b734f29b/configuration");
+	public void fromDomainConfigurationShouldCopyAllFields() {
+		DomainConfiguration configuration = 
+				DomainConfiguration.builder()
+					.domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"))
+					.enabled(false)
+					.time(LocalTime.parse("13:23"))
+					.recurrence(ArchiveRecurrence.builder()
+							.repeat(RepeatKind.DAILY)
+							.dayOfMonth(DayOfMonth.of(12))
+							.dayOfWeek(DayOfWeek.FRIDAY)
+							.dayOfYear(DayOfYear.of(234))
+							.build())
+					.build();
+		DomainConfigurationDto dto = DomainConfigurationDto.from(configuration);
+		assertThat(dto.domainId).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
+		assertThat(dto.enabled).isFalse();
+		assertThat(dto.repeatKind).isEqualTo("DAILY");
+		assertThat(dto.dayOfMonth).isEqualTo(12);
+		assertThat(dto.dayOfWeek).isEqualTo(5);
+		assertThat(dto.dayOfYear).isEqualTo(234);
+		assertThat(dto.hour).isEqualTo(13);
+		assertThat(dto.minute).isEqualTo(23);
+
 	}
+	
 }

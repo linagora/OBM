@@ -51,17 +51,17 @@ public class DomainConfigurationTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void builderShouldThrowWhenDomainIdIsNotProvided() {
-		DomainConfiguration.builder().activated(false).build();
+		DomainConfiguration.builder().enabled(false).build();
 	}
 
 	@Test(expected=IllegalStateException.class)
-	public void builderShouldThrowWhenActivatedIsNotProvided() {
+	public void builderShouldThrowWhenEnabledIsNotProvided() {
 		DomainConfiguration.builder().domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
 	}
 
 	@Test(expected=IllegalStateException.class)
-	public void builderShouldThrowWhenActivatedAndTimeIsNotProvided() {
-		DomainConfiguration.builder().activated(true).domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
+	public void builderShouldThrowWhenEnabledAndTimeIsNotProvided() {
+		DomainConfiguration.builder().enabled(true).domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -76,35 +76,35 @@ public class DomainConfigurationTest {
 
 	
 	@Test(expected=IllegalStateException.class)
-	public void builderShouldThrowWhenActivatedAndRepeatKindIsNotProvided() {
+	public void builderShouldThrowWhenEnabledAndRepeatKindIsNotProvided() {
 		DomainConfiguration.builder().time(LocalTime.parse("10:22")).domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
 	}
 	
 	@Test
-	public void builderShouldBuildConfigurationWhenActivatedIsTrueAndRequiredFieldsAreProvided() {
+	public void builderShouldBuildConfigurationWhenEnabledIsTrueAndRequiredFieldsAreProvided() {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
 					.domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"))
-					.activated(true)
+					.enabled(true)
 					.time(LocalTime.parse("13:23"))
 					.recurrence(ArchiveRecurrence.daily())
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
-		assertThat(configuration.isActivated()).isTrue();
+		assertThat(configuration.isEnabled()).isTrue();
 		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
 		assertThat(configuration.getHour()).isEqualTo(13);
 		assertThat(configuration.getMinute()).isEqualTo(23);
 	}
 	
 	@Test
-	public void builderShouldBuildConfigurationWhenActivatedIsFalseAndRequiredFieldsAreProvided() {
+	public void builderShouldBuildConfigurationWhenEnabledIsFalseAndRequiredFieldsAreProvided() {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
 					.domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"))
-					.activated(false)
+					.enabled(false)
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
-		assertThat(configuration.isActivated()).isFalse();
+		assertThat(configuration.isEnabled()).isFalse();
 	}
 
 	@Test
@@ -112,12 +112,12 @@ public class DomainConfigurationTest {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
 					.domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"))
-					.activated(false)
+					.enabled(false)
 					.time(LocalTime.parse("13:23"))
 					.recurrence(ArchiveRecurrence.daily())
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
-		assertThat(configuration.isActivated()).isFalse();
+		assertThat(configuration.isEnabled()).isFalse();
 		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
 		assertThat(configuration.getHour()).isEqualTo(13);
 		assertThat(configuration.getMinute()).isEqualTo(23);

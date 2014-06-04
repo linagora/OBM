@@ -49,12 +49,14 @@ import org.obm.server.EmbeddedServerModule;
 import org.obm.server.ServerConfiguration;
 import org.obm.sync.XTrustProvider;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 public class ImapArchiveModule extends AbstractModule {
@@ -97,7 +99,7 @@ public class ImapArchiveModule extends AbstractModule {
 			bind(CyrusStatusHandler.class);
 			
 			filter(URL_PATTERN).through(AuthenticationFilter.class);
-			serve(URL_PATTERN).with(GuiceJerseyServlet.class);
+			serve(URL_PATTERN).with(GuiceJerseyServlet.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
 		}
 
 		@Singleton

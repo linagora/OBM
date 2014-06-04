@@ -48,7 +48,7 @@ public class DomainConfiguration {
 	public static class Builder {
 		
 		private UUID domainId;
-		private Boolean activated;
+		private Boolean enabled;
 		private ArchiveRecurrence recurrence;
 		private LocalTime time;
 		
@@ -67,8 +67,8 @@ public class DomainConfiguration {
 			return this;
 		}
 
-		public Builder activated(boolean activated) {
-			this.activated = activated;
+		public Builder enabled(boolean enabled) {
+			this.enabled = enabled;
 			return this;
 		}
 
@@ -79,26 +79,26 @@ public class DomainConfiguration {
 		
 		public DomainConfiguration build() {
 			Preconditions.checkState(domainId != null);
-			Preconditions.checkState(activated != null);
-			if (activated) {
+			Preconditions.checkState(enabled != null);
+			if (enabled) {
 				Preconditions.checkState(time != null);
 				Preconditions.checkState(recurrence != null);
 			}
-			return new DomainConfiguration(domainId, activated, recurrence, time);
+			return new DomainConfiguration(domainId, enabled, recurrence, time);
 		}
 	}
 	
 	public enum DayOfWeek {MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY}
 	
 	private final UUID domainId;
-	private final boolean activated;
+	private final boolean enabled;
 	private final ArchiveRecurrence recurrence;
 	private final LocalTime time;
 
-	private DomainConfiguration(UUID domainId, boolean activated, ArchiveRecurrence recurrence, LocalTime time) {
+	private DomainConfiguration(UUID domainId, boolean enabled, ArchiveRecurrence recurrence, LocalTime time) {
 		this.domainId = domainId;
 		this.time = time;
-		this.activated = activated;
+		this.enabled = enabled;
 		this.recurrence = recurrence;
 	}
 	
@@ -106,8 +106,8 @@ public class DomainConfiguration {
 		return domainId;
 	}
 	
-	public boolean isActivated() {
-		return activated;
+	public boolean isEnabled() {
+		return enabled;
 	}
 	
 	public RepeatKind getRepeatKind() {
@@ -144,7 +144,7 @@ public class DomainConfiguration {
 
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(domainId, activated, recurrence, time);
+		return Objects.hashCode(domainId, enabled, recurrence, time);
 	}
 	
 	@Override
@@ -152,7 +152,7 @@ public class DomainConfiguration {
 		if (object instanceof DomainConfiguration) {
 			DomainConfiguration that = (DomainConfiguration) object;
 			return Objects.equal(this.domainId, that.domainId)
-				&& Objects.equal(this.activated, that.activated)
+				&& Objects.equal(this.enabled, that.enabled)
 				&& Objects.equal(this.recurrence, that.recurrence)
 				&& Objects.equal(this.time, that.time);
 		}
@@ -163,7 +163,7 @@ public class DomainConfiguration {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("domainId", domainId)
-			.add("activated", activated)
+			.add("enabled", enabled)
 			.add("recurrence", recurrence)
 			.add("time", time)
 			.toString();

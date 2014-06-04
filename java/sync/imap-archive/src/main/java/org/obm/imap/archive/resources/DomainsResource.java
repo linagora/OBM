@@ -31,63 +31,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
-import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import java.util.UUID;
 
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.GuiceRunner;
-import org.obm.imap.archive.TestImapArchiveModules;
-import org.obm.server.WebServer;
+import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.dto.DomainConfigurationDto;
 
-import com.google.inject.Inject;
-import com.jayway.restassured.http.ContentType;
-
-@RunWith(GuiceRunner.class)
-@GuiceModule(TestImapArchiveModules.Simple.class)
-public class RootHandlerTest {
-
-	@Inject WebServer server;
+@Produces(MediaType.APPLICATION_JSON)
+public class DomainsResource {
 	
-	@Before
-	public void setUp() throws Exception {
-		server.start();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		server.stop();
+	@GET
+	@Path("/configuration")
+	public DomainConfigurationDto configuration(@PathParam("domain") UUID uuid) {
+		return DomainConfigurationDto.from(DomainConfiguration.builder().domainId(uuid).enabled(false).build());
 	}
 	
-	@Test
-	public void testStatusOk() {
-		given()
-			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
-			.param("domain_name", "mydomain.org").
-		expect()
-			.statusCode(Status.OK.getStatusCode()).
-		when()
-			.get("/imap-archive/service/v1/status");
-	}
-	
-
-	@Test
-	public void getDomainConfigurationShouldReturnADefaultConfiguration() {
-		given()
-			.port(server.getHttpPort()).
-		expect()
-			.contentType(ContentType.JSON)
-			.body("domainId", equalTo("7387f73e-4068-4598-aed5-3447b734f29b"),
-				"activated", equalTo(false))
-			.statusCode(Status.OK.getStatusCode()).
-		when()
-			.get("/imap-archive/service/v1/domains/7387f73e-4068-4598-aed5-3447b734f29b/configuration");
-	}
 }
