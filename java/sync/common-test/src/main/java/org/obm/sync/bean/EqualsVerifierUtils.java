@@ -32,6 +32,7 @@
 package org.obm.sync.bean;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,11 @@ public class EqualsVerifierUtils {
 			prefabValues = Maps.newHashMap();
 			classes = Lists.newArrayList();
 			withSuperClass = false;
+		}
+		
+		public EqualsVerifierBuilder equalsVerifiers(Class<?>... classes) {
+			equalsVerifiers(Arrays.asList(classes));
+			return this;
 		}
 		
 		public EqualsVerifierBuilder equalsVerifiers(Collection<Class<?>> classes) {
