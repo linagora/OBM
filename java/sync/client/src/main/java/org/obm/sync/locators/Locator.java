@@ -33,9 +33,9 @@ package org.obm.sync.locators;
 
 import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.DomainConfiguration;
-import org.obm.configuration.VMArgumentsUtils;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
+import org.obm.push.utils.jvm.VMArgumentsUtils;
 import org.obm.sync.BreakdownGroups;
 
 import com.google.common.annotations.VisibleForTesting;

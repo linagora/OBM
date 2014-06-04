@@ -29,9 +29,8 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.configuration;
+package org.obm.push.utils.jvm;
 
-import org.obm.configuration.module.LoggerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,7 @@ import com.google.common.base.Strings;
 
 public class VMArgumentsUtils {
 	
-	private static final Logger logger = LoggerFactory.getLogger(LoggerModule.CONFIGURATION);
+	private static final Logger logger = LoggerFactory.getLogger(VMArgumentsUtils.class);
 	
 	public static boolean booleanArgumentValue(String argument) {
 		String property = System.getProperty(argument);

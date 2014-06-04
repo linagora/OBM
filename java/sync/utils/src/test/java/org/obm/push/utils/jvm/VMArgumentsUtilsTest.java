@@ -29,11 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.configuration;
+package org.obm.push.utils.jvm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.obm.push.utils.jvm.VMArgumentsUtils;
 
 
 public class VMArgumentsUtilsTest {

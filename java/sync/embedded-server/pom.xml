@@ -35,6 +35,10 @@
 			<artifactId>guice-webapp-extensions</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>utils</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-access</artifactId>
 			<scope>compile</scope>

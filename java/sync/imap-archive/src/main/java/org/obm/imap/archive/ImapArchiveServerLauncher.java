@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive;
 
-import org.obm.configuration.VMArgumentsUtils;
+import org.obm.push.utils.jvm.VMArgumentsUtils;
 import org.obm.server.ServerConfiguration;
 import org.obm.server.WebServer;
 

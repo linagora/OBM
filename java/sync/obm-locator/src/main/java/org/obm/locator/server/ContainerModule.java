@@ -40,8 +40,8 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.thread.QueuedThreadPool;
-import org.obm.configuration.VMArgumentsUtils;
 import org.obm.locator.LocatorServerLauncher;
+import org.obm.push.utils.jvm.VMArgumentsUtils;
 import org.slf4j.Logger;
 
 import com.google.common.base.Objects;
