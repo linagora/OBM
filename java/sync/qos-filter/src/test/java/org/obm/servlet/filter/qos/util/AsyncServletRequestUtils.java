@@ -41,11 +41,18 @@ import java.util.concurrent.TimeoutException;
 import org.apache.http.StatusLine;
 import org.apache.http.client.fluent.Async;
 import org.apache.http.client.fluent.Request;
+import org.obm.push.utils.jvm.VMArgumentsUtils;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
 public class AsyncServletRequestUtils {
 
+	private static final int DEFAULT_TIMEOUT = 15;
+	private static final TimeUnit DEFAULT_TIMEUNIT = TimeUnit.SECONDS;
+	private static final String QOS_TIMEOUT = "QOSTimeout";
+	private static final String QOS_TIME_UNIT = "QOSTimeUnit";
+	
 	private int count;
 	private final Async async;
 	private final String serviceUri;
@@ -74,9 +81,20 @@ public class AsyncServletRequestUtils {
 
 	public StatusLine retrieveRequestStatus(Future<StatusLine> request)
 			throws InterruptedException, ExecutionException, TimeoutException {
-		return request.get(15, TimeUnit.SECONDS);
+		return request.get(getTimeout(), getTimeUnit());
 	}
 
+	private int getTimeout() {
+		return Objects.firstNonNull(VMArgumentsUtils.integerArgumentValue(QOS_TIMEOUT), DEFAULT_TIMEOUT);
+	}
+
+	private TimeUnit getTimeUnit() {
+		String qosTimeUnit = VMArgumentsUtils.stringArgumentValue(QOS_TIME_UNIT);
+		if (qosTimeUnit == null) {
+			return DEFAULT_TIMEUNIT;
+		}
+		return TimeUnit.valueOf(qosTimeUnit);
+	}
 
 	public List<Future<StatusLine>> asyncHttpGets(int number) {
 		List<Future<StatusLine>> list = Lists.newArrayList();
