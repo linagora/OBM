@@ -21,6 +21,7 @@ import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.Right;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
@@ -39,10 +40,11 @@ import fr.aliacom.obm.common.user.UserLogin;
 @GuiceModule(ProfileDaoJdbcImplTest.Env.class)
 public class ProfileDaoJdbcImplTest implements H2TestClass {
 
-	public static class Env extends DaoTestModule {
+	public static class Env extends AbstractModule {
 
 		@Override
-		protected void configureImpl() {
+		protected void configure() {
+			install(new DaoTestModule());
 			bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
 		}
 

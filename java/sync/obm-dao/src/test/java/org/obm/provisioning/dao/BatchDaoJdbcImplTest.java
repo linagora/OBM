@@ -54,6 +54,7 @@ import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
@@ -63,10 +64,11 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 @GuiceModule(BatchDaoJdbcImplTest.Env.class)
 public class BatchDaoJdbcImplTest implements H2TestClass {
 
-	public static class Env extends DaoTestModule {
+	public static class Env extends AbstractModule {
 
 		@Override
-		protected void configureImpl() {
+		protected void configure() {
+			install(new DaoTestModule());
 			bind(BatchDao.class).to(BatchDaoJdbcImpl.class);
 			bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);

@@ -47,6 +47,7 @@ import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -57,10 +58,11 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 @GuiceModule(DomainDaoJdbcImplTest.Env.class)
 public class DomainDaoJdbcImplTest implements H2TestClass {
 
-	public static class Env extends DaoTestModule {
+	public static class Env extends AbstractModule {
 
 		@Override
-		protected void configureImpl() {
+		protected void configure() {
+			install(new DaoTestModule());
 			bind(DomainDao.class);
 		}
 

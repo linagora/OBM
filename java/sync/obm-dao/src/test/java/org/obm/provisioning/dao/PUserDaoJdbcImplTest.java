@@ -45,6 +45,7 @@ import org.obm.domain.dao.PUserDaoJdbcImpl;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -56,10 +57,11 @@ import fr.aliacom.obm.common.user.UserLogin;
 @GuiceModule(PUserDaoJdbcImplTest.Env.class)
 public class PUserDaoJdbcImplTest implements H2TestClass {
 
-	public static class Env extends DaoTestModule {
+	public static class Env extends AbstractModule {
 
 		@Override
-		protected void configureImpl() {
+		protected void configure() {
+			install(new DaoTestModule());
 			bind(PUserDao.class).to(PUserDaoJdbcImpl.class);
 		}
 

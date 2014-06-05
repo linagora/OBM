@@ -67,6 +67,7 @@ import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.dao.EntityId;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
@@ -84,20 +85,21 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
 
 	public static final int FIRST_AUTOMATIC_GID = 1001;
 
-    public static class Env extends DaoTestModule {
+	public static class Env extends AbstractModule {
 
-        @Override
-        protected void configureImpl() {
-            bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
-            bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
-            bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
-            bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
-            bind(UserDao.class).to(UserDaoJdbcImpl.class);
-            bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
-        }
+		@Override
+		protected void configure() {
+			install(new DaoTestModule());
+			bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
+			bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
+			bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
+			bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
+			bind(UserDao.class).to(UserDaoJdbcImpl.class);
+			bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
+		}
 
-    }
-    
+	}
+
 	@Rule public H2InMemoryDatabaseRule dbRule = new H2InMemoryDatabaseRule(this, "sql/initial.sql");
 	@Inject H2InMemoryDatabase db;
 

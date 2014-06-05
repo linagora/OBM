@@ -57,6 +57,7 @@ import org.obm.sync.host.ObmHost;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -140,10 +141,11 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		return db;
 	}
 	
-	public static class Env extends DaoTestModule {
+	public static class Env extends AbstractModule {
 
 		@Override
-		protected void configureImpl() {
+		protected void configure() {
+			install(new DaoTestModule());
 			bind(DomainDao.class);
 			bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
 			bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);

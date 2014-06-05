@@ -46,6 +46,7 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.Group;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 
@@ -53,10 +54,11 @@ import com.google.inject.Inject;
 @GuiceModule(PGroupDaoJdbcImplTest.Env.class)
 public class PGroupDaoJdbcImplTest implements H2TestClass {
 
-	public static class Env extends DaoTestModule {
+	public static class Env extends AbstractModule {
 
 		@Override
-		protected void configureImpl() {
+		protected void configure() {
+			install(new DaoTestModule());
 			bind(PGroupDao.class).to(PGroupDaoJdbcImpl.class);
 		}
 

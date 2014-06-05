@@ -53,6 +53,7 @@ import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.OperationNotFoundException;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
@@ -62,10 +63,11 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 @GuiceModule(OperationDaoJdbcImplTest.Env.class)
 public class OperationDaoJdbcImplTest implements H2TestClass {
 	
-	public static class Env extends DaoTestModule {
+	public static class Env extends AbstractModule {
 
 		@Override
-		protected void configureImpl() {
+		protected void configure() {
+			install(new DaoTestModule());
 			bind(OperationDao.class).to(OperationDaoJdbcImpl.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
 		}
