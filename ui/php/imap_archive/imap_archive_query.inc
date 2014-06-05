@@ -57,7 +57,7 @@ function connect_to_imap_archive_service(){
   $iterator = new ArrayIterator($imapArchiveServer);
   $imapArchiveServer = $iterator->current();
   $imapArchiveRootPath = "http://".$imapArchiveServer[0]["ip"].":8085";
-  $loginPath = "/imap-archive/services/v1/status";
+  $loginPath = "/imap-archive/service/v1/status";
   $username = $userInfo["login"];
   $password = get_trust_token($userInfo);
   $origin= $GLOBALS['c_origin_web'];
@@ -72,17 +72,24 @@ function connect_to_imap_archive_service(){
   }
   
   $loginUrl = $imapArchiveRootPath.$loginPath."?".http_build_query($params);
-  $xmlLogin = new DomDocument();
-  $loadResult = $xmlLogin->load($loginUrl);
-  if ($loadResult == false) {
+  
+  $curl = curl_init($loginUrl);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+  $success = curl_exec($curl);
+  $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+  $errno = curl_errno($curl);
+  curl_close($curl);
+  
+  if ($code == 0) {
     return array(0, $l_imap_archive_server_unreachable);
   }
-  $errors = $xmlLogin->getElementsByTagName("error");
-  if($errors->length > 0){
-    error_log("Couldn't login to IMAP archive server (".$errors->item(0)->nodeValue.")");
+  if ($code == 200) {
+    return array(1, null);
+  }
+  if($errno){
+    error_log("Couldn't login to IMAP archive server (".$errno.")");
     return array(0, $l_could_not_login_imap_archive_server);
   }
 
-  return array(1, null);
 }
 ?>
