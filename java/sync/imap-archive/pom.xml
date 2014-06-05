@@ -40,10 +40,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>greenmail-imap-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
 			<artifactId>locator</artifactId>
 		</dependency>
 		<dependency>
@@ -61,10 +57,6 @@
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-servlet</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.jayway.restassured</groupId>
-			<artifactId>rest-assured</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
