@@ -16,6 +16,10 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-dao-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>common-test</artifactId>
 		</dependency>
 		<dependency>

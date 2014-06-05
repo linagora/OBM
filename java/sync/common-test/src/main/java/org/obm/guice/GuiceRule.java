@@ -29,59 +29,36 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive;
+package org.obm.guice;
 
-import org.obm.dao.utils.DaoTestModule;
-import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
-import org.obm.push.mail.greenmail.GreenMailProviderModule;
-import org.obm.server.ServerConfiguration;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
-import com.google.inject.util.Modules;
+import com.google.inject.Guice;
+import com.google.inject.Module;
 
-public class TestImapArchiveModules {
-	
-	public static class Simple extends AbstractModule {
-	
-		@Override
-		protected void configure() {
-			ServerConfiguration config = ServerConfiguration.defaultConfiguration();
-			install(Modules.override(new ImapArchiveModule(config)).with(
-				new DaoTestModule(),
-				new LocalLocatorModule()
-			));
-		}
+public class GuiceRule implements TestRule {
+
+	private final Module module;
+	private final Object testClass;
+
+	public GuiceRule(Object testClass, Module module) {
+		this.testClass = testClass;
+		this.module = module;
 	}
-	
-	public static class WithGreenmail extends AbstractModule {
 
-		@Override
-		protected void configure() {
-			install(Modules.override(new Simple()).with(new AbstractModule() {
-
-				@Override
-				protected void configure() {
-					install(new GreenMailProviderModule());
-					bind(Integer.class).annotatedWith(Names.named("imapTimeout")).toInstance(3600);
-				}})
-			);
-		}
-	}
-	
-	public static class LocalLocatorModule extends AbstractModule {
-
-		@Override
-		protected void configure() {
-			bind(LocatorService.class).toInstance(new LocatorService() {
+	@Override
+	public Statement apply(final Statement base, Description description) {
+		return new Statement() {
+			
+			@Override
+			public void evaluate() throws Throwable {
+				Guice.createInjector(module).injectMembers(testClass);
 				
-				@Override
-				public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
-					return "localhost";
-				}
-			});
-		}
+				base.evaluate();
+			}
+		};
 	}
 	
 }
