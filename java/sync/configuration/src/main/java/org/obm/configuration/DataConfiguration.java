@@ -39,7 +39,5 @@ public interface DataConfiguration {
 
 	int transactionTimeoutInSeconds();
 
-	boolean usePersistentEhcacheStore();
-
 	ResourceBundle getResourceBundle(Locale locale);
 }

@@ -115,11 +115,6 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 		return iniFile.getBooleanValue(GLOBAL_ADDRESS_BOOK_SYNC,
 				GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE);
 	}
-	
-	@Override
-	public boolean usePersistentEhcacheStore() {
-		return false;
-	}
 
 	@Override
 	public CalendarEncoding getEmailCalendarEncoding() {

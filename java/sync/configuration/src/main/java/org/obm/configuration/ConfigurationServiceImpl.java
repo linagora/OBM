@@ -113,12 +113,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		return DEFAULT_ENCODING;
 	}
 
-
-	@Override
-	public boolean usePersistentEhcacheStore() {
-		return true;
-	}
-
 	@Override
 	public int trustTokenTimeoutInSeconds() {
 		return iniFile.getIntValue(TRUST_TOKEN_TIMEOUT_KEY, TRUST_TOKEN_TIMEOUT_DEFAULT);

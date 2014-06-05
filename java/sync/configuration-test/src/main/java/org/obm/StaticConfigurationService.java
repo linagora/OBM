@@ -96,11 +96,6 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 	}
 
 	@Override
-	public boolean usePersistentEhcacheStore() {
-		return configuration.transaction.usePersistentCache;
-	}
-
-	@Override
 	public int trustTokenTimeoutInSeconds() {
 		return configuration.trustTokenTimeoutInSeconds;
 	}
