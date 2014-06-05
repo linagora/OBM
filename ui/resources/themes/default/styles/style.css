@@ -21,10 +21,17 @@
 
 }
 
+@font-face {
+    font-family: 'Source';
+    src: url('../fonts/SourceSansPro-Regular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
   background:url(../images/structure/pattern.png) top left repeat #FFF;
   font-size: 11px;
-  font-family: 'Lato',sans-serif, arial;
+  font-family: 'Source', sans-serif, arial;
   font-weight: normal;
   font-style: normal;
   height: 100%;
