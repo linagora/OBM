@@ -170,8 +170,6 @@ class OBM_Challenge_Auth extends Auth {
     $login_page = "$path/../$obminclude/login.inc";
     include_once($login_page);
   }
-
-  function logout() {}
   
   function auth_validatelogin() {
     global $obm, $params;
