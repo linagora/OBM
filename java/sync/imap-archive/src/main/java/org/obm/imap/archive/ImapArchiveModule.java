@@ -33,7 +33,10 @@ package org.obm.imap.archive;
 
 import java.util.TimeZone;
 
+import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.cyrus.imap.CyrusClientModule;
+import org.obm.dbcp.DatabaseModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationModule;
@@ -71,6 +74,9 @@ public class ImapArchiveModule extends AbstractModule {
 		install(new ImapArchiveServletModule());
 		install(new CyrusClientModule());
 		install(new ImapArchiveConfigurationModule());
+		install(new TransactionalModule());
+		install(new DatabaseModule());
+		install(new LoggerModule());
 		
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
