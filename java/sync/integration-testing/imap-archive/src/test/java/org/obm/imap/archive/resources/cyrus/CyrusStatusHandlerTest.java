@@ -51,6 +51,9 @@ import org.obm.server.WebServer;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.icegreen.greenmail.util.GreenMail;
+import com.ninja_squad.dbsetup.DbSetup;
+import com.ninja_squad.dbsetup.Operations;
+import com.ninja_squad.dbsetup.operation.Operation;
 
 public class CyrusStatusHandlerTest {
 	
@@ -74,6 +77,15 @@ public class CyrusStatusHandlerTest {
 	@Before
 	public void setUp() {
 		imapServer.start();
+		Operation operation =
+				Operations.sequenceOf(
+						Operations.deleteAllFrom("usersystem"),
+						Operations.insertInto("usersystem")
+						.columns("usersystem_login", "usersystem_password", "usersystem_homedir")
+						.values("cyrus", "cyrus", "")
+						.build());
+		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
+		dbSetup.launch();
 	}
 
 	@After

@@ -41,6 +41,3 @@ ALTER TABLE usersystem
 ALTER TABLE usersystem
     ADD CONSTRAINT usersystem_usersystem_login_key UNIQUE (usersystem_login);
 
-INSERT INTO UserSystem (usersystem_login, usersystem_password, usersystem_homedir)
-    VALUES
-        ('cyrus', 'cyrus', '');

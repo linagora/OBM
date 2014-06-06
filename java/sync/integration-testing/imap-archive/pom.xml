@@ -35,6 +35,11 @@
 			<artifactId>rest-assured</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.ninja-squad</groupId>
+			<artifactId>DbSetup</artifactId>
+			<version>1.3.0</version>
+		</dependency>
+		<dependency>
 			<groupId>info.cukes</groupId>
 			<artifactId>cucumber-guice</artifactId>
 			<scope>test</scope>
