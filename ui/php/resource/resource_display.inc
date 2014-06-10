@@ -41,6 +41,10 @@ applicable to the OBM software.
 
 require_once(dirname(__file__)."/../share/share_display.inc");
 
+// Do not require_once, we need to overwrite the calendar labels included in 
+// share_display with the resource labels
+require(dirname(__file__)."/../../obminclude/lang/".$_SESSION['set_lang']."/resource.inc");
+
 //---------------------------------------------------------------------------//
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
