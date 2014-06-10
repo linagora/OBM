@@ -796,12 +796,27 @@ org.eclipse.jdt.core.compiler.source=1.7
 				<artifactId>mina-core</artifactId>
 				<version>2.0.7</version>
 			</dependency>
-            		<dependency>
-                		<groupId>org.assertj</groupId>
-                		<artifactId>assertj-core</artifactId>
-                		<version>${assertj.version}</version>
-                		<scope>test</scope>
-            		</dependency>
+			<dependency>
+				<groupId>org.apache.shiro</groupId>
+				<artifactId>shiro-core</artifactId>
+				<version>${shiro.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.shiro</groupId>
+				<artifactId>shiro-guice</artifactId>
+				<version>${shiro.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.shiro</groupId>
+				<artifactId>shiro-web</artifactId>
+				<version>${shiro.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.assertj</groupId>
+				<artifactId>assertj-core</artifactId>
+				<version>${assertj.version}</version>
+				<scope>test</scope>
+			</dependency>
 			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-guava</artifactId>
@@ -815,31 +830,31 @@ org.eclipse.jdt.core.compiler.source=1.7
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-                                <groupId>org.eclipse.jetty</groupId>
-                                <artifactId>jetty-continuation</artifactId>
-                                <version>${jetty.version}</version>
-                        </dependency>
-                        <dependency>
-                                <groupId>org.eclipse.jetty</groupId>
-                                <artifactId>jetty-http</artifactId>
-                                <version>${jetty.version}</version>
-                        </dependency>
-                        <dependency>
-                                <groupId>org.eclipse.jetty</groupId>
-                                <artifactId>jetty-servlet</artifactId>
-                                <version>${jetty.version}</version>
-                        </dependency>
-                        <dependency>
-                                <groupId>org.eclipse.jetty</groupId>
-                                <artifactId>jetty-server</artifactId>
-                                <version>${jetty.version}</version>
-                                <exclusions>
-                                        <exclusion>
-                                                <groupId>org.eclipse.jetty.orbit</groupId>
-                                                <artifactId>javax.servlet</artifactId>
-                                        </exclusion>
-                                </exclusions>
-                        </dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-continuation</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-http</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-servlet</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-server</artifactId>
+				<version>${jetty.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.eclipse.jetty.orbit</groupId>
+						<artifactId>javax.servlet</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 			<dependency>
 				<groupId>org.freemarker</groupId>
 				<artifactId>freemarker</artifactId>
