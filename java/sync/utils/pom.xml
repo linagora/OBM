@@ -6,14 +6,14 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.0.0-rc1</version>
+		<version>3.0.0-rc2</version>
 	</parent>
 
 	<artifactId>utils</artifactId>
 	<packaging>jar</packaging>
 	<name>opush org.obm.push.utils</name>
 	<url>http://www.obm.org/</url>
-	<version>3.0.0-rc1</version>
+	<version>3.0.0-rc2</version>
 
 	<licenses>
 		<license>

@@ -6,7 +6,7 @@
 
 	<groupId>com.linagora.obm</groupId>
 	<artifactId>ui-testing</artifactId>
-	<version>3.0.0-rc1</version>
+	<version>3.0.0-rc2</version>
 	<packaging>jar</packaging>
 	<name>obm-ui integration testing</name>
 
