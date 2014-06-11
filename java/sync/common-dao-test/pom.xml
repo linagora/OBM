@@ -40,6 +40,10 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.ninja-squad</groupId>
+			<artifactId>DbSetup</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>jta</artifactId>
 			<scope>test</scope>

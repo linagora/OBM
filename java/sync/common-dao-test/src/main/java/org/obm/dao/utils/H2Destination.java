@@ -29,12 +29,10 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.resources.cyrus;
+package org.obm.dao.utils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import org.obm.dao.utils.H2InMemoryDatabase;
 
 import com.google.common.base.Throwables;
 import com.ninja_squad.dbsetup.destination.Destination;

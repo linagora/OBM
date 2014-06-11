@@ -42,11 +42,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
+import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
-import org.obm.imap.archive.resources.cyrus.H2Destination;
 import org.obm.server.WebServer;
 
 import com.google.inject.Inject;
