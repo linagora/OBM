@@ -37,8 +37,6 @@ import java.util.UUID;
 
 import org.joda.time.LocalTime;
 import org.junit.Test;
-import org.obm.imap.archive.beans.ArchiveRecurrence;
-import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 
 
@@ -121,5 +119,27 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
 		assertThat(configuration.getHour()).isEqualTo(13);
 		assertThat(configuration.getMinute()).isEqualTo(23);
+	}
+	
+	@Test
+	public void defaultValues() {
+		UUID domainId = UUID.fromString("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
+		ArchiveRecurrence archiveRecurrence = ArchiveRecurrence.builder()
+			.dayOfMonth(DayOfMonth.last())
+			.dayOfWeek(null)
+			.dayOfYear(null)
+			.repeat(RepeatKind.MONTHLY)
+			.build();
+		
+		DomainConfiguration configuration = DomainConfiguration.defaultValues(domainId);
+		assertThat(configuration.isEnabled()).isFalse();
+		assertThat(configuration.getRepeatKind()).isEqualTo(archiveRecurrence.getRepeatKind());
+		assertThat(configuration.getDayOfMonth()).isEqualTo(archiveRecurrence.getDayOfMonth());
+		assertThat(configuration.getDayOfWeek()).isEqualTo(archiveRecurrence.getDayOfWeek());
+		assertThat(configuration.getDayOfYear()).isEqualTo(archiveRecurrence.getDayOfYear());
+		assertThat(configuration.getDomainId()).isEqualTo(domainId);
+		assertThat(configuration.getHour()).isEqualTo(0);
+		assertThat(configuration.getMinute()).isEqualTo(0);
+		assertThat(configuration.getRecurrence()).isEqualTo(archiveRecurrence);
 	}
 }
