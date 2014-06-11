@@ -72,10 +72,7 @@ class Authentication {
   }
 
   public static function unauthorized() {
-    if (!isset($_SERVER['PHP_AUTH_USER'])) {
-      header('WWW-Authenticate: Basic realm="OBM Health Check"');
-    }
-    
+    header('WWW-Authenticate: Basic realm="OBM Health Check"');
     header('HTTP/1.0 401 Unauthorized');
   }
   
