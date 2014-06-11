@@ -33,14 +33,25 @@ package org.obm.imap.archive.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import org.obm.domain.dao.DomainDao;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
 @Path("/")
@@ -51,6 +62,9 @@ public class RootHandler {
 	@Context
 	private Application application;
 
+	@Inject
+	private DomainDao domainDao;
+	
 	@GET
 	@Path("/status")
 	public Response status() {
@@ -58,7 +72,29 @@ public class RootHandler {
 	}
 	
 	@Path("domains/{domain}/")
-	public Class<DomainsResource> domains() {
-		return DomainsResource.class;
+	public Class<DomainsResource> domains(@PathParam("domain") String domainId) throws DaoException {
+		ObmDomainUuid checkedDomainUuid = checkDomainUuid(domainId);
+		Optional<ObmDomain> domain = getDomain(checkedDomainUuid);
+		if (!domain.isPresent()) {
+			throw new WebApplicationException(Status.NOT_FOUND);
+		} else {
+			return DomainsResource.class;
+		}
+	}
+	
+	private ObmDomainUuid checkDomainUuid(String domainUuid) {
+		try {
+			return ObmDomainUuid.of(domainUuid);
+		} catch (IllegalArgumentException e) {
+			throw new WebApplicationException(Status.BAD_REQUEST);
+		}
+	}
+	
+	private Optional<ObmDomain> getDomain(ObmDomainUuid domainUuid) throws DaoException {
+		try {
+			return Optional.of(domainDao.findDomainByUuid(domainUuid));
+		} catch (DomainNotFoundException e) {
+			return Optional.absent();
+		}
 	}
 }

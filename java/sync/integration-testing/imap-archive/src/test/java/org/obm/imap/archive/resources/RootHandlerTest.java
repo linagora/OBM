@@ -32,30 +32,59 @@
 package org.obm.imap.archive.resources;
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.guice.GuiceModule;
-import org.obm.guice.GuiceRunner;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
+import org.obm.dao.utils.H2InMemoryDatabase;
+import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
+import org.obm.imap.archive.resources.cyrus.H2Destination;
 import org.obm.server.WebServer;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.jayway.restassured.http.ContentType;
+import com.ninja_squad.dbsetup.DbSetup;
+import com.ninja_squad.dbsetup.Operations;
+import com.ninja_squad.dbsetup.operation.Operation;
 
-@RunWith(GuiceRunner.class)
-@GuiceModule(TestImapArchiveModules.Simple.class)
 public class RootHandlerTest {
+
+	@Rule public TestRule chain = RuleChain
+			.outerRule(new GuiceRule(this, new TestImapArchiveModules.Simple()))
+			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
+				@Override
+				public H2InMemoryDatabase get() {
+					return db;
+				}
+			}, "sql/initial.sql"));
+
+	@Inject
+	private H2InMemoryDatabase db;
 
 	@Inject WebServer server;
 	
 	@Before
 	public void setUp() throws Exception {
+		Operation operation =
+				Operations.sequenceOf(
+						Operations.deleteAllFrom("domain"),
+						Operations.insertInto("domain")
+						.columns("domain_id", "domain_name", "domain_label", "domain_uuid")
+						.values(654, "my_domain_name", "my_domain.local", "a6af9131-60b6-4e3a-a9f3-df5b43a89309")
+						.build());
+
+		
+		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
+		dbSetup.launch();
 		server.start();
 	}
 
@@ -84,10 +113,31 @@ public class RootHandlerTest {
 			.port(server.getHttpPort()).
 		expect()
 			.contentType(ContentType.JSON)
-			.body("domainId", equalTo("7387f73e-4068-4598-aed5-3447b734f29b"),
+			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
 				"activated", equalTo(false))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/7387f73e-4068-4598-aed5-3447b734f29b/configuration");
+			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
 	}
+	
+	@Test
+	public void getDomainConfigurationShouldReturnBadRequestOnInvalidUuid() {
+		given()
+			.port(server.getHttpPort()).
+		expect()
+			.statusCode(Status.BAD_REQUEST.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/toto/configuration");
+	}
+	
+	@Test
+	public void getDomainConfigurationShouldReturnNotFoundOnAbsentDomain() {
+		given()
+			.port(server.getHttpPort()).
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/c7dd9583-5057-4c0a-ac30-d284940420c8/configuration");
+	}
+	
 }
