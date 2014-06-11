@@ -131,7 +131,7 @@ public class DomainConfigurationTest {
 			.repeat(RepeatKind.MONTHLY)
 			.build();
 		
-		DomainConfiguration configuration = DomainConfiguration.defaultValues(domainId);
+		DomainConfiguration configuration = DomainConfiguration.DEFAULT_VALUES_BUILDER.domainId(domainId).build();
 		assertThat(configuration.isEnabled()).isFalse();
 		assertThat(configuration.getRepeatKind()).isEqualTo(archiveRecurrence.getRepeatKind());
 		assertThat(configuration.getDayOfMonth()).isEqualTo(archiveRecurrence.getDayOfMonth());

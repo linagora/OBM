@@ -28,6 +28,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-dao-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
 		</dependency>
 		<dependency>
@@ -61,6 +65,10 @@
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-servlet</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.ninja-squad</groupId>
+			<artifactId>DbSetup</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>

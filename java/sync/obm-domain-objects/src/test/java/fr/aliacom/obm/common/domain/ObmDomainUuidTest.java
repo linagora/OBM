@@ -82,4 +82,11 @@ public class ObmDomainUuidTest {
 		ObmDomainUuid actual = ObmDomainUuid.of(UUID.fromString("4e3fa926-bbba-48c4-84ab-272b7433c412"));
 		assertThat(actual.get()).isEqualTo("4e3fa926-bbba-48c4-84ab-272b7433c412");
 	}
+	
+	@Test
+	public void getUUID() {
+		UUID uuid = UUID.fromString("4e3fa926-bbba-48c4-84ab-272b7433c412");
+		ObmDomainUuid actual = ObmDomainUuid.of(uuid);
+		assertThat(actual.getUUID()).isEqualTo(uuid);
+	}
 }

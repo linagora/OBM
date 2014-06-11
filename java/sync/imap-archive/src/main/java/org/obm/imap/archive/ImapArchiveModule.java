@@ -82,6 +82,7 @@ public class ImapArchiveModule extends AbstractModule {
 		install(new TransactionalModule());
 		install(new DatabaseModule());
 		install(new LoggerModule());
+		install(new DaoModule());
 		
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);

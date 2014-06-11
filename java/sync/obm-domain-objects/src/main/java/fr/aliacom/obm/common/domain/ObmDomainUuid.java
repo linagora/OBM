@@ -64,6 +64,10 @@ public class ObmDomainUuid implements Serializable {
 	public String get() {
 		return uuid;
 	}
+	
+	public UUID getUUID() {
+		return UUID.fromString(uuid);
+	}
 
 	@Override
 	public int hashCode() {

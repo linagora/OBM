@@ -40,23 +40,20 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 public class DomainConfiguration {
+	
+	public static final DomainConfiguration.Builder DEFAULT_VALUES_BUILDER = 
+		builder()
+			.time(LocalTime.MIDNIGHT)
+			.enabled(false)
+			.recurrence(ArchiveRecurrence.builder()
+					.dayOfMonth(DayOfMonth.last())
+					.dayOfWeek(null)
+					.dayOfYear(null)
+					.repeat(RepeatKind.MONTHLY)
+					.build());
 
 	public static Builder builder() {
 		return new Builder();
-	}
-
-	public static DomainConfiguration defaultValues(UUID domainId) {
-		return builder()
-				.domainId(domainId)
-				.time(LocalTime.MIDNIGHT)
-				.enabled(false)
-				.recurrence(ArchiveRecurrence.builder()
-						.dayOfMonth(DayOfMonth.last())
-						.dayOfWeek(null)
-						.dayOfYear(null)
-						.repeat(RepeatKind.MONTHLY)
-						.build())
-				.build();
 	}
 	
 	public static class Builder {
