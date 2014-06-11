@@ -33,8 +33,8 @@ package org.obm.imap.archive.dto;
 
 import java.util.UUID;
 
+import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.beans.DomainConfiguration.DayOfWeek;
 
 public class DomainConfigurationDto {
 

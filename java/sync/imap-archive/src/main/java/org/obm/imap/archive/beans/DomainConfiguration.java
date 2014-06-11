@@ -88,8 +88,6 @@ public class DomainConfiguration {
 		}
 	}
 	
-	public enum DayOfWeek {MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY}
-	
 	private final UUID domainId;
 	private final boolean enabled;
 	private final ArchiveRecurrence recurrence;
@@ -168,6 +166,4 @@ public class DomainConfiguration {
 			.add("time", time)
 			.toString();
 	}
-	
-	
 }

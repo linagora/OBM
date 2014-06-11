@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.beans;
 
-import org.obm.imap.archive.beans.DomainConfiguration.DayOfWeek;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Objects;
 

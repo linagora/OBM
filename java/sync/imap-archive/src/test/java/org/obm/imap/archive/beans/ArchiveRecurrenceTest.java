@@ -38,7 +38,6 @@ import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
-import org.obm.imap.archive.beans.DomainConfiguration.DayOfWeek;
 
 
 public class ArchiveRecurrenceTest {
