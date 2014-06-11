@@ -34,8 +34,11 @@ package org.obm.dao.utils;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.H2DriverConfiguration;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 
 public class DaoTestModule extends AbstractModule {
 	
@@ -43,6 +46,8 @@ public class DaoTestModule extends AbstractModule {
 	protected void configure() {
 		bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 		bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
+		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
+		databaseDrivers.addBinding().to(H2DriverConfiguration.class);
 	}
 
 }
