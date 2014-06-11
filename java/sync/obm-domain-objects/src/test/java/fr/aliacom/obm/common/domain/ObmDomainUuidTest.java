@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013-2014  Linagora
+ * Copyright (C) 2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,60 +29,57 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package fr.aliacom.obm.common.domain;
 
-import java.io.Serializable;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.UUID;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
+import org.junit.Test;
 
-public class ObmDomainUuid implements Serializable {
 
-	private final String uuid;
+public class ObmDomainUuidTest {
 
-	public static ObmDomainUuid of(UUID uuid) {
-		Preconditions.checkNotNull(uuid);
-		return of(uuid.toString());
+	@Test(expected=NullPointerException.class)
+	public void nullStringShouldThrow() {
+		ObmDomainUuid.of((String)null);
 	}
 	
-	public static ObmDomainUuid of(String uuid) {
-		Preconditions.checkNotNull(uuid);
-		Preconditions.checkArgument(UUID.fromString(uuid) != null);
-		return new ObmDomainUuid(uuid);
+	@Test(expected=NullPointerException.class)
+	public void nullStringShouldThrowOnValueOf() {
+		ObmDomainUuid.valueOf(null);
 	}
-
-	public static ObmDomainUuid valueOf(String uuid) {
-		return of(uuid);
+	
+	@Test(expected=NullPointerException.class)
+	public void nullUUIDShouldThrow() {
+		ObmDomainUuid.of((UUID)null);
 	}
-
-	private ObmDomainUuid(String uuid) {
-		this.uuid = uuid;
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void ofShouldNotBuildFromRandomString() {
+		ObmDomainUuid.of("random");
 	}
-
-	public String get() {
-		return uuid;
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void valueOfShouldNotBuildFromRandomString() {
+		ObmDomainUuid.valueOf("random");
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hashCode(uuid);
+	
+	@Test
+	public void ofShouldBuildFromString() {
+		ObmDomainUuid actual = ObmDomainUuid.of("4e3fa926-bbba-48c4-84ab-272b7433c412");
+		assertThat(actual.get()).isEqualTo("4e3fa926-bbba-48c4-84ab-272b7433c412");
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof ObmDomainUuid) {
-			ObmDomainUuid other = (ObmDomainUuid) obj;
-
-			return Objects.equal(uuid, other.uuid);
-		}
-		return false;
+	
+	@Test
+	public void valueOfShouldBuildFromString() {
+		ObmDomainUuid actual = ObmDomainUuid.valueOf("4e3fa926-bbba-48c4-84ab-272b7433c412");
+		assertThat(actual.get()).isEqualTo("4e3fa926-bbba-48c4-84ab-272b7433c412");
 	}
-
-	@Override
-	public String toString() {
-		return uuid;
+	
+	@Test
+	public void ofShouldBuildFromUUID() {
+		ObmDomainUuid actual = ObmDomainUuid.of(UUID.fromString("4e3fa926-bbba-48c4-84ab-272b7433c412"));
+		assertThat(actual.get()).isEqualTo("4e3fa926-bbba-48c4-84ab-272b7433c412");
 	}
-
 }

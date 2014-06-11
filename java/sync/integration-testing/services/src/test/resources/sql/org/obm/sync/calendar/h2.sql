@@ -752,7 +752,7 @@ ALTER TABLE profilemodule
 INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global, domain_uuid) 
 	VALUES
 		(NOW(), 'Test domain', 'Test domain', 'domain.org', FALSE, 'b55911e6-6848-4f16-abd4-52d94b6901a6'),
-		(NOW(), 'Test domain 2', 'Test domain 2', 'domain2.org', FALSE, 'abcdefgh');
+		(NOW(), 'Test domain 2', 'Test domain 2', 'domain2.org', FALSE, '46a049d5-f45c-4fbf-abad-6ef014dc6a11');
 
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email) 
 	VALUES

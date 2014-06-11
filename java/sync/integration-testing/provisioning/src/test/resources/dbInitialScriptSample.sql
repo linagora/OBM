@@ -201,7 +201,7 @@ INSERT INTO domain (domain_name, domain_uuid, domain_label, domain_global)
 	('test.tlse.lng', 'ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6', 'test.tlse.lng', false),
 	('test2.tlse.lng', '3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf', 'test2.tlse.lng', false),
 	('test3.tlse.lng', '68936f0f-2bb5-447c-87f5-efcd46f58122', 'test3.tlse.lng', false),
-	('global.virt', '123456789', 'global.virt', true);
+	('global.virt', 'abf7c2bc-aa84-461c-b057-ee42c5dce40a', 'global.virt', true);
 
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
     VALUES

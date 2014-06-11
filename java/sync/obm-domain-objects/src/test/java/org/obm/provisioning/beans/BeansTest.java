@@ -37,23 +37,26 @@ import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
+
 
 public class BeansTest {
 
-    private EqualsVerifierUtils equalsVerifierUtilsTest;
+	private EqualsVerifierUtils equalsVerifierUtilsTest;
 
-    @Before
-    public void init() {
-        equalsVerifierUtilsTest = new EqualsVerifierUtils();
-    }
+	@Before
+	public void init() {
+		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	}
 
-    @Test
-    public void test() {
-        equalsVerifierUtilsTest.test(
-                Group.class,
-                GroupExtId.class,
-                ProfileId.class,
-                ProfileName.class);
-    }
+	@Test
+	public void test() {
+		equalsVerifierUtilsTest.test(
+				Group.class,
+				GroupExtId.class,
+				ProfileId.class,
+				ProfileName.class,
+				ObmDomainUuid.class);
+	}
 
 }

@@ -61,7 +61,7 @@ public class UserIntegrationTest {
 	@Test
 	@RunAsClient
 	public void testGetUserWithGroup(@ArquillianResource URL baseURL) {
-		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("123456789");
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("abf7c2bc-aa84-461c-b057-ee42c5dce40a");
 		RestAssured.baseURI = userUrl(baseURL, obmDomainUuid);
 		
 		given()

@@ -29,11 +29,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.domain.dao;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -97,7 +97,7 @@ public class DomainDaoTest {
 		assertThat(d.getId()).isEqualTo(1);
 		assertThat(d.getName()).isEqualTo("domain");
 		assertThat(d.getLabel()).isEqualTo("label");
-		assertThat(d.getUuid().get()).isEqualTo("uuid");
+		assertThat(d.getUuid().get()).isEqualTo("631965ae-34aa-48a1-9721-d9b73beedc21");
 		assertThat(d.getAliases()).isEmpty();
 		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
 		assertThat(d.isGlobal()).isFalse();
@@ -111,7 +111,7 @@ public class DomainDaoTest {
 		assertThat(d.getId()).isEqualTo(1);
 		assertThat(d.getName()).isEqualTo("domain");
 		assertThat(d.getLabel()).isEqualTo("label");
-		assertThat(d.getUuid().get()).isEqualTo("uuid");
+		assertThat(d.getUuid().get()).isEqualTo("631965ae-34aa-48a1-9721-d9b73beedc21");
 		assertThat(d.getAliases()).containsExactly("alias");
 		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
 		assertThat(d.isGlobal()).isFalse();
@@ -125,7 +125,7 @@ public class DomainDaoTest {
 		assertThat(d.getId()).isEqualTo(1);
 		assertThat(d.getName()).isEqualTo("domain");
 		assertThat(d.getLabel()).isEqualTo("label");
-		assertThat(d.getUuid().get()).isEqualTo("uuid");
+		assertThat(d.getUuid().get()).isEqualTo("631965ae-34aa-48a1-9721-d9b73beedc21");
 		assertThat(d.getAliases()).containsExactly("alias1", "alias2", "alias3");
 		assertThat(d.getHosts().get(ServiceProperty.OBM_SYNC)).hasSize(1);
 		assertThat(d.isGlobal()).isFalse();
@@ -138,7 +138,7 @@ public class DomainDaoTest {
 		assertThat(d).isNotNull();
 		assertThat(d.getId()).isEqualTo(1);
 		assertThat(d.getName()).isEqualTo("domain");
-		assertThat(d.getUuid().get()).isEqualTo("uuid");
+		assertThat(d.getUuid().get()).isEqualTo("631965ae-34aa-48a1-9721-d9b73beedc21");
 		assertThat(d.getAliases()).isEmpty();
 		assertThat(d.isGlobal()).isTrue();
 	}
@@ -218,7 +218,7 @@ public class DomainDaoTest {
 		con.close();
 		expectLastCall();
 
-		expect(rs.getString("domain_uuid")).andReturn("uuid");
+		expect(rs.getString("domain_uuid")).andReturn("631965ae-34aa-48a1-9721-d9b73beedc21");
 		expect(rs.getInt("domain_id")).andReturn(1);
 		expect(rs.getString("domain_alias")).andReturn(aliases);
 		expect(rs.getString("domain_label")).andReturn("label");

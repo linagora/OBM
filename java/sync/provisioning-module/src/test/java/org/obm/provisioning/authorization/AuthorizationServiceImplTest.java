@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.authorization;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 
@@ -84,7 +84,7 @@ public class AuthorizationServiceImplTest {
 	@Inject
 	AuthorizationService authService;
 	
-	ObmDomainUuid dummyUuid = ObmDomainUuid.of("dummyUuid");
+	ObmDomainUuid dummyUuid = ObmDomainUuid.of("fc72d37d-b82d-45be-b05d-f186e88e7a26");
 	ObmDomain dummyDomain = ObmDomain.builder().name("dummydomain.obm.org")
 			.uuid(dummyUuid).build();
 	ProfileName adminProfile = ProfileName.builder().name("admin").build();

@@ -109,7 +109,7 @@ public class LoginBindingImplTest {
 				.name(domainName)
 				.id(1)
 				.alias(domainName)
-				.uuid(ObmDomainUuid.of("1"))
+				.uuid(ObmDomainUuid.of("83baccbb-a36d-4602-8516-3e1581a2c4d4"))
 				.global(true)
 				.build();
 		expect(domainDao.findDomainByName(domainName))
@@ -148,7 +148,7 @@ public class LoginBindingImplTest {
 				.name(domainName)
 				.id(1)
 				.alias(domainName)
-				.uuid(ObmDomainUuid.of("1"))
+				.uuid(ObmDomainUuid.of("83baccbb-a36d-4602-8516-3e1581a2c4d4"))
 				.global(true)
 				.build();
 		expect(domainDao.findDomainByName(domainName))
@@ -177,7 +177,7 @@ public class LoginBindingImplTest {
 				.name(domainName)
 				.id(1)
 				.alias(domainName)
-				.uuid(ObmDomainUuid.of("1"))
+				.uuid(ObmDomainUuid.of("83baccbb-a36d-4602-8516-3e1581a2c4d4"))
 				.build();
 		expect(domainDao.findDomainByName(domainName))
 			.andReturn(obmDomain);
@@ -215,7 +215,7 @@ public class LoginBindingImplTest {
 				.name(domainName)
 				.id(1)
 				.alias(domainName)
-				.uuid(ObmDomainUuid.of("1"))
+				.uuid(ObmDomainUuid.of("83baccbb-a36d-4602-8516-3e1581a2c4d4"))
 				.build();
 		expect(domainDao.findDomainByName(domainName))
 			.andReturn(obmDomain);

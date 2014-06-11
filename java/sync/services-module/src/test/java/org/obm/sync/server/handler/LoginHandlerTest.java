@@ -340,7 +340,7 @@ public class LoginHandlerTest {
             				.builder()
             				.id(1)
             				.name(String.valueOf(getCurrentArguments()[0]))
-        					.uuid(ObmDomainUuid.of("1234567890"))
+        					.uuid(ObmDomainUuid.of("076c337a-5487-4928-b9d4-77f0079ffd8f"))
             				.build();
 				}
 			}).anyTimes();
