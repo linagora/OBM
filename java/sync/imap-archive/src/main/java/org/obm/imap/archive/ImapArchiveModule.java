@@ -41,6 +41,9 @@ import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.imap.archive.authentication.AuthenticationFilter;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationModule;
+import org.obm.imap.archive.resources.ConfigurationResource;
+import org.obm.imap.archive.resources.DomainBasedSubResource;
+import org.obm.imap.archive.resources.ObmDomainProvider;
 import org.obm.imap.archive.resources.RootHandler;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
 import org.obm.locator.store.LocatorCache;
@@ -98,6 +101,9 @@ public class ImapArchiveModule extends AbstractModule {
 		protected void configureServlets() {
 			bind(RootHandler.class);
 			bind(CyrusStatusHandler.class);
+			bind(DomainBasedSubResource.class);
+			bind(ConfigurationResource.class);
+			bind(ObmDomainProvider.class);
 			
 			filter(URL_PATTERN).through(AuthenticationFilter.class);
 			serve(URL_PATTERN).with(GuiceJerseyServlet.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));

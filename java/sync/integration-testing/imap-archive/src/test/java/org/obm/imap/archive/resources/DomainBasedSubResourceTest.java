@@ -46,7 +46,6 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
-import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.server.WebServer;
 
 import com.google.inject.Inject;
@@ -55,7 +54,7 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
 
-public class RootHandlerTest {
+public class DomainBasedSubResourceTest {
 
 	@Rule public TestRule chain = RuleChain
 			.outerRule(new GuiceRule(this, new TestImapArchiveModules.Simple()))
@@ -75,25 +74,10 @@ public class RootHandlerTest {
 	public void setUp() throws Exception {
 		Operation operation =
 				Operations.sequenceOf(
-						Operations.deleteAllFrom("domain", "mail_archive"),
+						Operations.deleteAllFrom("domain"),
 						Operations.insertInto("domain")
 						.columns("domain_id", "domain_name", "domain_label", "domain_uuid")
 						.values(654, "my_domain_name", "my_domain.local", "a6af9131-60b6-4e3a-a9f3-df5b43a89309")
-						.build(),
-						Operations.insertInto("domain")
-						.columns("domain_id", "domain_name", "domain_label", "domain_uuid")
-						.values(321, "my_domain_name", "my_domain.local", "21aeb670-f49e-428a-9d0c-f11f5feaa688")
-						.build(),
-						Operations.insertInto("mail_archive")
-						.columns("mail_archive_domain_id", 
-								"mail_archive_activated", 
-								"mail_archive_repeat_kind", 
-								"mail_archive_day_of_week", 
-								"mail_archive_day_of_month", 
-								"mail_archive_day_of_year", 
-								"mail_archive_hour", 
-								"mail_archive_minute")
-						.values(321, Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
 						.build());
 
 		
@@ -108,15 +92,29 @@ public class RootHandlerTest {
 	}
 	
 	@Test
-	public void testStatusOk() {
+	public void getDomainConfigurationShouldReturnBadRequestOnInvalidUuid() {
 		given()
 			.port(server.getHttpPort())
 			.param("login", "cyrus")
 			.param("password", "cyrus")
 			.param("domain_name", "mydomain.org").
 		expect()
-			.statusCode(Status.OK.getStatusCode()).
+			.statusCode(Status.BAD_REQUEST.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/status");
+			.get("/imap-archive/service/v1/domains/toto/configuration");
 	}
+	
+	@Test
+	public void getDomainConfigurationShouldReturnNotFoundOnAbsentDomain() {
+		given()
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org").
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/c7dd9583-5057-4c0a-ac30-d284940420c8/configuration");
+	}
+	
 }

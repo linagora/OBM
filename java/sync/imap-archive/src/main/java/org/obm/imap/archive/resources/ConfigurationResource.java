@@ -31,24 +31,37 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
-import java.util.UUID;
-
 import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
+import org.obm.provisioning.dao.exceptions.DaoException;
+
+import com.google.common.base.Objects;
+import com.google.inject.Inject;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 @Produces(MediaType.APPLICATION_JSON)
-public class DomainsResource {
+public class ConfigurationResource {
+	
+	@Inject
+	private DomainConfigurationDao domainConfigurationDao;
+
+	@Context
+	private ObmDomain domain;
 	
 	@GET
-	@Path("/configuration")
-	public DomainConfigurationDto configuration(@PathParam("domain") UUID uuid) {
-		return DomainConfigurationDto.from(DomainConfiguration.builder().domainId(uuid).enabled(false).build());
+	public DomainConfigurationDto configuration() throws DaoException {
+		return DomainConfigurationDto.from(
+				Objects.firstNonNull(domainConfigurationDao.getDomainConfiguration(domain), 
+						DomainConfiguration.DEFAULT_VALUES_BUILDER
+							.domainId(domain.getUuid().getUUID())
+							.build()));
 	}
 	
 }

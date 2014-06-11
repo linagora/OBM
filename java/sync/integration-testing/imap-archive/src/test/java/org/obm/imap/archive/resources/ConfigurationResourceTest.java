@@ -32,6 +32,7 @@
 package org.obm.imap.archive.resources;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -51,11 +52,12 @@ import org.obm.server.WebServer;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.jayway.restassured.http.ContentType;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
 
-public class RootHandlerTest {
+public class ConfigurationResourceTest {
 
 	@Rule public TestRule chain = RuleChain
 			.outerRule(new GuiceRule(this, new TestImapArchiveModules.Simple()))
@@ -108,15 +110,35 @@ public class RootHandlerTest {
 	}
 	
 	@Test
-	public void testStatusOk() {
+	public void getDomainConfigurationShouldReturnADefaultConfiguration() {
 		given()
 			.port(server.getHttpPort())
 			.param("login", "cyrus")
 			.param("password", "cyrus")
 			.param("domain_name", "mydomain.org").
 		expect()
+			.contentType(ContentType.JSON)
+			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
+				"enabled", equalTo(false))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/status");
+			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
 	}
+
+	@Test
+	public void getDomainConfigurationShouldReturnStoredConfiguration() {
+		given()
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org").
+		expect()
+			.contentType(ContentType.JSON)
+			.body("domainId", equalTo("21aeb670-f49e-428a-9d0c-f11f5feaa688"),
+				"enabled", equalTo(true))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/21aeb670-f49e-428a-9d0c-f11f5feaa688/configuration");
+	}
+	
 }
