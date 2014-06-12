@@ -877,7 +877,7 @@ if ($action == 'search') {
         run_query_calendar_delete($params,false);
         OBM_IndexingService::delete('event', $id);
     } else {
-        $params['old_date_begin'] = of_isodate_convert($params['exception_date'],true);
+        $params['old_date_begin'] = of_isodate_format($params['exception_date'],'',true);
         if(!is_null($params['old_date_begin'])) {
             $params['old_date_begin'] = new Of_Date($params['old_date_begin']);
         }  
