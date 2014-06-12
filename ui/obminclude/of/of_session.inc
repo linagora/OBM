@@ -330,6 +330,7 @@ class Auth {
     $obm['domain_label'] = $d['label'];
     $obm['domain_name'] = $d['name'];
     $obm['domain_global'] = $d['global'];
+    $obm['domain_uuid'] = $d['uuid'];
     $obm['mailserver'] = $d['mailserver'];
     $obm['group_admin'] = $d['group_admin'];
     $obm['group_com'] = $d['group_com'];

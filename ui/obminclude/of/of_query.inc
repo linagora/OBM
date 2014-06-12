@@ -916,7 +916,8 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
     domain_label,
     domain_name,
     domain_alias,
-    domain_global
+    domain_global,
+    domain_uuid
     FROM Domain
     WHERE domain_id $d_id";
   display_debug_msg($query, $cdg_sql, 'of_domain_get_domain_infos()');
@@ -928,7 +929,8 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
   $domain['name'] = $obm_q->f('domain_name');
   $domain['alias'] = $obm_q->f('domain_alias');
   $domain['global'] = $obm_q->f('domain_global');
-
+  $domain['uuid'] = $obm_q->f('domain_uuid');
+  
   if ($get_properties) {
     $query = "SELECT * FROM DomainPropertyValue
       WHERE domainpropertyvalue_domain_id $d_id ";
