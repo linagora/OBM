@@ -74,7 +74,13 @@ if ($status[0] != 1) {
   if ($action == 'detailconsult') {
     $display['detail'] = dis_imap_archive_consult($backup, $params);
   } elseif ($action == 'detailupdate') {
-    $display['detail'] = dis_imap_archive_form($backup, $params);
+    $status = load_configuration_from_imap_archive_service();
+    if ($status[0] != 1) {
+      $display['msg'] .= display_err_msg("$status[1]");
+    } else {
+      $configuration = $status[1];
+      $display['detail'] = dis_imap_archive_form($backup, $params, $configuration);
+    }
   }
 }
 

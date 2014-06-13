@@ -44,24 +44,32 @@ include_once("$obminclude/global.inc");
 // Display the IMAP Archive form
 ///////////////////////////////////////////////////////////////////////////////
 
-function dis_imap_archive_form($backup, $params) {
+function dis_imap_archive_form($backup, $params, $configuration) {
   global $l_users, $l_validate;
   global $l_service_activating, $l_activating;
-  global $l_scheduling, $l_repeat_kind, $l_weekly_repeat_kind, $l_monthly_repeat_kind, $l_yearly_repeat_kind;
-  global $l_hour, $l_minute, $l_next_run, $l_excluded_users, $l_name, $l_delete, $l_remove_archive;
+  global $l_scheduling;
+  global $l_next_run, $l_excluded_users, $l_name, $l_delete, $l_remove_archive;
   global $l_mailing_feedback, $l_email_address;
 
   $user_id = $params['user_id'];
   $url = url_prepare('imap_archive_index.php');
-
-  $block_repeat_kind = get_block_repeat_kind();
-  $block_weekly = get_block_weekly();
-  $block_monthly = get_block_monthly();
-  $block_yearly = get_block_yearly();
-  $block_hour = get_block_hour();
-  $block_minute = get_block_minute();
-
-
+  
+  $repeatKind = $configuration->repeatKind;
+  $dayOfWeek = $configuration->dayOfWeek;
+  $dayOfMonth = $configuration->dayOfMonth;
+  $dayOfYear = $configuration->dayOfYear;
+  $enabled = $configuration->enabled;
+  $hour = $configuration->hour;
+  $minute = $configuration->minute;
+  
+  $disabled = ($enabled == 0) ? "disabled" : "";
+  $block_repeat_kind = get_block_repeat_kind($repeatKind, $disabled);
+  $block_weekly = get_block_weekly($repeatKind, $dayOfWeek, $disabled);
+  $block_monthly = get_block_monthly($repeatKind, $dayOfMonth, $disabled);
+  $block_yearly = get_block_yearly($repeatKind, $dayOfYear, $disabled);
+  $block_hour = get_block_hour($hour, $disabled);
+  $block_minute = get_block_minute($minute, $disabled);
+  
   $block = "
     <form method='get' name='f_imap_archive' action='imap_archive_index.php'>
 
@@ -70,7 +78,7 @@ function dis_imap_archive_form($backup, $params) {
       <table>
         <tr>
           <th>$l_activating</th>
-          <td><input id='activation' name='activation' type='checkbox' value='0'/></td>
+          <td><input id='activation' name='activation' type='checkbox' value='1' ".(($enabled)?"checked='checked'":"")."/></td>
         </tr>
       </table>
     </fieldset>
@@ -78,55 +86,25 @@ function dis_imap_archive_form($backup, $params) {
       <legend>$l_scheduling</legend>
       <table>
         <tr>
-          <th>$l_repeat_kind</th>
-          <td>
-            <select type='text' name='sel_repeat_kind_cron'>
-              $block_repeat_kind
-            </select>
-          </td>
+          $block_repeat_kind
         </tr>
         <tr>
-          <th>$l_weekly_repeat_kind</th>
-          <td>
-            <select type='text' name='sel_weekly'>
-              $block_weekly
-            </select>
-          </td>
+          $block_weekly
         </tr>
         <tr>
-          <th>$l_monthly_repeat_kind</th>
-          <td>
-            <select type='text' name='sel_monthly'>
-              $block_monthly
-            </select>
-          </td>
+          $block_monthly
         </tr>
         <tr>
-          <th>$l_yearly_repeat_kind</th>
-          <td>
-            <select type='text' name='sel_yearly'>
-              $block_yearly
-            </select>
-          </td>
+          $block_yearly
         </tr>
       </table>
       <br>
       <table>
         <tr>
-          <th>$l_hour</th>
-          <td>
-            <select type='text' name='sel_hour'>
-              $block_hour
-            </select>
-          </td>
+          $block_hour
         </tr>
         <tr>
-          <th>$l_minute</th>
-          <td>
-            <select type='text' name='sel_minute'>
-              $block_minute
-            </select>
-          </td>
+          $block_minute
         </tr>
       </table>
       <br>
@@ -202,66 +180,161 @@ function dis_imap_archive_form($backup, $params) {
   return $block;
 }
 
-function get_block_repeat_kind() {
-  global $l_daily, $l_weekly, $l_monthly, $l_yearly;
+function get_block_repeat_kind($repeatKind, $disabled) {
+  global $l_repeat_kind, $l_daily, $l_weekly, $l_monthly, $l_yearly;
 
-  $l_repeat_kinds = array($l_yearly, $l_monthly, $l_weekly, $l_daily);
-  foreach($l_repeat_kinds as $l_repeat_kind) {
-    if($l_repeat_kind == $l_yearly) {
-      $block_repeat_kind .= "<option selected='selected' value='$l_repeat_kind'>$l_repeat_kind</option>";
+  $block_repeat_kind = "";
+  $repeat_kinds = array("YEARLY" => $l_yearly, "MONTHLY" => $l_monthly, "WEEKLY" => $l_weekly, "DAILY" => $l_daily);
+  foreach($repeat_kinds as $repeat_kind) {
+    if($repeat_kind == $repeat_kinds[$repeatKind]) {
+      $block_repeat_kind .= "<option selected='selected' value='$repeat_kind'>$repeat_kind</option>";
     } else {
-      $block_repeat_kind .= "<option value='$l_repeat_kind'>$l_repeat_kind</option>";
+      $block_repeat_kind .= "<option value='$repeat_kind'>$repeat_kind</option>";
     }
   }
-  return $block_repeat_kind;
+  
+  return
+    "<th>$l_repeat_kind</th>
+     <td>
+       <select type='text' name='sel_repeat_kind_cron' $disabled>
+         $block_repeat_kind
+       </select>
+     </td>";
 }
 
-function get_block_weekly() {
+function get_block_weekly($repeatKind, $dayOfWeek, $disabled) {
+  global $l_weekly_repeat_kind;
   global $l_monday, $l_tuesday, $l_wednesday, $l_thursday, $l_friday, $l_saturday, $l_sunday;
 
-  $l_days = array($l_monday, $l_tuesday, $l_wednesday, $l_thursday, $l_friday, $l_saturday, $l_sunday);
+  if ($repeatKind != "WEEKLY") {
+    return "";
+  }
+
+  $block_weekly = "";
+  $l_days = array(1 => $l_monday, 2 => $l_tuesday, 3 => $l_wednesday, 4 => $l_thursday, 5 => $l_friday, 6 => $l_saturday, 7 => $l_sunday);
   foreach ($l_days as $l_day) {
-    if ($l_day == $l_monday) {
-      $block_weekly = "<option selected='selected' value='$l_day'>$l_day</option>";
+    if ($l_day == $l_days[$dayOfWeek]) {
+      $block_weekly .= "<option selected='selected' value='$l_day'>$l_day</option>";
     } else {
       $block_weekly .= "<option value='$l_day'>$l_day</option>";
     }
   }
-  return $block_weekly;
+  
+  return 
+    "<th>$l_weekly_repeat_kind</th>
+     <td>
+       <select type='text' name='sel_weekly' $disabled>
+         $block_weekly
+       </select>
+     </td>";
 }
 
-function get_block_monthly() {
+function get_block_monthly($repeatKind, $dayOfMonth, $disabled) {
+  global $l_monthly_repeat_kind;
   global $l_last;
 
-  $block_monthly = "<option selected='selected' value='1'>1</option>";
+  if ($repeatKind != "MONTHLY") {
+    return "";
+  }
+  
+  $block_monthly = "";
   for ($i = 1; $i <= 27; $i++) {
-    $block_monthly .= "<option value='$i'>$i</option>";
+    if ($i == $dayOfMonth) {
+      $block_monthly .= "<option selected='selected' value='$i'>$i</option>";
+    } else {
+      $block_monthly .= "<option value='$i'>$i</option>";
+    }
   }
-  $block_monthly .= "<option value='$l_last'>$l_last</option>";
-  return $block_monthly;
+  if ($dayOfMonth == -1) {
+    $block_monthly .= "<option selected='selected' value='$l_last'>$l_last</option>";
+  } else {
+    $block_monthly .= "<option value='$l_last'>$l_last</option>";
+  }
+  
+  return 
+    "<th>$l_monthly_repeat_kind</th>
+     <td>
+       <select type='text' name='sel_monthly' $disabled>
+         $block_monthly
+       </select>
+     </td>";
 }
 
-function get_block_yearly() {
-  $block_yearly = "<option selected='selected' value='1 Janvier'>1 Janvier</option>";
-  $block_yearly .= "<option selected='selected' value='...'>...</option>";
-  $block_yearly .= "<option selected='selected' value='31 Décembre'>31 Décembre</option>";
-  return $block_yearly;
+function get_block_yearly($repeatKind, $dayOfYear, $disabled) {
+  global $l_yearly_repeat_kind;
+  
+  if ($repeatKind != "YEARLY") {
+    return "";
+  }
+  
+  $january = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[0]; }, range(1, 31));
+  $february = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[1]; }, range(1, 28));
+  $march = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[2]; }, range(1, 31));
+  $april = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[3]; }, range(1, 30));
+  $may = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[4]; }, range(1, 31));
+  $june = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[5]; }, range(1, 30));
+  $july = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[6]; }, range(1, 31));
+  $august = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[7]; }, range(1, 31));
+  $september = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[8]; }, range(1, 30));
+  $october = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[9]; }, range(1, 31));
+  $november = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[10]; }, range(1, 30));
+  $december = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[11]; }, range(1, 31));
+  
+  $year = array_merge(array(0), $january, $february, $march, $april, $may, $june, $july, $august, $september, $october, $november, $december);
+  for ($i = 1; $i <= 365; $i++) {
+    if ($i == $dayOfYear) {
+      $block_yearly .= "<option selected='selected' value='$i'>$year[$i]</option>";
+    } else {
+      $block_yearly .= "<option value='$i'>$year[$i]</option>";
+    }
+  }
+  return 
+    "<th>$l_yearly_repeat_kind</th>
+     <td>
+       <select type='text' name='sel_yearly' $disabled>
+         $block_yearly
+       </select>
+     </td>";
 }
 
-function get_block_hour() {
-  $block_hour = "<option selected='selected' value='0'>0</option>";
-  for ($i = 1; $i <= 23; $i++) {
-    $block_hour .= "<option value='$i'>$i</option>";
+function get_block_hour($hour, $disabled) {
+  global $l_hour;
+  
+  $block_hour = "";
+  for ($i = 0; $i <= 23; $i++) {
+    if ($i == $hour) {
+      $block_hour .= "<option selected='selected' value='$i'>$i</option>";
+    } else {
+      $block_hour .= "<option value='$i'>$i</option>";
+    }
   }
-  return $block_hour;
+  return
+    "<th>$l_hour</th>
+     <td>
+       <select type='text' name='sel_hour' $disabled>
+         $block_hour
+       </select>
+     </td>";
 }
 
-function get_block_minute() {
-  $block_minute = "<option selected='selected' value='0'>0</option>";
-  for ($i = 1; $i <= 59; $i++) {
-    $block_minute .= "<option value='$i'>$i</option>";
+function get_block_minute($minute, $disabled) {
+  global $l_minute;
+  
+  $block_minute = "";
+  for ($i = 0; $i <= 59; $i++) {
+    if ($i == $minute) {
+      $block_minute .= "<option selected='selected' value='$i'>$i</option>";
+    } else {
+      $block_minute .= "<option value='$i'>$i</option>";
+    }
   }
-  return $block_minute;
+  return
+    "<th>$l_minute</th>
+     <td>
+       <select type='text' name='sel_minute' $disabled>
+         $block_minute
+       </select>
+     </td>";
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -43,44 +43,19 @@ applicable to the OBM software.
 ///////////////////////////////////////////////////////////////////////////////
 function connect_to_imap_archive_service(){
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
   $userInfo = get_user_info($obm['uid']);
   
   if(empty($userInfo["email"])) {
     return array(0, $l_email_address_not_found);
   }
   
-  $imapArchiveServer = of_domain_get_domain_imaparchiveserver($obm['domain_id']);
-  if(!count($imapArchiveServer)){
-    return array(0, $l_imap_archive_server_not_found);
-  }
-  $iterator = new ArrayIterator($imapArchiveServer);
-  $imapArchiveServer = $iterator->current();
-  $imapArchiveRootPath = "http://".$imapArchiveServer[0]["ip"].":8085";
   $loginPath = "/imap-archive/service/v1/status";
-  $username = $userInfo["login"];
-  $domainName = $userInfo["domain_name"];
-  $password = get_trust_token($userInfo);
-  $origin= $GLOBALS['c_origin_web'];
-
-  $params = array("login" => $username,
-    "password" => $password,
-    "domain_name" => $domainName,
-    "origin" => $origin);
-  if ($userInfo["password_type"] == "MD5SUM") {
-      $loginUrl .= "&isPasswordHashed=true";
-      $params = array_merge($params, array("isPasswordHashed" => "true"));
-      error_log("Password already hashed, adding 'isPasswordHashed' parameter to the imap-archive call");
-  }
   
-  $loginUrl = $imapArchiveRootPath.$loginPath."?".http_build_query($params);
-  
-  $curl = curl_init($loginUrl);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  $success = curl_exec($curl);
-  $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-  $errno = curl_errno($curl);
-  curl_close($curl);
+  $curl = curlGet($loginPath);
+  $success = $curl["success"];
+  $code = $curl["code"];
+  $errno = $curl["errno"];
   
   if ($code == 0) {
     return array(0, $l_imap_archive_server_unreachable);
@@ -88,8 +63,88 @@ function connect_to_imap_archive_service(){
   if ($code == 200) {
     return array(1, null);
   }
-  error_log("Couldn't login to IMAP archive server (".$errno.")");
-  return array(0, $l_could_not_login_imap_archive_server);
+  if($errno){
+    error_log("Couldn't login to IMAP archive server (".$errno.")");
+    return array(0, $l_could_not_login_imap_archive_server);
+  }
 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Load configuration from IMAP archive service
+// Parameters:
+//   - none
+///////////////////////////////////////////////////////////////////////////////
+function load_configuration_from_imap_archive_service(){
+  global $obm;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  $userInfo = get_user_info($obm['uid']);
+  
+  if(empty($userInfo["email"])) {
+    return array(0, $l_email_address_not_found);
+  }
+  
+  $configurationPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/configuration";
+  
+  $curl = curlGet($configurationPath);
+  $success = $curl["success"];
+  $code = $curl["code"];
+  $errno = $curl["errno"];
+  
+  if ($code == 0) {
+    return array(0, $l_imap_archive_server_unreachable);
+  }
+  if ($code == 200) {
+    return array(1, json_decode($success));
+  }
+  if($errno){
+    error_log("Couldn't login to IMAP archive server (".$errno.")");
+    return array(0, $l_could_not_login_imap_archive_server);
+  }
+}
+
+function imapArchiveRootPath() {
+  global $obm;
+  global $l_imap_archive_server_not_found;
+  
+  $imapArchiveServer = of_domain_get_domain_imaparchiveserver($obm['domain_id']);
+  if(!count($imapArchiveServer)){
+    return array(0, $l_imap_archive_server_not_found);
+  }
+  $iterator = new ArrayIterator($imapArchiveServer);
+  $imapArchiveServer = $iterator->current();
+  return "http://".$imapArchiveServer[0]["ip"].":8085";
+}
+
+function curlGet($url) {
+  global $obm;
+  
+  $userInfo = get_user_info($obm['uid']);
+  $imapArchiveRootPath = imapArchiveRootPath();
+  $username = $userInfo["login"];
+  $domainName = $userInfo["domain_name"];
+  $password = get_trust_token($userInfo);
+  $domainName = $obm['domain_name'];
+  $origin= $GLOBALS['c_origin_web'];
+
+  $params = array("login" => $username,
+    "password" => $password,
+    "domain_name" => $domainName,
+    "origin" => $origin);
+  if ($userInfo["password_type"] == "MD5SUM") {
+      $params = array_merge($params, array("isPasswordHashed" => "true"));
+      error_log("Password already hashed, adding 'isPasswordHashed' parameter to the imap-archive call");
+  }
+  
+  $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($params);
+  
+  $curl = curl_init($curlUrl);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+  $success = curl_exec($curl);
+  $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+  $errno = curl_errno($curl);
+  curl_close($curl);
+  
+  return array("success" => $success, "code" => $code, "errno" => $errno);
 }
 ?>
