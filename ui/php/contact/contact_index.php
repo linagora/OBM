@@ -130,6 +130,8 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 
 } elseif ($action == 'ext_search') {
 ///////////////////////////////////////////////////////////////////////////////
+  // Makes it possible to process other requests in parallel, do not remove
+  session_write_close();
   $contacts = run_query_contact_ext_search($params);
   json_search_contact($params, $contacts);
   echo '('.$display['json'].')';
