@@ -29,38 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.injection;
+package org.obm.jersey.injection;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.glassfish.hk2.api.Context;
+import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.servlet.ServletContainer;
-import org.obm.imap.archive.resources.ConfigurationResource;
-import org.obm.imap.archive.resources.DomainBasedSubResource;
-import org.obm.imap.archive.resources.ObmDomainFactory;
-import org.obm.imap.archive.resources.RootHandler;
-import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
+import org.jvnet.hk2.guice.bridge.api.GuiceScope;
+import org.jvnet.hk2.guice.bridge.internal.GuiceScopeContext;
 
 import com.google.inject.Injector;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+class JerseyDiBinder extends AbstractBinder {
+	
+	private Injector injector;
 
-@Singleton
-public class GuiceContainer extends ServletContainer {
-	@Inject
-	public GuiceContainer(Injector injector) {
-		super(new JerseyResourceConfig(injector)
-			.register(new AbstractBinder() {
-				@Override
-				protected void configure() {
-					bindFactory(ObmDomainFactory.class).to(ObmDomain.class);
-				}
-			})
-			.register(RootHandler.class)
-			.register(CyrusStatusHandler.class)
-			.register(DomainBasedSubResource.class)
-			.register(ConfigurationResource.class)
-		);
+	JerseyDiBinder(Injector injector) {
+		this.injector = injector;
 	}
+
+	@Override
+	protected void configure() {
+		bind(NullableGuiceScopeContext.class)
+			.to(NullableGuiceScopeContext.class)
+			.to(GuiceScopeContext.class)
+			.to(new TypeLiteral<Context<GuiceScope>>() {})
+			.in(Singleton.class);
+		bind(injector).to(Injector.class);
+	}
+
+	@Singleton
+	private static class NullableGuiceScopeContext extends GuiceScopeContext {
+		@Override
+		public boolean supportsNullCreation() {
+			return true;
+		}
+	}
+	
 }

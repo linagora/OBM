@@ -29,42 +29,19 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.injection;
+package org.obm.jersey.injection;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.glassfish.hk2.api.Context;
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.jvnet.hk2.guice.bridge.api.GuiceScope;
-import org.jvnet.hk2.guice.bridge.internal.GuiceScopeContext;
+import org.glassfish.jersey.servlet.ServletContainer;
 
 import com.google.inject.Injector;
 
-class JerseyDiBinder extends AbstractBinder {
-	
-	private Injector injector;
-
-	JerseyDiBinder(Injector injector) {
-		this.injector = injector;
+@Singleton
+public class GuiceContainer extends ServletContainer {
+	@Inject
+	public GuiceContainer(Injector injector) {
+		super(new JerseyResourceConfig(injector));
 	}
-
-	@Override
-	protected void configure() {
-		bind(NullableGuiceScopeContext.class)
-			.to(NullableGuiceScopeContext.class)
-			.to(GuiceScopeContext.class)
-			.to(new TypeLiteral<Context<GuiceScope>>() {})
-			.in(Singleton.class);
-		bind(injector).to(Injector.class);
-	}
-
-	@Singleton
-	private static class NullableGuiceScopeContext extends GuiceScopeContext {
-		@Override
-		public boolean supportsNullCreation() {
-			return true;
-		}
-	}
-	
 }

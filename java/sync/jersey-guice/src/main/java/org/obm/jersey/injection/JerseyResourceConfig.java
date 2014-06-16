@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.injection;
+package org.obm.jersey.injection;
 
 import java.lang.reflect.Type;
 

@@ -112,6 +112,7 @@
 		<module>icalendar</module>
 		<module>imap-archive</module>
 		<module>integration-testing</module>
+		<module>jersey-guice</module>
 		<module>ldap-client</module>
 		<module>linagora-imap</module>
 		<module>locator</module>
@@ -425,6 +426,11 @@ org.eclipse.jdt.core.compiler.source=1.7
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
 				<artifactId>imap-archive</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>jersey-guice</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>

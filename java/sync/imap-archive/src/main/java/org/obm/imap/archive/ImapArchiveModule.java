@@ -33,6 +33,11 @@ package org.obm.imap.archive;
 
 import java.util.TimeZone;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.cyrus.imap.CyrusClientModule;
@@ -41,12 +46,12 @@ import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.imap.archive.authentication.AuthenticationFilter;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationModule;
-import org.obm.imap.archive.injection.GuiceContainer;
 import org.obm.imap.archive.resources.ConfigurationResource;
 import org.obm.imap.archive.resources.DomainBasedSubResource;
 import org.obm.imap.archive.resources.ObmDomainFactory;
 import org.obm.imap.archive.resources.RootHandler;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
+import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.server.EmbeddedServerModule;
@@ -54,8 +59,11 @@ import org.obm.server.ServerConfiguration;
 import org.obm.sync.XTrustProvider;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class ImapArchiveModule extends AbstractModule {
 	
@@ -95,8 +103,27 @@ public class ImapArchiveModule extends AbstractModule {
 		@Override
 		protected void configureServlets() {
 			filter(URL_PATTERN).through(AuthenticationFilter.class);
-			serve(URL_PATTERN).with(GuiceContainer.class);
+			serve(URL_PATTERN).with(ImapArchiveServicesContainer.class);
 		}
-
+	}
+	
+	@Singleton
+	public static class ImapArchiveServicesContainer extends ServletContainer {
+		
+		@Inject
+		public ImapArchiveServicesContainer(Injector injector) {
+			super(new JerseyResourceConfig(injector)
+					.register(new AbstractBinder() {
+						@Override
+						protected void configure() {
+							bindFactory(ObmDomainFactory.class).to(ObmDomain.class);
+						}
+					})
+					.register(RootHandler.class)
+					.register(CyrusStatusHandler.class)
+					.register(DomainBasedSubResource.class)
+					.register(ConfigurationResource.class));
+		}
+		
 	}
 }
