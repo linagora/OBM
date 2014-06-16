@@ -32,7 +32,10 @@
 package org.obm.imap.archive.resources;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
+
+import java.util.UUID;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -48,6 +51,10 @@ import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
+import org.obm.imap.archive.beans.DayOfMonth;
+import org.obm.imap.archive.beans.DayOfWeek;
+import org.obm.imap.archive.beans.DayOfYear;
+import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
 import com.google.inject.Inject;
@@ -140,5 +147,101 @@ public class ConfigurationResourceTest {
 		when()
 			.get("/imap-archive/service/v1/domains/21aeb670-f49e-428a-9d0c-f11f5feaa688/configuration");
 	}
-	
+
+	@Test
+	public void updateDomainConfigurationShouldThrowExceptionWhenBadInputs() {
+		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
+		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		
+		given()
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org")
+			.contentType(ContentType.JSON)
+			.body(domainConfigurationDto).
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.put("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+	}
+
+	@Test
+	public void updateDomainConfigurationShouldCreateWhenNoData() {
+		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
+		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		domainConfigurationDto.enabled = true;
+		domainConfigurationDto.repeatKind = RepeatKind.WEEKLY.toString();
+		domainConfigurationDto.dayOfWeek = DayOfWeek.TUESDAY.getSpecificationValue();
+		domainConfigurationDto.dayOfMonth = DayOfMonth.of(10).getDayIndex();
+		domainConfigurationDto.dayOfYear = DayOfYear.of(100).getDayOfYear();
+		domainConfigurationDto.hour = 11;
+		domainConfigurationDto.minute = 32;
+		
+		given()
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org")
+			.contentType(ContentType.JSON)
+			.body(domainConfigurationDto).
+		expect()
+			.header("Location", endsWith("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration"))
+			.statusCode(Status.CREATED.getStatusCode()).
+		when()
+			.put("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+		
+		given()
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org").
+		expect()
+			.contentType(ContentType.JSON)
+			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
+				"enabled", equalTo(true),
+				"dayOfWeek", equalTo(DayOfWeek.TUESDAY.getSpecificationValue()))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+	}
+
+	@Test
+	public void updateDomainConfigurationShouldReturnNoContentWhenUpdating() {
+		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
+		domainConfigurationDto.domainId = UUID.fromString("21aeb670-f49e-428a-9d0c-f11f5feaa688");
+		domainConfigurationDto.enabled = true;
+		domainConfigurationDto.repeatKind = RepeatKind.WEEKLY.toString();
+		domainConfigurationDto.dayOfWeek = DayOfWeek.WEDNESDAY.getSpecificationValue();
+		domainConfigurationDto.dayOfMonth = DayOfMonth.of(10).getDayIndex();
+		domainConfigurationDto.dayOfYear = DayOfYear.of(100).getDayOfYear();
+		domainConfigurationDto.hour = 11;
+		domainConfigurationDto.minute = 32;
+		
+		given()
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org")
+			.contentType(ContentType.JSON)
+			.body(domainConfigurationDto).
+		expect()
+			.statusCode(Status.NO_CONTENT.getStatusCode()).
+		when()
+			.put("/imap-archive/service/v1/domains/21aeb670-f49e-428a-9d0c-f11f5feaa688/configuration");
+		
+		given()
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org").
+		expect()
+			.contentType(ContentType.JSON)
+			.body("domainId", equalTo("21aeb670-f49e-428a-9d0c-f11f5feaa688"),
+				"enabled", equalTo(true),
+				"dayOfWeek", equalTo(DayOfWeek.WEDNESDAY.getSpecificationValue()))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/21aeb670-f49e-428a-9d0c-f11f5feaa688/configuration");
+	}
 }

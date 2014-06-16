@@ -51,6 +51,7 @@ import org.obm.imap.archive.resources.DomainBasedSubResource;
 import org.obm.imap.archive.resources.ObmDomainFactory;
 import org.obm.imap.archive.resources.RootHandler;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
+import org.obm.imap.archive.services.DomainConfigurationService;
 import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
@@ -93,6 +94,12 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
+		
+		bindImapArchiveServices();
+	}
+	
+	private void bindImapArchiveServices() {
+		bind(DomainConfigurationService.class);
 	}
 	
 	public static class ImapArchiveServletModule extends ServletModule {

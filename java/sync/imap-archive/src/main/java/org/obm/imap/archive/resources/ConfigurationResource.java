@@ -32,28 +32,43 @@
 package org.obm.imap.archive.resources;
 
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
+import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.PersistedResult;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
+import org.obm.imap.archive.services.DomainConfigurationService;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import com.google.common.base.Objects;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ConfigurationResource {
 	
 	@Inject
 	private DomainConfigurationDao domainConfigurationDao;
+	@Inject
+	private DomainConfigurationService domainConfigurationService;
 
 	@Inject
 	private ObmDomain domain;
-	
+	@Inject
+	private UriInfo uriInfo;
+
 	@GET
 	public DomainConfigurationDto configuration() throws DaoException {
 		return DomainConfigurationDto.from(
@@ -63,4 +78,18 @@ public class ConfigurationResource {
 							.build()));
 	}
 	
+	@PUT
+	@Transactional
+	public Response update(DomainConfigurationDto domainConfigurationDto) throws DaoException {
+		try {
+			PersistedResult persistedResult = domainConfigurationService.updateOrCreate(DomainConfiguration.from(domainConfigurationDto), domain);
+			if (persistedResult.isUpdate()) {
+				return Response.noContent().build();
+			} else {
+				return Response.created(uriInfo.getAbsolutePath()).build();
+			}
+		} catch (DomainNotFoundException e) {
+			throw new WebApplicationException(e, Status.NOT_FOUND);
+		}
+	}
 }

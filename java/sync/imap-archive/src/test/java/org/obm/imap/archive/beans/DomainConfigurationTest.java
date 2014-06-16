@@ -38,6 +38,7 @@ import java.util.UUID;
 import org.joda.time.LocalTime;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
+import org.obm.imap.archive.dto.DomainConfigurationDto;
 
 
 public class DomainConfigurationTest {
@@ -141,5 +142,37 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getHour()).isEqualTo(0);
 		assertThat(configuration.getMinute()).isEqualTo(0);
 		assertThat(configuration.getRecurrence()).isEqualTo(archiveRecurrence);
+	}
+	
+	@Test
+	public void fromDto() {
+		UUID expectedDomainId = UUID.fromString("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
+		boolean expectedEnabled = true;
+		RepeatKind expectedRepeatKind = RepeatKind.WEEKLY;
+		DayOfWeek expectedDayOfWeek = DayOfWeek.TUESDAY;
+		DayOfMonth expectedDayOfMonth = DayOfMonth.of(10);
+		DayOfYear expectedDayOfYear = DayOfYear.of(100);
+		Integer expectedHour = 11;
+		Integer expectedMinute = 32;
+		
+		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
+		domainConfigurationDto.domainId = expectedDomainId;
+		domainConfigurationDto.enabled = expectedEnabled;
+		domainConfigurationDto.repeatKind = expectedRepeatKind.toString();
+		domainConfigurationDto.dayOfWeek = expectedDayOfWeek.getSpecificationValue();
+		domainConfigurationDto.dayOfMonth = expectedDayOfMonth.getDayIndex();
+		domainConfigurationDto.dayOfYear = expectedDayOfYear.getDayOfYear();
+		domainConfigurationDto.hour = expectedHour;
+		domainConfigurationDto.minute = expectedMinute;
+		
+		DomainConfiguration configuration = DomainConfiguration.from(domainConfigurationDto);
+		assertThat(configuration.isEnabled()).isEqualTo(expectedEnabled);
+		assertThat(configuration.getRepeatKind()).isEqualTo(expectedRepeatKind);
+		assertThat(configuration.getDayOfMonth()).isEqualTo(expectedDayOfMonth);
+		assertThat(configuration.getDayOfWeek()).isEqualTo(expectedDayOfWeek);
+		assertThat(configuration.getDayOfYear()).isEqualTo(expectedDayOfYear);
+		assertThat(configuration.getDomainId()).isEqualTo(expectedDomainId);
+		assertThat(configuration.getHour()).isEqualTo(expectedHour);
+		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
 	}
 }

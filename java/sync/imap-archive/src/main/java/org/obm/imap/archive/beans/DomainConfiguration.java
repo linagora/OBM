@@ -35,6 +35,7 @@ import java.util.UUID;
 
 import org.joda.time.LocalTime;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
+import org.obm.imap.archive.dto.DomainConfigurationDto;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -52,6 +53,20 @@ public class DomainConfiguration {
 					.repeat(RepeatKind.MONTHLY)
 					.build());
 
+	public static DomainConfiguration from(DomainConfigurationDto configuration) {
+		return DomainConfiguration.builder()
+				.domainId(configuration.domainId)
+				.enabled(configuration.enabled)
+				.recurrence(ArchiveRecurrence.builder()
+						.repeat(RepeatKind.valueOf(configuration.repeatKind))
+						.dayOfWeek(DayOfWeek.fromSpecificationValue(configuration.dayOfWeek))
+						.dayOfMonth(DayOfMonth.of(configuration.dayOfMonth))
+						.dayOfYear(DayOfYear.of(configuration.dayOfYear))
+						.build())
+				.time(LocalTime.parse(configuration.hour + ":" + configuration.minute))
+				.build();
+	}
+	
 	public static Builder builder() {
 		return new Builder();
 	}

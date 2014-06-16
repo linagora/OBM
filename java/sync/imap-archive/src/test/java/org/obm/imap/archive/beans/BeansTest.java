@@ -45,7 +45,8 @@ public class BeansTest {
 				ArchiveRecurrence.class,
 				DayOfMonth.class,
 				DayOfYear.class,
-				DomainConfiguration.class
+				DomainConfiguration.class,
+				PersistedResult.class
 			).verify();
 	}	
 }
