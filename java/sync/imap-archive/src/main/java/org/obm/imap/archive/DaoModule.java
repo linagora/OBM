@@ -32,6 +32,7 @@
 
 package org.obm.imap.archive;
 
+import org.obm.domain.dao.DomainDao;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
 
@@ -42,6 +43,7 @@ public class DaoModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(DomainConfigurationDao.class).to(DomainConfigurationJdbcImpl.class);
+		bind(DomainDao.class);
 	}
 
 }

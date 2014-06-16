@@ -29,38 +29,38 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.resources;
+package org.obm.imap.archive.injection;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import javax.inject.Singleton;
 
-import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dto.DomainConfigurationDto;
-import org.obm.provisioning.dao.exceptions.DaoException;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.servlet.ServletContainer;
+import org.obm.imap.archive.resources.ConfigurationResource;
+import org.obm.imap.archive.resources.DomainBasedSubResource;
+import org.obm.imap.archive.resources.ObmDomainFactory;
+import org.obm.imap.archive.resources.RootHandler;
+import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
 
-import com.google.common.base.Objects;
+import com.google.inject.Injector;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-@Produces(MediaType.APPLICATION_JSON)
-public class ConfigurationResource {
-	
+@Singleton
+public class GuiceContainer extends ServletContainer {
 	@Inject
-	private DomainConfigurationDao domainConfigurationDao;
-
-	@Inject
-	private ObmDomain domain;
-	
-	@GET
-	public DomainConfigurationDto configuration() throws DaoException {
-		return DomainConfigurationDto.from(
-				Objects.firstNonNull(domainConfigurationDao.getDomainConfiguration(domain), 
-						DomainConfiguration.DEFAULT_VALUES_BUILDER
-							.domainId(domain.getUuid().getUUID())
-							.build()));
+	public GuiceContainer(Injector injector) {
+		super(new JerseyResourceConfig(injector)
+			.register(new AbstractBinder() {
+				@Override
+				protected void configure() {
+					bindFactory(ObmDomainFactory.class).to(ObmDomain.class);
+				}
+			})
+			.register(RootHandler.class)
+			.register(CyrusStatusHandler.class)
+			.register(DomainBasedSubResource.class)
+			.register(ConfigurationResource.class)
+		);
 	}
-	
 }

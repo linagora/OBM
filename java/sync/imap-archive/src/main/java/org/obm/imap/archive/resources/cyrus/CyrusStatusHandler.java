@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources.cyrus;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -50,8 +52,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.system.ObmSystemUser;
 

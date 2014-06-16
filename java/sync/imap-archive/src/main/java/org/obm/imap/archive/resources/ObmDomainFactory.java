@@ -29,84 +29,71 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
+import javax.inject.Inject;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.Provider;
 
+import org.glassfish.hk2.api.Factory;
 import org.obm.domain.dao.DomainDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import com.google.common.base.Optional;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.core.spi.component.ComponentContext;
-import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.PerRequestTypeInjectableProvider;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-@Singleton
-@Provider
-public class ObmDomainProvider extends PerRequestTypeInjectableProvider<Context, ObmDomain> {
+public class ObmDomainFactory implements Factory<ObmDomain> {
 
 	private final DomainDao domainDao;
+	
+	@PathParam("domain")
+	private String domainUuid;
 
 	@Inject
-	private ObmDomainProvider(DomainDao domainDao) {
-		super(ObmDomain.class);
-
+	private ObmDomainFactory(DomainDao domainDao) {
 		this.domainDao = domainDao;
 	}
-
+	
 	@Override
-	public Injectable<ObmDomain> getInjectable(ComponentContext componentContext, Context context) {
-		return new AbstractHttpContextInjectable<ObmDomain>() {
-
-			@Override
-			public ObmDomain getValue(HttpContext httpContext) {
-				MultivaluedMap<String, String> pathParameters = httpContext.getUriInfo().getPathParameters();
-				String domainUuid = pathParameters.getFirst("domain");
-
-				if (domainUuid == null) {
-					throw new WebApplicationException(Status.BAD_REQUEST);
-				}
-
-				ObmDomainUuid checkedDomainUuid = checkDomainUuid(domainUuid);
-				Optional<ObmDomain> domain;
-				try {
-					domain = getDomain(checkedDomainUuid);
-					if (!domain.isPresent()) {
-						throw new WebApplicationException(Status.NOT_FOUND);
-					}
-					return domain.get();
-				} catch (DaoException e) {
-					throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-				}
-			}
-
-			
-			private ObmDomainUuid checkDomainUuid(String domainUuid) {
-				try {
-					return ObmDomainUuid.of(domainUuid);
-				} catch (IllegalArgumentException e) {
-					throw new WebApplicationException(Status.BAD_REQUEST);
-				}
-			}
-			
-			private Optional<ObmDomain> getDomain(ObmDomainUuid domainUuid) throws DaoException {
-				try {
-					return Optional.of(domainDao.findDomainByUuid(domainUuid));
-				} catch (DomainNotFoundException e) {
-					return Optional.absent();
-				}
-			}
-		};
+	public void dispose(ObmDomain instance) {
 	}
+	
+	@Override
+	public ObmDomain provide() {
 
+		if (domainUuid == null) {
+			throw new WebApplicationException(Status.BAD_REQUEST);
+		}
+
+		ObmDomainUuid checkedDomainUuid = checkDomainUuid(domainUuid);
+		Optional<ObmDomain> domain;
+		try {
+			domain = getDomain(checkedDomainUuid);
+			if (!domain.isPresent()) {
+				throw new WebApplicationException(Status.NOT_FOUND);
+			}
+			return domain.get();
+		} catch (DaoException e) {
+			throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+	
+	private ObmDomainUuid checkDomainUuid(String domainUuid) {
+		try {
+			return ObmDomainUuid.of(domainUuid);
+		} catch (IllegalArgumentException e) {
+			throw new WebApplicationException(Status.BAD_REQUEST);
+		}
+	}
+	
+	private Optional<ObmDomain> getDomain(ObmDomainUuid domainUuid) throws DaoException {
+		try {
+			return Optional.of(domainDao.findDomainByUuid(domainUuid));
+		} catch (DomainNotFoundException e) {
+			return Optional.absent();
+		}
+	}
 }

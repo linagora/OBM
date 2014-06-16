@@ -29,38 +29,47 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.resources;
+package org.obm.imap.archive.injection;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
-import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dto.DomainConfigurationDto;
-import org.obm.provisioning.dao.exceptions.DaoException;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.jersey.server.monitoring.ApplicationEvent;
+import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
+import org.glassfish.jersey.server.monitoring.RequestEvent;
+import org.glassfish.jersey.server.monitoring.RequestEventListener;
+import org.jvnet.hk2.guice.bridge.api.GuiceBridge;
+import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
 
-import com.google.common.base.Objects;
+import com.google.inject.Injector;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-
-@Produces(MediaType.APPLICATION_JSON)
-public class ConfigurationResource {
-	
-	@Inject
-	private DomainConfigurationDao domainConfigurationDao;
+public class JerseyEventListener implements ApplicationEventListener {
 
 	@Inject
-	private ObmDomain domain;
-	
-	@GET
-	public DomainConfigurationDto configuration() throws DaoException {
-		return DomainConfigurationDto.from(
-				Objects.firstNonNull(domainConfigurationDao.getDomainConfiguration(domain), 
-						DomainConfiguration.DEFAULT_VALUES_BUILDER
-							.domainId(domain.getUuid().getUUID())
-							.build()));
+	private ServiceLocator serviceLocator;
+
+	@Override
+	public void onEvent(ApplicationEvent event) {
+		switch (event.getType()) {
+		case INITIALIZATION_FINISHED: {
+			bidirectionalBinding();
+			break;
+		}
+		default:
+			break;
+		}
+
 	}
-	
+
+	private void bidirectionalBinding() {
+		Injector injector = serviceLocator.getService(Injector.class);
+		GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);
+		GuiceIntoHK2Bridge guiceBridge = serviceLocator.getService(GuiceIntoHK2Bridge.class);
+		guiceBridge.bridgeGuiceInjector(injector);
+	}
+
+	@Override
+	public RequestEventListener onRequest(RequestEvent requestEvent) {
+		return null;
+	}
 }

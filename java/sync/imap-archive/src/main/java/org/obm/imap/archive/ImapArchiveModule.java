@@ -41,9 +41,10 @@ import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.imap.archive.authentication.AuthenticationFilter;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationModule;
+import org.obm.imap.archive.injection.GuiceContainer;
 import org.obm.imap.archive.resources.ConfigurationResource;
 import org.obm.imap.archive.resources.DomainBasedSubResource;
-import org.obm.imap.archive.resources.ObmDomainProvider;
+import org.obm.imap.archive.resources.ObmDomainFactory;
 import org.obm.imap.archive.resources.RootHandler;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
 import org.obm.locator.store.LocatorCache;
@@ -52,15 +53,9 @@ import org.obm.server.EmbeddedServerModule;
 import org.obm.server.ServerConfiguration;
 import org.obm.sync.XTrustProvider;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 public class ImapArchiveModule extends AbstractModule {
 	
@@ -99,24 +94,9 @@ public class ImapArchiveModule extends AbstractModule {
 		
 		@Override
 		protected void configureServlets() {
-			bind(RootHandler.class);
-			bind(CyrusStatusHandler.class);
-			bind(DomainBasedSubResource.class);
-			bind(ConfigurationResource.class);
-			bind(ObmDomainProvider.class);
-			
 			filter(URL_PATTERN).through(AuthenticationFilter.class);
-			serve(URL_PATTERN).with(GuiceJerseyServlet.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
+			serve(URL_PATTERN).with(GuiceContainer.class);
 		}
 
-		@Singleton
-		private static class GuiceJerseyServlet extends GuiceContainer {
-
-			@Inject
-			private GuiceJerseyServlet(Injector injector) {
-				super(injector);
-			}
-			
-		}
 	}
 }

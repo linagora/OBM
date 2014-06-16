@@ -29,38 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.resources;
+package org.obm.imap.archive.injection;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import javax.inject.Singleton;
 
-import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dto.DomainConfigurationDto;
-import org.obm.provisioning.dao.exceptions.DaoException;
+import org.glassfish.hk2.api.Context;
+import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.jvnet.hk2.guice.bridge.api.GuiceScope;
+import org.jvnet.hk2.guice.bridge.internal.GuiceScopeContext;
 
-import com.google.common.base.Objects;
+import com.google.inject.Injector;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-
-@Produces(MediaType.APPLICATION_JSON)
-public class ConfigurationResource {
+class JerseyDiBinder extends AbstractBinder {
 	
-	@Inject
-	private DomainConfigurationDao domainConfigurationDao;
+	private Injector injector;
 
-	@Inject
-	private ObmDomain domain;
-	
-	@GET
-	public DomainConfigurationDto configuration() throws DaoException {
-		return DomainConfigurationDto.from(
-				Objects.firstNonNull(domainConfigurationDao.getDomainConfiguration(domain), 
-						DomainConfiguration.DEFAULT_VALUES_BUILDER
-							.domainId(domain.getUuid().getUUID())
-							.build()));
+	JerseyDiBinder(Injector injector) {
+		this.injector = injector;
+	}
+
+	@Override
+	protected void configure() {
+		bind(NullableGuiceScopeContext.class)
+			.to(NullableGuiceScopeContext.class)
+			.to(GuiceScopeContext.class)
+			.to(new TypeLiteral<Context<GuiceScope>>() {})
+			.in(Singleton.class);
+		bind(injector).to(Injector.class);
+	}
+
+	@Singleton
+	private static class NullableGuiceScopeContext extends GuiceScopeContext {
+		@Override
+		public boolean supportsNullCreation() {
+			return true;
+		}
 	}
 	
 }

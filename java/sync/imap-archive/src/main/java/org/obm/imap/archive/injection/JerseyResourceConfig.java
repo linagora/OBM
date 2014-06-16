@@ -29,38 +29,47 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.resources;
+package org.obm.imap.archive.injection;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import java.lang.reflect.Type;
 
-import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dto.DomainConfigurationDto;
-import org.obm.provisioning.dao.exceptions.DaoException;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.ext.Provider;
 
-import com.google.common.base.Objects;
+import org.glassfish.jersey.server.ResourceConfig;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 
-@Produces(MediaType.APPLICATION_JSON)
-public class ConfigurationResource {
-	
-	@Inject
-	private DomainConfigurationDao domainConfigurationDao;
+public class JerseyResourceConfig extends ResourceConfig {
 
-	@Inject
-	private ObmDomain domain;
-	
-	@GET
-	public DomainConfigurationDto configuration() throws DaoException {
-		return DomainConfigurationDto.from(
-				Objects.firstNonNull(domainConfigurationDao.getDomainConfiguration(domain), 
-						DomainConfiguration.DEFAULT_VALUES_BUILDER
-							.domainId(domain.getUuid().getUUID())
-							.build()));
+	public JerseyResourceConfig(Injector injector) {
+		super();
+
+		registerClasses(JerseyEventListener.class);
+		register(new JerseyDiBinder(injector));
+
+		register(injector);
 	}
-	
+
+	private void register(Injector injector) {
+		while (injector != null) {
+			for (Key<?> key : injector.getBindings().keySet()) {
+				Type type = key.getTypeLiteral().getType();
+				if (type instanceof Class) {
+					Class<?> c = (Class<?>)type;
+					if (c.isAnnotationPresent(Path.class)) {
+						register(c);
+					} else if (c.isAnnotationPresent(Provider.class)) {
+						register(c);
+					} else if (Feature.class.isAssignableFrom(c)) {
+						register(c);
+					}
+				}
+			}
+			injector = injector.getParent();
+		}
+	}
+
 }
