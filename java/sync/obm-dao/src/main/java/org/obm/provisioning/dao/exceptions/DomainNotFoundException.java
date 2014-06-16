@@ -29,12 +29,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.dao.exceptions;
 
+import java.util.UUID;
+
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class DomainNotFoundException extends Exception {
 
 	public DomainNotFoundException(ObmDomainUuid uuid) {
-		super(String.format("The domain with the uuid %s was not found", uuid.get()));
+		this(uuid.get());
+	}
+
+	public DomainNotFoundException(UUID uuid) {
+		this(uuid.toString());
 	}
 	
 	public DomainNotFoundException() {

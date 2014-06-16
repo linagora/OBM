@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
 
+import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,11 +47,15 @@ import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
+import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+
+import pl.wkr.fluentrule.api.FluentExpectedException;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -78,6 +83,9 @@ public class DomainConfigurationJdbcImplTest {
 	
 	@Inject
 	private DomainConfigurationJdbcImpl domainConfigurationJdbcImpl;
+	
+	@Rule
+	public FluentExpectedException expectedException = FluentExpectedException.none();
 	
 	@Before
 	public void setUp() {
@@ -131,5 +139,46 @@ public class DomainConfigurationJdbcImplTest {
 				.uuid(ObmDomainUuid.of(uuid))
 				.build();
 		assertThat(domainConfigurationJdbcImpl.getDomainConfiguration(domain)).isNull();
+	}
+	
+	@Test
+	public void updateDomainConfigurationShouldThrowsExceptionWhenDomainNotFound() throws Exception {
+		expectedException.expect(DomainNotFoundException.class).hasMessage("844db7a6-6788-47a4-9f04-f5ed9f007a04");
+		
+		domainConfigurationJdbcImpl.updateDomainConfiguration(DomainConfiguration.DEFAULT_VALUES_BUILDER
+				.domainId(UUID.fromString("844db7a6-6788-47a4-9f04-f5ed9f007a04"))
+				.build());
+	}
+	
+	@Test
+	public void updateDomainConfigurationShouldUpdateWhenDomainFound() throws Exception {
+		UUID uuid = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
+				.domainId(uuid)
+				.enabled(false)
+				.recurrence(ArchiveRecurrence.builder()
+						.repeat(RepeatKind.YEARLY)
+						.dayOfMonth(DayOfMonth.of(1))
+						.dayOfWeek(DayOfWeek.MONDAY)
+						.dayOfYear(DayOfYear.of(100))
+						.build())
+				.time(LocalTime.parse("13:23"))
+				.build();
+		
+		domainConfigurationJdbcImpl.updateDomainConfiguration(expectedDomainConfiguration);
+		
+		ObmDomain domain = ObmDomain.builder()
+				.id(654)
+				.uuid(ObmDomainUuid.of(uuid))
+				.build();
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.getDomainConfiguration(domain);
+		assertThat(domainConfiguration.getDomainId()).isEqualTo(uuid);
+		assertThat(domainConfiguration.isEnabled()).isEqualTo(expectedDomainConfiguration.isEnabled());
+		assertThat(domainConfiguration.getRepeatKind()).isEqualTo(expectedDomainConfiguration.getRepeatKind());
+		assertThat(domainConfiguration.getDayOfWeek()).isEqualTo(expectedDomainConfiguration.getDayOfWeek());
+		assertThat(domainConfiguration.getDayOfMonth()).isEqualTo(expectedDomainConfiguration.getDayOfMonth());
+		assertThat(domainConfiguration.getDayOfYear()).isEqualTo(expectedDomainConfiguration.getDayOfYear());
+		assertThat(domainConfiguration.getHour()).isEqualTo(expectedDomainConfiguration.getHour());
+		assertThat(domainConfiguration.getMinute()).isEqualTo(expectedDomainConfiguration.getMinute());
 	}
 }

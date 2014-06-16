@@ -126,8 +126,8 @@ public class DomainConfigurationTest {
 		UUID domainId = UUID.fromString("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
 		ArchiveRecurrence archiveRecurrence = ArchiveRecurrence.builder()
 			.dayOfMonth(DayOfMonth.last())
-			.dayOfWeek(null)
-			.dayOfYear(null)
+			.dayOfWeek(DayOfWeek.MONDAY)
+			.dayOfYear(DayOfYear.of(1))
 			.repeat(RepeatKind.MONTHLY)
 			.build();
 		

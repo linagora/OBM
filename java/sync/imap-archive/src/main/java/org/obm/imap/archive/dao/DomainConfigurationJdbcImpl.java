@@ -44,6 +44,7 @@ import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -114,5 +115,37 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 						.build())
 				.time(new LocalTime(rs.getInt("mail_archive_hour"), rs.getInt("mail_archive_minute")))
 				.build();
+	}
+
+	@Override
+	public void updateDomainConfiguration(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException {
+		Connection connection = null;
+		PreparedStatement ps = null;
+		try {
+			connection = dbcp.getConnection();
+			ps = connection.prepareStatement(
+					"UPDATE " + TABLE +
+					" SET mail_archive_activated = ?, mail_archive_repeat_kind = ?, " + 
+					"mail_archive_day_of_week = ?, mail_archive_day_of_month = ?, mail_archive_day_of_year = ?, mail_archive_hour = ?, mail_archive_minute = ?" +
+					" WHERE  mail_archive_domain_id = (SELECT domain_id FROM Domain WHERE domain_uuid = ?)");
+
+			int idx = 1;
+			ps.setBoolean(idx++, domainConfiguration.isEnabled());
+			ps.setString(idx++, domainConfiguration.getRepeatKind().name());
+			ps.setInt(idx++, domainConfiguration.getDayOfWeek().getSpecificationValue());
+			ps.setInt(idx++, domainConfiguration.getDayOfMonth().getDayIndex());
+			ps.setInt(idx++, domainConfiguration.getDayOfYear().getDayOfYear());
+			ps.setInt(idx++, domainConfiguration.getHour());
+			ps.setInt(idx++, domainConfiguration.getMinute());
+			ps.setString(idx++, domainConfiguration.getDomainId().toString());
+
+			if (ps.executeUpdate() < 1) {
+				throw new DomainNotFoundException(domainConfiguration.getDomainId());
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(connection, ps, null);
+		}
 	}
 }

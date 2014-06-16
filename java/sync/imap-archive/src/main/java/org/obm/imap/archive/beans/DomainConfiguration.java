@@ -47,8 +47,8 @@ public class DomainConfiguration {
 			.enabled(false)
 			.recurrence(ArchiveRecurrence.builder()
 					.dayOfMonth(DayOfMonth.last())
-					.dayOfWeek(null)
-					.dayOfYear(null)
+					.dayOfWeek(DayOfWeek.MONDAY)
+					.dayOfYear(DayOfYear.of(1))
 					.repeat(RepeatKind.MONTHLY)
 					.build());
 

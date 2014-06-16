@@ -34,10 +34,13 @@ package org.obm.imap.archive.dao;
 
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 public interface DomainConfigurationDao {
 
 	DomainConfiguration getDomainConfiguration(ObmDomain domain) throws DaoException;
+	
+	void updateDomainConfiguration(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException;
 }
