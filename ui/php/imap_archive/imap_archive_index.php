@@ -47,9 +47,8 @@ if ($obminclude == '') $obminclude = 'obminclude';
 
 include_once("$obminclude/global.inc");
 
-$params = get_global_params('Entity');
-page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 $params = get_imap_archive_params();
+page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include_once("$obminclude/global_pref.inc");
 require_once('imap_archive_display.inc');
 require_once('imap_archive_query.inc');
@@ -72,6 +71,16 @@ $status = connect_to_imap_archive_service() ;
 if ($status[0] != 1) {
   $display['msg'] .= display_err_msg("$status[1]");
 } else {
+  if ($action == 'update') {
+    $ret = run_query_imap_archive_update($params);
+    if ($ret[0] == 1) {
+      $display['msg'] .= display_ok_msg($l_update_ok);
+    } else {
+      $display['msg'] .= display_err_msg($l_update_error);
+    }
+    $action = 'detailconsult';
+  }
+  
   if ($action == 'detailconsult') {
     $display['detail'] = dis_imap_archive_consult($backup, $params);
   } elseif ($action == 'detailupdate') {
@@ -95,7 +104,7 @@ if (! $params['popup']) {
 $display['end'] = display_end();
 
 display_page($display);
-        
+
 ///////////////////////////////////////////////////////////////////////////////
 // Stores User parameters transmited in $params hash
 // returns : $params hash with parameters set
@@ -105,6 +114,8 @@ function get_imap_archive_params() {
     // Get global params
     $params = get_global_params();
 
+    get_global_params_document($params);
+  
     return $params;
   }
 
@@ -116,7 +127,7 @@ function get_imap_archive_action() {
   global $actions, $cright_read_admin, $cright_write_admin;
   global $l_header_consult, $l_header_update;
   
-// Consult
+// Detail Consult
   $actions['imap_archive']['detailconsult'] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/imap_archive/imap_archive_index.php?action=detailconsult",
@@ -124,10 +135,17 @@ function get_imap_archive_action() {
     'Condition'=> array ('all') 
   );
 
-// Update
+// Detail Update
   $actions['imap_archive']['detailupdate'] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/imap_archive/imap_archive_index.php?action=detailupdate",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('all')
+  );
+
+// Update
+  $actions['imap_archive']['update'] = array (
+    'Url'      => "$path/imap_archive/imap_archive_index.php?action=update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('all')
   );

@@ -53,7 +53,7 @@ function dis_imap_archive_form($backup, $params, $configuration) {
 
   $user_id = $params['user_id'];
   $url = url_prepare('imap_archive_index.php');
-  
+
   $repeatKind = $configuration->repeatKind;
   $dayOfWeek = $configuration->dayOfWeek;
   $dayOfMonth = $configuration->dayOfMonth;
@@ -171,7 +171,8 @@ function dis_imap_archive_form($backup, $params, $configuration) {
       </table>
     </fieldset>
     <div class='buttons'>  
-        <input type='submit' value=$l_validate />
+      <input type=\"hidden\" name=\"action\" value=\"update\">
+      <input type='submit' value=$l_validate />
     </div>
     </form>
   ";
@@ -196,7 +197,7 @@ function get_block_repeat_kind($repeatKind, $disabled) {
   return
     "<th>$l_repeat_kind</th>
      <td>
-       <select type='text' name='sel_repeat_kind_cron' $disabled class='configuration' onchange='redraw(this.options[this.selectedIndex].value);'>
+       <select type='text' name='sel_repeat_kind' $disabled class='configuration' onchange='redraw(this.options[this.selectedIndex].value);'>
          $block_repeat_kind
        </select>
      </td>";
@@ -210,18 +211,18 @@ function get_block_weekly($repeatKind, $dayOfWeek, $disabled) {
 
   $block_weekly = "";
   $l_days = array(1 => $l_monday, 2 => $l_tuesday, 3 => $l_wednesday, 4 => $l_thursday, 5 => $l_friday, 6 => $l_saturday, 7 => $l_sunday);
-  foreach ($l_days as $l_day) {
-    if ($l_day == $l_days[$dayOfWeek]) {
-      $block_weekly .= "<option selected='selected' value='$l_day'>$l_day</option>";
+  foreach ($l_days as $l_day => $l_day_value) {
+    if ($l_day == $dayOfWeek) {
+      $block_weekly .= "<option selected='selected' value='$l_day'>$l_day_value</option>";
     } else {
-      $block_weekly .= "<option value='$l_day'>$l_day</option>";
+      $block_weekly .= "<option value='$l_day'>$l_day_value</option>";
     }
   }
   
   return 
     "<th class='class_weekly' style='visibility:$visibility'>$l_weekly_repeat_kind</th>
      <td>
-       <select name='sel_weekly' class='configuration class_weekly' style='visibility:$visibility' $disabled>
+       <select name='sel_day_of_week' class='configuration class_weekly' style='visibility:$visibility' $disabled>
          $block_weekly
        </select>
      </td>";
@@ -243,15 +244,15 @@ function get_block_monthly($repeatKind, $dayOfMonth, $disabled) {
     }
   }
   if ($dayOfMonth == -1) {
-    $block_monthly .= "<option selected='selected' value='$l_last'>$l_last</option>";
+    $block_monthly .= "<option selected='selected' value='$last_day_of_month'>$l_last</option>";
   } else {
-    $block_monthly .= "<option value='$l_last'>$l_last</option>";
+    $block_monthly .= "<option value='$last_day_of_month'>$l_last</option>";
   }
   
   return 
     "<th class='class_monthly' style='visibility:$visibility'>$l_monthly_repeat_kind</th>
      <td>
-       <select type='text' name='sel_monthly' class='configuration class_monthly' style='visibility:$visibility' $disabled>
+       <select type='text' name='sel_day_of_month' class='configuration class_monthly' style='visibility:$visibility' $disabled>
          $block_monthly
        </select>
      </td>";
@@ -286,7 +287,7 @@ function get_block_yearly($repeatKind, $dayOfYear, $disabled) {
   return 
     "<th class='class_yearly' style='visibility:$visibility'>$l_yearly_repeat_kind</th>
      <td>
-       <select type='text' name='sel_yearly' class='configuration class_yearly' style='visibility:$visibility' $disabled>
+       <select type='text' name='sel_day_of_year' class='configuration class_yearly' style='visibility:$visibility' $disabled>
          $block_yearly
        </select>
      </td>";
