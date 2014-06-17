@@ -81,10 +81,10 @@ public class CyrusStatusHandler {
 	}
 	
 	@GET
-	public Response status(@QueryParam("loginAtDomain") String loginAtDomain) {
+	public Response status(@QueryParam("login") String login, @QueryParam("domain_name") String domainName) {
 		try {
 			ObmSystemUser cyrusUser = userSystemDao.getByLogin(ObmSystemUser.CYRUS);
-			String cyrusAddress = locator.getServiceLocation("mail/imap_frontend", loginAtDomain);
+			String cyrusAddress = locator.getServiceLocation("mail/imap_frontend", login + "@" + domainName);
 			if (canConnectToCyrus(cyrusUser, cyrusAddress)) {
 				return Response.ok().build();
 			}
