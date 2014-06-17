@@ -138,7 +138,8 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 
 			int idx = 1;
 			ps.setBoolean(idx++, domainConfiguration.isEnabled());
-			ps.setString(idx++, domainConfiguration.getRepeatKind().name());
+			ps.setObject(idx++, obmHelper.getDBCP()
+					.getJdbcObject("repeat_kind", domainConfiguration.getRepeatKind().toString()));
 			ps.setInt(idx++, domainConfiguration.getDayOfWeek().getSpecificationValue());
 			ps.setInt(idx++, domainConfiguration.getDayOfMonth().getDayIndex());
 			ps.setInt(idx++, domainConfiguration.getDayOfYear().getDayOfYear());
@@ -174,7 +175,8 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			int idx = 1;
 			ps.setInt(idx++, domain.getId());
 			ps.setBoolean(idx++, domainConfiguration.isEnabled());
-			ps.setString(idx++, domainConfiguration.getRepeatKind().name());
+			ps.setObject(idx++, obmHelper.getDBCP()
+					.getJdbcObject("repeat_kind", domainConfiguration.getRepeatKind().toString()));
 			ps.setInt(idx++, domainConfiguration.getDayOfWeek().getSpecificationValue());
 			ps.setInt(idx++, domainConfiguration.getDayOfMonth().getDayIndex());
 			ps.setInt(idx++, domainConfiguration.getDayOfYear().getDayOfYear());

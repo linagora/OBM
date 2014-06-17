@@ -32,7 +32,10 @@
 package org.obm.imap.archive;
 
 import org.apache.http.client.HttpClient;
+import org.obm.Configuration;
+import org.obm.StaticConfigurationService;
 import org.obm.configuration.DomainConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -59,7 +62,8 @@ public class TestImapArchiveModules {
 			install(Modules.override(new ImapArchiveModule(config)).with(
 				new DaoTestModule(),
 				new LocalLocatorModule(),
-				new ObmSyncModule()
+				new ObmSyncModule(),
+				new TransactionalModule()
 			));
 		}
 	}
@@ -123,5 +127,13 @@ public class TestImapArchiveModules {
  	 	protected void configure() {
  	 		bind(LoginClient.Factory.class).toInstance(new FakeLoginClientFactory());
  	 	}
+	}
+	
+	public static class TransactionalModule extends AbstractModule {
+
+		@Override
+		protected void configure() {
+			bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(new Configuration.Transaction()));
+		}
 	}
 }
