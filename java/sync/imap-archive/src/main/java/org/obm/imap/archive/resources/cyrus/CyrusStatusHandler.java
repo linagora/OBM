@@ -34,6 +34,7 @@ package org.obm.imap.archive.resources.cyrus;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -80,10 +81,10 @@ public class CyrusStatusHandler {
 	}
 	
 	@GET
-	public Response status() {
+	public Response status(@QueryParam("loginAtDomain") String loginAtDomain) {
 		try {
 			ObmSystemUser cyrusUser = userSystemDao.getByLogin(ObmSystemUser.CYRUS);
-			String cyrusAddress = locator.getServiceLocation("mail/imap_frontend", "loginAtDomain");
+			String cyrusAddress = locator.getServiceLocation("mail/imap_frontend", loginAtDomain);
 			if (canConnectToCyrus(cyrusUser, cyrusAddress)) {
 				return Response.ok().build();
 			}
