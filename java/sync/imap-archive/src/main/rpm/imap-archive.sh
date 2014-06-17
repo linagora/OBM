@@ -20,7 +20,7 @@ APP_JAR="$APP_HOME/imap-archive.jar"
 APP_RUNNABLE="$APP_HOME/imap-archive-start.sh"
 LOGDIR="/var/log/$NAME"
 LOGFILE="$LOGDIR/out.log"
-PIDFILE="/var/run/$NAME.pid"
+PIDFILE="/var/run/$NAME/$NAME.pid"
 
 # Source function library.
 . /etc/rc.d/init.d/functions
