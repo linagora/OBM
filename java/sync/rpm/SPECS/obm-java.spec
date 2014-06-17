@@ -134,6 +134,7 @@ cp -a obm-locator/obm-locator.centos.sh $RPM_BUILD_ROOT%{_initrddir}/obm-locator
 
 # obm-imap-archive
 
+mkdir -p $RPM_BUILD_ROOT/var/run/obm-imap-archive
 mkdir -p $RPM_BUILD_ROOT/usr/share/obm-imap-archive
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/obm-imap-archive
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/obm-imap-archive
@@ -185,6 +186,7 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %{_initrddir}/obm-imap-archive
 %attr(0775,imap-archive,root) %{_localstatedir}/log/obm-imap-archive
 %attr(0775,imap-archive,root) %{_localstatedir}/lib/obm-imap-archive
+%attr(0775,imap-archive,root) %{_localstatedir}/run/obm-imap-archive
 %attr(0775,root,root) %{_datarootdir}/obm-imap-archive
 %attr(0775,root,root) %{_initrddir}/obm-imap-archive
 
