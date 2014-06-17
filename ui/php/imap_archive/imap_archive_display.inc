@@ -78,7 +78,7 @@ function dis_imap_archive_form($backup, $params, $configuration) {
       <table>
         <tr>
           <th>$l_activating</th>
-          <td><input id='activation' name='activation' type='checkbox' value='1' ".(($enabled)?"checked='checked'":"")."/></td>
+          <td><input id='activation' name='cb_enabled' type='checkbox' value='1' ".(($enabled)?"checked='checked'":"")." onclick='enableConfiguration(this.checked);'/></td>
         </tr>
       </table>
     </fieldset>
@@ -185,18 +185,18 @@ function get_block_repeat_kind($repeatKind, $disabled) {
 
   $block_repeat_kind = "";
   $repeat_kinds = array("YEARLY" => $l_yearly, "MONTHLY" => $l_monthly, "WEEKLY" => $l_weekly, "DAILY" => $l_daily);
-  foreach($repeat_kinds as $repeat_kind) {
-    if($repeat_kind == $repeat_kinds[$repeatKind]) {
-      $block_repeat_kind .= "<option selected='selected' value='$repeat_kind'>$repeat_kind</option>";
+  foreach($repeat_kinds as $repeat_kind => $repeat_kind_value) {
+    if($repeat_kind == $repeatKind) {
+      $block_repeat_kind .= "<option selected='selected' value='$repeat_kind'>$repeat_kind_value</option>";
     } else {
-      $block_repeat_kind .= "<option value='$repeat_kind'>$repeat_kind</option>";
+      $block_repeat_kind .= "<option value='$repeat_kind'>$repeat_kind_value</option>";
     }
   }
   
   return
     "<th>$l_repeat_kind</th>
      <td>
-       <select type='text' name='sel_repeat_kind_cron' $disabled>
+       <select type='text' name='sel_repeat_kind_cron' $disabled class='configuration' onchange='redraw(this.options[this.selectedIndex].value);'>
          $block_repeat_kind
        </select>
      </td>";
@@ -206,9 +206,7 @@ function get_block_weekly($repeatKind, $dayOfWeek, $disabled) {
   global $l_weekly_repeat_kind;
   global $l_monday, $l_tuesday, $l_wednesday, $l_thursday, $l_friday, $l_saturday, $l_sunday;
 
-  if ($repeatKind != "WEEKLY") {
-    return "";
-  }
+  $visibility = ($repeatKind == 'WEEKLY') ? 'visible' : 'hidden';
 
   $block_weekly = "";
   $l_days = array(1 => $l_monday, 2 => $l_tuesday, 3 => $l_wednesday, 4 => $l_thursday, 5 => $l_friday, 6 => $l_saturday, 7 => $l_sunday);
@@ -221,9 +219,9 @@ function get_block_weekly($repeatKind, $dayOfWeek, $disabled) {
   }
   
   return 
-    "<th>$l_weekly_repeat_kind</th>
+    "<th class='class_weekly' style='visibility:$visibility'>$l_weekly_repeat_kind</th>
      <td>
-       <select type='text' name='sel_weekly' $disabled>
+       <select name='sel_weekly' class='configuration class_weekly' style='visibility:$visibility' $disabled>
          $block_weekly
        </select>
      </td>";
@@ -233,10 +231,9 @@ function get_block_monthly($repeatKind, $dayOfMonth, $disabled) {
   global $l_monthly_repeat_kind;
   global $l_last;
 
-  if ($repeatKind != "MONTHLY") {
-    return "";
-  }
-  
+  $visibility = ($repeatKind == 'MONTHLY') ? 'visible' : 'hidden';
+  $last_day_of_month = -1;
+
   $block_monthly = "";
   for ($i = 1; $i <= 27; $i++) {
     if ($i == $dayOfMonth) {
@@ -252,9 +249,9 @@ function get_block_monthly($repeatKind, $dayOfMonth, $disabled) {
   }
   
   return 
-    "<th>$l_monthly_repeat_kind</th>
+    "<th class='class_monthly' style='visibility:$visibility'>$l_monthly_repeat_kind</th>
      <td>
-       <select type='text' name='sel_monthly' $disabled>
+       <select type='text' name='sel_monthly' class='configuration class_monthly' style='visibility:$visibility' $disabled>
          $block_monthly
        </select>
      </td>";
@@ -263,10 +260,8 @@ function get_block_monthly($repeatKind, $dayOfMonth, $disabled) {
 function get_block_yearly($repeatKind, $dayOfYear, $disabled) {
   global $l_yearly_repeat_kind;
   
-  if ($repeatKind != "YEARLY") {
-    return "";
-  }
-  
+  $visibility = ($repeatKind == 'YEARLY') ? 'visible' : 'hidden';
+
   $january = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[0]; }, range(1, 31));
   $february = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[1]; }, range(1, 28));
   $march = array_map(function ($day) { global $l_monthsofyear; return $day." ".$l_monthsofyear[2]; }, range(1, 31));
@@ -289,9 +284,9 @@ function get_block_yearly($repeatKind, $dayOfYear, $disabled) {
     }
   }
   return 
-    "<th>$l_yearly_repeat_kind</th>
+    "<th class='class_yearly' style='visibility:$visibility'>$l_yearly_repeat_kind</th>
      <td>
-       <select type='text' name='sel_yearly' $disabled>
+       <select type='text' name='sel_yearly' class='configuration class_yearly' style='visibility:$visibility' $disabled>
          $block_yearly
        </select>
      </td>";
@@ -311,7 +306,7 @@ function get_block_hour($hour, $disabled) {
   return
     "<th>$l_hour</th>
      <td>
-       <select type='text' name='sel_hour' $disabled>
+       <select type='text' name='sel_hour' class='configuration' $disabled>
          $block_hour
        </select>
      </td>";
@@ -331,7 +326,7 @@ function get_block_minute($minute, $disabled) {
   return
     "<th>$l_minute</th>
      <td>
-       <select type='text' name='sel_minute' $disabled>
+       <select type='text' name='sel_minute' class='configuration' $disabled>
          $block_minute
        </select>
      </td>";

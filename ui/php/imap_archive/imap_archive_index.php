@@ -55,6 +55,7 @@ require_once('imap_archive_display.inc');
 require_once('imap_archive_query.inc');
 require_once("$obminclude/of/of_category.inc");
 require_once("$obminclude/of/of_right.inc");
+$extra_js_include[] = 'imap_archive.js';
 
 if ($action == 'index') $action = 'detailconsult';
 
