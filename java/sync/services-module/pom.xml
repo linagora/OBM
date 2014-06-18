@@ -50,7 +50,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>healthcheck-api</artifactId>
+			<artifactId>healthcheck-api-jersey-1</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
