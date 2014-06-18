@@ -95,10 +95,6 @@ stop() {
         echo
 }
 
-status() {
-        status -p $PIDFILE $NAME
-}
-
 case "$1" in
   start)
         start
@@ -107,7 +103,7 @@ case "$1" in
         stop
         ;;
   status)
-        status
+        status -p $PIDFILE $NAME
         ;;
   restart)
         stop
