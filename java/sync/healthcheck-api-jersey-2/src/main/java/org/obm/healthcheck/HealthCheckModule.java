@@ -31,6 +31,8 @@ package org.obm.healthcheck;
 
 import javax.inject.Inject;
 
+import org.glassfish.jersey.CommonProperties;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.obm.healthcheck.handlers.RootHandler;
@@ -51,7 +53,9 @@ public class HealthCheckModule extends ServletModule {
 	}
 	
 	public HealthCheckModule(ResourceConfig module) {
-		application = ResourceConfig.forApplication(module).register(RootHandler.class);
+		application = ResourceConfig.forApplication(module).register(RootHandler.class)
+				.property(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, true)
+				.register(JacksonFeature.class);
 	}
 	
 	@Override
