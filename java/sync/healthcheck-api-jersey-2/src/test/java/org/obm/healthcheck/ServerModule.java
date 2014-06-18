@@ -29,51 +29,34 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.jersey.injection;
+package org.obm.healthcheck;
 
-import java.lang.reflect.Type;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.DefaultServlet;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.ext.Provider;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.servlet.GuiceFilter;
 
-import org.glassfish.jersey.server.ResourceConfig;
+public class ServerModule extends AbstractModule {
 
-import com.google.inject.Injector;
-import com.google.inject.Key;
-
-public class JerseyResourceConfig extends ResourceConfig {
-
-	public JerseyResourceConfig(ResourceConfig application, Injector injector) {
-		super(application);
-
-		registerClasses(JerseyEventListener.class);
-		register(new JerseyDiBinder(injector));
-
-		register(injector);
+	@Override
+	protected void configure() {
 	}
 	
-	public JerseyResourceConfig(Injector injector) {
-		this(new ResourceConfig(), injector);
+	@Provides
+	@Singleton
+	protected Server createServer() {
+		Server server = new Server(0);
+		Context root = new Context(server, "/", Context.SESSIONS);
+		
+		root.addFilter(GuiceFilter.class, "/*", 0);
+		root.addServlet(DefaultServlet.class, "/*");
+		
+		return server;
 	}
 
-	private void register(Injector injector) {
-		while (injector != null) {
-			for (Key<?> key : injector.getBindings().keySet()) {
-				Type type = key.getTypeLiteral().getType();
-				if (type instanceof Class) {
-					Class<?> c = (Class<?>)type;
-					if (c.isAnnotationPresent(Path.class)) {
-						register(c);
-					} else if (c.isAnnotationPresent(Provider.class)) {
-						register(c);
-					} else if (Feature.class.isAssignableFrom(c)) {
-						register(c);
-					}
-				}
-			}
-			injector = injector.getParent();
-		}
-	}
-
+	
 }
