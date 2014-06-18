@@ -43,4 +43,6 @@ public interface DomainConfigurationDao {
 	DomainConfiguration getDomainConfiguration(ObmDomain domain) throws DaoException;
 	
 	void updateDomainConfiguration(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException;
+	
+	DomainConfiguration createDomainConfiguration(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException;
 }

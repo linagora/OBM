@@ -37,6 +37,7 @@ import java.util.UUID;
 
 import org.joda.time.LocalTime;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.domain.dao.DomainDao;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.beans.DayOfMonth;
@@ -46,17 +47,21 @@ import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
 public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 
 	private final DatabaseConnectionProvider dbcp;
+	private final DomainDao domainDao;
+	private final ObmHelper obmHelper;
 	private static final String TABLE = "mail_archive";
 	private static final String FIELDS = 
 			"mail_archive_domain_id, " +
@@ -69,8 +74,10 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			"mail_archive_minute ";
 	
 	@Inject
-	@VisibleForTesting DomainConfigurationJdbcImpl(DatabaseConnectionProvider dbcp) {
+	@VisibleForTesting DomainConfigurationJdbcImpl(DatabaseConnectionProvider dbcp, DomainDao domainDao, ObmHelper obmHelper) {
 		this.dbcp = dbcp;
+		this.domainDao = domainDao;
+		this.obmHelper = obmHelper;
 	}
 
 	@Override
@@ -146,6 +153,41 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(connection, ps, null);
+		}
+	}
+
+	@Override
+	public DomainConfiguration createDomainConfiguration(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException {
+		Connection connection = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ObmDomain domain = domainDao.findDomainByUuid(ObmDomainUuid.of(domainConfiguration.getDomainId()));
+			
+			connection = dbcp.getConnection();
+			ps = connection.prepareStatement(
+					"INSERT INTO " + TABLE +
+					" (mail_archive_domain_id, mail_archive_activated, mail_archive_repeat_kind, " + 
+					"mail_archive_day_of_week, mail_archive_day_of_month, mail_archive_day_of_year, mail_archive_hour, mail_archive_minute)" +
+					" VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+			int idx = 1;
+			ps.setInt(idx++, domain.getId());
+			ps.setBoolean(idx++, domainConfiguration.isEnabled());
+			ps.setString(idx++, domainConfiguration.getRepeatKind().name());
+			ps.setInt(idx++, domainConfiguration.getDayOfWeek().getSpecificationValue());
+			ps.setInt(idx++, domainConfiguration.getDayOfMonth().getDayIndex());
+			ps.setInt(idx++, domainConfiguration.getDayOfYear().getDayOfYear());
+			ps.setInt(idx++, domainConfiguration.getHour());
+			ps.setInt(idx++, domainConfiguration.getMinute());
+
+			ps.executeUpdate();
+			
+			return getDomainConfiguration(domain);
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			JDBCUtils.cleanup(connection, ps, rs);
 		}
 	}
 }

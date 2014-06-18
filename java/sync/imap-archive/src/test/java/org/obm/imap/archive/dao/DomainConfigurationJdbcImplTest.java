@@ -53,6 +53,7 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import pl.wkr.fluentrule.api.FluentExpectedException;
@@ -95,6 +96,10 @@ public class DomainConfigurationJdbcImplTest {
 						Operations.insertInto("domain")
 						.columns("domain_id", "domain_name", "domain_label", "domain_uuid")
 						.values(654, "my_domain_name", "my_domain.local", "a6af9131-60b6-4e3a-a9f3-df5b43a89309")
+						.build(),
+						Operations.insertInto("domain")
+						.columns("domain_id", "domain_name", "domain_label", "domain_uuid")
+						.values(321, "my_second_domain", "my_second_domain.local", "1383b12c-6d79-40c7-acf9-c79bcc673fff")
 						.build(),
 						Operations.insertInto("mail_archive")
 						.columns("mail_archive_domain_id", 
@@ -142,7 +147,7 @@ public class DomainConfigurationJdbcImplTest {
 	}
 	
 	@Test
-	public void updateDomainConfigurationShouldThrowsExceptionWhenDomainNotFound() throws Exception {
+	public void updateDomainConfigurationShouldThrowExceptionWhenDomainNotFound() throws Exception {
 		expectedException.expect(DomainNotFoundException.class).hasMessage("844db7a6-6788-47a4-9f04-f5ed9f007a04");
 		
 		domainConfigurationJdbcImpl.updateDomainConfiguration(DomainConfiguration.DEFAULT_VALUES_BUILDER
@@ -172,6 +177,51 @@ public class DomainConfigurationJdbcImplTest {
 				.uuid(ObmDomainUuid.of(uuid))
 				.build();
 		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.getDomainConfiguration(domain);
+		assertThat(domainConfiguration.getDomainId()).isEqualTo(uuid);
+		assertThat(domainConfiguration.isEnabled()).isEqualTo(expectedDomainConfiguration.isEnabled());
+		assertThat(domainConfiguration.getRepeatKind()).isEqualTo(expectedDomainConfiguration.getRepeatKind());
+		assertThat(domainConfiguration.getDayOfWeek()).isEqualTo(expectedDomainConfiguration.getDayOfWeek());
+		assertThat(domainConfiguration.getDayOfMonth()).isEqualTo(expectedDomainConfiguration.getDayOfMonth());
+		assertThat(domainConfiguration.getDayOfYear()).isEqualTo(expectedDomainConfiguration.getDayOfYear());
+		assertThat(domainConfiguration.getHour()).isEqualTo(expectedDomainConfiguration.getHour());
+		assertThat(domainConfiguration.getMinute()).isEqualTo(expectedDomainConfiguration.getMinute());
+	}
+	
+	@Test
+	public void createDomainConfigurationShouldThrowExceptionWhenDomainNotFound() throws Exception {
+		expectedException.expect(DomainNotFoundException.class).hasMessage("The domain with the uuid 844db7a6-6788-47a4-9f04-f5ed9f007a04 was not found");
+		
+		domainConfigurationJdbcImpl.createDomainConfiguration(DomainConfiguration.DEFAULT_VALUES_BUILDER
+				.domainId(UUID.fromString("844db7a6-6788-47a4-9f04-f5ed9f007a04"))
+				.build());
+	}
+	
+	@Test
+	public void createDomainConfigurationShouldThrowExceptionWhenDomainConfigurationAlreadyExists() throws Exception {
+		expectedException.expect(DaoException.class);
+		
+		domainConfigurationJdbcImpl.createDomainConfiguration(DomainConfiguration.DEFAULT_VALUES_BUILDER
+				.domainId(UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309"))
+				.build());
+	}
+	
+	@Test
+	public void createDomainConfigurationShouldCreateWhenDomainFound() throws Exception {
+		UUID uuid = UUID.fromString("1383b12c-6d79-40c7-acf9-c79bcc673fff");
+		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
+				.domainId(uuid)
+				.enabled(false)
+				.recurrence(ArchiveRecurrence.builder()
+						.repeat(RepeatKind.YEARLY)
+						.dayOfMonth(DayOfMonth.of(1))
+						.dayOfWeek(DayOfWeek.MONDAY)
+						.dayOfYear(DayOfYear.of(100))
+						.build())
+				.time(LocalTime.parse("13:23"))
+				.build();
+		
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.createDomainConfiguration(expectedDomainConfiguration);
+		
 		assertThat(domainConfiguration.getDomainId()).isEqualTo(uuid);
 		assertThat(domainConfiguration.isEnabled()).isEqualTo(expectedDomainConfiguration.isEnabled());
 		assertThat(domainConfiguration.getRepeatKind()).isEqualTo(expectedDomainConfiguration.getRepeatKind());
