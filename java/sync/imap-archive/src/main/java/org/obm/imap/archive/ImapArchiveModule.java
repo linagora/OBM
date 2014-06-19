@@ -51,6 +51,7 @@ import org.obm.imap.archive.resources.DomainBasedSubResource;
 import org.obm.imap.archive.resources.ObmDomainFactory;
 import org.obm.imap.archive.resources.RootHandler;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
+import org.obm.imap.archive.service.SchedulingDatesService;
 import org.obm.imap.archive.services.DomainConfigurationService;
 import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
@@ -103,6 +104,7 @@ public class ImapArchiveModule extends AbstractModule {
 	
 	private void bindImapArchiveServices() {
 		bind(DomainConfigurationService.class);
+		bind(SchedulingDatesService.class);
 	}
 	
 	public static class ImapArchiveServletModule extends ServletModule {

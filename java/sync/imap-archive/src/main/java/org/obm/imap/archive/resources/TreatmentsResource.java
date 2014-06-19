@@ -29,26 +29,40 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.beans;
+package org.obm.imap.archive.resources;
 
-import org.joda.time.LocalTime;
-import org.junit.Test;
-import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-public class BeansTest {
+import org.joda.time.DateTime;
+import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.SchedulingDates;
+import org.obm.imap.archive.dto.DomainConfigurationDto;
+import org.obm.imap.archive.service.SchedulingDatesService;
 
-	@Test
-	public void beanShouldRespectBeanContract() {
-		EqualsVerifierBuilder.builder()
-			.prefabValue(LocalTime.class, LocalTime.parse("23:32"), LocalTime.parse("12:22"))
-			.equalsVerifiers(
-				ArchiveRecurrence.class,
-				DayOfMonth.class,
-				DayOfYear.class,
-				DomainConfiguration.class,
-				PersistedResult.class,
-				SchedulingConfiguration.class,
-				SchedulingDates.class
-			).verify();
-	}	
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public class TreatmentsResource {
+	
+	@Inject
+	private SchedulingDatesService schedulingDateService;
+	
+	@POST
+	@Path("next")
+	public Response calculateNextScheduledDate(DomainConfigurationDto domainConfigurationDto) {
+		DomainConfiguration domainConfiguration = DomainConfiguration.from(domainConfigurationDto);
+		if (!domainConfiguration.isEnabled()) {
+			return Response.noContent().build();
+		}
+		
+		DateTime nextTreatmentDate = schedulingDateService.nextTreatmentDate(domainConfiguration.getSchedulingConfiguration());
+		return Response.ok(SchedulingDates.builder()
+				.nextTreatmentDate(nextTreatmentDate)
+				.build()).build();
+	}
 }

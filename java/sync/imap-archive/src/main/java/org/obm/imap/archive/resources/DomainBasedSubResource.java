@@ -35,7 +35,12 @@ import javax.ws.rs.Path;
 public class DomainBasedSubResource {
 
 	@Path("{domain}/configuration")
-	public Class<ConfigurationResource> users() {
+	public Class<ConfigurationResource> configuration() {
 		return ConfigurationResource.class;
+	}
+
+	@Path("{domain}/treatments")
+	public Class<TreatmentsResource> treatments() {
+		return TreatmentsResource.class;
 	}
 }

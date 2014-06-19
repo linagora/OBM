@@ -31,7 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive;
 
+import java.util.Date;
+
 import org.apache.http.client.HttpClient;
+import org.joda.time.DateTime;
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.DomainConfiguration;
@@ -45,6 +48,7 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.impl.SyncClientAssert;
 import org.obm.sync.client.login.LoginClient;
+import org.obm.sync.date.DateProvider;
 import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
 
@@ -54,6 +58,8 @@ import com.google.inject.util.Modules;
 
 public class TestImapArchiveModules {
 	
+	public static final DateTime LOCAL_DATE_TIME = new DateTime(2014, 6, 18, 0, 0);
+
 	public static class Simple extends AbstractModule {
 	
 		@Override
@@ -63,7 +69,8 @@ public class TestImapArchiveModules {
 				new DaoTestModule(),
 				new LocalLocatorModule(),
 				new ObmSyncModule(),
-				new TransactionalModule()
+				new TransactionalModule(),
+				new DateProviderModule()
 			));
 		}
 	}
@@ -134,6 +141,20 @@ public class TestImapArchiveModules {
 		@Override
 		protected void configure() {
 			bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(new Configuration.Transaction()));
+		}
+	}
+	
+	public static class DateProviderModule extends AbstractModule {
+
+		@Override
+		protected void configure() {
+			bind(DateProvider.class).toInstance(new DateProvider() {
+				
+				@Override
+				public Date getDate() {
+					return LOCAL_DATE_TIME.toDate();
+				}
+			});
 		}
 	}
 }
