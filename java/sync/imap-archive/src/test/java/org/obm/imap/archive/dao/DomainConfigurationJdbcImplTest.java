@@ -53,6 +53,7 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
@@ -161,13 +162,15 @@ public class DomainConfigurationJdbcImplTest {
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
 				.domainId(uuid)
 				.enabled(false)
-				.recurrence(ArchiveRecurrence.builder()
-						.repeat(RepeatKind.YEARLY)
-						.dayOfMonth(DayOfMonth.of(1))
-						.dayOfWeek(DayOfWeek.MONDAY)
-						.dayOfYear(DayOfYear.of(100))
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+							.repeat(RepeatKind.YEARLY)
+							.dayOfMonth(DayOfMonth.of(1))
+							.dayOfWeek(DayOfWeek.MONDAY)
+							.dayOfYear(DayOfYear.of(100))
+							.build())
+						.time(LocalTime.parse("13:23"))
 						.build())
-				.time(LocalTime.parse("13:23"))
 				.build();
 		
 		domainConfigurationJdbcImpl.updateDomainConfiguration(expectedDomainConfiguration);
@@ -211,13 +214,15 @@ public class DomainConfigurationJdbcImplTest {
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
 				.domainId(uuid)
 				.enabled(false)
-				.recurrence(ArchiveRecurrence.builder()
-						.repeat(RepeatKind.YEARLY)
-						.dayOfMonth(DayOfMonth.of(1))
-						.dayOfWeek(DayOfWeek.MONDAY)
-						.dayOfYear(DayOfYear.of(100))
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+							.repeat(RepeatKind.YEARLY)
+							.dayOfMonth(DayOfMonth.of(1))
+							.dayOfWeek(DayOfWeek.MONDAY)
+							.dayOfYear(DayOfYear.of(100))
+							.build())
+						.time(LocalTime.parse("13:23"))
 						.build())
-				.time(LocalTime.parse("13:23"))
 				.build();
 		
 		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.createDomainConfiguration(expectedDomainConfiguration);

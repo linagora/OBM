@@ -44,6 +44,7 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.push.utils.JDBCUtils;
@@ -114,13 +115,15 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 		return DomainConfiguration.builder()
 				.domainId(domainUUId)
 				.enabled(rs.getBoolean("mail_archive_activated"))
-				.recurrence(ArchiveRecurrence.builder()
-						.dayOfMonth(DayOfMonth.of(rs.getInt("mail_archive_day_of_month")))
-						.dayOfWeek(DayOfWeek.fromSpecificationValue(rs.getInt("mail_archive_day_of_week")))
-						.dayOfYear(DayOfYear.of(rs.getInt("mail_archive_day_of_year")))
-						.repeat(RepeatKind.valueOf(rs.getString("mail_archive_repeat_kind")))
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+							.dayOfMonth(DayOfMonth.of(rs.getInt("mail_archive_day_of_month")))
+							.dayOfWeek(DayOfWeek.fromSpecificationValue(rs.getInt("mail_archive_day_of_week")))
+							.dayOfYear(DayOfYear.of(rs.getInt("mail_archive_day_of_year")))
+							.repeat(RepeatKind.valueOf(rs.getString("mail_archive_repeat_kind")))
+							.build())
+						.time(new LocalTime(rs.getInt("mail_archive_hour"), rs.getInt("mail_archive_minute")))
 						.build())
-				.time(new LocalTime(rs.getInt("mail_archive_hour"), rs.getInt("mail_archive_minute")))
 				.build();
 	}
 

@@ -58,6 +58,8 @@ import org.obm.locator.store.LocatorService;
 import org.obm.server.EmbeddedServerModule;
 import org.obm.server.ServerConfiguration;
 import org.obm.sync.XTrustProvider;
+import org.obm.sync.date.DateProvider;
+import org.obm.utils.ObmHelper;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -91,6 +93,7 @@ public class ImapArchiveModule extends AbstractModule {
 		install(new LoggerModule());
 		install(new DaoModule());
 		
+		bind(DateProvider.class).to(ObmHelper.class);
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);

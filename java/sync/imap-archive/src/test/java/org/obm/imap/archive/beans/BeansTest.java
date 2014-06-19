@@ -46,7 +46,8 @@ public class BeansTest {
 				DayOfMonth.class,
 				DayOfYear.class,
 				DomainConfiguration.class,
-				PersistedResult.class
+				PersistedResult.class,
+				SchedulingConfiguration.class
 			).verify();
 	}	
 }

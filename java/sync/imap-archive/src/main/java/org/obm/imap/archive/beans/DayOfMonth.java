@@ -31,21 +31,22 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.beans;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 public class DayOfMonth {
 
 
 	private static final int LAST_ALWAYS_VALID_DAY = 28;
+	private static final int LAST_DAY_OF_MONTH = -1;
 
 	public static DayOfMonth of(int dayIndex) {
-		Preconditions.checkArgument(dayIndex == -1 || (dayIndex > 0 && dayIndex <= LAST_ALWAYS_VALID_DAY));
+		Preconditions.checkArgument(dayIndex == LAST_DAY_OF_MONTH || (dayIndex > 0 && dayIndex <= LAST_ALWAYS_VALID_DAY));
 		return new DayOfMonth(dayIndex);
 	}
 	
 	public static DayOfMonth last() {
-		return DayOfMonth.of(-1);
+		return DayOfMonth.of(LAST_DAY_OF_MONTH);
 	}
 	
 	private final int dayIndex;
@@ -56,6 +57,10 @@ public class DayOfMonth {
 	
 	public int getDayIndex() {
 		return dayIndex;
+	}
+	
+	public boolean isLastDayOfMonth() {
+		return dayIndex == LAST_DAY_OF_MONTH;
 	}
 
 	@Override

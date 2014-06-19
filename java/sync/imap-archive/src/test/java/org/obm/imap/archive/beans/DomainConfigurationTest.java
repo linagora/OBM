@@ -59,24 +59,8 @@ public class DomainConfigurationTest {
 	}
 
 	@Test(expected=IllegalStateException.class)
-	public void builderShouldThrowWhenEnabledAndTimeIsNotProvided() {
+	public void builderShouldThrowWhenEnabledAndSchedulingConfigurationIsNotProvided() {
 		DomainConfiguration.builder().enabled(true).domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
-	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void builderShouldThrowWhenTimeHasSeconds() {
-		DomainConfiguration.builder().time(LocalTime.parse("12:22:23")).domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
-	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void builderShouldThrowWhenTimeHasMillis() {
-		DomainConfiguration.builder().time(LocalTime.parse("12:22:00.552")).domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
-	}
-
-	
-	@Test(expected=IllegalStateException.class)
-	public void builderShouldThrowWhenEnabledAndRepeatKindIsNotProvided() {
-		DomainConfiguration.builder().time(LocalTime.parse("10:22")).domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
 	}
 	
 	@Test
@@ -85,8 +69,10 @@ public class DomainConfigurationTest {
 				DomainConfiguration.builder()
 					.domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"))
 					.enabled(true)
-					.time(LocalTime.parse("13:23"))
-					.recurrence(ArchiveRecurrence.daily())
+					.schedulingConfiguration(SchedulingConfiguration.builder()
+							.recurrence(ArchiveRecurrence.daily())
+							.time(LocalTime.parse("13:23"))
+							.build())
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
 		assertThat(configuration.isEnabled()).isTrue();
@@ -112,8 +98,10 @@ public class DomainConfigurationTest {
 				DomainConfiguration.builder()
 					.domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"))
 					.enabled(false)
-					.time(LocalTime.parse("13:23"))
-					.recurrence(ArchiveRecurrence.daily())
+					.schedulingConfiguration(SchedulingConfiguration.builder()
+							.recurrence(ArchiveRecurrence.daily())
+							.time(LocalTime.parse("13:23"))
+							.build())
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
 		assertThat(configuration.isEnabled()).isFalse();
@@ -125,23 +113,26 @@ public class DomainConfigurationTest {
 	@Test
 	public void defaultValues() {
 		UUID domainId = UUID.fromString("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
-		ArchiveRecurrence archiveRecurrence = ArchiveRecurrence.builder()
-			.dayOfMonth(DayOfMonth.last())
-			.dayOfWeek(DayOfWeek.MONDAY)
-			.dayOfYear(DayOfYear.of(1))
-			.repeat(RepeatKind.MONTHLY)
-			.build();
+		SchedulingConfiguration schedulingConfiguration = SchedulingConfiguration.builder()
+				.recurrence(ArchiveRecurrence.builder()
+						.dayOfMonth(DayOfMonth.last())
+						.dayOfWeek(DayOfWeek.MONDAY)
+						.dayOfYear(DayOfYear.of(1))
+						.repeat(RepeatKind.MONTHLY)
+						.build())
+				.time(LocalTime.parse("0:0"))
+				.build();
 		
 		DomainConfiguration configuration = DomainConfiguration.DEFAULT_VALUES_BUILDER.domainId(domainId).build();
 		assertThat(configuration.isEnabled()).isFalse();
-		assertThat(configuration.getRepeatKind()).isEqualTo(archiveRecurrence.getRepeatKind());
-		assertThat(configuration.getDayOfMonth()).isEqualTo(archiveRecurrence.getDayOfMonth());
-		assertThat(configuration.getDayOfWeek()).isEqualTo(archiveRecurrence.getDayOfWeek());
-		assertThat(configuration.getDayOfYear()).isEqualTo(archiveRecurrence.getDayOfYear());
+		assertThat(configuration.getRepeatKind()).isEqualTo(schedulingConfiguration.getRepeatKind());
+		assertThat(configuration.getDayOfMonth()).isEqualTo(schedulingConfiguration.getDayOfMonth());
+		assertThat(configuration.getDayOfWeek()).isEqualTo(schedulingConfiguration.getDayOfWeek());
+		assertThat(configuration.getDayOfYear()).isEqualTo(schedulingConfiguration.getDayOfYear());
 		assertThat(configuration.getDomainId()).isEqualTo(domainId);
 		assertThat(configuration.getHour()).isEqualTo(0);
 		assertThat(configuration.getMinute()).isEqualTo(0);
-		assertThat(configuration.getRecurrence()).isEqualTo(archiveRecurrence);
+		assertThat(configuration.getSchedulingConfiguration()).isEqualTo(schedulingConfiguration);
 	}
 	
 	@Test

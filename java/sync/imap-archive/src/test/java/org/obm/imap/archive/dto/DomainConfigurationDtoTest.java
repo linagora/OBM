@@ -38,11 +38,12 @@ import java.util.UUID;
 import org.joda.time.LocalTime;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
+import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
+import org.obm.imap.archive.beans.SchedulingConfiguration;
 
 
 public class DomainConfigurationDtoTest {
@@ -53,12 +54,14 @@ public class DomainConfigurationDtoTest {
 				DomainConfiguration.builder()
 					.domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"))
 					.enabled(false)
-					.time(LocalTime.parse("13:23"))
-					.recurrence(ArchiveRecurrence.builder()
-							.repeat(RepeatKind.DAILY)
-							.dayOfMonth(DayOfMonth.of(12))
-							.dayOfWeek(DayOfWeek.FRIDAY)
-							.dayOfYear(DayOfYear.of(234))
+					.schedulingConfiguration(SchedulingConfiguration.builder()
+							.recurrence(ArchiveRecurrence.builder()
+								.repeat(RepeatKind.DAILY)
+								.dayOfMonth(DayOfMonth.of(12))
+								.dayOfWeek(DayOfWeek.FRIDAY)
+								.dayOfYear(DayOfYear.of(234))
+								.build())
+							.time(LocalTime.parse("13:23"))
 							.build())
 					.build();
 		DomainConfigurationDto dto = DomainConfigurationDto.from(configuration);

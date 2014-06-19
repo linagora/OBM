@@ -33,48 +33,57 @@ package org.obm.imap.archive.beans;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.joda.time.LocalTime;
 import org.junit.Test;
+import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 
 
-public class DayOfMonthTest {
+public class SchedulingConfigurationTest {
 
-	@Test
-	public void lastShouldHaveMinusOneIndex() {
-		DayOfMonth last = DayOfMonth.last();
-		assertThat(last.getDayIndex()).isEqualTo(-1);
-	}
-	
-	@Test
-	public void dayOfMonthShouldAcceptMinus1Value() {
-		DayOfMonth last = DayOfMonth.of(-1);
-		assertThat(last.getDayIndex()).isEqualTo(-1);
-	}
-	
 	@Test(expected=IllegalArgumentException.class)
-	public void dayOfMonthShouldNotAcceptNegativeValueSmallerThan1() {
-		DayOfMonth.of(-2);
+	public void builderShouldThrowWhenTimeHasSeconds() {
+		SchedulingConfiguration.builder().time(LocalTime.parse("12:22:23")).build();
 	}
-	
+
 	@Test(expected=IllegalArgumentException.class)
-	public void dayOfMonthShouldNotAcceptValueGreaterThan28() {
-		DayOfMonth.of(29);
+	public void builderShouldThrowWhenTimeHasMillis() {
+		SchedulingConfiguration.builder().time(LocalTime.parse("12:22:00.552")).build();
+	}
+
+	
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThrowWhenRepeatKindIsNotProvided() {
+		SchedulingConfiguration.builder().time(LocalTime.parse("10:22")).build();
 	}
 	
 	@Test
-	public void dayOfMonthShouldAcceptValueSmallerOrEqualTo28() {
-		DayOfMonth last = DayOfMonth.of(28);
-		assertThat(last.getDayIndex()).isEqualTo(28);
+	public void builderShouldBuildConfigurationWhenRequiredFieldsAreProvided() {
+		SchedulingConfiguration configuration = 
+				SchedulingConfiguration.builder()
+					.time(LocalTime.parse("13:23"))
+					.recurrence(ArchiveRecurrence.daily())
+					.build();
+		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
+		assertThat(configuration.getHour()).isEqualTo(13);
+		assertThat(configuration.getMinute()).isEqualTo(23);
 	}
 	
 	@Test
-	public void isLastDayOfMonthShouldReturnTrueWhenLast() {
-		DayOfMonth last = DayOfMonth.of(-1);
-		assertThat(last.isLastDayOfMonth()).isTrue();
-	}
-	
-	@Test
-	public void isLastDayOfMonthShouldReturnFalseWhenNotLast() {
-		DayOfMonth last = DayOfMonth.of(1);
-		assertThat(last.isLastDayOfMonth()).isFalse();
+	public void defaultValues() {
+		ArchiveRecurrence archiveRecurrence = ArchiveRecurrence.builder()
+			.dayOfMonth(DayOfMonth.last())
+			.dayOfWeek(DayOfWeek.MONDAY)
+			.dayOfYear(DayOfYear.of(1))
+			.repeat(RepeatKind.MONTHLY)
+			.build();
+		
+		SchedulingConfiguration configuration = SchedulingConfiguration.DEFAULT_VALUES_BUILDER;
+		assertThat(configuration.getRepeatKind()).isEqualTo(archiveRecurrence.getRepeatKind());
+		assertThat(configuration.getDayOfMonth()).isEqualTo(archiveRecurrence.getDayOfMonth());
+		assertThat(configuration.getDayOfWeek()).isEqualTo(archiveRecurrence.getDayOfWeek());
+		assertThat(configuration.getDayOfYear()).isEqualTo(archiveRecurrence.getDayOfYear());
+		assertThat(configuration.getHour()).isEqualTo(0);
+		assertThat(configuration.getMinute()).isEqualTo(0);
+		assertThat(configuration.getRecurrence()).isEqualTo(archiveRecurrence);
 	}
 }

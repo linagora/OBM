@@ -44,26 +44,22 @@ public class DomainConfiguration {
 	
 	public static final DomainConfiguration.Builder DEFAULT_VALUES_BUILDER = 
 		builder()
-			.time(LocalTime.MIDNIGHT)
 			.enabled(false)
-			.recurrence(ArchiveRecurrence.builder()
-					.dayOfMonth(DayOfMonth.last())
-					.dayOfWeek(DayOfWeek.MONDAY)
-					.dayOfYear(DayOfYear.of(1))
-					.repeat(RepeatKind.MONTHLY)
-					.build());
+			.schedulingConfiguration(SchedulingConfiguration.DEFAULT_VALUES_BUILDER);
 
 	public static DomainConfiguration from(DomainConfigurationDto configuration) {
 		return DomainConfiguration.builder()
 				.domainId(configuration.domainId)
 				.enabled(configuration.enabled)
-				.recurrence(ArchiveRecurrence.builder()
-						.repeat(RepeatKind.valueOf(configuration.repeatKind))
-						.dayOfWeek(DayOfWeek.fromSpecificationValue(configuration.dayOfWeek))
-						.dayOfMonth(DayOfMonth.of(configuration.dayOfMonth))
-						.dayOfYear(DayOfYear.of(configuration.dayOfYear))
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+							.repeat(RepeatKind.valueOf(configuration.repeatKind))
+							.dayOfWeek(DayOfWeek.fromSpecificationValue(configuration.dayOfWeek))
+							.dayOfMonth(DayOfMonth.of(configuration.dayOfMonth))
+							.dayOfYear(DayOfYear.of(configuration.dayOfYear))
+							.build())
+						.time(LocalTime.parse(configuration.hour + ":" + configuration.minute))
 						.build())
-				.time(LocalTime.parse(configuration.hour + ":" + configuration.minute))
 				.build();
 	}
 	
@@ -75,8 +71,7 @@ public class DomainConfiguration {
 		
 		private UUID domainId;
 		private Boolean enabled;
-		private ArchiveRecurrence recurrence;
-		private LocalTime time;
+		private SchedulingConfiguration schedulingConfiguration;
 		
 		private Builder() {
 		}
@@ -86,20 +81,14 @@ public class DomainConfiguration {
 			this.domainId = domainId;
 			return this;
 		}
-		
-		public Builder time(LocalTime time) {
-			Preconditions.checkArgument(time.getMillisOfSecond() == 0 && time.getSecondOfMinute() == 0);
-			this.time = time;
-			return this;
-		}
 
 		public Builder enabled(boolean enabled) {
 			this.enabled = enabled;
 			return this;
 		}
 
-		public Builder recurrence(ArchiveRecurrence recurrence) {
-			this.recurrence = recurrence;
+		public Builder schedulingConfiguration(SchedulingConfiguration schedulingConfiguration) {
+			this.schedulingConfiguration = schedulingConfiguration;
 			return this;
 		}
 		
@@ -107,23 +96,20 @@ public class DomainConfiguration {
 			Preconditions.checkState(domainId != null);
 			Preconditions.checkState(enabled != null);
 			if (enabled) {
-				Preconditions.checkState(time != null);
-				Preconditions.checkState(recurrence != null);
+				Preconditions.checkState(schedulingConfiguration != null);
 			}
-			return new DomainConfiguration(domainId, enabled, recurrence, time);
+			return new DomainConfiguration(domainId, enabled, schedulingConfiguration);
 		}
 	}
 	
 	private final UUID domainId;
 	private final boolean enabled;
-	private final ArchiveRecurrence recurrence;
-	private final LocalTime time;
+	private final SchedulingConfiguration schedulingConfiguration;
 
-	private DomainConfiguration(UUID domainId, boolean enabled, ArchiveRecurrence recurrence, LocalTime time) {
+	private DomainConfiguration(UUID domainId, boolean enabled, SchedulingConfiguration schedulingConfiguration) {
 		this.domainId = domainId;
-		this.time = time;
 		this.enabled = enabled;
-		this.recurrence = recurrence;
+		this.schedulingConfiguration = schedulingConfiguration;
 	}
 	
 	public UUID getDomainId() {
@@ -135,40 +121,44 @@ public class DomainConfiguration {
 	}
 	
 	public RepeatKind getRepeatKind() {
-		return recurrence != null ? recurrence.getRepeatKind() : null;
+		return schedulingConfiguration != null ? schedulingConfiguration.getRepeatKind() : null;
 	}
 	
 	public DayOfWeek getDayOfWeek() {
-		return recurrence != null ? recurrence.getDayOfWeek() : null;
+		return schedulingConfiguration != null ? schedulingConfiguration.getDayOfWeek() : null;
 	}
 	
 	public DayOfMonth getDayOfMonth() {
-		return recurrence != null ? recurrence.getDayOfMonth() : null;
+		return schedulingConfiguration != null ? schedulingConfiguration.getDayOfMonth() : null;
+	}
+	
+	public Boolean isLastDayOfMonth() {
+		return schedulingConfiguration != null ? schedulingConfiguration.isLastDayOfMonth() : null;
 	}
 	
 	public DayOfYear getDayOfYear() {
-		return recurrence != null ? recurrence.getDayOfYear() : null;
+		return schedulingConfiguration != null ? schedulingConfiguration.getDayOfYear() : null;
 	}
 	
-	public ArchiveRecurrence getRecurrence() {
-		return recurrence;
+	public SchedulingConfiguration getSchedulingConfiguration() {
+		return schedulingConfiguration;
 	}
 	
 	public LocalTime getTime() {
-		return time;
+		return schedulingConfiguration != null ? schedulingConfiguration.getTime() : null;
 	}
 	
 	public Integer getHour() {
-		return time != null ? time.getHourOfDay() : null;
+		return schedulingConfiguration != null ? schedulingConfiguration.getHour() : null;
 	}
 	
 	public Integer getMinute() {
-		return time != null ? time.getMinuteOfHour() : null;
+		return schedulingConfiguration != null ? schedulingConfiguration.getMinute() : null;
 	}
 
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(domainId, enabled, recurrence, time);
+		return Objects.hashCode(domainId, enabled, schedulingConfiguration);
 	}
 	
 	@Override
@@ -177,8 +167,7 @@ public class DomainConfiguration {
 			DomainConfiguration that = (DomainConfiguration) object;
 			return Objects.equal(this.domainId, that.domainId)
 				&& Objects.equal(this.enabled, that.enabled)
-				&& Objects.equal(this.recurrence, that.recurrence)
-				&& Objects.equal(this.time, that.time);
+				&& Objects.equal(this.schedulingConfiguration, that.schedulingConfiguration);
 		}
 		return false;
 	}
@@ -188,8 +177,7 @@ public class DomainConfiguration {
 		return Objects.toStringHelper(this)
 			.add("domainId", domainId)
 			.add("enabled", enabled)
-			.add("recurrence", recurrence)
-			.add("time", time)
+			.add("recurrence", schedulingConfiguration)
 			.toString();
 	}
 }
