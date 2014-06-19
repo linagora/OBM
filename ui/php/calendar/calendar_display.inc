@@ -3451,8 +3451,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
         $resource_comment = phpStringToJsString(str_replace("\n\r", ', ', $comment));
         if (OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) {
           $$state = "checked=\"checked\" disabled";
-          $url= "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
-    
          if($resource_comment != ''){
           $comment_style = 'text-align:justify;';
           $resource_comment_display = $resource_comment." <a class=\"editcomment\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.commentedDecisionPopup.compute($r_id, $id,'ACCEPTED', '$state', 'resource', '$resource_comment', '$escaped_title', 'detailconsult', 'value')\" />";
@@ -3463,8 +3461,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
            <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($r_id, $id , '$GLOBALS[l_add_comment]...', 'resource', true);\" title=\"$l_add\"></a>";
          }
           $escaped_title = phpStringToJsString(str_replace("\n\r", ', ', $title));
-
-          $url= "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
           $label = $entity['label'];
           $state = $entity['state'];
           $ACCEPTED = '';
@@ -3476,9 +3472,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
           <tr>
           <td>$label $property[$r_id]</td>
           <td>
-          <input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"ACCEPTED\" onclick=\"window.location='$url&rd_decision_event=ACCEPTED'\" /> $l_accepted
-          <input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$url&rd_decision_event=NEEDS-ACTION'\" /> $l_needs_action
-          <input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"DECLINED\" onclick=\"window.location='$url&rd_decision_event=DECLINED'\" /> $l_declined
+          <input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"ACCEPTED\" onclick=\"Obm.decisionCBHandler.call(this);\" data-event-id=\"$id\" data-occurrence-date=\"$date_edit_occurrence\" data-entity-id=\"$r_id\" data-entity-kind=\"resource\"/> $l_accepted
+          <input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"Obm.decisionCBHandler.call(this);\" data-event-id=\"$id\" data-occurrence-date=\"$date_edit_occurrence\" data-entity-id=\"$r_id\" data-entity-kind=\"resource\"/> $l_needs_action
+          <input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"DECLINED\" onclick=\"Obm.decisionCBHandler.call(this);\" data-event-id=\"$id\" data-occurrence-date=\"$date_edit_occurrence\" data-entity-id=\"$r_id\" data-entity-kind=\"resource\"/> $l_declined
           </td>
           <td style=\"$comment_style\">$resource_comment_display</td>
           </tr>";

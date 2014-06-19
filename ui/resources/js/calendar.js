@@ -2353,8 +2353,12 @@ Obm.CommentedDecisionPopup = new Class({
 });
 
 Obm.decisionCBHandler = function(decision) {
+  var entityKind = 'user';
+  if(this.getAttribute("data-entity-kind")){
+    entityKind = this.getAttribute("data-entity-kind");
+  }
   Obm.Rest.update_decision_and_comment(
-    "user",
+    entityKind,
     this.getAttribute("data-entity-id"),
     this.getAttribute("data-event-id"),
     this.getAttribute("value"),
