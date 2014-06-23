@@ -106,7 +106,7 @@ function load_configuration_from_imap_archive_service(){
 function imapArchiveRootPath() {
   global $obm;
   global $l_imap_archive_server_not_found;
-  
+
   $imapArchiveServer = of_domain_get_domain_imaparchiveserver($obm['domain_id']);
   if(!count($imapArchiveServer)){
     return array(0, $l_imap_archive_server_not_found);
@@ -118,6 +118,73 @@ function imapArchiveRootPath() {
 
 function curlGet($url) {
   global $obm;
+
+  $params = requestParams();
+  $imapArchiveRootPath = imapArchiveRootPath();
+  $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($params);
+  
+  $curl = curl_init($curlUrl);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    
+  return curlExec($curl);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Calculate next treatment date from IMAP archive service
+// Parameters:
+//   - none
+///////////////////////////////////////////////////////////////////////////////
+function calculate_next_treatment_date_from_imap_archive_service($configuration) {
+  global $obm;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  $userInfo = get_user_info($obm['uid']);
+
+  if(empty($userInfo["email"])) {
+    return array(0, $l_email_address_not_found);
+  }
+
+  $configurationPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/treatments/next";
+
+  $repeatKind = $configuration->repeatKind;
+  $dayOfWeek = $configuration->dayOfWeek;
+  $dayOfMonth = $configuration->dayOfMonth;
+  $dayOfYear = $configuration->dayOfYear;
+  $enabled = $configuration->enabled;
+  $hour = $configuration->hour;
+  $minute = $configuration->minute;
+    
+  $json = json_encode(array("domainId" => $obm['domain_uuid'],
+      "enabled" => ($enabled) ? true : false,
+      "repeatKind" => ($repeatKind) ? $repeatKind : "MONTHLY",
+      "dayOfWeek" => ($dayOfWeek) ? $dayOfWeek : 1,
+      "dayOfMonth" => ($dayOfMonth) ? $dayOfMonth : -1,
+      "dayOfYear" => ($dayOfYear) ? $dayOfYear : 1,
+      "hour" => ($hour) ? $hour : 0,
+      "minute" => ($minute) ? $minute : 0
+  ));
+  
+  $curl = curlPost($configurationPath, $json);
+  $success = $curl["success"];
+  $code = $curl["code"];
+  $errno = $curl["errno"];
+
+  if($errno){
+    error_log("Couldn't login to IMAP archive server (".$errno.")");
+    return array(0, $l_could_not_login_imap_archive_server);
+  }
+  if ($code == 0) {
+    return array(0, $l_imap_archive_server_unreachable);
+  }
+  if ($code == 200) {
+    return array(1, json_decode($success));
+  }
+  if ($code == 204) {
+    return array(1, null);
+  }
+}
+
+function curlPost($url, $json) {
+  global $obm;
   
   $params = requestParams();
   $imapArchiveRootPath = imapArchiveRootPath();
@@ -125,9 +192,11 @@ function curlGet($url) {
   
   $curl = curl_init($curlUrl);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($curl, CURLOPT_POST, 1);
+  curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-type: application/json'));
+  curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
   
-  $result = curlExec($curl);
-  return $result;
+  return curlExec($curl);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

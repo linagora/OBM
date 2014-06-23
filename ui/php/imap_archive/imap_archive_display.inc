@@ -39,6 +39,7 @@ applicable to the OBM software.
 ///////////////////////////////////////////////////////////////////////////////
 
 include_once("$obminclude/global.inc");
+require_once('imap_archive_query.inc');
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the IMAP Archive form
@@ -48,7 +49,7 @@ function dis_imap_archive_form($backup, $params, $configuration) {
   global $l_users, $l_validate;
   global $l_service_activating, $l_activating;
   global $l_scheduling;
-  global $l_next_run, $l_excluded_users, $l_name, $l_delete, $l_remove_archive;
+  global $l_excluded_users, $l_name, $l_delete, $l_remove_archive;
   global $l_mailing_feedback, $l_email_address;
 
   $user_id = $params['user_id'];
@@ -69,6 +70,7 @@ function dis_imap_archive_form($backup, $params, $configuration) {
   $block_yearly = get_block_yearly($repeatKind, $dayOfYear, $disabled);
   $block_hour = get_block_hour($hour, $disabled);
   $block_minute = get_block_minute($minute, $disabled);
+  $block_next_treatment_date = get_block_next_treatment_date($configuration);
   
   $block = "
     <form method='get' name='f_imap_archive' action='imap_archive_index.php'>
@@ -110,8 +112,7 @@ function dis_imap_archive_form($backup, $params, $configuration) {
       <br>
       <table>
         <tr>
-          <th>$l_next_run</th>
-          <td>2014-04-18 22:30:00</td>
+          $block_next_treatment_date
         </tr>
       </table>
     </fieldset>
@@ -197,7 +198,7 @@ function get_block_repeat_kind($repeatKind, $disabled) {
   return
     "<th>$l_repeat_kind</th>
      <td>
-       <select type='text' name='sel_repeat_kind' $disabled class='configuration' onchange='redraw(this.options[this.selectedIndex].value);'>
+       <select type='text' id='repeat_kind' name='sel_repeat_kind' $disabled class='configuration' onchange='redraw(this.options[this.selectedIndex].value); nextTreatmentDate();'>
          $block_repeat_kind
        </select>
      </td>";
@@ -222,7 +223,7 @@ function get_block_weekly($repeatKind, $dayOfWeek, $disabled) {
   return 
     "<th class='class_weekly' style='visibility:$visibility'>$l_weekly_repeat_kind</th>
      <td>
-       <select name='sel_day_of_week' class='configuration class_weekly' style='visibility:$visibility' $disabled>
+       <select id='day_of_week' name='sel_day_of_week' class='configuration class_weekly' style='visibility:$visibility' $disabled onchange='nextTreatmentDate();'>
          $block_weekly
        </select>
      </td>";
@@ -252,7 +253,7 @@ function get_block_monthly($repeatKind, $dayOfMonth, $disabled) {
   return 
     "<th class='class_monthly' style='visibility:$visibility'>$l_monthly_repeat_kind</th>
      <td>
-       <select type='text' name='sel_day_of_month' class='configuration class_monthly' style='visibility:$visibility' $disabled>
+       <select type='text' id='day_of_month' name='sel_day_of_month' class='configuration class_monthly' style='visibility:$visibility' $disabled onchange='nextTreatmentDate();'>
          $block_monthly
        </select>
      </td>";
@@ -287,7 +288,7 @@ function get_block_yearly($repeatKind, $dayOfYear, $disabled) {
   return 
     "<th class='class_yearly' style='visibility:$visibility'>$l_yearly_repeat_kind</th>
      <td>
-       <select type='text' name='sel_day_of_year' class='configuration class_yearly' style='visibility:$visibility' $disabled>
+       <select type='text' id='day_of_year' name='sel_day_of_year' class='configuration class_yearly' style='visibility:$visibility' $disabled onchange='nextTreatmentDate();'>
          $block_yearly
        </select>
      </td>";
@@ -307,7 +308,7 @@ function get_block_hour($hour, $disabled) {
   return
     "<th>$l_hour</th>
      <td>
-       <select type='text' name='sel_hour' class='configuration' $disabled>
+       <select type='text' id='hour' name='sel_hour' class='configuration' $disabled onchange='nextTreatmentDate();'>
          $block_hour
        </select>
      </td>";
@@ -327,10 +328,25 @@ function get_block_minute($minute, $disabled) {
   return
     "<th>$l_minute</th>
      <td>
-       <select type='text' name='sel_minute' class='configuration' $disabled>
+       <select type='text' id='minute' name='sel_minute' class='configuration' $disabled onchange='nextTreatmentDate();'>
          $block_minute
        </select>
      </td>";
+}
+
+function get_block_next_treatment_date($configuration) {
+  global $l_next_run;
+  
+  $status = calculate_next_treatment_date_from_imap_archive_service($configuration);
+
+  $date = null;
+  if ($status[0] == 1) {
+    $nextTreatmentDate = $status[1]->nextTreatmentDate->millis;
+    $date = new Of_Date($nextTreatmentDate / 1000, 'UTC');
+  }
+  return
+    "<th>$l_next_run</th>
+     <td id='nextTreatmentDate' >".(is_null($date) ? '' : $date)."</td>";
 }
 
 ///////////////////////////////////////////////////////////////////////////////

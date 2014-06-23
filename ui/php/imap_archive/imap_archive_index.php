@@ -79,16 +79,32 @@ if ($status[0] != 1) {
       $display['msg'] .= display_err_msg($l_update_error);
     }
     $action = 'detailconsult';
+  } else if ($action == 'next_treatment_date') {
+    $configuration = (Object) $params['configuration'];
+    $status = calculate_next_treatment_date_from_imap_archive_service($configuration);
+    if ($status[0] != 1) {
+      $display['msg'] .= display_err_msg($status[1]);
+    } else {
+      $json = $status[1];
+      error_log("nextTreatmentDate");
+      error_log(print_r($json->nextTreatmentDate, true));
+      $nextTreatmentDate = new Of_Date($json->nextTreatmentDate->millis / 1000, 'UTC');
+      $display['json'] = json_encode($nextTreatmentDate);
+      echo '('.$display['json'].')';
+    }
+    exit();
   }
   
-  if ($action == 'detailconsult') {
-    $display['detail'] = dis_imap_archive_consult($backup, $params);
-  } elseif ($action == 'detailupdate') {
-    $status = load_configuration_from_imap_archive_service();
-    if ($status[0] != 1) {
-      $display['msg'] .= display_err_msg("$status[1]");
-    } else {
-      $configuration = $status[1];
+  $status = load_configuration_from_imap_archive_service();
+  if ($status[0] != 1) {
+    $display['msg'] .= display_err_msg($status[1]);
+  } else {
+    $configuration = $status[1];
+    $display['detail'] = dis_imap_archive_form($backup, $params, $configuration);
+    
+    if ($action == 'detailconsult') {
+      $display['detail'] = dis_imap_archive_consult($backup, $params, $configuration);
+    } elseif ($action == 'detailupdate') {
       $display['detail'] = dis_imap_archive_form($backup, $params, $configuration);
     }
   }
@@ -146,6 +162,13 @@ function get_imap_archive_action() {
 // Update
   $actions['imap_archive']['update'] = array (
     'Url'      => "$path/imap_archive/imap_archive_index.php?action=update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('all')
+  );
+
+// Next Treatment Date
+  $actions['imap_archive']['next_treatment_date'] = array (
+    'Url'      => "$path/imap_archive/imap_archive_index.php?action=next_treatment_date",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('all')
   );

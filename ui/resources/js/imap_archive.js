@@ -86,3 +86,34 @@ function enableConfiguration(enabled) {
     element.disabled = !enabled;
   });
 }
+
+function nextTreatmentDate() {
+  var activation = $('activation').get('checked');
+  var repeatKind = $('repeat_kind').get('value');
+  var dayOfWeek = $('day_of_week').get('value');
+  var dayOfMonth = $('day_of_month').get('value');
+  var dayOfYear = $('day_of_year').get('value');
+  var hour = $('hour').get('value');
+  var minute = $('minute').get('value');
+    
+  var configuration = {};
+  configuration.enabled = (activation) ? 1 : 0;
+  configuration.repeatKind = repeatKind;
+  configuration.dayOfWeek = dayOfWeek;
+  configuration.dayOfMonth = dayOfMonth;
+  configuration.dayOfYear = dayOfYear;
+  configuration.hour = hour;
+  configuration.minute = minute;
+    
+  new Request.JSON({
+    url: obm.vars.consts.obmUrl+'/imap_archive/imap_archive_index.php',
+    secure: false,
+    async: true,
+    onFailure: function (response) {
+      Obm.Error.parseStatus(this);
+    },
+    onComplete: function(response) {
+      $('nextTreatmentDate').set('text', response.date);
+    }
+  }).get({ajax : 1, action : 'next_treatment_date', 'configuration' : configuration});
+}
