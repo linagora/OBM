@@ -343,24 +343,27 @@ function get_block_next_treatment_date($configuration) {
   if ($status[0] == 1) {
     $nextTreatmentDate = $status[1]->nextTreatmentDate->millis;
     $date = new Of_Date($nextTreatmentDate / 1000, 'UTC');
+    $date->setTimezone(DateTimeZone::UTC);
   }
   return
     "<th>$l_next_run</th>
-     <td id='nextTreatmentDate' >".(is_null($date) ? '' : $date)."</td>";
+     <td id='nextTreatmentDate' >".(is_null($date) ? '' : $date->getOutputDateTime())."</td>";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the IMAP Archive consult
 ///////////////////////////////////////////////////////////////////////////////
 
-function dis_imap_archive_consult($backup, $params) {
+function dis_imap_archive_consult($backup, $params, $configuration) {
 
   global $l_past_operations, $l_start_time, $l_end_time, $l_status, $l_next_run;
   global $l_last_fail;
   
   $user_id = $params['user_id'];
   $url = url_prepare('imap_archive_index.php');
-
+  
+  $block_next_treatment_date = get_block_next_treatment_date($configuration);
+  
   $block = "
     <div class='detail infos'>
       <h1>$l_past_operations</h1>
@@ -390,8 +393,7 @@ function dis_imap_archive_consult($backup, $params) {
       <h1>$l_next_run</h1>
       <table>
       <tr>
-        <th>2014-04-18 22:30:00</th>
-        <td></td>
+        $block_next_treatment_date
       </tr>
       </table>
     </div>
