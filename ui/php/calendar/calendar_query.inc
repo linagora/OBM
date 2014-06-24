@@ -3739,7 +3739,8 @@ function run_query_calendar_duplicate_template($template_id, $duplicate_name) {
     eventtemplate_resource_ids,
     eventtemplate_group_ids,
     eventtemplate_document_ids,
-    eventtemplate_organizer)
+    eventtemplate_organizer,
+    eventtemplate_notify)
     SELECT 
     '$duplicate_name',
     NOW(),
@@ -3769,7 +3770,8 @@ function run_query_calendar_duplicate_template($template_id, $duplicate_name) {
     eventtemplate_resource_ids,
     eventtemplate_group_ids,
     eventtemplate_document_ids,
-    eventtemplate_organizer
+    eventtemplate_organizer,
+    eventtemplate_notify
     FROM EventTemplate 
     WHERE eventtemplate_id = $template_id";
 
