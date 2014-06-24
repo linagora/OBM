@@ -3557,7 +3557,8 @@ function run_query_calendar_get_template($template_id) {
     eventtemplate_force_insertion AS event_force_insertion,
     eventtemplate_opacity AS event_opacity,
     eventtemplate_show_user_calendar AS event_show_user_calendar,
-    eventtemplate_show_resource_calendar AS event_show_resource_calendar
+    eventtemplate_show_resource_calendar AS event_show_resource_calendar,
+    eventtemplate_notify AS event_attendees_notification
     FROM
     EventTemplate 
     LEFT JOIN EventCategory1 ON eventtemplate_category1_id = eventcategory1_id 
