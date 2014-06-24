@@ -3313,6 +3313,7 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
   $opacity = $calendar['opacity'];
   $show_user_calendar = $calendar['show_user_calendar'] ? 'true' : 'false';
   $show_resource_calendar = $calendar['show_resource_calendar'] ? 'true' : 'false';
+  $attendees_notification = $calendar['attendees_notification'] ? 'true' : 'false';
   $allResources = run_query_calendar_merge_resource_groups($calendar['sel_resource_group_id'], $calendar['sel_resource_id']);
   
   $user_ids = is_array($calendar['sel_user_id']) ? "'".implode(',', $calendar['sel_user_id'])."'" : 'NULL';
@@ -3380,7 +3381,8 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       eventtemplate_force_insertion = '$force_insertion',
       eventtemplate_opacity = '$opacity',
       eventtemplate_show_user_calendar = '$show_user_calendar',
-      eventtemplate_show_resource_calendar = '$show_resource_calendar'
+      eventtemplate_show_resource_calendar = '$show_resource_calendar',
+      eventtemplate_notify = $attendees_notification
       WHERE eventtemplate_id = $template_id";
   } else {
     $query = "INSERT INTO EventTemplate (
@@ -3416,7 +3418,8 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       eventtemplate_force_insertion,
       eventtemplate_opacity,
       eventtemplate_show_user_calendar,
-      eventtemplate_show_resource_calendar)
+      eventtemplate_show_resource_calendar,
+      eventtemplate_notify)
       VALUES (
       '".$obm_q->escape($name)."',
       NOW(),
@@ -3450,8 +3453,8 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
       '$force_insertion',
       '$opacity',
       '$show_user_calendar',
-      '$show_resource_calendar')";
-
+      '$show_resource_calendar',
+      $attendees_notification)";
   }
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_create_or_update_event_template()');
   $obm_q->query($query);
