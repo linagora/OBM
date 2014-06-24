@@ -1,8 +1,10 @@
 #!/bin/bash
 set -e
 
-service obm-locator stop > /dev/null
-[ -f /etc/init.d/obm-locator ] && unlink /etc/init.d/obm-locator
+if [ "$1" = "remove" ]; then
+    service obm-locator stop > /dev/null
+    [ -f /etc/init.d/obm-locator ] && unlink /etc/init.d/obm-locator
+fi
 
 exit 0
 
