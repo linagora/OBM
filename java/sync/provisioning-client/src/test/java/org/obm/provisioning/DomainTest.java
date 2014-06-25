@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import static com.github.restdriver.clientdriver.RestClientDriver.*;
+import static com.github.restdriver.clientdriver.RestClientDriver.giveEmptyResponse;
+import static com.github.restdriver.clientdriver.RestClientDriver.giveResponse;
+import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 
@@ -59,7 +59,7 @@ public class DomainTest {
 				giveResponse("{\"id\":\"d6b64792-b093-d85a-1b4f-d2a9e05d4011\",\"name\":\"global.virt\",\"label\":\"Global Domain\",\"aliases\":[]}",
 						MediaType.APPLICATION_JSON));
 		
-		Optional<ObmDomain> domain = new Domain(driver.getBaseUrl() + "/obm-sync/").getById(UUID.fromString("d6b64792-b093-d85a-1b4f-d2a9e05d4011"));
+		Optional<ObmDomain> domain = new Domain(driver.getBaseUrl() + "/obm-sync/").getById(ObmDomainUuid.of("d6b64792-b093-d85a-1b4f-d2a9e05d4011"));
 		
 		assertThat(domain.isPresent()).isTrue();
 		assertThat(domain.get()).isEqualTo(ObmDomain.builder().uuid(ObmDomainUuid.of("d6b64792-b093-d85a-1b4f-d2a9e05d4011")).name("global.virt").label("Global Domain").build());
@@ -71,7 +71,7 @@ public class DomainTest {
 				onRequestTo("/obm-sync/provisioning/v1/domains/d6b64792-b093-d85a-1b4f-d2a9e05d4011"), 
 				giveEmptyResponse().withStatus(404));
 		
-		Optional<ObmDomain> actual = new Domain(driver.getBaseUrl() + "/obm-sync/").getById(UUID.fromString("d6b64792-b093-d85a-1b4f-d2a9e05d4011"));
+		Optional<ObmDomain> actual = new Domain(driver.getBaseUrl() + "/obm-sync/").getById(ObmDomainUuid.of("d6b64792-b093-d85a-1b4f-d2a9e05d4011"));
 		assertThat(actual.isPresent()).isFalse();
 	}
 	
@@ -81,7 +81,7 @@ public class DomainTest {
 				onRequestTo("/obm-sync/provisioning/v1/domains/d6b64792-b093-d85a-1b4f-d2a9e05d4011"), 
 				giveEmptyResponse().withStatus(500));
 		
-		Optional<ObmDomain> actual = new Domain(driver.getBaseUrl() + "/obm-sync/").getById(UUID.fromString("d6b64792-b093-d85a-1b4f-d2a9e05d4011"));
+		Optional<ObmDomain> actual = new Domain(driver.getBaseUrl() + "/obm-sync/").getById(ObmDomainUuid.of("d6b64792-b093-d85a-1b4f-d2a9e05d4011"));
 		assertThat(actual.isPresent()).isFalse();
 	}
 }

@@ -31,16 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
+import static com.github.restdriver.clientdriver.RestClientDriver.giveResponse;
+import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static com.jayway.restassured.RestAssured.given;
-import static org.easymock.EasyMock.expect;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.UUID;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.easymock.IMocksControl;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,7 +52,6 @@ import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
-import org.obm.domain.dao.DomainDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
@@ -60,6 +61,9 @@ import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
+import com.github.restdriver.clientdriver.ClientDriverExpectation;
+import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
+import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.jayway.restassured.http.ContentType;
@@ -67,13 +71,15 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ConfigurationResourceTest {
 
+	private ClientDriverRule driver = new ClientDriverRule();
+	
 	@Rule public TestRule chain = RuleChain
-			.outerRule(new GuiceRule(this, new TestImapArchiveModules.Simple()))
+			.outerRule(driver)
+			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver)))
 			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
 				@Override
 				public H2InMemoryDatabase get() {
@@ -81,35 +87,52 @@ public class ConfigurationResourceTest {
 				}
 			}, "sql/initial.sql"));
 
-	@Inject
-	private H2InMemoryDatabase db;
-
+	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
-	@Inject IMocksControl control;
-	@Inject DomainDao domainDao;
 	
 	@Before
 	public void setUp() {
-		Operation operation =
-				Operations.sequenceOf(
-						Operations.deleteAllFrom("mail_archive"),
-						Operations.insertInto("mail_archive")
-						.columns("mail_archive_domain_uuid", 
-								"mail_archive_activated", 
-								"mail_archive_repeat_kind", 
-								"mail_archive_day_of_week", 
-								"mail_archive_day_of_month", 
-								"mail_archive_day_of_year", 
-								"mail_archive_hour", 
-								"mail_archive_minute")
-						.values("21aeb670-f49e-428a-9d0c-f11f5feaa688", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
-						.build());
+		ObmDomainUuid domainId = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		expectTrustedLogin(domainId);
+		expectGetDomain(domainId);
+	}
 
+	private ClientDriverExpectation expectTrustedLogin(ObmDomainUuid domainId) {
+		return driver.addExpectation(
+				onRequestTo("/obm-sync/login/trustedLogin").withMethod(Method.POST)
+					.withBody(Matchers.allOf(
+								Matchers.containsString("login=admin%40mydomain.org"),
+								Matchers.containsString("password=trust3dToken")),
+					MediaType.APPLICATION_FORM_URLENCODED),
+				giveResponse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+						+ "<token xmlns=\"http://www.obm.org/xsd/sync/token.xsd\">"
+						+ "<sid>06ae323a-0fa1-42ea-9ee8-313a023e4fd4</sid>"
+						+ "<domain uuid=\"" + domainId.toString() + "\">mydomain.org</domain>"
+						+ "</token>",
+					MediaType.APPLICATION_XML)
+				);
+	}
+	
+	private ClientDriverExpectation expectGetDomain(ObmDomainUuid domainId) {
+		return driver.addExpectation(
+				onRequestTo("/obm-sync/provisioning/v1/domains/" + domainId.toString()),
+				giveResponse("{\"id\":\"" + domainId.toString() + "\","
+							+ "\"name\":\"mydomain\","
+							+ "\"label\":\"mydomain.org\","
+							+ "\"aliases\":[]}",
+					MediaType.APPLICATION_JSON)
+				);
+	}
+
+	private void initDb(Operation... operationToAppend) {
+		Operation operation =
+				Operations.sequenceOf(Operations.deleteAllFrom("mail_archive"),
+				Operations.sequenceOf(operationToAppend));
 		
 		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
 		dbSetup.launch();
 	}
-
+	
 	@After
 	public void tearDown() throws Exception {
 		server.stop();
@@ -117,16 +140,13 @@ public class ConfigurationResourceTest {
 	
 	@Test
 	public void getDomainConfigurationShouldReturnADefaultConfiguration() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
-		expect(domainDao.findDomainByUuid(domainId)).andReturn(ObmDomain.builder().uuid(domainId).build());
-		control.replay();
+		initDb();
 		server.start();
-		
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
+			.param("login", "admin")
+			.param("password", "trust3dToken")
 			.param("domain_name", "mydomain.org").
 		expect()
 			.contentType(ContentType.JSON)
@@ -139,36 +159,43 @@ public class ConfigurationResourceTest {
 
 	@Test
 	public void getDomainConfigurationShouldReturnStoredConfiguration() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("21aeb670-f49e-428a-9d0c-f11f5feaa688");
-		expect(domainDao.findDomainByUuid(domainId)).andReturn(ObmDomain.builder().uuid(domainId).build());
-		control.replay();
+		initDb(Operations.insertInto("mail_archive")
+				.columns("mail_archive_domain_uuid", 
+						"mail_archive_activated", 
+						"mail_archive_repeat_kind", 
+						"mail_archive_day_of_week", 
+						"mail_archive_day_of_month", 
+						"mail_archive_day_of_year", 
+						"mail_archive_hour", 
+						"mail_archive_minute")
+						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
+						.build());
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
+			.param("login", "admin")
+			.param("password", "trust3dToken")
 			.param("domain_name", "mydomain.org").
 		expect()
 			.contentType(ContentType.JSON)
-			.body("domainId", equalTo("21aeb670-f49e-428a-9d0c-f11f5feaa688"),
+			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
 				"enabled", equalTo(true))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/21aeb670-f49e-428a-9d0c-f11f5feaa688/configuration");
+			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
 	}
 
 	@Test
 	public void updateDomainConfigurationShouldThrowExceptionWhenBadInputs() throws Exception {
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
-		control.replay();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
+			.param("login", "admin")
+			.param("password", "trust3dToken")
 			.param("domain_name", "mydomain.org")
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
@@ -180,9 +207,7 @@ public class ConfigurationResourceTest {
 
 	@Test
 	public void updateDomainConfigurationShouldCreateWhenNoData() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
-		expect(domainDao.findDomainByUuid(domainId)).andReturn(ObmDomain.builder().uuid(domainId).build());
-		control.replay();
+		expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
 		server.start();
 		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
@@ -197,8 +222,8 @@ public class ConfigurationResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
+			.param("login", "admin")
+			.param("password", "trust3dToken")
 			.param("domain_name", "mydomain.org")
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
@@ -210,8 +235,8 @@ public class ConfigurationResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
+			.param("login", "admin")
+			.param("password", "trust3dToken")
 			.param("domain_name", "mydomain.org").
 		expect()
 			.contentType(ContentType.JSON)
@@ -225,12 +250,21 @@ public class ConfigurationResourceTest {
 
 	@Test
 	public void updateDomainConfigurationShouldReturnNoContentWhenUpdating() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("21aeb670-f49e-428a-9d0c-f11f5feaa688");
-		expect(domainDao.findDomainByUuid(domainId)).andReturn(ObmDomain.builder().uuid(domainId).build());
-		control.replay();
+		initDb(Operations.insertInto("mail_archive")
+				.columns("mail_archive_domain_uuid", 
+						"mail_archive_activated", 
+						"mail_archive_repeat_kind", 
+						"mail_archive_day_of_week", 
+						"mail_archive_day_of_month", 
+						"mail_archive_day_of_year", 
+						"mail_archive_hour", 
+						"mail_archive_minute")
+						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
+						.build());
+		expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
 		server.start();
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
-		domainConfigurationDto.domainId = UUID.fromString("21aeb670-f49e-428a-9d0c-f11f5feaa688");
+		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		domainConfigurationDto.enabled = true;
 		domainConfigurationDto.repeatKind = RepeatKind.WEEKLY.toString();
 		domainConfigurationDto.dayOfWeek = DayOfWeek.WEDNESDAY.getSpecificationValue();
@@ -241,28 +275,28 @@ public class ConfigurationResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
+			.param("login", "admin")
+			.param("password", "trust3dToken")
 			.param("domain_name", "mydomain.org")
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
 		expect()
 			.statusCode(Status.NO_CONTENT.getStatusCode()).
 		when()
-			.put("/imap-archive/service/v1/domains/21aeb670-f49e-428a-9d0c-f11f5feaa688/configuration");
+			.put("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
+			.param("login", "admin")
+			.param("password", "trust3dToken")
 			.param("domain_name", "mydomain.org").
 		expect()
 			.contentType(ContentType.JSON)
-			.body("domainId", equalTo("21aeb670-f49e-428a-9d0c-f11f5feaa688"),
+			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
 				"enabled", equalTo(true),
 				"dayOfWeek", equalTo(DayOfWeek.WEDNESDAY.getSpecificationValue()))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/21aeb670-f49e-428a-9d0c-f11f5feaa688/configuration");
+			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
 	}
 }

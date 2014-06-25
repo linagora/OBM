@@ -33,29 +33,22 @@ package org.obm.imap.archive;
 
 import java.util.Date;
 
-import org.apache.http.client.HttpClient;
-import org.joda.time.DateTime;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.joda.time.DateTime;
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
-import org.obm.configuration.DomainConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
-import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
 import org.obm.server.ServerConfiguration;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
-import org.obm.sync.client.impl.SyncClientAssert;
-import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.locators.Locator;
-import org.slf4j.Logger;
 
+import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
@@ -66,22 +59,26 @@ public class TestImapArchiveModules {
 
 	public static class Simple extends AbstractModule {
 	
+		private final ClientDriverRule obmSyncHttpMock;
+
+		public Simple(ClientDriverRule obmSyncHttpMock) {
+			this.obmSyncHttpMock = obmSyncHttpMock;
+		}
+		
 		@Override
 		protected void configure() {
 			ServerConfiguration config = ServerConfiguration.defaultConfiguration();
 			install(Modules.override(new ImapArchiveModule(config)).with(
 				new DaoTestModule(),
-				new LocalLocatorModule(),
-				new ObmSyncModule(),
 				new TransactionalModule(),
 				new DateProviderModule(),
+				new LocalLocatorModule(obmSyncHttpMock.getBaseUrl() + "/obm-sync"),
 				new AbstractModule() {
 					
 					@Override
 					protected void configure() {
 						IMocksControl control = EasyMock.createControl();
 						bind(IMocksControl.class).toInstance(control);
-						bind(DomainDao.class).toInstance(control.createMock(DomainDao.class));
 						bind(UserSystemDao.class).toInstance(control.createMock(UserSystemDao.class));
 					}
 				}
@@ -91,9 +88,15 @@ public class TestImapArchiveModules {
 	
 	public static class WithGreenmail extends AbstractModule {
 
+		private ClientDriverRule obmSyncHttpMock;
+
+		public WithGreenmail(ClientDriverRule obmSyncHttpMock) {
+			this.obmSyncHttpMock = obmSyncHttpMock;
+		}
+		
 		@Override
 		protected void configure() {
-			install(Modules.override(new Simple()).with(new AbstractModule() {
+			install(Modules.override(new Simple(obmSyncHttpMock)).with(new AbstractModule() {
 
 				@Override
 				protected void configure() {
@@ -106,48 +109,42 @@ public class TestImapArchiveModules {
 	
 	public static class LocalLocatorModule extends AbstractModule {
 
+		private String obmSyncBaseUrl;
+
+		public LocalLocatorModule(String obmSyncBaseUrl) {
+			this.obmSyncBaseUrl = obmSyncBaseUrl;
+		}
+		
 		@Override
 		protected void configure() {
 			bind(LocatorService.class).toInstance(new LocatorService() {
 				
 				@Override
-				public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
-					return "localhost";
+				public String getServiceLocation(String serviceSlashProperty,
+						String loginAtDomain) throws LocatorClientException {
+					if (serviceSlashProperty.equals("mail/imap_frontend")) {
+						return "localhost";
+					}
+					throw new IllegalStateException();
 				}
 			});
+			bind(Locator.class).toInstance(new TestLocator(obmSyncBaseUrl));
 		}
 	}
-    
-	public static class ObmSyncModule extends AbstractModule {
 
-	 	public class FakeLoginClient extends LoginClient {
+	public static class TestLocator extends Locator {
+		
+		private String obmSyncBaseUrl;
 
-	 		protected FakeLoginClient(String origin, DomainConfiguration domainConfiguration, SyncClientAssert syncClientAssert, Locator locator, Logger obmSyncLogger, HttpClient httpClient) {
- 	 			super(origin, domainConfiguration, syncClientAssert, locator, obmSyncLogger, httpClient);
- 	 		}
-
- 	 		@Override
- 	 		public AccessToken trustedLogin(String loginAtDomain, String password) throws AuthFault {
- 	 			return new AccessToken(1, "origin");
- 	 		}
- 	 	}
-
- 	 	public class FakeLoginClientFactory extends LoginClient.Factory {
-
- 	 		public FakeLoginClientFactory() {
- 	 			super(null, null, null, null, null);
- 	 		}
-
- 	 		@Override
- 	 		public LoginClient create(HttpClient httpClient) {
- 	 			return new FakeLoginClient(origin, domainConfiguration, syncClientAssert, locator, obmSyncLogger, httpClient);
- 	 		}
- 	 	}
-
- 	 	@Override
- 	 	protected void configure() {
- 	 		bind(LoginClient.Factory.class).toInstance(new FakeLoginClientFactory());
- 	 	}
+		public TestLocator(String obmSyncBaseUrl) {
+			super(null, null);
+			this.obmSyncBaseUrl = obmSyncBaseUrl;
+		}
+		
+		@Override
+		public String backendUrl(String loginAtDomain) throws LocatorClientException {
+			return obmSyncBaseUrl;
+		}
 	}
 	
 	public static class TransactionalModule extends AbstractModule {

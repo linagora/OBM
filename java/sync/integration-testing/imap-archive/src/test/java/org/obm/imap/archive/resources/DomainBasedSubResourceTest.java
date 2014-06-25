@@ -31,37 +31,54 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
+import static com.github.restdriver.clientdriver.RestClientDriver.*;
 import static com.jayway.restassured.RestAssured.given;
-import static org.easymock.EasyMock.expect;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.easymock.IMocksControl;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.obm.domain.dao.DomainDao;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
-import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.server.WebServer;
 
+import com.github.restdriver.clientdriver.ClientDriverRule;
+import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
 import com.google.inject.Inject;
-
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class DomainBasedSubResourceTest {
 
-	@Rule public GuiceRule guiceRule = new GuiceRule(this, new TestImapArchiveModules.Simple());
+	private ClientDriverRule driver = new ClientDriverRule();
+	
+	@Rule public TestRule chain = RuleChain
+			.outerRule(driver)
+			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver)));
 
+	
 	@Inject WebServer server;
-	@Inject IMocksControl control;
-	@Inject DomainDao domainDao;
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
+		driver.addExpectation(
+				onRequestTo("/obm-sync/login/trustedLogin").withMethod(Method.POST)
+					.withBody(Matchers.allOf(
+								Matchers.containsString("login=admin%40mydomain.org"),
+								Matchers.containsString("password=trust3dToken")),
+					MediaType.APPLICATION_FORM_URLENCODED),
+				giveResponse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+						+ "<token xmlns=\"http://www.obm.org/xsd/sync/token.xsd\">"
+						+ "<sid>06ae323a-0fa1-42ea-9ee8-313a023e4fd4</sid>"
+						+ "<domain uuid=\"a6af9131-60b6-4e3a-a9f3-df5b43a89309\">mydomain.org</domain>"
+						+ "</token>",
+					MediaType.APPLICATION_XML)
+				);
+		server.start();
 	}
 
 	@After
@@ -70,16 +87,11 @@ public class DomainBasedSubResourceTest {
 	}
 	
 	@Test
-	public void getDomainConfigurationShouldReturnBadRequestOnInvalidUuid() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("21aeb670-f49e-428a-9d0c-f11f5feaa688");
-		expect(domainDao.findDomainByUuid(domainId)).andReturn(ObmDomain.builder().uuid(domainId).build());
-		control.replay();
-		server.start();
-		
+	public void getDomainConfigurationShouldReturnBadRequestOnInvalidUuid() {
 		given()
 			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
+			.param("login", "admin")
+			.param("password", "trust3dToken")
 			.param("domain_name", "mydomain.org").
 		expect()
 			.statusCode(Status.BAD_REQUEST.getStatusCode()).
@@ -88,20 +100,20 @@ public class DomainBasedSubResourceTest {
 	}
 	
 	@Test
-	public void getDomainConfigurationShouldReturnNotFoundOnAbsentDomain() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("c7dd9583-5057-4c0a-ac30-d284940420c8");
-		expect(domainDao.findDomainByUuid(domainId)).andThrow(new DomainNotFoundException());
-		control.replay();
-		server.start();
+	public void getDomainConfigurationShouldReturnNotFoundOnAbsentDomain() {
+		driver.addExpectation(
+				onRequestTo("/obm-sync/provisioning/v1/domains/56077db7-ffdc-4e47-8fdd-40c69884bee6"),
+				giveEmptyResponse().withStatus(Status.NOT_FOUND.getStatusCode())
+				);
 		given()
 			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
+			.param("login", "admin")
+			.param("password", "trust3dToken")
 			.param("domain_name", "mydomain.org").
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/c7dd9583-5057-4c0a-ac30-d284940420c8/configuration");
+			.get("/imap-archive/service/v1/domains/56077db7-ffdc-4e47-8fdd-40c69884bee6/configuration");
 	}
 	
 }

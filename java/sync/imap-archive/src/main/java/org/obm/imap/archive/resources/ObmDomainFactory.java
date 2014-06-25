@@ -35,9 +35,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.hk2.api.Factory;
-import org.obm.domain.dao.DomainDao;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+import org.obm.provisioning.Domain;
+import org.obm.sync.locators.Locator;
 
 import com.google.common.base.Optional;
 
@@ -46,14 +45,14 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ObmDomainFactory implements Factory<ObmDomain> {
 
-	private final DomainDao domainDao;
+	private final Domain domainService;
 	
 	@PathParam("domain")
 	private String domainUuid;
 
 	@Inject
-	private ObmDomainFactory(DomainDao domainDao) {
-		this.domainDao = domainDao;
+	private ObmDomainFactory(Locator locator) {
+		domainService = new Domain(locator.backendUrl("global.admin"));
 	}
 	
 	@Override
@@ -68,17 +67,11 @@ public class ObmDomainFactory implements Factory<ObmDomain> {
 		}
 
 		ObmDomainUuid checkedDomainUuid = checkDomainUuid(domainUuid);
-		Optional<ObmDomain> domain;
-		try {
-			domain = getDomain(checkedDomainUuid);
-			if (!domain.isPresent()) {
-				throw new WebApplicationException(Status.NOT_FOUND);
-			}
-			return domain.get();
-		} catch (DaoException e) {
-			throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+		Optional<ObmDomain> domain = domainService.getById(checkedDomainUuid);
+		if (!domain.isPresent()) {
+			throw new WebApplicationException(Status.NOT_FOUND);
 		}
-
+		return domain.get();
 	}
 	
 	private ObmDomainUuid checkDomainUuid(String domainUuid) {
@@ -86,14 +79,6 @@ public class ObmDomainFactory implements Factory<ObmDomain> {
 			return ObmDomainUuid.of(domainUuid);
 		} catch (IllegalArgumentException e) {
 			throw new WebApplicationException(Status.BAD_REQUEST);
-		}
-	}
-	
-	private Optional<ObmDomain> getDomain(ObmDomainUuid domainUuid) throws DaoException {
-		try {
-			return Optional.of(domainDao.findDomainByUuid(domainUuid));
-		} catch (DomainNotFoundException e) {
-			return Optional.absent();
 		}
 	}
 }

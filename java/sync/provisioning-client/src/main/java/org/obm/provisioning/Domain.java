@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import java.util.UUID;
-
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
@@ -45,6 +43,7 @@ import org.obm.provisioning.dto.ObmDomainDto;
 import com.google.common.base.Optional;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class Domain {
 
@@ -59,8 +58,8 @@ public class Domain {
 				.path(BASE_PATH);
 	}
 	
-	public Optional<ObmDomain> getById(UUID domainUUID) {
-		Response response = client.path("domains").path(domainUUID.toString())
+	public Optional<ObmDomain> getById(ObmDomainUuid domainUUID) {
+		Response response = client.path("domains").path(domainUUID.getUUID().toString())
 					.request().accept(MediaType.APPLICATION_JSON).get();
 		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL) {
 			return Optional.of(response.readEntity(ObmDomainDto.class).toDomainObject());

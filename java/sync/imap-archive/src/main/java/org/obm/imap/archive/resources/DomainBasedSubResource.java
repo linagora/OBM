@@ -29,8 +29,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
+import javax.inject.Singleton;
 import javax.ws.rs.Path;
 
+@Singleton
 @Path("domains")
 public class DomainBasedSubResource {
 

@@ -31,13 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
+import static com.github.restdriver.clientdriver.RestClientDriver.giveResponse;
+import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.UUID;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -55,18 +59,35 @@ import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
+import com.github.restdriver.clientdriver.ClientDriverRule;
+import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
 import com.google.inject.Inject;
 import com.jayway.restassured.http.ContentType;
 
 public class TreatmentsResourceTest {
 
+	private ClientDriverRule driver = new ClientDriverRule();
+	
 	@Rule public TestRule chain = RuleChain
-			.outerRule(new GuiceRule(this, new TestImapArchiveModules.Simple()));
+			.outerRule(new GuiceRule(this, new TestImapArchiveModules.Simple(driver)));
 
 	@Inject WebServer server;
 	
 	@Before
 	public void setUp() throws Exception {
+		driver.addExpectation(
+				onRequestTo("/obm-sync/login/trustedLogin").withMethod(Method.POST)
+					.withBody(Matchers.allOf(
+								Matchers.containsString("login=admin%40mydomain.org"),
+								Matchers.containsString("password=trust3dToken")),
+					MediaType.APPLICATION_FORM_URLENCODED),
+				giveResponse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+						+ "<token xmlns=\"http://www.obm.org/xsd/sync/token.xsd\">"
+						+ "<sid>06ae323a-0fa1-42ea-9ee8-313a023e4fd4</sid>"
+						+ "<domain uuid=\"962b7b35-abf3-4f1b-943d-d6640450812b\">mydomain.org</domain>"
+						+ "</token>",
+					MediaType.APPLICATION_XML)
+				);
 		server.start();
 	}
 
@@ -89,8 +110,8 @@ public class TreatmentsResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "cyrus")
-			.queryParam("password", "cyrus")
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
 			.queryParam("domain_name", "mydomain.org")
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
@@ -117,8 +138,8 @@ public class TreatmentsResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "cyrus")
-			.queryParam("password", "cyrus")
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
 			.queryParam("domain_name", "mydomain.org")
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).

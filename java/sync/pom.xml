@@ -482,6 +482,11 @@ org.eclipse.jdt.core.compiler.source=1.7
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
+				<artifactId>provisioning-client</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
 				<artifactId>provisioning-module</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
@@ -552,6 +557,12 @@ org.eclipse.jdt.core.compiler.source=1.7
 				<groupId>com.fasterxml.jackson.datatype</groupId>
 				<artifactId>jackson-datatype-guava</artifactId>
 				<version>2.4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.rest-driver</groupId>
+				<artifactId>rest-client-driver</artifactId>
+				<version>1.1.37</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
