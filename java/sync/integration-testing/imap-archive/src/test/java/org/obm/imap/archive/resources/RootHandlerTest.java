@@ -99,4 +99,17 @@ public class RootHandlerTest {
 		when()
 			.get("/imap-archive/service/v1/status");
 	}
+	
+	@Test
+	public void testStatusOkOnHealthcheckRoot() {
+		given()
+			.port(server.getHttpPort())
+			.param("login", "cyrus")
+			.param("password", "cyrus")
+			.param("domain_name", "mydomain.org").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/healthcheck/status");
+	}
 }

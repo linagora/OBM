@@ -48,6 +48,7 @@ import org.obm.imap.archive.authentication.AuthenticationFilter;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationModule;
 import org.obm.imap.archive.resources.ConfigurationResource;
 import org.obm.imap.archive.resources.DomainBasedSubResource;
+import org.obm.imap.archive.resources.HealthcheckHandler;
 import org.obm.imap.archive.resources.ObmDomainFactory;
 import org.obm.imap.archive.resources.RootHandler;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
@@ -111,11 +112,14 @@ public class ImapArchiveModule extends AbstractModule {
 
 		public final static String URL_PREFIX = "/imap-archive/service/v1";
 		public final static String URL_PATTERN = URL_PREFIX + "/*";
+		public final static String URL_HEALTHCHECK_PREFIX = "/imap-archive/healthcheck";
+		public final static String URL_HEALTHCHECK_PATTERN = URL_HEALTHCHECK_PREFIX + "/*";
 		
 		@Override
 		protected void configureServlets() {
 			filter(URL_PATTERN).through(AuthenticationFilter.class);
 			serve(URL_PATTERN).with(ImapArchiveServicesContainer.class);
+			serve(URL_HEALTHCHECK_PATTERN).with(ImapArchiveHealthcheckContainer.class);
 		}
 	}
 	
@@ -132,10 +136,21 @@ public class ImapArchiveModule extends AbstractModule {
 						}
 					})
 					.register(RootHandler.class)
-					.register(CyrusStatusHandler.class)
 					.register(DomainBasedSubResource.class)
 					.register(ConfigurationResource.class)
 					.register(ImapArchiveObjectMapper.class));
+		}
+		
+	}
+	
+	@Singleton
+	public static class ImapArchiveHealthcheckContainer extends ServletContainer {
+		
+		@Inject
+		public ImapArchiveHealthcheckContainer(Injector injector) {
+			super(new JerseyResourceConfig(injector)
+					.register(HealthcheckHandler.class)
+					.register(CyrusStatusHandler.class));
 		}
 		
 	}

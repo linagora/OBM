@@ -111,7 +111,7 @@ public class CyrusStatusHandlerTest {
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/cyrus/status");
+			.get("/imap-archive/healthcheck/cyrus/status");
 	}
 	
 	@Test
@@ -126,7 +126,7 @@ public class CyrusStatusHandlerTest {
 		expect()
 			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/cyrus/status");
+			.get("/imap-archive/healthcheck/cyrus/status");
 	}
 	
 	@Test
@@ -141,7 +141,7 @@ public class CyrusStatusHandlerTest {
 		expect()
 			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/cyrus/status");
+			.get("/imap-archive/healthcheck/cyrus/status");
 	}
 	
 	@Test
@@ -158,6 +158,6 @@ public class CyrusStatusHandlerTest {
 		expect()
 			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/cyrus/status");
+			.get("/imap-archive/healthcheck/cyrus/status");
 	}
 }
