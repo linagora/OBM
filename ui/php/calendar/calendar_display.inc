@@ -4800,7 +4800,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $frequency_block = "<input type=\"text\" size=\"4\" style=\"width:3em;\" id=\"tf_repeatfrequency\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />";
   }
 
-  $attendees_notification  = 'checked';
   if (isset($calendar['date_exception'])) { $date_exception = null; }
   if (isset($calendar['list-item'])) { $t_list_item = $calendar['list-item']; }
   if (isset($calendar['list-item-id'])) { $t_list_item_id = $calendar['list-item-id']; }
@@ -4810,7 +4809,22 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['add_displayed_users'])) { $add_displayed_users = $calendar['add_displayed_users']; }
   if (isset($calendar['show_user_calendar'])) { $show_user_calendar = ($calendar['show_user_calendar'] == 1 ? 'checked' : ''); }
   if (isset($calendar['show_resource_calendar'])) { $show_resource_calendar = ($calendar['show_resource_calendar'] == 1 ? 'checked' : ''); }
-  if (isset($calendar['attendees_notification'])) { $attendees_notification = ($calendar['attendees_notification'] == 1 ? 'checked' : ''); }
+  $attendees_notification = null;
+  if (($action == 'new' || $action == 'detailupdate') && !isset($calendar['template_id'])) {
+    # If not loading from a template, is on per default
+    $attendees_notification = 'checked';
+  }
+  elseif (isset($calendar['attendees_notification']) && $calendar['attendees_notification'] == 1) {
+    $attendees_notification = 'checked';
+  }
+  elseif ($event_q) {
+    $attendees_notification = $event_q->f('event_attendees_notification') ?
+      'checked' :
+      '';
+  }
+  else {
+    $attendees_notification = '';
+  }
   if (isset($calendar['alert'])) {
     // handle only one entry for now
     if (is_array($sel_alert)) {
@@ -4839,20 +4853,18 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $l_check_busy = "checked='checked'";
   }
 
-  if ($action != 'edit_template' && $action != 'update_template') {
-    $dis_attendees_notification = "
-    <fieldset class=\"detail extra\">    
-    <legend>$GLOBALS[l_notification]</legend>  
-    <table>    
-    <tr>    
-      <th><label for=\"cba_attendees_notification\">$GLOBALS[l_sendamail]</label></th> 
-      <td>
-        <input style=\"margin:0\" type=\"checkbox\" id=\"cba_attendees_notification\" name=\"cba_attendees_notification\" value=\"1\" $attendees_notification />
-      </td>
-    </tr>
-    </table>
-    </fieldset>";
-  }
+  $dis_attendees_notification = "
+  <fieldset class=\"detail extra\">
+  <legend>$GLOBALS[l_notification]</legend>
+  <table>
+  <tr>
+    <th><label for=\"cba_attendees_notification\">$GLOBALS[l_sendamail]</label></th>
+    <td>
+      <input style=\"margin:0\" type=\"checkbox\" id=\"cba_attendees_notification\" name=\"cba_attendees_notification\" value=\"1\" $attendees_notification />
+    </td>
+  </tr>
+  </table>
+  </fieldset>";
 
   if (($action == 'detailupdate') || ($action == 'update') || ($action == 'conflict_manager')) {
     $dis_button = "
