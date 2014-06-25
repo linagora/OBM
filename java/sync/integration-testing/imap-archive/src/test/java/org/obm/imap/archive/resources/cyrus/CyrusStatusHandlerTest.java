@@ -32,61 +32,36 @@
 package org.obm.imap.archive.resources.cyrus;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.easymock.EasyMock.expect;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.obm.dao.utils.H2Destination;
-import org.obm.dao.utils.H2InMemoryDatabase;
-import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.server.WebServer;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.icegreen.greenmail.util.GreenMail;
-import com.ninja_squad.dbsetup.DbSetup;
-import com.ninja_squad.dbsetup.Operations;
-import com.ninja_squad.dbsetup.operation.Operation;
+
+import fr.aliacom.obm.common.system.ObmSystemUser;
 
 public class CyrusStatusHandlerTest {
 	
-	@Rule public TestRule chain = RuleChain
-			.outerRule(new GuiceRule(this, new TestImapArchiveModules.WithGreenmail()))
-			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
-				@Override
-				public H2InMemoryDatabase get() {
-					return db;
-				}
-			}, "sql/initial.sql"));
+	@Rule public GuiceRule guiceRule = new GuiceRule(this, new TestImapArchiveModules.WithGreenmail());
 
-	@Inject
-	private H2InMemoryDatabase db;
-
-	
 	@Inject WebServer server;
 	@Inject GreenMail imapServer;
 	@Inject UserSystemDao userSystemDao;
+	@Inject IMocksControl control;
 
 	@Before
 	public void setUp() {
-		imapServer.start();
-		Operation operation =
-				Operations.sequenceOf(
-						Operations.deleteAllFrom("usersystem"),
-						Operations.insertInto("usersystem")
-						.columns("usersystem_login", "usersystem_password", "usersystem_homedir")
-						.values("cyrus", "cyrus", "")
-						.build());
-		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
-		dbSetup.launch();
 	}
 
 	@After
@@ -98,6 +73,9 @@ public class CyrusStatusHandlerTest {
 	@Test
 	public void testStatusIs200WhenImapIsUp() throws Exception {
 		imapServer.setUser("cyrus", "cyrus");
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build());
+		control.replay();
+		imapServer.start();
 		server.start();
 		
 		given()

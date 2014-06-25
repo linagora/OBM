@@ -31,13 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -45,10 +42,6 @@ import javax.ws.rs.core.Response;
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 public class RootHandler {
-
-	@Inject
-	@Context
-	private Application application;
 
 	@GET
 	@Path("/status")

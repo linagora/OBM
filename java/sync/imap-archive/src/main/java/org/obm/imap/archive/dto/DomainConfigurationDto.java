@@ -40,7 +40,7 @@ public class DomainConfigurationDto {
 
 	public static DomainConfigurationDto from(DomainConfiguration configuration) {
 		DomainConfigurationDto dto = new DomainConfigurationDto();
-		dto.domainId = configuration.getDomainId();
+		dto.domainId = configuration.getDomainId().getUUID();
 		dto.enabled = configuration.isEnabled();
 		dto.repeatKind = configuration.getRepeatKind() != null ? configuration.getRepeatKind().name() : null;
 		dto.dayOfWeek = from(configuration.getDayOfWeek());

@@ -32,58 +32,36 @@
 package org.obm.imap.archive.resources;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.easymock.EasyMock.expect;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
-import org.junit.rules.TestRule;
-import org.obm.dao.utils.H2Destination;
-import org.obm.dao.utils.H2InMemoryDatabase;
-import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.domain.dao.DomainDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.server.WebServer;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.ninja_squad.dbsetup.DbSetup;
-import com.ninja_squad.dbsetup.Operations;
-import com.ninja_squad.dbsetup.operation.Operation;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class DomainBasedSubResourceTest {
 
-	@Rule public TestRule chain = RuleChain
-			.outerRule(new GuiceRule(this, new TestImapArchiveModules.Simple()))
-			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
-				@Override
-				public H2InMemoryDatabase get() {
-					return db;
-				}
-			}, "sql/initial.sql"));
-
-	@Inject
-	private H2InMemoryDatabase db;
+	@Rule public GuiceRule guiceRule = new GuiceRule(this, new TestImapArchiveModules.Simple());
 
 	@Inject WebServer server;
+	@Inject IMocksControl control;
+	@Inject DomainDao domainDao;
 	
 	@Before
-	public void setUp() throws Exception {
-		Operation operation =
-				Operations.sequenceOf(
-						Operations.deleteAllFrom("domain"),
-						Operations.insertInto("domain")
-						.columns("domain_id", "domain_name", "domain_label", "domain_uuid")
-						.values(654, "my_domain_name", "my_domain.local", "a6af9131-60b6-4e3a-a9f3-df5b43a89309")
-						.build());
-
-		
-		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
-		dbSetup.launch();
-		server.start();
+	public void setUp() {
 	}
 
 	@After
@@ -92,7 +70,12 @@ public class DomainBasedSubResourceTest {
 	}
 	
 	@Test
-	public void getDomainConfigurationShouldReturnBadRequestOnInvalidUuid() {
+	public void getDomainConfigurationShouldReturnBadRequestOnInvalidUuid() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("21aeb670-f49e-428a-9d0c-f11f5feaa688");
+		expect(domainDao.findDomainByUuid(domainId)).andReturn(ObmDomain.builder().uuid(domainId).build());
+		control.replay();
+		server.start();
+		
 		given()
 			.port(server.getHttpPort())
 			.param("login", "cyrus")
@@ -105,7 +88,11 @@ public class DomainBasedSubResourceTest {
 	}
 	
 	@Test
-	public void getDomainConfigurationShouldReturnNotFoundOnAbsentDomain() {
+	public void getDomainConfigurationShouldReturnNotFoundOnAbsentDomain() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("c7dd9583-5057-4c0a-ac30-d284940420c8");
+		expect(domainDao.findDomainByUuid(domainId)).andThrow(new DomainNotFoundException());
+		control.replay();
+		server.start();
 		given()
 			.port(server.getHttpPort())
 			.param("login", "cyrus")

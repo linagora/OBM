@@ -35,11 +35,15 @@ import java.util.Date;
 
 import org.apache.http.client.HttpClient;
 import org.joda.time.DateTime;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.DomainConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
+import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.UserSystemDao;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
@@ -70,7 +74,17 @@ public class TestImapArchiveModules {
 				new LocalLocatorModule(),
 				new ObmSyncModule(),
 				new TransactionalModule(),
-				new DateProviderModule()
+				new DateProviderModule(),
+				new AbstractModule() {
+					
+					@Override
+					protected void configure() {
+						IMocksControl control = EasyMock.createControl();
+						bind(IMocksControl.class).toInstance(control);
+						bind(DomainDao.class).toInstance(control.createMock(DomainDao.class));
+						bind(UserSystemDao.class).toInstance(control.createMock(UserSystemDao.class));
+					}
+				}
 			));
 		}
 	}

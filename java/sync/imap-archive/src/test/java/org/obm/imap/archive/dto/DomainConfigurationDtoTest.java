@@ -45,6 +45,8 @@ import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
+
 
 public class DomainConfigurationDtoTest {
 
@@ -52,7 +54,7 @@ public class DomainConfigurationDtoTest {
 	public void fromDomainConfigurationShouldCopyAllFields() {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
-					.domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"))
+					.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
 					.enabled(false)
 					.schedulingConfiguration(SchedulingConfiguration.builder()
 							.recurrence(ArchiveRecurrence.builder()

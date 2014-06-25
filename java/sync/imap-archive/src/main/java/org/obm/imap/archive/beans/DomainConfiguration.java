@@ -31,14 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.beans;
 
-import java.util.UUID;
-
 import org.joda.time.LocalTime;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class DomainConfiguration {
 	
@@ -49,7 +49,7 @@ public class DomainConfiguration {
 
 	public static DomainConfiguration from(DomainConfigurationDto configuration) {
 		return DomainConfiguration.builder()
-				.domainId(configuration.domainId)
+				.domainId(ObmDomainUuid.of(configuration.domainId))
 				.enabled(configuration.enabled)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
@@ -69,14 +69,14 @@ public class DomainConfiguration {
 	
 	public static class Builder {
 		
-		private UUID domainId;
+		private ObmDomainUuid domainId;
 		private Boolean enabled;
 		private SchedulingConfiguration schedulingConfiguration;
 		
 		private Builder() {
 		}
 		
-		public Builder domainId(UUID domainId) {
+		public Builder domainId(ObmDomainUuid domainId) {
 			Preconditions.checkNotNull(domainId);
 			this.domainId = domainId;
 			return this;
@@ -102,17 +102,17 @@ public class DomainConfiguration {
 		}
 	}
 	
-	private final UUID domainId;
+	private final ObmDomainUuid domainId;
 	private final boolean enabled;
 	private final SchedulingConfiguration schedulingConfiguration;
 
-	private DomainConfiguration(UUID domainId, boolean enabled, SchedulingConfiguration schedulingConfiguration) {
+	private DomainConfiguration(ObmDomainUuid  domainId, boolean enabled, SchedulingConfiguration schedulingConfiguration) {
 		this.domainId = domainId;
 		this.enabled = enabled;
 		this.schedulingConfiguration = schedulingConfiguration;
 	}
 	
-	public UUID getDomainId() {
+	public ObmDomainUuid getDomainId() {
 		return domainId;
 	}
 	

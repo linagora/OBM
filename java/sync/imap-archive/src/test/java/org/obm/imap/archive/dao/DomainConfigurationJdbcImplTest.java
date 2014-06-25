@@ -34,8 +34,6 @@ package org.obm.imap.archive.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.UUID;
-
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -65,9 +63,7 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
-
 
 public class DomainConfigurationJdbcImplTest {
 
@@ -93,17 +89,9 @@ public class DomainConfigurationJdbcImplTest {
 	public void setUp() {
 		Operation operation =
 				Operations.sequenceOf(
-						Operations.deleteAllFrom("mail_archive", "domain"),
-						Operations.insertInto("domain")
-						.columns("domain_id", "domain_name", "domain_label", "domain_uuid")
-						.values(654, "my_domain_name", "my_domain.local", "a6af9131-60b6-4e3a-a9f3-df5b43a89309")
-						.build(),
-						Operations.insertInto("domain")
-						.columns("domain_id", "domain_name", "domain_label", "domain_uuid")
-						.values(321, "my_second_domain", "my_second_domain.local", "1383b12c-6d79-40c7-acf9-c79bcc673fff")
-						.build(),
+						Operations.deleteAllFrom("mail_archive"),
 						Operations.insertInto("mail_archive")
-						.columns("mail_archive_domain_id", 
+						.columns("mail_archive_domain_uuid", 
 								"mail_archive_activated", 
 								"mail_archive_repeat_kind", 
 								"mail_archive_day_of_week", 
@@ -111,7 +99,7 @@ public class DomainConfigurationJdbcImplTest {
 								"mail_archive_day_of_year", 
 								"mail_archive_hour", 
 								"mail_archive_minute")
-						.values(654, Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
+						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
 						.build());
 
 		
@@ -121,12 +109,8 @@ public class DomainConfigurationJdbcImplTest {
 	
 	@Test
 	public void getDomainConfigurationShouldReturnStoredValueWhenDomainIdMatch() throws Exception {
-		UUID uuid = UUID.fromString("d0bad16f-7b79-4b08-aaf2-af2f2764673d");
-		ObmDomain domain = ObmDomain.builder()
-				.id(654)
-				.uuid(ObmDomainUuid.of(uuid))
-				.build();
-		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.getDomainConfiguration(domain);
+		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.getDomainConfiguration(uuid);
 		assertThat(domainConfiguration.getDomainId()).isEqualTo(uuid);
 		assertThat(domainConfiguration.isEnabled()).isTrue();
 		assertThat(domainConfiguration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
@@ -139,12 +123,8 @@ public class DomainConfigurationJdbcImplTest {
 	
 	@Test
 	public void getDomainConfigurationShouldReturnNullWhenDomainIdDoesntMatch() throws Exception {
-		UUID uuid = UUID.fromString("d0bad16f-7b79-4b08-aaf2-af2f2764673d");
-		ObmDomain domain = ObmDomain.builder()
-				.id(666)
-				.uuid(ObmDomainUuid.of(uuid))
-				.build();
-		assertThat(domainConfigurationJdbcImpl.getDomainConfiguration(domain)).isNull();
+		ObmDomainUuid uuid = ObmDomainUuid.of("78d6e95b-ab6c-4625-b3bf-e86c68347e2d");
+		assertThat(domainConfigurationJdbcImpl.getDomainConfiguration(uuid)).isNull();
 	}
 	
 	@Test
@@ -152,13 +132,13 @@ public class DomainConfigurationJdbcImplTest {
 		expectedException.expect(DomainNotFoundException.class).hasMessage("844db7a6-6788-47a4-9f04-f5ed9f007a04");
 		
 		domainConfigurationJdbcImpl.updateDomainConfiguration(DomainConfiguration.DEFAULT_VALUES_BUILDER
-				.domainId(UUID.fromString("844db7a6-6788-47a4-9f04-f5ed9f007a04"))
+				.domainId(ObmDomainUuid.of("844db7a6-6788-47a4-9f04-f5ed9f007a04"))
 				.build());
 	}
 	
 	@Test
 	public void updateDomainConfigurationShouldUpdateWhenDomainFound() throws Exception {
-		UUID uuid = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
 				.domainId(uuid)
 				.enabled(false)
@@ -175,11 +155,7 @@ public class DomainConfigurationJdbcImplTest {
 		
 		domainConfigurationJdbcImpl.updateDomainConfiguration(expectedDomainConfiguration);
 		
-		ObmDomain domain = ObmDomain.builder()
-				.id(654)
-				.uuid(ObmDomainUuid.of(uuid))
-				.build();
-		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.getDomainConfiguration(domain);
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.getDomainConfiguration(uuid);
 		assertThat(domainConfiguration.getDomainId()).isEqualTo(uuid);
 		assertThat(domainConfiguration.isEnabled()).isEqualTo(expectedDomainConfiguration.isEnabled());
 		assertThat(domainConfiguration.getRepeatKind()).isEqualTo(expectedDomainConfiguration.getRepeatKind());
@@ -191,26 +167,17 @@ public class DomainConfigurationJdbcImplTest {
 	}
 	
 	@Test
-	public void createDomainConfigurationShouldThrowExceptionWhenDomainNotFound() throws Exception {
-		expectedException.expect(DomainNotFoundException.class).hasMessage("The domain with the uuid 844db7a6-6788-47a4-9f04-f5ed9f007a04 was not found");
-		
-		domainConfigurationJdbcImpl.createDomainConfiguration(DomainConfiguration.DEFAULT_VALUES_BUILDER
-				.domainId(UUID.fromString("844db7a6-6788-47a4-9f04-f5ed9f007a04"))
-				.build());
-	}
-	
-	@Test
 	public void createDomainConfigurationShouldThrowExceptionWhenDomainConfigurationAlreadyExists() throws Exception {
 		expectedException.expect(DaoException.class);
 		
 		domainConfigurationJdbcImpl.createDomainConfiguration(DomainConfiguration.DEFAULT_VALUES_BUILDER
-				.domainId(UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309"))
+				.domainId(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"))
 				.build());
 	}
 	
 	@Test
 	public void createDomainConfigurationShouldCreateWhenDomainFound() throws Exception {
-		UUID uuid = UUID.fromString("1383b12c-6d79-40c7-acf9-c79bcc673fff");
+		ObmDomainUuid uuid = ObmDomainUuid.of("1383b12c-6d79-40c7-acf9-c79bcc673fff");
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
 				.domainId(uuid)
 				.enabled(false)

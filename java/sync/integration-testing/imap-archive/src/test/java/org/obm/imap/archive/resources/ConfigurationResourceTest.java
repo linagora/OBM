@@ -32,6 +32,7 @@
 package org.obm.imap.archive.resources;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.easymock.EasyMock.expect;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -39,6 +40,7 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,6 +50,7 @@ import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.domain.dao.DomainDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
@@ -64,6 +67,9 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
+
 public class ConfigurationResourceTest {
 
 	@Rule public TestRule chain = RuleChain
@@ -79,22 +85,16 @@ public class ConfigurationResourceTest {
 	private H2InMemoryDatabase db;
 
 	@Inject WebServer server;
+	@Inject IMocksControl control;
+	@Inject DomainDao domainDao;
 	
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		Operation operation =
 				Operations.sequenceOf(
-						Operations.deleteAllFrom("domain", "mail_archive"),
-						Operations.insertInto("domain")
-						.columns("domain_id", "domain_name", "domain_label", "domain_uuid")
-						.values(654, "my_domain_name", "my_domain.local", "a6af9131-60b6-4e3a-a9f3-df5b43a89309")
-						.build(),
-						Operations.insertInto("domain")
-						.columns("domain_id", "domain_name", "domain_label", "domain_uuid")
-						.values(321, "my_domain_name", "my_domain.local", "21aeb670-f49e-428a-9d0c-f11f5feaa688")
-						.build(),
+						Operations.deleteAllFrom("mail_archive"),
 						Operations.insertInto("mail_archive")
-						.columns("mail_archive_domain_id", 
+						.columns("mail_archive_domain_uuid", 
 								"mail_archive_activated", 
 								"mail_archive_repeat_kind", 
 								"mail_archive_day_of_week", 
@@ -102,13 +102,12 @@ public class ConfigurationResourceTest {
 								"mail_archive_day_of_year", 
 								"mail_archive_hour", 
 								"mail_archive_minute")
-						.values(321, Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
+						.values("21aeb670-f49e-428a-9d0c-f11f5feaa688", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
 						.build());
 
 		
 		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
 		dbSetup.launch();
-		server.start();
 	}
 
 	@After
@@ -117,7 +116,13 @@ public class ConfigurationResourceTest {
 	}
 	
 	@Test
-	public void getDomainConfigurationShouldReturnADefaultConfiguration() {
+	public void getDomainConfigurationShouldReturnADefaultConfiguration() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		expect(domainDao.findDomainByUuid(domainId)).andReturn(ObmDomain.builder().uuid(domainId).build());
+		control.replay();
+		server.start();
+		
+		
 		given()
 			.port(server.getHttpPort())
 			.param("login", "cyrus")
@@ -133,7 +138,12 @@ public class ConfigurationResourceTest {
 	}
 
 	@Test
-	public void getDomainConfigurationShouldReturnStoredConfiguration() {
+	public void getDomainConfigurationShouldReturnStoredConfiguration() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("21aeb670-f49e-428a-9d0c-f11f5feaa688");
+		expect(domainDao.findDomainByUuid(domainId)).andReturn(ObmDomain.builder().uuid(domainId).build());
+		control.replay();
+		server.start();
+		
 		given()
 			.port(server.getHttpPort())
 			.param("login", "cyrus")
@@ -149,9 +159,11 @@ public class ConfigurationResourceTest {
 	}
 
 	@Test
-	public void updateDomainConfigurationShouldThrowExceptionWhenBadInputs() {
+	public void updateDomainConfigurationShouldThrowExceptionWhenBadInputs() throws Exception {
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		control.replay();
+		server.start();
 		
 		given()
 			.port(server.getHttpPort())
@@ -167,7 +179,12 @@ public class ConfigurationResourceTest {
 	}
 
 	@Test
-	public void updateDomainConfigurationShouldCreateWhenNoData() {
+	public void updateDomainConfigurationShouldCreateWhenNoData() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		expect(domainDao.findDomainByUuid(domainId)).andReturn(ObmDomain.builder().uuid(domainId).build());
+		control.replay();
+		server.start();
+		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		domainConfigurationDto.enabled = true;
@@ -207,7 +224,11 @@ public class ConfigurationResourceTest {
 	}
 
 	@Test
-	public void updateDomainConfigurationShouldReturnNoContentWhenUpdating() {
+	public void updateDomainConfigurationShouldReturnNoContentWhenUpdating() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("21aeb670-f49e-428a-9d0c-f11f5feaa688");
+		expect(domainDao.findDomainByUuid(domainId)).andReturn(ObmDomain.builder().uuid(domainId).build());
+		control.replay();
+		server.start();
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = UUID.fromString("21aeb670-f49e-428a-9d0c-f11f5feaa688");
 		domainConfigurationDto.enabled = true;

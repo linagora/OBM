@@ -33,12 +33,12 @@ package org.obm.imap.archive.beans;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.UUID;
-
 import org.joda.time.LocalTime;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
+
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 
 public class DomainConfigurationTest {
@@ -55,26 +55,26 @@ public class DomainConfigurationTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void builderShouldThrowWhenEnabledIsNotProvided() {
-		DomainConfiguration.builder().domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
+		DomainConfiguration.builder().domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
 	}
 
 	@Test(expected=IllegalStateException.class)
 	public void builderShouldThrowWhenEnabledAndSchedulingConfigurationIsNotProvided() {
-		DomainConfiguration.builder().enabled(true).domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
+		DomainConfiguration.builder().enabled(true).domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
 	}
 	
 	@Test
 	public void builderShouldBuildConfigurationWhenEnabledIsTrueAndRequiredFieldsAreProvided() {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
-					.domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"))
+					.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
 					.enabled(true)
 					.schedulingConfiguration(SchedulingConfiguration.builder()
 							.recurrence(ArchiveRecurrence.daily())
 							.time(LocalTime.parse("13:23"))
 							.build())
 					.build();
-		assertThat(configuration.getDomainId()).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
+		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
 		assertThat(configuration.isEnabled()).isTrue();
 		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
 		assertThat(configuration.getHour()).isEqualTo(13);
@@ -85,10 +85,10 @@ public class DomainConfigurationTest {
 	public void builderShouldBuildConfigurationWhenEnabledIsFalseAndRequiredFieldsAreProvided() {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
-					.domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"))
+					.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
 					.enabled(false)
 					.build();
-		assertThat(configuration.getDomainId()).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
+		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
 		assertThat(configuration.isEnabled()).isFalse();
 	}
 
@@ -96,14 +96,14 @@ public class DomainConfigurationTest {
 	public void builderShouldKeepUnusedConfigurationWhenProvidingDisabledFields() {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
-					.domainId(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"))
+					.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
 					.enabled(false)
 					.schedulingConfiguration(SchedulingConfiguration.builder()
 							.recurrence(ArchiveRecurrence.daily())
 							.time(LocalTime.parse("13:23"))
 							.build())
 					.build();
-		assertThat(configuration.getDomainId()).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
+		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
 		assertThat(configuration.isEnabled()).isFalse();
 		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
 		assertThat(configuration.getHour()).isEqualTo(13);
@@ -112,7 +112,7 @@ public class DomainConfigurationTest {
 	
 	@Test
 	public void defaultValues() {
-		UUID domainId = UUID.fromString("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
+		ObmDomainUuid domainId = ObmDomainUuid.of("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
 		SchedulingConfiguration schedulingConfiguration = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 						.dayOfMonth(DayOfMonth.last())
@@ -137,7 +137,7 @@ public class DomainConfigurationTest {
 	
 	@Test
 	public void fromDto() {
-		UUID expectedDomainId = UUID.fromString("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
+		ObmDomainUuid expectedDomainId = ObmDomainUuid.of("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
 		boolean expectedEnabled = true;
 		RepeatKind expectedRepeatKind = RepeatKind.WEEKLY;
 		DayOfWeek expectedDayOfWeek = DayOfWeek.TUESDAY;
@@ -147,7 +147,7 @@ public class DomainConfigurationTest {
 		Integer expectedMinute = 32;
 		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
-		domainConfigurationDto.domainId = expectedDomainId;
+		domainConfigurationDto.domainId = expectedDomainId.getUUID();
 		domainConfigurationDto.enabled = expectedEnabled;
 		domainConfigurationDto.repeatKind = expectedRepeatKind.toString();
 		domainConfigurationDto.dayOfWeek = expectedDayOfWeek.getSpecificationValue();

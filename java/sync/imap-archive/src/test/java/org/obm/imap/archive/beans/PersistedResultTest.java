@@ -34,9 +34,9 @@ package org.obm.imap.archive.beans;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.UUID;
-
 import org.junit.Test;
+
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 
 public class PersistedResultTest {
@@ -52,7 +52,7 @@ public class PersistedResultTest {
 	@Test
 	public void createPersistedResult() {
 		DomainConfiguration domainConfiguration = DomainConfiguration.DEFAULT_VALUES_BUILDER
-				.domainId(UUID.fromString("8fc17d70-f50f-4b49-8e39-4693eeff7e41"))
+				.domainId(ObmDomainUuid.of("8fc17d70-f50f-4b49-8e39-4693eeff7e41"))
 				.build();
 		
 		PersistedResult persistedResult = PersistedResult.create(domainConfiguration);

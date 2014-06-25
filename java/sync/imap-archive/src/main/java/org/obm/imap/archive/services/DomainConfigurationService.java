@@ -58,7 +58,7 @@ public class DomainConfigurationService {
 	
 	@Transactional
 	public PersistedResult updateOrCreate(DomainConfiguration domainConfiguration, ObmDomain domain) throws DaoException, DomainNotFoundException {
-		if (domainConfigurationDao.getDomainConfiguration(domain) != null) {
+		if (domainConfigurationDao.getDomainConfiguration(domain.getUuid()) != null) {
 			domainConfigurationDao.updateDomainConfiguration(domainConfiguration);
 			return PersistedResult.update();
 		} else {
