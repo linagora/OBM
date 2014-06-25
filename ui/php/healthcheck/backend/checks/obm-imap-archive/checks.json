@@ -1,0 +1,18 @@
+{
+    "checks": [
+        {
+            "id": "ConnectionStatus",
+            "name": "OBM IMAP Archive Connection Check",
+            "description": "Checks that the OBM IMAP Archive server(s) are up and running.",
+            "url": null,
+            "parentId": null
+        },
+        {
+            "id": "CyrusConnectionStatus",
+            "name": "OBM IMAP Archive Cyrus Connection Check",
+            "description": "Checks that the OBM IMAP Archive server(s) can connect to Cyrus.",
+            "url": null,
+            "parentId": null
+        }
+    ]
+}
