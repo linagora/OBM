@@ -120,6 +120,7 @@ cp ${OBM_UPDATE_SCRIPTS_30}/update-3.0.0~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/3.
 
 # Upgrade My OBM 3.0.1
 cp ${OBM_UPDATE_SCRIPTS_30}/update-3.0.1~1.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/3.0.1~1
+cp ${OBM_UPDATE_SCRIPTS_30}/update-3.0.1~2.mysql.sql ${UPGRADE_SQL_DIR_MYSQL}/3.0.1~2
 
 #PGSQL UPGRADE
 #upgrade Pgsql OBM 2.2.1
@@ -203,5 +204,6 @@ cp ${OBM_UPDATE_SCRIPTS_30}/update-3.0.0~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.
 
 # Upgrade Pg OBM 3.0.1
 cp ${OBM_UPDATE_SCRIPTS_30}/update-3.0.1~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.0.1~1
+cp ${OBM_UPDATE_SCRIPTS_30}/update-3.0.1~2.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.0.1~2
 
 exit 0
