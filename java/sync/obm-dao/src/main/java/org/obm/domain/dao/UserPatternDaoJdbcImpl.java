@@ -60,7 +60,7 @@ public class UserPatternDaoJdbcImpl implements UserPatternDao {
 	public void updateUserIndex(ObmUser user) throws DaoException {
 		Connection con = null;
 		PreparedStatement ps = null;
-		String query = "INSERT INTO _userpattern (id, pattern) VALUES (?, ?)";
+		String query = "INSERT INTO _userpattern (id, pattern) VALUES (?, LOWER(?))";
 
 		try {
 			con = obmHelper.getConnection();
