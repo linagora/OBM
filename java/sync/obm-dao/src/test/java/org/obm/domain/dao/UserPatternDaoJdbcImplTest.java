@@ -133,7 +133,7 @@ public class UserPatternDaoJdbcImplTest implements H2TestClass {
 		dao.updateUserIndex(user);
 
 		Set<String> patterns = Sets.newHashSet();
-		Set<String> expectedPatterns = ImmutableSet.of("jdoe", "john.doe", "John", "Doe");
+		Set<String> expectedPatterns = ImmutableSet.of("jdoe", "john.doe", "john", "doe");
 		ResultSet rs = db.execute("SELECT pattern FROM _userpattern WHERE id = ?", user.getUid());
 
 		while (rs.next()) {

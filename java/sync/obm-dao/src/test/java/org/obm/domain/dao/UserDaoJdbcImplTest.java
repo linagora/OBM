@@ -546,7 +546,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		ObmUser createdUser = dao.create(user);
 
 		Set<String> patterns = Sets.newHashSet();
-		Set<String> expectedPatterns = ImmutableSet.of("jdoe", "John", "Doe");
+		Set<String> expectedPatterns = ImmutableSet.of("jdoe", "john", "doe");
 		ResultSet rs = db.execute("SELECT pattern FROM _userpattern WHERE id = ?", createdUser.getUid());
 
 		while (rs.next()) {
