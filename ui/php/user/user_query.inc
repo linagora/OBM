@@ -425,7 +425,7 @@ function run_query_user_ext_search($user) {
   foreach ($patterns as $index => $pattern) {
     $pattern = strtolower($pattern);
     $innerpattern .= " INNER JOIN _userpattern  p$index ON p$index.id  = userobm_id ";
-    $wherepattern .= " AND p$index.pattern #LIKE '$pattern%'";
+    $wherepattern .= " AND p$index.pattern LIKE '$pattern%'";
   }
 
   if ($filter_entity == 'calendar') {
