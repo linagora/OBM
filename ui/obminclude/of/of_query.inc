@@ -4347,7 +4347,7 @@ function of_index_update($entity, $id=null) {
     $words = array_unique($words);
     foreach($words as $word) {
       if(trim($word) != '') {
-        $query = "INSERT INTO _userpattern VALUES(".$obm_q->f('userobm_id').", '".$obm_q->escape(trim($word))."')";
+        $query = "INSERT INTO _userpattern VALUES(".$obm_q->f('userobm_id').", LOWER('".$obm_q->escape(trim($word))."'))";
         $obm_q2->query($query);
       }
     }
