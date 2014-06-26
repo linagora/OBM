@@ -4181,9 +4181,6 @@ function get_domain_property($domain, $property) {
 function splitwords($string) {
   $mask = "/[\p{L}0-9][\p{L}\p{Mn}\x{2019}0-9]*/u";
   preg_match_all($mask, $string, $matches);
-  if($callback !== null) {
-    $matches[0] = array_map($callback,$matches[0]);
-  }
   return $matches[0];
 }
 
@@ -4203,9 +4200,9 @@ function of_index_update($entity, $id=null) {
     $words = array();
     $mails = $obm_q->f('userobm_email');
     $words = explode("\r\n",$mails);
-    $words = array_merge($words, splitwords($obm_q->f('userobm_lastname'),'strtolower'));
-    $words = array_merge($words, splitwords($obm_q->f('userobm_firstname'),'strtolower'));
-    $words = array_merge($words, splitwords($obm_q->f('userobm_login'),'strtolower'));
+    $words = array_merge($words, splitwords($obm_q->f('userobm_lastname')));
+    $words = array_merge($words, splitwords($obm_q->f('userobm_firstname')));
+    $words = array_merge($words, splitwords($obm_q->f('userobm_login')));
     $words = array_unique($words);
     foreach($words as $word) {
       if(trim($word) != '') {
