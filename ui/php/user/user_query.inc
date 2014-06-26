@@ -434,7 +434,7 @@ function run_query_user_ext_search($user) {
       INNER JOIN CalendarEntity ON calendarentity_calendar_id = userobm_id
       INNER JOIN EntityRight ON calendarentity_entity_id = entityright_entity_id
       ';
-    $filterWhere = 'AND ( entityright_'.$filter_pattern.' = 1 AND (entityright_consumer_id IN ('.implode(',',$userEntities).') OR entityright_consumer_id IS NULL) OR userobm_id = '.$obm['uid'].')';    
+    $filterWhere = 'AND ( entityright_'.$filter_pattern.' = 1 AND (entityright_consumer_id IN ('.implode(',',$userEntities).') OR entityright_consumer_id IS NULL) OR entityright_entity_id = (SELECT calendarentity_entity_id FROM CalendarEntity WHERE calendarentity_calendar_id='.$obm['uid'].'))';
   }
   
   if ($filter_archived) {
