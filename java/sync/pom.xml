@@ -131,6 +131,7 @@
 		<module>services-configuration-module</module>
 		<module>services-module</module>
 		<module>services-webapp</module>
+		<module>task-scheduler</module>
 		<module>transaction-test</module>
 		<module>utils</module>
 		<module>webapp-common-dependencies</module>
