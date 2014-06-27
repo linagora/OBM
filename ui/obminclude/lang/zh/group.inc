@@ -72,3 +72,4 @@ $l_cant_update_domain_group = "域分组自动被OBM处理，无法被更新！"
 $l_add_groups = "添加分组"; //"Add groups"
 $l_err_system_samba = "系统分组的windows更新权限没有被授权。"; //"Windows rights update of system group is not authorised."
 
+$l_public_book_not_writable = "公用通讯录必须是可写才能执行此操作";

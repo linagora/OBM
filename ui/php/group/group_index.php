@@ -268,11 +268,14 @@ if (($action == 'index') || ($action == '')) {
 } elseif ($action == 'contact_add') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_update_rights($params)) {
-      if($params['contact_nb'] == 0 && $params['contact_add'] != '') {
+    if($params['contact_nb'] == 0 && $params['contact_add'] != '') {
       $id = run_query_group_contact_create($params);
+
       if($id > 0) {
         $params['contact_nb'] = 1;
         $params["contact1"] = $id;
+      } else {
+	$display['msg'] .= display_err_msg($l_public_book_not_writable);
       }
     }    
     if ($params['contact_nb'] > 0) {
@@ -283,7 +286,7 @@ if (($action == 'index') || ($action == '')) {
 	set_update_state();
       }
       $display['msg'] .= display_ok_msg("$nb $l_contact_added");
-    } else {
+    } else if ($params['contact_add'] == '') {
       $display['msg'] .= display_err_msg($l_no_contact_added);
     }
 
