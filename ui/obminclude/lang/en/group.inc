@@ -72,3 +72,4 @@ $l_cant_update_domain_group = "Domain groups are automatically handled by OBM an
 $l_add_groups = "Add groups";
 $l_err_system_samba = "Windows rights update of system group is not authorised."; 
 
+$l_public_book_not_writable = "The public address book must be writable to complete this operation.";

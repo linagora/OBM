@@ -76,3 +76,5 @@ $l_err_cant_delete_default_user_group = "Le groupe est le groupe par défaut d'u
 $l_cant_delete_domain_group = "Les groupes de domaine sont gérés automatiquement par OBM et ne peuvent être supprimés.";
 $l_cant_update_domain_group = "Les groupes de domaine par défaut sont gérés automatiquement par OBM et ne peuvent être modifiés.";
 $l_add_groups = "Ajouter des groupes";
+
+$l_public_book_not_writable = "Le carnet d'adresses public doit être accessible en écriture pour effectuer cette action.";
