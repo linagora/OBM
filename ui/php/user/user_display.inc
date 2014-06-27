@@ -888,6 +888,7 @@ function html_user_consult($obm_q) {
   $smb_home_drive = $obm_q->f('userobm_samba_home_drive');
   $smb_logon = $obm_q->f('userobm_samba_logon_script');
 
+  $web_state = ($web_perms ? $l_yes : $l_no);
   $nomade_perms = ($nomade_perms ? $l_yes : $l_no);
   $nomade_enable = ($nomade_enable ? $l_yes : $l_no);
   $nomade_local_copy = ($nomade_local_copy ? $l_yes : $l_no);
