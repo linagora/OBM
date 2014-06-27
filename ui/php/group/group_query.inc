@@ -580,6 +580,11 @@ function run_query_group_contact_create($group) {
   $email = $group['contact_add'];
   $addressbooks = OBM_AddressBook::search();
   $addressbook = $addressbooks->getPublicAddressbook($email);
+
+  if (!$addressbook) {
+    return false;
+  }
+
   $contacts = $addressbook->getContacts($email);
   if(!empty($contacts)) {
     return key($contacts);

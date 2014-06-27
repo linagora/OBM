@@ -68,3 +68,4 @@ $l_cant_update_domain_group = "Nhóm miền này sẽ được OBM tự động 
 $l_add_groups = "Thêm nhóm";
 $l_err_system_samba = "Không được phép cập nhật quyền Windows của nhóm hệ thống."; 
 
+$l_public_book_not_writable = "Sách Địa chỉ công phải có khả năng ghi để thực hiện hành động này.";
