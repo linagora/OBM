@@ -113,7 +113,7 @@ function nextTreatmentDate() {
       Obm.Error.parseStatus(this);
     },
     onComplete: function(response) {
-      $('nextTreatmentDate').set('text', response.date);
+      $('nextTreatmentDate').set('text', response);
     }
   }).get({ajax : 1, action : 'next_treatment_date', 'configuration' : configuration});
 }

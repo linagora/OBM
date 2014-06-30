@@ -37,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Date;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +60,14 @@ public class SchedulingDatesServiceTest {
 			
 			@Override
 			public Date getDate() {
-				return new DateTime(2014, 6, 18, 16, 1).toDate();
+				return new DateTime()
+							.withZone(DateTimeZone.UTC)
+							.withYear(2014)
+							.withMonthOfYear(6)
+							.withDayOfMonth(18)
+							.withHourOfDay(16)
+							.withMinuteOfHour(1)
+							.toDate();
 			}
 		});
 	}
@@ -74,7 +82,15 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime(2014, 6, 18, 22, 58));
+		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
+				.withZone(DateTimeZone.UTC)
+				.withYear(2014)
+				.withMonthOfYear(6)
+				.withDayOfMonth(18)
+				.withHourOfDay(22)
+				.withMinuteOfHour(58)
+				.withSecondOfMinute(0)
+				.withMillisOfSecond(0));
 	}
 	
 	@Test
@@ -87,7 +103,15 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime(2014, 6, 19, 16, 1));
+		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
+				.withZone(DateTimeZone.UTC)
+				.withYear(2014)
+				.withMonthOfYear(6)
+				.withDayOfMonth(19)
+				.withHourOfDay(16)
+				.withMinuteOfHour(1)
+				.withSecondOfMinute(0)
+				.withMillisOfSecond(0));
 	}
 	
 	@Test
@@ -100,7 +124,15 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime(2014, 6, 19, 12, 15));
+		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
+				.withZone(DateTimeZone.UTC)
+				.withYear(2014)
+				.withMonthOfYear(6)
+				.withDayOfMonth(19)
+				.withHourOfDay(12)
+				.withMinuteOfHour(15)
+				.withSecondOfMinute(0)
+				.withMillisOfSecond(0));
 	}
 	
 	@Test
@@ -114,7 +146,15 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime(2014, 6, 24, 23, 59));
+		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
+				.withZone(DateTimeZone.UTC)
+				.withYear(2014)
+				.withMonthOfYear(6)
+				.withDayOfMonth(24)
+				.withHourOfDay(23)
+				.withMinuteOfHour(59)
+				.withSecondOfMinute(0)
+				.withMillisOfSecond(0));
 	}
 	
 	@Test
@@ -128,7 +168,15 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime(2014, 6, 18, 23, 59));
+		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
+				.withZone(DateTimeZone.UTC)
+				.withYear(2014)
+				.withMonthOfYear(6)
+				.withDayOfMonth(18)
+				.withHourOfDay(23)
+				.withMinuteOfHour(59)
+				.withSecondOfMinute(0)
+				.withMillisOfSecond(0));
 	}
 	
 	@Test
@@ -142,7 +190,15 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime(2014, 6, 21, 23, 59));
+		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
+				.withZone(DateTimeZone.UTC)
+				.withYear(2014)
+				.withMonthOfYear(6)
+				.withDayOfMonth(21)
+				.withHourOfDay(23)
+				.withMinuteOfHour(59)
+				.withSecondOfMinute(0)
+				.withMillisOfSecond(0));
 	}
 	
 	@Test
@@ -156,7 +212,15 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime(2014, 7, 10, 23, 59));
+		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
+				.withZone(DateTimeZone.UTC)
+				.withYear(2014)
+				.withMonthOfYear(7)
+				.withDayOfMonth(10)
+				.withHourOfDay(23)
+				.withMinuteOfHour(59)
+				.withSecondOfMinute(0)
+				.withMillisOfSecond(0));
 	}
 	
 	@Test
@@ -170,7 +234,15 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime(2014, 6, 20, 23, 59));
+		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
+				.withZone(DateTimeZone.UTC)
+				.withYear(2014)
+				.withMonthOfYear(6)
+				.withDayOfMonth(20)
+				.withHourOfDay(23)
+				.withMinuteOfHour(59)
+				.withSecondOfMinute(0)
+				.withMillisOfSecond(0));
 	}
 	
 	@Test
@@ -184,7 +256,15 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime(2014, 6, 30, 23, 59));
+		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
+				.withZone(DateTimeZone.UTC)
+				.withYear(2014)
+				.withMonthOfYear(6)
+				.withDayOfMonth(30)
+				.withHourOfDay(23)
+				.withMinuteOfHour(59)
+				.withSecondOfMinute(0)
+				.withMillisOfSecond(0));
 	}
 	
 	@Test
@@ -198,7 +278,15 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime(2015, 2, 10, 23, 59));
+		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
+				.withZone(DateTimeZone.UTC)
+				.withYear(2015)
+				.withMonthOfYear(2)
+				.withDayOfMonth(10)
+				.withHourOfDay(23)
+				.withMinuteOfHour(59)
+				.withSecondOfMinute(0)
+				.withMillisOfSecond(0));
 	}
 	
 	@Test
@@ -212,6 +300,14 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime(2014, 7, 31, 23, 59));
+		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
+				.withZone(DateTimeZone.UTC)
+				.withYear(2014)
+				.withMonthOfYear(7)
+				.withDayOfMonth(31)
+				.withHourOfDay(23)
+				.withMinuteOfHour(59)
+				.withSecondOfMinute(0)
+				.withMillisOfSecond(0));
 	}
 }

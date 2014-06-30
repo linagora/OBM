@@ -341,13 +341,12 @@ function get_block_next_treatment_date($configuration) {
 
   $date = null;
   if ($status[0] == 1) {
-    $nextTreatmentDate = $status[1]->nextTreatmentDate->millis;
-    $date = new Of_Date($nextTreatmentDate / 1000, 'UTC');
-    $date->setTimezone(DateTimeZone::UTC);
+    $date = new DateTime($status[1]->nextTreatmentDate);
+    $date->setTimezone(new DateTimeZone('UTC'));
   }
   return
     "<th>$l_next_run</th>
-     <td id='nextTreatmentDate' >".(is_null($date) ? '' : $date->getOutputDateTime())."</td>";
+     <td id='nextTreatmentDate' >".(is_null($date) ? '' : $date->format('Y-m-d H:i'))."</td>";
 }
 
 ///////////////////////////////////////////////////////////////////////////////

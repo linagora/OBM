@@ -42,10 +42,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.hamcrest.Matchers;
-import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -59,8 +57,8 @@ import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
-import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
+import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.Inject;
 import com.jayway.restassured.http.ContentType;
 
@@ -121,11 +119,8 @@ public class TreatmentsResourceTest {
 			.post("/imap-archive/service/v1/domains/962b7b35-abf3-4f1b-943d-d6640450812b/treatments/next");
 	}
 	
-	@Ignore
 	@Test
 	public void calculateNextScheduledDateShouldReturnNextTreatmentDateWhenConfigurationActive() {
-		DateTime now = TestImapArchiveModules.LOCAL_DATE_TIME
-				.plusDays(1);
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = UUID.fromString("21aeb670-f49e-428a-9d0c-f11f5feaa688");
 		domainConfigurationDto.enabled = true;
@@ -145,7 +140,7 @@ public class TreatmentsResourceTest {
 			.body(domainConfigurationDto).
 		expect()
 			.contentType(ContentType.JSON)
-			.body("nextTreatmentDate", equalTo(now.getMillis()))
+			.body("nextTreatmentDate", equalTo("2014-06-19T00:00:00.000Z"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.post("/imap-archive/service/v1/domains/21aeb670-f49e-428a-9d0c-f11f5feaa688/treatments/next");

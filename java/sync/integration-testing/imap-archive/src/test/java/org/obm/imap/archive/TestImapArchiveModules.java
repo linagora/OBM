@@ -36,6 +36,7 @@ import java.util.Date;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
@@ -55,7 +56,15 @@ import com.google.inject.util.Modules;
 
 public class TestImapArchiveModules {
 	
-	public static final DateTime LOCAL_DATE_TIME = new DateTime(2014, 6, 18, 0, 0);
+	public static final DateTime LOCAL_DATE_TIME = new DateTime()
+			.withZone(DateTimeZone.UTC)
+			.withYear(2014)
+			.withMonthOfYear(6)
+			.withDayOfMonth(18)
+			.withHourOfDay(0)
+			.withMinuteOfHour(0)
+			.withSecondOfMinute(0)
+			.withMillisOfSecond(0);
 
 	public static class Simple extends AbstractModule {
 	

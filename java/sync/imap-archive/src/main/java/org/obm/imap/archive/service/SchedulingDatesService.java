@@ -35,6 +35,7 @@ package org.obm.imap.archive.service;
 import javax.inject.Inject;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.sync.date.DateProvider;
 
@@ -54,11 +55,12 @@ public class SchedulingDatesService {
 	public DateTime nextTreatmentDate(SchedulingConfiguration schedulingConfiguration) {
 		DateTime actualDateTime = new DateTime(dateProvider.getDate());
 		DateTime actualDateWithScheduledTime = actualDateTime
+				.withZone(DateTimeZone.UTC)
 				.withHourOfDay(schedulingConfiguration.getHour())
 				.withMinuteOfHour(schedulingConfiguration.getMinute())
 				.withSecondOfMinute(0)
 				.withMillisOfSecond(0);
-		
+
 		switch (schedulingConfiguration.getRepeatKind()) {
 		case DAILY:
 			return dailyNextTreatmentDate(actualDateTime, actualDateWithScheduledTime);

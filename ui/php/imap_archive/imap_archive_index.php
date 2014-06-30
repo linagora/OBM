@@ -85,11 +85,9 @@ if ($status[0] != 1) {
     if ($status[0] != 1) {
       $display['msg'] .= display_err_msg($status[1]);
     } else {
-      $json = $status[1];
-      error_log("nextTreatmentDate");
-      error_log(print_r($json->nextTreatmentDate, true));
-      $nextTreatmentDate = new Of_Date($json->nextTreatmentDate->millis / 1000, 'UTC');
-      $display['json'] = json_encode($nextTreatmentDate);
+      $nextTreatmentDate = new DateTime($status[1]->nextTreatmentDate);
+      $nextTreatmentDate->setTimezone(new DateTimeZone('UTC'));
+      $display['json'] = json_encode($nextTreatmentDate->format('Y-m-d H:i'));
       echo '('.$display['json'].')';
     }
     exit();

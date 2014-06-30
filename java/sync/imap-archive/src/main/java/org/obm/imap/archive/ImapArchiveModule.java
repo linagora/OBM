@@ -134,7 +134,8 @@ public class ImapArchiveModule extends AbstractModule {
 					.register(RootHandler.class)
 					.register(CyrusStatusHandler.class)
 					.register(DomainBasedSubResource.class)
-					.register(ConfigurationResource.class));
+					.register(ConfigurationResource.class)
+					.register(ImapArchiveObjectMapper.class));
 		}
 		
 	}
