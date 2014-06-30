@@ -173,7 +173,7 @@ function dis_imap_archive_form($backup, $params, $configuration) {
     </fieldset>
     <div class='buttons'>  
       <input type=\"hidden\" name=\"action\" value=\"update\">
-      <input type='submit' value=$l_validate />
+      <input type='submit' value=$l_validate onclick=\"enableConfiguration(true);\"/>
     </div>
     </form>
   ";
