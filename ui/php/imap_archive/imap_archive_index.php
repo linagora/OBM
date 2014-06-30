@@ -161,14 +161,14 @@ function get_imap_archive_action() {
   $actions['imap_archive']['update'] = array (
     'Url'      => "$path/imap_archive/imap_archive_index.php?action=update",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('all')
+    'Condition'=> array ('None')
   );
 
 // Next Treatment Date
   $actions['imap_archive']['next_treatment_date'] = array (
     'Url'      => "$path/imap_archive/imap_archive_index.php?action=next_treatment_date",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('all')
+    'Condition'=> array ('None')
   );
 }
 
