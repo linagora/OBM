@@ -135,6 +135,11 @@ public class Scheduler implements AutoCloseable {
 		return dateTimeProvider.now();
 	}
 	
+
+	public void cancel(ScheduledTask scheduledTask) {
+		actualScheduler.remove(scheduledTask);
+	}
+	
 	private class ActualScheduler extends AbstractScheduledService {
 		
 		private final DelayQueue<ScheduledTask> tasks;
@@ -157,6 +162,10 @@ public class Scheduler implements AutoCloseable {
 		public ScheduledTask submit(ScheduledTask scheduledTask) {
 			tasks.put(scheduledTask);
 			return scheduledTask;
+		}
+
+		public void remove(ScheduledTask scheduledTask) {
+			tasks.remove(scheduledTask);
 		}
 		
 		@Override

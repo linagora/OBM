@@ -177,7 +177,7 @@ public class SchedulerTest {
 	@Test
 	public void scheduleInShouldRunATaskInOneHour() throws Exception {
 		DateTime targetTime = now.plusHours(1);
-		Task task = dummyTask();
+		Task task = dummyTask(Duration.millis(10));
 		TestListener testListener = new TestListener();
 		ScheduledTask actual = testee.schedule(task).addListener(testListener).in(Period.hours(1));
 		assertThat(actual.state()).isEqualTo(ScheduledTask.State.WAITING);
@@ -186,10 +186,46 @@ public class SchedulerTest {
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.TERMINATED);
 	}
 	
+	@Test
+	public void scheduleInShouldNotRunACanceldedTaskInOneHour() throws Exception {
+		DateTime targetTime = now.plusHours(1);
+		Task task = dummyTask();
+		TestListener testListener = new TestListener();
+		ScheduledTask actual = testee.schedule(task).addListener(testListener).in(Period.hours(1));
+		assertThat(actual.state()).isEqualTo(ScheduledTask.State.WAITING);
+		actual.cancel();
+		assertThat(actual.state()).isEqualTo(ScheduledTask.State.CANCELED);
+		dateTimeProvider.setCurrent(targetTime);
+		try {
+			testListener.getNextState(100, TimeUnit.MILLISECONDS);
+			Fail.failBecauseExceptionWasNotThrown(TimeoutException.class);
+		} catch (TimeoutException e) {
+		}
+	}
 
 	@Test
+	public void cancelShouldNotAbortARunningTask() throws Exception {
+		Task task = dummyTask(Duration.millis(100));
+		TestListener testListener = new TestListener();
+		ScheduledTask actual = testee.schedule(task).addListener(testListener).at(now);
+		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
+		actual.cancel();
+		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.TERMINATED);
+	}
+	
+	@Test
+	public void cancelShouldNotFailWhenTerminatedTask() throws Exception {
+		Task task = dummyTask(Duration.millis(100));
+		TestListener testListener = new TestListener();
+		ScheduledTask actual = testee.schedule(task).addListener(testListener).at(now);
+		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
+		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.TERMINATED);
+		actual.cancel();
+	}
+	
+	@Test
 	public void scheduleInShouldRunATaskInOneYearAnd2Hours() throws Exception {
-		Task task = dummyTask();
+		Task task = dummyTask(Duration.millis(10));
 		TestListener testListener = new TestListener();
 		ScheduledTask actual = testee.schedule(task).addListener(testListener).in(Period.years(1).plusHours(2));
 		dateTimeProvider.setCurrent(now.plusYears(1));
@@ -201,7 +237,7 @@ public class SchedulerTest {
 	
 	@Test
 	public void scheduleInShouldRunATaskOnceWhenHourJumpBack() throws Exception {
-		Task task = dummyTask();
+		Task task = dummyTask(Duration.millis(10));
 		TestListener testListener = new TestListener();
 		testee.schedule(task).addListener(testListener).in(Period.hours(2));
 		dateTimeProvider.setCurrent(now.plusHours(2));
@@ -218,7 +254,7 @@ public class SchedulerTest {
 	
 	@Test
 	public void scheduleAtShouldRunATaskOnceWhenHourJumpBack() throws Exception {
-		Task task = dummyTask();
+		Task task = dummyTask(Duration.millis(10));
 		TestListener testListener = new TestListener();
 		testee.schedule(task).addListener(testListener).at(now.plusHours(2));
 		dateTimeProvider.setCurrent(now.plusHours(2));
@@ -235,7 +271,7 @@ public class SchedulerTest {
 	
 	@Test
 	public void scheduleInShouldRunATaskOnceWhenHourJumpForward() throws Exception {
-		Task task = dummyTask();
+		Task task = dummyTask(Duration.millis(10));
 		TestListener testListener = new TestListener();
 		testee.schedule(task).addListener(testListener).in(Period.hours(2));
 		dateTimeProvider.setCurrent(now.plusHours(3));
@@ -245,7 +281,7 @@ public class SchedulerTest {
 	
 	@Test
 	public void scheduleAtShouldRunATaskOnceWhenHourJumpForward() throws Exception {
-		Task task = dummyTask();
+		Task task = dummyTask(Duration.millis(10));
 		TestListener testListener = new TestListener();
 		testee.schedule(task).addListener(testListener).at(now.plusHours(2));
 		dateTimeProvider.setCurrent(now.plusHours(3));
@@ -270,7 +306,7 @@ public class SchedulerTest {
 	@Test
 	public void listenerFailureShouldNotBreakNotification() throws Exception {
 		DateTime targetTime = now.plusHours(1);
-		Task task = dummyTask();
+		Task task = dummyTask(Duration.millis(100));
 		TestListener testListener = new TestListener();
 		Future<State> scheduledFuture = testListener.getFutureState();
 		testee.schedule(task).addListener(new Listener() {
@@ -319,13 +355,32 @@ public class SchedulerTest {
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.FAILED);
 	}
 	
+	@Test
+	public void canceledListenerShouldNotBreakNotification() throws Exception {
+		Task task = dummyTask(Duration.millis(100));
+		TestListener testListener = new TestListener();
+		ScheduledTask scheduled = testee.schedule(task).addListener(new Listener() {
+			@Override
+			public void canceled() {
+				throw new RuntimeException();
+			}
+		}).addListener(testListener).in(Period.hours(1));
+		Future<State> canceledFuture = testListener.getFutureState();
+		scheduled.cancel();
+		assertThat(canceledFuture.get(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.CANCELED);
+	}
+	
 	private Task dummyTask() {
+		return dummyTask(Duration.standardSeconds(1));
+	}
+	
+	private Task dummyTask(final Duration duration) {
 		return new Task() {
 			
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(TimeUnit.MILLISECONDS.toMillis(5));
+					Thread.sleep(duration.getMillis());
 				} catch (InterruptedException e) {
 					Throwables.propagate(e);
 				}
@@ -379,6 +434,11 @@ public class SchedulerTest {
 			stateRef.getAndSet(SettableFuture.<State>create()).set(state);
 		}
 
+		@Override
+		public void canceled() {
+			notifyOnce(State.CANCELED);
+		}
+		
 		@Override
 		public void running() {
 			notifyOnce(State.RUNNING);

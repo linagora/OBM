@@ -44,6 +44,7 @@ import com.google.common.collect.ImmutableList;
 public class ScheduledTask implements Delayed {
 
 	public enum State {
+		CANCELED,
 		FAILED,
 		NEW,
 		RUNNING,
@@ -52,6 +53,7 @@ public class ScheduledTask implements Delayed {
 	}
 
 	public static abstract class Listener {
+		public void canceled() {}
 		@SuppressWarnings("unused") 
 		public void failed(Throwable failure) {}
 		public void running() {}
@@ -115,7 +117,8 @@ public class ScheduledTask implements Delayed {
 	}
 
 	public void cancel() {
-		//FIXME coming soon
+		scheduler.cancel(this);
+		notifyCanceled();
 	}
 
 	public State state() {
@@ -150,6 +153,17 @@ public class ScheduledTask implements Delayed {
 		for (Listener listener: listeners) {
 			try {
 				listener.scheduled();
+			} catch (Exception listenerException) {
+				logger.error("Error notifying a listener", listenerException);
+			}
+		}
+	}
+	
+	private void notifyCanceled() {
+		state = State.CANCELED;
+		for (Listener listener: listeners) {
+			try {
+				listener.canceled();
 			} catch (Exception listenerException) {
 				logger.error("Error notifying a listener", listenerException);
 			}
