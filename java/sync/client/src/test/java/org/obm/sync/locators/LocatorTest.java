@@ -113,4 +113,23 @@ public class LocatorTest {
 	private void setObmSyncVMArgument(String obmSyncHost) {
 		System.setProperty(Locator.OBM_SYNC_HOST, obmSyncHost);
 	}
+
+	@Test
+	public void testGetObmSyncBaseUrl() {
+		String loginAtDomain = "user@linagora.com";
+		String obmSyncHost = "10.69.0.172";
+		expect(locatorService.getServiceLocation(Locator.OBM_SYNC_SERVICE, loginAtDomain))
+			.andReturn(obmSyncHost);
+		String expectBaseUrl = "http://" + obmSyncHost + ":8080";
+		expect(domainConfiguration.getObmSyncBaseUrl(obmSyncHost))
+			.andReturn(expectBaseUrl);
+		
+		mocksControl.replay();
+		
+		String baseUrl = locator.backendBaseUrl(loginAtDomain);
+		
+		mocksControl.verify();
+		
+		assertThat(baseUrl).isEqualTo(expectBaseUrl);
+	}
 }
