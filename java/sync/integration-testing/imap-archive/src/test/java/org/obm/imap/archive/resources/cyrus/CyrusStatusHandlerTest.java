@@ -31,18 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources.cyrus;
 
-import static com.github.restdriver.clientdriver.RestClientDriver.giveResponse;
-import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.expect;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.easymock.IMocksControl;
-import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -52,7 +47,6 @@ import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.server.WebServer;
 
-import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
 import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.util.GreenMail;
@@ -71,23 +65,6 @@ public class CyrusStatusHandlerTest {
 	@Inject GreenMail imapServer;
 	@Inject UserSystemDao userSystemDao;
 	@Inject IMocksControl control;
-
-	@Before
-	public void setUp() {
-		driver.addExpectation(
-				onRequestTo("/obm-sync/login/trustedLogin").withMethod(Method.POST)
-					.withBody(Matchers.allOf(
-								Matchers.containsString("login=admin%40mydomain.org"),
-								Matchers.containsString("password=trust3dToken")),
-					MediaType.APPLICATION_FORM_URLENCODED),
-				giveResponse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-						+ "<token xmlns=\"http://www.obm.org/xsd/sync/token.xsd\">"
-						+ "<sid>06ae323a-0fa1-42ea-9ee8-313a023e4fd4</sid>"
-						+ "<domain uuid=\"a6af9131-60b6-4e3a-a9f3-df5b43a89309\">mydomain.org</domain>"
-						+ "</token>",
-					MediaType.APPLICATION_XML)
-				);
-	}
 
 	@After
 	public void tearDown() throws Exception {

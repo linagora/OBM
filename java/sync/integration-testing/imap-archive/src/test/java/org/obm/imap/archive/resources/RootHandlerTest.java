@@ -49,8 +49,8 @@ import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.server.WebServer;
 
-import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
+import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.Inject;
 
 public class RootHandlerTest {
@@ -65,6 +65,16 @@ public class RootHandlerTest {
 	
 	@Before
 	public void setUp() throws Exception {
+		server.start();
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		server.stop();
+	}
+	
+	@Test
+	public void testStatusOk() {
 		driver.addExpectation(
 				onRequestTo("/obm-sync/login/trustedLogin").withMethod(Method.POST)
 					.withBody(Matchers.allOf(
@@ -78,17 +88,7 @@ public class RootHandlerTest {
 						+ "</token>",
 					MediaType.APPLICATION_XML)
 				);
-		server.start();
-		server.start();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		server.stop();
-	}
-	
-	@Test
-	public void testStatusOk() {
+		
 		given()
 			.port(server.getHttpPort())
 			.param("login", "admin")
