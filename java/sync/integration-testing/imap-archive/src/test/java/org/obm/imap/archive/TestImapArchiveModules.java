@@ -154,6 +154,11 @@ public class TestImapArchiveModules {
 		public String backendUrl(String loginAtDomain) throws LocatorClientException {
 			return obmSyncBaseUrl;
 		}
+		
+		@Override
+		public String backendBaseUrl(String loginAtDomain) throws LocatorClientException {
+			return obmSyncBaseUrl;
+		}
 	}
 	
 	public static class TransactionalModule extends AbstractModule {

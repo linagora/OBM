@@ -45,6 +45,8 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ObmDomainFactory implements Factory<ObmDomain> {
 
+	private static final String GLOBAL_VIRT = "global.virt";
+
 	private final Domain domainService;
 	
 	@PathParam("domain")
@@ -52,7 +54,7 @@ public class ObmDomainFactory implements Factory<ObmDomain> {
 
 	@Inject
 	private ObmDomainFactory(Locator locator) {
-		domainService = new Domain(locator.backendUrl("global.admin"));
+		domainService = new Domain(locator.backendBaseUrl(GLOBAL_VIRT));
 	}
 	
 	@Override
