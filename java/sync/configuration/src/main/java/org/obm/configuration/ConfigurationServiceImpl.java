@@ -60,7 +60,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private final static String EXTERNAL_URL_KEY = "external-url";
 	private final static String OBM_SYNC_PORT = "8080";
-	private final static String OBM_SYNC_APP_NAME = "obm-sync/services";
+	private final static String OBM_SYNC_APP_NAME = "obm-sync";
+	private final static String SERVICES_APP_NAME = "services";
 	
 	public static class Factory {
 		
@@ -175,7 +176,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	}
 
 	@Override
-	public String getObmSyncUrl(String obmSyncHost) {
+	public String getObmSyncServicesUrl(String obmSyncHost) {
+		return getObmSyncBaseUrl(obmSyncHost) + "/" + SERVICES_APP_NAME;
+	}
+
+	@Override
+	public String getObmSyncBaseUrl(String obmSyncHost) {
 		return "http://" + obmSyncHost + ":" + OBM_SYNC_PORT + "/" + OBM_SYNC_APP_NAME;
 	}
 

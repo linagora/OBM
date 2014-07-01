@@ -61,7 +61,7 @@ public class Locator {
 	
 	public String backendUrl(String loginAtDomain) throws LocatorClientException {
 		String obmSyncHost = getObmSyncHost(loginAtDomain);
-		return domainConfiguration.getObmSyncUrl(obmSyncHost);
+		return domainConfiguration.getObmSyncBaseUrl(obmSyncHost);
 	}
 	
 	@VisibleForTesting String getObmSyncHost(String loginAtDomain) throws LocatorClientException {

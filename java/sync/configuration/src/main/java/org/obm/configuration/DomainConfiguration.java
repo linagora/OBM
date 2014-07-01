@@ -37,5 +37,7 @@ public interface DomainConfiguration {
 	
 	String getGlobalDomain();
 	
-	String getObmSyncUrl(String obmSyncHost);
+	String getObmSyncServicesUrl(String obmSyncHost);
+	
+	String getObmSyncBaseUrl(String obmSyncHost);
 }

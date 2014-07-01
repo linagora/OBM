@@ -151,8 +151,13 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 	}
 
 	@Override
-	public String getObmSyncUrl(String obmSyncHost) {
+	public String getObmSyncServicesUrl(String obmSyncHost) {
 		return obmSyncHost + configuration.obmSyncServices;
+	}
+
+	@Override
+	public String getObmSyncBaseUrl(String obmSyncHost) {
+		return obmSyncHost;
 	}
 
 	@Override

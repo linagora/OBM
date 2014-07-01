@@ -80,6 +80,11 @@ public class ConfigurationServiceImplTest {
 	
 	@Test
 	public void testGetObmSyncUrl() {
-		assertThat(configurationServiceImpl.getObmSyncUrl("10.69.1.23")).isEqualTo("http://10.69.1.23:8080/obm-sync/services");
+		assertThat(configurationServiceImpl.getObmSyncServicesUrl("10.69.1.23")).isEqualTo("http://10.69.1.23:8080/obm-sync/services");
+	}
+	
+	@Test
+	public void testGetObmSyncBaseUrl() {
+		assertThat(configurationServiceImpl.getObmSyncBaseUrl("10.69.1.23")).isEqualTo("http://10.69.1.23:8080/obm-sync");
 	}
 }
