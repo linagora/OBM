@@ -102,7 +102,7 @@ public class ScheduledTask implements Delayed {
 	private final ImmutableList<Listener> listeners;
 	private State state;
 	
-	public ScheduledTask(DateTime scheduledTime, Task task, Scheduler scheduler, ImmutableList<Listener> listeners) {
+	private ScheduledTask(DateTime scheduledTime, Task task, Scheduler scheduler, ImmutableList<Listener> listeners) {
 		this.scheduledTime = scheduledTime;
 		this.task = task;
 		this.scheduler = scheduler;
