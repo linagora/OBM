@@ -53,8 +53,8 @@ public class SchedulingDatesService {
 	}
 	
 	public DateTime nextTreatmentDate(SchedulingConfiguration schedulingConfiguration) {
-		DateTime actualDateTime = new DateTime(dateProvider.getDate());
-		DateTime actualDateWithScheduledTime = actualDateTime
+		DateTime currentDateTime = new DateTime(dateProvider.getDate());
+		DateTime currentDateWithScheduledTime = currentDateTime
 				.withZone(DateTimeZone.UTC)
 				.withHourOfDay(schedulingConfiguration.getHour())
 				.withMinuteOfHour(schedulingConfiguration.getMinute())
@@ -63,62 +63,80 @@ public class SchedulingDatesService {
 
 		switch (schedulingConfiguration.getRepeatKind()) {
 		case DAILY:
-			return dailyNextTreatmentDate(actualDateTime, actualDateWithScheduledTime);
+			return dailyNextTreatmentDate(currentDateTime, currentDateWithScheduledTime);
 			
 		case WEEKLY:
-			return weeklyNextTreatmentDate(schedulingConfiguration, actualDateTime, actualDateWithScheduledTime);
+			return weeklyNextTreatmentDate(schedulingConfiguration, currentDateTime, currentDateWithScheduledTime);
 
 		case MONTHLY:
-			return monthlyNextTreatmentDate(schedulingConfiguration, actualDateTime, actualDateWithScheduledTime);
+			return monthlyNextTreatmentDate(schedulingConfiguration, currentDateTime, currentDateWithScheduledTime);
 			
 		case YEARLY:
-			return yearlyNextTreatmentDate(schedulingConfiguration, actualDateTime, actualDateWithScheduledTime);
+			return yearlyNextTreatmentDate(schedulingConfiguration, currentDateTime, currentDateWithScheduledTime);
 		
 		default:
 			throw new IllegalArgumentException("Unknown repeat kind: " + schedulingConfiguration.getRepeatKind());
 		}
 	}
 
-	private DateTime dailyNextTreatmentDate(DateTime actualDateTime, DateTime actualDateWithScheduledTime) {
-		if (actualDateWithScheduledTime.isAfter(actualDateTime)) {
-			return actualDateWithScheduledTime;
+	private DateTime dailyNextTreatmentDate(DateTime currentDateTime, DateTime currentDateWithScheduledTime) {
+		if (currentDateWithScheduledTime.isAfter(currentDateTime)) {
+			return currentDateWithScheduledTime;
 		}
-		return actualDateWithScheduledTime
+		return currentDateWithScheduledTime
 				.plusDays(1);
 	}
 
-	private DateTime weeklyNextTreatmentDate(SchedulingConfiguration schedulingConfiguration, DateTime actualDateTime, DateTime actualDateWithScheduledTime) {
-		DateTime dayOfWeek = actualDateWithScheduledTime
+	private DateTime weeklyNextTreatmentDate(SchedulingConfiguration schedulingConfiguration, DateTime currentDateTime, DateTime currentDateWithScheduledTime) {
+		DateTime dayOfWeek = currentDateWithScheduledTime
 				.withDayOfWeek(schedulingConfiguration.getDayOfWeek().getSpecificationValue());
-		if (dayOfWeek.isAfter(actualDateTime)) {
+		if (dayOfWeek.isAfter(currentDateTime)) {
 			return dayOfWeek;
 		}
 		return dayOfWeek
 				.plusWeeks(1);
 	}
 
-	private DateTime monthlyNextTreatmentDate(SchedulingConfiguration schedulingConfiguration, DateTime actualDateTime, DateTime actualDateWithScheduledTime) {
-		DateTime dayOfMonth;
+	private DateTime monthlyNextTreatmentDate(SchedulingConfiguration schedulingConfiguration, DateTime currentDateTime, DateTime currentDateWithScheduledTime) {
 		if (schedulingConfiguration.isLastDayOfMonth()) {
-			dayOfMonth = actualDateWithScheduledTime
-				.withDayOfMonth(1)
-				.minusDays(1);
-		} else {
-			dayOfMonth = actualDateWithScheduledTime
-				.withDayOfMonth(schedulingConfiguration.getDayOfMonth().getDayIndex());
+			return nextTreatmentDateOnLastDayOfMonth(currentDateTime, currentDateWithScheduledTime);
 		}
 		
-		if (dayOfMonth.isAfter(actualDateTime)) {
+		return nextTreatmentDateCommonDayOfMonth(schedulingConfiguration, currentDateTime, currentDateWithScheduledTime);
+	}
+
+	private DateTime nextTreatmentDateOnLastDayOfMonth(DateTime currentDateTime, DateTime currentDateWithScheduledTime) {
+		DateTime dayOfMonth = lastDayOfMonth(currentDateWithScheduledTime);
+		
+		if (dayOfMonth.isAfter(currentDateTime)) {
+			return dayOfMonth;
+		}
+		// currentDateTime is at the end of the month, but on a higher time -> next month 
+		return lastDayOfMonth(currentDateWithScheduledTime.plusMonths(1));
+	}
+
+	private DateTime lastDayOfMonth(DateTime currentDateWithScheduledTime) {
+		return currentDateWithScheduledTime
+			.plusMonths(1)
+			.withDayOfMonth(1)
+			.minusDays(1);
+	}
+
+	private DateTime nextTreatmentDateCommonDayOfMonth(SchedulingConfiguration schedulingConfiguration,DateTime currentDateTime, DateTime currentDateWithScheduledTime) {
+		DateTime dayOfMonth = currentDateWithScheduledTime
+			.withDayOfMonth(schedulingConfiguration.getDayOfMonth().getDayIndex());
+		
+		if (dayOfMonth.isAfter(currentDateTime)) {
 			return dayOfMonth;
 		}
 		return dayOfMonth
 				.plusMonths(1);
 	}
 
-	private DateTime yearlyNextTreatmentDate(SchedulingConfiguration schedulingConfiguration, DateTime actualDateTime, DateTime actualDateWithScheduledTime) {
-		DateTime dayOfYear = actualDateWithScheduledTime
+	private DateTime yearlyNextTreatmentDate(SchedulingConfiguration schedulingConfiguration, DateTime currentDateTime, DateTime currentDateWithScheduledTime) {
+		DateTime dayOfYear = currentDateWithScheduledTime
 			.withDayOfYear(schedulingConfiguration.getDayOfYear().getDayOfYear());
-		if (dayOfYear.isAfter(actualDateTime)) {
+		if (dayOfYear.isAfter(currentDateTime)) {
 			return dayOfYear;
 		}
 		return dayOfYear

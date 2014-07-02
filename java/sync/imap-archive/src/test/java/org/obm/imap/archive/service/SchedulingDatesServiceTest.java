@@ -37,7 +37,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Date;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,20 +59,13 @@ public class SchedulingDatesServiceTest {
 			
 			@Override
 			public Date getDate() {
-				return new DateTime()
-							.withZone(DateTimeZone.UTC)
-							.withYear(2014)
-							.withMonthOfYear(6)
-							.withDayOfMonth(18)
-							.withHourOfDay(16)
-							.withMinuteOfHour(1)
-							.toDate();
+				return DateTime.parse("2014-06-18T16:01:00.000Z").toDate();
 			}
 		});
 	}
 	
 	@Test
-	public void nextTreatmentDateShouldSameDayWhenDailyRepeatKind() {
+	public void nextTreatmentDateShouldSameDayWhenDailyRepeatKindAndLowerTime() {
 		SchedulingConfiguration build = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.DAILY)
@@ -82,19 +74,11 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
-				.withZone(DateTimeZone.UTC)
-				.withYear(2014)
-				.withMonthOfYear(6)
-				.withDayOfMonth(18)
-				.withHourOfDay(22)
-				.withMinuteOfHour(58)
-				.withSecondOfMinute(0)
-				.withMillisOfSecond(0));
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-06-18T22:58:00.000Z"));
 	}
 	
 	@Test
-	public void nextTreatmentDateShouldNextDayWhenDailyRepeatKindSameTime() {
+	public void nextTreatmentDateShouldNextDayWhenDailyRepeatKindAndSameTime() {
 		SchedulingConfiguration build = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.DAILY)
@@ -103,19 +87,11 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
-				.withZone(DateTimeZone.UTC)
-				.withYear(2014)
-				.withMonthOfYear(6)
-				.withDayOfMonth(19)
-				.withHourOfDay(16)
-				.withMinuteOfHour(1)
-				.withSecondOfMinute(0)
-				.withMillisOfSecond(0));
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-06-19T16:01:00.000Z"));
 	}
 	
 	@Test
-	public void nextTreatmentDateShouldBeDayPlusOneWhenDailyRepeatKind() {
+	public void nextTreatmentDateShouldBeDayPlusOneWhenDailyRepeatKindAndHigherTime() {
 		SchedulingConfiguration build = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.DAILY)
@@ -124,19 +100,11 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
-				.withZone(DateTimeZone.UTC)
-				.withYear(2014)
-				.withMonthOfYear(6)
-				.withDayOfMonth(19)
-				.withHourOfDay(12)
-				.withMinuteOfHour(15)
-				.withSecondOfMinute(0)
-				.withMillisOfSecond(0));
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-06-19T12:15:00.000Z"));
 	}
 	
 	@Test
-	public void nextTreatmentDateShouldBeNextTuesdayNextWeekWhenWeeklyRepeatKind() {
+	public void nextTreatmentDateShouldBeNextTuesdayNextWeekWhenWeeklyRepeatKindAndOtherDay() {
 		SchedulingConfiguration build = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.WEEKLY)
@@ -146,19 +114,11 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
-				.withZone(DateTimeZone.UTC)
-				.withYear(2014)
-				.withMonthOfYear(6)
-				.withDayOfMonth(24)
-				.withHourOfDay(23)
-				.withMinuteOfHour(59)
-				.withSecondOfMinute(0)
-				.withMillisOfSecond(0));
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-06-24T23:59:00.000Z"));
 	}
 	
 	@Test
-	public void nextTreatmentDateShouldBeSameWednesdayNextWeekWhenWeeklyRepeatKind() {
+	public void nextTreatmentDateShouldBeSameWednesdayNextWeekWhenWeeklyRepeatKindAndSameDay() {
 		SchedulingConfiguration build = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.WEEKLY)
@@ -168,19 +128,11 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
-				.withZone(DateTimeZone.UTC)
-				.withYear(2014)
-				.withMonthOfYear(6)
-				.withDayOfMonth(18)
-				.withHourOfDay(23)
-				.withMinuteOfHour(59)
-				.withSecondOfMinute(0)
-				.withMillisOfSecond(0));
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-06-18T23:59:00.000Z"));
 	}
 	
 	@Test
-	public void nextTreatmentDateShouldBeNextSaturdaySameWeekWhenWeeklyRepeatKind() {
+	public void nextTreatmentDateShouldBeNextSaturdaySameWeekWhenWeeklyRepeatKindAndSameWeek() {
 		SchedulingConfiguration build = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.WEEKLY)
@@ -190,19 +142,11 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
-				.withZone(DateTimeZone.UTC)
-				.withYear(2014)
-				.withMonthOfYear(6)
-				.withDayOfMonth(21)
-				.withHourOfDay(23)
-				.withMinuteOfHour(59)
-				.withSecondOfMinute(0)
-				.withMillisOfSecond(0));
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-06-21T23:59:00.000Z"));
 	}
 	
 	@Test
-	public void nextTreatmentDateShouldBeNext10NextMonthWhenMonthlyRepeatKind() {
+	public void nextTreatmentDateShouldBeNext10NextMonthWhenMonthlyRepeatKindAndDayOfMonthPassed() {
 		SchedulingConfiguration build = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.MONTHLY)
@@ -212,19 +156,11 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
-				.withZone(DateTimeZone.UTC)
-				.withYear(2014)
-				.withMonthOfYear(7)
-				.withDayOfMonth(10)
-				.withHourOfDay(23)
-				.withMinuteOfHour(59)
-				.withSecondOfMinute(0)
-				.withMillisOfSecond(0));
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-07-10T23:59:00.000Z"));
 	}
 	
 	@Test
-	public void nextTreatmentDateShouldBeNext20SameMonthWhenMonthlyRepeatKind() {
+	public void nextTreatmentDateShouldBeNext20SameMonthWhenMonthlyRepeatKindAndDayOfMonthInTheFuture() {
 		SchedulingConfiguration build = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.MONTHLY)
@@ -234,41 +170,113 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
-				.withZone(DateTimeZone.UTC)
-				.withYear(2014)
-				.withMonthOfYear(6)
-				.withDayOfMonth(20)
-				.withHourOfDay(23)
-				.withMinuteOfHour(59)
-				.withSecondOfMinute(0)
-				.withMillisOfSecond(0));
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-06-20T23:59:00.000Z"));
 	}
 	
 	@Test
-	public void nextTreatmentDateShouldBeNextDaySameMonthWhenMonthlyRepeatKind() {
+	public void nextTreatmentDateShouldBeNextDaySameMonthWhenMonthlyRepeatKindAndDayOfMonthInTheFuture() {
 		SchedulingConfiguration build = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.MONTHLY)
-					.dayOfMonth(DayOfMonth.of(-1))
+					.dayOfMonth(DayOfMonth.last())
 					.build())
 				.time(LocalTime.parse("23:59"))
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
-				.withZone(DateTimeZone.UTC)
-				.withYear(2014)
-				.withMonthOfYear(6)
-				.withDayOfMonth(30)
-				.withHourOfDay(23)
-				.withMinuteOfHour(59)
-				.withSecondOfMinute(0)
-				.withMillisOfSecond(0));
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-06-30T23:59:00.000Z"));
 	}
 	
 	@Test
-	public void nextTreatmentDateShouldBeNextFebruary10NextYearWhenYearlyRepeatKind() {
+	public void nextTreatmentDateShouldBeEndOfJulyWhenMonthlyRepeatKindAnd30DaysMonth() {
+		SchedulingDatesService schedulingDatesService = new SchedulingDatesService(new DateProvider() {
+					
+					@Override
+					public Date getDate() {
+						return DateTime.parse("2014-07-02T16:01:00.000Z").toDate();
+					}
+				});
+		
+		SchedulingConfiguration build = SchedulingConfiguration.builder()
+				.recurrence(ArchiveRecurrence.builder()
+					.repeat(RepeatKind.MONTHLY)
+					.dayOfMonth(DayOfMonth.last())
+					.build())
+				.time(LocalTime.parse("23:59"))
+				.build();
+		
+		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-07-31T23:59:00.000Z"));
+	}
+	
+	@Test
+	public void nextTreatmentDateShouldBeEndOfFebruaryWhenMonthlyRepeatKindAnd28DaysMonth() {
+		SchedulingDatesService schedulingDatesService = new SchedulingDatesService(new DateProvider() {
+					
+					@Override
+					public Date getDate() {
+						return DateTime.parse("2014-02-02T16:01:00.000Z").toDate();
+					}
+				});
+		
+		SchedulingConfiguration build = SchedulingConfiguration.builder()
+				.recurrence(ArchiveRecurrence.builder()
+					.repeat(RepeatKind.MONTHLY)
+					.dayOfMonth(DayOfMonth.last())
+					.build())
+				.time(LocalTime.parse("23:59"))
+				.build();
+		
+		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-02-28T23:59:00.000Z"));
+	}
+	
+	@Test
+	public void nextTreatmentDateShouldBeSameMonthSameDayWhenMonthlyRepeatKindAndLowerTime() {
+		SchedulingDatesService schedulingDatesService = new SchedulingDatesService(new DateProvider() {
+					
+					@Override
+					public Date getDate() {
+						return DateTime.parse("2014-06-30T16:01:00.000Z").toDate();
+					}
+				});
+		
+		SchedulingConfiguration build = SchedulingConfiguration.builder()
+				.recurrence(ArchiveRecurrence.builder()
+					.repeat(RepeatKind.MONTHLY)
+					.dayOfMonth(DayOfMonth.last())
+					.build())
+				.time(LocalTime.parse("23:59"))
+				.build();
+		
+		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-06-30T23:59:00.000Z"));
+	}
+	
+	@Test
+	public void nextTreatmentDateShouldBeNextMonthWhenMonthlyRepeatKindAndHigherTime() {
+		SchedulingDatesService schedulingDatesService = new SchedulingDatesService(new DateProvider() {
+					
+					@Override
+					public Date getDate() {
+						return DateTime.parse("2014-06-30T16:01:00.000Z").toDate();
+					}
+				});
+		
+		SchedulingConfiguration build = SchedulingConfiguration.builder()
+				.recurrence(ArchiveRecurrence.builder()
+					.repeat(RepeatKind.MONTHLY)
+					.dayOfMonth(DayOfMonth.last())
+					.build())
+				.time(LocalTime.parse("10:59"))
+				.build();
+		
+		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-07-31T10:59:00.000Z"));
+	}
+	
+	@Test
+	public void nextTreatmentDateShouldBeNextFebruary10NextYearWhenYearlyRepeatKindAndPassedDay() {
 		SchedulingConfiguration build = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.YEARLY)
@@ -278,19 +286,11 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
-				.withZone(DateTimeZone.UTC)
-				.withYear(2015)
-				.withMonthOfYear(2)
-				.withDayOfMonth(10)
-				.withHourOfDay(23)
-				.withMinuteOfHour(59)
-				.withSecondOfMinute(0)
-				.withMillisOfSecond(0));
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2015-02-10T23:59:00.000Z"));
 	}
 	
 	@Test
-	public void nextTreatmentDateShouldBeNextJully31NextYearWhenYearlyRepeatKind() {
+	public void nextTreatmentDateShouldBeNextJully31NextYearWhenYearlyRepeatKindAndDayInTheFuture() {
 		SchedulingConfiguration build = SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.YEARLY)
@@ -300,14 +300,6 @@ public class SchedulingDatesServiceTest {
 				.build();
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
-		assertThat(nextTreatmentDate).isEqualTo(new DateTime()
-				.withZone(DateTimeZone.UTC)
-				.withYear(2014)
-				.withMonthOfYear(7)
-				.withDayOfMonth(31)
-				.withHourOfDay(23)
-				.withMinuteOfHour(59)
-				.withSecondOfMinute(0)
-				.withMillisOfSecond(0));
+		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-07-31T23:59:00.000Z"));
 	}
 }
