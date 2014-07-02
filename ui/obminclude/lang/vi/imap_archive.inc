@@ -1,46 +1,46 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : Language : en
-//      - File : obminclude/en/imap_archive.inc
+// OBM - File : Language : vi
+//      - File : obminclude/vi/imap_archive.inc
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: $ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_daily = "Daily";
-$l_weekly = "Weekly";
-$l_monthly = "Monthly";
-$l_yearly = "Yearly";
-$l_monday = "Monday";
-$l_tuesday = "Tuesday";
-$l_wednesday = "Wednesdau";
-$l_thursday = "Thursday";
-$l_friday = "Fridya";
-$l_saturday = "Saturday";
-$l_sunday = "Sunday";
-$l_last = "Last";
-$l_service_activating = "Service activation";
-$l_activating = "Activating";
-$l_scheduling = "Scheduling";
-$l_repeat_kind = "Repeat kind";
-$l_weekly_repeat_kind = "Weekly day of week";
-$l_monthly_repeat_kind = "Monthly day of month";
-$l_yearly_repeat_kind = "Yearly day of year";
-$l_hour = "Hour";
-$l_minute = "Minute";
-$l_next_run = "Next run";
-$l_excluded_users = "Excluded users";
-$l_name = "Name";
-$l_delete = "Delete";
-$l_remove_archive = "Remove from archive";
-$l_mailing_feedback = "Send emails to";
-$l_email_address = "Email address";
-$l_past_operations = "Past operations";
-$l_start_time = "Start time";
-$l_end_time = "End time";
-$l_status = "Status";
-$l_last_fail = "Last failure";
+$l_daily = "Hàng ngày";
+$l_weekly = "Hàng tuần";
+$l_monthly = "Hàng tháng";
+$l_yearly = "Hàng năm";
+$l_monday = "Thứ hai";
+$l_tuesday = "Thứ ba";
+$l_wednesday = "Thứ tư";
+$l_thursday = "Thứ năm";
+$l_friday = "Thứ sáu";
+$l_saturday = "Thứ bảy";
+$l_sunday = "Chủ nhật";
+$l_last = "Cuối cùng";
+$l_service_activating = "Kích hoạt dịch vụ";
+$l_activating = "Kích hoạt";
+$l_scheduling = "Lập kế hoạch";
+$l_repeat_kind = "Loại lặp lại";
+$l_weekly_repeat_kind = "Ngày nghỉ hàng tuần trong tuần";
+$l_monthly_repeat_kind = "Ngày hàng tháng của tháng";
+$l_yearly_repeat_kind = "Ngày hàng năm của năm";
+$l_hour = "Giờ";
+$l_minute = "Phút";
+$l_next_run = "Chạy tiếp theo";
+$l_excluded_users = "Người sử dụng loại trừ";
+$l_name = "Tên";
+$l_delete = "Xóa";
+$l_remove_archive = "Loại bỏ từ kho lưu trữ";
+$l_mailing_feedback = "Gửi email đến";
+$l_email_address = "Dịa chỉ email";
+$l_past_operations = "Hoạt động trong quá khứ";
+$l_start_time = "Thời gian bắt đầu";
+$l_end_time = "Kết thúc thời gian";
+$l_status = "Tình trạng";
+$l_last_fail = "Thất bại cuối cùng";
 
-$l_email_address_not_found = "Couldn't find your email address for this domain";
-$l_imap_archive_server_not_found = "Couldn't find an IMAP archive server for this domain";
-$l_imap_archive_server_unreachable = "IMAP archive server unreachable";
-$l_could_not_login_imap_archive_server = "Couldn't login to IMAP archive server";
+$l_email_address_not_found = "Không thể tìm thấy địa chỉ email của bạn cho tên miền này";
+$l_imap_archive_server_not_found = "Không thể tìm thấy một máy chủ lưu trữ IMAP cho tên miền này";
+$l_imap_archive_server_unreachable = "Máy chủ lưu trữ IMAP không thể kết nối";
+$l_could_not_login_imap_archive_server = "Không thể đăng nhập vào máy chủ lưu trữ IMAP";

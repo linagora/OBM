@@ -1,46 +1,46 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : Language : en
-//      - File : obminclude/en/imap_archive.inc
+// OBM - File : Language : zh
+//      - File : obminclude/zh/imap_archive.inc
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: $ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_daily = "Daily";
-$l_weekly = "Weekly";
-$l_monthly = "Monthly";
-$l_yearly = "Yearly";
-$l_monday = "Monday";
-$l_tuesday = "Tuesday";
-$l_wednesday = "Wednesdau";
-$l_thursday = "Thursday";
-$l_friday = "Fridya";
-$l_saturday = "Saturday";
-$l_sunday = "Sunday";
-$l_last = "Last";
-$l_service_activating = "Service activation";
-$l_activating = "Activating";
-$l_scheduling = "Scheduling";
-$l_repeat_kind = "Repeat kind";
-$l_weekly_repeat_kind = "Weekly day of week";
-$l_monthly_repeat_kind = "Monthly day of month";
-$l_yearly_repeat_kind = "Yearly day of year";
-$l_hour = "Hour";
-$l_minute = "Minute";
-$l_next_run = "Next run";
-$l_excluded_users = "Excluded users";
-$l_name = "Name";
-$l_delete = "Delete";
-$l_remove_archive = "Remove from archive";
-$l_mailing_feedback = "Send emails to";
-$l_email_address = "Email address";
-$l_past_operations = "Past operations";
-$l_start_time = "Start time";
-$l_end_time = "End time";
-$l_status = "Status";
-$l_last_fail = "Last failure";
+$l_daily = "每日";
+$l_weekly = "周刊";
+$l_monthly = "每月一次";
+$l_yearly = "每年";
+$l_monday = "星期一";
+$l_tuesday = "星期一";
+$l_wednesday = "星期三";
+$l_thursday = "星期四";
+$l_friday = "星期五";
+$l_saturday = "星期六";
+$l_sunday = "星期天";
+$l_last = "最后";
+$l_service_activating = "服务激活";
+$l_activating = "激活";
+$l_scheduling = "调度";
+$l_repeat_kind = "重复样";
+$l_weekly_repeat_kind = "本周的每周日";
+$l_monthly_repeat_kind = "本月的月日";
+$l_yearly_repeat_kind = "今年的年日";
+$l_hour = "小时";
+$l_minute = "分钟";
+$l_next_run = "下一次运行";
+$l_excluded_users = "排除用户";
+$l_name = "名称";
+$l_delete = "删除";
+$l_remove_archive = "从存档中删除";
+$l_mailing_feedback = "发送电子邮件至";
+$l_email_address = "电子邮件地址";
+$l_past_operations = "过去的操作";
+$l_start_time = "开始时间";
+$l_end_time = "结束时间";
+$l_status = "状态";
+$l_last_fail = "最后失败";
 
-$l_email_address_not_found = "Couldn't find your email address for this domain";
-$l_imap_archive_server_not_found = "Couldn't find an IMAP archive server for this domain";
-$l_imap_archive_server_unreachable = "IMAP archive server unreachable";
-$l_could_not_login_imap_archive_server = "Couldn't login to IMAP archive server";
+$l_email_address_not_found = "无法找到您的电子邮件地址，该域名";
+$l_imap_archive_server_not_found = "无法找到一个IMAP服务器存档此域";
+$l_imap_archive_server_unreachable = "IMAP归档服务器无法访问";
+$l_could_not_login_imap_archive_server = "无法登录到IMAP服务器归档";
