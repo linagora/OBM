@@ -30,23 +30,73 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive;
+package org.obm.imap.archive.beans;
 
-import org.obm.domain.dao.DomainDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
+import java.util.UUID;
 
-import com.google.inject.AbstractModule;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
-public class DaoModule extends AbstractModule {
+public class ArchiveTreatmentRunId {
 
-	@Override
-	protected void configure() {
-		bind(DomainConfigurationDao.class).to(DomainConfigurationJdbcImpl.class);
-		bind(DomainDao.class);
-		bind(ArchiveTreatmentDao.class).to(ArchiveTreatmentJdbcImpl.class);
+	public static ArchiveTreatmentRunId from(UUID runId) {
+		return new Builder().runId(runId).build();
 	}
 
+	public static ArchiveTreatmentRunId from(String runId) {
+		return new Builder().runId(UUID.fromString(runId)).build();
+	}
+	
+	private static class Builder {
+
+		private UUID runId;
+		
+		private Builder() {
+		}
+		
+		public Builder runId(UUID runId) {
+			Preconditions.checkNotNull(runId);
+			this.runId = runId;
+			return this;
+		}
+		
+		public ArchiveTreatmentRunId build() {
+			return new ArchiveTreatmentRunId(runId);
+		}
+	}
+	
+	private final UUID runId;
+	
+	private ArchiveTreatmentRunId(UUID runId) {
+		this.runId = runId;
+	}
+
+	public UUID getRunId() {
+		return runId;
+	}
+
+	public String serialize() {
+		return runId.toString();
+	}
+	
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(runId);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof ArchiveTreatmentRunId) {
+			ArchiveTreatmentRunId that = (ArchiveTreatmentRunId) object;
+			return Objects.equal(this.runId, that.runId);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("runId", runId)
+			.toString();
+	}
 }

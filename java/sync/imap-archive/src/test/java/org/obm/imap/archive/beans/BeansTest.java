@@ -50,7 +50,9 @@ public class BeansTest {
 				PersistedResult.class,
 				SchedulingConfiguration.class,
 				SchedulingDates.class,
-				ArchiveDomainTask.class
+				ArchiveDomainTask.class,
+				ArchiveTreatment.class,
+				ArchiveTreatmentRunId.class
 			).verify();
 	}	
 }

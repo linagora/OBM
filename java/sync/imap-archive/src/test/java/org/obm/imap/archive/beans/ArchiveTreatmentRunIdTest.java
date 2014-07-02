@@ -30,23 +30,42 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive;
+package org.obm.imap.archive.beans;
 
-import org.obm.domain.dao.DomainDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.inject.AbstractModule;
+import java.util.UUID;
 
-public class DaoModule extends AbstractModule {
+import org.junit.Test;
 
-	@Override
-	protected void configure() {
-		bind(DomainConfigurationDao.class).to(DomainConfigurationJdbcImpl.class);
-		bind(DomainDao.class);
-		bind(ArchiveTreatmentDao.class).to(ArchiveTreatmentJdbcImpl.class);
+
+public class ArchiveTreatmentRunIdTest {
+
+	@Test(expected=NullPointerException.class)
+	public void builderFromUUIDShouldThrowWhenRunIdIsNull() {
+		ArchiveTreatmentRunId.from((UUID) null);
 	}
 
+	@Test(expected=NullPointerException.class)
+	public void builderFromStringShouldThrowWhenRunIdIsNull() {
+		ArchiveTreatmentRunId.from((String) null);
+	}
+
+	@Test
+	public void builderShouldBuildWhenEveryThingIsProvided() {
+		UUID runId = UUID.fromString("e294d88f-a0b6-4f9c-b310-88cfe7be8679");
+		
+		ArchiveTreatmentRunId archiveTreatmentRunId = ArchiveTreatmentRunId.from(runId);
+		
+		assertThat(archiveTreatmentRunId.getRunId()).isEqualTo(runId);
+	}
+
+	@Test
+	public void builderFromStringShouldBuildWhenEveryThingIsProvided() {
+		UUID runId = UUID.fromString("e294d88f-a0b6-4f9c-b310-88cfe7be8679");
+		
+		ArchiveTreatmentRunId archiveTreatmentRunId = ArchiveTreatmentRunId.from("e294d88f-a0b6-4f9c-b310-88cfe7be8679");
+		
+		assertThat(archiveTreatmentRunId.getRunId()).isEqualTo(runId);
+	}
 }
