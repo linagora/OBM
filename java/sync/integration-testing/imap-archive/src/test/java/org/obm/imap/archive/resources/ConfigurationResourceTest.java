@@ -31,18 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
-import static com.github.restdriver.clientdriver.RestClientDriver.giveResponse;
-import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.UUID;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,6 +49,7 @@ import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
+import org.obm.imap.archive.CommonClientDriverExpectation;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.beans.DayOfMonth;
@@ -61,9 +58,6 @@ import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
-import com.github.restdriver.clientdriver.ClientDriverExpectation;
-import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
-import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.jayway.restassured.http.ContentType;
@@ -75,11 +69,11 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ConfigurationResourceTest {
 
-	private ClientDriverRule driver = new ClientDriverRule();
+	private CommonClientDriverExpectation driver = new CommonClientDriverExpectation();
 	
 	@Rule public TestRule chain = RuleChain
-			.outerRule(driver)
-			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver)))
+			.outerRule(driver.getClientDriverRule())
+			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver.getClientDriverRule())))
 			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
 				@Override
 				public H2InMemoryDatabase get() {
@@ -93,35 +87,8 @@ public class ConfigurationResourceTest {
 	@Before
 	public void setUp() {
 		ObmDomainUuid domainId = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
-		expectTrustedLogin(domainId);
-		expectGetDomain(domainId);
-	}
-
-	private ClientDriverExpectation expectTrustedLogin(ObmDomainUuid domainId) {
-		return driver.addExpectation(
-				onRequestTo("/obm-sync/login/trustedLogin").withMethod(Method.POST)
-					.withBody(Matchers.allOf(
-								Matchers.containsString("login=admin%40mydomain.org"),
-								Matchers.containsString("password=trust3dToken")),
-					MediaType.APPLICATION_FORM_URLENCODED),
-				giveResponse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-						+ "<token xmlns=\"http://www.obm.org/xsd/sync/token.xsd\">"
-						+ "<sid>06ae323a-0fa1-42ea-9ee8-313a023e4fd4</sid>"
-						+ "<domain uuid=\"" + domainId.toString() + "\">mydomain.org</domain>"
-						+ "</token>",
-					MediaType.APPLICATION_XML)
-				);
-	}
-	
-	private ClientDriverExpectation expectGetDomain(ObmDomainUuid domainId) {
-		return driver.addExpectation(
-				onRequestTo("/obm-sync/provisioning/v1/domains/" + domainId.toString()),
-				giveResponse("{\"id\":\"" + domainId.toString() + "\","
-							+ "\"name\":\"mydomain\","
-							+ "\"label\":\"mydomain.org\","
-							+ "\"aliases\":[]}",
-					MediaType.APPLICATION_JSON)
-				);
+		driver.expectTrustedLogin(domainId);
+		driver.expectGetDomain(domainId);
 	}
 
 	private void initDb(Operation... operationToAppend) {
@@ -207,7 +174,7 @@ public class ConfigurationResourceTest {
 
 	@Test
 	public void updateDomainConfigurationShouldCreateWhenNoData() throws Exception {
-		expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
+		driver.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
 		server.start();
 		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
@@ -261,7 +228,7 @@ public class ConfigurationResourceTest {
 						"mail_archive_minute")
 						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
 						.build());
-		expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
+		driver.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
 		server.start();
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
