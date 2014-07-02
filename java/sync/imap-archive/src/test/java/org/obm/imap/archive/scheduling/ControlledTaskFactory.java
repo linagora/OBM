@@ -32,6 +32,7 @@
 package org.obm.imap.archive.scheduling;
 
 import org.joda.time.DateTime;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.services.ArchiveService;
 
 import com.google.common.base.Throwables;
@@ -49,8 +50,8 @@ public class ControlledTaskFactory extends ArchiveDomainTask.Factory {
 	}
 
 	@Override
-	public RemotelyControlledTask create(ObmDomain domain, DateTime when) {
-		return new RemotelyControlledTask(archiveService, domain, when);
+	public RemotelyControlledTask create(ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
+		return new RemotelyControlledTask(archiveService, domain, when, runId);
 	}
 
 	public class RemotelyControlledTask extends ArchiveDomainTask {
@@ -69,8 +70,8 @@ public class ControlledTaskFactory extends ArchiveDomainTask.Factory {
 		
 		private final Terminator terminator;
 	
-		RemotelyControlledTask(ArchiveService archiveService, ObmDomain domain, DateTime when) {
-			super(archiveService, domain, when);
+		RemotelyControlledTask(ArchiveService archiveService, ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
+			super(archiveService, domain, when, runId);
 			terminator = new Terminator();
 		}
 		

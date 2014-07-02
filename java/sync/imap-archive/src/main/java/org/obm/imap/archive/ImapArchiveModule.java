@@ -32,6 +32,7 @@
 package org.obm.imap.archive;
 
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -51,12 +52,17 @@ import org.obm.imap.archive.resources.DomainBasedSubResource;
 import org.obm.imap.archive.resources.HealthcheckHandler;
 import org.obm.imap.archive.resources.ObmDomainFactory;
 import org.obm.imap.archive.resources.RootHandler;
+import org.obm.imap.archive.resources.TreatmentsResource;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
+import org.obm.imap.archive.scheduling.OnlyOnePerDomainScheduler;
 import org.obm.imap.archive.service.SchedulingDatesService;
+import org.obm.imap.archive.services.ArchiveService;
+import org.obm.imap.archive.services.ArchiveServiceImpl;
 import org.obm.imap.archive.services.DomainConfigurationService;
 import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
+import org.obm.push.utils.UUIDFactory;
 import org.obm.server.EmbeddedServerModule;
 import org.obm.server.ServerConfiguration;
 import org.obm.sync.XTrustProvider;
@@ -67,6 +73,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
+import com.linagora.scheduling.DateTimeProvider;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
@@ -99,6 +106,8 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
+		bind(Boolean.class).annotatedWith(Names.named("endlessTask")).toInstance(Boolean.TRUE);
+		bind(TimeUnit.class).annotatedWith(Names.named("schedulerResolution")).toInstance(TimeUnit.MINUTES);
 		
 		bindImapArchiveServices();
 	}
@@ -106,6 +115,10 @@ public class ImapArchiveModule extends AbstractModule {
 	private void bindImapArchiveServices() {
 		bind(DomainConfigurationService.class);
 		bind(SchedulingDatesService.class);
+		bind(UUIDFactory.class);
+		bind(ArchiveService.class).to(ArchiveServiceImpl.class);
+		bind(OnlyOnePerDomainScheduler.class);
+		bind(DateTimeProvider.class).toInstance(DateTimeProvider.SYSTEM_UTC);
 	}
 	
 	public static class ImapArchiveServletModule extends ServletModule {
@@ -138,6 +151,7 @@ public class ImapArchiveModule extends AbstractModule {
 					.register(RootHandler.class)
 					.register(DomainBasedSubResource.class)
 					.register(ConfigurationResource.class)
+					.register(TreatmentsResource.class)
 					.register(ImapArchiveObjectMapper.class));
 		}
 		

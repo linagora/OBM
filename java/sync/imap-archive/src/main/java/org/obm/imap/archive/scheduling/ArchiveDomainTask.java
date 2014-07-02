@@ -31,10 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.scheduling;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.Comparator;
 
+import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.services.ArchiveService;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -47,6 +51,10 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class ArchiveDomainTask implements Task {
 
+	private final static String LOG_PATH = "/var/log/obm-imap-archive";
+	private final static String LOG_EXTENSION = ".log";
+	private final static int BYTES_IN_MEMORY = 10240;
+	
 	public static Comparator<ArchiveDomainTask> comparator() {
 		return new Comparator<ArchiveDomainTask>() {
 
@@ -67,24 +75,31 @@ public class ArchiveDomainTask implements Task {
 			this.archiveService = archiveService;
 		}
 		
-		public ArchiveDomainTask create(ObmDomain domain, DateTime when) {
-			return new ArchiveDomainTask(archiveService, domain, when);
+		public ArchiveDomainTask create(ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
+			return new ArchiveDomainTask(archiveService, domain, when, runId);
 		}
 	}
 	
 	private final ArchiveService archiveService;
 	private final ObmDomain domain;
 	private final DateTime when;
+	private final ArchiveTreatmentRunId runId;
+	private final DeferredFileOutputStream deferredFileOutputStream;
 
-	protected ArchiveDomainTask(ArchiveService archiveService, ObmDomain domain, DateTime when) {
+	protected ArchiveDomainTask(ArchiveService archiveService, ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
 		this.archiveService = archiveService;
 		this.domain = domain;
 		this.when = when;
+		this.runId = runId;
+		this.deferredFileOutputStream = new DeferredFileOutputStream(BYTES_IN_MEMORY, 
+				new File(Paths.get(LOG_PATH, runId.getRunId().toString() + LOG_EXTENSION).toUri()));
+		
+
 	}
 	
 	@Override
 	public void run() {
-		archiveService.archive(domain);
+		archiveService.archive(domain, runId, deferredFileOutputStream);
 	}
 
 	@Override
@@ -100,9 +115,17 @@ public class ArchiveDomainTask implements Task {
 		return when;
 	}
 
+	public ArchiveTreatmentRunId getRunId() {
+		return runId;
+	}
+
+	public DeferredFileOutputStream getDeferredFileOutputStream() {
+		return deferredFileOutputStream;
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(domain, when);
+		return Objects.hashCode(domain, when, runId);
 	}
 
 	@Override
@@ -110,7 +133,8 @@ public class ArchiveDomainTask implements Task {
 		if (object instanceof ArchiveDomainTask) {
 			ArchiveDomainTask that = (ArchiveDomainTask) object;
 			return Objects.equal(this.domain, that.domain)
-				&& Objects.equal(this.when, that.when);
+				&& Objects.equal(this.when, that.when)
+				&& Objects.equal(this.runId, that.runId);
 		}
 		return false;
 	}
@@ -120,6 +144,7 @@ public class ArchiveDomainTask implements Task {
 		return Objects.toStringHelper(this)
 			.add("domain", domain)
 			.add("when", when)
+			.add("runId", runId)
 			.toString();
 	}
 	

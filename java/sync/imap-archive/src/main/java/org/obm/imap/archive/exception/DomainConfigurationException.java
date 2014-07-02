@@ -30,18 +30,19 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.services;
+package org.obm.imap.archive.exception;
 
-import org.apache.commons.io.output.DeferredFileOutputStream;
-import org.glassfish.jersey.server.ChunkedOutput;
-import org.obm.imap.archive.beans.ArchiveTreatment;
-import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-
-import fr.aliacom.obm.common.domain.ObmDomain;
-
-public interface ArchiveService {
-
-	ArchiveTreatment archive(ObmDomain domain, ArchiveTreatmentRunId runId, DeferredFileOutputStream deferredFileOutputStream);
+public class DomainConfigurationException extends RuntimeException {
 	
-	ChunkedOutput<String> runningProcessLogs(ArchiveTreatmentRunId runId);
+	public DomainConfigurationException(String message) {
+		super(message);
+	}
+	
+	public DomainConfigurationException(String message, Throwable cause) {
+		super(message, cause);
+	}
+	
+	public DomainConfigurationException(Throwable cause) {
+		super(cause);
+	}
 }

@@ -31,18 +31,26 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.scheduling;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.joda.time.DateTime;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.TreeMultimap;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.linagora.scheduling.DateTimeProvider;
+import com.linagora.scheduling.Listener;
 import com.linagora.scheduling.Listener.NoopListener;
 import com.linagora.scheduling.Monitor;
 import com.linagora.scheduling.ScheduledTask;
@@ -57,8 +65,11 @@ public class OnlyOnePerDomainScheduler extends NoopListener<ArchiveDomainTask> i
 	@VisibleForTesting final LockingResourcesScheduler lockingResourcesScheduler;
 
 	@Inject
-	private OnlyOnePerDomainScheduler(ArchiveDomainTask.Factory archiveTaskFactory) {
-		this(archiveTaskFactory, Monitor.<ArchiveDomainTask>builder(), DateTimeProvider.SYSTEM_UTC, TimeUnit.MINUTES);
+	private OnlyOnePerDomainScheduler(ArchiveDomainTask.Factory archiveTaskFactory, 
+			DateTimeProvider dateTimeProvider,
+			@Named("schedulerResolution") TimeUnit schedulerResolution) {
+		
+		this(archiveTaskFactory, Monitor.<ArchiveDomainTask>builder(), dateTimeProvider, schedulerResolution);
 	}
 	
 	@VisibleForTesting OnlyOnePerDomainScheduler(ArchiveDomainTask.Factory archiveTaskFactory,
@@ -69,9 +80,15 @@ public class OnlyOnePerDomainScheduler extends NoopListener<ArchiveDomainTask> i
 		this.lockingResourcesScheduler = new LockingResourcesScheduler(monitor, timeProvider, resolution);
 	}
 
-	public ArchiveDomainTask scheduleDomainArchiving(ObmDomain domain, DateTime when) {
-		ArchiveDomainTask task = archiveTaskFactory.create(domain, when);
+	public ArchiveDomainTask scheduleDomainArchiving(ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
+		ArchiveDomainTask task = archiveTaskFactory.create(domain, when, runId);
 		lockingResourcesScheduler.schedule(task);
+		return task;
+	}
+
+	public ArchiveDomainTask scheduleNowDomainArchiving(ObmDomain domain, DateTime now, ArchiveTreatmentRunId runId) {
+		ArchiveDomainTask task = archiveTaskFactory.create(domain, now, runId);
+		lockingResourcesScheduler.now(task);
 		return task;
 	}
 
@@ -126,10 +143,19 @@ public class OnlyOnePerDomainScheduler extends NoopListener<ArchiveDomainTask> i
 
 		private synchronized void schedule(ArchiveDomainTask toSchedule) {
 			if (!hasScheduledTaskForDomain(toSchedule.getDomain())) {
-				scheduler.schedule(toSchedule).at(toSchedule.getWhen());
+			
+				scheduler.schedule(toSchedule)
+					.addListener(new OutputStreamCloserListener(toSchedule.getDeferredFileOutputStream()))
+					.at(toSchedule.getWhen());
 			} else {
 				domainEnqueuedTasks.put(toSchedule.getDomain(), toSchedule);
 			}
+		}
+
+		private void now(ArchiveDomainTask toSchedule) {
+			scheduler.schedule(toSchedule)
+				.addListener(new OutputStreamCloserListener(toSchedule.getDeferredFileOutputStream()))
+				.now();
 		}
 
 		private synchronized boolean hasScheduledTaskForDomain(final ObmDomain domain) {
@@ -140,6 +166,41 @@ public class OnlyOnePerDomainScheduler extends NoopListener<ArchiveDomainTask> i
 					return input.task().getDomain().equals(domain);
 				}
 			});
+		}
+	}
+
+	private final static class OutputStreamCloserListener extends Listener.NoopListener<ArchiveDomainTask> {
+		private final static Logger logger = LoggerFactory.getLogger(OutputStreamCloserListener.class);
+		private final DeferredFileOutputStream deferredFileOutputStream;
+
+		private OutputStreamCloserListener(DeferredFileOutputStream deferredFileOutputStream) {
+			this.deferredFileOutputStream = deferredFileOutputStream;
+		}
+
+		@Override
+		public void canceled(ScheduledTask<ArchiveDomainTask> task) {
+			closeStream(deferredFileOutputStream);
+		}
+
+		@Override
+		public void failed(ScheduledTask<ArchiveDomainTask> task, Throwable failure) {
+			closeStream(deferredFileOutputStream);
+		}
+
+		@Override
+		public void terminated(ScheduledTask<ArchiveDomainTask> task) {
+			closeStream(deferredFileOutputStream);
+		}
+
+		private void closeStream(DeferredFileOutputStream deferredFileOutputStream) {
+			if (deferredFileOutputStream != null) {
+				try (FileOutputStream fileOutputStream = new FileOutputStream(deferredFileOutputStream.getFile())) {
+					deferredFileOutputStream.close();
+					deferredFileOutputStream.writeTo(fileOutputStream);
+				} catch (IOException e) {
+					logger.error("Error closing stream", e);
+				}
+			}
 		}
 	}
 }

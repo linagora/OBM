@@ -34,16 +34,22 @@ package org.obm.imap.archive.scheduling;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
 
 import java.util.UUID;
 
+import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.imap.archive.beans.ArchiveStatus;
+import org.obm.imap.archive.beans.ArchiveTreatment;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.scheduling.ControlledTaskFactory.RemotelyControlledTask;
 import org.obm.imap.archive.services.ArchiveService;
 
@@ -56,6 +62,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class OnlyOnePerDomainSchedulerTest {
 
+	private static final DateTime THE_BEGINNING = DateTime.parse("1970-01-01T00:00");
 	IMocksControl mocksControl;
 	ArchiveService archiveService;
 	
@@ -112,11 +119,12 @@ public class OnlyOnePerDomainSchedulerTest {
 		ObmDomain domain = dummyDomain();
 		DateTime when = DateTime.parse("2024-11-1T05:04");
 		
-		archiveService.archive(domain);
-		expectLastCall();
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
+		expect(archiveService.archive(eq(domain), eq(runId), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId, when, domain.getUuid()));
 		
 		mocksControl.replay();
-		ArchiveDomainTask task = testee.scheduleDomainArchiving(domain, when);
+		ArchiveDomainTask task = testee.scheduleDomainArchiving(domain, when, runId);
 		assertTaskProgression(task);
 		assertThat(monitor.all()).isEmpty();
 		mocksControl.verify();
@@ -127,14 +135,18 @@ public class OnlyOnePerDomainSchedulerTest {
 		ObmDomain domain = dummyDomain();
 		DateTime when1 = DateTime.parse("2024-11-1T05:04");
 		DateTime when2 = DateTime.parse("2024-11-5T05:04");
+		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
+		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		
-		archiveService.archive(domain);
-		expectLastCall().times(2);
+		expect(archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId1, when1, domain.getUuid()));
+		expect(archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId2, when2, domain.getUuid()));
 		
 		mocksControl.replay();
-		ArchiveDomainTask task1 = testee.scheduleDomainArchiving(domain, when1);
+		ArchiveDomainTask task1 = testee.scheduleDomainArchiving(domain, when1, runId1);
 		assertTaskProgression(task1);
-		ArchiveDomainTask task2 = testee.scheduleDomainArchiving(domain, when2);
+		ArchiveDomainTask task2 = testee.scheduleDomainArchiving(domain, when2, runId2);
 		assertTaskProgression(task2);
 		assertThat(monitor.all()).isEmpty();
 		mocksControl.verify();
@@ -145,13 +157,17 @@ public class OnlyOnePerDomainSchedulerTest {
 		ObmDomain domain = dummyDomain();
 		DateTime when = DateTime.parse("2024-11-1T05:04");
 		DateTime whenToEnqueue = DateTime.parse("2024-11-2T05:04");
+		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
+		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		
-		archiveService.archive(domain);
-		expectLastCall().times(2);
+		expect(archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId1, when, domain.getUuid()));
+		expect(archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId2, whenToEnqueue, domain.getUuid()));
 		
 		mocksControl.replay();
-		ArchiveDomainTask task = testee.scheduleDomainArchiving(domain, when);
-		ArchiveDomainTask taskEnqueued = testee.scheduleDomainArchiving(domain, whenToEnqueue);
+		ArchiveDomainTask task = testee.scheduleDomainArchiving(domain, when, runId1);
+		ArchiveDomainTask taskEnqueued = testee.scheduleDomainArchiving(domain, whenToEnqueue, runId2);
 		assertTaskProgression(task);
 		assertTaskProgression(taskEnqueued);
 		assertThat(monitor.all()).isEmpty();
@@ -164,14 +180,21 @@ public class OnlyOnePerDomainSchedulerTest {
 		DateTime when = DateTime.parse("2024-11-1T00:00");
 		DateTime whenToEnqueueAfter = DateTime.parse("2024-11-9T00:00");
 		DateTime whenToEnqueueBefore = DateTime.parse("2024-11-5T00:00");
+		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
+		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
+		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
 		
-		archiveService.archive(domain);
-		expectLastCall().times(3);
+		expect(archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId1, when, domain.getUuid()));
+		expect(archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId2, whenToEnqueueAfter, domain.getUuid()));
+		expect(archiveService.archive(eq(domain), eq(runId3), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId3, whenToEnqueueBefore, domain.getUuid()));
 		
 		mocksControl.replay();
-		ArchiveDomainTask task = testee.scheduleDomainArchiving(domain, when);
-		ArchiveDomainTask taskEnqueuedAfter = testee.scheduleDomainArchiving(domain, whenToEnqueueAfter);
-		ArchiveDomainTask taskEnqueuedBefore = testee.scheduleDomainArchiving(domain, whenToEnqueueBefore);
+		ArchiveDomainTask task = testee.scheduleDomainArchiving(domain, when, runId1);
+		ArchiveDomainTask taskEnqueuedAfter = testee.scheduleDomainArchiving(domain, whenToEnqueueAfter, runId2);
+		ArchiveDomainTask taskEnqueuedBefore = testee.scheduleDomainArchiving(domain, whenToEnqueueBefore, runId3);
 		assertTaskProgression(task);
 		assertTaskProgression(taskEnqueuedBefore);
 		assertTaskProgression(taskEnqueuedAfter);
@@ -195,15 +218,17 @@ public class OnlyOnePerDomainSchedulerTest {
 		ObmDomain domain2 = dummyDomain();
 		DateTime when1 = DateTime.parse("2024-11-1T05:04");
 		DateTime when2 = DateTime.parse("2024-11-2T05:04");
+		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
+		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		
-		archiveService.archive(domain1);
-		expectLastCall();
-		archiveService.archive(domain2);
-		expectLastCall();
+		expect(archiveService.archive(eq(domain1), eq(runId1), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId1, when1, domain1.getUuid()));
+		expect(archiveService.archive(eq(domain2), eq(runId2), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId2, when2, domain2.getUuid()));
 		
 		mocksControl.replay();
-		ArchiveDomainTask taskDomain1 = testee.scheduleDomainArchiving(domain1, when1);
-		ArchiveDomainTask taskDomain2 = testee.scheduleDomainArchiving(domain2, when2);
+		ArchiveDomainTask taskDomain1 = testee.scheduleDomainArchiving(domain1, when1, runId1);
+		ArchiveDomainTask taskDomain2 = testee.scheduleDomainArchiving(domain2, when2, runId2);
 		
 		// BOTH ARE WAITING
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.WAITING);
@@ -240,17 +265,25 @@ public class OnlyOnePerDomainSchedulerTest {
 		DateTime when2 = DateTime.parse("2024-11-2T05:04");
 		DateTime when1ToEnqueue = DateTime.parse("2024-11-3T05:04");
 		DateTime when2ToEnqueue = DateTime.parse("2024-11-4T05:04");
+		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
+		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
+		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
+		ArchiveTreatmentRunId runId4 = ArchiveTreatmentRunId.from("b1226053-265d-4b0e-a524-e37b1dfcb2e9");
 		
-		archiveService.archive(domain1);
-		expectLastCall().times(2);
-		archiveService.archive(domain2);
-		expectLastCall().times(2);
+		expect(archiveService.archive(eq(domain1), eq(runId1), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId1, when1, domain1.getUuid()));
+		expect(archiveService.archive(eq(domain2), eq(runId2), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId2, when2, domain2.getUuid()));
+		expect(archiveService.archive(eq(domain1), eq(runId3), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId3, when1ToEnqueue, domain1.getUuid()));
+		expect(archiveService.archive(eq(domain2), eq(runId4), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId4, when2ToEnqueue, domain2.getUuid()));
 		
 		mocksControl.replay();
-		ArchiveDomainTask taskDomain1 = testee.scheduleDomainArchiving(domain1, when1);
-		ArchiveDomainTask taskDomain2 = testee.scheduleDomainArchiving(domain2, when2);
-		ArchiveDomainTask taskDomain1Enqueued = testee.scheduleDomainArchiving(domain1, when1ToEnqueue);
-		ArchiveDomainTask taskDomain2Enqueued = testee.scheduleDomainArchiving(domain2, when2ToEnqueue);
+		ArchiveDomainTask taskDomain1 = testee.scheduleDomainArchiving(domain1, when1, runId1);
+		ArchiveDomainTask taskDomain2 = testee.scheduleDomainArchiving(domain2, when2, runId2);
+		ArchiveDomainTask taskDomain1Enqueued = testee.scheduleDomainArchiving(domain1, when1ToEnqueue, runId3);
+		ArchiveDomainTask taskDomain2Enqueued = testee.scheduleDomainArchiving(domain2, when2ToEnqueue, runId4);
 		
 		// BOTH ARE WAITING
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.WAITING);
@@ -307,11 +340,38 @@ public class OnlyOnePerDomainSchedulerTest {
 		mocksControl.verify();
 	}
 	
+	@Test
+	public void scheduleNowShouldCallScheduler() throws Exception {
+		ObmDomain domain = dummyDomain();
+		
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
+		expect(archiveService.archive(eq(domain), eq(runId), anyObject(DeferredFileOutputStream.class)))
+			.andReturn(archiveTreatment(runId, now, domain.getUuid()));
+		
+		mocksControl.replay();
+		ArchiveDomainTask task = testee.scheduleNowDomainArchiving(domain, now, runId);
+		assertTaskProgression(task);
+		assertThat(monitor.all()).isEmpty();
+		mocksControl.verify();
+	}
+	
 	private ObmDomain dummyDomain() {
 		return ObmDomain.builder()
 				.id(4)
 				.uuid(ObmDomainUuid.of(UUID.randomUUID()))
 				.name("domain.test")
+				.build();
+	}
+	
+	private ArchiveTreatment archiveTreatment(ArchiveTreatmentRunId runId, DateTime start, ObmDomainUuid domainId) {
+		return ArchiveTreatment.builder()
+				.runId(runId)
+				.domainId(domainId)
+				.archiveStatus(ArchiveStatus.SUCCESS)
+				.start(start)
+				.end(THE_BEGINNING)
+				.lowerBoundary(THE_BEGINNING)
+				.higherBoundary(THE_BEGINNING)
 				.build();
 	}
 }

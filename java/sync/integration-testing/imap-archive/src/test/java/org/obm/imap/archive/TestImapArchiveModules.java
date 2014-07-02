@@ -32,6 +32,8 @@
 package org.obm.imap.archive;
 
 import java.util.Date;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -45,6 +47,7 @@ import org.obm.domain.dao.UserSystemDao;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
+import org.obm.push.utils.UUIDFactory;
 import org.obm.server.ServerConfiguration;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.locators.Locator;
@@ -53,8 +56,11 @@ import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
+import com.linagora.scheduling.DateTimeProvider;
 
 public class TestImapArchiveModules {
+	
+	public static final UUID uuid = UUID.fromString("08c00ba3-fb00-48ac-a077-24b47c123692");
 	
 	public static final DateTime LOCAL_DATE_TIME = new DateTime()
 			.withZone(DateTimeZone.UTC)
@@ -80,7 +86,8 @@ public class TestImapArchiveModules {
 			install(Modules.override(new ImapArchiveModule(config)).with(
 				new DaoTestModule(),
 				new TransactionalModule(),
-				new DateProviderModule(),
+				new TimeBasedModule(),
+				new StaticUUIDModule(),
 				new LocalLocatorModule(obmSyncHttpMock.getBaseUrl() + "/obm-sync"),
 				new AbstractModule() {
 					
@@ -169,7 +176,7 @@ public class TestImapArchiveModules {
 		}
 	}
 	
-	public static class DateProviderModule extends AbstractModule {
+	public static class TimeBasedModule extends AbstractModule {
 
 		@Override
 		protected void configure() {
@@ -178,6 +185,28 @@ public class TestImapArchiveModules {
 				@Override
 				public Date getDate() {
 					return LOCAL_DATE_TIME.toDate();
+				}
+			});
+			bind(DateTimeProvider.class).toInstance(new DateTimeProvider() {
+				
+				@Override
+				public DateTime now() {
+					return LOCAL_DATE_TIME;
+				}
+			});
+			bind(TimeUnit.class).annotatedWith(Names.named("schedulerResolution")).toInstance(TimeUnit.MILLISECONDS);
+		}
+	}
+	
+	public static class StaticUUIDModule extends AbstractModule {
+
+		@Override
+		protected void configure() {
+			bind(UUIDFactory.class).toInstance(new UUIDFactory() {
+
+				@Override
+				public UUID randomUUID() {
+					return uuid;
 				}
 			});
 		}
