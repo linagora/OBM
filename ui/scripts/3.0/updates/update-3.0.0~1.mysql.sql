@@ -67,6 +67,10 @@ UPDATE UGroup
 SET group_ext_id = UUID()
 WHERE group_ext_id IS NULL;
 
+UPDATE UGroup
+SET group_ext_id = UUID()
+WHERE group_ext_id = '';
+
 ALTER TABLE UGroup MODIFY group_ext_id CHARACTER(36) NOT NULL;
 ALTER TABLE UGroup ADD UNIQUE (group_domain_id, group_ext_id);
 
