@@ -77,6 +77,10 @@ UPDATE ONLY ugroup
 SET group_ext_id = UUID()
 WHERE group_ext_id IS NULL;
 
+UPDATE UGroup
+SET group_ext_id = UUID()
+WHERE group_ext_id = '';
+
 ALTER TABLE ONLY ugroup ALTER group_ext_id SET NOT NULL;
 CREATE UNIQUE INDEX group_ext_id_unique_idx ON ugroup (group_domain_id, group_ext_id);
 
