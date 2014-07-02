@@ -36,7 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.assertj.core.api.Fail;
 import org.joda.time.DateTime;
@@ -46,10 +45,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.base.Stopwatch;
-import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.Atomics;
-import com.google.common.util.concurrent.SettableFuture;
 import com.linagora.scheduling.ScheduledTask.Listener;
 import com.linagora.scheduling.ScheduledTask.State;
 
@@ -136,17 +131,17 @@ public class SchedulerTest {
 	
 	@Test(expected=NullPointerException.class)
 	public void scheduleAtShouldThrowOnNullDateTime() {
-		assertThat(testee.schedule(dummyTask()).at(null));
+		assertThat(testee.schedule(new DummyTask()).at(null));
 	}
 	
 	@Test(expected=TaskInThePastException.class)
 	public void scheduleAtShouldThrowOnTaskScheduledInThePast() {
-		assertThat(testee.schedule(dummyTask()).at(now.minusHours(1)));
+		assertThat(testee.schedule(new DummyTask()).at(now.minusHours(1)));
 	}
 
 	@Test
 	public void scheduleNowShouldRegisterATaskForNow() {
-		Task task = dummyTask();
+		Task task = new DummyTask();
 		ScheduledTask actual = testee.schedule(task).now();
 		assertThat(actual.scheduledTime()).isEqualTo(now);
 		assertThat(actual.task()).isEqualTo(task);
@@ -155,7 +150,7 @@ public class SchedulerTest {
 	@Test
 	public void scheduleAtShouldRegisterATaskForNextHour() {
 		DateTime targetTime = now.plusHours(1);
-		Task task = dummyTask();
+		Task task = new DummyTask();
 		ScheduledTask actual = testee.schedule(task).at(targetTime);
 		assertThat(actual.scheduledTime()).isEqualTo(targetTime);
 		assertThat(actual.task()).isEqualTo(task);
@@ -164,18 +159,18 @@ public class SchedulerTest {
 	
 	@Test(expected=NullPointerException.class)
 	public void scheduleInShouldThrowOnTaskScheduledInThePast() {
-		testee.schedule(dummyTask()).in(null);
+		testee.schedule(new DummyTask()).in(null);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void scheduleShouldThrowOnNullListener() {
-		testee.schedule(dummyTask()).addListener(null);
+		testee.schedule(new DummyTask()).addListener(null);
 	}
 	
 	@Test
 	public void scheduleInShouldRegisterATaskForNextHour() {
 		DateTime targetTime = now.plusHours(1);
-		Task task = dummyTask();
+		Task task = new DummyTask();
 		ScheduledTask actual = testee.schedule(task).in(Period.hours(1));
 		assertThat(actual.scheduledTime()).isEqualTo(targetTime);
 		assertThat(actual.task()).isEqualTo(task);
@@ -184,8 +179,8 @@ public class SchedulerTest {
 	
 	@Test
 	public void scheduleNowShouldRunATaskNow() throws Exception {
-		Task task = dummyTask(Duration.millis(1000));
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask(Duration.millis(1000));
+		FutureTestListener testListener = new FutureTestListener();
 		Future<State> futureState = testListener.getFutureState();
 		testee.schedule(task).addListener(testListener).now();
 		assertThat(futureState.get(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.WAITING);
@@ -196,8 +191,8 @@ public class SchedulerTest {
 	@Test
 	public void scheduleInShouldRunATaskInOneHour() throws Exception {
 		DateTime targetTime = now.plusHours(1);
-		Task task = dummyTask(Duration.millis(10));
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask(Duration.millis(10));
+		FutureTestListener testListener = new FutureTestListener();
 		ScheduledTask actual = testee.schedule(task).addListener(testListener).in(Period.hours(1));
 		assertThat(actual.state()).isEqualTo(ScheduledTask.State.WAITING);
 		dateTimeProvider.setCurrent(targetTime);
@@ -208,8 +203,8 @@ public class SchedulerTest {
 	@Test
 	public void scheduleInShouldNotRunACanceldedTaskInOneHour() throws Exception {
 		DateTime targetTime = now.plusHours(1);
-		Task task = dummyTask();
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask();
+		FutureTestListener testListener = new FutureTestListener();
 		ScheduledTask actual = testee.schedule(task).addListener(testListener).in(Period.hours(1));
 		assertThat(actual.state()).isEqualTo(ScheduledTask.State.WAITING);
 		actual.cancel();
@@ -224,8 +219,8 @@ public class SchedulerTest {
 
 	@Test
 	public void cancelShouldNotAbortARunningTask() throws Exception {
-		Task task = dummyTask(Duration.millis(100));
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask(Duration.millis(100));
+		FutureTestListener testListener = new FutureTestListener();
 		ScheduledTask actual = testee.schedule(task).addListener(testListener).at(now);
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
 		actual.cancel();
@@ -234,8 +229,8 @@ public class SchedulerTest {
 	
 	@Test
 	public void cancelShouldNotFailWhenTerminatedTask() throws Exception {
-		Task task = dummyTask(Duration.millis(100));
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask(Duration.millis(100));
+		FutureTestListener testListener = new FutureTestListener();
 		ScheduledTask actual = testee.schedule(task).addListener(testListener).at(now);
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.TERMINATED);
@@ -244,8 +239,8 @@ public class SchedulerTest {
 	
 	@Test
 	public void scheduleInShouldRunATaskInOneYearAnd2Hours() throws Exception {
-		Task task = dummyTask(Duration.millis(10));
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask(Duration.millis(10));
+		FutureTestListener testListener = new FutureTestListener();
 		ScheduledTask actual = testee.schedule(task).addListener(testListener).in(Period.years(1).plusHours(2));
 		dateTimeProvider.setCurrent(now.plusYears(1));
 		assertThat(actual.state()).isEqualTo(ScheduledTask.State.WAITING);
@@ -256,8 +251,8 @@ public class SchedulerTest {
 	
 	@Test
 	public void scheduleInShouldRunATaskOnceWhenHourJumpBack() throws Exception {
-		Task task = dummyTask(Duration.millis(10));
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask(Duration.millis(10));
+		FutureTestListener testListener = new FutureTestListener();
 		testee.schedule(task).addListener(testListener).in(Period.hours(2));
 		dateTimeProvider.setCurrent(now.plusHours(2));
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
@@ -273,8 +268,8 @@ public class SchedulerTest {
 	
 	@Test
 	public void scheduleAtShouldRunATaskOnceWhenHourJumpBack() throws Exception {
-		Task task = dummyTask(Duration.millis(10));
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask(Duration.millis(10));
+		FutureTestListener testListener = new FutureTestListener();
 		testee.schedule(task).addListener(testListener).at(now.plusHours(2));
 		dateTimeProvider.setCurrent(now.plusHours(2));
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
@@ -290,8 +285,8 @@ public class SchedulerTest {
 	
 	@Test
 	public void scheduleInShouldRunATaskOnceWhenHourJumpForward() throws Exception {
-		Task task = dummyTask(Duration.millis(10));
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask(Duration.millis(10));
+		FutureTestListener testListener = new FutureTestListener();
 		testee.schedule(task).addListener(testListener).in(Period.hours(2));
 		dateTimeProvider.setCurrent(now.plusHours(3));
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
@@ -300,8 +295,8 @@ public class SchedulerTest {
 	
 	@Test
 	public void scheduleAtShouldRunATaskOnceWhenHourJumpForward() throws Exception {
-		Task task = dummyTask(Duration.millis(10));
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask(Duration.millis(10));
+		FutureTestListener testListener = new FutureTestListener();
 		testee.schedule(task).addListener(testListener).at(now.plusHours(2));
 		dateTimeProvider.setCurrent(now.plusHours(3));
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
@@ -310,8 +305,8 @@ public class SchedulerTest {
 	
 	@Test
 	public void scheduleInShouldRunNothingAfterStop() throws Exception {
-		Task task = dummyTask();
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask();
+		FutureTestListener testListener = new FutureTestListener();
 		testee.schedule(task).addListener(testListener).in(Period.hours(2));
 		testee.stop();
 		dateTimeProvider.setCurrent(now.plusHours(2));
@@ -325,8 +320,8 @@ public class SchedulerTest {
 	@Test
 	public void listenerFailureShouldNotBreakNotification() throws Exception {
 		DateTime targetTime = now.plusHours(1);
-		Task task = dummyTask(Duration.millis(100));
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask(Duration.millis(100));
+		FutureTestListener testListener = new FutureTestListener();
 		Future<State> scheduledFuture = testListener.getFutureState();
 		testee.schedule(task).addListener(new Listener() {
 			@Override
@@ -352,8 +347,8 @@ public class SchedulerTest {
 
 	@Test
 	public void failingTaskShouldNotifyListener() throws Exception {
-		TestListener testListener = new TestListener();
-		testee.schedule(failingTask(Duration.millis(100))).addListener(testListener).in(Period.hours(1));
+		FutureTestListener testListener = new FutureTestListener();
+		testee.schedule(new FailingTask(Duration.millis(100))).addListener(testListener).in(Period.hours(1));
 		dateTimeProvider.setCurrent(now.plusHours(1));
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.FAILED);
@@ -362,8 +357,8 @@ public class SchedulerTest {
 	
 	@Test
 	public void failedListenerShouldNotBreakNotification() throws Exception {
-		TestListener testListener = new TestListener();
-		testee.schedule(failingTask(Duration.millis(100))).addListener(new Listener() {
+		FutureTestListener testListener = new FutureTestListener();
+		testee.schedule(new FailingTask(Duration.millis(100))).addListener(new Listener() {
 			@Override
 			public void failed(Throwable failure) {
 				throw new RuntimeException();
@@ -376,8 +371,8 @@ public class SchedulerTest {
 	
 	@Test
 	public void canceledListenerShouldNotBreakNotification() throws Exception {
-		Task task = dummyTask(Duration.millis(100));
-		TestListener testListener = new TestListener();
+		Task task = new DummyTask(Duration.millis(100));
+		FutureTestListener testListener = new FutureTestListener();
 		ScheduledTask scheduled = testee.schedule(task).addListener(new Listener() {
 			@Override
 			public void canceled() {
@@ -389,95 +384,5 @@ public class SchedulerTest {
 		assertThat(canceledFuture.get(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.CANCELED);
 	}
 	
-	private Task dummyTask() {
-		return dummyTask(Duration.standardSeconds(1));
-	}
-	
-	private Task dummyTask(final Duration duration) {
-		return new Task() {
-			
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(duration.getMillis());
-				} catch (InterruptedException e) {
-					Throwables.propagate(e);
-				}
-			}
-			
-			@Override
-			public String taskName() {
-				return "dummy";
-			}
-		};
-	}
-	
-	private Task failingTask(final Duration duration) {
-		return new Task() {
-			
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(duration.getMillis());
-				} catch (InterruptedException e) {
-				}
-				throw new RuntimeException("failing task message");
-			}
-			
-			@Override
-			public String taskName() {
-				return "failing task";
-			}
-		};
-	}
-	
-	private static class TestListener extends Listener {
-
-		AtomicReference<SettableFuture<State>> stateRef = Atomics.newReference(SettableFuture.<State>create());
-		Throwable failure;
-
-		Future<State> getFutureState() {
-			return stateRef.get();
-		}
-		
-		State getNextState(int timeout, TimeUnit unit) throws Exception {
-			Stopwatch start = Stopwatch.createStarted();
-			try {
-				return stateRef.get().get(timeout, unit);
-			} finally {
-				System.out.println("next state in : " + start.elapsed(TimeUnit.MILLISECONDS));
-			}
-		}
-
-		void notifyOnce(State state) {
-			stateRef.getAndSet(SettableFuture.<State>create()).set(state);
-		}
-
-		@Override
-		public void canceled() {
-			notifyOnce(State.CANCELED);
-		}
-		
-		@Override
-		public void running() {
-			notifyOnce(State.RUNNING);
-		}
-
-		@Override
-		public void terminated() {
-			notifyOnce(State.TERMINATED);
-		}
-		
-		@Override
-		public void failed(Throwable failure) {
-			this.failure = failure;
-			notifyOnce(State.FAILED);
-		}
-		
-		@Override
-		public void scheduled() {
-			notifyOnce(State.WAITING);
-		}
-	}
 }
 
