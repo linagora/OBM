@@ -143,6 +143,14 @@ public class SchedulerTest {
 	public void scheduleAtShouldThrowOnTaskScheduledInThePast() {
 		assertThat(testee.schedule(dummyTask()).at(now.minusHours(1)));
 	}
+
+	@Test
+	public void scheduleNowShouldRegisterATaskForNow() {
+		Task task = dummyTask();
+		ScheduledTask actual = testee.schedule(task).now();
+		assertThat(actual.scheduledTime()).isEqualTo(now);
+		assertThat(actual.task()).isEqualTo(task);
+	}
 	
 	@Test
 	public void scheduleAtShouldRegisterATaskForNextHour() {
@@ -172,6 +180,17 @@ public class SchedulerTest {
 		assertThat(actual.scheduledTime()).isEqualTo(targetTime);
 		assertThat(actual.task()).isEqualTo(task);
 		assertThat(actual.state()).isEqualTo(ScheduledTask.State.WAITING);
+	}
+	
+	@Test
+	public void scheduleNowShouldRunATaskNow() throws Exception {
+		Task task = dummyTask(Duration.millis(1000));
+		TestListener testListener = new TestListener();
+		Future<State> futureState = testListener.getFutureState();
+		testee.schedule(task).addListener(testListener).now();
+		assertThat(futureState.get(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.WAITING);
+		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
+		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.TERMINATED);
 	}
 	
 	@Test

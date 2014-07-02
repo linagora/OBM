@@ -202,7 +202,11 @@ public class Scheduler implements AutoCloseable {
 			DateTime when = dateTimeProvider.now().plus(period);
 			return taskBuilder.scheduledTime(when).schedule(Scheduler.this);
 		}
-		
+
+		public ScheduledTask now() {
+			return taskBuilder.scheduledTime(dateTimeProvider.now()).schedule(Scheduler.this);
+		}
+
 		public TaskToSchedule addListener(Listener listener) {
 			Preconditions.checkNotNull(listener);
 			taskBuilder.addListener(listener);
