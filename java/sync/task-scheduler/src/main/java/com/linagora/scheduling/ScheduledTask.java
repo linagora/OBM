@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.scheduling;
 
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
@@ -39,10 +41,38 @@ import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
 public class ScheduledTask implements Delayed {
 
+	public static class Id {
+		
+		public static Id generate() {
+			return new Id(UUID.randomUUID());
+		}
+		
+		private UUID id;
+		
+		private Id(UUID uuid) {
+			id = uuid;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof Id) {
+				Id other = (Id) obj;
+				return Objects.equal(id, other.id);
+			}
+			return false;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(id);
+		}
+	}
+	
 	public enum State {
 		CANCELED,
 		FAILED,
@@ -91,10 +121,11 @@ public class ScheduledTask implements Delayed {
 		}
 		
 		public ScheduledTask schedule(Scheduler scheduler) {
-			return new ScheduledTask(scheduledTime, task, scheduler, listeners.build()).schedule();
+			return new ScheduledTask(Id.generate(), scheduledTime, task, scheduler, listeners.build()).schedule();
 		}
 	}
 	
+	private final Id id;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final DateTime scheduledTime;
 	private final Task task;
@@ -102,7 +133,8 @@ public class ScheduledTask implements Delayed {
 	private final ImmutableList<Listener> listeners;
 	private State state;
 	
-	private ScheduledTask(DateTime scheduledTime, Task task, Scheduler scheduler, ImmutableList<Listener> listeners) {
+	private ScheduledTask(Id id, DateTime scheduledTime, Task task, Scheduler scheduler, ImmutableList<Listener> listeners) {
+		this.id = id;
 		this.scheduledTime = scheduledTime;
 		this.task = task;
 		this.scheduler = scheduler;
@@ -123,6 +155,10 @@ public class ScheduledTask implements Delayed {
 
 	public State state() {
 		return state;
+	}
+
+	public Id id() {
+		return id;
 	}
 	
 	public DateTime scheduledTime() {
