@@ -325,17 +325,17 @@ public class SchedulerTest {
 		Future<State> scheduledFuture = testListener.getFutureState();
 		testee.schedule(task).addListener(new Listener() {
 			@Override
-			public void scheduled() {
+			public void scheduled(ScheduledTask task) {
 				throw new RuntimeException();
 			}
 			
 			@Override
-			public void running() {
+			public void running(ScheduledTask task) {
 				throw new RuntimeException();
 			}
 			
 			@Override
-			public void terminated() {
+			public void terminated(ScheduledTask task) {
 				throw new RuntimeException();
 			}
 		}).addListener(testListener).in(Period.hours(1));
@@ -360,7 +360,7 @@ public class SchedulerTest {
 		FutureTestListener testListener = new FutureTestListener();
 		testee.schedule(new FailingTask(Duration.millis(100))).addListener(new Listener() {
 			@Override
-			public void failed(Throwable failure) {
+			public void failed(ScheduledTask task, Throwable failure) {
 				throw new RuntimeException();
 			}
 		}).addListener(testListener).in(Period.hours(1));
@@ -375,7 +375,7 @@ public class SchedulerTest {
 		FutureTestListener testListener = new FutureTestListener();
 		ScheduledTask scheduled = testee.schedule(task).addListener(new Listener() {
 			@Override
-			public void canceled() {
+			public void canceled(ScheduledTask task) {
 				throw new RuntimeException();
 			}
 		}).addListener(testListener).in(Period.hours(1));

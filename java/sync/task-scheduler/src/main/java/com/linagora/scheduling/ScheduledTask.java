@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.scheduling;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -83,12 +82,16 @@ public class ScheduledTask implements Delayed {
 	}
 
 	public static abstract class Listener {
-		public void canceled() {}
+		@SuppressWarnings("unused")
+		public void canceled(ScheduledTask task) {}
+		@SuppressWarnings("unused")
+		public void failed(ScheduledTask task, Throwable failure) {}
 		@SuppressWarnings("unused") 
-		public void failed(Throwable failure) {}
-		public void running() {}
-		public void scheduled() {}
-		public void terminated() {}
+		public void running(ScheduledTask task) {}
+		@SuppressWarnings("unused") 
+		public void scheduled(ScheduledTask task) {}
+		@SuppressWarnings("unused") 
+		public void terminated(ScheduledTask task) {}
 	}
 	
 	public static Builder builder() {
@@ -188,7 +191,7 @@ public class ScheduledTask implements Delayed {
 		state = State.WAITING;
 		for (Listener listener: listeners) {
 			try {
-				listener.scheduled();
+				listener.scheduled(this);
 			} catch (Exception listenerException) {
 				logger.error("Error notifying a listener", listenerException);
 			}
@@ -199,7 +202,7 @@ public class ScheduledTask implements Delayed {
 		state = State.CANCELED;
 		for (Listener listener: listeners) {
 			try {
-				listener.canceled();
+				listener.canceled(this);
 			} catch (Exception listenerException) {
 				logger.error("Error notifying a listener", listenerException);
 			}
@@ -210,7 +213,7 @@ public class ScheduledTask implements Delayed {
 		state = State.RUNNING;
 		for (Listener listener: listeners) {
 			try {
-				listener.running();
+				listener.running(this);
 			} catch (Exception listenerException) {
 				logger.error("Error notifying a listener", listenerException);
 			}
@@ -221,7 +224,7 @@ public class ScheduledTask implements Delayed {
 		state = State.TERMINATED;
 		for (Listener listener: listeners) {
 			try {
-				listener.terminated();
+				listener.terminated(this);
 			} catch (Exception listenerException) {
 				logger.error("Error notifying a listener", listenerException);
 			}
@@ -232,7 +235,7 @@ public class ScheduledTask implements Delayed {
 		state = State.FAILED;
 		for (Listener listener: listeners) {
 			try {
-				listener.failed(e);
+				listener.failed(this, e);
 			} catch (Exception listenerException) {
 				logger.error("Error notifying a listener", listenerException);
 			}

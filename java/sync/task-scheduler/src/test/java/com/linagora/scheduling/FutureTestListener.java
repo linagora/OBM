@@ -64,28 +64,28 @@ class FutureTestListener extends Listener {
 	}
 
 	@Override
-	public void canceled() {
+	public void canceled(ScheduledTask task) {
 		notifyOnce(State.CANCELED);
 	}
 	
 	@Override
-	public void running() {
+	public void running(ScheduledTask task) {
 		notifyOnce(State.RUNNING);
 	}
 
 	@Override
-	public void terminated() {
+	public void terminated(ScheduledTask task) {
 		notifyOnce(State.TERMINATED);
 	}
 	
 	@Override
-	public void failed(Throwable failure) {
+	public void failed(ScheduledTask task, Throwable failure) {
 		this.failure = failure;
 		notifyOnce(State.FAILED);
 	}
 	
 	@Override
-	public void scheduled() {
+	public void scheduled(ScheduledTask task) {
 		notifyOnce(State.WAITING);
 	}
 }
