@@ -136,8 +136,8 @@ public class Scheduler implements AutoCloseable {
 	}
 	
 
-	public void cancel(ScheduledTask scheduledTask) {
-		actualScheduler.remove(scheduledTask);
+	public boolean cancel(ScheduledTask scheduledTask) {
+		return actualScheduler.remove(scheduledTask);
 	}
 	
 	private class ActualScheduler extends AbstractScheduledService {
@@ -164,8 +164,8 @@ public class Scheduler implements AutoCloseable {
 			return scheduledTask;
 		}
 
-		public void remove(ScheduledTask scheduledTask) {
-			tasks.remove(scheduledTask);
+		public boolean remove(ScheduledTask scheduledTask) {
+			return tasks.remove(scheduledTask);
 		}
 		
 		@Override

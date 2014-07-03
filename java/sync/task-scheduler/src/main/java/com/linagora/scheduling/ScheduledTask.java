@@ -152,8 +152,9 @@ public class ScheduledTask implements Delayed {
 	}
 
 	public void cancel() {
-		scheduler.cancel(this);
-		notifyCanceled();
+		if (scheduler.cancel(this)) {
+			notifyCanceled();
+		}
 	}
 
 	public State state() {

@@ -31,36 +31,40 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.scheduling;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.TimeoutException;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.util.concurrent.Atomics;
-import com.google.common.util.concurrent.SettableFuture;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Queues;
 import com.linagora.scheduling.ScheduledTask.Listener;
 import com.linagora.scheduling.ScheduledTask.State;
 
 class FutureTestListener extends Listener {
 
-	AtomicReference<SettableFuture<State>> stateRef = Atomics.newReference(SettableFuture.<State>create());
+	ArrayBlockingQueue<State> states = Queues.newArrayBlockingQueue(10);
 	Throwable failure;
 
-	Future<State> getFutureState() {
-		return stateRef.get();
-	}
-	
 	State getNextState(int timeout, TimeUnit unit) throws Exception {
 		Stopwatch start = Stopwatch.createStarted();
 		try {
-			return stateRef.get().get(timeout, unit);
+			State state = states.poll(timeout, unit);
+			if (state == null) {
+				throw new TimeoutException();
+			}
+			return state;
 		} finally {
 			System.out.println("next state in : " + start.elapsed(TimeUnit.MILLISECONDS));
 		}
 	}
 
 	void notifyOnce(State state) {
-		stateRef.getAndSet(SettableFuture.<State>create()).set(state);
+		try {
+			states.put(state);
+		} catch (InterruptedException e) {
+			Throwables.propagate(e);
+		}
 	}
 
 	@Override
