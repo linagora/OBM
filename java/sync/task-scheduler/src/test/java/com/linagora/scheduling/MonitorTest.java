@@ -35,6 +35,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.TimeUnit;
 
+import org.assertj.guava.api.Assertions;
+import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,5 +78,55 @@ public class MonitorTest {
 		remotelyControlledTask.terminate();
 		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.TERMINATED);
 		assertThat(monitor.all()).isEmpty();
+	}
+	
+	@Test
+	public void findByIdShouldFindAScheduledTasks() throws Exception {
+		FutureTestListener futureListener = new FutureTestListener();
+		ScheduledTask scheduledTask = scheduler.schedule(new DummyTask()).addListener(futureListener).in(Period.days(1));
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.WAITING);
+		assertThat(monitor.findById(scheduledTask.id()).get()).isEqualTo(scheduledTask);
+	}
+	
+	@Test
+	public void findByIdShouldFindARunningTasks() throws Exception {
+		FutureTestListener futureListener = new FutureTestListener();
+		RemotelyControlledTask remotelyControlledTask = new RemotelyControlledTask();
+		ScheduledTask scheduledTask = scheduler.schedule(remotelyControlledTask).addListener(futureListener).now();
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.WAITING);
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.RUNNING);
+		Assertions.assertThat(monitor.findById(scheduledTask.id())).isPresent().contains(scheduledTask);
+	}
+	
+	@Test
+	public void findByIdShouldNotFindAFinishedTasks() throws Exception {
+		FutureTestListener futureListener = new FutureTestListener();
+		RemotelyControlledTask remotelyControlledTask = new RemotelyControlledTask();
+		ScheduledTask scheduledTask = scheduler.schedule(remotelyControlledTask).addListener(futureListener).now();
+		remotelyControlledTask.terminate();
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.WAITING);
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.RUNNING);
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.TERMINATED);
+		Assertions.assertThat(monitor.findById(scheduledTask.id())).isAbsent();
+	}
+	
+	@Test
+	public void findByIdShouldNotFindACanceledTasks() throws Exception {
+		FutureTestListener futureListener = new FutureTestListener();
+		ScheduledTask scheduledTask = scheduler.schedule(new DummyTask()).addListener(futureListener).in(Period.days(1));
+		scheduledTask.cancel();
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.WAITING);
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.CANCELED);
+		Assertions.assertThat(monitor.findById(scheduledTask.id())).isAbsent();
+	}
+	
+	@Test
+	public void findByIdShouldNotFindAFailingTasks() throws Exception {
+		FutureTestListener futureListener = new FutureTestListener();
+		ScheduledTask scheduledTask = scheduler.schedule(new FailingTask(Duration.millis(1))).addListener(futureListener).now();
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.WAITING);
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.RUNNING);
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.FAILED);
+		Assertions.assertThat(monitor.findById(scheduledTask.id())).isAbsent();
 	}
 }

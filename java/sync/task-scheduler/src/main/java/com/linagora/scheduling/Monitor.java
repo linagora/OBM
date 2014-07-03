@@ -34,6 +34,7 @@ package com.linagora.scheduling;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
 import com.linagora.scheduling.ScheduledTask.Listener;
@@ -50,6 +51,10 @@ public class Monitor extends Listener {
 		return ImmutableList.copyOf(tasks.values());
 	}
 	
+	public Optional<ScheduledTask> findById(ScheduledTask.Id id) {
+		return Optional.fromNullable(tasks.get(id));
+	}
+	
 	@Override
 	public void scheduled(ScheduledTask task) {
 		tasks.put(task.id(), task);
@@ -57,6 +62,16 @@ public class Monitor extends Listener {
 	
 	@Override
 	public void terminated(ScheduledTask task) {
+		tasks.remove(task.id());
+	}
+	
+	@Override
+	public void canceled(ScheduledTask task) {
+		tasks.remove(task.id());
+	}
+	
+	@Override
+	public void failed(ScheduledTask task, Throwable failure) {
 		tasks.remove(task.id());
 	}
 }
