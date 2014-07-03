@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.scheduling;
 
+import java.util.List;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,6 +42,7 @@ import org.joda.time.ReadablePeriod;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.linagora.scheduling.ScheduledTask.Listener;
 
@@ -52,11 +54,13 @@ public class Scheduler implements AutoCloseable {
 	
 	public static class Builder {
 		
+		private ImmutableList.Builder<Listener> listeners;
 		private TimeUnit unit;
 		private Integer resolution;
 		private DateTimeProvider timeProvider;
 
 		private Builder() {
+			listeners = ImmutableList.builder();
 		}
 
 		public Builder resolution(int resolution, TimeUnit unit) {
@@ -66,7 +70,6 @@ public class Scheduler implements AutoCloseable {
 			this.resolution = resolution;
 			return this;
 		}
-
 		
 		public Builder resolution(TimeUnit unit) {
 			return resolution(1, unit);
@@ -78,11 +81,17 @@ public class Scheduler implements AutoCloseable {
 			return this;
 		}
 		
+		public Builder addListener(Listener listener) {
+			listeners.add(listener);
+			return this;
+		}
+		
 		public Scheduler start() {
 			Scheduler scheduler = new Scheduler(
 				Objects.firstNonNull(timeProvider, DateTimeProvider.SYSTEM_UTC),
 				Objects.firstNonNull(resolution, 1),
-				Objects.firstNonNull(unit, TimeUnit.MINUTES)
+				Objects.firstNonNull(unit, TimeUnit.MINUTES),
+				listeners.build()
 				);
 			scheduler.start();
 			return scheduler;
@@ -92,12 +101,14 @@ public class Scheduler implements AutoCloseable {
 	private final DateTimeProvider dateTimeProvider;
 	private final int resolution;
 	private final TimeUnit unit;
+	private final ImmutableList<Listener> listeners;
 	private ActualScheduler actualScheduler;
 	
-	private Scheduler(DateTimeProvider dateTimeProvider, int resolution, TimeUnit unit) {
+	private Scheduler(DateTimeProvider dateTimeProvider, int resolution, TimeUnit unit, ImmutableList<Listener> listeners) {
 		this.dateTimeProvider = dateTimeProvider;
 		this.resolution = resolution;
 		this.unit = unit;
+		this.listeners = listeners;
 	}
 
 	public synchronized Scheduler start() {
@@ -116,7 +127,6 @@ public class Scheduler implements AutoCloseable {
 		return this;
 	}
 	
-
 	@Override
 	public void close() throws Exception {
 		stop();
@@ -124,7 +134,9 @@ public class Scheduler implements AutoCloseable {
 	
 	public TaskToSchedule schedule(Task task) {
 		Preconditions.checkNotNull(task);
-		return new TaskToSchedule(task);
+		TaskToSchedule taskToSchedule = new TaskToSchedule(task);
+		taskToSchedule.addListeners(listeners);
+		return taskToSchedule;
 	}
 	
 	/* package */ ScheduledTask schedule(ScheduledTask scheduledTask) {
@@ -196,7 +208,7 @@ public class Scheduler implements AutoCloseable {
 			}
 			return taskBuilder.scheduledTime(when).schedule(Scheduler.this);
 		}
-		
+
 		public ScheduledTask in(ReadablePeriod period) {
 			Preconditions.checkNotNull(period);
 			DateTime when = dateTimeProvider.now().plus(period);
@@ -212,7 +224,12 @@ public class Scheduler implements AutoCloseable {
 			taskBuilder.addListener(listener);
 			return this;
 		}
-		
+
+		public TaskToSchedule addListeners(List<Listener> listeners) {
+			Preconditions.checkNotNull(listeners);
+			taskBuilder.addListeners(listeners);
+			return this;
+		}
 	}
 	
 }

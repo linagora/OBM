@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.scheduling;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -120,6 +121,11 @@ public class ScheduledTask implements Delayed {
 		
 		public Builder addListener(Listener listener) {
 			listeners.add(listener);
+			return this;
+		}
+		
+		public Builder addListeners(List<Listener> listeners) {
+			this.listeners.addAll(listeners);
 			return this;
 		}
 		
@@ -255,4 +261,5 @@ public class ScheduledTask implements Delayed {
 				Seconds.secondsBetween(scheduler.now(), scheduledTime).getSeconds(), 
 				TimeUnit.SECONDS);
 	}
+
 }
