@@ -376,7 +376,9 @@ class CAS_Auth extends Auth {
 
     $this->db->query(sprintf("select userobm_id,
       userobm_perms,
-      userobm_domain_id
+      userobm_domain_id,
+      userobm_delegation,
+      userobm_delegation_target
       from %s
       where userobm_login = '%s'",
 			     $this->database_table,
@@ -385,6 +387,8 @@ class CAS_Auth extends Auth {
       $domain_id = $this->db->f('userobm_domain_id');
       $uid  = $this->db->f('userobm_id');
       $perm = $this->db->f('userobm_perms');
+      $delegation = $this->db->f('userobm_delegation');
+      $delegationTarget = $this->db->f('userobm_delegation_target');
     } else {
 	die("Login ".htmlentities($login)." not found in OBM database. Aborting");
     }
@@ -393,6 +397,9 @@ class CAS_Auth extends Auth {
       $obm['login'] = $login;
       $obm['domain_id'] = $domain_id;
       $obm['uid'] = $uid;
+      $obm['delegation'] = $delegation;
+      $obm['delegation_target'] = $delegationTarget;
+
       $obm = $this->add_domain_infos($obm);
       $_SESSION["obm"] = $obm;
       return $uid;
