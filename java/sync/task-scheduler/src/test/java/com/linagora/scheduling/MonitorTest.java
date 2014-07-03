@@ -81,6 +81,26 @@ public class MonitorTest {
 	}
 	
 	@Test
+	public void allShouldNotReturnCanceledTasks() throws Exception {
+		FutureTestListener futureListener = new FutureTestListener();
+		ScheduledTask scheduledTask = scheduler.schedule(new DummyTask()).addListener(futureListener).in(Period.days(1));
+		scheduledTask.cancel();
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.WAITING);
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.CANCELED);
+		assertThat(monitor.all()).isEmpty();
+	}
+	
+	@Test
+	public void allShouldNotReturnFailingTasks() throws Exception {
+		FutureTestListener futureListener = new FutureTestListener();
+		scheduler.schedule(new FailingTask(Duration.millis(1))).addListener(futureListener).now();
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.WAITING);
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.RUNNING);
+		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.FAILED);
+		assertThat(monitor.all()).isEmpty();
+	}
+	
+	@Test
 	public void findByIdShouldFindAScheduledTasks() throws Exception {
 		FutureTestListener futureListener = new FutureTestListener();
 		ScheduledTask scheduledTask = scheduler.schedule(new DummyTask()).addListener(futureListener).in(Period.days(1));
