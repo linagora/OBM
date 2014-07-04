@@ -44,7 +44,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.linagora.scheduling.ScheduledTask.Listener;
+import com.linagora.scheduling.Listener.NoopListener;
 import com.linagora.scheduling.Scheduler.Builder;
 
 public class SchedulerTest {
@@ -348,7 +348,7 @@ public class SchedulerTest {
 	public void schedulerListenerFailureShouldNotBreakNotification() throws Exception {
 		FutureTestListener testListener = new FutureTestListener();
 		testee = testeeBuilder
-			.addListener(new Listener() {
+			.addListener(new NoopListener() {
 				@Override
 				public void scheduled(ScheduledTask task) {
 					throw new RuntimeException();
@@ -379,7 +379,7 @@ public class SchedulerTest {
 		start();
 		Period waitingPeriod = Period.hours(1);
 		FutureTestListener testListener = new FutureTestListener();
-		testee.schedule(new DummyTask(Duration.millis(100))).addListener(new Listener() {
+		testee.schedule(new DummyTask(Duration.millis(100))).addListener(new NoopListener() {
 			@Override
 			public void scheduled(ScheduledTask task) {
 				throw new RuntimeException();
@@ -432,7 +432,7 @@ public class SchedulerTest {
 		start();
 		FutureTestListener testListener = new FutureTestListener();
 		Period waitingPeriod = Period.hours(1);
-		testee.schedule(new FailingTask(Duration.millis(100))).addListener(new Listener() {
+		testee.schedule(new FailingTask(Duration.millis(100))).addListener(new NoopListener() {
 			@Override
 			public void failed(ScheduledTask task, Throwable failure) {
 				throw new RuntimeException();
@@ -448,7 +448,7 @@ public class SchedulerTest {
 	public void failedSchedulerListenerShouldNotBreakNotification() throws Exception {
 		FutureTestListener testListener = new FutureTestListener();
 		testee = testeeBuilder
-				.addListener(new Listener() {
+				.addListener(new NoopListener() {
 					@Override
 					public void failed(ScheduledTask task, Throwable failure) {
 						throw new RuntimeException();
@@ -468,7 +468,7 @@ public class SchedulerTest {
 	public void canceledTaskListenerShouldNotBreakNotification() throws Exception {
 		start();
 		FutureTestListener testListener = new FutureTestListener();
-		ScheduledTask scheduled = testee.schedule(new DummyTask(Duration.millis(100))).addListener(new Listener() {
+		ScheduledTask scheduled = testee.schedule(new DummyTask(Duration.millis(100))).addListener(new NoopListener() {
 			@Override
 			public void canceled(ScheduledTask task) {
 				throw new RuntimeException();
@@ -483,7 +483,7 @@ public class SchedulerTest {
 	public void canceledSchedulerListenerShouldNotBreakNotification() throws Exception {
 		FutureTestListener testListener = new FutureTestListener();
 		testee = testeeBuilder
-				.addListener(new Listener() {
+				.addListener(new NoopListener() {
 					@Override
 					public void canceled(ScheduledTask task) {
 						throw new RuntimeException();

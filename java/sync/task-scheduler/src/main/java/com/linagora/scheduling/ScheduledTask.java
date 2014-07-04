@@ -80,19 +80,6 @@ public class ScheduledTask implements Delayed {
 		WAITING
 	}
 
-	public static abstract class Listener {
-		@SuppressWarnings("unused")
-		public void canceled(ScheduledTask task) {}
-		@SuppressWarnings("unused")
-		public void failed(ScheduledTask task, Throwable failure) {}
-		@SuppressWarnings("unused") 
-		public void running(ScheduledTask task) {}
-		@SuppressWarnings("unused") 
-		public void scheduled(ScheduledTask task) {}
-		@SuppressWarnings("unused") 
-		public void terminated(ScheduledTask task) {}
-	}
-	
 	public static Builder builder() {
 		return new Builder();
 	}

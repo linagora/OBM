@@ -31,64 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.scheduling;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import com.google.common.base.Stopwatch;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Queues;
-import com.linagora.scheduling.ScheduledTask.State;
-
-class FutureTestListener implements Listener {
-
-	ArrayBlockingQueue<State> states = Queues.newArrayBlockingQueue(10);
-	Throwable failure;
-
-	State getNextState(int timeout, TimeUnit unit) throws Exception {
-		Stopwatch start = Stopwatch.createStarted();
-		try {
-			State state = states.poll(timeout, unit);
-			if (state == null) {
-				throw new TimeoutException();
-			}
-			return state;
-		} finally {
-			System.out.println("next state in : " + start.elapsed(TimeUnit.MILLISECONDS));
-		}
-	}
-
-	void notifyOnce(State state) {
-		try {
-			states.put(state);
-		} catch (InterruptedException e) {
-			Throwables.propagate(e);
-		}
-	}
-
-	@Override
-	public void canceled(ScheduledTask task) {
-		notifyOnce(State.CANCELED);
-	}
+public interface Listener {
 	
-	@Override
-	public void running(ScheduledTask task) {
-		notifyOnce(State.RUNNING);
-	}
-
-	@Override
-	public void terminated(ScheduledTask task) {
-		notifyOnce(State.TERMINATED);
-	}
+	void canceled(ScheduledTask task);
+	void failed(ScheduledTask task, Throwable failure);
+	void running(ScheduledTask task);
+	void scheduled(ScheduledTask task);
+	void terminated(ScheduledTask task);
 	
-	@Override
-	public void failed(ScheduledTask task, Throwable failure) {
-		this.failure = failure;
-		notifyOnce(State.FAILED);
-	}
-	
-	@Override
-	public void scheduled(ScheduledTask task) {
-		notifyOnce(State.WAITING);
+	class NoopListener implements Listener {
+		public void canceled(ScheduledTask task) {}
+		public void failed(ScheduledTask task, Throwable failure) {}
+		public void running(ScheduledTask task) {}
+		public void scheduled(ScheduledTask task) {}
+		public void terminated(ScheduledTask task) {}
 	}
 }

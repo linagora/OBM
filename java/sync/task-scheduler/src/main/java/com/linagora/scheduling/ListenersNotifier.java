@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
-import com.linagora.scheduling.ScheduledTask.Listener;
 
 public class ListenersNotifier {
 
@@ -49,7 +48,7 @@ public class ListenersNotifier {
 	}
 	
 	public void notifyCanceled(final ScheduledTask task) {
-		notify(new Function<ScheduledTask.Listener, Void>() {
+		notify(new Function<Listener, Void>() {
 
 			@Override
 			public Void apply(Listener listener) {
@@ -59,7 +58,7 @@ public class ListenersNotifier {
 		});
 	}
 	public void notifyFailed(final ScheduledTask task, final Throwable t) {
-		notify(new Function<ScheduledTask.Listener, Void>() {
+		notify(new Function<Listener, Void>() {
 			
 			@Override
 			public Void apply(Listener listener) {
@@ -70,7 +69,7 @@ public class ListenersNotifier {
 	}
 	
 	public void notifyRunning(final ScheduledTask task) {
-		notify(new Function<ScheduledTask.Listener, Void>() {
+		notify(new Function<Listener, Void>() {
 			
 			@Override
 			public Void apply(Listener listener) {
@@ -81,7 +80,7 @@ public class ListenersNotifier {
 	}
 	
 	public void notifyScheduled(final ScheduledTask task) {
-		notify(new Function<ScheduledTask.Listener, Void>() {
+		notify(new Function<Listener, Void>() {
 			
 			@Override
 			public Void apply(Listener listener) {
@@ -92,7 +91,7 @@ public class ListenersNotifier {
 	}
 	
 	public void notifyTerminated(final ScheduledTask task) {
-		notify(new Function<ScheduledTask.Listener, Void>() {
+		notify(new Function<Listener, Void>() {
 			
 			@Override
 			public Void apply(Listener listener) {
