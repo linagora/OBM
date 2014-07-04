@@ -29,28 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.beans;
+package org.obm.imap.archive.services;
 
-import org.joda.time.LocalTime;
-import org.junit.Test;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
-import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-public class BeansTest {
+public interface ArchiveService {
 
-	@Test
-	public void beanShouldRespectBeanContract() {
-		EqualsVerifierBuilder.builder()
-			.prefabValue(LocalTime.class, LocalTime.parse("23:32"), LocalTime.parse("12:22"))
-			.equalsVerifiers(
-				ArchiveRecurrence.class,
-				DayOfMonth.class,
-				DayOfYear.class,
-				DomainConfiguration.class,
-				PersistedResult.class,
-				SchedulingConfiguration.class,
-				SchedulingDates.class,
-				ArchiveDomainTask.class
-			).verify();
-	}	
+	void archive(ObmDomain domain);
+	
 }

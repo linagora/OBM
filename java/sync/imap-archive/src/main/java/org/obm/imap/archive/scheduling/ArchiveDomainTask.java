@@ -29,28 +29,72 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.beans;
+package org.obm.imap.archive.scheduling;
 
-import org.joda.time.LocalTime;
-import org.junit.Test;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
-import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
+import org.obm.imap.archive.services.ArchiveService;
 
-public class BeansTest {
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.linagora.scheduling.Task;
 
-	@Test
-	public void beanShouldRespectBeanContract() {
-		EqualsVerifierBuilder.builder()
-			.prefabValue(LocalTime.class, LocalTime.parse("23:32"), LocalTime.parse("12:22"))
-			.equalsVerifiers(
-				ArchiveRecurrence.class,
-				DayOfMonth.class,
-				DayOfYear.class,
-				DomainConfiguration.class,
-				PersistedResult.class,
-				SchedulingConfiguration.class,
-				SchedulingDates.class,
-				ArchiveDomainTask.class
-			).verify();
-	}	
+import fr.aliacom.obm.common.domain.ObmDomain;
+
+public class ArchiveDomainTask implements Task {
+
+	@Singleton
+	public static class Factory {
+		
+		private final ArchiveService archiveService;
+
+		@Inject
+		@VisibleForTesting Factory(ArchiveService archiveService) {
+			this.archiveService = archiveService;
+		}
+		
+		public ArchiveDomainTask create(ObmDomain domain) {
+			return new ArchiveDomainTask(archiveService, domain);
+		}
+	}
+	
+	private final ArchiveService archiveService;
+	private final ObmDomain domain;
+
+	private ArchiveDomainTask(ArchiveService archiveService, ObmDomain domain) {
+		this.archiveService = archiveService;
+		this.domain = domain;
+	}
+	
+	@Override
+	public void run() {
+		archiveService.archive(domain);
+	}
+
+	@Override
+	public String taskName() {
+		return domain.getUuid().get();
+	}
+
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(domain);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof ArchiveDomainTask) {
+			ArchiveDomainTask that = (ArchiveDomainTask) object;
+			return Objects.equal(this.domain, that.domain);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("domain", domain)
+			.toString();
+	}
+	
 }
