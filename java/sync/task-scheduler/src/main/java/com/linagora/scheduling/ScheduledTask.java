@@ -38,8 +38,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
@@ -130,24 +128,26 @@ public class ScheduledTask implements Delayed {
 		}
 		
 		public ScheduledTask schedule(Scheduler scheduler) {
-			return new ScheduledTask(Id.generate(), scheduledTime, task, scheduler, listeners.build()).schedule();
+			return new ScheduledTask(
+					Id.generate(), scheduledTime, task, scheduler, 
+					new ListenersNotifier(ScheduledTask.class, listeners.build()))
+				.schedule();
 		}
 	}
 	
 	private final Id id;
-	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final DateTime scheduledTime;
 	private final Task task;
 	private final Scheduler scheduler;
-	private final ImmutableList<Listener> listeners;
+	private final ListenersNotifier listenersNotifier;
 	private State state;
 	
-	private ScheduledTask(Id id, DateTime scheduledTime, Task task, Scheduler scheduler, ImmutableList<Listener> listeners) {
+	private ScheduledTask(Id id, DateTime scheduledTime, Task task, Scheduler scheduler, ListenersNotifier listenersNotifier) {
 		this.id = id;
 		this.scheduledTime = scheduledTime;
 		this.task = task;
 		this.scheduler = scheduler;
-		this.listeners = listeners;
+		this.listenersNotifier = listenersNotifier;
 		this.state = State.NEW;
 	}
 	
@@ -198,57 +198,27 @@ public class ScheduledTask implements Delayed {
 	
 	private void notifyScheduled() {
 		state = State.WAITING;
-		for (Listener listener: listeners) {
-			try {
-				listener.scheduled(this);
-			} catch (Exception listenerException) {
-				logger.error("Error notifying a listener", listenerException);
-			}
-		}
+		listenersNotifier.notifyScheduled(this);
 	}
 	
 	private void notifyCanceled() {
 		state = State.CANCELED;
-		for (Listener listener: listeners) {
-			try {
-				listener.canceled(this);
-			} catch (Exception listenerException) {
-				logger.error("Error notifying a listener", listenerException);
-			}
-		}
+		listenersNotifier.notifyCanceled(this);
 	}
 	
 	private void notifyStart() {
 		state = State.RUNNING;
-		for (Listener listener: listeners) {
-			try {
-				listener.running(this);
-			} catch (Exception listenerException) {
-				logger.error("Error notifying a listener", listenerException);
-			}
-		}
+		listenersNotifier.notifyRunning(this);
 	}
 	
 	private void notifyTerminated() {
 		state = State.TERMINATED;
-		for (Listener listener: listeners) {
-			try {
-				listener.terminated(this);
-			} catch (Exception listenerException) {
-				logger.error("Error notifying a listener", listenerException);
-			}
-		}
+		listenersNotifier.notifyTerminated(this);
 	}
 
 	private void notifyFailed(Exception e) {
 		state = State.FAILED;
-		for (Listener listener: listeners) {
-			try {
-				listener.failed(this, e);
-			} catch (Exception listenerException) {
-				logger.error("Error notifying a listener", listenerException);
-			}
-		}
+		listenersNotifier.notifyFailed(this, e);
 	}
 	
 	@Override
