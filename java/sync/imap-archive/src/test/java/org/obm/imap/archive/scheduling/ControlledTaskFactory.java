@@ -31,96 +31,61 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.scheduling;
 
-import java.util.Comparator;
-
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeComparator;
 import org.obm.imap.archive.services.ArchiveService;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Objects;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.linagora.scheduling.Task;
+import com.google.common.base.Throwables;
+import com.google.common.util.concurrent.SettableFuture;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-public class ArchiveDomainTask implements Task {
+public class ControlledTaskFactory extends ArchiveDomainTask.Factory {
 
-	public static Comparator<ArchiveDomainTask> comparator() {
-		return new Comparator<ArchiveDomainTask>() {
-
-			@Override
-			public int compare(ArchiveDomainTask o1, ArchiveDomainTask o2) {
-				return DateTimeComparator.getInstance().compare(o1.getWhen(), o2.getWhen());
-			}
-		};
-	}
-	
-	@Singleton
-	public static class Factory {
-		
-		private final ArchiveService archiveService;
-
-		@Inject
-		@VisibleForTesting Factory(ArchiveService archiveService) {
-			this.archiveService = archiveService;
-		}
-		
-		public ArchiveDomainTask create(ObmDomain domain, DateTime when) {
-			return new ArchiveDomainTask(archiveService, domain, when);
-		}
-	}
-	
 	private final ArchiveService archiveService;
-	private final ObmDomain domain;
-	private final DateTime when;
 
-	protected ArchiveDomainTask(ArchiveService archiveService, ObmDomain domain, DateTime when) {
+	public ControlledTaskFactory(ArchiveService archiveService) {
+		super(archiveService);
 		this.archiveService = archiveService;
-		this.domain = domain;
-		this.when = when;
-	}
-	
-	@Override
-	public void run() {
-		archiveService.archive(domain);
 	}
 
 	@Override
-	public String taskName() {
-		return domain.getUuid().get();
-	}
-	
-	public ObmDomain getDomain() {
-		return domain;
+	public RemotelyControlledTask create(ObmDomain domain, DateTime when) {
+		return new RemotelyControlledTask(archiveService, domain, when);
 	}
 
-	public DateTime getWhen() {
-		return when;
-	}
+	public class RemotelyControlledTask extends ArchiveDomainTask {
 
-	@Override
-	public final int hashCode(){
-		return Objects.hashCode(domain, when);
-	}
-
-	@Override
-	public final boolean equals(Object object){
-		if (object instanceof ArchiveDomainTask) {
-			ArchiveDomainTask that = (ArchiveDomainTask) object;
-			return Objects.equal(this.domain, that.domain)
-				&& Objects.equal(this.when, that.when);
+		public class Terminator {
+			private final SettableFuture<Boolean> future;
+			
+			public Terminator() {
+				future = SettableFuture.create();
+			}
+			
+			public void terminate() {
+				future.set(true);
+			}
 		}
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("domain", domain)
-			.add("when", when)
-			.toString();
-	}
+		
+		private final Terminator terminator;
 	
+		RemotelyControlledTask(ArchiveService archiveService, ObmDomain domain, DateTime when) {
+			super(archiveService, domain, when);
+			terminator = new Terminator();
+		}
+		
+		void terminate() {
+			terminator.terminate();
+		}
+		
+		@Override
+		public void run() {
+			try {
+				super.run();
+				terminator.future.get();
+			} catch (Exception e) {
+				Throwables.propagate(e);
+			}
+		}
+	}
 }
