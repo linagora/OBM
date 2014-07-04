@@ -514,6 +514,11 @@ org.eclipse.jdt.core.compiler.source=1.7
 			</dependency>
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
+				<artifactId>task-scheduler</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
 				<artifactId>transaction-test</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
