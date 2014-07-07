@@ -45,7 +45,7 @@ require_once('imap_archive_query.inc');
 // Display the IMAP Archive form
 ///////////////////////////////////////////////////////////////////////////////
 
-function dis_imap_archive_form($backup, $params, $configuration) {
+function dis_imap_archive_form($params, $configuration) {
   global $l_users, $l_validate;
   global $l_service_activating, $l_activating;
   global $l_scheduling;
@@ -353,15 +353,22 @@ function get_block_next_treatment_date($configuration) {
 // Display the IMAP Archive consult
 ///////////////////////////////////////////////////////////////////////////////
 
-function dis_imap_archive_consult($backup, $params, $configuration) {
+function dis_imap_archive_consult($params, $configuration) {
 
-  global $l_past_operations, $l_start_time, $l_end_time, $l_status, $l_next_run;
-  global $l_last_fail;
+  global $l_delete, $l_back, $l_past_operations, $l_start_time, $l_end_time, $l_status, $l_next_run, $l_manual_launch;
+  global $l_last_fail, $path, $l_confirm;
   
   $user_id = $params['user_id'];
   $url = url_prepare('imap_archive_index.php');
   
   $block_next_treatment_date = get_block_next_treatment_date($configuration);
+  
+  $confirm = "<script type='text/javascript'>
+
+    function confirm_launch() {
+      return confirm('$l_confirm');
+    }
+    </script>";
   
   $block = "
     <div class='detail infos'>
@@ -387,6 +394,11 @@ function dis_imap_archive_consult($backup, $params, $configuration) {
           </tr>
         </tbody>
       </table>
+    </div>
+    <div class='buttons'>
+      <a href='$path/imap_archive/imap_archive_index.php?action=manual_launch' target='_blank' onclick='return confirm_launch();'>
+      $l_manual_launch 
+      </a>
     </div>
     <div class='detail infos'>
       <h1>$l_next_run</h1>
@@ -415,8 +427,78 @@ function dis_imap_archive_consult($backup, $params, $configuration) {
         </tbody>
       </table>
     </div>
+    $confirm
   ";
 
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the log IMAP Archive page
+///////////////////////////////////////////////////////////////////////////////
+
+function dis_log_page($params, $configuration, $run_id) {
+  global $obm;
+  global $l_archiving_running, $l_unsupported_iframe;
+  
+  $repeatKind = $configuration->repeatKind;
+  $dayOfWeek = $configuration->dayOfWeek;
+  $dayOfMonth = $configuration->dayOfMonth;
+  $dayOfYear = $configuration->dayOfYear;
+  $enabled = $configuration->enabled;
+  $hour = $configuration->hour;
+  $minute = $configuration->minute;
+  
+  $disabled = "disabled";
+  $block_repeat_kind = get_block_repeat_kind($repeatKind, $disabled);
+  $block_weekly = get_block_weekly($repeatKind, $dayOfWeek, $disabled);
+  $block_monthly = get_block_monthly($repeatKind, $dayOfMonth, $disabled);
+  $block_yearly = get_block_yearly($repeatKind, $dayOfYear, $disabled);
+  $block_hour = get_block_hour($hour, $disabled);
+  $block_minute = get_block_minute($minute, $disabled);
+  
+  $queryParams = array("run_id" => $run_id,
+      "action" => "archiving_logs");
+  $params = requestParams();
+  $params = array_merge($params, $queryParams);
+  
+  $url = "$path/imap_archive/".basename($_SERVER['SCRIPT_NAME'])."?".http_build_query($params);
+  
+  $block = "
+    <div class='detail infos'>
+      <h1>Configuration</h1>
+      <table class='details'>
+        <tr>
+          $block_repeat_kind
+        </tr>
+        <tr>
+          $block_weekly
+        </tr>
+        <tr>
+          $block_monthly
+        </tr>
+        <tr>
+          $block_yearly
+        </tr>
+      </table>
+      <br>
+      <table class='details'>
+        <tr>
+          $block_hour
+        </tr>
+        <tr>
+          $block_minute
+        </tr>
+      </table>
+    </div>
+    <div class='detail infos'>
+      <h1>$l_archiving_running</h1>
+  	  <iframe id='archivingLogs' src='$url' height='300' width='500' frameborder='0'>
+  	    <p>$l_unsupported_iframe</p>
+  	  </iframe>
+  	</div>
+  ";
 
   return $block;
 }

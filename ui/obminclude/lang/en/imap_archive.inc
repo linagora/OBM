@@ -39,8 +39,12 @@ $l_start_time = "Start time";
 $l_end_time = "End time";
 $l_status = "Status";
 $l_last_fail = "Last failure";
+$l_manual_launch = "Manual launch";
 
 $l_email_address_not_found = "Couldn't find your email address for this domain";
 $l_imap_archive_server_not_found = "Couldn't find an IMAP archive server for this domain";
 $l_imap_archive_server_unreachable = "IMAP archive server unreachable";
 $l_could_not_login_imap_archive_server = "Couldn't login to IMAP archive server";
+$l_archiving_running = "Current archiving logs";
+$l_unsupported_iframe = "Your browser does not support iframes.";
+$l_archiving_launched = "The archiving process has been started successfully.";

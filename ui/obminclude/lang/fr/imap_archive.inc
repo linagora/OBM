@@ -39,8 +39,12 @@ $l_start_time = "Heure de début";
 $l_end_time = "Heure de fin";
 $l_status = "Statut";
 $l_last_fail = "Dernière erreur";
+$l_manual_launch = "Exécution manuelle";
 
 $l_email_address_not_found = "Adresse mail introuvable pour ce domaine";
 $l_imap_archive_server_not_found = "Server d'archivage IMAP introuvable pour ce domaine";
 $l_imap_archive_server_unreachable = "Server d'archivage IMAP injoignable";
 $l_could_not_login_imap_archive_server = "Impossible de se connecter au Server d'archivage IMAP";
+$l_archiving_running = "Logs de l'archivage en cours";
+$l_unsupported_iframe = "Votre navigateur ne supporte pas les iframes.";
+$l_archiving_launched = "L'archivage a été lancé avec succès.";

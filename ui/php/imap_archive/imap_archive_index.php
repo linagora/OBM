@@ -91,19 +91,40 @@ if ($status[0] != 1) {
       echo '('.$display['json'].')';
     }
     exit();
+  } else if ($action == 'manual_launch') {
+    $status = manual_launch();
+    if ($status[0] == 1) {
+      $display['msg'] .= display_ok_msg($l_archiving_launched);
+      $display['run_id'] = $status[1]->runId;
+      $action = 'log_page';
+    } else {
+      $display['msg'] .= display_err_msg($l_update_error);
+      $action = 'detailconsult';
+    }
+  } else if ($action == 'archiving_logs') {
+    echo "<pre>";
+    echo "Please wait...</br>";
+    $runId = $params['run_id'];
+    $status = get_logs($runId);
+    if ($status[0] != 1) {
+      $display['msg'] .= display_err_msg($status[1]);
+    }
+    echo "</pre>";
+    exit();
   }
-  
+      
   $status = load_configuration_from_imap_archive_service();
   if ($status[0] != 1) {
     $display['msg'] .= display_err_msg($status[1]);
   } else {
     $configuration = $status[1];
-    $display['detail'] = dis_imap_archive_form($backup, $params, $configuration);
     
     if ($action == 'detailconsult') {
-      $display['detail'] = dis_imap_archive_consult($backup, $params, $configuration);
+      $display['detail'] = dis_imap_archive_consult($params, $configuration);
     } elseif ($action == 'detailupdate') {
-      $display['detail'] = dis_imap_archive_form($backup, $params, $configuration);
+      $display['detail'] = dis_imap_archive_form($params, $configuration);
+    } elseif ($action == 'log_page') {
+      $display['detail'] = dis_log_page($params, $configuration, $display['run_id']);
     }
   }
 }
@@ -167,6 +188,27 @@ function get_imap_archive_action() {
 // Next Treatment Date
   $actions['imap_archive']['next_treatment_date'] = array (
     'Url'      => "$path/imap_archive/imap_archive_index.php?action=next_treatment_date",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+  );
+
+// Manual Launch
+  $actions['imap_archive']['manual_launch'] = array (
+    'Url'      => "$path/imap_archive/imap_archive_index.php?action=manual_launch",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+  );
+
+// Log page
+  $actions['imap_archive']['log_page'] = array (
+    'Url'      => "$path/imap_archive/imap_archive_index.php?action=log_page",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+  );
+
+// Archiving logs
+  $actions['imap_archive']['archiving_logs'] = array (
+    'Url'      => "$path/imap_archive/imap_archive_index.php?action=archiving_logs",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
   );

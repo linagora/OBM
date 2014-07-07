@@ -39,8 +39,12 @@ $l_start_time = "开始时间";
 $l_end_time = "结束时间";
 $l_status = "状态";
 $l_last_fail = "最后失败";
+$l_manual_launch = "手动启动";
 
 $l_email_address_not_found = "无法找到您的电子邮件地址，该域名";
 $l_imap_archive_server_not_found = "无法找到一个IMAP服务器存档此域";
 $l_imap_archive_server_unreachable = "IMAP归档服务器无法访问";
 $l_could_not_login_imap_archive_server = "无法登录到IMAP服务器归档";
+$l_archiving_running = "当前归档日志";
+$l_unsupported_iframe = "您的浏览器并不支援iframes。";
+$l_archiving_launched = "存档有过气政客成功推出。";

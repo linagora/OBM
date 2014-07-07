@@ -117,3 +117,23 @@ function nextTreatmentDate() {
     }
   }).get({ajax : 1, action : 'next_treatment_date', 'configuration' : configuration});
 }
+
+function loadLogs() {
+  var runId = $('runId').get('text');
+  
+  var run = {};
+  run.id = runId;
+  
+  new Request.JSON({
+    url: obm.vars.consts.obmUrl+'/imap_archive/imap_archive_index.php',
+    secure: false,
+    async: true,
+    onFailure: function (response) {
+      Obm.Error.parseStatus(this);
+    },
+    onComplete: function(response) {
+//      $('archivingLogs').set('text', response);
+    }
+  }).get({ajax : 1, action : 'archiving_logs', 'run' : run});
+}
+

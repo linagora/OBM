@@ -30,7 +30,6 @@ applicable to the OBM software.
 ******************************************************************************/
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : imap_archive_query.inc                                       //
 //     - Desc : IMAP Archive service File                                    //
@@ -116,11 +115,16 @@ function imapArchiveRootPath() {
   return "http://".$imapArchiveServer[0]["ip"].":8085";
 }
 
-function curlGet($url) {
+function curlGet($url, $queryParams = null) {
   global $obm;
 
   $params = requestParams();
+  if ($queryParams != null) {
+    $params = array_merge($params, $queryParams);
+  }
   $imapArchiveRootPath = imapArchiveRootPath();
+  error_log("imapArchiveRootPath");
+  error_log(print_r($imapArchiveRootPath, true));
   $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($params);
   
   $curl = curl_init($curlUrl);
@@ -183,7 +187,7 @@ function calculate_next_treatment_date_from_imap_archive_service($configuration)
   }
 }
 
-function curlPost($url, $json) {
+function curlPost($url, $json = "") {
   global $obm;
   
   $params = requestParams();
@@ -295,5 +299,101 @@ function curlExec($curl) {
   curl_close($curl);
   
   return array("success" => $success, "code" => $code, "errno" => $errno);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Launch manually an archive on IMAP archive service
+// Parameters:
+//   - none
+///////////////////////////////////////////////////////////////////////////////
+function manual_launch() {
+  global $obm;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  $userInfo = get_user_info($obm['uid']);
+
+  if(empty($userInfo["email"])) {
+    return array(0, $l_email_address_not_found);
+  }
+
+  $manualLaunchPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/treatments";
+
+  $curl = curlPost($manualLaunchPath);
+  $success = $curl["success"];
+  $code = $curl["code"];
+  $errno = $curl["errno"];
+  
+  if($errno){
+    error_log("Couldn't login to IMAP archive server ($errno)");
+    return array(0, $l_could_not_login_imap_archive_server);
+  }
+  if ($code == 0) {
+    return array(0, $l_imap_archive_server_unreachable);
+  }
+  if ($code == 200) {
+    return array(1, json_decode($success));
+  }
+  if ($code == 204) {
+    return array(1, null);
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Get log on IMAP archive service
+// Parameters:
+//   - none
+///////////////////////////////////////////////////////////////////////////////
+function get_logs($runId) {
+  global $obm;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  $userInfo = get_user_info($obm['uid']);
+
+  if(empty($userInfo["email"])) {
+    return array(0, $l_email_address_not_found);
+  }
+
+  $oneMinute = 60;
+  sleep($oneMinute);
+  
+  $logPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/treatments/logs/";
+  
+  $queryParams = array("run_id" => $runId);
+      
+  $params = requestParams();
+  $params = array_merge($params, $queryParams);
+  
+  $imapArchiveRootPath = imapArchiveRootPath();
+  $curlUrl = $imapArchiveRootPath.$logPath."?".http_build_query($params);
+  
+  $curl = curl_init($curlUrl);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($curl, CURLOPT_WRITEFUNCTION, 'curl_write_flush');
+  curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+  
+  $success = curl_exec($curl);
+  $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+  $errno = curl_errno($curl);
+  
+  curl_close($curl);
+  
+  if($errno){
+    error_log("Couldn't login to IMAP archive server ($errno)");
+    return array(0, $l_could_not_login_imap_archive_server);
+  }
+  if ($code == 0) {
+    return array(0, $l_imap_archive_server_unreachable);
+  }
+  if ($code == 200 || $code == 204 || $code == 206) {
+    return array(1, null);
+  }
+}
+
+function curl_write_flush($curl_handle, $chunk)
+{
+  echo "$chunk";
+  
+  ob_flush();
+  flush();
+  
+  return strlen($chunk);
 }
 ?>
