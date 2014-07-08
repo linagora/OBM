@@ -29,55 +29,43 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive;
+package org.obm.imap.archive.startup;
 
-import org.obm.push.utils.jvm.VMArgumentsUtils;
-import org.obm.server.ServerConfiguration;
-import org.obm.server.WebServer;
+import org.joda.time.DateTime;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.scheduling.OnlyOnePerDomainScheduler;
+import org.obm.server.LifeCycleHandler;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Throwables;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-public class ImapArchiveServerLauncher {
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-	private static final int DEFAULT_SERVER_PORT = 8085; 
-	private static final int SERVER_PORT = Objects.firstNonNull( 
-			VMArgumentsUtils.integerArgumentValue("imapArchivePort"), DEFAULT_SERVER_PORT);
+@Singleton
+public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 
-	public static void main(String... args) throws Exception {
-		/******************************************************************
-		 * EVERY CHANGES DONE THERE CAN SILENTLY BREAK THE START UP *
-		 ******************************************************************/
-		Injector injector = Guice.createInjector(new ImapArchiveModule(
-			ServerConfiguration.builder()
-				.port(SERVER_PORT)
-				.requestLoggerEnabled(true)
-				.lifeCycleHandler(ImapArchiveModule.STARTUP_HANDLER_CLASS)
-				.build()));
-		WebServer webServer = injector.getInstance(WebServer.class);
-		
-		start(webServer).join();
+	public static final DateTime WHEN = DateTime.parse("2024-11-1T05:04");
+	public static final ArchiveTreatmentRunId RUN_ID = ArchiveTreatmentRunId.from("ee855151-f0a8-4182-a3e5-7469141526b4");
+	public static final ObmDomain DOMAIN = ObmDomain.builder()
+			.id(6)
+			.uuid(ObmDomainUuid.of("67ecfad0-a684-47ed-aec5-f2c303f90467"))
+			.name("test domain")
+			.build();
+	
+	private final OnlyOnePerDomainScheduler scheduler;
+
+	@Inject
+	private RestoreTasksOnStartupHandler(OnlyOnePerDomainScheduler scheduler) {
+		this.scheduler = scheduler;
 	}
-
-	public static WebServer start(WebServer server) throws Exception {
-		registerSigTermHandler(server);
-		server.start();
-		return server;
+	
+	@Override
+	public void starting() {
+		restoreScheduledTasks();
 	}
-
-	private static void registerSigTermHandler(final WebServer server) {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-
-			@Override
-			public void run() {
-				try {
-					server.stop();
-				} catch (Exception e) {
-					Throwables.propagate(e);
-				}
-			}
-		});
+	
+	private void restoreScheduledTasks() {
+		scheduler.scheduleDomainArchiving(DOMAIN, WHEN, RUN_ID);
 	}
 }

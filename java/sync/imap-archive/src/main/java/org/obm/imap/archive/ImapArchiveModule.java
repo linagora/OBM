@@ -56,12 +56,15 @@ import org.obm.imap.archive.resources.RootHandler;
 import org.obm.imap.archive.resources.TreatmentsResource;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
+import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
+import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory.OnlyOnePerDomainMonitorFactoryImpl;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainScheduler;
 import org.obm.imap.archive.service.SchedulingDatesService;
 import org.obm.imap.archive.services.ArchiveService;
 import org.obm.imap.archive.services.ArchiveServiceImpl;
 import org.obm.imap.archive.services.DomainConfigurationService;
 import org.obm.imap.archive.services.LogFileService;
+import org.obm.imap.archive.startup.RestoreTasksOnStartupHandler;
 import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
@@ -89,6 +92,7 @@ public class ImapArchiveModule extends AbstractModule {
 	
 	private final ServerConfiguration configuration;
 	private static final String APPLICATION_ORIGIN = "imap-archive";
+	public  static final Class<RestoreTasksOnStartupHandler> STARTUP_HANDLER_CLASS = RestoreTasksOnStartupHandler.class;
 	
 	public ImapArchiveModule(ServerConfiguration configuration) {
 		this.configuration = configuration;
@@ -116,6 +120,7 @@ public class ImapArchiveModule extends AbstractModule {
 	}
 	
 	private void bindImapArchiveServices() {
+		bind(OnlyOnePerDomainMonitorFactory.class).to(OnlyOnePerDomainMonitorFactoryImpl.class);
 		bind(ArchiveSchedulingService.class);
 		bind(DomainConfigurationService.class);
 		bind(SchedulingDatesService.class);

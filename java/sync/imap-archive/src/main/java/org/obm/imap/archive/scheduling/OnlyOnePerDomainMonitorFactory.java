@@ -29,55 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive;
+package org.obm.imap.archive.scheduling;
 
-import org.obm.push.utils.jvm.VMArgumentsUtils;
-import org.obm.server.ServerConfiguration;
-import org.obm.server.WebServer;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.linagora.scheduling.Listener;
+import com.linagora.scheduling.Monitor;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Throwables;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+public interface OnlyOnePerDomainMonitorFactory {
+	
+	Monitor<ArchiveDomainTask> create(Listener<ArchiveDomainTask> listener);
 
-public class ImapArchiveServerLauncher {
-
-	private static final int DEFAULT_SERVER_PORT = 8085; 
-	private static final int SERVER_PORT = Objects.firstNonNull( 
-			VMArgumentsUtils.integerArgumentValue("imapArchivePort"), DEFAULT_SERVER_PORT);
-
-	public static void main(String... args) throws Exception {
-		/******************************************************************
-		 * EVERY CHANGES DONE THERE CAN SILENTLY BREAK THE START UP *
-		 ******************************************************************/
-		Injector injector = Guice.createInjector(new ImapArchiveModule(
-			ServerConfiguration.builder()
-				.port(SERVER_PORT)
-				.requestLoggerEnabled(true)
-				.lifeCycleHandler(ImapArchiveModule.STARTUP_HANDLER_CLASS)
-				.build()));
-		WebServer webServer = injector.getInstance(WebServer.class);
+	@Singleton
+	public static class OnlyOnePerDomainMonitorFactoryImpl implements OnlyOnePerDomainMonitorFactory {
 		
-		start(webServer).join();
-	}
-
-	public static WebServer start(WebServer server) throws Exception {
-		registerSigTermHandler(server);
-		server.start();
-		return server;
-	}
-
-	private static void registerSigTermHandler(final WebServer server) {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-
-			@Override
-			public void run() {
-				try {
-					server.stop();
-				} catch (Exception e) {
-					Throwables.propagate(e);
-				}
-			}
-		});
+		@Inject
+		protected OnlyOnePerDomainMonitorFactoryImpl() {
+		}
+		
+		@Override
+		public Monitor<ArchiveDomainTask> create(Listener<ArchiveDomainTask> listener) {
+			return Monitor.<ArchiveDomainTask>builder()
+					.addListener(listener)
+					.build();
+		}
 	}
 }
+

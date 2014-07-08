@@ -35,8 +35,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
@@ -48,6 +46,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.TreeMultimap;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.linagora.scheduling.DateTimeProvider;
@@ -67,21 +66,15 @@ public class OnlyOnePerDomainScheduler extends NoopListener<ArchiveDomainTask> i
 	@VisibleForTesting final LockingResourcesScheduler lockingResourcesScheduler;
 
 	@Inject
-	private OnlyOnePerDomainScheduler(ArchiveDomainTask.Factory archiveTaskFactory, 
+	@VisibleForTesting OnlyOnePerDomainScheduler(ArchiveDomainTask.Factory archiveTaskFactory, 
+			OnlyOnePerDomainMonitorFactory monitorFactory,
 			DateTimeProvider dateTimeProvider,
 			@Named("schedulerResolution") TimeUnit schedulerResolution) {
-		
-		this(archiveTaskFactory, Monitor.<ArchiveDomainTask>builder(), dateTimeProvider, schedulerResolution);
+		Monitor<ArchiveDomainTask> monitor = monitorFactory.create(this);
+		this.archiveTaskFactory = archiveTaskFactory;
+		this.lockingResourcesScheduler = new LockingResourcesScheduler(monitor, dateTimeProvider, schedulerResolution);
 	}
 	
-	@VisibleForTesting OnlyOnePerDomainScheduler(ArchiveDomainTask.Factory archiveTaskFactory,
-			Monitor.Builder<ArchiveDomainTask> monitorBuilder,
-			DateTimeProvider timeProvider, TimeUnit resolution) {
-		Monitor<ArchiveDomainTask> monitor = monitorBuilder.addListener(this).build();
-		this.archiveTaskFactory = archiveTaskFactory;
-		this.lockingResourcesScheduler = new LockingResourcesScheduler(monitor, timeProvider, resolution);
-	}
-
 	public ArchiveDomainTask scheduleDomainArchiving(ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
 		ArchiveDomainTask task = archiveTaskFactory.create(domain, when, runId);
 		lockingResourcesScheduler.scheduleIfNoneForDomain(task);

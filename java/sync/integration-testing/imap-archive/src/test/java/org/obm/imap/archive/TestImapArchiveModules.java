@@ -46,6 +46,9 @@ import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
+import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory.OnlyOnePerDomainMonitorFactoryImpl;
 import org.obm.imap.archive.services.LogFileService;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
@@ -60,6 +63,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import com.linagora.scheduling.DateTimeProvider;
+import com.linagora.scheduling.Listener;
+import com.linagora.scheduling.Monitor;
 import com.linagora.scheduling.Scheduler;
 
 public class TestImapArchiveModules {
@@ -80,14 +85,17 @@ public class TestImapArchiveModules {
 	public static class Simple extends AbstractModule {
 	
 		private final ClientDriverRule obmSyncHttpMock;
+		private final ServerConfiguration config;
 
 		public Simple(ClientDriverRule obmSyncHttpMock) {
 			this.obmSyncHttpMock = obmSyncHttpMock;
+			this.config = ServerConfiguration.builder()
+					.lifeCycleHandler(ImapArchiveModule.STARTUP_HANDLER_CLASS)
+					.build();
 		}
 		
 		@Override
 		protected void configure() {
-			ServerConfiguration config = ServerConfiguration.defaultConfiguration();
 			install(Modules.override(new ImapArchiveModule(config)).with(
 				new DaoTestModule(),
 				new TransactionalModule(),
@@ -152,6 +160,44 @@ public class TestImapArchiveModules {
 				}})
 			);
 		}
+	}
+
+	public static class WithTestingMonitor extends AbstractModule {
+
+		private ClientDriverRule obmSyncHttpMock;
+
+		public WithTestingMonitor(ClientDriverRule obmSyncHttpMock) {
+			this.obmSyncHttpMock = obmSyncHttpMock;
+		}
+		
+		@Override
+		protected void configure() {
+			install(Modules.override(new Simple(obmSyncHttpMock)).with(new AbstractModule() {
+
+				@Override
+				protected void configure() {
+					TestingOnlyOnePerDomainMonitorFactory factory = new TestingOnlyOnePerDomainMonitorFactory();
+					bind(OnlyOnePerDomainMonitorFactory.class).toInstance(factory);
+					bind(TestingOnlyOnePerDomainMonitorFactory.class).toInstance(factory);
+				}})
+			);
+		}
+
+		public static class TestingOnlyOnePerDomainMonitorFactory extends OnlyOnePerDomainMonitorFactoryImpl {
+			
+			Monitor<ArchiveDomainTask> monitor;
+
+			@Override
+			public Monitor<ArchiveDomainTask> create(Listener<ArchiveDomainTask> listener) {
+				monitor = super.create(listener);
+				return monitor;
+			}
+			
+			public Monitor<ArchiveDomainTask> get() {
+				return monitor;
+			}
+		}
+
 	}
 	
 	public static class LocalLocatorModule extends AbstractModule {

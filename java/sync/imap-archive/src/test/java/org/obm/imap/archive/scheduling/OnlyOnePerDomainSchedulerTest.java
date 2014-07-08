@@ -59,6 +59,7 @@ import org.obm.imap.archive.services.ArchiveService;
 import org.obm.imap.archive.services.LogFileService;
 
 import com.linagora.scheduling.DateTimeProvider;
+import com.linagora.scheduling.Listener;
 import com.linagora.scheduling.Monitor;
 import com.linagora.scheduling.ScheduledTask.State;
 
@@ -95,10 +96,21 @@ public class OnlyOnePerDomainSchedulerTest {
 		timeProvider = new TestDateTimeProvider(now);
 		archiveTaskFactory = new ControlledTaskFactory(archiveService, logFileService); 
 		futureListener = new FutureTestListener<>();
-		Monitor.Builder<ArchiveDomainTask> monitorBuilder = Monitor.<ArchiveDomainTask>builder().addListener(futureListener);
 		
-		testee = new OnlyOnePerDomainScheduler(archiveTaskFactory, monitorBuilder, timeProvider, MILLISECONDS);
-		monitor = testee.getMonitor();
+		OnlyOnePerDomainMonitorFactory monitorFactory = new OnlyOnePerDomainMonitorFactory() {
+
+				@Override
+				public Monitor<ArchiveDomainTask> create(Listener<ArchiveDomainTask> listener) {
+					monitor = Monitor.<ArchiveDomainTask>builder()
+							.addListener(futureListener)
+							.addListener(listener)
+							.build();
+					return monitor;
+				}
+			
+		};
+		
+		testee = new OnlyOnePerDomainScheduler(archiveTaskFactory, monitorFactory, timeProvider, MILLISECONDS);
 	}
 	
 	@After
