@@ -31,15 +31,20 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
+import java.util.UUID;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.glassfish.jersey.server.ChunkedOutput;
 import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
@@ -50,6 +55,7 @@ import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainScheduler;
 import org.obm.imap.archive.service.SchedulingDatesService;
+import org.obm.imap.archive.services.ArchiveService;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +81,8 @@ public class TreatmentsResource {
 	private ArchiveTreatmentRunId.Factory archiveTreatmentRunIdFactory;
 	@Inject
 	private ArchiveTreatmentDao archiveTreatmentDao;
+	@Inject
+	private ArchiveService archiveService;
 
 	@Inject
 	private ObmDomain domain;
@@ -107,5 +115,12 @@ public class TreatmentsResource {
 		onlyOnePerDomainScheduler.scheduleNowDomainArchiving(domain, dateTimeProvider.now(), runId);
 		return Response.ok(runId)
 				.build();
+	}
+	
+	@GET
+	@Path("logs")
+	@Produces(MediaType.TEXT_PLAIN)
+	public ChunkedOutput<String> runningTreatment(@QueryParam("run_id") UUID runId) {
+		return archiveService.runningProcessLogs(ArchiveTreatmentRunId.from(runId));
 	}
 }

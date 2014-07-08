@@ -57,6 +57,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import com.linagora.scheduling.DateTimeProvider;
+import com.linagora.scheduling.Scheduler;
 
 public class TestImapArchiveModules {
 	
@@ -88,6 +89,7 @@ public class TestImapArchiveModules {
 				new TransactionalModule(),
 				new TimeBasedModule(),
 				new StaticUUIDModule(),
+				new SchedulerModule(),
 				new LocalLocatorModule(obmSyncHttpMock.getBaseUrl() + "/obm-sync"),
 				new AbstractModule() {
 					
@@ -209,6 +211,17 @@ public class TestImapArchiveModules {
 					return uuid;
 				}
 			});
+		}
+	}
+	
+	public static class SchedulerModule extends AbstractModule {
+
+		@Override
+		protected void configure() {
+			bind(Boolean.class).annotatedWith(Names.named("endlessTask")).toInstance(Boolean.FALSE);
+			bind(Scheduler.class).toInstance(Scheduler.builder()
+					.resolution(1, TimeUnit.SECONDS)
+					.start());
 		}
 	}
 }

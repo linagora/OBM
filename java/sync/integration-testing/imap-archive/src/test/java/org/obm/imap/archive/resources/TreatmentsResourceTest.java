@@ -32,6 +32,7 @@
 package org.obm.imap.archive.resources;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.UUID;
@@ -79,7 +80,7 @@ public class TreatmentsResourceTest {
 					return db;
 				}
 			}, "sql/initial.sql"));
-
+	
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
 
@@ -156,21 +157,7 @@ public class TreatmentsResourceTest {
 		driver.expectTrustedLogin(domainId);
 		driver.expectGetDomain(domainId);
 		
-		Operation operation =
-				Operations.sequenceOf(Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE),
-				Operations.sequenceOf(Operations.insertInto(DomainConfigurationJdbcImpl.TABLE)
-						.columns(DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DOMAIN_UUID, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_ACTIVATED, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_REPEAT_KIND, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_WEEK, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_MONTH, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_YEAR, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_HOUR, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_MINUTE)
-								.values("2f096466-5a2a-463e-afad-4196c2952de3", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
-								.build()));
-		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
-		dbSetup.launch();
+		insertDomainConfiguration();
 		
 		server.start();
 		
@@ -187,14 +174,8 @@ public class TreatmentsResourceTest {
 		when()
 			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
 	}
-	
-	@Test
-	public void startArchivingTwiceShouldRespondConflict() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
-		driver.expectTrustedLogin(domainId);
-		driver.expectTrustedLogin(domainId);
-		driver.expectGetDomain(domainId);
-		
+
+	private void insertDomainConfiguration() {
 		Operation operation =
 				Operations.sequenceOf(Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE),
 				Operations.sequenceOf(Operations.insertInto(DomainConfigurationJdbcImpl.TABLE)
@@ -210,6 +191,16 @@ public class TreatmentsResourceTest {
 								.build()));
 		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
 		dbSetup.launch();
+	}
+	
+	@Test
+	public void startArchivingTwiceShouldRespondConflict() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		driver.expectTrustedLogin(domainId);
+		driver.expectTrustedLogin(domainId);
+		driver.expectGetDomain(domainId);
+		
+		insertDomainConfiguration();
 		
 		server.start();
 		
@@ -234,5 +225,113 @@ public class TreatmentsResourceTest {
 			.statusCode(Status.CONFLICT.getStatusCode()).
 		when()
 			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+	}
+	
+	@Test
+	public void runningTreatmentShouldReturnChunk() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		// POST
+		driver.expectTrustedLogin(domainId);
+		driver.expectGetDomain(domainId);
+		// GET 
+		driver.expectTrustedLogin(domainId);
+		
+		insertDomainConfiguration();
+		
+		server.start();
+		
+		UUID runId = TestImapArchiveModules.uuid;
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org").
+		expect()
+			.contentType(ContentType.JSON)
+			.body("runId", equalTo(runId.toString()))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+		
+		String date = TestImapArchiveModules.LOCAL_DATE_TIME.toString();
+		String expectedString = date + System.lineSeparator() + date;
+		
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org")
+			.queryParam("run_id", runId.toString())
+			.contentType(ContentType.JSON).
+		expect()
+			.header("Transfer-encoding", "chunked")
+			.body(containsString(expectedString)).
+		when()
+			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/logs");
+	}
+	
+	@Test
+	public void runningTreatmentShouldReturnNoContentWhenTreatmentIsOver() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		// POST
+		driver.expectTrustedLogin(domainId);
+		driver.expectGetDomain(domainId);
+		// GET 
+		driver.expectTrustedLogin(domainId);
+		
+		insertDomainConfiguration();
+		
+		server.start();
+		
+		UUID runId = TestImapArchiveModules.uuid;
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org").
+		expect()
+			.contentType(ContentType.JSON)
+			.body("runId", equalTo(runId.toString()))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+		
+		long twoSeconds = 2000;
+		Thread.sleep(twoSeconds);
+		
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org")
+			.queryParam("run_id", runId.toString())
+			.contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.NO_CONTENT.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/logs");
+	}
+	
+	@Test
+	public void runningTreatmentShouldReturnNoContentWhenBadRunId() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		driver.expectTrustedLogin(domainId);
+		driver.expectGetDomain(domainId);
+		
+		insertDomainConfiguration();
+		
+		server.start();
+		
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org")
+			.queryParam("run_id", TestImapArchiveModules.uuid.toString())
+			.contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.NO_CONTENT.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/logs");
 	}
 }

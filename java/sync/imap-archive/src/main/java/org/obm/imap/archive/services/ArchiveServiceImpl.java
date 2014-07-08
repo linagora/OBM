@@ -39,6 +39,8 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.glassfish.jersey.server.ChunkedOutput;
@@ -194,7 +196,11 @@ public class ArchiveServiceImpl implements ArchiveService {
 		if (logGenerator == null) {
 			return waitForOneScheduledTimeUnitDuration(runId);
 		}
-		return logGenerator.chunkedOutput;
+		ChunkedOutput<String> chunkedOutput = logGenerator.chunkedOutput;
+		if (chunkedOutput.isClosed()) {
+			throw new WebApplicationException(Status.NO_CONTENT);
+		}
+		return chunkedOutput;
 	}
 
 	private ChunkedOutput<String> waitForOneScheduledTimeUnitDuration(ArchiveTreatmentRunId runId) {
