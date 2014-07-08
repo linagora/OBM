@@ -81,7 +81,7 @@ public class OnlyOnePerDomainSchedulerTest {
 		Monitor.Builder<ArchiveDomainTask> monitorBuilder = Monitor.<ArchiveDomainTask>builder().addListener(futureListener);
 		
 		testee = new OnlyOnePerDomainScheduler(archiveTaskFactory, monitorBuilder, timeProvider, MILLISECONDS);
-		monitor = testee.monitor;
+		monitor = testee.getMonitor();
 	}
 	
 	@After

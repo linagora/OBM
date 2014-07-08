@@ -54,9 +54,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 public class OnlyOnePerDomainScheduler extends NoopListener<ArchiveDomainTask> implements AutoCloseable {
 
 	private final ArchiveDomainTask.Factory archiveTaskFactory;
-	private final TreeMultimap<ObmDomain, ArchiveDomainTask> domainEnqueuedTasks;
-	@VisibleForTesting final Monitor<ArchiveDomainTask> monitor;
-	@VisibleForTesting final Scheduler<ArchiveDomainTask> scheduler;
+	@VisibleForTesting final LockingResourcesScheduler lockingResourcesScheduler;
 
 	@Inject
 	private OnlyOnePerDomainScheduler(ArchiveDomainTask.Factory archiveTaskFactory) {
@@ -66,61 +64,82 @@ public class OnlyOnePerDomainScheduler extends NoopListener<ArchiveDomainTask> i
 	@VisibleForTesting OnlyOnePerDomainScheduler(ArchiveDomainTask.Factory archiveTaskFactory,
 			Monitor.Builder<ArchiveDomainTask> monitorBuilder,
 			DateTimeProvider timeProvider, TimeUnit resolution) {
-		this.monitor = monitorBuilder.addListener(this).build();
-		this.scheduler = Scheduler.<ArchiveDomainTask>builder().timeProvider(timeProvider).resolution(resolution).addListener(monitor).start();
+		Monitor<ArchiveDomainTask> monitor = monitorBuilder.addListener(this).build();
 		this.archiveTaskFactory = archiveTaskFactory;
-		this.domainEnqueuedTasks = TreeMultimap.create(ObmDomain.byUuidComparator(), ArchiveDomainTask.comparator());
+		this.lockingResourcesScheduler = new LockingResourcesScheduler(monitor, timeProvider, resolution);
 	}
 
-	public synchronized ArchiveDomainTask scheduleDomainArchiving(ObmDomain domain, DateTime when) {
+	public ArchiveDomainTask scheduleDomainArchiving(ObmDomain domain, DateTime when) {
 		ArchiveDomainTask task = archiveTaskFactory.create(domain, when);
-		schedule(task);
+		lockingResourcesScheduler.schedule(task);
 		return task;
 	}
 
-	private void schedule(ArchiveDomainTask toSchedule) {
-		if (!hasScheduledTaskForDomain(toSchedule.getDomain())) {
-			scheduler.schedule(toSchedule).at(toSchedule.getWhen());
-		} else {
-			domainEnqueuedTasks.put(toSchedule.getDomain(), toSchedule);
-		}
+	@Override
+	public void canceled(ScheduledTask<ArchiveDomainTask> scheduledTask) {
+		lockingResourcesScheduler.scheduleFromQueue(scheduledTask);
 	}
 
 	@Override
-	public synchronized void canceled(ScheduledTask<ArchiveDomainTask> scheduledTask) {
-		scheduleFromQueue(scheduledTask);
+	public void failed(ScheduledTask<ArchiveDomainTask> scheduledTask, Throwable failure) {
+		lockingResourcesScheduler.scheduleFromQueue(scheduledTask);
 	}
 
 	@Override
-	public synchronized void failed(ScheduledTask<ArchiveDomainTask> scheduledTask, Throwable failure) {
-		scheduleFromQueue(scheduledTask);
-	}
-
-	@Override
-	public synchronized void terminated(ScheduledTask<ArchiveDomainTask> scheduledTask) {
-		scheduleFromQueue(scheduledTask);
-	}
-
-	private void scheduleFromQueue(ScheduledTask<ArchiveDomainTask> scheduledTask) {
-		ObmDomain domainToDequeue = scheduledTask.task().getDomain();
-		ArchiveDomainTask toSchedule = domainEnqueuedTasks.get(domainToDequeue).pollFirst();
-		if (toSchedule != null) {
-			schedule(toSchedule);
-		}
-	}
-
-	private boolean hasScheduledTaskForDomain(final ObmDomain domain) {
-		return Iterables.any(monitor.all(), new Predicate<ScheduledTask<ArchiveDomainTask>>() {
-
-			@Override
-			public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
-				return input.task().getDomain().equals(domain);
-			}
-		});
+	public void terminated(ScheduledTask<ArchiveDomainTask> scheduledTask) {
+		lockingResourcesScheduler.scheduleFromQueue(scheduledTask);
 	}
 	
 	@Override
 	public void close() throws Exception {
-		scheduler.stop();
+		getScheduler().stop();
+	}
+
+	@VisibleForTesting Monitor<ArchiveDomainTask> getMonitor() {
+		return lockingResourcesScheduler.monitor;
+	}
+	
+	@VisibleForTesting Scheduler<ArchiveDomainTask> getScheduler() {
+		return lockingResourcesScheduler.scheduler;
+	}
+	
+	private class LockingResourcesScheduler {
+
+		private final TreeMultimap<ObmDomain, ArchiveDomainTask> domainEnqueuedTasks;
+		private final Monitor<ArchiveDomainTask> monitor;
+		private final Scheduler<ArchiveDomainTask> scheduler;
+
+		private LockingResourcesScheduler(Monitor<ArchiveDomainTask> monitor,
+				DateTimeProvider timeProvider, TimeUnit resolution) {
+			this.monitor = monitor;
+			this.domainEnqueuedTasks = TreeMultimap.create(ObmDomain.byUuidComparator(), ArchiveDomainTask.comparator());
+			this.scheduler = Scheduler.<ArchiveDomainTask>builder().timeProvider(timeProvider).resolution(resolution).addListener(monitor).start();
+		}
+
+		private synchronized void scheduleFromQueue(ScheduledTask<ArchiveDomainTask> scheduledTask) {
+			ObmDomain domainToDequeue = scheduledTask.task().getDomain();
+			ArchiveDomainTask toSchedule = domainEnqueuedTasks.get(domainToDequeue).pollFirst();
+			if (toSchedule != null) {
+				schedule(toSchedule);
+			}
+		}
+
+		private synchronized void schedule(ArchiveDomainTask toSchedule) {
+			if (!hasScheduledTaskForDomain(toSchedule.getDomain())) {
+				scheduler.schedule(toSchedule).at(toSchedule.getWhen());
+			} else {
+				domainEnqueuedTasks.put(toSchedule.getDomain(), toSchedule);
+			}
+		}
+
+		private synchronized boolean hasScheduledTaskForDomain(final ObmDomain domain) {
+			return Iterables.any(monitor.all(), new Predicate<ScheduledTask<ArchiveDomainTask>>() {
+
+				@Override
+				public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
+					return input.task().getDomain().equals(domain);
+				}
+			});
+		}
 	}
 }
