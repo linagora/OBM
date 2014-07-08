@@ -53,12 +53,14 @@ public class ServerConfiguration {
 		private static final boolean DEFAULT_REQUEST_LOGGER = false;
 		private static final int DEFAULT_SELECTOR_COUNT = 10;
 		private static final int DEFAULT_SELECTED_PORT = 0;
+		private static final Class<? extends LifeCycleHandler> DEFAULT_LIFE_CYCLE_HANDLER = LifeCycleHandler.Noop.class;
 		
 		private String contextPath = DEFAULT_CONTEXT_PATH;
 		private boolean requestLoggerEnabled = DEFAULT_REQUEST_LOGGER;
 		private int port = DEFAULT_SELECTED_PORT;
 		private int threadPoolSize = DEFAULT_THREADPOOL_SIZE;
 		private int selectorCount = DEFAULT_SELECTOR_COUNT;
+		private Class<? extends LifeCycleHandler> lifeCycleHandlerClass = DEFAULT_LIFE_CYCLE_HANDLER;
 		
 		private ServerConfigurationBuilder() {
 		}
@@ -93,9 +95,14 @@ public class ServerConfiguration {
 			return this;
 		}
 		
+		public ServerConfigurationBuilder lifeCycleHandler(Class<? extends LifeCycleHandler> lifeCycleHandlerClass) {
+			this.lifeCycleHandlerClass = lifeCycleHandlerClass;
+			return this;
+		}
+		
 		public ServerConfiguration build() {
 			return new ServerConfiguration(contextPath, requestLoggerEnabled,
-					port, threadPoolSize, selectorCount);
+					port, threadPoolSize, selectorCount, lifeCycleHandlerClass);
 		}
 	}
 	
@@ -104,15 +111,17 @@ public class ServerConfiguration {
 	private final int port;
 	private final int threadPoolSize;
 	private final int selectorCount;
+	private final Class<? extends LifeCycleHandler> lifeCycleHandlerClass;
 	
 	private ServerConfiguration(String contextPath, boolean requestLoggerEnabled,
-			int port, int threadPoolSize, int selectorCount) {
+			int port, int threadPoolSize, int selectorCount, Class<? extends LifeCycleHandler> lifeCycleHandlerClass) {
 		super();
 		this.contextPath = contextPath;
 		this.requestLoggerEnabled = requestLoggerEnabled;
 		this.port = port;
 		this.threadPoolSize = threadPoolSize;
 		this.selectorCount = selectorCount;
+		this.lifeCycleHandlerClass = lifeCycleHandlerClass;
 	}
 
 	public int selectorCount() {
@@ -135,10 +144,14 @@ public class ServerConfiguration {
 		return contextPath;
 	}
 
+	public Class<? extends LifeCycleHandler> lifeCycleHandlerClass() {
+		return lifeCycleHandlerClass;
+	}
+
 	@Override
 	public int hashCode(){
 		return Objects.hashCode(requestLoggerEnabled, contextPath, 
-				port, threadPoolSize, selectorCount);
+				port, threadPoolSize, selectorCount, lifeCycleHandlerClass);
 	}
 	
 	@Override
@@ -149,7 +162,8 @@ public class ServerConfiguration {
 				&& Objects.equal(this.contextPath, that.contextPath)
 				&& Objects.equal(this.requestLoggerEnabled, that.requestLoggerEnabled)
 				&& Objects.equal(this.threadPoolSize, that.threadPoolSize)
-				&& Objects.equal(this.selectorCount, that.selectorCount);
+				&& Objects.equal(this.selectorCount, that.selectorCount)
+				&& Objects.equal(this.lifeCycleHandlerClass, that.lifeCycleHandlerClass);
 		}
 		return false;
 	}
@@ -162,6 +176,7 @@ public class ServerConfiguration {
 			.add("requestLogger", requestLoggerEnabled)
 			.add("threadPoolSize", threadPoolSize)
 			.add("selectorCount", selectorCount)
+			.add("lifeCycleHandlerClass", lifeCycleHandlerClass)
 			.toString();
 	}
 }

@@ -31,47 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.server;
 
-import org.obm.server.jetty.JettyServerFactory;
-import org.obm.sync.LifecycleListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public interface LifeCycleHandler {
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
-
-public class EmbeddedServerModule extends AbstractModule {
-
-	private final ServerConfiguration configuration;
-
-	public EmbeddedServerModule(ServerConfiguration configuration) {
-		this.configuration = configuration;
-	}
-
-	@Override
-	protected void configure() {
-		Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		install(new LoggerModule());
-		bind(LifeCycleHandler.class).to(configuration.lifeCycleHandlerClass());
-	}
+	void starting();
 	
-	@Provides @Singleton
-	public WebServer buildWebServer(Injector injector) {
-		return injector
-				.getInstance(JettyServerFactory.class)
-				.buildServer(configuration);
-	}
-
-	public static class LoggerModule extends AbstractModule {
-
-		public static final String CONTAINER = "CONTAINER";
+	class Noop implements LifeCycleHandler {
 		
 		@Override
-		protected void configure() {
-			bind(Logger.class).annotatedWith(Names.named(CONTAINER)).toInstance(LoggerFactory.getLogger(CONTAINER));
+		public void starting() {
+			// noop
 		}
 	}
 }

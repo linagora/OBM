@@ -82,7 +82,7 @@ public class JettyServerFactory {
 		this.logger = logger;
 	}
 	
-	public WebServer buildServer(ServerConfiguration config) {
+	public WebServer buildServer(final ServerConfiguration config) {
 		final Server jetty = new Server(new QueuedThreadPool(config.threadPoolSize()));
 		jetty.setStopAtShutdown(true);
 		jetty.setStopTimeout(GRACEFUL_STOP_TIMEOUT_MS);
@@ -102,6 +102,7 @@ public class JettyServerFactory {
 			
 			@Override
 			public void start() throws Exception {
+				injector.getInstance(config.lifeCycleHandlerClass()).starting();
 				jetty.start();
 			}
 			
