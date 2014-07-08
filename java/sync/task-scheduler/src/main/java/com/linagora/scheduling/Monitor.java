@@ -38,72 +38,72 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
 
-public class Monitor implements Listener {
+public class Monitor<T extends Task> implements Listener<T> {
 
-	public static Builder builder() {
-		return new Builder();
+	public static <T extends Task> Builder<T> builder() {
+		return new Builder<T>();
 	}
 	
-	public static class Builder {
+	public static class Builder<T extends Task> {
 		
-		private final ImmutableList.Builder<Listener> listeners;
+		private final ImmutableList.Builder<Listener<T>> listeners;
 
 		private Builder() {
 			listeners = ImmutableList.builder();
 		}
 		
-		public Builder addListener(Listener listener) {
+		public Builder<T> addListener(Listener<T> listener) {
 			listeners.add(listener);
 			return this;
 		}
 		
-		public Monitor build() {
-			return new Monitor(listeners.build());
+		public Monitor<T> build() {
+			return new Monitor<T>(listeners.build());
 		}
 	}
 	
-	private final ListenersNotifier listenerNofifier;
-	private final ConcurrentMap<ScheduledTask.Id, ScheduledTask> tasks;
+	private final ListenersNotifier<T> listenerNofifier;
+	private final ConcurrentMap<ScheduledTask.Id, ScheduledTask<T>> tasks;
 	
-	private Monitor(ImmutableList<Listener> listeners) {
-		this.listenerNofifier = new ListenersNotifier(Monitor.class, listeners);
+	private Monitor(ImmutableList<Listener<T>> listeners) {
+		this.listenerNofifier = new ListenersNotifier<>(Monitor.class, listeners);
 		this.tasks = new MapMaker().weakKeys().makeMap();
 	}
 	
-	public List<ScheduledTask> all() {
+	public List<ScheduledTask<T>> all() {
 		return ImmutableList.copyOf(tasks.values());
 	}
 	
-	public Optional<ScheduledTask> findById(ScheduledTask.Id id) {
+	public Optional<ScheduledTask<T>> findById(ScheduledTask.Id id) {
 		return Optional.fromNullable(tasks.get(id));
 	}
 	
 	@Override
-	public void scheduled(ScheduledTask task) {
+	public void scheduled(ScheduledTask<T> task) {
 		tasks.put(task.id(), task);
 		listenerNofifier.notifyScheduled(task);
 	}
 	
 	@Override
-	public void terminated(ScheduledTask task) {
+	public void terminated(ScheduledTask<T> task) {
 		tasks.remove(task.id());
 		listenerNofifier.notifyTerminated(task);
 	}
 	
 	@Override
-	public void canceled(ScheduledTask task) {
+	public void canceled(ScheduledTask<T> task) {
 		tasks.remove(task.id());
 		listenerNofifier.notifyCanceled(task);
 	}
 	
 	@Override
-	public void failed(ScheduledTask task, Throwable failure) {
+	public void failed(ScheduledTask<T> task, Throwable failure) {
 		tasks.remove(task.id());
 		listenerNofifier.notifyFailed(task, failure);
 	}
 
 	@Override
-	public void running(ScheduledTask task) {
+	public void running(ScheduledTask<T> task) {
 		listenerNofifier.notifyRunning(task);
 	}
 }

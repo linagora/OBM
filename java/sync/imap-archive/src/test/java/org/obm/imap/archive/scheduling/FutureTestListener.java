@@ -41,8 +41,9 @@ import com.google.common.collect.Queues;
 import com.linagora.scheduling.Listener;
 import com.linagora.scheduling.ScheduledTask;
 import com.linagora.scheduling.ScheduledTask.State;
+import com.linagora.scheduling.Task;
 
-class FutureTestListener implements Listener {
+class FutureTestListener<T extends Task> implements Listener<T> {
 
 	ArrayBlockingQueue<State> states = Queues.newArrayBlockingQueue(10);
 	Throwable failure;
@@ -69,28 +70,28 @@ class FutureTestListener implements Listener {
 	}
 
 	@Override
-	public void canceled(ScheduledTask task) {
+	public void canceled(ScheduledTask<T> task) {
 		notifyOnce(State.CANCELED);
 	}
 	
 	@Override
-	public void running(ScheduledTask task) {
+	public void running(ScheduledTask<T> task) {
 		notifyOnce(State.RUNNING);
 	}
 
 	@Override
-	public void terminated(ScheduledTask task) {
+	public void terminated(ScheduledTask<T> task) {
 		notifyOnce(State.TERMINATED);
 	}
 	
 	@Override
-	public void failed(ScheduledTask task, Throwable failure) {
+	public void failed(ScheduledTask<T> task, Throwable failure) {
 		this.failure = failure;
 		notifyOnce(State.FAILED);
 	}
 	
 	@Override
-	public void scheduled(ScheduledTask task) {
+	public void scheduled(ScheduledTask<T> task) {
 		notifyOnce(State.WAITING);
 	}
 }

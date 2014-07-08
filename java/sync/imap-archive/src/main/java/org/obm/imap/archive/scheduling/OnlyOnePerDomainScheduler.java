@@ -51,22 +51,23 @@ import com.linagora.scheduling.Scheduler;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 @Singleton
-public class OnlyOnePerDomainScheduler extends NoopListener implements AutoCloseable {
+public class OnlyOnePerDomainScheduler extends NoopListener<ArchiveDomainTask> implements AutoCloseable {
 
 	private final ArchiveDomainTask.Factory archiveTaskFactory;
 	private final TreeMultimap<ObmDomain, ArchiveDomainTask> domainEnqueuedTasks;
-	@VisibleForTesting final Monitor monitor;
-	@VisibleForTesting final Scheduler scheduler;
+	@VisibleForTesting final Monitor<ArchiveDomainTask> monitor;
+	@VisibleForTesting final Scheduler<ArchiveDomainTask> scheduler;
 
 	@Inject
 	private OnlyOnePerDomainScheduler(ArchiveDomainTask.Factory archiveTaskFactory) {
-		this(archiveTaskFactory, Monitor.builder(), DateTimeProvider.SYSTEM_UTC, TimeUnit.MINUTES);
+		this(archiveTaskFactory, Monitor.<ArchiveDomainTask>builder(), DateTimeProvider.SYSTEM_UTC, TimeUnit.MINUTES);
 	}
 	
 	@VisibleForTesting OnlyOnePerDomainScheduler(ArchiveDomainTask.Factory archiveTaskFactory,
-			Monitor.Builder monitorBuilder, DateTimeProvider timeProvider, TimeUnit resolution) {
+			Monitor.Builder<ArchiveDomainTask> monitorBuilder,
+			DateTimeProvider timeProvider, TimeUnit resolution) {
 		this.monitor = monitorBuilder.addListener(this).build();
-		this.scheduler = Scheduler.builder().timeProvider(timeProvider).resolution(resolution).addListener(monitor).start();
+		this.scheduler = Scheduler.<ArchiveDomainTask>builder().timeProvider(timeProvider).resolution(resolution).addListener(monitor).start();
 		this.archiveTaskFactory = archiveTaskFactory;
 		this.domainEnqueuedTasks = TreeMultimap.create(ObmDomain.byUuidComparator(), ArchiveDomainTask.comparator());
 	}
@@ -86,25 +87,22 @@ public class OnlyOnePerDomainScheduler extends NoopListener implements AutoClose
 	}
 
 	@Override
-	public synchronized void canceled(ScheduledTask task) {
-		scheduleFromQueue(task);
+	public synchronized void canceled(ScheduledTask<ArchiveDomainTask> scheduledTask) {
+		scheduleFromQueue(scheduledTask);
 	}
 
 	@Override
-	public synchronized void failed(ScheduledTask task, Throwable failure) {
-		scheduleFromQueue(task);
+	public synchronized void failed(ScheduledTask<ArchiveDomainTask> scheduledTask, Throwable failure) {
+		scheduleFromQueue(scheduledTask);
 	}
 
 	@Override
-	public synchronized void terminated(ScheduledTask task) {
-		scheduleFromQueue(task);
+	public synchronized void terminated(ScheduledTask<ArchiveDomainTask> scheduledTask) {
+		scheduleFromQueue(scheduledTask);
 	}
 
-	private void scheduleFromQueue(ScheduledTask task) {
-		if (!isArchiveDomainTask(task)) {
-			return;
-		}
-		ObmDomain domainToDequeue = getBusinessTask(task).getDomain();
+	private void scheduleFromQueue(ScheduledTask<ArchiveDomainTask> scheduledTask) {
+		ObmDomain domainToDequeue = scheduledTask.task().getDomain();
 		ArchiveDomainTask toSchedule = domainEnqueuedTasks.get(domainToDequeue).pollFirst();
 		if (toSchedule != null) {
 			schedule(toSchedule);
@@ -112,24 +110,13 @@ public class OnlyOnePerDomainScheduler extends NoopListener implements AutoClose
 	}
 
 	private boolean hasScheduledTaskForDomain(final ObmDomain domain) {
-		return Iterables.any(monitor.all(), new Predicate<ScheduledTask>() {
+		return Iterables.any(monitor.all(), new Predicate<ScheduledTask<ArchiveDomainTask>>() {
 
 			@Override
-			public boolean apply(ScheduledTask input) {
-				if (isArchiveDomainTask(input)) {
-					return getBusinessTask(input).getDomain().equals(domain);
-				}
-				return false;
+			public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
+				return input.task().getDomain().equals(domain);
 			}
 		});
-	}
-
-	private ArchiveDomainTask getBusinessTask(ScheduledTask task) {
-		return (ArchiveDomainTask) task.task();
-	}
-
-	private boolean isArchiveDomainTask(ScheduledTask input) {
-		return input.task() instanceof ArchiveDomainTask;
 	}
 	
 	@Override

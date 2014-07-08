@@ -31,19 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.scheduling;
 
-public interface Listener {
+public interface Listener<T extends Task> {
 	
-	void canceled(ScheduledTask task);
-	void failed(ScheduledTask task, Throwable failure);
-	void running(ScheduledTask task);
-	void scheduled(ScheduledTask task);
-	void terminated(ScheduledTask task);
+	void canceled(ScheduledTask<T> task);
+	void failed(ScheduledTask<T> task, Throwable failure);
+	void running(ScheduledTask<T> task);
+	void scheduled(ScheduledTask<T> task);
+	void terminated(ScheduledTask<T> task);
 	
-	class NoopListener implements Listener {
-		public void canceled(ScheduledTask task) {}
-		public void failed(ScheduledTask task, Throwable failure) {}
-		public void running(ScheduledTask task) {}
-		public void scheduled(ScheduledTask task) {}
-		public void terminated(ScheduledTask task) {}
+	class NoopListener<T extends Task> implements Listener<T> {
+		public void canceled(ScheduledTask<T> task) {}
+		public void failed(ScheduledTask<T> task, Throwable failure) {}
+		public void running(ScheduledTask<T> task) {}
+		public void scheduled(ScheduledTask<T> task) {}
+		public void terminated(ScheduledTask<T> task) {}
 	}
 }

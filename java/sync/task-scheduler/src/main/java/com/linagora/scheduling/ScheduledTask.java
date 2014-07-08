@@ -42,7 +42,7 @@ import org.joda.time.Seconds;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 
-public class ScheduledTask implements Delayed {
+public class ScheduledTask<T extends Task> implements Delayed {
 
 	public static class Id {
 		
@@ -80,56 +80,56 @@ public class ScheduledTask implements Delayed {
 		WAITING
 	}
 
-	public static Builder builder() {
-		return new Builder();
+	public static <T extends Task> Builder<T> builder() {
+		return new Builder<T>();
 	}
 	
-	public static class Builder {
+	public static class Builder<T extends Task> {
 		
 		private DateTime scheduledTime;
-		private Task task;
-		private ImmutableList.Builder<Listener> listeners;
+		private T task;
+		private ImmutableList.Builder<Listener<T>> listeners;
 
 		private Builder() {
-			listeners = ImmutableList.<Listener>builder();
+			listeners = ImmutableList.<Listener<T>>builder();
 		}
 		
-		public Builder scheduledTime(DateTime scheduledTime) {
+		public Builder<T> scheduledTime(DateTime scheduledTime) {
 			this.scheduledTime = scheduledTime;
 			return this;
 		}
 		
-		public Builder task(Task task) {
+		public Builder<T> task(T task) {
 			this.task = task;
 			return this;
 		}
 		
-		public Builder addListener(Listener listener) {
+		public Builder<T> addListener(Listener<T> listener) {
 			listeners.add(listener);
 			return this;
 		}
 		
-		public Builder addListeners(List<Listener> listeners) {
+		public Builder<T> addListeners(List<Listener<T>> listeners) {
 			this.listeners.addAll(listeners);
 			return this;
 		}
 		
-		public ScheduledTask schedule(Scheduler scheduler) {
-			return new ScheduledTask(
+		public ScheduledTask<T> schedule(Scheduler<T> scheduler) {
+			return new ScheduledTask<>(
 					Id.generate(), scheduledTime, task, scheduler, 
-					new ListenersNotifier(ScheduledTask.class, listeners.build()))
+					new ListenersNotifier<>(ScheduledTask.class, listeners.build()))
 				.schedule();
 		}
 	}
 	
 	private final Id id;
 	private final DateTime scheduledTime;
-	private final Task task;
-	private final Scheduler scheduler;
-	private final ListenersNotifier listenersNotifier;
+	private final T task;
+	private final Scheduler<T> scheduler;
+	private final ListenersNotifier<T> listenersNotifier;
 	private State state;
 	
-	private ScheduledTask(Id id, DateTime scheduledTime, Task task, Scheduler scheduler, ListenersNotifier listenersNotifier) {
+	private ScheduledTask(Id id, DateTime scheduledTime, T task, Scheduler<T> scheduler, ListenersNotifier<T> listenersNotifier) {
 		this.id = id;
 		this.scheduledTime = scheduledTime;
 		this.task = task;
@@ -138,8 +138,8 @@ public class ScheduledTask implements Delayed {
 		this.state = State.NEW;
 	}
 	
-	private ScheduledTask schedule() {
-		ScheduledTask task = scheduler.schedule(this);
+	private ScheduledTask<T> schedule() {
+		ScheduledTask<T> task = scheduler.schedule(this);
 		notifyScheduled();
 		return task;
 	}
@@ -164,7 +164,7 @@ public class ScheduledTask implements Delayed {
 		return scheduledTime;
 	}
 	
-	public Task task() {
+	public T task() {
 		return task;
 	}
 

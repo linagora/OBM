@@ -37,72 +37,72 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 
-public class ListenersNotifier {
+public class ListenersNotifier<T extends Task> {
 
 	private final Logger logger;
-	private final ImmutableList<Listener> listeners;
+	private final ImmutableList<Listener<T>> listeners;
 
-	public ListenersNotifier(Class<?> loggerClass, ImmutableList<Listener> listeners) {
+	public ListenersNotifier(Class<?> loggerClass, ImmutableList<Listener<T>> listeners) {
 		this.logger = LoggerFactory.getLogger(loggerClass);
 		this.listeners = listeners;
 	}
 	
-	public void notifyCanceled(final ScheduledTask task) {
-		notify(new Function<Listener, Void>() {
+	public void notifyCanceled(final ScheduledTask<T> task) {
+		notify(new Function<Listener<T>, Void>() {
 
 			@Override
-			public Void apply(Listener listener) {
+			public Void apply(Listener<T> listener) {
 				listener.canceled(task);
 				return null;
 			}
 		});
 	}
-	public void notifyFailed(final ScheduledTask task, final Throwable t) {
-		notify(new Function<Listener, Void>() {
+	public void notifyFailed(final ScheduledTask<T> task, final Throwable t) {
+		notify(new Function<Listener<T>, Void>() {
 			
 			@Override
-			public Void apply(Listener listener) {
+			public Void apply(Listener<T> listener) {
 				listener.failed(task, t);
 				return null;
 			}
 		});
 	}
 	
-	public void notifyRunning(final ScheduledTask task) {
-		notify(new Function<Listener, Void>() {
+	public void notifyRunning(final ScheduledTask<T> task) {
+		notify(new Function<Listener<T>, Void>() {
 			
 			@Override
-			public Void apply(Listener listener) {
+			public Void apply(Listener<T> listener) {
 				listener.running(task);
 				return null;
 			}
 		});
 	}
 	
-	public void notifyScheduled(final ScheduledTask task) {
-		notify(new Function<Listener, Void>() {
+	public void notifyScheduled(final ScheduledTask<T> task) {
+		notify(new Function<Listener<T>, Void>() {
 			
 			@Override
-			public Void apply(Listener listener) {
+			public Void apply(Listener<T> listener) {
 				listener.scheduled(task);
 				return null;
 			}
 		});
 	}
 	
-	public void notifyTerminated(final ScheduledTask task) {
-		notify(new Function<Listener, Void>() {
+	public void notifyTerminated(final ScheduledTask<T> task) {
+		notify(new Function<Listener<T>, Void>() {
 			
 			@Override
-			public Void apply(Listener listener) {
+			public Void apply(Listener<T> listener) {
 				listener.terminated(task);
 				return null;
 			}
 		});
 	}
 	
-	public void notify(Function<Listener, Void> function) {
-		for (Listener listener: listeners) {
+	public void notify(Function<Listener<T>, Void> function) {
+		for (Listener<T> listener: listeners) {
 			try {
 				function.apply(listener);
 			} catch (Exception listenerException) {

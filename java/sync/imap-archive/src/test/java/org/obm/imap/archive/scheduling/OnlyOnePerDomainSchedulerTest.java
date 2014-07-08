@@ -62,8 +62,8 @@ public class OnlyOnePerDomainSchedulerTest {
 	DateTime now;
 	TestDateTimeProvider timeProvider;
 	ControlledTaskFactory archiveTaskFactory;
-	Monitor monitor;
-	FutureTestListener futureListener;
+	Monitor<ArchiveDomainTask> monitor;
+	FutureTestListener<ArchiveDomainTask> futureListener;
 	OnlyOnePerDomainScheduler testee;
 	
 	int timeout;
@@ -77,8 +77,8 @@ public class OnlyOnePerDomainSchedulerTest {
 		now = DateTime.parse("2024-10-1T05:04");
 		timeProvider = new TestDateTimeProvider(now);
 		archiveTaskFactory = new ControlledTaskFactory(archiveService); 
-		futureListener = new FutureTestListener();
-		Monitor.Builder monitorBuilder = Monitor.builder().addListener(futureListener);
+		futureListener = new FutureTestListener<>();
+		Monitor.Builder<ArchiveDomainTask> monitorBuilder = Monitor.<ArchiveDomainTask>builder().addListener(futureListener);
 		
 		testee = new OnlyOnePerDomainScheduler(archiveTaskFactory, monitorBuilder, timeProvider, MILLISECONDS);
 		monitor = testee.monitor;

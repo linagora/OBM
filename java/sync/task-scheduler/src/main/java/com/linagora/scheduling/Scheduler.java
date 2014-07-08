@@ -45,15 +45,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.AbstractScheduledService;
 
-public class Scheduler implements AutoCloseable {
+public class Scheduler<T extends Task> implements AutoCloseable {
 
-	public static Builder builder() {
-		return new Builder();
+	public static <T extends Task> Builder<T> builder() {
+		return new Builder<T>();
 	}
 	
-	public static class Builder {
+	public static class Builder<T extends Task> {
 		
-		private ImmutableList.Builder<Listener> listeners;
+		private ImmutableList.Builder<Listener<T>> listeners;
 		private TimeUnit unit;
 		private Integer resolution;
 		private DateTimeProvider timeProvider;
@@ -62,7 +62,7 @@ public class Scheduler implements AutoCloseable {
 			listeners = ImmutableList.builder();
 		}
 
-		public Builder resolution(int resolution, TimeUnit unit) {
+		public Builder<T> resolution(int resolution, TimeUnit unit) {
 			Preconditions.checkNotNull(unit);
 			Preconditions.checkArgument(resolution > 0);
 			this.unit = unit;
@@ -70,28 +70,27 @@ public class Scheduler implements AutoCloseable {
 			return this;
 		}
 		
-		public Builder resolution(TimeUnit unit) {
+		public Builder<T> resolution(TimeUnit unit) {
 			return resolution(1, unit);
 		}
 		
-		public Builder timeProvider(DateTimeProvider timeProvider) {
+		public Builder<T> timeProvider(DateTimeProvider timeProvider) {
 			Preconditions.checkNotNull(timeProvider);
 			this.timeProvider = timeProvider;
 			return this;
 		}
 		
-		public Builder addListener(Listener listener) {
+		public Builder<T> addListener(Listener<T> listener) {
 			listeners.add(listener);
 			return this;
 		}
 		
-		public Scheduler start() {
-			Scheduler scheduler = new Scheduler(
+		public Scheduler<T> start() {
+			Scheduler<T> scheduler = new Scheduler<>(
 				Objects.firstNonNull(timeProvider, DateTimeProvider.SYSTEM_UTC),
 				Objects.firstNonNull(resolution, 1),
 				Objects.firstNonNull(unit, TimeUnit.MINUTES),
-				listeners.build()
-				);
+				listeners.build());
 			scheduler.start();
 			return scheduler;
 		}
@@ -100,17 +99,17 @@ public class Scheduler implements AutoCloseable {
 	private final DateTimeProvider dateTimeProvider;
 	private final int resolution;
 	private final TimeUnit unit;
-	private final ImmutableList<Listener> listeners;
+	private final ImmutableList<Listener<T>> listeners;
 	private ActualScheduler actualScheduler;
 	
-	private Scheduler(DateTimeProvider dateTimeProvider, int resolution, TimeUnit unit, ImmutableList<Listener> listeners) {
+	private Scheduler(DateTimeProvider dateTimeProvider, int resolution, TimeUnit unit, ImmutableList<Listener<T>> listeners) {
 		this.dateTimeProvider = dateTimeProvider;
 		this.resolution = resolution;
 		this.unit = unit;
 		this.listeners = listeners;
 	}
 
-	public synchronized Scheduler start() {
+	public synchronized Scheduler<T> start() {
 		if (actualScheduler == null) {
 			actualScheduler = new ActualScheduler();
 			actualScheduler.startAsync();
@@ -118,7 +117,7 @@ public class Scheduler implements AutoCloseable {
 		return this;
 	}
 
-	public synchronized Scheduler stop() throws Exception {
+	public synchronized Scheduler<T> stop() throws Exception {
 		if (actualScheduler != null) {
 			actualScheduler.shutDown();
 			actualScheduler = null;
@@ -131,14 +130,14 @@ public class Scheduler implements AutoCloseable {
 		stop();
 	}
 	
-	public TaskToSchedule schedule(Task task) {
+	public TaskToSchedule schedule(T task) {
 		Preconditions.checkNotNull(task);
 		TaskToSchedule taskToSchedule = new TaskToSchedule(task);
 		taskToSchedule.addListeners(listeners);
 		return taskToSchedule;
 	}
 	
-	/* package */ ScheduledTask schedule(ScheduledTask scheduledTask) {
+	/* package */ ScheduledTask<T> schedule(ScheduledTask<T> scheduledTask) {
 		return actualScheduler.submit(scheduledTask);
 	}
 	
@@ -147,13 +146,13 @@ public class Scheduler implements AutoCloseable {
 	}
 	
 
-	public boolean cancel(ScheduledTask scheduledTask) {
+	public boolean cancel(ScheduledTask<T> scheduledTask) {
 		return actualScheduler.remove(scheduledTask);
 	}
 	
 	private class ActualScheduler extends AbstractScheduledService {
 		
-		private final DelayQueue<ScheduledTask> tasks;
+		private final DelayQueue<ScheduledTask<T>> tasks;
 		private final ExecutorService workers;
 		
 		public ActualScheduler() {
@@ -164,18 +163,18 @@ public class Scheduler implements AutoCloseable {
 		
 		@Override
 		protected void runOneIteration() throws Exception {
-			ScheduledTask task = tasks.poll();
+			ScheduledTask<T> task = tasks.poll();
 			if (task != null) {
 				workers.execute(task.runnable());
 			}
 		}
 		
-		public ScheduledTask submit(ScheduledTask scheduledTask) {
+		public ScheduledTask<T> submit(ScheduledTask<T> scheduledTask) {
 			tasks.put(scheduledTask);
 			return scheduledTask;
 		}
 
-		public boolean remove(ScheduledTask scheduledTask) {
+		public boolean remove(ScheduledTask<T> scheduledTask) {
 			return tasks.remove(scheduledTask);
 		}
 		
@@ -194,13 +193,13 @@ public class Scheduler implements AutoCloseable {
 	
 	public class TaskToSchedule {
 		
-		private ScheduledTask.Builder taskBuilder;
+		private ScheduledTask.Builder<T> taskBuilder;
 
-		public TaskToSchedule(Task task) {
-			taskBuilder = ScheduledTask.builder().task(task);
+		public TaskToSchedule(T task) {
+			taskBuilder = ScheduledTask.<T>builder().task(task);
 		}
 		
-		public ScheduledTask at(DateTime when) {
+		public ScheduledTask<T> at(DateTime when) {
 			Preconditions.checkNotNull(when);
 			if (dateTimeProvider.now().isAfter(when)) {
 				throw new TaskInThePastException();
@@ -208,23 +207,23 @@ public class Scheduler implements AutoCloseable {
 			return taskBuilder.scheduledTime(when).schedule(Scheduler.this);
 		}
 
-		public ScheduledTask in(ReadablePeriod period) {
+		public ScheduledTask<T> in(ReadablePeriod period) {
 			Preconditions.checkNotNull(period);
 			DateTime when = dateTimeProvider.now().plus(period);
 			return taskBuilder.scheduledTime(when).schedule(Scheduler.this);
 		}
 
-		public ScheduledTask now() {
+		public ScheduledTask<T> now() {
 			return taskBuilder.scheduledTime(dateTimeProvider.now()).schedule(Scheduler.this);
 		}
 
-		public TaskToSchedule addListener(Listener listener) {
+		public TaskToSchedule addListener(Listener<T> listener) {
 			Preconditions.checkNotNull(listener);
 			taskBuilder.addListener(listener);
 			return this;
 		}
 
-		public TaskToSchedule addListeners(List<Listener> listeners) {
+		public TaskToSchedule addListeners(List<Listener<T>> listeners) {
 			Preconditions.checkNotNull(listeners);
 			taskBuilder.addListeners(listeners);
 			return this;
