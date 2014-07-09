@@ -321,6 +321,33 @@ public class UserDaoJdbcImpl implements UserDao {
 		return obmUser;
 	}
 
+	@Override
+	public Integer findUserIdByEntityId(EntityId entityId) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		Integer userId = null;
+		String query = "SELECT userobm_id "
+				+ " FROM UserObm "
+				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
+				+ "WHERE userentity_entity_id=? AND userobm_archive != '1'";
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(query);
+			ps.setInt(1, entityId.getId());
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				userId = rs.getInt(1);
+			}
+		} catch (SQLException ex) {
+			throw new DaoException(ex);
+		} finally {
+			obmHelper.cleanup(con, ps, rs);
+		}
+		return userId;
+	}
+
 	@VisibleForTesting
 	ObmUser createUserFromResultSetAndFetchCreators(ObmDomain domain, ResultSet rs) throws SQLException {
 		ObmUser creator = findUserById(rs.getInt("userobm_usercreate"), domain, false);
@@ -490,9 +517,7 @@ public class UserDaoJdbcImpl implements UserDao {
 		return user;
 	}
 
-	
 	@VisibleForTesting Integer userIdFromLogin(Connection con, EmailLogin login, Integer domainId) {
-		
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
@@ -514,8 +539,9 @@ public class UserDaoJdbcImpl implements UserDao {
 			obmHelper.cleanup(null, ps, rs);
 		}
 		return ret;
+
 	}
-	
+
 	public Integer userIdFromEmail(Connection con, String email, Integer domainId) throws SQLException {
 
 		String[] parts = email.split("@");

@@ -36,7 +36,7 @@ public class DomainNotFoundException extends Exception {
 	public DomainNotFoundException(ObmDomainUuid uuid) {
 		super(String.format("The domain with the uuid %s was not found", uuid.get()));
 	}
-	
+
 	public DomainNotFoundException() {
 		super();
 	}

@@ -50,6 +50,7 @@ import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.host.ObmHost;
@@ -181,6 +182,18 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		ObmUser user = sampleUser(1, 3, "1");
 
 		assertThat(dao.findUserById(1, domain)).isEqualTo(user);
+	}
+
+	@Test
+	public void testFindUserByEntityId() throws DaoException {
+		EntityId user2EntityId = EntityId.valueOf(4);
+		int user2Id = 2;
+		assertThat(dao.findUserIdByEntityId(user2EntityId)).isEqualTo(user2Id);
+	}
+
+	@Test
+	public void testFindUserByEntityIdWhenUserDoesntExist() throws DaoException {
+		assertThat(dao.findUserIdByEntityId(EntityId.valueOf(404))).isNull();
 	}
 
 	@Test
