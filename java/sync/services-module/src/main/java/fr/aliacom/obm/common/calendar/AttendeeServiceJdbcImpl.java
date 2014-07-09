@@ -72,7 +72,13 @@ public class AttendeeServiceJdbcImpl implements AttendeeService {
 
 	@Override
 	public UserAttendee findUserAttendee(String name, String email, ObmDomain domain) {
-		ObmUser user = userDao.findUser(email, domain);
+		ObmUser user;
+		if (!Strings.isNullOrEmpty(email)) {
+			user = userDao.findUser(email, domain);
+		}
+		else {
+			user = userDao.findUserByLogin(name, domain);
+		}
 		
 		if (user != null) {
 			return UserAttendee
