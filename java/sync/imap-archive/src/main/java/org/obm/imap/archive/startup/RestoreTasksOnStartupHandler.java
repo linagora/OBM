@@ -44,7 +44,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 @Singleton
 public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 
-	public static final DateTime WHEN = DateTime.parse("2024-11-1T05:04");
+	public static final DateTime WHEN = DateTime.parse("2024-11-1T05:04Z");
 	public static final ArchiveTreatmentRunId RUN_ID = ArchiveTreatmentRunId.from("ee855151-f0a8-4182-a3e5-7469141526b4");
 	public static final ObmDomainUuid DOMAIN = ObmDomainUuid.of("67ecfad0-a684-47ed-aec5-f2c303f90467");
 	

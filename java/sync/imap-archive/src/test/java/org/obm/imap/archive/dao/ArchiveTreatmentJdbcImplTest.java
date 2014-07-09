@@ -33,7 +33,6 @@
 package org.obm.imap.archive.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.guava.api.Assertions.assertThat;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -41,13 +40,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
+import org.obm.ElementNotFoundException;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
+import org.obm.imap.archive.beans.ArchiveRunningTreatment;
+import org.obm.imap.archive.beans.ArchiveScheduledTreatment;
 import org.obm.imap.archive.beans.ArchiveStatus;
-import org.obm.imap.archive.beans.ArchiveTreatment;
+import org.obm.imap.archive.beans.ArchiveTerminatedTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
@@ -63,6 +65,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ArchiveTreatmentJdbcImplTest {
 
+	@Rule public FluentExpectedException expectedException = FluentExpectedException.none();
 	@Rule public TestRule chain = RuleChain
 			.outerRule(new GuiceRule(this, new DaoTestModule()))
 			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
@@ -72,99 +75,275 @@ public class ArchiveTreatmentJdbcImplTest {
 				}
 			}, "sql/mail_archive_run.sql"));
 
-	@Inject
-	private H2InMemoryDatabase db;
-	
-	@Inject
-	private ArchiveTreatmentJdbcImpl archiveTreatmentJdbcImpl;
-	
-	@Rule
-	public FluentExpectedException expectedException = FluentExpectedException.none();
+	@Inject H2InMemoryDatabase db;
+	@Inject ArchiveTreatmentJdbcImpl testee;
+	ObmDomainUuid domainUuid;
 	
 	@Before
 	public void setUp() {
-		Operation operation =
-				Operations.sequenceOf(
-						Operations.deleteAllFrom(ArchiveTreatmentJdbcImpl.TABLE.NAME),
-						Operations.insertInto(ArchiveTreatmentJdbcImpl.TABLE.NAME)
-						.columns(ArchiveTreatmentJdbcImpl.TABLE.FIELDS.UUID,
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.STATUS, 
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.START, 
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.END, 
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.LOWER_BOUNDARY, 
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.HIGHER_BOUNDARY)
-						.values("c3c5cb24-f5df-45ed-8918-99c7555a02c4",
-								"633bdb12-bb8a-4943-9dd0-6a6e48051517", 
-								ArchiveStatus.WARNING, 
-								DateTime.parse("2014-06-01T00:00:00.000Z").toDate(), 
-								DateTime.parse("2014-06-01T00:01:00.000Z").toDate(), 
-								DateTime.parse("2014-06-01T00:02:00.000Z").toDate(), 
-								DateTime.parse("2014-06-01T00:03:00.000Z").toDate())
-						.values("a860eecd-e608-4cbe-9d7a-6ef907b56367",
-								"633bdb12-bb8a-4943-9dd0-6a6e48051517", 
-								ArchiveStatus.SUCCESS, 
-								DateTime.parse("2014-07-01T00:00:00.000Z").toDate(), 
-								DateTime.parse("2014-07-01T00:01:00.000Z").toDate(), 
-								DateTime.parse("2014-07-01T00:02:00.000Z").toDate(), 
-								DateTime.parse("2014-07-01T00:03:00.000Z").toDate())
-						.build());
-
-		
-		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
-		dbSetup.launch();
+		domainUuid = ObmDomainUuid.of("633bdb12-bb8a-4943-9dd0-6a6e48051517");
+		Operation operation = Operations.deleteAllFrom(ArchiveTreatmentJdbcImpl.TABLE.NAME);
+		new DbSetup(H2Destination.from(db), operation).launch();
 	}	
-	
-	@Test
-	public void getLastArchiveTreatmentShouldReturnLastStoredValueWhenDomainIdMatch() throws Exception {
-		ObmDomainUuid uuid = ObmDomainUuid.of("633bdb12-bb8a-4943-9dd0-6a6e48051517");
-		ArchiveTreatment archiveTreatment = archiveTreatmentJdbcImpl.getLastArchiveTreatment(uuid).get();
-		assertThat(archiveTreatment.getRunId()).isEqualTo(ArchiveTreatmentRunId.from("a860eecd-e608-4cbe-9d7a-6ef907b56367"));
-		assertThat(archiveTreatment.getDomainId()).isEqualTo(uuid);
-		assertThat(archiveTreatment.getArchiveStatus()).isEqualTo(ArchiveStatus.SUCCESS);
-		assertThat(archiveTreatment.getStart()).isEqualTo(DateTime.parse("2014-07-01T00:00:00.000Z"));
-		assertThat(archiveTreatment.getEnd()).isEqualTo(DateTime.parse("2014-07-01T00:01:00.000Z"));
-		assertThat(archiveTreatment.getLowerBoundary()).isEqualTo(DateTime.parse("2014-07-01T00:02:00.000Z"));
-		assertThat(archiveTreatment.getHigherBoundary()).isEqualTo(DateTime.parse("2014-07-01T00:03:00.000Z"));
-	}
-	
-	@Test
-	public void getLastArchiveTreatmentShouldReturnNullWhenDomainIdDoesntMatch() throws Exception {
-		ObmDomainUuid uuid = ObmDomainUuid.of("07c48baf-cf15-4f27-bc04-f227a9dbf71f");
-		assertThat(archiveTreatmentJdbcImpl.getLastArchiveTreatment(uuid)).isAbsent();
-	}
-	
-	@Test
-	public void insertShouldReturnMatchingValues() throws Exception {
-		ArchiveTreatment expectedArchiveTreatment = ArchiveTreatment.builder()
-				.runId(ArchiveTreatmentRunId.from("bc139d31-5ffb-4174-a5e3-ac33d0b9f204"))
-				.domainId(ObmDomainUuid.of("74c66801-44f1-4bb2-b334-08053cb4ad53"))
-				.archiveStatus(ArchiveStatus.ERROR)
-				.start(DateTime.parse("2014-07-02T00:00:00.000Z"))
-				.end(DateTime.parse("2014-07-02T00:01:00.000Z"))
-				.lowerBoundary(DateTime.parse("2014-07-02T00:02:00.000Z"))
-				.higherBoundary(DateTime.parse("2014-07-02T00:03:00.000Z"))
-				.build();
-		
-		archiveTreatmentJdbcImpl.insert(expectedArchiveTreatment);
-		ArchiveTreatment archiveTreatment = archiveTreatmentJdbcImpl.getLastArchiveTreatment(expectedArchiveTreatment.getDomainId()).get();
-		assertThat(archiveTreatment).isEqualToComparingFieldByField(expectedArchiveTreatment);
-	}
-	
+
 	@Test
 	public void insertShouldThrowWhenDuplicateRunId() throws Exception {
-		ArchiveTreatment expectedArchiveTreatment = ArchiveTreatment.builder()
-				.runId(ArchiveTreatmentRunId.from("a860eecd-e608-4cbe-9d7a-6ef907b56367"))
-				.domainId(ObmDomainUuid.of("633bdb12-bb8a-4943-9dd0-6a6e48051517"))
-				.archiveStatus(ArchiveStatus.ERROR)
-				.start(DateTime.parse("2014-07-02T00:00:00.000Z"))
-				.end(DateTime.parse("2014-07-02T00:01:00.000Z"))
-				.lowerBoundary(DateTime.parse("2014-07-02T00:02:00.000Z"))
-				.higherBoundary(DateTime.parse("2014-07-02T00:03:00.000Z"))
+		ArchiveScheduledTreatment treatment = ArchiveScheduledTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
 				.build();
-		
+
 		expectedException.expect(DaoException.class);
 		
-		archiveTreatmentJdbcImpl.insert(expectedArchiveTreatment);
+		testee.insert(treatment);
+		testee.insert(treatment);
+	}
+	
+	@Test
+	public void findAllScheduledOrRunningShouldReturnEmptyWhenNone() throws Exception {
+		assertThat(testee.findAllScheduledOrRunning()).isEmpty();
+	}
+	
+	@Test
+	public void findAllScheduledOrRunningShouldReturnOnlyMatching() throws Exception {
+		ArchiveScheduledTreatment scheduled = ArchiveScheduledTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.build();
+		
+		ArchiveRunningTreatment running = ArchiveRunningTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-07-06T00:03:00Z"))
+				.build();
+		
+		ArchiveTerminatedTreatment terminated = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("a5ac1bc7-7c2d-415e-9933-00c073146d41")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-07-06T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		testee.insert(scheduled);
+		testee.insert(running);
+		testee.insert(terminated);
+		
+		assertThat(testee.findAllScheduledOrRunning())
+			.containsOnlyOnce(scheduled, running);
+	}
+	
+	@Test
+	public void findAllScheduledOrRunningShouldReturnSortedByScheduleTime() throws Exception {
+		ArchiveScheduledTreatment treatment1 = ArchiveScheduledTreatment
+				.forDomain(domainUuid)
+				.runId("d7a88445-053c-49dc-964a-f38e867ae62a")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2056-01-02T11:11Z"))
+				.build();
+		ArchiveRunningTreatment treatment2 = ArchiveRunningTreatment
+				.forDomain(domainUuid)
+				.runId("94c4856e-aae3-46d6-acd8-7c40d81ff309")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2056-01-01T10:22Z"))
+				.startedAt(DateTime.parse("2056-02-01T10:22Z"))
+				.build();
+		ArchiveRunningTreatment treatment3 = ArchiveRunningTreatment
+				.forDomain(ObmDomainUuid.of("72e2be30-ad54-4115-84f2-471fa2688805"))
+				.runId("9d53ef2b-1853-48fe-93c5-e39627fb0c4a")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2056-01-03T20:20Z"))
+				.startedAt(DateTime.parse("2056-02-02T10:22Z"))
+				.build();
+		ArchiveScheduledTreatment treatment4 = ArchiveScheduledTreatment
+				.forDomain(ObmDomainUuid.of("72e2be30-ad54-4115-84f2-471fa2688805"))
+				.runId("879e9046-ad73-446a-be66-824ef745de63")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2056-01-02T20:33Z"))
+				.build();
+		
+		testee.insert(treatment1);
+		testee.insert(treatment2);
+		testee.insert(treatment3);
+		testee.insert(treatment4);
+		
+		assertThat(testee.findAllScheduledOrRunning()).containsExactly(
+				treatment2, treatment1, treatment4, treatment3);
+	}
+
+	@Test
+	public void findByScheduledTimeShouldTriggerExceptionWhenNegativeLimit() throws Exception {
+		expectedException.expect(IllegalArgumentException.class);
+		testee.findByScheduledTime(domainUuid, -1);
+	}
+	
+	@Test
+	public void findByScheduledTimeShouldTriggerExceptionWhenZeroLimit() throws Exception {
+		expectedException.expect(IllegalArgumentException.class);
+		testee.findByScheduledTime(domainUuid, 0);
+	}
+	
+	@Test
+	public void findByScheduledTimeShouldReturnEmptyWhenNone() throws Exception {
+		assertThat(testee.findByScheduledTime(domainUuid, 5)).isEmpty();
+	}
+
+	@Test
+	public void findByScheduledTimeShouldReturnOnlyDomainEntries() throws Exception {
+		ArchiveScheduledTreatment otherDomain = ArchiveScheduledTreatment
+				.forDomain(ObmDomainUuid.of("254933bc-fad8-488e-98cd-f302c2a22fb3"))
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.build();
+
+		ArchiveTerminatedTreatment expectedDomain = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-07-06T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		testee.insert(otherDomain);
+		testee.insert(expectedDomain);
+		
+		assertThat(testee.findByScheduledTime(domainUuid, 5)).containsOnlyOnce(expectedDomain);
+	}
+	
+	@Test
+	public void findByScheduledTimeShouldReturnRespectLimitParameter() throws Exception {
+		ArchiveScheduledTreatment one = ArchiveScheduledTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.build();
+
+		ArchiveTerminatedTreatment two = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-01T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+		
+		ArchiveRunningTreatment three = ArchiveRunningTreatment
+				.forDomain(domainUuid)
+				.runId("31534c25-2012-45d7-9808-586a488e6c8b")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-01-01T00:03:00Z"))
+				.build();
+
+		testee.insert(one);
+		testee.insert(two);
+		testee.insert(three);
+		
+		assertThat(testee.findByScheduledTime(domainUuid, 2)).containsOnlyOnce(two, three);
+	}
+	
+	@Test
+	public void findByScheduledTimeShouldReturnSortedByScheduleTime() throws Exception {
+		ArchiveScheduledTreatment one = ArchiveScheduledTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.build();
+
+		ArchiveTerminatedTreatment two = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-01T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+		
+		ArchiveRunningTreatment three = ArchiveRunningTreatment
+				.forDomain(domainUuid)
+				.runId("31534c25-2012-45d7-9808-586a488e6c8b")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-01-01T00:03:00Z"))
+				.build();
+
+		testee.insert(one);
+		testee.insert(two);
+		testee.insert(three);
+		
+		assertThat(testee.findByScheduledTime(domainUuid, 5)).containsOnlyOnce(two, three, one);
+	}
+	
+	@Test
+	public void removeShouldDropTreatment() throws Exception {
+		ArchiveScheduledTreatment treatment = ArchiveScheduledTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.build();
+
+		testee.insert(treatment);
+		testee.remove(treatment.getRunId());
+		
+		assertThat(testee.findByScheduledTime(domainUuid, 5)).isEmpty();
+	}
+	
+	@Test
+	public void removeShouldTriggerExceptionWhenUuidNotFound() throws Exception {
+		expectedException.expect(ElementNotFoundException.class);
+		testee.remove(ArchiveTreatmentRunId.from("013f9981-9c51-400f-81a5-2dfc48e3925f"));
+	}
+
+	@Test
+	public void updateShouldTriggerExceptionWhenUuidNotFound() throws Exception {
+		expectedException.expect(ElementNotFoundException.class);
+		
+		testee.update(ArchiveScheduledTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.build());
+	}
+	
+	@Test
+	public void updateShouldChangeAllFields() throws Exception {
+		ArchiveScheduledTreatment created = ArchiveScheduledTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-11-11T00:00:00Z"))
+				.scheduledAt(DateTime.parse("2014-11-11T11:00:00Z"))
+				.build();
+
+		ArchiveTerminatedTreatment terminated = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-02-02T00:00:00Z"))
+				.scheduledAt(DateTime.parse("2014-02-02T02:00:00Z"))
+				.startedAt(DateTime.parse("2014-07-06T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+		
+		testee.insert(created);
+		testee.update(terminated);
+		
+		assertThat(testee.findByScheduledTime(domainUuid, 5)).containsOnlyOnce(terminated);
 	}
 }

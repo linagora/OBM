@@ -32,24 +32,20 @@
 
 package org.obm.imap.archive.services;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
-import org.obm.imap.archive.beans.ArchiveStatus;
-import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
-import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.exception.DomainConfigurationException;
 
@@ -65,7 +61,6 @@ public class ArchiveServiceImplTest {
 	private IMocksControl control;
 	
 	private DomainConfigurationDao domainConfigurationDao;
-	private ArchiveTreatmentDao archiveTreatmentDao;
 	private DateTimeProvider dateTimeProvider;
 	private LogFileService logFileService;
 	
@@ -79,11 +74,10 @@ public class ArchiveServiceImplTest {
 	public void setup() {
 		control = createControl();
 		domainConfigurationDao = control.createMock(DomainConfigurationDao.class);
-		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		dateTimeProvider = control.createMock(DateTimeProvider.class);
 		logFileService = control.createMock(LogFileService.class);
 		
-		archiveService = new ArchiveServiceImpl(domainConfigurationDao, archiveTreatmentDao, dateTimeProvider, logFileService, Boolean.FALSE);
+		archiveService = new ArchiveServiceImpl(domainConfigurationDao, dateTimeProvider, logFileService, Boolean.FALSE);
 	}
 	
 	@Test
@@ -132,33 +126,14 @@ public class ArchiveServiceImplTest {
 							.build())
 					.build());
 		
-		DateTime currentDate = DateTime.now();
-		expect(dateTimeProvider.now())
-			.andReturn(currentDate)
-			.times(2);
+		expect(dateTimeProvider.now()).andReturn(DateTime.now(DateTimeZone.UTC));
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
-		ArchiveTreatment expectedArchiveTreatment = ArchiveTreatment.builder()
-				.runId(runId)
-				.domainId(domainId)
-				.archiveStatus(ArchiveStatus.RUNNING)
-				.start(new DateTime(currentDate))
-				.build();
-		archiveTreatmentDao.insert(expectedArchiveTreatment);
-		expectLastCall();
 		
 		control.replay();
-		ArchiveTreatment archiveTreatment = archiveService.archive(domainId, runId, null);
+		archiveService.archive(domainId, runId, null);
 		int twoSeconds = 2000;
 		Thread.sleep(twoSeconds);
 		control.verify();
-		
-		assertThat(archiveTreatment.getRunId()).isEqualTo(runId);
-		assertThat(archiveTreatment.getDomainId()).isEqualTo(expectedArchiveTreatment.getDomainId());
-		assertThat(archiveTreatment.getArchiveStatus()).isEqualTo(expectedArchiveTreatment.getArchiveStatus());
-		assertThat(archiveTreatment.getStart()).isEqualTo(expectedArchiveTreatment.getStart());
-		assertThat(archiveTreatment.getEnd()).isNull();
-		assertThat(archiveTreatment.getLowerBoundary()).isNull();
-		assertThat(archiveTreatment.getHigherBoundary()).isNull();
 	}
 }

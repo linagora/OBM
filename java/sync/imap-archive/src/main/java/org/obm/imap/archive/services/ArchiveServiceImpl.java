@@ -44,13 +44,9 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.glassfish.jersey.server.ChunkedOutput;
-import org.joda.time.DateTime;
 import org.obm.annotations.transactional.Transactional;
-import org.obm.imap.archive.beans.ArchiveStatus;
-import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.exception.DomainConfigurationException;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -75,23 +71,19 @@ public class ArchiveServiceImpl implements ArchiveService {
 	private final static int NUMBER_OF_ITERATIONS = 2;
 	
 	private final DomainConfigurationDao domainConfigurationDao;
-	private final ArchiveTreatmentDao archiveTreatmentDao;
 	private final DateTimeProvider dateTimeProvider;
 	private final LogFileService logFileService;
 	private final boolean endlessTask;
 	private final Map<ArchiveTreatmentRunId, LogWriter> runIdToPeriodicTaskMap;
 
-
-
 	@Inject
-	@VisibleForTesting ArchiveServiceImpl(DomainConfigurationDao domainConfigurationDao, 
-			ArchiveTreatmentDao archiveTreatmentDao, 
+	@VisibleForTesting ArchiveServiceImpl(
+			DomainConfigurationDao domainConfigurationDao,
 			DateTimeProvider dateTimeProvider,
 			LogFileService logFileService,
 			@Named("endlessTask") Boolean endlessTask) {
 		
 		this.domainConfigurationDao = domainConfigurationDao;
-		this.archiveTreatmentDao = archiveTreatmentDao;
 		this.dateTimeProvider = dateTimeProvider;
 		this.logFileService = logFileService;
 		this.endlessTask = endlessTask;
@@ -101,17 +93,9 @@ public class ArchiveServiceImpl implements ArchiveService {
 	
 	@Override
 	@Transactional
-	public ArchiveTreatment archive(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DeferredFileOutputStream deferredFileOutputStream) {
+	public void archive(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DeferredFileOutputStream deferredFileOutputStream) {
 		try {
 			checkConfiguration(domain);
-			DateTime start = dateTimeProvider.now();
-			
-			ArchiveTreatment archiveTreatment = ArchiveTreatment.builder()
-					.runId(runId)
-					.domainId(domain)
-					.archiveStatus(ArchiveStatus.RUNNING)
-					.start(start)
-					.build();
 			
 			LogWriter logWriter = new LogWriter(runId, 
 					new ChunkedOutput<String>(String.class), 
@@ -119,13 +103,9 @@ public class ArchiveServiceImpl implements ArchiveService {
 					endlessTask);
 			runIdToPeriodicTaskMap.put(runId, logWriter);
 			logWriter.run();
-			
-			archiveTreatmentDao.insert(archiveTreatment);
-			return archiveTreatment;
 		} catch (DaoException e) {
 			logger.error("Error on archive treatment", e);
 			Throwables.propagate(e);
-			return null;
 		}
 	}
 

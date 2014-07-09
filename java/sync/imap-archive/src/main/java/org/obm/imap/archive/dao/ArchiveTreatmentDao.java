@@ -32,16 +32,25 @@
 
 package org.obm.imap.archive.dao;
 
-import org.obm.imap.archive.beans.ArchiveTreatment;
-import org.obm.provisioning.dao.exceptions.DaoException;
+import java.util.List;
 
-import com.google.common.base.Optional;
+import org.obm.ElementNotFoundException;
+import org.obm.imap.archive.beans.ArchiveTreatment;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.provisioning.dao.exceptions.DaoException;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public interface ArchiveTreatmentDao {
 
-	Optional<ArchiveTreatment> getLastArchiveTreatment(ObmDomainUuid domainId) throws DaoException;
+	void insert(ArchiveTreatment treatment) throws DaoException;
+	
+	void update(ArchiveTreatment treatment) throws DaoException, ElementNotFoundException;
 
-	void insert(ArchiveTreatment archiveTreatment) throws DaoException;
+	void remove(ArchiveTreatmentRunId runId) throws DaoException, ElementNotFoundException;
+
+	List<ArchiveTreatment> findAllScheduledOrRunning() throws DaoException;
+	
+	List<ArchiveTreatment> findByScheduledTime(ObmDomainUuid domain, int limit) throws DaoException;
+	
 }

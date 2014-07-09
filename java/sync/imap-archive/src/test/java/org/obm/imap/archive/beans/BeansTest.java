@@ -52,6 +52,9 @@ public class BeansTest {
 				SchedulingDates.class,
 				ArchiveDomainTask.class,
 				ArchiveTreatment.class,
+				ArchiveScheduledTreatment.class,
+				ArchiveRunningTreatment.class,
+				ArchiveTerminatedTreatment.class,
 				ArchiveTreatmentRunId.class
 			).verify();
 	}	

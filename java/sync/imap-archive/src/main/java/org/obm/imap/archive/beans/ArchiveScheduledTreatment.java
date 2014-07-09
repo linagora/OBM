@@ -31,44 +31,46 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.beans;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.obm.imap.archive.beans.ArchiveStatus.ERROR;
-import static org.obm.imap.archive.beans.ArchiveStatus.RUNNING;
-import static org.obm.imap.archive.beans.ArchiveStatus.SCHEDULED;
-import static org.obm.imap.archive.beans.ArchiveStatus.SUCCESS;
-import static org.obm.imap.archive.beans.ArchiveStatus.fromSpecificationValue;
+import org.joda.time.DateTime;
 
-import org.junit.Test;
+import com.google.common.base.Preconditions;
 
-public class ArchiveStatusTest {
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-	@Test
-	public void error() {
-		assertThat(ERROR.asSpecificationValue()).isEqualTo("ERROR");
-		assertThat(fromSpecificationValue("ERROR")).isEqualTo(ERROR);
+public class ArchiveScheduledTreatment extends ArchiveTreatment {
+	
+	public static ScheduledBuilder forDomain(ObmDomainUuid domainUuid) {
+		return new ScheduledBuilder(domainUuid);
 	}
 	
-	@Test
-	public void scheduled() {
-		assertThat(SCHEDULED.asSpecificationValue()).isEqualTo("SCHEDULED");
-		assertThat(fromSpecificationValue("SCHEDULED")).isEqualTo(SCHEDULED);
+	public static class ScheduledBuilder extends Builder<ArchiveScheduledTreatment> {
+
+		protected ScheduledBuilder(ObmDomainUuid domainUuid) {
+			super(domainUuid);
+		}
+
+		@Override
+		public ArchiveScheduledTreatment build() {
+			Preconditions.checkState(runId != null);
+			Preconditions.checkState(scheduledTime != null);
+			Preconditions.checkState(higherBoundary != null);
+			return new ArchiveScheduledTreatment(runId, domainUuid, ArchiveStatus.SCHEDULED, 
+					scheduledTime, higherBoundary);
+		}
 	}
 	
-	@Test
-	public void success() {
-		assertThat(SUCCESS.asSpecificationValue()).isEqualTo("SUCCESS");
-		assertThat(fromSpecificationValue("SUCCESS")).isEqualTo(SUCCESS);
-	}
-	
-	@Test
-	public void running() {
-		assertThat(RUNNING.asSpecificationValue()).isEqualTo("RUNNING");
-		assertThat(fromSpecificationValue("RUNNING")).isEqualTo(RUNNING);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void unknown() {
-		fromSpecificationValue("unknown");
+	private ArchiveScheduledTreatment(ArchiveTreatmentRunId runId, ObmDomainUuid  domainUuid, 
+			ArchiveStatus archiveStatus, DateTime scheduledTime, DateTime higherBoundary) {
+		super(runId, domainUuid, archiveStatus, scheduledTime, NO_DATE, NO_DATE, higherBoundary);
 	}
 
+	public ArchiveRunningTreatment asRunning(DateTime startedAt) {
+		return ArchiveRunningTreatment
+				.forDomain(domainUuid)
+				.runId(runId)
+				.scheduledAt(scheduledTime)
+				.higherBoundary(higherBoundary)
+				.startedAt(startedAt)
+				.build();
+	}
 }

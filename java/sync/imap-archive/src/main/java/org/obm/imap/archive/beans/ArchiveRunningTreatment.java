@@ -31,44 +31,55 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.beans;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.obm.imap.archive.beans.ArchiveStatus.ERROR;
-import static org.obm.imap.archive.beans.ArchiveStatus.RUNNING;
-import static org.obm.imap.archive.beans.ArchiveStatus.SCHEDULED;
-import static org.obm.imap.archive.beans.ArchiveStatus.SUCCESS;
-import static org.obm.imap.archive.beans.ArchiveStatus.fromSpecificationValue;
+import org.joda.time.DateTime;
 
-import org.junit.Test;
+import com.google.common.base.Preconditions;
 
-public class ArchiveStatusTest {
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-	@Test
-	public void error() {
-		assertThat(ERROR.asSpecificationValue()).isEqualTo("ERROR");
-		assertThat(fromSpecificationValue("ERROR")).isEqualTo(ERROR);
+public class ArchiveRunningTreatment extends ArchiveTreatment {
+
+	public static RunningBuilder forDomain(ObmDomainUuid domainUuid) {
+		return new RunningBuilder(domainUuid);
 	}
 	
-	@Test
-	public void scheduled() {
-		assertThat(SCHEDULED.asSpecificationValue()).isEqualTo("SCHEDULED");
-		assertThat(fromSpecificationValue("SCHEDULED")).isEqualTo(SCHEDULED);
-	}
-	
-	@Test
-	public void success() {
-		assertThat(SUCCESS.asSpecificationValue()).isEqualTo("SUCCESS");
-		assertThat(fromSpecificationValue("SUCCESS")).isEqualTo(SUCCESS);
-	}
-	
-	@Test
-	public void running() {
-		assertThat(RUNNING.asSpecificationValue()).isEqualTo("RUNNING");
-		assertThat(fromSpecificationValue("RUNNING")).isEqualTo(RUNNING);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void unknown() {
-		fromSpecificationValue("unknown");
+	public static class RunningBuilder extends Builder<ArchiveRunningTreatment> {
+		
+		private RunningBuilder(ObmDomainUuid domainUuid) {
+			super(domainUuid);
+		}
+
+		@Override
+		public ArchiveRunningTreatment build() {
+			Preconditions.checkState(runId != null);
+			Preconditions.checkState(scheduledTime != null);
+			Preconditions.checkState(higherBoundary != null);
+			Preconditions.checkState(startTime != null);
+			return new ArchiveRunningTreatment(runId, domainUuid, ArchiveStatus.RUNNING, 
+					scheduledTime, startTime, higherBoundary);
+		}
 	}
 
+	private ArchiveRunningTreatment(ArchiveTreatmentRunId runId, ObmDomainUuid  domainUuid, 
+			ArchiveStatus archiveStatus, DateTime scheduledTime, DateTime startTime, DateTime higherBoundary) {
+		super(runId, domainUuid, archiveStatus, scheduledTime, startTime, NO_DATE, higherBoundary);
+	}
+
+	public ArchiveTerminatedTreatment asSuccess(DateTime endTime) {
+		return asTerminatedBuilder(endTime).status(ArchiveStatus.SUCCESS).build();
+	}
+
+	public ArchiveTerminatedTreatment asError(DateTime endTime) {
+		return asTerminatedBuilder(endTime).status(ArchiveStatus.ERROR).build();
+	}
+	
+	private ArchiveTerminatedTreatment.Builder<ArchiveTerminatedTreatment> asTerminatedBuilder(DateTime endTime) {
+		return ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId(runId)
+				.scheduledAt(scheduledTime)
+				.startedAt(startTime)
+				.higherBoundary(higherBoundary)
+				.terminatedAt(endTime);
+	}
 }

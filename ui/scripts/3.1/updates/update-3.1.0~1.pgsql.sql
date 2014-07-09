@@ -15,7 +15,7 @@ mail_archive_minute INTEGER,
 CONSTRAINT mail_archive_domain_uuid_ukey UNIQUE (mail_archive_domain_uuid)
 );
 
-CREATE TYPE mail_archive_status AS ENUM ('ERROR', 'WARNING', 'RUNNING', 'SUCCESS');
+CREATE TYPE mail_archive_status AS ENUM ('ERROR', 'SCHEDULED', 'RUNNING', 'SUCCESS');
 
 CREATE TABLE mail_archive_run (
 id SERIAL PRIMARY KEY,

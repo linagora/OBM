@@ -377,8 +377,8 @@ public class JDBCUtilsTest {
 	}
 	
 	@Test
-	public void toTimestampShouldReturnDefaultValueWhenNoDateTimeProvided() {
-		assertThat(JDBCUtils.toTimestamp(null)).isEqualTo(JDBCUtils.DEFAULT_TIMESTAMP);
+	public void toTimestampShouldReturnNullWhenNoDateTimeProvided() {
+		assertThat(JDBCUtils.toTimestamp(null)).isNull();
 	}
 	
 	@Test

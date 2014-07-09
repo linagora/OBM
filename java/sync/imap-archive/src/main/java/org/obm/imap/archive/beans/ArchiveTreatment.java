@@ -32,6 +32,7 @@
 package org.obm.imap.archive.beans;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -39,120 +40,118 @@ import com.google.common.base.Preconditions;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ArchiveTreatment {
-	
-	public static Builder builder() {
-		return new Builder();
+
+	public static Builder<ArchiveTreatment> builder(ObmDomainUuid domainUuid) {
+		return new Builder<ArchiveTreatment>(domainUuid);
 	}
 	
-	public static class Builder {
+	public static class Builder<T extends ArchiveTreatment> {
 		
-		private ArchiveTreatmentRunId runId;
-		private ObmDomainUuid domainId;
-		private ArchiveStatus archiveStatus;
-		private DateTime start;
-		private DateTime end;
-		private DateTime lowerBoundary;
-		private DateTime higherBoundary;
-		
-		private Builder() {
+		protected final ObmDomainUuid domainUuid;
+		protected ArchiveTreatmentRunId runId;
+		protected ArchiveStatus status;
+		protected DateTime scheduledTime;
+		protected DateTime startTime;
+		protected DateTime endTime;
+		protected DateTime higherBoundary;
+
+		protected Builder(ObmDomainUuid domainUuid) {
+			Preconditions.checkNotNull(domainUuid);
+			this.domainUuid = domainUuid;
 		}
 		
-		public Builder runId(ArchiveTreatmentRunId runId) {
+		public Builder<T> runId(String runId) {
+			return runId(ArchiveTreatmentRunId.from(runId));
+		}
+		
+		public Builder<T> runId(ArchiveTreatmentRunId runId) {
 			Preconditions.checkNotNull(runId);
 			this.runId = runId;
 			return this;
 		}
 		
-		public Builder domainId(ObmDomainUuid domainId) {
-			Preconditions.checkNotNull(domainId);
-			this.domainId = domainId;
+		public Builder<T> scheduledAt(DateTime scheduledTime) {
+			Preconditions.checkNotNull(scheduledTime);
+			this.scheduledTime = scheduledTime;
 			return this;
 		}
 		
-		public Builder archiveStatus(ArchiveStatus archiveStatus) {
-			Preconditions.checkNotNull(archiveStatus);
-			this.archiveStatus = archiveStatus;
+		public Builder<T> startedAt(DateTime startTime) {
+			this.startTime = startTime;
 			return this;
 		}
 		
-		public Builder start(DateTime start) {
-			Preconditions.checkNotNull(start);
-			this.start = start;
+		public Builder<T> terminatedAt(DateTime endTime) {
+			this.endTime = endTime;
 			return this;
 		}
 		
-		public Builder end(DateTime end) {
-			Preconditions.checkNotNull(end);
-			this.end = end;
-			return this;
-		}
-		
-		public Builder lowerBoundary(DateTime lowerBoundary) {
-			Preconditions.checkNotNull(lowerBoundary);
-			this.lowerBoundary = lowerBoundary;
-			return this;
-		}
-		
-		public Builder higherBoundary(DateTime higherBoundary) {
+		public Builder<T> higherBoundary(DateTime higherBoundary) {
 			Preconditions.checkNotNull(higherBoundary);
 			this.higherBoundary = higherBoundary;
 			return this;
 		}
 		
-		public ArchiveTreatment build() {
+		public Builder<T> status(ArchiveStatus status) {
+			Preconditions.checkNotNull(status);
+			this.status = status;
+			return this;
+		}
+		
+		@SuppressWarnings("unchecked")
+		public T build() {
 			Preconditions.checkState(runId != null);
-			Preconditions.checkState(domainId != null);
-			Preconditions.checkState(archiveStatus != null);
-			Preconditions.checkState(start != null);
-			
-			if (archiveStatus != ArchiveStatus.RUNNING) {
-				Preconditions.checkState(end != null);
-			}
-			
-			return new ArchiveTreatment(runId, domainId, archiveStatus, start, end, lowerBoundary, higherBoundary);
+			Preconditions.checkState(scheduledTime != null);
+			Preconditions.checkState(higherBoundary != null);
+			Preconditions.checkState(status != null);
+			return (T) new ArchiveTreatment(runId, domainUuid, status, scheduledTime, startTime, endTime, higherBoundary);
 		}
 	}
 	
-	private final ArchiveTreatmentRunId runId;
-	private final ObmDomainUuid domainId;
-	private final ArchiveStatus archiveStatus;
-	private final DateTime start;
-	private final DateTime end;
-	private final DateTime lowerBoundary;
-	private final DateTime higherBoundary;
+	public static final DateTime FAILED_AT_UNKOWN_DATE = new DateTime(0, DateTimeZone.UTC);
+	public static final DateTime NO_DATE = null;
+	
+	protected final ArchiveTreatmentRunId runId;
+	protected final ObmDomainUuid domainUuid;
+	protected final ArchiveStatus archiveStatus;
+	protected final DateTime scheduledTime;
+	protected final DateTime startTime;
+	protected final DateTime endTime;
+	protected final DateTime higherBoundary;
 
-	private ArchiveTreatment(ArchiveTreatmentRunId runId, ObmDomainUuid  domainId, ArchiveStatus archiveStatus, DateTime start, DateTime end, DateTime lowerBoundary, DateTime higherBoundary) {
+	protected ArchiveTreatment(ArchiveTreatmentRunId runId, ObmDomainUuid  domainUuid, ArchiveStatus archiveStatus, 
+			DateTime scheduledTime, DateTime startTime, DateTime endTime, DateTime higherBoundary) {
 		this.runId = runId;
-		this.domainId = domainId;
+		this.domainUuid = domainUuid;
 		this.archiveStatus = archiveStatus;
-		this.start = start;
-		this.end = end;
-		this.lowerBoundary = lowerBoundary;
+		this.scheduledTime = scheduledTime;
+		this.startTime = startTime;
+		this.endTime = endTime;
 		this.higherBoundary = higherBoundary;
 	}
-	
+
 	public ArchiveTreatmentRunId getRunId() {
 		return runId;
 	}
-	
-	public ObmDomainUuid getDomainId() {
-		return domainId;
+
+	public ObmDomainUuid getDomainUuid() {
+		return domainUuid;
 	}
 
 	public ArchiveStatus getArchiveStatus() {
 		return archiveStatus;
 	}
 
-	public DateTime getStart() {
-		return start;
+	public DateTime getScheduledTime() {
+		return scheduledTime;
 	}
 
-	public DateTime getEnd() {
-		return end;
+	public DateTime getStartTime() {
+		return startTime;
 	}
 
-	public DateTime getLowerBoundary() {
-		return lowerBoundary;
+	public DateTime getEndTime() {
+		return endTime;
 	}
 
 	public DateTime getHigherBoundary() {
@@ -161,7 +160,8 @@ public class ArchiveTreatment {
 
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(runId, domainId, archiveStatus, start, end, lowerBoundary, higherBoundary);
+		return Objects.hashCode(runId, domainUuid, archiveStatus,
+				startTime, endTime, higherBoundary);
 	}
 	
 	@Override
@@ -169,11 +169,10 @@ public class ArchiveTreatment {
 		if (object instanceof ArchiveTreatment) {
 			ArchiveTreatment that = (ArchiveTreatment) object;
 			return Objects.equal(this.runId, that.runId)
-				&& Objects.equal(this.domainId, that.domainId)
+				&& Objects.equal(this.domainUuid, that.domainUuid)
 				&& Objects.equal(this.archiveStatus, that.archiveStatus)
-				&& Objects.equal(this.start, that.start)
-				&& Objects.equal(this.end, that.end)
-				&& Objects.equal(this.lowerBoundary, that.lowerBoundary)
+				&& Objects.equal(this.startTime, that.startTime)
+				&& Objects.equal(this.endTime, that.endTime)
 				&& Objects.equal(this.higherBoundary, that.higherBoundary);
 		}
 		return false;
@@ -183,11 +182,10 @@ public class ArchiveTreatment {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("runId", runId)
-			.add("domainId", domainId)
+			.add("domainUuid", domainUuid)
 			.add("archiveStatus", archiveStatus)
-			.add("start", start)
-			.add("end", end)
-			.add("lowerBoundary", lowerBoundary)
+			.add("startTime", startTime)
+			.add("endTime", endTime)
 			.add("higherBoundary", higherBoundary)
 			.toString();
 	}

@@ -34,14 +34,13 @@ package org.obm.imap.archive.services;
 
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.glassfish.jersey.server.ChunkedOutput;
-import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public interface ArchiveService {
 
-	ArchiveTreatment archive(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DeferredFileOutputStream deferredFileOutputStream);
+	void archive(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DeferredFileOutputStream deferredFileOutputStream);
 	
 	ChunkedOutput<String> runningProcessLogs(ArchiveTreatmentRunId runId);
 }

@@ -38,6 +38,7 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.assertj.core.data.MapEntry;
@@ -49,8 +50,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.obm.imap.archive.beans.ArchiveStatus;
-import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.scheduling.ControlledTaskFactory.RemotelyControlledTask;
 import org.obm.imap.archive.services.ArchiveService;
@@ -65,7 +64,6 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class OnlyOnePerDomainSchedulerTest {
 
-	private static final DateTime THE_BEGINNING = DateTime.parse("1970-01-01T00:00");
 	IMocksControl mocksControl;
 	ArchiveService archiveService;
 	LogFileService logFileService;
@@ -139,8 +137,8 @@ public class OnlyOnePerDomainSchedulerTest {
 		DateTime when = DateTime.parse("2024-11-1T05:04");
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
-		expect(archiveService.archive(eq(domain), eq(runId), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId, when, domain));
+		archiveService.archive(eq(domain), eq(runId), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
 		
 		expect(logFileService.getFile(runId))
 			.andReturn(temporaryFolder.newFile());
@@ -159,11 +157,11 @@ public class OnlyOnePerDomainSchedulerTest {
 		DateTime when2 = DateTime.parse("2024-11-5T05:04");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
-		
-		expect(archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId1, when1, domain));
-		expect(archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId2, when2, domain));
+
+		archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
+		archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
 		
 		expect(logFileService.getFile(runId1))
 			.andReturn(temporaryFolder.newFile());
@@ -186,11 +184,11 @@ public class OnlyOnePerDomainSchedulerTest {
 		DateTime whenToEnqueue = DateTime.parse("2024-11-2T05:04");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
-		
-		expect(archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId1, when, domain));
-		expect(archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId2, whenToEnqueue, domain));
+
+		archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
+		archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
 		
 		expect(logFileService.getFile(runId1))
 			.andReturn(temporaryFolder.newFile());
@@ -215,13 +213,13 @@ public class OnlyOnePerDomainSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
-		
-		expect(archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId1, when, domain));
-		expect(archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId2, whenToEnqueueAfter, domain));
-		expect(archiveService.archive(eq(domain), eq(runId3), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId3, whenToEnqueueBefore, domain));
+
+		archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
+		archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
+		archiveService.archive(eq(domain), eq(runId3), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
 		
 		expect(logFileService.getFile(runId1))
 			.andReturn(temporaryFolder.newFile());
@@ -268,11 +266,11 @@ public class OnlyOnePerDomainSchedulerTest {
 		DateTime when2 = DateTime.parse("2024-11-2T05:04");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
-		
-		expect(archiveService.archive(eq(domain1), eq(runId1), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId1, when1, domain1));
-		expect(archiveService.archive(eq(domain2), eq(runId2), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId2, when2, domain2));
+
+		archiveService.archive(eq(domain1), eq(runId1), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
+		archiveService.archive(eq(domain2), eq(runId2), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
 		
 		expect(logFileService.getFile(runId1))
 			.andReturn(temporaryFolder.newFile());
@@ -322,15 +320,15 @@ public class OnlyOnePerDomainSchedulerTest {
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
 		ArchiveTreatmentRunId runId4 = ArchiveTreatmentRunId.from("b1226053-265d-4b0e-a524-e37b1dfcb2e9");
-		
-		expect(archiveService.archive(eq(domain1), eq(runId1), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId1, when1, domain1));
-		expect(archiveService.archive(eq(domain2), eq(runId2), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId2, when2, domain2));
-		expect(archiveService.archive(eq(domain1), eq(runId3), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId3, when1ToEnqueue, domain1));
-		expect(archiveService.archive(eq(domain2), eq(runId4), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId4, when2ToEnqueue, domain2));
+
+		archiveService.archive(eq(domain1), eq(runId1), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
+		archiveService.archive(eq(domain2), eq(runId2), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
+		archiveService.archive(eq(domain1), eq(runId3), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
+		archiveService.archive(eq(domain2), eq(runId4), anyObject(DeferredFileOutputStream.class));
+		expectLastCall();
 		
 		expect(logFileService.getFile(runId1))
 			.andReturn(temporaryFolder.newFile());
@@ -433,15 +431,4 @@ public class OnlyOnePerDomainSchedulerTest {
 		mocksControl.verify();
 	}
 	
-	private ArchiveTreatment archiveTreatment(ArchiveTreatmentRunId runId, DateTime start, ObmDomainUuid domainId) {
-		return ArchiveTreatment.builder()
-				.runId(runId)
-				.domainId(domainId)
-				.archiveStatus(ArchiveStatus.SUCCESS)
-				.start(start)
-				.end(THE_BEGINNING)
-				.lowerBoundary(THE_BEGINNING)
-				.higherBoundary(THE_BEGINNING)
-				.build();
-	}
 }

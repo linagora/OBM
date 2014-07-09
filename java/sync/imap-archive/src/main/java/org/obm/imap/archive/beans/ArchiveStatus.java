@@ -40,9 +40,8 @@ import com.google.common.collect.ImmutableMap.Builder;
 public enum ArchiveStatus {
 
 	SCHEDULED("SCHEDULED"), 
-	ERROR("ERROR"), 
-	WARNING("WARNING"), 
 	RUNNING("RUNNING"), 
+	ERROR("ERROR"), 
 	SUCCESS("SUCCESS");
 
 	private static Map<String, ArchiveStatus> specValueToEnum;

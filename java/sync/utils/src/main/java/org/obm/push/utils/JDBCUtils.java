@@ -53,8 +53,6 @@ public class JDBCUtils {
 
 	private final static Logger logger = LoggerFactory
 			.getLogger(JDBCUtils.class);
-	
-	public static final Timestamp DEFAULT_TIMESTAMP = new Timestamp(0);
 
 	public static final void rollback(Connection con) {
 		if (con != null) {
@@ -208,7 +206,7 @@ public class JDBCUtils {
 	
 	public static Timestamp toTimestamp(DateTime dateTime) {
 		if (dateTime == null) {
-			return DEFAULT_TIMESTAMP;
+			return null;
 		}
 		return new Timestamp(dateTime.getMillis());
 	}
