@@ -157,10 +157,12 @@ public class ScheduledTask implements Delayed {
 		return task;
 	}
 
-	public void cancel() {
+	public boolean cancel() {
 		if (scheduler.cancel(this)) {
 			notifyCanceled();
+			return true;
 		}
+		return false;
 	}
 
 	public State state() {

@@ -222,7 +222,7 @@ public class SchedulerTest {
 		FutureTestListener testListener = new FutureTestListener();
 		ScheduledTask actual = testee.schedule(new DummyTask()).addListener(testListener).in(waitingPeriod);
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.WAITING);
-		actual.cancel();
+		assertThat(actual.cancel()).isTrue();
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.CANCELED);
 		dateTimeProvider.setCurrent(now.plus(waitingPeriod));
 		try {
@@ -239,7 +239,7 @@ public class SchedulerTest {
 		ScheduledTask actual = testee.schedule(new DummyTask(Duration.millis(100))).addListener(testListener).at(now);
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.WAITING);
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
-		actual.cancel();
+		assertThat(actual.cancel()).isFalse();
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.TERMINATED);
 	}
 	
@@ -251,7 +251,7 @@ public class SchedulerTest {
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.WAITING);
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.TERMINATED);
-		actual.cancel();
+		assertThat(actual.cancel()).isFalse();
 	}
 	
 	@Test
@@ -475,7 +475,7 @@ public class SchedulerTest {
 			}
 		}).addListener(testListener).in(Period.hours(1));
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.WAITING);
-		scheduled.cancel();
+		assertThat(scheduled.cancel()).isTrue();
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.CANCELED);
 	}
 	
@@ -493,7 +493,7 @@ public class SchedulerTest {
 				.start();
 		ScheduledTask scheduled = testee.schedule(new DummyTask(Duration.millis(100))).in(Period.hours(1));
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.WAITING);
-		scheduled.cancel();
+		assertThat(scheduled.cancel()).isTrue();
 		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.CANCELED);
 	}
 }

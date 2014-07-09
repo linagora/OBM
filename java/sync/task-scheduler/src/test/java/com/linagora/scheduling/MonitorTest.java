@@ -84,7 +84,7 @@ public class MonitorTest {
 	public void allShouldNotReturnCanceledTasks() throws Exception {
 		FutureTestListener futureListener = new FutureTestListener();
 		ScheduledTask scheduledTask = scheduler.schedule(new DummyTask()).addListener(futureListener).in(Period.days(1));
-		scheduledTask.cancel();
+		assertThat(scheduledTask.cancel()).isTrue();
 		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.WAITING);
 		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.CANCELED);
 		assertThat(monitor.all()).isEmpty();
@@ -134,7 +134,7 @@ public class MonitorTest {
 	public void findByIdShouldNotFindACanceledTasks() throws Exception {
 		FutureTestListener futureListener = new FutureTestListener();
 		ScheduledTask scheduledTask = scheduler.schedule(new DummyTask()).addListener(futureListener).in(Period.days(1));
-		scheduledTask.cancel();
+		assertThat(scheduledTask.cancel()).isTrue();
 		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.WAITING);
 		assertThat(futureListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(State.CANCELED);
 		Assertions.assertThat(monitor.findById(scheduledTask.id())).isAbsent();
