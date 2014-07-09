@@ -32,7 +32,43 @@
 
 package org.obm.imap.archive.beans;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+
 public enum ArchiveStatus {
 
-	ERROR, WARNING, RUNNING, SUCCESS;
+	SCHEDULED("SCHEDULED"), 
+	ERROR("ERROR"), 
+	WARNING("WARNING"), 
+	RUNNING("RUNNING"), 
+	SUCCESS("SUCCESS");
+
+	private static Map<String, ArchiveStatus> specValueToEnum;
+	
+	static {
+		Builder<String, ArchiveStatus> builder = ImmutableMap.builder();
+		for (ArchiveStatus syncStatus : values()) {
+			builder.put(syncStatus.specificationValue, syncStatus);
+		}
+		specValueToEnum = builder.build();
+	}
+	
+	public static ArchiveStatus fromSpecificationValue(String specificationValue) {
+		if (specValueToEnum.containsKey(specificationValue)) {
+			return specValueToEnum.get(specificationValue);
+		}
+		throw new IllegalArgumentException("No ArchiveStatus for '" + specificationValue + "'");
+	}
+	
+	private final String specificationValue;
+
+	private ArchiveStatus(String asSpecificationValue) {
+		this.specificationValue = asSpecificationValue;
+	}
+	
+	public String asSpecificationValue() {
+		return specificationValue;
+	}
 }

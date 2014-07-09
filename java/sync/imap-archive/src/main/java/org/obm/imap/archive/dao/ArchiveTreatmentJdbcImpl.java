@@ -114,7 +114,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 		return ArchiveTreatment.builder()
 				.runId(ArchiveTreatmentRunId.from(rs.getString(FIELDS.UUID)))
 				.domainId(ObmDomainUuid.of(rs.getString(FIELDS.DOMAIN_UUID)))
-				.archiveStatus(ArchiveStatus.valueOf(rs.getString(FIELDS.STATUS)))
+				.archiveStatus(ArchiveStatus.fromSpecificationValue(rs.getString(FIELDS.STATUS)))
 				.start(JDBCUtils.getDateTime(rs, FIELDS.START, DateTimeZone.UTC))
 				.end(JDBCUtils.getDateTime(rs, FIELDS.END, DateTimeZone.UTC))
 				.lowerBoundary(JDBCUtils.getDateTime(rs, FIELDS.LOWER_BOUNDARY, DateTimeZone.UTC))
