@@ -297,6 +297,28 @@ public class UserDaoJdbcImpl implements UserDao {
 		return obmUser;
 	}
 
+	@Override
+	public Integer findUserIdByEntityId(EntityId entityId) throws DaoException {
+		Integer userId = null;
+		String query = "SELECT userobm_id "
+				+ " FROM UserObm "
+				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
+				+ "WHERE userentity_entity_id=? AND userobm_archive != '1'";
+
+		try (Connection con = obmHelper.getConnection();
+				PreparedStatement ps = con.prepareStatement(query)) {
+			ps.setInt(1, entityId.getId());
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				userId = rs.getInt(1);
+			}
+		} catch (SQLException ex) {
+			throw new DaoException(ex);
+		}
+
+		return userId;
+	}
+
 	@VisibleForTesting
 	ObmUser createUserFromResultSetAndFetchCreators(ObmDomain domain, ResultSet rs) throws SQLException {
 		ObmUser creator = findUserById(rs.getInt("userobm_usercreate"), domain, false);
@@ -465,6 +487,7 @@ public class UserDaoJdbcImpl implements UserDao {
 		String uq = "SELECT userobm_id "
 				+ "FROM UserObm "
 				+ "WHERE userobm_domain_id=? AND userobm_login=? AND userobm_archive != '1'";
+
 		try (PreparedStatement ps = con.prepareStatement(uq)) {
 			ps.setInt(1, domainId);
 			ps.setString(2, login.get());
@@ -475,6 +498,7 @@ public class UserDaoJdbcImpl implements UserDao {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 		}
+
 		return ret;
 	}
 	

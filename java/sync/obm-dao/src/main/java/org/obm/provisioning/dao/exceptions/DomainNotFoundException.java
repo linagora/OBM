@@ -42,7 +42,7 @@ public class DomainNotFoundException extends Exception {
 	public DomainNotFoundException(UUID uuid) {
 		this(uuid.toString());
 	}
-	
+
 	public DomainNotFoundException() {
 		super();
 	}

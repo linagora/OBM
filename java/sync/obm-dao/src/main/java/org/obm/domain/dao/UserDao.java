@@ -37,6 +37,7 @@ import java.util.Set;
 
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
+import org.obm.sync.dao.EntityId;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -57,6 +58,8 @@ public interface UserDao {
 	ObmUser getByExtId(UserExtId userExtId, ObmDomain domain) throws SQLException, UserNotFoundException;
 
 	ObmUser getByExtIdWithGroups(UserExtId userExtId, ObmDomain domain) throws SQLException, UserNotFoundException;
+
+	Integer findUserIdByEntityId(EntityId entityId) throws DaoException;
 
 	List<ObmUser> list(ObmDomain domain) throws SQLException;
 
