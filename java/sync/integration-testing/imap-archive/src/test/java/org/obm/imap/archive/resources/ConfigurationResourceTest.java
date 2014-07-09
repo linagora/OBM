@@ -49,7 +49,7 @@ import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
-import org.obm.imap.archive.CommonClientDriverExpectation;
+import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.beans.DayOfMonth;
@@ -58,6 +58,7 @@ import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
+import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.jayway.restassured.http.ContentType;
@@ -69,11 +70,11 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ConfigurationResourceTest {
 
-	private CommonClientDriverExpectation driver = new CommonClientDriverExpectation();
+	private ClientDriverRule driver = new ClientDriverRule();
 	
 	@Rule public TestRule chain = RuleChain
-			.outerRule(driver.getClientDriverRule())
-			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver.getClientDriverRule())))
+			.outerRule(driver)
+			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver)))
 			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
 				@Override
 				public H2InMemoryDatabase get() {
@@ -83,12 +84,15 @@ public class ConfigurationResourceTest {
 
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
+	Expectations expectations;
+
 	
 	@Before
 	public void setUp() {
 		ObmDomainUuid domainId = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
-		driver.expectTrustedLogin(domainId);
-		driver.expectGetDomain(domainId);
+		expectations = new Expectations(driver)
+			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId);
 	}
 
 	private void initDb(Operation... operationToAppend) {
@@ -174,7 +178,7 @@ public class ConfigurationResourceTest {
 
 	@Test
 	public void updateDomainConfigurationShouldCreateWhenNoData() throws Exception {
-		driver.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
+		expectations.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
 		server.start();
 		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
@@ -228,7 +232,7 @@ public class ConfigurationResourceTest {
 						"mail_archive_minute")
 						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
 						.build());
-		driver.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
+		expectations.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
 		server.start();
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");

@@ -43,6 +43,7 @@ import java.util.UUID;
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -51,7 +52,7 @@ import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
-import org.obm.imap.archive.CommonClientDriverExpectation;
+import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.beans.DayOfMonth;
@@ -61,6 +62,7 @@ import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
+import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -73,8 +75,8 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class TreatmentsResourceTest {
 
-	private CommonClientDriverExpectation driver = new CommonClientDriverExpectation();
-
+	private ClientDriverRule driver = new ClientDriverRule();
+	
 	private static File logFile;
 	
 	static {
@@ -84,10 +86,10 @@ public class TreatmentsResourceTest {
 			Throwables.propagate(e);
 		}
 	}
-	
+
 	@Rule public TestRule chain = RuleChain
-			.outerRule(driver.getClientDriverRule())
-			.around(new GuiceRule(this, new TestImapArchiveModules.WithLogFile(driver.getClientDriverRule(), logFile)))
+			.outerRule(driver)
+			.around(new GuiceRule(this, new TestImapArchiveModules.WithLogFile(driver, logFile)))
 			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
 				@Override
 				public H2InMemoryDatabase get() {
@@ -97,6 +99,13 @@ public class TreatmentsResourceTest {
 	
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
+	Expectations expectations;
+
+	@Before
+	public void setUp() throws Exception {
+		expectations = new Expectations(driver);
+		server.start();
+	}
 
 	@After
 	public void tearDown() throws Exception {
@@ -107,8 +116,9 @@ public class TreatmentsResourceTest {
 	@Test
 	public void calculateNextScheduledDateShouldReturnNoContentWhenConfigurationInactive() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("962b7b35-abf3-4f1b-943d-d6640450812b");
-		driver.expectTrustedLogin(domainId);
-		driver.expectGetDomain(domainId);
+		expectations
+			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId);
 		server.start();
 		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
@@ -137,8 +147,9 @@ public class TreatmentsResourceTest {
 	@Test
 	public void calculateNextScheduledDateShouldReturnNextTreatmentDateWhenConfigurationActive() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("21aeb670-f49e-428a-9d0c-f11f5feaa688");
-		driver.expectTrustedLogin(domainId);
-		driver.expectGetDomain(domainId);
+		expectations
+			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId);
 		server.start();
 		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
@@ -169,8 +180,9 @@ public class TreatmentsResourceTest {
 	@Test
 	public void startArchivingShouldCreate() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
-		driver.expectTrustedLogin(domainId);
-		driver.expectGetDomain(domainId);
+		expectations
+			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId);
 		
 		insertDomainConfiguration();
 		
@@ -211,9 +223,10 @@ public class TreatmentsResourceTest {
 	@Test
 	public void startArchivingTwiceShouldStackSchedules() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
-		driver.expectTrustedLogin(domainId);
-		driver.expectTrustedLogin(domainId);
-		driver.expectGetDomain(domainId);
+		expectations
+			.expectTrustedLogin(domainId)
+			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId);
 		
 		insertDomainConfiguration();
 		
@@ -248,11 +261,10 @@ public class TreatmentsResourceTest {
 	@Test
 	public void runningTreatmentShouldReturnChunk() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
-		// POST
-		driver.expectTrustedLogin(domainId);
-		driver.expectGetDomain(domainId);
-		// GET 
-		driver.expectTrustedLogin(domainId);
+		expectations
+			.expectTrustedLogin(domainId) // POST expectations
+			.expectGetDomain(domainId) 
+			.expectTrustedLogin(domainId); // GET
 		
 		insertDomainConfiguration();
 		
@@ -291,11 +303,10 @@ public class TreatmentsResourceTest {
 	@Test
 	public void runningTreatmentShouldReturnChunkWhenTreatmentIsOverAndLogFileOnServer() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
-		// POST
-		driver.expectTrustedLogin(domainId);
-		driver.expectGetDomain(domainId);
-		// GET 
-		driver.expectTrustedLogin(domainId);
+		expectations
+			.expectTrustedLogin(domainId) // POST
+			.expectGetDomain(domainId)
+			.expectTrustedLogin(domainId); // GET
 		
 		insertDomainConfiguration();
 		
@@ -334,8 +345,9 @@ public class TreatmentsResourceTest {
 	@Test
 	public void runningTreatmentShouldReturnNotFoundWhenBadRunId() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
-		driver.expectTrustedLogin(domainId);
-		driver.expectGetDomain(domainId);
+		expectations
+			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId);
 		
 		insertDomainConfiguration();
 		
