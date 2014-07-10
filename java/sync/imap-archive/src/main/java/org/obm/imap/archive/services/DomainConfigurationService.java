@@ -44,7 +44,7 @@ import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
 public class DomainConfigurationService {
@@ -57,8 +57,8 @@ public class DomainConfigurationService {
 	}
 	
 	@Transactional
-	public PersistedResult updateOrCreate(DomainConfiguration domainConfiguration, ObmDomain domain) throws DaoException, DomainNotFoundException {
-		if (domainConfigurationDao.get(domain.getUuid()) != null) {
+	public PersistedResult updateOrCreate(DomainConfiguration domainConfiguration, ObmDomainUuid domain) throws DaoException, DomainNotFoundException {
+		if (domainConfigurationDao.get(domain) != null) {
 			domainConfigurationDao.update(domainConfiguration);
 			return PersistedResult.update();
 		} else {

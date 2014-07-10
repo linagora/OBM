@@ -32,7 +32,6 @@
 package fr.aliacom.obm.common.domain;
 
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.Set;
 
 import org.obm.sync.host.ObmHost;
@@ -46,15 +45,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 public class ObmDomain implements Serializable {
-
-	public static Comparator<ObmDomain> byUuidComparator() {
-		return new Comparator<ObmDomain>(){
-
-			@Override
-			public int compare(ObmDomain o1, ObmDomain o2) {
-				return o1.getUuid().getUUID().compareTo(o2.getUuid().getUUID());
-			}};
-	}
 	
 	public static class Builder {
 		

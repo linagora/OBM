@@ -33,9 +33,14 @@ package fr.aliacom.obm.common.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.junit.Test;
+
+import com.google.common.collect.Sets;
+
+import fr.aliacom.obm.common.domain.ObmDomainUuid.ObmDomainUuidComparator;
 
 
 public class ObmDomainUuidTest {
@@ -88,5 +93,18 @@ public class ObmDomainUuidTest {
 		UUID uuid = UUID.fromString("4e3fa926-bbba-48c4-84ab-272b7433c412");
 		ObmDomainUuid actual = ObmDomainUuid.of(uuid);
 		assertThat(actual.getUUID()).isEqualTo(uuid);
+	}
+	
+	@Test
+	public void comparatorByUuidOrder() {
+		TreeSet<ObmDomainUuid> set = Sets.newTreeSet(new ObmDomainUuidComparator());
+		set.add(ObmDomainUuid.of("ebdf06c0-4e90-4479-8c41-1d168dba195e"));
+		set.add(ObmDomainUuid.of("7c3fc3be-f5f2-45c8-b440-64a1831aff85"));
+		set.add(ObmDomainUuid.of("9375cfcb-f712-4231-aa0c-7ba373f60394"));
+		
+		assertThat(set).containsExactly(
+				ObmDomainUuid.of("9375cfcb-f712-4231-aa0c-7ba373f60394"),
+				ObmDomainUuid.of("ebdf06c0-4e90-4479-8c41-1d168dba195e"),
+				ObmDomainUuid.of("7c3fc3be-f5f2-45c8-b440-64a1831aff85"));
 	}
 }

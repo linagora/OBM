@@ -46,7 +46,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.linagora.scheduling.Task;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ArchiveDomainTask implements Task {
 
@@ -74,7 +74,7 @@ public class ArchiveDomainTask implements Task {
 			this.logFileService = logFileService;
 		}
 		
-		public ArchiveDomainTask create(ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
+		public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, ArchiveTreatmentRunId runId) {
 			return new ArchiveDomainTask(archiveService, 
 					deferredFileOutputStream(runId), 
 					domain, when, runId);
@@ -86,12 +86,12 @@ public class ArchiveDomainTask implements Task {
 	}
 	
 	private final ArchiveService archiveService;
-	private final ObmDomain domain;
+	private final ObmDomainUuid domain;
 	private final DateTime when;
 	private final ArchiveTreatmentRunId runId;
 	private final DeferredFileOutputStream deferredFileOutputStream;
 
-	protected ArchiveDomainTask(ArchiveService archiveService, DeferredFileOutputStream deferredFileOutputStream, ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
+	protected ArchiveDomainTask(ArchiveService archiveService, DeferredFileOutputStream deferredFileOutputStream, ObmDomainUuid domain, DateTime when, ArchiveTreatmentRunId runId) {
 		this.archiveService = archiveService;
 		this.domain = domain;
 		this.when = when;
@@ -106,10 +106,10 @@ public class ArchiveDomainTask implements Task {
 
 	@Override
 	public String taskName() {
-		return domain.getUuid().get();
+		return domain.get();
 	}
 	
-	public ObmDomain getDomain() {
+	public ObmDomainUuid getDomain() {
 		return domain;
 	}
 

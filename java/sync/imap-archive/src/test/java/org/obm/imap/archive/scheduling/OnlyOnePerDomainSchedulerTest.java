@@ -39,8 +39,6 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 
-import java.util.UUID;
-
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.assertj.core.data.MapEntry;
 import org.assertj.guava.api.Assertions;
@@ -63,7 +61,6 @@ import com.linagora.scheduling.Listener;
 import com.linagora.scheduling.Monitor;
 import com.linagora.scheduling.ScheduledTask.State;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class OnlyOnePerDomainSchedulerTest {
@@ -138,12 +135,12 @@ public class OnlyOnePerDomainSchedulerTest {
 	
 	@Test
 	public void scheduleShouldCallScheduler() throws Exception {
-		ObmDomain domain = dummyDomain();
+		ObmDomainUuid domain = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
 		DateTime when = DateTime.parse("2024-11-1T05:04");
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		expect(archiveService.archive(eq(domain), eq(runId), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId, when, domain.getUuid()));
+			.andReturn(archiveTreatment(runId, when, domain));
 		
 		expect(logFileService.getFile(runId))
 			.andReturn(temporaryFolder.newFile());
@@ -157,16 +154,16 @@ public class OnlyOnePerDomainSchedulerTest {
 
 	@Test
 	public void scheduleShouldCallSchedulerWhenPreviousDomainTaskIsDone() throws Exception {
-		ObmDomain domain = dummyDomain();
+		ObmDomainUuid domain = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
 		DateTime when1 = DateTime.parse("2024-11-1T05:04");
 		DateTime when2 = DateTime.parse("2024-11-5T05:04");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		
 		expect(archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId1, when1, domain.getUuid()));
+			.andReturn(archiveTreatment(runId1, when1, domain));
 		expect(archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId2, when2, domain.getUuid()));
+			.andReturn(archiveTreatment(runId2, when2, domain));
 		
 		expect(logFileService.getFile(runId1))
 			.andReturn(temporaryFolder.newFile());
@@ -184,16 +181,16 @@ public class OnlyOnePerDomainSchedulerTest {
 	
 	@Test
 	public void scheduleShouldEnqueueWhenTaskForDomainAlreadyScheduled() throws Exception {
-		ObmDomain domain = dummyDomain();
+		ObmDomainUuid domain = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
 		DateTime when = DateTime.parse("2024-11-1T05:04");
 		DateTime whenToEnqueue = DateTime.parse("2024-11-2T05:04");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		
 		expect(archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId1, when, domain.getUuid()));
+			.andReturn(archiveTreatment(runId1, when, domain));
 		expect(archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId2, whenToEnqueue, domain.getUuid()));
+			.andReturn(archiveTreatment(runId2, whenToEnqueue, domain));
 		
 		expect(logFileService.getFile(runId1))
 			.andReturn(temporaryFolder.newFile());
@@ -211,7 +208,7 @@ public class OnlyOnePerDomainSchedulerTest {
 	
 	@Test
 	public void scheduleShouldEnqueueRespectingOrderWhenTaskForDomainAlreadyRunning() throws Exception {
-		ObmDomain domain = dummyDomain();
+		ObmDomainUuid domain = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
 		DateTime when = DateTime.parse("2024-11-1T00:00");
 		DateTime whenToEnqueueAfter = DateTime.parse("2024-11-9T00:00");
 		DateTime whenToEnqueueBefore = DateTime.parse("2024-11-5T00:00");
@@ -220,11 +217,11 @@ public class OnlyOnePerDomainSchedulerTest {
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
 		
 		expect(archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId1, when, domain.getUuid()));
+			.andReturn(archiveTreatment(runId1, when, domain));
 		expect(archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId2, whenToEnqueueAfter, domain.getUuid()));
+			.andReturn(archiveTreatment(runId2, whenToEnqueueAfter, domain));
 		expect(archiveService.archive(eq(domain), eq(runId3), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId3, whenToEnqueueBefore, domain.getUuid()));
+			.andReturn(archiveTreatment(runId3, whenToEnqueueBefore, domain));
 		
 		expect(logFileService.getFile(runId1))
 			.andReturn(temporaryFolder.newFile());
@@ -265,17 +262,17 @@ public class OnlyOnePerDomainSchedulerTest {
 	
 	@Test
 	public void scheduleDifferentDomainsShouldCallSchedulerForBoth() throws Exception {
-		ObmDomain domain1 = dummyDomain();
-		ObmDomain domain2 = dummyDomain();
+		ObmDomainUuid domain1 = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
+		ObmDomainUuid domain2 = ObmDomainUuid.of("b360ac79-a928-4655-a173-59d2c4666cad");
 		DateTime when1 = DateTime.parse("2024-11-1T05:04");
 		DateTime when2 = DateTime.parse("2024-11-2T05:04");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		
 		expect(archiveService.archive(eq(domain1), eq(runId1), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId1, when1, domain1.getUuid()));
+			.andReturn(archiveTreatment(runId1, when1, domain1));
 		expect(archiveService.archive(eq(domain2), eq(runId2), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId2, when2, domain2.getUuid()));
+			.andReturn(archiveTreatment(runId2, when2, domain2));
 		
 		expect(logFileService.getFile(runId1))
 			.andReturn(temporaryFolder.newFile());
@@ -315,8 +312,8 @@ public class OnlyOnePerDomainSchedulerTest {
 	
 	@Test
 	public void scheduleDifferentDomainsShouldCallSchedulerForBothThenEnqueueOthers() throws Exception {
-		ObmDomain domain1 = dummyDomain();
-		ObmDomain domain2 = dummyDomain();
+		ObmDomainUuid domain1 = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
+		ObmDomainUuid domain2 = ObmDomainUuid.of("b360ac79-a928-4655-a173-59d2c4666cad");
 		DateTime when1 = DateTime.parse("2024-11-1T05:04");
 		DateTime when2 = DateTime.parse("2024-11-2T05:04");
 		DateTime when1ToEnqueue = DateTime.parse("2024-11-3T05:04");
@@ -327,13 +324,13 @@ public class OnlyOnePerDomainSchedulerTest {
 		ArchiveTreatmentRunId runId4 = ArchiveTreatmentRunId.from("b1226053-265d-4b0e-a524-e37b1dfcb2e9");
 		
 		expect(archiveService.archive(eq(domain1), eq(runId1), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId1, when1, domain1.getUuid()));
+			.andReturn(archiveTreatment(runId1, when1, domain1));
 		expect(archiveService.archive(eq(domain2), eq(runId2), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId2, when2, domain2.getUuid()));
+			.andReturn(archiveTreatment(runId2, when2, domain2));
 		expect(archiveService.archive(eq(domain1), eq(runId3), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId3, when1ToEnqueue, domain1.getUuid()));
+			.andReturn(archiveTreatment(runId3, when1ToEnqueue, domain1));
 		expect(archiveService.archive(eq(domain2), eq(runId4), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId4, when2ToEnqueue, domain2.getUuid()));
+			.andReturn(archiveTreatment(runId4, when2ToEnqueue, domain2));
 		
 		expect(logFileService.getFile(runId1))
 			.andReturn(temporaryFolder.newFile());
@@ -407,7 +404,7 @@ public class OnlyOnePerDomainSchedulerTest {
 	
 	@Test
 	public void scheduleShouldRescheduleAllWhenTaskForDomainAlreadyScheduled() throws Exception {
-		ObmDomain domain = dummyDomain();
+		ObmDomainUuid domain = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("66625183-d0f6-4275-8805-09093ae2787f");
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("1b58c33f-ecfc-48b4-bdcc-2cd57587364d");
@@ -434,14 +431,6 @@ public class OnlyOnePerDomainSchedulerTest {
 			MapEntry.entry(domain, expectedMiddle),
 			MapEntry.entry(domain, expectedLast));
 		mocksControl.verify();
-	}
-	
-	private ObmDomain dummyDomain() {
-		return ObmDomain.builder()
-				.id(4)
-				.uuid(ObmDomainUuid.of(UUID.randomUUID()))
-				.name("domain.test")
-				.build();
 	}
 	
 	private ArchiveTreatment archiveTreatment(ArchiveTreatmentRunId runId, DateTime start, ObmDomainUuid domainId) {

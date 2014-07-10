@@ -92,7 +92,7 @@ public class TreatmentsResource {
 	
 	@POST
 	public Response startArchiving() {
-		ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain, dateTimeProvider.now());
+		ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain.getUuid(), dateTimeProvider.now());
 		return Response.ok(runId).build();
 	}
 	

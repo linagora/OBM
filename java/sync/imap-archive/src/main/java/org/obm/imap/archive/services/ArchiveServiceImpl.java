@@ -65,7 +65,7 @@ import com.google.inject.name.Named;
 import com.linagora.scheduling.DateTimeProvider;
 import com.linagora.scheduling.Task;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
 public class ArchiveServiceImpl implements ArchiveService {
@@ -101,14 +101,14 @@ public class ArchiveServiceImpl implements ArchiveService {
 	
 	@Override
 	@Transactional
-	public ArchiveTreatment archive(ObmDomain domain, ArchiveTreatmentRunId runId, DeferredFileOutputStream deferredFileOutputStream) {
+	public ArchiveTreatment archive(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DeferredFileOutputStream deferredFileOutputStream) {
 		try {
 			checkConfiguration(domain);
 			DateTime start = dateTimeProvider.now();
 			
 			ArchiveTreatment archiveTreatment = ArchiveTreatment.builder()
 					.runId(runId)
-					.domainId(domain.getUuid())
+					.domainId(domain)
 					.archiveStatus(ArchiveStatus.RUNNING)
 					.start(start)
 					.build();
@@ -129,13 +129,13 @@ public class ArchiveServiceImpl implements ArchiveService {
 		}
 	}
 
-	private DomainConfiguration checkConfiguration(ObmDomain domain) throws DaoException {
-		DomainConfiguration domainConfiguration = domainConfigurationDao.get(domain.getUuid());
+	private DomainConfiguration checkConfiguration(ObmDomainUuid domain) throws DaoException {
+		DomainConfiguration domainConfiguration = domainConfigurationDao.get(domain);
 		if (domainConfiguration == null) {
-			throw new DomainConfigurationException("The IMAP Archive configuration is not defined for the domain: '" + domain.getName() + "'");
+			throw new DomainConfigurationException("The IMAP Archive configuration is not defined for the domain: '" + domain.get() + "'");
 		}
 		if (!domainConfiguration.isEnabled()) {
-			throw new DomainConfigurationException("The IMAP Archive service is disable for the domain: '" + domain.getName() + "'");
+			throw new DomainConfigurationException("The IMAP Archive service is disable for the domain: '" + domain.get() + "'");
 		}
 		return domainConfiguration;
 	}

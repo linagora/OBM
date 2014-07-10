@@ -40,7 +40,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
 public class ArchiveSchedulingService {
@@ -57,7 +57,7 @@ public class ArchiveSchedulingService {
 	}
 	
 	@Transactional
-	public ArchiveTreatmentRunId schedule(ObmDomain domain, DateTime when) {
+	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when) {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
 		onlyOnePerDomainScheduler.scheduleDomainArchiving(domain, when, runId);
 		return runId;

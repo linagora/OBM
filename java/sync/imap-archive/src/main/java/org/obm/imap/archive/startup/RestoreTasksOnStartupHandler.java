@@ -39,7 +39,6 @@ import org.obm.server.LifeCycleHandler;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
@@ -47,11 +46,7 @@ public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 
 	public static final DateTime WHEN = DateTime.parse("2024-11-1T05:04");
 	public static final ArchiveTreatmentRunId RUN_ID = ArchiveTreatmentRunId.from("ee855151-f0a8-4182-a3e5-7469141526b4");
-	public static final ObmDomain DOMAIN = ObmDomain.builder()
-			.id(6)
-			.uuid(ObmDomainUuid.of("67ecfad0-a684-47ed-aec5-f2c303f90467"))
-			.name("test domain")
-			.build();
+	public static final ObmDomainUuid DOMAIN = ObmDomainUuid.of("67ecfad0-a684-47ed-aec5-f2c303f90467");
 	
 	private final OnlyOnePerDomainScheduler scheduler;
 

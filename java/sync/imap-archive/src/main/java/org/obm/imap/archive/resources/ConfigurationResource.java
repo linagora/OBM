@@ -82,7 +82,7 @@ public class ConfigurationResource {
 	@Transactional
 	public Response update(DomainConfigurationDto domainConfigurationDto) throws DaoException {
 		try {
-			PersistedResult persistedResult = domainConfigurationService.updateOrCreate(DomainConfiguration.from(domainConfigurationDto), domain);
+			PersistedResult persistedResult = domainConfigurationService.updateOrCreate(DomainConfiguration.from(domainConfigurationDto), domain.getUuid());
 			if (persistedResult.isUpdate()) {
 				return Response.noContent().build();
 			} else {

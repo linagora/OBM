@@ -37,11 +37,11 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public interface ArchiveService {
 
-	ArchiveTreatment archive(ObmDomain domain, ArchiveTreatmentRunId runId, DeferredFileOutputStream deferredFileOutputStream);
+	ArchiveTreatment archive(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DeferredFileOutputStream deferredFileOutputStream);
 	
 	ChunkedOutput<String> runningProcessLogs(ArchiveTreatmentRunId runId);
 }

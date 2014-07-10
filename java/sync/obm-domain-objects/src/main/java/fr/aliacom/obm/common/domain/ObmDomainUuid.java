@@ -33,6 +33,7 @@
 package fr.aliacom.obm.common.domain;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.UUID;
 
 import com.google.common.base.Objects;
@@ -89,4 +90,11 @@ public class ObmDomainUuid implements Serializable {
 		return uuid;
 	}
 
+	public static class ObmDomainUuidComparator implements Comparator<ObmDomainUuid> {
+
+		@Override
+		public int compare(ObmDomainUuid o1, ObmDomainUuid o2) {
+			return o1.getUUID().compareTo(o2.getUUID());
+		}
+	}
 }

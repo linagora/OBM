@@ -57,7 +57,6 @@ import pl.wkr.fluentrule.api.FluentExpectedException;
 
 import com.linagora.scheduling.DateTimeProvider;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 
@@ -90,47 +89,39 @@ public class ArchiveServiceImplTest {
 	@Test
 	public void archiveShouldThrowWhenNoDomainFound() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
-		ObmDomain domain = ObmDomain.builder()
-				.uuid(domainId)
-				.name("name")
-				.build();
 		expect(domainConfigurationDao.get(domainId))
 			.andReturn(null);
 		
-		expectedException.expect(DomainConfigurationException.class).hasMessage("The IMAP Archive configuration is not defined for the domain: 'name'");
+		expectedException
+			.expect(DomainConfigurationException.class)
+			.hasMessage("The IMAP Archive configuration is not defined for the domain: 'fc2f915e-9df4-4560-b141-7b4c7ddecdd6'");
 		
 		control.replay();
-		archiveService.archive(domain, ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), null);
+		archiveService.archive(domainId, ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), null);
 		control.verify();
 	}
 	
 	@Test
 	public void archiveShouldThrowWhenConfigurationDisable() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
-		ObmDomain domain = ObmDomain.builder()
-				.uuid(domainId)
-				.name("name")
-				.build();
 		expect(domainConfigurationDao.get(domainId))
 			.andReturn(DomainConfiguration.builder()
 					.domainId(domainId)
 					.enabled(false)
 					.build());
 		
-		expectedException.expect(DomainConfigurationException.class).hasMessage("The IMAP Archive service is disable for the domain: 'name'");
+		expectedException
+			.expect(DomainConfigurationException.class)
+			.hasMessage("The IMAP Archive service is disable for the domain: 'fc2f915e-9df4-4560-b141-7b4c7ddecdd6'");
 		
 		control.replay();
-		archiveService.archive(domain, ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), null);
+		archiveService.archive(domainId, ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), null);
 		control.verify();
 	}
 	
 	@Test
 	public void archiveShouldReturnSuccessAndWrite2TimesWhenConfigurationEnableAndWaitingFor2Seconds() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
-		ObmDomain domain = ObmDomain.builder()
-				.uuid(domainId)
-				.name("name")
-				.build();
 		expect(domainConfigurationDao.get(domainId))
 			.andReturn(DomainConfiguration.builder()
 					.domainId(domainId)
@@ -157,7 +148,7 @@ public class ArchiveServiceImplTest {
 		expectLastCall();
 		
 		control.replay();
-		ArchiveTreatment archiveTreatment = archiveService.archive(domain, runId, null);
+		ArchiveTreatment archiveTreatment = archiveService.archive(domainId, runId, null);
 		int twoSeconds = 2000;
 		Thread.sleep(twoSeconds);
 		control.verify();

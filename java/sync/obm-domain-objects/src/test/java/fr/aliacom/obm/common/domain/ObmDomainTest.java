@@ -31,13 +31,7 @@ package fr.aliacom.obm.common.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.TreeSet;
-
 import org.junit.Test;
-
-import com.google.common.collect.Sets;
-
-import fr.aliacom.obm.common.domain.ObmDomain.Builder;
 
 
 public class ObmDomainTest {
@@ -121,19 +115,5 @@ public class ObmDomainTest {
 		ObmDomain domain = ObmDomain.builder().name("name").global(false).build();
 		
 		assertThat(domain.isGlobal()).isFalse();
-	}
-	
-	@Test
-	public void comparatorByUuidOrder() {
-		TreeSet<ObmDomain> set = Sets.newTreeSet(ObmDomain.byUuidComparator());
-		Builder builder = ObmDomain.builder();
-		set.add(builder.uuid(ObmDomainUuid.of("ebdf06c0-4e90-4479-8c41-1d168dba195e")).build());
-		set.add(builder.uuid(ObmDomainUuid.of("7c3fc3be-f5f2-45c8-b440-64a1831aff85")).build());
-		set.add(builder.uuid(ObmDomainUuid.of("9375cfcb-f712-4231-aa0c-7ba373f60394")).build());
-		
-		assertThat(set).extracting("uuid").containsExactly(
-				ObmDomainUuid.of("9375cfcb-f712-4231-aa0c-7ba373f60394"),
-				ObmDomainUuid.of("ebdf06c0-4e90-4479-8c41-1d168dba195e"),
-				ObmDomainUuid.of("7c3fc3be-f5f2-45c8-b440-64a1831aff85"));
 	}
 }

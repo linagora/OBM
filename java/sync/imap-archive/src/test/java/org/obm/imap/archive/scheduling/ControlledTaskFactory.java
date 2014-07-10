@@ -39,7 +39,7 @@ import org.obm.imap.archive.services.LogFileService;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.SettableFuture;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ControlledTaskFactory extends ArchiveDomainTask.Factory {
 
@@ -51,7 +51,7 @@ public class ControlledTaskFactory extends ArchiveDomainTask.Factory {
 	}
 
 	@Override
-	public RemotelyControlledTask create(ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
+	public RemotelyControlledTask create(ObmDomainUuid domain, DateTime when, ArchiveTreatmentRunId runId) {
 		return new RemotelyControlledTask(archiveService, domain, when, runId);
 	}
 
@@ -71,7 +71,7 @@ public class ControlledTaskFactory extends ArchiveDomainTask.Factory {
 		
 		private final Terminator terminator;
 	
-		RemotelyControlledTask(ArchiveService archiveService, ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
+		RemotelyControlledTask(ArchiveService archiveService, ObmDomainUuid domain, DateTime when, ArchiveTreatmentRunId runId) {
 			super(archiveService, deferredFileOutputStream(runId), domain, when, runId);
 			terminator = new Terminator();
 		}
