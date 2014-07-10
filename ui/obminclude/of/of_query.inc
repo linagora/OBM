@@ -1923,7 +1923,7 @@ function run_query_user_pref_insert($user_id, $option, $value) {
     userobmpref_value)
     VALUES (
       $user_id,
-      '".$obm_q->escape($option).".',
+      '".$obm_q->escape($option)."',
       '".$obm_q->escape($value)."')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_user_pref_insert()');
