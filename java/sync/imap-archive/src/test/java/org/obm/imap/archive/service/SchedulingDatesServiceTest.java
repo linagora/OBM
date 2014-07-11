@@ -41,10 +41,10 @@ import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
-import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
+import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.sync.date.DateProvider;
 
@@ -301,5 +301,61 @@ public class SchedulingDatesServiceTest {
 		
 		DateTime nextTreatmentDate = schedulingDatesService.nextTreatmentDate(build);
 		assertThat(nextTreatmentDate).isEqualTo(DateTime.parse("2014-07-31T23:59:00.000Z"));
+	}
+	
+	@Test
+	public void higherBoundaryShouldBePreviousDayWhenDailyRepeatKind() {
+		DateTime treatmentDate = DateTime.parse("2014-06-18T16:01:00.000Z");
+		DateTime higherBoundary = schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.DAILY);
+		assertThat(higherBoundary).isEqualTo(DateTime.parse("2014-06-17T23:59:59.999Z"));
+	}
+	
+	@Test
+	public void higherBoundaryShouldBePreviousWeekWhenWeeklyRepeatKind() {
+		DateTime treatmentDate = DateTime.parse("2014-06-18T16:01:00.000Z");
+		DateTime higherBoundary = schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.WEEKLY);
+		assertThat(higherBoundary).isEqualTo(DateTime.parse("2014-06-11T23:59:59.999Z"));
+	}
+	
+	@Test
+	public void higherBoundaryShouldBePreviousMonthWhenMonthlyRepeatKind() {
+		DateTime treatmentDate = DateTime.parse("2014-06-18T16:01:00.000Z");
+		DateTime higherBoundary = schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.MONTHLY);
+		assertThat(higherBoundary).isEqualTo(DateTime.parse("2014-05-18T23:59:59.999Z"));
+	}
+	
+	@Test
+	public void higherBoundaryShouldBePreviousYearWhenYearlyRepeatKind() {
+		DateTime treatmentDate = DateTime.parse("2014-06-18T16:01:00.000Z");
+		DateTime higherBoundary = schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.YEARLY);
+		assertThat(higherBoundary).isEqualTo(DateTime.parse("2013-06-18T23:59:59.999Z"));
+	}
+	
+	@Test
+	public void LowerBoundaryShouldBe2DaysBeforeWhenDailyRepeatKind() {
+		DateTime treatmentDate = DateTime.parse("2014-06-18T16:01:00.000Z");
+		DateTime higherBoundary = schedulingDatesService.lowerBoundary(treatmentDate, RepeatKind.DAILY);
+		assertThat(higherBoundary).isEqualTo(DateTime.parse("2014-06-16T00:00:00.000Z"));
+	}
+	
+	@Test
+	public void LowerBoundaryShouldBe2WeeksBeforeWhenWeeklyRepeatKind() {
+		DateTime treatmentDate = DateTime.parse("2014-06-18T16:01:00.000Z");
+		DateTime higherBoundary = schedulingDatesService.lowerBoundary(treatmentDate, RepeatKind.WEEKLY);
+		assertThat(higherBoundary).isEqualTo(DateTime.parse("2014-06-04T00:00:00.000Z"));
+	}
+	
+	@Test
+	public void LowerBoundaryShouldBe2MonthBeforeWhenMonthlyRepeatKind() {
+		DateTime treatmentDate = DateTime.parse("2014-06-18T16:01:00.000Z");
+		DateTime higherBoundary = schedulingDatesService.lowerBoundary(treatmentDate, RepeatKind.MONTHLY);
+		assertThat(higherBoundary).isEqualTo(DateTime.parse("2014-04-18T00:00:00.000Z"));
+	}
+	
+	@Test
+	public void LowerBoundaryShouldBe2YearBeforeWhenYearlyRepeatKind() {
+		DateTime treatmentDate = DateTime.parse("2014-06-18T16:01:00.000Z");
+		DateTime higherBoundary = schedulingDatesService.lowerBoundary(treatmentDate, RepeatKind.YEARLY);
+		assertThat(higherBoundary).isEqualTo(DateTime.parse("2012-06-18T00:00:00.000Z"));
 	}
 }

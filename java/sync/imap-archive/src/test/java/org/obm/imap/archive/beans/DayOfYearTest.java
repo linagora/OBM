@@ -34,7 +34,6 @@ package org.obm.imap.archive.beans;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.obm.imap.archive.beans.DayOfYear;
 
 
 public class DayOfYearTest {

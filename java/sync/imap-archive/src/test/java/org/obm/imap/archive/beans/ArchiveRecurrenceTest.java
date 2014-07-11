@@ -34,10 +34,6 @@ package org.obm.imap.archive.beans;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.obm.imap.archive.beans.ArchiveRecurrence;
-import org.obm.imap.archive.beans.DayOfMonth;
-import org.obm.imap.archive.beans.DayOfYear;
-import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 
 
 public class ArchiveRecurrenceTest {

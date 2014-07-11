@@ -32,7 +32,6 @@
 package org.obm.imap.archive.beans;
 
 import org.joda.time.LocalTime;
-import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 
 import com.google.common.base.Objects;

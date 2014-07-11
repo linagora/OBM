@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.beans;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 public class DayOfYear {
 

@@ -38,11 +38,11 @@ import java.util.UUID;
 import org.joda.time.LocalTime;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
-import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;

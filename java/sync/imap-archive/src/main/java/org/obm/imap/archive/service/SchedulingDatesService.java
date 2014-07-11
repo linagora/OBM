@@ -36,6 +36,7 @@ import javax.inject.Inject;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.sync.date.DateProvider;
 
@@ -141,5 +142,15 @@ public class SchedulingDatesService {
 		}
 		return dayOfYear
 				.plusYears(1);
+	}
+	
+	public DateTime higherBoundary(DateTime treatmentDate, RepeatKind repeatKind) {
+		return treatmentDate.minus(RepeatKind.toPeriod(repeatKind, 1))
+				.withTime(23, 59, 59, 999);
+	}
+	
+	public DateTime lowerBoundary(DateTime treatmentDate, RepeatKind repeatKind) {
+		return treatmentDate.minus(RepeatKind.toPeriod(repeatKind, 2))
+				.withTime(0, 0, 0, 0);
 	}
 }

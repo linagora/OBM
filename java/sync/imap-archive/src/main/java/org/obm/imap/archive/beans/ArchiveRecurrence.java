@@ -36,8 +36,6 @@ import com.google.common.base.Preconditions;
 
 public class ArchiveRecurrence {
 
-	public enum RepeatKind {DAILY, WEEKLY, MONTHLY, YEARLY}
-	
 	public static Builder builder() {
 		return new Builder();
 	}

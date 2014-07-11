@@ -35,7 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.joda.time.LocalTime;
 import org.junit.Test;
-import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;

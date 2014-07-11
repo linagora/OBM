@@ -51,10 +51,10 @@ import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
-import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
+import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
