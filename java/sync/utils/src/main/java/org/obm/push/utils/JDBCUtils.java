@@ -41,6 +41,8 @@ import java.util.Date;
 
 import javax.transaction.UserTransaction;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +53,8 @@ public class JDBCUtils {
 
 	private final static Logger logger = LoggerFactory
 			.getLogger(JDBCUtils.class);
+	
+	public static final Timestamp DEFAULT_TIMESTAMP = new Timestamp(0);
 
 	public static final void rollback(Connection con) {
 		if (con != null) {
@@ -146,11 +150,8 @@ public class JDBCUtils {
 		}
 	}
 
-	public static Date getDate(ResultSet rs, String fieldName)
-			throws SQLException {
-		Preconditions.checkNotNull(rs);
-		Preconditions.checkNotNull(fieldName);
-		Timestamp timestamp = rs.getTimestamp(fieldName);
+	public static Date getDate(ResultSet rs, String fieldName) throws SQLException {
+		Timestamp timestamp = getTimestamp(rs, fieldName);
 		if (timestamp != null) {
 			return new Date(timestamp.getTime());
 		} else {
@@ -170,6 +171,22 @@ public class JDBCUtils {
 		}
 	}
 
+	public static DateTime getDateTime(ResultSet rs, String fieldName, DateTimeZone dateTimeZone) throws SQLException {
+		Preconditions.checkNotNull(dateTimeZone);
+		Timestamp timestamp = getTimestamp(rs, fieldName);
+		if (timestamp != null) {
+			return new DateTime(timestamp).withZone(dateTimeZone);
+		} else {
+			return null;
+		}
+	}
+
+	private static Timestamp getTimestamp(ResultSet rs, String fieldName) throws SQLException {
+		Preconditions.checkNotNull(rs);
+		Preconditions.checkNotNull(fieldName);
+		return rs.getTimestamp(fieldName);
+	}
+
 	public static java.sql.Date getDateWithoutTime(Date lastSync) {
 		return new java.sql.Date(lastSync.getTime());
 	}
@@ -187,5 +204,12 @@ public class JDBCUtils {
 		int value = rs.getInt(fieldName);
 
 		return !rs.wasNull() ? value : null;
+	}
+	
+	public static Timestamp toTimestamp(DateTime dateTime) {
+		if (dateTime == null) {
+			return DEFAULT_TIMESTAMP;
+		}
+		return new Timestamp(dateTime.getMillis());
 	}
 }

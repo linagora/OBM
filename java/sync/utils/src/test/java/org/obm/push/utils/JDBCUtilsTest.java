@@ -31,19 +31,22 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 
@@ -253,7 +256,7 @@ public class JDBCUtilsTest {
 	}
 
 	@Test(expected=RuntimeException.class)
-	public void throwRuntimeIfNotNullWhenCatchedExceptionKeepCause() throws Throwable {
+	public void throwRuntimeIfNotNullWhenCatchedExceptionKeepCause() {
 		try {
 			JDBCUtils.throwRuntimeIfNotNull(new SQLException());
 		} catch (Throwable e) {
@@ -273,7 +276,7 @@ public class JDBCUtilsTest {
 	}
 
 	@Test(expected=RuntimeException.class)
-	public void throwFirstNotNullWhenLast() throws Throwable {
+	public void throwFirstNotNullWhenLast() {
 		try {
 			JDBCUtils.throwFirstNotNull(null, null, new SQLException());
 		} catch (Throwable e) {
@@ -283,7 +286,7 @@ public class JDBCUtilsTest {
 	}
 
 	@Test(expected=RuntimeException.class)
-	public void throwFirstNotNullWhenMany() throws Throwable {
+	public void throwFirstNotNullWhenMany() {
 		try {
 			JDBCUtils.throwFirstNotNull(new IOException(), new SQLException());
 		} catch (Throwable e) {
@@ -328,4 +331,61 @@ public class JDBCUtilsTest {
 		JDBCUtils.getInteger(createMock(ResultSet.class), null);
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void getDateTimeShouldThrowWhenNoResultSet() throws Exception {
+		JDBCUtils.getDateTime(null, null, null);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void getDateTimeShouldThrowWhenNoFieldName() throws Exception {
+		JDBCUtils.getDateTime(createMock(ResultSet.class), null, null);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void getDateTimeShouldThrowWhenNoDateTimeZone() throws Exception {
+		JDBCUtils.getDateTime(createMock(ResultSet.class), "field_name", null);
+	}
+
+	@Test
+	public void getDateTimeShouldReturnNullWhenNoSuchFieldName() throws Exception {
+		ResultSet resultSet = createMock(ResultSet.class);
+		String fieldName = "field_name";
+		expect(resultSet.getTimestamp(fieldName))
+			.andReturn(null);
+		replay(resultSet);
+		
+		DateTime dateTime = JDBCUtils.getDateTime(resultSet, fieldName, DateTimeZone.UTC);
+		
+		verify(resultSet);
+		assertThat(dateTime).isNull();
+	}
+
+	@Test
+	public void getDateTimeShouldReturnDateTimeWhenEveryThingIsOk() throws Exception {
+		DateTime expectedDateTime = DateTime.parse("2014-07-15T15:55:00.000Z");
+		Timestamp timestamp = new Timestamp(expectedDateTime.getMillis());
+		ResultSet resultSet = createMock(ResultSet.class);
+		String fieldName = "field_name";
+		expect(resultSet.getTimestamp(fieldName))
+			.andReturn(timestamp);
+		replay(resultSet);
+		
+		DateTime dateTime = JDBCUtils.getDateTime(resultSet, fieldName, DateTimeZone.UTC);
+		
+		verify(resultSet);
+		assertThat(dateTime).isEqualTo(expectedDateTime);
+	}
+	
+	@Test
+	public void toTimestampShouldReturnDefaultValueWhenNoDateTimeProvided() {
+		assertThat(JDBCUtils.toTimestamp(null)).isEqualTo(JDBCUtils.DEFAULT_TIMESTAMP);
+	}
+	
+	@Test
+	public void toTimestampShouldReturnTimestampWhenDateTimeProvided() {
+		Timestamp expectedTimestamp = Timestamp.valueOf("2014-07-15 15:55:00");
+		DateTime dateTime = new DateTime(expectedTimestamp.getTime());
+		
+		assertThat(JDBCUtils.toTimestamp(dateTime)).isEqualTo(expectedTimestamp);
+	}
 }
