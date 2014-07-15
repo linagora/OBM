@@ -140,8 +140,9 @@ public class ConfigurationResourceTest {
 						"mail_archive_day_of_month", 
 						"mail_archive_day_of_year", 
 						"mail_archive_hour", 
-						"mail_archive_minute")
-						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
+						"mail_archive_minute",
+						"mail_archive_excluded_folder")
+						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
 						.build());
 		server.start();
 		
@@ -231,8 +232,9 @@ public class ConfigurationResourceTest {
 						"mail_archive_day_of_month", 
 						"mail_archive_day_of_year", 
 						"mail_archive_hour", 
-						"mail_archive_minute")
-						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
+						"mail_archive_minute",
+						"mail_archive_excluded_folder")
+						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
 						.build());
 		expectations.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
 		server.start();
@@ -245,6 +247,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(100).getDayOfYear();
 		domainConfigurationDto.hour = 11;
 		domainConfigurationDto.minute = 32;
+		domainConfigurationDto.excludedFolder = "anotherExcluded";
 		
 		given()
 			.port(server.getHttpPort())
@@ -267,7 +270,8 @@ public class ConfigurationResourceTest {
 			.contentType(ContentType.JSON)
 			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
 				"enabled", equalTo(true),
-				"dayOfWeek", equalTo(DayOfWeek.WEDNESDAY.getSpecificationValue()))
+				"dayOfWeek", equalTo(DayOfWeek.WEDNESDAY.getSpecificationValue()),
+				"excludedFolder", equalTo("anotherExcluded"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");

@@ -72,13 +72,18 @@ if ($status[0] != 1) {
   $display['msg'] .= display_err_msg("$status[1]");
 } else {
   if ($action == 'update') {
-    $ret = run_query_imap_archive_update($params);
-    if ($ret[0] == 1) {
-      $display['msg'] .= display_ok_msg($l_update_ok);
+    if (!check_configuration($params)) {
+      $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
+      $action = 'detailupdate';
     } else {
-      $display['msg'] .= display_err_msg($l_update_error);
+      $ret = run_query_imap_archive_update($params);
+      if ($ret[0] == 1) {
+        $display['msg'] .= display_ok_msg($l_update_ok);
+      } else {
+        $display['msg'] .= display_err_msg($l_update_error);
+      }
+      $action = 'detailconsult';
     }
-    $action = 'detailconsult';
   } else if ($action == 'next_treatment_date') {
     $configuration = (Object) $params['configuration'];
     $status = calculate_next_treatment_date_from_imap_archive_service($configuration);

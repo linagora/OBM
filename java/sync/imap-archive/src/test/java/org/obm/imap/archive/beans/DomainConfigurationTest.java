@@ -62,8 +62,54 @@ public class DomainConfigurationTest {
 		DomainConfiguration.builder().enabled(true).domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
 	}
 	
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThrowWhenExcludeFolderContainsSlash() {
+		DomainConfiguration.builder()
+			.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
+			.enabled(true)
+			.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+			.excludedFolder("exclud/ed")
+			.build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThrowWhenExcludeFolderContainsAt() {
+		DomainConfiguration.builder()
+			.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
+			.enabled(true)
+			.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+			.excludedFolder("ex@cluded")
+			.build();
+	}
+	
 	@Test
 	public void builderShouldBuildConfigurationWhenEnabledIsTrueAndRequiredFieldsAreProvided() {
+		DomainConfiguration configuration = 
+				DomainConfiguration.builder()
+					.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
+					.enabled(true)
+					.schedulingConfiguration(SchedulingConfiguration.builder()
+							.recurrence(ArchiveRecurrence.daily())
+							.time(LocalTime.parse("13:23"))
+							.build())
+					.excludedFolder("excluded")
+					.build();
+		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
+		assertThat(configuration.isEnabled()).isTrue();
+		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
+		assertThat(configuration.getHour()).isEqualTo(13);
+		assertThat(configuration.getMinute()).isEqualTo(23);
+		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
+	}
+	
+	@Test
+	public void builderShouldBuildConfigurationWhenExcludedIsNotProvided() {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
 					.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
@@ -78,6 +124,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
 		assertThat(configuration.getHour()).isEqualTo(13);
 		assertThat(configuration.getMinute()).isEqualTo(23);
+		assertThat(configuration.getExcludedFolder()).isNull();
 	}
 	
 	@Test
@@ -132,6 +179,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getHour()).isEqualTo(0);
 		assertThat(configuration.getMinute()).isEqualTo(0);
 		assertThat(configuration.getSchedulingConfiguration()).isEqualTo(schedulingConfiguration);
+		assertThat(configuration.getExcludedFolder()).isNull();
 	}
 	
 	@Test
@@ -154,6 +202,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.dayOfYear = expectedDayOfYear.getDayOfYear();
 		domainConfigurationDto.hour = expectedHour;
 		domainConfigurationDto.minute = expectedMinute;
+		domainConfigurationDto.excludedFolder = "excluded";
 		
 		DomainConfiguration configuration = DomainConfiguration.from(domainConfigurationDto);
 		assertThat(configuration.isEnabled()).isEqualTo(expectedEnabled);
@@ -164,5 +213,6 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getDomainId()).isEqualTo(expectedDomainId);
 		assertThat(configuration.getHour()).isEqualTo(expectedHour);
 		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
+		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
 	}
 }

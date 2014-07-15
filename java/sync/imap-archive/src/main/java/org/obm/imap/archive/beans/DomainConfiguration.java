@@ -59,6 +59,7 @@ public class DomainConfiguration {
 							.build())
 						.time(LocalTime.parse(configuration.hour + ":" + configuration.minute))
 						.build())
+				.excludedFolder(configuration.excludedFolder)
 				.build();
 	}
 	
@@ -71,6 +72,7 @@ public class DomainConfiguration {
 		private ObmDomainUuid domainId;
 		private Boolean enabled;
 		private SchedulingConfiguration schedulingConfiguration;
+		private String excludedFolder;
 		
 		private Builder() {
 		}
@@ -91,24 +93,35 @@ public class DomainConfiguration {
 			return this;
 		}
 		
+		public Builder excludedFolder(String excludedFolder) {
+			this.excludedFolder = excludedFolder;
+			return this;
+		}
+		
 		public DomainConfiguration build() {
 			Preconditions.checkState(domainId != null);
 			Preconditions.checkState(enabled != null);
 			if (enabled) {
 				Preconditions.checkState(schedulingConfiguration != null);
 			}
-			return new DomainConfiguration(domainId, enabled, schedulingConfiguration);
+			if (excludedFolder != null) {
+				Preconditions.checkState(excludedFolder.contains("/") == false);
+				Preconditions.checkState(excludedFolder.contains("@") == false);
+			}
+			return new DomainConfiguration(domainId, enabled, schedulingConfiguration, excludedFolder);
 		}
 	}
 	
 	private final ObmDomainUuid domainId;
 	private final boolean enabled;
 	private final SchedulingConfiguration schedulingConfiguration;
+	private final String excludedFolder;
 
-	private DomainConfiguration(ObmDomainUuid  domainId, boolean enabled, SchedulingConfiguration schedulingConfiguration) {
+	private DomainConfiguration(ObmDomainUuid  domainId, boolean enabled, SchedulingConfiguration schedulingConfiguration, String excludedFolder) {
 		this.domainId = domainId;
 		this.enabled = enabled;
 		this.schedulingConfiguration = schedulingConfiguration;
+		this.excludedFolder = excludedFolder;
 	}
 	
 	public ObmDomainUuid getDomainId() {
@@ -155,9 +168,13 @@ public class DomainConfiguration {
 		return schedulingConfiguration != null ? schedulingConfiguration.getMinute() : null;
 	}
 
+	public String getExcludedFolder() {
+		return excludedFolder;
+	}
+	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(domainId, enabled, schedulingConfiguration);
+		return Objects.hashCode(domainId, enabled, schedulingConfiguration, excludedFolder);
 	}
 	
 	@Override
@@ -166,7 +183,8 @@ public class DomainConfiguration {
 			DomainConfiguration that = (DomainConfiguration) object;
 			return Objects.equal(this.domainId, that.domainId)
 				&& Objects.equal(this.enabled, that.enabled)
-				&& Objects.equal(this.schedulingConfiguration, that.schedulingConfiguration);
+				&& Objects.equal(this.schedulingConfiguration, that.schedulingConfiguration)
+				&& Objects.equal(this.excludedFolder, that.excludedFolder);
 		}
 		return false;
 	}
@@ -177,6 +195,7 @@ public class DomainConfiguration {
 			.add("domainId", domainId)
 			.add("enabled", enabled)
 			.add("recurrence", schedulingConfiguration)
+			.add("excludedFolder", excludedFolder)
 			.toString();
 	}
 }

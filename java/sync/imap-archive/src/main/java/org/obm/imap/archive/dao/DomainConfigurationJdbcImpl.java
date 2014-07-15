@@ -74,9 +74,10 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			String DAY_OF_YEAR = "mail_archive_day_of_year";
 			String HOUR = "mail_archive_hour";
 			String MINUTE = "mail_archive_minute";
+			String EXCLUDED_FOLDER = "mail_archive_excluded_folder";
 			
-			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE);
-			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE);
+			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, EXCLUDED_FOLDER);
+			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, EXCLUDED_FOLDER);
 		}
 	}
 	
@@ -89,7 +90,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				"UPDATE %s SET %s = ? WHERE %s = ?", TABLE.NAME, FIELDS.UPDATABLE, FIELDS.DOMAIN_UUID);
 		
 		String INSERT = String.format(
-				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
+				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
 	}
 	
 	@Inject
@@ -108,7 +109,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
-				return domainConfigurationFromCursor(rs);
+				return domainConfigurationFromResultSet(rs);
 			} else {
 				return null;
 			}
@@ -118,7 +119,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 		}
 	}
 
-	private DomainConfiguration domainConfigurationFromCursor(ResultSet rs) throws SQLException {
+	private DomainConfiguration domainConfigurationFromResultSet(ResultSet rs) throws SQLException {
 		return DomainConfiguration.builder()
 				.domainId(ObmDomainUuid.of(rs.getString(FIELDS.DOMAIN_UUID)))
 				.enabled(rs.getBoolean(FIELDS.ACTIVATED))
@@ -131,6 +132,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 							.build())
 						.time(new LocalTime(rs.getInt(FIELDS.HOUR), rs.getInt(FIELDS.MINUTE)))
 						.build())
+				.excludedFolder(rs.getString(FIELDS.EXCLUDED_FOLDER))
 				.build();
 	}
 
@@ -148,6 +150,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setInt(idx++, domainConfiguration.getDayOfYear().getDayOfYear());
 			ps.setInt(idx++, domainConfiguration.getHour());
 			ps.setInt(idx++, domainConfiguration.getMinute());
+			ps.setString(idx++, domainConfiguration.getExcludedFolder());
 			ps.setString(idx++, domainConfiguration.getDomainId().toString());
 
 			if (ps.executeUpdate() < 1) {
@@ -173,6 +176,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setInt(idx++, domainConfiguration.getDayOfYear().getDayOfYear());
 			ps.setInt(idx++, domainConfiguration.getHour());
 			ps.setInt(idx++, domainConfiguration.getMinute());
+			ps.setString(idx++, domainConfiguration.getExcludedFolder());
 
 			ps.executeUpdate();
 		} catch (SQLException e) {

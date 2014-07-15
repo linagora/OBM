@@ -48,6 +48,7 @@ public class DomainConfigurationDto {
 		dto.dayOfYear = configuration.getDayOfYear() != null ? configuration.getDayOfYear().getDayOfYear() : null;
 		dto.hour = configuration.getHour();
 		dto.minute = configuration.getMinute();
+		dto.excludedFolder = configuration.getExcludedFolder();
 		return dto;
 	}
 	
@@ -82,5 +83,6 @@ public class DomainConfigurationDto {
 	public Integer dayOfYear;
 	public Integer hour;
 	public Integer minute;
+	public String excludedFolder;
 	
 }

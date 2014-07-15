@@ -204,6 +204,24 @@ function curlPost($url, $json = "") {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Check configuration 
+// Parameters:
+//   - none
+///////////////////////////////////////////////////////////////////////////////
+function check_configuration($params) {
+  global $err;
+  global $php_regexp_imap_sub_folder, $l_excluded_folder_error;
+  
+  $excludedFolder = $params['excluded_folder'];
+  
+  if (preg_match($php_regexp_imap_sub_folder, $excludedFolder)) {
+    $err['msg'] .= "$excludedFolder : $l_excluded_folder_error";
+    return false;
+  }
+  return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Update configuration to IMAP archive service
 // Parameters:
 //   - none
@@ -225,6 +243,7 @@ function run_query_imap_archive_update($params) {
   $dayOfYear = $params['day_of_year'];
   $hour = $params['hour'];
   $minute = $params['minute'];
+  $excludedFolder = $params['excluded_folder'];
   
   $json = json_encode(array("domainId" => $obm['domain_uuid'],
       "enabled" => ($params['enabled']) ? "true" : "false",
@@ -233,7 +252,8 @@ function run_query_imap_archive_update($params) {
       "dayOfMonth" => ($dayOfMonth) ? $dayOfMonth : -1,
       "dayOfYear" => ($dayOfYear) ? $dayOfYear : 1,
       "hour" => ($hour) ? $hour : 0,
-      "minute" => ($minute) ? $minute : 0
+      "minute" => ($minute) ? $minute : 0,
+      "excludedFolder" => $excludedFolder
   ));
   
   $curl = curlPut($configurationPath, $json);

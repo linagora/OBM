@@ -865,6 +865,8 @@ $php_regexp_profile_level_managepeers = "/^[01]$/";
 $php_regexp_profile_access_restriction = "/^ALLOW_ALL|DENY_ALL$/"; // TODO
 $php_regexp_profile_admin_realm = "/^[A-Za-z0-9][A-Za-z0-9-._ ]{1,64}$/";
 
+// IMAP sub-folder
+$php_regexp_imap_sub_folder = "/[\/@]+/";
 
 $global_dis_debug_msg = '';
 $global_dis_debug_param = '';

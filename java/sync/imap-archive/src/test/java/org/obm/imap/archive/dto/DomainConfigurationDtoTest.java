@@ -65,6 +65,7 @@ public class DomainConfigurationDtoTest {
 								.build())
 							.time(LocalTime.parse("13:23"))
 							.build())
+					.excludedFolder("excluded")
 					.build();
 		DomainConfigurationDto dto = DomainConfigurationDto.from(configuration);
 		assertThat(dto.domainId).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
@@ -75,6 +76,7 @@ public class DomainConfigurationDtoTest {
 		assertThat(dto.dayOfYear).isEqualTo(234);
 		assertThat(dto.hour).isEqualTo(13);
 		assertThat(dto.minute).isEqualTo(23);
+		assertThat(dto.excludedFolder).isEqualTo("excluded");
 
 	}
 	
