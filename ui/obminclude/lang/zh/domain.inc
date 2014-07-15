@@ -14,7 +14,7 @@ $l_mail_servers = "邮件服务器"; //"Mail servers"
 $l_sync_servers = "同步服务器"; //"Synchronization servers"
 $l_solr_servers = "索引服务器"; //"Indexing servers"
 $l_imap_frontend_servers = "IMAP前端服务器"; //"IMAP frontend servers"
-$l_imap_archive_servers = "IMAP archive servers";
+$l_imap_archive_servers = "IMAP归档服务器";
 $l_ldap_servers = "LDAP servers";
 $l_max_quota = "最大值"; //"Max value"
 

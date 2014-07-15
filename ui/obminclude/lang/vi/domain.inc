@@ -13,7 +13,7 @@ $l_mail_servers = "Mail servers";
 $l_sync_servers = "Các server đồng bộ";
 $l_solr_servers = "Indexing servers";
 $l_imap_frontend_servers = "IMAP frontend servers";
-$l_imap_archive_servers = "IMAP archive servers";
+$l_imap_archive_servers = "Các máy chủ lưu trữ IMAP";
 $l_max_quota = "Giá trị tối đa";
 
 // Mail chooser labels
