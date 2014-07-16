@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive;
 
+import java.io.File;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +45,8 @@ import org.obm.StaticConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.domain.dao.UserSystemDao;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.services.LogFileService;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
@@ -89,6 +92,7 @@ public class TestImapArchiveModules {
 				new TransactionalModule(),
 				new TimeBasedModule(),
 				new StaticUUIDModule(),
+				logFileModule(),
 				new SchedulerModule(),
 				new LocalLocatorModule(obmSyncHttpMock.getBaseUrl() + "/obm-sync"),
 				new AbstractModule() {
@@ -101,6 +105,30 @@ public class TestImapArchiveModules {
 					}
 				}
 			));
+		}
+
+		protected AbstractModule logFileModule() {
+			return new AbstractModule() {
+				
+				@Override
+				protected void configure() {
+				}
+			};
+		}
+	}
+	
+	public static class WithLogFile extends Simple {
+		
+		private final File logFile;
+
+		public WithLogFile(ClientDriverRule obmSyncHttpMock, File logFile) {
+			super(obmSyncHttpMock);
+			this.logFile = logFile;
+		}
+		
+		@Override
+		protected AbstractModule logFileModule() {
+			return new LogFileModule(logFile);
 		}
 	}
 	
@@ -222,6 +250,35 @@ public class TestImapArchiveModules {
 			bind(Scheduler.class).toInstance(Scheduler.builder()
 					.resolution(1, TimeUnit.SECONDS)
 					.start());
+		}
+	}
+	
+	public static class LogFileModule extends AbstractModule {
+
+		private final File logFile;
+
+		public LogFileModule(File logFile) {
+			this.logFile = logFile;
+		}
+
+		@Override
+		protected void configure() {
+			bind(LogFileService.class).toInstance(new TestLogFileService(logFile));
+		}
+	}
+	
+	public static class TestLogFileService extends LogFileService {
+
+		private final File logFile;
+
+		private TestLogFileService(File logFile) {
+			super(TimeUnit.MILLISECONDS);
+			this.logFile = logFile;
+		}
+
+		@Override
+		public File getFile(ArchiveTreatmentRunId runId) {
+			return logFile;
 		}
 	}
 }

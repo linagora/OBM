@@ -34,6 +34,7 @@ package org.obm.imap.archive.scheduling;
 import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.services.ArchiveService;
+import org.obm.imap.archive.services.LogFileService;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.SettableFuture;
@@ -44,8 +45,8 @@ public class ControlledTaskFactory extends ArchiveDomainTask.Factory {
 
 	private final ArchiveService archiveService;
 
-	public ControlledTaskFactory(ArchiveService archiveService) {
-		super(archiveService);
+	public ControlledTaskFactory(ArchiveService archiveService, LogFileService logFileService) {
+		super(archiveService, logFileService);
 		this.archiveService = archiveService;
 	}
 
@@ -71,7 +72,7 @@ public class ControlledTaskFactory extends ArchiveDomainTask.Factory {
 		private final Terminator terminator;
 	
 		RemotelyControlledTask(ArchiveService archiveService, ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
-			super(archiveService, domain, when, runId);
+			super(archiveService, deferredFileOutputStream(runId), domain, when, runId);
 			terminator = new Terminator();
 		}
 		

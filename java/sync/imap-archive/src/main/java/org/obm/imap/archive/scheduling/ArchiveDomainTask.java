@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.scheduling;
 
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.Comparator;
 
 import org.apache.commons.io.output.DeferredFileOutputStream;
@@ -40,6 +38,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.services.ArchiveService;
+import org.obm.imap.archive.services.LogFileService;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
@@ -51,9 +50,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class ArchiveDomainTask implements Task {
 
-	private final static String LOG_PATH = "/var/log/obm-imap-archive";
-	private final static String LOG_EXTENSION = ".log";
-	private final static int BYTES_IN_MEMORY = 10240;
+	public final static int BYTES_IN_MEMORY = 10240;
 	
 	public static Comparator<ArchiveDomainTask> comparator() {
 		return new Comparator<ArchiveDomainTask>() {
@@ -69,14 +66,22 @@ public class ArchiveDomainTask implements Task {
 	public static class Factory {
 		
 		private final ArchiveService archiveService;
+		private final LogFileService logFileService;
 
 		@Inject
-		@VisibleForTesting Factory(ArchiveService archiveService) {
+		@VisibleForTesting Factory(ArchiveService archiveService, LogFileService logFileService) {
 			this.archiveService = archiveService;
+			this.logFileService = logFileService;
 		}
 		
 		public ArchiveDomainTask create(ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
-			return new ArchiveDomainTask(archiveService, domain, when, runId);
+			return new ArchiveDomainTask(archiveService, 
+					deferredFileOutputStream(runId), 
+					domain, when, runId);
+		}
+
+		protected DeferredFileOutputStream deferredFileOutputStream(ArchiveTreatmentRunId runId) {
+			return new DeferredFileOutputStream(BYTES_IN_MEMORY, logFileService.getFile(runId));
 		}
 	}
 	
@@ -86,15 +91,12 @@ public class ArchiveDomainTask implements Task {
 	private final ArchiveTreatmentRunId runId;
 	private final DeferredFileOutputStream deferredFileOutputStream;
 
-	protected ArchiveDomainTask(ArchiveService archiveService, ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
+	protected ArchiveDomainTask(ArchiveService archiveService, DeferredFileOutputStream deferredFileOutputStream, ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
 		this.archiveService = archiveService;
 		this.domain = domain;
 		this.when = when;
 		this.runId = runId;
-		this.deferredFileOutputStream = new DeferredFileOutputStream(BYTES_IN_MEMORY, 
-				new File(Paths.get(LOG_PATH, runId.getRunId().toString() + LOG_EXTENSION).toUri()));
-		
-
+		this.deferredFileOutputStream = deferredFileOutputStream;
 	}
 	
 	@Override

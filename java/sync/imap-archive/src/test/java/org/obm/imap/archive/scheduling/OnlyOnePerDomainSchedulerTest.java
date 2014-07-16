@@ -46,12 +46,15 @@ import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.scheduling.ControlledTaskFactory.RemotelyControlledTask;
 import org.obm.imap.archive.services.ArchiveService;
+import org.obm.imap.archive.services.LogFileService;
 
 import com.linagora.scheduling.DateTimeProvider;
 import com.linagora.scheduling.Monitor;
@@ -65,6 +68,7 @@ public class OnlyOnePerDomainSchedulerTest {
 	private static final DateTime THE_BEGINNING = DateTime.parse("1970-01-01T00:00");
 	IMocksControl mocksControl;
 	ArchiveService archiveService;
+	LogFileService logFileService;
 	
 	DateTime now;
 	TestDateTimeProvider timeProvider;
@@ -75,15 +79,19 @@ public class OnlyOnePerDomainSchedulerTest {
 	
 	int timeout;
 
+	@Rule
+	public TemporaryFolder temporaryFolder = new TemporaryFolder();
+	
 	@Before
 	public void setUp() {
 		timeout = 1500;
 		mocksControl = createControl();
 		archiveService = mocksControl.createMock(ArchiveService.class);
+		logFileService = mocksControl.createMock(LogFileService.class);
 
 		now = DateTime.parse("2024-10-1T05:04");
 		timeProvider = new TestDateTimeProvider(now);
-		archiveTaskFactory = new ControlledTaskFactory(archiveService); 
+		archiveTaskFactory = new ControlledTaskFactory(archiveService, logFileService); 
 		futureListener = new FutureTestListener<>();
 		Monitor.Builder<ArchiveDomainTask> monitorBuilder = Monitor.<ArchiveDomainTask>builder().addListener(futureListener);
 		
@@ -123,6 +131,9 @@ public class OnlyOnePerDomainSchedulerTest {
 		expect(archiveService.archive(eq(domain), eq(runId), anyObject(DeferredFileOutputStream.class)))
 			.andReturn(archiveTreatment(runId, when, domain.getUuid()));
 		
+		expect(logFileService.getFile(runId))
+			.andReturn(temporaryFolder.newFile());
+		
 		mocksControl.replay();
 		ArchiveDomainTask task = testee.scheduleDomainArchiving(domain, when, runId);
 		assertTaskProgression(task);
@@ -143,6 +154,11 @@ public class OnlyOnePerDomainSchedulerTest {
 		expect(archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class)))
 			.andReturn(archiveTreatment(runId2, when2, domain.getUuid()));
 		
+		expect(logFileService.getFile(runId1))
+			.andReturn(temporaryFolder.newFile());
+		expect(logFileService.getFile(runId2))
+			.andReturn(temporaryFolder.newFile());
+
 		mocksControl.replay();
 		ArchiveDomainTask task1 = testee.scheduleDomainArchiving(domain, when1, runId1);
 		assertTaskProgression(task1);
@@ -165,6 +181,11 @@ public class OnlyOnePerDomainSchedulerTest {
 		expect(archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class)))
 			.andReturn(archiveTreatment(runId2, whenToEnqueue, domain.getUuid()));
 		
+		expect(logFileService.getFile(runId1))
+			.andReturn(temporaryFolder.newFile());
+		expect(logFileService.getFile(runId2))
+			.andReturn(temporaryFolder.newFile());
+
 		mocksControl.replay();
 		ArchiveDomainTask task = testee.scheduleDomainArchiving(domain, when, runId1);
 		ArchiveDomainTask taskEnqueued = testee.scheduleDomainArchiving(domain, whenToEnqueue, runId2);
@@ -191,6 +212,13 @@ public class OnlyOnePerDomainSchedulerTest {
 		expect(archiveService.archive(eq(domain), eq(runId3), anyObject(DeferredFileOutputStream.class)))
 			.andReturn(archiveTreatment(runId3, whenToEnqueueBefore, domain.getUuid()));
 		
+		expect(logFileService.getFile(runId1))
+			.andReturn(temporaryFolder.newFile());
+		expect(logFileService.getFile(runId2))
+			.andReturn(temporaryFolder.newFile());
+		expect(logFileService.getFile(runId3))
+			.andReturn(temporaryFolder.newFile());
+
 		mocksControl.replay();
 		ArchiveDomainTask task = testee.scheduleDomainArchiving(domain, when, runId1);
 		ArchiveDomainTask taskEnqueuedAfter = testee.scheduleDomainArchiving(domain, whenToEnqueueAfter, runId2);
@@ -226,6 +254,11 @@ public class OnlyOnePerDomainSchedulerTest {
 		expect(archiveService.archive(eq(domain2), eq(runId2), anyObject(DeferredFileOutputStream.class)))
 			.andReturn(archiveTreatment(runId2, when2, domain2.getUuid()));
 		
+		expect(logFileService.getFile(runId1))
+			.andReturn(temporaryFolder.newFile());
+		expect(logFileService.getFile(runId2))
+			.andReturn(temporaryFolder.newFile());
+
 		mocksControl.replay();
 		ArchiveDomainTask taskDomain1 = testee.scheduleDomainArchiving(domain1, when1, runId1);
 		ArchiveDomainTask taskDomain2 = testee.scheduleDomainArchiving(domain2, when2, runId2);
@@ -279,6 +312,15 @@ public class OnlyOnePerDomainSchedulerTest {
 		expect(archiveService.archive(eq(domain2), eq(runId4), anyObject(DeferredFileOutputStream.class)))
 			.andReturn(archiveTreatment(runId4, when2ToEnqueue, domain2.getUuid()));
 		
+		expect(logFileService.getFile(runId1))
+			.andReturn(temporaryFolder.newFile());
+		expect(logFileService.getFile(runId2))
+			.andReturn(temporaryFolder.newFile());
+		expect(logFileService.getFile(runId3))
+			.andReturn(temporaryFolder.newFile());
+		expect(logFileService.getFile(runId4))
+			.andReturn(temporaryFolder.newFile());
+
 		mocksControl.replay();
 		ArchiveDomainTask taskDomain1 = testee.scheduleDomainArchiving(domain1, when1, runId1);
 		ArchiveDomainTask taskDomain2 = testee.scheduleDomainArchiving(domain2, when2, runId2);
@@ -348,6 +390,9 @@ public class OnlyOnePerDomainSchedulerTest {
 		expect(archiveService.archive(eq(domain), eq(runId), anyObject(DeferredFileOutputStream.class)))
 			.andReturn(archiveTreatment(runId, now, domain.getUuid()));
 		
+		expect(logFileService.getFile(runId))
+			.andReturn(temporaryFolder.newFile());
+	
 		mocksControl.replay();
 		ArchiveDomainTask task = testee.scheduleNowDomainArchiving(domain, now, runId);
 		assertTaskProgression(task);

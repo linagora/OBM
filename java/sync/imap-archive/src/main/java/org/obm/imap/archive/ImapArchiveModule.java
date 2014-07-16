@@ -60,6 +60,7 @@ import org.obm.imap.archive.service.SchedulingDatesService;
 import org.obm.imap.archive.services.ArchiveService;
 import org.obm.imap.archive.services.ArchiveServiceImpl;
 import org.obm.imap.archive.services.DomainConfigurationService;
+import org.obm.imap.archive.services.LogFileService;
 import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
@@ -117,6 +118,7 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(DomainConfigurationService.class);
 		bind(SchedulingDatesService.class);
 		bind(UUIDFactory.class);
+		bind(LogFileService.class);
 		bind(ArchiveTreatmentRunId.Factory.class);
 		bind(ArchiveService.class).to(ArchiveServiceImpl.class);
 		bind(OnlyOnePerDomainScheduler.class);

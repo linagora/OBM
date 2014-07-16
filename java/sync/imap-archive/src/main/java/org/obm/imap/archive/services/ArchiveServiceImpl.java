@@ -33,10 +33,10 @@
 package org.obm.imap.archive.services;
 
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
@@ -77,23 +77,24 @@ public class ArchiveServiceImpl implements ArchiveService {
 	private final DomainConfigurationDao domainConfigurationDao;
 	private final ArchiveTreatmentDao archiveTreatmentDao;
 	private final DateTimeProvider dateTimeProvider;
+	private final LogFileService logFileService;
 	private final boolean endlessTask;
-	private final TimeUnit schedulerResolution;
 	private final Map<ArchiveTreatmentRunId, LogWriter> runIdToPeriodicTaskMap;
+
 
 
 	@Inject
 	@VisibleForTesting ArchiveServiceImpl(DomainConfigurationDao domainConfigurationDao, 
 			ArchiveTreatmentDao archiveTreatmentDao, 
 			DateTimeProvider dateTimeProvider,
-			@Named("endlessTask") Boolean endlessTask,
-			@Named("schedulerResolution") TimeUnit schedulerResolution) {
+			LogFileService logFileService,
+			@Named("endlessTask") Boolean endlessTask) {
 		
 		this.domainConfigurationDao = domainConfigurationDao;
 		this.archiveTreatmentDao = archiveTreatmentDao;
 		this.dateTimeProvider = dateTimeProvider;
+		this.logFileService = logFileService;
 		this.endlessTask = endlessTask;
-		this.schedulerResolution = schedulerResolution;
 		
 		this.runIdToPeriodicTaskMap = Maps.newHashMap();
 	}
@@ -192,29 +193,22 @@ public class ArchiveServiceImpl implements ArchiveService {
 	
 	@Override
 	public ChunkedOutput<String> runningProcessLogs(final ArchiveTreatmentRunId runId) {
-		LogWriter logGenerator = runIdToPeriodicTaskMap.get(runId);
-		if (logGenerator == null) {
-			return waitForOneScheduledTimeUnitDuration(runId);
+		LogWriter logWriter = runIdToPeriodicTaskMap.get(runId);
+		if (logWriter == null) {
+			return chunkLogFile(runId);
 		}
-		ChunkedOutput<String> chunkedOutput = logGenerator.chunkedOutput;
+		ChunkedOutput<String> chunkedOutput = logWriter.chunkedOutput;
 		if (chunkedOutput.isClosed()) {
-			throw new WebApplicationException(Status.NO_CONTENT);
+			return chunkLogFile(runId);
 		}
 		return chunkedOutput;
 	}
 
-	private ChunkedOutput<String> waitForOneScheduledTimeUnitDuration(ArchiveTreatmentRunId runId) {
+	private ChunkedOutput<String> chunkLogFile(ArchiveTreatmentRunId runId) {
 		try {
-			Thread.sleep(TimeUnit.MILLISECONDS.convert(1, schedulerResolution));
-			
-			LogWriter logGenerator = runIdToPeriodicTaskMap.get(runId);
-			if (logGenerator == null) {
-				return null;
-			}
-			return logGenerator.chunkedOutput;
-		} catch (InterruptedException e) {
-			logger.error("Error when sleeping", e);
-			return null;
+			return logFileService.chunkLogFile(runId);
+		} catch (NoSuchFileException e) {
+			throw new WebApplicationException(Status.NOT_FOUND);
 		}
 	}
 }

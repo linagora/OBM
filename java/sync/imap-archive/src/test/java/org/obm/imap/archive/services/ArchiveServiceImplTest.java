@@ -37,8 +37,6 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
-import java.util.concurrent.TimeUnit;
-
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
@@ -70,12 +68,12 @@ public class ArchiveServiceImplTest {
 	private DomainConfigurationDao domainConfigurationDao;
 	private ArchiveTreatmentDao archiveTreatmentDao;
 	private DateTimeProvider dateTimeProvider;
+	private LogFileService logFileService;
 	
 	private ArchiveServiceImpl archiveService;
 
 	@Rule
 	public FluentExpectedException expectedException = FluentExpectedException.none();
-
 
 	
 	@Before
@@ -84,8 +82,9 @@ public class ArchiveServiceImplTest {
 		domainConfigurationDao = control.createMock(DomainConfigurationDao.class);
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		dateTimeProvider = control.createMock(DateTimeProvider.class);
+		logFileService = control.createMock(LogFileService.class);
 		
-		archiveService = new ArchiveServiceImpl(domainConfigurationDao, archiveTreatmentDao, dateTimeProvider, Boolean.FALSE, TimeUnit.MILLISECONDS);
+		archiveService = new ArchiveServiceImpl(domainConfigurationDao, archiveTreatmentDao, dateTimeProvider, logFileService, Boolean.FALSE);
 	}
 	
 	@Test
