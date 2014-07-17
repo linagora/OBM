@@ -18,14 +18,14 @@ $GLOBALS['obmdb_password'] = $obmdb_password;
 $GLOBALS['obmdb_db'] = $obmdb_db;
 $GLOBALS['obmdb_dbtype'] = $obmdb_dbtype;
 
-$query = "SELECT 
+$query = "SELECT
 		    domain_name, serviceproperty_property, host_ip
 		    FROM Domain
 		    INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
 		    LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id
 		    LEFT JOIN Host ON host_id = #CAST(serviceproperty_value, INTEGER)
 		    WHERE
-		    serviceproperty_property = 'imap_frontend' 
+		    serviceproperty_property = 'imap_frontend'
             OR serviceproperty_property = 'smtp_out'
             OR serviceproperty_property = 'obm_sync'";
 $obm_q = new DB_OBM;
@@ -73,6 +73,7 @@ $config["plugins"][] = "obm_unread";
 
 if ( $auth_kind && $auth_kind == "CAS" ) {
   $config["plugins"][] = "cas_authn";
+  $config["obmAuthType"] = "LemonLDAP";
   // CAS plugin configuration
   set_include_path(get_include_path() . PATH_SEPARATOR . "../../obminclude/lib/CAS");
   // force CAS authentication (doesn't fallback to roundcube db auth if CAS fails)
@@ -94,6 +95,7 @@ if ( $auth_kind && $auth_kind == "CAS" ) {
   }
 } else if ( $auth_kind && $auth_kind == "LemonLDAP") {
   $config["plugins"][] = "http_authentication";
+  $config["obmAuthType"] = "LemonLDAP";
 } else {
   $config["plugins"][] = "obm_auth";
 }
