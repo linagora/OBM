@@ -65,6 +65,7 @@ import com.linagora.scheduling.Scheduler;
 public class TestImapArchiveModules {
 	
 	public static final UUID uuid = UUID.fromString("08c00ba3-fb00-48ac-a077-24b47c123692");
+	public static final UUID uuid2 = UUID.fromString("e72906d1-4b6f-4727-8be8-3e78441623ea");
 	
 	public static final DateTime LOCAL_DATE_TIME = new DateTime()
 			.withZone(DateTimeZone.UTC)
@@ -234,9 +235,17 @@ public class TestImapArchiveModules {
 		protected void configure() {
 			bind(UUIDFactory.class).toInstance(new UUIDFactory() {
 
+				boolean use1 = true;
+				
 				@Override
-				public UUID randomUUID() {
-					return uuid;
+				public synchronized UUID randomUUID() {
+					if (use1) {
+						use1 = !use1;
+						return uuid;
+					} else {
+						use1 = !use1;
+						return uuid2;
+					}
 				}
 			});
 		}

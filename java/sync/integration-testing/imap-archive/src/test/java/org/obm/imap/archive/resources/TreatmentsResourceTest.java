@@ -209,7 +209,7 @@ public class TreatmentsResourceTest {
 	}
 	
 	@Test
-	public void startArchivingTwiceShouldRespondConflict() throws Exception {
+	public void startArchivingTwiceShouldStackSchedules() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
 		driver.expectTrustedLogin(domainId);
 		driver.expectTrustedLogin(domainId);
@@ -220,6 +220,7 @@ public class TreatmentsResourceTest {
 		server.start();
 		
 		UUID expectedRunId = TestImapArchiveModules.uuid;
+		UUID expectedRunId2 = TestImapArchiveModules.uuid2;
 		given()
 			.port(server.getHttpPort())
 			.queryParam("login", "admin")
@@ -237,7 +238,9 @@ public class TreatmentsResourceTest {
 			.queryParam("password", "trust3dToken")
 			.queryParam("domain_name", "mydomain.org").
 		expect()
-			.statusCode(Status.CONFLICT.getStatusCode()).
+			.contentType(ContentType.JSON)
+			.body("runId", equalTo(expectedRunId2.toString()))
+			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
 	}

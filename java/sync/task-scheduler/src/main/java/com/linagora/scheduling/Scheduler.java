@@ -201,9 +201,6 @@ public class Scheduler<T extends Task> implements AutoCloseable {
 		
 		public ScheduledTask<T> at(DateTime when) {
 			Preconditions.checkNotNull(when);
-			if (dateTimeProvider.now().isAfter(when)) {
-				throw new TaskInThePastException();
-			}
 			return taskBuilder.scheduledTime(when).schedule(Scheduler.this);
 		}
 
@@ -211,10 +208,6 @@ public class Scheduler<T extends Task> implements AutoCloseable {
 			Preconditions.checkNotNull(period);
 			DateTime when = dateTimeProvider.now().plus(period);
 			return taskBuilder.scheduledTime(when).schedule(Scheduler.this);
-		}
-
-		public ScheduledTask<T> now() {
-			return taskBuilder.scheduledTime(dateTimeProvider.now()).schedule(Scheduler.this);
 		}
 
 		public TaskToSchedule addListener(Listener<T> listener) {

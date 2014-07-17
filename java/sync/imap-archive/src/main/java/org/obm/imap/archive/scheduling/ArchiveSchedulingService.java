@@ -29,8 +29,37 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.scheduling;
+package org.obm.imap.archive.scheduling;
 
-public class TaskInThePastException extends SchedulerException {
+import org.joda.time.DateTime;
+import org.obm.annotations.transactional.Transactional;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.push.utils.UUIDFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
+
+@Singleton
+public class ArchiveSchedulingService {
+
+	private final OnlyOnePerDomainScheduler onlyOnePerDomainScheduler;
+	private final UUIDFactory uuidFactory;
+	
+	@Inject
+	@VisibleForTesting ArchiveSchedulingService(
+			OnlyOnePerDomainScheduler onlyOnePerDomainScheduler,
+			UUIDFactory uuidFactory) {
+		this.onlyOnePerDomainScheduler = onlyOnePerDomainScheduler;
+		this.uuidFactory = uuidFactory;
+	}
+	
+	@Transactional
+	public ArchiveTreatmentRunId schedule(ObmDomain domain, DateTime when) {
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
+		onlyOnePerDomainScheduler.scheduleDomainArchiving(domain, when, runId);
+		return runId;
+	}
 }

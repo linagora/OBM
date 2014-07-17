@@ -144,21 +144,19 @@ public class SchedulerTest {
 		assertThat(testee.schedule(new DummyTask()).at(null));
 	}
 	
-	@Test(expected=TaskInThePastException.class)
-	public void scheduleAtShouldThrowOnTaskScheduledInThePast() {
+	@Test
+	public void scheduleAtCanScheduleInThePast() throws Exception {
 		start();
-		assertThat(testee.schedule(new DummyTask()).at(now.minusHours(1)));
+		DateTime targetTime = now.minusHours(1);
+		Task task = new DummyTask();
+		FutureTestListener<Task> testListener = new FutureTestListener<>();
+		ScheduledTask<Task> actual = testee.schedule(task).addListener(testListener).at(targetTime);
+		assertThat(actual.scheduledTime()).isEqualTo(targetTime);
+		assertThat(actual.task()).isEqualTo(task);
+		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.WAITING);
+		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
 	}
 
-	@Test
-	public void scheduleNowShouldRegisterATaskForNow() {
-		start();
-		Task task = new DummyTask();
-		ScheduledTask<Task> actual = testee.schedule(task).now();
-		assertThat(actual.scheduledTime()).isEqualTo(now);
-		assertThat(actual.task()).isEqualTo(task);
-	}
-	
 	@Test
 	public void scheduleAtShouldRegisterATaskForNextHour() {
 		start();
@@ -192,17 +190,7 @@ public class SchedulerTest {
 		assertThat(actual.task()).isEqualTo(task);
 		assertThat(actual.state()).isEqualTo(ScheduledTask.State.WAITING);
 	}
-	
-	@Test
-	public void scheduleNowShouldRunATaskNow() throws Exception {
-		start();
-		FutureTestListener<Task> testListener = new FutureTestListener<>();
-		testee.schedule(new DummyTask(Duration.millis(10))).addListener(testListener).now();
-		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.WAITING);
-		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.RUNNING);
-		assertThat(testListener.getNextState(1500, TimeUnit.MILLISECONDS)).isEqualTo(ScheduledTask.State.TERMINATED);
-	}
-	
+
 	@Test
 	public void scheduleInShouldRunATaskInOneHour() throws Exception {
 		start();

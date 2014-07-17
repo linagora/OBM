@@ -45,6 +45,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
+import org.obm.dao.utils.H2InMemoryDatabase;
+import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.server.WebServer;
@@ -52,6 +54,7 @@ import org.obm.server.WebServer;
 import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
 import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class RootHandlerTest {
 
@@ -59,8 +62,15 @@ public class RootHandlerTest {
 	
 	@Rule public TestRule chain = RuleChain
 			.outerRule(driver)
-			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver)));
-
+			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver)))
+			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
+				@Override
+				public H2InMemoryDatabase get() {
+					return db;
+				}
+			}, "sql/initial.sql"));
+	
+	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
 	
 	@Before

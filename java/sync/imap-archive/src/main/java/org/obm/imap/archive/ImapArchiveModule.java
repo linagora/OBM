@@ -55,6 +55,7 @@ import org.obm.imap.archive.resources.ObmDomainFactory;
 import org.obm.imap.archive.resources.RootHandler;
 import org.obm.imap.archive.resources.TreatmentsResource;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
+import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainScheduler;
 import org.obm.imap.archive.service.SchedulingDatesService;
 import org.obm.imap.archive.services.ArchiveService;
@@ -115,6 +116,7 @@ public class ImapArchiveModule extends AbstractModule {
 	}
 	
 	private void bindImapArchiveServices() {
+		bind(ArchiveSchedulingService.class);
 		bind(DomainConfigurationService.class);
 		bind(SchedulingDatesService.class);
 		bind(UUIDFactory.class);

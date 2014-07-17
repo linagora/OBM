@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.TreeMultimap;
@@ -54,6 +55,7 @@ import com.linagora.scheduling.Listener;
 import com.linagora.scheduling.Listener.NoopListener;
 import com.linagora.scheduling.Monitor;
 import com.linagora.scheduling.ScheduledTask;
+import com.linagora.scheduling.ScheduledTask.State;
 import com.linagora.scheduling.Scheduler;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -82,19 +84,8 @@ public class OnlyOnePerDomainScheduler extends NoopListener<ArchiveDomainTask> i
 
 	public ArchiveDomainTask scheduleDomainArchiving(ObmDomain domain, DateTime when, ArchiveTreatmentRunId runId) {
 		ArchiveDomainTask task = archiveTaskFactory.create(domain, when, runId);
-		lockingResourcesScheduler.schedule(task);
+		lockingResourcesScheduler.scheduleIfNoneForDomain(task);
 		return task;
-	}
-
-	public ArchiveDomainTask scheduleNowDomainArchiving(ObmDomain domain, DateTime now, ArchiveTreatmentRunId runId) {
-		ArchiveDomainTask task = archiveTaskFactory.create(domain, now, runId);
-		lockingResourcesScheduler.now(task);
-		return task;
-	}
-
-	@Override
-	public void canceled(ScheduledTask<ArchiveDomainTask> scheduledTask) {
-		lockingResourcesScheduler.scheduleFromQueue(scheduledTask);
 	}
 
 	@Override
@@ -120,9 +111,9 @@ public class OnlyOnePerDomainScheduler extends NoopListener<ArchiveDomainTask> i
 		return lockingResourcesScheduler.scheduler;
 	}
 	
-	private class LockingResourcesScheduler {
+	@VisibleForTesting class LockingResourcesScheduler {
 
-		private final TreeMultimap<ObmDomain, ArchiveDomainTask> domainEnqueuedTasks;
+		@VisibleForTesting final TreeMultimap<ObmDomain, ArchiveDomainTask> domainEnqueuedTasks;
 		private final Monitor<ArchiveDomainTask> monitor;
 		private final Scheduler<ArchiveDomainTask> scheduler;
 
@@ -141,29 +132,44 @@ public class OnlyOnePerDomainScheduler extends NoopListener<ArchiveDomainTask> i
 			}
 		}
 
-		private synchronized void schedule(ArchiveDomainTask toSchedule) {
-			if (!hasScheduledTaskForDomain(toSchedule.getDomain())) {
-			
-				scheduler.schedule(toSchedule)
-					.addListener(new OutputStreamCloserListener(toSchedule.getDeferredFileOutputStream()))
-					.at(toSchedule.getWhen());
-			} else {
-				domainEnqueuedTasks.put(toSchedule.getDomain(), toSchedule);
+		private synchronized void scheduleIfNoneForDomain(ArchiveDomainTask toSchedule) {
+			Optional<ScheduledTask<ArchiveDomainTask>> alreadyScheduled = getScheduledTaskForDomain(toSchedule.getDomain());
+			if (!alreadyScheduled.isPresent()) {
+				schedule(toSchedule);
+				return;
+			}
+			domainEnqueuedTasks.put(toSchedule.getDomain(), toSchedule);
+			if (hasToReSchedule(alreadyScheduled.get())) {
+				reSchedule(alreadyScheduled.get());
 			}
 		}
 
-		private void now(ArchiveDomainTask toSchedule) {
-			scheduler.schedule(toSchedule)
-				.addListener(new OutputStreamCloserListener(toSchedule.getDeferredFileOutputStream()))
-				.now();
+		private boolean hasToReSchedule(ScheduledTask<ArchiveDomainTask> scheduledTask) {
+			boolean stateIsWaiting = State.WAITING == scheduledTask.state();
+			DateTime earlierOfQueue = domainEnqueuedTasks.get(scheduledTask.task().getDomain()).first().getWhen();
+			boolean theEarlierIsNotScheduled = scheduledTask.scheduledTime().compareTo(earlierOfQueue) > 0;
+			return stateIsWaiting && theEarlierIsNotScheduled;
 		}
 
-		private synchronized boolean hasScheduledTaskForDomain(final ObmDomain domain) {
-			return Iterables.any(monitor.all(), new Predicate<ScheduledTask<ArchiveDomainTask>>() {
+		private void reSchedule(ScheduledTask<ArchiveDomainTask> alreadyScheduled) {
+			ObmDomain domain = alreadyScheduled.task().getDomain();
+			alreadyScheduled.cancel();
+			domainEnqueuedTasks.put(domain, alreadyScheduled.task());
+			schedule(domainEnqueuedTasks.get(domain).pollFirst());
+		}
+
+		private void schedule(ArchiveDomainTask toSchedule) {
+			scheduler.schedule(toSchedule)
+				.addListener(new OutputStreamCloserListener(toSchedule.getDeferredFileOutputStream()))
+				.at(toSchedule.getWhen());
+		}
+
+		private synchronized Optional<ScheduledTask<ArchiveDomainTask>> getScheduledTaskForDomain(final ObmDomain obmDomain) {
+			return Iterables.tryFind(monitor.all(), new Predicate<ScheduledTask<ArchiveDomainTask>>() {
 
 				@Override
 				public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
-					return input.task().getDomain().equals(domain);
+					return input.task().getDomain().equals(obmDomain);
 				}
 			});
 		}

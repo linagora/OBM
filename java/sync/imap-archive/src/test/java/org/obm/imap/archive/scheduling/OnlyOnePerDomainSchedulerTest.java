@@ -42,6 +42,8 @@ import static org.easymock.EasyMock.expect;
 import java.util.UUID;
 
 import org.apache.commons.io.output.DeferredFileOutputStream;
+import org.assertj.core.data.MapEntry;
+import org.assertj.guava.api.Assertions;
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -84,7 +86,7 @@ public class OnlyOnePerDomainSchedulerTest {
 	
 	@Before
 	public void setUp() {
-		timeout = 1500;
+		timeout = 150000;
 		mocksControl = createControl();
 		archiveService = mocksControl.createMock(ArchiveService.class);
 		logFileService = mocksControl.createMock(LogFileService.class);
@@ -196,7 +198,7 @@ public class OnlyOnePerDomainSchedulerTest {
 	}
 	
 	@Test
-	public void scheduleShouldEnqueueRespectingOrderWhenTaskForDomainAlreadyScheduled() throws Exception {
+	public void scheduleShouldEnqueueRespectingOrderWhenTaskForDomainAlreadyRunning() throws Exception {
 		ObmDomain domain = dummyDomain();
 		DateTime when = DateTime.parse("2024-11-1T00:00");
 		DateTime whenToEnqueueAfter = DateTime.parse("2024-11-9T00:00");
@@ -221,9 +223,10 @@ public class OnlyOnePerDomainSchedulerTest {
 
 		mocksControl.replay();
 		ArchiveDomainTask task = testee.scheduleDomainArchiving(domain, when, runId1);
+		assertTaskStart(task);
 		ArchiveDomainTask taskEnqueuedAfter = testee.scheduleDomainArchiving(domain, whenToEnqueueAfter, runId2);
 		ArchiveDomainTask taskEnqueuedBefore = testee.scheduleDomainArchiving(domain, whenToEnqueueBefore, runId3);
-		assertTaskProgression(task);
+		assertTaskTerminate(task);
 		assertTaskProgression(taskEnqueuedBefore);
 		assertTaskProgression(taskEnqueuedAfter);
 		assertThat(monitor.all()).isEmpty();
@@ -231,11 +234,19 @@ public class OnlyOnePerDomainSchedulerTest {
 	}
 
 	private void assertTaskProgression(ArchiveDomainTask task) throws Exception {
+		assertTaskStart(task);
+		assertTaskTerminate(task);
+	}
+
+	private void assertTaskStart(ArchiveDomainTask task) throws Exception {
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.WAITING);
 		assertThat(monitor.all()).extracting("task", "scheduledTime").containsOnlyOnce(tuple(task, task.getWhen()));
 		timeProvider.setCurrent(task.getWhen());
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.RUNNING);
 		assertThat(monitor.all()).extracting("task", "scheduledTime").containsOnlyOnce(tuple(task, task.getWhen()));
+	}
+
+	private void assertTaskTerminate(ArchiveDomainTask task) throws Exception {
 		((RemotelyControlledTask)task).terminate();
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.TERMINATED);
 	}
@@ -383,20 +394,33 @@ public class OnlyOnePerDomainSchedulerTest {
 	}
 	
 	@Test
-	public void scheduleNowShouldCallScheduler() throws Exception {
+	public void scheduleShouldRescheduleAllWhenTaskForDomainAlreadyScheduled() throws Exception {
 		ObmDomain domain = dummyDomain();
+		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
+		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("66625183-d0f6-4275-8805-09093ae2787f");
+		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("1b58c33f-ecfc-48b4-bdcc-2cd57587364d");
 		
-		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
-		expect(archiveService.archive(eq(domain), eq(runId), anyObject(DeferredFileOutputStream.class)))
-			.andReturn(archiveTreatment(runId, now, domain.getUuid()));
-		
-		expect(logFileService.getFile(runId))
+		expect(logFileService.getFile(runId1))
 			.andReturn(temporaryFolder.newFile());
-	
+		expect(logFileService.getFile(runId2))
+			.andReturn(temporaryFolder.newFile());
+		expect(logFileService.getFile(runId3))
+			.andReturn(temporaryFolder.newFile());
+		
 		mocksControl.replay();
-		ArchiveDomainTask task = testee.scheduleNowDomainArchiving(domain, now, runId);
-		assertTaskProgression(task);
-		assertThat(monitor.all()).isEmpty();
+		
+		ArchiveDomainTask expectedLast = testee.scheduleDomainArchiving(
+			domain, DateTime.parse("2046-11-1T05:04"), runId1);
+		ArchiveDomainTask expectedFirst = testee.scheduleDomainArchiving(
+			domain, DateTime.parse("2026-11-1T05:04"), runId2);
+		ArchiveDomainTask expectedMiddle = testee.scheduleDomainArchiving(
+			domain, DateTime.parse("2036-11-1T05:04"), runId3);
+		
+		assertThat(monitor.all()).extracting("task", "scheduledTime").containsOnlyOnce(
+			tuple(expectedFirst, expectedFirst.getWhen()));
+		Assertions.assertThat(testee.lockingResourcesScheduler.domainEnqueuedTasks).contains(
+			MapEntry.entry(domain, expectedMiddle),
+			MapEntry.entry(domain, expectedLast));
 		mocksControl.verify();
 	}
 	
