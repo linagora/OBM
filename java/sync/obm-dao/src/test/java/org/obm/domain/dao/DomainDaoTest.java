@@ -173,7 +173,6 @@ public class DomainDaoTest {
 		PreparedStatement statement = mocksControl.createMock(PreparedStatement.class);
 
 		expect(dbcp.getConnection()).andReturn(con);
-		expect(dbcp.getIntegerCastType()).andReturn("INTEGER");
 		expect(con.prepareStatement(isA(String.class))).andReturn(statement);
 		statement.setInt(1, 1);
 		expectLastCall();

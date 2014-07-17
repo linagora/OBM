@@ -207,7 +207,7 @@ public class DomainDao {
 				"FROM Domain " +
 				"INNER JOIN DomainEntity ON domainentity_domain_id = domain_id " +
 				"LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id " +
-				"LEFT JOIN Host ON host_id = CAST(serviceproperty_value AS " + dbcp.getIntegerCastType() + ") " +
+				"LEFT JOIN Host ON CAST(host_id AS CHAR) = serviceproperty_value " +
 				"WHERE domain_id = ? AND host_id IS NOT NULL " +
 				"GROUP BY serviceproperty_service, serviceproperty_property, host_id, host_name, host_ip, host_fqdn, host_domain_id");
 
