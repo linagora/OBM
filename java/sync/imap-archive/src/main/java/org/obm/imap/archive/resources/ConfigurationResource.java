@@ -72,7 +72,7 @@ public class ConfigurationResource {
 	@GET
 	public DomainConfigurationDto configuration() throws DaoException {
 		return DomainConfigurationDto.from(
-				Objects.firstNonNull(domainConfigurationDao.getDomainConfiguration(domain.getUuid()), 
+				Objects.firstNonNull(domainConfigurationDao.get(domain.getUuid()), 
 						DomainConfiguration.DEFAULT_VALUES_BUILDER
 							.domainId(domain.getUuid())
 							.build()));

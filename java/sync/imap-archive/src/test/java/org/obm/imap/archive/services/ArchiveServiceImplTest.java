@@ -94,7 +94,7 @@ public class ArchiveServiceImplTest {
 				.uuid(domainId)
 				.name("name")
 				.build();
-		expect(domainConfigurationDao.getDomainConfiguration(domainId))
+		expect(domainConfigurationDao.get(domainId))
 			.andReturn(null);
 		
 		expectedException.expect(DomainConfigurationException.class).hasMessage("The IMAP Archive configuration is not defined for the domain: 'name'");
@@ -111,7 +111,7 @@ public class ArchiveServiceImplTest {
 				.uuid(domainId)
 				.name("name")
 				.build();
-		expect(domainConfigurationDao.getDomainConfiguration(domainId))
+		expect(domainConfigurationDao.get(domainId))
 			.andReturn(DomainConfiguration.builder()
 					.domainId(domainId)
 					.enabled(false)
@@ -131,7 +131,7 @@ public class ArchiveServiceImplTest {
 				.uuid(domainId)
 				.name("name")
 				.build();
-		expect(domainConfigurationDao.getDomainConfiguration(domainId))
+		expect(domainConfigurationDao.get(domainId))
 			.andReturn(DomainConfiguration.builder()
 					.domainId(domainId)
 					.enabled(true)

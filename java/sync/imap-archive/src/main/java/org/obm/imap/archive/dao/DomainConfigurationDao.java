@@ -40,9 +40,9 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public interface DomainConfigurationDao {
 
-	DomainConfiguration getDomainConfiguration(ObmDomainUuid domainId) throws DaoException;
+	DomainConfiguration get(ObmDomainUuid domainId) throws DaoException;
 	
-	void updateDomainConfiguration(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException;
+	void update(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException;
 	
-	DomainConfiguration createDomainConfiguration(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException;
+	void create(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException;
 }

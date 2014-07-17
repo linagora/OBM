@@ -130,7 +130,7 @@ public class ArchiveServiceImpl implements ArchiveService {
 	}
 
 	private DomainConfiguration checkConfiguration(ObmDomain domain) throws DaoException {
-		DomainConfiguration domainConfiguration = domainConfigurationDao.getDomainConfiguration(domain.getUuid());
+		DomainConfiguration domainConfiguration = domainConfigurationDao.get(domain.getUuid());
 		if (domainConfiguration == null) {
 			throw new DomainConfigurationException("The IMAP Archive configuration is not defined for the domain: '" + domain.getName() + "'");
 		}

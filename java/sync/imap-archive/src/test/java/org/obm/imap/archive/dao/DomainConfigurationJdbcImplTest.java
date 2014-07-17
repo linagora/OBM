@@ -89,16 +89,16 @@ public class DomainConfigurationJdbcImplTest {
 	public void setUp() {
 		Operation operation =
 				Operations.sequenceOf(
-						Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE),
-						Operations.insertInto(DomainConfigurationJdbcImpl.TABLE)
-						.columns(DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DOMAIN_UUID, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_ACTIVATED, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_REPEAT_KIND, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_WEEK, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_MONTH, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_YEAR, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_HOUR, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_MINUTE)
+						Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE.NAME),
+						Operations.insertInto(DomainConfigurationJdbcImpl.TABLE.NAME)
+						.columns(DomainConfigurationJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.ACTIVATED, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.REPEAT_KIND, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_WEEK, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_MONTH, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE)
 						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
 						.build());
 
@@ -108,9 +108,9 @@ public class DomainConfigurationJdbcImplTest {
 	}	
 	
 	@Test
-	public void getDomainConfigurationShouldReturnStoredValueWhenDomainIdMatch() throws Exception {
+	public void getShouldReturnStoredValueWhenDomainIdMatch() throws Exception {
 		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
-		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.getDomainConfiguration(uuid);
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(uuid);
 		assertThat(domainConfiguration.getDomainId()).isEqualTo(uuid);
 		assertThat(domainConfiguration.isEnabled()).isTrue();
 		assertThat(domainConfiguration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
@@ -122,22 +122,22 @@ public class DomainConfigurationJdbcImplTest {
 	}
 	
 	@Test
-	public void getDomainConfigurationShouldReturnNullWhenDomainIdDoesntMatch() throws Exception {
+	public void getShouldReturnNullWhenDomainIdDoesntMatch() throws Exception {
 		ObmDomainUuid uuid = ObmDomainUuid.of("78d6e95b-ab6c-4625-b3bf-e86c68347e2d");
-		assertThat(domainConfigurationJdbcImpl.getDomainConfiguration(uuid)).isNull();
+		assertThat(domainConfigurationJdbcImpl.get(uuid)).isNull();
 	}
 	
 	@Test
-	public void updateDomainConfigurationShouldThrowExceptionWhenDomainNotFound() throws Exception {
+	public void updateShouldThrowExceptionWhenDomainNotFound() throws Exception {
 		expectedException.expect(DomainNotFoundException.class).hasMessage("844db7a6-6788-47a4-9f04-f5ed9f007a04");
 		
-		domainConfigurationJdbcImpl.updateDomainConfiguration(DomainConfiguration.DEFAULT_VALUES_BUILDER
+		domainConfigurationJdbcImpl.update(DomainConfiguration.DEFAULT_VALUES_BUILDER
 				.domainId(ObmDomainUuid.of("844db7a6-6788-47a4-9f04-f5ed9f007a04"))
 				.build());
 	}
 	
 	@Test
-	public void updateDomainConfigurationShouldUpdateWhenDomainFound() throws Exception {
+	public void updateShouldUpdateWhenDomainFound() throws Exception {
 		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
 				.domainId(uuid)
@@ -153,30 +153,23 @@ public class DomainConfigurationJdbcImplTest {
 						.build())
 				.build();
 		
-		domainConfigurationJdbcImpl.updateDomainConfiguration(expectedDomainConfiguration);
+		domainConfigurationJdbcImpl.update(expectedDomainConfiguration);
 		
-		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.getDomainConfiguration(uuid);
-		assertThat(domainConfiguration.getDomainId()).isEqualTo(uuid);
-		assertThat(domainConfiguration.isEnabled()).isEqualTo(expectedDomainConfiguration.isEnabled());
-		assertThat(domainConfiguration.getRepeatKind()).isEqualTo(expectedDomainConfiguration.getRepeatKind());
-		assertThat(domainConfiguration.getDayOfWeek()).isEqualTo(expectedDomainConfiguration.getDayOfWeek());
-		assertThat(domainConfiguration.getDayOfMonth()).isEqualTo(expectedDomainConfiguration.getDayOfMonth());
-		assertThat(domainConfiguration.getDayOfYear()).isEqualTo(expectedDomainConfiguration.getDayOfYear());
-		assertThat(domainConfiguration.getHour()).isEqualTo(expectedDomainConfiguration.getHour());
-		assertThat(domainConfiguration.getMinute()).isEqualTo(expectedDomainConfiguration.getMinute());
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(uuid);
+		assertThat(domainConfiguration).isEqualToComparingFieldByField(expectedDomainConfiguration);
 	}
 	
 	@Test
-	public void createDomainConfigurationShouldThrowExceptionWhenDomainConfigurationAlreadyExists() throws Exception {
+	public void createShouldThrowExceptionWhenDomainConfigurationAlreadyExists() throws Exception {
 		expectedException.expect(DaoException.class);
 		
-		domainConfigurationJdbcImpl.createDomainConfiguration(DomainConfiguration.DEFAULT_VALUES_BUILDER
+		domainConfigurationJdbcImpl.create(DomainConfiguration.DEFAULT_VALUES_BUILDER
 				.domainId(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"))
 				.build());
 	}
 	
 	@Test
-	public void createDomainConfigurationShouldCreateWhenDomainFound() throws Exception {
+	public void createShouldCreateWhenDomainFound() throws Exception {
 		ObmDomainUuid uuid = ObmDomainUuid.of("1383b12c-6d79-40c7-acf9-c79bcc673fff");
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
 				.domainId(uuid)
@@ -192,15 +185,9 @@ public class DomainConfigurationJdbcImplTest {
 						.build())
 				.build();
 		
-		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.createDomainConfiguration(expectedDomainConfiguration);
+		domainConfigurationJdbcImpl.create(expectedDomainConfiguration);
 		
-		assertThat(domainConfiguration.getDomainId()).isEqualTo(uuid);
-		assertThat(domainConfiguration.isEnabled()).isEqualTo(expectedDomainConfiguration.isEnabled());
-		assertThat(domainConfiguration.getRepeatKind()).isEqualTo(expectedDomainConfiguration.getRepeatKind());
-		assertThat(domainConfiguration.getDayOfWeek()).isEqualTo(expectedDomainConfiguration.getDayOfWeek());
-		assertThat(domainConfiguration.getDayOfMonth()).isEqualTo(expectedDomainConfiguration.getDayOfMonth());
-		assertThat(domainConfiguration.getDayOfYear()).isEqualTo(expectedDomainConfiguration.getDayOfYear());
-		assertThat(domainConfiguration.getHour()).isEqualTo(expectedDomainConfiguration.getHour());
-		assertThat(domainConfiguration.getMinute()).isEqualTo(expectedDomainConfiguration.getMinute());
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(uuid); 
+		assertThat(domainConfiguration).isEqualToComparingFieldByField(expectedDomainConfiguration);
 	}
 }

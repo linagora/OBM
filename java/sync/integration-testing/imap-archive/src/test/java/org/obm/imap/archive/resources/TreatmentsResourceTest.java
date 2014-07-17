@@ -192,16 +192,16 @@ public class TreatmentsResourceTest {
 
 	private void insertDomainConfiguration() {
 		Operation operation =
-				Operations.sequenceOf(Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE),
-				Operations.sequenceOf(Operations.insertInto(DomainConfigurationJdbcImpl.TABLE)
-						.columns(DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DOMAIN_UUID, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_ACTIVATED, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_REPEAT_KIND, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_WEEK, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_MONTH, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_YEAR, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_HOUR, 
-								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_MINUTE)
+				Operations.sequenceOf(Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE.NAME),
+				Operations.sequenceOf(Operations.insertInto(DomainConfigurationJdbcImpl.TABLE.NAME)
+						.columns(DomainConfigurationJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.ACTIVATED, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.REPEAT_KIND, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_WEEK, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_MONTH, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
+								DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE)
 								.values("2f096466-5a2a-463e-afad-4196c2952de3", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
 								.build()));
 		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
