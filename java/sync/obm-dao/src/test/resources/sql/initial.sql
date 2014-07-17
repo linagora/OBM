@@ -17066,7 +17066,8 @@ INSERT INTO serviceproperty (serviceproperty_service, serviceproperty_property, 
         ('mail', 'smtp_in', 1, 1),
         ('mail', 'imap', 1, 1),
         ('sync', 'obm_sync', 1, 2),
-        ('mail', 'smtp_in', 2, 1);
+        ('mail', 'smtp_in', 2, 1),
+        ('samba', 'domain', 2, 'Yeepee, a SAMBA domain !');
 
 INSERT INTO profile (profile_domain_id, profile_name)
     VALUES
