@@ -49,6 +49,7 @@ import org.obm.push.utils.JDBCUtils;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -60,16 +61,25 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 	private final DatabaseConnectionProvider dbcp;
 	private final ObmHelper obmHelper;
 	
-	private static final String TABLE = "mail_archive";
-	private static final String FIELDS = 
-			"mail_archive_domain_uuid, " +
-			"mail_archive_activated, " +
-			"mail_archive_repeat_kind, " +
-			"mail_archive_day_of_week, " +
-			"mail_archive_day_of_month, " +
-			"mail_archive_day_of_year, " +
-			"mail_archive_hour, " +
-			"mail_archive_minute ";
+	public static final String TABLE = "mail_archive";
+	public static final String MAIL_ARCHIVE_DOMAIN_UUID = "mail_archive_domain_uuid";
+	public static final String MAIL_ARCHIVE_ACTIVATED = "mail_archive_activated";
+	public static final String MAIL_ARCHIVE_REPEAT_KIND = "mail_archive_repeat_kind";
+	public static final String MAIL_ARCHIVE_DAY_OF_WEEK = "mail_archive_day_of_week";
+	public static final String MAIL_ARCHIVE_DAY_OF_MONTH = "mail_archive_day_of_month";
+	public static final String MAIL_ARCHIVE_DAY_OF_YEAR = "mail_archive_day_of_year";
+	public static final String MAIL_ARCHIVE_HOUR = "mail_archive_hour";
+	public static final String MAIL_ARCHIVE_MINUTE = "mail_archive_minute";
+	
+	private static final String FIELDS =Joiner.on(", ")
+			.join(MAIL_ARCHIVE_DOMAIN_UUID, 
+				MAIL_ARCHIVE_ACTIVATED, 
+				MAIL_ARCHIVE_REPEAT_KIND, 
+				MAIL_ARCHIVE_DAY_OF_WEEK, 
+				MAIL_ARCHIVE_DAY_OF_MONTH, 
+				MAIL_ARCHIVE_DAY_OF_YEAR, 
+				MAIL_ARCHIVE_HOUR, 
+				MAIL_ARCHIVE_MINUTE);
 	
 	@Inject
 	@VisibleForTesting DomainConfigurationJdbcImpl(DatabaseConnectionProvider dbcp, ObmHelper obmHelper) {
@@ -108,16 +118,16 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 
 	private DomainConfiguration domainConfigurationFromCursor(ResultSet rs) throws SQLException {
 		return DomainConfiguration.builder()
-				.domainId(ObmDomainUuid.of(rs.getString("mail_archive_domain_uuid")))
-				.enabled(rs.getBoolean("mail_archive_activated"))
+				.domainId(ObmDomainUuid.of(rs.getString(MAIL_ARCHIVE_DOMAIN_UUID)))
+				.enabled(rs.getBoolean(MAIL_ARCHIVE_ACTIVATED))
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
-							.dayOfMonth(DayOfMonth.of(rs.getInt("mail_archive_day_of_month")))
-							.dayOfWeek(DayOfWeek.fromSpecificationValue(rs.getInt("mail_archive_day_of_week")))
-							.dayOfYear(DayOfYear.of(rs.getInt("mail_archive_day_of_year")))
-							.repeat(RepeatKind.valueOf(rs.getString("mail_archive_repeat_kind")))
+							.dayOfMonth(DayOfMonth.of(rs.getInt(MAIL_ARCHIVE_DAY_OF_MONTH)))
+							.dayOfWeek(DayOfWeek.fromSpecificationValue(rs.getInt(MAIL_ARCHIVE_DAY_OF_WEEK)))
+							.dayOfYear(DayOfYear.of(rs.getInt(MAIL_ARCHIVE_DAY_OF_YEAR)))
+							.repeat(RepeatKind.valueOf(rs.getString(MAIL_ARCHIVE_REPEAT_KIND)))
 							.build())
-						.time(new LocalTime(rs.getInt("mail_archive_hour"), rs.getInt("mail_archive_minute")))
+						.time(new LocalTime(rs.getInt(MAIL_ARCHIVE_HOUR), rs.getInt(MAIL_ARCHIVE_MINUTE)))
 						.build())
 				.build();
 	}
@@ -130,8 +140,15 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			connection = dbcp.getConnection();
 			ps = connection.prepareStatement(
 					"UPDATE " + TABLE +
-					" SET mail_archive_activated = ?, mail_archive_repeat_kind = ?, " + 
-					"mail_archive_day_of_week = ?, mail_archive_day_of_month = ?, mail_archive_day_of_year = ?, mail_archive_hour = ?, mail_archive_minute = ?" +
+					" SET " + Joiner.on(" = ?, ")
+					.join(MAIL_ARCHIVE_ACTIVATED, 
+						MAIL_ARCHIVE_REPEAT_KIND, 
+						MAIL_ARCHIVE_DAY_OF_WEEK, 
+						MAIL_ARCHIVE_DAY_OF_MONTH, 
+						MAIL_ARCHIVE_DAY_OF_YEAR, 
+						MAIL_ARCHIVE_HOUR, 
+						MAIL_ARCHIVE_MINUTE) + 
+					" = ?" +
 					" WHERE mail_archive_domain_uuid = ?");
 
 			int idx = 1;
@@ -164,8 +181,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			connection = dbcp.getConnection();
 			ps = connection.prepareStatement(
 					"INSERT INTO " + TABLE +
-					" (mail_archive_domain_uuid, mail_archive_activated, mail_archive_repeat_kind, " + 
-					"mail_archive_day_of_week, mail_archive_day_of_month, mail_archive_day_of_year, mail_archive_hour, mail_archive_minute)" +
+					" (" + FIELDS + ")" +
 					" VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
 			int idx = 1;

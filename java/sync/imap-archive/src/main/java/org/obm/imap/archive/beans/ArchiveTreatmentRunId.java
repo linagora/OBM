@@ -34,10 +34,28 @@ package org.obm.imap.archive.beans;
 
 import java.util.UUID;
 
+import org.obm.push.utils.UUIDFactory;
+
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 
 public class ArchiveTreatmentRunId {
+
+	public static class Factory {
+		
+		private UUIDFactory uuidFactory;
+
+		@Inject
+		@VisibleForTesting Factory(UUIDFactory uuidFactory) {
+			this.uuidFactory = uuidFactory;
+		}
+		
+		public ArchiveTreatmentRunId randomRunId() {
+			return new Builder().runId(uuidFactory.randomUUID()).build();
+		}
+	}
 
 	public static ArchiveTreatmentRunId from(UUID runId) {
 		return new Builder().runId(runId).build();

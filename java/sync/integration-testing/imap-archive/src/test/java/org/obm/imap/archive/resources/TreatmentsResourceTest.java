@@ -31,63 +31,57 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
-import static com.github.restdriver.clientdriver.RestClientDriver.giveResponse;
-import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.UUID;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
+import org.obm.dao.utils.H2Destination;
+import org.obm.dao.utils.H2InMemoryDatabase;
+import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
+import org.obm.imap.archive.CommonClientDriverExpectation;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveRecurrence.RepeatKind;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
+import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
-import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
-import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.jayway.restassured.http.ContentType;
+import com.ninja_squad.dbsetup.DbSetup;
+import com.ninja_squad.dbsetup.Operations;
+import com.ninja_squad.dbsetup.operation.Operation;
+
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class TreatmentsResourceTest {
 
-	private ClientDriverRule driver = new ClientDriverRule();
+	private CommonClientDriverExpectation driver = new CommonClientDriverExpectation();
 	
 	@Rule public TestRule chain = RuleChain
-			.outerRule(new GuiceRule(this, new TestImapArchiveModules.Simple(driver)));
+			.outerRule(driver.getClientDriverRule())
+			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver.getClientDriverRule())))
+			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
+				@Override
+				public H2InMemoryDatabase get() {
+					return db;
+				}
+			}, "sql/initial.sql"));
 
+	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
-	
-	@Before
-	public void setUp() throws Exception {
-		driver.addExpectation(
-				onRequestTo("/obm-sync/login/trustedLogin").withMethod(Method.POST)
-					.withBody(Matchers.allOf(
-								Matchers.containsString("login=admin%40mydomain.org"),
-								Matchers.containsString("password=trust3dToken")),
-					MediaType.APPLICATION_FORM_URLENCODED),
-				giveResponse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-						+ "<token xmlns=\"http://www.obm.org/xsd/sync/token.xsd\">"
-						+ "<sid>06ae323a-0fa1-42ea-9ee8-313a023e4fd4</sid>"
-						+ "<domain uuid=\"962b7b35-abf3-4f1b-943d-d6640450812b\">mydomain.org</domain>"
-						+ "</token>",
-					MediaType.APPLICATION_XML)
-				);
-		server.start();
-	}
 
 	@After
 	public void tearDown() throws Exception {
@@ -95,9 +89,14 @@ public class TreatmentsResourceTest {
 	}
 	
 	@Test
-	public void calculateNextScheduledDateShouldReturnNoContentWhenConfigurationInactive() {
+	public void calculateNextScheduledDateShouldReturnNoContentWhenConfigurationInactive() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("962b7b35-abf3-4f1b-943d-d6640450812b");
+		driver.expectTrustedLogin(domainId);
+		driver.expectGetDomain(domainId);
+		server.start();
+		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
-		domainConfigurationDto.domainId = UUID.fromString("962b7b35-abf3-4f1b-943d-d6640450812b");
+		domainConfigurationDto.domainId = domainId.getUUID();
 		domainConfigurationDto.enabled = false;
 		domainConfigurationDto.repeatKind = RepeatKind.DAILY.toString();
 		domainConfigurationDto.dayOfWeek = DayOfWeek.MONDAY.getSpecificationValue();
@@ -120,9 +119,14 @@ public class TreatmentsResourceTest {
 	}
 	
 	@Test
-	public void calculateNextScheduledDateShouldReturnNextTreatmentDateWhenConfigurationActive() {
+	public void calculateNextScheduledDateShouldReturnNextTreatmentDateWhenConfigurationActive() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("21aeb670-f49e-428a-9d0c-f11f5feaa688");
+		driver.expectTrustedLogin(domainId);
+		driver.expectGetDomain(domainId);
+		server.start();
+		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
-		domainConfigurationDto.domainId = UUID.fromString("21aeb670-f49e-428a-9d0c-f11f5feaa688");
+		domainConfigurationDto.domainId = domainId.getUUID();
 		domainConfigurationDto.enabled = true;
 		domainConfigurationDto.repeatKind = RepeatKind.DAILY.toString();
 		domainConfigurationDto.dayOfWeek = DayOfWeek.MONDAY.getSpecificationValue();
@@ -144,5 +148,91 @@ public class TreatmentsResourceTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.post("/imap-archive/service/v1/domains/21aeb670-f49e-428a-9d0c-f11f5feaa688/treatments/next");
+	}
+	
+	@Test
+	public void startArchivingShouldCreate() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		driver.expectTrustedLogin(domainId);
+		driver.expectGetDomain(domainId);
+		
+		Operation operation =
+				Operations.sequenceOf(Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE),
+				Operations.sequenceOf(Operations.insertInto(DomainConfigurationJdbcImpl.TABLE)
+						.columns(DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DOMAIN_UUID, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_ACTIVATED, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_REPEAT_KIND, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_WEEK, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_MONTH, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_YEAR, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_HOUR, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_MINUTE)
+								.values("2f096466-5a2a-463e-afad-4196c2952de3", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
+								.build()));
+		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
+		dbSetup.launch();
+		
+		server.start();
+		
+		UUID expectedRunId = TestImapArchiveModules.uuid;
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org").
+		expect()
+			.contentType(ContentType.JSON)
+			.body("runId", equalTo(expectedRunId.toString()))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+	}
+	
+	@Test
+	public void startArchivingTwiceShouldRespondConflict() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		driver.expectTrustedLogin(domainId);
+		driver.expectTrustedLogin(domainId);
+		driver.expectGetDomain(domainId);
+		
+		Operation operation =
+				Operations.sequenceOf(Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE),
+				Operations.sequenceOf(Operations.insertInto(DomainConfigurationJdbcImpl.TABLE)
+						.columns(DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DOMAIN_UUID, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_ACTIVATED, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_REPEAT_KIND, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_WEEK, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_MONTH, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_YEAR, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_HOUR, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_MINUTE)
+								.values("2f096466-5a2a-463e-afad-4196c2952de3", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
+								.build()));
+		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
+		dbSetup.launch();
+		
+		server.start();
+		
+		UUID expectedRunId = TestImapArchiveModules.uuid;
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org").
+		expect()
+			.contentType(ContentType.JSON)
+			.body("runId", equalTo(expectedRunId.toString()))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org").
+		expect()
+			.statusCode(Status.CONFLICT.getStatusCode()).
+		when()
+			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
 	}
 }

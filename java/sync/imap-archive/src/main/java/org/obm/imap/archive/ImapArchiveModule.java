@@ -46,6 +46,7 @@ import org.obm.dbcp.DatabaseModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.imap.archive.authentication.AuthenticationFilter;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationModule;
 import org.obm.imap.archive.resources.ConfigurationResource;
 import org.obm.imap.archive.resources.DomainBasedSubResource;
@@ -116,6 +117,7 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(DomainConfigurationService.class);
 		bind(SchedulingDatesService.class);
 		bind(UUIDFactory.class);
+		bind(ArchiveTreatmentRunId.Factory.class);
 		bind(ArchiveService.class).to(ArchiveServiceImpl.class);
 		bind(OnlyOnePerDomainScheduler.class);
 		bind(DateTimeProvider.class).toInstance(DateTimeProvider.SYSTEM_UTC);

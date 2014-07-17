@@ -89,16 +89,16 @@ public class DomainConfigurationJdbcImplTest {
 	public void setUp() {
 		Operation operation =
 				Operations.sequenceOf(
-						Operations.deleteAllFrom("mail_archive"),
-						Operations.insertInto("mail_archive")
-						.columns("mail_archive_domain_uuid", 
-								"mail_archive_activated", 
-								"mail_archive_repeat_kind", 
-								"mail_archive_day_of_week", 
-								"mail_archive_day_of_month", 
-								"mail_archive_day_of_year", 
-								"mail_archive_hour", 
-								"mail_archive_minute")
+						Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE),
+						Operations.insertInto(DomainConfigurationJdbcImpl.TABLE)
+						.columns(DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DOMAIN_UUID, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_ACTIVATED, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_REPEAT_KIND, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_WEEK, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_MONTH, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_DAY_OF_YEAR, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_HOUR, 
+								DomainConfigurationJdbcImpl.MAIL_ARCHIVE_MINUTE)
 						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32)
 						.build());
 
