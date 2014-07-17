@@ -39,6 +39,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl.TABLE.FIELDS;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.utils.ObmHelper;
@@ -57,23 +58,31 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 	private final DatabaseConnectionProvider dbcp;
 	private final ObmHelper obmHelper;
 	
-	protected static final String TABLE = "mail_archive_run";
-	protected static final String MAIL_ARCHIVE_RUN_UUID = "mail_archive_run_uuid";
-	protected static final String MAIL_ARCHIVE_RUN_DOMAIN_UUID = "mail_archive_run_domain_uuid";
-	protected static final String MAIL_ARCHIVE_RUN_STATUS = "mail_archive_run_status";
-	protected static final String MAIL_ARCHIVE_RUN_START = "mail_archive_run_start";
-	protected static final String MAIL_ARCHIVE_RUN_END = "mail_archive_run_end";
-	protected static final String MAIL_ARCHIVE_RUN_LOWER_BOUNDARY = "mail_archive_run_lower_boundary";
-	protected static final String MAIL_ARCHIVE_RUN_HIGHER_BOUNDARY = "mail_archive_run_higher_boundary";
+	interface TABLE {
+		
+		String NAME = "mail_archive_run";
+		
+		interface FIELDS {
+			String UUID = "mail_archive_run_uuid";
+			String DOMAIN_UUID = "mail_archive_run_domain_uuid";
+			String STATUS = "mail_archive_run_status";
+			String START = "mail_archive_run_start";
+			String END = "mail_archive_run_end";
+			String LOWER_BOUNDARY = "mail_archive_run_lower_boundary";
+			String HIGHER_BOUNDARY = "mail_archive_run_higher_boundary";
+			
+			String ALL = Joiner.on(", ").join(UUID, DOMAIN_UUID, STATUS, START, END, LOWER_BOUNDARY, HIGHER_BOUNDARY);
+		}
+	}
 	
-	private static final String FIELDS = Joiner.on(", ")
-			.join(MAIL_ARCHIVE_RUN_UUID, 
-				MAIL_ARCHIVE_RUN_DOMAIN_UUID, 
-				MAIL_ARCHIVE_RUN_STATUS, 
-				MAIL_ARCHIVE_RUN_START, 
-				MAIL_ARCHIVE_RUN_END, 
-				MAIL_ARCHIVE_RUN_LOWER_BOUNDARY, 
-				MAIL_ARCHIVE_RUN_HIGHER_BOUNDARY);
+	interface REQUESTS {
+		
+		String SELECT_ORDERED = String.format(
+				"SELECT %s FROM %s WHERE %s = ? ORDER BY id DESC", FIELDS.ALL, TABLE.NAME, FIELDS.DOMAIN_UUID);
+		
+		String INSERT = String.format(
+				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
+	}
 	
 	@Inject
 	@VisibleForTesting ArchiveTreatmentJdbcImpl(DatabaseConnectionProvider dbcp, ObmHelper obmHelper) {
@@ -84,10 +93,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 	@Override
 	public Optional<ArchiveTreatment> getLastArchiveTreatment(ObmDomainUuid domainId) throws DaoException {
 		try (Connection connection = dbcp.getConnection();
-				PreparedStatement ps = connection.prepareStatement(
-					"SELECT " + FIELDS + " FROM " + TABLE + " " +
-					"WHERE " + MAIL_ARCHIVE_RUN_DOMAIN_UUID + " = ? " +
-					"ORDER BY id DESC")) {
+				PreparedStatement ps = connection.prepareStatement(REQUESTS.SELECT_ORDERED)) {
 
 			ps.setString(1, domainId.toString());
 
@@ -106,29 +112,26 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 
 	private ArchiveTreatment archiveTreatmentFromResultSet(ResultSet rs) throws SQLException {
 		return ArchiveTreatment.builder()
-				.runId(ArchiveTreatmentRunId.from(rs.getString(MAIL_ARCHIVE_RUN_UUID)))
-				.domainId(ObmDomainUuid.of(rs.getString(MAIL_ARCHIVE_RUN_DOMAIN_UUID)))
-				.archiveStatus(ArchiveStatus.valueOf(rs.getString(MAIL_ARCHIVE_RUN_STATUS)))
-				.start(JDBCUtils.getDateTime(rs, MAIL_ARCHIVE_RUN_START, DateTimeZone.UTC))
-				.end(JDBCUtils.getDateTime(rs, MAIL_ARCHIVE_RUN_END, DateTimeZone.UTC))
-				.lowerBoundary(JDBCUtils.getDateTime(rs, MAIL_ARCHIVE_RUN_LOWER_BOUNDARY, DateTimeZone.UTC))
-				.higherBoundary(JDBCUtils.getDateTime(rs, MAIL_ARCHIVE_RUN_HIGHER_BOUNDARY, DateTimeZone.UTC))
+				.runId(ArchiveTreatmentRunId.from(rs.getString(FIELDS.UUID)))
+				.domainId(ObmDomainUuid.of(rs.getString(FIELDS.DOMAIN_UUID)))
+				.archiveStatus(ArchiveStatus.valueOf(rs.getString(FIELDS.STATUS)))
+				.start(JDBCUtils.getDateTime(rs, FIELDS.START, DateTimeZone.UTC))
+				.end(JDBCUtils.getDateTime(rs, FIELDS.END, DateTimeZone.UTC))
+				.lowerBoundary(JDBCUtils.getDateTime(rs, FIELDS.LOWER_BOUNDARY, DateTimeZone.UTC))
+				.higherBoundary(JDBCUtils.getDateTime(rs, FIELDS.HIGHER_BOUNDARY, DateTimeZone.UTC))
 				.build();
 	}
 
 	@Override
 	public void insert(ArchiveTreatment archiveTreatment) throws DaoException {
 		try (Connection connection = dbcp.getConnection();
-				PreparedStatement ps = connection.prepareStatement(
-					"INSERT INTO " + TABLE +
-					" (" + FIELDS+ ")" +
-					" VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+				PreparedStatement ps = connection.prepareStatement(REQUESTS.INSERT)) {
 
 			int idx = 1;
 			ps.setString(idx++, archiveTreatment.getRunId().serialize());
 			ps.setString(idx++, archiveTreatment.getDomainId().get());
 			ps.setObject(idx++, obmHelper.getDBCP()
-					.getJdbcObject(MAIL_ARCHIVE_RUN_STATUS, archiveTreatment.getArchiveStatus().toString()));
+					.getJdbcObject(FIELDS.STATUS, archiveTreatment.getArchiveStatus().toString()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(archiveTreatment.getStart()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(archiveTreatment.getEnd()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(archiveTreatment.getLowerBoundary()));

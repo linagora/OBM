@@ -85,15 +85,15 @@ public class ArchiveTreatmentJdbcImplTest {
 	public void setUp() {
 		Operation operation =
 				Operations.sequenceOf(
-						Operations.deleteAllFrom(ArchiveTreatmentJdbcImpl.TABLE),
-						Operations.insertInto(ArchiveTreatmentJdbcImpl.TABLE)
-						.columns(ArchiveTreatmentJdbcImpl.MAIL_ARCHIVE_RUN_UUID,
-								ArchiveTreatmentJdbcImpl.MAIL_ARCHIVE_RUN_DOMAIN_UUID, 
-								ArchiveTreatmentJdbcImpl.MAIL_ARCHIVE_RUN_STATUS, 
-								ArchiveTreatmentJdbcImpl.MAIL_ARCHIVE_RUN_START, 
-								ArchiveTreatmentJdbcImpl.MAIL_ARCHIVE_RUN_END, 
-								ArchiveTreatmentJdbcImpl.MAIL_ARCHIVE_RUN_LOWER_BOUNDARY, 
-								ArchiveTreatmentJdbcImpl.MAIL_ARCHIVE_RUN_HIGHER_BOUNDARY)
+						Operations.deleteAllFrom(ArchiveTreatmentJdbcImpl.TABLE.NAME),
+						Operations.insertInto(ArchiveTreatmentJdbcImpl.TABLE.NAME)
+						.columns(ArchiveTreatmentJdbcImpl.TABLE.FIELDS.UUID,
+								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
+								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.STATUS, 
+								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.START, 
+								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.END, 
+								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.LOWER_BOUNDARY, 
+								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.HIGHER_BOUNDARY)
 						.values("c3c5cb24-f5df-45ed-8918-99c7555a02c4",
 								"633bdb12-bb8a-4943-9dd0-6a6e48051517", 
 								ArchiveStatus.WARNING, 
@@ -135,7 +135,7 @@ public class ArchiveTreatmentJdbcImplTest {
 	}
 	
 	@Test
-	public void insertArchiveTreatmentShouldReturnMatchingValues() throws Exception {
+	public void insertShouldReturnMatchingValues() throws Exception {
 		ArchiveTreatment expectedArchiveTreatment = ArchiveTreatment.builder()
 				.runId(ArchiveTreatmentRunId.from("bc139d31-5ffb-4174-a5e3-ac33d0b9f204"))
 				.domainId(ObmDomainUuid.of("74c66801-44f1-4bb2-b334-08053cb4ad53"))
@@ -152,7 +152,7 @@ public class ArchiveTreatmentJdbcImplTest {
 	}
 	
 	@Test
-	public void insertArchiveTreatmentShouldThrowWhenDuplicateRunId() throws Exception {
+	public void insertShouldThrowWhenDuplicateRunId() throws Exception {
 		ArchiveTreatment expectedArchiveTreatment = ArchiveTreatment.builder()
 				.runId(ArchiveTreatmentRunId.from("a860eecd-e608-4cbe-9d7a-6ef907b56367"))
 				.domainId(ObmDomainUuid.of("633bdb12-bb8a-4943-9dd0-6a6e48051517"))
