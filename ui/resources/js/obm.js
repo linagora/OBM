@@ -677,8 +677,9 @@ function refreshWaitEvent() {
             if ( obm.vars.newTopbar ) {
               var count = parseInt(response.count, 10);
               if(count > 0){
-                displayInTitleTab('calendar', count);
-                elem.set('text',response.count);
+                var displayedCount = getDisplayedcount(count);
+                elem.set('text', displayedCount);
+                displayInTitleTab('calendar', displayedCount);
                 elem.setStyle('display', 'inline-block');
                 resizeForBadges(elem, count);
               }
@@ -696,8 +697,14 @@ function refreshUnreadMail(){
 
 function displayUnreadMail(count) {
   var elem = $('bannerUnreadMail');
+  var displayedCount = getDisplayedcount(count);
+
+  if(count > 0){
+    displayInTitleTab('webmail', displayedCount);
+  }
+
   if(count > 0 && $('webmail_iframe') == null){
-    elem.set('text', count);
+    elem.set('text', displayedCount);
     elem.setStyle('display', 'inline-block');
     resizeForBadges(elem, count);
   } else {
@@ -739,15 +746,15 @@ function getWebmailUnreadMail(callback) {
   r.send();
 }
 
+function getDisplayedcount(count){
+  return count < 99 ? count.toString() : '99+';
+}
+
 function resizeForBadges(elem, count){
   if (count <= 9) {
     elem.getParent('li').setStyle('margin-right', '10px');
-  } else if (count > 9 && count < 99) {
-    elem.getParent('li').setStyle('margin-right', '15px');
-  } else if (count > 99 && count < 999) {
-    elem.getParent('li').setStyle('margin-right', '22px');
-  } else if (count > 999) {
-    elem.getParent('li').setStyle('margin-right', '28px');
+  } else {
+    elem.getParent('li').setStyle('margin-right', '20px');
   }
 }
 
