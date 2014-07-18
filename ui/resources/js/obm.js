@@ -4,7 +4,7 @@
  */
 
 Obm.Menu = new Class({
-  
+
   initialize: function() {
     this.menuItems = new Object();
 
@@ -13,13 +13,13 @@ Obm.Menu = new Class({
       var item = sectionItems[i];
       item.addEvent('mouseover', function(e){
         this.addClass('hover');
-      });  
+      });
       item.addEvent('mouseout', function(e){
         this.removeClass('hover');
-      });        
+      });
     }
 
-  },  
+  },
 
   addItem: function(item) {
     var slide = new Fx.Slide(item +'-items', {duration: 150,onComplete:this.menuListBoxFix});
@@ -40,7 +40,7 @@ Obm.Menu = new Class({
     this.menuItems[item] = slide;
     sectionBlock.addEvent('click', function(e){
       obm.menu.toggle(this.id)
-    });   
+    });
   },
 
   toggle: function(item) {
@@ -65,7 +65,7 @@ Obm.Menu = new Class({
       this.menuItems[i].hide();
     }
   },
-  
+
   menuListBoxFix: function(element) {
     if (this.wrapper['offset'+this.layout.capitalize()] > 0) {
       overListBoxFix(element,'block');
@@ -81,7 +81,7 @@ Obm.Menu = new Class({
  */
 
 Obm.Portlets = new Class({
-  
+
   initialize: function() {
     if(!$('portlets') )
       return false;
@@ -95,11 +95,11 @@ Obm.Portlets = new Class({
     img.src = obm.vars.images.minus;
     this.close = img.src;
     img.src = obm.vars.images.plus;
-    this.open = img.src; 
-    
-    // 
+    this.open = img.src;
+
+    //
     this.portlets = new Object();
-    
+
     $('portlets').set('slide', {duration: 'normal',mode: 'horizontal', wrapper: 'portletsPanel'});
     $('mainPanel').set('tween',{property: 'margin-left'});
 
@@ -117,20 +117,20 @@ Obm.Portlets = new Class({
 
     if(Cookie.read("portletHidden") == "true") {
       $('portletsHandler').getFirst().setStyle('display','none')
-                  .getNext().setStyle('display','inline'); 
+                  .getNext().setStyle('display','inline');
       $('portlets').get('slide').hide();
       $('portletsPanel').setStyle('width',this.delta + 'px');
       $('mainPanel').tween(this.delta);
       $('portletsHandler').tween(0);
     }
 
-  
+
     for(i=0;i<elements.length;i++) {
-      var el = elements[i];      
+      var el = elements[i];
       var title = el.getFirst();
       var content = title.getNext();
       this.portlets[el.id] = new Fx.Slide(content, {duration: 150,wait:false});
-      
+
       var img = new Element('img');
       if(Cookie.read(el.id + "Hidden")  == "true") {
         this.portlets[el.id].hide();
@@ -142,9 +142,9 @@ Obm.Portlets = new Class({
       img.className = 'handle';
       img = $(img);
       img.addEvent('click', function(e){
-        if(this.getAttribute("src") == obm.portlets.close) 
+        if(this.getAttribute("src") == obm.portlets.close)
           this.setAttribute("src", obm.portlets.open);
-        else 
+        else
           this.setAttribute("src", obm.portlets.close);
         obm.portlets.toggleElement(this.parentNode.parentNode.id);
       });
@@ -159,7 +159,7 @@ Obm.Portlets = new Class({
                    .getNext().setStyle('display','none');
     else
        $('portletsHandler').getFirst().setStyle('display','none')
-                   .getNext().setStyle('display','inline');      
+                   .getNext().setStyle('display','inline');
 
     if($('portlets').get('slide').open) {
       $('mainPanel').tween(this.width + this.delta,this.delta);
@@ -186,7 +186,7 @@ Obm.Portlets = new Class({
       Cookie.write(item + "Hidden", "true",{path: '/'});
     } else {
       Cookie.write(item + "Hidden", "false",{path: '/'});
-    }    
+    }
   }
 
 });
@@ -194,7 +194,7 @@ Obm.Portlets = new Class({
 
 /*
  *
- * OBM Tip 
+ * OBM Tip
  * A simple wrapper arround mootools Tips.
  *
  */
@@ -227,7 +227,7 @@ Obm.Tip = new Class({
       element.set('title', content);
     } else {
       try {
-        element_title = eval(element.get('title')); 
+        element_title = eval(element.get('title'));
         content = element_title.content;
       } catch (ee) {
         content = element.get('title');
@@ -235,7 +235,7 @@ Obm.Tip = new Class({
     }
     var title = element.retrieve('tip:title', content);
     var text = element.retrieve('tip:text', element.get('rel') || element.get('href'));
-    if (this.options.click) { 
+    if (this.options.click) {
       element.addEvent('click', function() {
         if (this.tip.style.visibility == 'hidden') {
           this.elementEnter(this, element);
@@ -272,12 +272,12 @@ Obm.Tip = new Class({
  *
  */
 Obm.Popup = new Class ({
-  
+
   initialize: function() {
     this.popups = new Hash();
     this.isOpen = false;
   },
-  
+
   add: function(id, content, buttons) {
     if(content != undefined) {
       var content = StickyWin.ui('the caption', 'this is the body', {
@@ -313,7 +313,7 @@ Obm.Popup = new Class ({
   hide: function(id) {
     if(this.popups.get(id)) {
       this.popups.get(id).hide();
-    } 
+    }
     this.isOpen = false;
   }
 
@@ -326,10 +326,10 @@ Obm.Popup = new Class ({
  * OBM Drag
  *
  * Extends Mootools Drag.Move class
- * Support overflow & x/y units 
+ * Support overflow & x/y units
  *
  */
-Obm.Drag = new Class ({ 
+Obm.Drag = new Class ({
 
   Extends: Drag.Move,
 
@@ -426,7 +426,7 @@ Obm.Drag = new Class ({
 
 /*
  *
- * OBM Scroller 
+ * OBM Scroller
  *
  * Extends Mootools Scroller class
  * Fix mootools bug
@@ -461,14 +461,14 @@ Obm.Scroller = new Class({
  * OBM Observer
  *
  * Add a periodical check on an element property
- * If the property change it call the onStart function, will changing 
+ * If the property change it call the onStart function, will changing
  * it call the onChange  function, and when not changing anymore the
  * onStop function.
  *
  */
-Obm.Observer = new Class({ 
+Obm.Observer = new Class({
 
-  Implements: Options,   
+  Implements: Options,
 
   options: {
     property: 'width',
@@ -482,30 +482,30 @@ Obm.Observer = new Class({
     this.setOptions(options);
     this.el = $(el);
     this.lastValue = this.setValue();
-    this.change = false; 
+    this.change = false;
     this.timer = this.check.periodical(this.options.frequency, this);
   },
-  
+
   setValue: function() {
     var v;
     if(this.options.property == 'contentHeight') {
       v = this.el.getHeight() + this.el.getScrollHeight();
     } else if(this.options.property == 'contentWidth') {
-      v = this.el.getWidth() + this.el.getScrollWidth();      
+      v = this.el.getWidth() + this.el.getScrollWidth();
     } else if (this.options.property == 'innerHeight') {
       v = this.el.getHeight();
     } else if (this.options.property == 'innerWidth') {
       v = this.el.getWidth();
     } else {
       v = this.el[this.options.property];
-      if(!v) 
+      if(!v)
         v = this.el.getStyle(this.options.property);
     }
     return v;
   },
-  
+
   check: function() {
-    var v = this.setValue(); 
+    var v = this.setValue();
     if(this.lastValue == v) {
       if(this.change) {
         this.options.onStop(this.el, v);
@@ -513,7 +513,7 @@ Obm.Observer = new Class({
       }
       return;
     }
-    this.lastValue = v; 
+    this.lastValue = v;
     if(!this.change) {
       this.options.onStart(this.el, v);
       this.change = true;
@@ -546,7 +546,7 @@ Obm.Observer = new Class({
 //
 //  //} else {
 //    this._send(options);
-//    this.addEvent('complete', function() { Request.Cache[cacheId] = this.response; }); 
+//    this.addEvent('complete', function() { Request.Cache[cacheId] = this.response; });
 //  //}
 //  return this;
 //}
@@ -597,13 +597,13 @@ function showMessage(klass, message) {
 }
 
 function overListBoxFix(overObject, forceDisplay) {
-  
+
   if (navigator.userAgent.toLowerCase().indexOf("msie") == -1)
     return;
-  
+
   try {
     if (!$('listBoxHider')) {
-      
+
       new Element("iframe").setProperty('id','listBoxHider')
         .setProperty("src", "javascript:false;")
         .setProperty("scrolling", "no")
@@ -622,7 +622,7 @@ function overListBoxFix(overObject, forceDisplay) {
       left : overObject.getLeft(),
       zIndex : overObject.getStyle("zIndex") - 1,
       visibility : overObject.getStyle("visibility") == "hidden" ? "hidden" : "visible",
-      display : (forceDisplay) ? forceDisplay : overObject.getStyle("display") 
+      display : (forceDisplay) ? forceDisplay : overObject.getStyle("display")
     });
   } catch (ee) {
     alert(ee);
@@ -631,7 +631,7 @@ function overListBoxFix(overObject, forceDisplay) {
 }
 
 function showWaitingPanel(el) {
-  return false; 
+  return false;
   el = $(el);
   obm.waitingPanel = new Element('div')
                       .setStyles({
@@ -664,7 +664,7 @@ function unSelectAllCb(container) {
   var chks = container.getElements('input[type=checkbox]');
   chks.each(function (chk) {
     chk.checked = false;
-  })          
+  })
 }
 
 function refreshWaitEvent() {
@@ -682,7 +682,7 @@ function refreshWaitEvent() {
             } else {
               elem.set('text',response.msg);
               elem.setStyle('display', 'inline-block');
-            }            
+            }
         }
   }).get({ajax : 1,action : 'get_json_waiting_events'});
 }
@@ -699,6 +699,14 @@ function displayUnreadMail(count) {
     resizeForBadges(elem, count);
   } else {
     elem.setStyle('display', 'none');
+  }
+}
+
+function displayInTitleTab(page, count){
+  if (window.location.pathname == '/' + page + '/' + page + '_index.php'){
+    var title = document.title;
+    title = title.split(')');
+    document.title = '(' + count + ') ' + title;
   }
 }
 
@@ -861,7 +869,7 @@ Obm.CalendarPopupManager = new Class({
       obm.calendarManager.cancel(this.ivent.element_id);
     }
   },
-  
+
   complete: function() {
     this.chain.clearChain();
     this.fireEvent('complete')
@@ -871,7 +879,7 @@ Obm.CalendarPopupManager = new Class({
 });
 
 /****************************************************************
-  *  Close new top bar div 
+  *  Close new top bar div
 ****************************************************************/
 
 window.addEvent('domready', function() {
