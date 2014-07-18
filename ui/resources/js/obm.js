@@ -703,10 +703,10 @@ function displayUnreadMail(count) {
 }
 
 function displayInTitleTab(page, count){
+  var title = document.title;
   if (window.location.pathname == '/' + page + '/' + page + '_index.php'){
-    var title = document.title;
     title = title.split(')');
-    document.title = '(' + count + ') ' + title;
+    document.title = '(' + count + ') ' + title.pop();
   }
 }
 
