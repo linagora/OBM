@@ -811,13 +811,20 @@ function get_json_waiting_events($id) {
   $multidomain = sql_multidomain('event');
   $obm_q = new DB_OBM;
 
+  $writable_cal = array_keys(OBM_Acl::getAllowedEntities($id, 'calendar', 'write'));
+  $writable_res = array_keys(OBM_Acl::getAllowedEntities($id, 'resource', 'write'));
+
+  $resource_where = '';
+  if(count($writable_res) > 0){
+    $resource_where = "resourceentity_resource_id IN (".implode(",", $writable_res).") OR";
+  }
+
   $query = "
     SELECT count(event_id) as nb_event
     FROM Event
     INNER JOIN EventLink ON event_id  = eventlink_event_id
-    INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
-    INNER JOIN UserObm attendee ON userentity_user_id = attendee.userobm_id
-    INNER JOIN UserObm u ON event_owner = u.userobm_id
+    LEFT JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+    LEFT JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
     WHERE
     event_type='VEVENT'
     AND eventlink_state = 'NEEDS-ACTION'
@@ -826,8 +833,8 @@ function get_json_waiting_events($id) {
            AND (event_endrepeat IS NULL OR event_endrepeat >= NOW())
            ) 
         )
-    AND userentity_user_id = $id
-    ";
+    AND ( $resource_where userentity_user_id IN (".implode(",", $writable_cal).") )
+  ";
 
   $obm_q->query($query);
   if ($obm_q->num_rows() == 1) {
