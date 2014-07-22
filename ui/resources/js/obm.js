@@ -676,9 +676,12 @@ function refreshWaitEvent() {
             var elem = $('bannerWaitingEvent');
             if ( obm.vars.newTopbar ) {
               var count = parseInt(response.count, 10);
-              elem.set('text',response.count);
-              elem.setStyle('display', 'inline-block');
-              resizeForBadges(elem, count);
+              if(count > 0){
+                displayInTitleTab('calendar', count);
+                elem.set('text',response.count);
+                elem.setStyle('display', 'inline-block');
+                resizeForBadges(elem, count);
+              }
             } else {
               elem.set('text',response.msg);
               elem.setStyle('display', 'inline-block');
