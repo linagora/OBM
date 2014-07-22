@@ -3592,6 +3592,11 @@ var Request = new Class({
 		this.fireEvent('complete').fireEvent('failure', this.xhr);
 	},
 
+	onSendException: function(e) {
+		console.log('Cannot send request. ', e);
+		window.location.reload();
+	},
+
 	setHeader: function(name, value){
 		this.headers.set(name, value);
 		return this;
@@ -3662,7 +3667,11 @@ var Request = new Class({
 		}, this);
 
 		this.fireEvent('request');
-		this.xhr.send(data);
+		try {
+			this.xhr.send(data);
+		} catch (e) {
+			this.onSendException(e);
+		}
 		if (!this.options.async) this.onStateChange();
 		return this;
 	},
