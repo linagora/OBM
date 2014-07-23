@@ -40,6 +40,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 
@@ -52,7 +53,7 @@ public class ClientIdServiceImplTest {
 	public void setup() {
 		User user = User.Factory.create().createUser("test@test", "test@domain", "displayName");
 		Device device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
-		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, new ResourcesHolder());
 	}
 	
 	@Test

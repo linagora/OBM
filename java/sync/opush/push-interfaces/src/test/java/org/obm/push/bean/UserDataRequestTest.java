@@ -31,12 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Before;
@@ -45,8 +41,6 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.User.Factory;
 
-import com.google.common.collect.Maps;
-
 @RunWith(SlowFilterRunner.class)
 public class UserDataRequestTest {
 
@@ -54,7 +48,6 @@ public class UserDataRequestTest {
 	private Credentials credentials;
 	private String command;
 	private Device device;
-	private Resource resource1, resource2;
 	
 	@Before
 	public void setUp() {
@@ -106,86 +99,7 @@ public class UserDataRequestTest {
 		assertThat(userDataRequest.getDevice()).isEqualTo(device);
 	}
 	
-	@Test
-	public void testPutNullKeyToResources() {
-		Resource resource = createMock(Resource.class);
-		
-		UserDataRequest userDataRequest = createUserDataRequest();
-		userDataRequest.putResource(null, resource);
-		assertThat(userDataRequest.getResources()).isEmpty();
-	}
-	
-	@Test
-	public void testPutNullResourceToResources() {
-		UserDataRequest userDataRequest = createUserDataRequest();
-		userDataRequest.putResource("ACCESS_TOKEN", null);
-		assertThat(userDataRequest.getResources()).isEmpty();
-	}
-
-	@Test
-	public void testPutResource() {
-		Resource resource = createMock(Resource.class);
-		
-		UserDataRequest userDataRequest = createUserDataRequest();
-		userDataRequest.putResource("ACCESS_TOKEN", resource);
-		assertThat(userDataRequest.getResources()).hasSize(1);
-	}
-
-	@Test
-	public void testPutAllNullResources() {
-		UserDataRequest userDataRequest = createUserDataRequest();
-		userDataRequest.putAllResources(null);
-		assertThat(userDataRequest.getResources()).isEmpty();
-	}
-
-	private Map<String, Resource> createResourcesMap() {
-		resource1 = createMock(Resource.class);
-		resource1.close();
-		expectLastCall().once();
-		resource2 = createMock(Resource.class);
-		resource2.close();
-		expectLastCall().once();
-		replay(resource1, resource2);
-		
-		Map<String, Resource> resources = Maps.newHashMap();
-		resources.put("ACCESS_TOKEN", resource1);
-		resources.put("IMAP_STORE", resource2);
-		return resources;
-	}
-	
-	@Test
-	public void testPutAllResources() {
-		UserDataRequest userDataRequest = createUserDataRequest();
-		userDataRequest.putAllResources(createResourcesMap());
-		assertThat(userDataRequest.getResources()).hasSize(2);
-	}
-
-	@Test
-	public void testGetResource() {
-		UserDataRequest userDataRequest = createUserDataRequest();
-		Resource resource = createMock(Resource.class);
-		Map<String, Resource> resources = Maps.newHashMap();
-		resources.put("ACCESS_TOKEN", resource);
-		
-		userDataRequest.putAllResources(resources);
-		
-		assertThat(userDataRequest.getResource("ACCESS_TOKEN")).isEqualTo(resource);
-	}
-	
-	@Test
-	public void testGetResourcesWithNullResource() {
-		UserDataRequest userDataRequest = createUserDataRequest();
-		assertThat(userDataRequest.getResources()).isEmpty();
-	}
-
-	@Test
-	public void testGetResources() {
-		UserDataRequest userDataRequest = createUserDataRequest();
-		userDataRequest.putAllResources(createResourcesMap());
-		assertThat(userDataRequest.getResources()).hasSize(2);
-	}
-	
 	private UserDataRequest createUserDataRequest() {
-		return new UserDataRequest(credentials, command, device);
+		return new UserDataRequest(credentials, command, device, new ResourcesHolder());
 	}
 }

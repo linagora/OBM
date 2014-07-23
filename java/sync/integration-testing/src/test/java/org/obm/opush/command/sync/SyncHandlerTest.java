@@ -94,6 +94,7 @@ import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
@@ -429,7 +430,7 @@ public class SyncHandlerTest {
 
 		UserDataRequest userDataRequest = new UserDataRequest(singleUserFixture.jaures.credentials, 
 				"Sync", 
-				singleUserFixture.jaures.device);
+				singleUserFixture.jaures.device, new ResourcesHolder());
 		
 		expectAllocateFolderState(classToInstanceMap.get(CollectionDao.class), newSyncState(syncEmailSyncKey));
 		expectCreateFolderMappingState(classToInstanceMap.get(FolderSyncStateBackendMappingDao.class));
@@ -791,7 +792,7 @@ public class SyncHandlerTest {
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncKey, existingCollections, serverDataDelta, fakeTestUsers, classToInstanceMap);
 		
-		UserDataRequest udr = new UserDataRequest(singleUserFixture.jaures.credentials, "Sync", singleUserFixture.jaures.device);
+		UserDataRequest udr = new UserDataRequest(singleUserFixture.jaures.credentials, "Sync", singleUserFixture.jaures.device, new ResourcesHolder());
 		expect(contentsImporter.importMessageChange(udr, collectionId, serverId, clientId, clientData))
 			.andThrow(new NoPermissionException());
 		
@@ -836,7 +837,7 @@ public class SyncHandlerTest {
 		mockHierarchyChangesOnlyInbox(classToInstanceMap);
 		mockEmailSyncClasses(syncKey, existingCollections, serverDataDelta, fakeTestUsers, classToInstanceMap);
 		
-		UserDataRequest udr = new UserDataRequest(singleUserFixture.jaures.credentials, "Sync", singleUserFixture.jaures.device);
+		UserDataRequest udr = new UserDataRequest(singleUserFixture.jaures.credentials, "Sync", singleUserFixture.jaures.device, new ResourcesHolder());
 		expect(contentsImporter.importMessageChange(udr, collectionId, serverId, clientId, clientData))
 			.andThrow(new NoPermissionException());
 		

@@ -47,6 +47,7 @@ public class LoggerModule extends AbstractModule {
 	public static final String CONFIGURATION = "CONFIGURATION";
 	public static final String TECHNICAL_LOG = "technical_log";
 	public static final String MIGRATION = "MIGRATION";
+	public static final String RESOURCES = "RESOURCES";
 	
 	@Override
 	protected void configure() {
@@ -59,6 +60,7 @@ public class LoggerModule extends AbstractModule {
 		bind(Logger.class).annotatedWith(Names.named(CONFIGURATION)).toInstance(LoggerFactory.getLogger(CONFIGURATION));
 		bind(Logger.class).annotatedWith(Names.named(TECHNICAL_LOG)).toInstance(LoggerFactory.getLogger(TECHNICAL_LOG));
 		bind(Logger.class).annotatedWith(Names.named(MIGRATION)).toInstance(LoggerFactory.getLogger(MIGRATION));
+		bind(Logger.class).annotatedWith(Names.named(RESOURCES)).toInstance(LoggerFactory.getLogger(RESOURCES));
 	}
 	
 }

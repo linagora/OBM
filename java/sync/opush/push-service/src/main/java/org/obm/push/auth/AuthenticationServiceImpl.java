@@ -31,18 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.auth;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.UnexpectedObmSyncServerException;
 import org.obm.push.resource.AccessTokenResource;
 import org.obm.push.resource.HttpClientResource;
-import org.obm.push.resource.ResourceCloseOrder;
-import org.obm.push.resource.ResourcesUtils;
 import org.obm.push.service.AuthenticationService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
@@ -80,19 +76,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	public String getUserEmail(UserDataRequest udr) {
 		try {
-			return userClientFactory.create(ResourcesUtils.getHttpClient(udr))
-					.getUserEmail(ResourcesUtils.getAccessToken(udr));
+			HttpClient httpClient = udr.getResource(HttpClientResource.class).getHttpClient();
+			AccessToken accessToken = udr.getResource(AccessTokenResource.class).getAccessToken();
+			return userClientFactory.create(httpClient).getUserEmail(accessToken);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		}
 	}
 
 	@Override
-	public Credentials authenticateValidRequest(HttpServletRequest request, String userId, String password) throws Exception {
-		HttpClientResource httpClientResource = setHttpClientRequestAttribute(request);
-		
-		AccessTokenResource token = setAccessTokenRequestAttribute(request, 
-				httpClientResource.getHttpClient(), userId, password);
+	public Credentials authenticateValidRequest(ResourcesHolder resourcesHolder, String userId, String password) throws Exception {
+		AccessTokenResource token = buildAccessTokenResource(resourcesHolder, userId, password);
 		return getCredentials(token, userId, password);
 	}
 
@@ -106,16 +100,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		}
 	}
 
-	private AccessTokenResource setAccessTokenRequestAttribute(HttpServletRequest request, HttpClient httpClient, String userId, String password) throws Exception {
+	private AccessTokenResource buildAccessTokenResource(ResourcesHolder resourcesHolder, String userId, String password) throws Exception {
+		HttpClient httpClient = resourcesHolder.get(HttpClientResource.class).getHttpClient();
 		AccessTokenResource token = login(httpClient, getLoginAtDomain(userId), password);
-		request.setAttribute(ResourceCloseOrder.ACCESS_TOKEN.name(), token);
+		resourcesHolder.put(AccessTokenResource.class, token);
 		return token;
-	}
-	
-	private HttpClientResource setHttpClientRequestAttribute(HttpServletRequest request) {
-		HttpClientResource httpClientResource = new HttpClientResource(new DefaultHttpClient());
-		request.setAttribute(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
-		return httpClientResource;
 	}
 	
 	private AccessTokenResource login(HttpClient httpClient, String userId, String password) throws Exception {

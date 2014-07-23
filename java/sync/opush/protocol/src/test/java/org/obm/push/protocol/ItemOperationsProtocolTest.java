@@ -58,6 +58,7 @@ import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.ItemOperationsStatus;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
@@ -92,7 +93,7 @@ public class ItemOperationsProtocolTest {
 		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
 		Device device = new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121);
 		Credentials credentials = new Credentials(user, "test");
-		udr = new UserDataRequest(credentials, "Sync", device);
+		udr = new UserDataRequest(credentials, "Sync", device, new ResourcesHolder());
 		itemOperationsProtocol = new ItemOperationsProtocol.Factory(null).create(device, true);
 	}
 	

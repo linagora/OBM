@@ -33,7 +33,6 @@ package org.obm.opush;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Singleton;
@@ -41,36 +40,28 @@ import com.google.inject.Singleton;
 @Singleton
 public class PendingQueriesLock {
 
-	private final AtomicInteger nbClient;
 	private final Semaphore lock;
-	private int nbLock;
+	private int nbClient;
 	
 	public PendingQueriesLock() {
-		nbLock = 0;
-		nbClient = new AtomicInteger(0);
+		nbClient = 0;
 		lock = new Semaphore(1);
 	}
+
+	public synchronized void startQuery() {
+		nbClient++;
+		lock.tryAcquire();
+	}
 	
-	public synchronized void countDown() {
-		nbLock -= 1;
-		Preconditions.checkState(nbLock >= 0);
-		if (nbLock == 0) {
+	public synchronized void closeQuery() {
+		nbClient--;
+		Preconditions.checkState(nbClient >= 0);
+		if (nbClient == 0) {
 			lock.release();
 		}
 	}
 	
 	public boolean waitingClose(long timeout, TimeUnit unit) throws InterruptedException {
 		return lock.tryAcquire(timeout, unit);
-	}
-
-	public void incrementLockCount() {
-		nbClient.incrementAndGet();
-	}
-
-	public synchronized void start() {
-		nbLock += nbClient.get();
-		if (nbLock > 0) {
-			lock.tryAcquire();
-		}
 	}
 }

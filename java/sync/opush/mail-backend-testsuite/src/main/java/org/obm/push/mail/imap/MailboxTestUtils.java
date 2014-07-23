@@ -38,9 +38,9 @@ import java.util.Set;
 import javax.mail.internet.MimeMessage;
 
 import org.obm.configuration.EmailConfiguration;
-import org.obm.push.bean.UserDataRequest;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.exception.UnsupportedBackendFunctionException;
 import org.obm.push.mail.ImapMessageNotFoundException;

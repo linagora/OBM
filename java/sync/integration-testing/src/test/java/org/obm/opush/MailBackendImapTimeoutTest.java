@@ -68,6 +68,7 @@ import org.obm.push.bean.MeetingResponseStatus;
 import org.obm.push.bean.MoveItemsStatus;
 import org.obm.push.bean.PIMDataType;
 import org.obm.push.bean.PingStatus;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
 import org.obm.push.bean.UserDataRequest;
@@ -267,7 +268,7 @@ public class MailBackendImapTimeoutTest {
 		expect(collectionDao.allocateNewFolderSyncState(user.device, secondSyncKey))
 			.andReturn(secondFolderSyncState).anyTimes();
 		
-		UserDataRequest udr = new UserDataRequest(user.credentials, "FolderSync", user.device);
+		UserDataRequest udr = new UserDataRequest(user.credentials, "FolderSync", user.device, new ResourcesHolder());
 		expect(contactsBackend.getHierarchyChanges(udr, folderSyncState, secondFolderSyncState))
 			.andReturn(HierarchyCollectionChanges.builder().build()).anyTimes();
 		expect(taskBackend.getHierarchyChanges(udr, folderSyncState, secondFolderSyncState))

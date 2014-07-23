@@ -57,7 +57,7 @@ public class SpecificCollectionPathHelperTest {
 		EmailConfiguration emailConfiguration = mockEmailConfiguration();
 		collectionPathHelper = new CollectionPathHelper(emailConfiguration);
 		User user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
-		udr = new UserDataRequest(new Credentials(user, "test"), null, null);
+		udr = new UserDataRequest(new Credentials(user, "test"), null, null, new ResourcesHolder());
 	}
 	
 	private EmailConfiguration mockEmailConfiguration() {

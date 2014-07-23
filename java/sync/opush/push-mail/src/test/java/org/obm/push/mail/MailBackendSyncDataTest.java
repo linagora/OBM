@@ -53,6 +53,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.UserDataRequest;
@@ -90,7 +91,7 @@ public class MailBackendSyncDataTest {
 		collectionId = 13411;
 		collectionPath = "mailboxCollectionPath";
 		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"), null);
-		udr = new UserDataRequest(null,  null, device);
+		udr = new UserDataRequest(null,  null, device, new ResourcesHolder());
 		
 		control = createControl();
 		mailboxService = control.createMock(MailboxService.class);

@@ -33,16 +33,17 @@ package org.obm.push.resource;
 
 import org.obm.push.bean.Resource;
 
-import com.google.common.base.Preconditions;
-
 public abstract class ObmBackendResource implements Resource {
 
 	protected abstract ResourceCloseOrder getCloseOrder();
 	
+	@Override
 	public int compareTo(Resource o) {
-		Preconditions.checkArgument(o instanceof ObmBackendResource);
-		ObmBackendResource otherResource = (ObmBackendResource) o;
-		return getCloseOrder().compareTo(otherResource.getCloseOrder());
+		if (o instanceof ObmBackendResource) {
+			ObmBackendResource otherResource = (ObmBackendResource) o;
+			return getCloseOrder().compareTo(otherResource.getCloseOrder());
+		}
+		return 0;
 	}
 	
 }

@@ -45,6 +45,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -63,7 +64,7 @@ public class ImapClientProviderImplTest {
 	public void setup() {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
-		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, new ResourcesHolder());
 		mocksControl = EasyMock.createControl();
 	}
 	
@@ -94,7 +95,7 @@ public class ImapClientProviderImplTest {
 		
 		mocksControl.replay();
 
-		udr.putResource(ImapClientProviderImpl.IMAP_STORE, imapStore);
+		udr.putResource(ImapStore.class, imapStore);
 		
 		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore nullImapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, null);
@@ -115,7 +116,7 @@ public class ImapClientProviderImplTest {
 		
 		mocksControl.replay();
 
-		udr.putResource(ImapClientProviderImpl.IMAP_STORE, expectedImapStore);
+		udr.putResource(ImapStore.class, expectedImapStore);
 		
 		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore imapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, opushImapFolder);
@@ -140,7 +141,7 @@ public class ImapClientProviderImplTest {
 		
 		mocksControl.replay();
 
-		udr.putResource(ImapClientProviderImpl.IMAP_STORE, expectedImapStore);
+		udr.putResource(ImapStore.class, expectedImapStore);
 		
 		ImapClientProviderImpl imapClientProviderImpl = new ImapClientProviderImpl(null, emailConfiguration, null, null);
 		ImapStore imapStore = imapClientProviderImpl.retrieveWorkingImapStore(udr, opushImapFolder);

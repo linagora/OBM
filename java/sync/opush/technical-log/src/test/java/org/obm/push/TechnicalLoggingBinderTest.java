@@ -50,6 +50,7 @@ import org.obm.push.backend.IContinuation;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -177,7 +178,7 @@ public class TechnicalLoggingBinderTest {
 	private UserDataRequest getFakeUserDataRequest() {
 		User user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
 		UserDataRequest udr = new UserDataRequest(new Credentials(user, "test"),
-				"Sync", getFakeDevice());
+				"Sync", getFakeDevice(), new ResourcesHolder());
 		return udr;
 	}
 

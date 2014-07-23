@@ -62,10 +62,13 @@ public class PendingQueryFilter implements Filter {
 	}
 	
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response,
-			FilterChain chain) throws IOException, ServletException {
-		queriesLock.start();
-		chain.doFilter(request, response);
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		try {
+			queriesLock.startQuery();
+			chain.doFilter(request, response);
+		} finally {
+			queriesLock.closeQuery();
+		}
 	}
 	
 }

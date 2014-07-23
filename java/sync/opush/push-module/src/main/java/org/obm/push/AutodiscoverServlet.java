@@ -32,7 +32,6 @@
 package org.obm.push;
 
 import java.io.IOException;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -40,13 +39,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.Device;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.handler.AutodiscoverHandler;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.impl.ResponderImpl.Factory;
 import org.obm.push.protocol.request.SimpleQueryString;
-import org.obm.push.resource.ResourcesService;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
@@ -59,21 +59,18 @@ public class AutodiscoverServlet extends HttpServlet {
 	private final Factory responderFactory;
 	private final UserDataRequest.Factory userDataRequestFactory;
 	private final LoggerService loggerService;
-	private final Set<ResourcesService> resourcesServices;
 	
 	@Inject
 	@VisibleForTesting AutodiscoverServlet(AutodiscoverHandler autodiscoverHandler, 
 			ResponderImpl.Factory responderFactory, 
 			UserDataRequest.Factory userDataRequestFactory,
-			LoggerService loggerService,
-			Set<ResourcesService> resourcesServices) {
+			LoggerService loggerService) {
 		
 		super();
 		this.autodiscoverHandler = autodiscoverHandler;
 		this.responderFactory = responderFactory;
 		this.userDataRequestFactory = userDataRequestFactory;
 		this.loggerService = loggerService;
-		this.resourcesServices = resourcesServices;
 	}
 
 	@Override
@@ -81,23 +78,25 @@ public class AutodiscoverServlet extends HttpServlet {
 			throws ServletException, IOException {
 	
 		UserDataRequest userDataRequest = null;
-		try {
-			Credentials credentials = getCheckedCredentials(request);
-			loggerService.defineCommand("autodiscover");
-			
-			userDataRequest = userDataRequestFactory.createUserDataRequest(credentials, "autodiscover", null);
-			SimpleQueryString queryString = new SimpleQueryString(request);
-			Responder responder = responderFactory.createResponder(request, response);
-			
-			autodiscoverHandler.process(null, userDataRequest, queryString, responder);
-		} finally {
-			if (userDataRequest != null) {
-				for (ResourcesService resourcesService: resourcesServices) {
-					resourcesService.closeResources(userDataRequest);
-				}
-			}
-		}
+		Credentials credentials = getCheckedCredentials(request);
+		ResourcesHolder resourcesHolder = getCheckedResourcesHolder(request);
+		loggerService.defineCommand("autodiscover");
+		
+		Device device = null;
+		userDataRequest = userDataRequestFactory.createUserDataRequest(credentials, "autodiscover", device, resourcesHolder);
+		SimpleQueryString queryString = new SimpleQueryString(request);
+		Responder responder = responderFactory.createResponder(request, response);
+		
+		autodiscoverHandler.process(null, userDataRequest, queryString, responder);
 
+	}
+
+	private ResourcesHolder getCheckedResourcesHolder(HttpServletRequest request) {
+		ResourcesHolder resourcesHolder = (ResourcesHolder) request.getAttribute(RequestProperties.RESOURCES);
+		if (resourcesHolder == null) {
+			throw new IllegalStateException("ResourcesHolder must be handled by " + ResourcesFilter.class.getSimpleName());
+		}
+		return resourcesHolder;
 	}
 
 	public Credentials getCheckedCredentials(HttpServletRequest request) {

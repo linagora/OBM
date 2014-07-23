@@ -34,7 +34,6 @@ package org.obm.push.mail.imap;
 import org.obm.push.bean.Resource;
 import org.obm.push.minig.imap.StoreClient;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -81,7 +80,6 @@ public class MinigStoreClientImpl implements MinigStoreClient {
 	
 	@Override
 	public int compareTo(Resource o) {
-		Preconditions.checkArgument(o instanceof MinigStoreClient);
 		return 0;
 	}
 }

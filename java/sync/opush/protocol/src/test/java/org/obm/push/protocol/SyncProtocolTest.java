@@ -61,6 +61,7 @@ import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSContact;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncCollectionCommand;
 import org.obm.push.bean.SyncCollectionCommands;
 import org.obm.push.bean.SyncCollectionOptions;
@@ -123,7 +124,7 @@ public class SyncProtocolTest {
 		user = Factory.create().createUser(mailbox, mailbox, "displayName");
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), ProtocolVersion.V121);
 		credentials = new Credentials(user, password);
-		udr = new UserDataRequest(credentials, "noCommand", device);
+		udr = new UserDataRequest(credentials, "noCommand", device, new ResourcesHolder());
 		
 		mocks = createControl();
 		syncedCollectionDao = mocks.createMock(SyncedCollectionDao.class);

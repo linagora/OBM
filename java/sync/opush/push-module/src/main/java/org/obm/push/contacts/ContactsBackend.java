@@ -74,7 +74,7 @@ import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.exception.activesync.NotAllowedException;
 import org.obm.push.exception.activesync.ProcessingEmailException;
 import org.obm.push.impl.ObmSyncBackend;
-import org.obm.push.resource.ResourcesUtils;
+import org.obm.push.resource.HttpClientResource;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.push.utils.DateUtils;
@@ -495,7 +495,7 @@ public class ContactsBackend extends ObmSyncBackend implements PIMBackend {
 	}
 
 	private IAddressBook getBookClient(UserDataRequest udr) {
-		return bookClientFactory.create(ResourcesUtils.getHttpClient(udr));
+		return bookClientFactory.create(udr.getResource(HttpClientResource.class).getHttpClient());
 	}
 	
 	@Override

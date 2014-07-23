@@ -70,7 +70,9 @@ public abstract class ActiveSyncServletModule extends AbstractModule {
 	protected abstract void onModuleInstalled();
 	
 	protected void configure() {
-		OverriddenModuleBuilder override = Modules.override(new OpushModule(), new PendingQueryFilterModule());
+		OverriddenModuleBuilder override = Modules.override(
+				new PendingQueryFilterModule(), 
+				new OpushModule());
 		try {
 			install(override.with(overrideModule()));
 			onModuleInstalled();

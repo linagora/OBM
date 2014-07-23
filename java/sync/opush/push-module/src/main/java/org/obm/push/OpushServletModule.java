@@ -53,6 +53,7 @@ public class OpushServletModule extends ServletModule{
 	        bind(ContinuationFilter.class).in(Singleton.class);
 	        filter("/*").through(ContinuationFilter.class);
 	        filter("/*").through(PushContinuationFilter.class);
+	        filter("/*").through(ResourcesFilter.class);
 	        filter("/*").through(AuthenticationFilter.class);
 	        filter(ACTIVE_SYNC_SERVLET_PATH).through(ActiveSyncRequestFilter.class);
 	        filter(ACTIVE_SYNC_SERVLET_PATH).through(QoSFilter.class);

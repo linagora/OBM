@@ -64,6 +64,7 @@ import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.EmailViewPartsFetcherException;
@@ -142,7 +143,7 @@ public class EmailViewPartsFetcherImplTest {
 		password = "password";
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null);
+						.createUser(mailbox, mailbox, null), password), null, null, new ResourcesHolder());
 		
 		messageFixture = new MessageFixture();
 		messageFixture.attachment = Resources.getResource("ics/attendee.ics").openStream();

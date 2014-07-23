@@ -58,6 +58,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.IApplicationData;
 import org.obm.push.bean.MSEvent;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -227,7 +228,8 @@ public class EventConverterTest {
 	
 	private UserDataRequest buildUserDataRequest(Credentials credentials) {
 		UserDataRequest udr = new UserDataRequest(credentials,
-				"Sync", new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121));
+				"Sync", new Device(1, "devType", new DeviceId("devId"), new Properties(), ProtocolVersion.V121),
+				new ResourcesHolder());
 		return udr;
 	}
 	

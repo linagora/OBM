@@ -87,7 +87,8 @@ public class LinagoraImapClientProvider {
 
 		MinigStoreClient newMinigStoreClient = minigStoreClientFactory.create(imapHost, login, udr.getPassword());
 		newMinigStoreClient.login(activateTLS);
-		udr.putResource(IMAP_STORE, newMinigStoreClient);
+		udr.removeResource(MinigStoreClient.class);
+		udr.putResource(MinigStoreClient.class, newMinigStoreClient);
 		
 		logger.debug("Creating storeClient with login {} : loginWithDomain = {}", login, loginWithDomain);
 		
@@ -95,7 +96,7 @@ public class LinagoraImapClientProvider {
 	}
 
 	private StoreClient retrieveWorkingStoreClient(UserDataRequest udr) {
-		MinigStoreClient minigStoreClient = (MinigStoreClient) udr.getResource(IMAP_STORE);
+		MinigStoreClient minigStoreClient = udr.getResource(MinigStoreClient.class);
 		if (minigStoreClient != null) {
 			try {
 				StoreClient storeClient = minigStoreClient.getStoreClient();

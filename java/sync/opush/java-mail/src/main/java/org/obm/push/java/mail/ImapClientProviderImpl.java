@@ -60,8 +60,6 @@ import com.sun.mail.imap.IMAPStore;
 
 public class ImapClientProviderImpl {
 
-	public static final String IMAP_STORE = "IMAP_STORE";
-	
 	private static final Set<String> AVAILABLE_PROTOCOLS = ImmutableSet.of("imap", "imaps");
 
 	private static final Logger logger = LoggerFactory.getLogger(ImapClientProviderImpl.class);
@@ -123,7 +121,8 @@ public class ImapClientProviderImpl {
 			} else {
 				ImapStore newStore = buildImapStore(udr);
 				newStore.login();
-				udr.putResource(IMAP_STORE, newStore);
+				udr.removeResource(ImapStore.class);
+				udr.putResource(ImapStore.class, newStore);
 				return newStore;
 			}
 		} catch (NoImapClientAvailableException e) {
@@ -138,7 +137,7 @@ public class ImapClientProviderImpl {
 	}
 
 	@VisibleForTesting ImapStore retrieveWorkingImapStore(UserDataRequest udr, OpushImapFolder opushImapFolder) throws MessagingException {
-		ImapStore imapStore = (ImapStore) udr.getResource(IMAP_STORE);
+		ImapStore imapStore = udr.getResource(ImapStore.class);
 		if (imapStore != null && opushImapFolder != null) {
 			try {
 				if (imapStore.isConnected(opushImapFolder)) {

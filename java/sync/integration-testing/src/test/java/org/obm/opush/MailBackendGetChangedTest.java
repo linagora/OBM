@@ -68,7 +68,6 @@ import org.obm.push.bean.AnalysedSyncCollection;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
-import org.obm.push.bean.Resource;
 import org.obm.push.bean.ServerId;
 import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
@@ -436,9 +435,7 @@ public class MailBackendGetChangedTest {
 		OPClient opClient = buildWBXMLOpushClient(user, opushServer.getPort());
 		sendTwoEmailsToImapServer();
 		mailboxService.setDeletedFlag(user.userDataRequest, inboxCollectionPath, MessageSet.singleton(1l));
-		for (Resource resource : user.userDataRequest.getResources().values()) {
-			resource.close();
-		}
+		user.userDataRequest.getResourcesHolder().close();
 		opClient.syncEmail(decoder, initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		SyncResponse syncResponse = opClient.syncEmail(decoder, firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		mocksControl.verify();
@@ -512,9 +509,7 @@ public class MailBackendGetChangedTest {
 		opClient.syncEmail(decoder, initialSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		opClient.syncEmail(decoder, firstAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		mailboxService.setDeletedFlag(user.userDataRequest, inboxCollectionPath, MessageSet.singleton(1l));
-		for (Resource resource : user.userDataRequest.getResources().values()) {
-			resource.close();
-		}
+		user.userDataRequest.getResourcesHolder().close();
 		
 		SyncResponse syncResponse = opClient.syncEmail(decoder, secondAllocatedSyncKey, inboxCollectionIdAsString, FilterType.THREE_DAYS_BACK, 100);
 		mocksControl.verify();

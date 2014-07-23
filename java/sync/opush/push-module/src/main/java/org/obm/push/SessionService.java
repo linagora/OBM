@@ -31,9 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.DaoException;
 import org.obm.push.protocol.request.ActiveSyncRequest;
@@ -73,11 +76,20 @@ public class SessionService {
 		
 		Device device = deviceService.getDevice(credentials.getUser(), devId, userAgent, getProtocolVersion(r));
 		
-		UserDataRequest udr = userDataRequestFactory.createUserDataRequest(credentials, 
-				r.getCommand(), device);
+		ResourcesHolder resourcesHolder = getCheckedResourcesHolder(r.getHttpServletRequest());
+		UserDataRequest udr = userDataRequestFactory.createUserDataRequest(
+				credentials,  r.getCommand(), device, resourcesHolder);
 		
 		logger.debug("New session = {}", sessionId);
 		return udr;
+	}
+
+	private ResourcesHolder getCheckedResourcesHolder(HttpServletRequest request) {
+		ResourcesHolder resourcesHolder = (ResourcesHolder) request.getAttribute(RequestProperties.RESOURCES);
+		if (resourcesHolder == null) {
+			throw new IllegalStateException("ResourcesHolder must be handled by " + ResourcesFilter.class.getSimpleName());
+		}
+		return resourcesHolder;
 	}
 
 	private ProtocolVersion getProtocolVersion(ActiveSyncRequest request) {

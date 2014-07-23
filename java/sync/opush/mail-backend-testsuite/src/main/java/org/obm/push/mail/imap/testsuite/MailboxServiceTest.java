@@ -52,6 +52,7 @@ import org.obm.filter.Slow;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
@@ -95,7 +96,7 @@ public abstract class MailboxServiceTest {
 		greenMail.setUser(mailbox, password);
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null);
+						.createUser(mailbox, mailbox, null), password), null, null, new ResourcesHolder());
 		testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
 	}
 	
@@ -353,7 +354,7 @@ public abstract class MailboxServiceTest {
 		greenMail.setUser(user, weirdPassword);
 		UserDataRequest udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(user, user, null), weirdPassword), null, null);
+						.createUser(user, user, null), weirdPassword), null, null, new ResourcesHolder());
 		
 		GreenMailUtil.sendTextEmail(user, "from@localhost.com", "subject", "body", smtpServerSetup);
 		greenMail.waitForIncomingEmail(1);

@@ -31,32 +31,29 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.bean;
 
-import java.util.Map;
-
 import com.google.common.base.Objects;
-import com.google.common.collect.Maps;
 import com.google.inject.Singleton;
 
 public class UserDataRequest {
 
 	@Singleton
 	public static class Factory {
-		public UserDataRequest createUserDataRequest(Credentials credentials, String command, Device device) {
-			return new UserDataRequest(credentials, command, device);
+		public UserDataRequest createUserDataRequest(Credentials credentials, String command, Device device, ResourcesHolder resourcesHolder) {
+			return new UserDataRequest(credentials, command, device, resourcesHolder);
 		}
 	}
 	
 	private final Credentials credentials;
 	private final Device device;
 	private final String command;
-	private final Map<String, Resource> resources;
+	private final ResourcesHolder resourcesHolder;
 
-	public UserDataRequest(Credentials credentials, String command, Device device) {
+	public UserDataRequest(Credentials credentials, String command, Device device, ResourcesHolder resourcesHolder) {
 		super();
 		this.credentials = credentials;
 		this.command = command;
 		this.device = device;
-		this.resources = Maps.newHashMap();
+		this.resourcesHolder = resourcesHolder;
 	}
 	
 	public boolean checkHint(String key, boolean defaultValue) {
@@ -90,28 +87,21 @@ public class UserDataRequest {
 	public Device getDevice(){
 		return device;
 	}
-
-	public void putResource(String key, Resource resource) {
-		if (key != null && resource != null) {
-			this.resources.put(key, resource);
-		}
+	
+	public ResourcesHolder getResourcesHolder() {
+		return resourcesHolder;
 	}
 	
-	public void putAllResources(Map<String, Resource> resources) {
-		if (resources != null) {
-			this.resources.putAll(resources);
-		}
+	public <T extends Resource> void putResource(Class<T> clazz, T resource) {
+		resourcesHolder.put(clazz, resource);
 	}
 	
-	public Resource getResource(String key) {
-		if (null != key) {
-			return resources.get(key);
-		}
-		return null;
+	public <T extends Resource> void removeResource(Class<T> clazz) {
+		resourcesHolder.remove(clazz);
 	}
 	
-	public Map<String, Resource> getResources() {
-		return resources;
+	public <T extends Resource> T getResource(Class<T> clazz) {
+		return resourcesHolder.get(clazz);
 	}
 
 	@Override
@@ -136,7 +126,7 @@ public class UserDataRequest {
 			.add("credentials", credentials)
 			.add("device", device)
 			.add("command", command)
-			.add("resources", resources)
+			.add("resourcesHolder", resourcesHolder)
 			.toString();
 	}
 }

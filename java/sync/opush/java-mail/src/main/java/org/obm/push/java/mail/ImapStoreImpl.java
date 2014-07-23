@@ -62,7 +62,6 @@ import org.obm.push.mail.imap.StreamedLiteral;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.sun.mail.imap.IMAPFolder;
@@ -334,10 +333,9 @@ public class ImapStoreImpl implements ImapStore {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
 	@Override
 	public int compareTo(Resource o) {
-		Preconditions.checkArgument(o instanceof ImapStore);
 		return 0;
 	}
 }

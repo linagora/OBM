@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,38 +29,71 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.resource;
+package org.obm.push.bean;
 
-import java.util.SortedSet;
+import java.util.PriorityQueue;
 
-import org.obm.push.bean.Resource;
-import org.obm.push.bean.UserDataRequest;
+import org.obm.configuration.module.LoggerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Ordering;
-import com.google.inject.Singleton;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.MutableClassToInstanceMap;
 
-@Singleton
-public class ResourceCloserImpl implements ResourceCloser {
+public class ResourcesHolder {
 
-	private final Logger logger = LoggerFactory.getLogger(ResourceCloserImpl.class);
+	private final Logger logger = LoggerFactory.getLogger(LoggerModule.RESOURCES);
 	
-	@Override
-	public void closeResources(UserDataRequest userDataRequest, Class<? extends Resource> type) {
-		SortedSet<Resource> sortedResources =
-			FluentIterable.from(userDataRequest.getResources().values())
-			.filter(Predicates.instanceOf(type))
-			.toSortedSet(Ordering.natural());
+	private ClassToInstanceMap<Resource> resources;
+
+	public ResourcesHolder() {
+		resources = MutableClassToInstanceMap.create();
+	}
+
+	public void remove(Class<? extends Resource> clazz) {
+		logger.info("remove {}", clazz.getSimpleName());
+		Resource resource = resources.remove(clazz);
+		if (resource != null) {
+			logger.info("close {}", resource);
+			resource.close();
+		}
+	}
+	
+	public <T extends Resource> void put(Class<T> clazz, T resource) {
+		logger.info("put {}:{}", clazz.getSimpleName(), resource);
+		Resource previousResource = resources.putInstance(clazz, resource);
+		if (previousResource != null) {
+			throwAlreadyHeldResourceException(clazz, previousResource);
+		}
+	}
+
+	private <T extends Resource> void throwAlreadyHeldResourceException(Class<T> clazz, Resource previousResource) {
+		try {
+			throw new IllegalStateException(String.format(
+				"Resource type already held %s:%s", clazz.getSimpleName(), previousResource));
+		} finally {
+			previousResource.close();
+		}
+	}
+
+	public <T extends Resource> T get(Class<T> clazz) {
+		T resource = resources.getInstance(clazz);
+		logger.info("get {}:{}", clazz.getSimpleName(), resource);
+		return resource;
+	}
+	
+	public void close() {
 		
-		for (Resource resource: sortedResources) {
+		PriorityQueue<Resource> queue = new PriorityQueue<Resource>(resources.values());
+		Resource resource = queue.poll();
+		while (resource != null) {
 			try {
+				logger.info("close {}:{}", resource.getClass().getSimpleName(), resource);
 				resource.close();
 			} catch (RuntimeException exception) {
 				logger.error("fail to close resource {}, exception occured {}", resource, exception);
 			}
+			resource = queue.poll();
 		}
 	}
 	

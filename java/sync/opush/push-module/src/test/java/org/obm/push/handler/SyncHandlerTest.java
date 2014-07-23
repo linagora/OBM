@@ -47,6 +47,7 @@ import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncCollectionCommand;
 import org.obm.push.bean.SyncCollectionCommands;
 import org.obm.push.bean.SyncKey;
@@ -71,7 +72,7 @@ public class SyncHandlerTest {
 	public void setUp() {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
-		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, new ResourcesHolder());
 
 		mocks = createControl();
 		contentsImporter = mocks.createMock(ContentsImporter.class);

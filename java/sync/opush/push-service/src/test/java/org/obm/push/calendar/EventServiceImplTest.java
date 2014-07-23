@@ -54,12 +54,12 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.ConversionException;
 import org.obm.push.exception.DaoException;
 import org.obm.push.resource.AccessTokenResource;
-import org.obm.push.resource.ResourceCloseOrder;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.EventParsingException;
 import org.obm.push.store.CalendarDao;
@@ -100,12 +100,12 @@ public class EventServiceImplTest {
 	public void testOBMFULL3526() throws EventParsingException, ConversionException, IOException, DaoException {
 		
 		UserDataRequest udr = new UserDataRequest(
-				new Credentials(User.Factory.create().createUser("user@domain", "user@domain", null), "password"), null, null);
+				new Credentials(User.Factory.create().createUser("user@domain", "user@domain", null), "password"), null, null, new ResourcesHolder());
 		AccessToken accessToken = new AccessToken(1, "origin");
 		AccessTokenResource accessTokenResource = mocksControl.createMock(AccessTokenResource.class);
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(accessToken).anyTimes();
-		udr.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
+		udr.putResource(AccessTokenResource.class, accessTokenResource);
 		
 		CalendarDao calendarDao = mocksControl.createMock(CalendarDao.class);
 		expect(calendarDao.getMSEventUidFor(anyObject(EventExtId.class), anyObject(Device.class))).andReturn(new MSEventUid("uid"));

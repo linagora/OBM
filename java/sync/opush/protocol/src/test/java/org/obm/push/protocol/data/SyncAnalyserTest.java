@@ -52,6 +52,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.Sync;
 import org.obm.push.bean.SyncCollectionCommands;
 import org.obm.push.bean.SyncCollectionOptions;
@@ -92,7 +93,7 @@ public class SyncAnalyserTest {
 		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), null);
 		user = Factory.create().createUser("adrien@test.tlse.lngr", "email@test.tlse.lngr", "Adrien");
 		credentials = new Credentials(user, "test");
-		udr = new UserDataRequest(credentials, "Sync", device);
+		udr = new UserDataRequest(credentials, "Sync", device, new ResourcesHolder());
 		collectionPath = "INBOX";
 		collectionId = 5;
 

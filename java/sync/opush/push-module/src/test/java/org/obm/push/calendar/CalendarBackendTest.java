@@ -71,6 +71,7 @@ import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
 import org.obm.push.bean.MSMessageClass;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
@@ -87,7 +88,6 @@ import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.exception.activesync.ItemNotFoundException;
 import org.obm.push.resource.AccessTokenResource;
 import org.obm.push.resource.HttpClientResource;
-import org.obm.push.resource.ResourceCloseOrder;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
@@ -120,6 +120,7 @@ public class CalendarBackendTest {
 
 	private User user;
 	private Device device;
+	private ResourcesHolder resourcesHolder;
 	private UserDataRequest userDataRequest;
 	private AccessToken token;
 	private FolderSyncState lastKnownState;
@@ -154,7 +155,8 @@ public class CalendarBackendTest {
 	public void setUp() {
 		this.user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
-		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		this.resourcesHolder = new ResourcesHolder();
+		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, resourcesHolder);
 		this.token = new AccessToken(0, "OBM");
 		this.lastKnownState = buildFolderSyncState(new SyncKey("1234567890a"));
 		this.outgoingSyncState = buildFolderSyncState(new SyncKey("1234567890b"));
@@ -165,11 +167,11 @@ public class CalendarBackendTest {
 		AccessTokenResource accessTokenResource = mockControl.createMock(AccessTokenResource.class);
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(token).anyTimes();
-		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
+		resourcesHolder.put(AccessTokenResource.class, accessTokenResource);
 		HttpClientResource httpClientResource = mockControl.createMock(HttpClientResource.class);
 		expect(httpClientResource.getHttpClient())
 			.andReturn(new DefaultHttpClient()).anyTimes();
-		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
+		resourcesHolder.put(HttpClientResource.class, httpClientResource);
 		
 		this.mappingService = mockControl.createMock(MappingService.class);
 		this.calendarClient = mockControl.createMock(CalendarClient.class);
@@ -266,15 +268,15 @@ public class CalendarBackendTest {
 		FolderSyncState outgoingSyncState = buildFolderSyncState(new SyncKey("1234567890b"));
 
 		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"), null);
-		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, new ResourcesHolder());
 		AccessTokenResource accessTokenResource = mockControl.createMock(AccessTokenResource.class);
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(token).anyTimes();
-		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
+		userDataRequest.putResource(AccessTokenResource.class, accessTokenResource);
 		HttpClientResource httpClientResource = mockControl.createMock(HttpClientResource.class);
 		expect(httpClientResource.getHttpClient())
 			.andReturn(new DefaultHttpClient()).anyTimes();
-		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
+		userDataRequest.putResource(HttpClientResource.class, httpClientResource);
 		
 		int calendar1MappingId = 1;
 		String calendar1DisplayName = "test calendar";
@@ -332,15 +334,15 @@ public class CalendarBackendTest {
 		FolderSyncState outgoingSyncState = buildFolderSyncState(new SyncKey("1234567890b"));
 
 		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"), null);
-		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, new ResourcesHolder());
 		AccessTokenResource accessTokenResource = mockControl.createMock(AccessTokenResource.class);
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(token).anyTimes();
-		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
+		userDataRequest.putResource(AccessTokenResource.class, accessTokenResource);
 		HttpClientResource httpClientResource = mockControl.createMock(HttpClientResource.class);
 		expect(httpClientResource.getHttpClient())
 			.andReturn(new DefaultHttpClient()).anyTimes();
-		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
+		userDataRequest.putResource(HttpClientResource.class, httpClientResource);
 		
 		int calendar1MappingId = 1;
 		String calendar1DisplayName = "added calendar";
@@ -424,15 +426,15 @@ public class CalendarBackendTest {
 		String calendar2CollectionPath = rootCalendarPath + calendar2BackendName;
 
 		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"), null);
-		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, new ResourcesHolder());
 		AccessTokenResource accessTokenResource = mockControl.createMock(AccessTokenResource.class);
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(token).anyTimes();
-		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
+		userDataRequest.putResource(AccessTokenResource.class, accessTokenResource);
 		HttpClientResource httpClientResource = mockControl.createMock(HttpClientResource.class);
 		expect(httpClientResource.getHttpClient())
 			.andReturn(new DefaultHttpClient()).anyTimes();
-		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
+		userDataRequest.putResource(HttpClientResource.class, httpClientResource);
 		
 		expectObmSyncCalendarChanges(
 				newCalendarInfo("test", calendarBackendName),

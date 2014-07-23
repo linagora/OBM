@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.exception.AuthenticationException;
 import org.obm.push.service.AuthenticationService;
 import org.slf4j.Logger;
@@ -108,7 +109,8 @@ public class AuthenticationFilter implements Filter {
 					String userPass = new String( Base64.decodeBase64(credentials), Charsets.ISO_8859_1 );
 					int p = userPass.indexOf(":");
 					if (p != -1) {
-						return authenticateValidRequest(request, 
+						return authenticateValidRequest(
+								(ResourcesHolder) request.getAttribute(RequestProperties.RESOURCES), 
 								userPass.substring(0, p), 
 								userPass.substring(p + 1));
 					}
@@ -118,9 +120,9 @@ public class AuthenticationFilter implements Filter {
 		throw new AuthenticationException("There is not 'Authorization' field in HttpServletRequest.");
 	}
 
-	private Credentials authenticateValidRequest(HttpServletRequest request, String userId, String password) throws AuthenticationException {
+	private Credentials authenticateValidRequest(ResourcesHolder resourcesHolder, String userId, String password) throws AuthenticationException {
 		try {
-			return authenticationService.authenticateValidRequest(request, userId, password);
+			return authenticationService.authenticateValidRequest(resourcesHolder, userId, password);
 		} catch (Exception e) {
 			throw new AuthenticationException(e);
 		}

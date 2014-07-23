@@ -51,6 +51,7 @@ import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
@@ -79,7 +80,7 @@ public class BackendWindowingServiceImplTest {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
 		credentials = new Credentials(user, "password");
-		udr = new UserDataRequest(credentials, "noCommand", device);
+		udr = new UserDataRequest(credentials, "noCommand", device, new ResourcesHolder());
 		
 		mocks = createControl();
 		responseWindowingService = mocks.createMock(ResponseWindowingService.class);

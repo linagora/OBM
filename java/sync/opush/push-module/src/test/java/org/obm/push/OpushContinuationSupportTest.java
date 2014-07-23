@@ -31,7 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expectLastCall;
 
 import javax.servlet.ServletRequest;
 

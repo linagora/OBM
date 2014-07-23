@@ -33,7 +33,6 @@ package org.obm.push;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -57,7 +56,6 @@ import org.obm.push.handler.IRequestHandler;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
-import org.obm.push.resource.ResourcesService;
 import org.obm.push.service.DeviceService;
 import org.obm.sync.auth.AuthFault;
 import org.slf4j.Logger;
@@ -91,7 +89,6 @@ public class ActiveSyncServlet extends HttpServlet {
 	private final HttpErrorResponder httpErrorResponder;
 
 	private final PolicyService policyService;
-	private final Set<ResourcesService> resourcesServices;
 
 	@Inject
 	@VisibleForTesting ActiveSyncServlet(SessionService sessionService, 
@@ -99,8 +96,7 @@ public class ActiveSyncServlet extends HttpServlet {
 			PolicyService policyService,
 			ResponderImpl.Factory responderFactory, Handlers handlers,
 			LoggerService loggerService, @Named(LoggerModule.AUTH)Logger authLogger,
-			HttpErrorResponder httpErrorResponder,
-			Set<ResourcesService> resourcesServices) {
+			HttpErrorResponder httpErrorResponder) {
 	
 		super();
 		
@@ -113,7 +109,6 @@ public class ActiveSyncServlet extends HttpServlet {
 		this.loggerService = loggerService;
 		this.authLogger = authLogger;
 		this.httpErrorResponder = httpErrorResponder;
-		this.resourcesServices = resourcesServices;
 	}
 
 	@Override
@@ -174,7 +169,7 @@ public class ActiveSyncServlet extends HttpServlet {
 				logger.debug("policy used = {}", asrequest.getMsPolicyKey());
 			}
 
-			processActiveSyncMethod(continuation, credentials, asrequest.getDeviceId(), asrequest, response, request);
+			processActiveSyncMethod(continuation, credentials, asrequest.getDeviceId(), asrequest, response);
 		
 		} catch (RuntimeException e) {
 			logger.error(e.getMessage(), e);
@@ -231,40 +226,26 @@ public class ActiveSyncServlet extends HttpServlet {
 	private void processActiveSyncMethod(IContinuation continuation,
 			Credentials credentials, DeviceId devId,
 			ActiveSyncRequest request, 
-			HttpServletResponse response, 
-			HttpServletRequest servletRequest)
+			HttpServletResponse response)
 					throws IOException, DaoException {
 
-		UserDataRequest userDataRequest = null;
-		Responder responder = null;
-		try {
-			userDataRequest = sessionService.getSession(credentials, devId, request);
-			for (ResourcesService resourcesService: resourcesServices) {
-				resourcesService.initRequest(userDataRequest, servletRequest);
-			}
-			logger.debug("incoming query");
-			
-			if (userDataRequest.getCommand() == null) {
-				logger.warn("POST received without explicit command, aborting");
-				return;
-			}
-	
-			IRequestHandler rh = getHandler(userDataRequest);
-			if (rh == null) {
-				noHandlerError(request, userDataRequest);
-				return;
-			}
-	
-			sendASHeaders(response);
-			responder = responderFactory.createResponder(request.getHttpServletRequest(), response);
-			rh.process(continuation, userDataRequest, request, responder);
-		} finally {
-			if (userDataRequest != null) {
-				for (ResourcesService resourcesService: resourcesServices) {
-					resourcesService.closeResources(userDataRequest);
-				}
-			}
+		UserDataRequest userDataRequest = sessionService.getSession(credentials, devId, request);
+		logger.debug("incoming query");
+		
+		if (userDataRequest.getCommand() == null) {
+			logger.warn("POST received without explicit command, aborting");
+			return;
 		}
+
+		IRequestHandler rh = getHandler(userDataRequest);
+		if (rh == null) {
+			noHandlerError(request, userDataRequest);
+			return;
+		}
+
+		sendASHeaders(response);
+		Responder responder = responderFactory.createResponder(request.getHttpServletRequest(), response);
+		rh.process(continuation, userDataRequest, request, responder);
 	}
 	
 	private ActiveSyncRequest getActiveSyncRequest(HttpServletRequest r) {

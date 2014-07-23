@@ -35,11 +35,11 @@ import org.obm.push.ProtocolVersion;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.resource.AccessTokenResource;
-import org.obm.push.resource.ResourceCloseOrder;
 import org.obm.sync.auth.AccessToken;
 
 import com.google.inject.Inject;
@@ -86,10 +86,12 @@ public class SingleUserFixture {
 		user.accessToken.setUserEmail(user.user.getEmail());
 		user.credentials = new Credentials(user.user, user.password);
 		user.device = new Device.Factory().create(1, user.deviceType, user.userAgent, user.deviceId, user.deviceProtocolVersion);
-		user.userDataRequest = new UserDataRequest(user.credentials, null, user.device);
-		user.userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), 
-				accessTokenResourceFactory.create(null, user.accessToken));
 		user.rootCollectionPath = "obm:\\\\" + user.user.getLoginAtDomain();
+		ResourcesHolder resourcesHolder = new ResourcesHolder();
+		resourcesHolder.put(
+				AccessTokenResource.class, 
+				accessTokenResourceFactory.create(null, user.accessToken));
+		user.userDataRequest = new UserDataRequest(user.credentials, null, user.device, resourcesHolder);
 		return user;
 	}
 }

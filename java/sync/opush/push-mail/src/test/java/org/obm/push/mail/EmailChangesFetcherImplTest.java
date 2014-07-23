@@ -48,10 +48,11 @@ import org.obm.push.bean.BodyPreference;
 import org.obm.push.bean.MSAddress;
 import org.obm.push.bean.MSEmailBodyType;
 import org.obm.push.bean.MSEmailHeader;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.UserDataRequest;
-import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.change.item.ItemChangeBuilder;
 import org.obm.push.bean.change.item.ItemDeletion;
+import org.obm.push.bean.change.item.MSEmailChanges;
 import org.obm.push.bean.ms.MSEmail;
 import org.obm.push.bean.ms.MSEmailBody;
 import org.obm.push.bean.ms.MSEmailMetadata;
@@ -78,7 +79,7 @@ public class EmailChangesFetcherImplTest {
 	public void setUp() {
 		collectionId = 385;
 		collectionPath = "obm:\\\\login@domain\\email\\INBOX";
-		udr = new UserDataRequest(null,  null, null);
+		udr = new UserDataRequest(null,  null, null, new ResourcesHolder());
 		bodyPreferences = ImmutableList.<BodyPreference>of();
 
 		mocks = createControl();

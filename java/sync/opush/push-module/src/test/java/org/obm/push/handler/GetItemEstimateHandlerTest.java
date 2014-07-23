@@ -50,6 +50,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncCollectionResponse;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.SyncStatus;
@@ -81,7 +82,7 @@ public class GetItemEstimateHandlerTest {
 		control = createControl();
 		
 		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", new DeviceId("my phone"), null);
-		udr = new UserDataRequest(null,  null, device);
+		udr = new UserDataRequest(null,  null, device, new ResourcesHolder());
 		
 		contentsExporter = control.createMock(ContentsExporter.class);
 		stMachine = control.createMock(StateMachine.class);

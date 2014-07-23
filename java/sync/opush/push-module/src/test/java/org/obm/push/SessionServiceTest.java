@@ -31,14 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 
-import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.same;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Properties;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,6 +49,7 @@ import org.obm.filter.SlowFilterRunner;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.DeviceId;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
 import org.obm.push.bean.UserDataRequest;
@@ -64,48 +68,55 @@ public class SessionServiceTest {
 	private Device device;
 	private ProtocolVersion protocolVersion;
 	private UserDataRequest userDataRequest;
+	private HttpServletRequest httpServletRequest;
+	private ResourcesHolder resourcesHolder;
+	private IMocksControl mocks;
 
 	@Before
 	public void setup() {
+		mocks = EasyMock.createControl();
 		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
 		credentials = new Credentials(user, "test");
 		deviceId = new DeviceId("devId");
 		command = "autodiscover";
 		protocolVersion = ProtocolVersion.V121;
+		resourcesHolder = new ResourcesHolder();
 		device = new Device(1, "devType", deviceId, new Properties(), protocolVersion);
 		bindActiveSyncRequest();
 	}
 	
 	public void bindActiveSyncRequest() {
-		activeSyncRequest = createMock(ActiveSyncRequest.class);
+		activeSyncRequest = mocks.createMock(ActiveSyncRequest.class);
+		httpServletRequest = mocks.createMock(HttpServletRequest.class);
 		expect(activeSyncRequest.getUserAgent()).andReturn(user.getDisplayName()).anyTimes();
 		expect(activeSyncRequest.getDeviceId()).andReturn(deviceId).anyTimes();
 		expect(activeSyncRequest.getCommand()).andReturn(command).anyTimes();
 		expect(activeSyncRequest.getMSASProtocolVersion()).andReturn(null).anyTimes();
-		replay(activeSyncRequest);
+		expect(activeSyncRequest.getHttpServletRequest()).andReturn(httpServletRequest);
 	}
 	
 	@Test
 	public void testEnsureThatGetSessionDontCallCloseResources() throws DaoException {
-		userDataRequest = createMock(UserDataRequest.class);
-		replay(userDataRequest);
+		userDataRequest = mocks.createMock(UserDataRequest.class);
+		expect(httpServletRequest.getAttribute(RequestProperties.RESOURCES)).andReturn(resourcesHolder);
 		
 		SessionService sessionService = createSessionService();
-		 
+		mocks.replay(); 
+		
 		UserDataRequest userDataRequest = sessionService.getSession(credentials, deviceId, activeSyncRequest);
+
+		mocks.verify(); 
 		assertThat(userDataRequest).isNotNull();
 	}
 	
 	private SessionService createSessionService() throws DaoException {
-		UserDataRequest.Factory userDataRequestFactory = createMock(UserDataRequest.Factory.class);
-		expect(userDataRequestFactory.createUserDataRequest(eq(credentials), eq(command), eq(device)))
+		UserDataRequest.Factory userDataRequestFactory = mocks.createMock(UserDataRequest.Factory.class);
+		expect(userDataRequestFactory.createUserDataRequest(eq(credentials), eq(command), eq(device), same(resourcesHolder)))
 			.andReturn(userDataRequest);
 		
-		DeviceService deviceService = createMock(DeviceService.class);
+		DeviceService deviceService = mocks.createMock(DeviceService.class);
 		expect(deviceService.getDevice(user, deviceId, user.getDisplayName(), protocolVersion))
 			.andReturn(device);
-		
-		replay(userDataRequestFactory, deviceService);
 		
 		return new SessionService(deviceService, userDataRequestFactory);
 	}

@@ -38,7 +38,6 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.same;
 
 import java.io.IOException;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -63,11 +62,8 @@ import org.obm.push.impl.PushContinuation;
 import org.obm.push.impl.Responder;
 import org.obm.push.impl.ResponderImpl;
 import org.obm.push.protocol.request.ActiveSyncRequest;
-import org.obm.push.resource.ResourcesService;
 import org.obm.push.service.DeviceService;
 import org.slf4j.Logger;
-
-import com.google.common.collect.Sets;
 
 @RunWith(SlowFilterRunner.class)
 public class ActiveSyncServletTest {
@@ -85,8 +81,6 @@ public class ActiveSyncServletTest {
 	private Credentials credentials;
 	private ActiveSyncRequest activeSyncRequest;
 	private PolicyService policyService;
-	private ResourcesService resourcesService;
-	private Set<ResourcesService> resourcesServices;
 	
 	@Before
 	public void setUp() throws DaoException {
@@ -130,20 +124,12 @@ public class ActiveSyncServletTest {
 		response = mocksControl.createMock(HttpServletResponse.class);
 		response.setHeader(anyObject(String.class), anyObject(String.class));
 		expectLastCall().anyTimes();
-		
-		resourcesService = mocksControl.createMock(ResourcesService.class);
-		resourcesServices = Sets.newHashSet(resourcesService);
 	}
 	
 	@Test
 	public void testEnsureThatProcessActiveSyncMethodCallCloseResources() throws ServletException, IOException, DaoException {
 		UserDataRequest userDataRequest = mocksControl.createMock(UserDataRequest.class);
 		expect(userDataRequest.getCommand()).andReturn(command).atLeastOnce();
-		
-		resourcesService.initRequest(userDataRequest, request);
-		expectLastCall().once();
-		resourcesService.closeResources(userDataRequest);
-		expectLastCall().once();
 		
 		ActiveSyncServlet activeSyncServlet = createActiveSyncServlet(userDataRequest);
 		mocksControl.replay();
@@ -217,6 +203,6 @@ public class ActiveSyncServletTest {
 		
 		Logger logger = createLogger();
 		
-		return new ActiveSyncServlet(sessionService, backend, deviceService, policyService, responderFactory, handlers, loggerService, logger, httpErrorResponder, resourcesServices);
+		return new ActiveSyncServlet(sessionService, backend, deviceService, policyService, responderFactory, handlers, loggerService, logger, httpErrorResponder);
 	}
 }

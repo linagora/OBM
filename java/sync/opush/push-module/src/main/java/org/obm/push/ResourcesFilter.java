@@ -29,34 +29,65 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push.resource;
+package org.obm.push;
 
-import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
-import org.obm.push.bean.UserDataRequest;
-import org.obm.push.mail.imap.ImapStore;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.obm.push.bean.ResourcesHolder;
+import org.obm.push.resource.HttpClientResource;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class JavaMailResourcesService implements ResourcesService {
-	
-	private final ResourceCloser resourceCloser;
+public class ResourcesFilter implements Filter {
 
 	@Inject
-	@VisibleForTesting JavaMailResourcesService(ResourceCloser resourceCloser) {
-		this.resourceCloser = resourceCloser;
+	@VisibleForTesting ResourcesFilter() {
 	}
 	
 	@Override
-	public void initRequest(UserDataRequest userDataRequest, HttpServletRequest request) {
+	public void init(FilterConfig filterConfig) throws ServletException {
 	}
+
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 		
-	@Override
-	public void closeResources(UserDataRequest userDataRequest) {
-		resourceCloser.closeResources(userDataRequest, ImapStore.class);
+		ResourcesHolder resourcesHolder = new ResourcesHolder();
+		doFilter(request, response, chain, resourcesHolder);
 	}
-	
+
+	@VisibleForTesting void doFilter(ServletRequest request, ServletResponse response,
+			FilterChain chain, ResourcesHolder resourcesHolder)
+			throws IOException, ServletException {
+		try {
+			setHolderAsRequestAttribute(request, resourcesHolder);
+			chain.doFilter(request, response);
+		} finally {
+			resourcesHolder.close();
+		}
+	}
+
+	private void setHolderAsRequestAttribute(ServletRequest request,ResourcesHolder resourcesHolder) {
+		Preconditions.checkState(request.getAttribute(RequestProperties.RESOURCES) == null);
+
+		resourcesHolder.put(HttpClientResource.class, new HttpClientResource(new DefaultHttpClient()));
+		request.setAttribute(RequestProperties.RESOURCES, resourcesHolder);
+	}
+
+	@Override
+	public void destroy() {
+	}
+
 }

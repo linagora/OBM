@@ -52,6 +52,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
@@ -81,7 +82,7 @@ public class HierarchyExporterTest {
 	public void setUp() {
 		this.user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		this.device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
-		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		this.userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, new ResourcesHolder());
 	}
 	
 	@Test

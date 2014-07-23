@@ -48,6 +48,7 @@ import org.junit.runner.RunWith;
 import org.obm.filter.SlowFilterRunner;
 import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.utils.Mime4jUtils;
@@ -77,7 +78,7 @@ public class ErrorsManagerTest {
 	@Test
 	public void testPrepareMessage() throws ParseException, FileNotFoundException, IOException {
 		User user = User.Factory.create().createUser("test@domain", "test@domain", "displayName");
-		UserDataRequest userDataRequest = new UserDataRequest(new Credentials(user, "password"), null, null);
+		UserDataRequest userDataRequest = new UserDataRequest(new Credentials(user, "password"), null, null, new ResourcesHolder());
 		
 		Mime4jUtils mime4jUtils = new Mime4jUtils();
 		

@@ -59,6 +59,7 @@ import org.obm.opush.mail.StreamMailTestsUtils;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.MailTestsUtils;
@@ -104,7 +105,7 @@ public abstract class MailboxMemoryAPITest {
 		
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null);
+						.createUser(mailbox, mailbox, null), password), null, null, new ResourcesHolder());
 		String imapLocation = locatorService.getServiceLocation("mail/imap_frontend", udr.getUser().getLoginAtDomain());
 		MailTestsUtils.waitForGreenmailAvailability(imapLocation, greenMailExternalProcess.getImapPort());
 		MailTestsUtils.waitForGreenmailAvailability(imapLocation, greenMailExternalProcess.getSmtpPort());

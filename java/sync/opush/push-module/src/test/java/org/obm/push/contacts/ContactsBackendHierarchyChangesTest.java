@@ -59,6 +59,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
@@ -70,7 +71,6 @@ import org.obm.push.exception.DaoException;
 import org.obm.push.exception.activesync.CollectionNotFoundException;
 import org.obm.push.resource.AccessTokenResource;
 import org.obm.push.resource.HttpClientResource;
-import org.obm.push.resource.ResourceCloseOrder;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.impl.MappingService;
 import org.obm.sync.auth.AccessToken;
@@ -110,18 +110,18 @@ public class ContactsBackendHierarchyChangesTest {
 	public void setUp() {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
-		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		userDataRequest = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, new ResourcesHolder());
 		accessToken = new AccessToken(0, "OBM");
 		
 		mocks = createControl();
 		AccessTokenResource accessTokenResource = mocks.createMock(AccessTokenResource.class);
 		expect(accessTokenResource.getAccessToken())
 			.andReturn(accessToken).anyTimes();
-		userDataRequest.putResource(ResourceCloseOrder.ACCESS_TOKEN.name(), accessTokenResource);
+		userDataRequest.putResource(AccessTokenResource.class, accessTokenResource);
 		HttpClientResource httpClientResource = mocks.createMock(HttpClientResource.class);
 		expect(httpClientResource.getHttpClient())
 			.andReturn(new DefaultHttpClient()).anyTimes();
-		userDataRequest.putResource(ResourceCloseOrder.HTTP_CLIENT.name(), httpClientResource);
+		userDataRequest.putResource(HttpClientResource.class, httpClientResource);
 		contactParentId = 0;
 		contactParentIdAsString = String.valueOf(contactParentId);
 		contactParentName = "contacts";

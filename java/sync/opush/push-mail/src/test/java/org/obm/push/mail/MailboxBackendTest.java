@@ -61,6 +61,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.MSEmailBodyType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
@@ -121,7 +122,7 @@ public class MailboxBackendTest {
 		device = new Device(1, "devType", new DeviceId("devId"), new Properties(), null);
 		udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, device);
+						.createUser(mailbox, mailbox, null), password), null, device, new ResourcesHolder());
 		mocks = createControl();
 		mailboxService = mocks.createMock(MailboxService.class);
 		mappingService = mocks.createMock(MappingService.class);

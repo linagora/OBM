@@ -43,11 +43,8 @@ import org.obm.push.mail.imap.idle.IdleClient;
 import org.obm.push.minig.imap.IdleClientImpl;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.push.minig.imap.StoreClientImpl;
-import org.obm.push.resource.ResourcesService;
-import org.obm.push.resource.LinagoraMailResourcesService;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
 
 public class LinagoraImapModule extends AbstractModule {
 	
@@ -59,8 +56,5 @@ public class LinagoraImapModule extends AbstractModule {
 		bind(MessageInputStreamProvider.class).to(MessageInputStreamProviderImpl.class);
 		bind(IdleClient.Factory.class).to(IdleClientImpl.Factory.class);
 		bind(SocketConnector.class).to(NioSocketConnector.class);
-		
-		Multibinder<ResourcesService> resources = Multibinder.newSetBinder(binder(), ResourcesService.class);
-		resources.addBinding().to(LinagoraMailResourcesService.class);
 	}
 }

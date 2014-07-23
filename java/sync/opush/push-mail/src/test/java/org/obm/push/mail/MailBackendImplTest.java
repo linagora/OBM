@@ -57,6 +57,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FilterType;
 import org.obm.push.bean.ItemSyncState;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncCollectionOptions;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
@@ -111,7 +112,7 @@ public class MailBackendImplTest {
 		user = Factory.create().createUser("user@domain", "user@domain", "user@domain");
 		devId = new DeviceId("my phone");
 		device = new Device.Factory().create(null, "MultipleCalendarsDevice", "iOs 5", devId, null);
-		udr = new UserDataRequest(new Credentials(user, "password"),  null, device);
+		udr = new UserDataRequest(new Credentials(user, "password"),  null, device, new ResourcesHolder());
 		
 		control = createControl();
 		

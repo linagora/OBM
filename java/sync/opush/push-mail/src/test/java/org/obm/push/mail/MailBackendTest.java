@@ -65,6 +65,7 @@ import org.obm.push.bean.DeviceId;
 import org.obm.push.bean.FolderSyncState;
 import org.obm.push.bean.FolderType;
 import org.obm.push.bean.PIMDataType;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.SyncKey;
 import org.obm.push.bean.User;
 import org.obm.push.bean.User.Factory;
@@ -118,7 +119,7 @@ public class MailBackendTest {
 	public void setUp() {
 		user = Factory.create().createUser("test@test", "test@domain", "displayName");
 		device = new Device.Factory().create(null, "iPhone", "iOs 5", new DeviceId("my phone"), null);
-		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device);
+		udr = new UserDataRequest(new Credentials(user, "password"), "noCommand", device, new ResourcesHolder());
 		
 		mocksControl = createControl();
 		

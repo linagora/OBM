@@ -44,6 +44,7 @@ import org.obm.configuration.EmailConfiguration;
 import org.obm.filter.Slow;
 import org.obm.push.bean.CollectionPathHelper;
 import org.obm.push.bean.Credentials;
+import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.bean.User;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.mail.ImapMessageNotFoundException;
@@ -90,7 +91,7 @@ public abstract class ImapDeleteAPITest {
 	    greenMail.setUser(mailbox, password);
 	    udr = new UserDataRequest(
 				new Credentials(User.Factory.create()
-						.createUser(mailbox, mailbox, null), password), null, null);
+						.createUser(mailbox, mailbox, null), password), null, null, new ResourcesHolder());
 
 	    testUtils = new MailboxTestUtils(mailboxService, udr, mailbox, beforeTest, collectionPathHelper, smtpServerSetup);
 	    testUtils.createFolders(TRASH);
