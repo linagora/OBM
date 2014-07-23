@@ -183,6 +183,7 @@ $l_warn_file_upload = "Một số file không thể tải lên";
 $l_warn_already_attached = "Một số tài liệu đã được đính kèm";
 $l_err_file_access_forbidden = "Bạn không được phép truy cập tài liệu này";
 $l_over_quota_error = "Thêm tài liệu này sẽ vượt quá dung lượng của bạn! Để thêm tài liệu này phải xóa một số tài liệu riêng.";
+$l_dtstart_after_repeat_end_error = "Ngày đầu tiên của sự kiện hàng tuần này xảy ra sau ngày lặp lại của sự kiện";
 $l_err_no_calendar_selected = "Không có lịch nào được chọn";
 $l_err_begin_end = "Ngày kết thúc phải sau ngày bắt đầu!";
 $l_err_end_repeat = "Ngày lặp lại phải sau ngày kết thúc";
