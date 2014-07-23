@@ -485,6 +485,7 @@ if ($action == 'search') {
           $id = $result['id'];
         }
         else {
+          synchronizeDTSTARTWithRRULE($params);
           run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
           $id = $params['calendar_id'];
         }
@@ -500,13 +501,9 @@ if ($action == 'search') {
         }
       }
     } catch (OverQuotaDocumentException $e) {
-      $extra_js_include[] = 'inplaceeditor.js';
-      $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
-      $extra_js_include[] = 'freebusy.js';
-      $extra_css[] = $css_ext_color_picker ;
-      $display['msg'] .= display_err_msg("$l_event : $l_over_quota_error");
-      $display['msg'] .= add_upload_warn_message_if_attachments();
-      $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
+      editEvent ($action, $l_over_quota_error, $params, $entities, $current_view);
+    } catch (DtStartAfterRepeatEndException $e) {
+      editEvent ($action, $l_dtstart_after_repeat_end_error, $params, $entities, $current_view);
     }
   } else {
     $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
