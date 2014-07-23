@@ -74,14 +74,22 @@ public abstract class Scenario {
 		
 		try {
 			credentialsService.validate(credentials);
-			
-			OPClient client = new WBXMLOPClient(chooseHttpClientBuilder(credentials, serviceUrl),
-				credentials.getLoginAtDomain(), credentials.getPassword(),
+
+			OPClient client = new WBXMLOPClient(chooseHttpClientBuilder(credentials, serviceUrl), credentials.getLoginAtDomain(), credentials.getPassword(),
 				DEVICE_ID, DEV_TYPE, USER_AGENT, serviceUrl, new WBXMLTools(), ProtocolVersion.V121);
-		
-			return scenarii(client);
+			
+			return run(client);
 		} catch (Exception e) {
 			return handleException(e);
+		}
+	}
+
+	@VisibleForTesting CheckResult run(OPClient client) throws Exception {
+		Preconditions.checkNotNull(client);
+		try {
+			return scenarii(client);
+		} finally {
+			client.shutdown();
 		}
 	}
 

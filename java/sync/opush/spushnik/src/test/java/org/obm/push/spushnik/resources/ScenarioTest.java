@@ -31,8 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.spushnik.resources;
 
+import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
 
+import java.nio.channels.IllegalSelectorException;
+
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +52,7 @@ import org.obm.sync.push.client.SSLHttpClientBuilder;
 @RunWith(SlowFilterRunner.class)
 public class ScenarioTest {
 
+	private IMocksControl mocks;
 	private Scenario testee;
 	private Credentials noCertificateCredentials;
 	private Credentials pkcs12CertificateCredentials;
@@ -55,6 +61,7 @@ public class ScenarioTest {
 
 	@Before
 	public void setUp() {
+		mocks = EasyMock.createControl();
 		testee = new Scenario(){
 			@Override
 			protected CheckResult scenarii(OPClient client) throws Exception {
@@ -110,6 +117,40 @@ public class ScenarioTest {
 	public void testChooseHttpClientWhenHttpsServiceAndClientCertificateCredentials() {
 		assertThat(testee.chooseHttpClientBuilder(pkcs12CertificateCredentials, httpsServiceUrl))
 			.isExactlyInstanceOf(Pkcs12HttpClientBuilder.class);
+	}
+
+	@Test
+	public void runShouldCloseHttpClient() throws Exception {
+		OPClient client = mocks.createMock(OPClient.class);
+		client.shutdown();
+		expectLastCall();
+	
+		mocks.replay();
+		assertThat(testee.run(client));
+		mocks.verify();
+	}
+
+	@Test(expected=IllegalSelectorException.class)
+	public void runShouldCloseHttpClientWhenException() throws Exception {
+		OPClient client = mocks.createMock(OPClient.class);
+		client.shutdown();
+		expectLastCall();
+	
+		Scenario testeeWithException = new Scenario(){
+			
+			@Override
+			protected CheckResult scenarii(OPClient client) throws Exception {
+				throw new IllegalSelectorException();
+			}
+		};
+			
+		mocks.replay();
+		try {
+			assertThat(testeeWithException.run(client));
+		} catch (Exception e) {
+			mocks.verify();
+			throw e;
+		}
 	}
 	
 }

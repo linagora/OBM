@@ -276,4 +276,8 @@ public abstract class OPClient {
 				+ "&DeviceId=" + deviceId.getDeviceId()
 				+ "&DeviceType=" + devType;
 	}
+	
+	public void shutdown() {
+		hc.getConnectionManager().shutdown();
+	}
 }
