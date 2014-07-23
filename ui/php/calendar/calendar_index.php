@@ -327,6 +327,7 @@ if ($action == 'search') {
               $entities['document'] = array_merge($entities['document'], $other_files);
             }
           }
+          synchronizeDTSTARTWithRRULE($params);
           $event_id = run_query_calendar_add_event($params, $entities);
           $params["calendar_id"] = $event_id;
           if ($params['date_begin']->compare(Of_Date::today()) <= 0) {
@@ -346,13 +347,9 @@ if ($action == 'search') {
           }
         }
       } catch (OverQuotaDocumentException $e) {
-        $extra_js_include[] = 'inplaceeditor.js';
-        $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
-        $extra_js_include[] = 'freebusy.js';
-        $extra_css[] = $css_ext_color_picker ;
-        $display['msg'] .= display_err_msg("$l_event : $l_over_quota_error");
-        $display['msg'] .= add_upload_warn_message_if_attachments();
-        $display['detail'] .= dis_calendar_event_form($action, $params, '',$entities, $current_view);
+        editEvent ($action, $l_over_quota_error, $params, $entities, $current_view);
+      } catch (DtStartAfterRepeatEndException $e) {
+        editEvent ($action, $l_dtstart_after_repeat_end_error, $params, $entities, $current_view);
       }
   } else {
     $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
@@ -2445,4 +2442,47 @@ function canUpdateCalendarRights($obm, $params, $profiles, $peer_profile_id) {
         check_calendar_update_rights($params) ||
         Perm::user_can_update_peer($obm['uid'], $profiles[$obm['profile']], $params['entity_id'], $profiles[$peer_profile_id]));
 }
+
+function editEvent($action, $message, $params, $entities, $current_view) {
+    global $extra_js_include, $extra_css, $display;
+    global $css_ext_color_picker;
+    global $l_event;
+
+    $extra_js_include[] = 'inplaceeditor.js';
+    $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
+    $extra_js_include[] = 'freebusy.js';
+    $extra_css[] = $css_ext_color_picker ;
+    $display['msg'] .= display_err_msg("$l_event : $message");
+    $display['msg'] .= add_upload_warn_message_if_attachments();
+    $display['detail'] .= dis_calendar_event_form($action, $params, '', $entities, $current_view);
+}
+
+function synchronizeDTSTARTWithRRULE($params) {
+  $repeat_kind = $params['repeat_kind'];
+  if ($repeat_kind != 'weekly') {
+      return;
+  }
+  $repeat_days = $params['repeat_days'];
+  $dtstart = $params['date_begin'];
+  incrementDTSTARTUntilNextRepeatDay($dtstart, $repeat_days);
+  $repeat_end = $params['repeat_end'];
+  if (isset($repeat_end) && $dtstart->compare($repeat_end) == 1) {
+      throw new DtStartAfterRepeatEndException();
+  }
+}
+
+function incrementDTSTARTUntilNextRepeatDay($dtstart, $repeat_days) {
+    while (true) {
+        $dtstart_weekday = $dtstart->getWeekday();
+        $dtstart_day_is_repeat_day = $repeat_days[$dtstart_weekday] == '1';
+        if ($dtstart_day_is_repeat_day) {
+            return;
+        }
+        else {
+            $dtstart->addDay(1);
+        }
+    }
+}
+
+class DtStartAfterRepeatEndException extends Exception {}
 ?>

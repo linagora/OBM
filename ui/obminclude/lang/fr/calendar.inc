@@ -272,6 +272,7 @@ $l_warn_file_upload = "Certains fichiers n'ont pu être téléchargés";
 $l_warn_already_attached = "Un ou plusieurs documents étaient déjà attachés";
 $l_err_file_access_forbidden = "Vous n'avez pas la permission d'accéder à ce document";
 $l_over_quota_error = "Ajouter ce document vous ferait dépasser votre quota ! Supprimez quelques documents privés pour pouvoir ajouter celui-ci.";
+$l_dtstart_after_repeat_end_error = "La date de la première occurrence de cet évènement hebdomadaire survient après la fin de la répétition";
 $l_err_no_calendar_selected = "Aucun agenda séléctionné";
 $l_err_begin_end = "La date de fin doit être supérieure à la date de début";
 $l_err_end_repeat = "La fin de répétition doit être supérieure à la date de fin";

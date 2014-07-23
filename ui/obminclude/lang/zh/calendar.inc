@@ -185,6 +185,7 @@ $l_warn_file_upload = "有些文件无法上传";  //"Some files could not be up
 $l_warn_already_attached = "一些文件已经被附加";  //"Some documents were already attached"
 $l_err_file_access_forbidden = "您不被允许访问此文档";  //"You're not allowed to access this document"
 $l_over_quota_error = "添加此文件可能会超出您的分配配额！要添加这个文件，一些私人文件必须被删除。";  //"Adding this document would exceed your allocated quota ! To add this document, some private documents must be deleted."
+$l_dtstart_after_repeat_end_error = "第一次出现这种每周一次活动的日期是重复结束后";  //"The date of the first occurrence for this weekly event is after the end of the repetition"
 $l_err_no_calendar_selected = "未选择日历";  //"No calendar selected"
 $l_err_begin_end = "结束日期必须在开始日期之后！";  //"End date must be after begin date!"
 $l_err_end_repeat = "重复结束必须在结束日期之后";  //"Repetion end must be after end date"
