@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.auth.crsh;
 
+import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.crsh.auth.AuthenticationPlugin;
 import org.crsh.plugin.CRaSHPlugin;
@@ -38,6 +39,7 @@ import org.obm.push.configuration.RemoteConsoleConfiguration;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginClient;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 
 @SuppressWarnings("rawtypes")
@@ -48,18 +50,25 @@ public class ObmSyncAuthenticationPlugin extends CRaSHPlugin<AuthenticationPlugi
 	private final RemoteConsoleConfiguration consoleConfiguration;
 
 	@Inject
-	private ObmSyncAuthenticationPlugin(LoginClient.Factory loginClientFactory, RemoteConsoleConfiguration consoleConfiguration) {
+	@VisibleForTesting ObmSyncAuthenticationPlugin(LoginClient.Factory loginClientFactory, RemoteConsoleConfiguration consoleConfiguration) {
 		this.loginClientFactory = loginClientFactory;
 		this.consoleConfiguration = consoleConfiguration;
 	}
 	
 	@Override
 	public boolean authenticate(String username, String password) throws Exception {
+		return authenticate(new DefaultHttpClient(), username, password);
+	}
+
+	@VisibleForTesting boolean authenticate(HttpClient httpClient, String username, String password) {
 		try {
-			return loginClientFactory.create(new DefaultHttpClient())
+			return loginClientFactory
+					.create(httpClient)
 					.authenticateAdmin(username, password, consoleConfiguration.authoritativeDomain());
 		} catch (AuthFault e) {
 			return false;
+		} finally {
+			httpClient.getConnectionManager().shutdown();
 		}
 	}
 	
