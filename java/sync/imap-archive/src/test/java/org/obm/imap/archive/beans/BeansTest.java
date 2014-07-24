@@ -63,7 +63,8 @@ public class BeansTest {
 				ArchiveRunningTreatment.class,
 				ArchiveTerminatedTreatment.class,
 				ArchiveTreatmentRunId.class,
-				ImapFolder.class
+				ImapFolder.class,
+				ProcessedFolder.class
 			).verify();
 	}	
 }
