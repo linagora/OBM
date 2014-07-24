@@ -63,7 +63,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import com.linagora.scheduling.DateTimeProvider;
-import com.linagora.scheduling.Listener;
 import com.linagora.scheduling.Monitor;
 import com.linagora.scheduling.Scheduler;
 
@@ -188,8 +187,8 @@ public class TestImapArchiveModules {
 			Monitor<ArchiveDomainTask> monitor;
 
 			@Override
-			public Monitor<ArchiveDomainTask> create(Listener<ArchiveDomainTask> listener) {
-				monitor = super.create(listener);
+			public Monitor<ArchiveDomainTask> create() {
+				monitor = super.create();
 				return monitor;
 			}
 			

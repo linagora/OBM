@@ -60,7 +60,6 @@ import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
-import org.obm.imap.archive.scheduling.OnlyOnePerDomainScheduler;
 import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
@@ -91,7 +90,6 @@ public class RestoreOnStartUpTest {
 	@Inject WebServer server;
 	@Inject ArchiveDomainTask.Factory taskFactory;
 	@Inject TestingOnlyOnePerDomainMonitorFactory monitor;
-	@Inject OnlyOnePerDomainScheduler scheduler;
 	@Inject ArchiveTreatmentDao archiveTreatmentDao;
 	
 	@Before

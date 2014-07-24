@@ -46,12 +46,13 @@ import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
-import org.obm.imap.archive.scheduling.OnlyOnePerDomainScheduler;
+import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.linagora.scheduling.ScheduledTask;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
@@ -61,7 +62,7 @@ public class RestoreTasksOnStartupHandlerTest {
 	
 	ObmDomainUuid domainUuid;
 	IMocksControl control;
-	OnlyOnePerDomainScheduler scheduler;
+	ArchiveScheduler scheduler;
 	ArchiveTreatmentDao archiveTreatmentDao;
 	RestoreTasksOnStartupHandler testee;
 	
@@ -70,7 +71,7 @@ public class RestoreTasksOnStartupHandlerTest {
 		domainUuid = ObmDomainUuid.of("b7e91835-68de-498f-bff8-97d43acf222c");
 		control = createControl();
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
-		scheduler = control.createMock(OnlyOnePerDomainScheduler.class);
+		scheduler = control.createMock(ArchiveScheduler.class);
 		
 		testee = new RestoreTasksOnStartupHandler(logger, scheduler, archiveTreatmentDao);
 	}
@@ -99,8 +100,8 @@ public class RestoreTasksOnStartupHandlerTest {
 				.build()
 			));
 		
-		ArchiveDomainTask task = control.createMock(ArchiveDomainTask.class);
-		expect(scheduler.scheduleDomainArchiving(domainUuid, when, runId)).andReturn(task);
+		ScheduledTask<ArchiveDomainTask> task = control.createMock(ScheduledTask.class);
+		expect(scheduler.schedule(domainUuid, when, runId)).andReturn(task);
 		
 		control.replay();
 		testee.starting();

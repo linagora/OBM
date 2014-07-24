@@ -38,7 +38,7 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.scheduling.OnlyOnePerDomainScheduler;
+import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.server.LifeCycleHandler;
 import org.slf4j.Logger;
@@ -52,13 +52,13 @@ import com.google.inject.name.Named;
 public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 	
 	private final Logger logger;
-	private final OnlyOnePerDomainScheduler scheduler;
+	private final ArchiveScheduler scheduler;
 	private final ArchiveTreatmentDao archiveTreatmentDao;
 
 	@Inject
 	@VisibleForTesting RestoreTasksOnStartupHandler(
 			@Named(LoggerModule.TASK) Logger logger,
-			OnlyOnePerDomainScheduler scheduler,
+			ArchiveScheduler scheduler,
 			ArchiveTreatmentDao archiveTreatmentDao) {
 		this.logger = logger;
 		this.scheduler = scheduler;
@@ -96,7 +96,7 @@ public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 		logger.info("Re-schedule task uuid:{} for domain:{} at:{}", 
 				treatment.getRunId().serialize(), treatment.getDomainUuid().get(), treatment.getScheduledTime());
 		
-		scheduler.scheduleDomainArchiving(treatment.getDomainUuid(), treatment.getScheduledTime(), treatment.getRunId());
+		scheduler.schedule(treatment.getDomainUuid(), treatment.getScheduledTime(), treatment.getRunId());
 	}
 
 	private void markAsFailed(ArchiveTreatment treatment) throws DaoException, ElementNotFoundException {

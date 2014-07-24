@@ -29,37 +29,43 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.scheduling;
+package com.linagora.scheduling;
 
-import org.joda.time.DateTime;
-import org.obm.annotations.transactional.Transactional;
-import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.push.utils.UUIDFactory;
+import java.util.Collection;
+import java.util.concurrent.DelayQueue;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.google.common.collect.ImmutableSet;
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+public interface TaskQueue<T extends Task> {
 
-@Singleton
-public class ArchiveSchedulingService {
-
-	private final ArchiveScheduler scheduler;
-	private final UUIDFactory uuidFactory;
+	Collection<ScheduledTask<T>> poll();
 	
-	@Inject
-	@VisibleForTesting ArchiveSchedulingService(
-			ArchiveScheduler scheduler,
-			UUIDFactory uuidFactory) {
-		this.scheduler = scheduler;
-		this.uuidFactory = uuidFactory;
-	}
+	void put(ScheduledTask<T> task);
 	
-	@Transactional
-	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when) {
-		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
-		scheduler.schedule(domain, when, runId);
-		return runId;
+	boolean remove(ScheduledTask<T> task);
+		
+	public static class DelayedQueue<T extends Task> implements TaskQueue<T> {
+
+		private final DelayQueue<ScheduledTask<T>> queue;
+
+		public DelayedQueue() {
+			queue = new DelayQueue<ScheduledTask<T>>();
+		}
+		
+		@Override
+		public Collection<ScheduledTask<T>> poll() {
+			return ImmutableSet.of(queue.poll());
+		}
+
+		@Override
+		public void put(ScheduledTask<T> task) {
+			queue.put(task);
+		}
+
+		@Override
+		public boolean remove(ScheduledTask<T> task) {
+			return queue.remove(task);
+		}
+
 	}
 }

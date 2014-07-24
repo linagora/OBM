@@ -129,7 +129,7 @@ public class ScheduledTask<T extends Task> implements Delayed {
 	private final ListenersNotifier<T> listenersNotifier;
 	private State state;
 	
-	private ScheduledTask(Id id, DateTime scheduledTime, T task, Scheduler<T> scheduler, ListenersNotifier<T> listenersNotifier) {
+	protected ScheduledTask(Id id, DateTime scheduledTime, T task, Scheduler<T> scheduler, ListenersNotifier<T> listenersNotifier) {
 		this.id = id;
 		this.scheduledTime = scheduledTime;
 		this.task = task;

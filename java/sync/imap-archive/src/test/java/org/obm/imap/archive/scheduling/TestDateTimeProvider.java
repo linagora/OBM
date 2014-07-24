@@ -32,34 +32,23 @@
 package org.obm.imap.archive.scheduling;
 
 import org.joda.time.DateTime;
-import org.obm.annotations.transactional.Transactional;
-import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.push.utils.UUIDFactory;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.linagora.scheduling.DateTimeProvider;
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
-
-@Singleton
-public class ArchiveSchedulingService {
-
-	private final ArchiveScheduler scheduler;
-	private final UUIDFactory uuidFactory;
+public class TestDateTimeProvider implements DateTimeProvider {
 	
-	@Inject
-	@VisibleForTesting ArchiveSchedulingService(
-			ArchiveScheduler scheduler,
-			UUIDFactory uuidFactory) {
-		this.scheduler = scheduler;
-		this.uuidFactory = uuidFactory;
+	private DateTime current;
+
+	public TestDateTimeProvider(DateTime start) {
+		this.current = start;
 	}
 	
-	@Transactional
-	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when) {
-		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
-		scheduler.schedule(domain, when, runId);
-		return runId;
+	public void setCurrent(DateTime current) {
+		this.current = current;
+	}
+	
+	@Override
+	public DateTime now() {
+		return current;
 	}
 }

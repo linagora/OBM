@@ -33,12 +33,11 @@ package org.obm.imap.archive.scheduling;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.linagora.scheduling.Listener;
 import com.linagora.scheduling.Monitor;
 
 public interface OnlyOnePerDomainMonitorFactory {
 	
-	Monitor<ArchiveDomainTask> create(Listener<ArchiveDomainTask> listener);
+	Monitor<ArchiveDomainTask> create();
 
 	@Singleton
 	public static class OnlyOnePerDomainMonitorFactoryImpl implements OnlyOnePerDomainMonitorFactory {
@@ -48,10 +47,8 @@ public interface OnlyOnePerDomainMonitorFactory {
 		}
 		
 		@Override
-		public Monitor<ArchiveDomainTask> create(Listener<ArchiveDomainTask> listener) {
-			return Monitor.<ArchiveDomainTask>builder()
-					.addListener(listener)
-					.build();
+		public Monitor<ArchiveDomainTask> create() {
+			return Monitor.<ArchiveDomainTask>builder().build();
 		}
 	}
 }

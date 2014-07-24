@@ -32,13 +32,14 @@
 package com.linagora.scheduling;
 
 import java.util.List;
-import java.util.concurrent.DelayQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.joda.time.DateTime;
 import org.joda.time.ReadablePeriod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -52,7 +53,8 @@ public class Scheduler<T extends Task> implements AutoCloseable {
 	}
 	
 	public static class Builder<T extends Task> {
-		
+
+		private TaskQueue<T> queue;
 		private ImmutableList.Builder<Listener<T>> listeners;
 		private TimeUnit unit;
 		private Integer resolution;
@@ -84,9 +86,15 @@ public class Scheduler<T extends Task> implements AutoCloseable {
 			listeners.add(listener);
 			return this;
 		}
+
+		public Builder<T> queue(TaskQueue<T> queue) {
+			this.queue = queue;
+			return this;
+		}
 		
 		public Scheduler<T> start() {
 			Scheduler<T> scheduler = new Scheduler<>(
+				Objects.firstNonNull(queue, new TaskQueue.DelayedQueue<T>()),
 				Objects.firstNonNull(timeProvider, DateTimeProvider.SYSTEM_UTC),
 				Objects.firstNonNull(resolution, 1),
 				Objects.firstNonNull(unit, TimeUnit.MINUTES),
@@ -96,13 +104,17 @@ public class Scheduler<T extends Task> implements AutoCloseable {
 		}
 	}
 	
+	private static Logger logger = LoggerFactory.getLogger(Scheduler.class);
+	
 	private final DateTimeProvider dateTimeProvider;
 	private final int resolution;
 	private final TimeUnit unit;
 	private final ImmutableList<Listener<T>> listeners;
+	private final TaskQueue<T> queue;
 	private ActualScheduler actualScheduler;
 	
-	private Scheduler(DateTimeProvider dateTimeProvider, int resolution, TimeUnit unit, ImmutableList<Listener<T>> listeners) {
+	private Scheduler(TaskQueue<T> queue, DateTimeProvider dateTimeProvider, int resolution, TimeUnit unit, ImmutableList<Listener<T>> listeners) {
+		this.queue = queue;
 		this.dateTimeProvider = dateTimeProvider;
 		this.resolution = resolution;
 		this.unit = unit;
@@ -111,7 +123,7 @@ public class Scheduler<T extends Task> implements AutoCloseable {
 
 	public synchronized Scheduler<T> start() {
 		if (actualScheduler == null) {
-			actualScheduler = new ActualScheduler();
+			actualScheduler = new ActualScheduler(queue);
 			actualScheduler.startAsync();
 		}
 		return this;
@@ -152,20 +164,23 @@ public class Scheduler<T extends Task> implements AutoCloseable {
 	
 	private class ActualScheduler extends AbstractScheduledService {
 		
-		private final DelayQueue<ScheduledTask<T>> tasks;
+		private final TaskQueue<T> tasks;
 		private final ExecutorService workers;
 		
-		public ActualScheduler() {
+		public ActualScheduler(TaskQueue<T> queue) {
 			super();
-			tasks = new DelayQueue<>();
+			tasks = queue;
 			workers = Executors.newCachedThreadPool();
 		}
 		
 		@Override
 		protected void runOneIteration() throws Exception {
-			ScheduledTask<T> task = tasks.poll();
-			if (task != null) {
-				workers.execute(task.runnable());
+			try {
+				for (ScheduledTask<T> task : tasks.poll()) {
+					workers.execute(task.runnable());
+				}
+			} catch (Exception e) {
+				logger.error("error in task-scheduler", e);
 			}
 		}
 		

@@ -54,10 +54,11 @@ import org.obm.imap.archive.resources.ObmDomainFactory;
 import org.obm.imap.archive.resources.RootHandler;
 import org.obm.imap.archive.resources.TreatmentsResource;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
+import org.obm.imap.archive.scheduling.ArchiveScheduler;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerQueue;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory.OnlyOnePerDomainMonitorFactoryImpl;
-import org.obm.imap.archive.scheduling.OnlyOnePerDomainScheduler;
 import org.obm.imap.archive.service.SchedulingDatesService;
 import org.obm.imap.archive.services.ArchiveService;
 import org.obm.imap.archive.services.ArchiveServiceImpl;
@@ -129,7 +130,8 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(LogFileService.class);
 		bind(ArchiveTreatmentRunId.Factory.class);
 		bind(ArchiveService.class).to(ArchiveServiceImpl.class);
-		bind(OnlyOnePerDomainScheduler.class);
+		bind(ArchiveScheduler.class);
+		bind(ArchiveSchedulerQueue.class);
 		bind(DateTimeProvider.class).toInstance(DateTimeProvider.SYSTEM_UTC);
 	}
 	

@@ -31,35 +31,76 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.scheduling;
 
+import java.util.concurrent.TimeUnit;
+
 import org.joda.time.DateTime;
-import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.push.utils.UUIDFactory;
+import org.obm.imap.archive.scheduling.ArchiveDomainTask.Factory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+import com.linagora.scheduling.DateTimeProvider;
+import com.linagora.scheduling.ScheduledTask;
+import com.linagora.scheduling.ScheduledTask.State;
+import com.linagora.scheduling.Scheduler;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
-public class ArchiveSchedulingService {
+public class ArchiveScheduler implements AutoCloseable {
 
-	private final ArchiveScheduler scheduler;
-	private final UUIDFactory uuidFactory;
-	
+	private final ArchiveSchedulerQueue queue;
+	private final Scheduler<ArchiveDomainTask> scheduler;
+	private final Factory archiveTaskFactory;
+
 	@Inject
-	@VisibleForTesting ArchiveSchedulingService(
-			ArchiveScheduler scheduler,
-			UUIDFactory uuidFactory) {
-		this.scheduler = scheduler;
-		this.uuidFactory = uuidFactory;
+	@VisibleForTesting ArchiveScheduler(
+			ArchiveSchedulerQueue queue,
+			ArchiveDomainTask.Factory archiveTaskFactory,
+			DateTimeProvider dateTimeProvider,
+			@Named("schedulerResolution") TimeUnit schedulerResolution) {
+		
+		this.archiveTaskFactory = archiveTaskFactory;
+		this.queue = queue;
+		this.scheduler = Scheduler.<ArchiveDomainTask>builder()
+				.queue(this.queue)
+				.timeProvider(dateTimeProvider)
+				.resolution(schedulerResolution)
+				.addListener(queue.getListener())
+				.start();
 	}
 	
-	@Transactional
-	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when) {
-		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
-		scheduler.schedule(domain, when, runId);
-		return runId;
+	@Override
+	public void close() throws Exception {
+		scheduler.stop();
 	}
+
+	public ScheduledTask<ArchiveDomainTask> schedule(ObmDomainUuid domain, DateTime when, ArchiveTreatmentRunId runId) {
+		ArchiveDomainTask task = archiveTaskFactory.create(domain, when, runId);
+		return scheduler.schedule(task).at(when);
+	}
+
+	
+	public void clearDomain(ObmDomainUuid domain) {
+		for (ScheduledTask<ArchiveDomainTask> task : 
+				Iterables.filter(queue.getDomainTasks(domain), onlyScheduledTasksPredicate())) {
+			task.cancel();
+		}
+	}
+
+	private Predicate<ScheduledTask<ArchiveDomainTask>> onlyScheduledTasksPredicate() {
+		return new Predicate<ScheduledTask<ArchiveDomainTask>>() {
+
+			@Override
+			public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
+				return input.state() == State.NEW
+					|| input.state() == State.WAITING;
+			}
+		};
+	}
+
 }
