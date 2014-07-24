@@ -1724,7 +1724,7 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
   $end = get_conflict_end_date($calendar);
 
   if (!empty($sel_entity_id['user'])) {
-    $sel_entity_id['user'] = array_keys(OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read', $sel_entity_id['user']));
+    $sel_entity_id['user'] = array_keys(OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'access', $sel_entity_id['user']));
   }
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   if (sizeof($cal_entities) == 0) return false; // user doesn't have read permission on attendees
@@ -1817,7 +1817,7 @@ function quick_check_calendar_conflict($calendar, $entities) {
 
   // Event entities
   if (!empty($entities['user']['ids'])) {
-    $sel_entity_id['user'] = array_keys(OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'read', $entities['user']['ids']));
+    $sel_entity_id['user'] = array_keys(OBM_Acl::getAllowedEntities($GLOBALS[obm][uid], 'calendar', 'access', $entities['user']['ids']));
   }
   $sel_entity_id['resource'] = $entities['resource']['ids'];
 
