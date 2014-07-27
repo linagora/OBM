@@ -130,6 +130,7 @@ case "$1" in
         ;;
   status)
 	status -p $JETTY_PID jetty6
+	exit $?
 	;;
   restart|reload)
         stop
