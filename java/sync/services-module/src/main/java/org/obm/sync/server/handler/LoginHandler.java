@@ -35,13 +35,11 @@ import java.util.Map;
 
 import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.OBMConnectorVersionException;
 import org.obm.sync.login.LoginBackend;
 import org.obm.sync.login.LoginBindingImpl;
 import org.obm.sync.login.TrustedLoginBindingImpl;
 import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
-import org.obm.sync.server.mailer.ErrorMailer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,21 +61,16 @@ public class LoginHandler implements ISyncHandler {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final LoginBindingImpl binding;
 	private final TrustedLoginBindingImpl trustedBinding;
-	private final ErrorMailer errorMailer;
-	private final VersionValidator versionValidator;
 	private final SettingsService settingsService;
 	private final UserService userService;
 
 	@Inject
 	private LoginHandler(LoginBindingImpl loginBindingImpl,
 			TrustedLoginBindingImpl trustedLoginBindingImpl,
-			ErrorMailer errorMailer, SettingsService settingsService,
-			VersionValidator versionValidator, UserService userService) {
+			SettingsService settingsService, UserService userService) {
 		this.binding = loginBindingImpl;
 		this.trustedBinding = trustedLoginBindingImpl;
-		this.errorMailer = errorMailer;
 		this.settingsService = settingsService;
-		this.versionValidator = versionValidator;
 		this.userService = userService;
 	}
 
@@ -163,15 +156,10 @@ public class LoginHandler implements ISyncHandler {
 				return;
 			}
 
-			versionValidator.checkObmConnectorVersion(token);
-
 			fillTokenWithUserSettings(token);
 			fillTokenWithServerCapabilities(token);
 
 			responder.sendToken(token);
-		} catch (OBMConnectorVersionException e) {
-			responder.sendError("Connector version not supported");
-			notifyConnectorVersionError(e);
 		} catch (ObmSyncVersionNotFoundException e) {
 			responder.sendError("Invalid obm-sync server version");
 		} catch (IllegalArgumentException e) {
@@ -211,16 +199,5 @@ public class LoginHandler implements ISyncHandler {
 		for (ServerCapability serverCapability: ServerCapability.values()) {
 			serverCapabilities.put(serverCapability, "true");
 		}
-	}
-
-	private void notifyConnectorVersionError(OBMConnectorVersionException e) {
-		logger.error(e.getToken().getOrigin() + " is not supported anymore.");
-		ObmUser user = userService.getUserFromAccessToken(e.getToken());
-		UserSettings settings = settingsService.getSettings(user);
-		errorMailer.notifyConnectorVersionError(
-				e.getToken(),
-				e.getConnectorVersion().toString(),
-				settings.locale(),
-				settings.timezone());
 	}
 }
