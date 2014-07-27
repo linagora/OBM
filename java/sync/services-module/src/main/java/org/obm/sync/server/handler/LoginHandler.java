@@ -35,13 +35,11 @@ import java.util.Map;
 
 import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.OBMConnectorVersionException;
 import org.obm.sync.login.LoginBackend;
 import org.obm.sync.login.LoginBindingImpl;
 import org.obm.sync.login.TrustedLoginBindingImpl;
 import org.obm.sync.server.Request;
 import org.obm.sync.server.XmlResponder;
-import org.obm.sync.server.mailer.ErrorMailer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +51,6 @@ import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserSettings;
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 /**
  * Responds to the following urls :
@@ -65,26 +62,19 @@ public class LoginHandler implements ISyncHandler {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final LoginBindingImpl binding;
 	private final TrustedLoginBindingImpl trustedBinding;
-	private final ErrorMailer errorMailer;
-	private final VersionValidator versionValidator;
 	private final SettingsService settingsService;
 	private final UserService userService;
-	private final ObmSyncConfigurationService configurationService;
 
 	@Inject
 	@VisibleForTesting
 	LoginHandler(LoginBindingImpl loginBindingImpl,
 			TrustedLoginBindingImpl trustedLoginBindingImpl,
-			ErrorMailer errorMailer, SettingsService settingsService,
-			VersionValidator versionValidator, UserService userService,
-			ObmSyncConfigurationService configurationService) {
+			SettingsService settingsService,
+			UserService userService) {
 		this.binding = loginBindingImpl;
 		this.trustedBinding = trustedLoginBindingImpl;
-		this.errorMailer = errorMailer;
 		this.settingsService = settingsService;
-		this.versionValidator = versionValidator;
 		this.userService = userService;
-		this.configurationService = configurationService;
 	}
 
 	@Override
@@ -162,22 +152,17 @@ public class LoginHandler implements ISyncHandler {
 			}
 
 			AccessToken token = loginBackend.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
-				request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
-			
+					request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
+
 			if (token == null) {
 				responder.sendError("Login failed for user '" + login + "'");
 				return;
 			}
 
-			versionValidator.checkObmConnectorVersion(token);
-
 			fillTokenWithUserSettings(token);
 			fillTokenWithServerCapabilities(token);
 
 			responder.sendToken(token);
-		} catch (OBMConnectorVersionException e) {
-			responder.sendError("Connector version not supported");
-			notifyConnectorVersionError(e);
 		} catch (ObmSyncVersionNotFoundException e) {
 			responder.sendError("Invalid obm-sync server version");
 		} catch (IllegalArgumentException e) {
@@ -188,15 +173,15 @@ public class LoginHandler implements ISyncHandler {
 	private String getOrigin(Request request) {
 		return request.getMandatoryParameter("origin");
 	}
-	
+
 	private String getLogin(Request request) {
 		return request.getMandatoryParameter("login");
 	}
-	
+
 	private String getPassword(Request request) {
 		return request.getParameter("password");
 	}
-	
+
 	private String getDomainName(Request request) {
 		return request.getParameter("domainName");
 	}
@@ -204,7 +189,7 @@ public class LoginHandler implements ISyncHandler {
 	private Boolean isPasswordHashed(Request request) {
 		return Boolean.valueOf(request.getParameter("isPasswordHashed"));
 	}
-	
+
 	private void fillTokenWithUserSettings(AccessToken token) {
 		ObmUser user = userService.getUserFromAccessToken(token);
 		UserSettings settings = settingsService.getSettings(user);
@@ -214,30 +199,10 @@ public class LoginHandler implements ISyncHandler {
 
 	@VisibleForTesting
 	void fillTokenWithServerCapabilities(AccessToken token) {
-		Map<ServerCapability, String> capabilities = token.getServerCapabilities();
-
-		for (ServerCapability capability: ServerCapability.values()) {
-			capabilities.put(capability, String.valueOf(isServerCapabilityEnabled(capability)));
+		Map<ServerCapability, String> serverCapabilities = token.getServerCapabilities();
+		for (ServerCapability serverCapability: ServerCapability.values()) {
+			serverCapabilities.put(serverCapability, "true");
 		}
 	}
 
-	private boolean isServerCapabilityEnabled(ServerCapability capability) {
-		switch (capability) {
-			case CONFIDENTIAL_EVENTS:
-				return configurationService.isConfidentialEventsEnabled();
-			default:
-				return true;
-		}
-	}
-
-	private void notifyConnectorVersionError(OBMConnectorVersionException e) {
-		logger.error(e.getToken().getOrigin() + " is not supported anymore.");
-		ObmUser user = userService.getUserFromAccessToken(e.getToken());
-		UserSettings settings = settingsService.getSettings(user);
-		errorMailer.notifyConnectorVersionError(
-				e.getToken(),
-				e.getConnectorVersion().toString(),
-				settings.locale(),
-				settings.timezone());
-	}
 }

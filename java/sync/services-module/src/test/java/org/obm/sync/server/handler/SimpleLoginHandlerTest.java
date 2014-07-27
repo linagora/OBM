@@ -41,7 +41,6 @@ import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.login.LoginBindingImpl;
 import org.obm.sync.login.TrustedLoginBindingImpl;
-import org.obm.sync.server.mailer.ErrorMailer;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -60,9 +59,7 @@ public class SimpleLoginHandlerTest {
 	public void setup() {
 		LoginBindingImpl loginBinding = null;
 		TrustedLoginBindingImpl trustedLoginBinding = null;
-		ErrorMailer errorMailer = null;
 		SettingsService settingsService = null;
-		VersionValidator versionValidator = null;
 		UserService userService = null;
 
 		control = createControl();
@@ -71,11 +68,8 @@ public class SimpleLoginHandlerTest {
 		handler = new LoginHandler(
 				loginBinding,
 				trustedLoginBinding,
-				errorMailer,
 				settingsService,
-				versionValidator,
-				userService,
-				configurationService);
+				userService, configurationService);
 	}
 
 	@After
@@ -100,6 +94,8 @@ public class SimpleLoginHandlerTest {
 				.put(ServerCapability.CALENDAR_HANDLER_SUPPORTS_STOREEVENT, "true")
 				.put(ServerCapability.CONFIDENTIAL_EVENTS, "true")
 				.put(ServerCapability.SERVER_SIDE_ANONYMIZATION, "true")
+				.put(ServerCapability.HASH_IN_EVENT_SERIALIZATION, "true")
+				.put(ServerCapability.LOGIN_HANDLER_SUPPORTS_AUTHFAULT, "true")
 				.build());
 	}
 
@@ -120,6 +116,8 @@ public class SimpleLoginHandlerTest {
 				.put(ServerCapability.CALENDAR_HANDLER_SUPPORTS_STOREEVENT, "true")
 				.put(ServerCapability.CONFIDENTIAL_EVENTS, "false")
 				.put(ServerCapability.SERVER_SIDE_ANONYMIZATION, "true")
+				.put(ServerCapability.HASH_IN_EVENT_SERIALIZATION, "true")
+				.put(ServerCapability.LOGIN_HANDLER_SUPPORTS_AUTHFAULT, "true")
 				.build());
 	}
 
