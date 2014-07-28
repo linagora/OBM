@@ -32,6 +32,7 @@
 package org.obm.sync.login;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 
 import fr.aliacom.obm.common.DomainNotFoundException;
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
@@ -41,7 +42,7 @@ public interface LoginBackend {
 	AccessToken logUserIn(String user, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
 			String lemonDomain, boolean isPasswordHashed)
-			throws ObmSyncVersionNotFoundException, DomainNotFoundException;
+			throws ObmSyncVersionNotFoundException, DomainNotFoundException, AuthFault;
 
 	void logout(String sessionId);
 

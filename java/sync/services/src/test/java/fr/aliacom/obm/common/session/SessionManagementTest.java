@@ -42,6 +42,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Login;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
@@ -177,7 +178,7 @@ public class SessionManagementTest {
 	}
 
 	@Test
-	public void testLoginWithoutPasswordFromTrustedLemonIP() throws DomainNotFoundException {
+	public void testLoginWithoutPasswordFromTrustedLemonIP() throws DomainNotFoundException, AuthFault {
 		expect(authentificationServiceFactory.get()).andReturn(authenticationService);
 		expect(authenticationService.getType()).andReturn("TestAuthService");
 		expect(domainService.findDomainByName(DOMAIN)).andReturn(obmDomain);
@@ -195,7 +196,7 @@ public class SessionManagementTest {
 	}
 	
 	@Test
-	public void testLoginIsLoweredBeforeAuthServiceUsage() throws DomainNotFoundException {
+	public void testLoginIsLoweredBeforeAuthServiceUsage() throws DomainNotFoundException, AuthFault {
 		expect(authentificationServiceFactory.get()).andReturn(authenticationService);
 		expect(authenticationService.getType()).andReturn("TestAuthService");
 		expect(userDao.getUniqueObmDomain(LOGIN)).andReturn(DOMAIN);

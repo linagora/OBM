@@ -33,6 +33,7 @@ package org.obm.sync.login;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
 import org.obm.sync.server.auth.impl.DatabaseAuthentificationService;
@@ -81,13 +82,13 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 	@Transactional(readOnly=true)
 	public AccessToken logUserIn(String user, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException {
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException, AuthFault {
 
 		return sessionManagement.login(user, password, origin, clientIP, remoteIP, lemonLogin, lemonDomain, isPasswordHashed);
 	}
 
 	@Transactional(readOnly=true)
-	public boolean authenticateGlobalAdmin(String user, String password, String origin, boolean isPasswordHashed) {
+	public boolean authenticateGlobalAdmin(String user, String password, String origin, boolean isPasswordHashed) throws AuthFault {
 		logger.info("trying global admin authentication with login '{}' from '{}'", user, origin);
 		Credentials credentials = Credentials.builder()
 			.login(user)
@@ -100,7 +101,7 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 	}
 
 	@Transactional(readOnly=true)
-	public boolean authenticateAdmin(String user, String password, String origin, String domainName, boolean isPasswordHashed) {
+	public boolean authenticateAdmin(String user, String password, String origin, String domainName, boolean isPasswordHashed) throws AuthFault {
 		logger.info("trying {} admin authentication with login '{}' from '{}'", new String[] { domainName, user, origin });
 		ObmDomain domain = domainDao.findDomainByName(domainName);
 		Credentials credentials = Credentials.builder()
@@ -113,7 +114,7 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 		return authenticateAdmin(domain, credentials);
 	}
 
-	private boolean authenticateAdmin(ObmDomain domain, Credentials credentials) {
+	private boolean authenticateAdmin(ObmDomain domain, Credentials credentials) throws AuthFault {
 		ObmUser user = userDao.findUserByLogin(credentials.getLogin().getLogin(), domain);
 		if (user == null || !user.isAdmin()) {
 			return false;

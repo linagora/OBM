@@ -1,1 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?><error xmlns="http://www.obm.org/xsd/sync/error.xsd"><message>No domain found for login usera</message><type>fr.aliacom.obm.common.DomainNotFoundException</type></error>
+<?xml version="1.0" encoding="UTF-8"?><error xmlns="http://www.obm.org/xsd/sync/error.xsd"><message>fr.aliacom.obm.common.DomainNotFoundException: No domain found for login usera</message><type>org.obm.sync.auth.AuthFault</type></error>
