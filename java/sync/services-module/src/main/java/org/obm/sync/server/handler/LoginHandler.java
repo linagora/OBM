@@ -36,6 +36,7 @@ import java.util.Map;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.login.LoginBackend;
 import org.obm.sync.login.LoginBindingImpl;
 import org.obm.sync.login.TrustedLoginBindingImpl;
@@ -52,6 +53,7 @@ import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserSettings;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 /**
  * Responds to the following urls :
@@ -65,24 +67,32 @@ public class LoginHandler implements ISyncHandler {
 	private final TrustedLoginBindingImpl trustedBinding;
 	private final SettingsService settingsService;
 	private final UserService userService;
+	private final ObmSyncConfigurationService configurationService;
+
 
 	@Inject
 	@VisibleForTesting
 	LoginHandler(LoginBindingImpl loginBindingImpl,
+
 			TrustedLoginBindingImpl trustedLoginBindingImpl,
 			SettingsService settingsService,
-			UserService userService) {
+			UserService userService,
+			ObmSyncConfigurationService configurationService) {
+
 		this.binding = loginBindingImpl;
 		this.trustedBinding = trustedLoginBindingImpl;
 		this.settingsService = settingsService;
 		this.userService = userService;
+		this.configurationService = configurationService;
 	}
 
-	@Override
-	public void handle(Request request,
-			XmlResponder responder) throws Exception {
-		String method = request.getMethod();
 
+
+	@Override
+
+	public void handle(Request request,XmlResponder responder) throws Exception {
+
+		String method = request.getMethod();
 		if ("doLogin".equals(method)) {
 			login(request, responder);
 		} else if ("authenticateGlobalAdmin".equals(method)) {
@@ -100,22 +110,37 @@ public class LoginHandler implements ISyncHandler {
 
 	}
 
+
+
 	private void authenticateGlobalAdmin(Request request, XmlResponder responder) {
+
 		try {
 			String login = getLogin(request);
 			String password = getPassword(request);
 			boolean isPasswordHashed = isPasswordHashed(request);
 			String origin = getOrigin(request);
 			boolean success = binding.authenticateGlobalAdmin(login, password, origin, isPasswordHashed);
+
 			responder.sendBoolean(success);
+		} catch (AuthFault e) {
+			responder.sendError(e);
+
 		} catch (IllegalArgumentException e) {
+
 			responder.sendError("Authentication refused : " + e.getMessage());
+
 		} catch (IllegalStateException e) {
+
 			responder.sendError("Authentication refused : " + e.getMessage());
+
 		}
+
 	}
 
-	private void authenticateAdmin(Request request, XmlResponder responder) {
+
+
+	private void authenticateAdmin(Request request, XmlResponder responder) throws AuthFault {
+
 		try {
 			responder.sendBoolean(binding.authenticateAdmin(
 					getLogin(request), getPassword(request), getOrigin(request), getDomainName(request), isPasswordHashed(request)));
@@ -124,48 +149,57 @@ public class LoginHandler implements ISyncHandler {
 		} catch (IllegalStateException e) {
 			responder.sendError("Authentication refused : " + e.getMessage());
 		}
+
 	}
+
+
 
 	private void doLogout(Request request) {
 		request.destroySession();
 		binding.logout(request.getParameter("sid"));
 	}
 
+
+
 	private void trustedLogin(Request request, XmlResponder responder) {
 		doLogin(request, responder, trustedBinding);
 	}
+
+
 
 	private void login(Request request, XmlResponder responder) {
 		doLogin(request, responder, binding);
 	}
 
+
+
 	private void doLogin(Request request, XmlResponder responder, LoginBackend loginBackend) {
 		try {
 			request.createSession();
-
 			String origin = getOrigin(request);
 			String login = getLogin(request);
 			String pass = getPassword(request);
 			boolean isPasswordHashed = isPasswordHashed(request);
-
 			if (logger.isDebugEnabled()) {
 				request.dumpHeaders();
 			}
-
-			AccessToken token = loginBackend.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
-					request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
-
+			AccessToken token = null;
+			
+			                       try {
+			                               token = loginBackend.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
+			                                                       request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
+			                       } catch (DomainNotFoundException e) {
+			                               throw new AuthFault(e);
+			                       }
 			if (token == null) {
-				responder.sendError("Login failed for user '" + login + "'");
-				return;
+				throw new AuthFault("Login failed for user '" + login + "'");
 			}
 
 			fillTokenWithUserSettings(token);
 			fillTokenWithServerCapabilities(token);
-
 			responder.sendToken(token);
-		} catch (DomainNotFoundException e) {
-			responder.sendError(e);
+		} catch (AuthFault e) {
+            responder.sendError(e);
 		} catch (ObmSyncVersionNotFoundException e) {
 			responder.sendError("Invalid obm-sync server version");
 		} catch (IllegalArgumentException e) {
@@ -173,39 +207,66 @@ public class LoginHandler implements ISyncHandler {
 		}
 	}
 
+
+
 	private String getOrigin(Request request) {
 		return request.getMandatoryParameter("origin");
 	}
+
+
 
 	private String getLogin(Request request) {
 		return request.getMandatoryParameter("login");
 	}
 
+
+
 	private String getPassword(Request request) {
 		return request.getParameter("password");
 	}
+
+
 
 	private String getDomainName(Request request) {
 		return request.getParameter("domainName");
 	}
 
+
+
 	private Boolean isPasswordHashed(Request request) {
 		return Boolean.valueOf(request.getParameter("isPasswordHashed"));
 	}
 
+
+
 	private void fillTokenWithUserSettings(AccessToken token) {
 		ObmUser user = userService.getUserFromAccessToken(token);
 		UserSettings settings = settingsService.getSettings(user);
-
 		token.setUserSettings(settings);
 	}
 
+
+
 	@VisibleForTesting
+
 	void fillTokenWithServerCapabilities(AccessToken token) {
-		Map<ServerCapability, String> serverCapabilities = token.getServerCapabilities();
-		for (ServerCapability serverCapability: ServerCapability.values()) {
-			serverCapabilities.put(serverCapability, "true");
+		Map<ServerCapability, String> capabilities = token.getServerCapabilities();
+		for (ServerCapability capability: ServerCapability.values()) {
+			capabilities.put(capability, String.valueOf(isServerCapabilityEnabled(capability)));
 		}
+	}
+
+
+
+	private boolean isServerCapabilityEnabled(ServerCapability capability) {
+		switch (capability) {
+		case CONFIDENTIAL_EVENTS:
+			return configurationService.isConfidentialEventsEnabled();
+		default:
+			return true;
+
+		}
+
 	}
 
 }

@@ -118,7 +118,7 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 		try {
 			loginClient.login("user@domain.org", "user1");
 		} catch(AuthFault e) {
-			assertThat(e.getMessage()).contains("Login failed for user 'user@domain.org'");
+			assertThat(e.getMessage()).contains("Bad credentials for user 'user'");
 			throw e;
 		}
 	}
@@ -131,7 +131,7 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 		try {
 			loginClient.login("user1", "user");
 		} catch(AuthFault e) {
-			assertThat(e.getMessage()).contains("Login failed for user 'user1'");
+			assertThat(e.getMessage()).contains("Bad credentials for user 'user1'");
 			throw e;
 		}
 	}

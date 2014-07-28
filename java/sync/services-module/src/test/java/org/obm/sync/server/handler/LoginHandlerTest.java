@@ -186,7 +186,7 @@ public class LoginHandlerTest {
 		control.replay();
 		handler.handle(new Request(httpServletRequest), responder);
 		assertThat(resultStream.toString()).isEqualTo(
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><string xmlns=\"http://www.obm.org/xsd/sync/string.xsd\"><value>false</value></string>");
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><error xmlns=\"http://www.obm.org/xsd/sync/error.xsd\"><message>Bad credentials for user 'usera'.</message><type>org.obm.sync.auth.AuthFault</type></error>");
 	}
 
 	

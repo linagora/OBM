@@ -40,6 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
 import org.obm.sync.server.auth.IAuthentificationService;
@@ -79,7 +80,7 @@ public class LoginBindingImplTest {
 	}
 	
 	@Test
-	public void testAuthenticateGlobalAdmin() {
+	public void testAuthenticateGlobalAdmin() throws AuthFault {
 		String domain = "global.virt";
 		expect(obmSyncConfigurationService.getGlobalDomain())
 			.andReturn(domain);
@@ -103,7 +104,7 @@ public class LoginBindingImplTest {
 	}
 
 	@Test
-	public void testAuthenticateAdminOnGlobalDomain() {
+	public void testAuthenticateAdminOnGlobalDomain() throws AuthFault {
 		String domainName = "global.virt";
 		ObmDomain obmDomain = ObmDomain.builder()
 				.name(domainName)
@@ -142,7 +143,7 @@ public class LoginBindingImplTest {
 	}
 	
 	@Test
-	public void testAuthenticateAdminOnGlobalDomainNoAdminRights() {
+	public void testAuthenticateAdminOnGlobalDomainNoAdminRights() throws AuthFault {
 		String domainName = "global.virt";
 		ObmDomain obmDomain = ObmDomain.builder()
 				.name(domainName)
@@ -171,7 +172,7 @@ public class LoginBindingImplTest {
 	}
 	
 	@Test
-	public void testAuthenticateAdminOnOtherDomain() {
+	public void testAuthenticateAdminOnOtherDomain() throws AuthFault {
 		String domainName = "domain";
 		ObmDomain obmDomain = ObmDomain.builder()
 				.name(domainName)
@@ -209,7 +210,7 @@ public class LoginBindingImplTest {
 	}
 	
 	@Test
-	public void testAuthenticateAdminOnOtherDomainNoAdminRights() {
+	public void testAuthenticateAdminOnOtherDomainNoAdminRights() throws AuthFault {
 		String domainName = "domain";
 		ObmDomain obmDomain = ObmDomain.builder()
 				.name(domainName)

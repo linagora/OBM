@@ -33,18 +33,21 @@ package fr.aliacom.obm.ldap;
 
 import java.util.Hashtable;
 
+import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchResult;
 
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.server.auth.IAuthentificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -65,17 +68,15 @@ public class LDAPAuthService implements IAuthentificationService {
 	}
 
 	@Override
-	public boolean doAuth(Credentials credentials) {
+	public boolean doAuth(Credentials credentials) throws AuthFault {
 		Preconditions.checkArgument(!credentials.isPasswordHashed(), "The LDAP authentication service does not handle already hashed passwords");
-		return doBindAuth(credentials.getLogin().getLogin(), credentials.getLogin().getDomain(), credentials.getPassword());
+
+		doBindAuth(credentials.getLogin().getLogin(), credentials.getLogin().getDomain(), credentials.getPassword());
+		return true;
 	}
 
-	private boolean doBindAuth(String login, String domain,
-			String clearTextPassword) {
-
-		LDAPUtils utils = new LDAPUtils(directory.getUri(), directory
-				.getRootDN(), directory.getRootPW(), directory.getBaseDN());
-		boolean ret = false;
+	private void doBindAuth(String login, String domain, String clearTextPassword) throws AuthFault {
+		LDAPUtils utils = new LDAPUtils(directory.getUri(), directory.getRootDN(), directory.getRootPW(), directory.getBaseDN());
 		DirContext lookup = null;
 		DirContext bind = null;
 		String dn = null;
@@ -90,7 +91,7 @@ public class LDAPAuthService implements IAuthentificationService {
 			}
 
 		} catch (Exception e) {
-			logger.error(e.getMessage() + " (dn: " + dn + ")", e);
+			Throwables.propagate(e);
 		} finally {
 			if (lookup != null) {
 				try {
@@ -110,9 +111,10 @@ public class LDAPAuthService implements IAuthentificationService {
 				bindenv.put(Context.SECURITY_PRINCIPAL, dn);
 				bindenv.put(Context.SECURITY_CREDENTIALS, clearTextPassword);
 				bind = new InitialDirContext(bindenv);
-				ret = true;
+			} catch (AuthenticationException e) {
+				throw new AuthFault(e);
 			} catch (Exception e) {
-				logger.error(e.getMessage() + " with dn: " + dn + ")", e);
+				Throwables.propagate(e);
 			} finally {
 				if (bind != null) {
 					try {
@@ -123,7 +125,6 @@ public class LDAPAuthService implements IAuthentificationService {
 				}
 			}
 		}
-		return ret;
 	}
 
 	@Override
