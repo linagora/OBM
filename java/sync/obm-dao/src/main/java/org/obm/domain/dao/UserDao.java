@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.dao.EntityId;
 
@@ -76,5 +77,7 @@ public interface UserDao {
 	Integer userIdFromEmail(Connection con, String email, Integer domainId) throws SQLException;
 
 	Set<String> getAllEmailsFrom(ObmDomain domain, UserExtId toIgnore) throws SQLException;
+
+	String getUniqueObmDomain(String userLogin) throws DomainNotFoundException;
 
 }

@@ -154,7 +154,7 @@ public class LoginIntegrationTest extends ObmSyncIntegrationTest {
 		try {
 			loginClient.login("user2", "user2");
 		} catch(AuthFault e) {
-			assertThat(e.getMessage()).contains("Login failed for user 'user2'");
+			assertThat(e.getMessage()).contains("The login user2 is in several domains (at least domain.org and  domain2.org).");
 			throw e;
 		}
 	}

@@ -42,6 +42,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.domain.dao.UserDao;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.Login;
 import org.obm.sync.auth.MavenVersion;
@@ -95,88 +96,88 @@ public class SessionManagementTest {
 	}
 	
 	@Test
-	public void prepareLoginLemonComesFirst() {
+	public void prepareLoginLemonComesFirst() throws DomainNotFoundException {
 		control.replay();
 		
-		Login actualLogin = sessionManagement.prepareLogin("specifiedLogin@domain", "lemonLogin", "lemonDomain", authenticationService);
+		Login actualLogin = sessionManagement.prepareLogin("specifiedLogin@domain", "lemonLogin", "lemonDomain");
 		
 		control.verify();
 		assertThat(actualLogin).isEqualTo(Login.builder().login("lemonLogin").domain("lemonDomain").build());
 	}
 	
 	@Test
-	public void prepareLoginLemonComesFirstIgnoringNullLogin() {
+	public void prepareLoginLemonComesFirstIgnoringNullLogin() throws DomainNotFoundException {
 		control.replay();
 		
-		Login actualLogin = sessionManagement.prepareLogin(null, "lemonLogin", "lemonDomain", authenticationService);
+		Login actualLogin = sessionManagement.prepareLogin(null, "lemonLogin", "lemonDomain");
 		
 		control.verify();
 		assertThat(actualLogin).isEqualTo(Login.builder().login("lemonLogin").domain("lemonDomain").build());
 	}
 	
 	@Test
-	public void prepareLoginFallbackToSpecifiedLoginWhenLemonDomainIsNull() {
+	public void prepareLoginFallbackToSpecifiedLoginWhenLemonDomainIsNull() throws DomainNotFoundException {
 		control.replay();
 		
-		Login actualLogin = sessionManagement.prepareLogin("specifiedLogin@domain", "lemonLogin", null, authenticationService);
+		Login actualLogin = sessionManagement.prepareLogin("specifiedLogin@domain", "lemonLogin", null);
 		
 		control.verify();
 		assertThat(actualLogin).isEqualTo(Login.builder().login("specifiedLogin").domain("domain").build());
 	}
 	
 	@Test
-	public void prepareLoginFallbackToSpecifiedLoginWhenLemonLoginIsNull() {
+	public void prepareLoginFallbackToSpecifiedLoginWhenLemonLoginIsNull() throws DomainNotFoundException {
 		control.replay();
 		
-		Login actualLogin = sessionManagement.prepareLogin("specifiedLogin@domain", null, "lemonDomain", authenticationService);
+		Login actualLogin = sessionManagement.prepareLogin("specifiedLogin@domain", null, "lemonDomain");
 		
 		control.verify();
 		assertThat(actualLogin).isEqualTo(Login.builder().login("specifiedLogin").domain("domain").build());
 	}
 	
 	@Test
-	public void prepareLoginSpecifiedLoginWhenLemonNotProvided() {
+	public void prepareLoginSpecifiedLoginWhenLemonNotProvided() throws DomainNotFoundException {
 		control.replay();
 		
-		Login actualLogin = sessionManagement.prepareLogin("specifiedLogin@domain", null, null, authenticationService);
+		Login actualLogin = sessionManagement.prepareLogin("specifiedLogin@domain", null, null);
 		
 		control.verify();
 		assertThat(actualLogin).isEqualTo(Login.builder().login("specifiedLogin").domain("domain").build());
 	}
 	
 	@Test(expected=IllegalStateException.class)
-	public void prepareLoginNoLoginAtAll() {
+	public void prepareLoginNoLoginAtAll() throws DomainNotFoundException {
 		control.replay();
 		
 		try {
-			sessionManagement.prepareLogin(null, null, null, authenticationService);
+			sessionManagement.prepareLogin(null, null, null);
 		} finally {
 			control.verify();
 		}
 	}
 	
 	@Test
-	public void prepareLoginLoginWithoutDomain() {
-		expect(authenticationService.getObmDomain("login")).andReturn(null);
+	public void prepareLoginLoginWithoutDomain() throws DomainNotFoundException {
+		expect(userDao.getUniqueObmDomain("login")).andReturn(null);
 		control.replay();
 		
-		Login actualLogin = sessionManagement.prepareLogin("login", null, null, authenticationService);
+		Login actualLogin = sessionManagement.prepareLogin("login", null, null);
 		control.verify();
 		assertThat(actualLogin).isEqualTo(Login.builder().login("login").build());
 	}
 	
 	@Test
-	public void prepareLoginLoginWithoutProvidedDomainButFoundWithService() {
-		expect(authenticationService.getObmDomain("login")).andReturn("domain");
+	public void prepareLoginLoginWithoutProvidedDomainButFoundWithService() throws DomainNotFoundException {
+		expect(userDao.getUniqueObmDomain("login")).andReturn("domain");
 		control.replay();
 		
-		Login actualLogin = sessionManagement.prepareLogin("login", null, null, authenticationService);
+		Login actualLogin = sessionManagement.prepareLogin("login", null, null);
 		control.verify();
 		assertThat(actualLogin).isEqualTo(Login.builder().login("login").domain("domain").build());
 	}
 
 	@Test
-	public void testLoginWithoutPasswordFromTrustedLemonIP() {
+	public void testLoginWithoutPasswordFromTrustedLemonIP() throws DomainNotFoundException {
 		expect(authentificationServiceFactory.get()).andReturn(authenticationService);
 		expect(authenticationService.getType()).andReturn("TestAuthService");
 		expect(domainService.findDomainByName(DOMAIN)).andReturn(obmDomain);
@@ -194,10 +195,10 @@ public class SessionManagementTest {
 	}
 	
 	@Test
-	public void testLoginIsLoweredBeforeAuthServiceUsage() {
+	public void testLoginIsLoweredBeforeAuthServiceUsage() throws DomainNotFoundException {
 		expect(authentificationServiceFactory.get()).andReturn(authenticationService);
 		expect(authenticationService.getType()).andReturn("TestAuthService");
-		expect(authenticationService.getObmDomain(LOGIN)).andReturn(DOMAIN);
+		expect(userDao.getUniqueObmDomain(LOGIN)).andReturn(DOMAIN);
 		expect(domainService.findDomainByName(DOMAIN)).andReturn(obmDomain);
 		expect(specialAccounts.isRootAccount(LOGINATDOMAIN, null)).andReturn(false);
 		expect(specialAccounts.isAnyUserAccount(null)).andReturn(true);

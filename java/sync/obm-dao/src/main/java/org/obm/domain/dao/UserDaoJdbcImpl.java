@@ -50,6 +50,7 @@ import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.base.DomainName;
@@ -67,6 +68,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -1018,4 +1020,40 @@ public class UserDaoJdbcImpl implements UserDao {
 			JDBCUtils.cleanup(connection, ps, rs);
 		}
 	}
+
+	@Override
+	public String getUniqueObmDomain(String userLogin) throws DomainNotFoundException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String domain = null;
+
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(
+					"SELECT domain_name FROM Domain " +
+					"INNER JOIN UserObm ON userobm_domain_id = domain_id " +
+					"WHERE userobm_login = ?");
+
+			ps.setString(1, userLogin);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				domain = rs.getString("domain_name");
+			} else {
+				throw new DomainNotFoundException(String.format("No domain found for login %s", userLogin));
+			}
+
+			if (!rs.next()) {
+				return domain;
+			} else {
+				throw new DomainNotFoundException(String.format("The login %s is in several domains (at least %s and  %s).", userLogin, domain, rs.getString("domain_name")));
+			}
+		} catch (SQLException e){
+			throw Throwables.propagate(e);
+		} finally {
+			obmHelper.cleanup(con, ps, rs);
+		}
+	}
+
 }

@@ -30,6 +30,7 @@
 package org.obm.sync.login;
 
 import org.obm.annotations.transactional.Transactional;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.auth.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class TrustedLoginBindingImpl extends AbstractLoginBackend implements Log
 	@Transactional(readOnly = true)
 	public AccessToken logUserIn(String user, String token, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException {
 
 		TrustToken trustToken = null;
 		
