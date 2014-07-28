@@ -60,6 +60,7 @@ public class ArchiveScheduler implements AutoCloseable {
 	@Inject
 	@VisibleForTesting ArchiveScheduler(
 			ArchiveSchedulerQueue queue,
+			ArchiveSchedulerBus bus,
 			ArchiveDomainTask.Factory archiveTaskFactory,
 			DateTimeProvider dateTimeProvider,
 			@Named("schedulerResolution") TimeUnit schedulerResolution) {
@@ -71,6 +72,7 @@ public class ArchiveScheduler implements AutoCloseable {
 				.timeProvider(dateTimeProvider)
 				.resolution(schedulerResolution)
 				.addListener(queue.getListener())
+				.addListener(bus)
 				.start();
 	}
 	
@@ -102,5 +104,5 @@ public class ArchiveScheduler implements AutoCloseable {
 			}
 		};
 	}
-
+	
 }

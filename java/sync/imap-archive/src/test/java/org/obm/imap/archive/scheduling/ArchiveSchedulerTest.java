@@ -40,6 +40,10 @@ import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
@@ -49,12 +53,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Client;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events;
 import org.obm.imap.archive.scheduling.ControlledTaskFactory.RemotelyControlledTask;
 import org.obm.imap.archive.services.ArchiveService;
 import org.obm.imap.archive.services.LogFileService;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Queues;
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
 import com.linagora.scheduling.Monitor;
 import com.linagora.scheduling.ScheduledTask;
 import com.linagora.scheduling.ScheduledTask.State;
@@ -75,8 +86,12 @@ public class ArchiveSchedulerTest {
 	ControlledTaskFactory archiveTaskFactory;
 	Monitor<ArchiveDomainTask> monitor;
 	FutureTestListener<ArchiveDomainTask> futureListener;
+	BusClient busClient;
+	ArchiveSchedulerBus bus;
 	ArchiveSchedulerQueue queue;
 	ArchiveScheduler testee;
+
+
 
 	@Before
 	public void setUp() {
@@ -103,7 +118,9 @@ public class ArchiveSchedulerTest {
 		};
 
 		queue = new ArchiveSchedulerQueue(monitorFactory);
-		testee = new ArchiveScheduler(queue, archiveTaskFactory, timeProvider, MILLISECONDS);
+		busClient = Guice.createInjector(new BusModule()).getInstance(BusClient.class); 
+		bus = new ArchiveSchedulerBus(ImmutableSet.<Client>of(busClient));
+		testee = new ArchiveScheduler(queue, bus, archiveTaskFactory, timeProvider, MILLISECONDS);
 	}
 	
 	@After
@@ -312,7 +329,7 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
 		archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class));
-		expectLastCall();
+		expectLastCall().anyTimes();
 
 		expectGetRunLogFile(runId1, runId2);
 		
@@ -366,6 +383,7 @@ public class ArchiveSchedulerTest {
 
 	void assertTaskIsScheduled(ArchiveDomainTask task) throws Exception {
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.WAITING);
+		assertThat(busClient.getState(timeout, MILLISECONDS)).isEqualTo(State.WAITING);
 		assertThat(
 				Iterables.filter(monitor.all(), onlyTaskWithStatusPredicate(State.WAITING)))
 				.extracting("task", "scheduledTime")
@@ -375,6 +393,7 @@ public class ArchiveSchedulerTest {
 	void assertTaskIsRunning(ArchiveDomainTask task) throws Exception {
 		timeProvider.setCurrent(task.getWhen());
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.RUNNING);
+		assertThat(busClient.getState(timeout, MILLISECONDS)).isEqualTo(State.RUNNING);
 		assertThat(
 				Iterables.filter(monitor.all(), onlyTaskWithStatusPredicate(State.RUNNING)))
 				.extracting("task", "scheduledTime")
@@ -384,6 +403,7 @@ public class ArchiveSchedulerTest {
 	void assertTaskIsTerminated(ArchiveDomainTask task) throws Exception {
 		((RemotelyControlledTask)task).terminate();
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.TERMINATED);
+		assertThat(busClient.getState(timeout, MILLISECONDS)).isEqualTo(State.TERMINATED);
 		assertThat(monitor.all()).extracting("task").doesNotContain(task);
 	}
 
@@ -395,5 +415,36 @@ public class ArchiveSchedulerTest {
 				return input.state() == state;
 			}
 		};
+	}
+	
+	static class BusModule extends AbstractModule {
+
+		@Override
+		protected void configure() {
+			bind(BusClient.class).toInstance(new BusClient());
+		}
+		
+	}
+	
+	static class BusClient implements Client {
+		
+		final ArrayBlockingQueue<State> states;
+
+		public BusClient() {
+			states = Queues.newArrayBlockingQueue(10);
+		}
+		
+		@Subscribe 
+		public void onTaskStateChanged(Events.TaskStatusChanged event) throws Exception {
+			states.put(event.getTask().state());
+		}
+
+		State getState(int timeout, TimeUnit unit) throws Exception {
+			State state = states.poll(timeout, unit);
+			if (state == null) {
+				throw new TimeoutException();
+			}
+			return state;
+		}
 	}
 }

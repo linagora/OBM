@@ -55,6 +55,7 @@ import org.obm.imap.archive.resources.RootHandler;
 import org.obm.imap.archive.resources.TreatmentsResource;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerQueue;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
@@ -79,6 +80,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
 import com.linagora.scheduling.DateTimeProvider;
@@ -117,6 +119,9 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
 		bind(Boolean.class).annotatedWith(Names.named("endlessTask")).toInstance(Boolean.TRUE);
 		bind(TimeUnit.class).annotatedWith(Names.named("schedulerResolution")).toInstance(TimeUnit.MINUTES);
+		
+		bind(ArchiveSchedulerBus.class);
+		Multibinder.newSetBinder(binder(), ArchiveSchedulerBus.Client.class);
 		
 		bindImapArchiveServices();
 	}
