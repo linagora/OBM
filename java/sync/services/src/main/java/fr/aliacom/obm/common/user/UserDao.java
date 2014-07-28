@@ -47,11 +47,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.DomainNotFoundException;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.utils.ObmHelper;
 
@@ -355,4 +357,52 @@ public class UserDao {
 		
 		return ownerId;
 	}
+
+	public String getUniqueObmDomain(String userLogin) throws DomainNotFoundException {
+		Connection con = null;
+
+		try {
+			con = obmHelper.getConnection();
+
+			return getUniqueObmDomain(userLogin, con);
+		} catch (SQLException e){
+			throw new DomainNotFoundException(e);
+		} finally {
+			obmHelper.cleanup(con, null, null);
+		}
+	}
+
+	@VisibleForTesting
+	String getUniqueObmDomain(String userLogin, Connection con) throws DomainNotFoundException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String domain = null;
+
+		try {
+			ps = con.prepareStatement(
+					"SELECT domain_name FROM Domain " +
+					"INNER JOIN UserObm ON userobm_domain_id = domain_id " +
+					"WHERE userobm_login = ?");
+
+			ps.setString(1, userLogin);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				domain = rs.getString("domain_name");
+			} else {
+				throw new DomainNotFoundException(String.format("No domain found for login %s", userLogin));
+			}
+
+			if (!rs.next()) {
+				return domain;
+			} else {
+				throw new DomainNotFoundException(String.format("The login %s is in several domains (at least %s and  %s).", userLogin, domain, rs.getString("domain_name")));
+			}
+		} catch (SQLException e){
+			throw Throwables.propagate(e);
+		} finally {
+			obmHelper.cleanup(null, ps, rs);
+		}
+	}
+
 }

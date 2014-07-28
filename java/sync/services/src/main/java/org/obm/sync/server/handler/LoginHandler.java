@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.DomainNotFoundException;
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -160,6 +161,8 @@ public class LoginHandler implements ISyncHandler {
 			fillTokenWithServerCapabilities(token);
 
 			responder.sendToken(token);
+		} catch (DomainNotFoundException e) {
+			responder.sendError(e);
 		} catch (ObmSyncVersionNotFoundException e) {
 			responder.sendError("Invalid obm-sync server version");
 		} catch (IllegalArgumentException e) {

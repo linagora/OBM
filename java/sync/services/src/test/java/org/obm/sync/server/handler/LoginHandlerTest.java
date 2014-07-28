@@ -210,7 +210,7 @@ public class LoginHandlerTest {
 
 		expect(rs.next()).andReturn(false).anyTimes(); // So that domain selection returns nothing
 		
-		assertLoginResult(httpServletRequest, "loginFailedForUserUsera.xml");
+		assertLoginResult(httpServletRequest, "unknownDomainForUserUsera.xml");
 	}
 	
 	@Test
@@ -226,7 +226,7 @@ public class LoginHandlerTest {
 	private void expectPaswordVerification(String password) throws SQLException {
 		expect(rs.next()).andReturn(true).once(); // So that domain selection returns something...
 		expect(rs.next()).andReturn(false).once(); // ...but exactly one record
-		expect(rs.getString(eq(1))).andReturn("domain").once(); // Domain name
+		expect(rs.getString("domain_name")).andReturn("domain").once(); // Domain name
 		expect(rs.next()).andReturn(true).once(); // So that the password selection returns something
 		expect(rs.getString(eq(1))).andReturn("PLAIN").once(); // Password type
 		expect(rs.getString(eq(2))).andReturn(password).once();// Password

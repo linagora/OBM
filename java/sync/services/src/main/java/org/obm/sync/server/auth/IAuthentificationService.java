@@ -35,8 +35,6 @@ import org.obm.sync.auth.Credentials;
 
 public interface IAuthentificationService {
 
-	String getObmDomain(String userLogin);
-
 	boolean doAuth(Credentials credentials);
 
 	String getType();

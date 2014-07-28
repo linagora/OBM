@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.DomainNotFoundException;
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.domain.DomainDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -80,7 +81,7 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 	@Transactional(readOnly=true)
 	public AccessToken logUserIn(String user, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException {
 
 		return sessionManagement.login(user, password, origin, clientIP, remoteIP, lemonLogin, lemonDomain, isPasswordHashed);
 	}

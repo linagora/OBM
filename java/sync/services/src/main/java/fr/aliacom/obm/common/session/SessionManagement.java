@@ -55,6 +55,7 @@ import com.google.common.cache.RemovalNotification;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.DomainNotFoundException;
 import fr.aliacom.obm.common.ObmSyncVersion;
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.domain.DomainService;
@@ -160,10 +161,10 @@ public class SessionManagement {
 	 * one wants everyone to be able to login as anyone!
 	 */
 	public AccessToken trustedLogin(String specifiedLogin, String origin,
-			String clientIP, String remoteIP, String lemonLogin, String lemonDomain) {
+			String clientIP, String remoteIP, String lemonLogin, String lemonDomain) throws DomainNotFoundException {
 		IAuthentificationService authService = authentificationServiceFactory.get();
 
-		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain, authService);
+		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain);
 		logLoginAttempt(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
 
 		ObmDomain obmDomain = login.hasDomain() ? domainService.findDomainByName(login.getDomain()) : null;
@@ -182,11 +183,11 @@ public class SessionManagement {
 	 */
 	public AccessToken login(String specifiedLogin, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException {
 
 		IAuthentificationService authService = authentificationServiceFactory.get();
 
-		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain, authService);
+		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain);
 		logLoginAttempt(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
 
 		ObmDomain obmDomain = login.hasDomain() ? domainService.findDomainByName(login.getDomain()) : null;
@@ -220,11 +221,11 @@ public class SessionManagement {
 	}
 
 	@VisibleForTesting Login prepareLogin(String specifiedLogin, String lemonLogin,
-			String lemonDomain, IAuthentificationService authService) {
+			String lemonDomain) throws DomainNotFoundException {
 		Login login = Login.builder().login(chooseLogin(specifiedLogin, lemonLogin, lemonDomain)).build();
 		return login.hasDomain()
 				? login
-				: login.withDomain(authService.getObmDomain(login.getLogin()));
+				: login.withDomain(userManagementDAO.getUniqueObmDomain(login.getLogin()));
 	}
 
 	private AccessToken login(String origin, String userLogin, ObmDomain obmDomain, String authServiceType) {

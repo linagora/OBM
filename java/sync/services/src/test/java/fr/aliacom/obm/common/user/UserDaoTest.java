@@ -39,6 +39,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.easymock.IMocksControl;
@@ -58,6 +59,7 @@ import com.google.common.base.Joiner;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.DomainNotFoundException;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.utils.ObmHelper;
 
@@ -333,4 +335,116 @@ public class UserDaoTest {
 		
 		assertThat(obmUser).isEqualsToByComparingFields(expectedObmUser);
 	}
+
+	@Test(expected=RuntimeException.class)
+	public void testGetUniqueObmDomainOnSQLException() throws Exception {
+		Connection con = mocksControl.createMock(Connection.class);
+		PreparedStatement ps = mocksControl.createMock(PreparedStatement.class);
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+
+		expect(con.prepareStatement(isA(String.class))).andReturn(ps);
+		ps.setString(1, "login");
+		expectLastCall();
+		expect(ps.executeQuery()).andReturn(rs);
+		expect(rs.next()).andThrow(new SQLException());
+
+		ps.close();
+		expectLastCall();
+		rs.close();
+		expectLastCall();
+
+		mocksControl.replay();
+
+		try {
+			userDao.getUniqueObmDomain("login", con);
+		}
+		finally {
+			mocksControl.verify();
+		}
+	}
+
+	@Test(expected=DomainNotFoundException.class)
+	public void testGetUniqueObmDomainOnMultipleDomainsFound() throws Exception {
+		Connection con = mocksControl.createMock(Connection.class);
+		PreparedStatement ps = mocksControl.createMock(PreparedStatement.class);
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+
+		expect(con.prepareStatement(isA(String.class))).andReturn(ps);
+		ps.setString(1, "login");
+		expectLastCall();
+		expect(ps.executeQuery()).andReturn(rs);
+		expect(rs.next()).andReturn(true).times(2);
+		expect(rs.getString("domain_name")).andReturn("domain").times(2);
+
+		ps.close();
+		expectLastCall();
+		rs.close();
+		expectLastCall();
+
+		mocksControl.replay();
+
+		try {
+			userDao.getUniqueObmDomain("login", con);
+		}
+		finally {
+			mocksControl.verify();
+		}
+	}
+
+	@Test(expected=DomainNotFoundException.class)
+	public void testGetUniqueObmDomainOnNoDomainFound() throws Exception {
+		Connection con = mocksControl.createMock(Connection.class);
+		PreparedStatement ps = mocksControl.createMock(PreparedStatement.class);
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+
+		expect(con.prepareStatement(isA(String.class))).andReturn(ps);
+		ps.setString(1, "login");
+		expectLastCall();
+		expect(ps.executeQuery()).andReturn(rs);
+		expect(rs.next()).andReturn(false);
+
+		ps.close();
+		expectLastCall();
+		rs.close();
+		expectLastCall();
+
+		mocksControl.replay();
+
+		try {
+			userDao.getUniqueObmDomain("login", con);
+		}
+		finally {
+			mocksControl.verify();
+		}
+	}
+
+	@Test
+	public void testUniqueGetObmDomain() throws Exception {
+		Connection con = mocksControl.createMock(Connection.class);
+		PreparedStatement ps = mocksControl.createMock(PreparedStatement.class);
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+
+		expect(con.prepareStatement(isA(String.class))).andReturn(ps);
+		ps.setString(1, "login");
+		expectLastCall();
+		expect(ps.executeQuery()).andReturn(rs);
+		expect(rs.next()).andReturn(true);
+		expect(rs.getString("domain_name")).andReturn("domain");
+		expect(rs.next()).andReturn(false);
+
+		ps.close();
+		expectLastCall();
+		rs.close();
+		expectLastCall();
+
+		mocksControl.replay();
+
+		try {
+			assertThat(userDao.getUniqueObmDomain("login", con)).isEqualTo("domain");
+		}
+		finally {
+			mocksControl.verify();
+		}
+	}
+
 }

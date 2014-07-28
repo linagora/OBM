@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.DomainNotFoundException;
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.session.SessionManagement;
 import fr.aliacom.obm.common.trust.TrustToken;
@@ -59,7 +60,7 @@ public class TrustedLoginBindingImpl extends AbstractLoginBackend implements Log
 	@Transactional(readOnly = true)
 	public AccessToken logUserIn(String user, String token, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException {
 
 		TrustToken trustToken = null;
 		
