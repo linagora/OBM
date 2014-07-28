@@ -55,8 +55,13 @@ public enum ServerCapability {
 	 * Advertise support for anonymized events
 	 */
 	SERVER_SIDE_ANONYMIZATION,
-	/*
+	/**
 	 * Used to advertise support for the storeContact endpoint.
 	 */
-	ADDRESS_BOOK_HANDLER_SUPPORTS_STORECONTACT
+	ADDRESS_BOOK_HANDLER_SUPPORTS_STORECONTACT,
+	/**
+	 * Used to advertise that LoginHandler sends AuthFault on login failure instead
+	 * of a weakly typed String message only.
+	 */
+	LOGIN_HANDLER_SUPPORTS_AUTHFAULT
 }
