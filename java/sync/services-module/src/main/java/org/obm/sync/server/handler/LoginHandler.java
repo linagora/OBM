@@ -33,6 +33,7 @@ package org.obm.sync.server.handler;
 
 import java.util.Map;
 
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.login.LoginBackend;
@@ -163,6 +164,8 @@ public class LoginHandler implements ISyncHandler {
 			fillTokenWithServerCapabilities(token);
 
 			responder.sendToken(token);
+		} catch (DomainNotFoundException e) {
+			responder.sendError(e);
 		} catch (ObmSyncVersionNotFoundException e) {
 			responder.sendError("Invalid obm-sync server version");
 		} catch (IllegalArgumentException e) {

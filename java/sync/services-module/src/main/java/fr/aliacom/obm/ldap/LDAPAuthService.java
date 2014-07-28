@@ -48,8 +48,6 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.contact.UserDao;
-
 /**
  * Authenticate on LDAP
  */
@@ -57,24 +55,13 @@ import fr.aliacom.obm.common.contact.UserDao;
 public class LDAPAuthService implements IAuthentificationService {
 
 	private static Logger logger =  LoggerFactory.getLogger(LDAPAuthService.class);
-	private final LDAPAuthConfig authConfig;
-	private final LDAPDirectory directory;
-	private final UserDao userDao;
+	private LDAPAuthConfig authConfig;
+	private LDAPDirectory directory;
 
 	@Inject
-	private LDAPAuthService(LDAPAuthConfig ldapAuthConfig, UserDao userDao) {
+	private LDAPAuthService(LDAPAuthConfig ldapAuthConfig) {
 		this.authConfig = ldapAuthConfig;
-		this.userDao = userDao;
 		this.directory = authConfig.getDirectory();
-	}
-
-	@Override
-	public String getObmDomain(String login) {
-		String ret = directory.getObmDomain();
-		if (ret == null) {
-			ret = userDao.getUserDomain(login);
-		}
-		return ret;
 	}
 
 	@Override

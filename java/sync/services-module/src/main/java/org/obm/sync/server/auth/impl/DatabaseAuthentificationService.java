@@ -133,38 +133,6 @@ public class DatabaseAuthentificationService implements IAuthentificationService
 	}
 
 	@Override
-	public String getObmDomain(String userLogin) {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		String dn = null;
-		try {
-			con = obmHelper.getConnection();
-			ps = con
-					.prepareStatement("SELECT domain_name FROM UserObm, Domain "
-							+ "WHERE userobm_domain_id=domain_id AND userobm_login=?");
-			ps.setString(1, userLogin);
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				dn = rs.getString(1);
-			}
-			if (rs.next()) {
-				logger.error("the login " + userLogin
-						+ " is in several domain (at least " + dn + " and "
-						+ rs.getString(1)
-						+ ") and you did @domain was not provided in login");
-				dn = null;
-			}
-		} catch (SQLException se) {
-			logger.error(se.getMessage(), se);
-		} finally {
-			obmHelper.cleanup(con, ps, rs);
-		}
-		return dn;
-	}
-
-	@Override
 	public String getType() {
 		return "OBM DB";
 	}

@@ -51,6 +51,7 @@ import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.host.ObmHost;
@@ -850,6 +851,21 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		dao.getAllEmailsFrom(domain, null);
 	}
 
+	@Test(expected = DomainNotFoundException.class)
+	public void testGetUniqueObmDomainFailsWhenUserIsInSeveralDomains() throws Exception {
+		dao.getUniqueObmDomain("user2");
+	}
+
+	@Test(expected = DomainNotFoundException.class)
+	public void testGetUniqueObmDomainFailsWhenUserDoesntExist() throws Exception {
+		dao.getUniqueObmDomain("iamnotaregistereduser!");
+	}
+
+	@Test
+	public void testGetUniqueObmDomain() throws Exception {
+		assertThat(dao.getUniqueObmDomain("user8")).isEqualTo("test2.tlse.lng");
+	}
+
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId, String extId) {
 		return ObmUser
 				.builder()
@@ -883,5 +899,5 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		return sampleUserBuilder(id, entityId, extId)
 				.build();
 	}
-	
+
 }

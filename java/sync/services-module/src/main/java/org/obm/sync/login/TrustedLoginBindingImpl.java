@@ -30,6 +30,7 @@
 package org.obm.sync.login;
 
 import org.obm.annotations.transactional.Transactional;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.domain.dao.TrustTokenDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.Login;
@@ -42,6 +43,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.session.SessionManagement;
 import fr.aliacom.obm.common.trust.TrustToken;
+import fr.aliacom.obm.common.trust.TrustTokenDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class TrustedLoginBindingImpl extends AbstractLoginBackend implements LoginBackend {
@@ -61,7 +63,7 @@ public class TrustedLoginBindingImpl extends AbstractLoginBackend implements Log
 	@Transactional(readOnly = true)
 	public AccessToken logUserIn(String user, String token, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException {
 
 		TrustToken trustToken = null;
 		Login login = Login.builder().login(user).build();

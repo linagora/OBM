@@ -34,6 +34,7 @@ package org.obm.sync.login;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.server.auth.AuthentificationServiceFactory;
@@ -80,7 +81,7 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 	@Transactional(readOnly=true)
 	public AccessToken logUserIn(String user, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException {
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException {
 
 		return sessionManagement.login(user, password, origin, clientIP, remoteIP, lemonLogin, lemonDomain, isPasswordHashed);
 	}

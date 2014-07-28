@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.login;
 
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.auth.AccessToken;
 
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
@@ -40,7 +41,7 @@ public interface LoginBackend {
 	AccessToken logUserIn(String user, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
 			String lemonDomain, boolean isPasswordHashed)
-			throws ObmSyncVersionNotFoundException;
+			throws ObmSyncVersionNotFoundException, DomainNotFoundException;
 
 	void logout(String sessionId);
 
