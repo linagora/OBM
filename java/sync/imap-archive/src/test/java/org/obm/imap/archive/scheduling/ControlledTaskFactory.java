@@ -51,8 +51,8 @@ public class ControlledTaskFactory extends ArchiveDomainTask.Factory {
 	}
 
 	@Override
-	public RemotelyControlledTask create(ObmDomainUuid domain, DateTime when, ArchiveTreatmentRunId runId) {
-		return new RemotelyControlledTask(archiveService, domain, when, runId);
+	public RemotelyControlledTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
+		return new RemotelyControlledTask(archiveService, domain, when, higherBoundary, runId);
 	}
 
 	public class RemotelyControlledTask extends ArchiveDomainTask {
@@ -71,8 +71,9 @@ public class ControlledTaskFactory extends ArchiveDomainTask.Factory {
 		
 		private final Terminator terminator;
 	
-		RemotelyControlledTask(ArchiveService archiveService, ObmDomainUuid domain, DateTime when, ArchiveTreatmentRunId runId) {
-			super(archiveService, deferredFileOutputStream(runId), domain, when, runId);
+		RemotelyControlledTask(ArchiveService archiveService, ObmDomainUuid domain,
+				DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
+			super(archiveService, deferredFileOutputStream(runId), domain, when, higherBoundary, runId);
 			terminator = new Terminator();
 		}
 		

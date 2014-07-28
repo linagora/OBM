@@ -81,6 +81,7 @@ public class ArchiveSchedulerTest {
 	IMocksControl mocks;
 	ArchiveService archiveService;
 	LogFileService logFileService;
+	DateTime higherBoundary;
 	
 	TestDateTimeProvider timeProvider;
 	ControlledTaskFactory archiveTaskFactory;
@@ -92,14 +93,15 @@ public class ArchiveSchedulerTest {
 	ArchiveScheduler testee;
 
 
-
 	@Before
 	public void setUp() {
 		timeout = 1500;
+		higherBoundary = DateTime.parse("2024-11-1T05:04Z");
+		
 		mocks = createControl();
 		archiveService = mocks.createMock(ArchiveService.class);
 		logFileService = mocks.createMock(LogFileService.class);
-
+		
 		DateTime testsStartTime = DateTime.parse("2024-01-1T05:04Z");
 		timeProvider = new TestDateTimeProvider(testsStartTime);
 		archiveTaskFactory = new ControlledTaskFactory(archiveService, logFileService); 
@@ -120,7 +122,7 @@ public class ArchiveSchedulerTest {
 		queue = new ArchiveSchedulerQueue(monitorFactory);
 		busClient = Guice.createInjector(new BusModule()).getInstance(BusClient.class); 
 		bus = new ArchiveSchedulerBus(ImmutableSet.<Client>of(busClient));
-		testee = new ArchiveScheduler(queue, bus, archiveTaskFactory, timeProvider, MILLISECONDS);
+		testee = new ArchiveScheduler(queue, bus, timeProvider, MILLISECONDS);
 	}
 	
 	@After
@@ -139,7 +141,8 @@ public class ArchiveSchedulerTest {
 		expectLastCall();
 		
 		mocks.replay();
-		ArchiveDomainTask task = testee.schedule(domain, when, runId).task();
+		RemotelyControlledTask task = archiveTaskFactory.create(domain, when, higherBoundary, runId);
+		testee.schedule(task);
 		assertTaskProgression(task);
 		assertThat(monitor.all()).isEmpty();
 		mocks.verify();
@@ -161,9 +164,11 @@ public class ArchiveSchedulerTest {
 		expectGetRunLogFile(runId1, runId2);
 
 		mocks.replay();
-		ArchiveDomainTask task1 = testee.schedule(domain, when1, runId1).task();
+		RemotelyControlledTask task1 = archiveTaskFactory.create(domain, when1, higherBoundary, runId1);
+		testee.schedule(task1);
 		assertTaskProgression(task1);
-		ArchiveDomainTask task2 = testee.schedule(domain, when2, runId2).task();
+		RemotelyControlledTask task2 = archiveTaskFactory.create(domain, when2, higherBoundary, runId2);
+		testee.schedule(task2);
 		assertTaskProgression(task2);
 		assertThat(monitor.all()).isEmpty();
 		mocks.verify();
@@ -185,8 +190,10 @@ public class ArchiveSchedulerTest {
 		expectGetRunLogFile(runId1, runId2);
 
 		mocks.replay();
-		ArchiveDomainTask task = testee.schedule(domain, when, runId1).task();
-		ArchiveDomainTask taskEnqueued = testee.schedule(domain, whenToEnqueue, runId2).task();
+		RemotelyControlledTask task = archiveTaskFactory.create(domain, when, higherBoundary, runId1);
+		testee.schedule(task);
+		RemotelyControlledTask taskEnqueued = archiveTaskFactory.create(domain, whenToEnqueue, higherBoundary, runId2);
+		testee.schedule(taskEnqueued);
 		assertTaskIsScheduled(task);
 		assertTaskIsScheduled(taskEnqueued);
 		assertTaskIsRunning(task);
@@ -218,11 +225,15 @@ public class ArchiveSchedulerTest {
 		expectGetRunLogFile(runId1, runId2, runId3);
 
 		mocks.replay();
-		ArchiveDomainTask task = testee.schedule(domain, when, runId1).task();
+		RemotelyControlledTask task = archiveTaskFactory.create(domain, when, higherBoundary, runId1);
+		testee.schedule(task);
 		assertTaskIsScheduled(task);
 		assertTaskIsRunning(task);
-		ArchiveDomainTask laterTaskEnqueuedBefore = testee.schedule(domain, laterWhenEnqueuedBefore, runId2).task();
-		ArchiveDomainTask earlierTaskEnqueuedAfter = testee.schedule(domain, earlierWhenEnqueuedAfter, runId3).task();
+		
+		RemotelyControlledTask laterTaskEnqueuedBefore = archiveTaskFactory.create(domain, laterWhenEnqueuedBefore, higherBoundary, runId2);
+		RemotelyControlledTask earlierTaskEnqueuedAfter = archiveTaskFactory.create(domain, earlierWhenEnqueuedAfter, higherBoundary, runId3);
+		testee.schedule(laterTaskEnqueuedBefore);
+		testee.schedule(earlierTaskEnqueuedAfter);
 		assertTaskIsScheduled(laterTaskEnqueuedBefore);
 		assertTaskIsScheduled(earlierTaskEnqueuedAfter);
 		assertTaskIsTerminated(task);
@@ -251,8 +262,10 @@ public class ArchiveSchedulerTest {
 		expectGetRunLogFile(runId1, runId2);
 
 		mocks.replay();
-		ArchiveDomainTask taskDomain1 = testee.schedule(domain1, when1, runId1).task();
-		ArchiveDomainTask taskDomain2 = testee.schedule(domain2, when2, runId2).task();
+		RemotelyControlledTask taskDomain1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1);
+		RemotelyControlledTask taskDomain2 = archiveTaskFactory.create(domain2, when2, higherBoundary, runId2);
+		testee.schedule(taskDomain1);
+		testee.schedule(taskDomain2);
 		assertTaskIsScheduled(taskDomain1);
 		assertTaskIsScheduled(taskDomain2);
 		assertTaskIsRunning(taskDomain1);
@@ -289,10 +302,14 @@ public class ArchiveSchedulerTest {
 		expectGetRunLogFile(runId1, runId2, runId3, runId4);
 
 		mocks.replay();
-		ArchiveDomainTask taskDomain1 = testee.schedule(domain1, when1, runId1).task();
-		ArchiveDomainTask taskDomain2 = testee.schedule(domain2, when2, runId2).task();
-		ArchiveDomainTask taskDomain1Enqueued = testee.schedule(domain1, when1ToEnqueue, runId3).task();
-		ArchiveDomainTask taskDomain2Enqueued = testee.schedule(domain2, when2ToEnqueue, runId4).task();
+		RemotelyControlledTask taskDomain1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1);
+		RemotelyControlledTask taskDomain2 = archiveTaskFactory.create(domain2, when2, higherBoundary, runId2);
+		RemotelyControlledTask taskDomain1Enqueued = archiveTaskFactory.create(domain1, when1ToEnqueue, higherBoundary, runId3);
+		RemotelyControlledTask taskDomain2Enqueued = archiveTaskFactory.create(domain2, when2ToEnqueue, higherBoundary, runId4);
+		testee.schedule(taskDomain1);
+		testee.schedule(taskDomain2);
+		testee.schedule(taskDomain1Enqueued);
+		testee.schedule(taskDomain2Enqueued);
 
 		assertTaskIsScheduled(taskDomain1);
 		assertTaskIsScheduled(taskDomain2);
@@ -334,16 +351,19 @@ public class ArchiveSchedulerTest {
 		expectGetRunLogFile(runId1, runId2);
 		
 		mocks.replay();
-		ScheduledTask<ArchiveDomainTask> taskRunning = testee.schedule(domain, when1, runId1);
-		ScheduledTask<ArchiveDomainTask> taskScheduled = testee.schedule(domain, when2, runId2);
-		assertTaskIsScheduled(taskRunning.task());
-		assertTaskIsScheduled(taskScheduled.task());
-		assertTaskIsRunning(taskRunning.task());
+		RemotelyControlledTask runningTask = archiveTaskFactory.create(domain, when1, higherBoundary, runId1);
+		ScheduledTask<ArchiveDomainTask> running = testee.schedule(runningTask);
+		RemotelyControlledTask scheduledTask = archiveTaskFactory.create(domain, when2, higherBoundary, runId2);
+		ScheduledTask<ArchiveDomainTask> scheduled = testee.schedule(scheduledTask);
+		
+		assertTaskIsScheduled(runningTask);
+		assertTaskIsScheduled(scheduledTask);
+		assertTaskIsRunning(runningTask);
 		testee.clearDomain(domain);
 		mocks.verify();
 		
-		assertThat(taskScheduled.state()).isEqualTo(State.CANCELED);
-		assertThat(taskRunning.state()).isEqualTo(State.RUNNING);
+		assertThat(scheduled.state()).isEqualTo(State.CANCELED);
+		assertThat(running.state()).isEqualTo(State.RUNNING);
 	}
 
 	@Test
@@ -358,15 +378,17 @@ public class ArchiveSchedulerTest {
 		expectGetRunLogFile(runId1, runId2);
 		
 		mocks.replay();
-		ScheduledTask<ArchiveDomainTask> taskScheduled1 = testee.schedule(domain1, when1, runId1);
-		ScheduledTask<ArchiveDomainTask> taskScheduled2 = testee.schedule(domain2, when2, runId2);
-		assertTaskIsScheduled(taskScheduled1.task());
-		assertTaskIsScheduled(taskScheduled2.task());
+		RemotelyControlledTask scheduledTask1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1);
+		ScheduledTask<ArchiveDomainTask> scheduled1 = testee.schedule(scheduledTask1);
+		RemotelyControlledTask scheduledTask2 = archiveTaskFactory.create(domain2, when2, higherBoundary, runId2);
+		ScheduledTask<ArchiveDomainTask> scheduled2 = testee.schedule(scheduledTask2);
+		assertTaskIsScheduled(scheduledTask1);
+		assertTaskIsScheduled(scheduledTask2);
 		testee.clearDomain(domain1);
 		mocks.verify();
 		
-		assertThat(taskScheduled1.state()).isEqualTo(State.CANCELED);
-		assertThat(taskScheduled2.state()).isEqualTo(State.WAITING);
+		assertThat(scheduled1.state()).isEqualTo(State.CANCELED);
+		assertThat(scheduled2.state()).isEqualTo(State.WAITING);
 	}
 
 	private void expectGetRunLogFile(ArchiveTreatmentRunId...runIds) throws Exception {

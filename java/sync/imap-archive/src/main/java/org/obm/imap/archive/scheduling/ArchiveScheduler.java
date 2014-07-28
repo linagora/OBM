@@ -33,10 +33,6 @@ package org.obm.imap.archive.scheduling;
 
 import java.util.concurrent.TimeUnit;
 
-import org.joda.time.DateTime;
-import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask.Factory;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -55,17 +51,14 @@ public class ArchiveScheduler implements AutoCloseable {
 
 	private final ArchiveSchedulerQueue queue;
 	private final Scheduler<ArchiveDomainTask> scheduler;
-	private final Factory archiveTaskFactory;
 
 	@Inject
 	@VisibleForTesting ArchiveScheduler(
 			ArchiveSchedulerQueue queue,
 			ArchiveSchedulerBus bus,
-			ArchiveDomainTask.Factory archiveTaskFactory,
 			DateTimeProvider dateTimeProvider,
 			@Named("schedulerResolution") TimeUnit schedulerResolution) {
 		
-		this.archiveTaskFactory = archiveTaskFactory;
 		this.queue = queue;
 		this.scheduler = Scheduler.<ArchiveDomainTask>builder()
 				.queue(this.queue)
@@ -81,9 +74,8 @@ public class ArchiveScheduler implements AutoCloseable {
 		scheduler.stop();
 	}
 
-	public ScheduledTask<ArchiveDomainTask> schedule(ObmDomainUuid domain, DateTime when, ArchiveTreatmentRunId runId) {
-		ArchiveDomainTask task = archiveTaskFactory.create(domain, when, runId);
-		return scheduler.schedule(task).at(when);
+	public ScheduledTask<ArchiveDomainTask> schedule(ArchiveDomainTask task) {
+		return scheduler.schedule(task).at(task.getWhen());
 	}
 
 	

@@ -38,6 +38,8 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
+import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.ArchiveDomainTask.Factory;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.server.LifeCycleHandler;
@@ -54,15 +56,18 @@ public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 	private final Logger logger;
 	private final ArchiveScheduler scheduler;
 	private final ArchiveTreatmentDao archiveTreatmentDao;
+	private final Factory taskFactory;
 
 	@Inject
 	@VisibleForTesting RestoreTasksOnStartupHandler(
 			@Named(LoggerModule.TASK) Logger logger,
 			ArchiveScheduler scheduler,
-			ArchiveTreatmentDao archiveTreatmentDao) {
+			ArchiveTreatmentDao archiveTreatmentDao,
+			ArchiveDomainTask.Factory taskFactory) {
 		this.logger = logger;
 		this.scheduler = scheduler;
 		this.archiveTreatmentDao = archiveTreatmentDao;
+		this.taskFactory = taskFactory;
 	}
 	
 	@Transactional
@@ -96,7 +101,11 @@ public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 		logger.info("Re-schedule task uuid:{} for domain:{} at:{}", 
 				treatment.getRunId().serialize(), treatment.getDomainUuid().get(), treatment.getScheduledTime());
 		
-		scheduler.schedule(treatment.getDomainUuid(), treatment.getScheduledTime(), treatment.getRunId());
+		scheduler.schedule(taskFactory.create(
+				treatment.getDomainUuid(), 
+				treatment.getScheduledTime(), 
+				treatment.getHigherBoundary(), 
+				treatment.getRunId()));
 	}
 
 	private void markAsFailed(ArchiveTreatment treatment) throws DaoException, ElementNotFoundException {

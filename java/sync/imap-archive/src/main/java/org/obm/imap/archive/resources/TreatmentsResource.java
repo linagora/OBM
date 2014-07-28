@@ -52,6 +52,7 @@ import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.obm.imap.archive.service.SchedulingDatesService;
 import org.obm.imap.archive.services.ArchiveService;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,8 +93,14 @@ public class TreatmentsResource {
 	
 	@POST
 	public Response startArchiving() {
-		ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain.getUuid(), dateTimeProvider.now());
-		return Response.ok(runId).build();
+		try {
+			ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain.getUuid(), dateTimeProvider.now());
+			return Response.ok(runId).build();
+		} catch (DaoException e) {
+			logger.error("Cannot schedule an archiving", e);
+			return Response.serverError().build();
+		}
+		
 	}
 	
 	@GET

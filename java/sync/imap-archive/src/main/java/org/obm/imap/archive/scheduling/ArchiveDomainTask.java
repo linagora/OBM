@@ -74,10 +74,10 @@ public class ArchiveDomainTask implements Task {
 			this.logFileService = logFileService;
 		}
 		
-		public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, ArchiveTreatmentRunId runId) {
+		public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
 			return new ArchiveDomainTask(archiveService, 
 					deferredFileOutputStream(runId), 
-					domain, when, runId);
+					domain, when, higherBoundary, runId);
 		}
 
 		protected DeferredFileOutputStream deferredFileOutputStream(ArchiveTreatmentRunId runId) {
@@ -88,13 +88,16 @@ public class ArchiveDomainTask implements Task {
 	private final ArchiveService archiveService;
 	private final ObmDomainUuid domain;
 	private final DateTime when;
+	private final DateTime higherBoundary;
 	private final ArchiveTreatmentRunId runId;
 	private final DeferredFileOutputStream deferredFileOutputStream;
 
-	protected ArchiveDomainTask(ArchiveService archiveService, DeferredFileOutputStream deferredFileOutputStream, ObmDomainUuid domain, DateTime when, ArchiveTreatmentRunId runId) {
+	protected ArchiveDomainTask(ArchiveService archiveService, DeferredFileOutputStream deferredFileOutputStream, ObmDomainUuid domain,
+			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
 		this.archiveService = archiveService;
 		this.domain = domain;
 		this.when = when;
+		this.higherBoundary = higherBoundary;
 		this.runId = runId;
 		this.deferredFileOutputStream = deferredFileOutputStream;
 	}
@@ -116,6 +119,10 @@ public class ArchiveDomainTask implements Task {
 	public DateTime getWhen() {
 		return when;
 	}
+	
+	public DateTime getHigherBoundary() {
+		return higherBoundary;
+	}
 
 	public ArchiveTreatmentRunId getRunId() {
 		return runId;
@@ -127,7 +134,7 @@ public class ArchiveDomainTask implements Task {
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(domain, when, runId);
+		return Objects.hashCode(domain, when, runId, higherBoundary);
 	}
 
 	@Override
@@ -136,6 +143,7 @@ public class ArchiveDomainTask implements Task {
 			ArchiveDomainTask that = (ArchiveDomainTask) object;
 			return Objects.equal(this.domain, that.domain)
 				&& Objects.equal(this.when, that.when)
+				&& Objects.equal(this.higherBoundary, that.higherBoundary)
 				&& Objects.equal(this.runId, that.runId);
 		}
 		return false;
@@ -146,6 +154,7 @@ public class ArchiveDomainTask implements Task {
 		return Objects.toStringHelper(this)
 			.add("domain", domain)
 			.add("when", when)
+			.add("higherBoundary", higherBoundary)
 			.add("runId", runId)
 			.toString();
 	}

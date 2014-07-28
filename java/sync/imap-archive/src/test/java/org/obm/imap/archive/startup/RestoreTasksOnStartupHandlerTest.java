@@ -64,6 +64,7 @@ public class RestoreTasksOnStartupHandlerTest {
 	IMocksControl control;
 	ArchiveScheduler scheduler;
 	ArchiveTreatmentDao archiveTreatmentDao;
+	ArchiveDomainTask.Factory taskFactory;
 	RestoreTasksOnStartupHandler testee;
 	
 	@Before
@@ -72,8 +73,8 @@ public class RestoreTasksOnStartupHandlerTest {
 		control = createControl();
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		scheduler = control.createMock(ArchiveScheduler.class);
-		
-		testee = new RestoreTasksOnStartupHandler(logger, scheduler, archiveTreatmentDao);
+		taskFactory = control.createMock(ArchiveDomainTask.Factory.class);
+		testee = new RestoreTasksOnStartupHandler(logger, scheduler, archiveTreatmentDao, taskFactory);
 	}
 
 	@Test
@@ -89,19 +90,22 @@ public class RestoreTasksOnStartupHandlerTest {
 	@Test
 	public void startingShouldReScheduleWhenScheduledEntry() throws DaoException {
 		DateTime when = DateTime.parse("2014-12-2T11:35Z");
+		DateTime higherBoundary = DateTime.parse("2014-12-1T01:01Z");
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("aee2d1ab-b237-4077-a61b-a85e3cb67742");
 		
 		expect(archiveTreatmentDao.findAllScheduledOrRunning()).andReturn(ImmutableList.<ArchiveTreatment>of(
 			ArchiveScheduledTreatment
 				.forDomain(domainUuid)
 				.runId(runId)
-				.higherBoundary(DateTime.parse("2014-12-1T01:01Z"))
+				.higherBoundary(higherBoundary)
 				.scheduledAt(when)
 				.build()
 			));
 		
+		ArchiveDomainTask archiveTask = control.createMock(ArchiveDomainTask.class);
+		expect(taskFactory.create(domainUuid, when, higherBoundary, runId)).andReturn(archiveTask);
 		ScheduledTask<ArchiveDomainTask> task = control.createMock(ScheduledTask.class);
-		expect(scheduler.schedule(domainUuid, when, runId)).andReturn(task);
+		expect(scheduler.schedule(archiveTask)).andReturn(task);
 		
 		control.replay();
 		testee.starting();

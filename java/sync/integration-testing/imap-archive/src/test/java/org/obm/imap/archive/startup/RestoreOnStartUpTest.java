@@ -151,6 +151,7 @@ public class RestoreOnStartUpTest {
 		assertThat(tasks.get(0).task()).isEqualTo(taskFactory.create(
 			expectedScheduledDomain,
 			expectedScheduledTime,
+			expectedScheduledHigherBoundary,
 			expectedScheduledRunId));
 		
 		List<ArchiveTreatment> failedTreatments = archiveTreatmentDao.findByScheduledTime(expectedFailedDomain, 5);

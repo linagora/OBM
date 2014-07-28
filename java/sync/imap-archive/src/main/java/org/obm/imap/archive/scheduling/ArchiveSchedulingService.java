@@ -34,6 +34,10 @@ package org.obm.imap.archive.scheduling;
 import org.joda.time.DateTime;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.dao.DomainConfigurationDao;
+import org.obm.imap.archive.service.SchedulingDatesService;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.UUIDFactory;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -47,19 +51,30 @@ public class ArchiveSchedulingService {
 
 	private final ArchiveScheduler scheduler;
 	private final UUIDFactory uuidFactory;
+	private final ArchiveDomainTask.Factory taskFactory;
+	private final SchedulingDatesService schedulingDatesService;
+	private final DomainConfigurationDao domainConfigDao;
 	
 	@Inject
 	@VisibleForTesting ArchiveSchedulingService(
 			ArchiveScheduler scheduler,
-			UUIDFactory uuidFactory) {
+			ArchiveDomainTask.Factory taskFactory,
+			UUIDFactory uuidFactory,
+			SchedulingDatesService schedulingDatesService,
+			DomainConfigurationDao domainConfigDao) {
 		this.scheduler = scheduler;
+		this.taskFactory = taskFactory;
 		this.uuidFactory = uuidFactory;
+		this.schedulingDatesService = schedulingDatesService;
+		this.domainConfigDao = domainConfigDao;
 	}
 	
 	@Transactional
-	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when) {
+	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when) throws DaoException {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
-		scheduler.schedule(domain, when, runId);
+		DomainConfiguration config = domainConfigDao.get(domain);
+		DateTime higherBoundary = schedulingDatesService.higherBoundary(when, config.getRepeatKind());
+		scheduler.schedule(taskFactory.create(domain, when, higherBoundary, runId));
 		return runId;
 	}
 }
