@@ -36,6 +36,7 @@ import java.util.Map;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.login.LoginBackend;
 import org.obm.sync.login.LoginBindingImpl;
 import org.obm.sync.login.TrustedLoginBindingImpl;
@@ -105,6 +106,8 @@ public class LoginHandler implements ISyncHandler {
 			String origin = getOrigin(request);
 			boolean success = binding.authenticateGlobalAdmin(login, password, origin, isPasswordHashed);
 			responder.sendBoolean(success);
+		} catch (AuthFault e) {
+			responder.sendError(e);
 		} catch (IllegalArgumentException e) {
 			responder.sendError("Authentication refused : " + e.getMessage());
 		} catch (IllegalStateException e) {
@@ -116,6 +119,8 @@ public class LoginHandler implements ISyncHandler {
 		try {
 			responder.sendBoolean(binding.authenticateAdmin(
 					getLogin(request), getPassword(request), getOrigin(request), getDomainName(request), isPasswordHashed(request)));
+		} catch (AuthFault e) {
+			responder.sendError(e);
 		} catch (IllegalArgumentException e) {
 			responder.sendError("Authentication refused : " + e.getMessage());
 		} catch (IllegalStateException e) {
@@ -149,19 +154,24 @@ public class LoginHandler implements ISyncHandler {
 				request.dumpHeaders();
 			}
 
-			AccessToken token = loginBackend.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
-				request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
-			
+			AccessToken token = null;
+
+			try {
+				token = loginBackend.logUserIn(login, pass, origin, request.getClientIP(), request.getRemoteIP(),
+							request.getLemonLdapLogin(), request.getLemonLdapDomain(), isPasswordHashed);
+			} catch (DomainNotFoundException e) {
+				throw new AuthFault(e);
+			}
+
 			if (token == null) {
-				responder.sendError("Login failed for user '" + login + "'");
-				return;
+				throw new AuthFault("Login failed for user '" + login + "'");
 			}
 
 			fillTokenWithUserSettings(token);
 			fillTokenWithServerCapabilities(token);
 
 			responder.sendToken(token);
-		} catch (DomainNotFoundException e) {
+		} catch (AuthFault e) {
 			responder.sendError(e);
 		} catch (ObmSyncVersionNotFoundException e) {
 			responder.sendError("Invalid obm-sync server version");

@@ -36,12 +36,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.server.auth.IAuthentificationService;
 import org.obm.utils.ObmHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -56,7 +56,6 @@ import fr.aliacom.obm.utils.HelperService;
 @Singleton
 public class DatabaseAuthentificationService implements IAuthentificationService {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private final ObmHelper obmHelper;
 	private final HelperService helperService;
 	private final DomainService domainService;
@@ -69,32 +68,18 @@ public class DatabaseAuthentificationService implements IAuthentificationService
 	}
 	
 	@Override
-	public boolean doAuth(Credentials credentials) {
-		try {
-			ObmDomain obmDomain = domainService.findDomainByName(credentials.getLogin().getDomain());
-			if (obmDomain == null) {
-				throw new RuntimeException("domain not found");
-			}
-			return isValidPassword(credentials.getLogin().getLogin(), credentials.getPassword(), obmDomain.getId(), credentials.isPasswordHashed());
-		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
+	public boolean doAuth(Credentials credentials) throws AuthFault {
+		ObmDomain obmDomain = domainService.findDomainByName(credentials.getLogin().getDomain());
+
+		if (obmDomain == null) {
+			throw new RuntimeException("domain not found");
 		}
-		return false;
+
+		checkPassword(credentials.getLogin().getLogin(), credentials.getPassword(), obmDomain.getId(), credentials.isPasswordHashed());
+		return true;
 	}
 
-	/**
-	 * Checks the validity of the password for the given login in the given
-	 * domain
-	 * 
-	 * @param login
-	 *            user login without the domain part
-	 * @param password
-	 *            clear text password
-	 * @param domainId
-	 *            database id of the domain
-	 * @return true if the credential matches
-	 */
-	private boolean isValidPassword(String login, String password, int domainId, boolean isPasswordHashed) {
+	private void checkPassword(String login, String password, int domainId, boolean isPasswordHashed) throws AuthFault {
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
@@ -125,11 +110,14 @@ public class DatabaseAuthentificationService implements IAuthentificationService
 				}
 			}
 		} catch (SQLException e) {
-			logger.error("Could not authentificate against OBM", e);
+			Throwables.propagate(e);
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-		return ret;
+
+		if (!ret) {
+			throw new AuthFault("Bad credentials for user '" + login + "'.");
+		}
 	}
 
 	@Override

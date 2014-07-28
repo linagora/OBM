@@ -167,12 +167,7 @@ public class SessionManagement {
 		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain);
 		logLoginAttempt(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
 
-		ObmDomain obmDomain = login.hasDomain() ? domainService.findDomainByName(login.getDomain()) : null;
-		
-		if (obmDomain == null) {
-			logNoDomain(login.getDomain());
-			return null;
-		}
+		ObmDomain obmDomain = domainFromLogin(login);
 
 		return login(origin, login.getLogin(), obmDomain, authService.getType());
 	}
@@ -183,19 +178,14 @@ public class SessionManagement {
 	 */
 	public AccessToken login(String specifiedLogin, String password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException {
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException, AuthFault {
 
 		IAuthentificationService authService = authentificationServiceFactory.get();
 
 		Login login = prepareLogin(specifiedLogin, lemonLogin, lemonDomain);
 		logLoginAttempt(origin, clientIP, remoteIP, lemonLogin, lemonDomain, login);
 
-		ObmDomain obmDomain = login.hasDomain() ? domainService.findDomainByName(login.getDomain()) : null;
-		
-		if (obmDomain == null) {
-			logNoDomain(login.getDomain());
-			return null;
-		}
+		ObmDomain obmDomain = domainFromLogin(login);
 
 		if ((lemonLogin != null && lemonDomain != null
 				&& doAuthLemonLdap(remoteIP))
@@ -208,16 +198,26 @@ public class SessionManagement {
 		return null;
 	}
 
+	private ObmDomain domainFromLogin(Login login) throws DomainNotFoundException {
+		ObmDomain domain = null;
+
+		if (login.hasDomain()) {
+			domain = domainService.findDomainByName(login.getDomain());
+		}
+
+		if (domain == null) {
+			throw new DomainNotFoundException("Cannot figure out domain from login '" + login.getFullLogin() + "'.");
+		}
+
+		return domain;
+	}
+
 	private Credentials buildCredentials(Login login, String password, boolean isPasswordHashed) {
 		return Credentials.builder()
 				.login(login)
 				.hashedPassword(isPasswordHashed)
 				.password(password)
 				.build();
-	}
-
-	private void logNoDomain(String domainName) {
-		logger.warn("cannot figure out domain for the domain_name "	+ domainName);
 	}
 
 	@VisibleForTesting Login prepareLogin(String specifiedLogin, String lemonLogin,

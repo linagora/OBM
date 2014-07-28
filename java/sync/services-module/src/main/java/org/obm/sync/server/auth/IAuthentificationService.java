@@ -31,11 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.auth;
 
+import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Credentials;
 
 public interface IAuthentificationService {
 
-	boolean doAuth(Credentials credentials);
+	boolean doAuth(Credentials credentials) throws AuthFault;
 
 	String getType();
 

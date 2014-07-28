@@ -32,9 +32,9 @@ package org.obm.sync.login;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.auth.AccessToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.obm.sync.auth.AuthFault;
 
+import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
@@ -46,7 +46,6 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 public class TrustedLoginBindingImpl extends AbstractLoginBackend implements LoginBackend {
 	private final TrustTokenDao trustTokenDao;
 	private final ObmSyncConfigurationService configurationService;
-	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Inject
 	public TrustedLoginBindingImpl(SessionManagement sessionManagement, TrustTokenDao trustTokenDao, ObmSyncConfigurationService configurationService) {
@@ -60,7 +59,7 @@ public class TrustedLoginBindingImpl extends AbstractLoginBackend implements Log
 	@Transactional(readOnly = true)
 	public AccessToken logUserIn(String user, String token, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
-			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException {
+			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException, AuthFault {
 
 		TrustToken trustToken = null;
 		
@@ -68,23 +67,19 @@ public class TrustedLoginBindingImpl extends AbstractLoginBackend implements Log
 			trustToken = trustTokenDao.getTrustToken(user);
 		}
 		catch (Exception e) {
-			logger.error("Failed to locate trust token in database.", e);
+			throw Throwables.propagate(e);
 		}
 		
 		if (trustToken == null) {
-			return null;
+			throw new AuthFault("No trust token found in database for user '" + user  + "'.");
 		}
 
 		if (!trustToken.isTokenValid(token)) {
-			logger.warn("Invalid trust token, denying access for user '{}'.", user);
-
-			return null;
+			throw new AuthFault("Invalid trust token, denying access for user '" + user  + "'.");
 		}
 
 		if (trustToken.isExpired(configurationService.trustTokenTimeoutInSeconds())) {
-			logger.warn("Trust token is expired, denying access for user '{}'.", user);
-			
-			return null;
+			throw new AuthFault("Trust token is expired, denying access for user '" + user  + "'.");
 		}
 
 		return sessionManagement.trustedLogin(user, origin, clientIP, remoteIP, lemonLogin, lemonDomain);
