@@ -50,6 +50,7 @@ import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
@@ -102,6 +103,10 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 		String SELECT_LAST = String.format(
 				"SELECT %s FROM %s WHERE %s = ? ORDER BY %s ASC LIMIT ?", 
 				FIELDS.ALL, TABLE.NAME, FIELDS.DOMAIN_UUID, FIELDS.SCHEDULE);
+		
+		String SELECT_BY_RUN_ID = String.format(
+				"SELECT %s FROM %s WHERE %s = ?", 
+				FIELDS.ALL, TABLE.NAME, FIELDS.UUID);
 		
 	}
 	
@@ -202,6 +207,24 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 				list.add(treatmentFromResultSet(rs));
 			}
 			return list.build();
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		}
+	}
+
+	@Override
+	public Optional<ArchiveTreatment> find(ArchiveTreatmentRunId runId) throws DaoException {
+		Preconditions.checkNotNull(runId);
+		try (Connection connection = dbcp.getConnection();
+				PreparedStatement ps = connection.prepareStatement(REQUESTS.SELECT_BY_RUN_ID)) {
+
+			ps.setString(1, runId.serialize());
+
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				return Optional.of(treatmentFromResultSet(rs));
+			}
+			return Optional.absent();
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		}

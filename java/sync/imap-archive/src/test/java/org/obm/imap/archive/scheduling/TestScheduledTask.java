@@ -31,80 +31,33 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.scheduling;
 
-import java.util.Set;
+import org.joda.time.DateTime;
 
-import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.eventbus.EventBus;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import com.google.common.collect.ImmutableList;
 import com.linagora.scheduling.Listener;
+import com.linagora.scheduling.ListenersNotifier;
 import com.linagora.scheduling.ScheduledTask;
+import com.linagora.scheduling.Scheduler;
 
-@Singleton
-public class ArchiveSchedulerBus implements Listener<ArchiveDomainTask> {
+public class TestScheduledTask extends ScheduledTask<ArchiveDomainTask> {
 
-	private final EventBus bus;
+	private ScheduledTask.State state;
 
-	@Inject
-	@VisibleForTesting ArchiveSchedulerBus(Set<ArchiveSchedulerBus.Client> clients) {
-		this(new EventBus("ArchiveSchedulerBus"), clients);
-		
+	public TestScheduledTask(State state, ArchiveDomainTask task, 
+			Scheduler<ArchiveDomainTask> scheduler, DateTime scheduledTime) {
+		super(
+			ScheduledTask.Id.generate(), 
+			scheduledTime,
+			task, scheduler, 
+			new ListenersNotifier<>(
+					TestScheduledTask.class, 
+					ImmutableList.<Listener<ArchiveDomainTask>>of())
+		);
+		this.state = state;
 	}
 	
-	@VisibleForTesting ArchiveSchedulerBus(EventBus bus, Set<? extends ArchiveSchedulerBus.Client> clients) {
-		this.bus = bus;
-		for (ArchiveSchedulerBus.Client client : clients) {
-			bus.register(client);
-		}
-	}
-	
 	@Override
-	public void canceled(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
-	}
-
-	@Override
-	public void failed(ScheduledTask<ArchiveDomainTask> task, Throwable failure) {
-		postTaskStatusChange(task);
-	}
-
-	@Override
-	public void running(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
-	}
-
-	@Override
-	public void scheduled(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
-	}
-
-	@Override
-	public void terminated(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
-	}
-
-	private void postTaskStatusChange(ScheduledTask<ArchiveDomainTask> task) {
-		bus.post(new TaskStatusChanged(task));
-	}
-	
-	public static interface Client {}
-	
-	public static interface Events {
-
-		static class TaskStatusChanged {
-			
-			private final ScheduledTask<ArchiveDomainTask> task;
-
-			public TaskStatusChanged(ScheduledTask<ArchiveDomainTask> task) {
-				this.task = task;
-			}
-
-			public ScheduledTask<ArchiveDomainTask> getTask() {
-				return task;
-			}
-			
-		}
+	public ScheduledTask.State state() {
+		return state;
 	}
 }

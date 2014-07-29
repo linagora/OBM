@@ -39,6 +39,8 @@ import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
+import com.google.common.base.Optional;
+
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public interface ArchiveTreatmentDao {
@@ -52,5 +54,7 @@ public interface ArchiveTreatmentDao {
 	List<ArchiveTreatment> findAllScheduledOrRunning() throws DaoException;
 	
 	List<ArchiveTreatment> findByScheduledTime(ObmDomainUuid domain, int limit) throws DaoException;
+
+	Optional<ArchiveTreatment> find(ArchiveTreatmentRunId runId) throws DaoException;
 	
 }

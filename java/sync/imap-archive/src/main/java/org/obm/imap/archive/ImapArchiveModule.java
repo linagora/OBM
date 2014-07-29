@@ -61,6 +61,7 @@ import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory.OnlyOnePerDomainMonitorFactoryImpl;
 import org.obm.imap.archive.service.SchedulingDatesService;
+import org.obm.imap.archive.services.ArchiveDaoTracking;
 import org.obm.imap.archive.services.ArchiveService;
 import org.obm.imap.archive.services.ArchiveServiceImpl;
 import org.obm.imap.archive.services.DomainConfigurationService;
@@ -121,7 +122,9 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(TimeUnit.class).annotatedWith(Names.named("schedulerResolution")).toInstance(TimeUnit.MINUTES);
 		
 		bind(ArchiveSchedulerBus.class);
-		Multibinder.newSetBinder(binder(), ArchiveSchedulerBus.Client.class);
+		bind(ArchiveDaoTracking.class);
+		Multibinder<ArchiveSchedulerBus.Client> busClients = Multibinder.newSetBinder(binder(), ArchiveSchedulerBus.Client.class);
+		busClients.addBinding().to(ArchiveDaoTracking.class);
 		
 		bindImapArchiveServices();
 	}

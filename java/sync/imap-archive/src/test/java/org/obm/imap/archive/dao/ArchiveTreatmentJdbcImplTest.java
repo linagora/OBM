@@ -34,6 +34,7 @@ package org.obm.imap.archive.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.assertj.guava.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -345,5 +346,83 @@ public class ArchiveTreatmentJdbcImplTest {
 		testee.update(terminated);
 		
 		assertThat(testee.findByScheduledTime(domainUuid, 5)).containsOnlyOnce(terminated);
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void findShouldThrowNPEWhenNullRunId() throws DaoException {
+		testee.find(null);
+	}
+
+	@Test
+	public void findShouldReturnAbsentWhenNoMatch() throws DaoException {
+		Assertions.assertThat(testee.find(ArchiveTreatmentRunId.from("a860eecd-e608-4cbe-9d7a-6ef907b56367")))
+			.isAbsent();
+	}
+
+	@Test
+	public void findShouldReturnTreatmentIfScheduled() throws Exception {
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("a860eecd-e608-4cbe-9d7a-6ef907b56367");
+		ArchiveScheduledTreatment treatment = ArchiveScheduledTreatment
+				.forDomain(ObmDomainUuid.of("254933bc-fad8-488e-98cd-f302c2a22fb3"))
+				.runId(runId)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.build();
+
+		testee.insert(treatment);
+		
+		assertThat(testee.find(runId).get()).isEqualTo(treatment);
+	}
+
+	@Test
+	public void findShouldReturnTreatmentIfRunning() throws Exception {
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("a860eecd-e608-4cbe-9d7a-6ef907b56367");
+		ArchiveRunningTreatment treatment = ArchiveRunningTreatment
+				.forDomain(domainUuid)
+				.runId(runId)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-01-01T00:03:00Z"))
+				.build();
+
+		testee.insert(treatment);
+		
+		assertThat(testee.find(runId).get()).isEqualTo(treatment);
+	}
+
+	@Test
+	public void findShouldReturnTreatmentIfError() throws Exception {
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("a860eecd-e608-4cbe-9d7a-6ef907b56367");
+		ArchiveTerminatedTreatment treatment = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId(runId)
+				.higherBoundary(DateTime.parse("2014-02-02T00:00:00Z"))
+				.scheduledAt(DateTime.parse("2014-02-02T02:00:00Z"))
+				.startedAt(DateTime.parse("2014-07-06T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.ERROR)
+				.build();
+
+		testee.insert(treatment);
+		
+		assertThat(testee.find(runId).get()).isEqualTo(treatment);
+	}
+
+	@Test
+	public void findShouldReturnTreatmentIfSuccess() throws Exception {
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("a860eecd-e608-4cbe-9d7a-6ef907b56367");
+		ArchiveTerminatedTreatment treatment = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId(runId)
+				.higherBoundary(DateTime.parse("2014-02-02T00:00:00Z"))
+				.scheduledAt(DateTime.parse("2014-02-02T02:00:00Z"))
+				.startedAt(DateTime.parse("2014-07-06T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		testee.insert(treatment);
+		
+		assertThat(testee.find(runId).get()).isEqualTo(treatment);
 	}
 }

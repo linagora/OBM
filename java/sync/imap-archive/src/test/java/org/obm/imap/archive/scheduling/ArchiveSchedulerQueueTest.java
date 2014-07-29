@@ -43,9 +43,6 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-import com.linagora.scheduling.Listener;
-import com.linagora.scheduling.ListenersNotifier;
 import com.linagora.scheduling.Monitor;
 import com.linagora.scheduling.ScheduledTask;
 import com.linagora.scheduling.ScheduledTask.State;
@@ -242,28 +239,5 @@ public class ArchiveSchedulerQueueTest {
 		mocks.verify();
 		
 		assertThat(tasks).containsOnly(scheduled1, scheduled2);
-	}
-	
-	static class TestScheduledTask extends ScheduledTask<ArchiveDomainTask> {
-
-		ScheduledTask.State state;
-
-		protected TestScheduledTask(State state, ArchiveDomainTask task, 
-				Scheduler<ArchiveDomainTask> scheduler, DateTime scheduledTime) {
-			super(
-				ScheduledTask.Id.generate(), 
-				scheduledTime,
-				task, scheduler, 
-				new ListenersNotifier<>(
-						TestScheduledTask.class, 
-						ImmutableList.<Listener<ArchiveDomainTask>>of())
-			);
-			this.state = state;
-		}
-		
-		@Override
-		public ScheduledTask.State state() {
-			return state;
-		}
 	}
 }
