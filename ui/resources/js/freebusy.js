@@ -8,6 +8,8 @@ Obm.CalendarFreeBusy = new Class({
    */
   initialize: function(time_slots, unit, day_first_hour, day_last_hour) {
     this.eventStartDate = new Obm.DateTime(obm.vars.consts.begin_timestamp*1000);
+    this.hourOffset = parseInt(day_first_hour,10) - this.eventStartDate.getHours();
+    this.displayEventStartDate = this.getDisplayEventStartDate(parseInt(day_first_hour));
     this.unit = unit;
     this.stepSize = 40/this.unit;
     this.external_contact_count = 0;
@@ -18,7 +20,7 @@ Obm.CalendarFreeBusy = new Class({
     this.currentPosition = 0;
     //$('fbcContainer').setStyle('width', $(document.body).offsetWidth - 100 +'px');
     if (IE4) {
-      $('calendarFreeBusyScroll').setStyle('width', $(document.body).offsetWidth - 400 +'px'); // FIXME: POPUP SIZE 
+      $('calendarFreeBusyScroll').setStyle('width', $(document.body).offsetWidth - 400 +'px'); // FIXME: POPUP SIZE
     } else {
       $('fbcContainer').setStyle('width', $(document.body).offsetWidth - 100 +'px');
     }
@@ -32,9 +34,22 @@ Obm.CalendarFreeBusy = new Class({
     this.duration = 1;
   },
 
-  getEventEndDate: function() {
-    var endDate = new Obm.DateTime(this.eventStartDate).addHours(this.duration);
+  getDisplayEventEndDate: function(duration) {
+    var endDate = new Obm.DateTime(this.displayEventStartDate);
+    if ((this.displayEventStartDate.getHours() + duration) > this.lastHour) {
+      endDate.setHours(this.lastHour);
+    } else {
+      endDate.addHours(duration);
+    }
     return endDate;
+  },
+
+  getDisplayEventStartDate: function(firstHour) {
+    var startDate = new Obm.DateTime(this.eventStartDate);
+    if (this.hourOffset > 0){
+      startDate.setHours(parseInt(firstHour,10));
+    }
+    return startDate;
   },
 
   /**
@@ -127,17 +142,23 @@ Obm.CalendarFreeBusy = new Class({
   },
 
   /*
-   * build panel 
+   * build panel
    * Build meeting slider, meeting resizer
    */
   buildFreeBusyPanel: function(duration, readOnly) {
+<<<<<<< HEAD
     this.duration = duration;
+=======
+
+    this.duration = parseInt(duration, 10);
+    var durationDisplay = (this.hourOffset > 0) ?  (duration - this.hourOffset) : duration;
+>>>>>>> 3e3f1d3... OBMFULL-5471 fixed allDay event display
     $('duration').value = this.duration*3600;
 
-    var eventEndDate = this.getEventEndDate();
-    this.meeting_slots = this.timeSlotCountBetween(eventEndDate, this.eventStartDate);
+    var eventEndDate = this.getDisplayEventEndDate(durationDisplay);
+    this.meeting_slots = this.timeSlotCountBetween(eventEndDate, this.displayEventStartDate);
 
-    // /!\ meeting width must be set BEFORE slider 
+    // /!\ meeting width must be set BEFORE slider
     if (Browser.Engine.trident) {
       $('calendarFreeBusyMeeting').setStyle('width', this.stepSize*this.meeting_slots-(this.meeting_slots/2)+'px');
     } else {
@@ -167,7 +188,7 @@ Obm.CalendarFreeBusy = new Class({
 
     });
 
-    // very crappy IE fix 
+    // very crappy IE fix
     // FIXME (David)
     this.slider.element.removeEvents();
     this.slider.element.addEvent('mousedown', function(event) {
@@ -216,9 +237,9 @@ Obm.CalendarFreeBusy = new Class({
           var date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000)
           this.duration = (date_end.getTime() - date_begin_ts)/3600000;
           $('duration').value = this.duration*3600;
-          
+
           this.slider.drag.attach();
-        }.bind(this)     
+        }.bind(this)
       });
     }
     $('calendarFreeBusyMeeting').setOpacity(.5);
@@ -246,20 +267,20 @@ Obm.CalendarFreeBusy = new Class({
 
     // Scroll to the right position
     this.initPosition();
-    
+
     if ($('new_event_form')) {
       var qstring = $('new_event_form').toQueryString().split("&");
-      
+
       qstring.each(function(e) {
         var input = e.split("=");
-        if (input[0] != 'action' && 
-            input[0] != 'tf_date_begin' && 
-            input[0]!= 'tf_date_end' && 
-            input[0]!= 'sel_time_begin' && 
-            input[0]!= 'sel_min_begin' && 
-            input[0]!= 'sel_time_end' && 
-            input[0]!= 'sel_min_end' && 
-            input[0]!= 'sel_user_id[]' && 
+        if (input[0] != 'action' &&
+            input[0] != 'tf_date_begin' &&
+            input[0]!= 'tf_date_end' &&
+            input[0]!= 'sel_time_begin' &&
+            input[0]!= 'sel_min_begin' &&
+            input[0]!= 'sel_time_end' &&
+            input[0]!= 'sel_min_end' &&
+            input[0]!= 'sel_user_id[]' &&
             input[0]!= 'sel_resource_id[]' &&
             input[0] != 'tf_others_attendees[]') {
           var name = input[0];
@@ -275,7 +296,7 @@ Obm.CalendarFreeBusy = new Class({
           if (input[1] == 'update') {
           $('freebusy_action').value = 'detailupdate';
           }
-        } 
+        }
       });
       input = null;
       qstring = null;
@@ -323,7 +344,7 @@ Obm.CalendarFreeBusy = new Class({
 
 
   /*
-   * Refresh freebusy 
+   * Refresh freebusy
    */
   refresh: function() {
     var data = new Object();
@@ -346,10 +367,10 @@ Obm.CalendarFreeBusy = new Class({
       },
       onComplete: function() {
         obm.popup.show('fbcContainer');
-        obm.calendarFreeBusy.buildFreeBusyPanel(duration, false);      
+        obm.calendarFreeBusy.buildFreeBusyPanel(duration, false);
         $('spinner').hide();
       }
-    }).get($merge({ajax : 1, action : 'perform_meeting'}, data));    
+    }).get($merge({ajax : 1, action : 'perform_meeting'}, data));
   },
 
 
@@ -357,9 +378,9 @@ Obm.CalendarFreeBusy = new Class({
    * Add an attendee
    */
   addAttendee: function(attendee) {
-    if (typeof attendee == 'string') 
+    if (typeof attendee == 'string')
         attendee = attendee.split(',');
-    
+
     for(var i = 0; i < attendee.length; i++) {
       var a = attendee[i].split('-');
       if (a[1] == 'user') obm.calendarFreeBusy.entities.sel_user_id.push(a[2]);
@@ -413,9 +434,9 @@ Obm.CalendarFreeBusy = new Class({
    */
   changeStatus: function(isBusy) {
     if(isBusy) {
-      $('calendarFreeBusyMeeting').addClass('meetingBusy');        
+      $('calendarFreeBusyMeeting').addClass('meetingBusy');
     } else {
-      $('calendarFreeBusyMeeting').removeClass('meetingBusy');        
+      $('calendarFreeBusyMeeting').removeClass('meetingBusy');
     }
   },
 
