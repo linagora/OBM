@@ -158,6 +158,24 @@ public class ArchiveTreatment {
 		return higherBoundary;
 	}
 
+	public ArchiveTerminatedTreatment asSuccess(DateTime endTime) {
+		return asTerminatedBuilder(endTime).status(ArchiveStatus.SUCCESS).build();
+	}
+
+	public ArchiveTerminatedTreatment asError(DateTime endTime) {
+		return asTerminatedBuilder(endTime).status(ArchiveStatus.ERROR).build();
+	}
+	
+	private ArchiveTerminatedTreatment.Builder<ArchiveTerminatedTreatment> asTerminatedBuilder(DateTime endTime) {
+		return ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId(runId)
+				.scheduledAt(scheduledTime)
+				.startedAt(startTime)
+				.higherBoundary(higherBoundary)
+				.terminatedAt(endTime);
+	}
+
 	@Override
 	public int hashCode(){
 		return Objects.hashCode(runId, domainUuid, archiveStatus,

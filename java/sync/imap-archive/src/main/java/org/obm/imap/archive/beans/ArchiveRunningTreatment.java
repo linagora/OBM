@@ -64,22 +64,4 @@ public class ArchiveRunningTreatment extends ArchiveTreatment {
 			ArchiveStatus archiveStatus, DateTime scheduledTime, DateTime startTime, DateTime higherBoundary) {
 		super(runId, domainUuid, archiveStatus, scheduledTime, startTime, NO_DATE, higherBoundary);
 	}
-
-	public ArchiveTerminatedTreatment asSuccess(DateTime endTime) {
-		return asTerminatedBuilder(endTime).status(ArchiveStatus.SUCCESS).build();
-	}
-
-	public ArchiveTerminatedTreatment asError(DateTime endTime) {
-		return asTerminatedBuilder(endTime).status(ArchiveStatus.ERROR).build();
-	}
-	
-	private ArchiveTerminatedTreatment.Builder<ArchiveTerminatedTreatment> asTerminatedBuilder(DateTime endTime) {
-		return ArchiveTerminatedTreatment
-				.forDomain(domainUuid)
-				.runId(runId)
-				.scheduledAt(scheduledTime)
-				.startedAt(startTime)
-				.higherBoundary(higherBoundary)
-				.terminatedAt(endTime);
-	}
 }

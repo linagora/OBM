@@ -40,7 +40,6 @@ import javax.inject.Singleton;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.configuration.module.LoggerModule;
 import org.obm.cyrus.imap.CyrusClientModule;
 import org.obm.dbcp.DatabaseModule;
 import org.obm.domain.dao.UserSystemDao;
@@ -74,6 +73,8 @@ import org.obm.server.ServerConfiguration;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.date.DateProvider;
 import org.obm.utils.ObmHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -176,6 +177,18 @@ public class ImapArchiveModule extends AbstractModule {
 			super(new JerseyResourceConfig(injector)
 					.register(HealthcheckHandler.class)
 					.register(CyrusStatusHandler.class));
+		}
+		
+	}
+	
+	public static class LoggerModule extends AbstractModule {
+
+		public static final String TASK = "TASK";
+		
+		@Override
+		protected void configure() {
+			install(new org.obm.configuration.module.LoggerModule());
+			bind(Logger.class).annotatedWith(Names.named(TASK)).toInstance(LoggerFactory.getLogger(TASK));
 		}
 		
 	}

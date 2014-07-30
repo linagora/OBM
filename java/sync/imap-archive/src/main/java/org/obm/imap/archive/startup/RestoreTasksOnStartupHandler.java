@@ -31,36 +31,78 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.startup;
 
-import org.joda.time.DateTime;
-import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.scheduling.OnlyOnePerDomainScheduler;
-import org.obm.server.LifeCycleHandler;
+import jersey.repackaged.com.google.common.base.Throwables;
 
+import org.obm.ElementNotFoundException;
+import org.obm.annotations.transactional.Transactional;
+import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
+import org.obm.imap.archive.beans.ArchiveTreatment;
+import org.obm.imap.archive.dao.ArchiveTreatmentDao;
+import org.obm.imap.archive.scheduling.OnlyOnePerDomainScheduler;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.server.LifeCycleHandler;
+import org.slf4j.Logger;
+
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import com.google.inject.name.Named;
 
 @Singleton
 public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
-
-	public static final DateTime WHEN = DateTime.parse("2024-11-1T05:04Z");
-	public static final ArchiveTreatmentRunId RUN_ID = ArchiveTreatmentRunId.from("ee855151-f0a8-4182-a3e5-7469141526b4");
-	public static final ObmDomainUuid DOMAIN = ObmDomainUuid.of("67ecfad0-a684-47ed-aec5-f2c303f90467");
 	
+	private final Logger logger;
 	private final OnlyOnePerDomainScheduler scheduler;
+	private final ArchiveTreatmentDao archiveTreatmentDao;
 
 	@Inject
-	private RestoreTasksOnStartupHandler(OnlyOnePerDomainScheduler scheduler) {
+	@VisibleForTesting RestoreTasksOnStartupHandler(
+			@Named(LoggerModule.TASK) Logger logger,
+			OnlyOnePerDomainScheduler scheduler,
+			ArchiveTreatmentDao archiveTreatmentDao) {
+		this.logger = logger;
 		this.scheduler = scheduler;
+		this.archiveTreatmentDao = archiveTreatmentDao;
 	}
 	
+	@Transactional
 	@Override
 	public void starting() {
-		restoreScheduledTasks();
+		try {
+			restoreScheduledTasks();
+		} catch (Exception e) {
+			Throwables.propagate(e);
+		}
 	}
 	
-	private void restoreScheduledTasks() {
-		scheduler.scheduleDomainArchiving(DOMAIN, WHEN, RUN_ID);
+	private void restoreScheduledTasks() throws DaoException, ElementNotFoundException {
+		for (ArchiveTreatment treatment: archiveTreatmentDao.findAllScheduledOrRunning()) {
+			switch (treatment.getArchiveStatus()) {
+			case SCHEDULED:
+				reSchedule(treatment);
+				break;
+			case RUNNING:
+				markAsFailed(treatment);
+				break;
+			case SUCCESS:
+			case ERROR:
+				logger.error("The treatment:{} has an unexpected status:{}",
+					treatment.getRunId().serialize(), treatment.getArchiveStatus().asSpecificationValue());
+			}
+		}
+	}
+
+	private void reSchedule(ArchiveTreatment treatment) {
+		logger.info("Re-schedule task uuid:{} for domain:{} at:{}", 
+				treatment.getRunId().serialize(), treatment.getDomainUuid().get(), treatment.getScheduledTime());
+		
+		scheduler.scheduleDomainArchiving(treatment.getDomainUuid(), treatment.getScheduledTime(), treatment.getRunId());
+	}
+
+	private void markAsFailed(ArchiveTreatment treatment) throws DaoException, ElementNotFoundException {
+		logger.warn("Mark as failed task uuid:{} for domain:{}", 
+				treatment.getRunId().serialize(), treatment.getDomainUuid().get());
+		
+		archiveTreatmentDao.update(treatment.asError(ArchiveTreatment.FAILED_AT_UNKOWN_DATE));
 	}
 }
