@@ -134,6 +134,7 @@ cp -a obm-locator/obm-locator.centos.sh $RPM_BUILD_ROOT%{_initrddir}/obm-locator
 
 # obm-imap-archive
 
+mkdir -p $RPM_BUILD_ROOT/etc/obm-imap-archive
 mkdir -p $RPM_BUILD_ROOT/var/run/obm-imap-archive
 mkdir -p $RPM_BUILD_ROOT/usr/share/obm-imap-archive
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/obm-imap-archive
@@ -182,6 +183,7 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 
 %files -n obm-imap-archive
 %defattr(-,root,root,-)
+%{_sysconfdir}/obm-imap-archive
 %{_datarootdir}/obm-imap-archive
 %{_initrddir}/obm-imap-archive
 %attr(0775,imap-archive,root) %{_localstatedir}/log/obm-imap-archive
@@ -224,6 +226,18 @@ chown -R imap-archive:adm %{_localstatedir}/log/obm-imap-archive
 chown -R imap-archive:adm %{_localstatedir}/lib/obm-imap-archive
 chown -R imap-archive:adm %{_localstatedir}/run/obm-imap-archive
 /sbin/service obm-imap-archive restart >/dev/null 2>&1 || :
+if [ -f /etc/obm-imap-archive/logback.xml ]; then
+  echo "The file /etc/obm-imap-archive/logback.xml already exists, do not replace it\n"
+else
+  echo "<<EOF
+<included>
+ <logger name="CONFIGURATION" level="DEBUG" />
+ <logger name="CONTAINER" level="DEBUG" />
+ <logger name="TASK" level="DEBUG" />
+</included>
+EOF"
+fi
+
 
 %post -n obm-sync
 if [ "$1" = "1" ]; then

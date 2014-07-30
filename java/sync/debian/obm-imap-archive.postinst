@@ -33,6 +33,16 @@ else
   insserv obm-imap-archive
 fi
 
+if [ -f /etc/obm-imap-archive/logback.xml ]; then
+  echo "The file /etc/obm-imap-archive/logback.xml already exists, do not replace it\n"
+else
+ echo "<included>
+ <logger name="CONFIGURATION" level="DEBUG" />
+ <logger name="CONTAINER" level="DEBUG" />
+ <logger name="TASK" level="DEBUG" />
+</included>" > /etc/obm-imap-archive/logback.xml
+fi
+
 invoke-rc.d obm-imap-archive restart	 3>1
 
 exit 0
