@@ -283,6 +283,7 @@
   position: absolute;
   z-index:10;
   overflow:hidden;
+  height: 18px;
 }
 
 .printableCalendar .printableEvent {
