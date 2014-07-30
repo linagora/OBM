@@ -229,13 +229,11 @@ chown -R imap-archive:adm %{_localstatedir}/run/obm-imap-archive
 if [ -f /etc/obm-imap-archive/logback.xml ]; then
   echo "The file /etc/obm-imap-archive/logback.xml already exists, do not replace it\n"
 else
-  echo "<<EOF
-<included>
+ echo '<included>
  <logger name="CONFIGURATION" level="DEBUG" />
  <logger name="CONTAINER" level="DEBUG" />
  <logger name="TASK" level="DEBUG" />
-</included>
-EOF"
+</included>' > /etc/obm-imap-archive/logback.xml
 fi
 
 
