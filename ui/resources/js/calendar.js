@@ -591,7 +591,7 @@ Obm.CalendarManager = new Class({
   resizeAlldayContainer: function() {
     $$('div.alldayContainer').each(function(element) {
       var str = element.id.split('_');
-      var canBeDisplayed = Math.floor(element.offsetHeight/15) - 2;
+      var canBeDisplayed = Math.floor(element.offsetHeight/15) - 3;
 
       if (obm.calendarManager.alldayEventGrid[str[2]] && 
           obm.calendarManager.alldayEventGrid[str[2]].length>canBeDisplayed) {
@@ -606,7 +606,7 @@ Obm.CalendarManager = new Class({
           i++;
         });
         var more = $('more_'+str[2]);
-        more.style.top = canBeDisplayed*15+'px';
+        more.style.top = canBeDisplayed*19+'px';
         more.style.display = '';
         more.set('html','+'+undisplayed+' '+obm.vars.labels.more);
         obm.calendarManager.tips.add(more);
@@ -2085,7 +2085,8 @@ Obm.CalendarAllDayEvent = new Class({
    */
   updatePosition: function(position, size, col) {
     var alldayColumn = $('allday_'+col);
-    this.element.style.top = alldayColumn.getParent().offsetTop+ position * this.element.offsetHeight+'px';
+    var labelMarginBottom = 2;
+    this.element.style.top = alldayColumn.getParent().offsetTop + labelMarginBottom + position * this.element.offsetHeight+'px';
     if (obm.vars.consts.calendarRange == 'month') {
       this.element.style.top = this.element.style.top.toFloat()+$('dayMonthLabel_'+col).getHeight()+'px';
     }
