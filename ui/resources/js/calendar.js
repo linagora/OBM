@@ -895,8 +895,6 @@ Obm.CalendarManager = new Class({
   showDay: function(day) {
    if (day) {
      this.current = new Obm.DateTime(day*1000);
-   } else {
-     this.current = null;
    }
    obm.vars.consts.calendarRange = 'day';
    obm.vars.consts.nbDisplayedDays =  1;
@@ -910,8 +908,6 @@ Obm.CalendarManager = new Class({
   showWeek: function(day) {
    if (day) {
      this.current = new Obm.DateTime(day*1000);
-   } else {
-     this.current = null;
    }
    obm.vars.consts.calendarRange = 'week';
    obm.vars.consts.nbDisplayedDays =  obm.vars.consts.daysByWeek;
