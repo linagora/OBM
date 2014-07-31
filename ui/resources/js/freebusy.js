@@ -36,18 +36,31 @@ Obm.CalendarFreeBusy = new Class({
 
   getDisplayEventEndDate: function(duration) {
     var endDate = new Obm.DateTime(this.displayEventStartDate);
-    if ((this.displayEventStartDate.getHours() + duration) > this.lastHour) {
-      endDate.setHours(this.lastHour);
+    if ((this.displayEventStartDate.getHours() + this.displayEventStartDate.getMinutes()/60 + duration) < this.lastHour) {
+      endDate.addSeconds(duration*60*60);
+      if (endDate.getMinutes() < 30) {
+        endDate.setMinutes(0);
+      } else {
+        endDate.setMinutes(30);
+      }
     } else {
-      endDate.addHours(duration);
+      endDate.setHours(this.lastHour);
+      endDate.setMinutes(0);
     }
+
     return endDate;
   },
 
   getDisplayEventStartDate: function(firstHour) {
     var startDate = new Obm.DateTime(this.eventStartDate);
+    if (this.eventStartDate.getMinutes() < 30 ) {
+      startDate.setMinutes(0);
+    } else {
+      startDate.setMinutes(30);
+    }
     if (this.hourOffset > 0){
       startDate.setHours(parseInt(firstHour,10));
+      startDate.setMinutes(0);
     }
     return startDate;
   },
@@ -132,9 +145,8 @@ Obm.CalendarFreeBusy = new Class({
    * Build meeting slider, meeting resizer
    */
   buildFreeBusyPanel: function(duration, readOnly) {
-
-    this.duration = parseInt(duration, 10);
-    var durationDisplay = (this.hourOffset > 0) ?  (duration - this.hourOffset) : duration;
+    this.duration = parseFloat(duration,10);
+    var durationDisplay = (this.hourOffset > 0) ?  (this.duration - this.hourOffset) : this.duration;
     $('duration').value = this.duration*3600;
 
     var eventEndDate = this.getDisplayEventEndDate(durationDisplay);
@@ -465,7 +477,7 @@ Obm.CalendarFreeBusy = new Class({
    * Initialize meeting position
    */
   initPosition: function() {
-    this.currentPosition = this.dateTimeToTimeSlot(this.getAlmostDisplayableDateTime(this.eventStartDate));
+    this.currentPosition = this.dateTimeToTimeSlot(this.getAlmostDisplayableDateTime(this.displayEventStartDate));
     this.slider.set(this.currentPosition);
     this.autoScroll.toElement($('calendarFreeBusyMeeting'));
   }
