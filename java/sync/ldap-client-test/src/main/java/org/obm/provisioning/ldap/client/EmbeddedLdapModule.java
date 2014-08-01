@@ -32,10 +32,17 @@
 package org.obm.provisioning.ldap.client;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import org.apache.commons.io.FileUtils;
-import org.obm.provisioning.ldap.client.Configuration;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.commons.lang.StringUtils;
 import org.opends.server.core.DirectoryServer;
 import org.opends.server.extensions.ConfigFileHandler;
 import org.opends.server.types.DirectoryEnvironmentConfig;
@@ -47,28 +54,29 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 public class EmbeddedLdapModule extends AbstractModule {
-	
+
 	public static final String OPENDJ_FOLDER = "opendj/";
-	
+	public static final String JAR_FILE_PREFIX = "jar:file:";
+
 	@Override
 	protected void configure() {
 		bind(Configuration.class).toInstance(new LdapConfiguration("cn=directory manager", "secret", 0));
 	}
-	
-	@Provides @Singleton
+
+	@Provides
+	@Singleton
 	protected DirectoryServer provideDirectoryServer() throws Exception {
-		String tmpFolderPath = createOpenDJTemporaryEnvironment();
-		String configPath = tmpFolderPath + "config/config.ldif";
+		File tmpFolder = createOpenDJTemporaryEnvironment();
 
 		TimeThread.start();
-		
+
 		DirectoryServer directoryServer = DirectoryServer.getInstance();
 		directoryServer.bootstrapServer();
-		directoryServer.initializeConfiguration(ConfigFileHandler.class.getName(), configPath);
+		directoryServer.initializeConfiguration(ConfigFileHandler.class.getName(), new File(tmpFolder, "config/config.ldif").getAbsolutePath());
 		DirectoryEnvironmentConfig envConfig = new DirectoryEnvironmentConfig();
-		File locksDir = new File(tmpFolderPath, "locks");
-		File logsDir = new File(tmpFolderPath, "logs");
-		File schemaDir = new File(tmpFolderPath, "config/schema");
+		File locksDir = new File(tmpFolder, "locks");
+		File logsDir = new File(tmpFolder, "logs");
+		File schemaDir = new File(tmpFolder, "config/schema");
 
 		locksDir.mkdirs();
 		schemaDir.mkdirs();
@@ -76,27 +84,44 @@ public class EmbeddedLdapModule extends AbstractModule {
 		envConfig.setLockDirectory(locksDir);
 		envConfig.setSchemaDirectory(schemaDir);
 		directoryServer.setEnvironmentConfig(envConfig);
+
 		return directoryServer;
 	}
-	
-	private File mainTemporaryFolder() {
-        return Files.createTempDir();
+
+	private File createOpenDJTemporaryEnvironment() throws IOException {
+		File tmpFolder = Files.createTempDir();
+		URL resource = ClassLoader.getSystemClassLoader().getResource(OPENDJ_FOLDER);
+
+		if ("file".equals(resource.getProtocol())) {
+			FileUtils.copyDirectory(FileUtils.toFile(resource), tmpFolder);
+		} else if ("jar".equals(resource.getProtocol())) {
+			String url = resource.toString();
+			JarFile jar = new JarFile(StringUtils.substringBetween(url, JAR_FILE_PREFIX, "!"));
+
+			copyDirectoryFromJar(jar, OPENDJ_FOLDER, tmpFolder);
+		}
+
+		mkFolder(tmpFolder, "locks");
+		mkFolder(tmpFolder, "logs");
+
+		return tmpFolder;
 	}
 
-	private String createOpenDJTemporaryEnvironment() throws IOException {
-		File tmpFolder = mainTemporaryFolder();
-		String tmpFolderPath = tmpFolder.getAbsolutePath() + "/";
-		
-		File resourcesFolder = new File(
-				ClassLoader.getSystemClassLoader().getResource(OPENDJ_FOLDER).getPath());
-		FileUtils.copyDirectory(resourcesFolder, tmpFolder);
-		mkFolder(tmpFolderPath, "locks");
-		mkFolder(tmpFolderPath, "logs");
-
-		return tmpFolderPath;
+	private void mkFolder(File tmpFolder, String folderName) {
+		new File(tmpFolder, folderName).mkdir();
 	}
 
-	private void mkFolder(String tmpFolderPath, String folderName) {
-		new File(tmpFolderPath, folderName).mkdir();
+	private void copyDirectoryFromJar(JarFile jar, String folder, File destDir) throws IOException {
+		for (Enumeration<JarEntry> entries = jar.entries(); entries.hasMoreElements();) {
+			JarEntry entry = entries.nextElement();
+
+			if (entry.getName().startsWith(folder) && !entry.isDirectory()) {
+				File destFile = new File(destDir, StringUtils.removeStart(entry.getName(), folder));
+				FileOutputStream out = FileUtils.openOutputStream(destFile);
+
+				IOUtils.copy(new AutoCloseInputStream(jar.getInputStream(entry)), out);
+				IOUtils.closeQuietly(out);
+			}
+		}
 	}
 }

@@ -74,7 +74,19 @@ public class Configuration {
 		public String emailCalendarEncoding = "Auto";
 		public boolean syncUsersAsAddressBook = true;
 	}
-	
+
+	public static class ObmSyncWithLDAPAuth extends ObmSync {
+		
+		public ObmSyncWithLDAPAuth() {
+			this.ldapServer = "ldap://localhost:33389";
+			this.ldapBaseDn = "dc=local";
+			this.ldapFilter = "(&(uid=%u)(obmDomain=%d))";
+			this.ldapBindDn = "cn=directory manager";
+			this.ldapBindPassword = "secret";
+		}
+
+	}
+
 	public ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.FRANCE);
 	public Transaction transaction = new Transaction();
 	public Locator locator = new Locator();

@@ -1,0 +1,33 @@
+dn: dc=domain.org,dc=local
+objectClass: dcObject
+objectClass: organization
+dc: domain.org
+o: Test
+description: Integration testing
+
+dn: ou=users,dc=domain.org,dc=local
+objectClass: organizationalUnit
+ou: users
+description: Users account
+
+dn: ou=groups,dc=domain.org,dc=local
+objectClass: organizationalUnit
+ou: groups
+description: System Groups
+
+dn: dc=domain2.org,dc=local
+objectClass: dcObject
+objectClass: organization
+dc: domain2.org
+o: Test
+description: Integration testing
+
+dn: ou=users,dc=domain2.org,dc=local
+objectClass: organizationalUnit
+ou: users
+description: Users account
+
+dn: ou=groups,dc=domain2.org,dc=local
+objectClass: organizationalUnit
+ou: groups
+description: System Groups
