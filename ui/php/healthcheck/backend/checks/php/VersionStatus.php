@@ -37,19 +37,34 @@ require_once dirname(__FILE__) . '/../../CheckStatus.php';
 class VersionStatus implements Check {
 
   public function execute() {
-    if($this->checkVersion(phpversion())) {
+    if($this->checkVersion()) {
       return new CheckResult(CheckStatus::OK);
     }
 
     return new CheckResult(CheckStatus::ERROR,
-        "Your version of PHP is not valid" . phpVersion()
-        . "You must upgrade it to the last available version.");
+        "Your version of PHP (" . phpVersion() . ") is not valid. "
+          . "It contains a critical date/time bug ( see https://bugs.php.net/bug.php?id=52290 ). "
+          . "You must upgrade it to the lastest available version of PHP 5.3 or 5.4.");
   }
 
-  public function checkVersion($version) {
-    $versionExploded = explode("-", $version);
-    $phpVersion = $versionExploded[0];
-    return !($phpVersion >= "5.3.2" && $phpVersion <= '5.3.6');
-  }
+  public function checkVersion() {
 
+    $dt = new DateTime('2006-01-01', new DateTimeZone('UTC'));
+
+    $test1 = $dt->format('o-\WW-N | Y-m-d | H:i:s');
+
+    $dt->setISODate(2005, 52, 1);
+    $test2 = $dt->format('o-\WW-N | Y-m-d | H:i:s');
+
+    $dt->setDate(2007, 10, 10);
+    $test3 = $dt->format('o-\WW-N | Y-m-d | H:i:s');
+
+    $dt->setTime(20, 30, 40);
+    $test4 = $dt->format('o-\WW-N | Y-m-d | H:i:s');
+
+    return   $test1 == '2005-W52-7 | 2006-01-01 | 00:00:00'
+          && $test2 == '2005-W52-1 | 2005-12-26 | 00:00:00'
+          && $test3 == '2007-W41-3 | 2007-10-10 | 00:00:00'
+          && $test4 == '2007-W41-3 | 2007-10-10 | 20:30:40';
+  }
 }
