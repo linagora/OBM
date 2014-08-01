@@ -31,13 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.ldap;
 
-import java.util.Hashtable;
-
 import javax.naming.AuthenticationException;
-import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchResult;
 
 import org.obm.sync.auth.AuthFault;
@@ -46,6 +42,7 @@ import org.obm.sync.server.auth.IAuthentificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
@@ -57,14 +54,19 @@ import com.google.inject.Singleton;
 @Singleton
 public class LDAPAuthService implements IAuthentificationService {
 
-	private static Logger logger =  LoggerFactory.getLogger(LDAPAuthService.class);
-	private LDAPAuthConfig authConfig;
+	private static Logger logger = LoggerFactory.getLogger(LDAPAuthService.class);
 	private LDAPDirectory directory;
+	private LDAPUtilsFactory ldapUtilsFactory;
 
 	@Inject
-	private LDAPAuthService(LDAPAuthConfig ldapAuthConfig) {
-		this.authConfig = ldapAuthConfig;
-		this.directory = authConfig.getDirectory();
+	private LDAPAuthService(LDAPAuthConfig ldapAuthConfig, LDAPUtilsFactory ldapUtilsFactory) {
+		this(ldapAuthConfig.getDirectory(), ldapUtilsFactory);
+	}
+
+	@VisibleForTesting
+	LDAPAuthService(LDAPDirectory directory, LDAPUtilsFactory ldapUtilsFactory) {
+		this.ldapUtilsFactory = ldapUtilsFactory;
+		this.directory = directory;
 	}
 
 	@Override
@@ -76,60 +78,46 @@ public class LDAPAuthService implements IAuthentificationService {
 	}
 
 	private void doBindAuth(String login, String domain, String clearTextPassword) throws AuthFault {
-		LDAPUtils utils = new LDAPUtils(directory.getUri(), directory.getRootDN(), directory.getRootPW(), directory.getBaseDN());
+		LDAPUtils utils = ldapUtilsFactory.create(directory.getUri(), directory.getRootDN(), directory.getRootPW(), directory.getBaseDN());
 		DirContext lookup = null;
 		DirContext bind = null;
-		String dn = null;
+
 		try {
 			lookup = utils.getConnection();
-			SearchResult sr = utils.findResultByFilter(directory
-					.getUserPattern().replace("%u", login)
-					.replace("%d", domain), lookup);
-			if (sr != null) {
-				dn = sr.getName() + "," + directory.getBaseDN();
-				logger.info("dn lookup: " + login + "@" + domain + " => " + dn);
+
+			SearchResult sr = utils.findResultByFilter(directory.getUserPattern().replace("%u", login).replace("%d", domain), lookup);
+
+			if (sr == null) {
+				throw new AuthenticationException("User with login '" + login + "' not found in LDAP directory.");
 			}
 
+			String dn = sr.getName() + "," + directory.getBaseDN();
+
+			logger.info("dn lookup: " + login + "@" + domain + " => " + dn);
+			bind = ldapUtilsFactory.create(directory.getUri(), dn, clearTextPassword, directory.getBaseDN()).getConnection();
+		} catch (AuthenticationException e) {
+			throw new AuthFault(e);
 		} catch (Exception e) {
 			Throwables.propagate(e);
 		} finally {
-			if (lookup != null) {
-				try {
-					lookup.close();
-				} catch (NamingException e) {
-					logger.debug("error closing lookup DirContext", e);
-				}
-			}
-		}
-		if (dn != null) {
-			try {
-				Hashtable<String, String> bindenv = new Hashtable<String, String>();
-				bindenv.put(Context.INITIAL_CONTEXT_FACTORY,
-						"com.sun.jndi.ldap.LdapCtxFactory");
-				bindenv.put(Context.PROVIDER_URL, directory.getUri());
-				bindenv.put(Context.SECURITY_AUTHENTICATION, "simple");
-				bindenv.put(Context.SECURITY_PRINCIPAL, dn);
-				bindenv.put(Context.SECURITY_CREDENTIALS, clearTextPassword);
-				bind = new InitialDirContext(bindenv);
-			} catch (AuthenticationException e) {
-				throw new AuthFault(e);
-			} catch (Exception e) {
-				Throwables.propagate(e);
-			} finally {
-				if (bind != null) {
-					try {
-						bind.close();
-					} catch (NamingException e) {
-						logger.debug("error closing bind DirContext", e);
-					}
-				}
-			}
+			closeQuietly(lookup);
+			closeQuietly(bind);
 		}
 	}
 
 	@Override
 	public String getType() {
 		return "LDAP";
+	}
+
+	private void closeQuietly(DirContext context) {
+		if (context != null) {
+			try {
+				context.close();
+			} catch (NamingException e) {
+				logger.debug("Error closing DirContext.", e);
+			}
+		}
 	}
 
 }
