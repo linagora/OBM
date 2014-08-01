@@ -96,12 +96,23 @@ public class SyncClientAssert {
 		}
 	}
 	
-	public void checkLoginExpection(Document doc) throws AuthFault {
+	public void checkLoginException(Document doc) throws AuthFault {
 		if (documentIsError(doc)) {
+			throwRuntimeException(doc);
+
 			throw new AuthFault(getErrorMessage(doc));
 		}
 	}
-	
+
+	private void throwRuntimeException(Document doc) {
+		String message = getErrorMessage(doc);
+		String type = DOMUtils.getElementText(doc.getDocumentElement(), "type");
+
+		if (RuntimeException.class.getName().equals(type)) {
+			throw new RuntimeException(message);
+		}
+	}
+
 	public void checkNotAllowedException(Document doc) throws ServerFault, NotAllowedException {
 		if (documentIsError(doc)) {
 			throwNotAllowedException(doc);

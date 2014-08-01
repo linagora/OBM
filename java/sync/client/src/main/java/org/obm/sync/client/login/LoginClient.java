@@ -117,7 +117,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		AccessToken token = newAccessToken(loginAtDomain, origin);
 		
 		Document doc = execute(token, "/login/doLogin", params);
-		exceptionFactory.checkLoginExpection(doc);
+		exceptionFactory.checkLoginException(doc);
 		
 		return fillToken(token, doc);
 	}
@@ -164,7 +164,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		AccessToken token = newAccessToken(login, domainConfiguration.getGlobalDomain(), origin);
 		
 		Document doc = execute(token, "/login/authenticateGlobalAdmin", params);
-		exceptionFactory.checkLoginExpection(doc);
+		exceptionFactory.checkLoginException(doc);
 		return Boolean.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
 	}
 
@@ -176,7 +176,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 		AccessToken token = newAccessToken(login, domainConfiguration.getGlobalDomain(), origin);
 		
 		Document doc = execute(token, "/login/authenticateAdmin", params);
-		exceptionFactory.checkLoginExpection(doc);
+		exceptionFactory.checkLoginException(doc);
 		return Boolean.valueOf(DOMUtils.getElementText(doc.getDocumentElement(), "value"));
 	}
 	

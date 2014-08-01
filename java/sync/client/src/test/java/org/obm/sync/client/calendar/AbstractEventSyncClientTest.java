@@ -29,15 +29,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.client.calendar;
 
-import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 
 import java.util.Date;
 
-import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.sync.NotAllowedException;
@@ -48,15 +45,11 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.RecurrenceId;
+import org.obm.sync.client.AbstractClientTest;
 import org.obm.sync.client.impl.SyncClientAssert;
-import org.slf4j.Logger;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
@@ -64,33 +57,22 @@ import com.google.common.collect.Multimap;
 import fr.aliacom.obm.ToolBox;
 
 
-public class AbstractEventSyncClientTest {
+public class AbstractEventSyncClientTest extends AbstractClientTest {
 
 	private static String CALENDAR = "calendar";
 	
 	private AbstractEventSyncClient client;
-	private Logger logger;
 	private AccessToken token;
-	private Responder responder;
-	private IMocksControl control;
 	
 	@Before
-	public void setUp() {
-		control = createControl();
-		responder = control.createMock(Responder.class);
+	public void setUpEventSyncClient() {
 		token = ToolBox.mockAccessToken(control);
-		logger = control.createMock(Logger.class);
 		client = new AbstractEventSyncClient("/calendar", new SyncClientAssert(), null, logger, null) {
 			@Override
 			protected Document execute(AccessToken token, String action, Multimap<String, String> parameters) {
 				return responder.execute(token, action, parameters);
 			}
 		};
-	}
-	
-	@After
-	public void tearDown() {
-		control.verify();
 	}
 	
 	@Test(expected=NotAllowedException.class)
@@ -559,70 +541,6 @@ public class AbstractEventSyncClientTest {
 		client.listResources(token, 10, 5, "p");
 
 		control.verify();
-	}
-
-	private Document mockErrorDocument(Class<? extends Exception> exceptionClass, String message) {
-		Document doc = control.createMock(Document.class);
-		Element root = control.createMock(Element.class);
-		
-		expect(doc.getDocumentElement()).andReturn(root).anyTimes();
-		expect(root.getNodeName()).andReturn("error").anyTimes();
-		
-		mockTextElement(root, "message", message);
-		mockTextElement(root, "type", exceptionClass.getName());
-		
-		return doc;
-	}
-
-	private Document mockEmptyResourceInfosDocument() {
-		Document doc = control.createMock(Document.class);
-		Element root = control.createMock(Element.class);
-		NodeList list = control.createMock(NodeList.class);
-
-		expect(doc.getDocumentElement()).andReturn(root).anyTimes();
-		expect(root.getNodeName()).andReturn("resourceInfoGroup").anyTimes();
-		expect(doc.getElementsByTagName(eq("resourceInfo"))).andReturn(list).anyTimes();
-		expect(list.getLength()).andReturn(0).anyTimes();
-
-		return doc;
-	}
-
-	private Document mockEmptyCalendarInfosDocument() {
-		Document doc = control.createMock(Document.class);
-		Element root = control.createMock(Element.class);
-		NodeList list = control.createMock(NodeList.class);
-
-		expect(doc.getDocumentElement()).andReturn(root).anyTimes();
-		expect(root.getNodeName()).andReturn("calendar-infos").anyTimes();
-		expect(doc.getElementsByTagName(eq("info"))).andReturn(list).anyTimes();
-		expect(list.getLength()).andReturn(0).anyTimes();
-
-		return doc;
-	}
-
-	private void mockTextElement(Element root, String elementName, String text) {
-		NodeList list = control.createMock(NodeList.class);
-		Element element = control.createMock(Element.class);
-		Text textNode = control.createMock(Text.class);
-		
-		expect(root.getElementsByTagName(eq(elementName))).andReturn(list).anyTimes();
-		expect(list.getLength()).andReturn(1).anyTimes();
-		expect(list.item(eq(0))).andReturn(element).anyTimes();
-		expect(element.getFirstChild()).andReturn(textNode).anyTimes();
-		expect(textNode.getData()).andReturn(text).anyTimes();
-	}
-	
-	private Event createEvent() {
-		Event event = new Event();
-		
-		event.setType(EventType.VEVENT);
-		event.setExtId(new EventExtId("abc"));
-		
-		return event;
-	}
-	
-	private static interface Responder {
-		Document execute(AccessToken token, String action, Multimap<String, String> parameters);
 	}
 
 }
