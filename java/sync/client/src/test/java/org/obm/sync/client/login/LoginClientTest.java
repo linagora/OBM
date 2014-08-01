@@ -103,7 +103,7 @@ public class LoginClientTest extends AbstractClientTest {
 		client.login("user@domain.com", "secret");
 	}
 
-	@Test(expected = AuthFault.class)
+	@Test(expected = RuntimeException.class)
 	public void testLoginRuntimeException() throws Exception {
 		Document document = mockErrorDocument(RuntimeException.class, null);
 
