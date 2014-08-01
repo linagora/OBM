@@ -66,6 +66,11 @@ public class ObmSyncArchiveUtils {
 		return createDeployment(ServicesTestModule.class);
 	}
 
+	public static WebArchive createDeploymentWithLDAPAuth() {
+		return createDeployment(ServicesTestModuleWithLDAPAuth.class)
+				.addClass(ServicesTestModule.class);
+	}
+
 	public static WebArchive createDeployment(Class<? extends Module> moduleClass) {
 		return buildWebArchive(moduleClass)
 				.addClasses(moduleClass)

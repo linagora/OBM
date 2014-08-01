@@ -33,55 +33,17 @@ package org.obm.sync;
 
 import javax.servlet.ServletContext;
 
-import org.obm.Configuration;
-import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.domain.dao.DaoModule;
-
-import com.google.common.io.Files;
-import com.google.inject.AbstractModule;
 import com.google.inject.Module;
-import com.google.inject.util.Modules;
-import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
-public class ServicesTestModule extends AbstractModule {
+public class ServicesTestModuleWithLDAPAuth extends ServicesTestModule {
 	
-	public final Configuration configuration;
-
-	public ServicesTestModule(@SuppressWarnings("unused") ServletContext servletContext) {
-		configuration = new Configuration();
-		configuration.obmUiBaseUrl = "localhost";
-		configuration.locator.url = "localhost";
-		configuration.dataDir = Files.createTempDir();
-		configuration.transaction.timeoutInSeconds = 3600;
+	public ServicesTestModuleWithLDAPAuth(ServletContext servletContext) {
+		super(servletContext);
 	}
 
 	@Override
-	protected void configure() {
-		OverriddenModuleBuilder override = Modules.override(
-				new ObmSyncServletModule(),
-				new ObmSyncServicesModule(),
-				new MessageQueueModule(),
-				new TransactionalModule(),
-				new DatabaseModule(),
-				new DaoModule(),
-				new SolrJmsModule(),
-				new DatabaseMetadataModule());
-		try {
-			install(override.with(overrideModule()));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public Module overrideModule() {
-		return Modules.combine(
-				getConfigurationModule(),
-				ModuleUtils.buildDummySmtpModule(),
-				ModuleUtils.buildDummySolrModule());
-	}
-
 	protected Module getConfigurationModule() {
-		return ModuleUtils.buildDummyConfigurationModule(configuration);
+		return ModuleUtils.buildDummyConfigurationModuleWithLDAPAuth(configuration);
 	}
 
 }

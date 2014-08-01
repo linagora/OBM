@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2013-2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,57 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import javax.servlet.ServletContext;
+import org.obm.provisioning.ldap.client.EmbeddedLdapModule;
 
-import org.obm.Configuration;
-import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.domain.dao.DaoModule;
-
-import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 import com.google.inject.util.Modules;
-import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
-public class ServicesTestModule extends AbstractModule {
-	
-	public final Configuration configuration;
-
-	public ServicesTestModule(@SuppressWarnings("unused") ServletContext servletContext) {
-		configuration = new Configuration();
-		configuration.obmUiBaseUrl = "localhost";
-		configuration.locator.url = "localhost";
-		configuration.dataDir = Files.createTempDir();
-		configuration.transaction.timeoutInSeconds = 3600;
-	}
+public class ServicesClientAndEmbeddedLDAPModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		OverriddenModuleBuilder override = Modules.override(
-				new ObmSyncServletModule(),
-				new ObmSyncServicesModule(),
-				new MessageQueueModule(),
-				new TransactionalModule(),
-				new DatabaseModule(),
-				new DaoModule(),
-				new SolrJmsModule(),
-				new DatabaseMetadataModule());
-		try {
-			install(override.with(overrideModule()));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public Module overrideModule() {
-		return Modules.combine(
-				getConfigurationModule(),
-				ModuleUtils.buildDummySmtpModule(),
-				ModuleUtils.buildDummySolrModule());
-	}
-
-	protected Module getConfigurationModule() {
-		return ModuleUtils.buildDummyConfigurationModule(configuration);
+		install(Modules.combine(new ServicesClientModule(), new EmbeddedLdapModule()));
 	}
 
 }

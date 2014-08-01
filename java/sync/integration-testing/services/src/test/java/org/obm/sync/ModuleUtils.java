@@ -41,6 +41,7 @@ import org.apache.commons.io.FileUtils;
 import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
 import org.hornetq.core.remoting.impl.netty.TransportConstants;
 import org.obm.Configuration;
+import org.obm.Configuration.ObmSyncWithLDAPAuth;
 import org.obm.ConfigurationModule;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.LocatorConfiguration;
@@ -51,6 +52,7 @@ import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
+import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
 import org.obm.sync.solr.SolrRequest;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.CommandConverter;
@@ -58,11 +60,23 @@ import org.obm.sync.solr.jms.CommandConverter;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.util.Modules;
 import com.linagora.obm.sync.HornetQConfiguration;
 
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class ModuleUtils {
+
+	public static Module buildDummyConfigurationModuleWithLDAPAuth(final Configuration configuration) {
+		return Modules.override(buildDummyConfigurationModule(configuration)).with(new AbstractModule() {
+
+			@Override
+			protected void configure() {
+				bind(ObmSyncConfigurationService.class).toInstance(new ObmSyncConfiguration(configuration, new ObmSyncWithLDAPAuth()));
+			}
+
+		});
+	}
 
 	public static Module buildDummyConfigurationModule(final Configuration configuration) {
 		return new AbstractModule() {

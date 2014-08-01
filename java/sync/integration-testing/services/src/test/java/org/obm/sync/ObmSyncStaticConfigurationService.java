@@ -88,7 +88,7 @@ public class ObmSyncStaticConfigurationService {
 
 		@Override
 		public String getLdapBindPassword() {
-			return obmSyncConfiguration.ldapServer;
+			return obmSyncConfiguration.ldapBindPassword;
 		}
 
 		@Override

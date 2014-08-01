@@ -24,6 +24,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
+			<artifactId>ldap-client-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>services-module</artifactId>
 		</dependency>
 		<dependency>

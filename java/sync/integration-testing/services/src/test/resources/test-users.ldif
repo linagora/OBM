@@ -1,0 +1,53 @@
+dn: uid=user1,ou=users,dc=domain.org,dc=local
+uid: user1
+uidNumber: 1
+gidNumber: 1
+cn: Lastname Firstname
+displayName: Lastname Firstname
+sn: User
+givenName: Lastname Firstname User
+homeDirectory: /home/user1
+userPassword: {SSHA}By3YDDfAMunaPNQKA2nKrqzd7/SaHReR
+HIDDENUSER: FALSE
+OBMDOMAIN: domain.org
+entryUUID: ee078aea-99d1-1033-8fb2-d7c842965ed1
+objectClass: shadowAccount
+objectClass: obmUser
+objectClass: posixAccount
+objectClass: inetOrgPerson
+
+dn: uid=user2,ou=users,dc=domain.org,dc=local
+uid: user2
+uidNumber: 2
+gidNumber: 1
+cn: Lastname Firstname
+displayName: Lastname Firstname
+sn: User
+givenName: Lastname Firstname User
+homeDirectory: /home/user2
+userPassword: {SSHA}wCy6dYAJbHd/7+nWGynSCcRCrbqJBnV7
+HIDDENUSER: FALSE
+OBMDOMAIN: domain.org
+entryUUID: ee078aea-99d1-1033-8fb2-d7c842965ed2
+objectClass: shadowAccount
+objectClass: obmUser
+objectClass: posixAccount
+objectClass: inetOrgPerson
+
+dn: uid=user2,ou=users,dc=domain2.org,dc=local
+uid: user2
+uidNumber: 3
+gidNumber: 1
+cn: Lastname Firstname
+displayName: Lastname Firstname
+sn: User
+givenName: Lastname Firstname User
+homeDirectory: /home/user2
+userPassword: {SSHA}wCy6dYAJbHd/7+nWGynSCcRCrbqJBnV7
+HIDDENUSER: FALSE
+OBMDOMAIN: domain2.org
+entryUUID: ee078aea-99d1-1033-8fb2-d7c842965ed3
+objectClass: shadowAccount
+objectClass: obmUser
+objectClass: posixAccount
+objectClass: inetOrgPerson
