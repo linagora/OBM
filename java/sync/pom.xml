@@ -117,6 +117,7 @@
 		<module>integration-testing</module>
 		<module>jersey-guice</module>
 		<module>ldap-client</module>
+		<module>ldap-client-test</module>
 		<module>linagora-imap</module>
 		<module>locator</module>
 		<module>message-queue</module>
@@ -457,6 +458,11 @@ org.eclipse.jdt.core.compiler.source=1.7
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
 				<artifactId>ldap-client</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>ldap-client-test</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
