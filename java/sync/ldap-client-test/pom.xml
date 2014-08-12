@@ -7,9 +7,9 @@
 		<version>3.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>ldap-client</artifactId>
+	<artifactId>ldap-client-test</artifactId>
 	<packaging>jar</packaging>
-	<name>LDAP Client library</name>
+	<name>LDAP Client library - Test code</name>
 	<url>http://www.obm.org/</url>
 	<version>3.0.1-SNAPSHOT</version>
 
@@ -23,6 +23,14 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>ldap-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>obm-domain-objects</artifactId>
 		</dependency>
 		<dependency>
@@ -32,6 +40,11 @@
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.sleepycat</groupId>
+			<artifactId>je</artifactId>
+			<version>5.0.73</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -45,6 +58,11 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>opendj-server</groupId>
+			<artifactId>opendj-server</artifactId>
+			<version>2.4.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.directory.api</groupId>
