@@ -1427,17 +1427,9 @@ public class CalendarBindingImpl implements ICalendar {
 		} else {
 			Event parentEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
 			if(parentEvent != null) {
-				String owner = parentEvent.getOwner();
-				Event eventException = parentEvent.clone();
-				EventRecurrence recurrence = new EventRecurrence();
-				recurrence.setKind(RecurrenceKind.none);
-				eventException.setRecurrence(recurrence);
-				if (recurrenceId != null) {
-					eventException.setStartDate(new DateTime(recurrenceId.getRecurrenceId()));
-					eventException.setRecurrenceId(new DateTime(recurrenceId.getRecurrenceId()));					
-				}	
+				Event eventException = createOccurrence(parentEvent, recurrenceId);	
 				parentEvent.getRecurrence().addEventException(eventException);
-				parentEvent = calendarDao.modifyEventForcingSequence(token, owner, parentEvent, true, parentEvent.getSequence(), true);
+				calendarDao.modifyEventForcingSequence(token, parentEvent.getOwner(), parentEvent, true, parentEvent.getSequence(), true);
 				changed = applyParticipationChange(token, extId, recurrenceId, participation,
 						sequence, calendarOwner, eventException);
 			}
@@ -1460,6 +1452,18 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 		}
 		return changed;
+	}
+
+	private Event createOccurrence(Event parent, RecurrenceId recurrenceId) throws ParseException {
+		Event eventException = parent.clone();
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.none);
+		eventException.setRecurrence(recurrence);
+		if (recurrenceId != null) {
+			eventException.setStartDate(new DateTime(recurrenceId.getRecurrenceId()));
+			eventException.setRecurrenceId(new DateTime(recurrenceId.getRecurrenceId()));
+		}
+		return eventException;
 	}
 
 	@VisibleForTesting boolean applyParticipationChange(AccessToken token, EventExtId extId,
