@@ -68,8 +68,6 @@ public class SessionFactoryImplTest {
 		socketConnector = control.createMock(SocketConnector.class);
 		expect(connectorFactory.get()).andReturn(socketConnector);
 		ClientHandler handler = control.createMock(ClientHandler.class);
-		handler.setConnector(socketConnector);
-		expectLastCall();
 		socketConnector.setHandler(handler);
 		expectLastCall().once();
 		testee = new SessionFactoryImpl(connectorFactory, handler, DEFAULT_IMAP_TIMEOUT);

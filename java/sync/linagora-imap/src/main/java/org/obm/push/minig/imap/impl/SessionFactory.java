@@ -39,6 +39,7 @@ import org.obm.push.mail.imap.IMAPException;
 
 public interface SessionFactory {
 
-	IoSession connect(SocketAddress address) throws IMAPException, ImapTimeoutException;
+	String SOCKET_CONNECTOR = "SocketConnector";
 	
+	IoSession connect(SocketAddress address) throws IMAPException, ImapTimeoutException;
 }

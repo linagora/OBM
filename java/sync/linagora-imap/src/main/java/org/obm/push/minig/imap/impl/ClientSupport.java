@@ -49,6 +49,7 @@ import javax.net.ssl.SSLException;
 import org.apache.mina.core.future.IoFuture;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.transport.socket.SocketConnector;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.EmailMetadata;
@@ -182,6 +183,10 @@ public class ClientSupport {
 			if (session != null) {
 				boolean immediatly = true;
 				session.close(immediatly);
+				
+				SocketConnector socketConnector = (SocketConnector) session.getAttribute(SessionFactory.SOCKET_CONNECTOR);
+				socketConnector.dispose();
+				
 				session = null;				
 			}
 		} finally {

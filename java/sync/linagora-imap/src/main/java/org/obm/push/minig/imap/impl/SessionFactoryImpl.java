@@ -57,7 +57,6 @@ public class SessionFactoryImpl implements SessionFactory {
 	public IoSession connect(SocketAddress address) throws IMAPException, ImapTimeoutException {
 		SocketConnector socketConnector = connectorFactory.get();
 		socketConnector.setHandler(handler);
-		handler.setConnector(socketConnector);
 		try {
 			ConnectFuture future = socketConnector.connect(address);
 			boolean joinSuccess = future.awaitUninterruptibly(imapTimeoutInMilliseconds);
@@ -70,9 +69,11 @@ public class SessionFactoryImpl implements SessionFactory {
 				future.getSession();
 				// This should never occur
 				throw new IMAPException("Cannot log into imap server");
-			} else {
-				return future.getSession();
 			}
+			
+			IoSession session = future.getSession();
+			session.setAttribute(SessionFactory.SOCKET_CONNECTOR, socketConnector);
+			return session;
 		} catch (RuntimeException e) {
 			cleanup(socketConnector);
 			throw e;
@@ -85,5 +86,4 @@ public class SessionFactoryImpl implements SessionFactory {
 	private void cleanup(SocketConnector socketConnector) {
 		socketConnector.dispose();
 	}
-	
 }
