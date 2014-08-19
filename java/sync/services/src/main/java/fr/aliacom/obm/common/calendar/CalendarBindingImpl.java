@@ -1430,7 +1430,7 @@ public class CalendarBindingImpl implements ICalendar {
 				String owner = parentEvent.getOwner();
 				Event eventException = parentEvent.clone();
 				EventRecurrence recurrence = new EventRecurrence();
-				recurrence.setKind(RecurrenceKind.lookup("none"));
+				recurrence.setKind(RecurrenceKind.none);
 				eventException.setRecurrence(recurrence);
 				if (recurrenceId != null) {
 					eventException.setStartDate(new DateTime(recurrenceId.getRecurrenceId()));
