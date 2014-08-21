@@ -587,11 +587,13 @@ public class CalendarBindingImplTest {
 				.state(State.ACCEPTED)
 				.comment("a comment")
 				.build();
-		Event currentEvent = new Event();
-		currentEvent.setSequence(0);
 		ObmUser calendarOwner = ToolBox.getDefaultObmUser();
 		AccessToken accessToken = new AccessToken(0, "origin");
-
+		Event currentEvent = new Event();
+		currentEvent.setSequence(0);
+		currentEvent.addAttendee(
+				UserAttendee.builder().asAttendee().email(calendarOwner.getEmail()).participation(Participation.needsAction()).build());
+		
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		EventExtId extId = new EventExtId("0000");
 		expect(calendarDao.changeParticipation(accessToken, calendarOwner,
