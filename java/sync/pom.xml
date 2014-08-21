@@ -177,7 +177,7 @@
 						<downloadSources>true</downloadSources>
 						<projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
 						<excludes>
-							<exclude>ch.qos.logback:logback-classic</exclude>
+							<exclude>org.slf4j:slf4j-simple</exclude>
 						</excludes>
 						<additionalConfig>
 							<file>
@@ -968,13 +968,6 @@ org.eclipse.jdt.core.compiler.source=1.7
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-nop</artifactId>
-				<version>${slf4j.version}</version>
-				<scope>test</scope>
-				<optional>true</optional>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-simple</artifactId>
 				<version>${slf4j.version}</version>
 				<scope>test</scope>
 				<optional>true</optional>
