@@ -193,12 +193,14 @@ public class ImapArchiveModule extends AbstractModule {
 	
 	public static class LoggerModule extends AbstractModule {
 
+		private static final String LOG_PATH = "/var/log/obm-imap-archive/";
 		public static final String TASK = "TASK";
 		
 		@Override
 		protected void configure() {
 			install(new org.obm.configuration.module.LoggerModule());
 			bind(Logger.class).annotatedWith(Names.named(TASK)).toInstance(LoggerFactory.getLogger(TASK));
+			bind(String.class).annotatedWith(Names.named("logPath")).toInstance(LOG_PATH);
 		}
 		
 	}

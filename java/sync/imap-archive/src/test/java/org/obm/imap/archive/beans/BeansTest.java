@@ -31,10 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.beans;
 
+import java.util.concurrent.ConcurrentLinkedDeque;
+
 import org.joda.time.LocalTime;
 import org.junit.Test;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
 
 public class BeansTest {
 
@@ -42,6 +47,8 @@ public class BeansTest {
 	public void beanShouldRespectBeanContract() {
 		EqualsVerifierBuilder.builder()
 			.prefabValue(LocalTime.class, LocalTime.parse("23:32"), LocalTime.parse("12:22"))
+			.prefabValue(Logger.class, (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("1"), (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("2"))
+			.prefabValue(ConcurrentLinkedDeque.class, new ConcurrentLinkedDeque<String>(), new ConcurrentLinkedDeque<String>())
 			.equalsVerifiers(
 				ArchiveRecurrence.class,
 				DayOfMonth.class,
