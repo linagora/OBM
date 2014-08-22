@@ -70,7 +70,7 @@ import org.obm.imap.archive.services.ArchiveServiceImpl;
 import org.obm.imap.archive.services.DomainClient;
 import org.obm.imap.archive.services.DomainClientImpl;
 import org.obm.imap.archive.services.DomainConfigurationService;
-import org.obm.imap.archive.services.RunningArchiveTracking;
+import org.obm.imap.archive.services.RunningArchivingTracker;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.imap.archive.services.StoreClientFactory;
 import org.obm.imap.archive.startup.RestoreTasksOnStartupHandler;
@@ -124,14 +124,13 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
-		bind(Boolean.class).annotatedWith(Names.named("endlessTask")).toInstance(Boolean.TRUE);
 		bind(TimeUnit.class).annotatedWith(Names.named("schedulerResolution")).toInstance(TimeUnit.SECONDS);
 		
 		bind(ArchiveDomainTask.Factory.class).to(ArchiveDomainTask.FactoryImpl.class);
 		bind(ArchiveSchedulerBus.class);
 		Multibinder<ArchiveSchedulerBus.Client> busClients = Multibinder.newSetBinder(binder(), ArchiveSchedulerBus.Client.class);
 		busClients.addBinding().to(ArchiveDaoTracking.class);
-		busClients.addBinding().to(RunningArchiveTracking.class);
+		busClients.addBinding().to(RunningArchivingTracker.class);
 		
 		bindImapArchiveServices();
 	}

@@ -30,29 +30,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive;
+package org.obm.imap.archive.beans;
 
-import org.obm.domain.dao.DomainDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
-import org.obm.imap.archive.dao.ImapFolderDao;
-import org.obm.imap.archive.dao.ImapFolderJdbcImpl;
-import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.dao.ProcessedFolderJdbcImpl;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.inject.AbstractModule;
+import org.junit.Test;
 
-public class DaoModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
-		bind(DomainConfigurationDao.class).to(DomainConfigurationJdbcImpl.class);
-		bind(DomainDao.class);
-		bind(ArchiveTreatmentDao.class).to(ArchiveTreatmentJdbcImpl.class);
-		bind(ImapFolderDao.class).to(ImapFolderJdbcImpl.class);
-		bind(ProcessedFolderDao.class).to(ProcessedFolderJdbcImpl.class);
+public class YearTest {
+
+	@Test(expected=IllegalArgumentException.class)
+	public void yearShouldBeGreaterThan1970() {
+		Year.from(1969);
 	}
 
+	@Test
+	public void toIntShouldReturnTheYearAsInt() {
+		int expectedYear = 2014;
+		
+		Year year = Year.from(expectedYear);
+		assertThat(year.toInt()).isEqualTo(expectedYear);
+	}
+	
+	@Test
+	public void serializeShouldWork() {
+		assertThat(Year.from(2014).serialize()).isEqualTo("2014");
+	}
 }

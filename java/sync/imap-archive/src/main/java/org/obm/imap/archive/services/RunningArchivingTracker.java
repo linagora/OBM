@@ -47,11 +47,11 @@ import com.google.inject.Singleton;
 import com.linagora.scheduling.ScheduledTask;
 
 @Singleton
-public class RunningArchiveTracking implements ArchiveSchedulerBus.Client {
+public class RunningArchivingTracker implements ArchiveSchedulerBus.Client {
 
 	private final Map<ArchiveTreatmentRunId, ArchiveDomainTask> runningTasks;
 
-	@VisibleForTesting RunningArchiveTracking() {
+	@VisibleForTesting RunningArchivingTracker() {
 		this.runningTasks = Maps.newConcurrentMap();
 	}
 	

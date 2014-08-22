@@ -30,29 +30,21 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive;
+package org.obm.imap.archive.exception;
 
-import org.obm.domain.dao.DomainDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
-import org.obm.imap.archive.dao.ImapFolderDao;
-import org.obm.imap.archive.dao.ImapFolderJdbcImpl;
-import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.dao.ProcessedFolderJdbcImpl;
+import org.obm.push.mail.imap.IMAPException;
 
-import com.google.inject.AbstractModule;
+public class ImapSelectException extends IMAPException {
 
-public class DaoModule extends AbstractModule {
-
-	@Override
-	protected void configure() {
-		bind(DomainConfigurationDao.class).to(DomainConfigurationJdbcImpl.class);
-		bind(DomainDao.class);
-		bind(ArchiveTreatmentDao.class).to(ArchiveTreatmentJdbcImpl.class);
-		bind(ImapFolderDao.class).to(ImapFolderJdbcImpl.class);
-		bind(ProcessedFolderDao.class).to(ProcessedFolderJdbcImpl.class);
+	public ImapSelectException(Throwable e) {
+		super(e);
 	}
-
+	
+	public ImapSelectException(String s, Throwable e) {
+		super(s, e);
+	}
+	
+	public ImapSelectException(String s) {
+		super(s);
+	}
 }

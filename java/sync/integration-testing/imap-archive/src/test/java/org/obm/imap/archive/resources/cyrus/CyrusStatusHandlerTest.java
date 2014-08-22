@@ -62,11 +62,17 @@ public class CyrusStatusHandlerTest {
 	
 	private ClientDriverRule driver = new ClientDriverRule();
 	
-	@Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
 	@Rule public TestRule chain = RuleChain
 			.outerRule(driver)
-			.around(new GuiceRule(this, new TestImapArchiveModules.WithGreenmail(driver, temporaryFolder)))
+			.around(new TemporaryFolder())
+			.around(new GuiceRule(this, new TestImapArchiveModules.WithGreenmail(driver, new Provider<TemporaryFolder>() {
+
+				@Override
+				public TemporaryFolder get() {
+					return temporaryFolder;
+				}
+				
+			})))
 			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
 				@Override
 				public H2InMemoryDatabase get() {
@@ -74,6 +80,7 @@ public class CyrusStatusHandlerTest {
 				}
 			}, "sql/initial.sql"));
 	
+	@Inject TemporaryFolder temporaryFolder;
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
 	@Inject GreenMail imapServer;

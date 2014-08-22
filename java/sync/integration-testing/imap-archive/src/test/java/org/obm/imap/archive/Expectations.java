@@ -69,6 +69,11 @@ public class Expectations {
 	}
 	
 	public Expectations expectGetDomain(ObmDomainUuid domainId) {
+		expectDomain(domainId);
+		return this;
+	}
+
+	private void expectDomain(ObmDomainUuid domainId) {
 		driver.addExpectation(
 				onRequestTo("/obm-sync/provisioning/v1/domains/" + domainId.toString()),
 				giveResponse("{\"id\":\"" + domainId.toString() + "\","
@@ -77,6 +82,5 @@ public class Expectations {
 							+ "\"aliases\":[]}",
 					MediaType.APPLICATION_JSON)
 				);
-		return this;
 	}
 }

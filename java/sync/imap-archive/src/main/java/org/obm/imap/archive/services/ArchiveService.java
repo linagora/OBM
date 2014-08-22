@@ -32,14 +32,16 @@
 
 package org.obm.imap.archive.services;
 
-import javax.ws.rs.core.Response;
+import java.io.IOException;
 
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+
+import com.google.common.base.Optional;
 
 public interface ArchiveService {
 
 	void archive(ArchiveDomainTask archiveDomainTask);
 	
-	Response runningProcessLogs(ArchiveTreatmentRunId runId);
+	Optional<Object> runningProcessLogs(ArchiveTreatmentRunId runId) throws IOException;
 }

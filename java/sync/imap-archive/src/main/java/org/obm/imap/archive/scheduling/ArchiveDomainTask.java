@@ -36,13 +36,11 @@ import java.util.Comparator;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.logging.ChunkedOutputAppender;
+import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.logging.LoggerFactory;
 import org.obm.imap.archive.services.ArchiveService;
 
 import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.Appender;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
@@ -84,8 +82,11 @@ public class ArchiveDomainTask implements Task {
 		
 		@Override
 		public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
+			Logger logger = loggerFactory.create(runId);
+			LoggerAppenders loggerAppenders = LoggerAppenders.from(runId, logger);
+			
 			return new ArchiveDomainTask(archiveService, 
-					domain, when, higherBoundary, runId, loggerFactory.create(runId));
+					domain, when, higherBoundary, runId, logger, loggerAppenders);
 		}
 	}
 	
@@ -95,15 +96,17 @@ public class ArchiveDomainTask implements Task {
 	private final DateTime higherBoundary;
 	private final ArchiveTreatmentRunId runId;
 	private final Logger logger;
+	private final LoggerAppenders loggerAppenders;
 
 	protected ArchiveDomainTask(ArchiveService archiveService, ObmDomainUuid domain,
-			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger) {
+			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger, LoggerAppenders loggerAppenders) {
 		this.archiveService = archiveService;
 		this.domain = domain;
 		this.when = when;
 		this.higherBoundary = higherBoundary;
 		this.runId = runId;
 		this.logger = logger;
+		this.loggerAppenders = loggerAppenders;
 	}
 	
 	@Override
@@ -136,21 +139,8 @@ public class ArchiveDomainTask implements Task {
 		return logger;
 	}
 	
-	public void startAppenders() {
-		getAppender(runId.serialize()).start();
-		getChunkAppender().start();
-	}
-	
-	public void stopAppenders() {
-		logger.detachAndStopAllAppenders();
-	}
-
-	public ChunkedOutputAppender getChunkAppender() {
-		return (ChunkedOutputAppender) getAppender(LoggerFactory.CHUNK_APPENDER_PREFIX + runId.serialize());
-	}
-	
-	private Appender<ILoggingEvent> getAppender(String name) {
-		return logger.getAppender(name);
+	public LoggerAppenders getLoggerAppenders() {
+		return loggerAppenders;
 	}
 	
 	@Override

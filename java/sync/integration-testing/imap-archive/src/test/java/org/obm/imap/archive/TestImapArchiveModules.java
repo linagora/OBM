@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -59,7 +60,9 @@ import org.obm.sync.date.DateProvider;
 import org.obm.sync.locators.Locator;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
+import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import com.linagora.scheduling.DateTimeProvider;
@@ -85,9 +88,9 @@ public class TestImapArchiveModules {
 	
 		private final ClientDriverRule obmSyncHttpMock;
 		private final ServerConfiguration config;
-		private final TemporaryFolder temporaryFolder;
+		private final Provider<TemporaryFolder> temporaryFolder;
 
-		public Simple(ClientDriverRule obmSyncHttpMock, TemporaryFolder temporaryFolder) {
+		public Simple(ClientDriverRule obmSyncHttpMock, Provider<TemporaryFolder> temporaryFolder) {
 			this.obmSyncHttpMock = obmSyncHttpMock;
 			this.temporaryFolder = temporaryFolder;
 			this.config = ServerConfiguration.builder()
@@ -131,9 +134,9 @@ public class TestImapArchiveModules {
 	public static class WithGreenmail extends AbstractModule {
 
 		private ClientDriverRule obmSyncHttpMock;
-		private TemporaryFolder temporaryFolder;
+		private Provider<TemporaryFolder> temporaryFolder;
 
-		public WithGreenmail(ClientDriverRule obmSyncHttpMock, TemporaryFolder temporaryFolder) {
+		public WithGreenmail(ClientDriverRule obmSyncHttpMock, Provider<TemporaryFolder> temporaryFolder) {
 			this.obmSyncHttpMock = obmSyncHttpMock;
 			this.temporaryFolder = temporaryFolder;
 		}
@@ -154,9 +157,9 @@ public class TestImapArchiveModules {
 	public static class WithTestingMonitor extends AbstractModule {
 
 		private ClientDriverRule obmSyncHttpMock;
-		private TemporaryFolder temporaryFolder;
+		private Provider<TemporaryFolder> temporaryFolder;
 
-		public WithTestingMonitor(ClientDriverRule obmSyncHttpMock, TemporaryFolder temporaryFolder) {
+		public WithTestingMonitor(ClientDriverRule obmSyncHttpMock, Provider<TemporaryFolder> temporaryFolder) {
 			this.obmSyncHttpMock = obmSyncHttpMock;
 			this.temporaryFolder = temporaryFolder;
 		}
@@ -301,15 +304,22 @@ public class TestImapArchiveModules {
 	
 	public static class TemporaryLoggerFileNameService implements LoggerFileNameService {
 
-		private final TemporaryFolder temporaryFolder;
+		private final Provider<TemporaryFolder> temporaryFolderProvider;
 
-		public TemporaryLoggerFileNameService(TemporaryFolder temporaryFolder) {
-			this.temporaryFolder = temporaryFolder;
+		public TemporaryLoggerFileNameService(Provider<TemporaryFolder> temporaryFolderProvider) {
+			this.temporaryFolderProvider = temporaryFolderProvider;
 		}
 		
 		@Override
 		public String loggerFileName(ArchiveTreatmentRunId runId) {
-			return temporaryFolder.getRoot().getAbsolutePath() + "/" + runId.serialize() + ".log";
+			try {
+				TemporaryFolder temporaryFolder = temporaryFolderProvider.get();
+				temporaryFolder.create();
+				return temporaryFolder.getRoot().getAbsolutePath() + "/" + runId.serialize() + ".log";
+			} catch (IOException e) {
+				Throwables.propagate(e);
+				return null;
+			}
 		}
 
 	}

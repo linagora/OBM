@@ -33,6 +33,7 @@ package org.obm.imap.archive.scheduling;
 
 import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.logging.LoggerFactory;
 import org.obm.imap.archive.services.ArchiveService;
 
@@ -47,11 +48,13 @@ public class ControlledTaskFactory extends ArchiveDomainTask.FactoryImpl {
 
 	private final ArchiveService archiveService;
 	private final Logger logger;
+	private final LoggerAppenders loggerAppenders;
 
-	public ControlledTaskFactory(ArchiveService archiveService, LoggerFactory loggerFactory, Logger logger) {
+	public ControlledTaskFactory(ArchiveService archiveService, LoggerFactory loggerFactory, Logger logger, LoggerAppenders loggerAppenders) {
 		super(archiveService, loggerFactory);
 		this.archiveService = archiveService;
 		this.logger = logger;
+		this.loggerAppenders = loggerAppenders;
 	}
 
 	@Override
@@ -77,7 +80,7 @@ public class ControlledTaskFactory extends ArchiveDomainTask.FactoryImpl {
 	
 		RemotelyControlledTask(ArchiveService archiveService, ObmDomainUuid domain,
 				DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
-			super(archiveService, domain, when, higherBoundary, runId, logger);
+			super(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders);
 			terminator = new Terminator();
 		}
 		

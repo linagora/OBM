@@ -50,6 +50,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.logging.TemporaryLoggerFactory;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Client;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events;
@@ -81,6 +82,7 @@ public class ArchiveSchedulerTest {
 	IMocksControl mocks;
 	ArchiveService archiveService;
 	Logger logger;
+	LoggerAppenders loggerAppenders;
 	DateTime higherBoundary;
 	
 	TestDateTimeProvider timeProvider;
@@ -100,10 +102,15 @@ public class ArchiveSchedulerTest {
 		mocks = createControl();
 		archiveService = mocks.createMock(ArchiveService.class);
 		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
+		loggerAppenders = mocks.createMock(LoggerAppenders.class);
+		loggerAppenders.startAppenders();
+		expectLastCall().anyTimes();
+		loggerAppenders.stopAppenders();
+		expectLastCall().anyTimes();
 		
 		DateTime testsStartTime = DateTime.parse("2024-01-1T05:04Z");
 		timeProvider = new TestDateTimeProvider(testsStartTime);
-		archiveTaskFactory = new ControlledTaskFactory(archiveService, new TemporaryLoggerFactory(temporaryFolder), logger); 
+		archiveTaskFactory = new ControlledTaskFactory(archiveService, new TemporaryLoggerFactory(temporaryFolder), logger, loggerAppenders); 
 		futureListener = new FutureTestListener<>();
 		
 		OnlyOnePerDomainMonitorFactory monitorFactory = new OnlyOnePerDomainMonitorFactory() {
@@ -376,7 +383,7 @@ public class ArchiveSchedulerTest {
 	}
 
 	ArchiveDomainTask archiveDomainTask(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DateTime when) {
-		return new ArchiveDomainTask(archiveService, domain, when, higherBoundary, runId, logger);
+		return new ArchiveDomainTask(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders);
 	}
 
 	void assertTaskProgression(ArchiveDomainTask task) throws Exception {

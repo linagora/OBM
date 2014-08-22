@@ -50,7 +50,7 @@ public class ArchiveSchedulerLoggerListener implements Listener<ArchiveDomainTas
 
 	@Override
 	public void running(ScheduledTask<ArchiveDomainTask> task) {
-		getArchiveDomainTask(task).startAppenders();
+		getArchiveDomainTask(task).getLoggerAppenders().startAppenders();
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class ArchiveSchedulerLoggerListener implements Listener<ArchiveDomainTas
 	}
 
 	private void stopAppenders(ScheduledTask<ArchiveDomainTask> task) {
-		getArchiveDomainTask(task).stopAppenders();
+		getArchiveDomainTask(task).getLoggerAppenders().stopAppenders();
 	}
 
 	private ArchiveDomainTask getArchiveDomainTask(ScheduledTask<ArchiveDomainTask> task) {

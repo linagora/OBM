@@ -64,7 +64,9 @@ public class BeansTest {
 				ArchiveTerminatedTreatment.class,
 				ArchiveTreatmentRunId.class,
 				ImapFolder.class,
-				ProcessedFolder.class
+				ProcessedFolder.class,
+				Boundaries.class,
+				Year.class
 			).verify();
 	}	
 }

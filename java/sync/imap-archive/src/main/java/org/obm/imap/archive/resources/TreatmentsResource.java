@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -42,6 +43,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
@@ -55,6 +57,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
 import com.linagora.scheduling.DateTimeProvider;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -106,6 +109,14 @@ public class TreatmentsResource {
 	@Path("logs")
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response runningTreatment(@QueryParam("run_id") UUID runId) {
-		return archiveService.runningProcessLogs(ArchiveTreatmentRunId.from(runId));
+		try {
+			Optional<Object> runningProcessLogs = archiveService.runningProcessLogs(ArchiveTreatmentRunId.from(runId));
+			if (!runningProcessLogs.isPresent()) {
+				return Response.status(Status.NOT_FOUND).build();
+			}
+			return Response.ok(runningProcessLogs.get()).build();
+		} catch (IOException e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 }

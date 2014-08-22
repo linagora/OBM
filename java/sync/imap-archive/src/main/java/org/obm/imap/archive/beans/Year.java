@@ -30,29 +30,52 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive;
+package org.obm.imap.archive.beans;
 
-import org.obm.domain.dao.DomainDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
-import org.obm.imap.archive.dao.ImapFolderDao;
-import org.obm.imap.archive.dao.ImapFolderJdbcImpl;
-import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.dao.ProcessedFolderJdbcImpl;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
-import com.google.inject.AbstractModule;
+public class Year {
 
-public class DaoModule extends AbstractModule {
-
-	@Override
-	protected void configure() {
-		bind(DomainConfigurationDao.class).to(DomainConfigurationJdbcImpl.class);
-		bind(DomainDao.class);
-		bind(ArchiveTreatmentDao.class).to(ArchiveTreatmentJdbcImpl.class);
-		bind(ImapFolderDao.class).to(ImapFolderJdbcImpl.class);
-		bind(ProcessedFolderDao.class).to(ProcessedFolderJdbcImpl.class);
+	private static final int MINIMAL_YEAR = 1970;
+	
+	public static Year from(int year) {
+		Preconditions.checkArgument(year >= MINIMAL_YEAR);
+		return new Year(year);
+	}
+	
+	private final int year;
+	
+	private Year(int year) {
+		this.year = year;
 	}
 
+	public int toInt() {
+		return year;
+	}
+	
+	public String serialize() {
+		return String.valueOf(year);
+	}
+	
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(year);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof Year) {
+			Year that = (Year) object;
+			return Objects.equal(this.year, that.year);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("year", year)
+			.toString();
+	}
 }

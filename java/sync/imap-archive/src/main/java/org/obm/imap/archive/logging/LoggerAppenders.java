@@ -30,29 +30,49 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive;
+package org.obm.imap.archive.logging;
 
-import org.obm.domain.dao.DomainDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
-import org.obm.imap.archive.dao.ImapFolderDao;
-import org.obm.imap.archive.dao.ImapFolderJdbcImpl;
-import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.dao.ProcessedFolderJdbcImpl;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 
-import com.google.inject.AbstractModule;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
 
-public class DaoModule extends AbstractModule {
+import com.google.common.base.Preconditions;
 
-	@Override
-	protected void configure() {
-		bind(DomainConfigurationDao.class).to(DomainConfigurationJdbcImpl.class);
-		bind(DomainDao.class);
-		bind(ArchiveTreatmentDao.class).to(ArchiveTreatmentJdbcImpl.class);
-		bind(ImapFolderDao.class).to(ImapFolderJdbcImpl.class);
-		bind(ProcessedFolderDao.class).to(ProcessedFolderJdbcImpl.class);
+public class LoggerAppenders {
+
+	public static LoggerAppenders from(ArchiveTreatmentRunId runId, Logger logger) {
+		String baseAppenderName = runId.serialize();
+		
+		Appender<ILoggingEvent> fileAppender = logger.getAppender(baseAppenderName);
+		Preconditions.checkState(fileAppender != null);
+		ChunkedOutputAppender chunkedOutputAppender = (ChunkedOutputAppender) logger.getAppender(LoggerFactory.CHUNK_APPENDER_PREFIX + baseAppenderName);
+		Preconditions.checkState(chunkedOutputAppender != null);
+		
+		return new LoggerAppenders(logger, fileAppender, chunkedOutputAppender);
 	}
 
+	private final Logger logger;
+	private final Appender<ILoggingEvent> fileAppender;
+	private final ChunkedOutputAppender chunkedOutputAppender;
+
+	private LoggerAppenders(Logger logger, Appender<ILoggingEvent> fileAppender, ChunkedOutputAppender chunkedOutputAppender) {
+		this.logger = logger;
+		this.fileAppender = fileAppender;
+		this.chunkedOutputAppender = chunkedOutputAppender;
+	}
+	
+	public void startAppenders() {
+		fileAppender.start();
+		chunkedOutputAppender.start();
+	}
+	
+	public void stopAppenders() {
+		logger.detachAndStopAllAppenders();
+	}
+
+	public ChunkedOutputAppender getChunkAppender() {
+		return chunkedOutputAppender;
+	}
 }

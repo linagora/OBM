@@ -30,29 +30,26 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive;
+package org.obm.imap.archive.scheduling;
 
-import org.obm.domain.dao.DomainDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
-import org.obm.imap.archive.dao.ImapFolderDao;
-import org.obm.imap.archive.dao.ImapFolderJdbcImpl;
-import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.dao.ProcessedFolderJdbcImpl;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.logging.LoggerAppenders;
 
-import com.google.inject.AbstractModule;
+import ch.qos.logback.classic.Logger;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public class DaoModule extends AbstractModule {
+public class TestArchiveDomainTaskFactory extends ArchiveDomainTask.FactoryImpl {
 
-	@Override
-	protected void configure() {
-		bind(DomainConfigurationDao.class).to(DomainConfigurationJdbcImpl.class);
-		bind(DomainDao.class);
-		bind(ArchiveTreatmentDao.class).to(ArchiveTreatmentJdbcImpl.class);
-		bind(ImapFolderDao.class).to(ImapFolderJdbcImpl.class);
-		bind(ProcessedFolderDao.class).to(ProcessedFolderJdbcImpl.class);
+	private Logger logger;
+	private LoggerAppenders loggerAppenders;
+
+	public TestArchiveDomainTaskFactory(Logger logger, LoggerAppenders loggerAppenders) {
+		super(null, null);
+		this.logger = logger;
+		this.loggerAppenders = loggerAppenders;
 	}
 
+	public ArchiveDomainTask create(ObmDomainUuid domain, ArchiveTreatmentRunId runId) {
+		return new ArchiveDomainTask(null, domain, null, null, runId, logger, loggerAppenders);
+	}
 }
