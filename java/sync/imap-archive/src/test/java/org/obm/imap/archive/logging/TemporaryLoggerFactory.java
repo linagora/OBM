@@ -30,16 +30,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.services;
+package org.obm.imap.archive.logging;
 
-import javax.ws.rs.core.Response;
+import org.junit.rules.TemporaryFolder;
 
-import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+public class TemporaryLoggerFactory extends LoggerFactory {
 
-public interface ArchiveService {
-
-	void archive(ArchiveDomainTask archiveDomainTask);
-	
-	Response runningProcessLogs(ArchiveTreatmentRunId runId);
+	public TemporaryLoggerFactory(TemporaryFolder temporaryFolder) {
+		super(new TemporaryLoggerFileNameService(temporaryFolder));
+	}
 }

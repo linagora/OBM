@@ -32,77 +32,87 @@
 
 package org.obm.imap.archive.services;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.NoSuchFileException;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.io.output.DeferredFileOutputStream;
-import org.glassfish.jersey.server.ChunkedOutput;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.exception.DomainConfigurationException;
+import org.obm.imap.archive.logging.LoggerFileNameService;
+import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
+import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.linagora.scheduling.DateTimeProvider;
-import com.linagora.scheduling.Task;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
 public class ArchiveServiceImpl implements ArchiveService {
 
-	private final static Logger logger = LoggerFactory.getLogger(ArchiveServiceImpl.class);
-	
 	private final static int NUMBER_OF_ITERATIONS = 2;
 	
 	private final DomainConfigurationDao domainConfigurationDao;
+	private final RunningArchiveTracking runningArchiveTracking;
+	private final LoggerFileNameService loggerFileNameService;
 	private final DateTimeProvider dateTimeProvider;
-	private final LogFileService logFileService;
 	private final boolean endlessTask;
-	private final Map<ArchiveTreatmentRunId, LogWriter> runIdToPeriodicTaskMap;
+
+
 
 	@Inject
-	@VisibleForTesting ArchiveServiceImpl(
-			DomainConfigurationDao domainConfigurationDao,
+	@VisibleForTesting ArchiveServiceImpl(DomainConfigurationDao domainConfigurationDao, 
+			RunningArchiveTracking runningArchiveTracking,
+			LoggerFileNameService loggerFileNameService,
 			DateTimeProvider dateTimeProvider,
-			LogFileService logFileService,
 			@Named("endlessTask") Boolean endlessTask) {
 		
 		this.domainConfigurationDao = domainConfigurationDao;
+		this.runningArchiveTracking = runningArchiveTracking;
+		this.loggerFileNameService = loggerFileNameService;
 		this.dateTimeProvider = dateTimeProvider;
-		this.logFileService = logFileService;
 		this.endlessTask = endlessTask;
-		
-		this.runIdToPeriodicTaskMap = Maps.newHashMap();
 	}
 	
 	@Override
 	@Transactional
-	public void archive(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DeferredFileOutputStream deferredFileOutputStream) {
+	public void archive(final ArchiveDomainTask archiveDomainTask) {
+		final Logger logger = archiveDomainTask.getLogger();
+		ArchiveTreatmentRunId runId = archiveDomainTask.getRunId();
+		ObmDomainUuid domain = archiveDomainTask.getDomain();
 		try {
-			checkConfiguration(domain);
+			logger.info("Started {}", runId.serialize());
 			
-			LogWriter logWriter = new LogWriter(runId, 
-					new ChunkedOutput<String>(String.class), 
-					deferredFileOutputStream,
-					endlessTask);
-			runIdToPeriodicTaskMap.put(runId, logWriter);
-			logWriter.run();
+			checkConfiguration(domain);
+			Stopwatch stopwatch = Stopwatch.createStarted();
+			int numberOfIterations = 0;
+			long previousElapsed = 0;
+			while (true) {
+				long elapsed = stopwatch.elapsed(TimeUnit.SECONDS);
+				if ((elapsed - previousElapsed) == 1) {
+					logger.info(dateTimeProvider.now().toString() + System.lineSeparator());
+					numberOfIterations++;
+				}
+				previousElapsed = elapsed;
+				if (!endlessTask && numberOfIterations >= NUMBER_OF_ITERATIONS) {
+					break;
+				}
+			}
+			
+			logger.info("Ended {}", runId.serialize());
 		} catch (DaoException e) {
 			logger.error("Error on archive treatment", e);
 			Throwables.propagate(e);
@@ -120,75 +130,22 @@ public class ArchiveServiceImpl implements ArchiveService {
 		return domainConfiguration;
 	}
 	
-	public final class LogWriter implements Task {
-		private final ArchiveTreatmentRunId runId;
-		private final ChunkedOutput<String> chunkedOutput;
-		private final DeferredFileOutputStream deferredFileOutputStream;
-		private int numberOfIterations;
-		private boolean isEndlessTask;
-
-		private LogWriter(ArchiveTreatmentRunId runId, ChunkedOutput<String> chunkedOutput, DeferredFileOutputStream deferredFileOutputStream, boolean isEndlessTask) {
-			this.runId = runId;
-			this.chunkedOutput = chunkedOutput;
-			this.deferredFileOutputStream = deferredFileOutputStream;
-			this.isEndlessTask = isEndlessTask;
-			this.numberOfIterations = 0;
-		}
-
-		@Override
-		public void run() {
-			final Timer timer = new Timer();
-			timer.schedule(new TimerTask() {
-				
-				@Override
-				public void run() {
-					try {
-						if (!isEndlessTask && numberOfIterations++ >= NUMBER_OF_ITERATIONS) {
-							cancel();
-							timer.cancel();
-							timer.purge();
-							chunkedOutput.close();
-							return;
-						}
-
-						String output = dateTimeProvider.now().toString() + System.lineSeparator();
-						
-						deferredFileOutputStream.write(output.getBytes());
-						deferredFileOutputStream.flush();
-						chunkedOutput.write(output);
-					} catch (IOException e) {
-						logger.error("Error on timer task", e);
-						Throwables.propagate(e);
-					}
-				}
-			}, 0, 1000);
-			
-		}
-
-		@Override
-		public String taskName() {
-			return runId.toString();
-		}
-	}
-	
 	@Override
-	public ChunkedOutput<String> runningProcessLogs(final ArchiveTreatmentRunId runId) {
-		LogWriter logWriter = runIdToPeriodicTaskMap.get(runId);
-		if (logWriter == null) {
-			return chunkLogFile(runId);
-		}
-		ChunkedOutput<String> chunkedOutput = logWriter.chunkedOutput;
-		if (chunkedOutput.isClosed()) {
-			return chunkLogFile(runId);
-		}
-		return chunkedOutput;
-	}
-
-	private ChunkedOutput<String> chunkLogFile(ArchiveTreatmentRunId runId) {
+	public Response runningProcessLogs(final ArchiveTreatmentRunId runId) {
 		try {
-			return logFileService.chunkLogFile(runId);
-		} catch (NoSuchFileException e) {
-			throw new WebApplicationException(Status.NOT_FOUND);
+			Optional<ArchiveDomainTask> optional = runningArchiveTracking.get(runId);
+			if (optional.isPresent()) {
+				return Response.ok(optional.get().getChunkAppender().chunk()).build();
+			}
+			
+			File loggerFile = new File(loggerFileNameService.loggerFileName(runId));
+			if (!loggerFile.exists()) {
+				return Response.status(Status.NOT_FOUND).build();
+			}
+			return Response.ok(loggerFile).build();
+		} catch (IOException e) {
+			Throwables.propagate(e);
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 }

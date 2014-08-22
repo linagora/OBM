@@ -33,8 +33,10 @@ package org.obm.imap.archive.scheduling;
 
 import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.logging.LoggerFactory;
 import org.obm.imap.archive.services.ArchiveService;
-import org.obm.imap.archive.services.LogFileService;
+
+import ch.qos.logback.classic.Logger;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.SettableFuture;
@@ -44,10 +46,12 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 public class ControlledTaskFactory extends ArchiveDomainTask.FactoryImpl {
 
 	private final ArchiveService archiveService;
+	private final Logger logger;
 
-	public ControlledTaskFactory(ArchiveService archiveService, LogFileService logFileService) {
-		super(archiveService, logFileService);
+	public ControlledTaskFactory(ArchiveService archiveService, LoggerFactory loggerFactory, Logger logger) {
+		super(archiveService, loggerFactory);
 		this.archiveService = archiveService;
+		this.logger = logger;
 	}
 
 	@Override
@@ -73,7 +77,7 @@ public class ControlledTaskFactory extends ArchiveDomainTask.FactoryImpl {
 	
 		RemotelyControlledTask(ArchiveService archiveService, ObmDomainUuid domain,
 				DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
-			super(archiveService, deferredFileOutputStream(runId), domain, when, higherBoundary, runId);
+			super(archiveService, domain, when, higherBoundary, runId, logger);
 			terminator = new Terminator();
 		}
 		

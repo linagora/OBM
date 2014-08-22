@@ -33,12 +33,16 @@ package org.obm.imap.archive.scheduling;
 
 import java.util.Comparator;
 
-import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.logging.ChunkedOutputAppender;
+import org.obm.imap.archive.logging.LoggerFactory;
 import org.obm.imap.archive.services.ArchiveService;
-import org.obm.imap.archive.services.LogFileService;
+
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
@@ -70,23 +74,18 @@ public class ArchiveDomainTask implements Task {
 	public static class FactoryImpl implements Factory {
 		
 		private final ArchiveService archiveService;
-		private final LogFileService logFileService;
+		private final LoggerFactory loggerFactory;
 
 		@Inject
-		@VisibleForTesting FactoryImpl(ArchiveService archiveService, LogFileService logFileService) {
+		@VisibleForTesting FactoryImpl(ArchiveService archiveService, LoggerFactory loggerFactory) {
 			this.archiveService = archiveService;
-			this.logFileService = logFileService;
+			this.loggerFactory = loggerFactory;
 		}
 		
 		@Override
 		public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
 			return new ArchiveDomainTask(archiveService, 
-					deferredFileOutputStream(runId), 
-					domain, when, higherBoundary, runId);
-		}
-
-		protected DeferredFileOutputStream deferredFileOutputStream(ArchiveTreatmentRunId runId) {
-			return new DeferredFileOutputStream(BYTES_IN_MEMORY, logFileService.getFile(runId));
+					domain, when, higherBoundary, runId, loggerFactory.create(runId));
 		}
 	}
 	
@@ -95,21 +94,21 @@ public class ArchiveDomainTask implements Task {
 	private final DateTime when;
 	private final DateTime higherBoundary;
 	private final ArchiveTreatmentRunId runId;
-	private final DeferredFileOutputStream deferredFileOutputStream;
+	private final Logger logger;
 
-	protected ArchiveDomainTask(ArchiveService archiveService, DeferredFileOutputStream deferredFileOutputStream, ObmDomainUuid domain,
-			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
+	protected ArchiveDomainTask(ArchiveService archiveService, ObmDomainUuid domain,
+			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger) {
 		this.archiveService = archiveService;
 		this.domain = domain;
 		this.when = when;
 		this.higherBoundary = higherBoundary;
 		this.runId = runId;
-		this.deferredFileOutputStream = deferredFileOutputStream;
+		this.logger = logger;
 	}
 	
 	@Override
 	public void run() {
-		archiveService.archive(domain, runId, deferredFileOutputStream);
+		archiveService.archive(this);
 	}
 
 	@Override
@@ -132,9 +131,26 @@ public class ArchiveDomainTask implements Task {
 	public ArchiveTreatmentRunId getRunId() {
 		return runId;
 	}
+	
+	public Logger getLogger() {
+		return logger;
+	}
+	
+	public void startAppenders() {
+		getAppender(runId.serialize()).start();
+		getChunkAppender().start();
+	}
+	
+	public void stopAppenders() {
+		logger.detachAndStopAllAppenders();
+	}
 
-	public DeferredFileOutputStream getDeferredFileOutputStream() {
-		return deferredFileOutputStream;
+	public ChunkedOutputAppender getChunkAppender() {
+		return (ChunkedOutputAppender) getAppender(LoggerFactory.CHUNK_APPENDER_PREFIX + runId.serialize());
+	}
+	
+	private Appender<ILoggingEvent> getAppender(String name) {
+		return logger.getAppender(name);
 	}
 	
 	@Override

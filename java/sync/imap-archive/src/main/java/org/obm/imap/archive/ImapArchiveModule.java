@@ -47,6 +47,9 @@ import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.imap.archive.authentication.AuthenticationFilter;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationModule;
+import org.obm.imap.archive.logging.LoggerFactory;
+import org.obm.imap.archive.logging.LoggerFileNameService;
+import org.obm.imap.archive.logging.LoggerFileNameServiceImpl;
 import org.obm.imap.archive.resources.ConfigurationResource;
 import org.obm.imap.archive.resources.DomainBasedSubResource;
 import org.obm.imap.archive.resources.HealthcheckHandler;
@@ -66,7 +69,7 @@ import org.obm.imap.archive.services.ArchiveDaoTracking;
 import org.obm.imap.archive.services.ArchiveService;
 import org.obm.imap.archive.services.ArchiveServiceImpl;
 import org.obm.imap.archive.services.DomainConfigurationService;
-import org.obm.imap.archive.services.LogFileService;
+import org.obm.imap.archive.services.RunningArchiveTracking;
 import org.obm.imap.archive.startup.RestoreTasksOnStartupHandler;
 import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
@@ -78,7 +81,6 @@ import org.obm.sync.XTrustProvider;
 import org.obm.sync.date.DateProvider;
 import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -120,13 +122,13 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
 		bind(Boolean.class).annotatedWith(Names.named("endlessTask")).toInstance(Boolean.TRUE);
-		bind(TimeUnit.class).annotatedWith(Names.named("schedulerResolution")).toInstance(TimeUnit.MINUTES);
+		bind(TimeUnit.class).annotatedWith(Names.named("schedulerResolution")).toInstance(TimeUnit.SECONDS);
 		
 		bind(ArchiveDomainTask.Factory.class).to(ArchiveDomainTask.FactoryImpl.class);
 		bind(ArchiveSchedulerBus.class);
-		bind(ArchiveDaoTracking.class);
 		Multibinder<ArchiveSchedulerBus.Client> busClients = Multibinder.newSetBinder(binder(), ArchiveSchedulerBus.Client.class);
 		busClients.addBinding().to(ArchiveDaoTracking.class);
+		busClients.addBinding().to(RunningArchiveTracking.class);
 		
 		bindImapArchiveServices();
 	}
@@ -137,12 +139,13 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(DomainConfigurationService.class);
 		bind(SchedulingDatesService.class);
 		bind(UUIDFactory.class);
-		bind(LogFileService.class);
+		bind(LoggerFactory.class);
 		bind(ArchiveTreatmentRunId.Factory.class);
 		bind(ArchiveService.class).to(ArchiveServiceImpl.class);
 		bind(ArchiveScheduler.class);
 		bind(ArchiveSchedulerQueue.class);
 		bind(DateTimeProvider.class).toInstance(DateTimeProvider.SYSTEM_UTC);
+		bind(LoggerFileNameService.class).to(LoggerFileNameServiceImpl.class);
 	}
 	
 	public static class ImapArchiveServletModule extends ServletModule {
@@ -201,7 +204,7 @@ public class ImapArchiveModule extends AbstractModule {
 		@Override
 		protected void configure() {
 			install(new org.obm.configuration.module.LoggerModule());
-			bind(Logger.class).annotatedWith(Names.named(TASK)).toInstance(LoggerFactory.getLogger(TASK));
+			bind(Logger.class).annotatedWith(Names.named(TASK)).toInstance(org.slf4j.LoggerFactory.getLogger(TASK));
 			bind(String.class).annotatedWith(Names.named("logPath")).toInstance(LOG_PATH);
 		}
 		

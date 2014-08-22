@@ -31,72 +31,42 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.scheduling;
 
-import java.util.concurrent.TimeUnit;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.linagora.scheduling.DateTimeProvider;
+import com.linagora.scheduling.Listener;
 import com.linagora.scheduling.ScheduledTask;
-import com.linagora.scheduling.ScheduledTask.State;
-import com.linagora.scheduling.Scheduler;
-
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
-public class ArchiveScheduler implements AutoCloseable {
+public class ArchiveSchedulerLoggerListener implements Listener<ArchiveDomainTask> {
 
-	private final ArchiveSchedulerQueue queue;
-	private final Scheduler<ArchiveDomainTask> scheduler;
-
-	@Inject
-	@VisibleForTesting ArchiveScheduler(
-			ArchiveSchedulerQueue queue,
-			ArchiveSchedulerBus bus,
-			ArchiveSchedulerLoggerListener loggerListener,
-			DateTimeProvider dateTimeProvider,
-			@Named("schedulerResolution") TimeUnit schedulerResolution) {
-		
-		this.queue = queue;
-		this.scheduler = Scheduler.<ArchiveDomainTask>builder()
-				.queue(this.queue)
-				.timeProvider(dateTimeProvider)
-				.resolution(schedulerResolution)
-				.addListener(queue.getListener())
-				.addListener(bus)
-				.addListener(loggerListener)
-				.start();
-	}
-	
 	@Override
-	public void close() throws Exception {
-		scheduler.stop();
+	public void canceled(ScheduledTask<ArchiveDomainTask> task) {
+		stopAppenders(task);
 	}
 
-	public ScheduledTask<ArchiveDomainTask> schedule(ArchiveDomainTask task) {
-		return scheduler.schedule(task).at(task.getWhen());
+	@Override
+	public void failed(ScheduledTask<ArchiveDomainTask> task, Throwable failure) {
+		stopAppenders(task);
 	}
 
-	
-	public void clearDomain(ObmDomainUuid domain) {
-		for (ScheduledTask<ArchiveDomainTask> task : 
-				Iterables.filter(queue.getDomainTasks(domain), onlyScheduledTasksPredicate())) {
-			task.cancel();
-		}
+	@Override
+	public void running(ScheduledTask<ArchiveDomainTask> task) {
+		getArchiveDomainTask(task).startAppenders();
 	}
 
-	private Predicate<ScheduledTask<ArchiveDomainTask>> onlyScheduledTasksPredicate() {
-		return new Predicate<ScheduledTask<ArchiveDomainTask>>() {
-
-			@Override
-			public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
-				return input.state() == State.NEW
-					|| input.state() == State.WAITING;
-			}
-		};
+	@Override
+	public void scheduled(ScheduledTask<ArchiveDomainTask> task) {
 	}
-	
+
+	@Override
+	public void terminated(ScheduledTask<ArchiveDomainTask> task) {
+		stopAppenders(task);
+	}
+
+	private void stopAppenders(ScheduledTask<ArchiveDomainTask> task) {
+		getArchiveDomainTask(task).stopAppenders();
+	}
+
+	private ArchiveDomainTask getArchiveDomainTask(ScheduledTask<ArchiveDomainTask> task) {
+		return task.task();
+	}
 }

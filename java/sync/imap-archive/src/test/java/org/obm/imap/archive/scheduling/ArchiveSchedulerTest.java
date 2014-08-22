@@ -34,17 +34,14 @@ package org.obm.imap.archive.scheduling;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
+import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -53,11 +50,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.logging.TemporaryLoggerFactory;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Client;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events;
 import org.obm.imap.archive.scheduling.ControlledTaskFactory.RemotelyControlledTask;
 import org.obm.imap.archive.services.ArchiveService;
-import org.obm.imap.archive.services.LogFileService;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
@@ -80,7 +80,7 @@ public class ArchiveSchedulerTest {
 
 	IMocksControl mocks;
 	ArchiveService archiveService;
-	LogFileService logFileService;
+	Logger logger;
 	DateTime higherBoundary;
 	
 	TestDateTimeProvider timeProvider;
@@ -92,19 +92,18 @@ public class ArchiveSchedulerTest {
 	ArchiveSchedulerQueue queue;
 	ArchiveScheduler testee;
 
-
 	@Before
-	public void setUp() {
+	public void setUp() throws IOException {
 		timeout = 1500;
 		higherBoundary = DateTime.parse("2024-11-1T05:04Z");
 		
 		mocks = createControl();
 		archiveService = mocks.createMock(ArchiveService.class);
-		logFileService = mocks.createMock(LogFileService.class);
+		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
 		
 		DateTime testsStartTime = DateTime.parse("2024-01-1T05:04Z");
 		timeProvider = new TestDateTimeProvider(testsStartTime);
-		archiveTaskFactory = new ControlledTaskFactory(archiveService, logFileService); 
+		archiveTaskFactory = new ControlledTaskFactory(archiveService, new TemporaryLoggerFactory(temporaryFolder), logger); 
 		futureListener = new FutureTestListener<>();
 		
 		OnlyOnePerDomainMonitorFactory monitorFactory = new OnlyOnePerDomainMonitorFactory() {
@@ -122,7 +121,7 @@ public class ArchiveSchedulerTest {
 		queue = new ArchiveSchedulerQueue(monitorFactory);
 		busClient = Guice.createInjector(new BusModule()).getInstance(BusClient.class); 
 		bus = new ArchiveSchedulerBus(ImmutableSet.<Client>of(busClient));
-		testee = new ArchiveScheduler(queue, bus, timeProvider, MILLISECONDS);
+		testee = new ArchiveScheduler(queue, bus, new ArchiveSchedulerLoggerListener(), timeProvider, MILLISECONDS);
 	}
 	
 	@After
@@ -136,8 +135,7 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		DateTime when = DateTime.parse("2024-11-1T05:04Z");
 		
-		expectGetRunLogFile(runId);
-		archiveService.archive(eq(domain), eq(runId), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain, runId, when));
 		expectLastCall();
 		
 		mocks.replay();
@@ -156,12 +154,10 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
-		archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain, runId1, when1));
 		expectLastCall();
-		archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain, runId2, when2));
 		expectLastCall();
-
-		expectGetRunLogFile(runId1, runId2);
 
 		mocks.replay();
 		RemotelyControlledTask task1 = archiveTaskFactory.create(domain, when1, higherBoundary, runId1);
@@ -182,12 +178,10 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
-		archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain, runId1, when));
 		expectLastCall();
-		archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain, runId2, whenToEnqueue));
 		expectLastCall();
-
-		expectGetRunLogFile(runId1, runId2);
 
 		mocks.replay();
 		RemotelyControlledTask task = archiveTaskFactory.create(domain, when, higherBoundary, runId1);
@@ -215,14 +209,12 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
 
-		archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain, runId1, when));
 		expectLastCall();
-		archiveService.archive(eq(domain), eq(runId2), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain, runId2, laterWhenEnqueuedBefore));
 		expectLastCall();
-		archiveService.archive(eq(domain), eq(runId3), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain, runId3, earlierWhenEnqueuedAfter));
 		expectLastCall();
-
-		expectGetRunLogFile(runId1, runId2, runId3);
 
 		mocks.replay();
 		RemotelyControlledTask task = archiveTaskFactory.create(domain, when, higherBoundary, runId1);
@@ -254,12 +246,10 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
-		archiveService.archive(eq(domain1), eq(runId1), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain1, runId1, when1));
 		expectLastCall();
-		archiveService.archive(eq(domain2), eq(runId2), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain2, runId2, when2));
 		expectLastCall();
-
-		expectGetRunLogFile(runId1, runId2);
 
 		mocks.replay();
 		RemotelyControlledTask taskDomain1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1);
@@ -290,17 +280,15 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
 		ArchiveTreatmentRunId runId4 = ArchiveTreatmentRunId.from("b1226053-265d-4b0e-a524-e37b1dfcb2e9");
 
-		archiveService.archive(eq(domain1), eq(runId1), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain1, runId1, when1));
 		expectLastCall();
-		archiveService.archive(eq(domain2), eq(runId2), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain2, runId2, when2));
 		expectLastCall();
-		archiveService.archive(eq(domain1), eq(runId3), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain1, runId3, when1ToEnqueue));
 		expectLastCall();
-		archiveService.archive(eq(domain2), eq(runId4), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain2, runId4, when2ToEnqueue));
 		expectLastCall();
 		
-		expectGetRunLogFile(runId1, runId2, runId3, runId4);
-
 		mocks.replay();
 		RemotelyControlledTask taskDomain1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1);
 		RemotelyControlledTask taskDomain2 = archiveTaskFactory.create(domain2, when2, higherBoundary, runId2);
@@ -345,11 +333,9 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
-		archiveService.archive(eq(domain), eq(runId1), anyObject(DeferredFileOutputStream.class));
+		archiveService.archive(archiveDomainTask(domain, runId1, when1));
 		expectLastCall().anyTimes();
 
-		expectGetRunLogFile(runId1, runId2);
-		
 		mocks.replay();
 		RemotelyControlledTask runningTask = archiveTaskFactory.create(domain, when1, higherBoundary, runId1);
 		ScheduledTask<ArchiveDomainTask> running = testee.schedule(runningTask);
@@ -375,8 +361,6 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
-		expectGetRunLogFile(runId1, runId2);
-		
 		mocks.replay();
 		RemotelyControlledTask scheduledTask1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1);
 		ScheduledTask<ArchiveDomainTask> scheduled1 = testee.schedule(scheduledTask1);
@@ -391,10 +375,8 @@ public class ArchiveSchedulerTest {
 		assertThat(scheduled2.state()).isEqualTo(State.WAITING);
 	}
 
-	private void expectGetRunLogFile(ArchiveTreatmentRunId...runIds) throws Exception {
-		for (ArchiveTreatmentRunId runId : runIds) {
-			expect(logFileService.getFile(runId)).andReturn(temporaryFolder.newFile());
-		}
+	ArchiveDomainTask archiveDomainTask(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DateTime when) {
+		return new ArchiveDomainTask(archiveService, domain, when, higherBoundary, runId, logger);
 	}
 
 	void assertTaskProgression(ArchiveDomainTask task) throws Exception {

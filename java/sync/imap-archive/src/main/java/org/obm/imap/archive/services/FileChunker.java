@@ -34,68 +34,44 @@ package org.obm.imap.archive.services;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Paths;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
-
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.logging.LoggerFactory;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
 import com.google.common.io.Files;
 import com.google.common.io.LineProcessor;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 @Singleton
-public class LogFileService {
+class FileChunker {
 
-	private final static Logger logger = LoggerFactory.getLogger(ArchiveServiceImpl.class);
-
-	private final static String LOG_PATH = "/var/log/obm-imap-archive";
-	private final static String LOG_EXTENSION = ".log";
-
-	private final TimeUnit schedulerResolution;
-
-	@Inject
-	protected LogFileService(@Named("schedulerResolution") TimeUnit schedulerResolution) {
-		this.schedulerResolution = schedulerResolution;
-	}
+	private final static Logger logger = org.slf4j.LoggerFactory.getLogger(FileChunker.class);
 	
-	public File getFile(ArchiveTreatmentRunId runId) {
-		return new File(Paths.get(LOG_PATH, runId.serialize() + LOG_EXTENSION).toUri());	
-	}
-	
-	public ChunkedOutput<String> chunkLogFile(ArchiveTreatmentRunId runId) throws NoSuchFileException {
-		File file = getFile(runId);
-		if (!file.exists()) {
-			throw new NoSuchFileException(file.getAbsolutePath());
-		}
-		
-		ChunkedOutput<String> chunkedOutput = new ChunkedOutput<String>(String.class);
-		copyFileToChunk(chunkedOutput, file);
-		return chunkedOutput;
-	}
-
-	private void copyFileToChunk(final ChunkedOutput<String> chunkedOutput, final File logFile) {
+	public ChunkedOutput<String> chunk(final ArchiveTreatmentRunId runId) {
+		final ChunkedOutput<String> chunkedOutput = new ChunkedOutput<String> (String.class);
+		// This code is used to work around the https://java.net/jira/browse/JERSEY-2558 issue
+		// delay closing the chunk for 10 seconds, in order to let the client received it before.
+		long delay = TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS);
 		new Timer().schedule(new TimerTask() {
-			
+
 			@Override
 			public void run() {
+				String absolutePath = LoggerFactory.LOG_PATH + runId.serialize() + LoggerFactory.LOG_EXTENSION;
 				try {
-					Files.readLines(logFile, Charsets.UTF_8, new LineProcessor<ChunkedOutput<String>>() {
+					File inputFile = new File(absolutePath);
+					Files.readLines(inputFile, Charsets.UTF_8, new LineProcessor<ChunkedOutput<String>>() {
 
 						@Override
 						public boolean processLine(String line) throws IOException {
 							chunkedOutput.write(line);
+							chunkedOutput.write(System.lineSeparator());
 							return true;
 						}
 
@@ -103,14 +79,21 @@ public class LogFileService {
 						public ChunkedOutput<String> getResult() {
 							return chunkedOutput;
 						}
-					}).close();
-					
-					cancel();
+					});
 				} catch (IOException e) {
-					logger.error("Error when retrieving log file", e);
-					throw new WebApplicationException(Status.NO_CONTENT);
+					logger.error("Error when reading file: {}", absolutePath);
+					Throwables.propagate(e);
+				} finally {
+					try {
+						chunkedOutput.close();
+					} catch (IOException e) {
+						logger.error("Error when reading file: {}", absolutePath);
+						Throwables.propagate(e);
+					}
 				}
 			}
-		}, schedulerResolution.toMillis(1));
+		
+		}, delay);
+		return chunkedOutput;
 	}
 }

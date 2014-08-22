@@ -35,19 +35,16 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.UUID;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
@@ -64,7 +61,6 @@ import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
-import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.jayway.restassured.http.ContentType;
@@ -77,20 +73,11 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 public class TreatmentsResourceTest {
 
 	private ClientDriverRule driver = new ClientDriverRule();
-	
-	private static File logFile;
-	
-	static {
-		try {
-			logFile = Files.createTempFile(TestImapArchiveModules.uuid.toString(), ".log").toFile();
-		} catch (IOException e) {
-			Throwables.propagate(e);
-		}
-	}
+	@Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Rule public TestRule chain = RuleChain
 			.outerRule(driver)
-			.around(new GuiceRule(this, new TestImapArchiveModules.WithLogFile(driver, logFile)))
+			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver, temporaryFolder)))
 			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
 				@Override
 				public H2InMemoryDatabase get() {
@@ -111,7 +98,6 @@ public class TreatmentsResourceTest {
 	@After
 	public void tearDown() throws Exception {
 		server.stop();
-		logFile.delete();
 	}
 	
 	@Test
@@ -301,7 +287,6 @@ public class TreatmentsResourceTest {
 			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/logs");
 	}
 
-	@Ignore("Can fail sometimes I can't figure out why and ADU already remake the logging system")
 	@Test
 	public void runningTreatmentShouldReturnChunkWhenTreatmentIsOverAndLogFileOnServer() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
@@ -338,7 +323,6 @@ public class TreatmentsResourceTest {
 			.queryParam("run_id", runId.toString())
 			.contentType(ContentType.JSON).
 		expect()
-			.header("Transfer-encoding", "chunked")
 			.body(containsString(TestImapArchiveModules.LOCAL_DATE_TIME.toString())).
 		when()
 			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/logs");

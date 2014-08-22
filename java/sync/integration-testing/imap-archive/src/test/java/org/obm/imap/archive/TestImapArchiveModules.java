@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive;
 
-import java.io.File;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -40,16 +39,17 @@ import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.rules.TemporaryFolder;
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.logging.LoggerFileNameService;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory.OnlyOnePerDomainMonitorFactoryImpl;
-import org.obm.imap.archive.services.LogFileService;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
@@ -85,9 +85,11 @@ public class TestImapArchiveModules {
 	
 		private final ClientDriverRule obmSyncHttpMock;
 		private final ServerConfiguration config;
+		private final TemporaryFolder temporaryFolder;
 
-		public Simple(ClientDriverRule obmSyncHttpMock) {
+		public Simple(ClientDriverRule obmSyncHttpMock, TemporaryFolder temporaryFolder) {
 			this.obmSyncHttpMock = obmSyncHttpMock;
+			this.temporaryFolder = temporaryFolder;
 			this.config = ServerConfiguration.builder()
 					.lifeCycleHandler(ImapArchiveModule.STARTUP_HANDLER_CLASS)
 					.build();
@@ -120,37 +122,25 @@ public class TestImapArchiveModules {
 				
 				@Override
 				protected void configure() {
+					bind(LoggerFileNameService.class).toInstance(new TemporaryLoggerFileNameService(temporaryFolder));
 				}
 			};
-		}
-	}
-	
-	public static class WithLogFile extends Simple {
-		
-		private final File logFile;
-
-		public WithLogFile(ClientDriverRule obmSyncHttpMock, File logFile) {
-			super(obmSyncHttpMock);
-			this.logFile = logFile;
-		}
-		
-		@Override
-		protected AbstractModule logFileModule() {
-			return new LogFileModule(logFile);
 		}
 	}
 	
 	public static class WithGreenmail extends AbstractModule {
 
 		private ClientDriverRule obmSyncHttpMock;
+		private TemporaryFolder temporaryFolder;
 
-		public WithGreenmail(ClientDriverRule obmSyncHttpMock) {
+		public WithGreenmail(ClientDriverRule obmSyncHttpMock, TemporaryFolder temporaryFolder) {
 			this.obmSyncHttpMock = obmSyncHttpMock;
+			this.temporaryFolder = temporaryFolder;
 		}
 		
 		@Override
 		protected void configure() {
-			install(Modules.override(new Simple(obmSyncHttpMock)).with(new AbstractModule() {
+			install(Modules.override(new Simple(obmSyncHttpMock, temporaryFolder)).with(new AbstractModule() {
 
 				@Override
 				protected void configure() {
@@ -164,14 +154,16 @@ public class TestImapArchiveModules {
 	public static class WithTestingMonitor extends AbstractModule {
 
 		private ClientDriverRule obmSyncHttpMock;
+		private TemporaryFolder temporaryFolder;
 
-		public WithTestingMonitor(ClientDriverRule obmSyncHttpMock) {
+		public WithTestingMonitor(ClientDriverRule obmSyncHttpMock, TemporaryFolder temporaryFolder) {
 			this.obmSyncHttpMock = obmSyncHttpMock;
+			this.temporaryFolder = temporaryFolder;
 		}
 		
 		@Override
 		protected void configure() {
-			install(Modules.override(new Simple(obmSyncHttpMock)).with(new AbstractModule() {
+			install(Modules.override(new Simple(obmSyncHttpMock, temporaryFolder)).with(new AbstractModule() {
 
 				@Override
 				protected void configure() {
@@ -307,32 +299,18 @@ public class TestImapArchiveModules {
 		}
 	}
 	
-	public static class LogFileModule extends AbstractModule {
+	public static class TemporaryLoggerFileNameService implements LoggerFileNameService {
 
-		private final File logFile;
+		private final TemporaryFolder temporaryFolder;
 
-		public LogFileModule(File logFile) {
-			this.logFile = logFile;
+		public TemporaryLoggerFileNameService(TemporaryFolder temporaryFolder) {
+			this.temporaryFolder = temporaryFolder;
 		}
-
+		
 		@Override
-		protected void configure() {
-			bind(LogFileService.class).toInstance(new TestLogFileService(logFile));
-		}
-	}
-	
-	public static class TestLogFileService extends LogFileService {
-
-		private final File logFile;
-
-		private TestLogFileService(File logFile) {
-			super(TimeUnit.MILLISECONDS);
-			this.logFile = logFile;
+		public String loggerFileName(ArchiveTreatmentRunId runId) {
+			return temporaryFolder.getRoot().getAbsolutePath() + "/" + runId.serialize() + ".log";
 		}
 
-		@Override
-		public File getFile(ArchiveTreatmentRunId runId) {
-			return logFile;
-		}
 	}
 }

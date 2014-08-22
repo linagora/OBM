@@ -44,6 +44,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
@@ -75,10 +76,11 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 public class RestoreOnStartUpTest {
 
 	private ClientDriverRule driver = new ClientDriverRule();
+	@Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Rule public TestRule chain = RuleChain
 			.outerRule(driver)
-			.around(new GuiceRule(this, new TestImapArchiveModules.WithTestingMonitor(driver)))
+			.around(new GuiceRule(this, new TestImapArchiveModules.WithTestingMonitor(driver, temporaryFolder)))
 			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
 				@Override
 				public H2InMemoryDatabase get() {

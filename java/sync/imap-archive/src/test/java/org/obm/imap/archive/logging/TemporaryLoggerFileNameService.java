@@ -30,66 +30,22 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.services;
+package org.obm.imap.archive.logging;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.File;
-import java.nio.file.NoSuchFileException;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.io.FileUtils;
-import org.glassfish.jersey.server.ChunkedOutput;
-import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 
-import pl.wkr.fluentrule.api.FluentExpectedException;
+public class TemporaryLoggerFileNameService implements LoggerFileNameService {
 
+	private final TemporaryFolder temporaryFolder;
 
-public class LogFileServiceTest {
-
-	@Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
-	
-	@Rule public FluentExpectedException expectedException = FluentExpectedException.none();
-	
-	@Test
-	public void chunkLogFileShouldThrowWhenNoLogFile() throws Exception {
-		expectedException.expect(NoSuchFileException.class);
-		
-		new LogFileService(TimeUnit.MILLISECONDS).chunkLogFile(ArchiveTreatmentRunId.from("2abf5fbb-c187-466f-9932-5cf7796566eb"));
+	public TemporaryLoggerFileNameService(TemporaryFolder temporaryFolder) {
+		this.temporaryFolder = temporaryFolder;
 	}
 	
-	@Test
-	public void chunkLogFileShouldCopyDataToChunkedOutputWhenDone() throws Exception {
-		File logFile = temporaryFolder.newFile();
-		
-		String expectedData = "expected String";
-		FileUtils.write(logFile, expectedData);
-		
-		ChunkedOutput<String> chunkedOutput = new MyLogFileService(logFile)
-			.chunkLogFile(ArchiveTreatmentRunId.from("2abf5fbb-c187-466f-9932-5cf7796566eb"));
-		
-		long oneSecond = 1000;
-		Thread.sleep(oneSecond);
-		assertThat(chunkedOutput).isNotNull();
-		assertThat(chunkedOutput.isClosed()).isTrue();
+	@Override
+	public String loggerFileName(ArchiveTreatmentRunId runId) {
+		return temporaryFolder.getRoot().getAbsolutePath() + "/" + runId.serialize() + ".log";
 	}
-	
-	private static class MyLogFileService extends LogFileService {
 
-		private final File logFile;
-
-		public MyLogFileService(File logFile) {
-			super(TimeUnit.MILLISECONDS);
-			this.logFile = logFile;
-		}
-		
-		@Override
-		public File getFile(ArchiveTreatmentRunId runId) {
-			return logFile;
-		}
-		
-	}
 }

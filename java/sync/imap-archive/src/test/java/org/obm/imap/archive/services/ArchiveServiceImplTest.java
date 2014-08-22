@@ -35,6 +35,8 @@ package org.obm.imap.archive.services;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 
+import java.io.IOException;
+
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -42,42 +44,50 @@ import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.exception.DomainConfigurationException;
+import org.obm.imap.archive.logging.TemporaryLoggerFileNameService;
+import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.slf4j.LoggerFactory;
 
 import pl.wkr.fluentrule.api.FluentExpectedException;
+import ch.qos.logback.classic.Logger;
 
 import com.linagora.scheduling.DateTimeProvider;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-
 public class ArchiveServiceImplTest {
 
-	private IMocksControl control;
+	@Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 	
+	private IMocksControl control;
 	private DomainConfigurationDao domainConfigurationDao;
+	private RunningArchiveTracking runningArchiveTracking;
 	private DateTimeProvider dateTimeProvider;
-	private LogFileService logFileService;
+	private Logger logger;
 	
 	private ArchiveServiceImpl archiveService;
 
 	@Rule
 	public FluentExpectedException expectedException = FluentExpectedException.none();
 
+
 	
 	@Before
-	public void setup() {
+	public void setup() throws IOException {
 		control = createControl();
 		domainConfigurationDao = control.createMock(DomainConfigurationDao.class);
+		runningArchiveTracking = control.createMock(RunningArchiveTracking.class);
 		dateTimeProvider = control.createMock(DateTimeProvider.class);
-		logFileService = control.createMock(LogFileService.class);
+		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
 		
-		archiveService = new ArchiveServiceImpl(domainConfigurationDao, dateTimeProvider, logFileService, Boolean.FALSE);
+		archiveService = new ArchiveServiceImpl(domainConfigurationDao, runningArchiveTracking, new TemporaryLoggerFileNameService(temporaryFolder), dateTimeProvider, false);
 	}
 	
 	@Test
@@ -91,7 +101,7 @@ public class ArchiveServiceImplTest {
 			.hasMessage("The IMAP Archive configuration is not defined for the domain: 'fc2f915e-9df4-4560-b141-7b4c7ddecdd6'");
 		
 		control.replay();
-		archiveService.archive(domainId, ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), null);
+		archiveService.archive(new TestArchiveDomainTask(archiveService, domainId, ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77")));
 		control.verify();
 	}
 	
@@ -109,7 +119,7 @@ public class ArchiveServiceImplTest {
 			.hasMessage("The IMAP Archive service is disable for the domain: 'fc2f915e-9df4-4560-b141-7b4c7ddecdd6'");
 		
 		control.replay();
-		archiveService.archive(domainId, ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), null);
+		archiveService.archive(new TestArchiveDomainTask(archiveService, domainId, ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77")));
 		control.verify();
 	}
 	
@@ -126,14 +136,21 @@ public class ArchiveServiceImplTest {
 							.build())
 					.build());
 		
-		expect(dateTimeProvider.now()).andReturn(DateTime.now(DateTimeZone.UTC));
-		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		
+		expect(dateTimeProvider.now()).andReturn(DateTime.now(DateTimeZone.UTC)).times(2);
+		
 		control.replay();
-		archiveService.archive(domainId, runId, null);
+		archiveService.archive(new TestArchiveDomainTask(archiveService, domainId, runId));
 		int twoSeconds = 2000;
 		Thread.sleep(twoSeconds);
 		control.verify();
+	}
+	
+	private class TestArchiveDomainTask extends ArchiveDomainTask {
+
+		protected TestArchiveDomainTask(ArchiveService archiveService, ObmDomainUuid domain, ArchiveTreatmentRunId runId) {
+			super(archiveService, domain, null, null, runId, logger);
+		}
 	}
 }

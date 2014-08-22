@@ -29,74 +29,56 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.scheduling;
+package org.obm.imap.archive.services;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+
+import org.obm.annotations.transactional.Transactional;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-import com.google.inject.Inject;
+import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
-import com.linagora.scheduling.DateTimeProvider;
 import com.linagora.scheduling.ScheduledTask;
-import com.linagora.scheduling.ScheduledTask.State;
-import com.linagora.scheduling.Scheduler;
-
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
-public class ArchiveScheduler implements AutoCloseable {
+public class RunningArchiveTracking implements ArchiveSchedulerBus.Client {
 
-	private final ArchiveSchedulerQueue queue;
-	private final Scheduler<ArchiveDomainTask> scheduler;
+	private final Map<ArchiveTreatmentRunId, ArchiveDomainTask> runningTasks;
 
-	@Inject
-	@VisibleForTesting ArchiveScheduler(
-			ArchiveSchedulerQueue queue,
-			ArchiveSchedulerBus bus,
-			ArchiveSchedulerLoggerListener loggerListener,
-			DateTimeProvider dateTimeProvider,
-			@Named("schedulerResolution") TimeUnit schedulerResolution) {
-		
-		this.queue = queue;
-		this.scheduler = Scheduler.<ArchiveDomainTask>builder()
-				.queue(this.queue)
-				.timeProvider(dateTimeProvider)
-				.resolution(schedulerResolution)
-				.addListener(queue.getListener())
-				.addListener(bus)
-				.addListener(loggerListener)
-				.start();
+	@VisibleForTesting RunningArchiveTracking() {
+		this.runningTasks = Maps.newConcurrentMap();
 	}
 	
-	@Override
-	public void close() throws Exception {
-		scheduler.stop();
-	}
-
-	public ScheduledTask<ArchiveDomainTask> schedule(ArchiveDomainTask task) {
-		return scheduler.schedule(task).at(task.getWhen());
-	}
-
-	
-	public void clearDomain(ObmDomainUuid domain) {
-		for (ScheduledTask<ArchiveDomainTask> task : 
-				Iterables.filter(queue.getDomainTasks(domain), onlyScheduledTasksPredicate())) {
-			task.cancel();
+	@Subscribe
+	@Transactional
+	public void onTreatmentStateChange(TaskStatusChanged event) {
+		ScheduledTask<ArchiveDomainTask> schedulerTask = event.getTask();
+		ArchiveDomainTask archiveDomainTask = schedulerTask.task();
+		switch (schedulerTask.state()) {
+		case RUNNING:
+			runningTasks.put(archiveDomainTask.getRunId(), archiveDomainTask);
+			break;
+			
+		case CANCELED:
+		case FAILED:
+		case TERMINATED:
+			runningTasks.remove(archiveDomainTask.getRunId());
+			break;
+			
+		case NEW:
+		case WAITING:
+		default:
+			break;
 		}
 	}
-
-	private Predicate<ScheduledTask<ArchiveDomainTask>> onlyScheduledTasksPredicate() {
-		return new Predicate<ScheduledTask<ArchiveDomainTask>>() {
-
-			@Override
-			public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
-				return input.state() == State.NEW
-					|| input.state() == State.WAITING;
-			}
-		};
-	}
 	
+	public Optional<ArchiveDomainTask> get(ArchiveTreatmentRunId runId) {
+		return Optional.fromNullable(runningTasks.get(runId));
+	}
 }

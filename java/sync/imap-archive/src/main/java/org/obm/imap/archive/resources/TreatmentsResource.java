@@ -43,7 +43,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.glassfish.jersey.server.ChunkedOutput;
 import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
@@ -106,7 +105,7 @@ public class TreatmentsResource {
 	@GET
 	@Path("logs")
 	@Produces(MediaType.TEXT_PLAIN)
-	public ChunkedOutput<String> runningTreatment(@QueryParam("run_id") UUID runId) {
+	public Response runningTreatment(@QueryParam("run_id") UUID runId) {
 		return archiveService.runningProcessLogs(ArchiveTreatmentRunId.from(runId));
 	}
 }

@@ -40,6 +40,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
@@ -57,10 +58,12 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 public class RootHandlerTest {
 
 	private ClientDriverRule driver = new ClientDriverRule();
+	@Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
 	
 	@Rule public TestRule chain = RuleChain
 			.outerRule(driver)
-			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver)))
+			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver, temporaryFolder)))
 			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
 				@Override
 				public H2InMemoryDatabase get() {
