@@ -110,6 +110,7 @@ case "$1" in
         ;;
   status)
         status -p $LOCATOR_PID obm-locator
+        exit $?
         ;;
   restart)
         stop
