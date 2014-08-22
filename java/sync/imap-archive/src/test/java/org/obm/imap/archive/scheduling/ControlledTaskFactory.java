@@ -41,7 +41,7 @@ import com.google.common.util.concurrent.SettableFuture;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public class ControlledTaskFactory extends ArchiveDomainTask.Factory {
+public class ControlledTaskFactory extends ArchiveDomainTask.FactoryImpl {
 
 	private final ArchiveService archiveService;
 

@@ -62,18 +62,23 @@ public class ArchiveDomainTask implements Task {
 		};
 	}
 	
+	public interface Factory {
+		ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId);
+	}
+	
 	@Singleton
-	public static class Factory {
+	public static class FactoryImpl implements Factory {
 		
 		private final ArchiveService archiveService;
 		private final LogFileService logFileService;
 
 		@Inject
-		@VisibleForTesting Factory(ArchiveService archiveService, LogFileService logFileService) {
+		@VisibleForTesting FactoryImpl(ArchiveService archiveService, LogFileService logFileService) {
 			this.archiveService = archiveService;
 			this.logFileService = logFileService;
 		}
 		
+		@Override
 		public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
 			return new ArchiveDomainTask(archiveService, 
 					deferredFileOutputStream(runId), 
