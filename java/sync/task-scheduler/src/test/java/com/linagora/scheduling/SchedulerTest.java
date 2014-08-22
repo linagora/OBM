@@ -46,6 +46,7 @@ import org.junit.Test;
 
 import com.linagora.scheduling.Listener.NoopListener;
 import com.linagora.scheduling.Scheduler.Builder;
+import com.linagora.scheduling.TaskQueue.DelayedQueue;
 
 public class SchedulerTest {
 
@@ -101,6 +102,15 @@ public class SchedulerTest {
 	public void startShouldBeCallableMoreThanOnce() {
 		start();
 		testee.start();
+	}
+	
+	@Test
+	public void pollingTheQueueShouldNotFail() {
+		DelayedQueue<Task> queue = new TaskQueue.DelayedQueue<Task>();
+		testeeBuilder.queue(queue);
+		start();
+		
+		assertThat(queue.poll()).isEmpty();
 	}
 	
 	@Test

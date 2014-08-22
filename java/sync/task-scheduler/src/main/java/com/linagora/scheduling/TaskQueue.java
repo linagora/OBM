@@ -54,7 +54,11 @@ public interface TaskQueue<T extends Task> {
 		
 		@Override
 		public Collection<ScheduledTask<T>> poll() {
-			return ImmutableSet.of(queue.poll());
+			ScheduledTask<T> scheduledTask = queue.poll();
+			if (scheduledTask != null) {
+				return ImmutableSet.of(scheduledTask);
+			}
+			return ImmutableSet.of();
 		}
 
 		@Override
