@@ -60,7 +60,7 @@ import org.obm.push.minig.imap.impl.MailThread;
 /**
  * IMAP client entry point
  */
-public interface StoreClient {
+public interface StoreClient extends AutoCloseable {
 
 	interface Factory {
 		StoreClient create(String hostname, String login, String password);

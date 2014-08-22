@@ -48,6 +48,7 @@ import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
+import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
@@ -60,6 +61,7 @@ import fr.aliacom.obm.common.system.ObmSystemUser;
 public class CyrusStatusHandlerTest {
 	
 	private ClientDriverRule driver = new ClientDriverRule();
+	
 	@Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@Rule public TestRule chain = RuleChain
@@ -80,6 +82,7 @@ public class CyrusStatusHandlerTest {
 
 	@After
 	public void tearDown() throws Exception {
+		control.verify();
 		server.stop();
 		imapServer.stop();
 	}
@@ -106,6 +109,9 @@ public class CyrusStatusHandlerTest {
 	@Test
 	public void testStatusIs503WhenImapIsUpButCyrusUserNotFound() throws Exception {
 		server.start();
+		expect(userSystemDao.getByLogin("cyrus")).andThrow(new SystemUserNotFoundException());
+		
+		control.replay();
 		
 		given()
 			.port(server.getHttpPort())
@@ -121,6 +127,9 @@ public class CyrusStatusHandlerTest {
 	@Test
 	public void testStatusIs503WhenImapIsUpButLoginFails() throws Exception {
 		server.start();
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build());
+		
+		control.replay();
 		
 		given()
 			.port(server.getHttpPort())
@@ -136,7 +145,9 @@ public class CyrusStatusHandlerTest {
 	@Test
 	public void testStatusIs503WhenImapIsDown() throws Exception {
 		server.start();
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build());
 		
+		control.replay();
 		imapServer.stop();
 		
 		given()

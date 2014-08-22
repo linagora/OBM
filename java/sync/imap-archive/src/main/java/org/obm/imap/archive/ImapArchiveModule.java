@@ -70,6 +70,7 @@ import org.obm.imap.archive.services.ArchiveServiceImpl;
 import org.obm.imap.archive.services.DomainConfigurationService;
 import org.obm.imap.archive.services.RunningArchiveTracking;
 import org.obm.imap.archive.services.SchedulingDatesService;
+import org.obm.imap.archive.services.StoreClientFactory;
 import org.obm.imap.archive.startup.RestoreTasksOnStartupHandler;
 import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
@@ -146,6 +147,7 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(ArchiveSchedulerQueue.class);
 		bind(DateTimeProvider.class).toInstance(DateTimeProvider.SYSTEM_UTC);
 		bind(LoggerFileNameService.class).to(LoggerFileNameServiceImpl.class);
+		bind(StoreClientFactory.class);
 	}
 	
 	public static class ImapArchiveServletModule extends ServletModule {

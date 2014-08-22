@@ -43,17 +43,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.obm.cyrus.imap.admin.CyrusImapService;
-import org.obm.cyrus.imap.admin.CyrusManager;
-import org.obm.domain.dao.UserSystemDao;
-import org.obm.locator.store.LocatorService;
-import org.obm.push.mail.imap.IMAPException;
+import org.obm.imap.archive.services.StoreClientFactory;
+import org.obm.push.minig.imap.StoreClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-
-import fr.aliacom.obm.common.system.ObmSystemUser;
 
 @Singleton
 @Path("/cyrus/status")
@@ -65,39 +60,22 @@ public class CyrusStatusHandler {
 	@Inject
 	@Context
 	private Application application;
-	
-	private final LocatorService locator;
-	private final CyrusImapService cyrus;
-	private final UserSystemDao userSystemDao;
 
+	private final StoreClientFactory storeClientFactory;
+	
 	@Inject
-	@VisibleForTesting CyrusStatusHandler(
-			LocatorService locator,
-			CyrusImapService cyrus,
-			UserSystemDao userSystemDao) {
-		this.locator = locator;
-		this.cyrus = cyrus;
-		this.userSystemDao = userSystemDao;
+	@VisibleForTesting CyrusStatusHandler(StoreClientFactory storeClientFactory) {
+		this.storeClientFactory = storeClientFactory;
 	}
 	
 	@GET
-	public Response status(@QueryParam("login") String login, @QueryParam("domain_name") String domainName) {
-		try {
-			ObmSystemUser cyrusUser = userSystemDao.getByLogin(ObmSystemUser.CYRUS);
-			String cyrusAddress = locator.getServiceLocation("mail/imap_frontend", login + "@" + domainName);
-			if (canConnectToCyrus(cyrusUser, cyrusAddress)) {
-				return Response.ok().build();
-			}
+	public Response status(@QueryParam("domain_name") String domainName) {
+		try (StoreClient storeClient = storeClientFactory.create(domainName)) {
+			storeClient.login(false);
+			return Response.ok().build();
 		} catch (Exception e) {
-			logger.error("The server cannot try to connect to cyrus", e);
+			logger.error("The server failed to connect to Cyrus", e);
+			return Response.status(Status.SERVICE_UNAVAILABLE).build();
 		}
-		return Response.status(Status.SERVICE_UNAVAILABLE).build();
-	}
-
-	@VisibleForTesting boolean canConnectToCyrus(ObmSystemUser cyrusUser, String cyrusAddress) throws IMAPException {
-		try (CyrusManager cyrusManager = cyrus.buildManager(
-				cyrusAddress, cyrusUser.getLogin(), cyrusUser.getPassword())) {
-			return cyrusManager != null;
-		} 
 	}
 }

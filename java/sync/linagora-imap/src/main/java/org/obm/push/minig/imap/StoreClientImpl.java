@@ -129,6 +129,11 @@ public class StoreClientImpl implements StoreClient {
 	}
 
 	@Override
+	public void close() throws Exception {
+		logout();
+	}
+
+	@Override
 	public void login(Boolean activateTLS) throws IMAPException, ImapTimeoutException {
 		logger.debug("login attempt to {}:{} for {}", hostname, port, login);
 		SocketAddress sa = new InetSocketAddress(hostname, port);

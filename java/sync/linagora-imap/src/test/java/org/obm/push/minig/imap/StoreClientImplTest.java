@@ -34,6 +34,7 @@ package org.obm.push.minig.imap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -389,4 +390,17 @@ public class StoreClientImplTest {
 		mocks.verify();
 	}
 
+	@Test
+	public void storeClientShouldBeAutoCloseable() {
+		clientSupport.logout();
+		expectLastCall();
+		
+		storeClientImpl = new StoreClientImpl(null, port, null, null, MailboxNameCheckPolicy.NEVER, clientSupport);
+		try (StoreClient checkedStoreClient = storeClientImpl) {
+			storeClientImpl.login(false);
+			assertThat(storeClientImpl.isConnected()).isTrue();
+		} catch (Exception e) {
+		}
+		assertThat(storeClientImpl.isConnected()).isFalse();
+	}
 }
