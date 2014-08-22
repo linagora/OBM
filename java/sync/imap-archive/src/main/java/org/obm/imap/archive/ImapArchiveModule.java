@@ -67,6 +67,8 @@ import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory.OnlyOnePer
 import org.obm.imap.archive.services.ArchiveDaoTracking;
 import org.obm.imap.archive.services.ArchiveService;
 import org.obm.imap.archive.services.ArchiveServiceImpl;
+import org.obm.imap.archive.services.DomainClient;
+import org.obm.imap.archive.services.DomainClientImpl;
 import org.obm.imap.archive.services.DomainConfigurationService;
 import org.obm.imap.archive.services.RunningArchiveTracking;
 import org.obm.imap.archive.services.SchedulingDatesService;
@@ -148,6 +150,7 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(DateTimeProvider.class).toInstance(DateTimeProvider.SYSTEM_UTC);
 		bind(LoggerFileNameService.class).to(LoggerFileNameServiceImpl.class);
 		bind(StoreClientFactory.class);
+		bind(DomainClient.class).to(DomainClientImpl.class);
 	}
 	
 	public static class ImapArchiveServletModule extends ServletModule {

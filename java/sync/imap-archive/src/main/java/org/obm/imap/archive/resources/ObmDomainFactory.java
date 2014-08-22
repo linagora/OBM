@@ -35,8 +35,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.hk2.api.Factory;
-import org.obm.provisioning.Domain;
-import org.obm.sync.locators.Locator;
+import org.obm.imap.archive.services.DomainClient;
 
 import com.google.common.base.Optional;
 
@@ -45,16 +44,14 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ObmDomainFactory implements Factory<ObmDomain> {
 
-	private static final String GLOBAL_VIRT = "global.virt";
-
-	private final Domain domainService;
+	private final DomainClient domainClient;
 	
 	@PathParam("domain")
 	private String domainUuid;
 
 	@Inject
-	private ObmDomainFactory(Locator locator) {
-		domainService = new Domain(locator.backendBaseUrl(GLOBAL_VIRT));
+	private ObmDomainFactory(DomainClient domainClient) {
+		this.domainClient = domainClient;
 	}
 	
 	@Override
@@ -69,7 +66,7 @@ public class ObmDomainFactory implements Factory<ObmDomain> {
 		}
 
 		ObmDomainUuid checkedDomainUuid = checkDomainUuid(domainUuid);
-		Optional<ObmDomain> domain = domainService.getById(checkedDomainUuid);
+		Optional<ObmDomain> domain = domainClient.getById(checkedDomainUuid);
 		if (!domain.isPresent()) {
 			throw new WebApplicationException(Status.NOT_FOUND);
 		}
