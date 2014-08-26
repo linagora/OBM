@@ -52,6 +52,7 @@ public class BeansTest {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 					.add(MessageSet.class)
+					.add(SearchQuery.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}

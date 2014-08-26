@@ -34,6 +34,8 @@ package org.obm.push.mail.bean;
 
 import java.util.Date;
 
+import com.google.common.base.Objects;
+
 public class SearchQuery {
 
 	public static final SearchQuery MATCH_ALL = new SearchQuery(null, null); 
@@ -71,6 +73,10 @@ public class SearchQuery {
 			return new SearchQuery(before, after, includeDeleted);
 		}
 	}
+
+	private final Date after;
+	private final Date before;
+	private final boolean matchDeleted;
 	
 	/**
 	 * 
@@ -88,31 +94,40 @@ public class SearchQuery {
 		this.matchDeleted = matchDeleted;
 	}
 
-	private Date after;
-	private Date before;
-	private boolean matchDeleted;
-
 	public Date getAfter() {
 		return after;
-	}
-
-	public void setAfter(Date after) {
-		this.after = after;
 	}
 
 	public Date getBefore() {
 		return before;
 	}
 
-	public void setBefore(Date before) {
-		this.before = before;
-	}
-
 	public boolean isMatchDeleted() {
 		return matchDeleted;
 	}
 
-	public void setMatchDeleted(boolean matchDeleted) {
-		this.matchDeleted = matchDeleted;
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(after, before, matchDeleted);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof SearchQuery) {
+			SearchQuery that = (SearchQuery) object;
+				return Objects.equal(this.after, that.after)
+				&& Objects.equal(this.before, that.before)
+				&& Objects.equal(this.matchDeleted, that.matchDeleted);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("after", after)
+			.add("before", before)
+			.add("matchDeleted", matchDeleted)
+			.toString();
 	}
 }
