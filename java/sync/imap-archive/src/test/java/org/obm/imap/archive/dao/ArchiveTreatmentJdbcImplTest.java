@@ -292,6 +292,112 @@ public class ArchiveTreatmentJdbcImplTest {
 	}
 	
 	@Test
+	public void findLastTerminatedShouldReturnEmptyWhenNone() throws Exception {
+		assertThat(testee.findLastTerminated(domainUuid, 3)).isEmpty();
+	}
+
+	@Test
+	public void findLastTerminatedShouldReturnOnlyDomainEntries() throws Exception {
+		ArchiveTerminatedTreatment otherDomain = ArchiveTerminatedTreatment
+				.forDomain(ObmDomainUuid.of("254933bc-fad8-488e-98cd-f302c2a22fb3"))
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-07-06T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		ArchiveTerminatedTreatment expectedDomain = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-07-06T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		testee.insert(otherDomain);
+		testee.insert(expectedDomain);
+		
+		assertThat(testee.findLastTerminated(domainUuid, 2)).containsOnly(expectedDomain);
+	}
+	
+	@Test
+	public void findLastTerminatedShouldReturnOnlyTerminatedTreatments() throws Exception {
+		ArchiveScheduledTreatment one = ArchiveScheduledTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.build();
+
+		ArchiveTerminatedTreatment two = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-01T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+		
+		ArchiveRunningTreatment three = ArchiveRunningTreatment
+				.forDomain(domainUuid)
+				.runId("31534c25-2012-45d7-9808-586a488e6c8b")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-01-01T00:03:00Z"))
+				.build();
+
+		testee.insert(one);
+		testee.insert(two);
+		testee.insert(three);
+		
+		assertThat(testee.findLastTerminated(domainUuid, 3)).containsOnly(two);
+	}
+	
+	@Test
+	public void findLastTerminatedShouldReturnMoreRecentSortedByScheduleTime() throws Exception {
+		ArchiveTerminatedTreatment one = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		ArchiveTerminatedTreatment two = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-01T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+		
+		ArchiveTerminatedTreatment three = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("31534c25-2012-45d7-9808-586a488e6c8b")
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.ERROR)
+				.build();
+
+		testee.insert(one);
+		testee.insert(two);
+		testee.insert(three);
+		
+		assertThat(testee.findLastTerminated(domainUuid, 3)).containsOnly(one, three, two);
+	}
+	
+	@Test
 	public void removeShouldDropTreatment() throws Exception {
 		ArchiveScheduledTreatment treatment = ArchiveScheduledTreatment
 				.forDomain(domainUuid)

@@ -54,7 +54,9 @@ public interface ArchiveTreatmentDao {
 	List<ArchiveTreatment> findAllScheduledOrRunning() throws DaoException;
 	
 	List<ArchiveTreatment> findByScheduledTime(ObmDomainUuid domain, int limit) throws DaoException;
+	
+	List<ArchiveTreatment> findLastTerminated(ObmDomainUuid domain, int max) throws DaoException;
 
 	Optional<ArchiveTreatment> find(ArchiveTreatmentRunId runId) throws DaoException;
-	
+
 }

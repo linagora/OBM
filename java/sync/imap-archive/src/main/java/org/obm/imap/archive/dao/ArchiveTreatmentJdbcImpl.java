@@ -162,12 +162,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 					.orderBy(Fields.SCHEDULE, ASC)
 					.prepareStatement(connection)) {
 
-			ImmutableList.Builder<ArchiveTreatment> list = ImmutableList.builder();
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				list.add(treatmentFromResultSet(rs));
-			}
-			return list.build();
+			return toList(ps.executeQuery());
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		}
@@ -184,15 +179,35 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 							.orderBy(Fields.SCHEDULE, DESC)
 							.prepareStatement(connection)) {
 
-			ImmutableList.Builder<ArchiveTreatment> list = ImmutableList.builder();
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				list.add(treatmentFromResultSet(rs));
-			}
-			return list.build();
+			return toList(ps.executeQuery());
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		}
+	}
+
+	@Override
+	public List<ArchiveTreatment> findLastTerminated(ObmDomainUuid domain, int max) throws DaoException {
+		try (Connection connection = dbcp.getConnection();
+				PreparedStatement ps = 
+						selectArchiveTreatment()
+							.where(domain)
+							.where(ArchiveStatus.SUCCESS, ArchiveStatus.ERROR)
+							.limit(max)
+							.orderBy(Fields.SCHEDULE, DESC)
+							.prepareStatement(connection)) {
+
+			return toList(ps.executeQuery());
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		}
+	}
+
+	private List<ArchiveTreatment> toList(ResultSet rs) throws SQLException {
+		ImmutableList.Builder<ArchiveTreatment> list = ImmutableList.builder();
+		while (rs.next()) {
+			list.add(treatmentFromResultSet(rs));
+		}
+		return list.build();
 	}
 
 	@Override
