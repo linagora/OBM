@@ -48,7 +48,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class LoggerFactory {
 	
-	public final static String CHUNK_APPENDER_PREFIX = "Chunk";
+	public static final String CHUNK_APPENDER_PREFIX = "Chunk";
+	private static final Level DEFAULT_LOG_LEVEL = Level.INFO;
 	private final LoggerFileNameService loggerFileNameService;
 	
 	@Inject
@@ -61,9 +62,17 @@ public class LoggerFactory {
 		
 		logger.addAppender(fileAppender(runId));
 		logger.addAppender(chunkedOutputAppender(runId));
-		logger.setLevel(Level.INFO);
+		logger.setLevel(getLevel());
 		
 		return logger;
+	}
+	
+	private Level getLevel() {
+		Level level = ((Logger) org.slf4j.LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME)).getLevel();
+		if (level.isGreaterOrEqual(DEFAULT_LOG_LEVEL)) {
+			return DEFAULT_LOG_LEVEL;
+		}
+		return level;
 	}
 
 	@VisibleForTesting FileAppender<ILoggingEvent> fileAppender(ArchiveTreatmentRunId runId) {

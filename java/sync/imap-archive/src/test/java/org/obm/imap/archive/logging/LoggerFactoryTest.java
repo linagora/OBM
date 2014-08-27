@@ -34,6 +34,7 @@ package org.obm.imap.archive.logging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -49,7 +50,14 @@ import ch.qos.logback.core.FileAppender;
 public class LoggerFactoryTest {
 
 	@Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
+	private Logger rootLogger;
 
+	@Before
+	public void setup() {
+		rootLogger = (Logger) org.slf4j.LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+		rootLogger.setLevel(Level.INFO);
+	}
+	
 	@Test
 	public void loggerShouldHaveAFileAppender() {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("c336b597-fc9a-40f1-bda0-23179a9e67a1");
@@ -71,11 +79,21 @@ public class LoggerFactoryTest {
 	}
 	
 	@Test
-	public void LogLevelShouldBeInfo() {
+	public void LogLevelShouldBeAtLeastInfo() {
+		rootLogger.setLevel(Level.ERROR);
 		Logger logger = new LoggerFactory(new TemporaryLoggerFileNameService(temporaryFolder))
 			.create(ArchiveTreatmentRunId.from("c336b597-fc9a-40f1-bda0-23179a9e67a1"));
 		
 		assertThat(logger.getLevel()).isEqualTo(Level.INFO);
+	}
+	
+	@Test
+	public void LogLevelShouldBeTheSameAsRootLogger() {
+		rootLogger.setLevel(Level.TRACE);
+		Logger logger = new LoggerFactory(new TemporaryLoggerFileNameService(temporaryFolder))
+			.create(ArchiveTreatmentRunId.from("c336b597-fc9a-40f1-bda0-23179a9e67a1"));
+		
+		assertThat(logger.getLevel()).isEqualTo(Level.TRACE);
 	}
 	
 	@Test
