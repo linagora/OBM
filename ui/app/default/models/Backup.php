@@ -91,17 +91,26 @@ class Backup {
    * @access public
    */
   public function doBackup($options = array()) {
+    global $obm;
     $dataFunc = $this->details['entity'].'Data';
     $data = array(
       'report' => true,
       'sendMail' => true,
       'email' => array()
     );
+
+    $domain_id = $this->details['realm_id'];
+
+    $remember_domain_id = $obm['domain_id'];
+    $obm['domain_id'] = $domain_id;
     $data = array_merge($this->$dataFunc(),$data,$options);
     try {
       $query = new OBM_Satellite_BackupEntity(Backup::$auth, $this->details, $data);
-      return $query->execute();
+      $result = $query->execute();
+      $obm['domain_id'] = $remember_domain_id;
+      return $result;
     } catch (Exception $e) {
+      $obm['domain_id'] = $remember_domain_id;
       throw new Exception($GLOBALS['l_err_cant_backup'].' ('.$e->getMessage().')');
     }
   }
