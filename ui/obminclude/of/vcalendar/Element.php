@@ -47,6 +47,8 @@ class Vcalendar_Element {
 
   var $name;
 
+  var $valarm = array();
+  
   var $children = array();
 
   public $private = true;
@@ -136,6 +138,9 @@ class Vcalendar_Element {
     } else {
       $this->$name = $value;
     }
+  }
+  function setVAlarm($value) {
+  	$this->valarm[] = $value;
   }
 
   /**

@@ -275,7 +275,7 @@ class Vcalendar_Reader_OBM {
     }
     if(!empty($this->valarms[$data['event_id']])) {
       foreach($this->valarms[$data['event_id']] as $valarm) {
-        $vevent->set('valarm', $valarm);
+        $vevent->setVAlarm($valarm);
       }
     }
     $vevent->set('uid', $data['event_ext_id']);

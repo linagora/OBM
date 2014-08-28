@@ -385,14 +385,14 @@ class Vcalendar_Writer_ICS {
   }
 
   function writeVAlarm($name, $values) {
-    $this->buffer .= "BEGIN:VALARM\r\n";
-    foreach($values as $name=>$value ) {
-      $property  = $this->parseProperty(
-                    $this->parseName($name).':'.$value."\r\n"
-                  )."\r\n";
-      $this->buffer .= $property;
+    foreach ( $values as $valarm ) {
+      $this->buffer .= "BEGIN:VALARM\r\n";
+      foreach ( $valarm as $name => $value ) {
+        $property = $this->parseProperty ( $this->parseName ( $name ) . ':' . $value . "\r\n" ) . "\r\n";
+        $this->buffer .= $property;
+      }
+      $this->buffer .= "END:VALARM\r\n";
     }
-    $this->buffer .= "END:VALARM\r\n";
   }
 }
 ?>
