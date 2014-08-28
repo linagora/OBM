@@ -52,6 +52,7 @@ import org.obm.imap.archive.beans.ArchiveScheduledTreatment;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTerminatedTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.dao.SqlTables.MailArchiveRun;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
 import pl.wkr.fluentrule.api.FluentExpectedException;
@@ -83,7 +84,7 @@ public class ArchiveTreatmentJdbcImplTest {
 	@Before
 	public void setUp() {
 		domainUuid = ObmDomainUuid.of("633bdb12-bb8a-4943-9dd0-6a6e48051517");
-		Operation operation = Operations.deleteAllFrom(ArchiveTreatmentJdbcImpl.TABLE.NAME);
+		Operation operation = Operations.deleteAllFrom(MailArchiveRun.NAME);
 		new DbSetup(H2Destination.from(db), operation).launch();
 	}	
 
@@ -253,7 +254,7 @@ public class ArchiveTreatmentJdbcImplTest {
 		testee.insert(two);
 		testee.insert(three);
 		
-		assertThat(testee.findByScheduledTime(domainUuid, 2)).containsOnlyOnce(two, three);
+		assertThat(testee.findByScheduledTime(domainUuid, 2)).containsOnlyOnce(one, three);
 	}
 	
 	@Test

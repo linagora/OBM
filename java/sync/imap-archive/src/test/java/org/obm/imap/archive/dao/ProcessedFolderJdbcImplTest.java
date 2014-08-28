@@ -50,6 +50,7 @@ import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.ImapFolder;
 import org.obm.imap.archive.beans.ProcessedFolder;
+import org.obm.imap.archive.dao.SqlTables.MailArchiveRun;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
 import pl.wkr.fluentrule.api.FluentExpectedException;
@@ -98,15 +99,15 @@ public class ProcessedFolderJdbcImplTest {
 							.columns(ImapFolderJdbcImpl.TABLE.FIELDS.FOLDER)
 							.values("user/usera/Test@mydomain.org")
 							.build(),
-						Operations.deleteAllFrom(ArchiveTreatmentJdbcImpl.TABLE.NAME),
-						Operations.insertInto(ArchiveTreatmentJdbcImpl.TABLE.NAME)
-						.columns(ArchiveTreatmentJdbcImpl.TABLE.FIELDS.UUID,
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.DOMAIN_UUID,
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.STATUS, 
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.SCHEDULE,
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.START, 
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.END, 
-								ArchiveTreatmentJdbcImpl.TABLE.FIELDS.HIGHER_BOUNDARY)
+						Operations.deleteAllFrom(MailArchiveRun.NAME),
+						Operations.insertInto(MailArchiveRun.NAME)
+						.columns(MailArchiveRun.Fields.UUID,
+								MailArchiveRun.Fields.DOMAIN_UUID,
+								MailArchiveRun.Fields.STATUS, 
+								MailArchiveRun.Fields.SCHEDULE,
+								MailArchiveRun.Fields.START, 
+								MailArchiveRun.Fields.END, 
+								MailArchiveRun.Fields.HIGHER_BOUNDARY)
 						.values("c3c5cb24-f5df-45ed-8918-99c7555a02c4",
 								"633bdb12-bb8a-4943-9dd0-6a6e48051517", 
 								ArchiveStatus.SCHEDULED, 

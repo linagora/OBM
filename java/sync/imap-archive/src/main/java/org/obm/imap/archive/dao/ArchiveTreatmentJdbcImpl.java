@@ -29,6 +29,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.dao;
 
+import static org.obm.imap.archive.dao.SelectArchiveTreatmentQueryBuilder.Ordering.ASC;
+import static org.obm.imap.archive.dao.SelectArchiveTreatmentQueryBuilder.Ordering.DESC;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,8 +45,9 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl.TABLE.FIELDS;
-import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl.TABLE.TYPES;
+import org.obm.imap.archive.dao.SqlTables.MailArchiveRun;
+import org.obm.imap.archive.dao.SqlTables.MailArchiveRun.Fields;
+import org.obm.imap.archive.dao.SqlTables.MailArchiveRun.Types;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.utils.ObmHelper;
@@ -64,50 +68,24 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 	private final DatabaseConnectionProvider dbcp;
 	private final ObmHelper obmHelper;
 	
-	interface TABLE {
-		
-		String NAME = "mail_archive_run";
-
-		interface TYPES {
-			String STATUS = "mail_archive_status";
-		}
-		
-		interface FIELDS {
-			String UUID = "mail_archive_run_uuid";
-			String DOMAIN_UUID = "mail_archive_run_domain_uuid";
-			String STATUS = "mail_archive_run_status";
-			String SCHEDULE = "mail_archive_run_schedule";
-			String START = "mail_archive_run_start";
-			String END = "mail_archive_run_end";
-			String HIGHER_BOUNDARY = "mail_archive_run_higher_boundary";
-			
-			String ALL = Joiner.on(", ").join(UUID, DOMAIN_UUID, STATUS, SCHEDULE, START, END, HIGHER_BOUNDARY);
-		}
-	}
-	
 	interface REQUESTS {
 		
+		String ALL = Joiner.on(", ").join(Fields.ALL);
+		
 		String INSERT = String.format(
-				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
+				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?)", MailArchiveRun.NAME, ALL);
 
 		String UPDATE = String.format(
-				"UPDATE %s SET (%s) = (?, ?, ?, ?, ?, ?, ?) WHERE %s = ?", TABLE.NAME, FIELDS.ALL, FIELDS.UUID);
+				"UPDATE %s SET (%s) = (?, ?, ?, ?, ?, ?, ?) WHERE %s = ?", MailArchiveRun.NAME, ALL, Fields.UUID);
 		
 		String REMOVE = String.format(
-				"DELETE FROM %s WHERE %s = ?", TABLE.NAME, FIELDS.UUID);
+				"DELETE FROM %s WHERE %s = ?", MailArchiveRun.NAME, Fields.UUID);
 
-		String SELECT_SCHEDULED_OR_RUNNING = String.format(
-				"SELECT %s FROM %s WHERE %s IN('%s', '%s') ORDER BY %s ASC", 
-				FIELDS.ALL, TABLE.NAME, FIELDS.STATUS, ArchiveStatus.SCHEDULED, ArchiveStatus.RUNNING, FIELDS.SCHEDULE);
 		
-		String SELECT_LAST = String.format(
-				"SELECT %s FROM %s WHERE %s = ? ORDER BY %s ASC LIMIT ?", 
-				FIELDS.ALL, TABLE.NAME, FIELDS.DOMAIN_UUID, FIELDS.SCHEDULE);
-		
-		String SELECT_BY_RUN_ID = String.format(
-				"SELECT %s FROM %s WHERE %s = ?", 
-				FIELDS.ALL, TABLE.NAME, FIELDS.UUID);
-		
+	}
+	
+	private SelectArchiveTreatmentQueryBuilder selectArchiveTreatment() {
+		return new SelectArchiveTreatmentQueryBuilder(obmHelper);
 	}
 	
 	@Inject
@@ -124,7 +102,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 			int idx = 1;
 			ps.setString(idx++, treatment.getRunId().serialize());
 			ps.setString(idx++, treatment.getDomainUuid().get());
-			ps.setObject(idx++, obmHelper.getDBCP().getJdbcObject(TYPES.STATUS, treatment.getArchiveStatus().asSpecificationValue()));
+			ps.setObject(idx++, obmHelper.getDBCP().getJdbcObject(Types.STATUS, treatment.getArchiveStatus().asSpecificationValue()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getScheduledTime()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getStartTime()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getEndTime()));
@@ -144,7 +122,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 			int idx = 1;
 			ps.setString(idx++, treatment.getRunId().serialize());
 			ps.setString(idx++, treatment.getDomainUuid().get());
-			ps.setObject(idx++, obmHelper.getDBCP().getJdbcObject(TYPES.STATUS, treatment.getArchiveStatus().asSpecificationValue()));
+			ps.setObject(idx++, obmHelper.getDBCP().getJdbcObject(Types.STATUS, treatment.getArchiveStatus().asSpecificationValue()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getScheduledTime()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getStartTime()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getEndTime()));
@@ -179,7 +157,10 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 	@Override
 	public List<ArchiveTreatment> findAllScheduledOrRunning() throws DaoException {
 		try (Connection connection = dbcp.getConnection();
-				PreparedStatement ps = connection.prepareStatement(REQUESTS.SELECT_SCHEDULED_OR_RUNNING)) {
+				PreparedStatement ps = selectArchiveTreatment()
+					.where(ArchiveStatus.SCHEDULED, ArchiveStatus.RUNNING)
+					.orderBy(Fields.SCHEDULE, ASC)
+					.prepareStatement(connection)) {
 
 			ImmutableList.Builder<ArchiveTreatment> list = ImmutableList.builder();
 			ResultSet rs = ps.executeQuery();
@@ -196,11 +177,13 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 	public List<ArchiveTreatment> findByScheduledTime(ObmDomainUuid domain, int limit) throws DaoException {
 		Preconditions.checkArgument(limit > 0);
 		try (Connection connection = dbcp.getConnection();
-				PreparedStatement ps = connection.prepareStatement(REQUESTS.SELECT_LAST)) {
+				PreparedStatement ps = 
+						selectArchiveTreatment()
+							.where(domain)
+							.limit(limit)
+							.orderBy(Fields.SCHEDULE, DESC)
+							.prepareStatement(connection)) {
 
-			ps.setString(1, domain.get());
-			ps.setInt(2, limit);
-			
 			ImmutableList.Builder<ArchiveTreatment> list = ImmutableList.builder();
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
@@ -216,9 +199,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 	public Optional<ArchiveTreatment> find(ArchiveTreatmentRunId runId) throws DaoException {
 		Preconditions.checkNotNull(runId);
 		try (Connection connection = dbcp.getConnection();
-				PreparedStatement ps = connection.prepareStatement(REQUESTS.SELECT_BY_RUN_ID)) {
-
-			ps.setString(1, runId.serialize());
+				PreparedStatement ps = selectArchiveTreatment().where(runId).prepareStatement(connection)) {
 
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
@@ -231,13 +212,13 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 	}
 
 	private ArchiveTreatment treatmentFromResultSet(ResultSet rs) throws SQLException {
-		ObmDomainUuid domain = ObmDomainUuid.of(rs.getString(FIELDS.DOMAIN_UUID));
-		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(rs.getString(FIELDS.UUID));
-		ArchiveStatus status = ArchiveStatus.fromSpecificationValue(rs.getString(FIELDS.STATUS));
-		DateTime scheduleTime = JDBCUtils.getDateTime(rs, FIELDS.SCHEDULE, DateTimeZone.UTC);
-		DateTime startTime = JDBCUtils.getDateTime(rs, FIELDS.START, DateTimeZone.UTC);
-		DateTime endTime = JDBCUtils.getDateTime(rs, FIELDS.END, DateTimeZone.UTC);
-		DateTime higherBoundary = JDBCUtils.getDateTime(rs, FIELDS.HIGHER_BOUNDARY, DateTimeZone.UTC);
+		ObmDomainUuid domain = ObmDomainUuid.of(rs.getString(Fields.DOMAIN_UUID));
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(rs.getString(Fields.UUID));
+		ArchiveStatus status = ArchiveStatus.fromSpecificationValue(rs.getString(Fields.STATUS));
+		DateTime scheduleTime = JDBCUtils.getDateTime(rs, Fields.SCHEDULE, DateTimeZone.UTC);
+		DateTime startTime = JDBCUtils.getDateTime(rs, Fields.START, DateTimeZone.UTC);
+		DateTime endTime = JDBCUtils.getDateTime(rs, Fields.END, DateTimeZone.UTC);
+		DateTime higherBoundary = JDBCUtils.getDateTime(rs, Fields.HIGHER_BOUNDARY, DateTimeZone.UTC);
 		
 		return ArchiveTreatment
 				.builder(domain)
