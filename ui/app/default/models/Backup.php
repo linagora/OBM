@@ -259,7 +259,7 @@ class Backup {
     //contacts data to restore
     if (is_array($data['privateContact'])) {
       if (empty($method) || $method=='all' || $method=='contact')
-        $this->user_contacts_import($data['privateContact'], $this->details['id']);
+        $this->user_contacts_import($data['privateContact'], $this->details['id'], $domain_id);
     }
   }
 
@@ -388,12 +388,14 @@ class Backup {
   /**
    * Perform the import of the contacts
    */
-  function user_contacts_import($vcf_contacts,$user_id) {
+  function user_contacts_import($vcf_contacts, $user_id, $domain_id) {
     include_once('php/contact/addressbook.php');
     include_once('php/contact/contact_query.inc');
 
     $remember_uid = $GLOBALS['obm']['uid'];
+    $remember_domain_id = $GLOBALS['obm']['domain_id'];
     $GLOBALS['obm']['uid'] = $user_id; // some kind of sudo $user_id
+    $GLOBALS['obm']['domain_id'] = $domain_id;
 
     $addressbooks = OBM_AddressBook::searchOwnAddressBooks($user_id);
     $addressBookByName = array();
@@ -420,6 +422,7 @@ class Backup {
     }
 
     $GLOBALS['obm']['uid'] = $remember_uid;
+    $GLOBALS['obm']['domain_id'] = $remember_domain_id;
   }
 
 }
