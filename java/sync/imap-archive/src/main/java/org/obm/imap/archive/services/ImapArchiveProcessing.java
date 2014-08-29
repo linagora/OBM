@@ -118,7 +118,7 @@ public class ImapArchiveProcessing {
 			}
 			
 			ObmDomain domain = optionalDomain.get();
-			logger.info("Starting IMAP Archive for domain {}", domain.getName());
+			logger.info("Starting IMAP Archive in {} for domain {}", archiveDomainTask.getArchiveTreatmentKind(), domain.getName());
 
 			DomainConfiguration domainConfiguration = getConfiguration(domain);
 			Optional<ArchiveTreatment> previousArchiveTreatment = previousArchiveTreatment(domain.getUuid());

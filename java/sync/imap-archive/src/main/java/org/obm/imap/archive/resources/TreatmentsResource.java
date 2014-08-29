@@ -46,6 +46,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.joda.time.DateTime;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingDates;
@@ -57,6 +58,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.linagora.scheduling.DateTimeProvider;
 
@@ -94,9 +96,10 @@ public class TreatmentsResource {
 	}
 	
 	@POST
-	public Response startArchiving() {
+	public Response startArchiving(@QueryParam("archive_treatment_kind") ArchiveTreatmentKind archiveTreatmentKind) {
 		try {
-			ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain.getUuid(), dateTimeProvider.now());
+			ArchiveTreatmentKind actualTreatmentKind = Objects.firstNonNull(archiveTreatmentKind, ArchiveTreatmentKind.REAL_RUN);
+			ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain.getUuid(), dateTimeProvider.now(), actualTreatmentKind);
 			return Response.ok(runId).build();
 		} catch (DaoException e) {
 			logger.error("Cannot schedule an archiving", e);

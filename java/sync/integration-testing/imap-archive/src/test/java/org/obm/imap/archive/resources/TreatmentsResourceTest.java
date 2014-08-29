@@ -56,6 +56,7 @@ import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
@@ -209,7 +210,8 @@ public class TreatmentsResourceTest {
 			.port(server.getHttpPort())
 			.queryParam("login", "admin")
 			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org").
+			.queryParam("domain_name", "mydomain.org")
+			.queryParam("archive_treatment_kind", ArchiveTreatmentKind.REAL_RUN).
 		expect()
 			.contentType(ContentType.JSON)
 			.body("runId", equalTo(expectedRunId.toString()))
@@ -237,6 +239,89 @@ public class TreatmentsResourceTest {
 	}
 	
 	@Test
+	public void startArchivingShouldProcessARealRunWhenMissingArchiveTreatmentKind() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		expectations
+			.expectTrustedLogin(domainId)
+			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId)
+			.expectGetDomain(domainId);
+		
+		insertDomainConfiguration();
+		
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		
+		control.replay();
+		server.start();
+		
+		UUID expectedRunId = TestImapArchiveModules.uuid;
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org").
+		expect()
+			.contentType(ContentType.JSON)
+			.body("runId", equalTo(expectedRunId.toString()))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org")
+			.queryParam("run_id", expectedRunId.toString())
+			.contentType(ContentType.JSON).
+		expect()
+			.body(containsString("Starting IMAP Archive in REAL_RUN for domain mydomain")).
+		when()
+			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/logs");
+	}
+	
+	@Test
+	public void startArchivingShouldProcessADryRunWhenArchiveTreatmentKindIsDry() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		expectations
+			.expectTrustedLogin(domainId)
+			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId)
+			.expectGetDomain(domainId);
+		
+		insertDomainConfiguration();
+		
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		
+		control.replay();
+		server.start();
+		
+		UUID expectedRunId = TestImapArchiveModules.uuid;
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org")
+			.queryParam("archive_treatment_kind", ArchiveTreatmentKind.DRY_RUN).
+		expect()
+			.contentType(ContentType.JSON)
+			.body("runId", equalTo(expectedRunId.toString()))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+		given()
+			.port(server.getHttpPort())
+			.queryParam("login", "admin")
+			.queryParam("password", "trust3dToken")
+			.queryParam("domain_name", "mydomain.org")
+			.queryParam("run_id", expectedRunId.toString())
+			.contentType(ContentType.JSON).
+		expect()
+			.body(containsString("Starting IMAP Archive in DRY_RUN for domain mydomain")).
+		when()
+			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/logs");
+	}
+	
+	@Test
 	public void startArchivingTwiceShouldStackSchedules() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
 		expectations
@@ -258,7 +343,8 @@ public class TreatmentsResourceTest {
 			.port(server.getHttpPort())
 			.queryParam("login", "admin")
 			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org").
+			.queryParam("domain_name", "mydomain.org")
+			.queryParam("archive_treatment_kind", ArchiveTreatmentKind.REAL_RUN).
 		expect()
 			.contentType(ContentType.JSON)
 			.body("runId", equalTo(expectedRunId.toString()))
@@ -270,7 +356,8 @@ public class TreatmentsResourceTest {
 			.port(server.getHttpPort())
 			.queryParam("login", "admin")
 			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org").
+			.queryParam("domain_name", "mydomain.org")
+			.queryParam("archive_treatment_kind", ArchiveTreatmentKind.REAL_RUN).
 		expect()
 			.contentType(ContentType.JSON)
 			.body("runId", equalTo(expectedRunId2.toString()))

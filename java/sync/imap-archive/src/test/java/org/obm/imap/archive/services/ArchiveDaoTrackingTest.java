@@ -44,6 +44,7 @@ import org.obm.imap.archive.beans.ArchiveScheduledTreatment;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTerminatedTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatment;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
@@ -114,6 +115,7 @@ public class ArchiveDaoTrackingTest {
 		logger.info("Insert a task as {} for domain {}, scheduled at {} with id {}", 
 				ArchiveStatus.SCHEDULED, domain.get(), scheduledTime, runId);
 		expectLastCall();
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.REAL_RUN);
 		
 		expect(dao.find(runId)).andReturn(Optional.<ArchiveTreatment>absent());
 		dao.insert(ArchiveScheduledTreatment
@@ -136,6 +138,7 @@ public class ArchiveDaoTrackingTest {
 		logger.info("Update a task as {} for domain {}, scheduled at {} with id {}", 
 				State.WAITING, domain.get(), scheduledTime, runId);
 		expectLastCall();
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.REAL_RUN);
 
 		expect(dao.find(runId)).andReturn(Optional.<ArchiveTreatment>of(
 				ArchiveScheduledTreatment
@@ -166,6 +169,7 @@ public class ArchiveDaoTrackingTest {
 		logger.info("Update a task as {} for domain {}, scheduled at {} with id {}", 
 				State.RUNNING, domain.get(), scheduledTime, runId);
 		expectLastCall();
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.REAL_RUN);
 
 		expect(dao.find(runId)).andReturn(Optional.<ArchiveTreatment>of(
 				ArchiveScheduledTreatment
@@ -191,6 +195,7 @@ public class ArchiveDaoTrackingTest {
 	
 	@Test
 	public void eventShouldLogErrorWhenTaskStateIsRunningButNotFound() throws DaoException {
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.REAL_RUN);
 		expect(dao.find(runId)).andReturn(Optional.<ArchiveTreatment>absent());
 		
 		logger.error("Only task with status {} can be created, received {}", State.WAITING, State.RUNNING);
@@ -209,6 +214,7 @@ public class ArchiveDaoTrackingTest {
 		logger.info("Update a task as {} for domain {}, scheduled at {} with id {}", 
 				State.FAILED, domain.get(), scheduledTime, runId);
 		expectLastCall();
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.REAL_RUN);
 
 		expect(dao.find(runId)).andReturn(Optional.<ArchiveTreatment>of(
 				ArchiveRunningTreatment
@@ -243,6 +249,7 @@ public class ArchiveDaoTrackingTest {
 		logger.info("Update a task as {} for domain {}, scheduled at {} with id {}", 
 				State.TERMINATED, domain.get(), scheduledTime, runId);
 		expectLastCall();
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.REAL_RUN);
 
 		expect(dao.find(runId)).andReturn(Optional.<ArchiveTreatment>of(
 				ArchiveRunningTreatment
@@ -271,6 +278,7 @@ public class ArchiveDaoTrackingTest {
 	
 	@Test
 	public void eventShouldLogErrorWhenTaskStateIsCanceledAndNotFound() throws DaoException {
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.REAL_RUN);
 		expect(dao.find(runId)).andReturn(Optional.<ArchiveTreatment>absent());
 		
 		logger.error("Only task with status {} can be created, received {}", State.WAITING, State.CANCELED);
@@ -283,6 +291,7 @@ public class ArchiveDaoTrackingTest {
 	
 	@Test
 	public void eventShouldRemoveWhenTaskStateIsCanceled() throws Exception {
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.REAL_RUN);
 		expect(dao.find(runId)).andReturn(Optional.<ArchiveTreatment>of(
 				ArchiveRunningTreatment
 				.forDomain(domain)
@@ -305,6 +314,7 @@ public class ArchiveDaoTrackingTest {
 	
 	@Test
 	public void eventShouldLogWhenInsertFails() throws Exception {
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.REAL_RUN);
 		expect(dao.find(runId)).andReturn(Optional.<ArchiveTreatment>absent());
 		logger.info("Insert a task as {} for domain {}, scheduled at {} with id {}", 
 				ArchiveStatus.SCHEDULED, domain.get(), scheduledTime, runId);
@@ -333,6 +343,7 @@ public class ArchiveDaoTrackingTest {
 		logger.info("Update a task as {} for domain {}, scheduled at {} with id {}", 
 				State.TERMINATED, domain.get(), scheduledTime, runId);
 		expectLastCall();
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.REAL_RUN);
 
 		expect(dao.find(runId)).andReturn(Optional.<ArchiveTreatment>of(
 				ArchiveRunningTreatment
@@ -365,6 +376,7 @@ public class ArchiveDaoTrackingTest {
 	
 	@Test
 	public void eventShouldLogWhenRemoveFails() throws Exception {
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.REAL_RUN);
 		expect(dao.find(runId)).andReturn(Optional.<ArchiveTreatment>of(
 				ArchiveRunningTreatment
 				.forDomain(domain)
@@ -386,4 +398,12 @@ public class ArchiveDaoTrackingTest {
 		mocks.verify();
 	}
 	
+	@Test
+	public void eventShouldNotPersistWhenNotARealRunTreatment() {
+		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.DRY_RUN);
+		
+		mocks.replay();
+		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.CANCELED, task, scheduler, scheduledTime)));
+		mocks.verify();
+	}
 }

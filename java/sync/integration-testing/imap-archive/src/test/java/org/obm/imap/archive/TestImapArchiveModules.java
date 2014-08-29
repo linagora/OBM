@@ -60,6 +60,7 @@ import org.obm.sync.date.DateProvider;
 import org.obm.sync.locators.Locator;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -305,6 +306,7 @@ public class TestImapArchiveModules {
 	public static class TemporaryLoggerFileNameService implements LoggerFileNameService {
 
 		private final Provider<TemporaryFolder> temporaryFolderProvider;
+		private String loggerFileName;
 
 		public TemporaryLoggerFileNameService(Provider<TemporaryFolder> temporaryFolderProvider) {
 			this.temporaryFolderProvider = temporaryFolderProvider;
@@ -312,10 +314,15 @@ public class TestImapArchiveModules {
 		
 		@Override
 		public String loggerFileName(ArchiveTreatmentRunId runId) {
+			if (!Strings.isNullOrEmpty(loggerFileName)) {
+				return loggerFileName;
+			}
+			
 			try {
 				TemporaryFolder temporaryFolder = temporaryFolderProvider.get();
 				temporaryFolder.create();
-				return temporaryFolder.getRoot().getAbsolutePath() + "/" + runId.serialize() + ".log";
+				loggerFileName = temporaryFolder.getRoot().getAbsolutePath() + "/" + runId.serialize() + ".log";
+				return loggerFileName;
 			} catch (IOException e) {
 				Throwables.propagate(e);
 				return null;

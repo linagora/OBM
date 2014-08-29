@@ -406,7 +406,7 @@ function dis_imap_archive_consult($params, $configuration) {
       </table>
     </div>
     <div class='buttons'>
-      <a href='$path/imap_archive/imap_archive_index.php?action=manual_launch' target='_blank' onclick='return confirm_launch();'>
+      <a href='$path/imap_archive/imap_archive_index.php?action=manual_launch&archive_treatment_kind=DRY_RUN' target='_blank' onclick='return confirm_launch();'>
       $l_manual_launch 
       </a>
     </div>

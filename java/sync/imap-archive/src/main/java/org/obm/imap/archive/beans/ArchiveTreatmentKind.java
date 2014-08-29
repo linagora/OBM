@@ -30,27 +30,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.scheduling;
+package org.obm.imap.archive.beans;
 
-import org.obm.imap.archive.beans.ArchiveTreatmentKind;
-import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.logging.LoggerAppenders;
 
-import ch.qos.logback.classic.Logger;
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
-
-public class TestArchiveDomainTaskFactory extends ArchiveDomainTask.FactoryImpl {
-
-	private Logger logger;
-	private LoggerAppenders loggerAppenders;
-
-	public TestArchiveDomainTaskFactory(Logger logger, LoggerAppenders loggerAppenders) {
-		super(null, null);
-		this.logger = logger;
-		this.loggerAppenders = loggerAppenders;
-	}
-
-	public ArchiveDomainTask create(ObmDomainUuid domain, ArchiveTreatmentRunId runId) {
-		return new ArchiveDomainTask(null, domain, null, null, runId, logger, loggerAppenders, ArchiveTreatmentKind.REAL_RUN);
-	}
+public enum ArchiveTreatmentKind {
+	REAL_RUN, DRY_RUN;
 }

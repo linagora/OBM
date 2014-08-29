@@ -37,6 +37,7 @@ import org.obm.ElementNotFoundException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
 import org.obm.imap.archive.beans.ArchiveTreatment;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask.Factory;
@@ -105,7 +106,8 @@ public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 				treatment.getDomainUuid(), 
 				treatment.getScheduledTime(), 
 				treatment.getHigherBoundary(), 
-				treatment.getRunId()));
+				treatment.getRunId(),
+				ArchiveTreatmentKind.REAL_RUN));
 	}
 
 	private void markAsFailed(ArchiveTreatment treatment) throws DaoException, ElementNotFoundException {

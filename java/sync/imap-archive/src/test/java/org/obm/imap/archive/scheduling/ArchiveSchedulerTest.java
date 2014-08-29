@@ -49,6 +49,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.logging.TemporaryLoggerFactory;
@@ -146,7 +147,7 @@ public class ArchiveSchedulerTest {
 		expectLastCall();
 		
 		mocks.replay();
-		RemotelyControlledTask task = archiveTaskFactory.create(domain, when, higherBoundary, runId);
+		RemotelyControlledTask task = archiveTaskFactory.create(domain, when, higherBoundary, runId, ArchiveTreatmentKind.REAL_RUN);
 		testee.schedule(task);
 		assertTaskProgression(task);
 		assertThat(monitor.all()).isEmpty();
@@ -167,10 +168,10 @@ public class ArchiveSchedulerTest {
 		expectLastCall();
 
 		mocks.replay();
-		RemotelyControlledTask task1 = archiveTaskFactory.create(domain, when1, higherBoundary, runId1);
+		RemotelyControlledTask task1 = archiveTaskFactory.create(domain, when1, higherBoundary, runId1, ArchiveTreatmentKind.REAL_RUN);
 		testee.schedule(task1);
 		assertTaskProgression(task1);
-		RemotelyControlledTask task2 = archiveTaskFactory.create(domain, when2, higherBoundary, runId2);
+		RemotelyControlledTask task2 = archiveTaskFactory.create(domain, when2, higherBoundary, runId2, ArchiveTreatmentKind.REAL_RUN);
 		testee.schedule(task2);
 		assertTaskProgression(task2);
 		assertThat(monitor.all()).isEmpty();
@@ -191,9 +192,9 @@ public class ArchiveSchedulerTest {
 		expectLastCall();
 
 		mocks.replay();
-		RemotelyControlledTask task = archiveTaskFactory.create(domain, when, higherBoundary, runId1);
+		RemotelyControlledTask task = archiveTaskFactory.create(domain, when, higherBoundary, runId1, ArchiveTreatmentKind.REAL_RUN);
 		testee.schedule(task);
-		RemotelyControlledTask taskEnqueued = archiveTaskFactory.create(domain, whenToEnqueue, higherBoundary, runId2);
+		RemotelyControlledTask taskEnqueued = archiveTaskFactory.create(domain, whenToEnqueue, higherBoundary, runId2, ArchiveTreatmentKind.REAL_RUN);
 		testee.schedule(taskEnqueued);
 		assertTaskIsScheduled(task);
 		assertTaskIsScheduled(taskEnqueued);
@@ -224,13 +225,13 @@ public class ArchiveSchedulerTest {
 		expectLastCall();
 
 		mocks.replay();
-		RemotelyControlledTask task = archiveTaskFactory.create(domain, when, higherBoundary, runId1);
+		RemotelyControlledTask task = archiveTaskFactory.create(domain, when, higherBoundary, runId1, ArchiveTreatmentKind.REAL_RUN);
 		testee.schedule(task);
 		assertTaskIsScheduled(task);
 		assertTaskIsRunning(task);
 		
-		RemotelyControlledTask laterTaskEnqueuedBefore = archiveTaskFactory.create(domain, laterWhenEnqueuedBefore, higherBoundary, runId2);
-		RemotelyControlledTask earlierTaskEnqueuedAfter = archiveTaskFactory.create(domain, earlierWhenEnqueuedAfter, higherBoundary, runId3);
+		RemotelyControlledTask laterTaskEnqueuedBefore = archiveTaskFactory.create(domain, laterWhenEnqueuedBefore, higherBoundary, runId2, ArchiveTreatmentKind.REAL_RUN);
+		RemotelyControlledTask earlierTaskEnqueuedAfter = archiveTaskFactory.create(domain, earlierWhenEnqueuedAfter, higherBoundary, runId3, ArchiveTreatmentKind.REAL_RUN);
 		testee.schedule(laterTaskEnqueuedBefore);
 		testee.schedule(earlierTaskEnqueuedAfter);
 		assertTaskIsScheduled(laterTaskEnqueuedBefore);
@@ -259,8 +260,8 @@ public class ArchiveSchedulerTest {
 		expectLastCall();
 
 		mocks.replay();
-		RemotelyControlledTask taskDomain1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1);
-		RemotelyControlledTask taskDomain2 = archiveTaskFactory.create(domain2, when2, higherBoundary, runId2);
+		RemotelyControlledTask taskDomain1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1, ArchiveTreatmentKind.REAL_RUN);
+		RemotelyControlledTask taskDomain2 = archiveTaskFactory.create(domain2, when2, higherBoundary, runId2, ArchiveTreatmentKind.REAL_RUN);
 		testee.schedule(taskDomain1);
 		testee.schedule(taskDomain2);
 		assertTaskIsScheduled(taskDomain1);
@@ -297,10 +298,10 @@ public class ArchiveSchedulerTest {
 		expectLastCall();
 		
 		mocks.replay();
-		RemotelyControlledTask taskDomain1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1);
-		RemotelyControlledTask taskDomain2 = archiveTaskFactory.create(domain2, when2, higherBoundary, runId2);
-		RemotelyControlledTask taskDomain1Enqueued = archiveTaskFactory.create(domain1, when1ToEnqueue, higherBoundary, runId3);
-		RemotelyControlledTask taskDomain2Enqueued = archiveTaskFactory.create(domain2, when2ToEnqueue, higherBoundary, runId4);
+		RemotelyControlledTask taskDomain1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1, ArchiveTreatmentKind.REAL_RUN);
+		RemotelyControlledTask taskDomain2 = archiveTaskFactory.create(domain2, when2, higherBoundary, runId2, ArchiveTreatmentKind.REAL_RUN);
+		RemotelyControlledTask taskDomain1Enqueued = archiveTaskFactory.create(domain1, when1ToEnqueue, higherBoundary, runId3, ArchiveTreatmentKind.REAL_RUN);
+		RemotelyControlledTask taskDomain2Enqueued = archiveTaskFactory.create(domain2, when2ToEnqueue, higherBoundary, runId4, ArchiveTreatmentKind.REAL_RUN);
 		testee.schedule(taskDomain1);
 		testee.schedule(taskDomain2);
 		testee.schedule(taskDomain1Enqueued);
@@ -344,9 +345,9 @@ public class ArchiveSchedulerTest {
 		expectLastCall().anyTimes();
 
 		mocks.replay();
-		RemotelyControlledTask runningTask = archiveTaskFactory.create(domain, when1, higherBoundary, runId1);
+		RemotelyControlledTask runningTask = archiveTaskFactory.create(domain, when1, higherBoundary, runId1, ArchiveTreatmentKind.REAL_RUN);
 		ScheduledTask<ArchiveDomainTask> running = testee.schedule(runningTask);
-		RemotelyControlledTask scheduledTask = archiveTaskFactory.create(domain, when2, higherBoundary, runId2);
+		RemotelyControlledTask scheduledTask = archiveTaskFactory.create(domain, when2, higherBoundary, runId2, ArchiveTreatmentKind.REAL_RUN);
 		ScheduledTask<ArchiveDomainTask> scheduled = testee.schedule(scheduledTask);
 		
 		assertTaskIsScheduled(runningTask);
@@ -369,9 +370,9 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
 		mocks.replay();
-		RemotelyControlledTask scheduledTask1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1);
+		RemotelyControlledTask scheduledTask1 = archiveTaskFactory.create(domain1, when1, higherBoundary, runId1, ArchiveTreatmentKind.REAL_RUN);
 		ScheduledTask<ArchiveDomainTask> scheduled1 = testee.schedule(scheduledTask1);
-		RemotelyControlledTask scheduledTask2 = archiveTaskFactory.create(domain2, when2, higherBoundary, runId2);
+		RemotelyControlledTask scheduledTask2 = archiveTaskFactory.create(domain2, when2, higherBoundary, runId2, ArchiveTreatmentKind.REAL_RUN);
 		ScheduledTask<ArchiveDomainTask> scheduled2 = testee.schedule(scheduledTask2);
 		assertTaskIsScheduled(scheduledTask1);
 		assertTaskIsScheduled(scheduledTask2);
@@ -383,7 +384,7 @@ public class ArchiveSchedulerTest {
 	}
 
 	ArchiveDomainTask archiveDomainTask(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DateTime when) {
-		return new ArchiveDomainTask(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders);
+		return new ArchiveDomainTask(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders, ArchiveTreatmentKind.REAL_RUN);
 	}
 
 	void assertTaskProgression(ArchiveDomainTask task) throws Exception {

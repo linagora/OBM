@@ -123,8 +123,6 @@ function curlGet($url, $queryParams = null) {
     $params = array_merge($params, $queryParams);
   }
   $imapArchiveRootPath = imapArchiveRootPath();
-  error_log("imapArchiveRootPath");
-  error_log(print_r($imapArchiveRootPath, true));
   $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($params);
   
   $curl = curl_init($curlUrl);
@@ -187,10 +185,10 @@ function calculate_next_treatment_date_from_imap_archive_service($configuration)
   }
 }
 
-function curlPost($url, $json = "") {
+function curlPost($url, $extraParams = null, $json = "") {
   global $obm;
   
-  $params = requestParams();
+  $params = requestParams($extraParams);
   $imapArchiveRootPath = imapArchiveRootPath();
   $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($params);
   
@@ -289,7 +287,7 @@ function curlPut($url, $json) {
   return curlExec($curl);
 }
 
-function requestParams() {
+function requestParams($extraParams = null) {
   global $obm;
   
   $userInfo = get_user_info($obm['uid']);
@@ -303,6 +301,9 @@ function requestParams() {
     "password" => $password,
     "domain_name" => $domainName,
     "origin" => $origin);
+  if ($extraParams != null) {
+      $params = array_merge($params, $extraParams);
+  }
   if ($userInfo["password_type"] == "MD5SUM") {
       $params = array_merge($params, array("isPasswordHashed" => "true"));
       error_log("Password already hashed, adding 'isPasswordHashed' parameter to the imap-archive call");
@@ -326,7 +327,7 @@ function curlExec($curl) {
 // Parameters:
 //   - none
 ///////////////////////////////////////////////////////////////////////////////
-function manual_launch() {
+function manual_launch($archiveTreatmentKind) {
   global $obm;
   global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
   $userInfo = get_user_info($obm['uid']);
@@ -337,7 +338,7 @@ function manual_launch() {
 
   $manualLaunchPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/treatments";
 
-  $curl = curlPost($manualLaunchPath);
+  $curl = curlPost($manualLaunchPath, array("archive_treatment_kind" => $archiveTreatmentKind));
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];

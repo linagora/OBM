@@ -33,6 +33,7 @@ package org.obm.imap.archive.scheduling;
 
 import org.joda.time.DateTime;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.RepeatKind;
@@ -71,21 +72,21 @@ public class ArchiveSchedulingService {
 	}
 	
 	@Transactional
-	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when) throws DaoException {
+	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when, ArchiveTreatmentKind archiveTreatmentKind) throws DaoException {
 		DomainConfiguration config = domainConfigDao.get(domain);
-		return schedule(domain, when, config.getRepeatKind());
+		return schedule(domain, when, config.getRepeatKind(), archiveTreatmentKind);
 	}
 
 	@Transactional
-	public ArchiveTreatmentRunId schedule(DomainConfiguration domainConfiguration) {
+	public ArchiveTreatmentRunId schedule(DomainConfiguration domainConfiguration, ArchiveTreatmentKind archiveTreatmentKind) {
 		DateTime when = schedulingDatesService.nextTreatmentDate(domainConfiguration.getSchedulingConfiguration());
-		return schedule(domainConfiguration.getDomainId(), when, domainConfiguration.getRepeatKind());
+		return schedule(domainConfiguration.getDomainId(), when, domainConfiguration.getRepeatKind(), archiveTreatmentKind);
 	}
 
-	private ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when, RepeatKind repeatKink) {
+	private ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when, RepeatKind repeatKink, ArchiveTreatmentKind archiveTreatmentKind) {
 		DateTime higherBoundary = schedulingDatesService.higherBoundary(when, repeatKink);
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
-		scheduler.schedule(taskFactory.create(domain, when, higherBoundary, runId));
+		scheduler.schedule(taskFactory.create(domain, when, higherBoundary, runId, archiveTreatmentKind));
 		return runId;
 	}
 }

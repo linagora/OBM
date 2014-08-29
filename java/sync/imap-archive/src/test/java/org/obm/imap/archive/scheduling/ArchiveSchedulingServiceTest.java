@@ -42,6 +42,7 @@ import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
@@ -117,11 +118,11 @@ public class ArchiveSchedulingServiceTest {
 		expect(domainConfigDao.get(domain)).andReturn(config);
 		expect(schedulingDatesService.higherBoundary(when, config.getRepeatKind())).andReturn(higherBoundary);
 		expect(uuidFactory.randomUUID()).andReturn(runUuid);
-		expect(taskFactory.create(domain, when, higherBoundary, runId)).andReturn(task);
+		expect(taskFactory.create(domain, when, higherBoundary, runId, ArchiveTreatmentKind.REAL_RUN)).andReturn(task);
 		expect(scheduler.schedule(task)).andReturn(scheduled);
 		
 		mocks.replay();
-		testee.schedule(domain, when);
+		testee.schedule(domain, when, ArchiveTreatmentKind.REAL_RUN);
 		mocks.verify();
 	}
 
@@ -162,11 +163,11 @@ public class ArchiveSchedulingServiceTest {
 		expect(schedulingDatesService.nextTreatmentDate(config.getSchedulingConfiguration())).andReturn(when);
 		expect(schedulingDatesService.higherBoundary(when, config.getRepeatKind())).andReturn(higherBoundary);
 		expect(uuidFactory.randomUUID()).andReturn(runUuid);
-		expect(taskFactory.create(domain, when, higherBoundary, runId)).andReturn(task);
+		expect(taskFactory.create(domain, when, higherBoundary, runId, ArchiveTreatmentKind.REAL_RUN)).andReturn(task);
 		expect(scheduler.schedule(task)).andReturn(scheduled);
 		
 		mocks.replay();
-		testee.schedule(config);
+		testee.schedule(config, ArchiveTreatmentKind.REAL_RUN);
 		mocks.verify();
 	}
 }

@@ -97,7 +97,8 @@ if ($status[0] != 1) {
     }
     exit();
   } else if ($action == 'manual_launch') {
-    $status = manual_launch();
+    $archiveTreatmentKind = $params['archive_treatment_kind'];
+    $status = manual_launch($archiveTreatmentKind);
     if ($status[0] == 1) {
       $display['msg'] .= display_ok_msg($l_archiving_launched);
       $display['run_id'] = $status[1]->runId;

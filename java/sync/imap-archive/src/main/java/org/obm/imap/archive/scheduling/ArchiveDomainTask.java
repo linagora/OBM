@@ -35,6 +35,7 @@ import java.util.Comparator;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.logging.LoggerFactory;
@@ -65,7 +66,7 @@ public class ArchiveDomainTask implements Task {
 	}
 	
 	public interface Factory {
-		ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId);
+		ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, ArchiveTreatmentKind archiveTreatmentKind);
 	}
 	
 	@Singleton
@@ -81,12 +82,12 @@ public class ArchiveDomainTask implements Task {
 		}
 		
 		@Override
-		public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
+		public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, ArchiveTreatmentKind archiveTreatmentKind) {
 			Logger logger = loggerFactory.create(runId);
 			LoggerAppenders loggerAppenders = LoggerAppenders.from(runId, logger);
 			
 			return new ArchiveDomainTask(archiveService, 
-					domain, when, higherBoundary, runId, logger, loggerAppenders);
+					domain, when, higherBoundary, runId, logger, loggerAppenders, archiveTreatmentKind);
 		}
 	}
 	
@@ -97,9 +98,10 @@ public class ArchiveDomainTask implements Task {
 	private final ArchiveTreatmentRunId runId;
 	private final Logger logger;
 	private final LoggerAppenders loggerAppenders;
+	private final ArchiveTreatmentKind archiveTreatmentKind;
 
 	protected ArchiveDomainTask(ArchiveService archiveService, ObmDomainUuid domain,
-			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger, LoggerAppenders loggerAppenders) {
+			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger, LoggerAppenders loggerAppenders, ArchiveTreatmentKind archiveTreatmentKind) {
 		this.archiveService = archiveService;
 		this.domain = domain;
 		this.when = when;
@@ -107,6 +109,7 @@ public class ArchiveDomainTask implements Task {
 		this.runId = runId;
 		this.logger = logger;
 		this.loggerAppenders = loggerAppenders;
+		this.archiveTreatmentKind = archiveTreatmentKind;
 	}
 	
 	@Override
@@ -143,9 +146,13 @@ public class ArchiveDomainTask implements Task {
 		return loggerAppenders;
 	}
 	
+	public ArchiveTreatmentKind getArchiveTreatmentKind() {
+		return archiveTreatmentKind;
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(domain, when, runId, higherBoundary);
+		return Objects.hashCode(domain, when, runId, higherBoundary, archiveTreatmentKind);
 	}
 
 	@Override
@@ -155,7 +162,8 @@ public class ArchiveDomainTask implements Task {
 			return Objects.equal(this.domain, that.domain)
 				&& Objects.equal(this.when, that.when)
 				&& Objects.equal(this.higherBoundary, that.higherBoundary)
-				&& Objects.equal(this.runId, that.runId);
+				&& Objects.equal(this.runId, that.runId)
+				&& Objects.equal(this.archiveTreatmentKind, that.archiveTreatmentKind);
 		}
 		return false;
 	}
@@ -167,6 +175,7 @@ public class ArchiveDomainTask implements Task {
 			.add("when", when)
 			.add("higherBoundary", higherBoundary)
 			.add("runId", runId)
+			.add("archiveTreatmentKind", archiveTreatmentKind)
 			.toString();
 	}
 	

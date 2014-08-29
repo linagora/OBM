@@ -37,6 +37,7 @@ import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
 import org.obm.imap.archive.beans.ArchiveScheduledTreatment;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
@@ -84,15 +85,21 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 
 	private void insertOrUpdate(ArchiveDomainTask task, State state) {
 		try {
-			Optional<ArchiveTreatment> treatment = archiveTreatmentDao.find(task.getRunId());
-			if (!treatment.isPresent()) {
-				insert(task, state);
-			} else {
-				update(treatment.get(), task, state);
+			if (hasToBePersisted(task)) {
+				Optional<ArchiveTreatment> treatment = archiveTreatmentDao.find(task.getRunId());
+				if (!treatment.isPresent()) {
+					insert(task, state);
+				} else {
+					update(treatment.get(), task, state);
+				}
 			}
 		} catch (Exception e) {
 			logger.error("Cannot insert or update a treatment", e);
 		}
+	}
+
+	private boolean hasToBePersisted(ArchiveDomainTask task) {
+		return ArchiveTreatmentKind.REAL_RUN.equals(task.getArchiveTreatmentKind());
 	}
 
 	private void insert(ArchiveDomainTask task, State state) throws DaoException {

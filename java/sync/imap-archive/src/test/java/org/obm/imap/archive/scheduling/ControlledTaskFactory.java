@@ -32,6 +32,7 @@
 package org.obm.imap.archive.scheduling;
 
 import org.joda.time.DateTime;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.logging.LoggerFactory;
@@ -58,8 +59,8 @@ public class ControlledTaskFactory extends ArchiveDomainTask.FactoryImpl {
 	}
 
 	@Override
-	public RemotelyControlledTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
-		return new RemotelyControlledTask(archiveService, domain, when, higherBoundary, runId);
+	public RemotelyControlledTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, ArchiveTreatmentKind archiveTreatmentKind) {
+		return new RemotelyControlledTask(archiveService, domain, when, higherBoundary, runId, archiveTreatmentKind);
 	}
 
 	public class RemotelyControlledTask extends ArchiveDomainTask {
@@ -79,8 +80,8 @@ public class ControlledTaskFactory extends ArchiveDomainTask.FactoryImpl {
 		private final Terminator terminator;
 	
 		RemotelyControlledTask(ArchiveService archiveService, ObmDomainUuid domain,
-				DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
-			super(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders);
+				DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, ArchiveTreatmentKind archiveTreatmentKind) {
+			super(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders, archiveTreatmentKind);
 			terminator = new Terminator();
 		}
 		
