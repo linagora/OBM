@@ -47,6 +47,7 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
+import org.obm.imap.archive.exception.DomainConfigurationException;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask.Factory;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -126,6 +127,19 @@ public class ArchiveSchedulingServiceTest {
 		mocks.verify();
 	}
 
+	@Test(expected=DomainConfigurationException.class)
+	public void scheduleShouldRaiseExceptionWhenConfigNotFound() throws Exception {
+		DateTime when = DateTime.parse("2024-01-1T05:04Z");
+		expect(domainConfigDao.get(domain)).andThrow(new DomainConfigurationException("error"));
+		mocks.replay();
+		try {
+			testee.schedule(domain, when, ArchiveTreatmentKind.REAL_RUN);
+		} catch (Exception e) {
+			mocks.verify();
+			throw e;
+		}
+	}
+
 	@Test
 	public void scheduleByConfigShouldGetDatesThenSchedule() {
 		testScheduleByConfig(
@@ -163,11 +177,11 @@ public class ArchiveSchedulingServiceTest {
 		expect(schedulingDatesService.nextTreatmentDate(config.getSchedulingConfiguration())).andReturn(when);
 		expect(schedulingDatesService.higherBoundary(when, config.getRepeatKind())).andReturn(higherBoundary);
 		expect(uuidFactory.randomUUID()).andReturn(runUuid);
-		expect(taskFactory.create(domain, when, higherBoundary, runId, ArchiveTreatmentKind.REAL_RUN)).andReturn(task);
+		expect(taskFactory.createAsRecurrent(domain, when, higherBoundary, runId)).andReturn(task);
 		expect(scheduler.schedule(task)).andReturn(scheduled);
 		
 		mocks.replay();
-		testee.schedule(config, ArchiveTreatmentKind.REAL_RUN);
+		testee.scheduleAsRecurrent(config);
 		mocks.verify();
 	}
 }

@@ -38,6 +38,7 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
+import org.obm.imap.archive.exception.DomainConfigurationException;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.UUIDFactory;
@@ -72,21 +73,30 @@ public class ArchiveSchedulingService {
 	}
 	
 	@Transactional
-	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when, ArchiveTreatmentKind archiveTreatmentKind) throws DaoException {
+	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when, ArchiveTreatmentKind kind) throws DaoException {
 		DomainConfiguration config = domainConfigDao.get(domain);
-		return schedule(domain, when, config.getRepeatKind(), archiveTreatmentKind);
+		if (config == null) {
+			throw new DomainConfigurationException("No configuration can be found for domain: " + domain.get());
+		}
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
+		RepeatKind repeatKind = config.getRepeatKind();
+		DateTime higherBoundary = schedulingDatesService.higherBoundary(when, repeatKind);
+		
+		ArchiveDomainTask task = taskFactory.create(domain, when, higherBoundary, runId, kind);
+		scheduler.schedule(task);
+		
+		return runId;
 	}
 
 	@Transactional
-	public ArchiveTreatmentRunId schedule(DomainConfiguration domainConfiguration, ArchiveTreatmentKind archiveTreatmentKind) {
-		DateTime when = schedulingDatesService.nextTreatmentDate(domainConfiguration.getSchedulingConfiguration());
-		return schedule(domainConfiguration.getDomainId(), when, domainConfiguration.getRepeatKind(), archiveTreatmentKind);
-	}
-
-	private ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when, RepeatKind repeatKink, ArchiveTreatmentKind archiveTreatmentKind) {
-		DateTime higherBoundary = schedulingDatesService.higherBoundary(when, repeatKink);
+	public ArchiveTreatmentRunId scheduleAsRecurrent(DomainConfiguration domainConfiguration) {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
-		scheduler.schedule(taskFactory.create(domain, when, higherBoundary, runId, archiveTreatmentKind));
+		DateTime when = schedulingDatesService.nextTreatmentDate(domainConfiguration.getSchedulingConfiguration());
+		DateTime higherBoundary = schedulingDatesService.higherBoundary(when, domainConfiguration.getRepeatKind());
+		
+		ArchiveDomainTask task = taskFactory.createAsRecurrent(domainConfiguration.getDomainId(), when, higherBoundary, runId);
+		scheduler.schedule(task);
+		
 		return runId;
 	}
 }

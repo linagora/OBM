@@ -81,7 +81,7 @@ public class ControlledTaskFactory extends ArchiveDomainTask.FactoryImpl {
 	
 		RemotelyControlledTask(ArchiveService archiveService, ObmDomainUuid domain,
 				DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, ArchiveTreatmentKind archiveTreatmentKind) {
-			super(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders, archiveTreatmentKind);
+			super(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders, archiveTreatmentKind, false);
 			terminator = new Terminator();
 		}
 		

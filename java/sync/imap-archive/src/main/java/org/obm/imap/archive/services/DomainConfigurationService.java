@@ -36,7 +36,6 @@ import javax.inject.Inject;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.module.LoggerModule;
-import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.PersistedResult;
@@ -100,7 +99,7 @@ public class DomainConfigurationService {
 		scheduler.clearDomain(domainConfiguration.getDomainId());
 		logger.info("Domain scheduled tasks have been canceled {} ", domainConfiguration.getDomainId());
 		if (domainConfiguration.isEnabled()) {
-			ArchiveTreatmentRunId runId = schedulingService.schedule(domainConfiguration, ArchiveTreatmentKind.REAL_RUN);
+			ArchiveTreatmentRunId runId = schedulingService.scheduleAsRecurrent(domainConfiguration);
 			logger.info("The task {} has been scheduled for domain {} ", runId, domainConfiguration.getDomainId());
 		}
 	}

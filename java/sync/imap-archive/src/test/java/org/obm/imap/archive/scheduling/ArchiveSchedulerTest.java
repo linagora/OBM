@@ -384,7 +384,7 @@ public class ArchiveSchedulerTest {
 	}
 
 	ArchiveDomainTask archiveDomainTask(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DateTime when) {
-		return new ArchiveDomainTask(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders, ArchiveTreatmentKind.REAL_RUN);
+		return new ArchiveDomainTask(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders, ArchiveTreatmentKind.REAL_RUN, false);
 	}
 
 	void assertTaskProgression(ArchiveDomainTask task) throws Exception {

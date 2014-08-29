@@ -40,7 +40,6 @@ import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
-import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
@@ -86,7 +85,7 @@ public class DomainConfigurationServiceTest {
 		scheduler.clearDomain(domain);
 		expectLastCall();
 
-		expect(schedulingService.schedule(config, ArchiveTreatmentKind.REAL_RUN))
+		expect(schedulingService.scheduleAsRecurrent(config))
 			.andReturn(ArchiveTreatmentRunId.from("5879b689-ffb5-422c-bf8d-eab80b2eddd6"));
 		
 		control.replay();
@@ -122,7 +121,7 @@ public class DomainConfigurationServiceTest {
 		scheduler.clearDomain(domain);
 		expectLastCall();
 
-		expect(schedulingService.schedule(config, ArchiveTreatmentKind.REAL_RUN))
+		expect(schedulingService.scheduleAsRecurrent(config))
 			.andReturn(ArchiveTreatmentRunId.from("5879b689-ffb5-422c-bf8d-eab80b2eddd6"));
 		
 		control.replay();

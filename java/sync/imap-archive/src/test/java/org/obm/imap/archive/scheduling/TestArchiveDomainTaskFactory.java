@@ -51,6 +51,6 @@ public class TestArchiveDomainTaskFactory extends ArchiveDomainTask.FactoryImpl 
 	}
 
 	public ArchiveDomainTask create(ObmDomainUuid domain, ArchiveTreatmentRunId runId) {
-		return new ArchiveDomainTask(null, domain, null, null, runId, logger, loggerAppenders, ArchiveTreatmentKind.REAL_RUN);
+		return new ArchiveDomainTask(null, domain, null, null, runId, logger, loggerAppenders, ArchiveTreatmentKind.REAL_RUN, false);
 	}
 }

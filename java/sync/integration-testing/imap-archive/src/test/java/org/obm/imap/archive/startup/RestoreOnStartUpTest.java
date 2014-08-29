@@ -58,7 +58,6 @@ import org.obm.imap.archive.beans.ArchiveScheduledTreatment;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTerminatedTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatment;
-import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
@@ -159,12 +158,11 @@ public class RestoreOnStartUpTest {
 		
 		List<ScheduledTask<ArchiveDomainTask>> tasks = monitor.get().all();
 		assertThat(tasks).hasSize(1);
-		assertThat(tasks.get(0).task()).isEqualTo(taskFactory.create(
+		assertThat(tasks.get(0).task()).isEqualTo(taskFactory.createAsRecurrent(
 			expectedScheduledDomain,
 			expectedScheduledTime,
 			expectedScheduledHigherBoundary,
-			expectedScheduledRunId, 
-			ArchiveTreatmentKind.REAL_RUN));
+			expectedScheduledRunId));
 		
 		List<ArchiveTreatment> failedTreatments = archiveTreatmentDao.findByScheduledTime(expectedFailedDomain, 5);
 		assertThat(failedTreatments).containsExactly(ArchiveTerminatedTreatment

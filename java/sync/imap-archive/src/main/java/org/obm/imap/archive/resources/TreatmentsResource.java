@@ -51,6 +51,7 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingDates;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
+import org.obm.imap.archive.exception.DomainConfigurationException;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.obm.imap.archive.services.ArchiveService;
 import org.obm.imap.archive.services.SchedulingDatesService;
@@ -101,7 +102,7 @@ public class TreatmentsResource {
 			ArchiveTreatmentKind actualTreatmentKind = Objects.firstNonNull(archiveTreatmentKind, ArchiveTreatmentKind.REAL_RUN);
 			ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain.getUuid(), dateTimeProvider.now(), actualTreatmentKind);
 			return Response.ok(runId).build();
-		} catch (DaoException e) {
+		} catch (DaoException | DomainConfigurationException e) {
 			logger.error("Cannot schedule an archiving", e);
 			return Response.serverError().build();
 		}
