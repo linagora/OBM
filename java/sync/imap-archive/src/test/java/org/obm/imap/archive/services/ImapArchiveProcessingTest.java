@@ -345,6 +345,7 @@ public class ImapArchiveProcessingTest {
 		expect(archiveTreatmentDao.findLastTerminated(domainId, 1))
 			.andReturn(ImmutableList.<ArchiveTreatment> of(ArchiveTreatment.builder(domainId)
 					.runId(ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"))
+					.recurrent(true)
 					.scheduledAt(DateTime.parse("2014-08-26T08:46:00.000Z"))
 					.higherBoundary(DateTime.parse("2014-09-26T08:46:00.000Z"))
 					.status(ArchiveStatus.SCHEDULED)
@@ -378,6 +379,7 @@ public class ImapArchiveProcessingTest {
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ArchiveTreatment archiveTreatment = ArchiveTreatment.builder(domainId)
 			.runId(ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"))
+			.recurrent(true)
 			.scheduledAt(start)
 			.higherBoundary(higherBoundary)
 			.status(ArchiveStatus.ERROR)
@@ -402,6 +404,7 @@ public class ImapArchiveProcessingTest {
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ArchiveTreatment archiveTreatment = ArchiveTreatment.builder(domainId)
 			.runId(ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"))
+			.recurrent(true)
 			.scheduledAt(start)
 			.higherBoundary(lowerBoundary)
 			.status(ArchiveStatus.SUCCESS)
@@ -601,6 +604,7 @@ public class ImapArchiveProcessingTest {
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> of(ArchiveTreatment.builder(ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6"))
 						.runId(runId)
+						.recurrent(true)
 						.scheduledAt(DateTime.parse("2014-08-26T08:46:00.000Z"))
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
 						.status(ArchiveStatus.ERROR)
@@ -712,6 +716,7 @@ public class ImapArchiveProcessingTest {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		ArchiveTreatment archiveTreatment = ArchiveTreatment.builder(ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6"))
 				.runId(runId)
+				.recurrent(true)
 				.scheduledAt(DateTime.parse("2014-08-26T08:46:00.000Z"))
 				.higherBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
 				.status(ArchiveStatus.SUCCESS)
@@ -754,6 +759,7 @@ public class ImapArchiveProcessingTest {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		ArchiveTreatment archiveTreatment = ArchiveTreatment.builder(ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6"))
 				.runId(runId)
+				.recurrent(true)
 				.scheduledAt(DateTime.parse("2014-08-26T08:46:00.000Z"))
 				.higherBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
 				.status(ArchiveStatus.SUCCESS)
@@ -791,6 +797,7 @@ public class ImapArchiveProcessingTest {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		ArchiveTreatment archiveTreatment = ArchiveTreatment.builder(ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6"))
 				.runId(runId)
+				.recurrent(true)
 				.scheduledAt(DateTime.parse("2014-08-26T08:46:00.000Z"))
 				.higherBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
 				.status(ArchiveStatus.SUCCESS)
@@ -813,6 +820,7 @@ public class ImapArchiveProcessingTest {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		ArchiveTreatment archiveTreatment = ArchiveTreatment.builder(ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6"))
 				.runId(runId)
+				.recurrent(true)
 				.scheduledAt(DateTime.parse("2014-08-26T08:46:00.000Z"))
 				.higherBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
 				.status(ArchiveStatus.SUCCESS)
@@ -856,6 +864,7 @@ public class ImapArchiveProcessingTest {
 		DateTime previousHigherBoundary = DateTime.parse("2014-07-23T23:59:59.999Z");
 		Optional<ArchiveTreatment> previousArchiveTreatment = Optional.<ArchiveTreatment> of(ArchiveTreatment.builder(domainId)
 			.runId(runId)
+			.recurrent(true)
 			.status(ArchiveStatus.ERROR)
 			.scheduledAt(DateTime.now())
 			.higherBoundary(previousHigherBoundary)
@@ -875,6 +884,7 @@ public class ImapArchiveProcessingTest {
 		DateTime previousHigherBoundary = DateTime.parse("2014-07-23T23:59:59.999Z");
 		Optional<ArchiveTreatment> previousArchiveTreatment = Optional.<ArchiveTreatment> of(ArchiveTreatment.builder(domainId)
 			.runId(runId)
+			.recurrent(true)
 			.status(ArchiveStatus.ERROR)
 			.scheduledAt(DateTime.now())
 			.higherBoundary(previousHigherBoundary)

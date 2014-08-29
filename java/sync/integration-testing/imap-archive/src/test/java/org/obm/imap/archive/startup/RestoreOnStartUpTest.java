@@ -132,6 +132,7 @@ public class RestoreOnStartUpTest {
 		archiveTreatmentDao.insert(ArchiveScheduledTreatment
 				.forDomain(expectedScheduledDomain)
 				.runId(expectedScheduledRunId)
+				.recurrent(true)
 				.higherBoundary(expectedScheduledHigherBoundary)
 				.scheduledAt(expectedScheduledTime)
 				.build());
@@ -139,6 +140,7 @@ public class RestoreOnStartUpTest {
 		archiveTreatmentDao.insert(ArchiveRunningTreatment
 				.forDomain(expectedFailedDomain)
 				.runId(expectedFailedRunId)
+				.recurrent(true)
 				.higherBoundary(expectedFailedHigherBoundary)
 				.scheduledAt(expectedFailedScheduleTime)
 				.startedAt(expectedFailedStartTime)
@@ -168,6 +170,7 @@ public class RestoreOnStartUpTest {
 		assertThat(failedTreatments).containsExactly(ArchiveTerminatedTreatment
 			.forDomain(expectedFailedDomain)
 			.runId(expectedFailedRunId)
+			.recurrent(true)
 			.scheduledAt(expectedFailedScheduleTime)
 			.startedAt(expectedFailedStartTime)
 			.higherBoundary(expectedFailedHigherBoundary)

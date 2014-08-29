@@ -97,6 +97,7 @@ public class RestoreTasksOnStartupHandlerTest {
 			ArchiveScheduledTreatment
 				.forDomain(domainUuid)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(when)
 				.build()
@@ -117,6 +118,7 @@ public class RestoreTasksOnStartupHandlerTest {
 		ArchiveRunningTreatment runningTreatment = ArchiveRunningTreatment
 			.forDomain(domainUuid)
 			.runId("aee2d1ab-b237-4077-a61b-a85e3cb67742")
+			.recurrent(true)
 			.higherBoundary(DateTime.parse("2014-12-1T01:01Z"))
 			.scheduledAt(DateTime.parse("2014-12-2T11:35Z"))
 			.startedAt(DateTime.parse("2014-12-3T01:01Z"))
@@ -138,6 +140,7 @@ public class RestoreTasksOnStartupHandlerTest {
 			ArchiveTerminatedTreatment
 				.forDomain(domainUuid)
 				.runId("aee2d1ab-b237-4077-a61b-a85e3cb67742")
+				.recurrent(true)
 				.higherBoundary(DateTime.parse("2014-12-1T01:01Z"))
 				.scheduledAt(DateTime.parse("2014-12-2T11:35Z"))
 				.startedAt(DateTime.parse("2014-12-3T01:01Z"))

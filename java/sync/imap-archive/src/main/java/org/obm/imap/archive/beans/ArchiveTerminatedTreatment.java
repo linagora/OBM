@@ -57,8 +57,9 @@ public class ArchiveTerminatedTreatment extends ArchiveTreatment {
 			Preconditions.checkState(startTime != null);
 			Preconditions.checkState(endTime != null);
 			Preconditions.checkState(higherBoundary != null);
+			Preconditions.checkState(recurrent != null);
 			return new ArchiveTerminatedTreatment(runId, domainUuid, status, 
-					scheduledTime, startTime, endTime, higherBoundary);
+					scheduledTime, startTime, endTime, higherBoundary, recurrent);
 		}
 
 		private boolean isValidStatus(ArchiveStatus status) {
@@ -76,8 +77,8 @@ public class ArchiveTerminatedTreatment extends ArchiveTreatment {
 	
 	private ArchiveTerminatedTreatment(
 			ArchiveTreatmentRunId runId, ObmDomainUuid  domainUuid, ArchiveStatus archiveStatus, 
-			DateTime scheduledTime, DateTime startTime, DateTime endTime, DateTime higherBoundary) {
-		super(runId, domainUuid, archiveStatus, scheduledTime, startTime, endTime, higherBoundary);
+			DateTime scheduledTime, DateTime startTime, DateTime endTime, DateTime higherBoundary, boolean recurrent) {
+		super(runId, domainUuid, archiveStatus, scheduledTime, startTime, endTime, higherBoundary, recurrent);
 	}
 	
 }

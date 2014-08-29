@@ -27,6 +27,7 @@ mail_archive_run_schedule TIMESTAMP,
 mail_archive_run_start TIMESTAMP,
 mail_archive_run_end TIMESTAMP,
 mail_archive_run_higher_boundary TIMESTAMP,
+mail_archive_run_recurrent BOOLEAN NOT NULL,
 CONSTRAINT mail_archive_run_uuid_ukey UNIQUE (mail_archive_run_uuid)
 );
 

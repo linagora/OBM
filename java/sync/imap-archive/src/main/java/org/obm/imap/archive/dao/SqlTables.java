@@ -54,8 +54,9 @@ public interface SqlTables {
 			String START = "mail_archive_run_start";
 			String END = "mail_archive_run_end";
 			String HIGHER_BOUNDARY = "mail_archive_run_higher_boundary";
+			String RECURRENT = "mail_archive_run_recurrent";
 			
-			List<String> ALL = ImmutableList.of(UUID, DOMAIN_UUID, STATUS, SCHEDULE, START, END, HIGHER_BOUNDARY);
+			List<String> ALL = ImmutableList.of(UUID, DOMAIN_UUID, STATUS, SCHEDULE, START, END, HIGHER_BOUNDARY, RECURRENT);
 		}
 	}
 

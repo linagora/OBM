@@ -64,6 +64,7 @@ public class ArchiveScheduledTreatmentTest {
 		ArchiveScheduledTreatment
 			.forDomain(domainUuid)
 			.runId(runId)
+			.recurrent(true)
 			.higherBoundary(higherBoundary)
 			.scheduledAt(null);
 	}
@@ -73,6 +74,7 @@ public class ArchiveScheduledTreatmentTest {
 		ArchiveScheduledTreatment
 			.forDomain(domainUuid)
 			.runId(runId)
+			.recurrent(true)
 			.scheduledAt(scheduledTime)
 			.build();
 	}
@@ -81,6 +83,17 @@ public class ArchiveScheduledTreatmentTest {
 	public void buildShouldTriggerExceptionWhenNoRunId() {
 		ArchiveScheduledTreatment
 			.forDomain(domainUuid)
+			.recurrent(true)
+			.higherBoundary(higherBoundary)
+			.scheduledAt(scheduledTime)
+			.build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void buildShouldTriggerExceptionWhenNoRecurrent() {
+		ArchiveScheduledTreatment
+			.forDomain(domainUuid)
+			.runId(runId)
 			.higherBoundary(higherBoundary)
 			.scheduledAt(scheduledTime)
 			.build();
@@ -91,6 +104,7 @@ public class ArchiveScheduledTreatmentTest {
 		ArchiveScheduledTreatment testee = ArchiveScheduledTreatment
 				.forDomain(domainUuid)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(scheduledTime)
 				.build();
@@ -100,6 +114,7 @@ public class ArchiveScheduledTreatmentTest {
 		assertThat(testee.getRunId()).isEqualTo(runId);
 		assertThat(testee.getScheduledTime()).isEqualTo(scheduledTime);
 		assertThat(testee.getHigherBoundary()).isEqualTo(higherBoundary);
+		assertThat(testee.recurrent).isTrue();
 	}
 
 	@Test
@@ -108,6 +123,7 @@ public class ArchiveScheduledTreatmentTest {
 		ArchiveRunningTreatment testee = ArchiveScheduledTreatment
 				.forDomain(domainUuid)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(scheduledTime)
 				.build()
@@ -119,5 +135,6 @@ public class ArchiveScheduledTreatmentTest {
 		assertThat(testee.getScheduledTime()).isEqualTo(scheduledTime);
 		assertThat(testee.getHigherBoundary()).isEqualTo(higherBoundary);
 		assertThat(testee.getStartTime()).isEqualTo(startTime);
+		assertThat(testee.isRecurrent()).isTrue();
 	}
 }

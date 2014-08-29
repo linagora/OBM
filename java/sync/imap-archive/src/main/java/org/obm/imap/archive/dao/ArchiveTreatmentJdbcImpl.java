@@ -73,10 +73,10 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 		String ALL = Joiner.on(", ").join(Fields.ALL);
 		
 		String INSERT = String.format(
-				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?)", MailArchiveRun.NAME, ALL);
+				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", MailArchiveRun.NAME, ALL);
 
 		String UPDATE = String.format(
-				"UPDATE %s SET (%s) = (?, ?, ?, ?, ?, ?, ?) WHERE %s = ?", MailArchiveRun.NAME, ALL, Fields.UUID);
+				"UPDATE %s SET (%s) = (?, ?, ?, ?, ?, ?, ?, ?) WHERE %s = ?", MailArchiveRun.NAME, ALL, Fields.UUID);
 		
 		String REMOVE = String.format(
 				"DELETE FROM %s WHERE %s = ?", MailArchiveRun.NAME, Fields.UUID);
@@ -107,6 +107,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getStartTime()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getEndTime()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getHigherBoundary()));
+			ps.setBoolean(idx++, treatment.isRecurrent());
 
 			ps.executeUpdate();
 		} catch (SQLException e) {
@@ -127,6 +128,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getStartTime()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getEndTime()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(treatment.getHigherBoundary()));
+			ps.setBoolean(idx++, treatment.isRecurrent());
 			ps.setString(idx++, treatment.getRunId().serialize());
 
 			if (ps.executeUpdate() == 0) {
@@ -230,6 +232,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 		ObmDomainUuid domain = ObmDomainUuid.of(rs.getString(Fields.DOMAIN_UUID));
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(rs.getString(Fields.UUID));
 		ArchiveStatus status = ArchiveStatus.fromSpecificationValue(rs.getString(Fields.STATUS));
+		boolean isRecurrent = rs.getBoolean(Fields.RECURRENT);
 		DateTime scheduleTime = JDBCUtils.getDateTime(rs, Fields.SCHEDULE, DateTimeZone.UTC);
 		DateTime startTime = JDBCUtils.getDateTime(rs, Fields.START, DateTimeZone.UTC);
 		DateTime endTime = JDBCUtils.getDateTime(rs, Fields.END, DateTimeZone.UTC);
@@ -239,6 +242,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 				.builder(domain)
 				.runId(runId)
 				.higherBoundary(higherBoundary)
+				.recurrent(isRecurrent)
 				.scheduledAt(scheduleTime)
 				.startedAt(startTime)
 				.terminatedAt(endTime)

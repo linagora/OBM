@@ -95,6 +95,7 @@ public class ArchiveDaoTrackingTest {
 		expect(task.getHigherBoundary()).andReturn(higherBoundary).anyTimes();
 		expect(task.getWhen()).andReturn(scheduledTime).anyTimes();
 		expect(task.getRunId()).andReturn(runId).anyTimes();
+		expect(task.isRecurrent()).andReturn(true).anyTimes();
 		
 		scheduler = Scheduler.<ArchiveDomainTask>builder().timeProvider(timeProvider).start();
 		testee = new ArchiveDaoTracking(logger, dao, timeProvider);
@@ -121,6 +122,7 @@ public class ArchiveDaoTrackingTest {
 		dao.insert(ArchiveScheduledTreatment
 			.forDomain(domain)
 			.runId(runId)
+			.recurrent(true)
 			.higherBoundary(higherBoundary)
 			.scheduledAt(scheduledTime)
 			.build());
@@ -144,6 +146,7 @@ public class ArchiveDaoTrackingTest {
 				ArchiveScheduledTreatment
 				.forDomain(domain)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(daoScheduledTime)
 				.build()));
@@ -151,6 +154,7 @@ public class ArchiveDaoTrackingTest {
 		dao.update(ArchiveScheduledTreatment
 			.forDomain(domain)
 			.runId(runId)
+			.recurrent(true)
 			.higherBoundary(higherBoundary)
 			.scheduledAt(scheduledTime)
 			.build());
@@ -175,6 +179,7 @@ public class ArchiveDaoTrackingTest {
 				ArchiveScheduledTreatment
 				.forDomain(domain)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(daoScheduledTime)
 				.build()));
@@ -182,6 +187,7 @@ public class ArchiveDaoTrackingTest {
 		dao.update(ArchiveRunningTreatment
 			.forDomain(domain)
 			.runId(runId)
+			.recurrent(true)
 			.higherBoundary(higherBoundary)
 			.scheduledAt(scheduledTime)
 			.startedAt(startTime)
@@ -220,6 +226,7 @@ public class ArchiveDaoTrackingTest {
 				ArchiveRunningTreatment
 				.forDomain(domain)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(daoScheduledTime)
 				.startedAt(startTime)
@@ -228,6 +235,7 @@ public class ArchiveDaoTrackingTest {
 		dao.update(ArchiveTerminatedTreatment
 			.forDomain(domain)
 			.runId(runId)
+			.recurrent(true)
 			.higherBoundary(higherBoundary)
 			.scheduledAt(scheduledTime)
 			.startedAt(startTime)
@@ -255,6 +263,7 @@ public class ArchiveDaoTrackingTest {
 				ArchiveRunningTreatment
 				.forDomain(domain)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(daoScheduledTime)
 				.startedAt(startTime)
@@ -263,6 +272,7 @@ public class ArchiveDaoTrackingTest {
 		dao.update(ArchiveTerminatedTreatment
 			.forDomain(domain)
 			.runId(runId)
+			.recurrent(true)
 			.higherBoundary(higherBoundary)
 			.scheduledAt(scheduledTime)
 			.startedAt(startTime)
@@ -296,6 +306,7 @@ public class ArchiveDaoTrackingTest {
 				ArchiveRunningTreatment
 				.forDomain(domain)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(scheduledTime)
 				.startedAt(startTime)
@@ -324,6 +335,7 @@ public class ArchiveDaoTrackingTest {
 		dao.insert(ArchiveScheduledTreatment
 			.forDomain(domain)
 			.runId(runId)
+			.recurrent(true)
 			.higherBoundary(higherBoundary)
 			.scheduledAt(scheduledTime)
 			.build());
@@ -349,6 +361,7 @@ public class ArchiveDaoTrackingTest {
 				ArchiveRunningTreatment
 				.forDomain(domain)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(scheduledTime)
 				.startedAt(startTime)
@@ -358,6 +371,7 @@ public class ArchiveDaoTrackingTest {
 		dao.update(ArchiveTerminatedTreatment
 			.forDomain(domain)
 			.runId(runId)
+			.recurrent(true)
 			.higherBoundary(higherBoundary)
 			.scheduledAt(scheduledTime)
 			.startedAt(startTime)
@@ -381,6 +395,7 @@ public class ArchiveDaoTrackingTest {
 				ArchiveRunningTreatment
 				.forDomain(domain)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(scheduledTime)
 				.startedAt(startTime)

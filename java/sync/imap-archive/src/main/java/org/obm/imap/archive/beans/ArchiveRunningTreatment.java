@@ -55,13 +55,14 @@ public class ArchiveRunningTreatment extends ArchiveTreatment {
 			Preconditions.checkState(scheduledTime != null);
 			Preconditions.checkState(higherBoundary != null);
 			Preconditions.checkState(startTime != null);
+			Preconditions.checkState(recurrent != null);
 			return new ArchiveRunningTreatment(runId, domainUuid, ArchiveStatus.RUNNING, 
-					scheduledTime, startTime, higherBoundary);
+					scheduledTime, startTime, higherBoundary, recurrent);
 		}
 	}
 
 	private ArchiveRunningTreatment(ArchiveTreatmentRunId runId, ObmDomainUuid  domainUuid, 
-			ArchiveStatus archiveStatus, DateTime scheduledTime, DateTime startTime, DateTime higherBoundary) {
-		super(runId, domainUuid, archiveStatus, scheduledTime, startTime, NO_DATE, higherBoundary);
+			ArchiveStatus archiveStatus, DateTime scheduledTime, DateTime startTime, DateTime higherBoundary, boolean recurrent) {
+		super(runId, domainUuid, archiveStatus, scheduledTime, startTime, NO_DATE, higherBoundary, recurrent);
 	}
 }

@@ -54,20 +54,22 @@ public class ArchiveScheduledTreatment extends ArchiveTreatment {
 			Preconditions.checkState(runId != null);
 			Preconditions.checkState(scheduledTime != null);
 			Preconditions.checkState(higherBoundary != null);
+			Preconditions.checkState(recurrent != null);
 			return new ArchiveScheduledTreatment(runId, domainUuid, ArchiveStatus.SCHEDULED, 
-					scheduledTime, higherBoundary);
+					scheduledTime, higherBoundary, recurrent);
 		}
 	}
 	
 	private ArchiveScheduledTreatment(ArchiveTreatmentRunId runId, ObmDomainUuid  domainUuid, 
-			ArchiveStatus archiveStatus, DateTime scheduledTime, DateTime higherBoundary) {
-		super(runId, domainUuid, archiveStatus, scheduledTime, NO_DATE, NO_DATE, higherBoundary);
+			ArchiveStatus archiveStatus, DateTime scheduledTime, DateTime higherBoundary, boolean recurrent) {
+		super(runId, domainUuid, archiveStatus, scheduledTime, NO_DATE, NO_DATE, higherBoundary, recurrent);
 	}
 
 	public ArchiveRunningTreatment asRunning(DateTime startedAt) {
 		return ArchiveRunningTreatment
 				.forDomain(domainUuid)
 				.runId(runId)
+				.recurrent(recurrent)
 				.scheduledAt(scheduledTime)
 				.higherBoundary(higherBoundary)
 				.startedAt(startedAt)

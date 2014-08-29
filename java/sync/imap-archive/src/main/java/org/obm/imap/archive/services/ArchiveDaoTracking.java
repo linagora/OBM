@@ -114,6 +114,7 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 		archiveTreatmentDao.insert(ArchiveScheduledTreatment
 				.forDomain(task.getDomain())
 				.runId(task.getRunId())
+				.recurrent(task.isRecurrent())
 				.higherBoundary(task.getHigherBoundary())
 				.scheduledAt(task.getWhen())
 				.build());
@@ -123,6 +124,7 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 		ArchiveTreatment.Builder<ArchiveTreatment> treatmentBuilder = ArchiveTreatment
 			.builder(task.getDomain())
 			.runId(task.getRunId())
+			.recurrent(task.isRecurrent())
 			.higherBoundary(task.getHigherBoundary())
 			.scheduledAt(task.getWhen());
 		

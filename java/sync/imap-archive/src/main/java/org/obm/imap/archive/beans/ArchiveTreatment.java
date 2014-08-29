@@ -50,6 +50,7 @@ public class ArchiveTreatment {
 		protected final ObmDomainUuid domainUuid;
 		protected ArchiveTreatmentRunId runId;
 		protected ArchiveStatus status;
+		protected Boolean recurrent;
 		protected DateTime scheduledTime;
 		protected DateTime startTime;
 		protected DateTime endTime;
@@ -97,6 +98,11 @@ public class ArchiveTreatment {
 			this.status = status;
 			return this;
 		}
+
+		public Builder<T> recurrent(boolean recurrent) {
+			this.recurrent = recurrent;
+			return this;
+		}
 		
 		@SuppressWarnings("unchecked")
 		public T build() {
@@ -104,7 +110,8 @@ public class ArchiveTreatment {
 			Preconditions.checkState(scheduledTime != null);
 			Preconditions.checkState(higherBoundary != null);
 			Preconditions.checkState(status != null);
-			return (T) new ArchiveTreatment(runId, domainUuid, status, scheduledTime, startTime, endTime, higherBoundary);
+			Preconditions.checkState(recurrent != null);
+			return (T) new ArchiveTreatment(runId, domainUuid, status, scheduledTime, startTime, endTime, higherBoundary, recurrent);
 		}
 	}
 	
@@ -118,9 +125,10 @@ public class ArchiveTreatment {
 	protected final DateTime startTime;
 	protected final DateTime endTime;
 	protected final DateTime higherBoundary;
+	protected final boolean recurrent;
 
 	protected ArchiveTreatment(ArchiveTreatmentRunId runId, ObmDomainUuid  domainUuid, ArchiveStatus archiveStatus, 
-			DateTime scheduledTime, DateTime startTime, DateTime endTime, DateTime higherBoundary) {
+			DateTime scheduledTime, DateTime startTime, DateTime endTime, DateTime higherBoundary, boolean recurrent) {
 		this.runId = runId;
 		this.domainUuid = domainUuid;
 		this.archiveStatus = archiveStatus;
@@ -128,6 +136,7 @@ public class ArchiveTreatment {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.higherBoundary = higherBoundary;
+		this.recurrent = recurrent;
 	}
 
 	public ArchiveTreatmentRunId getRunId() {
@@ -158,6 +167,10 @@ public class ArchiveTreatment {
 		return higherBoundary;
 	}
 
+	public boolean isRecurrent() {
+		return recurrent;
+	}
+
 	public ArchiveTerminatedTreatment asSuccess(DateTime endTime) {
 		return asTerminatedBuilder(endTime).status(ArchiveStatus.SUCCESS).build();
 	}
@@ -170,6 +183,7 @@ public class ArchiveTreatment {
 		return ArchiveTerminatedTreatment
 				.forDomain(domainUuid)
 				.runId(runId)
+				.recurrent(recurrent)
 				.scheduledAt(scheduledTime)
 				.startedAt(startTime)
 				.higherBoundary(higherBoundary)
@@ -179,7 +193,7 @@ public class ArchiveTreatment {
 	@Override
 	public int hashCode(){
 		return Objects.hashCode(runId, domainUuid, archiveStatus,
-				startTime, endTime, higherBoundary);
+				startTime, endTime, higherBoundary, recurrent);
 	}
 	
 	@Override
@@ -188,6 +202,7 @@ public class ArchiveTreatment {
 			ArchiveTreatment that = (ArchiveTreatment) object;
 			return Objects.equal(this.runId, that.runId)
 				&& Objects.equal(this.domainUuid, that.domainUuid)
+				&& Objects.equal(this.recurrent, that.recurrent)
 				&& Objects.equal(this.archiveStatus, that.archiveStatus)
 				&& Objects.equal(this.startTime, that.startTime)
 				&& Objects.equal(this.endTime, that.endTime)
@@ -201,6 +216,7 @@ public class ArchiveTreatment {
 		return Objects.toStringHelper(this)
 			.add("runId", runId)
 			.add("domainUuid", domainUuid)
+			.add("recurrent", recurrent)
 			.add("archiveStatus", archiveStatus)
 			.add("startTime", startTime)
 			.add("endTime", endTime)

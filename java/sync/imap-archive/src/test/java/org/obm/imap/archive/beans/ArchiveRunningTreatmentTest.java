@@ -66,6 +66,7 @@ public class ArchiveRunningTreatmentTest {
 		ArchiveRunningTreatment
 			.forDomain(domainUuid)
 			.runId(runId)
+			.recurrent(true)
 			.higherBoundary(higherBoundary)
 			.startedAt(startTime)
 			.build();
@@ -75,6 +76,7 @@ public class ArchiveRunningTreatmentTest {
 	public void buildShouldTriggerExceptionWhenNoRunId() {
 		ArchiveRunningTreatment
 			.forDomain(domainUuid)
+			.recurrent(true)
 			.scheduledAt(scheduledTime)
 			.higherBoundary(higherBoundary)
 			.startedAt(startTime)
@@ -85,10 +87,22 @@ public class ArchiveRunningTreatmentTest {
 	public void buildShouldTriggerExceptionWhenNoHigherBoundary() {
 		ArchiveRunningTreatment
 			.forDomain(domainUuid)
+			.recurrent(true)
 			.runId(runId)
 			.scheduledAt(scheduledTime)
 			.startedAt(startTime)
 			.build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void buildShouldTriggerExceptionWhenNoRecurrent() {
+		ArchiveRunningTreatment
+		.forDomain(domainUuid)
+		.runId(runId)
+		.higherBoundary(higherBoundary)
+		.scheduledAt(scheduledTime)
+		.startedAt(startTime)
+		.build();
 	}
 	
 	@Test
@@ -96,6 +110,7 @@ public class ArchiveRunningTreatmentTest {
 		ArchiveRunningTreatment testee = ArchiveRunningTreatment
 			.forDomain(domainUuid)
 			.runId(runId)
+			.recurrent(true)
 			.scheduledAt(scheduledTime)
 			.higherBoundary(higherBoundary)
 			.startedAt(startTime)
@@ -107,6 +122,7 @@ public class ArchiveRunningTreatmentTest {
 		assertThat(testee.getScheduledTime()).isEqualTo(scheduledTime);
 		assertThat(testee.getStartTime()).isEqualTo(startTime);
 		assertThat(testee.getHigherBoundary()).isEqualTo(higherBoundary);
+		assertThat(testee.isRecurrent()).isTrue();
 	}
 
 	@Test
@@ -116,6 +132,7 @@ public class ArchiveRunningTreatmentTest {
 		ArchiveTerminatedTreatment testee = ArchiveScheduledTreatment
 				.forDomain(domainUuid)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(scheduledTime)
 				.build()
@@ -129,6 +146,7 @@ public class ArchiveRunningTreatmentTest {
 		assertThat(testee.getHigherBoundary()).isEqualTo(higherBoundary);
 		assertThat(testee.getStartTime()).isEqualTo(startTime);
 		assertThat(testee.getEndTime()).isEqualTo(endTime);
+		assertThat(testee.isRecurrent()).isTrue();
 	}
 
 	@Test
@@ -138,6 +156,7 @@ public class ArchiveRunningTreatmentTest {
 		ArchiveTerminatedTreatment testee = ArchiveScheduledTreatment
 				.forDomain(domainUuid)
 				.runId(runId)
+				.recurrent(true)
 				.higherBoundary(higherBoundary)
 				.scheduledAt(scheduledTime)
 				.build()
@@ -151,5 +170,6 @@ public class ArchiveRunningTreatmentTest {
 		assertThat(testee.getHigherBoundary()).isEqualTo(higherBoundary);
 		assertThat(testee.getStartTime()).isEqualTo(startTime);
 		assertThat(testee.getEndTime()).isEqualTo(endTime);
+		assertThat(testee.isRecurrent()).isTrue();
 	}
 }
