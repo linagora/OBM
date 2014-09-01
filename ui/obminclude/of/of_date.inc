@@ -828,6 +828,15 @@ class Of_Date extends DateTime {
   }
 
   /**
+   * Returns the number of days in the month of this object.
+   *
+   * @return integer
+   */
+  public function getDayCountInMonth() {
+    return $this->format(self::MONTH_DAYS);
+  }
+
+  /**
    * Sets a new month
    *
    * @param  integer|string|array|Of_Date  $month  Month to set
