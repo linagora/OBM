@@ -109,7 +109,6 @@ if ($status[0] != 1) {
     }
   } else if ($action == 'archiving_logs') {
     echo "<pre>";
-    echo "Please wait...</br>";
     $runId = $params['run_id'];
     $status = get_logs($runId);
     if ($status[0] != 1) {

@@ -51,3 +51,4 @@ $l_archiving_running = "当前归档日志";
 $l_unsupported_iframe = "您的浏览器并不支援iframes。";
 $l_archiving_launched = "存档有过气政客成功推出。";
 $l_excluded_folder_error = "无效排除的文件夹！它不能包含特殊字符";
+$l_confirm_manual_launch = "一个新的选项卡将打开，并在其归档进程日志。您确定要触发手动存档吗？";

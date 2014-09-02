@@ -51,3 +51,4 @@ $l_archiving_running = "Logs de l'archivage en cours";
 $l_unsupported_iframe = "Votre navigateur ne supporte pas les iframes.";
 $l_archiving_launched = "L'archivage a été lancé avec succès.";
 $l_excluded_folder_error = "Le dossier à exclure doit être correctement renseigné ! Il ne doit pas contenir de caractères spéciaux";
+$l_confirm_manual_launch = "Un nouvel onglet contenant les logs va être ouvert. Etes-vous certain(e) de vouloir lancer un archivage manuel maintenant ?";

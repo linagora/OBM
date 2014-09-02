@@ -366,17 +366,20 @@ function get_block_next_treatment_date($configuration) {
 function dis_imap_archive_consult($params, $configuration) {
 
   global $l_delete, $l_back, $l_past_operations, $l_start_time, $l_end_time, $l_status, $l_next_run, $l_manual_launch;
-  global $l_last_fail, $path, $l_confirm;
+  global $l_last_fail, $path, $l_confirm_manual_launch;
   
   $user_id = $params['user_id'];
   $url = url_prepare('imap_archive_index.php');
+  
+  $enabled = $configuration->enabled;
+  $class = ($enabled != TRUE) ? "unavailable" : "";
   
   $block_next_treatment_date = get_block_next_treatment_date($configuration);
   
   $confirm = "<script type='text/javascript'>
 
     function confirm_launch() {
-      return confirm('$l_confirm');
+      return confirm('$l_confirm_manual_launch');
     }
     </script>";
   
@@ -406,7 +409,7 @@ function dis_imap_archive_consult($params, $configuration) {
       </table>
     </div>
     <div class='buttons'>
-      <a href='$path/imap_archive/imap_archive_index.php?action=manual_launch&archive_treatment_kind=DRY_RUN' target='_blank' onclick='return confirm_launch();'>
+      <a class='$class' href='$path/imap_archive/imap_archive_index.php?action=manual_launch&archive_treatment_kind=DRY_RUN' target='_blank' onclick='return confirm_launch();'>
       $l_manual_launch 
       </a>
     </div>

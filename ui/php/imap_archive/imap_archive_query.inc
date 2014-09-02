@@ -372,9 +372,6 @@ function get_logs($runId) {
     return array(0, $l_email_address_not_found);
   }
 
-  $oneMinute = 60;
-  sleep($oneMinute);
-  
   $logPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/treatments/logs/";
   
   $queryParams = array("run_id" => $runId);
