@@ -64,6 +64,7 @@ import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import com.linagora.scheduling.DateTimeProvider;
@@ -76,15 +77,15 @@ public class TestImapArchiveModules {
 	public static final UUID uuid2 = UUID.fromString("e72906d1-4b6f-4727-8be8-3e78441623ea");
 	
 	public static final DateTime LOCAL_DATE_TIME = new DateTime()
-			.withZone(DateTimeZone.UTC)
-			.withYear(2014)
-			.withMonthOfYear(6)
-			.withDayOfMonth(18)
-			.withHourOfDay(0)
-			.withMinuteOfHour(0)
-			.withSecondOfMinute(0)
-			.withMillisOfSecond(0);
-
+		.withZone(DateTimeZone.UTC)
+		.withYear(2014)
+		.withMonthOfYear(6)
+		.withDayOfMonth(18)
+		.withHourOfDay(0)
+		.withMinuteOfHour(0)
+		.withSecondOfMinute(0)
+		.withMillisOfSecond(0);
+	
 	public static class Simple extends AbstractModule {
 	
 		private final ClientDriverRule obmSyncHttpMock;
@@ -252,21 +253,34 @@ public class TestImapArchiveModules {
 
 		@Override
 		protected void configure() {
-			bind(DateProvider.class).toInstance(new DateProvider() {
-				
-				@Override
-				public Date getDate() {
-					return LOCAL_DATE_TIME.toDate();
-				}
-			});
-			bind(DateTimeProvider.class).toInstance(new DateTimeProvider() {
-				
-				@Override
-				public DateTime now() {
-					return LOCAL_DATE_TIME;
-				}
-			});
+			bind(DateProvider.class).to(TestDateProvider.class);
+			bind(DateTimeProvider.class).to(TestDateProvider.class);
 			bind(TimeUnit.class).annotatedWith(Names.named("schedulerResolution")).toInstance(TimeUnit.MILLISECONDS);
+		}
+		
+		@Singleton
+		public static class TestDateProvider implements DateTimeProvider, DateProvider {
+
+			private DateTime current;
+
+			public TestDateProvider() {
+				this.current = LOCAL_DATE_TIME;
+			}
+			
+			public void setCurrent(DateTime current) {
+				this.current = current;
+			}
+			
+			@Override
+			public Date getDate() {
+				return current.toDate();
+			}
+
+			@Override
+			public DateTime now() {
+				return current;
+			}
+			
 		}
 	}
 	
