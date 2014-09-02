@@ -12,6 +12,7 @@ mail_archive_day_of_month INTEGER,
 mail_archive_day_of_year INTEGER,
 mail_archive_hour INTEGER,
 mail_archive_minute INTEGER,
+mail_archive_excluded_folder	TEXT,
 CONSTRAINT mail_archive_domain_uuid_ukey UNIQUE (mail_archive_domain_uuid)
 );
 
