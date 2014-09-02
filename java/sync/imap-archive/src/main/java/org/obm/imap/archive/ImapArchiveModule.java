@@ -60,6 +60,7 @@ import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBusInitializer;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerQueue;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
@@ -131,6 +132,7 @@ public class ImapArchiveModule extends AbstractModule {
 		Multibinder<ArchiveSchedulerBus.Client> busClients = Multibinder.newSetBinder(binder(), ArchiveSchedulerBus.Client.class);
 		busClients.addBinding().to(ArchiveDaoTracking.class);
 		busClients.addBinding().to(RunningArchivingTracker.class);
+		bind(ArchiveSchedulerBusInitializer.class).asEagerSingleton();
 		
 		bindImapArchiveServices();
 	}

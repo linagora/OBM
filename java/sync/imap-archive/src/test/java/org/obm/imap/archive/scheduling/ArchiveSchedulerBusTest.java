@@ -42,7 +42,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.linagora.scheduling.ScheduledTask;
 
@@ -56,7 +55,7 @@ public class ArchiveSchedulerBusTest {
 	public void setUp() {
 		mocks = EasyMock.createControl();
 		bus = mocks.createMock(EventBus.class);
-		testee = new ArchiveSchedulerBus(bus, ImmutableSet.<ArchiveSchedulerBus.Client>of());
+		testee = new ArchiveSchedulerBus(bus);
 	}
 
 	@Test

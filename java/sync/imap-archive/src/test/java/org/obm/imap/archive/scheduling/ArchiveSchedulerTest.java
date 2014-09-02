@@ -62,7 +62,6 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Logger;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Queues;
 import com.google.common.eventbus.Subscribe;
@@ -128,7 +127,8 @@ public class ArchiveSchedulerTest {
 
 		queue = new ArchiveSchedulerQueue(monitorFactory);
 		busClient = Guice.createInjector(new BusModule()).getInstance(BusClient.class); 
-		bus = new ArchiveSchedulerBus(ImmutableSet.<Client>of(busClient));
+		bus = new ArchiveSchedulerBus();
+		bus.register(busClient);
 		testee = new ArchiveScheduler(queue, bus, new ArchiveSchedulerLoggerListener(), timeProvider, MILLISECONDS);
 	}
 	

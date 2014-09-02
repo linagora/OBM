@@ -31,78 +31,22 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.scheduling;
 
-import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
+import java.util.Set;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.linagora.scheduling.Listener;
-import com.linagora.scheduling.ScheduledTask;
 
 @Singleton
-public class ArchiveSchedulerBus implements Listener<ArchiveDomainTask> {
-
-	private final EventBus bus;
+public class ArchiveSchedulerBusInitializer {
 
 	@Inject
-	@VisibleForTesting ArchiveSchedulerBus() {
-		this(new EventBus("ArchiveSchedulerBus"));
-	}
-	
-	@VisibleForTesting ArchiveSchedulerBus(EventBus bus) {
-		this.bus = bus;
-	}
-	
-	@Override
-	public void canceled(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
-	}
-
-	@Override
-	public void failed(ScheduledTask<ArchiveDomainTask> task, Throwable failure) {
-		postTaskStatusChange(task);
-	}
-
-	@Override
-	public void running(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
-	}
-
-	@Override
-	public void scheduled(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
-	}
-
-	@Override
-	public void terminated(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
-	}
-
-	private void postTaskStatusChange(ScheduledTask<ArchiveDomainTask> task) {
-		bus.post(new TaskStatusChanged(task));
-	}
-	
-	/* package */ void register(ArchiveSchedulerBus.Client client) {
-		bus.register(client);
-	}
-	
-	public static interface Client {}
-	
-	public static interface Events {
-
-		static class TaskStatusChanged {
-			
-			private final ScheduledTask<ArchiveDomainTask> task;
-
-			public TaskStatusChanged(ScheduledTask<ArchiveDomainTask> task) {
-				this.task = task;
-			}
-
-			public ScheduledTask<ArchiveDomainTask> getTask() {
-				return task;
-			}
-			
+	@VisibleForTesting ArchiveSchedulerBusInitializer(
+			ArchiveSchedulerBus schedulerBus,
+			Set<ArchiveSchedulerBus.Client> clients) {
+		
+		for (ArchiveSchedulerBus.Client client : clients) {
+			schedulerBus.register(client);
 		}
 	}
 }
