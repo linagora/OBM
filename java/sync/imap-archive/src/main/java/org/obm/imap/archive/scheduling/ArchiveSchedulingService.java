@@ -89,6 +89,11 @@ public class ArchiveSchedulingService {
 	}
 
 	@Transactional
+	public ArchiveTreatmentRunId scheduleAsRecurrent(ObmDomainUuid domain) throws DaoException {
+		return scheduleAsRecurrent(domainConfigDao.get(domain));
+	}
+	
+	@Transactional
 	public ArchiveTreatmentRunId scheduleAsRecurrent(DomainConfiguration domainConfiguration) {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
 		DateTime when = schedulingDatesService.nextTreatmentDate(domainConfiguration.getSchedulingConfiguration());

@@ -141,32 +141,61 @@ public class ArchiveSchedulingServiceTest {
 	}
 
 	@Test
+	public void scheduleByDomainUuidShouldGetDatesThenSchedule() throws Exception {
+		DomainConfiguration config = DomainConfiguration.builder()
+			.domainId(domain)
+			.enabled(true)
+			.schedulingConfiguration(
+				SchedulingConfiguration.builder()
+					.time(LocalTime.parse("22:15"))
+					.recurrence(ArchiveRecurrence.daily()).build())
+			.build();
+		
+		expect(domainConfigDao.get(domain)).andReturn(config);
+		expectScheduleByConfig(config);
+
+		mocks.replay();
+		testee.scheduleAsRecurrent(domain);
+		mocks.verify();
+	}
+
+	@Test
 	public void scheduleByConfigShouldGetDatesThenSchedule() {
-		testScheduleByConfig(
-			DomainConfiguration.builder()
-				.domainId(domain)
-				.enabled(true)
-				.schedulingConfiguration(
-					SchedulingConfiguration.builder()
-						.time(LocalTime.parse("22:15"))
-						.recurrence(ArchiveRecurrence.daily()).build())
-				.build());
+		DomainConfiguration config = DomainConfiguration.builder()
+			.domainId(domain)
+			.enabled(true)
+			.schedulingConfiguration(
+				SchedulingConfiguration.builder()
+					.time(LocalTime.parse("22:15"))
+					.recurrence(ArchiveRecurrence.daily()).build())
+			.build();
+
+		expectScheduleByConfig(config);
+		
+		mocks.replay();
+		testee.scheduleAsRecurrent(config);
+		mocks.verify();
 	}
 
 	@Test
 	public void scheduleByConfigShouldNotCheckEnabledStatus() {
-		testScheduleByConfig(
-			DomainConfiguration.builder()
-				.domainId(domain)
-				.enabled(false)
-				.schedulingConfiguration(
-					SchedulingConfiguration.builder()
-						.time(LocalTime.parse("22:15"))
-						.recurrence(ArchiveRecurrence.daily()).build())
-				.build());
+		DomainConfiguration config = DomainConfiguration.builder()
+			.domainId(domain)
+			.enabled(false)
+			.schedulingConfiguration(
+				SchedulingConfiguration.builder()
+					.time(LocalTime.parse("22:15"))
+					.recurrence(ArchiveRecurrence.daily()).build())
+			.build();
+		
+		expectScheduleByConfig(config);
+
+		mocks.replay();
+		testee.scheduleAsRecurrent(config);
+		mocks.verify();
 	}
 
-	private void testScheduleByConfig(DomainConfiguration config) {
+	private void expectScheduleByConfig(DomainConfiguration config) {
 		DateTime when = DateTime.parse("2024-01-1T05:04Z");
 		DateTime higherBoundary = DateTime.parse("2024-02-1T05:04Z");
 		UUID runUuid = UUID.fromString("ecd08c0d-70aa-4a04-8a18-57fe7afe1404");
@@ -179,9 +208,5 @@ public class ArchiveSchedulingServiceTest {
 		expect(uuidFactory.randomUUID()).andReturn(runUuid);
 		expect(taskFactory.createAsRecurrent(domain, when, higherBoundary, runId)).andReturn(task);
 		expect(scheduler.schedule(task)).andReturn(scheduled);
-		
-		mocks.replay();
-		testee.scheduleAsRecurrent(config);
-		mocks.verify();
 	}
 }

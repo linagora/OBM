@@ -49,6 +49,7 @@ import org.obm.domain.dao.UserSystemDao;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerFileNameService;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory.OnlyOnePerDomainMonitorFactoryImpl;
 import org.obm.locator.LocatorClientException;
@@ -65,11 +66,11 @@ import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import com.linagora.scheduling.DateTimeProvider;
 import com.linagora.scheduling.Monitor;
-import com.linagora.scheduling.Scheduler;
 
 public class TestImapArchiveModules {
 	
@@ -117,6 +118,9 @@ public class TestImapArchiveModules {
 						IMocksControl control = EasyMock.createControl();
 						bind(IMocksControl.class).toInstance(control);
 						bind(UserSystemDao.class).toInstance(control.createMock(UserSystemDao.class));
+
+						Multibinder<ArchiveSchedulerBus.Client> busClients = Multibinder.newSetBinder(binder(), ArchiveSchedulerBus.Client.class);
+						busClients.addBinding().to(FutureSchedulerBusClient.class);
 					}
 				}
 			));
@@ -311,9 +315,6 @@ public class TestImapArchiveModules {
 		@Override
 		protected void configure() {
 			bind(Boolean.class).annotatedWith(Names.named("endlessTask")).toInstance(Boolean.FALSE);
-			bind(Scheduler.class).toInstance(Scheduler.builder()
-					.resolution(1, TimeUnit.SECONDS)
-					.start());
 		}
 	}
 	
