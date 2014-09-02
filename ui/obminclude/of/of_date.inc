@@ -976,6 +976,16 @@ class Of_Date extends DateTime {
   }
 
   /**
+   * Returns this object's internal weekday in ISO 8601 format (Monday=1 to
+   * Sunday = 7).
+   *
+   * @return integer
+   */
+  public function getIso8601Weekday() {
+    return $this->format(self::WEEKDAY_8601);
+  }
+
+  /**
    * Sets a new weekday
    *
    * @param  integer|string|array|Of_Date  $weekday  Weekday to set
