@@ -31,10 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.scheduling;
 
-import java.util.Comparator;
-
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeComparator;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
@@ -52,18 +49,6 @@ import com.linagora.scheduling.Task;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ArchiveDomainTask implements Task {
-
-	public final static int BYTES_IN_MEMORY = 10240;
-	
-	public static Comparator<ArchiveDomainTask> comparator() {
-		return new Comparator<ArchiveDomainTask>() {
-
-			@Override
-			public int compare(ArchiveDomainTask o1, ArchiveDomainTask o2) {
-				return DateTimeComparator.getInstance().compare(o1.getWhen(), o2.getWhen());
-			}
-		};
-	}
 	
 	public interface Factory {
 		ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, ArchiveTreatmentKind kind);
