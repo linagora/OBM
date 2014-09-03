@@ -35,7 +35,7 @@ import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
-import org.obm.imap.archive.services.ArchiveService;
+import org.obm.imap.archive.services.ImapArchiveProcessing;
 
 import ch.qos.logback.classic.Logger;
 
@@ -45,15 +45,15 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class DryRunArchiveDomainTask extends AbstractArchiveDomainTask {
 
-	public DryRunArchiveDomainTask(ArchiveService archiveService, ObmDomainUuid domain,
+	public DryRunArchiveDomainTask(ImapArchiveProcessing imapArchiveProcessing, ObmDomainUuid domain,
 			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger,
 			LoggerAppenders loggerAppenders) {
-		super(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders, false);
+		super(imapArchiveProcessing, domain, when, higherBoundary, runId, logger, loggerAppenders, false);
 	}
 	
 	@Override
 	public void run() {
-		archiveService.archive(this);
+		imapArchiveProcessing.archive(this);
 	}
 
 	@Override

@@ -37,7 +37,6 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
-import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerFileNameService;
 import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
@@ -50,23 +49,14 @@ import com.google.inject.Singleton;
 public class ArchiveServiceImpl implements ArchiveService {
 
 	private final ScheduledArchivingTracker scheduledArchivingTracker;
-	private final ImapArchiveProcessing imapArchiveProcessing;
 	private final LoggerFileNameService loggerFileNameService;
 
 	@Inject
 	@VisibleForTesting ArchiveServiceImpl(ScheduledArchivingTracker scheduledArchivingTracker,
-			ImapArchiveProcessing imapArchiveProcessing,
 			LoggerFileNameService loggerFileNameService) {
 		
 		this.scheduledArchivingTracker = scheduledArchivingTracker;
-		this.imapArchiveProcessing = imapArchiveProcessing;
 		this.loggerFileNameService = loggerFileNameService;
-	}
-	
-	@Override
-	@Transactional
-	public void archive(final AbstractArchiveDomainTask archiveDomainTask) {
-		imapArchiveProcessing.archive(archiveDomainTask);
 	}
 	
 	@Override

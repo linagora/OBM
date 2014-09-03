@@ -53,7 +53,7 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Client;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events;
-import org.obm.imap.archive.services.ArchiveService;
+import org.obm.imap.archive.services.ImapArchiveProcessing;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
@@ -77,7 +77,7 @@ public class ArchiveSchedulerTest {
 	int timeout;
 
 	IMocksControl mocks;
-	ArchiveService archiveService;
+	ImapArchiveProcessing imapArchiveProcessing;
 	Logger logger;
 	LoggerAppenders loggerAppenders;
 	DateTime higherBoundary;
@@ -96,7 +96,7 @@ public class ArchiveSchedulerTest {
 		higherBoundary = DateTime.parse("2024-11-1T05:04Z");
 		
 		mocks = createControl();
-		archiveService = mocks.createMock(ArchiveService.class);
+		imapArchiveProcessing = mocks.createMock(ImapArchiveProcessing.class);
 		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
 		loggerAppenders = mocks.createMock(LoggerAppenders.class);
 		loggerAppenders.startAppenders();
@@ -129,7 +129,7 @@ public class ArchiveSchedulerTest {
 	
 	private RemotelyControlledTask createTask(ObmDomainUuid domain,
 			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
-		return new RemotelyControlledTask(archiveService, logger, loggerAppenders, domain, when, higherBoundary, runId);
+		return new RemotelyControlledTask(imapArchiveProcessing, logger, loggerAppenders, domain, when, higherBoundary, runId);
 	}
 	
 	@After
@@ -143,7 +143,7 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		DateTime when = DateTime.parse("2024-11-1T05:04Z");
 		
-		archiveService.archive(archiveDomainTask(domain, runId, when));
+		imapArchiveProcessing.archive(archiveDomainTask(domain, runId, when));
 		expectLastCall();
 		
 		mocks.replay();
@@ -163,9 +163,9 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
-		archiveService.archive(archiveDomainTask(domain, runId1, when1));
+		imapArchiveProcessing.archive(archiveDomainTask(domain, runId1, when1));
 		expectLastCall();
-		archiveService.archive(archiveDomainTask(domain, runId2, when2));
+		imapArchiveProcessing.archive(archiveDomainTask(domain, runId2, when2));
 		expectLastCall();
 
 		mocks.replay();
@@ -187,9 +187,9 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
-		archiveService.archive(archiveDomainTask(domain, runId1, when));
+		imapArchiveProcessing.archive(archiveDomainTask(domain, runId1, when));
 		expectLastCall();
-		archiveService.archive(archiveDomainTask(domain, runId2, whenToEnqueue));
+		imapArchiveProcessing.archive(archiveDomainTask(domain, runId2, whenToEnqueue));
 		expectLastCall();
 
 		mocks.replay();
@@ -218,11 +218,11 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
 
-		archiveService.archive(archiveDomainTask(domain, runId1, when));
+		imapArchiveProcessing.archive(archiveDomainTask(domain, runId1, when));
 		expectLastCall();
-		archiveService.archive(archiveDomainTask(domain, runId2, laterWhenEnqueuedBefore));
+		imapArchiveProcessing.archive(archiveDomainTask(domain, runId2, laterWhenEnqueuedBefore));
 		expectLastCall();
-		archiveService.archive(archiveDomainTask(domain, runId3, earlierWhenEnqueuedAfter));
+		imapArchiveProcessing.archive(archiveDomainTask(domain, runId3, earlierWhenEnqueuedAfter));
 		expectLastCall();
 
 		mocks.replay();
@@ -255,9 +255,9 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
-		archiveService.archive(archiveDomainTask(domain1, runId1, when1));
+		imapArchiveProcessing.archive(archiveDomainTask(domain1, runId1, when1));
 		expectLastCall();
-		archiveService.archive(archiveDomainTask(domain2, runId2, when2));
+		imapArchiveProcessing.archive(archiveDomainTask(domain2, runId2, when2));
 		expectLastCall();
 
 		mocks.replay();
@@ -289,13 +289,13 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
 		ArchiveTreatmentRunId runId4 = ArchiveTreatmentRunId.from("b1226053-265d-4b0e-a524-e37b1dfcb2e9");
 
-		archiveService.archive(archiveDomainTask(domain1, runId1, when1));
+		imapArchiveProcessing.archive(archiveDomainTask(domain1, runId1, when1));
 		expectLastCall();
-		archiveService.archive(archiveDomainTask(domain2, runId2, when2));
+		imapArchiveProcessing.archive(archiveDomainTask(domain2, runId2, when2));
 		expectLastCall();
-		archiveService.archive(archiveDomainTask(domain1, runId3, when1ToEnqueue));
+		imapArchiveProcessing.archive(archiveDomainTask(domain1, runId3, when1ToEnqueue));
 		expectLastCall();
-		archiveService.archive(archiveDomainTask(domain2, runId4, when2ToEnqueue));
+		imapArchiveProcessing.archive(archiveDomainTask(domain2, runId4, when2ToEnqueue));
 		expectLastCall();
 		
 		mocks.replay();
@@ -342,7 +342,7 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
-		archiveService.archive(archiveDomainTask(domain, runId1, when1));
+		imapArchiveProcessing.archive(archiveDomainTask(domain, runId1, when1));
 		expectLastCall().anyTimes();
 
 		mocks.replay();
@@ -385,7 +385,7 @@ public class ArchiveSchedulerTest {
 	}
 
 	AbstractArchiveDomainTask archiveDomainTask(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DateTime when) {
-		return new ArchiveDomainTask(archiveService, domain, when, 
+		return new ArchiveDomainTask(imapArchiveProcessing, domain, when, 
 				higherBoundary, runId, logger, loggerAppenders, false);
 	}
 

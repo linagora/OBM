@@ -36,7 +36,7 @@ import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.logging.LoggerFactory;
-import org.obm.imap.archive.services.ArchiveService;
+import org.obm.imap.archive.services.ImapArchiveProcessing;
 
 import ch.qos.logback.classic.Logger;
 
@@ -49,12 +49,12 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 @Singleton
 public class ArchiveDomainTaskFactory {
 	
-	private final ArchiveService archiveService;
+	private final ImapArchiveProcessing imapArchiveProcessing;
 	private final LoggerFactory loggerFactory;
 
 	@Inject
-	@VisibleForTesting ArchiveDomainTaskFactory(ArchiveService archiveService, LoggerFactory loggerFactory) {
-		this.archiveService = archiveService;
+	@VisibleForTesting ArchiveDomainTaskFactory(ImapArchiveProcessing imapArchiveProcessing, LoggerFactory loggerFactory) {
+		this.imapArchiveProcessing = imapArchiveProcessing;
 		this.loggerFactory = loggerFactory;
 	}
 	
@@ -76,10 +76,10 @@ public class ArchiveDomainTaskFactory {
 		
 		switch (archiveTreatmentKind) {
 		case DRY_RUN:
-			return new DryRunArchiveDomainTask(archiveService, 
+			return new DryRunArchiveDomainTask(imapArchiveProcessing, 
 					domain, when, higherBoundary, runId, logger, loggerAppenders);
 		case REAL_RUN:
-			return new ArchiveDomainTask(archiveService,
+			return new ArchiveDomainTask(imapArchiveProcessing,
 					domain, when, higherBoundary, runId, logger, loggerAppenders,
 					recurrent);
 		}

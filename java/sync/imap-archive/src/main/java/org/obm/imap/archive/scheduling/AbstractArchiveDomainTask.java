@@ -35,7 +35,7 @@ import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
-import org.obm.imap.archive.services.ArchiveService;
+import org.obm.imap.archive.services.ImapArchiveProcessing;
 
 import ch.qos.logback.classic.Logger;
 
@@ -46,7 +46,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public abstract class AbstractArchiveDomainTask implements Task {
 
-	protected final ArchiveService archiveService;
+	protected final ImapArchiveProcessing imapArchiveProcessing;
 	protected final ObmDomainUuid domain;
 	protected final DateTime when;
 	protected final DateTime higherBoundary;
@@ -55,10 +55,10 @@ public abstract class AbstractArchiveDomainTask implements Task {
 	protected final LoggerAppenders loggerAppenders;
 	protected final boolean recurrent;
 	
-	protected AbstractArchiveDomainTask(ArchiveService archiveService, ObmDomainUuid domain,
+	protected AbstractArchiveDomainTask(ImapArchiveProcessing imapArchiveProcessing, ObmDomainUuid domain,
 			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger, LoggerAppenders loggerAppenders, 
 			boolean recurrent) {
-		this.archiveService = archiveService;
+		this.imapArchiveProcessing = imapArchiveProcessing;
 		this.domain = domain;
 		this.when = when;
 		this.higherBoundary = higherBoundary;
