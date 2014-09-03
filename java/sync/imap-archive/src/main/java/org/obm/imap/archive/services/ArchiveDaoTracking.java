@@ -39,7 +39,7 @@ import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -82,7 +82,7 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 		insertOrUpdate(event.getTask(), state);
 	}
 
-	private void insertOrUpdate(ArchiveDomainTask task, State state) {
+	private void insertOrUpdate(AbstractArchiveDomainTask task, State state) {
 		try {
 			if (hasToBePersisted(task)) {
 				Optional<ArchiveTreatment> treatment = archiveTreatmentDao.find(task.getRunId());
@@ -97,11 +97,11 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 		}
 	}
 
-	private boolean hasToBePersisted(ArchiveDomainTask task) {
+	private boolean hasToBePersisted(AbstractArchiveDomainTask task) {
 		return ArchiveTreatmentKind.REAL_RUN.equals(task.getArchiveTreatmentKind());
 	}
 
-	private void insert(ArchiveDomainTask task, State state) throws DaoException {
+	private void insert(AbstractArchiveDomainTask task, State state) throws DaoException {
 		if (State.WAITING != state) {
 			logger.error("Only task with status {} can be created, received {}", State.WAITING, state);
 			return;
@@ -119,7 +119,7 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 				.build());
 	}
 
-	private void update(ArchiveTreatment from, ArchiveDomainTask task, State state) throws DaoException, ElementNotFoundException {
+	private void update(ArchiveTreatment from, AbstractArchiveDomainTask task, State state) throws DaoException, ElementNotFoundException {
 		ArchiveTreatment.Builder<ArchiveTreatment> treatmentBuilder = ArchiveTreatment
 			.builder(task.getDomain())
 			.runId(task.getRunId())

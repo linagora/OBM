@@ -35,7 +35,7 @@ import java.util.Map;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
 
@@ -48,7 +48,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class ScheduledArchivingTracker implements ArchiveSchedulerBus.Client {
 
-	private final Map<ArchiveTreatmentRunId, ArchiveDomainTask> scheduledTasks;
+	private final Map<ArchiveTreatmentRunId, AbstractArchiveDomainTask> scheduledTasks;
 
 	@VisibleForTesting ScheduledArchivingTracker() {
 		this.scheduledTasks = Maps.newConcurrentMap();
@@ -57,7 +57,7 @@ public class ScheduledArchivingTracker implements ArchiveSchedulerBus.Client {
 	@Subscribe
 	@Transactional
 	public void onTreatmentStateChange(TaskStatusChanged event) {
-		ArchiveDomainTask archiveDomainTask = event.getTask();
+		AbstractArchiveDomainTask archiveDomainTask = event.getTask();
 		switch (event.getState()) {
 		case RUNNING:
 		case NEW:
@@ -73,7 +73,7 @@ public class ScheduledArchivingTracker implements ArchiveSchedulerBus.Client {
 		}
 	}
 	
-	public Optional<ArchiveDomainTask> get(ArchiveTreatmentRunId runId) {
+	public Optional<AbstractArchiveDomainTask> get(ArchiveTreatmentRunId runId) {
 		return Optional.fromNullable(scheduledTasks.get(runId));
 	}
 }

@@ -47,7 +47,7 @@ import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
@@ -72,8 +72,8 @@ public class ArchiveDaoTrackingTest {
 	Logger logger;
 	ArchiveTreatmentDao dao;
 	DateTimeProvider timeProvider;
-	Scheduler<ArchiveDomainTask> scheduler;
-	ArchiveDomainTask task;
+	Scheduler<AbstractArchiveDomainTask> scheduler;
+	AbstractArchiveDomainTask task;
 	ArchiveDaoTracking testee;
 
 	@Before
@@ -86,7 +86,7 @@ public class ArchiveDaoTrackingTest {
 		higherBoundary = DateTime.parse("2024-12-1T01:04Z");
 		
 		mocks = EasyMock.createControl();
-		task = mocks.createMock(ArchiveDomainTask.class);
+		task = mocks.createMock(AbstractArchiveDomainTask.class);
 		logger = mocks.createMock(Logger.class);
 		dao = mocks.createMock(ArchiveTreatmentDao.class);
 		timeProvider = mocks.createMock(DateTimeProvider.class);
@@ -96,7 +96,7 @@ public class ArchiveDaoTrackingTest {
 		expect(task.getRunId()).andReturn(runId).anyTimes();
 		expect(task.isRecurrent()).andReturn(true).anyTimes();
 		
-		scheduler = Scheduler.<ArchiveDomainTask>builder().timeProvider(timeProvider).start();
+		scheduler = Scheduler.<AbstractArchiveDomainTask>builder().timeProvider(timeProvider).start();
 		testee = new ArchiveDaoTracking(logger, dao, timeProvider);
 	}
 

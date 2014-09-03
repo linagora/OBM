@@ -79,7 +79,7 @@ public class ArchiveSchedulingService {
 		DateTime higherBoundary = schedulingDatesService.higherBoundary(when, repeatKind);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
-		ArchiveDomainTask task = taskFactory.create(domain, when, higherBoundary, runId, kind);
+		AbstractArchiveDomainTask task = taskFactory.create(domain, when, higherBoundary, runId, kind);
 		scheduler.schedule(task);
 		
 		return runId;
@@ -106,7 +106,7 @@ public class ArchiveSchedulingService {
 		DateTime when = schedulingDatesService.nextTreatmentDate(domainConfiguration.getSchedulingConfiguration());
 		DateTime higherBoundary = schedulingDatesService.higherBoundary(when, domainConfiguration.getRepeatKind());
 		
-		ArchiveDomainTask task = taskFactory.createAsRecurrent(domainConfiguration.getDomainId(), when, higherBoundary, runId);
+		AbstractArchiveDomainTask task = taskFactory.createAsRecurrent(domainConfiguration.getDomainId(), when, higherBoundary, runId);
 		scheduler.schedule(task);
 		
 		return runId;

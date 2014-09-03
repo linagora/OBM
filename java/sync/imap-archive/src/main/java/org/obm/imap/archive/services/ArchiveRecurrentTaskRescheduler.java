@@ -32,7 +32,7 @@
 package org.obm.imap.archive.services;
 
 import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
@@ -71,9 +71,9 @@ public class ArchiveRecurrentTaskRescheduler implements ArchiveSchedulerBus.Clie
 		}
 	}
 
-	private void reschedule(ArchiveDomainTask task) {
+	private void reschedule(AbstractArchiveDomainTask schedulerTask) {
 		try {
-			ObmDomainUuid domain = task.getDomain();
+			ObmDomainUuid domain = schedulerTask.getDomain();
 			logger.info("A recurrent task for domain {} will be re-scheduled", domain.get());
 			schedulingService.scheduleAsRecurrent(domain);
 		} catch (DaoException e) {

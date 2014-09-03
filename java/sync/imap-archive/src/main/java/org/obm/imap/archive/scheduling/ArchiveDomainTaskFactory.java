@@ -58,17 +58,17 @@ public class ArchiveDomainTaskFactory {
 		this.loggerFactory = loggerFactory;
 	}
 	
-	public ArchiveDomainTask createAsRecurrent(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
+	public AbstractArchiveDomainTask createAsRecurrent(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
 		return create(domain, when, higherBoundary, runId, ArchiveTreatmentKind.REAL_RUN, true);
 	}
 
-	public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when,
+	public AbstractArchiveDomainTask create(ObmDomainUuid domain, DateTime when,
 			DateTime higherBoundary, ArchiveTreatmentRunId runId,
 			ArchiveTreatmentKind kind) {
 		return create(domain, when, higherBoundary, runId, kind, false);
 	}
 	
-	private ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, 
+	private AbstractArchiveDomainTask create(ObmDomainUuid domain, DateTime when, 
 			DateTime higherBoundary, ArchiveTreatmentRunId runId, 
 			ArchiveTreatmentKind archiveTreatmentKind, boolean recurrent) {
 		Logger logger = loggerFactory.create(runId);
@@ -79,7 +79,7 @@ public class ArchiveDomainTaskFactory {
 			return new DryRunArchiveDomainTask(archiveService, 
 					domain, when, higherBoundary, runId, logger, loggerAppenders);
 		case REAL_RUN:
-			return new RealRunArchiveDomainTask(archiveService,
+			return new ArchiveDomainTask(archiveService,
 					domain, when, higherBoundary, runId, logger, loggerAppenders,
 					recurrent);
 		}

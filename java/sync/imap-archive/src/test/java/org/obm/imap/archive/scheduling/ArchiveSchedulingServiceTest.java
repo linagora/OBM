@@ -120,8 +120,8 @@ public class ArchiveSchedulingServiceTest {
 		DateTime higherBoundary = DateTime.parse("2024-02-1T05:04Z");
 		UUID runUuid = UUID.fromString("ecd08c0d-70aa-4a04-8a18-57fe7afe1404");
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(runUuid);
-		ArchiveDomainTask task = mocks.createMock(ArchiveDomainTask.class);
-		ScheduledTask<ArchiveDomainTask> scheduled = mocks.createMock(ScheduledTask.class);
+		AbstractArchiveDomainTask task = mocks.createMock(AbstractArchiveDomainTask.class);
+		ScheduledTask<AbstractArchiveDomainTask> scheduled = mocks.createMock(ScheduledTask.class);
 
 		expect(domainConfigDao.get(domain)).andReturn(config);
 		expect(schedulingDatesService.higherBoundary(when, config.getRepeatKind())).andReturn(higherBoundary);
@@ -209,8 +209,8 @@ public class ArchiveSchedulingServiceTest {
 		DateTime higherBoundary = DateTime.parse("2024-02-1T05:04Z");
 		UUID runUuid = UUID.fromString("ecd08c0d-70aa-4a04-8a18-57fe7afe1404");
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(runUuid);
-		ArchiveDomainTask task = mocks.createMock(ArchiveDomainTask.class);
-		ScheduledTask<ArchiveDomainTask> scheduled = mocks.createMock(ScheduledTask.class);
+		AbstractArchiveDomainTask task = mocks.createMock(AbstractArchiveDomainTask.class);
+		ScheduledTask<AbstractArchiveDomainTask> scheduled = mocks.createMock(ScheduledTask.class);
 		
 		expect(schedulingDatesService.nextTreatmentDate(config.getSchedulingConfiguration())).andReturn(when);
 		expect(schedulingDatesService.higherBoundary(when, config.getRepeatKind())).andReturn(higherBoundary);

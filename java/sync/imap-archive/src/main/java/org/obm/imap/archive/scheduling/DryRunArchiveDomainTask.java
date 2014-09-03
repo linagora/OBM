@@ -43,7 +43,7 @@ import com.google.common.base.Objects;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public class DryRunArchiveDomainTask extends ArchiveDomainTask {
+public class DryRunArchiveDomainTask extends AbstractArchiveDomainTask {
 
 	public DryRunArchiveDomainTask(ArchiveService archiveService, ObmDomainUuid domain,
 			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger,

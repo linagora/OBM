@@ -40,7 +40,7 @@ import javax.inject.Inject;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerFileNameService;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
@@ -65,13 +65,13 @@ public class ArchiveServiceImpl implements ArchiveService {
 	
 	@Override
 	@Transactional
-	public void archive(final ArchiveDomainTask archiveDomainTask) {
+	public void archive(final AbstractArchiveDomainTask archiveDomainTask) {
 		imapArchiveProcessing.archive(archiveDomainTask);
 	}
 	
 	@Override
 	public Optional<Object> archiveTreatmentLogs(final ArchiveTreatmentRunId runId) throws IOException {
-		Optional<ArchiveDomainTask> optional = scheduledArchivingTracker.get(runId);
+		Optional<AbstractArchiveDomainTask> optional = scheduledArchivingTracker.get(runId);
 		if (optional.isPresent()) {
 			return Optional.<Object> of(optional.get().getLoggerAppenders().getChunkAppender().chunk());
 		}

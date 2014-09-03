@@ -42,7 +42,7 @@ import com.linagora.scheduling.ScheduledTask;
 import com.linagora.scheduling.ScheduledTask.State;
 
 @Singleton
-public class ArchiveSchedulerBus implements Listener<ArchiveDomainTask> {
+public class ArchiveSchedulerBus implements Listener<AbstractArchiveDomainTask> {
 
 	private final EventBus bus;
 
@@ -56,31 +56,31 @@ public class ArchiveSchedulerBus implements Listener<ArchiveDomainTask> {
 	}
 	
 	@Override
-	public void canceled(ScheduledTask<ArchiveDomainTask> task) {
+	public void canceled(ScheduledTask<AbstractArchiveDomainTask> task) {
 		postTaskStatusChange(task.task(), State.CANCELED);
 	}
 
 	@Override
-	public void failed(ScheduledTask<ArchiveDomainTask> task, Throwable failure) {
+	public void failed(ScheduledTask<AbstractArchiveDomainTask> task, Throwable failure) {
 		postTaskStatusChange(task.task(), State.FAILED);
 	}
 
 	@Override
-	public void running(ScheduledTask<ArchiveDomainTask> task) {
+	public void running(ScheduledTask<AbstractArchiveDomainTask> task) {
 		postTaskStatusChange(task.task(), State.RUNNING);
 	}
 
 	@Override
-	public void scheduled(ScheduledTask<ArchiveDomainTask> task) {
+	public void scheduled(ScheduledTask<AbstractArchiveDomainTask> task) {
 		postTaskStatusChange(task.task(), State.WAITING);
 	}
 
 	@Override
-	public void terminated(ScheduledTask<ArchiveDomainTask> task) {
+	public void terminated(ScheduledTask<AbstractArchiveDomainTask> task) {
 		postTaskStatusChange(task.task(), State.TERMINATED);
 	}
 
-	private void postTaskStatusChange(ArchiveDomainTask task, State state) {
+	private void postTaskStatusChange(AbstractArchiveDomainTask task, State state) {
 		bus.post(new TaskStatusChanged(task, state));
 	}
 	
@@ -94,15 +94,15 @@ public class ArchiveSchedulerBus implements Listener<ArchiveDomainTask> {
 
 		static class TaskStatusChanged {
 			
-			private final ArchiveDomainTask task;
+			private final AbstractArchiveDomainTask task;
 			private final State state;
 
-			public TaskStatusChanged(ArchiveDomainTask task, State state) {
+			public TaskStatusChanged(AbstractArchiveDomainTask task, State state) {
 				this.task = task;
 				this.state = state;
 			}
 
-			public ArchiveDomainTask getTask() {
+			public AbstractArchiveDomainTask getTask() {
 				return task;
 			}
 			

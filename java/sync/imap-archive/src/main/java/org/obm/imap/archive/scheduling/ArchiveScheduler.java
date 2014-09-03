@@ -50,7 +50,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 public class ArchiveScheduler implements AutoCloseable {
 
 	private final ArchiveSchedulerQueue queue;
-	private final Scheduler<ArchiveDomainTask> scheduler;
+	private final Scheduler<AbstractArchiveDomainTask> scheduler;
 
 	@Inject
 	@VisibleForTesting ArchiveScheduler(
@@ -61,7 +61,7 @@ public class ArchiveScheduler implements AutoCloseable {
 			@Named("schedulerResolution") TimeUnit schedulerResolution) {
 		
 		this.queue = queue;
-		this.scheduler = Scheduler.<ArchiveDomainTask>builder()
+		this.scheduler = Scheduler.<AbstractArchiveDomainTask>builder()
 				.queue(this.queue)
 				.timeProvider(dateTimeProvider)
 				.resolution(schedulerResolution)
@@ -76,23 +76,23 @@ public class ArchiveScheduler implements AutoCloseable {
 		scheduler.stop();
 	}
 
-	public ScheduledTask<ArchiveDomainTask> schedule(ArchiveDomainTask task) {
+	public ScheduledTask<AbstractArchiveDomainTask> schedule(AbstractArchiveDomainTask task) {
 		return scheduler.schedule(task).at(task.getWhen());
 	}
 
 	
 	public void clearDomain(ObmDomainUuid domain) {
-		for (ScheduledTask<ArchiveDomainTask> task : 
+		for (ScheduledTask<AbstractArchiveDomainTask> task : 
 				Iterables.filter(queue.getDomainTasks(domain), onlyScheduledTasksPredicate())) {
 			task.cancel();
 		}
 	}
 
-	private Predicate<ScheduledTask<ArchiveDomainTask>> onlyScheduledTasksPredicate() {
-		return new Predicate<ScheduledTask<ArchiveDomainTask>>() {
+	private Predicate<ScheduledTask<AbstractArchiveDomainTask>> onlyScheduledTasksPredicate() {
+		return new Predicate<ScheduledTask<AbstractArchiveDomainTask>>() {
 
 			@Override
-			public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
+			public boolean apply(ScheduledTask<AbstractArchiveDomainTask> input) {
 				return input.state() == State.NEW
 					|| input.state() == State.WAITING;
 			}

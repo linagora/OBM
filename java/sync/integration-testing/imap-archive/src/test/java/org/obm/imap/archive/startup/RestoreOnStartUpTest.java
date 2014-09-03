@@ -60,7 +60,7 @@ import org.obm.imap.archive.beans.ArchiveTerminatedTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
 import org.obm.server.WebServer;
 
@@ -157,7 +157,7 @@ public class RestoreOnStartUpTest {
 		when()
 			.get("/imap-archive/service/v1/status");
 		
-		List<ScheduledTask<ArchiveDomainTask>> tasks = monitor.get().all();
+		List<ScheduledTask<AbstractArchiveDomainTask>> tasks = monitor.get().all();
 		assertThat(tasks).hasSize(1);
 		assertThat(tasks.get(0).task()).isEqualTo(taskFactory.createAsRecurrent(
 			expectedScheduledDomain,

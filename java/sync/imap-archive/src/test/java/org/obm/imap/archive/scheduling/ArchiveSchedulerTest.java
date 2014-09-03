@@ -83,8 +83,8 @@ public class ArchiveSchedulerTest {
 	DateTime higherBoundary;
 	
 	TestDateTimeProvider timeProvider;
-	Monitor<ArchiveDomainTask> monitor;
-	FutureTestListener<ArchiveDomainTask> futureListener;
+	Monitor<AbstractArchiveDomainTask> monitor;
+	FutureTestListener<AbstractArchiveDomainTask> futureListener;
 	BusClient busClient;
 	ArchiveSchedulerBus bus;
 	ArchiveSchedulerQueue queue;
@@ -111,8 +111,8 @@ public class ArchiveSchedulerTest {
 		OnlyOnePerDomainMonitorFactory monitorFactory = new OnlyOnePerDomainMonitorFactory() {
 
 				@Override
-				public Monitor<ArchiveDomainTask> create() {
-					monitor = Monitor.<ArchiveDomainTask>builder()
+				public Monitor<AbstractArchiveDomainTask> create() {
+					monitor = Monitor.<AbstractArchiveDomainTask>builder()
 							.addListener(futureListener)
 							.build();
 					return monitor;
@@ -347,9 +347,9 @@ public class ArchiveSchedulerTest {
 
 		mocks.replay();
 		RemotelyControlledTask runningTask = createTask(domain, when1, higherBoundary, runId1);
-		ScheduledTask<ArchiveDomainTask> running = testee.schedule(runningTask);
+		ScheduledTask<AbstractArchiveDomainTask> running = testee.schedule(runningTask);
 		RemotelyControlledTask scheduledTask = createTask(domain, when2, higherBoundary, runId2);
-		ScheduledTask<ArchiveDomainTask> scheduled = testee.schedule(scheduledTask);
+		ScheduledTask<AbstractArchiveDomainTask> scheduled = testee.schedule(scheduledTask);
 		
 		assertTaskIsScheduled(runningTask);
 		assertTaskIsScheduled(scheduledTask);
@@ -372,9 +372,9 @@ public class ArchiveSchedulerTest {
 
 		mocks.replay();
 		RemotelyControlledTask scheduledTask1 = createTask(domain1, when1, higherBoundary, runId1);
-		ScheduledTask<ArchiveDomainTask> scheduled1 = testee.schedule(scheduledTask1);
+		ScheduledTask<AbstractArchiveDomainTask> scheduled1 = testee.schedule(scheduledTask1);
 		RemotelyControlledTask scheduledTask2 = createTask(domain2, when2, higherBoundary, runId2);
-		ScheduledTask<ArchiveDomainTask> scheduled2 = testee.schedule(scheduledTask2);
+		ScheduledTask<AbstractArchiveDomainTask> scheduled2 = testee.schedule(scheduledTask2);
 		assertTaskIsScheduled(scheduledTask1);
 		assertTaskIsScheduled(scheduledTask2);
 		testee.clearDomain(domain1);
@@ -384,18 +384,18 @@ public class ArchiveSchedulerTest {
 		assertThat(scheduled2.state()).isEqualTo(State.WAITING);
 	}
 
-	ArchiveDomainTask archiveDomainTask(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DateTime when) {
-		return new RealRunArchiveDomainTask(archiveService, domain, when, 
+	AbstractArchiveDomainTask archiveDomainTask(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DateTime when) {
+		return new ArchiveDomainTask(archiveService, domain, when, 
 				higherBoundary, runId, logger, loggerAppenders, false);
 	}
 
-	void assertTaskProgression(ArchiveDomainTask task) throws Exception {
+	void assertTaskProgression(AbstractArchiveDomainTask task) throws Exception {
 		assertTaskIsScheduled(task);
 		assertTaskIsRunning(task);
 		assertTaskIsTerminated(task);
 	}
 
-	void assertTaskIsScheduled(ArchiveDomainTask task) throws Exception {
+	void assertTaskIsScheduled(AbstractArchiveDomainTask task) throws Exception {
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.WAITING);
 		assertThat(busClient.getState(timeout, MILLISECONDS)).isEqualTo(State.WAITING);
 		assertThat(
@@ -404,7 +404,7 @@ public class ArchiveSchedulerTest {
 				.contains(tuple(task, task.getWhen()));
 	}
 	
-	void assertTaskIsRunning(ArchiveDomainTask task) throws Exception {
+	void assertTaskIsRunning(AbstractArchiveDomainTask task) throws Exception {
 		timeProvider.setCurrent(task.getWhen());
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.RUNNING);
 		assertThat(busClient.getState(timeout, MILLISECONDS)).isEqualTo(State.RUNNING);
@@ -414,18 +414,18 @@ public class ArchiveSchedulerTest {
 				.contains(tuple(task, task.getWhen()));
 	}
 
-	void assertTaskIsTerminated(ArchiveDomainTask task) throws Exception {
+	void assertTaskIsTerminated(AbstractArchiveDomainTask task) throws Exception {
 		((RemotelyControlledTask)task).terminate();
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.TERMINATED);
 		assertThat(busClient.getState(timeout, MILLISECONDS)).isEqualTo(State.TERMINATED);
 		assertThat(monitor.all()).extracting("task").doesNotContain(task);
 	}
 
-	Predicate<ScheduledTask<ArchiveDomainTask>> onlyTaskWithStatusPredicate(final State state) {
-		return new Predicate<ScheduledTask<ArchiveDomainTask>>() {
+	Predicate<ScheduledTask<AbstractArchiveDomainTask>> onlyTaskWithStatusPredicate(final State state) {
+		return new Predicate<ScheduledTask<AbstractArchiveDomainTask>>() {
 
 			@Override
-			public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
+			public boolean apply(ScheduledTask<AbstractArchiveDomainTask> input) {
 				return input.state() == state;
 			}
 		};

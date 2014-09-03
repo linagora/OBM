@@ -39,19 +39,19 @@ import com.linagora.scheduling.ListenersNotifier;
 import com.linagora.scheduling.ScheduledTask;
 import com.linagora.scheduling.Scheduler;
 
-public class TestScheduledTask extends ScheduledTask<ArchiveDomainTask> {
+public class TestScheduledTask extends ScheduledTask<AbstractArchiveDomainTask> {
 
 	private ScheduledTask.State state;
 
-	public TestScheduledTask(State state, ArchiveDomainTask task, 
-			Scheduler<ArchiveDomainTask> scheduler, DateTime scheduledTime) {
+	public TestScheduledTask(State state, AbstractArchiveDomainTask task, 
+			Scheduler<AbstractArchiveDomainTask> scheduler, DateTime scheduledTime) {
 		super(
 			ScheduledTask.Id.generate(), 
 			scheduledTime,
 			task, scheduler, 
 			new ListenersNotifier<>(
 					TestScheduledTask.class, 
-					ImmutableList.<Listener<ArchiveDomainTask>>of())
+					ImmutableList.<Listener<AbstractArchiveDomainTask>>of())
 		);
 		this.state = state;
 	}

@@ -35,13 +35,13 @@ package org.obm.imap.archive.services;
 import java.io.IOException;
 
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 
 import com.google.common.base.Optional;
 
 public interface ArchiveService {
 
-	void archive(ArchiveDomainTask archiveDomainTask);
+	void archive(AbstractArchiveDomainTask archiveDomainTask);
 	
 	Optional<Object> archiveTreatmentLogs(ArchiveTreatmentRunId runId) throws IOException;
 }

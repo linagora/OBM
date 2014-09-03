@@ -65,7 +65,8 @@ public class ArchiveSchedulerBusTest {
 	@Test
 	public void scheduledShouldPostAsTaskStatusChanged() {
 		ArchiveDomainTask archiveDomainTask = mocks.createMock(ArchiveDomainTask.class);
-		expect(scheduledTask.task())
+		ScheduledTask<AbstractArchiveDomainTask> task = mocks.createMock(ScheduledTask.class);
+		expect(task.task())
 			.andReturn(archiveDomainTask);
 		Capture<TaskStatusChanged> postTaskCapture = new Capture<>();
 		
@@ -73,7 +74,7 @@ public class ArchiveSchedulerBusTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.scheduled(scheduledTask);
+		testee.scheduled(task);
 		mocks.verify();
 		
 		assertThat(postTaskCapture.getValue().getTask()).isSameAs(archiveDomainTask);
@@ -82,7 +83,8 @@ public class ArchiveSchedulerBusTest {
 	@Test
 	public void runningShouldPostAsTaskStatusChanged() {
 		ArchiveDomainTask archiveDomainTask = mocks.createMock(ArchiveDomainTask.class);
-		expect(scheduledTask.task())
+		ScheduledTask<AbstractArchiveDomainTask> task = mocks.createMock(ScheduledTask.class);
+		expect(task.task())
 			.andReturn(archiveDomainTask);
 		Capture<TaskStatusChanged> postTaskCapture = new Capture<>();
 		
@@ -90,7 +92,7 @@ public class ArchiveSchedulerBusTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.running(scheduledTask);
+		testee.running(task);
 		mocks.verify();
 		
 		assertThat(postTaskCapture.getValue().getTask()).isSameAs(archiveDomainTask);
@@ -99,7 +101,8 @@ public class ArchiveSchedulerBusTest {
 	@Test
 	public void terminatedShouldPostAsTaskStatusChanged() {
 		ArchiveDomainTask archiveDomainTask = mocks.createMock(ArchiveDomainTask.class);
-		expect(scheduledTask.task())
+		ScheduledTask<AbstractArchiveDomainTask> task = mocks.createMock(ScheduledTask.class);
+		expect(task.task())
 			.andReturn(archiveDomainTask);
 		Capture<TaskStatusChanged> postTaskCapture = new Capture<>();
 		
@@ -107,7 +110,7 @@ public class ArchiveSchedulerBusTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.terminated(scheduledTask);
+		testee.terminated(task);
 		mocks.verify();
 		
 		assertThat(postTaskCapture.getValue().getTask()).isSameAs(archiveDomainTask);
@@ -117,7 +120,8 @@ public class ArchiveSchedulerBusTest {
 	public void failedShouldPostAsTaskStatusChanged() {
 		Throwable exception = new IllegalStateException();
 		ArchiveDomainTask archiveDomainTask = mocks.createMock(ArchiveDomainTask.class);
-		expect(scheduledTask.task())
+		ScheduledTask<AbstractArchiveDomainTask> task = mocks.createMock(ScheduledTask.class);
+		expect(task.task())
 			.andReturn(archiveDomainTask);
 		Capture<TaskStatusChanged> postTaskCapture = new Capture<>();
 		
@@ -125,7 +129,7 @@ public class ArchiveSchedulerBusTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.failed(scheduledTask, exception);
+		testee.failed(task, exception);
 		mocks.verify();
 		
 		assertThat(postTaskCapture.getValue().getTask()).isSameAs(archiveDomainTask);
@@ -134,7 +138,8 @@ public class ArchiveSchedulerBusTest {
 	@Test
 	public void cancelShouldPostAsTaskStatusChanged() {
 		ArchiveDomainTask archiveDomainTask = mocks.createMock(ArchiveDomainTask.class);
-		expect(scheduledTask.task())
+		ScheduledTask<AbstractArchiveDomainTask> task = mocks.createMock(ScheduledTask.class);
+		expect(task.task())
 			.andReturn(archiveDomainTask);
 		Capture<TaskStatusChanged> postTaskCapture = new Capture<>();
 		
@@ -142,7 +147,7 @@ public class ArchiveSchedulerBusTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.canceled(scheduledTask);
+		testee.canceled(task);
 		mocks.verify();
 		
 		assertThat(postTaskCapture.getValue().getTask()).isSameAs(archiveDomainTask);
@@ -151,7 +156,8 @@ public class ArchiveSchedulerBusTest {
 	@Test
 	public void eventsAreImmutable() {
 		ArchiveDomainTask archiveDomainTask = mocks.createMock(ArchiveDomainTask.class);
-		expect(scheduledTask.task())
+		ScheduledTask<AbstractArchiveDomainTask> task = mocks.createMock(ScheduledTask.class);
+		expect(task.task())
 			.andReturn(archiveDomainTask).times(2);
 		Capture<TaskStatusChanged> scheduledTaskCapture = new Capture<>();
 		Capture<TaskStatusChanged> canceledTaskCapture = new Capture<>();
@@ -163,8 +169,8 @@ public class ArchiveSchedulerBusTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.scheduled(scheduledTask);
-		testee.canceled(scheduledTask);
+		testee.scheduled(task);
+		testee.canceled(task);
 		mocks.verify();
 		
 		assertThat(scheduledTaskCapture.getValue().getTask()).isSameAs(archiveDomainTask);

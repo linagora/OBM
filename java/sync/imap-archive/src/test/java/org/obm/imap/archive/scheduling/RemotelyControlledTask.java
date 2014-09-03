@@ -43,7 +43,7 @@ import com.google.common.util.concurrent.SettableFuture;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public class RemotelyControlledTask extends RealRunArchiveDomainTask {
+public class RemotelyControlledTask extends ArchiveDomainTask {
 
 
 	public class Terminator {

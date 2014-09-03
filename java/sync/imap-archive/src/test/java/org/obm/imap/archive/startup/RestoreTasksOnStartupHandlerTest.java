@@ -45,7 +45,7 @@ import org.obm.imap.archive.beans.ArchiveTerminatedTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -104,9 +104,9 @@ public class RestoreTasksOnStartupHandlerTest {
 				.build()
 			));
 		
-		ArchiveDomainTask archiveTask = control.createMock(ArchiveDomainTask.class);
+		AbstractArchiveDomainTask archiveTask = control.createMock(AbstractArchiveDomainTask.class);
 		expect(taskFactory.createAsRecurrent(domainUuid, when, higherBoundary, runId)).andReturn(archiveTask);
-		ScheduledTask<ArchiveDomainTask> task = control.createMock(ScheduledTask.class);
+		ScheduledTask<AbstractArchiveDomainTask> task = control.createMock(ScheduledTask.class);
 		expect(scheduler.schedule(archiveTask)).andReturn(task);
 		
 		control.replay();

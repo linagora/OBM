@@ -65,7 +65,7 @@ import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.exception.DomainConfigurationException;
 import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.logging.LoggerAppenders;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.imap.archive.scheduling.TestArchiveDomainTaskFactory;
 import org.obm.imap.archive.services.ImapArchiveProcessing.ProcessedTask;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
@@ -445,7 +445,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
 		
-		ArchiveDomainTask archiveDomainTask = control.createMock(ArchiveDomainTask.class);
+		AbstractArchiveDomainTask archiveDomainTask = control.createMock(AbstractArchiveDomainTask.class);
 		expect(archiveDomainTask.getLogger())
 			.andReturn(logger);
 		expect(archiveDomainTask.getRunId())
@@ -499,7 +499,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
 		
-		ArchiveDomainTask archiveDomainTask = control.createMock(ArchiveDomainTask.class);
+		AbstractArchiveDomainTask archiveDomainTask = control.createMock(AbstractArchiveDomainTask.class);
 		expect(archiveDomainTask.getLogger())
 			.andReturn(logger);
 		expect(archiveDomainTask.getRunId())
@@ -555,7 +555,7 @@ public class ImapArchiveProcessingTest {
 			.andReturn(storeClient);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
-		ArchiveDomainTask archiveDomainTask = control.createMock(ArchiveDomainTask.class);
+		AbstractArchiveDomainTask archiveDomainTask = control.createMock(AbstractArchiveDomainTask.class);
 		expect(archiveDomainTask.getLogger())
 			.andReturn(logger);
 		expect(archiveDomainTask.getRunId())
@@ -643,7 +643,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
 		
-		ArchiveDomainTask archiveDomainTask = control.createMock(ArchiveDomainTask.class);
+		AbstractArchiveDomainTask archiveDomainTask = control.createMock(AbstractArchiveDomainTask.class);
 		expect(archiveDomainTask.getLogger())
 			.andReturn(logger);
 		expect(archiveDomainTask.getRunId())

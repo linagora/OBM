@@ -51,7 +51,7 @@ import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
@@ -109,7 +109,7 @@ public class ImapArchiveProcessing {
 	}
 	
 	@Transactional
-	public void archive(ArchiveDomainTask archiveDomainTask) {
+	public void archive(AbstractArchiveDomainTask archiveDomainTask) {
 		Logger logger = archiveDomainTask.getLogger();
 		try {
 			Optional<ObmDomain> optionalDomain = domainClient.getById(archiveDomainTask.getDomain());
@@ -376,7 +376,7 @@ public class ImapArchiveProcessing {
 		
 		public static class Builder {
 			
-			private ArchiveDomainTask archiveDomainTask;
+			private AbstractArchiveDomainTask archiveDomainTask;
 			private ObmDomain domain;
 			private Boundaries boundaries;
 			private DomainConfiguration domainConfiguration;
@@ -385,7 +385,7 @@ public class ImapArchiveProcessing {
 			
 			private Builder() {}
 
-			public Builder archiveDomainTask(ArchiveDomainTask archiveDomainTask) {
+			public Builder archiveDomainTask(AbstractArchiveDomainTask archiveDomainTask) {
 				this.archiveDomainTask = archiveDomainTask;
 				return this;
 			}

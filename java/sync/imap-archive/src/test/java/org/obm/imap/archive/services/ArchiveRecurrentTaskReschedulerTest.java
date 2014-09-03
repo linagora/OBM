@@ -39,7 +39,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -60,8 +60,8 @@ public class ArchiveRecurrentTaskReschedulerTest {
 	
 	IMocksControl mocks;
 	ArchiveSchedulingService schedulingService;
-	Scheduler<ArchiveDomainTask> scheduler;
-	ArchiveDomainTask task;
+	Scheduler<AbstractArchiveDomainTask> scheduler;
+	AbstractArchiveDomainTask task;
 	ArchiveRecurrentTaskRescheduler testee;
 
 	@Before
@@ -74,7 +74,7 @@ public class ArchiveRecurrentTaskReschedulerTest {
 		mocks = EasyMock.createControl();
 		schedulingService = mocks.createMock(ArchiveSchedulingService.class);
 		scheduler = mocks.createMock(Scheduler.class);
-		task = mocks.createMock(ArchiveDomainTask.class);
+		task = mocks.createMock(AbstractArchiveDomainTask.class);
 		testee = new ArchiveRecurrentTaskRescheduler(logger, schedulingService);
 	}
 

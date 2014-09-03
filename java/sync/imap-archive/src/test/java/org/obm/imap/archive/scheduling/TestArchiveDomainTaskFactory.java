@@ -49,7 +49,7 @@ public class TestArchiveDomainTaskFactory extends ArchiveDomainTaskFactory {
 		this.loggerAppenders = loggerAppenders;
 	}
 
-	public ArchiveDomainTask create(ObmDomainUuid domain, ArchiveTreatmentRunId runId) {
-		return new RealRunArchiveDomainTask(null, domain, null, null, runId, logger, loggerAppenders, false);
+	public AbstractArchiveDomainTask create(ObmDomainUuid domain, ArchiveTreatmentRunId runId) {
+		return new ArchiveDomainTask(null, domain, null, null, runId, logger, loggerAppenders, false);
 	}
 }
