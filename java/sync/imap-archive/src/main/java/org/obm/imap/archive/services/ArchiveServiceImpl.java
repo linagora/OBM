@@ -49,16 +49,16 @@ import com.google.inject.Singleton;
 @Singleton
 public class ArchiveServiceImpl implements ArchiveService {
 
-	private final RunningArchivingTracker runningArchivingTracker;
+	private final ScheduledArchivingTracker scheduledArchivingTracker;
 	private final ImapArchiveProcessing imapArchiveProcessing;
 	private final LoggerFileNameService loggerFileNameService;
 
 	@Inject
-	@VisibleForTesting ArchiveServiceImpl(RunningArchivingTracker runningArchivingTracker,
+	@VisibleForTesting ArchiveServiceImpl(ScheduledArchivingTracker scheduledArchivingTracker,
 			ImapArchiveProcessing imapArchiveProcessing,
 			LoggerFileNameService loggerFileNameService) {
 		
-		this.runningArchivingTracker = runningArchivingTracker;
+		this.scheduledArchivingTracker = scheduledArchivingTracker;
 		this.imapArchiveProcessing = imapArchiveProcessing;
 		this.loggerFileNameService = loggerFileNameService;
 	}
@@ -70,8 +70,8 @@ public class ArchiveServiceImpl implements ArchiveService {
 	}
 	
 	@Override
-	public Optional<Object> runningProcessLogs(final ArchiveTreatmentRunId runId) throws IOException {
-		Optional<ArchiveDomainTask> optional = runningArchivingTracker.get(runId);
+	public Optional<Object> archiveTreatmentLogs(final ArchiveTreatmentRunId runId) throws IOException {
+		Optional<ArchiveDomainTask> optional = scheduledArchivingTracker.get(runId);
 		if (optional.isPresent()) {
 			return Optional.<Object> of(optional.get().getLoggerAppenders().getChunkAppender().chunk());
 		}

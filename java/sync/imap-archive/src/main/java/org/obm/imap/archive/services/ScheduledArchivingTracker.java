@@ -47,12 +47,12 @@ import com.google.inject.Singleton;
 import com.linagora.scheduling.ScheduledTask;
 
 @Singleton
-public class RunningArchivingTracker implements ArchiveSchedulerBus.Client {
+public class ScheduledArchivingTracker implements ArchiveSchedulerBus.Client {
 
-	private final Map<ArchiveTreatmentRunId, ArchiveDomainTask> runningTasks;
+	private final Map<ArchiveTreatmentRunId, ArchiveDomainTask> scheduledTasks;
 
-	@VisibleForTesting RunningArchivingTracker() {
-		this.runningTasks = Maps.newConcurrentMap();
+	@VisibleForTesting ScheduledArchivingTracker() {
+		this.scheduledTasks = Maps.newConcurrentMap();
 	}
 	
 	@Subscribe
@@ -62,23 +62,20 @@ public class RunningArchivingTracker implements ArchiveSchedulerBus.Client {
 		ArchiveDomainTask archiveDomainTask = schedulerTask.task();
 		switch (schedulerTask.state()) {
 		case RUNNING:
-			runningTasks.put(archiveDomainTask.getRunId(), archiveDomainTask);
+		case NEW:
+		case WAITING:
+			scheduledTasks.put(archiveDomainTask.getRunId(), archiveDomainTask);
 			break;
 			
 		case CANCELED:
 		case FAILED:
 		case TERMINATED:
-			runningTasks.remove(archiveDomainTask.getRunId());
-			break;
-			
-		case NEW:
-		case WAITING:
-		default:
+			scheduledTasks.remove(archiveDomainTask.getRunId());
 			break;
 		}
 	}
 	
 	public Optional<ArchiveDomainTask> get(ArchiveTreatmentRunId runId) {
-		return Optional.fromNullable(runningTasks.get(runId));
+		return Optional.fromNullable(scheduledTasks.get(runId));
 	}
 }

@@ -114,7 +114,7 @@ public class TreatmentsResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response runningTreatment(@QueryParam("run_id") UUID runId) {
 		try {
-			Optional<Object> runningProcessLogs = archiveService.runningProcessLogs(ArchiveTreatmentRunId.from(runId));
+			Optional<Object> runningProcessLogs = archiveService.archiveTreatmentLogs(ArchiveTreatmentRunId.from(runId));
 			if (!runningProcessLogs.isPresent()) {
 				return Response.status(Status.NOT_FOUND).build();
 			}

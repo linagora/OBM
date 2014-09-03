@@ -43,5 +43,5 @@ public interface ArchiveService {
 
 	void archive(ArchiveDomainTask archiveDomainTask);
 	
-	Optional<Object> runningProcessLogs(ArchiveTreatmentRunId runId) throws IOException;
+	Optional<Object> archiveTreatmentLogs(ArchiveTreatmentRunId runId) throws IOException;
 }

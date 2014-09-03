@@ -73,7 +73,7 @@ import org.obm.imap.archive.services.DateTimeProviderImpl;
 import org.obm.imap.archive.services.DomainClient;
 import org.obm.imap.archive.services.DomainClientImpl;
 import org.obm.imap.archive.services.DomainConfigurationService;
-import org.obm.imap.archive.services.RunningArchivingTracker;
+import org.obm.imap.archive.services.ScheduledArchivingTracker;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.imap.archive.services.StoreClientFactory;
 import org.obm.imap.archive.startup.RestoreTasksOnStartupHandler;
@@ -136,7 +136,7 @@ public class ImapArchiveModule extends AbstractModule {
 		Multibinder<ArchiveSchedulerBus.Client> busClients = Multibinder.newSetBinder(binder(), ArchiveSchedulerBus.Client.class);
 		busClients.addBinding().to(ArchiveRecurrentTaskRescheduler.class);
 		busClients.addBinding().to(ArchiveDaoTracking.class);
-		busClients.addBinding().to(RunningArchivingTracker.class);
+		busClients.addBinding().to(ScheduledArchivingTracker.class);
 		bind(ArchiveSchedulerBusInitializer.class).asEagerSingleton();
 		
 		bindImapArchiveServices();
