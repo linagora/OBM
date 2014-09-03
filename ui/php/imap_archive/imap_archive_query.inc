@@ -165,7 +165,7 @@ function calculate_next_treatment_date_from_imap_archive_service($configuration)
       "minute" => ($minute) ? $minute : 0
   ));
   
-  $curl = curlPost($configurationPath, $json);
+  $curl = curlPost($configurationPath, $extraParams, $json);
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];
