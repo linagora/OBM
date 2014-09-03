@@ -48,6 +48,7 @@ applicable to the OBM software.
 
 require_once(dirname(__file__)."/../contact/addressbook.php");
 require_once(dirname(__file__)."/../share/share_query.inc");
+require_once("$obminclude/of/of_recur_utils.php");
 require_once('obm_eventdiff.php');
 require_once('calendar_utils.php');
 
@@ -5585,7 +5586,13 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
               // Repeat events
               $event_start = clone $date;
               $event_start->setHour(0)->setMinute(0)->setSecond(0);
-              $event_end = compute_recurrence_end($vevent, $end);
+              try {
+                $event_end = compute_recurrence_end($vevent, $end);
+              }
+              catch (RRuleException $e) {
+                error_log("Caught exception $e while computing occurrences for event ".print_r($e, true));
+                return array();
+              }
               switch($rrule['freq']) {
                 case 'daily' :
                   calendar_daily_repeatition($date, $event_start,$event_end, $rrule['interval'], $event, $c['id'], "contact", $partstat);
@@ -5642,7 +5649,7 @@ function compute_recurrence_end($vevent, $display_period_end_date) {
     $last_occurrence = compute_last_occurrence_from_count($vevent);
   }
   $recurrence_end = $last_occurrence != null ? $last_occurrence->addTimestamp($vevent->getDuration()) : null;
-  $recurrence_end_within_display_period = $recurrence_end != null && $display_period_end_date->compare($until) > 0 ?
+  $recurrence_end_within_display_period = $recurrence_end != null && $display_period_end_date->compare($recurrence_end) > 0 ?
     $recurrence_end :
     clone $display_period_end_date;
   return $recurrence_end_within_display_period;
@@ -5662,41 +5669,16 @@ function get_freq($rrule) {
 }
 
 function compute_last_occurrence_from_count($vevent) {
-  $rrule = $vevent->getRrule();
-  $freq = get_freq($rrule);
-  if ($freq == null) {
-    return null;
-  }
+  $rrule = $vevent->getRealRrule();
+  $dtstart = $vevent->getDtstart();
   $count = (int)$rrule['count'];
-  $interval = $rrule['interval'] != null ? (int)$rrule['interval'] : 1;
-  $event_dtstart = clone $vevent->start;
-  $last_occurrence = null;
-  # Decrease count as DTSTART count as the first occurrence
-  $time_unit_count = $interval * ($count - 1);
-  switch ($freq) {
-    case 'secondly':
-      $last_occurrence = $event_dtstart->addSecond($time_unit_count);
-      break;
-    case 'minutely':
-      $last_occurrence = $event_dtstart->addMinute($time_unit_count);
-      break;
-    case 'hourly':
-      $last_occurrence = $event_dtstart->addHour($time_unit_count);
-      break;
-    case 'daily':
-      $last_occurrence = $event_dtstart->addDay($time_unit_count);
-      break;
-    case 'weekly':
-      $last_occurrence = $event_dtstart->addWeek($time_unit_count);
-      break;
-    case 'monthly':
-      $last_occurrence = $event_dtstart->addMonth($time_unit_count);
-      break;
-    case 'yearly':
-      $last_occurrence = $event_dtstart->addYear($time_unit_count);
-      break;
+  $rrule_app = RRuleApplication::from_rrule($rrule);
+  $last_occ = $dtstart;
+  $occurrences_left_after_dtstart = $count - 1;
+  for ($i = 0 ; $i < $occurrences_left_after_dtstart ; $i++) {
+    $last_occ = $rrule_app->next_occurrence($last_occ);
   }
-  return $last_occurrence;
+  return $last_occ;
 }
 
 function calendar_add_anonymous_occurrences($repeatkind, $date, $event_start, $event_end, $repeatfrequence, $event, $entity_id, $entity, $entity_state, $repeatdays = null) {
