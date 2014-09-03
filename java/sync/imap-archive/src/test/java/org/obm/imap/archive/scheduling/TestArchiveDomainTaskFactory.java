@@ -32,7 +32,6 @@
 
 package org.obm.imap.archive.scheduling;
 
-import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
 
@@ -51,6 +50,6 @@ public class TestArchiveDomainTaskFactory extends ArchiveDomainTask.FactoryImpl 
 	}
 
 	public ArchiveDomainTask create(ObmDomainUuid domain, ArchiveTreatmentRunId runId) {
-		return new ArchiveDomainTask(null, domain, null, null, runId, logger, loggerAppenders, ArchiveTreatmentKind.REAL_RUN, false);
+		return new RealRunArchiveDomainTask(null, domain, null, null, runId, logger, loggerAppenders, false);
 	}
 }

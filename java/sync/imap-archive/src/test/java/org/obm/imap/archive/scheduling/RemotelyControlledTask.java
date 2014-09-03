@@ -29,14 +29,24 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.scheduling;
+package org.obm.imap.archive.scheduling;
+
+import org.joda.time.DateTime;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.logging.LoggerAppenders;
+import org.obm.imap.archive.services.ArchiveService;
+
+import ch.qos.logback.classic.Logger;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.SettableFuture;
 
-class RemotelyControlledTask implements Task {
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-	public static class Terminator {
+public class RemotelyControlledTask extends RealRunArchiveDomainTask {
+
+
+	public class Terminator {
 		private final SettableFuture<Boolean> future;
 		
 		public Terminator() {
@@ -50,12 +60,14 @@ class RemotelyControlledTask implements Task {
 	
 	private final Terminator terminator;
 
-	RemotelyControlledTask() {
+	public RemotelyControlledTask(ArchiveService archiveService, Logger logger,
+			LoggerAppenders loggerAppenders, ObmDomainUuid domain,
+			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
+		
+		super(archiveService, domain, when, higherBoundary, runId, logger, 
+				loggerAppenders, false);
+		
 		terminator = new Terminator();
-	}
-
-	Terminator terminatorControl() {
-		return terminator;
 	}
 	
 	void terminate() {
@@ -65,14 +77,10 @@ class RemotelyControlledTask implements Task {
 	@Override
 	public void run() {
 		try {
+			super.run();
 			terminator.future.get();
 		} catch (Exception e) {
 			Throwables.propagate(e);
 		}
-	}
-	
-	@Override
-	public String taskName() {
-		return getClass().getName();
 	}
 }

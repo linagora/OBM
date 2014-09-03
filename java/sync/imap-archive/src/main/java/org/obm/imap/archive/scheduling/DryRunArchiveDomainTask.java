@@ -29,50 +29,60 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package com.linagora.scheduling;
+package org.obm.imap.archive.scheduling;
 
-import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.SettableFuture;
+import org.joda.time.DateTime;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.logging.LoggerAppenders;
+import org.obm.imap.archive.services.ArchiveService;
 
-class RemotelyControlledTask implements Task {
+import ch.qos.logback.classic.Logger;
 
-	public static class Terminator {
-		private final SettableFuture<Boolean> future;
-		
-		public Terminator() {
-			future = SettableFuture.create();
-		}
-		
-		public void terminate() {
-			future.set(true);
-		}
-	}
-	
-	private final Terminator terminator;
+import com.google.common.base.Objects;
 
-	RemotelyControlledTask() {
-		terminator = new Terminator();
-	}
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-	Terminator terminatorControl() {
-		return terminator;
-	}
-	
-	void terminate() {
-		terminator.terminate();
+public class DryRunArchiveDomainTask extends ArchiveDomainTask {
+
+	public DryRunArchiveDomainTask(ArchiveService archiveService, ObmDomainUuid domain,
+			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger,
+			LoggerAppenders loggerAppenders) {
+		super(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders, false);
 	}
 	
 	@Override
 	public void run() {
-		try {
-			terminator.future.get();
-		} catch (Exception e) {
-			Throwables.propagate(e);
-		}
+		archiveService.archive(this);
+	}
+
+	@Override
+	public ArchiveTreatmentKind getArchiveTreatmentKind() {
+		return ArchiveTreatmentKind.DRY_RUN;
 	}
 	
 	@Override
-	public String taskName() {
-		return getClass().getName();
+	public int hashCode(){
+		return Objects.hashCode(super.hashCode(), ArchiveTreatmentKind.DRY_RUN);
 	}
+
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof DryRunArchiveDomainTask) {
+			DryRunArchiveDomainTask that = (DryRunArchiveDomainTask) object;
+			return super.equals(that);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("domain", domain)
+			.add("when", when)
+			.add("higherBoundary", higherBoundary)
+			.add("runId", runId)
+			.toString();
+	}
+	
 }

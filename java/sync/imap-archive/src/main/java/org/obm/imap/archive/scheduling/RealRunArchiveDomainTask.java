@@ -35,68 +35,57 @@ import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
-import org.obm.imap.archive.logging.LoggerFactory;
 import org.obm.imap.archive.services.ArchiveService;
 
 import ch.qos.logback.classic.Logger;
 
-import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.SettableFuture;
+import com.google.common.base.Objects;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public class ControlledTaskFactory extends ArchiveDomainTask.FactoryImpl {
+public class RealRunArchiveDomainTask extends ArchiveDomainTask {
 
-	private final ArchiveService archiveService;
-	private final Logger logger;
-	private final LoggerAppenders loggerAppenders;
-
-	public ControlledTaskFactory(ArchiveService archiveService, LoggerFactory loggerFactory, Logger logger, LoggerAppenders loggerAppenders) {
-		super(archiveService, loggerFactory);
-		this.archiveService = archiveService;
-		this.logger = logger;
-		this.loggerAppenders = loggerAppenders;
+	public RealRunArchiveDomainTask(ArchiveService archiveService, ObmDomainUuid domain,
+			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId,
+			Logger logger, LoggerAppenders loggerAppenders, boolean recurrent) {
+		
+		super(archiveService, domain, when, higherBoundary, runId, logger, 
+				loggerAppenders, recurrent);
+	}
+	
+	@Override
+	public void run() {
+		archiveService.archive(this);
 	}
 
 	@Override
-	public RemotelyControlledTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, ArchiveTreatmentKind archiveTreatmentKind) {
-		return new RemotelyControlledTask(archiveService, domain, when, higherBoundary, runId, archiveTreatmentKind);
+	public ArchiveTreatmentKind getArchiveTreatmentKind() {
+		return ArchiveTreatmentKind.REAL_RUN;
 	}
-
-	public class RemotelyControlledTask extends ArchiveDomainTask {
-
-		public class Terminator {
-			private final SettableFuture<Boolean> future;
-			
-			public Terminator() {
-				future = SettableFuture.create();
-			}
-			
-			public void terminate() {
-				future.set(true);
-			}
-		}
-		
-		private final Terminator terminator;
 	
-		RemotelyControlledTask(ArchiveService archiveService, ObmDomainUuid domain,
-				DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, ArchiveTreatmentKind archiveTreatmentKind) {
-			super(archiveService, domain, when, higherBoundary, runId, logger, loggerAppenders, archiveTreatmentKind, false);
-			terminator = new Terminator();
-		}
-		
-		void terminate() {
-			terminator.terminate();
-		}
-		
-		@Override
-		public void run() {
-			try {
-				super.run();
-				terminator.future.get();
-			} catch (Exception e) {
-				Throwables.propagate(e);
-			}
-		}
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(super.hashCode(), getArchiveTreatmentKind());
 	}
+
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof RealRunArchiveDomainTask) {
+			RealRunArchiveDomainTask that = (RealRunArchiveDomainTask) object;
+			return super.equals(that);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("domain", domain)
+			.add("when", when)
+			.add("higherBoundary", higherBoundary)
+			.add("runId", runId)
+			.add("recurrent", recurrent)
+			.toString();
+	}
+	
 }

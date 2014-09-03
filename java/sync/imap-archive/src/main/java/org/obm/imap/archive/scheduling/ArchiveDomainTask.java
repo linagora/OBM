@@ -48,11 +48,15 @@ import com.linagora.scheduling.Task;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public class ArchiveDomainTask implements Task {
-	
+public abstract class ArchiveDomainTask implements Task {
+
 	public interface Factory {
-		ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, ArchiveTreatmentKind kind);
-		ArchiveDomainTask createAsRecurrent(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId);
+		ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, 
+				DateTime higherBoundary, ArchiveTreatmentRunId runId,
+				ArchiveTreatmentKind kind);
+		
+		ArchiveDomainTask createAsRecurrent(ObmDomainUuid domain, DateTime when,
+				DateTime higherBoundary, ArchiveTreatmentRunId runId);
 	}
 	
 	@Singleton
@@ -68,40 +72,48 @@ public class ArchiveDomainTask implements Task {
 		}
 		
 		@Override
-		public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, ArchiveTreatmentKind kind) {
-			return create(domain, when, higherBoundary, runId, kind, false);
-		}
-
-		@Override
 		public ArchiveDomainTask createAsRecurrent(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
 			return create(domain, when, higherBoundary, runId, ArchiveTreatmentKind.REAL_RUN, true);
 		}
 
-		private ArchiveDomainTask create(ObmDomainUuid domain, DateTime when,
+		@Override
+		public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when,
+				DateTime higherBoundary, ArchiveTreatmentRunId runId,
+				ArchiveTreatmentKind kind) {
+			return create(domain, when, higherBoundary, runId, kind, false);
+		}
+		
+		private ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, 
 				DateTime higherBoundary, ArchiveTreatmentRunId runId, 
 				ArchiveTreatmentKind archiveTreatmentKind, boolean recurrent) {
-			
 			Logger logger = loggerFactory.create(runId);
 			LoggerAppenders loggerAppenders = LoggerAppenders.from(runId, logger);
 			
-			return new ArchiveDomainTask(archiveService, 
-					domain, when, higherBoundary, runId, logger, loggerAppenders, archiveTreatmentKind, recurrent);
+			switch (archiveTreatmentKind) {
+			case DRY_RUN:
+				return new DryRunArchiveDomainTask(archiveService, 
+						domain, when, higherBoundary, runId, logger, loggerAppenders);
+			case REAL_RUN:
+				return new RealRunArchiveDomainTask(archiveService,
+						domain, when, higherBoundary, runId, logger, loggerAppenders,
+						recurrent);
+			}
+			throw new IllegalArgumentException();
 		}
 	}
-	
-	private final ArchiveService archiveService;
-	private final ObmDomainUuid domain;
-	private final DateTime when;
-	private final DateTime higherBoundary;
-	private final ArchiveTreatmentRunId runId;
-	private final Logger logger;
-	private final LoggerAppenders loggerAppenders;
-	private final ArchiveTreatmentKind archiveTreatmentKind;
-	private final boolean recurrent;
 
+	protected final ArchiveService archiveService;
+	protected final ObmDomainUuid domain;
+	protected final DateTime when;
+	protected final DateTime higherBoundary;
+	protected final ArchiveTreatmentRunId runId;
+	protected final Logger logger;
+	protected final LoggerAppenders loggerAppenders;
+	protected final boolean recurrent;
+	
 	protected ArchiveDomainTask(ArchiveService archiveService, ObmDomainUuid domain,
 			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger, LoggerAppenders loggerAppenders, 
-			ArchiveTreatmentKind archiveTreatmentKind, boolean recurrent) {
+			boolean recurrent) {
 		this.archiveService = archiveService;
 		this.domain = domain;
 		this.when = when;
@@ -109,15 +121,9 @@ public class ArchiveDomainTask implements Task {
 		this.runId = runId;
 		this.logger = logger;
 		this.loggerAppenders = loggerAppenders;
-		this.archiveTreatmentKind = archiveTreatmentKind;
 		this.recurrent = recurrent;
 	}
 	
-	@Override
-	public void run() {
-		archiveService.archive(this);
-	}
-
 	@Override
 	public String taskName() {
 		return domain.get();
@@ -147,29 +153,26 @@ public class ArchiveDomainTask implements Task {
 		return loggerAppenders;
 	}
 	
-	public ArchiveTreatmentKind getArchiveTreatmentKind() {
-		return archiveTreatmentKind;
-	}
-
 	public boolean isRecurrent() {
 		return recurrent;
 	}
+
+	public abstract ArchiveTreatmentKind getArchiveTreatmentKind();
 	
 	@Override
-	public final int hashCode(){
-		return Objects.hashCode(domain, when, recurrent, runId, higherBoundary, archiveTreatmentKind);
+	public int hashCode(){
+		return Objects.hashCode(domain, when, recurrent, runId, higherBoundary);
 	}
 
 	@Override
-	public final boolean equals(Object object){
+	public boolean equals(Object object){
 		if (object instanceof ArchiveDomainTask) {
 			ArchiveDomainTask that = (ArchiveDomainTask) object;
 			return Objects.equal(this.domain, that.domain)
-				&& Objects.equal(this.when, that.when)
-				&& Objects.equal(this.recurrent, that.recurrent)
-				&& Objects.equal(this.higherBoundary, that.higherBoundary)
-				&& Objects.equal(this.runId, that.runId)
-				&& Objects.equal(this.archiveTreatmentKind, that.archiveTreatmentKind);
+					&& Objects.equal(this.recurrent, that.recurrent)
+					&& Objects.equal(this.when, that.when)
+					&& Objects.equal(this.higherBoundary, that.higherBoundary)
+					&& Objects.equal(this.runId, that.runId);
 		}
 		return false;
 	}
@@ -182,8 +185,6 @@ public class ArchiveDomainTask implements Task {
 			.add("recurrent", recurrent)
 			.add("higherBoundary", higherBoundary)
 			.add("runId", runId)
-			.add("archiveTreatmentKind", archiveTreatmentKind)
 			.toString();
 	}
-	
 }
