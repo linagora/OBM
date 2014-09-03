@@ -66,7 +66,7 @@ public class ChunkedOutputAppender extends AppenderBase<ILoggingEvent> {
 		
 		for (ChunkedOutput<String> chunkedOutput : chunkedOutputs) {
 			try {
-				chunkedOutput.write(formattedMessage);
+				writeToChunk(chunkedOutput, formattedMessage);
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 			}
@@ -89,12 +89,19 @@ public class ChunkedOutputAppender extends AppenderBase<ILoggingEvent> {
 		ChunkedOutput<String> chunkedOutput = chunkedOutput();
 		chunkedOutputs.add(chunkedOutput);
 		for (String message : messages) {
-			chunkedOutput.write(message);
+			writeToChunk(chunkedOutput, message);
 		}
 		return chunkedOutput;
 	}
 	
 	@VisibleForTesting ChunkedOutput<String> chunkedOutput() {
 		return new ChunkedOutput<String>(String.class);
+	}
+	
+	private void writeToChunk(ChunkedOutput<String> chunkedOutput, String message) throws IOException {
+		chunkedOutput.write(message);
+		if (!message.endsWith(System.lineSeparator())) {
+			chunkedOutput.write(System.lineSeparator());
+		}
 	}
 }

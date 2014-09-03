@@ -101,7 +101,11 @@ public class ChunkedOutputAppenderTest {
 		ChunkedOutput<String> chunkedOutput = control.createMock(ChunkedOutput.class);
 		chunkedOutput.write(message);
 		expectLastCall();
+		chunkedOutput.write(System.lineSeparator());
+		expectLastCall();
 		chunkedOutput.write(message2);
+		expectLastCall();
+		chunkedOutput.write(System.lineSeparator());
 		expectLastCall();
 		
 		MockedChunkedOutputAppender chunkedOutputAppender = new MockedChunkedOutputAppender(chunkedOutput);
@@ -126,7 +130,11 @@ public class ChunkedOutputAppenderTest {
 		ChunkedOutput<String> chunkedOutput = control.createMock(ChunkedOutput.class);
 		chunkedOutput.write(message);
 		expectLastCall();
+		chunkedOutput.write(System.lineSeparator());
+		expectLastCall();
 		chunkedOutput.write(message2);
+		expectLastCall();
+		chunkedOutput.write(System.lineSeparator());
 		expectLastCall();
 		
 		MockedChunkedOutputAppender chunkedOutputAppender = new MockedChunkedOutputAppender(chunkedOutput);
