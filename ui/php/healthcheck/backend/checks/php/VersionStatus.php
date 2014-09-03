@@ -37,17 +37,17 @@ require_once dirname(__FILE__) . '/../../CheckStatus.php';
 class VersionStatus implements Check {
 
   public function execute() {
-    if($this->checkVersion()) {
+    if($this->hasPHPCorrectDateTimeBehaviour()) {
       return new CheckResult(CheckStatus::OK);
     }
 
     return new CheckResult(CheckStatus::ERROR,
         "Your version of PHP (" . phpVersion() . ") is not valid. "
           . "It contains a critical date/time bug ( see https://bugs.php.net/bug.php?id=52290 ). "
-          . "You must upgrade it to the lastest available version of PHP 5.3 or 5.4.");
+          . "You must upgrade it to the latest available version of PHP 5.3 or 5.4.");
   }
 
-  public function checkVersion() {
+  public function hasPHPCorrectDateTimeBehaviour() {
 
     $dt = new DateTime('2006-01-01', new DateTimeZone('UTC'));
 
