@@ -170,6 +170,15 @@ class Vpdi_Icalendar_Event {
     return $this->evt->getRrule();
   }
 
+  /**
+   * Returns the original RRULE as a dictionary of strings
+   *
+   * @return string[] The RRULE, as a dictionary of key => values
+   */
+  public function getRealRrule() {
+    return $this->evt->getRealRrule();
+  }
+
 }
 
 ?>
