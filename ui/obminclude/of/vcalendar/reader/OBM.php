@@ -119,7 +119,7 @@ class Vcalendar_Reader_OBM {
 
   function readEventsVAlarms($events) {
     $valarms = array();
-
+    $uid = $GLOBALS['obm']['uid'];
     if(!empty($events)){
       $query = 'SELECT      event_date,
                             event_title,
@@ -127,7 +127,8 @@ class Vcalendar_Reader_OBM {
                             eventalert_event_id
                 FROM        EventAlert
                 INNER JOIN  Event ON eventalert_event_id = event_id
-                WHERE       eventalert_event_id IN ('.implode(',', $events).')';
+                WHERE       eventalert_event_id IN ('.implode(',', $events).')
+                AND         eventalert_user_id = '.$uid;
       $this->db->query($query);
       while($this->db->next_record()) {
         $trigger = $this->db->f('eventalert_duration')  < 0 ? "-P" : "P";
