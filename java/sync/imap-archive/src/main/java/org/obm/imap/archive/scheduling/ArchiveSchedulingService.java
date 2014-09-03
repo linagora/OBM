@@ -55,14 +55,14 @@ public class ArchiveSchedulingService {
 
 	private final ArchiveScheduler scheduler;
 	private final UUIDFactory uuidFactory;
-	private final ArchiveDomainTask.Factory taskFactory;
+	private final ArchiveDomainTaskFactory taskFactory;
 	private final SchedulingDatesService schedulingDatesService;
 	private final DomainConfigurationDao domainConfigDao;
 	
 	@Inject
 	@VisibleForTesting ArchiveSchedulingService(
 			ArchiveScheduler scheduler,
-			ArchiveDomainTask.Factory taskFactory,
+			ArchiveDomainTaskFactory taskFactory,
 			UUIDFactory uuidFactory,
 			SchedulingDatesService schedulingDatesService,
 			DomainConfigurationDao domainConfigDao) {

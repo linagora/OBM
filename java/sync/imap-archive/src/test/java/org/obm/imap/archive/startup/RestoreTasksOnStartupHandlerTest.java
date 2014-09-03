@@ -47,6 +47,7 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
+import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public class RestoreTasksOnStartupHandlerTest {
 	IMocksControl control;
 	ArchiveScheduler scheduler;
 	ArchiveTreatmentDao archiveTreatmentDao;
-	ArchiveDomainTask.Factory taskFactory;
+	ArchiveDomainTaskFactory taskFactory;
 	RestoreTasksOnStartupHandler testee;
 	
 	@Before
@@ -73,7 +74,7 @@ public class RestoreTasksOnStartupHandlerTest {
 		control = createControl();
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		scheduler = control.createMock(ArchiveScheduler.class);
-		taskFactory = control.createMock(ArchiveDomainTask.Factory.class);
+		taskFactory = control.createMock(ArchiveDomainTaskFactory.class);
 		testee = new RestoreTasksOnStartupHandler(logger, scheduler, archiveTreatmentDao, taskFactory);
 	}
 

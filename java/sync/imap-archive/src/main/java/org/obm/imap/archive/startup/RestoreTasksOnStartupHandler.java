@@ -38,9 +38,8 @@ import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask.Factory;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
+import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.server.LifeCycleHandler;
 import org.slf4j.Logger;
@@ -56,14 +55,14 @@ public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 	private final Logger logger;
 	private final ArchiveScheduler scheduler;
 	private final ArchiveTreatmentDao archiveTreatmentDao;
-	private final Factory taskFactory;
+	private final ArchiveDomainTaskFactory taskFactory;
 
 	@Inject
 	@VisibleForTesting RestoreTasksOnStartupHandler(
 			@Named(LoggerModule.TASK) Logger logger,
 			ArchiveScheduler scheduler,
 			ArchiveTreatmentDao archiveTreatmentDao,
-			ArchiveDomainTask.Factory taskFactory) {
+			ArchiveDomainTaskFactory taskFactory) {
 		this.logger = logger;
 		this.scheduler = scheduler;
 		this.archiveTreatmentDao = archiveTreatmentDao;

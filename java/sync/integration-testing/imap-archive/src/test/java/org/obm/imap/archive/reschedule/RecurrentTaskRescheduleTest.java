@@ -64,8 +64,8 @@ import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
+import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
 import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
@@ -106,7 +106,7 @@ public class RecurrentTaskRescheduleTest {
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
 	@Inject GreenMail imapServer;
-	@Inject ArchiveDomainTask.Factory taskFactory;
+	@Inject ArchiveDomainTaskFactory taskFactory;
 	@Inject DomainConfigurationDao domainConfigDao;
 	@Inject ArchiveScheduler scheduler;
 	@Inject TestDateProvider timeProvider;

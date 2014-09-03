@@ -50,7 +50,6 @@ import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.exception.DomainConfigurationDisableException;
 import org.obm.imap.archive.exception.DomainConfigurationNotFoundException;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask.Factory;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.UUIDFactory;
@@ -68,7 +67,7 @@ public class ArchiveSchedulingServiceTest {
 	ObmDomainUuid domain;
 	IMocksControl mocks;
 	ArchiveScheduler scheduler;
-	ArchiveDomainTask.Factory taskFactory;
+	ArchiveDomainTaskFactory taskFactory;
 	UUIDFactory uuidFactory;
 	SchedulingDatesService schedulingDatesService;
 	DomainConfigurationDao domainConfigDao;
@@ -80,7 +79,7 @@ public class ArchiveSchedulingServiceTest {
 		
 		mocks = EasyMock.createControl();
 		scheduler = mocks.createMock(ArchiveScheduler.class);
-		taskFactory = mocks.createMock(Factory.class);
+		taskFactory = mocks.createMock(ArchiveDomainTaskFactory.class);
 		uuidFactory = mocks.createMock(UUIDFactory.class);
 		schedulingDatesService = mocks.createMock(SchedulingDatesService.class);
 		domainConfigDao = mocks.createMock(DomainConfigurationDao.class);

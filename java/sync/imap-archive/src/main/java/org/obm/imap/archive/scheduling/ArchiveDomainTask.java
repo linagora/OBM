@@ -35,72 +35,16 @@ import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
-import org.obm.imap.archive.logging.LoggerFactory;
 import org.obm.imap.archive.services.ArchiveService;
 
 import ch.qos.logback.classic.Logger;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.linagora.scheduling.Task;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public abstract class ArchiveDomainTask implements Task {
-
-	public interface Factory {
-		ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, 
-				DateTime higherBoundary, ArchiveTreatmentRunId runId,
-				ArchiveTreatmentKind kind);
-		
-		ArchiveDomainTask createAsRecurrent(ObmDomainUuid domain, DateTime when,
-				DateTime higherBoundary, ArchiveTreatmentRunId runId);
-	}
-	
-	@Singleton
-	public static class FactoryImpl implements Factory {
-		
-		private final ArchiveService archiveService;
-		private final LoggerFactory loggerFactory;
-
-		@Inject
-		@VisibleForTesting FactoryImpl(ArchiveService archiveService, LoggerFactory loggerFactory) {
-			this.archiveService = archiveService;
-			this.loggerFactory = loggerFactory;
-		}
-		
-		@Override
-		public ArchiveDomainTask createAsRecurrent(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
-			return create(domain, when, higherBoundary, runId, ArchiveTreatmentKind.REAL_RUN, true);
-		}
-
-		@Override
-		public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when,
-				DateTime higherBoundary, ArchiveTreatmentRunId runId,
-				ArchiveTreatmentKind kind) {
-			return create(domain, when, higherBoundary, runId, kind, false);
-		}
-		
-		private ArchiveDomainTask create(ObmDomainUuid domain, DateTime when, 
-				DateTime higherBoundary, ArchiveTreatmentRunId runId, 
-				ArchiveTreatmentKind archiveTreatmentKind, boolean recurrent) {
-			Logger logger = loggerFactory.create(runId);
-			LoggerAppenders loggerAppenders = LoggerAppenders.from(runId, logger);
-			
-			switch (archiveTreatmentKind) {
-			case DRY_RUN:
-				return new DryRunArchiveDomainTask(archiveService, 
-						domain, when, higherBoundary, runId, logger, loggerAppenders);
-			case REAL_RUN:
-				return new RealRunArchiveDomainTask(archiveService,
-						domain, when, higherBoundary, runId, logger, loggerAppenders,
-						recurrent);
-			}
-			throw new IllegalArgumentException();
-		}
-	}
 
 	protected final ArchiveService archiveService;
 	protected final ObmDomainUuid domain;

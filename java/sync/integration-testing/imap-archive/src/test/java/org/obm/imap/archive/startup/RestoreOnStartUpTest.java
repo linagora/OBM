@@ -61,6 +61,7 @@ import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
 import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
@@ -98,7 +99,7 @@ public class RestoreOnStartUpTest {
 	@Inject TemporaryFolder temporaryFolder;
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
-	@Inject ArchiveDomainTask.Factory taskFactory;
+	@Inject ArchiveDomainTaskFactory taskFactory;
 	@Inject TestingOnlyOnePerDomainMonitorFactory monitor;
 	@Inject ArchiveTreatmentDao archiveTreatmentDao;
 	

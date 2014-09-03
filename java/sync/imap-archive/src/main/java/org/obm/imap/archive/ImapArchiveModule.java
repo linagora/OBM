@@ -60,7 +60,6 @@ import org.obm.imap.archive.resources.TreatmentFactory;
 import org.obm.imap.archive.resources.TreatmentResource;
 import org.obm.imap.archive.resources.TreatmentsResource;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
-import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBusInitializer;
@@ -132,7 +131,6 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
 		bind(TimeUnit.class).annotatedWith(Names.named("schedulerResolution")).toInstance(TimeUnit.SECONDS);
 		
-		bind(ArchiveDomainTask.Factory.class).to(ArchiveDomainTask.FactoryImpl.class);
 		bind(ArchiveSchedulerBus.class);
 		bind(ArchiveDaoTracking.class);
 		bind(ArchiveRecurrentTaskRescheduler.class);

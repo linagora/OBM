@@ -38,7 +38,7 @@ import org.obm.imap.archive.logging.LoggerAppenders;
 import ch.qos.logback.classic.Logger;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public class TestArchiveDomainTaskFactory extends ArchiveDomainTask.FactoryImpl {
+public class TestArchiveDomainTaskFactory extends ArchiveDomainTaskFactory {
 
 	private Logger logger;
 	private LoggerAppenders loggerAppenders;
