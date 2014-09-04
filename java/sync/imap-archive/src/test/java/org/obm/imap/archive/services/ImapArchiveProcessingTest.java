@@ -49,6 +49,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
@@ -65,8 +66,6 @@ import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.exception.DomainConfigurationException;
 import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.logging.LoggerAppenders;
-import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
-import org.obm.imap.archive.scheduling.TestArchiveDomainTaskFactory;
 import org.obm.imap.archive.services.ImapArchiveProcessing.ProcessedTask;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.push.mail.bean.ListInfo;
@@ -179,7 +178,7 @@ public class ImapArchiveProcessingTest {
 			.andReturn(storeClient).times(4);
 		
 		control.replay();
-		imapArchiveProcessing.archive(new TestArchiveDomainTaskFactory(logger, loggerAppenders).create(domainId, runId));
+		imapArchiveProcessing.archive(new ArchiveConfiguration(domainId, null, null, runId, logger, loggerAppenders, false));
 		control.verify();
 	}
 	
@@ -248,7 +247,7 @@ public class ImapArchiveProcessingTest {
 		expectedException.expectCause(ImapArchiveProcessingException.class);
 		
 		control.replay();
-		imapArchiveProcessing.archive(new TestArchiveDomainTaskFactory(logger, loggerAppenders).create(domainId, runId));
+		imapArchiveProcessing.archive(new ArchiveConfiguration(domainId, null, null, runId, logger, loggerAppenders, false));
 		control.verify();
 	}
 	
@@ -286,7 +285,8 @@ public class ImapArchiveProcessingTest {
 			.hasMessage("The domain with the uuid fc2f915e-9df4-4560-b141-7b4c7ddecdd6 was not found");
 		
 		control.replay();
-		imapArchiveProcessing.archive(new TestArchiveDomainTaskFactory(logger, loggerAppenders).create(domainId, ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77")));
+		imapArchiveProcessing.archive(new ArchiveConfiguration(domainId, null, null, 
+				ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), logger, loggerAppenders, false));
 		control.verify();
 	}
 	
@@ -303,7 +303,8 @@ public class ImapArchiveProcessingTest {
 			.hasMessage("The IMAP Archive configuration is not defined for the domain: 'MyName'");
 		
 		control.replay();
-		imapArchiveProcessing.archive(new TestArchiveDomainTaskFactory(logger, loggerAppenders).create(domainId, ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77")));
+		imapArchiveProcessing.archive(new ArchiveConfiguration(domainId, null, null,
+				ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), logger, loggerAppenders, false));
 		control.verify();
 	}
 	
@@ -323,7 +324,8 @@ public class ImapArchiveProcessingTest {
 			.hasMessage("The IMAP Archive service is disabled for the domain: 'MyName'");
 		
 		control.replay();
-		imapArchiveProcessing.archive(new TestArchiveDomainTaskFactory(logger, loggerAppenders).create(domainId, ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77")));
+		imapArchiveProcessing.archive(new ArchiveConfiguration(domainId, null, null, 
+				ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), logger, loggerAppenders, false));
 		control.verify();
 	}
 	
@@ -445,15 +447,14 @@ public class ImapArchiveProcessingTest {
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
 		
-		AbstractArchiveDomainTask archiveDomainTask = control.createMock(AbstractArchiveDomainTask.class);
-		expect(archiveDomainTask.getLogger())
-			.andReturn(logger);
-		expect(archiveDomainTask.getRunId())
+		ArchiveConfiguration archiveConfiguration = control.createMock(ArchiveConfiguration.class);
+		expect(archiveConfiguration.getLogger()).andReturn(logger);
+		expect(archiveConfiguration.getRunId())
 			.andReturn(ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"));
 		
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveDomainTask(archiveDomainTask)
+				.archiveConfiguration(archiveConfiguration)
 				.domain(domain)
 				.boundaries(Boundaries.builder()
 						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
@@ -499,15 +500,14 @@ public class ImapArchiveProcessingTest {
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
 		
-		AbstractArchiveDomainTask archiveDomainTask = control.createMock(AbstractArchiveDomainTask.class);
-		expect(archiveDomainTask.getLogger())
-			.andReturn(logger);
-		expect(archiveDomainTask.getRunId())
+		ArchiveConfiguration archiveConfiguration = control.createMock(ArchiveConfiguration.class);
+		expect(archiveConfiguration.getLogger()).andReturn(logger);
+		expect(archiveConfiguration.getRunId())
 			.andReturn(ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"));
 		
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveDomainTask(archiveDomainTask)
+				.archiveConfiguration(archiveConfiguration)
 				.domain(domain)
 				.boundaries(Boundaries.builder()
 						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
@@ -555,11 +555,9 @@ public class ImapArchiveProcessingTest {
 			.andReturn(storeClient);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
-		AbstractArchiveDomainTask archiveDomainTask = control.createMock(AbstractArchiveDomainTask.class);
-		expect(archiveDomainTask.getLogger())
-			.andReturn(logger);
-		expect(archiveDomainTask.getRunId())
-			.andReturn(runId);
+		ArchiveConfiguration archiveConfiguration = control.createMock(ArchiveConfiguration.class);
+		expect(archiveConfiguration.getLogger()).andReturn(logger);
+		expect(archiveConfiguration.getRunId()).andReturn(runId);
 		
 		expect(processedFolderDao.get(runId, ImapFolder.from("user/usera@mydomain.org")))
 			.andReturn(Optional.<ProcessedFolder> of(ProcessedFolder.builder()
@@ -588,7 +586,7 @@ public class ImapArchiveProcessingTest {
 		
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveDomainTask(archiveDomainTask)
+				.archiveConfiguration(archiveConfiguration)
 				.domain(domain)
 				.boundaries(Boundaries.builder()
 						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
@@ -643,15 +641,14 @@ public class ImapArchiveProcessingTest {
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
 		
-		AbstractArchiveDomainTask archiveDomainTask = control.createMock(AbstractArchiveDomainTask.class);
-		expect(archiveDomainTask.getLogger())
-			.andReturn(logger);
-		expect(archiveDomainTask.getRunId())
+		ArchiveConfiguration archiveConfiguration = control.createMock(ArchiveConfiguration.class);
+		expect(archiveConfiguration.getLogger()).andReturn(logger);
+		expect(archiveConfiguration.getRunId())
 			.andReturn(ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"));
 		
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveDomainTask(archiveDomainTask)
+				.archiveConfiguration(archiveConfiguration)
 				.domain(domain)
 				.boundaries(Boundaries.builder()
 						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))

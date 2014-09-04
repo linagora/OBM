@@ -42,6 +42,7 @@ import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.imap.archive.beans.ArchiveConfiguration;
 
 import com.linagora.scheduling.Monitor;
 import com.linagora.scheduling.ScheduledTask;
@@ -52,9 +53,9 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ArchiveSchedulerQueueTest {
 
-	Scheduler<AbstractArchiveDomainTask> scheduler;
+	Scheduler<ArchiveDomainTask> scheduler;
 	OnlyOnePerDomainMonitorFactory monitorFactory;
-	Monitor<AbstractArchiveDomainTask> monitor;
+	Monitor<ArchiveDomainTask> monitor;
 	TestDateTimeProvider timeProvider;
 	ObmDomainUuid domain;
 	IMocksControl mocks;
@@ -64,10 +65,10 @@ public class ArchiveSchedulerQueueTest {
 	public void setUp() {
 		mocks = createControl();
 		domain = ObmDomainUuid.of("5859ec4d-8dc2-4143-ba53-e86d6862b4d4");
-		monitor = Monitor.<AbstractArchiveDomainTask>builder().build();
+		monitor = Monitor.<ArchiveDomainTask>builder().build();
 		DateTime testsStartTime = DateTime.parse("2024-01-1T05:04Z");
 		timeProvider = new TestDateTimeProvider(testsStartTime);
-		scheduler = Scheduler.<AbstractArchiveDomainTask>builder()
+		scheduler = Scheduler.<ArchiveDomainTask>builder()
 				.resolution(1, TimeUnit.SECONDS)
 				.timeProvider(timeProvider)
 				.addListener(monitor)
@@ -76,7 +77,7 @@ public class ArchiveSchedulerQueueTest {
 		monitorFactory = new OnlyOnePerDomainMonitorFactory() {
 			
 			@Override
-			public Monitor<AbstractArchiveDomainTask> create() {
+			public Monitor<ArchiveDomainTask> create() {
 				return monitor;
 			}
 		};
@@ -87,12 +88,16 @@ public class ArchiveSchedulerQueueTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void putShouldStackDomainTasks() {
-		AbstractArchiveDomainTask task1 = mocks.createMock(AbstractArchiveDomainTask.class);
-		AbstractArchiveDomainTask task2 = mocks.createMock(AbstractArchiveDomainTask.class);
+		ArchiveDomainTask task1 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration1 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task1.getArchiveConfiguration()).andReturn(configuration1);
+		ArchiveDomainTask task2 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration2 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task2.getArchiveConfiguration()).andReturn(configuration2);
 		TestScheduledTask scheduled1 = new TestScheduledTask(State.WAITING, task1, scheduler, DateTime.parse("2024-11-1T05:04Z"));
 		TestScheduledTask scheduled2 = new TestScheduledTask(State.WAITING, task2, scheduler, DateTime.parse("2024-11-1T15:04Z"));
-		expect(task1.getDomain()).andReturn(domain);
-		expect(task2.getDomain()).andReturn(domain);
+		expect(configuration1.getDomain()).andReturn(domain);
+		expect(configuration2.getDomain()).andReturn(domain);
 		
 		mocks.replay();
 		testee.put(scheduled1);
@@ -106,12 +111,16 @@ public class ArchiveSchedulerQueueTest {
 	@Test
 	public void putShouldSetTaskInExpectedDomain() {
 		ObmDomainUuid domain2 = ObmDomainUuid.of("b9b7ea0f-a65e-4d2e-89b1-fb9ef4d2c97d");
-		AbstractArchiveDomainTask task1 = mocks.createMock(AbstractArchiveDomainTask.class);
-		AbstractArchiveDomainTask task2 = mocks.createMock(AbstractArchiveDomainTask.class);
+		ArchiveDomainTask task1 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration1 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task1.getArchiveConfiguration()).andReturn(configuration1);
+		ArchiveDomainTask task2 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration2 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task2.getArchiveConfiguration()).andReturn(configuration2);
 		TestScheduledTask scheduled1 = new TestScheduledTask(State.WAITING, task1, scheduler, DateTime.parse("2024-11-1T05:04Z"));
 		TestScheduledTask scheduled2 = new TestScheduledTask(State.WAITING, task2, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(task1.getDomain()).andReturn(domain);
-		expect(task2.getDomain()).andReturn(domain2);
+		expect(configuration1.getDomain()).andReturn(domain);
+		expect(configuration2.getDomain()).andReturn(domain2);
 		
 		mocks.replay();
 		testee.put(scheduled1);
@@ -124,9 +133,11 @@ public class ArchiveSchedulerQueueTest {
 	
 	@Test
 	public void removeShouldReturnFalseIfNonExisting() {
-		AbstractArchiveDomainTask task = mocks.createMock(AbstractArchiveDomainTask.class);
+		ArchiveDomainTask task = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration = mocks.createMock(ArchiveConfiguration.class);
+		expect(task.getArchiveConfiguration()).andReturn(configuration);
 		TestScheduledTask scheduled = new TestScheduledTask(State.WAITING, task, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(task.getDomain()).andReturn(domain);
+		expect(configuration.getDomain()).andReturn(domain);
 		
 		mocks.replay();
 		testee.remove(scheduled);
@@ -138,12 +149,16 @@ public class ArchiveSchedulerQueueTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void removeShouldDeleteOneFromStack() {
-		AbstractArchiveDomainTask task1 = mocks.createMock(AbstractArchiveDomainTask.class);
-		AbstractArchiveDomainTask task2 = mocks.createMock(AbstractArchiveDomainTask.class);
+		ArchiveDomainTask task1 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration1 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task1.getArchiveConfiguration()).andReturn(configuration1).anyTimes();
+		ArchiveDomainTask task2 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration2 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task2.getArchiveConfiguration()).andReturn(configuration2).anyTimes();
 		TestScheduledTask scheduled1 = new TestScheduledTask(State.WAITING, task1, scheduler, DateTime.parse("2024-11-1T06:04Z"));
 		TestScheduledTask scheduled2 = new TestScheduledTask(State.WAITING, task2, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(task1.getDomain()).andReturn(domain).times(2);
-		expect(task2.getDomain()).andReturn(domain);
+		expect(configuration1.getDomain()).andReturn(domain).times(2);
+		expect(configuration2.getDomain()).andReturn(domain);
 		
 		mocks.replay();
 		testee.put(scheduled1);
@@ -157,7 +172,7 @@ public class ArchiveSchedulerQueueTest {
 	@Test
 	public void pollShouldReturnEmptyWhenNoTask() {
 		mocks.replay();
-		Collection<ScheduledTask<AbstractArchiveDomainTask>> tasks = testee.poll();
+		Collection<ScheduledTask<ArchiveDomainTask>> tasks = testee.poll();
 		mocks.verify();
 		
 		assertThat(tasks).isEmpty();
@@ -165,14 +180,16 @@ public class ArchiveSchedulerQueueTest {
 	
 	@Test
 	public void pollShouldReturnEmptyWhenTaskButScheduleTimeNotPassed() {
-		AbstractArchiveDomainTask task = mocks.createMock(AbstractArchiveDomainTask.class);
+		ArchiveDomainTask task = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration = mocks.createMock(ArchiveConfiguration.class);
+		expect(task.getArchiveConfiguration()).andReturn(configuration);
 		TestScheduledTask scheduled = new TestScheduledTask(State.WAITING, task, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(task.getDomain()).andReturn(domain);
+		expect(configuration.getDomain()).andReturn(domain);
 		
 		mocks.replay();
 		testee.put(scheduled);
 		timeProvider.setCurrent(scheduled.scheduledTime().minusHours(1));
-		Collection<ScheduledTask<AbstractArchiveDomainTask>> tasks = testee.poll();
+		Collection<ScheduledTask<ArchiveDomainTask>> tasks = testee.poll();
 		mocks.verify();
 		
 		assertThat(tasks).isEmpty();
@@ -181,16 +198,18 @@ public class ArchiveSchedulerQueueTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void pollShouldReturnDomainTaskWhenNoneRunning() {
-		AbstractArchiveDomainTask task = mocks.createMock(AbstractArchiveDomainTask.class);
+		ArchiveDomainTask task = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration = mocks.createMock(ArchiveConfiguration.class);
+		expect(task.getArchiveConfiguration()).andReturn(configuration).anyTimes();
 		TestScheduledTask scheduled = new TestScheduledTask(State.WAITING, task, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(task.getDomain()).andReturn(domain).times(2);
+		expect(configuration.getDomain()).andReturn(domain).times(2);
 		
 		monitor.scheduled(scheduled);
 		
 		mocks.replay();
 		testee.put(scheduled);
 		timeProvider.setCurrent(scheduled.scheduledTime());
-		Collection<ScheduledTask<AbstractArchiveDomainTask>> tasks = testee.poll();
+		Collection<ScheduledTask<ArchiveDomainTask>> tasks = testee.poll();
 		mocks.verify();
 		
 		assertThat(tasks).containsOnly(scheduled);
@@ -198,19 +217,23 @@ public class ArchiveSchedulerQueueTest {
 
 	@Test
 	public void pollShouldReturnEmptyWhenDomainTaskIsRunning() {
-		AbstractArchiveDomainTask task1 = mocks.createMock(AbstractArchiveDomainTask.class);
-		AbstractArchiveDomainTask task2 = mocks.createMock(AbstractArchiveDomainTask.class);
+		ArchiveDomainTask task1 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration1 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task1.getArchiveConfiguration()).andReturn(configuration1);
+		ArchiveDomainTask task2 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration2 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task2.getArchiveConfiguration()).andReturn(configuration2);
 		TestScheduledTask scheduled = new TestScheduledTask(State.WAITING, task1, scheduler, DateTime.parse("2024-11-1T06:04Z"));
 		TestScheduledTask running = new TestScheduledTask(State.RUNNING, task2, scheduler, DateTime.parse("2024-11-1T01:04Z"));
-		expect(task1.getDomain()).andReturn(domain);
-		expect(task2.getDomain()).andReturn(domain);
+		expect(configuration1.getDomain()).andReturn(domain);
+		expect(configuration2.getDomain()).andReturn(domain);
 
 		monitor.scheduled(running);
 		
 		mocks.replay();
 		testee.put(scheduled);
 		timeProvider.setCurrent(scheduled.scheduledTime());
-		Collection<ScheduledTask<AbstractArchiveDomainTask>> tasks = testee.poll();
+		Collection<ScheduledTask<ArchiveDomainTask>> tasks = testee.poll();
 		mocks.verify();
 		
 		assertThat(tasks).isEmpty();
@@ -220,22 +243,28 @@ public class ArchiveSchedulerQueueTest {
 	@Test
 	public void pollShouldReturnOnlyOneTaskPerDomain() {
 		ObmDomainUuid domain2 = ObmDomainUuid.of("b9b7ea0f-a65e-4d2e-89b1-fb9ef4d2c97d");
-		AbstractArchiveDomainTask task1 = mocks.createMock(AbstractArchiveDomainTask.class);
-		AbstractArchiveDomainTask task2 = mocks.createMock(AbstractArchiveDomainTask.class);
-		AbstractArchiveDomainTask task3 = mocks.createMock(AbstractArchiveDomainTask.class);
+		ArchiveDomainTask task1 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration1 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task1.getArchiveConfiguration()).andReturn(configuration1);
+		ArchiveDomainTask task2 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration2 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task2.getArchiveConfiguration()).andReturn(configuration2);
+		ArchiveDomainTask task3 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration3 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task3.getArchiveConfiguration()).andReturn(configuration3);
 		TestScheduledTask scheduled1 = new TestScheduledTask(State.WAITING, task1, scheduler, DateTime.parse("2024-11-1T01:04Z"));
 		TestScheduledTask scheduled2 = new TestScheduledTask(State.WAITING, task2, scheduler, DateTime.parse("2024-11-1T03:04Z"));
 		TestScheduledTask scheduledTheLater = new TestScheduledTask(State.WAITING, task3, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(task1.getDomain()).andReturn(domain);
-		expect(task2.getDomain()).andReturn(domain2);
-		expect(task3.getDomain()).andReturn(domain);
+		expect(configuration1.getDomain()).andReturn(domain);
+		expect(configuration2.getDomain()).andReturn(domain2);
+		expect(configuration3.getDomain()).andReturn(domain);
 		
 		mocks.replay();
 		testee.put(scheduled1);
 		testee.put(scheduled2);
 		testee.put(scheduledTheLater);
 		timeProvider.setCurrent(scheduledTheLater.scheduledTime());
-		Collection<ScheduledTask<AbstractArchiveDomainTask>> tasks = testee.poll();
+		Collection<ScheduledTask<ArchiveDomainTask>> tasks = testee.poll();
 		mocks.verify();
 		
 		assertThat(tasks).containsOnly(scheduled1, scheduled2);

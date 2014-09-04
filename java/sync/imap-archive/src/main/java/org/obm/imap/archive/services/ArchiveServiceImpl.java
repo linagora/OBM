@@ -39,7 +39,7 @@ import javax.inject.Inject;
 
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerFileNameService;
-import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
+import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
@@ -61,9 +61,10 @@ public class ArchiveServiceImpl implements ArchiveService {
 	
 	@Override
 	public Optional<Object> archiveTreatmentLogs(final ArchiveTreatmentRunId runId) throws IOException {
-		Optional<AbstractArchiveDomainTask> optional = scheduledArchivingTracker.get(runId);
+		Optional<ArchiveDomainTask> optional = scheduledArchivingTracker.get(runId);
 		if (optional.isPresent()) {
-			return Optional.<Object> of(optional.get().getLoggerAppenders().getChunkAppender().chunk());
+			ArchiveDomainTask task = optional.get();
+			return Optional.<Object> of(task.getArchiveConfiguration().getLoggerAppenders().getChunkAppender().chunk());
 		}
 		
 		File loggerFile = new File(loggerFileNameService.loggerFileName(runId));

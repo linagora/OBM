@@ -31,18 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.scheduling;
 
-import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.linagora.scheduling.Listener;
 import com.linagora.scheduling.ScheduledTask;
-import com.linagora.scheduling.ScheduledTask.State;
 
 @Singleton
-public class ArchiveSchedulerBus implements Listener<AbstractArchiveDomainTask> {
+public class ArchiveSchedulerBus implements Listener<ArchiveDomainTask> {
 
 	private final EventBus bus;
 
@@ -56,58 +53,90 @@ public class ArchiveSchedulerBus implements Listener<AbstractArchiveDomainTask> 
 	}
 	
 	@Override
-	public void canceled(ScheduledTask<AbstractArchiveDomainTask> task) {
-		postTaskStatusChange(task.task(), State.CANCELED);
+	public void canceled(ScheduledTask<ArchiveDomainTask> task) {
+		postTaskStatusChange(task);
 	}
 
 	@Override
-	public void failed(ScheduledTask<AbstractArchiveDomainTask> task, Throwable failure) {
-		postTaskStatusChange(task.task(), State.FAILED);
+	public void failed(ScheduledTask<ArchiveDomainTask> task, Throwable failure) {
+		postTaskStatusChange(task);
 	}
 
 	@Override
-	public void running(ScheduledTask<AbstractArchiveDomainTask> task) {
-		postTaskStatusChange(task.task(), State.RUNNING);
+	public void running(ScheduledTask<ArchiveDomainTask> task) {
+		postTaskStatusChange(task);
 	}
 
 	@Override
-	public void scheduled(ScheduledTask<AbstractArchiveDomainTask> task) {
-		postTaskStatusChange(task.task(), State.WAITING);
+	public void scheduled(ScheduledTask<ArchiveDomainTask> task) {
+		postTaskStatusChange(task);
 	}
 
 	@Override
-	public void terminated(ScheduledTask<AbstractArchiveDomainTask> task) {
-		postTaskStatusChange(task.task(), State.TERMINATED);
+	public void terminated(ScheduledTask<ArchiveDomainTask> task) {
+		postTaskStatusChange(task);
 	}
 
-	private void postTaskStatusChange(AbstractArchiveDomainTask task, State state) {
-		bus.post(new TaskStatusChanged(task, state));
+	private void postTaskStatusChange(ScheduledTask<ArchiveDomainTask> task) {
+		bus.post(task.task().createStatusChangeEvent(task.state()));
 	}
 	
 	/* package */ void register(ArchiveSchedulerBus.Client client) {
 		bus.register(client);
 	}
 	
-	public static interface Client {}
+	public interface Client {}
 	
-	public static interface Events {
+	public interface Events {
 
-		static class TaskStatusChanged {
+		public abstract class TaskStatusChanged {
+
+			interface Factory {
+				TaskStatusChanged create(ScheduledTask.State state, ArchiveDomainTask archiveDomainTask);
+			}
 			
-			private final AbstractArchiveDomainTask task;
-			private final State state;
+			private final ArchiveDomainTask task;
+			private final ScheduledTask.State state;
 
-			public TaskStatusChanged(AbstractArchiveDomainTask task, State state) {
-				this.task = task;
+			protected TaskStatusChanged(ScheduledTask.State state, ArchiveDomainTask task) {
 				this.state = state;
+				this.task = task;
 			}
 
-			public AbstractArchiveDomainTask getTask() {
+			public ArchiveDomainTask task() {
 				return task;
 			}
 			
-			public State getState() {
+			public ScheduledTask.State state() {
 				return state;
+			}
+		}
+		
+		public class DryRunTaskStatusChanged extends TaskStatusChanged {
+			
+			public static class Factory implements TaskStatusChanged.Factory {
+				@Override
+				public TaskStatusChanged create(ScheduledTask.State state, ArchiveDomainTask archiveDomainTask) {
+					return new DryRunTaskStatusChanged(state, archiveDomainTask);
+				}
+			}
+			
+			public DryRunTaskStatusChanged(ScheduledTask.State state, ArchiveDomainTask task) {
+				super(state, task);
+			}
+		}
+		
+		public class RealRunTaskStatusChanged extends TaskStatusChanged {
+			
+			public static class Factory implements TaskStatusChanged.Factory {
+				@Override
+				public TaskStatusChanged create(ScheduledTask.State state, ArchiveDomainTask archiveDomainTask) {
+					return new RealRunTaskStatusChanged(state, archiveDomainTask);
+				}
+			}
+			
+			public RealRunTaskStatusChanged(ScheduledTask.State state, ArchiveDomainTask task) {
+				super(state, task);
 			}
 		}
 	}

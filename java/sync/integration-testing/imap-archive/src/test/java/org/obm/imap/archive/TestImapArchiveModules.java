@@ -48,7 +48,7 @@ import org.obm.dao.utils.DaoTestModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerFileNameService;
-import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
+import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory.OnlyOnePerDomainMonitorFactoryImpl;
@@ -184,15 +184,15 @@ public class TestImapArchiveModules {
 
 		public static class TestingOnlyOnePerDomainMonitorFactory extends OnlyOnePerDomainMonitorFactoryImpl {
 			
-			Monitor<AbstractArchiveDomainTask> monitor;
+			Monitor<ArchiveDomainTask> monitor;
 
 			@Override
-			public Monitor<AbstractArchiveDomainTask> create() {
+			public Monitor<ArchiveDomainTask> create() {
 				monitor = super.create();
 				return monitor;
 			}
 			
-			public Monitor<AbstractArchiveDomainTask> get() {
+			public Monitor<ArchiveDomainTask> get() {
 				return monitor;
 			}
 		}

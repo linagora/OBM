@@ -36,37 +36,37 @@ import com.linagora.scheduling.Listener;
 import com.linagora.scheduling.ScheduledTask;
 
 @Singleton
-public class ArchiveSchedulerLoggerListener implements Listener<AbstractArchiveDomainTask> {
+public class ArchiveSchedulerLoggerListener implements Listener<ArchiveDomainTask> {
 
 	@Override
-	public void canceled(ScheduledTask<AbstractArchiveDomainTask> task) {
+	public void canceled(ScheduledTask<ArchiveDomainTask> task) {
 		stopAppenders(task);
 	}
 
 	@Override
-	public void failed(ScheduledTask<AbstractArchiveDomainTask> task, Throwable failure) {
+	public void failed(ScheduledTask<ArchiveDomainTask> task, Throwable failure) {
 		stopAppenders(task);
 	}
 
 	@Override
-	public void running(ScheduledTask<AbstractArchiveDomainTask> task) {
-		getArchiveDomainTask(task).getLoggerAppenders().startAppenders();
+	public void running(ScheduledTask<ArchiveDomainTask> task) {
+		getArchiveDomainTask(task).getArchiveConfiguration().getLoggerAppenders().startAppenders();
 	}
 
 	@Override
-	public void scheduled(ScheduledTask<AbstractArchiveDomainTask> task) {
+	public void scheduled(ScheduledTask<ArchiveDomainTask> task) {
 	}
 
 	@Override
-	public void terminated(ScheduledTask<AbstractArchiveDomainTask> task) {
+	public void terminated(ScheduledTask<ArchiveDomainTask> task) {
 		stopAppenders(task);
 	}
 
-	private void stopAppenders(ScheduledTask<AbstractArchiveDomainTask> task) {
-		getArchiveDomainTask(task).getLoggerAppenders().stopAppenders();
+	private void stopAppenders(ScheduledTask<ArchiveDomainTask> task) {
+		getArchiveDomainTask(task).getArchiveConfiguration().getLoggerAppenders().stopAppenders();
 	}
 
-	private AbstractArchiveDomainTask getArchiveDomainTask(ScheduledTask<AbstractArchiveDomainTask> task) {
+	private ArchiveDomainTask getArchiveDomainTask(ScheduledTask<ArchiveDomainTask> task) {
 		return task.task();
 	}
 }

@@ -49,16 +49,19 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Client;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.RealRunTaskStatusChanged;
 import org.obm.imap.archive.services.ImapArchiveProcessing;
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Queues;
 import com.google.common.eventbus.Subscribe;
@@ -83,8 +86,8 @@ public class ArchiveSchedulerTest {
 	DateTime higherBoundary;
 	
 	TestDateTimeProvider timeProvider;
-	Monitor<AbstractArchiveDomainTask> monitor;
-	FutureTestListener<AbstractArchiveDomainTask> futureListener;
+	Monitor<ArchiveDomainTask> monitor;
+	FutureTestListener<ArchiveDomainTask> futureListener;
 	BusClient busClient;
 	ArchiveSchedulerBus bus;
 	ArchiveSchedulerQueue queue;
@@ -111,8 +114,8 @@ public class ArchiveSchedulerTest {
 		OnlyOnePerDomainMonitorFactory monitorFactory = new OnlyOnePerDomainMonitorFactory() {
 
 				@Override
-				public Monitor<AbstractArchiveDomainTask> create() {
-					monitor = Monitor.<AbstractArchiveDomainTask>builder()
+				public Monitor<ArchiveDomainTask> create() {
+					monitor = Monitor.<ArchiveDomainTask>builder()
 							.addListener(futureListener)
 							.build();
 					return monitor;
@@ -142,12 +145,11 @@ public class ArchiveSchedulerTest {
 		ObmDomainUuid domain = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		DateTime when = DateTime.parse("2024-11-1T05:04Z");
-		
-		imapArchiveProcessing.archive(archiveDomainTask(domain, runId, when));
+		RemotelyControlledTask task = createTask(domain, when, higherBoundary, runId);
+		imapArchiveProcessing.archive(task.getArchiveConfiguration());
 		expectLastCall();
 		
 		mocks.replay();
-		RemotelyControlledTask task = createTask(domain, when, higherBoundary, runId);
 		
 		testee.schedule(task);
 		assertTaskProgression(task);
@@ -162,17 +164,17 @@ public class ArchiveSchedulerTest {
 		DateTime when2 = DateTime.parse("2024-11-5T05:04Z");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
+		RemotelyControlledTask task1 = createTask(domain, when1, higherBoundary, runId1);
+		RemotelyControlledTask task2 = createTask(domain, when2, higherBoundary, runId2);
 
-		imapArchiveProcessing.archive(archiveDomainTask(domain, runId1, when1));
+		imapArchiveProcessing.archive(task1.getArchiveConfiguration());
 		expectLastCall();
-		imapArchiveProcessing.archive(archiveDomainTask(domain, runId2, when2));
+		imapArchiveProcessing.archive(task2.getArchiveConfiguration());
 		expectLastCall();
 
 		mocks.replay();
-		RemotelyControlledTask task1 = createTask(domain, when1, higherBoundary, runId1);
 		testee.schedule(task1);
 		assertTaskProgression(task1);
-		RemotelyControlledTask task2 = createTask(domain, when2, higherBoundary, runId2);
 		testee.schedule(task2);
 		assertTaskProgression(task2);
 		assertThat(monitor.all()).isEmpty();
@@ -186,16 +188,16 @@ public class ArchiveSchedulerTest {
 		DateTime whenToEnqueue = DateTime.parse("2024-11-2T05:04Z");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
+		RemotelyControlledTask task =  createTask(domain, when, higherBoundary, runId1);
+		RemotelyControlledTask taskEnqueued = createTask(domain, whenToEnqueue, higherBoundary, runId2);
 
-		imapArchiveProcessing.archive(archiveDomainTask(domain, runId1, when));
+		imapArchiveProcessing.archive(task.getArchiveConfiguration());
 		expectLastCall();
-		imapArchiveProcessing.archive(archiveDomainTask(domain, runId2, whenToEnqueue));
+		imapArchiveProcessing.archive(taskEnqueued.getArchiveConfiguration());
 		expectLastCall();
 
 		mocks.replay();
-		RemotelyControlledTask task =  createTask(domain, when, higherBoundary, runId1);
 		testee.schedule(task);
-		RemotelyControlledTask taskEnqueued = createTask(domain, whenToEnqueue, higherBoundary, runId2);
 		testee.schedule(taskEnqueued);
 		assertTaskIsScheduled(task);
 		assertTaskIsScheduled(taskEnqueued);
@@ -217,22 +219,22 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
+		RemotelyControlledTask task = createTask(domain, when, higherBoundary, runId1);
+		RemotelyControlledTask laterTaskEnqueuedBefore = createTask(domain, laterWhenEnqueuedBefore, higherBoundary, runId2);
+		RemotelyControlledTask earlierTaskEnqueuedAfter = createTask(domain, earlierWhenEnqueuedAfter, higherBoundary, runId3);
 
-		imapArchiveProcessing.archive(archiveDomainTask(domain, runId1, when));
+		imapArchiveProcessing.archive(task.getArchiveConfiguration());
 		expectLastCall();
-		imapArchiveProcessing.archive(archiveDomainTask(domain, runId2, laterWhenEnqueuedBefore));
+		imapArchiveProcessing.archive(laterTaskEnqueuedBefore.getArchiveConfiguration());
 		expectLastCall();
-		imapArchiveProcessing.archive(archiveDomainTask(domain, runId3, earlierWhenEnqueuedAfter));
+		imapArchiveProcessing.archive(earlierTaskEnqueuedAfter.getArchiveConfiguration());
 		expectLastCall();
 
 		mocks.replay();
-		RemotelyControlledTask task = createTask(domain, when, higherBoundary, runId1);
 		testee.schedule(task);
 		assertTaskIsScheduled(task);
 		assertTaskIsRunning(task);
 		
-		RemotelyControlledTask laterTaskEnqueuedBefore = createTask(domain, laterWhenEnqueuedBefore, higherBoundary, runId2);
-		RemotelyControlledTask earlierTaskEnqueuedAfter = createTask(domain, earlierWhenEnqueuedAfter, higherBoundary, runId3);
 		testee.schedule(laterTaskEnqueuedBefore);
 		testee.schedule(earlierTaskEnqueuedAfter);
 		assertTaskIsScheduled(laterTaskEnqueuedBefore);
@@ -255,14 +257,15 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
-		imapArchiveProcessing.archive(archiveDomainTask(domain1, runId1, when1));
+		RemotelyControlledTask taskDomain1 = createTask(domain1, when1, higherBoundary, runId1);
+		RemotelyControlledTask taskDomain2 = createTask(domain2, when2, higherBoundary, runId2);
+
+		imapArchiveProcessing.archive(taskDomain1.getArchiveConfiguration());
 		expectLastCall();
-		imapArchiveProcessing.archive(archiveDomainTask(domain2, runId2, when2));
+		imapArchiveProcessing.archive(taskDomain2.getArchiveConfiguration());
 		expectLastCall();
 
 		mocks.replay();
-		RemotelyControlledTask taskDomain1 = createTask(domain1, when1, higherBoundary, runId1);
-		RemotelyControlledTask taskDomain2 = createTask(domain2, when2, higherBoundary, runId2);
 		testee.schedule(taskDomain1);
 		testee.schedule(taskDomain2);
 		assertTaskIsScheduled(taskDomain1);
@@ -288,21 +291,21 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
 		ArchiveTreatmentRunId runId4 = ArchiveTreatmentRunId.from("b1226053-265d-4b0e-a524-e37b1dfcb2e9");
-
-		imapArchiveProcessing.archive(archiveDomainTask(domain1, runId1, when1));
-		expectLastCall();
-		imapArchiveProcessing.archive(archiveDomainTask(domain2, runId2, when2));
-		expectLastCall();
-		imapArchiveProcessing.archive(archiveDomainTask(domain1, runId3, when1ToEnqueue));
-		expectLastCall();
-		imapArchiveProcessing.archive(archiveDomainTask(domain2, runId4, when2ToEnqueue));
-		expectLastCall();
-		
-		mocks.replay();
 		RemotelyControlledTask taskDomain1 = createTask(domain1, when1, higherBoundary, runId1);
 		RemotelyControlledTask taskDomain2 = createTask(domain2, when2, higherBoundary, runId2);
 		RemotelyControlledTask taskDomain1Enqueued = createTask(domain1, when1ToEnqueue, higherBoundary, runId3);
 		RemotelyControlledTask taskDomain2Enqueued = createTask(domain2, when2ToEnqueue, higherBoundary, runId4);
+
+		imapArchiveProcessing.archive(taskDomain1.getArchiveConfiguration());
+		expectLastCall();
+		imapArchiveProcessing.archive(taskDomain2.getArchiveConfiguration());
+		expectLastCall();
+		imapArchiveProcessing.archive(taskDomain1Enqueued.getArchiveConfiguration());
+		expectLastCall();
+		imapArchiveProcessing.archive(taskDomain2Enqueued.getArchiveConfiguration());
+		expectLastCall();
+		
+		mocks.replay();
 		testee.schedule(taskDomain1);
 		testee.schedule(taskDomain2);
 		testee.schedule(taskDomain1Enqueued);
@@ -341,15 +344,15 @@ public class ArchiveSchedulerTest {
 		DateTime when2 = DateTime.parse("2024-11-9T00:00");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
+		RemotelyControlledTask runningTask = createTask(domain, when1, higherBoundary, runId1);
+		RemotelyControlledTask scheduledTask = createTask(domain, when2, higherBoundary, runId2);
 
-		imapArchiveProcessing.archive(archiveDomainTask(domain, runId1, when1));
+		imapArchiveProcessing.archive(runningTask.getArchiveConfiguration());
 		expectLastCall().anyTimes();
 
 		mocks.replay();
-		RemotelyControlledTask runningTask = createTask(domain, when1, higherBoundary, runId1);
-		ScheduledTask<AbstractArchiveDomainTask> running = testee.schedule(runningTask);
-		RemotelyControlledTask scheduledTask = createTask(domain, when2, higherBoundary, runId2);
-		ScheduledTask<AbstractArchiveDomainTask> scheduled = testee.schedule(scheduledTask);
+		ScheduledTask<ArchiveDomainTask> running = testee.schedule(runningTask);
+		ScheduledTask<ArchiveDomainTask> scheduled = testee.schedule(scheduledTask);
 		
 		assertTaskIsScheduled(runningTask);
 		assertTaskIsScheduled(scheduledTask);
@@ -372,9 +375,9 @@ public class ArchiveSchedulerTest {
 
 		mocks.replay();
 		RemotelyControlledTask scheduledTask1 = createTask(domain1, when1, higherBoundary, runId1);
-		ScheduledTask<AbstractArchiveDomainTask> scheduled1 = testee.schedule(scheduledTask1);
+		ScheduledTask<ArchiveDomainTask> scheduled1 = testee.schedule(scheduledTask1);
 		RemotelyControlledTask scheduledTask2 = createTask(domain2, when2, higherBoundary, runId2);
-		ScheduledTask<AbstractArchiveDomainTask> scheduled2 = testee.schedule(scheduledTask2);
+		ScheduledTask<ArchiveDomainTask> scheduled2 = testee.schedule(scheduledTask2);
 		assertTaskIsScheduled(scheduledTask1);
 		assertTaskIsScheduled(scheduledTask2);
 		testee.clearDomain(domain1);
@@ -384,48 +387,49 @@ public class ArchiveSchedulerTest {
 		assertThat(scheduled2.state()).isEqualTo(State.WAITING);
 	}
 
-	AbstractArchiveDomainTask archiveDomainTask(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DateTime when) {
-		return new ArchiveDomainTask(imapArchiveProcessing, domain, when, 
-				higherBoundary, runId, logger, loggerAppenders, false);
+	ArchiveDomainTask archiveDomainTask(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DateTime when) {
+		return new ArchiveDomainTask(imapArchiveProcessing, new RealRunTaskStatusChanged.Factory(),
+				new ArchiveConfiguration(domain, when, 
+				higherBoundary, runId, logger, loggerAppenders, false));
 	}
 
-	void assertTaskProgression(AbstractArchiveDomainTask task) throws Exception {
+	void assertTaskProgression(ArchiveDomainTask task) throws Exception {
 		assertTaskIsScheduled(task);
 		assertTaskIsRunning(task);
 		assertTaskIsTerminated(task);
 	}
 
-	void assertTaskIsScheduled(AbstractArchiveDomainTask task) throws Exception {
+	void assertTaskIsScheduled(ArchiveDomainTask task) throws Exception {
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.WAITING);
 		assertThat(busClient.getState(timeout, MILLISECONDS)).isEqualTo(State.WAITING);
 		assertThat(
-				Iterables.filter(monitor.all(), onlyTaskWithStatusPredicate(State.WAITING)))
+				FluentIterable.from(monitor.all()).filter(onlyTaskWithStatusPredicate(State.WAITING)))
 				.extracting("task", "scheduledTime")
-				.contains(tuple(task, task.getWhen()));
+				.contains(tuple(task, task.getArchiveConfiguration().getWhen()));
 	}
 	
-	void assertTaskIsRunning(AbstractArchiveDomainTask task) throws Exception {
-		timeProvider.setCurrent(task.getWhen());
+	void assertTaskIsRunning(ArchiveDomainTask task) throws Exception {
+		timeProvider.setCurrent(task.getArchiveConfiguration().getWhen());
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.RUNNING);
 		assertThat(busClient.getState(timeout, MILLISECONDS)).isEqualTo(State.RUNNING);
 		assertThat(
 				Iterables.filter(monitor.all(), onlyTaskWithStatusPredicate(State.RUNNING)))
 				.extracting("task", "scheduledTime")
-				.contains(tuple(task, task.getWhen()));
+				.contains(tuple(task, task.getArchiveConfiguration().getWhen()));
 	}
 
-	void assertTaskIsTerminated(AbstractArchiveDomainTask task) throws Exception {
+	void assertTaskIsTerminated(ArchiveDomainTask task) throws Exception {
 		((RemotelyControlledTask)task).terminate();
 		assertThat(futureListener.getNextState(timeout, MILLISECONDS)).isEqualTo(State.TERMINATED);
 		assertThat(busClient.getState(timeout, MILLISECONDS)).isEqualTo(State.TERMINATED);
 		assertThat(monitor.all()).extracting("task").doesNotContain(task);
 	}
 
-	Predicate<ScheduledTask<AbstractArchiveDomainTask>> onlyTaskWithStatusPredicate(final State state) {
-		return new Predicate<ScheduledTask<AbstractArchiveDomainTask>>() {
+	Predicate<ScheduledTask<ArchiveDomainTask>> onlyTaskWithStatusPredicate(final State state) {
+		return new Predicate<ScheduledTask<ArchiveDomainTask>>() {
 
 			@Override
-			public boolean apply(ScheduledTask<AbstractArchiveDomainTask> input) {
+			public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
 				return input.state() == state;
 			}
 		};
@@ -450,7 +454,7 @@ public class ArchiveSchedulerTest {
 		
 		@Subscribe 
 		public void onTaskStateChanged(Events.TaskStatusChanged event) throws Exception {
-			states.put(event.getState());
+			states.put(event.state());
 		}
 
 		State getState(int timeout, TimeUnit unit) throws Exception {

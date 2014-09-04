@@ -35,7 +35,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.joda.time.LocalTime;
 import org.junit.Test;
-import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +56,7 @@ public class BeansTest {
 				PersistedResult.class,
 				SchedulingConfiguration.class,
 				SchedulingDates.class,
-				AbstractArchiveDomainTask.class,
+				ArchiveConfiguration.class,
 				ArchiveTreatment.class,
 				ArchiveScheduledTreatment.class,
 				ArchiveRunningTreatment.class,

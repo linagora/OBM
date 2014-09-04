@@ -64,8 +64,8 @@ import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
+import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
@@ -181,6 +181,6 @@ public class RecurrentTaskRescheduleTest {
 	}
 
 	private State nextTaskState() throws Exception {
-		return futureBusClient.next(timeout, TimeUnit.SECONDS).getState();
+		return futureBusClient.next(timeout, TimeUnit.SECONDS).state();
 	}
 }

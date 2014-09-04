@@ -29,13 +29,10 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.scheduling;
+package org.obm.imap.archive.beans;
 
 import org.joda.time.DateTime;
-import org.obm.imap.archive.beans.ArchiveTreatmentKind;
-import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
-import org.obm.imap.archive.services.ImapArchiveProcessing;
 
 import ch.qos.logback.classic.Logger;
 
@@ -43,34 +40,70 @@ import com.google.common.base.Objects;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public class DryRunArchiveDomainTask extends AbstractArchiveDomainTask {
-
-	public DryRunArchiveDomainTask(ImapArchiveProcessing imapArchiveProcessing, ObmDomainUuid domain,
-			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger,
-			LoggerAppenders loggerAppenders) {
-		super(imapArchiveProcessing, domain, when, higherBoundary, runId, logger, loggerAppenders, false);
+public class ArchiveConfiguration {
+	
+	private final Logger logger;
+	private final LoggerAppenders loggerAppenders;
+	private final ObmDomainUuid domain;
+	private final DateTime when;
+	private final DateTime higherBoundary;
+	private final ArchiveTreatmentRunId runId;
+	private final boolean recurrent;
+	
+	public ArchiveConfiguration(ObmDomainUuid domain,
+			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger, LoggerAppenders loggerAppenders, 
+			boolean recurrent) {
+		this.domain = domain;
+		this.when = when;
+		this.higherBoundary = higherBoundary;
+		this.runId = runId;
+		this.logger = logger;
+		this.loggerAppenders = loggerAppenders;
+		this.recurrent = recurrent;
 	}
 	
-	@Override
-	public void run() {
-		imapArchiveProcessing.archive(this);
+	public ObmDomainUuid getDomain() {
+		return domain;
 	}
 
-	@Override
-	public ArchiveTreatmentKind getArchiveTreatmentKind() {
-		return ArchiveTreatmentKind.DRY_RUN;
+	public DateTime getWhen() {
+		return when;
 	}
 	
+	public DateTime getHigherBoundary() {
+		return higherBoundary;
+	}
+
+	public ArchiveTreatmentRunId getRunId() {
+		return runId;
+	}
+	
+	public Logger getLogger() {
+		return logger;
+	}
+	
+	public LoggerAppenders getLoggerAppenders() {
+		return loggerAppenders;
+	}
+	
+	public boolean isRecurrent() {
+		return recurrent;
+	}
+
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(super.hashCode(), ArchiveTreatmentKind.DRY_RUN);
+		return Objects.hashCode(domain, when, recurrent, runId, higherBoundary);
 	}
 
 	@Override
 	public boolean equals(Object object){
-		if (object instanceof DryRunArchiveDomainTask) {
-			DryRunArchiveDomainTask that = (DryRunArchiveDomainTask) object;
-			return super.equals(that);
+		if (object instanceof ArchiveConfiguration) {
+			ArchiveConfiguration that = (ArchiveConfiguration) object;
+			return Objects.equal(this.domain, that.domain)
+					&& Objects.equal(this.recurrent, that.recurrent)
+					&& Objects.equal(this.when, that.when)
+					&& Objects.equal(this.higherBoundary, that.higherBoundary)
+					&& Objects.equal(this.runId, that.runId);
 		}
 		return false;
 	}
@@ -80,9 +113,9 @@ public class DryRunArchiveDomainTask extends AbstractArchiveDomainTask {
 		return Objects.toStringHelper(this)
 			.add("domain", domain)
 			.add("when", when)
+			.add("recurrent", recurrent)
 			.add("higherBoundary", higherBoundary)
 			.add("runId", runId)
 			.toString();
 	}
-	
 }

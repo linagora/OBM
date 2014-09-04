@@ -34,8 +34,10 @@ package org.obm.imap.archive.services;
 
 import org.joda.time.DateTime;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.Boundaries;
 import org.obm.imap.archive.beans.DomainConfiguration;
@@ -51,7 +53,6 @@ import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
-import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
@@ -109,22 +110,22 @@ public class ImapArchiveProcessing {
 	}
 	
 	@Transactional
-	public void archive(AbstractArchiveDomainTask archiveDomainTask) {
-		Logger logger = archiveDomainTask.getLogger();
+	public void archive(ArchiveConfiguration configuration) {
+		Logger logger = configuration.getLogger();
 		try {
-			Optional<ObmDomain> optionalDomain = domainClient.getById(archiveDomainTask.getDomain());
+			Optional<ObmDomain> optionalDomain = domainClient.getById(configuration.getDomain());
 			if (!optionalDomain.isPresent()) {
-				throw new DomainNotFoundException(archiveDomainTask.getDomain());
+				throw new DomainNotFoundException(configuration.getDomain());
 			}
 			
 			ObmDomain domain = optionalDomain.get();
-			logger.info("Starting IMAP Archive in {} for domain {}", archiveDomainTask.getArchiveTreatmentKind(), domain.getName());
+			logStart(logger, domain);
 
 			DomainConfiguration domainConfiguration = getConfiguration(domain);
 			Optional<ArchiveTreatment> previousArchiveTreatment = previousArchiveTreatment(domain.getUuid());
 			Boundaries boundaries = calculateBoundaries(dateTimeProvider.now(), domainConfiguration.getRepeatKind(), previousArchiveTreatment, logger);
 			ProcessedTask.Builder processedTaskBuilder = ProcessedTask.builder()
-					.archiveDomainTask(archiveDomainTask)
+					.archiveConfiguration(configuration)
 					.domain(domain)
 					.domainConfiguration(domainConfiguration)
 					.previousArchiveTreatment(previousArchiveTreatment)
@@ -142,6 +143,10 @@ public class ImapArchiveProcessing {
 		}
 	}
 
+	protected void logStart(Logger logger, ObmDomain domain) {
+		logger.info("Starting IMAP Archive in {} for domain {}", ArchiveTreatmentKind.REAL_RUN, domain.getName());
+	}
+	
 	@VisibleForTesting Optional<ArchiveTreatment> previousArchiveTreatment(ObmDomainUuid domainId) throws DaoException {
 		return FluentIterable.from(archiveTreatmentDao.findLastTerminated(domainId, 1)).first();
 	}
@@ -376,7 +381,7 @@ public class ImapArchiveProcessing {
 		
 		public static class Builder {
 			
-			private AbstractArchiveDomainTask archiveDomainTask;
+			private ArchiveConfiguration archiveConfiguration;
 			private ObmDomain domain;
 			private Boundaries boundaries;
 			private DomainConfiguration domainConfiguration;
@@ -385,8 +390,8 @@ public class ImapArchiveProcessing {
 			
 			private Builder() {}
 
-			public Builder archiveDomainTask(AbstractArchiveDomainTask archiveDomainTask) {
-				this.archiveDomainTask = archiveDomainTask;
+			public Builder archiveConfiguration(ArchiveConfiguration archiveConfiguration) {
+				this.archiveConfiguration = archiveConfiguration;
 				return this;
 			}
 			
@@ -416,12 +421,13 @@ public class ImapArchiveProcessing {
 			}
 			
 			public ProcessedTask build() {
-				Preconditions.checkState(archiveDomainTask != null);
+				Preconditions.checkState(archiveConfiguration != null);
 				Preconditions.checkState(domain != null);
 				Preconditions.checkState(boundaries != null);
 				Preconditions.checkState(domainConfiguration != null);
 				Preconditions.checkState(previousArchiveTreatment != null);
-				return new ProcessedTask(archiveDomainTask.getLogger(), archiveDomainTask.getRunId(), domain, boundaries, domainConfiguration, previousArchiveTreatment, continuePrevious);
+				return new ProcessedTask(archiveConfiguration.getLogger(), archiveConfiguration.getRunId(),
+						domain, boundaries, domainConfiguration, previousArchiveTreatment, continuePrevious);
 			}
 		}
 		

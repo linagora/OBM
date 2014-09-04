@@ -32,6 +32,7 @@
 
 package org.obm.imap.archive.scheduling;
 
+import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
 
@@ -44,12 +45,12 @@ public class TestArchiveDomainTaskFactory extends ArchiveDomainTaskFactory {
 	private LoggerAppenders loggerAppenders;
 
 	public TestArchiveDomainTaskFactory(Logger logger, LoggerAppenders loggerAppenders) {
-		super(null, null);
+		super(null, null, null);
 		this.logger = logger;
 		this.loggerAppenders = loggerAppenders;
 	}
 
-	public AbstractArchiveDomainTask create(ObmDomainUuid domain, ArchiveTreatmentRunId runId) {
-		return new ArchiveDomainTask(null, domain, null, null, runId, logger, loggerAppenders, false);
+	public ArchiveDomainTask create(ObmDomainUuid domain, ArchiveTreatmentRunId runId) {
+		return new ArchiveDomainTask(null, null, new ArchiveConfiguration(domain, null, null, runId, logger, loggerAppenders, false));
 	}
 }

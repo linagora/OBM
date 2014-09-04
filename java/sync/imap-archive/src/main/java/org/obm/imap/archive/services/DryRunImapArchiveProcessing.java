@@ -29,35 +29,40 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.scheduling;
+package org.obm.imap.archive.services;
 
-import org.joda.time.DateTime;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import com.google.common.collect.ImmutableList;
-import com.linagora.scheduling.Listener;
-import com.linagora.scheduling.ListenersNotifier;
-import com.linagora.scheduling.ScheduledTask;
-import com.linagora.scheduling.Scheduler;
+import org.obm.imap.archive.beans.ArchiveTreatmentKind;
+import org.obm.imap.archive.dao.ArchiveTreatmentDao;
+import org.obm.imap.archive.dao.DomainConfigurationDao;
+import org.obm.imap.archive.dao.ProcessedFolderDao;
+import org.slf4j.Logger;
 
-public class TestScheduledTask extends ScheduledTask<ArchiveDomainTask> {
+import com.linagora.scheduling.DateTimeProvider;
 
-	private ScheduledTask.State state;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	public TestScheduledTask(State state, ArchiveDomainTask task, 
-			Scheduler<ArchiveDomainTask> scheduler, DateTime scheduledTime) {
-		super(
-			ScheduledTask.Id.generate(), 
-			scheduledTime,
-			task, scheduler, 
-			new ListenersNotifier<>(
-					TestScheduledTask.class, 
-					ImmutableList.<Listener<ArchiveDomainTask>>of())
-		);
-		this.state = state;
+@Singleton
+public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
+
+	@Inject
+	/* visibility for injection */ 
+		DryRunImapArchiveProcessing(DateTimeProvider dateTimeProvider,
+			SchedulingDatesService schedulingDatesService,
+			StoreClientFactory storeClientFactory, DomainClient domainClient,
+			ArchiveTreatmentDao archiveTreatmentDao,
+			DomainConfigurationDao domainConfigurationDao,
+			ProcessedFolderDao processedFolderDao) {
+		
+		super(dateTimeProvider, schedulingDatesService, storeClientFactory,
+				domainClient, archiveTreatmentDao, domainConfigurationDao,
+				processedFolderDao);
 	}
 	
-	@Override
-	public ScheduledTask.State state() {
-		return state;
+	protected void logStart(Logger logger, ObmDomain domain) {
+		logger.info("Starting IMAP Archive in {} for domain {}", ArchiveTreatmentKind.DRY_RUN, domain.getName());
 	}
+	
 }

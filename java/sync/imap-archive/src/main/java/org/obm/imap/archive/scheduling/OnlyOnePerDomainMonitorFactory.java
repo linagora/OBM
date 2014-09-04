@@ -37,7 +37,7 @@ import com.linagora.scheduling.Monitor;
 
 public interface OnlyOnePerDomainMonitorFactory {
 	
-	Monitor<AbstractArchiveDomainTask> create();
+	Monitor<ArchiveDomainTask> create();
 
 	@Singleton
 	public static class OnlyOnePerDomainMonitorFactoryImpl implements OnlyOnePerDomainMonitorFactory {
@@ -47,8 +47,8 @@ public interface OnlyOnePerDomainMonitorFactory {
 		}
 		
 		@Override
-		public Monitor<AbstractArchiveDomainTask> create() {
-			return Monitor.<AbstractArchiveDomainTask>builder().build();
+		public Monitor<ArchiveDomainTask> create() {
+			return Monitor.<ArchiveDomainTask>builder().build();
 		}
 	}
 }

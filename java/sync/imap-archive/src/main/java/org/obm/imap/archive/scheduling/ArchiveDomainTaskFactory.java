@@ -32,10 +32,14 @@
 package org.obm.imap.archive.scheduling;
 
 import org.joda.time.DateTime;
+import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.logging.LoggerFactory;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.DryRunTaskStatusChanged;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.RealRunTaskStatusChanged;
+import org.obm.imap.archive.services.DryRunImapArchiveProcessing;
 import org.obm.imap.archive.services.ImapArchiveProcessing;
 
 import ch.qos.logback.classic.Logger;
@@ -51,37 +55,47 @@ public class ArchiveDomainTaskFactory {
 	
 	private final ImapArchiveProcessing imapArchiveProcessing;
 	private final LoggerFactory loggerFactory;
+	private final DryRunImapArchiveProcessing dryRunImapArchiveProcessing;
 
 	@Inject
-	@VisibleForTesting ArchiveDomainTaskFactory(ImapArchiveProcessing imapArchiveProcessing, LoggerFactory loggerFactory) {
+	@VisibleForTesting ArchiveDomainTaskFactory(ImapArchiveProcessing imapArchiveProcessing, 
+			DryRunImapArchiveProcessing dryRunImapArchiveProcessing, LoggerFactory loggerFactory) {
 		this.imapArchiveProcessing = imapArchiveProcessing;
+		this.dryRunImapArchiveProcessing = dryRunImapArchiveProcessing;
 		this.loggerFactory = loggerFactory;
 	}
 	
-	public AbstractArchiveDomainTask createAsRecurrent(ObmDomainUuid domain, DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
-		return create(domain, when, higherBoundary, runId, ArchiveTreatmentKind.REAL_RUN, true);
+	public ArchiveDomainTask createAsRecurrent(ObmDomainUuid domain, DateTime when, 
+			DateTime higherBoundary, ArchiveTreatmentRunId runId) {
+		
+		ArchiveConfiguration configuration = createConfiguration(domain, when, higherBoundary, runId, true);
+		return create(configuration, ArchiveTreatmentKind.REAL_RUN); 
 	}
 
-	public AbstractArchiveDomainTask create(ObmDomainUuid domain, DateTime when,
+	public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when,
 			DateTime higherBoundary, ArchiveTreatmentRunId runId,
 			ArchiveTreatmentKind kind) {
-		return create(domain, when, higherBoundary, runId, kind, false);
+		
+		ArchiveConfiguration configuration = createConfiguration(domain, when, higherBoundary, runId, false);
+		return create(configuration, kind);
 	}
 	
-	private AbstractArchiveDomainTask create(ObmDomainUuid domain, DateTime when, 
-			DateTime higherBoundary, ArchiveTreatmentRunId runId, 
-			ArchiveTreatmentKind archiveTreatmentKind, boolean recurrent) {
+	private ArchiveConfiguration createConfiguration(ObmDomainUuid domain, DateTime when, 
+			DateTime higherBoundary, ArchiveTreatmentRunId runId, boolean recurrent) {
 		Logger logger = loggerFactory.create(runId);
 		LoggerAppenders loggerAppenders = LoggerAppenders.from(runId, logger);
+		return new ArchiveConfiguration(domain, 
+				when, higherBoundary, runId, logger, loggerAppenders, recurrent);
+	}
+	
+	private ArchiveDomainTask create(ArchiveConfiguration configuration, 
+			ArchiveTreatmentKind archiveTreatmentKind) {
 		
 		switch (archiveTreatmentKind) {
 		case DRY_RUN:
-			return new DryRunArchiveDomainTask(imapArchiveProcessing, 
-					domain, when, higherBoundary, runId, logger, loggerAppenders);
+			return new ArchiveDomainTask(dryRunImapArchiveProcessing, new DryRunTaskStatusChanged.Factory(), configuration);
 		case REAL_RUN:
-			return new ArchiveDomainTask(imapArchiveProcessing,
-					domain, when, higherBoundary, runId, logger, loggerAppenders,
-					recurrent);
+			return new ArchiveDomainTask(imapArchiveProcessing, new RealRunTaskStatusChanged.Factory(), configuration);
 		}
 		throw new IllegalArgumentException();
 	}

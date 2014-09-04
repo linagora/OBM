@@ -34,14 +34,13 @@ package org.obm.imap.archive.services;
 import org.obm.ElementNotFoundException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
+import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveScheduledTreatment;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
-import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
-import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.RealRunTaskStatusChanged;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 
@@ -72,67 +71,58 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 	
 	@Subscribe
 	@Transactional
-	public void onTreatmentStateChange(TaskStatusChanged event) {
-		State state = event.getState();
+	public void onTreatmentStateChange(RealRunTaskStatusChanged event) {
+		State state = event.state();
 		if (State.NEW == state) {
 			logger.info("A task has been created but the state {} is not tracked", State.NEW);
 			return;
 		}
 		
-		insertOrUpdate(event.getTask(), state);
-	}
-
-	private void insertOrUpdate(AbstractArchiveDomainTask task, State state) {
 		try {
-			if (hasToBePersisted(task)) {
-				Optional<ArchiveTreatment> treatment = archiveTreatmentDao.find(task.getRunId());
-				if (!treatment.isPresent()) {
-					insert(task, state);
-				} else {
-					update(treatment.get(), task, state);
-				}
+			ArchiveConfiguration archiveConfiguration = event.task().getArchiveConfiguration();
+			Optional<ArchiveTreatment> treatment = archiveTreatmentDao.find(archiveConfiguration.getRunId());
+			if (!treatment.isPresent()) {
+				insert(archiveConfiguration, state);
+			} else {
+				update(treatment.get(), archiveConfiguration, state);
 			}
 		} catch (Exception e) {
 			logger.error("Cannot insert or update a treatment", e);
 		}
 	}
 
-	private boolean hasToBePersisted(AbstractArchiveDomainTask task) {
-		return ArchiveTreatmentKind.REAL_RUN.equals(task.getArchiveTreatmentKind());
-	}
-
-	private void insert(AbstractArchiveDomainTask task, State state) throws DaoException {
+	private void insert(ArchiveConfiguration archiveConfiguration, State state) throws DaoException {
 		if (State.WAITING != state) {
 			logger.error("Only task with status {} can be created, received {}", State.WAITING, state);
 			return;
 		}
 		
 		logger.info("Insert a task as {} for domain {}, scheduled at {} with id {}", 
-				ArchiveStatus.SCHEDULED, task.getDomain().get(), task.getWhen(), task.getRunId());
+				ArchiveStatus.SCHEDULED, archiveConfiguration.getDomain().get(), archiveConfiguration.getWhen(), archiveConfiguration.getRunId());
 		
 		archiveTreatmentDao.insert(ArchiveScheduledTreatment
-				.forDomain(task.getDomain())
-				.runId(task.getRunId())
-				.recurrent(task.isRecurrent())
-				.higherBoundary(task.getHigherBoundary())
-				.scheduledAt(task.getWhen())
+				.forDomain(archiveConfiguration.getDomain())
+				.runId(archiveConfiguration.getRunId())
+				.recurrent(archiveConfiguration.isRecurrent())
+				.higherBoundary(archiveConfiguration.getHigherBoundary())
+				.scheduledAt(archiveConfiguration.getWhen())
 				.build());
 	}
 
-	private void update(ArchiveTreatment from, AbstractArchiveDomainTask task, State state) throws DaoException, ElementNotFoundException {
+	private void update(ArchiveTreatment from, ArchiveConfiguration archiveConfiguration, State state) throws DaoException, ElementNotFoundException {
 		ArchiveTreatment.Builder<ArchiveTreatment> treatmentBuilder = ArchiveTreatment
-			.builder(task.getDomain())
-			.runId(task.getRunId())
-			.recurrent(task.isRecurrent())
-			.higherBoundary(task.getHigherBoundary())
-			.scheduledAt(task.getWhen());
+			.builder(archiveConfiguration.getDomain())
+			.runId(archiveConfiguration.getRunId())
+			.recurrent(archiveConfiguration.isRecurrent())
+			.higherBoundary(archiveConfiguration.getHigherBoundary())
+			.scheduledAt(archiveConfiguration.getWhen());
 		
 		switch (state) {
 		case NEW:
 			return;
 		case CANCELED:
-			archiveTreatmentDao.remove(task.getRunId());
-			logger.info("A task has been canceled {}", task.getRunId());
+			archiveTreatmentDao.remove(archiveConfiguration.getRunId());
+			logger.info("A task has been canceled {}", archiveConfiguration.getRunId());
 			return;
 		case WAITING:
 			treatmentBuilder.status(ArchiveStatus.SCHEDULED);
@@ -154,7 +144,7 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 		}
 		
 		logger.info("Update a task as {} for domain {}, scheduled at {} with id {}", 
-				state, task.getDomain().get(),  task.getWhen(), task.getRunId());
+				state, archiveConfiguration.getDomain().get(),  archiveConfiguration.getWhen(), archiveConfiguration.getRunId());
 		
 		archiveTreatmentDao.update(treatmentBuilder.build());
 	}

@@ -38,9 +38,10 @@ import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.scheduling.AbstractArchiveDomainTask;
-import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
+import org.obm.imap.archive.scheduling.ArchiveDomainTask;
+import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.RealRunTaskStatusChanged;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
@@ -60,9 +61,10 @@ public class ArchiveRecurrentTaskReschedulerTest {
 	
 	IMocksControl mocks;
 	ArchiveSchedulingService schedulingService;
-	Scheduler<AbstractArchiveDomainTask> scheduler;
-	AbstractArchiveDomainTask task;
+	Scheduler<ArchiveDomainTask> scheduler;
+	ArchiveDomainTask task;
 	ArchiveRecurrentTaskRescheduler testee;
+	ArchiveConfiguration archiveConfiguration;
 
 	@Before
 	public void setUp() {
@@ -74,86 +76,88 @@ public class ArchiveRecurrentTaskReschedulerTest {
 		mocks = EasyMock.createControl();
 		schedulingService = mocks.createMock(ArchiveSchedulingService.class);
 		scheduler = mocks.createMock(Scheduler.class);
-		task = mocks.createMock(AbstractArchiveDomainTask.class);
+		task = mocks.createMock(ArchiveDomainTask.class);
+		archiveConfiguration = mocks.createMock(ArchiveConfiguration.class);
+		expect(task.getArchiveConfiguration()).andReturn(archiveConfiguration).anyTimes();
 		testee = new ArchiveRecurrentTaskRescheduler(logger, schedulingService);
 	}
 
 	@Test
 	public void onChangeShouldDoNothingWhenNew() {
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.NEW));
+		testee.onTreatmentStateChange(new RealRunTaskStatusChanged(State.NEW, task));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldDoNothingWhenWaiting() {
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.WAITING));
+		testee.onTreatmentStateChange(new RealRunTaskStatusChanged(State.WAITING, task));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldDoNothingWhenRunning() {
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.RUNNING));
+		testee.onTreatmentStateChange(new RealRunTaskStatusChanged(State.RUNNING, task));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldDoNothingWhenCancel() {
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.CANCELED));
+		testee.onTreatmentStateChange(new RealRunTaskStatusChanged(State.CANCELED, task));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldDoNothingWhenFailedAndNotRecurrent() {
-		expect(task.isRecurrent()).andReturn(false);
+		expect(archiveConfiguration.isRecurrent()).andReturn(false);
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.FAILED));
+		testee.onTreatmentStateChange(new RealRunTaskStatusChanged(State.FAILED, task));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldDoNothingWhenTerminatedAndNotRecurrent() {
-		expect(task.isRecurrent()).andReturn(false);
+		expect(archiveConfiguration.isRecurrent()).andReturn(false);
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.TERMINATED));
+		testee.onTreatmentStateChange(new RealRunTaskStatusChanged(State.TERMINATED, task));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldRescheduleWhenFailedAndRecurrent() throws Exception {
-		expect(task.isRecurrent()).andReturn(true);
-		expect(task.getDomain()).andReturn(domain);
+		expect(archiveConfiguration.isRecurrent()).andReturn(true);
+		expect(archiveConfiguration.getDomain()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andReturn(runId);
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.FAILED));
+		testee.onTreatmentStateChange(new RealRunTaskStatusChanged(State.FAILED, task));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldRescheduleWhenTerminatedAndRecurrent() throws Exception {
-		expect(task.isRecurrent()).andReturn(true);
-		expect(task.getDomain()).andReturn(domain);
+		expect(archiveConfiguration.isRecurrent()).andReturn(true);
+		expect(archiveConfiguration.getDomain()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andReturn(runId);
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.TERMINATED));
+		testee.onTreatmentStateChange(new RealRunTaskStatusChanged(State.TERMINATED, task));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldNotPropagateExceptionWhenDaoException() throws Exception {
-		expect(task.isRecurrent()).andReturn(true);
-		expect(task.getDomain()).andReturn(domain);
+		expect(archiveConfiguration.isRecurrent()).andReturn(true);
+		expect(archiveConfiguration.getDomain()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andThrow(new DaoException("error"));
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.TERMINATED));
+		testee.onTreatmentStateChange(new RealRunTaskStatusChanged(State.TERMINATED, task));
 		mocks.verify();
 	}
 }

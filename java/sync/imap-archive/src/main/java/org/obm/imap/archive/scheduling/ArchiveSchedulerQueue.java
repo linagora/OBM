@@ -55,9 +55,9 @@ import com.linagora.scheduling.TaskQueue;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
-public class ArchiveSchedulerQueue implements TaskQueue<AbstractArchiveDomainTask> {
+public class ArchiveSchedulerQueue implements TaskQueue<ArchiveDomainTask> {
 
-	@VisibleForTesting final Monitor<AbstractArchiveDomainTask> monitor;
+	@VisibleForTesting final Monitor<ArchiveDomainTask> monitor;
 	@VisibleForTesting final DelayQueueMultimap domainTasks;
 
 	@Inject
@@ -67,25 +67,25 @@ public class ArchiveSchedulerQueue implements TaskQueue<AbstractArchiveDomainTas
 	}
 	
 	@Override
-	public void put(ScheduledTask<AbstractArchiveDomainTask> scheduled) {
+	public void put(ScheduledTask<ArchiveDomainTask> scheduled) {
 		domainTasks
-			.get(scheduled.task().getDomain())
+			.get(scheduled.task().getArchiveConfiguration().getDomain())
 			.offer(scheduled);
 	}
 
 	@Override
-	public boolean remove(ScheduledTask<AbstractArchiveDomainTask> scheduled) {
+	public boolean remove(ScheduledTask<ArchiveDomainTask> scheduled) {
 		return domainTasks
-			.get(scheduled.task().getDomain())
+			.get(scheduled.task().getArchiveConfiguration().getDomain())
 			.remove(scheduled);
 	}
 
 	@Override
-	public Collection<ScheduledTask<AbstractArchiveDomainTask>> poll() {
-		Builder<ScheduledTask<AbstractArchiveDomainTask>> polledTasks = ImmutableList.builder();
+	public Collection<ScheduledTask<ArchiveDomainTask>> poll() {
+		Builder<ScheduledTask<ArchiveDomainTask>> polledTasks = ImmutableList.builder();
 		for (ObmDomainUuid domain : domainTasks.domains()) {
 			if (domainHasNoRunningTask(domain)) {
-				ScheduledTask<AbstractArchiveDomainTask> task = domainTasks.get(domain).poll();
+				ScheduledTask<ArchiveDomainTask> task = domainTasks.get(domain).poll();
 				if (task != null) {
 					polledTasks.add(task);
 				}
@@ -94,11 +94,11 @@ public class ArchiveSchedulerQueue implements TaskQueue<AbstractArchiveDomainTas
 		return polledTasks.build();
 	}
 	
-	/* package */ Collection<ScheduledTask<AbstractArchiveDomainTask>> getDomainTasks(ObmDomainUuid domain) {
+	/* package */ Collection<ScheduledTask<ArchiveDomainTask>> getDomainTasks(ObmDomainUuid domain) {
 		return ImmutableList.copyOf(domainTasks.get(domain));
 	}
 	
-	/* package */ Listener<AbstractArchiveDomainTask> getListener() {
+	/* package */ Listener<ArchiveDomainTask> getListener() {
 		return monitor;
 	}
 	
@@ -106,12 +106,12 @@ public class ArchiveSchedulerQueue implements TaskQueue<AbstractArchiveDomainTas
 		return !Iterables.any(monitor.all(), onlyRunningPredicate(domain));
 	}
 
-	private Predicate<ScheduledTask<AbstractArchiveDomainTask>> onlyRunningPredicate(final ObmDomainUuid domain) {
-		return new Predicate<ScheduledTask<AbstractArchiveDomainTask>>() {
+	private Predicate<ScheduledTask<ArchiveDomainTask>> onlyRunningPredicate(final ObmDomainUuid domain) {
+		return new Predicate<ScheduledTask<ArchiveDomainTask>>() {
 
 			@Override
-			public boolean apply(ScheduledTask<AbstractArchiveDomainTask> input) {
-				return input.task().getDomain().equals(domain)
+			public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
+				return input.task().getArchiveConfiguration().getDomain().equals(domain)
 					&& input.state() == State.RUNNING;
 			}
 		};
@@ -119,7 +119,7 @@ public class ArchiveSchedulerQueue implements TaskQueue<AbstractArchiveDomainTas
 	
 	@VisibleForTesting static class DelayQueueMultimap {
 		
-		private Map<ObmDomainUuid, Queue<ScheduledTask<AbstractArchiveDomainTask>>> map;
+		private Map<ObmDomainUuid, Queue<ScheduledTask<ArchiveDomainTask>>> map;
 
 		public DelayQueueMultimap() {
 			map = new MapMaker().makeMap();
@@ -129,10 +129,10 @@ public class ArchiveSchedulerQueue implements TaskQueue<AbstractArchiveDomainTas
 			return map.keySet();
 		}
 
-		public Queue<ScheduledTask<AbstractArchiveDomainTask>> get(ObmDomainUuid domain) {
-			Queue<ScheduledTask<AbstractArchiveDomainTask>> domainQueue = map.get(domain);
+		public Queue<ScheduledTask<ArchiveDomainTask>> get(ObmDomainUuid domain) {
+			Queue<ScheduledTask<ArchiveDomainTask>> domainQueue = map.get(domain);
 			if (domainQueue == null) {
-				domainQueue = Queues.synchronizedQueue(new DelayQueue<ScheduledTask<AbstractArchiveDomainTask>>());
+				domainQueue = Queues.synchronizedQueue(new DelayQueue<ScheduledTask<ArchiveDomainTask>>());
 				map.put(domain, domainQueue);
 			}
 			return domainQueue;
