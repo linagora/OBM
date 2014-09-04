@@ -93,7 +93,14 @@ function run_query_user_search($user, $user_results_limit, $strongest_profile_le
   $user_results_limit_as_int = $user_results_limit != null && is_numeric($user_results_limit) ?
       $user_results_limit :
       null;
-  $limit = $user_results_limit_as_int != null ? "LIMIT $user_results_limit_as_int " : "";
+
+  if ($ctu_sql_limit) {
+    $sql_limit .= $user_results_limit_as_int != null ? "LIMIT $user_results_limit_as_int " : "";
+    $row_limit = $_SESSION['set_rows'];
+    $offset = $user['page'] != null ? ($user['page']-1)*$row_limit : 0;
+    $sql_limit .=  "OFFSET $offset " ;
+  }
+
   $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
   $dateexp = sql_date_format($db_type, 'userobm_account_dateexp', 'dateexp');
   $diff = "#DAYDIFF(now(),userobm_account_dateexp)";
@@ -384,7 +391,8 @@ function run_query_user_search($user, $user_results_limit, $strongest_profile_le
   $query = "$select
     $whereq
     $orderq
-    $limit";
+    $sql_limit";
+    
   if ($ctu_sql_limit) {
     $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm INNER JOIN UserEntity ON userentity_user_id = userobm_id $join_grp $join_host $join_userdata $join_custom $join_domain $join_profile $whereq");
     $obm_q->set_num_rows_total($count);
