@@ -73,7 +73,6 @@ public class ArchiveSchedulingService {
 		this.domainConfigDao = domainConfigDao;
 	}
 	
-	@Transactional
 	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when, ArchiveTreatmentKind kind) throws DaoException {
 		DomainConfiguration domainConfiguration = getConfiguration(domain);
 		RepeatKind repeatKind = domainConfiguration.getRepeatKind();
@@ -86,7 +85,12 @@ public class ArchiveSchedulingService {
 		return runId;
 	}
 
-	private DomainConfiguration getConfiguration(ObmDomainUuid domain) throws DaoException {
+	public ArchiveTreatmentRunId scheduleAsRecurrent(ObmDomainUuid domain) throws DaoException {
+		return scheduleAsRecurrent(getConfiguration(domain));
+	}
+
+	@Transactional
+	protected DomainConfiguration getConfiguration(ObmDomainUuid domain) throws DaoException {
 		DomainConfiguration domainConfiguration = domainConfigDao.get(domain);
 		if (domainConfiguration == null) {
 			throw new DomainConfigurationNotFoundException("No configuration can be found for domain: " + domain.get());
@@ -96,13 +100,7 @@ public class ArchiveSchedulingService {
 		}
 		return domainConfiguration;
 	}
-
-	@Transactional
-	public ArchiveTreatmentRunId scheduleAsRecurrent(ObmDomainUuid domain) throws DaoException {
-		return scheduleAsRecurrent(domainConfigDao.get(domain));
-	}
 	
-	@Transactional
 	public ArchiveTreatmentRunId scheduleAsRecurrent(DomainConfiguration domainConfiguration) {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
 		DateTime when = schedulingDatesService.nextTreatmentDate(domainConfiguration.getSchedulingConfiguration());
