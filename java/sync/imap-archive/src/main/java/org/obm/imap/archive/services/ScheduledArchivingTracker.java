@@ -44,7 +44,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Singleton;
-import com.linagora.scheduling.ScheduledTask;
 
 @Singleton
 public class ScheduledArchivingTracker implements ArchiveSchedulerBus.Client {
@@ -58,9 +57,8 @@ public class ScheduledArchivingTracker implements ArchiveSchedulerBus.Client {
 	@Subscribe
 	@Transactional
 	public void onTreatmentStateChange(TaskStatusChanged event) {
-		ScheduledTask<ArchiveDomainTask> schedulerTask = event.getTask();
-		ArchiveDomainTask archiveDomainTask = schedulerTask.task();
-		switch (schedulerTask.state()) {
+		ArchiveDomainTask archiveDomainTask = event.getTask();
+		switch (event.getState()) {
 		case RUNNING:
 		case NEW:
 		case WAITING:

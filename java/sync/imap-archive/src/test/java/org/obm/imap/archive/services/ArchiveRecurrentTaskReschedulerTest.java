@@ -42,7 +42,6 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
-import org.obm.imap.archive.scheduling.TestScheduledTask;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,98 +80,80 @@ public class ArchiveRecurrentTaskReschedulerTest {
 
 	@Test
 	public void onChangeShouldDoNothingWhenNew() {
-		TestScheduledTask scheduledTask = new TestScheduledTask(State.NEW, task, scheduler, scheduledTime);
-		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(scheduledTask));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.NEW));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldDoNothingWhenWaiting() {
-		TestScheduledTask scheduledTask = new TestScheduledTask(State.WAITING, task, scheduler, scheduledTime);
-		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(scheduledTask));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.WAITING));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldDoNothingWhenRunning() {
-		TestScheduledTask scheduledTask = new TestScheduledTask(State.RUNNING, task, scheduler, scheduledTime);
-		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(scheduledTask));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.RUNNING));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldDoNothingWhenCancel() {
-		TestScheduledTask scheduledTask = new TestScheduledTask(State.CANCELED, task, scheduler, scheduledTime);
-		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(scheduledTask));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.CANCELED));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldDoNothingWhenFailedAndNotRecurrent() {
-		TestScheduledTask scheduledTask = new TestScheduledTask(State.FAILED, task, scheduler, scheduledTime);
-		
 		expect(task.isRecurrent()).andReturn(false);
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(scheduledTask));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.FAILED));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldDoNothingWhenTerminatedAndNotRecurrent() {
-		TestScheduledTask scheduledTask = new TestScheduledTask(State.TERMINATED, task, scheduler, scheduledTime);
-		
 		expect(task.isRecurrent()).andReturn(false);
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(scheduledTask));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.TERMINATED));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldRescheduleWhenFailedAndRecurrent() throws Exception {
-		TestScheduledTask scheduledTask = new TestScheduledTask(State.FAILED, task, scheduler, scheduledTime);
-		
 		expect(task.isRecurrent()).andReturn(true);
 		expect(task.getDomain()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andReturn(runId);
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(scheduledTask));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.FAILED));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldRescheduleWhenTerminatedAndRecurrent() throws Exception {
-		TestScheduledTask scheduledTask = new TestScheduledTask(State.TERMINATED, task, scheduler, scheduledTime);
-		
 		expect(task.isRecurrent()).andReturn(true);
 		expect(task.getDomain()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andReturn(runId);
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(scheduledTask));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.TERMINATED));
 		mocks.verify();
 	}
 	
 	@Test
 	public void onChangeShouldNotPropagateExceptionWhenDaoException() throws Exception {
-		TestScheduledTask scheduledTask = new TestScheduledTask(State.TERMINATED, task, scheduler, scheduledTime);
-		
 		expect(task.isRecurrent()).andReturn(true);
 		expect(task.getDomain()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andThrow(new DaoException("error"));
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(scheduledTask));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.TERMINATED));
 		mocks.verify();
 	}
 }

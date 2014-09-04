@@ -44,7 +44,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import com.linagora.scheduling.ScheduledTask;
 import com.linagora.scheduling.ScheduledTask.State;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -65,17 +64,16 @@ public class ArchiveRecurrentTaskRescheduler implements ArchiveSchedulerBus.Clie
 	
 	@Subscribe
 	public void onTreatmentStateChange(TaskStatusChanged event) {
-		ScheduledTask<ArchiveDomainTask> schedulerTask = event.getTask();
-		if (stateLeadsToReschdule(schedulerTask.state())) {
-			if (schedulerTask.task().isRecurrent()) {
-				reschedule(schedulerTask);
+		if (stateLeadsToReschdule(event.getState())) {
+			if (event.getTask().isRecurrent()) {
+				reschedule(event.getTask());
 			}
 		}
 	}
 
-	private void reschedule(ScheduledTask<ArchiveDomainTask> schedulerTask) {
+	private void reschedule(ArchiveDomainTask task) {
 		try {
-			ObmDomainUuid domain = schedulerTask.task().getDomain();
+			ObmDomainUuid domain = task.getDomain();
 			logger.info("A recurrent task for domain {} will be re-scheduled", domain.get());
 			schedulingService.scheduleAsRecurrent(domain);
 		} catch (DaoException e) {

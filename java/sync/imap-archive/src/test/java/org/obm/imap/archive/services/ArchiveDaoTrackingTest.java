@@ -49,7 +49,6 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.TaskStatusChanged;
-import org.obm.imap.archive.scheduling.TestScheduledTask;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 
@@ -107,7 +106,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.NEW, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.NEW));
 		mocks.verify();
 	}
 	
@@ -129,7 +128,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.WAITING, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.WAITING));
 		mocks.verify();
 	}
 	
@@ -161,7 +160,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.WAITING, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.WAITING));
 		mocks.verify();
 	}
 	
@@ -195,7 +194,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.RUNNING, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.RUNNING));
 		mocks.verify();
 	}
 	
@@ -208,7 +207,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.RUNNING, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.RUNNING));
 		mocks.verify();
 	}
 
@@ -245,7 +244,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.FAILED, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.FAILED));
 		mocks.verify();
 	}
 
@@ -282,7 +281,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.TERMINATED, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.TERMINATED));
 		mocks.verify();
 	}
 	
@@ -295,7 +294,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.CANCELED, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.CANCELED));
 		mocks.verify();
 	}
 	
@@ -319,7 +318,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.CANCELED, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.CANCELED));
 		mocks.verify();
 	}
 	
@@ -345,7 +344,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.WAITING, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.WAITING));
 		mocks.verify();
 	}
 	
@@ -384,7 +383,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.TERMINATED, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.TERMINATED));
 		mocks.verify();
 	}
 	
@@ -409,7 +408,7 @@ public class ArchiveDaoTrackingTest {
 		expectLastCall();
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.CANCELED, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.CANCELED));
 		mocks.verify();
 	}
 	
@@ -418,7 +417,7 @@ public class ArchiveDaoTrackingTest {
 		expect(task.getArchiveTreatmentKind()).andReturn(ArchiveTreatmentKind.DRY_RUN);
 		
 		mocks.replay();
-		testee.onTreatmentStateChange(new TaskStatusChanged(new TestScheduledTask(State.CANCELED, task, scheduler, scheduledTime)));
+		testee.onTreatmentStateChange(new TaskStatusChanged(task, State.CANCELED));
 		mocks.verify();
 	}
 }

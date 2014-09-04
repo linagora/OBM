@@ -181,6 +181,6 @@ public class RecurrentTaskRescheduleTest {
 	}
 
 	private State nextTaskState() throws Exception {
-		return futureBusClient.next(timeout, TimeUnit.SECONDS).getTask().state();
+		return futureBusClient.next(timeout, TimeUnit.SECONDS).getState();
 	}
 }

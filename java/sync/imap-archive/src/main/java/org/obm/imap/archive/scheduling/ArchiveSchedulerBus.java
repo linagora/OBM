@@ -39,6 +39,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.linagora.scheduling.Listener;
 import com.linagora.scheduling.ScheduledTask;
+import com.linagora.scheduling.ScheduledTask.State;
 
 @Singleton
 public class ArchiveSchedulerBus implements Listener<ArchiveDomainTask> {
@@ -56,31 +57,31 @@ public class ArchiveSchedulerBus implements Listener<ArchiveDomainTask> {
 	
 	@Override
 	public void canceled(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
+		postTaskStatusChange(task.task(), State.CANCELED);
 	}
 
 	@Override
 	public void failed(ScheduledTask<ArchiveDomainTask> task, Throwable failure) {
-		postTaskStatusChange(task);
+		postTaskStatusChange(task.task(), State.FAILED);
 	}
 
 	@Override
 	public void running(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
+		postTaskStatusChange(task.task(), State.RUNNING);
 	}
 
 	@Override
 	public void scheduled(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
+		postTaskStatusChange(task.task(), State.WAITING);
 	}
 
 	@Override
 	public void terminated(ScheduledTask<ArchiveDomainTask> task) {
-		postTaskStatusChange(task);
+		postTaskStatusChange(task.task(), State.TERMINATED);
 	}
 
-	private void postTaskStatusChange(ScheduledTask<ArchiveDomainTask> task) {
-		bus.post(new TaskStatusChanged(task));
+	private void postTaskStatusChange(ArchiveDomainTask task, State state) {
+		bus.post(new TaskStatusChanged(task, state));
 	}
 	
 	/* package */ void register(ArchiveSchedulerBus.Client client) {
@@ -93,16 +94,21 @@ public class ArchiveSchedulerBus implements Listener<ArchiveDomainTask> {
 
 		static class TaskStatusChanged {
 			
-			private final ScheduledTask<ArchiveDomainTask> task;
+			private final ArchiveDomainTask task;
+			private final State state;
 
-			public TaskStatusChanged(ScheduledTask<ArchiveDomainTask> task) {
+			public TaskStatusChanged(ArchiveDomainTask task, State state) {
 				this.task = task;
+				this.state = state;
 			}
 
-			public ScheduledTask<ArchiveDomainTask> getTask() {
+			public ArchiveDomainTask getTask() {
 				return task;
 			}
 			
+			public State getState() {
+				return state;
+			}
 		}
 	}
 }

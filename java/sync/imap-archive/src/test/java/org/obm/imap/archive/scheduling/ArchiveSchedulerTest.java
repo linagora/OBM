@@ -448,7 +448,7 @@ public class ArchiveSchedulerTest {
 		
 		@Subscribe 
 		public void onTaskStateChanged(Events.TaskStatusChanged event) throws Exception {
-			states.put(event.getTask().state());
+			states.put(event.getState());
 		}
 
 		State getState(int timeout, TimeUnit unit) throws Exception {

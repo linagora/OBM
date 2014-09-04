@@ -52,7 +52,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.linagora.scheduling.DateTimeProvider;
-import com.linagora.scheduling.ScheduledTask;
 import com.linagora.scheduling.ScheduledTask.State;
 
 @Singleton
@@ -74,13 +73,13 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 	@Subscribe
 	@Transactional
 	public void onTreatmentStateChange(TaskStatusChanged event) {
-		ScheduledTask<ArchiveDomainTask> schedulerTask = event.getTask();
-		if (State.NEW == schedulerTask.state()) {
+		State state = event.getState();
+		if (State.NEW == state) {
 			logger.info("A task has been created but the state {} is not tracked", State.NEW);
 			return;
 		}
 		
-		insertOrUpdate(schedulerTask.task(), schedulerTask.state());
+		insertOrUpdate(event.getTask(), state);
 	}
 
 	private void insertOrUpdate(ArchiveDomainTask task, State state) {
