@@ -451,7 +451,7 @@ function dis_imap_archive_consult($params, $configuration) {
 // Display the log IMAP Archive page
 ///////////////////////////////////////////////////////////////////////////////
 
-function dis_log_page($params, $configuration, $run_id) {
+function dis_log_page($params, $configuration) {
   global $obm;
   global $l_archiving_running, $l_unsupported_iframe;
   
@@ -471,12 +471,12 @@ function dis_log_page($params, $configuration, $run_id) {
   $block_hour = get_block_hour($hour, $disabled);
   $block_minute = get_block_minute($minute, $disabled);
   
-  $queryParams = array("run_id" => $run_id,
-      "action" => "archiving_logs");
-  $params = requestParams();
-  $params = array_merge($params, $queryParams);
+  $runId = $params['run_id'];
   
-  $url = "$path/imap_archive/".basename($_SERVER['SCRIPT_NAME'])."?".http_build_query($params);
+  $queryParams = array("run_id" => $runId,
+      "action" => "archiving_logs");
+  
+  $url = "$path/imap_archive/".basename($_SERVER['SCRIPT_NAME'])."?".http_build_query($queryParams);
   
   $block = "
     <div class='detail infos'>

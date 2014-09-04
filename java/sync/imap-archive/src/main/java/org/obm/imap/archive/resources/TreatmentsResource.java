@@ -31,12 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.resources;
 
-import java.io.IOException;
-import java.util.UUID;
+import java.net.URI;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -44,6 +42,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
@@ -54,14 +54,12 @@ import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.imap.archive.exception.DomainConfigurationDisableException;
 import org.obm.imap.archive.exception.DomainConfigurationNotFoundException;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
-import org.obm.imap.archive.services.ArchiveService;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.linagora.scheduling.DateTimeProvider;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -75,13 +73,13 @@ public class TreatmentsResource {
 	@Inject
 	private SchedulingDatesService schedulingDateService;
 	@Inject
-	private ArchiveService archiveService;
-	@Inject
 	private ArchiveSchedulingService archiveSchedulingService;
 	@Inject
 	private ObmDomain domain;
 	@Inject
 	private DateTimeProvider dateTimeProvider;
+	@Inject
+	private UriInfo uriInfo;
 
 	@POST
 	@Path("next")
@@ -102,7 +100,7 @@ public class TreatmentsResource {
 		try {
 			ArchiveTreatmentKind actualTreatmentKind = Objects.firstNonNull(archiveTreatmentKind, ArchiveTreatmentKind.REAL_RUN);
 			ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain.getUuid(), dateTimeProvider.now(), actualTreatmentKind);
-			return Response.ok(runId).build();
+			return Response.seeOther(buildUri(runId)).build();
 		} catch (DaoException e) {
 			logger.error("Cannot schedule an archiving", e);
 			return Response.serverError().build();
@@ -113,18 +111,14 @@ public class TreatmentsResource {
 		}
 	}
 	
-	@GET
-	@Path("logs")
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response runningTreatment(@QueryParam("run_id") UUID runId) {
-		try {
-			Optional<Object> runningProcessLogs = archiveService.archiveTreatmentLogs(ArchiveTreatmentRunId.from(runId));
-			if (!runningProcessLogs.isPresent()) {
-				return Response.status(Status.NOT_FOUND).build();
-			}
-			return Response.ok(runningProcessLogs.get()).build();
-		} catch (IOException e) {
-			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-		}
+	private URI buildUri(ArchiveTreatmentRunId runId) {
+		return UriBuilder.fromUri(uriInfo.getAbsolutePath())
+			.path(runId.serialize())
+			.build();
+	}
+	
+	@Path(TreatmentFactory.PATH)
+	public Class<TreatmentResource> treatment() {
+		return TreatmentResource.class;
 	}
 }

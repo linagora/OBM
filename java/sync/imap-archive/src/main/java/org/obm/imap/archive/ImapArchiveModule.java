@@ -45,6 +45,7 @@ import org.obm.dbcp.DatabaseModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
 import org.obm.imap.archive.authentication.AuthenticationFilter;
+import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationModule;
 import org.obm.imap.archive.logging.LoggerFactory;
@@ -55,6 +56,8 @@ import org.obm.imap.archive.resources.DomainBasedSubResource;
 import org.obm.imap.archive.resources.HealthcheckHandler;
 import org.obm.imap.archive.resources.ObmDomainFactory;
 import org.obm.imap.archive.resources.RootHandler;
+import org.obm.imap.archive.resources.TreatmentFactory;
+import org.obm.imap.archive.resources.TreatmentResource;
 import org.obm.imap.archive.resources.TreatmentsResource;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
@@ -184,12 +187,14 @@ public class ImapArchiveModule extends AbstractModule {
 						@Override
 						protected void configure() {
 							bindFactory(ObmDomainFactory.class).to(ObmDomain.class);
+							bindFactory(TreatmentFactory.class).to(ArchiveTreatment.class);
 						}
 					})
 					.register(RootHandler.class)
 					.register(DomainBasedSubResource.class)
 					.register(ConfigurationResource.class)
 					.register(TreatmentsResource.class)
+					.register(TreatmentResource.class)
 					.register(ImapArchiveObjectMapper.class));
 		}
 		

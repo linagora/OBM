@@ -101,8 +101,10 @@ if ($status[0] != 1) {
     $status = manual_launch($archiveTreatmentKind);
     if ($status[0] == 1) {
       $display['msg'] .= display_ok_msg($l_archiving_launched);
-      $display['run_id'] = $status[1]->runId;
-      $action = 'log_page';
+      $runId = $status[1]->runId;
+      $redirectUrl = $_SERVER['SCRIPT_NAME']."?action=log_page&run_id=$runId";
+      redirect_to($redirectUrl);
+      exit();
     } else {
       $display['msg'] .= display_err_msg($status[1]);
       $action = 'detailconsult';
@@ -129,7 +131,7 @@ if ($status[0] != 1) {
     } elseif ($action == 'detailupdate') {
       $display['detail'] = dis_imap_archive_form($params, $configuration);
     } elseif ($action == 'log_page') {
-      $display['detail'] = dis_log_page($params, $configuration, $display['run_id']);
+      $display['detail'] = dis_log_page($params, $configuration);
     }
   }
 }

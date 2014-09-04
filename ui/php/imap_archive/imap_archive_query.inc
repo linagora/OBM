@@ -161,7 +161,7 @@ function calculate_next_treatment_date_from_imap_archive_service($configuration)
       "minute" => ($minute) ? $minute : 0
   ));
   
-  $curl = curlPost($configurationPath, $extraParams, $json);
+  $curl = curlPost($configurationPath, array(), $json);
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];
@@ -192,6 +192,7 @@ function curlPost($url, $extraParams = array(), $json = "") {
   curl_setopt($curl, CURLOPT_POST, 1);
   curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-type: application/json'));
   curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
+  curl_setopt($curl, CURLOPT_HEADER, 1);
   
   return curlExec($curl);
 }
@@ -286,9 +287,10 @@ function curlExec($curl) {
   $success = curl_exec($curl);
   $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
   $errno = curl_errno($curl);
+  $redirectUrl = curl_getinfo($curl, CURLINFO_REDIRECT_URL);
   curl_close($curl);
   
-  return array("success" => $success, "code" => $code, "errno" => $errno);
+  return array("success" => $success, "code" => $code, "errno" => $errno, "redirectUrl" => $redirectUrl);
 }
 
 function basicAuthCurlInit($curlUrl) {
@@ -339,8 +341,32 @@ function manual_launch($archiveTreatmentKind) {
   if ($code == 409) {
     return array(0, $l_domain_configuration_disable);
   }
-  if ($code == 200) {
-    return array(1, json_decode($success));
+  if ($code == 303) {
+    return followRedirect($curl["redirectUrl"]);
+  }
+}
+
+function followRedirect($redirectUrl) {
+  global $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+
+  $curl = basicAuthCurlInit($redirectUrl);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    
+  $result = curlExec($curl);
+    
+  $successGet = $result["success"];
+  $codeGet = $result["code"];
+  $errnoGet = $result["errno"];
+  
+  if($errnoGet){
+    error_log("Couldn't login to IMAP archive server ($errnoGet)");
+    return array(0, $l_could_not_login_imap_archive_server);
+  }
+  if ($codeGet == 0) {
+    return array(0, $l_imap_archive_server_unreachable);
+  }
+  if ($codeGet == 200) {
+    return array(1, json_decode($successGet));
   }
 }
 
@@ -358,17 +384,14 @@ function get_logs($runId) {
     return array(0, $l_email_address_not_found);
   }
 
-  $logPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/treatments/logs/";
+  $logPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/treatments/".$runId."/logs/";
   
-  $queryParams = array("run_id" => $runId);
-      
   $imapArchiveRootPath = imapArchiveRootPath();
-  $curlUrl = $imapArchiveRootPath.$logPath."?".http_build_query($queryParams);
+  $curlUrl = $imapArchiveRootPath.$logPath;
   
   $curl = basicAuthCurlInit($curlUrl);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($curl, CURLOPT_WRITEFUNCTION, 'curl_write_flush');
-  curl_setopt($ch, CURLOPT_TIMEOUT, 60);
   
   $success = curl_exec($curl);
   $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
