@@ -101,7 +101,7 @@ public class ClientSupportTest {
 	}
 
 	private void login() throws IMAPException {
-		clientSupport.login(mailbox, password.toCharArray(), new InetSocketAddress(greenMail.getImap().getBindTo(), greenMail.getImap().getPort()), false);
+		clientSupport.login(mailbox, password, new InetSocketAddress(greenMail.getImap().getBindTo(), greenMail.getImap().getPort()), false);
 	}
 	
 }

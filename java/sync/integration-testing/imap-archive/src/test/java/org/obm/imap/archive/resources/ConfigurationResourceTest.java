@@ -126,9 +126,7 @@ public class ConfigurationResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
-			.param("domain_name", "mydomain.org").
+			.auth().basic("admin@mydomain.org", "trust3dToken").
 		expect()
 			.contentType(ContentType.JSON)
 			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
@@ -156,9 +154,7 @@ public class ConfigurationResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
-			.param("domain_name", "mydomain.org").
+			.auth().basic("admin@mydomain.org", "trust3dToken").
 		expect()
 			.contentType(ContentType.JSON)
 			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
@@ -176,9 +172,7 @@ public class ConfigurationResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
-			.param("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
 		expect()
@@ -203,10 +197,8 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.minute = 32;
 		
 		given()
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
-			.param("domain_name", "mydomain.org")
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
 		expect()
@@ -217,9 +209,7 @@ public class ConfigurationResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
-			.param("domain_name", "mydomain.org").
+			.auth().basic("admin@mydomain.org", "trust3dToken").
 		expect()
 			.contentType(ContentType.JSON)
 			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
@@ -259,9 +249,7 @@ public class ConfigurationResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
-			.param("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
 		expect()
@@ -271,9 +259,7 @@ public class ConfigurationResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
-			.param("domain_name", "mydomain.org").
+			.auth().basic("admin@mydomain.org", "trust3dToken").
 		expect()
 			.contentType(ContentType.JSON)
 			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),

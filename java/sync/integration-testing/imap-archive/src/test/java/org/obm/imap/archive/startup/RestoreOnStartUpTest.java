@@ -150,9 +150,7 @@ public class RestoreOnStartUpTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
-			.param("domain_name", "mydomain.org").
+			.auth().basic("admin@mydomain.org", "trust3dToken").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()

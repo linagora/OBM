@@ -144,9 +144,7 @@ public class TreatmentsResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
 		expect()
@@ -177,9 +175,7 @@ public class TreatmentsResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
 		expect()
@@ -254,9 +250,7 @@ public class TreatmentsResourceTest {
 		UUID expectedRunId = TestImapArchiveModules.uuid;
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.queryParam("archive_treatment_kind", ArchiveTreatmentKind.REAL_RUN).
 		expect()
 			.contentType(ContentType.JSON)
@@ -303,9 +297,7 @@ public class TreatmentsResourceTest {
 		UUID expectedRunId = TestImapArchiveModules.uuid;
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org").
+			.auth().basic("admin@mydomain.org", "trust3dToken").
 		expect()
 			.contentType(ContentType.JSON)
 			.body("runId", equalTo(expectedRunId.toString()))
@@ -314,9 +306,7 @@ public class TreatmentsResourceTest {
 			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.queryParam("run_id", expectedRunId.toString())
 			.contentType(ContentType.JSON).
 		expect()
@@ -344,9 +334,7 @@ public class TreatmentsResourceTest {
 		UUID expectedRunId = TestImapArchiveModules.uuid;
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.queryParam("archive_treatment_kind", ArchiveTreatmentKind.DRY_RUN).
 		expect()
 			.contentType(ContentType.JSON)
@@ -356,9 +344,7 @@ public class TreatmentsResourceTest {
 			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.queryParam("run_id", expectedRunId.toString())
 			.contentType(ContentType.JSON).
 		expect()
@@ -387,9 +373,7 @@ public class TreatmentsResourceTest {
 		UUID expectedRunId2 = TestImapArchiveModules.uuid2;
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.queryParam("archive_treatment_kind", ArchiveTreatmentKind.REAL_RUN).
 		expect()
 			.contentType(ContentType.JSON)
@@ -400,9 +384,7 @@ public class TreatmentsResourceTest {
 		Thread.sleep(1);
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.queryParam("archive_treatment_kind", ArchiveTreatmentKind.REAL_RUN).
 		expect()
 			.contentType(ContentType.JSON)
@@ -475,9 +457,7 @@ public class TreatmentsResourceTest {
 		UUID runId = TestImapArchiveModules.uuid;
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org").
+			.auth().basic("admin@mydomain.org", "trust3dToken").
 		expect()
 			.contentType(ContentType.JSON)
 			.body("runId", equalTo(runId.toString()))
@@ -490,9 +470,7 @@ public class TreatmentsResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.queryParam("run_id", runId.toString())
 			.contentType(ContentType.JSON).
 		expect()
@@ -515,9 +493,7 @@ public class TreatmentsResourceTest {
 		
 		given()
 			.port(server.getHttpPort())
-			.queryParam("login", "admin")
-			.queryParam("password", "trust3dToken")
-			.queryParam("domain_name", "mydomain.org")
+			.auth().basic("admin@mydomain.org", "trust3dToken")
 			.queryParam("run_id", TestImapArchiveModules.uuid.toString())
 			.contentType(ContentType.JSON).
 		expect()

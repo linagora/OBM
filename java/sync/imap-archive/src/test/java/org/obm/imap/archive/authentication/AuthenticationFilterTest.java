@@ -57,8 +57,8 @@ public class AuthenticationFilterTest {
 
 	private LoginClient.Factory loginClientFactory;
 	private LoginClient loginClient;
-	private HttpServletRequest httpServletRequest;
-	private HttpServletResponse httpServletResponse;
+	private HttpServletRequest request;
+	private HttpServletResponse response;
 	private FilterChain filterChain;
 	private AuthenticationFilter authenticationFilter;
 	
@@ -73,8 +73,8 @@ public class AuthenticationFilterTest {
 		
 		loginClientFactory = mocks.createMock(LoginClient.Factory.class);
 		loginClient = mocks.createMock(LoginClient.class);
-		httpServletRequest = mocks.createMock(HttpServletRequest.class);
-		httpServletResponse = mocks.createMock(HttpServletResponse.class);
+		request = mocks.createMock(HttpServletRequest.class);
+		response = mocks.createMock(HttpServletResponse.class);
 		filterChain = mocks.createMock(FilterChain.class);
 		
 		authenticationFilter = new AuthenticationFilterMockedHttpClient(loginClientFactory);
@@ -93,114 +93,83 @@ public class AuthenticationFilterTest {
 	}
 	
 	@Test
-	public void doFilterWhenBadParameters() throws Exception {
-		String login = "user";
-		String domainName = "mydomain.org";
-		String password = "password";
-		expect(httpServletRequest.getParameter("login")).andReturn(login);
-		expect(httpServletRequest.getParameter("domain_name")).andReturn(domainName);
-		expect(httpServletRequest.getParameter("password")).andReturn(password);
-		
-		httpServletResponse.setHeader("WWW-Authenticate", "Basic realm=\"OBMIMAPArchive\"");
+	public void doFilterWhenBadCredentials() throws Exception {
+		String loginAtDomain = "admin@mydomain.org";
+		String password = "trust3dToken";
+		String header = "Basic YWRtaW5AbXlkb21haW4ub3JnOnRydXN0M2RUb2tlbg==";
+		expect(request.getHeader("Authorization")).andReturn(header);
+
+		response.setHeader("WWW-Authenticate", "Basic realm=\"OBMIMAPArchive\"");
 		expectLastCall();
-		httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		expectLastCall();
 		
-		expect(loginClient.trustedLogin(login + "@" + domainName, password)).andThrow(new AuthFault("Bad password"));
+		expect(loginClient.trustedLogin(loginAtDomain, password)).andThrow(new AuthFault("Bad password"));
 		
 		mocks.replay();
-		authenticationFilter.doFilter(httpServletRequest, httpServletResponse, filterChain);
+		authenticationFilter.doFilter(request, response, filterChain);
 		mocks.verify();
 	}
 	
 	@Test
-	public void doFilterAuthorization() throws Exception {
-		String login = "user";
-		String domainName = "mydomain.org";
-		String password = "password";
-		expect(httpServletRequest.getParameter("login")).andReturn(login);
-		expect(httpServletRequest.getParameter("domain_name")).andReturn(domainName);
-		expect(httpServletRequest.getParameter("password")).andReturn(password);
+	public void doFilterWhenRightCredentials() throws Exception {
+		String loginAtDomain = "admin@mydomain.org";
+		String password = "trust3dToken";
+		String header = "Basic YWRtaW5AbXlkb21haW4ub3JnOnRydXN0M2RUb2tlbg==";
+		expect(request.getHeader("Authorization")).andReturn(header);
 		
-		expect(loginClient.trustedLogin(login + "@" + domainName, password)).andReturn(new AccessToken(1, "origin"));
+		expect(loginClient.trustedLogin(loginAtDomain, password)).andReturn(new AccessToken(1, "origin"));
 		
-		filterChain.doFilter(httpServletRequest, httpServletResponse);
+		filterChain.doFilter(request, response);
 		expectLastCall();
 		
 		mocks.replay();
-		authenticationFilter.doFilter(httpServletRequest, httpServletResponse, filterChain);
+		authenticationFilter.doFilter(request, response, filterChain);
 		mocks.verify();
 	}
 	
 	@Test
-	public void authenticationWhenNoLoginParameter() throws Exception {
-		expect(httpServletRequest.getParameter("login")).andReturn(null);
+	public void authenticationWhenNoAuthorization() throws Exception {
+		expect(request.getHeader("Authorization")).andReturn(null);
+
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		expectLastCall();
 		
-		expectedException.expect(AuthenticationException.class).hasMessage("A mandatory parameter is missing in HttpServletRequest: 'login'");
+		expectedException.expect(AuthenticationException.class)
+			.hasMessage("The request has no 'Authorization' header");
 		
 		mocks.replay();
-		authenticationFilter.authentication(httpServletRequest);
+		authenticationFilter.authenticate(request);
 		mocks.verify();
 	}
 	
 	@Test
-	public void authenticationWhenEmptyLoginParameter() throws Exception {
-		expect(httpServletRequest.getParameter("login")).andReturn("");
+	public void authenticationWhenBadBasicAuthorizationFormat() throws Exception {
+		expect(request.getHeader("Authorization")).andReturn("Basic blabla");
+
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		expectLastCall();
 		
-		expectedException.expect(AuthenticationException.class).hasMessage("A mandatory parameter is missing in HttpServletRequest: 'login'");
+		expectedException.expect(AuthenticationException.class)
+			.hasMessageEndingWith("Cannot build credentials from the given header");
 		
 		mocks.replay();
-		authenticationFilter.authentication(httpServletRequest);
+		authenticationFilter.authenticate(request);
 		mocks.verify();
 	}
 	
 	@Test
-	public void authenticationWhenNoPasswordParameter() throws Exception {
-		expect(httpServletRequest.getParameter("login")).andReturn("user");
-		expect(httpServletRequest.getParameter("password")).andReturn(null);
+	public void authenticationWhenBadAuthorizationFormat() throws Exception {
+		expect(request.getHeader("Authorization")).andReturn("givenMethod unsupported");
+
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		expectLastCall();
 		
-		expectedException.expect(AuthenticationException.class).hasMessage("A mandatory parameter is missing in HttpServletRequest: 'password'");
-		
-		mocks.replay();
-		authenticationFilter.authentication(httpServletRequest);
-		mocks.verify();
-	}
-	
-	@Test
-	public void authenticationWhenEmptyPasswordParameter() throws Exception {
-		expect(httpServletRequest.getParameter("login")).andReturn("user");
-		expect(httpServletRequest.getParameter("password")).andReturn("");
-		
-		expectedException.expect(AuthenticationException.class).hasMessage("A mandatory parameter is missing in HttpServletRequest: 'password'");
+		expectedException.expect(AuthenticationException.class)
+			.hasMessageEndingWith("Only 'Basic' authentication is supported: givenMethod");
 		
 		mocks.replay();
-		authenticationFilter.authentication(httpServletRequest);
-		mocks.verify();
-	}
-	
-	@Test
-	public void authenticationWhenNoDomainNameParameter() throws Exception {
-		expect(httpServletRequest.getParameter("login")).andReturn("user");
-		expect(httpServletRequest.getParameter("password")).andReturn("password");
-		expect(httpServletRequest.getParameter("domain_name")).andReturn(null);
-		
-		expectedException.expect(AuthenticationException.class).hasMessage("A mandatory parameter is missing in HttpServletRequest: 'domain_name'");
-		
-		mocks.replay();
-		authenticationFilter.authentication(httpServletRequest);
-		mocks.verify();
-	}
-	
-	@Test
-	public void authenticationWhenEmptyDomainNameParameter() throws Exception {
-		expect(httpServletRequest.getParameter("login")).andReturn("user");
-		expect(httpServletRequest.getParameter("password")).andReturn("password");
-		expect(httpServletRequest.getParameter("domain_name")).andReturn("");
-		
-		expectedException.expect(AuthenticationException.class).hasMessage("A mandatory parameter is missing in HttpServletRequest: 'domain_name'");
-		
-		mocks.replay();
-		authenticationFilter.authentication(httpServletRequest);
+		authenticationFilter.authenticate(request);
 		mocks.verify();
 	}
 }

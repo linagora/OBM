@@ -31,11 +31,37 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.auth;
 
+import java.util.StringTokenizer;
+
+import org.apache.commons.codec.binary.Base64;
+
+import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
 public class Credentials {
 
+	public static Credentials fromAuthorizationHeader(String authHeader) {
+		StringTokenizer st = new StringTokenizer(authHeader);
+		if (st.hasMoreTokens()) {
+			String basic = st.nextToken();
+			if (!basic.equalsIgnoreCase("Basic")) {
+				throw new IllegalArgumentException("Only 'Basic' authentication is supported: " + basic);
+			}
+			String credentials = st.nextToken();
+			String userPass = new String( Base64.decodeBase64(credentials), Charsets.ISO_8859_1 );
+			int p = userPass.indexOf(":");
+			if (p != -1) {
+				return builder()
+						.login(userPass.substring(0, p))
+						.password(userPass.substring(p + 1))
+						.hashedPassword(false)
+						.build();
+			}
+		}
+		throw new IllegalArgumentException("Cannot build credentials from the given header");
+	}
+	
 	public static Builder builder() {
 		return new Builder();
 	}

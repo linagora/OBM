@@ -98,9 +98,7 @@ public class RootHandlerTest {
 		expectations.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
-			.param("domain_name", "mydomain.org").
+			.auth().basic("admin@mydomain.org", "trust3dToken").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -111,9 +109,7 @@ public class RootHandlerTest {
 	public void testStatusOkOnHealthcheckRoot() {
 		given()
 			.port(server.getHttpPort())
-			.param("login", "cyrus")
-			.param("password", "cyrus")
-			.param("domain_name", "mydomain.org").
+			.auth().basic("cyrus@mydomain.org", "cyrus").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()

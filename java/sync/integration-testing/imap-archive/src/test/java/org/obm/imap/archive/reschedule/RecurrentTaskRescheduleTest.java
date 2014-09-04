@@ -79,7 +79,6 @@ import com.ninja_squad.dbsetup.operation.Operation;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.system.ObmSystemUser;
-import fr.aliacom.obm.common.user.UserPassword;
 
 public class RecurrentTaskRescheduleTest {
 
@@ -142,7 +141,7 @@ public class RecurrentTaskRescheduleTest {
 			.expectGetDomain(domainUuid);
 		imapServer.setUser("cyrus", "cyrus");
 		expect(userSystemDao.getByLogin("cyrus"))
-			.andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build())
+			.andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build())
 			.anyTimes();
 		
 		domainConfigDao.create(DomainConfiguration.builder()

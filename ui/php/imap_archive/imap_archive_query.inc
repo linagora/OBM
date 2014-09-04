@@ -115,17 +115,13 @@ function imapArchiveRootPath() {
   return "http://".$imapArchiveServer[0]["ip"].":8085";
 }
 
-function curlGet($url, $queryParams = null) {
+function curlGet($url) {
   global $obm;
 
-  $params = requestParams();
-  if ($queryParams != null) {
-    $params = array_merge($params, $queryParams);
-  }
   $imapArchiveRootPath = imapArchiveRootPath();
-  $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($params);
+  $curlUrl = $imapArchiveRootPath.$url;
   
-  $curl = curl_init($curlUrl);
+  $curl = basicAuthCurlInit($curlUrl);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     
   return curlExec($curl);
@@ -185,14 +181,13 @@ function calculate_next_treatment_date_from_imap_archive_service($configuration)
   }
 }
 
-function curlPost($url, $extraParams = null, $json = "") {
+function curlPost($url, $extraParams = array(), $json = "") {
   global $obm;
   
-  $params = requestParams($extraParams);
   $imapArchiveRootPath = imapArchiveRootPath();
-  $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($params);
+  $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($extraParams);
   
-  $curl = curl_init($curlUrl);
+  $curl = basicAuthCurlInit($curlUrl);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($curl, CURLOPT_POST, 1);
   curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-type: application/json'));
@@ -274,42 +269,16 @@ function run_query_imap_archive_update($params) {
 function curlPut($url, $json) {
   global $obm;
   
-  $params = requestParams();
   $imapArchiveRootPath = imapArchiveRootPath();
-  $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($params);
+  $curlUrl = $imapArchiveRootPath.$url;
   
-  $curl = curl_init($curlUrl);
+  $curl = basicAuthCurlInit($curlUrl);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
   curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-type: application/json'));
   curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
   
   return curlExec($curl);
-}
-
-function requestParams($extraParams = null) {
-  global $obm;
-  
-  $userInfo = get_user_info($obm['uid']);
-  $username = $userInfo["login"];
-  $domainName = $userInfo["domain_name"];
-  $password = get_trust_token($userInfo);
-  $domainName = $obm['domain_name'];
-  $origin= $GLOBALS['c_origin_web'];
-
-  $params = array("login" => $username,
-    "password" => $password,
-    "domain_name" => $domainName,
-    "origin" => $origin);
-  if ($extraParams != null) {
-      $params = array_merge($params, $extraParams);
-  }
-  if ($userInfo["password_type"] == "MD5SUM") {
-      $params = array_merge($params, array("isPasswordHashed" => "true"));
-      error_log("Password already hashed, adding 'isPasswordHashed' parameter to the imap-archive call");
-  }
-  
-  return $params;
 }
 
 function curlExec($curl) {
@@ -320,6 +289,20 @@ function curlExec($curl) {
   curl_close($curl);
   
   return array("success" => $success, "code" => $code, "errno" => $errno);
+}
+
+function basicAuthCurlInit($curlUrl) {
+  global $obm;
+
+  $userInfo = get_user_info($obm['uid']);  
+  $username = $userInfo["login"];
+  $password = get_trust_token($userInfo);
+  $domainName = $obm['domain_name'];
+
+  $curl = curl_init($curlUrl);
+  curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+  curl_setopt($curl, CURLOPT_USERPWD, "$username@$domainName:$password");
+  return $curl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -379,13 +362,10 @@ function get_logs($runId) {
   
   $queryParams = array("run_id" => $runId);
       
-  $params = requestParams();
-  $params = array_merge($params, $queryParams);
-  
   $imapArchiveRootPath = imapArchiveRootPath();
-  $curlUrl = $imapArchiveRootPath.$logPath."?".http_build_query($params);
+  $curlUrl = $imapArchiveRootPath.$logPath."?".http_build_query($queryParams);
   
-  $curl = curl_init($curlUrl);
+  $curl = basicAuthCurlInit($curlUrl);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($curl, CURLOPT_WRITEFUNCTION, 'curl_write_flush');
   curl_setopt($ch, CURLOPT_TIMEOUT, 60);

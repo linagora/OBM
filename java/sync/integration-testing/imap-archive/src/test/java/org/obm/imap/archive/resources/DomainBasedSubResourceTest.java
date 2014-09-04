@@ -99,9 +99,7 @@ public class DomainBasedSubResourceTest {
 	public void getDomainConfigurationShouldReturnBadRequestOnInvalidUuid() {
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
-			.param("domain_name", "mydomain.org").
+			.auth().basic("admin@mydomain.org", "trust3dToken").
 		expect()
 			.statusCode(Status.BAD_REQUEST.getStatusCode()).
 		when()
@@ -116,9 +114,7 @@ public class DomainBasedSubResourceTest {
 				);
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
-			.param("domain_name", "mydomain.org").
+			.auth().basic("admin@mydomain.org", "trust3dToken").
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()

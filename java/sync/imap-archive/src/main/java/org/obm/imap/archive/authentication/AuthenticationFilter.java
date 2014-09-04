@@ -44,15 +44,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.obm.imap.archive.exception.AuthenticationException;
-import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
+import org.obm.sync.auth.Credentials;
 import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.client.login.LoginClient.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -77,10 +76,9 @@ public class AuthenticationFilter implements Filter {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		HttpServletResponse httpResponse = (HttpServletResponse) response;
 		try {
-			authentication(httpRequest);
-			
+			authenticate(httpRequest);
 			chain.doFilter(request, response);
-		} catch (AuthFault e) {
+		} catch (AuthFault | AuthenticationException e) {
 			logger.info(e.getMessage());
 			returnHttpAuthenticationError(httpResponse);
 		}
@@ -91,30 +89,26 @@ public class AuthenticationFilter implements Filter {
 		response.setHeader("WWW-Authenticate", s);
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	}
+	
+	@VisibleForTesting void authenticate(HttpServletRequest request) throws AuthFault {
+		Credentials credentials = getCredentials(request);
+		loginClient().trustedLogin(credentials.getLogin().getFullLogin(), credentials.getPassword());
+	}
 
-	@VisibleForTesting AccessToken authentication(HttpServletRequest request) throws AuthFault {
-		String login = getMandatoryParameter(request, "login");
-		String password = getMandatoryParameter(request, "password");
-		String domainName = getMandatoryParameter(request, "domain_name");
-		
-		LoginClient loginClient = loginClient();
-		return loginClient.trustedLogin(loginAtDomain(login, domainName), password);
+	private Credentials getCredentials(HttpServletRequest request) throws AuthenticationException {
+		String authHeader = request.getHeader("Authorization");
+		if (authHeader == null) {
+			throw new AuthenticationException("The request has no 'Authorization' header");
+		}
+		try {
+			return Credentials.fromAuthorizationHeader(authHeader);
+		} catch (Exception e) {
+			throw new AuthenticationException(e);
+		}
 	}
 
 	protected LoginClient loginClient() {
 		return loginClientFactory.create(HttpClientBuilder.create().build());
-	}
-	
-	private String loginAtDomain(String login, String domainName) {
-		return login + "@" + domainName;
-	}
-
-	private String getMandatoryParameter(HttpServletRequest request, String parameterName) {
-		String value = request.getParameter(parameterName);
-		if (Strings.isNullOrEmpty(value)) {
-			throw new AuthenticationException("A mandatory parameter is missing in HttpServletRequest: '" + parameterName + "'");
-		}
-		return value;
 	}
 
 	@Override
