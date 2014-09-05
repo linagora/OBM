@@ -44,9 +44,12 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ObmDomainFactory implements Factory<ObmDomain> {
 
+	public static final String PATH_PARAM = "treatment";
+	public static final String PATH = "{" + PATH_PARAM + "}";
+	
 	private final DomainClient domainClient;
 	
-	@PathParam("domain")
+	@PathParam(PATH_PARAM)
 	private String domainUuid;
 
 	@Inject

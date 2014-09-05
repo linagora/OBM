@@ -36,12 +36,12 @@ import javax.ws.rs.Path;
 @Path("domains")
 public class DomainBasedSubResource {
 
-	@Path("{domain}/configuration")
+	@Path(ObmDomainFactory.PATH + "/configuration")
 	public Class<ConfigurationResource> configuration() {
 		return ConfigurationResource.class;
 	}
 
-	@Path("{domain}/treatments")
+	@Path(ObmDomainFactory.PATH + "/treatments")
 	public Class<TreatmentsResource> treatments() {
 		return TreatmentsResource.class;
 	}

@@ -264,6 +264,7 @@ public class TreatmentsResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId)
+			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
 		insertDomainConfiguration(true);
@@ -310,6 +311,7 @@ public class TreatmentsResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId)
+			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
 		insertDomainConfiguration(true);
@@ -347,6 +349,7 @@ public class TreatmentsResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId)
+			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
 		insertDomainConfiguration(true);
@@ -383,6 +386,7 @@ public class TreatmentsResourceTest {
 		expectations
 			.expectTrustedLogin(domainId)
 			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId)
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		

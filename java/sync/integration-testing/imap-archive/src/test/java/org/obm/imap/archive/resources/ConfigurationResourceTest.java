@@ -96,10 +96,12 @@ public class ConfigurationResourceTest {
 	@Inject WebServer server;
 	Expectations expectations;
 
+	private ObmDomainUuid domainId;
+
 	
 	@Before
 	public void setUp() {
-		ObmDomainUuid domainId = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		domainId = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		expectations = new Expectations(driver)
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId);
@@ -165,6 +167,51 @@ public class ConfigurationResourceTest {
 	}
 
 	@Test
+	public void domainShouldBeEvaluatedEachTime() throws Exception {
+		initDb(Operations.insertInto("mail_archive")
+				.columns("mail_archive_domain_uuid", 
+						"mail_archive_activated", 
+						"mail_archive_repeat_kind", 
+						"mail_archive_day_of_week", 
+						"mail_archive_day_of_month", 
+						"mail_archive_day_of_year", 
+						"mail_archive_hour", 
+						"mail_archive_minute",
+						"mail_archive_excluded_folder")
+						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
+						.build());
+		
+		ObmDomainUuid otherDomain = ObmDomainUuid.of("31ae9172-ca35-4045-8ea3-c3125dab771e");
+		expectations
+			.expectTrustedLogin(otherDomain)
+			.expectGetDomain(otherDomain);
+		
+		server.start();
+		
+		given()
+			.port(server.getHttpPort())
+			.auth().basic("admin@mydomain.org", "trust3dToken").
+		expect()
+			.contentType(ContentType.JSON)
+			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
+				"enabled", equalTo(true))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+		
+		given()
+			.port(server.getHttpPort())
+			.auth().basic("admin@mydomain.org", "trust3dToken").
+		expect()
+			.contentType(ContentType.JSON)
+			.body("domainId", equalTo("31ae9172-ca35-4045-8ea3-c3125dab771e"),
+				"enabled", equalTo(false))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/31ae9172-ca35-4045-8ea3-c3125dab771e/configuration");
+	}
+
+	@Test
 	public void updateDomainConfigurationShouldThrowExceptionWhenBadInputs() throws Exception {
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
@@ -183,7 +230,10 @@ public class ConfigurationResourceTest {
 
 	@Test
 	public void updateDomainConfigurationShouldCreateWhenNoData() throws Exception {
-		expectations.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
+		ObmDomainUuid newDomainUuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		expectations
+			.expectTrustedLogin(newDomainUuid)
+			.expectGetDomain(newDomainUuid);
 		server.start();
 		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
@@ -234,7 +284,11 @@ public class ConfigurationResourceTest {
 						"mail_archive_excluded_folder")
 						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
 						.build());
-		expectations.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
+		ObmDomainUuid newDomainUuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		expectations
+			.expectTrustedLogin(newDomainUuid)
+			.expectGetDomain(newDomainUuid);
+		
 		server.start();
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");

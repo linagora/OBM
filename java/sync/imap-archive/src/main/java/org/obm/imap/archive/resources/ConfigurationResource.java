@@ -37,11 +37,13 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.glassfish.jersey.process.internal.RequestScoped;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.PersistedResult;
@@ -55,6 +57,7 @@ import com.google.common.base.Objects;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
+@RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ConfigurationResource {
@@ -64,7 +67,7 @@ public class ConfigurationResource {
 	@Inject
 	private DomainConfigurationService domainConfigurationService;
 
-	@Inject
+	@Context
 	private ObmDomain domain;
 	@Inject
 	private UriInfo uriInfo;

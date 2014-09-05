@@ -250,6 +250,7 @@ public class TreatmentResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId)
+			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
 		play(Operations.sequenceOf(cleanDB(), 
@@ -289,6 +290,8 @@ public class TreatmentResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectTrustedLogin(domainId)
 			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId)
+			.expectGetDomain(domainId)
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
