@@ -62,7 +62,7 @@ public class DeployForEachTestsExtensionTest {
 	}
 	
 	@Test(expected=IllegalStateException.class)
-	public void testBeforeWhenNoDeployment() throws Exception {
+	public void testBeforeWhenNoDeployment() {
 		control.replay();
 		try {
 			testee.executeOnJUnitBefore(beforeEvent, deployer, new TestClass(ClassWithoutAnnotation.class));
@@ -73,7 +73,7 @@ public class DeployForEachTestsExtensionTest {
 	}
 
 	@Test(expected=IllegalStateException.class)
-	public void testAfterWhenNoDeployment() throws Exception {
+	public void testAfterWhenNoDeployment() {
 		control.replay();
 		try {
 			testee.executeOnJUnitAfter(afterEvent, deployer, new TestClass(ClassWithoutAnnotation.class));
@@ -152,7 +152,7 @@ public class DeployForEachTestsExtensionTest {
 	}
 	
 	@Test(expected=IllegalStateException.class)
-	public void testBeforeWhenBothManagedDeployment() throws Exception {
+	public void testBeforeWhenBothManagedDeployment() {
 		control.replay();
 		try {
 			testee.executeOnJUnitBefore(beforeEvent, deployer, new TestClass(ClassWithBothManagedDeployment.class));
@@ -163,7 +163,7 @@ public class DeployForEachTestsExtensionTest {
 	}
 	
 	@Test(expected=IllegalStateException.class)
-	public void testAfterWhenBothManagedDeployment() throws Exception {
+	public void testAfterWhenBothManagedDeployment() {
 		control.replay();
 		try {
 			testee.executeOnJUnitAfter(afterEvent, deployer, new TestClass(ClassWithBothManagedDeployment.class));

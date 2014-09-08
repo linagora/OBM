@@ -74,16 +74,13 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 	@Override
 	public Batch get(Batch.Id id, ObmDomain domain) throws DaoException, BatchNotFoundException, DomainNotFoundException {
-		Connection connection = null;
-		PreparedStatement ps = null;
 		ResultSet rs = null;
 
-		try {
-			connection = dbcp.getConnection();
-			ps = connection.prepareStatement(
-					"SELECT " + FIELDS + " FROM batch " +
-					"INNER JOIN Domain ON domain_id = domain " +
-					"WHERE id = ? AND domain_id = ?");
+		try (Connection connection = dbcp.getConnection();
+				PreparedStatement ps = connection.prepareStatement(
+						"SELECT " + FIELDS + " FROM batch " +
+						"INNER JOIN Domain ON domain_id = domain " +
+						"WHERE id = ? AND domain_id = ?");) {
 
 			ps.setInt(1, id.getId());
 			ps.setInt(2, domain.getId());
@@ -93,12 +90,8 @@ public class BatchDaoJdbcImpl implements BatchDao {
 			if (rs.next()) {
 				return batchFromCursor(rs);
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			throw new DaoException(e);
-		}
-		finally {
-			JDBCUtils.cleanup(connection, ps, rs);
 		}
 
 		throw new BatchNotFoundException(id);
@@ -106,12 +99,9 @@ public class BatchDaoJdbcImpl implements BatchDao {
 
 	@Override
 	public Batch create(Batch batch) throws DaoException, BatchNotFoundException, DomainNotFoundException {
-		Connection connection = null;
-		PreparedStatement ps = null;
 
-		try {
-			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("INSERT INTO batch (status, domain) VALUES (?, ?)");
+		try (Connection connection = dbcp.getConnection();
+				PreparedStatement ps = connection.prepareStatement("INSERT INTO batch (status, domain) VALUES (?, ?)")) {
 
 			ps.setObject(1, dbcp.getJdbcObject(ObmHelper.BATCH_STATUS, batch.getStatus().toString()));
 			ps.setInt(2, batch.getDomain().getId());
@@ -119,23 +109,16 @@ public class BatchDaoJdbcImpl implements BatchDao {
 			ps.executeUpdate();
 
 			return get(Batch.Id.builder().id(obmHelper.lastInsertId(connection)).build(), batch.getDomain());
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			throw new DaoException(e);
-		}
-		finally {
-			JDBCUtils.cleanup(connection, ps, null);
 		}
 	}
 
 	@Override
 	public Batch update(Batch batch) throws DaoException, BatchNotFoundException, DomainNotFoundException {
-		Connection connection = null;
-		PreparedStatement ps = null;
 
-		try {
-			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("UPDATE batch SET status = ?, timecommit = ? WHERE id = ?");
+		try (Connection connection = dbcp.getConnection();
+			PreparedStatement ps = connection.prepareStatement("UPDATE batch SET status = ?, timecommit = ? WHERE id = ?")) {
 
 			ps.setObject(1, dbcp.getJdbcObject(ObmHelper.BATCH_STATUS, batch.getStatus().toString()));
 
@@ -168,20 +151,12 @@ public class BatchDaoJdbcImpl implements BatchDao {
 		catch (SQLException e) {
 			throw new DaoException(e);
 		}
-		finally {
-			JDBCUtils.cleanup(connection, ps, null);
-		}
 	}
 
 	@Override
 	public void delete(Batch.Id id) throws DaoException, BatchNotFoundException {
-		Connection connection = null;
-		PreparedStatement ps = null;
-
-		try {
-			connection = dbcp.getConnection();
-			ps = connection.prepareStatement("DELETE FROM batch WHERE id = ?");
-
+		try (Connection connection = dbcp.getConnection();
+				PreparedStatement ps = connection.prepareStatement("DELETE FROM batch WHERE id = ?")) {
 			ps.setInt(1, id.getId());
 
 			int updateCount = ps.executeUpdate();
@@ -189,13 +164,9 @@ public class BatchDaoJdbcImpl implements BatchDao {
 			if (updateCount != 1) {
 				throw new BatchNotFoundException(String.format("No such batch: %s", id));
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			throw new DaoException(e);
 		}
-		finally {
-			JDBCUtils.cleanup(connection, ps, null);
-		}	
 	}
 
 	@Override

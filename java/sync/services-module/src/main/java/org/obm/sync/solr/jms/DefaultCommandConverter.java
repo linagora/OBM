@@ -70,6 +70,7 @@ public class DefaultCommandConverter implements CommandConverter {
 	@Override
 	public <T extends Serializable> SolrRequest convert(Command<T> command) throws Exception {
 		SolrService solrService = command.getSolrService();
+		@SuppressWarnings("unchecked")
 		IndexerFactory<T> factory = (IndexerFactory<T>) solrServiceToFactoryMap.get(solrService);
 		
 		if (factory == null) {

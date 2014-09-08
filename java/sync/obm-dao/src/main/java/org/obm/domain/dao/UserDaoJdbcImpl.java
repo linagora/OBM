@@ -172,14 +172,11 @@ public class UserDaoJdbcImpl implements UserDao {
 		String q = "SELECT serviceproperty_service, serviceproperty_property, serviceproperty_value "
 				+ "FROM ServiceProperty "
 				+ "INNER JOIN UserEntity ON serviceproperty_entity_id=userentity_entity_id AND userentity_user_id=?";
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		Connection con = null;
-		try {
-			con = obmHelper.getConnection();
-			ps = con.prepareStatement(q);
+		
+		try (Connection con = obmHelper.getConnection();
+				PreparedStatement ps = con.prepareStatement(q)) {
 			ps.setInt(1, userObmId);
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			Map<String, String> map = Maps.newHashMap();
 			while (rs.next()) {
 				String k = rs.getString(1) + "/" + rs.getString(2);
@@ -189,19 +186,12 @@ public class UserDaoJdbcImpl implements UserDao {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-		} finally {
-			obmHelper.cleanup(con, ps, rs);
 		}
 		return ImmutableMap.of();
 	}
 	
 	@VisibleForTesting Integer userIdFromEmailQuery(Connection con, EmailLogin login, DomainName domain) throws SQLException {
-		Statement st = null;
-		ResultSet rs = null;
-		
-		try {
-			st = con.createStatement();
-
+		try (Statement st = con.createStatement()) {
 			// Don't use a PreparedStatement here, as they can't be load-balanced and this is a very frequent query
 			String request = String.format("SELECT userobm_id, userobm_email, domain_name, domain_alias " +
 					"FROM UserObm " +
@@ -209,7 +199,7 @@ public class UserDaoJdbcImpl implements UserDao {
 					"WHERE UPPER(userobm_email) like UPPER('%s') AND userobm_archive != 1", StringEscapeUtils.escapeSql(
 							"%" + login.get().toString() + "%"));
 			
-			rs = st.executeQuery(request);
+			ResultSet rs = st.executeQuery(request);
 			
 			while (rs.next()) {
 				
@@ -225,9 +215,6 @@ public class UserDaoJdbcImpl implements UserDao {
 					}	
 				}
 			}
-
-		} finally {
-			obmHelper.cleanup(null, st, rs);
 		}
 		
 		return null;
@@ -271,15 +258,11 @@ public class UserDaoJdbcImpl implements UserDao {
 	
 	@Override
 	public ObmUser findUser(String email, ObmDomain domain) {
-		Connection con = null;
 		Integer id = null;
-		try {
-			con = obmHelper.getConnection();
+		try (Connection con = obmHelper.getConnection()) {
 			id = userIdFromEmail(con, email, domain.getId());
 		} catch (SQLException se) {
 			logger.error(se.getMessage(), se);
-		} finally {
-			obmHelper.cleanup(con, null, null);
 		}
 		if (id != null && id > 0) {
 			return findUserById(id, domain);
@@ -292,10 +275,6 @@ public class UserDaoJdbcImpl implements UserDao {
 	 */
 	@Override
 	public ObmUser findUserByLogin(String login, ObmDomain domain) {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
 		ObmUser obmUser = null;
 		String uq = "SELECT " + USER_FIELDS
 				+ " FROM UserObm "
@@ -304,19 +283,16 @@ public class UserDaoJdbcImpl implements UserDao {
 				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
 				+ "WHERE userobm_domain_id=? AND userobm_login=? AND userobm_archive != '1'";
-		try {
-			con = obmHelper.getConnection();
-			ps = con.prepareStatement(uq);
+		try (Connection con = obmHelper.getConnection();
+				PreparedStatement ps = con.prepareStatement(uq)) {
 			ps.setInt(1, domain.getId());
 			ps.setString(2, login);
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				obmUser = createUserFromResultSetAndFetchCreators(domain, rs);
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
-		} finally {
-			obmHelper.cleanup(con, ps, rs);
 		}
 		return obmUser;
 	}
@@ -444,10 +420,6 @@ public class UserDaoJdbcImpl implements UserDao {
 	}
 
 	private ObmUser findUserById(int id, ObmDomain domain, boolean fetchCreators) {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
 		ObmUser obmUser = null;
 		String uq = "SELECT " + USER_FIELDS
 				+ " FROM UserObm "
@@ -456,12 +428,11 @@ public class UserDaoJdbcImpl implements UserDao {
 				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=? "
 				+ "WHERE userobm_id=? ";
-		try {
-			con = obmHelper.getConnection();
-			ps = con.prepareStatement(uq);
+		try (Connection con = obmHelper.getConnection();
+				PreparedStatement ps = con.prepareStatement(uq)) {
 			ps.setInt(1, id);
 			ps.setInt(2, id);
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				if (fetchCreators) {
 					obmUser = createUserFromResultSetAndFetchCreators(domain, rs);
@@ -471,8 +442,6 @@ public class UserDaoJdbcImpl implements UserDao {
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
-		} finally {
-			obmHelper.cleanup(con, ps, rs);
 		}
 		return obmUser;
 	}
@@ -492,26 +461,19 @@ public class UserDaoJdbcImpl implements UserDao {
 
 	
 	@VisibleForTesting Integer userIdFromLogin(Connection con, EmailLogin login, Integer domainId) {
-		
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
 		Integer ret = null;
 		String uq = "SELECT userobm_id "
 				+ "FROM UserObm "
 				+ "WHERE userobm_domain_id=? AND userobm_login=? AND userobm_archive != '1'";
-		try {
-			ps = con.prepareStatement(uq);
+		try (PreparedStatement ps = con.prepareStatement(uq)) {
 			ps.setInt(1, domainId);
 			ps.setString(2, login.get());
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				ret = rs.getInt(1);
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
-		} finally {
-			obmHelper.cleanup(null, ps, rs);
 		}
 		return ret;
 	}
@@ -550,10 +512,6 @@ public class UserDaoJdbcImpl implements UserDao {
 	}
 
 	private ObmUser getByExtIdWithOptionalGroups(UserExtId userExtId, ObmDomain domain, boolean fetchGroups) throws SQLException, UserNotFoundException {
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
 		String uq = "SELECT " + USER_FIELDS
 				+ " FROM UserObm "
 				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
@@ -561,12 +519,11 @@ public class UserDaoJdbcImpl implements UserDao {
 				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
 				+ "WHERE userobm_domain_id=? AND userobm_ext_id=?";
-		try {
-			conn = obmHelper.getConnection();
-			ps = conn.prepareStatement(uq);
+		try (Connection conn = obmHelper.getConnection();
+				PreparedStatement ps = conn.prepareStatement(uq)) {
 			ps.setInt(1, domain.getId());
 			ps.setString(2, userExtId.getExtId());
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				if (!fetchGroups) {
 					return createUserFromResultSetAndFetchCreators(domain, rs);
@@ -577,16 +534,11 @@ public class UserDaoJdbcImpl implements UserDao {
 			else {
 				throw new UserNotFoundException(userExtId);
 			}
-		} finally {
-			obmHelper.cleanup(conn, ps, rs);
 		}
 	}
 
 	@Override
 	public List<ObmUser> list(ObmDomain domain) throws SQLException {
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
 		List<ObmUser> users = Lists.newArrayList();
 
 		String query = "SELECT " + USER_FIELDS + " FROM UserObm " + 
@@ -596,17 +548,14 @@ public class UserDaoJdbcImpl implements UserDao {
 				"LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id " + 
 				"WHERE userobm_domain_id = ?";
 
-		try {
-			conn = obmHelper.getConnection();
-			ps = conn.prepareStatement(query);
+		try (Connection conn = obmHelper.getConnection();
+				PreparedStatement ps =  conn.prepareStatement(query)) {
 			ps.setInt(1, domain.getId());
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
 				users.add(createUserFromResultSetAndFetchCreators(domain, rs));
 			}
-		} finally {
-			obmHelper.cleanup(conn, ps, rs);
 		}
 
 		return users;
@@ -614,8 +563,6 @@ public class UserDaoJdbcImpl implements UserDao {
 
 	@Override
 	public ObmUser create(ObmUser user) throws SQLException, DaoException {
-		Connection conn = null;
-		PreparedStatement ps = null;
 		ObmDomain domain = user.getDomain();
 
 		String q = "INSERT INTO UserObm (" +
@@ -659,11 +606,10 @@ public class UserDaoJdbcImpl implements UserDao {
 				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?" +
 				")";
 
-		try {
-			int idx = 1;
-			conn = obmHelper.getConnection();
-			ps = conn.prepareStatement(q);
+		try (Connection conn = obmHelper.getConnection();
+				PreparedStatement ps = conn.prepareStatement(q)) {
 
+			int idx = 1;
 			ps.setInt(idx++, domain.getId());
 
 			if (user.getCreatedBy() != null) {
@@ -758,8 +704,6 @@ public class UserDaoJdbcImpl implements UserDao {
 			userPatternDao.updateUserIndex(createdUser);
 
 			return createdUser;
-		} finally {
-			obmHelper.cleanup(conn, ps, null);
 		}
 	}
 
@@ -775,9 +719,6 @@ public class UserDaoJdbcImpl implements UserDao {
 
 	@Override
 	public ObmUser update(ObmUser user) throws SQLException, UserNotFoundException {
-		Connection conn = null;
-		PreparedStatement ps = null;
-
 		String query = "UPDATE UserObm SET " +
                     "userobm_timeupdate = ?, " +
                     "userobm_userupdate = ?, " +
@@ -813,11 +754,10 @@ public class UserDaoJdbcImpl implements UserDao {
                     "userobm_hidden = ? " +
                     "WHERE userobm_id = ?";
 
-		try {
-			int idx = 1;
-			conn = obmHelper.getConnection();
-			ps = conn.prepareStatement(query);
+		try (Connection conn = obmHelper.getConnection();
+				PreparedStatement ps =  conn.prepareStatement(query)) {
 
+			int idx = 1;
 			ps.setTimestamp(idx++, new Timestamp(obmHelper.selectNow(conn).getTime()));
 
 			if (user.getUpdatedBy() != null) {
@@ -886,8 +826,6 @@ public class UserDaoJdbcImpl implements UserDao {
 			}
 
 			return findUserById(user.getUid(), user.getDomain());
-		} finally {
-			obmHelper.cleanup(conn, ps, null);
 		}
 	}
 
@@ -902,12 +840,8 @@ public class UserDaoJdbcImpl implements UserDao {
 	
 	@Override
 	public void delete(ObmUser user) throws SQLException, UserNotFoundException {
-		Connection connection = null;
-		PreparedStatement ps = null;
-
-		try {
-			connection = obmHelper.getConnection();
-			ps = connection.prepareStatement("DELETE FROM UserObm WHERE userobm_ext_id = ? AND userobm_domain_id = ?");
+		try (Connection con = obmHelper.getConnection();
+				PreparedStatement ps = con.prepareStatement("DELETE FROM UserObm WHERE userobm_ext_id = ? AND userobm_domain_id = ?")) {
 
 			String extId = user.getExtId().getExtId();
 
@@ -919,21 +853,13 @@ public class UserDaoJdbcImpl implements UserDao {
 			if (updateCount != 1) {
 				throw new UserNotFoundException(String.format("No user found with extid %s.", extId));
 			}
-		}
-		finally {
-			JDBCUtils.cleanup(connection, ps, null);
 		}
 	}
 
 	@Override
 	public void archive(ObmUser user) throws SQLException, UserNotFoundException {
-		Connection connection = null;
-		PreparedStatement ps = null;
-
-		try {
-			connection = obmHelper.getConnection();
-
-			ps = connection.prepareStatement("UPDATE UserObm SET userobm_archive = 1 WHERE userobm_ext_id = ? AND userobm_domain_id = ?");
+		try (Connection con = obmHelper.getConnection();
+				PreparedStatement ps = con.prepareStatement("UPDATE UserObm SET userobm_archive = 1 WHERE userobm_ext_id = ? AND userobm_domain_id = ?")) {
 
 			String extId = user.getExtId().getExtId();
 			ps.setString(1, extId);
@@ -944,9 +870,6 @@ public class UserDaoJdbcImpl implements UserDao {
 			if (updateCount != 1) {
 				throw new UserNotFoundException(String.format("No user found with extid %s.", extId));
 			}
-		}
-		finally {
-			JDBCUtils.cleanup(connection, ps, null);
 		}
 	}
 
@@ -954,14 +877,8 @@ public class UserDaoJdbcImpl implements UserDao {
 	public ImmutableSet<String> getAllEmailsFrom(ObmDomain domain, UserExtId toIgnore) throws SQLException {
 		Preconditions.checkArgument(toIgnore != null);
 		
-		Connection connection = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			connection = obmHelper.getConnection();
-			
-			ps = connection.prepareStatement(
+		try (Connection con = obmHelper.getConnection();
+				PreparedStatement ps = con.prepareStatement(
 				"SELECT userobm_email as mail FROM UserObm " +
 				"INNER JOIN Domain ON Domain.domain_id = userobm_domain_id " +
 				"WHERE domain_id = ? " +
@@ -973,14 +890,14 @@ public class UserDaoJdbcImpl implements UserDao {
 				"UNION " +
 				"SELECT group_email as mail FROM UGroup " + 
 				"INNER JOIN Domain ON Domain.domain_id = group_domain_id " +
-				"WHERE domain_id = ?");
+				"WHERE domain_id = ?")) {
 
 			ps.setInt(1, domain.getId());
 			ps.setString(2, toIgnore.getExtId());
 			ps.setInt(3, domain.getId());
 			ps.setInt(4, domain.getId());
 			
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			ImmutableSet.Builder<String> builder = ImmutableSet.builder();
 			
 			while (rs.next()) {
@@ -988,8 +905,6 @@ public class UserDaoJdbcImpl implements UserDao {
 			}
 			
 			return builder.build();
-		} finally {
-			JDBCUtils.cleanup(connection, ps, rs);
 		}
 	}
 }
