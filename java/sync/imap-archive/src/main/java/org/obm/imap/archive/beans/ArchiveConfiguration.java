@@ -62,7 +62,7 @@ public class ArchiveConfiguration {
 		this.recurrent = recurrent;
 	}
 	
-	public ObmDomainUuid getDomain() {
+	public ObmDomainUuid getDomainId() {
 		return domain;
 	}
 

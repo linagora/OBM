@@ -98,10 +98,10 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 		}
 		
 		logger.info("Insert a task as {} for domain {}, scheduled at {} with id {}", 
-				ArchiveStatus.SCHEDULED, archiveConfiguration.getDomain().get(), archiveConfiguration.getWhen(), archiveConfiguration.getRunId());
+				ArchiveStatus.SCHEDULED, archiveConfiguration.getDomainId().get(), archiveConfiguration.getWhen(), archiveConfiguration.getRunId());
 		
 		archiveTreatmentDao.insert(ArchiveScheduledTreatment
-				.forDomain(archiveConfiguration.getDomain())
+				.forDomain(archiveConfiguration.getDomainId())
 				.runId(archiveConfiguration.getRunId())
 				.recurrent(archiveConfiguration.isRecurrent())
 				.higherBoundary(archiveConfiguration.getHigherBoundary())
@@ -111,7 +111,7 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 
 	private void update(ArchiveTreatment from, ArchiveConfiguration archiveConfiguration, State state) throws DaoException, ElementNotFoundException {
 		ArchiveTreatment.Builder<ArchiveTreatment> treatmentBuilder = ArchiveTreatment
-			.builder(archiveConfiguration.getDomain())
+			.builder(archiveConfiguration.getDomainId())
 			.runId(archiveConfiguration.getRunId())
 			.recurrent(archiveConfiguration.isRecurrent())
 			.higherBoundary(archiveConfiguration.getHigherBoundary())
@@ -144,7 +144,7 @@ public class ArchiveDaoTracking implements ArchiveSchedulerBus.Client {
 		}
 		
 		logger.info("Update a task as {} for domain {}, scheduled at {} with id {}", 
-				state, archiveConfiguration.getDomain().get(),  archiveConfiguration.getWhen(), archiveConfiguration.getRunId());
+				state, archiveConfiguration.getDomainId().get(),  archiveConfiguration.getWhen(), archiveConfiguration.getRunId());
 		
 		archiveTreatmentDao.update(treatmentBuilder.build());
 	}

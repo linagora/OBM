@@ -74,7 +74,7 @@ public class ArchiveRecurrentTaskRescheduler implements ArchiveSchedulerBus.Clie
 
 	private void reschedule(ArchiveDomainTask task) {
 		try {
-			ObmDomainUuid domain = task.getArchiveConfiguration().getDomain();
+			ObmDomainUuid domain = task.getArchiveConfiguration().getDomainId();
 			logger.info("A recurrent task for domain {} will be re-scheduled", domain.get());
 			schedulingService.scheduleAsRecurrent(domain);
 		} catch (DaoException e) {

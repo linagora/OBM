@@ -290,8 +290,6 @@ public class UserDaoTest {
 			expect(rs.next()).andReturn(false);
 		}
 		
-		rs.close();
-		expectLastCall();
 		st.close();
 		expectLastCall();
 	}

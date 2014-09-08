@@ -92,7 +92,7 @@ public class ArchiveDaoTrackingTest {
 		logger = mocks.createMock(Logger.class);
 		dao = mocks.createMock(ArchiveTreatmentDao.class);
 		timeProvider = mocks.createMock(DateTimeProvider.class);
-		expect(archiveConfiguration.getDomain()).andReturn(domain).anyTimes();
+		expect(archiveConfiguration.getDomainId()).andReturn(domain).anyTimes();
 		expect(archiveConfiguration.getHigherBoundary()).andReturn(higherBoundary).anyTimes();
 		expect(archiveConfiguration.getWhen()).andReturn(scheduledTime).anyTimes();
 		expect(archiveConfiguration.getRunId()).andReturn(runId).anyTimes();

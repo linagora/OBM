@@ -56,7 +56,7 @@ public class ArchiveDomainTask implements Task {
 
 	@Override
 	public String taskName() {
-		return getArchiveConfiguration().getDomain().get();
+		return getArchiveConfiguration().getDomainId().get();
 	}
 	
 	public ArchiveConfiguration getArchiveConfiguration() {

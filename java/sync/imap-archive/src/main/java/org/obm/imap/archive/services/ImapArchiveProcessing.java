@@ -113,9 +113,9 @@ public class ImapArchiveProcessing {
 	public void archive(ArchiveConfiguration configuration) {
 		Logger logger = configuration.getLogger();
 		try {
-			Optional<ObmDomain> optionalDomain = domainClient.getById(configuration.getDomain());
+			Optional<ObmDomain> optionalDomain = domainClient.getById(configuration.getDomainId());
 			if (!optionalDomain.isPresent()) {
-				throw new DomainNotFoundException(configuration.getDomain());
+				throw new DomainNotFoundException(configuration.getDomainId());
 			}
 			
 			ObmDomain domain = optionalDomain.get();
@@ -439,7 +439,10 @@ public class ImapArchiveProcessing {
 		private final Optional<ArchiveTreatment> previousArchiveTreatment;
 		private final boolean continuePrevious;
 		
-		private ProcessedTask(Logger logger, ArchiveTreatmentRunId runId, ObmDomain domain, Boundaries boundaries, DomainConfiguration domainConfiguration, Optional<ArchiveTreatment> previousArchiveTreatment, boolean continuePrevious) {
+		private ProcessedTask(Logger logger, ArchiveTreatmentRunId runId, ObmDomain domain, 
+				Boundaries boundaries, DomainConfiguration domainConfiguration, 
+				Optional<ArchiveTreatment> previousArchiveTreatment, boolean continuePrevious) {
+			
 			this.logger = logger;
 			this.runId = runId;
 			this.domain = domain;

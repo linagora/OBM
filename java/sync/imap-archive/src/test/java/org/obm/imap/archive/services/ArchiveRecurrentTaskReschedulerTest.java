@@ -131,7 +131,7 @@ public class ArchiveRecurrentTaskReschedulerTest {
 	@Test
 	public void onChangeShouldRescheduleWhenFailedAndRecurrent() throws Exception {
 		expect(archiveConfiguration.isRecurrent()).andReturn(true);
-		expect(archiveConfiguration.getDomain()).andReturn(domain);
+		expect(archiveConfiguration.getDomainId()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andReturn(runId);
 		
 		mocks.replay();
@@ -142,7 +142,7 @@ public class ArchiveRecurrentTaskReschedulerTest {
 	@Test
 	public void onChangeShouldRescheduleWhenTerminatedAndRecurrent() throws Exception {
 		expect(archiveConfiguration.isRecurrent()).andReturn(true);
-		expect(archiveConfiguration.getDomain()).andReturn(domain);
+		expect(archiveConfiguration.getDomainId()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andReturn(runId);
 		
 		mocks.replay();
@@ -153,7 +153,7 @@ public class ArchiveRecurrentTaskReschedulerTest {
 	@Test
 	public void onChangeShouldNotPropagateExceptionWhenDaoException() throws Exception {
 		expect(archiveConfiguration.isRecurrent()).andReturn(true);
-		expect(archiveConfiguration.getDomain()).andReturn(domain);
+		expect(archiveConfiguration.getDomainId()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andThrow(new DaoException("error"));
 		
 		mocks.replay();

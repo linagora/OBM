@@ -96,8 +96,8 @@ public class ArchiveSchedulerQueueTest {
 		expect(task2.getArchiveConfiguration()).andReturn(configuration2);
 		TestScheduledTask scheduled1 = new TestScheduledTask(State.WAITING, task1, scheduler, DateTime.parse("2024-11-1T05:04Z"));
 		TestScheduledTask scheduled2 = new TestScheduledTask(State.WAITING, task2, scheduler, DateTime.parse("2024-11-1T15:04Z"));
-		expect(configuration1.getDomain()).andReturn(domain);
-		expect(configuration2.getDomain()).andReturn(domain);
+		expect(configuration1.getDomainId()).andReturn(domain);
+		expect(configuration2.getDomainId()).andReturn(domain);
 		
 		mocks.replay();
 		testee.put(scheduled1);
@@ -119,8 +119,8 @@ public class ArchiveSchedulerQueueTest {
 		expect(task2.getArchiveConfiguration()).andReturn(configuration2);
 		TestScheduledTask scheduled1 = new TestScheduledTask(State.WAITING, task1, scheduler, DateTime.parse("2024-11-1T05:04Z"));
 		TestScheduledTask scheduled2 = new TestScheduledTask(State.WAITING, task2, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(configuration1.getDomain()).andReturn(domain);
-		expect(configuration2.getDomain()).andReturn(domain2);
+		expect(configuration1.getDomainId()).andReturn(domain);
+		expect(configuration2.getDomainId()).andReturn(domain2);
 		
 		mocks.replay();
 		testee.put(scheduled1);
@@ -137,7 +137,7 @@ public class ArchiveSchedulerQueueTest {
 		ArchiveConfiguration configuration = mocks.createMock(ArchiveConfiguration.class);
 		expect(task.getArchiveConfiguration()).andReturn(configuration);
 		TestScheduledTask scheduled = new TestScheduledTask(State.WAITING, task, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(configuration.getDomain()).andReturn(domain);
+		expect(configuration.getDomainId()).andReturn(domain);
 		
 		mocks.replay();
 		testee.remove(scheduled);
@@ -157,8 +157,8 @@ public class ArchiveSchedulerQueueTest {
 		expect(task2.getArchiveConfiguration()).andReturn(configuration2).anyTimes();
 		TestScheduledTask scheduled1 = new TestScheduledTask(State.WAITING, task1, scheduler, DateTime.parse("2024-11-1T06:04Z"));
 		TestScheduledTask scheduled2 = new TestScheduledTask(State.WAITING, task2, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(configuration1.getDomain()).andReturn(domain).times(2);
-		expect(configuration2.getDomain()).andReturn(domain);
+		expect(configuration1.getDomainId()).andReturn(domain).times(2);
+		expect(configuration2.getDomainId()).andReturn(domain);
 		
 		mocks.replay();
 		testee.put(scheduled1);
@@ -184,7 +184,7 @@ public class ArchiveSchedulerQueueTest {
 		ArchiveConfiguration configuration = mocks.createMock(ArchiveConfiguration.class);
 		expect(task.getArchiveConfiguration()).andReturn(configuration);
 		TestScheduledTask scheduled = new TestScheduledTask(State.WAITING, task, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(configuration.getDomain()).andReturn(domain);
+		expect(configuration.getDomainId()).andReturn(domain);
 		
 		mocks.replay();
 		testee.put(scheduled);
@@ -202,7 +202,7 @@ public class ArchiveSchedulerQueueTest {
 		ArchiveConfiguration configuration = mocks.createMock(ArchiveConfiguration.class);
 		expect(task.getArchiveConfiguration()).andReturn(configuration).anyTimes();
 		TestScheduledTask scheduled = new TestScheduledTask(State.WAITING, task, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(configuration.getDomain()).andReturn(domain).times(2);
+		expect(configuration.getDomainId()).andReturn(domain).times(2);
 		
 		monitor.scheduled(scheduled);
 		
@@ -225,8 +225,8 @@ public class ArchiveSchedulerQueueTest {
 		expect(task2.getArchiveConfiguration()).andReturn(configuration2);
 		TestScheduledTask scheduled = new TestScheduledTask(State.WAITING, task1, scheduler, DateTime.parse("2024-11-1T06:04Z"));
 		TestScheduledTask running = new TestScheduledTask(State.RUNNING, task2, scheduler, DateTime.parse("2024-11-1T01:04Z"));
-		expect(configuration1.getDomain()).andReturn(domain);
-		expect(configuration2.getDomain()).andReturn(domain);
+		expect(configuration1.getDomainId()).andReturn(domain);
+		expect(configuration2.getDomainId()).andReturn(domain);
 
 		monitor.scheduled(running);
 		
@@ -255,9 +255,9 @@ public class ArchiveSchedulerQueueTest {
 		TestScheduledTask scheduled1 = new TestScheduledTask(State.WAITING, task1, scheduler, DateTime.parse("2024-11-1T01:04Z"));
 		TestScheduledTask scheduled2 = new TestScheduledTask(State.WAITING, task2, scheduler, DateTime.parse("2024-11-1T03:04Z"));
 		TestScheduledTask scheduledTheLater = new TestScheduledTask(State.WAITING, task3, scheduler, DateTime.parse("2024-11-1T06:04Z"));
-		expect(configuration1.getDomain()).andReturn(domain);
-		expect(configuration2.getDomain()).andReturn(domain2);
-		expect(configuration3.getDomain()).andReturn(domain);
+		expect(configuration1.getDomainId()).andReturn(domain);
+		expect(configuration2.getDomainId()).andReturn(domain2);
+		expect(configuration3.getDomainId()).andReturn(domain);
 		
 		mocks.replay();
 		testee.put(scheduled1);

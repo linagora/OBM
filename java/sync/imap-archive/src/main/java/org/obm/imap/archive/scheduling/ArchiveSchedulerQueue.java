@@ -69,14 +69,14 @@ public class ArchiveSchedulerQueue implements TaskQueue<ArchiveDomainTask> {
 	@Override
 	public void put(ScheduledTask<ArchiveDomainTask> scheduled) {
 		domainTasks
-			.get(scheduled.task().getArchiveConfiguration().getDomain())
+			.get(scheduled.task().getArchiveConfiguration().getDomainId())
 			.offer(scheduled);
 	}
 
 	@Override
 	public boolean remove(ScheduledTask<ArchiveDomainTask> scheduled) {
 		return domainTasks
-			.get(scheduled.task().getArchiveConfiguration().getDomain())
+			.get(scheduled.task().getArchiveConfiguration().getDomainId())
 			.remove(scheduled);
 	}
 
@@ -111,7 +111,7 @@ public class ArchiveSchedulerQueue implements TaskQueue<ArchiveDomainTask> {
 
 			@Override
 			public boolean apply(ScheduledTask<ArchiveDomainTask> input) {
-				return input.task().getArchiveConfiguration().getDomain().equals(domain)
+				return input.task().getArchiveConfiguration().getDomainId().equals(domain)
 					&& input.state() == State.RUNNING;
 			}
 		};
