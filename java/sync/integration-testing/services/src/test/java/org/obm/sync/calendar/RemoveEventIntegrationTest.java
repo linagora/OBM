@@ -31,22 +31,12 @@ package org.obm.sync.calendar;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
+import static org.obm.sync.IntegrationTestICSUtils.assertIcsCancelFormat;
+import static org.obm.sync.IntegrationTestICSUtils.assertIcsReplyFormat;
 import static org.obm.sync.IntegrationTestUtils.newEvent;
 
 import java.net.URL;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.TextMessage;
-
-import net.fortuna.ical4j.model.property.Method;
-
-import org.assertj.core.api.StringAssert;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -59,6 +49,7 @@ import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
 import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
 import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
+import org.obm.sync.IntegrationTestICSUtils.StoreMessageReceivedListener;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
 import org.obm.sync.ServicesClientModule.ArquillianLocatorService;
@@ -70,7 +61,6 @@ import org.obm.sync.calendar.ServicesClientWithJMSModule.MessageConsumerResource
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.client.login.LoginClient;
 
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
@@ -114,13 +104,13 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 		
 		assertThatGetEventByExtIdTriggersEventNotFound(calendarClient, token, userCalendar, event);
 		storeMessageReceivedListener.waitForMessageCount(2, TIMEOUT);
-		assertIcsCancelFormat(storeMessageReceivedListener.messages.get(1))
+		assertIcsCancelFormat(storeMessageReceivedListener.messages().get(1))
 			.contains(
 				"UID:testRemoveEventByIdWhenOwnerInInternal\r\n")
 			.contains(
 				"ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=DECLINED;RSVP=TRUE;CN=Firstname Lastna\r\n" +
 				" me;ROLE=OPT-PARTICIPANT:mailto:user1@domain.org\r\n" +
-				"DTSTART:20130601T100000Z\r\n" +
+				"DTSTART:20130601T120000Z\r\n" +
 				"DURATION:PT0S\r\n" +
 				"TRANSP:OPAQUE\r\n" +
 				"ORGANIZER;CN=Firstname Lastname:mailto:user1@domain.org\r\n" +
@@ -153,14 +143,14 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 		assertThat(eventFromServer.findAttendeeFromEmail(organizerCalendar).getParticipation()).isEqualTo(Participation.accepted());
 		assertThat(eventFromServer.findAttendeeFromEmail(userCalendar).getParticipation()).isEqualTo(Participation.declined());
 		storeMessageReceivedListener.waitForMessageCount(2, TIMEOUT);
-		assertIcsReplyFormat(storeMessageReceivedListener.messages.get(1))
+		assertIcsReplyFormat(storeMessageReceivedListener.messages().get(1))
 			.contains(
 				"UID:testRemoveEventByIdWhenAttendeeInInternal\r\n")
 			.contains(
 				"ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=DECLINED;RSVP=TRUE;CN=Firstname Lastna\r\n" +
 				" me;ROLE=REQ-PARTICIPANT:mailto:user1@domain.org\r\n" +
 				"COMMENT:\r\n" +
-				"DTSTART:20130601T100000Z\r\n" +
+				"DTSTART:20130601T120000Z\r\n" +
 				"DURATION:PT0S\r\n" +
 				"TRANSP:OPAQUE\r\n" +
 				"ORGANIZER;CN=Firstname Lastname:mailto:user2@domain.org\r\n" +
@@ -199,14 +189,14 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 		assertThat(eventFromServer.findAttendeeFromEmail(organizerCalendar).getParticipation()).isEqualTo(Participation.accepted());
 		assertThat(eventFromServer.findAttendeeFromEmail(userCalendar).getParticipation()).isEqualTo(Participation.declined());
 		storeMessageReceivedListener.waitForMessageCount(2, TIMEOUT);
-		assertIcsReplyFormat(storeMessageReceivedListener.messages.get(1))
+		assertIcsReplyFormat(storeMessageReceivedListener.messages().get(1))
 			.contains(
 				"UID:testRemoveEventByIdWhenAttendeeInExternal\r\n")
 			.contains(
 				"ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=DECLINED;RSVP=TRUE;CN=Firstname Lastna\r\n" +
 				" me;ROLE=REQ-PARTICIPANT:mailto:user1@domain.org\r\n" +
 				"COMMENT:\r\n" +
-				"DTSTART:20130601T100000Z\r\n" +
+				"DTSTART:20130601T120000Z\r\n" +
 				"DURATION:PT0S\r\n" +
 				"TRANSP:OPAQUE\r\n" +
 				"ORGANIZER;CN=organizer@external.org:mailto:organizer@external.org\r\n" +
@@ -228,13 +218,13 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 		
 		assertThatGetEventByExtIdTriggersEventNotFound(calendarClient, token, userCalendar, event);
 		storeMessageReceivedListener.waitForMessageCount(2, TIMEOUT);
-		assertIcsCancelFormat(storeMessageReceivedListener.messages.get(1))
+		assertIcsCancelFormat(storeMessageReceivedListener.messages().get(1))
 			.contains(
 				"UID:testRemoveEventByExtIdWhenOwnerInInternal\r\n")
 			.contains(
 				"ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=DECLINED;RSVP=TRUE;CN=Firstname Lastna\r\n" +
 				" me;ROLE=OPT-PARTICIPANT:mailto:user1@domain.org\r\n" +
-				"DTSTART:20130601T100000Z\r\n" +
+				"DTSTART:20130601T120000Z\r\n" +
 				"DURATION:PT0S\r\n" +
 				"TRANSP:OPAQUE\r\n" +
 				"ORGANIZER;CN=Firstname Lastname:mailto:user1@domain.org\r\n" +
@@ -267,14 +257,14 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 		assertThat(eventFromServer.findAttendeeFromEmail(organizerCalendar).getParticipation()).isEqualTo(Participation.accepted());
 		assertThat(eventFromServer.findAttendeeFromEmail(userCalendar).getParticipation()).isEqualTo(Participation.declined());
 		storeMessageReceivedListener.waitForMessageCount(2, TIMEOUT);
-		assertIcsReplyFormat(storeMessageReceivedListener.messages.get(1))
+		assertIcsReplyFormat(storeMessageReceivedListener.messages().get(1))
 			.contains(
 				"UID:testRemoveEventByExtIdWhenAttendeeInInternal\r\n")
 			.contains(
 				"ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=DECLINED;RSVP=TRUE;CN=Firstname Lastna\r\n" +
 				" me;ROLE=REQ-PARTICIPANT:mailto:user1@domain.org\r\n" +
 				"COMMENT:\r\n" +
-				"DTSTART:20130601T100000Z\r\n" +
+				"DTSTART:20130601T120000Z\r\n" +
 				"DURATION:PT0S\r\n" +
 				"TRANSP:OPAQUE\r\n" +
 				"ORGANIZER;CN=Firstname Lastname:mailto:user2@domain.org\r\n" +
@@ -313,44 +303,20 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 		assertThat(eventFromServer.findAttendeeFromEmail(organizerCalendar).getParticipation()).isEqualTo(Participation.accepted());
 		assertThat(eventFromServer.findAttendeeFromEmail(userCalendar).getParticipation()).isEqualTo(Participation.declined());
 		storeMessageReceivedListener.waitForMessageCount(2, TIMEOUT);
-		assertIcsReplyFormat(storeMessageReceivedListener.messages.get(1))
+		assertIcsReplyFormat(storeMessageReceivedListener.messages().get(1))
 			.contains(
 				"UID:testRemoveEventByExtIdWhenAttendeeInExternal\r\n")
 			.contains(
 				"ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=DECLINED;RSVP=TRUE;CN=Firstname Lastna\r\n" +
 				" me;ROLE=REQ-PARTICIPANT:mailto:user1@domain.org\r\n" +
 				"COMMENT:\r\n" +
-				"DTSTART:20130601T100000Z\r\n" +
+				"DTSTART:20130601T120000Z\r\n" +
 				"DURATION:PT0S\r\n" +
 				"TRANSP:OPAQUE\r\n" +
 				"ORGANIZER;CN=organizer@external.org:mailto:organizer@external.org\r\n" +
 				"PRIORITY:5\r\n" +
 				"CLASS:PUBLIC\r\n" +
 				"SUMMARY:Title_testRemoveEventByExtIdWhenAttendeeInExternal\r\n");
-	}
-
-	private StringAssert assertIcsReplyFormat(Message message) throws JMSException {
-		return assertIcsMethodFormat(message, Method.REPLY);
-	}
-	private StringAssert assertIcsCancelFormat(Message message) throws JMSException {
-		return assertIcsMethodFormat(message, Method.CANCEL);
-	}
-
-	private StringAssert assertIcsMethodFormat(Message message, Method method) throws JMSException {
-		return assertThat(((TextMessage)message).getText())
-			.startsWith(
-				"BEGIN:VCALENDAR\r\n" +
-				"PRODID:-//Aliasource Groupe LINAGORA//OBM Calendar //FR\r\n" +
-				"VERSION:2.0\r\n" +
-				"CALSCALE:GREGORIAN\r\n" +
-				"METHOD:" + method.getValue() + "\r\n" +
-				"BEGIN:VEVENT\r\n")
-			.endsWith(
-				"X-OBM-ORIGIN:integration-testing\r\n" +
-				"X-OBM-DOMAIN:domain.org\r\n" +
-				"X-OBM-DOMAIN-UUID:b55911e6-6848-4f16-abd4-52d94b6901a6\r\n" +
-				"END:VEVENT\r\n" +
-				"END:VCALENDAR\r\n");
 	}
 
 	private void assertThatGetEventByExtIdTriggersEventNotFound(CalendarClient calendarClient,
@@ -360,35 +326,6 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 			failBecauseExceptionWasNotThrown(EventNotFoundException.class);
 		} catch (Exception e) {
 			assertThat(e).isInstanceOf(EventNotFoundException.class);
-		}
-	}
-	
-	public static class StoreMessageReceivedListener implements MessageListener {
-
-		private final List<Message> messages;
-		private CountDownLatch countDownLatch;
-		
-		public StoreMessageReceivedListener() {
-			messages = Lists.newArrayList();
-			countDownLatch = new CountDownLatch(0);
-		}
-		
-		@Override
-		public void onMessage(Message message) {
-			messages.add(message);
-			countDownLatch.countDown();
-		}
-		
-		public void waitForMessageCount(int messageCount, int timeoutInMs) throws InterruptedException, TimeoutException {
-			if (messages.size() < messageCount) {
-				int missingMessageCount = messageCount - messages.size();
-				countDownLatch = new CountDownLatch(missingMessageCount);
-				if (!countDownLatch.await(timeoutInMs, TimeUnit.MILLISECONDS)) {
-					throw new TimeoutException(String.format(
-							"Not enough message received, timeout:%s expected:%d received:%d", 
-							timeoutInMs, messageCount, messages.size()));
-				}
-			}
 		}
 	}
 	
