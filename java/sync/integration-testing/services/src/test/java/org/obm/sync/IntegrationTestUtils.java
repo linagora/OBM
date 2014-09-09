@@ -135,7 +135,7 @@ public class IntegrationTestUtils {
 		event.setInternalEvent(true);
 		event.setOwnerEmail(calendar);
 		event.setExtId(new EventExtId(extId));
-		event.setStartDate(date("2013-06-01T12:00:00"));
+		event.setStartDate(date("2013-06-01T12:00:00Z"));
 		event.addAttendee(UnidentifiedAttendee.builder().email(calendar).participation(Participation.accepted()).asOrganizer().build());
 
 		return event;

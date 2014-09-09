@@ -520,6 +520,7 @@ public abstract class AbstractEventSyncClient extends AbstractClientImpl impleme
 		params.put("calendar", calendar);
 		params.put("extId", extId.serializeToString());
 		if (recurrenceId != null) {
+			params.put("recursive", String.valueOf(false));
 			params.put("recurrenceId", recurrenceId.serializeToString());
 		}
 		params.put("state", participation.toString());
