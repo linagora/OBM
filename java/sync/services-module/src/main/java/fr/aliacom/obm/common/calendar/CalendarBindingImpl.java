@@ -266,7 +266,7 @@ public class CalendarBindingImpl implements ICalendar {
 			ObmUser owner = userService.getUserFromLogin(ev.getOwner(), token.getDomain().getName());
 			if (owner != null) {
 				if (ev.isInternalEvent() && owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
-					cancelEventById(token, calendar, notification, ev);
+					cancelInternalEventById(token, calendar, notification, ev);
 				} else {
 					changeParticipationInternal(
 							token, calendar, ev.getExtId(), Participation.declined(), sequence, notification);
@@ -286,11 +286,10 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private Event cancelEventById(AccessToken token, String calendar,
-			boolean notification, Event toRemoveEvent) throws SQLException,
-			FindException, EventNotFoundException, ServerFault {
+	private Event cancelInternalEventById(AccessToken token, String calendar, boolean notification, Event toRemoveEvent)
+			throws SQLException, EventNotFoundException, ServerFault {
 		
-		return cancelEvent(token, calendar, notification, toRemoveEvent, new RemoveEventFunction() {
+		return cancelInternalEvent(token, calendar, notification, toRemoveEvent, new RemoveEventFunction() {
 			
 			@Override
 			public Event remove(AccessToken token, Event event) throws SQLException, EventNotFoundException, ServerFault {
@@ -299,10 +298,10 @@ public class CalendarBindingImpl implements ICalendar {
 		});
 	}
 
-	private Event cancelEventByExtId(AccessToken token, final ObmUser obmUser, Event event, boolean notification)
-			throws FindException, SQLException, EventNotFoundException, ServerFault {
+	private Event cancelInternalEventByExtId(AccessToken token, final ObmUser obmUser, Event event, boolean notification)
+			throws SQLException, EventNotFoundException, ServerFault {
 		
-		return cancelEvent(token, obmUser.getEmailAtDomain(), notification, event, new RemoveEventFunction() {
+		return cancelInternalEvent(token, obmUser.getEmailAtDomain(), notification, event, new RemoveEventFunction() {
 
 			@Override
 			public Event remove(AccessToken token, Event event) throws SQLException, EventNotFoundException, ServerFault {
@@ -311,15 +310,15 @@ public class CalendarBindingImpl implements ICalendar {
 		});
 	}
 
-	private Event cancelEvent(AccessToken token, String calendar, boolean notification, Event toRemoveEvent,
+	private Event cancelInternalEvent(AccessToken token, String calendar, boolean notification, Event toRemoveEvent,
 			RemoveEventFunction removeEventFunction)
-			throws FindException, SQLException, EventNotFoundException, ServerFault {
+			throws SQLException, EventNotFoundException, ServerFault {
 		
 		Event removedEvent = removeEventFunction.remove(token, toRemoveEvent);
 		logger.info(LogUtils.prefix(token) + String.format("Calendar : event[uid:%s, extId:%s] removed",
 				toRemoveEvent.getUid().serializeToString(), toRemoveEvent.getExtId().getExtId()));
 		changeCalendarOwnerParticipation(calendar, removedEvent, Participation.declined());
-		notifyOnRemoveEvent(token, calendar, removedEvent, notification);
+		notifyOnRemoveInternalEvent(token, removedEvent, notification);
 		return removedEvent;
 	}
 	
@@ -327,12 +326,8 @@ public class CalendarBindingImpl implements ICalendar {
 		Event remove(AccessToken token, Event event) throws SQLException, EventNotFoundException, ServerFault;
 	}
 
-	private void notifyOnRemoveEvent(AccessToken token, String calendar, Event event, boolean notification) throws FindException {
-		if (event.isInternalEvent()) {
-			eventChangeHandler.delete(event, notification, token);
-		} else {
-			notifyOrganizerForExternalEvent(token, calendar, event, Participation.declined(), notification);
-		}
+	private void notifyOnRemoveInternalEvent(AccessToken token, Event event, boolean notification) {
+		eventChangeHandler.delete(event, notification, token);
 	}
 
 	private void changeCalendarOwnerParticipation(String ownerEmail, Event event, Participation participation) {
@@ -363,7 +358,7 @@ public class CalendarBindingImpl implements ICalendar {
 			}
 			
 			if (ev.isInternalEvent() && owner.getEmailAtDomain().equals(calendarUser.getEmailAtDomain())) {
-				return cancelEventByExtId(token, calendarUser, ev, notification);
+				return cancelInternalEventByExtId(token, calendarUser, ev, notification);
 			} else {
 				changeParticipationInternal(token, calendar, ev.getExtId(), Participation.declined(), sequence, notification);
 				return calendarDao.findEventByExtId(token, calendarUser, extId);
