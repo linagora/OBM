@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.obm.push.RecurrenceDayOfWeekConverter;
 import org.obm.push.bean.AttendeeStatus;
 import org.obm.push.bean.AttendeeType;
@@ -186,11 +184,10 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 	private void fillEventException(User user, Event eventFromDB, MSEvent msEvent, boolean isObmInternalEvent, 
 			Event convertedEvent, EventRecurrence eventRecurrence) throws ConversionException {
 		
-		DateTimeZone timeZone = DateTimeZone.forID(convertedEvent.getTimezoneName());
 		for (MSEventException msEventException : msEvent.getExceptions()) {
-			assertExceptionValidity(eventRecurrence, msEventException, msEvent.getTimeZone());
+			assertExceptionValidity(eventRecurrence, msEventException);
 			if (msEventException.isDeleted()) {
-				addDeletedExceptionToRecurrence(eventRecurrence, msEventException, timeZone);
+				addDeletedExceptionToRecurrence(eventRecurrence, msEventException);
 			} else {
 				Event eventException = convertEventException(user, eventFromDB, convertedEvent, msEventException, isObmInternalEvent);
 				addEventExceptionToRecurrence(eventRecurrence, eventException);
@@ -198,27 +195,15 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		}
 	}
 
-	@VisibleForTesting void addDeletedExceptionToRecurrence(EventRecurrence eventRecurrence, MSEventException msEventException,
-			DateTimeZone timeZone) {
+	@VisibleForTesting void addDeletedExceptionToRecurrence(EventRecurrence eventRecurrence, MSEventException msEventException) {
 		
-		Date exceptionStartTime = msEventExceptionStartTimeToObmExceptionDate(msEventException, timeZone);
+		Date exceptionStartTime = msEventException.getExceptionStartTime();
 		
 		if (eventRecurrence.hasDeletedExceptionAtDate(exceptionStartTime)) {
 			logger.warn("The converter discards a duplicate deleted exception");
 		} else {
 			eventRecurrence.addException(exceptionStartTime);
 		}
-	}
-
-	private Date msEventExceptionStartTimeToObmExceptionDate(
-			MSEventException msEventException, DateTimeZone timeZone) {
-		Date exceptionStartTime = new DateTime(msEventException.getExceptionStartTime(), DateTimeZone.UTC)
-			.withZone(timeZone)
-			.toDateMidnight()
-			.toDateTime()
-			.withZone(DateTimeZone.UTC)
-			.toDate();
-		return exceptionStartTime;
 	}
 	
 	private void addEventExceptionToRecurrence(EventRecurrence eventRecurrence, Event eventException) throws ConversionException {
@@ -776,16 +761,16 @@ public class MSEventToObmEventConverterImpl implements MSEventToObmEventConverte
 		return Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 	}
 
-	private void assertExceptionValidity(EventRecurrence recurrence, MSEventException exception, TimeZone timeZone)
+	private void assertExceptionValidity(EventRecurrence recurrence, MSEventException exception)
 			throws ConversionException {
-		assertExceptionDoesntExistInRecurrence(recurrence, exception, timeZone);
+		assertExceptionDoesntExistInRecurrence(recurrence, exception);
 		assertExceptionStartTime(exception);
 	}
 
-	private void assertExceptionDoesntExistInRecurrence(EventRecurrence recurrence, MSEventException exception, TimeZone timeZone)
+	private void assertExceptionDoesntExistInRecurrence(EventRecurrence recurrence, MSEventException exception)
 			throws ConversionException {
 		if (!exception.isDeleted()) {
-			Date obmExceptionDate = msEventExceptionStartTimeToObmExceptionDate(exception, DateTimeZone.forTimeZone(timeZone));
+			Date obmExceptionDate = exception.getExceptionStartTime();
 			if (recurrence.hasDeletedExceptionAtDate(obmExceptionDate)) {
 					throw new ConversionException("Trying to add a moved exception where a deleted exception already exists");
 			}

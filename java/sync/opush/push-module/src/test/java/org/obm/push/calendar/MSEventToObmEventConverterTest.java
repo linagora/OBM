@@ -1421,7 +1421,7 @@ public class MSEventToObmEventConverterTest {
 		Iterable<Date> exceptions = convertedEvent.getRecurrence().getExceptions();
 		Set<Event> eventExceptions = convertedEvent.getRecurrence().getEventExceptions();
 		assertThat(exceptions).hasSize(1);
-		assertThat(exceptions).containsOnly(date("2004-10-11T00:00:00Z"));
+		assertThat(exceptions).containsOnly(date("2004-10-11T11:15:10Z"));
 		assertThat(eventExceptions).isEmpty();
 	}
 
