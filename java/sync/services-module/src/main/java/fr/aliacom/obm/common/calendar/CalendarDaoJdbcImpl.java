@@ -1806,6 +1806,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 			ps = createEventUpdateStatement(con, editor, ev, sequence);
 			ps.executeUpdate();
+			if (ps.getUpdateCount() <= 0) {
+				throw new EventNotFoundException("Unexpected Event modification failure : " + ev.getObmId());
+			}
 			ps.close();
 			ps = null;
 			if (updateAttendees) {
@@ -2680,7 +2683,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			dev = con.prepareStatement("DELETE FROM Event WHERE event_id=?");
 			dev.setInt(1, databaseId.getObmId());
 			dev.executeUpdate();
-
+			if (dev.getUpdateCount() <= 0) {
+				throw new EventNotFoundException("Unexpected Event deletion failure : " + databaseId.getObmId());
+			}
 		} catch (Throwable se) {
 			logger.error(se.getMessage(), se);
 		} finally {
