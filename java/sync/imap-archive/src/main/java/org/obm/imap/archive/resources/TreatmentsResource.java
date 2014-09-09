@@ -87,7 +87,7 @@ public class TreatmentsResource {
 	@POST
 	@Path("next")
 	public Response calculateNextScheduledDate(DomainConfigurationDto domainConfigurationDto) {
-		DomainConfiguration domainConfiguration = DomainConfiguration.from(domainConfigurationDto);
+		DomainConfiguration domainConfiguration = DomainConfiguration.from(domainConfigurationDto, domain);
 		if (!domainConfiguration.isEnabled()) {
 			return Response.noContent().build();
 		}
@@ -102,7 +102,7 @@ public class TreatmentsResource {
 	public Response startArchiving(@QueryParam("archive_treatment_kind") ArchiveTreatmentKind archiveTreatmentKind) {
 		try {
 			ArchiveTreatmentKind actualTreatmentKind = Objects.firstNonNull(archiveTreatmentKind, ArchiveTreatmentKind.REAL_RUN);
-			ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain.getUuid(), dateTimeProvider.now(), actualTreatmentKind);
+			ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain, dateTimeProvider.now(), actualTreatmentKind);
 			return Response.seeOther(buildUri(runId)).build();
 		} catch (DaoException e) {
 			logger.error("Cannot schedule an archiving", e);

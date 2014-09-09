@@ -50,8 +50,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
-
 @Singleton
 public class DomainConfigurationService {
 
@@ -73,8 +71,8 @@ public class DomainConfigurationService {
 	}
 	
 	@Transactional
-	public PersistedResult updateOrCreate(DomainConfiguration domainConfiguration, ObmDomainUuid domain) throws DaoException, DomainNotFoundException {
-		if (domainConfigurationDao.get(domain) == null) {
+	public PersistedResult updateOrCreate(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException {
+		if (domainConfigurationDao.get(domainConfiguration.getDomain()) == null) {
 			return create(domainConfiguration);
 		} else {
 			return update(domainConfiguration);

@@ -44,13 +44,17 @@ import java.util.concurrent.TimeoutException;
 
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
+import org.joda.time.LocalTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.obm.imap.archive.beans.ArchiveConfiguration;
+import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Client;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events;
@@ -71,6 +75,7 @@ import com.linagora.scheduling.Monitor;
 import com.linagora.scheduling.ScheduledTask;
 import com.linagora.scheduling.ScheduledTask.State;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ArchiveSchedulerTest {
@@ -88,6 +93,7 @@ public class ArchiveSchedulerTest {
 	TestDateTimeProvider timeProvider;
 	Monitor<ArchiveDomainTask> monitor;
 	FutureTestListener<ArchiveDomainTask> futureListener;
+	ObmDomain domain;
 	BusClient busClient;
 	ArchiveSchedulerBus bus;
 	ArchiveSchedulerQueue queue;
@@ -123,6 +129,8 @@ public class ArchiveSchedulerTest {
 			
 		};
 
+		domain = ObmDomain.builder().uuid(ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4")).name("mydomain.org").build();
+		
 		queue = new ArchiveSchedulerQueue(monitorFactory);
 		busClient = Guice.createInjector(new BusModule()).getInstance(BusClient.class); 
 		bus = new ArchiveSchedulerBus();
@@ -130,9 +138,9 @@ public class ArchiveSchedulerTest {
 		testee = new ArchiveScheduler(queue, bus, new ArchiveSchedulerLoggerListener(), timeProvider, MILLISECONDS);
 	}
 	
-	private RemotelyControlledTask createTask(ObmDomainUuid domain,
+	private RemotelyControlledTask createTask(DomainConfiguration domainConfiguration,
 			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
-		return new RemotelyControlledTask(imapArchiveProcessing, logger, loggerAppenders, domain, when, higherBoundary, runId);
+		return new RemotelyControlledTask(imapArchiveProcessing, logger, loggerAppenders, domainConfiguration, when, higherBoundary, runId);
 	}
 	
 	@After
@@ -142,10 +150,17 @@ public class ArchiveSchedulerTest {
 
 	@Test
 	public void scheduleShouldCallScheduler() throws Exception {
-		ObmDomainUuid domain = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
+		DomainConfiguration configuration = DomainConfiguration.builder()
+				.domain(domain)
+				.enabled(true)
+				.schedulingConfiguration(
+					SchedulingConfiguration.builder()
+						.time(LocalTime.parse("22:15"))
+						.recurrence(ArchiveRecurrence.daily()).build())
+				.build();
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		DateTime when = DateTime.parse("2024-11-1T05:04Z");
-		RemotelyControlledTask task = createTask(domain, when, higherBoundary, runId);
+		RemotelyControlledTask task = createTask(configuration, when, higherBoundary, runId);
 		imapArchiveProcessing.archive(task.getArchiveConfiguration());
 		expectLastCall();
 		
@@ -159,13 +174,20 @@ public class ArchiveSchedulerTest {
 
 	@Test
 	public void scheduleShouldCallSchedulerWhenPreviousDomainTaskIsDone() throws Exception {
-		ObmDomainUuid domain = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
+		DomainConfiguration configuration = DomainConfiguration.builder()
+				.domain(domain)
+				.enabled(true)
+				.schedulingConfiguration(
+					SchedulingConfiguration.builder()
+						.time(LocalTime.parse("22:15"))
+						.recurrence(ArchiveRecurrence.daily()).build())
+				.build();
 		DateTime when1 = DateTime.parse("2024-11-1T05:04Z");
 		DateTime when2 = DateTime.parse("2024-11-5T05:04Z");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
-		RemotelyControlledTask task1 = createTask(domain, when1, higherBoundary, runId1);
-		RemotelyControlledTask task2 = createTask(domain, when2, higherBoundary, runId2);
+		RemotelyControlledTask task1 = createTask(configuration, when1, higherBoundary, runId1);
+		RemotelyControlledTask task2 = createTask(configuration, when2, higherBoundary, runId2);
 
 		imapArchiveProcessing.archive(task1.getArchiveConfiguration());
 		expectLastCall();
@@ -183,13 +205,20 @@ public class ArchiveSchedulerTest {
 	
 	@Test
 	public void scheduleShouldEnqueueWhenTaskForDomainAlreadyScheduled() throws Exception {
-		ObmDomainUuid domain = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
+		DomainConfiguration configuration = DomainConfiguration.builder()
+				.domain(domain)
+				.enabled(true)
+				.schedulingConfiguration(
+					SchedulingConfiguration.builder()
+						.time(LocalTime.parse("22:15"))
+						.recurrence(ArchiveRecurrence.daily()).build())
+				.build();
 		DateTime when = DateTime.parse("2024-11-1T05:04Z");
 		DateTime whenToEnqueue = DateTime.parse("2024-11-2T05:04Z");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
-		RemotelyControlledTask task =  createTask(domain, when, higherBoundary, runId1);
-		RemotelyControlledTask taskEnqueued = createTask(domain, whenToEnqueue, higherBoundary, runId2);
+		RemotelyControlledTask task =  createTask(configuration, when, higherBoundary, runId1);
+		RemotelyControlledTask taskEnqueued = createTask(configuration, whenToEnqueue, higherBoundary, runId2);
 
 		imapArchiveProcessing.archive(task.getArchiveConfiguration());
 		expectLastCall();
@@ -212,16 +241,23 @@ public class ArchiveSchedulerTest {
 	
 	@Test
 	public void scheduleShouldEnqueueRespectingOrderWhenTaskForDomainAlreadyRunning() throws Exception {
-		ObmDomainUuid domain = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
+		DomainConfiguration configuration = DomainConfiguration.builder()
+				.domain(domain)
+				.enabled(true)
+				.schedulingConfiguration(
+					SchedulingConfiguration.builder()
+						.time(LocalTime.parse("22:15"))
+						.recurrence(ArchiveRecurrence.daily()).build())
+				.build();
 		DateTime when = DateTime.parse("2024-11-1T00:00");
 		DateTime earlierWhenEnqueuedAfter = DateTime.parse("2024-11-5T00:00");
 		DateTime laterWhenEnqueuedBefore = DateTime.parse("2024-11-9T00:00");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
-		RemotelyControlledTask task = createTask(domain, when, higherBoundary, runId1);
-		RemotelyControlledTask laterTaskEnqueuedBefore = createTask(domain, laterWhenEnqueuedBefore, higherBoundary, runId2);
-		RemotelyControlledTask earlierTaskEnqueuedAfter = createTask(domain, earlierWhenEnqueuedAfter, higherBoundary, runId3);
+		RemotelyControlledTask task = createTask(configuration, when, higherBoundary, runId1);
+		RemotelyControlledTask laterTaskEnqueuedBefore = createTask(configuration, laterWhenEnqueuedBefore, higherBoundary, runId2);
+		RemotelyControlledTask earlierTaskEnqueuedAfter = createTask(configuration, earlierWhenEnqueuedAfter, higherBoundary, runId3);
 
 		imapArchiveProcessing.archive(task.getArchiveConfiguration());
 		expectLastCall();
@@ -250,15 +286,31 @@ public class ArchiveSchedulerTest {
 	
 	@Test
 	public void scheduleDifferentDomainsShouldCallSchedulerForBoth() throws Exception {
-		ObmDomainUuid domain1 = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
-		ObmDomainUuid domain2 = ObmDomainUuid.of("b360ac79-a928-4655-a173-59d2c4666cad");
+		ObmDomain domain1 = ObmDomain.builder().uuid(ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4")).name("mydomain.org").build();
+		ObmDomain domain2 = ObmDomain.builder().uuid(ObmDomainUuid.of("b9b7ea0f-a65e-4d2e-89b1-fb9ef4d2c97d")).name("mydomain2.org").build();
+		DomainConfiguration configuration1 = DomainConfiguration.builder()
+				.domain(domain1)
+				.enabled(true)
+				.schedulingConfiguration(
+					SchedulingConfiguration.builder()
+						.time(LocalTime.parse("22:15"))
+						.recurrence(ArchiveRecurrence.daily()).build())
+				.build();
+		DomainConfiguration configuration2 = DomainConfiguration.builder()
+				.domain(domain2)
+				.enabled(true)
+				.schedulingConfiguration(
+					SchedulingConfiguration.builder()
+						.time(LocalTime.parse("22:15"))
+						.recurrence(ArchiveRecurrence.daily()).build())
+				.build();
 		DateTime when1 = DateTime.parse("2024-11-1T05:04Z");
 		DateTime when2 = DateTime.parse("2024-11-2T05:04Z");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
-		RemotelyControlledTask taskDomain1 = createTask(domain1, when1, higherBoundary, runId1);
-		RemotelyControlledTask taskDomain2 = createTask(domain2, when2, higherBoundary, runId2);
+		RemotelyControlledTask taskDomain1 = createTask(configuration1, when1, higherBoundary, runId1);
+		RemotelyControlledTask taskDomain2 = createTask(configuration2, when2, higherBoundary, runId2);
 
 		imapArchiveProcessing.archive(taskDomain1.getArchiveConfiguration());
 		expectLastCall();
@@ -281,8 +333,24 @@ public class ArchiveSchedulerTest {
 	
 	@Test
 	public void scheduleDifferentDomainsShouldCallSchedulerForBothThenEnqueueOthers() throws Exception {
-		ObmDomainUuid domain1 = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
-		ObmDomainUuid domain2 = ObmDomainUuid.of("b360ac79-a928-4655-a173-59d2c4666cad");
+		ObmDomain domain1 = ObmDomain.builder().uuid(ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4")).name("mydomain.org").build();
+		ObmDomain domain2 = ObmDomain.builder().uuid(ObmDomainUuid.of("b9b7ea0f-a65e-4d2e-89b1-fb9ef4d2c97d")).name("mydomain2.org").build();
+		DomainConfiguration configuration1 = DomainConfiguration.builder()
+				.domain(domain1)
+				.enabled(true)
+				.schedulingConfiguration(
+					SchedulingConfiguration.builder()
+						.time(LocalTime.parse("22:15"))
+						.recurrence(ArchiveRecurrence.daily()).build())
+				.build();
+		DomainConfiguration configuration2 = DomainConfiguration.builder()
+				.domain(domain2)
+				.enabled(true)
+				.schedulingConfiguration(
+					SchedulingConfiguration.builder()
+						.time(LocalTime.parse("22:15"))
+						.recurrence(ArchiveRecurrence.daily()).build())
+				.build();
 		DateTime when1 = DateTime.parse("2024-11-1T05:04Z");
 		DateTime when2 = DateTime.parse("2024-11-2T05:04Z");
 		DateTime when1ToEnqueue = DateTime.parse("2024-11-3T05:04Z");
@@ -291,10 +359,10 @@ public class ArchiveSchedulerTest {
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("b13c4e34-c70a-446d-a764-17575c4ea52f");
 		ArchiveTreatmentRunId runId4 = ArchiveTreatmentRunId.from("b1226053-265d-4b0e-a524-e37b1dfcb2e9");
-		RemotelyControlledTask taskDomain1 = createTask(domain1, when1, higherBoundary, runId1);
-		RemotelyControlledTask taskDomain2 = createTask(domain2, when2, higherBoundary, runId2);
-		RemotelyControlledTask taskDomain1Enqueued = createTask(domain1, when1ToEnqueue, higherBoundary, runId3);
-		RemotelyControlledTask taskDomain2Enqueued = createTask(domain2, when2ToEnqueue, higherBoundary, runId4);
+		RemotelyControlledTask taskDomain1 = createTask(configuration1, when1, higherBoundary, runId1);
+		RemotelyControlledTask taskDomain2 = createTask(configuration2, when2, higherBoundary, runId2);
+		RemotelyControlledTask taskDomain1Enqueued = createTask(configuration1, when1ToEnqueue, higherBoundary, runId3);
+		RemotelyControlledTask taskDomain2Enqueued = createTask(configuration2, when2ToEnqueue, higherBoundary, runId4);
 
 		imapArchiveProcessing.archive(taskDomain1.getArchiveConfiguration());
 		expectLastCall();
@@ -339,13 +407,21 @@ public class ArchiveSchedulerTest {
 
 	@Test
 	public void clearDomainShouldRemoveScheduledButNotRunningTasks() throws Exception {
-		ObmDomainUuid domain = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
+		DomainConfiguration configuration = DomainConfiguration.builder()
+				.domain(domain)
+				.enabled(true)
+				.schedulingConfiguration(
+					SchedulingConfiguration.builder()
+						.time(LocalTime.parse("22:15"))
+						.recurrence(ArchiveRecurrence.daily()).build())
+				.build();
+
 		DateTime when1 = DateTime.parse("2024-11-1T00:00");
 		DateTime when2 = DateTime.parse("2024-11-9T00:00");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
-		RemotelyControlledTask runningTask = createTask(domain, when1, higherBoundary, runId1);
-		RemotelyControlledTask scheduledTask = createTask(domain, when2, higherBoundary, runId2);
+		RemotelyControlledTask runningTask = createTask(configuration, when1, higherBoundary, runId1);
+		RemotelyControlledTask scheduledTask = createTask(configuration, when2, higherBoundary, runId2);
 
 		imapArchiveProcessing.archive(runningTask.getArchiveConfiguration());
 		expectLastCall().anyTimes();
@@ -357,7 +433,7 @@ public class ArchiveSchedulerTest {
 		assertTaskIsScheduled(runningTask);
 		assertTaskIsScheduled(scheduledTask);
 		assertTaskIsRunning(runningTask);
-		testee.clearDomain(domain);
+		testee.clearDomain(domain.getUuid());
 		mocks.verify();
 		
 		assertThat(scheduled.state()).isEqualTo(State.CANCELED);
@@ -366,30 +442,46 @@ public class ArchiveSchedulerTest {
 
 	@Test
 	public void clearDomainShouldNotRemoveOtherDomainTasks() throws Exception {
-		ObmDomainUuid domain1 = ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4");
-		ObmDomainUuid domain2 = ObmDomainUuid.of("b9b7ea0f-a65e-4d2e-89b1-fb9ef4d2c97d");
+		ObmDomain domain1 = ObmDomain.builder().uuid(ObmDomainUuid.of("70cd05cd-72f9-449a-b83b-740d136cd8d4")).name("mydomain.org").build();
+		ObmDomain domain2 = ObmDomain.builder().uuid(ObmDomainUuid.of("b9b7ea0f-a65e-4d2e-89b1-fb9ef4d2c97d")).name("mydomain2.org").build();
+		DomainConfiguration configuration1 = DomainConfiguration.builder()
+				.domain(domain1)
+				.enabled(true)
+				.schedulingConfiguration(
+					SchedulingConfiguration.builder()
+						.time(LocalTime.parse("22:15"))
+						.recurrence(ArchiveRecurrence.daily()).build())
+				.build();
+		DomainConfiguration configuration2 = DomainConfiguration.builder()
+				.domain(domain2)
+				.enabled(true)
+				.schedulingConfiguration(
+					SchedulingConfiguration.builder()
+						.time(LocalTime.parse("22:15"))
+						.recurrence(ArchiveRecurrence.daily()).build())
+				.build();
 		DateTime when1 = DateTime.parse("2024-11-1T00:00");
 		DateTime when2 = DateTime.parse("2024-11-9T00:00");
 		ArchiveTreatmentRunId runId1 = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("14a311d0-aa84-4aed-ba33-f796a6283e50");
 
 		mocks.replay();
-		RemotelyControlledTask scheduledTask1 = createTask(domain1, when1, higherBoundary, runId1);
+		RemotelyControlledTask scheduledTask1 = createTask(configuration1, when1, higherBoundary, runId1);
 		ScheduledTask<ArchiveDomainTask> scheduled1 = testee.schedule(scheduledTask1);
-		RemotelyControlledTask scheduledTask2 = createTask(domain2, when2, higherBoundary, runId2);
+		RemotelyControlledTask scheduledTask2 = createTask(configuration2, when2, higherBoundary, runId2);
 		ScheduledTask<ArchiveDomainTask> scheduled2 = testee.schedule(scheduledTask2);
 		assertTaskIsScheduled(scheduledTask1);
 		assertTaskIsScheduled(scheduledTask2);
-		testee.clearDomain(domain1);
+		testee.clearDomain(domain1.getUuid());
 		mocks.verify();
 		
 		assertThat(scheduled1.state()).isEqualTo(State.CANCELED);
 		assertThat(scheduled2.state()).isEqualTo(State.WAITING);
 	}
 
-	ArchiveDomainTask archiveDomainTask(ObmDomainUuid domain, ArchiveTreatmentRunId runId, DateTime when) {
+	ArchiveDomainTask archiveDomainTask(DomainConfiguration configuration, ArchiveTreatmentRunId runId, DateTime when) {
 		return new ArchiveDomainTask(imapArchiveProcessing, new RealRunTaskStatusChanged.Factory(),
-				new ArchiveConfiguration(domain, when, 
+				new ArchiveConfiguration(configuration, when, 
 				higherBoundary, runId, logger, loggerAppenders, false));
 	}
 

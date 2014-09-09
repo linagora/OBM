@@ -34,6 +34,7 @@ package org.obm.imap.archive.scheduling;
 import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.RealRunTaskStatusChanged;
 import org.obm.imap.archive.services.ImapArchiveProcessing;
@@ -42,8 +43,6 @@ import ch.qos.logback.classic.Logger;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.SettableFuture;
-
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class RemotelyControlledTask extends ArchiveDomainTask {
 
@@ -63,11 +62,11 @@ public class RemotelyControlledTask extends ArchiveDomainTask {
 	private final Terminator terminator;
 
 	public RemotelyControlledTask(ImapArchiveProcessing imapArchiveProcessing, Logger logger,
-			LoggerAppenders loggerAppenders, ObmDomainUuid domain,
+			LoggerAppenders loggerAppenders, DomainConfiguration domainConfiguration,
 			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId) {
 		
 		super(imapArchiveProcessing, new RealRunTaskStatusChanged.Factory(),
-				new ArchiveConfiguration(domain, when, higherBoundary, runId, logger, 
+				new ArchiveConfiguration(domainConfiguration, when, higherBoundary, runId, logger, 
 				loggerAppenders, false));
 		
 		terminator = new Terminator();

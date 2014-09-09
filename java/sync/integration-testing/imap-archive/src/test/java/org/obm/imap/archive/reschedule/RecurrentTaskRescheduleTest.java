@@ -51,7 +51,6 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
-import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.FutureSchedulerBusClient;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.TestImapArchiveModules.TimeBasedModule.TestDateProvider;
@@ -77,6 +76,7 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.system.ObmSystemUser;
 
@@ -136,16 +136,13 @@ public class RecurrentTaskRescheduleTest {
 		DateTime when = DateTime.parse("2026-11-02T13:37Z");
 		DateTime higherBoundary = DateTime.parse("2026-11-02T23:59Z");
 		
-		new Expectations(driver)
-			.expectGetDomain(domainUuid)
-			.expectGetDomain(domainUuid);
 		imapServer.setUser("cyrus", "cyrus");
 		expect(userSystemDao.getByLogin("cyrus"))
 			.andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build())
 			.anyTimes();
 		
-		domainConfigDao.create(DomainConfiguration.builder()
-			.domainId(domainUuid)
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+			.domain(ObmDomain.builder().uuid(domainUuid).name("mydomain.org").build())
 			.enabled(true)
 			.schedulingConfiguration(SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
@@ -156,14 +153,15 @@ public class RecurrentTaskRescheduleTest {
 					.build())
 				.time(LocalTime.parse("13:37"))
 				.build())
-			.build());
+			.build();
+		domainConfigDao.create(domainConfiguration);
 		
 		control.replay();
 		imapServer.start();
 		server.start();
 
 		// SCHEDULE AND RUN A RECURRENT TASK
-		scheduler.schedule(taskFactory.createAsRecurrent(domainUuid, when, higherBoundary, runId));
+		scheduler.schedule(taskFactory.createAsRecurrent(domainConfiguration, when, higherBoundary, runId));
 		assertThat(nextTaskState()).isEqualTo(State.WAITING);
 		timeProvider.setCurrent(when);
 		assertThat(nextTaskState()).isEqualTo(State.RUNNING);

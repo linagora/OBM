@@ -44,17 +44,22 @@ import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTerminatedTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
+import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
+import org.obm.imap.archive.services.DomainClient;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.linagora.scheduling.ScheduledTask;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class RestoreTasksOnStartupHandlerTest {
@@ -65,17 +70,23 @@ public class RestoreTasksOnStartupHandlerTest {
 	IMocksControl control;
 	ArchiveScheduler scheduler;
 	ArchiveTreatmentDao archiveTreatmentDao;
+	DomainConfigurationDao domainConfigurationDao;
 	ArchiveDomainTaskFactory taskFactory;
+	DomainClient domainClient;
+	ObmDomain domain;
 	RestoreTasksOnStartupHandler testee;
 	
 	@Before
 	public void setUp() {
 		domainUuid = ObmDomainUuid.of("b7e91835-68de-498f-bff8-97d43acf222c");
+		domain = ObmDomain.builder().uuid(domainUuid).build();
 		control = createControl();
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		scheduler = control.createMock(ArchiveScheduler.class);
 		taskFactory = control.createMock(ArchiveDomainTaskFactory.class);
-		testee = new RestoreTasksOnStartupHandler(logger, scheduler, archiveTreatmentDao, taskFactory);
+		domainConfigurationDao = control.createMock(DomainConfigurationDao.class);
+		domainClient = control.createMock(DomainClient.class);
+		testee = new RestoreTasksOnStartupHandler(logger, scheduler, archiveTreatmentDao, domainConfigurationDao, taskFactory, domainClient);
 	}
 
 	@Test
@@ -94,6 +105,11 @@ public class RestoreTasksOnStartupHandlerTest {
 		DateTime higherBoundary = DateTime.parse("2014-12-1T01:01Z");
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("aee2d1ab-b237-4077-a61b-a85e3cb67742");
 		
+		expect(domainClient.getById(domainUuid)).andReturn(Optional.of(domain));
+		
+		DomainConfiguration domainConfiguration = control.createMock(DomainConfiguration.class);
+		expect(domainConfigurationDao.get(domain)).andReturn(domainConfiguration);
+		
 		expect(archiveTreatmentDao.findAllScheduledOrRunning()).andReturn(ImmutableList.<ArchiveTreatment>of(
 			ArchiveScheduledTreatment
 				.forDomain(domainUuid)
@@ -105,7 +121,7 @@ public class RestoreTasksOnStartupHandlerTest {
 			));
 		
 		ArchiveDomainTask archiveTask = control.createMock(ArchiveDomainTask.class);
-		expect(taskFactory.createAsRecurrent(domainUuid, when, higherBoundary, runId)).andReturn(archiveTask);
+		expect(taskFactory.createAsRecurrent(domainConfiguration, when, higherBoundary, runId)).andReturn(archiveTask);
 		ScheduledTask<ArchiveDomainTask> task = control.createMock(ScheduledTask.class);
 		expect(scheduler.schedule(archiveTask)).andReturn(task);
 		

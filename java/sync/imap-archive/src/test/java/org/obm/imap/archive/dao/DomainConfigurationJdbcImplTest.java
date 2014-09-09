@@ -63,6 +63,7 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class DomainConfigurationJdbcImplTest {
@@ -111,7 +112,8 @@ public class DomainConfigurationJdbcImplTest {
 	@Test
 	public void getShouldReturnStoredValueWhenDomainIdMatch() throws Exception {
 		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
-		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(uuid);
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
 		assertThat(domainConfiguration.getDomainId()).isEqualTo(uuid);
 		assertThat(domainConfiguration.isEnabled()).isTrue();
 		assertThat(domainConfiguration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
@@ -126,7 +128,8 @@ public class DomainConfigurationJdbcImplTest {
 	@Test
 	public void getShouldReturnNullWhenDomainIdDoesntMatch() throws Exception {
 		ObmDomainUuid uuid = ObmDomainUuid.of("78d6e95b-ab6c-4625-b3bf-e86c68347e2d");
-		assertThat(domainConfigurationJdbcImpl.get(uuid)).isNull();
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
+		assertThat(domainConfigurationJdbcImpl.get(domain)).isNull();
 	}
 	
 	@Test
@@ -134,15 +137,16 @@ public class DomainConfigurationJdbcImplTest {
 		expectedException.expect(DomainNotFoundException.class).hasMessage("844db7a6-6788-47a4-9f04-f5ed9f007a04");
 		
 		domainConfigurationJdbcImpl.update(DomainConfiguration.DEFAULT_VALUES_BUILDER
-				.domainId(ObmDomainUuid.of("844db7a6-6788-47a4-9f04-f5ed9f007a04"))
+				.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("844db7a6-6788-47a4-9f04-f5ed9f007a04")).build())
 				.build());
 	}
 	
 	@Test
 	public void updateShouldUpdateWhenDomainFound() throws Exception {
 		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
-				.domainId(uuid)
+				.domain(domain)
 				.enabled(false)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
@@ -158,7 +162,7 @@ public class DomainConfigurationJdbcImplTest {
 		
 		domainConfigurationJdbcImpl.update(expectedDomainConfiguration);
 		
-		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(uuid);
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
 		assertThat(domainConfiguration).isEqualToComparingFieldByField(expectedDomainConfiguration);
 	}
 	
@@ -167,15 +171,16 @@ public class DomainConfigurationJdbcImplTest {
 		expectedException.expect(DaoException.class);
 		
 		domainConfigurationJdbcImpl.create(DomainConfiguration.DEFAULT_VALUES_BUILDER
-				.domainId(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"))
+				.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309")).build())
 				.build());
 	}
 	
 	@Test
 	public void createShouldCreateWhenDomainFound() throws Exception {
 		ObmDomainUuid uuid = ObmDomainUuid.of("1383b12c-6d79-40c7-acf9-c79bcc673fff");
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
-				.domainId(uuid)
+				.domain(domain)
 				.enabled(false)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
@@ -191,7 +196,7 @@ public class DomainConfigurationJdbcImplTest {
 		
 		domainConfigurationJdbcImpl.create(expectedDomainConfiguration);
 		
-		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(uuid); 
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain); 
 		assertThat(domainConfiguration).isEqualToComparingFieldByField(expectedDomainConfiguration);
 	}
 }

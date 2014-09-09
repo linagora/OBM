@@ -37,17 +37,23 @@ import org.obm.ElementNotFoundException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
 import org.obm.imap.archive.beans.ArchiveTreatment;
+import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
+import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
+import org.obm.imap.archive.services.DomainClient;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.server.LifeCycleHandler;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 @Singleton
 public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
@@ -56,17 +62,23 @@ public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 	private final ArchiveScheduler scheduler;
 	private final ArchiveTreatmentDao archiveTreatmentDao;
 	private final ArchiveDomainTaskFactory taskFactory;
+	private final DomainConfigurationDao configurationDao;
+	private final DomainClient domainClient;
 
 	@Inject
 	@VisibleForTesting RestoreTasksOnStartupHandler(
 			@Named(LoggerModule.TASK) Logger logger,
 			ArchiveScheduler scheduler,
 			ArchiveTreatmentDao archiveTreatmentDao,
-			ArchiveDomainTaskFactory taskFactory) {
+			DomainConfigurationDao configurationDao,
+			ArchiveDomainTaskFactory taskFactory,
+			DomainClient domainClient) {
 		this.logger = logger;
 		this.scheduler = scheduler;
 		this.archiveTreatmentDao = archiveTreatmentDao;
+		this.configurationDao = configurationDao;
 		this.taskFactory = taskFactory;
+		this.domainClient = domainClient;
 	}
 	
 	@Transactional
@@ -96,12 +108,15 @@ public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 		}
 	}
 
-	private void reSchedule(ArchiveTreatment treatment) {
+	private void reSchedule(ArchiveTreatment treatment) throws DaoException {
 		logger.info("Re-schedule task uuid:{} for domain:{} at:{}", 
 				treatment.getRunId().serialize(), treatment.getDomainUuid().get(), treatment.getScheduledTime());
 		
+		Optional<ObmDomain> domain = domainClient.getById(treatment.getDomainUuid());
+		
+		DomainConfiguration domainConfiguration = configurationDao.get(domain.get());
 		scheduler.schedule(taskFactory.createAsRecurrent(
-				treatment.getDomainUuid(), 
+				domainConfiguration, 
 				treatment.getScheduledTime(), 
 				treatment.getHigherBoundary(), 
 				treatment.getRunId()));

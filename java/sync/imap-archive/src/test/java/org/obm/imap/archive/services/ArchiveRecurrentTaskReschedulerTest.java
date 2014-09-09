@@ -50,13 +50,14 @@ import org.slf4j.LoggerFactory;
 import com.linagora.scheduling.ScheduledTask.State;
 import com.linagora.scheduling.Scheduler;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ArchiveRecurrentTaskReschedulerTest {
 
 	Logger logger;
 	ArchiveTreatmentRunId runId;
-	ObmDomainUuid domain;
+	ObmDomain domain;
 	DateTime scheduledTime;
 	
 	IMocksControl mocks;
@@ -70,7 +71,7 @@ public class ArchiveRecurrentTaskReschedulerTest {
 	public void setUp() {
 		logger = LoggerFactory.getLogger(ArchiveRecurrentTaskRescheduler.class);
 		runId = ArchiveTreatmentRunId.from("38efaa5c-6d46-419c-97e6-6e6c6d9cbed3");
-		domain = ObmDomainUuid.of("f7d9e710-1863-48dc-af78-bdd59cf6d82f");
+		domain = ObmDomain.builder().uuid(ObmDomainUuid.of("f7d9e710-1863-48dc-af78-bdd59cf6d82f")).build();
 		scheduledTime = DateTime.parse("2024-11-1T01:04Z");
 		
 		mocks = EasyMock.createControl();
@@ -131,7 +132,7 @@ public class ArchiveRecurrentTaskReschedulerTest {
 	@Test
 	public void onChangeShouldRescheduleWhenFailedAndRecurrent() throws Exception {
 		expect(archiveConfiguration.isRecurrent()).andReturn(true);
-		expect(archiveConfiguration.getDomainId()).andReturn(domain);
+		expect(archiveConfiguration.getDomain()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andReturn(runId);
 		
 		mocks.replay();
@@ -142,7 +143,7 @@ public class ArchiveRecurrentTaskReschedulerTest {
 	@Test
 	public void onChangeShouldRescheduleWhenTerminatedAndRecurrent() throws Exception {
 		expect(archiveConfiguration.isRecurrent()).andReturn(true);
-		expect(archiveConfiguration.getDomainId()).andReturn(domain);
+		expect(archiveConfiguration.getDomain()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andReturn(runId);
 		
 		mocks.replay();
@@ -153,7 +154,7 @@ public class ArchiveRecurrentTaskReschedulerTest {
 	@Test
 	public void onChangeShouldNotPropagateExceptionWhenDaoException() throws Exception {
 		expect(archiveConfiguration.isRecurrent()).andReturn(true);
-		expect(archiveConfiguration.getDomainId()).andReturn(domain);
+		expect(archiveConfiguration.getDomain()).andReturn(domain);
 		expect(schedulingService.scheduleAsRecurrent(domain)).andThrow(new DaoException("error"));
 		
 		mocks.replay();

@@ -46,7 +46,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.linagora.scheduling.ScheduledTask.State;
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 @Singleton
 public class ArchiveRecurrentTaskRescheduler implements ArchiveSchedulerBus.Client {
@@ -74,8 +74,8 @@ public class ArchiveRecurrentTaskRescheduler implements ArchiveSchedulerBus.Clie
 
 	private void reschedule(ArchiveDomainTask task) {
 		try {
-			ObmDomainUuid domain = task.getArchiveConfiguration().getDomainId();
-			logger.info("A recurrent task for domain {} will be re-scheduled", domain.get());
+			ObmDomain domain = task.getArchiveConfiguration().getDomain();
+			logger.info("A recurrent task for domain {} will be re-scheduled", domain.getName());
 			schedulingService.scheduleAsRecurrent(domain);
 		} catch (DaoException e) {
 			logger.error("Cannot re-schedule a recurrent task", e);

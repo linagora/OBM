@@ -37,6 +37,7 @@ import org.obm.imap.archive.dto.DomainConfigurationDto;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class DomainConfiguration {
@@ -46,9 +47,9 @@ public class DomainConfiguration {
 			.enabled(false)
 			.schedulingConfiguration(SchedulingConfiguration.DEFAULT_VALUES_BUILDER);
 
-	public static DomainConfiguration from(DomainConfigurationDto configuration) {
+	public static DomainConfiguration from(DomainConfigurationDto configuration, ObmDomain domain) {
 		return DomainConfiguration.builder()
-				.domainId(ObmDomainUuid.of(configuration.domainId))
+				.domain(domain)
 				.enabled(configuration.enabled)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
@@ -69,7 +70,7 @@ public class DomainConfiguration {
 	
 	public static class Builder {
 		
-		private ObmDomainUuid domainId;
+		private ObmDomain domain;
 		private Boolean enabled;
 		private SchedulingConfiguration schedulingConfiguration;
 		private String excludedFolder;
@@ -77,9 +78,9 @@ public class DomainConfiguration {
 		private Builder() {
 		}
 		
-		public Builder domainId(ObmDomainUuid domainId) {
-			Preconditions.checkNotNull(domainId);
-			this.domainId = domainId;
+		public Builder domain(ObmDomain domain) {
+			Preconditions.checkNotNull(domain);
+			this.domain = domain;
 			return this;
 		}
 
@@ -99,7 +100,7 @@ public class DomainConfiguration {
 		}
 		
 		public DomainConfiguration build() {
-			Preconditions.checkState(domainId != null);
+			Preconditions.checkState(domain != null);
 			Preconditions.checkState(enabled != null);
 			if (enabled) {
 				Preconditions.checkState(schedulingConfiguration != null);
@@ -108,24 +109,28 @@ public class DomainConfiguration {
 				Preconditions.checkState(excludedFolder.contains("/") == false);
 				Preconditions.checkState(excludedFolder.contains("@") == false);
 			}
-			return new DomainConfiguration(domainId, enabled, schedulingConfiguration, excludedFolder);
+			return new DomainConfiguration(domain, enabled, schedulingConfiguration, excludedFolder);
 		}
 	}
 	
-	private final ObmDomainUuid domainId;
+	private final ObmDomain domain;
 	private final boolean enabled;
 	private final SchedulingConfiguration schedulingConfiguration;
 	private final String excludedFolder;
 
-	private DomainConfiguration(ObmDomainUuid  domainId, boolean enabled, SchedulingConfiguration schedulingConfiguration, String excludedFolder) {
-		this.domainId = domainId;
+	private DomainConfiguration(ObmDomain domain, boolean enabled, SchedulingConfiguration schedulingConfiguration, String excludedFolder) {
+		this.domain = domain;
 		this.enabled = enabled;
 		this.schedulingConfiguration = schedulingConfiguration;
 		this.excludedFolder = excludedFolder;
 	}
+
+	public ObmDomain getDomain() {
+		return domain;
+	}
 	
 	public ObmDomainUuid getDomainId() {
-		return domainId;
+		return domain.getUuid();
 	}
 	
 	public boolean isEnabled() {
@@ -174,14 +179,14 @@ public class DomainConfiguration {
 	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(domainId, enabled, schedulingConfiguration, excludedFolder);
+		return Objects.hashCode(domain, enabled, schedulingConfiguration, excludedFolder);
 	}
 	
 	@Override
 	public boolean equals(Object object){
 		if (object instanceof DomainConfiguration) {
 			DomainConfiguration that = (DomainConfiguration) object;
-			return Objects.equal(this.domainId, that.domainId)
+			return Objects.equal(this.domain, that.domain)
 				&& Objects.equal(this.enabled, that.enabled)
 				&& Objects.equal(this.schedulingConfiguration, that.schedulingConfiguration)
 				&& Objects.equal(this.excludedFolder, that.excludedFolder);
@@ -192,7 +197,7 @@ public class DomainConfiguration {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("domainId", domainId)
+			.add("domain", domain)
 			.add("enabled", enabled)
 			.add("recurrence", schedulingConfiguration)
 			.add("excludedFolder", excludedFolder)

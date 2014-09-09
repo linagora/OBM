@@ -46,15 +46,12 @@ import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.Year;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.exception.DomainConfigurationException;
 import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
 import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.SearchQuery;
@@ -85,9 +82,7 @@ public class ImapArchiveProcessing {
 	private final DateTimeProvider dateTimeProvider;
 	private final SchedulingDatesService schedulingDatesService;
 	private final StoreClientFactory storeClientFactory;
-	private final DomainClient domainClient;
 	private final ArchiveTreatmentDao archiveTreatmentDao;
-	private final DomainConfigurationDao domainConfigurationDao;
 	private final ProcessedFolderDao processedFolderDao;
 
 	
@@ -95,17 +90,13 @@ public class ImapArchiveProcessing {
 	@VisibleForTesting ImapArchiveProcessing(DateTimeProvider dateTimeProvider,
 			SchedulingDatesService schedulingDatesService,
 			StoreClientFactory storeClientFactory,
-			DomainClient domainClient,
 			ArchiveTreatmentDao archiveTreatmentDao,
-			DomainConfigurationDao domainConfigurationDao,
 			ProcessedFolderDao processedFolderDao) {
 		
 		this.dateTimeProvider = dateTimeProvider;
 		this.schedulingDatesService = schedulingDatesService;
 		this.storeClientFactory = storeClientFactory;
-		this.domainClient = domainClient;
 		this.archiveTreatmentDao = archiveTreatmentDao;
-		this.domainConfigurationDao = domainConfigurationDao;
 		this.processedFolderDao = processedFolderDao;
 	}
 	
@@ -113,21 +104,10 @@ public class ImapArchiveProcessing {
 	public void archive(ArchiveConfiguration configuration) {
 		Logger logger = configuration.getLogger();
 		try {
-			Optional<ObmDomain> optionalDomain = domainClient.getById(configuration.getDomainId());
-			if (!optionalDomain.isPresent()) {
-				throw new DomainNotFoundException(configuration.getDomainId());
-			}
-			
-			ObmDomain domain = optionalDomain.get();
-			logStart(logger, domain);
-
-			DomainConfiguration domainConfiguration = getConfiguration(domain);
-			Optional<ArchiveTreatment> previousArchiveTreatment = previousArchiveTreatment(domain.getUuid());
-			Boundaries boundaries = calculateBoundaries(dateTimeProvider.now(), domainConfiguration.getRepeatKind(), previousArchiveTreatment, logger);
+			Optional<ArchiveTreatment> previousArchiveTreatment = previousArchiveTreatment(configuration.getDomainId());
+			Boundaries boundaries = calculateBoundaries(dateTimeProvider.now(), configuration.getConfiguration().getRepeatKind(), previousArchiveTreatment, logger);
 			ProcessedTask.Builder processedTaskBuilder = ProcessedTask.builder()
 					.archiveConfiguration(configuration)
-					.domain(domain)
-					.domainConfiguration(domainConfiguration)
 					.previousArchiveTreatment(previousArchiveTreatment)
 					.boundaries(boundaries)
 					.continuePrevious(continuePrevious(previousArchiveTreatment, boundaries.getHigherBoundary()));
@@ -136,7 +116,7 @@ public class ImapArchiveProcessing {
 				throw new ImapArchiveProcessingException();
 			}
 			
-			logger.info("End of IMAP Archive for domain {}", domain.getName());
+			logger.info("End of IMAP Archive for domain {}", configuration.getDomain().getName());
 		} catch (Exception e) {
 			logger.error("Error on archive treatment: ", e);
 			Throwables.propagate(e);
@@ -149,17 +129,6 @@ public class ImapArchiveProcessing {
 	
 	@VisibleForTesting Optional<ArchiveTreatment> previousArchiveTreatment(ObmDomainUuid domainId) throws DaoException {
 		return FluentIterable.from(archiveTreatmentDao.findLastTerminated(domainId, 1)).first();
-	}
-
-	private DomainConfiguration getConfiguration(ObmDomain domain) throws DaoException {
-		DomainConfiguration domainConfiguration = domainConfigurationDao.get(domain.getUuid());
-		if (domainConfiguration == null) {
-			throw new DomainConfigurationException("The IMAP Archive configuration is not defined for the domain: '" + domain.getName() + "'");
-		}
-		if (!domainConfiguration.isEnabled()) {
-			throw new DomainConfigurationException("The IMAP Archive service is disabled for the domain: '" + domain.getName() + "'");
-		}
-		return domainConfiguration;
 	}
 	
 	@VisibleForTesting Boundaries calculateBoundaries(DateTime start, RepeatKind repeatKind, Optional<ArchiveTreatment> previousArchiveTreatment, Logger archiveLogger) {
@@ -188,6 +157,7 @@ public class ImapArchiveProcessing {
 	private boolean dryRun(ProcessedTask processedTask) throws Exception {
 		boolean isSuccess = true;
 		Logger logger = processedTask.getLogger();
+		logStart(logger, processedTask.getDomain());
 		for (ListInfo listInfo : listImapFolders(processedTask)) {
 			try {
 				processMailbox(Mailbox.from(listInfo.getName(), logger, storeClientFactory.create(processedTask.getDomain().getName())), 
@@ -382,9 +352,7 @@ public class ImapArchiveProcessing {
 		public static class Builder {
 			
 			private ArchiveConfiguration archiveConfiguration;
-			private ObmDomain domain;
 			private Boundaries boundaries;
-			private DomainConfiguration domainConfiguration;
 			private Optional<ArchiveTreatment> previousArchiveTreatment;
 			private boolean continuePrevious;
 			
@@ -395,18 +363,8 @@ public class ImapArchiveProcessing {
 				return this;
 			}
 			
-			public Builder domain(ObmDomain domain) {
-				this.domain = domain;
-				return this;
-			}
-
 			public Builder boundaries(Boundaries boundaries) {
 				this.boundaries = boundaries;
-				return this;
-			}
-			
-			public Builder domainConfiguration(DomainConfiguration domainConfiguration) {
-				this.domainConfiguration = domainConfiguration;
 				return this;
 			}
 			
@@ -422,12 +380,11 @@ public class ImapArchiveProcessing {
 			
 			public ProcessedTask build() {
 				Preconditions.checkState(archiveConfiguration != null);
-				Preconditions.checkState(domain != null);
 				Preconditions.checkState(boundaries != null);
-				Preconditions.checkState(domainConfiguration != null);
 				Preconditions.checkState(previousArchiveTreatment != null);
 				return new ProcessedTask(archiveConfiguration.getLogger(), archiveConfiguration.getRunId(),
-						domain, boundaries, domainConfiguration, previousArchiveTreatment, continuePrevious);
+					archiveConfiguration.getDomain(), boundaries, 
+					archiveConfiguration.getConfiguration(), previousArchiveTreatment, continuePrevious);
 			}
 		}
 		

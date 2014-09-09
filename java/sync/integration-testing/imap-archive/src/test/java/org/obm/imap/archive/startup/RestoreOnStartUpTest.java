@@ -39,6 +39,7 @@ import java.util.List;
 import javax.ws.rs.core.Response.Status;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,13 +54,21 @@ import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.TestImapArchiveModules.WithTestingMonitor.TestingOnlyOnePerDomainMonitorFactory;
+import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveRunningTreatment;
 import org.obm.imap.archive.beans.ArchiveScheduledTreatment;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTerminatedTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.DayOfMonth;
+import org.obm.imap.archive.beans.DayOfWeek;
+import org.obm.imap.archive.beans.DayOfYear;
+import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.RepeatKind;
+import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
+import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
 import org.obm.server.WebServer;
@@ -72,6 +81,7 @@ import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class RestoreOnStartUpTest {
@@ -102,10 +112,13 @@ public class RestoreOnStartUpTest {
 	@Inject ArchiveDomainTaskFactory taskFactory;
 	@Inject TestingOnlyOnePerDomainMonitorFactory monitor;
 	@Inject ArchiveTreatmentDao archiveTreatmentDao;
+	@Inject DomainConfigurationDao domainConfigurationDao;
+
+	Expectations expectations;
 	
 	@Before
 	public void setUp() {
-		new Expectations(driver)
+		expectations = new Expectations(driver)
 			.expectTrustedLogin(ObmDomainUuid.of("ada1cd0a-f6e7-41f4-ac18-b0ce68573776"));
 
 		Operation operation = Operations.deleteAllFrom("mail_archive_run");
@@ -120,18 +133,56 @@ public class RestoreOnStartUpTest {
 	@Test
 	public void testTasksAreWellRestoredOrMovedAsFailed() throws Exception {
 		ArchiveTreatmentRunId expectedScheduledRunId = ArchiveTreatmentRunId.from("45896372-cc9f-4ee9-9efd-8df63e2da8c3");
-		ObmDomainUuid expectedScheduledDomain = ObmDomainUuid.of("65ae0168-cb77-43b8-bda3-0aa81f79ab5c");
+		ObmDomain expectedScheduledDomain = ObmDomain.builder()
+				.uuid(ObmDomainUuid.of("65ae0168-cb77-43b8-bda3-0aa81f79ab5c"))
+				.name("mydomain")
+				.label("mydomain.org")
+				.build();
 		DateTime expectedScheduledHigherBoundary = DateTime.parse("2026-11-02T01:04Z");
 		DateTime expectedScheduledTime = DateTime.parse("2026-11-02T03:04Z");
+		DomainConfiguration expectedScheduledDomainConfiguration = DomainConfiguration.builder()
+				.domain(expectedScheduledDomain)
+				.enabled(true)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+								.repeat(RepeatKind.DAILY)
+								.dayOfWeek(DayOfWeek.MONDAY)
+								.dayOfMonth(DayOfMonth.last())
+								.dayOfYear(DayOfYear.of(1))
+								.build())
+						.time(LocalTime.parse("03:04"))
+						.build())
+				.build();
 		
 		ArchiveTreatmentRunId expectedFailedRunId = ArchiveTreatmentRunId.from("c6eb4f70-2304-4bb4-aa38-441935dc6a47");
-		ObmDomainUuid expectedFailedDomain = ObmDomainUuid.of("b9de411c-5375-4100-aedf-8e4d827c0a2c");
+		ObmDomain expectedFailedDomain = ObmDomain.builder()
+				.uuid(ObmDomainUuid.of("b9de411c-5375-4100-aedf-8e4d827c0a2c"))
+				.name("mydomain2")
+				.label("mydomain2.org")
+				.build();
 		DateTime expectedFailedHigherBoundary = DateTime.parse("2026-10-02T01:04Z");
 		DateTime expectedFailedScheduleTime = DateTime.parse("2026-11-02T03:04Z");
 		DateTime expectedFailedStartTime = DateTime.parse("2026-10-01T01:01Z");
+		DomainConfiguration expectedFailedDomainConfiguration = DomainConfiguration.builder()
+				.domain(expectedFailedDomain)
+				.enabled(true)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+								.repeat(RepeatKind.DAILY)
+								.dayOfWeek(DayOfWeek.MONDAY)
+								.dayOfMonth(DayOfMonth.last())
+								.dayOfYear(DayOfYear.of(1))
+								.build())
+						.time(LocalTime.parse("03:04"))
+						.build())
+				.build();
+		
+
+		domainConfigurationDao.create(expectedScheduledDomainConfiguration);
+		domainConfigurationDao.create(expectedFailedDomainConfiguration);
 		
 		archiveTreatmentDao.insert(ArchiveScheduledTreatment
-				.forDomain(expectedScheduledDomain)
+				.forDomain(expectedScheduledDomain.getUuid())
 				.runId(expectedScheduledRunId)
 				.recurrent(true)
 				.higherBoundary(expectedScheduledHigherBoundary)
@@ -139,13 +190,16 @@ public class RestoreOnStartUpTest {
 				.build());
 		
 		archiveTreatmentDao.insert(ArchiveRunningTreatment
-				.forDomain(expectedFailedDomain)
+				.forDomain(expectedFailedDomain.getUuid())
 				.runId(expectedFailedRunId)
 				.recurrent(true)
 				.higherBoundary(expectedFailedHigherBoundary)
 				.scheduledAt(expectedFailedScheduleTime)
 				.startedAt(expectedFailedStartTime)
 				.build());
+		
+		expectations
+			.expectGetDomain(expectedScheduledDomain.getUuid());
 
 		server.start();
 		
@@ -160,14 +214,14 @@ public class RestoreOnStartUpTest {
 		List<ScheduledTask<ArchiveDomainTask>> tasks = monitor.get().all();
 		assertThat(tasks).hasSize(1);
 		assertThat(tasks.get(0).task()).isEqualTo(taskFactory.createAsRecurrent(
-			expectedScheduledDomain,
+			expectedScheduledDomainConfiguration,
 			expectedScheduledTime,
 			expectedScheduledHigherBoundary,
 			expectedScheduledRunId));
 		
-		List<ArchiveTreatment> failedTreatments = archiveTreatmentDao.findByScheduledTime(expectedFailedDomain, 5);
+		List<ArchiveTreatment> failedTreatments = archiveTreatmentDao.findByScheduledTime(expectedFailedDomain.getUuid(), 5);
 		assertThat(failedTreatments).containsExactly(ArchiveTerminatedTreatment
-			.forDomain(expectedFailedDomain)
+			.forDomain(expectedFailedDomain.getUuid())
 			.runId(expectedFailedRunId)
 			.recurrent(true)
 			.scheduledAt(expectedFailedScheduleTime)

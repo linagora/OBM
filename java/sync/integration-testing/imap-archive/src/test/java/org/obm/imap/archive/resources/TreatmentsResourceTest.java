@@ -234,7 +234,6 @@ public class TreatmentsResourceTest {
 		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
 		expectations
 			.expectTrustedLogin(domainId)
-			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
 		insertDomainConfiguration(true);
@@ -263,7 +262,6 @@ public class TreatmentsResourceTest {
 		expectations
 			.expectTrustedLogin(domainId)
 			.expectTrustedLogin(domainId)
-			.expectGetDomain(domainId)
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
@@ -311,7 +309,6 @@ public class TreatmentsResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId)
-			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
 		insertDomainConfiguration(true);
@@ -349,7 +346,6 @@ public class TreatmentsResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId)
-			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
 		insertDomainConfiguration(true);
@@ -386,7 +382,6 @@ public class TreatmentsResourceTest {
 		expectations
 			.expectTrustedLogin(domainId)
 			.expectTrustedLogin(domainId)
-			.expectGetDomain(domainId)
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		

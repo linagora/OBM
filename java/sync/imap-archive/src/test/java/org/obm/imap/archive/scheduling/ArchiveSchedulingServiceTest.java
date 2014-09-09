@@ -58,13 +58,14 @@ import pl.wkr.fluentrule.api.FluentExpectedException;
 
 import com.linagora.scheduling.ScheduledTask;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ArchiveSchedulingServiceTest {
 
 	@Rule public FluentExpectedException expectedException= FluentExpectedException.none();
-	
-	ObmDomainUuid domain;
+
+	ObmDomain domain;
 	IMocksControl mocks;
 	ArchiveScheduler scheduler;
 	ArchiveDomainTaskFactory taskFactory;
@@ -75,7 +76,7 @@ public class ArchiveSchedulingServiceTest {
 
 	@Before
 	public void setUp() {
-		domain = ObmDomainUuid.of("f1dabddf-7da2-412b-8159-71f3428e902f");
+		domain = ObmDomain.builder().uuid(ObmDomainUuid.of("f1dabddf-7da2-412b-8159-71f3428e902f")).build();
 		
 		mocks = EasyMock.createControl();
 		scheduler = mocks.createMock(ArchiveScheduler.class);
@@ -91,7 +92,7 @@ public class ArchiveSchedulingServiceTest {
 	public void scheduleShouldFindHigherBoundaryThenSchedule() throws Exception {
 		testSchedule(
 			DomainConfiguration.builder()
-				.domainId(domain)
+				.domain(domain)
 				.enabled(true)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
@@ -106,7 +107,7 @@ public class ArchiveSchedulingServiceTest {
 		
 		testSchedule(
 			DomainConfiguration.builder()
-				.domainId(domain)
+				.domain(domain)
 				.enabled(false)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
@@ -126,7 +127,7 @@ public class ArchiveSchedulingServiceTest {
 		expect(domainConfigDao.get(domain)).andReturn(config);
 		expect(schedulingDatesService.higherBoundary(when, config.getRepeatKind())).andReturn(higherBoundary);
 		expect(uuidFactory.randomUUID()).andReturn(runUuid);
-		expect(taskFactory.create(domain, when, higherBoundary, runId, ArchiveTreatmentKind.REAL_RUN)).andReturn(task);
+		expect(taskFactory.create(config, when, higherBoundary, runId, ArchiveTreatmentKind.REAL_RUN)).andReturn(task);
 		expect(scheduler.schedule(task)).andReturn(scheduled);
 		
 		mocks.replay();
@@ -152,7 +153,7 @@ public class ArchiveSchedulingServiceTest {
 	@Test
 	public void scheduleByDomainUuidShouldGetDatesThenSchedule() throws Exception {
 		DomainConfiguration config = DomainConfiguration.builder()
-			.domainId(domain)
+			.domain(domain)
 			.enabled(true)
 			.schedulingConfiguration(
 				SchedulingConfiguration.builder()
@@ -171,7 +172,7 @@ public class ArchiveSchedulingServiceTest {
 	@Test
 	public void scheduleByConfigShouldGetDatesThenSchedule() {
 		DomainConfiguration config = DomainConfiguration.builder()
-			.domainId(domain)
+			.domain(domain)
 			.enabled(true)
 			.schedulingConfiguration(
 				SchedulingConfiguration.builder()
@@ -189,7 +190,7 @@ public class ArchiveSchedulingServiceTest {
 	@Test
 	public void scheduleByConfigShouldNotCheckEnabledStatus() {
 		DomainConfiguration config = DomainConfiguration.builder()
-			.domainId(domain)
+			.domain(domain)
 			.enabled(false)
 			.schedulingConfiguration(
 				SchedulingConfiguration.builder()
@@ -215,7 +216,7 @@ public class ArchiveSchedulingServiceTest {
 		expect(schedulingDatesService.nextTreatmentDate(config.getSchedulingConfiguration())).andReturn(when);
 		expect(schedulingDatesService.higherBoundary(when, config.getRepeatKind())).andReturn(higherBoundary);
 		expect(uuidFactory.randomUUID()).andReturn(runUuid);
-		expect(taskFactory.createAsRecurrent(domain, when, higherBoundary, runId)).andReturn(task);
+		expect(taskFactory.createAsRecurrent(config, when, higherBoundary, runId)).andReturn(task);
 		expect(scheduler.schedule(task)).andReturn(scheduled);
 	}
 }

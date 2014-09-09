@@ -53,7 +53,7 @@ import com.google.common.base.Joiner;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 @Singleton
 public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
@@ -100,16 +100,16 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 	}
 
 	@Override
-	public DomainConfiguration get(ObmDomainUuid domainId) throws DaoException {
+	public DomainConfiguration get(ObmDomain domain) throws DaoException {
 		try (Connection connection = dbcp.getConnection();
 				PreparedStatement ps = connection.prepareStatement(REQUESTS.SELECT)) {
 
-			ps.setString(1, domainId.toString());
+			ps.setString(1, domain.getUuid().toString());
 
 			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
-				return domainConfigurationFromResultSet(rs);
+				return domainConfigurationFromResultSet(rs, domain);
 			} else {
 				return null;
 			}
@@ -119,9 +119,9 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 		}
 	}
 
-	private DomainConfiguration domainConfigurationFromResultSet(ResultSet rs) throws SQLException {
+	private DomainConfiguration domainConfigurationFromResultSet(ResultSet rs, ObmDomain domain) throws SQLException {
 		return DomainConfiguration.builder()
-				.domainId(ObmDomainUuid.of(rs.getString(FIELDS.DOMAIN_UUID)))
+				.domain(domain)
 				.enabled(rs.getBoolean(FIELDS.ACTIVATED))
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()

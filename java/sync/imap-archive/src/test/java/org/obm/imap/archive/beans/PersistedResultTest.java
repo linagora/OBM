@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 
@@ -52,7 +53,7 @@ public class PersistedResultTest {
 	@Test
 	public void createPersistedResult() {
 		DomainConfiguration domainConfiguration = DomainConfiguration.DEFAULT_VALUES_BUILDER
-				.domainId(ObmDomainUuid.of("8fc17d70-f50f-4b49-8e39-4693eeff7e41"))
+				.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("8fc17d70-f50f-4b49-8e39-4693eeff7e41")).build())
 				.build();
 		
 		PersistedResult persistedResult = PersistedResult.create(domainConfiguration);

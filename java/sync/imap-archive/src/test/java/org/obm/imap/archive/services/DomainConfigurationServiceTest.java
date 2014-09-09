@@ -49,11 +49,12 @@ import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class DomainConfigurationServiceTest {
 
-	ObmDomainUuid domain;
+	ObmDomain domain;
 	Logger logger;
 	IMocksControl control;
 	DomainConfigurationDao domainConfigurationDao;
@@ -63,7 +64,7 @@ public class DomainConfigurationServiceTest {
 
 	@Before
 	public void setup() {
-		domain = ObmDomainUuid.of("f1dabddf-7da2-412b-8159-71f3428e902f");
+		domain = ObmDomain.builder().uuid(ObmDomainUuid.of("f1dabddf-7da2-412b-8159-71f3428e902f")).build();
 		logger = LoggerFactory.getLogger(getClass());
 		
 		control = EasyMock.createControl();
@@ -82,14 +83,14 @@ public class DomainConfigurationServiceTest {
 		domainConfigurationDao.create(config);
 		expectLastCall();
 		
-		scheduler.clearDomain(domain);
+		scheduler.clearDomain(domain.getUuid());
 		expectLastCall();
 
 		expect(schedulingService.scheduleAsRecurrent(config))
 			.andReturn(ArchiveTreatmentRunId.from("5879b689-ffb5-422c-bf8d-eab80b2eddd6"));
 		
 		control.replay();
-		testee.updateOrCreate(config, domain);
+		testee.updateOrCreate(config);
 		control.verify();
 	}
 
@@ -101,11 +102,11 @@ public class DomainConfigurationServiceTest {
 		domainConfigurationDao.create(config);
 		expectLastCall();
 		
-		scheduler.clearDomain(domain);
+		scheduler.clearDomain(domain.getUuid());
 		expectLastCall();
 
 		control.replay();
-		testee.updateOrCreate(config, domain);
+		testee.updateOrCreate(config);
 		control.verify();
 	}
 
@@ -118,14 +119,14 @@ public class DomainConfigurationServiceTest {
 		domainConfigurationDao.update(config);
 		expectLastCall();
 		
-		scheduler.clearDomain(domain);
+		scheduler.clearDomain(domain.getUuid());
 		expectLastCall();
 
 		expect(schedulingService.scheduleAsRecurrent(config))
 			.andReturn(ArchiveTreatmentRunId.from("5879b689-ffb5-422c-bf8d-eab80b2eddd6"));
 		
 		control.replay();
-		testee.updateOrCreate(config, domain);
+		testee.updateOrCreate(config);
 		control.verify();
 	}
 
@@ -138,18 +139,18 @@ public class DomainConfigurationServiceTest {
 		domainConfigurationDao.update(config);
 		expectLastCall();
 		
-		scheduler.clearDomain(domain);
+		scheduler.clearDomain(domain.getUuid());
 		expectLastCall();
 		
 		control.replay();
-		testee.updateOrCreate(config, domain);
+		testee.updateOrCreate(config);
 		control.verify();
 	}
 
 	private DomainConfiguration configurationAsEnabled(boolean enabled) {
 		return DomainConfiguration
 				.builder()
-				.domainId(domain)
+				.domain(domain)
 				.enabled(enabled)
 				.schedulingConfiguration(
 						SchedulingConfiguration.builder()

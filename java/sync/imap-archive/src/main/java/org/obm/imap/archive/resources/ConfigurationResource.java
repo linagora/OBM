@@ -75,9 +75,9 @@ public class ConfigurationResource {
 	@GET
 	public DomainConfigurationDto configuration() throws DaoException {
 		return DomainConfigurationDto.from(
-				Objects.firstNonNull(domainConfigurationDao.get(domain.getUuid()), 
+				Objects.firstNonNull(domainConfigurationDao.get(domain), 
 						DomainConfiguration.DEFAULT_VALUES_BUILDER
-							.domainId(domain.getUuid())
+							.domain(domain)
 							.build()));
 	}
 	
@@ -85,7 +85,7 @@ public class ConfigurationResource {
 	@Transactional
 	public Response update(DomainConfigurationDto domainConfigurationDto) throws DaoException {
 		try {
-			PersistedResult persistedResult = domainConfigurationService.updateOrCreate(DomainConfiguration.from(domainConfigurationDto), domain.getUuid());
+			PersistedResult persistedResult = domainConfigurationService.updateOrCreate(DomainConfiguration.from(domainConfigurationDto, domain));
 			if (persistedResult.isUpdate()) {
 				return Response.noContent().build();
 			} else {

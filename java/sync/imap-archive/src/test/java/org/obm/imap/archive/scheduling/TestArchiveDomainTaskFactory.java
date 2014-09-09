@@ -34,10 +34,10 @@ package org.obm.imap.archive.scheduling;
 
 import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.logging.LoggerAppenders;
 
 import ch.qos.logback.classic.Logger;
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class TestArchiveDomainTaskFactory extends ArchiveDomainTaskFactory {
 
@@ -50,7 +50,7 @@ public class TestArchiveDomainTaskFactory extends ArchiveDomainTaskFactory {
 		this.loggerAppenders = loggerAppenders;
 	}
 
-	public ArchiveDomainTask create(ObmDomainUuid domain, ArchiveTreatmentRunId runId) {
-		return new ArchiveDomainTask(null, null, new ArchiveConfiguration(domain, null, null, runId, logger, loggerAppenders, false));
+	public ArchiveDomainTask create(DomainConfiguration configuration, ArchiveTreatmentRunId runId) {
+		return new ArchiveDomainTask(null, null, new ArchiveConfiguration(configuration, null, null, runId, logger, loggerAppenders, false));
 	}
 }

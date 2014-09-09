@@ -38,22 +38,23 @@ import ch.qos.logback.classic.Logger;
 
 import com.google.common.base.Objects;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ArchiveConfiguration {
 	
 	private final Logger logger;
 	private final LoggerAppenders loggerAppenders;
-	private final ObmDomainUuid domain;
 	private final DateTime when;
 	private final DateTime higherBoundary;
 	private final ArchiveTreatmentRunId runId;
 	private final boolean recurrent;
+	private final DomainConfiguration configuration;
 	
-	public ArchiveConfiguration(ObmDomainUuid domain,
+	public ArchiveConfiguration(DomainConfiguration configuration,
 			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, Logger logger, LoggerAppenders loggerAppenders, 
 			boolean recurrent) {
-		this.domain = domain;
+		this.configuration = configuration;
 		this.when = when;
 		this.higherBoundary = higherBoundary;
 		this.runId = runId;
@@ -62,10 +63,18 @@ public class ArchiveConfiguration {
 		this.recurrent = recurrent;
 	}
 	
+	public DomainConfiguration getConfiguration() {
+		return configuration;
+	}
+	
 	public ObmDomainUuid getDomainId() {
-		return domain;
+		return configuration.getDomainId();
 	}
 
+	public ObmDomain getDomain() {
+		return configuration.getDomain();
+	}
+	
 	public DateTime getWhen() {
 		return when;
 	}
@@ -92,14 +101,14 @@ public class ArchiveConfiguration {
 
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(domain, when, recurrent, runId, higherBoundary);
+		return Objects.hashCode(configuration, when, recurrent, runId, higherBoundary);
 	}
 
 	@Override
 	public boolean equals(Object object){
 		if (object instanceof ArchiveConfiguration) {
 			ArchiveConfiguration that = (ArchiveConfiguration) object;
-			return Objects.equal(this.domain, that.domain)
+			return Objects.equal(this.configuration, that.configuration)
 					&& Objects.equal(this.recurrent, that.recurrent)
 					&& Objects.equal(this.when, that.when)
 					&& Objects.equal(this.higherBoundary, that.higherBoundary)
@@ -111,7 +120,7 @@ public class ArchiveConfiguration {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("domain", domain)
+			.add("domainConfiguration", configuration)
 			.add("when", when)
 			.add("recurrent", recurrent)
 			.add("higherBoundary", higherBoundary)

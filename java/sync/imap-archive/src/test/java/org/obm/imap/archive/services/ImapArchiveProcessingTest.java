@@ -61,13 +61,10 @@ import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.exception.DomainConfigurationException;
 import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.services.ImapArchiveProcessing.ProcessedTask;
-import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.mail.bean.MessageSet;
@@ -97,9 +94,7 @@ public class ImapArchiveProcessingTest {
 	private DateTimeProvider dateTimeProvider;
 	private SchedulingDatesService schedulingDatesService;
 	private StoreClientFactory storeClientFactory;
-	private DomainClient domainClient;
 	private ArchiveTreatmentDao archiveTreatmentDao;
-	private DomainConfigurationDao domainConfigurationDao;
 	private ProcessedFolderDao processedFolderDao;
 	private Logger logger;
 	private LoggerAppenders loggerAppenders;
@@ -112,32 +107,27 @@ public class ImapArchiveProcessingTest {
 		dateTimeProvider = control.createMock(DateTimeProvider.class);
 		schedulingDatesService = control.createMock(SchedulingDatesService.class);
 		storeClientFactory = control.createMock(StoreClientFactory.class);
-		domainClient = control.createMock(DomainClient.class);
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
-		domainConfigurationDao = control.createMock(DomainConfigurationDao.class);
 		processedFolderDao = control.createMock(ProcessedFolderDao.class);
 		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
 		loggerAppenders = control.createMock(LoggerAppenders.class);
 		
-		imapArchiveProcessing = new ImapArchiveProcessing(dateTimeProvider, schedulingDatesService, storeClientFactory, domainClient, archiveTreatmentDao, domainConfigurationDao, processedFolderDao);
+		imapArchiveProcessing = new ImapArchiveProcessing(dateTimeProvider, 
+				schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao);
 	}
 	
 	@Test
 	public void archiveShouldWork() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
-		expect(domainClient.getById(domainId))
-			.andReturn(Optional.of(domain));
-		expect(domainConfigurationDao.get(domainId))
-			.andReturn(DomainConfiguration.builder()
-					.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
-					.enabled(true)
-					.schedulingConfiguration(SchedulingConfiguration.builder()
-							.recurrence(ArchiveRecurrence.daily())
-							.time(LocalTime.parse("13:23"))
-							.build())
-					.build());
-		
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.enabled(true)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.daily())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, 1))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
 		
@@ -178,7 +168,7 @@ public class ImapArchiveProcessingTest {
 			.andReturn(storeClient).times(4);
 		
 		control.replay();
-		imapArchiveProcessing.archive(new ArchiveConfiguration(domainId, null, null, runId, logger, loggerAppenders, false));
+		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
 		control.verify();
 	}
 	
@@ -186,17 +176,14 @@ public class ImapArchiveProcessingTest {
 	public void archiveShouldContinueWhenAnExceptionIsThrownByAFolderProcessing() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
-		expect(domainClient.getById(domainId))
-			.andReturn(Optional.of(domain));
-		expect(domainConfigurationDao.get(domainId))
-			.andReturn(DomainConfiguration.builder()
-					.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
-					.enabled(true)
-					.schedulingConfiguration(SchedulingConfiguration.builder()
-							.recurrence(ArchiveRecurrence.daily())
-							.time(LocalTime.parse("13:23"))
-							.build())
-					.build());
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.enabled(true)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.daily())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.build();
 		
 		expect(archiveTreatmentDao.findLastTerminated(domainId, 1))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -247,7 +234,7 @@ public class ImapArchiveProcessingTest {
 		expectedException.expectCause(ImapArchiveProcessingException.class);
 		
 		control.replay();
-		imapArchiveProcessing.archive(new ArchiveConfiguration(domainId, null, null, runId, logger, loggerAppenders, false));
+		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
 		control.verify();
 	}
 	
@@ -272,61 +259,6 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		storeClient.close();
 		expectLastCall();
-	}
-	
-	@Test
-	public void archiveShouldThrowWhenNoDomainFound() {
-		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
-		expect(domainClient.getById(domainId))
-			.andReturn(Optional.<ObmDomain> absent());
-		
-		expectedException
-			.expectCause(DomainNotFoundException.class)
-			.hasMessage("The domain with the uuid fc2f915e-9df4-4560-b141-7b4c7ddecdd6 was not found");
-		
-		control.replay();
-		imapArchiveProcessing.archive(new ArchiveConfiguration(domainId, null, null, 
-				ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), logger, loggerAppenders, false));
-		control.verify();
-	}
-	
-	@Test
-	public void archiveShouldThrowWhenNoDomainConfigurationFound() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
-		expect(domainClient.getById(domainId))
-			.andReturn(Optional.of(ObmDomain.builder().uuid(domainId).name("MyName").build()));
-		expect(domainConfigurationDao.get(domainId))
-			.andReturn(null);
-		
-		expectedException
-			.expect(DomainConfigurationException.class)
-			.hasMessage("The IMAP Archive configuration is not defined for the domain: 'MyName'");
-		
-		control.replay();
-		imapArchiveProcessing.archive(new ArchiveConfiguration(domainId, null, null,
-				ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), logger, loggerAppenders, false));
-		control.verify();
-	}
-	
-	@Test
-	public void archiveShouldThrowWhenDomainConfigurationDisable() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
-		expect(domainClient.getById(domainId))
-			.andReturn(Optional.of(ObmDomain.builder().uuid(domainId).name("MyName").build()));
-		expect(domainConfigurationDao.get(domainId))
-			.andReturn(DomainConfiguration.builder()
-					.domainId(domainId)
-					.enabled(false)
-					.build());
-		
-		expectedException
-			.expect(DomainConfigurationException.class)
-			.hasMessage("The IMAP Archive service is disabled for the domain: 'MyName'");
-		
-		control.replay();
-		imapArchiveProcessing.archive(new ArchiveConfiguration(domainId, null, null, 
-				ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"), logger, loggerAppenders, false));
-		control.verify();
 	}
 	
 	@Test
@@ -444,29 +376,27 @@ public class ImapArchiveProcessingTest {
 		expectLastCall();
 		
 		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.enabled(true)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+				.build();
+		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
 		
-		ArchiveConfiguration archiveConfiguration = control.createMock(ArchiveConfiguration.class);
-		expect(archiveConfiguration.getLogger()).andReturn(logger);
-		expect(archiveConfiguration.getRunId())
-			.andReturn(ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"));
+		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
+				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
 		
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.domain(domain)
 				.boundaries(Boundaries.builder()
 						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.domainConfiguration(DomainConfiguration.builder()
-						.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
-						.enabled(true)
-						.schedulingConfiguration(SchedulingConfiguration.builder()
-								.recurrence(ArchiveRecurrence.daily())
-								.time(LocalTime.parse("13:23"))
-								.build())
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
 				.build();
@@ -496,31 +426,29 @@ public class ImapArchiveProcessingTest {
 		storeClient.close();
 		expectLastCall();
 		
-		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
+		ObmDomain domain = ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).name("mydomain.org").build();
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+			.domain(domain)
+			.enabled(true)
+			.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+			.excludedFolder("Excluded")
+			.build();
+		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
 		
-		ArchiveConfiguration archiveConfiguration = control.createMock(ArchiveConfiguration.class);
-		expect(archiveConfiguration.getLogger()).andReturn(logger);
-		expect(archiveConfiguration.getRunId())
-			.andReturn(ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"));
+		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
+				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
 		
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.domain(domain)
 				.boundaries(Boundaries.builder()
 						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.domainConfiguration(DomainConfiguration.builder()
-						.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
-						.enabled(true)
-						.schedulingConfiguration(SchedulingConfiguration.builder()
-								.recurrence(ArchiveRecurrence.daily())
-								.time(LocalTime.parse("13:23"))
-								.build())
-						.excludedFolder("Excluded")
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
 				.build();
@@ -550,14 +478,22 @@ public class ImapArchiveProcessingTest {
 		storeClient.close();
 		expectLastCall();
 		
-		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
+		ObmDomain domain = ObmDomain.builder().name("mydomain.org").uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.enabled(true)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.daily())
+						.time(LocalTime.parse("13:23"))
+						.build())
+						.build();
+		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
-		ArchiveConfiguration archiveConfiguration = control.createMock(ArchiveConfiguration.class);
-		expect(archiveConfiguration.getLogger()).andReturn(logger);
-		expect(archiveConfiguration.getRunId()).andReturn(runId);
+		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
+					domainConfiguration, null, null, runId, logger, null, false);
 		
 		expect(processedFolderDao.get(runId, ImapFolder.from("user/usera@mydomain.org")))
 			.andReturn(Optional.<ProcessedFolder> of(ProcessedFolder.builder()
@@ -587,18 +523,9 @@ public class ImapArchiveProcessingTest {
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.domain(domain)
 				.boundaries(Boundaries.builder()
 						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.domainConfiguration(DomainConfiguration.builder()
-						.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
-						.enabled(true)
-						.schedulingConfiguration(SchedulingConfiguration.builder()
-								.recurrence(ArchiveRecurrence.daily())
-								.time(LocalTime.parse("13:23"))
-								.build())
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> of(ArchiveTreatment.builder(ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6"))
 						.runId(runId)
@@ -637,30 +564,30 @@ public class ImapArchiveProcessingTest {
 		storeClient.close();
 		expectLastCall();
 		
-		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
+		ObmDomain domain = ObmDomain.builder().name("mydomain.org").uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.enabled(true)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.daily())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.build();
+		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		
-		ArchiveConfiguration archiveConfiguration = control.createMock(ArchiveConfiguration.class);
-		expect(archiveConfiguration.getLogger()).andReturn(logger);
-		expect(archiveConfiguration.getRunId())
-			.andReturn(ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"));
+
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
+		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
+				domainConfiguration, null, null, runId, logger, null, false);
 		
 		control.replay();
+		
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.domain(domain)
 				.boundaries(Boundaries.builder()
 						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.domainConfiguration(DomainConfiguration.builder()
-						.domainId(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"))
-						.enabled(true)
-						.schedulingConfiguration(SchedulingConfiguration.builder()
-								.recurrence(ArchiveRecurrence.daily())
-								.time(LocalTime.parse("13:23"))
-								.build())
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
 				.build();

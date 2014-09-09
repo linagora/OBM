@@ -36,7 +36,6 @@ import javax.inject.Singleton;
 
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.slf4j.Logger;
 
@@ -51,14 +50,12 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 	/* visibility for injection */ 
 		DryRunImapArchiveProcessing(DateTimeProvider dateTimeProvider,
 			SchedulingDatesService schedulingDatesService,
-			StoreClientFactory storeClientFactory, DomainClient domainClient,
+			StoreClientFactory storeClientFactory,
 			ArchiveTreatmentDao archiveTreatmentDao,
-			DomainConfigurationDao domainConfigurationDao,
 			ProcessedFolderDao processedFolderDao) {
 		
 		super(dateTimeProvider, schedulingDatesService, storeClientFactory,
-				domainClient, archiveTreatmentDao, domainConfigurationDao,
-				processedFolderDao);
+				archiveTreatmentDao, processedFolderDao);
 	}
 	
 	protected void logStart(Logger logger, ObmDomain domain) {

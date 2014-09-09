@@ -35,6 +35,7 @@ import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.logging.LoggerFactory;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.DryRunTaskStatusChanged;
@@ -47,8 +48,6 @@ import ch.qos.logback.classic.Logger;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
 public class ArchiveDomainTaskFactory {
@@ -65,26 +64,26 @@ public class ArchiveDomainTaskFactory {
 		this.loggerFactory = loggerFactory;
 	}
 	
-	public ArchiveDomainTask createAsRecurrent(ObmDomainUuid domain, DateTime when, 
+	public ArchiveDomainTask createAsRecurrent(DomainConfiguration configuration, DateTime when, 
 			DateTime higherBoundary, ArchiveTreatmentRunId runId) {
 		
-		ArchiveConfiguration configuration = createConfiguration(domain, when, higherBoundary, runId, true);
-		return create(configuration, ArchiveTreatmentKind.REAL_RUN); 
+		ArchiveConfiguration archiveConfiguration = createConfiguration(configuration, when, higherBoundary, runId, true);
+		return create(archiveConfiguration, ArchiveTreatmentKind.REAL_RUN); 
 	}
 
-	public ArchiveDomainTask create(ObmDomainUuid domain, DateTime when,
+	public ArchiveDomainTask create(DomainConfiguration configuration, DateTime when,
 			DateTime higherBoundary, ArchiveTreatmentRunId runId,
 			ArchiveTreatmentKind kind) {
 		
-		ArchiveConfiguration configuration = createConfiguration(domain, when, higherBoundary, runId, false);
-		return create(configuration, kind);
+		ArchiveConfiguration archiveConfiguration = createConfiguration(configuration, when, higherBoundary, runId, false);
+		return create(archiveConfiguration, kind);
 	}
 	
-	private ArchiveConfiguration createConfiguration(ObmDomainUuid domain, DateTime when, 
-			DateTime higherBoundary, ArchiveTreatmentRunId runId, boolean recurrent) {
+	private ArchiveConfiguration createConfiguration(DomainConfiguration configuration,
+			DateTime when, DateTime higherBoundary, ArchiveTreatmentRunId runId, boolean recurrent) {
 		Logger logger = loggerFactory.create(runId);
 		LoggerAppenders loggerAppenders = LoggerAppenders.from(runId, logger);
-		return new ArchiveConfiguration(domain, 
+		return new ArchiveConfiguration(configuration, 
 				when, higherBoundary, runId, logger, loggerAppenders, recurrent);
 	}
 	
