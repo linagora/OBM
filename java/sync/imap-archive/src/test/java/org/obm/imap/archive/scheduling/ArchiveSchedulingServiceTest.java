@@ -40,6 +40,7 @@ import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
@@ -47,11 +48,14 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.exception.DomainConfigurationException;
+import org.obm.imap.archive.exception.DomainConfigurationDisableException;
+import org.obm.imap.archive.exception.DomainConfigurationNotFoundException;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask.Factory;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.UUIDFactory;
+
+import pl.wkr.fluentrule.api.FluentExpectedException;
 
 import com.linagora.scheduling.ScheduledTask;
 
@@ -59,6 +63,8 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class ArchiveSchedulingServiceTest {
 
+	@Rule public FluentExpectedException expectedException= FluentExpectedException.none();
+	
 	ObmDomainUuid domain;
 	IMocksControl mocks;
 	ArchiveScheduler scheduler;
@@ -96,7 +102,9 @@ public class ArchiveSchedulingServiceTest {
 	}
 
 	@Test
-	public void scheduleShouldNotCheckEnabledStatus() throws Exception {
+	public void scheduleShouldRaiseExceptionWhenConfigurationDisable() throws Exception {
+		expectedException.expect(DomainConfigurationDisableException.class);
+		
 		testSchedule(
 			DomainConfiguration.builder()
 				.domainId(domain)
@@ -127,16 +135,18 @@ public class ArchiveSchedulingServiceTest {
 		mocks.verify();
 	}
 
-	@Test(expected=DomainConfigurationException.class)
+	@Test
 	public void scheduleShouldRaiseExceptionWhenConfigNotFound() throws Exception {
 		DateTime when = DateTime.parse("2024-01-1T05:04Z");
-		expect(domainConfigDao.get(domain)).andThrow(new DomainConfigurationException("error"));
+		expect(domainConfigDao.get(domain)).andReturn(null);
+		
+		expectedException.expect(DomainConfigurationNotFoundException.class);
+		
 		mocks.replay();
 		try {
 			testee.schedule(domain, when, ArchiveTreatmentKind.REAL_RUN);
-		} catch (Exception e) {
+		} finally {
 			mocks.verify();
-			throw e;
 		}
 	}
 

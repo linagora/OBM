@@ -104,7 +104,7 @@ if ($status[0] != 1) {
       $display['run_id'] = $status[1]->runId;
       $action = 'log_page';
     } else {
-      $display['msg'] .= display_err_msg($l_update_error);
+      $display['msg'] .= display_err_msg($status[1]);
       $action = 'detailconsult';
     }
   } else if ($action == 'archiving_logs') {

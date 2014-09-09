@@ -329,7 +329,7 @@ function curlExec($curl) {
 ///////////////////////////////////////////////////////////////////////////////
 function manual_launch($archiveTreatmentKind) {
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_domain_configuration_not_found, $l_domain_configuration_disable;
   $userInfo = get_user_info($obm['uid']);
 
   if(empty($userInfo["email"])) {
@@ -350,11 +350,14 @@ function manual_launch($archiveTreatmentKind) {
   if ($code == 0) {
     return array(0, $l_imap_archive_server_unreachable);
   }
+  if ($code == 404) {
+    return array(0, $l_domain_configuration_not_found);
+  }
+  if ($code == 409) {
+    return array(0, $l_domain_configuration_disable);
+  }
   if ($code == 200) {
     return array(1, json_decode($success));
-  }
-  if ($code == 204) {
-    return array(1, null);
   }
 }
 

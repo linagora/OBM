@@ -38,7 +38,8 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.exception.DomainConfigurationException;
+import org.obm.imap.archive.exception.DomainConfigurationDisableException;
+import org.obm.imap.archive.exception.DomainConfigurationNotFoundException;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.UUIDFactory;
@@ -74,18 +75,26 @@ public class ArchiveSchedulingService {
 	
 	@Transactional
 	public ArchiveTreatmentRunId schedule(ObmDomainUuid domain, DateTime when, ArchiveTreatmentKind kind) throws DaoException {
-		DomainConfiguration config = domainConfigDao.get(domain);
-		if (config == null) {
-			throw new DomainConfigurationException("No configuration can be found for domain: " + domain.get());
-		}
-		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
-		RepeatKind repeatKind = config.getRepeatKind();
+		DomainConfiguration domainConfiguration = getConfiguration(domain);
+		RepeatKind repeatKind = domainConfiguration.getRepeatKind();
 		DateTime higherBoundary = schedulingDatesService.higherBoundary(when, repeatKind);
 		
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(uuidFactory.randomUUID());
 		ArchiveDomainTask task = taskFactory.create(domain, when, higherBoundary, runId, kind);
 		scheduler.schedule(task);
 		
 		return runId;
+	}
+
+	private DomainConfiguration getConfiguration(ObmDomainUuid domain) throws DaoException {
+		DomainConfiguration domainConfiguration = domainConfigDao.get(domain);
+		if (domainConfiguration == null) {
+			throw new DomainConfigurationNotFoundException("No configuration can be found for domain: " + domain.get());
+		}
+		if (!domainConfiguration.isEnabled()) {
+			throw new DomainConfigurationDisableException("The IMAP Archive service is disabled for the domain: '" + domain.get() + "'");
+		}
+		return domainConfiguration;
 	}
 
 	@Transactional
