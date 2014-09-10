@@ -34,6 +34,7 @@ import static org.obm.sync.IntegrationTestICSUtils.assertIcsReplyFormat;
 import static org.obm.sync.IntegrationTestUtils.newEvent;
 
 import java.net.URL;
+import java.util.concurrent.TimeoutException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -66,6 +67,7 @@ import com.google.inject.Inject;
 public class ChangeParticipationIntegrationTest extends ObmSyncIntegrationTest {
 
 	private static final int TIMEOUT = 5000;
+	private static final int ONE_SECOND = 1000;
 
 	@Inject ArquillianLocatorService locatorService;
 	@Inject CalendarClient calendarClient;
@@ -134,6 +136,33 @@ public class ChangeParticipationIntegrationTest extends ObmSyncIntegrationTest {
 				"PRIORITY:5\r\n" +
 				"CLASS:PUBLIC\r\n" +
 				"SUMMARY:Title_changeParticipationShouldNotifyWhenRegularEvent\r\n");
+	}
+	
+	@Test(expected=TimeoutException.class)
+	@RunAsClient
+	public void changeParticipationShouldNotifyOnlyOnceWhenAcceptingTwiceRegularEvent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+
+		Event event = newEvent(ownerEmail, owner, "changeParticipationShouldNotifyOnlyOnceWhenAcceptingTwiceRegularEvent");
+		event.addAttendee(UserAttendee.builder()
+				.asAttendee()
+				.email(attendeeEmail)
+				.participation(Participation.needsAction())
+				.participationRole(ParticipationRole.REQ)
+				.build());
+		AccessToken ownerToken = loginClient.login(ownerEmail, owner);
+		calendarClient.storeEvent(ownerToken, ownerEmail, event, false, null);
+		
+		AccessToken attendeeToken = loginClient.login(attendeeEmail, attendee);
+		calendarClient.changeParticipationState(attendeeToken, attendeeEmail, event.getExtId(), Participation.accepted(), 0, true);
+		boolean changed = calendarClient.changeParticipationState(attendeeToken, attendeeEmail, event.getExtId(), 
+				Participation.accepted(), 0, true);
+		Event eventFromServer = calendarClient.getEventFromExtId(ownerToken, ownerEmail, event.getExtId());
+
+		assertThat(changed).isFalse();
+		assertThat(eventFromServer.findAttendeeFromEmail(ownerEmail).getParticipation()).isEqualTo(Participation.accepted());
+		assertThat(eventFromServer.findAttendeeFromEmail(attendeeEmail).getParticipation()).isEqualTo(Participation.accepted());
+		storeMessageReceivedListener.waitForMessageCount(3, ONE_SECOND);
 	}
 	
 	@Test
