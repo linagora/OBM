@@ -41,6 +41,7 @@ $l_start_time = "Start time";
 $l_end_time = "End time";
 $l_status = "Status";
 $l_last_fail = "Last failure";
+$l_simulation = "Simulation";
 $l_manual_launch = "Manual launch";
 
 $l_email_address_not_found = "Couldn't find your email address for this domain";

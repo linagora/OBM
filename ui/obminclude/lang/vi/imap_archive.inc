@@ -41,6 +41,7 @@ $l_start_time = "Thời gian bắt đầu";
 $l_end_time = "Kết thúc thời gian";
 $l_status = "Tình trạng";
 $l_last_fail = "Thất bại cuối cùng";
+$l_simulation = "mô phỏng";
 $l_manual_launch = "Dẫn ra mắt";
 
 $l_email_address_not_found = "Không thể tìm thấy địa chỉ email của bạn cho tên miền này";

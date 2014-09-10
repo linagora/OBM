@@ -112,7 +112,7 @@ public class ImapArchiveProcessing {
 					.boundaries(boundaries)
 					.continuePrevious(continuePrevious(previousArchiveTreatment, boundaries.getHigherBoundary()));
 			
-			if (!dryRun(processedTaskBuilder.build())) {
+			if (!run(processedTaskBuilder.build())) {
 				throw new ImapArchiveProcessingException();
 			}
 			
@@ -154,7 +154,7 @@ public class ImapArchiveProcessing {
 		return boundaries;
 	}
 
-	private boolean dryRun(ProcessedTask processedTask) throws Exception {
+	private boolean run(ProcessedTask processedTask) throws Exception {
 		boolean isSuccess = true;
 		Logger logger = processedTask.getLogger();
 		logStart(logger, processedTask.getDomain());
@@ -171,7 +171,7 @@ public class ImapArchiveProcessing {
 	}
 
 	@Transactional
-	private void processMailbox(Mailbox mailbox, ProcessedTask processedTask) throws Exception {
+	protected void processMailbox(Mailbox mailbox, ProcessedTask processedTask) throws Exception {
 		try (StoreClient storeClient = mailbox.storeClient) {
 			storeClient.login(false);
 			
@@ -204,7 +204,7 @@ public class ImapArchiveProcessing {
 				// uidStore Flag.SEEN
 			}
 			
-			insertProcessedFolder(processedFolder);
+			folderProcessed(processedFolder);
 		}
 	}
 
@@ -338,9 +338,8 @@ public class ImapArchiveProcessing {
 		archiveMailbox.select();
 	}
 
-	@SuppressWarnings("unused")
-	@VisibleForTesting void insertProcessedFolder(ProcessedFolder.Builder processedFolder) throws DaoException {
-//		processedFolderDao.insert(processedFolder.end(dateTimeProvider.now()).build());
+	protected void folderProcessed(ProcessedFolder.Builder processedFolder) throws DaoException {
+		processedFolderDao.insert(processedFolder.end(dateTimeProvider.now()).build());
 	}
 	
 	@VisibleForTesting static class ProcessedTask {

@@ -41,6 +41,7 @@ $l_start_time = "开始时间";
 $l_end_time = "结束时间";
 $l_status = "状态";
 $l_last_fail = "最后失败";
+$l_simulation = "模拟";
 $l_manual_launch = "手动启动";
 
 $l_email_address_not_found = "无法找到您的电子邮件地址，该域名";

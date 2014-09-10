@@ -165,7 +165,7 @@ function calculate_next_treatment_date_from_imap_archive_service($configuration)
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];
-
+  
   if($errno){
     error_log("Couldn't login to IMAP archive server (".$errno.")");
     return array(0, $l_could_not_login_imap_archive_server);
@@ -192,7 +192,6 @@ function curlPost($url, $extraParams = array(), $json = "") {
   curl_setopt($curl, CURLOPT_POST, 1);
   curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-type: application/json'));
   curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
-  curl_setopt($curl, CURLOPT_HEADER, 1);
   
   return curlExec($curl);
 }

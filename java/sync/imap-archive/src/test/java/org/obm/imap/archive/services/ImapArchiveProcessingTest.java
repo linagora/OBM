@@ -155,11 +155,11 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", 
-				Range.openClosed(1l, 10l), higherBoundary, storeClient);
+				Range.openClosed(1l, 10l), higherBoundary, treatmentDate, runId, storeClient);
 		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org", 
-				Range.openClosed(3l, 100l), higherBoundary, storeClient);
+				Range.openClosed(3l, 100l), higherBoundary, treatmentDate, runId, storeClient);
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org", 
-				Range.singleton(1230l), higherBoundary, storeClient);
+				Range.singleton(1230l), higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.close();
 		expectLastCall();
@@ -213,7 +213,7 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", 
-				Range.openClosed(1l, 10l), higherBoundary, storeClient);
+				Range.openClosed(1l, 10l), higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.login(false);
 		expectLastCall();
@@ -223,7 +223,7 @@ public class ImapArchiveProcessingTest {
 		expectLastCall();
 		
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org", 
-				Range.openClosed(3l, 100l), higherBoundary, storeClient);
+				Range.openClosed(3l, 100l), higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.close();
 		expectLastCall();
@@ -238,7 +238,10 @@ public class ImapArchiveProcessingTest {
 		control.verify();
 	}
 	
-	private void expectImapCommandsOnMailboxProcessing(String mailboxName, String archiveMailboxName, Range<Long> uids, DateTime higherBoundary, StoreClient storeClient) throws Exception {
+	private void expectImapCommandsOnMailboxProcessing(String mailboxName, String archiveMailboxName, Range<Long> uids, DateTime higherBoundary, 
+				DateTime treatmentDate, ArchiveTreatmentRunId runId, StoreClient storeClient) 
+			throws Exception {
+		
 		storeClient.login(false);
 		expectLastCall();
 		expect(storeClient.select(mailboxName)).andReturn(true);
@@ -258,6 +261,17 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(archiveMailboxName)).andReturn(true);
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		storeClient.close();
+		expectLastCall();
+		
+		expect(dateTimeProvider.now())
+			.andReturn(treatmentDate);
+		processedFolderDao.insert(ProcessedFolder.builder()
+				.runId(runId)
+				.folder(ImapFolder.from(mailboxName))
+				.uidNext(uids.upperEndpoint())
+				.start(treatmentDate)
+				.end(treatmentDate)
+				.build());
 		expectLastCall();
 	}
 	

@@ -348,7 +348,6 @@ function get_block_next_treatment_date($configuration) {
   global $l_next_run;
   
   $status = calculate_next_treatment_date_from_imap_archive_service($configuration);
-
   $date = null;
   if ($status[0] == 1) {
     $date = new DateTime($status[1]->nextTreatmentDate);
@@ -365,7 +364,7 @@ function get_block_next_treatment_date($configuration) {
 
 function dis_imap_archive_consult($params, $configuration) {
 
-  global $l_delete, $l_back, $l_past_operations, $l_start_time, $l_end_time, $l_status, $l_next_run, $l_manual_launch;
+  global $l_delete, $l_back, $l_past_operations, $l_start_time, $l_end_time, $l_status, $l_next_run, $l_simulation, $l_manual_launch;
   global $l_last_fail, $path, $l_confirm_manual_launch;
   
   $user_id = $params['user_id'];
@@ -410,6 +409,9 @@ function dis_imap_archive_consult($params, $configuration) {
     </div>
     <div class='buttons'>
       <a class='$class' href='$path/imap_archive/imap_archive_index.php?action=manual_launch&archive_treatment_kind=DRY_RUN' target='_blank' onclick='return confirm_launch();'>
+      $l_simulation 
+      </a>
+      <a class='$class' href='$path/imap_archive/imap_archive_index.php?action=manual_launch&archive_treatment_kind=REAL_RUN' target='_blank' onclick='return confirm_launch();'>
       $l_manual_launch 
       </a>
     </div>

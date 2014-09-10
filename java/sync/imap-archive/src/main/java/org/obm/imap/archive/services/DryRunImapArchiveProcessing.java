@@ -35,8 +35,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
+import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 
 import com.linagora.scheduling.DateTimeProvider;
@@ -58,8 +60,12 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 				archiveTreatmentDao, processedFolderDao);
 	}
 	
+	@Override
 	protected void logStart(Logger logger, ObmDomain domain) {
 		logger.info("Starting IMAP Archive in {} for domain {}", ArchiveTreatmentKind.DRY_RUN, domain.getName());
 	}
 	
+	@Override
+	protected void folderProcessed(ProcessedFolder.Builder processedFolder) throws DaoException {
+	}
 }
