@@ -1118,6 +1118,7 @@ p.emptyset {
 a.unavailable {
   pointer-events: none;
   cursor: default;
+  background: #999;
 }
 
 /* ------------------------------------------------------------------------- */
