@@ -42,7 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.obm.annotations.technicallogging.KindToBeLogged;
 import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.annotations.transactional.Transactional;
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.obm.logger.LoggerService;
 import org.obm.push.backend.IBackend;
 import org.obm.push.backend.ICollectionChangeListener;

@@ -38,7 +38,7 @@ import org.obm.annotations.technicallogging.KindToBeLogged;
 import org.obm.annotations.technicallogging.ResourceType;
 import org.obm.annotations.technicallogging.TechnicalLogging;
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;

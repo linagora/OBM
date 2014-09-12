@@ -34,7 +34,7 @@ package org.obm.sync.client.mailingList;
 import java.util.List;
 
 import org.apache.http.client.HttpClient;
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;

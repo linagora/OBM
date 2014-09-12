@@ -32,7 +32,7 @@
 package org.obm.sync.client.calendar;
 
 import org.apache.http.client.HttpClient;
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.obm.sync.client.impl.SyncClientException;
 import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;

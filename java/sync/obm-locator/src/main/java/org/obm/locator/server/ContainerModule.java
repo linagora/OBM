@@ -50,9 +50,9 @@ import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.VMArgumentsUtils;
-import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseModule;
 import org.obm.locator.LocatorServerLauncher;
+import org.obm.logger.LoggerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

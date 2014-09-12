@@ -37,7 +37,7 @@ import org.obm.annotations.transactional.TransactionProvider;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.TestTransactionConfiguration;
 import org.obm.configuration.TransactionConfiguration;
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.obm.opush.env.Configuration;
 import org.obm.opush.env.StaticConfigurationService;
 import org.obm.push.mail.WindowingService;

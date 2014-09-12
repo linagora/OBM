@@ -35,7 +35,7 @@ import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
 import org.obm.configuration.TransactionConfiguration;
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.slf4j.Logger;
 
 import bitronix.tm.BitronixTransactionManager;

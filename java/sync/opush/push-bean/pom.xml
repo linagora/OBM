@@ -23,12 +23,17 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>utils</artifactId>
+			<artifactId>configuration</artifactId>
+			<version>${obm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>configuration</artifactId>
+			<artifactId>logger-module</artifactId>
 			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>utils</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>

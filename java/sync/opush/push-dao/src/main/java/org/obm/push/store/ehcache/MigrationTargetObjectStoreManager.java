@@ -46,7 +46,7 @@ import net.sf.ehcache.config.MemoryUnit;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.obm.push.store.ehcache.EhCacheConfiguration.Percentage;
 import org.slf4j.Logger;
 

@@ -47,7 +47,7 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.obm.sync.ObmSmtpConf;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;

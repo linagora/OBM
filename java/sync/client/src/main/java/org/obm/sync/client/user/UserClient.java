@@ -33,7 +33,7 @@ package org.obm.sync.client.user;
 
 import org.apache.http.client.HttpClient;
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;

@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.configuration;
 
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

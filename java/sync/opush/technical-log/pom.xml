@@ -17,6 +17,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
+			<artifactId>annotations</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>common</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
@@ -27,7 +32,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>annotations</artifactId>
+			<artifactId>logger-module</artifactId>
 			<version>${obm.version}</version>
 		</dependency>
 		<dependency>

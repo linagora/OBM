@@ -31,9 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push;
 import org.obm.configuration.VMArgumentsUtils;
-import org.obm.configuration.module.LoggerModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
+import org.obm.logger.LoggerModule;
 import org.obm.push.java.mail.ImapModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

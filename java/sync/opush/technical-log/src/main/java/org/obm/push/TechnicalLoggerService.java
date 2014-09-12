@@ -37,7 +37,7 @@ import javax.xml.bind.JAXBException;
 
 import net.sf.ehcache.Element;
 
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.obm.push.bean.jaxb.JAXBBean;
 import org.obm.push.bean.jaxb.Request;
 import org.obm.push.bean.jaxb.Resource;

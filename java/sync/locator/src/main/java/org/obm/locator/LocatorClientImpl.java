@@ -38,8 +38,8 @@ import javax.naming.ConfigurationException;
 
 import org.apache.http.client.fluent.Request;
 import org.obm.configuration.LocatorConfiguration;
-import org.obm.configuration.module.LoggerModule;
 import org.obm.locator.store.LocatorService;
+import org.obm.logger.LoggerModule;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;

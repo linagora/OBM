@@ -43,7 +43,7 @@ import net.sf.ehcache.migrating.config.DiskStoreConfiguration;
 import net.sf.ehcache.migrating.store.MemoryStoreEvictionPolicy;
 
 import org.obm.configuration.ConfigurationService;
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.slf4j.Logger;
 
 import com.google.inject.Inject;

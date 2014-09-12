@@ -34,10 +34,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.obm.configuration.LocatorConfiguration;
-import org.obm.configuration.module.LoggerModule;
 import org.obm.locator.LocatorCacheException;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
+import org.obm.logger.LoggerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

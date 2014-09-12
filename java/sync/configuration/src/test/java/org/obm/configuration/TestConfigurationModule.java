@@ -33,7 +33,7 @@ package org.obm.configuration;
 
 import static org.easymock.EasyMock.createNiceMock;
 
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.slf4j.Logger;
 
 import com.google.inject.AbstractModule;

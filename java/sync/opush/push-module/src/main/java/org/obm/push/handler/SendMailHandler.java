@@ -31,7 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.handler;
 
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.obm.push.backend.IErrorsManager;
 import org.obm.push.bean.UserDataRequest;
 import org.obm.push.exception.activesync.ProcessingEmailException;

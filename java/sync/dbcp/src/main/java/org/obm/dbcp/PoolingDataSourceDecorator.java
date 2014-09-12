@@ -35,8 +35,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.logger.LoggerModule;
 import org.slf4j.Logger;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;

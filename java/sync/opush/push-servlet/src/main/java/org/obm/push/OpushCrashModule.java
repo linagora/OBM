@@ -35,7 +35,7 @@ import org.crsh.auth.AuthenticationPlugin;
 import org.crsh.plugin.CRaSHPlugin;
 import org.crsh.ssh.SSHPlugin;
 import org.obm.auth.crsh.ObmSyncAuthenticationPlugin;
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.obm.push.configuration.RemoteConsoleConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

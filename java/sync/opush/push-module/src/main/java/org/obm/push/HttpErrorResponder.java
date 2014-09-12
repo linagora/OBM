@@ -34,7 +34,7 @@ package org.obm.push;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.configuration.module.LoggerModule;
+import org.obm.logger.LoggerModule;
 import org.slf4j.Logger;
 
 import com.google.inject.Inject;
