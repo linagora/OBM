@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
+import org.obm.logger.LoggerService;
 import org.obm.push.bean.Credentials;
 import org.obm.push.bean.ResourcesHolder;
 import org.obm.push.exception.AuthenticationException;
@@ -87,7 +88,7 @@ public class AuthenticationFilter implements Filter {
 		try {
 			if ("POST".equals(httpRequest.getMethod())) {
 				Credentials credentials = authentication(httpRequest);
-				loggerService.defineUser(credentials.getUser());
+				loggerService.defineUser(credentials.getUser().getLoginAtDomain());
 				httpRequest.setAttribute(RequestProperties.CREDENTIALS, credentials);
 			}
 			chain.doFilter(request, response);

@@ -15,10 +15,15 @@
 
 	<dependencies>
  		<dependency>
-                        <groupId>com.linagora.obm</groupId>
-                        <artifactId>common-test</artifactId>
-                        <version>${obm.version}</version>
-                </dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-test</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
+ 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>logger-module</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>

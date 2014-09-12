@@ -39,6 +39,7 @@ import javax.servlet.ServletRequest;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.logger.LoggerService;
 import org.obm.servlet.filter.qos.QoSContinuationSupportJettyUtils;
 
 

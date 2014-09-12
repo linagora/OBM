@@ -40,6 +40,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.obm.logger.LoggerService;
 import org.obm.push.impl.PushContinuation;
 import org.obm.push.impl.PushContinuation.Factory;
 

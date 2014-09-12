@@ -29,42 +29,45 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.push;
+package org.obm.logger;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import org.obm.push.bean.User;
 import org.slf4j.MDC;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
 public class LoggerService {
 
+	private final String applicationName;
+
 	@Inject
-	private LoggerService() {
+	private LoggerService(@Named("application-name") String applicationName) {
+		this.applicationName = applicationName;
 	}
 	
-	public void startSession(User user, int requestId, String command) {
+	public void startSession(String loginAtDomain, int requestId, String command) {
 		startSession();
-		defineUser(user);
+		defineUser(loginAtDomain);
 		defineRequestId(requestId);
 		defineCommand(command);
 	}
 	
 	public void startSession() {
-		MDC.put("title", "Opush ActiveSync");
+		MDC.put("title", applicationName);
 		MDC.put("threadId", String.valueOf(Thread.currentThread().getId()));
 	}
 	
-	public void defineUser(User user) {
+	public void defineUser(String loginAtDomain) {
 		Calendar date = Calendar.getInstance();
 		SimpleDateFormat dateformatter = new SimpleDateFormat("yyyy.MM.dd_hh:mm:ss");
 		String now = dateformatter.format(date.getTime());
-		String sessionId = user.getLoginAtDomain() + "-" + now;
-		MDC.put("user", user.getLoginAtDomain());
+		String sessionId = loginAtDomain + "-" + now;
+		MDC.put("user", loginAtDomain);
 		MDC.put("sessionId", sessionId);
 	}
 	

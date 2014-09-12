@@ -42,6 +42,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.obm.logger.LoggerService;
 import org.obm.push.protocol.request.ActiveSyncRequest;
 import org.obm.push.protocol.request.Base64QueryString;
 import org.obm.push.protocol.request.SimpleQueryString;

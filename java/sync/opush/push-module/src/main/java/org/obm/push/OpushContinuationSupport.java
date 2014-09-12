@@ -34,6 +34,7 @@ package org.obm.push;
 import javax.servlet.ServletRequest;
 
 import org.eclipse.jetty.continuation.Continuation;
+import org.obm.logger.LoggerService;
 import org.obm.servlet.filter.qos.QoSContinuationSupport;
 import org.obm.servlet.filter.qos.QoSContinuationSupportJettyUtils;
 
