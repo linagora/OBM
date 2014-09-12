@@ -45,8 +45,6 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.utils.LogUtils;
-
 @Singleton
 public class MailingListBindingImpl implements IMailingList {
 
@@ -67,7 +65,7 @@ public class MailingListBindingImpl implements IMailingList {
 		try {
 			return mailingListHome.findMailingLists(token);
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault("error finding addressbooks ");
 		}
 	}
@@ -80,11 +78,11 @@ public class MailingListBindingImpl implements IMailingList {
 			MailingList ml = mailingListHome.createMailingList(
 					token, mailingList);
 
-			logger.info(LogUtils.prefix(token) + "Mailing list[" + ml.getId()
+			logger.info("Mailing list[" + ml.getId()
 					+ "] : " + ml.getName() + " created");
 			return ml;
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -97,11 +95,11 @@ public class MailingListBindingImpl implements IMailingList {
 			MailingList ml = mailingListHome.modifyMailingList(
 					token, mailingList);
 
-			logger.info(LogUtils.prefix(token) + "Mailing list : "
+			logger.info("Mailing list : "
 					+ ml.getName() + " modified");
 			return ml;
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -112,10 +110,10 @@ public class MailingListBindingImpl implements IMailingList {
 			throws ServerFault {
 		try {
 			mailingListHome.removeMailingList(token, id);
-			logger.info(LogUtils.prefix(token) + "Mailing list : " + id
+			logger.info("Mailing list : " + id
 					+ " removed");
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -127,7 +125,7 @@ public class MailingListBindingImpl implements IMailingList {
 		try {
 			return mailingListHome.getMailingListFromId(token, id);
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -138,10 +136,10 @@ public class MailingListBindingImpl implements IMailingList {
 			List<MLEmail> email) throws ServerFault {
 		try {
 			List<MLEmail> ret = mailingListHome.addEmails(at, mailingListId, email);
-			logger.info(LogUtils.prefix(at) + ret.size() +" emails were added in mailingList: " + mailingListId );
+			logger.info(ret.size() +" emails were added in mailingList: " + mailingListId );
 			return ret;
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(at) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -153,11 +151,11 @@ public class MailingListBindingImpl implements IMailingList {
 		try {
 			mailingListHome.removeEmail(at, mailingListId,
 					emailId);
-			logger.info(LogUtils.prefix(at) + "Email[" + emailId
+			logger.info("Email[" + emailId
 					+ "] in MailingList[" + mailingListId + "]  : "
 					+ " removed");
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(at) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 

@@ -74,7 +74,6 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.calendar.CalendarBindingImpl;
 import fr.aliacom.obm.common.session.SessionManagement;
-import fr.aliacom.obm.utils.LogUtils;
 
 /**
  * Handles the following urls :
@@ -125,7 +124,7 @@ public class EventHandler extends SecureSyncHandler {
 		
 		AccessToken at = getCheckedToken(request);
 		String res = searchAndInvokeMethod(request, responder, at);
-		logger.debug(LogUtils.prefix(at) + res);
+		logger.debug(res);
 	}
 
 	private String searchAndInvokeMethod(Request request, XmlResponder responder, AccessToken at)
@@ -213,7 +212,7 @@ public class EventHandler extends SecureSyncHandler {
 			return storeEvent(at, request, responder);
 		}
 		else {
-			logger.error(LogUtils.prefix(at) + "cannot handle method '" + method + "'");
+			logger.error("cannot handle method '" + method + "'");
 			return "";
 		}
 	} 

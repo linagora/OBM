@@ -47,7 +47,6 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
-import fr.aliacom.obm.utils.LogUtils;
 
 @Singleton
 public class SettingBindingImpl implements ISetting {
@@ -70,11 +69,11 @@ public class SettingBindingImpl implements ISetting {
 	public Map<String, String> getSettings(AccessToken token)
 			throws ServerFault {
 		try {
-			logger.info(LogUtils.prefix(token) + "Setting : getSettings()");
+			logger.info("Setting : getSettings()");
 			ObmUser user = userService.getUserFromAccessToken(token);
 			return settingDao.getSettings(user);
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -84,12 +83,12 @@ public class SettingBindingImpl implements ISetting {
 	public void setVacationSettings(AccessToken token, VacationSettings vs)
 			throws ServerFault {
 		try {
-			logger.info(LogUtils.prefix(token) + "Setting : setVacation("
+			logger.info("Setting : setVacation("
 					+ vs.isEnabled() + " " + vs.getStart() + " " + vs.getEnd()
 					+ " " + vs.getText() + ")");
 			settingDao.setVacationSettings(token, vs);
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -99,12 +98,12 @@ public class SettingBindingImpl implements ISetting {
 	public void setEmailForwarding(AccessToken token, ForwardingSettings fs)
 			throws ServerFault {
 		try {
-			logger.info(LogUtils.prefix(token) + "Setting : setForwarding("
+			logger.info("Setting : setForwarding("
 					+ fs.isEnabled() + ", " + fs.getEmail() + ", localCopy: "
 					+ fs.isLocalCopy() + ")");
 			settingDao.setEmailForwarding(token, fs);
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -114,10 +113,10 @@ public class SettingBindingImpl implements ISetting {
 	public ForwardingSettings getEmailForwarding(AccessToken token)
 			throws ServerFault {
 		try {
-			logger.info(LogUtils.prefix(token) + "Setting : getEmailForwarding()");
+			logger.info("Setting : getEmailForwarding()");
 			return settingDao.getEmailForwarding(token);
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -127,10 +126,10 @@ public class SettingBindingImpl implements ISetting {
 	public VacationSettings getVacationSettings(AccessToken token)
 			throws ServerFault {
 		try {
-			logger.info(LogUtils.prefix(token) + "Setting : getVacationSettings()");
+			logger.info("Setting : getVacationSettings()");
 			return settingDao.getVacationSettings(token);
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}

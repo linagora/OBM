@@ -125,7 +125,6 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
 import fr.aliacom.obm.utils.LinkedEntity;
-import fr.aliacom.obm.utils.LogUtils;
 import fr.aliacom.obm.utils.ObmHelper;
 import fr.aliacom.obm.utils.RFC2445;
 
@@ -2202,7 +2201,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 				ps.setInt(6, editor.getObmId());
 				ps.setBoolean(7, isOrganizer);
 				ps.addBatch();
-				logger.info(LogUtils.prefix(editor) + "Adding " + attendeeEmail + ( isOrganizer ? " as organizer" : " as attendee"));
+				logger.info("Adding " + attendeeEmail + ( isOrganizer ? " as organizer" : " as attendee"));
 				
 				alreadyAddedAttendees.add(userEntity);
 			}

@@ -48,7 +48,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.utils.LogUtils;
 
 @Singleton
 public class ParticipationService {
@@ -71,12 +70,11 @@ public class ParticipationService {
 			final Participation participation, int sequence,
 			final ObmUser calendarOwner, Event currentEvent) throws SQLException, ParseException {
 		
-		return change(token, extId, participation, sequence, calendarOwner, currentEvent, new ChangeParticipationFunction() {
+		return change(extId, participation, sequence, calendarOwner, currentEvent, new ChangeParticipationFunction() {
 			
 			@Override
 			public boolean apply() throws SQLException, ParseException {
-				logger.info(LogUtils.prefix(token) + 
-					"Calendar : event[extId:{}] change participation state for user {} new state : {}", 
+				logger.info("Calendar : event[extId:{}] change participation state for user {} new state : {}", 
 					new Object[]{extId, calendarOwner.getEmail(), participation});
 				return calendarDao.changeParticipation(token, calendarOwner, extId, participation);
 			}
@@ -88,27 +86,25 @@ public class ParticipationService {
 			final ObmUser calendarOwner, Event currentEvent) throws SQLException, ParseException {
 		
 
-		return change(token, extId, participation, sequence, calendarOwner, currentEvent, new ChangeParticipationFunction() {
+		return change(extId, participation, sequence, calendarOwner, currentEvent, new ChangeParticipationFunction() {
 			
 			@Override
 			public boolean apply() throws SQLException, ParseException {
-				logger.info(LogUtils.prefix(token) + 
-					"Calendar : event[extId:{} and recurrenceId:{}] change participation state for user {} new state : {}", 
+				logger.info("Calendar : event[extId:{} and recurrenceId:{}] change participation state for user {} new state : {}", 
 					new Object[]{extId, recurrenceId, calendarOwner.getEmail(), participation});
 				return calendarDao.changeParticipation(token, calendarOwner, extId, recurrenceId, participation);
 			}
 		});
 	}
 
-	private boolean change(AccessToken token, EventExtId extId, Participation participation, int sequence, 
+	private boolean change(EventExtId extId, Participation participation, int sequence, 
 			ObmUser calendarOwner, Event currentEvent, ChangeParticipationFunction changeFunction) 
 			throws SQLException, ParseException {
 		
 		if (currentEvent.getSequence() == sequence) {
 			Attendee attendee = currentEvent.findAttendeeFromEmail(calendarOwner.getEmail());
 			if (attendee.getParticipation().equals(participation)) {
-				logger.info(LogUtils.prefix(token) + 
-					"Calendar : event[extId:{}] change participation state for user {} with same state {} ignored",
+				logger.info("Calendar : event[extId:{}] change participation state for user {} with same state {} ignored",
 					new Object[]{extId, calendarOwner.getEmail(), participation});
 				return false;
 			} else {
@@ -116,8 +112,7 @@ public class ParticipationService {
 				return changeFunction.apply();
 			}
 		} else {
-			logger.info(LogUtils.prefix(token) + 
-				"Calendar : event[extId:" + extId + "] ignoring new participation state for user " + 
+			logger.info("Calendar : event[extId:" + extId + "] ignoring new participation state for user " + 
 				calendarOwner.getEmail() + " as sequence number is different from current event (got " + sequence + ", expected " + currentEvent.getSequence());
 			return false;
 		}
