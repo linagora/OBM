@@ -166,7 +166,7 @@ public class GuiceServletContextListener implements ServletContextListener {
             	bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
             	bind(DateProvider.class).to(ObmHelper.class);
             	bind(AttendeeService.class).to(AttendeeServiceJdbcImpl.class);
-		bind(Ical4jRecurrenceHelper.class).to(Ical4jHelper.class);
+            	bind(Ical4jRecurrenceHelper.class).to(Ical4jHelper.class);
             }
         },
         new MessageQueueModule(), new TransactionalModule(),
