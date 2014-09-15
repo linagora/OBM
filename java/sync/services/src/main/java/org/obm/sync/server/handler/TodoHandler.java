@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
+import org.obm.logger.LoggerService;
 import org.obm.sync.calendar.CalendarItemsParser;
 import org.obm.sync.calendar.EventType;
 
@@ -44,8 +45,8 @@ import fr.aliacom.obm.common.session.SessionManagement;
 public class TodoHandler extends EventHandler {
 
 	@Inject
-	public TodoHandler(SessionManagement sessionManagement, CalendarBindingImpl calendarBindingImpl, CalendarItemsParser cip) {
-		super(sessionManagement, calendarBindingImpl, cip);
+	public TodoHandler(SessionManagement sessionManagement, LoggerService loggerService, CalendarBindingImpl calendarBindingImpl, CalendarItemsParser cip) {
+		super(sessionManagement, loggerService, calendarBindingImpl, cip);
 		
 		calendarBindingImpl.setEventType(EventType.VTODO);
 	}

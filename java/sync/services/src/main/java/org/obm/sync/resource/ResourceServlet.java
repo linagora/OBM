@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.icalendar.Ical4jHelper;
+import org.obm.logger.LoggerService;
 import org.obm.sync.GuiceServletContextListener;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
@@ -54,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
@@ -62,9 +64,16 @@ import fr.aliacom.obm.common.calendar.ResourceNotFoundException;
 @Singleton
 public class ResourceServlet extends HttpServlet {
 
-	private Logger logger = LoggerFactory.getLogger(ResourceServlet.class);
+	private static final Logger logger = LoggerFactory.getLogger(ResourceServlet.class);
+	private final LoggerService loggerService;
+	
 	private ICalendar calendarBinding;
 	private Ical4jHelper ical4jHelper;
+	
+	@Inject
+	@VisibleForTesting ResourceServlet(LoggerService loggerService) {
+		this.loggerService = loggerService;
+	}
 
 	@Override
 	public void init() throws ServletException {
@@ -77,14 +86,16 @@ public class ResourceServlet extends HttpServlet {
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String resourceEmail = extractResourceEmail(request);
-		if (resourceEmail == null) {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			logger.warn("The email of the resource is null or empty ");
-			return;			
-		}
-		
 		try {
+			String resourceEmail = extractResourceEmail(request);
+			if (resourceEmail == null) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				logger.warn("The email of the resource is null or empty ");
+				return;			
+			}
+			loggerService.defineUser(resourceEmail);
+			loggerService.defineCommand(ResourceServlet.class.getSimpleName());
+			
 			response.setContentType("text/calendar;charset=UTF-8");
 			String resourceICS = getResourceICS(resourceEmail, extractSyncRange(request));
 			
@@ -94,13 +105,11 @@ public class ResourceServlet extends HttpServlet {
 				response.getWriter().write(resourceICS);
 				response.setStatus(HttpServletResponse.SC_OK);
 			}
-		}
-		catch(ResourceNotFoundException e) {
+		} catch(ResourceNotFoundException e) {
 			logger.error(e.getMessage(),  e);
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			response.flushBuffer();			
-		}
-		catch (ServerFault e) {
+		} catch (ServerFault e) {
 			logger.error(e.getMessage(),  e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.flushBuffer();

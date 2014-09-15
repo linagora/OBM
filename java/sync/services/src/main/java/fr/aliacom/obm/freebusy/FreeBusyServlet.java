@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.logger.LoggerService;
 import org.obm.sync.GuiceServletContextListener;
 import org.obm.sync.calendar.FreeBusyRequest;
 import org.obm.sync.calendar.UserAttendee;
@@ -76,9 +77,16 @@ public class FreeBusyServlet extends HttpServlet {
 	private enum FreeBusyQueryType { LOCAL, REMOTE }
 	
 	private static final long serialVersionUID = -3887606350629311688L;
-	private Logger logger = LoggerFactory.getLogger(FreeBusyServlet.class);
+	private static final Logger logger = LoggerFactory.getLogger(FreeBusyServlet.class);
+	private final LoggerService loggerService;
+	
 	private LocalFreeBusyProvider localFreeBusyProvider;
 	private Collection<RemoteFreeBusyProvider> remoteFreeBusyProviders;
+	
+	@Inject
+	private FreeBusyServlet(LoggerService loggerService) {
+		this.loggerService = loggerService;
+	}
 	
 	@Override
 	public void init() throws ServletException {
@@ -96,6 +104,7 @@ public class FreeBusyServlet extends HttpServlet {
 		}
 	}
 	
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -110,17 +119,25 @@ public class FreeBusyServlet extends HttpServlet {
 		
 		String attendee = extractAttendeeFrom(pathInfo);
 		String organizer = request.getParameter("organizer");
+		loggerService.defineUser(organizer);
+		loggerService.defineCommand(FreeBusyServlet.class.getSimpleName());
 
-		java.util.Calendar dnow = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-		dnow.add(java.util.Calendar.MONTH, -1);
-		Date dstart = dnow.getTime();
-		dnow.add(java.util.Calendar.MONTH, 2);
-		Date dend = dnow.getTime();
+		doTheJob(request, response, attendee, organizer);
+	}
 
-		FreeBusyRequest fbr = makeFreeBusyRequest(organizer, attendee, dstart, dend);
-		Set<FreeBusyQueryType> queryTypes = findFreeBusyQueryTypes(request);
-		List<FreeBusyProvider> providers = makeProvidersList(queryTypes);
+	private void doTheJob(HttpServletRequest request, HttpServletResponse response, String attendee, String organizer)
+			throws IOException {
 		try {
+			Calendar dnow = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+			dnow.add(Calendar.MONTH, -1);
+			Date dstart = dnow.getTime();
+			dnow.add(Calendar.MONTH, 2);
+			Date dend = dnow.getTime();
+			
+			FreeBusyRequest fbr = makeFreeBusyRequest(organizer, attendee, dstart, dend);
+			Set<FreeBusyQueryType> queryTypes = findFreeBusyQueryTypes(request);
+			List<FreeBusyProvider> providers = makeProvidersList(queryTypes);
+			
 			String ics = findFreeBusyIcs(fbr, providers);
 			if (ics != null) {
 				response.getOutputStream().write(ics.getBytes());

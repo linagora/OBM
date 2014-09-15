@@ -35,6 +35,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 
 @RunWith(SlowFilterRunner.class)
 public class FreeBusyServletTest {
@@ -57,6 +58,7 @@ public class FreeBusyServletTest {
 			bindWithMock(HttpServletRequest.class);
 			bindWithMock(HttpServletResponse.class);
 			bindWithMock(ServletConfig.class);
+			bind(String.class).annotatedWith(Names.named("application-name")).toInstance("obm-sync");
 		}
 		
 		private <T> void bindWithMock(Class<T> cls) {

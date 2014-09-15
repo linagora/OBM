@@ -39,6 +39,7 @@ import java.util.List;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.apache.commons.lang.StringUtils;
+import org.obm.logger.LoggerService;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.auth.AccessToken;
@@ -111,8 +112,8 @@ public class EventHandler extends SecureSyncHandler {
 	private final CalendarItemsParser cip;
 
 	@Inject
-	public EventHandler(SessionManagement sessionManagement, CalendarBindingImpl calendarBindingImpl, CalendarItemsParser cip) {
-		super(sessionManagement);
+	public EventHandler(SessionManagement sessionManagement, LoggerService loggerService, CalendarBindingImpl calendarBindingImpl, CalendarItemsParser cip) {
+		super(sessionManagement, loggerService);
 		
 		this.binding = calendarBindingImpl;
 		this.cip = cip;

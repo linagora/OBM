@@ -59,6 +59,7 @@ import org.obm.DateUtils;
 import org.obm.icalendar.ICSParsingResults;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.logger.LoggerService;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventExtId.Factory;
@@ -89,6 +90,7 @@ public class ResourceServletTest {
 	private DateProvider dateProvider;
 	private AttendeeService attendeeService;
 	private Date now;
+	private LoggerService loggerService;
 	
 	@Before
 	public void setUp() {
@@ -99,7 +101,13 @@ public class ResourceServletTest {
 		helper = new Ical4jHelper(dateProvider, eventExtIdFactory, attendeeService);
 		iCalUser = Ical4jUser.Factory.create().createIcal4jUser("toto@toto.com",
 				ToolBox.getDefaultObmDomain());
-		resourceServlet = new ResourceServlet();
+		loggerService = createMock(LoggerService.class);
+		loggerService.startSession();
+		expectLastCall();
+		loggerService.closeSession();
+		expectLastCall();
+		
+		resourceServlet = new ResourceServlet(loggerService);
 
 		servletConfig = createMock(ServletConfig.class);
 		servletContext = createMock(ServletContext.class);

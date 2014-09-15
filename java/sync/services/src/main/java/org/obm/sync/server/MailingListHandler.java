@@ -33,6 +33,7 @@ package org.obm.sync.server;
 
 import java.util.List;
 
+import org.obm.logger.LoggerService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.mailingList.MLEmail;
 import org.obm.sync.mailingList.MailingList;
@@ -52,8 +53,8 @@ public class MailingListHandler extends SecureSyncHandler {
 	private MailingListItemsParser parser;
 
 	@Inject
-	private MailingListHandler(SessionManagement sessionManagement, MailingListBindingImpl mailingListBindingImpl, MailingListItemsParser mailingListItemsParser) {
-		super(sessionManagement);
+	private MailingListHandler(SessionManagement sessionManagement, LoggerService loggerService, MailingListBindingImpl mailingListBindingImpl, MailingListItemsParser mailingListItemsParser) {
+		super(sessionManagement, loggerService);
 		binding = mailingListBindingImpl;
 		parser = mailingListItemsParser;
 	}

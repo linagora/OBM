@@ -40,6 +40,7 @@ import javax.naming.NoPermissionException;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.configuration.ContactConfiguration;
+import org.obm.logger.LoggerService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.KeyList;
@@ -72,10 +73,10 @@ public class AddressBookHandler extends SecureSyncHandler {
 	private final ContactConfiguration contactConfiguration;
 
 	@Inject
-	private AddressBookHandler(SessionManagement sessionManagement, AddressBookBindingImpl addressBookBindingImpl, 
-			ContactConfiguration contactConfiguration) {
+	private AddressBookHandler(SessionManagement sessionManagement, LoggerService loggerService,
+			AddressBookBindingImpl addressBookBindingImpl, ContactConfiguration contactConfiguration) {
 		
-		super(sessionManagement);
+		super(sessionManagement, loggerService);
 		this.binding = addressBookBindingImpl;
 		this.contactConfiguration = contactConfiguration;
 		this.bip = new BookItemsParser();

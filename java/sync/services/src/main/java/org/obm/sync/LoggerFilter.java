@@ -31,29 +31,51 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import org.obm.sync.resource.ResourceServlet;
-import org.obm.sync.server.SyncServlet;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import com.google.inject.servlet.ServletModule;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
-import fr.aliacom.obm.freebusy.FreeBusyServlet;
+import org.obm.logger.LoggerService;
 
-public class ObmSyncServletModule  extends ServletModule {
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
+public class LoggerFilter implements Filter {
 
-	private static final String SERVICES_MAIN_SERVLET_PATH = "/services";
-	private static final String SERVICES_SERVLET_PATH = SERVICES_MAIN_SERVLET_PATH + "/*";
-	private static final String RESOURCES_SERVLET_PATH = "/resources/*";
-	private static final String FREEBUSY_SERVLET_PATH = "/freebusy/*";
+	private final LoggerService loggerService;
+	private final AtomicInteger id;
+	
+	@Inject
+	private LoggerFilter(LoggerService loggerService) {
+		this.loggerService = loggerService;
+		this.id = new AtomicInteger();
+	}
+	
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+	}
 
-	protected void configureServlets() {
-		super.configureServlets();
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) 
+			throws IOException, ServletException {
 		
-		serve(SERVICES_MAIN_SERVLET_PATH).with(SyncServlet.class);
-		serve(SERVICES_SERVLET_PATH).with(SyncServlet.class);
-		serve(RESOURCES_SERVLET_PATH).with(ResourceServlet.class);
-		serve(FREEBUSY_SERVLET_PATH).with(FreeBusyServlet.class);
-        
-        filter("/*").through(LoggerFilter.class);
-    }
+		try {
+			loggerService.startSession();
+			loggerService.defineRequestId(id.getAndIncrement());
+			chain.doFilter(request, response);
+		} finally {
+			loggerService.closeSession();
+		}
+	}
+
+	@Override
+	public void destroy() {
+	}
 }

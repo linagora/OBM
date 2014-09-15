@@ -39,11 +39,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.logger.LoggerService;
 import org.obm.sync.GuiceServletContextListener;
 import org.obm.sync.server.handler.ISyncHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
@@ -53,9 +55,15 @@ import fr.aliacom.obm.common.ObmSyncVersion;
 public class SyncServlet extends HttpServlet {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final LoggerService loggerService;
 
 	private Injector injector;
 
+	@Inject
+	private SyncServlet(LoggerService loggerService) {
+		this.loggerService = loggerService;
+	}
+	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		logger.info("Init obm-sync servlet ...");
@@ -83,20 +91,21 @@ public class SyncServlet extends HttpServlet {
 					responder.sendError(new Exception("no handler for " + handlerName));
 				}
 				else {
+					String methodName = request.getMethod();
+					loggerService.defineCommand(handlerName + "." + methodName);
+					
 					long t = System.nanoTime();
 					handler.handle(request, responder);
 					final long elapsedTime = (System.nanoTime() - t) / 1000000;
 					logger.info("handler responded to {}/{} in {}ms.", new Object[]{handlerName,
-							request.getMethod(), elapsedTime});
+							methodName, elapsedTime});
 				}
 			}
 
-		}
-		catch(Exception ex) {
+		} catch(Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			responder.sendError(ex);
 		}
-
 	}
 
 	private void showSyncStatus(HttpServletResponse resp) {
