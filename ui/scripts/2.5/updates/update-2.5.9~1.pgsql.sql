@@ -1,0 +1,7 @@
+BEGIN;
+
+CREATE INDEX opush_folder_sync_state_backend_folder_sync_state_index ON opush_folder_sync_state_backend_mapping (folder_sync_state_id);
+CREATE INDEX opush_folder_snapshot_folder_sync_state_id_index ON opush_folder_snapshot (folder_sync_state_id);
+CREATE INDEX opush_folder_snapshot_collection_id_index ON opush_folder_snapshot (collection_id);
+
+COMMIT;

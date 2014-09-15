@@ -1,0 +1,3 @@
+--
+-- NO INDEX CREATED FOR MYSQL (see OP-57)
+--
