@@ -131,6 +131,7 @@ public class GuiceServletContextListener implements ServletContextListener {
             protected void configure() {
             	install(new ConfigurationModule());
             	install(new DatabaseModule());
+            	install(new ObmSyncServletModule());
             	bind(DomainService.class).to(DomainCache.class);
             	bind(UserService.class).to(UserServiceImpl.class);
             	bind(SettingsService.class).to(SettingsServiceImpl.class);

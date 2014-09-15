@@ -55,9 +55,11 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.calendar.ResourceNotFoundException;
 
+@Singleton
 public class ResourceServlet extends HttpServlet {
 
 	private Logger logger = LoggerFactory.getLogger(ResourceServlet.class);

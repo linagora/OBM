@@ -45,9 +45,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.ObmSyncVersion;
 
+@Singleton
 public class SyncServlet extends HttpServlet {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());

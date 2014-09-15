@@ -57,13 +57,16 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.inject.ConfigurationException;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 
 /*
  * /obm-sync/freebusy/<email_of_attendee>?organizer=<login_of_organizer>
  */
+@Singleton
 public class FreeBusyServlet extends HttpServlet {
 
 	public final static String DATASOURCE_PARAMETER = "datasource";
