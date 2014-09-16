@@ -141,28 +141,31 @@ Obm.Contact.AddressBook = new Class ({
   },
 
   updateContact: function(id, addressbook) {
-    $('informationGrid').show(); 
-    this.dataRequest.read({ajax : 1, action : 'updateContact', id : id}); 
+    $('informationGrid').show();
+    this.dataRequest.read({ajax : 1, action : 'updateContact', id : id});
     $('dataGrid').removeClass('expanded');
     $('dataGrid').addClass('shrinked');
-  },  
+  },
 
   addContact: function(id) {
     var id = this.addressbook.get('id').split('-')[1];
-    $('informationGrid').show(); 
-    this.dataRequest.read({ajax : 1, action : 'updateContact', addressbook: id}); 
+    $('informationGrid').show();
+    this.dataRequest.read({ajax : 1, action : 'updateContact', addressbook: id});
     $('dataGrid').removeClass('expanded');
     $('dataGrid').addClass('shrinked');
-  },  
+  },
 
   storeContact: function(form, id) {
     var self = this;
     function callback(contacts) {
-      if ( contacts.length <= 0  || ( contacts.length > 0 && confirm(obm.vars.labels.confirmAddHomonym) ) ) {
-        self.storeContactRequest(form);
+
+      if ( contacts.length <= 0 || form.lastname.value != '') {
+        if (confirm(obm.vars.labels.confirmAddHomonym)) {
+          self.storeContactRequest(form);
+        }
       }
     }
-    if (id != '') {
+    if (id != '' || form.lastname.value == '') {
       $('informationGrid').show();
       this.storeContactRequest(form);
     } else {
