@@ -51,6 +51,8 @@ import org.slf4j.LoggerFactory;
 
 public class LdapUtils {
 
+	private static final int DEFAULT_LIMIT = Integer.MAX_VALUE;
+
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private final DirContext ctx;
@@ -74,6 +76,26 @@ public class LdapUtils {
 	 * @throws NamingException
 	 */
 	public List<Map<String, List<String>>> getAttributes(String filter, String query, String[] attributes) throws NamingException {
+		return getAttributes(filter, query, DEFAULT_LIMIT, attributes);
+	}
+
+	/**
+	 * Search ldap attributes using the given filter/query
+	 * 
+	 * @param filter
+	 *            ldap filter where %q is replaced by query
+	 * @param query
+	 *            replaces %q in filter
+	 * @param limit
+	 *            max entry count to read from the server 
+	 * @param attributes
+	 *            the searched attributes (only first value is returned)
+	 * @return
+	 * @throws NamingException
+	 */
+	public List<Map<String, List<String>>> getAttributes(String filter, String query,
+			int limit, String[] attributes) throws NamingException {
+		
 		SearchControls constraints = new SearchControls();
 		constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
 		String attrList[] = attributes;
@@ -82,7 +104,7 @@ public class LdapUtils {
 		List<Map<String, List<String>>> matched = new LinkedList<Map<String, List<String>>>();
 		NamingEnumeration<? extends Attribute> ae = null;
 		try {
-			while (results.hasMore()) {
+			for (int resultIndex = 0; resultIndex < limit && results.hasMore(); resultIndex++) {
 				SearchResult si = results.next();
 				Attributes attrs = si.getAttributes();
 				if (attrs == null) {
@@ -107,9 +129,7 @@ public class LdapUtils {
 				matched.add(ret);
 			}
 		} catch (SizeLimitExceededException e) {
-			logger.error("Too much entries returned by the query, " +
-					"results truncated by server, " +
-					"check openldap sizelimit parameter", e);
+			logger.info("No more entry can be read: {}", e.getMessage());
 		} finally {
 			if (results != null) {
 				try {
