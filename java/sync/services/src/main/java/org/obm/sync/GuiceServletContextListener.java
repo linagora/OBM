@@ -41,7 +41,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.ConfigurationModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
@@ -64,6 +63,7 @@ import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 import org.obm.sync.services.AttendeeService;
 import org.obm.sync.services.ICalendar;
+import org.obm.sync.transactional.JdbcTransactionalModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,8 +172,8 @@ public class GuiceServletContextListener implements ServletContextListener {
             	bind(Ical4jRecurrenceHelper.class).to(Ical4jHelper.class);
             }
         },
-        new MessageQueueModule(), new TransactionalModule(), new HealthCheckModule(),
-        new HealthCheckDefaultHandlersModule(), new DatabaseMetadataModule());
+        new MessageQueueModule(), new JdbcTransactionalModule(),
+        new HealthCheckModule(), new HealthCheckDefaultHandlersModule(), new DatabaseMetadataModule());
     }
     
     private void failStartup(String message) { 
