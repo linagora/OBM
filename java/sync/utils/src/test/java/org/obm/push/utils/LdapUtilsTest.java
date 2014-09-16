@@ -31,23 +31,32 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
+import org.assertj.core.data.MapEntry;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
 
 
 public class LdapUtilsTest {
@@ -90,5 +99,72 @@ public class LdapUtilsTest {
 		control.replay();
 		ldapUtils.getAttributes("aFilter", "aQuery", null);
 		control.verify();
+	}
+
+	@Test
+	public void getAttributesShouldReturnEmptyWhenNone() throws NamingException {
+		expect(ctx.search(eq("baseDN"), eq("aFilter"), anyObject(SearchControls.class))).andReturn(namingEnumeration);
+		expect(namingEnumeration.hasMore()).andReturn(false);
+
+		namingEnumeration.close();
+		expectLastCall().once();
+
+		control.replay();
+		List<Map<String, List<String>>> results = ldapUtils.getAttributes("aFilter", "aQuery", null);
+		control.verify();
+		
+		assertThat(results).isEmpty();
+	}
+
+	@Test
+	public void getAttributesShouldReturnEmptyEntryWhenEmtpyAtttributes() throws NamingException {
+		expect(ctx.search(eq("baseDN"), eq("aFilter"), anyObject(SearchControls.class))).andReturn(namingEnumeration);
+		expect(namingEnumeration.hasMore()).andReturn(true);
+		expect(namingEnumeration.next()).andReturn(searchResult);
+		expect(searchResult.getAttributes()).andReturn(attributes);
+		expect((NamingEnumeration<Attribute>)attributes.getAll()).andReturn(ae);
+		expect(ae.hasMoreElements()).andReturn(false);
+		expect(namingEnumeration.hasMore()).andReturn(false);
+		
+		namingEnumeration.close();
+		expectLastCall().once();
+		ae.close();
+		expectLastCall().once();
+
+		control.replay();
+		List<Map<String, List<String>>> results = ldapUtils.getAttributes("aFilter", "aQuery", null);
+		control.verify();
+		
+		assertThat(results).hasSize(1);
+		assertThat(results.get(0)).isEmpty();
+	}
+
+	@Test
+	public void getAttributesShouldReturnEntryWhenOne() throws NamingException {
+		Attribute attribute = new BasicAttribute("key", "value");
+		
+		expect(ctx.search(eq("baseDN"), eq("aFilter"), anyObject(SearchControls.class))).andReturn(namingEnumeration);
+		expect(namingEnumeration.hasMore()).andReturn(true);
+		expect(namingEnumeration.next()).andReturn(searchResult);
+		expect(searchResult.getAttributes()).andReturn(attributes);
+		expect((NamingEnumeration<Attribute>)attributes.getAll()).andReturn(ae);
+		expect(ae.hasMoreElements()).andReturn(true);
+		expect(ae.next()).andReturn(attribute);
+		expect(ae.hasMoreElements()).andReturn(false);
+		expect(namingEnumeration.hasMore()).andReturn(false);
+		
+		namingEnumeration.close();
+		expectLastCall().once();
+		ae.close();
+		expectLastCall().once();
+
+		control.replay();
+		List<Map<String, List<String>>> results = ldapUtils.getAttributes("aFilter", "aQuery", null);
+		control.verify();
+		
+		assertThat(results).hasSize(1);
+		LinkedList<Object> expectedValues = Lists.newLinkedList();
+		expectedValues.add("value");
+		assertThat(results.get(0)).contains(MapEntry.entry("key", expectedValues));
 	}
 }
