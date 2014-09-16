@@ -43,7 +43,6 @@ public class DatabaseModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
-		bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
 		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
 		databaseDrivers.addBinding().to(MySQLDriverConfiguration.class);
 		databaseDrivers.addBinding().to(PostgresDriverConfiguration.class);
