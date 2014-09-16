@@ -44,6 +44,7 @@ import java.util.Map;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.SizeLimitExceededException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
@@ -162,9 +163,61 @@ public class LdapUtilsTest {
 		List<Map<String, List<String>>> results = ldapUtils.getAttributes("aFilter", "aQuery", null);
 		control.verify();
 		
-		assertThat(results).hasSize(1);
 		LinkedList<Object> expectedValues = Lists.newLinkedList();
 		expectedValues.add("value");
+		assertThat(results).hasSize(1);
+		assertThat(results.get(0)).contains(MapEntry.entry("key", expectedValues));
+	}
+	
+	@Test
+	public void getAttributesShouldReturnSilentlyWhenSizeLimitExceededException() throws NamingException {
+		expect(ctx.search(eq("baseDN"), eq("aFilter"), anyObject(SearchControls.class))).andReturn(namingEnumeration);
+		expect(namingEnumeration.hasMore()).andReturn(true);
+		expect(namingEnumeration.next()).andReturn(searchResult);
+		expect(searchResult.getAttributes()).andReturn(attributes);
+		expect((NamingEnumeration<Attribute>)attributes.getAll()).andReturn(ae);
+		expect(ae.hasMoreElements()).andReturn(false);
+		expect(namingEnumeration.hasMore()).andThrow(new SizeLimitExceededException());
+
+		namingEnumeration.close();
+		expectLastCall().once();
+		ae.close();
+		expectLastCall().once();
+		
+		control.replay();
+		List<Map<String, List<String>>> results = ldapUtils.getAttributes("aFilter", "aQuery", null);
+		control.verify();
+		
+		assertThat(results).hasSize(1);
+		assertThat(results.get(0)).isEmpty();
+	}
+	
+	@Test
+	public void getAttributesShouldRespectLimit() throws NamingException {
+		int limit = 1;
+		Attribute attribute = new BasicAttribute("key", "value");
+		
+		expect(ctx.search(eq("baseDN"), eq("aFilter"), anyObject(SearchControls.class))).andReturn(namingEnumeration);
+		expect(namingEnumeration.hasMore()).andReturn(true);
+		expect(namingEnumeration.next()).andReturn(searchResult);
+		expect(searchResult.getAttributes()).andReturn(attributes);
+		expect((NamingEnumeration<Attribute>)attributes.getAll()).andReturn(ae);
+		expect(ae.hasMoreElements()).andReturn(true);
+		expect(ae.next()).andReturn(attribute);
+		expect(ae.hasMoreElements()).andReturn(false);
+
+		namingEnumeration.close();
+		expectLastCall().once();
+		ae.close();
+		expectLastCall().once();
+		
+		control.replay();
+		List<Map<String, List<String>>> results = ldapUtils.getAttributes("aFilter", "aQuery", limit, null);
+		control.verify();
+
+		LinkedList<Object> expectedValues = Lists.newLinkedList();
+		expectedValues.add("value");
+		assertThat(results).hasSize(1);
 		assertThat(results.get(0)).contains(MapEntry.entry("key", expectedValues));
 	}
 }
