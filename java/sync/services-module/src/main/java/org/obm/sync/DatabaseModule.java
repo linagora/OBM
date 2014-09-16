@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
+import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.DatabaseDriversModule;
 import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.AddressBookDaoJdbcImpl;
 import org.obm.domain.dao.ObmInfoDao;
@@ -43,6 +45,7 @@ import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.common.addition.CommitedOperationDaoJdbcImpl;
@@ -55,7 +58,10 @@ public class DatabaseModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		install(new org.obm.dbcp.DatabaseModule());
+		install(new DatabaseDriversModule());
+		bind(DatabaseConnectionProvider.class).to(RequestScopedDatabaseConnectionProvider.class);
+		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
+		lifecycleListeners.addBinding().to(RequestScopedDatabaseConnectionProvider.class);
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
 		bind(ContactDao.class).to(ContactDaoJdbcImpl.class);
 		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
