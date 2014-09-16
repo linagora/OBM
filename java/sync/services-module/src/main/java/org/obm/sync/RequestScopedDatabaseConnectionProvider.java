@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,27 +31,42 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import org.obm.servlet.filter.resource.ResourcesFilter;
-import org.obm.sync.resource.ResourceServlet;
-import org.obm.sync.server.SyncServlet;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-import com.google.inject.servlet.ServletModule;
+import org.obm.annotations.transactional.ITransactionAttributeBinder;
+import org.obm.dbcp.DatabaseConnectionProviderImpl;
+import org.obm.dbcp.PoolingDataSourceDecorator;
+import org.obm.servlet.filter.resource.ResourcesHolder;
 
-import fr.aliacom.obm.freebusy.FreeBusyServlet;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 
-public class ObmSyncServletModule extends ServletModule {
+@Singleton
+public class RequestScopedDatabaseConnectionProvider extends DatabaseConnectionProviderImpl {
 
-	@Override
-	public void configureServlets() {
-		super.configureServlets();
+	private Provider<ResourcesHolder> resourcesHolderProvider;
 
-		serve("/services").with(SyncServlet.class);
-		serve("/services/*").with(SyncServlet.class);
-		serve("/resources/*").with(ResourceServlet.class);
-		serve("/freebusy/*").with(FreeBusyServlet.class);
-		
-		filter("/*").through(LoggerFilter.class);
-		filter("/*").through(ResourcesFilter.class);
+	@Inject
+	public RequestScopedDatabaseConnectionProvider(
+			ITransactionAttributeBinder transactionAttributeBinder,
+			PoolingDataSourceDecorator poolingDataSource,
+			Provider<ResourcesHolder> resourcesHolderProvider) {
+		super(transactionAttributeBinder, poolingDataSource);
+		this.resourcesHolderProvider = resourcesHolderProvider;
 	}
 
+	@Override
+	public Connection getConnection() throws SQLException {
+		ResourcesHolder resourcesHolder = resourcesHolderProvider.get();
+		ConnectionResource connection = resourcesHolder.get(ConnectionResource.class);
+		if (connection != null) {
+			return connection;
+		} else {
+			ConnectionResource newConnection = ConnectionResource.wrap(super.getConnection());
+			resourcesHolder.put(ConnectionResource.class, newConnection);
+			return newConnection;
+		}
+	}
 }

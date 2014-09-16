@@ -31,9 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.dbcp;
 
-import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
-import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
-import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
 import org.obm.sync.LifecycleListener;
 
 import com.google.inject.AbstractModule;
@@ -44,14 +41,9 @@ public class DatabaseModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bindDatabaseConnectionProvider();
-		bind(DatabaseDriverConfiguration.class).toProvider(DatabaseDriverConfigurationProvider.class);
-		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
-		databaseDrivers.addBinding().to(MySQLDriverConfiguration.class);
-		databaseDrivers.addBinding().to(PostgresDriverConfiguration.class);
-
+		install(new DatabaseDriversModule());
 		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
 		lifecycleListeners.addBinding().to(DatabaseConnectionProviderImpl.class);
-
 	}
 	
 	protected void bindDatabaseConnectionProvider() {
