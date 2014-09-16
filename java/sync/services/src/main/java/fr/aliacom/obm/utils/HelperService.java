@@ -31,8 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.utils;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
+import org.obm.sync.Right;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -41,6 +44,7 @@ public interface HelperService {
 
 	boolean canWriteOnCalendar(AccessToken writer, String targetCalendar);
 	boolean canReadCalendar(AccessToken writer, String targetCalendar);
+	Map<String, EnumSet<Right>> listRightsOnCalendars(AccessToken accessToken, Iterable<String> emails);
 	boolean attendeesContainsUser(List<Attendee> attendees, AccessToken token);
 	String getMD5Diggest(String plaintext);
 	boolean eventBelongsToCalendar(Event event, String calendar);

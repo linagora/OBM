@@ -33,8 +33,13 @@ package fr.aliacom.obm.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.obm.sync.Right;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -42,11 +47,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -96,18 +108,135 @@ public class HelperServiceImpl implements HelperService {
 	 */
 	@Override
 	public boolean canWriteOnCalendar(AccessToken accessToken, String email) {
-		if (!isSameDomain(accessToken, email)) {
-			return false;
-		} else {
-			return canWriteOnCalendarFromUserLogin(accessToken, extractLogin(email));
-		}
+		return listRightsOnCalendars(accessToken, ImmutableList.of(email)).get(email).contains(Right.READ);
 	}
 
-	private boolean canWriteOnCalendarFromUserLogin(AccessToken accessToken, String login) {
-		if (checkImplicitRights(accessToken, login)) {
-			return true;
+	@Override
+	public Map<String, EnumSet<Right>> listRightsOnCalendars(AccessToken accessToken,
+			Iterable<String> emails) {
+		Set<String> emailSet = ImmutableSet.copyOf(emails);
+		Set<String> emailsOnDifferentDomains = findEmailsOnDifferentDomains(accessToken, emailSet);
+		Set<String> emailsOnCurrentDomain = Sets.difference(emailSet, emailsOnDifferentDomains);
+		Map<String, String> loginToEmail = buildLoginToEmailMap(emailsOnCurrentDomain);
+		Set<String> loginsOnCurrentDomain = loginToEmail.keySet();
+		Set<String> loginsWithImplicitRights = findEmailsWithImplicitRights(accessToken,
+				loginsOnCurrentDomain);
+		Set<String> loginsWithUnknownRights = Sets.difference(loginsOnCurrentDomain,
+				loginsWithImplicitRights);
+		Map<String, EnumSet<Right>> otherLoginsToRights = null;
+		try {
+			otherLoginsToRights = helperDao.listRightsOnCalendars(accessToken,
+					loginsWithUnknownRights);
+		} catch (SQLException e) {
+			Throwables.propagate(e);
 		}
-		return helperDao.canWriteOnCalendar(accessToken, login);
+
+		Map<String, EnumSet<Right>> calsOnOtherDomainsToRights = buildOtherDomainRights(emailsOnDifferentDomains);
+		Map<String, EnumSet<Right>> calsWithImplicitRightsToRights = buildCalsWithImplicitRightsToRights(
+				loginsToEmails(loginsWithImplicitRights, loginToEmail));
+		Map<String, EnumSet<Right>> otherCalsToRights = loginMapToEmailMap(otherLoginsToRights,
+				loginToEmail);
+		Map<String, EnumSet<Right>> almostCompleteResults = Maps.newHashMap();
+		almostCompleteResults.putAll(calsOnOtherDomainsToRights);
+		almostCompleteResults.putAll(calsWithImplicitRightsToRights);
+		almostCompleteResults.putAll(otherCalsToRights);
+
+		Map<String, EnumSet<Right>> results;
+		if (almostCompleteResults.size() == emailSet.size()) {
+			results = ImmutableMap.copyOf(almostCompleteResults);
+		}
+		else {
+			// Some target calendars have no rights at all and do not appear in
+			// otherCalsToRights
+			results = appendCalendarsWithNoRights(emailSet, almostCompleteResults);
+		}
+
+		return results;
+	}
+
+	private static <T> Map<String, T> loginMapToEmailMap(Map<String, T> loginToValue,
+			final Map<String, String> loginToEmail) {
+		ImmutableMap.Builder<String, T> builder = ImmutableMap.builder();
+		for (Map.Entry<String, T> entry : loginToValue.entrySet()) {
+			builder.put(loginToEmail.get(entry.getKey()), entry.getValue());
+		}
+		return builder.build();
+	}
+
+	private static Set<String> loginsToEmails(Set<String> logins,
+			final Map<String, String> loginToEmail) {
+		return ImmutableSet.copyOf(Iterables.transform(logins, new Function<String, String>() {
+
+			@Override
+			public String apply(String login) {
+				return loginToEmail.get(login);
+			}
+
+		}));
+	}
+
+	private static Map<String, EnumSet<Right>> appendCalendarsWithNoRights(Set<String> allEmails,
+			Map<String, EnumSet<Right>> emailToRights) {
+		ImmutableMap.Builder<String, EnumSet<Right>> builder = ImmutableMap.builder();
+		for (String email : allEmails) {
+			EnumSet<Right> rights = emailToRights.get(email);
+			builder.put(email, rights != null ? rights : EnumSet.noneOf(Right.class));
+		}
+		return builder.build();
+	}
+
+	private Map<String, String> buildLoginToEmailMap(Set<String> emails) {
+		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+		for (String email : emails) {
+			builder.put(this.extractLogin(email), email);
+		}
+		return builder.build();
+	}
+
+	private static Map<String, EnumSet<Right>> buildOtherDomainRights(Set<String> emails) {
+		return Maps.asMap(emails, new Function<String, EnumSet<Right>>() {
+
+			@Override
+			public EnumSet<Right> apply(String input) {
+				return EnumSet.noneOf(Right.class);
+			}
+
+		});
+	}
+
+	private static Map<String, EnumSet<Right>> buildCalsWithImplicitRightsToRights(
+			Set<String> emails) {
+		return Maps.asMap(emails, new Function<String, EnumSet<Right>>() {
+
+			@Override
+			public EnumSet<Right> apply(String input) {
+				return EnumSet.of(Right.READ, Right.WRITE);
+			}
+
+		});
+	}
+
+	private Set<String> findEmailsOnDifferentDomains(final AccessToken accessToken,
+			Set<String> emails) {
+		return ImmutableSet.copyOf(Iterables.filter(emails, new Predicate<String>() {
+
+			@Override
+			public boolean apply(String email) {
+				return !isSameDomain(accessToken, email);
+			}
+
+		}));
+	}
+
+	private Set<String> findEmailsWithImplicitRights(final AccessToken token, Set<String> emails) {
+		return ImmutableSet.copyOf(Iterables.filter(emails, new Predicate<String>() {
+
+			@Override
+			public boolean apply(String email) {
+				return checkImplicitRights(token, email);
+			}
+
+		}));
 	}
 
 	@VisibleForTesting boolean isSameDomain(AccessToken accessToken, String email) {
@@ -147,7 +276,14 @@ public class HelperServiceImpl implements HelperService {
 		if (checkImplicitRights(accessToken, login)) {
 			return true;
 		}
-		return helperDao.canReadCalendar(accessToken, login);
+		try {
+			Map<String, EnumSet<Right>> mailToRights = helperDao.listRightsOnCalendars(accessToken, ImmutableList.of(login));
+			EnumSet<Right> rights = mailToRights.get(login);
+			return rights != null && rights.contains(Right.READ);
+		} catch (SQLException e) {
+			Throwables.propagate(e);
+			return false;
+		}
 	}
 
 	private String extractLogin(String loginOrEmail) {

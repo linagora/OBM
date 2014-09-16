@@ -35,18 +35,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Map;
 
+import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
+import org.obm.sync.Right;
 import org.obm.sync.auth.AccessToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class HelperDao {
-
-	private static final Logger logger = LoggerFactory.getLogger(HelperDao.class);
 
 	private final ObmHelper obmHelper;
 
@@ -55,122 +58,89 @@ public class HelperDao {
 		this.obmHelper = obmHelper;
 	}
 
-	public boolean canWriteOnCalendar(AccessToken accessToken, String login) {
-		boolean ret = false;
-		String q =
-		// direct rights
-		"select entityright_write "
-				+ "from EntityRight "
-				+ "inner join UserEntity on entityright_consumer_id=userentity_entity_id "
-				+ "inner join CalendarEntity on calendarentity_entity_id=entityright_entity_id "
-				+ "inner join UserObm on userobm_id=calendarentity_calendar_id "
-				+ "where userentity_user_id=? and userobm_login=?  "
-				+ "and entityright_write=1 and userobm_email is not null "
-				+ "and userobm_email != '' and userobm_archive != 1"
-				+ " union "
+	public Map<String, EnumSet<Right>> listRightsOnCalendars(AccessToken accessToken, Collection<String> logins) throws SQLException {
+		if (logins.isEmpty()) {
+			return ImmutableMap.of();
+		}
+
+		StringSQLCollectionHelper sqlHelper = new StringSQLCollectionHelper(logins);
+		return executeRightsQuery(buildRightsQuery(sqlHelper), accessToken, sqlHelper);
+	}
+
+	private static String buildRightsQuery(StringSQLCollectionHelper sqlHelper) {
+		// Use UNION ALL instead of UNION - no need to use the implicit DISTINCT in our case
+		return MessageFormat.format(
+		"SELECT userobm_login, SUM(entityright_read) AS read_rights, SUM(entityright_write) AS write_rights "
+				+ "FROM "
+				+ "("
+				+ "SELECT userobm_login, entityright_read, entityright_write "
+				+ "FROM CalendarEntity "
+				+ "INNER JOIN UserObm ON userobm_id=calendarentity_calendar_id "
+				+ "INNER JOIN EntityRight ON calendarentity_entity_id=entityright_entity_id "
+				+ "INNER JOIN UserEntity ON entityright_consumer_id=userentity_entity_id "
+				+ "WHERE userentity_user_id=? AND userobm_login IN ({0}) "
+				+ "AND NULLIF(userobm_email, '''') IS NOT NULL "
+				+ "AND userobm_archive != 1 "
+				+ "UNION ALL "
 				// public cals
-				+ "select entityright_write "
-				+ "from EntityRight "
-				+ "inner join CalendarEntity on calendarentity_entity_id=entityright_entity_id "
-				+ "inner join UserObm on userobm_id=calendarentity_calendar_id "
-				+ "where userobm_login=? AND "
+				+ "SELECT userobm_login, entityright_read, entityright_write "
+				+ "FROM CalendarEntity "
+				+ "INNER JOIN UserObm ON userobm_id=calendarentity_calendar_id "
+				+ "INNER JOIN EntityRight ON calendarentity_entity_id=entityright_entity_id "
+				+ "WHERE userobm_login IN ({0}) AND "
 				+ // targetCalendar
-				"entityright_consumer_id is null and entityright_write=1 and userobm_email is not null and userobm_email != '' "
-				+ " and userobm_archive != 1 "
+				"entityright_consumer_id IS NULL AND NULLIF(userobm_email, '''') IS NOT NULL "
+				+ "AND userobm_archive != 1 "
 
-				+ " union "
+				+ "UNION ALL "
 				// group rights
-				+ "select entityright_write "
-				+ "from EntityRight "
-				+ "inner join GroupEntity on entityright_consumer_id=groupentity_entity_id "
-				+ "inner join CalendarEntity on calendarentity_entity_id=entityright_entity_id "
-				+ "inner join UserObm on userobm_id=calendarentity_calendar_id "
-				+ "inner join of_usergroup on of_usergroup_group_id = groupentity_group_id "
-				+ "where of_usergroup_user_id=? and entityright_write=1  and userobm_login=? "
-				+ "and userobm_email is not null and userobm_email != '' and userobm_archive != 1";
+				+ "SELECT userobm_login, entityright_read, entityright_write "
+				+ "FROM CalendarEntity "
+				+ "INNER JOIN UserObm ON userobm_id=calendarentity_calendar_id "
+				+ "INNER JOIN EntityRight ON calendarentity_entity_id=entityright_entity_id "
+				+ "INNER JOIN GroupEntity ON entityright_consumer_id=groupentity_entity_id "
+				+ "INNER JOIN of_usergroup ON of_usergroup_group_id = groupentity_group_id "
+				+ "WHERE of_usergroup_user_id=? AND userobm_login IN ({0}) "
+				+ "AND userobm_email IS NOT NULL AND NULLIF(userobm_email, '''') IS NOT NULL AND userobm_archive != 1"
 
+				+ ") rights "
+				+ "GROUP BY userobm_login",
+				sqlHelper.asPlaceHolders());
+	}
+
+	private Map<String, EnumSet<Right>> executeRightsQuery(String query, AccessToken accessToken, StringSQLCollectionHelper sqlHelper)
+			throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+		ImmutableMap.Builder<String, EnumSet<Right>> builder = ImmutableMap.builder();
 		try {
 			con = obmHelper.getConnection();
-			ps = con.prepareStatement(q);
-			ps.setInt(1, accessToken.getObmId());
-			ps.setString(2, login);
-			ps.setString(3, login);
-			ps.setInt(4, accessToken.getObmId());
-			ps.setString(5, login);
+			ps = con.prepareStatement(query);
+			int index = 1;
+			ps.setInt(index++, accessToken.getObmId());
+			index = sqlHelper.insertValues(ps, index);
+			index = sqlHelper.insertValues(ps, index);
+			ps.setInt(index++, accessToken.getObmId());
+			index = sqlHelper.insertValues(ps, index);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				ret = ret || rs.getBoolean(1);
+				String login = rs.getString("userobm_login");
+				int readRightsInt = rs.getInt("read_rights");
+				int writeRightsInt = rs.getInt("write_rights");
+
+				EnumSet<Right> rights = EnumSet.noneOf(Right.class);
+				if (readRightsInt > 0) {
+					rights.add(Right.READ);
+				}
+				if (writeRightsInt > 0) {
+					rights.add(Right.WRITE);
+				}
+				builder.put(login, rights);
 			}
-		} catch (SQLException t) {
-			logger.error(t.getMessage(), t);
+			return builder.build();
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-		return ret;
 	}
-
-	/**
-	 * Returns true if the logged in user can writer on the given user_login's
-	 * calendar
-	 */
-	public boolean canReadCalendar(AccessToken accessToken, String login) {
-		boolean ret = false;
-		String q =
-		// direct rights
-		"select entityright_read "
-				+ "from EntityRight "
-				+ "inner join UserEntity on entityright_consumer_id=userentity_entity_id "
-				+ "inner join CalendarEntity on calendarentity_entity_id=entityright_entity_id "
-				+ "inner join UserObm on userobm_id=calendarentity_calendar_id "
-				+ "where userentity_user_id=? and userobm_login=?  "
-				+ "and entityright_read=1 and userobm_email is not null "
-				+ "and userobm_email != '' and userobm_archive != 1"
-				+ " union "
-				// public cals
-				+ "select entityright_read "
-				+ "from EntityRight "
-				+ "inner join CalendarEntity on calendarentity_entity_id=entityright_entity_id "
-				+ "inner join UserObm on userobm_id=calendarentity_calendar_id "
-				+ "where userobm_login=? AND "
-				+ // targetCalendar
-				"entityright_consumer_id is null and entityright_read=1 and userobm_email is not null and userobm_email != '' "
-				+ " and userobm_archive != 1 "
-
-				+ " union "
-				// group rights
-				+ "select entityright_read "
-				+ "from EntityRight "
-				+ "inner join GroupEntity on entityright_consumer_id=groupentity_entity_id "
-				+ "inner join CalendarEntity on calendarentity_entity_id=entityright_entity_id "
-				+ "inner join UserObm on userobm_id=calendarentity_calendar_id "
-				+ "inner join of_usergroup on of_usergroup_group_id = groupentity_group_id "
-				+ "where of_usergroup_user_id=? and entityright_read=1  and userobm_login=? "
-				+ "and userobm_email is not null and userobm_email != '' and userobm_archive != 1";
-
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		try {
-			con = obmHelper.getConnection();
-			ps = con.prepareStatement(q);
-			ps.setInt(1, accessToken.getObmId());
-			ps.setString(2, login);
-			ps.setString(3, login);
-			ps.setInt(4, accessToken.getObmId());
-			ps.setString(5, login);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				ret = ret || rs.getBoolean(1);
-			}
-		} catch (SQLException t) {
-			logger.error(t.getMessage(), t);
-		} finally {
-			obmHelper.cleanup(con, ps, rs);
-		}
-		return ret;
-	}
-
 }
