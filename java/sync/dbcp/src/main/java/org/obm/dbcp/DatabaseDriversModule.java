@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,34 +29,23 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.dbcp;
 
-import org.obm.servlet.filter.resource.ResourcesFilter;
-import org.obm.sync.resource.ResourceServlet;
-import org.obm.sync.server.SyncServlet;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
+import org.obm.dbcp.jdbc.MySQLDriverConfiguration;
+import org.obm.dbcp.jdbc.PostgresDriverConfiguration;
 
-import com.google.inject.servlet.ServletModule;
-
-import fr.aliacom.obm.freebusy.FreeBusyServlet;
-
-public class ObmSyncServletModule  extends ServletModule {
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 
 
-	private static final String SERVICES_MAIN_SERVLET_PATH = "/services";
-	private static final String SERVICES_SERVLET_PATH = SERVICES_MAIN_SERVLET_PATH + "/*";
-	private static final String RESOURCES_SERVLET_PATH = "/resources/*";
-	private static final String FREEBUSY_SERVLET_PATH = "/freebusy/*";
+public class DatabaseDriversModule extends AbstractModule {
 
 	@Override
-	protected void configureServlets() {
-		super.configureServlets();
-		
-		serve(SERVICES_MAIN_SERVLET_PATH).with(SyncServlet.class);
-		serve(SERVICES_SERVLET_PATH).with(SyncServlet.class);
-		serve(RESOURCES_SERVLET_PATH).with(ResourceServlet.class);
-		serve(FREEBUSY_SERVLET_PATH).with(FreeBusyServlet.class);
-		
-		filter("/*").through(LoggerFilter.class);
-		filter("/*").through(ResourcesFilter.class);
+	protected void configure() {
+		Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
+		databaseDrivers.addBinding().to(MySQLDriverConfiguration.class);
+		databaseDrivers.addBinding().to(PostgresDriverConfiguration.class);
 	}
+	
 }

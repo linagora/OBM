@@ -49,7 +49,8 @@ import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.TransactionConfiguration;
-import org.obm.dbcp.DatabaseModule;
+import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.dbcp.DatabaseDriversModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
 import org.obm.icalendar.Ical4jHelper;
@@ -130,7 +131,8 @@ public class GuiceServletContextListener implements ServletContextListener {
             @Override
             protected void configure() {
             	install(new ConfigurationModule());
-            	install(new DatabaseModule());
+            	install(new DatabaseDriversModule());
+            	bind(DatabaseConnectionProvider.class).to(RequestScopedDatabaseConnectionProvider.class);
             	install(new ObmSyncServletModule());
             	bind(DomainService.class).to(DomainCache.class);
             	bind(UserService.class).to(UserServiceImpl.class);
