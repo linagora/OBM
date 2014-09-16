@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<configuration scan="true" scanPeriod="60 seconds">
+
+	<appender name="PROD" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{${time-pattern:-"HH:mm:ss.SSS"}} [%-5level] {%logger{32}} %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="DEBUG">
+		<appender-ref ref="PROD" />
+	</root>
+
+</configuration>
