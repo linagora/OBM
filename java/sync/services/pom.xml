@@ -185,6 +185,11 @@
 			<groupId>xmlunit</groupId>
 			<artifactId>xmlunit</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>resource-management-filter</artifactId>
+			<version>${obm.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

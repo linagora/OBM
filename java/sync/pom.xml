@@ -99,6 +99,7 @@
 		<module>webapp-common-dependencies</module>
     		<module>icalendar</module>
     		<module>qos-filter</module>
+    		<module>resource-management-filter</module>
     		<module>ui-testing</module>
 	        <module>healthcheck-api</module>
 		<module>transaction-test</module>
@@ -661,6 +662,11 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<artifactId>transaction-test</artifactId>
 				<version>${obm.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>configuration</artifactId>
+				<version>${obm.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
