@@ -78,6 +78,10 @@
 			<artifactId>provisioning-module</artifactId>
 		</dependency>
 		<dependency>
+                  <groupId>com.linagora.obm</groupId>
+                  <artifactId>resource-management-filter</artifactId>
+                </dependency>
+		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 		</dependency>

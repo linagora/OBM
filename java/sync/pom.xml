@@ -119,6 +119,7 @@
 		<module>provisioning-module</module>
 		<module>provisioning-client</module>
 		<module>qos-filter</module>
+		<module>resource-management-filter</module>
 		<module>satellite-client</module>
 		<module>services-configuration-module</module>
 		<module>services-module</module>
@@ -461,6 +462,11 @@ org.eclipse.jdt.core.compiler.source=1.6
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
 				<artifactId>qos-filter</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>resource-management-filter</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
