@@ -33,18 +33,15 @@
 package org.obm.configuration.utils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Map;
-import java.util.Properties;
 
+import org.ini4j.Ini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 public class IniFile {
 
@@ -57,59 +54,69 @@ public class IniFile {
 		}
 		
 		public IniFile build(String path) {
-			return new IniFile(loadFileContent(path));
+			return new IniFile(loadIniFile(new File(path)));
 		}
 		
-		private Map<String, String> loadFileContent(String path) {
-			Map<String, String> settings = Maps.newHashMap();
-			File f = new File(path);
-			if (f.exists()) {
-				loadIniFile(f, settings);
-			} else {
-				logger.warn(path+ " does not exist.");
-			}
-			return ImmutableMap.copyOf(settings);
-		}
-		
-		private void loadIniFile(File f, Map<String, String> settings) {
-			FileInputStream in = null;
+		private Ini loadIniFile(File f) {
 			try {
-				Properties p = new Properties();
-				in = new FileInputStream(f);
-				p.load(in);
-				for (Object key : p.keySet()) {
-					settings.put((String) key, p.getProperty((String) key));
-				}
+				Ini ini =  new Ini();
+
+				ini.getConfig().setGlobalSection(true); // So that our properties files can be parsed as ini files
+				ini.getConfig().setMultiOption(false);
+
+				ini.load(f);
+
+				return ini;
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			} finally {
-				if (in != null) {
-					try {
-						in.close();
-					} catch (IOException e) {
-					}
-				}
+				logger.error("Unable to parse ini file '{}'", f, e);
+				return new Ini();
 			}
 		}
 	}
-	
-	private final Map<String, String> settings;
-	
+
+	private final Map<String, ? extends Map<String, String>> settings;
+
+	private IniFile(Ini ini) {
+		this(ImmutableMap.copyOf(ini));
+	}
+
 	@VisibleForTesting
-	public IniFile(Map<String, String> settings) {
+	public IniFile(Map<String, ? extends Map<String, String>> settings) {
 		this.settings = settings;
 	}
 
 	public String getStringValue(String prop) {
-		return settings.get(prop);
+		for (Map<String, String> section : settings.values()) {
+			String value = section.get(prop);
+
+			if (value != null) {
+				return value;
+			}
+		}
+
+		return null;
+	}
+
+	public String getIniStringValue(String section, String prop) {
+		Map<String, String> values = settings.get(section);
+
+		return values != null ? values.get(prop) : null;
 	}
 
 	public String getStringValue(String prop, String defaultValue) {
 		return Objects.firstNonNull(getStringValue(prop), defaultValue);
 	}
 
+	public String getIniStringValue(String section, String prop, String defaultValue) {
+		return Objects.firstNonNull(getIniStringValue(section, prop), defaultValue);
+	}
+
 	public boolean getBooleanValue(String prop) {
 		return Boolean.valueOf(getStringValue(prop)).booleanValue();
+	}
+
+	public boolean getIniBooleanValue(String section, String prop) {
+		return Boolean.valueOf(getIniStringValue(section, prop)).booleanValue();
 	}
 
 	public boolean getBooleanValue(String prop, boolean defaultValue) {
@@ -117,6 +124,12 @@ public class IniFile {
 		boolean value = valueString != null ? Boolean.valueOf(valueString).booleanValue()
 				: defaultValue;
 		return value;
+	}
+
+	public boolean getIniBooleanValue(String section, String prop, boolean defaultValue) {
+		String value = getIniStringValue(section, prop);
+
+		return value != null ? Boolean.valueOf(value).booleanValue() : defaultValue;
 	}
 
 	public Boolean getNullableBooleanValue(String prop, Boolean defaultValue) {
@@ -127,10 +140,24 @@ public class IniFile {
 			return defaultValue;
 		}
 	}
-	
+
+	public Boolean getNullableIniBooleanValue(String section, String prop, Boolean defaultValue) {
+		String value = getIniStringValue(section, prop);
+
+		return value != null ? Boolean.valueOf(value) : defaultValue;
+	}
+
 	public int getIntValue(String prop, int defaultValue) {
 		try {
 			return Integer.parseInt(getStringValue(prop));
+		} catch (NumberFormatException nfe) {
+			return defaultValue;
+		}
+	}
+
+	public int getIniIntValue(String section, String prop, int defaultValue) {
+		try {
+			return Integer.parseInt(getIniStringValue(section, prop));
 		} catch (NumberFormatException nfe) {
 			return defaultValue;
 		}
@@ -143,4 +170,13 @@ public class IniFile {
 			return defaultValue;
 		}
 	}
+
+	public Integer getIniIntegerValue(String section, String prop, Integer defaultValue) {
+		try {
+			return Integer.parseInt(getIniStringValue(section, prop));
+		} catch (NumberFormatException nfe) {
+			return defaultValue;
+		}
+	}
+
 }

@@ -924,6 +924,11 @@ org.eclipse.jdt.core.compiler.source=1.7
 				<version>${hornetq.version}</version>
 			</dependency>
 			<dependency>
+                                <groupId>org.ini4j</groupId>
+                                <artifactId>ini4j</artifactId>
+                                <version>0.5.2</version>
+                        </dependency>
+			<dependency>
 				<groupId>org.jboss.arquillian.container</groupId>
 				<artifactId>arquillian-jetty-embedded-6.1</artifactId>
 				<version>1.0.0.CR2</version>
@@ -1031,7 +1036,7 @@ org.eclipse.jdt.core.compiler.source=1.7
 				<groupId>xml-apis</groupId>
 				<artifactId>xml-apis</artifactId>
 				<version>1.4.01</version>
-			</dependency>
+                        </dependency>
 			<dependency>
 				<groupId>xmlunit</groupId>
 				<artifactId>xmlunit</artifactId>
