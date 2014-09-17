@@ -256,7 +256,7 @@ function checkAvailability() {
 
 /////////////////////////////////////////////////////////////////////////////
 function displayFreeBusyConflict(duration, date_begin, readOnly) {
-  var allDay = $('cba_all_day').checked;
+
   var data = new Object();
   data.sel_user_id = new Array();
   data.sel_resource_id = new Array();
@@ -274,13 +274,11 @@ function displayFreeBusyConflict(duration, date_begin, readOnly) {
     if(id[2] == 'resourcegroup') data.sel_resource_group_id.push(id[3]);
     if(id[2] == 'contact') data.sel_contact_id.push(id[3]);
   });
-
+ 
   $$('input.otherAttendee').each(function(e) {
     if (e.value != '') data.others_attendees.push(e.value);
   });
-  if (allDay){
-    duration = 24;
-  }
+
   display_freebusy(data, duration, readOnly);
 }
 

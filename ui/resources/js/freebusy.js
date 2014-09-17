@@ -8,8 +8,6 @@ Obm.CalendarFreeBusy = new Class({
    */
   initialize: function(time_slots, unit, day_first_hour, day_last_hour) {
     this.eventStartDate = new Obm.DateTime(obm.vars.consts.begin_timestamp*1000);
-    this.hourOffset = parseInt(day_first_hour,10) - this.eventStartDate.getHours();
-    this.displayEventStartDate = this.getDisplayEventStartDate(parseInt(day_first_hour));
     this.unit = unit;
     this.stepSize = 40/this.unit;
     this.external_contact_count = 0;
@@ -34,22 +32,9 @@ Obm.CalendarFreeBusy = new Class({
     this.duration = 1;
   },
 
-  getDisplayEventEndDate: function(duration) {
-    var endDate = new Obm.DateTime(this.displayEventStartDate);
-    if ((this.displayEventStartDate.getHours() + duration) > this.lastHour) {
-      endDate.setHours(this.lastHour);
-    } else {
-      endDate.addHours(duration);
-    }
+  getEventEndDate: function() {
+    var endDate = new Obm.DateTime(this.eventStartDate).addHours(this.duration);
     return endDate;
-  },
-
-  getDisplayEventStartDate: function(firstHour) {
-    var startDate = new Obm.DateTime(this.eventStartDate);
-    if (this.hourOffset > 0){
-      startDate.setHours(parseInt(firstHour,10));
-    }
-    return startDate;
   },
 
   /**
@@ -142,23 +127,17 @@ Obm.CalendarFreeBusy = new Class({
   },
 
   /*
-   * build panel
+   * build panel 
    * Build meeting slider, meeting resizer
    */
   buildFreeBusyPanel: function(duration, readOnly) {
-<<<<<<< HEAD
     this.duration = duration;
-=======
-
-    this.duration = parseInt(duration, 10);
-    var durationDisplay = (this.hourOffset > 0) ?  (duration - this.hourOffset) : duration;
->>>>>>> 3e3f1d3... OBMFULL-5471 fixed allDay event display
     $('duration').value = this.duration*3600;
 
-    var eventEndDate = this.getDisplayEventEndDate(durationDisplay);
-    this.meeting_slots = this.timeSlotCountBetween(eventEndDate, this.displayEventStartDate);
+    var eventEndDate = this.getEventEndDate();
+    this.meeting_slots = this.timeSlotCountBetween(eventEndDate, this.eventStartDate);
 
-    // /!\ meeting width must be set BEFORE slider
+    // /!\ meeting width must be set BEFORE slider 
     if (Browser.Engine.trident) {
       $('calendarFreeBusyMeeting').setStyle('width', this.stepSize*this.meeting_slots-(this.meeting_slots/2)+'px');
     } else {
