@@ -55,7 +55,7 @@ import com.google.common.collect.ImmutableMap;
 @RunWith(SlowFilterRunner.class)
 public class ConfigurationTest {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private static final String FILE = "/etc/opush/ldap_conf.ini";
 	private static final String KEY_URL = "search.ldap.url";
@@ -64,14 +64,11 @@ public class ConfigurationTest {
 	
 	private IMocksControl mocks;
 	private Factory iniFileFactory;
-	private IniFile iniFile;
 
 	@Before
 	public void setUp() {
 		mocks = createControl();
 		iniFileFactory = mocks.createMock(IniFile.Factory.class);
-		iniFile = mocks.createMock(IniFile.class);
-		expect(iniFileFactory.build(FILE)).andReturn(iniFile);
 	}
 	
 	@Test
@@ -79,7 +76,7 @@ public class ConfigurationTest {
 		Map<String, String> settings = ImmutableMap.of(
 				KEY_BASE, "%d,dc=local",
 				KEY_FILTER, "filter");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -95,7 +92,7 @@ public class ConfigurationTest {
 				KEY_BASE, "%d,dc=local",
 				KEY_FILTER, "filter",
 				KEY_URL, "");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -111,7 +108,7 @@ public class ConfigurationTest {
 				KEY_BASE, "%d,dc=local",
 				KEY_FILTER, "filter",
 				KEY_URL, "127.0.0.1");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -127,7 +124,7 @@ public class ConfigurationTest {
 				KEY_BASE, "%d,dc=local",
 				KEY_FILTER, "filter",
 				KEY_URL, "http://ldapserver");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -143,7 +140,7 @@ public class ConfigurationTest {
 				KEY_BASE, "%d,dc=local",
 				KEY_FILTER, "filter",
 				KEY_URL, "ldap://");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -159,7 +156,7 @@ public class ConfigurationTest {
 				KEY_BASE, "%d,dc=local",
 				KEY_FILTER, "filter",
 				KEY_URL, "ldap://ldapserver");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -175,7 +172,7 @@ public class ConfigurationTest {
 				KEY_BASE, "%d,dc=local",
 				KEY_FILTER, "filter",
 				KEY_URL, "ldaps://ldapserver");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -190,7 +187,7 @@ public class ConfigurationTest {
 		Map<String, String> settings = ImmutableMap.of(
 				KEY_URL, "ldaps://ldapserver",
 				KEY_FILTER, "filter");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -206,7 +203,7 @@ public class ConfigurationTest {
 				KEY_URL, "ldaps://ldapserver",
 				KEY_FILTER, "filter",
 				KEY_BASE, "");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -222,7 +219,7 @@ public class ConfigurationTest {
 				KEY_URL, "ldaps://ldapserver",
 				KEY_FILTER, "filter",
 				KEY_BASE, "%d,dc=local");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -237,7 +234,7 @@ public class ConfigurationTest {
 		Map<String, String> settings = ImmutableMap.of(
 				KEY_URL, "ldaps://ldapserver",
 				KEY_BASE, "%d,dc=local");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -253,7 +250,7 @@ public class ConfigurationTest {
 				KEY_URL, "ldaps://ldapserver",
 				KEY_BASE, "%d,dc=local",
 				KEY_FILTER, "");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -269,7 +266,7 @@ public class ConfigurationTest {
 				KEY_URL, "ldaps://ldapserver",
 				KEY_BASE, "%d,dc=local",
 				KEY_FILTER, "filter");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		Configuration configuration = new Configuration(iniFileFactory, logger);
@@ -284,7 +281,7 @@ public class ConfigurationTest {
 		Map<String, String> settings = ImmutableMap.of(
 				KEY_BASE, "%d,dc=local",
 				KEY_FILTER, "filter");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		new Configuration(iniFileFactory, logger).buildContextConnection();
@@ -295,7 +292,7 @@ public class ConfigurationTest {
 		Map<String, String> settings = ImmutableMap.of(
 				KEY_URL, "ldaps://ldapserver",
 				KEY_FILTER, "filter");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		new Configuration(iniFileFactory, logger).buildContextConnection();
@@ -306,7 +303,7 @@ public class ConfigurationTest {
 		Map<String, String> settings = ImmutableMap.of(
 				KEY_URL, "ldaps://ldapserver",
 				KEY_BASE, "%d,dc=local");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		new Configuration(iniFileFactory, logger).buildContextConnection();
@@ -319,12 +316,16 @@ public class ConfigurationTest {
 				KEY_URL, "ldaps://ldapserver",
 				KEY_BASE, "%d,dc=local",
 				KEY_FILTER, "filter");
-		expect(iniFile.getData()).andReturn(settings).anyTimes();
+		expectIniFile(settings);
 		
 		mocks.replay();
 		DirContext connection = new Configuration(iniFileFactory, logger).buildContextConnection();
 		mocks.verify();
 
 		assertThat(connection).isNotNull();
+	}
+
+	private void expectIniFile(Map<String, String> settings) {
+		expect(iniFileFactory.build(FILE)).andReturn(new IniFile(settings));
 	}
 }

@@ -61,11 +61,7 @@ public class IniFile {
 		}
 		
 		public IniFile build(String path) {
-			return this.build(path, null);
-		}
-		
-		public IniFile build(String path, String category) {
-			return new IniFile(loadFileContent(path), category);
+			return new IniFile(loadFileContent(path));
 		}
 		
 		private Map<String, String> loadFileContent(String path) {
@@ -102,29 +98,16 @@ public class IniFile {
 	}
 	
 	private final Map<String, String> settings;
-	private final String category;
 	
-	@VisibleForTesting IniFile(Map<String, String> settings, String category) {
+	@VisibleForTesting
+	public IniFile(Map<String, String> settings) {
 		this.settings = settings;
-		this.category = category;
-	}
-
-	protected String getSetting(String settingName) {
-		return settings.get(settingName);
-	}
-	
-	public Map<String, String> getData() {
-		return ImmutableMap.copyOf(settings);
-	}
-
-	public String getCategory() {
-		return category;
 	}
 
 	public String getStringValue(String prop) {
-		return getSetting(prop);
+		return settings.get(prop);
 	}
-	
+
 	public String getStringValue(String prop, String defaultValue) {
 		return Objects.firstNonNull(getStringValue(prop), defaultValue);
 	}

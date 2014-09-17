@@ -41,7 +41,6 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.utils.IniFile;
 import org.obm.filter.SlowFilterRunner;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 @RunWith(SlowFilterRunner.class)
@@ -53,7 +52,7 @@ public class IniFileTest {
 	@Before
 	public void setup() {
 		settings = Maps.newHashMap();
-		iniFile = new IniFile(settings, "discarded");
+		iniFile = new IniFile(settings);
 	}
 	
 	@Test
@@ -184,23 +183,6 @@ public class IniFileTest {
 	@Test
 	public void testGetNullAsNullableBooleanWithNullDefault() {
 		assertThat(iniFile.getNullableBooleanValue("key", null)).isNull();
-	}
-	
-	@Test
-	public void testGetCategory() {
-		assertThat(iniFile.getCategory()).isEqualTo("discarded");
-	}
-	
-	@Test
-	public void testGetData() {
-		settings.put("key", "value");
-		assertThat(iniFile.getData()).isEqualTo(ImmutableMap.of("key", "value"));
-	}
-	
-	@Test(expected=UnsupportedOperationException.class)
-	public void testGetDataReturnsAnImmutableMap() {
-		Map<String, String> data = iniFile.getData();
-		data.put("key2", "value2");
 	}
 	
 	@Test

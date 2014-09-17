@@ -31,23 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.createMock;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.util.Locale;
 
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.utils.IniFile;
-import org.obm.configuration.utils.IniFile.Factory;
 import org.obm.filter.SlowFilterRunner;
-
-import com.google.common.collect.ImmutableMap;
 
 @RunWith(SlowFilterRunner.class)
 public class MessagesTest {
@@ -56,13 +50,7 @@ public class MessagesTest {
 
 	@Before
 	public void setLocale() {
-		IMocksControl control = createControl();
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getData()).andReturn(ImmutableMap.<String, String>of());
-		Factory factory = control.createMock(IniFile.Factory.class);
-		expect(factory.build(anyObject(String.class))).andReturn(iniFile);
-		control.replay();
-		configurationService = new ConfigurationServiceImpl(factory, "test", "fakeConfPath", null);
+		configurationService = new ConfigurationServiceImpl(createMock(IniFile.Factory.class), "test", "fakeConfPath", null);
 		Locale.setDefault(Locale.US);
 	}
 

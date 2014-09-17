@@ -74,9 +74,9 @@ class Configuration {
 		IniFile ini = iniFileFactory.build(LDAP_CONF_FILE);
 
 		logger = configurationLogger;
-		url = validUrlOrNull(ini.getData().get(SEARCH_LDAP_URL));
-		baseDn = Strings.emptyToNull(ini.getData().get(SEARCH_LDAP_BASE));
-		filter = Strings.emptyToNull(ini.getData().get(SEARCH_LDAP_FILTER));
+		url = validUrlOrNull(ini.getStringValue(SEARCH_LDAP_URL));
+		baseDn = Strings.emptyToNull(ini.getStringValue(SEARCH_LDAP_BASE));
+		filter = Strings.emptyToNull(ini.getStringValue(SEARCH_LDAP_FILTER));
 		settings = buildSettings();
 		isValidConfiguration = checkConfigurationValidity();
 		
