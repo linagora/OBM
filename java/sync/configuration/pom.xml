@@ -47,6 +47,10 @@
 			<artifactId>easymock</artifactId>
 		</dependency>
 		<dependency>
+                        <groupId>org.ini4j</groupId>
+                        <artifactId>ini4j</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>

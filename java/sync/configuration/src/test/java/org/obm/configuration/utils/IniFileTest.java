@@ -37,9 +37,10 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.configuration.utils.IniFile;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.io.Resources;
 
 
 public class IniFileTest {
@@ -50,9 +51,39 @@ public class IniFileTest {
 	@Before
 	public void setup() {
 		settings = Maps.newHashMap();
-		iniFile = new IniFile(settings);
+		iniFile = new IniFile(ImmutableMap.of("?", settings));
 	}
-	
+
+	@Test
+	public void testConstructorCreatesFlatViewOfSettings() {
+		iniFile = buildIniFileFromResourceFile("withSections.ini");
+
+		assertThat(iniFile.getStringValue("key1")).isEqualTo("value1");
+		assertThat(iniFile.getStringValue("key2")).isEqualTo("value2");
+	}
+
+	@Test
+	public void testIniFileParsesTypicalOBMConfiguration() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getStringValue("lemonLdapIps")).isEqualTo("127.0.0.1,172.16.18.50");
+	}
+
+	@Test
+	public void testIniFileParsesSections() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniStringValue("automate", "logLevel")).isEqualTo("3");
+	}
+
+	@Test
+	public void testIniFileParsesPropertiesFile() {
+		iniFile = buildIniFileFromResourceFile("withoutSections.properties");
+
+		assertThat(iniFile.getStringValue("key1")).isEqualTo("value1");
+		assertThat(iniFile.getStringValue("key2")).isEqualTo("value2");
+	}
+
 	@Test
 	public void testGetTrue() {
 		settings.put("key", "true");
@@ -256,4 +287,142 @@ public class IniFileTest {
 		settings.put("key", "111211111111");
 		assertThat(iniFile.getStringValue("key")).isEqualTo("111211111111");
 	}
+
+	@Test
+	public void testGetIniIntegerValue() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniIntegerValue("automate", "logLevel", 12345)).isEqualTo(3);
+	}
+
+	@Test
+	public void testGetIniIntegerValueNoSection() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniIntegerValue("iamnotasection", "?", 12345)).isEqualTo(12345);
+	}
+
+	@Test
+	public void testGetIniIntegerValueNoSetting() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniIntegerValue("global", "iamnotasetting", 12345)).isEqualTo(12345);
+	}
+
+	@Test
+	public void testGetIniIntegerValueNotAnInteger() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniIntegerValue("global", "host", 12345)).isEqualTo(12345);
+	}
+
+	@Test
+	public void testGetIniIntValue() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniIntValue("automate", "logLevel", 12345)).isEqualTo(3);
+	}
+
+	@Test
+	public void testGetIniIntValueNoSection() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniIntValue("iamnotasection", "?", 12345)).isEqualTo(12345);
+	}
+
+	@Test
+	public void testGetIniIntValueNoSetting() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniIntValue("global", "iamnotasetting", 12345)).isEqualTo(12345);
+	}
+
+	@Test
+	public void testGetIniIntValueNotAnInteger() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniIntValue("global", "host", 12345)).isEqualTo(12345);
+	}
+
+	@Test
+	public void testGetNullableIniBooleanValue() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getNullableIniBooleanValue("global", "globalAddressBookSync", null)).isTrue();
+	}
+
+	@Test
+	public void testGetNullableIniBooleanValueNoSection() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getNullableIniBooleanValue("iamnotasection", "?", null)).isNull();
+	}
+
+	@Test
+	public void testGetNullableIniBooleanNoSetting() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getNullableIniBooleanValue("global", "iamnotasetting", null)).isNull();
+	}
+
+	@Test
+	public void testGetIniBooleanValue() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniBooleanValue("global", "globalAddressBookSync", false)).isTrue();
+	}
+
+	@Test
+	public void testGetIniBooleanValueNoSection() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniBooleanValue("iamnotasection", "?", true)).isTrue();
+	}
+
+	@Test
+	public void testGetIniBooleanNoSetting() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniBooleanValue("global", "iamnotasetting", true)).isTrue();
+	}
+
+	@Test
+	public void testGetIniStringValue() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniStringValue("global", "host")).isEqualTo("127.0.0.1");
+	}
+
+	@Test
+	public void testGetIniStringValueNoSection() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniStringValue("iamnotasection", "host")).isNull();
+	}
+
+	@Test
+	public void testGetIniStringValueNoSetting() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniStringValue("global", "iamnotasetting")).isNull();
+	}
+
+	@Test
+	public void testGetIniStringValueNoSectionReturnsDefault() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniStringValue("iamnotasection", "host", "value")).isEqualTo("value");
+	}
+
+	@Test
+	public void testGetIniStringValueNoSettingReturnsDefault() {
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+
+		assertThat(iniFile.getIniStringValue("global", "iamnotasetting", "value")).isEqualTo("value");
+	}
+
+	private IniFile buildIniFileFromResourceFile(String file) {
+		return new IniFile.Factory().build(Resources.getResource(file).getFile());
+	}
+
 }
