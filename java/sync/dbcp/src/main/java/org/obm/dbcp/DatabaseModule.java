@@ -44,6 +44,7 @@ public class DatabaseModule extends AbstractModule {
 		install(new DatabaseDriversModule());
 		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
 		lifecycleListeners.addBinding().to(DatabaseConnectionProviderImpl.class);
+		lifecycleListeners.addBinding().to(HikariCPDatabaseConnectionProvider.class);
 	}
 	
 	protected void bindDatabaseConnectionProvider() {

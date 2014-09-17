@@ -37,18 +37,26 @@ import org.obm.configuration.DatabaseFlavour;
 
 public class DatabaseConfigurationFixtureH2 implements DatabaseConfiguration {
 
+	private static final String DEFAULT_DB_NAME = "obm";
+
 	private final String jdbcOptions;
-	private int minPoolSize;
+	private final int minPoolSize;
+	private final String databaseName;
 
 	public DatabaseConfigurationFixtureH2() {
 		this(NO_JDBC_OPTION, 0);
 	}
 	
 	public DatabaseConfigurationFixtureH2(String jdbcOptions, int minPoolSize) {
+		this(jdbcOptions, minPoolSize, DEFAULT_DB_NAME);
+	}
+
+	public DatabaseConfigurationFixtureH2(String jdbcOptions, int minPoolSize, String databaseName) {
 		this.jdbcOptions = jdbcOptions;
 		this.minPoolSize = minPoolSize;
+		this.databaseName = databaseName;
 	}
-	
+
 	@Override
 	public Integer getDatabaseMaxConnectionPoolSize() {
 		return 10;
@@ -61,7 +69,7 @@ public class DatabaseConfigurationFixtureH2 implements DatabaseConfiguration {
 
 	@Override
 	public String getDatabaseName() {
-		return "obm";
+		return databaseName;
 	}
 
 	@Override
