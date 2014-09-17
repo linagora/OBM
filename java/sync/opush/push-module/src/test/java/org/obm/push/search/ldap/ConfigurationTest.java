@@ -326,6 +326,6 @@ public class ConfigurationTest {
 	}
 
 	private void expectIniFile(Map<String, String> settings) {
-		expect(iniFileFactory.build(FILE)).andReturn(new IniFile(settings));
+		expect(iniFileFactory.build(FILE)).andReturn(new IniFile(ImmutableMap.of("?", settings)));
 	}
 }
