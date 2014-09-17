@@ -71,6 +71,11 @@ public class MySQLDriverConfiguration implements DatabaseDriverConfiguration {
 	}
 
 	@Override
+	public String getNonXADataSourceClassName() {
+		return "com.mysql.jdbc.jdbc2.optional.MysqlDataSource";
+	}
+
+	@Override
 	public DatabaseFlavour getFlavour() {
 		return DatabaseFlavour.MYSQL;
 	}

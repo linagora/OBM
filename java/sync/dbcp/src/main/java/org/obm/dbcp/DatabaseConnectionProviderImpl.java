@@ -57,11 +57,17 @@ import com.google.inject.Singleton;
 @Singleton
 public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvider {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private final ITransactionAttributeBinder transactionAttributeBinder;
-	private final DatabaseDriverConfiguration driverConfiguration;
-	private final PoolingDataSourceDecorator poolingDataSource;
+	protected final ITransactionAttributeBinder transactionAttributeBinder;
+	protected final DatabaseDriverConfiguration driverConfiguration;
+	protected final PoolingDataSourceDecorator poolingDataSource;
+
+	protected DatabaseConnectionProviderImpl(DatabaseDriverConfiguration driverConfiguration) {
+		this.driverConfiguration = driverConfiguration;
+		this.transactionAttributeBinder = null;
+		this.poolingDataSource = null;
+	}
 
 	@Inject
 	public DatabaseConnectionProviderImpl(

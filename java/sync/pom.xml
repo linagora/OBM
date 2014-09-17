@@ -658,6 +658,11 @@ org.eclipse.jdt.core.compiler.source=1.6
 				<scope>test</scope>
 			</dependency>
 			<dependency>
+				<groupId>com.zaxxer</groupId>
+				<artifactId>HikariCP-java6</artifactId>
+				<version>2.0.1</version>
+			</dependency>
+			<dependency>
 				<groupId>com.linagora.obm</groupId>
 				<artifactId>transaction-test</artifactId>
 				<version>${obm.version}</version>

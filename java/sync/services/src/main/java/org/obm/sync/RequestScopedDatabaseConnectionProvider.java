@@ -34,26 +34,31 @@ package org.obm.sync;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.obm.annotations.transactional.ITransactionAttributeBinder;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
-import org.obm.dbcp.PoolingDataSourceDecorator;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.dbcp.DatabaseDriverConfigurationFactory;
+import org.obm.dbcp.HikariCPDatabaseConnectionProvider;
+import org.obm.logger.LoggerModule;
 import org.obm.servlet.filter.resource.ResourcesHolder;
+import org.slf4j.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton
-public class RequestScopedDatabaseConnectionProvider extends DatabaseConnectionProviderImpl {
+public class RequestScopedDatabaseConnectionProvider extends HikariCPDatabaseConnectionProvider {
 
 	private Provider<ResourcesHolder> resourcesHolderProvider;
 
 	@Inject
 	public RequestScopedDatabaseConnectionProvider(
-			ITransactionAttributeBinder transactionAttributeBinder,
-			PoolingDataSourceDecorator poolingDataSource,
+			DatabaseDriverConfigurationFactory databaseDriverConfigurationFactory, 
+			DatabaseConfiguration databaseConfiguration,
+			@Named(LoggerModule.CONFIGURATION)Logger logger,
 			Provider<ResourcesHolder> resourcesHolderProvider) {
-		super(transactionAttributeBinder, poolingDataSource);
+		super(databaseDriverConfigurationFactory, databaseConfiguration, logger);
+
 		this.resourcesHolderProvider = resourcesHolderProvider;
 	}
 

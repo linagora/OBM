@@ -53,6 +53,11 @@ public class H2DriverConfiguration implements DatabaseDriverConfiguration {
 	}
 
 	@Override
+	public String getNonXADataSourceClassName() {
+		return "org.h2.jdbcx.JdbcDataSource";
+	}
+
+	@Override
 	public DatabaseFlavour getFlavour() {
 		return DatabaseFlavour.H2;
 	}
