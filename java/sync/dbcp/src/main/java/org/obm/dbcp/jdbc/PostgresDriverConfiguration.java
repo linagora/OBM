@@ -54,6 +54,11 @@ public class PostgresDriverConfiguration implements DatabaseDriverConfiguration 
 	}
 
 	@Override
+	public String getNonXADataSourceClassName() {
+		return "org.postgresql.ds.PGSimpleDataSource";
+	}
+
+	@Override
 	public DatabaseFlavour getFlavour() {
 		return DatabaseFlavour.PGSQL;
 	}

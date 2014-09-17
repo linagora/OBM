@@ -43,6 +43,8 @@ public interface DatabaseDriverConfiguration {
 
 	String getDataSourceClassName();
 
+	String getNonXADataSourceClassName();
+
 	DatabaseFlavour getFlavour();
 
 	Map<String, String> getDriverProperties(DatabaseConfiguration configuration);
