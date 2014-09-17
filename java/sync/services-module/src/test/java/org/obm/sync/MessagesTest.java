@@ -32,19 +32,11 @@
 package org.obm.sync;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.expect;
 
 import java.util.Locale;
 
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.configuration.utils.IniFile;
-import org.obm.configuration.utils.IniFile.Factory;
-
-import com.google.common.collect.ImmutableMap;
 
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationServiceImpl;
@@ -56,12 +48,6 @@ public class MessagesTest {
 
 	@Before
 	public void setLocale() {
-		IMocksControl control = createControl();
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getData()).andReturn(ImmutableMap.<String, String>of());
-		Factory factory = control.createMock(IniFile.Factory.class);
-		expect(factory.build(anyObject(String.class))).andReturn(iniFile);
-		control.replay();
 		configurationService = new ObmSyncConfigurationServiceImpl.Factory().create("fakeConfPath", "appName");
 		Locale.setDefault(Locale.US);
 	}
