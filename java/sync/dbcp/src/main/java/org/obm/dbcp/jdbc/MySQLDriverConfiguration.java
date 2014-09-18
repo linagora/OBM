@@ -38,13 +38,25 @@ import java.util.Map;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 public class MySQLDriverConfiguration implements DatabaseDriverConfiguration {
 
-	private String getJDBCUrl(String host, String dbName) {
-		String jdbcUrl = "jdbc:mysql://" + host + "/" + dbName + "?" + getMySQLOptions();
-		return jdbcUrl;
+	@VisibleForTesting
+	String getJDBCUrl(String host, Integer port, String dbName) {
+		StringBuilder builder = new StringBuilder("jdbc:mysql://").append(host);
+
+		if (port != null) {
+			builder.append(':').append(port);
+		}
+
+		return builder
+				.append('/')
+				.append(dbName)
+				.append('?')
+				.append(getMySQLOptions())
+				.toString();
 	}
 
 	private String getMySQLOptions() {
@@ -87,7 +99,7 @@ public class MySQLDriverConfiguration implements DatabaseDriverConfiguration {
 		builder.put("user", configuration.getDatabaseLogin());
 		builder.put("password", configuration.getDatabasePassword());
 		builder.put("databaseName", configuration.getDatabaseName());
-		builder.put("url", getJDBCUrl(configuration.getDatabaseHost(), configuration.getDatabaseName()));
+		builder.put("url", getJDBCUrl(configuration.getDatabaseHost(), configuration.getDatabasePort(), configuration.getDatabaseName()));
 		return builder.build();
 	}
 
