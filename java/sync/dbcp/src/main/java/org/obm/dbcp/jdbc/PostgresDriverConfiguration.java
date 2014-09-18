@@ -63,15 +63,21 @@ public class PostgresDriverConfiguration implements DatabaseDriverConfiguration 
 
 	@Override
 	public Map<String, String> getDriverProperties(DatabaseConfiguration conf) {
+		Integer port = conf.getDatabasePort();
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+
 		builder.put("user", conf.getDatabaseLogin());
 		builder.put("password", conf.getDatabasePassword());
 		builder.put("databaseName", conf.getDatabaseName());
 		builder.put("serverName", conf.getDatabaseHost());
+		if (port != null) {
+			builder.put("portNumber", String.valueOf(port));
+		}
 		builder.put("ssl", String.valueOf(conf.isPostgresSSLEnabled()));
 		if (conf.isPostgresSSLNonValidating()) {
 			builder.put("sslfactory", "org.postgresql.ssl.NonValidatingFactory");
 		}
+
 		return builder.build();
 	}
 

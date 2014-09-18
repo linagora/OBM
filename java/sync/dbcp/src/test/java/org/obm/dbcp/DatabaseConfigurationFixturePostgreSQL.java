@@ -59,6 +59,11 @@ public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfigura
 	}
 
 	@Override
+	public Integer getDatabasePort() {
+		return null;
+	}
+
+	@Override
 	public String getDatabaseLogin() {
 		return "obm";
 	}

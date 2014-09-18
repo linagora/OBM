@@ -78,6 +78,11 @@ public class DatabaseConfigurationFixtureH2 implements DatabaseConfiguration {
 	}
 
 	@Override
+	public Integer getDatabasePort() {
+		return null;
+	}
+
+	@Override
 	public String getDatabaseLogin() {
 		return "sa";
 	}
