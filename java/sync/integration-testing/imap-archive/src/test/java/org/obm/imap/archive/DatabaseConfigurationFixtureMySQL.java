@@ -91,4 +91,9 @@ public class DatabaseConfigurationFixtureMySQL implements DatabaseConfiguration 
 	public Integer getDatabaseMinConnectionPoolSize() {
 		return null;
 	}
+
+	@Override
+	public boolean isReadOnly() {
+		return false;
+	}
 }

@@ -58,4 +58,6 @@ public interface DatabaseConfiguration {
 
 	String getJdbcOptions();
 
+	boolean isReadOnly();
+
 }
