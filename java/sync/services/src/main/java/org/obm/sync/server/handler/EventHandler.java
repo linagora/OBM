@@ -42,6 +42,7 @@ import org.apache.commons.lang.StringUtils;
 import org.obm.logger.LoggerService;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.NotAllowedException;
+import org.obm.sync.PermissionException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -391,7 +392,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String createEvent(
 			AccessToken at, Request request, XmlResponder responder)
-		throws ServerFault, SAXException, IOException, FactoryConfigurationError, EventAlreadyExistException, NotAllowedException {
+		throws ServerFault, SAXException, IOException, FactoryConfigurationError, EventAlreadyExistException, NotAllowedException, PermissionException {
 		EventObmId ev = binding.createEvent(at,	getCalendar(request), getEvent(request), getNotificationOption(request), getClientId(request));
 		return responder.sendInt(ev.getObmId());
 	}
@@ -424,7 +425,7 @@ public class EventHandler extends SecureSyncHandler {
 
 	private String modifyEvent(
 			AccessToken at, Request request, XmlResponder responder)
-		throws ServerFault, SAXException, IOException, FactoryConfigurationError, NotAllowedException {
+		throws ServerFault, SAXException, IOException, FactoryConfigurationError, NotAllowedException, PermissionException {
 		Event ev = binding.modifyEvent(at, getCalendar(request),
 				getEvent(request), Boolean.valueOf(request.getParameter("updateAttendees")),
 				getNotificationOption(request)
@@ -606,7 +607,7 @@ public class EventHandler extends SecureSyncHandler {
 	}
 
 	private String storeEvent(AccessToken at, Request request, XmlResponder responder)
-		throws ServerFault, SAXException, IOException, FactoryConfigurationError, NotAllowedException {
+		throws ServerFault, SAXException, IOException, FactoryConfigurationError, NotAllowedException, PermissionException {
 		Event event = binding.storeEvent(at, getCalendar(request), getEvent(request), getNotificationOption(request), getClientId(request));
 
 		return responder.sendEvent(event);

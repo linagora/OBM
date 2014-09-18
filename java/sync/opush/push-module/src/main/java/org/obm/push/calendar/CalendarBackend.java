@@ -79,6 +79,7 @@ import org.obm.push.resource.HttpClientResource;
 import org.obm.push.service.ClientIdService;
 import org.obm.push.service.EventService;
 import org.obm.push.service.impl.MappingService;
+import org.obm.sync.PermissionException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -429,6 +430,9 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		} catch (org.obm.sync.NotAllowedException e) {
 			logger.warn(e.getMessage(), e);
 			throw new ItemNotFoundException(e);
+		} catch (org.obm.sync.PermissionException e) {
+			logger.warn(e.getMessage(), e);
+			throw new ItemNotFoundException(e);
 		} catch (ServerFault e) {
 			throw new UnexpectedObmSyncServerException(e);
 		} catch (EventNotFoundException e) {
@@ -447,7 +451,8 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private EventObmId chooseBackendChange(UserDataRequest udr, MSEvent msEvent,
 			CollectionPath collectionPath, AccessToken token,
 			EventExtId eventExtId, Event oldEvent, final EventObmId eventId, String clientId)
-			throws org.obm.sync.NotAllowedException, ServerFault {
+			throws org.obm.sync.NotAllowedException, ServerFault,
+				org.obm.sync.PermissionException {
 		
 		if (isParticipationChangeUpdate(collectionPath, oldEvent)) {
 			updateUserStatus(oldEvent, AttendeeStatus.ACCEPT, token, collectionPath, udr);
@@ -494,7 +499,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	private void updateEvent(AccessToken token, UserDataRequest udr, 
 			CollectionPath collectionPath, Event oldEvent, 
-			EventExtId eventExtId, MSEvent msEvent) throws ServerFault, org.obm.sync.NotAllowedException {
+			EventExtId eventExtId, MSEvent msEvent) throws ServerFault, org.obm.sync.NotAllowedException, PermissionException {
 		
 		boolean isInternal = eventConverter.isInternalEvent(oldEvent, eventExtId);
 		Event event = convertMSObjectToObmObject(udr, msEvent, oldEvent, isInternal);
@@ -516,7 +521,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 
 	private EventObmId createEvent(UserDataRequest udr, AccessToken token,
 			CollectionPath collectionPath, Event oldEvent, MSEvent msEvent, EventExtId eventExtId, String clientId)
-			throws ServerFault, DaoException, org.obm.sync.NotAllowedException {
+			throws ServerFault, DaoException, org.obm.sync.NotAllowedException, org.obm.sync.PermissionException {
 		
 		boolean isInternal = eventConverter.isInternalEvent(oldEvent, eventExtId);
 		Event event = convertMSObjectToObmObject(udr, msEvent, oldEvent, isInternal);
@@ -601,6 +606,9 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 		} catch (org.obm.sync.NotAllowedException e) {
 			logger.warn(e.getMessage(), e);
 			throw new ItemNotFoundException(e);
+		} catch (org.obm.sync.PermissionException e) {
+			logger.warn(e.getMessage(), e);
+			throw new ItemNotFoundException(e);
 		} catch (UnexpectedObmSyncServerException e) {
 			throw e;
 		} catch (EventNotFoundException e) {
@@ -611,7 +619,7 @@ public class CalendarBackend extends ObmSyncBackend implements PIMBackend {
 	private Event createOrModifyInvitationEvent(UserDataRequest udr, AccessToken at, 
 			MSEvent event, CollectionPath collectionPath) 
 		throws UnexpectedObmSyncServerException, EventNotFoundException, 
-			ConversionException, DaoException, org.obm.sync.NotAllowedException {
+			ConversionException, DaoException, org.obm.sync.NotAllowedException, org.obm.sync.PermissionException {
 		
 		try {
 			EventExtId extId = getEventExtId(udr, event);
