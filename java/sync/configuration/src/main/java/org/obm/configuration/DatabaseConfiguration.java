@@ -46,6 +46,8 @@ public interface DatabaseConfiguration {
 
 	String getDatabaseHost();
 
+	Integer getDatabasePort();
+
 	String getDatabaseLogin();
 
 	String getDatabasePassword();

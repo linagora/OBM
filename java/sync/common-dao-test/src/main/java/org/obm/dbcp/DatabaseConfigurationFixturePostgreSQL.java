@@ -88,4 +88,9 @@ public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfigura
     public Integer getDatabaseMinConnectionPoolSize() {
     	return null;
     }
+
+	@Override
+	public Integer getDatabasePort() {
+		return null;
+	}
 }

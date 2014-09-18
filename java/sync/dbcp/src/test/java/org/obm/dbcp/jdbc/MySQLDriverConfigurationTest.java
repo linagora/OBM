@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * Copyright (C) 2014  Linagora
- * 
+ *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option) any
@@ -16,7 +16,7 @@
  * from infringing Linagora intellectual property rights over its trademarks and
  * commercial brands. Other Additional Terms apply, see
  * <http://www.linagora.com/licenses/> for more details.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
  * PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
@@ -27,68 +27,32 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
+package org.obm.dbcp.jdbc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 
-package org.obm.imap.archive;
+import org.junit.Before;
+import org.junit.Test;
 
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.DatabaseFlavour;
+public class MySQLDriverConfigurationTest {
 
-public class DatabaseConfigurationFixtureMySQL implements DatabaseConfiguration {
+	private static final String QUERY_STRING = "?zeroDateTimeBehavior=convertToNull&relaxAutocommit=true&jdbcCompliantTruncation=false&interactiveClient=true&useGmtMillisForDatetime=true&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&connectionCollation=utf8_general_ci";
 
+	private MySQLDriverConfiguration driver;
 
-	@Override
-	public Integer getDatabaseMaxConnectionPoolSize() {
-		return 10;
+	@Before
+	public void setUp() {
+		driver = new MySQLDriverConfiguration();
 	}
 
-	@Override
-	public DatabaseFlavour getDatabaseSystem() {
-		return DatabaseFlavour.MYSQL;
+	@Test
+	public void testGetJDBCUrlShouldNotIncludePortWhenNull() {
+		assertThat(driver.getJDBCUrl("host", null, "db")).isEqualTo("jdbc:mysql://host/db" + QUERY_STRING);
 	}
 
-	@Override
-	public String getDatabaseName() {
-		return "obm";
+	@Test
+	public void testGetJDBCUrlShouldIncludePortWhenNotNull() {
+		assertThat(driver.getJDBCUrl("host", 3306, "db")).isEqualTo("jdbc:mysql://host:3306/db" + QUERY_STRING);
 	}
 
-	@Override
-	public String getDatabaseHost() {
-		return "localhost.localdomain";
-	}
-
-	@Override
-	public Integer getDatabasePort() {
-		return null;
-	}
-
-	@Override
-	public String getDatabaseLogin() {
-		return "obm";
-	}
-
-	@Override
-	public String getDatabasePassword() {
-		return "obm";
-	}
-
-	@Override
-	public boolean isPostgresSSLEnabled() {
-		return true;
-	}
-
-	@Override
-	public boolean isPostgresSSLNonValidating() {
-		return true;
-	}
-
-	@Override
-	public String getJdbcOptions() {
-		return NO_JDBC_OPTION;
-	}
-
-	@Override
-	public Integer getDatabaseMinConnectionPoolSize() {
-		return null;
-	}
 }
