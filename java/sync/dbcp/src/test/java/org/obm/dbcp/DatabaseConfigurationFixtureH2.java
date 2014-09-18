@@ -111,4 +111,10 @@ public class DatabaseConfigurationFixtureH2 implements DatabaseConfiguration {
 	public Integer getDatabaseMinConnectionPoolSize() {
 		return minPoolSize;
 	}
+
+	@Override
+	public boolean isReadOnly() {
+		return false;
+	}
+
 }

@@ -51,6 +51,7 @@ public class DatabaseConfigurationImpl implements DatabaseConfiguration {
     private static final String DB_MAX_POOL_SIZE_KEY = "database-max-connection-pool-size";
     private static final String DB_PG_SSL = "database-postgres-ssl-enabled";
     private static final String DB_PG_SSL_NON_VALIDATING = "database-postgres-ssl-non-validating-factory";
+    private static final String DB_READONLY_KEY = "read-only";
     private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
 
     private final IniFile iniFile;
@@ -119,4 +120,10 @@ public class DatabaseConfigurationImpl implements DatabaseConfiguration {
     public Integer getDatabaseMinConnectionPoolSize() {
     	return null;
     }
+
+	@Override
+	public boolean isReadOnly() {
+		return false;
+	}
+
 }

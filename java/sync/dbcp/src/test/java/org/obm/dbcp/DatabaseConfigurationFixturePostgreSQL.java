@@ -92,4 +92,10 @@ public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfigura
     public Integer getDatabaseMinConnectionPoolSize() {
     	return null;
     }
+
+	@Override
+	public boolean isReadOnly() {
+		return false;
+	}
+
 }
