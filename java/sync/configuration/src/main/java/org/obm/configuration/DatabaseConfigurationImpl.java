@@ -35,6 +35,7 @@ package org.obm.configuration;
 import org.obm.configuration.utils.IniFile;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -42,88 +43,119 @@ import com.google.inject.name.Named;
 @Singleton
 public class DatabaseConfigurationImpl implements DatabaseConfiguration {
 
-    private static final String DB_TYPE_KEY = "dbtype";
-    private static final String DB_HOST_KEY = "host";
-    private static final String DB_PORT_KEY = "port";
-    private static final String DB_NAME_KEY = "db";
-    private static final String DB_USER_KEY = "user";
-    private static final String DB_PASSWORD_KEY = "password";
-    private static final String DB_MAX_POOL_SIZE_KEY = "database-max-connection-pool-size";
-    private static final String DB_PG_SSL = "database-postgres-ssl-enabled";
-    private static final String DB_PG_SSL_NON_VALIDATING = "database-postgres-ssl-non-validating-factory";
-    private static final String DB_READONLY_KEY = "read-only";
-    private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
+	private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
 
-    private final IniFile iniFile;
+	private final IniFile iniFile;
 
-    @Inject
-    DatabaseConfigurationImpl(IniFile.Factory iniFileFactory, @Named("globalConfigurationFile") String globalConfigurationFile) {
-        iniFile = iniFileFactory.build(globalConfigurationFile);
-    }
+	@Inject
+	DatabaseConfigurationImpl(IniFile.Factory iniFileFactory, @Named("globalConfigurationFile") String globalConfigurationFile) {
+		iniFile = iniFileFactory.build(globalConfigurationFile);
+	}
 
-    @Override
-    public Integer getDatabaseMaxConnectionPoolSize() {
-        return iniFile.getIntValue(DB_MAX_POOL_SIZE_KEY, DB_MAX_POOL_SIZE_DEFAULT);
-    }
+	@Override
+	public Integer getDatabaseMaxConnectionPoolSize() {
+		return iniFile.getIntValue(DB_MAX_POOL_SIZE_KEY, DB_MAX_POOL_SIZE_DEFAULT);
+	}
 
-    @Override
-    public DatabaseFlavour getDatabaseSystem() {
-        return DatabaseFlavour.valueOf(iniFile.getStringValue(DB_TYPE_KEY).trim());
-    }
+	@Override
+	public DatabaseFlavour getDatabaseSystem() {
+		return DatabaseFlavour.valueOf(iniFile.getStringValue(DB_TYPE_KEY).trim());
+	}
 
-    @Override
-    public String getDatabaseName() {
-        return iniFile.getStringValue(DB_NAME_KEY);
-    }
+	@Override
+	public String getDatabaseName() {
+		return iniFile.getStringValue(DB_NAME_KEY);
+	}
 
-    @Override
-    public String getDatabaseHost() {
-        return iniFile.getStringValue(DB_HOST_KEY);
-    }
+	@Override
+	public String getDatabaseHost() {
+		return iniFile.getStringValue(DB_HOST_KEY);
+	}
 
-    @Override
-    public Integer getDatabasePort() {
-    	return iniFile.getIntegerValue(DB_PORT_KEY, null);
-    }
+	@Override
+	public Integer getDatabasePort() {
+		return iniFile.getIntegerValue(DB_PORT_KEY, null);
+	}
 
-    @Override
-    public String getDatabaseLogin() {
-        return iniFile.getStringValue(DB_USER_KEY);
-    }
+	@Override
+	public String getDatabaseLogin() {
+		return iniFile.getStringValue(DB_USER_KEY);
+	}
 
-    @VisibleForTesting String removeEnclosingDoubleQuotes(String toUnquote)
-    {
-        return toUnquote.replaceAll("^\"(.+)\"$", "$1");
-    }
+	@VisibleForTesting String removeEnclosingDoubleQuotes(String toUnquote)
+	{
+		return toUnquote.replaceAll("^\"(.+)\"$", "$1");
+	}
 
-    @Override
-    public String getDatabasePassword() {
-        return removeEnclosingDoubleQuotes(iniFile.getStringValue(DB_PASSWORD_KEY));
-    }
+	@Override
+	public String getDatabasePassword() {
+		return removeEnclosingDoubleQuotes(iniFile.getStringValue(DB_PASSWORD_KEY));
+	}
 
-    @Override
-    public boolean isPostgresSSLEnabled() {
-        return iniFile.getBooleanValue(DB_PG_SSL, false);
-    }
+	@Override
+	public boolean isPostgresSSLEnabled() {
+		return iniFile.getBooleanValue(DB_PG_SSL, false);
+	}
 
-    @Override
-    public boolean isPostgresSSLNonValidating() {
-        return iniFile.getBooleanValue(DB_PG_SSL_NON_VALIDATING, false);
-    }
-    
-    @Override
-    public String getJdbcOptions() {
-    	return NO_JDBC_OPTION;
-    }
-    
-    @Override
-    public Integer getDatabaseMinConnectionPoolSize() {
-    	return null;
-    }
+	@Override
+	public boolean isPostgresSSLNonValidating() {
+		return iniFile.getBooleanValue(DB_PG_SSL_NON_VALIDATING, false);
+	}
+
+	@Override
+	public String getJdbcOptions() {
+		return NO_JDBC_OPTION;
+	}
+
+	@Override
+	public Integer getDatabaseMinConnectionPoolSize() {
+		return null;
+	}
 
 	@Override
 	public boolean isReadOnly() {
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getDatabaseHost(), getDatabasePort(), getDatabaseSystem(), getDatabaseName(),
+				getDatabaseLogin(), isReadOnly(), getDatabaseMinConnectionPoolSize(), getDatabaseMaxConnectionPoolSize(), getJdbcOptions());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof IniFileSectionDatabaseConfiguration) {
+			IniFileSectionDatabaseConfiguration other = (IniFileSectionDatabaseConfiguration) obj;
+
+			return Objects.equal(getDatabaseHost(), other.getDatabaseHost())
+					&& Objects.equal(getDatabasePort(), other.getDatabasePort())
+					&& Objects.equal(getDatabaseSystem(), other.getDatabaseSystem())
+					&& Objects.equal(getDatabaseName(), other.getDatabaseName())
+					&& Objects.equal(getDatabaseLogin(), other.getDatabaseLogin())
+					&& Objects.equal(isReadOnly(), other.isReadOnly())
+					&& Objects.equal(getDatabaseMinConnectionPoolSize(), other.getDatabaseMinConnectionPoolSize())
+					&& Objects.equal(getDatabaseMaxConnectionPoolSize(), other.getDatabaseMaxConnectionPoolSize())
+					&& Objects.equal(getJdbcOptions(), other.getJdbcOptions());
+		}
+
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects
+				.toStringHelper(getClass())
+				.add("host", getDatabaseHost())
+				.add("port", getDatabasePort())
+				.add("dbType", getDatabaseSystem())
+				.add("dbName", getDatabaseName())
+				.add("login", getDatabaseLogin())
+				.add("readOnly", isReadOnly())
+				.add("minPoolSize", getDatabaseMinConnectionPoolSize())
+				.add("maxPoolSize", getDatabaseMaxConnectionPoolSize())
+				.add("jdbcOptions", getJdbcOptions())
+				.toString();
 	}
 
 }

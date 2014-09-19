@@ -39,6 +39,7 @@ public class ConfigurationModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(String.class).annotatedWith(Names.named("globalConfigurationFile")).toInstance("/etc/obm/obm_conf.ini");
+		bind(String.class).annotatedWith(Names.named("dbConfigurationFile")).toInstance("/etc/obm/databases.ini");
 	}
 
 }
