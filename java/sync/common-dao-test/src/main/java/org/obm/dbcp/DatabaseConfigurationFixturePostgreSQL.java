@@ -93,4 +93,9 @@ public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfigura
 	public Integer getDatabasePort() {
 		return null;
 	}
+
+	@Override
+	public boolean isReadOnly() {
+		return false;
+	}
 }

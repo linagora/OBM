@@ -32,6 +32,7 @@
 package org.obm.configuration;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
 public class ConfigurationModule<MainConfigurationType extends DomainConfiguration> extends AbstractModule {
 	
@@ -51,6 +52,8 @@ public class ConfigurationModule<MainConfigurationType extends DomainConfigurati
 		bindWhenDefined(LocatorConfiguration.class, globalAppConfiguration.getLocatorConfiguration());
 		bindWhenDefined(DatabaseConfiguration.class, globalAppConfiguration.getDatabaseConfiguration());
 		bindWhenDefined(TransactionConfiguration.class, globalAppConfiguration.getTransactionConfiguration());
+		bind(String.class).annotatedWith(Names.named("globalConfigurationFile")).toInstance("/etc/obm/obm_conf.ini");
+		bind(String.class).annotatedWith(Names.named("dbConfigurationFile")).toInstance("/etc/obm/databases.ini");
 	}
 	
 	private <T> void bindWhenDefined(Class<T> classToBind, T instance) {

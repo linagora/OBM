@@ -421,6 +421,27 @@ public class IniFileTest {
 		assertThat(iniFile.getIniStringValue("global", "iamnotasetting", "value")).isEqualTo("value");
 	}
 
+	@Test
+	public void testGetIniSection() {
+		iniFile = buildIniFileFromResourceFile("withSections.ini");
+
+		assertThat(iniFile.getIniSection("section1")).isEqualTo(ImmutableMap.of("key1", "value1"));
+	}
+
+	@Test
+	public void testGetIniSectionNoSection() {
+		iniFile = buildIniFileFromResourceFile("withSections.ini");
+
+		assertThat(iniFile.getIniSection("iamnotasection")).isNull();
+	}
+
+	@Test
+	public void testGetIniSectionNames() {
+		iniFile = buildIniFileFromResourceFile("withSections.ini");
+
+		assertThat(iniFile.getIniSectionNames()).containsOnly("section1", "section2");
+	}
+
 	private IniFile buildIniFileFromResourceFile(String file) {
 		return new IniFile.Factory().build(Resources.getResource(file).getFile());
 	}

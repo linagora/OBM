@@ -34,6 +34,17 @@ package org.obm.configuration;
 
 public interface DatabaseConfiguration {
 
+	String DB_TYPE_KEY = "dbtype";
+	String DB_HOST_KEY = "host";
+	String DB_PORT_KEY = "port";
+	String DB_NAME_KEY = "db";
+	String DB_USER_KEY = "user";
+	String DB_PASSWORD_KEY = "password";
+	String DB_MAX_POOL_SIZE_KEY = "database-max-connection-pool-size";
+	String DB_PG_SSL = "database-postgres-ssl-enabled";
+	String DB_PG_SSL_NON_VALIDATING = "database-postgres-ssl-non-validating-factory";
+	String DB_READONLY_KEY = "read-only";
+
 	String NO_JDBC_OPTION = "";
 
 	Integer getDatabaseMinConnectionPoolSize();
