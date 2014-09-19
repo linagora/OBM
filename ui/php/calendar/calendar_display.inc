@@ -4786,7 +4786,14 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $frequency_block = "<input type=\"text\" size=\"4\" style=\"width:3em;\" id=\"tf_repeatfrequency\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />";
   }
 
-  if (isset($calendar['date_exception'])) { $date_exception = null; }
+  $attendees_notification  = 'checked';
+  if (isset($calendar['date_exception'])) {
+    $i = 0;
+    foreach ($calendar['date_exception'] as $date_ex) {
+      $date_exception[$i]['date'] = $date_ex;
+      $i++;
+    }
+  }
   if (isset($calendar['list-item'])) { $t_list_item = $calendar['list-item']; }
   if (isset($calendar['list-item-id'])) { $t_list_item_id = $calendar['list-item-id']; }
   if (isset($calendar['property-name'])) { $t_property_name = $calendar['property-name']; }
