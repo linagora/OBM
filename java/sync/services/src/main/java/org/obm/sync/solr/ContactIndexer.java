@@ -107,159 +107,181 @@ public class ContactIndexer extends SolrRequest {
 
 	private boolean doIndex() throws IOException, SolrServerException {
 		Connection con = null;
-		ResultSet rs = null;
+		ResultSet rs1 = null;
+		ResultSet rs2 = null;
 		Statement st = null;
-		boolean found = false;
-
-		SolrInputDocument sid = new SolrInputDocument();
 		try {
 			con = obmHelper.getConnection();
 			st = con.createStatement();
 
-			rs = st.executeQuery("SELECT "
-					+ "c.*, ab.*, k.*, cf.*, Website.website_url, Website.website_label, "
-					+ "bd.event_id as bd_id, bd.event_date as bd_date, an.event_id as an_id, an.event_date as an_date "
-					+ "FROM Contact c "
-					+ "INNER JOIN AddressBook ab ON c.contact_addressbook_id=ab.id "
-					+ "LEFT JOIN Kind k ON c.contact_kind_id=k.kind_id "
-					+ "LEFT JOIN ContactFunction cf ON c.contact_function_id=cf.contactfunction_id "
-					+ "LEFT JOIN Event bd ON c.contact_birthday_id=bd.event_id "
-					+ "LEFT JOIN Event an ON c.contact_anniversary_id=an.event_id "
-					+ "LEFT JOIN ContactEntity ce ON c.contact_id=ce.contactentity_contact_id "	
-					+ "LEFT JOIN Website ON ce.contactentity_entity_id=Website.website_entity_id "
-					+ "WHERE c.contact_id=" + cid);
-			if (!rs.next()) {
+			rs1 = loadIndexableContactFromDatabase(st);
+			if (rs1 == null) {
 				logger.warn("contact with id " + cid + " not found.");
-				return found;
+				return false;
 			}
-			found = true;
-			f(sid, "id", cid);
-			f(sid, "timecreate", rs.getDate("contact_timecreate"));
-			f(sid, "timeupdate", rs.getDate("contact_timeupdate"));
-			f(sid, "usercreate", rs.getInt("contact_usercreate"));
-			f(sid, "usercreate", rs.getInt("contact_userupdate"));
-			f(sid, "datasource", rs.getInt("contact_datasource_id"));
-			f(sid, "domain", rs.getInt("contact_domain_id"));
-			f(sid, "in", rs.getString("name"));
-			f(sid, "addressbookId", rs.getInt("id"));
-			f(sid, "company", rs.getString("contact_company"));
-			f(sid, "companyId", rs.getInt("contact_company_id"));
-			f(sid, "commonname", rs.getString("contact_commonname"));
-			f(sid, "lastname", rs.getString("contact_lastname"));
-			f(sid, "firstname", rs.getString("contact_firstname"));
-			f(sid, "middlename", rs.getString("contact_middlename"));
-			f(sid, "suffix", rs.getString("contact_suffix"));
-			f(sid, "aka", rs.getString("contact_aka"));
-			f(sid, "kind", rs.getString("kind_minilabel"),
-					rs.getString("kind_header"));
-			f(sid, "manager", rs.getString("contact_manager"));
-			f(sid, "assistant", rs.getString("contact_assistant"));
-			f(sid, "spouse", rs.getString("contact_spouse"));
-			f(sid, "category", rs.getString("contact_category"));
-			f(sid, "service", rs.getString("contact_service"));
-			f(sid, "function", rs.getString("contactfunction_label"));
-			f(sid, "title", rs.getString("contact_title"));
-			f(sid, "is", (rs.getBoolean("contact_archive") ? "archive" : null),
-					(rs.getBoolean("contact_collected") ? "collected" : null),
-					(rs.getBoolean("contact_mailing_ok") ? "mailing" : null),
-					(rs.getBoolean("contact_newsletter") ? "newsletter" : null));
-
-			f(sid, "date", rs.getDate("contact_date"));
-			f(sid, "birthday", rs.getDate("bd_date"));
-			f(sid, "birthdayId", rs.getInt("bd_id"));
-			f(sid, "anniversary", rs.getDate("an_date"));
-			f(sid, "anniversaryId", rs.getInt("an_id"));
-
-			f(sid, "comment1", rs.getString("contact_comment"));
-			f(sid, "comment2", rs.getString("contact_comment2"));
-			f(sid, "comment3", rs.getString("contact_comment3"));
-
-			f(sid, "from", rs.getString("contact_origin"));
-			f(sid, "hasACalendar", hasCaluri(rs.getString("website_label"), rs.getString("website_url")));
-			rs.close();
-			rs = null;
-
-			LinkedList<String> mails = new LinkedList<String>();
-			for (EmailAddress e : c.getEmails().values()) {
-				mails.add(e.get());
-			}
-			f(sid, "email", mails);
-
-			LinkedList<String> phones = new LinkedList<String>();
-			LinkedList<String> fax = new LinkedList<String>();
-			for (String kind : c.getPhones().keySet()) {
-				if (kind.contains("FAX")) {
-					fax.add(c.getPhones().get(kind).getNumber());
-				} else {
-					phones.add(c.getPhones().get(kind).getNumber());
-				}
-			}
-			f(sid, "phone", phones);
-			f(sid, "fax", fax);
-
-			LinkedList<String> jab = new LinkedList<String>();
-			for (InstantMessagingId e : c.getImIdentifiers().values()) {
-				jab.add(e.getId());
-			}
-			f(sid, "jabber", jab);
-
-			LinkedList<String> street = new LinkedList<String>();
-			LinkedList<String> zip = new LinkedList<String>();
-			LinkedList<String> express = new LinkedList<String>();
-			LinkedList<String> town = new LinkedList<String>();
-			LinkedList<String> country = new LinkedList<String>();
-			for (Address a : c.getAddresses().values()) {
-				if (a.getStreet() != null) {
-					street.add(a.getStreet());
-				}
-				if (a.getZipCode() != null) {
-					zip.add(a.getZipCode());
-				}
-				if (a.getExpressPostal() != null) {
-					express.add(a.getExpressPostal());
-				}
-				if (a.getTown() != null) {
-					town.add(a.getTown());
-				}
-				if (a.getCountry() != null) {
-					country.add(a.getCountry());
-				}
-			}
-			f(sid, "street", street);
-			f(sid, "zipcode", zip);
-			f(sid, "expresspostal", express);
-			f(sid, "town", town);
-			f(sid, "country", country);
-
-			StringBuilder sortable = new StringBuilder();
-			if (c.getLastname() != null) {
-				sortable.append(c.getLastname());
-				sortable.append(' ');
-			}
-			if (c.getFirstname() != null) {
-				sortable.append(c.getFirstname());
-			}
-			f(sid, "sortable", sortable.toString().trim());
-
-			LinkedList<Integer> catId = new LinkedList<Integer>();
-			rs = st.executeQuery("SELECT categorylink_category_id FROM CategoryLink WHERE categorylink_entity_id="
-					+ c.getEntityId());
-			while (rs.next()) {
-				catId.add(rs.getInt(1));
-			}
-			f(sid, "categoryId", catId);
-
-			server.add(sid);
+			SolrInputDocument document = buildDocumentFromResultSet(rs1);
+			
+			
+			rs2 = st.executeQuery("SELECT categorylink_category_id FROM CategoryLink WHERE categorylink_entity_id=" + c.getEntityId());
+			appendCatetories(document, rs2);
+			
+			server.add(document);
 			server.commit();
 			logger.info("[" + c.getUid() + "] indexed in SOLR");
+			return true;
 		} catch (SQLException t) {
 			logger.error(t.getMessage(), t);
 		} finally {
-			obmHelper.cleanup(con, st, rs);
+			obmHelper.cleanup(null, null, rs2);
+			obmHelper.cleanup(con, st, rs1);
 		}
-		return found;
+		return false;
 	}
 
+	private void appendCatetories(SolrInputDocument document, ResultSet rs) throws SQLException {
+		LinkedList<Integer> catId = new LinkedList<Integer>();
+		while (rs.next()) {
+			catId.add(rs.getInt(1));
+		}
+		f(document, "categoryId", catId);
+	}
+
+	private ResultSet loadIndexableContactFromDatabase(Statement st)
+			throws SQLException {
+		ResultSet rs;
+		rs = st.executeQuery("SELECT "
+				+ "c.*, ab.*, k.*, cf.*, Website.website_url, Website.website_label, "
+				+ "bd.event_id as bd_id, bd.event_date as bd_date, an.event_id as an_id, an.event_date as an_date "
+				+ "FROM Contact c "
+				+ "INNER JOIN AddressBook ab ON c.contact_addressbook_id=ab.id "
+				+ "LEFT JOIN Kind k ON c.contact_kind_id=k.kind_id "
+				+ "LEFT JOIN ContactFunction cf ON c.contact_function_id=cf.contactfunction_id "
+				+ "LEFT JOIN Event bd ON c.contact_birthday_id=bd.event_id "
+				+ "LEFT JOIN Event an ON c.contact_anniversary_id=an.event_id "
+				+ "LEFT JOIN ContactEntity ce ON c.contact_id=ce.contactentity_contact_id "	
+				+ "LEFT JOIN Website ON ce.contactentity_entity_id=Website.website_entity_id "
+				+ "WHERE c.contact_id=" + cid);
+		if (!rs.next()) {
+			return null;
+		}
+		return rs;
+	}
+
+	private SolrInputDocument buildDocumentFromResultSet(ResultSet rs) throws SQLException {
+		SolrInputDocument sid = new SolrInputDocument();
+		f(sid, "id", cid);
+		f(sid, "timecreate", rs.getDate("contact_timecreate"));
+		f(sid, "timeupdate", rs.getDate("contact_timeupdate"));
+		f(sid, "usercreate", rs.getInt("contact_usercreate"));
+		f(sid, "usercreate", rs.getInt("contact_userupdate"));
+		f(sid, "datasource", rs.getInt("contact_datasource_id"));
+		f(sid, "domain", rs.getInt("contact_domain_id"));
+		f(sid, "in", rs.getString("name"));
+		f(sid, "addressbookId", rs.getInt("id"));
+		f(sid, "company", rs.getString("contact_company"));
+		f(sid, "companyId", rs.getInt("contact_company_id"));
+		f(sid, "commonname", rs.getString("contact_commonname"));
+		f(sid, "lastname", rs.getString("contact_lastname"));
+		f(sid, "firstname", rs.getString("contact_firstname"));
+		f(sid, "middlename", rs.getString("contact_middlename"));
+		f(sid, "suffix", rs.getString("contact_suffix"));
+		f(sid, "aka", rs.getString("contact_aka"));
+		f(sid, "kind", rs.getString("kind_minilabel"),
+				rs.getString("kind_header"));
+		f(sid, "manager", rs.getString("contact_manager"));
+		f(sid, "assistant", rs.getString("contact_assistant"));
+		f(sid, "spouse", rs.getString("contact_spouse"));
+		f(sid, "category", rs.getString("contact_category"));
+		f(sid, "service", rs.getString("contact_service"));
+		f(sid, "function", rs.getString("contactfunction_label"));
+		f(sid, "title", rs.getString("contact_title"));
+		f(sid, "is", (rs.getBoolean("contact_archive") ? "archive" : null),
+				(rs.getBoolean("contact_collected") ? "collected" : null),
+				(rs.getBoolean("contact_mailing_ok") ? "mailing" : null),
+				(rs.getBoolean("contact_newsletter") ? "newsletter" : null));
+
+		f(sid, "date", rs.getDate("contact_date"));
+		f(sid, "birthday", rs.getDate("bd_date"));
+		f(sid, "birthdayId", rs.getInt("bd_id"));
+		f(sid, "anniversary", rs.getDate("an_date"));
+		f(sid, "anniversaryId", rs.getInt("an_id"));
+
+		f(sid, "comment1", rs.getString("contact_comment"));
+		f(sid, "comment2", rs.getString("contact_comment2"));
+		f(sid, "comment3", rs.getString("contact_comment3"));
+
+		f(sid, "from", rs.getString("contact_origin"));
+		f(sid, "hasACalendar", hasCaluri(rs.getString("website_label"), rs.getString("website_url")));
+		rs.close();
+		rs = null;
+
+		LinkedList<String> mails = new LinkedList<String>();
+		for (EmailAddress e : c.getEmails().values()) {
+			mails.add(e.get());
+		}
+		f(sid, "email", mails);
+
+		LinkedList<String> phones = new LinkedList<String>();
+		LinkedList<String> fax = new LinkedList<String>();
+		for (String kind : c.getPhones().keySet()) {
+			if (kind.contains("FAX")) {
+				fax.add(c.getPhones().get(kind).getNumber());
+			} else {
+				phones.add(c.getPhones().get(kind).getNumber());
+			}
+		}
+		f(sid, "phone", phones);
+		f(sid, "fax", fax);
+
+		LinkedList<String> jab = new LinkedList<String>();
+		for (InstantMessagingId e : c.getImIdentifiers().values()) {
+			jab.add(e.getId());
+		}
+		f(sid, "jabber", jab);
+
+		LinkedList<String> street = new LinkedList<String>();
+		LinkedList<String> zip = new LinkedList<String>();
+		LinkedList<String> express = new LinkedList<String>();
+		LinkedList<String> town = new LinkedList<String>();
+		LinkedList<String> country = new LinkedList<String>();
+		for (Address a : c.getAddresses().values()) {
+			if (a.getStreet() != null) {
+				street.add(a.getStreet());
+			}
+			if (a.getZipCode() != null) {
+				zip.add(a.getZipCode());
+			}
+			if (a.getExpressPostal() != null) {
+				express.add(a.getExpressPostal());
+			}
+			if (a.getTown() != null) {
+				town.add(a.getTown());
+			}
+			if (a.getCountry() != null) {
+				country.add(a.getCountry());
+			}
+		}
+		f(sid, "street", street);
+		f(sid, "zipcode", zip);
+		f(sid, "expresspostal", express);
+		f(sid, "town", town);
+		f(sid, "country", country);
+
+		StringBuilder sortable = new StringBuilder();
+		if (c.getLastname() != null) {
+			sortable.append(c.getLastname());
+			sortable.append(' ');
+		}
+		if (c.getFirstname() != null) {
+			sortable.append(c.getFirstname());
+		}
+		f(sid, "sortable", sortable.toString().trim());
+		
+		return sid;
+	}
+	
+	
+	
 	private boolean hasCaluri(String websiteLabel, String websiteUrl) {
 		if(websiteUrl != null && websiteLabel != null){
 			StringTokenizer websiteTokenizer = new StringTokenizer(websiteLabel, ";");
