@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2013-2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,16 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.dbcp;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import org.obm.configuration.IniFileMultiNodeDatabaseConfiguration;
+import org.obm.configuration.MultiNodeDatabaseConfiguration;
+import org.obm.dbcp.MultiNodeHikariCPDatabaseConnectionProvider.HikariCPProviderFactory;
 
-public interface DatabaseConnectionProvider {
-	
-	Connection getConnection() throws SQLException;
-	
-	int lastInsertId(Connection con) throws SQLException;
-	
-	Object getJdbcObject(String dbFieldName, String dbFieldValue) throws SQLException;
+import com.google.inject.AbstractModule;
 
-	void cleanup();
+public class MultiNodeDatabaseModule extends AbstractModule {
+
+	@Override
+	protected void configure() {
+		bind(MultiNodeDatabaseConfiguration.class).to(IniFileMultiNodeDatabaseConfiguration.class);
+		bind(MultiNodeDatabaseConnectionProviderSelector.class).to(RoundRobinMultiNodeDatabaseConnectionProviderSelector.class);
+		bind(MultiNodeDatabaseConnectionProvider.ProviderFactory.class).to(HikariCPProviderFactory.class);
+	}
+
 }

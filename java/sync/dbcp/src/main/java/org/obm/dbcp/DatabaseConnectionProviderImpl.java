@@ -64,8 +64,12 @@ public class DatabaseConnectionProviderImpl implements DatabaseConnectionProvide
 	protected final PoolingDataSourceDecorator poolingDataSource;
 
 	protected DatabaseConnectionProviderImpl(DatabaseDriverConfiguration driverConfiguration) {
+		this(driverConfiguration, null);
+	}
+
+	protected DatabaseConnectionProviderImpl(DatabaseDriverConfiguration driverConfiguration, ITransactionAttributeBinder transactionAttributeBinder) {
 		this.driverConfiguration = driverConfiguration;
-		this.transactionAttributeBinder = null;
+		this.transactionAttributeBinder = transactionAttributeBinder;
 		this.poolingDataSource = null;
 	}
 

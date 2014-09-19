@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2014  Linagora
+ * Copyright (C) 2011-2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,51 +29,25 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.dbcp;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.util.Set;
 
-import org.obm.annotations.transactional.ITransactionAttributeBinder;
 import org.obm.configuration.MultiNodeDatabaseConfiguration;
-import org.obm.dbcp.MultiNodeDatabaseConnectionProvider;
-import org.obm.dbcp.MultiNodeDatabaseConnectionProviderSelector;
-import org.obm.dbcp.MultiNodeDatabaseDriverConfigurationFactory;
-import org.obm.dbcp.MultiNodeHikariCPDatabaseConnectionProvider;
-import org.obm.servlet.filter.resource.ResourcesHolder;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
-public class RequestScopedDatabaseConnectionProvider extends MultiNodeHikariCPDatabaseConnectionProvider {
-
-	private final Provider<ResourcesHolder> resourcesHolderProvider;
+public class MultiNodeDatabaseDriverConfigurationFactory extends DatabaseDriverConfigurationFactory {
 
 	@Inject
-	public RequestScopedDatabaseConnectionProvider(
-			ITransactionAttributeBinder transactionAttributeBinder,
-			MultiNodeDatabaseDriverConfigurationFactory databaseDriverConfigurationFactory, 
-			MultiNodeDatabaseConfiguration databaseConfiguration,
-			MultiNodeDatabaseConnectionProviderSelector selector,
-			MultiNodeDatabaseConnectionProvider.ProviderFactory providerFactory,
-			Provider<ResourcesHolder> resourcesHolderProvider) {
-		super(transactionAttributeBinder, databaseDriverConfigurationFactory, databaseConfiguration, selector, providerFactory);
-
-		this.resourcesHolderProvider = resourcesHolderProvider;
+	@VisibleForTesting
+	MultiNodeDatabaseDriverConfigurationFactory(Set<DatabaseDriverConfiguration> drivers, MultiNodeDatabaseConfiguration databaseConfigurations) {
+		super(drivers, Iterables.getFirst(databaseConfigurations.getDatabaseConfigurations().values(), null));
 	}
 
-	@Override
-	public Connection getConnection() throws SQLException {
-		ResourcesHolder resourcesHolder = resourcesHolderProvider.get();
-		ConnectionResource connection = resourcesHolder.get(ConnectionResource.class);
-		if (connection != null) {
-			return connection;
-		} else {
-			ConnectionResource newConnection = ConnectionResource.wrap(super.getConnection());
-			resourcesHolder.put(ConnectionResource.class, newConnection);
-			return newConnection;
-		}
-	}
 }

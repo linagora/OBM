@@ -60,13 +60,7 @@ public class HikariCPDatabaseConnectionProvider extends DatabaseConnectionProvid
 			@Named(LoggerModule.CONFIGURATION)Logger configurationLogger) {
 		super(databaseDriverConfigurationFactory.create());
 
-		logger.info("Starting OBM/HikariCP connection pool...");
-
-		configurationLogger.info("Database system : {}", databaseConfiguration.getDatabaseSystem());
-		configurationLogger.info("Database name {} on host {}", databaseConfiguration.getDatabaseName(), databaseConfiguration.getDatabaseHost());
-		configurationLogger.info("Database connection min pool size : {}", databaseConfiguration.getDatabaseMinConnectionPoolSize());
-		configurationLogger.info("Database connection pool size : {}", databaseConfiguration.getDatabaseMaxConnectionPoolSize());
-		configurationLogger.info("Databse login : {}", databaseConfiguration.getDatabaseLogin());
+		configurationLogger.info("Starting OBM/HikariCP connection pool using {}.", databaseConfiguration);
 
 		pool = new HikariDataSource();
 		pool.setDataSourceClassName(driverConfiguration.getNonXADataSourceClassName());
