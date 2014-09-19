@@ -29,44 +29,25 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.dbcp;
 
-import javax.servlet.ServletContext;
+import java.util.Set;
 
-import org.obm.dbcp.MultiNodeDatabaseModule;
-import org.obm.domain.dao.DaoModule;
-import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
-import org.obm.healthcheck.HealthCheckModule;
-import org.obm.provisioning.ProvisioningService;
-import org.obm.sync.transactional.JdbcTransactionalModule;
+import org.obm.configuration.MultiNodeDatabaseConfiguration;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 
-import com.google.inject.AbstractModule;
-import com.sun.jersey.guice.JerseyServletModule;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Iterables;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-public class ObmSyncModule extends AbstractModule {
-	
-	private final ServletContext servletContext;
-	
-	public ObmSyncModule(ServletContext servletContext) {
-		this.servletContext = servletContext;
-	}
+@Singleton
+public class MultiNodeDatabaseDriverConfigurationProvider extends DatabaseDriverConfigurationProvider {
 
-	@Override
-	protected void configure() {
-		install(new ObmSyncServletModule());
-		install(new ObmSyncServicesModule());
-		install(new SmtpModule());
-		install(new MessageQueueModule());
-		install(new JdbcTransactionalModule());
-		install(new DatabaseModule());
-		install(new MultiNodeDatabaseModule());
-		install(new DaoModule());
-		install(new SolrJmsModule());
-		install(new HealthCheckModule());
-		install(new HealthCheckDefaultHandlersModule());
-		install(new DatabaseMetadataModule());
-		install(new ProvisioningService(servletContext));
-		install(new JerseyServletModule());
+	@Inject
+	@VisibleForTesting
+	MultiNodeDatabaseDriverConfigurationProvider(Set<DatabaseDriverConfiguration> drivers, MultiNodeDatabaseConfiguration databaseConfigurations) {
+		super(drivers, Iterables.getFirst(databaseConfigurations.getDatabaseConfigurations().values(), null));
 	}
 
 }

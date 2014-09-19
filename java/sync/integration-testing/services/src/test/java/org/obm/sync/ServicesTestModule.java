@@ -35,6 +35,7 @@ import javax.servlet.ServletContext;
 
 import org.obm.Configuration;
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.dbcp.MultiNodeDatabaseModule;
 import org.obm.domain.dao.DaoModule;
 
 import com.google.common.io.Files;
@@ -61,6 +62,7 @@ public class ServicesTestModule extends AbstractModule {
 				new ObmSyncServletModule(),
 				new ObmSyncServicesModule(),
 				new MessageQueueModule(),
+				new MultiNodeDatabaseModule(),
 				new TransactionalModule(),
 				new DatabaseModule(),
 				new DaoModule(),

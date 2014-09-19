@@ -34,30 +34,32 @@ package org.obm.sync;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.module.LoggerModule;
-import org.obm.dbcp.DatabaseDriverConfigurationProvider;
-import org.obm.dbcp.HikariCPDatabaseConnectionProvider;
+import org.obm.annotations.transactional.ITransactionAttributeBinder;
+import org.obm.configuration.MultiNodeDatabaseConfiguration;
+import org.obm.dbcp.MultiNodeDatabaseConnectionProvider;
+import org.obm.dbcp.MultiNodeDatabaseConnectionProviderSelector;
+import org.obm.dbcp.MultiNodeDatabaseDriverConfigurationProvider;
+import org.obm.dbcp.MultiNodeHikariCPDatabaseConnectionProvider;
 import org.obm.servlet.filter.resource.ResourcesHolder;
-import org.slf4j.Logger;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 @Singleton
-public class RequestScopedDatabaseConnectionProvider extends HikariCPDatabaseConnectionProvider {
+public class RequestScopedDatabaseConnectionProvider extends MultiNodeHikariCPDatabaseConnectionProvider {
 
-	private Provider<ResourcesHolder> resourcesHolderProvider;
+	private final Provider<ResourcesHolder> resourcesHolderProvider;
 
 	@Inject
 	public RequestScopedDatabaseConnectionProvider(
-			DatabaseDriverConfigurationProvider databaseDriverConfigurationProvider, 
-			DatabaseConfiguration databaseConfiguration,
-			@Named(LoggerModule.CONFIGURATION)Logger logger,
+			ITransactionAttributeBinder transactionAttributeBinder,
+			MultiNodeDatabaseDriverConfigurationProvider databaseDriverConfigurationProvider, 
+			MultiNodeDatabaseConfiguration databaseConfiguration,
+			MultiNodeDatabaseConnectionProviderSelector selector,
+			MultiNodeDatabaseConnectionProvider.ProviderFactory providerFactory,
 			Provider<ResourcesHolder> resourcesHolderProvider) {
-		super(databaseDriverConfigurationProvider, databaseConfiguration, logger);
+		super(transactionAttributeBinder, databaseDriverConfigurationProvider, databaseConfiguration, selector, providerFactory);
 
 		this.resourcesHolderProvider = resourcesHolderProvider;
 	}

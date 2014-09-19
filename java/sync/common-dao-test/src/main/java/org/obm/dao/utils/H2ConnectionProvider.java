@@ -91,4 +91,9 @@ public class H2ConnectionProvider implements DatabaseConnectionProvider {
 	public String getIntegerCastType() {
 		return "INTEGER";
 	}
+	
+	@Override
+	public void shutdown() throws Exception {
+		geth2Instance().closeConnections();
+	}
 }

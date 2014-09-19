@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2013-2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,44 +29,21 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.dbcp;
 
-import javax.servlet.ServletContext;
-
-import org.obm.dbcp.MultiNodeDatabaseModule;
-import org.obm.domain.dao.DaoModule;
-import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
-import org.obm.healthcheck.HealthCheckModule;
-import org.obm.provisioning.ProvisioningService;
-import org.obm.sync.transactional.JdbcTransactionalModule;
+import org.obm.configuration.IniFileMultiNodeDatabaseConfiguration;
+import org.obm.configuration.MultiNodeDatabaseConfiguration;
+import org.obm.dbcp.MultiNodeHikariCPDatabaseConnectionProvider.HikariCPProviderFactory;
 
 import com.google.inject.AbstractModule;
-import com.sun.jersey.guice.JerseyServletModule;
 
-public class ObmSyncModule extends AbstractModule {
-	
-	private final ServletContext servletContext;
-	
-	public ObmSyncModule(ServletContext servletContext) {
-		this.servletContext = servletContext;
-	}
+public class MultiNodeDatabaseModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		install(new ObmSyncServletModule());
-		install(new ObmSyncServicesModule());
-		install(new SmtpModule());
-		install(new MessageQueueModule());
-		install(new JdbcTransactionalModule());
-		install(new DatabaseModule());
-		install(new MultiNodeDatabaseModule());
-		install(new DaoModule());
-		install(new SolrJmsModule());
-		install(new HealthCheckModule());
-		install(new HealthCheckDefaultHandlersModule());
-		install(new DatabaseMetadataModule());
-		install(new ProvisioningService(servletContext));
-		install(new JerseyServletModule());
+		bind(MultiNodeDatabaseConfiguration.class).to(IniFileMultiNodeDatabaseConfiguration.class);
+		bind(MultiNodeDatabaseConnectionProviderSelector.class).to(RoundRobinMultiNodeDatabaseConnectionProviderSelector.class);
+		bind(MultiNodeDatabaseConnectionProvider.ProviderFactory.class).to(HikariCPProviderFactory.class);
 	}
 
 }
