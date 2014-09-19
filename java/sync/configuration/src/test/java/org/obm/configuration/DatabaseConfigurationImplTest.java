@@ -32,23 +32,28 @@
 
 package org.obm.configuration;
 
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
 
+import org.easymock.IMocksControl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.utils.IniFile;
+import org.obm.configuration.utils.IniFile.Factory;
 
 public class DatabaseConfigurationImplTest {
 
 	private DatabaseConfigurationImpl databaseConfigurationImpl;
+	private IMocksControl control;
 
 	@Before
 	public void setup() {
-		IniFile iniFile = createNiceMock(IniFile.class);
-		replay(iniFile);
-		databaseConfigurationImpl = new DatabaseConfigurationImpl(iniFile);
+		control = createControl();
+		Factory factory = control.createMock(IniFile.Factory.class);
+		expect(factory.build("file")).andReturn(control.createMock(IniFile.class));
+		control.replay();
+		databaseConfigurationImpl = new DatabaseConfigurationImpl(factory, "file");
 	}
 	
     @Test

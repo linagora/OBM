@@ -33,6 +33,7 @@
 package org.obm.configuration.utils;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Map;
 
 import org.ini4j.Ini;
@@ -83,6 +84,14 @@ public class IniFile {
 	@VisibleForTesting
 	public IniFile(Map<String, ? extends Map<String, String>> settings) {
 		this.settings = settings;
+	}
+
+	public Collection<String> getIniSectionNames() {
+		return settings.keySet();
+	}
+
+	public Map<String, String> getIniSection(String section) {
+		return settings.get(section);
 	}
 
 	public String getStringValue(String prop) {

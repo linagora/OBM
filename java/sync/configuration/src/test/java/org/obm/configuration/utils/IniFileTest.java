@@ -421,6 +421,31 @@ public class IniFileTest {
 		assertThat(iniFile.getIniStringValue("global", "iamnotasetting", "value")).isEqualTo("value");
 	}
 
+	@Test
+	public void testGetIniSection() {
+		iniFile = buildIniFileFromResourceFile("withSections.ini");
+
+		// Sides of isEqualTo are inverted because ini4j BasicProfileSection does not
+		// implement .equals(). This means that AssertJ tries to compare the objects and
+		// they're not equal as far as == is concerned.
+		// Guava ImmutableMap implements .equals() correctly.
+		assertThat(ImmutableMap.of("key1", "value1")).isEqualTo(iniFile.getIniSection("section1"));
+	}
+
+	@Test
+	public void testGetIniSectionNoSection() {
+		iniFile = buildIniFileFromResourceFile("withSections.ini");
+
+		assertThat(iniFile.getIniSection("iamnotasection")).isNull();
+	}
+
+	@Test
+	public void testGetIniSectionNames() {
+		iniFile = buildIniFileFromResourceFile("withSections.ini");
+
+		assertThat(iniFile.getIniSectionNames()).containsOnly("section1", "section2");
+	}
+
 	private IniFile buildIniFileFromResourceFile(String file) {
 		return new IniFile.Factory().build(Resources.getResource(file).getFile());
 	}
