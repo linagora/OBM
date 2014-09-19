@@ -43,4 +43,6 @@ public interface DatabaseConnectionProvider {
 	Object getJdbcObject(String dbFieldName, String dbFieldValue) throws SQLException;
 
 	String getIntegerCastType();
+
+	void shutdown() throws Exception;
 }

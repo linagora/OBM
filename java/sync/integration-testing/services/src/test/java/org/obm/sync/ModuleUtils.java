@@ -33,6 +33,7 @@ package org.obm.sync;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Map;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -50,6 +51,7 @@ import org.obm.Configuration.ObmSyncWithLDAPAuth;
 import org.obm.ConfigurationModule;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.LocatorConfiguration;
+import org.obm.configuration.MultiNodeDatabaseConfiguration;
 import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -62,6 +64,7 @@ import org.obm.sync.solr.SolrClientFactory;
 import org.obm.sync.solr.SolrService;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
@@ -100,6 +103,13 @@ public class ModuleUtils {
 				databaseDrivers.addBinding().to(H2DriverConfiguration.class);
 				bind(DatabaseConnectionProvider.class).to(H2ConnectionProvider.class);
 				bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
+				bind(MultiNodeDatabaseConfiguration.class).toInstance(new MultiNodeDatabaseConfiguration() {
+					
+					@Override
+					public Map<String, DatabaseConfiguration> getDatabaseConfigurations() {
+						return ImmutableMap.<String, DatabaseConfiguration>of("default", new DatabaseConfigurationFixtureH2());
+					}
+				});
 				ObmSyncStaticConfigurationService.ObmSyncConfiguration obmSyncConfiguration = 
 						new ObmSyncStaticConfigurationService.ObmSyncConfiguration(configuration, new Configuration.ObmSync());
 				bind(ObmSyncConfigurationService.class).toInstance(obmSyncConfiguration);

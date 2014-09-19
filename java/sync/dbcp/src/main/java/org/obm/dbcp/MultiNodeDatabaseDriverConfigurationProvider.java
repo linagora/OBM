@@ -29,60 +29,25 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.dbcp;
 
-import javax.servlet.ServletContext;
+import java.util.Set;
 
-import org.obm.Configuration;
-import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.dbcp.MultiNodeDatabaseModule;
-import org.obm.domain.dao.DaoModule;
+import org.obm.configuration.MultiNodeDatabaseConfiguration;
+import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 
-import com.google.common.io.Files;
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
-import com.google.inject.util.Modules;
-import com.google.inject.util.Modules.OverriddenModuleBuilder;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Iterables;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-public class ServicesTestModule extends AbstractModule {
-	
-	public final Configuration configuration;
+@Singleton
+public class MultiNodeDatabaseDriverConfigurationProvider extends DatabaseDriverConfigurationProvider {
 
-	public ServicesTestModule(@SuppressWarnings("unused") ServletContext servletContext) {
-		configuration = new Configuration();
-		configuration.obmUiBaseUrl = "localhost";
-		configuration.locator.url = "localhost";
-		configuration.dataDir = Files.createTempDir();
-		configuration.transaction.timeoutInSeconds = 3600;
-	}
-
-	@Override
-	protected void configure() {
-		OverriddenModuleBuilder override = Modules.override(
-				new ObmSyncServletModule(),
-				new ObmSyncServicesModule(),
-				new MessageQueueModule(),
-				new MultiNodeDatabaseModule(),
-				new TransactionalModule(),
-				new DatabaseModule(),
-				new DaoModule(),
-				new DatabaseMetadataModule());
-		try {
-			install(override.with(overrideModule()));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public Module overrideModule() {
-		return Modules.combine(
-				getConfigurationModule(),
-				ModuleUtils.buildDummySmtpModule(),
-				ModuleUtils.buildDummySolrModule());
-	}
-
-	protected Module getConfigurationModule() {
-		return ModuleUtils.buildDummyConfigurationModule(configuration);
+	@Inject
+	@VisibleForTesting
+	MultiNodeDatabaseDriverConfigurationProvider(Set<DatabaseDriverConfiguration> drivers, MultiNodeDatabaseConfiguration databaseConfigurations) {
+		super(drivers, Iterables.getFirst(databaseConfigurations.getDatabaseConfigurations().values(), null));
 	}
 
 }

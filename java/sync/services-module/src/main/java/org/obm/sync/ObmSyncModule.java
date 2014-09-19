@@ -33,6 +33,7 @@ package org.obm.sync;
 
 import javax.servlet.ServletContext;
 
+import org.obm.dbcp.MultiNodeDatabaseModule;
 import org.obm.domain.dao.DaoModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
@@ -57,6 +58,7 @@ public class ObmSyncModule extends AbstractModule {
 		install(new MessageQueueModule());
 		install(new JdbcTransactionalModule());
 		install(new DatabaseModule());
+		install(new MultiNodeDatabaseModule());
 		install(new DaoModule());
 		install(new SolrJmsModule());
 		install(new HealthCheckModule());

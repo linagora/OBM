@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2013-2014 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,60 +29,21 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.dbcp;
 
-import javax.servlet.ServletContext;
+import org.obm.configuration.IniFileMultiNodeDatabaseConfiguration;
+import org.obm.configuration.MultiNodeDatabaseConfiguration;
+import org.obm.dbcp.MultiNodeHikariCPDatabaseConnectionProvider.HikariCPProviderFactory;
 
-import org.obm.Configuration;
-import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.dbcp.MultiNodeDatabaseModule;
-import org.obm.domain.dao.DaoModule;
-
-import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
-import com.google.inject.Module;
-import com.google.inject.util.Modules;
-import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
-public class ServicesTestModule extends AbstractModule {
-	
-	public final Configuration configuration;
-
-	public ServicesTestModule(@SuppressWarnings("unused") ServletContext servletContext) {
-		configuration = new Configuration();
-		configuration.obmUiBaseUrl = "localhost";
-		configuration.locator.url = "localhost";
-		configuration.dataDir = Files.createTempDir();
-		configuration.transaction.timeoutInSeconds = 3600;
-	}
+public class MultiNodeDatabaseModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		OverriddenModuleBuilder override = Modules.override(
-				new ObmSyncServletModule(),
-				new ObmSyncServicesModule(),
-				new MessageQueueModule(),
-				new MultiNodeDatabaseModule(),
-				new TransactionalModule(),
-				new DatabaseModule(),
-				new DaoModule(),
-				new DatabaseMetadataModule());
-		try {
-			install(override.with(overrideModule()));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public Module overrideModule() {
-		return Modules.combine(
-				getConfigurationModule(),
-				ModuleUtils.buildDummySmtpModule(),
-				ModuleUtils.buildDummySolrModule());
-	}
-
-	protected Module getConfigurationModule() {
-		return ModuleUtils.buildDummyConfigurationModule(configuration);
+		bind(MultiNodeDatabaseConfiguration.class).to(IniFileMultiNodeDatabaseConfiguration.class);
+		bind(MultiNodeDatabaseConnectionProviderSelector.class).to(RoundRobinMultiNodeDatabaseConnectionProviderSelector.class);
+		bind(MultiNodeDatabaseConnectionProvider.ProviderFactory.class).to(HikariCPProviderFactory.class);
 	}
 
 }
