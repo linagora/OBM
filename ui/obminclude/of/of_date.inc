@@ -188,8 +188,7 @@ class Of_Date extends DateTime {
   private static $_options = array(
     'outputdate' => 'd/m/Y',
     'inputdate' => 'd/m/Y',
-    'timezone' => 'Europe/Paris',
-    'timeformat' => 24
+    'timezone' => 'Europe/Paris'
   );
   
   private static $_localized_formats = array(
