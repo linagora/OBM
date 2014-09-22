@@ -312,21 +312,4 @@ class Vpdi_Icalendar_Vevent extends Vpdi_Icalendar_Component {
     }
     return $return;
   }
-
-  /**
-   * Returns the original RRULE as a dictionary of strings
-   *
-   * @return string[] The RRULE, as a dictionary of key => values
-   */
-  public function getRealRrule() {
-    if (($rrule = $this->getProperty('RRULE')) === null) {
-      return null;
-    }
-    $data = Vpdi::decodeTextList($rrule->value(), ';');
-    foreach($data as $d) {
-      list($name, $value) = explode('=', $d);
-      $property[$name] = $value;
-    }
-    return $property;
-  }
 }
