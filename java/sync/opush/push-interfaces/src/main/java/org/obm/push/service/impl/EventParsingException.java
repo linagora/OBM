@@ -33,10 +33,6 @@ package org.obm.push.service.impl;
 
 public class EventParsingException extends Exception {
 
-	public EventParsingException(String message) {
-		super(message);
-	}
-
 	public EventParsingException(Throwable cause) {
 		super(cause);
 	}

@@ -35,14 +35,12 @@ import java.io.IOException;
 import java.util.Collection;
 
 import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.commons.codec.binary.Hex;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.icalendar.ParsingResults;
-import org.obm.icalendar.Reject;
 import org.obm.push.bean.Device;
 import org.obm.push.bean.MSEvent;
 import org.obm.push.bean.MSEventUid;
@@ -146,13 +144,7 @@ public class EventServiceImpl implements EventService {
 			AccessToken accessToken = udr.getResource(AccessTokenResource.class).getAccessToken();
 			Ical4jUser ical4jUser = ical4jUserFactory.createIcal4jUser(udr.getUser().getEmail(), accessToken.getDomain());
 			ParsingResults<Event, VEvent> parsingResults = ical4jHelper.parseICSEvent(ics, ical4jUser, accessToken.getObmId());
-			if (!parsingResults.getRejectedItems().isEmpty()) {
-				throw new EventParsingException(
-						String.format(
-								"The following events could not be converted to OBM events: %s",
-								this.formatRejects(parsingResults.getRejectedItems())));
-			}
-
+		
 			Collection<Event> obmEvents = parsingResults.getParsedItems();
 			if (!obmEvents.isEmpty()) {
 				final Event icsEvent = Iterables.getOnlyElement(obmEvents);
@@ -166,16 +158,5 @@ public class EventServiceImpl implements EventService {
 		} catch (ParserException e) {
 			throw new EventParsingException(e);
 		}
-	}
-
-	private <T extends CalendarComponent> String formatRejects(Collection<Reject<T>> rejects) {
-		StringBuilder messageBuilder = new StringBuilder();
-		for (Reject<T> reject : rejects) {
-			String formattedICS = this.ical4jHelper.calendarComponentToString(reject.getItem());
-			messageBuilder.append(String.format(
-					"Unable to parse the following ICS component due to %s: %s",
-					reject.getReason(), formattedICS));
-		}
-		return messageBuilder.toString();
 	}
 }
