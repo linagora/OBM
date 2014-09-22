@@ -56,7 +56,6 @@ import org.fest.assertions.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.DateUtils;
-import org.obm.icalendar.ICSParsingResults;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.logger.LoggerService;
@@ -141,10 +140,7 @@ public class ResourceServletTest {
 		resourceServlet.init(servletConfig);
 
 		String ics = resourceServlet.getResourceICS("resource@domain", new SyncRange(null, null));
-		ICSParsingResults parsingResults = helper.parseICS(ics, iCalUser, 0);
-		Assertions.assertThat(parsingResults.getParsedEvents()).hasSize(collectionSize);
-		Assertions.assertThat(parsingResults.getRejectedEvents()).isEmpty();
-		Assertions.assertThat(parsingResults.getRejectedTodos()).isEmpty();
+		Assertions.assertThat(helper.parseICS(ics, iCalUser, 0)).isNotNull().hasSize(collectionSize);
 		verify(mocks);
 	}
 
@@ -178,10 +174,7 @@ public class ResourceServletTest {
 
 		verify(mocks);
 		String ics = stringWriter.toString();
-		ICSParsingResults parsingResults = helper.parseICS(ics, iCalUser, 0);
-		Assertions.assertThat(parsingResults.getParsedEvents()).hasSize(collectionSize);
-		Assertions.assertThat(parsingResults.getRejectedEvents()).isEmpty();
-		Assertions.assertThat(parsingResults.getRejectedTodos()).isEmpty();
+		Assertions.assertThat(helper.parseICS(ics, iCalUser, 0)).isNotNull().hasSize(collectionSize);
 	}
 
 	@Test
