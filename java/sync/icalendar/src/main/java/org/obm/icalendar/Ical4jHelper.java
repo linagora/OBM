@@ -1308,11 +1308,36 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 
 			RecurrenceKind recurrenceKind;
 			if (er.getDays().isEmpty()) {
-				recurrenceKind = computeRecurrenceKind(recur);
-				if (recurrenceKind == RecurrenceKind.monthlybyday) {
-					GregorianCalendar eventStartCalendar = getEventStartCalendar(event);
-					event.setStartDate(computeStartDateForMonthlyByDayEvent(recur,
-							eventStartCalendar));
+				if (Recur.DAILY.equals(frequency)) {
+					recurrenceKind = RecurrenceKind.daily;
+				} else if (Recur.WEEKLY.equals(frequency)) {
+					recurrenceKind = RecurrenceKind.weekly;
+				} else if (Recur.MONTHLY.equals(frequency)) {
+					WeekDayList wdl = recur.getDayList();
+
+					if (wdl.size() > 0) {
+						WeekDay day = (WeekDay) wdl.get(0);
+						GregorianCalendar cal = getEventStartCalendar(event);
+
+						recurrenceKind = RecurrenceKind.monthlybyday;
+						cal.set(GregorianCalendar.DAY_OF_WEEK, WeekDay.getCalendarDay(day));
+						cal.set(GregorianCalendar.DAY_OF_WEEK_IN_MONTH, day.getOffset());
+						event.setStartDate(cal.getTime());
+					} else {
+						recurrenceKind = RecurrenceKind.monthlybydate;
+					}
+
+				} else if (Recur.YEARLY.equals(frequency)) {
+					recurrenceKind = RecurrenceKind.yearly;
+				}
+				else {
+					if (frequency == null) {
+						logger.warn("Got invalid recurrence rule without frequency");
+					}
+					else {
+						logger.warn(String.format("Unable to handle recurrence rule frequency %s", frequency));
+					}
+					recurrenceKind = null;
 				}
 			} else {
 				recurrenceKind = RecurrenceKind.weekly;
@@ -1323,50 +1348,6 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		event.setRecurrence(er);
 
 		appendNegativeExceptions(event, component.getProperties(Property.EXDATE));
-	}
-
-	private RecurrenceKind computeRecurrenceKind(Recur recur) {
-		String frequency = recur.getFrequency();
-		RecurrenceKind recurrenceKind;
-		if (Recur.DAILY.equals(frequency)) {
-			recurrenceKind = RecurrenceKind.daily;
-		} else if (Recur.WEEKLY.equals(frequency)) {
-			recurrenceKind = RecurrenceKind.weekly;
-		} else if (Recur.MONTHLY.equals(frequency)) {
-			WeekDayList wdl = recur.getDayList();
-
-			if (wdl.size() > 0) {
-				recurrenceKind = RecurrenceKind.monthlybyday;
-			} else {
-				recurrenceKind = RecurrenceKind.monthlybydate;
-			}
-
-		} else if (Recur.YEARLY.equals(frequency)) {
-			recurrenceKind = RecurrenceKind.yearly;
-		}
-		else {
-			if (frequency == null) {
-				logger.warn("Got invalid recurrence rule without frequency");
-			}
-			else {
-				logger.warn(String.format("Unable to handle recurrence rule frequency %s",
-						frequency));
-			}
-			recurrenceKind = null;
-		}
-		return recurrenceKind;
-	}
-
-	private Date computeStartDateForMonthlyByDayEvent(Recur recur,
-			GregorianCalendar eventStartCalendar) {
-		WeekDayList wdl = recur.getDayList();
-
-		// The weekday list is guaranteed non-empty for a monthly by day event
-		WeekDay day = (WeekDay) wdl.get(0);
-
-		eventStartCalendar.set(GregorianCalendar.DAY_OF_WEEK, WeekDay.getCalendarDay(day));
-		eventStartCalendar.set(GregorianCalendar.DAY_OF_WEEK_IN_MONTH, day.getOffset());
-		return eventStartCalendar.getTime();
 	}
 
 	private void appendNegativeExceptions(Event event, PropertyList exdates) {
