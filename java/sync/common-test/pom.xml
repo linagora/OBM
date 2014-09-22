@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.0.1-SNAPSHOT</version>
+		<version>3.0.1-alpha1</version>
 	</parent>
 	
 	<artifactId>common-test</artifactId>
 	<packaging>jar</packaging>
 	<name>common test classes</name>
 	<url>http://www.obm.org/</url>
-	<version>3.0.1-SNAPSHOT</version>
+	<version>3.0.1-alpha1</version>
 
 	<dependencies>
 		<dependency>
