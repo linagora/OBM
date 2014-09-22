@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
-import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -355,9 +354,6 @@ public class AddressBookBindingImpl implements IAddressBook {
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
-		} catch (MalformedURLException e) {
-			logger.error(e.getMessage(), e);
-			throw new ServerFault(e.getMessage(), e);
 		} catch (LocatorClientException e) {
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
@@ -474,9 +470,6 @@ public class AddressBookBindingImpl implements IAddressBook {
 			Collection<AddressBook> addressBooks = contactDao.listSynchronizedAddressBooks(token);
 			return contactDao.searchContactsInAddressBooksList(token, addressBooks, query, limit, offset);
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
-			throw new ServerFault(e.getMessage(), e);
-		} catch (MalformedURLException e) {
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
 		} catch (LocatorClientException e) {

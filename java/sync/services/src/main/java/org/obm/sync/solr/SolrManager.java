@@ -29,7 +29,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
-import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -44,8 +43,8 @@ import javax.jms.Session;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.configuration.ConfigurationService;
+import org.obm.locator.LocatorClientException;
 import org.obm.sync.solr.jms.Command;
-import org.obm.sync.solr.jms.CommandConverter;
 import org.obm.sync.solr.jms.SolrJmsQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +64,6 @@ public class SolrManager {
 	private boolean solrAvailable;
 	private Timer checker;
 	private int solrCheckingInterval;
-	private CommandConverter commandConverter;
 	private CommonsHttpSolrServer failingSolrServer;
 
 	private final Connection jmsConnection;
@@ -76,11 +74,12 @@ public class SolrManager {
 	private final MessageConsumer jmsContactConsumer;
 	private final EnumMap<SolrJmsQueue, Producer> queueNameToProducerMap;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final SolrClientFactory solrClientFactory;
 
 	@Inject
 	@VisibleForTesting
-	protected SolrManager(ConfigurationService configurationService, QueueManager queueManager, CommandConverter commandConverter) throws JMSException {
-		this.commandConverter = commandConverter;
+	protected SolrManager(ConfigurationService configurationService, QueueManager queueManager, SolrClientFactory solrClientFactory) throws JMSException {
+		this.solrClientFactory = solrClientFactory;
 		solrCheckingInterval = configurationService.solrCheckingInterval() * 1000;
 		queueNameToProducerMap = new EnumMap<SolrJmsQueue, Producer>(SolrJmsQueue.class);
 		
@@ -151,7 +150,7 @@ public class SolrManager {
 				throw new IllegalArgumentException("Unknown JMS queue '" + queue + "'.");
 			}
 			
-			producer.send(jmsProducerSession.createObjectMessage(command));
+			producer.send(jmsProducerSession.createObjectMessage(command.asSolrRequest()));
 		}
 		catch (Exception e) {
 			throw new IllegalStateException("Couldn't create JMS message for SolR request", e);
@@ -186,6 +185,7 @@ public class SolrManager {
 
 		@Override
 		public void onMessage(Message message) {
+			SolrRequest request = null;
 			try {
 				// SolR has been marked unavailable, we should stop message processing
 				// This is handled directly in the MessageListener to not cause deadlocks if called from multiple threads 
@@ -196,25 +196,33 @@ public class SolrManager {
 					return;
 				}
 				
-				Command<? extends Serializable> command = (Command<?>) ((ObjectMessage) message).getObject();
-				SolrRequest request = commandConverter.convert(command);
-				
-				try {
-					request.run();
-					session.commit();
-				}
-				catch (Exception e) {
-					session.rollback();
-					failingSolrServer = request.getServer();
-					setSolrAvailable(false);
+				request = (SolrRequest) ((ObjectMessage) message).getObject();
 
+				CommonsHttpSolrServer solrClient = null;
+				try {
+					solrClient = solrClientFactory.create(request.getSolrService(), request.getLoginAtDomain());
+					request.run(solrClient);
+					session.commit();
+				} catch (LocatorClientException e) {
+					session.rollback();
+					logger.warn("unable to locate solr server.", e);
+					request.onError(e);
+				} catch (Exception e) {
+					session.rollback();
+					failingSolrServer = solrClient;
+					setSolrAvailable(false);
 					logger.warn("SolR server is unavailable, last request is kept in the queue.", e);
-				} finally {
+					request.onError(e);
+				}
+			} catch (Throwable e) {
+				logger.error("Couldn't process JMS message", e);
+				if (request != null) {
+					request.onError(e);
+				}
+			} finally {
+				if (request != null) {
 					request.postProcess();
 				}
-			}
-			catch (Throwable e) {
-				logger.error("Couldn't process JMS message", e);
 			}
 		}
 	}

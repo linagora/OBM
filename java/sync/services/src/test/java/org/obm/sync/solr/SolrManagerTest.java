@@ -29,46 +29,28 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.createMockBuilder;
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.jms.JMSException;
+
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.fest.assertions.api.Assertions;
+import org.apache.solr.common.SolrInputDocument;
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.ConfigurationService;
-import org.obm.sync.base.EmailAddress;
-import org.obm.sync.book.Address;
-import org.obm.sync.book.Contact;
-import org.obm.sync.book.InstantMessagingId;
-import org.obm.sync.book.Phone;
-import org.obm.sync.book.Website;
-import org.obm.sync.calendar.Attendee;
-import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.EventExtId;
-import org.obm.sync.calendar.EventObmId;
-import org.obm.sync.calendar.EventRecurrence;
-import org.obm.sync.calendar.ParticipationRole;
-import org.obm.sync.calendar.RecurrenceDay;
-import org.obm.sync.calendar.RecurrenceDays;
-import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.solr.jms.Command;
-import org.obm.sync.solr.jms.CommandConverter;
 import org.obm.sync.solr.jms.SolrJmsQueue;
 
 import com.linagora.obm.sync.QueueManager;
@@ -78,60 +60,48 @@ public class SolrManagerTest {
 
 	private CommonsHttpSolrServer server;
 	private SolrManager manager;
-	private Lock lock;
-	private Condition condition;
-	private SolrRequest pingRequest;
+	private PingSolrRequest pingRequest;
 	private Command<Integer> pingCommand;
 	private QueueManager queueManager;
 	private ConfigurationService configurationService;
-	private CommandConverter converter = new CommandConverter() {
-		@Override
-		public <T extends Serializable> SolrRequest convert(Command<T> command) throws Exception {
-			return pingRequest;
-		}
-	};
+	private SolrClientFactory solrClientFactory;
+	private IMocksControl control;
 	
 	@Before
 	public void setUp() throws Exception {
+		control = createControl();
 		queueManager = new QueueManager();
 		queueManager.start();
 		
-		configurationService = createMock(ConfigurationService.class);
-		server = createMockBuilder(CommonsHttpSolrServer.class).addMockedMethod("ping").createStrictMock();
+		configurationService = control.createMock(ConfigurationService.class);
+		solrClientFactory = control.createMock(SolrClientFactory.class);
+		server = control.createMock(CommonsHttpSolrServer.class);//createMockBuilder(CommonsHttpSolrServer.class).addMockedMethod("ping").createStrictMock();
 		
-		expect(configurationService.solrCheckingInterval()).andReturn(10);
-		replay(configurationService);
+		expect(configurationService.solrCheckingInterval()).andReturn(10).anyTimes();
+		expect(solrClientFactory.create(SolrService.CONTACT_SERVICE, "l@d")).andReturn(server).anyTimes();
 		
-		pingCommand = new PingCommand();
-		manager = new SolrManager(configurationService, queueManager, converter);
-		lock = new ReentrantLock();
-		condition = lock.newCondition();
-		pingRequest = new PingSolrRequest(server, lock, condition);
+		PingSolrRequest.lock = new ReentrantLock();
+		PingSolrRequest.condition = PingSolrRequest.lock.newCondition();
+		PingSolrRequest.error = null;
+		pingRequest = new PingSolrRequest("l@d", SolrService.CONTACT_SERVICE);
+		pingCommand = new PingCommand(pingRequest);
 	}
 	
 	@After
 	public void tearDown() throws Exception {
-		manager.stop();
+		if (manager != null) {
+			manager.stop();
+		}
 		queueManager.stop();
 	}
 	
 	@Test
-	public void test_event_serialization() throws Exception {
-		Event event = new Event();
-		EventRecurrence recurrence = new EventRecurrence();
-		Attendee attendee = UserAttendee.builder().email("Test").participationRole(ParticipationRole.REQ).build();
-		
-		// We only set the fields that aren't simple types to verify that they're all Serializable
-		event.setUid(new EventObmId(1));
-		event.setExtId(new EventExtId("1"));
-		recurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday));
-		event.setRecurrence(recurrence);
-		event.addAttendee(attendee);
-		
+	public void removerRequestShouldBeSerializable() throws Exception {
+		Remover remover = new Remover("l@d", SolrService.CONTACT_SERVICE, "id");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		
-		oos.writeObject(event);
+		oos.writeObject(remover);
 		oos.close();
 		
 		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
@@ -140,26 +110,16 @@ public class SolrManagerTest {
 		
 		ois.close();
 		
-		Assertions.assertThat(object).isInstanceOf(Event.class);
+		assertThat(object).isInstanceOf(Remover.class).isEqualsToByComparingFields(remover);
 	}
 	
 	@Test
-	public void test_contact_serialization() throws Exception {
-		Contact contact = new Contact();
-		
-		// We only set the fields that aren't simple types to verify that they're all Serializable
-		contact.setUid(1);
-		contact.setBirthdayId(new EventObmId(1));
-		contact.addAddress("Test", new Address("", "", "", "", "", ""));
-		contact.addEmail("Test", EmailAddress.loginAtDomain("login@domain"));
-		contact.addIMIdentifier("Test", new InstantMessagingId("", ""));
-		contact.addWebsite(new Website("Test", ""));
-		contact.addPhone("Test", new Phone(""));
-		
+	public void solrDocumentIndexerShouldBeSerializable() throws Exception {
+		SolrDocumentIndexer indexer = new SolrDocumentIndexer("l@d", SolrService.CONTACT_SERVICE, new SolrInputDocument());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		
-		oos.writeObject(contact);
+		oos.writeObject(indexer);
 		oos.close();
 		
 		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
@@ -168,86 +128,104 @@ public class SolrManagerTest {
 		
 		ois.close();
 		
-		Assertions.assertThat(object).isInstanceOf(Contact.class);
+		assertThat(object).isInstanceOf(SolrDocumentIndexer.class).isEqualsToByComparingFields(indexer);
 	}
 	
 	@Test(expected=IllegalStateException.class)
-	public void request_rejected_if_queue_unknown() {
-		manager.process(new PingCommand(null));
+	public void requestShouldBerejectedWhenQueueUnknown() throws JMSException {
+		control.replay();
+		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
+		manager.process(new PingCommand(pingRequest) {
+
+			@Override
+			public SolrJmsQueue getQueue() {
+				return null;
+			}
+
+		});
 	}
 	
 	@Test
-	public void solr_down_when_request_fails() throws Exception {        
+	public void solrShouldBeMarkedAsDownWhenRequestFails() throws Exception {        
 		expect(server.ping()).andThrow(new IOException()).anyTimes();
-		replay(server);
+		control.replay();
 		
+		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
 		manager.process(pingCommand);
 		
-		Assertions.assertThat(waitForRequestProcessing()).isTrue();
-		Assertions.assertThat(manager.isSolrAvailable()).isFalse();
-		verify(server);
+		assertThat(waitForRequestProcessing()).isTrue();
+		assertThat(pingRequest.getError()).isInstanceOf(IOException.class);
+		assertThat(manager.isSolrAvailable()).isFalse();
+		control.verify();
 	}
 	
 	@Test
-	public void solr_remains_up_when_request_pass() throws Exception {
+	public void solrShouldRemainsUpWhenRequestPass() throws Exception {
 		expect(server.ping()).andReturn(null).anyTimes();
-		replay(server);
+		control.replay();
 		
+		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
 		manager.process(pingCommand);
 		
-		Assertions.assertThat(waitForRequestProcessing()).isTrue();
-		Assertions.assertThat(manager.isSolrAvailable()).isTrue();
-		verify(server);
+		assertThat(waitForRequestProcessing()).isTrue();
+		assertThat(pingRequest.getError()).isNull();
+		assertThat(manager.isSolrAvailable()).isTrue();
+		control.verify();
 	}
 
 	@Test
-	public void request_processed_when_solr_is_up_again() throws Exception {
+	public void requestShouldBeProcessedWhenSolrIsUpAgain() throws Exception {
 		expect(server.ping()).andThrow(new IOException()); // This will make SolR unavailable at first request
 		expect(server.ping()).andReturn(null); // SolR should be back up at the second check
 		expect(server.ping()).andReturn(null); // This one's for the actual request that must be processed once SolR is back up
-		replay(server);
+		control.replay();
 		
+		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
 		manager.setSolrCheckingInterval(100);
 		manager.process(pingCommand);
 		
-		Assertions.assertThat(waitForRequestProcessing()).isTrue();
-		Assertions.assertThat(waitForRequestProcessing()).isTrue(); // Request will be processed a second time once SolR is back
-		Assertions.assertThat(manager.isSolrAvailable()).isTrue();
-		verify(server);
+		assertThat(waitForRequestProcessing()).isTrue();
+		assertThat(waitForRequestProcessing()).isTrue(); // Request will be processed a second time once SolR is back
+		assertThat(manager.isSolrAvailable()).isTrue();
+		control.verify();
 	}
 	
 	@Test
-	public void request_not_processed_while_solr_down() throws Exception {
+	public void requestShouldNotProcessedWhileSolrDown() throws Exception {
 		expect(server.ping()).andThrow(new IOException()).anyTimes(); 
-		replay(server);
+		control.replay();
 		
+		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
 		manager.setSolrAvailable(false);
 		manager.process(pingCommand);
 		
-		Assertions.assertThat(waitForRequestProcessing()).isFalse();
-		Assertions.assertThat(manager.isSolrAvailable()).isFalse();
+		assertThat(waitForRequestProcessing()).isFalse();
+		assertThat(pingRequest.getError()).isNull();
+		assertThat(manager.isSolrAvailable()).isFalse();
 		
-		verify(server);
+		control.verify();
 	}
 	
 	private boolean waitForRequestProcessing() throws InterruptedException {
-		lock.lock();
+		PingSolrRequest.lock.lock();
 		
-		return condition.await(2, TimeUnit.SECONDS);
+		return PingSolrRequest.condition.await(2, TimeUnit.SECONDS);
 	}
 
 	private static class PingCommand extends Command<Integer> {
 
 		private SolrJmsQueue queue;
+		private PingSolrRequest request;
 
-		public PingCommand() {
-			this(SolrJmsQueue.CONTACT_CHANGES_QUEUE);
+		public PingCommand(PingSolrRequest request) {
+			this(SolrJmsQueue.CONTACT_CHANGES_QUEUE, request);
 		}
 		
-		public PingCommand(SolrJmsQueue queue) {
-			super(null, 0);
+		public PingCommand(SolrJmsQueue queue, PingSolrRequest request) {
+			super(null, "l", 0);
 			
 			this.queue = queue;
+			this.request = request;
 		}
 
 		@Override
@@ -261,8 +239,8 @@ public class SolrManagerTest {
 		}
 
 		@Override
-		public SolrRequest asSolrRequest(CommonsHttpSolrServer server, IndexerFactory<Integer> factory) {
-			return null;
+		public SolrRequest asSolrRequest() {
+			return request;
 		}
 
 	}

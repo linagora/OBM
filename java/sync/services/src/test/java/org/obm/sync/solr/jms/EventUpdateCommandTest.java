@@ -29,12 +29,11 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.sync.solr.jms;
 
 import static fr.aliacom.obm.ToolBox.getDefaultObmDomain;
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
 import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.obm.DateUtils.date;
@@ -58,24 +57,28 @@ import org.obm.sync.calendar.UserAttendee;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserDao;
+import fr.aliacom.obm.utils.ObmHelper;
 
 
-public class EventIndexerTest {
+public class EventUpdateCommandTest {
 
 	private IMocksControl mocksControl; 
-	private EventIndexer eventIndexer;
 	private UserDao userDao;
 	private ObmUser user;
 	private ObmDomain domain;
 	private Event eventToIndex;
+	private ObmHelper obmHelper;
+	private EventUpdateCommand.Factory testee;
 	
 	@Before
 	public void setUp() {
 		mocksControl = createControl();
 		userDao = mocksControl.createMock(UserDao.class);
+		obmHelper = mocksControl.createMock(ObmHelper.class);
 		user = getDefaultObmUser();
 		domain = getDefaultObmDomain();
 		eventToIndex = buildEvent();
+		testee = new EventUpdateCommand.Factory(userDao, obmHelper);
 	}
 	
 	@After
@@ -85,13 +88,12 @@ public class EventIndexerTest {
 	
 	@Test
 	public void buildDocumentWithoutOwnerUsesOwnerEmail() {
-		eventToIndex.setOwner("");
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
-		
-		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
+
+		eventToIndex.setOwner("");
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
 	}
@@ -99,24 +101,24 @@ public class EventIndexerTest {
 	@Test
 	public void buildDocumentWithoutOwnerEmailUsesOwner() {
 		eventToIndex.setOwnerEmail("");
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq("owner"), eq(domain))).andReturn(user);
+		expect(userDao.findUser("owner", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
+
 		
 		assertSolrDocumentIsBuilt(solrDocument);
 	}
 	
 	@Test
 	public void buildDocumentWithOwnerAndOwnerEmailUsesOwnerEmail() {
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
+
 		
 		assertSolrDocumentIsBuilt(solrDocument);
 	}
@@ -125,26 +127,11 @@ public class EventIndexerTest {
 	public void buildDocumentWithoutOwnerNorOwnerEmailFails() {
 		eventToIndex.setOwner("");
 		eventToIndex.setOwnerEmail("");
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq(""), eq(domain))).andReturn(null);
+		expect(userDao.findUser("", domain)).andReturn(null);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
-		
-		assertSolrDocumentIsBuilt(solrDocument);
-	}
-	
-	@Test
-	public void indexEventWithoutOwnerNorOwnerEmailSucceeds() throws Exception {
-		eventToIndex.setOwner("");
-		eventToIndex.setOwnerEmail("");
-		expect(userDao.findUser(eq(""), eq(domain))).andReturn(null);
-		mocksControl.replay();
-		
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
-		
-		assertThat(eventIndexer.doIndex()).isTrue();
+		testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
 	}
 	
 	@Test
@@ -153,16 +140,15 @@ public class EventIndexerTest {
 		eventRecurrence.setKind(RecurrenceKind.daily);
 		eventToIndex.setRecurrence(eventRecurrence);
 		eventToIndex.setPrivacy(EventPrivacy.PRIVATE);
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		
+		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
-		String[] is = {"periodic", "busy", "private"};
-		assertThat(solrDocument.getField("is").getValues().toArray()).isEqualTo(is);
+		assertThat(solrDocument.getField("is").getValues()).containsExactly("periodic", "busy", "private");
 	}
 	
 	@Test
@@ -170,32 +156,28 @@ public class EventIndexerTest {
 		eventToIndex.setAllday(true);
 		eventToIndex.setOpacity(EventOpacity.TRANSPARENT);
 		eventToIndex.setPrivacy(EventPrivacy.CONFIDENTIAL);
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
-		String[] is = {"allday", "free", "confidential"};
 		assertThat(solrDocument.getField("duration").getValue()).isEqualTo(86400);
-		assertThat(solrDocument.getField("is").getValues().toArray()).isEqualTo(is);
+		assertThat(solrDocument.getField("is").getValues()).containsExactly("allday", "free", "confidential");
 	}
 	
 	@Test
 	public void buildDocumentOfSimpleFreePublicEvent() {
 		eventToIndex.setOpacity(EventOpacity.TRANSPARENT);
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
-		String[] is = {"free"};
-		assertThat(solrDocument.getField("is").getValues().toArray()).isEqualTo(is);
+		assertThat(solrDocument.getField("is").getValues()).containsExactly("free");
 	}
 	
 	

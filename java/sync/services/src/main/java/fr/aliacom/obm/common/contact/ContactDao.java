@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
-import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -1643,7 +1642,7 @@ public class ContactDao {
 	}
 
 	private List<Contact> searchContact(AccessToken at, Collection<AddressBook> addrBooks, Connection con, String query, int limit, Integer offset) 
-			throws MalformedURLException, SQLException, LocatorClientException {
+			throws SQLException, LocatorClientException {
 		
 		List<Contact> ret = new LinkedList<Contact>();
 		Set<Integer> evtIds = new HashSet<Integer>();
@@ -1746,7 +1745,7 @@ public class ContactDao {
 	}
 
 	public List<Contact> searchContactsInAddressBooksList(AccessToken at, Collection<AddressBook> addrBooks, String query, int limit, Integer offset) 
-			throws MalformedURLException, LocatorClientException, SQLException {
+			throws LocatorClientException, SQLException {
 		
 		Connection con = null;
 		try {

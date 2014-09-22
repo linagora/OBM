@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,24 +31,55 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.obm.locator.LocatorClientException;
+import org.obm.locator.store.LocatorService;
 
-/**
- * Removes by uniqueID in a Solr index.
- */
-public class Remover extends SolrRequest {
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-	private final String id;
+@Singleton
+public class SolrClientFactory {
 
-	public Remover(String loginAtDomain, SolrService solrService, String id) {
-		super(loginAtDomain, solrService);
-		this.id = id;
+	private HttpClient httpClient;
+	private LocatorService locatorService;
+	
+	@Inject
+	@VisibleForTesting
+	SolrClientFactory(LocatorService locatorService) {
+		this.locatorService = locatorService;
+		this.httpClient = buildHttpClient();
 	}
 
-	@Override
-	public void run(CommonsHttpSolrServer server) throws Exception {
-		server.deleteById(id);
-		server.commit();
-		logger.info("id {} removed from SOLR index", id);
+	private HttpClient buildHttpClient() {
+		MultiThreadedHttpConnectionManager cnxManager = new MultiThreadedHttpConnectionManager();
+		cnxManager.getParams().setDefaultMaxConnectionsPerHost(10);
+		cnxManager.getParams().setMaxTotalConnections(100);
+		return new HttpClient(cnxManager);
 	}
+	
+	public CommonsHttpSolrServer create(SolrService service, String loginAtDomain) {
+		try {
+			URI uri = new URIBuilder()
+				.setScheme("http")
+				.setHost(locatorService.getServiceLocation(service.getName(), loginAtDomain))
+				.setPort(8080)
+				.setPath('/' + service.getName())
+				.build();
+			return new CommonsHttpSolrServer(uri.toURL(), httpClient);
+		} catch (MalformedURLException e) {
+			throw new LocatorClientException(e);
+		} catch (URISyntaxException e) {
+			throw new LocatorClientException(e);
+		}
+	}
+	
 }

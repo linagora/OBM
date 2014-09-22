@@ -170,8 +170,7 @@ public class GuiceServletContextListener implements ServletContextListener {
             	bind(Ical4jRecurrenceHelper.class).to(Ical4jHelper.class);
             }
         },
-        new MessageQueueModule(), new TransactionalModule(),
-        new SolrJmsModule(), new HealthCheckModule(),
+        new MessageQueueModule(), new TransactionalModule(), new HealthCheckModule(),
         new HealthCheckDefaultHandlersModule(), new DatabaseMetadataModule());
     }
     

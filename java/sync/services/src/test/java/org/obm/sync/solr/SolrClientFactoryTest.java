@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -29,12 +29,48 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
-import java.io.Serializable;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
+import static org.fest.assertions.api.Assertions.assertThat;
 
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.easymock.IMocksControl;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.obm.locator.store.LocatorService;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+public class SolrClientFactoryTest {
 
-public interface IndexerFactory<T extends Serializable> {
-	SolrRequest createIndexer(CommonsHttpSolrServer srv, ObmDomain domain, T e);
+	private SolrClientFactory factory;
+	private LocatorService locatorService;
+	private IMocksControl control;
+
+	@Before
+	public void setUp() {
+		control = createControl();
+		locatorService = control.createMock(LocatorService.class);
+		factory = new SolrClientFactory(locatorService);
+	}
+
+	@After
+	public void tearDown() {
+		control.verify();
+	}
+
+	@Test
+	public void testCreateShouldSucceedWhenServiceIsSolrEvent() throws Exception {
+		expect(locatorService.getServiceLocation("solr/event", "l@d")).andReturn("1.2.3.4");
+		control.replay();
+
+		assertThat(factory.create(SolrService.EVENT_SERVICE, "l@d").getBaseURL()).isEqualTo("http://1.2.3.4:8080/solr/event");
+	}
+
+	@Test
+	public void testCreateShouldSucceedWhenServiceIsSolrContact() throws Exception {
+		expect(locatorService.getServiceLocation("solr/contact", "l@d")).andReturn("1.2.3.4");
+		control.replay();
+
+		assertThat(factory.create(SolrService.CONTACT_SERVICE, "l@d").getBaseURL()).isEqualTo("http://1.2.3.4:8080/solr/contact");
+	}
+
 }

@@ -29,6 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.locator;
 
+
 public class LocatorClientException extends RuntimeException {
 
 	public LocatorClientException(String message) {
@@ -37,6 +38,10 @@ public class LocatorClientException extends RuntimeException {
 	
 	public LocatorClientException(String message, Throwable cause) {
 		super(message, cause);
+	}
+
+	public LocatorClientException(Throwable cause) {
+		super(cause);
 	}
 
 }

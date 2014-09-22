@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -32,23 +32,21 @@
 package org.obm.sync.solr;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.common.SolrInputDocument;
 
-/**
- * Removes by uniqueID in a Solr index.
- */
-public class Remover extends SolrRequest {
+public class SolrDocumentIndexer extends SolrRequest {
 
-	private final String id;
+	private final SolrInputDocument document;
 
-	public Remover(String loginAtDomain, SolrService solrService, String id) {
+	public SolrDocumentIndexer(String loginAtDomain, SolrService solrService, SolrInputDocument document) {
 		super(loginAtDomain, solrService);
-		this.id = id;
+		this.document = document;
 	}
-
+	
 	@Override
 	public void run(CommonsHttpSolrServer server) throws Exception {
-		server.deleteById(id);
+		server.add(document);
 		server.commit();
-		logger.info("id {} removed from SOLR index", id);
 	}
+
 }
