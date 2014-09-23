@@ -392,7 +392,7 @@ public class CalendarBindingImpl implements ICalendar {
 		if (before.isInternalEvent()) {
 			return modifyInternalEvent(token, calendar, before, event, updateAttendees, notification);
 		} else {
-			return modifyExternalEvent(token, calendar, before, event, updateAttendees, notification);
+			return modifyExternalEvent(token, calendar, event, updateAttendees, notification);
 		}
 	}
 	
@@ -580,29 +580,22 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private Event modifyExternalEvent(AccessToken token, String calendar, 
-			Event previous, Event event, boolean updateAttendees, boolean notification) throws ServerFault {
+			Event event, boolean updateAttendees, boolean notification) throws ServerFault {
 		try {
 			Attendee attendee = calendarOwnerAsAttendee(token, calendar, event);
 			if (isEventDeclinedForCalendarOwner(attendee)) {
 				ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain().getName());
-				boolean changed = calendarDao.removeEventByExtId(token, calendarOwner, event.getExtId(), event.getSequence()) != null;
-				if (changed) {
-					notifyOrganizerForExternalEvent(token, calendar, event, notification);
-					logger.info("Calendar : External event[" + event.getTitle() + 
-							"] removed, calendar owner won't attend to it");
-				} else {
-					logger.warn("Calendar : External event[" + event.getTitle() + 
-							"] can't be found so can't be removed");
-				}
+				calendarDao.removeEventByExtId(token, calendarOwner, event.getExtId(), event.getSequence());
+				notifyOrganizerForExternalEvent(token, calendar, event, notification);
+				logger.info("Calendar : External event[" + event.getTitle() + 
+						"] removed, calendar owner won't attend to it");
 				return event;
 			} else {
-				Event after = calendarDao.modifyEvent(token, calendar, event, updateAttendees, false);
+				Event after = calendarDao.modifyEvent(token,  calendar, event, updateAttendees, false);
 				if (after != null) {
 					logger.info("Calendar : External event[" + after.getTitle() + "] modified");
 				}
-				if (participationChanged(token, calendar, previous, event)) {
-					notifyOrganizerForExternalEvent(token, calendar, after, notification);
-				}
+				notifyOrganizerForExternalEvent(token, calendar, after, notification);
 				return after;
 			}
 		} catch (Throwable e) {
@@ -611,12 +604,6 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private boolean participationChanged(AccessToken token, String calendar, Event previous, Event event) throws FindException {
-		Attendee previousAttendee = calendarOwnerAsAttendee(token, calendar, previous);
-		Attendee newAttendee = calendarOwnerAsAttendee(token, calendar, event);
-		return !previousAttendee.getParticipation().equals(newAttendee.getParticipation());
-	}
-	
 	@Override
 	@Transactional
 	public EventObmId createEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId)
