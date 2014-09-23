@@ -97,7 +97,6 @@ import net.fortuna.ical4j.util.TimeZones;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.StringContains;
-import org.joda.time.DateTimeZone;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -2047,64 +2046,6 @@ public class Ical4jHelperTest {
 
 		assertThat(event.getStartDate()).isEqualTo(DateUtils.date("2013-04-08T12:00:00Z")); // 2MO of 2013/04
 		assertRecurrenceEquals(event, recurrence);
-	}
-
-	@Test
-	public void testParseIcsWithCOUNT() throws Exception {
-		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = getICSAsString("recurrenceCOUNT.ics");
-		Date expectedEndDate = new org.joda.time.DateTime(2014, 3, 8, 9, 0,
-				DateTimeZone.forID("Europe/Paris")).toDate();
-		ICSParsingResults parsingResults = ical4jHelper.parseICS(ics, ical4jUser, 1);
-		assertThat(parsingResults.getParsedEvents()).hasSize(1);
-		Date recurrenceEndDate = Iterables.getOnlyElement(parsingResults.getParsedEvents())
-				.getRecurrence().getEnd();
-		assertThat(recurrenceEndDate).isEqualTo(expectedEndDate);
-		assertThat(parsingResults.getRejectedEvents()).isEmpty();
-		assertThat(parsingResults.getRejectedTodos()).isEmpty();
-	}
-	
-	@Test
-	public void testParseIcsWithBothCOUNTAndUNTIL() throws Exception {
-		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = getICSAsString("recurrenceBothCOUNTAndUNTIL.ics");
-		ICSParsingResults parsingResults = ical4jHelper.parseICS(ics, ical4jUser, 1);
-		assertThat(parsingResults.getParsedEvents()).isEmpty();
-		assertThat(parsingResults.getRejectedEvents()).hasSize(1);
-		assertThat(Iterables.getLast(parsingResults.getRejectedEvents()).getReason()).isEqualTo(
-				"Found invalid recurrence containing both UNTIL and COUNT");
-		assertThat(parsingResults.getRejectedTodos()).isEmpty();
-	}
-
-	@Test
-	public void testParseIcsWithMINUTELYFrequency() throws Exception {
-		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = getICSAsString("minutely.ics");
-		ICSParsingResults parsingResults = ical4jHelper.parseICS(ics, ical4jUser, 1);
-		assertThat(parsingResults.getParsedEvents()).isEmpty();
-		assertThat(parsingResults.getRejectedEvents()).hasSize(1);
-		assertThat(Iterables.getLast(parsingResults.getRejectedEvents()).getReason()).isEqualTo(
-				"Unable to handle recurrence rule frequency MINUTELY");
-		assertThat(parsingResults.getRejectedTodos()).isEmpty();
-	}
-
-	@Test
-	public void testParseIcsWithSECONDLYFrequency() throws Exception {
-		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = getICSAsString("secondly.ics");
-		ICSParsingResults parsingResults = ical4jHelper.parseICS(ics, ical4jUser, 1);
-		assertThat(parsingResults.getParsedEvents()).isEmpty();
-		assertThat(parsingResults.getRejectedEvents()).hasSize(1);
-		assertThat(Iterables.getLast(parsingResults.getRejectedEvents()).getReason()).isEqualTo(
-				"Unable to handle recurrence rule frequency SECONDLY");
-		assertThat(parsingResults.getRejectedTodos()).isEmpty();
-	}
-
-	@Test(expected=ParserException.class)
-	public void testParseIcsWithoutFREQ() throws Exception {
-		Ical4jUser ical4jUser = getDefaultObmUser();
-		String ics = getICSAsString("recurrenceNoFREQ.ics");
-		ical4jHelper.parseICS(ics, ical4jUser, 1);
 	}
 
 	@Test
