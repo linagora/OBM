@@ -199,6 +199,8 @@ fi
 
 
 %changelog
+* Wed Sep 24 2014 Thomas Sarboni <tsarboni@linagora.com> - obm-java-3.0.1-0.alpha1
+- New upstream release.
 * Mon Sep 22 2014 Thomas Sarboni <tsarboni@linagora.com> - obm-java-3.0.1-0.alpha1
 - New upstream release.
 * Tue Apr 30 2013 Thomas Sarboni <tsarboni@linagora.com> - obm-java-2.5.0-
