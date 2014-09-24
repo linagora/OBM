@@ -35,6 +35,7 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -62,6 +63,7 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
+import org.obm.sync.items.FolderChanges;
 import org.obm.test.GuiceModule;
 import org.obm.test.SlowGuiceRunner;
 
@@ -178,12 +180,9 @@ public class AddressBookBindingImplTest {
 		expect(configuration.syncUsersAsAddressBook()).andReturn(true).atLeastOnce();
 		expect(contactConfiguration.getAddressBookUserId()).andReturn(-1);
 		expect(contactConfiguration.getAddressBookUsersName()).andReturn("users");
-		expect(helper.getConnection()).andReturn(null).anyTimes();
-		expect(helper.selectNow(null)).andReturn(new Date()).anyTimes();
-		helper.cleanup(null, null, null);
-		expectLastCall().anyTimes();
+		mockGetLastSyncSubtractByTransactionTimeout(timestamp, 0);
+
 		mocksControl.replay();
-		
 		AddressBookChangesResponse changes = binding.getAddressBookSync(token, timestamp);
 
 		assertThat(changes.getContactChanges().getUpdated()).containsOnly(newContact, newUser);
@@ -213,17 +212,12 @@ public class AddressBookBindingImplTest {
 		expect(userDao.findRemovalCandidates(date, token))
 			.andReturn(ImmutableSet.<Integer> of(1, 2)).once();
 		
-		expect(helper.getConnection())
-			.andReturn(null).once();
-		helper.cleanup(null, null, null);
-		expectLastCall().once();
-		expect(helper.selectNow(null))
-			.andReturn(date).once();
+		mockGetLastSyncSubtractByTransactionTimeout(date, 0);
 
 		mocksControl.replay();
 
 		AddressBookBindingImpl binding = new AddressBookBindingImpl(null, userDao, null, helper, 
-				null, contactConfiguration, null);
+				configuration, contactConfiguration, null);
 		ContactChanges firstListContactsChanged = binding.firstListContactsChanged(token, date, addressBookId);
 
 		mocksControl.verify();
@@ -255,17 +249,12 @@ public class AddressBookBindingImplTest {
 		expect(contactDao.findRemovalCandidates(date, otherAddressBookId, token))
 			.andReturn(ImmutableSet.<Integer> of(1, 2)).once();
 		
-		expect(helper.getConnection())
-			.andReturn(null).once();
-		helper.cleanup(null, null, null);
-		expectLastCall().once();
-		expect(helper.selectNow(null))
-			.andReturn(date).once();
+		mockGetLastSyncSubtractByTransactionTimeout(date, 0);
 
 		mocksControl.replay();
 
 		AddressBookBindingImpl binding = new AddressBookBindingImpl(contactDao, null, null, helper, 
-				null, contactConfiguration, null);
+				configuration, contactConfiguration, null);
 		ContactChanges firstListContactsChanged = binding.firstListContactsChanged(token, date, otherAddressBookId);
 
 		mocksControl.verify();
@@ -304,12 +293,9 @@ public class AddressBookBindingImplTest {
 		expect(contactDao.findUpdatedFolders(timestamp, token)).andReturn(updatedContactFolders).once();
 		expect(contactDao.findRemovedFolders(timestamp, token)).andReturn(removedContactFolders).once();
 		expect(configuration.syncUsersAsAddressBook()).andReturn(false).atLeastOnce();
-		expect(helper.getConnection()).andReturn(null).anyTimes();
-		expect(helper.selectNow(null)).andReturn(new Date()).anyTimes();
-		helper.cleanup(null, null, null);
-		expectLastCall().anyTimes();
+		mockGetLastSyncSubtractByTransactionTimeout(timestamp, 0);
+
 		mocksControl.replay();
-		
 		AddressBookChangesResponse changes = binding.getAddressBookSync(token, timestamp);
 
 		assertThat(changes.getContactChanges().getUpdated()).containsOnly(newContact);
@@ -606,4 +592,138 @@ public class AddressBookBindingImplTest {
 		
 		binding.removeContact(token, USERS_ADDRESS_BOOK_ID, 1);
 	}
+
+	private void mockGetLastSyncSubtractByTransactionTimeout(Date lastSync, int transactionTimeoutInSeconds) throws SQLException {
+		expect(helper.getConnection()).andReturn(null).anyTimes();
+		expect(helper.selectNow(null)).andReturn(lastSync).anyTimes();
+		expect(configuration.getTransactionToleranceTimeoutInSeconds()).andReturn(transactionTimeoutInSeconds).anyTimes();
+		helper.cleanup(null, null, null);
+		expectLastCall().anyTimes();
+	}
+
+	private void mockSimpleGetContactsChanges(Date lastSync, int addressBookId) throws SQLException {
+		Contact newContact = new Contact();
+		newContact.setLastname("newContact");
+
+		ContactUpdates contactUpdates = new ContactUpdates();
+		contactUpdates.setContacts(ImmutableList.of(newContact));
+		contactUpdates.setArchived(ImmutableSet.of(1, 2));
+
+		expect(contactConfiguration.getAddressBookUserId()).andReturn(-1).once();
+		expect(contactDao.findUpdatedContacts(lastSync, addressBookId, token)).andReturn(contactUpdates).once();
+		expect(contactDao.findRemovalCandidates(lastSync, addressBookId, token)).andReturn(ImmutableSet.of(3)).once();
+	}
+
+	@Test
+	public void testLastSyncOfListsContactsChanges() throws ServerFault, SQLException {
+		Date lastSync = date("2014-09-24T17:16:00");
+		int transactionTimeoutInSeconds = 60;
+		int addressBookId = 0;
+
+		mockSimpleGetContactsChanges(lastSync,addressBookId);
+		mockGetLastSyncSubtractByTransactionTimeout(lastSync, transactionTimeoutInSeconds);
+
+		mocksControl.replay();
+		ContactChanges contactChanges = binding.listContactsChanged(token, lastSync, addressBookId);
+		mocksControl.verify();
+
+		assertThat(contactChanges.getLastSync()).isEqualTo(date("2014-09-24T17:15:00"));
+	}
+
+	@Test
+	public void testLastSyncOfListsContactsChangesWithAddressBookId() throws ServerFault, SQLException {
+		Date lastSync = date("2014-09-24T17:16:00");
+		int transactionTimeoutInSeconds = 60;
+		int addressBookId = 0;
+
+		mockSimpleGetContactsChanges(lastSync,addressBookId);
+		mockGetLastSyncSubtractByTransactionTimeout(lastSync, transactionTimeoutInSeconds);
+
+		mocksControl.replay();
+		ContactChanges contactChanges = binding.firstListContactsChanged(token, lastSync, addressBookId);
+		mocksControl.verify();
+
+		assertThat(contactChanges.getLastSync()).isEqualTo(date("2014-09-24T17:15:00"));
+	}
+
+	private void mockSimpleGetContactsChanges(Date lastSync) throws SQLException {
+		Contact newContact = new Contact();
+		newContact.setLastname("newContact");
+
+		ContactUpdates contactUpdates = new ContactUpdates();
+		contactUpdates.setContacts(ImmutableList.of(newContact));
+		contactUpdates.setArchived(ImmutableSet.of(1, 2));
+
+		expect(contactDao.findUpdatedContacts(lastSync, token)).andReturn(contactUpdates).once();
+		expect(configuration.syncUsersAsAddressBook()).andReturn(false).once();
+		expect(contactDao.findRemovalCandidates(lastSync, token)).andReturn(ImmutableSet.of(3)).once();
+	}
+
+	@Test
+	public void testLastSyncOfListsContactsChangesWithoutAddressBookId() throws ServerFault, SQLException {
+		Date lastSync = date("2014-09-24T17:16:00");
+		int transactionTimeoutInSeconds = 60;
+
+		mockSimpleGetContactsChanges(lastSync);
+		mockGetLastSyncSubtractByTransactionTimeout(lastSync, transactionTimeoutInSeconds);
+
+		mocksControl.replay();
+		ContactChanges contactChanges = binding.listContactsChanged(token, lastSync);
+		mocksControl.verify();
+
+		assertThat(contactChanges.getLastSync()).isEqualTo(date("2014-09-24T17:15:00"));
+	}
+
+	@Test
+	public void testLastSyncOfFirstListContactsChangedWithoutAddressBookId() throws SQLException, ServerFault {
+		Date lastSync = date("2014-09-24T17:16:00");
+		int transactionTimeoutInSeconds = 60;
+
+		mockSimpleGetContactsChanges(lastSync);
+		mockGetLastSyncSubtractByTransactionTimeout(lastSync, transactionTimeoutInSeconds);
+
+		mocksControl.replay();
+		ContactChanges contactChanges = binding.firstListContactsChanged(token, lastSync);
+		mocksControl.verify();
+
+		assertThat(contactChanges.getLastSync()).isEqualTo(date("2014-09-24T17:15:00"));
+	}
+
+	private void mockListAddressBooksChanged(Date lastSync) throws SQLException {
+		expect(contactDao.findUpdatedFolders(lastSync, token)).andReturn(null).once();
+		expect(configuration.syncUsersAsAddressBook()).andReturn(false).once();
+		expect(contactDao.findRemovedFolders(lastSync, token)).andReturn(null).once();
+	}
+
+	@Test
+	public void testLastSyncOfGetAddressBookSync() throws ServerFault, SQLException {
+		Date lastSync = date("2014-09-24T17:16:00");
+		int transactionTimeoutInSeconds = 60;
+
+		mockSimpleGetContactsChanges(lastSync);
+		mockListAddressBooksChanged(lastSync);
+		mockGetLastSyncSubtractByTransactionTimeout(lastSync, transactionTimeoutInSeconds);
+
+		mocksControl.replay();
+		AddressBookChangesResponse contactChanges = binding.getAddressBookSync(token, lastSync);
+		mocksControl.verify();
+
+		assertThat(contactChanges.getLastSync()).isEqualTo(date("2014-09-24T17:15:00"));
+	}
+
+	@Test
+	public void testLastSyncOfListAddressBooksChanged() throws ServerFault, SQLException {
+		Date lastSync = date("2014-09-24T17:16:00");
+		int transactionTimeoutInSeconds = 60;
+
+		mockListAddressBooksChanged(lastSync);
+		mockGetLastSyncSubtractByTransactionTimeout(lastSync, transactionTimeoutInSeconds);
+
+		mocksControl.replay();
+		FolderChanges contactChanges = binding.listAddressBooksChanged(token, lastSync);
+		mocksControl.verify();
+
+		assertThat(contactChanges.getLastSync()).isEqualTo(date("2014-09-24T17:15:00"));
+	}
+
 }
