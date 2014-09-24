@@ -51,6 +51,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Months;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.configuration.ConfigurationService;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
@@ -135,16 +136,21 @@ public class CalendarBindingImpl implements ICalendar {
 	private final ICalendarFactory calendarFactory;
 	private final AttendeeService attendeeService;
 
+	private final ConfigurationService configuration;
 	
 	@Inject
 	protected CalendarBindingImpl(EventChangeHandler eventChangeHandler,
-			DomainService domainService, UserService userService,
+			DomainService domainService,
+			UserService userService,
 			CalendarDao calendarDao,
 			CategoryDao categoryDao,
 			CommitedOperationDao commitedOperationDao,
 			HelperService helperService, 
 			ParticipationService participationService, 
-			Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory, AttendeeService attendeeService) {
+			Ical4jHelper ical4jHelper,
+			ICalendarFactory calendarFactory,
+			AttendeeService attendeeService,
+			ConfigurationService configuration) {
 		this.eventChangeHandler = eventChangeHandler;
 		this.domainService = domainService;
 		this.userService = userService;
@@ -156,6 +162,7 @@ public class CalendarBindingImpl implements ICalendar {
 		this.ical4jHelper = ical4jHelper;
 		this.calendarFactory = calendarFactory;
 		this.attendeeService = attendeeService;
+		this.configuration = configuration;
 	}
 
 	@Override
@@ -944,7 +951,8 @@ public class CalendarBindingImpl implements ICalendar {
 				.build();
 	}
 
-	private EventChanges getSync(AccessToken token, String calendar,
+	@VisibleForTesting
+	EventChanges getSync(AccessToken token, String calendar,
 			Date lastSync, SyncRange syncRange, boolean onEventDate) throws ServerFault, NotAllowedException {
 
 		logger.info("Calendar : getSync(" + calendar
@@ -960,7 +968,8 @@ public class CalendarBindingImpl implements ICalendar {
 					+ calendar + ") => " + changesFromDatabase.getUpdated().size() + " upd, "
 					+ changesFromDatabase.getDeletedEvents().size() + " rmed.");
 			
-			EventChanges changesToSend = moveConfidentalEventsOnDelegation(token, calendarUser, changesFromDatabase);
+			EventChanges changesToSend = moveConfidentalEventsOnDelegation(token, calendarUser, changesFromDatabase)
+											.subtractLastSyncBy(configuration.getTransactionToleranceTimeoutInSeconds());
 			boolean userHasReadOnlyDelegation = !helperService.canWriteOnCalendar(token, calendar);
 
 			if (userHasReadOnlyDelegation) {
