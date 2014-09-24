@@ -109,18 +109,18 @@ public class EventUpdateCommand extends EventCommand {
 		
 		SolrInputDocument sid = new SolrInputDocument();
 
-		putField(sid, "id", event.getObmId().getObmId());
-		putField(sid, "timecreate", event.getTimeCreate());
-		putField(sid, "timeupdate", event.getTimeUpdate());
-		putField(sid, "domain", getDomain().getId());
-		putField(sid, "title", event.getTitle());
-		putField(sid, "location", event.getLocation());
-		putField(sid, "category", event.getCategory());
-		putField(sid, "date", event.getStartDate());
-		putField(sid, "duration", event.getDuration());
-		putField(sid, "owner", obmUser.getLastName(), obmUser.getFirstName(), obmUser.getLogin(), obmUser.getEmail());
-		putField(sid, "ownerId", obmUser.getUid());
-		putField(sid, "description", event.getDescription());
+		appendField(sid, "id", event.getObmId().getObmId());
+		appendField(sid, "timecreate", event.getTimeCreate());
+		appendField(sid, "timeupdate", event.getTimeUpdate());
+		appendField(sid, "domain", getDomain().getId());
+		appendField(sid, "title", event.getTitle());
+		appendField(sid, "location", event.getLocation());
+		appendField(sid, "category", event.getCategory());
+		appendField(sid, "date", event.getStartDate());
+		appendField(sid, "duration", event.getDuration());
+		appendField(sid, "owner", obmUser.getLastName(), obmUser.getFirstName(), obmUser.getLogin(), obmUser.getEmail());
+		appendField(sid, "ownerId", obmUser.getUid());
+		appendField(sid, "description", event.getDescription());
 
 		List<String> attendees = new LinkedList<String>();
 		for (Attendee attendee : event.getAttendees()) {
@@ -128,9 +128,9 @@ public class EventUpdateCommand extends EventCommand {
 			s += " " + attendee.getEmail();
 			attendees.add(s);
 		}
-		putField(sid, "with", attendees);
+		appendField(sid, "with", attendees);
 		
-		putField(sid, "is",
+		appendField(sid, "is",
 			(event.isAllday() ? "allday" : null),
 			(event.isRecurrent() ? "periodic" : null),
 			(event.getOpacity() == EventOpacity.OPAQUE ? "busy" : "free"),
@@ -148,7 +148,7 @@ public class EventUpdateCommand extends EventCommand {
 		}
 	}
 	
-	private void putField(SolrInputDocument solrInputDocument, String field, Object... values) {
+	private void appendField(SolrInputDocument solrInputDocument, String field, Object... values) {
 		SolrInputField solrInputField = new SolrInputField(field);
 		for (Object value: values) {
 			if (value != null) {
@@ -174,7 +174,7 @@ public class EventUpdateCommand extends EventCommand {
 			st.setInt(1, getObject().getObmId().getObmId());
 			rs = st.executeQuery();
 			if (rs.next()) {
-				putField(sid, "tag", rs.getString(1));
+				appendField(sid, "tag", rs.getString(1));
 			}
 		} finally {
 			obmHelper.cleanup(con, st, rs);
