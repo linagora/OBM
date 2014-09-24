@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.0.1-SNAPSHOT</version>
+		<version>3.0.1-alpha2</version>
 	</parent>
 	
 	<artifactId>dbcp</artifactId>
 	<packaging>jar</packaging>
 	<name>OBM Database connection pool</name>
 	<url>http://www.obm.org/</url>
-	<version>3.0.1-SNAPSHOT</version>
+	<version>3.0.1-alpha2</version>
 
 	<licenses>
 		<license>
