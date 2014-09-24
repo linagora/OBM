@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>2.5.9-SNAPSHOT</version>
+		<version>2.5.9-alpha1</version>
 	</parent>
 
 	<artifactId>webapp-common-dependencies</artifactId>
 	<name>Common dependencies to deploy to the servlet container</name>
 	<packaging>pom</packaging>
-	<version>2.5.9-SNAPSHOT</version>
+	<version>2.5.9-alpha1</version>
 
 	<build>
 		<plugins>
