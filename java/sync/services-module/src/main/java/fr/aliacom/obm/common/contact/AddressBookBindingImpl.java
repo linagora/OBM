@@ -167,17 +167,13 @@ public class AddressBookBindingImpl implements IAddressBook {
 	
 	private AddressBookChangesResponse getSync(AccessToken token, Date timestamp) throws ServerFault {
 		AddressBookChangesResponse response = new AddressBookChangesResponse();
-		Connection connection = null;
 		try {
-			connection = obmHelper.getConnection();
 			response.setContactChanges(getContactsChanges(token, timestamp));
 			response.setBooksChanges(listAddressBooksChanged(token, timestamp));
-			response.setLastSync(obmHelper.selectNow(connection));
+			response.setLastSync(getLastSyncSubtractByTransactionTimeout());
 		} catch (Throwable t) {
 			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
 			throw new ServerFault(t);
-		} finally {
-			obmHelper.cleanup(connection, null, null);
 		}
 		
 		return response;
@@ -195,7 +191,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		Set<Integer> removalCandidates = contactDao.findRemovalCandidates(timestamp, token);
 		
 		return new ContactChanges(getUpdatedContacts(contactUpdates, userUpdates),
-				getRemovedContacts(contactUpdates, userUpdates, removalCandidates), getLastSync());
+				getRemovedContacts(contactUpdates, userUpdates, removalCandidates), getLastSyncSubtractByTransactionTimeout());
 	}
 	
 	private Set<Integer> getRemovedContacts(ContactUpdates contactUpdates,
@@ -394,7 +390,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 			}
 			
 			Set<Folder> removed = contactDao.findRemovedFolders(timestamp, token);
-			return new FolderChanges(updated, removed, getLastSync());	
+			return new FolderChanges(updated, removed, getLastSyncSubtractByTransactionTimeout());	
 		} catch (SQLException ex) {
 			throw new ServerFault(ex.getMessage());
 		}
@@ -437,7 +433,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 			return new ContactChanges(
 					contactUpdates.getContacts(), 
 					Sets.union(contactUpdates.getArchived(), removal), 
-					getLastSync());
+					getLastSyncSubtractByTransactionTimeout());
 			
 		} catch (SQLException ex) {
 			throw new ServerFault(ex);
@@ -482,11 +478,12 @@ public class AddressBookBindingImpl implements IAddressBook {
 		}
 	}
 	
-	private Date getLastSync() throws ServerFault {
+	private Date getLastSyncSubtractByTransactionTimeout() throws ServerFault {
 		Connection connection = null;
 		try {
 			connection = obmHelper.getConnection();
-			return obmHelper.selectNow(connection);
+			return new Date(
+					obmHelper.selectNow(connection).getTime() - configuration.transactionTimeoutInSeconds() * 1000);
 		} catch (SQLException ex) {
 			throw new ServerFault(ex);
 		} finally {
