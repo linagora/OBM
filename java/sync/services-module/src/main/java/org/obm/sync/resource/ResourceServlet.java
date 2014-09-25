@@ -96,6 +96,7 @@ public class ResourceServlet extends HttpServlet {
 				response.getWriter().write(resourceICS);
 				response.setStatus(HttpServletResponse.SC_OK);
 			}
+			logger.debug("ResourceICS {}", resourceICS);
 		} catch(ResourceNotFoundException e) {
 			logger.error(e.getMessage(),  e);
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
