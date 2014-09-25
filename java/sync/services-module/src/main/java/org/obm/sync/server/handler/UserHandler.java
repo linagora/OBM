@@ -42,7 +42,6 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.calendar.CalendarBindingImpl;
 import fr.aliacom.obm.common.session.SessionManagement;
-import fr.aliacom.obm.utils.LogUtils;
 
 /**
  * Responds to the following urls :
@@ -66,7 +65,7 @@ public class UserHandler extends SecureSyncHandler {
 		
 		AccessToken at = getCheckedToken(request);
 		String res = searchAndInvokeMethod(request, responder, at);
-		logger.debug(LogUtils.prefix(at) + res);
+		logger.debug(res);
 	}
 
 	private String searchAndInvokeMethod(Request request, XmlResponder responder, AccessToken at)
@@ -75,7 +74,7 @@ public class UserHandler extends SecureSyncHandler {
 		if (method.equals("getUserEmail")) {
 			return getUserEmail(at, responder);
 		} else {
-			logger.error(LogUtils.prefix(at) + "cannot handle method '" + method + "'");
+			logger.error("cannot handle method '" + method + "'");
 			return "";
 		}
 	} 
