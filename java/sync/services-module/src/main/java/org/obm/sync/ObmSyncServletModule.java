@@ -48,6 +48,8 @@ public class ObmSyncServletModule extends ServletModule {
 		serve("/services/*").with(SyncServlet.class);
 		serve("/resources/*").with(ResourceServlet.class);
 		serve("/freebusy/*").with(FreeBusyServlet.class);
+
+		filter("/*").through(LoggerFilter.class);
 	}
 
 }

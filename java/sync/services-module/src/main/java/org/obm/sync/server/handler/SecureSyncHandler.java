@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.server.handler;
 
+import org.obm.sync.LoggerService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.server.Request;
@@ -44,10 +45,12 @@ import fr.aliacom.obm.common.session.SessionManagement;
 public abstract class SecureSyncHandler implements ISyncHandler {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
+	private final LoggerService loggerService;
 	private final SessionManagement sessions;
 
-	protected SecureSyncHandler(SessionManagement sessionManagement) {
+	protected SecureSyncHandler(SessionManagement sessionManagement, LoggerService loggerService) {
 		sessions = sessionManagement;
+		this.loggerService = loggerService;
 	}
 
 	protected String p(Request params, String name) {
@@ -73,6 +76,7 @@ public abstract class SecureSyncHandler implements ISyncHandler {
 			throws AuthFault {
 		AccessToken token = getToken(params);
 		sessions.checkToken(token);
+		loggerService.defineUser(token.getUserWithDomain());
 		return token;
 	}
 

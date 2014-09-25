@@ -46,6 +46,7 @@ import org.obm.sync.book.BookType;
 import org.obm.sync.server.Request;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 
 import fr.aliacom.obm.common.contact.AddressBookBindingImpl;
 import fr.aliacom.obm.common.session.SessionManagement;
@@ -115,6 +116,7 @@ public class AddressBookHandlerTest {
 			bindMock(SessionManagement.class);
 			bindMock(AddressBookBindingImpl.class);
 			bindMock(ContactConfiguration.class);
+			bind(String.class).annotatedWith(Names.named("application-name")).toInstance("obm-sync");
 		}
 	}
 }

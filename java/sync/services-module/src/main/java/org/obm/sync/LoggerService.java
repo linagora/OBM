@@ -29,30 +29,58 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.server.handler;
+package org.obm.sync;
 
-import org.obm.sync.LoggerService;
-import org.obm.sync.calendar.CalendarItemsParser;
-import org.obm.sync.calendar.EventType;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+import org.slf4j.MDC;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import fr.aliacom.obm.common.calendar.CalendarBindingImpl;
-import fr.aliacom.obm.common.session.SessionManagement;
+import com.google.inject.name.Named;
 
 @Singleton
-public class TodoHandler extends EventHandler {
+public class LoggerService {
+
+	private final String applicationName;
 
 	@Inject
-	public TodoHandler(SessionManagement sessionManagement,
-			LoggerService loggerService,
-			CalendarBindingImpl calendarBindingImpl,
-			CalendarItemsParser cip) {
-
-		super(sessionManagement, loggerService, calendarBindingImpl, cip);
-		
-		calendarBindingImpl.setEventType(EventType.VTODO);
+	private LoggerService(@Named("application-name") String applicationName) {
+		this.applicationName = applicationName;
+	}
+	
+	public void startSession(String loginAtDomain, int requestId, String command) {
+		startSession();
+		defineUser(loginAtDomain);
+		defineRequestId(requestId);
+		defineCommand(command);
+	}
+	
+	public void startSession() {
+		MDC.put("title", applicationName);
+		MDC.put("threadId", String.valueOf(Thread.currentThread().getId()));
+	}
+	
+	public void defineUser(String loginAtDomain) {
+		Calendar date = Calendar.getInstance();
+		SimpleDateFormat dateformatter = new SimpleDateFormat("yyyy.MM.dd_hh:mm:ss");
+		String now = dateformatter.format(date.getTime());
+		String sessionId = loginAtDomain + "-" + now;
+		MDC.put("user", loginAtDomain);
+		MDC.put("sessionId", sessionId);
+	}
+	
+	public void defineRequestId(int requestId) {
+		MDC.put("requestId", String.valueOf(requestId));
+	}
+	
+	public void defineCommand(String command) {
+		MDC.put("command", command);
 	}
 
+	public void closeSession() {
+		MDC.clear();
+	}
+	
 }

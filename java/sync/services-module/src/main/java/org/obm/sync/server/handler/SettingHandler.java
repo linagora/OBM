@@ -34,6 +34,7 @@ package org.obm.sync.server.handler;
 import java.util.Date;
 import java.util.Map;
 
+import org.obm.sync.LoggerService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.server.Request;
@@ -58,8 +59,11 @@ public class SettingHandler extends SecureSyncHandler {
 	private final SettingBindingImpl binding;
 
 	@Inject
-	private SettingHandler(SessionManagement sessionManagement, SettingBindingImpl settingBindingImpl) {
-		super(sessionManagement);
+	private SettingHandler(SessionManagement sessionManagement,
+			LoggerService loggerService,
+			SettingBindingImpl settingBindingImpl) {
+
+		super(sessionManagement, loggerService);
 		this.binding = settingBindingImpl;
 	}
 

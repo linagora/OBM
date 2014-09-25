@@ -33,6 +33,7 @@ package org.obm.sync.server.handler;
 
 import javax.xml.parsers.FactoryConfigurationError;
 
+import org.obm.sync.LoggerService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.server.Request;
@@ -53,8 +54,11 @@ public class UserHandler extends SecureSyncHandler {
 	private final CalendarBindingImpl binding;
 
 	@Inject
-	public UserHandler(SessionManagement sessionManagement, CalendarBindingImpl calendarBindingImpl) {
-		super(sessionManagement);
+	public UserHandler(SessionManagement sessionManagement,
+			LoggerService loggerService,
+			CalendarBindingImpl calendarBindingImpl) {
+
+		super(sessionManagement, loggerService);
 		
 		this.binding = calendarBindingImpl;
 	}

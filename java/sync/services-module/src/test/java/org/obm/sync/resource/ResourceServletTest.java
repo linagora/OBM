@@ -29,12 +29,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.resource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -54,6 +54,7 @@ import org.junit.Test;
 import org.obm.DateUtils;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.sync.LoggerService;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventExtId.Factory;
@@ -80,6 +81,7 @@ public class ResourceServletTest {
 	private AttendeeService attendeeService;
 	private Date now;
 	private IMocksControl control;
+	private LoggerService loggerService;
 	
 	@Before
 	public void setUp() {
@@ -97,7 +99,14 @@ public class ResourceServletTest {
 		response = control.createMock(HttpServletResponse.class);
 
 		expect(dateProvider.getDate()).andReturn(now).anyTimes();
-		resourceServlet = new ResourceServlet(calendarBinding, helper);
+
+		loggerService = control.createMock(LoggerService.class);
+		loggerService.defineUser(anyObject(String.class));
+		expectLastCall().anyTimes();
+		loggerService.defineCommand(anyObject(String.class));
+		expectLastCall().anyTimes();
+
+		resourceServlet = new ResourceServlet(loggerService, calendarBinding, helper);
 	}
 
 	@Test
