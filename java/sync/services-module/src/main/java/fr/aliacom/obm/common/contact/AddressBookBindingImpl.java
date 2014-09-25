@@ -77,7 +77,6 @@ import com.google.inject.Singleton;
 import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
-import fr.aliacom.obm.utils.LogUtils;
 
 /**
  * OBM {@link IAddressBook} web service implementation
@@ -144,7 +143,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Override
 	@Transactional(readOnly=true)
 	public ContactChanges listContactsChanged(AccessToken token, Date lastSync) throws ServerFault {
-		logger.info(LogUtils.prefix(token) + "AddressBook : listContactsChanged");
+		logger.info("AddressBook : listContactsChanged");
 		try {
 			return getContactsChanges(token, lastSync);
 		} catch (SQLException e) {
@@ -157,10 +156,10 @@ public class AddressBookBindingImpl implements IAddressBook {
 	public AddressBookChangesResponse getAddressBookSync(AccessToken token, Date timestamp)
 			throws ServerFault {
 		try {
-			logger.info(LogUtils.prefix(token) + "AddressBook : getAddressBookSync()");
+			logger.info("AddressBook : getAddressBookSync()");
 			return getSync(token, timestamp);
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault("error synchronizing contacts ", e);
 		}
 	}
@@ -172,7 +171,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 			response.setBooksChanges(listAddressBooksChanged(token, timestamp));
 			response.setLastSync(getLastSyncSubtractByTransactionTimeout());
 		} catch (Throwable t) {
-			logger.error(LogUtils.prefix(token) + t.getMessage(), t);
+			logger.error(t.getMessage(), t);
 			throw new ServerFault(t);
 		}
 		
@@ -346,13 +345,13 @@ public class AddressBookBindingImpl implements IAddressBook {
 			List<AddressBook> addrBooks = contactDao.findAddressBooks(token);
 			return contactDao.searchContactsInAddressBooksList(token, addrBooks, query, limit, offset);
 		} catch (SQLException e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
 		} catch (MalformedURLException e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
 		} catch (LocatorClientException e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
 		}
 	}
@@ -364,7 +363,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		try {
 			return contactDao.searchContact(token, book, query, limit, offset);
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -375,7 +374,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		try {
 			return contactDao.unsubscribeBook(token, addressBookId);
 		} catch (Throwable e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
 	}
@@ -467,13 +466,13 @@ public class AddressBookBindingImpl implements IAddressBook {
 			Collection<AddressBook> addressBooks = contactDao.listSynchronizedAddressBooks(token);
 			return contactDao.searchContactsInAddressBooksList(token, addressBooks, query, limit, offset);
 		} catch (SQLException e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
 		} catch (MalformedURLException e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
 		} catch (LocatorClientException e) {
-			logger.error(LogUtils.prefix(token) + e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
 		}
 	}

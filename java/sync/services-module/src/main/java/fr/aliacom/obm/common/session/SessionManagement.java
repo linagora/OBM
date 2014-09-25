@@ -64,7 +64,6 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.services.constant.SpecialAccounts;
-import fr.aliacom.obm.utils.LogUtils;
 
 /**
  * Helpers for working with userobm & domain tables Authentification method is
@@ -107,7 +106,7 @@ public class SessionManagement {
 					@Override
 					public void onRemoval(
 							RemovalNotification<String, AccessToken> notification) {
-						logSessionRemoval(notification.getValue());
+						logSessionRemoval();
 
 					}
 				})
@@ -244,7 +243,7 @@ public class SessionManagement {
 
 	private void logLoginSuccess(String login,
 			String domainName, String authServiceType, AccessToken token) {
-		logger.info(LogUtils.prefix(token) + login + "@" + domainName + " logged in from " + token.getOrigin()
+		logger.info(login + "@" + domainName + " logged in from " + token.getOrigin()
 				+ ". auth type: " + authServiceType + " (mail: " + token.getUserEmail()
 				+ ") on obm-sync " + token.getVersion());
 	}
@@ -325,13 +324,13 @@ public class SessionManagement {
 	public void logout(String sessionId) {
 		AccessToken token = sessions.remove(sessionId);
 		if (token != null) {
-			logSessionRemoval(token);
+			logSessionRemoval();
 		} else {
 			logger.info("logout for " + sessionId + "...");
 		}
 	}
 
-	private void logSessionRemoval(AccessToken token) {
-		logger.info(LogUtils.prefix(token) + "logout.");
+	private void logSessionRemoval() {
+		logger.info("logout.");
 	}
 }
