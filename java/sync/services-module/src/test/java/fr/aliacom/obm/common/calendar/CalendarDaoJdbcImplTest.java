@@ -84,7 +84,9 @@ import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.AttendeeService;
+import org.obm.sync.solr.SolrClientFactory;
 import org.obm.sync.solr.SolrManager;
+import org.obm.sync.solr.jms.EventUpdateCommand;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -126,6 +128,7 @@ public class CalendarDaoJdbcImplTest {
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(DateProvider.class);
 			bindWithMock(SolrManager.class);
+			bindWithMock(SolrClientFactory.class);
 			bind(AttendeeService.class).to(SimpleAttendeeService.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 			bind(Ical4jRecurrenceHelper.class).to(Ical4jHelper.class);
@@ -144,6 +147,8 @@ public class CalendarDaoJdbcImplTest {
 	private CalendarDaoJdbcImpl calendarDaoJdbcImpl;
 	@Inject
 	private DatabaseConnectionProvider dbcp;
+	@Inject
+	private SolrManager solrManager;
 	
 	@Test
 	public void touchParentOfDeclinedRecurrentEventsMustNotIncludeDuplicatesWhenExDatesDiffer() {
@@ -311,7 +316,8 @@ public class CalendarDaoJdbcImplTest {
 		Connection connection = mocksControl.createMock(Connection.class);
 		PreparedStatement ps = mocksControl.createMock(PreparedStatement.class);
 		AccessToken token = ToolBox.mockAccessToken(user.getLogin(), user.getDomain(), mocksControl);
-		
+		expect(solrManager.isSolrAvailable()).andReturn(true);
+		solrManager.process(anyObject(EventUpdateCommand.class));
 		expect(dbcp.getConnection())
 			.andReturn(connection).once();
 		

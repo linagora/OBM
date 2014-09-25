@@ -31,20 +31,25 @@ package org.obm.sync.solr.jms;
 
 import java.io.Serializable;
 
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.obm.sync.solr.IndexerFactory;
 import org.obm.sync.solr.SolrRequest;
 import org.obm.sync.solr.SolrService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 public abstract class Command<T extends Serializable> implements Serializable {
 	
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	
 	private final ObmDomain domain;
 	private final T object;
-	
-	protected Command(ObmDomain domain, T object) {
+
+	private String login;
+
+	protected Command(ObmDomain domain, String login, T object) {
 		this.domain = domain;
+		this.login = login;
 		this.object = object;
 	}
 
@@ -52,13 +57,21 @@ public abstract class Command<T extends Serializable> implements Serializable {
 		return domain;
 	}
 
+	public String getLogin() {
+		return login;
+	}
+	
+	protected String getLoginAtDomain() {
+		return login + "@" + domain.getName();
+	}
+	
 	public T getObject() {
 		return object;
 	}
-	
+
 	public abstract SolrJmsQueue getQueue();
 	
 	public abstract SolrService getSolrService();
 	
-	public abstract SolrRequest asSolrRequest(CommonsHttpSolrServer server, IndexerFactory<T> factory);
+	public abstract SolrRequest asSolrRequest();
 }

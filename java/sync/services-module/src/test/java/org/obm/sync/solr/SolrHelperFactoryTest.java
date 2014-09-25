@@ -29,14 +29,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.createMockBuilder;
-import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.replay;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.easymock.IMocksControl;
 import org.hornetq.core.config.Configuration;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
@@ -44,30 +42,28 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
-import org.obm.sync.solr.jms.DefaultCommandConverter;
+import org.obm.sync.solr.jms.ContactUpdateCommand;
+import org.obm.sync.solr.jms.EventUpdateCommand;
 import org.obm.sync.solr.jms.SolrJmsQueue;
 
 import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.QueueManager;
 
 import fr.aliacom.obm.ToolBox;
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class SolrHelperFactoryTest {
 
 	private Contact contact;
 	private AccessToken accessToken;
-	private LocatorService locatorClient;
-	private ContactIndexer.Factory contactIndexerFactory;
-	private ContactIndexer contactIndexer;
 	private SolrHelper.Factory factory;
 	private SolrManager manager;
 	private QueueManager queueManager;
 	private ObmSyncConfigurationService configurationService;
+	private IMocksControl control;
+	private SolrClientFactory solrClientFactory;
 
 	private static JMSConfiguration jmsConfiguration() {
 		return 
@@ -97,26 +93,27 @@ public class SolrHelperFactoryTest {
 	public void setUp() throws Exception {
 		queueManager = new QueueManager(hornetQConfiguration(), jmsConfiguration());
 		queueManager.start();
-
 		contact = new Contact();
-		accessToken = ToolBox.mockAccessToken();
-		locatorClient = createMock(LocatorService.class);
-		configurationService = createMock(ObmSyncConfigurationService.class);
-		contactIndexerFactory = createMockBuilder(ContactIndexer.Factory.class).addMockedMethod("createIndexer", CommonsHttpSolrServer.class, ObmDomain.class, Contact.class).createMock();
-		contactIndexer = createMockBuilder(ContactIndexer.class).createMock();
-		
-		expect(configurationService.solrCheckingInterval()).andReturn(10);
-		expect(locatorClient.getServiceLocation(isA(String.class), isA(String.class))).andReturn(null).anyTimes();
-		expect(contactIndexerFactory.createIndexer(isA(CommonsHttpSolrServer.class), isA(ObmDomain.class), eq(contact))).andReturn(contactIndexer).once();
 
-		replay(accessToken, locatorClient, contactIndexerFactory, configurationService);
-		
-		manager = new SolrManager(configurationService, queueManager, new DefaultCommandConverter(locatorClient, contactIndexerFactory, null));
-		factory = new SolrHelper.Factory(manager, locatorClient);
+ 		control = createControl();
+ 		accessToken = ToolBox.mockAccessToken(control);
+ 		solrClientFactory = control.createMock(SolrClientFactoryImpl.class);
+ 		configurationService = control.createMock(ObmSyncConfigurationService.class);
+ 		CommonsHttpSolrServer solrClient = control.createMock(CommonsHttpSolrServer.class);
+ 		ContactUpdateCommand.Factory contactCommandFactory = control.createMock(ContactUpdateCommand.Factory.class);
+ 		EventUpdateCommand.Factory eventCommandFactory = control.createMock(EventUpdateCommand.Factory.class);
+  		
+ 		expect(configurationService.solrCheckingInterval()).andReturn(10);
+ 		expect(solrClientFactory.create(SolrService.CONTACT_SERVICE, "user@test.tlse.lng")).andReturn(solrClient);
+ 		expect(solrClient.deleteById(anyObject(String.class))).andReturn(null);
+ 		expect(solrClient.commit()).andReturn(null);
 
-		contact.setUid(1);
+ 		control.replay();
 
-		
+ 		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
+		factory = new SolrHelper.Factory(manager, solrClientFactory, contactCommandFactory, eventCommandFactory);
+  
+ 		contact.setUid(1);
 	}
 
 	@After
@@ -126,23 +123,8 @@ public class SolrHelperFactoryTest {
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void create_contact_solr_remains_unavailable() throws LocatorClientException {
-		index(false);
-	}
-
-	@Test(expected = IllegalStateException.class)
 	public void delete_contact_solr_remains_unavailable() throws LocatorClientException {
 		delete(false);
-	}
-
-	@Test
-	public void create_contact_solr_available() throws LocatorClientException {
-		try {
-			index(true);
-		}
-		catch (IllegalStateException e) {
-			fail();
-		}
 	}
 
 	@Test
@@ -156,16 +138,6 @@ public class SolrHelperFactoryTest {
 	}
 
 	@Test
-	public void create_contact_solr_becomes_available() throws  LocatorClientException {
-		try {
-			index(false);
-		}
-		catch (IllegalStateException e) {
-		}
-		create_contact_solr_available();
-	}
-
-	@Test
 	public void delete_contact_solr_becomes_available() throws  LocatorClientException {
 		try {
 			delete(false);
@@ -176,20 +148,9 @@ public class SolrHelperFactoryTest {
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void create_contact_solr_becomes_unavailable() throws Exception, LocatorClientException {
-		create_contact_solr_available();
-		index(false);
-	}
-
-	@Test(expected = IllegalStateException.class)
 	public void delete_contact_solr_becomes_unavailable() throws LocatorClientException {
 		delete_contact_solr_available();
 		delete(false);
-	}
-
-	private void index(boolean solrUp) {
-		manager.setSolrAvailable(solrUp);
-		factory.createClient(accessToken).createOrUpdate(contact);
 	}
 
 	private void delete(boolean solrUp) {

@@ -36,23 +36,25 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 
 public class PingSolrRequest extends SolrRequest {
 
-	private final Lock lock;
-	private final Condition condition;
-
-	public PingSolrRequest(CommonsHttpSolrServer server, Lock lock, Condition condition) {
-		super(server);
-
-		this.lock = lock;
-		this.condition = condition;
+	public static Lock lock;
+	public static Condition condition;
+	public static Throwable error;
+	
+	public PingSolrRequest(String loginAtDomain, SolrService solrService) {
+		super(loginAtDomain, solrService);
 	}
 
 	@Override
-	public void run() throws Exception {
+	public void run(CommonsHttpSolrServer server) throws Exception {
 		server.ping();
 	}
 
 	@Override
 	public void postProcess() {
+		requestProcessed();
+	}
+
+	private void requestProcessed() {
 		if (lock == null) {
 			return;
 		}
@@ -60,5 +62,14 @@ public class PingSolrRequest extends SolrRequest {
 		lock.lock();
 		condition.signal();
 		lock.unlock();
+	}
+	
+	@Override
+	public void onError(Throwable t) {
+		error = t;
+	}
+	
+	public Throwable getError() {
+		return error;
 	}
 }

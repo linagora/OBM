@@ -615,6 +615,164 @@ ALTER TABLE profilemodule ADD CONSTRAINT profilemodule_pkey PRIMARY KEY (profile
 CREATE SEQUENCE profilemodule_profilemodule_id_seq INCREMENT BY 1 CACHE 1;
 ALTER TABLE profilemodule ALTER COLUMN profilemodule_id SET DEFAULT nextval('profilemodule_profilemodule_id_seq');
 
+CREATE TABLE kind (
+    kind_id integer NOT NULL,
+    kind_domain_id integer NOT NULL,
+    kind_timeupdate timestamp,
+    kind_timecreate timestamp DEFAULT now(),
+    kind_userupdate integer,
+    kind_usercreate integer,
+    kind_minilabel character varying(64),
+    kind_header character varying(64),
+    kind_lang character(2),
+    kind_default integer DEFAULT 0 NOT NULL
+);
+
+CREATE SEQUENCE kind_kind_id_seq
+    INCREMENT BY 1
+    CACHE 1;
+ALTER TABLE kind ALTER COLUMN kind_id SET DEFAULT nextval('kind_kind_id_seq');
+ALTER TABLE kind
+    ADD CONSTRAINT kind_pkey PRIMARY KEY (kind_id);
+ALTER TABLE kind
+    ADD CONSTRAINT kind_domain_id_domain_id_fkey FOREIGN KEY (kind_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: kind_usercreate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: obm
+--
+
+ALTER TABLE kind
+    ADD CONSTRAINT kind_usercreate_userobm_id_fkey FOREIGN KEY (kind_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: kind_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: obm
+--
+
+ALTER TABLE kind
+    ADD CONSTRAINT kind_userupdate_userobm_id_fkey FOREIGN KEY (kind_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+CREATE TABLE contactfunction (
+    contactfunction_id integer NOT NULL,
+    contactfunction_domain_id integer NOT NULL,
+    contactfunction_timeupdate timestamp,
+    contactfunction_timecreate timestamp DEFAULT now(),
+    contactfunction_userupdate integer,
+    contactfunction_usercreate integer,
+    contactfunction_code character varying(10) DEFAULT '',
+    contactfunction_label character varying(64)
+);
+--
+-- Name: contactfunction_contactfunction_id_seq; Type: SEQUENCE; Schema: public; Owner: obm
+--
+
+CREATE SEQUENCE contactfunction_contactfunction_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    
+    
+    CACHE 1;
+ALTER TABLE contactfunction ALTER COLUMN contactfunction_id SET DEFAULT nextval('contactfunction_contactfunction_id_seq');
+ALTER TABLE contactfunction
+    ADD CONSTRAINT contactfunction_pkey PRIMARY KEY (contactfunction_id);
+
+CREATE INDEX contactfunction_domain_id_fkey ON contactfunction(contactfunction_domain_id);
+
+
+--
+-- Name: contactfunction_usercreate_fkey; Type: INDEX; Schema: public; Owner: obm; Tablespace: 
+--
+
+CREATE INDEX contactfunction_usercreate_fkey ON contactfunction(contactfunction_usercreate);
+
+
+--
+-- Name: contactfunction_userupdate_fkey; Type: INDEX; Schema: public; Owner: obm; Tablespace: 
+--
+
+CREATE INDEX contactfunction_userupdate_fkey ON contactfunction(contactfunction_userupdate);
+
+ALTER TABLE contact
+    ADD CONSTRAINT contact_function_id_contactfunction_id_fkey FOREIGN KEY (contact_function_id) REFERENCES contactfunction(contactfunction_id) ON UPDATE CASCADE ON DELETE SET NULL;
+    
+    
+ALTER TABLE contactfunction
+    ADD CONSTRAINT contactfunction_domain_id_domain_id_fkey FOREIGN KEY (contactfunction_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: contactfunction_usercreate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: obm
+--
+
+ALTER TABLE contactfunction
+    ADD CONSTRAINT contactfunction_usercreate_userobm_id_fkey FOREIGN KEY (contactfunction_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: contactfunction_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: obm
+--
+
+ALTER TABLE contactfunction
+    ADD CONSTRAINT contactfunction_userupdate_userobm_id_fkey FOREIGN KEY (contactfunction_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+    
+CREATE TABLE categorylink (
+    categorylink_category_id integer NOT NULL,
+    categorylink_entity_id integer NOT NULL,
+    categorylink_category character varying(24) DEFAULT ''::character varying NOT NULL
+);
+
+CREATE TABLE category (
+    category_id integer NOT NULL,
+    category_domain_id integer NOT NULL,
+    category_timeupdate timestamp,
+    category_timecreate timestamp DEFAULT now(),
+    category_userupdate integer,
+    category_usercreate integer,
+    category_category character varying(24) DEFAULT ''::character varying NOT NULL,
+    category_code character varying(100) DEFAULT ''::character varying NOT NULL,
+    category_label character varying(100) DEFAULT ''::character varying NOT NULL
+);
+
+
+    ALTER TABLE categorylink
+    ADD CONSTRAINT categorylink_pkey PRIMARY KEY (categorylink_category_id, categorylink_entity_id);
+    CREATE INDEX categorylink_category_id_fkey ON categorylink(categorylink_category_id);
+
+
+--
+-- Name: categorylink_entity_id_fkey; Type: INDEX; Schema: public; Owner: obm; Tablespace: 
+--
+
+CREATE INDEX categorylink_entity_id_fkey ON categorylink(categorylink_entity_id);
+
+
+--
+-- Name: catl_idx_cat; Type: INDEX; Schema: public; Owner: obm; Tablespace: 
+--
+
+CREATE INDEX catl_idx_cat ON categorylink(categorylink_category);
+
+
+--
+-- Name: catl_idx_entid; Type: INDEX; Schema: public; Owner: obm; Tablespace: 
+--
+
+CREATE INDEX catl_idx_entid ON categorylink(categorylink_entity_id);
+
+    ALTER TABLE categorylink
+    ADD CONSTRAINT categorylink_category_id_category_id_fkey FOREIGN KEY (categorylink_category_id) REFERENCES category(category_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: categorylink_entity_id_entity_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: obm
+--
+
+ALTER TABLE categorylink
+    ADD CONSTRAINT categorylink_entity_id_entity_id_fkey FOREIGN KEY (categorylink_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+    
+
 --
 -- Cascades
 --

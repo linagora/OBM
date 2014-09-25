@@ -35,11 +35,11 @@ import org.obm.sync.solr.SolrService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 public abstract class EventCommand extends Command<Event> {
-
-	public EventCommand(ObmDomain domain, Event data) {
-		super(domain, data);
+	
+	public EventCommand(ObmDomain domain, String login, Event data) {
+		super(domain, login, data);
 	}
-
+	
 	@Override
 	public SolrJmsQueue getQueue() {
 		return SolrJmsQueue.CALENDAR_CHANGES_QUEUE;

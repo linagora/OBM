@@ -31,11 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
-import java.net.MalformedURLException;
-
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
@@ -62,13 +58,19 @@ public class SolrHelper {
 	@Singleton
 	public static class Factory {
 		private final SolrManager solrManager;
-		private final LocatorService locatorService;
+		private final ContactUpdateCommand.Factory contactCommandFactory;
+		private final EventUpdateCommand.Factory eventCommandFactory;
+		private final SolrClientFactory solrClientFactory;
 		
 		@Inject
 		@VisibleForTesting
-		protected Factory(SolrManager solrManager, LocatorService locatorService) {
+		protected Factory(SolrManager solrManager,
+				SolrClientFactory solrClientFactory,
+				ContactUpdateCommand.Factory contactCommandFactory, EventUpdateCommand.Factory eventCommandFactory) {
 			this.solrManager = solrManager;
-			this.locatorService = locatorService;
+			this.solrClientFactory = solrClientFactory;
+			this.contactCommandFactory = contactCommandFactory;
+			this.eventCommandFactory = eventCommandFactory;
 		}
 
 		public SolrHelper createClient(AccessToken at) {
@@ -76,47 +78,51 @@ public class SolrHelper {
 				throw new IllegalStateException("SolR is unavailable");
 			}
 			
-			return new SolrHelper(at, locatorService, solrManager);
+			return new SolrHelper(at, solrManager, solrClientFactory, eventCommandFactory, contactCommandFactory);
 		}
 	}
 	
+	private final AccessToken at;
 	private final ObmDomain domain;
 	private final SolrManager solrManager;
-	private final LocatorService locatorClient;
-	private final AccessToken at;
-
-	private SolrHelper(AccessToken at, LocatorService locatorClient, SolrManager solrManager) {
+	private final EventUpdateCommand.Factory eventCommandFactory;
+	private final ContactUpdateCommand.Factory contactCommandFactory;
+	private final SolrClientFactory solrClientFactory;
+	
+	private SolrHelper(AccessToken at, SolrManager solrManager,
+			SolrClientFactory solrClientFactory,
+			EventUpdateCommand.Factory eventCommandFactory, 
+			ContactUpdateCommand.Factory contactCommandFactory) {
 		this.at = at;
+		this.solrClientFactory = solrClientFactory;
 		this.domain = at.getDomain();
 		this.solrManager = solrManager;
-		this.locatorClient = locatorClient;
-	}
-	
-	public CommonsHttpSolrServer getSolrContact() throws MalformedURLException, LocatorClientException {
-		return new CommonsHttpSolrServer("http://" + locatorClient.getServiceLocation("solr/contact", at.getUserLogin() + "@" + domain.getName()) + ":8080/solr/contact");
-	}
-	
-	public CommonsHttpSolrServer getSolrEvent() throws MalformedURLException, LocatorClientException {
-		return new CommonsHttpSolrServer("http://" + locatorClient.getServiceLocation("solr/event", at.getUserLogin() + "@" + domain.getName()) + ":8080/solr/event");
-	}
-	
-	public void createOrUpdate(Contact c) {
-		logger.info("[contact " + c.getUid() + "] scheduled for solr indexing");
-		solrManager.process(new ContactUpdateCommand(domain, c));
+		this.eventCommandFactory = eventCommandFactory;
+		this.contactCommandFactory = contactCommandFactory;
+		
 	}
 
-	public void delete(Contact c) {
-		logger.info("[contact " + c.getUid() + "] scheduled for solr removal");
-		solrManager.process(new ContactDeleteCommand(domain, c));
+	public CommonsHttpSolrServer getSolrContact() {
+		return solrClientFactory.create(SolrService.CONTACT_SERVICE, at.getUserLogin() + "@" + domain.getName());
+	}
+	
+	public void createOrUpdate(Contact contact) {
+		logger.info("[contact {}] scheduled for solr indexing", contact.getUid());
+		solrManager.process(contactCommandFactory.create(domain, at.getUserLogin(), contact));
 	}
 
-	public void delete(Event e) {
-		logger.info("[event " + e.getObmId() + "] scheduled for solr removal");
-		solrManager.process(new EventDeleteCommand(domain, e));
+	public void delete(Contact contact) {
+		logger.info("[contact {} ] scheduled for solr removal", contact.getUid());
+		solrManager.process(new ContactDeleteCommand(domain, at.getUserLogin(), contact));
 	}
 
-	public void createOrUpdate(Event ev) {
-		logger.info("[event " + ev.getObmId() + "] scheduled for solr indexing");
-		solrManager.process(new EventUpdateCommand(domain, ev));
+	public void delete(Event event) {
+		logger.info("[event {} ] scheduled for solr removal", event.getObmId());
+		solrManager.process(new EventDeleteCommand(domain, at.getUserLogin(), event));
+	}
+
+	public void createOrUpdate(Event event) {
+		logger.info("[event {} ] scheduled for solr indexing", event.getObmId());
+		solrManager.process(eventCommandFactory.create(domain, at.getUserLogin(), event));
 	}
 }

@@ -29,19 +29,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
+import java.io.Serializable;
+
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class SolrRequest {
+public abstract class SolrRequest implements Serializable {
+
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	protected final CommonsHttpSolrServer server;
+	private final String loginAtDomain;
+	private final SolrService solrService;
 	
-	public SolrRequest(CommonsHttpSolrServer server) {
-		this.server = server;
+	public SolrRequest(String loginAtDomain, SolrService solrService) {
+		this.loginAtDomain = loginAtDomain;
+		this.solrService = solrService;
 	}
 
-	public abstract void run() throws Exception;
+	public abstract void run(CommonsHttpSolrServer server) throws Exception;
 
 	/**
 	 * Gets called after processing of this {@link SolrRequest} is done.<br />
@@ -50,7 +55,15 @@ public abstract class SolrRequest {
 	public void postProcess() {
 	}
 
-	public CommonsHttpSolrServer getServer() {
-		return server;
+	public String getLoginAtDomain() {
+		return loginAtDomain;
 	}
+
+	public SolrService getSolrService() {
+		return solrService;
+	}
+
+	public void onError(@SuppressWarnings("unused") Throwable t) {
+	}
+
 }

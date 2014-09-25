@@ -1539,7 +1539,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 	}
 
 	private List<Contact> searchContact(AccessToken at, Collection<AddressBook> addrBooks, Connection con, String query, int limit, Integer offset) 
-			throws MalformedURLException, SQLException, LocatorClientException {
+			throws SQLException, LocatorClientException {
 		
 		Set<Integer> contactIds = new HashSet<Integer>();
 

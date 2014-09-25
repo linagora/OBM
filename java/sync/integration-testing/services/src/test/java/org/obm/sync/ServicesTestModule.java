@@ -64,7 +64,6 @@ public class ServicesTestModule extends AbstractModule {
 				new TransactionalModule(),
 				new DatabaseModule(),
 				new DaoModule(),
-				new SolrJmsModule(),
 				new DatabaseMetadataModule());
 		try {
 			install(override.with(overrideModule()));

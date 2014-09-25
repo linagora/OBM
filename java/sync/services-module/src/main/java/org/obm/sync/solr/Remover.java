@@ -40,16 +40,15 @@ public class Remover extends SolrRequest {
 
 	private final String id;
 
-	public Remover(CommonsHttpSolrServer srv, String id) {
-		super(srv);
-		
+	public Remover(String loginAtDomain, SolrService solrService, String id) {
+		super(loginAtDomain, solrService);
 		this.id = id;
 	}
 
 	@Override
-	public void run() throws Exception {
+	public void run(CommonsHttpSolrServer server) throws Exception {
 		server.deleteById(id);
 		server.commit();
-		logger.info("id " + id + " removed from SOLR index");
+		logger.info("id {} removed from SOLR index", id);
 	}
 }

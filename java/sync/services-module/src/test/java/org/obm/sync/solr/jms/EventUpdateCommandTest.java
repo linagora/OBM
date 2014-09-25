@@ -1,42 +1,39 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * 
  * Copyright (C) 2011-2014  Linagora
  *
- * This program is free software: you can redistribute it and/or 
- * modify it under the terms of the GNU Affero General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
- * License, or (at your option) any later version, provided you comply 
- * with the Additional Terms applicable for OBM connector by Linagora 
- * pursuant to Section 7 of the GNU Affero General Public License, 
- * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
- * the “Message sent thanks to OBM, Free Communication by Linagora” 
- * signature notice appended to any and all outbound messages 
- * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
- * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
- * from infringing Linagora intellectual property rights over its trademarks 
- * and commercial brands. Other Additional Terms apply, 
- * see <http://www.linagora.com/licenses/> for more details. 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version, provided you comply with the Additional Terms applicable for OBM
+ * software by Linagora pursuant to Section 7 of the GNU Affero General Public
+ * License, subsections (b), (c), and (e), pursuant to which you must notably (i)
+ * retain the displaying by the interactive user interfaces of the “OBM, Free
+ * Communication by Linagora” Logo with the “You are using the Open Source and
+ * free version of OBM developed and supported by Linagora. Contribute to OBM R&D
+ * by subscribing to an Enterprise offer !” infobox, (ii) retain all hypertext
+ * links between OBM and obm.org, between Linagora and linagora.com, as well as
+ * between the expression “Enterprise offer” and pro.obm.org, and (iii) refrain
+ * from infringing Linagora intellectual property rights over its trademarks and
+ * commercial brands. Other Additional Terms apply, see
+ * <http://www.linagora.com/licenses/> for more details.
  *
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
- * for more details. 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License 
- * and its applicable Additional Terms for OBM along with this program. If not, 
- * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
- * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
- * OBM connectors. 
- * 
+ * You should have received a copy of the GNU Affero General Public License and
+ * its applicable Additional Terms for OBM along with this program. If not, see
+ * <http://www.gnu.org/licenses/> for the GNU Affero General   Public License
+ * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
+ * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.sync.solr.jms;
 
 import static fr.aliacom.obm.ToolBox.getDefaultObmDomain;
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
-import static org.easymock.EasyMock.createControl;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
 import static org.obm.DateUtils.date;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -55,27 +52,32 @@ import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.UserAttendee;
+import org.obm.sync.solr.jms.EventUpdateCommand;
+import org.obm.utils.ObmHelper;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
 
-public class EventIndexerTest {
+public class EventUpdateCommandTest {
 
 	private IMocksControl mocksControl; 
-	private EventIndexer eventIndexer;
 	private UserDao userDao;
 	private ObmUser user;
 	private ObmDomain domain;
 	private Event eventToIndex;
+ 	private ObmHelper obmHelper;
+ 	private EventUpdateCommand.Factory testee;
 	
 	@Before
 	public void setUp() {
 		mocksControl = createControl();
 		userDao = mocksControl.createMock(UserDao.class);
+		obmHelper = mocksControl.createMock(ObmHelper.class);
 		user = getDefaultObmUser();
 		domain = getDefaultObmDomain();
 		eventToIndex = buildEvent();
+		testee = new EventUpdateCommand.Factory(userDao, obmHelper);
 	}
 	
 	@After
@@ -85,13 +87,12 @@ public class EventIndexerTest {
 	
 	@Test
 	public void buildDocumentWithoutOwnerUsesOwnerEmail() {
-		eventToIndex.setOwner("");
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
-		
-		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
+
+		eventToIndex.setOwner("");
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
 	}
@@ -99,24 +100,24 @@ public class EventIndexerTest {
 	@Test
 	public void buildDocumentWithoutOwnerEmailUsesOwner() {
 		eventToIndex.setOwnerEmail("");
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq("owner"), eq(domain))).andReturn(user);
+		expect(userDao.findUser("owner", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
+
 		
 		assertSolrDocumentIsBuilt(solrDocument);
 	}
 	
 	@Test
 	public void buildDocumentWithOwnerAndOwnerEmailUsesOwnerEmail() {
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
+
 		
 		assertSolrDocumentIsBuilt(solrDocument);
 	}
@@ -125,26 +126,11 @@ public class EventIndexerTest {
 	public void buildDocumentWithoutOwnerNorOwnerEmailFails() {
 		eventToIndex.setOwner("");
 		eventToIndex.setOwnerEmail("");
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq(""), eq(domain))).andReturn(null);
+		expect(userDao.findUser("", domain)).andReturn(null);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
-		
-		assertSolrDocumentIsBuilt(solrDocument);
-	}
-	
-	@Test
-	public void indexEventWithoutOwnerNorOwnerEmailSucceeds() throws Exception {
-		eventToIndex.setOwner("");
-		eventToIndex.setOwnerEmail("");
-		expect(userDao.findUser(eq(""), eq(domain))).andReturn(null);
-		mocksControl.replay();
-		
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
-		
-		assertThat(eventIndexer.doIndex()).isTrue();
+		testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
 	}
 	
 	@Test
@@ -153,16 +139,15 @@ public class EventIndexerTest {
 		eventRecurrence.setKind(RecurrenceKind.daily);
 		eventToIndex.setRecurrence(eventRecurrence);
 		eventToIndex.setPrivacy(EventPrivacy.PRIVATE);
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		
+		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
-		String[] is = {"periodic", "busy", "private"};
-		assertThat(solrDocument.getField("is").getValues().toArray()).isEqualTo(is);
+		assertThat(solrDocument.getField("is").getValues()).containsExactly("periodic", "busy", "private");
 	}
 	
 	@Test
@@ -170,32 +155,28 @@ public class EventIndexerTest {
 		eventToIndex.setAllday(true);
 		eventToIndex.setOpacity(EventOpacity.TRANSPARENT);
 		eventToIndex.setPrivacy(EventPrivacy.CONFIDENTIAL);
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
-		String[] is = {"allday", "free", "confidential"};
 		assertThat(solrDocument.getField("duration").getValue()).isEqualTo(86400);
-		assertThat(solrDocument.getField("is").getValues().toArray()).isEqualTo(is);
+		assertThat(solrDocument.getField("is").getValues()).containsExactly("allday", "free", "confidential");
 	}
 	
 	@Test
 	public void buildDocumentOfSimpleFreePublicEvent() {
 		eventToIndex.setOpacity(EventOpacity.TRANSPARENT);
-		eventIndexer = new EventIndexer(null, null, userDao, domain, eventToIndex);
 		
-		expect(userDao.findUser(eq("owner@domain.com"), eq(domain))).andReturn(user);
+		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = eventIndexer.buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
-		String[] is = {"free"};
-		assertThat(solrDocument.getField("is").getValues().toArray()).isEqualTo(is);
+		assertThat(solrDocument.getField("is").getValues()).containsExactly("free");
 	}
 	
 	
@@ -215,7 +196,7 @@ public class EventIndexerTest {
 		assertThat(solrDocument.getField("date").getValue()).isEqualTo(date("2012-12-13T13:14:15"));
 		assertThat(solrDocument.getField("ownerId").getValue()).isEqualTo(1);
 		assertThat(solrDocument.getField("description").getValue()).isEqualTo("description");
-		String[] with = {"Attendee One attendee.one@domain.com", " testgt@domain.com", "Owner owner@domain.com"};
+		String[] with = {"Attendee One attendee.one@domain.com", "testgt@domain.com", "Owner owner@domain.com"};
 		assertThat(solrDocument.getField("with").getValues().toArray()).isEqualTo(with);
 		String[] owner = {"User", "Obm", "user", "user@test"};
 		assertThat(solrDocument.getField("owner").getValues().toArray()).isEqualTo(owner);

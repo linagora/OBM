@@ -29,9 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr.jms;
 
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.solr.IndexerFactory;
 import org.obm.sync.solr.Remover;
 import org.obm.sync.solr.SolrRequest;
 
@@ -39,12 +37,12 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class EventDeleteCommand extends EventCommand {
 	
-	public EventDeleteCommand(ObmDomain domain, Event data) {
-		super(domain, data);
+	public EventDeleteCommand(ObmDomain domain, String login, Event data) {
+		super(domain, login, data);
 	}
 
 	@Override
-	public SolrRequest asSolrRequest(CommonsHttpSolrServer server, IndexerFactory<Event> factory) {
-		return new Remover(server, String.valueOf(getObject().getObmId().getObmId()));
+	public SolrRequest asSolrRequest() {
+		return new Remover(getLoginAtDomain(), getSolrService(), String.valueOf(getObject().getObmId().getObmId()));
 	}
 }

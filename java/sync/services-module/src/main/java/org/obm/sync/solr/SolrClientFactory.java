@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -29,12 +29,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.solr;
 
-import java.io.Serializable;
-
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+public interface SolrClientFactory {
 
-public interface IndexerFactory<T extends Serializable> {
-	SolrRequest createIndexer(CommonsHttpSolrServer srv, ObmDomain domain, T e);
+	public abstract CommonsHttpSolrServer create(SolrService service,
+			String loginAtDomain);
+
 }

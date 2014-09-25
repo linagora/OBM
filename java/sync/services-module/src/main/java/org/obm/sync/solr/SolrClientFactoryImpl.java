@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -27,59 +27,57 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr.jms;
+package org.obm.sync.solr;
 
-import java.io.Serializable;
-import java.util.EnumMap;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
-import org.obm.sync.solr.ContactIndexer;
-import org.obm.sync.solr.EventIndexer;
-import org.obm.sync.solr.IndexerFactory;
-import org.obm.sync.solr.SolrRequest;
-import org.obm.sync.solr.SolrService;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class DefaultCommandConverter implements CommandConverter {
-	private final LocatorService locatorService;
-	private final EnumMap<SolrService, IndexerFactory<? extends Serializable>> solrServiceToFactoryMap;
-	private final HttpClient solrHttpClient;
-	
+public class SolrClientFactoryImpl implements SolrClientFactory {
+
+	private HttpClient httpClient;
+	private LocatorService locatorService;
+
 	@Inject
 	@VisibleForTesting
-	public DefaultCommandConverter(LocatorService locatorService, ContactIndexer.Factory contactIndexerFactory, EventIndexer.Factory eventIndexerFactory) {
+	SolrClientFactoryImpl(LocatorService locatorService) {
 		this.locatorService = locatorService;
-		
+		this.httpClient = buildHttpClient();
+	}
+
+	private HttpClient buildHttpClient() {
 		MultiThreadedHttpConnectionManager cnxManager = new MultiThreadedHttpConnectionManager();
 		cnxManager.getParams().setDefaultMaxConnectionsPerHost(10);
 		cnxManager.getParams().setMaxTotalConnections(100);
-		solrHttpClient = new HttpClient(cnxManager);
-	
-		solrServiceToFactoryMap = new EnumMap<SolrService, IndexerFactory<? extends Serializable>>(SolrService.class);
-		solrServiceToFactoryMap.put(SolrService.EVENT_SERVICE, eventIndexerFactory);
-		solrServiceToFactoryMap.put(SolrService.CONTACT_SERVICE, contactIndexerFactory);
+		return new HttpClient(cnxManager);
 	}
 
-	@Override
-	public <T extends Serializable> SolrRequest convert(Command<T> command) throws Exception {
-		SolrService solrService = command.getSolrService();
-		IndexerFactory<T> factory = (IndexerFactory<T>) solrServiceToFactoryMap.get(solrService);
-		
-		if (factory == null) {
-			throw new IllegalArgumentException("Unknown SolR service '" + solrService + "'.");
+	public CommonsHttpSolrServer create(SolrService service, String loginAtDomain) {
+		try {
+			URI uri = new URIBuilder()
+			.setScheme("http")
+			.setHost(locatorService.getServiceLocation(service.getName(), loginAtDomain))
+			.setPort(8080)
+			.setPath('/' + service.getName())
+			.build();
+			return new CommonsHttpSolrServer(uri.toURL(), httpClient);
+		} catch (MalformedURLException e) {
+			throw new LocatorClientException(e);
+		} catch (URISyntaxException e) {
+			throw new LocatorClientException(e);
 		}
-		
-		String solrLocation = locatorService.getServiceLocation(solrService.getName(), command.getDomain().getName());
-		CommonsHttpSolrServer server = new CommonsHttpSolrServer("http://" + solrLocation + ":8080/" + solrService.getName(), solrHttpClient);
-		
-		return command.asSolrRequest(server, factory);
 	}
-	
+
 }
