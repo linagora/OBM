@@ -31,13 +31,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import java.io.Serializable;
+import java.io.IOException;
+import java.net.MalformedURLException;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrInputDocument;
 import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
 import org.hornetq.core.remoting.impl.netty.TransportConstants;
 import org.obm.Configuration;
@@ -53,10 +58,10 @@ import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
-import org.obm.sync.solr.SolrRequest;
-import org.obm.sync.solr.jms.Command;
-import org.obm.sync.solr.jms.CommandConverter;
+import org.obm.sync.solr.SolrClientFactory;
+import org.obm.sync.solr.SolrService;
 
+import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
@@ -122,22 +127,44 @@ public class ModuleUtils {
 		};
 	}
 	
+	private static class DummyCommonsHttpSolrServer extends CommonsHttpSolrServer {
+		public DummyCommonsHttpSolrServer() throws MalformedURLException {
+			super("http://localhost:8983/solr/");
+		}
+		
+		@Override
+		public UpdateResponse deleteById(String id) throws SolrServerException,
+				IOException {
+			return null;
+		}
+		
+		@Override
+		public UpdateResponse add(SolrInputDocument doc)
+				throws SolrServerException, IOException {
+			return null;
+		}
+		
+		@Override
+		public UpdateResponse commit() throws SolrServerException, IOException {
+			return null;
+		}
+	}
+	
 	public static Module buildDummySolrModule() {
 		return new AbstractModule() {
-
+			
 			@Override
 			protected void configure() {
-				bind(CommandConverter.class).toInstance(new CommandConverter() {
+				bind(SolrClientFactory.class).toInstance(new SolrClientFactory() {
 					
 					@Override
-					public <T extends Serializable> SolrRequest convert(Command<T> command) throws Exception {
-						return new SolrRequest(null) {
-							
-							@Override
-							public void run() throws Exception {
-								// do nothing
-							}
-						};
+					public CommonsHttpSolrServer create(SolrService service,
+							String loginAtDomain) {
+						try {
+							return new DummyCommonsHttpSolrServer();
+						} catch (MalformedURLException e) {
+							throw Throwables.propagate(e);
+						}
 					}
 				});
 			}

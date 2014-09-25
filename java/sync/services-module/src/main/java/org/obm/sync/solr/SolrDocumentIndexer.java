@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -27,27 +27,24 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr.jms;
+package org.obm.sync.solr;
 
-import org.obm.sync.book.Contact;
-import org.obm.sync.solr.SolrService;
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.common.SolrInputDocument;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+public class SolrDocumentIndexer extends SolrRequest {
 
-public abstract class ContactCommand extends Command<Contact> {
+	private final SolrInputDocument document;
 
-	public ContactCommand(ObmDomain domain, String login, Contact data) {
-		super(domain, login, data);
+	public SolrDocumentIndexer(String loginAtDomain, SolrService solrService, SolrInputDocument document) {
+		super(loginAtDomain, solrService);
+		this.document = document;
 	}
 
 	@Override
-	public SolrJmsQueue getQueue() {
-		return SolrJmsQueue.CONTACT_CHANGES_QUEUE;
-	}
-
-	@Override
-	public SolrService getSolrService() {
-		return SolrService.CONTACT_SERVICE;
+	public void run(CommonsHttpSolrServer server) throws Exception {
+		server.add(document);
+		server.commit();
 	}
 
 }

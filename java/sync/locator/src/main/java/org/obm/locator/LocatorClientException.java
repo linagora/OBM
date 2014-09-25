@@ -39,4 +39,8 @@ public class LocatorClientException extends RuntimeException {
 		super(message, cause);
 	}
 
+	public LocatorClientException(Throwable cause) {
+		super(cause);
+	}
+
 }

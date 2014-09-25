@@ -27,12 +27,51 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr.jms;
+package org.obm.sync.solr;
 
-import java.io.Serializable;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
 
-import org.obm.sync.solr.SolrRequest;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public interface CommandConverter {
-	<T extends Serializable> SolrRequest convert(Command<T> command) throws Exception;
+import org.easymock.IMocksControl;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.obm.locator.store.LocatorService;
+
+public class SolrClientFactoryTest {
+
+	private SolrClientFactory factory;
+	private LocatorService locatorService;
+	private IMocksControl control;
+
+	@Before
+	public void setUp() {
+		control = createControl();
+		locatorService = control.createMock(LocatorService.class);
+		factory = new SolrClientFactoryImpl(locatorService);
+	}
+
+	@After
+	public void tearDown() {
+		control.verify();
+	}
+
+	@Test
+	public void testCreateShouldSucceedWhenServiceIsSolrEvent() throws Exception {
+		expect(locatorService.getServiceLocation("solr/event", "l@d")).andReturn("1.2.3.4");
+		control.replay();
+
+		assertThat(factory.create(SolrService.EVENT_SERVICE, "l@d").getBaseURL()).isEqualTo("http://1.2.3.4:8080/solr/event");
+	}
+
+	@Test
+	public void testCreateShouldSucceedWhenServiceIsSolrContact() throws Exception {
+		expect(locatorService.getServiceLocation("solr/contact", "l@d")).andReturn("1.2.3.4");
+		control.replay();
+
+		assertThat(factory.create(SolrService.CONTACT_SERVICE, "l@d").getBaseURL()).isEqualTo("http://1.2.3.4:8080/solr/contact");
+	}
+
 }
