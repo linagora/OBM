@@ -5,7 +5,7 @@
 	<appender name="PROD" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <File>/var/log/obm-sync/obm-sync.log</File>
                 <layout>
-                        <pattern>%d{dd-MM-yyyy|HH:mm:ss.SSS} [%-5level] {%logger{32}} : %msg%n</pattern>
+                        <pattern>%d{${time-pattern:-"HH:mm:ss.SSS"}} [%-5level] {%logger{32}} [t%X{threadId}/c%X{command}/r%X{requestId}/%X{user}] %msg%n</pattern>
                 </layout>
                 <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
                         <maxIndex>10</maxIndex>
@@ -19,7 +19,7 @@
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<layout>
 			<pattern>
-				%d{dd-MM-yyyy|HH:mm:ss.SSS} [%-5level] {%logger{32}} : %msg%n
+			    %d{${time-pattern:-"HH:mm:ss.SSS"}} [%-5level] {%logger{32}} [t%X{threadId}/c%X{command}/r%X{requestId}/%X{user}] %msg%n
 			</pattern>
 		</layout>
 	</appender>

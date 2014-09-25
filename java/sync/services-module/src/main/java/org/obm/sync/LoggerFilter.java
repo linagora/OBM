@@ -9,7 +9,7 @@
  * with the Additional Terms applicable for OBM connector by Linagora 
  * pursuant to Section 7 of the GNU Affero General Public License, 
  * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
- * the “Message sent thanks to OBM, Free Communication by Linagora” 
+ * the â€œMessage sent thanks to OBM, Free Communication by Linagoraâ€ 
  * signature notice appended to any and all outbound messages 
  * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
  * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
@@ -29,30 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.server.handler;
+package org.obm.sync;
 
-import org.obm.sync.LoggerService;
-import org.obm.sync.calendar.CalendarItemsParser;
-import org.obm.sync.calendar.EventType;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.calendar.CalendarBindingImpl;
-import fr.aliacom.obm.common.session.SessionManagement;
-
 @Singleton
-public class TodoHandler extends EventHandler {
+public class LoggerFilter implements Filter {
 
+	private final LoggerService loggerService;
+	private final AtomicInteger id;
+	
 	@Inject
-	public TodoHandler(SessionManagement sessionManagement,
-			LoggerService loggerService,
-			CalendarBindingImpl calendarBindingImpl,
-			CalendarItemsParser cip) {
-
-		super(sessionManagement, loggerService, calendarBindingImpl, cip);
-		
-		calendarBindingImpl.setEventType(EventType.VTODO);
+	private LoggerFilter(LoggerService loggerService) {
+		this.loggerService = loggerService;
+		this.id = new AtomicInteger();
+	}
+	
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
 	}
 
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) 
+			throws IOException, ServletException {
+		
+		try {
+			loggerService.startSession();
+			loggerService.defineRequestId(id.getAndIncrement());
+			chain.doFilter(request, response);
+		} finally {
+			loggerService.closeSession();
+		}
+	}
+
+	@Override
+	public void destroy() {
+	}
 }

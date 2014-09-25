@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.icalendar.Ical4jHelper;
+import org.obm.sync.LoggerService;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.SyncRange;
@@ -61,12 +62,14 @@ import fr.aliacom.obm.common.calendar.ResourceNotFoundException;
 @Singleton
 public class ResourceServlet extends HttpServlet {
 
-	private final Logger logger = LoggerFactory.getLogger(ResourceServlet.class);
+	private final static Logger logger = LoggerFactory.getLogger(ResourceServlet.class);
+	private final LoggerService loggerService;
 	private final ICalendar calendarBinding;
 	private final Ical4jHelper ical4jHelper;
 
 	@Inject
-	@VisibleForTesting ResourceServlet(ICalendar calendarBinding, Ical4jHelper ical4jHelper) {
+	@VisibleForTesting ResourceServlet(LoggerService loggerService, ICalendar calendarBinding, Ical4jHelper ical4jHelper) {
+		this.loggerService = loggerService;
 		this.calendarBinding = calendarBinding;
 		this.ical4jHelper = ical4jHelper;
 		
@@ -74,14 +77,16 @@ public class ResourceServlet extends HttpServlet {
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String resourceEmail = extractResourceEmail(request);
-		if (resourceEmail == null) {
-			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			logger.warn("The email of the resource is null or empty ");
-			return;			
-		}
-		
 		try {
+			String resourceEmail = extractResourceEmail(request);
+			if (resourceEmail == null) {
+				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+				logger.warn("The email of the resource is null or empty ");
+				return;			
+			}
+			loggerService.defineUser(resourceEmail);
+			loggerService.defineCommand(ResourceServlet.class.getSimpleName());
+
 			response.setContentType("text/calendar;charset=UTF-8");
 			String resourceICS = getResourceICS(resourceEmail, extractSyncRange(request));
 			
@@ -91,13 +96,11 @@ public class ResourceServlet extends HttpServlet {
 				response.getWriter().write(resourceICS);
 				response.setStatus(HttpServletResponse.SC_OK);
 			}
-		}
-		catch(ResourceNotFoundException e) {
+		} catch(ResourceNotFoundException e) {
 			logger.error(e.getMessage(),  e);
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			response.flushBuffer();			
-		}
-		catch (ServerFault e) {
+		} catch (ServerFault e) {
 			logger.error(e.getMessage(),  e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.flushBuffer();
