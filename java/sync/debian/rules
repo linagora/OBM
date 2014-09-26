@@ -46,7 +46,7 @@ install/obm-sync: WEB_INF = $(shell find $(CURDIR)/services-webapp/target -name 
 install/obm-sync: INSTALL_DIR := $(CURDIR)/debian/obm-sync/usr/share/obm-sync/
 install/obm-sync::
 	cp -r $(WEB_INF) $(INSTALL_DIR)
-	rm -f $(INSTALL_DIR)/WEB-INF/lib/postgresql-9.0-801.jdbc4.jar
+	rm -f $(INSTALL_DIR)/WEB-INF/lib/postgresql-*.jdbc4.jar
 	rm -f $(INSTALL_DIR)/WEB-INF/lib/slf4j-api-*.jar
 	rm -f $(INSTALL_DIR)/WEB-INF/lib/logback*.jar
 	rm -f $(INSTALL_DIR)/WEB-INF/lib/jta-1.1.jar

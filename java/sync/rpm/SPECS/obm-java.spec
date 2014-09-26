@@ -98,7 +98,7 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/obm-sync
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/obm-sync/jms
 WEB_INF=`find services-webapp/target -name WEB-INF`
 cp -r ${WEB_INF} $RPM_BUILD_ROOT%{_datadir}/obm-sync
-rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/postgresql-9.0-801.jdbc4.jar
+rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/postgresql-*.jdbc4.jar
 rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/slf4j-api-*.jar
 rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/logback*.jar
 rm -f $RPM_BUILD_ROOT%{_datadir}/obm-sync/WEB-INF/lib/jta-1.1.jar
