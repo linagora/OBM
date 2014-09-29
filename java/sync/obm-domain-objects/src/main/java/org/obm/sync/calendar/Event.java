@@ -700,6 +700,10 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Cloneable, 
 		return getRecurrence().isRecurrent();
 	}
 
+	public boolean hasEndRepeat() {
+		return this.isRecurrent() && this.getRecurrence().hasEndRepeat();
+    }
+
 	public Set<Event> getEventsExceptions() {
 		return recurrence.getEventExceptions();
 	}

@@ -399,4 +399,16 @@ public class EventRecurrenceTest {
 		return id == 0 ? true : false;
 	}
 
+	@Test
+	public void testHasEndRepeat() {
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setEnd(new Date());
+		Assert.assertTrue(recurrence.hasEndRepeat());
+	}
+
+	@Test
+	public void testHasNoEndRepeat() {
+		EventRecurrence recurrence = new EventRecurrence();
+		Assert.assertFalse(recurrence.hasEndRepeat());
+	}
 }

@@ -48,9 +48,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.DateTime;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.Months;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.ConfigurationService;
@@ -397,8 +397,9 @@ public class CalendarBindingImpl implements ICalendar {
 			
 			assertEventCanBeModified(token, calendarUser, before);
 			convertAttendees(event, calendarUser);
+			Event forceEndRepeatEvent = forceEndRepeatToLastOccurrence(event);
 			
-			Event toReturn = modifyEvent(token, calendar, event, updateAttendees, notification, before);
+			Event toReturn = modifyEvent(token, calendar, forceEndRepeatEvent, updateAttendees, notification, before);
 
 			return inheritAlertFromOwnerIfNotSet(token.getObmId(), calendarUser.getUid(), toReturn);
 		} catch (Throwable e) {
@@ -408,6 +409,27 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault(e);
 		}
 
+	}
+
+	@VisibleForTesting Event forceEndRepeatToLastOccurrence(Event event) {
+		if (!event.hasEndRepeat()) {
+			return event;
+		}
+
+		Event clone = event.clone();
+		
+		List<Date> occurrences = ical4jHelper.dateInInterval(
+				event.getRecurrence(),
+				event.getStartDate(),
+				event.getStartDate(),
+				event.getRecurrence().getEnd(),
+				event.getRecurrence().getExceptions());
+
+		Date newEndRepeat = new DateTime(Iterables.getLast(occurrences))
+															.plusSeconds(event.getDuration())
+															.toDate();
+		clone.getRecurrence().setEnd(newEndRepeat);
+		return clone;
 	}
 
 	private Event modifyEvent(AccessToken token, String calendar, Event event, boolean updateAttendees, boolean notification, Event before) throws ServerFault {
@@ -915,7 +937,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 	
 	private String getRecurrenceIdToIcalFormat(Date recurrenceId) {
-		DateTime recurrenceIdToIcalFormat = new DateTime(recurrenceId);
+		net.fortuna.ical4j.model.DateTime recurrenceIdToIcalFormat = new net.fortuna.ical4j.model.DateTime(recurrenceId);
 		recurrenceIdToIcalFormat.setUtc(true);
 		return recurrenceIdToIcalFormat.toString();
 	}
@@ -1427,8 +1449,10 @@ public class CalendarBindingImpl implements ICalendar {
 		recurrence.setKind(RecurrenceKind.none);
 		eventException.setRecurrence(recurrence);
 		if (recurrenceId != null) {
-			eventException.setStartDate(new DateTime(recurrenceId.getRecurrenceId()));
-			eventException.setRecurrenceId(new DateTime(recurrenceId.getRecurrenceId()));
+			eventException.setStartDate(
+					new net.fortuna.ical4j.model.DateTime(recurrenceId.getRecurrenceId()));
+			eventException.setRecurrenceId(
+					new net.fortuna.ical4j.model.DateTime(recurrenceId.getRecurrenceId()));
 		}
 		return eventException;
 	}

@@ -1674,4 +1674,29 @@ public class EventTest {
 
 		assertThat(newEventOrganizer).isEqualTo(organizer).isEqualToComparingFieldByField(organizer);
 	}
+
+	@Test
+	public void testHasEndRepeat() {
+		Event event = new Event();
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setEnd(new Date());
+		event.setRecurrence(recurrence);
+		assertThat(event.hasEndRepeat()).isTrue();
+	}
+
+	@Test
+	public void testHasNoEndRepeatButIsRecurrent() {
+		Event event = new Event();
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		event.setRecurrence(recurrence);
+		assertThat(event.hasEndRepeat()).isFalse();
+	}
+
+	@Test
+	public void testHasNoEndRepeat() {
+		Event event = new Event();
+		assertThat(event.hasEndRepeat()).isFalse();
+	}
 }
