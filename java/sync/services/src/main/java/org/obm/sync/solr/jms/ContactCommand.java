@@ -36,8 +36,8 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public abstract class ContactCommand extends Command<Contact> {
 
-	public ContactCommand(ObmDomain domain, String login, Contact data) {
-		super(domain, login, data);
+	public ContactCommand(ObmDomain domain, Contact data) {
+		super(domain, data);
 	}
 
 	@Override

@@ -37,12 +37,12 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class EventDeleteCommand extends EventCommand {
 	
-	public EventDeleteCommand(ObmDomain domain, String login, Event data) {
-		super(domain, login, data);
+	public EventDeleteCommand(ObmDomain domain, Event data) {
+		super(domain, data);
 	}
 
 	@Override
 	public SolrRequest asSolrRequest() {
-		return new Remover(getLoginAtDomain(), getSolrService(), String.valueOf(getObject().getObmId().getObmId()));
+		return new Remover(getDomain(), getSolrService(), String.valueOf(getObject().getObmId().getObmId()));
 	}
 }

@@ -348,7 +348,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private void indexEvent(AccessToken editor, Event ev) {
 		try {
-			solrHelperFactory.createClient(editor).createOrUpdate(ev);
+			solrHelperFactory.createClient(editor.getDomain()).createOrUpdate(ev);
 		} catch (Throwable t) {
 			logger.error("indexing error " + t.getMessage(), t);
 		}
@@ -2149,7 +2149,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private void removeEventFromSolr(AccessToken token, Event ev) {
 		try {
-			solrHelperFactory.createClient(token).delete(ev);
+			solrHelperFactory.createClient(token.getDomain()).delete(ev);
 		} catch (Throwable t) {
 			logger.error("indexing error " + t.getMessage(), t);
 		}

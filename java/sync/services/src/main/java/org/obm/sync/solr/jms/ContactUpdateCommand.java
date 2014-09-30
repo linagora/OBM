@@ -66,23 +66,23 @@ public class ContactUpdateCommand extends ContactCommand {
 			this.obmHelper = obmHelper;
 		}
 
-		public ContactUpdateCommand create(ObmDomain domain, String login, Contact data) {
-			return new ContactUpdateCommand(domain, login, data, obmHelper);
+		public ContactUpdateCommand create(ObmDomain domain, Contact data) {
+			return new ContactUpdateCommand(domain, data, obmHelper);
 		}
 		
 	}
 	
 	private final ObmHelper obmHelper;
 
-	private ContactUpdateCommand(ObmDomain domain, String login, Contact data, ObmHelper obmHelper) {
-		super(domain, login, data);
+	private ContactUpdateCommand(ObmDomain domain, Contact data, ObmHelper obmHelper) {
+		super(domain, data);
 		this.obmHelper = obmHelper;
 	}
 
 	@Override
 	public SolrRequest asSolrRequest() {
 		try {
-			return new SolrDocumentIndexer(getLoginAtDomain(), getSolrService(), dataToDocument());
+			return new SolrDocumentIndexer(getDomain(), getSolrService(), dataToDocument());
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}

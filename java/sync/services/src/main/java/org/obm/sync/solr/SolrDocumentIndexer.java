@@ -34,12 +34,14 @@ package org.obm.sync.solr;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public class SolrDocumentIndexer extends SolrRequest {
 
 	private final SolrInputDocument document;
 
-	public SolrDocumentIndexer(String loginAtDomain, SolrService solrService, SolrInputDocument document) {
-		super(loginAtDomain, solrService);
+	public SolrDocumentIndexer(ObmDomain domain, SolrService solrService, SolrInputDocument document) {
+		super(domain, solrService);
 		this.document = document;
 	}
 	

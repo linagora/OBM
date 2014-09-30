@@ -384,7 +384,7 @@ public class ContactDao {
 		try {
 			// no need to pass the sql connection as indexing will be done in a
 			// separate thread
-			solrHelperFactory.createClient(at).createOrUpdate(c);
+			solrHelperFactory.createClient(at.getDomain()).createOrUpdate(c);
 		} catch (Exception e) {
 			throw new ServerFault("Indexing server is unavailable", e);
 		}
@@ -1344,7 +1344,7 @@ public class ContactDao {
 
 	private void removeContactFromSolr(AccessToken at, Contact c) throws ServerFault {
 		try {
-			solrHelperFactory.createClient(at).delete(c);
+			solrHelperFactory.createClient(at.getDomain()).delete(c);
 		} catch (Exception e) {
 			throw new ServerFault("Indexing server is unavailable", e);
 		}
@@ -1651,7 +1651,7 @@ public class ContactDao {
 		ResultSet rs = null;
 		try {
 			if (addrBooks.size() > 0) {
-				SolrHelper solrHelper = solrHelperFactory.createClient(at);
+				SolrHelper solrHelper = solrHelperFactory.createClient(at.getDomain());
 				CommonsHttpSolrServer solrServer = solrHelper.getSolrContact();
 				StringBuilder sb = new StringBuilder();
 				sb.append("-is:archive ");

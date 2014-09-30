@@ -45,24 +45,13 @@ public abstract class Command<T extends Serializable> implements Serializable {
 	private final ObmDomain domain;
 	private final T object;
 
-	private String login;
-
-	protected Command(ObmDomain domain, String login, T object) {
+	protected Command(ObmDomain domain, T object) {
 		this.domain = domain;
-		this.login = login;
 		this.object = object;
 	}
 
 	public ObmDomain getDomain() {
 		return domain;
-	}
-
-	public String getLogin() {
-		return login;
-	}
-	
-	protected String getLoginAtDomain() {
-		return login + "@" + domain.getName();
 	}
 	
 	public T getObject() {

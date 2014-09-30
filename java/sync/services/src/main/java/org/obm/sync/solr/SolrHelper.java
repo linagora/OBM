@@ -32,7 +32,6 @@
 package org.obm.sync.solr;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.solr.jms.ContactDeleteCommand;
@@ -73,29 +72,27 @@ public class SolrHelper {
 			this.eventCommandFactory = eventCommandFactory;
 		}
 
-		public SolrHelper createClient(AccessToken at) {
+		public SolrHelper createClient(ObmDomain domain) {
 			if(!solrManager.isSolrAvailable()) {
 				throw new IllegalStateException("SolR is unavailable");
 			}
 			
-			return new SolrHelper(at, solrManager, solrClientFactory, eventCommandFactory, contactCommandFactory);
+			return new SolrHelper(domain, solrManager, solrClientFactory, eventCommandFactory, contactCommandFactory);
 		}
 	}
 	
-	private final AccessToken at;
 	private final ObmDomain domain;
 	private final SolrManager solrManager;
 	private final EventUpdateCommand.Factory eventCommandFactory;
 	private final ContactUpdateCommand.Factory contactCommandFactory;
 	private final SolrClientFactory solrClientFactory;
 	
-	private SolrHelper(AccessToken at, SolrManager solrManager,
+	private SolrHelper(ObmDomain domain, SolrManager solrManager,
 			SolrClientFactory solrClientFactory,
 			EventUpdateCommand.Factory eventCommandFactory, 
 			ContactUpdateCommand.Factory contactCommandFactory) {
-		this.at = at;
 		this.solrClientFactory = solrClientFactory;
-		this.domain = at.getDomain();
+		this.domain = domain;
 		this.solrManager = solrManager;
 		this.eventCommandFactory = eventCommandFactory;
 		this.contactCommandFactory = contactCommandFactory;
@@ -103,26 +100,26 @@ public class SolrHelper {
 	}
 
 	public CommonsHttpSolrServer getSolrContact() {
-		return solrClientFactory.create(SolrService.CONTACT_SERVICE, at.getUserLogin() + "@" + domain.getName());
+		return solrClientFactory.create(SolrService.CONTACT_SERVICE, domain);
 	}
 	
 	public void createOrUpdate(Contact contact) {
 		logger.info("[contact {}] scheduled for solr indexing", contact.getUid());
-		solrManager.process(contactCommandFactory.create(domain, at.getUserLogin(), contact));
+		solrManager.process(contactCommandFactory.create(domain, contact));
 	}
 
 	public void delete(Contact contact) {
 		logger.info("[contact {} ] scheduled for solr removal", contact.getUid());
-		solrManager.process(new ContactDeleteCommand(domain, at.getUserLogin(), contact));
+		solrManager.process(new ContactDeleteCommand(domain, contact));
 	}
 
 	public void delete(Event event) {
 		logger.info("[event {} ] scheduled for solr removal", event.getObmId());
-		solrManager.process(new EventDeleteCommand(domain, at.getUserLogin(), event));
+		solrManager.process(new EventDeleteCommand(domain, event));
 	}
 
 	public void createOrUpdate(Event event) {
 		logger.info("[event {} ] scheduled for solr indexing", event.getObmId());
-		solrManager.process(eventCommandFactory.create(domain, at.getUserLogin(), event));
+		solrManager.process(eventCommandFactory.create(domain, event));
 	}
 }

@@ -55,6 +55,8 @@ import org.obm.sync.solr.jms.SolrJmsQueue;
 
 import com.linagora.obm.sync.QueueManager;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 
 public class SolrManagerTest {
 
@@ -78,12 +80,12 @@ public class SolrManagerTest {
 		server = control.createMock(CommonsHttpSolrServer.class);//createMockBuilder(CommonsHttpSolrServer.class).addMockedMethod("ping").createStrictMock();
 		
 		expect(configurationService.solrCheckingInterval()).andReturn(10).anyTimes();
-		expect(solrClientFactory.create(SolrService.CONTACT_SERVICE, "l@d")).andReturn(server).anyTimes();
+		expect(solrClientFactory.create(SolrService.CONTACT_SERVICE, ObmDomain.builder().name("d").build())).andReturn(server).anyTimes();
 		
 		PingSolrRequest.lock = new ReentrantLock();
 		PingSolrRequest.condition = PingSolrRequest.lock.newCondition();
 		PingSolrRequest.error = null;
-		pingRequest = new PingSolrRequest("l@d", SolrService.CONTACT_SERVICE);
+		pingRequest = new PingSolrRequest(ObmDomain.builder().name("d").build(), SolrService.CONTACT_SERVICE);
 		pingCommand = new PingCommand(pingRequest);
 	}
 	
@@ -97,7 +99,7 @@ public class SolrManagerTest {
 	
 	@Test
 	public void removerRequestShouldBeSerializable() throws Exception {
-		Remover remover = new Remover("l@d", SolrService.CONTACT_SERVICE, "id");
+		Remover remover = new Remover(ObmDomain.builder().name("d").build(), SolrService.CONTACT_SERVICE, "id");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		
@@ -115,7 +117,7 @@ public class SolrManagerTest {
 	
 	@Test
 	public void solrDocumentIndexerShouldBeSerializable() throws Exception {
-		SolrDocumentIndexer indexer = new SolrDocumentIndexer("l@d", SolrService.CONTACT_SERVICE, new SolrInputDocument());
+		SolrDocumentIndexer indexer = new SolrDocumentIndexer(ObmDomain.builder().name("d").build(), SolrService.CONTACT_SERVICE, new SolrInputDocument());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		
@@ -222,7 +224,7 @@ public class SolrManagerTest {
 		}
 		
 		public PingCommand(SolrJmsQueue queue, PingSolrRequest request) {
-			super(null, "l", 0);
+			super(null, 0);
 			
 			this.queue = queue;
 			this.request = request;

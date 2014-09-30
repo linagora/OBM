@@ -49,6 +49,7 @@ import org.obm.sync.solr.jms.EventUpdateCommand;
 import com.linagora.obm.sync.QueueManager;
 
 import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class SolrHelperFactoryTest {
 
@@ -77,7 +78,7 @@ public class SolrHelperFactoryTest {
 		EventUpdateCommand.Factory eventCommandFactory = control.createMock(EventUpdateCommand.Factory.class);
 		
 		expect(configurationService.solrCheckingInterval()).andReturn(10);
-		expect(solrClientFactory.create(SolrService.CONTACT_SERVICE, "user@test.tlse.lng")).andReturn(solrClient);
+		expect(solrClientFactory.create(SolrService.CONTACT_SERVICE, ObmDomain.builder().name("test.tlse.lng").build())).andReturn(solrClient);
 		expect(solrClient.deleteById(anyObject(String.class))).andReturn(null);
 		expect(solrClient.commit()).andReturn(null);
 
@@ -130,7 +131,7 @@ public class SolrHelperFactoryTest {
 
 	private void delete(boolean solrUp) {
 		manager.setSolrAvailable(solrUp);
-		factory.createClient(accessToken).delete(contact);
+		factory.createClient(accessToken.getDomain()).delete(contact);
 	}
 
 	private void fail() {

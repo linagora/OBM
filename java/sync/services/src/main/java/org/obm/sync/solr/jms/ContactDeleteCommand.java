@@ -37,12 +37,12 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class ContactDeleteCommand extends ContactCommand {
 	
-	public ContactDeleteCommand(ObmDomain domain, String login, Contact data) {
-		super(domain, login, data);
+	public ContactDeleteCommand(ObmDomain domain, Contact data) {
+		super(domain, data);
 	}
 
 	@Override
 	public SolrRequest asSolrRequest() {
-		return new Remover(getLoginAtDomain(), getSolrService(), String.valueOf(getObject().getUid()));
+		return new Remover(getDomain(), getSolrService(), String.valueOf(getObject().getUid()));
 	}
 }

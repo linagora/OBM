@@ -70,16 +70,16 @@ public class EventUpdateCommand extends EventCommand {
 			this.obmHelper = obmHelper;
 		}
 
-		public EventUpdateCommand create(ObmDomain domain, String login, Event data) {
-			return new EventUpdateCommand(domain, data, login, userDao, obmHelper);
+		public EventUpdateCommand create(ObmDomain domain, Event data) {
+			return new EventUpdateCommand(domain, data, userDao, obmHelper);
 		}
 	}
 
 	private UserDao userDao;
 	private ObmHelper obmHelper;
 
-	private EventUpdateCommand(ObmDomain domain, Event data, String login, UserDao userDao, ObmHelper obmHelper) {
-		super(domain, login, data);
+	private EventUpdateCommand(ObmDomain domain, Event data, UserDao userDao, ObmHelper obmHelper) {
+		super(domain, data);
 		this.userDao = userDao;
 		this.obmHelper = obmHelper;
 	}
@@ -87,7 +87,7 @@ public class EventUpdateCommand extends EventCommand {
 	@Override
 	public SolrRequest asSolrRequest() {
 		try {
-			return new SolrDocumentIndexer(getLoginAtDomain(), getSolrService(), dataToDocument());
+			return new SolrDocumentIndexer(getDomain(), getSolrService(), dataToDocument());
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}

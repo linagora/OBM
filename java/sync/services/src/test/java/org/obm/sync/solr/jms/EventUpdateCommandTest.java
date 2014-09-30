@@ -93,7 +93,7 @@ public class EventUpdateCommandTest {
 
 		eventToIndex.setOwner("");
 		
-		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
 	}
@@ -105,7 +105,7 @@ public class EventUpdateCommandTest {
 		expect(userDao.findUser("owner", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, eventToIndex).buildDocument();
 
 		
 		assertSolrDocumentIsBuilt(solrDocument);
@@ -117,7 +117,7 @@ public class EventUpdateCommandTest {
 		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, eventToIndex).buildDocument();
 
 		
 		assertSolrDocumentIsBuilt(solrDocument);
@@ -131,7 +131,7 @@ public class EventUpdateCommandTest {
 		expect(userDao.findUser("", domain)).andReturn(null);
 		mocksControl.replay();
 		
-		testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
+		testee.create(domain, eventToIndex).buildDocument();
 	}
 	
 	@Test
@@ -145,7 +145,7 @@ public class EventUpdateCommandTest {
 		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
 		assertThat(solrDocument.getField("is").getValues()).containsExactly("periodic", "busy", "private");
@@ -160,7 +160,7 @@ public class EventUpdateCommandTest {
 		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
 		assertThat(solrDocument.getField("duration").getValue()).isEqualTo(86400);
@@ -174,7 +174,7 @@ public class EventUpdateCommandTest {
 		expect(userDao.findUser("owner@domain.com", domain)).andReturn(user);
 		mocksControl.replay();
 		
-		SolrInputDocument solrDocument = testee.create(domain, user.getLogin(), eventToIndex).buildDocument();
+		SolrInputDocument solrDocument = testee.create(domain, eventToIndex).buildDocument();
 		
 		assertSolrDocumentIsBuilt(solrDocument);
 		assertThat(solrDocument.getField("is").getValues()).containsExactly("free");
