@@ -176,15 +176,6 @@ public final class EventChanges implements Anonymizable<EventChanges> {
 					.build();
 	}
 
-	public EventChanges subtractLastSyncBy(int inSeconds) {
-		return EventChanges.builder()
-					.lastSync(new Date(this.lastSync.getTime() - inSeconds * 1000))
-					.deletes(this.deletedEvents)
-					.updates(this.updatedEvents)
-					.participationChanges(this.participationUpdated)
-					.build();
-	}
-
 	private boolean isFilteredConfidentialEvent(String loggedUserEmail, Event event) {
 		return event.getPrivacy().equals(EventPrivacy.CONFIDENTIAL)
 				&& event.findAttendeeFromEmail(loggedUserEmail) == null;

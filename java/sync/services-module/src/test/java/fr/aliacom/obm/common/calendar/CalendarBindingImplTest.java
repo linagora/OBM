@@ -70,7 +70,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -129,8 +128,8 @@ import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserEmails;
-import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
 
@@ -154,7 +153,6 @@ public class CalendarBindingImplTest {
 			bindWithMock(HelperService.class);
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(DateProvider.class);
-			bindWithMock(ConfigurationService.class);
 			bind(AttendeeService.class).toInstance(new SimpleAttendeeService());
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 		}
@@ -192,8 +190,6 @@ public class CalendarBindingImplTest {
 	private EventExtId.Factory eventExtIdFactory;
 	@Inject
 	private EventNotificationService eventNotifier;
-	@Inject
-	private ConfigurationService configurationService;
 
 	private AccessToken token;
 
@@ -287,7 +283,7 @@ public class CalendarBindingImplTest {
 		// Wrap the returned list into array list because we need a mutable list
 		expectLastCall().andReturn( new ArrayList<CalendarInfo>(Arrays.asList(calendarInfosFromDao)) ).once();
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
 
 		Object[] mocks = {accessToken, userService, calendarDao, rightsHelper};
 
@@ -350,7 +346,7 @@ public class CalendarBindingImplTest {
 		// Wrap the returned list into array list because we need a mutable list
 		expectLastCall().andReturn( new ArrayList<CalendarInfo>(Arrays.asList(calendarInfosFromDao)) ).once();
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
 
 		Object[] mocks = {accessToken, userService, calendarDao, rightsHelper};
 
@@ -383,7 +379,7 @@ public class CalendarBindingImplTest {
 		replay(mocks);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService,
-				calendarDao, null, commitedOperationDao, null, null, null, attendeeService, null);
+				calendarDao, null, commitedOperationDao, null, null, null, attendeeService);
 		assertThat(ImmutableList.of(resource1, resource2))
 			.containsExactlyElementsOf(calendarService.getResourceMetadata(accessToken, resources));
 
@@ -398,7 +394,7 @@ public class CalendarBindingImplTest {
 		replay(mocks);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null,
-				null, null, null, null, null, null, attendeeService, null);
+				null, null, null, null, null, null, attendeeService);
 		assertThat(calendarService.getResourceMetadata(accessToken, new String[0])).isEmpty();
 
 
@@ -429,7 +425,7 @@ public class CalendarBindingImplTest {
 		calendarDao.findEventByExtId(eq(accessToken), eq(defaultUser), eq(eventExtId));
 		expectLastCall().andReturn(null).once();
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
 		mocksControl.replay();
 		try {
 			calendarService.createEvent(accessToken, calendar, event, true, null);
@@ -474,7 +470,7 @@ public class CalendarBindingImplTest {
 		replay(mocks);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao,
-				null, commitedOperationDao, rightsHelper, ical4jHelper, calendarFactory, attendeeService, null);
+				null, commitedOperationDao, rightsHelper, ical4jHelper, calendarFactory, attendeeService);
 
 		try {
 			calendarService.importICalendar(accessToken, defaultUser.getLogin(), icsData, null);
@@ -549,7 +545,7 @@ public class CalendarBindingImplTest {
 		Object[] mocks = { accessToken, userService, rightsHelper, calendarDao, eventChangeHandler };
 		replay(mocks);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
 
 		calendarService.purge(accessToken, calendar);
 
@@ -602,7 +598,7 @@ public class CalendarBindingImplTest {
 
 		replay(calendarDao);
 
-		CalendarBindingImpl calendarBindingImpl = new CalendarBindingImpl(null, null, null, calendarDao, null, commitedOperationDao, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarBindingImpl = new CalendarBindingImpl(null, null, null, calendarDao, null, commitedOperationDao, null, null, null, attendeeService);
 
 		boolean changed =
 				calendarBindingImpl.applyParticipationChange(accessToken, extId, participation, 0, calendarOwner, currentEvent);
@@ -634,7 +630,7 @@ public class CalendarBindingImplTest {
 
 		replay(calendarDao);
 
-		CalendarBindingImpl calendarBindingImpl = new CalendarBindingImpl(null, null, null, calendarDao, null, commitedOperationDao, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarBindingImpl = new CalendarBindingImpl(null, null, null, calendarDao, null, commitedOperationDao, null, null, null, attendeeService);
 
 		boolean changed =
 				calendarBindingImpl.applyParticipationChange(accessToken, extId, recurrenceId, participation, 0, calendarOwner, currentEvent);
@@ -679,7 +675,7 @@ public class CalendarBindingImplTest {
 		replay(mocks);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao,
-				rightsHelper, ical4jHelper, calendarFactory, attendeeService, null);
+				rightsHelper, ical4jHelper, calendarFactory, attendeeService);
 
 		try {
 			calendarService.importICalendar(accessToken, defaultUser.getLogin(), icsData, null);
@@ -697,7 +693,7 @@ public class CalendarBindingImplTest {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		String calendar = "cal1";
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 
 		replay(accessToken);
@@ -721,7 +717,7 @@ public class CalendarBindingImplTest {
 						.once();
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, null, null, null, attendeeService);
 		expect(calendarService.loadCurrentEvent(accessToken, defaultObmUser, event)).andReturn(null).once();
 
 		replay(accessToken, userService, calendarDao);
@@ -749,7 +745,7 @@ public class CalendarBindingImplTest {
 		expect(rightsHelper.canWriteOnCalendar(accessToken, calendar))
 				.andReturn(false).once();
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
 		expect(calendarService.loadCurrentEvent(accessToken, defaultObmUser, event)).andReturn(event).once();
 
 		replay(accessToken, userService, calendarDao, rightsHelper);
@@ -801,7 +797,7 @@ public class CalendarBindingImplTest {
 
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService);
 		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee, notification);
 
 		verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
@@ -855,7 +851,7 @@ public class CalendarBindingImplTest {
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
-				userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService, null);
+				userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService);
 
 		calendarService.modifyEvent(accessToken, calendar, event, updateAttendee, notification);
 
@@ -948,7 +944,7 @@ public class CalendarBindingImplTest {
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
-				userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService, null);
+				userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService);
 		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee,
 				notification);
 
@@ -1049,7 +1045,7 @@ public class CalendarBindingImplTest {
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
-				userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService, null);
+				userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService);
 
 		calendarService.modifyEvent(accessToken, calendar, event, updateAttendee, notification);
 
@@ -1118,7 +1114,7 @@ public class CalendarBindingImplTest {
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
-				userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService, null);
+				userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService);
 		Event newEvent = calendarService.modifyEvent(accessToken, calendar, event, updateAttendee,
 				notification);
 
@@ -1179,7 +1175,7 @@ public class CalendarBindingImplTest {
 		Object[] mocks = {accessToken, calendarDao, userService, rightsHelper, eventChangeHandler};
 		replay(mocks);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
 
 		calendarService.modifyEvent(accessToken, calendar, newEvent, updateAttendees, notification);
 
@@ -1211,7 +1207,7 @@ public class CalendarBindingImplTest {
 		Object[] mocks = { accessToken, calendarDao, userService };
 		replay(mocks);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, null, null, null, attendeeService);
 		assertThat(ImmutableList.of(resource1, resource2))
 			.containsExactlyElementsOf(calendarService.listResources(accessToken, null, 0, null));
 
@@ -1304,7 +1300,7 @@ public class CalendarBindingImplTest {
 
 		replay(mocks);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, helper, ical4jHelper, calendarFactory, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, helper, ical4jHelper, calendarFactory, attendeeService);
 		List<Event> events = calendarService.parseICS(accessToken, ics);
 
 		verify(mocks);
@@ -1359,7 +1355,7 @@ public class CalendarBindingImplTest {
 
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService);
 		calendarService.createEvent(accessToken, calendar, event, notification, null);
 
 		verify(accessToken, helper, calendarDao, userService, eventChangeHandler);
@@ -1414,13 +1410,10 @@ public class CalendarBindingImplTest {
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		expect(calendarDao.getSync(accessToken, defaultUser, lastSync, null, null, false)).andReturn(daoChanges).once();
 
-		ConfigurationService configurationService = createMock(ConfigurationService.class);
-		expect(configurationService.transactionTimeoutInSeconds()).andReturn(0);
-
-		Object[] mocks = {calendarDao, accessToken, userService, rightsHelper, configurationService};
+		Object[] mocks = {calendarDao, accessToken, userService, rightsHelper};
 		replay(mocks);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService, configurationService);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
 
 		EventChanges sortedChanges = calendarService.getSyncWithSortedChanges(accessToken, calendar, lastSync, null);
 		verify(mocks);
@@ -1472,7 +1465,7 @@ public class CalendarBindingImplTest {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		String calendar = "cal1";
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 
 		try {
@@ -1488,7 +1481,7 @@ public class CalendarBindingImplTest {
 		ObmUser defaultObmUser = ToolBox.getDefaultObmUser();
 		String calendar = "cal1";
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		AccessToken accessToken = ToolBox.mockAccessToken(defaultObmUser.getLogin(), defaultObmUser.getDomain());
 		Event event = new Event();
 		event.setUid(new EventObmId(42));
@@ -1516,7 +1509,7 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.findEventByExtId(accessToken, defaultObmUser, event.getExtId())).andReturn(event).once();
 
 		replay(accessToken, userService, calendarDao);
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, null, null, null, attendeeService);
 
 		calendarService.createEvent(accessToken, calendar, event, false, null);
 	}
@@ -1539,7 +1532,7 @@ public class CalendarBindingImplTest {
 		HelperService helperService = mockNoRightsHelper(calendar, accessToken);
 
 		replay(accessToken, userService, calendarDao, helperService);
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService);
 
 		try {
 			calendarService.createEvent(accessToken, calendar, event, false, null);
@@ -1569,7 +1562,7 @@ public class CalendarBindingImplTest {
 
 		replay(calendarDao, eventChangeHandler);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, null, calendarDao, null, commitedOperationDao, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, null, calendarDao, null, commitedOperationDao, null, null, null, attendeeService);
 		Event createdEvent = calendarService.createInternalEvent(accessToken, calendar, internalEvent, false);
 
 		verify(calendarDao, eventChangeHandler);
@@ -1594,7 +1587,7 @@ public class CalendarBindingImplTest {
 
 		replay(accessToken, noRightsHelper);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, noRightsHelper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, noRightsHelper, null, null, attendeeService);
 		calendarService.assignDelegationRightsOnAttendees(accessToken, after);
 		calendarService.applyParticipationModifications(before, after);
 
@@ -1637,7 +1630,7 @@ public class CalendarBindingImplTest {
 
 		replay(accessToken, rightsHelper);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, rightsHelper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, rightsHelper, null, null, attendeeService);
 		calendarService.assignDelegationRightsOnAttendees(accessToken, after);
 		calendarService.applyParticipationModifications(before, after);
 
@@ -1685,7 +1678,7 @@ public class CalendarBindingImplTest {
 
 		replay(accessToken, rightsHelper);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, rightsHelper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, rightsHelper, null, null, attendeeService);
 		calendarService.assignDelegationRightsOnAttendees(accessToken, afterRecurrentEvent);
 		calendarService.applyParticipationModifications(beforeRecurrentEvent, afterRecurrentEvent);
 
@@ -1762,7 +1755,7 @@ public class CalendarBindingImplTest {
 		replay(token, eventChangeHandler, userService, rightsHelper, calendarDao);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null,
-				userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService, null);
+				userService, calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
 		calendarService.modifyEvent(token, calendar, currentEvent, updateAttendees,
 				notification);
 	}
@@ -2077,14 +2070,11 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.getSync(token, user, lastSync, null, null, false)).andReturn(
 				eventChangesFromDao);
 
-		ConfigurationService configurationService = createMock(ConfigurationService.class);
-		expect(configurationService.transactionTimeoutInSeconds()).andReturn(0);
-
-		Object[] mocks = { token, userService, calendarDao, rightsHelper, configurationService };
+		Object[] mocks = { token, userService, calendarDao, rightsHelper };
 		replay(mocks);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService,
-				calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService, configurationService);
+				calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
 
 		EventChanges actualChanges = calendarService.getSyncWithSortedChanges(token, calendar,
 				lastSync, null);
@@ -2141,14 +2131,11 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.getSync(token, user, lastSync, null, null, false)).andReturn(
 				eventChangesFromDao);
 
-		ConfigurationService configurationService = createMock(ConfigurationService.class);
-		expect(configurationService.transactionTimeoutInSeconds()).andReturn(0);
-
-		Object[] mocks = { token, userService, calendarDao, rightsHelper, configurationService};
+		Object[] mocks = { token, userService, calendarDao, rightsHelper };
 		replay(mocks);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, userService,
-				calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService, configurationService);
+				calendarDao, null, commitedOperationDao, rightsHelper, null, null, attendeeService);
 
 		EventChanges actualChanges = calendarService.getSyncWithSortedChanges(token, calendar,
 				lastSync, null);
@@ -2209,7 +2196,6 @@ public class CalendarBindingImplTest {
 		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).once();
 
 		expect(calendarDao.getSync(token, user, lastSync, null, null, false)).andReturn(eventChangesFromDao);
-		expect(configurationService.transactionTimeoutInSeconds()).andReturn(0);
 
 		mocksControl.replay();
 
@@ -2269,7 +2255,6 @@ public class CalendarBindingImplTest {
 		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).once();
 
 		expect(calendarDao.getSync(token, user, lastSync, null, null, false)).andReturn(eventChangesFromDao);
-		expect(configurationService.transactionTimeoutInSeconds()).andReturn(0);
 
 		mocksControl.replay();
 
@@ -2330,7 +2315,6 @@ public class CalendarBindingImplTest {
 		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(false).once();
 
 		expect(calendarDao.getSync(token, user, lastSync, null, null, true)).andReturn(eventChangesFromDao);
-		expect(configurationService.transactionTimeoutInSeconds()).andReturn(0);
 
 		mocksControl.replay();
 
@@ -2382,7 +2366,6 @@ public class CalendarBindingImplTest {
 		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).once();
 
 		expect(calendarDao.getSync(token, user, lastSync, null, null, false)).andReturn(eventChangesFromDao);
-		expect(configurationService.transactionTimeoutInSeconds()).andReturn(0);
 
 		mocksControl.replay();
 
@@ -2405,7 +2388,7 @@ public class CalendarBindingImplTest {
 		replay(helperService);
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, helperService, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, helperService, null, null, attendeeService);
 
 		calendarService.assertEventCanBeModified(token, user, eventToModify);
 	}
@@ -2423,7 +2406,7 @@ public class CalendarBindingImplTest {
 		replay(helperService, token);
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, helperService, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, helperService, null, null, attendeeService);
 
 		calendarService.assertEventCanBeModified(token, user, eventToModify);
 	}
@@ -2441,7 +2424,7 @@ public class CalendarBindingImplTest {
 		replay(helperService);
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, helperService, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, helperService, null, null, attendeeService);
 
 		calendarService.assertEventCanBeModified(token, user, eventToModify);
 	}
@@ -2461,7 +2444,7 @@ public class CalendarBindingImplTest {
 		eventToModify.setOwnerEmail(token.getUserEmail());
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, helperService, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, helperService, null, null, attendeeService);
 
 		calendarService.assertEventCanBeModified(token, user, eventToModify);
 	}
@@ -2475,7 +2458,7 @@ public class CalendarBindingImplTest {
 		Event event = createEvent(Arrays.asList(expectedAttendee));
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		Attendee attendee = UserAttendee.builder()
 			.email("attendee@test.lng")
@@ -2491,7 +2474,7 @@ public class CalendarBindingImplTest {
 		Event after = new Event();
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(after.getAttendees()).isEmpty();
@@ -2505,7 +2488,7 @@ public class CalendarBindingImplTest {
 		Event after = createEvent(expectedAttendees);
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
@@ -2519,7 +2502,7 @@ public class CalendarBindingImplTest {
 		Event after = new Event();
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(after.getAttendees()).isEmpty();
@@ -2533,7 +2516,7 @@ public class CalendarBindingImplTest {
 		Event after = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
@@ -2547,7 +2530,7 @@ public class CalendarBindingImplTest {
 		Event after = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.inheritsParticipationOnExceptions(before, after);
 		assertThat(after.getEventsExceptions()).isEmpty();
@@ -2560,7 +2543,7 @@ public class CalendarBindingImplTest {
 		Event before = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
 		Event after = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
 		Event afterException = createEventException(createOrganiserAndContactAttendees(Participation.declined()), eventDate.plusDays(1).toDate());
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		before.addEventException(createEventException(expectedAttendeesException, eventDate.plusDays(1).toDate()));
 		before.setExtId(new EventExtId("Event"));
@@ -2583,7 +2566,7 @@ public class CalendarBindingImplTest {
 		Event afterException_2 = createEventException(createOrganiserAndContactAttendees(Participation.needsAction()), eventDate.plusDays(2).toDate());
 		Event afterException_3 = createEventException(createOrganiserAndContactAttendees(Participation.tentative()), eventDate.plusDays(3).toDate());
 		Event after = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		before.addEventException(createEventException(expectedAttendeesException_1, eventDate.plusDays(1).toDate()));
 		before.addEventException(createEventException(expectedAttendeesException_2, eventDate.plusDays(2).toDate()));
@@ -2627,7 +2610,7 @@ public class CalendarBindingImplTest {
 		after.addEventException(afterException);
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
@@ -2648,7 +2631,7 @@ public class CalendarBindingImplTest {
 		Event after = createEvent(createOrganiserAndContactAttendees(Participation.accepted()));
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(after.getEventsExceptions()).isEmpty();
@@ -2672,7 +2655,7 @@ public class CalendarBindingImplTest {
 		after.addEventException(afterException);
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
@@ -2702,7 +2685,7 @@ public class CalendarBindingImplTest {
 		after.addEventException(afterException);
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
@@ -2729,7 +2712,7 @@ public class CalendarBindingImplTest {
 		after.addEventException(afterException);
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendees);
@@ -2740,7 +2723,7 @@ public class CalendarBindingImplTest {
 		ImmutableSet<Event> events = ImmutableSet.<Event> of();
 
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		SortedMap<Event, Event> treeMap = calendarService.buildSortedMap(events);
 		assertThat(treeMap).isEmpty();
@@ -2749,7 +2732,7 @@ public class CalendarBindingImplTest {
 	@Test
 	public void testBuildTreeMapNullList() {
 		CalendarBindingImpl calendarService =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		SortedMap<Event, Event> treeMap = calendarService.buildSortedMap(null);
 		assertThat(treeMap).isEmpty();
@@ -2763,7 +2746,7 @@ public class CalendarBindingImplTest {
 		Event secondException = createEventException(attendees, eventDate.plusDays(2).toDate());
 		Event thirdException = createEventException(attendees, eventDate.plusDays(3).toDate());
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		SortedMap<Event, Event> treeMap = calendarService.buildSortedMap(ImmutableSet.of(firstException, secondException, thirdException));
 
 		assertThat(treeMap.keySet()).containsExactly(firstException, secondException, thirdException);
@@ -2789,7 +2772,7 @@ public class CalendarBindingImplTest {
 		replay(mocks);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, mockDao,
-				null, null, null, null, null, attendeeService, null);
+				null, null, null, null, null, attendeeService);
 		Collection<Event> events = calendarService.getResourceEvents(resourceEmail, date, syncRange);
 		assertThat(events).isEqualTo(expectedEvents);
 
@@ -2807,7 +2790,7 @@ public class CalendarBindingImplTest {
 		replay(mocks);
 
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, mockDao,
-				null, null, null, null, null, attendeeService, null);
+				null, null, null, null, null, attendeeService);
 		try {
 			calendarService.getResourceEvents(resourceEmail, new Date(), new SyncRange(null, null));
 		}
@@ -2836,7 +2819,7 @@ public class CalendarBindingImplTest {
 
 		replay(mocks);
 		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, mockDao,
-				null, null, null, null, null, attendeeService, null);
+				null, null, null, null, null, attendeeService);
 		Collection<Event> events = calendarService.getResourceEvents(resourceEmail, date, null);
 		verify(mocks);
 
@@ -2848,7 +2831,7 @@ public class CalendarBindingImplTest {
 		Attendee organizer = UserAttendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
 		Attendee att1 = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.needsAction()).build();
 		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.applyParticipationModifications(before, event);
 
@@ -2860,7 +2843,7 @@ public class CalendarBindingImplTest {
 		Attendee organizer = UserAttendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
 		Attendee att1 = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.needsAction()).build();
 		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		att1.setCanWriteOnCalendar(true);
 		calendarService.applyParticipationModifications(before, event);
@@ -2876,7 +2859,7 @@ public class CalendarBindingImplTest {
 		Attendee att1ForExc = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.needsAction()).build();
 		Event exception = createEvent(Arrays.asList(organizerForExc, att1ForExc));
 		Event before = createEvent(Arrays.asList(organizer)), event = createEvent(Arrays.asList(organizer, att1));
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		att1.setCanWriteOnCalendar(true);
 		att1ForExc.setCanWriteOnCalendar(true);
@@ -2892,7 +2875,7 @@ public class CalendarBindingImplTest {
 		Attendee organizer = UserAttendee.builder().asOrganizer().email("organizer@eve.nt").participation(Participation.accepted()).build();
 		Attendee att1 = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.accepted()).build();
 		Event event = createEvent(Arrays.asList(organizer, att1));
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		calendarService.initDefaultParticipation(event);
 
@@ -2908,7 +2891,7 @@ public class CalendarBindingImplTest {
 		Attendee att1ForExc = UserAttendee.builder().asAttendee().email("att1@eve.nt").participation(Participation.accepted()).build();
 		Event event = createEvent(Arrays.asList(organizer, att1));
 		Event exception = createEvent(Arrays.asList(organizerForExc, att1ForExc));
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 
 		event.addEventException(exception);
 		calendarService.initDefaultParticipation(event);
@@ -3036,7 +3019,7 @@ public class CalendarBindingImplTest {
 
 		mocksControl.replay();
 
-		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService, null);
+		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService);
 		binding.createEvent(token, calendar, event, false, clientId);
 
 		mocksControl.verify();
@@ -3080,7 +3063,7 @@ public class CalendarBindingImplTest {
 
 		mocksControl.replay();
 
-		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService, null);
+		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService);
 		binding.createEvent(token, userEmail, incommingEvent, false, clientId);
 
 		mocksControl.verify();
@@ -3115,7 +3098,7 @@ public class CalendarBindingImplTest {
 
 		mocksControl.replay();
 
-		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService, null);
+		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService);
 		binding.createEvent(token, userEmail, event, false, clientId);
 
 		mocksControl.verify();
@@ -3147,7 +3130,7 @@ public class CalendarBindingImplTest {
 
 		mocksControl.replay();
 
-		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService, null);
+		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService);
 		binding.createEvent(token, userEmail, event, false, clientId);
 
 		mocksControl.verify();
@@ -3190,7 +3173,7 @@ public class CalendarBindingImplTest {
 
 		mocksControl.replay();
 
-		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService, null);
+		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helperService, null, null, attendeeService);
 		binding.createEvent(token, userEmail, event, false, clientId);
 
 		mocksControl.verify();
@@ -3237,7 +3220,7 @@ public class CalendarBindingImplTest {
 
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler, commitedOperationDao);
 
-		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService, null);
+		CalendarBindingImpl calendarService = new CalendarBindingImpl(eventChangeHandler, null, userService, calendarDao, null, commitedOperationDao, helper, null, null, attendeeService);
 		EventObmId eventObmId = calendarService.createEvent(accessToken, calendar, event, notification, clientId);
 
 		verify(accessToken, helper, calendarDao, userService, eventChangeHandler, commitedOperationDao);
@@ -3330,7 +3313,7 @@ public class CalendarBindingImplTest {
 		String ics = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("ics/4Events.ics"));
 		AttendeeService attendeeService = mocksControl.createMock(AttendeeService.class);
 		Ical4jHelper ical4jHelper = new Ical4jHelper(mocksControl.createMock(DateProvider.class), eventExtIdFactory, attendeeService);
-		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, domainService, userService, calendarDao, categoryDao, commitedOperationDao, helperService, ical4jHelper, calendarFactory, attendeeService, null);
+		CalendarBindingImpl binding = new CalendarBindingImpl(eventChangeHandler, domainService, userService, calendarDao, categoryDao, commitedOperationDao, helperService, ical4jHelper, calendarFactory, attendeeService);
 		UserAttendee userAttendee = UserAttendee.builder().email(calendar).build();
 		UserAttendee organizerAttendee = UserAttendee.builder().email("organizer@test.tlse.lng").build();
 
@@ -3568,7 +3551,6 @@ public class CalendarBindingImplTest {
 		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true);
 		expect(calendarDao.getSync(token, calendarUser, null, null, null, false)).andReturn(eventChanges);
 		expect(calendarDao.getEventAlertForUser(null, 2)).andReturn(30);
-		expect(configurationService.transactionTimeoutInSeconds()).andReturn(0);
 		mocksControl.replay();
 
 		EventChanges changesFromService = binding.getSyncWithSortedChanges(token, calendar, null, null);
@@ -3590,7 +3572,6 @@ public class CalendarBindingImplTest {
 		expect(userService.getUserFromAccessToken(token)).andReturn(calendarUser);
 		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(false);
 		expect(calendarDao.getSync(token, calendarUser, null, null, null, false)).andReturn(eventChanges);
-		expect(configurationService.transactionTimeoutInSeconds()).andReturn(0);
 		mocksControl.replay();
 
 		EventChanges changesFromService = binding.getSyncWithSortedChanges(token, calendar, null, null);
@@ -3614,7 +3595,6 @@ public class CalendarBindingImplTest {
 		expect(userService.getUserFromCalendar(calendar, domain.getName())).andReturn(calendarUser);
 		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true);
 		expect(calendarDao.getSync(token, calendarUser, null, null, null, false)).andReturn(eventChanges);
-		expect(configurationService.transactionTimeoutInSeconds()).andReturn(0);
 		mocksControl.replay();
 
 		EventChanges changesFromService = binding.getSyncWithSortedChanges(token, calendar, null, null);
@@ -4046,7 +4026,7 @@ public class CalendarBindingImplTest {
 
 		mocksControl.replay();
 		CalendarBindingImpl binding =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		binding.convertAttendeesOnEvent(event, owner);
 		mocksControl.verify();
 
@@ -4084,7 +4064,7 @@ public class CalendarBindingImplTest {
 
 		mocksControl.replay();
 		CalendarBindingImpl binding =
-				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService, null);
+				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, attendeeService);
 		binding.convertAttendeesOnEvent(event, owner);
 		mocksControl.verify();
 
@@ -4126,107 +4106,4 @@ public class CalendarBindingImplTest {
 				.build());
 		expectLastCall().once();
 	}
-	
-	private void mockSimpleGetSync(
-					ObmUser defaultUser, Date lastSync, EventChanges daoChanges, boolean userHasReadOnlyDelegation, boolean onEventDate)
-					throws FindException {
-			int transactionTimeoutInSeconds = 60;
-			expect(helperService.canReadCalendar(token, "calendar")).andReturn(true).once();
-			expect(userService.getUserFromCalendar("calendar", "test.tlse.lng")).andReturn(defaultUser).once();
-			expect(helperService.canWriteOnCalendar(token, "calendar")).andReturn(!userHasReadOnlyDelegation).once();
-			expect(calendarDao.getSync(token, defaultUser, lastSync, null, null, onEventDate)).andReturn(daoChanges).once();
-			expect(configurationService.transactionTimeoutInSeconds()).andReturn(transactionTimeoutInSeconds);
-	}
-	
-	@Test
-	public void testReturnOfGetSyncChangeLastSyncIfUserHasReadOnly()
-			throws ServerFault, NotAllowedException, FindException {
-		Date lastSync = DateUtils.date("2014-09-24T17:16:00");
-		EventChanges daoChanges = EventChanges.builder().lastSync(lastSync).build();
-
-		mockSimpleGetSync(ToolBox.getDefaultObmUser(), lastSync, daoChanges, true, false);
-		expect(userService.getUserFromAccessToken(token)).andReturn(ToolBox.getDefaultObmUser()).once();
-
-		mocksControl.replay();
-		EventChanges eventChanges = binding.getSync(token, "calendar",lastSync, null, false);
-		mocksControl.verify();
-
-		assertThat(eventChanges.getLastSync()).isEqualTo(DateUtils.date("2014-09-24T17:15:00"));
-	}
-
-	@Test
-	public void testReturnOfGetSyncChangeLastSync() throws ServerFault,
-			NotAllowedException, FindException {
-		Date lastSync = DateUtils.date("2014-09-24T17:16:00");
-		EventChanges daoChanges = EventChanges.builder().lastSync(lastSync).build();
-
-		mockSimpleGetSync(ToolBox.getDefaultObmUser(), lastSync, daoChanges, false, false);
-
-		mocksControl.replay();
-		EventChanges eventChanges = binding.getSync(token, "calendar", lastSync, null, false);
-		mocksControl.verify();
-
-		assertThat(eventChanges.getLastSync()).isEqualTo(DateUtils.date("2014-09-24T17:15:00"));
-	}
-
-	@Test
-	public void testLastSyncOfGetSync() throws ServerFault,
-			NotAllowedException, FindException {
-		Date lastSync = DateUtils.date("2014-09-24T17:16:00");
-		EventChanges daoChanges = EventChanges.builder().lastSync(lastSync).build();
-
-		mockSimpleGetSync(ToolBox.getDefaultObmUser(), lastSync, daoChanges, false, false);
-
-		mocksControl.replay();
-		EventChanges eventChanges = binding.getSync(token, "calendar", lastSync);
-		mocksControl.verify();
-
-		assertThat(eventChanges.getLastSync()).isEqualTo(DateUtils.date("2014-09-24T17:15:00"));
-	}
-
-	@Test
-	public void testLastSyncOfGetSyncEventDate() throws ServerFault,
-			NotAllowedException, FindException {
-		Date lastSync = DateUtils.date("2014-09-24T17:16:00");
-		EventChanges daoChanges = EventChanges.builder().lastSync(lastSync).build();
-
-		mockSimpleGetSync(ToolBox.getDefaultObmUser(), lastSync, daoChanges, false, true);
-
-		mocksControl.replay();
-		EventChanges eventChanges = binding.getSyncEventDate(token, "calendar", lastSync);
-		mocksControl.verify();
-
-		assertThat(eventChanges.getLastSync()).isEqualTo(DateUtils.date("2014-09-24T17:15:00"));
-	}
-
-	@Test
-	public void testLastSyncOfGetSyncInRange() throws FindException,
-			ServerFault, NotAllowedException {
-		Date lastSync = DateUtils.date("2014-09-24T17:16:00");
-		EventChanges daoChanges = EventChanges.builder().lastSync(lastSync).build();
-
-		mockSimpleGetSync(ToolBox.getDefaultObmUser(), lastSync, daoChanges, false, false);
-
-		mocksControl.replay();
-		EventChanges eventChanges = binding.getSyncInRange(token, "calendar", lastSync, null);
-		mocksControl.verify();
-
-		assertThat(eventChanges.getLastSync()).isEqualTo(DateUtils.date("2014-09-24T17:15:00"));
-	}
-
-	@Test
-	public void testLastSyncOfGetSyncWithSortedChanges() throws ServerFault,
-			NotAllowedException, FindException {
-		Date lastSync = DateUtils.date("2014-09-24T17:16:00");
-		EventChanges daoChanges = EventChanges.builder().lastSync(lastSync).build();
-
-		mockSimpleGetSync(ToolBox.getDefaultObmUser(), lastSync, daoChanges, false, false);
-
-		mocksControl.replay();
-		EventChanges eventChanges = binding.getSyncWithSortedChanges(token, "calendar", lastSync, null);
-		mocksControl.verify();
-
-		assertThat(eventChanges.getLastSync()).isEqualTo(DateUtils.date("2014-09-24T17:15:00"));
-	}
-
 }
