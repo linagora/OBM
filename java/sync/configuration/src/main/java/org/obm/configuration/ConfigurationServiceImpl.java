@@ -63,6 +63,9 @@ public class ConfigurationServiceImpl implements ConfigurationService, LocatorCo
 	private static final String TRANSACTION_TIMEOUT_KEY = "transaction-timeout";
 	private static final int TRANSACTION_TIMEOUT_DEFAULT = 1;
 
+	private static final String TRANSACTION_TOLERANCE_TIMEOUT_KEY = "transaction-tolerance-timeout-seconds";
+	private static final int TRANSACTION_TOLERANCE_TIMEOUT_DEFAULT = 5;
+
 	private static final String TRUST_TOKEN_TIMEOUT_KEY = "trust-token-timeout";
 	private static final int TRUST_TOKEN_TIMEOUT_DEFAULT = 60;
 
@@ -137,6 +140,11 @@ public class ConfigurationServiceImpl implements ConfigurationService, LocatorCo
 	public TimeUnit getLocatorCacheTimeUnit() {
 		String key = iniFile.getStringValue(LOCATOR_CACHE_TIMEUNIT_KEY);
 		return timeUnitMapper.getTimeUnitOrDefault(key, TimeUnit.MINUTES);
+	}
+
+	@Override
+	public int getTransactionToleranceTimeoutInSeconds() {
+		return iniFile.getIntValue(TRANSACTION_TOLERANCE_TIMEOUT_KEY, TRANSACTION_TOLERANCE_TIMEOUT_DEFAULT);
 	}
 
 	private int getTransactionTimeout() {

@@ -59,4 +59,6 @@ public interface ConfigurationService {
 	String getDataDirectory();
 
 	String getGlobalDomain();
+
+	int getTransactionToleranceTimeoutInSeconds();
 }

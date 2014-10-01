@@ -325,4 +325,9 @@ public class StaticConfigurationService implements ConfigurationService {
 		return "global.test";
 	}
 
+	@Override
+	public int getTransactionToleranceTimeoutInSeconds() {
+		return configuration.transaction.toleranceInSeconds;
+	}
+
 }
