@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>2.5.9-alpha3</version>
+		<version>2.5.9-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>annotations</artifactId>
 	<packaging>jar</packaging>
 	<name>obm annotations</name>
 	<url>http://www.obm.org/</url>
-	<version>2.5.9-alpha3</version>
+	<version>2.5.9-SNAPSHOT</version>
 
 	<licenses>
 		<license>
