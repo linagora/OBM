@@ -44,6 +44,7 @@ public interface DatabaseConfiguration {
 	String DB_PG_SSL = "database-postgres-ssl-enabled";
 	String DB_PG_SSL_NON_VALIDATING = "database-postgres-ssl-non-validating-factory";
 	String DB_READONLY_KEY = "read-only";
+	String DB_MIN_POOL_SIZE_KEY = "database-min-connection-pool-size";
 
 	String NO_JDBC_OPTION = "";
 
