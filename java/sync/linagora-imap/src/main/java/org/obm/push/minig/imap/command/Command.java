@@ -63,7 +63,7 @@ public abstract class Command<T> implements ICommand<T> {
 		sb.append(' ');
 		sb.append(cmd);
 		String sent = sb.toString();
-		imaplogger.info("C: {}", sent);
+		imaplogger.info("C: {}", commandToBeLogged(sent));
 		WriteFuture writeFuture = session.write(sent);
 		if (args.hasLiteralData()) {
 			writeFuture.awaitUninterruptibly();
@@ -74,6 +74,10 @@ public abstract class Command<T> implements ICommand<T> {
 		}
 		return writeFuture;
 
+	}
+
+	protected String commandToBeLogged(String sent) {
+		return sent;
 	}
 
 	@Override

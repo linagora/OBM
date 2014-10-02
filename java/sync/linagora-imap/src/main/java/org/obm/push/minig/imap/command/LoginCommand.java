@@ -34,6 +34,10 @@ package org.obm.push.minig.imap.command;
 
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.FluentIterable;
+
 public class LoginCommand extends SimpleCommand<Boolean> {
 
 	public LoginCommand(String login, String password) {
@@ -50,6 +54,12 @@ public class LoginCommand extends SimpleCommand<Boolean> {
 			ret.append(c);
 		}
 		return ret.toString();
+	}
+
+	@Override
+	protected String commandToBeLogged(String sent) {
+		return Joiner.on(" ")
+				.join(FluentIterable.from(Splitter.on(" ").split(sent)).limit(3)) + " \"***\"";
 	}
 
 	@Override
