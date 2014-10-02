@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.book;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -48,6 +50,7 @@ import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableList;
@@ -66,17 +69,43 @@ public class BookItemsWriterTest {
 	}
 
 	@Test
-	public void testGetXMLDocumentFromContact() throws TransformerException, SAXException, IOException {
+	public void testGetXMLDocumentFromContactCreateAnHashCodeTag() {
+		Contact contact = mockContact();
+		Document resultDocument = writer.getXMLDocumentFrom(contact);
+
+		Element hashElement = (Element) resultDocument.getElementsByTagName("hash").item(0);
+		int hash = Integer.valueOf(hashElement.getFirstChild().getTextContent());
+
+		assertThat(hash).isEqualTo(contact.hashCode());
+	}
+
+	@Test
+	public void testGetXMLDocumentFromContact() throws SAXException, IOException, TransformerException {
 		String expectedXML = loadXmlFile("SimpleContact.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(mockContact());
+		removeHashInContact(resultDocument);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	private void removeHashInContact(Document resultDocument) {
+		Element contact = (Element) resultDocument.getElementsByTagName("contact").item(0);
+		contact.removeChild(
+				contact.getElementsByTagName("hash").item(0));
 	}
 
 	@Test
 	public void testGetXMLDocumentFromContacts() throws TransformerException, SAXException, IOException {
 		String expectedXML = loadXmlFile("SimpleListOfContacts.xml");
 		Document resultDocument = writer.getXMLDocumentFromContacts(ImmutableList.of(mockContact()));
+		removeHashInContacts(resultDocument);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	private void removeHashInContacts(Document resultDocument) {
+		Element contacts = (Element) resultDocument.getElementsByTagName("contacts").item(0);
+		Element contact = (Element) contacts.getElementsByTagName("contact").item(0);
+		contact.removeChild(
+				contact.getElementsByTagName("hash").item(0));
 	}
 
 	@Test
@@ -90,7 +119,15 @@ public class BookItemsWriterTest {
 	public void testGetXMLDocumentFromContactChanges() throws TransformerException, SAXException, IOException {
 		String expectedXML = loadXmlFile("SimpleContactChanges.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(mockContactChanges());
+		removeHashInContactChanges(resultDocument);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	private void removeHashInContactChanges(Document resultDocument) {
+		Element updated = (Element) resultDocument.getElementsByTagName("updated").item(0);
+		Element contact = (Element) updated.getElementsByTagName("contact").item(0);
+		contact.removeChild(
+				contact.getElementsByTagName("hash").item(0));
 	}
 
 	@Test
@@ -104,7 +141,17 @@ public class BookItemsWriterTest {
 	public void testGetXMLDocumentFromAddressBookChanges() throws TransformerException, IOException, SAXException {
 		String expectedXML = loadXmlFile("SimpleAddressBookChanges.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(mockAddressBookChanges());
+		removeHashInAddressBookChanges(resultDocument);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	private void removeHashInAddressBookChanges(Document resultDocument) {
+		Element addressbooks = (Element) resultDocument.getElementsByTagName("contacts").item(0);
+		Element updated = (Element) addressbooks.getElementsByTagName("updated").item(0);
+		Element contactUpdated = (Element) updated.getElementsByTagName("contact").item(0);
+
+		contactUpdated.removeChild(
+				contactUpdated.getElementsByTagName("hash").item(0));
 	}
 
 	@Test
@@ -119,6 +166,32 @@ public class BookItemsWriterTest {
 		String expectedXML = loadXmlFile("SimpleCountOfContacts.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(123);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
+
+	@Test
+	public void testSerializingTwiceSameContactProducesSameHashcode() {
+		Document resultDocument1 = writer.getXMLDocumentFrom(mockContact());
+		Document resultDocument2 = writer.getXMLDocumentFrom(mockContact());
+
+		Element hash1 = (Element) resultDocument1.getElementsByTagName("hash").item(0);
+		Element hash2 = (Element) resultDocument2.getElementsByTagName("hash").item(0);
+
+		assertThat(hash1.getFirstChild().getTextContent())
+		.isEqualTo(hash2.getFirstChild().getTextContent());
+	}
+
+	@Test
+	public void testSerializingTwiceNotSameContactProducesNotSameHashcode() {
+		Document resultDocument1 = writer.getXMLDocumentFrom(mockContact());
+		Contact newContact = mockContact();
+		newContact.setComment("newComment");
+		Document resultDocument2 = writer.getXMLDocumentFrom(newContact);
+
+		Element hash1 = (Element) resultDocument1.getElementsByTagName("hash").item(0);
+		Element hash2 = (Element) resultDocument2.getElementsByTagName("hash").item(0);
+
+		assertThat(hash1.getFirstChild().getTextContent())
+		.isNotEqualTo(hash2.getFirstChild().getTextContent());
 	}
 
 	private Contact mockContact() {

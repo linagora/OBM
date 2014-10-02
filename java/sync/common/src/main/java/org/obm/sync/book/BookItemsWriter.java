@@ -151,6 +151,7 @@ public class BookItemsWriter extends AbstractItemsWriter {
 
 		parent.setAttribute("collected", "" + contact.isCollected());
 
+		createIfNotNull(parent, "hash", contact.hashCode());
 		createIfNotNull(parent, "commonname", contact.getCommonname());
 		createIfNotNull(parent, "first", contact.getFirstname());
 		createIfNotNull(parent, "last", contact.getLastname());
