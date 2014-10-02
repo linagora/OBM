@@ -62,11 +62,16 @@ public class HikariCPDatabaseConnectionProvider extends DatabaseConnectionProvid
 
 		configurationLogger.info("Starting OBM/HikariCP connection pool using {}.", databaseConfiguration);
 
+		Integer minPoolSize = databaseConfiguration.getDatabaseMinConnectionPoolSize();
+
 		pool = new HikariDataSource();
 		pool.setDataSourceClassName(driverConfiguration.getNonXADataSourceClassName());
 		pool.setPoolName(driverConfiguration.getFlavour().name());
 		pool.setAutoCommit(false);
 		pool.setMaximumPoolSize(databaseConfiguration.getDatabaseMaxConnectionPoolSize());
+		if (minPoolSize != null) {
+			pool.setMinimumIdle(minPoolSize);
+		}
 		pool.setJdbc4ConnectionTest(true);
 		pool.setConnectionInitSql(driverConfiguration.getGMTTimezoneQuery());
 		pool.setDataSourceProperties(mapToProperties(driverConfiguration.getDriverProperties(databaseConfiguration)));
