@@ -48,7 +48,6 @@ import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableList;
@@ -67,67 +66,59 @@ public class BookItemsWriterTest {
 	}
 
 	@Test
-	public void testAppendContact() throws TransformerException, SAXException, IOException {
-		Document resultDocument = DOMUtils.createDoc(
-				"http://www.obm.org/xsd/sync/contact.xsd", "contact");
-		Element root = resultDocument.getDocumentElement();
-
+	public void testGetXMLDocumentFromContact() throws TransformerException, SAXException, IOException {
 		String expectedXML = loadXmlFile("SimpleContact.xml");
-		writer.appendContact(root, mockContact());
+		Document resultDocument = writer.getXMLDocumentFrom(mockContact());
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
 	@Test
-	public void testAppendAddressBook() throws TransformerException, SAXException, IOException {
-		Document resultDocument = DOMUtils.createDoc(
-				"http://www.obm.org/xsd/sync/books.xsd", "books");
-		Element root = resultDocument.getDocumentElement();
+	public void testGetXMLDocumentFromContacts() throws TransformerException, SAXException, IOException {
+		String expectedXML = loadXmlFile("SimpleListOfContacts.xml");
+		Document resultDocument = writer.getXMLDocumentFromContacts(ImmutableList.of(mockContact()));
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
+	}
 
+	@Test
+	public void testGetXMLDocumentFromAddressBook() throws TransformerException, SAXException, IOException {
 		String expectedXML = loadXmlFile("SimpleAddressBook.xml");
-		writer.appendAddressBook(root, mockAddressBook());
+		Document resultDocument = writer.getXMLDocumentFromAddressBooks(ImmutableList.of(mockAddressBook()));
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
 	@Test
-	public void testWriteChanges() throws TransformerException, SAXException, IOException {
+	public void testGetXMLDocumentFromContactChanges() throws TransformerException, SAXException, IOException {
 		String expectedXML = loadXmlFile("SimpleContactChanges.xml");
-		Document resultDocument = writer.writeChanges(mockContactChanges());
+		Document resultDocument = writer.getXMLDocumentFrom(mockContactChanges());
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
 	@Test
-	public void AppendFolder() throws TransformerException, IOException, SAXException {
-		Document resultDocument = DOMUtils.createDoc(
-				"http://www.obm.org/xsd/sync/contact.xsd", "folder");
-		Element root = resultDocument.getDocumentElement();
-
+	public void testGetXMLDocumentFromFolder() throws TransformerException, IOException, SAXException {
 		String expectedXML = loadXmlFile("SimpleFolder.xml");
-		writer.appendFolder(root, mockFolder());
+		Document resultDocument = writer.getXMLDocumentFrom(mockFolder());
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
 	@Test
-	public void testWriteAddressBookChanges() throws TransformerException, IOException, SAXException {
+	public void testGetXMLDocumentFromAddressBookChanges() throws TransformerException, IOException, SAXException {
 		String expectedXML = loadXmlFile("SimpleAddressBookChanges.xml");
-		Document resultDocument = writer.writeAddressBookChanges(mockAddressBookChanges());
+		Document resultDocument = writer.getXMLDocumentFrom(mockAddressBookChanges());
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
 	@Test
-	public void testWriteListAddressBooksChanged() throws TransformerException, IOException, SAXException {
+	public void testGetXMLDocumentFromOfListAddressBooksChanged() throws TransformerException, IOException, SAXException {
 		String expectedXML = loadXmlFile("SimpleFolderChanges.xml");
-		Document resultDocument = writer.writeListAddressBooksChanged(mockFolderChanges());
-		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));		
+		Document resultDocument = writer.getXMLDocumentFrom(mockFolderChanges());
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
 	@Test
-	public void testAppendCountContacts() throws TransformerException, SAXException, IOException {
-		Document resultDocument = DOMUtils.createDoc(
-				"http://www.obm.org/xsd/sync/addressbookcount.xsd", "addressbook-count");
-		Element root = resultDocument.getDocumentElement();
+	public void testGetXMLDocumentFromCountContacts() throws TransformerException, SAXException, IOException {
 		String expectedXML = loadXmlFile("SimpleCountOfContacts.xml");
-		writer.appendCountContacts(root, 123);
-		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));		
+		Document resultDocument = writer.getXMLDocumentFrom(123);
+		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
 	private Contact mockContact() {

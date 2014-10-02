@@ -291,21 +291,11 @@ public class XmlResponder {
 	}
 
 	public String sendContact(Contact contact) {
-		String res = "";
-		try {
-			Document doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/contact.xsd", "contact");
-			Element root = doc.getDocumentElement();
-			biw.appendContact(root, contact);
-			res = emitResponse(doc);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-		return res;
+		return emitResponse(biw.getXMLDocumentFrom(contact));
 	}
 
 	public String sendContactChanges(ContactChanges contactChanges) {
-		return emitResponse(biw.writeChanges(contactChanges));
+		return emitResponse(biw.getXMLDocumentFrom(contactChanges));
 	}
 
 	public String sendCategories(List<Category> ret) {
@@ -324,20 +314,8 @@ public class XmlResponder {
 		return res;
 	}
 
-	public String sendListAddressBooks(List<AddressBook> ret) {
-		String res = "";
-		try {
-			Document doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/books.xsd", "books");
-			Element root = doc.getDocumentElement();
-			for (AddressBook book: ret) {
-				biw.appendAddressBook(root, book);
-			}
-			res = emitResponse(doc);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-		return res;
+	public String sendListAddressBooks(List<AddressBook> addressbooks) {
+		return emitResponse(biw.getXMLDocumentFromAddressBooks(addressbooks));
 	}
 
 	public String sendListEvent(List<Event> events) {
@@ -361,20 +339,8 @@ public class XmlResponder {
 		return res;
 	}
 
-	public String sendListContact(List<Contact> ret) {
-		String res = "";
-		try {
-			Document doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/contact.xsd", "contacts");
-			Element root = doc.getDocumentElement();
-			for (Contact contact : ret) {
-				biw.appendContact(root, contact);
-			}
-			res = emitResponse(doc);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-		return res;
+	public String sendListContact(List<Contact> contacts) {
+		return emitResponse(biw.getXMLDocumentFromContacts(contacts));
 	}
 
 	public String sendSettings(Map<String, String> ret) {
@@ -411,20 +377,9 @@ public class XmlResponder {
 		return res;
 	}
 
-	public String sendFolder(Folder ret) {
-		String res = "";
-		try {
-			Document doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/contact.xsd", "folder");
-			Element root = doc.getDocumentElement();
-			biw.appendFolder(root, ret);
-			res = emitResponse(doc);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-		return res;
+	public String sendFolder(Folder folder) {
+		return emitResponse(biw.getXMLDocumentFrom(folder));
 	}
-
 	public String sendFreeBusyRequest(FreeBusyRequest freeBusy) {
 		String res = "";
 		try {
@@ -499,24 +454,15 @@ public class XmlResponder {
 	}
 
 	public void sendAddressBookChanges(AddressBookChangesResponse response) {
-		emitResponse(biw.writeAddressBookChanges(response));
+		emitResponse(biw.getXMLDocumentFrom(response));
 	}
 
 	public void sendlistAddressBooksChanged(FolderChanges folderChanges) {
-		emitResponse(biw.writeListAddressBooksChanged(folderChanges));
+		emitResponse(biw.getXMLDocumentFrom(folderChanges));
 	}
 
 	public String sendCountContacts(int count) {
-		String res = "";
-		try {
-			Document doc = DOMUtils.createDoc("http://www.obm.org/xsd/sync/addressbookcount.xsd", "addressbook-count");
-			Element root = doc.getDocumentElement();
-			biw.appendCountContacts(root, count);
-			res = emitResponse(doc);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-		return res;
+		return emitResponse(biw.getXMLDocumentFrom(count));
 	}
 
 }

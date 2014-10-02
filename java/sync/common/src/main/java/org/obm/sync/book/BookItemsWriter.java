@@ -32,6 +32,7 @@
 package org.obm.sync.book;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -52,57 +53,143 @@ import org.w3c.dom.Element;
  */
 public class BookItemsWriter extends AbstractItemsWriter {
 
-	public void appendContact(Element root, Contact contact) {
-		Element c = root;
-		if (!"contact".equals(root.getNodeName())) {
-			c = DOMUtils.createElement(root, "contact");
+	public Document getXMLDocumentFromAddressBooks(List<AddressBook> addressbooks) {
+		Document doc = DOMUtils.createDoc(
+				"http://www.obm.org/xsd/sync/books.xsd", "books");
+		Element root = doc.getDocumentElement();
+		for (AddressBook book: addressbooks) {
+			appendAddressBook(root, book);
+		}
+		return doc;
+	}
+
+	public Document getXMLDocumentFromContacts(List<Contact> contacts) {
+		Document doc = DOMUtils.createDoc(
+				"http://www.obm.org/xsd/sync/contact.xsd", "contacts");
+		Element root = doc.getDocumentElement();
+		for (Contact contact : contacts) {
+			appendContact(root, contact);
+		}
+		return doc;
+	}
+
+	public Document getXMLDocumentFrom(AddressBookChangesResponse response) {
+		Document doc = DOMUtils.createDoc(
+					"http://www.obm.org/xsd/sync/folder-changes.xsd", "addressbook-changes");
+		Element root = doc.getDocumentElement();
+		root.setAttribute("lastSync", DateHelper.asString(response.getLastSync()));
+
+		Element addressbooks = DOMUtils.createElement(root, "addressbooks");
+		createFolderChanges(response.getBooksChanges(), addressbooks);
+		Element contacts = DOMUtils.createElement(root, "contacts");
+		createContactChanges(response.getContactChanges(), contacts);
+
+		return doc;
+	}
+
+	public Document getXMLDocumentFrom(Folder folder) {
+		Document doc = DOMUtils.createDoc(
+				"http://www.obm.org/xsd/sync/contact.xsd", "folder");
+		Element root = doc.getDocumentElement();
+		appendFolder(root, folder);
+		return doc;
+	}
+
+	public Document getXMLDocumentFrom(FolderChanges folderChanges) {
+		Document doc = DOMUtils.createDoc(
+				"http://www.obm.org/xsd/sync/folder-changes.xsd", "folder-changes");
+		Element root = doc.getDocumentElement();
+		root.setAttribute("lastSync", DateHelper.asString(folderChanges.getLastSync()));
+		createFolderChanges(folderChanges, root);
+		return doc;
+	}
+
+	public Document getXMLDocumentFrom(int count) {
+		Document doc = DOMUtils.createDoc(
+				"http://www.obm.org/xsd/sync/addressbookcount.xsd", "addressbook-count");
+		Element root = doc.getDocumentElement();
+		appendCountContacts(root, count);
+		return doc;
+	}
+
+	public Document getXMLDocumentFrom(Contact contact) {
+		Document doc = DOMUtils.createDoc(
+				"http://www.obm.org/xsd/sync/contact.xsd", "contact");
+		Element root = doc.getDocumentElement();
+		appendContact(root, contact);
+		return doc;
+	}
+
+	public Document getXMLDocumentFrom(ContactChanges contactChanges) {
+		Document doc = DOMUtils.createDoc(
+					"http://www.obm.org/xsd/sync/contact-changes.xsd", "contact-changes");
+		Element root = doc.getDocumentElement();
+		root.setAttribute("lastSync", DateHelper.asString(contactChanges.getLastSync()));
+
+		createContactChanges(contactChanges, root);
+
+		return doc;
+	}
+
+	public String getContactAsString(Contact contact) {
+		try {
+			return DOMUtils.serialize(getXMLDocumentFrom(contact));
+		} catch (TransformerException e) {
+			logger.error(e.getMessage(), e);
+		}
+		return "";
+	}
+
+	private void appendContact(Element parent, Contact contact) {
+		if (!"contact".equals(parent.getNodeName())) {
+			parent = DOMUtils.createElement(parent, "contact");
 		}
 
 		if (contact.getUid() != null) {
-			c.setAttribute("uid", "" + contact.getUid());
+			parent.setAttribute("uid", "" + contact.getUid());
 		}
 
-		c.setAttribute("collected", "" + contact.isCollected());
+		parent.setAttribute("collected", "" + contact.isCollected());
 
-		createIfNotNull(c, "commonname", contact.getCommonname());
-		createIfNotNull(c, "first", contact.getFirstname());
-		createIfNotNull(c, "last", contact.getLastname());
-		createIfNotNull(c, "service", contact.getService());
-		createIfNotNull(c, "title", contact.getTitle());
-		createIfNotNull(c, "aka", contact.getAka());
-		createIfNotNull(c, "comment", contact.getComment());
-		createIfNotNull(c, "company", contact.getCompany());
+		createIfNotNull(parent, "commonname", contact.getCommonname());
+		createIfNotNull(parent, "first", contact.getFirstname());
+		createIfNotNull(parent, "last", contact.getLastname());
+		createIfNotNull(parent, "service", contact.getService());
+		createIfNotNull(parent, "title", contact.getTitle());
+		createIfNotNull(parent, "aka", contact.getAka());
+		createIfNotNull(parent, "comment", contact.getComment());
+		createIfNotNull(parent, "company", contact.getCompany());
 
-		createIfNotNull(c, "middlename", contact.getMiddlename());
-		createIfNotNull(c, "suffix", contact.getSuffix());
-		createIfNotNull(c, "manager", contact.getManager());
-		createIfNotNull(c, "assistant", contact.getAssistant());
-		createIfNotNull(c, "spouse", contact.getSpouse());
+		createIfNotNull(parent, "middlename", contact.getMiddlename());
+		createIfNotNull(parent, "suffix", contact.getSuffix());
+		createIfNotNull(parent, "manager", contact.getManager());
+		createIfNotNull(parent, "assistant", contact.getAssistant());
+		createIfNotNull(parent, "spouse", contact.getSpouse());
 		if(contact.getFolderId() != null){
-			createIfNotNull(c, "addressbookid", String.valueOf(contact.getFolderId()));
+			createIfNotNull(parent, "addressbookid", String.valueOf(contact.getFolderId()));
 		}
 		
 		String bday = null;
 		if (contact.getBirthday() != null) {
 			bday = DateHelper.asString(contact.getBirthday());
 		}
-		createIfNotNull(c, "birthday", bday);
+		createIfNotNull(parent, "birthday", bday);
 
 		String anni = null;
 		if (contact.getAnniversary() != null) {
 			anni = DateHelper.asString(contact.getAnniversary());
 		}
-		createIfNotNull(c, "anniversary", anni);
-		createIfNotNull(c, "caluri", contact.getCalUri());
+		createIfNotNull(parent, "anniversary", anni);
+		createIfNotNull(parent, "caluri", contact.getCalUri());
 		
-		addPhones(c, contact.getPhones());
-		addAddress(c, contact.getAddresses());
-		addWebsite(c, contact.getWebsites());
-		addEmail(c, contact.getEmails());
-		addIM(c, contact.getImIdentifiers());
+		addPhones(parent, contact.getPhones());
+		addAddress(parent, contact.getAddresses());
+		addWebsite(parent, contact.getWebsites());
+		addEmail(parent, contact.getEmails());
+		addIM(parent, contact.getImIdentifiers());
 	}
 
-	public void appendAddressBook(Element root, AddressBook book) {
+	private void appendAddressBook(Element root, AddressBook book) {
 		Element c = root;
 		if (!"book".equals(root.getNodeName())) {
 			c = DOMUtils.createElement(root, "book");
@@ -170,24 +257,6 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		}
 	}
 
-	public Document writeChanges(ContactChanges contactChanges) {
-		Document doc = null;
-		try {
-			doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/contact-changes.xsd",
-					"contact-changes");
-			Element root = doc.getDocumentElement();
-			root.setAttribute("lastSync", DateHelper.asString(contactChanges.getLastSync()));
-
-			createContactChanges(contactChanges, root);
-
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-
-		return doc;
-	}
-
 	private void createContactChanges(ContactChanges cc, Element root) {
 		
 		Element removed = DOMUtils.createElement(root, "removed");
@@ -202,20 +271,6 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		}
 	}
 
-	public String getContactAsString(Contact contact) {
-		String out = "";
-		try {
-			Document doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/contact.xsd", "contact");
-			Element root = doc.getDocumentElement();
-			appendContact(root, contact);
-			out = DOMUtils.serialize(doc);
-		} catch (TransformerException ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-		return out;
-	}
-
 	private void createFolderChanges(FolderChanges fc, Element root) {
 		Element removed = DOMUtils.createElement(root, "removed");
 		for (Folder ev : fc.getRemoved()) {
@@ -228,7 +283,7 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		}
 	}
 
-	public void appendFolder(Element root, Folder folder) {
+	private void appendFolder(Element root, Folder folder) {
 		Element f = root;
 		if (!"folder".equals(root.getNodeName())) {
 			f = DOMUtils.createElement(root, "folder");
@@ -243,37 +298,7 @@ public class BookItemsWriter extends AbstractItemsWriter {
 		createIfNotNull(f, "ownerLoginAtDomain", folder.getOwnerLoginAtDomain());
 	}
 
-	public Document writeAddressBookChanges(AddressBookChangesResponse response) {
-		Document doc = null;
-		try {
-			doc = DOMUtils.createDoc(
-					"http://www.obm.org/xsd/sync/folder-changes.xsd",
-					"addressbook-changes");
-			Element root = doc.getDocumentElement();
-			root.setAttribute("lastSync", DateHelper.asString(response.getLastSync()));
-
-			Element addressbooks = DOMUtils.createElement(root, "addressbooks");
-			createFolderChanges(response.getBooksChanges(), addressbooks);
-			Element contacts = DOMUtils.createElement(root, "contacts");
-			createContactChanges(response.getContactChanges(), contacts);
-
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-		}
-
-		return doc;
-	}
-
-	public Document writeListAddressBooksChanged(FolderChanges folderChanges) {
-		Document doc = null;
-		doc = DOMUtils.createDoc("http://www.obm.org/xsd/sync/folder-changes.xsd", "folder-changes");
-		Element root = doc.getDocumentElement();
-		root.setAttribute("lastSync", DateHelper.asString(folderChanges.getLastSync()));
-		createFolderChanges(folderChanges, root);
-		return doc;
-	}
-
-	public void appendCountContacts(Element root, int count) {
+	private void appendCountContacts(Element root, int count) {
 		createIfNotNull(root, "count", count);
 	}
 
