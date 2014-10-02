@@ -36,6 +36,7 @@ import com.google.common.base.Objects;
 public class IniFileSectionDatabaseConfiguration implements DatabaseConfiguration {
 
 	private static final int DB_MAX_POOL_SIZE_DEFAULT = 10;
+	private static final int DB_MIN_POOL_SIZE_PERCENT_DEFAULT = 10;
 
 	private final IniFile iniFile;
 	private final String section;
@@ -47,7 +48,9 @@ public class IniFileSectionDatabaseConfiguration implements DatabaseConfiguratio
 
 	@Override
 	public Integer getDatabaseMinConnectionPoolSize() {
-		return null;
+		int defaultValue = Math.max(1, getDatabaseMaxConnectionPoolSize() * DB_MIN_POOL_SIZE_PERCENT_DEFAULT / 100);
+
+		return iniFile.getIniIntegerValue(section, DB_MIN_POOL_SIZE_KEY, defaultValue);
 	}
 
 	@Override
