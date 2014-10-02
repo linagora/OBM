@@ -57,13 +57,28 @@ public class IniFileSectionDatabaseConfigurationTest {
 	private IniFile.Factory iniFileFactory;
 
 	@Test
+	public void testGetDatabaseMinConnectionPoolSizeShouldReturn1WhenMinAndMaxAreNotSet() {
+		assertThat(newEmptyConf().getDatabaseMinConnectionPoolSize()).isEqualTo(1);
+	}
+
+	@Test
+	public void testGetDatabaseMinConnectionPoolSizeShouldReturn1WhenMaxIsLowerThan10() {
+		assertThat(newConf("dbMaster.ini", "master").getDatabaseMinConnectionPoolSize()).isEqualTo(1);
+	}
+
+	@Test
+	public void testGetDatabaseMinConnectionPoolSizeShouldReturn5WhenMaxIs50AndMinIsNotSet() {
+		assertThat(newConf("dbMasterWithMax50.ini", "master").getDatabaseMinConnectionPoolSize()).isEqualTo(5);
+	}
+
+	@Test
 	public void testGetDatabaseMinConnectionPoolSize() {
-		assertThat(newEmptyConf().getDatabaseMinConnectionPoolSize()).isNull();
+		assertThat(newConf("dbMasterWithMinSize.ini", "master").getDatabaseMinConnectionPoolSize()).isEqualTo(20);
 	}
 
 	@Test
 	public void testGetDatabaseMaxConnectionPoolSizeShouldReturnDefaultWhenNotSet() {
-		assertThat(newEmptyConf().getDatabaseMinConnectionPoolSize()).isNull();
+		assertThat(newEmptyConf().getDatabaseMaxConnectionPoolSize()).isEqualTo(10);
 	}
 
 	@Test
