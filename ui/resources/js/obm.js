@@ -704,9 +704,16 @@ function displayUnreadMail(count) {
 
 function displayInTitleTab(page, count){
   var title = document.title;
+  var favicon = new Favico({
+    animation:'none',
+    bgColor : '#ef5a04',
+    textColor : '#ffffff',
+  });
+
   if (window.location.pathname == '/' + page + '/' + page + '_index.php'){
-    title = title.split(')');
-    document.title = '(' + count + ') ' + title.pop();
+    title = title.split(' (');
+    document.title =  title[0]  + ' (' + count + ') ' ;
+    favicon.badge(count.toString());
   }
 }
 
