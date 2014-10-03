@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -53,6 +55,7 @@ import org.obm.sync.items.AbstractItemsWriter;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableSet;
@@ -108,6 +111,16 @@ private CalendarItemsWriter writer;
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
+    private void removeHashInEventChanges(Document resultDocument) {
+        Element updated = (Element) resultDocument.getElementsByTagName("updated").item(0);
+        Element event = (Element) updated.getElementsByTagName("event").item(0);
+        Element eventException = (Element) event.getElementsByTagName("eventException").item(0);
+        event.removeChild(
+                event.getElementsByTagName("hash").item(0));
+        eventException.removeChild(
+                eventException.getElementsByTagName("hash").item(0));
+    }
+
 	@Test
 	public void testGetXMLDocumentFromEventChangesWithUpdatedElements() throws SAXException, IOException, TransformerException {
 		Event updatedEvent = getFakeEvent(Participation.needsAction());
@@ -123,6 +136,7 @@ private CalendarItemsWriter writer;
 
 		String expectedXML = loadXmlFile("OBMFULL-3301_WithUpdatedElements.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(eventChanges);
+		removeHashInEventChanges(resultDocument);
 		String serialize = DOMUtils.serialize(resultDocument);
 		XMLAssert.assertXMLEqual(expectedXML, serialize);
 	}
@@ -155,16 +169,31 @@ private CalendarItemsWriter writer;
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
+    private void removeHashNodeInEvent(Document resultDocument) {
+        Element hash = (Element) resultDocument.getElementsByTagName("hash").item(0);
+        hash.getParentNode().removeChild(hash);
+    }
+
 	@Test
 	public void testGetXMLDocumentFromEvent() throws SAXException, IOException, TransformerException {
 		Event event = getFakeEvent(Participation.needsAction());
 
 		String expectedXML = loadXmlFile("OBMFULL-3301_SimpleEvent.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(event);
+		removeHashNodeInEvent(resultDocument);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
-	@Test
+    @Test
+    public void testGetXMLDocumentFromEventCreateAnHashCodeTag() {
+        Event event = getFakeEvent(Participation.needsAction());
+        Document resultDocument = writer.getXMLDocumentFrom(event);
+        Element hashElement = (Element) resultDocument.getElementsByTagName("hash").item(0);
+        int hash = Integer.valueOf(hashElement.getFirstChild().getTextContent());
+        assertThat(hash).isEqualTo(event.hashCode());
+    }
+
+    @Test
 	public void testGetXMLDocumentFromAnonymizedEvent() throws SAXException, IOException, TransformerException {
 		Event event = new Event();
 		
@@ -182,6 +211,7 @@ private CalendarItemsWriter writer;
 
 		String expectedXML = loadXmlFile("AnonymizedSimpleEvent.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(event);
+		removeHashNodeInEvent(resultDocument);
 
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
@@ -204,6 +234,7 @@ private CalendarItemsWriter writer;
 
 		String expectedXML = loadXmlFile("NotAnonymizedSimpleEvent.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(event);
+		removeHashNodeInEvent(resultDocument);
 
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
@@ -225,9 +256,19 @@ private CalendarItemsWriter writer;
 
 		String expectedXML = loadXmlFile("NotAnonymizedSimpleEvent.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(event);
+		removeHashNodeInEvent(resultDocument);
 
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
+
+    private void removeHashInListOfEvents(Document resultDocument) {
+        Element event1 = (Element) resultDocument.getElementsByTagName("event").item(0);
+        Element event2 = (Element) resultDocument.getElementsByTagName("event").item(1);
+        event1.removeChild(
+                event1.getElementsByTagName("hash").item(0));
+        event2.removeChild(
+                event2.getElementsByTagName("hash").item(0));
+    }
 
 	@Test
 	public void testGetXMLDocumentFromListOfEvent() throws SAXException, IOException, TransformerException {
@@ -237,6 +278,7 @@ private CalendarItemsWriter writer;
 
 		String expectedXML = loadXmlFile("OBMFULL-3301_ListOfEvent.xml");
 		Document resultDocument = writer.getXMLDocumentFrom(events);
+		removeHashInListOfEvents(resultDocument);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
 
@@ -260,6 +302,28 @@ private CalendarItemsWriter writer;
 		Document resultDocument = writer.getXMLDocumentFrom(resourceInfo);
 		XMLAssert.assertXMLEqual(expectedXML, DOMUtils.serialize(resultDocument));
 	}
+	
+    @Test
+    public void testSerializingTwiceSameContactProducesSameHashcode() {
+        Document resultDocument1 = writer.getXMLDocumentFrom(getFakeEvent(Participation.needsAction()));
+        Document resultDocument2 = writer.getXMLDocumentFrom(getFakeEvent(Participation.needsAction()));
+        Element hash1 = (Element) resultDocument1.getElementsByTagName("hash").item(0);
+        Element hash2 = (Element) resultDocument2.getElementsByTagName("hash").item(0);
+        assertThat(hash1.getFirstChild().getTextContent())
+        .isEqualTo(hash2.getFirstChild().getTextContent());
+    }
+
+    @Test
+    public void testSerializingTwiceNotSameContactProducesNotSameHashcode() {
+        Document resultDocument1 = writer.getXMLDocumentFrom(getFakeEvent(Participation.needsAction()));
+        Event newEvent = getFakeEvent(Participation.needsAction());
+        newEvent.setAlert(123456);
+        Document resultDocument2 = writer.getXMLDocumentFrom(newEvent);
+        Element hash1 = (Element) resultDocument1.getElementsByTagName("hash").item(0);
+        Element hash2 = (Element) resultDocument2.getElementsByTagName("hash").item(0);
+        assertThat(hash1.getFirstChild().getTextContent())
+        .isNotEqualTo(hash2.getFirstChild().getTextContent());
+    }
 
 	private Event getFakeEvent(Participation participation) {
 		Event ev = new Event();
