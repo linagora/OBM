@@ -53,6 +53,7 @@ public class Configuration {
 	public static class Transaction {
 		public int timeoutInSeconds = 10;
 		public boolean usePersistentCache = true;
+		public int toleranceInSeconds = 5;
 		public File journal1 = null;
 		public File journal2 = null;
 		public boolean enableJournal = false;

@@ -66,5 +66,7 @@ public interface ConfigurationService extends DomainConfiguration, DataConfigura
 
 	boolean isConfidentialEventsEnabled();
 	
+	int getTransactionToleranceTimeoutInSeconds();
+	
 	boolean  isPrivateEventAnonymizationEnabled();
 }

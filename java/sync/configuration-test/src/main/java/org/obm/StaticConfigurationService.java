@@ -145,6 +145,11 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 		return "global.test";
 	}
 
+    @Override
+    public int getTransactionToleranceTimeoutInSeconds() {
+            return configuration.transaction.toleranceInSeconds;
+    }
+
 	@Override
 	public String getObmUIBaseUrl() {
 		return configuration.obmUiBaseUrl;
