@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><folder-changes xmlns="http://www.obm.org/xsd/sync/folder-changes.xsd" lastSync="1412337600000">
+<removed>
+<folder uid="123">
+<name>name</name>
+<ownerDisplayName>ownerDisplayName</ownerDisplayName>
+<ownerLoginAtDomain>ownerLoginAtDomain</ownerLoginAtDomain>
+</folder>
+</removed>
+<updated>
+<folder uid="123">
+<name>name</name>
+<ownerDisplayName>ownerDisplayName</ownerDisplayName>
+<ownerLoginAtDomain>ownerLoginAtDomain</ownerLoginAtDomain>
+</folder>
+</updated>
+</folder-changes>
+

@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?><books xmlns="http://www.obm.org/xsd/sync/books.xsd">
+<book name="name" readonly="true" uid="123"/>
+</books>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><contacts xmlns="http://www.obm.org/xsd/sync/contact.xsd">
+<contact collected="true" uid="1">
+<commonname>commonname</commonname>
+<first>firstname</first>
+<last>lastname</last>
+<service>service</service>
+<title>title</title>
+<aka>aka</aka>
+<comment>comment</comment>
+<middlename>middlename</middlename>
+<suffix>suffix</suffix>
+<manager>manager</manager>
+<assistant>assistant</assistant>
+<spouse>spouse</spouse>
+<addressbookid>1</addressbookid>
+<birthday>1412337600000</birthday>
+<anniversary>1412337600000</anniversary>
+<caluri>caluri</caluri>
+<phones>
+<phone label="phone" number="123"/>
+</phones>
+<addresses>
+<address country="country" expressPostal="expressPostal" label="address" state="state" town="town" zip="zipCode">street</address>
+</addresses>
+<websites>
+<site label="label" url="url"/>
+</websites>
+<emails>
+<mail label="email" value="email@linagora"/>
+</emails>
+<instantmessaging>
+<im address="address" label="im" protocol="protocol"/>
+</instantmessaging>
+</contact>
+</contacts>
+
