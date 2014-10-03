@@ -57,4 +57,6 @@ public interface ConfigurationService extends DomainConfiguration, DataConfigura
 	String getObmUIBaseUrl();
 
 	boolean isLdapModuleEnabled();
+
+	int getTransactionToleranceTimeoutInSeconds();
 }
