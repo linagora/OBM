@@ -816,7 +816,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 	
 	private void applyDelegationRightsOnAttendeesToEvent(AccessToken token, Event event) throws PermissionException {
-		Iterable<Attendee> attendeesWithEmails = findAttendeesWithEmail(event.getAttendees());
+		Iterable<Attendee> attendeesWithEmails = filterAttendeesWithEmail(event.getAttendees());
 		Map<String, Attendee> emailToAttendee = emailToAttendee(attendeesWithEmails);
 		CalendarRights emailToRights = helperService.listRightsOnCalendars(token, emailToAttendee.keySet());
 		for (CalendarRightsPair pair : emailToRights) {
@@ -832,7 +832,7 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private static Iterable<Attendee> findAttendeesWithEmail(List<Attendee> attendees) {
+	private static Iterable<Attendee> filterAttendeesWithEmail(List<Attendee> attendees) {
 		return Iterables.filter(attendees, new Predicate<Attendee>() {
 
 			@Override
