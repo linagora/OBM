@@ -80,6 +80,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
 
@@ -134,7 +135,8 @@ public class BeansTest {
 				UserIdentity.class,
 				UserAddress.class,
 				UserPhones.class,
-				UserWork.class);
+				UserWork.class,
+				UserPassword.class);
 	}
 	
 	@Test
