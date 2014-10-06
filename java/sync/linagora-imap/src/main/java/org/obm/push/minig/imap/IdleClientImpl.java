@@ -67,21 +67,21 @@ public class IdleClientImpl implements IdleClient {
 		}
 		
 		@Override
-		public IdleClient create(String hostname, int port, String loginAtDomain, String password) {
+		public IdleClient create(String hostname, int port, String loginAtDomain, char[] password) {
 			return new IdleClientImpl(hostname, port, loginAtDomain, password, socketProvider);
 		}
 		
 	}
 	
 	private final String login;
-	private final String password;
+	private final char[] password;
 	private final String hostname;
 	private final int port;
 	private final ClientSupport cs;
 	private final IdleClientCallback icb;
 
 	@VisibleForTesting IdleClientImpl(String hostname, int port, String loginAtDomain,
-			String password, Provider<SocketConnector> socketProvider) {
+			char[] password, Provider<SocketConnector> socketProvider) {
 		this.login = loginAtDomain;
 		this.password = password;
 		this.hostname = hostname;

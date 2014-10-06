@@ -73,7 +73,7 @@ public class UIDFetchPartTest {
 	}
 	
 	private StoreClient loggedClient() throws Exception  {
-		StoreClient storeClient = storeClientFactory.create(greenMail.getImap().getBindTo(), mailbox, password);
+		StoreClient storeClient = storeClientFactory.create(greenMail.getImap().getBindTo(), mailbox, password.toCharArray());
 		storeClient.login(false);
 		return storeClient;
 	}

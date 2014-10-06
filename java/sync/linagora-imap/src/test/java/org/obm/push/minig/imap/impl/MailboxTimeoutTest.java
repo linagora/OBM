@@ -126,7 +126,7 @@ public class MailboxTimeoutTest {
 
 	@Test
 	public void select() throws IMAPException, InterruptedException, ImapTimeoutException {
-		testee.login(mailbox, password, greenmailAddress, false);
+		testee.login(mailbox, password.toCharArray(), greenmailAddress, false);
 		boolean result = testee.select(IMAP_INBOX_NAME);
 		testee.logout();
 		assertThat(result).isTrue();
@@ -138,7 +138,7 @@ public class MailboxTimeoutTest {
 		greenMail.lockGreenmailAndReleaseAfter(4);
 		Stopwatch stopwatch = Stopwatch.createStarted();
 		try {
-			testee.login(mailbox, password, greenmailAddress, false);
+			testee.login(mailbox, password.toCharArray(), greenmailAddress, false);
 		} finally {
 			assertThat(stopwatch.elapsed(TimeUnit.MILLISECONDS)).isGreaterThan(configuredTimeout).isLessThan(TimeUnit.MILLISECONDS.convert(3, TimeUnit.SECONDS));
 			checkFreedResources();
@@ -153,14 +153,14 @@ public class MailboxTimeoutTest {
 
 	@Test
 	public void loginLogout() throws IMAPException, InterruptedException, ImapTimeoutException {
-		testee.login(mailbox, password, greenmailAddress, false);
+		testee.login(mailbox, password.toCharArray(), greenmailAddress, false);
 		testee.logout();
 		checkFreedResources();
 	}
 	
 	@Test
 	public void loginTlsLogout() throws IMAPException, InterruptedException, ImapTimeoutException {
-		testee.login(mailbox, password, greenmailAddress, true);
+		testee.login(mailbox, password.toCharArray(), greenmailAddress, true);
 		testee.logout();
 		checkFreedResources();
 	}
@@ -168,7 +168,7 @@ public class MailboxTimeoutTest {
 	@Test(expected=IMAPException.class)
 	public void loginBadCredentials() throws IMAPException, InterruptedException, ImapTimeoutException {
 		try {
-			testee.login("woho", password, greenmailAddress, false);
+			testee.login("woho", password.toCharArray(), greenmailAddress, false);
 		} finally {
 			checkFreedResources();
 		}
@@ -176,9 +176,9 @@ public class MailboxTimeoutTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void loginLogin() throws IMAPException, InterruptedException, ImapTimeoutException {
-		testee.login(mailbox, password, greenmailAddress, false);
+		testee.login(mailbox, password.toCharArray(), greenmailAddress, false);
 		try {
-			testee.login(mailbox, password, greenmailAddress, false);
+			testee.login(mailbox, password.toCharArray(), greenmailAddress, false);
 		} catch (IllegalStateException e) {
 			testee.logout();
 			throw e;
@@ -189,7 +189,7 @@ public class MailboxTimeoutTest {
 	
 	@Test
 	public void loginLogoutLogout() throws IMAPException, InterruptedException, ImapTimeoutException {
-		testee.login(mailbox, password, greenmailAddress, false);
+		testee.login(mailbox, password.toCharArray(), greenmailAddress, false);
 		testee.logout();
 		testee.logout();
 		checkFreedResources();
@@ -198,9 +198,9 @@ public class MailboxTimeoutTest {
 	@Test
 	@Ignore("This test fails for no obvious reason, it's not critical to OBM by the way")
 	public void loginLogoutLoginSelect() throws IMAPException, InterruptedException, ImapTimeoutException {
-		testee.login(mailbox, password, greenmailAddress, false);
+		testee.login(mailbox, password.toCharArray(), greenmailAddress, false);
 		testee.logout();
-		testee.login(mailbox, password, greenmailAddress, false);
+		testee.login(mailbox, password.toCharArray(), greenmailAddress, false);
 		boolean result = testee.select(IMAP_INBOX_NAME);
 		testee.logout();
 		
@@ -211,10 +211,10 @@ public class MailboxTimeoutTest {
 	@Test
 	@Ignore("This test fails for no obvious reason, it's not critical to OBM by the way")
 	public void loginSelectLogoutLoginSelect() throws IMAPException, InterruptedException, ImapTimeoutException {
-		testee.login(mailbox, password, greenmailAddress, false);
+		testee.login(mailbox, password.toCharArray(), greenmailAddress, false);
 		boolean result1 = testee.select(IMAP_INBOX_NAME);
 		testee.logout();
-		testee.login(mailbox, password, greenmailAddress, false);
+		testee.login(mailbox, password.toCharArray(), greenmailAddress, false);
 		boolean result2 = testee.select(IMAP_INBOX_NAME);
 		testee.logout();
 		
@@ -225,7 +225,7 @@ public class MailboxTimeoutTest {
 	
 	@Test
 	public void selectTimeout() throws IMAPException, InterruptedException, ImapTimeoutException {
-		testee.login(mailbox, password, greenmailAddress, false);
+		testee.login(mailbox, password.toCharArray(), greenmailAddress, false);
 		try {
 			greenMail.lockGreenmailAndReleaseAfter(3);
 			testee.select(IMAP_INBOX_NAME);

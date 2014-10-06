@@ -65,7 +65,7 @@ import org.obm.push.minig.imap.impl.MailThread;
 public interface StoreClient extends AutoCloseable {
 
 	interface Factory {
-		StoreClient create(String hostname, String login, String password);
+		StoreClient create(String hostname, String login, char[] password);
 	}
 	
 	/**
