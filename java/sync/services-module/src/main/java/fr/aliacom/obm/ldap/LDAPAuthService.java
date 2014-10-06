@@ -48,6 +48,8 @@ import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 /**
  * Authenticate on LDAP
  */
@@ -73,11 +75,11 @@ public class LDAPAuthService implements IAuthentificationService {
 	public boolean doAuth(Credentials credentials) throws AuthFault {
 		Preconditions.checkArgument(!credentials.isPasswordHashed(), "The LDAP authentication service does not handle already hashed passwords");
 
-		doBindAuth(credentials.getLogin().getLogin(), credentials.getLogin().getDomain(), credentials.getPassword());
+		doBindAuth(credentials.getLogin().getLogin(), credentials.getLogin().getDomain(), UserPassword.valueOf(credentials.getPassword()));
 		return true;
 	}
 
-	private void doBindAuth(String login, String domain, String clearTextPassword) throws AuthFault {
+	private void doBindAuth(String login, String domain, UserPassword password) throws AuthFault {
 		LDAPUtils utils = ldapUtilsFactory.create(directory.getUri(), directory.getRootDN(), directory.getRootPW(), directory.getBaseDN());
 		DirContext lookup = null;
 		DirContext bind = null;
@@ -94,7 +96,7 @@ public class LDAPAuthService implements IAuthentificationService {
 			String dn = sr.getName() + "," + directory.getBaseDN();
 
 			logger.info("dn lookup: " + login + "@" + domain + " => " + dn);
-			bind = ldapUtilsFactory.create(directory.getUri(), dn, clearTextPassword, directory.getBaseDN()).getConnection();
+			bind = ldapUtilsFactory.create(directory.getUri(), dn, password, directory.getBaseDN()).getConnection();
 		} catch (AuthenticationException e) {
 			throw new AuthFault(e);
 		} catch (Exception e) {

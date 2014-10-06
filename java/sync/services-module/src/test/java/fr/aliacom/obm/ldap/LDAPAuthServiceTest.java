@@ -45,6 +45,8 @@ import org.junit.Test;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Credentials;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public class LDAPAuthServiceTest {
 
 	private LDAPAuthService service;
@@ -114,7 +116,7 @@ public class LDAPAuthServiceTest {
 	@Test(expected = RuntimeException.class)
 	public void testDoAuthWhenBindFails() throws Exception {
 		LDAPUtils utils = expectLDAPUtils(null, null);
-		LDAPUtils bindUtils = expectLDAPUtils("uid=login,dc=local", "password");
+		LDAPUtils bindUtils = expectLDAPUtils("uid=login,dc=local", UserPassword.valueOf("password"));
 		DirContext context = mocksControl.createMock(DirContext.class);
 		SearchResult result = new SearchResult("uid=login", null, null);
 
@@ -133,7 +135,7 @@ public class LDAPAuthServiceTest {
 	@Test(expected = AuthFault.class)
 	public void testDoAuthWhenBindCannotAuthenticate() throws Exception {
 		LDAPUtils utils = expectLDAPUtils(null, null);
-		LDAPUtils bindUtils = expectLDAPUtils("uid=login,dc=local", "password");
+		LDAPUtils bindUtils = expectLDAPUtils("uid=login,dc=local", UserPassword.valueOf("password"));
 		DirContext context = mocksControl.createMock(DirContext.class);
 		SearchResult result = new SearchResult("uid=login", null, null);
 
@@ -152,7 +154,7 @@ public class LDAPAuthServiceTest {
 	@Test
 	public void testDoAuth() throws Exception {
 		LDAPUtils utils = expectLDAPUtils(null, null);
-		LDAPUtils bindUtils = expectLDAPUtils("uid=login,dc=local", "password");
+		LDAPUtils bindUtils = expectLDAPUtils("uid=login,dc=local", UserPassword.valueOf("password"));
 		DirContext context = mocksControl.createMock(DirContext.class);
 		SearchResult result = new SearchResult("uid=login", null, null);
 
@@ -168,7 +170,7 @@ public class LDAPAuthServiceTest {
 		service.doAuth(credentials);
 	}
 
-	private LDAPUtils expectLDAPUtils(String dn, String password) {
+	private LDAPUtils expectLDAPUtils(String dn, UserPassword password) {
 		LDAPUtils utils = mocksControl.createMock(LDAPUtils.class);
 
 		expect(ldapUtilsFactory.create("uri", dn, password, "dc=local")).andReturn(utils);

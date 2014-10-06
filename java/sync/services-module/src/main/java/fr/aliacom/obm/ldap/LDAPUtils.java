@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public class LDAPUtils {
 
 	private final Logger logger =  LoggerFactory.getLogger(LDAPUtils.class);
@@ -55,7 +57,7 @@ public class LDAPUtils {
 
 	private final Hashtable<String, String> env;
 
-	public LDAPUtils(String uri, String rootDn, String rootPw, String baseDn) {
+	public LDAPUtils(String uri, String rootDn, UserPassword rootPw, String baseDn) {
 		this.baseDn = baseDn;
 
 		env = new Hashtable<String, String>();
@@ -65,7 +67,7 @@ public class LDAPUtils {
 		env.put(DirContext.SECURITY_AUTHENTICATION, "simple");
 		if(rootDn != null && rootPw != null){
 			env.put(DirContext.SECURITY_PRINCIPAL, rootDn);
-			env.put(DirContext.SECURITY_CREDENTIALS, rootPw);
+			env.put(DirContext.SECURITY_CREDENTIALS, rootPw.getStringValue());
 		}
 
 		if (logger.isDebugEnabled()) {

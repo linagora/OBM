@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.ldap;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 /**
  * Un annuaire ldap pour l'authentification
  */
@@ -42,7 +44,7 @@ public class LDAPDirectory {
 
 	private final String rootDN;
 
-	private final String rootPW;
+	private final UserPassword rootPW;
 
 	private final String matchField;
 
@@ -51,7 +53,7 @@ public class LDAPDirectory {
 	private final String obmDomain;
 
 	public LDAPDirectory(String uri, String userPattern, String rootDN,
-			String rootPW, String baseDN, String matchField, String obmDomain) {
+			UserPassword rootPW, String baseDN, String matchField, String obmDomain) {
 		this.uri = uri;
 		this.userPattern = userPattern;
 		this.rootDN = rootDN;
@@ -74,7 +76,7 @@ public class LDAPDirectory {
 		return rootDN;
 	}
 
-	public String getRootPW() {
+	public UserPassword getRootPW() {
 		return rootPW;
 	}
 
