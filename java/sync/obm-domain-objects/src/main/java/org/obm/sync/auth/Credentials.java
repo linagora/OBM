@@ -152,7 +152,7 @@ public class Credentials {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("login", login)
-			.add("password", "XXXXXXXX")
+			.add("password", password)
 			.add("hashedPassword", hashedPassword)
 			.toString();
 	}

@@ -37,6 +37,8 @@ import org.obm.provisioning.ldap.client.bean.LdapDomain;
 import org.obm.provisioning.ldap.client.bean.LdapGroup;
 import org.obm.provisioning.ldap.client.bean.LdapUser;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public interface Configuration {
 
 	/**
@@ -44,7 +46,7 @@ public interface Configuration {
 	 */
 	int maxRequests();
 	Dn getBindDn();
-	String getBindPassword();
+	UserPassword getBindPassword();
 
 	Dn getUserBaseDn(LdapDomain domain);
 	String buildUserFilter(LdapUser.Uid userId);

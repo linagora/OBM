@@ -155,7 +155,7 @@ public class LdapUser {
 					obmUser.getLastName();
 			this.givenName = obmUser.getFirstName();
 			this.homeDirectory = buildHomeDirectory(obmUser);
-			this.userPassword = obmUser.getPassword();
+			this.userPassword = obmUser.getPassword().getStringValue();
 			this.webAccess = DEFAULT_WEB_ACCESS;
 			this.mailBox = String.format("%s@%s",
 					obmUser.getLogin().toLowerCase(),

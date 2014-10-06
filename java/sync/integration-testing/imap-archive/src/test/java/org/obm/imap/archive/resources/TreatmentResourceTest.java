@@ -63,9 +63,9 @@ import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
+import org.obm.imap.archive.CyrusCompatGreenmailRule;
 import org.obm.imap.archive.DatabaseOperations;
 import org.obm.imap.archive.Expectations;
-import org.obm.imap.archive.CyrusCompatGreenmailRule;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.TestImapArchiveModules.TimeBasedModule.TestDateProvider;
 import org.obm.imap.archive.beans.ArchiveStatus;
@@ -89,6 +89,7 @@ import com.ninja_squad.dbsetup.operation.Operation;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.system.ObmSystemUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 public class TreatmentResourceTest {
 
@@ -223,7 +224,7 @@ public class TreatmentResourceTest {
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build()).times(2);
 		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();
@@ -265,7 +266,7 @@ public class TreatmentResourceTest {
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build()).times(2);
 		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();
@@ -389,7 +390,7 @@ public class TreatmentResourceTest {
 							true)
 					.build()));
 		
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build()).times(2);
 		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();

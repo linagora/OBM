@@ -53,7 +53,6 @@ import net.fortuna.ical4j.model.DateTime;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.Months;
 import org.obm.annotations.transactional.Transactional;
-import org.obm.configuration.ConfigurationService;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;

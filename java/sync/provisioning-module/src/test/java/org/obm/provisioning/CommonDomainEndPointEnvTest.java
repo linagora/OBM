@@ -101,6 +101,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
@@ -147,7 +148,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(DateProvider.class).toInstance(mocksControl.createMock(DateProvider.class));
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));
 					bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
-					bind(Configuration.class).toInstance(new LdapConfiguration("cn=directory manager", "secret", 0));
+					bind(Configuration.class).toInstance(new LdapConfiguration("cn=directory manager", UserPassword.valueOf("secret"), 0));
 					bind(LdapService.class).toInstance(mocksControl.createMock(LdapService.class));
 					bind(BatchTracker.class).toInstance(mocksControl.createMock(BatchTracker.class));
 					bind(ObmSyncConfigurationService.class).toInstance(mocksControl.createMock(ObmSyncConfigurationService.class));
@@ -308,7 +309,7 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected void expectSuccessfulAuthentication(String login, String password) {
 		ObmUser user = ObmUser.builder()
 						.login(UserLogin.valueOf(login))
-						.password(password)
+						.password(UserPassword.valueOf(password))
 						.domain(domain)
 						.identity(UserIdentity.builder()
 								.lastName(login)
@@ -519,7 +520,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				.domain(domain)
 				.extId(userExtId("extId"))
 				.login(UserLogin.valueOf("user1"))
-				.password("password")
+				.password(UserPassword.valueOf("password"))
 				.identity(UserIdentity.builder()
 						.kind("kind")
 						.lastName("Doe")

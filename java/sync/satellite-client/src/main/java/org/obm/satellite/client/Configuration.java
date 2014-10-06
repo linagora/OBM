@@ -29,6 +29,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.satellite.client;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public interface Configuration {
 
 	public enum SatelliteProtocol {
@@ -50,7 +52,7 @@ public interface Configuration {
 
 	String getUsername();
 
-	String getPassword();
+	UserPassword getPassword();
 
 	boolean isIMAPServerManaged();
 

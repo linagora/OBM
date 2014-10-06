@@ -84,6 +84,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
 
@@ -360,7 +361,7 @@ public class UserDaoJdbcImpl implements UserDao {
 					.publicFreeBusy(computePublicFreeBusy(rs))
 					.extId(extId != null ? UserExtId.builder().extId(extId).build() : null)
 					.entityId(EntityId.valueOf(rs.getInt("userentity_entity_id")))
-					.password(Strings.emptyToNull(rs.getString("userobm_password")))
+					.password(UserPassword.valueOf(Strings.emptyToNull(rs.getString("userobm_password"))))
 					.profileName(ProfileName.builder().name(rs.getString("userobm_perms")).build())
 					.work(UserWork.builder()
 						.title(emptyToNull(rs.getString("userobm_title")))
@@ -654,7 +655,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			}
 
 			ps.setString(idx++, user.getLogin());
-			ps.setString(idx++, Strings.nullToEmpty(user.getPassword()));
+			ps.setString(idx++, userPasswordNullToEmpty(user));
 
 			if (user.getProfileName() != null) {
 				ps.setString(idx++, user.getProfileName().getName());
@@ -737,6 +738,14 @@ public class UserDaoJdbcImpl implements UserDao {
 		}
 	}
 
+	private String userPasswordNullToEmpty(ObmUser user) {
+		UserPassword password = user.getPassword();
+		if (password == null) {
+			return "";
+		}
+		return Strings.nullToEmpty(password.getStringValue());
+	}
+
 	private int getAndIncrementUidMaxUsed() throws DaoException {
 		Integer uid = obmInfoDao.getUidMaxUsed();
 
@@ -804,7 +813,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			}
 
 			ps.setString(idx++, user.getLogin());
-			ps.setString(idx++, Strings.nullToEmpty(user.getPassword()));
+			ps.setString(idx++, userPasswordNullToEmpty(user));
 
 			if (user.getProfileName() != null) {
 				ps.setString(idx++, user.getProfileName().getName());

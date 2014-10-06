@@ -87,6 +87,7 @@ import com.ninja_squad.dbsetup.operation.Operation;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.system.ObmSystemUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 public class TreatmentsResourceTest {
 
@@ -274,7 +275,7 @@ public class TreatmentsResourceTest {
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build()).times(2);
 		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();
@@ -305,7 +306,7 @@ public class TreatmentsResourceTest {
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build()).times(2);
 		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();
@@ -335,7 +336,7 @@ public class TreatmentsResourceTest {
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build()).times(2);
 		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();
@@ -374,7 +375,7 @@ public class TreatmentsResourceTest {
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build()).times(2);
 		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();
@@ -413,7 +414,7 @@ public class TreatmentsResourceTest {
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build()).times(2);
 		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();

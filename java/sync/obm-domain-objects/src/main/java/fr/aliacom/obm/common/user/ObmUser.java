@@ -76,7 +76,7 @@ public class ObmUser {
 		private ObmDomain domain;
 		private boolean publicFreeBusy;
 
-		private String password;
+		private UserPassword password;
 		private ProfileName profileName;
 		private Boolean archived;
 
@@ -189,7 +189,7 @@ public class ObmUser {
 			return this;
 		}
 
-		public Builder password(String password) {
+		public Builder password(UserPassword password) {
 			this.password = password;
 			return this;
 		}
@@ -267,7 +267,7 @@ public class ObmUser {
 	private final ObmDomain domain;
 	private final boolean publicFreeBusy;
 
-	private final String password;
+	private final UserPassword password;
 	private final ProfileName profileName;
 	private final boolean archived;
 
@@ -281,7 +281,7 @@ public class ObmUser {
 			String description, Date timeCreate, Date timeUpdate,
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName,
-			boolean archived, String password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
+			boolean archived, UserPassword password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -509,7 +509,7 @@ public class ObmUser {
 		return archived;
 	}
 
-	public String getPassword() {
+	public UserPassword getPassword() {
 		return password;
 	}
 

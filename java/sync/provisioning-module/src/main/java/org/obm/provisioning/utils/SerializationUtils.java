@@ -64,6 +64,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
 
@@ -197,7 +198,7 @@ public class SerializationUtils {
 				phonesBuilder.mobile(value.asText());
 				break;
 			case PASSWORD:
-				toBuild.password(value.asText());
+				toBuild.password(UserPassword.valueOf(value.asText()));
 				break;
 			case PHONES:
 				phonesBuilder.phones(getCurrentTokenTextValues(value));

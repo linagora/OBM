@@ -63,6 +63,6 @@ public class StoreClientFactory {
 		 
 		ObmSystemUser cyrusUser = userSystemDao.getByLogin(ObmSystemUser.CYRUS);
 		String cyrusAddress = locatorService.getServiceLocation("mail/imap_frontend", domainName);
-		return storeClientFactory.create(cyrusAddress, cyrusUser.getLogin(), cyrusUser.getPassword());
+		return storeClientFactory.create(cyrusAddress, cyrusUser.getLogin(), cyrusUser.getPassword().getStringValue());
      }
 }

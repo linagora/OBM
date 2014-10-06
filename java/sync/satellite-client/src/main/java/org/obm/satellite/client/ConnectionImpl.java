@@ -108,7 +108,7 @@ public class ConnectionImpl implements Connection {
 			StatusLine statusLine = Executor
 					.newInstance(client)
 					.authPreemptive(new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme()))
-					.auth(configuration.getUsername(), configuration.getPassword())
+					.auth(configuration.getUsername(), configuration.getPassword().getStringValue())
 					.execute(Request.Post(uri))
 					.returnResponse()
 					.getStatusLine();

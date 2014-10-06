@@ -46,6 +46,8 @@ import org.obm.provisioning.authorization.AuthorizationService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @Singleton
 public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
 	
@@ -84,9 +86,9 @@ public class ObmJDBCAuthorizingRealm extends AuthorizingRealm {
 		}
 		
 		String[] loginParts = splitLogin(loginAtDomain);
-		String password = authenticationService.getPasswordForUser(loginParts[0], loginParts[1]);
+		UserPassword password = authenticationService.getPasswordForUser(loginParts[0], loginParts[1]);
 		
-		return new SimpleAuthenticationInfo(loginAtDomain, password, this.getName());
+		return new SimpleAuthenticationInfo(loginAtDomain, password.getStringValue(), this.getName());
 
 	}
 

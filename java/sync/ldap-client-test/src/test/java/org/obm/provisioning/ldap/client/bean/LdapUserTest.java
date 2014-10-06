@@ -19,8 +19,9 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserEmails;
-import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPassword;
 
 @GuiceModule(EmbeddedLdapModule.class)
 @RunWith(GuiceRunner.class)
@@ -65,7 +66,7 @@ public class LdapUserTest {
 				.uidNumber(1895)
 				.gidNumber(1066)
 				.domain(domain)
-				.password("secret password")
+				.password(UserPassword.valueOf("secret password"))
 				.build();
 		return obmUser;
 	}
@@ -84,7 +85,7 @@ public class LdapUserTest {
 				.identity(richardSorgeIdentity)
 				.gidNumber(1066)
 				.domain(domain)
-				.password("secret password")
+				.password(UserPassword.valueOf("secret password"))
 				.build();
 		return obmUser;
 	}
@@ -103,7 +104,7 @@ public class LdapUserTest {
 				.identity(richardSorgeIdentity)
 				.uidNumber(1895)
 				.domain(domain)
-				.password("secret password")
+				.password(UserPassword.valueOf("secret password"))
 				.build();
 		return obmUser;
 	}
@@ -121,7 +122,7 @@ public class LdapUserTest {
 									ObmHost.builder().build())
 								.name("gru.gov.ru")
 								.build())
-				.password("secret password")
+				.password(UserPassword.valueOf("secret password"))
 				.build();
 		return obmUser;
 	}
@@ -140,7 +141,7 @@ public class LdapUserTest {
 				.uidNumber(1895)
 				.gidNumber(1066)
 				.domain(domain)
-				.password("secret password")
+				.password(UserPassword.valueOf("secret password"))
 				.build();
 		return obmUser;
 	}
@@ -164,7 +165,7 @@ public class LdapUserTest {
 				.uidNumber(1895)
 				.gidNumber(1066)
 				.domain(domain)
-				.password("secret password")
+				.password(UserPassword.valueOf("secret password"))
 				
 				.build();
 		return obmUser;

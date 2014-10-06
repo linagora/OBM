@@ -60,6 +60,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.UserPassword;
 
 
 public class ConnectionImplTest {
@@ -132,7 +133,7 @@ public class ConnectionImplTest {
 		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
-		expect(configuration.getPassword()).andReturn("pass");
+		expect(configuration.getPassword()).andReturn(UserPassword.valueOf("pass"));
 		control.replay();
 
 		testee.updateMTA();
@@ -147,7 +148,7 @@ public class ConnectionImplTest {
 		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP).times(3);
 		expect(configuration.getSatellitePort()).andReturn(serverPort).times(3);
 		expect(configuration.getUsername()).andReturn("user").times(3);
-		expect(configuration.getPassword()).andReturn("pass").times(3);
+		expect(configuration.getPassword()).andReturn(UserPassword.valueOf("pass")).times(3);
 		control.replay();
 
 		testee.updateMTA();
@@ -163,7 +164,7 @@ public class ConnectionImplTest {
 		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
-		expect(configuration.getPassword()).andReturn("pass");
+		expect(configuration.getPassword()).andReturn(UserPassword.valueOf("pass"));
 		control.replay();
 
 		servlet.statusCode = HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -176,7 +177,7 @@ public class ConnectionImplTest {
 		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
-		expect(configuration.getPassword()).andReturn("pass");
+		expect(configuration.getPassword()).andReturn(UserPassword.valueOf("pass"));
 		expect(configuration.isIMAPServerManaged()).andReturn(true);
 		control.replay();
 
@@ -200,7 +201,7 @@ public class ConnectionImplTest {
 		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
-		expect(configuration.getPassword()).andReturn("pass");
+		expect(configuration.getPassword()).andReturn(UserPassword.valueOf("pass"));
 		expect(configuration.isIMAPServerManaged()).andReturn(true);
 		control.replay();
 

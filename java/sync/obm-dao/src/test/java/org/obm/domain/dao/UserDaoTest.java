@@ -29,12 +29,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.domain.dao;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.createMockBuilder;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -70,8 +70,9 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
-import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPassword;
 
 
 @GuiceModule(UserDaoTest.Env.class)
@@ -376,7 +377,7 @@ public class UserDaoTest {
 				.build())
 			.extId(UserExtId.builder().extId("extid").build())
 			.publicFreeBusy(true)
-			.password("password")
+			.password(UserPassword.valueOf("password"))
 			.emails(UserEmails.builder()
 				.quota(100)
 				.server(ObmHost

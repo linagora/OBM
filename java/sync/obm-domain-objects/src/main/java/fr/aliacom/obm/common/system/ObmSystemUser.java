@@ -32,6 +32,8 @@ package fr.aliacom.obm.common.system;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public class ObmSystemUser {
 	
 	public final static String OBM_SATELLITE_REQUEST = "obmsatelliterequest";
@@ -45,7 +47,7 @@ public class ObmSystemUser {
 
 		private Integer id;
 		private String login;
-		private String password;
+		private UserPassword password;
 
 		private Builder() {
 		}
@@ -60,7 +62,7 @@ public class ObmSystemUser {
 			return this;
 		}
 
-		public Builder password(String password) {
+		public Builder password(UserPassword password) {
 			this.password = password;
 			return this;
 		}
@@ -71,16 +73,16 @@ public class ObmSystemUser {
 			return new ObmSystemUser(id, login, password);
 		}
 	}
+	
+	private final Integer id;
+	private final String login;
+	private final UserPassword password;
 
-	private ObmSystemUser(Integer id, String login, String password) {
+	private ObmSystemUser(Integer id, String login, UserPassword password) {
 		this.id = id;
 		this.login = login;
 		this.password = password;
 	}
-
-	private final Integer id;
-	private final String login;
-	private final String password;
 
 	public Integer getId() {
 		return id;
@@ -90,7 +92,7 @@ public class ObmSystemUser {
 		return login;
 	}
 
-	public String getPassword() {
+	public UserPassword getPassword() {
 		return password;
 	}
 

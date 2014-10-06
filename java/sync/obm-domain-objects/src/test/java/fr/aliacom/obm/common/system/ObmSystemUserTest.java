@@ -33,6 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 
 public class ObmSystemUserTest {
 
@@ -42,12 +44,12 @@ public class ObmSystemUserTest {
 				.builder()
 				.id(1)
 				.login("login")
-				.password("password")
+				.password(UserPassword.valueOf("password"))
 				.build();
 
 		assertThat(systemUser.getId()).isEqualTo(1);
 		assertThat(systemUser.getLogin()).isEqualTo("login");
-		assertThat(systemUser.getPassword()).isEqualTo("password");
+		assertThat(systemUser.getPassword().getStringValue()).isEqualTo("password");
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -55,7 +57,7 @@ public class ObmSystemUserTest {
 		ObmSystemUser
 			.builder()
 			.login("login")
-			.password("pwd")
+			.password(UserPassword.valueOf("pwd"))
 			.build();
 	}
 }

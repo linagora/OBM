@@ -50,8 +50,8 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
-import org.obm.imap.archive.FutureSchedulerBusClient;
 import org.obm.imap.archive.CyrusCompatGreenmailRule;
+import org.obm.imap.archive.FutureSchedulerBusClient;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.TestImapArchiveModules.TimeBasedModule.TestDateProvider;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
@@ -80,6 +80,7 @@ import com.ninja_squad.dbsetup.operation.Operation;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.system.ObmSystemUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 public class RecurrentTaskRescheduleTest {
 
@@ -146,7 +147,7 @@ public class RecurrentTaskRescheduleTest {
 		DateTime higherBoundary = DateTime.parse("2026-11-02T23:59Z");
 		
 		expect(userSystemDao.getByLogin("cyrus"))
-			.andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build())
+			.andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build())
 			.anyTimes();
 		
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()

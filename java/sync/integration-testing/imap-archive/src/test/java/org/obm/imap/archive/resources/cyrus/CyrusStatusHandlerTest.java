@@ -56,6 +56,7 @@ import com.google.inject.Provider;
 import com.icegreen.greenmail.util.GreenMail;
 
 import fr.aliacom.obm.common.system.ObmSystemUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 public class CyrusStatusHandlerTest {
 	
@@ -96,7 +97,7 @@ public class CyrusStatusHandlerTest {
 	@Test
 	public void testStatusIs200WhenImapIsUp() throws Exception {
 		imapServer.setUser("cyrus", "cyrus");
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build());
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build());
 		control.replay();
 		imapServer.start();
 		server.start();
@@ -133,7 +134,7 @@ public class CyrusStatusHandlerTest {
 	@Test
 	public void testStatusIs503WhenImapIsUpButLoginFails() throws Exception {
 		server.start();
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build());
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build());
 		
 		control.replay();
 		
@@ -151,7 +152,7 @@ public class CyrusStatusHandlerTest {
 	@Test
 	public void testStatusIs503WhenImapIsDown() throws Exception {
 		server.start();
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build());
+		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build());
 		
 		control.replay();
 		imapServer.stop();

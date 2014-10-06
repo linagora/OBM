@@ -38,13 +38,15 @@ import org.obm.provisioning.ldap.client.bean.LdapUser;
 
 import com.google.common.base.Throwables;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public class LdapConfiguration implements Configuration {
 
 	private final String bindDn;
-	private final String bindPassword;
+	private final UserPassword bindPassword;
 	private final int maxRequests;
 
-	public LdapConfiguration(String bindDn, String bindPassword, int maxRequests) {
+	public LdapConfiguration(String bindDn, UserPassword bindPassword, int maxRequests) {
 		this.bindDn = bindDn;
 		this.bindPassword = bindPassword;
 		this.maxRequests = maxRequests;
@@ -66,7 +68,7 @@ public class LdapConfiguration implements Configuration {
 	}
 
 	@Override
-	public String getBindPassword() {
+	public UserPassword getBindPassword() {
 		return bindPassword;
 	}
 
