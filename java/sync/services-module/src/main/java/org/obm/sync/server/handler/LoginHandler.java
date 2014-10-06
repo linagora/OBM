@@ -51,6 +51,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserSettings;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
@@ -116,7 +117,7 @@ public class LoginHandler implements ISyncHandler {
 
 		try {
 			String login = getLogin(request);
-			String password = getPassword(request);
+			UserPassword password = getPassword(request);
 			boolean isPasswordHashed = isPasswordHashed(request);
 			String origin = getOrigin(request);
 			boolean success = binding.authenticateGlobalAdmin(login, password, origin, isPasswordHashed);
@@ -178,7 +179,7 @@ public class LoginHandler implements ISyncHandler {
 			request.createSession();
 			String origin = getOrigin(request);
 			String login = getLogin(request);
-			String pass = getPassword(request);
+			UserPassword pass = getPassword(request);
 			boolean isPasswordHashed = isPasswordHashed(request);
 			if (logger.isDebugEnabled()) {
 				request.dumpHeaders();
@@ -218,11 +219,9 @@ public class LoginHandler implements ISyncHandler {
 	private String getLogin(Request request) {
 		return request.getMandatoryParameter("login");
 	}
-
-
-
-	private String getPassword(Request request) {
-		return request.getParameter("password");
+	
+	private UserPassword getPassword(Request request) {
+		return UserPassword.valueOf(request.getMandatoryParameter("password"));
 	}
 
 

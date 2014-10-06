@@ -35,6 +35,8 @@ import java.util.Random;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 /**
  * This class provides us with the ability to encrypt passwords when sent over
  * the network stream
@@ -529,7 +531,7 @@ public class UnixCrypt extends Object {
 	 * @return A string consisting of the 2-character salt followed by the
 	 *         encrypted password.
 	 */
-	public static final String crypt(String salt, String original) {
+	public static final String crypt(String salt, UserPassword original) {
 		StringBuilder saltPadding = new StringBuilder(salt);
 		while (saltPadding.length() < 2)
 			saltPadding.append('A');
@@ -551,8 +553,9 @@ public class UnixCrypt extends Object {
 		for (int i = 0; i < key.length; i++)
 			key[i] = (byte) 0;
 
-		for (int i = 0; i < key.length && i < original.length(); i++) {
-			int iChar = original.charAt(i);
+		String originalAsString = original.getStringValue();
+		for (int i = 0; i < key.length && i < originalAsString.length(); i++) {
+			int iChar = originalAsString.charAt(i);
 
 			key[i] = (byte) (iChar << 1);
 		}
@@ -596,13 +599,13 @@ public class UnixCrypt extends Object {
 	 * @return A string consisting of the 2-character salt followed by the
 	 *         encrypted password.
 	 */
-	public static final String crypt(String original) {
+	public static final String crypt(UserPassword original) {
 		Random randomGenerator = new Random();
 		return crypt(original, randomGenerator);
 	}
 
 	@VisibleForTesting
-	static final String crypt(String original, Random randomGenerator) {
+	static final String crypt(UserPassword original, Random randomGenerator) {
 		int numSaltChars = saltChars.length;
 
 		String salt = "";
@@ -627,7 +630,7 @@ public class UnixCrypt extends Object {
 	 * @return <B>true</B> if the password should be considered correct.
 	 */
 	public final static boolean matches(String encryptedPassword,
-			String enteredPassword) {
+			UserPassword enteredPassword) {
 		String salt = encryptedPassword.substring(0, 3);
 		String newCrypt = crypt(salt, enteredPassword);
 

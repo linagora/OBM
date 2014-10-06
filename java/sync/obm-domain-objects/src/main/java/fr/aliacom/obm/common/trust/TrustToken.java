@@ -33,6 +33,8 @@ import java.util.Date;
 
 import com.google.common.base.Objects;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 /**
  * A representation of a {@code Trust} token.<br />
  * A {@link TrustToken} is used for implicit logins to OBM-Sync from other OBM servers.
@@ -54,8 +56,8 @@ public class TrustToken {
 		return (System.currentTimeMillis() - creationDate.getTime()) >= (timeoutInSeconds * 1000);
 	}
 
-	public boolean isTokenValid(String token) {
-		return Objects.equal(this.token, token);
+	public boolean isTokenValid(UserPassword token) {
+		return Objects.equal(this.token, token.getStringValue());
 	}
 
 	public String getToken() {

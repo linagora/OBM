@@ -38,13 +38,15 @@ import org.apache.commons.codec.binary.Base64;
 
 import com.google.common.base.Charsets;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public class PasswordHandler {
 
 	PasswordHandler() {
 		super();
 	}
 
-	public synchronized boolean verify(String digest, String password)
+	public synchronized boolean verify(String digest, UserPassword password)
 			throws NoSuchAlgorithmException {
 
 		String alg = null;
@@ -79,7 +81,7 @@ public class PasswordHandler {
 		byte[] salt = hs[1];
 
 		msgDigest.reset();
-		msgDigest.update(password.getBytes(Charsets.UTF_8));
+		msgDigest.update(password.getStringValue().getBytes(Charsets.UTF_8));
 		msgDigest.update(salt);
 
 		byte[] pwhash = msgDigest.digest();
@@ -87,7 +89,7 @@ public class PasswordHandler {
 		return MessageDigest.isEqual(hash, pwhash);
 	}
 
-	public String generateDigest(String password, String saltHex,
+	public String generateDigest(UserPassword password, String saltHex,
 			String algorithm) throws NoSuchAlgorithmException {
 
 		if (algorithm.equalsIgnoreCase("crypt")) {
@@ -117,7 +119,7 @@ public class PasswordHandler {
 		}
 
 		msgDigest.reset();
-		msgDigest.update(password.getBytes(Charsets.UTF_8));
+		msgDigest.update(password.getStringValue().getBytes(Charsets.UTF_8));
 		msgDigest.update(salt);
 
 		byte[] pwhash = msgDigest.digest();

@@ -52,6 +52,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserService;
 
 @Singleton
@@ -70,10 +71,10 @@ public class HelperServiceImpl implements HelperService {
 	}
 
 	@Override
-	public String getMD5Diggest(String plaintext) {
+	public String getMD5Diggest(UserPassword password) {
 		try {
 			MessageDigest mg = MessageDigest.getInstance("MD5");
-			mg.update(plaintext.getBytes(Charsets.UTF_8));
+			mg.update(password.getStringValue().getBytes(Charsets.UTF_8));
 			return toHexString(mg.digest());
 		} catch (NoSuchAlgorithmException e) {
 			logger.error(e.getMessage(), e);

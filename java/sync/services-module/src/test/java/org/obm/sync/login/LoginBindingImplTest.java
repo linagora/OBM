@@ -50,6 +50,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 
@@ -86,7 +87,7 @@ public class LoginBindingImplTest {
 			.andReturn(domain);
 		
 		String login = "admin0";
-		String password = "admin";
+		UserPassword password = UserPassword.valueOf("admin");
 		expect(databaseAuthentificationService.doAuth(
 			Credentials.builder()
 				.login(login)
@@ -125,7 +126,7 @@ public class LoginBindingImplTest {
 				.admin(true)
 				.build());
 		
-		String password = "admin";
+		UserPassword password = UserPassword.valueOf("admin");
 		expect(databaseAuthentificationService.doAuth(
 			Credentials.builder()
 				.login(login)
@@ -136,7 +137,7 @@ public class LoginBindingImplTest {
 			.andReturn(true);
 		
 		control.replay();
-		boolean authenticated = loginBindingImpl.authenticateAdmin(login, "admin", "origin", domainName, false);
+		boolean authenticated = loginBindingImpl.authenticateAdmin(login, password, "origin", domainName, false);
 		control.verify();
 		
 		assertThat(authenticated).isTrue();
@@ -165,7 +166,7 @@ public class LoginBindingImplTest {
 				.build());
 		
 		control.replay();
-		boolean authenticated = loginBindingImpl.authenticateAdmin(login, "admin", "origin", domainName, false);
+		boolean authenticated = loginBindingImpl.authenticateAdmin(login, UserPassword.valueOf("admin"), "origin", domainName, false);
 		control.verify();
 		
 		assertThat(authenticated).isFalse();
@@ -192,7 +193,7 @@ public class LoginBindingImplTest {
 				.admin(true)
 				.build());
 		
-		String password = "admin";
+		UserPassword password = UserPassword.valueOf("admin");
 		expect(authentificationService.doAuth(
 			Credentials.builder()
 				.login(login)
@@ -231,7 +232,7 @@ public class LoginBindingImplTest {
 				.build());
 		
 		control.replay();
-		boolean authenticated = loginBindingImpl.authenticateAdmin(login, "admin", "origin", domainName, false);
+		boolean authenticated = loginBindingImpl.authenticateAdmin(login, UserPassword.valueOf("admin"), "origin", domainName, false);
 		control.verify();
 		
 		assertThat(authenticated).isFalse();

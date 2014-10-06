@@ -50,6 +50,7 @@ import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.session.SessionManagement;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 @Singleton
@@ -80,7 +81,7 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 
 	@Override
 	@Transactional(readOnly=true)
-	public AccessToken logUserIn(String user, String password, String origin,
+	public AccessToken logUserIn(String user, UserPassword password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
 			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException, AuthFault {
 
@@ -88,7 +89,7 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 	}
 
 	@Transactional(readOnly=true)
-	public boolean authenticateGlobalAdmin(String user, String password, String origin, boolean isPasswordHashed) throws AuthFault {
+	public boolean authenticateGlobalAdmin(String user, UserPassword password, String origin, boolean isPasswordHashed) throws AuthFault {
 		logger.info("trying global admin authentication with login '{}' from '{}'", user, origin);
 		Credentials credentials = Credentials.builder()
 			.login(user)
@@ -101,7 +102,7 @@ public class LoginBindingImpl extends AbstractLoginBackend implements LoginBacke
 	}
 
 	@Transactional(readOnly=true)
-	public boolean authenticateAdmin(String user, String password, String origin, String domainName, boolean isPasswordHashed) throws AuthFault {
+	public boolean authenticateAdmin(String user, UserPassword password, String origin, String domainName, boolean isPasswordHashed) throws AuthFault {
 		logger.info("trying {} admin authentication with login '{}' from '{}'", new String[] { domainName, user, origin });
 		ObmDomain domain = domainDao.findDomainByName(domainName);
 		Credentials credentials = Credentials.builder()

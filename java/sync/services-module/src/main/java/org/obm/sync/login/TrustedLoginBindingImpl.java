@@ -43,6 +43,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.session.SessionManagement;
 import fr.aliacom.obm.common.trust.TrustToken;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class TrustedLoginBindingImpl extends AbstractLoginBackend implements LoginBackend {
@@ -60,7 +61,7 @@ public class TrustedLoginBindingImpl extends AbstractLoginBackend implements Log
 
 	@Override
 	@Transactional(readOnly = true)
-	public AccessToken logUserIn(String user, String token, String origin,
+	public AccessToken logUserIn(String user, UserPassword token, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
 			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException, AuthFault {
 

@@ -29,11 +29,13 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.trust;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 
 import org.junit.Test;
+
+import fr.aliacom.obm.common.user.UserPassword;
 
 public class TrustTokenTest {
 	private TrustToken testee;
@@ -54,19 +56,19 @@ public class TrustTokenTest {
 
 	@Test
 	public void testIsTokenValid() {
-		String token = "ABCDEF";
+		UserPassword token = UserPassword.valueOf("ABCDEF");
 
-		testee = new TrustToken(token);
+		testee = new TrustToken(token.getStringValue());
 
 		assertThat(testee.isTokenValid(token)).isTrue();
 	}
 
 	@Test
 	public void testIsTokenValidInvalid() {
-		String token = "ABCDEF";
+		UserPassword token = UserPassword.valueOf("ABCDEF");
 
-		testee = new TrustToken(token);
+		testee = new TrustToken(token.getStringValue());
 
-		assertThat(testee.isTokenValid("0123")).isFalse();
+		assertThat(testee.isTokenValid(UserPassword.valueOf("0123"))).isFalse();
 	}
 }

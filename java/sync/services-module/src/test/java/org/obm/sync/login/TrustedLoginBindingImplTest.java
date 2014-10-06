@@ -45,6 +45,7 @@ import org.obm.sync.auth.AccessToken;
 
 import fr.aliacom.obm.common.session.SessionManagement;
 import fr.aliacom.obm.common.trust.TrustToken;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 
@@ -82,7 +83,7 @@ public class TrustedLoginBindingImplTest {
 			.andReturn(expectedAccessToken);
 		
 		control.replay();
-		assertThat(trustedLoginBindingImpl.logUserIn(userAtDomain, token, null, null, null, null, null, false)).isEqualTo(expectedAccessToken);
+		assertThat(trustedLoginBindingImpl.logUserIn(userAtDomain, UserPassword.valueOf(token), null, null, null, null, null, false)).isEqualTo(expectedAccessToken);
 		control.verify();
 	}
 	
@@ -100,7 +101,7 @@ public class TrustedLoginBindingImplTest {
 			.andReturn(expectedAccessToken);
 		
 		control.replay();
-		assertThat(trustedLoginBindingImpl.logUserIn(user, token, null, null, null, null, null, false)).isEqualTo(expectedAccessToken);
+		assertThat(trustedLoginBindingImpl.logUserIn(user, UserPassword.valueOf(token), null, null, null, null, null, false)).isEqualTo(expectedAccessToken);
 		control.verify();
 	}
 }

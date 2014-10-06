@@ -35,10 +35,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 
 public class CredentialsTest {
 
-	private static final String PASSWORD = "password";
+	private static final UserPassword PASSWORD = UserPassword.valueOf("password");
 	private static final String DOMAIN = "exemple.com";
 	private static final String LOGIN = "test";
 	private static final String FULL_LOGIN = LOGIN + Login.FULL_LOGIN_SEPARATOR + DOMAIN;

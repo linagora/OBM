@@ -62,6 +62,7 @@ import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.services.constant.SpecialAccounts;
 
@@ -175,7 +176,7 @@ public class SessionManagement {
 	 * @return null if the credential are not valid
 	 * @throws ObmSyncVersionNotFoundException
 	 */
-	public AccessToken login(String specifiedLogin, String password, String origin,
+	public AccessToken login(String specifiedLogin, UserPassword password, String origin,
 			String clientIP, String remoteIP, String lemonLogin,
 			String lemonDomain, boolean isPasswordHashed) throws ObmSyncVersionNotFoundException, DomainNotFoundException, AuthFault {
 
@@ -211,7 +212,7 @@ public class SessionManagement {
 		return domain;
 	}
 
-	private Credentials buildCredentials(Login login, String password, boolean isPasswordHashed) {
+	private Credentials buildCredentials(Login login, UserPassword password, boolean isPasswordHashed) {
 		return Credentials.builder()
 				.login(login)
 				.hashedPassword(isPasswordHashed)
