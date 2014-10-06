@@ -34,17 +34,16 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.obm.configuration.LocatorConfiguration;
-import org.obm.locator.LocatorCacheException;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 import org.obm.logger.LoggerModule;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -54,7 +53,6 @@ import com.google.inject.name.Named;
 @Singleton
 public class LocatorCache implements LocatorService {
 
-	private static final Logger logger = LoggerFactory.getLogger(LocatorClientImpl.class);
 	private static final String DEFAULT_VALUE = new String();
 	
 	private final LoadingCache<Key, String> store;
@@ -86,13 +84,8 @@ public class LocatorCache implements LocatorService {
 				});
 	}
 
-	private String getServiceLocation(Key key) {
-    	try {
-			return locatorClientImpl.getServiceLocation(key.getServiceSlashProperty(), key.getLoginAtDomain());
-    	} catch (LocatorClientException e) {
-			logger.error(e.getMessage());
-			throw new LocatorCacheException("No host for { " + key.toString() + " }", e);
-		}
+	private String getServiceLocation(Key key) throws LocatorClientException {
+		return locatorClientImpl.getServiceLocation(key.getServiceSlashProperty(), key.getLoginAtDomain());
 	}
 	
 	@Override
@@ -105,7 +98,9 @@ public class LocatorCache implements LocatorService {
 			}
 			return value;
 		} catch (ExecutionException e) {
-			throw new LocatorClientException("No host for { " + key.toString() + " }");
+			throw new LocatorClientException("No host for { " + key.toString() + " }", e.getCause());
+		} catch (UncheckedExecutionException e) {
+			throw new LocatorClientException("No host for { " + key.toString() + " }", e.getCause());
 		}
 	}
 	

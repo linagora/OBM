@@ -43,8 +43,6 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 import org.slf4j.Logger;
 
-import com.google.common.util.concurrent.UncheckedExecutionException;
-
 @RunWith(SlowFilterRunner.class)
 public class LocatorCacheTest {
 
@@ -93,7 +91,7 @@ public class LocatorCacheTest {
 		Assert.assertTrue(false);
 	}
 	
-	@Test(expected=UncheckedExecutionException.class) @Slow
+	@Test(expected=LocatorClientException.class) @Slow
 	public void testExceptionIsTriggeredWhenLoadingValueInCache() throws LocatorClientException, InterruptedException {
 		String obmSyncService = "obm-sync";
 
