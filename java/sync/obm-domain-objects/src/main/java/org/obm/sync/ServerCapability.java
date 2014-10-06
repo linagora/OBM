@@ -63,5 +63,10 @@ public enum ServerCapability {
 	 * Used to advertise that LoginHandler sends AuthFault on login failure instead
 	 * of a weakly typed String message only.
 	 */
-	LOGIN_HANDLER_SUPPORTS_AUTHFAULT
+	LOGIN_HANDLER_SUPPORTS_AUTHFAULT,
+	/**
+	* Used to advertise that a new hash tag of value Event.hashCode is present
+	* in the serialization of an event.
+	*/
+	HASH_IN_EVENT_SERIALIZATION
 }

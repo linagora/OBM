@@ -13,5 +13,6 @@
 		<server-capability name="SERVER_SIDE_ANONYMIZATION">true</server-capability>
 		<server-capability name="ADDRESS_BOOK_HANDLER_SUPPORTS_STORECONTACT">true</server-capability>
 		<server-capability name="LOGIN_HANDLER_SUPPORTS_AUTHFAULT">true</server-capability>
+		<server-capability name="HASH_IN_EVENT_SERIALIZATION">true</server-capability>
 	</server-capabilities>
 </token>
