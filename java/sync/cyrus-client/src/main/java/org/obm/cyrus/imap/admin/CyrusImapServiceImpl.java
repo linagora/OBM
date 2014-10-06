@@ -36,6 +36,8 @@ import org.obm.push.mail.imap.IMAPException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @Singleton
 public class CyrusImapServiceImpl implements CyrusImapService {
 
@@ -47,7 +49,7 @@ public class CyrusImapServiceImpl implements CyrusImapService {
 	}
 	
 	@Override
-	public CyrusManager buildManager(String hostname, String login, String password) throws IMAPException {
+	public CyrusManager buildManager(String hostname, String login, UserPassword password) throws IMAPException {
 		return managerFactory.create(hostname, login, password);
 	}
 

@@ -98,7 +98,8 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 				value.getProfileName() != null ? value.getProfileName().getName() : null);
 		jgen.writeStringField(FIRSTNAME.asSpecificationValue(), value.getFirstName());
 		jgen.writeStringField(COMMONNAME.asSpecificationValue(), value.getCommonName());
-		jgen.writeStringField(PASSWORD.asSpecificationValue(), value.getPassword());
+		jgen.writeStringField(PASSWORD.asSpecificationValue(), 
+				value.getPassword() != null ? value.getPassword().getStringValue() : null);
 		jgen.writeStringField(KIND.asSpecificationValue(), value.getKind());
 		jgen.writeStringField(TITLE.asSpecificationValue(), value.getTitle());
 		jgen.writeStringField(DESCRIPTION.asSpecificationValue(), value.getDescription());

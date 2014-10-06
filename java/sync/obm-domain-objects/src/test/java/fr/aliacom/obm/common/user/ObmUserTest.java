@@ -177,7 +177,7 @@ public class ObmUserTest {
 				.uid(1)
 				.extId(UserExtId.valueOf("JohnDoeExtId"))
 				.login(validLogin)
-				.password("secure")
+				.password(UserPassword.valueOf("secure"))
 				.profileName(ProfileName.valueOf("user"))
 				.identity(UserIdentity.builder()
 					.kind("Mr")

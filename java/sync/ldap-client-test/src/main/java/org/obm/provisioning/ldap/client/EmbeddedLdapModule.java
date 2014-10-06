@@ -53,6 +53,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public class EmbeddedLdapModule extends AbstractModule {
 
 	public static final String OPENDJ_FOLDER = "opendj/";
@@ -60,7 +62,7 @@ public class EmbeddedLdapModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind(Configuration.class).toInstance(new LdapConfiguration("cn=directory manager", "secret", 0));
+		bind(Configuration.class).toInstance(new LdapConfiguration("cn=directory manager", UserPassword.valueOf("secret"), 0));
 	}
 
 	@Provides

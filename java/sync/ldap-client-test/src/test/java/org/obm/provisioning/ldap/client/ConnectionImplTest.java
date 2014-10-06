@@ -68,6 +68,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @GuiceModule(EmbeddedLdapModule.class)
 @RunWith(GuiceRunner.class)
 public class ConnectionImplTest {
@@ -902,7 +904,7 @@ public class ConnectionImplTest {
 	
 	@Test
 	public void testRestartOnRequestCounterReached() {
-		MyConnection myConnection = new MyConnection(new LdapConfiguration("cn=directory manager", "secret", 1), getNetworkConfiguration());
+		MyConnection myConnection = new MyConnection(new LdapConfiguration("cn=directory manager", UserPassword.valueOf("secret"), 1), getNetworkConfiguration());
 
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})

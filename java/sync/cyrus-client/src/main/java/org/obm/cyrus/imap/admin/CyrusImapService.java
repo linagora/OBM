@@ -33,8 +33,10 @@ package org.obm.cyrus.imap.admin;
 
 import org.obm.push.mail.imap.IMAPException;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public interface CyrusImapService {
 
-	CyrusManager buildManager(String host, String login, String password) throws IMAPException;
+	CyrusManager buildManager(String host, String login, UserPassword password) throws IMAPException;
 	
 }

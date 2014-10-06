@@ -40,6 +40,7 @@ import org.obm.push.minig.imap.StoreClient;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 public class CyrusManagerImpl implements CyrusManager {
 
@@ -61,8 +62,8 @@ public class CyrusManagerImpl implements CyrusManager {
 		}
 
 		@Override
-		public CyrusManagerImpl create(String hostname, String login, String password) throws IMAPException, ImapTimeoutException {
-			StoreClient storeClient = storeClientFactory.create(hostname, login, password);
+		public CyrusManagerImpl create(String hostname, String login, UserPassword password) throws IMAPException, ImapTimeoutException {
+			StoreClient storeClient = storeClientFactory.create(hostname, login, password.getStringValue());
 			storeClient.login(false);
 			return new CyrusManagerImpl(connectionFactory.create(storeClient));
 		}

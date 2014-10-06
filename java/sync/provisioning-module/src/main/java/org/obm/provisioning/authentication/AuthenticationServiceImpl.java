@@ -39,6 +39,7 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 @Singleton
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -53,7 +54,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public String getPasswordForUser(String login, String domainName) {
+	public UserPassword getPasswordForUser(String login, String domainName) {
 		ObmDomain domain = domainDao.findDomainByName(domainName);
 		ObmUser user = userDao.findUserByLogin(login, domain);
 		return user.getPassword();

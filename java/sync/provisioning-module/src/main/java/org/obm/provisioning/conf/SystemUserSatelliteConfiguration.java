@@ -32,6 +32,7 @@ package org.obm.provisioning.conf;
 import org.obm.satellite.client.Configuration;
 
 import fr.aliacom.obm.common.system.ObmSystemUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 public class SystemUserSatelliteConfiguration implements Configuration {
 
@@ -47,7 +48,7 @@ public class SystemUserSatelliteConfiguration implements Configuration {
 	}
 
 	@Override
-	public String getPassword() {
+	public UserPassword getPassword() {
 		return systemUser.getPassword();
 	}
 

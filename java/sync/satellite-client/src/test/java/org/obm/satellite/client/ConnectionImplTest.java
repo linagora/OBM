@@ -29,9 +29,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.satellite.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 
@@ -56,6 +56,7 @@ import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.UserPassword;
 
 
 public class ConnectionImplTest {
@@ -99,7 +100,7 @@ public class ConnectionImplTest {
 		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
-		expect(configuration.getPassword()).andReturn("pass");
+		expect(configuration.getPassword()).andReturn(UserPassword.valueOf("pass"));
 		control.replay();
 
 		testee.updateMTA();
@@ -114,7 +115,7 @@ public class ConnectionImplTest {
 		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
-		expect(configuration.getPassword()).andReturn("pass");
+		expect(configuration.getPassword()).andReturn(UserPassword.valueOf("pass"));
 		control.replay();
 
 		servlet.statusCode = HttpStatus.SC_INTERNAL_SERVER_ERROR;
@@ -127,7 +128,7 @@ public class ConnectionImplTest {
 		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
-		expect(configuration.getPassword()).andReturn("pass");
+		expect(configuration.getPassword()).andReturn(UserPassword.valueOf("pass"));
 		expect(configuration.isIMAPServerManaged()).andReturn(true);
 		control.replay();
 
@@ -153,7 +154,7 @@ public class ConnectionImplTest {
 		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
 		expect(configuration.getSatellitePort()).andReturn(serverPort);
 		expect(configuration.getUsername()).andReturn("user");
-		expect(configuration.getPassword()).andReturn("pass");
+		expect(configuration.getPassword()).andReturn(UserPassword.valueOf("pass"));
 		expect(configuration.isIMAPServerManaged()).andReturn(true);
 		control.replay();
 

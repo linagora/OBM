@@ -44,6 +44,7 @@ import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.system.ObmSystemUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(UserDaoJdbcImplTest.Env.class)
@@ -66,7 +67,7 @@ public class UserSystemDaoJdbcImplTest implements H2TestClass {
 				.builder()
 				.id(1)
 				.login("obmsatelliterequest")
-				.password("osrpassword")
+				.password(UserPassword.valueOf("osrpassword"))
 				.build();
 
 		assertThat(dao.getByLogin("obmsatelliterequest")).isEqualTo(systemUser);

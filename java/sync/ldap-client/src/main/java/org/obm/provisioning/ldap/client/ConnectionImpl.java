@@ -96,7 +96,7 @@ public class ConnectionImpl implements Connection {
 		try {
 			requestCounter.set(0);
 			connection = new LdapNetworkConnection(connectionConfig);
-			connection.bind(configuration.getBindDn(), configuration.getBindPassword());
+			connection.bind(configuration.getBindDn(), configuration.getBindPassword().getStringValue());
 		} catch (LdapException e) {
 			throw new org.obm.provisioning.ldap.client.exception.LdapException(e);
 		} catch (IOException e) {

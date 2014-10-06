@@ -37,11 +37,12 @@ import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.imap.IMAPException;
 
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 public interface CyrusManager {
 
 	public interface Factory {
-		CyrusManager create(String hostname, String login, String password) throws IMAPException, ImapTimeoutException;
+		CyrusManager create(String hostname, String login, UserPassword password) throws IMAPException, ImapTimeoutException;
 	}
 
 	void create(ObmUser obmUser) throws ImapOperationException, ConnectionException, ImapTimeoutException;

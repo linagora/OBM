@@ -43,6 +43,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.system.ObmSystemUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 @Singleton
 public class UserSystemDaoJdbcImpl implements UserSystemDao {
@@ -89,7 +90,7 @@ public class UserSystemDaoJdbcImpl implements UserSystemDao {
 				.builder()
 				.id(rs.getInt("usersystem_id"))
 				.login(rs.getString("usersystem_login"))
-				.password(rs.getString("usersystem_password"))
+				.password(UserPassword.valueOf(rs.getString("usersystem_password")))
 				.build();
 	}
 }
