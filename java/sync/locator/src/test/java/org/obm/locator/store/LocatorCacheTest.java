@@ -40,9 +40,6 @@ import org.obm.locator.LocatorClientException;
 import org.obm.locator.LocatorClientImpl;
 import org.slf4j.Logger;
 
-import com.google.common.util.concurrent.UncheckedExecutionException;
-
-
 public class LocatorCacheTest {
 
 	private String loginAtDomain;
@@ -90,7 +87,8 @@ public class LocatorCacheTest {
 		Assert.assertTrue(false);
 	}
 	
-	@Test(expected=UncheckedExecutionException.class)	public void testExceptionIsTriggeredWhenLoadingValueInCache() throws LocatorClientException, InterruptedException {
+	@Test(expected=LocatorClientException.class)
+	public void testExceptionIsTriggeredWhenLoadingValueInCache() throws LocatorClientException, InterruptedException {
 		String obmSyncService = "obm-sync";
 
 		LocatorConfiguration configurationService = mockLocatorCacheWithExpiration(3, TimeUnit.SECONDS);
