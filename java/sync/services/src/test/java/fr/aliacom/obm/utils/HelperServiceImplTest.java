@@ -37,7 +37,6 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 import java.sql.SQLException;
 import java.util.EnumSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.easymock.IMocksControl;
@@ -223,9 +222,10 @@ public class HelperServiceImplTest {
 		mocksControl.replay();
 
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
-		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
-				"foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE));
-		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+		CalendarRights expectedMailToRights = CalendarRights.builder()
+				.addRights("foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE))
+				.build();
+		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("foo@bar"));
 
 		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
@@ -247,9 +247,10 @@ public class HelperServiceImplTest {
 
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
 
-		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
-				"foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE));
-		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+		CalendarRights expectedMailToRights = CalendarRights.builder().
+				addRights("foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE))
+				.build();
+		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("foo@bar"));
 
 		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
@@ -268,9 +269,10 @@ public class HelperServiceImplTest {
 		mocksControl.replay();
 
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
-		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
-				"foo@pub", EnumSet.noneOf(Right.class));
-		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+		CalendarRights expectedMailToRights = CalendarRights.builder()
+				.addRights("foo@pub", EnumSet.noneOf(Right.class))
+				.build();
+		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("foo@pub"));
 
 		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
@@ -292,9 +294,10 @@ public class HelperServiceImplTest {
 		mocksControl.replay();
 
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
-		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
-				"beer@bar", EnumSet.of(Right.ACCESS, Right.READ));
-		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+		CalendarRights expectedMailToRights = CalendarRights.builder()
+				.addRights("beer@bar", EnumSet.of(Right.ACCESS, Right.READ))
+				.build();
+		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("beer@bar"));
 
 		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
@@ -315,9 +318,10 @@ public class HelperServiceImplTest {
 		mocksControl.replay();
 
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
-		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
-				"beer@bar", EnumSet.noneOf(Right.class));
-		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+		CalendarRights expectedMailToRights = CalendarRights.builder()
+				.addRights("beer@bar", EnumSet.noneOf(Right.class))
+				.build();
+		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("beer@bar"));
 
 		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
@@ -342,11 +346,12 @@ public class HelperServiceImplTest {
 		mocksControl.replay();
 
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
-		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
-				"foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE),
-				"foo@pub", EnumSet.noneOf(Right.class),
-				"beer@bar", EnumSet.of(Right.ACCESS, Right.READ));
-		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+		CalendarRights expectedMailToRights = CalendarRights.builder()
+				.addRights("foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE))
+				.addRights("foo@pub", EnumSet.noneOf(Right.class))
+				.addRights("beer@bar", EnumSet.of(Right.ACCESS, Right.READ))
+				.build();
+		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("foo@bar", "foo@pub", "beer@bar"));
 
 		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
