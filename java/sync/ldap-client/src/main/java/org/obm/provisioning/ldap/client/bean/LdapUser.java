@@ -52,6 +52,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 public class LdapUser {
 
@@ -112,7 +113,7 @@ public class LdapUser {
 		private String sn;
 		private String givenName;
 		private String homeDirectory;
-		private String userPassword;
+		private UserPassword userPassword;
 		private String webAccess;
 		private String mailBox;
 		private String mailBoxServer;
@@ -155,7 +156,7 @@ public class LdapUser {
 					obmUser.getLastName();
 			this.givenName = obmUser.getFirstName();
 			this.homeDirectory = buildHomeDirectory(obmUser);
-			this.userPassword = obmUser.getPassword().getStringValue();
+			this.userPassword = obmUser.getPassword();
 			this.webAccess = DEFAULT_WEB_ACCESS;
 			this.mailBox = String.format("%s@%s",
 					obmUser.getLogin().toLowerCase(),
@@ -264,7 +265,7 @@ public class LdapUser {
 			return this;
 		}
 		
-		public Builder userPassword(String userPassword) {
+		public Builder userPassword(UserPassword userPassword) {
 			this.userPassword = userPassword;
 			return this;
 		}
@@ -334,7 +335,7 @@ public class LdapUser {
 	private final String sn;
 	private final String givenName;
 	private final String homeDirectory;
-	private final String userPassword;
+	private final UserPassword userPassword;
 	private final String webAccess;
 	private final String mailBox;
 	private final String mailBoxServer;
@@ -345,7 +346,7 @@ public class LdapUser {
 	private final LdapDomain domain;
 	
 	private LdapUser(Dn userBaseDn, String[] objectClasses, Uid uid, int uidNumber, int gidNumber, String loginShell,
-			String cn, String displayName, String sn, String givenName, String homeDirectory, String userPassword, String webAccess,
+			String cn, String displayName, String sn, String givenName, String homeDirectory, UserPassword userPassword, String webAccess,
 			String mailBox, String mailBoxServer, String mailAccess, String mail, Set<String>mailAlias, boolean hiddenUser, LdapDomain domain) {
 		this.userBaseDn = userBaseDn;
 		this.objectClasses = objectClasses;
@@ -409,7 +410,7 @@ public class LdapUser {
 		return homeDirectory;
 	}
 
-	public String getUserPassword() {
+	public UserPassword getUserPassword() {
 		return userPassword;
 	}
 
@@ -464,7 +465,7 @@ public class LdapUser {
 			.attribute(Attribute.valueOf("sn", sn))
 			.attribute(Attribute.valueOf("givenName", givenName))
 			.attribute(Attribute.valueOf("homeDirectory", homeDirectory))
-			.attribute(Attribute.valueOf("userPassword", userPassword))
+			.attribute(Attribute.valueOf("userPassword", userPassword.getStringValue()))
 			.attribute(Attribute.valueOf("webAccess", webAccess))
 			.attribute(Attribute.valueOf("mailBox", mailBox))
 			.attribute(Attribute.valueOf("mailBoxServer", mailBoxServer))
@@ -504,7 +505,7 @@ public class LdapUser {
 			mods.add(buildAttributeModification("homeDirectory", homeDirectory));
 		}
 		if (!Objects.equal(userPassword, oldUser.userPassword)) {
-			mods.add(buildAttributeModification("userPassword", userPassword));
+			mods.add(buildAttributeModification("userPassword", userPassword.getStringValue()));
 		}
 		if (!Objects.equal(webAccess, oldUser.webAccess)) {
 			mods.add(buildAttributeModification("webAccess", webAccess));
