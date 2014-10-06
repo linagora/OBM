@@ -39,6 +39,8 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public class UnixCryptTest {
 
 	private IMocksControl control;
@@ -55,19 +57,19 @@ public class UnixCryptTest {
 		expect(random.nextInt()).andReturn(10).once();
 		control.replay();
 
-		assertThat(UnixCrypt.crypt("original", random)).isEqualTo("kkd/hajGrQnyc");
+		assertThat(UnixCrypt.crypt(UserPassword.valueOf("original"), random)).isEqualTo("kkd/hajGrQnyc");
 
 		control.verify();
 	}
 
 	@Test
 	public void testCryptWithSalt() {
-		assertThat(UnixCrypt.crypt("salt", "original")).isEqualTo("sainhiUTfgxXY");
+		assertThat(UnixCrypt.crypt("salt", UserPassword.valueOf("original"))).isEqualTo("sainhiUTfgxXY");
 	}
 
 	@Test
 	public void testCryptWithEmptySalt() {
-		assertThat(UnixCrypt.crypt("", "original")).isEqualTo("AAMvmqciWpZ1w");
+		assertThat(UnixCrypt.crypt("", UserPassword.valueOf("original"))).isEqualTo("AAMvmqciWpZ1w");
 	}
 
 	@Test
@@ -77,7 +79,7 @@ public class UnixCryptTest {
 		expect(random.nextInt()).andReturn(Integer.MIN_VALUE).once();
 		control.replay();
 
-		assertThat(UnixCrypt.crypt("original", random)).isEqualTo("//oNpJOex0hc2");
+		assertThat(UnixCrypt.crypt(UserPassword.valueOf("original"), random)).isEqualTo("//oNpJOex0hc2");
 
 		control.verify();
 	}

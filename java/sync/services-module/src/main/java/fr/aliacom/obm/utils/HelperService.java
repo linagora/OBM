@@ -37,12 +37,14 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public interface HelperService {
 
 	boolean canWriteOnCalendar(AccessToken writer, String targetCalendar);
 	boolean canReadCalendar(AccessToken writer, String targetCalendar);
 	boolean attendeesContainsUser(List<Attendee> attendees, AccessToken token);
-	String getMD5Diggest(String plaintext);
+	String getMD5Diggest(UserPassword password);
 	boolean eventBelongsToCalendar(Event event, String calendar);
 
 }

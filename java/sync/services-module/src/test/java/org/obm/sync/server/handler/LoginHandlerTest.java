@@ -138,8 +138,8 @@ public class LoginHandlerTest {
 	}
 
 	@Test
-	public void authenticateGlobalAdminWithOnlyLogin() throws Exception {
-		ImmutableMap<String, String> parameters = ImmutableMap.of("login", "usera");
+	public void authenticateGlobalAdminWithLoginAndPassword() throws Exception {
+		ImmutableMap<String, String> parameters = ImmutableMap.of("login", "usera", "password", "password");
 		HttpServletRequest httpServletRequest = createHttpServletRequestMock("authenticateGlobalAdmin", parameters);
 		XmlResponder responder = createResponder();
 		control.replay();
@@ -216,7 +216,7 @@ public class LoginHandlerTest {
 	
 	@Test
 	public void testDoLoginUnknownDomainForLogin() throws Exception {
-		ImmutableMap<String, String> parameters = ImmutableMap.<String, String> of("origin", "origin", "login", "usera");
+		ImmutableMap<String, String> parameters = ImmutableMap.<String, String> of("origin", "origin", "login", "usera", "password", "password");
 		HttpServletRequest httpServletRequest = createHttpServletRequestMock("doLogin", parameters);
 
 		expect(rs.next()).andReturn(false).anyTimes(); // So that domain selection returns nothing

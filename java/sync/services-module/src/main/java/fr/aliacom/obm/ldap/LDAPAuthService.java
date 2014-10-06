@@ -75,7 +75,7 @@ public class LDAPAuthService implements IAuthentificationService {
 	public boolean doAuth(Credentials credentials) throws AuthFault {
 		Preconditions.checkArgument(!credentials.isPasswordHashed(), "The LDAP authentication service does not handle already hashed passwords");
 
-		doBindAuth(credentials.getLogin().getLogin(), credentials.getLogin().getDomain(), UserPassword.valueOf(credentials.getPassword()));
+		doBindAuth(credentials.getLogin().getLogin(), credentials.getLogin().getDomain(), credentials.getPassword());
 		return true;
 	}
 

@@ -80,7 +80,7 @@ public class LDAPUtils {
 	 * userPassword, then check equality
 	 */
 	public boolean checkPassword(String matchField, String matchValue,
-			String userPassword) {
+			UserPassword userPassword) {
 		try {
 			Attributes userEntry = getUserEntry(matchField, matchValue);
 			if (userEntry == null) {
@@ -95,7 +95,7 @@ public class LDAPUtils {
 		}
 	}
 
-	private boolean isMatchingPassword(String userPassword,
+	private boolean isMatchingPassword(UserPassword userPassword,
 			byte[] hashedPassword) {
 		boolean ret = false;
 		try {

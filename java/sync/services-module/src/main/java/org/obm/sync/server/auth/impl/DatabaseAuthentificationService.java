@@ -47,6 +47,7 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.ldap.UnixCrypt;
 import fr.aliacom.obm.utils.HelperService;
 
@@ -79,7 +80,7 @@ public class DatabaseAuthentificationService implements IAuthentificationService
 		return true;
 	}
 
-	private void checkPassword(String login, String password, int domainId, boolean isPasswordHashed) throws AuthFault {
+	private void checkPassword(String login, UserPassword password, int domainId, boolean isPasswordHashed) throws AuthFault {
 		Connection con = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
@@ -106,7 +107,7 @@ public class DatabaseAuthentificationService implements IAuthentificationService
 				} else if (passType.equals("md5sum") && !isPasswordHashed) {
 					ret = pass.equals(helperService.getMD5Diggest(password));
 				} else {
-					ret = pass.equals(password);
+					ret = pass.equals(password.getStringValue());
 				}
 			}
 		} catch (SQLException e) {

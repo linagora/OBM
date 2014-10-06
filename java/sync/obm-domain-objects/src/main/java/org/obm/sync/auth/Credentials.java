@@ -34,6 +34,8 @@ package org.obm.sync.auth;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public class Credentials {
 
 	public static Builder builder() {
@@ -43,7 +45,7 @@ public class Credentials {
 	public static class Builder {
 		
 		private final Login.Builder loginBuilder;
-		private String password;
+		private UserPassword password;
 		private Boolean hashedPassword;
 
 		private Builder() {
@@ -70,7 +72,7 @@ public class Credentials {
 			return this;
 		}
 		
-		public Builder password(String password) {
+		public Builder password(UserPassword password) {
 			this.password = password;
 			return this;
 		}
@@ -85,10 +87,10 @@ public class Credentials {
 	}
 
 	private final Login login;
-	private final String password;
+	private final UserPassword password;
 	private final boolean hashedPassword;
 
-	public Credentials(Login login, String password, boolean hashedPassword) {
+	public Credentials(Login login, UserPassword password, boolean hashedPassword) {
 		this.login = login;
 		this.password = password;
 		this.hashedPassword = hashedPassword;
@@ -98,7 +100,7 @@ public class Credentials {
 		return login;
 	}
 	
-	public String getPassword() {
+	public UserPassword getPassword() {
 		return password;
 	}
 	

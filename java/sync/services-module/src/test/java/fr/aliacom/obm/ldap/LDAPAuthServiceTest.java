@@ -57,14 +57,14 @@ public class LDAPAuthServiceTest {
 	private final Credentials credentials = Credentials
 			.builder()
 			.login("login")
-			.password("password")
+			.password(UserPassword.valueOf("password"))
 			.hashedPassword(false)
 			.domain("domain")
 			.build();
 	private final Credentials credentialsWithHashedPassword = Credentials
 			.builder()
 			.login("login")
-			.password("letsSayThisIsAHash")
+			.password(UserPassword.valueOf("letsSayThisIsAHash"))
 			.hashedPassword(true)
 			.domain("domain")
 			.build();

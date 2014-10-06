@@ -35,23 +35,25 @@ import java.security.NoSuchAlgorithmException;
 
 import org.junit.Test;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public class PasswordHandlerTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testGenerateDigestUnknownAlgorithm() throws NoSuchAlgorithmException {
-		new PasswordHandler().generateDigest("password", "salt", "MD2");
+		new PasswordHandler().generateDigest(UserPassword.valueOf("password"), "salt", "MD2");
 	}
 
 	@Test
 	public void testGenerateDigestSHA() throws NoSuchAlgorithmException {
-		assertThat(new PasswordHandler().generateDigest("password", "salt", "SHA-512"))
+		assertThat(new PasswordHandler().generateDigest(UserPassword.valueOf("password"), "salt", "SHA-512"))
 				.isEqualTo(
 						"{SSHA}HfVzxj/Uy6KvzUOMMXfZCP2Jg2kYeJE10zfTAk5gDYYqjOmkHrTWvE16WnUxGSf0kdLXceNDkLmihbGRwoWRJKA=");
 	}
 
 	@Test
 	public void testGenerateDigestMD5() throws NoSuchAlgorithmException {
-		assertThat(new PasswordHandler().generateDigest("password", "salt", "MD5"))
+		assertThat(new PasswordHandler().generateDigest(UserPassword.valueOf("password"), "salt", "MD5"))
 				.isEqualTo("{SMD5}yTbXILPozhPwQRPBfebw7qA=");
 	}
 }
