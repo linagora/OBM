@@ -37,7 +37,7 @@ import org.obm.push.mail.imap.IMAPException;
 public interface IdleClient {
 	
 	interface Factory {
-		IdleClient create(String hostname, int port, String loginAtDomain, String password);
+		IdleClient create(String hostname, int port, String loginAtDomain, char[] password);
 	}
 	
 	void login(Boolean activateTLS) throws IMAPException, ImapTimeoutException;

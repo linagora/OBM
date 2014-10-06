@@ -40,8 +40,8 @@ import com.google.common.collect.FluentIterable;
 
 public class LoginCommand extends SimpleCommand<Boolean> {
 
-	public LoginCommand(String login, String password) {
-		super("LOGIN \"" + escapeString(login) + "\" \"" + escapeString(password)+"\"");
+	public LoginCommand(String login, char[] password) {
+		super("LOGIN \"" + escapeString(login) + "\" \"" + escapeString(String.valueOf(password))+"\"");
 	}
 	
 	private static String escapeString(String s) {

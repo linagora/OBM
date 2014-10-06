@@ -63,7 +63,7 @@ public class CyrusManagerImpl implements CyrusManager {
 
 		@Override
 		public CyrusManagerImpl create(String hostname, String login, UserPassword password) throws IMAPException, ImapTimeoutException {
-			StoreClient storeClient = storeClientFactory.create(hostname, login, password.getStringValue());
+			StoreClient storeClient = storeClientFactory.create(hostname, login, password.getStringValue().toCharArray());
 			storeClient.login(false);
 			return new CyrusManagerImpl(connectionFactory.create(storeClient));
 		}

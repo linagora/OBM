@@ -140,7 +140,7 @@ public class ClientSupport {
 	}
 
 
-	public void login(String login, String password, SocketAddress address,
+	public void login(String login, char[] password, SocketAddress address,
 			Boolean activateTLS) throws IMAPException, ImapTimeoutException {
 		if (isConnected()) {
 			throw new IllegalStateException(

@@ -92,7 +92,7 @@ public class StoreClientImpl implements StoreClient {
 			this.socketConnectorProvider = socketConnectorProvider;
 		}
 		
-		public StoreClientImpl create(String hostname, String login, String password) {
+		public StoreClientImpl create(String hostname, String login, char[] password) {
 			return new StoreClientImpl(hostname, emailConfiguration.imapPort(), login, password, emailConfiguration.mailboxNameCheckPolicy(),
 							createClientSupport());
 		}
@@ -109,7 +109,7 @@ public class StoreClientImpl implements StoreClient {
 	
 	private static final Logger logger = LoggerFactory.getLogger(StoreClientImpl.class);
 	
-	private final String password;
+	private final char[] password;
 	private final String login;
 	private final int port;
 	private final String hostname;
@@ -118,7 +118,7 @@ public class StoreClientImpl implements StoreClient {
 
 	private final ClientSupport clientSupport;
 
-	protected StoreClientImpl(String hostname, int port, String login, String password, MailboxNameCheckPolicy mailboxNameCheckPolicy,
+	protected StoreClientImpl(String hostname, int port, String login, char[] password, MailboxNameCheckPolicy mailboxNameCheckPolicy,
 			ClientSupport clientSupport) {
 		this.hostname = hostname;
 		this.port = port;
