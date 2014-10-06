@@ -31,11 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.ldap;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.eq;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -46,6 +46,8 @@ import javax.naming.directory.SearchResult;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+
+import fr.aliacom.obm.common.user.UserPassword;
 
 
 public class LDAPUtilsTest {
@@ -60,7 +62,7 @@ public class LDAPUtilsTest {
 		control = createControl();
 		ctx = control.createMock(DirContext.class);
 		namingEnumeration = control.createMock(NamingEnumeration.class);
-		ldapUtils = new LDAPUtils("uri", "rooDN", "rootPW", "baseDN");
+		ldapUtils = new LDAPUtils("uri", "rooDN", UserPassword.valueOf("rootPW"), "baseDN");
 	}
 
 	@Test

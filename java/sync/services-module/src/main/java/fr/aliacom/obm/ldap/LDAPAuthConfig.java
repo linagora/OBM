@@ -33,6 +33,7 @@ package fr.aliacom.obm.ldap;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 /**
@@ -48,7 +49,7 @@ public class LDAPAuthConfig {
 		String baseDN = obmSyncConfiguration.getLdapBaseDn();
 		String userFilter = obmSyncConfiguration.getLdapFilter();
 		String bindDn = obmSyncConfiguration.getLdapBindDn();
-		String bindPw = obmSyncConfiguration.getLdapBindPassword();
+		UserPassword bindPw = UserPassword.valueOf(obmSyncConfiguration.getLdapBindPassword());
 		dir = new LDAPDirectory(uri, userFilter, bindDn, bindPw, baseDN, null,
 				null);
 	}

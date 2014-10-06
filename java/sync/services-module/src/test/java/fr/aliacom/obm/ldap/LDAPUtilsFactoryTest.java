@@ -33,11 +33,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 public class LDAPUtilsFactoryTest {
 
 	@Test
 	public void testCreateReturnsNonNull() {
-		assertThat(new LDAPUtilsFactory().create("a", "b", "c", "d")).isNotNull();
+		assertThat(new LDAPUtilsFactory().create("a", "b", UserPassword.valueOf("c"), "d")).isNotNull();
 	}
 
 }

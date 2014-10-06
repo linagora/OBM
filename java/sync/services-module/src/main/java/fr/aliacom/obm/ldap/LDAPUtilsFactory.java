@@ -32,6 +32,8 @@ package fr.aliacom.obm.ldap;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @Singleton
 public class LDAPUtilsFactory {
 
@@ -39,7 +41,7 @@ public class LDAPUtilsFactory {
 	LDAPUtilsFactory() {
 	}
 
-	public LDAPUtils create(String uri, String dn, String password, String baseDn) {
+	public LDAPUtils create(String uri, String dn, UserPassword password, String baseDn) {
 		return new LDAPUtils(uri, dn, password, baseDn);
 	}
 
