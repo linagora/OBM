@@ -42,6 +42,12 @@ public class LoginCommandTest {
 	@Test
 	public void commandToBeLoggedShouldFilterPassword() {
 		LoginCommand loginCommand = new LoginCommand("login", "password".toCharArray());
-		assertThat(loginCommand.commandToBeLogged("A1 LOGIN \"usera@adupratvm.lyon.lan\" \"usera\"")).isEqualTo("A1 LOGIN \"usera@adupratvm.lyon.lan\" \"***\"");
+		assertThat(loginCommand.commandToBeLogged("A1 LOGIN \"login\" \"password\"")).isEqualTo("A1 LOGIN \"login\" \"***\"");
+	}
+
+	@Test
+	public void getImapCommandShouldFilterPassword() {
+		LoginCommand loginCommand = new LoginCommand("login", "password".toCharArray());
+		assertThat(loginCommand.getImapCommand()).isEqualTo("LOGIN \"login\" \"***\"");
 	}
 }
