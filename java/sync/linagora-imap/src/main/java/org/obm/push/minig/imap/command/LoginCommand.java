@@ -34,14 +34,16 @@ package org.obm.push.minig.imap.command;
 
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Iterables;
 
 public class LoginCommand extends SimpleCommand<Boolean> {
 
+	private final String passwordFilteredCommand;
+	
 	public LoginCommand(String login, char[] password) {
 		super("LOGIN \"" + escapeString(login) + "\" \"" + escapeString(String.valueOf(password))+"\"");
+		passwordFilteredCommand = "LOGIN \"" + escapeString(login) + "\" \"***\"";
 	}
 	
 	private static String escapeString(String s) {
@@ -58,8 +60,13 @@ public class LoginCommand extends SimpleCommand<Boolean> {
 
 	@Override
 	protected String commandToBeLogged(String sent) {
-		return Joiner.on(" ")
-				.join(FluentIterable.from(Splitter.on(" ").split(sent)).limit(3)) + " \"***\"";
+		String requestId = Iterables.getFirst(Splitter.on(" ").split(sent), "");
+		return requestId + " " + passwordFilteredCommand;
+	}
+
+	@Override
+	public String getImapCommand() {
+		return passwordFilteredCommand;
 	}
 
 	@Override
