@@ -36,7 +36,11 @@ import java.util.Map;
 import org.apache.http.client.HttpClient;
 import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.sync.BooleanParameter;
 import org.obm.sync.BreakdownGroups;
+import org.obm.sync.LongParameter;
+import org.obm.sync.Parameter;
+import org.obm.sync.StringParameter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
@@ -91,7 +95,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 
 	@Override
 	public Map<String, String> getSettings(AccessToken token) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
+		Multimap<String, Parameter> params = initParams(token);
 		Document doc = execute(token, "/setting/getSettings", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseListSettings(doc);
@@ -99,16 +103,16 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 
 	@Override
 	public void setVacationSettings(AccessToken token, VacationSettings vs) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("enabled", "" + vs.isEnabled());
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("enabled", new BooleanParameter(vs.isEnabled()));
 		if (vs.isEnabled()) {
 			if (vs.getStart() != null) {
-				params.put("start", "" + vs.getStart().getTime());
+				params.put("start", new LongParameter(vs.getStart().getTime()));
 			}
 			if (vs.getEnd() != null) {
-				params.put("end", "" + vs.getEnd().getTime());
+				params.put("end", new LongParameter(vs.getEnd().getTime()));
 			}
-			params.put("text", "" + vs.getText());
+			params.put("text", new StringParameter(vs.getText()));
 		}
 		Document doc = execute(token, "/setting/setVacationSettings", params);
 		exceptionFactory.checkServerFaultException(doc);
@@ -116,19 +120,19 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 
 	@Override
 	public void setEmailForwarding(AccessToken token, ForwardingSettings fs) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("enabled", "" + fs.isEnabled());
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("enabled", new BooleanParameter(fs.isEnabled()));
 		if (fs.getEmail() != null && fs.isEnabled()) {
-			params.put("email", fs.getEmail());
+			params.put("email", new StringParameter(fs.getEmail()));
 		}
-		params.put("localCopy", "" + fs.isLocalCopy());
+		params.put("localCopy", new BooleanParameter(fs.isLocalCopy()));
 		Document doc = execute(token, "/setting/setEmailForwarding", params);
 		exceptionFactory.checkServerFaultException(doc);
 	}
 
 	@Override
 	public ForwardingSettings getEmailForwarding(AccessToken token) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
+		Multimap<String, Parameter> params = initParams(token);
 		Document doc = execute(token, "/setting/getEmailForwarding", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseForwarding(doc);
@@ -136,7 +140,7 @@ public class SettingClient extends AbstractClientImpl implements ISetting {
 
 	@Override
 	public VacationSettings getVacationSettings(AccessToken token) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
+		Multimap<String, Parameter> params = initParams(token);
 		Document doc = execute(token, "/setting/getVacationSettings", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return respParser.parseVacation(doc);

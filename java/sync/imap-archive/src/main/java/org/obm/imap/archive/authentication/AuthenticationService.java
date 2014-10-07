@@ -33,8 +33,10 @@ package org.obm.imap.archive.authentication;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 
 public interface AuthenticationService {
 	
-	AccessToken getTrustedAccessTokenForUser(String loginAtDomain, String password) throws AuthFault;
+	AccessToken getTrustedAccessTokenForUser(String loginAtDomain, UserPassword password) throws AuthFault;
 }

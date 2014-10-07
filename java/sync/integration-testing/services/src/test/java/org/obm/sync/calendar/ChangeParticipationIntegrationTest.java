@@ -62,6 +62,8 @@ import org.obm.sync.client.login.LoginClient;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientWithJMSModule.class)
 public class ChangeParticipationIntegrationTest extends ObmSyncIntegrationTest {
@@ -76,7 +78,9 @@ public class ChangeParticipationIntegrationTest extends ObmSyncIntegrationTest {
 	
 	StoreMessageReceivedListener storeMessageReceivedListener;
 	String owner;
+	UserPassword ownerPassword;
 	String attendee;
+	UserPassword attendeePassword;
 	String ownerEmail;
 	String attendeeEmail;
 
@@ -86,8 +90,10 @@ public class ChangeParticipationIntegrationTest extends ObmSyncIntegrationTest {
 		messageConsumerResourcesManager.start();
 		messageConsumerResourcesManager.getConsumer().setMessageListener(storeMessageReceivedListener);
 		owner = "user1";
+		ownerPassword = UserPassword.valueOf(owner);
 		ownerEmail = "user1@domain.org";
 		attendee = "user2";
+		attendeePassword = UserPassword.valueOf(attendee);
 		attendeeEmail = "user2@domain.org";
 	}
 	
@@ -109,10 +115,10 @@ public class ChangeParticipationIntegrationTest extends ObmSyncIntegrationTest {
 				.participation(Participation.needsAction())
 				.participationRole(ParticipationRole.REQ)
 				.build());
-		AccessToken ownerToken = loginClient.login(ownerEmail, owner);
+		AccessToken ownerToken = loginClient.login(ownerEmail, ownerPassword);
 		calendarClient.storeEvent(ownerToken, ownerEmail, event, false, null);
 		
-		AccessToken attendeeToken = loginClient.login(attendeeEmail, attendee);
+		AccessToken attendeeToken = loginClient.login(attendeeEmail, attendeePassword);
 		boolean changed = calendarClient.changeParticipationState(attendeeToken, attendeeEmail, event.getExtId(), 
 				Participation.accepted(), 0, true);
 		Event eventFromServer = calendarClient.getEventFromExtId(ownerToken, ownerEmail, event.getExtId());
@@ -150,10 +156,10 @@ public class ChangeParticipationIntegrationTest extends ObmSyncIntegrationTest {
 				.participation(Participation.needsAction())
 				.participationRole(ParticipationRole.REQ)
 				.build());
-		AccessToken ownerToken = loginClient.login(ownerEmail, owner);
+		AccessToken ownerToken = loginClient.login(ownerEmail, ownerPassword);
 		calendarClient.storeEvent(ownerToken, ownerEmail, event, false, null);
 		
-		AccessToken attendeeToken = loginClient.login(attendeeEmail, attendee);
+		AccessToken attendeeToken = loginClient.login(attendeeEmail, attendeePassword);
 		calendarClient.changeParticipationState(attendeeToken, attendeeEmail, event.getExtId(), Participation.accepted(), 0, true);
 		boolean changed = calendarClient.changeParticipationState(attendeeToken, attendeeEmail, event.getExtId(), 
 				Participation.accepted(), 0, true);
@@ -179,10 +185,10 @@ public class ChangeParticipationIntegrationTest extends ObmSyncIntegrationTest {
 				.participation(Participation.needsAction())
 				.participationRole(ParticipationRole.REQ)
 				.build());
-		AccessToken ownerToken = loginClient.login(ownerEmail, owner);
+		AccessToken ownerToken = loginClient.login(ownerEmail, ownerPassword);
 		calendarClient.storeEvent(ownerToken, ownerEmail, toStoreEvent, false, null);
 		
-		AccessToken attendeeToken = loginClient.login(attendeeEmail, attendee);
+		AccessToken attendeeToken = loginClient.login(attendeeEmail, attendeePassword);
 		RecurrenceId recurrenceId = new RecurrenceId("20130602T120000Z");
 		boolean changed = calendarClient.changeParticipationState(attendeeToken, attendeeEmail, toStoreEvent.getExtId(), 
 				recurrenceId, Participation.accepted(), 0, true);

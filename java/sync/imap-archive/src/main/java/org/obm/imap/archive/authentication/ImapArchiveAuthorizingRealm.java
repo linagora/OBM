@@ -47,6 +47,8 @@ import com.google.common.collect.FluentIterable;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @Singleton
 public class ImapArchiveAuthorizingRealm extends AuthorizingRealm {
 	
@@ -95,7 +97,7 @@ public class ImapArchiveAuthorizingRealm extends AuthorizingRealm {
 		
 		try {
 			char[] password = upToken.getPassword();
-			authenticationService.getTrustedAccessTokenForUser(loginAtDomain, String.valueOf(password));
+			authenticationService.getTrustedAccessTokenForUser(loginAtDomain, UserPassword.valueOf(String.valueOf(password)));
 			return new SimpleAuthenticationInfo(loginAtDomain, password, this.getName());
 		} catch (AuthFault e) {
 			throw new AuthenticationException(e);

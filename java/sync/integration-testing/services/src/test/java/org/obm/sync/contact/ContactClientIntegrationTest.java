@@ -60,6 +60,8 @@ import org.obm.sync.exception.ContactNotFoundException;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
 public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
@@ -84,7 +86,7 @@ public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
 	public void testModifyContact(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		Contact createdContact = bookClient.createContact(token, addressBookId, contact, null);
 
 		createdContact.setFirstname("John");
@@ -104,7 +106,7 @@ public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
 	public void testModifyContactWithNoPhones(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		Contact createdContact = bookClient.createContact(token, addressBookId, contact, null);
 
 		createdContact.getPhones().clear();
@@ -122,7 +124,7 @@ public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
 	public void testModifyContactWithNoAddresses(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		Contact createdContact = bookClient.createContact(token, addressBookId, contact, null);
 
 		createdContact.getAddresses().clear();
@@ -140,7 +142,7 @@ public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
 	public void testModifyContactWithNoImIdentifers(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		Contact createdContact = bookClient.createContact(token, addressBookId, contact, null);
 
 		createdContact.getImIdentifiers().clear();
@@ -158,7 +160,7 @@ public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
 	public void testModifyContactWithNoWebsites(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		Contact createdContact = bookClient.createContact(token, addressBookId, contact, null);
 
 		createdContact.setCalUri("");
@@ -178,7 +180,7 @@ public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
 	public void testStoreContactCreatesContactIfNotExist(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl)
 			throws Exception {
 		locatorService.configure(baseUrl);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 
 		bookClient.storeContact(token, addressBookId, contact, null);
 
@@ -192,7 +194,7 @@ public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
 	public void testStoreContactModifiesContactIfExists(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl)
 			throws Exception {
 		locatorService.configure(baseUrl);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 
 		bookClient.createContact(token, addressBookId, contact, null);
 		contact.setUid(1);
@@ -208,7 +210,7 @@ public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
 	public void testStoreContactClearPutInsteadOfPatch(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl)
 			throws Exception {
 		locatorService.configure(baseUrl);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 
 		bookClient.createContact(token, addressBookId, contact, null);
 		contact.setUid(1);
@@ -228,7 +230,7 @@ public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
 	public void testStoreContactWithUnkownnId(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl)
 			throws Exception {
 		locatorService.configure(baseUrl);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 
 		bookClient.createContact(token, addressBookId, contact, null);
 		contact.setUid(666);

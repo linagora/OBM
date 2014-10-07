@@ -41,6 +41,10 @@ import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.BreakdownGroups;
+import org.obm.sync.DateParameter;
+import org.obm.sync.IntegerParameter;
+import org.obm.sync.Parameter;
+import org.obm.sync.StringParameter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
@@ -56,7 +60,6 @@ import org.obm.sync.items.ContactChanges;
 import org.obm.sync.items.FolderChanges;
 import org.obm.sync.locators.Locator;
 import org.obm.sync.services.IAddressBook;
-import org.obm.sync.utils.DateHelper;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 
@@ -114,10 +117,10 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact, String clientId) 
 			throws ServerFault, NoPermissionException {
 		
-		Multimap<String, String> params = initParams(token);
-		params.put("bookId", String.valueOf(addressBookId));
-		params.put("contact", bookItemsWriter.getContactAsString(contact));
-		params.put("clientId", clientId);
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("bookId", new IntegerParameter(addressBookId));
+		params.put("contact", new StringParameter(bookItemsWriter.getContactAsString(contact)));
+		params.put("clientId", new StringParameter(clientId));
 		Document doc = execute(token, "/book/createContact", params);
 		exceptionFactory.checkCreateContactException(doc);
 		return bookItemsParser.parseContact(doc.getDocumentElement());
@@ -127,9 +130,9 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	public Contact getContactFromId(AccessToken token, Integer addressBookId, Integer contactId) 
 			throws ServerFault, ContactNotFoundException {
 		
-		Multimap<String, String> params = initParams(token);
-		params.put("bookId", String.valueOf(addressBookId));
-		params.put("id", String.valueOf(contactId));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("bookId", new IntegerParameter(addressBookId));
+		params.put("id", new IntegerParameter(contactId));
 		Document doc = execute(token, "/book/getContactFromId", params);
 		exceptionFactory.checkContactNotFoundException(doc);
 		return bookItemsParser.parseContact(doc.getDocumentElement());
@@ -137,8 +140,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public ContactChanges listContactsChanged(AccessToken token, Date lastSync) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("lastSync", DateHelper.asString(lastSync));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("lastSync", new DateParameter(lastSync));
 		Document doc = execute(token, "/book/listAllChanges", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return bookItemsParser.parseChanges(doc);
@@ -146,8 +149,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public boolean isReadOnly(AccessToken token, BookType book) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("book", book.toString());
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("book", new StringParameter(book.toString()));
 		Document doc = execute(token, "/book/isReadOnly", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return "true".equals(bookItemsParser.parseArrayOfString(doc)[0]);
@@ -155,7 +158,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public BookType[] listBooks(AccessToken token) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
+		Multimap<String, Parameter> params = initParams(token);
 		Document doc = execute(token, "/book/listBooks", params);
 		exceptionFactory.checkServerFaultException(doc);
 		String[] sa = bookItemsParser.parseArrayOfString(doc);
@@ -168,7 +171,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public List<AddressBook> listAllBooks(AccessToken token) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
+		Multimap<String, Parameter> params = initParams(token);
 		Document doc = execute(token, "/book/listAllBooks", params);
 		exceptionFactory.checkServerFaultException(doc);
 		List<AddressBook> addressBooks = bookItemsParser.parseListAddressBook(doc);
@@ -179,9 +182,9 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	public Contact modifyContact(AccessToken token, Integer addressBookId, Contact contact)
 			throws ServerFault, NoPermissionException, ContactNotFoundException {
 
-		Multimap<String, String> params = initParams(token);
-		params.put("bookId", String.valueOf(addressBookId));
-		params.put("contact", bookItemsWriter.getContactAsString(contact));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("bookId", new IntegerParameter(addressBookId));
+		params.put("contact", new StringParameter(bookItemsWriter.getContactAsString(contact)));
 		Document doc = execute(token, "/book/modifyContact", params);
 		exceptionFactory.checkModifyContactException(doc);
 		return bookItemsParser.parseContact(doc.getDocumentElement());
@@ -191,9 +194,9 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	public Contact removeContact(AccessToken token, Integer addressBookId , Integer contactId) 
 			throws ServerFault, ContactNotFoundException, NoPermissionException {
 		
-		Multimap<String, String> params = initParams(token);
-		params.put("bookId", String.valueOf(addressBookId));
-		params.put("id", String.valueOf(contactId));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("bookId", new IntegerParameter(addressBookId));
+		params.put("id", new IntegerParameter(contactId));
 		Document doc = execute(token, "/book/removeContact", params);
 		exceptionFactory.checkRemoveContactException(doc);
 		return bookItemsParser.parseContact(doc.getDocumentElement());
@@ -202,9 +205,9 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public List<Contact> searchContact(AccessToken token, String query, int limit, Integer offset) throws ServerFault {
 		Preconditions.checkNotNull(offset);
-		Multimap<String, String> params = initParams(token);
-		params.put("query", query);
-		params.put("limit", "" + limit);
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("query", new StringParameter(query));
+		params.put("limit", new IntegerParameter(limit));
 		Document doc = execute(token, "/book/searchContact", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return bookItemsParser.parseListContact(doc.getDocumentElement());
@@ -212,11 +215,11 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public List<Contact> searchContactInGroup(AccessToken token, AddressBook group, String query, int limit, Integer offset) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("query", query);
-		params.put("limit", String.valueOf(limit));
-		params.put("offset", String.valueOf(offset));
-		params.put("group", String.valueOf(group.getUid()));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("query", new StringParameter(query));
+		params.put("limit", new IntegerParameter(limit));
+		params.put("offset", new IntegerParameter(offset));
+		params.put("group", new IntegerParameter(group.getUid().getId()));
 		Document doc = execute(token, "/book/searchContactInGroup", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return bookItemsParser.parseListContact(doc.getDocumentElement());
@@ -224,8 +227,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	
 	@Override
 	public int countContactsInGroup(AccessToken token, int gid) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-	    params.put("group", String.valueOf(gid));
+		Multimap<String, Parameter> params = initParams(token);
+	    params.put("group", new IntegerParameter(gid));
 	    Document doc = execute(token, "/book/countContactsInGroup", params);
 	    exceptionFactory.checkServerFaultException(doc);
 	    return bookItemsParser.parseCountContactsInGroup(doc.getDocumentElement());
@@ -234,11 +237,11 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	
 	@Override
 	public AddressBookChangesResponse getAddressBookSync(AccessToken token, Date lastSync) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
+		Multimap<String, Parameter> params = initParams(token);
 		if (lastSync != null) {
-			params.put("lastSync", DateHelper.asString(lastSync));
+			params.put("lastSync", new DateParameter(lastSync));
 		} else {
-			params.put("lastSync", "0");
+			params.put("lastSync", new StringParameter("0"));
 		}
 
 		Document doc = execute(token, "/book/getAddressBookSync", params);
@@ -248,8 +251,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	
 	@Override
 	public boolean unsubscribeBook(AccessToken token, Integer addressBookId) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("bookId", String.valueOf(addressBookId));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("bookId", new IntegerParameter(addressBookId));
 		Document doc = execute(token, "/book/unsubscribeBook", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return "true".equalsIgnoreCase(DOMUtils.getElementText(doc
@@ -258,8 +261,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public FolderChanges listAddressBooksChanged(AccessToken token, Date lastSync) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("lastSync", DateHelper.asString(lastSync));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("lastSync", new DateParameter(lastSync));
 		Document doc = execute(token, "/book/listAddressBooksChanged", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return bookItemsParser.parseFolderChangesResponse(doc);
@@ -267,9 +270,9 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	
 	@Override
 	public ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("lastSync", DateHelper.asString(lastSync));
-		params.put("bookId", String.valueOf(addressBookId));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("lastSync", new DateParameter(lastSync));
+		params.put("bookId", new IntegerParameter(addressBookId));
 		Document doc = execute(token, "/book/listAllChanges", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return bookItemsParser.parseChanges(doc);
@@ -277,8 +280,8 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public ContactChanges firstListContactsChanged(AccessToken token, Date lastSync) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("lastSync", DateHelper.asString(lastSync));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("lastSync", new DateParameter(lastSync));
 		Document doc = execute(token, "/book/firstListAllChanges", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return bookItemsParser.parseChanges(doc);
@@ -286,9 +289,9 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	
 	@Override
 	public ContactChanges firstListContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("lastSync", DateHelper.asString(lastSync));
-		params.put("bookId", String.valueOf(addressBookId));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("lastSync", new DateParameter(lastSync));
+		params.put("bookId", new IntegerParameter(addressBookId));
 		Document doc = execute(token, "/book/firstListAllChanges", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return bookItemsParser.parseChanges(doc);
@@ -296,11 +299,11 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 
 	@Override
 	public List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit, Integer offset) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
-		params.put("query", query);
-		params.put("limit", String.valueOf(limit));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("query", new StringParameter(query));
+		params.put("limit", new IntegerParameter(limit));
 		if( offset != null ) {
-			params.put("offset", String.valueOf(offset));
+			params.put("offset", new IntegerParameter(offset));
 		}
 		Document doc = execute(token, "/book/searchContactsInSynchronizedAddressBooks", params);
 		exceptionFactory.checkServerFaultException(doc);
@@ -315,9 +318,9 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	@Override
 	public Contact storeContact(AccessToken token, Integer addressBookId, Contact contact, String clientId)
 			throws NoPermissionException, ServerFault, ContactNotFoundException {
-		Multimap<String, String> params = initParams(token);
-		params.put("bookId", String.valueOf(addressBookId));
-		params.put("contact", bookItemsWriter.getContactAsString(contact));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("bookId", new IntegerParameter(addressBookId));
+		params.put("contact", new StringParameter(bookItemsWriter.getContactAsString(contact)));
 		Document doc = execute(token, "/book/storeContact", params);
 		exceptionFactory.checkModifyContactException(doc);
 		return bookItemsParser.parseContact(doc.getDocumentElement());

@@ -36,6 +36,7 @@ import static org.easymock.EasyMock.expect;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
+import org.obm.sync.Parameter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.MavenVersion;
 import org.obm.sync.calendar.Event;
@@ -175,7 +176,7 @@ public abstract class AbstractClientTest {
 	}
 
 	protected static interface Responder {
-		Document execute(AccessToken token, String action, Multimap<String, String> parameters);
+		Document execute(AccessToken token, String action, Multimap<String, Parameter> parameters);
 	}
 
 }

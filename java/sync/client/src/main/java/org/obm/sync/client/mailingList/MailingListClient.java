@@ -37,6 +37,9 @@ import org.apache.http.client.HttpClient;
 import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.sync.BreakdownGroups;
+import org.obm.sync.IntegerParameter;
+import org.obm.sync.Parameter;
+import org.obm.sync.StringParameter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
@@ -97,8 +100,8 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if(mailingList == null){
 			return null;
 		}
-		Multimap<String, String> params = initParams(token);
-		params.put("mailingList", mlWriter.getMailingListsAsString(mailingList));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("mailingList", new StringParameter(mlWriter.getMailingListsAsString(mailingList)));
 		Document doc = execute(token, "/mailingList/createMailingList", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return mlParser.parseMailingList(doc.getDocumentElement());
@@ -109,8 +112,8 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if (id == null) {
 			return null;
 		}
-		Multimap<String, String> params = initParams(token);
-		params.put("id", id.toString());
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("id", new IntegerParameter(id));
 		Document doc = execute(token, "/mailingList/getMailingListFromId", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return mlParser.parseMailingList(doc.getDocumentElement());
@@ -118,7 +121,7 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 
 	@Override
 	public List<MailingList> listAllMailingList(AccessToken token) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
+		Multimap<String, Parameter> params = initParams(token);
 		Document doc = execute(token, "/mailingList/listAllMailingList", params);
 		exceptionFactory.checkServerFaultException(doc);
 		List<MailingList> addressBooks = mlParser.parseListMailingList(doc);
@@ -130,9 +133,9 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if (mailingList == null) {
 			return null;
 		}
-		Multimap<String, String> params = initParams(token);
+		Multimap<String, Parameter> params = initParams(token);
 		String ml = mlWriter.getMailingListsAsString(mailingList);
-		params.put("mailingList", ml);
+		params.put("mailingList", new StringParameter(ml));
 		Document doc = execute(token, "/mailingList/modifyMailingList", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return mlParser.parseMailingList(doc.getDocumentElement());
@@ -143,8 +146,8 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if (id == null) {
 			return;
 		}
-		Multimap<String, String> params = initParams(token);
-		params.put("id", id.toString());
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("id", new IntegerParameter(id));
 		executeVoid(token, "/mailingList/removeMailingList", params);
 	}
 
@@ -153,9 +156,9 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if (mailingListId == null || email == null) {
 			return null;
 		}
-		Multimap<String, String> params = initParams(token);
-		params.put("mailingListId", mailingListId.toString());
-		params.put("mailingListEmails", mlWriter.getMailingListEmailsAsString(email));
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("mailingListId", new IntegerParameter(mailingListId));
+		params.put("mailingListEmails", new StringParameter(mlWriter.getMailingListEmailsAsString(email)));
 		Document doc = execute(token, "/mailingList/addEmails", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return mlParser.parseMailingListEmails(doc);
@@ -166,9 +169,9 @@ public class MailingListClient extends AbstractClientImpl implements IMailingLis
 		if (mailingListId == null || emailId == null) {
 			return;
 		}
-		Multimap<String, String> params = initParams(token);
-		params.put("mailingListId", mailingListId.toString());
-		params.put("mailingListEmailId", emailId.toString());
+		Multimap<String, Parameter> params = initParams(token);
+		params.put("mailingListId", new IntegerParameter(mailingListId));
+		params.put("mailingListEmailId", new IntegerParameter(emailId));
 		executeVoid(token, "/mailingList/removeEmail", params);
 	}
 	

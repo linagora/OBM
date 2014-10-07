@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,20 +29,11 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.client.login;
 
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
+package org.obm.sync;
 
-import fr.aliacom.obm.common.user.UserPassword;
 
-public interface LoginService {
+public interface Parameter {
 
-	AccessToken login(String loginAtDomain, UserPassword password) throws AuthFault;
-	AccessToken trustedLogin(String loginAtDomain, UserPassword password) throws AuthFault;
-	AccessToken authenticate(String loginAtDomain, UserPassword password) throws AuthFault;
-	boolean authenticateGlobalAdmin(String login, UserPassword password) throws AuthFault;
-	boolean authenticateAdmin(String login, UserPassword password, String domainName) throws AuthFault;
-	void logout(AccessToken at);
-	
+	String getStringValue();
 }

@@ -36,6 +36,7 @@ import org.obm.breakdownduration.bean.Watch;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.BreakdownGroups;
+import org.obm.sync.Parameter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.client.impl.AbstractClientImpl;
@@ -91,7 +92,7 @@ public class UserClient extends AbstractClientImpl implements IUser {
 
 	@Override
 	public String getUserEmail(AccessToken token) throws ServerFault {
-		Multimap<String, String> params = initParams(token);
+		Multimap<String, Parameter> params = initParams(token);
 		Document doc = execute(token, "/user/getUserEmail", params);
 		exceptionFactory.checkServerFaultException(doc);
 		return DOMUtils.getElementText(doc.getDocumentElement(), "value");

@@ -39,6 +39,9 @@ import org.obm.configuration.DomainConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.push.utils.DOMUtils;
 import org.obm.sync.BreakdownGroups;
+import org.obm.sync.Parameter;
+import org.obm.sync.PasswordParameter;
+import org.obm.sync.StringParameter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.MavenVersion;
@@ -58,6 +61,7 @@ import com.google.inject.name.Named;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.UserPassword;
 
 @Watch(BreakdownGroups.CLIENT_LOGIN)
 public class LoginClient extends AbstractClientImpl implements LoginService {
@@ -108,11 +112,11 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 	
 	@Override
-	public AccessToken login(String loginAtDomain, String password) throws AuthFault {
-		Multimap<String, String> params = ArrayListMultimap.create();
-		params.put("login", loginAtDomain);
-		params.put("password", password);
-		params.put("origin", origin);
+	public AccessToken login(String loginAtDomain, UserPassword password) throws AuthFault {
+		Multimap<String, Parameter> params = ArrayListMultimap.create();
+		params.put("login", new StringParameter(loginAtDomain));
+		params.put("password", new PasswordParameter(password));
+		params.put("origin", new StringParameter(origin));
 
 		AccessToken token = newAccessToken(loginAtDomain, origin);
 		
@@ -138,11 +142,11 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 	
 	@Override
-	public AccessToken trustedLogin(String loginAtDomain, String password) throws AuthFault {
-		Multimap<String, String> params = ArrayListMultimap.create();
-		params.put("login", loginAtDomain);
-		params.put("password", password);
-		params.put("origin", origin);
+	public AccessToken trustedLogin(String loginAtDomain, UserPassword password) throws AuthFault {
+		Multimap<String, Parameter> params = ArrayListMultimap.create();
+		params.put("login", new StringParameter(loginAtDomain));
+		params.put("password", new PasswordParameter(password));
+		params.put("origin", new StringParameter(origin));
 
 		AccessToken token = newAccessToken(loginAtDomain, origin);
 		
@@ -163,7 +167,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 
 	@Override
-	public AccessToken authenticate(String loginAtDomain, String password) throws AuthFault {
+	public AccessToken authenticate(String loginAtDomain, UserPassword password) throws AuthFault {
 		AccessToken token = login(loginAtDomain, password);
 		if (token == null || token.getSessionId() == null) {
 			throw new AuthFault(loginAtDomain + " can't log on obm-sync. The username or password isn't valid");
@@ -172,9 +176,11 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 
 	@Override
-	public boolean authenticateGlobalAdmin(String login, String password) throws AuthFault {
-		ImmutableMultimap<String, String> params = ImmutableMultimap.of(
-				"login", login, "password", password, "origin", origin);
+	public boolean authenticateGlobalAdmin(String login, UserPassword password) throws AuthFault {
+		ImmutableMultimap<String, Parameter> params = ImmutableMultimap.of(
+				"login", new StringParameter(login), 
+				"password", new PasswordParameter(password), 
+				"origin", new StringParameter(origin));
 
 		AccessToken token = newAccessToken(login, domainConfiguration.getGlobalDomain(), origin);
 		
@@ -184,9 +190,12 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	}
 
 	@Override
-	public boolean authenticateAdmin(String login, String password, String domainName) throws AuthFault {
-		ImmutableMultimap<String, String> params = ImmutableMultimap.of(
-				"login", login, "password", password, "origin", origin, "domainName", domainName);
+	public boolean authenticateAdmin(String login, UserPassword password, String domainName) throws AuthFault {
+		ImmutableMultimap<String, Parameter> params = ImmutableMultimap.of(
+				"login", new StringParameter(login), 
+				"password", new PasswordParameter(password), 
+				"origin", new StringParameter(origin), 
+				"domainName", new StringParameter(domainName));
 
 		AccessToken token = newAccessToken(login, domainConfiguration.getGlobalDomain(), origin);
 		
@@ -198,7 +207,7 @@ public class LoginClient extends AbstractClientImpl implements LoginService {
 	@Override
 	public void logout(AccessToken at) {
 		try {
-			Multimap<String, String> params = ArrayListMultimap.create();
+			Multimap<String, Parameter> params = ArrayListMultimap.create();
 			setToken(params, at);
 			executeVoid(at, "/login/doLogout", params);
 		} catch (SIDNotFoundException e) {

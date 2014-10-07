@@ -29,20 +29,30 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.client.login;
+package org.obm.sync;
 
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
+import org.junit.Before;
+import org.junit.Test;
+import org.obm.sync.bean.EqualsVerifierUtils;
 
-import fr.aliacom.obm.common.user.UserPassword;
 
-public interface LoginService {
+public class BeansTest {
 
-	AccessToken login(String loginAtDomain, UserPassword password) throws AuthFault;
-	AccessToken trustedLogin(String loginAtDomain, UserPassword password) throws AuthFault;
-	AccessToken authenticate(String loginAtDomain, UserPassword password) throws AuthFault;
-	boolean authenticateGlobalAdmin(String login, UserPassword password) throws AuthFault;
-	boolean authenticateAdmin(String login, UserPassword password, String domainName) throws AuthFault;
-	void logout(AccessToken at);
+	private EqualsVerifierUtils equalsVerifierUtilsTest;
 	
+	@Before
+	public void init() {
+		equalsVerifierUtilsTest = new EqualsVerifierUtils();
+	}
+	
+	@Test
+	public void test() {
+		equalsVerifierUtilsTest.test(
+				BooleanParameter.class,
+				DateParameter.class,
+				IntegerParameter.class,
+				LongParameter.class,
+				PasswordParameter.class,
+				StringParameter.class);
+	}
 }

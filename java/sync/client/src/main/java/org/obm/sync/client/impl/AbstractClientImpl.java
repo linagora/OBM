@@ -50,6 +50,8 @@ import org.apache.http.client.fluent.Request;
 import org.apache.http.message.BasicNameValuePair;
 import org.obm.locator.LocatorClientException;
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.Parameter;
+import org.obm.sync.StringParameter;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.client.exception.ObmSyncClientException;
@@ -84,7 +86,7 @@ public abstract class AbstractClientImpl {
 		this.httpClient = httpClient;
 	}
 
-	protected Document execute(AccessToken token, String action, Multimap<String, String> parameters) {
+	protected Document execute(AccessToken token, String action, Multimap<String, Parameter> parameters) {
 		Request request = null;
 		try {
 			request = getPostRequest(token, action);
@@ -112,7 +114,7 @@ public abstract class AbstractClientImpl {
 		}
 	}
 
-	private void logRequest(String action, Multimap<String, String> parameters) {
+	private void logRequest(String action, Multimap<String, Parameter> parameters) {
 		obmSyncLogger.debug("action {}, request {}", action, parameters);
 	}
 
@@ -126,18 +128,18 @@ public abstract class AbstractClientImpl {
 		}
 	}
 
-	protected void setToken(Multimap<String, String> parameters, AccessToken token) throws SIDNotFoundException {
+	protected void setToken(Multimap<String, Parameter> parameters, AccessToken token) throws SIDNotFoundException {
 		if (token != null) {
 			if (token.getSessionId() != null) {
-				parameters.put("sid", token.getSessionId());
+				parameters.put("sid", new StringParameter(token.getSessionId()));
 			} else {
 				throw new SIDNotFoundException(token);
 			}
 		}
 	}
 
-	protected Multimap<String, String> initParams(AccessToken at) {
-		Multimap<String, String> m = ArrayListMultimap.create();
+	protected Multimap<String, Parameter> initParams(AccessToken at) {
+		Multimap<String, Parameter> m = ArrayListMultimap.create();
 		try {
 			setToken(m, at);
 		} catch (SIDNotFoundException e) {
@@ -146,7 +148,7 @@ public abstract class AbstractClientImpl {
 		return m;
 	}
 
-	private InputStream executePostAndGetResultStream(Request request, Multimap<String, String> parameters) throws IOException {
+	private InputStream executePostAndGetResultStream(Request request, Multimap<String, Parameter> parameters) throws IOException {
 		InputStream is = null;
 		setPostRequestParameters(request, parameters);
 		HttpResponse response = Executor.newInstance(httpClient).execute(request).returnResponse();
@@ -164,17 +166,19 @@ public abstract class AbstractClientImpl {
 		return httpResultStatus == HttpStatus.SC_OK;
 	}
 
-	@VisibleForTesting void setPostRequestParameters(Request request, Multimap<String, String> parameters) {
+	@VisibleForTesting void setPostRequestParameters(Request request, Multimap<String, Parameter> parameters) {
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-		for (Entry<String, String> entry: parameters.entries()) {
-			if (entry.getKey() != null && entry.getValue() != null) {
-				nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+		for (Entry<String, Parameter> entry: parameters.entries()) {
+			String key = entry.getKey();
+			Parameter value = entry.getValue();
+			if (key != null && value != null && value.getStringValue() != null) {
+				nameValuePairs.add(new BasicNameValuePair(key, value.getStringValue()));
 			}
 		}
 		request.bodyForm(nameValuePairs, Charsets.UTF_8);
 	}
 
-	protected void executeVoid(AccessToken at, String action, Multimap<String, String> parameters) {
+	protected void executeVoid(AccessToken at, String action, Multimap<String, Parameter> parameters) {
 		Request request = null; 
 		try {
 			request = getPostRequest(at, action);

@@ -41,6 +41,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @Singleton
 public class AuthenticationServiceImpl implements AuthenticationService {
 
@@ -54,7 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	}
 
 	@Override
-	public AccessToken getTrustedAccessTokenForUser(String loginAtDomain, String password) throws AuthFault {
+	public AccessToken getTrustedAccessTokenForUser(String loginAtDomain, UserPassword password) throws AuthFault {
 		try {
 			return loginClient().trustedLogin(loginAtDomain, password);
 		}

@@ -44,6 +44,7 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.client.login.LoginClient.Factory;
 
+import fr.aliacom.obm.common.user.UserPassword;
 import pl.wkr.fluentrule.api.FluentExpectedException;
 
 
@@ -85,11 +86,11 @@ public class AuthenticationServiceImplTest {
 		String loginAtDomain = "admin@mydomain.org";
 		String password = "trust3dToken";
 		
-		expect(loginClient.trustedLogin(loginAtDomain, password)).andThrow(new AuthFault("Bad password"));
+		expect(loginClient.trustedLogin(loginAtDomain, UserPassword.valueOf(password))).andThrow(new AuthFault("Bad password"));
 		
 		try {
 			control.replay();
-			authenticationService.getTrustedAccessTokenForUser(loginAtDomain, password);
+			authenticationService.getTrustedAccessTokenForUser(loginAtDomain, UserPassword.valueOf(password));
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -103,10 +104,10 @@ public class AuthenticationServiceImplTest {
 		String password = "trust3dToken";
 		
 		AccessToken expectedAccessToken = new AccessToken(1, "origin");
-		expect(loginClient.trustedLogin(loginAtDomain, password)).andReturn(expectedAccessToken);
+		expect(loginClient.trustedLogin(loginAtDomain, UserPassword.valueOf(password))).andReturn(expectedAccessToken);
 		
 		control.replay();
-		AccessToken accessToken = authenticationService.getTrustedAccessTokenForUser(loginAtDomain, password);
+		AccessToken accessToken = authenticationService.getTrustedAccessTokenForUser(loginAtDomain, UserPassword.valueOf(password));
 		control.verify();
 		
 		assertThat(accessToken).isEqualTo(expectedAccessToken);

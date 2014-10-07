@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,20 +29,42 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.client.login;
 
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.AuthFault;
+package org.obm.sync;
+
+import com.google.common.base.Objects;
 
 import fr.aliacom.obm.common.user.UserPassword;
 
-public interface LoginService {
+public class PasswordParameter implements Parameter {
 
-	AccessToken login(String loginAtDomain, UserPassword password) throws AuthFault;
-	AccessToken trustedLogin(String loginAtDomain, UserPassword password) throws AuthFault;
-	AccessToken authenticate(String loginAtDomain, UserPassword password) throws AuthFault;
-	boolean authenticateGlobalAdmin(String login, UserPassword password) throws AuthFault;
-	boolean authenticateAdmin(String login, UserPassword password, String domainName) throws AuthFault;
-	void logout(AccessToken at);
+	private final UserPassword value;
 	
+	public PasswordParameter(UserPassword value) {
+		this.value = value;
+	}
+
+	@Override
+	public String getStringValue() {
+		return value.getStringValue();
+	}
+	
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(value);
+	}
+
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof PasswordParameter) {
+			PasswordParameter that = (PasswordParameter) object;
+			return Objects.equal(this.value, that.value);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return value.toString();
+	}
 }

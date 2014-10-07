@@ -57,6 +57,9 @@ import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.obm.sync.Parameter;
+import org.obm.sync.PasswordParameter;
+import org.obm.sync.StringParameter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.locators.Locator;
 import org.slf4j.Logger;
@@ -67,6 +70,7 @@ import com.google.common.collect.Multimap;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserPassword;
 
 
 
@@ -114,46 +118,55 @@ public class AbstractClientImplTest {
 	@Test
 	public void testBodyForm() {
 		control.replay();
-		ImmutableMultimap<String, String> sentParams = ImmutableMultimap.of("foo", "bar");
+		Multimap<String, Parameter> sentParams = ImmutableMultimap.<String, Parameter> of("foo", new StringParameter("bar"));
 		client.callServlet(at, sentParams);
 		control.verify();
-		assertThat(params).isEqualTo(sentParams);
+		assertThat(params).isEqualTo(ImmutableMultimap.of("foo", "bar"));
 	}
 
 	@Test
 	public void testBodyFormMultipleValues() {
 		control.replay();
-		ImmutableMultimap<String, String> sentParams = ImmutableMultimap.of("foo", "bar", "foo", "taz");
+		ImmutableMultimap<String, Parameter> sentParams = ImmutableMultimap.<String, Parameter> of("foo", new StringParameter("bar"), "foo", new StringParameter("taz"));
 		client.callServlet(at, sentParams);
 		control.verify();
-		assertThat(params).isEqualTo(sentParams);
+		assertThat(params).isEqualTo(ImmutableMultimap.of("foo", "bar", "foo", "taz"));
 	}
 	
 	@Test
 	public void testBodyFormValueEncoding() {
 		control.replay();
-		ImmutableMultimap<String, String> sentParams = ImmutableMultimap.of("key", "élément");
+		ImmutableMultimap<String, Parameter> sentParams = ImmutableMultimap.<String, Parameter> of("key", new StringParameter("élément"));
 		client.callServlet(at, sentParams);
 		control.verify();
-		assertThat(params).isEqualTo(sentParams);
+		assertThat(params).isEqualTo(ImmutableMultimap.of("key", "élément"));
 	}
 	
 	@Test
 	public void testBodyFormKeyEncoding() {
 		control.replay();
-		ImmutableMultimap<String, String> sentParams = ImmutableMultimap.of("clé", "element");
+		ImmutableMultimap<String, Parameter> sentParams = ImmutableMultimap.<String, Parameter> of("clé", new StringParameter("element"));
 		client.callServlet(at, sentParams);
 		control.verify();
-		assertThat(params).isEqualTo(sentParams);
+		assertThat(params).isEqualTo(ImmutableMultimap.of("clé", "element"));
 	}
 	
 	@Test
 	public void testBodyFormBothEncoding() {
 		control.replay();
-		ImmutableMultimap<String, String> sentParams = ImmutableMultimap.of("clé", "élément");
+		ImmutableMultimap<String, Parameter> sentParams = ImmutableMultimap.<String, Parameter> of("clé", new StringParameter("élément"));
 		client.callServlet(at, sentParams);
 		control.verify();
-		assertThat(params).isEqualTo(sentParams);
+		assertThat(params).isEqualTo(ImmutableMultimap.of("clé", "élément"));
+	}
+	
+	@Test
+	public void testBodyFormWithPasswordParameter() {
+		control.replay();
+		ImmutableMultimap<String, Parameter> sentParams = ImmutableMultimap.<String, Parameter> of("clé", new StringParameter("élément"), "password", new PasswordParameter(UserPassword.valueOf("mypass")));
+		client.callServlet(at, sentParams);
+		control.verify();
+		assertThat(params).isEqualTo(ImmutableMultimap.of("clé", "élément", "password", "mypass"));
 	}
 	
 	private final class TestClient extends AbstractClientImpl {
@@ -168,7 +181,7 @@ public class AbstractClientImplTest {
 			return locator;
 		}
 		
-		public void callServlet(AccessToken at, Multimap<String, String> params) {
+		public void callServlet(AccessToken at, Multimap<String, Parameter> params) {
 			executeVoid(at, "/test", params);
 		}
 	}

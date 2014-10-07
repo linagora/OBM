@@ -37,7 +37,10 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.sync.IntegerParameter;
 import org.obm.sync.NotAllowedException;
+import org.obm.sync.Parameter;
+import org.obm.sync.StringParameter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -69,7 +72,7 @@ public class AbstractEventSyncClientTest extends AbstractClientTest {
 		token = ToolBox.mockAccessToken(control);
 		client = new AbstractEventSyncClient("/calendar", new SyncClientAssert(), null, logger, null) {
 			@Override
-			protected Document execute(AccessToken token, String action, Multimap<String, String> parameters) {
+			protected Document execute(AccessToken token, String action, Multimap<String, Parameter> parameters) {
 				return responder.execute(token, action, parameters);
 			}
 		};
@@ -416,7 +419,7 @@ public class AbstractEventSyncClientTest extends AbstractClientTest {
 	@Test
 	public void testListCalendarsSendsOnlySid() throws Exception {
 		Document doc = mockEmptyCalendarInfosDocument();
-		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId");
+		Multimap<String, Parameter> params = ImmutableListMultimap.<String, Parameter> of("sid", new StringParameter("sessionId"));
 
 		expect(responder.execute(token, "/calendar/listCalendars", params)).andReturn(doc).once();
 		control.replay();
@@ -429,7 +432,7 @@ public class AbstractEventSyncClientTest extends AbstractClientTest {
 	@Test
 	public void testListCalendarsWithLimitAndOffsetSendsLimitAndOffset() throws Exception {
 		Document doc = mockEmptyCalendarInfosDocument();
-		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "limit", "10", "offset", "5");
+		Multimap<String, Parameter> params = ImmutableListMultimap.<String, Parameter> of("sid", new StringParameter("sessionId"), "limit", new IntegerParameter(10), "offset", new IntegerParameter(5));
 
 		expect(responder.execute(token, "/calendar/listCalendars", params)).andReturn(doc).once();
 		control.replay();
@@ -442,7 +445,7 @@ public class AbstractEventSyncClientTest extends AbstractClientTest {
 	@Test
 	public void testListCalendarsWithNoLimitSendsSidOnly() throws Exception {
 		Document doc = mockEmptyCalendarInfosDocument();
-		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId");
+		Multimap<String, Parameter> params = ImmutableListMultimap.<String, Parameter> of("sid", new StringParameter("sessionId"));
 
 		expect(responder.execute(token, "/calendar/listCalendars", params)).andReturn(doc).once();
 		control.replay();
@@ -455,7 +458,7 @@ public class AbstractEventSyncClientTest extends AbstractClientTest {
 	@Test
 	public void testListCalendarsWithPatternSendsPatternAndSid() throws Exception {
 		Document doc = mockEmptyCalendarInfosDocument();
-		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "pattern", "p");
+		Multimap<String, Parameter> params = ImmutableListMultimap.<String, Parameter> of("sid", new StringParameter("sessionId"), "pattern", new StringParameter("p"));
 
 		expect(responder.execute(token, "/calendar/listCalendars", params)).andReturn(doc).once();
 		control.replay();
@@ -468,7 +471,7 @@ public class AbstractEventSyncClientTest extends AbstractClientTest {
 	@Test
 	public void testListCalendarsWithPatternAndLimitAndOffsetSendsAll() throws Exception {
 		Document doc = mockEmptyCalendarInfosDocument();
-		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "limit", "10", "offset", "5", "pattern", "p");
+		Multimap<String, Parameter> params = ImmutableListMultimap.<String, Parameter> of("sid", new StringParameter("sessionId"), "limit", new IntegerParameter(10), "offset", new IntegerParameter(5), "pattern", new StringParameter("p"));
 
 		expect(responder.execute(token, "/calendar/listCalendars", params)).andReturn(doc).once();
 		control.replay();
@@ -481,7 +484,7 @@ public class AbstractEventSyncClientTest extends AbstractClientTest {
 	@Test
 	public void testListResourcesSendsOnlySid() throws Exception {
 		Document doc = mockEmptyResourceInfosDocument();
-		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId");
+		Multimap<String, Parameter> params = ImmutableListMultimap.<String, Parameter> of("sid", new StringParameter("sessionId"));
 
 		expect(responder.execute(token, "/calendar/listResources", params)).andReturn(doc).once();
 		control.replay();
@@ -494,7 +497,7 @@ public class AbstractEventSyncClientTest extends AbstractClientTest {
 	@Test
 	public void testListResourcesWithLimitAndOffsetSendsLimitAndOffset() throws Exception {
 		Document doc = mockEmptyResourceInfosDocument();
-		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "limit", "10", "offset", "5");
+		Multimap<String, Parameter> params = ImmutableListMultimap.<String, Parameter> of("sid", new StringParameter("sessionId"), "limit", new IntegerParameter(10), "offset", new IntegerParameter(5));
 
 		expect(responder.execute(token, "/calendar/listResources", params)).andReturn(doc).once();
 		control.replay();
@@ -507,7 +510,7 @@ public class AbstractEventSyncClientTest extends AbstractClientTest {
 	@Test
 	public void testListResourcesWithNoLimitSendsSidOnly() throws Exception {
 		Document doc = mockEmptyResourceInfosDocument();
-		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId");
+		Multimap<String, Parameter> params = ImmutableListMultimap.<String, Parameter> of("sid", new StringParameter("sessionId"));
 
 		expect(responder.execute(token, "/calendar/listResources", params)).andReturn(doc).once();
 		control.replay();
@@ -520,7 +523,7 @@ public class AbstractEventSyncClientTest extends AbstractClientTest {
 	@Test
 	public void testListResourcesWithPatternSendsPatternAndSid() throws Exception {
 		Document doc = mockEmptyResourceInfosDocument();
-		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "pattern", "p");
+		Multimap<String, Parameter> params = ImmutableListMultimap.<String, Parameter> of("sid", new StringParameter("sessionId"), "pattern", new StringParameter("p"));
 
 		expect(responder.execute(token, "/calendar/listResources", params)).andReturn(doc).once();
 		control.replay();
@@ -533,7 +536,7 @@ public class AbstractEventSyncClientTest extends AbstractClientTest {
 	@Test
 	public void testListResourcesWithPatternAndLimitAndOffsetSendsAll() throws Exception {
 		Document doc = mockEmptyResourceInfosDocument();
-		Multimap<String, String> params = ImmutableListMultimap.of("sid", "sessionId", "limit", "10", "offset", "5", "pattern", "p");
+		Multimap<String, Parameter> params = ImmutableListMultimap.<String, Parameter> of("sid", new StringParameter("sessionId"), "limit", new IntegerParameter(10), "offset", new IntegerParameter(5), "pattern", new StringParameter("p"));
 
 		expect(responder.execute(token, "/calendar/listResources", params)).andReturn(doc).once();
 		control.replay();
