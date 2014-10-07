@@ -63,6 +63,8 @@ import org.obm.sync.client.login.LoginClient;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientWithJMSModule.class)
 public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
@@ -97,7 +99,7 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEvent(userCalendar, "user1", "testRemoveEventByIdWhenOwnerInInternal");
-		AccessToken token = loginClient.login(userCalendar, "user1");
+		AccessToken token = loginClient.login(userCalendar, UserPassword.valueOf("user1"));
 		Event storedEvent = calendarClient.storeEvent(token, userCalendar, event, false, null);
 
 		calendarClient.removeEventById(token, userCalendar, storedEvent.getObmId(), 0, true);
@@ -133,10 +135,10 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 				.participationRole(ParticipationRole.REQ)
 				.build());
 
-		AccessToken organizerToken = loginClient.login(organizerCalendar, "user2");
+		AccessToken organizerToken = loginClient.login(organizerCalendar, UserPassword.valueOf("user2"));
 		Event storedEvent = calendarClient.storeEvent(organizerToken, organizerCalendar, event, false, null);
 		
-		AccessToken userToken = loginClient.login(userCalendar, "user1");
+		AccessToken userToken = loginClient.login(userCalendar, UserPassword.valueOf("user1"));
 		calendarClient.removeEventById(userToken, userCalendar, storedEvent.getObmId(), 0, true);
 
 		Event eventFromServer = calendarClient.getEventFromExtId(userToken, userCalendar, event.getExtId());
@@ -180,7 +182,7 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 				.participationRole(ParticipationRole.REQ)
 				.build());
 
-		AccessToken token = loginClient.login(userCalendar, "user1");
+		AccessToken token = loginClient.login(userCalendar, UserPassword.valueOf("user1"));
 		Event storedEvent = calendarClient.storeEvent(token, userCalendar, event, false, null);
 		
 		calendarClient.removeEventById(token, userCalendar, storedEvent.getObmId(), 0, true);
@@ -211,7 +213,7 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEvent(userCalendar, "user1", "testRemoveEventByExtIdWhenOwnerInInternal");
-		AccessToken token = loginClient.login(userCalendar, "user1");
+		AccessToken token = loginClient.login(userCalendar, UserPassword.valueOf("user1"));
 		Event storedEvent = calendarClient.storeEvent(token, userCalendar, event, false, null);
 
 		calendarClient.removeEventByExtId(token, userCalendar, storedEvent.getExtId(), 0, true);
@@ -247,10 +249,10 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 				.participationRole(ParticipationRole.REQ)
 				.build());
 
-		AccessToken organizerToken = loginClient.login(organizerCalendar, "user2");
+		AccessToken organizerToken = loginClient.login(organizerCalendar, UserPassword.valueOf("user2"));
 		Event storedEvent = calendarClient.storeEvent(organizerToken, organizerCalendar, event, false, null);
 		
-		AccessToken userToken = loginClient.login(userCalendar, "user1");
+		AccessToken userToken = loginClient.login(userCalendar, UserPassword.valueOf("user1"));
 		calendarClient.removeEventByExtId(userToken, userCalendar, storedEvent.getExtId(), 0, true);
 
 		Event eventFromServer = calendarClient.getEventFromExtId(userToken, userCalendar, event.getExtId());
@@ -294,7 +296,7 @@ public class RemoveEventIntegrationTest extends ObmSyncIntegrationTest {
 				.participationRole(ParticipationRole.REQ)
 				.build());
 
-		AccessToken token = loginClient.login(userCalendar, "user1");
+		AccessToken token = loginClient.login(userCalendar, UserPassword.valueOf("user1"));
 		Event storedEvent = calendarClient.storeEvent(token, userCalendar, event, false, null);
 		
 		calendarClient.removeEventByExtId(token, userCalendar, storedEvent.getExtId(), 0, true);

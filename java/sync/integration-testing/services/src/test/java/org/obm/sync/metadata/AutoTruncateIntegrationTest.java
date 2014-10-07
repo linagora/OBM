@@ -72,6 +72,8 @@ import org.obm.sync.exception.ContactNotFoundException;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
 public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
@@ -109,7 +111,7 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 			throws ServerFault, EventAlreadyExistException, NotAllowedException, EventNotFoundException, AuthFault {
 
 		locatorService.configure(baseURL);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, getFakeBigFieldsEvent(calendar), false, null);
 		Event eventFromServer = calendarClient.getEventFromId(token, calendar, eventObmId);
@@ -123,7 +125,7 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 			throws ServerFault, NotAllowedException, EventNotFoundException, AuthFault, EventAlreadyExistException {
 
 		locatorService.configure(baseURL);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		
 		Event event = getFakeBigFieldsEvent(calendar);
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, event, false, null);
@@ -158,7 +160,7 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 	public void testAutoTruncateOnContactCreation(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseURL)
 			throws NoPermissionException, ServerFault, ContactNotFoundException, AuthFault {
 		locatorService.configure(baseURL);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		
 		Contact contact = bookClient.createContact(token, ADDRESSBOOK_ID, getFakeBigFieldsContact(), null);
 		Contact contactFromServer = bookClient.getContactFromId(token, ADDRESSBOOK_ID, contact.getUid());
@@ -172,7 +174,7 @@ public class AutoTruncateIntegrationTest extends ObmSyncIntegrationTest {
 			throws NoPermissionException, ServerFault, ContactNotFoundException, AuthFault {
 		
 		locatorService.configure(baseURL);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		
 		final Contact contact = getFakeBigFieldsContact();
 		Contact createdContact = bookClient.createContact(token, ADDRESSBOOK_ID, contact, null);

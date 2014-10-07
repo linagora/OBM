@@ -62,6 +62,8 @@ import org.obm.sync.items.EventChanges;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
 public class ImportICalendarIntegrationTest extends ObmSyncIntegrationTest {
@@ -76,7 +78,7 @@ public class ImportICalendarIntegrationTest extends ObmSyncIntegrationTest {
 		InputStream icsData = ClassLoader.getSystemClassLoader().getResourceAsStream("importICalendar.sample.ics");
 		String calendar = "user1@domain.org";
 
-		AccessToken accessToken = loginClient.login(calendar, "user1");
+		AccessToken accessToken = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		int importCount = calendarClient.importICalendar(accessToken, calendar, IOUtils.toString(icsData), UUID.randomUUID().toString());
 		EventChanges eventsInDB = calendarClient.getSync(accessToken, calendar, DateUtils.getEpochPlusOneSecondCalendar().getTime());
 		

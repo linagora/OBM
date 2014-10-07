@@ -55,6 +55,8 @@ import org.obm.sync.client.login.LoginClient;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
 public class ClientIntegrationTest extends ObmSyncIntegrationTest {
@@ -70,7 +72,7 @@ public class ClientIntegrationTest extends ObmSyncIntegrationTest {
 	public void testClientKeepsCookie(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 		
-		AccessToken token = loginClient.login("user1@domain.org", "user1");
+		AccessToken token = loginClient.login("user1@domain.org", UserPassword.valueOf("user1"));
 		String sid = cookiesFromClient.getSid();
 		
 		calendarClient.listCalendars(token);

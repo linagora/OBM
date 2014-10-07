@@ -58,6 +58,8 @@ import org.obm.sync.client.login.LoginClient;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
 public class CalendarClientIntegrationTest extends ObmSyncIntegrationTest {
@@ -77,7 +79,7 @@ public class CalendarClientIntegrationTest extends ObmSyncIntegrationTest {
 	@RunAsClient
 	public void testStoreEventCreatesEventIfNotPresent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 
 		Event event = newEvent(calendar, "user1", "testStoreEventCreatesEventIfNotPresent");
 		calendarClient.storeEvent(token, calendar, event, false, null);
@@ -91,7 +93,7 @@ public class CalendarClientIntegrationTest extends ObmSyncIntegrationTest {
 	@RunAsClient
 	public void testStoreEventModifiesEventIfPresent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 
 		Event event = newEvent(calendar, "user1", "testStoreEventModifiesEventIfPresent");
 		calendarClient.createEvent(token, calendar, event, false, null);
@@ -107,7 +109,7 @@ public class CalendarClientIntegrationTest extends ObmSyncIntegrationTest {
 	@RunAsClient
 	public void testCreateEventFailsIfPresent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 
 		Event event = newEvent(calendar, "user1", "testCreateEventFailsIfPresent");
 
@@ -119,7 +121,7 @@ public class CalendarClientIntegrationTest extends ObmSyncIntegrationTest {
 	@RunAsClient
 	public void testClientIdCreateTwiceEvent(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		
 		Event event = newEvent(calendar, "user1", "firstExtIdOfCreateTwiceEvent");
 		boolean notif = false;
@@ -145,7 +147,7 @@ public class CalendarClientIntegrationTest extends ObmSyncIntegrationTest {
 	@RunAsClient
 	public void testClientIdCreateEventDeleteItThenCreateAgain(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		
 		Event event = newEvent(calendar, "user1", "extIdOfCreateEventDeleteItThenCreateAgain");
 		boolean notif = false;

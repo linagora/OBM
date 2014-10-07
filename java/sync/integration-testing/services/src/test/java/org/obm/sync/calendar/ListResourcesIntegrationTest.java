@@ -59,6 +59,8 @@ import org.obm.sync.client.login.LoginClient;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
 public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
@@ -77,7 +79,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListResources(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token);
 
 		loginClient.logout(user1Token);
@@ -100,7 +102,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testGetResourceMetadata(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 		Collection<ResourceInfo> resources = calendarClient.getResourceMetadata(user1Token, new String[] {
 				"res-a@domain.org",
 				"res-b@domain.org"
@@ -119,7 +121,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListResourcesWithLimit(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, 2, 0);
 
 		loginClient.logout(user1Token);
@@ -135,7 +137,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListResourcesWithLimitAndOffset(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, 2, 2);
 
 		loginClient.logout(user1Token);
@@ -151,7 +153,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListResourcesPagination(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, 3, 0);
 
 		assertThat(resources).containsExactly(
@@ -184,7 +186,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListResourcesWithNegativeLimit(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 
 		calendarClient.listResources(user1Token, -1, 0, null);
 	}
@@ -194,7 +196,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListResourcesWithNegativeOffset(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 
 		calendarClient.listResources(user1Token, 10, -1, null);
 	}
@@ -204,7 +206,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListResourcesWithPatternMatchesName(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, null, 0, "resd");
 
 		loginClient.logout(user1Token);
@@ -219,7 +221,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListResourcesWithPatternMatchesNameICase(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, null, 0, "rESd");
 
 		loginClient.logout(user1Token);
@@ -234,7 +236,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListResourcesWithPatternMatchesDescription(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, null, 0, "description of resa");
 
 		loginClient.logout(user1Token);
@@ -249,7 +251,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListResourcesWithPatternMatchesDescriptionICase(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, null, 0, "descRIPTION oF ReSa");
 
 		loginClient.logout(user1Token);
@@ -264,7 +266,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListResourcesWithPatternLimitAndOffset(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, 2, 1, "res");
 
 		loginClient.logout(user1Token);
@@ -280,7 +282,7 @@ public class ListResourcesIntegrationTest extends ObmSyncIntegrationTest {
 	public void testListCalendarsWithBadPattern(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken user1Token = loginClient.login(USER1_EMAIL, "user1");
+		AccessToken user1Token = loginClient.login(USER1_EMAIL, UserPassword.valueOf("user1"));
 		Collection<ResourceInfo> resources = calendarClient.listResources(user1Token, 2, 1, "iwontmatch");
 
 		loginClient.logout(user1Token);

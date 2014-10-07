@@ -37,6 +37,7 @@ import static org.easymock.EasyMock.isA;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.DomainConfiguration;
+import org.obm.sync.Parameter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.MavenVersion;
@@ -48,6 +49,7 @@ import com.google.common.collect.Multimap;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.UserPassword;
 
 
 public class LoginClientTest extends AbstractClientTest {
@@ -71,7 +73,7 @@ public class LoginClientTest extends AbstractClientTest {
 		}, new SyncClientAssert(), null, logger, null) {
 
 			@Override
-			protected Document execute(AccessToken token, String action, Multimap<String, String> parameters) {
+			protected Document execute(AccessToken token, String action, Multimap<String, Parameter> parameters) {
 				return responder.execute(token, action, parameters);
 			}
 
@@ -85,7 +87,7 @@ public class LoginClientTest extends AbstractClientTest {
 		expect(responder.execute(isA(AccessToken.class), eq("/login/doLogin"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
 
-		client.login("user@domain.com", "secret");
+		client.login("user@domain.com", UserPassword.valueOf("secret"));
 	}
 
 	@Test(expected = AuthFault.class)
@@ -95,7 +97,7 @@ public class LoginClientTest extends AbstractClientTest {
 		expect(responder.execute(isA(AccessToken.class), eq("/login/doLogin"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
 
-		client.login("user@domain.com", "secret");
+		client.login("user@domain.com", UserPassword.valueOf("secret"));
 	}
 
 	@Test(expected = RuntimeException.class)
@@ -105,7 +107,7 @@ public class LoginClientTest extends AbstractClientTest {
 		expect(responder.execute(isA(AccessToken.class), eq("/login/doLogin"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
 
-		client.login("user@domain.com", "secret");
+		client.login("user@domain.com", UserPassword.valueOf("secret"));
 	}
 
 	@Test
@@ -121,7 +123,7 @@ public class LoginClientTest extends AbstractClientTest {
 		expect(responder.execute(isA(AccessToken.class), eq("/login/doLogin"), isA(Multimap.class))).andReturn(document).once();
 		control.replay();
 
-		AccessToken token = client.login("user@domain.com", "secret");
+		AccessToken token = client.login("user@domain.com", UserPassword.valueOf("secret"));
 		AccessToken expectedToken = new AccessToken(0, "client-testing");
 
 		expectedToken.setUserLogin("user");

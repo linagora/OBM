@@ -62,6 +62,8 @@ import org.obm.sync.items.EventChanges;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.user.UserPassword;
+
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
 public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
@@ -82,7 +84,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@RunAsClient
 	public void testCreateEventCreatesAlert(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 		
 		Event event = newEventWithAlert(calendar, "1", 30);
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, event, false, null);
@@ -97,8 +99,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "2", 30);
-		AccessToken user1Token = loginClient.login(calendar, "user1");
-		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		AccessToken user1Token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		AccessToken user2Token = loginClient.login("user2@domain.org", UserPassword.valueOf("user2"));
 		EventObmId eventObmId = calendarClient.createEvent(user2Token, calendar, event, false, null);
 		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, calendar, eventObmId);
 		Event eventFromServerAsUser2 = calendarClient.getEventFromId(user2Token, calendar, eventObmId);
@@ -111,7 +113,7 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 	@RunAsClient
 	public void testModifyEventModifiesAlert(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
-		AccessToken token = loginClient.login(calendar, "user1");
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
 
 		Event event = newEventWithAlert(calendar, "3", 30);
 		EventObmId eventObmId = calendarClient.createEvent(token, calendar, event, false, null);
@@ -130,8 +132,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "4", 30);
-		AccessToken user1Token = loginClient.login(calendar, "user1");
-		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		AccessToken user1Token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		AccessToken user2Token = loginClient.login("user2@domain.org", UserPassword.valueOf("user2"));
 		EventObmId eventObmId = calendarClient.createEvent(user1Token, calendar, event, false, null);
 
 		event.setAlert(60);
@@ -150,8 +152,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "5", 30);
-		AccessToken user1Token = loginClient.login(calendar, "user1");
-		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		AccessToken user1Token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		AccessToken user2Token = loginClient.login("user2@domain.org", UserPassword.valueOf("user2"));
 		EventObmId eventObmId = calendarClient.createEvent(user1Token, calendar, event, false, null);
 
 		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, calendar, eventObmId);
@@ -167,8 +169,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "6", 30);
-		AccessToken user1Token = loginClient.login(calendar, "user1");
-		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		AccessToken user1Token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		AccessToken user2Token = loginClient.login("user2@domain.org", UserPassword.valueOf("user2"));
 		Date lastSync = calendarClient.getSync(user1Token, calendar, null).getLastSync();
 
 		calendarClient.createEvent(user1Token, calendar, event, false, null);
@@ -186,8 +188,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "7", 30);
-		AccessToken user1Token = loginClient.login(calendar, "user1");
-		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		AccessToken user1Token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		AccessToken user2Token = loginClient.login("user2@domain.org", UserPassword.valueOf("user2"));
 		Date lastSync = calendarClient.getSync(user1Token, calendar, null).getLastSync();
 
 		calendarClient.createEvent(user1Token, calendar, event, false, null);
@@ -205,8 +207,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "8", 30);
-		AccessToken user1Token = loginClient.login(calendar, "user1");
-		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		AccessToken user1Token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		AccessToken user2Token = loginClient.login("user2@domain.org", UserPassword.valueOf("user2"));
 
 		calendarClient.createEvent(user1Token, calendar, event, false, null);
 
@@ -223,8 +225,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "9", 30, "2013-07-01T12:00:00Z");
-		AccessToken user1Token = loginClient.login(calendar, "user1");
-		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		AccessToken user1Token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		AccessToken user2Token = loginClient.login("user2@domain.org", UserPassword.valueOf("user2"));
 		Date start = date("2013-07-01T11:00:00Z"), end = date("2013-07-01T13:00:00Z");
 
 		calendarClient.createEvent(user1Token, calendar, event, false, null);
@@ -242,8 +244,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "10", 30);
-		AccessToken user1Token = loginClient.login(calendar, "user1");
-		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		AccessToken user1Token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		AccessToken user2Token = loginClient.login("user2@domain.org", UserPassword.valueOf("user2"));
 
 		calendarClient.createEvent(user1Token, calendar, event, false, null);
 
@@ -260,8 +262,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "11", 30);
-		AccessToken user1Token = loginClient.login(calendar, "user1");
-		AccessToken user3Token = loginClient.login("user3@domain.org", "user3");
+		AccessToken user1Token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		AccessToken user3Token = loginClient.login("user3@domain.org", UserPassword.valueOf("user3"));
 		EventObmId eventObmId = calendarClient.createEvent(user1Token, calendar, event, false, null);
 
 		Event eventFromServerAsUser1 = calendarClient.getEventFromId(user1Token, calendar, eventObmId);
@@ -277,8 +279,8 @@ public class EventAlertHandlingIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 		
 		Event event = newEventWithAlert(calendar, "12", 30, "2013-07-01T12:00:00Z");
-		AccessToken user1Token = loginClient.login(calendar, "user1");
-		AccessToken user2Token = loginClient.login("user2@domain.org", "user2");
+		AccessToken user1Token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		AccessToken user2Token = loginClient.login("user2@domain.org", UserPassword.valueOf("user2"));
 		Date start = date("2013-07-01T11:00:00Z");
 
 		calendarClient.createEvent(user1Token, calendar, event, false, null);

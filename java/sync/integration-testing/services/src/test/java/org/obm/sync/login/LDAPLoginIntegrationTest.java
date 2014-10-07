@@ -72,6 +72,7 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.UserPassword;
 
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientAndEmbeddedLDAPModule.class)
@@ -86,7 +87,7 @@ public class LDAPLoginIntegrationTest extends ObmSyncIntegrationTest {
 	public void testDoLoginSuccess(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken token = loginClient.login("user1@domain.org", "user1");
+		AccessToken token = loginClient.login("user1@domain.org", UserPassword.valueOf("user1"));
 		
 		assertThat(token).isNotNull();
 		assertThatTokenIsWellFormed(token);
@@ -97,7 +98,7 @@ public class LDAPLoginIntegrationTest extends ObmSyncIntegrationTest {
 	public void testDoLoginIsCaseInsensitive(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken token = loginClient.login("UseR1@domain.org", "user1");
+		AccessToken token = loginClient.login("UseR1@domain.org", UserPassword.valueOf("user1"));
 
 		assertThat(token).isNotNull();
 		assertThatTokenIsWellFormed(token);
@@ -108,7 +109,7 @@ public class LDAPLoginIntegrationTest extends ObmSyncIntegrationTest {
 	public void testDoLoginWithoutDomainSuccess(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken token = loginClient.login("user1", "user1");
+		AccessToken token = loginClient.login("user1", UserPassword.valueOf("user1"));
 
 		assertThat(token).isNotNull();
 		assertThatTokenIsWellFormed(token);
@@ -119,7 +120,7 @@ public class LDAPLoginIntegrationTest extends ObmSyncIntegrationTest {
 	public void testDoLoginWithoutDomainIsCaseInsensitive(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken token = loginClient.login("UseR1", "user1");
+		AccessToken token = loginClient.login("UseR1", UserPassword.valueOf("user1"));
 
 		assertThat(token).isNotNull();
 		assertThatTokenIsWellFormed(token);
@@ -131,7 +132,7 @@ public class LDAPLoginIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		try {
-			loginClient.login("user@domain.org", "user1");
+			loginClient.login("user@domain.org", UserPassword.valueOf("user1"));
 		} catch(AuthFault e) {
 			assertThat(e.getMessage()).contains("javax.naming.AuthenticationException: User with login 'user' not found in LDAP directory.");
 			throw e;
@@ -144,7 +145,7 @@ public class LDAPLoginIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		try {
-			loginClient.login("user1", "user");
+			loginClient.login("user1", UserPassword.valueOf("user"));
 		} catch(AuthFault e) {
 			assertThat(e.getMessage()).contains("javax.naming.AuthenticationException: [LDAP: error code 49 - Invalid Credentials]");
 			throw e;
@@ -156,7 +157,7 @@ public class LDAPLoginIntegrationTest extends ObmSyncIntegrationTest {
 	public void testDoLoginSuccessForUser2onDomain1(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken token = loginClient.login("user2@domain.org", "user2");
+		AccessToken token = loginClient.login("user2@domain.org", UserPassword.valueOf("user2"));
 
 		assertThat(token).isNotNull();
 	}
@@ -167,7 +168,7 @@ public class LDAPLoginIntegrationTest extends ObmSyncIntegrationTest {
 		locatorService.configure(baseUrl);
 
 		try {
-			loginClient.login("user2", "user2");
+			loginClient.login("user2", UserPassword.valueOf("user2"));
 		} catch(AuthFault e) {
 			assertThat(e.getMessage()).contains("The login user2 is in several domains (at least domain.org and  domain2.org).");
 			throw e;
@@ -179,7 +180,7 @@ public class LDAPLoginIntegrationTest extends ObmSyncIntegrationTest {
 	public void testDoLoginSuccessForUser2onDomain2(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
 		locatorService.configure(baseUrl);
 
-		AccessToken token = loginClient.login("user2@domain2.org", "user2");
+		AccessToken token = loginClient.login("user2@domain2.org", UserPassword.valueOf("user2"));
 
 		assertThat(token).isNotNull();
 	}
@@ -190,7 +191,7 @@ public class LDAPLoginIntegrationTest extends ObmSyncIntegrationTest {
 		tearDown();
 
 		locatorService.configure(baseUrl);
-		loginClient.login("user1@domain.org", "user1");
+		loginClient.login("user1@domain.org", UserPassword.valueOf("user1"));
 	}
 
 	private void assertThatTokenIsWellFormed(AccessToken token) {
