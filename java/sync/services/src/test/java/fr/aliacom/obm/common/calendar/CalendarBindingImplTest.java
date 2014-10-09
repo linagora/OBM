@@ -4413,4 +4413,43 @@ public class CalendarBindingImplTest {
 		Date expectedEndRepeat = DateUtils.date("2014-09-30T12:00:00Z");
 		assertThat(actualEndRepeat).isEqualTo(expectedEndRepeat);
 	}
+
+	@Test
+	public void testEndRepeatIsStandardizedInsideCreateEvent() throws Exception {
+		Event event = new Event();
+		event.setExtId(new EventExtId("extId"));
+		event.setInternalEvent(true);
+		event.setStartDate(DateUtils.date("2014-09-26T12:00:00Z"));
+		event.setDuration(3600);
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setEnd(DateUtils.date("2014-09-30T18:00:00Z"));
+		event.setRecurrence(recurrence);
+
+		ObmUser user = ToolBox.getDefaultObmUser();
+		String calendar = user.getEmail();
+		String clientId = null;
+
+		event.addAttendee(UserAttendee.builder().email(calendar).asOrganizer().build());
+
+		Event standardizedEvent = event.clone();
+		standardizedEvent.getRecurrence().setEnd(DateUtils.date("2014-09-30T12:00:00Z"));
+
+		CalendarRights calendarToRights = CalendarRights.builder()
+				.addRights(calendar, EnumSet.of(Right.WRITE))
+				.build();
+		expect(helperService.listRightsOnCalendars(token, ImmutableSet.of(calendar))).andReturn(calendarToRights);
+		expect(helperService.canWriteOnCalendar(token, calendar)).andReturn(true).anyTimes();
+		expect(calendarDao.findEventByExtId(token, user, event.getExtId())).andReturn(null);
+		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user).times(2);
+		expect(commitedOperationDao.findAsEvent(token, clientId)).andReturn(null);
+		expect(calendarDao.createEvent(token, calendar, standardizedEvent, true)).andReturn(standardizedEvent).anyTimes();
+		expect(calendarDao.findEventById(token, null)).andReturn(standardizedEvent).anyTimes();
+		messageQueueService.writeIcsInvitationRequest(eq(token), eq(standardizedEvent));
+		expectLastCall();
+
+		mocksControl.replay();
+		binding.createEvent(token, user.getEmail(), event, false, clientId);
+		mocksControl.verify();
+	}
 }
