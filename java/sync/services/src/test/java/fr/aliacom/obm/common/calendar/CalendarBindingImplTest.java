@@ -4326,7 +4326,7 @@ public class CalendarBindingImplTest {
 		event.setRecurrence(recurrence);
 
 		Date actualEndRepeat = binding.forceEndRepeatToLastOccurrence(event).getRecurrence().getEnd();
-		Date expectedEndRepeat = DateUtils.date("2014-09-29T13:00:00Z");
+		Date expectedEndRepeat = DateUtils.date("2014-09-29T12:00:00Z");
 		assertThat(actualEndRepeat).isEqualTo(expectedEndRepeat);
 	}
 
@@ -4341,7 +4341,7 @@ public class CalendarBindingImplTest {
 		event.setRecurrence(recurrence);
 
 		Date actualEndRepeat = binding.forceEndRepeatToLastOccurrence(event).getRecurrence().getEnd();
-		Date expectedEndRepeat = DateUtils.date("2014-09-30T13:00:00Z");
+		Date expectedEndRepeat = DateUtils.date("2014-09-30T12:00:00Z");
 		assertThat(actualEndRepeat).isEqualTo(expectedEndRepeat);
 	}
 
@@ -4356,7 +4356,7 @@ public class CalendarBindingImplTest {
 		event.setRecurrence(recurrence);
 
 		Date actualEndRepeat = binding.forceEndRepeatToLastOccurrence(event).getRecurrence().getEnd();
-		Date expectedEndRepeat = DateUtils.date("2014-09-30T13:00:00Z");
+		Date expectedEndRepeat = DateUtils.date("2014-09-30T12:00:00Z");
 		assertThat(actualEndRepeat).isEqualTo(expectedEndRepeat);
 	}
 
@@ -4371,7 +4371,7 @@ public class CalendarBindingImplTest {
 		event.setRecurrence(recurrence);
 
 		Date actualEndRepeat = binding.forceEndRepeatToLastOccurrence(event).getRecurrence().getEnd();
-		Date expectedEndRepeat = DateUtils.date("2014-09-30T13:00:00Z");
+		Date expectedEndRepeat = DateUtils.date("2014-09-30T12:00:00Z");
 		assertThat(actualEndRepeat).isEqualTo(expectedEndRepeat);
 	}
 
@@ -4392,7 +4392,7 @@ public class CalendarBindingImplTest {
 		event.addAttendee(UserAttendee.builder().email(calendar).asOrganizer().build());
 
 		Event standardizedEvent = event.clone();
-		standardizedEvent.getRecurrence().setEnd(DateUtils.date("2014-09-30T13:00:00Z"));
+		standardizedEvent.getRecurrence().setEnd(DateUtils.date("2014-09-30T12:00:00Z"));
 
 		CalendarRights calendarToRights = CalendarRights.builder()
 				.addRights(calendar, EnumSet.of(Right.WRITE))
@@ -4410,7 +4410,7 @@ public class CalendarBindingImplTest {
 		Date actualEndRepeat = binding.modifyEvent(token, user.getEmail(), event, false, false).getRecurrence().getEnd();
 		mocksControl.verify();
 
-		Date expectedEndRepeat = DateUtils.date("2014-09-30T13:00:00Z");
+		Date expectedEndRepeat = DateUtils.date("2014-09-30T12:00:00Z");
 		assertThat(actualEndRepeat).isEqualTo(expectedEndRepeat);
 	}
 }
