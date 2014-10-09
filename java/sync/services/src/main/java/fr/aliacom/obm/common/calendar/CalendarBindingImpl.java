@@ -117,8 +117,8 @@ import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
-import fr.aliacom.obm.utils.CalendarRightsPair;
 import fr.aliacom.obm.utils.CalendarRights;
+import fr.aliacom.obm.utils.CalendarRightsPair;
 import fr.aliacom.obm.utils.HelperService;
 
 public class CalendarBindingImpl implements ICalendar {
@@ -411,7 +411,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 		Event clone = event.clone();
 
-		List<Date> occurrences = ical4jHelper.dateInInterval(
+		List<Date> occurrences = ical4jHelper.dateInIntervalInclusive(
 			event.getRecurrence(),
 			event.getStartDate(),
 			event.getStartDate(),

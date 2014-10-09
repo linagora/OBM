@@ -4300,14 +4300,14 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testSetEndRepeatToLastOccurrenceWithNoRecurrent() {
+	public void testForceEndRepeatToLastOccurrenceWithNoRecurrent() {
 		Event event = new Event();
 
 		assertThat(binding.forceEndRepeatToLastOccurrence(event)).isEqualTo(event);
 	}
 
 	@Test
-	public void testSetEndRepeatToLastOccurrenceWithNoEndRepeat() {
+	public void testForceEndRepeatToLastOccurrenceWithNoEndRepeat() {
 		Event event = new Event();
 		EventRecurrence recurrence = new EventRecurrence();
 		event.setRecurrence(recurrence);
@@ -4316,7 +4316,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testSetEndRepeatToLastOccurrenceIfEndDateGtEndRepeat() {
+	public void testForceEndRepeatToLastOccurrenceIfEndDateGtEndRepeat() {
 		Event event = new Event();
 		event.setStartDate(DateUtils.date("2014-09-26T12:00:00Z"));
 		event.setDuration(3600);
@@ -4331,7 +4331,7 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testSetEndRepeatToLastOccurrenceOfIfEndDateLtEndRepeat() {
+	public void testForceEndRepeatToLastOccurrenceOfIfEndDateLtEndRepeat() {
 		Event event = new Event();
 		event.setStartDate(DateUtils.date("2014-09-26T12:00:00Z"));
 		event.setDuration(3600);
@@ -4346,28 +4346,28 @@ public class CalendarBindingImplTest {
 	}
 
 	@Test
-	public void testSetEndRepeatToLastOccurrenceIfEndDateLtEndRepeat() {
-		Event event = new Event();
-		event.setStartDate(DateUtils.date("2014-09-26T12:00:00Z"));
-		event.setDuration(3600);
-		EventRecurrence recurrence = new EventRecurrence();
-		recurrence.setKind(RecurrenceKind.daily);
-		recurrence.setEnd(DateUtils.date("2014-09-30T18:00:00Z"));
-		event.setRecurrence(recurrence);
-
-		Date actualEndRepeat = binding.forceEndRepeatToLastOccurrence(event).getRecurrence().getEnd();
-		Date expectedEndRepeat = DateUtils.date("2014-09-30T13:00:00Z");
-		assertThat(actualEndRepeat).isEqualTo(expectedEndRepeat);
-	}
-
-	@Test
-	public void testSetEndRepeatToLastOccurrenceIfEndDateEqEndRepeat() {
+	public void testForceEndRepeatToLastOccurrenceIfEndDateEqEndRepeat() {
 		Event event = new Event();
 		event.setStartDate(DateUtils.date("2014-09-26T12:00:00Z"));
 		event.setDuration(3600);
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
 		recurrence.setEnd(DateUtils.date("2014-09-30T13:00:00Z"));
+		event.setRecurrence(recurrence);
+
+		Date actualEndRepeat = binding.forceEndRepeatToLastOccurrence(event).getRecurrence().getEnd();
+		Date expectedEndRepeat = DateUtils.date("2014-09-30T13:00:00Z");
+		assertThat(actualEndRepeat).isEqualTo(expectedEndRepeat);
+	}
+
+	@Test
+	public void testForceEndRepeatToLastOccurrenceIfEndDateTimeEqEndRepeat() {
+		Event event = new Event();
+		event.setStartDate(DateUtils.date("2014-09-26T12:00:00Z"));
+		event.setDuration(3600);
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setEnd(DateUtils.date("2014-09-30T12:00:00Z"));
 		event.setRecurrence(recurrence);
 
 		Date actualEndRepeat = binding.forceEndRepeatToLastOccurrence(event).getRecurrence().getEnd();

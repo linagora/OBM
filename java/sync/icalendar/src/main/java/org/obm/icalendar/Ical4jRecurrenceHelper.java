@@ -46,4 +46,6 @@ public interface Ical4jRecurrenceHelper {
 
 	List<Date> dateInInterval(EventRecurrence recurrence, Date eventDate, Date start, Date end, Set<Date> dateExce);
 
+	List<Date> dateInIntervalInclusive(EventRecurrence recurrence, Date eventDate, Date start, Date end, Set<Date> dateExce);
+
 }

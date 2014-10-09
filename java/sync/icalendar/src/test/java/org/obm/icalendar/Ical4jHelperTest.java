@@ -2170,7 +2170,7 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testDateInIntervalWithNullEndRepeatAndStartdateBefore() {
+	public void testDateInIntervalWithNullEndRepeatAndStartDateBefore() {
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
 		Date eventDate = DateUtils.date("2014-01-01T20:00:00Z");
@@ -2188,7 +2188,22 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testDateInIntervalWithNullEndRepeatAndStartdateAfter() {
+	public void testDateInIntervalWithNullEndRepeatAndStartDateEq() {
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		Date eventDate = DateUtils.date("2014-01-01T20:00:00Z");
+		Date startDate = DateUtils.date("2014-01-01T20:00:00Z");
+		List<Date> dateInInterval = ical4jHelper.dateInInterval(
+				recurrence,
+				eventDate,
+				startDate,
+				null,
+				ImmutableSet.<Date> of());
+		assertThat(dateInInterval).isEmpty();
+	}
+
+	@Test
+	public void testDateInIntervalWithNullEndRepeatAndStartDateAfter() {
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.daily);
 		Date eventDate = DateUtils.date("2014-01-01T20:00:00Z");
@@ -2206,41 +2221,101 @@ public class Ical4jHelperTest {
 
 	@Test
 	public void testDateInIntervalForDaily() {
-		EventRecurrence recurrence = new EventRecurrence();
-		recurrence.setKind(RecurrenceKind.daily);
-		recurrence.setEnd(DateUtils.date("2014-01-05T20:00:00Z"));
 		Date eventDate = DateUtils.date("2014-01-01T20:00:00Z");
 		Date endDate = DateUtils.date("2014-01-05T21:00:00Z");
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setEnd(endDate);
+		List<Date> dateInInterval = ical4jHelper.dateInInterval(
+				recurrence,
+				eventDate,
+				eventDate,
+				endDate,
+				ImmutableSet.<Date> of(DateUtils.date("2014-01-03T20:00:00Z")));
+		assertThat(dateInInterval).containsExactly(
+				DateUtils.date("2014-01-01T20:00:00Z"),
+				DateUtils.date("2014-01-02T20:00:00Z"),
+				DateUtils.date("2014-01-04T20:00:00Z"),
+				DateUtils.date("2014-01-05T20:00:00Z"));
+	}
 
+	@Test
+	public void testDateInIntervalForDailyWhenEndDateOnLastOccurrence() {
+		Date eventDate = DateUtils.date("2014-01-01T20:00:00Z");
+		Date endDate = DateUtils.date("2014-01-05T20:00:00Z");
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setEnd(endDate);
 		List<Date> dateInInterval = ical4jHelper.dateInInterval(
 			recurrence,
 			eventDate,
 			eventDate,
 			endDate,
-			ImmutableSet.<Date>of(DateUtils.date("2014-01-03T20:00:00Z")));
+			ImmutableSet.of(DateUtils.date("2014-01-03T20:00:00Z")));
 
 		assertThat(dateInInterval).containsExactly(
-			DateUtils.date("2014-01-01T20:00:00Z"),
-			DateUtils.date("2014-01-02T20:00:00Z"),
-			DateUtils.date("2014-01-04T20:00:00Z"),
-			DateUtils.date("2014-01-05T20:00:00Z"));
+				DateUtils.date("2014-01-01T20:00:00Z"),
+				DateUtils.date("2014-01-02T20:00:00Z"),
+				DateUtils.date("2014-01-04T20:00:00Z"));
+	}
+
+	@Test
+	public void testDateInIntervalInclusiveForDailyWhenEndDateOnLastOccurrence() {
+		Date eventDate = DateUtils.date("2014-01-01T20:00:00Z");
+		Date endDate = DateUtils.date("2014-01-05T20:00:00Z");
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.daily);
+		recurrence.setEnd(endDate);
+		List<Date> dateInInterval = ical4jHelper.dateInIntervalInclusive(
+				recurrence,
+				eventDate,
+				eventDate,
+				endDate,
+				ImmutableSet.<Date> of(DateUtils.date("2014-01-03T20:00:00Z")));
+		assertThat(dateInInterval).containsExactly(
+				DateUtils.date("2014-01-01T20:00:00Z"),
+				DateUtils.date("2014-01-02T20:00:00Z"),
+				DateUtils.date("2014-01-04T20:00:00Z"),
+				DateUtils.date("2014-01-05T20:00:00Z"));
 	}
 
 	@Test
 	public void testDateInIntervalForWeekly() {
-		EventRecurrence recurrence = new EventRecurrence();
-		recurrence.setKind(RecurrenceKind.weekly);
-		recurrence.setEnd(DateUtils.date("2014-09-30T20:00:00Z"));
-		recurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday, RecurrenceDay.Wednesday));
 		Date eventDate = DateUtils.date("2014-09-01T20:00:00Z");
 		Date endDate = DateUtils.date("2014-09-20T20:00:00Z");
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.weekly);
+		recurrence.setEnd(endDate);
+		recurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday, RecurrenceDay.Wednesday));
+		List<Date> dateInInterval = ical4jHelper.dateInInterval(
+				recurrence,
+				eventDate,
+				eventDate,
+				endDate,
+				ImmutableSet.<Date> of(
+						DateUtils.date("2014-09-08T20:00:00Z"),
+						DateUtils.date("2014-09-17T20:00:00Z")));
+		assertThat(dateInInterval).containsExactly(
+				DateUtils.date("2014-09-01T20:00:00Z"),
+				DateUtils.date("2014-09-03T20:00:00Z"),
+				DateUtils.date("2014-09-10T20:00:00Z"),
+				DateUtils.date("2014-09-15T20:00:00Z"));
+	}
 
+	@Test
+	public void testDateInIntervalForWeeklyWhenEndDateOnLastOccurrence() {
+		Date eventDate = DateUtils.date("2014-09-01T20:00:00Z");
+		Date endDate = DateUtils.date("2014-09-22T20:00:00Z");
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.weekly);
+		recurrence.setEnd(endDate);
+		recurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday, RecurrenceDay.Wednesday));
 		List<Date> dateInInterval = ical4jHelper.dateInInterval(
 			recurrence,
 			eventDate,
 			eventDate,
 			endDate,
-			ImmutableSet.<Date>of(DateUtils.date("2014-09-08T20:00:00Z"), DateUtils.date("2014-09-17T20:00:00Z")));
+			ImmutableSet.of(DateUtils.date("2014-09-08T20:00:00Z"), DateUtils.date("2014-09-17T20:00:00Z")));
 
 		assertThat(dateInInterval).containsExactly(
 			DateUtils.date("2014-09-01T20:00:00Z"),
@@ -2250,19 +2325,59 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
+	public void testDateInIntervalInclusiveForWeeklyWhenEndDateOnLastOccurrence() {
+		Date eventDate = DateUtils.date("2014-09-01T20:00:00Z");
+		Date endDate = DateUtils.date("2014-09-22T20:00:00Z");
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.weekly);
+		recurrence.setEnd(endDate);
+		recurrence.setDays(new RecurrenceDays(RecurrenceDay.Monday, RecurrenceDay.Wednesday));
+		List<Date> dateInInterval = ical4jHelper.dateInIntervalInclusive(
+				recurrence,
+				eventDate,
+				eventDate,
+				endDate,
+				ImmutableSet.<Date> of(
+						DateUtils.date("2014-09-08T20:00:00Z"),
+						DateUtils.date("2014-09-17T20:00:00Z")));
+		assertThat(dateInInterval).containsExactly(
+				DateUtils.date("2014-09-01T20:00:00Z"),
+				DateUtils.date("2014-09-03T20:00:00Z"),
+				DateUtils.date("2014-09-10T20:00:00Z"),
+				DateUtils.date("2014-09-15T20:00:00Z"),
+				DateUtils.date("2014-09-22T20:00:00Z"));
+	}
+
+	@Test
 	public void testDateInIntervalForMonthlyByDate() {
+		Date eventDate = DateUtils.date("2014-09-01T20:00:00Z");
+		Date endDate = DateUtils.date("2014-12-02T20:00:00Z");
 		EventRecurrence recurrence = new EventRecurrence();
 		recurrence.setKind(RecurrenceKind.monthlybydate);
-		recurrence.setEnd(DateUtils.date("2015-01-01T20:00:00Z"));
+		recurrence.setEnd(endDate);
+		List<Date> dateInInterval = ical4jHelper.dateInInterval(recurrence,
+				eventDate, eventDate, endDate,
+				ImmutableSet.<Date> of(DateUtils.date("2014-10-01T20:00:00Z")));
+		assertThat(dateInInterval).containsExactly(
+				DateUtils.date("2014-09-01T20:00:00Z"),
+				DateUtils.date("2014-11-01T20:00:00Z"),
+				DateUtils.date("2014-12-01T20:00:00Z"));
+	}
+
+	@Test
+	public void testDateInIntervalForMonthlyByDateWhenEndDateOnLastOccurrence() {
 		Date eventDate = DateUtils.date("2014-09-01T20:00:00Z");
 		Date endDate = DateUtils.date("2014-12-01T20:00:00Z");
-
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.monthlybydate);
+		recurrence.setEnd(endDate);
+		
 		List<Date> dateInInterval = ical4jHelper.dateInInterval(
 			recurrence,
 			eventDate,
 			eventDate,
 			endDate,
-			ImmutableSet.<Date>of(DateUtils.date("2014-10-01T20:00:00Z")));
+			ImmutableSet.of(DateUtils.date("2014-10-01T20:00:00Z")));
 
 		assertThat(dateInInterval).containsExactly(
 			DateUtils.date("2014-09-01T20:00:00Z"),
@@ -2270,13 +2385,28 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testDateInIntervalForMonthlyByDay() {
-		EventRecurrence recurrence = new EventRecurrence();
-		recurrence.setKind(RecurrenceKind.monthlybyday);
-		recurrence.setEnd(DateUtils.date("2015-01-01T20:00:00Z"));
+	public void testDateInIntervalInclusiveForMonthlyByDateWhenEndDateOnLastOccurrence() {
 		Date eventDate = DateUtils.date("2014-09-01T20:00:00Z");
 		Date endDate = DateUtils.date("2014-12-01T20:00:00Z");
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.monthlybydate);
+		recurrence.setEnd(endDate);
+		List<Date> dateInInterval = ical4jHelper.dateInIntervalInclusive(recurrence,
+				eventDate, eventDate, endDate,
+				ImmutableSet.<Date> of(DateUtils.date("2014-10-01T20:00:00Z")));
+		assertThat(dateInInterval).containsExactly(
+				DateUtils.date("2014-09-01T20:00:00Z"),
+				DateUtils.date("2014-11-01T20:00:00Z"),
+				DateUtils.date("2014-12-01T20:00:00Z"));
+	}
 
+	@Test
+	public void testDateInIntervalForMonthlyByDay() {
+		Date eventDate = DateUtils.date("2014-09-01T20:00:00Z");
+		Date endDate = DateUtils.date("2014-12-01T20:00:00Z");
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.monthlybyday);
+		recurrence.setEnd(endDate);
 		List<Date> dateInInterval = ical4jHelper.dateInInterval(
 			recurrence,
 			eventDate,
@@ -2291,13 +2421,33 @@ public class Ical4jHelperTest {
 	}
 
 	@Test
-	public void testDateInIntervalForYearly() {
+	public void testDateInIntervalInclusiveForMonthlyByDayWhenEndDateOnLastOccurrence() {
+		Date eventDate = DateUtils.date("2014-09-01T20:00:00Z");
+		Date endDate = DateUtils.date("2014-12-01T20:00:00Z");
 		EventRecurrence recurrence = new EventRecurrence();
-		recurrence.setKind(RecurrenceKind.yearly);
-		recurrence.setEnd(DateUtils.date("2016-10-09T20:00:00Z"));
+		recurrence.setKind(RecurrenceKind.monthlybyday);
+		recurrence.setEnd(endDate);
+		List<Date> dateInInterval = ical4jHelper.dateInIntervalInclusive(
+			recurrence,
+			eventDate,
+			eventDate,
+			endDate,
+			ImmutableSet.<Date>of());
+
+		assertThat(dateInInterval).containsExactly(
+			DateUtils.date("2014-09-01T20:00:00Z"),
+			DateUtils.date("2014-10-06T20:00:00Z"),
+			DateUtils.date("2014-11-03T20:00:00Z"),
+			DateUtils.date("2014-12-01T20:00:00Z"));
+	}
+
+	@Test
+	public void testDateInIntervalForYearly() {
 		Date eventDate = DateUtils.date("2014-09-01T20:00:00Z");
 		Date endDate = DateUtils.date("2015-12-01T20:00:00Z");
-
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.yearly);
+		recurrence.setEnd(endDate);
 		List<Date> dateInInterval = ical4jHelper.dateInInterval(
 			recurrence,
 			eventDate,
@@ -2308,5 +2458,24 @@ public class Ical4jHelperTest {
 		assertThat(dateInInterval).containsExactly(
 			DateUtils.date("2014-09-01T20:00:00Z"),
 			DateUtils.date("2015-09-01T20:00:00Z"));
+	}
+
+	@Test
+	public void testDateInIntervalForYearlyWhenEndDateOnLastOccurrence() {
+		Date eventDate = DateUtils.date("2014-09-01T20:00:00Z");
+		Date endDate = DateUtils.date("2016-09-01T20:00:00Z");
+		EventRecurrence recurrence = new EventRecurrence();
+		recurrence.setKind(RecurrenceKind.yearly);
+		recurrence.setEnd(endDate);
+		List<Date> dateInInterval = ical4jHelper.dateInIntervalInclusive(
+			recurrence,
+			eventDate,
+			eventDate,
+			endDate,
+			ImmutableSet.of(DateUtils.date("2015-09-01T20:00:00Z")));
+
+		assertThat(dateInInterval).containsExactly(
+			DateUtils.date("2014-09-01T20:00:00Z"),
+			DateUtils.date("2016-09-01T20:00:00Z"));
 	}
 }

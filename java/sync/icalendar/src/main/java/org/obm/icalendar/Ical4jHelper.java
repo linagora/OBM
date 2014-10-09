@@ -1120,10 +1120,8 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 	}
 
 	@Override
-	public Date isInIntervalDate(Event event, Date start, Date end,
-			Set<Date> dateExce) {
-		return isInIntervalDate(event.getRecurrence(), event.getStartDate(), start,
-				end, dateExce);
+	public Date isInIntervalDate(Event event, Date start, Date end, Set<Date> dateExce) {
+		return isInIntervalDate(event.getRecurrence(), event.getStartDate(), start, end, dateExce);
 	}
 
 	@Override
@@ -1138,6 +1136,15 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 		}
 		return null;
 
+	}
+
+	@Override
+	public List<Date> dateInIntervalInclusive(EventRecurrence recurrence,
+			Date eventDate, Date start, Date end, Set<Date> dateExce) {
+		return dateInInterval(recurrence, eventDate, 
+				new org.joda.time.DateTime(start).minusSeconds(1).toDate(), 
+				new org.joda.time.DateTime(end).plusSeconds(1).toDate(), 
+				dateExce);
 	}
 
 	@Override
@@ -1156,8 +1163,7 @@ public class Ical4jHelper implements Ical4jRecurrenceHelper {
 			}
 			return ImmutableList.of();
 		}
-		DateList dl = recur.getDates(new DateTime(eventDate), new DateTime(
-				start), new DateTime(end), Value.DATE_TIME);
+		DateList dl = recur.getDates(new DateTime(eventDate), new DateTime(start), new DateTime(end), Value.DATE_TIME);
 		for (Iterator<?> it = dl.iterator(); it.hasNext();) {
 			Date evD = (Date) it.next();
 			GregorianCalendar cal = new GregorianCalendar();
