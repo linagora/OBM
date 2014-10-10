@@ -28,7 +28,7 @@ its applicable Additional Terms for OBM along with this program. If not, see
 version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
 applicable to the OBM software.
 ******************************************************************************/
-
+require_once('imap_archive_urls.php');
 
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : imap_archive_query.inc                                       //
@@ -49,7 +49,7 @@ function connect_to_imap_archive_service(){
     return array(0, $l_email_address_not_found);
   }
   
-  $loginPath = "/imap-archive/service/v1/status";
+  $loginPath = ImapArchiveUrls::status();
   
   $curl = curlGet($loginPath);
   $success = $curl["success"];
@@ -83,7 +83,7 @@ function load_configuration_from_imap_archive_service(){
     return array(0, $l_email_address_not_found);
   }
   
-  $configurationPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/configuration";
+  $configurationPath = ImapArchiveUrls::configuration($obm["domain_uuid"]);
   
   $curl = curlGet($configurationPath);
   $success = $curl["success"];
@@ -141,7 +141,7 @@ function calculate_next_treatment_date_from_imap_archive_service($configuration)
     return array(0, $l_email_address_not_found);
   }
 
-  $configurationPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/treatments/next";
+  $configurationPath = ImapArchiveUrls::nextTreatment($obm["domain_uuid"]);
 
   $repeatKind = $configuration->repeatKind;
   $dayOfWeek = $configuration->dayOfWeek;
@@ -228,7 +228,7 @@ function run_query_imap_archive_update($params) {
     return array(0, $l_email_address_not_found);
   }
   
-  $configurationPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/configuration";
+  $configurationPath = ImapArchiveUrls::configuration($obm["domain_uuid"]);
 
   $repeatKind = $params['repeat_kind'];
   $dayOfWeek = $params['day_of_week'];
@@ -320,7 +320,7 @@ function manual_launch($archiveTreatmentKind) {
     return array(0, $l_email_address_not_found);
   }
 
-  $manualLaunchPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/treatments";
+  $manualLaunchPath = ImapArchiveUrls::treatments($obm["domain_uuid"]);
 
   $curl = curlPost($manualLaunchPath, array("archive_treatment_kind" => $archiveTreatmentKind));
   $success = $curl["success"];
@@ -383,7 +383,7 @@ function get_logs($runId) {
     return array(0, $l_email_address_not_found);
   }
 
-  $logPath = "/imap-archive/service/v1/domains/".$obm["domain_uuid"]."/treatments/".$runId."/logs/";
+  $logPath = ImapArchiveUrls::logs($obm["domain_uuid"], $runId);
   
   $imapArchiveRootPath = imapArchiveRootPath();
   $curlUrl = $imapArchiveRootPath.$logPath;
