@@ -113,6 +113,7 @@ import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.HelperService;
 
 public class CalendarBindingImpl implements ICalendar {
@@ -149,7 +150,7 @@ public class CalendarBindingImpl implements ICalendar {
 			Ical4jHelper ical4jHelper,
 			ICalendarFactory calendarFactory,
 			AttendeeService attendeeService,
-			ConfigurationService configuration) {
+			ObmSyncConfigurationService configuration) {
 		this.eventChangeHandler = eventChangeHandler;
 		this.domainService = domainService;
 		this.userService = userService;
