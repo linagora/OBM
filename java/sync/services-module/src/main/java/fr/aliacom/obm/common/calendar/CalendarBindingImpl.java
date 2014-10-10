@@ -113,6 +113,7 @@ import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.HelperService;
 
 public class CalendarBindingImpl implements ICalendar {
@@ -136,7 +137,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private final ICalendarFactory calendarFactory;
 	private final AttendeeService attendeeService;
 	private final AnonymizerService anonymizerService;
-	private final ConfigurationService configuration;
+	private final ObmSyncConfigurationService configuration;
 	@Inject
 	protected CalendarBindingImpl(EventChangeHandler eventChangeHandler,
 			DomainService domainService,
@@ -149,7 +150,7 @@ public class CalendarBindingImpl implements ICalendar {
 			ICalendarFactory calendarFactory, 
 			AttendeeService attendeeService,
 			AnonymizerService anonymizerService,
-			ConfigurationService configuration) {
+			ObmSyncConfigurationService configuration) {
 		this.eventChangeHandler = eventChangeHandler;
 		this.domainService = domainService;
 		this.userService = userService;

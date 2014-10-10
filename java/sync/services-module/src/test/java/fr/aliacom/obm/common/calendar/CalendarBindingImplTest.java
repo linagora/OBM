@@ -70,7 +70,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.DateUtils;
-import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -132,6 +131,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserService;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.HelperService;
 
 @GuiceModule(CalendarBindingImplTest.Env.class)
@@ -155,7 +155,7 @@ public class CalendarBindingImplTest {
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(DateProvider.class);
 			bindWithMock(AnonymizerService.class);
-			bindWithMock(ConfigurationService.class);
+			bindWithMock(ObmSyncConfigurationService.class);
 			bind(AttendeeService.class).toInstance(new SimpleAttendeeService());
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 		}
@@ -194,7 +194,7 @@ public class CalendarBindingImplTest {
 	@Inject
 	private EventNotificationService eventNotifier;
 	@Inject
-	private ConfigurationService configurationService;
+	private ObmSyncConfigurationService configurationService;
 	@Inject
 	private AnonymizerService anonymizerService;
 
@@ -1417,7 +1417,7 @@ public class CalendarBindingImplTest {
 		AnonymizerService anonymizerService = createMock(AnonymizerService.class);
 		expect(calendarDao.getSync(accessToken, defaultUser, lastSync, null, null, false)).andReturn(daoChanges).once();
 		expect(anonymizerService.anonymize(isA(EventChanges.class), eq(calendar), eq(accessToken))).andReturn(daoChanges).once();
-		ConfigurationService configurationService = createMock(ConfigurationService.class);
+		ObmSyncConfigurationService configurationService = createMock(ObmSyncConfigurationService.class);
 		expect(configurationService.getTransactionToleranceTimeoutInSeconds()).andReturn(0);
 		
 		Object[] mocks = {calendarDao, accessToken, userService, rightsHelper, anonymizerService, configurationService};
@@ -2080,7 +2080,7 @@ public class CalendarBindingImplTest {
 		AnonymizerService anonymizerService = createMock(AnonymizerService.class);
 		expect(anonymizerService.anonymize(isA(EventChanges.class), eq(calendar), eq(token))).andReturn(anonymizedEventChanges).once();
 
-		ConfigurationService configurationService = createMock(ConfigurationService.class);
+		ObmSyncConfigurationService configurationService = createMock(ObmSyncConfigurationService.class);
 		expect(configurationService.getTransactionToleranceTimeoutInSeconds()).andReturn(0);
 
 		Object[] mocks = { token, userService, calendarDao, rightsHelper, anonymizerService, configurationService };
@@ -2145,7 +2145,7 @@ public class CalendarBindingImplTest {
 		AnonymizerService anonymizerService = createMock(AnonymizerService.class);
 		expect(anonymizerService.anonymize(isA(EventChanges.class), eq(calendar), eq(token))).andReturn(eventChangesFromDao).once();
 
-		ConfigurationService configurationService = createMock(ConfigurationService.class);
+		ObmSyncConfigurationService configurationService = createMock(ObmSyncConfigurationService.class);
 		expect(configurationService.getTransactionToleranceTimeoutInSeconds()).andReturn(0);
 
 		Object[] mocks = { token, userService, calendarDao, rightsHelper, anonymizerService, configurationService};
