@@ -30,37 +30,54 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.dao;
+package org.obm.imap.archive.beans;
 
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
-import org.obm.ElementNotFoundException;
-import org.obm.imap.archive.beans.ArchiveStatus;
-import org.obm.imap.archive.beans.ArchiveTreatment;
-import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.beans.Limit;
-import org.obm.provisioning.dao.exceptions.DaoException;
+public class Limit {
 
-import com.google.common.base.Optional;
-
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
-
-public interface ArchiveTreatmentDao {
-
-	void insert(ArchiveTreatment treatment) throws DaoException;
+	public static Limit from(int limit) {
+		Preconditions.checkArgument(limit > 0, "Limit should not be negative");
+		return new Limit(limit);
+	}
 	
-	void update(ArchiveTreatment treatment) throws DaoException, ElementNotFoundException;
-
-	void remove(ArchiveTreatmentRunId runId) throws DaoException, ElementNotFoundException;
-
-	List<ArchiveTreatment> findAllScheduledOrRunning() throws DaoException;
+	public static Limit unlimited() {
+		return new Limit(null);
+	}
 	
-	List<ArchiveTreatment> findByScheduledTime(ObmDomainUuid domain, Limit limit) throws DaoException;
+	private final Integer limit;
+
+	private Limit(Integer limit) {
+		this.limit = limit;
+	}
 	
-	List<ArchiveTreatment> findLastTerminated(ObmDomainUuid domain, Limit max) throws DaoException;
+	public Integer get() {
+		return limit;
+	}
+	
+	public boolean isUnlimited() {
+		return limit == null;
+	}
 
-	Optional<ArchiveTreatment> find(ArchiveTreatmentRunId runId) throws DaoException;
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(limit);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof Limit) {
+			Limit that = (Limit) object;
+			return Objects.equal(this.limit, that.limit);
+		}
+		return false;
+	}
 
-	List<ArchiveTreatment> history(ObmDomainUuid domain, Set<ArchiveStatus> statuses, Limit limit, Ordering ordering) throws DaoException;
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("limit", limit)
+			.toString();
+	}
 }

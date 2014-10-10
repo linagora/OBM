@@ -34,6 +34,8 @@ package org.obm.imap.archive.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.EnumSet;
+
 import org.assertj.guava.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -52,6 +54,7 @@ import org.obm.imap.archive.beans.ArchiveScheduledTreatment;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTerminatedTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun;
 import org.obm.provisioning.dao.exceptions.DaoException;
 
@@ -188,22 +191,10 @@ public class ArchiveTreatmentJdbcImplTest {
 		assertThat(testee.findAllScheduledOrRunning()).containsExactly(
 				treatment2, treatment1, treatment4, treatment3);
 	}
-
-	@Test
-	public void findByScheduledTimeShouldTriggerExceptionWhenNegativeLimit() throws Exception {
-		expectedException.expect(IllegalArgumentException.class);
-		testee.findByScheduledTime(domainUuid, -1);
-	}
-	
-	@Test
-	public void findByScheduledTimeShouldTriggerExceptionWhenZeroLimit() throws Exception {
-		expectedException.expect(IllegalArgumentException.class);
-		testee.findByScheduledTime(domainUuid, 0);
-	}
 	
 	@Test
 	public void findByScheduledTimeShouldReturnEmptyWhenNone() throws Exception {
-		assertThat(testee.findByScheduledTime(domainUuid, 5)).isEmpty();
+		assertThat(testee.findByScheduledTime(domainUuid, Limit.from(5))).isEmpty();
 	}
 
 	@Test
@@ -230,7 +221,7 @@ public class ArchiveTreatmentJdbcImplTest {
 		testee.insert(otherDomain);
 		testee.insert(expectedDomain);
 		
-		assertThat(testee.findByScheduledTime(domainUuid, 5)).containsOnlyOnce(expectedDomain);
+		assertThat(testee.findByScheduledTime(domainUuid, Limit.from(5))).containsOnlyOnce(expectedDomain);
 	}
 	
 	@Test
@@ -267,7 +258,7 @@ public class ArchiveTreatmentJdbcImplTest {
 		testee.insert(two);
 		testee.insert(three);
 		
-		assertThat(testee.findByScheduledTime(domainUuid, 2)).containsOnlyOnce(one, three);
+		assertThat(testee.findByScheduledTime(domainUuid, Limit.from(2))).containsOnlyOnce(one, three);
 	}
 	
 	@Test
@@ -304,12 +295,12 @@ public class ArchiveTreatmentJdbcImplTest {
 		testee.insert(two);
 		testee.insert(three);
 		
-		assertThat(testee.findByScheduledTime(domainUuid, 5)).containsOnlyOnce(two, three, one);
+		assertThat(testee.findByScheduledTime(domainUuid, Limit.from(5))).containsOnlyOnce(two, three, one);
 	}
 	
 	@Test
 	public void findLastTerminatedShouldReturnEmptyWhenNone() throws Exception {
-		assertThat(testee.findLastTerminated(domainUuid, 3)).isEmpty();
+		assertThat(testee.findLastTerminated(domainUuid, Limit.from(3))).isEmpty();
 	}
 
 	@Test
@@ -339,7 +330,7 @@ public class ArchiveTreatmentJdbcImplTest {
 		testee.insert(otherDomain);
 		testee.insert(expectedDomain);
 		
-		assertThat(testee.findLastTerminated(domainUuid, 2)).containsOnly(expectedDomain);
+		assertThat(testee.findLastTerminated(domainUuid, Limit.from(2))).containsOnly(expectedDomain);
 	}
 	
 	@Test
@@ -376,7 +367,7 @@ public class ArchiveTreatmentJdbcImplTest {
 		testee.insert(two);
 		testee.insert(three);
 		
-		assertThat(testee.findLastTerminated(domainUuid, 3)).containsOnly(two);
+		assertThat(testee.findLastTerminated(domainUuid, Limit.from(3))).containsOnly(two);
 	}
 	
 	@Test
@@ -418,7 +409,7 @@ public class ArchiveTreatmentJdbcImplTest {
 		testee.insert(two);
 		testee.insert(three);
 		
-		assertThat(testee.findLastTerminated(domainUuid, 3)).containsOnly(one, three, two);
+		assertThat(testee.findLastTerminated(domainUuid, Limit.from(3))).containsOnly(one, three, two);
 	}
 	
 	@Test
@@ -434,7 +425,7 @@ public class ArchiveTreatmentJdbcImplTest {
 		testee.insert(treatment);
 		testee.remove(treatment.getRunId());
 		
-		assertThat(testee.findByScheduledTime(domainUuid, 5)).isEmpty();
+		assertThat(testee.findByScheduledTime(domainUuid, Limit.from(5))).isEmpty();
 	}
 	
 	@Test
@@ -480,7 +471,7 @@ public class ArchiveTreatmentJdbcImplTest {
 		testee.insert(created);
 		testee.update(terminated);
 		
-		assertThat(testee.findByScheduledTime(domainUuid, 5)).containsOnlyOnce(terminated);
+		assertThat(testee.findByScheduledTime(domainUuid, Limit.from(5))).containsOnlyOnce(terminated);
 	}
 	
 	@Test(expected=NullPointerException.class)
@@ -563,5 +554,240 @@ public class ArchiveTreatmentJdbcImplTest {
 		testee.insert(treatment);
 		
 		assertThat(testee.find(runId).get()).isEqualTo(treatment);
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void historyShouldThrowWhenNoDomain() throws Exception {
+		testee.history(null, ArchiveStatus.TERMINATED, Limit.unlimited(), Ordering.NONE);
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void historyShouldThrowWhenNoStatus() throws Exception {
+		testee.history(domainUuid, null, Limit.unlimited(), Ordering.NONE);
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void historyShouldThrowWhenNoLimit() throws Exception {
+		testee.history(domainUuid, ArchiveStatus.TERMINATED, null, Ordering.NONE);
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void historyShouldThrowWhenNoOrdering() throws Exception {
+		testee.history(domainUuid, ArchiveStatus.TERMINATED, Limit.unlimited(), null);
+	}
+
+	@Test
+	public void historyShouldReturnEmptyListWhenNoEntry() throws Exception {
+		assertThat(testee.history(domainUuid, ArchiveStatus.TERMINATED, Limit.unlimited(), Ordering.NONE)).isEmpty();
+	}
+	
+	@Test
+	public void historyShouldFilterDomain() throws Exception {
+		ArchiveTerminatedTreatment one = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		ArchiveTerminatedTreatment two = ArchiveTerminatedTreatment
+				.forDomain(ObmDomainUuid.of("72e2be30-ad54-4115-84f2-471fa2688805"))
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-01T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+		
+		ArchiveTerminatedTreatment three = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("31534c25-2012-45d7-9808-586a488e6c8b")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.ERROR)
+				.build();
+
+		testee.insert(one);
+		testee.insert(two);
+		testee.insert(three);
+		
+		assertThat(testee.history(domainUuid, ArchiveStatus.TERMINATED, Limit.unlimited(), Ordering.NONE)).containsOnlyOnce(one, three);
+	}
+	
+	@Test
+	public void historyShouldFilterFailure() throws Exception {
+		ArchiveScheduledTreatment one = ArchiveScheduledTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SCHEDULED)
+				.build();
+
+		ArchiveTerminatedTreatment two = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-01T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+		
+		ArchiveTerminatedTreatment three = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("31534c25-2012-45d7-9808-586a488e6c8b")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.ERROR)
+				.build();
+
+		testee.insert(one);
+		testee.insert(two);
+		testee.insert(three);
+		
+		assertThat(testee.history(domainUuid, EnumSet.of(ArchiveStatus.ERROR), Limit.unlimited(), Ordering.NONE)).containsOnlyOnce(three);
+	}
+	
+	@Test
+	public void historyShouldLimit() throws Exception {
+		ArchiveTerminatedTreatment one = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		ArchiveTerminatedTreatment two = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-01T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+		
+		ArchiveTerminatedTreatment three = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("31534c25-2012-45d7-9808-586a488e6c8b")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.ERROR)
+				.build();
+
+		testee.insert(one);
+		testee.insert(two);
+		testee.insert(three);
+		
+		assertThat(testee.history(domainUuid, ArchiveStatus.TERMINATED, Limit.from(1), Ordering.NONE)).containsOnlyOnce(one);
+	}
+	
+	@Test
+	public void historyShouldSort() throws Exception {
+		ArchiveTerminatedTreatment one = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		ArchiveTerminatedTreatment two = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-01T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+		
+		ArchiveTerminatedTreatment three = ArchiveTerminatedTreatment
+				.forDomain(domainUuid) 
+				.runId("31534c25-2012-45d7-9808-586a488e6c8b")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.ERROR)
+				.build();
+
+		testee.insert(one);
+		testee.insert(two);
+		testee.insert(three);
+		
+		assertThat(testee.history(domainUuid, ArchiveStatus.TERMINATED, Limit.unlimited(), Ordering.DESC)).containsExactly(one, three, two);
+	}
+	
+	@Test
+	public void historyShouldFilterAllFields() throws Exception {
+		ArchiveTerminatedTreatment one = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.ERROR)
+				.build();
+
+		ArchiveTerminatedTreatment two = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-01T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.ERROR)
+				.build();
+		
+		ArchiveTerminatedTreatment three = ArchiveTerminatedTreatment
+				.forDomain(domainUuid) 
+				.runId("31534c25-2012-45d7-9808-586a488e6c8b")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		testee.insert(one);
+		testee.insert(two);
+		testee.insert(three);
+		
+		assertThat(testee.history(domainUuid, EnumSet.of(ArchiveStatus.ERROR), Limit.from(2), Ordering.DESC)).containsExactly(one, two);
 	}
 }

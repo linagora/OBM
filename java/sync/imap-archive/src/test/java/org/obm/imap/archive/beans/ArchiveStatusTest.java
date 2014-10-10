@@ -71,4 +71,8 @@ public class ArchiveStatusTest {
 		fromSpecificationValue("unknown");
 	}
 
+	@Test
+	public void terminated() {
+		assertThat(ArchiveStatus.TERMINATED).containsOnly(ArchiveStatus.ERROR, ArchiveStatus.SUCCESS);
+	}
 }

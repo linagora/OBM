@@ -30,37 +30,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.dao;
+package org.obm.imap.archive.beans;
 
-import java.util.List;
-import java.util.Set;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.obm.ElementNotFoundException;
-import org.obm.imap.archive.beans.ArchiveStatus;
-import org.obm.imap.archive.beans.ArchiveTreatment;
-import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.beans.Limit;
-import org.obm.provisioning.dao.exceptions.DaoException;
+import org.junit.Test;
 
-import com.google.common.base.Optional;
+public class LimitTest {
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+	@Test
+	public void fromShouldCreateWhenLimitIsDefined() {
+		Limit limit = Limit.from(2);
+		assertThat(limit.get()).isEqualTo(2);
+		assertThat(limit.isUnlimited()).isFalse();
+	}
 
-public interface ArchiveTreatmentDao {
+	@Test(expected = IllegalArgumentException.class)
+	public void fromShouldThrowWhenLimitIsNegative() {
+		Limit.from(-1);
+	}
 
-	void insert(ArchiveTreatment treatment) throws DaoException;
-	
-	void update(ArchiveTreatment treatment) throws DaoException, ElementNotFoundException;
-
-	void remove(ArchiveTreatmentRunId runId) throws DaoException, ElementNotFoundException;
-
-	List<ArchiveTreatment> findAllScheduledOrRunning() throws DaoException;
-	
-	List<ArchiveTreatment> findByScheduledTime(ObmDomainUuid domain, Limit limit) throws DaoException;
-	
-	List<ArchiveTreatment> findLastTerminated(ObmDomainUuid domain, Limit max) throws DaoException;
-
-	Optional<ArchiveTreatment> find(ArchiveTreatmentRunId runId) throws DaoException;
-
-	List<ArchiveTreatment> history(ObmDomainUuid domain, Set<ArchiveStatus> statuses, Limit limit, Ordering ordering) throws DaoException;
+	@Test
+	public void unLimitedShouldCreate() {
+		Limit limit = Limit.unlimited();
+		assertThat(limit.get()).isNull();
+		assertThat(limit.isUnlimited()).isTrue();
+	}
 }

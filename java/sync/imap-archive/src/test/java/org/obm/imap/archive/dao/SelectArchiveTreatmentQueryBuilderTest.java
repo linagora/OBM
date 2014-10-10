@@ -41,8 +41,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun.Fields;
 import org.obm.utils.ObmHelper;
+
+import com.google.common.collect.Sets;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
@@ -67,12 +70,12 @@ public class SelectArchiveTreatmentQueryBuilderTest {
 	
 	@Test(expected=NullPointerException.class)
 	public void archiveStatusShouldNotBeNull() {
-		new SelectArchiveTreatmentQueryBuilder(obmHelper).where((ArchiveStatus) null);
+		new SelectArchiveTreatmentQueryBuilder(obmHelper).where((Iterable<ArchiveStatus>) null);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void archiveStatusElementShouldNotBeNull() {
-		new SelectArchiveTreatmentQueryBuilder(obmHelper).where(ArchiveStatus.ERROR, null, ArchiveStatus.SUCCESS);
+		new SelectArchiveTreatmentQueryBuilder(obmHelper).where(Sets.newHashSet(ArchiveStatus.ERROR, null, ArchiveStatus.SUCCESS));
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -95,9 +98,9 @@ public class SelectArchiveTreatmentQueryBuilderTest {
 		new SelectArchiveTreatmentQueryBuilder(obmHelper).orderBy(Fields.DOMAIN_UUID, null);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
-	public void orderingShouldNotBeNone() {
-		new SelectArchiveTreatmentQueryBuilder(obmHelper).orderBy(Fields.DOMAIN_UUID, Ordering.NONE);
+	@Test(expected=NullPointerException.class)
+	public void limitShouldNotBeNull() {
+		new SelectArchiveTreatmentQueryBuilder(obmHelper).limit(null);
 	}
 	
 	@Test
@@ -109,7 +112,7 @@ public class SelectArchiveTreatmentQueryBuilderTest {
 	@Test
 	public void selectWhereArchiveStatus() {
 		assertThat(new SelectArchiveTreatmentQueryBuilder(obmHelper)
-				.where(ArchiveStatus.SUCCESS, ArchiveStatus.ERROR).buildQueryString())
+				.where(ArchiveStatus.TERMINATED).buildQueryString())
 			.isEqualTo("SELECT " + ArchiveTreatmentJdbcImpl.REQUESTS.ALL + " FROM mail_archive_run WHERE " + Fields.STATUS + " IN (?,?)");
 	}
 	
@@ -130,7 +133,7 @@ public class SelectArchiveTreatmentQueryBuilderTest {
 	@Test
 	public void selectAllWhere() {
 		assertThat(new SelectArchiveTreatmentQueryBuilder(obmHelper)
-				.where(ArchiveStatus.SUCCESS, ArchiveStatus.ERROR)
+				.where(ArchiveStatus.TERMINATED)
 				.where(ArchiveTreatmentRunId.from("12dee3ed-bbbe-462e-8b84-ce4f5c9cffa5"))
 				.where(ObmDomainUuid.of("cd2b23e2-e2a9-40dd-846d-53c584c98760")).buildQueryString())
 			.isEqualTo("SELECT " + ArchiveTreatmentJdbcImpl.REQUESTS.ALL + " FROM mail_archive_run WHERE " + Fields.UUID + " = ? AND " + Fields.DOMAIN_UUID + " = ? AND " + Fields.STATUS + " IN (?,?)");
@@ -153,7 +156,7 @@ public class SelectArchiveTreatmentQueryBuilderTest {
 	@Test
 	public void selectAllWhereOrderBy() {
 		assertThat(new SelectArchiveTreatmentQueryBuilder(obmHelper)
-				.where(ArchiveStatus.SUCCESS, ArchiveStatus.ERROR)
+				.where(ArchiveStatus.TERMINATED)
 				.where(ArchiveTreatmentRunId.from("12dee3ed-bbbe-462e-8b84-ce4f5c9cffa5"))
 				.where(ObmDomainUuid.of("cd2b23e2-e2a9-40dd-846d-53c584c98760"))
 				.orderBy(Fields.DOMAIN_UUID, Ordering.DESC).buildQueryString())
@@ -165,18 +168,18 @@ public class SelectArchiveTreatmentQueryBuilderTest {
 	@Test
 	public void selectLimit() {
 		assertThat(new SelectArchiveTreatmentQueryBuilder(obmHelper)
-				.limit(2).buildQueryString())
+				.limit(Limit.from(2)).buildQueryString())
 			.isEqualTo("SELECT " + ArchiveTreatmentJdbcImpl.REQUESTS.ALL + " FROM mail_archive_run LIMIT 2");
 	}
 	
 	@Test
 	public void selectAllWhereOrderByLimit() {
 		assertThat(new SelectArchiveTreatmentQueryBuilder(obmHelper)
-				.where(ArchiveStatus.SUCCESS, ArchiveStatus.ERROR)
+				.where(ArchiveStatus.TERMINATED)
 				.where(ArchiveTreatmentRunId.from("12dee3ed-bbbe-462e-8b84-ce4f5c9cffa5"))
 				.where(ObmDomainUuid.of("cd2b23e2-e2a9-40dd-846d-53c584c98760"))
 				.orderBy(Fields.DOMAIN_UUID, Ordering.DESC)
-				.limit(2).buildQueryString())
+				.limit(Limit.from(2)).buildQueryString())
 			.isEqualTo("SELECT " + ArchiveTreatmentJdbcImpl.REQUESTS.ALL + " FROM mail_archive_run"
 					+ " WHERE " + Fields.UUID + " = ? AND " + Fields.DOMAIN_UUID + " = ? AND " + Fields.STATUS + " IN (?,?)"
 					+ " ORDER BY " + Fields.DOMAIN_UUID + " DESC"

@@ -65,7 +65,8 @@ public class BeansTest {
 				ImapFolder.class,
 				ProcessedFolder.class,
 				Boundaries.class,
-				Year.class
+				Year.class,
+				Limit.class
 			).verify();
 	}	
 }

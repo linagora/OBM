@@ -57,6 +57,7 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.Boundaries;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.ImapFolder;
+import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
@@ -128,7 +129,7 @@ public class ImapArchiveProcessingTest {
 						.time(LocalTime.parse("13:23"))
 						.build())
 				.build();
-		expect(archiveTreatmentDao.findLastTerminated(domainId, 1))
+		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
 		
 		DateTime treatmentDate = DateTime.parse("2014-08-27T12:18:00.000Z");
@@ -185,7 +186,7 @@ public class ImapArchiveProcessingTest {
 						.build())
 				.build();
 		
-		expect(archiveTreatmentDao.findLastTerminated(domainId, 1))
+		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
 		
 		DateTime treatmentDate = DateTime.parse("2014-08-27T12:18:00.000Z");
@@ -278,7 +279,7 @@ public class ImapArchiveProcessingTest {
 	@Test
 	public void previousArchiveTreatmentShouldBeAbsentWhenNone() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
-		expect(archiveTreatmentDao.findLastTerminated(domainId, 1))
+		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
 		
 		control.replay();
@@ -290,7 +291,7 @@ public class ImapArchiveProcessingTest {
 	@Test
 	public void previousArchiveTreatmentShouldReturnPrevious() throws Exception {
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
-		expect(archiveTreatmentDao.findLastTerminated(domainId, 1))
+		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of(ArchiveTreatment.builder(domainId)
 					.runId(ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"))
 					.recurrent(true)

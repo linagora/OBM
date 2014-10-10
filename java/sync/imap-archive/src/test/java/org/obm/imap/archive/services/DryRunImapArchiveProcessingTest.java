@@ -52,6 +52,7 @@ import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
@@ -118,7 +119,7 @@ public class DryRunImapArchiveProcessingTest {
 						.time(LocalTime.parse("13:23"))
 						.build())
 				.build();
-		expect(archiveTreatmentDao.findLastTerminated(domainId, 1))
+		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
 		
 		DateTime treatmentDate = DateTime.parse("2014-08-27T12:18:00.000Z");

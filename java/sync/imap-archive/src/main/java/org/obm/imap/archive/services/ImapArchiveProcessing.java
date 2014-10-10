@@ -42,6 +42,7 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.Boundaries;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.ImapFolder;
+import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.Year;
@@ -128,7 +129,7 @@ public class ImapArchiveProcessing {
 	}
 	
 	@VisibleForTesting Optional<ArchiveTreatment> previousArchiveTreatment(ObmDomainUuid domainId) throws DaoException {
-		return FluentIterable.from(archiveTreatmentDao.findLastTerminated(domainId, 1)).first();
+		return FluentIterable.from(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1))).first();
 	}
 	
 	@VisibleForTesting Boundaries calculateBoundaries(DateTime start, RepeatKind repeatKind, Optional<ArchiveTreatment> previousArchiveTreatment, Logger archiveLogger) {

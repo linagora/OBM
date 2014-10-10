@@ -34,6 +34,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -42,6 +43,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun.Fields;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun.Types;
@@ -157,7 +159,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 	public List<ArchiveTreatment> findAllScheduledOrRunning() throws DaoException {
 		try (Connection connection = dbcp.getConnection();
 				PreparedStatement ps = selectArchiveTreatment()
-					.where(ArchiveStatus.SCHEDULED, ArchiveStatus.RUNNING)
+					.where(ArchiveStatus.SCHEDULED_OR_RUNNING)
 					.orderBy(Fields.SCHEDULE, Ordering.ASC)
 					.prepareStatement(connection)) {
 
@@ -168,8 +170,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 	}
 
 	@Override
-	public List<ArchiveTreatment> findByScheduledTime(ObmDomainUuid domain, int limit) throws DaoException {
-		Preconditions.checkArgument(limit > 0);
+	public List<ArchiveTreatment> findByScheduledTime(ObmDomainUuid domain, Limit limit) throws DaoException {
 		try (Connection connection = dbcp.getConnection();
 				PreparedStatement ps = 
 						selectArchiveTreatment()
@@ -185,12 +186,12 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 	}
 
 	@Override
-	public List<ArchiveTreatment> findLastTerminated(ObmDomainUuid domain, int max) throws DaoException {
+	public List<ArchiveTreatment> findLastTerminated(ObmDomainUuid domain, Limit max) throws DaoException {
 		try (Connection connection = dbcp.getConnection();
 				PreparedStatement ps = 
 						selectArchiveTreatment()
 							.where(domain)
-							.where(ArchiveStatus.SUCCESS, ArchiveStatus.ERROR)
+							.where(ArchiveStatus.TERMINATED)
 							.limit(max)
 							.orderBy(Fields.SCHEDULE, Ordering.DESC)
 							.prepareStatement(connection)) {
@@ -245,5 +246,29 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 				.terminatedAt(endTime)
 				.status(status)
 				.build();
+	}
+
+	@Override
+	public List<ArchiveTreatment> history(ObmDomainUuid domain, Set<ArchiveStatus> statuses, Limit limit, Ordering ordering) throws DaoException {
+		Preconditions.checkNotNull(domain);
+		Preconditions.checkNotNull(statuses);
+		Preconditions.checkNotNull(limit);
+		Preconditions.checkNotNull(ordering);
+		try (Connection connection = dbcp.getConnection();
+				PreparedStatement ps = 
+						historyQueryBuilder(domain, statuses, limit, ordering).prepareStatement(connection)) {
+
+			return toList(ps.executeQuery());
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		}
+	}
+
+	private SelectArchiveTreatmentQueryBuilder historyQueryBuilder(ObmDomainUuid domain, Set<ArchiveStatus> statuses, Limit limit, Ordering ordering) {
+		return selectArchiveTreatment()
+			.where(domain)
+			.where(statuses)
+			.orderBy(Fields.SCHEDULE, ordering)
+			.limit(limit);
 	}
 }

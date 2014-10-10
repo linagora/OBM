@@ -33,9 +33,11 @@
 package org.obm.imap.archive.beans;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
+import com.google.common.collect.Sets;
 
 public enum ArchiveStatus {
 
@@ -44,6 +46,9 @@ public enum ArchiveStatus {
 	ERROR("ERROR"), 
 	SUCCESS("SUCCESS");
 
+	public static final Set<ArchiveStatus> TERMINATED = Sets.immutableEnumSet(ERROR, SUCCESS);
+	public static final Set<ArchiveStatus> SCHEDULED_OR_RUNNING = Sets.immutableEnumSet(SCHEDULED, RUNNING);
+	
 	private static Map<String, ArchiveStatus> specValueToEnum;
 	
 	static {

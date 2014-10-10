@@ -40,6 +40,7 @@ import java.util.List;
 
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun.Fields;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun.Types;
@@ -60,7 +61,7 @@ class SelectArchiveTreatmentQueryBuilder {
 	private ObmDomainUuid domainId;
 	private Ordering ordering;
 	private String orderingField;
-	private Integer limit;
+	private Limit limit;
 	private List<String> fields;
 
 	SelectArchiveTreatmentQueryBuilder(ObmHelper obmHelper) {
@@ -68,6 +69,7 @@ class SelectArchiveTreatmentQueryBuilder {
 		ordering = Ordering.NONE;
 		statuses = ImmutableList.of();
 		fields = MailArchiveRun.Fields.ALL;
+		limit = Limit.unlimited();
 	}
 	
 	SelectArchiveTreatmentQueryBuilder where(ArchiveTreatmentRunId runId) {
@@ -76,9 +78,9 @@ class SelectArchiveTreatmentQueryBuilder {
 		return this;
 	}
 	
-	SelectArchiveTreatmentQueryBuilder where(ArchiveStatus... status) {
-		Preconditions.checkNotNull(status);
-		this.statuses = ImmutableList.copyOf(status);
+	SelectArchiveTreatmentQueryBuilder where(Iterable<ArchiveStatus> statuses) {
+		Preconditions.checkNotNull(statuses);
+		this.statuses = ImmutableList.copyOf(statuses);
 		return this;
 	}
 	
@@ -91,13 +93,13 @@ class SelectArchiveTreatmentQueryBuilder {
 	SelectArchiveTreatmentQueryBuilder orderBy(String orderingField, Ordering ordering) {
 		Preconditions.checkNotNull(orderingField);
 		Preconditions.checkNotNull(ordering);
-		Preconditions.checkArgument(ordering != Ordering.NONE);
 		this.ordering = ordering;
 		this.orderingField = orderingField;
 		return this;
 	}
 	
-	SelectArchiveTreatmentQueryBuilder limit(int limit) {
+	SelectArchiveTreatmentQueryBuilder limit(Limit limit) {
+		Preconditions.checkNotNull(limit);
 		this.limit = limit;
 		return this;
 	}
@@ -125,8 +127,8 @@ class SelectArchiveTreatmentQueryBuilder {
 		if (ordering != Ordering.NONE) {
 			queryString.append(" ORDER BY ").append(orderingField).append(" ").append(ordering.name());
 		}
-		if (limit != null) {
-			queryString.append(" LIMIT ").append(limit);
+		if (!limit.isUnlimited()) {
+			queryString.append(" LIMIT ").append(limit.get());
 		}
 		return queryString.toString();
 	}

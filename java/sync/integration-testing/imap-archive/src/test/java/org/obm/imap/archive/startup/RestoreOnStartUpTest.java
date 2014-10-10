@@ -65,6 +65,7 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
@@ -219,7 +220,7 @@ public class RestoreOnStartUpTest {
 			expectedScheduledHigherBoundary,
 			expectedScheduledRunId));
 		
-		List<ArchiveTreatment> failedTreatments = archiveTreatmentDao.findByScheduledTime(expectedFailedDomain.getUuid(), 5);
+		List<ArchiveTreatment> failedTreatments = archiveTreatmentDao.findByScheduledTime(expectedFailedDomain.getUuid(), Limit.from(5));
 		assertThat(failedTreatments).containsExactly(ArchiveTerminatedTreatment
 			.forDomain(expectedFailedDomain.getUuid())
 			.runId(expectedFailedRunId)
