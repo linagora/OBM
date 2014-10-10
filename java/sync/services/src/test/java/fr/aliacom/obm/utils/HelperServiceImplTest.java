@@ -270,7 +270,7 @@ public class HelperServiceImplTest {
 
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
 		CalendarRights expectedMailToRights = CalendarRights.builder()
-				.addRights("foo@pub", EnumSet.noneOf(Right.class))
+				.addRights("foo@pub", EnumSet.of(Right.ACCESS))
 				.build();
 		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("foo@pub"));
@@ -348,7 +348,7 @@ public class HelperServiceImplTest {
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
 		CalendarRights expectedMailToRights = CalendarRights.builder()
 				.addRights("foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE))
-				.addRights("foo@pub", EnumSet.noneOf(Right.class))
+				.addRights("foo@pub", EnumSet.of(Right.ACCESS))
 				.addRights("beer@bar", EnumSet.of(Right.ACCESS, Right.READ))
 				.build();
 		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(

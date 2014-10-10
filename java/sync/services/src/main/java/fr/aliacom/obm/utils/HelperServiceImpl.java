@@ -201,7 +201,7 @@ public class HelperServiceImpl implements HelperService {
 
 			@Override
 			public EnumSet<Right> apply(String input) {
-				return EnumSet.noneOf(Right.class);
+				return EnumSet.of(Right.ACCESS);
 			}
 
 		});
