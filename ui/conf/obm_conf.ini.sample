@@ -71,7 +71,7 @@ password = "aliasource"
 ; This parameter is used to add more tolerance to the
 ; obm-sync synchronization, lowering unconsistency in case of
 ; lag or very long synchronization.
-;transaction-tolerance-timeout-seconds=5
+;transaction-tolerance-timeout-seconds=0
 
 ; Locator infos
 ;locator-cache-timeunit=minutes
