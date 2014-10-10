@@ -61,14 +61,12 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
+import org.obm.imap.archive.DatabaseOperations;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.TestImapArchiveModules.TimeBasedModule.TestDateProvider;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.beans.RepeatKind;
-import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
-import org.obm.imap.archive.dao.SqlTables;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun;
 import org.obm.server.WebServer;
 
@@ -83,7 +81,6 @@ import com.jayway.restassured.config.RestAssuredConfig;
 import com.jayway.restassured.http.ContentType;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
-import com.ninja_squad.dbsetup.operation.Insert;
 import com.ninja_squad.dbsetup.operation.Operation;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -135,50 +132,6 @@ public class TreatmentResourceTest {
 		control.verify();
 	}
 
-	private Operation cleanDB() {
-		return Operations.sequenceOf(
-				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE.NAME),
-				Operations.deleteAllFrom(SqlTables.MailArchiveRun.NAME));
-	}
-
-	private Insert insertDomainConfiguration() {
-		return Operations.insertInto(DomainConfigurationJdbcImpl.TABLE.NAME)
-			.columns(DomainConfigurationJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
-					DomainConfigurationJdbcImpl.TABLE.FIELDS.ACTIVATED, 
-					DomainConfigurationJdbcImpl.TABLE.FIELDS.REPEAT_KIND, 
-					DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_WEEK, 
-					DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_MONTH, 
-					DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
-					DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
-					DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE)
-			.values("2f096466-5a2a-463e-afad-4196c2952de3", 
-					Boolean.TRUE, 
-					RepeatKind.DAILY, 
-					2, 10, 355, 10, 32)
-			.build();
-	}
-	
-	private Insert insertArchiveTreatment(ArchiveTreatmentRunId runId, ObmDomainUuid domainId) {
-		return Operations.insertInto(MailArchiveRun.NAME)
-			.columns(MailArchiveRun.Fields.UUID,
-					MailArchiveRun.Fields.DOMAIN_UUID,
-					MailArchiveRun.Fields.STATUS, 
-					MailArchiveRun.Fields.SCHEDULE,
-					MailArchiveRun.Fields.START, 
-					MailArchiveRun.Fields.END, 
-					MailArchiveRun.Fields.HIGHER_BOUNDARY, 
-					MailArchiveRun.Fields.RECURRENT)
-			.values(runId.serialize(),
-					domainId.get(),
-					ArchiveStatus.SUCCESS, 
-					DateTime.parse("2014-06-01T00:00:00.000Z").toDate(), 
-					DateTime.parse("2014-06-01T00:01:00.000Z").toDate(), 
-					DateTime.parse("2014-06-01T00:02:00.000Z").toDate(), 
-					DateTime.parse("2014-06-01T00:03:00.000Z").toDate(),
-					true)
-			.build();
-	}
-
 	private void play(Operation operation) {
 		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
 		dbSetup.launch();
@@ -192,9 +145,9 @@ public class TreatmentResourceTest {
 			.expectGetDomain(domainId);
 		
 		UUID runId = TestImapArchiveModules.uuid;
-		play(Operations.sequenceOf(cleanDB(), 
-				insertDomainConfiguration(), 
-				insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
+		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
+				DatabaseOperations.insertDomainConfiguration(domainId, true), 
+				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
 		
 		control.replay();
 		server.start();
@@ -226,9 +179,9 @@ public class TreatmentResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId);
 		
-		play(Operations.sequenceOf(cleanDB(), 
-				insertDomainConfiguration(), 
-				insertArchiveTreatment(ArchiveTreatmentRunId.from(TestImapArchiveModules.uuid), domainId)));
+		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
+				DatabaseOperations.insertDomainConfiguration(domainId, true), 
+				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(TestImapArchiveModules.uuid), domainId)));
 		
 		control.replay();
 		server.start();
@@ -252,8 +205,8 @@ public class TreatmentResourceTest {
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
-		play(Operations.sequenceOf(cleanDB(), 
-				insertDomainConfiguration()));
+		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
+				DatabaseOperations.insertDomainConfiguration(domainId, true)));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -293,8 +246,8 @@ public class TreatmentResourceTest {
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
-		play(Operations.sequenceOf(cleanDB(), 
-				insertDomainConfiguration()));
+		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
+				DatabaseOperations.insertDomainConfiguration(domainId, true)));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -340,9 +293,9 @@ public class TreatmentResourceTest {
 			.expectGetDomain(domainId);
 		
 		UUID runId = TestImapArchiveModules.uuid;
-		play(Operations.sequenceOf(cleanDB(), 
-				insertDomainConfiguration(), 
-				insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
+		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
+				DatabaseOperations.insertDomainConfiguration(domainId, true), 
+				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
 		
 		String expectedContent = "Old treatment file";
 		temporaryFolder.create();
@@ -371,9 +324,9 @@ public class TreatmentResourceTest {
 			.expectGetDomain(domainId);
 		
 		UUID runId = TestImapArchiveModules.uuid;
-		play(Operations.sequenceOf(cleanDB(), 
-				insertDomainConfiguration(), 
-				insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
+		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
+				DatabaseOperations.insertDomainConfiguration(domainId, true), 
+				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
 		
 		control.replay();
 		server.start();
@@ -398,8 +351,8 @@ public class TreatmentResourceTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(TestImapArchiveModules.uuid);
 		final DateTime scheduled = TestImapArchiveModules.LOCAL_DATE_TIME.plusSeconds(2);
-		play(Operations.sequenceOf(cleanDB(), 
-				insertDomainConfiguration(), 
+		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
+				DatabaseOperations.insertDomainConfiguration(domainId, true), 
 				Operations.insertInto(MailArchiveRun.NAME)
 					.columns(MailArchiveRun.Fields.UUID,
 							MailArchiveRun.Fields.DOMAIN_UUID,

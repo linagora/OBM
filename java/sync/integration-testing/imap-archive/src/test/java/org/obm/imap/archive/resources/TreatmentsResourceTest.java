@@ -53,6 +53,7 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
+import org.obm.imap.archive.DatabaseOperations;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
@@ -60,7 +61,6 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.RepeatKind;
-import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
@@ -121,6 +121,11 @@ public class TreatmentsResourceTest {
 		server.stop();
 		imapServer.stop();
 		control.verify();
+	}
+
+	private void play(Operation operation) {
+		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
+		dbSetup.launch();
 	}
 	
 	@Test
@@ -214,7 +219,7 @@ public class TreatmentsResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId);
 		
-		insertDomainConfiguration(false);
+		play(DatabaseOperations.insertDomainConfiguration(domainId, false));
 		
 		control.replay();
 		server.start();
@@ -236,7 +241,7 @@ public class TreatmentsResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId);
 		
-		insertDomainConfiguration(true);
+		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -265,7 +270,7 @@ public class TreatmentsResourceTest {
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
-		insertDomainConfiguration(true);
+		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -283,24 +288,6 @@ public class TreatmentsResourceTest {
 		when()
 			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
 	}
-
-	private void insertDomainConfiguration(boolean activated) {
-		Operation operation =
-				Operations.sequenceOf(Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE.NAME),
-				Operations.sequenceOf(Operations.insertInto(DomainConfigurationJdbcImpl.TABLE.NAME)
-						.columns(DomainConfigurationJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.ACTIVATED, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.REPEAT_KIND, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_WEEK, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_MONTH, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE)
-								.values("2f096466-5a2a-463e-afad-4196c2952de3", activated, RepeatKind.DAILY, 2, 10, 355, 10, 32)
-								.build()));
-		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
-		dbSetup.launch();
-	}
 	
 	@Test
 	public void startArchivingShouldProcessARealRunWhenMissingArchiveTreatmentKind() throws Exception {
@@ -311,7 +298,7 @@ public class TreatmentsResourceTest {
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
-		insertDomainConfiguration(true);
+		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -348,7 +335,7 @@ public class TreatmentsResourceTest {
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
-		insertDomainConfiguration(true);
+		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -385,7 +372,7 @@ public class TreatmentsResourceTest {
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
-		insertDomainConfiguration(true);
+		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
