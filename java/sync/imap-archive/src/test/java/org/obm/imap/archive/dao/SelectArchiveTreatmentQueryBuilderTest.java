@@ -41,7 +41,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.dao.SelectArchiveTreatmentQueryBuilder.Ordering;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun.Fields;
 import org.obm.utils.ObmHelper;
 

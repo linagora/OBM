@@ -29,9 +29,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.dao;
 
-import static org.obm.imap.archive.dao.SelectArchiveTreatmentQueryBuilder.Ordering.ASC;
-import static org.obm.imap.archive.dao.SelectArchiveTreatmentQueryBuilder.Ordering.DESC;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -161,7 +158,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 		try (Connection connection = dbcp.getConnection();
 				PreparedStatement ps = selectArchiveTreatment()
 					.where(ArchiveStatus.SCHEDULED, ArchiveStatus.RUNNING)
-					.orderBy(Fields.SCHEDULE, ASC)
+					.orderBy(Fields.SCHEDULE, Ordering.ASC)
 					.prepareStatement(connection)) {
 
 			return toList(ps.executeQuery());
@@ -178,7 +175,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 						selectArchiveTreatment()
 							.where(domain)
 							.limit(limit)
-							.orderBy(Fields.SCHEDULE, DESC)
+							.orderBy(Fields.SCHEDULE, Ordering.DESC)
 							.prepareStatement(connection)) {
 
 			return toList(ps.executeQuery());
@@ -195,7 +192,7 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 							.where(domain)
 							.where(ArchiveStatus.SUCCESS, ArchiveStatus.ERROR)
 							.limit(max)
-							.orderBy(Fields.SCHEDULE, DESC)
+							.orderBy(Fields.SCHEDULE, Ordering.DESC)
 							.prepareStatement(connection)) {
 
 			return toList(ps.executeQuery());

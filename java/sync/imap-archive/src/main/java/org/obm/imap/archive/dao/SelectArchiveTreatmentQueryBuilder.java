@@ -54,10 +54,6 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 class SelectArchiveTreatmentQueryBuilder {
 
-	enum Ordering {
-		ASC, DESC, NONE;
-	}
-	
 	private final ObmHelper obmHelper;
 	private ArchiveTreatmentRunId runId;
 	private List<ArchiveStatus> statuses;
