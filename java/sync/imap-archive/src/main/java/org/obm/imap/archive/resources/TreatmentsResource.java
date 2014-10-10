@@ -32,9 +32,11 @@
 package org.obm.imap.archive.resources;
 
 import java.net.URI;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -48,11 +50,16 @@ import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.joda.time.DateTime;
+import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.SchedulingDates;
+import org.obm.imap.archive.dao.ArchiveTreatmentDao;
+import org.obm.imap.archive.dao.Ordering;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
+import org.obm.imap.archive.dto.HistoryDto;
 import org.obm.imap.archive.exception.DomainConfigurationDisableException;
 import org.obm.imap.archive.exception.DomainConfigurationNotFoundException;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
@@ -62,6 +69,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 import com.linagora.scheduling.DateTimeProvider;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -73,12 +81,15 @@ public class TreatmentsResource {
 	
 	public static final Logger logger = LoggerFactory.getLogger(TreatmentsResource.class);
 	
+	@Context
+	private ObmDomain domain;
+	
 	@Inject
 	private SchedulingDatesService schedulingDateService;
 	@Inject
 	private ArchiveSchedulingService archiveSchedulingService;
-	@Context
-	private ObmDomain domain;
+	@Inject
+	private ArchiveTreatmentDao archiveTreatmentDao;
 	@Inject
 	private DateTimeProvider dateTimeProvider;
 	@Inject
@@ -120,6 +131,41 @@ public class TreatmentsResource {
 			.build();
 	}
 	
+	@GET
+	public Response treatments(@QueryParam("filter_terminated") Boolean filterTerminated, @QueryParam("filter_failure") Boolean filterFailure, @QueryParam("limit") Integer limit, @QueryParam("sort_by_date") Ordering ordering) {
+		try {
+			if (filterTerminated != null && filterTerminated) {
+				return Response.ok(HistoryDto.from(archiveTreatmentDao.history(domain.getUuid(), statuses(filterFailure), limit(limit), ordering(ordering))))
+						.build();
+			}
+			return Response.status(Status.NOT_IMPLEMENTED).build();
+		} catch (DaoException e) {
+			logger.error("Cannot schedule an archiving", e);
+			return Response.serverError().build();
+		}
+	}
+
+	private Set<ArchiveStatus> statuses(Boolean filterFailure) {
+		if (filterFailure == null || !filterFailure) {
+			return ArchiveStatus.TERMINATED;
+		}
+		return Sets.immutableEnumSet(ArchiveStatus.ERROR);
+	}
+	
+	private Limit limit(Integer limit) {
+		if (limit == null) {
+			return Limit.unlimited();
+		}
+		return Limit.from(limit);
+	}
+
+	private Ordering ordering(Ordering ordering) {
+		if (ordering == null) {
+			return Ordering.NONE;
+		}
+		return ordering;
+	}
+
 	@Path(TreatmentFactory.PATH)
 	public Class<TreatmentResource> treatment() {
 		return TreatmentResource.class;

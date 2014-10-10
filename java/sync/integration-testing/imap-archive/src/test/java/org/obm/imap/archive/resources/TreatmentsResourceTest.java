@@ -35,12 +35,15 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 
 import java.util.UUID;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.easymock.IMocksControl;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -57,6 +60,7 @@ import org.obm.imap.archive.DatabaseOperations;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
@@ -403,5 +407,112 @@ public class TreatmentsResourceTest {
 		when()
 			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
 		Thread.sleep(1);
+	}
+	
+	@Test
+	public void getShouldReturnNotImplemented() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		expectations
+		.expectTrustedLogin(domainId)
+		.expectGetDomain(domainId);
+		
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("7624b49f-4eb8-4b79-a396-c814ee5039bd");
+		play(Operations.sequenceOf(DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE),
+				DatabaseOperations.insertArchiveTreatment(runId, domainId)));
+		
+		control.replay();
+		server.start();
+		
+		given()
+			.port(server.getHttpPort())
+			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.NOT_IMPLEMENTED.getStatusCode()).
+		when()
+		.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+	}
+	
+	@Test
+	public void getShouldReturnEmptyListWhenNoTreatments() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		expectations
+			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId);
+		
+		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
+		
+		control.replay();
+		server.start();
+		
+		given()
+			.port(server.getHttpPort())
+			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.contentType(ContentType.JSON)
+			.queryParam("filter_terminated", true).
+		expect()
+			.contentType(ContentType.JSON)
+			.body("archiveTreatmentDtos", Matchers.emptyIterable())
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+	}
+	
+	@Test
+	public void getShouldReturnTheOnlyOne() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		expectations
+			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId);
+		
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("7624b49f-4eb8-4b79-a396-c814ee5039bd");
+		play(Operations.sequenceOf(DatabaseOperations.insertDomainConfiguration(domainId, true),
+				DatabaseOperations.insertArchiveTreatment(runId, domainId)));
+		
+		control.replay();
+		server.start();
+		
+		given()
+			.port(server.getHttpPort())
+			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.contentType(ContentType.JSON)
+			.queryParam("filter_terminated", true).
+		expect()
+			.contentType(ContentType.JSON)
+			.body("archiveTreatmentDtos.runId", hasItem(runId.serialize()))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+	}
+	
+	@Test
+	public void getShouldReturnMultiple() throws Exception {
+		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
+		expectations
+			.expectTrustedLogin(domainId)
+			.expectGetDomain(domainId);
+		
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("7624b49f-4eb8-4b79-a396-c814ee5039bd");
+		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("049bdc76-f991-4e40-ad96-1aeb3d9d3bae");
+		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("a8dc4c16-bc23-4f9f-9eb0-a0f18ff3f3b2");
+		play(Operations.sequenceOf(DatabaseOperations.insertDomainConfiguration(domainId, true),
+				DatabaseOperations.insertArchiveTreatment(runId, domainId),
+				DatabaseOperations.insertArchiveTreatment(runId2, domainId),
+				DatabaseOperations.insertArchiveTreatment(runId3, domainId)));
+		
+		control.replay();
+		server.start();
+		
+		given()
+			.port(server.getHttpPort())
+			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.contentType(ContentType.JSON)
+			.queryParam("filter_terminated", true).
+		expect()
+			.contentType(ContentType.JSON)
+			.body("archiveTreatmentDtos.runId", hasItems(runId.serialize(), runId2.serialize(), runId3.serialize()))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
 	}
 }
