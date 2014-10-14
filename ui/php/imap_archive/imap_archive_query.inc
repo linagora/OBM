@@ -115,11 +115,11 @@ function imapArchiveRootPath() {
   return "http://".$imapArchiveServer[0]["ip"].":8085";
 }
 
-function curlGet($url) {
+function curlGet($url, $extraParams = array()) {
   global $obm;
 
   $imapArchiveRootPath = imapArchiveRootPath();
-  $curlUrl = $imapArchiveRootPath.$url;
+  $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($extraParams);
   
   $curl = basicAuthCurlInit($curlUrl);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -418,5 +418,46 @@ function curl_write_flush($curl_handle, $chunk)
   flush();
   
   return strlen($chunk);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Treatments history from IMAP archive service
+// Parameters:
+//   - none
+///////////////////////////////////////////////////////////////////////////////
+function treatments_history($onlyFailure, $limit, $sort) {
+  global $obm;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  $userInfo = get_user_info($obm['uid']);
+
+  if(empty($userInfo["email"])) {
+    return array(0, $l_email_address_not_found);
+  }
+
+  $historyPath = ImapArchiveUrls::treatments($obm["domain_uuid"]);
+
+  $parameters = array("domainId" => $obm['domain_uuid'],
+      "filter_terminated" => 'true',
+      "filter_failure" => ($onlyFailure) ? 'true' : 'false',
+      "limit" => $limit,
+      "sort_by_date" => $sort
+  );
+  
+  $curl = curlGet($historyPath, $parameters);
+  $success = $curl["success"];
+  $code = $curl["code"];
+  $errno = $curl["errno"];
+  
+  
+  if($errno){
+    error_log("Couldn't login to IMAP archive server ($errno)");
+    return array(0, $l_could_not_login_imap_archive_server);
+  }
+  if ($code == 0) {
+    return array(0, $l_imap_archive_server_unreachable);
+  }
+  if ($code == 200) {
+    return array(1, json_decode($success));
+  }
 }
 ?>

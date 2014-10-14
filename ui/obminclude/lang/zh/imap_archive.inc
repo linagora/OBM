@@ -43,6 +43,8 @@ $l_status = "状态";
 $l_last_fail = "最后失败";
 $l_simulation = "模拟";
 $l_manual_launch = "手动启动";
+$l_status_error = "错误";
+$l_status_success = "行";
 
 $l_email_address_not_found = "无法找到您的电子邮件地址，该域名";
 $l_imap_archive_server_not_found = "无法找到一个IMAP服务器存档此域";

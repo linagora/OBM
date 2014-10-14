@@ -40,6 +40,7 @@ applicable to the OBM software.
 
 include_once("$obminclude/global.inc");
 require_once('imap_archive_query.inc');
+require_once('imap_archive_ordering.php');
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the IMAP Archive form
@@ -350,12 +351,20 @@ function get_block_next_treatment_date($configuration) {
   $status = calculate_next_treatment_date_from_imap_archive_service($configuration);
   $date = null;
   if ($status[0] == 1) {
-    $date = new DateTime($status[1]->nextTreatmentDate);
-    $date->setTimezone(new DateTimeZone('UTC'));
+    $date = $status[1]->nextTreatmentDate;
+  } else {
+  	$display['msg'] .= display_err_msg("$status[1]");
   }
   return
     "<th>$l_next_run</th>
-     <td id='nextTreatmentDate' >".(is_null($date) ? '' : $date->format('Y-m-d H:i'))."</td>";
+     <td id='nextTreatmentDate' >".formatStringAsDateString($date)."</td>";
+}
+
+function formatStringAsDateString($dateAsString) {
+  $date = new DateTime($dateAsString);
+  $date->setTimezone(new DateTimeZone('UTC'));
+
+  return is_null($date) ? '' : $date->format('Y-m-d H:i');
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -363,9 +372,9 @@ function get_block_next_treatment_date($configuration) {
 ///////////////////////////////////////////////////////////////////////////////
 
 function dis_imap_archive_consult($params, $configuration) {
-  global $l_delete, $l_back, $l_past_operations, $l_start_time, $l_end_time, $l_status, $l_next_run, $l_simulation, $l_manual_launch;
-  global $l_last_fail, $path, $l_confirm_manual_launch, $l_domain_configuration_disable;
-  
+  global $l_next_run, $l_simulation, $l_manual_launch;
+  global $path, $l_confirm_manual_launch, $l_domain_configuration_disable;
+
   $user_id = $params['user_id'];
   $url = url_prepare('imap_archive_index.php');
   
@@ -373,7 +382,9 @@ function dis_imap_archive_consult($params, $configuration) {
   $class = $enabled ? "" : "unavailable";
   $buttonTitle = $enabled ? "" : "\"$l_domain_configuration_disable\"";
   
+  $block_treatments_history = get_block_treatments_history();
   $block_next_treatment_date = get_block_next_treatment_date($configuration);
+  $block_last_failure = get_block_last_failure();
   
   $confirm = "<script type='text/javascript'>
 
@@ -384,28 +395,7 @@ function dis_imap_archive_consult($params, $configuration) {
   
   $block = "
     <div class='detail infos'>
-      <h1>$l_past_operations</h1>
-      <table class='spreadSheet'>
-        <thead>
-          <tr>
-            <td>$l_start_time</td>
-            <td>$l_end_time</td>
-            <td>$l_status</td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr id='run_1' class='run'>
-            <td>2012-10-01 00:00:00</td>
-            <td>2012-10-01 00:05:23</td>
-            <td>OK</td>
-          </tr>
-          <tr id='run_2' class='run'>
-            <td>2012-12-01 00:00:00</td>
-            <td>2012-12-01 00:03:05</td>
-            <td><a href='http://192.168.56.3/imap_archive'>Erreur</a></td>
-          </tr>
-        </tbody>
-      </table>
+      $block_treatments_history
     </div>
     <div class='buttons' title=$buttonTitle>
       <a class='$class' href='$path/imap_archive/imap_archive_index.php?action=manual_launch&archive_treatment_kind=DRY_RUN' target='_blank' onclick='return confirm_launch();'>
@@ -424,29 +414,95 @@ function dis_imap_archive_consult($params, $configuration) {
       </table>
     </div>
     <div class='detail infos'>
-      <h1>$l_last_fail</h1>
-      <table class='spreadSheet'>
-        <thead>
-          <tr>
-            <td>$l_start_time</td>
-            <td>$l_end_time</td>
-            <td>$l_status</td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr id='run_1' class='run'>
-            <td>2012-12-01 00:00:00</td>
-            <td>2012-12-01 00:03:05</td>
-            <td><a href='http://192.168.56.3/imap_archive'>Erreur</a></td>
-          </tr>
-        </tbody>
-      </table>
+      $block_last_failure
     </div>
     $confirm
   ";
 
 
   return $block;
+}
+
+function get_block_treatments_history() {
+  global $l_past_operations;
+  global $l_start_time, $l_end_time, $l_status;
+  
+  $status = treatments_history(false, 3, ImapArchiveOrdering::DESC);
+  $block_history = "";
+  if ($status[0] == 1) {
+    $history = $status[1];
+    
+    foreach ($history->archiveTreatmentDtos as $treatment) {
+      $block_history .= 
+        "<tr id='$treatment->runId' class='run'>
+          <td>".formatStringAsDateString($treatment->startTime)."</td>
+          <td>".formatStringAsDateString($treatment->endTime)."</td>
+          <td>".statusAsString($treatment->archiveStatus, $treatment->runId)."</td>
+        </tr>";
+    }
+  } else {
+  	$display['msg'] .= display_err_msg("$status[1]");
+  }
+  return "<h1>$l_past_operations</h1>
+    <table class='spreadSheet'>
+      <thead>
+        <tr>
+          <td>$l_start_time</td>
+          <td>$l_end_time</td>
+          <td>$l_status</td>
+        </tr>
+      </thead>
+    <tbody>
+      $block_history
+    </tbody>
+  </table>";
+}
+
+function get_block_last_failure() {
+  global $l_last_fail;
+  global $l_start_time, $l_end_time, $l_status;
+
+  $status = treatments_history(true, 1, ImapArchiveOrdering::DESC);
+  $block_history = "";
+  if ($status[0] == 1) {
+    $history = $status[1];
+
+    foreach ($history->archiveTreatmentDtos as $treatment) {
+      $block_history .=
+        "<tr id='$treatment->runId' class='run'>
+          <td>".formatStringAsDateString($treatment->startTime)."</td>
+          <td>".formatStringAsDateString($treatment->endTime)."</td>
+          <td>".statusAsString($treatment->archiveStatus, $treatment->runId)."</td>
+        </tr>";
+    }
+  } else {
+  	$display['msg'] .= display_err_msg("$status[1]");
+  }
+  
+  return "<h1>$l_last_fail</h1>
+    <table class='spreadSheet'>
+      <thead>
+        <tr>
+          <td>$l_start_time</td>
+          <td>$l_end_time</td>
+          <td>$l_status</td>
+        </tr>
+      </thead>
+      <tbody>
+        $block_history
+      </tbody>
+    </table>";
+}
+
+function statusAsString($status, $runId) {
+  global $obm, $path;
+  global $l_status_error, $l_status_success;
+  
+  $link = "$path/imap_archive/imap_archive_index.php?action=log_page&run_id=$runId";  
+  if ($status == 'ERROR') {
+  	return "<a href='$link'>$l_status_error</a>";
+  }
+  return "<a href='$link'>$l_status_success</a>";
 }
 
 ///////////////////////////////////////////////////////////////////////////////

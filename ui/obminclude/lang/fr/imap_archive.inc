@@ -43,6 +43,8 @@ $l_status = "Statut";
 $l_last_fail = "Dernière erreur";
 $l_simulation = "Simulation";
 $l_manual_launch = "Exécution manuelle";
+$l_status_error = "Erreur";
+$l_status_success = "Ok";
 
 $l_email_address_not_found = "Adresse mail introuvable pour ce domaine";
 $l_imap_archive_server_not_found = "Server d'archivage IMAP introuvable pour ce domaine";

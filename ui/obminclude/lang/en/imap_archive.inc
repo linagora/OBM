@@ -43,6 +43,8 @@ $l_status = "Status";
 $l_last_fail = "Last failure";
 $l_simulation = "Simulation";
 $l_manual_launch = "Manual launch";
+$l_status_error = "Error";
+$l_status_success = "Ok";
 
 $l_email_address_not_found = "Couldn't find your email address for this domain";
 $l_imap_archive_server_not_found = "Couldn't find an IMAP archive server for this domain";
