@@ -50,6 +50,7 @@ import java.util.TreeMap;
 import net.fortuna.ical4j.data.ParserException;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.joda.time.Months;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.ConfigurationService;
@@ -417,7 +418,10 @@ public class CalendarBindingImpl implements ICalendar {
 			event.getRecurrence().getEnd(),
 			event.getRecurrence().getExceptions());
 
-		clone.getRecurrence().setEnd(Iterables.getLast(occurrences));
+		Date newEndRepeat = new DateTime(Iterables.getLast(occurrences))
+									.plusSeconds(event.getDuration())
+									.toDate();
+		clone.getRecurrence().setEnd(newEndRepeat);
 
 		return clone;
 	}
