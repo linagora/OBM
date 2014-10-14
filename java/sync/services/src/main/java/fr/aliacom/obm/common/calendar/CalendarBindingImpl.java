@@ -659,11 +659,10 @@ public class CalendarBindingImpl implements ICalendar {
 			
 			Event ev = commitedOperationDao.findAsEvent(token, clientId);
 			if (ev == null) {
-				Event standardizedEvent = forceEndRepeatToLastOccurrence(event);
-				if (standardizedEvent.isInternalEvent()) {
-					ev = createInternalEvent(token, calendar, standardizedEvent, notification);
+				if (event.isInternalEvent()) {
+					ev = createInternalEvent(token, calendar, event, notification);
 				} else {
-					ev = createExternalEvent(token, calendar, standardizedEvent, notification);
+					ev = createExternalEvent(token, calendar, event, notification);
 				}
 			}
 
