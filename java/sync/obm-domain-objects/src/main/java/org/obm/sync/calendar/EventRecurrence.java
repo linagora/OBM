@@ -177,10 +177,6 @@ public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializa
 		return (this.kind != RecurrenceKind.none);
 	}
 
-	public boolean hasEndRepeat() {
-		return this.getEnd() != null;
-	}
-
 	public void replaceUnattendedEventExceptionByException(String attendeeEmail) {
 		HashSet<Event> eventExceptionsCopy = com.google.common.collect.Sets.newHashSet(eventExceptions);
 		for (Event eexp : eventExceptions) {
