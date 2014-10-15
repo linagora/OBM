@@ -55,7 +55,7 @@ public class ProcessedFolderJdbcImpl implements ProcessedFolderDao {
 	private final DatabaseConnectionProvider dbcp;
 	private final ImapFolderDao imapFolderDao;
 	
-	interface TABLE {
+	public interface TABLE {
 		
 		String NAME = "mail_archive_processed_folder";
 		

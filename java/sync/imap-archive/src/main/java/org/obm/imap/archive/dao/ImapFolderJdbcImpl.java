@@ -49,7 +49,7 @@ public class ImapFolderJdbcImpl implements ImapFolderDao {
 
 	private final DatabaseConnectionProvider dbcp;
 	
-	interface TABLE {
+	public interface TABLE {
 		
 		String NAME = "mail_archive_folder";
 		

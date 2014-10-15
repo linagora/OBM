@@ -38,6 +38,8 @@ import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
+import org.obm.imap.archive.dao.ImapFolderJdbcImpl;
+import org.obm.imap.archive.dao.ProcessedFolderJdbcImpl;
 import org.obm.imap.archive.dao.SqlTables;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun;
 
@@ -53,7 +55,10 @@ public class DatabaseOperations {
 		return Operations.sequenceOf(
 				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE.NAME),
 				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME),
-				Operations.deleteAllFrom(SqlTables.MailArchiveRun.NAME));
+				Operations.deleteAllFrom(SqlTables.MailArchiveRun.NAME),
+				Operations.deleteAllFrom(SqlTables.MailArchiveRun.NAME),
+				Operations.deleteAllFrom(ProcessedFolderJdbcImpl.TABLE.NAME),
+				Operations.deleteAllFrom(ImapFolderJdbcImpl.TABLE.NAME));
 	}
 
 	public static Insert insertDomainConfiguration(ObmDomainUuid domainId, ConfigurationState state) {
