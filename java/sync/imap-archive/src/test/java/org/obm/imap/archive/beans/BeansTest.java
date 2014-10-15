@@ -66,7 +66,8 @@ public class BeansTest {
 				ProcessedFolder.class,
 				Boundaries.class,
 				Year.class,
-				Limit.class
+				Limit.class,
+				ExcludedUser.class
 			).verify();
 	}	
 }

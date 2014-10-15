@@ -31,11 +31,16 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.beans;
 
+import java.util.List;
+
 import org.joda.time.LocalTime;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -61,7 +66,20 @@ public class DomainConfiguration {
 						.time(LocalTime.parse(configuration.hour + ":" + configuration.minute))
 						.build())
 				.excludedFolder(configuration.excludedFolder)
+				.excludedUsers(from(configuration.excludedUserIds))
 				.build();
+	}
+	
+	private static List<ExcludedUser> from(List<String> excludedUserIds) {
+		Preconditions.checkNotNull(excludedUserIds);
+		return FluentIterable.from(excludedUserIds)
+				.transform(new Function<String, ExcludedUser>() {
+
+					@Override
+					public ExcludedUser apply(String excludedUserId) {
+						return ExcludedUser.from(excludedUserId);
+					}
+				}).toList();
 	}
 	
 	public static Builder builder() {
@@ -74,8 +92,10 @@ public class DomainConfiguration {
 		private ConfigurationState state;
 		private SchedulingConfiguration schedulingConfiguration;
 		private String excludedFolder;
+		private ImmutableList.Builder<ExcludedUser> excludedUsers;
 		
 		private Builder() {
+			excludedUsers = ImmutableList.builder();
 		}
 		
 		public Builder domain(ObmDomain domain) {
@@ -99,6 +119,11 @@ public class DomainConfiguration {
 			return this;
 		}
 		
+		public Builder excludedUsers(List<ExcludedUser> excludedUsers) {
+			this.excludedUsers.addAll(excludedUsers);
+			return this;
+		}
+		
 		public DomainConfiguration build() {
 			Preconditions.checkState(domain != null);
 			Preconditions.checkState(state != null);
@@ -109,7 +134,7 @@ public class DomainConfiguration {
 				Preconditions.checkState(excludedFolder.contains("/") == false);
 				Preconditions.checkState(excludedFolder.contains("@") == false);
 			}
-			return new DomainConfiguration(domain, state, schedulingConfiguration, excludedFolder);
+			return new DomainConfiguration(domain, state, schedulingConfiguration, excludedFolder, excludedUsers.build());
 		}
 	}
 	
@@ -117,12 +142,14 @@ public class DomainConfiguration {
 	private final ConfigurationState state;
 	private final SchedulingConfiguration schedulingConfiguration;
 	private final String excludedFolder;
+	private final List<ExcludedUser> excludedUsers;
 
-	private DomainConfiguration(ObmDomain domain, ConfigurationState state, SchedulingConfiguration schedulingConfiguration, String excludedFolder) {
+	private DomainConfiguration(ObmDomain domain, ConfigurationState state, SchedulingConfiguration schedulingConfiguration, String excludedFolder, ImmutableList<ExcludedUser> excludedUsers) {
 		this.domain = domain;
 		this.state = state;
 		this.schedulingConfiguration = schedulingConfiguration;
 		this.excludedFolder = excludedFolder;
+		this.excludedUsers = excludedUsers;
 	}
 
 	public ObmDomain getDomain() {
@@ -181,9 +208,13 @@ public class DomainConfiguration {
 		return excludedFolder;
 	}
 	
+	public List<ExcludedUser> getExcludedUsers() {
+		return excludedUsers;
+	}
+	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(domain, state, schedulingConfiguration, excludedFolder);
+		return Objects.hashCode(domain, state, schedulingConfiguration, excludedFolder, excludedUsers);
 	}
 	
 	@Override
@@ -193,7 +224,8 @@ public class DomainConfiguration {
 			return Objects.equal(this.domain, that.domain)
 				&& Objects.equal(this.state, that.state)
 				&& Objects.equal(this.schedulingConfiguration, that.schedulingConfiguration)
-				&& Objects.equal(this.excludedFolder, that.excludedFolder);
+				&& Objects.equal(this.excludedFolder, that.excludedFolder)
+				&& Objects.equal(this.excludedUsers, that.excludedUsers);
 		}
 		return false;
 	}
@@ -205,6 +237,7 @@ public class DomainConfiguration {
 			.add("state", state)
 			.add("recurrence", schedulingConfiguration)
 			.add("excludedFolder", excludedFolder)
+			.add("excludedUsers", excludedUsers)
 			.toString();
 	}
 }

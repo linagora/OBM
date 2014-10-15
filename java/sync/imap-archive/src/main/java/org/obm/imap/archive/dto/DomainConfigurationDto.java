@@ -31,10 +31,15 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.dto;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.ExcludedUser;
+
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 
 public class DomainConfigurationDto {
 
@@ -49,9 +54,10 @@ public class DomainConfigurationDto {
 		dto.hour = configuration.getHour();
 		dto.minute = configuration.getMinute();
 		dto.excludedFolder = configuration.getExcludedFolder();
+		dto.excludedUserIds = toIds(configuration.getExcludedUsers());
 		return dto;
 	}
-	
+
 	private static Integer from(DayOfWeek dayOfWeek) {
 		if (dayOfWeek == null) {
 			return null;
@@ -75,6 +81,17 @@ public class DomainConfigurationDto {
 		throw new IllegalArgumentException(dayOfWeek.name() + " can't be converted to Integer");
 	}
 	
+	private static List<String> toIds(List<ExcludedUser> excludedUsers) {
+		return FluentIterable.from(excludedUsers)
+				.transform(new Function<ExcludedUser, String>() {
+
+					@Override
+					public String apply(ExcludedUser excludedUser) {
+						return excludedUser.serialize();
+					}
+				}).toList();
+	}
+	
 	public UUID domainId;
 	public Boolean enabled;
 	public String repeatKind;
@@ -84,5 +101,6 @@ public class DomainConfigurationDto {
 	public Integer hour;
 	public Integer minute;
 	public String excludedFolder;
+	public List<String> excludedUserIds;
 	
 }

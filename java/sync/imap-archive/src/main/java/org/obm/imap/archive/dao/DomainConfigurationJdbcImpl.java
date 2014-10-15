@@ -33,6 +33,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.joda.time.LocalTime;
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -42,6 +43,7 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl.TABLE.FIELDS;
@@ -51,10 +53,12 @@ import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
 public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
@@ -94,6 +98,33 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
 	}
 	
+	public interface EXCLUDED_USERS {
+		interface TABLE {
+			
+			String NAME = "mail_archive_excluded_users";
+			
+			interface FIELDS {
+				String DOMAIN_UUID = "mail_archive_excluded_users_domain_uuid";
+				String USER_UUID = "mail_archive_excluded_users_user_uuid";
+				
+				String ALL = Joiner.on(", ").join(DOMAIN_UUID, USER_UUID);
+			}
+		}
+		
+		interface REQUESTS {
+			
+			String SELECT = String.format(
+					"SELECT %s FROM %s WHERE %s = ?", TABLE.FIELDS.ALL, TABLE.NAME, TABLE.FIELDS.DOMAIN_UUID);
+			
+			String DELETE = String.format(
+					"DELETE FROM %s WHERE %s = ?", TABLE.NAME, TABLE.FIELDS.DOMAIN_UUID);
+			
+			String INSERT = String.format(
+					"INSERT INTO %s (%s) VALUES (?, ?)", TABLE.NAME, TABLE.FIELDS.ALL);
+			
+		}
+	}
+	
 	@Inject
 	@VisibleForTesting DomainConfigurationJdbcImpl(DatabaseConnectionProvider dbcp, ObmHelper obmHelper) {
 		this.dbcp = dbcp;
@@ -110,7 +141,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
-				return domainConfigurationFromResultSet(rs, domain);
+				return domainConfigurationFromResultSet(connection, rs, domain);
 			} else {
 				return null;
 			}
@@ -120,7 +151,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 		}
 	}
 
-	private DomainConfiguration domainConfigurationFromResultSet(ResultSet rs, ObmDomain domain) throws SQLException {
+	private DomainConfiguration domainConfigurationFromResultSet(Connection connection, ResultSet rs, ObmDomain domain) throws SQLException, DaoException {
 		return DomainConfiguration.builder()
 				.domain(domain)
 				.state(rs.getBoolean(FIELDS.ACTIVATED) ? ConfigurationState.ENABLE : ConfigurationState.DISABLE)
@@ -134,6 +165,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 						.time(new LocalTime(rs.getInt(FIELDS.HOUR), rs.getInt(FIELDS.MINUTE)))
 						.build())
 				.excludedFolder(rs.getString(FIELDS.EXCLUDED_FOLDER))
+				.excludedUsers(get(connection, domain.getUuid()))
 				.build();
 	}
 
@@ -157,6 +189,8 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			if (ps.executeUpdate() < 1) {
 				throw new DomainNotFoundException(domainConfiguration.getDomainId());
 			}
+			
+			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getExcludedUsers());
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		}
@@ -180,6 +214,45 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setString(idx++, domainConfiguration.getExcludedFolder());
 
 			ps.executeUpdate();
+			
+			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getExcludedUsers());
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		}
+	}
+	
+	private List<ExcludedUser> get(Connection connection, ObmDomainUuid domainId) throws DaoException {
+		try (PreparedStatement ps = connection.prepareStatement(EXCLUDED_USERS.REQUESTS.SELECT)) {
+
+			ps.setString(1, domainId.get());
+
+			ResultSet rs = ps.executeQuery();
+
+			ImmutableList.Builder<ExcludedUser> builder = ImmutableList.builder();
+			while (rs.next()) {
+				builder.add(ExcludedUser.from(rs.getString(EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)));
+			}
+			return builder.build();
+		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
+	}
+
+	private void update(Connection connection, ObmDomainUuid domainId, List<ExcludedUser> users) throws DaoException {
+		try (PreparedStatement psDelete = connection.prepareStatement(EXCLUDED_USERS.REQUESTS.DELETE);
+				PreparedStatement psInsert = connection.prepareStatement(EXCLUDED_USERS.REQUESTS.INSERT)) {
+
+			psDelete.setString(1, domainId.get());
+			psDelete.executeUpdate();
+			
+			for (ExcludedUser userId : users) {
+				int idx = 1;
+				psInsert.setString(idx++, domainId.get());
+				psInsert.setString(idx++, userId.serialize());
+				
+				psInsert.executeUpdate();
+			}
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		}

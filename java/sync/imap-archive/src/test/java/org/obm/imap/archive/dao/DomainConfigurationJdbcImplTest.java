@@ -35,7 +35,6 @@ package org.obm.imap.archive.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.joda.time.LocalTime;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -51,6 +50,7 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -58,10 +58,12 @@ import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import pl.wkr.fluentrule.api.FluentExpectedException;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
+import com.ninja_squad.dbsetup.operation.Insert;
 import com.ninja_squad.dbsetup.operation.Operation;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -87,31 +89,44 @@ public class DomainConfigurationJdbcImplTest {
 	@Rule
 	public FluentExpectedException expectedException = FluentExpectedException.none();
 	
-	@Before
-	public void setUp() {
-		Operation operation =
-				Operations.sequenceOf(
-						Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE.NAME),
-						Operations.insertInto(DomainConfigurationJdbcImpl.TABLE.NAME)
-						.columns(DomainConfigurationJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.ACTIVATED, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.REPEAT_KIND, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_WEEK, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_MONTH, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
-								DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
-						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
-						.build());
-
-		
+	private void play(Operation operation) {
 		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
 		dbSetup.launch();
+	}
+
+	private Operation delete() {
+		return Operations.sequenceOf(
+				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE.NAME),
+				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME));
+	}
+
+	private Insert domainConfiguration() {
+		return Operations.insertInto(DomainConfigurationJdbcImpl.TABLE.NAME)
+			.columns(DomainConfigurationJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.ACTIVATED, 
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.REPEAT_KIND, 
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_WEEK, 
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_MONTH, 
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
+			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
+			.build();
+	}	
+
+	private Insert excludedUser(ExcludedUser excludedUser) {
+		return Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
+			.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, 
+					DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID) 
+			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", excludedUser.getId())
+			.build();
 	}	
 	
 	@Test
 	public void getShouldReturnStoredValueWhenDomainIdMatch() throws Exception {
+		play(Operations.sequenceOf(delete(), domainConfiguration()));
+		
 		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
 		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
@@ -124,13 +139,28 @@ public class DomainConfigurationJdbcImplTest {
 		assertThat(domainConfiguration.getHour()).isEqualTo(10);
 		assertThat(domainConfiguration.getMinute()).isEqualTo(32);
 		assertThat(domainConfiguration.getExcludedFolder()).isEqualTo("excluded");
+		assertThat(domainConfiguration.getExcludedUsers()).isEmpty();
 	}
 	
 	@Test
 	public void getShouldReturnNullWhenDomainIdDoesntMatch() throws Exception {
+		play(Operations.sequenceOf(delete(), domainConfiguration()));
+		
 		ObmDomainUuid uuid = ObmDomainUuid.of("78d6e95b-ab6c-4625-b3bf-e86c68347e2d");
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
 		assertThat(domainConfigurationJdbcImpl.get(domain)).isNull();
+	}
+	
+	@Test
+	public void getShouldLoadExcludedUsers() throws Exception {
+		ExcludedUser excludedUser = ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
+		ExcludedUser excludedUser2 = ExcludedUser.from("8e30e673-1c47-4ca8-85e8-4609d4228c10");
+		play(Operations.sequenceOf(delete(), domainConfiguration(), excludedUser(excludedUser), excludedUser(excludedUser2)));
+		
+		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
+		assertThat(domainConfiguration.getExcludedUsers()).containsOnly(excludedUser, excludedUser2);
 	}
 	
 	@Test
@@ -144,6 +174,8 @@ public class DomainConfigurationJdbcImplTest {
 	
 	@Test
 	public void updateShouldUpdateWhenDomainFound() throws Exception {
+		play(Operations.sequenceOf(delete(), domainConfiguration()));
+		
 		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
@@ -168,7 +200,40 @@ public class DomainConfigurationJdbcImplTest {
 	}
 	
 	@Test
+	public void updateShouldUpdateExcludedUsers() throws Exception {
+		ExcludedUser excludedUser = ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
+		ExcludedUser excludedUser2 = ExcludedUser.from("8e30e673-1c47-4ca8-85e8-4609d4228c10");
+		play(Operations.sequenceOf(delete(), domainConfiguration(), excludedUser(excludedUser), excludedUser(excludedUser2)));
+		
+		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
+		ExcludedUser excludedUser3 = ExcludedUser.from("2d7a5942-46ab-4fad-9bd2-608bde249671");
+		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.DISABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+							.repeat(RepeatKind.YEARLY)
+							.dayOfMonth(DayOfMonth.of(1))
+							.dayOfWeek(DayOfWeek.MONDAY)
+							.dayOfYear(DayOfYear.of(100))
+							.build())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.excludedFolder("anotherExcluded")
+				.excludedUsers(ImmutableList.of(excludedUser, excludedUser3))
+				.build();
+		
+		domainConfigurationJdbcImpl.update(expectedDomainConfiguration);
+		
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
+		assertThat(domainConfiguration.getExcludedUsers()).containsOnly(excludedUser, excludedUser3);
+	}
+	
+	@Test
 	public void createShouldThrowExceptionWhenDomainConfigurationAlreadyExists() throws Exception {
+		play(Operations.sequenceOf(delete(), domainConfiguration()));
+		
 		expectedException.expect(DaoException.class);
 		
 		domainConfigurationJdbcImpl.create(DomainConfiguration.DEFAULT_VALUES_BUILDER
@@ -178,6 +243,8 @@ public class DomainConfigurationJdbcImplTest {
 	
 	@Test
 	public void createShouldCreateWhenDomainFound() throws Exception {
+		play(Operations.sequenceOf(delete(), domainConfiguration()));
+		
 		ObmDomainUuid uuid = ObmDomainUuid.of("1383b12c-6d79-40c7-acf9-c79bcc673fff");
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
@@ -199,5 +266,35 @@ public class DomainConfigurationJdbcImplTest {
 		
 		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain); 
 		assertThat(domainConfiguration).isEqualToComparingFieldByField(expectedDomainConfiguration);
+	}
+	
+	@Test
+	public void createShouldCreateExcludedUsers() throws Exception {
+		play(Operations.sequenceOf(delete(), domainConfiguration()));
+		
+		ObmDomainUuid uuid = ObmDomainUuid.of("1383b12c-6d79-40c7-acf9-c79bcc673fff");
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
+		ExcludedUser excludedUser = ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
+		ExcludedUser excludedUser2 = ExcludedUser.from("8e30e673-1c47-4ca8-85e8-4609d4228c10");
+		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.DISABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+							.repeat(RepeatKind.YEARLY)
+							.dayOfMonth(DayOfMonth.of(1))
+							.dayOfWeek(DayOfWeek.MONDAY)
+							.dayOfYear(DayOfYear.of(100))
+							.build())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.excludedFolder("excluded")
+				.excludedUsers(ImmutableList.of(excludedUser, excludedUser2))
+				.build();
+		
+		domainConfigurationJdbcImpl.create(expectedDomainConfiguration);
+		
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain); 
+		assertThat(domainConfiguration.getExcludedUsers()).containsOnly(excludedUser, excludedUser2);
 	}
 }

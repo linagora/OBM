@@ -56,6 +56,7 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.RepeatKind;
+import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
@@ -140,6 +141,7 @@ public class ConfigurationResourceTest {
 
 	@Test
 	public void getDomainConfigurationShouldReturnStoredConfiguration() throws Exception {
+		String domainId = "a6af9131-60b6-4e3a-a9f3-df5b43a89309";
 		initDb(Operations.insertInto("mail_archive")
 				.columns("mail_archive_domain_uuid", 
 						"mail_archive_activated", 
@@ -150,8 +152,16 @@ public class ConfigurationResourceTest {
 						"mail_archive_hour", 
 						"mail_archive_minute",
 						"mail_archive_excluded_folder")
-						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
-						.build());
+					.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
+					.build(),
+				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)
+					.values(domainId, "08607f19-05a4-42a2-9b02-6f11f3ceff3b")
+					.build(),
+				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)
+					.values(domainId, "8e30e673-1c47-4ca8-85e8-4609d4228c10")
+					.build());
 		server.start();
 		
 		given()
@@ -282,8 +292,16 @@ public class ConfigurationResourceTest {
 						"mail_archive_hour", 
 						"mail_archive_minute",
 						"mail_archive_excluded_folder")
-						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
-						.build());
+					.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
+					.build(),
+				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)
+					.values(domainId, "08607f19-05a4-42a2-9b02-6f11f3ceff3b")
+					.build(),
+				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)
+					.values(domainId, "8e30e673-1c47-4ca8-85e8-4609d4228c10")
+					.build());
 		ObmDomainUuid newDomainUuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		expectations
 			.expectTrustedLogin(newDomainUuid)

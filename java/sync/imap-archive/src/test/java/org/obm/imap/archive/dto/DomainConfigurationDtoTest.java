@@ -43,8 +43,11 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
+
+import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -68,6 +71,7 @@ public class DomainConfigurationDtoTest {
 							.time(LocalTime.parse("13:23"))
 							.build())
 					.excludedFolder("excluded")
+					.excludedUsers(ImmutableList.of(ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b")))
 					.build();
 		DomainConfigurationDto dto = DomainConfigurationDto.from(configuration);
 		assertThat(dto.domainId).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
@@ -79,6 +83,7 @@ public class DomainConfigurationDtoTest {
 		assertThat(dto.hour).isEqualTo(13);
 		assertThat(dto.minute).isEqualTo(23);
 		assertThat(dto.excludedFolder).isEqualTo("excluded");
+		assertThat(dto.excludedUserIds).containsOnly("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
 
 	}
 	

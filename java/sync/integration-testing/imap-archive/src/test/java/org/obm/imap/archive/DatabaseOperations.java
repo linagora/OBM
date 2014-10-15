@@ -52,6 +52,7 @@ public class DatabaseOperations {
 	public static Operation cleanDB() {
 		return Operations.sequenceOf(
 				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE.NAME),
+				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME),
 				Operations.deleteAllFrom(SqlTables.MailArchiveRun.NAME));
 	}
 

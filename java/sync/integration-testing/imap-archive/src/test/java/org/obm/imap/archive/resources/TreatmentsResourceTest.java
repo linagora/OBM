@@ -70,6 +70,7 @@ import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.icegreen.greenmail.util.GreenMail;
@@ -152,6 +153,7 @@ public class TreatmentsResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(1).getDayOfYear();
 		domainConfigurationDto.hour = 0;
 		domainConfigurationDto.minute = 0;
+		domainConfigurationDto.excludedUserIds = ImmutableList.of();
 		
 		given()
 			.port(server.getHttpPort())
@@ -183,6 +185,7 @@ public class TreatmentsResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(1).getDayOfYear();
 		domainConfigurationDto.hour = 0;
 		domainConfigurationDto.minute = 0;
+		domainConfigurationDto.excludedUserIds = ImmutableList.of();
 		
 		given()
 			.port(server.getHttpPort())
