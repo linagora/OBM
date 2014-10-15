@@ -109,8 +109,8 @@ public class HelperServiceImpl implements HelperService {
 	@Override
 	public boolean canWriteOnCalendar(AccessToken accessToken, String email) {
 		return listRightsOnCalendars(accessToken, ImmutableList.of(email))
-				.getRights(email).orNull()
-				.contains(Right.READ);
+				.getRights(email).or(EnumSet.noneOf(Right.class))
+				.contains(Right.WRITE);
 	}
 
 	@Override

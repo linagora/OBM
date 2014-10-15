@@ -358,6 +358,90 @@ public class HelperServiceImplTest {
 		mocksControl.verify();
 	}
 
+	@Test
+	public void canWriteOnCalendarShouldReturnFalseWhenAccessAndReadRights() throws SQLException {
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("other")))
+				.andReturn(
+						ImmutableMap.<String, EnumSet<Right>> of(
+								"other", EnumSet.of(Right.ACCESS, Right.READ))).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
+		mocksControl.replay();
+		
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		boolean canWriteOnCalendar = helperServiceImpl.canWriteOnCalendar(accessToken, "other@bar");
+
+		Assertions.assertThat(canWriteOnCalendar).isFalse();
+		mocksControl.verify();
+	}
+
+	@Test
+	public void canWriteOnCalendarShouldReturnFalseWhenAccessOnlyRight() throws SQLException {
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("other")))
+				.andReturn(
+						ImmutableMap.<String, EnumSet<Right>> of(
+								"other", EnumSet.of(Right.ACCESS))).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
+		mocksControl.replay();
+		
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		boolean canWriteOnCalendar = helperServiceImpl.canWriteOnCalendar(accessToken, "other@bar");
+
+		Assertions.assertThat(canWriteOnCalendar).isFalse();
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void canWriteOnCalendarShouldReturnTrueWhenWriteOnlyRight() throws SQLException {
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("other")))
+		.andReturn(
+				ImmutableMap.<String, EnumSet<Right>> of(
+						"other", EnumSet.of(Right.WRITE))).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
+		mocksControl.replay();
+		
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		boolean canWriteOnCalendar = helperServiceImpl.canWriteOnCalendar(accessToken, "other@bar");
+		
+		Assertions.assertThat(canWriteOnCalendar).isTrue();
+		mocksControl.verify();
+	}
+
+	@Test
+	public void canWriteOnCalendarShouldReturnTrueWhenAccessReadAndWriteRights() throws SQLException {
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("other")))
+				.andReturn(
+						ImmutableMap.<String, EnumSet<Right>> of(
+								"other", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE))).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
+		mocksControl.replay();
+		
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		boolean canWriteOnCalendar = helperServiceImpl.canWriteOnCalendar(accessToken, "other@bar");
+
+		Assertions.assertThat(canWriteOnCalendar).isTrue();
+		mocksControl.verify();
+	}
+
 	private ObmDomain domainWithName(String domainName) {
 		return ObmDomain
 				.builder()
