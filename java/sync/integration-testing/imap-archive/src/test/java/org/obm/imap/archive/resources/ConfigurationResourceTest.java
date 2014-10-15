@@ -50,6 +50,7 @@ import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
+import org.obm.imap.archive.DatabaseOperations;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.DayOfMonth;
@@ -110,7 +111,7 @@ public class ConfigurationResourceTest {
 
 	private void initDb(Operation... operationToAppend) {
 		Operation operation =
-				Operations.sequenceOf(Operations.deleteAllFrom("mail_archive"),
+				Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				Operations.sequenceOf(operationToAppend));
 		
 		DbSetup dbSetup = new DbSetup(H2Destination.from(db), operation);
@@ -142,16 +143,16 @@ public class ConfigurationResourceTest {
 	@Test
 	public void getDomainConfigurationShouldReturnStoredConfiguration() throws Exception {
 		String domainId = "a6af9131-60b6-4e3a-a9f3-df5b43a89309";
-		initDb(Operations.insertInto("mail_archive")
-				.columns("mail_archive_domain_uuid", 
-						"mail_archive_activated", 
-						"mail_archive_repeat_kind", 
-						"mail_archive_day_of_week", 
-						"mail_archive_day_of_month", 
-						"mail_archive_day_of_year", 
-						"mail_archive_hour", 
-						"mail_archive_minute",
-						"mail_archive_excluded_folder")
+		initDb(Operations.insertInto(DomainConfigurationJdbcImpl.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.ACTIVATED, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.REPEAT_KIND, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_WEEK, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_MONTH, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
 					.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
@@ -178,16 +179,16 @@ public class ConfigurationResourceTest {
 
 	@Test
 	public void domainShouldBeEvaluatedEachTime() throws Exception {
-		initDb(Operations.insertInto("mail_archive")
-				.columns("mail_archive_domain_uuid", 
-						"mail_archive_activated", 
-						"mail_archive_repeat_kind", 
-						"mail_archive_day_of_week", 
-						"mail_archive_day_of_month", 
-						"mail_archive_day_of_year", 
-						"mail_archive_hour", 
-						"mail_archive_minute",
-						"mail_archive_excluded_folder")
+		initDb(Operations.insertInto(DomainConfigurationJdbcImpl.TABLE.NAME)
+				.columns(DomainConfigurationJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.ACTIVATED, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.REPEAT_KIND, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_WEEK, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_MONTH, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
 						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
 						.build());
 		
@@ -282,16 +283,16 @@ public class ConfigurationResourceTest {
 
 	@Test
 	public void updateDomainConfigurationShouldReturnNoContentWhenUpdating() throws Exception {
-		initDb(Operations.insertInto("mail_archive")
-				.columns("mail_archive_domain_uuid", 
-						"mail_archive_activated", 
-						"mail_archive_repeat_kind", 
-						"mail_archive_day_of_week", 
-						"mail_archive_day_of_month", 
-						"mail_archive_day_of_year", 
-						"mail_archive_hour", 
-						"mail_archive_minute",
-						"mail_archive_excluded_folder")
+		initDb(Operations.insertInto(DomainConfigurationJdbcImpl.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.ACTIVATED, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.REPEAT_KIND, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_WEEK, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_MONTH, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
 					.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
