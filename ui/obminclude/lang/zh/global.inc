@@ -482,6 +482,7 @@ $l_of_right_err_user = "访问用户的权限不够！"; //"Insufficient rights 
 $l_of_right_err_resource = "访问资源的权限不够！"; //"Insufficient rights on resources !"
 $l_of_right_err_share_resource = "You are not allowed to share the calendar of this resource if it has not at least the public read right. Please upgrade its rights.";
 $l_waiting_events = "等待事件"; //"Waiting event(s)"
+$l_unread_mails = "未读邮件"; //"Unread mail(s)"
 $l_unfilled = "日期未填"; //"Day(s) unfilled"
 $l_my_calendar = "我的日历"; //"My calendar"
 $l_my_time = "我的时间管理"; //"My time management"
@@ -540,6 +541,7 @@ $l_resource_found_error = "发现了这一类型的资源，你应该删除它";
 $l_popin_message = "Hey ! New top bar is awesome, try it ?";
 $l_popin_activation_button = "New Top Bar";
 $l_close_popin_button = "Don't show this again.";
+$l_desktop_notification_title = "OBM 通知";
 
 $l_intro_next = "Next";
 $l_intro_previous = "Back";

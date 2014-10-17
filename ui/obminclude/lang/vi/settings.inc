@@ -57,3 +57,4 @@ $l_without_weekend = "Không bao gồm cuối tuần";
 $l_set_public_fb = "Công khai thông tin rảnh / bận rộn của bạn";
 
 $l_set_topbar = "Kích hoạt thanh công cụ OBM Topbar.";
+$l_browser_notification = "Thêm một máy tính để bàn thông báo popup cho các sự kiện và mail (không tương thích Internet Explorer)";

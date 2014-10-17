@@ -712,21 +712,6 @@ function displayUnreadMail(count) {
   }
 }
 
-function displayInTitleTab(page, count){
-  var title = document.title;
-  var favicon = new Favico({
-    animation:'none',
-    bgColor : '#ef5a04',
-    textColor : '#ffffff',
-  });
-
-  if (window.location.pathname == '/' + page + '/' + page + '_index.php'){
-    title = title.split(' (');
-    document.title =  title[0]  + ' (' + count + ') ' ;
-    favicon.badge(count.toString());
-  }
-}
-
 function getWebmailUnreadMail(callback) {
   var r = new Request({
     url: obm.vars.consts.obmUrl+'/webmail/',
@@ -749,6 +734,49 @@ function getWebmailUnreadMail(callback) {
   r.send();
 }
 
+function browserNotificationGetters() {
+  if(obm.vars.userNotificationDelay == "-1" || typeof(obm.vars.userNotificationDelay) == "undefined" ){
+    return;
+  }
+
+  var unreadNotifications = {};
+
+  var r = new Request({
+    url: obm.vars.consts.obmUrl+'/webmail/',
+    secure: false,
+    method: 'get',
+    data: {_task: "mail", _action: "unread_plugin"},
+    noCache: true,
+    async: true,
+    onSuccess: function(responseText){
+        var count = parseInt(responseText, 10);
+        if( isNaN(count)) {
+            if (window.console) {
+                window.console.log("Failed to get unread email count. Authentication error?");
+            }
+            return;
+        }
+        unreadNotifications.mails = count;
+
+        return browserNotification(unreadNotifications);
+    }
+  });
+
+  new Request.JSON({
+        url: obm.vars.consts.obmUrl+'/calendar/calendar_index.php',
+        secure: false,
+        async: true,
+        onComplete: function(response) {
+            var elem = $('bannerWaitingEvent');
+            var count = parseInt(response.count, 10);
+            unreadNotifications.events = count;
+            if ( obm.vars.newTopbar ) {
+              r.send();
+            }
+        }
+  }).get({ajax : 1,action : 'get_json_waiting_events'});
+}
+
 function getDisplayedcount(count){
   return count < 99 ? count.toString() : '99+';
 }
@@ -758,6 +786,62 @@ function resizeForBadges(elem, count){
     elem.getParent('li').setStyle('margin-right', '10px');
   } else {
     elem.getParent('li').setStyle('margin-right', '20px');
+  }
+}
+
+function displayInTitleTab(page, count){
+  var title = document.title;
+  var favicon = new Favico({
+    animation:'none',
+    bgColor : '#ef5a04',
+    textColor : '#ffffff',
+  });
+
+  if (window.location.pathname == '/' + page + '/' + page + '_index.php'){
+    title = title.split(' (');
+    document.title =  title[0]  + ' (' + count + ') ' ;
+    favicon.badge(count.toString());
+  }
+}
+
+function browserNotification(unreadNotifications){
+  var eventCount = unreadNotifications.events;
+  var mailCount = unreadNotifications.mails;
+  var userDelay = obm.vars.userNotificationDelay;
+
+  if(eventCount == 0 && mailCount == 0){
+    return;
+  }
+
+  var curDate = new Date();
+  var lastDate = obm.vars.lastBrowserNotify;
+
+  var millisecondsDelay = userDelay*1000;
+  if( typeof(lastDate) == "undefined" || curDate.getTime() > lastDate.getTime()+millisecondsDelay) {
+    obm.vars.lastBrowserNotify = curDate;
+
+    var desktopNotificationTitle = obm.vars.labels.l_desktop_notification_title;
+    var eventType = obm.vars.labels.l_waiting_events;
+    var mailType = obm.vars.labels.l_unread_mails;
+
+    var bodyValue = eventCount + " " + eventType + "\n" + mailCount + " " + mailType;
+    
+    var iconPath = '/images/themes/default/images/faviconOBM.png';
+
+    if (!("Notification" in window)) {
+      Obm.Console.log("This browser does not support desktop notification");
+    } else if (Notification.permission === "granted") {
+      var notification = new Notification(desktopNotificationTitle, {body: bodyValue, icon: iconPath});
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission(function (permission) {
+        if (!('permission' in Notification)) {
+          Notification.permission = permission;
+        }
+        if (permission === "granted") {
+          var notification = new Notification(desktopNotificationTitle, {body: bodyValue, icon: iconPath});
+        }
+      });
+    }
   }
 }
 
