@@ -125,8 +125,9 @@
 		<module>obm-domain-objects</module>
 		<module>obm-domain-objects-test</module>
 		<module>obm-locator</module>
-		<module>provisioning-module</module>
 		<module>provisioning-client</module>
+		<module>provisioning-module</module>
+		<module>provisioning-server</module>
 		<module>qos-filter</module>
 		<module>resource-management-filter</module>
 		<module>satellite-client</module>
@@ -501,6 +502,11 @@ org.eclipse.jdt.core.compiler.source=1.7
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
 				<artifactId>provisioning-module</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>provisioning-server</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>
