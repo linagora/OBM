@@ -35,39 +35,23 @@ import javax.servlet.ServletContext;
 
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
-import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.TransactionConfiguration;
-import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.dbcp.DatabaseConnectionProviderImpl;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
-import org.obm.domain.dao.AddressBookDao;
-import org.obm.domain.dao.AddressBookDaoJdbcImpl;
-import org.obm.domain.dao.ObmInfoDao;
-import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
-import org.obm.domain.dao.UserDao;
-import org.obm.domain.dao.UserDaoJdbcImpl;
-import org.obm.domain.dao.UserPatternDao;
-import org.obm.domain.dao.UserPatternDaoJdbcImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
-import com.sun.jersey.guice.JerseyServletModule;
 
 public class TestingProvisioningModule extends AbstractModule {
 
 	private Module module;
 
 	public TestingProvisioningModule(ServletContext servletContext) {
-		module = Modules.override(new ProvisioningService(servletContext)).with(new OverridingModule());
+		module = Modules.override(new ProvisioningServerService(servletContext)).with(new OverridingModule());
 	}
 	
 	@Override
@@ -82,21 +66,10 @@ public class TestingProvisioningModule extends AbstractModule {
 			Configuration.Transaction transaction = new Configuration.Transaction();
 			transaction.timeoutInSeconds = 3600;
 	
-			install(new TransactionalModule());
-			install(new JerseyServletModule());
-			
-			bind(DatabaseConnectionProvider.class).to(DatabaseConnectionProviderImpl.class);
 			bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(transaction));
 			Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
 			databaseDrivers.addBinding().to(H2DriverConfiguration.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
-			bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
-			bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
-			bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
-			bind(UserDao.class).to(UserDaoJdbcImpl.class);
-			
-			bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION))
-				.toInstance(LoggerFactory.getLogger(ProvisioningService.class));
 		}
 	}
 }

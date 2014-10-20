@@ -31,15 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import javax.servlet.ServletContext;
-
 import com.google.inject.Module;
 
 public class ServicesTestModuleWithLDAPAuth extends ServicesTestModule {
-	
-	public ServicesTestModuleWithLDAPAuth(ServletContext servletContext) {
-		super(servletContext);
-	}
 
 	@Override
 	protected Module getConfigurationModule() {

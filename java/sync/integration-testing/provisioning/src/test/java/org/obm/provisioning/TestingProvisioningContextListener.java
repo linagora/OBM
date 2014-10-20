@@ -31,13 +31,64 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import javax.servlet.ServletContextEvent;
+import java.lang.reflect.InvocationTargetException;
 
-public class TestingProvisioningContextListener extends ProvisioningContextListener {
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.SecurityManager;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+
+public class TestingProvisioningContextListener implements ServletContextListener {
+
+	protected Injector injector;
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		super.contextInitialized(sce);
-		injector.getInstance(H2Initializer.class).initialize();
+		try {
+			injector = createInjector(sce.getServletContext());
+			SecurityManager securityManager = injector.getInstance(SecurityManager.class);
+			SecurityUtils.setSecurityManager(securityManager);
+			
+			injector.getInstance(H2Initializer.class).initialize();
+		} catch (Exception e) {
+			Throwables.propagate(e);
+		}
+	}
+
+	@Override
+	public void contextDestroyed(ServletContextEvent sce) {
+	}
+
+    private Injector createInjector(ServletContext servletContext)
+    		throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
+    	
+        return Guice.createInjector(selectGuiceModule(servletContext));
+    }
+
+    @VisibleForTesting Module selectGuiceModule(ServletContext servletContext)
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
+		
+		return Objects.firstNonNull(newWebXmlModuleInstance(servletContext), new ProvisioningServerService(servletContext));
+	}
+
+    @VisibleForTesting Module newWebXmlModuleInstance(ServletContext servletContext)
+    		throws ClassNotFoundException, InstantiationException, IllegalAccessException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
+    	
+		String guiceModuleClassName = servletContext.getInitParameter("guiceModule");
+		if (Strings.isNullOrEmpty(guiceModuleClassName)) {
+			return null;
+		}
+		return (Module) Class.forName(guiceModuleClassName).getConstructor(ServletContext.class)
+				.newInstance(servletContext);
 	}
 }

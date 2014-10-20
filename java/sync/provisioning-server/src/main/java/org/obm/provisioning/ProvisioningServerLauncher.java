@@ -54,7 +54,7 @@ public class ProvisioningServerLauncher {
 		 * EVERY CHANGE DONE HERE CAN SILENTLY BREAK THE STARTUP *
 		 ******************************************************************/
 		Injector injector = Guice.createInjector(
-				new ProvisioningService(new NoContext()), 
+				new ProvisioningServerService(new NoContext()), 
 				new EmbeddedServerModule(
 					ServerConfiguration.builder()
 						.port(SERVER_PORT)

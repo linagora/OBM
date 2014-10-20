@@ -33,16 +33,6 @@ package org.obm.sync;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseDriversModule;
-import org.obm.domain.dao.AddressBookDao;
-import org.obm.domain.dao.AddressBookDaoJdbcImpl;
-import org.obm.domain.dao.ObmInfoDao;
-import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
-import org.obm.domain.dao.UserDao;
-import org.obm.domain.dao.UserDaoJdbcImpl;
-import org.obm.domain.dao.UserPatternDao;
-import org.obm.domain.dao.UserPatternDaoJdbcImpl;
-import org.obm.provisioning.dao.GroupDao;
-import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -65,10 +55,5 @@ public class DatabaseModule extends AbstractModule {
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
 		bind(ContactDao.class).to(ContactDaoJdbcImpl.class);
 		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
-		bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
-		bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
-		bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
-		bind(UserDao.class).to(UserDaoJdbcImpl.class);
-		bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
 	}
 }

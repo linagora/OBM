@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import javax.servlet.ServletContext;
-
 import org.obm.Configuration;
 
 import com.google.inject.AbstractModule;
@@ -41,16 +39,10 @@ import com.google.inject.util.Modules;
 import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
 public class ServicesWithSocketJMSTestModule extends AbstractModule {
-
-	private final ServletContext servletContext;
-
-	public ServicesWithSocketJMSTestModule(ServletContext servletContext) {
-		this.servletContext = servletContext;
-	}
 		
 	@Override
 	protected void configure() {
-		ServicesTestModule servicesModule = new ServicesTestModule(servletContext);
+		ServicesTestModule servicesModule = new ServicesTestModule();
 		OverriddenModuleBuilder override = Modules.override(servicesModule);
 		try {
 			install(override.with(overrideModule(servicesModule.configuration)));

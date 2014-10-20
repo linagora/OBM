@@ -60,5 +60,11 @@ public class DaoModule extends AbstractModule {
 		bind(EntityRightDao.class).to(EntityRightDaoJdbcImpl.class);
 		bind(PUserDao.class).to(PUserDaoJdbcImpl.class);
 		bind(PGroupDao.class).to(PGroupDaoJdbcImpl.class);
+
+		bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
+		bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
+		bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
+		bind(UserDao.class).to(UserDaoJdbcImpl.class);
+		bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
 	}
 }

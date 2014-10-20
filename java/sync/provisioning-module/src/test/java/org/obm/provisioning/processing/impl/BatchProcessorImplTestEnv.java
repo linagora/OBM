@@ -33,6 +33,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.obm.configuration.ConfigurationService;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
@@ -43,8 +44,6 @@ import org.obm.sync.date.DateProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.util.Modules;
-
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class BatchProcessorImplTestEnv extends CommonDomainEndPointEnvTest {
 
@@ -73,7 +72,7 @@ public class BatchProcessorImplTestEnv extends CommonDomainEndPointEnvTest {
 	@Inject
 	private LdapService ldapService;
 	@Inject
-	protected ObmSyncConfigurationService configurationService;
+	protected ConfigurationService configurationService;
 
 	protected LdapManager expectLdapBuild() {
 		expect(configurationService.isLdapModuleEnabled()).andReturn(true);

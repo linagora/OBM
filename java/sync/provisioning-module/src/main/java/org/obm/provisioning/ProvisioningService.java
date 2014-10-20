@@ -46,6 +46,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.codehaus.jackson.map.module.SimpleModule;
+import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.EmailConfiguration;
+import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.cyrus.imap.CyrusClientModule;
 import org.obm.domain.dao.DaoModule;
 import org.obm.domain.dao.UserSystemDao;
@@ -79,7 +82,6 @@ import org.obm.provisioning.resources.ProfileResource;
 import org.obm.provisioning.resources.UserResource;
 import org.obm.provisioning.resources.UserWriteResource;
 import org.obm.satellite.client.SatelliteClientModule;
-import org.obm.sync.ObmSyncConfigurationModule;
 import org.obm.sync.XTrustProvider;
 
 import com.google.common.collect.ImmutableMap;
@@ -92,6 +94,7 @@ import com.google.inject.servlet.RequestScoped;
 import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -119,15 +122,16 @@ public class ProvisioningService extends ServletModule {
 	@Override
 	protected void configureServlets() {
 		bind(GuiceContainer.class).to(GuiceProvisioningJerseyServlet.class);
-
+		bind(EmailConfiguration.class).toInstance(new EmailConfigurationImpl.Factory()
+			.create(ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH));
+		
 		filter("/*", "").through(GuiceShiroFilter.class);
 
 		serve(PROVISIONING_URL_PATTERN)
 			.with(GuiceProvisioningJerseyServlet.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
 
 		bindRestResources();
-
-		install(new ObmSyncConfigurationModule());
+		
 		install(new DaoModule());
 		install(new BatchProcessingModule());
 		install(new LdapModule());
@@ -135,6 +139,7 @@ public class ProvisioningService extends ServletModule {
 		install(new CyrusClientModule());
 		install(new ShiroAopModule());
 		install(new AuthorizingModule(servletContext));
+		install(new JerseyServletModule());
 	}
 
 	private void bindRestResources() {

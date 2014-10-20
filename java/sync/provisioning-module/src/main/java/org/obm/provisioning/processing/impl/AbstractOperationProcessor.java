@@ -30,6 +30,7 @@
 package org.obm.provisioning.processing.impl;
 
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.obm.configuration.ConfigurationService;
 import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
@@ -50,7 +51,6 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationProcessor {
 
@@ -61,7 +61,7 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 	@Inject
 	protected GroupDao groupDao;
 	@Inject
-	private ObmSyncConfigurationService configurationService;
+	private ConfigurationService configurationService;
 
 	protected AbstractOperationProcessor(BatchEntityType entityType, HttpVerb verb) {
 		super(entityType, verb);

@@ -66,6 +66,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
+			<artifactId>obm-dao</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>obm-domain-objects</artifactId>
 		</dependency>
 		<dependency>
@@ -75,7 +79,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>provisioning-module</artifactId>
+			<artifactId>services-configuration-module</artifactId>
 		</dependency>
 		<dependency>
                   <groupId>com.linagora.obm</groupId>

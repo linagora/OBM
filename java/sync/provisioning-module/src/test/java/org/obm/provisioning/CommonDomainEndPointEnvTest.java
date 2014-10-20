@@ -49,7 +49,10 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.DefaultServlet;
 import org.obm.DateUtils;
+import org.obm.StaticConfigurationService;
+import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -91,7 +94,6 @@ import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.util.Modules;
 import com.jayway.restassured.RestAssured;
-import com.sun.jersey.guice.JerseyServletModule;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -104,7 +106,6 @@ import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public abstract class CommonDomainEndPointEnvTest {
 
@@ -121,12 +122,12 @@ public abstract class CommonDomainEndPointEnvTest {
 
 			context = createContext(server);
 
-			install(Modules.override(new ProvisioningService(context.getServletContext())).with(new JerseyServletModule() {
+			install(Modules.override(new ProvisioningService(context.getServletContext())).with(new AbstractModule() {
 
 				private IMocksControl mocksControl = createControl();
 
 				@Override
-				protected void configureServlets() {
+				protected void configure() {
 					bind(IMocksControl.class).toInstance(mocksControl);
 					bind(ObmHelper.class).toInstance(mocksControl.createMock(ObmHelper.class));
 					bind(EntityRightDao.class).toInstance(mocksControl.createMock(EntityRightDao.class));
@@ -151,7 +152,11 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(Configuration.class).toInstance(new LdapConfiguration("cn=directory manager", UserPassword.valueOf("secret"), 0));
 					bind(LdapService.class).toInstance(mocksControl.createMock(LdapService.class));
 					bind(BatchTracker.class).toInstance(mocksControl.createMock(BatchTracker.class));
-					bind(ObmSyncConfigurationService.class).toInstance(mocksControl.createMock(ObmSyncConfigurationService.class));
+					
+					org.obm.Configuration configuration = new org.obm.Configuration();
+					configuration.applicationName = ProvisioningServerService.APPLICATION_NAME; 
+					bind(ConfigurationService.class).toInstance(mocksControl.createMock(ConfigurationService.class));
+					bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(configuration.transaction));
 				}
 			}));
 		}

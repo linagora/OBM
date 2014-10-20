@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import javax.servlet.ServletContext;
-
 import org.obm.Configuration;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.dbcp.MultiNodeDatabaseModule;
@@ -48,7 +46,7 @@ public class ServicesTestModule extends AbstractModule {
 	
 	public final Configuration configuration;
 
-	public ServicesTestModule(@SuppressWarnings("unused") ServletContext servletContext) {
+	public ServicesTestModule() {
 		configuration = new Configuration();
 		configuration.obmUiBaseUrl = "localhost";
 		configuration.locator.url = "localhost";

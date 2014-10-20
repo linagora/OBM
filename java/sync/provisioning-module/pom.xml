@@ -63,10 +63,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>services-configuration-module</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
 			<artifactId>utils</artifactId>
 		</dependency>
 		<dependency>
