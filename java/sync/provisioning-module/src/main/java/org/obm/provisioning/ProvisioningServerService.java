@@ -43,6 +43,8 @@ import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseModule;
+import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
+import org.obm.healthcheck.HealthCheckModule;
 
 import com.google.inject.name.Names;
 import com.google.inject.servlet.ServletModule;
@@ -66,6 +68,8 @@ public class ProvisioningServerService extends ServletModule {
 		install(new DatabaseModule());
 		install(new TransactionalModule());
 		install(new ProvisioningService(servletContext));
+		install(new HealthCheckModule());
+		install(new HealthCheckDefaultHandlersModule());
 	}
 
 	private GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
