@@ -23,16 +23,8 @@
 			<artifactId>provisioning-module</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.linagora.obm.integration-testing</groupId>
-			<artifactId>arquillian-bundle</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.integration-testing</groupId>
-			<artifactId>services-integration-testing</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm.integration-testing</groupId>
-			<artifactId>utils-integration-testing</artifactId>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>provisioning-server</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
@@ -72,11 +64,6 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.arquillian.container</groupId>
-			<artifactId>arquillian-tomcat-managed-6</artifactId>
-			<version>${arquillian.tomcat.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

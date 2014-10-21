@@ -37,30 +37,57 @@ import static org.hamcrest.Matchers.containsString;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.getAdminUserJsonWithGroup;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.userUrl;
 
-import java.io.File;
 import java.net.URL;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.provisioning.ProvisioningArchiveUtils;
-import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
+import org.obm.dao.utils.H2InMemoryDatabase;
+import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.guice.GuiceRule;
+import org.obm.provisioning.TestingProvisioningModule;
+import org.obm.server.WebServer;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.jayway.restassured.RestAssured;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-@RunWith(ManagedTomcatGuiceArquillianRunner.class)
 public class UserIntegrationTest {
 
+	@Rule public TestRule chain = RuleChain
+			.outerRule(new GuiceRule(this, new TestingProvisioningModule()))
+			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
+				@Override
+				public H2InMemoryDatabase get() {
+					return db;
+				}
+			}, "dbInitialScriptUser.sql"));
+
+	@Inject private H2InMemoryDatabase db;
+	@Inject private WebServer server;
+	
+	private URL baseURL;
+	
+	@Before
+	public void init() throws Exception {
+		server.start();
+		baseURL = new URL("http", "localhost", server.getHttpPort(), "/");
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		server.stop();
+	}
+	
 	@Test
-	@RunAsClient
-	public void testGetUserWithGroup(@ArquillianResource URL baseURL) {
+	public void testGetUserWithGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("abf7c2bc-aa84-461c-b057-ee42c5dce40a");
 		RestAssured.baseURI = userUrl(baseURL, obmDomainUuid);
 		
@@ -71,11 +98,5 @@ public class UserIntegrationTest {
 			.body(containsString(getAdminUserJsonWithGroup())).
 		when()
 			.get("/Admin0ExtId");
-	}
-	
-	@Deployment
-	public static WebArchive createDeployment() throws Exception {
-		return ProvisioningArchiveUtils.buildWebArchive(
-				new File(ClassLoader.getSystemResource("dbInitialScriptUser.sql").toURI()));
 	}
 }

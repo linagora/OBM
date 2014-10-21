@@ -45,6 +45,7 @@ import java.util.Set;
 import org.h2.tools.RunScript;
 import org.junit.Rule;
 import org.junit.rules.ExternalResource;
+import org.obm.configuration.DatabaseConfiguration;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Closer;
@@ -57,8 +58,8 @@ import com.google.inject.Singleton;
  */
 @Singleton
 public class H2InMemoryDatabase {
-	public static final String DB_URL = "jdbc:h2:mem:daotest";
-
+	
+	private final DatabaseConfiguration dbConf;
 	private final Set<Connection> openedConnections;
 
 	static {
@@ -76,7 +77,8 @@ public class H2InMemoryDatabase {
 	 * @param initialSql The initial SQL script to load when the DB is started.
 	 */
 	@Inject
-	public H2InMemoryDatabase() {
+	public H2InMemoryDatabase(DatabaseConfiguration configuration) {
+		this.dbConf = configuration;
 		this.openedConnections = new HashSet<Connection>();
 	}
 
@@ -136,7 +138,10 @@ public class H2InMemoryDatabase {
 	 * @throws Exception If the connection couldn't be created.
 	 */
 	public Connection getConnection() throws Exception {
-		Connection connection = DriverManager.getConnection(DB_URL);
+		Connection connection = DriverManager.getConnection(
+				"jdbc:h2:mem:" + dbConf.getDatabaseName(), 
+				dbConf.getDatabaseLogin(), 
+				dbConf.getDatabasePassword());
 
 		openedConnections.add(connection);
 

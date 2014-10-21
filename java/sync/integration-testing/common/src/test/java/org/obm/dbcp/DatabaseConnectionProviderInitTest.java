@@ -102,9 +102,8 @@ public class DatabaseConnectionProviderInitTest {
 			testee.getConnection();
 		} catch (SQLException e) {
 			//make database exists
-			DatabaseConfigurationFixtureH2 configuration = new DatabaseConfigurationFixtureH2();
-			DriverManager.getConnection(h2Driver.getDriverProperties(configuration).get("URL"), 
-					configuration.getDatabaseLogin(), configuration.getDatabasePassword());
+			DatabaseConfigurationFixtureH2 conf = new DatabaseConfigurationFixtureH2();
+			DriverManager.getConnection(h2Driver.getDriverProperties(conf).get("URL"), conf.getDatabaseLogin(), conf.getDatabasePassword());
 			//then check that the pool now get one connection
 			connection = testee.getConnection();
 		}

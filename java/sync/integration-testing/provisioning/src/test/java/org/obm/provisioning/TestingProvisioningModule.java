@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import javax.servlet.ServletContext;
-
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.DatabaseConfiguration;
@@ -40,6 +38,9 @@ import org.obm.configuration.TransactionConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
+import org.obm.server.EmbeddedServerModule;
+import org.obm.server.ServerConfiguration;
+import org.obm.server.context.NoContext;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -50,8 +51,8 @@ public class TestingProvisioningModule extends AbstractModule {
 
 	private Module module;
 
-	public TestingProvisioningModule(ServletContext servletContext) {
-		module = Modules.override(new ProvisioningServerService(servletContext)).with(new OverridingModule());
+	public TestingProvisioningModule() {
+		module = Modules.override(new ProvisioningServerService(new NoContext())).with(new OverridingModule());
 	}
 	
 	@Override
@@ -65,11 +66,13 @@ public class TestingProvisioningModule extends AbstractModule {
 		protected void configure() {
 			Configuration.Transaction transaction = new Configuration.Transaction();
 			transaction.timeoutInSeconds = 3600;
-	
+
 			bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(transaction));
 			Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
 			databaseDrivers.addBinding().to(H2DriverConfiguration.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
+
+			install(new EmbeddedServerModule(ServerConfiguration.defaultConfiguration()));
 		}
 	}
 }

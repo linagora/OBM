@@ -35,35 +35,61 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.batchUrl;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.domainUrl;
-import static org.obm.provisioning.ProvisioningIntegrationTestUtils.groupUrl;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.getAdminUserJson;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.groupUrl;
 
-import java.io.File;
 import java.net.URL;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.provisioning.ProvisioningArchiveUtils;
-import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
+import org.obm.dao.utils.H2InMemoryDatabase;
+import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.guice.GuiceRule;
+import org.obm.provisioning.TestingProvisioningModule;
+import org.obm.server.WebServer;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-
-@RunWith(ManagedTomcatGuiceArquillianRunner.class)
 public class GroupIntegrationTest {
 
+	@Rule public TestRule chain = RuleChain
+			.outerRule(new GuiceRule(this, new TestingProvisioningModule()))
+			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
+				@Override
+				public H2InMemoryDatabase get() {
+					return db;
+				}
+			}, "dbInitialScriptGroup.sql"));
+
+	@Inject private H2InMemoryDatabase db;
+	@Inject private WebServer server;
+	
+	private URL baseURL;
+	
+	@Before
+	public void init() throws Exception {
+		server.start();
+		baseURL = new URL("http", "localhost", server.getHttpPort(), "/");
+	}
+	
+	@After
+	public void tearDown() throws Exception {
+		server.stop();
+	}
+	
 	@Test
-	@RunAsClient
-	public void testGetNonExistGroup(@ArquillianResource URL baseURL) {
+	public void testGetNonExistGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 		
@@ -76,8 +102,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testGetGroup(@ArquillianResource URL baseURL) {
+	public void testGetGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 		
@@ -101,8 +126,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testGetGroupWithUsers(@ArquillianResource URL baseURL) {
+	public void testGetGroupWithUsers() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 
@@ -130,8 +154,7 @@ public class GroupIntegrationTest {
 
 
 	@Test
-	@RunAsClient
-	public void testGetGroupWithTwoSubgroup(@ArquillianResource URL baseURL) {
+	public void testGetGroupWithTwoSubgroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 		
@@ -176,8 +199,7 @@ public class GroupIntegrationTest {
 	}
 	
 	@Test
-	@RunAsClient
-	public void testGetUsersFromGroup(@ArquillianResource URL baseURL) {
+	public void testGetUsersFromGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 
@@ -191,8 +213,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testGetUserOfNonExistGroup(@ArquillianResource URL baseURL) {
+	public void testGetUserOfNonExistGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 
@@ -205,8 +226,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testGetUsersFromGroupWhoHaveNoUser(@ArquillianResource URL baseURL) {
+	public void testGetUsersFromGroupWhoHaveNoUser() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 
@@ -221,8 +241,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testGetSubGroupOfNonExistGroup(@ArquillianResource URL baseURL) {
+	public void testGetSubGroupOfNonExistGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 		
@@ -235,8 +254,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testGetSubGroupWithUsers(@ArquillianResource URL baseURL) {
+	public void testGetSubGroupWithUsers() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 
@@ -262,8 +280,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testGetGroupWhoHaveSubgroupWithDefaultExpandDepth(@ArquillianResource URL baseURL) {
+	public void testGetGroupWhoHaveSubgroupWithDefaultExpandDepth() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 		
@@ -287,8 +304,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testGetGroupWhoHaveSubgroupWithOneExpandDepth(@ArquillianResource URL baseURL) {
+	public void testGetGroupWhoHaveSubgroupWithOneExpandDepth() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 
@@ -325,8 +341,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testGetGroupWhoHaveSubgroupWithTwoExpandDepth(@ArquillianResource URL baseURL) {
+	public void testGetGroupWhoHaveSubgroupWithTwoExpandDepth() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 
@@ -363,8 +378,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testGetGroupWhoHaveSubgroupWithInfiniteExpandDepth(@ArquillianResource URL baseURL) {
+	public void testGetGroupWhoHaveSubgroupWithInfiniteExpandDepth() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 
@@ -401,8 +415,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testGetGroupWithSubgroup(@ArquillianResource URL baseURL) {
+	public void testGetGroupWithSubgroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 		
@@ -437,8 +450,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testCreateGroup(@ArquillianResource URL baseURL) {
+	public void testCreateGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = getBatchId(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
@@ -483,8 +495,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testModifyGroupByPutMethod(@ArquillianResource URL baseURL) {
+	public void testModifyGroupByPutMethod() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = getBatchId(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
@@ -537,8 +548,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testModifyGroupByPatchMethod(@ArquillianResource URL baseURL) {
+	public void testModifyGroupByPatchMethod() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = getBatchId(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
@@ -577,8 +587,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testDeleteGroup(@ArquillianResource URL baseURL) {
+	public void testDeleteGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = getBatchId(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
@@ -613,8 +622,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testAddUserToGroup(@ArquillianResource URL baseURL) {
+	public void testAddUserToGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = getBatchId(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
@@ -649,8 +657,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testDeleteUserFromGroup(@ArquillianResource URL baseURL) {
+	public void testDeleteUserFromGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = getBatchId(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
@@ -685,8 +692,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testAddSubgroupToGroup(@ArquillianResource URL baseURL) {
+	public void testAddSubgroupToGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = getBatchId(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
@@ -721,8 +727,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testDeleteSubgroupFromGroup(@ArquillianResource URL baseURL) {
+	public void testDeleteSubgroupFromGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = getBatchId(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
@@ -757,8 +762,7 @@ public class GroupIntegrationTest {
 	}
 
 	@Test
-	@RunAsClient
-	public void testListPublicGroups(@ArquillianResource URL baseURL) {
+	public void testListPublicGroups() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = groupUrl(baseURL, obmDomainUuid);
 
@@ -801,7 +805,7 @@ public class GroupIntegrationTest {
 			.get("/");
 	}
 
-	private static String getBatchId(@ArquillianResource URL baseURL, ObmDomainUuid obmDomainUuid) {
+	private static String getBatchId(URL baseURL, ObmDomainUuid obmDomainUuid) {
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 
 		  String batchId =  given()
@@ -809,12 +813,5 @@ public class GroupIntegrationTest {
 			.post("/batches").jsonPath().getString("id");
 
 		return batchId;
-	}
-	
-
-	@Deployment
-	public static WebArchive createDeployment() throws Exception {
-		return ProvisioningArchiveUtils.buildWebArchive(
-				new File(ClassLoader.getSystemResource("dbInitialScriptGroup.sql").toURI()));
 	}
 }

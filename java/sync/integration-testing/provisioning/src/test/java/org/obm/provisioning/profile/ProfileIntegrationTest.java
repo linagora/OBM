@@ -39,23 +39,53 @@ import java.net.URL;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.test.api.ArquillianResource;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.obm.provisioning.CommonIntegrationTest;
-import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TestRule;
+import org.obm.dao.utils.H2InMemoryDatabase;
+import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.guice.GuiceRule;
+import org.obm.provisioning.TestingProvisioningModule;
+import org.obm.server.WebServer;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.jayway.restassured.RestAssured;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-@RunWith(ManagedTomcatGuiceArquillianRunner.class)
-public class ProfileIntegrationTest extends CommonIntegrationTest {
+public class ProfileIntegrationTest {
+
+	@Rule public TestRule chain = RuleChain
+			.outerRule(new GuiceRule(this, new TestingProvisioningModule()))
+			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
+				@Override
+				public H2InMemoryDatabase get() {
+					return db;
+				}
+			}, "dbInitialScript.sql"));
+
+	@Inject private H2InMemoryDatabase db;
+	@Inject private WebServer server;
+	
+	private URL baseURL;
+	
+	@Before
+	public void init() throws Exception {
+		server.start();
+		baseURL = new URL("http", "localhost", server.getHttpPort(), "/");
+	}
+	
+	@After
+	public void tearDown() throws Exception {
+		server.stop();
+	}
 	
 	@Test
-	@RunAsClient
-	public void testGetProfilesWhenDomainExists(@ArquillianResource URL baseURL) {
+	public void testGetProfilesWhenDomainExists() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
@@ -72,8 +102,7 @@ public class ProfileIntegrationTest extends CommonIntegrationTest {
 	}
 	
 	@Test
-	@RunAsClient
-	public void testGetProfilesWhenDomainExistsButNoProfile(@ArquillianResource URL baseURL) {
+	public void testGetProfilesWhenDomainExistsButNoProfile() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("68936f0f-2bb5-447c-87f5-efcd46f58122");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
@@ -88,8 +117,7 @@ public class ProfileIntegrationTest extends CommonIntegrationTest {
 	}
 	
 	@Test
-	@RunAsClient
-	public void testGetProfilesWhenDoNotDomainExists(@ArquillianResource URL baseURL) {
+	public void testGetProfilesWhenDoNotDomainExists() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("99999999-9999-9999-9999-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
@@ -102,8 +130,7 @@ public class ProfileIntegrationTest extends CommonIntegrationTest {
 	}
 	
 	@Test
-	@RunAsClient
-	public void testGetProfileNameWhenProfileExists(@ArquillianResource URL baseURL) {
+	public void testGetProfileNameWhenProfileExists() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
@@ -118,8 +145,7 @@ public class ProfileIntegrationTest extends CommonIntegrationTest {
 	}
 	
 	@Test
-	@RunAsClient
-	public void testGetProfileNameWhenProfileExistsInAnotherDomain(@ArquillianResource URL baseURL) {
+	public void testGetProfileNameWhenProfileExistsInAnotherDomain() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
@@ -132,8 +158,7 @@ public class ProfileIntegrationTest extends CommonIntegrationTest {
 	}
 	
 	@Test
-	@RunAsClient
-	public void testGetProfileNameWhenProfileDoNotExists(@ArquillianResource URL baseURL) {
+	public void testGetProfileNameWhenProfileDoNotExists() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 		
