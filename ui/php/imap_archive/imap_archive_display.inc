@@ -39,6 +39,8 @@ applicable to the OBM software.
 ///////////////////////////////////////////////////////////////////////////////
 
 include_once("$obminclude/global.inc");
+require_once("$obminclude/javascript/check_js.inc");
+require_once("$obminclude/of/of_query.inc");
 require_once('imap_archive_query.inc');
 require_once('imap_archive_ordering.php');
 
@@ -47,10 +49,10 @@ require_once('imap_archive_ordering.php');
 ///////////////////////////////////////////////////////////////////////////////
 
 function dis_imap_archive_form($params, $configuration) {
-  global $l_users, $l_validate;
+  global $l_validate;
   global $l_service_activating, $l_activating;
   global $l_scheduling;
-  global $l_excluded_folder, $l_folder, $l_excluded_users, $l_name, $l_delete, $l_remove_archive;
+  global $l_excluded_folder, $l_folder, $l_excluded_users;
   global $l_mailing_feedback, $l_email_address;
 
   $user_id = $params['user_id'];
@@ -64,6 +66,7 @@ function dis_imap_archive_form($params, $configuration) {
   $hour = $configuration->hour;
   $minute = $configuration->minute;
   $excludedFolder = $configuration->excludedFolder;
+  $excludedUserIds = $configuration->excludedUserIds;
   
   $disabled = ($enabled == 0) ? "disabled" : "";
   $block_repeat_kind = get_block_repeat_kind($repeatKind, $disabled);
@@ -73,6 +76,9 @@ function dis_imap_archive_form($params, $configuration) {
   $block_hour = get_block_hour($hour, $disabled);
   $block_minute = get_block_minute($minute, $disabled);
   $block_next_treatment_date = get_block_next_treatment_date($configuration);
+  $block_excluded_users = get_block_excluded_users($excludedUserIds);
+  
+  $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_excluded_user_id', 'userSearch', {filter_pattern:'access'});";
   
   $block = "
     <form method='get' name='f_imap_archive' action='imap_archive_index.php'>
@@ -129,33 +135,7 @@ function dis_imap_archive_form($params, $configuration) {
     </fieldset>
     <fieldset class='detail infos'>
       <legend>$l_excluded_users</legend>
-      <table>
-        <th>$l_users</th>
-        <td class='autocompleteField'>
-          <input type='text' name='' value='' id='userSearch' autocomplete='off' />
-          <input type='hidden' id='userSearchContainer' value='sel_user_id'/>
-        </td>
-        <table class='spreadSheet'>
-          <thead>
-            <tr>
-              <td>$l_name</td>
-              <td>$l_delete</td>
-              <td>$l_remove_archive</td>
-            </tr>
-          </thead>
-          <tbody>
-            <tr id='user_1' class='user'>
-              <td>admin0</td>
-              <td>
-                <img onclick='obm.imapArchiveManager.removeExcludedUser(1);' src='/images/themes/default/images/ico_trash.gif'></img>
-              </td>
-              <td>
-                <img onclick='obm.imapArchiveManager.destroyExcludedUser(1);' src='/images/themes/default/images/ico_delete.gif'></img>
-              </td>
-            </tr>
-          </tbody>
-        <table>
-      </table>
+      $block_excluded_users
     </fieldset>
     <fieldset class='detail infos'>
       <legend>$l_mailing_feedback</legend>
@@ -187,8 +167,12 @@ function dis_imap_archive_form($params, $configuration) {
       <input type='submit' value=$l_validate onclick=\"enableConfiguration(true);\"/>
     </div>
     </form>
-  ";
 
+    <script type=\"text/javascript\">
+      obm.initialize.chain(function () {
+        $user_js
+      });
+    </script>";
 
   return $block;
 }
@@ -365,6 +349,46 @@ function formatStringAsDateString($dateAsString) {
   $date->setTimezone(new DateTimeZone('UTC'));
 
   return is_null($date) ? '' : $date->format('Y-m-d H:i');
+}
+
+function get_block_excluded_users($excludedUserIds) {
+  global $l_users, $ico_delete;
+  global $l_name, $l_delete, $l_remove_archive;
+  
+  $users = (count($excludedUserIds) > 0) ? get_userobm_from_ext_ids($excludedUserIds) : array();
+  if (is_array($users['entity'])) {
+    $dis_sel_user = "";
+    foreach ($users['entity'] as $u_ext_id => $u_ent) {
+      $u_name = $u_ent['label'];
+      $sel_id = $u_ext_id;
+      $div_id = "sel_excluded_user_id-$sel_id";
+      $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+      <a href=\"javascript: remove_element('$div_id', 'sel_excluded_user_id');\">
+      <img src=\"$ico_delete\" alt=\"[Delete]\" />
+      </a>
+      $u_name
+      <input value=\"$sel_id\" name=\"sel_excluded_user_id[]\" type=\"hidden\" />
+      </div>";
+    }
+  }
+  
+  return "
+    <table>
+      <tr>
+        <th>$l_users</th>
+        <td class='autocompleteField'>
+          <input type='text' name='' value='' id='userSearch' autocomplete='off' />
+          <input type='hidden' id='userSearchContainer' value='sel_excluded_user_id'/>
+        </td>
+      </tr>
+      <tr>
+        <th></th>
+        <td class='autocompleteResult'>
+          <span class='legend'>$GLOBALS[l_user]</span>
+          <div id='sel_excluded_user_id'>$dis_sel_user</div>
+        </td>
+      </tr>
+    </table>";
 }
 
 ///////////////////////////////////////////////////////////////////////////////

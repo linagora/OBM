@@ -76,7 +76,7 @@ if ($status[0] != 1) {
       $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
       $action = 'detailupdate';
     } else {
-      $ret = run_query_imap_archive_update($params);
+      $ret = run_query_imap_archive_update((object) $params);
       if ($ret[0] == 1) {
         $display['msg'] .= display_ok_msg($l_update_ok);
       } else {
