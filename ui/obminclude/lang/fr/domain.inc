@@ -16,6 +16,7 @@ $l_solr_servers = "Serveurs d'indexation";
 $l_imap_frontend_servers = "Serveurs IMAP frontaux";
 $l_imap_archive_servers = "Serveurs d'archivage IMAP";
 $l_ldap_servers = "Serveurs LDAP";
+$l_provisioning_servers = "Serveurs de provisioning";
 $l_max_quota = "Valeur max";
 $l_update_state = "Etat de mise à jour";
 
@@ -76,6 +77,7 @@ $l_solrserver_warn = 'Vous devez créer un hôte de ce type';
 $l_imapfrontendserver_warn = 'Vous devez créer un hôte de ce type';
 $l_imaparchiveserver_warn = 'Vous devez créer un hôte de ce type';
 $l_ldapserver_warn = 'Vous devez créer un hôte de ce type';
+$l_provisioningserver_warn = "Vous devez créer un hôte de ce type";
 
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';

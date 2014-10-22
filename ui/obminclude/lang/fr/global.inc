@@ -453,6 +453,7 @@ $l_header_select_solrserver = "Selection du serveur Solr";
 $l_header_select_imapfrontendserver = "Selection du serveur frontal IMAP";
 $l_header_select_imap_archive_server = "Selection du serveur d'archivage IMAP";
 $l_header_select_ldapserver = "Selection du serveur LDAP";
+$l_header_select_provisioningserver = "Sélection du serveur de provisioning";
 $l_header_upd_group = "Modifier groupes";
 $l_header_convert_deal = "Convertir en Affaire";
 $l_header_add_deal = "Ajouter affaire";

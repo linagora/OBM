@@ -16,6 +16,7 @@ $l_solr_servers = "Indexing servers";
 $l_imap_frontend_servers = "IMAP frontend servers";
 $l_imap_archive_servers = "IMAP archive servers";
 $l_ldap_servers = "LDAP servers";
+$l_provisioning_servers = "Provisioning servers";
 $l_max_quota = "Max value";
 
 // Mail chooser labels
@@ -68,6 +69,7 @@ $l_imaparchiveserver_warn = "You have to create a host of this kind first";
 $l_opushserver_warn = "You have to create a host of this kind first";
 $l_opushfrontendserver_warn = "You have to create a host of this kind first";
 $l_ldapserver_warn = "You have to create a host of this kind first";
+$l_provisioningserver_warn = "You have to create a host of this kind first";
 
 $l_mailserver = "Mail server";
 $l_imap = 'IMAP';

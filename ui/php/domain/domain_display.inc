@@ -174,9 +174,10 @@ function dis_domain_consult($domain) {
   $imapfrontendservers = of_domain_get_domain_imapfrontendserver($id);
   $imaparchiveservers = of_domain_get_domain_imaparchiveserver($id);
   $backupftpservers = of_domain_get_domain_backupftpserver($id);
+  $provisioningservers = of_domain_get_domain_provisioningserver($id);
   $samba = run_query_domain_samba_properties($id);
   if ($obm_q->num_rows() == 1) {
-    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers, $solrservers, $imapfrontendservers, $backupftpservers, $opushservers, $opushfrontendservers, $ldapservers, $imaparchiveservers);
+    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers, $solrservers, $imapfrontendservers, $backupftpservers, $opushservers, $opushfrontendservers, $ldapservers, $imaparchiveservers, $provisioningservers);
   } else {
     $display['msg'] .= display_err_msg($l_query_error);
   }
@@ -191,7 +192,7 @@ function dis_domain_consult($domain) {
 //   - $obm_q       : domain database result
 //   - $mailservers : domain mailservers array
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers=NULL,$solrservers=NULL, $imapfrontendservers=NULL, $backupftpservers=NULL, $opushservers = NULL, $opushfrontendservers=NULL, $ldapservers=NULL, $imaparchiveservers = NULL) {
+function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers=NULL,$solrservers=NULL, $imapfrontendservers=NULL, $backupftpservers=NULL, $opushservers = NULL, $opushfrontendservers=NULL, $ldapservers=NULL, $imaparchiveservers = NULL, $provisioningservers=NULL) {
   global $display, $ico_delete, $l_mail_server, $l_sync_servers, $cgp_use, $l_properties, $l_solr_servers, $l_ldap_servers;
   global $l_label, $l_domain, $l_desc, $l_domain_name, $l_alias;
   global $l_host, $l_ip, $l_role, $l_mail_servers, $l_header_delete;
@@ -466,6 +467,42 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
     }
   }
   
+  // Domain provisioning server 
+  // Get the domain provisioningservers
+  $block_s = '';
+  if (is_array($provisioningservers)) {
+    foreach ($provisioningservers as $s_id => $provisioningserver_info) {
+	    foreach ($provisioningserver_info as $server_info) {
+	      $name = $server_info['name'];
+	      $ip = $server_info['ip'];
+	      $role = $server_info['role'];
+	      $block_provisioningservers .= "
+            <tr>
+            <td>$name</td>
+            <td>$ip</td>
+            <td>$role</td>
+            </tr>";
+	    }
+    }
+    if ($block_provisioningservers != '') {
+          $block_provisioning = "
+          <div class=\"detail infos\">
+          <h1>$GLOBALS[l_provisioning_servers]</h1>
+
+          <table class=\"spreadSheet\">
+          <thead>
+          <tr>
+            <th>$l_host</th>
+            <th>$l_ip</th>
+            <th>$l_role</th>
+          </tr>
+          </thead>
+          $block_provisioningservers
+          </table>
+          </div>";
+    }
+  }
+
   // Domain backup_ftp server 
   // Get the domain backupftpservers
   $block_s = '';
@@ -586,6 +623,7 @@ $block_ldap
 $block_sync
 $block_solr
 $block_backupftp
+$block_provisioning
 $dis_samba
 $properties_block    
 ";
@@ -601,7 +639,7 @@ $properties_block
 //   - $domain      : default values or updated values (if error)
 //     kes used   : id, name, passwd, perms, email
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrservers = NULL, $imapfrontendservers, $backupftpservers=NULL, $samba, $properties_q, $domain, $opushservers = NULL, $opushfrontendservers = NULL, $ldapservers = NULL, $imap_archive_servers = NULL) {
+function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrservers = NULL, $imapfrontendservers, $backupftpservers=NULL, $samba, $properties_q, $domain, $opushservers = NULL, $opushfrontendservers = NULL, $ldapservers = NULL, $imap_archive_servers = NULL, $provisioningservers = NULL) {
   global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
   global $l_insert, $l_update,$l_mail_server, $l_header_add_mailserver;
   global $display, $cgp_use, $c_none, $l_none, $l_properties;
@@ -647,6 +685,9 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
     foreach($backupftpservers as $backupftpserver_id => $backupftpserver) {
       $backup_ftp[] = $backupftpserver_id;
     }
+    foreach($provisioningservers as $provisioningserver_id => $provisioningserver) {
+      $provisioning[] = $provisioningserver_id;
+    }
   }
 
   // If parameters have been given, they supercede the default action value
@@ -667,6 +708,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
   if (isset($domain['ldap'])) { $ldap = $domain['ldap'];}
   if (isset($domain['imap_frontend'])) { $imap_frontend = $domain['imap_frontend'];}
   if (isset($domain['backup_ftp'])) { $backup_ftp = $domain['backup_ftp'];}
+  if (isset($domain['provisioning'])) { $provisioning = $domain['provisioning'];}
   if (isset($domain['samba'])) { $samba = $domain['samba'];}
 
   while($properties_q->next_record()) {
@@ -1151,6 +1193,41 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
   </fieldset>";
     }
 
+  $provisioningservers = get_domain_provisioningservers($id);
+  if (is_array($provisioning)) {
+    foreach($provisioning as $provisioning_id) {
+      $provisioning_sel = $provisioning_id;
+    }
+  }
+  if (sizeof($provisioningservers) > 0) {
+    foreach($provisioningservers as $host_id => $serverinfos) {
+      $selected = '';
+      if(isset($provisioning_sel) && $provisioning_sel == $host_id) $selected = "selected='selected'";        
+      $provisioning_list .= "<option value=\"$host_id\" $selected>$serverinfos[name]</option>";
+    }
+    $dis_provisioning = "<fieldset class=\"detail infos\">
+      <legend>$GLOBALS[l_provisioning_servers]</legend>
+        <table>
+        <tr>
+        <th>$GLOBALS[l_header_select_provisioningserver]</th>
+        <td id='provisioningServer'>
+          <div class=\"multiple\">
+          <select name='sel_provisioning[]'>
+            <option value=''>---</option>
+            $provisioning_list
+          </select> 
+          </div>              
+        </td>
+        </tr>
+        </table>
+    </fieldset>";
+  } else {
+    $dis_provisioning = "
+      <fieldset class=\"detail infos\">
+        <legend class='warning'>$GLOBALS[l_provisioning_servers] : $GLOBALS[l_provisioningserver_warn]</legend>
+      </fieldset>";
+  }
+
   $backup_ftp_servers = get_domain_backupftpservers($id);
   if (sizeof($backup_ftp_servers) > 0) {
     if (is_array($backup_ftp)) {
@@ -1235,6 +1312,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $solrserver
     $dis_solr
     $dis_opush
     $dis_opush_frontend
+    $dis_provisioning
     $properties_block
     <fieldset class=\"buttons\">
     $dis_button

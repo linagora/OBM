@@ -72,6 +72,7 @@ $l_monitor = 'Supervision';
 $l_opush = 'OPush';
 $l_opush_frontend = 'OPush Frontal';
 $l_ldap = 'LDAP';
+$l_provisioning = 'Provisioning';
 
 
 $l_fqdn = 'Nom complet de la machine';

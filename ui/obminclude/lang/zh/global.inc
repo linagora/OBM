@@ -410,6 +410,7 @@ $l_header_select_solrserver = "选择solr服务器"; //"Select solr server"
 $l_header_select_imapfrontendserver = "选择IMAP前端"; //"Select IMAP frontend"
 $l_header_select_imap_archive_server = "选择IMAP存档";
 $l_header_select_ldapserver = "Select LDAP server";
+$l_header_select_provisioningserver = "选择配置服务器"; //"Select provisioning server"
 $l_header_upd_group = "更新分组"; //"Update groups"
 $l_header_convert_deal = "转换交易"; //"Convert to Deal"
 $l_header_add_deal = "添加交易"; //"Add deal"

@@ -55,6 +55,7 @@ $l_smtp_out = 'SMTP出'; //'SMTP out'
 $l_obm_sync = 'OBM同步'; //'OBM Sync'
 $l_imap_frontend = 'IMAP前端'; //'IMAP Frontend'
 $l_solr = 'Solr'; //'Solr'
+$l_provisioning = '供应'; // Provisioning
 $l_monitor = '监控'; //'Monitoring'/
 $l_ldap = 'LDAP';
 $l_fqdn = '符合标准的名称'; //'Fully qualified name'/

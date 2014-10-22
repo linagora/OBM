@@ -202,6 +202,8 @@ function run_query_domain_insert($domain) {
     of_service_property_insert('opush','opush', $entity_id, $domain['opush']);
     of_service_insert('opush_frontend', $entity_id);
     of_service_property_insert('opush','opush_frontend', $entity_id, $domain['opush_frontend']);
+    of_service_insert('provisioning', $entity_id);
+    of_service_property_insert('provisioning','provisioning', $entity_id, $domain['provisioning']);
     if (is_array($domain['backup_ftp']) && !empty($domain['backup_ftp'][0])) {
       of_service_insert('backup', $entity_id);
       of_service_property_insert('backup','backup_ftp', $entity_id, $domain['backup_ftp']);
@@ -527,6 +529,7 @@ function run_query_domain_update($domain_id, $domain) {
   of_service_property_replace('ldap','ldap', $entity_id, $domain['ldap']);
   of_service_property_replace('opush','opush', $entity_id, $domain['opush']);
   of_service_property_replace('opush','opush_frontend', $entity_id, $domain['opush_frontend']);
+  of_service_property_replace('provisioning','provisioning', $entity_id, $domain['provisioning']);
   of_service_delete('backup', $entity_id);
   of_service_property_delete_all('backup', $entity_id);
   if (is_array($domain['backup_ftp']) && !empty($domain['backup_ftp'][0])) {
@@ -1291,6 +1294,43 @@ function get_domain_frontendservers($domain_id= NULL) {
   return $m;
 }
 
+function get_domain_provisioningservers($domain_id= NULL) {
+  global $cdg_sql;
+
+  if ($domain_id > 0) {
+    $domain_id = sql_parse_id($domain_id, true);
+    // For one domain specified (domain update), global or domain syncserver
+    $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
+  } else {
+    // New domain (no id specified), host from domain 0
+    $where_domain = "AND (domain_global = true)";
+  }
+  $where = " AND (provisioning.service_id IS NOT NULL) ";
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT 
+      Host.*,
+      provisioning.service_id as host_provisioning
+    FROM Host 
+    INNER JOIN HostEntity ON hostentity_host_id = host_id
+    LEFT JOIN Domain ON domain_id = host_domain_id
+    LEFT JOIN Service as provisioning ON provisioning.service_service = 'provisioning' AND provisioning.service_entity_id = hostentity_entity_id    
+    WHERE 1 = 1
+    $where
+    $where_domain";
+  display_debug_msg($query, $cdg_sql, 'get_domain_provisioningservers()');
+  $obm_q->query($query);
+
+  $m = array();
+  while($obm_q->next_record()) {
+    $id = $obm_q->f('host_id');
+    $m[$id]['id'] = $id;
+    $m[$id]['name'] = $obm_q->f('host_name');
+    $m[$id]['provisioning'] = $obm_q->f('host_provisioning');
+  }
+
+  return $m;
+}
 
 /**
  * Get the backup_ftp server list candidate for a domain

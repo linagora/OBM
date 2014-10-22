@@ -53,6 +53,7 @@ $l_smtp_in = 'SMTP vào';
 $l_smtp_out = 'SMTP ra';
 $l_obm_sync = 'OBM đồng bộ';
 $l_imap_frontend = 'IMAP Frontend';
+$l_provisioning = 'cung cấp';
 $l_solr = 'Solr';
 $l_monitor = 'Giám sát';
 $l_fqdn = 'Tên đầy đủ của máy';

@@ -15,6 +15,7 @@ $l_sync_servers = "同步服务器"; //"Synchronization servers"
 $l_solr_servers = "索引服务器"; //"Indexing servers"
 $l_imap_frontend_servers = "IMAP前端服务器"; //"IMAP frontend servers"
 $l_imap_archive_servers = "IMAP归档服务器";
+$l_provisioning_servers = "配置服务器"; //"Provisioning servers"
 $l_ldap_servers = "LDAP servers";
 $l_max_quota = "最大值"; //"Max value"
 
@@ -65,6 +66,7 @@ $l_solrserver_warn = "您首先必须创建一个这种类型的主机"; //"You 
 $l_imapfrontendserver_warn = "您首先必须创建一个这种类型的主机"; // "You have to create a host of this kind first"
 $l_imaparchiveserver_warn = "您首先必须创建一个这种类型的主机"; // "You have to create a host of this kind first"
 $l_ldapserver_warn = "您首先必须创建一个这种类型的主机"; //"You have to create a host of this kind first"
+$l_provisioningserver_warn = "您首先必须创建一个这种类型的主机"; //"You have to create a host of this kind first"
 
 $l_mailserver = "邮件服务器"; //"Mail server"
 $l_imap = 'IMAP';  //'IMAP'

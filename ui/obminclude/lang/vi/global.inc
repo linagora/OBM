@@ -410,6 +410,7 @@ $l_header_select_syncserver = "Chọn obm-sync server";
 $l_header_select_solrserver = "Chọn solr server";
 $l_header_select_imapfrontendserver = "Chọn IMAP frontend";
 $l_header_select_imap_archive_server = "Chọn lưu trữ IMAP";
+$l_header_select_provisioningserver = "Chọn cấp dưỡng server";
 $l_header_upd_group = "Cập nhật các nhóm";
 $l_header_convert_deal = "Chuyển đổi sang giao dịch";
 $l_header_add_deal = "Thêm giao dịch";
