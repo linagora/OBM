@@ -1,0 +1,18 @@
+{
+    "checks": [
+        {
+            "id": "ConnectionStatus",
+            "name": "Provisioning Connection Check",
+            "description": "Checks that the provisioning server(s) are up and running.",
+            "url": null,
+            "parentId": null
+        },
+        {
+            "id": "JavaVersionStatus",
+            "name": "Provisioning JVM Version Check",
+            "description": "Checks that the provisioning server(s) runs on the proper JVM version",
+            "url": null,
+            "parentId": null
+        }
+    ]
+}
