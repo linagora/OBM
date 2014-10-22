@@ -43,8 +43,11 @@ import org.obm.provisioning.authorization.AuthorizationServiceImpl;
 
 public class AuthorizingModule extends ShiroWebModule {
 
-	public AuthorizingModule(ServletContext servletContext) {
+	private final String baseUrl;
+
+	public AuthorizingModule(ServletContext servletContext, String baseUrl) {
 		super(servletContext);
+		this.baseUrl = baseUrl;
 	}
 
 	@Override
@@ -62,10 +65,10 @@ public class AuthorizingModule extends ShiroWebModule {
 		bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
 		bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
 
-		addFilterChain("/provisioning/v1/*/users/**", AUTHC_BASIC);
-		addFilterChain("/provisioning/v1/*/groups/**", AUTHC_BASIC);
-		addFilterChain("/provisioning/v1/*/profiles/**", AUTHC_BASIC);
-		addFilterChain("/provisioning/v1/*/batches/**", AUTHC_BASIC);
+		addFilterChain(baseUrl + "*/users/**", AUTHC_BASIC);
+		addFilterChain(baseUrl + "*/groups/**", AUTHC_BASIC);
+		addFilterChain(baseUrl + "*/profiles/**", AUTHC_BASIC);
+		addFilterChain(baseUrl + "*/batches/**", AUTHC_BASIC);
 		expose(Realm.class);
 	}
 

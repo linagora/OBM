@@ -109,7 +109,7 @@ public class ProvisioningService extends ServletModule {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 	}
 	
-	public final static String PROVISIONING_ROOT_PATH = "provisioning/v1";
+	public final static String PROVISIONING_ROOT_PATH = "v1";
 	public final static String PROVISIONING_URL_PREFIX = "/" + PROVISIONING_ROOT_PATH;
 	public final static String PROVISIONING_URL_PATTERN = PROVISIONING_URL_PREFIX + "/*";
 
@@ -139,7 +139,7 @@ public class ProvisioningService extends ServletModule {
 		install(new SatelliteClientModule());
 		install(new CyrusClientModule());
 		install(new ShiroAopModule());
-		install(new AuthorizingModule(servletContext));
+		install(new AuthorizingModule(servletContext, PROVISIONING_URL_PREFIX + "/"));
 		install(new JerseyServletModule());
 	}
 
