@@ -129,7 +129,8 @@ public class ProvisioningService extends ServletModule {
 
 		serve(PROVISIONING_URL_PATTERN)
 			.with(GuiceProvisioningJerseyServlet.class, ImmutableMap.of(JSONConfiguration.FEATURE_POJO_MAPPING, "true"));
-
+		serve("/").with(RootServlet.class);
+		
 		bindRestResources();
 		
 		install(new DaoModule());
