@@ -32,6 +32,7 @@
 package org.obm.imap.archive.resources;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -62,6 +63,7 @@ import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.jayway.restassured.http.ContentType;
@@ -153,7 +155,7 @@ public class ConfigurationResourceTest {
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
-					.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
+					.values(domainId, Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)
@@ -170,8 +172,9 @@ public class ConfigurationResourceTest {
 			.auth().basic("admin@mydomain.org", "trust3dToken").
 		expect()
 			.contentType(ContentType.JSON)
-			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
-				"enabled", equalTo(true))
+			.body("domainId", equalTo(domainId),
+				"enabled", equalTo(true),
+				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "8e30e673-1c47-4ca8-85e8-4609d4228c10"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
@@ -256,6 +259,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(100).getDayOfYear();
 		domainConfigurationDto.hour = 11;
 		domainConfigurationDto.minute = 32;
+		domainConfigurationDto.excludedUserIds = ImmutableList.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "8e30e673-1c47-4ca8-85e8-4609d4228c10");
 		
 		given()
 			.auth().basic("admin@mydomain.org", "trust3dToken")
@@ -275,7 +279,8 @@ public class ConfigurationResourceTest {
 			.contentType(ContentType.JSON)
 			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
 				"enabled", equalTo(true),
-				"dayOfWeek", equalTo(DayOfWeek.TUESDAY.getSpecificationValue()))
+				"dayOfWeek", equalTo(DayOfWeek.TUESDAY.getSpecificationValue()),
+				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "8e30e673-1c47-4ca8-85e8-4609d4228c10"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
@@ -319,6 +324,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.hour = 11;
 		domainConfigurationDto.minute = 32;
 		domainConfigurationDto.excludedFolder = "anotherExcluded";
+		domainConfigurationDto.excludedUserIds = ImmutableList.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "2d7a5942-46ab-4fad-9bd2-608bde249671");
 		
 		given()
 			.port(server.getHttpPort())
@@ -338,7 +344,8 @@ public class ConfigurationResourceTest {
 			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
 				"enabled", equalTo(true),
 				"dayOfWeek", equalTo(DayOfWeek.WEDNESDAY.getSpecificationValue()),
-				"excludedFolder", equalTo("anotherExcluded"))
+				"excludedFolder", equalTo("anotherExcluded"),
+				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "2d7a5942-46ab-4fad-9bd2-608bde249671"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
