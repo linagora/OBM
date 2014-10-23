@@ -34,6 +34,7 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,6 +56,9 @@ import org.obm.satellite.client.exceptions.SatteliteClientException;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.UserPassword;
 
@@ -73,6 +77,17 @@ public class ConnectionImplTest {
 			.name("domain")
 			.host(ServiceProperty.IMAP, ObmHost.builder().ip("localhost").name("localIMAP").build())
 			.host(ServiceProperty.SMTP_IN, ObmHost.builder().ip("localhost").name("localMTA").build())
+			.build();
+	private final ObmDomain domainWithNoHosts = ObmDomain
+			.builder()
+			.name("domain")
+			.build();
+	private final ObmDomain domainWithThreeSmtpInHosts = ObmDomain
+			.builder()
+			.name("domain")
+			.host(ServiceProperty.SMTP_IN, ObmHost.builder().ip("localhost").name("localMTA").build())
+			.host(ServiceProperty.SMTP_IN, ObmHost.builder().ip("localhost").name("localMTA_2").build())
+			.host(ServiceProperty.SMTP_IN, ObmHost.builder().ip("localhost").name("localMTA_3").build())
 			.build();
 
 	@Before
@@ -95,6 +110,24 @@ public class ConnectionImplTest {
 		httpClient.close();
 	}
 
+	@Test(expected = SatteliteClientException.class)
+	public void testUpdateMTAShouldFailWhenNoSmtpInHostsAreLinked() {
+		testee = new ConnectionImpl(httpClient, configuration, domainWithNoHosts);
+		control.replay();
+
+		testee.updateMTA();
+	}
+
+	@Test(expected = SatteliteClientException.class)
+	public void testUpdateIMAPServerShouldFailWhenNoIMAPHostsAreLinked() {
+		testee = new ConnectionImpl(httpClient, configuration, domainWithNoHosts);
+
+		expect(configuration.isIMAPServerManaged()).andReturn(true);
+		control.replay();
+
+		testee.updateIMAPServer();
+	}
+
 	@Test
 	public void testUpdateMTA() {
 		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP);
@@ -105,9 +138,25 @@ public class ConnectionImplTest {
 
 		testee.updateMTA();
 
-		assertThat(servlet.done).isTrue();
-		assertThat(servlet.requestPath).isEqualTo("/postfixsmtpinmaps/host/localMTA");
-		assertThat(servlet.authentication).isEqualTo("Basic dXNlcjpwYXNz");
+		assertThat(servlet.requests).isEqualTo(ImmutableMap.of("/postfixsmtpinmaps/host/localMTA", "Basic dXNlcjpwYXNz"));
+	}
+
+	@Test
+	public void testUpdateMTAShouldUpdateAllSmtpInHosts() {
+		testee = new ConnectionImpl(httpClient, configuration, domainWithThreeSmtpInHosts);
+
+		expect(configuration.getSatelliteProtocol()).andReturn(SatelliteProtocol.HTTP).times(3);
+		expect(configuration.getSatellitePort()).andReturn(serverPort).times(3);
+		expect(configuration.getUsername()).andReturn("user").times(3);
+		expect(configuration.getPassword()).andReturn(UserPassword.valueOf("pass")).times(3);
+		control.replay();
+
+		testee.updateMTA();
+
+		assertThat(servlet.requests).isEqualTo(ImmutableMap.of(
+				"/postfixsmtpinmaps/host/localMTA", "Basic dXNlcjpwYXNz",
+				"/postfixsmtpinmaps/host/localMTA_2", "Basic dXNlcjpwYXNz",
+				"/postfixsmtpinmaps/host/localMTA_3", "Basic dXNlcjpwYXNz"));
 	}
 
 	@Test(expected = SatteliteClientException.class)
@@ -134,9 +183,7 @@ public class ConnectionImplTest {
 
 		testee.updateIMAPServer();
 
-		assertThat(servlet.done).isTrue();
-		assertThat(servlet.requestPath).isEqualTo("/cyruspartition/host/add/localIMAP");
-		assertThat(servlet.authentication).isEqualTo("Basic dXNlcjpwYXNz");
+		assertThat(servlet.requests).isEqualTo(ImmutableMap.of("/cyruspartition/host/add/localIMAP", "Basic dXNlcjpwYXNz"));
 	}
 
 	@Test
@@ -146,7 +193,7 @@ public class ConnectionImplTest {
 
 		testee.updateIMAPServer();
 
-		assertThat(servlet.done).isFalse();
+		assertThat(servlet.requests).isEmpty();
 	}
 
 	@Test(expected = SatteliteClientException.class)
@@ -174,16 +221,12 @@ public class ConnectionImplTest {
 
 	private class TestServlet extends HttpServlet {
 
-		String requestPath;
-		String authentication;
+		Map<String, String> requests = Maps.newConcurrentMap();
 		int statusCode = HttpStatus.SC_OK;
-		boolean done;
 
 		@Override
 		protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-			requestPath = req.getPathInfo();
-			authentication = req.getHeader("Authorization");
-			done = true;
+			requests.put(req.getPathInfo(), req.getHeader("Authorization"));
 
 			resp.setStatus(statusCode);
 		}
