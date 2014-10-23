@@ -32,6 +32,7 @@ package org.obm.satellite.client;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
@@ -66,13 +67,15 @@ public class ConnectionImpl implements Connection {
 
 	@Override
 	public void updateMTA() throws SatteliteClientException, ConnectionException {
-		ObmHost mtaHost = Iterables.getFirst(domain.getHosts().get(ServiceProperty.SMTP_IN), null);
+		Collection<ObmHost> smtpInHosts = domain.getHosts().get(ServiceProperty.SMTP_IN);
 
-		if (mtaHost == null) {
-			throw new SatteliteClientException(String.format("Domain %s doesn't have a linked mail/smtp_in host", domain.getName()));
+		if (smtpInHosts.isEmpty()) {
+			throw new SatteliteClientException(String.format("Domain %s doesn't have any linked mail/smtp_in host", domain.getName()));
 		}
 
-		post(mtaHost.getName(), mtaHost.getIp(), SATELLITE_MTA_PATH);
+		for (ObmHost mtaHost : smtpInHosts) {
+			post(mtaHost.getName(), mtaHost.getIp(), SATELLITE_MTA_PATH);
+		}
 	}
 
 	@Override
