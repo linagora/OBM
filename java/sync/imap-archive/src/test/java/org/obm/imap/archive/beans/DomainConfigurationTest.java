@@ -50,7 +50,7 @@ public class DomainConfigurationTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void builderShouldThrowWhenDomainIdIsNotProvided() {
-		DomainConfiguration.builder().enabled(false).build();
+		DomainConfiguration.builder().state(ConfigurationState.DISABLE).build();
 	}
 
 	@Test(expected=IllegalStateException.class)
@@ -61,7 +61,7 @@ public class DomainConfigurationTest {
 
 	@Test(expected=IllegalStateException.class)
 	public void builderShouldThrowWhenEnabledAndSchedulingConfigurationIsNotProvided() {
-		DomainConfiguration.builder().enabled(true).domain(
+		DomainConfiguration.builder().state(ConfigurationState.ENABLE).domain(
 				ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build()).build();
 	}
 	
@@ -69,7 +69,7 @@ public class DomainConfigurationTest {
 	public void builderShouldThrowWhenExcludeFolderContainsSlash() {
 		DomainConfiguration.builder()
 			.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
-			.enabled(true)
+			.state(ConfigurationState.ENABLE)
 			.schedulingConfiguration(SchedulingConfiguration.builder()
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
@@ -82,7 +82,7 @@ public class DomainConfigurationTest {
 	public void builderShouldThrowWhenExcludeFolderContainsAt() {
 		DomainConfiguration.builder()
 			.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
-			.enabled(true)
+			.state(ConfigurationState.ENABLE)
 			.schedulingConfiguration(SchedulingConfiguration.builder()
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
@@ -96,7 +96,7 @@ public class DomainConfigurationTest {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
 					.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
-					.enabled(true)
+					.state(ConfigurationState.ENABLE)
 					.schedulingConfiguration(SchedulingConfiguration.builder()
 							.recurrence(ArchiveRecurrence.daily())
 							.time(LocalTime.parse("13:23"))
@@ -116,7 +116,7 @@ public class DomainConfigurationTest {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
 					.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
-					.enabled(true)
+					.state(ConfigurationState.ENABLE)
 					.schedulingConfiguration(SchedulingConfiguration.builder()
 							.recurrence(ArchiveRecurrence.daily())
 							.time(LocalTime.parse("13:23"))
@@ -135,9 +135,10 @@ public class DomainConfigurationTest {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
 					.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
-					.enabled(false)
+					.state(ConfigurationState.DISABLE)
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
+		assertThat(configuration.getState()).isEqualTo(ConfigurationState.DISABLE);
 		assertThat(configuration.isEnabled()).isFalse();
 	}
 
@@ -146,7 +147,7 @@ public class DomainConfigurationTest {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
 					.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
-					.enabled(false)
+					.state(ConfigurationState.DISABLE)
 					.schedulingConfiguration(SchedulingConfiguration.builder()
 							.recurrence(ArchiveRecurrence.daily())
 							.time(LocalTime.parse("13:23"))
@@ -174,6 +175,7 @@ public class DomainConfigurationTest {
 		
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).build();
 		DomainConfiguration configuration = DomainConfiguration.DEFAULT_VALUES_BUILDER.domain(domain).build();
+		assertThat(configuration.getState()).isEqualTo(ConfigurationState.DISABLE);
 		assertThat(configuration.isEnabled()).isFalse();
 		assertThat(configuration.getRepeatKind()).isEqualTo(schedulingConfiguration.getRepeatKind());
 		assertThat(configuration.getDayOfMonth()).isEqualTo(schedulingConfiguration.getDayOfMonth());
@@ -210,6 +212,7 @@ public class DomainConfigurationTest {
 		
 		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
 		DomainConfiguration configuration = DomainConfiguration.from(domainConfigurationDto, domain);
+		assertThat(configuration.getState()).isEqualTo(ConfigurationState.ENABLE);
 		assertThat(configuration.isEnabled()).isEqualTo(expectedEnabled);
 		assertThat(configuration.getRepeatKind()).isEqualTo(expectedRepeatKind);
 		assertThat(configuration.getDayOfMonth()).isEqualTo(expectedDayOfMonth);

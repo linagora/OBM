@@ -53,6 +53,7 @@ import org.junit.rules.TemporaryFolder;
 import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.logging.LoggerAppenders;
@@ -152,7 +153,7 @@ public class ArchiveSchedulerTest {
 	public void scheduleShouldCallScheduler() throws Exception {
 		DomainConfiguration configuration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -176,7 +177,7 @@ public class ArchiveSchedulerTest {
 	public void scheduleShouldCallSchedulerWhenPreviousDomainTaskIsDone() throws Exception {
 		DomainConfiguration configuration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -207,7 +208,7 @@ public class ArchiveSchedulerTest {
 	public void scheduleShouldEnqueueWhenTaskForDomainAlreadyScheduled() throws Exception {
 		DomainConfiguration configuration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -243,7 +244,7 @@ public class ArchiveSchedulerTest {
 	public void scheduleShouldEnqueueRespectingOrderWhenTaskForDomainAlreadyRunning() throws Exception {
 		DomainConfiguration configuration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -290,7 +291,7 @@ public class ArchiveSchedulerTest {
 		ObmDomain domain2 = ObmDomain.builder().uuid(ObmDomainUuid.of("b9b7ea0f-a65e-4d2e-89b1-fb9ef4d2c97d")).name("mydomain2.org").build();
 		DomainConfiguration configuration1 = DomainConfiguration.builder()
 				.domain(domain1)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -298,7 +299,7 @@ public class ArchiveSchedulerTest {
 				.build();
 		DomainConfiguration configuration2 = DomainConfiguration.builder()
 				.domain(domain2)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -337,7 +338,7 @@ public class ArchiveSchedulerTest {
 		ObmDomain domain2 = ObmDomain.builder().uuid(ObmDomainUuid.of("b9b7ea0f-a65e-4d2e-89b1-fb9ef4d2c97d")).name("mydomain2.org").build();
 		DomainConfiguration configuration1 = DomainConfiguration.builder()
 				.domain(domain1)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -345,7 +346,7 @@ public class ArchiveSchedulerTest {
 				.build();
 		DomainConfiguration configuration2 = DomainConfiguration.builder()
 				.domain(domain2)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -409,7 +410,7 @@ public class ArchiveSchedulerTest {
 	public void clearDomainShouldRemoveScheduledButNotRunningTasks() throws Exception {
 		DomainConfiguration configuration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -446,7 +447,7 @@ public class ArchiveSchedulerTest {
 		ObmDomain domain2 = ObmDomain.builder().uuid(ObmDomainUuid.of("b9b7ea0f-a65e-4d2e-89b1-fb9ef4d2c97d")).name("mydomain2.org").build();
 		DomainConfiguration configuration1 = DomainConfiguration.builder()
 				.domain(domain1)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -454,7 +455,7 @@ public class ArchiveSchedulerTest {
 				.build();
 		DomainConfiguration configuration2 = DomainConfiguration.builder()
 				.domain(domain2)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))

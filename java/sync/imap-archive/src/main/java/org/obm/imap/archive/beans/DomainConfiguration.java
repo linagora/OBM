@@ -44,13 +44,13 @@ public class DomainConfiguration {
 	
 	public static final DomainConfiguration.Builder DEFAULT_VALUES_BUILDER = 
 		builder()
-			.enabled(false)
+			.state(ConfigurationState.DISABLE)
 			.schedulingConfiguration(SchedulingConfiguration.DEFAULT_VALUES_BUILDER);
 
 	public static DomainConfiguration from(DomainConfigurationDto configuration, ObmDomain domain) {
 		return DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(configuration.enabled)
+				.state(configuration.enabled ? ConfigurationState.ENABLE : ConfigurationState.DISABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
 							.repeat(RepeatKind.valueOf(configuration.repeatKind))
@@ -71,7 +71,7 @@ public class DomainConfiguration {
 	public static class Builder {
 		
 		private ObmDomain domain;
-		private Boolean enabled;
+		private ConfigurationState state;
 		private SchedulingConfiguration schedulingConfiguration;
 		private String excludedFolder;
 		
@@ -84,8 +84,8 @@ public class DomainConfiguration {
 			return this;
 		}
 
-		public Builder enabled(boolean enabled) {
-			this.enabled = enabled;
+		public Builder state(ConfigurationState state) {
+			this.state = state;
 			return this;
 		}
 
@@ -101,26 +101,26 @@ public class DomainConfiguration {
 		
 		public DomainConfiguration build() {
 			Preconditions.checkState(domain != null);
-			Preconditions.checkState(enabled != null);
-			if (enabled) {
+			Preconditions.checkState(state != null);
+			if (ConfigurationState.ENABLE == state) {
 				Preconditions.checkState(schedulingConfiguration != null);
 			}
 			if (excludedFolder != null) {
 				Preconditions.checkState(excludedFolder.contains("/") == false);
 				Preconditions.checkState(excludedFolder.contains("@") == false);
 			}
-			return new DomainConfiguration(domain, enabled, schedulingConfiguration, excludedFolder);
+			return new DomainConfiguration(domain, state, schedulingConfiguration, excludedFolder);
 		}
 	}
 	
 	private final ObmDomain domain;
-	private final boolean enabled;
+	private final ConfigurationState state;
 	private final SchedulingConfiguration schedulingConfiguration;
 	private final String excludedFolder;
 
-	private DomainConfiguration(ObmDomain domain, boolean enabled, SchedulingConfiguration schedulingConfiguration, String excludedFolder) {
+	private DomainConfiguration(ObmDomain domain, ConfigurationState state, SchedulingConfiguration schedulingConfiguration, String excludedFolder) {
 		this.domain = domain;
-		this.enabled = enabled;
+		this.state = state;
 		this.schedulingConfiguration = schedulingConfiguration;
 		this.excludedFolder = excludedFolder;
 	}
@@ -133,8 +133,12 @@ public class DomainConfiguration {
 		return domain.getUuid();
 	}
 	
+	public ConfigurationState getState() {
+		return state;
+	}
+	
 	public boolean isEnabled() {
-		return enabled;
+		return ConfigurationState.ENABLE.equals(state);
 	}
 	
 	public RepeatKind getRepeatKind() {
@@ -179,7 +183,7 @@ public class DomainConfiguration {
 	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(domain, enabled, schedulingConfiguration, excludedFolder);
+		return Objects.hashCode(domain, state, schedulingConfiguration, excludedFolder);
 	}
 	
 	@Override
@@ -187,7 +191,7 @@ public class DomainConfiguration {
 		if (object instanceof DomainConfiguration) {
 			DomainConfiguration that = (DomainConfiguration) object;
 			return Objects.equal(this.domain, that.domain)
-				&& Objects.equal(this.enabled, that.enabled)
+				&& Objects.equal(this.state, that.state)
 				&& Objects.equal(this.schedulingConfiguration, that.schedulingConfiguration)
 				&& Objects.equal(this.excludedFolder, that.excludedFolder);
 		}
@@ -198,7 +202,7 @@ public class DomainConfiguration {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("domain", domain)
-			.add("enabled", enabled)
+			.add("state", state)
 			.add("recurrence", schedulingConfiguration)
 			.add("excludedFolder", excludedFolder)
 			.toString();

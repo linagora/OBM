@@ -37,6 +37,7 @@ import java.sql.SQLException;
 import org.joda.time.LocalTime;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
@@ -122,7 +123,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 	private DomainConfiguration domainConfigurationFromResultSet(ResultSet rs, ObmDomain domain) throws SQLException {
 		return DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(rs.getBoolean(FIELDS.ACTIVATED))
+				.state(rs.getBoolean(FIELDS.ACTIVATED) ? ConfigurationState.ENABLE : ConfigurationState.DISABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
 							.dayOfMonth(DayOfMonth.of(rs.getInt(FIELDS.DAY_OF_MONTH)))

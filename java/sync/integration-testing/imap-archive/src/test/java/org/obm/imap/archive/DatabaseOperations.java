@@ -35,6 +35,7 @@ package org.obm.imap.archive;
 import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
 import org.obm.imap.archive.dao.SqlTables;
@@ -54,7 +55,7 @@ public class DatabaseOperations {
 				Operations.deleteAllFrom(SqlTables.MailArchiveRun.NAME));
 	}
 
-	public static Insert insertDomainConfiguration(ObmDomainUuid domainId, boolean activated) {
+	public static Insert insertDomainConfiguration(ObmDomainUuid domainId, ConfigurationState state) {
 		return Operations.insertInto(DomainConfigurationJdbcImpl.TABLE.NAME)
 			.columns(DomainConfigurationJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.ACTIVATED, 
@@ -65,7 +66,7 @@ public class DatabaseOperations {
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE)
 			.values(domainId.get(), 
-					activated, 
+					ConfigurationState.ENABLE == state ? true : false, 
 					RepeatKind.DAILY, 
 					2, 10, 355, 10, 32)
 			.build();

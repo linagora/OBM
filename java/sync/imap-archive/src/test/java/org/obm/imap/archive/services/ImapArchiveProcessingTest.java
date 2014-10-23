@@ -55,6 +55,7 @@ import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.Boundaries;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.ImapFolder;
 import org.obm.imap.archive.beans.Limit;
@@ -123,7 +124,7 @@ public class ImapArchiveProcessingTest {
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
@@ -179,7 +180,7 @@ public class ImapArchiveProcessingTest {
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
@@ -393,7 +394,7 @@ public class ImapArchiveProcessingTest {
 		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
@@ -444,7 +445,7 @@ public class ImapArchiveProcessingTest {
 		ObmDomain domain = ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
 			.domain(domain)
-			.enabled(true)
+			.state(ConfigurationState.ENABLE)
 			.schedulingConfiguration(SchedulingConfiguration.builder()
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
@@ -496,7 +497,7 @@ public class ImapArchiveProcessingTest {
 		ObmDomain domain = ObmDomain.builder().name("mydomain.org").uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
@@ -582,7 +583,7 @@ public class ImapArchiveProcessingTest {
 		ObmDomain domain = ObmDomain.builder().name("mydomain.org").uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))

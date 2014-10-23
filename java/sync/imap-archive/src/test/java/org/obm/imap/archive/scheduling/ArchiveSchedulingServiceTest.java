@@ -45,6 +45,7 @@ import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
@@ -93,7 +94,7 @@ public class ArchiveSchedulingServiceTest {
 		testSchedule(
 			DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -108,7 +109,7 @@ public class ArchiveSchedulingServiceTest {
 		testSchedule(
 			DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(false)
+				.state(ConfigurationState.DISABLE)
 				.schedulingConfiguration(
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
@@ -154,7 +155,7 @@ public class ArchiveSchedulingServiceTest {
 	public void scheduleByDomainUuidShouldGetDatesThenSchedule() throws Exception {
 		DomainConfiguration config = DomainConfiguration.builder()
 			.domain(domain)
-			.enabled(true)
+			.state(ConfigurationState.ENABLE)
 			.schedulingConfiguration(
 				SchedulingConfiguration.builder()
 					.time(LocalTime.parse("22:15"))
@@ -173,7 +174,7 @@ public class ArchiveSchedulingServiceTest {
 	public void scheduleByConfigShouldGetDatesThenSchedule() {
 		DomainConfiguration config = DomainConfiguration.builder()
 			.domain(domain)
-			.enabled(true)
+			.state(ConfigurationState.ENABLE)
 			.schedulingConfiguration(
 				SchedulingConfiguration.builder()
 					.time(LocalTime.parse("22:15"))
@@ -191,7 +192,7 @@ public class ArchiveSchedulingServiceTest {
 	public void scheduleByConfigShouldNotCheckEnabledStatus() {
 		DomainConfiguration config = DomainConfiguration.builder()
 			.domain(domain)
-			.enabled(false)
+			.state(ConfigurationState.DISABLE)
 			.schedulingConfiguration(
 				SchedulingConfiguration.builder()
 					.time(LocalTime.parse("22:15"))

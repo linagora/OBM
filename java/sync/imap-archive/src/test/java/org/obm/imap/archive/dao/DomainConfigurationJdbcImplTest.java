@@ -46,6 +46,7 @@ import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
@@ -147,7 +148,7 @@ public class DomainConfigurationJdbcImplTest {
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(false)
+				.state(ConfigurationState.DISABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
 							.repeat(RepeatKind.YEARLY)
@@ -181,7 +182,7 @@ public class DomainConfigurationJdbcImplTest {
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(false)
+				.state(ConfigurationState.DISABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
 							.repeat(RepeatKind.YEARLY)

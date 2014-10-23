@@ -51,6 +51,7 @@ import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.RepeatKind;
@@ -113,7 +114,7 @@ public class DryRunImapArchiveProcessingTest {
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
 				.domain(domain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))

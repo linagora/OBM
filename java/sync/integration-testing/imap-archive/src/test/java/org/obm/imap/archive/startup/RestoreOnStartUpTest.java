@@ -61,6 +61,7 @@ import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTerminatedTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
@@ -143,7 +144,7 @@ public class RestoreOnStartUpTest {
 		DateTime expectedScheduledTime = DateTime.parse("2026-11-02T03:04Z");
 		DomainConfiguration expectedScheduledDomainConfiguration = DomainConfiguration.builder()
 				.domain(expectedScheduledDomain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
 								.repeat(RepeatKind.DAILY)
@@ -166,7 +167,7 @@ public class RestoreOnStartUpTest {
 		DateTime expectedFailedStartTime = DateTime.parse("2026-10-01T01:01Z");
 		DomainConfiguration expectedFailedDomainConfiguration = DomainConfiguration.builder()
 				.domain(expectedFailedDomain)
-				.enabled(true)
+				.state(ConfigurationState.ENABLE)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
 								.repeat(RepeatKind.DAILY)

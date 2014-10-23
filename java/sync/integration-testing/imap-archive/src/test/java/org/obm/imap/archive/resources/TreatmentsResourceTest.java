@@ -61,6 +61,7 @@ import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
@@ -223,7 +224,7 @@ public class TreatmentsResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId);
 		
-		play(DatabaseOperations.insertDomainConfiguration(domainId, false));
+		play(DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.DISABLE));
 		
 		control.replay();
 		server.start();
@@ -245,7 +246,7 @@ public class TreatmentsResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId);
 		
-		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
+		play(DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -274,7 +275,7 @@ public class TreatmentsResourceTest {
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
-		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
+		play(DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -302,7 +303,7 @@ public class TreatmentsResourceTest {
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
-		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
+		play(DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -339,7 +340,7 @@ public class TreatmentsResourceTest {
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
-		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
+		play(DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -376,7 +377,7 @@ public class TreatmentsResourceTest {
 			.expectGetDomain(domainId)
 			.expectGetDomain(domainId);
 		
-		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
+		play(DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -440,7 +441,7 @@ public class TreatmentsResourceTest {
 			.expectTrustedLogin(domainId)
 			.expectGetDomain(domainId);
 		
-		play(DatabaseOperations.insertDomainConfiguration(domainId, true));
+		play(DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE));
 		
 		control.replay();
 		server.start();
@@ -466,7 +467,7 @@ public class TreatmentsResourceTest {
 			.expectGetDomain(domainId);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("7624b49f-4eb8-4b79-a396-c814ee5039bd");
-		play(Operations.sequenceOf(DatabaseOperations.insertDomainConfiguration(domainId, true),
+		play(Operations.sequenceOf(DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE),
 				DatabaseOperations.insertArchiveTreatment(runId, domainId)));
 		
 		control.replay();
@@ -495,7 +496,7 @@ public class TreatmentsResourceTest {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("7624b49f-4eb8-4b79-a396-c814ee5039bd");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("049bdc76-f991-4e40-ad96-1aeb3d9d3bae");
 		ArchiveTreatmentRunId runId3 = ArchiveTreatmentRunId.from("a8dc4c16-bc23-4f9f-9eb0-a0f18ff3f3b2");
-		play(Operations.sequenceOf(DatabaseOperations.insertDomainConfiguration(domainId, true),
+		play(Operations.sequenceOf(DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE),
 				DatabaseOperations.insertArchiveTreatment(runId, domainId),
 				DatabaseOperations.insertArchiveTreatment(runId2, domainId),
 				DatabaseOperations.insertArchiveTreatment(runId3, domainId)));

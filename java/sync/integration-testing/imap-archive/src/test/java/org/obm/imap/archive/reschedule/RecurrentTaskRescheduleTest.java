@@ -56,6 +56,7 @@ import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.TestImapArchiveModules.TimeBasedModule.TestDateProvider;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
@@ -143,7 +144,7 @@ public class RecurrentTaskRescheduleTest {
 		
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
 			.domain(ObmDomain.builder().uuid(domainUuid).name("mydomain.org").build())
-			.enabled(true)
+			.state(ConfigurationState.ENABLE)
 			.schedulingConfiguration(SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
 					.repeat(RepeatKind.DAILY)

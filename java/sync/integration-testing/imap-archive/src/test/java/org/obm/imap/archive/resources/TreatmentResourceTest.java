@@ -67,6 +67,7 @@ import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.TestImapArchiveModules.TimeBasedModule.TestDateProvider;
 import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.dao.SqlTables.MailArchiveRun;
 import org.obm.server.WebServer;
 
@@ -146,7 +147,7 @@ public class TreatmentResourceTest {
 		
 		UUID runId = TestImapArchiveModules.uuid;
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
-				DatabaseOperations.insertDomainConfiguration(domainId, true), 
+				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
 		
 		control.replay();
@@ -180,7 +181,7 @@ public class TreatmentResourceTest {
 			.expectGetDomain(domainId);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
-				DatabaseOperations.insertDomainConfiguration(domainId, true), 
+				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(TestImapArchiveModules.uuid), domainId)));
 		
 		control.replay();
@@ -206,7 +207,7 @@ public class TreatmentResourceTest {
 			.expectGetDomain(domainId);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
-				DatabaseOperations.insertDomainConfiguration(domainId, true)));
+				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -247,7 +248,7 @@ public class TreatmentResourceTest {
 			.expectGetDomain(domainId);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
-				DatabaseOperations.insertDomainConfiguration(domainId, true)));
+				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
 		
@@ -294,7 +295,7 @@ public class TreatmentResourceTest {
 		
 		UUID runId = TestImapArchiveModules.uuid;
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
-				DatabaseOperations.insertDomainConfiguration(domainId, true), 
+				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
 		
 		String expectedContent = "Old treatment file";
@@ -325,7 +326,7 @@ public class TreatmentResourceTest {
 		
 		UUID runId = TestImapArchiveModules.uuid;
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
-				DatabaseOperations.insertDomainConfiguration(domainId, true), 
+				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
 		
 		control.replay();
@@ -352,7 +353,7 @@ public class TreatmentResourceTest {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(TestImapArchiveModules.uuid);
 		final DateTime scheduled = TestImapArchiveModules.LOCAL_DATE_TIME.plusSeconds(2);
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
-				DatabaseOperations.insertDomainConfiguration(domainId, true), 
+				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				Operations.insertInto(MailArchiveRun.NAME)
 					.columns(MailArchiveRun.Fields.UUID,
 							MailArchiveRun.Fields.DOMAIN_UUID,

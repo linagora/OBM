@@ -38,6 +38,7 @@ import java.util.UUID;
 import org.joda.time.LocalTime;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
@@ -56,7 +57,7 @@ public class DomainConfigurationDtoTest {
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
 					.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
-					.enabled(false)
+					.state(ConfigurationState.DISABLE)
 					.schedulingConfiguration(SchedulingConfiguration.builder()
 							.recurrence(ArchiveRecurrence.builder()
 								.repeat(RepeatKind.DAILY)

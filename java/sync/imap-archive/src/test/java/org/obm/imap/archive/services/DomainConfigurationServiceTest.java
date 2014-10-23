@@ -41,6 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
@@ -77,7 +78,7 @@ public class DomainConfigurationServiceTest {
 
 	@Test
 	public void updateOrCreateShouldCreateAndScheduleWhenNewAndEnabled() throws Exception {
-		DomainConfiguration config = configurationAsEnabled(true);
+		DomainConfiguration config = configuration(ConfigurationState.ENABLE);
 
 		expect(domainConfigurationDao.get(domain)).andReturn(null);
 		domainConfigurationDao.create(config);
@@ -96,7 +97,7 @@ public class DomainConfigurationServiceTest {
 
 	@Test
 	public void updateOrCreateShouldCreateButNotScheduleWhenNewButDisabled() throws Exception {
-		DomainConfiguration config = configurationAsEnabled(false);
+		DomainConfiguration config = configuration(ConfigurationState.DISABLE);
 
 		expect(domainConfigurationDao.get(domain)).andReturn(null);
 		domainConfigurationDao.create(config);
@@ -112,8 +113,8 @@ public class DomainConfigurationServiceTest {
 
 	@Test
 	public void updateOrCreateShouldUpdateAndScheduleWhenNotNewAndEnabled() throws Exception {
-		DomainConfiguration previousConfig = configurationAsEnabled(false);
-		DomainConfiguration config = configurationAsEnabled(true);
+		DomainConfiguration previousConfig = configuration(ConfigurationState.DISABLE);
+		DomainConfiguration config = configuration(ConfigurationState.ENABLE);
 
 		expect(domainConfigurationDao.get(domain)).andReturn(previousConfig);
 		domainConfigurationDao.update(config);
@@ -132,8 +133,8 @@ public class DomainConfigurationServiceTest {
 
 	@Test
 	public void updateOrCreateShouldUpdateButNotScheduleWhenNotNewAndDisabled() throws Exception {
-		DomainConfiguration previousConfig = configurationAsEnabled(true);
-		DomainConfiguration config = configurationAsEnabled(false);
+		DomainConfiguration previousConfig = configuration(ConfigurationState.ENABLE);
+		DomainConfiguration config = configuration(ConfigurationState.DISABLE);
 
 		expect(domainConfigurationDao.get(domain)).andReturn(previousConfig);
 		domainConfigurationDao.update(config);
@@ -147,11 +148,11 @@ public class DomainConfigurationServiceTest {
 		control.verify();
 	}
 
-	private DomainConfiguration configurationAsEnabled(boolean enabled) {
+	private DomainConfiguration configuration(ConfigurationState state) {
 		return DomainConfiguration
 				.builder()
 				.domain(domain)
-				.enabled(enabled)
+				.state(state)
 				.schedulingConfiguration(
 						SchedulingConfiguration.builder()
 								.time(LocalTime.parse("22:15"))
