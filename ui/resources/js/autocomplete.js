@@ -418,6 +418,9 @@ obm.AutoComplete.Search = new Class({
     if (data['type'] != null) {
       res.addClass(data['type'] + "_suggestion");
     }
+    if (data['ext_id'] != null) {
+      res.setProperty('ext_id', data['ext_id']);
+    }
     var item_id = res.getProperty('id');
     var div_id = this.name + '-' +item_id.substr(('item_').length,item_id.length);
     if ($(div_id)) { res.addClass("selected"); }
@@ -571,7 +574,12 @@ obm.AutoComplete.Search = new Class({
   // dynamic
   addResultValueToBox: function(element, extension, selectedBox) {
     var item_id = element.getProperty('id');
-    var id = item_id.substr(('item_').length,item_id.length);
+    var id;
+    if (element.getProperty('ext_id') != null) {
+      id = element.getProperty('ext_id');
+    } else {
+      id = item_id.substr(('item_').length,item_id.length);
+    }
     var div_id = this.name + '-' + id;
     var text = $(item_id+'_label').innerHTML;
     if (!$(div_id)) {
