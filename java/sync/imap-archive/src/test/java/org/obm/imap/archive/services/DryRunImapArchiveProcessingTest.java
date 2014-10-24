@@ -58,6 +58,7 @@ import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
+import org.obm.imap.archive.dao.UserDao;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
@@ -88,6 +89,7 @@ public class DryRunImapArchiveProcessingTest {
 	private StoreClientFactory storeClientFactory;
 	private ArchiveTreatmentDao archiveTreatmentDao;
 	private ProcessedFolderDao processedFolderDao;
+	private UserDao userDao;
 	private Logger logger;
 	private LoggerAppenders loggerAppenders;
 	
@@ -101,11 +103,12 @@ public class DryRunImapArchiveProcessingTest {
 		storeClientFactory = control.createMock(StoreClientFactory.class);
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		processedFolderDao = control.createMock(ProcessedFolderDao.class);
+		userDao = control.createMock(UserDao.class);
 		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
 		loggerAppenders = control.createMock(LoggerAppenders.class);
 		
 		imapArchiveProcessing = new DryRunImapArchiveProcessing(dateTimeProvider, 
-				schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao);
+				schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao, userDao);
 	}
 	
 	@Test

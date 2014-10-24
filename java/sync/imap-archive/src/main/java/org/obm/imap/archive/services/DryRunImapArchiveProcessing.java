@@ -38,6 +38,7 @@ import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
+import org.obm.imap.archive.dao.UserDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 
@@ -54,10 +55,11 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 			SchedulingDatesService schedulingDatesService,
 			StoreClientFactory storeClientFactory,
 			ArchiveTreatmentDao archiveTreatmentDao,
-			ProcessedFolderDao processedFolderDao) {
+			ProcessedFolderDao processedFolderDao,
+			UserDao userDao) {
 		
 		super(dateTimeProvider, schedulingDatesService, storeClientFactory,
-				archiveTreatmentDao, processedFolderDao);
+				archiveTreatmentDao, processedFolderDao, userDao);
 	}
 	
 	@Override
