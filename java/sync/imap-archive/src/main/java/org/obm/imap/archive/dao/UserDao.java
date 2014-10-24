@@ -30,32 +30,15 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive;
+package org.obm.imap.archive.dao;
 
-import org.obm.domain.dao.DomainDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl;
-import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
-import org.obm.imap.archive.dao.ImapFolderDao;
-import org.obm.imap.archive.dao.ImapFolderJdbcImpl;
-import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.dao.ProcessedFolderJdbcImpl;
-import org.obm.imap.archive.dao.UserDao;
-import org.obm.imap.archive.dao.UserJdbcImpl;
+import org.obm.provisioning.dao.exceptions.DaoException;
 
-import com.google.inject.AbstractModule;
+import com.google.common.base.Optional;
 
-public class DaoModule extends AbstractModule {
+import fr.aliacom.obm.common.user.UserExtId;
 
-	@Override
-	protected void configure() {
-		bind(DomainConfigurationDao.class).to(DomainConfigurationJdbcImpl.class);
-		bind(DomainDao.class);
-		bind(ArchiveTreatmentDao.class).to(ArchiveTreatmentJdbcImpl.class);
-		bind(ImapFolderDao.class).to(ImapFolderJdbcImpl.class);
-		bind(ProcessedFolderDao.class).to(ProcessedFolderJdbcImpl.class);
-		bind(UserDao.class).to(UserJdbcImpl.class);
-	}
+public interface UserDao {
 
+	Optional<String> getUserLogin(UserExtId userExtId) throws DaoException;
 }
