@@ -65,6 +65,20 @@ be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
 simple contact database. OBM also features integration with PDAs, smartphones,
 Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
+%package -n obm-provisioning
+Summary: Provisioning API for Open Business Management
+Group:  Development/Tools
+Requires: java-1.7.0-openjdk >= 1.7.0
+Requires: obm-config
+
+%description -n obm-provisioning
+This package is an HTTP web service, which can be queried to provision an OBM
+server.
+
+OBM is a global groupware, messaging and CRM application. It is intended to
+be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
+simple contact database. OBM also features integration with PDAs, smartphones,
+Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 
 %package -n obm-autoconf
 Summary: Locator for Open Business Management
@@ -149,6 +163,20 @@ cp -r imap-archive/obm-imap-archive.ini $RPM_BUILD_ROOT%{_sysconfdir}/obm-imap-a
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 cp -a imap-archive/src/main/rpm/imap-archive.sh $RPM_BUILD_ROOT%{_initrddir}/obm-imap-archive
 
+# obm-provisioning
+
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/obm-provisioning
+mkdir -p $RPM_BUILD_ROOT%{_datarootdir}/obm-provisioning
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/obm-provisioning
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/obm-provisioning
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/obm-provisioning
+cp -r provisioning-server/target/provisioning-server.jar $RPM_BUILD_ROOT%{_datarootdir}/obm-provisioning/
+cp -r provisioning-server/target/lib $RPM_BUILD_ROOT%{_datarootdir}/obm-provisioning/
+cp -r provisioning-server/provisioning-start.sh $RPM_BUILD_ROOT%{_datarootdir}/obm-provisioning/
+cp -r provisioning-server/logback-include.xml $RPM_BUILD_ROOT%{_sysconfdir}/obm-provisioning/logback.xml
+mkdir -p $RPM_BUILD_ROOT%{_initrddir}
+cp -a provisioning-server/provisioning.centos.sh $RPM_BUILD_ROOT%{_initrddir}/obm-provisioning
+
 # obm-autoconf
 
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/obm-autoconf
@@ -200,6 +228,17 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %config(noreplace) %{_sysconfdir}/obm-imap-archive/logback.xml
 %config(noreplace) %{_sysconfdir}/obm-imap-archive/obm-imap-archive.ini
 
+%files -n obm-provisioning
+%defattr(-,root,root,-)
+%{_datarootdir}/obm-provisioning
+%{_initrddir}/obm-provisioning
+%attr(0775,provisioning,root) %{_localstatedir}/log/obm-provisioning
+%attr(0775,provisioning,root) %{_localstatedir}/lib/obm-provisioning
+%attr(0775,provisioning,root) %{_localstatedir}/run/obm-provisioning
+%attr(0775,root,root) %{_datarootdir}/obm-provisioning/provisioning-start.sh
+%attr(0755,root,root) %{_initrddir}/obm-provisioning
+%config(noreplace) %{_sysconfdir}/obm-provisioning/logback.xml
+
 %files -n obm-autoconf
 %defattr(-,root,root,-)
 %{_datadir}/obm-autoconf
@@ -212,7 +251,7 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %pre -n obm-locator
 # Create locator user if it doesn't exist
 id locator >/dev/null 2>&1
-if [ "$?" = "1" ]; then
+if [ $? -eq 1 ]; then
   useradd --system --gid adm locator
 fi
 
@@ -231,6 +270,16 @@ fi
 
 %post -n obm-imap-archive
 /sbin/service obm-imap-archive restart >/dev/null 2>&1 || :
+
+%pre -n obm-provisioning
+# Create provisioning user if it doesn't exist
+id provisioning >/dev/null 2>&1
+if [ $? -eq 1 ]; then
+  useradd --system --gid adm provisioning
+fi
+
+%post -n obm-provisioning
+/sbin/service obm-provisioning restart >/dev/null 2>&1 || :
 
 %post -n obm-sync
 if [ "$1" = "1" ]; then

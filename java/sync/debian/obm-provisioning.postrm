@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+if [ "$1" = "remove" ]; then
+    service obm-provisioning stop > /dev/null
+    [ -f /etc/init.d/obm-provisioning ] && unlink /etc/init.d/obm-provisioning
+fi
+
+exit 0
+

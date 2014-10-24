@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -e
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+createProvisioningUser() {
+  if ! id provisioning > /dev/null 2>&1 ; then
+    adduser --system --home /usr/share/obm-provisioning --no-create-home --group provisioning
+  fi
+}
+
+setOwnerToRequiredDir() {
+  if [ -d "$1" ]; then
+     chown -R provisioning:adm "$1"
+  else 
+     echo "error : $1 must exist."
+     exit 1
+  fi
+}
+
+#DEBHELPER#
+
+createProvisioningUser
+setOwnerToRequiredDir "/var/log/obm-provisioning"
+setOwnerToRequiredDir "/var/lib/obm-provisioning"
+setOwnerToRequiredDir "/usr/share/obm-provisioning"
+
+invoke-rc.d obm-provisioning restart	 3>1
+
+exit 0

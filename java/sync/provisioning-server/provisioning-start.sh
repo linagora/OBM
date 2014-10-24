@@ -1,0 +1,4 @@
+#!/bin/sh -e
+
+exec $JAVA_HOME/bin/java $JAVA_OPTS -jar $PROVISIONING_JAR >> $PROVISIONING_LOG_FILE 2>&1 &
+echo $! >$PROVISIONING_PID

@@ -21,6 +21,7 @@ FAKEROOT_INSTALL_DIR = debian/$(cdbs_curpkg)$(ROOT_INSTALL_DIR)
 FAKEROOT_TOMCAT_CONFIG_DIR = debian/$(cdbs_curpkg)/usr/share/obm-tomcat/applis
 FAKEROOT_LOCATOR_CONFIG_DIR = debian/$(cdbs_curpkg)/usr/share/obm-locator
 FAKEROOT_IMAP_ARCHIVE_CONFIG_DIR = debian/$(cdbs_curpkg)/usr/share/obm-imap-archive
+FAKEROOT_PROVISIONING_CONFIG_DIR = debian/$(cdbs_curpkg)/usr/share/obm-provisioning
 
 # Template for the Tomcat webapp file
 define WEBAPP_FILE
@@ -57,6 +58,12 @@ install/obm-locator::
 	cp $(CURDIR)/obm-locator/target/obm-locator.jar $(CURDIR)/debian/obm-locator/usr/share/obm-locator/
 	cp -a $(CURDIR)/obm-locator/obm-locator.debian.sh $(CURDIR)/debian/obm-locator/usr/share/obm-locator/obm-locator.sh
 	cp -r $(CURDIR)/obm-locator/target/lib $(CURDIR)/debian/obm-locator/usr/share/obm-locator/
+
+install/obm-provisioning::
+	mkdir -p $(FAKEROOT_PROVISIONING_CONFIG_DIR) 
+	cp $(CURDIR)/provisioning-server/target/provisioning-server.jar $(CURDIR)/debian/obm-provisioning/usr/share/obm-provisioning/
+	cp -a $(CURDIR)/provisioning-server/logback-include.xml $(CURDIR)/debian/obm-provisioning/etc/obm-provisioning/logback.xml
+	cp -r $(CURDIR)/provisioning-server/target/lib $(CURDIR)/debian/obm-provisioning/usr/share/obm-provisioning/
 
 install/obm-tomcat-common-libs::
 	cp $(CURDIR)/webapp-common-dependencies/target/tomcat/*.jar $(CURDIR)/debian/obm-tomcat-common-libs/usr/share/tomcat/lib/

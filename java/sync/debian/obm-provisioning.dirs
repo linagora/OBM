@@ -1,0 +1,4 @@
+usr/share/obm-provisioning
+var/log/obm-provisioning
+etc/obm-provisioning
+var/lib/obm-provisioning
