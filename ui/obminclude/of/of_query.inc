@@ -2360,6 +2360,47 @@ function get_userobm_from_ids($users) {
 
 /**
  * Get users infos from the uid array given
+ * Used by: agenda, todo
+ * @param users : array of users id
+ * @return array [ids], [entity] (label=>)
+ **/
+function get_userobm_from_ext_ids($ext_ids) {
+  global $cdg_sql;
+
+  $res = array();
+  if (!is_array($ext_ids) || empty($ext_ids)) {
+  	return $res;
+  }
+  
+  $where = null;
+  $obm_q = new DB_OBM ();
+  foreach ( $ext_ids as $ext_id ) {
+    if ($where == null) {
+    	$where = "('".$obm_q->escape($ext_id)."'";
+    } else {
+      $where .= ", '".$obm_q->escape($ext_id)."'";
+    }
+  }
+  $where .= ')';
+  $query = "SELECT userobm_ext_id, userobm_lastname, userobm_firstname
+    FROM UserObm
+    WHERE userobm_archive = 0
+    AND userobm_ext_id IN $where
+    ORDER by userobm_lastname";
+  display_debug_msg ( $query, $cdg_sql, 'get_userobm_from_ext_ids()' );
+  $obm_q->query ( $query );
+  while ( $obm_q->next_record () ) {
+    $id = $obm_q->f ( 'userobm_ext_id' );
+    $lname = $obm_q->f ( 'userobm_lastname' );
+    $fname = $obm_q->f ( 'userobm_firstname' );
+    $res ['ext_ids'] [] = $id;
+    $res ['entity'] [$id] = array('label' => "$lname $fname");
+  }
+  return $res;
+}
+
+/**
+ * Get users infos from the uid array given
  * Used by: agenda
  * @param contacts : array of contacts id
  * @return array [ids], [entity] (label=>, email_address=>)
