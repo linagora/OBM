@@ -46,13 +46,13 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 
-public class HtmlToText implements Transformer {
+public class TextToHtml implements Transformer {
 
 	public static class Factory implements Transformer.Factory {
 		
 		@Override
 		public Transformer create(FetchInstruction fetchInstruction) {
-			return new HtmlToText();
+			return new TextToHtml();
 		}
 
 		@Override

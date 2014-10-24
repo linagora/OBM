@@ -50,7 +50,7 @@ import org.obm.push.mail.WindowingService;
 import org.obm.push.mail.WindowingServiceImpl;
 import org.obm.push.mail.smtp.SmtpProvider;
 import org.obm.push.mail.smtp.SmtpProviderImpl;
-import org.obm.push.mail.transformer.HtmlToText;
+import org.obm.push.mail.transformer.TextToHtml;
 import org.obm.push.mail.transformer.Identity;
 import org.obm.push.mail.transformer.Transformer;
 import org.obm.push.store.SnapshotDao;
@@ -83,7 +83,7 @@ public class OpushMailModule extends AbstractModule {
 		Multibinder<Transformer.Factory> transformers = 
 				Multibinder.newSetBinder(binder(), Transformer.Factory.class);
 		transformers.addBinding().to(Identity.Factory.class);
-		transformers.addBinding().to(HtmlToText.Factory.class);
+		transformers.addBinding().to(TextToHtml.Factory.class);
 		bind(SnapshotDao.class).to(SnapshotDaoEhcacheImpl.class);
 		bind(WindowingDao.class).to(WindowingDaoEhcacheImpl.class);
 		bind(SyncKeysDao.class).to(SyncKeysDaoEhcacheImpl.class);

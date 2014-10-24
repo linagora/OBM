@@ -37,38 +37,42 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.base.Charsets;
 
 
-public class HtmlToTextTest {
+public class TextToHtmlTest {
 
+	private Transformer testee;
+
+	@Before
+	public void setup() {
+		testee = new TextToHtml.Factory().create(null);
+	}
+	
 	@Test(expected=NullPointerException.class)
 	public void transformNull() throws IOException {
-		Transformer htmlToTextFactory = new HtmlToText.Factory().create(null);
-		htmlToTextFactory.transform(null, Charsets.UTF_8);
+		testee.transform(null, Charsets.UTF_8);
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void transformNullCharset() throws IOException {
-		Transformer htmlToTextFactory = new HtmlToText.Factory().create(null);
-		htmlToTextFactory.transform(new ByteArrayInputStream(new byte[] {0x22}), null);
+		testee.transform(new ByteArrayInputStream(new byte[] {0x22}), null);
 	}
 	
 	@Test
 	public void transformSimpleString() throws IOException {
 		ByteArrayInputStream inputStream = stringToInputStream("simple string");
-		Transformer htmlToTextFactory = new HtmlToText.Factory().create(null);
-		InputStream actual = htmlToTextFactory.transform(inputStream, Charsets.UTF_8);
+		InputStream actual = testee.transform(inputStream, Charsets.UTF_8);
 		assertThat(actual).hasContentEqualTo(stringToInputStream("<html><body>simple string</body></html>"));
 	}
 
 	@Test
 	public void transformMultilineString() throws IOException {
 		ByteArrayInputStream inputStream = stringToInputStream("line one\r\nline two\r\n");
-		Transformer htmlToTextFactory = new HtmlToText.Factory().create(null);
-		InputStream actual = htmlToTextFactory.transform(inputStream, Charsets.UTF_8);
+		InputStream actual = testee.transform(inputStream, Charsets.UTF_8);
 		assertThat(actual).hasContentEqualTo(stringToInputStream("<html><body>line one<br/>line two</body></html>"));
 	}
 	
