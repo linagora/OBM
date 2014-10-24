@@ -44,11 +44,13 @@ import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.ExcludedUser;
+import org.obm.imap.archive.beans.Mailing;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl.TABLE.FIELDS;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+import org.obm.sync.base.EmailAddress;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -110,9 +112,8 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				String ALL = Joiner.on(", ").join(DOMAIN_UUID, USER_UUID);
 			}
 		}
-		
+				
 		interface REQUESTS {
-			
 			String SELECT = String.format(
 					"SELECT %s FROM %s WHERE %s = ?", TABLE.FIELDS.ALL, TABLE.NAME, TABLE.FIELDS.DOMAIN_UUID);
 			
@@ -121,7 +122,31 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			
 			String INSERT = String.format(
 					"INSERT INTO %s (%s) VALUES (?, ?)", TABLE.NAME, TABLE.FIELDS.ALL);
+		}
+	}
+		
+	public interface MAILING {
+		interface TABLE {
 			
+			String NAME = "mail_archive_mailing";
+			
+			interface FIELDS {
+				String DOMAIN_UUID = "mail_archive_mailing_domain_uuid";
+				String EMAIL = "mail_archive_mailing_email";
+				
+				String ALL = Joiner.on(", ").join(DOMAIN_UUID, EMAIL);
+			}
+		}
+		
+		interface REQUESTS {
+			String SELECT = String.format(
+					"SELECT %s FROM %s WHERE %s = ?", TABLE.FIELDS.ALL, TABLE.NAME, TABLE.FIELDS.DOMAIN_UUID);
+			
+			String DELETE = String.format(
+					"DELETE FROM %s WHERE %s = ?", TABLE.NAME, TABLE.FIELDS.DOMAIN_UUID);
+			
+			String INSERT = String.format(
+					"INSERT INTO %s (%s) VALUES (?, ?)", TABLE.NAME, TABLE.FIELDS.ALL);
 		}
 	}
 	
@@ -166,6 +191,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 						.build())
 				.excludedFolder(rs.getString(FIELDS.EXCLUDED_FOLDER))
 				.excludedUsers(get(connection, domain.getUuid()))
+				.mailing(getMailing(connection, domain.getUuid()))
 				.build();
 	}
 
@@ -191,6 +217,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			}
 			
 			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getExcludedUsers());
+			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getMailing());
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		}
@@ -216,6 +243,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.executeUpdate();
 			
 			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getExcludedUsers());
+			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getMailing());
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		}
@@ -227,7 +255,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setString(1, domainId.get());
 
 			ResultSet rs = ps.executeQuery();
-
+			
 			ImmutableList.Builder<ExcludedUser> builder = ImmutableList.builder();
 			while (rs.next()) {
 				builder.add(ExcludedUser.from(rs.getString(EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)));
@@ -251,6 +279,43 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				psInsert.setString(idx++, domainId.get());
 				psInsert.setString(idx++, userId.serialize());
 				
+				psInsert.executeUpdate();
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		}
+	}
+				
+	private Mailing getMailing(Connection connection, ObmDomainUuid domainId) throws DaoException {
+		try (PreparedStatement ps = connection.prepareStatement(MAILING.REQUESTS.SELECT)) {
+	
+			ps.setString(1, domainId.get());
+	
+			ResultSet rs = ps.executeQuery();
+	
+			Mailing.Builder builder = Mailing.builder();
+			while (rs.next()) {
+				builder.add(EmailAddress.loginAtDomain(rs.getString(MAILING.TABLE.FIELDS.EMAIL)));
+			}
+			return builder.build();
+		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
+	}
+	
+	private void update(Connection connection, ObmDomainUuid domainId, Mailing mailing) throws DaoException {
+		try (PreparedStatement psDelete = connection.prepareStatement(MAILING.REQUESTS.DELETE);
+				PreparedStatement psInsert = connection.prepareStatement(MAILING.REQUESTS.INSERT)) {
+
+			psDelete.setString(1, domainId.get());
+			psDelete.execute();
+			
+			for (EmailAddress emailAddress : mailing.getEmailAddresses()) {
+				int idx = 1;
+				psInsert.setString(idx++, domainId.get());
+				psInsert.setString(idx++, emailAddress.get());
+	
 				psInsert.executeUpdate();
 			}
 		} catch (SQLException e) {

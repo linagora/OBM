@@ -154,6 +154,7 @@ public class TreatmentsResourceTest {
 		domainConfigurationDto.hour = 0;
 		domainConfigurationDto.minute = 0;
 		domainConfigurationDto.excludedUserIds = ImmutableList.of();
+		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		
 		given()
 			.port(server.getHttpPort())
@@ -186,6 +187,7 @@ public class TreatmentsResourceTest {
 		domainConfigurationDto.hour = 0;
 		domainConfigurationDto.minute = 0;
 		domainConfigurationDto.excludedUserIds = ImmutableList.of();
+		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		
 		given()
 			.port(server.getHttpPort())

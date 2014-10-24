@@ -67,6 +67,7 @@ public class DomainConfiguration {
 						.build())
 				.excludedFolder(configuration.excludedFolder)
 				.excludedUsers(from(configuration.excludedUserIds))
+				.mailing(Mailing.fromStrings(configuration.mailingEmails))
 				.build();
 	}
 	
@@ -81,7 +82,7 @@ public class DomainConfiguration {
 					}
 				}).toList();
 	}
-	
+
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -93,6 +94,7 @@ public class DomainConfiguration {
 		private SchedulingConfiguration schedulingConfiguration;
 		private String excludedFolder;
 		private ImmutableList.Builder<ExcludedUser> excludedUsers;
+		private Mailing mailing;
 		
 		private Builder() {
 			excludedUsers = ImmutableList.builder();
@@ -124,6 +126,11 @@ public class DomainConfiguration {
 			return this;
 		}
 		
+		public Builder mailing(Mailing mailing) {
+			this.mailing = mailing;
+			return this;
+		}
+		
 		public DomainConfiguration build() {
 			Preconditions.checkState(domain != null);
 			Preconditions.checkState(state != null);
@@ -134,7 +141,7 @@ public class DomainConfiguration {
 				Preconditions.checkState(excludedFolder.contains("/") == false);
 				Preconditions.checkState(excludedFolder.contains("@") == false);
 			}
-			return new DomainConfiguration(domain, state, schedulingConfiguration, excludedFolder, excludedUsers.build());
+			return new DomainConfiguration(domain, state, schedulingConfiguration, excludedFolder, excludedUsers.build(), Objects.firstNonNull(mailing, Mailing.empty()));
 		}
 	}
 	
@@ -143,13 +150,15 @@ public class DomainConfiguration {
 	private final SchedulingConfiguration schedulingConfiguration;
 	private final String excludedFolder;
 	private final List<ExcludedUser> excludedUsers;
+	private final Mailing mailing;
 
-	private DomainConfiguration(ObmDomain domain, ConfigurationState state, SchedulingConfiguration schedulingConfiguration, String excludedFolder, ImmutableList<ExcludedUser> excludedUsers) {
+	private DomainConfiguration(ObmDomain domain, ConfigurationState state, SchedulingConfiguration schedulingConfiguration, String excludedFolder, ImmutableList<ExcludedUser> excludedUsers, Mailing mailing) {
 		this.domain = domain;
 		this.state = state;
 		this.schedulingConfiguration = schedulingConfiguration;
 		this.excludedFolder = excludedFolder;
 		this.excludedUsers = excludedUsers;
+		this.mailing = mailing;
 	}
 
 	public ObmDomain getDomain() {
@@ -212,9 +221,13 @@ public class DomainConfiguration {
 		return excludedUsers;
 	}
 	
+	public Mailing getMailing() {
+		return mailing;
+	}
+	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(domain, state, schedulingConfiguration, excludedFolder, excludedUsers);
+		return Objects.hashCode(domain, state, schedulingConfiguration, excludedFolder, excludedUsers, mailing);
 	}
 	
 	@Override
@@ -225,7 +238,8 @@ public class DomainConfiguration {
 				&& Objects.equal(this.state, that.state)
 				&& Objects.equal(this.schedulingConfiguration, that.schedulingConfiguration)
 				&& Objects.equal(this.excludedFolder, that.excludedFolder)
-				&& Objects.equal(this.excludedUsers, that.excludedUsers);
+				&& Objects.equal(this.excludedUsers, that.excludedUsers)
+				&& Objects.equal(this.mailing, that.mailing);
 		}
 		return false;
 	}
@@ -238,6 +252,7 @@ public class DomainConfiguration {
 			.add("recurrence", schedulingConfiguration)
 			.add("excludedFolder", excludedFolder)
 			.add("excludedUsers", excludedUsers)
+			.add("mailing", mailing)
 			.toString();
 	}
 }

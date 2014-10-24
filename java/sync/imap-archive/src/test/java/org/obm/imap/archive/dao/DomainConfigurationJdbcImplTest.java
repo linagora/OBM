@@ -51,10 +51,12 @@ import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.ExcludedUser;
+import org.obm.imap.archive.beans.Mailing;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+import org.obm.sync.base.EmailAddress;
 
 import pl.wkr.fluentrule.api.FluentExpectedException;
 
@@ -121,7 +123,19 @@ public class DomainConfigurationJdbcImplTest {
 					DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID) 
 			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", excludedUser.getId())
 			.build();
-	}	
+	}
+	
+	private Operation mailing(Mailing mailing) {
+		ImmutableList.Builder<Insert> inserts = ImmutableList.builder();
+		for (EmailAddress emailAddress : mailing.getEmailAddresses()) {
+			inserts.add(Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
+				.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, 
+						DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL) 
+				.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", emailAddress.get())
+				.build());
+		}
+		return Operations.sequenceOf(inserts.build());
+	}
 	
 	@Test
 	public void getShouldReturnStoredValueWhenDomainIdMatch() throws Exception {
@@ -163,6 +177,19 @@ public class DomainConfigurationJdbcImplTest {
 		assertThat(domainConfiguration.getExcludedUsers()).containsOnly(excludedUser, excludedUser2);
 	}
 	
+	@Test
+	public void getShouldLoadMailing() throws Exception {
+		EmailAddress emailAddress = EmailAddress.loginAtDomain("user@mydomain.org");
+		EmailAddress emailAddress2 = EmailAddress.loginAtDomain("user2@mydomain.org");
+		Mailing mailing = Mailing.from(ImmutableList.of(emailAddress, emailAddress2));
+		play(Operations.sequenceOf(delete(), domainConfiguration(), mailing(mailing)));
+		
+		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
+		assertThat(domainConfiguration.getMailing().getEmailAddresses()).containsOnly(emailAddress, emailAddress2);
+	}
+
 	@Test
 	public void updateShouldThrowExceptionWhenDomainNotFound() throws Exception {
 		expectedException.expect(DomainNotFoundException.class).hasMessage("844db7a6-6788-47a4-9f04-f5ed9f007a04");
@@ -231,6 +258,38 @@ public class DomainConfigurationJdbcImplTest {
 	}
 	
 	@Test
+	public void updateShouldUpdateMailing() throws Exception {
+		EmailAddress emailAddress = EmailAddress.loginAtDomain("user@mydomain.org");
+		EmailAddress emailAddress2 = EmailAddress.loginAtDomain("user2@mydomain.org");
+		Mailing mailing = Mailing.from(ImmutableList.of(emailAddress, emailAddress2));
+		play(Operations.sequenceOf(delete(), domainConfiguration(), mailing(mailing)));
+		
+		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
+		EmailAddress emailAddress3 = EmailAddress.loginAtDomain("user3@mydomain.org");
+		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.DISABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+							.repeat(RepeatKind.YEARLY)
+							.dayOfMonth(DayOfMonth.of(1))
+							.dayOfWeek(DayOfWeek.MONDAY)
+							.dayOfYear(DayOfYear.of(100))
+							.build())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.excludedFolder("anotherExcluded")
+				.mailing(Mailing.from(ImmutableList.of(emailAddress, emailAddress3)))
+				.build();
+		
+		domainConfigurationJdbcImpl.update(expectedDomainConfiguration);
+		
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
+		assertThat(domainConfiguration.getMailing().getEmailAddresses()).containsOnly(emailAddress, emailAddress3);
+	}
+	
+	@Test
 	public void createShouldThrowExceptionWhenDomainConfigurationAlreadyExists() throws Exception {
 		play(Operations.sequenceOf(delete(), domainConfiguration()));
 		
@@ -296,5 +355,35 @@ public class DomainConfigurationJdbcImplTest {
 		
 		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain); 
 		assertThat(domainConfiguration.getExcludedUsers()).containsOnly(excludedUser, excludedUser2);
+	}
+	
+	@Test
+	public void createShouldCreateMailing() throws Exception {
+		play(Operations.sequenceOf(delete(), domainConfiguration()));
+		
+		ObmDomainUuid uuid = ObmDomainUuid.of("1383b12c-6d79-40c7-acf9-c79bcc673fff");
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
+		EmailAddress emailAddress = EmailAddress.loginAtDomain("user@mydomain.org");
+		EmailAddress emailAddress2 = EmailAddress.loginAtDomain("user2@mydomain.org");
+		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.DISABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+							.repeat(RepeatKind.YEARLY)
+							.dayOfMonth(DayOfMonth.of(1))
+							.dayOfWeek(DayOfWeek.MONDAY)
+							.dayOfYear(DayOfYear.of(100))
+							.build())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.excludedFolder("excluded")
+				.mailing(Mailing.from(ImmutableList.of(emailAddress, emailAddress2)))
+				.build();
+		
+		domainConfigurationJdbcImpl.create(expectedDomainConfiguration);
+		
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain); 
+		assertThat(domainConfiguration.getMailing().getEmailAddresses()).containsOnly(emailAddress, emailAddress2);
 	}
 }

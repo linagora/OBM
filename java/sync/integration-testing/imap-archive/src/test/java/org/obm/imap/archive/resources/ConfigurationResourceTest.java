@@ -260,6 +260,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.hour = 11;
 		domainConfigurationDto.minute = 32;
 		domainConfigurationDto.excludedUserIds = ImmutableList.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "8e30e673-1c47-4ca8-85e8-4609d4228c10");
+		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user2@mydomain.org");
 		
 		given()
 			.auth().basic("admin@mydomain.org", "trust3dToken")
@@ -325,6 +326,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.minute = 32;
 		domainConfigurationDto.excludedFolder = "anotherExcluded";
 		domainConfigurationDto.excludedUserIds = ImmutableList.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "2d7a5942-46ab-4fad-9bd2-608bde249671");
+		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user3@mydomain.org");
 		
 		given()
 			.port(server.getHttpPort())

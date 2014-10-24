@@ -37,6 +37,8 @@ import java.util.UUID;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.ExcludedUser;
+import org.obm.imap.archive.beans.Mailing;
+import org.obm.sync.base.EmailAddress;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
@@ -55,6 +57,7 @@ public class DomainConfigurationDto {
 		dto.minute = configuration.getMinute();
 		dto.excludedFolder = configuration.getExcludedFolder();
 		dto.excludedUserIds = toIds(configuration.getExcludedUsers());
+		dto.mailingEmails = toStrings(configuration.getMailing());
 		return dto;
 	}
 
@@ -92,6 +95,17 @@ public class DomainConfigurationDto {
 				}).toList();
 	}
 	
+	private static List<String> toStrings(Mailing mailing) {
+		return FluentIterable.from(mailing.getEmailAddresses())
+				.transform(new Function<EmailAddress, String>() {
+
+					@Override
+					public String apply(EmailAddress emailAddress) {
+						return emailAddress.get();
+					}
+				}).toList();
+	}
+
 	public UUID domainId;
 	public Boolean enabled;
 	public String repeatKind;
@@ -102,5 +116,6 @@ public class DomainConfigurationDto {
 	public Integer minute;
 	public String excludedFolder;
 	public List<String> excludedUserIds;
+	public List<String> mailingEmails;
 	
 }

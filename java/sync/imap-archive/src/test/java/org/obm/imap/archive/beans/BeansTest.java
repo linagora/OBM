@@ -67,7 +67,8 @@ public class BeansTest {
 				Boundaries.class,
 				Year.class,
 				Limit.class,
-				ExcludedUser.class
+				ExcludedUser.class,
+				Mailing.class
 			).verify();
 	}	
 }

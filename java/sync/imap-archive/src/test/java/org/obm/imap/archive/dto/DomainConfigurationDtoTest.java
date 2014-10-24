@@ -44,8 +44,10 @@ import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.ExcludedUser;
+import org.obm.imap.archive.beans.Mailing;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
+import org.obm.sync.base.EmailAddress;
 
 import com.google.common.collect.ImmutableList;
 
@@ -72,6 +74,7 @@ public class DomainConfigurationDtoTest {
 							.build())
 					.excludedFolder("excluded")
 					.excludedUsers(ImmutableList.of(ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b")))
+					.mailing(Mailing.from(ImmutableList.of(EmailAddress.loginAtDomain("usera@mydomain.org"), EmailAddress.loginAtDomain("userb@mydomain.org"))))
 					.build();
 		DomainConfigurationDto dto = DomainConfigurationDto.from(configuration);
 		assertThat(dto.domainId).isEqualTo(UUID.fromString("e953d0ab-7053-4f84-b83a-abfe479d3888"));
@@ -84,7 +87,7 @@ public class DomainConfigurationDtoTest {
 		assertThat(dto.minute).isEqualTo(23);
 		assertThat(dto.excludedFolder).isEqualTo("excluded");
 		assertThat(dto.excludedUserIds).containsOnly("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
-
+		assertThat(dto.mailingEmails).containsOnly("usera@mydomain.org", "userb@mydomain.org");
 	}
 	
 }

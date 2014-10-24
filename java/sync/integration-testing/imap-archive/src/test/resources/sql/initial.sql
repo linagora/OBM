@@ -28,6 +28,14 @@ CREATE TABLE mail_archive_excluded_users (
 	CONSTRAINT mail_archive_excluded_users_ukey UNIQUE (mail_archive_excluded_users_domain_uuid, mail_archive_excluded_users_user_uuid)
 );
 
+CREATE TABLE mail_archive_mailing (
+	id									SERIAL PRIMARY KEY,
+	mail_archive_mailing_domain_uuid	character(36) NOT NULL,
+	mail_archive_mailing_email			TEXT NOT NULL,
+
+	CONSTRAINT mail_archive_mailing_ukey UNIQUE (mail_archive_mailing_domain_uuid, mail_archive_mailing_email)
+);
+
 CREATE DOMAIN mail_archive_status AS VARCHAR (16) CHECK VALUE IN (
 	'SCHEDULED',
 	'RUNNING',
