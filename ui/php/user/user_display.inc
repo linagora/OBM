@@ -3414,13 +3414,14 @@ function json_search_users($user,$results) {
   $users = array();
   foreach($user_q as $name => $data) {
     $id = $data['userobm_id'];
+    $ext_id = $data['userobm_ext_id'];
     $label = phpStringToJsString($data['userobm_lastname'].' '.$data['userobm_firstname']);
     if($user_q['userobm_hidden'] != 1 || $perm->check_right($module, $cright_write_admin)) {
       $extra = phpStringToJsString(get_entity_email($data['userobm_email']));
     } else {
       $extra = '';
     }
-    $users[] = "{id:'data-user-$id', label:'$label', extra:'$extra', type: 'user'}";
+    $users[] = "{id:'data-user-$id', label:'$label', extra:'$extra', type: 'user', ext_id:'$ext_id'}";
   }
   $display['json'] = "{length:".$results['length'].", datas:[".implode(',',$users)."]}";
 }
