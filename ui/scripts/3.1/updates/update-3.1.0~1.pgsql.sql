@@ -16,6 +16,13 @@ mail_archive_excluded_folder	TEXT,
 CONSTRAINT mail_archive_domain_uuid_ukey UNIQUE (mail_archive_domain_uuid)
 );
 
+CREATE TABLE mail_archive_excluded_users (
+id SERIAL PRIMARY KEY,
+mail_archive_excluded_users_domain_uuid character(36) NOT NULL,
+mail_archive_excluded_users_user_uuid character(36) NOT NULL,
+CONSTRAINT mail_archive_excluded_users_ukey UNIQUE (mail_archive_excluded_users_domain_uuid, mail_archive_excluded_users_user_uuid)
+);
+
 CREATE TYPE mail_archive_status AS ENUM ('ERROR', 'SCHEDULED', 'RUNNING', 'SUCCESS');
 
 CREATE TABLE mail_archive_run (
