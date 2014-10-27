@@ -55,6 +55,7 @@ public class DatabaseOperations {
 		return Operations.sequenceOf(
 				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE.NAME),
 				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME),
+				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME),
 				Operations.deleteAllFrom(SqlTables.MailArchiveRun.NAME),
 				Operations.deleteAllFrom(SqlTables.MailArchiveRun.NAME),
 				Operations.deleteAllFrom(ProcessedFolderJdbcImpl.TABLE.NAME),

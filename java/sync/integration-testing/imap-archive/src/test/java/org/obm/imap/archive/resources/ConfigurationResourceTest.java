@@ -33,6 +33,7 @@ package org.obm.imap.archive.resources;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -164,6 +165,14 @@ public class ConfigurationResourceTest {
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)
 					.values(domainId, "8e30e673-1c47-4ca8-85e8-4609d4228c10")
+					.build(),
+				Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL)
+					.values(domainId, "user@mydomain.org")
+					.build(),
+				Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL)
+					.values(domainId, "user2@mydomain.org")
 					.build());
 		server.start();
 		
@@ -174,7 +183,8 @@ public class ConfigurationResourceTest {
 			.contentType(ContentType.JSON)
 			.body("domainId", equalTo(domainId),
 				"enabled", equalTo(true),
-				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "8e30e673-1c47-4ca8-85e8-4609d4228c10"))
+				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "8e30e673-1c47-4ca8-85e8-4609d4228c10"),
+				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user2@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
@@ -281,7 +291,8 @@ public class ConfigurationResourceTest {
 			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
 				"enabled", equalTo(true),
 				"dayOfWeek", equalTo(DayOfWeek.TUESDAY.getSpecificationValue()),
-				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "8e30e673-1c47-4ca8-85e8-4609d4228c10"))
+				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "8e30e673-1c47-4ca8-85e8-4609d4228c10"),
+				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user2@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
@@ -308,6 +319,14 @@ public class ConfigurationResourceTest {
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)
 					.values(domainId, "8e30e673-1c47-4ca8-85e8-4609d4228c10")
+					.build(),
+				Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL)
+					.values(domainId, "user@mydomain.org")
+					.build(),
+				Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL)
+					.values(domainId, "user2@mydomain.org")
 					.build());
 		ObmDomainUuid newDomainUuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		expectations
@@ -347,7 +366,8 @@ public class ConfigurationResourceTest {
 				"enabled", equalTo(true),
 				"dayOfWeek", equalTo(DayOfWeek.WEDNESDAY.getSpecificationValue()),
 				"excludedFolder", equalTo("anotherExcluded"),
-				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "2d7a5942-46ab-4fad-9bd2-608bde249671"))
+				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "2d7a5942-46ab-4fad-9bd2-608bde249671"),
+				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user3@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
