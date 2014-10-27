@@ -161,6 +161,7 @@ public class ModuleUtils {
 
 			@Override
 			protected void configure() {
+				bind(ObmSmtpConf.class).to(ObmSmtpConfImpl.class);
 				bind(ObmSmtpService.class).toInstance(new ObmSmtpService() {
 					
 					@Override

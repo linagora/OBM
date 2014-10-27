@@ -27,6 +27,10 @@
 			<artifactId>services-module</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>smtp</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.linagora.obm.integration-testing</groupId>
 			<artifactId>arquillian-bundle</artifactId>
 		</dependency>

@@ -31,40 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import javax.servlet.ServletContext;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
-import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.domain.dao.DaoModule;
-import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
-import org.obm.healthcheck.HealthCheckModule;
-import org.obm.provisioning.ProvisioningService;
+import org.obm.sync.auth.AccessToken;
 
-import com.google.inject.AbstractModule;
-import com.sun.jersey.guice.JerseyServletModule;
+public interface ObmSmtpService {
 
-public class ObmSyncModule extends AbstractModule {
+	public void sendEmail(MimeMessage message, AccessToken token) throws MessagingException;
 	
-	private final ServletContext servletContext;
-	
-	public ObmSyncModule(ServletContext servletContext) {
-		this.servletContext = servletContext;
-	}
-
-	@Override
-	protected void configure() {
-		install(new ObmSyncServletModule());
-		install(new ObmSyncServicesModule());
-		install(new SmtpModule());
-		install(new MessageQueueModule());
-		install(new TransactionalModule());
-		install(new DatabaseModule());
-		install(new DaoModule());
-		install(new SolrJmsModule());
-		install(new HealthCheckModule());
-		install(new HealthCheckDefaultHandlersModule());
-		install(new DatabaseMetadataModule());
-		install(new ProvisioningService(servletContext));
-		install(new JerseyServletModule());
-	}
-
 }
