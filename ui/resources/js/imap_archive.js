@@ -137,3 +137,56 @@ function loadLogs() {
   }).get({ajax : 1, action : 'archiving_logs', 'run' : run});
 }
 
+function addMailingEmail() {
+  var validity = $('mailing_email').validity;
+  if (!validity.valid) {
+	  return;
+  }
+  
+  var mailingEmail = $('mailing_email').get('value');
+  if (mailingEmail) {
+    var mailingEmails = $('mailing_emails');
+    if (!mailingEmails.rows.namedItem(mailingEmail)) {
+      insertNewRow(mailingEmails, mailingEmail);
+    }
+  }
+}
+
+function insertNewRow(table, value) {
+  var row = table.insertRow(-1);
+  row.id = value;
+  
+  var valueCell = row.insertCell(0);
+  var divId = new Element('div');
+  divId.appendText(value);
+  divId.inject(valueCell);
+  var input = new Element('input', {
+      value: value,
+      name: 'sel_mailing_emails[]',
+      type: 'hidden'
+    });
+  input.inject(divId);
+  
+  var deleteButtonCell = row.insertCell(1);
+  
+  var removeLink = new Element('a', {
+      href: 'javascript: deleteMailingEmail("' + value + '");'
+  });
+  var removeImage = new Element('img', {
+      alt: '[Delete]',
+      src: '/images/themes/default/images/ico_trash.gif'
+    });
+  removeImage.inject(removeLink);
+  
+  removeLink.inject(deleteButtonCell);
+}
+
+function deleteMailingEmail(mailingEmail) {
+  if (mailingEmail) {
+    var mailingEmails = $('mailing_emails');
+    var row = mailingEmails.rows.namedItem(mailingEmail);
+    if (row) {
+    	mailingEmails.deleteRow(row.rowIndex - 1);
+    }
+  }
+}

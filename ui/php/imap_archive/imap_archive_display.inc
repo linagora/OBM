@@ -53,7 +53,7 @@ function dis_imap_archive_form($params, $configuration) {
   global $l_service_activating, $l_activating;
   global $l_scheduling;
   global $l_excluded_folder, $l_folder, $l_excluded_users;
-  global $l_mailing_feedback, $l_email_address;
+  global $l_mailing_feedback;
 
   $user_id = $params['user_id'];
   $url = url_prepare('imap_archive_index.php');
@@ -67,6 +67,7 @@ function dis_imap_archive_form($params, $configuration) {
   $minute = $configuration->minute;
   $excludedFolder = $configuration->excludedFolder;
   $excludedUserIds = $configuration->excludedUserIds;
+  $mailingEmails = $configuration->mailingEmails;
   
   $disabled = ($enabled == 0) ? "disabled" : "";
   $block_repeat_kind = get_block_repeat_kind($repeatKind, $disabled);
@@ -77,6 +78,7 @@ function dis_imap_archive_form($params, $configuration) {
   $block_minute = get_block_minute($minute, $disabled);
   $block_next_treatment_date = get_block_next_treatment_date($configuration);
   $block_excluded_users = get_block_excluded_users($excludedUserIds);
+  $block_mailing = get_block_mailing($mailingEmails);
   
   $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_excluded_user_id', 'userSearch', {filter_pattern:'access'});";
   
@@ -139,28 +141,7 @@ function dis_imap_archive_form($params, $configuration) {
     </fieldset>
     <fieldset class='detail infos'>
       <legend>$l_mailing_feedback</legend>
-      <table>
-        <th>$l_email_address</th>
-        <td class='autocompleteField'>
-          <input type='text' name='' value='' id='email' autocomplete='off' />
-        </td>
-        <table class='spreadSheet'>
-          <thead>
-            <tr>
-              <td>$l_email_address</td>
-              <td></td>
-            </tr>
-          </thead>
-          <tbody>
-            <tr id='user_1' class='user'>
-              <td>admin0@mydomain.org</td>
-              <td>
-                <img onclick='obm.imapArchiveManager.removeUser(1);' src='/images/themes/default/images/ico_trash.gif'></img>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </table>
+      $block_mailing
     </fieldset>
     <div class='buttons'>  
       <input type=\"hidden\" name=\"action\" value=\"update\">
@@ -388,6 +369,49 @@ function get_block_excluded_users($excludedUserIds) {
           <div id='sel_excluded_user_id'>$dis_sel_user</div>
         </td>
       </tr>
+    </table>";
+}
+
+function get_block_mailing($mailingEmails) {
+  global $l_mailing_email, $ico_delete;
+  
+  if (is_array($mailingEmails)) {
+  	$dis_mailing_emails = "";
+    foreach ($mailingEmails as $mailingEmail) {
+      $dis_mailing_emails .= 
+        "<tr id='$mailingEmail'>
+           <td>
+             <div>$mailingEmail</div>
+             <input value='$mailingEmail' name='sel_mailing_emails[]' type='hidden'/>
+           </td>
+           <td>
+             <a href='javascript: deleteMailingEmail(\"$mailingEmail\");'>
+               <img src='$ico_delete' alt='[Delete]' />
+             </a>
+           </td>
+         </tr>";
+    }
+  }
+  
+  return "
+    <table>
+      <tr>
+        <th>$l_mailing_email</th>
+        <td>
+          <input type='email' name='' value='' id='mailing_email' onblur='addMailingEmail();' />
+        </td>
+      </tr>
+      <table class='spreadSheet'>
+        <thead>
+          <tr>
+            <th>$l_mailing_email</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id='mailing_emails'>
+          $dis_mailing_emails
+        </tbody>
+      </table>
     </table>";
 }
 

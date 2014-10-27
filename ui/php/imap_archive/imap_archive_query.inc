@@ -173,6 +173,8 @@ function toJson($configuration) {
   $excludedFolder = $configuration->excluded_folder;
   $excludedUserIdsFromConfig = $configuration->excluded_user_id;
   $excludedUserIds = $excludedUserIdsFromConfig != null ? $excludedUserIdsFromConfig : array();
+  $mailingEmailsFromConfig = $configuration->mailing_emails;
+  $mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
 	
   return json_encode(array("domainId" => $obm['domain_uuid'],
     "enabled" => ($configuration->enabled) ? "true" : "false",
@@ -183,7 +185,8 @@ function toJson($configuration) {
     "hour" => ($hour) ? $hour : 0,
     "minute" => ($minute) ? $minute : 0,
     "excludedFolder" => $excludedFolder,
-    "excludedUserIds" => $excludedUserIds
+    "excludedUserIds" => $excludedUserIds,
+    "mailingEmails" => $mailingEmails
   ));	
 }
 
