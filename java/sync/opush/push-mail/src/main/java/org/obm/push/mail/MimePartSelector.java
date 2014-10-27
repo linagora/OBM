@@ -99,13 +99,10 @@ public class MimePartSelector {
 	@VisibleForTesting static Comparator<FetchInstruction> betterFitComparator(final List<BodyPreference> bodyPreferences) {
 		final List<MSEmailBodyType> preferences = FluentIterable
 				.from(Iterables.concat(bodyPreferences, DEFAULT_BODY_PREFERENCES))
-				.transform(new Function<BodyPreference, MSEmailBodyType>() {
-					@Override
-					public MSEmailBodyType apply(BodyPreference input) {
-						return input.getType();
-					}
-				}).toList();
-		
+				.transform(bodyPreferenceToMSEmailBodyType()).toList();
+			final List<MSEmailBodyType> clientPreferences = FluentIterable.from(bodyPreferences)
+				.transform(bodyPreferenceToMSEmailBodyType()).toList();
+
 		return new Comparator<FetchInstruction>() {
 			
 			private int computeWeight(FetchInstruction instruction) {
@@ -123,9 +120,22 @@ public class MimePartSelector {
 					return 1;
 				} else if (o2.getBodyType() == MSEmailBodyType.MIME) {
 					return -1;
+				} else if (clientPreferences.contains(o1.getBodyType()) && !clientPreferences.contains(o2.getBodyType())) {
+					return -1;
+				} else if (!clientPreferences.contains(o1.getBodyType()) && clientPreferences.contains(o2.getBodyType())) {
+					return 1;
 				} else {
 					return computeWeight(o1) - computeWeight(o2);
 				}
+			}
+		};
+	}
+	
+	private static Function<BodyPreference, MSEmailBodyType> bodyPreferenceToMSEmailBodyType() {
+		return new Function<BodyPreference, MSEmailBodyType>() {
+			@Override
+			public MSEmailBodyType apply(BodyPreference input) {
+				return input.getType();
 			}
 		};
 	}
@@ -177,20 +187,24 @@ public class MimePartSelector {
 		switch (bodyType) {
 		case HTML:
 			return Arrays.asList(
-						FetchHints.builder()
-							.contentType(toContentType(MSEmailBodyType.HTML)).build(),
-						FetchHints.builder()
-							.contentType(toContentType(MSEmailBodyType.PlainText))
-							.instruction(FetchInstruction.builder().mailTransformation(MailTransformation.TEXT_PLAIN_TO_TEXT_HTML))
-							.build());
+					FetchHints.builder()
+						.contentType(toContentType(MSEmailBodyType.HTML)).build(),
+					FetchHints.builder()
+						.contentType(toContentType(MSEmailBodyType.PlainText))
+						.instruction(FetchInstruction.builder().mailTransformation(MailTransformation.TEXT_PLAIN_TO_TEXT_HTML))
+						.build());
 		case PlainText:
 			return Arrays.asList(
 					FetchHints.builder()
-					.contentType(toContentType(MSEmailBodyType.PlainText)).build());
+						.contentType(toContentType(MSEmailBodyType.PlainText)).build(),
+					FetchHints.builder()
+						.contentType(toContentType(MSEmailBodyType.HTML))
+						.instruction(FetchInstruction.builder().mailTransformation(MailTransformation.TEXT_HTML_TO_TEXT_PLAIN))
+						.build());
 		case RTF:
 			return Arrays.asList(
 					FetchHints.builder()
-					.contentType(toContentType(MSEmailBodyType.RTF)).build());
+						.contentType(toContentType(MSEmailBodyType.RTF)).build());
 		default:
 			throw new IllegalArgumentException("Unexpected MSEmailBodyType");
 		}
