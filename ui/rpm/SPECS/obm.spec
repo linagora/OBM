@@ -27,6 +27,7 @@ Source11:       %{name}-ui.sh
 Source12:       pgadmin.sh
 Source13:       myadmin.sh
 Source14:       %{name}-services.cron.d
+Source15:       %{name}-services.logrotate.d
 
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -401,7 +402,7 @@ cp -apR auto/updateSieve.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
 cp -apR auto/changePasswd.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
 cp -apR auto/ldapContacts.pl $RPM_BUILD_ROOT%{_datadir}/%{name}/auto
 cp -apR scripts/2.3/update-2.2-2.3.ldap.pl $RPM_BUILD_ROOT%{_datadir}/%{name}-services/updates
-install -p -m 640 doc/conf/logrotate.%{name}-services.sample $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/%{name}-services
+install -p -m 640 %{SOURCE15} $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/%{name}-services
 install -p -m 0644 %{SOURCE14} $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/%{name}-services
 
 # obm-ldap
