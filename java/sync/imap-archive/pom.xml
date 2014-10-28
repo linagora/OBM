@@ -64,6 +64,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
+			<artifactId>smtp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>task-scheduler</artifactId>
 		</dependency>
 		<dependency>

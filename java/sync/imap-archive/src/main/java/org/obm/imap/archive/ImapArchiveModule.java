@@ -75,6 +75,9 @@ import org.obm.imap.archive.services.DateTimeProviderImpl;
 import org.obm.imap.archive.services.DomainClient;
 import org.obm.imap.archive.services.DomainClientImpl;
 import org.obm.imap.archive.services.DomainConfigurationService;
+import org.obm.imap.archive.services.Mailer;
+import org.obm.imap.archive.services.MailerImpl;
+import org.obm.imap.archive.services.NotificationTracking;
 import org.obm.imap.archive.services.ScheduledArchivingTracker;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.imap.archive.services.StoreClientFactory;
@@ -85,6 +88,7 @@ import org.obm.locator.store.LocatorService;
 import org.obm.push.utils.UUIDFactory;
 import org.obm.server.EmbeddedServerModule;
 import org.obm.server.ServerConfiguration;
+import org.obm.sync.SmtpModule;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.date.DateProvider;
 import org.obm.utils.ObmHelper;
@@ -124,6 +128,7 @@ public class ImapArchiveModule extends AbstractModule {
 		install(new DatabaseModule());
 		install(new LoggerModule());
 		install(new DaoModule());
+		install(new SmtpModule());
 		
 		bind(DateProvider.class).to(ObmHelper.class);
 		bind(LocatorService.class).to(LocatorCache.class);
@@ -138,6 +143,7 @@ public class ImapArchiveModule extends AbstractModule {
 		busClients.addBinding().to(ArchiveRecurrentTaskRescheduler.class);
 		busClients.addBinding().to(ArchiveDaoTracking.class);
 		busClients.addBinding().to(ScheduledArchivingTracker.class);
+		busClients.addBinding().to(NotificationTracking.class);
 		bind(ArchiveSchedulerBusInitializer.class).asEagerSingleton();
 		
 		bindImapArchiveServices();
@@ -158,6 +164,7 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(LoggerFileNameService.class).to(LoggerFileNameServiceImpl.class);
 		bind(StoreClientFactory.class);
 		bind(DomainClient.class).to(DomainClientImpl.class);
+		bind(Mailer.class).to(MailerImpl.class);
 	}
 	
 	public static class ImapArchiveServletModule extends ServletModule {
@@ -214,11 +221,13 @@ public class ImapArchiveModule extends AbstractModule {
 
 		private static final String LOG_PATH = "/var/log/obm-imap-archive/";
 		public static final String TASK = "TASK";
+		public static final String NOTIFICATION = "NOTIFICATION";
 		
 		@Override
 		protected void configure() {
 			install(new org.obm.configuration.module.LoggerModule());
 			bind(Logger.class).annotatedWith(Names.named(TASK)).toInstance(org.slf4j.LoggerFactory.getLogger(TASK));
+			bind(Logger.class).annotatedWith(Names.named(NOTIFICATION)).toInstance(org.slf4j.LoggerFactory.getLogger(NOTIFICATION));
 			bind(String.class).annotatedWith(Names.named("logPath")).toInstance(LOG_PATH);
 		}
 		

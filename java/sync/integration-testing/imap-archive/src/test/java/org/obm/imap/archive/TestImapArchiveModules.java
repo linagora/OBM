@@ -47,11 +47,13 @@ import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
+import org.obm.imap.archive.beans.Mailing;
 import org.obm.imap.archive.logging.LoggerFileNameService;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory.OnlyOnePerDomainMonitorFactoryImpl;
+import org.obm.imap.archive.services.Mailer;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
@@ -70,6 +72,9 @@ import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 import com.linagora.scheduling.DateTimeProvider;
 import com.linagora.scheduling.Monitor;
+import com.linagora.scheduling.ScheduledTask.State;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class TestImapArchiveModules {
 	
@@ -154,8 +159,16 @@ public class TestImapArchiveModules {
 				protected void configure() {
 					install(new GreenMailProviderModule());
 					bind(Integer.class).annotatedWith(Names.named("imapTimeout")).toInstance(3600);
+					bind(Mailer.class).to(NoopMailer.class);
 				}})
 			);
+		}
+	}
+	
+	private static class NoopMailer implements Mailer {
+		
+		@Override
+		public void send(ObmDomain domain, ArchiveTreatmentRunId runId, State state, Mailing mailing) {
 		}
 	}
 
