@@ -61,7 +61,7 @@ if ( $cs_lifetime ) {
   $rcSessionLifetime = round($cs_lifetime/60) + 1;
 } else {
   // session life cookie
-  $rcSessionLifetime = 0;
+  $rcSessionLifetime = 10;
 }
 $config['session_lifetime'] = $rcSessionLifetime;
 
