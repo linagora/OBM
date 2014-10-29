@@ -38,6 +38,7 @@ class ProvisioningModule implements ModuleInterface {
   public $name = "Provisioning";
   public $description = "Checks the provisioning service";
   public $url = "/provisioning";
+  public $doc = "http://obm.org/wiki/obm-provisioning-configuration";
 
   function isEnabled($domains = NULL) {
     if ($domains == NULL) {

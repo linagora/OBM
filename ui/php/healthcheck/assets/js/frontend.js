@@ -284,7 +284,8 @@ $.obm.insertExternalCheck = function(module){
 			"description": "Check access to " + module.name + " module ( " + module.url + " ) from this browser.",
 			"url": null,
 			"parentId": null,
-			"external": module.url
+			"external": module.url,
+			"doc": module.doc
 		}
 	);
 }
