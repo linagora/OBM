@@ -53,7 +53,7 @@ public class EmailReaderTest {
 		Charset charset = Charsets.UTF_8;
 		EmailReader testee = new EmailReader(new InputStreamReader(in("data°£€þðØ¿¶", charset), charset));
 		assertThat(testee.charset()).isEqualTo(charset);
-		assertThat(CharStreams.toString(testee)).isEqualTo(new String("data°£€þðØ¿¶".getBytes(charset)));
+		assertThat(CharStreams.toString(testee)).isEqualTo("data°£€þðØ¿¶");
 	}
 	
 	@Test

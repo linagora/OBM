@@ -34,6 +34,7 @@ package org.obm.sync.server.template;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -41,6 +42,7 @@ import org.obm.sync.server.mailer.AbstractMailer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.calendar.CalendarBindingImpl;
@@ -52,6 +54,8 @@ public class TemplateLoaderFreeMarkerImpl implements ITemplateLoader {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(CalendarBindingImpl.class);
+
+	private static final Charset TEMPLATE_CHARSET = Charsets.UTF_8;
 
 	private final ObmSyncConfigurationService constantService;
 
@@ -82,7 +86,7 @@ public class TemplateLoaderFreeMarkerImpl implements ITemplateLoader {
 			TimeZone timezone) throws IOException {
 		Template ret = null;
 		try {
-			ret = getOverrideCfg().getTemplate(templateName, locale);
+			ret = getOverrideCfg().getTemplate(templateName, locale, TEMPLATE_CHARSET.name());
 		} catch (Throwable e) {
 			if (logger.isDebugEnabled()) {
 				logger.debug(
@@ -93,7 +97,7 @@ public class TemplateLoaderFreeMarkerImpl implements ITemplateLoader {
 			}
 		}
 		if (ret == null) {
-			ret = getDefaultCfg(locale).getTemplate(templateName, locale);
+			ret = getDefaultCfg(locale).getTemplate(templateName, locale, TEMPLATE_CHARSET.name());
 		}
 		if (ret == null) {
 			throw new FileNotFoundException("Error while loading Template[ "

@@ -32,17 +32,17 @@
 package org.obm.sync.server.mailer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.obm.DateUtils.date;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.junit.Test;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 
 import freemarker.template.Configuration;
@@ -50,7 +50,6 @@ import freemarker.template.SimpleDate;
 import freemarker.template.Template;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateException;
-
 
 public class TemplateTest {
 	
@@ -65,8 +64,8 @@ public class TemplateTest {
 
 	private ImmutableMap<Object, Object> buildDatamodel() {
 		ImmutableMap<Object, Object> datamodel = ImmutableMap.builder().
-			put("start", date(2001, 8, 11, 9, 12)).
-			put("end", date(2001, 8, 11, 19, 12)).
+			put("start", new SimpleDate(date("2001-09-11T09:12:00Z"), TemplateDateModel.DATETIME)).
+			put("end", new SimpleDate(date("2001-09-11T19:12:00Z"), TemplateDateModel.DATETIME)).
 			put("subject", "test event").
 			put("location", "Lyon").
 			put("organizer", "Matthieu Baechler").
@@ -82,17 +81,10 @@ public class TemplateTest {
 		Configuration cfg = new Configuration();
 		cfg.setClassForTemplateLoading(getClass(), TemplateLoaderFreeMarkerImpl.getTemplatePathPrefix(locale));
 		cfg.setCustomAttribute("datetime_format", "string.medium_short");
-		Template template = cfg.getTemplate("EventInvitationPlain.tpl", locale);
+		cfg.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Template template = cfg.getTemplate("EventInvitationPlain.tpl", locale, Charsets.UTF_8.name());
 		return template;
 	}
-
-	private SimpleDate date(int year, int month, int day, int hour, int minute) {
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.set(year, month, day, hour, minute, 0);
-		Date refDate = calendar.getTime();
-		return new SimpleDate(refDate, TemplateDateModel.DATETIME);
-	}
-	
 	
 	@Test
 	public void testFr() throws IOException, TemplateException {

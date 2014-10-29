@@ -16,7 +16,7 @@
 ##	 enabled=1
 ##	 gpgcheck=0
 
-FROM debian:7.7
+FROM debian:7.3
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -25,20 +25,12 @@ RUN apt-get update && apt-get install -y \
      devscripts ant ant-optional openjdk-7-jre-headless cdbs \
      reprepro maven openjdk-7-jdk wget webfs rpm createrepo
 
-RUN mkdir /root/build-{deb,el6}
-
-RUN mkdir -p /repo/deb/conf ; mkdir -p /repo/rpm
+RUN mkdir /root/build-{deb,el6} && \
+    mkdir -p /repo/deb/conf && \
+    mkdir -p /repo/rpm
 
 ## COPY OBM SOURCES
-RUN mkdir /obm/
-COPY build-system/ /obm/build-system
-COPY ca/ /obm/ca
-COPY java /obm/java
-COPY release /obm/release
-COPY saslauthd /obm/saslauthd
-COPY satellite /obm/satellite
-COPY ui /obm/ui
-COPY .git /obm/.git
+ADD . obm
 
 ## BUILD OBM PACKAGES
 RUN cd obm/java/sync && \

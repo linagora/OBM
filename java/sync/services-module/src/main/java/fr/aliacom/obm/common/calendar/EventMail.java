@@ -89,7 +89,7 @@ public class EventMail {
 		MimeMessage message = new MimeMessage(session);
 		message.setFrom(from);
 		message.setRecipients(RecipientType.TO, getRecipients());
-		message.setSubject(subject);
+		message.setSubject(subject, Charsets.UTF_8.name());
 		message.addHeader(X_OBM_NOTIFICATION_EMAIL, getObmSyncVersion());
 		if(icsContent != null){
 			message.setContent(buildParts());

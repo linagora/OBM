@@ -214,6 +214,7 @@ public abstract class EventChangeMailerTest {
 
 	@Before
 	public void setup() {
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		dateProvider = createMock(DateProvider.class);
 		mailService = createMock(MailService.class);
 		logger = createNiceMock(Logger.class);
@@ -239,8 +240,8 @@ public abstract class EventChangeMailerTest {
 	private static Event buildTestEvent() {
 		Event event = new Event();
 		event.setSequence(2);
-		event.setTimeCreate(date("2009-06-08T16:22:53"));
-		event.setTimeUpdate(date("2009-06-08T16:23:15"));
+		event.setTimeCreate(date("2009-06-08T14:22:53Z"));
+		event.setTimeUpdate(date("2009-06-08T14:23:15Z"));
 		event.addAttendee(createAttendee("Ronan LANORE", "rlanore@linagora.com"));
 		event.addAttendee(createAttendee("Guillaume ALAUX", "galaux@linagora.com"));
 		event.addAttendee(createAttendee("Matthieu BAECHLER", "mbaechler@linagora.com"));
@@ -251,7 +252,7 @@ public abstract class EventChangeMailerTest {
 		event.setOwnerEmail("rrougeron@linagora.com");
 		event.setCreatorDisplayName("Emmanuel SURLEAU");
 		event.setCreatorEmail("esurleau@linagora.com");
-		event.setStartDate(date("2010-11-08T11:00:00"));
+		event.setStartDate(date("2010-11-08T11:00:00Z"));
 		event.setExtId(new EventExtId("f1514f44bf39311568d64072c1fec10f47fe"));
 		event.setDuration(2700);
 		event.setLocation("A random location");
@@ -271,7 +272,7 @@ public abstract class EventChangeMailerTest {
 				RecurrenceDay.Monday,
 				RecurrenceDay.Wednesday,
 				RecurrenceDay.Thursday));
-		recurrence.setEnd(date("2012-11-23T12:00:00"));
+		recurrence.setEnd(date("2012-11-23T12:00:00Z"));
 		event.setRecurrence(recurrence);
 		return event;
 	}
@@ -490,7 +491,7 @@ public abstract class EventChangeMailerTest {
 		checkHtmlMessage(parts, getChangeParticipationHtmlMessage());
 		assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=REPLY;");
 		icsToCheck.add("METHOD:REPLY");
-		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("DTSTART:20101108T110000Z");
 		icsToCheck.add("ATTENDEE;CUTYPE=INDIVIDUAL;PARTSTAT=ACCEPTED;RSVP=TRUE;CN=Matthieu BAECHLE\r\n R;ROLE=OPT-P" +
 				"ARTICIPANT:mailto:mbaechler@linagora.com");
 		icsToCheck.add("COMMENT:This is a random comment");
@@ -522,7 +523,7 @@ public abstract class EventChangeMailerTest {
 		checkHtmlMessage(parts, getCancelHtmlMessage());
 		assertThat(parts.textCalendar.getContentType()).isEqualTo("text/calendar; charset=UTF-8; method=CANCEL;");
 		icsToCheck.add("METHOD:CANCEL");
-		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("DTSTART:20101108T110000Z");
 		checkIcs(parts, icsToCheck);
 	}
 	
@@ -550,7 +551,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getRecurrentCancelPlainMessage());
 		checkHtmlMessage(parts, getRecurrentCancelHtmlMessage());
 		icsToCheck.add("METHOD:CANCEL");
-		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("DTSTART:20101108T110000Z");
 		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
 		checkIcs(parts, icsToCheck);
 	}
@@ -580,7 +581,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getInvitationPlainMessage());
 		checkHtmlMessage(parts, getInvitationHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("DTSTART:20101108T110000Z");
 		checkIcs(parts, icsToCheck);
 	}
 	
@@ -608,7 +609,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getRecurrentInvitationPlainMessage());
 		checkHtmlMessage(parts, getRecurrentInvitationHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("DTSTART:20101108T110000Z");
 		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
 		checkIcs(parts, icsToCheck);
 	}
@@ -624,7 +625,7 @@ public abstract class EventChangeMailerTest {
 
 		Event before = buildTestEvent();
 		Event after = before.clone();
-		after.setStartDate(date("2010-11-08T12:00:00"));
+		after.setStartDate(date("2010-11-08T12:00:00Z"));
 		after.setDuration(3600);
 		for (Attendee att : before.getAttendees()) {
 			att.setParticipation(Participation.needsAction());
@@ -647,7 +648,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getUpdatePlainMessage());
 		checkHtmlMessage(parts, getUpdateHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T110000Z");
+		icsToCheck.add("DTSTART:20101108T120000Z");
 		icsToCheck.remove("SEQUENCE:2");
 		icsToCheck.add("SEQUENCE:4");
 		icsToCheck.remove("DURATION:PT45M");
@@ -667,7 +668,7 @@ public abstract class EventChangeMailerTest {
 		Event before = buildTestRecurrentEvent();
 		Event after = before.clone();
 		before.getRecurrence().setEnd(null);
-		after.setStartDate(date("2010-11-08T12:00:00"));
+		after.setStartDate(date("2010-11-08T12:00:00Z"));
 		after.setDuration(3600);
 		for (Attendee att : before.getAttendees()) {
 			att.setParticipation(Participation.needsAction());
@@ -690,7 +691,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getRecurrentUpdatePlainMessage());
 		checkHtmlMessage(parts, getRecurrentUpdateHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T110000Z");
+		icsToCheck.add("DTSTART:20101108T120000Z");
 		icsToCheck.remove("SEQUENCE:2");
 		icsToCheck.add("SEQUENCE:4");
 		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
@@ -710,7 +711,7 @@ public abstract class EventChangeMailerTest {
 
 		Event before = buildTestEvent();
 		Event after = before.clone();
-		after.setStartDate(date("2010-11-08T12:00:00"));
+		after.setStartDate(date("2010-11-08T12:00:00Z"));
 		after.setDuration(3600);
 		for (Attendee att: before.getAttendees()) {
 			att.setParticipation(Participation.accepted());
@@ -744,7 +745,7 @@ public abstract class EventChangeMailerTest {
 		Event before = buildTestRecurrentEvent();
 		Event after = before.clone();
 		before.getRecurrence().setEnd(null);
-		after.setStartDate(date("2010-11-08T12:00:00"));
+		after.setStartDate(date("2010-11-08T12:00:00Z"));
 		after.setDuration(3600);
 		for (Attendee att: before.getAttendees()) {
 			att.setParticipation(Participation.accepted());
@@ -777,7 +778,7 @@ public abstract class EventChangeMailerTest {
 
 		Event before = buildTestEvent();
 		Event after = before.clone();
-		after.setStartDate(date("2010-11-08T12:00:00"));
+		after.setStartDate(date("2010-11-08T12:00:00Z"));
 		after.setDuration(3600);
 		for (Attendee att: before.getAttendees()) {
 			att.setParticipation(Participation.accepted());
@@ -843,7 +844,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getNonRecurrentToRecurrentUpdatePlainMessage());
 		checkHtmlMessage(parts, getNonRecurrentToRecurrentUpdateHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("DTSTART:20101108T110000Z");
 		icsToCheck.remove("SEQUENCE:2");
 		icsToCheck.add("SEQUENCE:4");
 		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
@@ -874,7 +875,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getNonRecurrentToRecurrentUpdatePlainMessage());
 		checkHtmlMessage(parts, getNonRecurrentToRecurrentUpdateHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("DTSTART:20101108T110000Z");
 		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
 		checkIcs(parts, icsToCheck);
 	}
@@ -902,7 +903,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getRecurrentToNonRecurrentUpdatePlainMessage());
 		checkHtmlMessage(parts, getRecurrentToNonRecurrentUpdateHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("DTSTART:20101108T110000Z");
 		checkIcs(parts, icsToCheck);
 		checkNotice(parts);
 	}
@@ -930,7 +931,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getRecurrentToNonRecurrentUpdatePlainMessage());
 		checkHtmlMessage(parts, getRecurrentToNonRecurrentUpdateHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T100000Z");
+		icsToCheck.add("DTSTART:20101108T110000Z");
 		checkIcs(parts, icsToCheck);
 	}
 

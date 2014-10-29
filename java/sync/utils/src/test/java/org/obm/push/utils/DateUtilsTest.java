@@ -42,7 +42,7 @@ import java.util.TimeZone;
 import org.junit.Test;
 
 public class DateUtilsTest {
-
+	
 	@Test
 	public void getGeneseDate() {
 		Calendar currentGMTCalendar = DateUtils.getEpochPlusOneSecondCalendar();
@@ -239,13 +239,35 @@ public class DateUtilsTest {
 	}
 
 	@Test
-	public void testDateWithTimeOffset() {
-		assertThat(DateUtils.date("2013-07-05T12:00:00+0400")).isEqualTo(new GregorianCalendar(2013, 6, 5, 10, 0, 0).getTime());
+	public void testDateWithTimeOffsetWhenEuropeParisTZ() {
+		GregorianCalendar gregorianCalendar = new GregorianCalendar(TimeZone.getTimeZone("Europe/Paris"));
+		gregorianCalendar.set(2013, 6, 5, 10, 0, 0);
+		gregorianCalendar.set(Calendar.MILLISECOND, 0);
+		assertThat(DateUtils.date("2013-07-05T12:00:00+0400")).isEqualTo(gregorianCalendar.getTime());
 	}
 
 	@Test
-	public void testDateWithNegativeTimeOffset() {
-		assertThat(DateUtils.date("2013-07-05T12:00:00-0400")).isEqualTo(new GregorianCalendar(2013, 6, 5, 18, 0, 0).getTime());
+	public void testDateWithNegativeTimeOffsetWhenEuropeParisTZ() {
+		GregorianCalendar gregorianCalendar = new GregorianCalendar(TimeZone.getTimeZone("Europe/Paris"));
+		gregorianCalendar.set(2013, 6, 5, 18, 0, 0);
+		gregorianCalendar.set(Calendar.MILLISECOND, 0);
+		assertThat(DateUtils.date("2013-07-05T12:00:00-0400")).isEqualTo(gregorianCalendar.getTime());
+	}
+
+	@Test
+	public void testDateWithTimeOffsetWhenUtcTZ() {
+		GregorianCalendar gregorianCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+		gregorianCalendar.set(2013, 6, 5, 8, 0, 0);
+		gregorianCalendar.set(Calendar.MILLISECOND, 0);
+		assertThat(DateUtils.date("2013-07-05T12:00:00+0400")).isEqualTo(gregorianCalendar.getTime());
+	}
+
+	@Test
+	public void testDateWithNegativeTimeOffsetWhenUtcTZ() {
+		GregorianCalendar gregorianCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+		gregorianCalendar.set(2013, 6, 5, 16, 0, 0);
+		gregorianCalendar.set(Calendar.MILLISECOND, 0);
+		assertThat(DateUtils.date("2013-07-05T12:00:00-0400")).isEqualTo(gregorianCalendar.getTime());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -262,6 +284,9 @@ public class DateUtilsTest {
 
 	@Test
 	public void testDateUTC() {
-		assertThat(DateUtils.dateUTC("2013-07-05T12:13:14")).isEqualTo(new GregorianCalendar(2013, 6, 5, 14, 13, 14).getTime());
+		GregorianCalendar gregorianCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+		gregorianCalendar.set(2013, 6, 5, 12, 13, 14);
+		gregorianCalendar.set(Calendar.MILLISECOND, 0);
+		assertThat(DateUtils.dateUTC("2013-07-05T12:13:14Z")).isEqualTo(gregorianCalendar.getTime());
 	}
 }

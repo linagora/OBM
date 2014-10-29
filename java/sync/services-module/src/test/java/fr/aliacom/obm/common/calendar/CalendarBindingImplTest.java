@@ -3382,25 +3382,25 @@ public class CalendarBindingImplTest {
 		Set<DeletedEvent> deletedEvents = Sets.newHashSet(deletedEvent);
 
 		Event updatedSimpleEvent = getFakeEvent(1, RecurrenceKind.none);
-		updatedSimpleEvent.setTimeCreate(DateUtils.date("2012-01-01T14:00:01"));
+		updatedSimpleEvent.setTimeCreate(DateUtils.date("2012-01-01T14:00:01Z"));
 		updatedSimpleEvent.setTimeUpdate(null);
 		updatedSimpleEvent.setRecurrenceId(null);
 
 		Event updatedRecurrenceEvent = getFakeEvent(2, RecurrenceKind.daily);
-		updatedRecurrenceEvent.setTimeCreate(DateUtils.date("2012-01-01T13:59:58"));
-		updatedRecurrenceEvent.setTimeUpdate(DateUtils.date("2012-01-01T13:59:59"));
+		updatedRecurrenceEvent.setTimeCreate(DateUtils.date("2012-01-01T13:59:58Z"));
+		updatedRecurrenceEvent.setTimeUpdate(DateUtils.date("2012-01-01T13:59:59Z"));
 
 		Event shouldMoveSimpleEvent = getFakeEvent(3, RecurrenceKind.none);
-		shouldMoveSimpleEvent.setTimeCreate(DateUtils.date("2012-01-01T13:59:58"));
-		shouldMoveSimpleEvent.setTimeUpdate(DateUtils.date("2012-01-01T13:59:59"));
+		shouldMoveSimpleEvent.setTimeCreate(DateUtils.date("2012-01-01T13:59:58Z"));
+		shouldMoveSimpleEvent.setTimeUpdate(DateUtils.date("2012-01-01T13:59:59Z"));
 		shouldMoveSimpleEvent.setRecurrenceId(null);
 
 		Event shouldMoveEventException = getFakeEvent(4, RecurrenceKind.none);
-		shouldMoveEventException.setRecurrenceId(DateUtils.date("2012-01-01T14:00:00"));
-		shouldMoveEventException.setTimeCreate(DateUtils.date("2012-01-01T13:59:57"));
+		shouldMoveEventException.setRecurrenceId(DateUtils.date("2012-01-01T13:00:00Z"));
+		shouldMoveEventException.setTimeCreate(DateUtils.date("2012-01-01T13:59:57Z"));
 		shouldMoveEventException.setTimeUpdate(null);
 
-		Date lastSync = DateUtils.date("2012-01-01T14:00:00");
+		Date lastSync = DateUtils.date("2012-01-01T14:00:00Z");
 
 		EventChanges eventChangesToSort =
 				EventChanges.builder()
@@ -3450,16 +3450,16 @@ public class CalendarBindingImplTest {
 		Set<DeletedEvent> deletedEvents = Sets.newHashSet(deletedEvent);
 
 		Event shouldMoveSimpleEvent = getFakeEvent(3, RecurrenceKind.none);
-		shouldMoveSimpleEvent.setTimeCreate(DateUtils.date("2012-01-01T13:59:58"));
-		shouldMoveSimpleEvent.setTimeUpdate(DateUtils.date("2012-01-01T13:59:59"));
+		shouldMoveSimpleEvent.setTimeCreate(DateUtils.date("2012-01-01T13:59:58Z"));
+		shouldMoveSimpleEvent.setTimeUpdate(DateUtils.date("2012-01-01T13:59:59Z"));
 		shouldMoveSimpleEvent.setRecurrenceId(null);
 
 		Event shouldMoveEventException = getFakeEvent(4, RecurrenceKind.none);
-		shouldMoveEventException.setRecurrenceId(DateUtils.date("2012-01-01T14:00:00"));
-		shouldMoveEventException.setTimeCreate(DateUtils.date("2012-01-01T13:59:57"));
+		shouldMoveEventException.setRecurrenceId(DateUtils.date("2012-01-01T13:00:00Z"));
+		shouldMoveEventException.setTimeCreate(DateUtils.date("2012-01-01T13:59:57Z"));
 		shouldMoveEventException.setTimeUpdate(null);
 
-		Date lastSync = DateUtils.date("2012-01-01T14:00:00");
+		Date lastSync = DateUtils.date("2012-01-01T14:00:00Z");
 
 		EventChanges eventChangesToSort =
 				EventChanges.builder()

@@ -73,7 +73,7 @@ private CalendarItemsWriter writer;
 	public void initCalendarWriter(){
 		writer = new CalendarItemsWriter();
 		XMLUnit.setIgnoreWhitespace(true);
-		lastSync = DateUtils.date("2012-03-05T14:26:29");
+		lastSync = DateUtils.date("2012-03-05T13:26:29Z");
 	}
 
 	@Test

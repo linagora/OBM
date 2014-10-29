@@ -170,8 +170,8 @@ public abstract class CommonDomainEndPointEnvTest {
 		}
 	}
 
-	private static Date TIMECREATE = DateUtils.date("2013-06-11T14:00:00");
-	private static Date TIMEUPDATE = DateUtils.date("2013-06-11T15:00:00");
+	private static Date TIMECREATE = DateUtils.date("2013-06-11T14:00:00Z");
+	private static Date TIMEUPDATE = DateUtils.date("2013-06-11T15:00:00Z");
 	
 	protected static final ProfileName adminProfile = ProfileName.builder().name("admin").build();
 
@@ -387,8 +387,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"mails\":[\"john@domain\",\"jo@*\",\"john@alias\"]," +
 					"\"effectiveMails\":[\"john@domain\",\"jo@domain\",\"jo@domain.com\",\"john@alias\"]," +
 					"\"hidden\":true," +
-					"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
-					"\"timeupdate\":\"2013-06-11T13:00:00.000+0000\"," +
+					"\"timecreate\":\"2013-06-11T14:00:00.000+0000\"," +
+					"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
 					"\"groups\":" +
 						"[]" +
 				"}";
@@ -424,8 +424,8 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"mails\":[\"john@domain\",\"jo@*\",\"john@alias\"]," +
 				"\"effectiveMails\":[\"john@domain\",\"jo@domain\",\"jo@domain.com\",\"john@alias\"]," +
 				"\"hidden\":true," +
-				"\"timecreate\":\"2013-06-11T12:00:00.000+0000\"," +
-				"\"timeupdate\":\"2013-06-11T13:00:00.000+0000\"," +
+				"\"timecreate\":\"2013-06-11T14:00:00.000+0000\"," +
+				"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
 				"\"groups\":" +
 					"[" +
 						"{" +

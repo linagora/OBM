@@ -38,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import javax.xml.parsers.FactoryConfigurationError;
@@ -75,16 +76,17 @@ public class DOMUtilsTest {
 	public void testCDataSectionEncoding() throws TransformerException, IOException{
 		Document reply = DOMUtils.createDoc(null, "Root");
 		Element root = reply.getDocumentElement();
+		Charset charset = Charsets.UTF_8;
 
 		String expectedString = " \" ' éàâ";
 		DOMUtils.createElementAndCDataText(root, 
-				"CDataSection",  new ByteArrayInputStream(expectedString.getBytes()), Charsets.UTF_8);
+				"CDataSection",  new ByteArrayInputStream(expectedString.getBytes(charset)), charset);
 		
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		DOMUtils.serialize(reply, out);
 				
-		assertThat(new String(out.toByteArray(), "UTF-8")).contains( 
+		assertThat(new String(out.toByteArray(), charset.name())).contains( 
 				"<CDataSection><![CDATA["+ expectedString + "]]></CDataSection>");
 	}
 
