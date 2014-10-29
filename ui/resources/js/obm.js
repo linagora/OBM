@@ -738,6 +738,9 @@ function getWebmailUnreadMail(callback) {
     onSuccess: function(responseText){
         var count = parseInt(responseText, 10);
         if( isNaN(count)) {
+            if (window.console) {
+                window.console.log("Failed to get unread email count. Authentication error?");
+            }
             return ;
         }
         callback(count);
