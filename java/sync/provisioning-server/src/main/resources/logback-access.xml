@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<configuration>
+  
+  <property scope="context" name="defaultLogDir" value="/var/log/obm-provisioning" />
+       
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${logDir:-${defaultLogDir}}/access.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${logDir:-${defaultLogDir}}/access.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+    </rollingPolicy>
+
+    <encoder>
+      <pattern>%h %l %u %user %date "%r" %s %b</pattern>
+    </encoder>
+  </appender>
+ 
+  <appender-ref ref="FILE" />
+  
+</configuration>

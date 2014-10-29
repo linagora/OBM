@@ -53,10 +53,11 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testObmUserDeserializerAndSerializer() throws DaoException, DomainNotFoundException {
 		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("user", "password")
+			.auth().basic("user@domain", "password")
 			.content(obmUserToJsonString()).contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.OK.getStatusCode())
@@ -70,10 +71,11 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testObmUserSerializerWithNullValue() throws DaoException, DomainNotFoundException {
 		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("user", "password")
+			.auth().basic("user@domain", "password")
 			.content(obmUserJsonStringWithNullValue()).contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.OK.getStatusCode())
@@ -87,10 +89,11 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testObmUserDeserializerWithMinimalRepresentation() throws DaoException, DomainNotFoundException {
 		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
 		mocksControl.replay();
 
 		given()
-			.auth().basic("user", "password")
+			.auth().basic("user@domain", "password")
 			.content(minimalObmUserJsonString()).contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
@@ -103,10 +106,11 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testObmUserDeserializerWhenNoLastName() throws DaoException, DomainNotFoundException {
 		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
 		mocksControl.replay();
 
 		given()
-			.auth().basic("user", "password")
+			.auth().basic("user@domain", "password")
 			.content(obmUserJsonStringWithoutLastName()).contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
@@ -119,10 +123,11 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testObmUserDeserializerWhenNoProfile() throws DaoException, DomainNotFoundException {
 		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
 		mocksControl.replay();
 
 		given()
-			.auth().basic("user", "password")
+			.auth().basic("user@domain", "password")
 			.content(obmUserJsonStringWithoutProfile()).contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
@@ -135,10 +140,11 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGroupDeserializerAndSerializerWithFullJsonAndNullValue() throws DaoException, DomainNotFoundException {
 		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("user", "password")
+			.auth().basic("user@domain", "password")
 			.content(
 					"{" +
 						"\"id\":\"groupExtId\"," +
@@ -170,10 +176,11 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGroupDeserializerAndSerializerWithFullJson() throws DaoException, DomainNotFoundException {
 		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("user", "password")
+			.auth().basic("user@domain", "password")
 			.content(
 					"{" +
 						"\"id\":\"groupExtId\"," +
@@ -205,10 +212,11 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testGroupDeserializerAndSerializerWithPartialJson() throws DaoException, DomainNotFoundException {
 		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("user", "password")
+			.auth().basic("user@domain", "password")
 			.content(
 					"{" +
 						"\"id\":\"groupExtId\"" +
@@ -237,10 +245,11 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testRuntimeExceptionSerializer() throws DaoException, DomainNotFoundException {
 		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("user", "password").
+			.auth().basic("user@domain", "password").
 		expect()
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
 			.content(containsString(
@@ -257,10 +266,11 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 	@Test
 	public void testExceptionSerializer() throws DaoException, DomainNotFoundException {
 		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
 		mocksControl.replay();
 		
 		given()
-			.auth().basic("user", "password").
+			.auth().basic("user@domain", "password").
 		expect()
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
 			.content(containsString(

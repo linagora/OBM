@@ -1,0 +1,4 @@
+<included>
+	<logger name="CONFIGURATION" level="INFO" />
+	<logger name="CONTAINER" level="INFO" />
+</included>

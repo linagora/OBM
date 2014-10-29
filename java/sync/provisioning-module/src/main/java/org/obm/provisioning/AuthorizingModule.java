@@ -41,6 +41,8 @@ import org.obm.provisioning.authentication.ObmJDBCAuthorizingRealm;
 import org.obm.provisioning.authorization.AuthorizationService;
 import org.obm.provisioning.authorization.AuthorizationServiceImpl;
 
+import com.google.inject.Key;
+
 public class AuthorizingModule extends ShiroWebModule {
 
 	private final String baseUrl;
@@ -69,6 +71,7 @@ public class AuthorizingModule extends ShiroWebModule {
 		addFilterChain(baseUrl + "*/groups/**", AUTHC_BASIC);
 		addFilterChain(baseUrl + "*/profiles/**", AUTHC_BASIC);
 		addFilterChain(baseUrl + "*/batches/**", AUTHC_BASIC);
+		addFilterChain(baseUrl + "**", Key.get(MDCFilter.class));
 		expose(Realm.class);
 	}
 

@@ -29,16 +29,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
+import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.util.Collections;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
@@ -46,6 +44,7 @@ import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 
 import com.google.common.collect.ImmutableList;
+import com.jayway.restassured.RestAssured;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -56,38 +55,52 @@ public class DomainResourceTest extends CommonDomainEndPointEnvTest {
 
 	@Test
 	public void testEmptyList() throws Exception {
+		RestAssured.baseURI = baseUrl;
+		expectSuccessfulAuthentication("user", "password");
 		expect(domainDao.list()).andReturn(Collections.<ObmDomain> emptyList());
 		mocksControl.replay();
 
-		HttpResponse response = get("/domains");
+		given()
+			.auth().basic("user@domain", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(equalTo("[]")).
+		when()
+			.get("/domains");
 
 		mocksControl.verify();
-
-		assertThat(EntityUtils.toString(response.getEntity())).isEqualTo("[]");
 	}
 
 	@Test
 	public void testNullList() throws Exception {
+		RestAssured.baseURI = baseUrl;
+		expectSuccessfulAuthentication("user", "password");
 		expect(domainDao.list()).andReturn(null);
 		mocksControl.replay();
 
-		HttpResponse response = get("/domains");
+		given()
+			.auth().basic("user@domain", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(equalTo("[]")).
+		when()
+			.get("/domains");
 
 		mocksControl.verify();
-
-		assertThat(EntityUtils.toString(response.getEntity())).isEqualTo("[]");
 	}
 
 	@Test
 	public void testList() throws Exception {
+		RestAssured.baseURI = baseUrl;
+		expectSuccessfulAuthentication("user", "password");
 		expect(domainDao.list()).andReturn(ImmutableList.<ObmDomain> of(domain, ToolBox.getDefaultObmDomain()));
 		mocksControl.replay();
 
-		HttpResponse response = get("/domains");
-
-		mocksControl.verify();
-
-		assertThat(EntityUtils.toString(response.getEntity())).isEqualTo(
+		given()
+			.auth().basic("user@domain", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(equalTo(
 				"[" +
 						"{" +
 							"\"id\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
@@ -97,58 +110,74 @@ public class DomainResourceTest extends CommonDomainEndPointEnvTest {
 							"\"id\":\"ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6\"," +
 							"\"url\":\"/domains/ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6\"" +
 						"}" +
-				"]");
+				"]")).
+		when()
+			.get("/domains");
+
+		mocksControl.verify();
 	}
 
 	@Test
 	public void testListOnError() throws Exception {
+		RestAssured.baseURI = baseUrl;
+		expectSuccessfulAuthentication("user", "password");
 		expect(domainDao.list()).andThrow(new RuntimeException("foo"));
 		mocksControl.replay();
 
-		HttpResponse response = get("/domains");
-
-		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.INTERNAL_SERVER_ERROR.getStatusCode());
-		assertThat(EntityUtils.toString(response.getEntity())).isEqualTo(
+		given()
+			.auth().basic("user@domain", "password").
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+			.body(equalTo(
 				"{" +
 						"\"message\":\"foo\"," +
 						"\"type\":\"java.lang.RuntimeException\"" +
-				"}");
+				"}")).
+		when()
+			.get("/domains");
+		
+		mocksControl.verify();
 	}
 
 	@Test
 	public void testGet() throws Exception {
+		RestAssured.baseURI = baseUrl;
+		expectSuccessfulAuthentication("user", "password");
 		expectDomain();
 		mocksControl.replay();
 
-		HttpResponse response = get("/domains/" + domain.getUuid().get());
-
-		mocksControl.verify();
-
-		assertThat(EntityUtils.toString(response.getEntity())).isEqualTo(
+		given()
+			.auth().basic("user@domain", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(equalTo(
 				"{" +
 					"\"id\":\"a3443822-bb58-4585-af72-543a287f7c0e\"," +
 					"\"name\":\"domain\"," +
 					"\"label\":null," +
 					"\"aliases\":[\"domain.com\"]" +
-				"}");
+				"}")).
+		when()
+			.get("/domains/" + domain.getUuid().get());
+		
+		mocksControl.verify();
 	}
 
 	@Test
 	public void testGetOnUnknownDomain() throws Exception {
+		RestAssured.baseURI = baseUrl;
+		expectSuccessfulAuthentication("user", "password");
 		expectNoDomain();
 		mocksControl.replay();
 
-		HttpResponse response = get("/domains/" + domain.getUuid().get());
+		given()
+			.auth().basic("user@domain", "password").
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.get("/domains/" + domain.getUuid().get());
 
 		mocksControl.verify();
-
-		assertThat(response.getStatusLine().getStatusCode()).isEqualTo(Status.NOT_FOUND.getStatusCode());
-	}
-	
-	private HttpResponse get(String path) throws Exception {
-		return Request.Get(baseUrl + path).execute().returnResponse();
 	}
 
 }

@@ -31,57 +31,52 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import org.obm.push.utils.jvm.VMArgumentsUtils;
-import org.obm.server.EmbeddedServerModule;
-import org.obm.server.ServerConfiguration;
-import org.obm.server.WebServer;
-import org.obm.server.context.NoContext;
+import java.util.concurrent.atomic.AtomicLong;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Throwables;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
-public class ProvisioningServerLauncher {
+import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
-	private static final int DEFAULT_SERVER_PORT = 8086;
-	private static final int SERVER_PORT = Objects.firstNonNull(
-			VMArgumentsUtils.integerArgumentValue("provisioningServerPort"),
-			DEFAULT_SERVER_PORT);
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-	public static void main(String... args) throws Exception {
-		/******************************************************************
-		 * EVERY CHANGE DONE HERE CAN SILENTLY BREAK THE STARTUP *
-		 ******************************************************************/
-		Injector injector = Guice.createInjector(
-				new ProvisioningServerService(new NoContext()), 
-				new EmbeddedServerModule(
-					ServerConfiguration.builder()
-						.port(SERVER_PORT)
-						.requestLoggerEnabled(true)
-						.build()));
+@Singleton
+public class MDCFilter extends BasicHttpAuthenticationFilter {
+
+	private static final Logger logger = LoggerFactory.getLogger(MDCFilter.class);
+
+	private final AtomicLong requestIdProvider;
+	
+	@Inject
+	public MDCFilter() {
+		requestIdProvider = new AtomicLong();
+	}
+	
+	@Override
+	protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+		boolean preHandle = super.preHandle(request, response);
 		
-		WebServer webserver = injector.getInstance(WebServer.class);
-		start(webserver).join();
-	}
-
-	public static WebServer start(WebServer server) throws Exception {
-		registerSigTermHandler(server);
-		server.start();
-		return server;
-	}
-
-	private static void registerSigTermHandler(final WebServer server) {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-
-			@Override
-			public void run() {
-				try {
-					server.stop();
-				} catch (Exception e) {
-					Throwables.propagate(e);
-				}
+		try {
+			MDC.put("threadId", String.valueOf(Thread.currentThread().getId()));
+			MDC.put("requestId", String.valueOf(requestIdProvider.incrementAndGet()));
+			Object principal = getSubject(request, response).getPrincipal();
+			if (principal != null) {
+				MDC.put("user", principal.toString());
+			} else {
+				logger.warn("Cannot identify the user");
 			}
-		});
+		} catch (Exception e) {
+			logger.error("Cannot configure MDC loggers", e);
+		}
+		return preHandle;
+	}
+	
+	@Override
+	public void afterCompletion(ServletRequest request, ServletResponse response, Exception exception) throws Exception {
+		MDC.clear();
 	}
 }
