@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.obm.Configuration;
 import org.obm.Configuration.ObmSync;
 import org.obm.StaticConfigurationService;
@@ -126,5 +129,10 @@ public class ObmSyncStaticConfigurationService {
 			return true;
 		}
 		
+		@Override
+		public ResourceBundle getResourceBundle(Locale locale) {
+			return obmSyncConfiguration.bundle;
+		}
+
 	}
 }

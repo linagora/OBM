@@ -31,6 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.services.constant;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.obm.configuration.ConfigurationService;
 import org.obm.sync.auth.AccessToken;
 
@@ -57,4 +60,5 @@ public interface ObmSyncConfigurationService extends ConfigurationService {
 	boolean syncUsersAsAddressBook();
 	CalendarEncoding getEmailCalendarEncoding();
 	boolean isAutoTruncateEnabled();
+	ResourceBundle getResourceBundle(Locale locale);
 }

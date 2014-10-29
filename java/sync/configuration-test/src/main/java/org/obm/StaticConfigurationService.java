@@ -34,8 +34,6 @@ package org.obm;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
@@ -78,11 +76,6 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 	public StaticConfigurationService(Configuration configuration) {
 		super(configuration.locator);
 		this.configuration = configuration;
-	}
-
-	@Override
-	public ResourceBundle getResourceBundle(Locale locale) {
-		return configuration.bundle;
 	}
 
 	@Override

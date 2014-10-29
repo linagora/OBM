@@ -32,11 +32,8 @@
 package org.obm.configuration;
 
 import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
-import org.obm.configuration.resourcebundle.Control;
 import org.obm.configuration.utils.IniFile;
 import org.obm.configuration.utils.TimeUnitMapper;
 
@@ -125,11 +122,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     public int getTransactionToleranceTimeoutInSeconds() {
             return iniFile.getIntValue(TRANSACTION_TOLERANCE_TIMEOUT_KEY, TRANSACTION_TOLERANCE_TIMEOUT_DEFAULT);
     }
-
-	@Override
-	public ResourceBundle getResourceBundle(Locale locale) {
-		return ResourceBundle.getBundle("Messages", locale, new Control());
-	}
 
 	@Override
 	public Charset getDefaultEncoding() {

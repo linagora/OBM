@@ -30,8 +30,6 @@
 
 package org.obm.configuration;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 public interface DataConfiguration {
 
@@ -39,5 +37,4 @@ public interface DataConfiguration {
 
 	int transactionTimeoutInSeconds();
 
-	ResourceBundle getResourceBundle(Locale locale);
 }

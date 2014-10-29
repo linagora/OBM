@@ -31,7 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.services.constant;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.obm.configuration.ConfigurationServiceImpl;
+import org.obm.configuration.resourcebundle.Control;
 import org.obm.configuration.utils.IniFile;
 import org.obm.sync.auth.AccessToken;
 import org.slf4j.Logger;
@@ -136,5 +140,11 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 	@Override
 	public boolean isAutoTruncateEnabled() {
 		return iniFile.getBooleanValue(DB_AUTO_TRUNCATE_PARAMETER, DB_AUTO_TRUNCATE_DEFAULT_VALUE);
+	}
+
+
+	@Override
+	public ResourceBundle getResourceBundle(Locale locale) {
+		return ResourceBundle.getBundle("Messages", locale, new Control());
 	}
 }

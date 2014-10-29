@@ -74,6 +74,7 @@ public class Configuration {
 		public String anyUserAccounts = "";
 		public String emailCalendarEncoding = "Auto";
 		public boolean syncUsersAsAddressBook = true;
+		public ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.FRANCE);
 	}
 
 	public static class ObmSyncWithLDAPAuth extends ObmSync {
@@ -88,7 +89,6 @@ public class Configuration {
 
 	}
 
-	public ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.FRANCE);
 	public Transaction transaction = new Transaction();
 	public Locator locator = new Locator();
 	public File dataDir;
