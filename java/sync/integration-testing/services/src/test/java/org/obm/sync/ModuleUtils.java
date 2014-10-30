@@ -34,6 +34,7 @@ package org.obm.sync;
 import java.io.Serializable;
 
 import javax.mail.MessagingException;
+import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.io.FileUtils;
@@ -166,6 +167,11 @@ public class ModuleUtils {
 					
 					@Override
 					public void sendEmail(MimeMessage message, AccessToken token) throws MessagingException {
+						// do nothing
+					}
+
+					@Override
+					public void sendEmail(MimeMessage message, Session session) throws MessagingException {
 						// do nothing
 					}
 					

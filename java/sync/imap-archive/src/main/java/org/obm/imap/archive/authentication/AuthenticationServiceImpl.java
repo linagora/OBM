@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  *
- * Copyright (C) 2014  Linagora
+ * Copyright (C) 2011-2014  Linagora
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License as
@@ -31,23 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.authentication;
 
-import java.io.IOException;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.obm.imap.archive.exception.AuthenticationException;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
-import org.obm.sync.auth.Credentials;
 import org.obm.sync.client.login.LoginClient;
-import org.obm.sync.client.login.LoginClient.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,62 +43,29 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class AuthenticationFilter implements Filter {
+public class AuthenticationServiceImpl implements AuthenticationService {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
 	
-	private final Factory loginClientFactory;
+	private final LoginClient.Factory loginClientFactory;
 
 	@Inject
-	@VisibleForTesting AuthenticationFilter(LoginClient.Factory loginClientFactory) {
+	@VisibleForTesting AuthenticationServiceImpl(LoginClient.Factory loginClientFactory) {
 		this.loginClientFactory = loginClientFactory;
 	}
-	
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-	}
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		HttpServletResponse httpResponse = (HttpServletResponse) response;
+	public AccessToken getTrustedAccessTokenForUser(String loginAtDomain, String password) throws AuthFault {
 		try {
-			authenticate(httpRequest);
-			chain.doFilter(request, response);
-		} catch (AuthFault | AuthenticationException e) {
-			logger.info(e.getMessage());
-			returnHttpAuthenticationError(httpResponse);
+			return loginClient().trustedLogin(loginAtDomain, password);
 		}
-	}
-
-	private void returnHttpAuthenticationError(HttpServletResponse response) {
-		String s = "Basic realm=\"OBMIMAPArchive\"";
-		response.setHeader("WWW-Authenticate", s);
-		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	}
-	
-	@VisibleForTesting void authenticate(HttpServletRequest request) throws AuthFault {
-		Credentials credentials = getCredentials(request);
-		loginClient().trustedLogin(credentials.getLogin().getFullLogin(), credentials.getPassword());
-	}
-
-	private Credentials getCredentials(HttpServletRequest request) throws AuthenticationException {
-		String authHeader = request.getHeader("Authorization");
-		if (authHeader == null) {
-			throw new AuthenticationException("The request has no 'Authorization' header");
-		}
-		try {
-			return Credentials.fromAuthorizationHeader(authHeader);
-		} catch (Exception e) {
-			throw new AuthenticationException(e);
+		catch (AuthFault e) {
+			LOGGER.error("Failed to locate trust token in database.", e);
+			throw e;
 		}
 	}
 
 	protected LoginClient loginClient() {
 		return loginClientFactory.create(HttpClientBuilder.create().build());
-	}
-
-	@Override
-	public void destroy() {
 	}
 }

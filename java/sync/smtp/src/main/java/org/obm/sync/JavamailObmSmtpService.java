@@ -62,22 +62,23 @@ public class JavamailObmSmtpService implements ObmSmtpService {
 	
 	@Override
 	public void sendEmail(MimeMessage message, AccessToken token) throws MessagingException {
-		Transport transport = null;
-		
 		try {
-			Session session = buildSession(token.getDomain());
-			
-			transport = session.getTransport("smtp");
-			transport.connect();
-			transport.sendMessage(message, message.getAllRecipients());
+			sendEmail(message, buildSession(token.getDomain()));
 		} catch (LocatorClientException e) {
 			logger.error("Couldn't send the message", e);
-		} finally {
-			if (transport != null) {
-				transport.close();
-			}
-		} 
+		}
     }
+
+	@Override
+	public void sendEmail(MimeMessage message, Session session) throws MessagingException {
+		Transport transport = session.getTransport("smtp"); 
+		try {
+			transport.connect();
+			transport.sendMessage(message, message.getAllRecipients());
+		} finally {
+			transport.close();
+		}
+	}
 	
 	private Session buildSession(ObmDomain domain) throws LocatorClientException {
 		Properties properties = new Properties();

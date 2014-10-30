@@ -68,6 +68,22 @@ public class Expectations {
 		return this;
 	}
 	
+	public Expectations expectTrustedLoginThrowAuthFault() {
+		driver.addExpectation(
+				onRequestTo("/obm-sync/login/trustedLogin").withMethod(Method.POST)
+					.withBody(Matchers.allOf(
+								Matchers.containsString("login=admin%40mydomain.org"),
+								Matchers.containsString("password=trust3dToken")),
+					MediaType.APPLICATION_FORM_URLENCODED),
+				giveResponse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+						+ "<error xmlns=\"http://www.obm.org/xsd/sync/error.xsd\">"
+						+ "<message>Login failed for user 'admin%40mydomain.org'</message>"
+						+ "</error>",
+					MediaType.APPLICATION_XML)
+				);
+		return this;
+	}
+	
 	public Expectations expectGetDomain(ObmDomainUuid domainId) {
 		expectDomain(domainId);
 		return this;

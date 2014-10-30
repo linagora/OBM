@@ -106,6 +106,18 @@ public class RootHandlerTest {
 	}
 	
 	@Test
+	public void testStatusUnauthorizedWhenBadCredentials() {
+		expectations.expectTrustedLoginThrowAuthFault();
+		given()
+			.port(server.getHttpPort())
+			.auth().basic("admin@mydomain.org", "trust3dToken").
+		expect()
+			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/status");
+	}
+	
+	@Test
 	public void testStatusOkOnHealthcheckRoot() {
 		given()
 			.port(server.getHttpPort())

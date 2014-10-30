@@ -37,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.shiro.guice.web.GuiceShiroFilter;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.obm.annotations.transactional.TransactionalModule;
@@ -44,7 +45,7 @@ import org.obm.cyrus.imap.CyrusClientModule;
 import org.obm.dbcp.DatabaseModule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.domain.dao.UserSystemDaoJdbcImpl;
-import org.obm.imap.archive.authentication.AuthenticationFilter;
+import org.obm.imap.archive.authentication.AuthorizationModule;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationModule;
@@ -88,6 +89,7 @@ import org.obm.locator.store.LocatorService;
 import org.obm.push.utils.UUIDFactory;
 import org.obm.server.EmbeddedServerModule;
 import org.obm.server.ServerConfiguration;
+import org.obm.server.context.NoContext;
 import org.obm.sync.SmtpModule;
 import org.obm.sync.XTrustProvider;
 import org.obm.sync.date.DateProvider;
@@ -129,6 +131,7 @@ public class ImapArchiveModule extends AbstractModule {
 		install(new LoggerModule());
 		install(new DaoModule());
 		install(new SmtpModule());
+		install(new AuthorizationModule(new NoContext()));
 		
 		bind(DateProvider.class).to(ObmHelper.class);
 		bind(LocatorService.class).to(LocatorCache.class);
@@ -176,7 +179,7 @@ public class ImapArchiveModule extends AbstractModule {
 		
 		@Override
 		protected void configureServlets() {
-			filter(URL_PATTERN).through(AuthenticationFilter.class);
+			filter("/*", "").through(GuiceShiroFilter.class);
 			serve(URL_PATTERN).with(ImapArchiveServicesContainer.class);
 			serve(URL_HEALTHCHECK_PATTERN).with(ImapArchiveHealthcheckContainer.class);
 		}

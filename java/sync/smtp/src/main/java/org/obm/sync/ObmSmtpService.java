@@ -32,6 +32,7 @@
 package org.obm.sync;
 
 import javax.mail.MessagingException;
+import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.obm.sync.auth.AccessToken;
@@ -40,4 +41,5 @@ public interface ObmSmtpService {
 
 	public void sendEmail(MimeMessage message, AccessToken token) throws MessagingException;
 	
+	public void sendEmail(MimeMessage message, Session session) throws MessagingException;
 }
