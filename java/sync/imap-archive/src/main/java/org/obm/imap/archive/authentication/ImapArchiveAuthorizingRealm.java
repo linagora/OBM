@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.authentication;
 
+import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -42,6 +43,8 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.obm.imap.archive.exception.AuthenticationException;
 import org.obm.sync.auth.AuthFault;
 
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -50,10 +53,36 @@ public class ImapArchiveAuthorizingRealm extends AuthorizingRealm {
 	
 	@Inject
 	private AuthenticationService authenticationService;
+	@Inject
+	private AuthorizationService authorizationService;
 	
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principal) {
-		return new SimpleAuthorizationInfo();
+		String loginAtDomain = (String) principal.getPrimaryPrincipal();
+		
+		if (loginAtDomain == null) {
+			throw new AccountException("Null usernames are not allowed by this realm.");
+		}
+		
+		String[] loginParts = splitLogin(loginAtDomain);
+		SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+		authorizationInfo.addRoles(FluentIterable.from(authorizationService.getRoles(loginParts[0], loginParts[1]))
+				.transform(new Function<Authorization, String>() {
+
+					@Override
+					public String apply(Authorization authorization) {
+						return authorization.get();
+					}
+				}).toList());
+		return authorizationInfo;
+	}
+
+	private String[] splitLogin(String loginAtDomain) {
+		String[] loginParts = loginAtDomain.split("@");
+		if (loginParts.length != 2) {
+			throw new AccountException("Usernames must be in the login@domain form for by this realm.");
+		}
+		return loginParts;
 	}
 
 	@Override

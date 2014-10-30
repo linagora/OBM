@@ -45,6 +45,8 @@ import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
+import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.Mailing;
@@ -122,6 +124,8 @@ public class TestImapArchiveModules {
 						IMocksControl control = EasyMock.createControl();
 						bind(IMocksControl.class).toInstance(control);
 						bind(UserSystemDao.class).toInstance(control.createMock(UserSystemDao.class));
+						bind(DomainDao.class).toInstance(control.createMock(DomainDao.class));
+						bind(UserDao.class).toInstance(control.createMock(UserDao.class));
 
 						Multibinder<ArchiveSchedulerBus.Client> busClients = Multibinder.newSetBinder(binder(), ArchiveSchedulerBus.Client.class);
 						busClients.addBinding().to(FutureSchedulerBusClient.class);

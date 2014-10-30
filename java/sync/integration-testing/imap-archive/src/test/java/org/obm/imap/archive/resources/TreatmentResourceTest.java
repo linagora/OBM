@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.expect;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.obm.imap.archive.ExpectAuthorization.expectAdmin;
 
 import java.io.File;
 import java.util.Timer;
@@ -59,6 +60,8 @@ import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.DatabaseOperations;
@@ -114,6 +117,8 @@ public class TreatmentResourceTest {
 	@Inject WebServer server;
 	@Inject GreenMail imapServer;
 	@Inject UserSystemDao userSystemDao;
+	@Inject DomainDao domainDao;
+	@Inject UserDao userDao;
 	@Inject TestDateProvider testDateProvider;
 	@Inject IMocksControl control;
 	Expectations expectations;
@@ -150,6 +155,8 @@ public class TreatmentResourceTest {
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
 		
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
+		
 		control.replay();
 		server.start();
 		
@@ -184,6 +191,8 @@ public class TreatmentResourceTest {
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(TestImapArchiveModules.uuid), domainId)));
 		
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
+		
 		control.replay();
 		server.start();
 		
@@ -210,6 +219,7 @@ public class TreatmentResourceTest {
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();
 		server.start();
@@ -251,6 +261,7 @@ public class TreatmentResourceTest {
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();
 		server.start();
@@ -298,6 +309,8 @@ public class TreatmentResourceTest {
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
 		
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
+		
 		String expectedContent = "Old treatment file";
 		temporaryFolder.create();
 		File treatmentFile = temporaryFolder.newFile(runId.toString() + ".log");
@@ -328,6 +341,8 @@ public class TreatmentResourceTest {
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
+		
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();
 		server.start();
@@ -370,6 +385,7 @@ public class TreatmentResourceTest {
 					.build()));
 		
 		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build()).times(2);
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		control.replay();
 		server.start();

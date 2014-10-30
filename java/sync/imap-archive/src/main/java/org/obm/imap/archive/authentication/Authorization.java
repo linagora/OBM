@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  *
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License as
@@ -29,38 +29,20 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
+
 package org.obm.imap.archive.authentication;
 
-import javax.servlet.ServletContext;
+public enum Authorization {
 
-import org.apache.shiro.guice.web.ShiroWebModule;
-import org.apache.shiro.realm.Realm;
-import org.obm.imap.archive.ImapArchiveModule.ImapArchiveServletModule;
-
-import com.google.common.base.Throwables;
-
-public class AuthorizationModule extends ShiroWebModule {
-
-	public AuthorizationModule(ServletContext servletContext) {
-		super(servletContext);
+	ADMIN("admin"), USER("user"), NONE("*");
+	
+	private String value;
+	
+	Authorization(String value) {
+		this.value = value;
 	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	protected void configureShiroWeb() {
-		try {
-			bindRealm().toConstructor(ImapArchiveAuthorizingRealm.class.getConstructor());
-		} catch (SecurityException e) {
-			throw e;
-		} catch (NoSuchMethodException e) {
-			Throwables.propagate(e);
-		}
-		
-		bind(Realm.class).to(ImapArchiveAuthorizingRealm.class);
-		bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
-		bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
-
-		addFilterChain(ImapArchiveServletModule.URL_PREFIX + "/**", AUTHC_BASIC, config(ROLES, Authorization.ADMIN.get()));
-		expose(Realm.class);
+	
+	public String get() {
+		return value;
 	}
 }

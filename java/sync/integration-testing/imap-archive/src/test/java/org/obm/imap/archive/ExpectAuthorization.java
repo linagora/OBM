@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  *
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2014  Linagora
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License as
@@ -29,38 +29,49 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.archive.authentication;
 
-import javax.servlet.ServletContext;
+package org.obm.imap.archive;
 
-import org.apache.shiro.guice.web.ShiroWebModule;
-import org.apache.shiro.realm.Realm;
-import org.obm.imap.archive.ImapArchiveModule.ImapArchiveServletModule;
+import static org.easymock.EasyMock.expect;
 
-import com.google.common.base.Throwables;
+import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.UserDao;
 
-public class AuthorizationModule extends ShiroWebModule {
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserLogin;
 
-	public AuthorizationModule(ServletContext servletContext) {
-		super(servletContext);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	protected void configureShiroWeb() {
-		try {
-			bindRealm().toConstructor(ImapArchiveAuthorizingRealm.class.getConstructor());
-		} catch (SecurityException e) {
-			throw e;
-		} catch (NoSuchMethodException e) {
-			Throwables.propagate(e);
-		}
+public class ExpectAuthorization {
+	
+	public static void expectAdmin(DomainDao domainDao, String domainName, UserDao userDao, String login) {
+		ObmDomain domain = expectDomain(domainDao, domainName);
 		
-		bind(Realm.class).to(ImapArchiveAuthorizingRealm.class);
-		bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
-		bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
-
-		addFilterChain(ImapArchiveServletModule.URL_PREFIX + "/**", AUTHC_BASIC, config(ROLES, Authorization.ADMIN.get()));
-		expose(Realm.class);
+		expect(userDao.findUserByLogin(login, domain))
+			.andReturn(ObmUser.builder()
+					.extId(UserExtId.valueOf("d4ad341d-89eb-4f3d-807a-cb372314845d"))
+					.login(UserLogin.valueOf(login))
+					.domain(domain)
+					.admin(true)
+					.build()).anyTimes();
 	}
+	
+	public static void expectSimpleUser(DomainDao domainDao, String domainName, UserDao userDao, String login) {
+		ObmDomain domain = expectDomain(domainDao, domainName);
+		
+		expect(userDao.findUserByLogin(login, domain))
+			.andReturn(ObmUser.builder()
+					.extId(UserExtId.valueOf("d4ad341d-89eb-4f3d-807a-cb372314845d"))
+					.login(UserLogin.valueOf(login))
+					.domain(domain)
+					.build()).anyTimes();
+	}
+
+	private static ObmDomain expectDomain(DomainDao domainDao, String domainName) {
+		ObmDomain domain = ObmDomain.builder().name(domainName).build();
+		expect(domainDao.findDomainByName(domainName))
+			.andReturn(domain).anyTimes();
+		return domain;
+	}
+
 }

@@ -36,11 +36,13 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
+import static org.obm.imap.archive.ExpectAuthorization.expectAdmin;
 
 import java.util.UUID;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,6 +53,8 @@ import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.DatabaseOperations;
 import org.obm.imap.archive.Expectations;
@@ -96,9 +100,12 @@ public class ConfigurationResourceTest {
 				}
 			}, "sql/initial.sql"));
 
+	@Inject DomainDao domainDao;
+	@Inject UserDao userDao;
 	@Inject TemporaryFolder temporaryFolder;
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
+	@Inject IMocksControl control;
 	Expectations expectations;
 
 	private ObmDomainUuid domainId;
@@ -129,6 +136,10 @@ public class ConfigurationResourceTest {
 	@Test
 	public void getDomainConfigurationShouldReturnADefaultConfiguration() throws Exception {
 		initDb();
+		
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
+		
+		control.replay();
 		server.start();
 		
 		given()
@@ -141,6 +152,8 @@ public class ConfigurationResourceTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+		
+		control.verify();
 	}
 
 	@Test
@@ -174,6 +187,10 @@ public class ConfigurationResourceTest {
 					.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL)
 					.values(domainId, "user2@mydomain.org")
 					.build());
+		
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
+		
+		control.replay();
 		server.start();
 		
 		given()
@@ -188,6 +205,8 @@ public class ConfigurationResourceTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+		
+		control.verify();
 	}
 
 	@Test
@@ -210,6 +229,9 @@ public class ConfigurationResourceTest {
 			.expectTrustedLogin(otherDomain)
 			.expectGetDomain(otherDomain);
 		
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
+		
+		control.replay();
 		server.start();
 		
 		given()
@@ -233,12 +255,18 @@ public class ConfigurationResourceTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/31ae9172-ca35-4045-8ea3-c3125dab771e/configuration");
+		
+		control.verify();
 	}
 
 	@Test
 	public void updateDomainConfigurationShouldThrowExceptionWhenBadInputs() throws Exception {
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
+		
+		control.replay();
 		server.start();
 		
 		given()
@@ -250,6 +278,8 @@ public class ConfigurationResourceTest {
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
 		when()
 			.put("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+		
+		control.verify();
 	}
 
 	@Test
@@ -258,6 +288,10 @@ public class ConfigurationResourceTest {
 		expectations
 			.expectTrustedLogin(newDomainUuid)
 			.expectGetDomain(newDomainUuid);
+		
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
+		
+		control.replay();
 		server.start();
 		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
@@ -296,6 +330,8 @@ public class ConfigurationResourceTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+		
+		control.verify();
 	}
 
 	@Test
@@ -333,6 +369,9 @@ public class ConfigurationResourceTest {
 			.expectTrustedLogin(newDomainUuid)
 			.expectGetDomain(newDomainUuid);
 		
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
+		
+		control.replay();
 		server.start();
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
@@ -371,5 +410,7 @@ public class ConfigurationResourceTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+		
+		control.verify();
 	}
 }

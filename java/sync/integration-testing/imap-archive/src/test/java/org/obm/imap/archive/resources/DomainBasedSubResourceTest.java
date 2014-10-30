@@ -34,9 +34,11 @@ package org.obm.imap.archive.resources;
 import static com.github.restdriver.clientdriver.RestClientDriver.giveEmptyResponse;
 import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static com.jayway.restassured.RestAssured.given;
+import static org.obm.imap.archive.ExpectAuthorization.expectAdmin;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,6 +48,8 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
@@ -79,9 +83,12 @@ public class DomainBasedSubResourceTest {
 				}
 			}, "sql/initial.sql"));
 	
+	@Inject DomainDao domainDao;
+	@Inject UserDao userDao;
 	@Inject TemporaryFolder temporaryFolder;
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
+	@Inject IMocksControl control;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -97,6 +104,10 @@ public class DomainBasedSubResourceTest {
 	
 	@Test
 	public void getDomainConfigurationShouldReturnBadRequestOnInvalidUuid() {
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
+		
+		control.replay();
+		
 		given()
 			.port(server.getHttpPort())
 			.auth().basic("admin@mydomain.org", "trust3dToken").
@@ -104,6 +115,8 @@ public class DomainBasedSubResourceTest {
 			.statusCode(Status.BAD_REQUEST.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/toto/configuration");
+		
+		control.verify();
 	}
 	
 	@Test
@@ -112,6 +125,11 @@ public class DomainBasedSubResourceTest {
 				onRequestTo("/obm-sync/provisioning/v1/domains/56077db7-ffdc-4e47-8fdd-40c69884bee6"),
 				giveEmptyResponse().withStatus(Status.NOT_FOUND.getStatusCode())
 				);
+		
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
+		
+		control.replay();
+		
 		given()
 			.port(server.getHttpPort())
 			.auth().basic("admin@mydomain.org", "trust3dToken").
@@ -119,6 +137,8 @@ public class DomainBasedSubResourceTest {
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/56077db7-ffdc-4e47-8fdd-40c69884bee6/configuration");
+		
+		control.verify();
 	}
 	
 }

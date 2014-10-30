@@ -33,11 +33,13 @@ package org.obm.imap.archive.startup;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.obm.imap.archive.ExpectAuthorization.expectAdmin;
 
 import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 import org.junit.After;
@@ -50,6 +52,8 @@ import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
@@ -115,6 +119,9 @@ public class RestoreOnStartUpTest {
 	@Inject TestingOnlyOnePerDomainMonitorFactory monitor;
 	@Inject ArchiveTreatmentDao archiveTreatmentDao;
 	@Inject DomainConfigurationDao domainConfigurationDao;
+	@Inject DomainDao domainDao;
+	@Inject UserDao userDao;
+	@Inject IMocksControl control;
 
 	Expectations expectations;
 	
@@ -202,7 +209,9 @@ public class RestoreOnStartUpTest {
 		
 		expectations
 			.expectGetDomain(expectedScheduledDomain.getUuid());
+		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 
+		control.replay();
 		server.start();
 		
 		given()
@@ -212,6 +221,8 @@ public class RestoreOnStartUpTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/status");
+		
+		control.verify();
 		
 		List<ScheduledTask<ArchiveDomainTask>> tasks = monitor.get().all();
 		assertThat(tasks).hasSize(1);

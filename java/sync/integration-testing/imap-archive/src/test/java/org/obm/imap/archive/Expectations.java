@@ -52,10 +52,14 @@ public class Expectations {
 	}
 	
 	public Expectations expectTrustedLogin(ObmDomainUuid domainId) {
+		return expectTrustedLoginForUser(domainId, "admin");
+	}
+	
+	public Expectations expectTrustedLoginForUser(ObmDomainUuid domainId, String login) {
 		driver.addExpectation(
 				onRequestTo("/obm-sync/login/trustedLogin").withMethod(Method.POST)
 					.withBody(Matchers.allOf(
-								Matchers.containsString("login=admin%40mydomain.org"),
+								Matchers.containsString("login=" + login + "%40mydomain.org"),
 								Matchers.containsString("password=trust3dToken")),
 					MediaType.APPLICATION_FORM_URLENCODED),
 				giveResponse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"

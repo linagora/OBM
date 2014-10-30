@@ -32,7 +32,14 @@
 
 package org.obm.imap.archive;
 
+import org.obm.domain.dao.AddressBookDao;
+import org.obm.domain.dao.AddressBookDaoJdbcImpl;
 import org.obm.domain.dao.DomainDao;
+import org.obm.domain.dao.ObmInfoDao;
+import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
+import org.obm.domain.dao.UserDaoJdbcImpl;
+import org.obm.domain.dao.UserPatternDao;
+import org.obm.domain.dao.UserPatternDaoJdbcImpl;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ArchiveTreatmentJdbcImpl;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
@@ -43,6 +50,10 @@ import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.dao.ProcessedFolderJdbcImpl;
 import org.obm.imap.archive.dao.UserDao;
 import org.obm.imap.archive.dao.UserJdbcImpl;
+import org.obm.provisioning.dao.GroupDao;
+import org.obm.provisioning.dao.GroupDaoJdbcImpl;
+import org.obm.provisioning.dao.ProfileDao;
+import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
 
 import com.google.inject.AbstractModule;
 
@@ -51,11 +62,24 @@ public class DaoModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(DomainConfigurationDao.class).to(DomainConfigurationJdbcImpl.class);
-		bind(DomainDao.class);
 		bind(ArchiveTreatmentDao.class).to(ArchiveTreatmentJdbcImpl.class);
 		bind(ImapFolderDao.class).to(ImapFolderJdbcImpl.class);
 		bind(ProcessedFolderDao.class).to(ProcessedFolderJdbcImpl.class);
 		bind(UserDao.class).to(UserJdbcImpl.class);
+		install(new ObmDaoModule());
 	}
+	
+	private static class ObmDaoModule extends AbstractModule {
 
+		@Override
+		protected void configure() {
+			bind(DomainDao.class);
+			bind(org.obm.domain.dao.UserDao.class).to(UserDaoJdbcImpl.class);
+			bind(AddressBookDao.class).to(AddressBookDaoJdbcImpl.class);
+			bind(ObmInfoDao.class).to(ObmInfoDaoJdbcImpl.class);
+			bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
+			bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
+			bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
+		}
+	}
 }
