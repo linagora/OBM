@@ -868,6 +868,19 @@ function check_host_can_delete($id) {
     return false;
   }
 
+  $query = "
+    SELECT count(*) as count FROM ServiceProperty
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    WHERE serviceproperty_service = 'provisioning' AND serviceproperty_property IN ('provisioning')
+    AND serviceproperty_value = '".$obm_q->escape($id)."'";
+  display_debug_msg($query, $cdg_sql, 'check_host_can_delete');
+  $obm_q->query($query);
+  $obm_q->next_record();
+  if ($obm_q->f('count') != 0) {
+    $err['msg'] .= $GLOBALS['l_cant_delete'];
+    return false;
+  }
+
   // Check that user has delegation rights for this host
   if (! check_host_update_rights(array('host_id' => $id))) {
     $err['msg'] .= $GLOBALS['l_cant_delete'];
