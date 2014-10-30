@@ -129,6 +129,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private final DomainService domainService;
 	private final UserService userService;
 	private final EventChangeHandler eventChangeHandler;
+	private final ParticipationService participationService;
 	
 	private final HelperService helperService;
 	private final Ical4jHelper ical4jHelper;
@@ -145,8 +146,9 @@ public class CalendarBindingImpl implements ICalendar {
 			CategoryDao categoryDao,
 			CommitedOperationDao commitedOperationDao,
 			HelperService helperService, 
-			Ical4jHelper ical4jHelper, 
-			ICalendarFactory calendarFactory, 
+			ParticipationService participationService,
+			Ical4jHelper ical4jHelper,
+			ICalendarFactory calendarFactory,
 			AttendeeService attendeeService,
 			AnonymizerService anonymizerService,
 			ObmSyncConfigurationService configuration) {
@@ -157,6 +159,7 @@ public class CalendarBindingImpl implements ICalendar {
 		this.categoryDao = categoryDao;
 		this.commitedOperationDao = commitedOperationDao;
 		this.helperService = helperService;
+		this.participationService = participationService;
 		this.ical4jHelper = ical4jHelper;
 		this.calendarFactory = calendarFactory;
 		this.attendeeService = attendeeService;
@@ -285,6 +288,9 @@ public class CalendarBindingImpl implements ICalendar {
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e);
 		} catch (SQLException e) {
+			logger.error(e.getMessage(), e);
+			throw new ServerFault(e);
+		} catch (ParseException e) {
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e);
 		}
@@ -1315,17 +1321,19 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault("no user found with calendar " + calendar);
 		} catch (SQLException e) {
 			throw new ServerFault(e);
+		} catch (ParseException e) {
+			throw new ServerFault(e);
 		}
 	}
 
-	private boolean changeParticipation(AccessToken token, String calendar, EventExtId extId, Participation participation,
-			int sequence, boolean notification) throws FindException, SQLException {
+	@VisibleForTesting boolean changeParticipation(AccessToken token, String calendar, EventExtId extId, Participation participation,
+			int sequence, boolean notification) throws FindException, SQLException, ParseException {
 
 		ObmUser calendarOwner = userService.getUserFromCalendar(calendar, token.getDomain().getName());
 		Event currentEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
 		boolean changed = false;
 		if (currentEvent != null) {
-			changed = applyParticipationChange(token, extId, participation, sequence, calendarOwner, currentEvent);
+			changed = participationService.changeOnEvent(token, extId, participation, sequence, calendarOwner, currentEvent);
 		}
 
 		Event newEvent = calendarDao.findEventByExtId(token, calendarOwner, extId);
@@ -1390,11 +1398,11 @@ public class CalendarBindingImpl implements ICalendar {
 		boolean changed = false;
 		if (currentEvent != null) {
 			if (recurrenceId != null) {
-				changed = applyParticipationChange(token, extId, recurrenceId, participation, 
-					sequence, calendarOwner, currentEvent);
+				changed = participationService.changeOnOccurrence(token, extId, recurrenceId,
+						participation, sequence, calendarOwner, currentEvent);
 			} else {
-				changed = applyParticipationChange(token, extId, participation, 
-						sequence, calendarOwner, currentEvent);
+				changed = participationService.changeOnEvent(token, extId, participation, sequence,
+						calendarOwner, currentEvent);
 			}
 		}
 		
