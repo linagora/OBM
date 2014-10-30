@@ -442,7 +442,7 @@ public class ObmUser {
 	}
 	
 	public String getLoginAtDomain() {
-		return login + "@" + domain.getName();
+		return login.getStringValue() + "@" + domain.getName();
 	}
 
 	public String getDisplayName(){

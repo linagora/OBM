@@ -44,6 +44,10 @@ public class ObmUserTest {
 	
 	private static final UserExtId userExtId = UserExtId.builder().extId("extId").build();
 	private static final UserLogin validLogin = UserLogin.valueOf("login");
+	private static final ObmDomain domain = ObmDomain
+			.builder()
+			.name("domain")
+			.build();
 	
 	@Test(expected=IllegalStateException.class)
 	public void testLoginPrecondition() {
@@ -318,4 +322,27 @@ public class ObmUserTest {
 				.build();
 		assertThat(obmUser.isAdmin()).isFalse();
 	}
+
+	@Test
+	public void testGetLoginShouldReturnTheActualLogin() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login(validLogin)
+				.domain(domain)
+				.build();
+
+		assertThat(obmUser.getLogin()).isEqualTo("login");
+	}
+
+	@Test
+	public void testGetLoginAtDomainShouldReturnTheActualLoginAtDomain() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login(validLogin)
+				.domain(domain)
+				.build();
+
+		assertThat(obmUser.getLoginAtDomain()).isEqualTo("login@domain");
+	}
+
 }
