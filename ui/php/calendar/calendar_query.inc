@@ -5357,14 +5357,10 @@ function get_one_event_user_alert($event_id, $user_id = null) {
 }
 
 function allday_start_date($date, $tz) {
-  $date->setTimezone(new DateTimeZone($tz));
-  
-  // The line below will correctly transform 00:00 in the event timezone
-  // to 00:00 in the local timezone, because Of_Date without a timezone uses
-  // the default one (i.e.: the local one).
-  // A side effect is that it will also transform 12:34 to 00:00 the same day
-  // which is fine anyway because allday events starts at 00:00..
-  return new Of_Date($date->format('Y-m-d'));
+  // Include '!' in the date format string to tell PHP to use values from EPOCH for
+  // values not specified in the format string instead of taking them from the
+  // current time.
+  return Of_Date::createFromFormat("Y-m-d!", $date->format('Y-m-d'), new DateTimeZone($tz));
 }
 
 function allday_actual_duration($date, $duration) {
