@@ -234,6 +234,24 @@ class Of_Date extends DateTime {
   }
 
   /**
+   * Returns new Of_Date object formatted according to the specified format
+   *
+   * @static
+   * @param string $format The format that the passed in string should be in
+   * @param string $time String representing the time
+   * @param DateTimeZone $timezone A DateTimeZone object representing the desired time zone
+   * @return Of_Date
+   */
+  static public function createFromFormat($format, $time, $timezone) {
+    $php_date = parent::createFromFormat($format, $time, $timezone);
+
+    $date = new Of_Date();
+    $date->setTimezone($timezone);
+    $date->setTimestamp($php_date->getTimestamp());
+    return $date;
+  }
+
+  /**
    * loadOptions 
    * 
    * @static
