@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.openqa.selenium.By.ByCssSelector;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverCommandProcessor;
+import com.thoughtworks.selenium.webdriven.WebDriverCommandProcessor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
