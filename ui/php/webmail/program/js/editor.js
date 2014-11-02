@@ -23,7 +23,7 @@ function rcmail_editor_init(config)
       apply_source_formatting: true,
       theme: 'advanced',
       language: config.lang,
-      content_css: config.skin_path + '/editor_content.css',
+      content_css: config.skin_path + '/editor_content.css?v2',
       theme_advanced_toolbar_location: 'top',
       theme_advanced_toolbar_align: 'left',
       theme_advanced_buttons3: '',
@@ -45,7 +45,7 @@ function rcmail_editor_init(config)
     });
   else { // mail compose
     $.extend(conf, {
-      plugins: 'paste,emotions,media,nonbreaking,table,searchreplace,visualchars,directionality,inlinepopups,tabfocus' + (config.spellcheck ? ',spellchecker' : ''),
+      plugins: 'paste,emotions,media,nonbreaking,table,searchreplace,visualchars,directionality,inlinepopups,tabfocus,contextmenu' + (config.spellcheck ? ',spellchecker' : ''),
       theme_advanced_buttons1: 'bold,italic,underline,|,justifyleft,justifycenter,justifyright,justifyfull,|,bullist,numlist,outdent,indent,ltr,rtl,blockquote,|,forecolor,backcolor,fontselect,fontsizeselect',
       theme_advanced_buttons2: 'link,unlink,table,|,emotions,charmap,image,media,|,code,search,undo,redo',
       spellchecker_languages: (rcmail.env.spellcheck_langs ? rcmail.env.spellcheck_langs : 'Dansk=da,Deutsch=de,+English=en,Espanol=es,Francais=fr,Italiano=it,Nederlands=nl,Polski=pl,Portugues=pt,Suomi=fi,Svenska=sv'),

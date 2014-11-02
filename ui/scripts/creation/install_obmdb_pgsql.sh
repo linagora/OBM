@@ -111,4 +111,7 @@ psql -U ${user} -h ${host} ${db} -f \
 psql -U ${user} -h ${host} ${db} -f \
   "../3.1/updates/update-3.1.2~4.pgsql.sql" >> /tmp/data_insert.log 2>&1
 
+psql -U ${user} -h ${host} ${db} -f \
+  "../3.1/updates/update-3.1.2~5.pgsql.sql" >> /tmp/data_insert.log 2>&1
+
 echo "DONE."
