@@ -81,4 +81,10 @@ mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
 mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
   < "../3.0/updates/update-3.0.1~2.mysql.sql" >> /tmp/data_insert.log 2>&1
 
+mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
+  < "../3.0/updates/update-3.0.1~4.mysql.sql" >> /tmp/data_insert.log 2>&1
+
+mysql --default-character-set='UTF8' -u ${user} -p$pw ${db} \
+  < "../3.0/updates/update-3.0.1~5.mysql.sql" >> /tmp/data_insert.log 2>&1
+
 echo "DONE."
