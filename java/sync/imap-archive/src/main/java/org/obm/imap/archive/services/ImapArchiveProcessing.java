@@ -185,7 +185,6 @@ public class ImapArchiveProcessing {
 			storeClient.login(false);
 			
 			Logger logger = processedTask.getLogger();
-			logger.info("Processing: {}", mailbox.getName());
 			
 			grantRightsWhenNotSelectable(mailbox);
 			
@@ -197,6 +196,7 @@ public class ImapArchiveProcessing {
 			
 			FluentIterable<Long> mailUids = searchMailUids(mailbox, processedTask.getBoundaries(), processedTask.getPreviousArchiveTreatment());
 			if (!mailUids.isEmpty()) {
+				logger.info("Processing: {}", mailbox.getName());
 				logger.info("{} mails will be archived, from UID {} to {}", mailUids.size(), mailUids.first().get(), mailUids.last().get());
 	
 				ArchiveMailbox archiveMailbox = ArchiveMailbox.from(mailbox, 
@@ -361,7 +361,8 @@ public class ImapArchiveProcessing {
 	}
 
 	@VisibleForTesting boolean continuePrevious(Optional<ArchiveTreatment> previousArchiveTreatment, DateTime higherBoundary) {
-		return previousArchiveTreatment.isPresent() && previousArchiveTreatment.get().getHigherBoundary().equals(higherBoundary);
+		return previousArchiveTreatment.isPresent() && previousArchiveTreatment.get().getArchiveStatus() != ArchiveStatus.SUCCESS
+				&& previousArchiveTreatment.get().getHigherBoundary().equals(higherBoundary);
 	}
 
 	private void createArchiveMailbox(ArchiveMailbox archiveMailbox, Logger logger) 

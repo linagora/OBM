@@ -1016,4 +1016,24 @@ public class ImapArchiveProcessingTest {
 		control.verify();
 		assertThat(continuePrevious).isTrue();
 	}
+	
+	@Test
+	public void continuePreviousShouldBeFalseWhenPreviousArchiveTreatmentIsSuccess() {
+		ObmDomainUuid domainId = ObmDomainUuid.of("b1a32567-05de-4d06-b699-ad94a7c59744");
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("011ce5f5-b56a-44b3-a2e6-e19942684d45");
+		
+		DateTime previousHigherBoundary = DateTime.parse("2014-07-23T23:59:59.999Z");
+		Optional<ArchiveTreatment> previousArchiveTreatment = Optional.<ArchiveTreatment> of(ArchiveTreatment.builder(domainId)
+			.runId(runId)
+			.recurrent(true)
+			.status(ArchiveStatus.SUCCESS)
+			.scheduledAt(DateTime.now())
+			.higherBoundary(previousHigherBoundary)
+			.build());
+		
+		control.replay();
+		boolean continuePrevious = imapArchiveProcessing.continuePrevious(previousArchiveTreatment, previousHigherBoundary);
+		control.verify();
+		assertThat(continuePrevious).isFalse();
+	}
 }
