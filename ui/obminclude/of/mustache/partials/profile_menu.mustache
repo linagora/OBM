@@ -11,9 +11,16 @@
 		</div>
 
 		<div id="infos">
-			<p>{{commonname}}</p>
+			{{#commonname}}
+				<p>{{commonname}}</p>
+			{{/commonname}}
+
+			{{^commonname}}
+				<p>{{firstname}} {{lastname}}</p>
+			{{/commonname}}
+
 			<p>{{email}}</p>
-			<p>{{profil}} : ({{domain}}) </p>
+			<p>{{profil_lang}} : {{profil}} ({{domain}})</p>
 
 			<p class="buttons"><a href="../obm.php?action=logout" alt="{{l_logout}}" id="logout" class="button">{{l_logout}}</a></p>
 		</div>
@@ -33,17 +40,17 @@
 
 			<li>
 				<a href="{{url}}" target="{{target}}" title="{{tooltip}}">
-				{{#ico}} <img src="{{ico}}" alt="{{tooltip}}" class="ico"> {{/ico}}
-				{{title}}
+					{{#ico}} <img src="{{ico}}" alt="{{tooltip}}" class="ico"> {{/ico}}
+					{{title}}
 				</a>
 			</li>
 
 			{{/links}}
 
-		<ul>
+			<ul>
 
-		{{/user_settings}}
+				{{/user_settings}}
 
-	</div>
+			</div>
 
-</div>
+		</div>

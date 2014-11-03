@@ -1428,8 +1428,11 @@ function display_unified_menu($module) {
   $data["user_infos"]["commonname"] = $common_name;
   $data["user_infos"]["email"] = $email;
   $data["user_infos"]["profil"] = $profil;
+  $data["user_infos"]["profil_lang"] = $l_profile;
   $data["user_infos"]["domain"] = $domain;
   $data["user_infos"]["intro-element-id"] = "user";
+  $data["user_infos"]["lastname"] = $user_infos["lastname"];
+  $data["user_infos"]["firstname"] =  $user_infos["firstname"];
 
   $data["user_infos"]["l_logout"] = $l_logout;
 
