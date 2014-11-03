@@ -45,6 +45,7 @@ $l_simulation = "mô phỏng";
 $l_manual_launch = "Dẫn ra mắt";
 $l_status_error = "lỗi";
 $l_status_success = "Ok";
+$l_not_configured = "không được cấu hình";
 
 $l_email_address_not_found = "Không thể tìm thấy địa chỉ email của bạn cho tên miền này";
 $l_imap_archive_server_not_found = "Không thể tìm thấy một máy chủ lưu trữ IMAP cho tên miền này";

@@ -326,10 +326,19 @@ function get_block_next_treatment_date($configuration) {
 }
 
 function formatStringAsDateString($dateAsString) {
-  $date = new DateTime($dateAsString);
-  $date->setTimezone(new DateTimeZone('UTC'));
-
-  return is_null($date) ? '' : $date->format('Y-m-d H:i');
+  global $l_not_configured;
+  
+  if ($dateAsString) {
+    try {
+      $date = new DateTime($dateAsString);
+      $date->setTimezone(new DateTimeZone('UTC'));
+      return $date->format('Y-m-d H:i');
+    } catch (Exception $e) {
+      error_log("Couldn't $dateAsString parse to date");
+      return '';
+    }
+  }
+  return $l_not_configured;
 }
 
 function get_block_excluded_users($excludedUserIds) {
