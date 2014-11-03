@@ -93,11 +93,12 @@ public class ContactUpdateCommand extends ContactCommand {
 	private SolrInputDocument dataToDocument() throws SQLException {
 		Contact contact = getObject();
 		Connection con = null;
+		
 		Statement st = null;
 		try {
 			con = obmHelper.getConnection();
 			st = con.createStatement();
-					
+
 			ResultSet rsContact = loadIndexableContactFromDatabase(st);
 			if (rsContact == null) {
 				throw new IllegalStateException("contact with id " + contact.getUid() + " not found.");
@@ -118,7 +119,7 @@ public class ContactUpdateCommand extends ContactCommand {
 		while (rs.next()) {
 			catId.add(rs.getInt(1));
 		}
-		f(document, "categoryId", catId);
+		appendField(document, "categoryId", catId);
 	}
 
 	private ResultSet loadIndexableContactFromDatabase(Statement st)
@@ -145,49 +146,49 @@ public class ContactUpdateCommand extends ContactCommand {
 	private SolrInputDocument buildDocumentFromResultSet(ResultSet rs) throws SQLException {
 		Contact contact = getObject();
 		SolrInputDocument sid = new SolrInputDocument();
-		f(sid, "id", contact.getUid());
-		f(sid, "timecreate", rs.getDate("contact_timecreate"));
-		f(sid, "timeupdate", rs.getDate("contact_timeupdate"));
-		f(sid, "usercreate", rs.getInt("contact_usercreate"));
-		f(sid, "usercreate", rs.getInt("contact_userupdate"));
-		f(sid, "datasource", rs.getInt("contact_datasource_id"));
-		f(sid, "domain", rs.getInt("contact_domain_id"));
-		f(sid, "in", rs.getString("name"));
-		f(sid, "addressbookId", rs.getInt("id"));
-		f(sid, "company", rs.getString("contact_company"));
-		f(sid, "companyId", rs.getInt("contact_company_id"));
-		f(sid, "commonname", rs.getString("contact_commonname"));
-		f(sid, "lastname", rs.getString("contact_lastname"));
-		f(sid, "firstname", rs.getString("contact_firstname"));
-		f(sid, "middlename", rs.getString("contact_middlename"));
-		f(sid, "suffix", rs.getString("contact_suffix"));
-		f(sid, "aka", rs.getString("contact_aka"));
-		f(sid, "kind", rs.getString("kind_minilabel"),
+		appendField(sid, "id", contact.getUid());
+		appendField(sid, "timecreate", rs.getDate("contact_timecreate"));
+		appendField(sid, "timeupdate", rs.getDate("contact_timeupdate"));
+		appendField(sid, "usercreate", rs.getInt("contact_usercreate"));
+		appendField(sid, "usercreate", rs.getInt("contact_userupdate"));
+		appendField(sid, "datasource", rs.getInt("contact_datasource_id"));
+		appendField(sid, "domain", rs.getInt("contact_domain_id"));
+		appendField(sid, "in", rs.getString("name"));
+		appendField(sid, "addressbookId", rs.getInt("id"));
+		appendField(sid, "company", rs.getString("contact_company"));
+		appendField(sid, "companyId", rs.getInt("contact_company_id"));
+		appendField(sid, "commonname", rs.getString("contact_commonname"));
+		appendField(sid, "lastname", rs.getString("contact_lastname"));
+		appendField(sid, "firstname", rs.getString("contact_firstname"));
+		appendField(sid, "middlename", rs.getString("contact_middlename"));
+		appendField(sid, "suffix", rs.getString("contact_suffix"));
+		appendField(sid, "aka", rs.getString("contact_aka"));
+		appendField(sid, "kind", rs.getString("kind_minilabel"),
 				rs.getString("kind_header"));
-		f(sid, "manager", rs.getString("contact_manager"));
-		f(sid, "assistant", rs.getString("contact_assistant"));
-		f(sid, "spouse", rs.getString("contact_spouse"));
-		f(sid, "category", rs.getString("contact_category"));
-		f(sid, "service", rs.getString("contact_service"));
-		f(sid, "function", rs.getString("contactfunction_label"));
-		f(sid, "title", rs.getString("contact_title"));
-		f(sid, "is", (rs.getBoolean("contact_archive") ? "archive" : null),
+		appendField(sid, "manager", rs.getString("contact_manager"));
+		appendField(sid, "assistant", rs.getString("contact_assistant"));
+		appendField(sid, "spouse", rs.getString("contact_spouse"));
+		appendField(sid, "category", rs.getString("contact_category"));
+		appendField(sid, "service", rs.getString("contact_service"));
+		appendField(sid, "function", rs.getString("contactfunction_label"));
+		appendField(sid, "title", rs.getString("contact_title"));
+		appendField(sid, "is", (rs.getBoolean("contact_archive") ? "archive" : null),
 				(rs.getBoolean("contact_collected") ? "collected" : null),
 				(rs.getBoolean("contact_mailing_ok") ? "mailing" : null),
 				(rs.getBoolean("contact_newsletter") ? "newsletter" : null));
 
-		f(sid, "date", rs.getDate("contact_date"));
-		f(sid, "birthday", rs.getDate("bd_date"));
-		f(sid, "birthdayId", rs.getInt("bd_id"));
-		f(sid, "anniversary", rs.getDate("an_date"));
-		f(sid, "anniversaryId", rs.getInt("an_id"));
+		appendField(sid, "date", rs.getDate("contact_date"));
+		appendField(sid, "birthday", rs.getDate("bd_date"));
+		appendField(sid, "birthdayId", rs.getInt("bd_id"));
+		appendField(sid, "anniversary", rs.getDate("an_date"));
+		appendField(sid, "anniversaryId", rs.getInt("an_id"));
 
-		f(sid, "comment1", rs.getString("contact_comment"));
-		f(sid, "comment2", rs.getString("contact_comment2"));
-		f(sid, "comment3", rs.getString("contact_comment3"));
+		appendField(sid, "comment1", rs.getString("contact_comment"));
+		appendField(sid, "comment2", rs.getString("contact_comment2"));
+		appendField(sid, "comment3", rs.getString("contact_comment3"));
 
-		f(sid, "from", rs.getString("contact_origin"));
-		f(sid, "hasACalendar", hasCaluri(rs.getString("website_label"), rs.getString("website_url")));
+		appendField(sid, "from", rs.getString("contact_origin"));
+		appendField(sid, "hasACalendar", hasCaluri(rs.getString("website_label"), rs.getString("website_url")));
 		rs.close();
 		rs = null;
 
@@ -195,7 +196,7 @@ public class ContactUpdateCommand extends ContactCommand {
 		for (EmailAddress e : contact.getEmails().values()) {
 			mails.add(e.get());
 		}
-		f(sid, "email", mails);
+		appendField(sid, "email", mails);
 
 		List<String> phones = Lists.newArrayList();
 		List<String> fax = Lists.newArrayList();
@@ -206,14 +207,14 @@ public class ContactUpdateCommand extends ContactCommand {
 				phones.add(contact.getPhones().get(kind).getNumber());
 			}
 		}
-		f(sid, "phone", phones);
-		f(sid, "fax", fax);
+		appendField(sid, "phone", phones);
+		appendField(sid, "fax", fax);
 
 		List<String> jab = Lists.newArrayList();
 		for (InstantMessagingId e : contact.getImIdentifiers().values()) {
 			jab.add(e.getId());
 		}
-		f(sid, "jabber", jab);
+		appendField(sid, "jabber", jab);
 
 		List<String> street = Lists.newArrayList();
 		List<String> zip = Lists.newArrayList();
@@ -237,11 +238,11 @@ public class ContactUpdateCommand extends ContactCommand {
 				country.add(a.getCountry());
 			}
 		}
-		f(sid, "street", street);
-		f(sid, "zipcode", zip);
-		f(sid, "expresspostal", express);
-		f(sid, "town", town);
-		f(sid, "country", country);
+		appendField(sid, "street", street);
+		appendField(sid, "zipcode", zip);
+		appendField(sid, "expresspostal", express);
+		appendField(sid, "town", town);
+		appendField(sid, "country", country);
 
 		StringBuilder sortable = new StringBuilder();
 		if (contact.getLastname() != null) {
@@ -251,7 +252,7 @@ public class ContactUpdateCommand extends ContactCommand {
 		if (contact.getFirstname() != null) {
 			sortable.append(contact.getFirstname());
 		}
-		f(sid, "sortable", sortable.toString().trim());
+		appendField(sid, "sortable", sortable.toString().trim());
 		
 		return sid;
 	}
@@ -285,7 +286,7 @@ public class ContactUpdateCommand extends ContactCommand {
 		}
 	}
 
-	private void f(SolrInputDocument sid, String field, Object... values) {
+	private void appendField(SolrInputDocument sid, String field, Object... values) {
 		LinkedList<Object> l = new LinkedList<Object>();
 		for (Object o : values) {
 			if (o != null) {
