@@ -52,6 +52,7 @@ import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.QueueManager;
 
 import fr.aliacom.obm.ToolBox;
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class SolrHelperFactoryTest {
@@ -104,7 +105,7 @@ public class SolrHelperFactoryTest {
  		EventUpdateCommand.Factory eventCommandFactory = control.createMock(EventUpdateCommand.Factory.class);
   		
  		expect(configurationService.solrCheckingInterval()).andReturn(10);
- 		expect(solrClientFactory.create(SolrService.CONTACT_SERVICE, "user@test.tlse.lng")).andReturn(solrClient);
+ 		expect(solrClientFactory.create(SolrService.CONTACT_SERVICE, ObmDomain.builder().name("test.tlse.lng").build())).andReturn(solrClient);
  		expect(solrClient.deleteById(anyObject(String.class))).andReturn(null);
  		expect(solrClient.commit()).andReturn(null);
 

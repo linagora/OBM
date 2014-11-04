@@ -57,6 +57,7 @@ import org.obm.sync.solr.jms.SolrJmsQueue;
 import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.QueueManager;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 
@@ -99,6 +100,7 @@ public class SolrManagerTest {
 	@Before
 	public void setUp() throws Exception {
 		control = createControl();
+		ObmDomain domain = ObmDomain.builder().name("d").build();
 		queueManager = new QueueManager(hornetQConfiguration(), jmsConfiguration());
 		queueManager.start();
 		
@@ -107,12 +109,12 @@ public class SolrManagerTest {
 		server = control.createMock(CommonsHttpSolrServer.class);
 		
 		expect(configurationService.solrCheckingInterval()).andReturn(10).anyTimes();
-		expect(solrClientFactory.create(SolrService.CONTACT_SERVICE, "l@d")).andReturn(server).anyTimes();
+		expect(solrClientFactory.create(SolrService.CONTACT_SERVICE, domain)).andReturn(server).anyTimes();
 
 		PingSolrRequest.lock = new ReentrantLock();
 		PingSolrRequest.condition = PingSolrRequest.lock.newCondition();
 		PingSolrRequest.error = null;
-		pingRequest = new PingSolrRequest("l@d", SolrService.CONTACT_SERVICE);
+		pingRequest = new PingSolrRequest(domain, SolrService.CONTACT_SERVICE);
 		pingCommand = new PingCommand(pingRequest);
 	}
 	
@@ -140,7 +142,7 @@ public class SolrManagerTest {
 	
 	@Test
  	public void removerRequestShouldBeSerializable() throws Exception {
- 		Remover remover = new Remover("l@d", SolrService.CONTACT_SERVICE, "id");
+ 		Remover remover = new Remover(ObmDomain.builder().name("d").build(), SolrService.CONTACT_SERVICE, "id");
  		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 
@@ -157,7 +159,7 @@ public class SolrManagerTest {
   }
 	@Test
  	public void solrDocumentIndexerShouldBeSerializable() throws Exception {
-		SolrDocumentIndexer indexer = new SolrDocumentIndexer("l@d", SolrService.CONTACT_SERVICE, new SolrInputDocument());
+		SolrDocumentIndexer indexer = new SolrDocumentIndexer(ObmDomain.builder().name("d").build(), SolrService.CONTACT_SERVICE, new SolrInputDocument());
   		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 

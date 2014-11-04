@@ -31,7 +31,6 @@ package org.obm.sync.solr;
 
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.easymock.IMocksControl;
@@ -39,6 +38,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.locator.store.LocatorService;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class SolrClientFactoryTest {
 
@@ -60,18 +61,18 @@ public class SolrClientFactoryTest {
 
 	@Test
 	public void testCreateShouldSucceedWhenServiceIsSolrEvent() throws Exception {
-		expect(locatorService.getServiceLocation("solr/event", "l@d")).andReturn("1.2.3.4");
+		expect(locatorService.getServiceLocation("solr/event", "d")).andReturn("1.2.3.4");
 		control.replay();
 
-		assertThat(factory.create(SolrService.EVENT_SERVICE, "l@d").getBaseURL()).isEqualTo("http://1.2.3.4:8080/solr/event");
+		assertThat(factory.create(SolrService.EVENT_SERVICE, ObmDomain.builder().name("d").build()).getBaseURL()).isEqualTo("http://1.2.3.4:8080/solr/event");
 	}
 
 	@Test
 	public void testCreateShouldSucceedWhenServiceIsSolrContact() throws Exception {
-		expect(locatorService.getServiceLocation("solr/contact", "l@d")).andReturn("1.2.3.4");
+		expect(locatorService.getServiceLocation("solr/contact", "d")).andReturn("1.2.3.4");
 		control.replay();
 
-		assertThat(factory.create(SolrService.CONTACT_SERVICE, "l@d").getBaseURL()).isEqualTo("http://1.2.3.4:8080/solr/contact");
+		assertThat(factory.create(SolrService.CONTACT_SERVICE, ObmDomain.builder().name("d").build()).getBaseURL()).isEqualTo("http://1.2.3.4:8080/solr/contact");
 	}
 
 }

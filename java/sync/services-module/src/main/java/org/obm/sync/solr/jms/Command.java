@@ -61,10 +61,6 @@ public abstract class Command<T extends Serializable> implements Serializable {
 		return login;
 	}
 	
-	protected String getLoginAtDomain() {
-		return login + "@" + domain.getName();
-	}
-	
 	public T getObject() {
 		return object;
 	}

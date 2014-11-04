@@ -44,6 +44,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 @Singleton
 public class SolrClientFactoryImpl implements SolrClientFactory {
 
@@ -64,11 +66,11 @@ public class SolrClientFactoryImpl implements SolrClientFactory {
 		return new HttpClient(cnxManager);
 	}
 
-	public CommonsHttpSolrServer create(SolrService service, String loginAtDomain) {
+	public CommonsHttpSolrServer create(SolrService service, ObmDomain domain) {
 		try {
 			URI uri = new URIBuilder()
 			.setScheme("http")
-			.setHost(locatorService.getServiceLocation(service.getName(), loginAtDomain))
+			.setHost(locatorService.getServiceLocation(service.getName(), domain.getName()))
 			.setPort(8080)
 			.setPath('/' + service.getName())
 			.build();

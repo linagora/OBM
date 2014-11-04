@@ -203,7 +203,7 @@ public class SolrManager implements LifecycleListener {
 
 				CommonsHttpSolrServer solrClient = null;
 				try {
-					solrClient = solrClientFactory.create(request.getSolrService(), request.getLoginAtDomain());
+					solrClient = solrClientFactory.create(request.getSolrService(), request.getDomain());
 					request.run(solrClient);
 					session.commit();
 				} catch (LocatorClientException e) {

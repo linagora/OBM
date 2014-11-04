@@ -43,6 +43,6 @@ public class ContactDeleteCommand extends ContactCommand {
 
 	@Override
 	public SolrRequest asSolrRequest() {
-		return new Remover(getLoginAtDomain(), getSolrService(), String.valueOf(getObject().getUid()));
+		return new Remover(getDomain(), getSolrService(), String.valueOf(getObject().getUid()));
 	}
 }

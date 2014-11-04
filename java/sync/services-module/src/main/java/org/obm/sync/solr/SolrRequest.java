@@ -35,14 +35,16 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public abstract class SolrRequest implements Serializable {
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	private final String loginAtDomain;
+	private final ObmDomain domain;
 	private final SolrService solrService;
 	
-	public SolrRequest(String loginAtDomain, SolrService solrService) {
-		this.loginAtDomain = loginAtDomain;
+	public SolrRequest(ObmDomain domain, SolrService solrService) {
+		this.domain = domain;
 		this.solrService = solrService;
 	}
 
@@ -55,8 +57,8 @@ public abstract class SolrRequest implements Serializable {
 	public void postProcess() {
 	}
 
-	public String getLoginAtDomain() {
-		return loginAtDomain;
+	public ObmDomain getDomain() {
+		return domain;
 	}
 
 	public SolrService getSolrService() {

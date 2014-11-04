@@ -103,7 +103,7 @@ public class SolrHelper {
 	}
 
 	public CommonsHttpSolrServer getSolrContact() {
-		return solrClientFactory.create(SolrService.CONTACT_SERVICE, at.getUserLogin() + "@" + domain.getName());
+		return solrClientFactory.create(SolrService.CONTACT_SERVICE, at.getDomain());
 	}
 	
 	public void createOrUpdate(Contact contact) {
