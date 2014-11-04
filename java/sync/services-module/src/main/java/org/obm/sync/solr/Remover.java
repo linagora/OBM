@@ -33,6 +33,8 @@ package org.obm.sync.solr;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 /**
  * Removes by uniqueID in a Solr index.
  */
@@ -40,8 +42,8 @@ public class Remover extends SolrRequest {
 
 	private final String id;
 
-	public Remover(String loginAtDomain, SolrService solrService, String id) {
-		super(loginAtDomain, solrService);
+	public Remover(ObmDomain domain, SolrService solrService, String id) {
+		super(domain, solrService);
 		this.id = id;
 	}
 

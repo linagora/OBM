@@ -84,7 +84,7 @@ public class ContactUpdateCommand extends ContactCommand {
 	@Override
 	public SolrRequest asSolrRequest() {
 		try {
-			return new SolrDocumentIndexer(getLoginAtDomain(), getSolrService(), dataToDocument());
+			return new SolrDocumentIndexer(getDomain(), getSolrService(), dataToDocument());
 		} catch (Exception e) {
 			throw Throwables.propagate(e);
 		}

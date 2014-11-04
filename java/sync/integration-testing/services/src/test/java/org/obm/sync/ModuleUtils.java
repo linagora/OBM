@@ -71,6 +71,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.util.Modules;
 import com.linagora.obm.sync.HornetQConfiguration;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class ModuleUtils {
@@ -169,7 +170,7 @@ public class ModuleUtils {
 					
 					@Override
 					public CommonsHttpSolrServer create(SolrService service,
-							String loginAtDomain) {
+							ObmDomain domain) {
 						try {
 							return new DummyCommonsHttpSolrServer();
 						} catch (MalformedURLException e) {

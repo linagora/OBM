@@ -34,14 +34,16 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public class PingSolrRequest extends SolrRequest {
 
 	public static Lock lock;
 	public static Condition condition;
 	public static Throwable error;
 	
-	public PingSolrRequest(String loginAtDomain, SolrService solrService) {
-		super(loginAtDomain, solrService);
+	public PingSolrRequest(ObmDomain domain, SolrService solrService) {
+		super(domain, solrService);
 	}
 
 	@Override

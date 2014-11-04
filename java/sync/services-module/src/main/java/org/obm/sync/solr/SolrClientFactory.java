@@ -31,9 +31,11 @@ package org.obm.sync.solr;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
+
 public interface SolrClientFactory {
 
 	public abstract CommonsHttpSolrServer create(SolrService service,
-			String loginAtDomain);
+			ObmDomain domain);
 
 }
