@@ -52,6 +52,7 @@ import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.FutureSchedulerBusClient;
+import org.obm.imap.archive.CyrusCompatGreenmailRule;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.TestImapArchiveModules.TimeBasedModule.TestDateProvider;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
@@ -101,7 +102,15 @@ public class RecurrentTaskRescheduleTest {
 				public H2InMemoryDatabase get() {
 					return db;
 				}
-			}, "sql/initial.sql"));
+			}, "sql/initial.sql"))
+			.around(new CyrusCompatGreenmailRule(new Provider<GreenMail>() {
+
+				@Override
+				public GreenMail get() {
+					return imapServer;
+				}
+				
+			}));
 
 	@Inject TemporaryFolder temporaryFolder;
 	@Inject H2InMemoryDatabase db;
@@ -137,7 +146,6 @@ public class RecurrentTaskRescheduleTest {
 		DateTime when = DateTime.parse("2026-11-02T13:37Z");
 		DateTime higherBoundary = DateTime.parse("2026-11-02T23:59Z");
 		
-		imapServer.setUser("cyrus", "cyrus");
 		expect(userSystemDao.getByLogin("cyrus"))
 			.andReturn(ObmSystemUser.builder().login("cyrus").password("cyrus").id(12).build())
 			.anyTimes();
@@ -158,7 +166,6 @@ public class RecurrentTaskRescheduleTest {
 		domainConfigDao.create(domainConfiguration);
 		
 		control.replay();
-		imapServer.start();
 		server.start();
 
 		// SCHEDULE AND RUN A RECURRENT TASK

@@ -61,6 +61,7 @@ import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.DatabaseOperations;
 import org.obm.imap.archive.Expectations;
+import org.obm.imap.archive.CyrusCompatGreenmailRule;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
@@ -107,7 +108,15 @@ public class TreatmentsResourceTest {
 				public H2InMemoryDatabase get() {
 					return db;
 				}
-			}, "sql/initial.sql"));
+			}, "sql/initial.sql"))
+			.around(new CyrusCompatGreenmailRule(new Provider<GreenMail>() {
+
+				@Override
+				public GreenMail get() {
+					return imapServer;
+				}
+				
+			}));
 	
 	@Inject TemporaryFolder temporaryFolder;
 	@Inject H2InMemoryDatabase db;
@@ -122,9 +131,6 @@ public class TreatmentsResourceTest {
 	@Before
 	public void setUp() {
 		expectations = new Expectations(driver);
-		
-		imapServer.start();
-		imapServer.setUser("cyrus", "cyrus");
 	}
 
 	@After

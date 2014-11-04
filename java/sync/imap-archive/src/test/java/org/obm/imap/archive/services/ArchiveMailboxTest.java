@@ -102,24 +102,37 @@ public class ArchiveMailboxTest {
 	public void archiveMailboxShouldWorkWhenMailboxIsINBOX() throws Exception {
 		String mailbox = "user/usera@mydomain.org";
 		
-		String archiveMailbox = ArchiveMailbox.archiveMailbox(mailbox, Year.from(2014));
-		assertThat(archiveMailbox).isEqualTo("user/usera/ARCHIVE/2014/INBOX@mydomain.org");
+		MailboxPaths archiveMailbox = ArchiveMailbox.archiveMailbox(mailbox, Year.from(2014));
+		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/INBOX@mydomain.org");
 	}
 	
 	@Test
 	public void archiveMailboxShouldWorkWhenMailboxIsAFolder() throws Exception {
 		String mailbox = "user/usera/Test@mydomain.org";
 		
-		String archiveMailbox = ArchiveMailbox.archiveMailbox(mailbox, Year.from(2014));
-		assertThat(archiveMailbox).isEqualTo("user/usera/ARCHIVE/2014/Test@mydomain.org");
+		MailboxPaths archiveMailbox = ArchiveMailbox.archiveMailbox(mailbox, Year.from(2014));
+		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/Test@mydomain.org");
 	}
 	
 	@Test
 	public void archiveMailboxShouldWorkWhenMailboxIsASubFolder() throws Exception {
 		String mailbox = "user/usera/Test/subfolder@mydomain.org";
 		
-		String archiveMailbox = ArchiveMailbox.archiveMailbox(mailbox, Year.from(2014));
-		assertThat(archiveMailbox).isEqualTo("user/usera/ARCHIVE/2014/Test/subfolder@mydomain.org");
+		MailboxPaths archiveMailbox = ArchiveMailbox.archiveMailbox(mailbox, Year.from(2014));
+		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/Test/subfolder@mydomain.org");
+	}
+	
+	@Test
+	public void fromShouldBuild() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		control.replay();
+		ArchiveMailbox archiveMailbox = ArchiveMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), Year.from(2015), new DomainName("mydomain.org"));
+		control.verify();
+		
+		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2015/INBOX@mydomain.org");
+		assertThat(archiveMailbox.getUserAtDomain()).isEqualTo("usera@mydomain.org");
 	}
 	
 	@Test
@@ -129,40 +142,6 @@ public class ArchiveMailboxTest {
 		expectedException.expect(MailboxFormatException.class);
 		
 		ArchiveMailbox.archiveMailbox(mailbox, Year.from(2014));
-	}
-	
-	@Test
-	public void getUserAtDomainShoudWorkWhenMailboxIsINBOX() throws Exception {
-		String mailbox = "user/usera@mydomain.org";
-		
-		String userAtDomain = ArchiveMailbox.getUserAtDomain(mailbox, new DomainName("mydomain.org"));
-		assertThat(userAtDomain).isEqualTo("usera@mydomain.org");
-	}
-	
-	@Test
-	public void getUserAtDomainShoudWorkWhenMailboxIsAFolder() throws Exception {
-		String mailbox = "user/usera/Test@mydomain.org";
-		
-		String userAtDomain = ArchiveMailbox.getUserAtDomain(mailbox, new DomainName("mydomain.org"));
-		assertThat(userAtDomain).isEqualTo("usera@mydomain.org");
-	}
-	
-	@Test
-	public void getUserAtDomainShoudWorkWhenMailboxIsASubFolder() throws Exception {
-		String mailbox = "user/usera/Test/subfolder@mydomain.org";
-		
-		String userAtDomain = ArchiveMailbox.getUserAtDomain(mailbox, new DomainName("mydomain.org"));
-		assertThat(userAtDomain).isEqualTo("usera@mydomain.org");
-	}
-	
-	@Test
-	public void getUserAtDomainShoudThrowWhenBadMailbox() throws Exception {
-		String mailbox = "user";
-		
-		expectedException.expect(MailboxFormatException.class);
-		
-		String userAtDomain = ArchiveMailbox.getUserAtDomain(mailbox, new DomainName("mydomain.org"));
-		assertThat(userAtDomain).isEqualTo("usera@mydomain.org");
 	}
 	
 	@Test

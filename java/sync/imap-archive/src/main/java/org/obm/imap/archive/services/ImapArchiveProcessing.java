@@ -322,10 +322,15 @@ public class ImapArchiveProcessing {
 
 			@Override
 			public boolean apply(ListInfo listInfo) {
-				if (listInfo.getName().contains(ArchiveMailbox.IMAP_FOLDER_SEPARATOR + ArchiveMailbox.ARCHIVE_MAIN_FOLDER + ArchiveMailbox.IMAP_FOLDER_SEPARATOR)) {
-					return false;
+				try {
+					MailboxPaths mailboxPaths = MailboxPaths.from(listInfo.getName());
+					if (!mailboxPaths.getSubPaths().startsWith(ArchiveMailbox.ARCHIVE_MAIN_FOLDER + MailboxPaths.IMAP_FOLDER_SEPARATOR)) {
+						return true;
+					}
+				} catch (MailboxFormatException e) {
+					Throwables.propagate(e);
 				}
-				return true;
+				return false;
 			}
 		};
 	}
