@@ -44,12 +44,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.obm.imap.archive.beans.Year;
 import org.obm.imap.archive.exception.ImapCreateException;
+import org.obm.imap.archive.exception.ImapStoreException;
 import org.obm.imap.archive.exception.MailboxFormatException;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
 import pl.wkr.fluentrule.api.FluentExpectedException;
+
+import com.google.common.collect.ImmutableSet;
 
 
 public class ArchiveMailboxTest {
@@ -190,6 +196,42 @@ public class ArchiveMailboxTest {
 		control.replay();
 		ArchiveMailbox archiveMailbox = ArchiveMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), Year.from(2015), new DomainName("mydomain.org"));
 		archiveMailbox.create();
+		control.verify();
+	}
+	
+	@Test
+	public void uidStoreSeenShouldNotThrowWhenSuccess() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		MessageSet messageSet = MessageSet.builder().add(12).add(13).add(14).build();
+		expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true))
+			.andReturn(true);
+		logger.debug(anyObject(String.class));
+		expectLastCall().anyTimes();
+		
+		control.replay();
+		ArchiveMailbox archiveMailbox = ArchiveMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), Year.from(2015), new DomainName("mydomain.org"));
+		archiveMailbox.uidStoreSeen(messageSet);
+		control.verify();
+	}
+	
+	@Test
+	public void uidStoreSeenShouldThrowWhenError() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		MessageSet messageSet = MessageSet.builder().add(12).add(13).add(14).build();
+		expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true))
+			.andReturn(false);
+		logger.error(anyObject(String.class));
+		expectLastCall();
+		
+		expectedException.expect(ImapStoreException.class);
+		
+		control.replay();
+		ArchiveMailbox archiveMailbox = ArchiveMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), Year.from(2015), new DomainName("mydomain.org"));
+		archiveMailbox.uidStoreSeen(messageSet);
 		control.verify();
 	}
 }

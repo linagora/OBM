@@ -34,7 +34,11 @@ package org.obm.imap.archive.services;
 
 import org.obm.imap.archive.beans.Year;
 import org.obm.imap.archive.exception.ImapCreateException;
+import org.obm.imap.archive.exception.ImapStoreException;
 import org.obm.imap.archive.exception.MailboxFormatException;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
@@ -42,6 +46,7 @@ import org.slf4j.Logger;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 
 class ArchiveMailbox extends Mailbox {
 
@@ -89,6 +94,13 @@ class ArchiveMailbox extends Mailbox {
 		logger.debug("Created");
 	}
 
+	public void uidStoreSeen(MessageSet messagesSet) throws ImapStoreException {
+		if (!storeClient.uidStore(messagesSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)) {
+			throw new ImapStoreException(String.format("Wasn't able to add flags on mails in the archive mailbox %s", name)); 
+		}
+		logger.debug("Stored");
+	}
+	
 	@Override
 	public int hashCode(){
 		return super.hashCode();
