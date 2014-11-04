@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.joda.time.LocalTime;
 import org.junit.Test;
+import org.obm.imap.archive.services.MailboxPaths;
 import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +69,8 @@ public class BeansTest {
 				Year.class,
 				Limit.class,
 				ExcludedUser.class,
-				Mailing.class
+				Mailing.class,
+				MailboxPaths.class
 			).verify();
 	}	
 }
