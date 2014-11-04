@@ -36,12 +36,12 @@ import org.obm.push.mail.imap.IMAPException;
 
 public class ImapCreateException extends IMAPException {
 
-	public ImapCreateException(Throwable e) {
-		super(e);
+	public ImapCreateException(Throwable t) {
+		super(t);
 	}
 	
-	public ImapCreateException(String s, Throwable e) {
-		super(s, e);
+	public ImapCreateException(String s, Throwable t) {
+		super(s, t);
 	}
 	
 	public ImapCreateException(String s) {

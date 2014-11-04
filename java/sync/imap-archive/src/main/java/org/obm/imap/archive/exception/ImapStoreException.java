@@ -34,17 +34,17 @@ package org.obm.imap.archive.exception;
 
 import org.obm.push.mail.imap.IMAPException;
 
-public class ImapSelectException extends IMAPException {
+public class ImapStoreException extends IMAPException {
 
-	public ImapSelectException(Throwable t) {
+	public ImapStoreException(Throwable t) {
 		super(t);
 	}
 	
-	public ImapSelectException(String s, Throwable t) {
+	public ImapStoreException(String s, Throwable t) {
 		super(s, t);
 	}
 	
-	public ImapSelectException(String s) {
+	public ImapStoreException(String s) {
 		super(s);
 	}
 }

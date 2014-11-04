@@ -39,12 +39,12 @@ public class IMAPException extends Exception {
 	 */
 	private static final long serialVersionUID = 673222847178210893L;
 
-	public IMAPException(Throwable e) {
-		super(e);
+	public IMAPException(Throwable t) {
+		super(t);
 	}
 	
-	public IMAPException(String s, Throwable e) {
-		super(s, e);
+	public IMAPException(String s, Throwable t) {
+		super(s, t);
 	}
 	
 	public IMAPException(String s) {
