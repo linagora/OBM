@@ -36,7 +36,6 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
-import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +43,7 @@ import org.obm.configuration.EmailConfiguration.MailboxNameCheckPolicy;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.ClientSupport;
 
 
@@ -304,7 +304,7 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("INBOXX", true, false));
-		EasyMock.expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll()).andReturn(listResult);
 		
 		mocks.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("INBOXX");
@@ -319,7 +319,7 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("INBOXX", true, false));
-		EasyMock.expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll()).andReturn(listResult);
 		
 		mocks.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("INBO");
@@ -334,7 +334,7 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("Trash", true, false));
-		EasyMock.expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll()).andReturn(listResult);
 		
 		mocks.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("Trash");
@@ -349,7 +349,7 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("TRASH", true, false));
-		EasyMock.expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll()).andReturn(listResult);
 		
 		mocks.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("Trash");
@@ -364,7 +364,7 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("TRASH", true, false));
-		EasyMock.expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll()).andReturn(listResult);
 		
 		mocks.replay();
 		storeClientImpl.findMailboxNameWithServerCase("Youpi");
@@ -402,5 +402,63 @@ public class StoreClientImplTest {
 		} catch (Exception e) {
 		}
 		assertThat(storeClientImpl.isConnected()).isFalse();
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void uidCopyShouldThrowWhenMessageSetIsNull() throws Exception {
+		try {
+			mocks.replay();
+			storeClientImpl.uidCopy(null, null);
+		} finally {
+			mocks.verify();
+		}
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void uidCopyShouldThrowWhenDestMailboxIsNull() throws Exception {
+		try {
+			mocks.replay();
+			storeClientImpl.uidCopy(MessageSet.empty(), null);
+		} finally {
+			mocks.verify();
+		}
+	}
+	
+	@Test
+	public void uidCopyShouldWorkWhenMessageSetIsEmpty() throws Exception {
+		MessageSet expectedMessageSet = MessageSet.empty();
+		String destMailbox = "dest";
+		
+		ListResult listResult = new ListResult(1);
+		listResult.add(new ListInfo(destMailbox, true, false));
+		expect(clientSupport.listAll()).andReturn(listResult);
+		
+		MessageSet messageSet = MessageSet.empty();
+		expect(clientSupport.uidCopy(messageSet, destMailbox))
+			.andReturn(expectedMessageSet);
+		
+		mocks.replay();
+		MessageSet returnedMessageSet = storeClientImpl.uidCopy(messageSet, destMailbox);
+		mocks.verify();
+		assertThat(returnedMessageSet).isEqualTo(expectedMessageSet);
+	}
+	
+	@Test
+	public void uidCopyShouldWork() throws Exception {
+		MessageSet expectedMessageSet = MessageSet.builder().add(1l).add(2l).build();
+		String destMailbox = "dest";
+		
+		ListResult listResult = new ListResult(1);
+		listResult.add(new ListInfo(destMailbox, true, false));
+		expect(clientSupport.listAll()).andReturn(listResult);
+		
+		MessageSet messageSet = MessageSet.builder().add(1l).add(2l).build();
+		expect(clientSupport.uidCopy(messageSet, destMailbox))
+			.andReturn(expectedMessageSet);
+		
+		mocks.replay();
+		MessageSet returnedMessageSet = storeClientImpl.uidCopy(messageSet, destMailbox);
+		mocks.verify();
+		assertThat(returnedMessageSet).isEqualTo(expectedMessageSet);
 	}
 }

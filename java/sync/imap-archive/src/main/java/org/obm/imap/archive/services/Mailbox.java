@@ -101,6 +101,10 @@ class Mailbox {
 		return storeClient.uidNext(name);
 	}
 	
+	public MessageSet uidCopy(MessageSet messages, ArchiveMailbox archiveMailbox) throws MailboxNotFoundException {
+		return storeClient.uidCopy(messages, archiveMailbox.getName());
+	}
+	
 	@Override
 	public int hashCode(){
 		return Objects.hashCode(name);

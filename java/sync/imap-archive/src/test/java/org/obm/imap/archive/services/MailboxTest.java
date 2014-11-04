@@ -32,6 +32,7 @@
 
 package org.obm.imap.archive.services;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
@@ -43,7 +44,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
+import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.StoreClient;
+import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
 import pl.wkr.fluentrule.api.FluentExpectedException;
@@ -143,5 +147,34 @@ public class MailboxTest {
 		Mailbox mailbox = Mailbox.from("mailbox", logger, storeClient);
 		mailbox.setAcl(user, acl);
 		control.verify();
+	}
+	
+	@Test
+	public void uidCopyShouldReturnMessageSet() throws Exception {
+		MessageSet expectedMessageSet = MessageSet.builder().add(12).add(13).add(15).build();
+		expect(storeClient.uidCopy(expectedMessageSet, "user/usera/TEMP/INBOX@mydomain.org"))
+			.andReturn(expectedMessageSet);
+		
+		control.replay();
+		Mailbox mailbox = Mailbox.from("user/usera@mydomain.org", logger, storeClient);
+		MessageSet messageSet = mailbox.uidCopy(expectedMessageSet, TemporaryMailbox.from(mailbox, new DomainName("mydomain.org")));
+		control.verify();
+		
+		assertThat(messageSet).isEqualTo(expectedMessageSet);
+	}
+	
+	@Test(expected=MailboxNotFoundException.class)
+	public void uidCopyShouldThrow() throws Exception {
+		MessageSet expectedMessageSet = MessageSet.builder().add(12).add(13).add(15).build();
+		expect(storeClient.uidCopy(expectedMessageSet, "user/usera/TEMP/INBOX@mydomain.org"))
+			.andThrow(new MailboxNotFoundException("Cannot find IMAP folder for collection [ user/usera/TEMP/INBOX@mydomain.org ]"));
+		
+		try {
+			control.replay();
+			Mailbox mailbox = Mailbox.from("user/usera@mydomain.org", logger, storeClient);
+			mailbox.uidCopy(expectedMessageSet, TemporaryMailbox.from(mailbox, new DomainName("mydomain.org")));
+		} finally {
+			control.verify();
+		}
 	}
 }
