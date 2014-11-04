@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -193,7 +194,15 @@ public class MessageSet implements Serializable, Iterable<Long> {
 	public int rangeNumber() {
 		return ranges.size();
 	}
+	
+	public Iterable<List<Long>> partition(int partitionSize) {
+		return Iterables.partition(asDiscreteValues(), partitionSize);
+	}
 
+	public long max() {
+		return Iterables.getLast(ranges).upperEndpoint();
+	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(ranges);

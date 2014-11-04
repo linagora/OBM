@@ -34,8 +34,12 @@ package org.obm.push.mail.bean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 
 
@@ -185,5 +189,65 @@ public class MessageSetTest {
 		assertThat(complex.contains(20)).isTrue();
 		assertThat(complex.contains(21)).isFalse();
 		assertThat(complex.contains(Integer.MAX_VALUE + 2)).isFalse();
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void partitionShouldProvideExpectedSizedLists() {
+		MessageSet messageSet = MessageSet.builder().add(1l).add(2l).add(3l).add(5l).build();
+		List<Long> part1 = ImmutableList.of(1l, 2l);
+		List<Long> part2 = ImmutableList.of(3l, 5l);
+		
+		Iterable<List<Long>> partition = messageSet.partition(2);
+		assertThat(partition).hasSize(2);
+		assertThat(partition).containsExactly(part1, part2);
+	}
+	
+	@Test
+	@SuppressWarnings("unchecked")
+	public void partitionShouldProvideRemainingInLastList() {
+		MessageSet messageSet = MessageSet.builder().add(1l).add(2l).add(3l).add(5l).add(6l).build();
+		List<Long> part1 = ImmutableList.of(1l, 2l, 3l);
+		List<Long> part2 = ImmutableList.of(5l, 6l);
+		
+		Iterable<List<Long>> partition = messageSet.partition(3);
+		assertThat(partition).hasSize(2);
+		assertThat(partition).containsExactly(part1, part2);
+	}
+	
+	@Test
+	public void partitionShouldProvideEmptyWhenNoValues() {
+		MessageSet messageSet = MessageSet.builder().build();
+		
+		Iterable<List<Long>> partition = messageSet.partition(2);
+		assertThat(partition).isEmpty();
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void partitionShouldThrowWhenBadSize() {
+		MessageSet messageSet = MessageSet.builder().add(1l).add(2l).add(3l).add(5l).build();
+		
+		messageSet.partition(-2);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void partitionShouldThrowWhenZeroSize() {
+		MessageSet messageSet = MessageSet.builder().add(1l).add(2l).add(3l).add(5l).build();
+		
+		messageSet.partition(0);
+	}
+	
+	@Test
+	public void maxShouldReturnTheMax() {
+		MessageSet messageSet = MessageSet.builder().add(1l).add(2l).add(3l).add(5l).build();
+		long max = messageSet.max();
+		assertThat(max).isEqualTo(5);
+	}
+	
+	@Test(expected=NoSuchElementException.class)
+	public void maxShouldThrowWhenEmpty() {
+		MessageSet messageSet = MessageSet.builder().build();
+		long max = messageSet.max();
+		assertThat(max).isEqualTo(0);
 	}
 }

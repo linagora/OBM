@@ -39,9 +39,14 @@ import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.dao.UserDao;
+import org.obm.imap.archive.exception.MailboxFormatException;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.imap.IMAPException;
+import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
+import com.google.common.collect.FluentIterable;
 import com.linagora.scheduling.DateTimeProvider;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -69,5 +74,10 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 	
 	@Override
 	protected void folderProcessed(ProcessedFolder.Builder processedFolder) throws DaoException {
+	}
+	
+	@Override
+	protected void processingImapCopy(Mailbox mailbox, ArchiveMailbox archiveMailbox, FluentIterable<Long> mailUids, DomainName domainName, ProcessedFolder.Builder processedFolder, Logger logger) 
+			throws IMAPException, MailboxFormatException, MailboxNotFoundException {
 	}
 }

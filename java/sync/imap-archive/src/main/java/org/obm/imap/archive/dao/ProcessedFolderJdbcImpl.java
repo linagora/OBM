@@ -36,12 +36,14 @@ import java.sql.SQLException;
 
 import org.joda.time.DateTimeZone;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.ImapFolder;
 import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.dao.ProcessedFolderJdbcImpl.TABLE.FIELDS;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
@@ -53,6 +55,7 @@ import com.google.inject.Singleton;
 public class ProcessedFolderJdbcImpl implements ProcessedFolderDao {
 
 	private final DatabaseConnectionProvider dbcp;
+	private final ObmHelper obmHelper;
 	private final ImapFolderDao imapFolderDao;
 	
 	public interface TABLE {
@@ -62,11 +65,12 @@ public class ProcessedFolderJdbcImpl implements ProcessedFolderDao {
 		interface FIELDS {
 			String RUN_ID = "mail_archive_processed_folder_run_uuid";
 			String FOLDER_ID = "mail_archive_processed_folder_id";
-			String UIDNEXT = "mail_archive_processed_folder_uidnext";
+			String LASTUID = "mail_archive_processed_folder_lastuid";
 			String START = "mail_archive_processed_folder_start";
 			String END = "mail_archive_processed_folder_end";
+			String STATUS = "mail_archive_processed_folder_status";
 			
-			String ALL = Joiner.on(", ").join(RUN_ID, FOLDER_ID, UIDNEXT, START, END);
+			String ALL = Joiner.on(", ").join(RUN_ID, FOLDER_ID, LASTUID, START, END, STATUS);
 		}
 	}
 	
@@ -78,13 +82,14 @@ public class ProcessedFolderJdbcImpl implements ProcessedFolderDao {
 					FIELDS.FOLDER_ID, ImapFolderJdbcImpl.TABLE.NAME);
 		
 		String INSERT = String.format(
-				"INSERT INTO %s (%s) VALUES (?, (SELECT id FROM %s WHERE %s = ?), ?, ?, ?)", TABLE.NAME, FIELDS.ALL,
+				"INSERT INTO %s (%s) VALUES (?, (SELECT id FROM %s WHERE %s = ?), ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL,
 					ImapFolderJdbcImpl.TABLE.NAME, ImapFolderJdbcImpl.TABLE.FIELDS.FOLDER);
 	}
 	
 	@Inject
-	@VisibleForTesting ProcessedFolderJdbcImpl(DatabaseConnectionProvider dbcp, ImapFolderDao imapFolderDao) {
+	@VisibleForTesting ProcessedFolderJdbcImpl(DatabaseConnectionProvider dbcp, ObmHelper obmHelper, ImapFolderDao imapFolderDao) {
 		this.dbcp = dbcp;
+		this.obmHelper = obmHelper;
 		this.imapFolderDao = imapFolderDao;
 	}
 
@@ -113,9 +118,10 @@ public class ProcessedFolderJdbcImpl implements ProcessedFolderDao {
 		return ProcessedFolder.builder()
 				.runId(ArchiveTreatmentRunId.from(rs.getString(FIELDS.RUN_ID)))
 				.folder(ImapFolder.from(rs.getString(ImapFolderJdbcImpl.TABLE.FIELDS.FOLDER)))
-				.uidNext(rs.getLong(FIELDS.UIDNEXT))
+				.lastUid(rs.getLong(FIELDS.LASTUID))
 				.start(JDBCUtils.getDateTime(rs, FIELDS.START, DateTimeZone.UTC))
 				.end(JDBCUtils.getDateTime(rs, FIELDS.END, DateTimeZone.UTC))
+				.status(ArchiveStatus.fromSpecificationValue(rs.getString(FIELDS.STATUS)))
 				.build();
 	}
 	
@@ -132,9 +138,10 @@ public class ProcessedFolderJdbcImpl implements ProcessedFolderDao {
 			int idx = 1;
 			ps.setString(idx++, processedFolder.getRunId().serialize());
 			ps.setString(idx++, imapFolder.getName());
-			ps.setLong(idx++, processedFolder.getUidNext());
+			ps.setLong(idx++, processedFolder.getLastUid());
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(processedFolder.getStart()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(processedFolder.getEnd()));
+			ps.setObject(idx++, obmHelper.getDBCP().getJdbcObject("mail_archive_status", processedFolder.getStatus().asSpecificationValue()));
 
 			ps.executeUpdate();
 		} catch (SQLException e) {

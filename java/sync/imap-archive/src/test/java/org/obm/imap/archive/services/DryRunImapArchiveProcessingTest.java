@@ -150,10 +150,10 @@ public class DryRunImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", 
-				Range.openClosed(1l, 10l), higherBoundary, storeClient);
-		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org", 
-				Range.openClosed(3l, 100l), higherBoundary, storeClient);
-		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org", 
+				Range.closed(1l, 10l), higherBoundary, storeClient);
+		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org",
+				Range.closed(3l, 100l), higherBoundary, storeClient);
+		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org",
 				Range.singleton(1230l), higherBoundary, storeClient);
 		
 		storeClient.close();
@@ -170,6 +170,10 @@ public class DryRunImapArchiveProcessingTest {
 	private void expectImapCommandsOnMailboxProcessing(String mailboxName, String archiveMailboxName, Range<Long> uids, DateTime higherBoundary, StoreClient storeClient) 
 			throws Exception {
 		
+		MessageSet messageSet = MessageSet.builder()
+				.add(uids)
+				.build();
+		
 		storeClient.login(false);
 		expectLastCall();
 		expect(storeClient.select(mailboxName)).andReturn(true);
@@ -177,17 +181,14 @@ public class DryRunImapArchiveProcessingTest {
 				.after(new DateTime(0, DateTimeZone.UTC).toDate())
 				.before(higherBoundary.toDate())
 				.build()))
-			.andReturn(MessageSet.builder()
-					.add(uids)
-					.build());
-		expect(storeClient.uidNext(mailboxName))
-			.andReturn(uids.upperEndpoint());
+			.andReturn(messageSet);
 		expect(storeClient.select(archiveMailboxName)).andReturn(false);
 		expect(storeClient.create(archiveMailboxName, "mydomain_org_archive")).andReturn(true);
 		expect(storeClient.setAcl(archiveMailboxName, ObmSystemUser.CYRUS, Mailbox.ALL_IMAP_RIGHTS)).andReturn(true);
 		expect(storeClient.setAcl(archiveMailboxName, "usera@mydomain.org", Mailbox.READ_IMAP_RIGHTS)).andReturn(true);
 		expect(storeClient.select(archiveMailboxName)).andReturn(true);
 		expect(storeClient.select(mailboxName)).andReturn(true);
+		
 		storeClient.close();
 		expectLastCall();
 	}

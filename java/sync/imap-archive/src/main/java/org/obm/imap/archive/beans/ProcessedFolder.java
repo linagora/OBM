@@ -45,11 +45,14 @@ public class ProcessedFolder {
 	
 	public static class Builder {
 		
+		private final static ArchiveStatus DEFAULT_STATUS = ArchiveStatus.ERROR;
+		
 		private ArchiveTreatmentRunId runId;
 		private ImapFolder folder;
-		private Long uidNext;
+		private Long lastUid;
 		private DateTime start;
 		private DateTime end;
+		private ArchiveStatus status;
 		
 		private Builder() {}
 		
@@ -65,8 +68,8 @@ public class ProcessedFolder {
 			return this;
 		}
 		
-		public Builder uidNext(long uidNext) {
-			this.uidNext = uidNext;
+		public Builder lastUid(long lastUid) {
+			this.lastUid = lastUid;
 			return this;
 		}
 		
@@ -82,29 +85,37 @@ public class ProcessedFolder {
 			return this;
 		}
 		
+		public Builder status(ArchiveStatus status) {
+			Preconditions.checkNotNull(status);
+			this.status = status;
+			return this;
+		}
+		
 		public ProcessedFolder build() {
 			Preconditions.checkState(runId != null);
 			Preconditions.checkState(folder != null);
-			Preconditions.checkState(uidNext != null);
+			Preconditions.checkState(lastUid != null);
 			Preconditions.checkState(start != null);
 			Preconditions.checkState(end != null);
 			
-			return new ProcessedFolder(runId, folder, uidNext, start, end);
+			return new ProcessedFolder(runId, folder, lastUid, start, end, Objects.firstNonNull(status, DEFAULT_STATUS));
 		}
 	}
 
 	private final ArchiveTreatmentRunId runId;
 	private final ImapFolder folder;
-	private final long uidNext;
+	private final long lastUid;
 	private final DateTime start;
 	private final DateTime end;
+	private final ArchiveStatus status;
 
-	private ProcessedFolder(ArchiveTreatmentRunId runId, ImapFolder folder, long uidNext, DateTime start, DateTime end) {
+	private ProcessedFolder(ArchiveTreatmentRunId runId, ImapFolder folder, long lastUid, DateTime start, DateTime end, ArchiveStatus status) {
 		this.runId = runId;
 		this.folder = folder;
-		this.uidNext = uidNext;
+		this.lastUid = lastUid;
 		this.start = start;
 		this.end = end;
+		this.status = status;
 	}
 	
 	public ArchiveTreatmentRunId getRunId() {
@@ -115,8 +126,8 @@ public class ProcessedFolder {
 		return folder;
 	}
 
-	public long getUidNext() {
-		return uidNext;
+	public long getLastUid() {
+		return lastUid;
 	}
 
 	public DateTime getStart() {
@@ -127,10 +138,13 @@ public class ProcessedFolder {
 		return end;
 	}
 
+	public ArchiveStatus getStatus() {
+		return status;
+	}
 
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(runId, folder, uidNext, start, end);
+		return Objects.hashCode(runId, folder, lastUid, start, end, status);
 	}
 	
 	@Override
@@ -139,9 +153,10 @@ public class ProcessedFolder {
 			ProcessedFolder that = (ProcessedFolder) object;
 			return Objects.equal(this.runId, that.runId)
 				&& Objects.equal(this.folder, that.folder)
-				&& Objects.equal(this.uidNext, that.uidNext)
+				&& Objects.equal(this.lastUid, that.lastUid)
 				&& Objects.equal(this.start, that.start)
-				&& Objects.equal(this.end, that.end);
+				&& Objects.equal(this.end, that.end)
+				&& Objects.equal(this.status, that.status);
 		}
 		return false;
 	}
@@ -151,9 +166,10 @@ public class ProcessedFolder {
 		return Objects.toStringHelper(this)
 			.add("runId", runId)
 			.add("folder", folder)
-			.add("uidNext", uidNext)
+			.add("lastUid", lastUid)
 			.add("start", start)
 			.add("end", end)
+			.add("status", status)
 			.toString();
 	}
 }

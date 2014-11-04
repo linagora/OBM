@@ -68,9 +68,10 @@ CREATE TABLE mail_archive_processed_folder (
 	id										SERIAL PRIMARY KEY,
 	mail_archive_processed_folder_run_uuid	character(36) NOT NULL,
 	mail_archive_processed_folder_id		INTEGER NOT NULL,
-	mail_archive_processed_folder_uidnext	NUMERIC(10,0) NOT NULL,
+	mail_archive_processed_folder_lastuid	NUMERIC(10,0) NOT NULL,
 	mail_archive_processed_folder_start		TIMESTAMP NOT NULL,
 	mail_archive_processed_folder_end		TIMESTAMP NOT NULL,
+ 	mail_archive_processed_folder_status	mail_archive_status NOT NULL,
 
 	CONSTRAINT mail_archive_processed_folder_ukey UNIQUE (mail_archive_processed_folder_run_uuid, mail_archive_processed_folder_id),
 	CONSTRAINT mail_archive_processed_folder_run_id_fkey FOREIGN KEY (mail_archive_processed_folder_run_uuid) REFERENCES mail_archive_run(mail_archive_run_uuid) ON UPDATE CASCADE ON DELETE CASCADE,

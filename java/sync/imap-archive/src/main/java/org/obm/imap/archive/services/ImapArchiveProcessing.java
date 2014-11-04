@@ -56,10 +56,13 @@ import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
+import org.obm.imap.archive.exception.MailboxFormatException;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.ListInfo;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
+import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
@@ -71,6 +74,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Range;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.linagora.scheduling.DateTimeProvider;
@@ -84,6 +88,8 @@ import fr.aliacom.obm.common.user.UserExtId;
 public class ImapArchiveProcessing {
 	
 	@VisibleForTesting static final String GLOBAL_VIRT = "global.virt";
+	@VisibleForTesting static final long DEFAULT_LAST_UID = -1l;
+	private static final int MOVE_PARTITION_SIZE = 20;
 
 	private final DateTimeProvider dateTimeProvider;
 	private final SchedulingDatesService schedulingDatesService;
@@ -109,7 +115,6 @@ public class ImapArchiveProcessing {
 		this.userDao = userDao;
 	}
 	
-	@Transactional
 	public void archive(ArchiveConfiguration configuration) {
 		Logger logger = configuration.getLogger();
 		try {
@@ -181,6 +186,14 @@ public class ImapArchiveProcessing {
 
 	@Transactional
 	protected void processMailbox(Mailbox mailbox, ProcessedTask processedTask) throws Exception {
+		Optional<Long> previousLastUid = previousLastUid(mailbox, processedTask.getPreviousArchiveTreatment());
+		
+		ProcessedFolder.Builder processedFolder = ProcessedFolder.builder()
+				.runId(processedTask.getRunId())
+				.folder(ImapFolder.from(mailbox.getName()))
+				.start(dateTimeProvider.now())
+				.lastUid(previousLastUid.or(DEFAULT_LAST_UID));
+		
 		try (StoreClient storeClient = mailbox.storeClient) {
 			storeClient.login(false);
 			
@@ -188,33 +201,63 @@ public class ImapArchiveProcessing {
 			
 			grantRightsWhenNotSelectable(mailbox);
 			
-			ProcessedFolder.Builder processedFolder = ProcessedFolder.builder()
-					.runId(processedTask.getRunId())
-					.folder(ImapFolder.from(mailbox.getName()))
-					.uidNext(mailbox.uidNext())
-					.start(dateTimeProvider.now());
-			
-			FluentIterable<Long> mailUids = searchMailUids(mailbox, processedTask.getBoundaries(), processedTask.getPreviousArchiveTreatment());
+			FluentIterable<Long> mailUids = searchMailUids(mailbox, processedTask.getBoundaries(), previousLastUid);
 			if (!mailUids.isEmpty()) {
 				logger.info("Processing: {}", mailbox.getName());
 				logger.info("{} mails will be archived, from UID {} to {}", mailUids.size(), mailUids.first().get(), mailUids.last().get());
 	
+				DomainName domainName = new DomainName(processedTask.getDomain().getName());
 				ArchiveMailbox archiveMailbox = ArchiveMailbox.from(mailbox, 
 						Year.from(processedTask.getBoundaries().getHigherBoundary().year().get()), 
-						new DomainName(processedTask.getDomain().getName())); 
+						domainName); 
 				createFolder(archiveMailbox, logger);
 				
 				mailbox.select();
 				logger.debug("Copying from {} mailbox to {} mailbox", mailbox, archiveMailbox);
-				// uidCopy mailbox to temp
-				// uidMove from temp to archive
 				
-				// archiveMailbox.select
-				// uidStore Flag.SEEN
+				processingImapCopy(mailbox, archiveMailbox, mailUids, domainName, processedFolder, logger);
 			}
-			
+			processedFolder.status(ArchiveStatus.SUCCESS);
+		} finally {
 			folderProcessed(processedFolder);
 		}
+	}
+
+	protected void processingImapCopy(Mailbox mailbox, ArchiveMailbox archiveMailbox, FluentIterable<Long> mailUids, DomainName domainName, ProcessedFolder.Builder processedFolder, Logger logger) 
+			throws IMAPException, MailboxFormatException, MailboxNotFoundException {
+		
+		MessageSet messageSet = MessageSet.builder().add(Range.encloseAll(mailUids)).build();
+		TemporaryMailbox temporaryMailbox = TemporaryMailbox.from(mailbox, domainName);
+		try {
+			copyToTemporary(mailbox, temporaryMailbox, logger, messageSet);
+			
+			batchCopyFromTemporaryToArchive(temporaryMailbox, archiveMailbox, messageSet, processedFolder);
+	
+			addSeenFlags(archiveMailbox, messageSet);
+		} finally {
+			temporaryMailbox.delete();
+		}
+	}
+
+	private void copyToTemporary(Mailbox mailbox, TemporaryMailbox temporaryMailbox, Logger logger, MessageSet messageSet) throws IMAPException, MailboxNotFoundException {
+		createFolder(temporaryMailbox, logger);
+		
+		mailbox.select();
+		mailbox.uidCopy(messageSet, temporaryMailbox);
+	}
+
+	private void batchCopyFromTemporaryToArchive(TemporaryMailbox temporaryMailbox, ArchiveMailbox archiveMailbox, MessageSet messageSet, ProcessedFolder.Builder processedFolder) throws MailboxNotFoundException {
+		for (List<Long> partition : messageSet.partition(MOVE_PARTITION_SIZE)) {
+			MessageSet partitionMessageSet = MessageSet.builder().addAll(partition).build();
+			
+			temporaryMailbox.uidCopy(partitionMessageSet, archiveMailbox);
+			processedFolder.lastUid(partitionMessageSet.max());
+		}
+	}
+
+	private void addSeenFlags(ArchiveMailbox archiveMailbox, MessageSet messageSet) throws MailboxNotFoundException, IMAPException {
+		archiveMailbox.select();
+		archiveMailbox.uidStoreSeen(messageSet);
 	}
 
 	private void grantRightsWhenNotSelectable(Mailbox mailbox) 
@@ -245,7 +288,6 @@ public class ImapArchiveProcessing {
 			return FluentIterable.from(storeClient.listAll())
 					.filter(filterExcludedFolder(processedTask))
 					.filter(filterOutExcludedUsers(processedTask))
-					.filter(filterAlreadyProcessedFolder(processedTask))
 					.filter(filterArchiveFolder())
 					.toList();
 		}
@@ -293,30 +335,6 @@ public class ImapArchiveProcessing {
 		return excludedUserLogins.build();
 	}
 
-	private Predicate<ListInfo> filterAlreadyProcessedFolder(final ProcessedTask processedTask) {
-		return new Predicate<ListInfo>() {
-
-			@Override
-			public boolean apply(ListInfo listInfo) {
-				if (processedTask.continuePrevious()) {
-					try {
-						if (hasBeenProcessedByPrevious(ImapFolder.from(listInfo.getName()), processedTask.getPreviousArchiveTreatment().get())) {
-							return false;
-						}
-					} catch (DaoException e) {
-						processedTask.getLogger().error("Error while getting ImapFolder", e);
-						Throwables.propagate(e);
-					}
-				}
-				return true;
-			}
-
-			private boolean hasBeenProcessedByPrevious(ImapFolder imapFolder, ArchiveTreatment previousArchiveTreatment) throws DaoException {
-				return processedFolderDao.get(previousArchiveTreatment.getRunId(), imapFolder).isPresent();
-			}
-		};
-	}
-
 	private Predicate<ListInfo> filterArchiveFolder() {
 		return new Predicate<ListInfo>() {
 
@@ -335,9 +353,7 @@ public class ImapArchiveProcessing {
 		};
 	}
 
-	@VisibleForTesting FluentIterable<Long> searchMailUids(Mailbox mailbox, Boundaries boundaries, Optional<ArchiveTreatment> previousArchiveTreatment) throws DaoException {
-		final Optional<Long> previousUidnext = previousUidnext(mailbox, previousArchiveTreatment);
-		
+	@VisibleForTesting FluentIterable<Long> searchMailUids(Mailbox mailbox, Boundaries boundaries, final Optional<Long> previousLastUid) {
 		return FluentIterable.from(
 				mailbox.uidSearch(SearchQuery.builder()
 					.after(boundaries.getLowerBoundary().toDate())
@@ -346,8 +362,8 @@ public class ImapArchiveProcessing {
 				.filter(new Predicate<Long> () {
 
 					@Override
-					public boolean apply(Long input) {
-						if (previousUidnext.isPresent() && input < previousUidnext.get()) {
+					public boolean apply(Long uid) {
+						if (previousLastUid.isPresent() && uid <= previousLastUid.get()) {
 							return false;
 						}
 						return true;
@@ -355,11 +371,11 @@ public class ImapArchiveProcessing {
 				});
 	}
 
-	@VisibleForTesting Optional<Long> previousUidnext(Mailbox mailbox, Optional<ArchiveTreatment> previousArchiveTreatment) throws DaoException {
+	@VisibleForTesting Optional<Long> previousLastUid(Mailbox mailbox, Optional<ArchiveTreatment> previousArchiveTreatment) throws DaoException {
 		if (previousArchiveTreatment.isPresent()) {
 			Optional<ProcessedFolder> optionalProcessedFolder = processedFolderDao.get(previousArchiveTreatment.get().getRunId(), ImapFolder.from(mailbox.getName()));
 			if (optionalProcessedFolder.isPresent()) {
-				return Optional.of(optionalProcessedFolder.get().getUidNext());
+				return Optional.of(optionalProcessedFolder.get().getLastUid());
 			}
 		}
 		return Optional.absent();

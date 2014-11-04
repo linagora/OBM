@@ -60,6 +60,11 @@ public class ProcessedFolderTest {
 		ProcessedFolder.builder().end(null);
 	}
 
+	@Test(expected=NullPointerException.class)
+	public void builderShouldThrowWhenStatusNull() {
+		ProcessedFolder.builder().status(null);
+	}
+
 	@Test(expected=IllegalStateException.class)
 	public void builderShouldThrowWhenRunIdNotProvided() {
 		ProcessedFolder.builder().build();
@@ -85,7 +90,7 @@ public class ProcessedFolderTest {
 		ProcessedFolder.builder()
 			.runId(ArchiveTreatmentRunId.from("1fa66563-926c-4600-a7a3-f56877f38737"))
 			.folder(ImapFolder.from("user/usera/Test@mydomain.org"))
-			.uidNext(12l)
+			.lastUid(12l)
 			.build();
 	}
 
@@ -94,9 +99,22 @@ public class ProcessedFolderTest {
 		ProcessedFolder.builder()
 			.runId(ArchiveTreatmentRunId.from("1fa66563-926c-4600-a7a3-f56877f38737"))
 			.folder(ImapFolder.from("user/usera/Test@mydomain.org"))
-			.uidNext(12l)
+			.lastUid(12l)
 			.start(DateTime.parse("2014-07-23T08:21:00.000Z"))
 			.build();
+	}
+
+	@Test
+	public void builderShouldUseDefaultStatusWhenNotGiven() {
+		ProcessedFolder processedFolder = ProcessedFolder.builder()
+			.runId(ArchiveTreatmentRunId.from("1fa66563-926c-4600-a7a3-f56877f38737"))
+			.folder(ImapFolder.from("user/usera/Test@mydomain.org"))
+			.lastUid(12l)
+			.start(DateTime.parse("2014-07-23T08:21:00.000Z"))
+			.end(DateTime.parse("2014-07-23T08:21:03.000Z"))
+			.build();
+		
+		assertThat(processedFolder.getStatus()).isEqualTo(ArchiveStatus.ERROR);
 	}
 
 	@Test
@@ -106,19 +124,22 @@ public class ProcessedFolderTest {
 		long uidNext = 12;
 		DateTime start = DateTime.parse("2014-07-23T08:21:00.000Z");
 		DateTime end = DateTime.parse("2014-07-23T08:21:03.000Z");
+		ArchiveStatus status = ArchiveStatus.SUCCESS;
 		
 		ProcessedFolder processedFolder = ProcessedFolder.builder()
 			.runId(archiveTreatmentRunId)
 			.folder(imapFolder)
-			.uidNext(uidNext)
+			.lastUid(uidNext)
 			.start(start)
 			.end(end)
+			.status(status)
 			.build();
 		
 		assertThat(processedFolder.getRunId()).isEqualTo(archiveTreatmentRunId);
 		assertThat(processedFolder.getFolder()).isEqualTo(imapFolder);
-		assertThat(processedFolder.getUidNext()).isEqualTo(uidNext);
+		assertThat(processedFolder.getLastUid()).isEqualTo(uidNext);
 		assertThat(processedFolder.getStart()).isEqualTo(start);
 		assertThat(processedFolder.getEnd()).isEqualTo(end);
+		assertThat(processedFolder.getStatus()).isEqualTo(status);
 	}
 }
