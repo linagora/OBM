@@ -290,7 +290,7 @@ form {
 
 #webmail_iframe {
   position:absolute;
-  top: 50px;
+  top: 55px;
   left: 0;
   border:none;
   width:100%;
@@ -2282,7 +2282,6 @@ form.button-to input {
 .popintopbar #popintopbar-form .popintopbar-message {
   color: #333;
   vertical-align: middle;
-  padding-top: 27px;
   font-weight: bold;
 }
 
