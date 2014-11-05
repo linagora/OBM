@@ -594,7 +594,7 @@ class LDAP_Auth extends Auth {
 
   function auth_ldap_validatelogin($login, $password, $domain){
     global $auth_ldap_server, $auth_ldap_basedn, $auth_ldap_binddn;
-    global $auth_ldap_bindpw, $auth_ldap_filter;
+    global $auth_ldap_bindpw, $auth_ldap_filter, $auth_ldap_userid_attribute;
     global $auth_ldap_attribute, $auth_ldap_sizelimit;
 
     if(!$login) {
@@ -603,7 +603,7 @@ class LDAP_Auth extends Auth {
     if(trim($password) == '') {
       return false;
     }
-    $auth_ldap_attribute = array("dn", "uid");
+    $auth_ldap_attribute = array("dn", $auth_ldap_userid_attribute);
     $auth_ldap_sizelimit = 1;
     $auth_ldap_filter = str_replace('%u', $login, $auth_ldap_filter);
     $auth_ldap_filter = str_replace('%d', $domain, $auth_ldap_filter);
@@ -627,7 +627,8 @@ class LDAP_Auth extends Auth {
       if ($result and ldap_count_entries($ldapconn, $result) > 0) {
         $ldap_data = ldap_get_entries($ldapconn, $result);
         $ldap_userdn = $ldap_data[0]["dn"];
-        $ldap_useruid = $ldap_data[0]["uid"][0];
+	// Lowercase the attribute because that's what php-ldap expects
+        $ldap_useruid = $ldap_data[0][strtolower($auth_ldap_userid_attribute)][0];
       } else {
         error_log( "Duplicate LDAP entry for user '".$login."', domaine '".$domain."'" );
         return false;
