@@ -2517,6 +2517,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   }
 
   $ext_id = generateUniqueKey();
+  $datebegin->setTimezone(new DateTimeZone('UTC'));
 
   $obm_q = new DB_OBM;
   $query = "INSERT INTO Event
