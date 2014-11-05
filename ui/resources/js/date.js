@@ -347,14 +347,11 @@ Obm.DateTime = new Class({
   },
 
   getTimezone: function() {    
-    var offset = this.offset/36000;
-    if(offset >= 0) {
-      offset = offset.pad(4,'0');
-      offset = '+' + offset
-    } else {
-      offset = offset.pad(4,'0');
-    }
-    return offset; 
+    var allMinutesOffset = this.offset/(60*1000),
+        hourOffset = Math.floor(allMinutesOffset/60),
+        remainingMinutesOffset = allMinutesOffset - hourOffset * 60,
+        sign = allMinutesOffset >= 0 ? '+' : '-';
+    return sign + hourOffset.pad(2, '0') + remainingMinutesOffset.pad(2, '0');
   },
   
   setNoon: function() {
