@@ -164,16 +164,16 @@ function calculate_next_treatment_date_from_imap_archive_service($configuration)
 }
 
 function toJson($configuration) {
-  $repeatKind = $configuration->repeat_kind;
-  $dayOfWeek = $configuration->day_of_week;
-  $dayOfMonth = $configuration->day_of_month;
-  $dayOfYear = $configuration->day_of_year;
+  $repeatKind = $configuration->repeatKind;
+  $dayOfWeek = $configuration->dayOfWeek;
+  $dayOfMonth = $configuration->dayOfMonth;
+  $dayOfYear = $configuration->dayOfYear;
   $hour = $configuration->hour;
   $minute = $configuration->minute;
-  $excludedFolder = $configuration->excluded_folder;
-  $excludedUserIdsFromConfig = $configuration->excluded_user_id;
+  $excludedFolder = $configuration->excludedFolder;
+  $excludedUserIdsFromConfig = $configuration->excludedUserIds;
   $excludedUserIds = $excludedUserIdsFromConfig != null ? $excludedUserIdsFromConfig : array();
-  $mailingEmailsFromConfig = $configuration->mailing_emails;
+  $mailingEmailsFromConfig = $configuration->mailingEmails;
   $mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
 	
   return json_encode(array("domainId" => $obm['domain_uuid'],
@@ -228,7 +228,7 @@ function check_configuration($params) {
 // Parameters:
 //   - none
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_imap_archive_update($configuration) {
+function run_query_imap_archive_update($paramsAsConfiguration) {
   global $obm;
   global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
   $userInfo = get_user_info($obm['uid']);
@@ -239,7 +239,7 @@ function run_query_imap_archive_update($configuration) {
   
   $configurationPath = ImapArchiveUrls::configuration($obm["domain_uuid"]);
 
-  $curl = curlPut($configurationPath, toJson($configuration));
+  $curl = curlPut($configurationPath, paramToJson($paramsAsConfiguration));
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];
@@ -254,6 +254,33 @@ function run_query_imap_archive_update($configuration) {
   if ($code == 200 || $code == 201 || $code == 204) {
     return array(1, json_decode($success));
   }
+}
+
+function paramToJson($paramsAsConfiguration) {
+	$repeatKind = $paramsAsConfiguration->repeat_kind;
+	$dayOfWeek = $paramsAsConfiguration->day_of_week;
+	$dayOfMonth = $paramsAsConfiguration->day_of_month;
+	$dayOfYear = $paramsAsConfiguration->day_of_year;
+	$hour = $paramsAsConfiguration->hour;
+	$minute = $paramsAsConfiguration->minute;
+	$excludedFolder = $paramsAsConfiguration->excluded_folder;
+	$excludedUserIdsFromConfig = $paramsAsConfiguration->excluded_user_id;
+	$excludedUserIds = $excludedUserIdsFromConfig != null ? $excludedUserIdsFromConfig : array();
+	$mailingEmailsFromConfig = $paramsAsConfiguration->mailing_emails;
+	$mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
+
+	return json_encode(array("domainId" => $obm['domain_uuid'],
+			"enabled" => ($paramsAsConfiguration->enabled) ? "true" : "false",
+			"repeatKind" => ($repeatKind) ? $repeatKind : "MONTHLY",
+			"dayOfWeek" => ($dayOfWeek) ? $dayOfWeek : 1,
+			"dayOfMonth" => ($dayOfMonth) ? $dayOfMonth : -1,
+			"dayOfYear" => ($dayOfYear) ? $dayOfYear : 1,
+			"hour" => ($hour) ? $hour : 0,
+			"minute" => ($minute) ? $minute : 0,
+			"excludedFolder" => $excludedFolder,
+			"excludedUserIds" => $excludedUserIds,
+			"mailingEmails" => $mailingEmails
+	));
 }
 
 function curlPut($url, $json) {
