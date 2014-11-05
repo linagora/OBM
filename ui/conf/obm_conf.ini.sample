@@ -120,6 +120,7 @@ documentDefaultPath="/"
 ; auth-ldap-filter = "(&(uid=%u)(obmDomain=%d))"
 ;auth-ldap-binddn = uid=ldapadmin,ou=sysusers,dc=local
 ;auth-ldap-bindpw = "mdp3PaAL"
+;auth-ldap-userid-attribute = "uid"
 
 
 ; If set to true, will display 'login@domain' instead of 'login' when downloading
