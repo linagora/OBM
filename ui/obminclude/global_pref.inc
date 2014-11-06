@@ -385,6 +385,7 @@ if ($cgp_show['module']['user']) {
   $modules['user'] = array('Name'=> $l_module_user,
                                    'Ico' => "$ico_user",
                                    'Url' => "$path/user/user_index.php",
+                                   'Id' => "user_module",
                                    'Right'=> $cright_read);
 }
 if ($cgp_show['module']['people']) {

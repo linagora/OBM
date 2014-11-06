@@ -169,7 +169,7 @@ if ($action == 'ext_get_ids') {
         $params['user_id'] = $cid;
         set_update_state();
         $display['msg'] .= display_ok_msg("$l_user : $l_insert_ok");
-        $display['msg'] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
+        $display['msg'] .= display_ok_msg("<input id=\"download_user_card\" type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
         $display['detail'] = dis_user_consult($params);
       } else {
         $display['msg'] .= display_err_msg("$l_user : $l_insert_error");
@@ -187,7 +187,7 @@ if ($action == 'ext_get_ids') {
           set_update_state();
           $params['user_id'] = $cid;
           $display['msg'] .= display_ok_msg("$l_user : $l_insert_ok");
-          $display['msg'] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
+          $display['msg'] .= display_ok_msg("<input id=\"download_user_card\" type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
           $display['detail'] = dis_user_consult($params);
         } else {
           $display['msg'] .= display_err_msg("$l_user : $l_insert_error");
@@ -198,7 +198,7 @@ if ($action == 'ext_get_ids') {
 
   // Form data are not valid
   } else {
-    $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
+    $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg'], true, 'invalid_data');
     $display['detail'] = dis_user_form($action, $params, $err['field']);
   }
 
@@ -868,6 +868,7 @@ function update_user_action() {
       // Check Delete
       $actions['user']['check_delete']['Url'] = "$path/user/user_index.php?action=check_delete&amp;user_id=$id";
       $actions['user']['check_delete']['Condition'][] = 'insert';
+      $actions['user']['check_delete']['Id'] = 'check_delete_user';
 
       // Group Consult
       $actions['user']['group_consult']['Url'] = "$path/user/user_index.php?action=group_consult&amp;user_id=$id";

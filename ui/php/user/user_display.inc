@@ -619,7 +619,7 @@ function dis_user_search_list($user, $user_results_limit, $strongest_profile_lev
   $prefs = get_display_pref($obm['uid'], 'user');
   $nb_user = $obm_q->num_rows_total();
   if ($nb_user == 0) {
-    $display['msg'] .= display_warn_msg($l_no_found);
+    $display['msg'] .= display_warn_msg($l_no_found, true, 'warn_no_found');
   } else {
     if ($nb_user < $user_results_limit) {
       $display['msg'] .= display_info_msg("$nb_user $l_found");
@@ -2651,7 +2651,7 @@ function dis_user_can_delete($p_id) {
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\" onsubmit=\"return confirm_del(this)\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"user_id\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\" />
+    <input id=\"delete_user\" type=\"submit\" value=\"$l_delete\" />
     </form>";
 
   $display['msg'] .= display_ok_msg($l_can_delete);
