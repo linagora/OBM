@@ -2,31 +2,31 @@
  * 
  * Copyright (C) 2011-2014  Linagora
  *
- * This program is free software: you can redistribute it and/or 
- * modify it under the terms of the GNU Affero General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
- * License, or (at your option) any later version, provided you comply 
- * with the Additional Terms applicable for OBM connector by Linagora 
- * pursuant to Section 7 of the GNU Affero General Public License, 
- * subsections (b), (c), and (e), pursuant to which you must notably (i) retain 
- * the “Message sent thanks to OBM, Free Communication by Linagora” 
- * signature notice appended to any and all outbound messages 
- * (notably e-mail and meeting requests), (ii) retain all hypertext links between 
- * OBM and obm.org, as well as between Linagora and linagora.com, and (iii) refrain 
- * from infringing Linagora intellectual property rights over its trademarks 
- * and commercial brands. Other Additional Terms apply, 
- * see <http://www.linagora.com/licenses/> for more details. 
- *
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License 
- * for more details. 
- *
- * You should have received a copy of the GNU Affero General Public License 
- * and its applicable Additional Terms for OBM along with this program. If not, 
- * see <http://www.gnu.org/licenses/> for the GNU Affero General Public License version 3 
- * and <http://www.linagora.com/licenses/> for the Additional Terms applicable to 
- * OBM connectors. 
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version, provided you comply with the Additional Terms applicable for OBM
+ * software by Linagora pursuant to Section 7 of the GNU Affero General Public
+ * License, subsections (b), (c), and (e), pursuant to which you must notably (i)
+ * retain the displaying by the interactive user interfaces of the “OBM, Free
+ * Communication by Linagora” Logo with the “You are using the Open Source and
+ * free version of OBM developed and supported by Linagora. Contribute to OBM R&D
+ * by subscribing to an Enterprise offer !” infobox, (ii) retain all hypertext
+ * links between OBM and obm.org, between Linagora and linagora.com, as well as
+ * between the expression “Enterprise offer” and pro.obm.org, and (iii) refrain
+ * from infringing Linagora intellectual property rights over its trademarks and
+ * commercial brands. Other Additional Terms apply, see
+ * <http://www.linagora.com/licenses/> for more details.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License and
+ * its applicable Additional Terms for OBM along with this program. If not, see
+ * <http://www.gnu.org/licenses/> for the GNU Affero General   Public License
+ * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
+ * applicable to the OBM software.
  * 
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.scenario.user;
@@ -45,15 +45,22 @@ import com.linagora.obm.ui.bean.UIUser;
 import com.linagora.obm.ui.bean.UIUserKind;
 import com.linagora.obm.ui.bean.UIUserProfile;
 import com.linagora.obm.ui.page.CreateUserPage;
+import com.linagora.obm.ui.page.FindUserPage;
+import com.linagora.obm.ui.page.FindUserAsAdmin0Page;
+import com.linagora.obm.ui.page.DeleteUserPage;
 import com.linagora.obm.ui.page.CreateUserSummaryPage;
 import com.linagora.obm.ui.page.LoginPage;
+import com.linagora.obm.ui.page.LogoutPage;
+import com.linagora.obm.ui.page.LogoutAsAdmin0Page;
 import com.linagora.obm.ui.page.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import cucumber.api.java.en.And;
 
 public class UserStepdefs {
 
@@ -63,24 +70,42 @@ public class UserStepdefs {
 	private UIUser uiUser;
 	private UIDomain uiDomain;
 	
+	private LoginPage loginPage;
+	private LogoutPage logoutPage;
 	private CreateUserPage createUserPage;
+	private FindUserPage findUserPage;
+	private DeleteUserPage deleteUserPage;
 	private CreateUserPage processedCreateUserPage;
 	private CreateUserSummaryPage processedCreationSummaryPage;
 	
-	@Before
-	public void setUp() {
-		uiUser = UIUser.admin0();
-		uiDomain = UIDomain.globalDomain();
+	@After
+	public void tearDown() {
+		driver.quit();
+	}
 
-		LoginPage loginPage = pageFactory.create(driver, LoginPage.class);
+	@Given("connected as \"([^\"]*)\" with password \"([^\"]*)\" on domain \"([^\"]*)\"")
+	public void connectAsUserToDomain(String userName, String password, String domainName) {
+		uiUser = UIUser.builder().login(userName).password(password).build();
+		uiDomain = UIDomain.builder().name(domainName).build();
+
+		findUserPage = pageFactory.create(driver, FindUserPage.class);
+		logoutPage = pageFactory.create(driver, LogoutPage.class);
+		loginPage = pageFactory.create(driver, LoginPage.class);
 		loginPage.open();
 		loginPage.login(uiUser, uiDomain);
 	}
-	
-	@After
-	public void tearDown() {
-		// TODO Pastille jaune ou suppression de ce qu'on a créé ?
-		driver.quit();
+
+	@Given("connected as admin0")
+	public void connectAsAdmin0()
+	{
+		uiUser = UIUser.admin0();
+		uiDomain = UIDomain.globalDomain();
+
+		findUserPage = pageFactory.create(driver, FindUserAsAdmin0Page.class);
+		logoutPage = pageFactory.create(driver, LogoutAsAdmin0Page.class);
+		loginPage = pageFactory.create(driver, LoginPage.class);
+		loginPage.open();
+		loginPage.login(uiUser, uiDomain);
 	}
 
 	@Given("on create user page")
@@ -118,10 +143,9 @@ public class UserStepdefs {
 				.build());
 	}
 	
-	@When("user creates a user with admin profile")
-	public void createUserWithAdminProfile() {
+	public void createUserWithAdminProfile(String login) {
 		processedCreationSummaryPage = createUserPage.createUser(UIUser.builder()
-				.login("testAdmin")
+				.login(login)
 				.lastName("admin lastname")
 				.password("admin")
 				.commonName("admin")
@@ -131,15 +155,14 @@ public class UserStepdefs {
 				.phone("0606060606")
 				.build());
 	}
-	
-	@When("user creates a user")
-	public void createUser() {
+
+	public void createUserWithUserProfile(String login) {
 		processedCreationSummaryPage = createUserPage.createUser(UIUser.builder()
 				.kind(UIUserKind.MADAME)
-				.login("testUser")
+				.login(login)
 				.lastName("testUser lastname")
 				.firstName("testUser Firstname")
-				.password("testUser")
+				.password(login)
 				.commonName("commonname testUser")
 				.title("Chef d'usine")
 				.noExpire(true)
@@ -160,8 +183,28 @@ public class UserStepdefs {
 				.description("Here's a short description of this user : " +
 						"This is a \"Lovely\" test with nearly all fields filled up !")
 				.emailInternalEnabled(true)
-				.emailAddress("testuser")
+				.emailAddress(login)
 				.build());
+	}
+
+	@When("user creates a user \"([^\"]*)\" with admin profile")
+	public void createUserWithAdminProfileWhen(String login) {
+		createUserWithAdminProfile(login);
+	}
+	
+	@When("user creates a user \"([^\"]*)\"")
+	public void createUserWhen(String login) {
+		createUserWithUserProfile(login);
+	}
+	
+	@Given("\"([^\"]*)\" exists with admin profile")
+	public void createUserWithAdminProfileGiven(String login) {
+		createUserWithAdminProfile(login);
+	}
+	
+	@Given("\"([^\"]*)\" exists with user profile")
+	public void createUserGiven(String login) {
+		createUserWithUserProfile(login);
 	}
 	
 	@When("user creates a user already existing")
@@ -181,7 +224,7 @@ public class UserStepdefs {
 		assertThat(processedCreateUserPage.elMessagesOk()).isEmpty();
 		assertThat(processedCreateUserPage.elMessagesWarning()).isEmpty();
 		assertThat(errorMessages).hasSize(1);
-		assertThat(errorMessages.get(0).getText()).isEqualTo("Données invalides : " + message);
+		assertThat(errorMessages.get(0).getAttribute("class")).matches(".*\\binvalid_data\\b.*");
 	}
 	
 	@Then("creation succeeds")
@@ -191,8 +234,42 @@ public class UserStepdefs {
 		assertThat(processedCreationSummaryPage.elMessagesError()).isEmpty();
 		assertThat(processedCreationSummaryPage.elMessagesWarning()).isEmpty();
 		assertThat(okMessages).hasSize(2);
-		assertThat(okMessages.get(0).getText()).isEqualTo("Utilisateur : Insertion réussie");
-		WebElement findElement = okMessages.get(1).findElement(By.tagName("input"));
-		assertThat(findElement.getAttribute("value")).isEqualTo("Télécharger la fiche utilisateur");
+		assertThat(okMessages.get(0).getAttribute("id")).isEqualTo("message_ok");
+		WebElement findElement = okMessages.get(1).findElement(By.id("download_user_card"));
 	}
+
+	@When("delete user \"([^\"]*)\"")
+	public void deleteUser(String userLogin) {
+
+		findUserPage.gotoUsers();
+		findUserPage.findUserByLogin(userLogin);
+
+		deleteUserPage = pageFactory.create(driver, DeleteUserPage.class);
+		deleteUserPage.deleteUserByLogin(userLogin);
+	}
+	
+	@And("\"([^\"]*)\" is no longer in user list")
+	public void isUserListed(String userLogin) {
+
+		findUserPage.gotoUsers();
+		findUserPage.findUserByLogin(userLogin);
+
+		assertThat(findUserPage.elMessagesWarning()).hasSize(1);
+		assertThat(findUserPage.elMessagesWarning().get(0).getAttribute("class")).matches(".*\\bwarn_no_found\\b.*");
+	}
+	
+	@And("\"([^\"]*)\" can t connect anymore with password \"([^\"]*)\" on domain \"([^\"]*)\"")
+	public void connectionFailedTest(String userLogin, String password, String domainName)
+	{
+		logoutPage.disconnect();
+		connectAsUserToDomain(userLogin, password, domainName);
+		WebElement errorLegend = loginPage.elErrorLegend();
+		assertThat(errorLegend).isNotNull();
+	}
+	
+	@Then("deletion succeeds")
+	public void deletionSucceeded() {
+		assertThat(deleteUserPage.deletionSucceeded()).isTrue();
+	}
+	
 }

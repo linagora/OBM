@@ -1332,7 +1332,7 @@ function display_menu($module) {
   $display['action'] = display_actions($section, $module);
   $update_state = get_update_state($domain_id);
   if (($update_state) && $cgp_show['module']['tools'] && ($perm->check_right('tools', $cright_write_admin))) {
-    $dis_scope = "<li><a href=\"$path/tools/tools_index.php?action=update_index\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
+    $dis_scope = "<li><a id=\"tools_update_index\" href=\"$path/tools/tools_index.php?action=update_index\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
   }
 
   $wait_event = "<li><a id=\"bannerWaitingEvent\" href='".$path."/calendar/calendar_index.php?action=waiting_events'></a></li>";
@@ -1643,10 +1643,10 @@ function display_modules($section, $module, $portlet = false) {
         if ($fico) {
           $ico = $modules[$mod]['Ico'];
           if ($ico) {
-            $block .= "<a$target href='".$modules[$mod]['Url']."' class='ico' title='$module_tooltip'><img src='$ico' alt='$module_name' /></a>";
+            $block .= "<a$target id=\"".$modules[$mod]['Id']."\" href='".$modules[$mod]['Url']."' class='ico' title='$module_tooltip'><img src='$ico' alt='$module_name' /></a>";
           }
         }
-        $block .= "<a$target href='".$modules[$mod]['Url']."' title='$module_tooltip'>";
+        $block .= "<a$target id=\"".$modules[$mod]['Id']."\" href='".$modules[$mod]['Url']."' title='$module_tooltip'>";
         if ($ftext || $portlet) $block .= $module_name;
         $block .= "</a></li>";
       }
@@ -1995,7 +1995,7 @@ function display_ok_msg($msg, $special=true) {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
-    $ret = "<p name=\"displayMessageOk\" class=\"message ok\">$msg</p>";
+    $ret = "<p id=\"message_ok\" name=\"displayMessageOk\" class=\"message ok\">$msg</p>";
   }
 
   return $ret;
@@ -2027,13 +2027,17 @@ function display_info_msg($msg, $special=true) {
 //   - $msg     : message to display
 //   - $special : if true (default), html special chars just displayed
 ///////////////////////////////////////////////////////////////////////////////
-function display_warn_msg($msg, $special=true) {
+function display_warn_msg($msg, $special=true, $warning_class=NULL) {
 
   if ($msg != '') {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
-    $ret = "<p name=\"displayMessageWarning\" class=\"message warning\">$msg</p>";
+    $ret = "<p name=\"displayMessageWarning\" class=\"message warning";
+    if(!is_null($warning_class)) {
+    	$ret .= " ".$warning_class;
+    }
+    $ret .= "\">$msg</p>";
   }
 
   return $ret;
@@ -2046,13 +2050,17 @@ function display_warn_msg($msg, $special=true) {
 //   - $msg     : message to display
 //   - $special : if true (default), html special chars just displayed
 ///////////////////////////////////////////////////////////////////////////////
-function display_err_msg($msg, $special=true) {
+function display_err_msg($msg, $special=true, $msg_class=NULL) {
 
   if ($msg != '') {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
-    $ret = "<p name=\"displayMessageError\" class=\"message error\">$msg</p>";
+    $ret = "<p id=\"message_ko\" name=\"displayMessageError\" class=\"message error";
+    if(!is_null($msg_class)) {
+    	$ret .= " ".$msg_class;
+    }
+    $ret .= "\">$msg</p>";
   }
 
   return $ret;
@@ -2153,6 +2161,7 @@ function get_module_data($section, $module) {
       if (!in_array($link_name, $exclusions) && ($userHasEmail || !in_array($mod, $modulesRequiringEmail))) {
         $link_tooltip = ( !empty($modules[$mod]['Tooltip']) ) ? $modules[$mod]['Tooltip'] : $modules[$mod]['Name'];
         $link_url = $modules[$mod]['Url'];
+        $link_id = $modules[$mod]['Id'];
 
         $link_right = $perm->get_module_rights($mod);
         if (($link_right & $modules[$mod]['Right']) == $modules[$mod]['Right']) {
@@ -2171,7 +2180,8 @@ function get_module_data($section, $module) {
             "target"  => $link_target,
             "ico"     => $link_ico,
             "title"   => $link_name,
-            "tooltip" => $link_tooltip
+            "tooltip" => $link_tooltip,
+            "id" => $link_id
           );
         }
       }
