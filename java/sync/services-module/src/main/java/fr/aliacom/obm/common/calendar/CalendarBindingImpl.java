@@ -41,8 +41,10 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -94,6 +96,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
@@ -101,6 +104,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -805,10 +809,35 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 	
 	private void applyDelegationRightsOnAttendeesToEvent(AccessToken token, Event event) {
-		for (Attendee att: event.getAttendees()) {
-			boolean isWriteOnCalendar = !StringUtils.isEmpty(att.getEmail()) && helperService.canWriteOnCalendar(token,  att.getEmail());
-			att.setCanWriteOnCalendar(isWriteOnCalendar);
+		Iterable<Attendee> attendeesWithEmails = findAttendeesWithEmail(event.getAttendees());
+		Map<String, Attendee> emailToAttendee = emailToAttendee(attendeesWithEmails);
+		Map<String, EnumSet<Right>> emailToRights = helperService.listRightsOnCalendars(token, emailToAttendee.keySet());
+		for (Map.Entry<String, EnumSet<Right>> entry : emailToRights.entrySet()) {
+			String email = entry.getKey();
+			EnumSet<Right> rights = entry.getValue();
+			if (rights.contains(Right.WRITE)) {
+				Attendee att = emailToAttendee.get(email);
+				att.setCanWriteOnCalendar(true);
+			}
 		}
+	}
+
+	private static Iterable<Attendee> findAttendeesWithEmail(List<Attendee> attendees) {
+		return Iterables.filter(attendees, new Predicate<Attendee>() {
+
+			@Override
+			public boolean apply(Attendee attendee) {
+				return !Strings.isNullOrEmpty(attendee.getEmail());
+			}
+		});
+	}
+
+	private static Map<String, Attendee> emailToAttendee(Iterable<Attendee> attendees) {
+		ImmutableMap.Builder<String, Attendee> builder = ImmutableMap.builder();
+		for (Attendee attendee : attendees) {
+			builder.put(attendee.getEmail(), attendee);
+		}
+		return builder.build();
 	}
 
 	@Override
