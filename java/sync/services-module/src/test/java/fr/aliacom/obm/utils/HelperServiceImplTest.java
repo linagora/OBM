@@ -33,7 +33,11 @@ package fr.aliacom.obm.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
 
+import java.sql.SQLException;
+import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.assertj.core.api.Assertions;
@@ -55,10 +59,12 @@ import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
+import org.obm.sync.Right;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.date.DateProvider;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -99,6 +105,12 @@ public class HelperServiceImplTest {
 	
 	@Inject
 	private UserService userService;
+
+	@Inject
+	private HelperDao helperDao;
+
+	@Inject
+	private IMocksControl mocksControl;
 
 	private HelperServiceImpl helperService;
 	private AccessToken accessToken;
@@ -207,6 +219,154 @@ public class HelperServiceImplTest {
 		boolean eventBelongsToCalendar = helperServiceImpl.eventBelongsToCalendar(event, "user@domain.org");
 
 		Assertions.assertThat(eventBelongsToCalendar).isTrue();
+	}
+
+	@Test
+	public void testListRightsOnCalendarWithUserLogin() throws SQLException {
+		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
+
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of())).andReturn(
+				ImmutableMap.<String, EnumSet<Right>> of()).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("foo@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("foo@bar")).andReturn("foo").once();
+		mocksControl.replay();
+
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
+				"foo@bar", EnumSet.of(Right.READ, Right.WRITE));
+		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+				accessToken, ImmutableSet.of("foo@bar"));
+
+		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testListRightsOnCalendarWithAdminLogin() {
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("admin");
+		accessToken.setDomain(domainWithName("bar"));
+		accessToken.setRootAccount(true);
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("foo@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("foo@bar")).andReturn("foo").once();
+		mocksControl.replay();
+
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+
+		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
+				"foo@bar", EnumSet.of(Right.READ, Right.WRITE));
+		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+				accessToken, ImmutableSet.of("foo@bar"));
+
+		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testListRightsOnCalendarWithOtherDomainCalendar() throws SQLException {
+		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of())).andReturn(
+				ImmutableMap.<String, EnumSet<Right>> of()).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("foo@pub")).andReturn("pub").once();
+		mocksControl.replay();
+
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
+				"foo@pub", EnumSet.noneOf(Right.class));
+		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+				accessToken, ImmutableSet.of("foo@pub"));
+
+		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testListRightsOnCalendarWithOwnDomainCalendar() throws SQLException {
+		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("beer")))
+				.andReturn(
+						ImmutableMap.<String, EnumSet<Right>> of(
+								"beer", EnumSet.of(Right.READ))).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("beer@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("beer@bar")).andReturn("beer").once();
+		mocksControl.replay();
+
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
+				"beer@bar", EnumSet.of(Right.READ));
+		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+				accessToken, ImmutableSet.of("beer@bar"));
+
+		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testListRightsOnCalendarWithOwnDomainCalendarButNoRights() throws SQLException {
+		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
+
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("beer")))
+				.andReturn(
+						ImmutableMap.<String, EnumSet<Right>> of()).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("beer@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("beer@bar")).andReturn("beer").once();
+		mocksControl.replay();
+
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
+				"beer@bar", EnumSet.noneOf(Right.class));
+		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+				accessToken, ImmutableSet.of("beer@bar"));
+
+		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testListRightsOnCalendarWithMixedCalendars() throws SQLException {
+		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("beer")))
+				.andReturn(
+						ImmutableMap.<String, EnumSet<Right>> of(
+								"beer", EnumSet.of(Right.READ))).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("foo@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("foo@bar")).andReturn("foo").once();
+		expect(userService.getDomainNameFromEmail("foo@pub")).andReturn("pub").once();
+		expect(userService.getDomainNameFromEmail("beer@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("beer@bar")).andReturn("beer").once();
+		mocksControl.replay();
+
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
+				"foo@bar", EnumSet.of(Right.READ, Right.WRITE),
+				"foo@pub", EnumSet.noneOf(Right.class),
+				"beer@bar", EnumSet.of(Right.READ));
+		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
+				accessToken, ImmutableSet.of("foo@bar", "foo@pub", "beer@bar"));
+
+		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
+		mocksControl.verify();
 	}
 
 	private ObmDomain domainWithName(String domainName) {
