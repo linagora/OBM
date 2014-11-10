@@ -110,11 +110,14 @@ public class HelperServiceImpl implements HelperService {
 	 */
 	@Override
 	public boolean canWriteOnCalendar(AccessToken accessToken, String email) {
-		return listRightsOnCalendars(accessToken, ImmutableList.of(email)).get(email).contains(Right.READ);
+		return listRightsOnCalendars(accessToken, ImmutableList.of(email))
+				.getRights(email).orNull()
+				.contains(Right.READ);
+
 	}
 
 	@Override
-	public Map<String, EnumSet<Right>> listRightsOnCalendars(AccessToken accessToken,
+	public CalendarRights listRightsOnCalendars(AccessToken accessToken,
 			Iterable<String> emails) {
 		Set<String> emailSet = ImmutableSet.copyOf(emails);
 		Set<String> emailsOnDifferentDomains = findEmailsOnDifferentDomains(accessToken, emailSet);
@@ -143,9 +146,10 @@ public class HelperServiceImpl implements HelperService {
 		almostCompleteResults.putAll(calsWithImplicitRightsToRights);
 		almostCompleteResults.putAll(otherCalsToRights);
 
-		Map<String, EnumSet<Right>> results;
+		CalendarRights results;
 		if (almostCompleteResults.size() == emailSet.size()) {
-			results = ImmutableMap.copyOf(almostCompleteResults);
+			results = CalendarRights.builder().fromMap(
+					ImmutableMap.copyOf(almostCompleteResults)).build();
 		}
 		else {
 			// Some target calendars have no rights at all and do not appear in
@@ -177,12 +181,12 @@ public class HelperServiceImpl implements HelperService {
 		}));
 	}
 
-	private static Map<String, EnumSet<Right>> appendCalendarsWithNoRights(Set<String> allEmails,
+	private static CalendarRights appendCalendarsWithNoRights(Set<String> allEmails,
 			Map<String, EnumSet<Right>> emailToRights) {
-		ImmutableMap.Builder<String, EnumSet<Right>> builder = ImmutableMap.builder();
+		CalendarRights.Builder builder = CalendarRights.builder();
 		for (String email : allEmails) {
 			EnumSet<Right> rights = emailToRights.get(email);
-			builder.put(email, rights != null ? rights : EnumSet.noneOf(Right.class));
+			builder.addRights(email, rights != null ? rights : EnumSet.noneOf(Right.class));
 		}
 		return builder.build();
 	}
