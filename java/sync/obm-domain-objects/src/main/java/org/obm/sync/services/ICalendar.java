@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.obm.sync.NotAllowedException;
+import org.obm.sync.PermissionException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
 import org.obm.sync.auth.EventNotFoundException;
@@ -132,9 +133,10 @@ public interface ICalendar {
 
 	/**
 	 * FIXME: needs work
+	 * @throws PermissionException
 	 */
 	Event modifyEvent(AccessToken token, String calendar, Event event,
-			boolean updateAttendees, boolean notification) throws ServerFault, NotAllowedException;
+			boolean updateAttendees, boolean notification) throws ServerFault, NotAllowedException, PermissionException;
 
 	/**
 	 * Creates an event
@@ -146,10 +148,11 @@ public interface ICalendar {
 	 *            This param is not mandatory, it must have a size of 40 characters when not null
 	 *            
 	 * @throws EventAlreadyExistException 
+	 * @throws PermissionException
 	 */
 	EventObmId createEvent(AccessToken token, String calendar, Event event,
 			boolean notification, String clientId) 
-					throws ServerFault, EventAlreadyExistException, NotAllowedException;
+					throws ServerFault, EventAlreadyExistException, NotAllowedException, PermissionException;
 
 	/**
 	 * Stores an {@link Event}.<br />
@@ -168,12 +171,13 @@ public interface ICalendar {
 	 * 			is ignored if the event already exists and is modified by this method.
 	 * 
 	 * @return The stored {@link Event}.
+	 * @throws PermissionException
 	 * 
 	 * @see #modifyEvent(AccessToken, String, Event, boolean, boolean)
 	 * @see #createEvent(AccessToken, String, Event, boolean, String)
 	 */
 	Event storeEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId)
-			throws ServerFault, NotAllowedException;
+			throws ServerFault, NotAllowedException, PermissionException;
 
 	/**
 	 * return every changes made to calendar since lastSync date for events into

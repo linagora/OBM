@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.FactoryConfigurationError;
 
 import org.obm.push.utils.DOMUtils;
+import org.obm.sync.PermissionException;
 import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.MavenVersion;
@@ -113,8 +114,33 @@ public class XmlResponder {
 		return sendError(Strings.nullToEmpty(message), null);
 	}
 
+	public String sendError(PermissionException e) {
+		String res = "";
+		try {
+			Document doc = DOMUtils.createDoc(
+					"http://www.obm.org/xsd/sync/error.xsd", "error");
+			Element root = doc.getDocumentElement();
+			DOMUtils.createElementAndText(root, "message", e.getMessage());
+			DOMUtils.createElementAndText(root, "type", e.getClass().getName());
+			root.setAttribute("calendar", e.getCalendar());
+			root.setAttribute("right", e.getRight().toString());
+			root.setAttribute("eventTitle", e.getEventTitle());
+			res = emitResponse(doc);
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+		}
+		return res;
+	}
+
 	public String sendError(Exception e) {
-		return sendError(Strings.nullToEmpty(e.getMessage()), e.getClass().getName());
+		String xml;
+		if (e instanceof PermissionException) {
+			xml = sendError((PermissionException) e);
+		}
+		else {
+			xml = sendError(Strings.nullToEmpty(e.getMessage()), e.getClass().getName());
+		}
+		return xml;
 	}
 
 	public String sendToken(AccessToken at) {

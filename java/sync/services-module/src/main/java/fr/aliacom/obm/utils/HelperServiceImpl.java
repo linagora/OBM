@@ -212,7 +212,7 @@ public class HelperServiceImpl implements HelperService {
 
 			@Override
 			public EnumSet<Right> apply(String input) {
-				return EnumSet.of(Right.READ, Right.WRITE);
+				return EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE);
 			}
 
 		});
@@ -283,8 +283,7 @@ public class HelperServiceImpl implements HelperService {
 			EnumSet<Right> rights = mailToRights.get(login);
 			return rights != null && rights.contains(Right.READ);
 		} catch (SQLException e) {
-			Throwables.propagate(e);
-			return false;
+			throw Throwables.propagate(e);
 		}
 	}
 
