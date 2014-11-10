@@ -118,6 +118,8 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
+import fr.aliacom.obm.utils.CalendarRights;
+import fr.aliacom.obm.utils.CalendarRightsPair;
 import fr.aliacom.obm.utils.HelperService;
 
 public class CalendarBindingImpl implements ICalendar {
@@ -810,13 +812,15 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private void applyDelegationRightsOnAttendeesToEvent(AccessToken token, Event event) throws PermissionException {
+	private void applyDelegationRightsOnAttendeesToEvent(AccessToken token, Event event)
+			throws PermissionException {
 		Iterable<Attendee> attendeesWithEmails = findAttendeesWithEmail(event.getAttendees());
 		Map<String, Attendee> emailToAttendee = emailToAttendee(attendeesWithEmails);
-		Map<String, EnumSet<Right>> emailToRights = helperService.listRightsOnCalendars(token, emailToAttendee.keySet());
-		for (Map.Entry<String, EnumSet<Right>> entry : emailToRights.entrySet()) {
-			String email = entry.getKey();
-			EnumSet<Right> rights = entry.getValue();
+		CalendarRights emailToRights = helperService.listRightsOnCalendars(token,
+				emailToAttendee.keySet());
+		for (CalendarRightsPair pair : emailToRights) {
+			String email = pair.getCalendar();
+			EnumSet<Right> rights = pair.getRights();
 			if (!rights.contains(Right.ACCESS) && !rights.contains(Right.WRITE)) {
 				throw new PermissionException(email, Right.ACCESS, event.getTitle());
 			}
