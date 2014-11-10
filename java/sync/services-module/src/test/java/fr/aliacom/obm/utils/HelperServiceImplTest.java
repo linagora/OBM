@@ -237,7 +237,7 @@ public class HelperServiceImplTest {
 
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
 		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
-				"foo@bar", EnumSet.of(Right.READ, Right.WRITE));
+				"foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE));
 		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("foo@bar"));
 
@@ -259,7 +259,7 @@ public class HelperServiceImplTest {
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
 
 		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
-				"foo@bar", EnumSet.of(Right.READ, Right.WRITE));
+				"foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE));
 		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("foo@bar"));
 
@@ -298,7 +298,7 @@ public class HelperServiceImplTest {
 		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("beer")))
 				.andReturn(
 						ImmutableMap.<String, EnumSet<Right>> of(
-								"beer", EnumSet.of(Right.READ))).once();
+								"beer", EnumSet.of(Right.ACCESS, Right.READ))).once();
 		UserService userService = mocksControl.createMock(UserService.class);
 		expect(userService.getDomainNameFromEmail("beer@bar")).andReturn("bar").once();
 		expect(userService.getLoginFromEmail("beer@bar")).andReturn("beer").once();
@@ -306,7 +306,7 @@ public class HelperServiceImplTest {
 
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
 		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
-				"beer@bar", EnumSet.of(Right.READ));
+				"beer@bar", EnumSet.of(Right.ACCESS, Right.READ));
 		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("beer@bar"));
 
@@ -348,7 +348,7 @@ public class HelperServiceImplTest {
 		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("beer")))
 				.andReturn(
 						ImmutableMap.<String, EnumSet<Right>> of(
-								"beer", EnumSet.of(Right.READ))).once();
+								"beer", EnumSet.of(Right.ACCESS, Right.READ))).once();
 		UserService userService = mocksControl.createMock(UserService.class);
 		expect(userService.getDomainNameFromEmail("foo@bar")).andReturn("bar").once();
 		expect(userService.getLoginFromEmail("foo@bar")).andReturn("foo").once();
@@ -359,9 +359,9 @@ public class HelperServiceImplTest {
 
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
 		Map<String, EnumSet<Right>> expectedMailToRights = ImmutableMap.of(
-				"foo@bar", EnumSet.of(Right.READ, Right.WRITE),
+				"foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE),
 				"foo@pub", EnumSet.noneOf(Right.class),
-				"beer@bar", EnumSet.of(Right.READ));
+				"beer@bar", EnumSet.of(Right.ACCESS, Right.READ));
 		Map<String, EnumSet<Right>> mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("foo@bar", "foo@pub", "beer@bar"));
 

@@ -71,10 +71,11 @@ public class HelperDao {
 	private static String buildRightsQuery(StringSQLCollectionHelper sqlHelper) {
 		// Use UNION ALL instead of UNION - no need to use the implicit DISTINCT in our case
 		return MessageFormat.format(
-		"SELECT userobm_login, SUM(entityright_read) AS read_rights, SUM(entityright_write) AS write_rights "
+			"SELECT userobm_login, SUM(entityright_access) AS access_rights, SUM(entityright_read) AS read_rights, "
+ 				+ "SUM(entityright_write) AS write_rights "
 				+ "FROM "
 				+ "("
-				+ "SELECT userobm_login, entityright_read, entityright_write "
+				+ "SELECT userobm_login, entityright_access, entityright_read, entityright_write "
 				+ "FROM CalendarEntity "
 				+ "INNER JOIN UserObm ON userobm_id=calendarentity_calendar_id "
 				+ "INNER JOIN EntityRight ON calendarentity_entity_id=entityright_entity_id "
@@ -84,7 +85,7 @@ public class HelperDao {
 				+ "AND userobm_archive != 1 "
 				+ "UNION ALL "
 				// public cals
-				+ "SELECT userobm_login, entityright_read, entityright_write "
+				+ "SELECT userobm_login, entityright_access, entityright_read, entityright_write "
 				+ "FROM CalendarEntity "
 				+ "INNER JOIN UserObm ON userobm_id=calendarentity_calendar_id "
 				+ "INNER JOIN EntityRight ON calendarentity_entity_id=entityright_entity_id "
@@ -95,7 +96,7 @@ public class HelperDao {
 
 				+ "UNION ALL "
 				// group rights
-				+ "SELECT userobm_login, entityright_read, entityright_write "
+				+ "SELECT userobm_login, entityright_access, entityright_read, entityright_write "
 				+ "FROM CalendarEntity "
 				+ "INNER JOIN UserObm ON userobm_id=calendarentity_calendar_id "
 				+ "INNER JOIN EntityRight ON calendarentity_entity_id=entityright_entity_id "
@@ -127,10 +128,14 @@ public class HelperDao {
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				String login = rs.getString("userobm_login");
+				int accessRightsInt = rs.getInt("access_rights");
 				int readRightsInt = rs.getInt("read_rights");
 				int writeRightsInt = rs.getInt("write_rights");
 
 				EnumSet<Right> rights = EnumSet.noneOf(Right.class);
+				if (accessRightsInt > 0) {
+					rights.add(Right.ACCESS);
+				}
 				if (readRightsInt > 0) {
 					rights.add(Right.READ);
 				}

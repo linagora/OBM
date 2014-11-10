@@ -58,6 +58,7 @@ import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
 import org.obm.sync.NotAllowedException;
+import org.obm.sync.PermissionException;
 import org.obm.sync.Right;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
@@ -387,7 +388,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional
 	public Event modifyEvent(AccessToken token, String calendar, Event event, boolean updateAttendees, boolean notification) 
-		throws ServerFault, NotAllowedException {
+		throws ServerFault, NotAllowedException, PermissionException {
 
 		if (event == null) {
 			logger.warn("Modify on NULL event: doing nothing");
@@ -413,6 +414,7 @@ public class CalendarBindingImpl implements ICalendar {
 			return inheritAlertFromOwnerIfNotSet(token.getObmId(), calendarUser.getUid(), toReturn);
 		} catch (Throwable e) {
 			Throwables.propagateIfInstanceOf(e, NotAllowedException.class);
+			Throwables.propagateIfInstanceOf(e, PermissionException.class);
 			
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e);
@@ -420,7 +422,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	}
 
-	private Event modifyEvent(AccessToken token, String calendar, Event event, boolean updateAttendees, boolean notification, Event before) throws ServerFault {
+	private Event modifyEvent(AccessToken token, String calendar, Event event, boolean updateAttendees, boolean notification, Event before) throws ServerFault, PermissionException {
 		if (before.isInternalEvent()) {
 			return modifyInternalEvent(token, calendar, before, event, updateAttendees, notification);
 		} else {
@@ -479,7 +481,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	private Event modifyInternalEvent(AccessToken token, String calendar, Event before, Event event, boolean updateAttendees,
-			boolean notification) throws ServerFault {
+			boolean notification) throws ServerFault, PermissionException {
 		
 		try {
 			assignDelegationRightsOnAttendees(token, event);
@@ -496,6 +498,7 @@ public class CalendarBindingImpl implements ICalendar {
             
 			return after;
 		} catch (Throwable e) {
+			Throwables.propagateIfInstanceOf(e, PermissionException.class);
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
@@ -637,7 +640,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional
 	public EventObmId createEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId)
-			throws ServerFault, EventAlreadyExistException, NotAllowedException {
+			throws ServerFault, EventAlreadyExistException, NotAllowedException, PermissionException {
 
 		assertEventNotNull(token, event);
 		assertEventIsNew(token, calendar, event);
@@ -645,7 +648,7 @@ public class CalendarBindingImpl implements ICalendar {
 		return createEventNoExistenceCheck(token, calendar, event, notification, clientId).getObmId();
 	}
 
-	private Event createEventNoExistenceCheck(AccessToken token, String calendar, Event event, boolean notification, String clientId) throws ServerFault, NotAllowedException {
+	private Event createEventNoExistenceCheck(AccessToken token, String calendar, Event event, boolean notification, String clientId) throws ServerFault, NotAllowedException, PermissionException {
 		assertUserCanWriteOnCalendar(token, calendar);
 
 		try {
@@ -798,7 +801,7 @@ public class CalendarBindingImpl implements ICalendar {
 	}
 
 	@VisibleForTesting
-	protected void assignDelegationRightsOnAttendees(AccessToken token, Event event) {
+	protected void assignDelegationRightsOnAttendees(AccessToken token, Event event) throws PermissionException {
 		applyDelegationRightsOnAttendeesToEvent(token, event);
 		Set<Event> eventsExceptions = event.getEventsExceptions();
 		for (Event eventException : eventsExceptions) {
@@ -806,13 +809,16 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private void applyDelegationRightsOnAttendeesToEvent(AccessToken token, Event event) {
+	private void applyDelegationRightsOnAttendeesToEvent(AccessToken token, Event event) throws PermissionException {
 		Iterable<Attendee> attendeesWithEmails = findAttendeesWithEmail(event.getAttendees());
 		Map<String, Attendee> emailToAttendee = emailToAttendee(attendeesWithEmails);
 		Map<String, EnumSet<Right>> emailToRights = helperService.listRightsOnCalendars(token, emailToAttendee.keySet());
 		for (Map.Entry<String, EnumSet<Right>> entry : emailToRights.entrySet()) {
 			String email = entry.getKey();
 			EnumSet<Right> rights = entry.getValue();
+			if (!rights.contains(Right.ACCESS) && !rights.contains(Right.WRITE)) {
+				throw new PermissionException(email, Right.ACCESS, event.getTitle());
+			}
 			if (rights.contains(Right.WRITE)) {
 				Attendee att = emailToAttendee.get(email);
 				att.setCanWriteOnCalendar(true);
@@ -1779,7 +1785,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	@Override
 	@Transactional
-	public Event storeEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId) throws ServerFault, NotAllowedException {
+	public Event storeEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId) throws ServerFault, NotAllowedException, PermissionException {
 		assertEventNotNull(token, event);
 
 		ObmUser calendarUser = userService.getUserFromLogin(calendar, token.getDomain().getName());
