@@ -282,7 +282,7 @@ public class HelperServiceImplTest {
 
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
 		CalendarRights expectedMailToRights = CalendarRights.builder()
-				.addRights("foo@pub", EnumSet.noneOf(Right.class))
+				.addRights("foo@pub", EnumSet.of(Right.ACCESS))
 				.build();
 		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("foo@pub"));
@@ -364,13 +364,102 @@ public class HelperServiceImplTest {
 		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
 		CalendarRights expectedMailToRights = CalendarRights.builder()
 				.addRights("foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE))
-				.addRights("foo@pub", EnumSet.noneOf(Right.class))
+				.addRights("foo@pub", EnumSet.of(Right.ACCESS))
 				.addRights("beer@bar", EnumSet.of(Right.ACCESS, Right.READ))
 				.build();
 		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("foo@bar", "foo@pub", "beer@bar"));
 
 		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void canWriteOnCalendarShouldReturnFalseWhenAccessAndReadRights() throws SQLException {
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("other")))
+				.andReturn(
+						ImmutableMap.<String, EnumSet<Right>> of(
+								"other", EnumSet.of(Right.ACCESS, Right.READ))).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
+		mocksControl.replay();
+
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		boolean canWriteOnCalendar = helperServiceImpl.canWriteOnCalendar(accessToken, "other@bar");
+
+		Assertions.assertThat(canWriteOnCalendar).isFalse();
+		mocksControl.verify();
+	}
+
+	@Test
+	public void canWriteOnCalendarShouldReturnFalseWhenAccessOnlyRight() throws SQLException {
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("other")))
+				.andReturn(
+						ImmutableMap.<String, EnumSet<Right>> of(
+								"other", EnumSet.of(Right.ACCESS))).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
+		mocksControl.replay();
+
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		boolean canWriteOnCalendar = helperServiceImpl.canWriteOnCalendar(accessToken, "other@bar");
+
+		Assertions.assertThat(canWriteOnCalendar).isFalse();
+		mocksControl.verify();
+	}
+
+	@Test
+	public void canWriteOnCalendarShouldReturnTrueWhenWriteOnlyRight() throws SQLException {
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("other")))
+				.andReturn(
+						ImmutableMap.<String, EnumSet<Right>> of(
+								"other", EnumSet.of(Right.WRITE))).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
+		mocksControl.replay();
+
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		boolean canWriteOnCalendar = helperServiceImpl.canWriteOnCalendar(accessToken, "other@bar");
+
+		Assertions.assertThat(canWriteOnCalendar).isTrue();
+		mocksControl.verify();
+	}
+
+	@Test
+	public void canWriteOnCalendarShouldReturnTrueWhenAccessReadAndWriteRights()
+			throws SQLException {
+		AccessToken accessToken = new AccessToken(1, "outer space");
+		accessToken.setUserLogin("foo");
+		accessToken.setDomain(domainWithName("bar"));
+		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
+		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("other")))
+				.andReturn(
+						ImmutableMap.<String, EnumSet<Right>> of(
+								"other", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE))).once();
+		UserService userService = mocksControl.createMock(UserService.class);
+		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
+		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
+		mocksControl.replay();
+
+		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
+		boolean canWriteOnCalendar = helperServiceImpl.canWriteOnCalendar(accessToken, "other@bar");
+
+		Assertions.assertThat(canWriteOnCalendar).isTrue();
 		mocksControl.verify();
 	}
 
