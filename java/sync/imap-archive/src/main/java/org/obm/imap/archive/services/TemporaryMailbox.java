@@ -33,13 +33,18 @@
 package org.obm.imap.archive.services;
 
 import org.obm.imap.archive.exception.ImapDeleteException;
+import org.obm.imap.archive.exception.ImapStoreException;
 import org.obm.imap.archive.exception.MailboxFormatException;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 
 class TemporaryMailbox extends ArchiveMailbox {
 
@@ -70,6 +75,18 @@ class TemporaryMailbox extends ArchiveMailbox {
 			throw new ImapDeleteException(String.format("Wasn't able to delete the temporary mailbox %s", name)); 
 		}
 		logger.debug("The folder {} was successfully deleted", name);
+	}
+
+	public void uidStoreDeleted(MessageSet messagesSet) throws ImapStoreException {
+		if (!storeClient.uidStore(messagesSet, new FlagsList(ImmutableSet.of(Flag.DELETED)), true)) {
+			throw new ImapStoreException(String.format("Wasn't able to add flags on mails in the archive mailbox %s", name)); 
+		}
+		logger.debug("Deleted flag stored for {} on mailbox {}", messagesSet, name);
+	}
+
+	public void expunge() {
+		storeClient.expunge();
+		logger.debug("Expunge processed on mailbox {}", name);
 	}
 	
 	@Override

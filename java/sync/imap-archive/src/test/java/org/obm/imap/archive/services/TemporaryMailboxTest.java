@@ -35,27 +35,30 @@ package org.obm.imap.archive.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.obm.imap.archive.beans.Year;
 import org.obm.imap.archive.exception.ImapDeleteException;
+import org.obm.imap.archive.exception.ImapStoreException;
 import org.obm.imap.archive.exception.MailboxFormatException;
+import org.obm.push.exception.ImapTimeoutException;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
-import pl.wkr.fluentrule.api.FluentExpectedException;
+import com.google.common.collect.ImmutableSet;
 
 
 public class TemporaryMailboxTest {
 
-	@Rule public FluentExpectedException expectedException = FluentExpectedException.none();
-	
 	private IMocksControl control;
 	
 	@Before
@@ -97,11 +100,9 @@ public class TemporaryMailboxTest {
 		assertThat(temporaryMailbox.getName()).isEqualTo("user/usera/TEMP/Test/subfolder@mydomain.org");
 	}
 	
-	@Test
+	@Test(expected=MailboxFormatException.class)
 	public void temporaryMailboxShouldThrowWhenBadMailbox() throws Exception {
 		String mailbox = "user";
-		
-		expectedException.expect(MailboxFormatException.class);
 		
 		TemporaryMailbox.temporaryMailbox(mailbox);
 	}
@@ -122,21 +123,88 @@ public class TemporaryMailboxTest {
 		control.verify();
 	}
 	
-	@Test
+	@Test(expected=ImapDeleteException.class)
 	public void deleteShouldThrowWhenError() throws Exception {
 		Logger logger = control.createMock(Logger.class);
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		expect(storeClient.delete("user/usera/TEMP/INBOX@mydomain.org"))
 			.andReturn(false);
-		logger.error(anyObject(String.class));
-		expectLastCall();
 		
-		expectedException.expect(ImapDeleteException.class);
+		try {
+			control.replay();
+			TemporaryMailbox temporaryMailbox = TemporaryMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), new DomainName("mydomain.org"));
+			temporaryMailbox.delete();
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test
+	public void uidStoreDeletedShouldNotThrowWhenSuccess() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		MessageSet messageSet = MessageSet.builder().add(1).add(2).build();
+		
+		expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableSet.of(Flag.DELETED)), true))
+			.andReturn(true);
+		logger.debug(anyObject(String.class), eq(messageSet), anyObject(String.class));
+		expectLastCall();
 		
 		control.replay();
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), new DomainName("mydomain.org"));
-		temporaryMailbox.delete();
+		temporaryMailbox.uidStoreDeleted(messageSet);
 		control.verify();
+	}
+	
+	@Test(expected=ImapStoreException.class)
+	public void uidStoreDeletedShouldThrowWhenError() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		MessageSet messageSet = MessageSet.builder().add(1).add(2).build();
+		
+		expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableSet.of(Flag.DELETED)), true))
+			.andReturn(false);
+		
+		try {
+			control.replay();
+			TemporaryMailbox temporaryMailbox = TemporaryMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), new DomainName("mydomain.org"));
+			temporaryMailbox.uidStoreDeleted(messageSet);
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test
+	public void expungeShouldNotThrowWhenSuccess() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		storeClient.expunge();
+		expectLastCall();
+		logger.debug(anyObject(String.class), anyObject(String.class));
+		expectLastCall();
+		
+		control.replay();
+		TemporaryMailbox temporaryMailbox = TemporaryMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), new DomainName("mydomain.org"));
+		temporaryMailbox.expunge();
+		control.verify();
+	}
+	
+	@Test(expected=ImapTimeoutException.class)
+	public void expungeShouldThrowWhenError() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		storeClient.expunge();
+		expectLastCall().andThrow(new ImapTimeoutException());
+		
+		try {
+			control.replay();
+			TemporaryMailbox temporaryMailbox = TemporaryMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), new DomainName("mydomain.org"));
+			temporaryMailbox.expunge();
+		} finally {
+			control.verify();
+		}
 	}
 }
