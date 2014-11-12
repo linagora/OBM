@@ -29,7 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.utils;
 
-import java.util.EnumSet;
+import java.util.Set;
 
 import org.obm.sync.Right;
 
@@ -37,9 +37,9 @@ import com.google.common.base.Objects;
 
 public class CalendarRightsPair {
 	private final String calendar;
-	private final EnumSet<Right> rights;
+	private final Set<Right> rights;
 
-	public CalendarRightsPair(String calendar, EnumSet<Right> rights) {
+	public CalendarRightsPair(String calendar, Set<Right> rights) {
 		this.calendar = calendar;
 		this.rights = rights;
 	}
@@ -48,7 +48,7 @@ public class CalendarRightsPair {
 		return this.calendar;
 	}
 
-	public EnumSet<Right> getRights() {
+	public Set<Right> getRights() {
 		return this.rights;
 	}
 
