@@ -147,8 +147,7 @@ public class HelperServiceImpl implements HelperService {
 
 		CalendarRights results;
 		if (almostCompleteResults.size() == emailSet.size()) {
-			results = CalendarRights.builder().fromMap(
-					ImmutableMap.copyOf(almostCompleteResults)).build();
+			results = CalendarRights.builder().fromMap(almostCompleteResults).build();
 		}
 		else {
 			// Some target calendars have no rights at all and do not appear in
