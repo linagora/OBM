@@ -3,7 +3,7 @@
 include /usr/share/cdbs/1/rules/debhelper.mk
 
 DEB_BUILD_ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
-JAVA_HOME := /usr/lib/jvm/java-1.7.0-openjdk-$(DEB_BUILD_ARCH)/
+JAVA_HOME := /usr/lib/jvm/java-6-sun/
 export JAVA_HOME
 
 ifneq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
