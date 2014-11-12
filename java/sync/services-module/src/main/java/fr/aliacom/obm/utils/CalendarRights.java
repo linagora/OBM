@@ -32,17 +32,19 @@ package fr.aliacom.obm.utils;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.obm.sync.Right;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 
 public final class CalendarRights implements Iterable<CalendarRightsPair> {
 
    public static class Builder {
-       private ImmutableMap.Builder<String, EnumSet<Right>> calendarToRightsBuilder;
+       private ImmutableMap.Builder<String, Set<Right>> calendarToRightsBuilder;
 
        private Builder() {
            calendarToRightsBuilder = ImmutableMap.builder();
@@ -54,7 +56,7 @@ public final class CalendarRights implements Iterable<CalendarRightsPair> {
        }
 
        public Builder addRights(String calendar, EnumSet<Right> rights) {
-           calendarToRightsBuilder.put(calendar, rights);
+           calendarToRightsBuilder.put(calendar, Sets.immutableEnumSet(rights));
            return this;
        }
 
@@ -64,9 +66,9 @@ public final class CalendarRights implements Iterable<CalendarRightsPair> {
    }
 
    private static class PairIterator implements Iterator<CalendarRightsPair> {
-       private Iterator<Map.Entry<String, EnumSet<Right>>> iterator;
+       private Iterator<Map.Entry<String, Set<Right>>> iterator;
 
-       private PairIterator(Iterator<Map.Entry<String, EnumSet<Right>>> iterator) {
+       private PairIterator(Iterator<Map.Entry<String, Set<Right>>> iterator) {
            this.iterator = iterator;
        }
 
@@ -77,7 +79,7 @@ public final class CalendarRights implements Iterable<CalendarRightsPair> {
 
        @Override
        public CalendarRightsPair next() {
-           Map.Entry<String, EnumSet<Right>> entry = iterator.next();
+           Map.Entry<String, Set<Right>> entry = iterator.next();
            return new CalendarRightsPair(entry.getKey(), entry.getValue());
        }
 
@@ -92,13 +94,13 @@ public final class CalendarRights implements Iterable<CalendarRightsPair> {
        return new Builder();
    }
 
-   private final Map<String, EnumSet<Right>> calendarToRights;
+   private final Map<String, Set<Right>> calendarToRights;
 
-   private CalendarRights(Map<String, EnumSet<Right>> calendarToRights) {
+   private CalendarRights(Map<String, Set<Right>> calendarToRights) {
        this.calendarToRights = calendarToRights;
    }
 
-   public Optional<EnumSet<Right>> getRights(String calendar) {
+   public Optional<Set<Right>> getRights(String calendar) {
        return Optional.fromNullable(this.calendarToRights.get(calendar));
    }
 

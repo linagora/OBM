@@ -41,7 +41,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -820,7 +819,7 @@ public class CalendarBindingImpl implements ICalendar {
 				emailToAttendee.keySet());
 		for (CalendarRightsPair pair : emailToRights) {
 			String email = pair.getCalendar();
-			EnumSet<Right> rights = pair.getRights();
+			Set<Right> rights = pair.getRights();
 			if (!rights.contains(Right.ACCESS) && !rights.contains(Right.WRITE)) {
 				throw new PermissionException(email, Right.ACCESS, event.getTitle());
 			}
