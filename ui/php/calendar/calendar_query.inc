@@ -5522,12 +5522,12 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       }
       $event->addAttendee($entity,$entity_id,$entity_label,$entity_state);
     }
-
+    $resource_ids = is_array($calendar_entity['resource']) ? array_keys($calendar_entity['resource']) : array();
     // Remove occurences of confidential events that the logged-in user doesn't attend
     foreach ($of->events as $id => $event) {
       if ($event->privacy == 2) {
         foreach ($of->occurrences[$id] as $occurence) {
-          if ($occurence->id != $obm['uid'] && !$event->userAttendeeExists($obm['uid'])) {
+          if ($occurence->id != $obm['uid'] && !$event->userAttendeeExists($obm['uid']) && !$event->hasResources($resource_ids)) {
             $of->removeOccurrences($id, $occurence->date);
           }
         }
@@ -6520,6 +6520,21 @@ Class Event {
     foreach ($this->attendee_data as $attendee) {
       if ($attendee["entity"] == "user" && $attendee["entity_id"] == $entity_id) {
         return true;
+      }
+    }
+
+    return false;
+  }
+
+  function hasResources($resource_entity_ids) {
+    if (empty($resource_entity_ids)) {
+        return false;
+    }
+    foreach ($this->attendee_data as $attendee) {
+      if ($attendee["entity"] == "resource") {
+        if (in_array($attendee["entity_id"], $resource_entity_ids)) {
+          return true;
+        }
       }
     }
 
