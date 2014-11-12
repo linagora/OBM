@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
@@ -183,8 +184,8 @@ public class HelperServiceImpl implements HelperService {
 			Map<String, EnumSet<Right>> emailToRights) {
 		CalendarRights.Builder builder = CalendarRights.builder();
 		for (String email : allEmails) {
-			EnumSet<Right> rights = emailToRights.get(email);
-			builder.addRights(email, rights != null ? rights : EnumSet.noneOf(Right.class));
+			EnumSet<Right> rights = Optional.fromNullable(emailToRights.get(email)).or(EnumSet.noneOf(Right.class));
+			builder.addRights(email, rights);
 		}
 		return builder.build();
 	}
