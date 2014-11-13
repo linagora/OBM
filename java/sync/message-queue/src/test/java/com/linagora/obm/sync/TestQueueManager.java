@@ -34,6 +34,7 @@ package com.linagora.obm.sync;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
@@ -268,7 +269,7 @@ public class TestQueueManager {
 	}
 
 	private void writeMessageOnTopic(String testText, String topicName,
-			QueueManager queueManager) throws JMSException {
+			QueueManager queueManager) throws JMSException, TimeoutException {
 		
 		Connection connection = createManagedConnection();
 		Session producerSession = queueManager.createSession(connection);

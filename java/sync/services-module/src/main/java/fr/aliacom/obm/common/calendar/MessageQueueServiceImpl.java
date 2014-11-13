@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.calendar;
 
-import javax.jms.JMSException;
-
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
@@ -97,7 +95,7 @@ public class MessageQueueServiceImpl implements MessageQueueService {
 			for (String s: ics) {
 				producer.write(s);	
 			}
-		} catch (JMSException e) {
+		} catch (Exception e) {
 			throw new NotificationException(e);
 		}
 	}

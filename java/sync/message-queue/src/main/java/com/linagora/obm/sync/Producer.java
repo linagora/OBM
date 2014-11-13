@@ -31,29 +31,53 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.sync;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeUnit;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import com.google.common.base.Throwables;
+
 public class Producer {
+
+	private final static int MAX_AVAILABLE = 1;
+	private final static long TIMEOUT_IN_SECONDS = 5;
 
 	private final Session session;
 	private final MessageProducer producer;
+	private final Semaphore mutex = new Semaphore(MAX_AVAILABLE, true);
+
 
 	public Producer(Session session, MessageProducer producer) {
 		this.session = session;
 		this.producer = producer;
 	}
 	
-	public void write(String message) throws JMSException {
+	public void write(String message) throws JMSException, TimeoutException {
 		TextMessage messageSent = session.createTextMessage(message);
-		producer.send(messageSent);
+		this.send(messageSent);
 	}
 	
-	public void send(Message message) throws JMSException {
-		producer.send(message);
+	public void send(Message message) throws JMSException, TimeoutException {
+		try {
+			if (mutex.tryAcquire(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)) {
+				try {
+					producer.send(message);
+				} finally {
+					mutex.release();
+				}
+			}
+			else {
+				throw new TimeoutException("Unable to acquire lock over the JMS producer in a reasonable amount of time");
+			}
+		} catch (InterruptedException ex) {
+			throw Throwables.propagate(ex);
+		}
 	}
 	
 	public void close() throws JMSException {
