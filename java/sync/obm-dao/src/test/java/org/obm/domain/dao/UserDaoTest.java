@@ -126,6 +126,7 @@ public class UserDaoTest {
 					.withArgs(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao, profileDao)
 					.addMockedMethod("userIdFromEmailQuery")
 					.addMockedMethod("userIdFromLogin")
+					.addMockedMethod("findUserById", Integer.TYPE, ObmDomain.class, Boolean.TYPE)
 					.createMock(mocksControl);
 	}
 
@@ -305,6 +306,9 @@ public class UserDaoTest {
 	@Test
 	public void testObmUserFromResultSet() throws Exception {
 		String profileName = "admin";
+		ObmDomain domain = ObmDomain.builder().id(1).name("obm.org").build();
+		expect(userDao.findUserById(0, domain, false)).andReturn(null).atLeastOnce();
+
 		expect(profileDao.isAdminProfile(profileName)).andReturn(true);
 		
 		ResultSet rs = mocksControl.createMock(ResultSet.class);
@@ -358,8 +362,6 @@ public class UserDaoTest {
 		expect(rs.getInt("userobm_userupdate")).andReturn(0);
 		expect(rs.getInt("userobm_usercreate")).andReturn(0);
 		
-		ObmDomain domain = ObmDomain.builder().id(1).name("obm.org").build();
-
 		mocksControl.replay();
 		ObmUser obmUser = userDao.createUserFromResultSetAndFetchCreators(domain, rs);
 		mocksControl.verify();

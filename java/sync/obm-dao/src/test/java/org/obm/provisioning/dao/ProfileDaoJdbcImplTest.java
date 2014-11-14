@@ -2,8 +2,14 @@ package org.obm.provisioning.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,6 +69,81 @@ public class ProfileDaoJdbcImplTest implements H2TestClass {
 	
 	private final ObmDomainUuid uuid1 = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 	private final ObmDomainUuid uuid2 = ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf");
+
+	private static int createEntity(Connection conn) throws SQLException {
+		try (Statement stat = conn.createStatement()) {
+            stat.execute("INSERT INTO entity (entity_mailing) VALUES (true)");
+			try (ResultSet rs = stat.getGeneratedKeys()) {
+				rs.next();
+				return rs.getInt(1);
+			}
+		}
+	}
+
+	private static int createDomain(Connection conn, int entityId, String name, String uuid) throws SQLException {
+		try (PreparedStatement domainStat = conn
+				.prepareStatement("INSERT INTO domain (domain_name, domain_uuid, domain_label) VALUES (?, ?, ?)")) {
+			domainStat.setString(1, name);
+			domainStat.setString(2, uuid);
+			domainStat.setString(3, name);
+			domainStat.execute();
+			try (ResultSet rs = domainStat.getGeneratedKeys()) {
+				rs.next();
+				int domainId = rs.getInt(1);
+
+				try (PreparedStatement entityStat = conn
+						.prepareStatement("INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (?, ?)")) {
+					entityStat.setInt(1, entityId);
+					entityStat.setInt(2, domainId);
+					entityStat.executeUpdate();
+					return domainId;
+				}
+			}
+		}
+	}
+
+	private static int createProfile(Connection conn, int domainId, String profileName) throws SQLException {
+		try (PreparedStatement profileStat = conn
+				.prepareStatement("INSERT INTO profile (profile_domain_id, profile_name) VALUES (?, ?)")) {
+			profileStat.setInt(1, domainId);
+			profileStat.setString(2, profileName);
+			profileStat.executeUpdate();
+			try (ResultSet rs = profileStat.getGeneratedKeys()) {
+				rs.next();
+				return rs.getInt(1);
+			}
+		}
+	}
+
+	private static void createProfileModule(Connection conn, int domainId, int profileId, String profileModuleName,
+			int profileModuleRight) throws SQLException {
+		try (PreparedStatement profileModuleStat = conn
+				.prepareStatement("INSERT INTO profilemodule (profilemodule_domain_id, profilemodule_profile_id, profilemodule_module_name, profilemodule_right) VALUES (?, ?, ?, ?)")) {
+			profileModuleStat.setInt(1, domainId);
+			profileModuleStat.setInt(2, profileId);
+			profileModuleStat.setString(3, profileModuleName);
+			profileModuleStat.setInt(4, profileModuleRight);
+			profileModuleStat.executeUpdate();
+		}
+	}
+
+	@Before
+	public void setup() throws Exception {
+		Connection conn = this.getDb().getConnection();
+		int domainEntityId = createEntity(conn);
+		int domainId = createDomain(conn, domainEntityId, "lotsaprofiles.tlse.lng", "42");
+		int profileWithNonDefaultTrueAndDefaultFalseId = createProfile(conn, domainId, "profile_with_non_default_true_and_default_false");
+		int profileWithNonDefaultFalseAndDefaultTrueId = createProfile(conn, domainId, "profile_with_non_default_false_and_default_true");
+		int profileWithOnlyTrueDefaultId = createProfile(conn, domainId, "profile_with_only_true_default");
+		int profileWithOnlyFalseDefaultId = createProfile(conn, domainId, "profile_with_only_false_default");
+		int globalDomainId = 3;
+		createProfileModule(conn, globalDomainId, profileWithNonDefaultTrueAndDefaultFalseId, "domain", 31);
+		createProfileModule(conn, domainId, profileWithNonDefaultTrueAndDefaultFalseId, "default", 0);
+		createProfileModule(conn, domainId, profileWithNonDefaultFalseAndDefaultTrueId, "domain", 0);
+		createProfileModule(conn, domainId, profileWithNonDefaultFalseAndDefaultTrueId, "default", 31);
+		createProfileModule(conn, domainId, profileWithOnlyTrueDefaultId, "default", 31);
+		createProfileModule(conn, domainId, profileWithOnlyFalseDefaultId, "default", 0);
+	}
 
 	@Test
 	public void testGetProfileNamesOnNonExistentDomains() throws Exception {
@@ -341,5 +422,25 @@ public class ProfileDaoJdbcImplTest implements H2TestClass {
 	@Test
 	public void testIsNotAdminProfileWhenUnknown() throws Exception {
 		assertThat(dao.isAdminProfile("editor")).isFalse();
+	}
+
+	@Test
+	public void testGetUserProfileWhenNonDefaultIsTrueAndDefaultIsFalse() throws DaoException {
+		assertThat(dao.isAdminProfile("profile_with_non_default_true_and_default_false")).isTrue();
+	}
+
+	@Test
+	public void testGetUserProfileWhenNonDefaultIsFalseAndDefaultIsTrue() throws DaoException {
+		assertThat(dao.isAdminProfile("profile_with_non_default_false_and_default_true")).isFalse();
+	}
+
+	@Test
+	public void testGetUserProfileWhenOnlyDefault() throws DaoException {
+		assertThat(dao.isAdminProfile("profile_with_only_true_default")).isTrue();
+	}
+
+	@Test
+	public void testGetUserProfileWhenFalseDefault() throws DaoException {
+		assertThat(dao.isAdminProfile("profile_with_only_false_default")).isFalse();
 	}
 }

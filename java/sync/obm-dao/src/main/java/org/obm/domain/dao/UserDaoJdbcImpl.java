@@ -444,7 +444,7 @@ public class UserDaoJdbcImpl implements UserDao {
 		return findUserById(id, domain, true);
 	}
 
-	private ObmUser findUserById(int id, ObmDomain domain, boolean fetchCreators) {
+	@VisibleForTesting ObmUser findUserById(int id, ObmDomain domain, boolean fetchCreators) {
 		ObmUser obmUser = null;
 		String uq = "SELECT " + USER_FIELDS
 				+ " FROM UserObm "
@@ -466,7 +466,7 @@ public class UserDaoJdbcImpl implements UserDao {
 				}
 			}
 		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
+			throw Throwables.propagate(e);
 		}
 		return obmUser;
 	}

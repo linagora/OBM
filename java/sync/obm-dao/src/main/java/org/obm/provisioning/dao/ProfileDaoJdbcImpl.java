@@ -38,6 +38,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
@@ -48,15 +49,19 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
 import org.obm.sync.Right;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -83,6 +88,8 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 	private static final String DEFAULT_RIGHT = "default_right";
 	private static final String MAX_MAIL_QUOTA = "mail_quota_max";
 	private static final String DEFAULT_MAIL_QUOTA = "mail_quota_default";
+	// Name of the module which contains the default permissions for a given profile
+	private static final String DEFAULT_MODULE_NAME = "default";
 	@VisibleForTesting static final String DOMAIN_MODULE_NAME = "domain";
 
 	/**
@@ -256,30 +263,37 @@ public class ProfileDaoJdbcImpl implements ProfileDao {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-
 		try {
 			con = connectionProvider.getConnection();
+			StringSQLCollectionHelper profileNameHelper = new StringSQLCollectionHelper(
+					ImmutableList.of(DOMAIN_MODULE_NAME, DEFAULT_MODULE_NAME));
 			ps = con.prepareStatement(
-					"SELECT profilemodule_right " +
+					String.format("SELECT profilemodule_module_name, profilemodule_right " +
 					"FROM ProfileModule " +
 					"INNER JOIN Profile ON profile_id=profilemodule_profile_id " +
-					"WHERE profilemodule_module_name = ? " +
-					"AND profile_name = ?");
+					"WHERE profilemodule_module_name IN (%s) " +
+					"AND profile_name = ?", profileNameHelper.asPlaceHolders()));
 
-			ps.setString(1, DOMAIN_MODULE_NAME);
-			ps.setString(2, profileName);
+			int index = 1;
+			index = profileNameHelper.insertValues(ps, index);
+			ps.setString(index++, profileName);
 			rs = ps.executeQuery();
 
-			if (rs.next()) {
-				return profileModuleRightsService.isAdmin(rs.getInt("profilemodule_right"));
+			Map<String, Integer> moduleToRights = Maps.newHashMap();
+			while (rs.next()) {
+				String moduleName = rs.getString("profilemodule_module_name");
+				int rights = rs.getInt("profilemodule_right");
+				moduleToRights.put(moduleName, rights);
 			}
+			Optional<Integer> maybeRights = Optional.fromNullable(moduleToRights.get(DOMAIN_MODULE_NAME))
+					.or(Optional.fromNullable(moduleToRights.get(DEFAULT_MODULE_NAME)));
+			return maybeRights.isPresent() ? profileModuleRightsService.isAdmin(maybeRights.get())
+					: false;
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		} finally {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
-
-		return false;
 	}
 
 	private ProfileId getUserProfileId(ObmUser user) throws SQLException, UserNotFoundException {
