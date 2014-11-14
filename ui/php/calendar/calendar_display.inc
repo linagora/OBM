@@ -1363,7 +1363,6 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
   } else {
     $dis_week = "<a href='javascript: void(0)' onclick='obm.calendarManager.showWeek($ts)'>$week_num</a>";
 
-    $can_write_in_calendar = can_write_in_calendar($calendar_entity);
     $dis_grid_action = "
         onmousedown='obm.calendarManager.newDummyEvent(event);'
         ondblclick='obm.calendarQuickForm.compute(event);'";
