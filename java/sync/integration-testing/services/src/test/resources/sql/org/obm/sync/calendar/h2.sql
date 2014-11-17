@@ -929,7 +929,8 @@ INSERT INTO calendarentity (calendarentity_entity_id, calendarentity_calendar_id
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id, entityright_access, entityright_read, entityright_write, entityright_admin)
     VALUES
         (1, 2, 1, 1, 1, 0),
-        (1, 3, 1, 1, 0, 0);
+        (1, 3, 1, 1, 0, 0),
+        (2, 1, 1, 0, 0, 0);
 
 INSERT INTO addressbook (domain_id, timeupdate, timecreate, userupdate, usercreate, owner, origin, name, is_default)
     VALUES
