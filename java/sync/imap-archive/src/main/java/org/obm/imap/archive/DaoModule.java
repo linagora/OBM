@@ -48,8 +48,6 @@ import org.obm.imap.archive.dao.ImapFolderDao;
 import org.obm.imap.archive.dao.ImapFolderJdbcImpl;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.dao.ProcessedFolderJdbcImpl;
-import org.obm.imap.archive.dao.UserDao;
-import org.obm.imap.archive.dao.UserJdbcImpl;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
@@ -65,7 +63,6 @@ public class DaoModule extends AbstractModule {
 		bind(ArchiveTreatmentDao.class).to(ArchiveTreatmentJdbcImpl.class);
 		bind(ImapFolderDao.class).to(ImapFolderJdbcImpl.class);
 		bind(ProcessedFolderDao.class).to(ProcessedFolderJdbcImpl.class);
-		bind(UserDao.class).to(UserJdbcImpl.class);
 		install(new ObmDaoModule());
 	}
 	

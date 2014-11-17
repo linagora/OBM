@@ -39,19 +39,26 @@ import org.easymock.IMocksControl;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.domain.dao.UserDao;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
+import org.obm.imap.archive.exception.LoginMismatchException;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableList;
+
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 public class DomainConfigurationServiceTest {
 
@@ -59,6 +66,7 @@ public class DomainConfigurationServiceTest {
 	Logger logger;
 	IMocksControl control;
 	DomainConfigurationDao domainConfigurationDao;
+	UserDao userDao;
 	ArchiveSchedulingService schedulingService;
 	ArchiveScheduler scheduler;
 	DomainConfigurationService testee;
@@ -70,10 +78,11 @@ public class DomainConfigurationServiceTest {
 		
 		control = EasyMock.createControl();
 		domainConfigurationDao = control.createMock(DomainConfigurationDao.class);
+		userDao = control.createMock(UserDao.class);
 		scheduler = control.createMock(ArchiveScheduler.class);
 		schedulingService = control.createMock(ArchiveSchedulingService.class);
 
-		testee = new DomainConfigurationService(logger, domainConfigurationDao,schedulingService, scheduler);
+		testee = new DomainConfigurationService(logger, domainConfigurationDao, userDao, schedulingService, scheduler);
 	}
 
 	@Test
@@ -148,6 +157,38 @@ public class DomainConfigurationServiceTest {
 		control.verify();
 	}
 
+	@Test(expected=LoginMismatchException.class)
+	public void updateOrCreateShouldThrowWhenBadLogin() throws Exception {
+		ObmUser obmUser = control.createMock(ObmUser.class);
+		UserExtId userId = UserExtId.valueOf("19683370-856f-44f5-8ca1-74284445ad17");
+		expect(obmUser.getLogin())
+			.andReturn("login");
+		
+		expect(userDao.getByExtId(userId, domain))
+			.andReturn(obmUser);
+		
+		DomainConfiguration domainConfiguration = DomainConfiguration
+				.builder()
+				.domain(domain)
+				.state(ConfigurationState.ENABLE)
+				.schedulingConfiguration(
+						SchedulingConfiguration.builder()
+								.time(LocalTime.parse("22:15"))
+								.recurrence(ArchiveRecurrence.daily()).build())
+				.excludedUsers(ImmutableList.of(ExcludedUser.builder()
+						.id(userId)
+						.login("badlogin")
+						.build()))
+				.build();
+		
+		try {
+			control.replay();
+			testee.updateOrCreate(domainConfiguration);
+		} finally {
+			control.verify();
+		}
+	}
+	
 	private DomainConfiguration configuration(ConfigurationState state) {
 		return DomainConfiguration
 				.builder()

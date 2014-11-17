@@ -32,18 +32,19 @@
 package org.obm.imap.archive.beans;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.joda.time.LocalTime;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.UserExtId;
 
 public class DomainConfiguration {
 	
@@ -66,21 +67,21 @@ public class DomainConfiguration {
 						.time(LocalTime.parse(configuration.hour + ":" + configuration.minute))
 						.build())
 				.excludedFolder(configuration.excludedFolder)
-				.excludedUsers(from(configuration.excludedUserIds))
+				.excludedUsers(from(configuration.excludedUserIdToLoginMap))
 				.mailing(Mailing.fromStrings(configuration.mailingEmails))
 				.build();
 	}
 	
-	private static List<ExcludedUser> from(List<String> excludedUserIds) {
-		Preconditions.checkNotNull(excludedUserIds);
-		return FluentIterable.from(excludedUserIds)
-				.transform(new Function<String, ExcludedUser>() {
-
-					@Override
-					public ExcludedUser apply(String excludedUserId) {
-						return ExcludedUser.from(excludedUserId);
-					}
-				}).toList();
+	private static List<ExcludedUser> from(Map<String, String> excludedUserIdToLoginMap) {
+		Preconditions.checkNotNull(excludedUserIdToLoginMap);
+		ImmutableList.Builder<ExcludedUser> builder = ImmutableList.builder();
+		for (Entry<String, String> excludedUserIdToLogin : excludedUserIdToLoginMap.entrySet()) {
+			builder.add(ExcludedUser.builder()
+					.id(UserExtId.valueOf(excludedUserIdToLogin.getKey()))
+					.login(excludedUserIdToLogin.getValue())
+					.build());
+		}
+		return builder.build();
 	}
 
 	public static Builder builder() {

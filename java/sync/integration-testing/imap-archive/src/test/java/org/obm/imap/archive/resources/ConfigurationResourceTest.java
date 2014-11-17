@@ -32,11 +32,12 @@
 package org.obm.imap.archive.resources;
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.obm.imap.archive.ExpectAuthorization.expectAdmin;
+import static org.obm.imap.archive.ExpectAuthorization.expectCheckUsers;
 
 import java.util.UUID;
 
@@ -62,6 +63,7 @@ import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
+import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
@@ -69,6 +71,7 @@ import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.jayway.restassured.http.ContentType;
@@ -77,6 +80,7 @@ import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.UserExtId;
 
 public class ConfigurationResourceTest {
 
@@ -172,12 +176,12 @@ public class ConfigurationResourceTest {
 					.values(domainId, Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
-					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)
-					.values(domainId, "08607f19-05a4-42a2-9b02-6f11f3ceff3b")
+					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
+					.values(domainId, "08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
-					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)
-					.values(domainId, "8e30e673-1c47-4ca8-85e8-4609d4228c10")
+					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
+					.values(domainId, "8e30e673-1c47-4ca8-85e8-4609d4228c10", "userb")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL)
@@ -200,7 +204,8 @@ public class ConfigurationResourceTest {
 			.contentType(ContentType.JSON)
 			.body("domainId", equalTo(domainId),
 				"enabled", equalTo(true),
-				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "8e30e673-1c47-4ca8-85e8-4609d4228c10"),
+				"excludedUserIdToLoginMap", hasEntry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera"),
+				"excludedUserIdToLoginMap", hasEntry("8e30e673-1c47-4ca8-85e8-4609d4228c10", "userb"),
 				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user2@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -291,6 +296,16 @@ public class ConfigurationResourceTest {
 		
 		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
+		expectCheckUsers(userDao, "mydomain.org", 
+				ExcludedUser.builder()
+					.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+					.login("usera")
+					.build(),
+				ExcludedUser.builder()
+					.id(UserExtId.valueOf("8e30e673-1c47-4ca8-85e8-4609d4228c10"))
+					.login("userb")
+					.build());
+		
 		control.replay();
 		server.start();
 		
@@ -303,7 +318,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(100).getDayOfYear();
 		domainConfigurationDto.hour = 11;
 		domainConfigurationDto.minute = 32;
-		domainConfigurationDto.excludedUserIds = ImmutableList.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "8e30e673-1c47-4ca8-85e8-4609d4228c10");
+		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera", "8e30e673-1c47-4ca8-85e8-4609d4228c10", "userb");
 		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user2@mydomain.org");
 		
 		given()
@@ -325,7 +340,8 @@ public class ConfigurationResourceTest {
 			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
 				"enabled", equalTo(true),
 				"dayOfWeek", equalTo(DayOfWeek.TUESDAY.getSpecificationValue()),
-				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "8e30e673-1c47-4ca8-85e8-4609d4228c10"),
+				"excludedUserIdToLoginMap", hasEntry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera"),
+				"excludedUserIdToLoginMap", hasEntry("8e30e673-1c47-4ca8-85e8-4609d4228c10", "userb"),
 				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user2@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -349,12 +365,12 @@ public class ConfigurationResourceTest {
 					.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
-					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)
-					.values(domainId, "08607f19-05a4-42a2-9b02-6f11f3ceff3b")
+					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
+					.values(domainId, "08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
-					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)
-					.values(domainId, "8e30e673-1c47-4ca8-85e8-4609d4228c10")
+					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
+					.values(domainId, "8e30e673-1c47-4ca8-85e8-4609d4228c10", "userb")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL)
@@ -371,6 +387,17 @@ public class ConfigurationResourceTest {
 		
 		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
+		expectCheckUsers(userDao, "mydomain.org", 
+				ExcludedUser.builder()
+					.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+					.login("usera")
+					.build(),
+				ExcludedUser.builder()
+					.id(UserExtId.valueOf("2d7a5942-46ab-4fad-9bd2-608bde249671"))
+					.login("userc")
+					.build());
+		
+		
 		control.replay();
 		server.start();
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
@@ -383,7 +410,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.hour = 11;
 		domainConfigurationDto.minute = 32;
 		domainConfigurationDto.excludedFolder = "anotherExcluded";
-		domainConfigurationDto.excludedUserIds = ImmutableList.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "2d7a5942-46ab-4fad-9bd2-608bde249671");
+		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera", "2d7a5942-46ab-4fad-9bd2-608bde249671", "userc");
 		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user3@mydomain.org");
 		
 		given()
@@ -405,7 +432,8 @@ public class ConfigurationResourceTest {
 				"enabled", equalTo(true),
 				"dayOfWeek", equalTo(DayOfWeek.WEDNESDAY.getSpecificationValue()),
 				"excludedFolder", equalTo("anotherExcluded"),
-				"excludedUserIds", contains("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "2d7a5942-46ab-4fad-9bd2-608bde249671"),
+				"excludedUserIdToLoginMap", hasEntry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera"),
+				"excludedUserIdToLoginMap", hasEntry("2d7a5942-46ab-4fad-9bd2-608bde249671", "userc"),
 				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user3@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()

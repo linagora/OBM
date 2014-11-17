@@ -171,8 +171,8 @@ function toJson($configuration) {
   $hour = $configuration->hour;
   $minute = $configuration->minute;
   $excludedFolder = $configuration->excludedFolder;
-  $excludedUserIdsFromConfig = $configuration->excludedUserIds;
-  $excludedUserIds = $excludedUserIdsFromConfig != null ? $excludedUserIdsFromConfig : array();
+  $excludedUserIdToLoginMapFromConfig = $configuration->excludedUserIdToLoginMap;
+  $excludedUserIdToLoginMap = $excludedUserIdToLoginMapFromConfig != null ? $excludedUserIdToLoginMapFromConfig : new stdClass();
   $mailingEmailsFromConfig = $configuration->mailingEmails;
   $mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
 	
@@ -185,7 +185,7 @@ function toJson($configuration) {
     "hour" => ($hour) ? $hour : 0,
     "minute" => ($minute) ? $minute : 0,
     "excludedFolder" => $excludedFolder,
-    "excludedUserIds" => $excludedUserIds,
+    "excludedUserIdToLoginMap" => $excludedUserIdToLoginMap,
     "mailingEmails" => $mailingEmails
   ));	
 }
@@ -264,8 +264,7 @@ function paramToJson($paramsAsConfiguration) {
 	$hour = $paramsAsConfiguration->hour;
 	$minute = $paramsAsConfiguration->minute;
 	$excludedFolder = $paramsAsConfiguration->excluded_folder;
-	$excludedUserIdsFromConfig = $paramsAsConfiguration->excluded_user_id;
-	$excludedUserIds = $excludedUserIdsFromConfig != null ? $excludedUserIdsFromConfig : array();
+	$excludedUserIdToLoginMap = excludedUserIdsToMap($paramsAsConfiguration->excluded_user_id);
 	$mailingEmailsFromConfig = $paramsAsConfiguration->mailing_emails;
 	$mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
 
@@ -278,9 +277,21 @@ function paramToJson($paramsAsConfiguration) {
 			"hour" => ($hour) ? $hour : 0,
 			"minute" => ($minute) ? $minute : 0,
 			"excludedFolder" => $excludedFolder,
-			"excludedUserIds" => $excludedUserIds,
+			"excludedUserIdToLoginMap" => $excludedUserIdToLoginMap,
 			"mailingEmails" => $mailingEmails
 	));
+}
+
+function excludedUserIdsToMap($excludedUserIds) {
+  $map = new stdClass();
+  if ($excludedUserIds == null) {
+    return $map;
+  }
+  $users = get_userobm_from_ext_ids($excludedUserIds);
+  foreach ($users['entity'] as $u_ext_id => $u_ent) {
+    $map->$u_ext_id = $u_ent['login'];
+  }
+  return $map;
 }
 
 function curlPut($url, $json) {

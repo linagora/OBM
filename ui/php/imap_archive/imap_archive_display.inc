@@ -66,7 +66,7 @@ function dis_imap_archive_form($params, $configuration) {
   $hour = $configuration->hour;
   $minute = $configuration->minute;
   $excludedFolder = $configuration->excludedFolder;
-  $excludedUserIds = $configuration->excludedUserIds;
+  $excludedUserIdToLoginMap = $configuration->excludedUserIdToLoginMap;
   $mailingEmails = $configuration->mailingEmails;
   
   $disabled = ($enabled == 0) ? "disabled" : "";
@@ -77,7 +77,7 @@ function dis_imap_archive_form($params, $configuration) {
   $block_hour = get_block_hour($hour, $disabled);
   $block_minute = get_block_minute($minute, $disabled);
   $block_next_treatment_date = get_block_next_treatment_date($configuration);
-  $block_excluded_users = get_block_excluded_users($excludedUserIds);
+  $block_excluded_users = get_block_excluded_users($excludedUserIdToLoginMap);
   $block_mailing = get_block_mailing($mailingEmails);
   
   $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_excluded_user_id', 'userSearch', {filter_pattern:'access'});";
@@ -342,10 +342,14 @@ function formatStringAsDateString($dateAsString) {
   return $l_not_configured;
 }
 
-function get_block_excluded_users($excludedUserIds) {
+function get_block_excluded_users($excludedUserIdToLoginMap) {
   global $l_users, $ico_delete;
   global $l_name, $l_delete, $l_remove_archive;
   
+  $excludedUserIds = array();
+  foreach (get_object_vars($excludedUserIdToLoginMap) as $name => $value) {
+    array_push($excludedUserIds, $name);
+  }
   $users = (count($excludedUserIds) > 0) ? get_userobm_from_ext_ids($excludedUserIds) : array();
   if (is_array($users['entity'])) {
     $dis_sel_user = "";

@@ -49,9 +49,11 @@ import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.PersistedResult;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
+import org.obm.imap.archive.exception.LoginMismatchException;
 import org.obm.imap.archive.services.DomainConfigurationService;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
 import com.google.common.base.Objects;
 
@@ -91,7 +93,7 @@ public class ConfigurationResource {
 			} else {
 				return Response.created(uriInfo.getAbsolutePath()).build();
 			}
-		} catch (DomainNotFoundException e) {
+		} catch (DomainNotFoundException | LoginMismatchException | UserNotFoundException e) {
 			throw new WebApplicationException(e, Status.NOT_FOUND);
 		}
 	}

@@ -34,9 +34,9 @@ package org.obm.imap.archive.beans;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.UUID;
-
 import org.junit.Test;
+
+import fr.aliacom.obm.common.user.UserExtId;
 
 public class ExcludedUserTest {
 
@@ -45,26 +45,31 @@ public class ExcludedUserTest {
 		ExcludedUser.builder().id(null);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
-	public void builderShouldThrowWhenNotaUUID() {
-		ExcludedUser.builder().id("not-uuid").build();
+	@Test(expected=NullPointerException.class)
+	public void builderShouldThrowWhenLoginIsNull() {
+		ExcludedUser.builder().login(null);
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThrowWhenIdNotProvided() {
+		ExcludedUser.builder().build();
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThrowWhenLoginNotProvided() {
+		ExcludedUser.builder().id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b")).build();
 	}
 	
 	@Test
 	public void builderShouldBuild() {
-		ExcludedUser excludedUser = ExcludedUser.builder().id("08607f19-05a4-42a2-9b02-6f11f3ceff3b").build();
-		assertThat(excludedUser.getId()).isEqualTo(UUID.fromString("08607f19-05a4-42a2-9b02-6f11f3ceff3b"));
+		ExcludedUser excludedUser = ExcludedUser.builder().id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b")).login("user").build();
+		assertThat(excludedUser.getId()).isEqualTo(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"));
+		assertThat(excludedUser.getLogin()).isEqualTo("user");
 	}
 	
 	@Test
-	public void fromShouldBuild() {
-		ExcludedUser excludedUser = ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
-		assertThat(excludedUser.getId()).isEqualTo(UUID.fromString("08607f19-05a4-42a2-9b02-6f11f3ceff3b"));
-	}
-	
-	@Test
-	public void serialize() {
-		ExcludedUser excludedUser = ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
-		assertThat(excludedUser.serialize()).isEqualTo("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
+	public void serializeId() {
+		ExcludedUser excludedUser = ExcludedUser.builder().id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b")).login("user").build();
+		assertThat(excludedUser.serializeId()).isEqualTo("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
 	}
 }

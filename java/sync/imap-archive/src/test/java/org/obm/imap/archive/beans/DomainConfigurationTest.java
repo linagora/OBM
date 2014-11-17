@@ -39,9 +39,11 @@ import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.sync.base.EmailAddress;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.UserExtId;
 
 
 public class DomainConfigurationTest {
@@ -156,6 +158,10 @@ public class DomainConfigurationTest {
 	
 	@Test
 	public void builderShouldBuildConfigurationWhenMailingIsNotProvided() {
+		ExcludedUser expectedExcludedUser = ExcludedUser.builder()
+				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+				.login("usera")
+				.build();
 		DomainConfiguration configuration = 
 				DomainConfiguration.builder()
 					.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
@@ -165,7 +171,7 @@ public class DomainConfigurationTest {
 							.time(LocalTime.parse("13:23"))
 							.build())
 					.excludedFolder("excluded")
-					.excludedUsers(ImmutableList.of(ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b")))
+					.excludedUsers(ImmutableList.of(expectedExcludedUser))
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
 		assertThat(configuration.isEnabled()).isTrue();
@@ -173,7 +179,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getHour()).isEqualTo(13);
 		assertThat(configuration.getMinute()).isEqualTo(23);
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
-		assertThat(configuration.getExcludedUsers()).containsOnly(ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b"));
+		assertThat(configuration.getExcludedUsers()).containsOnly(expectedExcludedUser);
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
 	}
 	
@@ -257,7 +263,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.hour = expectedHour;
 		domainConfigurationDto.minute = expectedMinute;
 		domainConfigurationDto.excludedFolder = "excluded";
-		domainConfigurationDto.excludedUserIds = ImmutableList.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
+		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
 		domainConfigurationDto.mailingEmails = ImmutableList.of("usera@mydomain.org", "userb@mydomain.org");
 		
 		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
@@ -271,7 +277,10 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getHour()).isEqualTo(expectedHour);
 		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
-		assertThat(configuration.getExcludedUsers()).containsOnly(ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b"));
+		assertThat(configuration.getExcludedUsers()).containsOnly(ExcludedUser.builder()
+				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+				.login("usera")
+				.build());
 		assertThat(configuration.getMailing()).isEqualTo(Mailing.from(ImmutableList.of(EmailAddress.loginAtDomain("usera@mydomain.org"), EmailAddress.loginAtDomain("userb@mydomain.org"))));
 	}
 	
@@ -296,7 +305,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.hour = expectedHour;
 		domainConfigurationDto.minute = expectedMinute;
 		domainConfigurationDto.excludedFolder = "excluded";
-		domainConfigurationDto.excludedUserIds = ImmutableList.of();
+		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of();
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		
 		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
@@ -336,7 +345,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.hour = expectedHour;
 		domainConfigurationDto.minute = expectedMinute;
 		domainConfigurationDto.excludedFolder = "excluded";
-		domainConfigurationDto.excludedUserIds = null;
+		domainConfigurationDto.excludedUserIdToLoginMap = null;
 		
 		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
 		DomainConfiguration.from(domainConfigurationDto, domain);
@@ -363,7 +372,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.hour = expectedHour;
 		domainConfigurationDto.minute = expectedMinute;
 		domainConfigurationDto.excludedFolder = "excluded";
-		domainConfigurationDto.excludedUserIds = ImmutableList.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
+		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		
 		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
@@ -377,7 +386,10 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getHour()).isEqualTo(expectedHour);
 		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
-		assertThat(configuration.getExcludedUsers()).containsOnly(ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b"));
+		assertThat(configuration.getExcludedUsers()).containsOnly(ExcludedUser.builder()
+				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+				.login("usera")
+				.build());
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
 	}
 	
@@ -402,7 +414,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.hour = expectedHour;
 		domainConfigurationDto.minute = expectedMinute;
 		domainConfigurationDto.excludedFolder = "excluded";
-		domainConfigurationDto.excludedUserIds = ImmutableList.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
+		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
 		domainConfigurationDto.mailingEmails = null;
 		
 		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
@@ -416,6 +428,9 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getHour()).isEqualTo(expectedHour);
 		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
-		assertThat(configuration.getExcludedUsers()).containsOnly(ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b"));
+		assertThat(configuration.getExcludedUsers()).containsOnly(ExcludedUser.builder()
+				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+				.login("usera")
+				.build());
 	}
 }

@@ -32,10 +32,16 @@
 
 package org.obm.imap.archive;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
+
+import java.sql.SQLException;
 
 import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
+import org.obm.imap.archive.beans.ExcludedUser;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -54,6 +60,18 @@ public class ExpectAuthorization {
 					.domain(domain)
 					.admin(true)
 					.build()).anyTimes();
+	}
+	
+	public static void expectCheckUsers(UserDao userDao, String domainName, ExcludedUser... users) throws SQLException, UserNotFoundException {
+		ObmDomain domain = ObmDomain.builder().name(domainName).build();
+		for (ExcludedUser user : users) {
+			expect(userDao.getByExtId(eq(user.getId()), anyObject(ObmDomain.class)))
+				.andReturn(ObmUser.builder()
+						.extId(user.getId())
+						.login(UserLogin.valueOf(user.getLogin()))
+						.domain(domain)
+						.build());
+		}
 	}
 	
 	public static void expectSimpleUser(DomainDao domainDao, String domainName, UserDao userDao, String login) {

@@ -30,15 +30,21 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.dao;
+package org.obm.imap.archive.exception;
 
-import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.push.mail.imap.IMAPException;
 
-import com.google.common.base.Optional;
+public class LoginMismatchException extends IMAPException {
 
-import fr.aliacom.obm.common.user.UserExtId;
-
-public interface UserDao {
-
-	Optional<String> getUserLogin(UserExtId userExtId) throws DaoException;
+	public LoginMismatchException(Throwable t) {
+		super(t);
+	}
+	
+	public LoginMismatchException(String s, Throwable t) {
+		super(s, t);
+	}
+	
+	public LoginMismatchException(String s) {
+		super(s);
+	}
 }

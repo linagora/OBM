@@ -36,8 +36,6 @@ import org.obm.sync.base.DomainName;
 
 public class ArchivePartitionName {
 	
-	private static final String ARCHIVE_PARTITION_SUFFIX = "_archive";
-
 	private ArchivePartitionName() {
 	}
 	

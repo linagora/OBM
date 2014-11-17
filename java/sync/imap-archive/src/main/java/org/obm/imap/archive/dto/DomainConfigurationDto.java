@@ -32,6 +32,7 @@
 package org.obm.imap.archive.dto;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.obm.imap.archive.beans.DayOfWeek;
@@ -42,6 +43,7 @@ import org.obm.sync.base.EmailAddress;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableMap;
 
 public class DomainConfigurationDto {
 
@@ -56,7 +58,7 @@ public class DomainConfigurationDto {
 		dto.hour = configuration.getHour();
 		dto.minute = configuration.getMinute();
 		dto.excludedFolder = configuration.getExcludedFolder();
-		dto.excludedUserIds = toIds(configuration.getExcludedUsers());
+		dto.excludedUserIdToLoginMap = toMap(configuration.getExcludedUsers());
 		dto.mailingEmails = toStrings(configuration.getMailing());
 		return dto;
 	}
@@ -84,15 +86,12 @@ public class DomainConfigurationDto {
 		throw new IllegalArgumentException(dayOfWeek.name() + " can't be converted to Integer");
 	}
 	
-	private static List<String> toIds(List<ExcludedUser> excludedUsers) {
-		return FluentIterable.from(excludedUsers)
-				.transform(new Function<ExcludedUser, String>() {
-
-					@Override
-					public String apply(ExcludedUser excludedUser) {
-						return excludedUser.serialize();
-					}
-				}).toList();
+	private static Map<String, String> toMap(List<ExcludedUser> excludedUsers) {
+		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+		for (ExcludedUser excludedUser : excludedUsers) {
+			builder.put(excludedUser.serializeId(), excludedUser.getLogin());
+		}
+		return builder.build();
 	}
 	
 	private static List<String> toStrings(Mailing mailing) {
@@ -115,7 +114,7 @@ public class DomainConfigurationDto {
 	public Integer hour;
 	public Integer minute;
 	public String excludedFolder;
-	public List<String> excludedUserIds;
+	public Map<String, String> excludedUserIdToLoginMap;
 	public List<String> mailingEmails;
 	
 }

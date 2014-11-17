@@ -70,6 +70,7 @@ import com.ninja_squad.dbsetup.operation.Operation;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.UserExtId;
 
 public class DomainConfigurationJdbcImplTest {
 
@@ -120,8 +121,9 @@ public class DomainConfigurationJdbcImplTest {
 	private Insert excludedUser(ExcludedUser excludedUser) {
 		return Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
 			.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, 
-					DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID) 
-			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", excludedUser.getId())
+					DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID,
+					DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN) 
+			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", excludedUser.serializeId(), excludedUser.getLogin())
 			.build();
 	}
 	
@@ -167,8 +169,14 @@ public class DomainConfigurationJdbcImplTest {
 	
 	@Test
 	public void getShouldLoadExcludedUsers() throws Exception {
-		ExcludedUser excludedUser = ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
-		ExcludedUser excludedUser2 = ExcludedUser.from("8e30e673-1c47-4ca8-85e8-4609d4228c10");
+		ExcludedUser excludedUser = ExcludedUser.builder()
+				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+				.login("usera")
+				.build();
+		ExcludedUser excludedUser2 = ExcludedUser.builder()
+				.id(UserExtId.valueOf("8e30e673-1c47-4ca8-85e8-4609d4228c10"))
+				.login("userb")
+				.build();
 		play(Operations.sequenceOf(delete(), domainConfiguration(), excludedUser(excludedUser), excludedUser(excludedUser2)));
 		
 		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
@@ -228,13 +236,22 @@ public class DomainConfigurationJdbcImplTest {
 	
 	@Test
 	public void updateShouldUpdateExcludedUsers() throws Exception {
-		ExcludedUser excludedUser = ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
-		ExcludedUser excludedUser2 = ExcludedUser.from("8e30e673-1c47-4ca8-85e8-4609d4228c10");
+		ExcludedUser excludedUser = ExcludedUser.builder()
+				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+				.login("usera")
+				.build();
+		ExcludedUser excludedUser2 = ExcludedUser.builder()
+				.id(UserExtId.valueOf("8e30e673-1c47-4ca8-85e8-4609d4228c10"))
+				.login("userb")
+				.build();
 		play(Operations.sequenceOf(delete(), domainConfiguration(), excludedUser(excludedUser), excludedUser(excludedUser2)));
 		
 		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
-		ExcludedUser excludedUser3 = ExcludedUser.from("2d7a5942-46ab-4fad-9bd2-608bde249671");
+		ExcludedUser excludedUser3 = ExcludedUser.builder()
+				.id(UserExtId.valueOf("2d7a5942-46ab-4fad-9bd2-608bde249671"))
+				.login("userc")
+				.build();
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
 				.domain(domain)
 				.state(ConfigurationState.DISABLE)
@@ -333,8 +350,14 @@ public class DomainConfigurationJdbcImplTest {
 		
 		ObmDomainUuid uuid = ObmDomainUuid.of("1383b12c-6d79-40c7-acf9-c79bcc673fff");
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
-		ExcludedUser excludedUser = ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
-		ExcludedUser excludedUser2 = ExcludedUser.from("8e30e673-1c47-4ca8-85e8-4609d4228c10");
+		ExcludedUser excludedUser = ExcludedUser.builder()
+				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+				.login("usera")
+				.build();
+		ExcludedUser excludedUser2 = ExcludedUser.builder()
+				.id(UserExtId.valueOf("8e30e673-1c47-4ca8-85e8-4609d4228c10"))
+				.login("userb")
+				.build();
 		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
 				.domain(domain)
 				.state(ConfigurationState.DISABLE)

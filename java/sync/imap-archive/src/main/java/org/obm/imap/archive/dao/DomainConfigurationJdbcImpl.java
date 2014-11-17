@@ -61,6 +61,7 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.UserExtId;
 
 @Singleton
 public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
@@ -108,8 +109,9 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			interface FIELDS {
 				String DOMAIN_UUID = "mail_archive_excluded_users_domain_uuid";
 				String USER_UUID = "mail_archive_excluded_users_user_uuid";
+				String USER_LOGIN = "mail_archive_excluded_users_user_login";
 				
-				String ALL = Joiner.on(", ").join(DOMAIN_UUID, USER_UUID);
+				String ALL = Joiner.on(", ").join(DOMAIN_UUID, USER_UUID, USER_LOGIN);
 			}
 		}
 				
@@ -121,7 +123,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 					"DELETE FROM %s WHERE %s = ?", TABLE.NAME, TABLE.FIELDS.DOMAIN_UUID);
 			
 			String INSERT = String.format(
-					"INSERT INTO %s (%s) VALUES (?, ?)", TABLE.NAME, TABLE.FIELDS.ALL);
+					"INSERT INTO %s (%s) VALUES (?, ?, ?)", TABLE.NAME, TABLE.FIELDS.ALL);
 		}
 	}
 		
@@ -258,7 +260,10 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			
 			ImmutableList.Builder<ExcludedUser> builder = ImmutableList.builder();
 			while (rs.next()) {
-				builder.add(ExcludedUser.from(rs.getString(EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)));
+				builder.add(ExcludedUser.builder()
+						.id(UserExtId.valueOf(rs.getString(EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)))
+						.login(rs.getString(EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN))
+						.build());
 			}
 			return builder.build();
 		}
@@ -274,10 +279,11 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			psDelete.setString(1, domainId.get());
 			psDelete.executeUpdate();
 			
-			for (ExcludedUser userId : users) {
+			for (ExcludedUser excludedUser : users) {
 				int idx = 1;
 				psInsert.setString(idx++, domainId.get());
-				psInsert.setString(idx++, userId.serialize());
+				psInsert.setString(idx++, excludedUser.serializeId());
+				psInsert.setString(idx++, excludedUser.getLogin());
 				
 				psInsert.executeUpdate();
 			}

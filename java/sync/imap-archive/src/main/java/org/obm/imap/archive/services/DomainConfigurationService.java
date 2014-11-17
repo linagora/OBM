@@ -32,29 +32,39 @@
 
 package org.obm.imap.archive.services;
 
+import java.sql.SQLException;
+
 import javax.inject.Inject;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.module.LoggerModule;
+import org.obm.domain.dao.UserDao;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
+import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.PersistedResult;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
+import org.obm.imap.archive.exception.LoginMismatchException;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.imap.archive.scheduling.ArchiveSchedulingService;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
+import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
+
 @Singleton
 public class DomainConfigurationService {
 
 	private final Logger logger;
 	private final DomainConfigurationDao domainConfigurationDao;
+	private final UserDao userDao;
 	private final ArchiveSchedulingService schedulingService;
 	private final ArchiveScheduler scheduler;
 	
@@ -62,20 +72,37 @@ public class DomainConfigurationService {
 	@VisibleForTesting DomainConfigurationService(
 			@Named(LoggerModule.CONFIGURATION) Logger logger,
 			DomainConfigurationDao domainConfigurationDao,
+			UserDao userDao,
 			ArchiveSchedulingService schedulingService,
 			ArchiveScheduler scheduler) {
 		this.logger = logger;
 		this.domainConfigurationDao = domainConfigurationDao;
+		this.userDao = userDao;
 		this.schedulingService = schedulingService;
 		this.scheduler = scheduler;
 	}
 	
 	@Transactional
-	public PersistedResult updateOrCreate(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException {
+	public PersistedResult updateOrCreate(DomainConfiguration domainConfiguration) throws DaoException, DomainNotFoundException, LoginMismatchException, UserNotFoundException {
+		checkDomainConfiguration(domainConfiguration);
+		
 		if (domainConfigurationDao.get(domainConfiguration.getDomain()) == null) {
 			return create(domainConfiguration);
 		} else {
 			return update(domainConfiguration);
+		}
+	}
+
+	private void checkDomainConfiguration(DomainConfiguration domainConfiguration) throws UserNotFoundException, LoginMismatchException, DaoException {
+		try {
+			for (ExcludedUser excludedUser : domainConfiguration.getExcludedUsers()) {
+				ObmUser obmUser = userDao.getByExtId(UserExtId.valueOf(excludedUser.serializeId()), domainConfiguration.getDomain());
+				if (!obmUser.getLogin().equals(excludedUser.getLogin())) {
+					throw new LoginMismatchException(String.format("Bad login for user id: %s", excludedUser.serializeId()));
+				}
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
 		}
 	}
 

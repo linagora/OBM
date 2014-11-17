@@ -52,7 +52,6 @@ import org.obm.imap.archive.beans.Year;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.dao.UserDao;
 import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapSelectException;
@@ -75,6 +74,7 @@ import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -89,7 +89,6 @@ import com.linagora.scheduling.DateTimeProvider;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.system.ObmSystemUser;
-import fr.aliacom.obm.common.user.UserExtId;
 
 @Singleton
 public class ImapArchiveProcessing {
@@ -102,7 +101,6 @@ public class ImapArchiveProcessing {
 	private final StoreClientFactory storeClientFactory;
 	private final ArchiveTreatmentDao archiveTreatmentDao;
 	private final ProcessedFolderDao processedFolderDao;
-	private final UserDao userDao;
 	private final ImapArchiveConfigurationService imapArchiveConfigurationService;
 
 	
@@ -112,7 +110,6 @@ public class ImapArchiveProcessing {
 			StoreClientFactory storeClientFactory,
 			ArchiveTreatmentDao archiveTreatmentDao,
 			ProcessedFolderDao processedFolderDao,
-			UserDao userDao,
 			ImapArchiveConfigurationService imapArchiveConfigurationService) {
 		
 		this.dateTimeProvider = dateTimeProvider;
@@ -120,7 +117,6 @@ public class ImapArchiveProcessing {
 		this.storeClientFactory = storeClientFactory;
 		this.archiveTreatmentDao = archiveTreatmentDao;
 		this.processedFolderDao = processedFolderDao;
-		this.userDao = userDao;
 		this.imapArchiveConfigurationService = imapArchiveConfigurationService;
 	}
 	
@@ -324,7 +320,7 @@ public class ImapArchiveProcessing {
 		};
 	}
 
-	private Predicate<? super ListInfo> filterOutExcludedUsers(ProcessedTask processedTask) throws DaoException {
+	private Predicate<? super ListInfo> filterOutExcludedUsers(ProcessedTask processedTask) {
 		final List<String> excludedUserLogins = excludedUserLogins(processedTask.getDomainConfiguration()); 
 		return new Predicate<ListInfo>() {
 
@@ -341,15 +337,15 @@ public class ImapArchiveProcessing {
 		};
 	}
 
-	private List<String> excludedUserLogins(DomainConfiguration domainConfiguration) throws DaoException {
-		ImmutableList.Builder<String> excludedUserLogins = ImmutableList.builder();
-		for (ExcludedUser excludedUser : domainConfiguration.getExcludedUsers()) {
-			Optional<String> optional = userDao.getUserLogin(UserExtId.valueOf(excludedUser.getId().toString()));
-			if (optional.isPresent()) {
-				excludedUserLogins.add(optional.get());
-			}
-		}
-		return excludedUserLogins.build();
+	private List<String> excludedUserLogins(DomainConfiguration domainConfiguration) {
+		return FluentIterable.from(domainConfiguration.getExcludedUsers())
+				.transform(new Function<ExcludedUser, String>() {
+
+					@Override
+					public String apply(ExcludedUser excludedUser) {
+						return excludedUser.getLogin();
+					}
+				}).toList();
 	}
 
 	private Predicate<ListInfo> filterArchiveFolder() {

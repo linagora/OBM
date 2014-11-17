@@ -59,9 +59,9 @@ import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
+import org.obm.imap.archive.CyrusCompatGreenmailRule;
 import org.obm.imap.archive.DatabaseOperations;
 import org.obm.imap.archive.Expectations;
-import org.obm.imap.archive.CyrusCompatGreenmailRule;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
@@ -75,6 +75,7 @@ import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.icegreen.greenmail.util.GreenMail;
@@ -166,7 +167,7 @@ public class TreatmentsResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(1).getDayOfYear();
 		domainConfigurationDto.hour = 0;
 		domainConfigurationDto.minute = 0;
-		domainConfigurationDto.excludedUserIds = ImmutableList.of();
+		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of();
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		
 		given()
@@ -201,7 +202,7 @@ public class TreatmentsResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(1).getDayOfYear();
 		domainConfigurationDto.hour = 0;
 		domainConfigurationDto.minute = 0;
-		domainConfigurationDto.excludedUserIds = ImmutableList.of();
+		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of();
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		
 		given()

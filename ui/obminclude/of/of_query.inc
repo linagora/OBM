@@ -2382,7 +2382,7 @@ function get_userobm_from_ext_ids($ext_ids) {
     }
   }
   $where .= ')';
-  $query = "SELECT userobm_ext_id, userobm_lastname, userobm_firstname
+  $query = "SELECT userobm_ext_id, userobm_login, userobm_lastname, userobm_firstname
     FROM UserObm
     WHERE userobm_archive = 0
     AND userobm_ext_id IN $where
@@ -2391,10 +2391,11 @@ function get_userobm_from_ext_ids($ext_ids) {
   $obm_q->query ( $query );
   while ( $obm_q->next_record () ) {
     $id = $obm_q->f ( 'userobm_ext_id' );
+    $login = $obm_q->f ( 'userobm_login' );
     $lname = $obm_q->f ( 'userobm_lastname' );
     $fname = $obm_q->f ( 'userobm_firstname' );
     $res ['ext_ids'] [] = $id;
-    $res ['entity'] [$id] = array('label' => "$lname $fname");
+    $res ['entity'] [$id] = array('label' => "$lname $fname", 'login' => $login);
   }
   return $res;
 }

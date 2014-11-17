@@ -39,7 +39,6 @@ import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.dao.UserDao;
 import org.obm.imap.archive.exception.MailboxFormatException;
 import org.obm.imap.archive.mailbox.ArchiveMailbox;
 import org.obm.imap.archive.mailbox.Mailbox;
@@ -64,11 +63,10 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 			StoreClientFactory storeClientFactory,
 			ArchiveTreatmentDao archiveTreatmentDao,
 			ProcessedFolderDao processedFolderDao,
-			UserDao userDao,
 			ImapArchiveConfigurationService imapArchiveConfigurationService) {
 		
 		super(dateTimeProvider, schedulingDatesService, storeClientFactory,
-				archiveTreatmentDao, processedFolderDao, userDao, imapArchiveConfigurationService);
+				archiveTreatmentDao, processedFolderDao, imapArchiveConfigurationService);
 	}
 	
 	@Override

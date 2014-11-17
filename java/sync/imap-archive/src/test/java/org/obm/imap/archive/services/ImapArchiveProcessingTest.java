@@ -69,12 +69,10 @@ import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.dao.UserDao;
 import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.imap.archive.services.ImapArchiveProcessing.ProcessedTask;
-import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Flag;
@@ -114,7 +112,6 @@ public class ImapArchiveProcessingTest {
 	private StoreClientFactory storeClientFactory;
 	private ArchiveTreatmentDao archiveTreatmentDao;
 	private ProcessedFolderDao processedFolderDao;
-	private UserDao userDao;
 	private ImapArchiveConfigurationService imapArchiveConfigurationService;
 	private Logger logger;
 	private LoggerAppenders loggerAppenders;
@@ -129,7 +126,6 @@ public class ImapArchiveProcessingTest {
 		storeClientFactory = control.createMock(StoreClientFactory.class);
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		processedFolderDao = control.createMock(ProcessedFolderDao.class);
-		userDao = control.createMock(UserDao.class);
 		imapArchiveConfigurationService = control.createMock(ImapArchiveConfigurationService.class);
 		expect(imapArchiveConfigurationService.getArchiveMainFolder())
 			.andReturn("ARCHIVE").anyTimes();
@@ -141,7 +137,7 @@ public class ImapArchiveProcessingTest {
 		loggerAppenders = control.createMock(LoggerAppenders.class);
 		
 		imapArchiveProcessing = new ImapArchiveProcessing(dateTimeProvider, 
-				schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao, userDao, imapArchiveConfigurationService);
+				schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao, imapArchiveConfigurationService);
 	}
 	
 	@Test
@@ -984,15 +980,14 @@ public class ImapArchiveProcessingTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
-			.excludedUsers(ImmutableList.of(ExcludedUser.from("3fb10c50-52fa-4a48-9554-2ae8c9c734b9")))
+			.excludedUsers(ImmutableList.of(ExcludedUser.builder()
+					.id(UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9"))
+					.login("userb")
+					.build()))
 			.build();
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		
-		UserExtId userExtId = UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9");
-		expect(userDao.getUserLogin(userExtId))
-			.andReturn(Optional.of("userb"));
 		
 		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
 				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
@@ -1035,77 +1030,14 @@ public class ImapArchiveProcessingTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
-			.excludedUsers(ImmutableList.of(ExcludedUser.from("3fb10c50-52fa-4a48-9554-2ae8c9c734b9")))
+			.excludedUsers(ImmutableList.of(ExcludedUser.builder()
+					.id(UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9"))
+					.login("usera")
+					.build()))
 			.build();
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		
-		UserExtId userExtId = UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9");
-		expect(userDao.getUserLogin(userExtId))
-			.andReturn(Optional.of("usera"));
-		
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
-		
-		control.replay();
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.boundaries(Boundaries.builder()
-						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders(processedTask);
-		control.verify();
-		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
-	}
-	
-	@Test(expected=DaoException.class)
-	public void listImapFoldersShouldPropagateWhenUserDaoThrows() throws Exception {
-		List<ListInfo> expectedListInfos = ImmutableList.of(
-				new ListInfo("user/usera@mydomain.org", true, false),
-				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
-				new ListInfo("user/usera/SPAM@mydomain.org", true, false),
-				new ListInfo("user/usera/Sent@mydomain.org", true, false),
-				new ListInfo("user/userc@mydomain.org", true, false),
-				new ListInfo("user/userc/Drafts@mydomain.org", true, false),
-				new ListInfo("user/userc/SPAM@mydomain.org", true, false),
-				new ListInfo("user/userc/Sent@mydomain.org", true, false));
-		ListResult listResult = new ListResult(12);
-		listResult.addAll(expectedListInfos);
-		listResult.add(new ListInfo("user/userb@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/userb/Drafts@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/userb/SPAM@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/userb/Sent@mydomain.org", true, false));
-		
-		StoreClient storeClient = control.createMock(StoreClient.class);
-		storeClient.login(false);
-		expectLastCall();
-		expect(storeClient.listAll())
-			.andReturn(listResult);
-		storeClient.close();
-		expectLastCall();
-		
-		ObmDomain domain = ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).name("mydomain.org").build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-			.domain(domain)
-			.state(ConfigurationState.ENABLE)
-			.schedulingConfiguration(SchedulingConfiguration.builder()
-					.recurrence(ArchiveRecurrence.daily())
-					.time(LocalTime.parse("13:23"))
-					.build())
-			.excludedUsers(ImmutableList.of(ExcludedUser.from("3fb10c50-52fa-4a48-9554-2ae8c9c734b9")))
-			.build();
-		
-		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient);
-		
-		UserExtId userExtId = UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9");
-		expect(userDao.getUserLogin(userExtId))
-			.andThrow(new DaoException());
 		
 		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
 				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);

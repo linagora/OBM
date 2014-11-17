@@ -32,10 +32,10 @@
 
 package org.obm.imap.archive.beans;
 
-import java.util.UUID;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+
+import fr.aliacom.obm.common.user.UserExtId;
 
 public class ExcludedUser {
 
@@ -43,50 +43,63 @@ public class ExcludedUser {
 		return new Builder();
 	}
 	
-	public static ExcludedUser from(String id) {
-		return new Builder().id(id).build();
-	}
-	
 	public static class Builder {
 		
-		private String id;
+		private UserExtId id;
+		private String login;
 		private Builder() {}
 		
-		public Builder id(String id) {
+		public Builder id(UserExtId id) {
 			Preconditions.checkNotNull(id);
 			this.id = id;
 			return this;
 		}
 		
+		public Builder login(String login) {
+			Preconditions.checkNotNull(login);
+			this.login = login;
+			return this;
+		}
+		
 		public ExcludedUser build() {
-			return new ExcludedUser(UUID.fromString(id));
+			Preconditions.checkState(id != null);
+			Preconditions.checkState(login != null);
+			
+			return new ExcludedUser(id, login);
 		}
 	}
 	
-	private final UUID id;
+	private final UserExtId id;
+	private final String login;
 	
-	private ExcludedUser(UUID id) {
+	private ExcludedUser(UserExtId id, String login) {
 		this.id = id;
+		this.login = login;
 	}
 	
-	public UUID getId() {
+	public UserExtId getId() {
 		return id;
 	}
 	
-	public String serialize() {
-		return id.toString();
+	public String getLogin() {
+		return login;
+	}
+	
+	public String serializeId() {
+		return id.getExtId();
 	}
 
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(id);
+		return Objects.hashCode(id, login);
 	}
 	
 	@Override
 	public boolean equals(Object object){
 		if (object instanceof ExcludedUser) {
 			ExcludedUser that = (ExcludedUser) object;
-			return Objects.equal(this.id, that.id);
+			return Objects.equal(this.id, that.id)
+				&& Objects.equal(this.login, that.login);
 		}
 		return false;
 	}
@@ -95,6 +108,7 @@ public class ExcludedUser {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("id", id)
+			.add("login", login)
 			.toString();
 	}
 }

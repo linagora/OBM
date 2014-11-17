@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
 
+import org.assertj.core.data.MapEntry;
 import org.joda.time.LocalTime;
 import org.junit.Test;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
@@ -53,6 +54,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.UserExtId;
 
 
 public class DomainConfigurationDtoTest {
@@ -73,7 +75,10 @@ public class DomainConfigurationDtoTest {
 							.time(LocalTime.parse("13:23"))
 							.build())
 					.excludedFolder("excluded")
-					.excludedUsers(ImmutableList.of(ExcludedUser.from("08607f19-05a4-42a2-9b02-6f11f3ceff3b")))
+					.excludedUsers(ImmutableList.of(ExcludedUser.builder()
+								.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+								.login("user")
+								.build()))
 					.mailing(Mailing.from(ImmutableList.of(EmailAddress.loginAtDomain("usera@mydomain.org"), EmailAddress.loginAtDomain("userb@mydomain.org"))))
 					.build();
 		DomainConfigurationDto dto = DomainConfigurationDto.from(configuration);
@@ -86,7 +91,7 @@ public class DomainConfigurationDtoTest {
 		assertThat(dto.hour).isEqualTo(13);
 		assertThat(dto.minute).isEqualTo(23);
 		assertThat(dto.excludedFolder).isEqualTo("excluded");
-		assertThat(dto.excludedUserIds).containsOnly("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
+		assertThat(dto.excludedUserIdToLoginMap).containsExactly(MapEntry.entry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "user"));
 		assertThat(dto.mailingEmails).containsOnly("usera@mydomain.org", "userb@mydomain.org");
 	}
 	
