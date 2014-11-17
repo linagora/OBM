@@ -43,6 +43,8 @@ import org.joda.time.DateTimeZone;
 import org.junit.rules.TemporaryFolder;
 import org.obm.Configuration;
 import org.obm.StaticConfigurationService;
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseFlavour;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.domain.dao.DomainDao;
@@ -133,6 +135,9 @@ public class TestImapArchiveModules {
 
 						Multibinder<ArchiveSchedulerBus.Client> busClients = Multibinder.newSetBinder(binder(), ArchiveSchedulerBus.Client.class);
 						busClients.addBinding().to(FutureSchedulerBusClient.class);
+						
+						Multibinder<DatabaseFlavour> supportedDatabases = Multibinder.newSetBinder(binder(), DatabaseFlavour.class);
+						supportedDatabases.addBinding().toInstance(DatabaseFlavour.H2);
 					}
 				}
 			));
@@ -146,6 +151,28 @@ public class TestImapArchiveModules {
 					bind(LoggerFileNameService.class).toInstance(new TemporaryLoggerFileNameService(temporaryFolder));
 				}
 			};
+		}
+	}
+	
+	public static class Mysql extends AbstractModule {
+
+		private ClientDriverRule obmSyncHttpMock;
+		private Provider<TemporaryFolder> temporaryFolder;
+
+		public Mysql(ClientDriverRule obmSyncHttpMock, Provider<TemporaryFolder> temporaryFolder) {
+			this.obmSyncHttpMock = obmSyncHttpMock;
+			this.temporaryFolder = temporaryFolder;
+		}
+		
+		@Override
+		protected void configure() {
+			install(Modules.override(new Simple(obmSyncHttpMock, temporaryFolder)).with(new AbstractModule() {
+				
+				@Override
+				protected void configure() {
+					bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureMySQL.class);
+				}
+			}));
 		}
 	}
 	

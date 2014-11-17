@@ -51,7 +51,6 @@ import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.imap.archive.services.DomainClient;
-import org.obm.provisioning.dao.exceptions.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,9 +61,9 @@ import com.linagora.scheduling.ScheduledTask;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
-public class RestoreTasksOnStartupHandlerTest {
+public class RestoreTasksOnStartupServiceTest {
 
-	Logger logger = LoggerFactory.getLogger(RestoreTasksOnStartupHandlerTest.class);
+	Logger logger = LoggerFactory.getLogger(RestoreTasksOnStartupServiceTest.class);
 	
 	ObmDomainUuid domainUuid;
 	IMocksControl control;
@@ -74,7 +73,7 @@ public class RestoreTasksOnStartupHandlerTest {
 	ArchiveDomainTaskFactory taskFactory;
 	DomainClient domainClient;
 	ObmDomain domain;
-	RestoreTasksOnStartupHandler testee;
+	RestoreTasksOnStartupService testee;
 	
 	@Before
 	public void setUp() {
@@ -86,21 +85,21 @@ public class RestoreTasksOnStartupHandlerTest {
 		taskFactory = control.createMock(ArchiveDomainTaskFactory.class);
 		domainConfigurationDao = control.createMock(DomainConfigurationDao.class);
 		domainClient = control.createMock(DomainClient.class);
-		testee = new RestoreTasksOnStartupHandler(logger, scheduler, archiveTreatmentDao, domainConfigurationDao, taskFactory, domainClient);
+		testee = new RestoreTasksOnStartupService(logger, scheduler, archiveTreatmentDao, domainConfigurationDao, taskFactory, domainClient);
 	}
 
 	@Test
-	public void startingShouldDoNothingIfNoEntry() throws DaoException {
+	public void startingShouldDoNothingIfNoEntry() throws Exception {
 		expect(archiveTreatmentDao.findAllScheduledOrRunning())
 			.andReturn(ImmutableList.<ArchiveTreatment>of());
 		
 		control.replay();
-		testee.starting();
+		testee.restoreScheduledTasks();
 		control.verify();
 	}
 	
 	@Test
-	public void startingShouldReScheduleWhenScheduledEntry() throws DaoException {
+	public void startingShouldReScheduleWhenScheduledEntry() throws Exception {
 		DateTime when = DateTime.parse("2014-12-2T11:35Z");
 		DateTime higherBoundary = DateTime.parse("2014-12-1T01:01Z");
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("aee2d1ab-b237-4077-a61b-a85e3cb67742");
@@ -126,7 +125,7 @@ public class RestoreTasksOnStartupHandlerTest {
 		expect(scheduler.schedule(archiveTask)).andReturn(task);
 		
 		control.replay();
-		testee.starting();
+		testee.restoreScheduledTasks();
 		control.verify();
 	}
 	
@@ -147,12 +146,12 @@ public class RestoreTasksOnStartupHandlerTest {
 		archiveTreatmentDao.update(runningTreatment.asError(ArchiveTreatment.FAILED_AT_UNKOWN_DATE));
 		
 		control.replay();
-		testee.starting();
+		testee.restoreScheduledTasks();
 		control.verify();
 	}
 	
 	@Test
-	public void startingShouldNotBeBrokenWhenOtherStatus() throws DaoException {
+	public void startingShouldNotBeBrokenWhenOtherStatus() throws Exception {
 		expect(archiveTreatmentDao.findAllScheduledOrRunning()).andReturn(ImmutableList.<ArchiveTreatment>of(
 			ArchiveTerminatedTreatment
 				.forDomain(domainUuid)
@@ -167,7 +166,7 @@ public class RestoreTasksOnStartupHandlerTest {
 			));
 		
 		control.replay();
-		testee.starting();
+		testee.restoreScheduledTasks();
 		control.verify();
 	}
 }

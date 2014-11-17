@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.startup;
 
-import jersey.repackaged.com.google.common.base.Throwables;
-
 import org.obm.ElementNotFoundException;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
@@ -40,11 +38,10 @@ import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
-import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
+import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.imap.archive.services.DomainClient;
 import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.server.LifeCycleHandler;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -56,7 +53,7 @@ import com.google.inject.name.Named;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 @Singleton
-public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
+public class RestoreTasksOnStartupService {
 	
 	private final Logger logger;
 	private final ArchiveScheduler scheduler;
@@ -66,7 +63,7 @@ public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 	private final DomainClient domainClient;
 
 	@Inject
-	@VisibleForTesting RestoreTasksOnStartupHandler(
+	@VisibleForTesting RestoreTasksOnStartupService(
 			@Named(LoggerModule.TASK) Logger logger,
 			ArchiveScheduler scheduler,
 			ArchiveTreatmentDao archiveTreatmentDao,
@@ -82,16 +79,7 @@ public class RestoreTasksOnStartupHandler implements LifeCycleHandler {
 	}
 	
 	@Transactional
-	@Override
-	public void starting() {
-		try {
-			restoreScheduledTasks();
-		} catch (Exception e) {
-			Throwables.propagate(e);
-		}
-	}
-	
-	private void restoreScheduledTasks() throws DaoException, ElementNotFoundException {
+	public void restoreScheduledTasks() throws DaoException, ElementNotFoundException {
 		for (ArchiveTreatment treatment: archiveTreatmentDao.findAllScheduledOrRunning()) {
 			switch (treatment.getArchiveStatus()) {
 			case SCHEDULED:

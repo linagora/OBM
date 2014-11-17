@@ -107,6 +107,11 @@ public class JettyServerFactory {
 			}
 			
 			@Override
+			public boolean isStarted() {
+				return jetty.isStarted();
+			}
+			
+			@Override
 			public void join() throws Exception {
 				jetty.join();
 			}

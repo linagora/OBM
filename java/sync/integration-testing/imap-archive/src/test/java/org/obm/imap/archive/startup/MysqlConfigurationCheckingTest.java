@@ -29,18 +29,53 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.server;
+package org.obm.imap.archive.startup;
 
-public interface WebServer {
-	
-	void start() throws Exception;
-	
-	boolean isStarted();
-	
-	void stop() throws Exception;
+import static org.assertj.core.api.Assertions.assertThat;
 
-	void join() throws Exception;
+import org.easymock.IMocksControl;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
+import org.obm.guice.GuiceRule;
+import org.obm.imap.archive.TestImapArchiveModules;
+import org.obm.imap.archive.exception.UnsupportedDatabaseFlavourException;
+import org.obm.server.WebServer;
+
+import com.github.restdriver.clientdriver.ClientDriverRule;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+
+public class MysqlConfigurationCheckingTest {
+
+	private ClientDriverRule driver = new ClientDriverRule();
+
+	@Rule public TestRule chain = RuleChain
+			.outerRule(driver)
+			.around(new TemporaryFolder())
+			.around(new GuiceRule(this, new TestImapArchiveModules.Mysql(driver, new Provider<TemporaryFolder>() {
+
+				@Override
+				public TemporaryFolder get() {
+					return temporaryFolder;
+				}
+				
+			})));
 	
-	int getHttpPort();
-	
+	private @Inject TemporaryFolder temporaryFolder;
+	private @Inject WebServer server;
+	private @Inject IMocksControl control;
+
+	@Test(expected=UnsupportedDatabaseFlavourException.class)
+	public void startingShouldFailWhenMysql() throws Exception {
+		try {
+			control.replay();
+			server.start();
+		} finally {
+			assertThat(server.isStarted()).isFalse();
+			control.verify();
+		}
+	}
 }

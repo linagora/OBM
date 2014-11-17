@@ -29,18 +29,64 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.server;
+package org.obm.imap.archive.startup;
 
-public interface WebServer {
-	
-	void start() throws Exception;
-	
-	boolean isStarted();
-	
-	void stop() throws Exception;
+import static org.assertj.core.api.Assertions.assertThat;
 
-	void join() throws Exception;
+import org.easymock.IMocksControl;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
+import org.obm.dao.utils.H2InMemoryDatabase;
+import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.guice.GuiceRule;
+import org.obm.imap.archive.TestImapArchiveModules;
+import org.obm.server.WebServer;
+
+import com.github.restdriver.clientdriver.ClientDriverRule;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+
+public class H2ConfigurationCheckingTest {
+
+	private ClientDriverRule driver = new ClientDriverRule();
+
+	@Rule public TestRule chain = RuleChain
+			.outerRule(driver)
+			.around(new TemporaryFolder())
+			.around(new GuiceRule(this, new TestImapArchiveModules.Simple(driver, new Provider<TemporaryFolder>() {
+
+				@Override
+				public TemporaryFolder get() {
+					return temporaryFolder;
+				}
+				
+			})))
+			.around(new H2InMemoryDatabaseTestRule(new Provider<H2InMemoryDatabase>() {
+				@Override
+				public H2InMemoryDatabase get() {
+					return db;
+				}
+			}, "sql/initial.sql"));
 	
-	int getHttpPort();
+	private @Inject TemporaryFolder temporaryFolder;
+	private @Inject H2InMemoryDatabase db;
+	private @Inject WebServer server;
+	private @Inject IMocksControl control;
+
+	@After
+	public void tearDown() throws Exception {
+		server.stop();
+	}
 	
+	@Test
+	public void startingShouldWorkWhenH2() throws Exception {
+		control.replay();
+		server.start();
+		assertThat(server.isStarted()).isTrue();
+		control.verify();
+	}
 }

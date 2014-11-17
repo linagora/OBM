@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2014 Linagora
+ * Copyright (C) 2011-2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,18 +29,62 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.server;
 
-public interface WebServer {
-	
-	void start() throws Exception;
-	
-	boolean isStarted();
-	
-	void stop() throws Exception;
+package org.obm.imap.archive;
 
-	void join() throws Exception;
-	
-	int getHttpPort();
-	
+import org.obm.configuration.DatabaseConfiguration;
+import org.obm.configuration.DatabaseFlavour;
+
+public class DatabaseConfigurationFixtureMySQL implements DatabaseConfiguration {
+
+
+	@Override
+	public Integer getDatabaseMaxConnectionPoolSize() {
+		return 10;
+	}
+
+	@Override
+	public DatabaseFlavour getDatabaseSystem() {
+		return DatabaseFlavour.MYSQL;
+	}
+
+	@Override
+	public String getDatabaseName() {
+		return "obm";
+	}
+
+	@Override
+	public String getDatabaseHost() {
+		return "localhost.localdomain";
+	}
+
+	@Override
+	public String getDatabaseLogin() {
+		return "obm";
+	}
+
+	@Override
+	public String getDatabasePassword() {
+		return "obm";
+	}
+
+    @Override
+    public boolean isPostgresSSLEnabled() {
+        return true;
+    }
+
+    @Override
+    public boolean isPostgresSSLNonValidating() {
+        return true;
+    }
+    
+    @Override
+    public String getJdbcOptions() {
+    	return NO_JDBC_OPTION;
+    }
+    
+    @Override
+    public Integer getDatabaseMinConnectionPoolSize() {
+    	return null;
+    }
 }

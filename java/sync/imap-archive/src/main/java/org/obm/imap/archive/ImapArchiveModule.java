@@ -41,6 +41,7 @@ import org.apache.shiro.guice.web.GuiceShiroFilter;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.obm.annotations.transactional.TransactionalModule;
+import org.obm.configuration.DatabaseFlavour;
 import org.obm.cyrus.imap.CyrusClientModule;
 import org.obm.dbcp.DatabaseModule;
 import org.obm.domain.dao.UserSystemDao;
@@ -84,7 +85,7 @@ import org.obm.imap.archive.services.ScheduledArchivingTracker;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.imap.archive.services.StoreClientFactory;
 import org.obm.imap.archive.services.TestingDateProvider;
-import org.obm.imap.archive.startup.RestoreTasksOnStartupHandler;
+import org.obm.imap.archive.startup.ImapArchiveLifeCycleHandler;
 import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
@@ -118,7 +119,7 @@ public class ImapArchiveModule extends AbstractModule {
 	private final ServerConfiguration configuration;
 	private static final String APPLICATION_ORIGIN = "imap-archive";
 	public static final String TESTING_MODE = "testingMode";
-	public static final Class<RestoreTasksOnStartupHandler> STARTUP_HANDLER_CLASS = RestoreTasksOnStartupHandler.class;
+	public  static final Class<ImapArchiveLifeCycleHandler> STARTUP_HANDLER_CLASS = ImapArchiveLifeCycleHandler.class;
 	
 	public ImapArchiveModule(ServerConfiguration configuration) {
 		this.configuration = configuration;
@@ -181,6 +182,9 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(StoreClientFactory.class);
 		bind(DomainClient.class).to(DomainClientImpl.class);
 		bind(Mailer.class).to(MailerImpl.class);
+		
+		Multibinder<DatabaseFlavour> supportedDatabases = Multibinder.newSetBinder(binder(), DatabaseFlavour.class);
+		supportedDatabases.addBinding().toInstance(DatabaseFlavour.PGSQL);
 	}
 	
 	public static class ImapArchiveServletModule extends ServletModule {
