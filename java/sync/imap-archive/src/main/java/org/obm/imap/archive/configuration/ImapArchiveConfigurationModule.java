@@ -50,6 +50,8 @@ public class ImapArchiveConfigurationModule extends AbstractModule {
 		final GlobalAppConfiguration<ConfigurationService> globalConfiguration = buildConfiguration();
 		bind(ConfigurationService.class).toInstance(globalConfiguration.getConfiguration());
 		install(new ConfigurationModule<ConfigurationService> (globalConfiguration, ConfigurationService.class));
+		
+		bind(ImapArchiveConfigurationService.class).toInstance(new ImapArchiveConfigurationServiceImpl.Factory().create());
 	}
 
 	private GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
