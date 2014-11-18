@@ -54,6 +54,7 @@ public class TemporaryMailbox extends MailboxImpl implements CreatableMailbox {
 		
 		private Mailbox mailbox;
 		private DomainName domainName;
+		private String cyrusPartitionSuffix;
 		
 		public Builder from(Mailbox mailbox) {
 			Preconditions.checkNotNull(mailbox);
@@ -67,14 +68,21 @@ public class TemporaryMailbox extends MailboxImpl implements CreatableMailbox {
 			return this;
 		}
 		
+		public Builder cyrusPartitionSuffix(String cyrusPartitionSuffix) {
+			Preconditions.checkNotNull(cyrusPartitionSuffix);
+			this.cyrusPartitionSuffix = cyrusPartitionSuffix;
+			return this;
+		}
+		
 		public TemporaryMailbox build() throws MailboxFormatException {
 			Preconditions.checkState(mailbox != null);
 			Preconditions.checkState(domainName != null);
+			Preconditions.checkState(cyrusPartitionSuffix != null);
 			MailboxPaths mailboxPaths = temporaryMailbox(mailbox.getName());
 			return new TemporaryMailbox( 
 					mailboxPaths.getName(), 
 					mailboxPaths.getUserAtDomain(),
-					ArchivePartitionName.from(domainName),
+					ArchivePartitionName.from(domainName, cyrusPartitionSuffix),
 					mailbox.getLogger(), 
 					mailbox.getStoreClient());
 		}

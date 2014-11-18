@@ -36,6 +36,7 @@ import javax.inject.Singleton;
 
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ProcessedFolder;
+import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.dao.UserDao;
@@ -63,10 +64,11 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 			StoreClientFactory storeClientFactory,
 			ArchiveTreatmentDao archiveTreatmentDao,
 			ProcessedFolderDao processedFolderDao,
-			UserDao userDao) {
+			UserDao userDao,
+			ImapArchiveConfigurationService imapArchiveConfigurationService) {
 		
 		super(dateTimeProvider, schedulingDatesService, storeClientFactory,
-				archiveTreatmentDao, processedFolderDao, userDao);
+				archiveTreatmentDao, processedFolderDao, userDao, imapArchiveConfigurationService);
 	}
 	
 	@Override

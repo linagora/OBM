@@ -44,7 +44,7 @@ public class ArchivePartitionNameTest {
 	public void archivePartitionNameShouldWorkWhenOneLevel() {
 		String expectedArchivePartitionName = "mydomain_archive";
 		
-		String archivePartitionName = ArchivePartitionName.from(new DomainName("mydomain"));
+		String archivePartitionName = ArchivePartitionName.from(new DomainName("mydomain"), "archive");
 		assertThat(archivePartitionName).isEqualTo(expectedArchivePartitionName);
 	}
 	
@@ -52,7 +52,7 @@ public class ArchivePartitionNameTest {
 	public void archivePartitionNameShouldWorkWhenTwoLevels() {
 		String expectedArchivePartitionName = "mydomain_org_archive";
 		
-		String archivePartitionName = ArchivePartitionName.from(new DomainName("mydomain.org"));
+		String archivePartitionName = ArchivePartitionName.from(new DomainName("mydomain.org"), "archive");
 		assertThat(archivePartitionName).isEqualTo(expectedArchivePartitionName);
 	}
 	
@@ -60,7 +60,7 @@ public class ArchivePartitionNameTest {
 	public void archivePartitionNameShouldWorkWhenThreeLevels() {
 		String expectedArchivePartitionName = "mydomain_imap_org_archive";
 		
-		String archivePartitionName = ArchivePartitionName.from(new DomainName("mydomain.imap.org"));
+		String archivePartitionName = ArchivePartitionName.from(new DomainName("mydomain.imap.org"), "archive");
 		assertThat(archivePartitionName).isEqualTo(expectedArchivePartitionName);
 	}
 }

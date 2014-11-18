@@ -41,7 +41,7 @@ public class ArchivePartitionName {
 	private ArchivePartitionName() {
 	}
 	
-	public static String from(DomainName domainName) {
-		return domainName.get().replace('.', '_').concat(ARCHIVE_PARTITION_SUFFIX);
+	public static String from(DomainName domainName, String cyrusPartitionSuffix) {
+		return domainName.get().replace('.', '_').concat("_").concat(cyrusPartitionSuffix);
 	}
 }

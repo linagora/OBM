@@ -187,6 +187,7 @@ public class MailboxImplTest {
 		MessageSet messageSet = mailbox.uidCopy(expectedMessageSet, TemporaryMailbox.builder()
 				.from(mailbox)
 				.domainName(new DomainName("mydomain.org"))
+				.cyrusPartitionSuffix("archive")
 				.build());
 		control.verify();
 		
@@ -205,6 +206,7 @@ public class MailboxImplTest {
 			mailbox.uidCopy(expectedMessageSet, TemporaryMailbox.builder()
 					.from(mailbox)
 					.domainName(new DomainName("mydomain.org"))
+					.cyrusPartitionSuffix("archive")
 					.build());
 		} finally {
 			control.verify();

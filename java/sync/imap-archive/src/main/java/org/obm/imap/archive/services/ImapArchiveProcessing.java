@@ -49,6 +49,7 @@ import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.Year;
+import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.dao.UserDao;
@@ -95,7 +96,6 @@ public class ImapArchiveProcessing {
 	
 	@VisibleForTesting static final String GLOBAL_VIRT = "global.virt";
 	@VisibleForTesting static final long DEFAULT_LAST_UID = -1l;
-	private static final int MOVE_PARTITION_SIZE = 20;
 
 	private final DateTimeProvider dateTimeProvider;
 	private final SchedulingDatesService schedulingDatesService;
@@ -103,6 +103,7 @@ public class ImapArchiveProcessing {
 	private final ArchiveTreatmentDao archiveTreatmentDao;
 	private final ProcessedFolderDao processedFolderDao;
 	private final UserDao userDao;
+	private final ImapArchiveConfigurationService imapArchiveConfigurationService;
 
 	
 	@Inject
@@ -111,7 +112,8 @@ public class ImapArchiveProcessing {
 			StoreClientFactory storeClientFactory,
 			ArchiveTreatmentDao archiveTreatmentDao,
 			ProcessedFolderDao processedFolderDao,
-			UserDao userDao) {
+			UserDao userDao,
+			ImapArchiveConfigurationService imapArchiveConfigurationService) {
 		
 		this.dateTimeProvider = dateTimeProvider;
 		this.schedulingDatesService = schedulingDatesService;
@@ -119,6 +121,7 @@ public class ImapArchiveProcessing {
 		this.archiveTreatmentDao = archiveTreatmentDao;
 		this.processedFolderDao = processedFolderDao;
 		this.userDao = userDao;
+		this.imapArchiveConfigurationService = imapArchiveConfigurationService;
 	}
 	
 	public void archive(ArchiveConfiguration configuration) {
@@ -217,6 +220,8 @@ public class ImapArchiveProcessing {
 						.from(mailbox) 
 						.year(Year.from(processedTask.getBoundaries().getHigherBoundary().year().get()))
 						.domainName(domainName)
+						.archiveMainFolder(imapArchiveConfigurationService.getArchiveMainFolder())
+						.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 						.build();
 				createFolder(archiveMailbox, logger);
 				
@@ -238,6 +243,7 @@ public class ImapArchiveProcessing {
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
 				.from(mailbox)
 				.domainName(domainName)
+				.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 				.build();
 		try {
 			copyToTemporary(mailbox, temporaryMailbox, logger, messageSet);
@@ -258,7 +264,7 @@ public class ImapArchiveProcessing {
 	}
 
 	private void batchCopyFromTemporaryToArchive(TemporaryMailbox temporaryMailbox, ArchiveMailbox archiveMailbox, MessageSet messageSet, ProcessedFolder.Builder processedFolder) throws MailboxNotFoundException {
-		for (List<Long> partition : messageSet.partition(MOVE_PARTITION_SIZE)) {
+		for (List<Long> partition : messageSet.partition(imapArchiveConfigurationService.getProcessingBatchSize())) {
 			MessageSet partitionMessageSet = MessageSet.builder().addAll(partition).build();
 			
 			temporaryMailbox.uidCopy(partitionMessageSet, archiveMailbox);
@@ -353,7 +359,7 @@ public class ImapArchiveProcessing {
 			public boolean apply(ListInfo listInfo) {
 				try {
 					MailboxPaths mailboxPaths = MailboxPaths.from(listInfo.getName());
-					if (!mailboxPaths.getSubPaths().startsWith(ArchiveMailbox.ARCHIVE_MAIN_FOLDER + MailboxPaths.IMAP_FOLDER_SEPARATOR)) {
+					if (!mailboxPaths.getSubPaths().startsWith(imapArchiveConfigurationService.getArchiveMainFolder() + MailboxPaths.IMAP_FOLDER_SEPARATOR)) {
 						return true;
 					}
 				} catch (MailboxFormatException e) {

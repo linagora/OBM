@@ -56,6 +56,7 @@ import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
+import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.dao.UserDao;
@@ -91,6 +92,7 @@ public class DryRunImapArchiveProcessingTest {
 	private ArchiveTreatmentDao archiveTreatmentDao;
 	private ProcessedFolderDao processedFolderDao;
 	private UserDao userDao;
+	private ImapArchiveConfigurationService imapArchiveConfigurationService;
 	private Logger logger;
 	private LoggerAppenders loggerAppenders;
 	
@@ -105,11 +107,16 @@ public class DryRunImapArchiveProcessingTest {
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		processedFolderDao = control.createMock(ProcessedFolderDao.class);
 		userDao = control.createMock(UserDao.class);
+		imapArchiveConfigurationService = control.createMock(ImapArchiveConfigurationService.class);
+		expect(imapArchiveConfigurationService.getArchiveMainFolder())
+			.andReturn("ARCHIVE").anyTimes();
+		expect(imapArchiveConfigurationService.getCyrusPartitionSuffix())
+			.andReturn("archive").anyTimes();
 		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
 		loggerAppenders = control.createMock(LoggerAppenders.class);
 		
 		imapArchiveProcessing = new DryRunImapArchiveProcessing(dateTimeProvider, 
-				schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao, userDao);
+				schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao, userDao, imapArchiveConfigurationService);
 	}
 	
 	@Test

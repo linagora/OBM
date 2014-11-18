@@ -68,6 +68,11 @@ public class TemporaryMailboxTest {
 		TemporaryMailbox.builder().domainName(null);
 	}
 	
+	@Test(expected=NullPointerException.class)
+	public void cyrusPartitionSuffixShouldNotBeNull() {
+		TemporaryMailbox.builder().cyrusPartitionSuffix(null);
+	}
+	
 	@Test(expected=IllegalStateException.class)
 	public void mailboxShouldBeProvided() throws Exception {
 		TemporaryMailbox.builder().build();
@@ -85,6 +90,21 @@ public class TemporaryMailboxTest {
 		}
 	}
 	
+	@Test(expected=IllegalStateException.class)
+	public void cyrusPartitionSuffixShouldBeProvided() throws Exception {
+		Mailbox mailbox = control.createMock(Mailbox.class);
+		
+		try {
+			control.replay();
+			TemporaryMailbox.builder()
+				.from(mailbox)
+				.domainName(new DomainName("mydomain.org"))
+				.build();
+		} finally {
+			control.verify();
+		}
+	}
+	
 	@Test
 	public void shouldBuildWhenEveryThingProvided() throws Exception {
 		Logger logger = control.createMock(Logger.class);
@@ -94,6 +114,7 @@ public class TemporaryMailboxTest {
 		TemporaryMailbox.builder()
 			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
 			.domainName(new DomainName("mydomain.org"))
+			.cyrusPartitionSuffix("archive")
 			.build();
 		control.verify();
 	}
@@ -143,6 +164,7 @@ public class TemporaryMailboxTest {
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
 			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
 			.domainName(new DomainName("mydomain.org"))
+			.cyrusPartitionSuffix("archive")
 			.build();
 		temporaryMailbox.delete();
 		control.verify();
@@ -161,6 +183,7 @@ public class TemporaryMailboxTest {
 			TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
 					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
 					.domainName(new DomainName("mydomain.org"))
+					.cyrusPartitionSuffix("archive")
 					.build();
 			temporaryMailbox.delete();
 		} finally {
@@ -182,6 +205,7 @@ public class TemporaryMailboxTest {
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
 				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
 				.domainName(new DomainName("mydomain.org"))
+				.cyrusPartitionSuffix("archive")
 				.build();
 		temporaryMailbox.create();
 		control.verify();
@@ -200,6 +224,7 @@ public class TemporaryMailboxTest {
 			TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
 					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
 					.domainName(new DomainName("mydomain.org"))
+					.cyrusPartitionSuffix("archive")
 					.build();
 			temporaryMailbox.create();
 		} finally {

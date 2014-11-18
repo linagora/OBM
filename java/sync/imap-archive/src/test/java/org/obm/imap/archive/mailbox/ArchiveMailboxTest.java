@@ -79,6 +79,16 @@ public class ArchiveMailboxTest {
 		ArchiveMailbox.builder().domainName(null);
 	}
 	
+	@Test(expected=NullPointerException.class)
+	public void archiveMainFolderShouldNotBeNull() {
+		ArchiveMailbox.builder().archiveMainFolder(null);
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void cyrusPartitionSuffixShouldNotBeNull() {
+		ArchiveMailbox.builder().cyrusPartitionSuffix(null);
+	}
+	
 	@Test(expected=IllegalStateException.class)
 	public void mailboxShouldBeProvided() throws Exception {
 		ArchiveMailbox.builder().build();
@@ -108,6 +118,39 @@ public class ArchiveMailboxTest {
 		}
 	}
 	
+	@Test(expected=IllegalStateException.class)
+	public void archiveMainFolderShouldBeProvided() throws Exception {
+		Mailbox mailbox = control.createMock(Mailbox.class);
+		
+		try {
+			control.replay();
+			ArchiveMailbox.builder()
+				.from(mailbox)
+				.year(Year.from(2015))
+				.domainName(new DomainName("mydomain.org"))
+				.build();
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void cyrusPartitionSuffixShouldBeProvided() throws Exception {
+		Mailbox mailbox = control.createMock(Mailbox.class);
+		
+		try {
+			control.replay();
+			ArchiveMailbox.builder()
+				.from(mailbox)
+				.year(Year.from(2015))
+				.domainName(new DomainName("mydomain.org"))
+				.archiveMainFolder("ARCHIVE")
+				.build();
+		} finally {
+			control.verify();
+		}
+	}
+	
 	@Test
 	public void shouldBuildWhenEveryThingProvided() throws Exception {
 		Logger logger = control.createMock(Logger.class);
@@ -118,6 +161,8 @@ public class ArchiveMailboxTest {
 			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
 			.year(Year.from(2015))
 			.domainName(new DomainName("mydomain.org"))
+			.archiveMainFolder("ARCHIVE")
+			.cyrusPartitionSuffix("archive")
 			.build();
 		control.verify();
 	}
@@ -126,7 +171,7 @@ public class ArchiveMailboxTest {
 	public void archiveMailboxShouldWorkWhenMailboxIsINBOX() throws Exception {
 		String mailbox = "user/usera@mydomain.org";
 		
-		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014));
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014), "ARCHIVE");
 		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/INBOX@mydomain.org");
 	}
 	
@@ -134,7 +179,7 @@ public class ArchiveMailboxTest {
 	public void archiveMailboxShouldWorkWhenMailboxIsAFolder() throws Exception {
 		String mailbox = "user/usera/Test@mydomain.org";
 		
-		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014));
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014), "ARCHIVE");
 		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/Test@mydomain.org");
 	}
 	
@@ -142,7 +187,7 @@ public class ArchiveMailboxTest {
 	public void archiveMailboxShouldWorkWhenMailboxIsASubFolder() throws Exception {
 		String mailbox = "user/usera/Test/subfolder@mydomain.org";
 		
-		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014));
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014), "ARCHIVE");
 		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/Test/subfolder@mydomain.org");
 	}
 
@@ -150,7 +195,7 @@ public class ArchiveMailboxTest {
 	public void archiveMailboxShouldThrowWhenBadMailbox() throws Exception {
 		String mailbox = "user";
 		
-		ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014));
+		ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014), "ARCHIVE");
 	}
 	
 	@Test
@@ -163,6 +208,8 @@ public class ArchiveMailboxTest {
 			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
 			.year(Year.from(2015))
 			.domainName(new DomainName("mydomain.org"))
+			.archiveMainFolder("ARCHIVE")
+			.cyrusPartitionSuffix("archive")
 			.build();
 		control.verify();
 		
@@ -185,6 +232,8 @@ public class ArchiveMailboxTest {
 				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
 				.year(Year.from(2015))
 				.domainName(new DomainName("mydomain.org"))
+				.archiveMainFolder("ARCHIVE")
+				.cyrusPartitionSuffix("archive")
 				.build();
 		archiveMailbox.create();
 		control.verify();
@@ -204,6 +253,8 @@ public class ArchiveMailboxTest {
 					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
 					.year(Year.from(2015))
 					.domainName(new DomainName("mydomain.org"))
+					.archiveMainFolder("ARCHIVE")
+					.cyrusPartitionSuffix("archive")
 					.build();
 			archiveMailbox.create();
 		} finally {
@@ -227,6 +278,8 @@ public class ArchiveMailboxTest {
 				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
 				.year(Year.from(2015))
 				.domainName(new DomainName("mydomain.org"))
+				.archiveMainFolder("ARCHIVE")
+				.cyrusPartitionSuffix("archive")
 				.build();
 		archiveMailbox.uidStoreSeen(messageSet);
 		control.verify();
@@ -247,6 +300,8 @@ public class ArchiveMailboxTest {
 					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
 					.year(Year.from(2015))
 					.domainName(new DomainName("mydomain.org"))
+					.archiveMainFolder("ARCHIVE")
+					.cyrusPartitionSuffix("archive")
 					.build();
 			archiveMailbox.uidStoreSeen(messageSet);
 		} finally {

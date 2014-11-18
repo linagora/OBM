@@ -65,12 +65,13 @@ import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
+import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
+import org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.dao.UserDao;
 import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.logging.LoggerAppenders;
-import org.obm.imap.archive.mailbox.ArchiveMailbox;
 import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.imap.archive.services.ImapArchiveProcessing.ProcessedTask;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -114,6 +115,7 @@ public class ImapArchiveProcessingTest {
 	private ArchiveTreatmentDao archiveTreatmentDao;
 	private ProcessedFolderDao processedFolderDao;
 	private UserDao userDao;
+	private ImapArchiveConfigurationService imapArchiveConfigurationService;
 	private Logger logger;
 	private LoggerAppenders loggerAppenders;
 	
@@ -128,11 +130,18 @@ public class ImapArchiveProcessingTest {
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		processedFolderDao = control.createMock(ProcessedFolderDao.class);
 		userDao = control.createMock(UserDao.class);
+		imapArchiveConfigurationService = control.createMock(ImapArchiveConfigurationService.class);
+		expect(imapArchiveConfigurationService.getArchiveMainFolder())
+			.andReturn("ARCHIVE").anyTimes();
+		expect(imapArchiveConfigurationService.getCyrusPartitionSuffix())
+			.andReturn("archive").anyTimes();
+		expect(imapArchiveConfigurationService.getProcessingBatchSize())
+			.andReturn(20).anyTimes();
 		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
 		loggerAppenders = control.createMock(LoggerAppenders.class);
 		
 		imapArchiveProcessing = new ImapArchiveProcessing(dateTimeProvider, 
-				schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao, userDao);
+				schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao, userDao, imapArchiveConfigurationService);
 	}
 	
 	@Test
@@ -1127,8 +1136,8 @@ public class ImapArchiveProcessingTest {
 				new ListInfo("user/usera/Excluded/subfolder@mydomain.org", true, false));
 		ListResult listResult = new ListResult(6);
 		listResult.addAll(expectedListInfos);
-		listResult.add(new ListInfo("user/usera/" + ArchiveMailbox.ARCHIVE_MAIN_FOLDER + "/Excluded@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/usera/" + ArchiveMailbox.ARCHIVE_MAIN_FOLDER + "/Excluded/subfolder@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded/subfolder@mydomain.org", true, false));
 		
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);

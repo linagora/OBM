@@ -50,8 +50,6 @@ import com.google.common.collect.ImmutableSet;
 
 public class ArchiveMailbox extends MailboxImpl implements CreatableMailbox {
 
-	public static final String ARCHIVE_MAIN_FOLDER = "ARCHIVE";
-	
 	public static Builder builder() {
 		return new Builder();
 	}
@@ -61,6 +59,8 @@ public class ArchiveMailbox extends MailboxImpl implements CreatableMailbox {
 		private Mailbox mailbox;
 		private Year year;
 		private DomainName domainName;
+		private String archiveMainFolder;
+		private String cyrusPartitionSuffix;
 		
 		public Builder from(Mailbox mailbox) {
 			Preconditions.checkNotNull(mailbox);
@@ -80,21 +80,35 @@ public class ArchiveMailbox extends MailboxImpl implements CreatableMailbox {
 			return this;
 		}
 		
+		public Builder archiveMainFolder(String archiveMainFolder) {
+			Preconditions.checkNotNull(archiveMainFolder);
+			this.archiveMainFolder = archiveMainFolder;
+			return this;
+		}
+		
+		public Builder cyrusPartitionSuffix(String cyrusPartitionSuffix) {
+			Preconditions.checkNotNull(cyrusPartitionSuffix);
+			this.cyrusPartitionSuffix = cyrusPartitionSuffix;
+			return this;
+		}
+		
 		public ArchiveMailbox build() throws MailboxFormatException {
 			Preconditions.checkState(mailbox != null);
 			Preconditions.checkState(year != null);
 			Preconditions.checkState(domainName != null);
-			MailboxPaths mailboxPaths = archiveMailbox(mailbox.getName(), year);
+			Preconditions.checkState(archiveMainFolder != null);
+			Preconditions.checkState(cyrusPartitionSuffix != null);
+			MailboxPaths mailboxPaths = archiveMailbox(mailbox.getName(), year, archiveMainFolder);
 			return new ArchiveMailbox( 
 					mailboxPaths.getName(), 
 					mailboxPaths.getUserAtDomain(),
-					ArchivePartitionName.from(domainName),
+					ArchivePartitionName.from(domainName, cyrusPartitionSuffix),
 					mailbox.getLogger(), 
 					mailbox.getStoreClient());
 		}
 		
-		@VisibleForTesting static MailboxPaths archiveMailbox(String mailbox, Year year) throws MailboxFormatException {
-			return MailboxPaths.from(mailbox).prepend(Joiner.on(MailboxPaths.IMAP_FOLDER_SEPARATOR).join(ARCHIVE_MAIN_FOLDER, year.serialize()));
+		@VisibleForTesting static MailboxPaths archiveMailbox(String mailbox, Year year, String archiveMainFolder) throws MailboxFormatException {
+			return MailboxPaths.from(mailbox).prepend(Joiner.on(MailboxPaths.IMAP_FOLDER_SEPARATOR).join(archiveMainFolder, year.serialize()));
 		}
 	}
 	
