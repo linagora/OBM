@@ -53,6 +53,10 @@ import com.google.common.base.Objects;
 public class IntegrationTestUtils {
 
 	public static Comparator<? super Event> ignoreDatabaseElementsComparator() {
+		return ignoreDatabaseElementsComparator(false);
+	}
+
+	public static Comparator<? super Event> ignoreDatabaseElementsComparator(final boolean ignoreExtId) {
 		return new Comparator<Event>() {
 	
 			@Override
@@ -60,7 +64,7 @@ public class IntegrationTestUtils {
 				boolean equalityIgnoringDatabaseElements = 
 					Objects.equal(one.getTitle(), two.getTitle())
 					&& Objects.equal(one.getDescription(), two.getDescription())
-					&& Objects.equal(one.getExtId(), two.getExtId())
+					&& (ignoreExtId || Objects.equal(one.getExtId(), two.getExtId()))
 					&& Objects.equal(one.getPrivacy(), two.getPrivacy())
 					&& Objects.equal(one.getMeetingStatus(), two.getMeetingStatus())
 					&& Objects.equal(one.getOwner(), two.getOwner())
