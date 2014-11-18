@@ -31,6 +31,7 @@ package org.obm.imap.archive.configuration;
 
 import org.obm.configuration.ConfigurationModule;
 import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
@@ -46,16 +47,16 @@ public class ImapArchiveConfigurationModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		final GlobalAppConfiguration<ImapArchiveConfigurationService> globalConfiguration = buildConfiguration();
-		bind(ImapArchiveConfigurationService.class).toInstance(globalConfiguration.getConfiguration());
-		install(new ConfigurationModule<ImapArchiveConfigurationService> (globalConfiguration, ImapArchiveConfigurationService.class));
+		final GlobalAppConfiguration<ConfigurationService> globalConfiguration = buildConfiguration();
+		bind(ConfigurationService.class).toInstance(globalConfiguration.getConfiguration());
+		install(new ConfigurationModule<ConfigurationService> (globalConfiguration, ConfigurationService.class));
 	}
 
-	private GlobalAppConfiguration<ImapArchiveConfigurationService> buildConfiguration() {
-		ImapArchiveConfigurationServiceImpl configurationService = new ImapArchiveConfigurationServiceImpl.Factory()
+	private GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
+		ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl.Factory()
 				.create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
 		return GlobalAppConfiguration
-				.<ImapArchiveConfigurationService> builder()
+				.<ConfigurationService> builder()
 				.mainConfiguration(configurationService)
 				.locatorConfiguration(
 						new LocatorConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
