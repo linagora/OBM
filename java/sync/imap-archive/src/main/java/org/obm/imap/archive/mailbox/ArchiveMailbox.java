@@ -48,45 +48,71 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
-public class ArchiveMailbox extends Mailbox {
+public class ArchiveMailbox extends MailboxImpl implements CreatableMailbox {
 
 	public static final String ARCHIVE_MAIN_FOLDER = "ARCHIVE";
-	private static final String ARCHIVE_PARTITION_SUFFIX = "_archive";
 	
-	public static ArchiveMailbox from(Mailbox mailbox, Year year, DomainName domainName) throws MailboxFormatException {
-		Preconditions.checkNotNull(mailbox);
-		Preconditions.checkNotNull(year);
-		Preconditions.checkNotNull(domainName);
-		MailboxPaths mailboxPaths = archiveMailbox(mailbox.name, year);
-		return new ArchiveMailbox( 
-				mailboxPaths.getName(), 
-				mailboxPaths.getUserAtDomain(),
-				archivePartitionName(domainName),
-				mailbox.logger, 
-				mailbox.storeClient);
+	public static Builder builder() {
+		return new Builder();
 	}
 	
-	@VisibleForTesting static MailboxPaths archiveMailbox(String mailbox, Year year) throws MailboxFormatException {
-		return MailboxPaths.from(mailbox).prepend(Joiner.on(MailboxPaths.IMAP_FOLDER_SEPARATOR).join(ARCHIVE_MAIN_FOLDER, year.serialize()));
-	}
-	
-	@VisibleForTesting static String archivePartitionName(DomainName domainName) {
-		return domainName.get().replace('.', '_').concat(ARCHIVE_PARTITION_SUFFIX);
+	public static class Builder {
+		
+		private Mailbox mailbox;
+		private Year year;
+		private DomainName domainName;
+		
+		public Builder from(Mailbox mailbox) {
+			Preconditions.checkNotNull(mailbox);
+			this.mailbox = mailbox;
+			return this;
+		}
+		
+		public Builder year(Year year) {
+			Preconditions.checkNotNull(year);
+			this.year = year;
+			return this;
+		}
+		
+		public Builder domainName(DomainName domainName) {
+			Preconditions.checkNotNull(domainName);
+			this.domainName = domainName;
+			return this;
+		}
+		
+		public ArchiveMailbox build() throws MailboxFormatException {
+			Preconditions.checkState(mailbox != null);
+			Preconditions.checkState(year != null);
+			Preconditions.checkState(domainName != null);
+			MailboxPaths mailboxPaths = archiveMailbox(mailbox.getName(), year);
+			return new ArchiveMailbox( 
+					mailboxPaths.getName(), 
+					mailboxPaths.getUserAtDomain(),
+					ArchivePartitionName.from(domainName),
+					mailbox.getLogger(), 
+					mailbox.getStoreClient());
+		}
+		
+		@VisibleForTesting static MailboxPaths archiveMailbox(String mailbox, Year year) throws MailboxFormatException {
+			return MailboxPaths.from(mailbox).prepend(Joiner.on(MailboxPaths.IMAP_FOLDER_SEPARATOR).join(ARCHIVE_MAIN_FOLDER, year.serialize()));
+		}
 	}
 	
 	private final String userAtDomain;
-	protected final String archivePartitionName;
+	private final String archivePartitionName;
 	
-	protected ArchiveMailbox(String name, String userAtDomain, String archivePartitionName, Logger logger, StoreClient storeClient) {
+	private ArchiveMailbox(String name, String userAtDomain, String archivePartitionName, Logger logger, StoreClient storeClient) {
 		super(name, logger, storeClient);
 		this.userAtDomain = userAtDomain;
 		this.archivePartitionName = archivePartitionName;
 	}
 
+	@Override
 	public String getUserAtDomain() {
 		return userAtDomain;
 	}
 	
+	@Override
 	public void create() throws ImapCreateException {
 		if (!storeClient.create(name, archivePartitionName)) {
 			throw new ImapCreateException(String.format("Wasn't able to create the archive mailbox %s", name)); 

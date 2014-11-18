@@ -32,29 +32,35 @@
 
 package org.obm.imap.archive.mailbox;
 
-import org.obm.imap.archive.exception.ImapSelectException;
-import org.obm.imap.archive.exception.ImapSetAclException;
-import org.obm.push.exception.MailboxNotFoundException;
-import org.obm.push.mail.bean.MessageSet;
-import org.obm.push.mail.bean.SearchQuery;
-import org.obm.push.minig.imap.StoreClient;
-import org.slf4j.Logger;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public interface Mailbox {
+import org.junit.Test;
+import org.obm.sync.base.DomainName;
 
-	String getName();
-	
-	Logger getLogger();
-	
-	StoreClient getStoreClient();
-	
-	void select() throws MailboxNotFoundException, ImapSelectException;
 
-	void grantReadRightsTo(String user) throws ImapSetAclException;
-
-	void grantAllRightsTo(String user) throws ImapSetAclException;
+public class ArchivePartitionNameTest {
 	
-	MessageSet uidSearch(SearchQuery searchQuery);
+	@Test
+	public void archivePartitionNameShouldWorkWhenOneLevel() {
+		String expectedArchivePartitionName = "mydomain_archive";
+		
+		String archivePartitionName = ArchivePartitionName.from(new DomainName("mydomain"));
+		assertThat(archivePartitionName).isEqualTo(expectedArchivePartitionName);
+	}
 	
-	MessageSet uidCopy(MessageSet messages, Mailbox mailbox) throws MailboxNotFoundException;
+	@Test
+	public void archivePartitionNameShouldWorkWhenTwoLevels() {
+		String expectedArchivePartitionName = "mydomain_org_archive";
+		
+		String archivePartitionName = ArchivePartitionName.from(new DomainName("mydomain.org"));
+		assertThat(archivePartitionName).isEqualTo(expectedArchivePartitionName);
+	}
+	
+	@Test
+	public void archivePartitionNameShouldWorkWhenThreeLevels() {
+		String expectedArchivePartitionName = "mydomain_imap_org_archive";
+		
+		String archivePartitionName = ArchivePartitionName.from(new DomainName("mydomain.imap.org"));
+		assertThat(archivePartitionName).isEqualTo(expectedArchivePartitionName);
+	}
 }

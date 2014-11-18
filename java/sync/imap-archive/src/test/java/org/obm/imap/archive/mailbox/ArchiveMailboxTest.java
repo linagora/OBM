@@ -40,13 +40,11 @@ import static org.easymock.EasyMock.expectLastCall;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.obm.imap.archive.beans.Year;
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapStoreException;
 import org.obm.imap.archive.exception.MailboxFormatException;
-import org.obm.imap.archive.mailbox.ArchiveMailbox;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
@@ -54,15 +52,11 @@ import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
-import pl.wkr.fluentrule.api.FluentExpectedException;
-
 import com.google.common.collect.ImmutableSet;
 
 
 public class ArchiveMailboxTest {
 
-	@Rule public FluentExpectedException expectedException = FluentExpectedException.none();
-	
 	private IMocksControl control;
 	
 	@Before
@@ -71,28 +65,47 @@ public class ArchiveMailboxTest {
 	}
 	
 	@Test(expected=NullPointerException.class)
-	public void mailboxShouldNotBeNull() throws Exception {
-		ArchiveMailbox.from((Mailbox) null, (Year) null, (DomainName) null);
+	public void mailboxShouldNotBeNull() {
+		ArchiveMailbox.builder().from(null);
 	}
 	
 	@Test(expected=NullPointerException.class)
-	public void yearShouldNotBeNull() throws Exception {
-		Logger logger = control.createMock(Logger.class);
-		StoreClient storeClient = control.createMock(StoreClient.class);
-		
-		control.replay();
-		ArchiveMailbox.from(Mailbox.from("mailbox", logger, storeClient), null, null);
-		control.verify();
+	public void yearShouldNotBeNull() {
+		ArchiveMailbox.builder().year(null);
 	}
 	
 	@Test(expected=NullPointerException.class)
-	public void domainNameShouldNotBeNull() throws Exception {
-		Logger logger = control.createMock(Logger.class);
-		StoreClient storeClient = control.createMock(StoreClient.class);
+	public void domainNameShouldNotBeNull() {
+		ArchiveMailbox.builder().domainName(null);
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void mailboxShouldBeProvided() throws Exception {
+		ArchiveMailbox.builder().build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void yearShouldBeProvided() throws Exception {
+		Mailbox mailbox = control.createMock(Mailbox.class);
 		
-		control.replay();
-		ArchiveMailbox.from(Mailbox.from("mailbox", logger, storeClient), Year.from(2015), null);
-		control.verify();
+		try {
+			control.replay();
+			ArchiveMailbox.builder().from(mailbox).build();
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void domainNameShouldBeProvided() throws Exception {
+		Mailbox mailbox = control.createMock(Mailbox.class);
+		
+		try {
+			control.replay();
+			ArchiveMailbox.builder().from(mailbox).year(Year.from(2015)).build();
+		} finally {
+			control.verify();
+		}
 	}
 	
 	@Test
@@ -101,7 +114,11 @@ public class ArchiveMailboxTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		control.replay();
-		ArchiveMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), Year.from(2015), new DomainName("mydomain.org"));
+		ArchiveMailbox.builder()
+			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+			.year(Year.from(2015))
+			.domainName(new DomainName("mydomain.org"))
+			.build();
 		control.verify();
 	}
 	
@@ -109,7 +126,7 @@ public class ArchiveMailboxTest {
 	public void archiveMailboxShouldWorkWhenMailboxIsINBOX() throws Exception {
 		String mailbox = "user/usera@mydomain.org";
 		
-		MailboxPaths archiveMailbox = ArchiveMailbox.archiveMailbox(mailbox, Year.from(2014));
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014));
 		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/INBOX@mydomain.org");
 	}
 	
@@ -117,7 +134,7 @@ public class ArchiveMailboxTest {
 	public void archiveMailboxShouldWorkWhenMailboxIsAFolder() throws Exception {
 		String mailbox = "user/usera/Test@mydomain.org";
 		
-		MailboxPaths archiveMailbox = ArchiveMailbox.archiveMailbox(mailbox, Year.from(2014));
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014));
 		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/Test@mydomain.org");
 	}
 	
@@ -125,8 +142,15 @@ public class ArchiveMailboxTest {
 	public void archiveMailboxShouldWorkWhenMailboxIsASubFolder() throws Exception {
 		String mailbox = "user/usera/Test/subfolder@mydomain.org";
 		
-		MailboxPaths archiveMailbox = ArchiveMailbox.archiveMailbox(mailbox, Year.from(2014));
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014));
 		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/Test/subfolder@mydomain.org");
+	}
+
+	@Test(expected=MailboxFormatException.class)
+	public void archiveMailboxShouldThrowWhenBadMailbox() throws Exception {
+		String mailbox = "user";
+		
+		ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014));
 	}
 	
 	@Test
@@ -135,35 +159,15 @@ public class ArchiveMailboxTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		control.replay();
-		ArchiveMailbox archiveMailbox = ArchiveMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), Year.from(2015), new DomainName("mydomain.org"));
+		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
+			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+			.year(Year.from(2015))
+			.domainName(new DomainName("mydomain.org"))
+			.build();
 		control.verify();
 		
 		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2015/INBOX@mydomain.org");
 		assertThat(archiveMailbox.getUserAtDomain()).isEqualTo("usera@mydomain.org");
-	}
-	
-	@Test
-	public void archiveMailboxShouldThrowWhenBadMailbox() throws Exception {
-		String mailbox = "user";
-		
-		expectedException.expect(MailboxFormatException.class);
-		
-		ArchiveMailbox.archiveMailbox(mailbox, Year.from(2014));
-	}
-	
-	@Test
-	public void archivePartitionNameShouldWorkWhenTwoLevels() {
-		assertThat(ArchiveMailbox.archivePartitionName(new DomainName("mydomain.org"))).isEqualTo("mydomain_org_archive");
-	}
-	
-	@Test
-	public void archivePartitionNameShouldWorkWhenThreeLevels() {
-		assertThat(ArchiveMailbox.archivePartitionName(new DomainName("mydomain.imap.org"))).isEqualTo("mydomain_imap_org_archive");
-	}
-	
-	@Test
-	public void archivePartitionNameShouldWorkWhenOneLevel() {
-		assertThat(ArchiveMailbox.archivePartitionName(new DomainName("mydomain"))).isEqualTo("mydomain_archive");
 	}
 	
 	@Test
@@ -177,27 +181,34 @@ public class ArchiveMailboxTest {
 		expectLastCall().anyTimes();
 		
 		control.replay();
-		ArchiveMailbox archiveMailbox = ArchiveMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), Year.from(2015), new DomainName("mydomain.org"));
+		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.year(Year.from(2015))
+				.domainName(new DomainName("mydomain.org"))
+				.build();
 		archiveMailbox.create();
 		control.verify();
 	}
 	
-	@Test
+	@Test(expected=ImapCreateException.class)
 	public void createShouldThrowWhenError() throws Exception {
 		Logger logger = control.createMock(Logger.class);
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		expect(storeClient.create("user/usera/ARCHIVE/2015/INBOX@mydomain.org", "mydomain_org_archive"))
 			.andReturn(false);
-		logger.error(anyObject(String.class));
-		expectLastCall();
 		
-		expectedException.expect(ImapCreateException.class);
-		
-		control.replay();
-		ArchiveMailbox archiveMailbox = ArchiveMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), Year.from(2015), new DomainName("mydomain.org"));
-		archiveMailbox.create();
-		control.verify();
+		try {
+			control.replay();
+			ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
+					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+					.year(Year.from(2015))
+					.domainName(new DomainName("mydomain.org"))
+					.build();
+			archiveMailbox.create();
+		} finally {
+			control.verify();
+		}
 	}
 	
 	@Test
@@ -212,12 +223,16 @@ public class ArchiveMailboxTest {
 		expectLastCall().anyTimes();
 		
 		control.replay();
-		ArchiveMailbox archiveMailbox = ArchiveMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), Year.from(2015), new DomainName("mydomain.org"));
+		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.year(Year.from(2015))
+				.domainName(new DomainName("mydomain.org"))
+				.build();
 		archiveMailbox.uidStoreSeen(messageSet);
 		control.verify();
 	}
 	
-	@Test
+	@Test(expected=ImapStoreException.class)
 	public void uidStoreSeenShouldThrowWhenError() throws Exception {
 		Logger logger = control.createMock(Logger.class);
 		StoreClient storeClient = control.createMock(StoreClient.class);
@@ -225,14 +240,17 @@ public class ArchiveMailboxTest {
 		MessageSet messageSet = MessageSet.builder().add(12).add(13).add(14).build();
 		expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true))
 			.andReturn(false);
-		logger.error(anyObject(String.class));
-		expectLastCall();
 		
-		expectedException.expect(ImapStoreException.class);
-		
-		control.replay();
-		ArchiveMailbox archiveMailbox = ArchiveMailbox.from(Mailbox.from("user/usera@mydomain.org", logger, storeClient), Year.from(2015), new DomainName("mydomain.org"));
-		archiveMailbox.uidStoreSeen(messageSet);
-		control.verify();
+		try {
+			control.replay();
+			ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
+					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+					.year(Year.from(2015))
+					.domainName(new DomainName("mydomain.org"))
+					.build();
+			archiveMailbox.uidStoreSeen(messageSet);
+		} finally {
+			control.verify();
+		}
 	}
 }

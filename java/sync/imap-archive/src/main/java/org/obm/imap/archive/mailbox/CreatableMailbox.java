@@ -32,29 +32,11 @@
 
 package org.obm.imap.archive.mailbox;
 
-import org.obm.imap.archive.exception.ImapSelectException;
-import org.obm.imap.archive.exception.ImapSetAclException;
-import org.obm.push.exception.MailboxNotFoundException;
-import org.obm.push.mail.bean.MessageSet;
-import org.obm.push.mail.bean.SearchQuery;
-import org.obm.push.minig.imap.StoreClient;
-import org.slf4j.Logger;
+import org.obm.imap.archive.exception.ImapCreateException;
 
-public interface Mailbox {
+public interface CreatableMailbox extends Mailbox {
 
-	String getName();
+	String getUserAtDomain();
 	
-	Logger getLogger();
-	
-	StoreClient getStoreClient();
-	
-	void select() throws MailboxNotFoundException, ImapSelectException;
-
-	void grantReadRightsTo(String user) throws ImapSetAclException;
-
-	void grantAllRightsTo(String user) throws ImapSetAclException;
-	
-	MessageSet uidSearch(SearchQuery searchQuery);
-	
-	MessageSet uidCopy(MessageSet messages, Mailbox mailbox) throws MailboxNotFoundException;
+	void create() throws ImapCreateException;
 }

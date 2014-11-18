@@ -58,7 +58,9 @@ import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
 import org.obm.imap.archive.exception.MailboxFormatException;
 import org.obm.imap.archive.mailbox.ArchiveMailbox;
+import org.obm.imap.archive.mailbox.CreatableMailbox;
 import org.obm.imap.archive.mailbox.Mailbox;
+import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.imap.archive.mailbox.MailboxPaths;
 import org.obm.imap.archive.mailbox.TemporaryMailbox;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -178,7 +180,7 @@ public class ImapArchiveProcessing {
 		logStart(logger, processedTask.getDomain());
 		for (ListInfo listInfo : listImapFolders(processedTask)) {
 			try {
-				processMailbox(Mailbox.from(listInfo.getName(), logger, storeClientFactory.create(processedTask.getDomain().getName())), 
+				processMailbox(MailboxImpl.from(listInfo.getName(), logger, storeClientFactory.create(processedTask.getDomain().getName())), 
 						processedTask);
 			} catch (Exception e) {
 				logger.error("Error on archive treatment: ", e);
@@ -211,9 +213,11 @@ public class ImapArchiveProcessing {
 				logger.info("{} mails will be archived, from UID {} to {}", mailUids.size(), mailUids.first().get(), mailUids.last().get());
 	
 				DomainName domainName = new DomainName(processedTask.getDomain().getName());
-				ArchiveMailbox archiveMailbox = ArchiveMailbox.from(mailbox, 
-						Year.from(processedTask.getBoundaries().getHigherBoundary().year().get()), 
-						domainName); 
+				ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
+						.from(mailbox) 
+						.year(Year.from(processedTask.getBoundaries().getHigherBoundary().year().get()))
+						.domainName(domainName)
+						.build();
 				createFolder(archiveMailbox, logger);
 				
 				mailbox.select();
@@ -231,7 +235,10 @@ public class ImapArchiveProcessing {
 			throws IMAPException, MailboxFormatException, MailboxNotFoundException {
 		
 		MessageSet messageSet = MessageSet.builder().add(Range.encloseAll(mailUids)).build();
-		TemporaryMailbox temporaryMailbox = TemporaryMailbox.from(mailbox, domainName);
+		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
+				.from(mailbox)
+				.domainName(domainName)
+				.build();
 		try {
 			copyToTemporary(mailbox, temporaryMailbox, logger, messageSet);
 			
@@ -275,13 +282,13 @@ public class ImapArchiveProcessing {
 		}
 	}
 
-	private void createFolder(ArchiveMailbox archiveMailbox, Logger logger) 
+	private void createFolder(CreatableMailbox creatableMailbox, Logger logger) 
 			throws MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException {
 		
 		try {
-			archiveMailbox.select();
+			creatableMailbox.select();
 		} catch (ImapSelectException e) {
-			createArchiveMailbox(archiveMailbox, logger);
+			createMailbox(creatableMailbox, logger);
 		}
 	}
 	
@@ -390,16 +397,16 @@ public class ImapArchiveProcessing {
 				&& previousArchiveTreatment.get().getHigherBoundary().equals(higherBoundary);
 	}
 
-	private void createArchiveMailbox(ArchiveMailbox archiveMailbox, Logger logger) 
+	private void createMailbox(CreatableMailbox creatableMailbox, Logger logger) 
 			throws MailboxNotFoundException, ImapSetAclException, ImapCreateException, ImapSelectException {
 		
-		String archiveMailboxName = archiveMailbox.getName();
+		String archiveMailboxName = creatableMailbox.getName();
 		logger.debug("Creating {} mailbox", archiveMailboxName);
 		
-		archiveMailbox.create();
-		archiveMailbox.grantAllRightsTo(ObmSystemUser.CYRUS);
-		archiveMailbox.grantReadRightsTo(archiveMailbox.getUserAtDomain());
-		archiveMailbox.select();
+		creatableMailbox.create();
+		creatableMailbox.grantAllRightsTo(ObmSystemUser.CYRUS);
+		creatableMailbox.grantReadRightsTo(creatableMailbox.getUserAtDomain());
+		creatableMailbox.select();
 	}
 
 	protected void folderProcessed(ProcessedFolder.Builder processedFolder) throws DaoException {

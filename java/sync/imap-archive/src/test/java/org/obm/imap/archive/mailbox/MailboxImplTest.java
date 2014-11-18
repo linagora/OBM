@@ -44,7 +44,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
-import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.StoreClient;
@@ -54,7 +53,7 @@ import org.slf4j.Logger;
 import pl.wkr.fluentrule.api.FluentExpectedException;
 
 
-public class MailboxTest {
+public class MailboxImplTest {
 
 	private IMocksControl control;
 	private Logger logger;
@@ -72,22 +71,49 @@ public class MailboxTest {
 	
 	@Test(expected=NullPointerException.class)
 	public void nameShouldNotBeNull() {
-		Mailbox.from(null, null, null);
+		MailboxImpl.from(null, null, null);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void nameShouldNotBeEmpty() {
-		Mailbox.from("", null, null);
+		MailboxImpl.from("", null, null);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void loggerShouldBeProvided() {
-		Mailbox.from("mailbox", null, null);
+		MailboxImpl.from("mailbox", null, null);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void storeClientShouldBeProvided() {
-		Mailbox.from("mailbox", logger, null);
+		MailboxImpl.from("mailbox", logger, null);
+	}
+	
+	@Test
+	public void getName() {
+		String expectedName = "mailbox";
+		
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
+		String name = mailbox.getName();
+		assertThat(name).isEqualTo(expectedName);
+	}
+	
+	@Test
+	public void getLogger() {
+		Logger expectedlogger = logger;
+		
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
+		Logger logger = mailbox.getLogger();
+		assertThat(logger).isEqualTo(expectedlogger);
+	}
+	
+	@Test
+	public void getStoreClient() {
+		StoreClient expectedStoreClient = storeClient;
+		
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
+		StoreClient storeClient = mailbox.getStoreClient();
+		assertThat(storeClient).isEqualTo(expectedStoreClient);
 	}
 	
 	@Test
@@ -98,7 +124,7 @@ public class MailboxTest {
 		expectLastCall().anyTimes();
 		
 		control.replay();
-		Mailbox mailbox = Mailbox.from("mailbox", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
 		mailbox.select();
 		control.verify();
 	}
@@ -113,7 +139,7 @@ public class MailboxTest {
 		expectedException.expect(ImapSelectException.class);
 		
 		control.replay();
-		Mailbox mailbox = Mailbox.from("mailbox", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
 		mailbox.select();
 		control.verify();
 	}
@@ -128,7 +154,7 @@ public class MailboxTest {
 		expectLastCall().anyTimes();
 		
 		control.replay();
-		Mailbox mailbox = Mailbox.from("mailbox", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
 		mailbox.setAcl(user, acl);
 		control.verify();
 	}
@@ -145,7 +171,7 @@ public class MailboxTest {
 		expectedException.expect(ImapSetAclException.class);
 		
 		control.replay();
-		Mailbox mailbox = Mailbox.from("mailbox", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
 		mailbox.setAcl(user, acl);
 		control.verify();
 	}
@@ -153,12 +179,15 @@ public class MailboxTest {
 	@Test
 	public void uidCopyShouldReturnMessageSet() throws Exception {
 		MessageSet expectedMessageSet = MessageSet.builder().add(12).add(13).add(15).build();
-		expect(storeClient.uidCopy(expectedMessageSet, "user/usera/TEMP/INBOX@mydomain.org"))
+		expect(storeClient.uidCopy(expectedMessageSet, "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org"))
 			.andReturn(expectedMessageSet);
 		
 		control.replay();
-		Mailbox mailbox = Mailbox.from("user/usera@mydomain.org", logger, storeClient);
-		MessageSet messageSet = mailbox.uidCopy(expectedMessageSet, TemporaryMailbox.from(mailbox, new DomainName("mydomain.org")));
+		MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+		MessageSet messageSet = mailbox.uidCopy(expectedMessageSet, TemporaryMailbox.builder()
+				.from(mailbox)
+				.domainName(new DomainName("mydomain.org"))
+				.build());
 		control.verify();
 		
 		assertThat(messageSet).isEqualTo(expectedMessageSet);
@@ -167,13 +196,16 @@ public class MailboxTest {
 	@Test(expected=MailboxNotFoundException.class)
 	public void uidCopyShouldThrow() throws Exception {
 		MessageSet expectedMessageSet = MessageSet.builder().add(12).add(13).add(15).build();
-		expect(storeClient.uidCopy(expectedMessageSet, "user/usera/TEMP/INBOX@mydomain.org"))
-			.andThrow(new MailboxNotFoundException("Cannot find IMAP folder for collection [ user/usera/TEMP/INBOX@mydomain.org ]"));
+		expect(storeClient.uidCopy(expectedMessageSet, "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org"))
+			.andThrow(new MailboxNotFoundException("Cannot find IMAP folder for collection [ user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org ]"));
 		
 		try {
 			control.replay();
-			Mailbox mailbox = Mailbox.from("user/usera@mydomain.org", logger, storeClient);
-			mailbox.uidCopy(expectedMessageSet, TemporaryMailbox.from(mailbox, new DomainName("mydomain.org")));
+			MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+			mailbox.uidCopy(expectedMessageSet, TemporaryMailbox.builder()
+					.from(mailbox)
+					.domainName(new DomainName("mydomain.org"))
+					.build());
 		} finally {
 			control.verify();
 		}

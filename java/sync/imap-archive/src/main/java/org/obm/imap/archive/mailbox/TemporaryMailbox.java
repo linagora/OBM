@@ -32,42 +32,78 @@
 
 package org.obm.imap.archive.mailbox;
 
+import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapDeleteException;
-import org.obm.imap.archive.exception.ImapStoreException;
 import org.obm.imap.archive.exception.MailboxFormatException;
-import org.obm.push.mail.bean.Flag;
-import org.obm.push.mail.bean.FlagsList;
-import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
 
-public class TemporaryMailbox extends ArchiveMailbox {
+public class TemporaryMailbox extends MailboxImpl implements CreatableMailbox {
 
-	public static final String TEMPORARY_FOLDER = "TEMP";
+	public static final String TEMPORARY_FOLDER = "TEMPORARY_ARCHIVE_FOLDER";
 	
-	public static TemporaryMailbox from(Mailbox mailbox, DomainName domainName) throws MailboxFormatException {
-		Preconditions.checkNotNull(mailbox);
-		Preconditions.checkNotNull(domainName);
-		MailboxPaths temporaryMailbox = temporaryMailbox(mailbox.name);
-		return new TemporaryMailbox( 
-				temporaryMailbox.getName(), 
-				temporaryMailbox.getUserAtDomain(),
-				archivePartitionName(domainName),
-				mailbox.logger, 
-				mailbox.storeClient);
+	public static Builder builder() {
+		return new Builder();
 	}
 	
-	@VisibleForTesting static MailboxPaths temporaryMailbox(String mailbox) throws MailboxFormatException {
-		return MailboxPaths.from(mailbox).prepend(TEMPORARY_FOLDER);
+	public static class Builder {
+		
+		private Mailbox mailbox;
+		private DomainName domainName;
+		
+		public Builder from(Mailbox mailbox) {
+			Preconditions.checkNotNull(mailbox);
+			this.mailbox = mailbox;
+			return this;
+		}
+		
+		public Builder domainName(DomainName domainName) {
+			Preconditions.checkNotNull(domainName);
+			this.domainName = domainName;
+			return this;
+		}
+		
+		public TemporaryMailbox build() throws MailboxFormatException {
+			Preconditions.checkState(mailbox != null);
+			Preconditions.checkState(domainName != null);
+			MailboxPaths mailboxPaths = temporaryMailbox(mailbox.getName());
+			return new TemporaryMailbox( 
+					mailboxPaths.getName(), 
+					mailboxPaths.getUserAtDomain(),
+					ArchivePartitionName.from(domainName),
+					mailbox.getLogger(), 
+					mailbox.getStoreClient());
+		}
+		
+		@VisibleForTesting static MailboxPaths temporaryMailbox(String mailbox) throws MailboxFormatException {
+			return MailboxPaths.from(mailbox).prepend(TEMPORARY_FOLDER);
+		}
 	}
+	
+	private final String userAtDomain;
+	private final String archivePartitionName;
 	
 	private TemporaryMailbox(String name, String userAtDomain, String archivePartitionName, Logger logger, StoreClient storeClient) {
-		super(name, userAtDomain, archivePartitionName, logger, storeClient);
+		super(name, logger, storeClient);
+		this.userAtDomain = userAtDomain;
+		this.archivePartitionName = archivePartitionName;
+	}
+
+	@Override
+	public String getUserAtDomain() {
+		return userAtDomain;
+	}
+	
+	@Override
+	public void create() throws ImapCreateException {
+		if (!storeClient.create(name, archivePartitionName)) {
+			throw new ImapCreateException(String.format("Wasn't able to create the temporary mailbox %s", name)); 
+		}
+		logger.debug("Created");
 	}
 	
 	public void delete() throws ImapDeleteException {
@@ -75,23 +111,6 @@ public class TemporaryMailbox extends ArchiveMailbox {
 			throw new ImapDeleteException(String.format("Wasn't able to delete the temporary mailbox %s", name)); 
 		}
 		logger.debug("The folder {} was successfully deleted", name);
-	}
-
-	public void uidStoreDeleted(MessageSet messagesSet) throws ImapStoreException {
-		if (!storeClient.uidStore(messagesSet, new FlagsList(ImmutableSet.of(Flag.DELETED)), true)) {
-			throw new ImapStoreException(String.format("Wasn't able to add flags on mails in the archive mailbox %s", name)); 
-		}
-		logger.debug("Deleted flag stored for {} on mailbox {}", messagesSet, name);
-	}
-
-	public void expunge() {
-		storeClient.expunge();
-		logger.debug("Expunge processed on mailbox {}", name);
-	}
-	
-	@Override
-	public int hashCode(){
-		return super.hashCode();
 	}
 	
 	@Override

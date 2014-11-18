@@ -60,7 +60,7 @@ import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.dao.UserDao;
 import org.obm.imap.archive.logging.LoggerAppenders;
-import org.obm.imap.archive.mailbox.Mailbox;
+import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.mail.bean.MessageSet;
@@ -185,8 +185,8 @@ public class DryRunImapArchiveProcessingTest {
 			.andReturn(messageSet);
 		expect(storeClient.select(archiveMailboxName)).andReturn(false);
 		expect(storeClient.create(archiveMailboxName, "mydomain_org_archive")).andReturn(true);
-		expect(storeClient.setAcl(archiveMailboxName, ObmSystemUser.CYRUS, Mailbox.ALL_IMAP_RIGHTS)).andReturn(true);
-		expect(storeClient.setAcl(archiveMailboxName, "usera@mydomain.org", Mailbox.READ_IMAP_RIGHTS)).andReturn(true);
+		expect(storeClient.setAcl(archiveMailboxName, ObmSystemUser.CYRUS, MailboxImpl.ALL_IMAP_RIGHTS)).andReturn(true);
+		expect(storeClient.setAcl(archiveMailboxName, "usera@mydomain.org", MailboxImpl.READ_IMAP_RIGHTS)).andReturn(true);
 		expect(storeClient.select(archiveMailboxName)).andReturn(true);
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		
