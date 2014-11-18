@@ -40,6 +40,8 @@ import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.dao.UserDao;
 import org.obm.imap.archive.exception.MailboxFormatException;
+import org.obm.imap.archive.mailbox.ArchiveMailbox;
+import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.imap.IMAPException;

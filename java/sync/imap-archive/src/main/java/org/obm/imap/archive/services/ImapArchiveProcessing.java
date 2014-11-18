@@ -57,6 +57,10 @@ import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
 import org.obm.imap.archive.exception.MailboxFormatException;
+import org.obm.imap.archive.mailbox.ArchiveMailbox;
+import org.obm.imap.archive.mailbox.Mailbox;
+import org.obm.imap.archive.mailbox.MailboxPaths;
+import org.obm.imap.archive.mailbox.TemporaryMailbox;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.ListInfo;
@@ -194,7 +198,7 @@ public class ImapArchiveProcessing {
 				.start(dateTimeProvider.now())
 				.lastUid(previousLastUid.or(DEFAULT_LAST_UID));
 		
-		try (StoreClient storeClient = mailbox.storeClient) {
+		try (StoreClient storeClient = mailbox.getStoreClient()) {
 			storeClient.login(false);
 			
 			Logger logger = processedTask.getLogger();

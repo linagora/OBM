@@ -30,7 +30,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.services;
+package org.obm.imap.archive.mailbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
@@ -44,6 +44,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
+import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.StoreClient;

@@ -30,7 +30,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.services;
+package org.obm.imap.archive.mailbox;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

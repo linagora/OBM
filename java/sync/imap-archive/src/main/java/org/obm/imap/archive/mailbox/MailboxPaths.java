@@ -30,7 +30,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.services;
+package org.obm.imap.archive.mailbox;
 
 import java.util.Iterator;
 import java.util.List;

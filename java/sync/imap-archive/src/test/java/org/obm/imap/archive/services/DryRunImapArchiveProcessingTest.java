@@ -60,6 +60,7 @@ import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.dao.UserDao;
 import org.obm.imap.archive.logging.LoggerAppenders;
+import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.mail.bean.MessageSet;

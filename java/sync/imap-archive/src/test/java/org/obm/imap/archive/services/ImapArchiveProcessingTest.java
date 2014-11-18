@@ -70,6 +70,8 @@ import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.dao.UserDao;
 import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.logging.LoggerAppenders;
+import org.obm.imap.archive.mailbox.ArchiveMailbox;
+import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.imap.archive.services.ImapArchiveProcessing.ProcessedTask;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.exception.ImapTimeoutException;

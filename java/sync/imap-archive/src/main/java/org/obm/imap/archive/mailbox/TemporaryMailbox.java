@@ -30,10 +30,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.services;
+package org.obm.imap.archive.mailbox;
 
-import org.obm.imap.archive.beans.Year;
-import org.obm.imap.archive.exception.ImapCreateException;
+import org.obm.imap.archive.exception.ImapDeleteException;
 import org.obm.imap.archive.exception.ImapStoreException;
 import org.obm.imap.archive.exception.MailboxFormatException;
 import org.obm.push.mail.bean.Flag;
@@ -44,61 +43,50 @@ import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
-class ArchiveMailbox extends Mailbox {
+public class TemporaryMailbox extends ArchiveMailbox {
 
-	public static final String ARCHIVE_MAIN_FOLDER = "ARCHIVE";
-	private static final String ARCHIVE_PARTITION_SUFFIX = "_archive";
+	public static final String TEMPORARY_FOLDER = "TEMP";
 	
-	public static ArchiveMailbox from(Mailbox mailbox, Year year, DomainName domainName) throws MailboxFormatException {
+	public static TemporaryMailbox from(Mailbox mailbox, DomainName domainName) throws MailboxFormatException {
 		Preconditions.checkNotNull(mailbox);
-		Preconditions.checkNotNull(year);
 		Preconditions.checkNotNull(domainName);
-		MailboxPaths mailboxPaths = archiveMailbox(mailbox.name, year);
-		return new ArchiveMailbox( 
-				mailboxPaths.getName(), 
-				mailboxPaths.getUserAtDomain(),
+		MailboxPaths temporaryMailbox = temporaryMailbox(mailbox.name);
+		return new TemporaryMailbox( 
+				temporaryMailbox.getName(), 
+				temporaryMailbox.getUserAtDomain(),
 				archivePartitionName(domainName),
 				mailbox.logger, 
 				mailbox.storeClient);
 	}
 	
-	@VisibleForTesting static MailboxPaths archiveMailbox(String mailbox, Year year) throws MailboxFormatException {
-		return MailboxPaths.from(mailbox).prepend(Joiner.on(MailboxPaths.IMAP_FOLDER_SEPARATOR).join(ARCHIVE_MAIN_FOLDER, year.serialize()));
+	@VisibleForTesting static MailboxPaths temporaryMailbox(String mailbox) throws MailboxFormatException {
+		return MailboxPaths.from(mailbox).prepend(TEMPORARY_FOLDER);
 	}
 	
-	@VisibleForTesting static String archivePartitionName(DomainName domainName) {
-		return domainName.get().replace('.', '_').concat(ARCHIVE_PARTITION_SUFFIX);
+	private TemporaryMailbox(String name, String userAtDomain, String archivePartitionName, Logger logger, StoreClient storeClient) {
+		super(name, userAtDomain, archivePartitionName, logger, storeClient);
 	}
 	
-	private final String userAtDomain;
-	protected final String archivePartitionName;
-	
-	protected ArchiveMailbox(String name, String userAtDomain, String archivePartitionName, Logger logger, StoreClient storeClient) {
-		super(name, logger, storeClient);
-		this.userAtDomain = userAtDomain;
-		this.archivePartitionName = archivePartitionName;
-	}
-
-	public String getUserAtDomain() {
-		return userAtDomain;
-	}
-	
-	public void create() throws ImapCreateException {
-		if (!storeClient.create(name, archivePartitionName)) {
-			throw new ImapCreateException(String.format("Wasn't able to create the archive mailbox %s", name)); 
+	public void delete() throws ImapDeleteException {
+		if (!storeClient.delete(name)) {
+			throw new ImapDeleteException(String.format("Wasn't able to delete the temporary mailbox %s", name)); 
 		}
-		logger.debug("Created");
+		logger.debug("The folder {} was successfully deleted", name);
 	}
 
-	public void uidStoreSeen(MessageSet messagesSet) throws ImapStoreException {
-		if (!storeClient.uidStore(messagesSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)) {
+	public void uidStoreDeleted(MessageSet messagesSet) throws ImapStoreException {
+		if (!storeClient.uidStore(messagesSet, new FlagsList(ImmutableSet.of(Flag.DELETED)), true)) {
 			throw new ImapStoreException(String.format("Wasn't able to add flags on mails in the archive mailbox %s", name)); 
 		}
-		logger.debug("Stored");
+		logger.debug("Deleted flag stored for {} on mailbox {}", messagesSet, name);
+	}
+
+	public void expunge() {
+		storeClient.expunge();
+		logger.debug("Expunge processed on mailbox {}", name);
 	}
 	
 	@Override
@@ -108,14 +96,9 @@ class ArchiveMailbox extends Mailbox {
 	
 	@Override
 	public boolean equals(Object object){
-		if (object instanceof ArchiveMailbox) {
+		if (object instanceof TemporaryMailbox) {
 			return super.equals(object);
 		}
 		return false;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString();
 	}
 }

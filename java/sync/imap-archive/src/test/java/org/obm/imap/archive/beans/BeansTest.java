@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.joda.time.LocalTime;
 import org.junit.Test;
-import org.obm.imap.archive.services.MailboxPaths;
+import org.obm.imap.archive.mailbox.MailboxPaths;
 import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 import org.slf4j.LoggerFactory;
 

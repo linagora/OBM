@@ -30,7 +30,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.services;
+package org.obm.imap.archive.mailbox;
 
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
@@ -44,7 +44,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
-class Mailbox {
+public class Mailbox {
 
 	public static final String ALL_IMAP_RIGHTS = "lrswipkxtecda";
 	public static final String READ_IMAP_RIGHTS = "lr";
@@ -69,6 +69,10 @@ class Mailbox {
 
 	public String getName() {
 		return name;
+	}
+	
+	public StoreClient getStoreClient() {
+		return storeClient;
 	}
 	
 	public void select() throws MailboxNotFoundException, ImapSelectException {
