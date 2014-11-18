@@ -134,14 +134,16 @@ cp -a obm-locator/obm-locator.centos.sh $RPM_BUILD_ROOT%{_initrddir}/obm-locator
 
 # obm-imap-archive
 
-mkdir -p $RPM_BUILD_ROOT/etc/obm-imap-archive
-mkdir -p $RPM_BUILD_ROOT/var/run/obm-imap-archive
-mkdir -p $RPM_BUILD_ROOT/usr/share/obm-imap-archive
-mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/log/obm-imap-archive
-mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/lib/obm-imap-archive
-cp -r imap-archive/target/imap-archive.jar $RPM_BUILD_ROOT/usr/share/obm-imap-archive/
-cp -r imap-archive/target/lib $RPM_BUILD_ROOT/usr/share/obm-imap-archive/
-cp -r imap-archive/src/main/rpm/imap-archive-start.sh $RPM_BUILD_ROOT/usr/share/obm-imap-archive/
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/obm-imap-archive
+mkdir -p $RPM_BUILD_ROOT%{_datarootdir}/obm-imap-archive
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/obm-imap-archive
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/obm-imap-archive
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/obm-imap-archive
+cp -r imap-archive/target/imap-archive.jar $RPM_BUILD_ROOT%{_datarootdir}/obm-imap-archive/
+cp -r imap-archive/target/lib $RPM_BUILD_ROOT%{_datarootdir}/obm-imap-archive/
+cp -r imap-archive/src/main/rpm/imap-archive-start.sh $RPM_BUILD_ROOT%{_datarootdir}/obm-imap-archive/
+cp -r imap-archive/logback-include.xml $RPM_BUILD_ROOT%{_sysconfdir}/obm-imap-archive/logback.xml
+cp -r imap-archive/obm-imap-archive.ini $RPM_BUILD_ROOT%{_sysconfdir}/obm-imap-archive/obm-imap-archive.ini
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
 cp -a imap-archive/src/main/rpm/imap-archive.sh $RPM_BUILD_ROOT%{_initrddir}/obm-imap-archive
 
@@ -191,6 +193,8 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %attr(0775,imap-archive,root) %{_localstatedir}/run/obm-imap-archive
 %attr(0775,root,root) %{_datarootdir}/obm-imap-archive
 %attr(0775,root,root) %{_initrddir}/obm-imap-archive
+%config(noreplace) %{_sysconfdir}/obm-imap-archive/logback.xml
+%config(noreplace) %{_sysconfdir}/obm-imap-archive/obm-imap-archive.ini
 
 %files -n obm-autoconf
 %defattr(-,root,root,-)
@@ -222,20 +226,7 @@ if [ "$?" = "1" ]; then
 fi
 
 %post -n obm-imap-archive
-chown -R imap-archive:adm %{_localstatedir}/log/obm-imap-archive
-chown -R imap-archive:adm %{_localstatedir}/lib/obm-imap-archive
-chown -R imap-archive:adm %{_localstatedir}/run/obm-imap-archive
 /sbin/service obm-imap-archive restart >/dev/null 2>&1 || :
-if [ -f /etc/obm-imap-archive/logback.xml ]; then
-  echo "The file /etc/obm-imap-archive/logback.xml already exists, do not replace it\n"
-else
- echo '<included>
- <logger name="CONFIGURATION" level="DEBUG" />
- <logger name="CONTAINER" level="DEBUG" />
- <logger name="TASK" level="DEBUG" />
-</included>' > /etc/obm-imap-archive/logback.xml
-fi
-
 
 %post -n obm-sync
 if [ "$1" = "1" ]; then

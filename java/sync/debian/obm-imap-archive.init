@@ -118,7 +118,7 @@ case "$1" in
         else
                 log_warning_msg "(already running)."
                 log_end_msg 0
-                exit 1
+                exit 0
         fi
         ;;
 

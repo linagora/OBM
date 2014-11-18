@@ -64,5 +64,7 @@ install/obm-tomcat-common-libs::
 install/obm-imap-archive::
 	mkdir -p $(FAKEROOT_IMAP_ARCHIVE_CONFIG_DIR) 
 	cp $(CURDIR)/imap-archive/target/imap-archive.jar $(CURDIR)/debian/obm-imap-archive/usr/share/obm-imap-archive/
-	cp -a $(CURDIR)/imap-archive/src/main/deb/imap-archive.sh $(CURDIR)/debian/obm-imap-archive/usr/share/obm-imap-archive/obm-imap-archive.sh
 	cp -r $(CURDIR)/imap-archive/target/lib $(CURDIR)/debian/obm-imap-archive/usr/share/obm-imap-archive/
+	cp $(CURDIR)/imap-archive/obm-imap-archive.ini $(CURDIR)/debian/obm-imap-archive/etc/obm-imap-archive/obm-imap-archive.ini
+	cp $(CURDIR)/imap-archive/logback-include.xml $(CURDIR)/debian/obm-imap-archive/etc/obm-imap-archive/logback.xml
+
