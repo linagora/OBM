@@ -1,3 +1,4 @@
+*~
 *.pyc
 target
 .project
@@ -8,3 +9,4 @@ java/.classpath
 java/sync/integration-testing/data/
 .idea/
 *.iml
+compileLastCommits.log*
