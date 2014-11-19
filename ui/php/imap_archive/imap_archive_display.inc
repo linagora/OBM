@@ -332,7 +332,8 @@ function formatStringAsDateString($dateAsString) {
     try {
       $date = new DateTime($dateAsString);
       $date->setTimezone(new DateTimeZone('UTC'));
-      return $date->format('Y-m-d H:i');
+      $formattedDate = $date->format('Y-m-d H:i');
+      return $formattedDate." UTC";
     } catch (Exception $e) {
       error_log("Couldn't $dateAsString parse to date");
       return '';
