@@ -1,0 +1,7 @@
+Origin: OBM www.obm.org
+Label: private
+Codename: obm
+Architectures: i386 amd64 source
+Components: obm
+Description: private repository
+Update: cyrus jetty
