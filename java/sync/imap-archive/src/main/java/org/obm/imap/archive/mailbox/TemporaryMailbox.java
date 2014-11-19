@@ -34,7 +34,9 @@ package org.obm.imap.archive.mailbox;
 
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapDeleteException;
+import org.obm.imap.archive.exception.ImapQuotaException;
 import org.obm.imap.archive.exception.MailboxFormatException;
+import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
@@ -119,6 +121,14 @@ public class TemporaryMailbox extends MailboxImpl implements CreatableMailbox {
 			throw new ImapDeleteException(String.format("Wasn't able to delete the temporary mailbox %s", name)); 
 		}
 		logger.debug("The folder {} was successfully deleted", name);
+	}
+
+	@Override
+	public void setMaxQuota(int quotaMaxSize) throws MailboxNotFoundException, ImapQuotaException {
+		if (!storeClient.setQuota(name, quotaMaxSize)) {
+			throw new ImapQuotaException(String.format("Wasn't able to give the MAX %d quota to the temporary mailbox %s", quotaMaxSize, name)); 
+		}
+		logger.debug("Max quota was successfully set on folder {}", name);
 	}
 	
 	@Override

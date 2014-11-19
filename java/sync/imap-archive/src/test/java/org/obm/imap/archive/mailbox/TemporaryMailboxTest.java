@@ -43,6 +43,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapDeleteException;
+import org.obm.imap.archive.exception.ImapQuotaException;
 import org.obm.imap.archive.exception.MailboxFormatException;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
@@ -227,6 +228,49 @@ public class TemporaryMailboxTest {
 					.cyrusPartitionSuffix("archive")
 					.build();
 			temporaryMailbox.create();
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test
+	public void setMaxQuotaShouldNotThrowWhenSuccess() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.domainName(new DomainName("mydomain.org"))
+				.cyrusPartitionSuffix("archive")
+				.build();
+		int quotaInKo = 1234;
+		expect(storeClient.setQuota(temporaryMailbox.getName(), quotaInKo))
+			.andReturn(true);
+		logger.debug(anyObject(String.class), anyObject(String.class));
+		expectLastCall().anyTimes();
+		
+		control.replay();
+		temporaryMailbox.setMaxQuota(1234);
+		control.verify();
+	}
+	
+	@Test(expected=ImapQuotaException.class)
+	public void setMaxQuotaShouldThrowWhenError() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.domainName(new DomainName("mydomain.org"))
+				.cyrusPartitionSuffix("archive")
+				.build();
+		int quotaInKo = 1234;
+		expect(storeClient.setQuota(temporaryMailbox.getName(), quotaInKo))
+			.andReturn(false);
+		
+		try {
+			control.replay();
+			temporaryMailbox.setMaxQuota(1234);
 		} finally {
 			control.verify();
 		}

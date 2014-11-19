@@ -48,6 +48,9 @@ public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigura
 	@VisibleForTesting static final String PROCESSING_BATCH_SIZE = "batch_size";
 	public static final int DEFAULT_PROCESSING_BATCH_SIZE = 20;
 	
+	@VisibleForTesting static final String QUOTA_MAX_SIZE = "quota_max_size";
+	public static final int DEFAULT_QUOTA_MAX_SIZE = Integer.MAX_VALUE;
+	
 	public static class Factory {
 		
 		protected IniFile.Factory iniFileFactory;
@@ -80,6 +83,11 @@ public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigura
 	@Override
 	public int getProcessingBatchSize() {
 		return iniFile.getIntValue(PROCESSING_BATCH_SIZE, DEFAULT_PROCESSING_BATCH_SIZE);
+	}
+
+	@Override
+	public int getQuotaMaxSize() {
+		return iniFile.getIntValue(QUOTA_MAX_SIZE, DEFAULT_QUOTA_MAX_SIZE);
 	}
 
 }

@@ -30,17 +30,21 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.mailbox;
+package org.obm.imap.archive.exception;
 
-import org.obm.imap.archive.exception.ImapCreateException;
-import org.obm.imap.archive.exception.ImapQuotaException;
-import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.imap.IMAPException;
 
-public interface CreatableMailbox extends Mailbox {
+public class ImapQuotaException extends IMAPException {
 
-	String getUserAtDomain();
+	public ImapQuotaException(Throwable t) {
+		super(t);
+	}
 	
-	void create() throws ImapCreateException;
+	public ImapQuotaException(String s, Throwable t) {
+		super(s, t);
+	}
 	
-	void setMaxQuota(int quotaMaxSize) throws MailboxNotFoundException, ImapQuotaException;
+	public ImapQuotaException(String s) {
+		super(s);
+	}
 }

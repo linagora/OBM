@@ -39,4 +39,6 @@ public interface ImapArchiveConfigurationService {
 	String getArchiveMainFolder();
 	
 	int getProcessingBatchSize();
+	
+	int getQuotaMaxSize();
 }

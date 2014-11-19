@@ -137,4 +137,33 @@ public class ImapArchiveConfigurationServiceImplTest {
 		
 		assertThat(processingBatchSize).isEqualTo(expectedProcessingBatchSize);
 	}
+	
+	@Test
+	public void quotaMaxSizeShouldBeDefaultValueWhenNotInFile() {
+		IniFile iniFile = control.createMock(IniFile.class);
+		expect(iniFile.getIntValue(ImapArchiveConfigurationServiceImpl.QUOTA_MAX_SIZE, ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE))
+			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE);
+		
+		control.replay();
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile);
+		int quotaMaxSize = imapArchiveConfigurationServiceImpl.getQuotaMaxSize();
+		control.verify();
+		
+		assertThat(quotaMaxSize).isEqualTo(ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE);
+	}
+	
+	@Test
+	public void quotaMaxSizeShouldReturnInFileValue() {
+		int expectedQuotaMaxSize = 1234;
+		IniFile iniFile = control.createMock(IniFile.class);
+		expect(iniFile.getIntValue(ImapArchiveConfigurationServiceImpl.QUOTA_MAX_SIZE, ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE))
+			.andReturn(expectedQuotaMaxSize);
+		
+		control.replay();
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile);
+		int quotaMaxSize = imapArchiveConfigurationServiceImpl.getQuotaMaxSize();
+		control.verify();
+		
+		assertThat(quotaMaxSize).isEqualTo(expectedQuotaMaxSize);
+	}
 }
