@@ -133,6 +133,8 @@ public class ImapArchiveProcessingTest {
 			.andReturn("archive").anyTimes();
 		expect(imapArchiveConfigurationService.getProcessingBatchSize())
 			.andReturn(20).anyTimes();
+		expect(imapArchiveConfigurationService.getQuotaMaxSize())
+			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE).anyTimes();
 		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
 		loggerAppenders = control.createMock(LoggerAppenders.class);
 		
@@ -723,6 +725,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.create(archiveMailboxName, "mydomain_org_archive")).andReturn(true);
 		expect(storeClient.setAcl(archiveMailboxName, ObmSystemUser.CYRUS, MailboxImpl.ALL_IMAP_RIGHTS)).andReturn(true);
 		expect(storeClient.setAcl(archiveMailboxName, "usera@mydomain.org", MailboxImpl.READ_IMAP_RIGHTS)).andReturn(true);
+		expect(storeClient.setQuota(archiveMailboxName, ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE)).andReturn(true);
 		expect(storeClient.select(archiveMailboxName)).andReturn(true);
 		expect(storeClient.select(mailboxName)).andReturn(true);
 	}

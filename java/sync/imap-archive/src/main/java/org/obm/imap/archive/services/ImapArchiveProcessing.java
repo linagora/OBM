@@ -54,6 +54,7 @@ import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.exception.ImapCreateException;
+import org.obm.imap.archive.exception.ImapQuotaException;
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
 import org.obm.imap.archive.exception.MailboxFormatException;
@@ -285,7 +286,7 @@ public class ImapArchiveProcessing {
 	}
 
 	private void createFolder(CreatableMailbox creatableMailbox, Logger logger) 
-			throws MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException {
+			throws MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException {
 		
 		try {
 			creatableMailbox.select();
@@ -400,7 +401,7 @@ public class ImapArchiveProcessing {
 	}
 
 	private void createMailbox(CreatableMailbox creatableMailbox, Logger logger) 
-			throws MailboxNotFoundException, ImapSetAclException, ImapCreateException, ImapSelectException {
+			throws MailboxNotFoundException, ImapSetAclException, ImapCreateException, ImapSelectException, ImapQuotaException {
 		
 		String archiveMailboxName = creatableMailbox.getName();
 		logger.debug("Creating {} mailbox", archiveMailboxName);
@@ -408,6 +409,7 @@ public class ImapArchiveProcessing {
 		creatableMailbox.create();
 		creatableMailbox.grantAllRightsTo(ObmSystemUser.CYRUS);
 		creatableMailbox.grantReadRightsTo(creatableMailbox.getUserAtDomain());
+		creatableMailbox.setMaxQuota(imapArchiveConfigurationService.getQuotaMaxSize());
 		creatableMailbox.select();
 	}
 
