@@ -131,7 +131,7 @@ if ($status[0] != 1) {
     } elseif ($action == 'detailupdate') {
       $display['detail'] = dis_imap_archive_form($params, $configuration);
     } elseif ($action == 'log_page') {
-      $display['detail'] = dis_log_page($params, $configuration);
+      $display['detail'] = dis_log_page($params);
     }
   }
 }

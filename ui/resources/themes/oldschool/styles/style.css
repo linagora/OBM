@@ -1888,3 +1888,13 @@ input.updateButton {
 
 #loginForm input, #loginForm select { width: 155px; }
 
+
+/* ------------------------------------------------------------------------- */
+/* Imap Archive iframe layout
+/* ------------------------------------------------------------------------- */
+
+#archivingLogs {
+  padding-right: 2px;
+  height: 500px;
+  width: 100%;
+}

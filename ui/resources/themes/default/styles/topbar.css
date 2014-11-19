@@ -2413,3 +2413,13 @@ form.button-to input {
 #print {
   width: 25px;
 }
+
+/* ------------------------------------------------------------------------- */
+/* Imap Archive iframe layout
+/* ------------------------------------------------------------------------- */
+
+#archivingLogs {
+  padding-right: 2px;
+  height: 500px;
+  width: 100%;
+}

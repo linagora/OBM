@@ -567,25 +567,8 @@ function statusAsString($status, $runId) {
 // Display the log IMAP Archive page
 ///////////////////////////////////////////////////////////////////////////////
 
-function dis_log_page($params, $configuration) {
-  global $obm;
+function dis_log_page($params) {
   global $l_archiving_running, $l_unsupported_iframe;
-  
-  $repeatKind = $configuration->repeatKind;
-  $dayOfWeek = $configuration->dayOfWeek;
-  $dayOfMonth = $configuration->dayOfMonth;
-  $dayOfYear = $configuration->dayOfYear;
-  $enabled = $configuration->enabled;
-  $hour = $configuration->hour;
-  $minute = $configuration->minute;
-  
-  $disabled = "disabled";
-  $block_repeat_kind = get_block_repeat_kind($repeatKind, $disabled);
-  $block_weekly = get_block_weekly($repeatKind, $dayOfWeek, $disabled);
-  $block_monthly = get_block_monthly($repeatKind, $dayOfMonth, $disabled);
-  $block_yearly = get_block_yearly($repeatKind, $dayOfYear, $disabled);
-  $block_hour = get_block_hour($hour, $disabled);
-  $block_minute = get_block_minute($minute, $disabled);
   
   $runId = $params['run_id'];
   
@@ -595,35 +578,9 @@ function dis_log_page($params, $configuration) {
   $url = "$path/imap_archive/".basename($_SERVER['SCRIPT_NAME'])."?".http_build_query($queryParams);
   
   $block = "
-    <div class='detail infos'>
-      <h1>Configuration</h1>
-      <table class='details'>
-        <tr>
-          $block_repeat_kind
-        </tr>
-        <tr>
-          $block_weekly
-        </tr>
-        <tr>
-          $block_monthly
-        </tr>
-        <tr>
-          $block_yearly
-        </tr>
-      </table>
-      <br>
-      <table class='details'>
-        <tr>
-          $block_hour
-        </tr>
-        <tr>
-          $block_minute
-        </tr>
-      </table>
-    </div>
-    <div class='detail infos'>
+    <div class='detail extra' >
       <h1>$l_archiving_running</h1>
-  	  <iframe id='archivingLogs' src='$url' height='300' width='500' frameborder='0'>
+  	  <iframe id='archivingLogs' src='$url' frameborder='0'>
   	    <p>$l_unsupported_iframe</p>
   	  </iframe>
   	</div>
