@@ -303,10 +303,9 @@ function curlExec($curl) {
   $success = curl_exec($curl);
   $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
   $errno = curl_errno($curl);
-  $redirectUrl = curl_getinfo($curl, CURLINFO_REDIRECT_URL);
   curl_close($curl);
   
-  return array("success" => $success, "code" => $code, "errno" => $errno, "redirectUrl" => $redirectUrl);
+  return array("success" => $success, "code" => $code, "errno" => $errno);
 }
 
 function basicAuthCurlInit($curlUrl) {
@@ -339,7 +338,7 @@ function manual_launch($archiveTreatmentKind) {
 
   $manualLaunchPath = ImapArchiveUrls::treatments($obm["domain_uuid"]);
 
-  $curl = curlPost($manualLaunchPath, array("archive_treatment_kind" => $archiveTreatmentKind));
+  $curl = curlPostWithHeader($manualLaunchPath, array("archive_treatment_kind" => $archiveTreatmentKind));
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];
@@ -360,6 +359,35 @@ function manual_launch($archiveTreatmentKind) {
   if ($code == 303) {
     return followRedirect($curl["redirectUrl"]);
   }
+}
+
+function curlPostWithHeader($url, $extraParams = array(), $json = "") {
+  global $obm;
+
+  $imapArchiveRootPath = imapArchiveRootPath();
+  $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($extraParams);
+
+  $curl = basicAuthCurlInit($curlUrl);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($curl, CURLOPT_POST, 1);
+  curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-type: application/json'));
+  curl_setopt($curl, CURLOPT_HEADER, true);
+  curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
+
+  return curlExecWithHeader($curl);
+}
+
+function curlExecWithHeader($curl) {
+
+  $success = curl_exec($curl);
+  $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+  $errno = curl_errno($curl);
+	
+  $redirectUrl = preg_match_all('/^Location:(.*)$/mi', $success, $matches) ? trim($matches[1][0]) : '';
+  
+  curl_close($curl);
+
+  return array("success" => $success, "code" => $code, "errno" => $errno, "redirectUrl" => $redirectUrl);
 }
 
 function followRedirect($redirectUrl) {
