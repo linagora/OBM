@@ -61,6 +61,7 @@ import org.obm.imap.archive.resources.TreatmentFactory;
 import org.obm.imap.archive.resources.TreatmentResource;
 import org.obm.imap.archive.resources.TreatmentsResource;
 import org.obm.imap.archive.resources.cyrus.CyrusStatusHandler;
+import org.obm.imap.archive.resources.testing.TestingResource;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBusInitializer;
@@ -82,11 +83,13 @@ import org.obm.imap.archive.services.NotificationTracking;
 import org.obm.imap.archive.services.ScheduledArchivingTracker;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.imap.archive.services.StoreClientFactory;
+import org.obm.imap.archive.services.TestingDateProvider;
 import org.obm.imap.archive.startup.RestoreTasksOnStartupHandler;
 import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.utils.UUIDFactory;
+import org.obm.push.utils.jvm.VMArgumentsUtils;
 import org.obm.server.EmbeddedServerModule;
 import org.obm.server.ServerConfiguration;
 import org.obm.server.context.NoContext;
@@ -114,7 +117,8 @@ public class ImapArchiveModule extends AbstractModule {
 	
 	private final ServerConfiguration configuration;
 	private static final String APPLICATION_ORIGIN = "imap-archive";
-	public  static final Class<RestoreTasksOnStartupHandler> STARTUP_HANDLER_CLASS = RestoreTasksOnStartupHandler.class;
+	public static final String TESTING_MODE = "testingMode";
+	public static final Class<RestoreTasksOnStartupHandler> STARTUP_HANDLER_CLASS = RestoreTasksOnStartupHandler.class;
 	
 	public ImapArchiveModule(ServerConfiguration configuration) {
 		this.configuration = configuration;
@@ -133,7 +137,6 @@ public class ImapArchiveModule extends AbstractModule {
 		install(new SmtpModule());
 		install(new AuthorizationModule(new NoContext()));
 		
-		bind(DateProvider.class).to(ObmHelper.class);
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(UserSystemDao.class).to(UserSystemDaoJdbcImpl.class);
 		bind(String.class).annotatedWith(Names.named("origin")).toInstance(APPLICATION_ORIGIN);
@@ -150,6 +153,16 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(ArchiveSchedulerBusInitializer.class).asEagerSingleton();
 		
 		bindImapArchiveServices();
+		if (isInTestingMode()) {
+			bind(DateProvider.class).to(TestingDateProvider.class);
+			install(new TestingServletModule());
+		} else {
+			bind(DateProvider.class).to(ObmHelper.class);
+		}
+	}
+
+	private boolean isInTestingMode() {
+		return VMArgumentsUtils.booleanArgumentValue(TESTING_MODE);
 	}
 	
 	private void bindImapArchiveServices() {
@@ -176,7 +189,7 @@ public class ImapArchiveModule extends AbstractModule {
 		public final static String URL_PATTERN = URL_PREFIX + "/*";
 		public final static String URL_HEALTHCHECK_PREFIX = "/imap-archive/healthcheck";
 		public final static String URL_HEALTHCHECK_PATTERN = URL_HEALTHCHECK_PREFIX + "/*";
-		
+
 		@Override
 		protected void configureServlets() {
 			filter("/*", "").through(GuiceShiroFilter.class);
@@ -216,6 +229,27 @@ public class ImapArchiveModule extends AbstractModule {
 			super(new JerseyResourceConfig(injector)
 					.register(HealthcheckHandler.class)
 					.register(CyrusStatusHandler.class));
+		}
+		
+	}
+	
+	public static class TestingServletModule extends ServletModule {
+
+		public final static String URL_TESTING_PATTERN = "/imap-archive/testing/*";
+		
+		@Override
+		protected void configureServlets() {
+			serve(URL_TESTING_PATTERN).with(TestingContainer.class);
+		}
+	}
+	
+	@Singleton
+	public static class TestingContainer extends ServletContainer {
+		
+		@Inject
+		public TestingContainer(Injector injector) {
+			super(new JerseyResourceConfig(injector)
+					.register(TestingResource.class));
 		}
 		
 	}

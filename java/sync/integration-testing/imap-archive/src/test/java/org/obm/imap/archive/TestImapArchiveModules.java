@@ -56,17 +56,21 @@ import org.obm.imap.archive.scheduling.ArchiveSchedulerBus;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory.OnlyOnePerDomainMonitorFactoryImpl;
 import org.obm.imap.archive.services.Mailer;
+import org.obm.imap.archive.services.TestingDateProvider;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
 import org.obm.push.utils.UUIDFactory;
+import org.obm.push.utils.jvm.VMArgumentsUtils;
 import org.obm.server.ServerConfiguration;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.locators.Locator;
+import org.obm.utils.ObmHelper;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
@@ -273,9 +277,17 @@ public class TestImapArchiveModules {
 
 		@Override
 		protected void configure() {
-			bind(DateProvider.class).to(TestDateProvider.class);
-			bind(DateTimeProvider.class).to(TestDateProvider.class);
+			if (!isInTestingMode()) {
+				bind(DateProvider.class).to(TestDateProvider.class);
+				bind(DateTimeProvider.class).to(TestDateProvider.class);
+			} else {
+				bind(TestingDateProvider.class).to(TestTestingDateProvider.class);
+			}
 			bind(TimeUnit.class).annotatedWith(Names.named("schedulerResolution")).toInstance(TimeUnit.MILLISECONDS);
+		}
+
+		private boolean isInTestingMode() {
+			return VMArgumentsUtils.booleanArgumentValue(ImapArchiveModule.TESTING_MODE);
 		}
 		
 		@Singleton
@@ -301,6 +313,21 @@ public class TestImapArchiveModules {
 				return current;
 			}
 			
+		}
+		
+		@Singleton
+		public static class TestTestingDateProvider extends TestingDateProvider {
+
+			@Inject
+			public TestTestingDateProvider(ObmHelper obmHelper) {
+				super(obmHelper);
+			}
+
+
+			@Override
+			protected Date currentDate() {
+				return LOCAL_DATE_TIME.toDate();
+			}
 		}
 	}
 	
