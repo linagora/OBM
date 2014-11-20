@@ -93,6 +93,7 @@ import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.solr.SolrHelper;
 import org.obm.sync.solr.SolrHelper.Factory;
+import org.obm.sync.utils.DisplayNameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -436,7 +437,7 @@ public class ContactDao {
 		}
 	}
 
-	private Event getEvent(AccessToken token, String displayName, Date startDate) {
+	private Event getEvent(AccessToken token, String displayName, Date startDate) throws SQLException {
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -457,30 +458,21 @@ public class ContactDao {
 		e.setRecurrence(rec);
 		e.setPrivacy(EventPrivacy.PRIVATE);
 		e.setPriority(1);
+		e.setOwnerEmail(token.getUserEmail());
 		
 		Attendee at = UserAttendee
 				.builder()
 				.email(token.getUserEmail())
 				.participationRole(ParticipationRole.CHAIR)
 				.participation(Participation.accepted())
+				.asOrganizer()
+				.entityId(obmHelper.fetchEntityId("User", token.getObmId()))
 				.build();
 		
 		e.addAttendee(at);
 
 		logger.info("inserting birthday with date " + cal.getTime());
 		return e;
-	}
-
-	private String displayName(Contact c) {
-		StringBuilder b = new StringBuilder(255);
-		if (c.getFirstname() != null) {
-			b.append(c.getFirstname());
-			b.append(" ");
-		}
-		if (c.getLastname() != null) {
-			b.append(c.getLastname());
-		}
-		return b.toString();
 	}
 
 	private EventObmId createOrUpdateDate(AccessToken at, Connection con, Contact c, Date date, String idField)
@@ -525,7 +517,7 @@ public class ContactDao {
 			FindException, ServerFault {
 		logger.info("eventId == null");
 		Event e = calendarDao.createEvent(con, at, at.getUserWithDomain(),
-				getEvent(at, displayName(c), date), true);
+				getEvent(at, DisplayNameUtils.getDisplayName(null, c.getFirstname(), c.getLastname()), date), true);
 		return e.getObmId();
 	}
 
