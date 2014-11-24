@@ -31,8 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.configuration;
 
+import org.obm.configuration.TransactionConfiguration;
 
-public interface ImapArchiveConfigurationService {
+
+public interface ImapArchiveConfigurationService extends TransactionConfiguration {
 	
 	String getCyrusPartitionSuffix();
 	

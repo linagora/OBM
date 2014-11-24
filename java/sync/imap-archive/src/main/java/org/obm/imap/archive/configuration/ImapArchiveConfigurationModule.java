@@ -36,6 +36,7 @@ import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.LocatorConfigurationImpl;
+import org.obm.configuration.TransactionConfiguration;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.AbstractModule;
@@ -47,16 +48,22 @@ public class ImapArchiveConfigurationModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		final GlobalAppConfiguration<ConfigurationService> globalConfiguration = buildConfiguration();
+		ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl.Factory()
+			.create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationService = imapArchiveConfigurationService(configurationService);
+		
+		final GlobalAppConfiguration<ConfigurationService> globalConfiguration = buildConfiguration(configurationService, imapArchiveConfigurationService);
 		bind(ConfigurationService.class).toInstance(globalConfiguration.getConfiguration());
 		install(new ConfigurationModule<ConfigurationService> (globalConfiguration, ConfigurationService.class));
 		
-		bind(ImapArchiveConfigurationService.class).toInstance(new ImapArchiveConfigurationServiceImpl.Factory().create());
+		bind(ImapArchiveConfigurationService.class).toInstance(imapArchiveConfigurationService);
 	}
 
-	private GlobalAppConfiguration<ConfigurationService> buildConfiguration() {
-		ConfigurationServiceImpl configurationService = new ConfigurationServiceImpl.Factory()
-				.create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME);
+	private ImapArchiveConfigurationServiceImpl imapArchiveConfigurationService(ConfigurationServiceImpl configurationService) {
+		return new ImapArchiveConfigurationServiceImpl.Factory(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, configurationService)).create();
+	}
+
+	private GlobalAppConfiguration<ConfigurationService> buildConfiguration(ConfigurationService configurationService, TransactionConfiguration transactionConfiguration) {
 		return GlobalAppConfiguration
 				.<ConfigurationService> builder()
 				.mainConfiguration(configurationService)
@@ -64,9 +71,7 @@ public class ImapArchiveConfigurationModule extends AbstractModule {
 						new LocatorConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
 				.databaseConfiguration(
 						new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
-				.transactionConfiguration(
-						new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME,
-								configurationService))
+				.transactionConfiguration(transactionConfiguration)
 				.build();
 	}
 

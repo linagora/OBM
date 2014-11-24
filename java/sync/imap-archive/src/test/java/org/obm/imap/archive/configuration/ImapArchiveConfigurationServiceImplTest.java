@@ -39,6 +39,7 @@ import static org.easymock.EasyMock.expect;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.utils.IniFile;
 
 
@@ -46,9 +47,13 @@ public class ImapArchiveConfigurationServiceImplTest {
 
 	private IMocksControl control;
 	
+	private TransactionConfiguration transactionConfiguration; 
+	
 	@Before
 	public void setup() {
 		control = createControl();
+		
+		transactionConfiguration = control.createMock(TransactionConfiguration.class);
 	}
 	
 	@Test
@@ -58,7 +63,7 @@ public class ImapArchiveConfigurationServiceImplTest {
 			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_CYRUS_PARTITION_SUFFIX);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile);
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
 		String cyrusPartitionSuffix = imapArchiveConfigurationServiceImpl.getCyrusPartitionSuffix();
 		control.verify();
 		
@@ -73,7 +78,7 @@ public class ImapArchiveConfigurationServiceImplTest {
 			.andReturn(expectedCyrusPartitionSuffix);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile);
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
 		String cyrusPartitionSuffix = imapArchiveConfigurationServiceImpl.getCyrusPartitionSuffix();
 		control.verify();
 		
@@ -87,7 +92,7 @@ public class ImapArchiveConfigurationServiceImplTest {
 			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile);
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
 		String archiveMainFolder = imapArchiveConfigurationServiceImpl.getArchiveMainFolder();
 		control.verify();
 		
@@ -102,7 +107,7 @@ public class ImapArchiveConfigurationServiceImplTest {
 			.andReturn(expectedArchiveMainFolder);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile);
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
 		String archiveMainFolder = imapArchiveConfigurationServiceImpl.getArchiveMainFolder();
 		control.verify();
 		
@@ -116,7 +121,7 @@ public class ImapArchiveConfigurationServiceImplTest {
 			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_PROCESSING_BATCH_SIZE);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile);
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
 		int processingBatchSize = imapArchiveConfigurationServiceImpl.getProcessingBatchSize();
 		control.verify();
 		
@@ -131,7 +136,7 @@ public class ImapArchiveConfigurationServiceImplTest {
 			.andReturn(expectedProcessingBatchSize);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile);
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
 		int processingBatchSize = imapArchiveConfigurationServiceImpl.getProcessingBatchSize();
 		control.verify();
 		
@@ -145,7 +150,7 @@ public class ImapArchiveConfigurationServiceImplTest {
 			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile);
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
 		int quotaMaxSize = imapArchiveConfigurationServiceImpl.getQuotaMaxSize();
 		control.verify();
 		
@@ -160,10 +165,39 @@ public class ImapArchiveConfigurationServiceImplTest {
 			.andReturn(expectedQuotaMaxSize);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile);
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
 		int quotaMaxSize = imapArchiveConfigurationServiceImpl.getQuotaMaxSize();
 		control.verify();
 		
 		assertThat(quotaMaxSize).isEqualTo(expectedQuotaMaxSize);
+	}
+	
+	@Test
+	public void timeOutInSecondShouldBeDefaultValueWhenNotInFile() {
+		IniFile iniFile = control.createMock(IniFile.class);
+		expect(iniFile.getIntValue(ImapArchiveConfigurationServiceImpl.TRANSACTION_TIMEOUT_IN_SECONDS, ImapArchiveConfigurationServiceImpl.DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS))
+			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS);
+		
+		control.replay();
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
+		int timeOutInSecond = imapArchiveConfigurationServiceImpl.getTimeOutInSecond();
+		control.verify();
+		
+		assertThat(timeOutInSecond).isEqualTo(ImapArchiveConfigurationServiceImpl.DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS);
+	}
+	
+	@Test
+	public void timeOutInSecondShouldReturnInFileValue() {
+		int expectedTimeOutInSecond = 12345;
+		IniFile iniFile = control.createMock(IniFile.class);
+		expect(iniFile.getIntValue(ImapArchiveConfigurationServiceImpl.TRANSACTION_TIMEOUT_IN_SECONDS, ImapArchiveConfigurationServiceImpl.DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS))
+			.andReturn(expectedTimeOutInSecond);
+		
+		control.replay();
+		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
+		int timeOutInSecond = imapArchiveConfigurationServiceImpl.getTimeOutInSecond();
+		control.verify();
+		
+		assertThat(timeOutInSecond).isEqualTo(expectedTimeOutInSecond);
 	}
 }

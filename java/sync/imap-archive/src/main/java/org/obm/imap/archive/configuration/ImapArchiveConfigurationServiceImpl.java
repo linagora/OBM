@@ -31,9 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.archive.configuration;
 
+import java.io.File;
+
+import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.utils.IniFile;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
 
 public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigurationService {
 
@@ -51,23 +55,31 @@ public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigura
 	@VisibleForTesting static final String QUOTA_MAX_SIZE = "quota_max_size";
 	public static final int DEFAULT_QUOTA_MAX_SIZE = Integer.MAX_VALUE;
 	
+	@VisibleForTesting static final String TRANSACTION_TIMEOUT_IN_SECONDS = "transaction_timeout_in_seconds";
+	public static final int DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS = 3600;
+	
 	public static class Factory {
 		
 		protected IniFile.Factory iniFileFactory;
+		private final TransactionConfiguration transactionConfiguration;
 
-		public Factory() {
+		@Inject
+		public Factory(TransactionConfiguration transactionConfiguration) {
+			this.transactionConfiguration = transactionConfiguration;
 			iniFileFactory = new IniFile.Factory();
 		}
 		
 		public ImapArchiveConfigurationServiceImpl create() {
-			return new ImapArchiveConfigurationServiceImpl(iniFileFactory.build(CONFIG_FILE_PATH));
+			return new ImapArchiveConfigurationServiceImpl(iniFileFactory.build(CONFIG_FILE_PATH), transactionConfiguration);
 		}
 	}
 	
 	private final IniFile iniFile;
+	private final TransactionConfiguration transactionConfiguration;
 	
-	@VisibleForTesting ImapArchiveConfigurationServiceImpl(IniFile iniFile) {
+	@VisibleForTesting ImapArchiveConfigurationServiceImpl(IniFile iniFile, TransactionConfiguration transactionConfiguration) {
 		this.iniFile = iniFile;
+		this.transactionConfiguration = transactionConfiguration;
 	}
 
 	@Override
@@ -88,6 +100,26 @@ public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigura
 	@Override
 	public int getQuotaMaxSize() {
 		return iniFile.getIntValue(QUOTA_MAX_SIZE, DEFAULT_QUOTA_MAX_SIZE);
+	}
+
+	@Override
+	public int getTimeOutInSecond() {
+		return iniFile.getIntValue(TRANSACTION_TIMEOUT_IN_SECONDS, DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS);
+	}
+
+	@Override
+	public File getJournalPart1Path() {
+		return transactionConfiguration.getJournalPart1Path();
+	}
+
+	@Override
+	public File getJournalPart2Path() {
+		return transactionConfiguration.getJournalPart2Path();
+	}
+
+	@Override
+	public boolean enableJournal() {
+		return transactionConfiguration.enableJournal();
 	}
 
 }
