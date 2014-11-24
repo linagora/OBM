@@ -1,0 +1,53 @@
+== Cyrus configuration
+
+=== Prerequisite
+
+*IMAP Archive* service needs a specific partition in order to store the archived mails.
+
+Such partition has to be created manually, as we want the *OBM* admin to choose where its archives are located.
+
+
+=== About
+
+Archive folders are stored in another Cyrus partition than other folders, this means that the system administrator can associate another file system to this partition. 
+
+
+=== Adding the archive partition
+
+In order to achieve this task, you have to edit the https://cyrusimap.org/[*Cyrus*] configuration file +/etc/imapd.conf+ and add the *IMAP Archive* partition:
+[source,subs="quotes"]
+----
+partition-**domain_suffix**: /var/spool/cyrus/**folder**
+---- 
+
+where:
+
+  * _domain_ is the name of the domain associated to this *IMAP Archive* partition (dots replaced by underscores)
+  * _suffix_ is the Cyrus archive partition suffix defined in the <<_configuration,Configuration>>
+  * _folder_ may be any not existing folder (read the note below for more information)
+
+
+[WARNING]
+====
+The partition folder is automatically created by *Cyrus* when needed. +
+Don't create it manually, as you may encounter rights issues. +
+The _cyrus_ user must have write rights on the parent directory. 
+====
+
+Then, you will have to restart *Cyrus* in order to run with the new configuration.
+
+Each domain configured for *IMAP Archive* service should have a corresponding https://cyrusimap.org/[*Cyrus*] partition.
+
+.Sample configuration +/etc/imapd.conf+ if your domain is _mydomain.org_
+****
+----
+partition-mydomain_org: /var/spool/cyrus/mydomain_org
+partition-mydomain_org_archive: /var/spool/cyrus/mydomain_org_archive
+partition-default: /var/spool/cyrus/mail
+defaultpartition: default
+# Debian Cyrus imapd.conf
+# $Id$
+# See imapd.conf(5) for more information and more options
+...
+----
+****

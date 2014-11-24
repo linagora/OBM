@@ -1,0 +1,14 @@
+== RHEL/CentOS - Installation
+
+=== System Requirements
+
+  * *RHEL 6.x* or *CentOS 6.x*
+  * *Obm 3.1*
+
+  
+=== Imap Archive Installation
+
+[source]
+----
+$ yum install obm-imap-archive
+----

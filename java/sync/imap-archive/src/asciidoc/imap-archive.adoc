@@ -1,0 +1,19 @@
+= IMAP Archive Service
+OBM Core Team <club@list.obm.org>;
+:imagesdir: images
+:numbered:
+:sectlink:
+:sectids:
+:toc: left
+:toclevels: 1
+:icons: font
+
+== About
+
+include::rhel-installation.adoc[]
+
+include::configuration.adoc[]
+
+include::imap-archive-cyrus.adoc[]
+
+include::ui-admin-interface.adoc[]

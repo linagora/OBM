@@ -1,0 +1,68 @@
+== Admin interfaces
+
+=== Prerequisite: Grant Rights to the Admin Profile
+
+In order to access the *IMAP Archive* pages, you have to give extra rights to the *OBM* domain administrators.
+
+To grant all rights on +domains+ to an *OBM* domain administrator, you have to
+modify +Admin+ user's profile.
+
+To achieve this, authenticate with the *OBM* web interface as an +Admin+ for the
+global domain (like +admin0+), click on +Administration+, +User profiles+ then
+update the +Admin+ profile. +
+There is a +Specific settings+ section where you can give all rights on the +domains+ line.
+
+
+=== General information
+
+The goal of this feature is to provide archived IMAP folders to users. Those folders represent an image of the user IMAP folders grouped by year.
+Users can only read those folders, and so will not be able to add, delete or perform any non-read action on them.
+
+The process will not modify users' emails, users are still responsible on taking care of their quotas.
+
+When the configuration is disable, no archive will be produce by the scheduler; and manual launch will not be available.
+
+The scheduling configuration determines the eligible emails to archive. 
+In other words, when you are setting the repeat kind:
+
+ * to daily (time selection): each emails older than one day will be archived
+ * to monthly (day of month and time selection): each emails older than one month will be archived +
+ Example: current date is 11-25-2014, day of month is set to 5 and time is set to 21:30 +
+ next run will be 12-05-2014 21:30, and every emails older than 11-05-2014 will be archived.
+ * ...
+
+
+=== Consultation page
+
+This page is displaying some basic information:
+
+ * *Past operations* last three runs, with start time, end time and status linked to the treatment logs
+ * *Simulation button* immediately launches a simulation run
+ * *Manual launch* immediately launches a run
+ * *Next run* date and time of the next scheduled treatment
+ * *Last failure* last failure, with start time, end time and status linked to the treatment logs
+  
+.*IMAP Archive* consultation
+image::admin_consult.png[*IMAP Archive* consultation]
+
+=== Update page
+
+This page is used to configure the treatment:
+
+ * *Activating* check to activate the *IMAP Archive* on this domain
+ * *Scheduling* basic scheduling configuration, with the next scheduled treatment
+ * *Excluded folder* IMAP folder to be excluded for each user
+ * *Excluded users* users to be excluded
+ * *Send emails to* list of emails to be annotated at the end of each treatment 
+  
+.*IMAP Archive* update
+image::admin_update.png[*IMAP Archive* update]
+
+=== Logs page
+
+When launching a simulation launch or a manual launch, a new tab containing logs will be opened.
+Emails annotation at the end of the treatment will also include a link to this page. 
+  
+.*IMAP Archive* logs
+image::logs.png[*IMAP Archive* logs]
+ 

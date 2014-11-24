@@ -1,0 +1,46 @@
+== IMAP Archive Configuration
+
+Once installed, you may configure the following parameters in the +/etc/obm-imap-archive/obm-imap-archive.ini+ file:
+
+* *partition_suffix* the Cyrus archive partition suffix, default value _archive_ 
+* *main_folder* the main folder used to store archives, default value _ARCHIVE_
+* <<_batch_size,*batch_size*>> default value _20_
+* <<_transaction_timeout,*transaction_timeout_in_seconds*>> default value _3600_
+
+.+/etc/obm-imap-archive/obm-imap-archive.ini+ example
+****
+----
+#partition_suffix=archive
+#main_folder=ARCHIVE
+#batch_size=20
+#transaction_timeout_in_seconds=3600
+----
+****
+
+=== Batch size
+
+*IMAP Archive* process copies emails by batch. Rather than copying all emails in one IMAP command, it's safer and more flexible to copy them by batches.
+
+For example, when *IMAP Archive* process has to copy 1000 emails from a folder, it will split the IMAP copy command in 50 IMAP copy commands:
+
+ * copy emails 1 to 20
+ * copy emails 21 to 40
+ * ...
+ 
+
+This configuration value is used to determine the number of emails copied in one batch.
+
+This value has some impact in performances, a higher value should be faster.
+
+But if a problem occurs during the treatment on a folder, the next treatment may duplicate some emails on this folder less than the batch size.
+
+The default value is a good compromise between the performance and the potential number of duplicated emails.
+
+=== Transaction timeout
+
+This configuration value is used to define the transaction timeout to the database.
+
+When processing, a transaction is opened per folder. This means that when archiving a huge amount of emails on a folder, transaction timeout may be reached.
+
+As only one archive process is running at the same time on a domain, and this process is persisting only data in it's own tables; we can use a _huge_ value on this parameter,
+such as the default (one hour).
