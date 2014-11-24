@@ -112,7 +112,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	private final ObmDomain domain = ObmDomain
 			.builder()
 			.id(1)
-			.uuid(ObmDomainUuid.of("3af47236-3638-458e-9c3e-5eebbaa8f9ae"))
+			.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
 			.name("domain")
 			.build();
 	

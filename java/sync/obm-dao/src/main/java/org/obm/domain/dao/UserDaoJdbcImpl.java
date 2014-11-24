@@ -515,13 +515,14 @@ public class UserDaoJdbcImpl implements UserDao {
 		String uq = "SELECT " + USER_FIELDS
 				+ " FROM UserObm "
 				+ "INNER JOIN UserEntity ON userentity_user_id = userobm_id "
+				+ "INNER JOIN Domain ON domain_id = userobm_domain_id "
 				+ "LEFT JOIN Host ON host_id = userobm_mail_server_id "
 				+ "LEFT JOIN UserObmPref defpref ON defpref.userobmpref_option='set_public_fb' AND defpref.userobmpref_user_id IS NULL "
 				+ "LEFT JOIN UserObmPref userpref ON userpref.userobmpref_option='set_public_fb' AND userpref.userobmpref_user_id=userobm_id "
-				+ "WHERE userobm_domain_id=? AND userobm_ext_id=?";
+				+ "WHERE domain_uuid=? AND userobm_ext_id=?";
 		try (Connection conn = obmHelper.getConnection();
 				PreparedStatement ps = conn.prepareStatement(uq)) {
-			ps.setInt(1, domain.getId());
+			ps.setString(1, domain.getUuid().get());
 			ps.setString(2, userExtId.getExtId());
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
