@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.1.0-rc1</version>
+		<version>3.1.0-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>obm-domain-objects</artifactId>
 	<packaging>jar</packaging>
 	<name>OBM domain objects</name>
 	<url>http://www.obm.org/</url>
-	<version>3.1.0-rc1</version>
+	<version>3.1.0-SNAPSHOT</version>
 
 	<licenses>
 		<license>
