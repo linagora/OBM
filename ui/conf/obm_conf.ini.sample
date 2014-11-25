@@ -52,6 +52,9 @@ obm-prefix = /
 ;Set this to false to disable the use of the 'confidential' privacy level
 ;enable-confidential-events = false
 
+;Hide private event to user have read rights
+;anonymize-private-events=false
+
 ; Synchronize global OBM address book
 globalAddressBookSync = true
 

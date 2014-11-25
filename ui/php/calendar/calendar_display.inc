@@ -2042,6 +2042,9 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
   return $block;
 }
 
+function should_display_private_events($uid, $owner){
+  return !$GLOBALS['anonymize_private_events'] && OBM_Acl::canWrite($uid, 'calendar', $owner);
+}
 
 /**
  * Perform HTML and javascript code for events. 
@@ -2072,7 +2075,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   // OBMFULL-4914
   // The uid is 0 when we browse the calendar through a public sharing URL,
   // so we assume no write rights in this specific case
-  if ($event->isNotPublic() && (is_null($attendee['user'][$obm['uid']])) && $owner != $obm['uid'] && ($obm['uid'] == 0 || !OBM_Acl::canWrite($obm['uid'], 'calendar', $owner))) {
+  if ($event->isNotPublic() && (is_null($attendee['user'][$obm['uid']])) && $owner != $obm['uid'] && ($obm['uid'] == 0 || !should_display_private_events($obm['uid'], $owner))) {
     $title = phpStringToJsString($l_private);
     $description = $title;
     $location = $title;
@@ -3079,7 +3082,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
       // OBMFULL-4914
       // An uid of 0 has write access on everyone according to Of_ACL... Unfortunately, the uid
       // is 0 when we browse a calendar through a public sharing URL, thus the check for != 0 here
-      ($obm['uid'] != 0 && OBM_Acl::canWrite($obm['uid'], 'calendar', $owner))) {
+      ($obm['uid'] != 0 && should_display_private_events($obm['uid'],$owner))) {
 
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));

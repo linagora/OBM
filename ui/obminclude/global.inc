@@ -1,4 +1,4 @@
-<script language="php"> 
+<?php 
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -331,6 +331,21 @@ if (is_null($ini_array['backupRoot'])) {
 }
 
 $cgp_host = $ini_array['external-protocol'].'://'.$ini_array['external-url'].$ini_array['obm-prefix'];
+
+// OBMFULL-6218
+// Because PHP can't parse a false state boolean in a ini file we must do this to keep boolean value
+// reference: https://bugs.php.net/bug.php?id=38409 - must be fixed in 5.6.1
+$anonymize_private_events_default = true;
+
+$anonymize_private_events = parse_anonymize_private_event($ini_array['anonymize-private-events'], $anonymize_private_events_default);
+
+function parse_anonymize_private_event($value, $default) {
+  if (!isset($value) && empty($value)) {
+    return $default;
+  } else {
+    return ($value == 1);
+  }
+}
 
 // ldapauth ini variables
 $auth_ldap_server = $ini_array['auth-ldap-server'];
@@ -2214,4 +2229,4 @@ function is_global_admin() {
   return $GLOBALS["obm"]["domain_global"];
 }
 
-</script>
+?>
