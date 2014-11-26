@@ -102,12 +102,6 @@ if ( $auth_kind && $auth_kind == "CAS" ) {
 // Enable the html editor by default
 $config['htmleditor'] = 1;
 
-// include external configuration file if it exists
-$external_config_file = "/etc/obm/webmail.inc.php";
-if ( file_exists($external_config_file) && is_readable($external_config_file) ) {
-  require_once($external_config_file);
-}
-
 // Default LDAP addressbook configuration
 $config['address_book_type'] = array('sql', 'ldap');
 $config['autocomplete_addressbooks'] = array('sql', 'obm');
@@ -138,3 +132,13 @@ $config['ldap_public'] ['obm'] = array(
   'sizelimit'     => '0',
   'timelimit'     => '0'
 );
+
+/**
+ * PLEASE KEEP THIS AT THE END OF THIS FILE
+ *
+ * Include external configuration file if it exists
+ */
+$external_config_file = "/etc/obm/webmail.inc.php";
+if (is_readable($external_config_file)) {
+  require_once($external_config_file);
+}
