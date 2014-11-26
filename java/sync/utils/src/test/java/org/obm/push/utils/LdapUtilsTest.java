@@ -81,7 +81,6 @@ public class LdapUtilsTest {
 		ldapUtils = new LdapUtils(ctx, "baseDN");
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testNamingEnumerationAreClosed() throws NamingException {
 		expect(ctx.search(eq("baseDN"), eq("aFilter"), anyObject(SearchControls.class))).andReturn(namingEnumeration);

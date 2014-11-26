@@ -88,7 +88,6 @@ public class ConcurrentRequestInfoStore<K extends Serializable> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public RequestInfo<K> getRequestInfo(K key) {
 		Element element = store.get(key);
 

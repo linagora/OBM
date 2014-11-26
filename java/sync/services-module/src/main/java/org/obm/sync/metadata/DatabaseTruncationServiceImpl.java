@@ -66,7 +66,6 @@ public class DatabaseTruncationServiceImpl implements DatabaseTruncationService 
 		}
 
 		try {
-			@SuppressWarnings("unchecked")
 			T newInstance = (T) entity.getClass().newInstance();
 			PropertyDescriptor[] descriptors = PropertyUtils.getPropertyDescriptors(entity.getClass());
 
