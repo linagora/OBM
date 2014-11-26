@@ -80,7 +80,7 @@ function dis_imap_archive_form($params, $configuration) {
   $block_excluded_users = get_block_excluded_users($excludedUserIdToLoginMap);
   $block_mailing = get_block_mailing($mailingEmails);
   
-  $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_excluded_user_id', 'userSearch', {filter_pattern:'access'});";
+  $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_excluded_user_id', 'userSearch', {filter_pattern:'access', item_id_property:'ext_id'});";
   
   $block = "
     <form method='get' name='f_imap_archive' action='imap_archive_index.php'>

@@ -129,7 +129,8 @@ obm.AutoComplete.Search = new Class({
     extension: null,                  // obm needs
     resultValue: null,		// obm needs
     strict: true, // If true, the result must be selected in the resultbox.
-    name: null
+    name: null,
+    item_id_property: 'id'
   },
 
 
@@ -143,6 +144,9 @@ obm.AutoComplete.Search = new Class({
       this.name = selectedBox;           // the name of the form validation paramater (also used as a prefix for results id)
     } else {
       this.name = this.options.name;
+    }
+    if( (this.options.item_id_property != null)) {
+      this.item_id_property = this.options.item_id_property;
     }
     this.selectedBox = $(selectedBox); // box used to add selected results
     this.isMouseOver = false;          // is mouse over the resultBox ?
@@ -573,15 +577,15 @@ obm.AutoComplete.Search = new Class({
   // avoids code duplication in ParallelExtSearch, where the selectedBox is
   // dynamic
   addResultValueToBox: function(element, extension, selectedBox) {
-    var item_id = element.getProperty('id');
+    var item_id = element.getProperty(this.item_id_property);
     var id;
-    if (element.getProperty('ext_id') != null) {
-      id = element.getProperty('ext_id');
+    if (item_id.search('item_') == -1) {
+      id = item_id;
     } else {
       id = item_id.substr(('item_').length,item_id.length);
     }
     var div_id = this.name + '-' + id;
-    var text = $(item_id+'_label').innerHTML;
+    var text = $(element.getProperty('id') + '_label').innerHTML;
     if (!$(div_id)) {
       element.addClass("selected");
       var result = new Element('div').addClass('elementRow');
