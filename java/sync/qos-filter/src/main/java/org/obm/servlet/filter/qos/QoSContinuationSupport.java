@@ -37,7 +37,12 @@ import org.eclipse.jetty.continuation.Continuation;
 
 public interface QoSContinuationSupport {
 
-	Continuation getContinuationFor(ServletRequest request);
+	interface QoSContinuation {
+		Continuation getContinuation();
+		long id();
+	}
+	
+	QoSContinuation getContinuationFor(ServletRequest request);
 
 	void suspend(ServletRequest request);
 

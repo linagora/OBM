@@ -31,22 +31,75 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import javax.servlet.ServletRequest;
 
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
+
 public class QoSContinuationSupportJettyUtils implements QoSContinuationSupport {
 
+	private final AtomicLong idGenerator;
+	
+	public QoSContinuationSupportJettyUtils() {
+		idGenerator = new AtomicLong();
+	}
+	
 	@Override
-	public Continuation getContinuationFor(ServletRequest request) {
-		return ContinuationSupport.getContinuation(request);
+	public QoSContinuation getContinuationFor(ServletRequest request) {
+		return new QoSContinuationImpl(idGenerator.incrementAndGet(), ContinuationSupport.getContinuation(request));
 	}
 	
 	@Override
 	public void suspend(ServletRequest request) {
-		Continuation continuation = getContinuationFor(request);
-		continuation.suspend();
+		QoSContinuation continuation = getContinuationFor(request);
+		continuation.getContinuation().suspend();
 	}
 	
+	public class QoSContinuationImpl implements QoSContinuation {
+
+		private final Continuation continuation;
+		private final long id;
+		
+		@VisibleForTesting QoSContinuationImpl(long id, Continuation continuation) {
+			this.id = id;
+			this.continuation = continuation;
+		}
+		
+		@Override
+		public Continuation getContinuation() {
+			return continuation;
+		}
+		
+		@Override
+		public long id() {
+			return id;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(id);
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof QoSContinuationImpl) {
+				QoSContinuationImpl other = (QoSContinuationImpl) obj;
+				return this.id == other.id;
+			}
+			return false;
+		}
+		
+		@Override
+		public String toString() {
+			return Objects.toStringHelper(getClass())
+					.add("id", id)
+					.toString();
+		}
+	}
+
 }

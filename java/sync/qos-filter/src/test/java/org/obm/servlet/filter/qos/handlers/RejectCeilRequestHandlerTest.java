@@ -43,6 +43,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.servlet.filter.qos.QoSAction;
+import org.obm.servlet.filter.qos.QoSContinuationSupport;
 import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.RequestDoneFunction;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.StartRequestFunction;
@@ -53,20 +54,20 @@ public class RejectCeilRequestHandlerTest {
 	private IMocksControl control;
 	private BusinessKeyProvider<String> keyProvider;
 	private ConcurrentRequestInfoStore<String> requestInfoStore;
-	private ContinuationIdStore continuationIdStore;
 	private RejectCeilRequestHandler<String> testee;
 	private RequestInfo<String> zeroRequest;
 	private RequestInfo<String> oneRequest;
 	private RequestInfo<String> twoRequests;
 	private RequestInfo<String> threeRequests;
 	private String key;
+	private QoSContinuationSupport continuationSupport;
 
 	@Before
 	public void setup() {
 		control = createStrictControl();
 		keyProvider = control.createMock(BusinessKeyProvider.class);
 		requestInfoStore = control.createMock(ConcurrentRequestInfoStore.class);
-		continuationIdStore = control.createMock(ContinuationIdStore.class);
+		continuationSupport = control.createMock(QoSContinuationSupport.class);
 		key = "myKey";
 		zeroRequest = RequestInfo.create(key);
 		oneRequest = zeroRequest.oneMoreRequest();
@@ -75,7 +76,7 @@ public class RejectCeilRequestHandlerTest {
 		
 		int suspendCeil = 2;
 		int rejectCeil = 3;
-		testee = new RejectCeilRequestHandler<String>(keyProvider, requestInfoStore, continuationIdStore, suspendCeil, rejectCeil);
+		testee = new RejectCeilRequestHandler<String>(keyProvider, requestInfoStore, continuationSupport, suspendCeil, rejectCeil);
 	}
 	
 	@SuppressWarnings("unused")
@@ -83,7 +84,7 @@ public class RejectCeilRequestHandlerTest {
 	public void testRejectCeilEqualsToSuspend() {
 		int suspendCeil = 2;
 		int rejectCeil = 2;
-		new RejectCeilRequestHandler<String>(keyProvider, requestInfoStore, continuationIdStore, suspendCeil, rejectCeil);
+		new RejectCeilRequestHandler<String>(keyProvider, requestInfoStore, continuationSupport, suspendCeil, rejectCeil);
 	}
 	
 	@SuppressWarnings("unused")
@@ -91,7 +92,7 @@ public class RejectCeilRequestHandlerTest {
 	public void testRejectCeilLessThanSuspend() {
 		int suspendCeil = 2;
 		int rejectCeil = 1;
-		new RejectCeilRequestHandler<String>(keyProvider, requestInfoStore, continuationIdStore, suspendCeil, rejectCeil);
+		new RejectCeilRequestHandler<String>(keyProvider, requestInfoStore, continuationSupport, suspendCeil, rejectCeil);
 	}
 	
 	@SuppressWarnings("unused")
@@ -99,7 +100,7 @@ public class RejectCeilRequestHandlerTest {
 	public void testRejectCeilGreaterThanSuspend() {
 		int suspendCeil = 2;
 		int rejectCeil = 3;
-		new RejectCeilRequestHandler<String>(keyProvider, requestInfoStore, continuationIdStore, suspendCeil, rejectCeil);
+		new RejectCeilRequestHandler<String>(keyProvider, requestInfoStore, continuationSupport, suspendCeil, rejectCeil);
 	}
 	
 	@SuppressWarnings("unchecked")

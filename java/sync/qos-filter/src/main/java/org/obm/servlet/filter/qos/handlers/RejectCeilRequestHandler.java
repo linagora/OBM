@@ -37,6 +37,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.obm.servlet.filter.qos.QoSAction;
+import org.obm.servlet.filter.qos.QoSContinuationSupport;
 import org.obm.servlet.filter.qos.QoSFilter;
 import org.obm.servlet.filter.qos.QoSRequestHandler;
 import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
@@ -64,7 +65,7 @@ public class RejectCeilRequestHandler<K extends Serializable> implements QoSRequ
 	@VisibleForTesting RejectCeilRequestHandler(
 			BusinessKeyProvider<K> businessKeyProvider,
 			ConcurrentRequestInfoStore<K> concurrentRequestInfoStore,
-			ContinuationIdStore continuationIdStore,
+			QoSContinuationSupport continuationSupport,
 			@Named(NPerClientQoSRequestHandler.MAX_REQUESTS_PER_CLIENT_PARAM) int maxSimultaneousRequestsPerClient,
 			@Named(REJECTING_CEIL_PER_CLIENT_PARAM) int rejectingCeilPerClient) {
 
@@ -79,7 +80,7 @@ public class RejectCeilRequestHandler<K extends Serializable> implements QoSRequ
 		this.concurrentRequestInfoStore = concurrentRequestInfoStore;
 		this.rejectingCeilPerClient = rejectingCeilPerClient;
 		this.suspendHandler = new NPerClientQoSRequestSuspendHandler<K>(
-				businessKeyProvider, concurrentRequestInfoStore, continuationIdStore, maxSimultaneousRequestsPerClient);
+				businessKeyProvider, concurrentRequestInfoStore, continuationSupport, maxSimultaneousRequestsPerClient);
 	}
 
 	@Override

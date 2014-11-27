@@ -31,12 +31,45 @@ package org.obm.servlet.filter.qos.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.eclipse.jetty.continuation.Continuation;
 import org.junit.Test;
-import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
+import org.obm.servlet.filter.qos.QoSContinuationSupport;
+import org.obm.servlet.filter.qos.QoSContinuationSupport.QoSContinuation;
+
+import com.google.common.base.Objects;
 
 
-public class RequestInfoTest
-{
+public class RequestInfoTest {
+	
+	public static class TestContinuation implements QoSContinuationSupport.QoSContinuation {
+		
+		private long id;
+
+		public TestContinuation(long id) {
+			this.id = id;
+		}
+		
+		@Override
+		public Continuation getContinuation() {
+			throw new IllegalStateException();
+		}
+		
+		@Override
+		public long id() {
+			return id;
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(id);
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			return id == ((TestContinuation)obj).id;
+		}
+	}
+	
 	@Test
 	public void defaultValues() {
 		RequestInfo<Integer> info = RequestInfo.create(2);
@@ -73,8 +106,8 @@ public class RequestInfoTest
 	@Test
 	public void testAppendOneContinuation() {
 		RequestInfo<Integer> info = RequestInfo.create(2);
-		ContinuationId continuationId = new ContinuationId(1l);
-		RequestInfo<Integer> actual = info.appendContinuationId(continuationId);
+		TestContinuation continuationId = new TestContinuation(1l);
+		RequestInfo<Integer> actual = info.appendContinuation(continuationId);
 		assertThat(actual.getContinuationIds()).containsOnly(continuationId);
 		assertThat(info.getContinuationIds()).isEmpty();
 	}
@@ -83,9 +116,9 @@ public class RequestInfoTest
 	public void testAppendTwoContinuation() {
 		RequestInfo<Integer> info = RequestInfo.create(2);
 		RequestInfo<Integer> actual = info
-				.appendContinuationId(new ContinuationId(1l))
-				.appendContinuationId(new ContinuationId(2l));
-		assertThat(actual.getContinuationIds()).containsOnly(new ContinuationId(1l), new ContinuationId(2l));
+				.appendContinuation(new TestContinuation(1l))
+				.appendContinuation(new TestContinuation(2l));
+		assertThat(actual.getContinuationIds()).containsOnly(new TestContinuation(1l), new TestContinuation(2l));
 		assertThat(info.getContinuationIds()).isEmpty();
 	}
 	
@@ -93,36 +126,36 @@ public class RequestInfoTest
 	public void testPopOneRequest() {
 		RequestInfo<Integer> info = RequestInfo.create(2);
 		RequestInfo<Integer> actual = info
-				.appendContinuationId(new ContinuationId(1l))
-				.appendContinuationId(new ContinuationId(2l))
+				.appendContinuation(new TestContinuation(1l))
+				.appendContinuation(new TestContinuation(2l))
 				.popContinuation();
-		assertThat(actual.getContinuationIds()).containsOnly(new ContinuationId(2l));
+		assertThat(actual.getContinuationIds()).containsOnly(new TestContinuation(2l));
 	}
 	
 	@Test
 	public void testNextContinuation() {
 		RequestInfo<Integer> info = RequestInfo.create(2);
-		ContinuationId actual = info
-				.appendContinuationId(new ContinuationId(1l))
-				.appendContinuationId(new ContinuationId(2l))
+		QoSContinuation actual = info
+				.appendContinuation(new TestContinuation(1l))
+				.appendContinuation(new TestContinuation(2l))
 				.nextContinuation();
-		assertThat(actual).isEqualTo(new ContinuationId(1l));
+		assertThat(actual).isEqualTo(new TestContinuation(1l));
 	}
 	
 	@Test
 	public void testNextContinuationIsSameAsPop() {
 		RequestInfo<Integer> info = RequestInfo.create(2);
 		RequestInfo<Integer> twoContinuations = info
-				.appendContinuationId(new ContinuationId(1l))
-				.appendContinuationId(new ContinuationId(2l));
-		assertThat(twoContinuations.nextContinuation()).isEqualTo(new ContinuationId(1l));
-		assertThat(twoContinuations.popContinuation().getContinuationIds()).containsOnly(new ContinuationId(2l));
+				.appendContinuation(new TestContinuation(1l))
+				.appendContinuation(new TestContinuation(2l));
+		assertThat(twoContinuations.nextContinuation()).isEqualTo(new TestContinuation(1l));
+		assertThat(twoContinuations.popContinuation().getContinuationIds()).containsOnly(new TestContinuation(2l));
 	}
 	
 	@Test(expected=IllegalStateException.class)
 	public void testTooManyRequests() {
 		RequestInfo<Integer> info = RequestInfo.create(2);
-		info.appendContinuationId(new ContinuationId(1l))
+		info.appendContinuation(new TestContinuation(1l))
 			.popContinuation()
 			.popContinuation();
 	}
@@ -152,8 +185,8 @@ public class RequestInfoTest
 	public void testGetRequestCountOnlyContinuation() {
 		RequestInfo<String> info = RequestInfo.create("key");
 		RequestInfo<String> twoContinuations = info
-				.appendContinuationId(new ContinuationId(1l))
-				.appendContinuationId(new ContinuationId(2l));
+				.appendContinuation(new TestContinuation(1l))
+				.appendContinuation(new TestContinuation(2l));
 		assertThat(twoContinuations.getPendingRequestCount()).isEqualTo(2);
 	}
 	
@@ -162,8 +195,8 @@ public class RequestInfoTest
 		RequestInfo<String> info = RequestInfo.create("key");
 		RequestInfo<String> twoContinuations = info
 				.oneMoreRequest()
-				.appendContinuationId(new ContinuationId(1l))
-				.appendContinuationId(new ContinuationId(2l))
+				.appendContinuation(new TestContinuation(1l))
+				.appendContinuation(new TestContinuation(2l))
 				.oneMoreRequest();
 		assertThat(twoContinuations.getPendingRequestCount()).isEqualTo(4);
 	}

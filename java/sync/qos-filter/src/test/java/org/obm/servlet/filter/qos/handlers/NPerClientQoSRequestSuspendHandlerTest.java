@@ -43,30 +43,30 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.servlet.filter.qos.QoSAction;
+import org.obm.servlet.filter.qos.QoSContinuationSupport;
+import org.obm.servlet.filter.qos.QoSContinuationSupport.QoSContinuation;
 import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
-import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.RequestDoneFunction;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.StartRequestFunction;
-
 
 public class NPerClientQoSRequestSuspendHandlerTest {
 	
 	private IMocksControl control;
 	private BusinessKeyProvider<String> keyProvider;
 	private ConcurrentRequestInfoStore<String> requestInfoStore;
-	private ContinuationIdStore continuationIdStore;
 	private NPerClientQoSRequestSuspendHandler<String> testee;
 	private RequestInfo<String> zeroRequest;
 	private RequestInfo<String> oneRequest;
 	private RequestInfo<String> twoRequests;
 	private String key;
+	private QoSContinuationSupport continuationSupport;
 
 	@Before
 	public void setup() {
 		control = createStrictControl();
 		keyProvider = control.createMock(BusinessKeyProvider.class);
 		requestInfoStore = control.createMock(ConcurrentRequestInfoStore.class);
-		continuationIdStore = control.createMock(ContinuationIdStore.class);
+		continuationSupport = control.createMock(QoSContinuationSupport.class);
 		key = "myKey";
 		zeroRequest = RequestInfo.create(key);
 		oneRequest = zeroRequest.oneMoreRequest();
@@ -76,7 +76,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void startRequest() {
-		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
+		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationSupport, 2);
 		HttpServletRequest firstRequest = control.createMock(HttpServletRequest.class);
 		expect(keyProvider.provideKey(firstRequest)).andReturn(key);
 		expect(requestInfoStore.executeInTransaction(eq(key), isA(StartRequestFunction.class))).andReturn(QoSAction.ACCEPT);
@@ -89,7 +89,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void requestDone() {
-		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
+		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationSupport, 2);
 		HttpServletRequest firstRequest = control.createMock(HttpServletRequest.class);
 		expect(keyProvider.provideKey(firstRequest)).andReturn(key);
 		expect(requestInfoStore.executeInTransaction(eq(key), isA(RequestDoneFunction.class))).andReturn(null);
@@ -100,7 +100,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	
 	@Test
 	public void acceptFirstRequest() {
-		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
+		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationSupport, 2);
 		HttpServletRequest firstRequest = control.createMock(HttpServletRequest.class);
 		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
 		expect(ref.get()).andReturn(zeroRequest);
@@ -114,7 +114,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	
 	@Test
 	public void acceptSecondRequest() {
-		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
+		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationSupport, 2);
 		HttpServletRequest secondRequest = control.createMock(HttpServletRequest.class);
 		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
 		expect(ref.get()).andReturn(oneRequest);
@@ -128,14 +128,14 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	
 	@Test
 	public void tooManyRequestsSuspend() {
-		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
+		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationSupport, 2);
 		HttpServletRequest thirdRequest = control.createMock(HttpServletRequest.class);
 		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
 		expect(ref.get()).andReturn(twoRequests).times(2);
 		expect(thirdRequest.getQueryString()).andReturn("");
-		ContinuationId continuationId = new ContinuationId(0l);
-		expect(continuationIdStore.generateIdFor(thirdRequest)).andReturn(continuationId);
-		RequestInfo<String> expectedInfo = twoRequests.appendContinuationId(continuationId);
+		QoSContinuation continuation = control.createMock(QoSContinuation.class);
+		expect(continuationSupport.getContinuationFor(thirdRequest)).andReturn(continuation);
+		RequestInfo<String> expectedInfo = twoRequests.appendContinuation(continuation);
 		ref.put(expectedInfo);
 		control.replay();
 		QoSAction actual = testee.startRequestImpl(ref, thirdRequest);
@@ -145,7 +145,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	
 	@Test
 	public void requestDoneTrackNbRequest() {
-		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
+		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationSupport, 2);
 		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
 		expect(ref.get()).andReturn(twoRequests);
 		ref.put(oneRequest);
@@ -157,7 +157,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	
 	@Test
 	public void cleanupEmptyInfo() {
-		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
+		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationSupport, 2);
 		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
 		expect(ref.get()).andReturn(zeroRequest).times(2);
 		ref.clear();
@@ -168,7 +168,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	
 	@Test
 	public void cleanupBusyInfo() {
-		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
+		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationSupport, 2);
 		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
 		expect(ref.get()).andReturn(oneRequest).times(2);
 		control.replay();
@@ -178,9 +178,10 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	
 	@Test
 	public void cleanupBusyInfoSuspendedQueue() {
-		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
+		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationSupport, 2);
 		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
-		expect(ref.get()).andReturn(zeroRequest.appendContinuationId(new ContinuationId(1l)));
+		QoSContinuation continuation = control.createMock(QoSContinuation.class);
+		expect(ref.get()).andReturn(zeroRequest.appendContinuation(continuation));
 		control.replay();
 		testee.cleanupImpl(ref);
 		control.verify();

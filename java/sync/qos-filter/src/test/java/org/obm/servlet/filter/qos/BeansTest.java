@@ -33,8 +33,8 @@ package org.obm.servlet.filter.qos;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.servlet.filter.qos.QoSContinuationSupportJettyUtils.QoSContinuationImpl;
 import org.obm.servlet.filter.qos.handlers.RequestInfo;
-import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 
@@ -49,7 +49,7 @@ public class BeansTest {
 	
 	@Test
 	public void test() {
-		equalsVerifierUtilsTest.test(RequestInfo.class, ContinuationId.class);
+		equalsVerifierUtilsTest.test(RequestInfo.class, QoSContinuationImpl.class);
 	}
 	
 }

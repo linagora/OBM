@@ -35,10 +35,10 @@ import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.jetty.continuation.Continuation;
 import org.obm.servlet.filter.qos.QoSAction;
+import org.obm.servlet.filter.qos.QoSContinuationSupport;
+import org.obm.servlet.filter.qos.QoSContinuationSupport.QoSContinuation;
 import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
-import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,16 +51,16 @@ import com.google.inject.name.Named;
 public class NPerClientQoSRequestSuspendHandler<K extends Serializable> extends NPerClientQoSRequestHandler<K> {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	private final ContinuationIdStore continuationIdStore;
+	private final QoSContinuationSupport continuationSupport;
 
 	@Inject
 	@VisibleForTesting NPerClientQoSRequestSuspendHandler(
 			BusinessKeyProvider<K> businessKeyProvider,
 			ConcurrentRequestInfoStore<K> concurrentRequestInfoStore,
-			ContinuationIdStore continuationIdStore,
+			QoSContinuationSupport continuationSupport,
 			@Named(MAX_REQUESTS_PER_CLIENT_PARAM) int maxSimultaneousRequestsPerClient) {
 		super(businessKeyProvider, concurrentRequestInfoStore, maxSimultaneousRequestsPerClient, QoSAction.SUSPEND);
-		this.continuationIdStore = continuationIdStore;
+		this.continuationSupport = continuationSupport;
 	}
 
 	@Override
@@ -69,8 +69,7 @@ public class NPerClientQoSRequestSuspendHandler<K extends Serializable> extends 
 		RequestInfo<K> info = ref.get();
 		if (action == QoSAction.SUSPEND) {
 			logger.debug("will suspend request {}", request.getQueryString());
-			final ContinuationId continuationId = continuationIdStore.generateIdFor(request);
-			ref.put(info.appendContinuationId(continuationId));
+			ref.put(info.appendContinuation(continuationSupport.getContinuationFor(request)));
 		}
 		return action;
 	}
@@ -79,12 +78,11 @@ public class NPerClientQoSRequestSuspendHandler<K extends Serializable> extends 
 	protected void requestDoneImpl(RequestInfoReference<K> ref) {
 		super.requestDoneImpl(ref);
 		RequestInfo<K> info = ref.get();
-		ContinuationId last = info.nextContinuation();
-		if (last != null) {
+		QoSContinuation continuation = info.nextContinuation();
+		if (continuation != null) {
 			logger.debug("resume continuation after request");
 			ref.put(info.popContinuation());
-			final Continuation continuation = continuationIdStore.removeContinuation(last);
-			continuation.resume();
+			continuation.getContinuation().resume();
 		} else {
 			logger.debug("no continuation to resume");
 		}
