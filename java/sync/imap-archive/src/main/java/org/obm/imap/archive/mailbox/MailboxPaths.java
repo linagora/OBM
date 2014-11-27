@@ -202,6 +202,10 @@ public class MailboxPaths {
 			.build();
 	}
 	
+	public boolean belongsTo(DomainName domainName) {
+		return this.domainName.equals(domainName);
+	}
+	
 	@Override
 	public int hashCode(){
 		return Objects.hashCode(mainPath, user, subPaths, domainName);

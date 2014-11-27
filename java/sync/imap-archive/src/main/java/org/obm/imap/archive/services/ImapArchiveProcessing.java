@@ -299,11 +299,61 @@ public class ImapArchiveProcessing {
 			storeClient.login(false);
 			
 			return FluentIterable.from(storeClient.listAll())
+					.transform(appendDomainWhenNone(processedTask))
+					.filter(filterDomain(processedTask))
 					.filter(filterExcludedFolder(processedTask))
 					.filter(filterOutExcludedUsers(processedTask))
 					.filter(filterArchiveFolder())
 					.toList();
 		}
+	}
+
+	private Function<ListInfo, ListInfo> appendDomainWhenNone(ProcessedTask processedTask) {
+		final String domainName = processedTask.getDomain().getName();
+		return new Function<ListInfo, ListInfo>() {
+
+			@Override
+			public ListInfo apply(ListInfo listInfo) {
+				if (!hasDomain(listInfo)) {
+					return appendDomainToListInfo(listInfo, domainName);
+				}
+				return listInfo;
+			}
+
+			private boolean hasDomain(ListInfo listInfo) {
+				return listInfo.getName().contains(MailboxPaths.AT);
+			}
+
+			private ListInfo appendDomainToListInfo(ListInfo listInfo, String domainName) {
+				return new ListInfo(
+						new StringBuilder()
+							.append(listInfo.getName())
+							.append(MailboxPaths.AT)
+							.append(domainName)
+							.toString(), 
+						listInfo.isSelectable(), listInfo.canCreateSubfolder());
+			}
+		};
+	}
+
+	private Predicate<ListInfo> filterDomain(ProcessedTask processedTask) {
+		final DomainName domainName = new DomainName(processedTask.getDomain().getName());
+		final Logger logger = processedTask.getLogger();
+		return new Predicate<ListInfo>() {
+
+			@Override
+			public boolean apply(ListInfo listInfo) {
+				try {
+					MailboxPaths mailboxPaths = MailboxPaths.from(listInfo.getName());
+					if (mailboxPaths.belongsTo(domainName)) {
+						return true;
+					}
+				} catch (MailboxFormatException e) {
+					logger.error(String.format("The mailbox %s can't be parsed", listInfo.getName()));
+				}
+				return false;
+			}
+		};
 	}
 
 	private Predicate<ListInfo> filterExcludedFolder(final ProcessedTask processedTask) {

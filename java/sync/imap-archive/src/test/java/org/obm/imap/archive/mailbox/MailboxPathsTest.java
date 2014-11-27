@@ -242,4 +242,25 @@ public class MailboxPathsTest {
 		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org");
 		assertThat(mailboxPaths.getUserAtDomain()).isEqualTo("usera@mydomain.org");
 	}
+	
+	@Test
+	public void belongsToShouldThrowWhenNull() throws Exception {
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org");
+		boolean belongsTo = mailboxPaths.belongsTo(null);
+		assertThat(belongsTo).isFalse();
+	}
+	
+	@Test
+	public void belongsToShouldReturnFalseWhenOtherDomain() throws Exception {
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org");
+		boolean belongsTo = mailboxPaths.belongsTo(new DomainName("otherdomain.org"));
+		assertThat(belongsTo).isFalse();
+	}
+	
+	@Test
+	public void belongsToShouldReturnTrueWhenMatching() throws Exception {
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org");
+		boolean belongsTo = mailboxPaths.belongsTo(new DomainName("mydomain.org"));
+		assertThat(belongsTo).isTrue();
+	}
 }
