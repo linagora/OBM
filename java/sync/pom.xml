@@ -179,9 +179,6 @@
 						<downloadJavadocs>true</downloadJavadocs>
 						<downloadSources>true</downloadSources>
 						<projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
-						<excludes>
-							<exclude>org.slf4j:slf4j-simple</exclude>
-						</excludes>
 						<additionalConfig>
 							<file>
 								<name>.settings/org.eclipse.jdt.core.prefs</name>
@@ -1020,6 +1017,12 @@ org.eclipse.jdt.core.compiler.source=1.7
 				<version>${slf4j.version}</version>
 				<scope>test</scope>
 				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>${slf4j.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.postgresql</groupId>
