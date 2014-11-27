@@ -303,7 +303,7 @@ public class ImapArchiveProcessing {
 					.filter(filterDomain(processedTask))
 					.filter(filterExcludedFolder(processedTask))
 					.filter(filterOutExcludedUsers(processedTask))
-					.filter(filterArchiveFolder())
+					.filter(filterArchiveFolder(processedTask))
 					.toList();
 		}
 	}
@@ -398,7 +398,8 @@ public class ImapArchiveProcessing {
 				}).toList();
 	}
 
-	private Predicate<ListInfo> filterArchiveFolder() {
+	private Predicate<ListInfo> filterArchiveFolder(ProcessedTask processedTask) {
+		final Logger logger = processedTask.getLogger();
 		return new Predicate<ListInfo>() {
 
 			@Override
@@ -409,7 +410,7 @@ public class ImapArchiveProcessing {
 						return true;
 					}
 				} catch (MailboxFormatException e) {
-					Throwables.propagate(e);
+					logger.error(String.format("The mailbox %s can't be parsed", listInfo.getName()));
 				}
 				return false;
 			}
