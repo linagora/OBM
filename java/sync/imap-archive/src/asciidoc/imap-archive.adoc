@@ -1,5 +1,5 @@
 = IMAP Archive Service
-OBM Core Team <club@list.obm.org>;
+OBM Core Team <lgs-obm-dev@linagora.com>;
 :imagesdir: images
 :numbered:
 :sectlink:
