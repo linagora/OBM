@@ -56,6 +56,10 @@ public class ContinuationIdStore {
 			this.id = id;
 		}
 
+		@VisibleForTesting long id() {
+			return id;
+		}
+		
 		@Override
 		public final int hashCode() {
 			return Objects.hashCode(id);

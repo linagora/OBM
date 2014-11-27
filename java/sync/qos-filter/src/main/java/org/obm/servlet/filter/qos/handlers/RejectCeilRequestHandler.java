@@ -39,6 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.obm.servlet.filter.qos.QoSAction;
 import org.obm.servlet.filter.qos.QoSFilter;
 import org.obm.servlet.filter.qos.QoSRequestHandler;
+import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
+import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.StoreFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +85,21 @@ public class RejectCeilRequestHandler<K extends Serializable> implements QoSRequ
 	@Override
 	public final QoSAction startRequestHandling(final HttpServletRequest request) throws ServletException {
 		final K key = businessKeyProvider.provideKey(request);
-		RequestInfo<K> requestInfo = concurrentRequestInfoStore.getRequestInfo(key);
+		return concurrentRequestInfoStore.executeInTransaction(key, new StoreFunction<K, QoSAction>() {
+			@Override
+			public QoSAction execute(RequestInfoReference<K> ref) {
+				return startRequestImpl(request, key, ref);
+			}
+
+			@Override
+			public void cleanup(RequestInfoReference<K> store) {
+				// nothing to cleanup
+			}
+		});
+	}
+
+	@VisibleForTesting QoSAction startRequestImpl(final HttpServletRequest request, final K key, RequestInfoReference<K> ref) {
+		RequestInfo<K> requestInfo = ref.get();
 		if (requestInfo.getPendingRequestCount() >= rejectingCeilPerClient) {
 			logger.warn("a request is rejected for the key:{}", key);
 			return QoSAction.REJECT;
@@ -91,7 +107,7 @@ public class RejectCeilRequestHandler<K extends Serializable> implements QoSRequ
 			return suspendHandler.startRequestHandling(request);
 		}
 	}
-
+	
 	@Override
 	public final void finishRequestHandling(final HttpServletRequest request) {
 		suspendHandler.finishRequestHandling(request);

@@ -42,8 +42,6 @@ import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.sf.ehcache.CacheManager;
-
 import org.apache.http.StatusLine;
 import org.easymock.IMocksControl;
 import org.junit.After;
@@ -61,7 +59,6 @@ import org.obm.servlet.filter.qos.util.server.EmbeddedServer;
 import org.obm.servlet.filter.qos.util.server.QoSFilterTestModule;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 @GuiceModule(OnePerClientQoSRequestHandlerTest.Configuration.class)
 @RunWith(GuiceRunner.class)
@@ -74,7 +71,6 @@ public class OnePerClientQoSRequestHandlerTest {
 		}
 	}
 	
-	@Inject @Named(org.obm.servlet.filter.qos.QoSFilterModule.CONCURRENT_REQUEST_INFO_STORE) CacheManager cacheManager; 
 	@Inject IMocksControl control;
 	@Inject BusinessKeyProvider<String> businessKeyProvider;
 	@Inject EmbeddedServer server;
@@ -98,7 +94,6 @@ public class OnePerClientQoSRequestHandlerTest {
 	public void tearDown() throws Exception {
 		server.stop();
 		threadpool.shutdown();
-		cacheManager.shutdown();
 	}
 	
 	@Test

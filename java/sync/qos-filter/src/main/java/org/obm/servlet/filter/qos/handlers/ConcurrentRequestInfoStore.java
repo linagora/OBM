@@ -31,83 +31,134 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.handlers;
 
-import java.io.Serializable;
+import java.io.Closeable;
+import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.config.CacheConfiguration.TransactionalMode;
-
-import org.obm.servlet.filter.qos.QoSFilterModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.MapMaker;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
-public class ConcurrentRequestInfoStore<K extends Serializable> {
+public class ConcurrentRequestInfoStore<K> {
 
-	interface StoreFunction<K extends Serializable, V> {
-		K key();
-		V execute(ConcurrentRequestInfoStore<K> store);
-		void cleanup(ConcurrentRequestInfoStore<K> store);
+	private static final Logger logger = LoggerFactory.getLogger(ConcurrentRequestInfoStore.class);
+	
+	interface RequestInfoReference<K> {
+		void put(RequestInfo<K> value);
+		RequestInfo<K> get();
+		void clear();
 	}
 	
-	private static final String STORE_NAME = "RequestInfoStore";
-	private static final int NO_LIMIT = 0;
-	@VisibleForTesting Cache store;
+	interface StoreFunction<K, V> {
+		V execute(RequestInfoReference<K> store);
+		void cleanup(RequestInfoReference<K> store);
+	}
+	
+
+	private static class LockableReference<K> implements Closeable, RequestInfoReference<K> {
+		
+		private ReentrantLock lock;
+		private RequestInfo<K> info;
+		private boolean used;
+
+		public LockableReference(K key) {
+			lock = new ReentrantLock(true);
+			info = RequestInfo.create(key);
+			used = false;
+		}
+
+		private LockableReference<K> lock() {
+			lock.lock();
+			used = true;
+			return this;
+		}
+		
+		@Override
+		public void close() {
+			lock.unlock();
+		}
+		
+		@Override
+		public void clear() {
+			Preconditions.checkState(lock.isHeldByCurrentThread());
+			logger.debug("mark as unused");
+			used = false;
+		}
+		
+		@Override
+		public RequestInfo<K> get() {
+			Preconditions.checkState(lock.isHeldByCurrentThread());
+			Preconditions.checkState(used == true);
+			return info;
+		}
+		
+		@Override
+		public void put(RequestInfo<K> value) {
+			Preconditions.checkState(lock.isHeldByCurrentThread());
+			Preconditions.checkNotNull(value);
+			Preconditions.checkState(used == true);
+			logger.debug("put requestInfo {}", value);
+			info = value;
+		}
+		
+		private boolean used() {
+			Preconditions.checkState(lock.isHeldByCurrentThread());
+			return used;
+		}
+	}
+	
+	private final ConcurrentMap<K, LockableReference<K>> map;
+	private final Set<LockableReference<K>> references;
+	private final AtomicInteger count;
 
 	@Inject
-	@VisibleForTesting ConcurrentRequestInfoStore(@Named(QoSFilterModule.CONCURRENT_REQUEST_INFO_STORE) CacheManager cacheManager) {
-		cacheManager.addCache(storeDefinition());
-		store = cacheManager.getCache(STORE_NAME);
+	@VisibleForTesting ConcurrentRequestInfoStore() {
+		references = Sets.newConcurrentHashSet();
+		map = new MapMaker()
+			.weakValues()
+			.makeMap();
+		count = new AtomicInteger();
 	}
 	
-	@SuppressWarnings("deprecation")
-	private static Cache storeDefinition() {
-		return new Cache(
-				new CacheConfiguration()
-				.maxEntriesLocalHeap(NO_LIMIT)
-				.copyOnRead(false)
-				.copyOnWrite(false)
-				.overflowToDisk(false)
-				.eternal(false)
-				.name(STORE_NAME)
-				.transactionalMode(TransactionalMode.OFF));
-	}
-	
-	public <V> V executeInTransaction(StoreFunction<K, V> function) {
-		K key = function.key();
-		store.acquireWriteLockOnKey(key);
-		try {
-			V result = function.execute(this);
-			function.cleanup(this);
+	public <V> V executeInTransaction(K key, StoreFunction<K, V> function) {
+		int id = count.incrementAndGet();
+		logger.debug("Enters with id {}", id);
+		
+		try (LockableReference<K> reference = getLock(key).lock()) {
+			
+			logger.debug("Lock with id {}", id);
+			
+			V result = executeFunction(function, reference);
+			if (!reference.used()) {
+				references.remove(reference);
+			}
+			
+			logger.debug("Leaves with id {}", id);
 			return result;
+		}
+	}
+
+	private <V> V executeFunction(StoreFunction<K, V> function, LockableReference<K> reference) {
+		try {
+			return function.execute(reference);
 		} finally {
-			store.releaseWriteLockOnKey(key);	
+			function.cleanup(reference);
 		}
 	}
-
-	public RequestInfo<K> getRequestInfo(K key) {
-		Element element = store.get(key);
-
-		if (element == null) {
-			return RequestInfo.create(key);
-		}
-		return (RequestInfo<K>) element.getObjectValue();
-	}
 	
-	public RequestInfo<K> storeRequestInfo(RequestInfo<K> value) {
-		store.put(element(value));
-		return value;
-	}
-	
-	public boolean remove(RequestInfo<K> value) {
-		return store.remove(element(value));
-	}
-	
-	private Element element(RequestInfo<K> info) {
-		return new Element(info.getKey(), info);
+	private LockableReference<K> getLock(K key) {
+		LockableReference<K> newReference = new LockableReference<K>(key);
+		LockableReference<K> mappedRef = Optional.fromNullable(map.putIfAbsent(key, newReference)).or(newReference);
+		references.add(mappedRef);
+		return mappedRef;
 	}
 	
 }

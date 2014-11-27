@@ -31,10 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.handlers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createStrictControl;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,6 +43,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.servlet.filter.qos.QoSAction;
+import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.RequestDoneFunction;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.StartRequestFunction;
 
@@ -102,15 +104,15 @@ public class RejectCeilRequestHandlerTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void acceptFirstRequest() throws Exception {
+	public void acceptFirstRequest() {
 		HttpServletRequest firstRequest = control.createMock(HttpServletRequest.class);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(zeroRequest);
 		expect(keyProvider.provideKey(firstRequest)).andReturn(key);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(zeroRequest);
-		expect(keyProvider.provideKey(firstRequest)).andReturn(key);
-		expect(requestInfoStore.executeInTransaction(isA(StartRequestFunction.class))).andReturn(QoSAction.ACCEPT);
+		expect(requestInfoStore.executeInTransaction(eq(key), isA(StartRequestFunction.class))).andReturn(QoSAction.ACCEPT);
 		
 		control.replay();
-		QoSAction actual = testee.startRequestHandling(firstRequest);
+		QoSAction actual = testee.startRequestImpl(firstRequest, key, ref);
 		control.verify();
 
 		assertThat(actual).isEqualTo(QoSAction.ACCEPT);
@@ -118,16 +120,16 @@ public class RejectCeilRequestHandlerTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void acceptSecondRequest() throws Exception {
+	public void acceptSecondRequest() {
 		HttpServletRequest firstRequest = control.createMock(HttpServletRequest.class);
 		
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(oneRequest);
 		expect(keyProvider.provideKey(firstRequest)).andReturn(key);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(oneRequest);
-		expect(keyProvider.provideKey(firstRequest)).andReturn(key);
-		expect(requestInfoStore.executeInTransaction(isA(StartRequestFunction.class))).andReturn(QoSAction.ACCEPT);
+		expect(requestInfoStore.executeInTransaction(eq(key), isA(StartRequestFunction.class))).andReturn(QoSAction.ACCEPT);
 		
 		control.replay();
-		QoSAction actual = testee.startRequestHandling(firstRequest);
+		QoSAction actual = testee.startRequestImpl(firstRequest, key, ref);
 		control.verify();
 
 		assertThat(actual).isEqualTo(QoSAction.ACCEPT);
@@ -135,28 +137,28 @@ public class RejectCeilRequestHandlerTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void suspendThirdRequest() throws Exception {
+	public void suspendThirdRequest() {
 		HttpServletRequest thirdRequest = control.createMock(HttpServletRequest.class);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(twoRequests);
 		expect(keyProvider.provideKey(thirdRequest)).andReturn(key);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(twoRequests);
-		expect(keyProvider.provideKey(thirdRequest)).andReturn(key);
-		expect(requestInfoStore.executeInTransaction(isA(StartRequestFunction.class))).andReturn(QoSAction.SUSPEND);
+		expect(requestInfoStore.executeInTransaction(eq(key), isA(StartRequestFunction.class))).andReturn(QoSAction.SUSPEND);
 		
 		control.replay();
-		QoSAction actual = testee.startRequestHandling(thirdRequest);
+		QoSAction actual = testee.startRequestImpl(thirdRequest, key, ref);
 		control.verify();
 
 		assertThat(actual).isEqualTo(QoSAction.SUSPEND);
 	}
 
 	@Test
-	public void rejectFourthRequest() throws Exception {
+	public void rejectFourthRequest() {
 		HttpServletRequest fourthRequest = control.createMock(HttpServletRequest.class);
-		expect(keyProvider.provideKey(fourthRequest)).andReturn(key);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(threeRequests);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(threeRequests);
 		
 		control.replay();
-		QoSAction actual = testee.startRequestHandling(fourthRequest);
+		QoSAction actual = testee.startRequestImpl(fourthRequest, key, ref);
 		control.verify();
 
 		assertThat(actual).isEqualTo(QoSAction.REJECT);
@@ -167,7 +169,7 @@ public class RejectCeilRequestHandlerTest {
 	public void finishRequest() {
 		HttpServletRequest request = control.createMock(HttpServletRequest.class);
 		expect(keyProvider.provideKey(request)).andReturn(key);
-		expect(requestInfoStore.executeInTransaction(isA(RequestDoneFunction.class))).andReturn(null);
+		expect(requestInfoStore.executeInTransaction(eq(key), isA(RequestDoneFunction.class))).andReturn(null);
 		
 		control.replay();
 		testee.finishRequestHandling(request);

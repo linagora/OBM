@@ -32,17 +32,20 @@
 package org.obm.servlet.filter.qos.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createStrictControl;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.servlet.filter.qos.QoSAction;
-import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.StartRequestFunction;
+import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.RequestDoneFunction;
+import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.StartRequestFunction;
 
 
 public class NPerClientQoSRequestHandlerTest {
@@ -69,12 +72,12 @@ public class NPerClientQoSRequestHandlerTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void startRequest() throws ServletException {
+	public void startRequest() {
 		testee = new NPerClientQoSRequestHandler<String>(keyProvider, requestInfoStore, 2);
 		HttpServletRequest firstRequest = control.createMock(HttpServletRequest.class);
 		
 		expect(keyProvider.provideKey(firstRequest)).andReturn(key);
-		expect(requestInfoStore.executeInTransaction(isA(StartRequestFunction.class))).andReturn(QoSAction.ACCEPT);
+		expect(requestInfoStore.executeInTransaction(eq(key), isA(StartRequestFunction.class))).andReturn(QoSAction.ACCEPT);
 		control.replay();
 		QoSAction actual = testee.startRequestHandling(firstRequest);
 		assertThat(actual).isEqualTo(QoSAction.ACCEPT);
@@ -87,7 +90,7 @@ public class NPerClientQoSRequestHandlerTest {
 		testee = new NPerClientQoSRequestHandler<String>(keyProvider, requestInfoStore, 2);
 		HttpServletRequest firstRequest = control.createMock(HttpServletRequest.class);
 		expect(keyProvider.provideKey(firstRequest)).andReturn(key);
-		expect(requestInfoStore.executeInTransaction(isA(RequestDoneFunction.class))).andReturn(null);
+		expect(requestInfoStore.executeInTransaction(eq(key), isA(RequestDoneFunction.class))).andReturn(null);
 		control.replay();
 		testee.finishRequestHandling(firstRequest);
 		control.verify();
@@ -97,10 +100,11 @@ public class NPerClientQoSRequestHandlerTest {
 	public void acceptFirstRequest() {
 		testee = new NPerClientQoSRequestHandler<String>(keyProvider, requestInfoStore, 2);
 		HttpServletRequest firstRequest = control.createMock(HttpServletRequest.class);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(zeroRequest);
-		expect(requestInfoStore.storeRequestInfo(oneRequest)).andReturn(oneRequest);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(zeroRequest);
+		ref.put(oneRequest);
 		control.replay();
-		QoSAction actual = testee.startRequestImpl(requestInfoStore, key, firstRequest);
+		QoSAction actual = testee.startRequestImpl(ref, firstRequest);
 		assertThat(actual).isEqualTo(QoSAction.ACCEPT);
 		control.verify();
 	}
@@ -109,10 +113,11 @@ public class NPerClientQoSRequestHandlerTest {
 	public void acceptSecondRequest() {
 		testee = new NPerClientQoSRequestHandler<String>(keyProvider, requestInfoStore, 2);
 		HttpServletRequest secondRequest = control.createMock(HttpServletRequest.class);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(oneRequest);
-		expect(requestInfoStore.storeRequestInfo(twoRequests)).andReturn(twoRequests);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(oneRequest);
+		ref.put(twoRequests);
 		control.replay();
-		QoSAction actual = testee.startRequestImpl(requestInfoStore, key, secondRequest);
+		QoSAction actual = testee.startRequestImpl(ref, secondRequest);
 		assertThat(actual).isEqualTo(QoSAction.ACCEPT);
 		control.verify();
 	}
@@ -121,9 +126,10 @@ public class NPerClientQoSRequestHandlerTest {
 	public void tooManyRequestsReject() {
 		testee = new NPerClientQoSRequestHandler<String>(keyProvider, requestInfoStore, 2);
 		HttpServletRequest thirdRequest = control.createMock(HttpServletRequest.class);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(twoRequests);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(twoRequests);
 		control.replay();
-		QoSAction actual = testee.startRequestImpl(requestInfoStore, key, thirdRequest);
+		QoSAction actual = testee.startRequestImpl(ref, thirdRequest);
 		assertThat(actual).isEqualTo(QoSAction.REJECT);
 		control.verify();
 	}
@@ -131,29 +137,32 @@ public class NPerClientQoSRequestHandlerTest {
 	@Test
 	public void requestDoneTrackNbRequest() {
 		testee = new NPerClientQoSRequestHandler<String>(keyProvider, requestInfoStore, 2);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(twoRequests);
-		expect(requestInfoStore.storeRequestInfo(oneRequest)).andReturn(oneRequest);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(twoRequests);
+		ref.put(oneRequest);
 		control.replay();
-		testee.requestDoneImpl(requestInfoStore, key);
+		testee.requestDoneImpl(ref);
 		control.verify();
 	}
 	
 	@Test
 	public void cleanupEmptyInfo() {
 		testee = new NPerClientQoSRequestHandler<String>(keyProvider, requestInfoStore, 2);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(zeroRequest);
-		expect(requestInfoStore.remove(zeroRequest)).andReturn(true);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(zeroRequest);
+		ref.clear();
 		control.replay();
-		testee.cleanupImpl(requestInfoStore, key);
+		testee.cleanupImpl(ref);
 		control.verify();
 	}
 	
 	@Test
 	public void cleanupBusyInfo() {
 		testee = new NPerClientQoSRequestHandler<String>(keyProvider, requestInfoStore, 2);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(oneRequest);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(oneRequest);
 		control.replay();
-		testee.cleanupImpl(requestInfoStore, key);
+		testee.cleanupImpl(ref);
 		control.verify();
 	}
 	

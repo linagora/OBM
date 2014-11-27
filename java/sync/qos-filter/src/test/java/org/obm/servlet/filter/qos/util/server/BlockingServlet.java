@@ -37,6 +37,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -44,6 +47,8 @@ import com.google.inject.Singleton;
 @Singleton
 public class BlockingServlet extends HttpServlet {
 
+	private static final Logger logger = LoggerFactory.getLogger(BlockingServlet.class);
+	
 	private final LinkedBlockingQueue<String> incomingMessages;
 	private final LinkedBlockingQueue<String> outgoingMessages;
 	
@@ -56,15 +61,20 @@ public class BlockingServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		try {
-			System.out.println("entering servlet");
+			Integer requestId = Integer.valueOf(req.getParameter("count"));
+			printDebug("entering servlet", requestId);
 			outgoingMessages.offer("request received");
-			System.out.println("outgoint sent, waiting for incoming");
+			printDebug("outgoint sent, waiting for incoming", requestId);
 			incomingMessages.take();
-			System.out.println("done");
+			printDebug("done", requestId);
 		} catch (InterruptedException e) {
 			Throwables.propagate(e);
 		}
 		resp.getWriter().write("ok");
+	}
+	
+	private void printDebug(String message, int requestId) {
+		logger.debug(String.format("[%d] " + message, requestId));
 	}
 	
 	public LinkedBlockingQueue<String> getIncomingMessages() {

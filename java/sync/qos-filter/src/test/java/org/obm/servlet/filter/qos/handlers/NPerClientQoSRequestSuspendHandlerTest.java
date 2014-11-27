@@ -31,18 +31,19 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.handlers;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createStrictControl;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
-import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.servlet.filter.qos.QoSAction;
+import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
 import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.RequestDoneFunction;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.StartRequestFunction;
@@ -74,11 +75,11 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	
 	@SuppressWarnings("unchecked")
 	@Test
-	public void startRequest() throws ServletException {
+	public void startRequest() {
 		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
 		HttpServletRequest firstRequest = control.createMock(HttpServletRequest.class);
 		expect(keyProvider.provideKey(firstRequest)).andReturn(key);
-		expect(requestInfoStore.executeInTransaction(isA(StartRequestFunction.class))).andReturn(QoSAction.ACCEPT);
+		expect(requestInfoStore.executeInTransaction(eq(key), isA(StartRequestFunction.class))).andReturn(QoSAction.ACCEPT);
 		control.replay();
 		QoSAction actual = testee.startRequestHandling(firstRequest);
 		assertThat(actual).isEqualTo(QoSAction.ACCEPT);
@@ -91,7 +92,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
 		HttpServletRequest firstRequest = control.createMock(HttpServletRequest.class);
 		expect(keyProvider.provideKey(firstRequest)).andReturn(key);
-		expect(requestInfoStore.executeInTransaction(isA(RequestDoneFunction.class))).andReturn(null);
+		expect(requestInfoStore.executeInTransaction(eq(key), isA(RequestDoneFunction.class))).andReturn(null);
 		control.replay();
 		testee.finishRequestHandling(firstRequest);
 		control.verify();
@@ -101,11 +102,12 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	public void acceptFirstRequest() {
 		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
 		HttpServletRequest firstRequest = control.createMock(HttpServletRequest.class);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(zeroRequest);
-		expect(requestInfoStore.storeRequestInfo(oneRequest)).andReturn(oneRequest);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(zeroRequest);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(zeroRequest);
+		ref.put(oneRequest);
+		expect(ref.get()).andReturn(zeroRequest);
 		control.replay();
-		QoSAction actual = testee.startRequestImpl(requestInfoStore, key, firstRequest);
+		QoSAction actual = testee.startRequestImpl(ref, firstRequest);
 		assertThat(actual).isEqualTo(QoSAction.ACCEPT);
 		control.verify();
 	}
@@ -114,11 +116,12 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	public void acceptSecondRequest() {
 		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
 		HttpServletRequest secondRequest = control.createMock(HttpServletRequest.class);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(oneRequest);
-		expect(requestInfoStore.storeRequestInfo(twoRequests)).andReturn(twoRequests);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(zeroRequest);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(oneRequest);
+		ref.put(twoRequests);
+		expect(ref.get()).andReturn(zeroRequest);
 		control.replay();
-		QoSAction actual = testee.startRequestImpl(requestInfoStore, key, secondRequest);
+		QoSAction actual = testee.startRequestImpl(ref, secondRequest);
 		assertThat(actual).isEqualTo(QoSAction.ACCEPT);
 		control.verify();
 	}
@@ -127,13 +130,15 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	public void tooManyRequestsSuspend() {
 		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
 		HttpServletRequest thirdRequest = control.createMock(HttpServletRequest.class);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(twoRequests).times(2);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(twoRequests).times(2);
+		expect(thirdRequest.getQueryString()).andReturn("");
 		ContinuationId continuationId = new ContinuationId(0l);
 		expect(continuationIdStore.generateIdFor(thirdRequest)).andReturn(continuationId);
 		RequestInfo<String> expectedInfo = twoRequests.appendContinuationId(continuationId);
-		expect(requestInfoStore.storeRequestInfo(expectedInfo)).andReturn(expectedInfo);
+		ref.put(expectedInfo);
 		control.replay();
-		QoSAction actual = testee.startRequestImpl(requestInfoStore, key, thirdRequest);
+		QoSAction actual = testee.startRequestImpl(ref, thirdRequest);
 		assertThat(actual).isEqualTo(QoSAction.SUSPEND);
 		control.verify();
 	}
@@ -141,39 +146,43 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	@Test
 	public void requestDoneTrackNbRequest() {
 		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(twoRequests);
-		expect(requestInfoStore.storeRequestInfo(oneRequest)).andReturn(oneRequest);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(oneRequest);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(twoRequests);
+		ref.put(oneRequest);
+		expect(ref.get()).andReturn(oneRequest);
 		control.replay();
-		testee.requestDoneImpl(requestInfoStore, key);
+		testee.requestDoneImpl(ref);
 		control.verify();
 	}
 	
 	@Test
 	public void cleanupEmptyInfo() {
 		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(zeroRequest).times(2);
-		expect(requestInfoStore.remove(zeroRequest)).andReturn(true);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(zeroRequest).times(2);
+		ref.clear();
 		control.replay();
-		testee.cleanupImpl(requestInfoStore, key);
+		testee.cleanupImpl(ref);
 		control.verify();
 	}
 	
 	@Test
 	public void cleanupBusyInfo() {
 		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(oneRequest).times(2);
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(oneRequest).times(2);
 		control.replay();
-		testee.cleanupImpl(requestInfoStore, key);
+		testee.cleanupImpl(ref);
 		control.verify();
 	}
 	
 	@Test
 	public void cleanupBusyInfoSuspendedQueue() {
 		testee = new NPerClientQoSRequestSuspendHandler<String>(keyProvider, requestInfoStore, continuationIdStore, 2);
-		expect(requestInfoStore.getRequestInfo(key)).andReturn(zeroRequest.appendContinuationId(new ContinuationId(1l))).once();
+		RequestInfoReference<String> ref = control.createMock(RequestInfoReference.class);
+		expect(ref.get()).andReturn(zeroRequest.appendContinuationId(new ContinuationId(1l)));
 		control.replay();
-		testee.cleanupImpl(requestInfoStore, key);
+		testee.cleanupImpl(ref);
 		control.verify();
 	}
 	

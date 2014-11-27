@@ -46,10 +46,6 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.ehcache.internal</groupId>
-			<artifactId>ehcache-core</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>fluent-hc</artifactId>
 			<scope>test</scope>

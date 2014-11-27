@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.jetty.continuation.Continuation;
 import org.obm.servlet.filter.qos.QoSAction;
+import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
 import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,32 +63,38 @@ public class NPerClientQoSRequestSuspendHandler<K extends Serializable> extends 
 		this.continuationIdStore = continuationIdStore;
 	}
 
-	protected QoSAction startRequestImpl(ConcurrentRequestInfoStore<K> store, K key, HttpServletRequest request) {
-		QoSAction action = super.startRequestImpl(store, key, request);
-		RequestInfo<K> info = store.getRequestInfo(key);
+	@Override
+	protected QoSAction startRequestImpl(RequestInfoReference<K> ref, HttpServletRequest request) {
+		QoSAction action = super.startRequestImpl(ref, request);
+		RequestInfo<K> info = ref.get();
 		if (action == QoSAction.SUSPEND) {
-			logger.debug("will suspend request" + request);
+			logger.debug("will suspend request {}", request.getQueryString());
 			final ContinuationId continuationId = continuationIdStore.generateIdFor(request);
-			store.storeRequestInfo(info.appendContinuationId(continuationId));					
+			ref.put(info.appendContinuationId(continuationId));
 		}
 		return action;
 	}
 
-	protected void requestDoneImpl(ConcurrentRequestInfoStore<K> store, K key) {
-		super.requestDoneImpl(store, key);
-		RequestInfo<K> info = store.getRequestInfo(key);
+	@Override
+	protected void requestDoneImpl(RequestInfoReference<K> ref) {
+		super.requestDoneImpl(ref);
+		RequestInfo<K> info = ref.get();
 		ContinuationId last = info.nextContinuation();
 		if (last != null) {
-			store.storeRequestInfo(info.popContinuation());
-			Continuation continuation = continuationIdStore.removeContinuation(last);
+			logger.debug("resume continuation after request");
+			ref.put(info.popContinuation());
+			final Continuation continuation = continuationIdStore.removeContinuation(last);
 			continuation.resume();
+		} else {
+			logger.debug("no continuation to resume");
 		}
 	}
 
-	protected void cleanupImpl(ConcurrentRequestInfoStore<K> store, K key) {
-		RequestInfo<K> info = store.getRequestInfo(key);
+	@Override
+	protected void cleanupImpl(RequestInfoReference<K> ref) {
+		RequestInfo<K> info = ref.get();
 		if (info.getContinuationIds().isEmpty()) {
-			super.cleanupImpl(store, key);
+			super.cleanupImpl(ref);
 		}
 	}
 	

@@ -111,7 +111,7 @@ public class AsyncServletRequestUtils {
 
 	public Request httpGet() {
 		count += 1;
-		return Request.Get(serviceUri + "?" + count);
+		return Request.Get(serviceUri + "?" + "count="+count);
 	}
 	
 }

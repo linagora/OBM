@@ -31,11 +31,12 @@ package org.obm.servlet.filter.qos.handlers;
 
 import java.io.Serializable;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.obm.servlet.filter.qos.QoSAction;
 import org.obm.servlet.filter.qos.QoSRequestHandler;
+import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
+import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.StoreFunction;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
@@ -43,35 +44,39 @@ import com.google.inject.name.Named;
 
 public class NPerClientQoSRequestHandler<K extends Serializable> implements QoSRequestHandler {
 
-	@VisibleForTesting final class StartRequestFunction extends AbstractStoreFunction<K, QoSAction> {
+	@VisibleForTesting final class StartRequestFunction implements StoreFunction<K, QoSAction> {
 		private final HttpServletRequest request;
 
-		private StartRequestFunction(K key, HttpServletRequest request) {
-			super(key);
+		private StartRequestFunction(HttpServletRequest request) {
 			this.request = request;
 		}
 
 		@Override
-		public QoSAction execute(ConcurrentRequestInfoStore<K> store) {
-			return startRequestImpl(store, key(), request);
+		public QoSAction execute(RequestInfoReference<K> ref) {
+			return startRequestImpl(ref, request);
+		}
+		
+		@Override
+		public void cleanup(RequestInfoReference<K> store) {
+			//nothing goes here
 		}
 	}
 	
-	@VisibleForTesting final class RequestDoneFunction extends AbstractStoreFunction<K, Void> {
+	@VisibleForTesting final class RequestDoneFunction implements StoreFunction<K, Void> {
 
-		private RequestDoneFunction(K key) {
-			super(key);
+		private RequestDoneFunction() {
+			super();
 		}
 
 		@Override
-		public Void execute(ConcurrentRequestInfoStore<K> store) {
-			requestDoneImpl(store, key());
+		public Void execute(RequestInfoReference<K> store) {
+			requestDoneImpl(store);
 			return null;
 		}
 
 		@Override
-		public void cleanup(ConcurrentRequestInfoStore<K> store) {
-			cleanupImpl(store, key());
+		public void cleanup(RequestInfoReference<K> store) {
+			cleanupImpl(store);
 		}
 	}
 
@@ -102,37 +107,37 @@ public class NPerClientQoSRequestHandler<K extends Serializable> implements QoSR
 	}
 
 	@Override
-	public final QoSAction startRequestHandling(final HttpServletRequest request) throws ServletException {
+	public final QoSAction startRequestHandling(final HttpServletRequest request) {
 		final K key = businessKeyProvider.provideKey(request);
-		return store.executeInTransaction(new StartRequestFunction(key, request));
+		return store.executeInTransaction(key, new StartRequestFunction(request));
 	}
 
 	@Override
 	public final void finishRequestHandling(final HttpServletRequest request) {
 		final K key = businessKeyProvider.provideKey(request);
-		store.executeInTransaction(new RequestDoneFunction(key));
+		store.executeInTransaction(key, new RequestDoneFunction());
 	}
 	
-	protected QoSAction startRequestImpl(ConcurrentRequestInfoStore<K> store, final K key, @SuppressWarnings("unused") HttpServletRequest request) {
-		RequestInfo<K> requestInfoHolder = store.getRequestInfo(key);
+	protected QoSAction startRequestImpl(RequestInfoReference<K> ref, @SuppressWarnings("unused") HttpServletRequest request) {
+		RequestInfo<K> requestInfoHolder = ref.get();
 		if (requestInfoHolder.getNumberOfRunningRequests() >= maxSimultaneousRequestsPerClient) {
 			return qosAction;
 		} else {
-			store.storeRequestInfo(requestInfoHolder.oneMoreRequest());
+			ref.put(requestInfoHolder.oneMoreRequest());
 			return QoSAction.ACCEPT;
 		}
 	}
 	
-	protected void requestDoneImpl(ConcurrentRequestInfoStore<K> store, K key) {
-		RequestInfo<K> info = store.getRequestInfo(key);
+	protected void requestDoneImpl(RequestInfoReference<K> ref) {
+		RequestInfo<K> info = ref.get();
 		RequestInfo<K> newInfo = info.removeOneRequest();
-		store.storeRequestInfo(newInfo);
+		ref.put(newInfo);
 	}
 	
-	protected void cleanupImpl(ConcurrentRequestInfoStore<K> store, K key) {
-		RequestInfo<K> info = store.getRequestInfo(key);
-		if (info.getNumberOfRunningRequests() == 0) {
-			store.remove(info);
+	protected void cleanupImpl(RequestInfoReference<K> ref) {
+		RequestInfo<K> info = ref.get();
+		if (info.getPendingRequestCount() == 0) {
+			ref.clear();
 		}
 	}
 	

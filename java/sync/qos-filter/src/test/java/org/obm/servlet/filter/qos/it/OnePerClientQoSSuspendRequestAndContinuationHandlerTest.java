@@ -29,9 +29,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.it;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -40,8 +40,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
-
-import net.sf.ehcache.CacheManager;
 
 import org.apache.http.StatusLine;
 import org.easymock.IMocksControl;
@@ -59,7 +57,6 @@ import org.obm.servlet.filter.qos.util.server.QoSFilterTestModule;
 import org.obm.servlet.filter.qos.util.server.SuspendingServlet;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 @GuiceModule(OnePerClientQoSSuspendRequestAndContinuationHandlerTest.Configuration.class)
 @RunWith(GuiceRunner.class)
@@ -72,7 +69,6 @@ public class OnePerClientQoSSuspendRequestAndContinuationHandlerTest {
 		}
 	}
 	
-	@Inject @Named(org.obm.servlet.filter.qos.QoSFilterModule.CONCURRENT_REQUEST_INFO_STORE) CacheManager cacheManager; 
 	@Inject IMocksControl control;
 	@Inject BusinessKeyProvider<String> businessKeyProvider;
 	@Inject EmbeddedServer server;
@@ -98,7 +94,6 @@ public class OnePerClientQoSSuspendRequestAndContinuationHandlerTest {
 	public void tearDown() throws Exception {
 		server.stop();
 		threadpool.shutdown();
-		cacheManager.shutdown();
 	}
 
 	@Test

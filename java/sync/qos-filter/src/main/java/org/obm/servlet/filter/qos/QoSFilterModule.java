@@ -31,24 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.config.Configuration;
-
 import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
 
 public class QoSFilterModule extends AbstractModule {
 
-	public static final String CONCURRENT_REQUEST_INFO_STORE = "ConcurrentRequestInfoStore";
-	
 	protected void configure() {
-		bind(CacheManager.class).annotatedWith(Names.named(CONCURRENT_REQUEST_INFO_STORE)).toInstance(CacheManager.create(storeConfiguration()));
-	}
-
-	private Configuration storeConfiguration() {
-		Configuration configuration = new Configuration();
-		configuration.updateCheck(false);
-		return configuration;
 	}
 	
 }

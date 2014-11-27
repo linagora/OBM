@@ -34,8 +34,10 @@ import java.util.List;
 
 import org.obm.servlet.filter.qos.handlers.ContinuationIdStore.ContinuationId;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
@@ -47,9 +49,9 @@ import com.google.common.collect.Iterables;
  * <li>The number of requests since.</li>
  * </ul>
  */
-public class RequestInfo<K extends Serializable> implements Serializable {
+public class RequestInfo<K> implements Serializable {
 	
-	public static <K extends Serializable> RequestInfo<K> create(K key) {
+	public static <K> RequestInfo<K> create(K key) {
 		return new RequestInfo<K>(key, 0, ImmutableList.<ContinuationId>of());
 	}
 	
@@ -141,7 +143,12 @@ public class RequestInfo<K extends Serializable> implements Serializable {
 		return Objects.toStringHelper(this)
 			.add("key", key)
 			.add("numberOfRunningRequests", numberOfRunningRequests)
-			.toString();
+			.add("waitingRequests", FluentIterable.from(continuationIds).transform(new Function<ContinuationId, Long>() {
+				@Override
+				public Long apply(ContinuationId input) {
+					return input.id();
+				}
+			})).toString();
 	}
 	
 }

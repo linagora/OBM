@@ -29,9 +29,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.it;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -41,8 +41,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
-
-import net.sf.ehcache.CacheManager;
 
 import org.apache.http.StatusLine;
 import org.easymock.IMocksControl;
@@ -61,7 +59,6 @@ import org.obm.servlet.filter.qos.util.server.EmbeddedServer;
 import org.obm.servlet.filter.qos.util.server.QoSFilterTestModule;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 @GuiceModule(OnePerClientQoSSuspendRequestHandlerTest.Configuration.class)
 @RunWith(GuiceRunner.class)
@@ -74,7 +71,6 @@ public class OnePerClientQoSSuspendRequestHandlerTest {
 		}
 	}
 	
-	@Inject @Named(org.obm.servlet.filter.qos.QoSFilterModule.CONCURRENT_REQUEST_INFO_STORE) CacheManager cacheManager; 
 	@Inject IMocksControl control;
 	@Inject BusinessKeyProvider<String> businessKeyProvider;
 	@Inject EmbeddedServer server;
@@ -100,7 +96,6 @@ public class OnePerClientQoSSuspendRequestHandlerTest {
 	public void tearDown() throws Exception {
 		server.stop();
 		threadpool.shutdown();
-		cacheManager.shutdown();
 	}
 
 	@Test
@@ -131,10 +126,15 @@ public class OnePerClientQoSSuspendRequestHandlerTest {
 		expect(businessKeyProvider.provideKey(anyObject(HttpServletRequest.class))).andReturn("sameKey").anyTimes();
 		control.replay();
 
+		//send a first request
 		Future<StatusLine> request1 = async.asyncHttpGet();
+		//wait for the request to enter the servlet
 		blockingServletUtils.waitingServletRequestHandling();
+		//send some more requests
 		List<Future<StatusLine>> requests = async.asyncHttpGets(10);
+		//check that no other request entered the servlet
 		boolean requestHandlingNotified = blockingServletUtils.tryWaitingServletRequestHandling();
+		//unlock all responses
 		blockingServletUtils.unlockServerRequestsHandling(11);
 		StatusLine response1 = async.retrieveRequestStatus(request1);
 		List<StatusLine> responses = async.retrieveRequestsStatus(requests);

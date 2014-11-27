@@ -41,8 +41,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.ehcache.CacheManager;
-
 import org.easymock.IMocksControl;
 import org.eclipse.jetty.continuation.Continuation;
 import org.junit.Before;
@@ -61,13 +59,11 @@ public class QoSFilterTest {
 	private Continuation continuation;
 	private QoSRequestHandler qosRequestHandler;
 	private QoSContinuationSupport suspender;
-	private CacheManager cacheManager;
 	
 	@Before
 	public void setUp() {
 		control = createStrictControl();
 		suspender = control.createMock(QoSContinuationSupportJettyUtils.class);
-		cacheManager = null;
 		request = control.createMock(HttpServletRequest.class);
 		response = control.createMock(HttpServletResponse.class);
 		chain = control.createMock(FilterChain.class);
@@ -83,7 +79,7 @@ public class QoSFilterTest {
 	public void testNullHandlers() throws Exception {
 		control.replay();
 
-		testee = new QoSFilter(null, suspender, cacheManager);
+		testee = new QoSFilter(null, suspender);
 		testee.doFilter(request, response, chain);
 	}
 
@@ -93,7 +89,7 @@ public class QoSFilterTest {
 		chain.doFilter(request, response);
 		qosRequestHandler.finishRequestHandling(request);
 		control.replay();
-		testee = new QoSFilter(qosRequestHandler, suspender, cacheManager);
+		testee = new QoSFilter(qosRequestHandler, suspender);
 		testee.doFilter(request, response, chain);
 		control.verify();
 	}
@@ -103,7 +99,7 @@ public class QoSFilterTest {
 		expect(qosRequestHandler.startRequestHandling(request)).andReturn(QoSAction.REJECT);
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 		control.replay();
-		testee = new QoSFilter(qosRequestHandler, suspender, cacheManager);
+		testee = new QoSFilter(qosRequestHandler, suspender);
 		testee.doFilter(request, response, chain);
 		control.verify();
 	}
@@ -114,7 +110,7 @@ public class QoSFilterTest {
 		suspender.suspend(request);
 		expectLastCall().once();
 		control.replay();
-		testee = new QoSFilter(qosRequestHandler, suspender, cacheManager);
+		testee = new QoSFilter(qosRequestHandler, suspender);
 		testee.doFilter(request, response, chain);
 		control.verify();
 	}
