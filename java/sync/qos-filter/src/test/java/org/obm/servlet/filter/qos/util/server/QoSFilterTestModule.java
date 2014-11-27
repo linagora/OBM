@@ -29,21 +29,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.util.server;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.EnumSet;
+
+import javax.servlet.DispatcherType;
 
 import org.eclipse.jetty.continuation.ContinuationFilter;
-import org.mortbay.component.LifeCycle;
-import org.mortbay.component.LifeCycle.Listener;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.DefaultServlet;
-import org.mortbay.thread.QueuedThreadPool;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.obm.servlet.filter.qos.QoSFilter;
 
-import com.google.common.base.Throwables;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.servlet.GuiceFilter;
@@ -54,21 +51,20 @@ public class QoSFilterTestModule extends ServletModule {
 	public static final String BLOCKING_SERVLET_NAME = "blocking";
 	public static final String SUSPENDING_SERVLET_NAME = "suspending";
 
-	private static final int WAIT_TO_BE_STARTED_MAX_TIME = 10;
-	private static final int WAIT_TO_BE_STARTED_LATCH_COUNT = 1;
-	
-	private final CountDownLatch serverStartedLatch = new CountDownLatch(WAIT_TO_BE_STARTED_LATCH_COUNT);
-	
 	@Provides @Singleton
 	protected EmbeddedServer buildServerWithModules() {
-		final Server server = new Server();
-		server.setThreadPool(new QueuedThreadPool(5));
-		final SelectChannelConnector selectChannelConnector = new SelectChannelConnector();
-		server.setConnectors(new Connector[] {selectChannelConnector});
-		Context root = new Context(server, "/", Context.SESSIONS);
-		root.addFilter(GuiceFilter.class, "/*", 0);
-		root.addServlet(DefaultServlet.class, "/");
-		root.addLifeCycleListener(buildServerStartedListener());
+		final Server server = new Server(0);
+		HandlerCollection handlers = new HandlerCollection();
+		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+		final ServerConnector httpConnector = new ServerConnector(server);
+		server.addConnector(httpConnector);
+		context.setContextPath("/");
+		context.addFilter(GuiceFilter.class, "/*", EnumSet.allOf(DispatcherType.class));
+		context.addServlet(DefaultServlet.class, "/");
+		handlers.addHandler(context);
+		server.setHandler(handlers);
+		
+		
 		return new EmbeddedServer() {
 			
 			@Override
@@ -83,50 +79,7 @@ public class QoSFilterTestModule extends ServletModule {
 
 			@Override
 			public int getPort() {
-				if (server.isRunning()) {
-					return waitServerStartsThenGetPorts();
-				}
-				throw new IllegalStateException("Could not get server's listening port. Start the server first.");
-			}
-
-			private int waitServerStartsThenGetPorts() {
-				try {
-					if (serverStartedLatch.await(WAIT_TO_BE_STARTED_MAX_TIME, TimeUnit.SECONDS)) {
-						return getLocalPort();
-					}
-				} catch (InterruptedException e) {
-					Throwables.propagate(e);
-				}
-				throw new IllegalStateException("Could not get server's listening port. Illegal concurrent state.");
-			}
-
-			private int getLocalPort() {
-				int port = selectChannelConnector.getLocalPort();
-				if (port > 0) {
-					return port;
-				}
-				throw new IllegalStateException("Could not get server's listening port. Received port is " + port);
-			}
-		};
-	}
-
-	private Listener buildServerStartedListener() {
-		return new Listener() {
-			@Override
-			public void lifeCycleStopping(LifeCycle event) {
-			}
-			@Override
-			public void lifeCycleStopped(LifeCycle event) {
-			}
-			@Override
-			public void lifeCycleStarting(LifeCycle event) {
-			}
-			@Override
-			public void lifeCycleStarted(LifeCycle event) {
-				serverStartedLatch.countDown();
-			}
-			@Override
-			public void lifeCycleFailure(LifeCycle event, Throwable cause) {
+				return httpConnector.getLocalPort();
 			}
 		};
 	}
