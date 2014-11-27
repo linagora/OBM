@@ -1826,10 +1826,9 @@ function phpArrayToJsArray($var) {
 // Convert a php string to a javascript string
 ////////////////////////////////////////////////////////////////////////////////
 function phpStringToJsString($var) {
-  $jsString = str_replace("\n", "\\n", addslashes($var));
-  $jsString = str_replace('"', '&quot;', $jsString);
-  $jsString = str_replace("'", "&#x27;", $jsString);
-  $jsString = str_replace("\r", "", $jsString);
+  $jsString = str_replace("\n","\\n",addslashes($var));
+  $jsString = str_replace('"','&quot;',$jsString);
+  $jsString = str_replace("\r","",$jsString);
   return $jsString;
 }
 
