@@ -1480,4 +1480,54 @@ public class ImapArchiveProcessingTest {
 		control.verify();
 		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
 	}
+	
+	@Test
+	public void listImapFoldersShouldFilterOutNonUserMailboxes() throws Exception {
+		List<ListInfo> expectedListInfos = ImmutableList.of(
+				new ListInfo("user/usera/SPAM@mydomain.org", true, false),
+				new ListInfo("user/usera/Sent@mydomain.org", true, false),
+				new ListInfo("user/usera/Excluded@mydomain.org", true, false));
+		ListResult listResult = new ListResult(5);
+		listResult.addAll(expectedListInfos);
+		listResult.add(new ListInfo("test@mydomain.org", true, false));
+		listResult.add(new ListInfo("test/folder@mydomain.org", true, false));
+		
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		storeClient.login(false);
+		expectLastCall();
+		expect(storeClient.listAll())
+			.andReturn(listResult);
+		storeClient.close();
+		expectLastCall();
+		
+		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.ENABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+				.build();
+		
+		expect(storeClientFactory.create(domain.getName()))
+			.andReturn(storeClient);
+		
+		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
+				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
+		
+		control.replay();
+		ProcessedTask processedTask = ProcessedTask.builder()
+				.archiveConfiguration(archiveConfiguration)
+				.boundaries(Boundaries.builder()
+						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
+						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
+						.build())
+				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
+				.build();
+		
+		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders(processedTask);
+		control.verify();
+		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+	}
 }

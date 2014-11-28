@@ -299,6 +299,7 @@ public class ImapArchiveProcessing {
 			storeClient.login(false);
 			
 			return FluentIterable.from(storeClient.listAll())
+					.filter(filterOutNonUserMailboxes())
 					.transform(appendDomainWhenNone(processedTask))
 					.filter(filterDomain(processedTask))
 					.filter(filterExcludedFolder(processedTask))
@@ -352,6 +353,19 @@ public class ImapArchiveProcessing {
 					logger.error(String.format("The mailbox %s can't be parsed", listInfo.getName()));
 				}
 				return false;
+			}
+		};
+	}
+
+	private Predicate<? super ListInfo> filterOutNonUserMailboxes() {
+		return new Predicate<ListInfo>() {
+
+			@Override
+			public boolean apply(ListInfo listInfo) {
+				if (!listInfo.getName().startsWith("user/")) {
+					return false;
+				}
+				return true;
 			}
 		};
 	}
