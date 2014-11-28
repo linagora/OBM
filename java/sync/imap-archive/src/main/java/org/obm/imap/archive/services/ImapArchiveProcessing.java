@@ -221,7 +221,6 @@ public class ImapArchiveProcessing {
 						.build();
 				createFolder(archiveMailbox, logger);
 				
-				mailbox.select();
 				logger.debug("Copying from {} mailbox to {} mailbox", mailbox, archiveMailbox);
 				
 				processingImapCopy(mailbox, archiveMailbox, mailUids, domainName, processedFolder, logger);
@@ -242,6 +241,7 @@ public class ImapArchiveProcessing {
 				.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 				.build();
 		try {
+			mailbox.select();
 			copyToTemporary(mailbox, temporaryMailbox, logger, messageSet);
 			
 			batchCopyFromTemporaryToArchive(temporaryMailbox, archiveMailbox, messageSet, processedFolder);
@@ -284,7 +284,7 @@ public class ImapArchiveProcessing {
 		}
 	}
 
-	private void createFolder(CreatableMailbox creatableMailbox, Logger logger) 
+	protected void createFolder(CreatableMailbox creatableMailbox, Logger logger) 
 			throws MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException {
 		
 		try {

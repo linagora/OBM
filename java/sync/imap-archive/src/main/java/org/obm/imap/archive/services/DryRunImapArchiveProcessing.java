@@ -38,8 +38,13 @@ import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
+import org.obm.imap.archive.exception.ImapCreateException;
+import org.obm.imap.archive.exception.ImapQuotaException;
+import org.obm.imap.archive.exception.ImapSelectException;
+import org.obm.imap.archive.exception.ImapSetAclException;
 import org.obm.imap.archive.exception.MailboxFormatException;
 import org.obm.imap.archive.mailbox.ArchiveMailbox;
+import org.obm.imap.archive.mailbox.CreatableMailbox;
 import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.exception.MailboxNotFoundException;
@@ -75,6 +80,11 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 	
 	@Override
 	protected void folderProcessed(ProcessedFolder.Builder processedFolder) throws DaoException {
+	}
+	
+	@Override
+	protected void createFolder(CreatableMailbox creatableMailbox, Logger logger) 
+			throws MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException {
 	}
 	
 	@Override

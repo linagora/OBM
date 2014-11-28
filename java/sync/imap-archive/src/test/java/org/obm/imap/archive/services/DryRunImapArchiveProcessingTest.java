@@ -60,7 +60,6 @@ import org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.logging.LoggerAppenders;
-import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
 import org.obm.push.mail.bean.MessageSet;
@@ -77,7 +76,6 @@ import com.linagora.scheduling.DateTimeProvider;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
-import fr.aliacom.obm.common.system.ObmSystemUser;
 
 public class DryRunImapArchiveProcessingTest {
 
@@ -156,12 +154,9 @@ public class DryRunImapArchiveProcessingTest {
 			.andReturn(listResult);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
-		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", 
-				Range.closed(1l, 10l), higherBoundary, storeClient);
-		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org",
-				Range.closed(3l, 100l), higherBoundary, storeClient);
-		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org",
-				Range.singleton(1230l), higherBoundary, storeClient);
+		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", Range.closed(1l, 10l), higherBoundary, storeClient);
+		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", Range.closed(3l, 100l), higherBoundary, storeClient);
+		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", Range.singleton(1230l), higherBoundary, storeClient);
 		
 		storeClient.close();
 		expectLastCall();
@@ -174,7 +169,7 @@ public class DryRunImapArchiveProcessingTest {
 		control.verify();
 	}
 	
-	private void expectImapCommandsOnMailboxProcessing(String mailboxName, String archiveMailboxName, Range<Long> uids, DateTime higherBoundary, StoreClient storeClient) 
+	private void expectImapCommandsOnMailboxProcessing(String mailboxName, Range<Long> uids, DateTime higherBoundary, StoreClient storeClient) 
 			throws Exception {
 		
 		MessageSet messageSet = MessageSet.builder()
@@ -189,13 +184,6 @@ public class DryRunImapArchiveProcessingTest {
 				.before(higherBoundary.toDate())
 				.build()))
 			.andReturn(messageSet);
-		expect(storeClient.select(archiveMailboxName)).andReturn(false);
-		expect(storeClient.create(archiveMailboxName, "mydomain_org_archive")).andReturn(true);
-		expect(storeClient.setAcl(archiveMailboxName, ObmSystemUser.CYRUS, MailboxImpl.ALL_IMAP_RIGHTS)).andReturn(true);
-		expect(storeClient.setAcl(archiveMailboxName, "usera@mydomain.org", MailboxImpl.READ_IMAP_RIGHTS)).andReturn(true);
-		expect(storeClient.setQuota(archiveMailboxName, ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE)).andReturn(true);
-		expect(storeClient.select(archiveMailboxName)).andReturn(true);
-		expect(storeClient.select(mailboxName)).andReturn(true);
 		
 		storeClient.close();
 		expectLastCall();
