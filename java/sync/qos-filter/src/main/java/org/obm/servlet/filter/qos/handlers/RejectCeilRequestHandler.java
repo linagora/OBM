@@ -40,8 +40,8 @@ import org.obm.servlet.filter.qos.QoSAction;
 import org.obm.servlet.filter.qos.QoSContinuationSupport;
 import org.obm.servlet.filter.qos.QoSFilter;
 import org.obm.servlet.filter.qos.QoSRequestHandler;
-import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
-import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.StoreFunction;
+import org.obm.servlet.filter.qos.handlers.TransactionalKeyRequestsInfoStore.RequestInfoReference;
+import org.obm.servlet.filter.qos.handlers.TransactionalKeyRequestsInfoStore.StoreFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,14 +57,14 @@ public class RejectCeilRequestHandler<K extends Serializable> implements QoSRequ
 	public final static String REJECTING_CEIL_PER_CLIENT_PARAM = "rejectingCeilPerClient";
 
 	private final BusinessKeyProvider<K> businessKeyProvider;
-	private final ConcurrentRequestInfoStore<K> concurrentRequestInfoStore;
+	private final TransactionalKeyRequestsInfoStore<K> concurrentRequestInfoStore;
 	private final NPerClientQoSRequestSuspendHandler<K> suspendHandler;
 	private final int rejectingCeilPerClient;
 	
 	@Inject
 	@VisibleForTesting RejectCeilRequestHandler(
 			BusinessKeyProvider<K> businessKeyProvider,
-			ConcurrentRequestInfoStore<K> concurrentRequestInfoStore,
+			TransactionalKeyRequestsInfoStore<K> concurrentRequestInfoStore,
 			QoSContinuationSupport continuationSupport,
 			@Named(NPerClientQoSRequestHandler.MAX_REQUESTS_PER_CLIENT_PARAM) int maxSimultaneousRequestsPerClient,
 			@Named(REJECTING_CEIL_PER_CLIENT_PARAM) int rejectingCeilPerClient) {

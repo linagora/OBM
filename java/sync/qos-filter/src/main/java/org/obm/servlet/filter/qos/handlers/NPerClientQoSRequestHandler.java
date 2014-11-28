@@ -35,8 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.obm.servlet.filter.qos.QoSAction;
 import org.obm.servlet.filter.qos.QoSRequestHandler;
-import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
-import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.StoreFunction;
+import org.obm.servlet.filter.qos.handlers.TransactionalKeyRequestsInfoStore.RequestInfoReference;
+import org.obm.servlet.filter.qos.handlers.TransactionalKeyRequestsInfoStore.StoreFunction;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
@@ -83,7 +83,7 @@ public class NPerClientQoSRequestHandler<K extends Serializable> implements QoSR
 	public static final String MAX_REQUESTS_PER_CLIENT_PARAM = "maxSimultaneousRequestsPerClient";
 	public static final String QOS_ACTION = "QoSAction";
 
-	protected final ConcurrentRequestInfoStore<K> store;
+	protected final TransactionalKeyRequestsInfoStore<K> store;
 	protected final BusinessKeyProvider<K> businessKeyProvider;
 
 	private final int maxSimultaneousRequestsPerClient;
@@ -91,14 +91,14 @@ public class NPerClientQoSRequestHandler<K extends Serializable> implements QoSR
 
 	@Inject
 	@VisibleForTesting NPerClientQoSRequestHandler(BusinessKeyProvider<K> businessKeyProvider,
-			ConcurrentRequestInfoStore<K> concurrentRequestInfoStore,
+			TransactionalKeyRequestsInfoStore<K> concurrentRequestInfoStore,
 			@Named(MAX_REQUESTS_PER_CLIENT_PARAM) int maxSimultaneousRequestsPerClient) {
 		this(businessKeyProvider, concurrentRequestInfoStore, maxSimultaneousRequestsPerClient, QoSAction.REJECT);
 	}
 	
 	protected NPerClientQoSRequestHandler(
 			BusinessKeyProvider<K> businessKeyProvider,
-			ConcurrentRequestInfoStore<K> concurrentRequestInfoStore,
+			TransactionalKeyRequestsInfoStore<K> concurrentRequestInfoStore,
 			int maxSimultaneousRequestsPerClient, QoSAction qosAction) {
 		this.businessKeyProvider = businessKeyProvider;
 		this.store = concurrentRequestInfoStore;

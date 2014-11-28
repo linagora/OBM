@@ -43,7 +43,7 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.servlet.filter.qos.QoSAction;
-import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
+import org.obm.servlet.filter.qos.handlers.TransactionalKeyRequestsInfoStore.RequestInfoReference;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.RequestDoneFunction;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.StartRequestFunction;
 
@@ -52,7 +52,7 @@ public class NPerClientQoSRequestHandlerTest {
 
 	private IMocksControl control;
 	private BusinessKeyProvider<String> keyProvider;
-	private ConcurrentRequestInfoStore<String> requestInfoStore;
+	private TransactionalKeyRequestsInfoStore<String> requestInfoStore;
 	private NPerClientQoSRequestHandler<String> testee;
 	private KeyRequestsInfo<String> zeroRequest;
 	private KeyRequestsInfo<String> oneRequest;
@@ -63,7 +63,7 @@ public class NPerClientQoSRequestHandlerTest {
 	public void setup() {
 		control = createStrictControl();
 		keyProvider = control.createMock(BusinessKeyProvider.class);
-		requestInfoStore = control.createMock(ConcurrentRequestInfoStore.class);
+		requestInfoStore = control.createMock(TransactionalKeyRequestsInfoStore.class);
 		key = "myKey";
 		zeroRequest = KeyRequestsInfo.create(key);
 		oneRequest = KeyRequestsInfo.create(key).oneMoreRequest();

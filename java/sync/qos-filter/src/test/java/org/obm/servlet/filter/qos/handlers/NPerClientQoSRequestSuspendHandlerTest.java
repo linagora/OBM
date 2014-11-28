@@ -45,7 +45,7 @@ import org.junit.Test;
 import org.obm.servlet.filter.qos.QoSAction;
 import org.obm.servlet.filter.qos.QoSContinuationSupport;
 import org.obm.servlet.filter.qos.QoSContinuationSupport.QoSContinuation;
-import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
+import org.obm.servlet.filter.qos.handlers.TransactionalKeyRequestsInfoStore.RequestInfoReference;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.RequestDoneFunction;
 import org.obm.servlet.filter.qos.handlers.NPerClientQoSRequestHandler.StartRequestFunction;
 
@@ -53,7 +53,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	
 	private IMocksControl control;
 	private BusinessKeyProvider<String> keyProvider;
-	private ConcurrentRequestInfoStore<String> requestInfoStore;
+	private TransactionalKeyRequestsInfoStore<String> requestInfoStore;
 	private NPerClientQoSRequestSuspendHandler<String> testee;
 	private KeyRequestsInfo<String> zeroRequest;
 	private KeyRequestsInfo<String> oneRequest;
@@ -65,7 +65,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	public void setup() {
 		control = createStrictControl();
 		keyProvider = control.createMock(BusinessKeyProvider.class);
-		requestInfoStore = control.createMock(ConcurrentRequestInfoStore.class);
+		requestInfoStore = control.createMock(TransactionalKeyRequestsInfoStore.class);
 		continuationSupport = control.createMock(QoSContinuationSupport.class);
 		key = "myKey";
 		zeroRequest = KeyRequestsInfo.create(key);

@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.obm.servlet.filter.qos.QoSAction;
 import org.obm.servlet.filter.qos.QoSContinuationSupport;
 import org.obm.servlet.filter.qos.QoSContinuationSupport.QoSContinuation;
-import org.obm.servlet.filter.qos.handlers.ConcurrentRequestInfoStore.RequestInfoReference;
+import org.obm.servlet.filter.qos.handlers.TransactionalKeyRequestsInfoStore.RequestInfoReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public class NPerClientQoSRequestSuspendHandler<K extends Serializable> extends 
 	@Inject
 	@VisibleForTesting NPerClientQoSRequestSuspendHandler(
 			BusinessKeyProvider<K> businessKeyProvider,
-			ConcurrentRequestInfoStore<K> concurrentRequestInfoStore,
+			TransactionalKeyRequestsInfoStore<K> concurrentRequestInfoStore,
 			QoSContinuationSupport continuationSupport,
 			@Named(MAX_REQUESTS_PER_CLIENT_PARAM) int maxSimultaneousRequestsPerClient) {
 		super(businessKeyProvider, concurrentRequestInfoStore, maxSimultaneousRequestsPerClient, QoSAction.SUSPEND);

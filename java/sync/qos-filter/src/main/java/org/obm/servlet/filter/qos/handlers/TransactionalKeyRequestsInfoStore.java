@@ -47,9 +47,9 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
-public class ConcurrentRequestInfoStore<K> {
+public class TransactionalKeyRequestsInfoStore<K> {
 
-	private static final Logger logger = LoggerFactory.getLogger(ConcurrentRequestInfoStore.class);
+	private static final Logger logger = LoggerFactory.getLogger(TransactionalKeyRequestsInfoStore.class);
 	
 	interface RequestInfoReference<K> {
 		void put(KeyRequestsInfo<K> value);
@@ -120,7 +120,7 @@ public class ConcurrentRequestInfoStore<K> {
 	private final AtomicInteger count;
 
 	@Inject
-	@VisibleForTesting ConcurrentRequestInfoStore() {
+	@VisibleForTesting TransactionalKeyRequestsInfoStore() {
 		references = Sets.newConcurrentHashSet();
 		map = new MapMaker()
 			.weakValues()
