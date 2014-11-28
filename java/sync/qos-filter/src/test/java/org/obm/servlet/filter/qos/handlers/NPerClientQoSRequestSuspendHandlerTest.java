@@ -55,9 +55,9 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 	private BusinessKeyProvider<String> keyProvider;
 	private ConcurrentRequestInfoStore<String> requestInfoStore;
 	private NPerClientQoSRequestSuspendHandler<String> testee;
-	private RequestInfo<String> zeroRequest;
-	private RequestInfo<String> oneRequest;
-	private RequestInfo<String> twoRequests;
+	private KeyRequestsInfo<String> zeroRequest;
+	private KeyRequestsInfo<String> oneRequest;
+	private KeyRequestsInfo<String> twoRequests;
 	private String key;
 	private QoSContinuationSupport continuationSupport;
 
@@ -68,7 +68,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 		requestInfoStore = control.createMock(ConcurrentRequestInfoStore.class);
 		continuationSupport = control.createMock(QoSContinuationSupport.class);
 		key = "myKey";
-		zeroRequest = RequestInfo.create(key);
+		zeroRequest = KeyRequestsInfo.create(key);
 		oneRequest = zeroRequest.oneMoreRequest();
 		twoRequests = oneRequest.oneMoreRequest();
 	}
@@ -135,7 +135,7 @@ public class NPerClientQoSRequestSuspendHandlerTest {
 		expect(thirdRequest.getQueryString()).andReturn("");
 		QoSContinuation continuation = control.createMock(QoSContinuation.class);
 		expect(continuationSupport.getContinuationFor(thirdRequest)).andReturn(continuation);
-		RequestInfo<String> expectedInfo = twoRequests.appendContinuation(continuation);
+		KeyRequestsInfo<String> expectedInfo = twoRequests.appendContinuation(continuation);
 		ref.put(expectedInfo);
 		control.replay();
 		QoSAction actual = testee.startRequestImpl(ref, thirdRequest);

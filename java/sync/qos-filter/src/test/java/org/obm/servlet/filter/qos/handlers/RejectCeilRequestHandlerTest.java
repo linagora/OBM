@@ -55,10 +55,10 @@ public class RejectCeilRequestHandlerTest {
 	private BusinessKeyProvider<String> keyProvider;
 	private ConcurrentRequestInfoStore<String> requestInfoStore;
 	private RejectCeilRequestHandler<String> testee;
-	private RequestInfo<String> zeroRequest;
-	private RequestInfo<String> oneRequest;
-	private RequestInfo<String> twoRequests;
-	private RequestInfo<String> threeRequests;
+	private KeyRequestsInfo<String> zeroRequest;
+	private KeyRequestsInfo<String> oneRequest;
+	private KeyRequestsInfo<String> twoRequests;
+	private KeyRequestsInfo<String> threeRequests;
 	private String key;
 	private QoSContinuationSupport continuationSupport;
 
@@ -69,7 +69,7 @@ public class RejectCeilRequestHandlerTest {
 		requestInfoStore = control.createMock(ConcurrentRequestInfoStore.class);
 		continuationSupport = control.createMock(QoSContinuationSupport.class);
 		key = "myKey";
-		zeroRequest = RequestInfo.create(key);
+		zeroRequest = KeyRequestsInfo.create(key);
 		oneRequest = zeroRequest.oneMoreRequest();
 		twoRequests = oneRequest.oneMoreRequest();
 		threeRequests = twoRequests.oneMoreRequest();

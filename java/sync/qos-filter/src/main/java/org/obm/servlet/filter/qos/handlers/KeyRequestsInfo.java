@@ -29,7 +29,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.servlet.filter.qos.handlers;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.obm.servlet.filter.qos.QoSContinuationSupport.QoSContinuation;
@@ -42,17 +41,18 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 /**
- * Holds information about a request.<br />
+ * Holds information about requests associated to a Key object.<br />
  * The information stored is:
  * <ul>
  * <li>The timestamp of the object creation.</li>
- * <li>The number of requests since.</li>
+ * <li>The number of running requests.</li>
+ * <li>The list of waiting requests.</li> 
  * </ul>
  */
-public class RequestInfo<K> implements Serializable {
+public class KeyRequestsInfo<K> {
 	
-	public static <K> RequestInfo<K> create(K key) {
-		return new RequestInfo<K>(key, 0, ImmutableList.<QoSContinuation>of());
+	public static <K> KeyRequestsInfo<K> create(K key) {
+		return new KeyRequestsInfo<K>(key, 0, ImmutableList.<QoSContinuation>of());
 	}
 	
 	private final List<QoSContinuation> continuations;
@@ -61,10 +61,10 @@ public class RequestInfo<K> implements Serializable {
 	private final K key;
 
 	/**
-	 * Builds a new {@link RequestInfo}.<br />
+	 * Builds a new {@link KeyRequestsInfo}.<br />
 	 * Use the factory method {@link #create()} to instantiate.
 	 */
-	private RequestInfo(K key, int numberOfRequests, List<QoSContinuation> continuations) {
+	private KeyRequestsInfo(K key, int numberOfRequests, List<QoSContinuation> continuations) {
 		this.key = key;
 		this.timestamp = System.currentTimeMillis();
 		this.numberOfRunningRequests = numberOfRequests;
@@ -72,28 +72,28 @@ public class RequestInfo<K> implements Serializable {
 	}
 
 	/**
-	 * @return a copy of this {@link RequestInfo} adding one to the pending requests number  
+	 * @return a copy of this {@link KeyRequestsInfo} adding one to the pending requests number  
 	 */
-	public RequestInfo<K> oneMoreRequest() {
-		return new RequestInfo<K>(key, numberOfRunningRequests + 1, continuations);
+	public KeyRequestsInfo<K> oneMoreRequest() {
+		return new KeyRequestsInfo<K>(key, numberOfRunningRequests + 1, continuations);
 	}
 
 	/**
-	 * @return a copy of this {@link RequestInfo} removing one to the pending requests number  
+	 * @return a copy of this {@link KeyRequestsInfo} removing one to the pending requests number  
 	 */
-	public RequestInfo<K> removeOneRequest() {
+	public KeyRequestsInfo<K> removeOneRequest() {
 		Preconditions.checkState(numberOfRunningRequests > 0);
-		return new RequestInfo<K>(key, numberOfRunningRequests - 1, continuations);
+		return new KeyRequestsInfo<K>(key, numberOfRunningRequests - 1, continuations);
 	}
 
-	public RequestInfo<K> appendContinuation(QoSContinuation testContinuation) {
-		return new RequestInfo<K>(key, numberOfRunningRequests, 
+	public KeyRequestsInfo<K> appendContinuation(QoSContinuation testContinuation) {
+		return new KeyRequestsInfo<K>(key, numberOfRunningRequests, 
 				ImmutableList.copyOf(Iterables.concat(continuations, ImmutableList.of(testContinuation))));
 	}
 
-	public RequestInfo<K> popContinuation() {
+	public KeyRequestsInfo<K> popContinuation() {
 		Preconditions.checkState(continuations.size() > 0);
-		return new RequestInfo<K>(key, numberOfRunningRequests, 
+		return new KeyRequestsInfo<K>(key, numberOfRunningRequests, 
 				ImmutableList.copyOf(Iterables.skip(continuations, 1)));
 	}
 
@@ -128,9 +128,9 @@ public class RequestInfo<K> implements Serializable {
 	
 	@Override
 	public final boolean equals(Object object) {
-		if (object instanceof RequestInfo) {
+		if (object instanceof KeyRequestsInfo) {
 			@SuppressWarnings("unchecked")
-			RequestInfo<K> that = (RequestInfo<K>) object;
+			KeyRequestsInfo<K> that = (KeyRequestsInfo<K>) object;
 			return Objects.equal(this.continuations, that.continuations)
 				&& Objects.equal(this.numberOfRunningRequests, that.numberOfRunningRequests)
 				&& Objects.equal(this.key, that.key);

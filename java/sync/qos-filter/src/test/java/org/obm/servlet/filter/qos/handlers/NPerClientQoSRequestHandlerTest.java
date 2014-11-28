@@ -54,9 +54,9 @@ public class NPerClientQoSRequestHandlerTest {
 	private BusinessKeyProvider<String> keyProvider;
 	private ConcurrentRequestInfoStore<String> requestInfoStore;
 	private NPerClientQoSRequestHandler<String> testee;
-	private RequestInfo<String> zeroRequest;
-	private RequestInfo<String> oneRequest;
-	private RequestInfo<String> twoRequests;
+	private KeyRequestsInfo<String> zeroRequest;
+	private KeyRequestsInfo<String> oneRequest;
+	private KeyRequestsInfo<String> twoRequests;
 	private String key;
 
 	@Before
@@ -65,9 +65,9 @@ public class NPerClientQoSRequestHandlerTest {
 		keyProvider = control.createMock(BusinessKeyProvider.class);
 		requestInfoStore = control.createMock(ConcurrentRequestInfoStore.class);
 		key = "myKey";
-		zeroRequest = RequestInfo.create(key);
-		oneRequest = RequestInfo.create(key).oneMoreRequest();
-		twoRequests = RequestInfo.create(key).oneMoreRequest().oneMoreRequest();
+		zeroRequest = KeyRequestsInfo.create(key);
+		oneRequest = KeyRequestsInfo.create(key).oneMoreRequest();
+		twoRequests = KeyRequestsInfo.create(key).oneMoreRequest().oneMoreRequest();
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -66,7 +66,7 @@ public class NPerClientQoSRequestSuspendHandler<K extends Serializable> extends 
 	@Override
 	protected QoSAction startRequestImpl(RequestInfoReference<K> ref, HttpServletRequest request) {
 		QoSAction action = super.startRequestImpl(ref, request);
-		RequestInfo<K> info = ref.get();
+		KeyRequestsInfo<K> info = ref.get();
 		if (action == QoSAction.SUSPEND) {
 			logger.debug("will suspend request {}", request.getQueryString());
 			ref.put(info.appendContinuation(continuationSupport.getContinuationFor(request)));
@@ -77,7 +77,7 @@ public class NPerClientQoSRequestSuspendHandler<K extends Serializable> extends 
 	@Override
 	protected void requestDoneImpl(RequestInfoReference<K> ref) {
 		super.requestDoneImpl(ref);
-		RequestInfo<K> info = ref.get();
+		KeyRequestsInfo<K> info = ref.get();
 		QoSContinuation continuation = info.nextContinuation();
 		if (continuation != null) {
 			logger.debug("resume continuation after request");
@@ -90,7 +90,7 @@ public class NPerClientQoSRequestSuspendHandler<K extends Serializable> extends 
 
 	@Override
 	protected void cleanupImpl(RequestInfoReference<K> ref) {
-		RequestInfo<K> info = ref.get();
+		KeyRequestsInfo<K> info = ref.get();
 		if (info.getContinuationIds().isEmpty()) {
 			super.cleanupImpl(ref);
 		}

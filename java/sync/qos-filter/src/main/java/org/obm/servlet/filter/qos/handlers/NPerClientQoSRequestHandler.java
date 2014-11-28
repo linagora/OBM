@@ -119,7 +119,7 @@ public class NPerClientQoSRequestHandler<K extends Serializable> implements QoSR
 	}
 	
 	protected QoSAction startRequestImpl(RequestInfoReference<K> ref, @SuppressWarnings("unused") HttpServletRequest request) {
-		RequestInfo<K> requestInfoHolder = ref.get();
+		KeyRequestsInfo<K> requestInfoHolder = ref.get();
 		if (requestInfoHolder.getNumberOfRunningRequests() >= maxSimultaneousRequestsPerClient) {
 			return qosAction;
 		} else {
@@ -129,13 +129,13 @@ public class NPerClientQoSRequestHandler<K extends Serializable> implements QoSR
 	}
 	
 	protected void requestDoneImpl(RequestInfoReference<K> ref) {
-		RequestInfo<K> info = ref.get();
-		RequestInfo<K> newInfo = info.removeOneRequest();
+		KeyRequestsInfo<K> info = ref.get();
+		KeyRequestsInfo<K> newInfo = info.removeOneRequest();
 		ref.put(newInfo);
 	}
 	
 	protected void cleanupImpl(RequestInfoReference<K> ref) {
-		RequestInfo<K> info = ref.get();
+		KeyRequestsInfo<K> info = ref.get();
 		if (info.getPendingRequestCount() == 0) {
 			ref.clear();
 		}

@@ -52,8 +52,8 @@ public class ConcurrentRequestInfoStore<K> {
 	private static final Logger logger = LoggerFactory.getLogger(ConcurrentRequestInfoStore.class);
 	
 	interface RequestInfoReference<K> {
-		void put(RequestInfo<K> value);
-		RequestInfo<K> get();
+		void put(KeyRequestsInfo<K> value);
+		KeyRequestsInfo<K> get();
 		void clear();
 	}
 	
@@ -66,12 +66,12 @@ public class ConcurrentRequestInfoStore<K> {
 	private static class LockableReference<K> implements Closeable, RequestInfoReference<K> {
 		
 		private ReentrantLock lock;
-		private RequestInfo<K> info;
+		private KeyRequestsInfo<K> info;
 		private boolean used;
 
 		public LockableReference(K key) {
 			lock = new ReentrantLock(true);
-			info = RequestInfo.create(key);
+			info = KeyRequestsInfo.create(key);
 			used = false;
 		}
 
@@ -94,14 +94,14 @@ public class ConcurrentRequestInfoStore<K> {
 		}
 		
 		@Override
-		public RequestInfo<K> get() {
+		public KeyRequestsInfo<K> get() {
 			Preconditions.checkState(lock.isHeldByCurrentThread());
 			Preconditions.checkState(used == true);
 			return info;
 		}
 		
 		@Override
-		public void put(RequestInfo<K> value) {
+		public void put(KeyRequestsInfo<K> value) {
 			Preconditions.checkState(lock.isHeldByCurrentThread());
 			Preconditions.checkNotNull(value);
 			Preconditions.checkState(used == true);

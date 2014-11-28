@@ -100,7 +100,7 @@ public class RejectCeilRequestHandler<K extends Serializable> implements QoSRequ
 	}
 
 	@VisibleForTesting QoSAction startRequestImpl(final HttpServletRequest request, final K key, RequestInfoReference<K> ref) {
-		RequestInfo<K> requestInfo = ref.get();
+		KeyRequestsInfo<K> requestInfo = ref.get();
 		if (requestInfo.getPendingRequestCount() >= rejectingCeilPerClient) {
 			logger.warn("a request is rejected for the key:{}", key);
 			return QoSAction.REJECT;

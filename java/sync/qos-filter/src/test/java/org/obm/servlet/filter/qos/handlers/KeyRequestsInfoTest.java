@@ -39,7 +39,7 @@ import org.obm.servlet.filter.qos.QoSContinuationSupport.QoSContinuation;
 import com.google.common.base.Objects;
 
 
-public class RequestInfoTest {
+public class KeyRequestsInfoTest {
 	
 	public static class TestContinuation implements QoSContinuationSupport.QoSContinuation {
 		
@@ -72,7 +72,7 @@ public class RequestInfoTest {
 	
 	@Test
 	public void defaultValues() {
-		RequestInfo<Integer> info = RequestInfo.create(2);
+		KeyRequestsInfo<Integer> info = KeyRequestsInfo.create(2);
 		assertThat(info.getNumberOfRunningRequests()).isEqualTo(0);
 		assertThat(info.getKey()).isEqualTo(2);
 		assertThat(info.getTimestamp()).isLessThanOrEqualTo(System.currentTimeMillis());
@@ -80,42 +80,42 @@ public class RequestInfoTest {
 
 	@Test
 	public void copyHaveSameKey() {
-		RequestInfo<Integer> info = RequestInfo.create(2);
-		RequestInfo<Integer> copy = info.oneMoreRequest();
+		KeyRequestsInfo<Integer> info = KeyRequestsInfo.create(2);
+		KeyRequestsInfo<Integer> copy = info.oneMoreRequest();
 		assertThat(copy.getKey()).isEqualTo(2);
 	}
 	
 	@Test
 	public void testOneMoreRequest() {
-		RequestInfo<Integer> info = RequestInfo.create(2);
-		RequestInfo<Integer> copy = info.oneMoreRequest();
+		KeyRequestsInfo<Integer> info = KeyRequestsInfo.create(2);
+		KeyRequestsInfo<Integer> copy = info.oneMoreRequest();
 		assertThat(copy.getNumberOfRunningRequests()).isEqualTo(1);
 		assertThat(info.getNumberOfRunningRequests()).isEqualTo(0);
 	}
 
 	@Test
 	public void testRemoveOneRequest() {
-		RequestInfo<Integer> info = RequestInfo.create(2);
-		RequestInfo<Integer> oneRequest = info.oneMoreRequest();
-		RequestInfo<Integer> twoRequests = oneRequest.oneMoreRequest();
-		RequestInfo<Integer> actual = twoRequests.removeOneRequest();
+		KeyRequestsInfo<Integer> info = KeyRequestsInfo.create(2);
+		KeyRequestsInfo<Integer> oneRequest = info.oneMoreRequest();
+		KeyRequestsInfo<Integer> twoRequests = oneRequest.oneMoreRequest();
+		KeyRequestsInfo<Integer> actual = twoRequests.removeOneRequest();
 		assertThat(actual.getNumberOfRunningRequests()).isEqualTo(1);
 		assertThat(info.getNumberOfRunningRequests()).isEqualTo(0);
 	}
 	
 	@Test
 	public void testAppendOneContinuation() {
-		RequestInfo<Integer> info = RequestInfo.create(2);
+		KeyRequestsInfo<Integer> info = KeyRequestsInfo.create(2);
 		TestContinuation continuationId = new TestContinuation(1l);
-		RequestInfo<Integer> actual = info.appendContinuation(continuationId);
+		KeyRequestsInfo<Integer> actual = info.appendContinuation(continuationId);
 		assertThat(actual.getContinuationIds()).containsOnly(continuationId);
 		assertThat(info.getContinuationIds()).isEmpty();
 	}
 	
 	@Test
 	public void testAppendTwoContinuation() {
-		RequestInfo<Integer> info = RequestInfo.create(2);
-		RequestInfo<Integer> actual = info
+		KeyRequestsInfo<Integer> info = KeyRequestsInfo.create(2);
+		KeyRequestsInfo<Integer> actual = info
 				.appendContinuation(new TestContinuation(1l))
 				.appendContinuation(new TestContinuation(2l));
 		assertThat(actual.getContinuationIds()).containsOnly(new TestContinuation(1l), new TestContinuation(2l));
@@ -124,8 +124,8 @@ public class RequestInfoTest {
 	
 	@Test
 	public void testPopOneRequest() {
-		RequestInfo<Integer> info = RequestInfo.create(2);
-		RequestInfo<Integer> actual = info
+		KeyRequestsInfo<Integer> info = KeyRequestsInfo.create(2);
+		KeyRequestsInfo<Integer> actual = info
 				.appendContinuation(new TestContinuation(1l))
 				.appendContinuation(new TestContinuation(2l))
 				.popContinuation();
@@ -134,7 +134,7 @@ public class RequestInfoTest {
 	
 	@Test
 	public void testNextContinuation() {
-		RequestInfo<Integer> info = RequestInfo.create(2);
+		KeyRequestsInfo<Integer> info = KeyRequestsInfo.create(2);
 		QoSContinuation actual = info
 				.appendContinuation(new TestContinuation(1l))
 				.appendContinuation(new TestContinuation(2l))
@@ -144,8 +144,8 @@ public class RequestInfoTest {
 	
 	@Test
 	public void testNextContinuationIsSameAsPop() {
-		RequestInfo<Integer> info = RequestInfo.create(2);
-		RequestInfo<Integer> twoContinuations = info
+		KeyRequestsInfo<Integer> info = KeyRequestsInfo.create(2);
+		KeyRequestsInfo<Integer> twoContinuations = info
 				.appendContinuation(new TestContinuation(1l))
 				.appendContinuation(new TestContinuation(2l));
 		assertThat(twoContinuations.nextContinuation()).isEqualTo(new TestContinuation(1l));
@@ -154,7 +154,7 @@ public class RequestInfoTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void testTooManyRequests() {
-		RequestInfo<Integer> info = RequestInfo.create(2);
+		KeyRequestsInfo<Integer> info = KeyRequestsInfo.create(2);
 		info.appendContinuation(new TestContinuation(1l))
 			.popContinuation()
 			.popContinuation();
@@ -162,20 +162,20 @@ public class RequestInfoTest {
 	
 	@Test(expected=IllegalStateException.class)
 	public void testNegativeRequest() {
-		RequestInfo<Integer> info = RequestInfo.create(2);
+		KeyRequestsInfo<Integer> info = KeyRequestsInfo.create(2);
 		info.removeOneRequest();
 	}
 	
 	@Test
 	public void testGetRequestCountWhenNone() {
-		RequestInfo<String> info = RequestInfo.create("key");
+		KeyRequestsInfo<String> info = KeyRequestsInfo.create("key");
 		assertThat(info.getPendingRequestCount()).isEqualTo(0);
 	}
 	
 	@Test
 	public void testGetRequestCountOnlyRunning() {
-		RequestInfo<String> info = RequestInfo.create("key");
-		RequestInfo<String> twoRunnings = info
+		KeyRequestsInfo<String> info = KeyRequestsInfo.create("key");
+		KeyRequestsInfo<String> twoRunnings = info
 				.oneMoreRequest()
 				.oneMoreRequest();
 		assertThat(twoRunnings.getPendingRequestCount()).isEqualTo(2);
@@ -183,8 +183,8 @@ public class RequestInfoTest {
 	
 	@Test
 	public void testGetRequestCountOnlyContinuation() {
-		RequestInfo<String> info = RequestInfo.create("key");
-		RequestInfo<String> twoContinuations = info
+		KeyRequestsInfo<String> info = KeyRequestsInfo.create("key");
+		KeyRequestsInfo<String> twoContinuations = info
 				.appendContinuation(new TestContinuation(1l))
 				.appendContinuation(new TestContinuation(2l));
 		assertThat(twoContinuations.getPendingRequestCount()).isEqualTo(2);
@@ -192,8 +192,8 @@ public class RequestInfoTest {
 	
 	@Test
 	public void testGetRequestCountBoth() {
-		RequestInfo<String> info = RequestInfo.create("key");
-		RequestInfo<String> twoContinuations = info
+		KeyRequestsInfo<String> info = KeyRequestsInfo.create("key");
+		KeyRequestsInfo<String> twoContinuations = info
 				.oneMoreRequest()
 				.appendContinuation(new TestContinuation(1l))
 				.appendContinuation(new TestContinuation(2l))
