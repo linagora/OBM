@@ -80,7 +80,7 @@ function dis_imap_archive_form($params, $configuration) {
   $block_excluded_users = get_block_excluded_users($excludedUserIdToLoginMap);
   $block_mailing = get_block_mailing($mailingEmails);
   
-  $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_excluded_user_id', 'userSearch', {filter_pattern:'access', item_id_property:'ext_id'});";
+  $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_excluded_user_id', 'userSearch', {filter_pattern:'access', item_id_property:'ext_id', filter_archived:false});";
   
   $block = "
     <form method='get' name='f_imap_archive' action='imap_archive_index.php'>
@@ -350,7 +350,7 @@ function get_block_excluded_users($excludedUserIdToLoginMap) {
   foreach (get_object_vars($excludedUserIdToLoginMap) as $name => $value) {
     array_push($excludedUserIds, $name);
   }
-  $users = (count($excludedUserIds) > 0) ? get_userobm_from_ext_ids($excludedUserIds) : array();
+  $users = (count($excludedUserIds) > 0) ? get_userobm_from_ext_ids($excludedUserIds, false) : array();
   if (is_array($users['entity'])) {
     $dis_sel_user = "";
     foreach ($users['entity'] as $u_ext_id => $u_ent) {

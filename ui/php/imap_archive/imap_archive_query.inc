@@ -287,7 +287,7 @@ function excludedUserIdsToMap($excludedUserIds) {
   if ($excludedUserIds == null) {
     return $map;
   }
-  $users = get_userobm_from_ext_ids($excludedUserIds);
+  $users = get_userobm_from_ext_ids($excludedUserIds, false);
   foreach ($users['entity'] as $u_ext_id => $u_ent) {
     $map->$u_ext_id = $u_ent['login'];
   }

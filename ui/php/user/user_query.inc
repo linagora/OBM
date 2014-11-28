@@ -412,6 +412,7 @@ function run_query_user_ext_search($user) {
   $pattern = $user['pattern'];
   $filter_entity = $user['filter_entity'];
   $filter_pattern = $user['filter_pattern'];
+  $filter_archived = ($user['filter_archived'] === 'true') ? true : false;
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('UserObm.userobm');
 
@@ -435,6 +436,10 @@ function run_query_user_ext_search($user) {
       ';
     $filterWhere = 'AND ( entityright_'.$filter_pattern.' = 1 AND (entityright_consumer_id IN ('.implode(',',$userEntities).') OR entityright_consumer_id IS NULL) OR userobm_id = '.$obm['uid'].')';    
   }
+  
+  if ($filter_archived) {
+    $archivedCondition = 'AND userobm_archive = 0';
+  }
 
   $query = "SELECT DISTINCT * FROM (SELECT 
       userobm_id,
@@ -451,7 +456,7 @@ function run_query_user_ext_search($user) {
       1 = 1  
       $wherepattern
       $filterWhere
-      AND userobm_archive = 0
+      $archivedCondition
       $multidomain
     LIMIT $limit OFFSET $first_row) AS unsorted ORDER BY userobm_id LIMIT $userLimit ";
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');

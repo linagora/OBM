@@ -2364,7 +2364,7 @@ function get_userobm_from_ids($users) {
  * @param users : array of users id
  * @return array [ids], [entity] (label=>)
  **/
-function get_userobm_from_ext_ids($ext_ids) {
+function get_userobm_from_ext_ids($ext_ids, $filterArchived = true) {
   global $cdg_sql;
 
   $res = array();
@@ -2382,10 +2382,15 @@ function get_userobm_from_ext_ids($ext_ids) {
     }
   }
   $where .= ')';
+  
+  if ($filterArchived) {
+    $archiveCondition = 'AND userobm_archive = 0';
+  }
+  
   $query = "SELECT userobm_ext_id, userobm_login, userobm_lastname, userobm_firstname
     FROM UserObm
-    WHERE userobm_archive = 0
-    AND userobm_ext_id IN $where
+    WHERE userobm_ext_id IN $where
+    $archiveCondition
     ORDER by userobm_lastname";
   display_debug_msg ( $query, $cdg_sql, 'get_userobm_from_ext_ids()' );
   $obm_q->query ( $query );
