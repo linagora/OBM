@@ -43,6 +43,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMessage.RecipientType;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.obm.configuration.ConfigurationService;
 import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.Mailing;
@@ -68,13 +69,17 @@ public class MailerImpl implements Mailer {
 	private static final String IMAP_ARCHIVE_PATH = "/imap_archive/imap_archive_index.php";
 	private static final String LINE_DELIMITER = "\r\n";
 	
+	private final ConfigurationService configurationService;
 	private final ObmSmtpService smtpService;
 	private final Logger logger;
 	private final Session session;
 
 	@Inject
-	protected MailerImpl(ObmSmtpService smtpService,
+	protected MailerImpl(
+			ConfigurationService configurationService,
+			ObmSmtpService smtpService,
 			@Named(LoggerModule.NOTIFICATION) Logger logger) {
+		this.configurationService = configurationService;
 		this.smtpService = smtpService;
 		this.logger = logger;
 		this.session = Session.getDefaultInstance(new Properties());
@@ -101,18 +106,20 @@ public class MailerImpl implements Mailer {
 		return new StringBuilder()
 			.append("IMAP Archive treatment has ended with state ")
 			.append(state)
+			.append(" for the domain ")
+			.append(domain.getName())
 			.append(LINE_DELIMITER)
 			.append("Logs are available at ")
-			.append(link(domain, runId))
+			.append(link(runId))
 			.append(LINE_DELIMITER)
 			.toString();
 	}
 
-	@VisibleForTesting String link(ObmDomain domain, ArchiveTreatmentRunId runId) throws URISyntaxException {
+	@VisibleForTesting String link(ArchiveTreatmentRunId runId) throws URISyntaxException {
 		return new URIBuilder()
-			.setScheme("https")
-			.setHost(domain.getName())
-			.setPath(IMAP_ARCHIVE_PATH)
+			.setScheme(configurationService.getObmUIUrlProtocol())
+			.setHost(configurationService.getObmUIUrlHost())
+			.setPath(configurationService.getObmUIUrlPrefix() + IMAP_ARCHIVE_PATH)
 			.setParameter("action", "log_page")
 			.setParameter("run_id", runId.serialize())
 			.build()

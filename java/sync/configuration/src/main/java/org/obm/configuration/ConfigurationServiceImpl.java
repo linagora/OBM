@@ -59,6 +59,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	private static final int SOLR_CHECKING_INTERVAL_DEFAULT = 10;
 
 	private final static String EXTERNAL_URL_KEY = "external-url";
+	private final static String EXTERNAL_URL_PROTOCOL_KEY = "external-protocol";
+	
+	private final static String EXTERNAL_URL_PREFIX_KEY = "obm-prefix";
+	private final static String EXTERNAL_URL_PREFIX_DEFAULT = "";
+	
 	private final static String OBM_SYNC_PORT = "8080";
 	private final static String OBM_SYNC_APP_NAME = "obm-sync";
 	private final static String SERVICES_APP_NAME = "services";
@@ -169,10 +174,25 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	@Override
 	public String getObmUIBaseUrl() {
-		String protocol = iniFile.getStringValue("external-protocol");
-		String hostname = getExternalUrl();
-		String path = iniFile.getStringValue("obm-prefix");
+		String protocol = getObmUIUrlProtocol();
+		String hostname = getObmUIUrlHost();
+		String path = getObmUIUrlPrefix();
 		return protocol + "://" + hostname + path;
+	}
+	
+	@Override
+	public String getObmUIUrlProtocol() {
+		return iniFile.getStringValue(EXTERNAL_URL_PROTOCOL_KEY);
+	}
+
+	@Override
+	public String getObmUIUrlHost() {
+		return iniFile.getStringValue(EXTERNAL_URL_KEY);
+	}
+	
+	@Override
+	public String getObmUIUrlPrefix() {
+		return iniFile.getStringValue(EXTERNAL_URL_PREFIX_KEY, EXTERNAL_URL_PREFIX_DEFAULT);
 	}
 
 	@Override
@@ -188,9 +208,5 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public boolean isLdapModuleEnabled() {
 		return this.iniFile.getBooleanValue("obm-ldap");
-	}
-
-	private String getExternalUrl() {
-		return iniFile.getStringValue(EXTERNAL_URL_KEY);
 	}
 }

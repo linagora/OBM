@@ -68,7 +68,7 @@ public class ConfigurationServiceImplTest {
 		expect(iniFile.getStringValue(LocatorConfigurationImpl.EXTERNAL_URL_KEY))
 			.andReturn(externalUrl);
 		String obmPrefix = "/obm/";
-		expect(iniFile.getStringValue("obm-prefix"))
+		expect(iniFile.getStringValue("obm-prefix", ""))
 			.andReturn(obmPrefix);
 		
 		control.replay();

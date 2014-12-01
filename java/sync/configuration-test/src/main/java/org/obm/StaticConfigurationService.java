@@ -164,4 +164,19 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 	public boolean isLdapModuleEnabled() {
 		return true;
 	}
+
+	@Override
+	public String getObmUIUrlProtocol() {
+		return "http";
+	}
+
+	@Override
+	public String getObmUIUrlHost() {
+		return "localhost";
+	}
+
+	@Override
+	public String getObmUIUrlPrefix() {
+		return "";
+	}
 }

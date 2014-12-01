@@ -34,6 +34,7 @@ package org.obm.imap.archive.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
 import javax.mail.Address;
@@ -45,6 +46,7 @@ import javax.mail.internet.MimeMessage;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.configuration.ConfigurationService;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.Mailing;
 import org.obm.sync.ObmSmtpService;
@@ -61,30 +63,38 @@ public class MailerImplTest {
 
 	private IMocksControl control;
 	
+	private ConfigurationService configurationService;
 	private ObmSmtpService obmSmtpService;
 	private Logger logger;
 	private ObmDomain domain;
 	private MailerImpl testee;
+
 	
 	@Before
 	public void setup() {
 		control = createControl();
+		configurationService = control.createMock(ConfigurationService.class);
 		obmSmtpService = control.createMock(ObmSmtpService.class);
 		logger = control.createMock(Logger.class);
 		
 		domain = ObmDomain.builder().name("mydomain.org").build();
-		testee = new MailerImpl(obmSmtpService, logger);
+		testee = new MailerImpl(configurationService, obmSmtpService, logger);
 	}
 	
 	@Test
 	public void text() throws Exception {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("94fc9ba5-422e-48b0-86f0-2d00e218a938");
+
+		expect(configurationService.getObmUIUrlProtocol()).andReturn("https");
+		expect(configurationService.getObmUIUrlHost()).andReturn("mydomain.org");
+		expect(configurationService.getObmUIUrlPrefix()).andReturn("/");
 		
 		control.replay();
 		String text = testee.text(domain, runId, State.TERMINATED);
 		control.verify();
 		
-		assertThat(text).isEqualTo("IMAP Archive treatment has ended with state "+ State.TERMINATED + "\r\n" + 
+		assertThat(text).isEqualTo(
+				"IMAP Archive treatment has ended with state "+ State.TERMINATED + " for the domain mydomain.org\r\n" + 
 				"Logs are available at https://mydomain.org/imap_archive/imap_archive_index.php?action=log_page&run_id=" + runId.serialize() + "\r\n");
 	}
 	
@@ -92,11 +102,45 @@ public class MailerImplTest {
 	public void link() throws Exception {
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("94fc9ba5-422e-48b0-86f0-2d00e218a938");
 		
+		expect(configurationService.getObmUIUrlProtocol()).andReturn("https");
+		expect(configurationService.getObmUIUrlHost()).andReturn("any.host.org");
+		expect(configurationService.getObmUIUrlPrefix()).andReturn("/prefix");
+		
 		control.replay();
-		String link = testee.link(domain, runId);
+		String link = testee.link(runId);
 		control.verify();
 		
-		assertThat(link).isEqualTo("https://mydomain.org/imap_archive/imap_archive_index.php?action=log_page&run_id=" + runId.serialize());
+		assertThat(link).isEqualTo("https://any.host.org/prefix/imap_archive/imap_archive_index.php?action=log_page&run_id=" + runId.serialize());
+	}
+	
+	@Test
+	public void linkWhenNoPrefix() throws Exception {
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("94fc9ba5-422e-48b0-86f0-2d00e218a938");
+		
+		expect(configurationService.getObmUIUrlProtocol()).andReturn("https");
+		expect(configurationService.getObmUIUrlHost()).andReturn("any.host.org");
+		expect(configurationService.getObmUIUrlPrefix()).andReturn("");
+		
+		control.replay();
+		String link = testee.link(runId);
+		control.verify();
+		
+		assertThat(link).isEqualTo("https://any.host.org/imap_archive/imap_archive_index.php?action=log_page&run_id=" + runId.serialize());
+	}
+	
+	@Test
+	public void linkWhenPrefixWithSlash() throws Exception {
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("94fc9ba5-422e-48b0-86f0-2d00e218a938");
+		
+		expect(configurationService.getObmUIUrlProtocol()).andReturn("https");
+		expect(configurationService.getObmUIUrlHost()).andReturn("any.host.org");
+		expect(configurationService.getObmUIUrlPrefix()).andReturn("/");
+		
+		control.replay();
+		String link = testee.link(runId);
+		control.verify();
+		
+		assertThat(link).isEqualTo("https://any.host.org/imap_archive/imap_archive_index.php?action=log_page&run_id=" + runId.serialize());
 	}
 	
 	@Test
@@ -146,6 +190,10 @@ public class MailerImplTest {
 	public void sendShouldSend() throws Exception {
 		obmSmtpService.sendEmail(anyObject(MimeMessage.class), anyObject(Session.class));
 		expectLastCall();
+
+		expect(configurationService.getObmUIUrlProtocol()).andReturn("https");
+		expect(configurationService.getObmUIUrlHost()).andReturn("any.host.org");
+		expect(configurationService.getObmUIUrlPrefix()).andReturn("/prefix");
 		
 		control.replay();
 		testee.send(domain, ArchiveTreatmentRunId.from("94fc9ba5-422e-48b0-86f0-2d00e218a938"), State.TERMINATED, Mailing.from(ImmutableList.of(EmailAddress.loginAtDomain("user@mydomain.org"), EmailAddress.loginAtDomain("user2@mydomain.org"))));
@@ -156,6 +204,10 @@ public class MailerImplTest {
 	public void sendShouldSendThrowWhenExceptionAppend() throws Exception {
 		obmSmtpService.sendEmail(anyObject(MimeMessage.class), anyObject(Session.class));
 		expectLastCall().andThrow(new MessagingException());
+
+		expect(configurationService.getObmUIUrlProtocol()).andReturn("https");
+		expect(configurationService.getObmUIUrlHost()).andReturn("any.host.org");
+		expect(configurationService.getObmUIUrlPrefix()).andReturn("/prefix");
 		
 		logger.error(anyObject(String.class), anyObject(Exception.class));
 		expectLastCall();
