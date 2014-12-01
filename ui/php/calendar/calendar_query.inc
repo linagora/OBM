@@ -1115,7 +1115,11 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
   $eid = of_entity_insert('event',$id);
   if($repeat_kind != 'none' && is_array($date_exception)) {
     foreach($date_exception as $key => $value) {
-      $calendar['old_date_begin'] = $value->setHour($datebegin)->setMinute($datebegin);        
+      if ($all_day != 'TRUE') {
+        $calendar['old_date_begin'] = $value->setHour($calendar['date_begin'])->setMinute($calendar['date_begin']);
+      } else {
+        $calendar['old_date_begin'] = $value;
+      }
       run_query_calendar_event_exception_insert($calendar);
     }
   }
@@ -2732,7 +2736,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
     $exception_recurrence_id_date = clone $calendar['old_date_begin'];
   }
   if ($calendar['all_day']) {
-      $exception_recurrence_id_date = allday_start_date($exception_recurrence_id_date, 'UTC', 'UTC');
+      $exception_recurrence_id_date = allday_start_date($exception_recurrence_id_date, Of_Date::getOption("timezone"), Of_Date::getOption("timezone"));
   }
   $exception_recurrence_id_date->setTimezone(new DateTimeZone('UTC'));
   $exception_date = $calendar['date_begin'] ? clone $calendar['date_begin'] : clone $date_occurrence;
