@@ -5535,13 +5535,10 @@ function calendar_events_model($start, $end, $calendar_entity, $current_timezone
     while($exception_q->next_record()) {
       $gmt_exception_date = new Of_Date($exception_q->f('eventexception_date'), 'UTC');
       $exception_date = null;
-      if ($exception_q->f('event_allday')) {
-        $exception_date = allday_start_date($gmt_exception_date, 'UTC', 'UTC');
-      }
-      else {
-        $exception_date = $gmt_exception_date;
-      }
-      $of->removeOccurrences($exception_q->f('eventexception_parent_id'), $exception_date);
+      $exception_date = $gmt_exception_date;
+      $event_id = $exception_q->f('eventexception_parent_id');
+      $event = $of->events[$event_id];
+      $of->removeOccurrencesForDisplay($event_id, $exception_date, $event->timezone, $event->all_day);
     }
 
     // Add attendees to events
@@ -5564,7 +5561,7 @@ function calendar_events_model($start, $end, $calendar_entity, $current_timezone
       if ($event->privacy == 2) {
         foreach ($of->occurrences[$id] as $occurence) {
           if ($occurence->id != $obm['uid'] && !$event->userAttendeeExists($obm['uid'])) {
-            $of->removeOccurrences($id, $occurence->date);
+            $of->removeOccurrencesForDisplay($id, $occurence->date, $event->all_day);
           }
         }
       }
@@ -5659,7 +5656,7 @@ function calendar_events_model($start, $end, $calendar_entity, $current_timezone
               if (is_array($exdates = $rrule['exdates'])) {
                 foreach($exdates as $exdate) {
                   if ($exdate->compare($end) < 0 && $exdate->compare($start) > 0) { 
-                    $of->removeOccurrences($vevent->getUid(), $exdate);
+                    $of->removeOccurrencesForDisplay($vevent->getUid(), $exdate_to_remove, $event->timezone, $event->all_day);
                   }
                 }
               } 
@@ -6695,6 +6692,26 @@ Class OccurrenceFactory {
       if($utc_occ_date->compareDateIso($date) == 0) {
         unset($this->occurrences[$id][$key]); 
       }
+    }
+  }
+
+  /**
+   * Like removeOccurrences, except it tries to treat occurrence dates as naive
+   * date times which are not sensitive to timezones.
+   */
+  function removeOccurrencesForDisplay($id, $date, $timezone_name, $is_allday) {
+    if (!$is_allday) {
+        $this->removeOccurrences($id, $date);
+    }
+    else {
+        foreach($this->occurrences[$id] as $key => $occurrence) {
+          $utc_occ_date = clone $occurrence->date;
+          $utc_occ_date = allday_start_date($utc_occ_date, Of_date::getOption('timezone'), Of_date::getOption('timezone'));
+          $normalized_occ_date = allday_start_date($date, $timezone_name, Of_date::getOption('timezone'));
+          if($utc_occ_date->getTimestamp() == $normalized_occ_date->getTimestamp()) {
+            unset($this->occurrences[$id][$key]);
+          }
+        }
     }
   }
 
