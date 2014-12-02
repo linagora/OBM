@@ -84,6 +84,10 @@
 			<artifactId>assertj-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-guava</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
 		</dependency>

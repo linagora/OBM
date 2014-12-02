@@ -45,6 +45,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
@@ -201,6 +202,10 @@ public class MessageSet implements Serializable, Iterable<Long> {
 
 	public long max() {
 		return Iterables.getLast(ranges).upperEndpoint();
+	}
+	
+	public Optional<Long> first() {
+		return FluentIterable.from(asDiscreteValues()).first();
 	}
 	
 	@Override

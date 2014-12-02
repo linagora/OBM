@@ -33,12 +33,14 @@
 package org.obm.push.mail.bean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.guava.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.junit.Test;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 
@@ -249,5 +251,28 @@ public class MessageSetTest {
 		MessageSet messageSet = MessageSet.builder().build();
 		long max = messageSet.max();
 		assertThat(max).isEqualTo(0);
+	}
+	
+	@Test
+	public void firstShouldReturnAbsentWhenNone() {
+		MessageSet messageSet = MessageSet.builder().build();
+		Optional<Long> first = messageSet.first();
+		assertThat(first).isAbsent();
+	}
+	
+	@Test
+	public void firstShouldReturnFirst() {
+		MessageSet messageSet = MessageSet.builder().add(1l).add(2l).add(3l).add(5l).build();
+		Optional<Long> first = messageSet.first();
+		assertThat(first).isPresent();
+		assertThat(first.get()).isEqualTo(1);
+	}
+	
+	@Test
+	public void firstShouldReturnFirstOrdered() {
+		MessageSet messageSet = MessageSet.builder().add(2l).add(3l).add(1l).add(5l).build();
+		Optional<Long> first = messageSet.first();
+		assertThat(first).isPresent();
+		assertThat(first.get()).isEqualTo(1);
 	}
 }
