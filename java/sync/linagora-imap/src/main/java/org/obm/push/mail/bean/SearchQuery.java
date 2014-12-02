@@ -35,11 +35,12 @@ package org.obm.push.mail.bean;
 import java.util.Date;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 public class SearchQuery {
 
 	public static final SearchQuery MATCH_ALL = new SearchQuery(null, null); 
-	public static final SearchQuery MATCH_ALL_EVEN_DELETED = new SearchQuery(null, null, true);
+	public static final SearchQuery MATCH_ALL_EVEN_DELETED = new SearchQuery(null, null, true, null);
 	
 	public static Builder builder() {
 		return new Builder();
@@ -49,6 +50,7 @@ public class SearchQuery {
 		private Date before;
 		private Date after;
 		private boolean includeDeleted;
+		private MessageSet messageSet;
 		
 		private Builder() {
 			this.includeDeleted = false;
@@ -69,14 +71,23 @@ public class SearchQuery {
 			return this;
 		}
 		
+		public Builder messageSet(MessageSet messageSet) {
+			this.messageSet = messageSet;
+			return this;
+		}
+		
 		public SearchQuery build() {
-			return new SearchQuery(before, after, includeDeleted);
+			if (messageSet != null) {
+				Preconditions.checkState(!messageSet.isEmpty());
+			}
+			return new SearchQuery(before, after, includeDeleted, messageSet);
 		}
 	}
 
 	private final Date after;
 	private final Date before;
 	private final boolean matchDeleted;
+	private final MessageSet messageSet;
 	
 	/**
 	 * 
@@ -85,13 +96,14 @@ public class SearchQuery {
 	 *            is within or later than the specified date.
 	 */
 	private SearchQuery(Date before, Date after) {
-		this(before, after, false);
+		this(before, after, false, null);
 	}
 	
-	private SearchQuery(Date before, Date after, boolean matchDeleted) {
+	private SearchQuery(Date before, Date after, boolean matchDeleted, MessageSet messageSet) {
 		this.after = after;
 		this.before = before;
 		this.matchDeleted = matchDeleted;
+		this.messageSet = messageSet;
 	}
 
 	public Date getAfter() {
@@ -106,9 +118,13 @@ public class SearchQuery {
 		return matchDeleted;
 	}
 
+	public MessageSet getMessageSet() {
+		return messageSet;
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(after, before, matchDeleted);
+		return Objects.hashCode(after, before, matchDeleted, messageSet);
 	}
 	
 	@Override
@@ -117,7 +133,8 @@ public class SearchQuery {
 			SearchQuery that = (SearchQuery) object;
 				return Objects.equal(this.after, that.after)
 				&& Objects.equal(this.before, that.before)
-				&& Objects.equal(this.matchDeleted, that.matchDeleted);
+				&& Objects.equal(this.matchDeleted, that.matchDeleted)
+				&& Objects.equal(this.messageSet, that.messageSet);
 		}
 		return false;
 	}
@@ -128,6 +145,7 @@ public class SearchQuery {
 			.add("after", after)
 			.add("before", before)
 			.add("matchDeleted", matchDeleted)
+			.add("messageSet", messageSet)
 			.toString();
 	}
 }

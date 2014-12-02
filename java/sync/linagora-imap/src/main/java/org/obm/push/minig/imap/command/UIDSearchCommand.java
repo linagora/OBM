@@ -36,11 +36,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.minig.imap.impl.IMAPResponse;
+import org.obm.push.minig.imap.impl.ImapMessageSet;
 
 import com.google.common.base.Splitter;
-import org.obm.push.mail.bean.MessageSet;
 
 public class UIDSearchCommand extends Command<MessageSet> {
 
@@ -66,6 +67,9 @@ public class UIDSearchCommand extends Command<MessageSet> {
 		if (sq.getBefore() != null) {
 			DateFormat df = new SimpleDateFormat("d-MMM-yyyy", Locale.ENGLISH);
 			cmd += " BEFORE " + df.format(sq.getBefore());
+		}
+		if (sq.getMessageSet() != null) {
+			cmd += " UID " + ImapMessageSet.wrap(sq.getMessageSet()).asString(); 
 		}
 		
 		// logger.info("cmd "+cmd);

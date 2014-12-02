@@ -34,6 +34,7 @@ package org.obm.push.minig.imap.command;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
@@ -52,5 +53,26 @@ public class UIDSearchCommandTest {
 		command.handleResponses(ImmutableList.of(response, response2, response3));
 		
 		assertThat(command.getReceivedData().getRanges()).hasSize(1);
+	}
+	
+	@Test
+	public void buildCommandShouldAddUids() {
+		UIDSearchCommand command = new UIDSearchCommand(SearchQuery.builder()
+				.messageSet(MessageSet.builder().add(1l).add(2l).add(5l).build())
+				.includeDeleted(true)
+				.build());
+		CommandArgument commandArgument = command.buildCommand();
+		
+		assertThat(commandArgument.getCommandString()).isEqualTo("UID SEARCH UID 1:2,5");
+	}
+	
+	@Test
+	public void buildCommandShouldNotAddUidsWhenNull() {
+		UIDSearchCommand command = new UIDSearchCommand(SearchQuery.builder()
+				.includeDeleted(true)
+				.build());
+		CommandArgument commandArgument = command.buildCommand();
+		
+		assertThat(commandArgument.getCommandString()).isEqualTo("UID SEARCH");
 	}
 }
