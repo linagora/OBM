@@ -148,7 +148,7 @@ public interface StoreClient extends AutoCloseable {
 
 	Map<Long, FlagsList> uidFetchFlags(MessageSet messages) throws ImapTimeoutException;
 	
-	Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) throws ImapTimeoutException;
+	List<InternalDate> uidFetchInternalDate(MessageSet messages) throws ImapTimeoutException;
 	
 	Collection<FastFetch> uidFetchFast(MessageSet messages) throws ImapTimeoutException;
 

@@ -31,9 +31,13 @@
 
 package org.obm.imap.archive.mailbox;
 
+import java.util.List;
+
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
+import org.obm.push.exception.ImapMessageNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.minig.imap.StoreClient;
@@ -114,6 +118,15 @@ public class MailboxImpl implements Mailbox {
 	@Override
 	public MessageSet uidCopy(MessageSet messages, Mailbox mailbox) throws MailboxNotFoundException {
 		return storeClient.uidCopy(messages, mailbox.getName());
+	}
+	
+	@Override
+	public List<InternalDate> fetchInternalDate(MessageSet messageSet) throws ImapMessageNotFoundException {
+		List<InternalDate> uidFetchInternalDate = storeClient.uidFetchInternalDate(messageSet);
+		if (uidFetchInternalDate.isEmpty()) {
+			throw new ImapMessageNotFoundException(String.format("No email for uid %s", messageSet));
+		}
+		return uidFetchInternalDate;
 	}
 	
 	@Override

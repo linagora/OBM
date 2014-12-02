@@ -31,9 +31,13 @@
 
 package org.obm.imap.archive.mailbox;
 
+import java.util.List;
+
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
+import org.obm.push.exception.ImapMessageNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.minig.imap.StoreClient;
@@ -56,4 +60,6 @@ public interface Mailbox {
 	MessageSet uidSearch(SearchQuery searchQuery);
 	
 	MessageSet uidCopy(MessageSet messages, Mailbox mailbox) throws MailboxNotFoundException;
+	
+	List<InternalDate> fetchInternalDate(MessageSet messageSet) throws ImapMessageNotFoundException ;
 }

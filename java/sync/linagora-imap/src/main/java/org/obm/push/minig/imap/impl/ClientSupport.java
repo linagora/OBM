@@ -375,8 +375,8 @@ public class ClientSupport {
 		return run(new UIDFetchFlagsCommand(messages));
 	}
 
-	public Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) throws ImapTimeoutException {
-		return run(new UIDFetchInternalDateCommand(uids));
+	public List<InternalDate> uidFetchInternalDate(MessageSet messages) throws ImapTimeoutException {
+		return run(new UIDFetchInternalDateCommand(messages));
 	}
 	
 	public Collection<FastFetch> uidFetchFast(MessageSet messages) throws ImapTimeoutException {

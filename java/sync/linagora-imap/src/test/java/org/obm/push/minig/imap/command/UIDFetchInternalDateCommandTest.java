@@ -34,6 +34,7 @@ package org.obm.push.minig.imap.command;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.collect.ImmutableList;
@@ -47,7 +48,7 @@ public class UIDFetchInternalDateCommandTest {
 		IMAPResponse response2 = new IMAPResponse("OK", "* 1 FETCH (UID 12 INTERNALDATE \"14-Dec-2012 10:56:18 +0100\")");
 		IMAPResponse response3 = new IMAPResponse("OK", "");
 		
-		UIDFetchInternalDateCommand command = new UIDFetchInternalDateCommand(ImmutableList.of(12l));
+		UIDFetchInternalDateCommand command = new UIDFetchInternalDateCommand(MessageSet.singleton(12));
 		command.handleResponses(ImmutableList.of(response, response2, response3));
 		
 		assertThat(command.getReceivedData()).hasSize(1);

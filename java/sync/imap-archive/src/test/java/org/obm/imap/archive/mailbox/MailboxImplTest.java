@@ -37,19 +37,26 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
+import java.util.List;
+
 import org.easymock.IMocksControl;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
+import org.obm.push.exception.ImapMessageNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
 import pl.wkr.fluentrule.api.FluentExpectedException;
+
+import com.google.common.collect.ImmutableList;
 
 
 public class MailboxImplTest {
@@ -210,5 +217,36 @@ public class MailboxImplTest {
 		} finally {
 			control.verify();
 		}
+	}
+	
+	@Test(expected=ImapMessageNotFoundException.class)
+	public void fetchInternalDateShouldThrowWhenNotFound() throws Exception {
+		MessageSet messageSet = MessageSet.singleton(1);
+		expect(storeClient.uidFetchInternalDate(messageSet))
+			.andReturn(ImmutableList.<InternalDate> of());
+		
+		try {
+			control.replay();
+			MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+			mailbox.fetchInternalDate(messageSet);
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test
+	public void fetchInternalDateShouldReturnInternalDate() throws Exception {
+		int uid = 1;
+		MessageSet messageSet = MessageSet.singleton(uid);
+		InternalDate expectedInternalDate = new InternalDate(uid, DateTime.parse("2014-02-12T14:26:00.000Z").toDate());
+		expect(storeClient.uidFetchInternalDate(messageSet))
+			.andReturn(ImmutableList.<InternalDate> of(expectedInternalDate));
+		
+		control.replay();
+		MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+		List<InternalDate> internalDates = mailbox.fetchInternalDate(messageSet);
+		control.verify();
+		
+		assertThat(internalDates).containsOnly(expectedInternalDate);
 	}
 }

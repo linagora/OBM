@@ -35,28 +35,27 @@ package org.obm.push.minig.imap.command;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import org.obm.push.mail.bean.InternalDate;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.minig.imap.impl.ImapMessageSet;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import org.obm.push.mail.bean.MessageSet;
 
-public class UIDFetchInternalDateCommand extends Command<Collection<InternalDate>> {
+public class UIDFetchInternalDateCommand extends Command<List<InternalDate>> {
 
 	private final static String IMAP_COMMAND = "UID FETCH";
 	private final static String IMAP_SUB_COMMAND = "UID INTERNALDATE";
 	private final ImapMessageSet imapMessageSet;
 	DateFormat df;
 
-	public UIDFetchInternalDateCommand(Collection<Long> uid) {
-		MessageSet messageSet = MessageSet.builder().addAll(uid).build();
-		imapMessageSet = ImapMessageSet.wrap(messageSet);
+	public UIDFetchInternalDateCommand(MessageSet messages) {
+		imapMessageSet = ImapMessageSet.wrap(messages);
 		//22-Mar-2010 14:26:18 +0100
 		df = new SimpleDateFormat("d-MMM-yyyy HH:mm:ss Z", Locale.ENGLISH);
 	}

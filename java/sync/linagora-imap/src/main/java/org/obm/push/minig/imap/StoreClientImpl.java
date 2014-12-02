@@ -283,8 +283,8 @@ public class StoreClientImpl implements StoreClient {
 	}
 	
 	@Override
-	public Collection<InternalDate> uidFetchInternalDate(Collection<Long> uids) throws ImapTimeoutException {
-		return clientSupport.uidFetchInternalDate(uids);
+	public List<InternalDate> uidFetchInternalDate(MessageSet messages) throws ImapTimeoutException {
+		return clientSupport.uidFetchInternalDate(messages);
 	}
 	
 	@Override
