@@ -33,6 +33,9 @@ package org.obm.imap.archive.beans;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Date;
+
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 
@@ -54,5 +57,37 @@ public class YearTest {
 	@Test
 	public void serializeShouldWork() {
 		assertThat(Year.from(2014).serialize()).isEqualTo("2014");
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void fromDateShouldThrowWhenNull() {
+		Year.from((Date) null);
+	}
+	
+	@Test
+	public void fromDate() {
+		Year expectedYear = Year.from(2014);
+		
+		Year year = Year.from(DateTime.parse("2014-12-02T14:33:00.000Z").toDate());
+		assertThat(year).isEqualTo(expectedYear);
+	}
+	
+	@Test
+	public void previous() {
+		Year previous = Year.from(2014).previous();
+		assertThat(previous.serialize()).isEqualTo("2013");
+	}
+	
+	@Test
+	public void next() {
+		Year next = Year.from(2014).next();
+		assertThat(next.serialize()).isEqualTo("2015");
+	}
+	
+	@Test
+	public void toDate() {
+		Date expectedDate = DateTime.parse("2014-01-01T00:00:00.000Z").toDate();
+		Date nextOnFirstSecond = Year.from(2014).toDate();
+		assertThat(nextOnFirstSecond).isEqualTo(expectedDate);
 	}
 }

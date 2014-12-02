@@ -31,6 +31,11 @@
 
 package org.obm.imap.archive.beans;
 
+import java.util.Date;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -41,6 +46,11 @@ public class Year {
 	public static Year from(int year) {
 		Preconditions.checkArgument(year >= MINIMAL_YEAR);
 		return new Year(year);
+	}
+	
+	public static Year from(Date date) {
+		Preconditions.checkNotNull(date);
+		return new Year(new DateTime(date, DateTimeZone.UTC).getYear());
 	}
 	
 	private final int year;
@@ -55,6 +65,26 @@ public class Year {
 	
 	public String serialize() {
 		return String.valueOf(year);
+	}
+	
+	public Year previous() {
+		return Year.from(year - 1);
+	}
+	
+	public Year next() {
+		return Year.from(year + 1);
+	}
+	
+	public Date toDate() {
+		return new DateTime(DateTimeZone.UTC)
+			.withYear(year)
+			.withMonthOfYear(1)
+			.withDayOfMonth(1)
+			.withHourOfDay(0)
+			.withMinuteOfHour(0)
+			.withSecondOfMinute(0)
+			.withMillisOfSecond(0)
+			.toDate();
 	}
 	
 	@Override
