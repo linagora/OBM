@@ -150,19 +150,19 @@ public class StoreClientImpl implements StoreClient {
 
 	@Override
 	public boolean select(String mailbox) throws MailboxNotFoundException, ImapTimeoutException {
-		if (hasToSelectMailbox(mailbox) && selectMailboxImpl(mailbox)) {
-			activeMailbox = mailbox;
+		if (Strings.isNullOrEmpty(mailbox)) {
+			return false;
+		}
+		
+		if (!givenMailboxIsDifferentOfActive(mailbox)) {
 			return true;
+		} else {
+			if (selectMailboxImpl(mailbox)) {
+				activeMailbox = mailbox;
+				return true;
+			}
 		}
 		return false;
-	}
-
-	@VisibleForTesting boolean hasToSelectMailbox(String mailbox) {
-		return givenMailboxIsSelectable(mailbox) && givenMailboxIsDifferentOfActive(mailbox);
-	}
-
-	private boolean givenMailboxIsSelectable(String mailbox) {
-		return !Strings.isNullOrEmpty(mailbox);
 	}
 
 	private boolean givenMailboxIsDifferentOfActive(String mailbox) {

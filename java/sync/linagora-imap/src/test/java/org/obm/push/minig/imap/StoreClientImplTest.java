@@ -52,13 +52,13 @@ public class StoreClientImplTest {
 	private static final int port = 12651;
 
 	private StoreClientImpl storeClientImpl;
-	private IMocksControl mocks;
+	private IMocksControl control;
 	private ClientSupport clientSupport;
 
 	@Before
 	public void setUp() {
-		mocks = createControl();
-		clientSupport = mocks.createMock(ClientSupport.class);
+		control = createControl();
+		clientSupport = control.createMock(ClientSupport.class);
 		storeClientImpl = new StoreClientImpl(null, port, null, null, MailboxNameCheckPolicy.ALWAYS, clientSupport);
 	}
 
@@ -66,9 +66,9 @@ public class StoreClientImplTest {
 	public void testFirstSelect() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isEqualTo("INBOX");
 		assertThat(selected).isTrue();
@@ -79,9 +79,9 @@ public class StoreClientImplTest {
 		expect(clientSupport.select("INBOX")).andReturn(false);
 		storeClientImpl.activeMailbox = null;
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isNull();
 		assertThat(selected).isFalse();
@@ -92,9 +92,9 @@ public class StoreClientImplTest {
 		expect(clientSupport.select("INBOX")).andReturn(false);
 		storeClientImpl.activeMailbox = "Trash";
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isEqualTo("Trash");
 		assertThat(selected).isFalse();
@@ -104,9 +104,9 @@ public class StoreClientImplTest {
 	public void testSelectWhenServiceReturnsTrue() throws Exception {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isEqualTo("INBOX");
 		assertThat(selected).isTrue();
@@ -117,9 +117,9 @@ public class StoreClientImplTest {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = null;
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isEqualTo("INBOX");
 		assertThat(selected).isTrue();
@@ -130,9 +130,9 @@ public class StoreClientImplTest {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = "";
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isEqualTo("INBOX");
 		assertThat(selected).isTrue();
@@ -143,9 +143,9 @@ public class StoreClientImplTest {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = "Trash";
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isEqualTo("INBOX");
 		assertThat(selected).isTrue();
@@ -156,9 +156,9 @@ public class StoreClientImplTest {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = "INBO";
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isEqualTo("INBOX");
 		assertThat(selected).isTrue();
@@ -169,9 +169,9 @@ public class StoreClientImplTest {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = "INBOXX";
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isEqualTo("INBOX");
 		assertThat(selected).isTrue();
@@ -182,9 +182,9 @@ public class StoreClientImplTest {
 		expect(clientSupport.select("INBOX")).andReturn(true);
 		storeClientImpl.activeMailbox = "INBOX/sub";
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isEqualTo("INBOX");
 		assertThat(selected).isTrue();
@@ -200,9 +200,9 @@ public class StoreClientImplTest {
 		expect(clientSupport.select("INBOX/sub")).andReturn(true);
 		storeClientImpl.activeMailbox = "INBOX";
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX/sub");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isEqualTo("INBOX/sub");
 		assertThat(selected).isTrue();
@@ -212,78 +212,113 @@ public class StoreClientImplTest {
 	public void testSelectWhenActiveMailboxIsSame() throws Exception {
 		storeClientImpl.activeMailbox = "INBOX";
 		
-		mocks.replay();
+		control.replay();
 		boolean selected = storeClientImpl.select("INBOX");
-		mocks.verify();
+		control.verify();
 
 		assertThat(storeClientImpl.activeMailbox).isEqualTo("INBOX");
-		assertThat(selected).isFalse();
+		assertThat(selected).isTrue();
 	}
 
 	@Test
-	public void testHasToSelectMailboxForNullWhenNullActive() {
+	public void selectForNullWhenNullActive() throws Exception {
 		storeClientImpl.activeMailbox = null;
-		assertThat(storeClientImpl.hasToSelectMailbox(null)).isFalse();
+		assertThat(storeClientImpl.select(null)).isFalse();
 	}
 
 	@Test
-	public void testHasToSelectMailboxForEmptyWhenNullActive() {
+	public void selectForEmptyWhenNullActive() throws Exception {
 		storeClientImpl.activeMailbox = null;
-		assertThat(storeClientImpl.hasToSelectMailbox("")).isFalse();
+		assertThat(storeClientImpl.select("")).isFalse();
 	}
 
 	@Test
-	public void testHasToSelectMailboxForInboxWhenNullActive() {
+	public void selectForInboxWhenNullActive() throws Exception {
+		String mailbox = "INBOX";
 		storeClientImpl.activeMailbox = null;
-		assertThat(storeClientImpl.hasToSelectMailbox("INBOX")).isTrue();
+		expect(clientSupport.select(mailbox))
+			.andReturn(true);
+		
+		control.replay();
+		assertThat(storeClientImpl.select(mailbox)).isTrue();
+		control.verify();
 	}
 
 	@Test
-	public void testHasToSelectMailboxForNullWhenEmptyActive() {
+	public void selectForNullWhenEmptyActive() throws Exception {
 		storeClientImpl.activeMailbox = "";
-		assertThat(storeClientImpl.hasToSelectMailbox(null)).isFalse();
+		assertThat(storeClientImpl.select(null)).isFalse();
 	}
 
 	@Test
-	public void testHasToSelectMailboxForEmptyWhenEmptyActive() {
+	public void selectForEmptyWhenEmptyActive() throws Exception {
 		storeClientImpl.activeMailbox = "";
-		assertThat(storeClientImpl.hasToSelectMailbox("")).isFalse();
+		assertThat(storeClientImpl.select("")).isFalse();
 	}
 
 	@Test
-	public void testHasToSelectMailboxForInboxWhenEmptyActive() {
+	public void selectForInboxWhenEmptyActive() throws Exception {
 		storeClientImpl.activeMailbox = "";
-		assertThat(storeClientImpl.hasToSelectMailbox("INBOX")).isTrue();
+		String mailbox = "INBOX";
+		expect(clientSupport.select(mailbox))
+			.andReturn(true);
+	
+		control.replay();
+		assertThat(storeClientImpl.select("INBOX")).isTrue();
+		control.verify();
 	}
 
 	@Test
-	public void testHasToSelectMailboxForNullWhenInboxActive() {
+	public void selectForNullWhenInboxActive() throws Exception {
 		storeClientImpl.activeMailbox = "INBOX";
-		assertThat(storeClientImpl.hasToSelectMailbox(null)).isFalse();
+		assertThat(storeClientImpl.select(null)).isFalse();
 	}
 
 	@Test
-	public void testHasToSelectMailboxForEmptyWhenInboxActive() {
+	public void selectForEmptyWhenInboxActive() throws Exception {
 		storeClientImpl.activeMailbox = "INBOX";
-		assertThat(storeClientImpl.hasToSelectMailbox("")).isFalse();
+		assertThat(storeClientImpl.select("")).isFalse();
 	}
 
 	@Test
-	public void testHasToSelectMailboxForInboxWhenInboxActive() {
-		storeClientImpl.activeMailbox = "INBOX";
-		assertThat(storeClientImpl.hasToSelectMailbox("INBOX")).isFalse();
+	public void selectForInboxWhenInboxActive() throws Exception {
+		String mailbox = "INBOX";
+		storeClientImpl.activeMailbox = mailbox;
+		assertThat(storeClientImpl.select(mailbox)).isTrue();
 	}
 
 	@Test
-	public void testHasToSelectMailboxForSubInboxWhenInboxActive() {
+	public void selectForSubInboxWhenInboxActive() throws Exception {
 		storeClientImpl.activeMailbox = "INBOX";
-		assertThat(storeClientImpl.hasToSelectMailbox("INBOX/subfolder")).isTrue();
+		String mailbox = "INBOX/subfolder";
+		expect(clientSupport.select(mailbox))
+			.andReturn(true);
+		ListResult listResult = new ListResult(2);
+		listResult.add(new ListInfo("INBOX", true, false));
+		listResult.add(new ListInfo(mailbox, true, false));
+		expect(clientSupport.listAll())
+			.andReturn(listResult);
+	
+		control.replay();
+		assertThat(storeClientImpl.select(mailbox)).isTrue();
+		control.verify();
 	}
 
 	@Test
-	public void testHasToSelectMailboxForTrashWhenInboxActive() {
+	public void selectForTrashWhenInboxActive() throws Exception {
 		storeClientImpl.activeMailbox = "INBOX";
-		assertThat(storeClientImpl.hasToSelectMailbox("Trash")).isTrue();
+		String mailbox = "Trash";
+		expect(clientSupport.select(mailbox))
+			.andReturn(true);
+		ListResult listResult = new ListResult(2);
+		listResult.add(new ListInfo("INBOX", true, false));
+		listResult.add(new ListInfo(mailbox, true, false));
+		expect(clientSupport.listAll())
+			.andReturn(listResult);
+
+		control.replay();
+		assertThat(storeClientImpl.select(mailbox)).isTrue();
+		control.verify();
 	}
 	
 	@Test
@@ -306,9 +341,9 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBOXX", true, false));
 		expect(clientSupport.listAll()).andReturn(listResult);
 		
-		mocks.replay();
+		control.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("INBOXX");
-		mocks.verify();
+		control.verify();
 		
 		assertThat(found).isEqualTo("INBOXX");
 	}
@@ -321,9 +356,9 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBOXX", true, false));
 		expect(clientSupport.listAll()).andReturn(listResult);
 		
-		mocks.replay();
+		control.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("INBO");
-		mocks.verify();
+		control.verify();
 		
 		assertThat(found).isEqualTo("INBO");
 	}
@@ -336,9 +371,9 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("Trash", true, false));
 		expect(clientSupport.listAll()).andReturn(listResult);
 		
-		mocks.replay();
+		control.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("Trash");
-		mocks.verify();
+		control.verify();
 		
 		assertThat(found).isEqualTo("Trash");
 	}
@@ -351,9 +386,9 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("TRASH", true, false));
 		expect(clientSupport.listAll()).andReturn(listResult);
 		
-		mocks.replay();
+		control.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("Trash");
-		mocks.verify();
+		control.verify();
 		
 		assertThat(found).isEqualTo("TRASH");
 	}
@@ -366,28 +401,28 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("TRASH", true, false));
 		expect(clientSupport.listAll()).andReturn(listResult);
 		
-		mocks.replay();
+		control.replay();
 		storeClientImpl.findMailboxNameWithServerCase("Youpi");
 	}
 
 	@Test
 	public void testFindMailboxNameWithServerCaseWithNeverPolicy() throws Exception {
 		storeClientImpl = new StoreClientImpl(null, port, null, null, MailboxNameCheckPolicy.NEVER, clientSupport);
-		mocks.replay();
+		control.replay();
 
 		assertThat(storeClientImpl.findMailboxNameWithServerCase("mailBOXname")).isEqualTo("mailBOXname");
 
-		mocks.verify();
+		control.verify();
 	}
 
 	@Test
 	public void testFindMailboxNameWithServerCaseForInboxWithNeverPolicy() throws Exception {
 		storeClientImpl = new StoreClientImpl(null, port, null, null, MailboxNameCheckPolicy.NEVER, clientSupport);
-		mocks.replay();
+		control.replay();
 
 		assertThat(storeClientImpl.findMailboxNameWithServerCase("INbOx")).isEqualTo("INBOX");
 
-		mocks.verify();
+		control.verify();
 	}
 
 	@Test
@@ -407,20 +442,20 @@ public class StoreClientImplTest {
 	@Test(expected=NullPointerException.class)
 	public void uidCopyShouldThrowWhenMessageSetIsNull() throws Exception {
 		try {
-			mocks.replay();
+			control.replay();
 			storeClientImpl.uidCopy(null, null);
 		} finally {
-			mocks.verify();
+			control.verify();
 		}
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void uidCopyShouldThrowWhenDestMailboxIsNull() throws Exception {
 		try {
-			mocks.replay();
+			control.replay();
 			storeClientImpl.uidCopy(MessageSet.empty(), null);
 		} finally {
-			mocks.verify();
+			control.verify();
 		}
 	}
 	
@@ -437,9 +472,9 @@ public class StoreClientImplTest {
 		expect(clientSupport.uidCopy(messageSet, destMailbox))
 			.andReturn(expectedMessageSet);
 		
-		mocks.replay();
+		control.replay();
 		MessageSet returnedMessageSet = storeClientImpl.uidCopy(messageSet, destMailbox);
-		mocks.verify();
+		control.verify();
 		assertThat(returnedMessageSet).isEqualTo(expectedMessageSet);
 	}
 	
@@ -456,9 +491,9 @@ public class StoreClientImplTest {
 		expect(clientSupport.uidCopy(messageSet, destMailbox))
 			.andReturn(expectedMessageSet);
 		
-		mocks.replay();
+		control.replay();
 		MessageSet returnedMessageSet = storeClientImpl.uidCopy(messageSet, destMailbox);
-		mocks.verify();
+		control.verify();
 		assertThat(returnedMessageSet).isEqualTo(expectedMessageSet);
 	}
 }
