@@ -42,7 +42,7 @@ require_once('imap_archive_urls.php');
 ///////////////////////////////////////////////////////////////////////////////
 function connect_to_imap_archive_service(){
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
   $userInfo = get_user_info($obm['uid']);
   
   if(empty($userInfo["email"])) {
@@ -50,8 +50,13 @@ function connect_to_imap_archive_service(){
   }
   
   $loginPath = ImapArchiveUrls::status();
-  
-  $curl = curlGet($loginPath);
+
+  try {
+    $curl = curlGet($loginPath);
+  }
+  catch(ImapArchiveServerNotFoundException $ex) {
+      return array(0, $l_imap_archive_server_not_found);
+  }
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];
@@ -76,7 +81,7 @@ function connect_to_imap_archive_service(){
 ///////////////////////////////////////////////////////////////////////////////
 function load_configuration_from_imap_archive_service(){
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
   $userInfo = get_user_info($obm['uid']);
   
   if(empty($userInfo["email"])) {
@@ -84,8 +89,13 @@ function load_configuration_from_imap_archive_service(){
   }
   
   $configurationPath = ImapArchiveUrls::configuration($obm["domain_uuid"]);
-  
-  $curl = curlGet($configurationPath);
+
+  try {
+    $curl = curlGet($configurationPath);
+  }
+  catch(ImapArchiveServerNotFoundException $ex) {
+      return array(0, $l_imap_archive_server_not_found);
+  }
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];
@@ -104,11 +114,10 @@ function load_configuration_from_imap_archive_service(){
 
 function imapArchiveRootPath() {
   global $obm;
-  global $l_imap_archive_server_not_found;
 
   $imapArchiveServer = of_domain_get_domain_imaparchiveserver($obm['domain_id']);
   if(!count($imapArchiveServer)){
-    return array(0, $l_imap_archive_server_not_found);
+    throw new ImapArchiveServerNotFoundException();
   }
   $iterator = new ArrayIterator($imapArchiveServer);
   $imapArchiveServer = $iterator->current();
@@ -134,7 +143,7 @@ function curlGet($url, $extraParams = array()) {
 ///////////////////////////////////////////////////////////////////////////////
 function calculate_next_treatment_date_from_imap_archive_service($configuration) {
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
   $userInfo = get_user_info($obm['uid']);
 
   if(empty($userInfo["email"])) {
@@ -143,7 +152,12 @@ function calculate_next_treatment_date_from_imap_archive_service($configuration)
 
   $configurationPath = ImapArchiveUrls::nextTreatment($obm["domain_uuid"]);
 
-  $curl = curlPost($configurationPath, array(), toJson($configuration));
+  try {
+    $curl = curlPost($configurationPath, array(), toJson($configuration));
+  }
+  catch(ImapArchiveServerNotFoundException $ex) {
+      return array(0, $l_imap_archive_server_not_found);
+  }
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];
@@ -230,7 +244,7 @@ function check_configuration($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_imap_archive_update($paramsAsConfiguration) {
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
   $userInfo = get_user_info($obm['uid']);
   
   if(empty($userInfo["email"])) {
@@ -239,7 +253,12 @@ function run_query_imap_archive_update($paramsAsConfiguration) {
   
   $configurationPath = ImapArchiveUrls::configuration($obm["domain_uuid"]);
 
-  $curl = curlPut($configurationPath, paramToJson($paramsAsConfiguration));
+  try {
+    $curl = curlPut($configurationPath, paramToJson($paramsAsConfiguration));
+  }
+  catch(ImapArchiveServerNotFoundException $ex) {
+      return array(0, $l_imap_archive_server_not_found);
+  }
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];
@@ -340,7 +359,7 @@ function basicAuthCurlInit($curlUrl) {
 ///////////////////////////////////////////////////////////////////////////////
 function manual_launch($archiveTreatmentKind) {
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_domain_configuration_not_found, $l_domain_configuration_disable;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_domain_configuration_not_found, $l_domain_configuration_disable, $l_imap_archive_server_not_found;
   $userInfo = get_user_info($obm['uid']);
 
   if(empty($userInfo["email"])) {
@@ -349,7 +368,12 @@ function manual_launch($archiveTreatmentKind) {
 
   $manualLaunchPath = ImapArchiveUrls::treatments($obm["domain_uuid"]);
 
-  $curl = curlPostWithHeader($manualLaunchPath, array("archive_treatment_kind" => $archiveTreatmentKind));
+  try {
+    $curl = curlPostWithHeader($manualLaunchPath, array("archive_treatment_kind" => $archiveTreatmentKind));
+  }
+  catch(ImapArchiveServerNotFoundException $ex) {
+      return array(0, $l_imap_archive_server_not_found);
+  }
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];
@@ -432,7 +456,7 @@ function followRedirect($redirectUrl) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_logs($runId) {
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
   $userInfo = get_user_info($obm['uid']);
 
   if(empty($userInfo["email"])) {
@@ -440,8 +464,13 @@ function get_logs($runId) {
   }
 
   $logPath = ImapArchiveUrls::logs($obm["domain_uuid"], $runId);
-  
-  $imapArchiveRootPath = imapArchiveRootPath();
+  $imapArchiveRootPath = null;
+  try {
+    $imapArchiveRootPath = imapArchiveRootPath();
+  }
+  catch(ImapArchiveServerNotFoundException $ex) {
+      return array(0, $l_imap_archive_server_not_found);
+  }
   $curlUrl = $imapArchiveRootPath.$logPath;
   
   $curl = basicAuthCurlInit($curlUrl);
@@ -483,7 +512,7 @@ function curl_write_flush($curl_handle, $chunk)
 ///////////////////////////////////////////////////////////////////////////////
 function treatments_history($onlyFailure, $limit, $sort) {
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
+  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
   $userInfo = get_user_info($obm['uid']);
 
   if(empty($userInfo["email"])) {
@@ -498,8 +527,13 @@ function treatments_history($onlyFailure, $limit, $sort) {
       "limit" => $limit,
       "sort_by_date" => $sort
   );
-  
-  $curl = curlGet($historyPath, $parameters);
+
+  try {
+    $curl = curlGet($historyPath, $parameters);
+  }
+  catch(ImapArchiveServerNotFoundException $ex) {
+      return array(0, $l_imap_archive_server_not_found);
+  }
   $success = $curl["success"];
   $code = $curl["code"];
   $errno = $curl["errno"];
@@ -516,4 +550,8 @@ function treatments_history($onlyFailure, $limit, $sort) {
     return array(1, json_decode($success));
   }
 }
+
+class ImapArchiveServerNotFoundException extends Exception {
+}
+
 ?>
