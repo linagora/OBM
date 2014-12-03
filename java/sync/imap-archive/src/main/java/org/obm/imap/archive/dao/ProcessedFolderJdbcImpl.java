@@ -119,7 +119,7 @@ public class ProcessedFolderJdbcImpl implements ProcessedFolderDao {
 		return ProcessedFolder.builder()
 				.runId(ArchiveTreatmentRunId.from(rs.getString(FIELDS.RUN_ID)))
 				.folder(ImapFolder.from(rs.getString(ImapFolderJdbcImpl.TABLE.FIELDS.FOLDER)))
-				.lastUid(rs.getLong(FIELDS.LASTUID))
+				.addUid(rs.getLong(FIELDS.LASTUID))
 				.start(JDBCUtils.getDateTime(rs, FIELDS.START, DateTimeZone.UTC))
 				.end(JDBCUtils.getDateTime(rs, FIELDS.END, DateTimeZone.UTC))
 				.status(ArchiveStatus.fromSpecificationValue(rs.getString(FIELDS.STATUS)))

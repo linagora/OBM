@@ -81,7 +81,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Range;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.linagora.scheduling.DateTimeProvider;
@@ -197,7 +196,7 @@ public class ImapArchiveProcessing {
 				.runId(processedTask.getRunId())
 				.folder(ImapFolder.from(mailbox.getName()))
 				.start(dateTimeProvider.now())
-				.lastUid(previousLastUid.or(DEFAULT_LAST_UID));
+				.addUid(previousLastUid.or(DEFAULT_LAST_UID));
 		
 		try (StoreClient storeClient = mailbox.getStoreClient()) {
 			storeClient.login(false);
@@ -210,20 +209,8 @@ public class ImapArchiveProcessing {
 			if (!mailUids.isEmpty()) {
 				logger.info("Processing: {}", mailbox.getName());
 				logger.info("{} mails will be archived, from UID {} to {}", mailUids.size(), mailUids.first().get(), mailUids.last().get());
-	
-				DomainName domainName = new DomainName(processedTask.getDomain().getName());
-				ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
-						.from(mailbox) 
-						.year(Year.from(processedTask.getBoundaries().getHigherBoundary().year().get()))
-						.domainName(domainName)
-						.archiveMainFolder(imapArchiveConfigurationService.getArchiveMainFolder())
-						.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
-						.build();
-				createFolder(archiveMailbox, logger);
 				
-				logger.debug("Copying from {} mailbox to {} mailbox", mailbox, archiveMailbox);
-				
-				processingImapCopy(mailbox, archiveMailbox, mailUids, domainName, processedFolder, logger);
+				processingImapCopy(mailbox, mailUids, processedFolder, processedTask);
 			}
 			processedFolder.status(ArchiveStatus.SUCCESS);
 		} finally {
@@ -231,22 +218,23 @@ public class ImapArchiveProcessing {
 		}
 	}
 
-	protected void processingImapCopy(Mailbox mailbox, ArchiveMailbox archiveMailbox, FluentIterable<Long> mailUids, DomainName domainName, ProcessedFolder.Builder processedFolder, Logger logger) 
+	protected void processingImapCopy(Mailbox mailbox, FluentIterable<Long> mailUids, ProcessedFolder.Builder processedFolder, ProcessedTask processedTask) 
 			throws IMAPException, MailboxFormatException, MailboxNotFoundException {
 		
-		MessageSet messageSet = MessageSet.builder().add(Range.encloseAll(mailUids)).build();
+		DomainName domainName = new DomainName(processedTask.getDomain().getName());
+		Logger logger = processedTask.getLogger();
+		
+		MessageSet messageSet = MessageSet.builder().addAll(mailUids).build();
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
 				.from(mailbox)
 				.domainName(domainName)
 				.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 				.build();
 		try {
-			mailbox.select();
 			copyToTemporary(mailbox, temporaryMailbox, logger, messageSet);
 			
-			batchCopyFromTemporaryToArchive(temporaryMailbox, archiveMailbox, messageSet, processedFolder);
+			batchCopyFromTemporaryToArchive(mailbox, temporaryMailbox, messageSet, processedFolder, processedTask);
 	
-			addSeenFlags(archiveMailbox, messageSet);
 		} finally {
 			temporaryMailbox.delete();
 		}
@@ -259,13 +247,60 @@ public class ImapArchiveProcessing {
 		mailbox.uidCopy(messageSet, temporaryMailbox);
 	}
 
-	private void batchCopyFromTemporaryToArchive(TemporaryMailbox temporaryMailbox, ArchiveMailbox archiveMailbox, MessageSet messageSet, ProcessedFolder.Builder processedFolder) throws MailboxNotFoundException {
-		for (List<Long> partition : messageSet.partition(imapArchiveConfigurationService.getProcessingBatchSize())) {
-			MessageSet partitionMessageSet = MessageSet.builder().addAll(partition).build();
-			
-			temporaryMailbox.uidCopy(partitionMessageSet, archiveMailbox);
-			processedFolder.lastUid(partitionMessageSet.max());
+	private void batchCopyFromTemporaryToArchive(Mailbox mailbox, TemporaryMailbox temporaryMailbox, MessageSet messageSet, ProcessedFolder.Builder processedFolder, ProcessedTask processedTask) 
+			throws MailboxNotFoundException, IMAPException, MailboxFormatException {
+		
+		Optional<Long> first = messageSet.first();
+		if (!first.isPresent()) {
+			return;
 		}
+		
+		Year year = Year.from(FluentIterable.from(mailbox.fetchInternalDate(MessageSet.singleton(first.get())))
+				.first().get());
+		
+		ArchiveMailbox archiveMailbox = createArchiveMailbox(mailbox, year, processedTask);
+		
+		for (MessageSet partitionMessageSet : messageSet.partition(imapArchiveConfigurationService.getProcessingBatchSize())) {
+
+			mailbox.select();
+			MessageSet uidsInPreviousYear = mailbox.uidSearch(SearchQuery.builder()
+					.before(archiveMailbox.getYear().previous().toDate())
+					.messageSet(partitionMessageSet)
+					.build());
+			MessageSet uidsInNextYear = mailbox.uidSearch(SearchQuery.builder()
+					.after(archiveMailbox.getYear().next().toDate())
+					.messageSet(partitionMessageSet)
+					.build());
+
+			MessageSet currentYearMessageSet = partitionMessageSet.remove(uidsInPreviousYear).remove(uidsInNextYear);
+			
+			batchCopyFromTemporaryToArchive(mailbox, temporaryMailbox, uidsInPreviousYear, processedFolder, processedTask);
+			batchCopyFromTemporaryToArchive(mailbox, temporaryMailbox, uidsInNextYear, processedFolder, processedTask);
+			
+			if (!currentYearMessageSet.isEmpty()) {
+				temporaryMailbox.select();
+				temporaryMailbox.uidCopy(currentYearMessageSet, archiveMailbox);
+				processedFolder.addUid(currentYearMessageSet.max());
+			}
+		}
+		addSeenFlags(archiveMailbox, messageSet);
+	}
+
+	private ArchiveMailbox createArchiveMailbox(Mailbox mailbox, Year year, ProcessedTask processedTask) 
+			throws MailboxFormatException, MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException {
+		
+		DomainName domainName = new DomainName(processedTask.getDomain().getName());
+		Logger logger = processedTask.getLogger();
+
+		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
+				.from(mailbox) 
+				.year(year)
+				.domainName(domainName)
+				.archiveMainFolder(imapArchiveConfigurationService.getArchiveMainFolder())
+				.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
+				.build();
+		createFolder(archiveMailbox, logger);
+		return archiveMailbox;
 	}
 
 	private void addSeenFlags(ArchiveMailbox archiveMailbox, MessageSet messageSet) throws MailboxNotFoundException, IMAPException {

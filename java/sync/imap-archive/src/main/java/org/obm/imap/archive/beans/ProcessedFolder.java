@@ -35,6 +35,8 @@ import org.joda.time.DateTime;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
 
 public class ProcessedFolder {
 
@@ -48,12 +50,14 @@ public class ProcessedFolder {
 		
 		private ArchiveTreatmentRunId runId;
 		private ImapFolder folder;
-		private Long lastUid;
+		private ImmutableList.Builder<Long> uids;
 		private DateTime start;
 		private DateTime end;
 		private ArchiveStatus status;
 		
-		private Builder() {}
+		private Builder() {
+			this.uids = ImmutableList.builder();
+		}
 		
 		public Builder runId(ArchiveTreatmentRunId runId) {
 			Preconditions.checkNotNull(runId);
@@ -67,8 +71,8 @@ public class ProcessedFolder {
 			return this;
 		}
 		
-		public Builder lastUid(long lastUid) {
-			this.lastUid = lastUid;
+		public Builder addUid(long uid) {
+			this.uids.add(uid);
 			return this;
 		}
 		
@@ -93,7 +97,7 @@ public class ProcessedFolder {
 		public ProcessedFolder build() {
 			Preconditions.checkState(runId != null);
 			Preconditions.checkState(folder != null);
-			Preconditions.checkState(lastUid != null);
+			Long lastUid = Ordering.natural().max(uids.build());
 			Preconditions.checkState(start != null);
 			Preconditions.checkState(end != null);
 			

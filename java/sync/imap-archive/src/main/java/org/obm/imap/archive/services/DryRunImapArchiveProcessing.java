@@ -43,13 +43,11 @@ import org.obm.imap.archive.exception.ImapQuotaException;
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
 import org.obm.imap.archive.exception.MailboxFormatException;
-import org.obm.imap.archive.mailbox.ArchiveMailbox;
 import org.obm.imap.archive.mailbox.CreatableMailbox;
 import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.imap.IMAPException;
-import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
 import com.google.common.collect.FluentIterable;
@@ -88,7 +86,7 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 	}
 	
 	@Override
-	protected void processingImapCopy(Mailbox mailbox, ArchiveMailbox archiveMailbox, FluentIterable<Long> mailUids, DomainName domainName, ProcessedFolder.Builder processedFolder, Logger logger) 
+	protected void processingImapCopy(Mailbox mailbox, FluentIterable<Long> mailUids, ProcessedFolder.Builder processedFolder, ProcessedTask processedTask) 
 			throws IMAPException, MailboxFormatException, MailboxNotFoundException {
 	}
 }

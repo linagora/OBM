@@ -168,6 +168,25 @@ public class ArchiveMailboxTest {
 	}
 	
 	@Test
+	public void getYearShouldWork() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		Year expectedYear = Year.from(2015);
+		
+		control.replay();
+		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
+			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+			.year(expectedYear)
+			.domainName(new DomainName("mydomain.org"))
+			.archiveMainFolder("ARCHIVE")
+			.cyrusPartitionSuffix("archive")
+			.build();
+		control.verify();
+		assertThat(archiveMailbox.getYear()).isEqualTo(expectedYear);
+	}
+	
+	@Test
 	public void archiveMailboxShouldWorkWhenMailboxIsINBOX() throws Exception {
 		String mailbox = "user/usera@mydomain.org";
 		

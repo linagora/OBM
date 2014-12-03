@@ -104,6 +104,7 @@ public class ArchiveMailbox extends MailboxImpl implements CreatableMailbox {
 					mailboxPaths.getName(), 
 					mailboxPaths.getUserAtDomain(),
 					ArchivePartitionName.from(domainName, cyrusPartitionSuffix),
+					year,
 					mailbox.getLogger(), 
 					mailbox.getStoreClient());
 		}
@@ -115,13 +116,19 @@ public class ArchiveMailbox extends MailboxImpl implements CreatableMailbox {
 	
 	private final String userAtDomain;
 	private final String archivePartitionName;
+	private final Year year;
 	
-	private ArchiveMailbox(String name, String userAtDomain, String archivePartitionName, Logger logger, StoreClient storeClient) {
+	private ArchiveMailbox(String name, String userAtDomain, String archivePartitionName, Year year, Logger logger, StoreClient storeClient) {
 		super(name, logger, storeClient);
 		this.userAtDomain = userAtDomain;
 		this.archivePartitionName = archivePartitionName;
+		this.year = year;
 	}
 
+	public Year getYear() {
+		return year;
+	}
+	
 	@Override
 	public String getUserAtDomain() {
 		return userAtDomain;

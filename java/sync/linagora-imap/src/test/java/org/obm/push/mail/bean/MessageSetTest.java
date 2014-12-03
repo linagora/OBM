@@ -194,34 +194,32 @@ public class MessageSetTest {
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void partitionShouldProvideExpectedSizedLists() {
 		MessageSet messageSet = MessageSet.builder().add(1l).add(2l).add(3l).add(5l).build();
 		List<Long> part1 = ImmutableList.of(1l, 2l);
 		List<Long> part2 = ImmutableList.of(3l, 5l);
 		
-		Iterable<List<Long>> partition = messageSet.partition(2);
+		Iterable<MessageSet> partition = messageSet.partition(2);
 		assertThat(partition).hasSize(2);
-		assertThat(partition).containsExactly(part1, part2);
+		assertThat(partition).containsExactly(MessageSet.builder().addAll(part1).build(), MessageSet.builder().addAll(part2).build());
 	}
 	
 	@Test
-	@SuppressWarnings("unchecked")
 	public void partitionShouldProvideRemainingInLastList() {
 		MessageSet messageSet = MessageSet.builder().add(1l).add(2l).add(3l).add(5l).add(6l).build();
 		List<Long> part1 = ImmutableList.of(1l, 2l, 3l);
 		List<Long> part2 = ImmutableList.of(5l, 6l);
 		
-		Iterable<List<Long>> partition = messageSet.partition(3);
+		Iterable<MessageSet> partition = messageSet.partition(3);
 		assertThat(partition).hasSize(2);
-		assertThat(partition).containsExactly(part1, part2);
+		assertThat(partition).containsExactly(MessageSet.builder().addAll(part1).build(), MessageSet.builder().addAll(part2).build());
 	}
 	
 	@Test
 	public void partitionShouldProvideEmptyWhenNoValues() {
 		MessageSet messageSet = MessageSet.builder().build();
 		
-		Iterable<List<Long>> partition = messageSet.partition(2);
+		Iterable<MessageSet> partition = messageSet.partition(2);
 		assertThat(partition).isEmpty();
 	}
 	

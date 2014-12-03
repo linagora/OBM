@@ -196,8 +196,15 @@ public class MessageSet implements Serializable, Iterable<Long> {
 		return ranges.size();
 	}
 	
-	public Iterable<List<Long>> partition(int partitionSize) {
-		return Iterables.partition(asDiscreteValues(), partitionSize);
+	public Iterable<MessageSet> partition(int partitionSize) {
+		return FluentIterable.from(Iterables.partition(asDiscreteValues(), partitionSize))
+				.transform(new Function<List<Long>, MessageSet>() {
+
+					@Override
+					public MessageSet apply(List<Long> values) {
+						return MessageSet.builder().addAll(values).build();
+					}
+				});
 	}
 
 	public long max() {
