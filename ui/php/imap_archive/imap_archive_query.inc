@@ -62,7 +62,7 @@ function connect_to_imap_archive_service(){
   $errno = $curl["errno"];
   
   if($errno){
-    error_log("Couldn't login to IMAP archive server (".$errno.")");
+    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
     return array(0, $l_could_not_login_imap_archive_server);
   }
   if ($code == 0) {
@@ -101,7 +101,7 @@ function load_configuration_from_imap_archive_service(){
   $errno = $curl["errno"];
   
   if($errno){
-    error_log("Couldn't login to IMAP archive server ($errno)");
+    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
     return array(0, $l_could_not_login_imap_archive_server);
   }
   if ($code == 0) {
@@ -163,7 +163,7 @@ function calculate_next_treatment_date_from_imap_archive_service($configuration)
   $errno = $curl["errno"];
   
   if($errno){
-    error_log("Couldn't login to IMAP archive server (".$errno.")");
+    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
     return array(0, $l_could_not_login_imap_archive_server);
   }
   if ($code == 0) {
@@ -264,7 +264,7 @@ function run_query_imap_archive_update($paramsAsConfiguration) {
   $errno = $curl["errno"];
   
   if($errno){
-    error_log("Couldn't login to IMAP archive server ($errno)");
+    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
     return array(0, $l_could_not_login_imap_archive_server);
   }
   if ($code == 0) {
@@ -349,6 +349,7 @@ function basicAuthCurlInit($curlUrl) {
   $curl = curl_init($curlUrl);
   curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
   curl_setopt($curl, CURLOPT_USERPWD, "$username@$domainName:$password");
+  curl_setopt($curl, CURLOPT_FAILONERROR, 1);
   return $curl;
 }
 
@@ -379,7 +380,7 @@ function manual_launch($archiveTreatmentKind) {
   $errno = $curl["errno"];
   
   if($errno){
-    error_log("Couldn't login to IMAP archive server ($errno)");
+    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
     return array(0, $l_could_not_login_imap_archive_server);
   }
   if ($code == 0) {
@@ -438,7 +439,7 @@ function followRedirect($redirectUrl) {
   $errnoGet = $result["errno"];
   
   if($errnoGet){
-    error_log("Couldn't login to IMAP archive server ($errnoGet)");
+    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errnoGet." - HTTP code $code)");
     return array(0, $l_could_not_login_imap_archive_server);
   }
   if ($codeGet == 0) {
@@ -484,7 +485,7 @@ function get_logs($runId) {
   curl_close($curl);
   
   if($errno){
-    error_log("Couldn't login to IMAP archive server ($errno)");
+    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
     return array(0, $l_could_not_login_imap_archive_server);
   }
   if ($code == 0) {
@@ -540,7 +541,7 @@ function treatments_history($onlyFailure, $limit, $sort) {
   
   
   if($errno){
-    error_log("Couldn't login to IMAP archive server ($errno)");
+    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
     return array(0, $l_could_not_login_imap_archive_server);
   }
   if ($code == 0) {
