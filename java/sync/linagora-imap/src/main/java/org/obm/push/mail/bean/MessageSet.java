@@ -33,7 +33,6 @@
 package org.obm.push.mail.bean;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +42,7 @@ import java.util.SortedSet;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.FluentIterable;
@@ -104,7 +104,7 @@ public class MessageSet implements Serializable, Iterable<Long> {
 			return add(Range.singleton(value));
 		}
 		
-		public Builder addAll(Collection<Long> values) {
+		public Builder addAll(Iterable<Long> values) {
 			for (Long value : values) {
 				add(value);
 			}
@@ -206,6 +206,19 @@ public class MessageSet implements Serializable, Iterable<Long> {
 	
 	public Optional<Long> first() {
 		return FluentIterable.from(asDiscreteValues()).first();
+	}
+	
+	public MessageSet remove(final MessageSet toRemove) {
+		return MessageSet.builder()
+				.addAll(FluentIterable.from(asDiscreteValues())
+						.filter(new Predicate<Long>() {
+
+							@Override
+							public boolean apply(Long discreteValue) {
+								return !toRemove.contains(discreteValue);
+							}
+						}))
+				.build();
 	}
 	
 	@Override

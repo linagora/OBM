@@ -275,4 +275,124 @@ public class MessageSetTest {
 		assertThat(first).isPresent();
 		assertThat(first.get()).isEqualTo(1);
 	}
+	
+	@Test
+	public void removeEmpty() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.empty());
+		assertThat(messageSet.asDiscreteValues()).containsExactly(10l, 11l, 12l, 13l, 14l, 15l, 16l, 17l, 18l, 19l, 20l);
+	}
+	
+	@Test
+	public void removeASingleton() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.builder().add(15l).build());
+		assertThat(messageSet.asDiscreteValues()).containsExactly(10l, 11l, 12l, 13l, 14l, 16l, 17l, 18l, 19l, 20l);
+	}
+	
+	@Test
+	public void removeASingletonLower() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.builder().add(1l).build());
+		assertThat(messageSet.asDiscreteValues()).containsExactly(10l, 11l, 12l, 13l, 14l, 15l, 16l, 17l, 18l, 19l, 20l);
+	}
+	
+	@Test
+	public void removeASingletonHigher() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.builder().add(30l).build());
+		assertThat(messageSet.asDiscreteValues()).containsExactly(10l, 11l, 12l, 13l, 14l, 15l, 16l, 17l, 18l, 19l, 20l);
+	}
+	
+	@Test
+	public void removeARange() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.builder().add(Range.closed(14l, 16l)).build());
+		assertThat(messageSet.asDiscreteValues()).containsExactly(10l, 11l, 12l, 13l, 17l, 18l, 19l, 20l);
+	}
+	
+	@Test
+	public void removeARangeWithSameUpperEndpoint() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.builder().add(Range.closed(14l, 20l)).build());
+		assertThat(messageSet.asDiscreteValues()).containsExactly(10l, 11l, 12l, 13l);
+	}
+	
+	@Test
+	public void removeARangeWithLowerEndpointLower() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.builder().add(Range.closed(8l, 12l)).build());
+		assertThat(messageSet.asDiscreteValues()).containsExactly(13l, 14l, 15l, 16l, 17l, 18l, 19l, 20l);
+	}
+	
+	@Test
+	public void removeARangeWithUpperEndpointUpper() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.builder().add(Range.closed(18l, 24l)).build());
+		assertThat(messageSet.asDiscreteValues()).containsExactly(10l, 11l, 12l, 13l, 14l, 15l, 16l, 17l);
+	}
+	
+	@Test
+	public void removeTwoSingletons() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.builder().add(Range.singleton(11l)).add(Range.singleton(13l)).build());
+		assertThat(messageSet.asDiscreteValues()).containsExactly(10l, 12l, 14l, 15l, 16l, 17l, 18l, 19l, 20l);
+	}
+	
+	@Test
+	public void removeMixed() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.builder().add(Range.singleton(11l)).add(Range.closed(13l, 15l)).build());
+		assertThat(messageSet.asDiscreteValues()).containsExactly(10l, 12l, 16l, 17l, 18l, 19l, 20l);
+	}
+	
+	@Test
+	public void removeTwoRanges() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.builder().add(Range.closed(12l, 14l)).add(Range.closed(16l, 18l)).build());
+		assertThat(messageSet.asDiscreteValues()).containsExactly(10l, 11l, 15l, 19l, 20l);
+	}
+	
+	@Test
+	public void removeAll() {
+		MessageSet origin = MessageSet.builder()
+				.add(Range.closed(10l, 20l))
+				.build();
+		
+		MessageSet messageSet = origin.remove(MessageSet.builder().add(Range.closed(8l, 30l)).build());
+		assertThat(messageSet.asDiscreteValues()).isEmpty();
+	}
 }
