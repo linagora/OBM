@@ -10,6 +10,8 @@ OBM Core Team <lgs-obm-dev@linagora.com>;
 
 == About
 
+include::debian-installation.adoc[]
+
 include::rhel-installation.adoc[]
 
 include::configuration.adoc[]

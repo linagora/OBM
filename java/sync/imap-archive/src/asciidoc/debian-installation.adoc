@@ -1,0 +1,14 @@
+== Debian - Installation
+
+=== System Requirements
+
+  * *Debian Squeeze* or *Wheezy*
+  * *Obm 3.1*
+
+  
+=== Imap Archive Installation
+
+[source]
+----
+$ aptitude install obm-imap-archive
+----
