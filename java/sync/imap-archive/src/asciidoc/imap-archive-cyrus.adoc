@@ -29,9 +29,12 @@ where:
 
 [WARNING]
 ====
-The partition folder is automatically created by *Cyrus* when needed. +
+Under *Debian*, the partition folder is automatically created by *Cyrus* when needed. +
 Don't create it manually, as you may encounter rights issues. +
-The _cyrus_ user must have write rights on the parent directory. 
+The _cyrus_ user must have write rights on the parent directory. +
+
+Under *RHEL/CentOS*, this folder is not created, you should create it manually, +
+and give rights to _cyrus_ user such as other partitions.
 ====
 
 Then, you will have to restart *Cyrus* in order to run with the new configuration.
