@@ -260,6 +260,7 @@ public class ImapArchiveProcessing {
 		
 		ArchiveMailbox archiveMailbox = createArchiveMailbox(mailbox, year, processedTask);
 		
+		MessageSet.Builder copiedMessageSet = MessageSet.builder();
 		for (MessageSet partitionMessageSet : messageSet.partition(imapArchiveConfigurationService.getProcessingBatchSize())) {
 
 			mailbox.select();
@@ -279,11 +280,11 @@ public class ImapArchiveProcessing {
 			
 			if (!currentYearMessageSet.isEmpty()) {
 				temporaryMailbox.select();
-				temporaryMailbox.uidCopy(currentYearMessageSet, archiveMailbox);
+				copiedMessageSet.add(temporaryMailbox.uidCopy(currentYearMessageSet, archiveMailbox));
 				processedFolder.addUid(currentYearMessageSet.max());
 			}
 		}
-		addSeenFlags(archiveMailbox, messageSet);
+		addSeenFlags(archiveMailbox, copiedMessageSet.build());
 	}
 
 	private ArchiveMailbox createArchiveMailbox(Mailbox mailbox, Year year, ProcessedTask processedTask) 

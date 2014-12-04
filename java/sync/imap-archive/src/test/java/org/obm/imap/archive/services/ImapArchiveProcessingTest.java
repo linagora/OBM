@@ -750,7 +750,8 @@ public class ImapArchiveProcessingTest {
 			.andReturn(higherBoundary);
 		
 		ListResult listResult = new ListResult(1);
-		listResult.addAll(ImmutableList.of(new ListInfo("user/usera@mydomain.org", true, false)));
+		String mailboxName = "user/usera@mydomain.org";
+		listResult.addAll(ImmutableList.of(new ListInfo(mailboxName, true, false)));
 		
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
@@ -759,25 +760,9 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.listAll())
 			.andReturn(listResult);
 		
-		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
-		expectImapCommandsOnMailboxProcessingWhenThreeYearsInRange("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", "user/usera/ARCHIVE/2013/INBOX@mydomain.org", "user/usera/ARCHIVE/2015/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
-				Range.closed(1l, 5l), Range.closed(6l, 10l), Range.closed(11l, 15l), lowerBoundary, higherBoundary, treatmentDate, runId, storeClient);
-		
-		storeClient.close();
-		expectLastCall();
-		
-		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(2);
-		
-		control.replay();
-		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
-		control.verify();
-	}
-	
-	private void expectImapCommandsOnMailboxProcessingWhenThreeYearsInRange(String mailboxName, String currentYearArchiveMailboxName, String previousYearArchiveMailboxName, String nextYearArchiveMailboxName, String temporaryMailboxName, 
-			Range<Long> currentYearRange, Range<Long> previousYearRange, Range<Long> nextYearRange, DateTime lowerBoundary, DateTime higherBoundary, DateTime treatmentDate, ArchiveTreatmentRunId runId, StoreClient storeClient) 
-			throws Exception {
-		
+		Range<Long> currentYearRange = Range.closed(1l, 5l);
+		Range<Long> previousYearRange = Range.closed(6l, 10l);
+		Range<Long> nextYearRange = Range.closed(11l, 15l);
 		MessageSet.Builder messageSetBuilder = MessageSet.builder();
 		messageSetBuilder.add(currentYearRange);
 		messageSetBuilder.add(previousYearRange);
@@ -792,6 +777,7 @@ public class ImapArchiveProcessingTest {
 				.build()))
 			.andReturn(messageSet);
 		
+		String temporaryMailboxName = "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org";
 		expectCreateMailbox(mailboxName, temporaryMailboxName, storeClient);
 		
 		// current Year
@@ -815,11 +801,13 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		expect(storeClient.uidCopy(messageSet, temporaryMailboxName)).andReturn(messageSet);
 		
+		MessageSet currentYearRangeCopiedUids = MessageSet.builder().add(Range.closed(3l, 7l)).build();
 		MessageSet firstYearMessageSet = MessageSet.builder().add(currentYearRange).build();
+		String currentYearArchiveMailboxName = "user/usera/ARCHIVE/2014/INBOX@mydomain.org";
 		expectCreateMailbox(mailboxName, currentYearArchiveMailboxName, storeClient);
-		expect(storeClient.uidCopy(firstYearMessageSet, currentYearArchiveMailboxName)).andReturn(firstYearMessageSet);
+		expect(storeClient.uidCopy(firstYearMessageSet, currentYearArchiveMailboxName)).andReturn(currentYearRangeCopiedUids);
 		expect(storeClient.select(currentYearArchiveMailboxName)).andReturn(true);
-		expect(storeClient.uidStore(firstYearMessageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
+		expect(storeClient.uidStore(currentYearRangeCopiedUids, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		// previous Year
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(previousYearMessageSet.first().get())))
@@ -835,12 +823,14 @@ public class ImapArchiveProcessingTest {
 				.build()))
 			.andReturn(MessageSet.empty());
 		
+		String previousYearArchiveMailboxName = "user/usera/ARCHIVE/2013/INBOX@mydomain.org";
 		expectCreateMailbox(mailboxName, previousYearArchiveMailboxName, storeClient);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
-		expect(storeClient.uidCopy(previousYearMessageSet, previousYearArchiveMailboxName)).andReturn(previousYearMessageSet);
+		MessageSet previousYearRangeCopiedUids = MessageSet.builder().add(Range.closed(8l, 12l)).build();
+		expect(storeClient.uidCopy(previousYearMessageSet, previousYearArchiveMailboxName)).andReturn(previousYearRangeCopiedUids);
 		
 		expect(storeClient.select(previousYearArchiveMailboxName)).andReturn(true);
-		expect(storeClient.uidStore(previousYearMessageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
+		expect(storeClient.uidStore(previousYearRangeCopiedUids, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		// next Year
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(nextYearMessageSet.first().get())))
@@ -856,12 +846,14 @@ public class ImapArchiveProcessingTest {
 				.build()))
 			.andReturn(MessageSet.empty());
 		
+		String nextYearArchiveMailboxName = "user/usera/ARCHIVE/2015/INBOX@mydomain.org";
 		expectCreateMailbox(mailboxName, nextYearArchiveMailboxName, storeClient);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
-		expect(storeClient.uidCopy(nextYearMessageSet, nextYearArchiveMailboxName)).andReturn(nextYearMessageSet);
+		MessageSet nextYearRangeCopiedUids = MessageSet.builder().add(Range.closed(13l, 17l)).build();
+		expect(storeClient.uidCopy(nextYearMessageSet, nextYearArchiveMailboxName)).andReturn(nextYearRangeCopiedUids);
 		
 		expect(storeClient.select(nextYearArchiveMailboxName)).andReturn(true);
-		expect(storeClient.uidStore(nextYearMessageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
+		expect(storeClient.uidStore(nextYearRangeCopiedUids, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		expect(storeClient.delete(temporaryMailboxName)).andReturn(true);
 		
@@ -870,6 +862,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(dateTimeProvider.now())
 			.andReturn(treatmentDate);
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		processedFolderDao.insert(ProcessedFolder.builder()
 				.runId(runId)
 				.folder(ImapFolder.from(mailboxName))
@@ -879,6 +872,16 @@ public class ImapArchiveProcessingTest {
 				.status(ArchiveStatus.SUCCESS)
 				.build());
 		expectLastCall();
+		
+		storeClient.close();
+		expectLastCall();
+		
+		expect(storeClientFactory.create(domain.getName()))
+			.andReturn(storeClient).times(2);
+		
+		control.replay();
+		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
+		control.verify();
 	}
 
 	private void expectImapCommandsOnAlreadyProcessedMailbox(String mailbox, DateTime treatmentDate, DateTime lowerBoundary, DateTime higherBoundary, 
