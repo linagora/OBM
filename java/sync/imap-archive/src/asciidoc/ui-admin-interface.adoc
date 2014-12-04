@@ -1,6 +1,8 @@
 == Admin interfaces
 
-=== Prerequisite: Grant Rights to the Admin Profile
+=== Prerequisites
+
+==== Grant Rights to the Admin Profile
 
 In order to access the *IMAP Archive* pages, you have to give extra rights to the *OBM* domain administrators.
 
@@ -11,6 +13,16 @@ To achieve this, authenticate with the *OBM* web interface as an +Admin+ for the
 global domain (like +admin0+), click on +Administration+, +User profiles+ then
 update the +Admin+ profile. +
 There is a +Specific settings+ section where you can give all rights on the +domains+ line.
+
+==== Enable IMAP Archive
+
+You should enable *IMAP Archive* in the host(s) configuration, then select the corresponding host for your domain(s) configuration.
+  
+.*IMAP Archive* host
+image::admin_host.png[*IMAP Archive* host]
+
+.*IMAP Archive* domain
+image::admin_domain.png[*IMAP Archive* domain]
 
 
 === General information
