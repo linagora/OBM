@@ -147,9 +147,4 @@ public class SchedulingDatesService {
 		return treatmentDate.minus(RepeatKind.toPeriod(repeatKind, 1))
 				.withTime(23, 59, 59, 999);
 	}
-	
-	public DateTime lowerBoundary(DateTime treatmentDate, RepeatKind repeatKind) {
-		return treatmentDate.minus(RepeatKind.toPeriod(repeatKind, 2))
-				.withTime(0, 0, 0, 0);
-	}
 }

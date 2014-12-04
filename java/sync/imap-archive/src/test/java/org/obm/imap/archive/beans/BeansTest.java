@@ -64,7 +64,7 @@ public class BeansTest {
 				ArchiveTreatmentRunId.class,
 				ImapFolder.class,
 				ProcessedFolder.class,
-				Boundaries.class,
+				HigherBoundary.class,
 				Year.class,
 				Limit.class,
 				ExcludedUser.class,

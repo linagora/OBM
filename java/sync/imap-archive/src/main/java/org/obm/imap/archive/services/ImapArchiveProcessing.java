@@ -40,9 +40,9 @@ import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.beans.Boundaries;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.ExcludedUser;
+import org.obm.imap.archive.beans.HigherBoundary;
 import org.obm.imap.archive.beans.ImapFolder;
 import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.ProcessedFolder;
@@ -81,6 +81,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Range;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.linagora.scheduling.DateTimeProvider;
@@ -94,6 +95,8 @@ public class ImapArchiveProcessing {
 	
 	@VisibleForTesting static final String GLOBAL_VIRT = "global.virt";
 	@VisibleForTesting static final long DEFAULT_LAST_UID = -1l;
+	private static final long UID_MIN = 0;
+	private static final long UID_MAX = Long.MAX_VALUE;
 
 	private final DateTimeProvider dateTimeProvider;
 	private final SchedulingDatesService schedulingDatesService;
@@ -123,12 +126,12 @@ public class ImapArchiveProcessing {
 		Logger logger = configuration.getLogger();
 		try {
 			Optional<ArchiveTreatment> previousArchiveTreatment = previousArchiveTreatment(configuration.getDomainId());
-			Boundaries boundaries = calculateBoundaries(dateTimeProvider.now(), configuration.getConfiguration().getRepeatKind(), previousArchiveTreatment, logger);
+			HigherBoundary higherBoundary = calculateHigherBoundary(dateTimeProvider.now(), configuration.getConfiguration().getRepeatKind(), previousArchiveTreatment, logger);
 			ProcessedTask.Builder processedTaskBuilder = ProcessedTask.builder()
 					.archiveConfiguration(configuration)
 					.previousArchiveTreatment(previousArchiveTreatment)
-					.boundaries(boundaries)
-					.continuePrevious(continuePrevious(previousArchiveTreatment, boundaries.getHigherBoundary()));
+					.higherBoundary(higherBoundary)
+					.continuePrevious(continuePrevious(previousArchiveTreatment, higherBoundary.getHigherBoundary()));
 			
 			if (!run(processedTaskBuilder.build())) {
 				throw new ImapArchiveProcessingException();
@@ -149,27 +152,21 @@ public class ImapArchiveProcessing {
 		return FluentIterable.from(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1))).first();
 	}
 	
-	@VisibleForTesting Boundaries calculateBoundaries(DateTime start, RepeatKind repeatKind, Optional<ArchiveTreatment> previousArchiveTreatment, Logger archiveLogger) {
-		Boundaries.Builder builder = Boundaries.builder();
+	@VisibleForTesting HigherBoundary calculateHigherBoundary(DateTime start, RepeatKind repeatKind, Optional<ArchiveTreatment> previousArchiveTreatment, Logger archiveLogger) {
+		HigherBoundary.Builder builder = HigherBoundary.builder();
 		if (previousArchiveTreatment.isPresent()) {
 			ArchiveTreatment lastArchiveTreatment = previousArchiveTreatment.get();
 			if (lastArchiveTreatment.getArchiveStatus() == ArchiveStatus.ERROR) {
-				builder
-					.lowerBoundary(schedulingDatesService.lowerBoundary(lastArchiveTreatment.getScheduledTime(), repeatKind))
-					.higherBoundary(lastArchiveTreatment.getHigherBoundary());
+				builder.higherBoundary(lastArchiveTreatment.getHigherBoundary());
 			} else {
-				builder
-					.lowerBoundary(lastArchiveTreatment.getHigherBoundary())
-					.higherBoundary(schedulingDatesService.higherBoundary(start, repeatKind));
+				builder.higherBoundary(schedulingDatesService.higherBoundary(start, repeatKind));
 			}
 		} else {
-			builder
-				.firstSync()
-				.higherBoundary(schedulingDatesService.higherBoundary(start, repeatKind));
+			builder.higherBoundary(schedulingDatesService.higherBoundary(start, repeatKind));
 		}
-		Boundaries boundaries = builder.build();
-		archiveLogger.debug("Boundaries: from {} to {}", boundaries.getLowerBoundary().toString("YYYY-MM-dd"), boundaries.getHigherBoundary().toString("YYYY-MM-dd"));
-		return boundaries;
+		HigherBoundary higherBoundary = builder.build();
+		archiveLogger.debug("HigherBoundary: upto {}", higherBoundary.getHigherBoundary().toString("YYYY-MM-dd"));
+		return higherBoundary;
 	}
 
 	private boolean run(ProcessedTask processedTask) throws Exception {
@@ -205,7 +202,7 @@ public class ImapArchiveProcessing {
 			
 			grantRightsWhenNotSelectable(mailbox);
 			
-			FluentIterable<Long> mailUids = searchMailUids(mailbox, processedTask.getBoundaries(), previousLastUid);
+			FluentIterable<Long> mailUids = searchMailUids(mailbox, processedTask.getHigherBoundary(), previousLastUid);
 			if (!mailUids.isEmpty()) {
 				logger.info("Processing: {}", mailbox.getName());
 				logger.info("{} mails will be archived, from UID {} to {}", mailUids.size(), mailUids.first().get(), mailUids.last().get());
@@ -255,6 +252,7 @@ public class ImapArchiveProcessing {
 			return;
 		}
 		
+		mailbox.select();
 		Year year = Year.from(FluentIterable.from(mailbox.fetchInternalDate(MessageSet.singleton(first.get())))
 				.first().get());
 		
@@ -305,8 +303,10 @@ public class ImapArchiveProcessing {
 	}
 
 	private void addSeenFlags(ArchiveMailbox archiveMailbox, MessageSet messageSet) throws MailboxNotFoundException, IMAPException {
-		archiveMailbox.select();
-		archiveMailbox.uidStoreSeen(messageSet);
+		if (!messageSet.isEmpty()) {
+			archiveMailbox.select();
+			archiveMailbox.uidStoreSeen(messageSet);
+		}
 	}
 
 	private void grantRightsWhenNotSelectable(Mailbox mailbox) 
@@ -467,22 +467,16 @@ public class ImapArchiveProcessing {
 		};
 	}
 
-	@VisibleForTesting FluentIterable<Long> searchMailUids(Mailbox mailbox, Boundaries boundaries, final Optional<Long> previousLastUid) {
+	@VisibleForTesting FluentIterable<Long> searchMailUids(Mailbox mailbox, HigherBoundary higherBoundary, final Optional<Long> previousLastUid) {
 		return FluentIterable.from(
 				mailbox.uidSearch(SearchQuery.builder()
-					.after(boundaries.getLowerBoundary().toDate())
-					.before(boundaries.getHigherBoundary().toDate())
-					.build()))
-				.filter(new Predicate<Long> () {
-
-					@Override
-					public boolean apply(Long uid) {
-						if (previousLastUid.isPresent() && uid <= previousLastUid.get()) {
-							return false;
-						}
-						return true;
-					}
-				});
+					.before(higherBoundary.getHigherBoundary().toDate())
+					.messageSet(messageSetFromPreviousToMax(previousLastUid))
+					.build()));
+	}
+	
+	private MessageSet messageSetFromPreviousToMax(Optional<Long> previousLastUid) {
+		return MessageSet.builder().add(Range.openClosed(previousLastUid.or(UID_MIN), UID_MAX)).build();
 	}
 
 	@VisibleForTesting Optional<Long> previousLastUid(Mailbox mailbox, Optional<ArchiveTreatment> previousArchiveTreatment) throws DaoException {
@@ -526,7 +520,7 @@ public class ImapArchiveProcessing {
 		public static class Builder {
 			
 			private ArchiveConfiguration archiveConfiguration;
-			private Boundaries boundaries;
+			private HigherBoundary higherBoundary;
 			private Optional<ArchiveTreatment> previousArchiveTreatment;
 			private boolean continuePrevious;
 			
@@ -537,8 +531,8 @@ public class ImapArchiveProcessing {
 				return this;
 			}
 			
-			public Builder boundaries(Boundaries boundaries) {
-				this.boundaries = boundaries;
+			public Builder higherBoundary(HigherBoundary higherBoundary) {
+				this.higherBoundary = higherBoundary;
 				return this;
 			}
 			
@@ -554,10 +548,10 @@ public class ImapArchiveProcessing {
 			
 			public ProcessedTask build() {
 				Preconditions.checkState(archiveConfiguration != null);
-				Preconditions.checkState(boundaries != null);
+				Preconditions.checkState(higherBoundary != null);
 				Preconditions.checkState(previousArchiveTreatment != null);
 				return new ProcessedTask(archiveConfiguration.getLogger(), archiveConfiguration.getRunId(),
-					archiveConfiguration.getDomain(), boundaries, 
+					archiveConfiguration.getDomain(), higherBoundary, 
 					archiveConfiguration.getConfiguration(), previousArchiveTreatment, continuePrevious);
 			}
 		}
@@ -565,19 +559,19 @@ public class ImapArchiveProcessing {
 		private final Logger logger;
 		private final ArchiveTreatmentRunId runId;
 		private final ObmDomain domain;
-		private final Boundaries boundaries;
+		private final HigherBoundary higherBoundary;
 		private final DomainConfiguration domainConfiguration;
 		private final Optional<ArchiveTreatment> previousArchiveTreatment;
 		private final boolean continuePrevious;
 		
 		private ProcessedTask(Logger logger, ArchiveTreatmentRunId runId, ObmDomain domain, 
-				Boundaries boundaries, DomainConfiguration domainConfiguration, 
+				HigherBoundary higherBoundary, DomainConfiguration domainConfiguration, 
 				Optional<ArchiveTreatment> previousArchiveTreatment, boolean continuePrevious) {
 			
 			this.logger = logger;
 			this.runId = runId;
 			this.domain = domain;
-			this.boundaries = boundaries;
+			this.higherBoundary = higherBoundary;
 			this.domainConfiguration = domainConfiguration;
 			this.previousArchiveTreatment = previousArchiveTreatment;
 			this.continuePrevious = continuePrevious;
@@ -595,8 +589,8 @@ public class ImapArchiveProcessing {
 			return domain;
 		}
 
-		public Boundaries getBoundaries() {
-			return boundaries;
+		public HigherBoundary getHigherBoundary() {
+			return higherBoundary;
 		}
 
 		public DomainConfiguration getDomainConfiguration() {

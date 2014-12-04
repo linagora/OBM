@@ -43,7 +43,6 @@ import java.util.Set;
 
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,10 +54,10 @@ import org.obm.imap.archive.beans.ArchiveStatus;
 import org.obm.imap.archive.beans.ArchiveTerminatedTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
-import org.obm.imap.archive.beans.Boundaries;
 import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.ExcludedUser;
+import org.obm.imap.archive.beans.HigherBoundary;
 import org.obm.imap.archive.beans.ImapFolder;
 import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.ProcessedFolder;
@@ -162,7 +161,6 @@ public class ImapArchiveProcessingTest {
 		expect(dateTimeProvider.now())
 			.andReturn(treatmentDate).times(4);
 		
-		DateTime lowerBoundary = new DateTime(0, DateTimeZone.UTC);
 		DateTime higherBoundary = DateTime.parse("2014-08-26T12:18:00.000Z");
 		expect(schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.DAILY))
 			.andReturn(higherBoundary);
@@ -183,12 +181,12 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
-				ImmutableSet.of(Range.closed(1l, 10l)), lowerBoundary, higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
 		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org", 
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)), 
-				lowerBoundary, higherBoundary, treatmentDate, runId, storeClient);
+				higherBoundary, treatmentDate, runId, storeClient);
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org", 
-				ImmutableSet.of(Range.singleton(1230l)), lowerBoundary, higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.singleton(1230l)), higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.close();
 		expectLastCall();
@@ -240,8 +238,8 @@ public class ImapArchiveProcessingTest {
 		expectLastCall();
 		expect(storeClient.select("user/usera@mydomain.org")).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(new DateTime(0, DateTimeZone.UTC).toDate())
 				.before(higherBoundary.toDate())
+				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(MessageSet.empty());
 		
@@ -287,7 +285,6 @@ public class ImapArchiveProcessingTest {
 		expect(dateTimeProvider.now())
 			.andReturn(treatmentDate).times(2);
 		
-		DateTime lowerBoundary = new DateTime(0, DateTimeZone.UTC);
 		DateTime higherBoundary = DateTime.parse("2014-08-26T12:18:00.000Z");
 		expect(schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.DAILY))
 			.andReturn(higherBoundary);
@@ -305,7 +302,7 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
-				ImmutableSet.of(Range.closed(1l, 10l)), lowerBoundary, higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.close();
 		expectLastCall();
@@ -345,11 +342,12 @@ public class ImapArchiveProcessingTest {
 					.build()));
 		
 		ImapFolder imapFolder = ImapFolder.from("user/usera@mydomain.org");
+		long previousLastUid = 123;
 		expect(processedFolderDao.get(previousRunId, imapFolder))
 			.andReturn(Optional.of(ProcessedFolder.builder()
 					.runId(previousRunId)
 					.folder(imapFolder)
-					.addUid(123)
+					.addUid(previousLastUid)
 					.start(previousTreatmentDate)
 					.end(previousTreatmentDate)
 					.status(ArchiveStatus.SUCCESS)
@@ -379,8 +377,8 @@ public class ImapArchiveProcessingTest {
 		expectLastCall();
 		expect(storeClient.select("user/usera@mydomain.org")).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(previousTreatmentDate.toDate())
 				.before(higherBoundary.toDate())
+				.messageSet(MessageSet.builder().add(Range.closed(previousLastUid, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(MessageSet.empty());
 		
@@ -427,7 +425,6 @@ public class ImapArchiveProcessingTest {
 		expect(dateTimeProvider.now())
 			.andReturn(treatmentDate).times(3);
 		
-		DateTime lowerBoundary = new DateTime(0, DateTimeZone.UTC);
 		DateTime higherBoundary = DateTime.parse("2014-08-26T12:18:00.000Z");
 		expect(schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.DAILY))
 			.andReturn(higherBoundary);
@@ -449,7 +446,7 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
-				ImmutableSet.of(Range.closed(1l, 10l)), lowerBoundary, higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.login(false);
 		expectLastCall();
@@ -472,7 +469,7 @@ public class ImapArchiveProcessingTest {
 		
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org",
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)),
-				lowerBoundary, higherBoundary, treatmentDate, runId, storeClient);
+				higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.close();
 		expectLastCall();
@@ -508,7 +505,6 @@ public class ImapArchiveProcessingTest {
 		expect(dateTimeProvider.now())
 			.andReturn(treatmentDate).times(3);
 		
-		DateTime lowerBoundary = new DateTime(0, DateTimeZone.UTC);
 		DateTime higherBoundary = DateTime.parse("2014-08-26T12:18:00.000Z");
 		expect(schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.DAILY))
 			.andReturn(higherBoundary);
@@ -530,15 +526,15 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
-				ImmutableSet.of(Range.closed(1l, 10l)), lowerBoundary, higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
 		
 		expectImapCommandsOnMailboxProcessingFails("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org",
 				ImmutableSet.of(Range.closed(1l, 20l), Range.closed(21l, 40l), Range.closed(41l, 60l)), 20l,
-				lowerBoundary, higherBoundary, treatmentDate, runId, storeClient);
+				higherBoundary, treatmentDate, runId, storeClient);
 		
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org",
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)),
-				lowerBoundary, higherBoundary, treatmentDate, runId, storeClient);
+				higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.close();
 		expectLastCall();
@@ -558,19 +554,16 @@ public class ImapArchiveProcessingTest {
 					.higherBoundary(higherBoundary)
 					.build()));
 	
-		expect(schedulingDatesService.lowerBoundary(treatmentDate, RepeatKind.DAILY))
-			.andReturn(lowerBoundary);
-		
 		ArchiveTreatmentRunId secondRunId = ArchiveTreatmentRunId.from("70044a54-1269-49dd-8e17-991b83816c72");
-		expectImapCommandsOnAlreadyProcessedMailbox("user/usera@mydomain.org", treatmentDate, lowerBoundary, higherBoundary, runId, secondRunId, 1, storeClient);
+		expectImapCommandsOnAlreadyProcessedMailbox("user/usera@mydomain.org", treatmentDate, higherBoundary, runId, secondRunId, 10, storeClient);
 		
 		expect(processedFolderDao.get(runId, ImapFolder.from("user/usera/Drafts@mydomain.org")))
 			.andReturn(Optional.<ProcessedFolder> absent());
 		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org", 
 				ImmutableSet.of(Range.closed(1l, 20l), Range.closed(21l, 40l), Range.closed(41l, 60l)), 
-				lowerBoundary, higherBoundary, treatmentDate, secondRunId, storeClient);
+				higherBoundary, treatmentDate, secondRunId, storeClient);
 		
-		expectImapCommandsOnAlreadyProcessedMailbox("user/usera/SPAM@mydomain.org", treatmentDate, lowerBoundary, higherBoundary, runId, secondRunId, 3, storeClient);
+		expectImapCommandsOnAlreadyProcessedMailbox("user/usera/SPAM@mydomain.org", treatmentDate, higherBoundary, runId, secondRunId, 100, storeClient);
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient).times(4);
@@ -611,7 +604,6 @@ public class ImapArchiveProcessingTest {
 		expect(dateTimeProvider.now())
 			.andReturn(treatmentDate).times(2);
 		
-		DateTime lowerBoundary = new DateTime(0, DateTimeZone.UTC);
 		DateTime higherBoundary = DateTime.parse("2014-08-26T12:18:00.000Z");
 		expect(schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.DAILY))
 			.andReturn(higherBoundary);
@@ -628,7 +620,7 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessingWhenTwoYearsInRange("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", "user/usera/ARCHIVE/2015/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
-				Range.closed(1l, 10l), Range.closed(11l, 15l), lowerBoundary, higherBoundary, treatmentDate, runId, storeClient);
+				Range.closed(1l, 10l), Range.closed(11l, 15l), higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.close();
 		expectLastCall();
@@ -642,7 +634,7 @@ public class ImapArchiveProcessingTest {
 	}
 	
 	private void expectImapCommandsOnMailboxProcessingWhenTwoYearsInRange(String mailboxName, String firstYearArchiveMailboxName, String secondYearArchiveMailboxName, String temporaryMailboxName, Range<Long> firstYearRange, Range<Long> secondYearRange,
-				DateTime lowerBoundary, DateTime higherBoundary, DateTime treatmentDate, ArchiveTreatmentRunId runId, StoreClient storeClient) 
+				DateTime higherBoundary, DateTime treatmentDate, ArchiveTreatmentRunId runId, StoreClient storeClient) 
 			throws Exception {
 		
 		MessageSet.Builder messageSetBuilder = MessageSet.builder();
@@ -653,8 +645,8 @@ public class ImapArchiveProcessingTest {
 		storeClient.login(false);
 		expectLastCall();
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(lowerBoundary.toDate())
 				.before(higherBoundary.toDate())
+				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(messageSet);
 		
@@ -662,6 +654,7 @@ public class ImapArchiveProcessingTest {
 		
 		// first Year
 		long firstUid = messageSet.first().get();
+		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
 				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
 		expect(storeClient.select(mailboxName)).andReturn(true);
@@ -687,6 +680,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidStore(firstYearMessageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		// second Year
+		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(secondYearMessageSet.first().get())))
 			.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2015-01-03T11:53:00.000Z").toDate())));
 		expect(storeClient.uidSearch(SearchQuery.builder()
@@ -744,7 +738,6 @@ public class ImapArchiveProcessingTest {
 		expect(dateTimeProvider.now())
 			.andReturn(treatmentDate).times(2);
 		
-		DateTime lowerBoundary = new DateTime(0, DateTimeZone.UTC);
 		DateTime higherBoundary = DateTime.parse("2014-08-26T12:18:00.000Z");
 		expect(schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.DAILY))
 			.andReturn(higherBoundary);
@@ -772,8 +765,8 @@ public class ImapArchiveProcessingTest {
 		storeClient.login(false);
 		expectLastCall();
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(lowerBoundary.toDate())
 				.before(higherBoundary.toDate())
+				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(messageSet);
 		
@@ -782,6 +775,7 @@ public class ImapArchiveProcessingTest {
 		
 		// current Year
 		long firstUid = messageSet.first().get();
+		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
 				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
 		expect(storeClient.select(mailboxName)).andReturn(true);
@@ -810,6 +804,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidStore(currentYearRangeCopiedUids, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		// previous Year
+		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(previousYearMessageSet.first().get())))
 			.andReturn(ImmutableList.of(new InternalDate(previousYearMessageSet.first().get(), DateTime.parse("2013-01-03T11:53:00.000Z").toDate())));
 		expect(storeClient.uidSearch(SearchQuery.builder()
@@ -833,6 +828,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidStore(previousYearRangeCopiedUids, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		// next Year
+		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(nextYearMessageSet.first().get())))
 			.andReturn(ImmutableList.of(new InternalDate(nextYearMessageSet.first().get(), DateTime.parse("2015-01-03T11:53:00.000Z").toDate())));
 		expect(storeClient.uidSearch(SearchQuery.builder()
@@ -884,7 +880,7 @@ public class ImapArchiveProcessingTest {
 		control.verify();
 	}
 
-	private void expectImapCommandsOnAlreadyProcessedMailbox(String mailbox, DateTime treatmentDate, DateTime lowerBoundary, DateTime higherBoundary, 
+	private void expectImapCommandsOnAlreadyProcessedMailbox(String mailbox, DateTime treatmentDate, DateTime higherBoundary, 
 			ArchiveTreatmentRunId runId, ArchiveTreatmentRunId secondRunId, long lastUid, StoreClient storeClient) throws Exception {
 		
 		storeClient.login(false);
@@ -907,10 +903,10 @@ public class ImapArchiveProcessingTest {
 			.andReturn(treatmentDate);
 		
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(lowerBoundary.toDate())
 				.before(higherBoundary.toDate())
+				.messageSet(MessageSet.builder().add(Range.openClosed(lastUid, Long.MAX_VALUE)).build())
 				.build()))
-			.andReturn(MessageSet.builder().add(Range.closed(0l, lastUid)).build());
+			.andReturn(MessageSet.empty());
 		processedFolderDao.insert(ProcessedFolder.builder()
 				.runId(secondRunId)
 				.folder(imapFolder)
@@ -925,7 +921,7 @@ public class ImapArchiveProcessingTest {
 	}
 	
 	private void expectImapCommandsOnMailboxProcessingFails(String mailboxName, String archiveMailboxName, String temporaryMailboxName, Set<Range<Long>> uids,
-				long lastUid, DateTime lowerBoundary, DateTime higherBoundary, DateTime treatmentDate, ArchiveTreatmentRunId runId, StoreClient storeClient) 
+				long lastUid, DateTime higherBoundary, DateTime treatmentDate, ArchiveTreatmentRunId runId, StoreClient storeClient) 
 			throws Exception {
 		
 		MessageSet.Builder messageSetBuilder = MessageSet.builder();
@@ -938,12 +934,13 @@ public class ImapArchiveProcessingTest {
 		expectLastCall();
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(lowerBoundary.toDate())
 				.before(higherBoundary.toDate())
+				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(messageSet);
 		
 		long firstUid = messageSet.first().get();
+		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
 				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
 		
@@ -973,7 +970,7 @@ public class ImapArchiveProcessingTest {
 	}
 	
 	private void expectImapCommandsOnMailboxProcessing(String mailboxName, String archiveMailboxName, String temporaryMailboxName, Set<Range<Long>> uids,
-				DateTime lowerBoundary, DateTime higherBoundary, DateTime treatmentDate, ArchiveTreatmentRunId runId, StoreClient storeClient) 
+				DateTime higherBoundary, DateTime treatmentDate, ArchiveTreatmentRunId runId, StoreClient storeClient) 
 			throws Exception {
 		
 		MessageSet.Builder messageSetBuilder = MessageSet.builder();
@@ -985,12 +982,13 @@ public class ImapArchiveProcessingTest {
 		storeClient.login(false);
 		expectLastCall();
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(lowerBoundary.toDate())
 				.before(higherBoundary.toDate())
+				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(messageSet);
 		
 		long firstUid = messageSet.first().get();
+		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
 				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
 		
@@ -1122,21 +1120,20 @@ public class ImapArchiveProcessingTest {
 	}
 	
 	@Test
-	public void calculateBoundariesWhenNoPreviousArchiveTreatment() {
+	public void calculateHigherBoundaryWhenNoPreviousArchiveTreatment() {
 		DateTime start = DateTime.parse("2014-08-26T08:46:00.000Z");
 		DateTime higherBoundary = DateTime.parse("2014-07-26T08:46:00.000Z");
 		expect(schedulingDatesService.higherBoundary(start, RepeatKind.MONTHLY))
 			.andReturn(higherBoundary);
 		
 		control.replay();
-		Boundaries boundaries = imapArchiveProcessing.calculateBoundaries(start, RepeatKind.MONTHLY, Optional.<ArchiveTreatment> absent(), logger);
+		HigherBoundary boundary = imapArchiveProcessing.calculateHigherBoundary(start, RepeatKind.MONTHLY, Optional.<ArchiveTreatment> absent(), logger);
 		control.verify();
-		assertThat(boundaries.getLowerBoundary()).isEqualTo(new DateTime(0, DateTimeZone.UTC));
-		assertThat(boundaries.getHigherBoundary()).isEqualTo(higherBoundary);
+		assertThat(boundary.getHigherBoundary()).isEqualTo(higherBoundary);
 	}
 	
 	@Test
-	public void calculateBoundariesShouldContinueWhenPreviousArchiveTreatmentIsInError() {
+	public void calculateHigherBoundaryShouldContinueWhenPreviousArchiveTreatmentIsInError() {
 		DateTime start = DateTime.parse("2014-08-26T08:46:00.000Z");
 		DateTime higherBoundary = DateTime.parse("2014-07-26T08:46:00.000Z");
 		
@@ -1149,28 +1146,23 @@ public class ImapArchiveProcessingTest {
 			.status(ArchiveStatus.ERROR)
 			.build();
 		
-		DateTime lowerBoundary = DateTime.parse("2014-06-26T08:46:00.000Z");
-		expect(schedulingDatesService.lowerBoundary(start, RepeatKind.MONTHLY))
-			.andReturn(lowerBoundary);
-		
 		control.replay();
-		Boundaries boundaries = imapArchiveProcessing.calculateBoundaries(start, RepeatKind.MONTHLY, Optional.fromNullable(archiveTreatment), logger);
+		HigherBoundary boundary = imapArchiveProcessing.calculateHigherBoundary(start, RepeatKind.MONTHLY, Optional.fromNullable(archiveTreatment), logger);
 		control.verify();
-		assertThat(boundaries.getLowerBoundary()).isEqualTo(lowerBoundary);
-		assertThat(boundaries.getHigherBoundary()).isEqualTo(higherBoundary);
+		assertThat(boundary.getHigherBoundary()).isEqualTo(higherBoundary);
 	}
 	
 	@Test
-	public void calculateBoundariesShouldBeNextWhenPreviousArchiveTreatmentIsSuccess() {
+	public void calculateHigherBoundaryShouldBeNextWhenPreviousArchiveTreatmentIsSuccess() {
 		DateTime start = DateTime.parse("2014-08-26T08:46:00.000Z");
-		DateTime lowerBoundary = DateTime.parse("2014-06-26T08:46:00.000Z");
+		DateTime previousHigherBoundary = DateTime.parse("2014-06-26T08:46:00.000Z");
 		
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ArchiveTreatment archiveTreatment = ArchiveTreatment.builder(domainId)
 			.runId(ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77"))
 			.recurrent(true)
 			.scheduledAt(start)
-			.higherBoundary(lowerBoundary)
+			.higherBoundary(previousHigherBoundary)
 			.status(ArchiveStatus.SUCCESS)
 			.build();
 		
@@ -1179,10 +1171,9 @@ public class ImapArchiveProcessingTest {
 			.andReturn(higherBoundary);
 		
 		control.replay();
-		Boundaries boundaries = imapArchiveProcessing.calculateBoundaries(start, RepeatKind.MONTHLY, Optional.fromNullable(archiveTreatment), logger);
+		HigherBoundary boundary = imapArchiveProcessing.calculateHigherBoundary(start, RepeatKind.MONTHLY, Optional.fromNullable(archiveTreatment), logger);
 		control.verify();
-		assertThat(boundaries.getLowerBoundary()).isEqualTo(lowerBoundary);
-		assertThat(boundaries.getHigherBoundary()).isEqualTo(higherBoundary);
+		assertThat(boundary.getHigherBoundary()).isEqualTo(higherBoundary);
 	}
 	
 	@Test
@@ -1224,8 +1215,7 @@ public class ImapArchiveProcessingTest {
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.boundaries(Boundaries.builder()
-						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
+				.higherBoundary(HigherBoundary.builder()
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
@@ -1276,8 +1266,7 @@ public class ImapArchiveProcessingTest {
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.boundaries(Boundaries.builder()
-						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
+				.higherBoundary(HigherBoundary.builder()
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
@@ -1337,8 +1326,7 @@ public class ImapArchiveProcessingTest {
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.boundaries(Boundaries.builder()
-						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
+				.higherBoundary(HigherBoundary.builder()
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
@@ -1387,8 +1375,7 @@ public class ImapArchiveProcessingTest {
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.boundaries(Boundaries.builder()
-						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
+				.higherBoundary(HigherBoundary.builder()
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
@@ -1442,8 +1429,7 @@ public class ImapArchiveProcessingTest {
 		
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.boundaries(Boundaries.builder()
-						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
+				.higherBoundary(HigherBoundary.builder()
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
@@ -1456,69 +1442,63 @@ public class ImapArchiveProcessingTest {
 	
 	@Test
 	public void searchMailUidsWhenNoPreviousUidNext() throws Exception {
-		DateTime lowerBoundary = DateTime.parse("2014-06-26T08:46:00.000Z");
 		DateTime higherBoundary = DateTime.parse("2014-07-26T08:46:00.000Z");
-		Boundaries boundaries = Boundaries.builder()
-				.lowerBoundary(lowerBoundary)
+		HigherBoundary boundary = HigherBoundary.builder()
 				.higherBoundary(higherBoundary)
 				.build();
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(lowerBoundary.toDate())
 				.before(higherBoundary.toDate())
+				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(MessageSet.builder()
 					.add(Range.<Long> openClosed(4l, 12l))
 					.build());
 		
 		control.replay();
-		FluentIterable<Long> searchMailUids = imapArchiveProcessing.searchMailUids(MailboxImpl.from("mailbox", logger, storeClient), boundaries, Optional.<Long> absent());
+		FluentIterable<Long> searchMailUids = imapArchiveProcessing.searchMailUids(MailboxImpl.from("mailbox", logger, storeClient), boundary, Optional.<Long> absent());
 		control.verify();
 		assertThat(searchMailUids).containsOnly(5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l);
 	}
 	
 	@Test
 	public void searchMailUidsShouldReturnAllUidsWhenPreviousUidnextIsLower() throws Exception {
-		DateTime lowerBoundary = DateTime.parse("2014-06-26T08:46:00.000Z");
 		DateTime higherBoundary = DateTime.parse("2014-07-26T08:46:00.000Z");
-		Boundaries boundaries = Boundaries.builder()
-				.lowerBoundary(lowerBoundary)
+		HigherBoundary boundary = HigherBoundary.builder()
 				.higherBoundary(higherBoundary)
 				.build();
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(lowerBoundary.toDate())
 				.before(higherBoundary.toDate())
+				.messageSet(MessageSet.builder().add(Range.closed(2l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(MessageSet.builder()
 					.add(Range.<Long> openClosed(4l, 12l))
 					.build());
 		
 		control.replay();
-		FluentIterable<Long> searchMailUids = imapArchiveProcessing.searchMailUids(MailboxImpl.from("mailbox", logger, storeClient), boundaries, Optional.of(2l));
+		FluentIterable<Long> searchMailUids = imapArchiveProcessing.searchMailUids(MailboxImpl.from("mailbox", logger, storeClient), boundary, Optional.of(2l));
 		control.verify();
 		assertThat(searchMailUids).containsOnly(5l, 6l, 7l, 8l, 9l, 10l, 11l, 12l);
 	}
 	
 	@Test
 	public void searchMailUidsShouldReturnFilteredUidsWhenPreviousLastUidIsInRange() throws Exception {
-		DateTime lowerBoundary = DateTime.parse("2014-06-26T08:46:00.000Z");
 		DateTime higherBoundary = DateTime.parse("2014-07-26T08:46:00.000Z");
-		Boundaries boundaries = Boundaries.builder()
-				.lowerBoundary(lowerBoundary)
+		HigherBoundary boundary = HigherBoundary.builder()
 				.higherBoundary(higherBoundary)
 				.build();
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(lowerBoundary.toDate())
 				.before(higherBoundary.toDate())
+				.messageSet(MessageSet.builder().add(Range.closed(6l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(MessageSet.builder()
-					.add(Range.<Long> openClosed(4l, 12l))
+					.add(Range.<Long> closed(7l, 12l))
 					.build());
 		
 		control.replay();
-		FluentIterable<Long> searchMailUids = imapArchiveProcessing.searchMailUids(MailboxImpl.from("mailbox", logger, storeClient), boundaries, Optional.of(6l));
+		FluentIterable<Long> searchMailUids = imapArchiveProcessing.searchMailUids(MailboxImpl.from("mailbox", logger, storeClient), boundary, Optional.of(6l));
 		control.verify();
 		assertThat(searchMailUids).containsOnly(7l, 8l, 9l, 10l, 11l, 12l);
 	}
@@ -1697,8 +1677,7 @@ public class ImapArchiveProcessingTest {
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.boundaries(Boundaries.builder()
-						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
+				.higherBoundary(HigherBoundary.builder()
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
@@ -1754,8 +1733,7 @@ public class ImapArchiveProcessingTest {
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.boundaries(Boundaries.builder()
-						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
+				.higherBoundary(HigherBoundary.builder()
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
@@ -1809,8 +1787,7 @@ public class ImapArchiveProcessingTest {
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.boundaries(Boundaries.builder()
-						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
+				.higherBoundary(HigherBoundary.builder()
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
@@ -1859,8 +1836,7 @@ public class ImapArchiveProcessingTest {
 		control.replay();
 		ProcessedTask processedTask = ProcessedTask.builder()
 				.archiveConfiguration(archiveConfiguration)
-				.boundaries(Boundaries.builder()
-						.lowerBoundary(DateTime.parse("2014-06-26T08:46:00.000Z"))
+				.higherBoundary(HigherBoundary.builder()
 						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
 						.build())
 				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())

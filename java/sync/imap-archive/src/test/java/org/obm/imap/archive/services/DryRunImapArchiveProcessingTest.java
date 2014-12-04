@@ -40,7 +40,6 @@ import java.util.List;
 
 import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 import org.junit.Before;
 import org.junit.Rule;
@@ -180,8 +179,8 @@ public class DryRunImapArchiveProcessingTest {
 		expectLastCall();
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(new DateTime(0, DateTimeZone.UTC).toDate())
 				.before(higherBoundary.toDate())
+				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(messageSet);
 		

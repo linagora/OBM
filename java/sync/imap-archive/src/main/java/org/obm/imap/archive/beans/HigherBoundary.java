@@ -32,33 +32,20 @@
 package org.obm.imap.archive.beans;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
-public class Boundaries {
+public class HigherBoundary {
 
 	public static Builder builder() {
 		return new Builder();
 	}
 	
 	public static class Builder {
-		private DateTime lowerBoundary;
 		private DateTime higherBoundary;
 		
 		private Builder() {}
-		
-		public Builder firstSync() {
-			this.lowerBoundary = new DateTime(0, DateTimeZone.UTC);
-			return this;
-		}
-		
-		public Builder lowerBoundary(DateTime lowerBoundary) {
-			Preconditions.checkNotNull(lowerBoundary);
-			this.lowerBoundary = lowerBoundary;
-			return this;
-		}
 		
 		public Builder higherBoundary(DateTime higherBoundary) {
 			Preconditions.checkNotNull(higherBoundary);
@@ -66,23 +53,16 @@ public class Boundaries {
 			return this;
 		}
 		
-		public Boundaries build() {
-			Preconditions.checkState(lowerBoundary != null);
+		public HigherBoundary build() {
 			Preconditions.checkState(higherBoundary != null);
-			return new Boundaries(lowerBoundary, higherBoundary);
+			return new HigherBoundary(higherBoundary);
 		}
 	}
 	
-	private final DateTime lowerBoundary;
 	private final DateTime higherBoundary;
 
-	private Boundaries(DateTime lowerBoundary, DateTime higherBoundary) {
-		this.lowerBoundary = lowerBoundary;
+	private HigherBoundary(DateTime higherBoundary) {
 		this.higherBoundary = higherBoundary;
-	}
-
-	public DateTime getLowerBoundary() {
-		return lowerBoundary;
 	}
 
 	public DateTime getHigherBoundary() {
@@ -91,15 +71,14 @@ public class Boundaries {
 
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(lowerBoundary, higherBoundary);
+		return Objects.hashCode(higherBoundary);
 	}
 	
 	@Override
 	public boolean equals(Object object){
-		if (object instanceof Boundaries) {
-			Boundaries that = (Boundaries) object;
-			return Objects.equal(this.lowerBoundary, that.lowerBoundary)
-				&& Objects.equal(this.higherBoundary, that.higherBoundary);
+		if (object instanceof HigherBoundary) {
+			HigherBoundary that = (HigherBoundary) object;
+			return Objects.equal(this.higherBoundary, that.higherBoundary);
 		}
 		return false;
 	}
@@ -107,7 +86,6 @@ public class Boundaries {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("lowerBoundary", lowerBoundary)
 			.add("higherBoundary", higherBoundary)
 			.toString();
 	}
