@@ -33,16 +33,22 @@ package org.obm.imap.archive.logging;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.pattern.ClassicConverter;
+import ch.qos.logback.classic.pattern.MessageConverter;
+import ch.qos.logback.classic.pattern.RootCauseFirstThrowableProxyConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.CoreConstants;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class ChunkedOutputAppender extends AppenderBase<ILoggingEvent> {
@@ -52,15 +58,46 @@ public class ChunkedOutputAppender extends AppenderBase<ILoggingEvent> {
 	private List<ChunkedOutput<String>> chunkedOutputs;
 	@VisibleForTesting ConcurrentLinkedDeque<String> messages;
 
-	
+	private final Set<ClassicConverter> converters;
+
 	public ChunkedOutputAppender() {
 		chunkedOutputs = Lists.newArrayList();
 		messages = new ConcurrentLinkedDeque<String>();
+		converters = ImmutableSet.of(messageConverter(), lineSeperatorConverter(), rootCauseFirstThrowableProxyConverter());
+	}
+
+	private MessageConverter messageConverter() {
+		MessageConverter messageConverter = new MessageConverter();
+		messageConverter.start();
+		return messageConverter;
+	}
+
+	private LineSeperatorConverter lineSeperatorConverter() {
+		LineSeperatorConverter lineSeperatorConverter = new LineSeperatorConverter();
+		lineSeperatorConverter.start();
+		return lineSeperatorConverter;
+	}
+
+	private RootCauseFirstThrowableProxyConverter rootCauseFirstThrowableProxyConverter() {
+		RootCauseFirstThrowableProxyConverter rootCauseFirstThrowableProxyConverter = new RootCauseFirstThrowableProxyConverter();
+		rootCauseFirstThrowableProxyConverter.start();
+		return rootCauseFirstThrowableProxyConverter;
+	}
+	
+	private static class LineSeperatorConverter extends ClassicConverter {
+		
+		  public String convert(ILoggingEvent event) {
+			  return CoreConstants.LINE_SEPARATOR;
+		  }
 	}
 	
 	@Override
-	protected void append(ILoggingEvent event) {
-		String formattedMessage = event.getFormattedMessage();
+	protected void append(final ILoggingEvent event) {
+		final StringBuilder buffer = new StringBuilder();
+		for (ClassicConverter converter : converters) {
+			converter.write(buffer, event);
+		}
+		String formattedMessage = buffer.toString();
 		messages.add(formattedMessage);
 		
 		for (ChunkedOutput<String> chunkedOutput : chunkedOutputs) {
@@ -74,12 +111,26 @@ public class ChunkedOutputAppender extends AppenderBase<ILoggingEvent> {
 
 	@Override
 	public void stop() {
-		super.stop();
-		for (ChunkedOutput<String> chunkedOutput : chunkedOutputs) {
+		try {
+			super.stop();
+			for (ChunkedOutput<String> chunkedOutput : chunkedOutputs) {
+				try {
+					chunkedOutput.close();
+				} catch (IOException e) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+		} finally {
+			stopConverters();
+		}
+	}
+
+	private void stopConverters() {
+		for (ClassicConverter converter : converters) {
 			try {
-				chunkedOutput.close();
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
+				converter.stop();
+			} catch (Exception e) {
+				logger.error("Error while stoping converter", e);
 			}
 		}
 	}

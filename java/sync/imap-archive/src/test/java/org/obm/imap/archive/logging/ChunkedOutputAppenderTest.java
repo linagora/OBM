@@ -35,12 +35,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expectLastCall;
 
+import java.util.concurrent.ConcurrentLinkedDeque;
+
 import org.easymock.IMocksControl;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.junit.Before;
 import org.junit.Test;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.classic.spi.ThrowableProxy;
 
 
 public class ChunkedOutputAppenderTest {
@@ -54,10 +57,12 @@ public class ChunkedOutputAppenderTest {
 	
 	@Test
 	public void appendShouldAddInMessages() {
+		String expectedMessage = "message" + System.lineSeparator();
 		String message = "message";
 		LoggingEvent loggingEvent = new LoggingEvent();
 		loggingEvent.setMessage(message);
 		
+		String expectedMessage2 = "message2" + System.lineSeparator();
 		String message2 = "message2";
 		LoggingEvent loggingEvent2 = new LoggingEvent();
 		loggingEvent2.setMessage(message2);
@@ -66,7 +71,24 @@ public class ChunkedOutputAppenderTest {
 		chunkedOutputAppender.append(loggingEvent);
 		chunkedOutputAppender.append(loggingEvent2);
 		
-		assertThat(chunkedOutputAppender.messages).containsOnly(message, message2);
+		assertThat(chunkedOutputAppender.messages).containsOnly(expectedMessage, expectedMessage2);
+	}
+	
+	@Test
+	public void appendShouldConvertException() {
+		String cause = "java.lang.NullPointerException: My Cause";
+		String stack = "at org.obm.imap.archive.logging.ChunkedOutputAppenderTest.appendShouldConvertException(ChunkedOutputAppenderTest.java:";
+		LoggingEvent loggingEvent = new LoggingEvent();
+		loggingEvent.setMessage("message");
+		loggingEvent.setThrowableProxy(new ThrowableProxy(new NullPointerException("My Cause")));
+		
+		ChunkedOutputAppender chunkedOutputAppender = new ChunkedOutputAppender();
+		chunkedOutputAppender.append(loggingEvent);
+		
+		ConcurrentLinkedDeque<String> messages = chunkedOutputAppender.messages;
+		String message = messages.getFirst();
+		assertThat(message).contains(cause);
+		assertThat(message).contains(stack);
 	}
 	
 	@Test
@@ -89,22 +111,20 @@ public class ChunkedOutputAppenderTest {
 	
 	@Test 
 	public void chunkShouldCopyAlreadyAppendedMessages() throws Exception {
+		String expectedMessage = "message" + System.lineSeparator();
 		String message = "message";
 		LoggingEvent loggingEvent = new LoggingEvent();
 		loggingEvent.setMessage(message);
 		
+		String expectedMessage2 = "message2" + System.lineSeparator();
 		String message2 = "message2";
 		LoggingEvent loggingEvent2 = new LoggingEvent();
 		loggingEvent2.setMessage(message2);
 		
 		ChunkedOutput<String> chunkedOutput = control.createMock(ChunkedOutput.class);
-		chunkedOutput.write(message);
+		chunkedOutput.write(expectedMessage);
 		expectLastCall();
-		chunkedOutput.write(System.lineSeparator());
-		expectLastCall();
-		chunkedOutput.write(message2);
-		expectLastCall();
-		chunkedOutput.write(System.lineSeparator());
+		chunkedOutput.write(expectedMessage2);
 		expectLastCall();
 		
 		MockedChunkedOutputAppender chunkedOutputAppender = new MockedChunkedOutputAppender(chunkedOutput);
@@ -118,22 +138,20 @@ public class ChunkedOutputAppenderTest {
 	
 	@Test 
 	public void appendShouldWriteMessagesInChunedOutput() throws Exception {
+		String expectedMessage = "message" + System.lineSeparator();
 		String message = "message";
 		LoggingEvent loggingEvent = new LoggingEvent();
 		loggingEvent.setMessage(message);
 		
+		String expectedMessage2 = "message2" + System.lineSeparator();
 		String message2 = "message2";
 		LoggingEvent loggingEvent2 = new LoggingEvent();
 		loggingEvent2.setMessage(message2);
 		
 		ChunkedOutput<String> chunkedOutput = control.createMock(ChunkedOutput.class);
-		chunkedOutput.write(message);
+		chunkedOutput.write(expectedMessage);
 		expectLastCall();
-		chunkedOutput.write(System.lineSeparator());
-		expectLastCall();
-		chunkedOutput.write(message2);
-		expectLastCall();
-		chunkedOutput.write(System.lineSeparator());
+		chunkedOutput.write(expectedMessage2);
 		expectLastCall();
 		
 		MockedChunkedOutputAppender chunkedOutputAppender = new MockedChunkedOutputAppender(chunkedOutput);
