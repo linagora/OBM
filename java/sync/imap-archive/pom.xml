@@ -190,6 +190,59 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-asciidoc-resources</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>src/main/asciidoc</directory>
+									<includes>
+										<include>images/*</include>
+									</includes>
+								</resource>
+							</resources>
+							<outputDirectory>target/generated-docs</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.asciidoctor</groupId>
+				<artifactId>asciidoctor-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>output-html</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>process-asciidoc</goal>
+						</goals>
+						<configuration>
+							<backend>html</backend>
+							<sourceDocumentName>imap-archive.adoc</sourceDocumentName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>release-html</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>process-asciidoc</goal>
+						</goals>
+						<configuration>
+							<backend>html</backend>
+							<sourceDirectory>${basedir}/src/main/asciidoc</sourceDirectory>
+							<outputDirectory>${project.build.directory}/generated-docs</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 		

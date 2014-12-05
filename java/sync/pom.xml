@@ -313,6 +313,11 @@ org.eclipse.jdt.core.compiler.source=1.7
 					<artifactId>maven-war-plugin</artifactId>
 					<version>${plugin.war.version}</version>
 				</plugin>
+				<plugin>
+					<groupId>org.asciidoctor</groupId>
+					<artifactId>asciidoctor-maven-plugin</artifactId>
+					<version>0.1.4</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<extensions>
