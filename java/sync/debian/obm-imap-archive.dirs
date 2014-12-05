@@ -2,3 +2,4 @@ etc/obm-imap-archive
 usr/share/obm-imap-archive
 var/log/obm-imap-archive
 var/lib/obm-imap-archive
+usr/share/doc/obm-imap-archive
