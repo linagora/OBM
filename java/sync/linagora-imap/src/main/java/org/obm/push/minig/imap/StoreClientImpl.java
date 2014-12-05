@@ -48,6 +48,8 @@ import org.obm.configuration.EmailConfiguration.MailboxNameCheckPolicy;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Acl;
+import org.obm.push.mail.bean.AnnotationEntry;
+import org.obm.push.mail.bean.AttributeValue;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
@@ -378,5 +380,10 @@ public class StoreClientImpl implements StoreClient {
 	@Override
 	public Set<Acl> getAcl(String mailbox)  throws ImapTimeoutException {
 		return clientSupport.getAcl(mailbox);
+	}
+
+	@Override
+	public boolean setAnnotation(String mailbox, AnnotationEntry annotationEntry, AttributeValue attributeValue) throws MailboxNotFoundException, ImapTimeoutException {
+		return clientSupport.setAnnotation(mailbox, annotationEntry, attributeValue);
 	}
 }

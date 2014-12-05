@@ -42,6 +42,8 @@ import java.util.Set;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Acl;
+import org.obm.push.mail.bean.AnnotationEntry;
+import org.obm.push.mail.bean.AttributeValue;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
@@ -165,5 +167,7 @@ public interface StoreClient extends AutoCloseable {
 	List<MailThread> uidThreads() throws ImapTimeoutException;
 
 	String findMailboxNameWithServerCase(String mailbox) throws MailboxNotFoundException, ImapTimeoutException;
+	
+	boolean setAnnotation(String mailbox, AnnotationEntry annotationEntry, AttributeValue attributeValue) throws MailboxNotFoundException, ImapTimeoutException;
 
 }

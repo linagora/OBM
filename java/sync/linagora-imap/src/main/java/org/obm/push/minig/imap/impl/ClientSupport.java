@@ -52,6 +52,8 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.SocketConnector;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.mail.bean.Acl;
+import org.obm.push.mail.bean.AnnotationEntry;
+import org.obm.push.mail.bean.AttributeValue;
 import org.obm.push.mail.bean.EmailMetadata;
 import org.obm.push.mail.bean.FastFetch;
 import org.obm.push.mail.bean.FlagsList;
@@ -81,6 +83,7 @@ import org.obm.push.minig.imap.command.QuotaRootCommand;
 import org.obm.push.minig.imap.command.RenameCommand;
 import org.obm.push.minig.imap.command.SelectCommand;
 import org.obm.push.minig.imap.command.SetACLCommand;
+import org.obm.push.minig.imap.command.SetAnnotationCommand;
 import org.obm.push.minig.imap.command.SetQuotaCommand;
 import org.obm.push.minig.imap.command.StartIdleCommand;
 import org.obm.push.minig.imap.command.StopIdleCommand;
@@ -430,5 +433,9 @@ public class ClientSupport {
 	
 	public long uidValidity(String mailbox) throws ImapTimeoutException {
 		return run(new UIDValidityCommand(mailbox));
+	}
+
+	public boolean setAnnotation(String mailbox, AnnotationEntry annotationEntry, AttributeValue attributeValue) {
+		return run(new SetAnnotationCommand(mailbox, annotationEntry, attributeValue));
 	}
 }
