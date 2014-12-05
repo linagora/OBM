@@ -41,10 +41,13 @@ import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.imap.archive.beans.Year;
+import org.obm.imap.archive.exception.ImapAnnotationException;
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapQuotaException;
 import org.obm.imap.archive.exception.ImapStoreException;
 import org.obm.imap.archive.exception.MailboxFormatException;
+import org.obm.push.mail.bean.AnnotationEntry;
+import org.obm.push.mail.bean.AttributeValue;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.MessageSet;
@@ -370,6 +373,51 @@ public class ArchiveMailboxTest {
 		try {
 			control.replay();
 			archiveMailbox.setMaxQuota(1234);
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test
+	public void setSharedSeenAnnotationShouldNotThrowWhenSuccess() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.year(Year.from(2015))
+				.domainName(new DomainName("mydomain.org"))
+				.archiveMainFolder("ARCHIVE")
+				.cyrusPartitionSuffix("archive")
+				.build();
+		expect(storeClient.setAnnotation(archiveMailbox.getName(), AnnotationEntry.SHAREDSEEN, AttributeValue.sharedValue("true")))
+			.andReturn(true);
+		logger.debug(anyObject(String.class), anyObject(String.class));
+		expectLastCall().anyTimes();
+
+		control.replay();
+		archiveMailbox.setSharedSeenAnnotation();
+		control.verify();
+	}
+	
+	@Test(expected=ImapAnnotationException.class)
+	public void setSharedSeenAnnotationShouldThrowWhenError() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.year(Year.from(2015))
+				.domainName(new DomainName("mydomain.org"))
+				.archiveMainFolder("ARCHIVE")
+				.cyrusPartitionSuffix("archive")
+				.build();
+		expect(storeClient.setAnnotation(archiveMailbox.getName(), AnnotationEntry.SHAREDSEEN, AttributeValue.sharedValue("true")))
+			.andReturn(false);
+
+		try {
+			control.replay();
+			archiveMailbox.setSharedSeenAnnotation();
 		} finally {
 			control.verify();
 		}

@@ -74,6 +74,8 @@ import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.imap.archive.services.ImapArchiveProcessing.ProcessedTask;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.AnnotationEntry;
+import org.obm.push.mail.bean.AttributeValue;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.InternalDate;
@@ -1025,6 +1027,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.setAcl(archiveMailboxName, ObmSystemUser.CYRUS, MailboxImpl.ALL_IMAP_RIGHTS)).andReturn(true);
 		expect(storeClient.setAcl(archiveMailboxName, "usera@mydomain.org", MailboxImpl.READ_IMAP_RIGHTS)).andReturn(true);
 		expect(storeClient.setQuota(archiveMailboxName, ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE)).andReturn(true);
+		expect(storeClient.setAnnotation(archiveMailboxName, AnnotationEntry.SHAREDSEEN, AttributeValue.sharedValue("true"))).andReturn(true);
 		expect(storeClient.select(archiveMailboxName)).andReturn(true);
 		expect(storeClient.select(mailboxName)).andReturn(true);
 	}

@@ -51,6 +51,7 @@ import org.obm.imap.archive.beans.Year;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
+import org.obm.imap.archive.exception.ImapAnnotationException;
 import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapQuotaException;
@@ -286,7 +287,7 @@ public class ImapArchiveProcessing {
 	}
 
 	private ArchiveMailbox createArchiveMailbox(Mailbox mailbox, Year year, ProcessedTask processedTask) 
-			throws MailboxFormatException, MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException {
+			throws MailboxFormatException, MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException, ImapAnnotationException {
 		
 		DomainName domainName = new DomainName(processedTask.getDomain().getName());
 		Logger logger = processedTask.getLogger();
@@ -321,7 +322,7 @@ public class ImapArchiveProcessing {
 	}
 
 	protected void createFolder(CreatableMailbox creatableMailbox, Logger logger) 
-			throws MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException {
+			throws MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException, ImapAnnotationException {
 		
 		try {
 			creatableMailbox.select();
@@ -495,7 +496,7 @@ public class ImapArchiveProcessing {
 	}
 
 	private void createMailbox(CreatableMailbox creatableMailbox, Logger logger) 
-			throws MailboxNotFoundException, ImapSetAclException, ImapCreateException, ImapSelectException, ImapQuotaException {
+			throws MailboxNotFoundException, ImapSetAclException, ImapCreateException, ImapSelectException, ImapQuotaException, ImapAnnotationException {
 		
 		String archiveMailboxName = creatableMailbox.getName();
 		logger.debug("Creating {} mailbox", archiveMailboxName);
@@ -504,6 +505,7 @@ public class ImapArchiveProcessing {
 		creatableMailbox.grantAllRightsTo(ObmSystemUser.CYRUS);
 		creatableMailbox.grantReadRightsTo(creatableMailbox.getUserAtDomain());
 		creatableMailbox.setMaxQuota(imapArchiveConfigurationService.getQuotaMaxSize());
+		creatableMailbox.setSharedSeenAnnotation();
 		creatableMailbox.select();
 	}
 

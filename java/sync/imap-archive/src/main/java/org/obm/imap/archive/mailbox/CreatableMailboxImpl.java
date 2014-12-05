@@ -35,14 +35,48 @@ import org.obm.imap.archive.exception.ImapAnnotationException;
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapQuotaException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.AnnotationEntry;
+import org.obm.push.mail.bean.AttributeValue;
+import org.obm.push.minig.imap.StoreClient;
+import org.slf4j.Logger;
 
-public interface CreatableMailbox extends Mailbox {
+public abstract class CreatableMailboxImpl extends MailboxImpl implements CreatableMailbox {
+	
+	private final String userAtDomain;
+	private final String archivePartitionName;
 
-	String getUserAtDomain();
+	protected CreatableMailboxImpl(String name, Logger logger, StoreClient storeClient, String userAtDomain, String archivePartitionName) {
+		super(name, logger, storeClient);
+		this.userAtDomain = userAtDomain;
+		this.archivePartitionName = archivePartitionName;
+	}
 	
-	void create() throws ImapCreateException;
+	@Override
+	public String getUserAtDomain() {
+		return userAtDomain;
+	}
 	
-	void setMaxQuota(int quotaMaxSize) throws MailboxNotFoundException, ImapQuotaException;
-	
-	void setSharedSeenAnnotation() throws MailboxNotFoundException, ImapAnnotationException;
+	@Override
+	public void create() throws ImapCreateException {
+		if (!storeClient.create(name, archivePartitionName)) {
+			throw new ImapCreateException(String.format("Wasn't able to create the mailbox %s", name)); 
+		}
+		logger.debug("Created");
+	}
+
+	@Override
+	public void setMaxQuota(int quotaMaxSize) throws MailboxNotFoundException, ImapQuotaException {
+		if (!storeClient.setQuota(name, quotaMaxSize)) {
+			throw new ImapQuotaException(String.format("Wasn't able to give the MAX %d quota to the mailbox %s", quotaMaxSize, name)); 
+		}
+		logger.debug("Max quota was successfully set on folder {}", name);
+	}
+
+	@Override
+	public void setSharedSeenAnnotation() throws MailboxNotFoundException, ImapAnnotationException {
+		if (!storeClient.setAnnotation(name, AnnotationEntry.SHAREDSEEN, AttributeValue.sharedValue(Boolean.TRUE.toString()))) {
+			throw new ImapAnnotationException(String.format("Wasn't able to set the annotation on the mailbox %s", name)); 
+		}
+		logger.debug("Annotation was successfully set on folder {}", name);
+	}
 }

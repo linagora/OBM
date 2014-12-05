@@ -40,10 +40,13 @@ import static org.easymock.EasyMock.expectLastCall;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.imap.archive.exception.ImapAnnotationException;
 import org.obm.imap.archive.exception.ImapCreateException;
 import org.obm.imap.archive.exception.ImapDeleteException;
 import org.obm.imap.archive.exception.ImapQuotaException;
 import org.obm.imap.archive.exception.MailboxFormatException;
+import org.obm.push.mail.bean.AnnotationEntry;
+import org.obm.push.mail.bean.AttributeValue;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
@@ -270,6 +273,47 @@ public class TemporaryMailboxTest {
 		try {
 			control.replay();
 			temporaryMailbox.setMaxQuota(1234);
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test
+	public void setSharedSeenAnnotationShouldNotThrowWhenSuccess() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.domainName(new DomainName("mydomain.org"))
+				.cyrusPartitionSuffix("archive")
+				.build();
+		expect(storeClient.setAnnotation(temporaryMailbox.getName(), AnnotationEntry.SHAREDSEEN, AttributeValue.sharedValue("true")))
+			.andReturn(true);
+		logger.debug(anyObject(String.class), anyObject(String.class));
+		expectLastCall().anyTimes();
+
+		control.replay();
+		temporaryMailbox.setSharedSeenAnnotation();
+		control.verify();
+	}
+	
+	@Test(expected=ImapAnnotationException.class)
+	public void setSharedSeenAnnotationShouldThrowWhenError() throws Exception {
+		Logger logger = control.createMock(Logger.class);
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.domainName(new DomainName("mydomain.org"))
+				.cyrusPartitionSuffix("archive")
+				.build();
+		expect(storeClient.setAnnotation(temporaryMailbox.getName(), AnnotationEntry.SHAREDSEEN, AttributeValue.sharedValue("true")))
+			.andReturn(false);
+
+		try {
+			control.replay();
+			temporaryMailbox.setSharedSeenAnnotation();
 		} finally {
 			control.verify();
 		}
