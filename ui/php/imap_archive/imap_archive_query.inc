@@ -29,6 +29,14 @@ version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
 applicable to the OBM software.
 ******************************************************************************/
 require_once('imap_archive_urls.php');
+$obminclude = getenv('OBM_INCLUDE_VAR');
+require_once("$obminclude/of/of_http_client.inc");
+
+// errno -> $l_could_not_login_imap_archive_server
+// code = 0 -> l_imap_archive_server_unreachable
+// ImapArchiveServerNotFoundException in imapArchiveRootPath -> l_imap_archive_server_not_found
+// 404 -> l_domain_configuration_not_found
+// ImapArchiveNoEmailException -> l_email_address_not_found
 
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : imap_archive_query.inc                                       //
@@ -41,37 +49,9 @@ require_once('imap_archive_urls.php');
 //   - none
 ///////////////////////////////////////////////////////////////////////////////
 function connect_to_imap_archive_service(){
-  global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
-  $userInfo = get_user_info($obm['uid']);
-  
-  if(empty($userInfo["email"])) {
-    return array(0, $l_email_address_not_found);
-  }
-  
   $loginPath = ImapArchiveUrls::status();
 
-  try {
-    $curl = curlGet($loginPath);
-  }
-  catch(ImapArchiveServerNotFoundException $ex) {
-      return array(0, $l_imap_archive_server_not_found);
-  }
-  $success = $curl["success"];
-  $code = $curl["code"];
-  $errno = $curl["errno"];
-  
-  if($errno){
-    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
-    return array(0, $l_could_not_login_imap_archive_server);
-  }
-  if ($code == 0) {
-    return array(0, $l_imap_archive_server_unreachable);
-  }
-  if ($code == 200) {
-    return array(1, null);
-  }
-
+  return http_get($loginPath)->as_text();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,59 +61,30 @@ function connect_to_imap_archive_service(){
 ///////////////////////////////////////////////////////////////////////////////
 function load_configuration_from_imap_archive_service(){
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
-  $userInfo = get_user_info($obm['uid']);
-  
-  if(empty($userInfo["email"])) {
-    return array(0, $l_email_address_not_found);
-  }
-  
+
   $configurationPath = ImapArchiveUrls::configuration($obm["domain_uuid"]);
 
-  try {
-    $curl = curlGet($configurationPath);
-  }
-  catch(ImapArchiveServerNotFoundException $ex) {
-      return array(0, $l_imap_archive_server_not_found);
-  }
-  $success = $curl["success"];
-  $code = $curl["code"];
-  $errno = $curl["errno"];
-  
-  if($errno){
-    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
-    return array(0, $l_could_not_login_imap_archive_server);
-  }
-  if ($code == 0) {
-    return array(0, $l_imap_archive_server_unreachable);
-  }
-  if ($code == 200) {
-    return array(1, json_decode($success));
-  }
+  return http_get($configurationPath)->as_json();
 }
 
 function imapArchiveRootPath() {
   global $obm;
 
-  $imapArchiveServer = of_domain_get_domain_imaparchiveserver($obm['domain_id']);
-  if(!count($imapArchiveServer)){
+  $imapArchiveServers = of_domain_get_domain_imaparchiveserver($obm['domain_id']);
+  if(!$imapArchiveServers) {
     throw new ImapArchiveServerNotFoundException();
   }
-  $iterator = new ArrayIterator($imapArchiveServer);
-  $imapArchiveServer = $iterator->current();
-  return "http://".$imapArchiveServer[0]["ip"].":8085";
+  $serverData = null;
+  foreach ($imapArchiveServers as $id => $imapArchiveServerData) {
+      $serverData = $imapArchiveServerData[0];
+      break;
+  }
+  return "http://".$serverData["ip"].":8085";
 }
 
-function curlGet($url, $extraParams = array()) {
-  global $obm;
-
-  $imapArchiveRootPath = imapArchiveRootPath();
-  $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($extraParams);
-  
-  $curl = basicAuthCurlInit($curlUrl);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    
-  return curlExec($curl);
+function http_get($url, $extraParams = array()) {
+  $config = build_http_config_with_auth();
+  return (new HttpClient($config))->get(new Url(imapArchiveRootPath().$url, $extraParams));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -143,41 +94,17 @@ function curlGet($url, $extraParams = array()) {
 ///////////////////////////////////////////////////////////////////////////////
 function calculate_next_treatment_date_from_imap_archive_service($configuration) {
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
-  $userInfo = get_user_info($obm['uid']);
-
-  if(empty($userInfo["email"])) {
-    return array(0, $l_email_address_not_found);
-  }
 
   $configurationPath = ImapArchiveUrls::nextTreatment($obm["domain_uuid"]);
 
-  try {
-    $curl = curlPost($configurationPath, array(), toJson($configuration));
-  }
-  catch(ImapArchiveServerNotFoundException $ex) {
-      return array(0, $l_imap_archive_server_not_found);
-  }
-  $success = $curl["success"];
-  $code = $curl["code"];
-  $errno = $curl["errno"];
-  
-  if($errno){
-    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
-    return array(0, $l_could_not_login_imap_archive_server);
-  }
-  if ($code == 0) {
-    return array(0, $l_imap_archive_server_unreachable);
-  }
-  if ($code == 200) {
-    return array(1, json_decode($success));
-  }
-  if ($code == 204) {
-    return array(1, null);
-  }
+  //return http_post($configurationPath, array(), toJson($configuration))->as_json();
+  $result = http_post($configurationPath, array(), toJson($configuration))->as_json();
+  return $result->nextTreatmentDate;
 }
 
 function toJson($configuration) {
+  global $obm;
+
   $repeatKind = $configuration->repeatKind;
   $dayOfWeek = $configuration->dayOfWeek;
   $dayOfMonth = $configuration->dayOfMonth;
@@ -204,32 +131,33 @@ function toJson($configuration) {
   ));	
 }
 
-function curlPost($url, $extraParams = array(), $json = "") {
-  global $obm;
-  
-  $imapArchiveRootPath = imapArchiveRootPath();
-  $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($extraParams);
-  
-  $curl = basicAuthCurlInit($curlUrl);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($curl, CURLOPT_POST, 1);
-  curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-type: application/json'));
-  curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
-  
-  return curlExec($curl);
+function jsonHeaders() {
+    return new HttpHeaders(array(
+      'Accept'        => 'application/json',
+      'Content-type'  => 'application/json'
+    ));
+}
+
+function http_post($url, $extraParams = array(), $json = "", $max_redirects = 0) {
+  $init_config = build_http_config_with_auth();
+  $post_config = HttpConfig::from_config($init_config, array(jsonHeaders()),
+    $max_redirects);
+  return (new HttpClient($post_config))->post(
+    new Url(imapArchiveRootPath().$url, $extraParams),
+    $json);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check configuration 
+// Check configuration
 // Parameters:
 //   - none
 ///////////////////////////////////////////////////////////////////////////////
 function check_configuration($params) {
   global $err;
   global $php_regexp_imap_sub_folder, $l_excluded_folder_error;
-  
+
   $excludedFolder = $params['excluded_folder'];
-  
+
   if (preg_match($php_regexp_imap_sub_folder, $excludedFolder)) {
     $err['msg'] .= "$excludedFolder : $l_excluded_folder_error";
     return false;
@@ -244,38 +172,15 @@ function check_configuration($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_imap_archive_update($paramsAsConfiguration) {
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
-  $userInfo = get_user_info($obm['uid']);
-  
-  if(empty($userInfo["email"])) {
-    return array(0, $l_email_address_not_found);
-  }
-  
+
   $configurationPath = ImapArchiveUrls::configuration($obm["domain_uuid"]);
 
-  try {
-    $curl = curlPut($configurationPath, paramToJson($paramsAsConfiguration));
-  }
-  catch(ImapArchiveServerNotFoundException $ex) {
-      return array(0, $l_imap_archive_server_not_found);
-  }
-  $success = $curl["success"];
-  $code = $curl["code"];
-  $errno = $curl["errno"];
-  
-  if($errno){
-    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
-    return array(0, $l_could_not_login_imap_archive_server);
-  }
-  if ($code == 0) {
-    return array(0, $l_imap_archive_server_unreachable);
-  }
-  if ($code == 200 || $code == 201 || $code == 204) {
-    return array(1, json_decode($success));
-  }
+  return http_put($configurationPath, paramToJson($paramsAsConfiguration));
 }
 
 function paramToJson($paramsAsConfiguration) {
+  global $obm;
+
 	$repeatKind = $paramsAsConfiguration->repeat_kind;
 	$dayOfWeek = $paramsAsConfiguration->day_of_week;
 	$dayOfMonth = $paramsAsConfiguration->day_of_month;
@@ -302,55 +207,36 @@ function paramToJson($paramsAsConfiguration) {
 }
 
 function excludedUserIdsToMap($excludedUserIds) {
-  $map = new stdClass();
+  $map = array();
   if ($excludedUserIds == null) {
     return $map;
   }
   $users = get_userobm_from_ext_ids($excludedUserIds, false);
   foreach ($users['entity'] as $u_ext_id => $u_ent) {
-    $map->$u_ext_id = $u_ent['login'];
+    $map[$u_ext_id] = $u_ent['login'];
   }
   return $map;
 }
 
-function curlPut($url, $json) {
-  global $obm;
-  
-  $imapArchiveRootPath = imapArchiveRootPath();
-  $curlUrl = $imapArchiveRootPath.$url;
-  
-  $curl = basicAuthCurlInit($curlUrl);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
-  curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-type: application/json'));
-  curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
-  
-  return curlExec($curl);
+function http_put($url, $json) {
+  $init_config = build_http_config_with_auth();
+  $config = HttpConfig::from_config($init_config, array(
+    jsonHeaders()
+  ));
+  return (new HttpClient($config))->put(new Url(imapArchiveRootPath().$url), $json);
 }
 
-function curlExec($curl) {
-  
-  $success = curl_exec($curl);
-  $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-  $errno = curl_errno($curl);
-  curl_close($curl);
-  
-  return array("success" => $success, "code" => $code, "errno" => $errno);
-}
-
-function basicAuthCurlInit($curlUrl) {
+function build_http_config_with_auth() {
   global $obm;
 
-  $userInfo = get_user_info($obm['uid']);  
+  $userInfo = get_user_info_with_email_or_die($obm['uid']);
+
   $username = $userInfo["login"];
   $password = get_trust_token($userInfo);
   $domainName = $obm['domain_name'];
-
-  $curl = curl_init($curlUrl);
-  curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-  curl_setopt($curl, CURLOPT_USERPWD, "$username@$domainName:$password");
-  curl_setopt($curl, CURLOPT_FAILONERROR, 1);
-  return $curl;
+  return new HttpConfig(array(
+    new BasicAuth(new Credentials($username, $password, $domainName))
+  ));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -360,94 +246,11 @@ function basicAuthCurlInit($curlUrl) {
 ///////////////////////////////////////////////////////////////////////////////
 function manual_launch($archiveTreatmentKind) {
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_domain_configuration_not_found, $l_domain_configuration_disable, $l_imap_archive_server_not_found;
-  $userInfo = get_user_info($obm['uid']);
-
-  if(empty($userInfo["email"])) {
-    return array(0, $l_email_address_not_found);
-  }
 
   $manualLaunchPath = ImapArchiveUrls::treatments($obm["domain_uuid"]);
 
-  try {
-    $curl = curlPostWithHeader($manualLaunchPath, array("archive_treatment_kind" => $archiveTreatmentKind));
-  }
-  catch(ImapArchiveServerNotFoundException $ex) {
-      return array(0, $l_imap_archive_server_not_found);
-  }
-  $success = $curl["success"];
-  $code = $curl["code"];
-  $errno = $curl["errno"];
-  
-  if($errno){
-    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
-    return array(0, $l_could_not_login_imap_archive_server);
-  }
-  if ($code == 0) {
-    return array(0, $l_imap_archive_server_unreachable);
-  }
-  if ($code == 404) {
-    return array(0, $l_domain_configuration_not_found);
-  }
-  if ($code == 409) {
-    return array(0, $l_domain_configuration_disable);
-  }
-  if ($code == 303) {
-    return followRedirect($curl["redirectUrl"]);
-  }
-}
-
-function curlPostWithHeader($url, $extraParams = array(), $json = "") {
-  global $obm;
-
-  $imapArchiveRootPath = imapArchiveRootPath();
-  $curlUrl = $imapArchiveRootPath.$url."?".http_build_query($extraParams);
-
-  $curl = basicAuthCurlInit($curlUrl);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($curl, CURLOPT_POST, 1);
-  curl_setopt($curl, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-type: application/json'));
-  curl_setopt($curl, CURLOPT_HEADER, true);
-  curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
-
-  return curlExecWithHeader($curl);
-}
-
-function curlExecWithHeader($curl) {
-
-  $success = curl_exec($curl);
-  $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-  $errno = curl_errno($curl);
-	
-  $redirectUrl = preg_match_all('/^Location:(.*)$/mi', $success, $matches) ? trim($matches[1][0]) : '';
-  
-  curl_close($curl);
-
-  return array("success" => $success, "code" => $code, "errno" => $errno, "redirectUrl" => $redirectUrl);
-}
-
-function followRedirect($redirectUrl) {
-  global $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server;
-
-  $curl = basicAuthCurlInit($redirectUrl);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-    
-  $result = curlExec($curl);
-    
-  $successGet = $result["success"];
-  $codeGet = $result["code"];
-  $errnoGet = $result["errno"];
-  
-  if($errnoGet){
-    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errnoGet." - HTTP code $code)");
-    return array(0, $l_could_not_login_imap_archive_server);
-  }
-  if ($codeGet == 0) {
-    return array(0, $l_imap_archive_server_unreachable);
-  }
-  if ($codeGet == 200) {
-    return array(1, json_decode($successGet));
-  }
+  $maxRedirects = 1;
+  return http_post($manualLaunchPath, array("archive_treatment_kind" => $archiveTreatmentKind), $max_redirects)->as_json();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -457,53 +260,21 @@ function followRedirect($redirectUrl) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_logs($runId) {
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
-  $userInfo = get_user_info($obm['uid']);
-
-  if(empty($userInfo["email"])) {
-    return array(0, $l_email_address_not_found);
-  }
 
   $logPath = ImapArchiveUrls::logs($obm["domain_uuid"], $runId);
-  $imapArchiveRootPath = null;
-  try {
-    $imapArchiveRootPath = imapArchiveRootPath();
-  }
-  catch(ImapArchiveServerNotFoundException $ex) {
-      return array(0, $l_imap_archive_server_not_found);
-  }
-  $curlUrl = $imapArchiveRootPath.$logPath;
-  
-  $curl = basicAuthCurlInit($curlUrl);
-  curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($curl, CURLOPT_WRITEFUNCTION, 'curl_write_flush');
-  
-  $success = curl_exec($curl);
-  $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-  $errno = curl_errno($curl);
-  
-  curl_close($curl);
-  
-  if($errno){
-    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
-    return array(0, $l_could_not_login_imap_archive_server);
-  }
-  if ($code == 0) {
-    return array(0, $l_imap_archive_server_unreachable);
-  }
-  if ($code == 200 || $code == 204 || $code == 206) {
-    return array(1, null);
-  }
-}
+  $imapArchiveRootPath = imapArchiveRootPath();
 
-function curl_write_flush($curl_handle, $chunk)
-{
-  echo "$chunk";
-  
-  ob_flush();
-  flush();
-  
-  return strlen($chunk);
+  $auth_config = build_http_config_with_auth();
+  $config = HttpConfig::from_config($auth_config,
+    array(
+      new HttpContentCallback(function ($chunk) {
+        echo "$chunk";
+        ob_flush();
+        flush();
+      })
+    )
+  );
+  return (new HttpClient($config))->get(new Url($imapArchiveRootPath.$logPath));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -513,12 +284,6 @@ function curl_write_flush($curl_handle, $chunk)
 ///////////////////////////////////////////////////////////////////////////////
 function treatments_history($onlyFailure, $limit, $sort) {
   global $obm;
-  global $l_email_address_not_found, $l_imap_archive_server_unreachable, $l_could_not_login_imap_archive_server, $l_imap_archive_server_not_found;
-  $userInfo = get_user_info($obm['uid']);
-
-  if(empty($userInfo["email"])) {
-    return array(0, $l_email_address_not_found);
-  }
 
   $historyPath = ImapArchiveUrls::treatments($obm["domain_uuid"]);
 
@@ -528,31 +293,20 @@ function treatments_history($onlyFailure, $limit, $sort) {
       "limit" => $limit,
       "sort_by_date" => $sort
   );
-
-  try {
-    $curl = curlGet($historyPath, $parameters);
-  }
-  catch(ImapArchiveServerNotFoundException $ex) {
-      return array(0, $l_imap_archive_server_not_found);
-  }
-  $success = $curl["success"];
-  $code = $curl["code"];
-  $errno = $curl["errno"];
-  
-  
-  if($errno){
-    error_log("Couldn't login to IMAP archive server (Curl ERRNO: ".$errno." - HTTP code $code)");
-    return array(0, $l_could_not_login_imap_archive_server);
-  }
-  if ($code == 0) {
-    return array(0, $l_imap_archive_server_unreachable);
-  }
-  if ($code == 200) {
-    return array(1, json_decode($success));
-  }
+  return http_get($historyPath, $parameters)->as_json();
 }
 
-class ImapArchiveServerNotFoundException extends Exception {
+function get_user_info_with_email_or_die() {
+  global $obm;
+  $userInfo = get_user_info($obm['uid']);
+  if(empty($userInfo["email"])) {
+    throw new ImapArchiveNoEmailException();
+  }
+  return $userInfo;
 }
+
+class ImapArchiveException extends Exception {}
+
+class ImapArchiveNoEmailException extends Exception {}
 
 ?>

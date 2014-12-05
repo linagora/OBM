@@ -67,73 +67,189 @@ page_close();
 
 $params['user_id'] = $obm['uid'];
 
-$status = connect_to_imap_archive_service() ;
-if ($status[0] != 1) {
-  $display['msg'] .= display_err_msg("$status[1]");
-} else {
+try {
+
+  connect_to_imap_archive_service();
+
   if ($action == 'update') {
-    if (!check_configuration($params)) {
-      $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
-      $action = 'detailupdate';
-    } else {
-      $ret = run_query_imap_archive_update((object) $params);
-      if ($ret[0] == 1) {
-        $display['msg'] .= display_ok_msg($l_update_ok);
-      } else {
-        $display['msg'] .= display_err_msg($l_update_error);
-      }
-      $action = 'detailconsult';
-    }
-  } else if ($action == 'next_treatment_date') {
-    $configuration = (Object) $params['configuration'];
-    $status = calculate_next_treatment_date_from_imap_archive_service($configuration);
-    if ($status[0] != 1) {
-      $display['msg'] .= display_err_msg($status[1]);
-    } else {
-      $nextTreatmentDate = new DateTime($status[1]->nextTreatmentDate);
-      $nextTreatmentDate->setTimezone(new DateTimeZone('UTC'));
-      $display['json'] = json_encode($nextTreatmentDate->format('Y-m-d H:i'));
-      echo '('.$display['json'].')';
-    }
-    exit();
-  } else if ($action == 'manual_launch') {
-    $archiveTreatmentKind = $params['archive_treatment_kind'];
-    $status = manual_launch($archiveTreatmentKind);
-    if ($status[0] == 1) {
-      $display['msg'] .= display_ok_msg($l_archiving_launched);
-      $runId = $status[1]->runId;
-      $redirectUrl = $_SERVER['SCRIPT_NAME']."?action=log_page&run_id=$runId";
-      redirect_to($redirectUrl);
-      exit();
-    } else {
-      $display['msg'] .= display_err_msg($status[1]);
-      $action = 'detailconsult';
-    }
-  } else if ($action == 'archiving_logs') {
-    echo "<pre>";
-    $runId = $params['run_id'];
-    $status = get_logs($runId);
-    if ($status[0] != 1) {
-      $display['msg'] .= display_err_msg($status[1]);
-    }
-    echo "</pre>";
-    exit();
+    display_update($params);
   }
-      
-  $status = load_configuration_from_imap_archive_service();
-  if ($status[0] != 1) {
-    $display['msg'] .= display_err_msg($status[1]);
+  elseif ($action == 'next_treatment_date') {
+    display_next_treatment_date($params);
+  }
+  elseif ($action == 'manual_launch') {
+    display_manual_launch($params);
+  }
+  elseif ($action == 'archiving_logs') {
+    display_archiving_logs($params);
+  }
+  elseif ($action == 'detailupdate') {
+    display_detailupdate($params);
+  }
+  elseif ($action == 'log_page') {
+    display_log_page($params);
+  }
+  else { //if ($action == 'detailconsult' or no action or unknown action) {
+    display_detailconsult($params);
+  }
+}
+catch(Exception $e) {
+  display_exception($e);
+}
+
+function display_update($params) {
+  global $display, $err;
+  global $l_invalid_data, $l_update_ok;
+
+  if (!check_configuration($params)) {
+    $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
+    display_detailupdate($params);
   } else {
-    $configuration = $status[1];
-    
-    if ($action == 'detailconsult') {
-      $display['detail'] = dis_imap_archive_consult($params, $configuration);
-    } elseif ($action == 'detailupdate') {
-      $display['detail'] = dis_imap_archive_form($params, $configuration);
-    } elseif ($action == 'log_page') {
-      $display['detail'] = dis_log_page($params);
+    try {
+      run_query_imap_archive_update((object) $params);
+      $display['msg'] .= display_ok_msg($l_update_ok);
+    }
+    catch(Exception $e) {
+      display_exception($e);
+    }
+    display_detailconsult($params);
+  }
+}
+
+function display_next_treatment_date($params) {
+  global $display;
+
+  $configuration = (Object) $params['configuration'];
+  try {
+    $treatment_date_string = calculate_next_treatment_date_from_imap_archive_service($configuration);
+    $next_treatment_date = new DateTime($treatment_date_string);
+    $next_treatment_date->setTimezone(new DateTimeZone('UTC'));
+    $display['json'] = json_encode($next_treatment_date->format('Y-m-d H:i'));
+    echo '('.$display['json'].')';
+  }
+  catch (Exception $e) {
+    display_exception($e);
+    http_response_code(500);
+  }
+  exit();
+}
+
+function display_manual_launch($params) {
+  global $display;
+
+  try {
+    $archive_treatment_kind = $params['archive_treatment_kind'];
+    $launch_data = manual_launch($archive_treatment_kind);
+    $display['msg'] .= display_ok_msg($l_archiving_launched);
+    $run_id = $launch_data->runId;
+
+    $redirect_url = $_SERVER['SCRIPT_NAME']."?action=log_page&run_id=$run_id";
+    redirect_to($redirect_url);
+    exit();
+  }
+  catch (Exception $e) {
+    display_exception($e);
+    display_detailconsult($params);
+  }
+}
+
+function display_archiving_logs($params) {
+  echo "<pre>";
+  $run_id = $params['run_id'];
+  try {
+    get_logs($run_id);
+  }
+  catch(Exception $e) {
+    display_exception($e);
+  }
+  echo "</pre>";
+  exit();
+}
+
+function display_detailconsult($params) {
+  global $display;
+
+  $configuration = load_configuration_from_imap_archive_service();
+
+  $next_treatment_date = get_result_or_empty(function() use($configuration) {
+    return calculate_next_treatment_date_from_imap_archive_service($configuration);
+  });
+  $history = get_result_or_empty(function() {
+    return treatments_history(false, 3, ImapArchiveOrdering::DESC);
+  });
+  $last_failure = get_result_or_empty(function() {
+    return treatments_history(true, 1, ImapArchiveOrdering::DESC);
+  });
+
+  $display['detail'] = dis_imap_archive_consult($params, $configuration,
+    $next_treatment_date, $history, $last_failure);
+}
+
+function display_detailupdate($params) {
+  global $display;
+
+  $configuration = load_configuration_from_imap_archive_service();
+
+  $next_treatment_date = get_result_or_empty(function() use($configuration) {
+    return calculate_next_treatment_date_from_imap_archive_service($configuration);
+  });
+
+  $display['detail'] = dis_imap_archive_form($params, $configuration, $next_treatment_date);
+}
+
+function get_result_or_empty($callback) {
+  $result = null;
+  try {
+    $result = $callback();
+  }
+  catch (Exception $e) {
+    display_exception($e);
+    $result = '';
+  }
+  return $result;
+}
+
+function display_log_page($params) {
+  global $display;
+
+  $display['detail'] = dis_log_page($params);
+}
+
+function display_exception($e) {
+  global $display;
+  global $l_email_address_not_found, $l_imap_archive_server_not_found, $l_domain_configuration_not_found;
+  global $l_could_not_login_imap_archive_server, $l_imap_archive_server_unreachable;
+
+  $message = null;
+  if ($e instanceof ImapArchiveNoEmailException) {
+    $message = $l_email_address_not_found;
+  }
+  elseif ($e instanceof ImapArchiveServerNotFoundException) {
+    $message = $l_imap_archive_server_not_found;
+  }
+  elseif ($e instanceof HttpClientHttpException) {
+    error_log("Got HTTP error ".$e->code." with URL ".$e->url);
+    if ($e->code == 404) {
+      $message = $l_domain_configuration_not_found;
+    }
+    else {
+      $message = $l_could_not_login_imap_archive_server;
     }
   }
+  elseif ($e instanceof HttpClientOtherException) {
+    error_log("Curl error ".$e->curl_errno." (".$e->message.") with URL ".$e->url);
+    $CURLE_COULDNT_CONNECT = 7;
+    if ($e->curl_errno == $CURLE_COULDNT_CONNECT) {
+      $message = $l_imap_archive_server_unreachable;
+    }
+    else {
+      $message = $l_could_not_login_imap_archive_server;
+    }
+  }
+  else {
+    error_log("Unknown error");
+  }
+  $display['msg'] .= display_err_msg($message);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
