@@ -136,12 +136,14 @@ cp -a obm-locator/obm-locator.centos.sh $RPM_BUILD_ROOT%{_initrddir}/obm-locator
 
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/obm-imap-archive
 mkdir -p $RPM_BUILD_ROOT%{_datarootdir}/obm-imap-archive
+mkdir -p $RPM_BUILD_ROOT%{_docdir}/obm-imap-archive
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/obm-imap-archive
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/lib/obm-imap-archive
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/run/obm-imap-archive
 cp -r imap-archive/target/imap-archive.jar $RPM_BUILD_ROOT%{_datarootdir}/obm-imap-archive/
 cp -r imap-archive/target/lib $RPM_BUILD_ROOT%{_datarootdir}/obm-imap-archive/
 cp -r imap-archive/src/main/rpm/imap-archive-start.sh $RPM_BUILD_ROOT%{_datarootdir}/obm-imap-archive/
+cp -r imap-archive/target/generated-docs/* $RPM_BUILD_ROOT%{_docdir}/obm-imap-archive/
 cp -r imap-archive/logback-include.xml $RPM_BUILD_ROOT%{_sysconfdir}/obm-imap-archive/logback.xml
 cp -r imap-archive/obm-imap-archive.ini $RPM_BUILD_ROOT%{_sysconfdir}/obm-imap-archive/obm-imap-archive.ini
 mkdir -p $RPM_BUILD_ROOT%{_initrddir}
@@ -187,11 +189,13 @@ cp -p webapp-common-dependencies/target/tomcat/*.jar \
 %defattr(-,root,root,-)
 %{_sysconfdir}/obm-imap-archive
 %{_datarootdir}/obm-imap-archive
+%{_docdir}/obm-imap-archive
 %{_initrddir}/obm-imap-archive
 %attr(0775,imap-archive,root) %{_localstatedir}/log/obm-imap-archive
 %attr(0775,imap-archive,root) %{_localstatedir}/lib/obm-imap-archive
 %attr(0775,imap-archive,root) %{_localstatedir}/run/obm-imap-archive
 %attr(0775,root,root) %{_datarootdir}/obm-imap-archive
+%attr(0775,root,root) %{_docdir}/obm-imap-archive
 %attr(0775,root,root) %{_initrddir}/obm-imap-archive
 %config(noreplace) %{_sysconfdir}/obm-imap-archive/logback.xml
 %config(noreplace) %{_sysconfdir}/obm-imap-archive/obm-imap-archive.ini
