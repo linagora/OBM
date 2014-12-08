@@ -1025,7 +1025,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(archiveMailboxName)).andReturn(false);
 		expect(storeClient.create(archiveMailboxName, "mydomain_org_archive")).andReturn(true);
 		expect(storeClient.setAcl(archiveMailboxName, ObmSystemUser.CYRUS, MailboxImpl.ALL_IMAP_RIGHTS)).andReturn(true);
-		expect(storeClient.setAcl(archiveMailboxName, "usera@mydomain.org", MailboxImpl.READ_IMAP_RIGHTS)).andReturn(true);
+		expect(storeClient.setAcl(archiveMailboxName, "usera@mydomain.org", MailboxImpl.READ_SEENFLAG_IMAP_RIGHTS)).andReturn(true);
 		expect(storeClient.setQuota(archiveMailboxName, ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE)).andReturn(true);
 		expect(storeClient.setAnnotation(archiveMailboxName, AnnotationEntry.SHAREDSEEN, AttributeValue.sharedValue("true"))).andReturn(true);
 		expect(storeClient.select(archiveMailboxName)).andReturn(true);

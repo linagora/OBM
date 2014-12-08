@@ -50,7 +50,7 @@ import com.google.common.base.Preconditions;
 public class MailboxImpl implements Mailbox {
 
 	public static final String ALL_IMAP_RIGHTS = "lrswipkxtecda";
-	public static final String READ_IMAP_RIGHTS = "lr";
+	public static final String READ_SEENFLAG_IMAP_RIGHTS = "lrs";
 
 	public static MailboxImpl from(String name, Logger logger, StoreClient storeClient) {
 		Preconditions.checkNotNull(name);
@@ -95,7 +95,7 @@ public class MailboxImpl implements Mailbox {
 
 	@Override
 	public void grantReadRightsTo(String user) throws ImapSetAclException { 
-		setAcl(user, READ_IMAP_RIGHTS);
+		setAcl(user, READ_SEENFLAG_IMAP_RIGHTS);
 	}
 
 	@Override
