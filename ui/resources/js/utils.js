@@ -302,6 +302,12 @@ Obm.Error = {
         errors.warning = new Hash(errors.warning);
         Obm.Error.globalMessage(errors);
         break;
+      case 500:
+        var errors = JSON.decode(caller.xhr.responseText, false);
+        errors.error = new Hash(errors.error);
+        errors.warning = new Hash(errors.warning);
+        Obm.Error.globalMessage(errors);
+        break;
       case 503:
         var errors = JSON.decode(caller.xhr.responseText, false);
         errors.error = new Hash(errors.error);

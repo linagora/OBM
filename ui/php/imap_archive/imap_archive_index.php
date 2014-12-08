@@ -53,6 +53,7 @@ include_once("$obminclude/global_pref.inc");
 require_once('imap_archive_display.inc');
 require_once('imap_archive_query.inc');
 require_once("$obminclude/of/of_category.inc");
+require_once("$obminclude/of/of_error.php");
 require_once("$obminclude/of/of_right.inc");
 $extra_js_include[] = 'imap_archive.js';
 
@@ -128,8 +129,10 @@ function display_next_treatment_date($params) {
     echo '('.$display['json'].')';
   }
   catch (Exception $e) {
-    display_exception($e);
     http_response_code(500);
+    OBM_Error::getInstance()->addError('internal', get_error_message($e));
+    echo OBM_Error::getInstance()->toJson();
+    exit();
   }
   exit();
 }
@@ -215,10 +218,9 @@ function display_log_page($params) {
   $display['detail'] = dis_log_page($params);
 }
 
-function display_exception($e) {
-  global $display;
+function get_error_message($e) {
   global $l_email_address_not_found, $l_imap_archive_server_not_found, $l_domain_configuration_not_found;
-  global $l_could_not_login_imap_archive_server, $l_imap_archive_server_unreachable;
+  global $l_could_not_login_imap_archive_server, $l_imap_archive_server_unreachable, $l_unknown_error;
 
   $message = null;
   if ($e instanceof ImapArchiveNoEmailException) {
@@ -247,11 +249,16 @@ function display_exception($e) {
     }
   }
   else {
-    error_log("Unknown error");
+    $message = $l_unknown_error;
   }
-  $display['msg'] .= display_err_msg($message);
+  return $message;
 }
 
+function display_exception($e) {
+  global $display;
+
+  $display['msg'] .= display_err_msg(get_error_message($e));
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////

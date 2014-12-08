@@ -58,3 +58,4 @@ $l_unsupported_iframe = "Your browser does not support iframes.";
 $l_archiving_launched = "The archiving process has been started successfully.";
 $l_excluded_folder_error = "Invalid excluded folder! It must not contain special characters";
 $l_confirm_manual_launch = "A new tab will be opened with the archive process logs in it. Are you sure you want to trigger archiving manually now?";
+$l_unknown_error = "Unknown error";

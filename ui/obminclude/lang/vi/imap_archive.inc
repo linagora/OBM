@@ -58,3 +58,4 @@ $l_unsupported_iframe = "Trình duyệt của bạn không hỗ trợ iframe.";
 $l_archiving_launched = "Các kho lưu trữ có-beens Ra mắt thành công.";
 $l_excluded_folder_error = "Thư mục loại trừ không hợp lệ! Nó không được chứa ký tự đặc biệt";
 $l_confirm_manual_launch = "Một tab mới sẽ được mở ra với các bản ghi quá trình lưu trữ trong đó. Bạn có chắc chắn bạn muốn kích hoạt lưu trữ bằng tay bây giờ?";
+$l_unknown_error = "Lỗi không xác định";
