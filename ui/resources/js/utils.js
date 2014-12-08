@@ -285,37 +285,28 @@ Obm.MultipleField = new Class({
 Obm.Error = {
  
   parseStatus: function(caller) {
-    switch(caller.status) {
-      case 400:
+    if (caller.status == 401) {
+      window.location.href= obm.vars.consts.obmUrl + '/';
+      exit;
+    }
+    else {
+      try {
         var errors = JSON.decode(caller.xhr.responseText, false);
         errors.error = new Hash(errors.error);
         errors.warning = new Hash(errors.warning);
-        Obm.Error.contentMessage(errors, caller);      
-        break;
-      case 401:
-        window.location.href= obm.vars.consts.obmUrl + '/';
-        exit;
-        break;
-      case 403:
-        var errors = JSON.decode(caller.xhr.responseText, false);
-        errors.error = new Hash(errors.error);
-        errors.warning = new Hash(errors.warning);
-        Obm.Error.globalMessage(errors);
-        break;
-      case 500:
-        var errors = JSON.decode(caller.xhr.responseText, false);
-        errors.error = new Hash(errors.error);
-        errors.warning = new Hash(errors.warning);
-        Obm.Error.globalMessage(errors);
-        break;
-      case 503:
-        var errors = JSON.decode(caller.xhr.responseText, false);
-        errors.error = new Hash(errors.error);
-        errors.warning = new Hash(errors.warning);
-        Obm.Error.globalMessage(errors);
-        break;
-      default:
-        break;
+        if (caller.status == 400) {
+          Obm.Error.contentMessage(errors, caller);
+        }
+        else {
+          Obm.Error.globalMessage(errors);
+        }
+      }
+      catch(e) {
+        if (window.console && window.console.error) {
+          window.console.error("Got error ", e, " while attempting to display a server error "+
+                  "(code ", caller.status, "): ", caller.xhr.responseText);
+        }
+      }
     }
   },
 
