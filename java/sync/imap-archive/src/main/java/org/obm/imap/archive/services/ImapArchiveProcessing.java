@@ -31,7 +31,10 @@
 
 package org.obm.imap.archive.services;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.obm.annotations.transactional.Transactional;
@@ -66,6 +69,7 @@ import org.obm.imap.archive.mailbox.MailboxPaths;
 import org.obm.imap.archive.mailbox.TemporaryMailbox;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
@@ -82,6 +86,9 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Range;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -248,42 +255,79 @@ public class ImapArchiveProcessing {
 	private void batchCopyFromTemporaryToArchive(Mailbox mailbox, TemporaryMailbox temporaryMailbox, MessageSet messageSet, ProcessedFolder.Builder processedFolder, ProcessedTask processedTask) 
 			throws MailboxNotFoundException, IMAPException, MailboxFormatException {
 		
-		Optional<Long> first = messageSet.first();
-		if (!first.isPresent()) {
-			return;
+		for (MessageSet partitionMessageSet : messageSet.partition(imapArchiveConfigurationService.getProcessingBatchSize())) {
+			Map<Year, MessageSet> mappedByYear = mapByYear(mailbox, partitionMessageSet);
+			for (Map.Entry<Year, MessageSet> entry : mappedByYear.entrySet()) {
+				ArchiveMailbox archiveMailbox = createArchiveMailbox(mailbox, entry.getKey(), processedTask);
+				
+				MessageSet yearMessageSet = entry.getValue();
+				copyTemporaryMessagesToArchive(temporaryMailbox, yearMessageSet, archiveMailbox);
+				processedFolder.addUid(yearMessageSet.max());
+			}
+		}
+	}
+
+	private void copyTemporaryMessagesToArchive(TemporaryMailbox temporaryMailbox, 
+			MessageSet partitionMessageSet, ArchiveMailbox archiveMailbox) 
+					throws MailboxNotFoundException, ImapSelectException, IMAPException {
+		temporaryMailbox.select();
+		MessageSet copiedMessageSet = temporaryMailbox.uidCopy(partitionMessageSet, archiveMailbox);
+		addSeenFlags(archiveMailbox, copiedMessageSet);
+	}
+
+	private Map<Year, MessageSet> mapByYear(Mailbox mailbox, MessageSet messageSet) throws ImapSelectException, MailboxNotFoundException {
+		if (messageSet.isEmpty()) {
+			return ImmutableMap.of();
 		}
 		
 		mailbox.select();
-		Year year = Year.from(FluentIterable.from(mailbox.fetchInternalDate(MessageSet.singleton(first.get())))
-				.first().get());
+		Year year = guessRangeYear(mailbox, messageSet);
+		MessageSet otherYears = searchOutOfYearMessages(mailbox, messageSet, year);
 		
-		ArchiveMailbox archiveMailbox = createArchiveMailbox(mailbox, year, processedTask);
-		
-		MessageSet.Builder copiedMessageSet = MessageSet.builder();
-		for (MessageSet partitionMessageSet : messageSet.partition(imapArchiveConfigurationService.getProcessingBatchSize())) {
+		HashMap<Year, MessageSet> messageSetsByYear = Maps.newHashMap(
+			Maps.transformValues(
+				Multimaps
+					.index(mailbox.fetchInternalDate(otherYears), new YearFromInternalDate())
+					.asMap(),
+					new CreateMessageSet<>()));
+		messageSetsByYear.put(year, messageSet.remove(otherYears));
+		return messageSetsByYear;
+	}
 
-			mailbox.select();
-			MessageSet uidsInPreviousYear = mailbox.uidSearch(SearchQuery.builder()
-					.before(archiveMailbox.getYear().previous().toDate())
-					.messageSet(partitionMessageSet)
-					.build());
-			MessageSet uidsInNextYear = mailbox.uidSearch(SearchQuery.builder()
-					.after(archiveMailbox.getYear().next().toDate())
-					.messageSet(partitionMessageSet)
-					.build());
-
-			MessageSet currentYearMessageSet = partitionMessageSet.remove(uidsInPreviousYear).remove(uidsInNextYear);
-			
-			batchCopyFromTemporaryToArchive(mailbox, temporaryMailbox, uidsInPreviousYear, processedFolder, processedTask);
-			batchCopyFromTemporaryToArchive(mailbox, temporaryMailbox, uidsInNextYear, processedFolder, processedTask);
-			
-			if (!currentYearMessageSet.isEmpty()) {
-				temporaryMailbox.select();
-				copiedMessageSet.add(temporaryMailbox.uidCopy(currentYearMessageSet, archiveMailbox));
-				processedFolder.addUid(currentYearMessageSet.max());
+	private static class CreateMessageSet<T extends Collection<InternalDate>> implements Function<T, MessageSet> {
+		@Override
+		public MessageSet apply(T input) {
+			MessageSet.Builder messageSetBuilder = MessageSet.builder();
+			for (InternalDate internalDate: input) {
+				messageSetBuilder.add(internalDate.getUid());
 			}
+			return messageSetBuilder.build();
 		}
-		addSeenFlags(archiveMailbox, copiedMessageSet.build());
+	}
+	
+	private static class YearFromInternalDate implements Function<InternalDate, Year> {
+		@Override
+		public Year apply(InternalDate input) {
+			return Year.from(input);
+		}
+	}
+	
+	private MessageSet searchOutOfYearMessages(Mailbox mailbox, MessageSet messageSet, Year year) {
+		return mailbox.uidSearch(SearchQuery.builder()
+				.between(true)
+				.beforeExclusive(year.toDate())
+				.afterInclusive(year.next().toDate())
+				.messageSet(messageSet)
+				.build());
+	}
+
+	private Year guessRangeYear(Mailbox mailbox, MessageSet messageSet) {
+		return Year
+				.from(
+					FluentIterable.from(
+							mailbox.fetchInternalDate(
+									MessageSet.singleton(messageSet.first().get())))
+				.first().get());
 	}
 
 	private ArchiveMailbox createArchiveMailbox(Mailbox mailbox, Year year, ProcessedTask processedTask) 
@@ -471,7 +515,7 @@ public class ImapArchiveProcessing {
 	@VisibleForTesting FluentIterable<Long> searchMailUids(Mailbox mailbox, HigherBoundary higherBoundary, final Optional<Long> previousLastUid) {
 		return FluentIterable.from(
 				mailbox.uidSearch(SearchQuery.builder()
-					.before(higherBoundary.getHigherBoundary().toDate())
+					.beforeExclusive(higherBoundary.getHigherBoundary().toDate())
 					.messageSet(messageSetFromPreviousToMax(previousLastUid))
 					.build()));
 	}

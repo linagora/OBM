@@ -49,9 +49,11 @@ public class UIDSearchCommand extends Command<MessageSet> {
 
 	private final static String IMAP_COMMAND = "UID SEARCH";
 	private final SearchQuery sq;
+	private DateFormat dateFormat;
 
 	public UIDSearchCommand(SearchQuery sq) {
 		this.sq = sq;
+		this.dateFormat = new SimpleDateFormat("d-MMM-yyyy", Locale.ENGLISH);
 	}
 
 	@Override
@@ -60,13 +62,18 @@ public class UIDSearchCommand extends Command<MessageSet> {
 		if (!sq.isMatchDeleted()) {
 			cmd += " NOT DELETED";
 		}
-		if (sq.getAfter() != null) {
-			DateFormat df = new SimpleDateFormat("d-MMM-yyyy", Locale.ENGLISH);
-			cmd += " NOT BEFORE " + df.format(sq.getAfter());
-		}
-		if (sq.getBefore() != null) {
-			DateFormat df = new SimpleDateFormat("d-MMM-yyyy", Locale.ENGLISH);
-			cmd += " BEFORE " + df.format(sq.getBefore());
+		if (sq.isBetween()) {
+			cmd += " OR";
+			cmd += " BEFORE " + dateFormat.format(sq.getBefore());
+			cmd += " SINCE " + dateFormat.format(sq.getAfter());
+			
+		} else {
+			if (sq.getAfter() != null) {
+				cmd += " NOT BEFORE " + dateFormat.format(sq.getAfter());
+			}
+			if (sq.getBefore() != null) {
+				cmd += " BEFORE " + dateFormat.format(sq.getBefore());
+			}
 		}
 		if (sq.getMessageSet() != null) {
 			cmd += " UID " + ImapMessageSet.wrap(sq.getMessageSet()).asString(); 

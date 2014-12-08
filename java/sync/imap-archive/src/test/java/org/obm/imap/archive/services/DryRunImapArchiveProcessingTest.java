@@ -179,7 +179,7 @@ public class DryRunImapArchiveProcessingTest {
 		expectLastCall();
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(higherBoundary.toDate())
+				.beforeExclusive(higherBoundary.toDate())
 				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(messageSet);

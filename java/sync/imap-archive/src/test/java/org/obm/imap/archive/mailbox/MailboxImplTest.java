@@ -249,4 +249,16 @@ public class MailboxImplTest {
 		
 		assertThat(internalDates).containsOnly(expectedInternalDate);
 	}
+	
+	@Test
+	public void fetchInternalDateShouldReturnEmptyWhenEmptyMessageSet() throws Exception {
+		MessageSet messageSet = MessageSet.empty();
+		
+		control.replay();
+		MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+		List<InternalDate> internalDates = mailbox.fetchInternalDate(messageSet);
+		control.verify();
+		
+		assertThat(internalDates).isEmpty();
+	}
 }

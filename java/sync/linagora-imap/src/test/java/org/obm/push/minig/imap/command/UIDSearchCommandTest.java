@@ -33,6 +33,7 @@ package org.obm.push.minig.imap.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
@@ -74,5 +75,18 @@ public class UIDSearchCommandTest {
 		CommandArgument commandArgument = command.buildCommand();
 		
 		assertThat(commandArgument.getCommandString()).isEqualTo("UID SEARCH");
+	}
+	
+	@Test
+	public void buildCommandShouldManagerBetween() {
+		UIDSearchCommand command = new UIDSearchCommand(SearchQuery.builder()
+				.between(true)
+				.beforeExclusive(DateTime.parse("2014-01-01").toDate())
+				.afterInclusive(DateTime.parse("2015-01-01").toDate())
+				.includeDeleted(true)
+				.build());
+		CommandArgument commandArgument = command.buildCommand();
+		
+		assertThat(commandArgument.getCommandString()).isEqualTo("UID SEARCH OR BEFORE 1-Jan-2014 SINCE 1-Jan-2015");
 	}
 }

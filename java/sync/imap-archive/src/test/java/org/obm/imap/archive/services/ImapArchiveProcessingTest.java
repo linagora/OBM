@@ -240,7 +240,7 @@ public class ImapArchiveProcessingTest {
 		expectLastCall();
 		expect(storeClient.select("user/usera@mydomain.org")).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(higherBoundary.toDate())
+				.beforeExclusive(higherBoundary.toDate())
 				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(MessageSet.empty());
@@ -379,7 +379,7 @@ public class ImapArchiveProcessingTest {
 		expectLastCall();
 		expect(storeClient.select("user/usera@mydomain.org")).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(higherBoundary.toDate())
+				.beforeExclusive(higherBoundary.toDate())
 				.messageSet(MessageSet.builder().add(Range.closed(previousLastUid, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(MessageSet.empty());
@@ -531,7 +531,7 @@ public class ImapArchiveProcessingTest {
 				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
 		
 		expectImapCommandsOnMailboxProcessingFails("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org",
-				ImmutableSet.of(Range.closed(1l, 20l), Range.closed(21l, 40l), Range.closed(41l, 60l)), 20l,
+				ImmutableSet.of(Range.closed(2l, 21l), Range.closed(22l, 41l), Range.closed(42l, 61l)), 21l,
 				higherBoundary, treatmentDate, runId, storeClient);
 		
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org",
@@ -562,7 +562,7 @@ public class ImapArchiveProcessingTest {
 		expect(processedFolderDao.get(runId, ImapFolder.from("user/usera/Drafts@mydomain.org")))
 			.andReturn(Optional.<ProcessedFolder> absent());
 		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org", 
-				ImmutableSet.of(Range.closed(1l, 20l), Range.closed(21l, 40l), Range.closed(41l, 60l)), 
+				ImmutableSet.of(Range.closed(2l, 21l), Range.closed(22l, 41l), Range.closed(42l, 61l)), 
 				higherBoundary, treatmentDate, secondRunId, storeClient);
 		
 		expectImapCommandsOnAlreadyProcessedMailbox("user/usera/SPAM@mydomain.org", treatmentDate, higherBoundary, runId, secondRunId, 100, storeClient);
@@ -646,57 +646,48 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
+		expect(storeClient.select(mailboxName)).andReturn(true).times(2);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(higherBoundary.toDate())
+				.beforeExclusive(higherBoundary.toDate())
 				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(messageSet);
 		
-		expectCreateMailbox(mailboxName, temporaryMailboxName, storeClient);
+		expectCreateMailbox(temporaryMailboxName, storeClient);
 		
-		// first Year
-		long firstUid = messageSet.first().get();
-		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
-				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		MessageSet secondYearMessageSet = MessageSet.builder().add(secondYearRange).build();
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(Year.from(2014).previous().toDate())
-				.messageSet(messageSet)
-				.build()))
-			.andReturn(MessageSet.empty());
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(Year.from(2014).next().toDate())
+				.between(true)
+				.beforeExclusive(Year.from(2014).toDate())
+				.afterInclusive(Year.from(2014).next().toDate())
 				.messageSet(messageSet)
 				.build()))
 			.andReturn(secondYearMessageSet);
+		
+		// first Year
+		long firstUid = messageSet.first().get();
+		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
+				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
 		
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		expect(storeClient.uidCopy(messageSet, temporaryMailboxName)).andReturn(messageSet);
 		
 		MessageSet firstYearMessageSet = MessageSet.builder().add(firstYearRange).build();
-		expectCreateMailbox(mailboxName, firstYearArchiveMailboxName, storeClient);
+		expectCreateMailbox(firstYearArchiveMailboxName, storeClient);
 		expect(storeClient.uidCopy(firstYearMessageSet, firstYearArchiveMailboxName)).andReturn(firstYearMessageSet);
 		expect(storeClient.select(firstYearArchiveMailboxName)).andReturn(true);
 		expect(storeClient.uidStore(firstYearMessageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		// second Year
-		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(secondYearMessageSet.first().get())))
-			.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2015-01-03T11:53:00.000Z").toDate())));
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(Year.from(2015).previous().toDate())
-				.messageSet(secondYearMessageSet)
-				.build()))
-			.andReturn(MessageSet.empty());
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(Year.from(2015).next().toDate())
-				.messageSet(secondYearMessageSet)
-				.build()))
-			.andReturn(MessageSet.empty());
+		ImmutableList.Builder<InternalDate> internalDates = ImmutableList.builder();
+		for (long uid : secondYearMessageSet.asDiscreteValues()) {
+			internalDates.add(new InternalDate(uid, DateTime.parse("2015-01-03T11:53:00.000Z").toDate()));
+		}
+		expect(storeClient.uidFetchInternalDate(secondYearMessageSet))
+			.andReturn(internalDates.build());
 		
-		expectCreateMailbox(mailboxName, secondYearArchiveMailboxName, storeClient);
+		expectCreateMailbox(secondYearArchiveMailboxName, storeClient);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		expect(storeClient.uidCopy(secondYearMessageSet, secondYearArchiveMailboxName)).andReturn(secondYearMessageSet);
 		
@@ -755,8 +746,8 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.listAll())
 			.andReturn(listResult);
 		
-		Range<Long> currentYearRange = Range.closed(1l, 5l);
-		Range<Long> previousYearRange = Range.closed(6l, 10l);
+		Range<Long> currentYearRange = Range.closed(6l, 10l);
+		Range<Long> previousYearRange = Range.closed(1l, 5l);
 		Range<Long> nextYearRange = Range.closed(11l, 15l);
 		MessageSet.Builder messageSetBuilder = MessageSet.builder();
 		messageSetBuilder.add(currentYearRange);
@@ -766,62 +757,56 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
+		expect(storeClient.select(mailboxName)).andReturn(true).times(2);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(higherBoundary.toDate())
+				.beforeExclusive(higherBoundary.toDate())
 				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(messageSet);
 		
 		String temporaryMailboxName = "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org";
-		expectCreateMailbox(mailboxName, temporaryMailboxName, storeClient);
+		expectCreateMailbox(temporaryMailboxName, storeClient);
+		
+		MessageSet previousYearMessageSet = MessageSet.builder().add(previousYearRange).build();
+		MessageSet nextYearMessageSet = MessageSet.builder().add(nextYearRange).build();
+		expect(storeClient.uidSearch(SearchQuery.builder()
+				.between(true)
+				.beforeExclusive(Year.from(2014).toDate())
+				.afterInclusive(Year.from(2014).next().toDate())
+				.messageSet(messageSet)
+				.build()))
+			.andReturn(MessageSet.builder().add(previousYearMessageSet).add(nextYearMessageSet).build());
 		
 		// current Year
 		long firstUid = messageSet.first().get();
-		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
 				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
-		expect(storeClient.select(mailboxName)).andReturn(true);
-		MessageSet previousYearMessageSet = MessageSet.builder().add(nextYearRange).build();
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(Year.from(2014).previous().toDate())
-				.messageSet(messageSet)
-				.build()))
-			.andReturn(previousYearMessageSet);
-		MessageSet nextYearMessageSet = MessageSet.builder().add(nextYearRange).build();
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(Year.from(2014).next().toDate())
-				.messageSet(messageSet)
-				.build()))
-			.andReturn(nextYearMessageSet);
 		
+		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		expect(storeClient.uidCopy(messageSet, temporaryMailboxName)).andReturn(messageSet);
 		
 		MessageSet currentYearRangeCopiedUids = MessageSet.builder().add(Range.closed(3l, 7l)).build();
 		MessageSet firstYearMessageSet = MessageSet.builder().add(currentYearRange).build();
 		String currentYearArchiveMailboxName = "user/usera/ARCHIVE/2014/INBOX@mydomain.org";
-		expectCreateMailbox(mailboxName, currentYearArchiveMailboxName, storeClient);
+		expectCreateMailbox(currentYearArchiveMailboxName, storeClient);
 		expect(storeClient.uidCopy(firstYearMessageSet, currentYearArchiveMailboxName)).andReturn(currentYearRangeCopiedUids);
 		expect(storeClient.select(currentYearArchiveMailboxName)).andReturn(true);
 		expect(storeClient.uidStore(currentYearRangeCopiedUids, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
-		// previous Year
-		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(previousYearMessageSet.first().get())))
-			.andReturn(ImmutableList.of(new InternalDate(previousYearMessageSet.first().get(), DateTime.parse("2013-01-03T11:53:00.000Z").toDate())));
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(Year.from(2013).previous().toDate())
-				.messageSet(previousYearMessageSet)
-				.build()))
-			.andReturn(MessageSet.empty());
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(Year.from(2013).next().toDate())
-				.messageSet(previousYearMessageSet)
-				.build()))
-			.andReturn(MessageSet.empty());
+		ImmutableList.Builder<InternalDate> otherYearsInternalDates = ImmutableList.builder();
+		for (long uid : previousYearMessageSet.asDiscreteValues()) {
+			otherYearsInternalDates.add(new InternalDate(uid, DateTime.parse("2013-01-03T11:53:00.000Z").toDate()));
+		}
+		for (long uid : nextYearMessageSet.asDiscreteValues()) {
+			otherYearsInternalDates.add(new InternalDate(uid, DateTime.parse("2015-01-03T11:53:00.000Z").toDate()));
+		}
+		expect(storeClient.uidFetchInternalDate(MessageSet.builder().add(previousYearMessageSet).add(nextYearMessageSet).build()))
+			.andReturn(otherYearsInternalDates.build());
 		
+		// previous Year
 		String previousYearArchiveMailboxName = "user/usera/ARCHIVE/2013/INBOX@mydomain.org";
-		expectCreateMailbox(mailboxName, previousYearArchiveMailboxName, storeClient);
+		expectCreateMailbox(previousYearArchiveMailboxName, storeClient);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		MessageSet previousYearRangeCopiedUids = MessageSet.builder().add(Range.closed(8l, 12l)).build();
 		expect(storeClient.uidCopy(previousYearMessageSet, previousYearArchiveMailboxName)).andReturn(previousYearRangeCopiedUids);
@@ -830,22 +815,8 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidStore(previousYearRangeCopiedUids, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		// next Year
-		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(nextYearMessageSet.first().get())))
-			.andReturn(ImmutableList.of(new InternalDate(nextYearMessageSet.first().get(), DateTime.parse("2015-01-03T11:53:00.000Z").toDate())));
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(Year.from(2015).previous().toDate())
-				.messageSet(nextYearMessageSet)
-				.build()))
-			.andReturn(MessageSet.empty());
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(Year.from(2015).next().toDate())
-				.messageSet(nextYearMessageSet)
-				.build()))
-			.andReturn(MessageSet.empty());
-		
 		String nextYearArchiveMailboxName = "user/usera/ARCHIVE/2015/INBOX@mydomain.org";
-		expectCreateMailbox(mailboxName, nextYearArchiveMailboxName, storeClient);
+		expectCreateMailbox(nextYearArchiveMailboxName, storeClient);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		MessageSet nextYearRangeCopiedUids = MessageSet.builder().add(Range.closed(13l, 17l)).build();
 		expect(storeClient.uidCopy(nextYearMessageSet, nextYearArchiveMailboxName)).andReturn(nextYearRangeCopiedUids);
@@ -905,7 +876,7 @@ public class ImapArchiveProcessingTest {
 			.andReturn(treatmentDate);
 		
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(higherBoundary.toDate())
+				.beforeExclusive(higherBoundary.toDate())
 				.messageSet(MessageSet.builder().add(Range.openClosed(lastUid, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(MessageSet.empty());
@@ -934,21 +905,16 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.select(mailboxName)).andReturn(true);
+		expect(storeClient.select(mailboxName)).andReturn(true).times(2);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(higherBoundary.toDate())
+				.beforeExclusive(higherBoundary.toDate())
 				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(messageSet);
 		
-		long firstUid = messageSet.first().get();
-		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
-				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
+		expectCreateMailbox(archiveMailboxName, storeClient);
 		
-		expectCreateMailbox(mailboxName, archiveMailboxName, storeClient);
-		
-		expectCreateMailbox(mailboxName, temporaryMailboxName, storeClient);
+		expectCreateMailbox(temporaryMailboxName, storeClient);
 		expect(storeClient.uidCopy(messageSet, temporaryMailboxName)).andReturn(messageSet);
 		
 		expectCopyPartitionFailsOnSecond(mailboxName, archiveMailboxName, temporaryMailboxName, uids, storeClient);
@@ -983,27 +949,21 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
+		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(higherBoundary.toDate())
+				.beforeExclusive(higherBoundary.toDate())
 				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(messageSet);
 		
-		long firstUid = messageSet.first().get();
 		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
-				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
 		
-		expectCreateMailbox(mailboxName, archiveMailboxName, storeClient);
-		
-		expectCreateMailbox(mailboxName, temporaryMailboxName, storeClient);
+		expectCreateMailbox(temporaryMailboxName, storeClient);
 		
 		expectCopyPartition(mailboxName, archiveMailboxName, temporaryMailboxName, uids, storeClient);
 		
 		expect(storeClient.uidCopy(messageSet, temporaryMailboxName)).andReturn(messageSet);
 		expect(storeClient.delete(temporaryMailboxName)).andReturn(true);
-		expect(storeClient.select(archiveMailboxName)).andReturn(true);
-		expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		storeClient.close();
 		expectLastCall();
@@ -1021,7 +981,7 @@ public class ImapArchiveProcessingTest {
 		expectLastCall();
 	}
 
-	private void expectCreateMailbox(String mailboxName, String archiveMailboxName, StoreClient storeClient) throws MailboxNotFoundException {
+	private void expectCreateMailbox(String archiveMailboxName, StoreClient storeClient) throws MailboxNotFoundException {
 		expect(storeClient.select(archiveMailboxName)).andReturn(false);
 		expect(storeClient.create(archiveMailboxName, "mydomain_org_archive")).andReturn(true);
 		expect(storeClient.setAcl(archiveMailboxName, ObmSystemUser.CYRUS, MailboxImpl.ALL_IMAP_RIGHTS)).andReturn(true);
@@ -1029,66 +989,83 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.setQuota(archiveMailboxName, ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE)).andReturn(true);
 		expect(storeClient.setAnnotation(archiveMailboxName, AnnotationEntry.SHAREDSEEN, AttributeValue.sharedValue("true"))).andReturn(true);
 		expect(storeClient.select(archiveMailboxName)).andReturn(true);
-		expect(storeClient.select(mailboxName)).andReturn(true);
 	}
 
 	private void expectCopyPartitionFailsOnSecond(String mailboxName, String archiveMailboxName, String temporaryMailboxName, Set<Range<Long>> uids, StoreClient storeClient) throws MailboxNotFoundException {
-		expect(storeClient.select(mailboxName)).andReturn(true);
-		MessageSet firstMessageSet = MessageSet.builder()
-				.add(Iterables.get(uids, 0))
-				.build();
+		Range<Long> first = Iterables.get(uids, 0);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(Year.from(2014).previous().toDate())
-				.messageSet(firstMessageSet)
-				.build()))
-			.andReturn(MessageSet.empty());
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(Year.from(2014).next().toDate())
-				.messageSet(firstMessageSet)
+				.between(true)
+				.beforeExclusive(Year.from(2014).toDate())
+				.afterInclusive(Year.from(2014).next().toDate())
+				.messageSet(MessageSet.builder().add(first).build())
 				.build()))
 			.andReturn(MessageSet.empty());
 		
+		MessageSet firstMessageSet = MessageSet.builder()
+				.add(Iterables.get(uids, 0))
+				.build();
+		long firstRangeLowerEndpoint = first.lowerEndpoint();
+		expect(storeClient.select(mailboxName)).andReturn(true);
+		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstRangeLowerEndpoint)))
+				.andReturn(ImmutableList.of(new InternalDate(firstRangeLowerEndpoint, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
+		
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		expect(storeClient.uidCopy(firstMessageSet, archiveMailboxName)).andReturn(firstMessageSet);
+		expect(storeClient.select(archiveMailboxName)).andReturn(true);
+		expect(storeClient.uidStore(firstMessageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
+		
+		Range<Long> second = Iterables.get(uids, 1);
+		expect(storeClient.uidSearch(SearchQuery.builder()
+				.between(true)
+				.beforeExclusive(Year.from(2014).toDate())
+				.afterInclusive(Year.from(2014).next().toDate())
+				.messageSet(MessageSet.builder().add(second).build())
+				.build()))
+			.andReturn(MessageSet.empty());
+		
+		long secondRangeLowerEndpoint = second.lowerEndpoint();
+		expect(storeClient.select(archiveMailboxName)).andReturn(true);
+		expect(storeClient.select(mailboxName)).andReturn(true);
+		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(secondRangeLowerEndpoint)))
+				.andReturn(ImmutableList.of(new InternalDate(secondRangeLowerEndpoint, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
 		
 		MessageSet secondMessageSet = MessageSet.builder()
 				.add(Iterables.get(uids, 1))
 				.build();
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(Year.from(2014).previous().toDate())
-				.messageSet(secondMessageSet)
-				.build()))
-			.andReturn(MessageSet.empty());
-		expect(storeClient.uidSearch(SearchQuery.builder()
-				.after(Year.from(2014).next().toDate())
-				.messageSet(secondMessageSet)
-				.build()))
-			.andReturn(MessageSet.empty());
-		
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		expect(storeClient.uidCopy(secondMessageSet, archiveMailboxName)).andThrow(new ImapTimeoutException());
 	}
 
 	private void expectCopyPartition(String mailboxName, String archiveMailboxName, String temporaryMailboxName, Set<Range<Long>> uids, StoreClient storeClient) throws MailboxNotFoundException {
+		boolean first = true;
 		for (Range<Long> partition : uids) {
+			if (first) {
+				expectCreateMailbox(archiveMailboxName, storeClient);
+				first = false;
+			} else {
+				expect(storeClient.select(archiveMailboxName)).andReturn(true);
+			}
+			
+			expect(storeClient.select(mailboxName)).andReturn(true);
+			long firstUid = partition.lowerEndpoint();
+			expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
+				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
+			
+			expect(storeClient.uidSearch(SearchQuery.builder()
+					.between(true)
+					.beforeExclusive(Year.from(2014).toDate())
+					.afterInclusive(Year.from(2014).next().toDate())
+					.messageSet(MessageSet.builder().add(partition).build())
+					.build()))
+					.andReturn(MessageSet.empty());
+			
 			MessageSet messageSet = MessageSet.builder()
 					.add(partition)
 					.build();
-			
-			expect(storeClient.select(mailboxName)).andReturn(true);
-			expect(storeClient.uidSearch(SearchQuery.builder()
-					.before(Year.from(2014).previous().toDate())
-					.messageSet(messageSet)
-					.build()))
-				.andReturn(MessageSet.empty());
-			expect(storeClient.uidSearch(SearchQuery.builder()
-					.after(Year.from(2014).next().toDate())
-					.messageSet(messageSet)
-					.build()))
-				.andReturn(MessageSet.empty());
-			
 			expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 			expect(storeClient.uidCopy(messageSet, archiveMailboxName)).andReturn(messageSet);
+			expect(storeClient.select(archiveMailboxName)).andReturn(true);
+			expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		}
 	}
 	
@@ -1451,7 +1428,7 @@ public class ImapArchiveProcessingTest {
 				.build();
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(higherBoundary.toDate())
+				.beforeExclusive(higherBoundary.toDate())
 				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(MessageSet.builder()
@@ -1472,7 +1449,7 @@ public class ImapArchiveProcessingTest {
 				.build();
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(higherBoundary.toDate())
+				.beforeExclusive(higherBoundary.toDate())
 				.messageSet(MessageSet.builder().add(Range.closed(2l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(MessageSet.builder()
@@ -1493,7 +1470,7 @@ public class ImapArchiveProcessingTest {
 				.build();
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		expect(storeClient.uidSearch(SearchQuery.builder()
-				.before(higherBoundary.toDate())
+				.beforeExclusive(higherBoundary.toDate())
 				.messageSet(MessageSet.builder().add(Range.closed(6l, Long.MAX_VALUE)).build())
 				.build()))
 			.andReturn(MessageSet.builder()

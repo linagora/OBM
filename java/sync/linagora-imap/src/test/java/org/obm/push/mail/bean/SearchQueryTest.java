@@ -34,6 +34,7 @@ package org.obm.push.mail.bean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 
@@ -62,5 +63,30 @@ public class SearchQueryTest {
 			.messageSet(expectedMessageSet)
 			.build();
 		assertThat(searchQuery.getMessageSet()).isEqualTo(expectedMessageSet);
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThwoWhenBetweenAndNullBefore() {
+		SearchQuery.builder()
+			.between(true)
+			.build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThwoWhenBetweenAndNullAfter() {
+		SearchQuery.builder()
+			.between(true)
+			.beforeExclusive(DateTime.parse("2014-01-01").toDate())
+			.build();
+	}
+	
+	@Test
+	public void builderShouldBuildWhenBetween() {
+		SearchQuery searchQuery = SearchQuery.builder()
+			.between(true)
+			.beforeExclusive(DateTime.parse("2014-01-01").toDate())
+			.afterInclusive(DateTime.parse("2015-01-01").toDate())
+			.build();
+		assertThat(searchQuery.isBetween()).isTrue();
 	}
 }

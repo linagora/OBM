@@ -54,7 +54,7 @@ public class ImapTestUtils {
 			throws MailException, MailboxNotFoundException, ImapTimeoutException {
 		
 		client.select(mailbox);
-		SearchQuery query = SearchQuery.builder().after(DateUtils.getEpochCalendar().getTime()).build();
+		SearchQuery query = SearchQuery.builder().afterInclusive(DateUtils.getEpochCalendar().getTime()).build();
 		MessageSet messages = client.uidSearch(query);
 		return Iterables.getLast(messages.asDiscreteValues());
 	}

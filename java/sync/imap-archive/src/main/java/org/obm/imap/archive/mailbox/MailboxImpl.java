@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 public class MailboxImpl implements Mailbox {
 
@@ -122,6 +123,9 @@ public class MailboxImpl implements Mailbox {
 	
 	@Override
 	public List<InternalDate> fetchInternalDate(MessageSet messageSet) throws ImapMessageNotFoundException {
+		if (messageSet.isEmpty()) {
+			return ImmutableList.of();
+		}
 		List<InternalDate> uidFetchInternalDate = storeClient.uidFetchInternalDate(messageSet);
 		if (uidFetchInternalDate.isEmpty()) {
 			throw new ImapMessageNotFoundException(String.format("No email for uid %s", messageSet));

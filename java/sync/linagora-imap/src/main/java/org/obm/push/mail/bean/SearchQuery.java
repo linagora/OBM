@@ -40,7 +40,7 @@ import com.google.common.base.Preconditions;
 public class SearchQuery {
 
 	public static final SearchQuery MATCH_ALL = new SearchQuery(null, null); 
-	public static final SearchQuery MATCH_ALL_EVEN_DELETED = new SearchQuery(null, null, true, null);
+	public static final SearchQuery MATCH_ALL_EVEN_DELETED = new SearchQuery(null, null, false, true, null);
 	
 	public static Builder builder() {
 		return new Builder();
@@ -49,6 +49,7 @@ public class SearchQuery {
 	public static class Builder {
 		private Date before;
 		private Date after;
+		private boolean between;
 		private boolean includeDeleted;
 		private MessageSet messageSet;
 		
@@ -56,13 +57,18 @@ public class SearchQuery {
 			this.includeDeleted = false;
 		}
 		
-		public Builder before(Date before) {
+		public Builder beforeExclusive(Date before) {
 			this.before = before;
 			return this;
 		}
 		
-		public Builder after(Date after) {
+		public Builder afterInclusive(Date after) {
 			this.after = after;
+			return this;
+		}
+
+		public Builder between(boolean between) {
+			this.between = between;
 			return this;
 		}
 		
@@ -80,12 +86,17 @@ public class SearchQuery {
 			if (messageSet != null) {
 				Preconditions.checkState(!messageSet.isEmpty());
 			}
-			return new SearchQuery(before, after, includeDeleted, messageSet);
+			if (between) {
+				Preconditions.checkState(before != null);
+				Preconditions.checkState(after != null);
+			}
+			return new SearchQuery(before, after, between, includeDeleted, messageSet);
 		}
 	}
 
-	private final Date after;
 	private final Date before;
+	private final Date after;
+	private final boolean between;
 	private final boolean matchDeleted;
 	private final MessageSet messageSet;
 	
@@ -96,22 +107,27 @@ public class SearchQuery {
 	 *            is within or later than the specified date.
 	 */
 	private SearchQuery(Date before, Date after) {
-		this(before, after, false, null);
+		this(before, after, false, false, null);
 	}
 	
-	private SearchQuery(Date before, Date after, boolean matchDeleted, MessageSet messageSet) {
+	private SearchQuery(Date before, Date after, boolean between, boolean matchDeleted, MessageSet messageSet) {
 		this.after = after;
 		this.before = before;
+		this.between = between;
 		this.matchDeleted = matchDeleted;
 		this.messageSet = messageSet;
+	}
+
+	public Date getBefore() {
+		return before;
 	}
 
 	public Date getAfter() {
 		return after;
 	}
 
-	public Date getBefore() {
-		return before;
+	public boolean isBetween() {
+		return between;
 	}
 
 	public boolean isMatchDeleted() {
@@ -124,15 +140,16 @@ public class SearchQuery {
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(after, before, matchDeleted, messageSet);
+		return Objects.hashCode(before, after, between, matchDeleted, messageSet);
 	}
 	
 	@Override
 	public final boolean equals(Object object){
 		if (object instanceof SearchQuery) {
 			SearchQuery that = (SearchQuery) object;
-				return Objects.equal(this.after, that.after)
-				&& Objects.equal(this.before, that.before)
+				return Objects.equal(this.before, that.before)
+				&& Objects.equal(this.after, that.after)
+				&& Objects.equal(this.between, that.between)
 				&& Objects.equal(this.matchDeleted, that.matchDeleted)
 				&& Objects.equal(this.messageSet, that.messageSet);
 		}
@@ -142,8 +159,9 @@ public class SearchQuery {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-			.add("after", after)
 			.add("before", before)
+			.add("after", after)
+			.add("between", between)
 			.add("matchDeleted", matchDeleted)
 			.add("messageSet", messageSet)
 			.toString();
