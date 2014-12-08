@@ -68,6 +68,9 @@ public class MailerImpl implements Mailer {
 
 	private static final String IMAP_ARCHIVE_PATH = "/imap_archive/imap_archive_index.php";
 	private static final String LINE_DELIMITER = "\r\n";
+	private static final String EMAIL_FROM = "imap-archive";
+	private static final String EMAIL_AT = "@";
+	private static final String EMAIL_FROM_DISPlAY_NAME = "IMAP Archive notifier";
 	
 	private final ConfigurationService configurationService;
 	private final ObmSmtpService smtpService;
@@ -90,6 +93,7 @@ public class MailerImpl implements Mailer {
 		try {
 			if (!mailing.getEmailAddresses().isEmpty()) {
 				MimeMessage message = new MimeMessage(session);
+				message.setFrom(from(domain));
 				message.addRecipients(RecipientType.TO, internetAddresses(mailing));
 				message.setSubject("End of IMAP Archive for domain " + domain.getName());
 				message.setText(text(domain, runId, state), Charsets.UTF_8.name());
@@ -99,6 +103,15 @@ public class MailerImpl implements Mailer {
 		} catch (MessagingException | URISyntaxException e) {
 			logger.error("Error when mailing", e);
 			throw e;
+		}
+	}
+
+	@VisibleForTesting Address from(ObmDomain domain) {
+		try {
+			return new InternetAddress(EMAIL_FROM + EMAIL_AT + domain.getName(), EMAIL_FROM_DISPlAY_NAME, Charsets.UTF_8.name());
+		} catch (Exception e) {
+			logger.error("Cannot build From address", e);
+			return null;
 		}
 	}
 

@@ -144,6 +144,41 @@ public class MailerImplTest {
 	}
 	
 	@Test
+	public void from() throws Exception {
+		control.replay();
+		Address from = testee.from(domain);
+		control.verify();
+		
+		assertThat(from).isEqualTo(new InternetAddress("IMAP Archive notifier <imap-archive@mydomain.org>"));
+	}
+	
+	@Test
+	public void fromShouldLogThenReturnNullWhenAnyError() {
+		IllegalStateException exception = new IllegalStateException();
+
+		ObmDomain domainMock = control.createMock(ObmDomain.class);
+		expect(domainMock.getName()).andThrow(exception);
+		
+		logger.error("Cannot build From address", exception);
+		expectLastCall();
+		
+		control.replay();
+		Address from = testee.from(domainMock);
+		control.verify();
+
+		assertThat(from).isNull();
+	}
+	
+	@Test
+	public void fromShouldAcceptWhenDomainHasOnePart() throws Exception {
+		control.replay();
+		Address from = testee.from(ObmDomain.builder().name("blabla").build());
+		control.verify();
+
+		assertThat(from).isEqualTo(new InternetAddress("IMAP Archive notifier <imap-archive@blabla>"));
+	}
+	
+	@Test
 	public void internetAddressesShouldBeEmptyWhenEmptyMailing() {
 		Mailing mailing = Mailing.empty();
 		
