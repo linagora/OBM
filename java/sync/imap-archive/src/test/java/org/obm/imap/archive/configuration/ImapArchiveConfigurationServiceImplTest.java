@@ -70,6 +70,58 @@ public class ImapArchiveConfigurationServiceImplTest {
 	}
 	
 	@Test
+	public void factoryCreateShouldReturnServiceWhenFieldsAreValid() {
+		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
+			.andReturn("archivetest");
+		
+		control.replay();
+		ImapArchiveConfigurationServiceImpl.Factory factory = new ImapArchiveConfigurationServiceImpl.Factory(transactionConfiguration, iniFile);
+		ImapArchiveConfigurationServiceImpl service = factory.create();
+		control.verify();
+		
+		assertThat(service).isNotNull();
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void factoryCreateShouldTriggerExceptionWhenPartitionSuffixContainsUpperCase() {
+		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
+			.andReturn("archiveTest");
+		
+		control.replay();
+		try {
+			new ImapArchiveConfigurationServiceImpl.Factory(transactionConfiguration, iniFile).create();
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void factoryCreateShouldTriggerExceptionWhenEmptyCyrusPartitionSuffix() {
+		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
+			.andReturn("");
+		
+		control.replay();
+		try {
+			new ImapArchiveConfigurationServiceImpl.Factory(transactionConfiguration, iniFile).create();
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void cyrusPartitionSuffixShouldTriggerExceptionWhenContainsUpperCase() {
+		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
+			.andReturn("archiveTest");
+		
+		control.replay();
+		try {
+			new ImapArchiveConfigurationServiceImpl.Factory(transactionConfiguration, iniFile).create();
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test
 	public void cyrusPartitionSuffixShouldReturnInFileValue() {
 		String expectedCyrusPartitionSuffix = "mypartitionsuffix";
 		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
@@ -92,32 +144,6 @@ public class ImapArchiveConfigurationServiceImplTest {
 		control.verify();
 		
 		assertThat(cyrusPartitionSuffix).isEqualTo(DEFAULT_CYRUS_PARTITION_SUFFIX);
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void cyrusPartitionSuffixShouldTriggerExceptionWhenEmpty() {
-		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
-			.andReturn("");
-		
-		control.replay();
-		try {
-			testee.getCyrusPartitionSuffix();
-		} finally {
-			control.verify();
-		}
-	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void cyrusPartitionSuffixShouldTriggerExceptionWhenContainsUpperCase() {
-		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
-			.andReturn("archiveTest");
-		
-		control.replay();
-		try {
-			testee.getCyrusPartitionSuffix();
-		} finally {
-			control.verify();
-		}
 	}
 	
 	@Test

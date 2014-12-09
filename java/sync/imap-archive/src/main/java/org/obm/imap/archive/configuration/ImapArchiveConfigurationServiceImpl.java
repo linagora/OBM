@@ -61,17 +61,35 @@ public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigura
 	
 	public static class Factory {
 		
-		protected IniFile.Factory iniFileFactory;
+		protected IniFile iniFile;
 		private final TransactionConfiguration transactionConfiguration;
 
 		@Inject
 		public Factory(TransactionConfiguration transactionConfiguration) {
+			this(transactionConfiguration, new IniFile.Factory().build(CONFIG_FILE_PATH));
+		}
+		
+		@VisibleForTesting Factory(TransactionConfiguration transactionConfiguration, IniFile iniFile) {
 			this.transactionConfiguration = transactionConfiguration;
-			iniFileFactory = new IniFile.Factory();
+			this.iniFile = iniFile;
 		}
 		
 		public ImapArchiveConfigurationServiceImpl create() {
-			return new ImapArchiveConfigurationServiceImpl(iniFileFactory.build(CONFIG_FILE_PATH), transactionConfiguration);
+			return checkCorrectnessForEarlyFail(
+					new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration));
+		}
+
+		private ImapArchiveConfigurationServiceImpl checkCorrectnessForEarlyFail(ImapArchiveConfigurationServiceImpl conf) {
+			checkCyrusPartitionSuffix(conf);
+			return conf;
+		}
+
+		private void checkCyrusPartitionSuffix(ImapArchiveConfigurationServiceImpl conf) {
+			String value = conf.getCyrusPartitionSuffix();
+			Preconditions.checkArgument(!Strings.isNullOrEmpty(value), CYRUS_PARTITION_SUFFIX + " cannot be null or empty");
+			
+			String onlyLowerCaseChars = value.toLowerCase();
+			Preconditions.checkArgument(onlyLowerCaseChars.equals(value), CYRUS_PARTITION_SUFFIX + " must only use lowercase");
 		}
 	}
 	
@@ -85,13 +103,8 @@ public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigura
 
 	@Override
 	public String getCyrusPartitionSuffix() {
-		String value = iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX);
-		Preconditions.checkArgument(!Strings.isNullOrEmpty(value), CYRUS_PARTITION_SUFFIX + " cannot be null or empty");
+		return iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX);
 		
-		String onlyLowerCaseChars = value.toLowerCase();
-		Preconditions.checkArgument(onlyLowerCaseChars.equals(value), CYRUS_PARTITION_SUFFIX + " must only use lowercase");
-		
-		return value;
 	}
 
 	@Override
