@@ -36,6 +36,8 @@ import org.obm.configuration.TransactionConfiguration;
 import org.obm.configuration.utils.IniFile;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 
 public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigurationService {
@@ -83,7 +85,13 @@ public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigura
 
 	@Override
 	public String getCyrusPartitionSuffix() {
-		return iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX);
+		String value = iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(value), CYRUS_PARTITION_SUFFIX + " cannot be null or empty");
+		
+		String onlyLowerCaseChars = value.toLowerCase();
+		Preconditions.checkArgument(onlyLowerCaseChars.equals(value), CYRUS_PARTITION_SUFFIX + " must only use lowercase");
+		
+		return value;
 	}
 
 	@Override

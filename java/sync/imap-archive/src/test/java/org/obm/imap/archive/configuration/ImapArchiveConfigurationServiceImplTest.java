@@ -70,18 +70,6 @@ public class ImapArchiveConfigurationServiceImplTest {
 	}
 	
 	@Test
-	public void cyrusPartitionSuffixShouldBeDefaultValueWhenNotInFile() {
-		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
-			.andReturn(DEFAULT_CYRUS_PARTITION_SUFFIX);
-		
-		control.replay();
-		String cyrusPartitionSuffix = testee.getCyrusPartitionSuffix();
-		control.verify();
-		
-		assertThat(cyrusPartitionSuffix).isEqualTo(DEFAULT_CYRUS_PARTITION_SUFFIX);
-	}
-	
-	@Test
 	public void cyrusPartitionSuffixShouldReturnInFileValue() {
 		String expectedCyrusPartitionSuffix = "mypartitionsuffix";
 		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
@@ -92,6 +80,44 @@ public class ImapArchiveConfigurationServiceImplTest {
 		control.verify();
 		
 		assertThat(cyrusPartitionSuffix).isEqualTo(expectedCyrusPartitionSuffix);
+	}
+	
+	@Test
+	public void cyrusPartitionSuffixShouldBeDefaultWhenNone() {
+		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
+			.andReturn(DEFAULT_CYRUS_PARTITION_SUFFIX);
+		
+		control.replay();
+		String cyrusPartitionSuffix = testee.getCyrusPartitionSuffix();
+		control.verify();
+		
+		assertThat(cyrusPartitionSuffix).isEqualTo(DEFAULT_CYRUS_PARTITION_SUFFIX);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void cyrusPartitionSuffixShouldTriggerExceptionWhenEmpty() {
+		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
+			.andReturn("");
+		
+		control.replay();
+		try {
+			testee.getCyrusPartitionSuffix();
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void cyrusPartitionSuffixShouldTriggerExceptionWhenContainsUpperCase() {
+		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
+			.andReturn("archiveTest");
+		
+		control.replay();
+		try {
+			testee.getCyrusPartitionSuffix();
+		} finally {
+			control.verify();
+		}
 	}
 	
 	@Test
