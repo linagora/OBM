@@ -69,7 +69,8 @@ public class BeansTest {
 				Limit.class,
 				ExcludedUser.class,
 				Mailing.class,
-				MailboxPaths.class
+				MailboxPaths.class,
+				MappedMessageSets.class
 			).verify();
 	}	
 }

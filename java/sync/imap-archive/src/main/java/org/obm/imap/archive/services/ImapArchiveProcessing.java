@@ -48,6 +48,7 @@ import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.HigherBoundary;
 import org.obm.imap.archive.beans.ImapFolder;
 import org.obm.imap.archive.beans.Limit;
+import org.obm.imap.archive.beans.MappedMessageSets;
 import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.Year;
@@ -236,33 +237,34 @@ public class ImapArchiveProcessing {
 				.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 				.build();
 		try {
-			copyToTemporary(mailbox, temporaryMailbox, logger, messageSet);
+			MessageSet copiedMessageSet = copyToTemporary(mailbox, temporaryMailbox, logger, messageSet);
+			MappedMessageSets mappedMessageSets = MappedMessageSets.builder().origin(messageSet).destination(copiedMessageSet).build();
 			
-			batchCopyFromTemporaryToArchive(mailbox, temporaryMailbox, messageSet, processedFolder, processedTask);
+			batchCopyFromTemporaryToArchive(mailbox, temporaryMailbox, mappedMessageSets, processedFolder, processedTask);
 	
 		} finally {
 			temporaryMailbox.delete();
 		}
 	}
 
-	private void copyToTemporary(Mailbox mailbox, TemporaryMailbox temporaryMailbox, Logger logger, MessageSet messageSet) throws IMAPException, MailboxNotFoundException {
+	private MessageSet copyToTemporary(Mailbox mailbox, TemporaryMailbox temporaryMailbox, Logger logger, MessageSet messageSet) throws IMAPException, MailboxNotFoundException {
 		createFolder(temporaryMailbox, logger);
 		
 		mailbox.select();
-		mailbox.uidCopy(messageSet, temporaryMailbox);
+		return mailbox.uidCopy(messageSet, temporaryMailbox);
 	}
 
-	private void batchCopyFromTemporaryToArchive(Mailbox mailbox, TemporaryMailbox temporaryMailbox, MessageSet messageSet, ProcessedFolder.Builder processedFolder, ProcessedTask processedTask) 
+	private void batchCopyFromTemporaryToArchive(Mailbox mailbox, TemporaryMailbox temporaryMailbox, MappedMessageSets mappedMessageSets, ProcessedFolder.Builder processedFolder, ProcessedTask processedTask) 
 			throws MailboxNotFoundException, IMAPException, MailboxFormatException {
-		
-		for (MessageSet partitionMessageSet : messageSet.partition(imapArchiveConfigurationService.getProcessingBatchSize())) {
+
+		for (MessageSet partitionMessageSet : mappedMessageSets.getDestination().partition(imapArchiveConfigurationService.getProcessingBatchSize())) {
 			Map<Year, MessageSet> mappedByYear = mapByYear(mailbox, partitionMessageSet);
 			for (Map.Entry<Year, MessageSet> entry : mappedByYear.entrySet()) {
 				ArchiveMailbox archiveMailbox = createArchiveMailbox(mailbox, entry.getKey(), processedTask);
 				
 				MessageSet yearMessageSet = entry.getValue();
 				copyTemporaryMessagesToArchive(temporaryMailbox, yearMessageSet, archiveMailbox);
-				processedFolder.addUid(yearMessageSet.max());
+				processedFolder.addUid(mappedMessageSets.getOriginUidFor(yearMessageSet.max()));
 			}
 		}
 	}
