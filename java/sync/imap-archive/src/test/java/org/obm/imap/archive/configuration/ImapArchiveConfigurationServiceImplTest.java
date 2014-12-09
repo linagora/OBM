@@ -34,6 +34,16 @@ package org.obm.imap.archive.configuration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
+import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.ARCHIVE_MAIN_FOLDER;
+import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.CYRUS_PARTITION_SUFFIX;
+import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER;
+import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.DEFAULT_CYRUS_PARTITION_SUFFIX;
+import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.DEFAULT_PROCESSING_BATCH_SIZE;
+import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE;
+import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS;
+import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.PROCESSING_BATCH_SIZE;
+import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.QUOTA_MAX_SIZE;
+import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.TRANSACTION_TIMEOUT_IN_SECONDS;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -45,40 +55,40 @@ import org.obm.configuration.utils.IniFile;
 public class ImapArchiveConfigurationServiceImplTest {
 
 	private IMocksControl control;
-	
-	private TransactionConfiguration transactionConfiguration; 
+	private TransactionConfiguration transactionConfiguration;
+	private IniFile iniFile;
+	private ImapArchiveConfigurationServiceImpl testee;
 	
 	@Before
 	public void setup() {
 		control = createControl();
 		
 		transactionConfiguration = control.createMock(TransactionConfiguration.class);
+		iniFile = control.createMock(IniFile.class);
+		
+		testee = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
 	}
 	
 	@Test
 	public void cyrusPartitionSuffixShouldBeDefaultValueWhenNotInFile() {
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getStringValue(ImapArchiveConfigurationServiceImpl.CYRUS_PARTITION_SUFFIX, ImapArchiveConfigurationServiceImpl.DEFAULT_CYRUS_PARTITION_SUFFIX))
-			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_CYRUS_PARTITION_SUFFIX);
+		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
+			.andReturn(DEFAULT_CYRUS_PARTITION_SUFFIX);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
-		String cyrusPartitionSuffix = imapArchiveConfigurationServiceImpl.getCyrusPartitionSuffix();
+		String cyrusPartitionSuffix = testee.getCyrusPartitionSuffix();
 		control.verify();
 		
-		assertThat(cyrusPartitionSuffix).isEqualTo(ImapArchiveConfigurationServiceImpl.DEFAULT_CYRUS_PARTITION_SUFFIX);
+		assertThat(cyrusPartitionSuffix).isEqualTo(DEFAULT_CYRUS_PARTITION_SUFFIX);
 	}
 	
 	@Test
 	public void cyrusPartitionSuffixShouldReturnInFileValue() {
 		String expectedCyrusPartitionSuffix = "mypartitionsuffix";
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getStringValue(ImapArchiveConfigurationServiceImpl.CYRUS_PARTITION_SUFFIX, ImapArchiveConfigurationServiceImpl.DEFAULT_CYRUS_PARTITION_SUFFIX))
+		expect(iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX))
 			.andReturn(expectedCyrusPartitionSuffix);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
-		String cyrusPartitionSuffix = imapArchiveConfigurationServiceImpl.getCyrusPartitionSuffix();
+		String cyrusPartitionSuffix = testee.getCyrusPartitionSuffix();
 		control.verify();
 		
 		assertThat(cyrusPartitionSuffix).isEqualTo(expectedCyrusPartitionSuffix);
@@ -86,28 +96,24 @@ public class ImapArchiveConfigurationServiceImplTest {
 	
 	@Test
 	public void archiveMainFolderShouldBeDefaultValueWhenNotInFile() {
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getStringValue(ImapArchiveConfigurationServiceImpl.ARCHIVE_MAIN_FOLDER, ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER))
-			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER);
+		expect(iniFile.getStringValue(ARCHIVE_MAIN_FOLDER, DEFAULT_ARCHIVE_MAIN_FOLDER))
+			.andReturn(DEFAULT_ARCHIVE_MAIN_FOLDER);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
-		String archiveMainFolder = imapArchiveConfigurationServiceImpl.getArchiveMainFolder();
+		String archiveMainFolder = testee.getArchiveMainFolder();
 		control.verify();
 		
-		assertThat(archiveMainFolder).isEqualTo(ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER);
+		assertThat(archiveMainFolder).isEqualTo(DEFAULT_ARCHIVE_MAIN_FOLDER);
 	}
 	
 	@Test
 	public void archiveMainFolderShouldReturnInFileValue() {
 		String expectedArchiveMainFolder = "myfolder";
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getStringValue(ImapArchiveConfigurationServiceImpl.ARCHIVE_MAIN_FOLDER, ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER))
+		expect(iniFile.getStringValue(ARCHIVE_MAIN_FOLDER, DEFAULT_ARCHIVE_MAIN_FOLDER))
 			.andReturn(expectedArchiveMainFolder);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
-		String archiveMainFolder = imapArchiveConfigurationServiceImpl.getArchiveMainFolder();
+		String archiveMainFolder = testee.getArchiveMainFolder();
 		control.verify();
 		
 		assertThat(archiveMainFolder).isEqualTo(expectedArchiveMainFolder);
@@ -115,28 +121,24 @@ public class ImapArchiveConfigurationServiceImplTest {
 	
 	@Test
 	public void processingBatchSizeShouldBeDefaultValueWhenNotInFile() {
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getIntValue(ImapArchiveConfigurationServiceImpl.PROCESSING_BATCH_SIZE, ImapArchiveConfigurationServiceImpl.DEFAULT_PROCESSING_BATCH_SIZE))
-			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_PROCESSING_BATCH_SIZE);
+		expect(iniFile.getIntValue(PROCESSING_BATCH_SIZE, DEFAULT_PROCESSING_BATCH_SIZE))
+			.andReturn(DEFAULT_PROCESSING_BATCH_SIZE);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
-		int processingBatchSize = imapArchiveConfigurationServiceImpl.getProcessingBatchSize();
+		int processingBatchSize = testee.getProcessingBatchSize();
 		control.verify();
 		
-		assertThat(processingBatchSize).isEqualTo(ImapArchiveConfigurationServiceImpl.DEFAULT_PROCESSING_BATCH_SIZE);
+		assertThat(processingBatchSize).isEqualTo(DEFAULT_PROCESSING_BATCH_SIZE);
 	}
 	
 	@Test
 	public void processingBatchSizeShouldReturnInFileValue() {
 		int expectedProcessingBatchSize = 123;
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getIntValue(ImapArchiveConfigurationServiceImpl.PROCESSING_BATCH_SIZE, ImapArchiveConfigurationServiceImpl.DEFAULT_PROCESSING_BATCH_SIZE))
+		expect(iniFile.getIntValue(PROCESSING_BATCH_SIZE, DEFAULT_PROCESSING_BATCH_SIZE))
 			.andReturn(expectedProcessingBatchSize);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
-		int processingBatchSize = imapArchiveConfigurationServiceImpl.getProcessingBatchSize();
+		int processingBatchSize = testee.getProcessingBatchSize();
 		control.verify();
 		
 		assertThat(processingBatchSize).isEqualTo(expectedProcessingBatchSize);
@@ -144,28 +146,24 @@ public class ImapArchiveConfigurationServiceImplTest {
 	
 	@Test
 	public void quotaMaxSizeShouldBeDefaultValueWhenNotInFile() {
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getIntValue(ImapArchiveConfigurationServiceImpl.QUOTA_MAX_SIZE, ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE))
-			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE);
+		expect(iniFile.getIntValue(QUOTA_MAX_SIZE, DEFAULT_QUOTA_MAX_SIZE))
+			.andReturn(DEFAULT_QUOTA_MAX_SIZE);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
-		int quotaMaxSize = imapArchiveConfigurationServiceImpl.getQuotaMaxSize();
+		int quotaMaxSize = testee.getQuotaMaxSize();
 		control.verify();
 		
-		assertThat(quotaMaxSize).isEqualTo(ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE);
+		assertThat(quotaMaxSize).isEqualTo(DEFAULT_QUOTA_MAX_SIZE);
 	}
 	
 	@Test
 	public void quotaMaxSizeShouldReturnInFileValue() {
 		int expectedQuotaMaxSize = 1234;
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getIntValue(ImapArchiveConfigurationServiceImpl.QUOTA_MAX_SIZE, ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE))
+		expect(iniFile.getIntValue(QUOTA_MAX_SIZE, DEFAULT_QUOTA_MAX_SIZE))
 			.andReturn(expectedQuotaMaxSize);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
-		int quotaMaxSize = imapArchiveConfigurationServiceImpl.getQuotaMaxSize();
+		int quotaMaxSize = testee.getQuotaMaxSize();
 		control.verify();
 		
 		assertThat(quotaMaxSize).isEqualTo(expectedQuotaMaxSize);
@@ -173,28 +171,24 @@ public class ImapArchiveConfigurationServiceImplTest {
 	
 	@Test
 	public void timeOutInSecondShouldBeDefaultValueWhenNotInFile() {
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getIntValue(ImapArchiveConfigurationServiceImpl.TRANSACTION_TIMEOUT_IN_SECONDS, ImapArchiveConfigurationServiceImpl.DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS))
-			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS);
+		expect(iniFile.getIntValue(TRANSACTION_TIMEOUT_IN_SECONDS, DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS))
+			.andReturn(DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
-		int timeOutInSecond = imapArchiveConfigurationServiceImpl.getTimeOutInSecond();
+		int timeOutInSecond = testee.getTimeOutInSecond();
 		control.verify();
 		
-		assertThat(timeOutInSecond).isEqualTo(ImapArchiveConfigurationServiceImpl.DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS);
+		assertThat(timeOutInSecond).isEqualTo(DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS);
 	}
 	
 	@Test
 	public void timeOutInSecondShouldReturnInFileValue() {
 		int expectedTimeOutInSecond = 12345;
-		IniFile iniFile = control.createMock(IniFile.class);
-		expect(iniFile.getIntValue(ImapArchiveConfigurationServiceImpl.TRANSACTION_TIMEOUT_IN_SECONDS, ImapArchiveConfigurationServiceImpl.DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS))
+		expect(iniFile.getIntValue(TRANSACTION_TIMEOUT_IN_SECONDS, DEFAULT_TRANSACTION_TIMEOUT_IN_SECONDS))
 			.andReturn(expectedTimeOutInSecond);
 		
 		control.replay();
-		ImapArchiveConfigurationServiceImpl imapArchiveConfigurationServiceImpl = new ImapArchiveConfigurationServiceImpl(iniFile, transactionConfiguration);
-		int timeOutInSecond = imapArchiveConfigurationServiceImpl.getTimeOutInSecond();
+		int timeOutInSecond = testee.getTimeOutInSecond();
 		control.verify();
 		
 		assertThat(timeOutInSecond).isEqualTo(expectedTimeOutInSecond);
