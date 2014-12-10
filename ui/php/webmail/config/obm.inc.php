@@ -72,7 +72,7 @@ $config["plugins"][] = "obm_identities";
 $config["plugins"][] = "obm_unread";
 
 if ( $auth_kind && $auth_kind == "CAS" ) {
-  $config["plugins"][] = "cas_authn";
+  $config["plugins"][] = "obm_cas_authn";
   $config["obmAuthType"] = "LemonLDAP";
   // CAS plugin configuration
   set_include_path(get_include_path() . PATH_SEPARATOR . "../../obminclude/lib/CAS");
@@ -93,6 +93,7 @@ if ( $auth_kind && $auth_kind == "CAS" ) {
     $config['cas_validation'] = $cas_validation;
     $config['cas_cert'] = $cas_cert;
   }
+  $config['cas_server_login_attribute'] = $cas_server_login_attribute;
 } else if ( $auth_kind && $auth_kind == "LemonLDAP") {
   $config["plugins"][] = "http_authentication";
   $config["obmAuthType"] = "LemonLDAP";
