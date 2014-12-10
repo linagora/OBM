@@ -207,13 +207,13 @@ function paramToJson($paramsAsConfiguration) {
 }
 
 function excludedUserIdsToMap($excludedUserIds) {
-  $map = array();
+  $map = new stdClass();
   if ($excludedUserIds == null) {
     return $map;
   }
   $users = get_userobm_from_ext_ids($excludedUserIds, false);
   foreach ($users['entity'] as $u_ext_id => $u_ent) {
-    $map[$u_ext_id] = $u_ent['login'];
+    $map->$u_ext_id = $u_ent['login'];
   }
   return $map;
 }
