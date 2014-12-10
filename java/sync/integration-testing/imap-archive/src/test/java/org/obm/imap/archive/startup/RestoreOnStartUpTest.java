@@ -143,7 +143,7 @@ public class RestoreOnStartUpTest {
 		ArchiveTreatmentRunId expectedScheduledRunId = ArchiveTreatmentRunId.from("45896372-cc9f-4ee9-9efd-8df63e2da8c3");
 		ObmDomain expectedScheduledDomain = ObmDomain.builder()
 				.uuid(ObmDomainUuid.of("65ae0168-cb77-43b8-bda3-0aa81f79ab5c"))
-				.name("mydomain")
+				.name("mydomain.org")
 				.label("mydomain.org")
 				.build();
 		DateTime expectedScheduledHigherBoundary = DateTime.parse("2026-11-02T01:04Z");
@@ -165,7 +165,7 @@ public class RestoreOnStartUpTest {
 		ArchiveTreatmentRunId expectedFailedRunId = ArchiveTreatmentRunId.from("c6eb4f70-2304-4bb4-aa38-441935dc6a47");
 		ObmDomain expectedFailedDomain = ObmDomain.builder()
 				.uuid(ObmDomainUuid.of("b9de411c-5375-4100-aedf-8e4d827c0a2c"))
-				.name("mydomain2")
+				.name("mydomain2.org")
 				.label("mydomain2.org")
 				.build();
 		DateTime expectedFailedHigherBoundary = DateTime.parse("2026-10-02T01:04Z");

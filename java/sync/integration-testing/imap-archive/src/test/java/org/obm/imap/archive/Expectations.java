@@ -96,7 +96,7 @@ public class Expectations {
 		driver.addExpectation(
 				onRequestTo("/obm-sync/provisioning/v1/domains/" + domainId.toString()),
 				giveResponse("{\"id\":\"" + domainId.toString() + "\","
-							+ "\"name\":\"mydomain\","
+							+ "\"name\":\"mydomain.org\","
 							+ "\"label\":\"mydomain.org\","
 							+ "\"aliases\":[]}",
 					MediaType.APPLICATION_JSON)

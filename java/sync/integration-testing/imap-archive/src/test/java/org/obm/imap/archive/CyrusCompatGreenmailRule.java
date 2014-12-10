@@ -48,7 +48,7 @@ public class CyrusCompatGreenmailRule implements TestRule {
 	}
 
 	@Override
-	public Statement apply(Statement base, Description description) {
+	public Statement apply(final Statement base, Description description) {
 		return new Statement() {
 			
 			@Override
@@ -58,6 +58,12 @@ public class CyrusCompatGreenmailRule implements TestRule {
 				greenMail.start();
 				greenMail.getManagers().getImapHostManager().deleteMailbox(greenMailUser, "INBOX");
 				greenMail.getManagers().getImapHostManager().createMailbox(greenMailUser, "user/cyrus@mydomain");
+				
+				try {
+					base.evaluate();
+				} finally {
+					greenMail.stop();
+				}
 			}
 		};
 	}
