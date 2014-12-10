@@ -789,4 +789,99 @@ public class ArchiveTreatmentJdbcImplTest {
 		
 		assertThat(testee.history(domainUuid, EnumSet.of(ArchiveStatus.ERROR), Limit.from(2), Ordering.DESC)).containsExactly(one, two);
 	}
+	
+	@Test(expected=NullPointerException.class)
+	public void deleteAllShouldThrowWhenDomainIsNull() throws Exception {
+		testee.deleteAll(null);
+	}
+	
+	@Test
+	public void deleteAllShouldDeleteAllRunFromAdomain() throws Exception {
+		ArchiveTerminatedTreatment one = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.ERROR)
+				.build();
+
+		ObmDomainUuid domainUuid2 = ObmDomainUuid.of("72e2be30-ad54-4115-84f2-471fa2688805");
+		ArchiveTerminatedTreatment two = ArchiveTerminatedTreatment
+				.forDomain(domainUuid2)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-01T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+		
+		ArchiveTerminatedTreatment three = ArchiveTerminatedTreatment
+				.forDomain(domainUuid) 
+				.runId("31534c25-2012-45d7-9808-586a488e6c8b")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		testee.insert(one);
+		testee.insert(two);
+		testee.insert(three);
+
+		testee.deleteAll(domainUuid);
+		assertThat(testee.findLastTerminated(domainUuid, Limit.unlimited())).isEmpty();
+		assertThat(testee.findLastTerminated(domainUuid2, Limit.unlimited())).containsOnly(two);
+	}
+	
+	@Test
+	public void deleteAllShouldNotDeleteWhenNone() throws Exception {
+		ArchiveTerminatedTreatment one = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("a860eecd-e608-4cbe-9d7a-6ef907b56367")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-05T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.ERROR)
+				.build();
+
+		ArchiveTerminatedTreatment two = ArchiveTerminatedTreatment
+				.forDomain(domainUuid)
+				.runId("21d3c634-5f5a-4e4d-bf89-dec6e699f007")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-01T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+		
+		ArchiveTerminatedTreatment three = ArchiveTerminatedTreatment
+				.forDomain(domainUuid) 
+				.runId("31534c25-2012-45d7-9808-586a488e6c8b")
+				.recurrent(true)
+				.higherBoundary(DateTime.parse("2014-07-01T00:03:00Z"))
+				.scheduledAt(DateTime.parse("2014-07-02T00:03:00Z"))
+				.startedAt(DateTime.parse("2014-11-11T00:03:00Z"))
+				.terminatedAt(DateTime.parse("2014-07-06T11:11:00Z"))
+				.status(ArchiveStatus.SUCCESS)
+				.build();
+
+		testee.insert(one);
+		testee.insert(two);
+		testee.insert(three);
+
+		ObmDomainUuid domainUuid2 = ObmDomainUuid.of("72e2be30-ad54-4115-84f2-471fa2688805");
+		testee.deleteAll(domainUuid2);
+		assertThat(testee.findLastTerminated(domainUuid, Limit.unlimited())).containsOnly(one, two, three);
+		assertThat(testee.findLastTerminated(domainUuid2, Limit.unlimited())).isEmpty();
+	}
 }

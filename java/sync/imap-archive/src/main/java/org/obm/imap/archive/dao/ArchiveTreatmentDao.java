@@ -62,4 +62,6 @@ public interface ArchiveTreatmentDao {
 	Optional<ArchiveTreatment> find(ArchiveTreatmentRunId runId) throws DaoException;
 
 	List<ArchiveTreatment> history(ObmDomainUuid domain, Set<ArchiveStatus> statuses, Limit limit, Ordering ordering) throws DaoException;
+
+	void deleteAll(ObmDomainUuid domain) throws DaoException;
 }

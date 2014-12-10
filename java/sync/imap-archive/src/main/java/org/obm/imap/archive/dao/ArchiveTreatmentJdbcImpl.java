@@ -51,6 +51,8 @@ import org.obm.imap.archive.dao.SqlTables.MailArchiveRun.Types;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.utils.ObmHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
@@ -65,6 +67,8 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 @Singleton
 public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveTreatmentJdbcImpl.class);
+	
 	private final DatabaseConnectionProvider dbcp;
 	private final ObmHelper obmHelper;
 	
@@ -81,7 +85,8 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 		String REMOVE = String.format(
 				"DELETE FROM %s WHERE %s = ?", MailArchiveRun.NAME, Fields.UUID);
 
-		
+		String DELETE = String.format(
+				"DELETE FROM %s WHERE %s = ?", MailArchiveRun.NAME, Fields.DOMAIN_UUID);
 	}
 	
 	private SelectArchiveTreatmentQueryBuilder selectArchiveTreatment() {
@@ -271,5 +276,20 @@ public class ArchiveTreatmentJdbcImpl implements ArchiveTreatmentDao {
 			.where(statuses)
 			.orderBy(Fields.SCHEDULE, ordering)
 			.limit(limit);
+	}
+
+	@Override
+	public void deleteAll(ObmDomainUuid domain) throws DaoException {
+		LOGGER.warn("Deleting all IMAP Archive runs");
+		Preconditions.checkNotNull(domain);
+		try (Connection connection = dbcp.getConnection();
+				PreparedStatement ps = connection.prepareStatement(REQUESTS.DELETE)) {
+
+			ps.setString(1, domain.get());
+
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		}
 	}
 }
