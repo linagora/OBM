@@ -79,22 +79,22 @@ public class MappedMessageSets {
 			int size = Iterables.size(destinationDiscreteValues);
 			Preconditions.checkState(Iterables.size(originDiscreteValues) == size);
 			
-			ImmutableMap.Builder<Long, Long> destinationUidsToOriginUids = ImmutableMap.builder();
+			ImmutableMap.Builder<Long, Long> originUidsToDestinationUids = ImmutableMap.builder();
 			for (int index = 0; index < size; index++) {
-				destinationUidsToOriginUids.put(Iterables.get(destinationDiscreteValues, index), Iterables.get(originDiscreteValues, index));
+				originUidsToDestinationUids.put(Iterables.get(originDiscreteValues, index), Iterables.get(destinationDiscreteValues, index));
 			}
-			return destinationUidsToOriginUids.build();
+			return originUidsToDestinationUids.build();
 		}
 	}
 
 	private final MessageSet origin;
 	private final MessageSet destination;
-	private final Map<Long, Long> destinationUidsToOriginUids;
+	private final Map<Long, Long> originUidsToDestinationUids;
 
-	public MappedMessageSets(MessageSet origin, MessageSet destination, Map<Long, Long> destinationUidsToOriginUids) {
+	public MappedMessageSets(MessageSet origin, MessageSet destination, Map<Long, Long> originUidsToDestinationUids) {
 		this.origin = origin;
 		this.destination = destination;
-		this.destinationUidsToOriginUids = destinationUidsToOriginUids;
+		this.originUidsToDestinationUids = originUidsToDestinationUids;
 	}
 	
 	public MessageSet getOrigin() {
@@ -105,8 +105,16 @@ public class MappedMessageSets {
 		return destination;
 	}
 	
-	public long getOriginUidFor(long destinationUid) {
-		return destinationUidsToOriginUids.get(destinationUid);
+	public long getDestinationUidFor(long originUid) {
+		return originUidsToDestinationUids.get(originUid);
+	}
+	
+	public MessageSet getDestinationUidFor(MessageSet originUids) {
+		MessageSet.Builder builder = MessageSet.builder();
+		for (long originUid : originUids.asDiscreteValues()) {
+			builder.add(getDestinationUidFor(originUid));
+		}
+		return builder.build();
 	}
 
 	@Override

@@ -257,14 +257,15 @@ public class ImapArchiveProcessing {
 	private void batchCopyFromTemporaryToArchive(Mailbox mailbox, TemporaryMailbox temporaryMailbox, MappedMessageSets mappedMessageSets, ProcessedFolder.Builder processedFolder, ProcessedTask processedTask) 
 			throws MailboxNotFoundException, IMAPException, MailboxFormatException {
 
-		for (MessageSet partitionMessageSet : mappedMessageSets.getDestination().partition(imapArchiveConfigurationService.getProcessingBatchSize())) {
+		for (MessageSet partitionMessageSet : mappedMessageSets.getOrigin().partition(imapArchiveConfigurationService.getProcessingBatchSize())) {
 			Map<Year, MessageSet> mappedByYear = mapByYear(mailbox, partitionMessageSet);
 			for (Map.Entry<Year, MessageSet> entry : mappedByYear.entrySet()) {
 				ArchiveMailbox archiveMailbox = createArchiveMailbox(mailbox, entry.getKey(), processedTask);
 				
-				MessageSet yearMessageSet = entry.getValue();
+				MessageSet originUids = entry.getValue();
+				MessageSet yearMessageSet = mappedMessageSets.getDestinationUidFor(originUids);
 				copyTemporaryMessagesToArchive(temporaryMailbox, yearMessageSet, archiveMailbox);
-				processedFolder.addUid(mappedMessageSets.getOriginUidFor(yearMessageSet.max()));
+				processedFolder.addUid(originUids.max());
 			}
 		}
 	}

@@ -71,9 +71,9 @@ public class MappedMessageSetsTest {
 		MessageSet destination = MessageSet.builder().add(10l).add(20l).add(30l).add(40l).build();
 		
 		MappedMessageSets mappedMessageSets = MappedMessageSets.builder().origin(origin).destination(destination).build();
-		assertThat(mappedMessageSets.getOriginUidFor(10l)).isEqualTo(1l);
-		assertThat(mappedMessageSets.getOriginUidFor(20l)).isEqualTo(2l);
-		assertThat(mappedMessageSets.getOriginUidFor(30l)).isEqualTo(3l);
-		assertThat(mappedMessageSets.getOriginUidFor(40l)).isEqualTo(4l);
+		assertThat(mappedMessageSets.getDestinationUidFor(1l)).isEqualTo(10l);
+		assertThat(mappedMessageSets.getDestinationUidFor(2l)).isEqualTo(20l);
+		assertThat(mappedMessageSets.getDestinationUidFor(3l)).isEqualTo(30l);
+		assertThat(mappedMessageSets.getDestinationUidFor(4l)).isEqualTo(40l);
 	}
 }
