@@ -109,10 +109,10 @@ public class ImapArchiveProcessing {
 
 	private final DateTimeProvider dateTimeProvider;
 	private final SchedulingDatesService schedulingDatesService;
-	private final StoreClientFactory storeClientFactory;
-	private final ArchiveTreatmentDao archiveTreatmentDao;
-	private final ProcessedFolderDao processedFolderDao;
-	private final ImapArchiveConfigurationService imapArchiveConfigurationService;
+	protected final StoreClientFactory storeClientFactory;
+	protected final ArchiveTreatmentDao archiveTreatmentDao;
+	protected final ProcessedFolderDao processedFolderDao;
+	protected final ImapArchiveConfigurationService imapArchiveConfigurationService;
 
 	
 	@Inject
@@ -389,13 +389,14 @@ public class ImapArchiveProcessing {
 	}
 	
 	@VisibleForTesting ImmutableList<ListInfo> listImapFolders(final ProcessedTask processedTask) throws Exception {
-		try (StoreClient storeClient = storeClientFactory.create(processedTask.getDomain().getName())) {
+		ObmDomain domain = processedTask.getDomain();
+		try (StoreClient storeClient = storeClientFactory.create(domain.getName())) {
 			storeClient.login(false);
 			
 			return FluentIterable.from(storeClient.listAll())
 					.filter(filterOutNonUserMailboxes())
-					.transform(appendDomainWhenNone(processedTask))
-					.filter(filterDomain(processedTask))
+					.transform(appendDomainWhenNone(domain))
+					.filter(filterDomain(domain, processedTask.getLogger()))
 					.filter(filterExcludedFolder(processedTask))
 					.filter(filterOutExcludedUsers(processedTask))
 					.filter(filterFolders(processedTask, imapArchiveConfigurationService.getArchiveMainFolder(), TemporaryMailbox.TEMPORARY_FOLDER))
@@ -403,8 +404,8 @@ public class ImapArchiveProcessing {
 		}
 	}
 
-	private Function<ListInfo, ListInfo> appendDomainWhenNone(ProcessedTask processedTask) {
-		final String domainName = processedTask.getDomain().getName();
+	protected Function<ListInfo, ListInfo> appendDomainWhenNone(ObmDomain domain) {
+		final String domainName = domain.getName();
 		return new Function<ListInfo, ListInfo>() {
 
 			@Override
@@ -431,9 +432,8 @@ public class ImapArchiveProcessing {
 		};
 	}
 
-	private Predicate<ListInfo> filterDomain(ProcessedTask processedTask) {
-		final DomainName domainName = new DomainName(processedTask.getDomain().getName());
-		final Logger logger = processedTask.getLogger();
+	protected Predicate<ListInfo> filterDomain(ObmDomain domain, final Logger logger) {
+		final DomainName domainName = new DomainName(domain.getName());
 		return new Predicate<ListInfo>() {
 
 			@Override
@@ -451,7 +451,7 @@ public class ImapArchiveProcessing {
 		};
 	}
 
-	private Predicate<? super ListInfo> filterOutNonUserMailboxes() {
+	protected Predicate<? super ListInfo> filterOutNonUserMailboxes() {
 		return new Predicate<ListInfo>() {
 
 			@Override

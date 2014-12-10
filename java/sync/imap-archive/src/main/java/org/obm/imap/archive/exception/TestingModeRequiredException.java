@@ -29,9 +29,11 @@
  * ***** END LICENSE BLOCK ***** */
 
 
-package org.obm.imap.archive.beans;
+package org.obm.imap.archive.exception;
 
-
-public enum ArchiveTreatmentKind {
-	REAL_RUN, DRY_RUN, DELETE_ALL;
+public class TestingModeRequiredException extends RuntimeException {
+	
+	public TestingModeRequiredException() {
+		super();
+	}
 }

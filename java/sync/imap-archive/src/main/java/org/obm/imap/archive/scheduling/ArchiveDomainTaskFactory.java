@@ -41,6 +41,7 @@ import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.DryRunTaskStat
 import org.obm.imap.archive.scheduling.ArchiveSchedulerBus.Events.RealRunTaskStatusChanged;
 import org.obm.imap.archive.services.DryRunImapArchiveProcessing;
 import org.obm.imap.archive.services.ImapArchiveProcessing;
+import org.obm.imap.archive.services.ResetImapArchiveProcessing;
 
 import ch.qos.logback.classic.Logger;
 
@@ -52,13 +53,18 @@ import com.google.inject.Singleton;
 public class ArchiveDomainTaskFactory {
 	
 	private final ImapArchiveProcessing imapArchiveProcessing;
-	private final LoggerFactory loggerFactory;
+	private final ResetImapArchiveProcessing resetImapArchiveProcessing;
 	private final DryRunImapArchiveProcessing dryRunImapArchiveProcessing;
+	private final LoggerFactory loggerFactory;
 
 	@Inject
-	@VisibleForTesting ArchiveDomainTaskFactory(ImapArchiveProcessing imapArchiveProcessing, 
-			DryRunImapArchiveProcessing dryRunImapArchiveProcessing, LoggerFactory loggerFactory) {
+	@VisibleForTesting ArchiveDomainTaskFactory(ImapArchiveProcessing imapArchiveProcessing,
+			ResetImapArchiveProcessing resetImapArchiveProcessing,
+			DryRunImapArchiveProcessing dryRunImapArchiveProcessing, 
+			LoggerFactory loggerFactory) {
+		
 		this.imapArchiveProcessing = imapArchiveProcessing;
+		this.resetImapArchiveProcessing = resetImapArchiveProcessing;
 		this.dryRunImapArchiveProcessing = dryRunImapArchiveProcessing;
 		this.loggerFactory = loggerFactory;
 	}
@@ -94,6 +100,8 @@ public class ArchiveDomainTaskFactory {
 			return new ArchiveDomainTask(dryRunImapArchiveProcessing, new DryRunTaskStatusChanged.Factory(), configuration);
 		case REAL_RUN:
 			return new ArchiveDomainTask(imapArchiveProcessing, new RealRunTaskStatusChanged.Factory(), configuration);
+		case DELETE_ALL:
+			return new ArchiveDomainTask(resetImapArchiveProcessing, new RealRunTaskStatusChanged.Factory(), configuration);
 		}
 		throw new IllegalArgumentException();
 	}

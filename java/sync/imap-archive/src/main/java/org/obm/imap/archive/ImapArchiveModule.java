@@ -154,7 +154,9 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(ArchiveSchedulerBusInitializer.class).asEagerSingleton();
 		
 		bindImapArchiveServices();
-		if (isInTestingMode()) {
+		Boolean inTestingMode = isInTestingMode();
+		bind(Boolean.class).annotatedWith(Names.named("testingMode")).toInstance(inTestingMode);
+		if (inTestingMode) {
 			bind(TestingDateProvider.class).to(TestingDateProviderImpl.class);
 			bind(DateProvider.class).to(TestingDateProviderImpl.class);
 			install(new TestingServletModule());

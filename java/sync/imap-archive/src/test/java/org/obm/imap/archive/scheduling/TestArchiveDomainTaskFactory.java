@@ -44,7 +44,7 @@ public class TestArchiveDomainTaskFactory extends ArchiveDomainTaskFactory {
 	private LoggerAppenders loggerAppenders;
 
 	public TestArchiveDomainTaskFactory(Logger logger, LoggerAppenders loggerAppenders) {
-		super(null, null, null);
+		super(null, null, null, null);
 		this.logger = logger;
 		this.loggerAppenders = loggerAppenders;
 	}
