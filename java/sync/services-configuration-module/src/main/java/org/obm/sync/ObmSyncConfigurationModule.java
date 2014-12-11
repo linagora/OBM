@@ -33,6 +33,7 @@ import org.obm.configuration.ConfigurationModule;
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.LocatorConfigurationImpl;
 
@@ -51,6 +52,9 @@ public class ObmSyncConfigurationModule extends AbstractModule {
 		final GlobalAppConfiguration<ObmSyncConfigurationService> globalConfiguration = buildConfiguration();
 		bind(ObmSyncConfigurationService.class).toInstance(globalConfiguration.getConfiguration());
 		install(new ConfigurationModule<ObmSyncConfigurationService> (globalConfiguration, ObmSyncConfigurationService.class));
+		
+		CyrusClientEmailConfiguration emailConfiguration = new CyrusClientEmailConfiguration.Factory().create(GLOBAL_CONFIGURATION_FILE);
+		bind(EmailConfiguration.class).toInstance(emailConfiguration);
 	}
 
 	private GlobalAppConfiguration<ObmSyncConfigurationService> buildConfiguration() {

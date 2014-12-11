@@ -27,25 +27,33 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.cyrus.imap;
+
+package org.obm.sync;
 
 import org.obm.configuration.EmailConfigurationImpl;
 import org.obm.configuration.utils.IniFile;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
-@Singleton
 public class CyrusClientEmailConfiguration extends EmailConfigurationImpl {
+	
+	public static class Factory {
+		
+		protected IniFile.Factory iniFileFactory;
 
-	@Inject
-	public CyrusClientEmailConfiguration(IniFile.Factory iniFileFactory) {
-		super(iniFileFactory);
+		public Factory() {
+			iniFileFactory = new IniFile.Factory();
+		}
+		
+		public CyrusClientEmailConfiguration create(String iniFile) {
+			return new CyrusClientEmailConfiguration(iniFileFactory.build(iniFile));
+		}
+	}
+
+	private CyrusClientEmailConfiguration(IniFile iniFile) {
+		super(iniFile);
 	}
 
 	@Override
 	public MailboxNameCheckPolicy mailboxNameCheckPolicy() {
 		return MailboxNameCheckPolicy.NEVER;
 	}
-
 }

@@ -35,6 +35,7 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
+import org.obm.configuration.EmailConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
 import org.obm.configuration.LocatorConfigurationImpl;
 import org.obm.configuration.TransactionConfiguration;
@@ -46,6 +47,8 @@ public class ImapArchiveConfigurationModule extends AbstractModule {
 
 	@VisibleForTesting static final String APPLICATION_NAME = "obm-imap-archive";
 	private static final String GLOBAL_CONFIGURATION_FILE = ConfigurationService.GLOBAL_OBM_CONFIGURATION_PATH;
+	public static final String IMAP_ARCHIVE_CONFIG_FILE_PATH = "/etc/obm-imap-archive/obm-imap-archive.ini";
+	
 
 	@Override
 	protected void configure() {
@@ -58,6 +61,9 @@ public class ImapArchiveConfigurationModule extends AbstractModule {
 		install(new ConfigurationModule<ConfigurationService> (globalConfiguration, ConfigurationService.class));
 		
 		bind(ImapArchiveConfigurationService.class).toInstance(imapArchiveConfigurationService);
+		
+		ImapArchiveEmailConfigurationImpl emailConfiguration = new ImapArchiveEmailConfigurationImpl.Factory().create(IMAP_ARCHIVE_CONFIG_FILE_PATH);
+		bind(EmailConfiguration.class).toInstance(emailConfiguration);
 	}
 
 	private ImapArchiveConfigurationServiceImpl imapArchiveConfigurationService(ConfigurationServiceImpl configurationService) {

@@ -42,8 +42,6 @@ import com.google.inject.Inject;
 
 public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigurationService {
 
-	@VisibleForTesting static final String CONFIG_FILE_PATH = "/etc/obm-imap-archive/obm-imap-archive.ini";
-	
 	@VisibleForTesting static final String CYRUS_PARTITION_SUFFIX = "partition_suffix";
 	public static final String DEFAULT_CYRUS_PARTITION_SUFFIX = "archive";
 	
@@ -66,7 +64,7 @@ public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigura
 
 		@Inject
 		public Factory(TransactionConfiguration transactionConfiguration) {
-			this(transactionConfiguration, new IniFile.Factory().build(CONFIG_FILE_PATH));
+			this(transactionConfiguration, new IniFile.Factory().build(ImapArchiveConfigurationModule.IMAP_ARCHIVE_CONFIG_FILE_PATH));
 		}
 		
 		@VisibleForTesting Factory(TransactionConfiguration transactionConfiguration, IniFile iniFile) {

@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2013-2014  Linagora
+ * Copyright (C) 2011-2014  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,27 +29,40 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.cyrus.imap;
+package org.obm.imap.archive.configuration;
 
-import org.obm.cyrus.imap.admin.Connection;
-import org.obm.cyrus.imap.admin.ConnectionImpl;
-import org.obm.cyrus.imap.admin.CyrusImapService;
-import org.obm.cyrus.imap.admin.CyrusImapServiceImpl;
-import org.obm.cyrus.imap.admin.CyrusManager;
-import org.obm.cyrus.imap.admin.CyrusManagerImpl;
-import org.obm.push.LinagoraImapClientModule;
+import java.util.concurrent.TimeUnit;
 
-import com.google.inject.AbstractModule;
+import org.obm.configuration.EmailConfigurationImpl;
+import org.obm.configuration.utils.IniFile;
 
-public class CyrusClientModule extends AbstractModule {
+import com.google.common.primitives.Ints;
+import com.google.inject.Singleton;
+
+@Singleton
+public class ImapArchiveEmailConfigurationImpl extends EmailConfigurationImpl {
+	
+	private static final int BACKEND_IMAP_TIMEOUT_DEFAULT = Ints.checkedCast(TimeUnit.HOURS.toMillis(1));
+	
+	public static class Factory {
+		
+		protected IniFile.Factory iniFileFactory;
+
+		public Factory() {
+			iniFileFactory = new IniFile.Factory();
+		}
+		
+		public ImapArchiveEmailConfigurationImpl create(String iniFile) {
+			return new ImapArchiveEmailConfigurationImpl(iniFileFactory.build(iniFile));
+		}
+	}
+	
+	protected ImapArchiveEmailConfigurationImpl(IniFile iniFile) {
+		super(iniFile);
+	}	
 
 	@Override
-	protected void configure() {
-		bind(CyrusImapService.class).to(CyrusImapServiceImpl.class);
-		bind(CyrusManager.Factory.class).to(CyrusManagerImpl.Factory.class);
-		bind(Connection.Factory.class).to(ConnectionImpl.Factory.class);
-		
-		install(new LinagoraImapClientModule());
+	public int imapTimeoutInMilliseconds() {
+		return iniFile.getIntValue(BACKEND_IMAP_TIMEOUT_VALUE, BACKEND_IMAP_TIMEOUT_DEFAULT);
 	}
-
 }

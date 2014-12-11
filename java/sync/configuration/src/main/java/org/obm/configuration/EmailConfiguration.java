@@ -36,10 +36,6 @@ public interface EmailConfiguration {
 	static enum MailboxNameCheckPolicy {
 		ALWAYS, NEVER
 	}
-
-	enum ExpungePolicy {
-		ALWAYS, NEVER
-	}
 	
 	public static final String IMAP_PROTOCOL = "imap";
 	public static final String IMAP_INBOX_NAME = "INBOX";
@@ -50,16 +46,10 @@ public interface EmailConfiguration {
 	boolean activateTls();
 
 	boolean loginWithDomain();
-
-	ExpungePolicy expungePolicy();
-	
-	int getMessageMaxSize();
 	
 	int imapPort();
 
 	int imapTimeoutInMilliseconds();
-
-	int getImapFetchBlockSize();
 
 	String imapMailboxDraft();
 
