@@ -65,4 +65,9 @@ public class ImapArchiveEmailConfigurationImpl extends EmailConfigurationImpl {
 	public int imapTimeoutInMilliseconds() {
 		return iniFile.getIntValue(BACKEND_IMAP_TIMEOUT_VALUE, BACKEND_IMAP_TIMEOUT_DEFAULT);
 	}
+
+	@Override
+	public MailboxNameCheckPolicy mailboxNameCheckPolicy() {
+		return MailboxNameCheckPolicy.NEVER;
+	}
 }
