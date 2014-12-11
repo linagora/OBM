@@ -243,7 +243,11 @@ public class ImapArchiveProcessing {
 			batchCopyFromTemporaryToArchive(mailbox, temporaryMailbox, mappedMessageSets, processedFolder, processedTask);
 	
 		} finally {
-			temporaryMailbox.delete();
+			try {
+				temporaryMailbox.delete();
+			} catch (Exception e) {
+				logger.warn(String.format("Wasn't able to delete temporary mailbox %s", temporaryMailbox.getName()), e);
+			}
 		}
 	}
 

@@ -70,7 +70,9 @@ import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.exception.ImapArchiveProcessingException;
 import org.obm.imap.archive.logging.LoggerAppenders;
+import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.imap.archive.mailbox.MailboxImpl;
+import org.obm.imap.archive.mailbox.TemporaryMailbox;
 import org.obm.imap.archive.services.ImapArchiveProcessing.ProcessedTask;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.exception.MailboxNotFoundException;
@@ -84,6 +86,7 @@ import org.obm.push.mail.bean.ListResult;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.minig.imap.StoreClient;
+import org.obm.sync.base.DomainName;
 import org.slf4j.LoggerFactory;
 
 import pl.wkr.fluentrule.api.FluentExpectedException;
@@ -1825,5 +1828,58 @@ public class ImapArchiveProcessingTest {
 		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders(processedTask);
 		control.verify();
 		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void processingImapCopyShouldThrowOriginException() throws Exception {
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		MessageSet messageSet = MessageSet.builder().add(Range.closed(1l, 100l)).build();
+		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
+		Mailbox mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
+				.from(mailbox)
+				.domainName(new DomainName(domain.getName()))
+				.cyrusPartitionSuffix("archive")
+				.build();
+		
+		expect(storeClient.select(mailbox.getName()))
+			.andReturn(true);
+		// Throws IllegalStateException
+		expect(storeClient.uidCopy(messageSet, temporaryMailbox.getName()))
+			.andReturn(MessageSet.empty());
+		expect(storeClient.select(temporaryMailbox.getName()))
+			.andReturn(true);
+		// Returning false throws ImapDeleteException in finally 
+		expect(storeClient.delete(temporaryMailbox.getName()))
+			.andReturn(false);
+		
+		ProcessedFolder.Builder processedFolder = ProcessedFolder.builder();
+		
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.ENABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+				.build();
+		
+		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
+				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
+		
+		ProcessedTask processedTask = ProcessedTask.builder()
+				.archiveConfiguration(archiveConfiguration)
+				.higherBoundary(HigherBoundary.builder()
+						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
+						.build())
+				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
+				.build();
+
+		try {
+			control.replay();
+			imapArchiveProcessing.processingImapCopy(mailbox, FluentIterable.from(messageSet.asDiscreteValues()), processedFolder, processedTask);
+		} finally {
+			control.verify();
+		}
 	}
 }
