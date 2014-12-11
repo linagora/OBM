@@ -2721,6 +2721,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
 
   $obm_q = new DB_OBM;
 
+  $exception_recurrence_id_date = null;
   if( $date_occurrence != NULL){
     $id = sql_parse_id($calendar['event_id']);
     $exception_recurrence_id_date = clone $date_occurrence;
@@ -2739,7 +2740,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
       $exception_recurrence_id_date = allday_start_date($exception_recurrence_id_date, Of_Date::getOption("timezone"), Of_Date::getOption("timezone"));
   }
   $exception_recurrence_id_date->setTimezone(new DateTimeZone('UTC'));
-  $exception_date = $calendar['date_begin'] ? clone $calendar['date_begin'] : clone $date_occurrence;
+  $exception_date = $calendar['date_begin'] ? clone $calendar['date_begin'] : clone $exception_recurrence_id_date;
   $exception_date->setTimezone(new DateTimeZone('UTC'));
   $event_duration = $calendar['event_duration'] > 0 ? $calendar['event_duration'] : $calendar['duration'];
   $title = $calendar['event_title'] ? sql_parse_text($calendar['event_title']) : sql_parse_text($calendar['title']);
