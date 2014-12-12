@@ -3,6 +3,11 @@
 <configuration scan="true" scanPeriod="60 seconds">
 
 	<statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+	
+	<logger name="CONFIGURATION" level="INFO" />
+	<logger name="CONTAINER" level="INFO" />
+	<logger name="TASK" level="INFO" />
+	<logger name="IMAP.COMMAND" level="DEBUG" />
 
 	<appender name="PROD" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
@@ -10,7 +15,7 @@
 		</encoder>
 	</appender>
 
-	<root level="DEBUG">
+	<root level="WARN">
 		<appender-ref ref="PROD" />
 	</root>
 
