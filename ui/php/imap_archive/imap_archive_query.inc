@@ -313,4 +313,5 @@ class ImapArchiveException extends Exception {}
 
 class ImapArchiveNoEmailException extends Exception {}
 
+class ImapArchiveServerNotFoundException extends Exception {}
 ?>
