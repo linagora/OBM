@@ -194,7 +194,6 @@ public class ImapArchiveProcessing {
 		return isSuccess;
 	}
 
-	@Transactional
 	protected void processMailbox(Mailbox mailbox, ProcessedTask processedTask) throws Exception {
 		Optional<Long> previousLastUid = previousLastUid(mailbox, processedTask.getPreviousArchiveTreatment());
 		
@@ -571,6 +570,7 @@ public class ImapArchiveProcessing {
 		creatableMailbox.select();
 	}
 
+	@Transactional
 	protected void folderProcessed(ProcessedFolder.Builder processedFolder) throws DaoException {
 		processedFolderDao.insert(processedFolder.end(dateTimeProvider.now()).build());
 	}
