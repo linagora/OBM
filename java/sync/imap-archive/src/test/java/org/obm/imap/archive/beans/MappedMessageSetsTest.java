@@ -37,6 +37,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 import org.obm.push.mail.bean.MessageSet;
 
+import com.google.common.collect.Range;
+
 
 public class MappedMessageSetsTest {
 
@@ -76,4 +78,26 @@ public class MappedMessageSetsTest {
 		assertThat(mappedMessageSets.getDestinationUidFor(3l)).isEqualTo(30l);
 		assertThat(mappedMessageSets.getDestinationUidFor(4l)).isEqualTo(40l);
 	}
+	
+	@Test
+	public void originAndDestinationShouldBeMappedWhenRanges() {
+		MessageSet origin = MessageSet.builder().add(Range.closed(1l, 5l)).add(10l).add(Range.closed(30l, 35l)).add(40l).build();
+		MessageSet destination = MessageSet.builder().add(10l).add(Range.closed(20l, 25l)).add(30l).add(Range.closed(40l, 44l)).build();
+		
+		MappedMessageSets mappedMessageSets = MappedMessageSets.builder().origin(origin).destination(destination).build();
+		assertThat(mappedMessageSets.getDestinationUidFor(1l)).isEqualTo(10l);
+		assertThat(mappedMessageSets.getDestinationUidFor(2l)).isEqualTo(20l);
+		assertThat(mappedMessageSets.getDestinationUidFor(3l)).isEqualTo(21l);
+		assertThat(mappedMessageSets.getDestinationUidFor(4l)).isEqualTo(22l);
+		assertThat(mappedMessageSets.getDestinationUidFor(5l)).isEqualTo(23l);
+		assertThat(mappedMessageSets.getDestinationUidFor(10l)).isEqualTo(24l);
+		assertThat(mappedMessageSets.getDestinationUidFor(30l)).isEqualTo(25l);
+		assertThat(mappedMessageSets.getDestinationUidFor(31l)).isEqualTo(30l);
+		assertThat(mappedMessageSets.getDestinationUidFor(32l)).isEqualTo(40l);
+		assertThat(mappedMessageSets.getDestinationUidFor(33l)).isEqualTo(41l);
+		assertThat(mappedMessageSets.getDestinationUidFor(34l)).isEqualTo(42l);
+		assertThat(mappedMessageSets.getDestinationUidFor(35l)).isEqualTo(43l);
+		assertThat(mappedMessageSets.getDestinationUidFor(40l)).isEqualTo(44l);
+	}
+	
 }
