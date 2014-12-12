@@ -399,7 +399,7 @@ public class ImapArchiveProcessing {
 					.filter(filterDomain(processedTask))
 					.filter(filterExcludedFolder(processedTask))
 					.filter(filterOutExcludedUsers(processedTask))
-					.filter(filterArchiveFolder(processedTask))
+					.filter(filterFolders(processedTask, imapArchiveConfigurationService.getArchiveMainFolder(), TemporaryMailbox.TEMPORARY_FOLDER))
 					.toList();
 		}
 	}
@@ -507,7 +507,7 @@ public class ImapArchiveProcessing {
 				}).toList();
 	}
 
-	private Predicate<ListInfo> filterArchiveFolder(ProcessedTask processedTask) {
+	private Predicate<ListInfo> filterFolders(ProcessedTask processedTask, final String...folders) {
 		final Logger logger = processedTask.getLogger();
 		return new Predicate<ListInfo>() {
 
@@ -515,16 +515,20 @@ public class ImapArchiveProcessing {
 			public boolean apply(ListInfo listInfo) {
 				try {
 					MailboxPaths mailboxPaths = MailboxPaths.from(listInfo.getName());
-					if (!mailboxPaths.getSubPaths().startsWith(imapArchiveConfigurationService.getArchiveMainFolder() + MailboxPaths.IMAP_FOLDER_SEPARATOR)) {
-						return true;
+					for (String folder : folders) {
+						if (mailboxPaths.getSubPaths().startsWith(folder + MailboxPaths.IMAP_FOLDER_SEPARATOR)) {
+							return false;
+						}
 					}
 				} catch (MailboxFormatException e) {
 					logger.error(String.format("The mailbox %s can't be parsed", listInfo.getName()));
+					return false;
 				}
-				return false;
+				return true;
 			}
 		};
 	}
+
 
 	@VisibleForTesting FluentIterable<Long> searchMailUids(Mailbox mailbox, HigherBoundary higherBoundary, final Optional<Long> previousLastUid) {
 		return FluentIterable.from(

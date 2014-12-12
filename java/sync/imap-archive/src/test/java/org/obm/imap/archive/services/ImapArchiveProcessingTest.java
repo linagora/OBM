@@ -1424,6 +1424,60 @@ public class ImapArchiveProcessingTest {
 	}
 	
 	@Test
+	public void listImapFoldersShouldFilterTemporaryFolder() throws Exception {
+		List<ListInfo> expectedListInfos = ImmutableList.of(
+				new ListInfo("user/usera@mydomain.org", true, false),
+				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
+				new ListInfo("user/usera/SPAM@mydomain.org", true, false),
+				new ListInfo("user/usera/Sent@mydomain.org", true, false),
+				new ListInfo("user/usera/Excluded@mydomain.org", true, false),
+				new ListInfo("user/usera/Excluded/subfolder@mydomain.org", true, false));
+		ListResult listResult = new ListResult(6);
+		listResult.addAll(expectedListInfos);
+		listResult.add(new ListInfo("user/usera/" + TemporaryMailbox.TEMPORARY_FOLDER + "/Excluded@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/" + TemporaryMailbox.TEMPORARY_FOLDER + "/Excluded/subfolder@mydomain.org", true, false));
+		
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		storeClient.login(false);
+		expectLastCall();
+		expect(storeClient.listAll())
+			.andReturn(listResult);
+		storeClient.close();
+		expectLastCall();
+		
+		ObmDomain domain = ObmDomain.builder().name("mydomain.org").uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.ENABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.daily())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.build();
+		
+		expect(storeClientFactory.create(domain.getName()))
+			.andReturn(storeClient);
+
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
+		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
+				domainConfiguration, null, null, runId, logger, null, false);
+		
+		control.replay();
+		
+		ProcessedTask processedTask = ProcessedTask.builder()
+				.archiveConfiguration(archiveConfiguration)
+				.higherBoundary(HigherBoundary.builder()
+						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
+						.build())
+				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
+				.build();
+		
+		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders(processedTask);
+		control.verify();
+		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+	}
+	
+	@Test
 	public void searchMailUidsWhenNoPreviousUidNext() throws Exception {
 		DateTime higherBoundary = DateTime.parse("2014-07-26T08:46:00.000Z");
 		HigherBoundary boundary = HigherBoundary.builder()
