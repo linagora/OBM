@@ -83,7 +83,7 @@ public class GreenMailEmailConfiguration implements EmailConfiguration {
 
 	@Override
 	public MailboxNameCheckPolicy mailboxNameCheckPolicy() {
-		return MailboxNameCheckPolicy.ALWAYS;
+		return MailboxNameCheckPolicy.NEVER;
 	}
 
 }

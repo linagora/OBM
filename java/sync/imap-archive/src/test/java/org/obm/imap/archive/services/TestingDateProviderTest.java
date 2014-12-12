@@ -55,7 +55,7 @@ public class TestingDateProviderTest {
 		control = createControl();
 		
 		obmHelper = control.createMock(ObmHelper.class);
-		testee = new TestingDateProvider(obmHelper);
+		testee = new TestingDateProviderImpl(obmHelper);
 	}
 	
 	@Test

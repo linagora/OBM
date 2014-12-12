@@ -84,6 +84,7 @@ import org.obm.imap.archive.services.ScheduledArchivingTracker;
 import org.obm.imap.archive.services.SchedulingDatesService;
 import org.obm.imap.archive.services.StoreClientFactory;
 import org.obm.imap.archive.services.TestingDateProvider;
+import org.obm.imap.archive.services.TestingDateProviderImpl;
 import org.obm.imap.archive.startup.ImapArchiveLifeCycleHandler;
 import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
@@ -154,7 +155,8 @@ public class ImapArchiveModule extends AbstractModule {
 		
 		bindImapArchiveServices();
 		if (isInTestingMode()) {
-			bind(DateProvider.class).to(TestingDateProvider.class);
+			bind(TestingDateProvider.class).to(TestingDateProviderImpl.class);
+			bind(DateProvider.class).to(TestingDateProviderImpl.class);
 			install(new TestingServletModule());
 		} else {
 			bind(DateProvider.class).to(ObmHelper.class);

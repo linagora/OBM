@@ -30,10 +30,44 @@
 
 package org.obm.imap.archive.services;
 
-import org.joda.time.DateTime;
-import org.obm.sync.date.DateProvider;
+import java.util.Date;
 
-public interface TestingDateProvider extends DateProvider {
+import org.joda.time.DateTime;
+import org.joda.time.Period;
+import org.obm.utils.ObmHelper;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
+public class TestingDateProviderImpl implements TestingDateProvider {
+
+	private final ObmHelper obmHelper;
+	private Period period;
+
+	@Inject
+	@VisibleForTesting
+	protected TestingDateProviderImpl(ObmHelper obmHelper) {
+		this.obmHelper = obmHelper;
+		this.period = new Period(0l);
+	}
 	
-	void setReferenceDate(DateTime referenceDate);
+	@Override
+	public Date getDate() {
+		return new DateTime(currentDate())
+				.plus(period)
+				.toDate();
+	}
+
+	protected Date currentDate() {
+		return obmHelper.getDate();
+	}
+
+	@Override
+	public void setReferenceDate(DateTime referenceDate) {
+		Preconditions.checkArgument(referenceDate != null);
+		this.period = new Period(new DateTime(currentDate()), referenceDate); 
+	}
 }

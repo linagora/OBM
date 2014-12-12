@@ -53,6 +53,7 @@ import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory;
 import org.obm.imap.archive.scheduling.OnlyOnePerDomainMonitorFactory.OnlyOnePerDomainMonitorFactoryImpl;
 import org.obm.imap.archive.services.Mailer;
 import org.obm.imap.archive.services.TestingDateProvider;
+import org.obm.imap.archive.services.TestingDateProviderImpl;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.mail.greenmail.GreenMailProviderModule;
@@ -181,7 +182,7 @@ public class TestImapArchiveModules {
 				@Override
 				protected void configure() {
 					install(new GreenMailProviderModule());
-					bind(Integer.class).annotatedWith(Names.named("imapTimeout")).toInstance(3600);
+					bind(Integer.class).annotatedWith(Names.named("imapTimeout")).toInstance(3600000);
 					bind(Mailer.class).to(NoopMailer.class);
 				}})
 			);
@@ -331,7 +332,7 @@ public class TestImapArchiveModules {
 		}
 		
 		@Singleton
-		public static class TestTestingDateProvider extends TestingDateProvider {
+		public static class TestTestingDateProvider extends TestingDateProviderImpl {
 
 			@Inject
 			public TestTestingDateProvider(ObmHelper obmHelper) {

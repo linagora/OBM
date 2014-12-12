@@ -28,12 +28,63 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.services;
+package org.obm.imap.archive;
 
-import org.joda.time.DateTime;
-import org.obm.sync.date.DateProvider;
+import org.junit.rules.TemporaryFolder;
+import org.obm.imap.archive.TestImapArchiveModules.WithGreenmail;
+import org.obm.imap.archive.services.TestingDateProvider;
+import org.obm.imap.archive.services.TestingDateProviderImpl;
 
-public interface TestingDateProvider extends DateProvider {
+import com.github.restdriver.clientdriver.ClientDriverRule;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.util.Modules;
+
+public class CucumberModule extends AbstractModule {
+
+	private ClientDriverRule driver = new ClientDriverRule();
+	private TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+	@Override
+	protected void configure() {
+		System.setProperty("testingMode", "true");
+		install(new Module(driver, new Provider<TemporaryFolder>() {
+
+				@Override
+				public TemporaryFolder get() {
+					return temporaryFolder;
+				}
+				
+			}));
+	}
 	
-	void setReferenceDate(DateTime referenceDate);
+	@Singleton
+	@Provides
+	public ClientDriverRule driver() {
+		return driver;
+	}
+	
+	public static class Module extends AbstractModule {
+
+		private ClientDriverRule obmSyncHttpMock;
+		private Provider<TemporaryFolder> temporaryFolder;
+
+		public Module(ClientDriverRule obmSyncHttpMock, Provider<TemporaryFolder> temporaryFolder) {
+			this.obmSyncHttpMock = obmSyncHttpMock;
+			this.temporaryFolder = temporaryFolder;
+		}
+
+		@Override
+		protected void configure() {
+			install(Modules.override(new WithGreenmail(obmSyncHttpMock, temporaryFolder)).with(new AbstractModule() {
+
+				@Override
+				protected void configure() {
+					bind(TestingDateProvider.class).to(TestingDateProviderImpl.class);
+				}})
+			);
+		}
+	}
 }

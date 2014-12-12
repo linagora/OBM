@@ -28,12 +28,12 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.services;
+package org.obm.imap.archive.treatment;
 
-import org.joda.time.DateTime;
-import org.obm.sync.date.DateProvider;
+import org.junit.runner.RunWith;
 
-public interface TestingDateProvider extends DateProvider {
-	
-	void setReferenceDate(DateTime referenceDate);
+import cucumber.api.junit.Cucumber;
+
+@RunWith(Cucumber.class)
+public class TreatmentCucumber {
 }
