@@ -32,6 +32,7 @@
 
 package org.obm.imap.archive.beans;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import org.obm.push.mail.bean.MessageSet;
@@ -39,7 +40,6 @@ import org.obm.push.mail.bean.MessageSet;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 
 public class MappedMessageSets {
 
@@ -74,15 +74,15 @@ public class MappedMessageSets {
 		}
 
 		private Map<Long, Long> map(MessageSet destination, MessageSet origin) {
-			Iterable<Long> destinationDiscreteValues = destination.asDiscreteValues();
+			Preconditions.checkState(origin.size() == destination.size());
 			Iterable<Long> originDiscreteValues = origin.asDiscreteValues();
-			int size = Iterables.size(destinationDiscreteValues);
-			Preconditions.checkState(Iterables.size(originDiscreteValues) == size);
+			Iterator<Long> destinationValuesIterator = destination.iterator();
 			
 			ImmutableMap.Builder<Long, Long> originUidsToDestinationUids = ImmutableMap.builder();
-			for (int index = 0; index < size; index++) {
-				originUidsToDestinationUids.put(Iterables.get(originDiscreteValues, index), Iterables.get(destinationDiscreteValues, index));
+			for (Long originValue : originDiscreteValues) {
+				originUidsToDestinationUids.put(originValue, destinationValuesIterator.next());
 			}
+			
 			return originUidsToDestinationUids.build();
 		}
 	}

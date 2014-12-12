@@ -393,4 +393,66 @@ public class MessageSetTest {
 		MessageSet messageSet = origin.remove(MessageSet.builder().add(Range.closed(8l, 30l)).build());
 		assertThat(messageSet.asDiscreteValues()).isEmpty();
 	}
+	
+	@Test
+	public void sizeShouldReturnZeroWhenEmpty() {
+		assertThat(MessageSet.empty().size()).isZero();
+	}
+	
+	@Test
+	public void sizeShouldReturnOneWhenSingleton() {
+		assertThat(MessageSet.singleton(4l).size()).isEqualTo(1);
+	}
+	
+	@Test
+	public void sizeShouldReturnOneWhenOneUid() {
+		assertThat(MessageSet.builder().add(4l).build().size()).isEqualTo(1);
+	}
+	
+	@Test
+	public void sizeShouldReturnOneWhenRangeOfOneUid() {
+		assertThat(MessageSet.builder().add(Range.closed(10l, 10l)).build().size()).isEqualTo(1);
+	}
+	
+	@Test
+	public void sizeShouldReturnThreeWhenThreeUids() {
+		assertThat(MessageSet.builder().add(4l).add(6l).add(100l).build().size()).isEqualTo(3);
+	}
+	
+	@Test
+	public void sizeShouldReturnThreeWhenRangeOfThreeUid() {
+		assertThat(MessageSet.builder().add(Range.closed(10l, 12l)).build().size()).isEqualTo(3);
+	}
+
+	@Test
+	public void sizeShouldReturnValueWhenRangeIsClosedClosed() {
+		assertThat(MessageSet.builder().add(Range.closed(0l, 5l)).build().size()).isEqualTo(6);
+	}
+
+	@Test
+	public void sizeShouldReturnValueWhenRangeIsClosedOpen() {
+		assertThat(MessageSet.builder().add(Range.closedOpen(0l, 5l)).build().size()).isEqualTo(5);
+	}
+	
+	@Test
+	public void sizeShouldReturnValueWhenRangeIsOpenClosed() {
+		assertThat(MessageSet.builder().add(Range.openClosed(0l, 5l)).build().size()).isEqualTo(5);
+	}
+	
+	@Test
+	public void sizeShouldReturnValueWhenRangeIsOpenOpen() {
+		assertThat(MessageSet.builder().add(Range.open(0l, 5l)).build().size()).isEqualTo(4);
+	}
+	
+	@Test
+	public void sizeShouldReturnComputedSizeWhenManyRanges() {
+		assertThat(MessageSet.builder()
+				.add(Range.closed(10l, 12l))
+				.add(Range.closed(100l, 102l))
+				.add(Range.closed(20l, 20l))
+				.add(Range.closed(1000l, 10000l))
+				.build()
+				.size())
+			.isEqualTo(9008);
+	}
 }

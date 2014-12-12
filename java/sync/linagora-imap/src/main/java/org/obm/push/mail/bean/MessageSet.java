@@ -43,6 +43,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.collect.BoundType;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.FluentIterable;
@@ -209,6 +210,26 @@ public class MessageSet implements Serializable, Iterable<Long> {
 
 	public long max() {
 		return Iterables.getLast(ranges).upperEndpoint();
+	}
+
+	public long size() {
+		long size = 0;
+		for (Range<Long> range : ranges) {
+			size += rangeSize(range);
+		}
+		return size;
+	}
+
+	private long rangeSize(Range<Long> range) {
+		return boundTypeAwareUpperEndpoint(range) - boundTypeAwareLowerEndpoint(range);
+	}
+
+	private long boundTypeAwareLowerEndpoint(Range<Long> range) {
+		return range.lowerEndpoint() + (BoundType.OPEN == range.lowerBoundType() ? 1 : 0 );
+	}
+
+	private long boundTypeAwareUpperEndpoint(Range<Long> range) {
+		return range.upperEndpoint() + (BoundType.CLOSED == range.upperBoundType() ? 1 : 0 );
 	}
 	
 	public Optional<Long> first() {
