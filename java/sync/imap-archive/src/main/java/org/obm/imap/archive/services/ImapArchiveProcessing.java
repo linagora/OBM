@@ -268,15 +268,20 @@ public class ImapArchiveProcessing {
 				
 				MessageSet originUids = entry.getValue();
 				MessageSet yearMessageSet = mappedMessageSets.getDestinationUidFor(originUids);
-				copyTemporaryMessagesToArchive(temporaryMailbox, yearMessageSet, archiveMailbox);
+				copyTemporaryMessagesToArchive(temporaryMailbox, yearMessageSet, archiveMailbox, processedTask.getLogger());
 				processedFolder.addUid(originUids.max());
 			}
 		}
 	}
 
 	private void copyTemporaryMessagesToArchive(TemporaryMailbox temporaryMailbox, 
-			MessageSet partitionMessageSet, ArchiveMailbox archiveMailbox) 
+			MessageSet partitionMessageSet, ArchiveMailbox archiveMailbox, Logger logger) 
 					throws MailboxNotFoundException, ImapSelectException, IMAPException {
+		
+		if (partitionMessageSet.isEmpty()) {
+			logger.warn("Empty messageSet for mailbox: {}", archiveMailbox.getName());
+			return;
+		}
 		temporaryMailbox.select();
 		MessageSet copiedMessageSet = temporaryMailbox.uidCopy(partitionMessageSet, archiveMailbox);
 		addSeenFlags(archiveMailbox, copiedMessageSet);
