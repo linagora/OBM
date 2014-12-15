@@ -84,7 +84,8 @@ function imapArchiveRootPath() {
 
 function http_get($url, $extraParams = array()) {
   $config = build_http_config_with_auth();
-  return (new HttpClient($config))->get(new Url(imapArchiveRootPath().$url, $extraParams));
+  $httpClient = new HttpClient($config);
+  return $httpClient->get(new Url(imapArchiveRootPath().$url, $extraParams));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -142,7 +143,8 @@ function http_post($url, $extraParams = array(), $json = "", $max_redirects = 0)
   $init_config = build_http_config_with_auth();
   $post_config = HttpConfig::from_config($init_config, array(jsonHeaders()),
     $max_redirects);
-  return (new HttpClient($post_config))->post(
+  $httpClient = new HttpClient($post_config);
+  return $httpClient->post(
     new Url(imapArchiveRootPath().$url, $extraParams),
     $json);
 }
@@ -223,7 +225,8 @@ function http_put($url, $json) {
   $config = HttpConfig::from_config($init_config, array(
     jsonHeaders()
   ));
-  return (new HttpClient($config))->put(new Url(imapArchiveRootPath().$url), $json);
+  $httpClient = new HttpClient($config);
+  return $httpClient->put(new Url(imapArchiveRootPath().$url), $json);
 }
 
 function build_http_config_with_auth() {
@@ -274,7 +277,8 @@ function get_logs($runId) {
       })
     )
   );
-  return (new HttpClient($config))->get(new Url($imapArchiveRootPath.$logPath));
+  $httpClient = new HttpClient($config);
+  return $httpClient->get(new Url($imapArchiveRootPath.$logPath));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
