@@ -269,7 +269,9 @@ public class ImapArchiveProcessing {
 				MessageSet originUids = entry.getValue();
 				MessageSet yearMessageSet = mappedMessageSets.getDestinationUidFor(originUids);
 				copyTemporaryMessagesToArchive(temporaryMailbox, yearMessageSet, archiveMailbox, processedTask.getLogger());
-				processedFolder.addUid(originUids.max());
+				if (!originUids.isEmpty()) {
+					processedFolder.addUid(originUids.max());
+				}
 			}
 		}
 	}
