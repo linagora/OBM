@@ -46,3 +46,16 @@ function get_conflict_end_date($calendar) {
 
   return $calendar["date_end"];
 }
+
+function event_end_date($begin, $duration, $allDay) {
+  $end = clone $begin;
+
+  if ($allDay) {
+    $end->addDay(Of_Date::allDayDurationInDays($duration));
+    $end->subSecond(1);
+  } else {
+    $end->addSecondsInUTC($duration);
+  }
+
+  return $end;
+}
