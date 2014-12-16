@@ -232,7 +232,7 @@ function dis_calendar_portal() {
   $end = clone $start;
   $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1)->setHour(0)->setMinute(0)->setSecond(0);
   $calendar_entity['user'] = array($obm['uid'] => array('dummy'));
-  calendar_events_model($start,$end, $calendar_entity, Of_date::getOption('timezone'));
+  calendar_events_model($start,$end, $calendar_entity);
   $of = &OccurrenceFactory::getInstance();
 
   // Minicalendar
