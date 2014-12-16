@@ -266,7 +266,7 @@ class Vcalendar_Writer_ICS {
     $params[] = 'INTERVAL='.strtoupper($value['interval']);
     $params[] = 'FREQ='.strtoupper($value['kind']);
     if ($value['until'])
-      $params[] = 'UNTIL=' . $this->parseDate($value['until'], $this->parsed_event->isAllDay() ? Of_Date::ICS_DATE : Of_Date::ICS_DATETIME);
+      $params[] = 'UNTIL='.$this->parseDate($value['until']);
     if(!is_null($value['byday'])) {
       $params[] = 'BYDAY='.strtoupper(implode(',',$value['byday']));
     }
