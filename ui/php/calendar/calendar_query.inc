@@ -112,7 +112,6 @@ function run_query_calendar_detail($calendar_id, $occurrence_date=null) {
     event_origin,
     event_allow_documents,
     event_date,
-    event_timezone,
     $eventexception_sql_if AS event_is_exception,
     ee.eventexception_parent_id AS event_eventexception_parent_id,
     ee.eventexception_date AS event_eventexception_date,
