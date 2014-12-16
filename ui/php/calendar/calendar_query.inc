@@ -5694,26 +5694,14 @@ function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfreque
     $current->setDateIso($start)->subDay($diff);
   }
   $days = str_split($repeatdays);
-  $is_allday = $event->all_day;
-  if($start->compare($date) < 0) {
-    $start = $date;
-    $of = &OccurrenceFactory::getInstance();
-    $of->addOccurrence($event, clone $date, $entity, $entity_id, $entity_state);
-  }
+  if($start->compare($date) < 0) $start = $date;
   while ($current->compare($end) < 0) {
     foreach ($days as $num => $repeat) {  
       if ($repeat == 1) {
         $current->setWeekday($num);
-        $is_occ_in_interval = $current->compare($start) >= 0 && $current->compare($end) < 0;
-        // When the first occurrence (as given by the recurrence 
-        // rule) matches the start date, we do not add this occurence,
-        // since we always add an occurrence which matches the current day
-        $is_occ_already_added = $date->compare($current) != 0;
-        if($is_occ_in_interval && $is_occ_already_added) {
-            $occ_date = $is_allday ?
-                allday_start_date($current, $event->timezone, Of_date::getOption('timezone')) : clone $current;
+        if($current->compare($start) >= 0 && $current->compare($end) < 0) {
           $of = &OccurrenceFactory::getInstance();
-          $of->addOccurrence($event, $occ_date, $entity, $entity_id, $entity_state);
+          $of->addOccurrence($event, clone $current, $entity, $entity_id, $entity_state);
         }
       }
     } 
