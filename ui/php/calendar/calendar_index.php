@@ -2419,19 +2419,6 @@ function create_new_exception($params, $user_id) {
   return $exception_insert;
 }
 
-function event_end_date($begin, $duration, $allDay) {
-  $end = clone $begin;
-
-  if ($allDay) {
-    $end->addDay(Of_Date::allDayDurationInDays($duration));
-    $end->subSecond(1);
-  } else {
-    $end->addSecondsInUTC($duration);
-  }
-
-  return $end;
-}
-
 class DBUpdateException extends Exception {}
 
 class ConflictException extends Exception {}
