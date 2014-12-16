@@ -184,7 +184,7 @@ $params['category_filter'] = $cal_category_filter;
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-$current_timezone = Of_date::getOption('timezone');
+
 if ($popup) {
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
@@ -226,7 +226,7 @@ if ($action == 'search') {
 } elseif ($action == 'decision') {
 ///////////////////////////////////////////////////////////////////////////////
   $extra_js_include[] = 'freebusy.js';
-  if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params, $current_timezone)) {
+  if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params)) {
     $display['detail'] = html_calendar_dis_conflict($params, $conflicts) ;
     $display['detail'] .= html_calendar_conflict_form($params);
     $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
@@ -298,7 +298,7 @@ if ($action == 'search') {
   $entities['document'] = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
   if (check_user_defined_rules() && check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource']) && check_upload_errors()) {
     try {
-      $conflicts = check_calendar_conflict($params, $entities, $current_timezone);
+      $conflicts = check_calendar_conflict($params, $entities);
       if ( $conflicts && (!$params['force'] || !can_force_resource_conflict($conflicts)) ) {
           if ($conflicts && !can_force_resource_conflict($conflicts)) {
             $params['force_disabled'] = 1;
@@ -449,7 +449,7 @@ if ($action == 'search') {
       && check_upload_errors()) {
     try {
       $c = get_calendar_event_info($params['calendar_id'],false); 
-      $conflicts = check_calendar_conflict($params, $entities, $current_timezone);
+      $conflicts = check_calendar_conflict($params, $entities);
       if ($conflicts && (!$params['force'] || !can_force_resource_conflict($conflicts))
         && !($c['date']->equals($params['date_begin']) && $c['event_duration'] == $params['event_duration'])) 
       {
@@ -527,7 +527,7 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_calendar_access($params['calendar_id']) && 
     check_calendar_data_quick_form($params)) {
-    $conflicts = check_calendar_conflict($params, null, $current_timezone);
+    $conflicts = check_calendar_conflict($params, null);
     if(!$conflicts || can_force_resource_conflict($conflicts)) {
       $id = $params['calendar_id'];
       $eve_q = run_query_calendar_detail($id);
@@ -646,7 +646,7 @@ if ($action == 'search') {
       if (!OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) $resourceNotification = true;
     }
   }
-  $conflicts = quick_check_calendar_conflict($params, $entities, $current_timezone);
+  $conflicts = quick_check_calendar_conflict($params, $entities);
   if ((!$event_q) || ($event_q->f('event_repeatkind')=='none') || !($params['date_begin']->equals($params['old_date_begin']))) {
     $json[] = 'occUpdate:false';
   } else {
@@ -787,7 +787,7 @@ if ($action == 'search') {
   //we want to send mails
   $GLOBALS["send_notification_mail"] = true;
   if (check_calendar_event_participation($params)) {
-    if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params, $current_timezone)) {
+    if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params)) {
       $display['msg'] .= display_warn_msg("$l_event : $l_conflicts");
     }
     $params['conflicts'] = $conflicts;
@@ -1272,7 +1272,7 @@ if ($action == 'search') {
       while ($attendees->next_record()) {
         $conflicts_entities[$attendees->f('eventlink_entity')][] = $attendees->f('eventlink_entity_id');
       } 
-      $conflicts = check_calendar_conflict($params, $conflicts_entities, $current_timezone);
+      $conflicts = check_calendar_conflict($params, $conflicts_entities);
       $extra_js_include[] = 'inplaceeditor.js';
       $extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
       $extra_js_include[] = 'freebusy.js';      
@@ -1417,7 +1417,7 @@ if (!$params['ajax']) {
   $ret = get_calendar_entity_label($entities);
   $ret['resourcegroup'] = run_query_resource_resourcegroup($params['sel_resource_group_id']);
   $entity_store = store_calendar_entities($ret);
-  get_json_entity_events($params, $entity_store, $current_timezone);
+  get_json_entity_events($params, $entity_store);
   echo "({".$display['json']."})";
   exit();
 
@@ -2383,7 +2383,7 @@ function update_decision_and_comment($params, $user_id) {
     return false;
   }
   if (!$params['force']) {
-    $conflicts = check_calendar_decision_conflict($params, $current_timezone);
+    $conflicts = check_calendar_decision_conflict($params);
     if ($conflicts) {
       throw new ConflictException();
     }

@@ -1329,7 +1329,7 @@ function dis_calendar_html_agenda($current_view, $calendar_entity, $writable_ent
 
   // Get events
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $occurrences = calendar_events_model($date,$end,$calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
   $tags = array();  
   if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
@@ -1485,7 +1485,7 @@ function dis_calendar_html_month_agenda($current_view, $calendar_entity,$writabl
  
   $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  calendar_events_model($date,$end,$calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
   $action = $GLOBALS['action'];
 
@@ -1792,7 +1792,7 @@ function dis_calendar_list_view($current_view, $calendar_entity, $writable_entit
   $category_filter = $current_view->get_category_filter();
 
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $occurrences = calendar_events_model($date, $end,$calendar_entity, Of_date::getOption('timezone'), $status, $category_filter,true,$events,null,$occurences);
+  $occurrences = calendar_events_model($date, $end,$calendar_entity, $status, $category_filter,true,$events,null,$occurences);
   $today_mark = false;
   $charset = mb_internal_encoding();
   $target = "";
@@ -2227,7 +2227,7 @@ function dis_calendar_month_planning($current_view, $calendar_entity, $writable_
   $end->addMonth(1);
 
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $events = calendar_events_model($current,$end, $calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  $events = calendar_events_model($current,$end, $calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
 
   $cats1 = of_category_get_ordered('event', 'category1');
@@ -2456,7 +2456,7 @@ function dis_calendar_planning_day_view($date, $end, $calendar_entity, $category
   global $ccalendar_first_hour, $ccalendar_last_hour;
 
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  calendar_events_model($date,$end, $calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  calendar_events_model($date,$end, $calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
   
   $cats1 = of_category_get_ordered('event', 'category1');
@@ -2551,7 +2551,7 @@ function dis_calendar_planning_view($date, $end, $calendar_entity, $category_fil
   global $l_daysofweekfirst,$l_daysofweek;
   
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  calendar_events_model($date,$end,$calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance(); 
   $day_duration = 86400;
 
@@ -4662,7 +4662,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $calendar['show_resource_calendar'] = $show_resource_calendar;
     }
     
-    $all_day = ( isset($calendar['all_day']) ) ? $calendar['all_day'] : $event_q->f('event_allday');
     if ($properties != '') {
       $charset = mb_internal_encoding();
       $item = "<?xml version='1.0' encoding='$charset' ?".">$properties";
@@ -4682,9 +4681,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
           $begin = clone $calendar['date_begin'];
         } else {
           $begin = new Of_Date($event_q->f('event_date'), 'GMT');
-          if ($all_day) {
-             $begin = allday_start_date($begin, $event_q->f('event_timezone'), Of_date::getOption('timezone'));
-          }
 
           if (isset($calendar['template_id']) && $action == 'new') {
             $today = isset($calendar['date_begin']) ? $calendar['date_begin'] : new Of_Date(date("Y-m-d"), 'GMT');
@@ -4696,6 +4692,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         }
       }
     }
+    $all_day = ( isset($calendar['all_day']) ) ? $calendar['all_day'] : $event_q->f('event_allday');
     // OBMFULL-3386
     // Same as above, for duration
     if ($is_quick_create_with_template && $current_view->useCalendarTimeForCreationWithTemplate()) {
@@ -6251,7 +6248,7 @@ function dis_calendar_free_interval($current_view, $calendar) {
     }
   }
 
-  calendar_events_model($date,$end, $entity_store, Of_date::getOption('timezone'), array('ACCEPTED', 'NEEDS-ACTION'), '', false, null, 'OPAQUE');
+  calendar_events_model($date,$end, $entity_store, array('ACCEPTED', 'NEEDS-ACTION'), '', false, null, 'OPAQUE');
   if (!is_array($entity_store['resource'])) $entity_store['resource'] = array();
   if (!is_array($entity_store['resourcegroup'])) $entity_store['resourcegroup'] = array();
 
@@ -7514,7 +7511,7 @@ function json_build_html_event($calendar, $current_view, $id) {
   if ($isMultiWeek) {
     $date = $current_view->get_date_range();
     $current = clone $date['begin'];
-    calendar_events_model($begin,$end,$calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+    calendar_events_model($begin,$end,$calendar_entity, $status, $category_filter);
     $of = &OccurrenceFactory::getInstance();
     while($current->compare($end) < 0) {
       $endWeek = clone $current;
@@ -7543,7 +7540,7 @@ function json_build_html_event($calendar, $current_view, $id) {
       $current->addDay(7);
     }
   } else {
-    calendar_events_model($begin,$end,$calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+    calendar_events_model($begin,$end,$calendar_entity, $status, $category_filter);
     $of = &OccurrenceFactory::getInstance();
     $occurrences = $of->getOccurrences();
     if (is_array($occurrences)) {
@@ -7585,8 +7582,9 @@ function json_insert_event_data($id,$calendar,$current_view) {
   );
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $category_filter = $current_view->get_category_filter();
-  $occurrences = calendar_events_model($date,$end,$calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
+
   if ($all_day) {
     $current = clone $date;
     while($current->compare($end) < 0) {
@@ -7940,7 +7938,7 @@ function dis_calendar_month_agenda_pdf($calendar, $current_view, $calendar_entit
   $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $occurrences = calendar_events_model($date, $end, $calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter);
 
   foreach($occurrences as $occurrence){
     $c = clone $occurrence->date;
@@ -7981,7 +7979,7 @@ function dis_calendar_custom_agenda_pdf($calendar, $current_view, $calendar_enti
     $status = array('ACCEPTED', 'NEEDS-ACTION');
     $category_filter = $current_view->get_category_filter();
 
-    $occurrences = calendar_events_model($date,$end,$calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+    $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
 
     while($date->compare($end) < 0) {
       $columns[$date->getTimestamp()] = array();
@@ -8038,7 +8036,7 @@ function dis_calendar_week_agenda_pdf($calendar, $current_view, $calendar_entity
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $category_filter = $current_view->get_category_filter();
 
-  $occurrences = calendar_events_model($date,$end,$calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
 
   while($date->compare($end) < 0) {
     $columns[$date->getTimestamp()] = array();
@@ -8090,7 +8088,7 @@ function dis_calendar_day_agenda_pdf($calendar, $current_view, $calendar_entity)
 
   $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $occurrences = calendar_events_model($date,$end, $calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  $occurrences = calendar_events_model($date,$end, $calendar_entity, $status, $category_filter);
   $id = $date->getTimestamp();
   $columns[$id] = array();
 
@@ -8139,7 +8137,7 @@ function dis_calendar_month_list_pdf($calendar, $current_view, $calendar_entity)
   $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED');
 
-  $occurrences = calendar_events_model($date, $end, $calendar_entity, Of_date::getOption('timezone'), $status, $category_filter, true);
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
   $pdf = new CalendarPdfList($current_view, 'month', $calendar, $calendar_entity, $occurrences);
   $pdf->drawCalendar();
   $pdf->download();
@@ -8165,7 +8163,7 @@ function dis_calendar_week_list_pdf($calendar, $current_view, $calendar_entity) 
   $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED');
 
-  $occurrences = calendar_events_model($date, $end, $calendar_entity, Of_date::getOption('timezone'), $status, $category_filter, true);
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
   $pdf = new CalendarPdfList($current_view, 'week', $calendar, $calendar_entity, $occurrences);
   $pdf->drawCalendar();
   $pdf->download();
@@ -8192,7 +8190,7 @@ function dis_calendar_day_list_pdf($calendar, $current_view, $calendar_entity) {
   $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED');
 
-  $occurrences = calendar_events_model($date, $end, $calendar_entity, Of_date::getOption('timezone'), $status, $category_filter, true);
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
 
   $pdf = new CalendarPdfList($current_view, 'day', $calendar, $calendar_entity, $occurrences);
   $pdf->drawCalendar();
@@ -8219,7 +8217,7 @@ function dis_calendar_month_planning_pdf($calendar, $current_view, $calendar_ent
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $category_filter = $current_view->get_category_filter();
 
-  $occurrences = calendar_events_model($date,$end,$calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
 
   while($date->compare($end) < 0) {
     $columns[$date->getTimestamp()] = array();
@@ -8273,7 +8271,7 @@ function dis_calendar_week_planning_pdf($calendar, $current_view, $calendar_enti
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $category_filter = $current_view->get_category_filter();
 
-  $occurrences = calendar_events_model($date,$end,$calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
 
   while($date->compare($end) < 0) {
     $columns[$date->getTimestamp()] = array();
@@ -8326,7 +8324,7 @@ function dis_calendar_day_planning_pdf($calendar, $current_view, $calendar_entit
 
   $category_filter = $current_view->get_category_filter();
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $occurrences = calendar_events_model($date,$end, $calendar_entity, Of_date::getOption('timezone'), $status, $category_filter);
+  $occurrences = calendar_events_model($date,$end, $calendar_entity, $status, $category_filter);
   $id = $date->getTimestamp();
   $columns[$id] = array();
 
