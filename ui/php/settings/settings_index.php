@@ -117,7 +117,6 @@ if ($params['form_user_pref']) {
     $_SESSION['set_timezone'] = $params['timezone'];
     Of_Date::setOption('timezone',$params['timezone']);
     update_user_pref($obm['uid'], 'set_timezone', $_SESSION['set_timezone']);
-    unset($_SESSION['cal_current_view']);
   }
 
   if ($params['timeformat'] != '') {
