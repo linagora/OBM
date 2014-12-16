@@ -5219,7 +5219,6 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
     event_duration,
     event_timezone,
     event_location,
-    event_allday,
     eventexception_parent_id,
     eventexception_child_id,
     eventexception_date
