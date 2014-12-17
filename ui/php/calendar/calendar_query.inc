@@ -1005,12 +1005,11 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
   $description = sql_parse_text($calendar['description']);
   $location = sql_parse_text($calendar['location']);
   $all_day = ($calendar['all_day'] == 1) ? 'TRUE' : 'FALSE';
-  $datebegin = clone $calendar['date_begin'];
+  $datebegin = $calendar['date_begin'];
   if ($all_day == 'TRUE') {
     $datebegin->setHour(0)->setMinute(0)->setSecond(0);
   }
   $event_duration = event_duration($datebegin, $calendar['event_duration'], $all_day == 'TRUE');
-  $datebegin->setTimezone(new DateTimeZone('UTC'));
   $privacy = $calendar['privacy'];
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
@@ -2258,10 +2257,9 @@ function run_query_calendar_update_event_data($calendar, $oldEvent) {
   $priority = $calendar['priority'];
   $description = sql_parse_text($calendar['description']);
   $location = sql_parse_text($calendar['location']);
-  $datebegin = clone $calendar['date_begin'];
+  $datebegin = $calendar['date_begin'];
   ($calendar['all_day'] != 1) ? $all_day = 'FALSE': $all_day = 'TRUE';
   $event_duration = event_duration($datebegin, $calendar['event_duration'], $calendar['all_day'] == 1);
-  $datebegin->setTimezone(new DateTimeZone('UTC'));
   $event_id = sql_parse_id( $calendar['calendar_id'], true); 
   $privacy = $calendar['privacy'];
   $repeat_kind = $calendar['repeat_kind'] ? $calendar['repeat_kind'] : "none";
@@ -2398,21 +2396,15 @@ function run_query_calendar_quick_event_update($calendar) {
 
   $multidomain = sql_multidomain('event');
   $title = sql_parse_text($calendar['title']);
-  $datebegin = clone $calendar['date_begin'];
+  $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
   $all_day = ($calendar["all_day"])?'TRUE':'FALSE';
   if ($all_day == 'TRUE' && $event_duration == 3600) {
       $event_duration = 86400;
   }
   $all = $calendar['all'];
-  $event_date = null;
   if ($all != 1) {
-    $timezone_name = $datebegin->getTimeZone()->getName();
-    $datebegin->setTimezone(new DateTimeZone('UTC'));
-    $event_date = "event_date = '$datebegin', event_timezone = '$timezone_name',";
-  }
-  else {
-    $event_date = '';
+    $event_date = "event_date = '$datebegin', event_timezone = '" . $datebegin->getTimezone()->getName() . "',";
   }
   $oldEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   $obm_q = new DB_OBM;
@@ -2462,7 +2454,7 @@ function run_query_calendar_quick_event_update($calendar) {
 function run_query_calendar_quick_event_insert(&$calendar,$state) {
   global $cdg_sql, $obm;
   $title = sql_parse_text($calendar['title']);
-  $datebegin = clone $calendar['date_begin'];
+  $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
   $organizerId = $calendar['entity_id'];
   $users = array($organizerId);
@@ -2485,7 +2477,7 @@ function run_query_calendar_quick_event_insert(&$calendar,$state) {
   if ($calendar['template_id'] > 0) {
     $t = run_query_calendar_get_template($calendar['template_id']);
     $q = $t[0]; 
-    $datebegin_tpl = new Of_Date($q->f('event_date'), 'UTC');
+    $datebegin_tpl = new Of_Date($q->f('event_date'), 'GMT');
     $datebegin = $datebegin_tpl->setDay($datebegin->getDay())->setMonth($datebegin->getMonth())->setYear($datebegin->getYear());
     $attendees = $t[1];
     $event_duration = $q->f('event_duration');
@@ -2719,24 +2711,18 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
 
   if( $date_occurrence != NULL){
     $id = sql_parse_id($calendar['event_id']);
-    $exception_recurrence_id_date = clone $date_occurrence;
-
     $check_exception_already_set = "SELECT eventexception_child_id FROM EventException WHERE eventexception_date = '".$date_occurrence."' AND eventexception_parent_id = ".$id.";";
     display_debug_msg($check_exception_already_set, $cdg_sql, 'check_exception_already_set');
     $obm_q->query($check_exception_already_set);
     if ($obm_q->next_record())
       return array('already_set' => true, 'id' => $obm_q->f('eventexception_child_id'));
 
+    $exception_recurrence_id_date = $date_occurrence;
   } else {
     $id = sql_parse_id($calendar['calendar_id']);
-    $exception_recurrence_id_date = clone $calendar['old_date_begin'];
+    $exception_recurrence_id_date = $calendar['old_date_begin'];
   }
-  if ($calendar['all_day']) {
-      $exception_recurrence_id_date = allday_start_date($exception_recurrence_id_date, 'UTC', 'UTC');
-  }
-  $exception_recurrence_id_date->setTimezone(new DateTimeZone('UTC'));
-  $exception_date = $calendar['date_begin'] ? clone $calendar['date_begin'] : clone $date_occurrence;
-  $exception_date->setTimezone(new DateTimeZone('UTC'));
+  $exception_date = $obm_q->escape($calendar['date_begin']) ? $obm_q->escape($calendar['date_begin']) : $date_occurrence;
   $event_duration = $calendar['event_duration'] > 0 ? $calendar['event_duration'] : $calendar['duration'];
   $title = $calendar['event_title'] ? sql_parse_text($calendar['event_title']) : sql_parse_text($calendar['title']);
 
@@ -2868,7 +2854,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '', $r
         NOW(),
         $sql_id,
         $sql_exception_id,
-        '".$obm_q->escape($exception_recurrence_id_date)."'
+        '$exception_recurrence_id_date'
       )";
   $sql_id = sql_parse_id($id, true);
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(2)');
@@ -3323,8 +3309,7 @@ function run_query_calendar_create_or_update_event_template(&$calendar) {
   $location = sql_parse_text($calendar['location']);
   $alert = sql_parse_int($calendar['alert']);
   $all_day = ($calendar['all_day'] != 1) ? 'FALSE' : 'TRUE';
-  $datebegin = clone $calendar['date_begin'];
-  $datebegin->setTimezone(new DateTimeZone('UTC'));
+  $datebegin = $calendar['date_begin'];
   $event_duration = event_duration($datebegin, $calendar['event_duration'], $calendar['all_day'] == 1);
   $privacy = $calendar['privacy'];
   $repeat_kind = $calendar['repeat_kind'];
@@ -5521,15 +5506,7 @@ function calendar_events_model($start, $end, $calendar_entity, $current_timezone
     // Handle exceptions : remove occurences from the model
     $exception_q = run_query_get_events_exception(array_keys($of->events),$start,$end);
     while($exception_q->next_record()) {
-      $gmt_exception_date = new Of_Date($exception_q->f('eventexception_date'), 'UTC');
-      $exception_date = null;
-      if ($exception_q->f('event_allday')) {
-        $exception_date = allday_start_date($gmt_exception_date, 'UTC', 'UTC');
-      }
-      else {
-        $exception_date = $gmt_exception_date;
-      }
-      $of->removeOccurrences($exception_q->f('eventexception_parent_id'), $exception_date);
+      $of->removeOccurrences($exception_q->f('eventexception_parent_id'), new Of_Date($exception_q->f('eventexception_date'), 'GMT'));
     }
 
     // Add attendees to events
@@ -6678,9 +6655,7 @@ Class OccurrenceFactory {
    */
   function removeOccurrences($id, $date) {
     foreach($this->occurrences[$id] as $key => $occurrence) {
-      $utc_occ_date = clone $occurrence->date;
-      $utc_occ_date->setTimezone(new DateTimeZone('UTC'));
-      if($utc_occ_date->compareDateIso($date) == 0) {
+      if($occurrence->date->compareDateIso($date) == 0) {
         unset($this->occurrences[$id][$key]); 
       }
     }
