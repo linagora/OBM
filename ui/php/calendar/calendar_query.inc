@@ -1716,7 +1716,7 @@ function search_user_by_name($lastname, $firstname) {
 //   - $calendar     : calendar parameters
 //   - sel_entity_id : selected entities id
 ///////////////////////////////////////////////////////////////////////////////
-function check_calendar_conflict($calendar, $sel_entity_id, $timezone) {
+function check_calendar_conflict($calendar, $sel_entity_id) {
   global $ccalendar_conflicts_limit;
 
   if ($calendar['opacity'] == 'TRANSPARENT') return false;
@@ -1736,7 +1736,7 @@ function check_calendar_conflict($calendar, $sel_entity_id, $timezone) {
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   if (sizeof($cal_entities) == 0) return false; // user doesn't have read permission on attendees
 
-  $occurrences = calendar_events_model($begin,$end,$cal_entities,$timezone, array('ACCEPTED', 'NEEDS-ACTION'));
+  $occurrences = calendar_events_model($begin,$end,$cal_entities, array('ACCEPTED', 'NEEDS-ACTION'));
   $of = &OccurrenceFactory::getInstance(); 
   if(!$calendar['all_day']) {
     $occurrences = $of->getPeriodOccurrences($calendar['date_begin'], $end);
@@ -1804,7 +1804,7 @@ function check_calendar_conflict($calendar, $sel_entity_id, $timezone) {
 // Parameters:
 //   - $calendar       : calendar parameters
 ///////////////////////////////////////////////////////////////////////////////
-function quick_check_calendar_conflict($calendar, $entities, $timezone) {
+function quick_check_calendar_conflict($calendar, $entities) {
   if ($calendar['opacity'] == 'TRANSPARENT') return false;
 
   $begin = clone $calendar['date_begin'];
@@ -1830,7 +1830,7 @@ function quick_check_calendar_conflict($calendar, $entities, $timezone) {
 
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
 	$status = array('ACCEPTED', 'NEEDS-ACTION');
-  $occurrences = calendar_events_model($begin,$end,$cal_entities,$timezone,$status);
+  $occurrences = calendar_events_model($begin,$end,$cal_entities,$status);
   $of = &OccurrenceFactory::getInstance(); 
   if(!$calendar['all_day']) {
     $occurrences = $of->getPeriodOccurrences($calendar['date_begin'], $calendar['date_end']);
@@ -1969,7 +1969,7 @@ function check_calendar_participation_decision($calendar) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurrence of each event
 ///////////////////////////////////////////////////////////////////////////////
-function check_calendar_decision_conflict($calendar, $timezone) {
+function check_calendar_decision_conflict($calendar) {
 
   if ($calendar['decision_event'] != 'ACCEPTED') {
     return false;
@@ -1986,7 +1986,7 @@ function check_calendar_decision_conflict($calendar, $timezone) {
   }
 
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
-  $occurrences = calendar_events_model($begin,$end,$cal_entities, $timezone);
+  $occurrences = calendar_events_model($begin,$end,$cal_entities);
   if (!is_null($occurrences)) {
     if(isset($calendar['calendar_id'])) {
       $event_id = $calendar["calendar_id"];
@@ -5356,14 +5356,11 @@ function get_one_event_user_alert($event_id, $user_id = null) {
   return $alerts;
 }
 
-function allday_start_date($date, $event_timezone_name, $display_timezone_name) {
-  $date_with_timezone = clone $date;
-  $event_timezone = new DateTimeZone($event_timezone_name);
-  $date_with_timezone->setTimezone($event_timezone);
-  $display_timezone = new DateTimeZone($display_timezone_name);
-  $date_for_display = Of_Date::createFromFormat(
-      "Y-m-d h:i:s", $date_with_timezone->format('Y-m-d')." 00:00:00", $display_timezone);
-  return $date_for_display;
+function allday_start_date($date, $tz) {
+  // Include '!' in the date format string to tell PHP to use values from EPOCH for
+  // values not specified in the format string instead of taking them from the
+  // current time.
+  return Of_Date::createFromFormat("Y-m-d!", $date->format('Y-m-d'), new DateTimeZone($tz));
 }
 
 function allday_actual_duration($date, $duration) {
@@ -5380,7 +5377,7 @@ function allday_actual_duration($date, $duration) {
 //   - $end_time        : timestamp of end date
 //   - $calendar_entity :
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_events_model($start, $end, $calendar_entity, $current_timezone, $status=array('ACCEPTED'), $category_filter='', $unique=false, $events=null, $opac=null, $occurences=true) {
+function calendar_events_model($start, $end, $calendar_entity, $status=array('ACCEPTED'), $category_filter='', $unique=false, $events=null, $opac=null, $occurences=true) {
   global $obm;
 
   // Get all non repeating events and construct occurences & events model
@@ -5403,7 +5400,7 @@ function calendar_events_model($start, $end, $calendar_entity, $current_timezone
       $date = new Of_Date($nr_q->f('event_date'),'GMT');
       $duration = $nr_q->f('event_duration');
       if ($all_day == 1) {
-        $date = allday_start_date($date, $timezone, $current_timezone);
+        $date = allday_start_date($date, $timezone);
         $duration = allday_actual_duration($date, $duration);
       }
       
@@ -5442,7 +5439,7 @@ function calendar_events_model($start, $end, $calendar_entity, $current_timezone
       $date = new Of_Date($r_q->f('event_date'), 'GMT');
       $duration = $r_q->f('event_duration');
       if ($all_day == 1) {
-        $date = allday_start_date($date, $timezone, $current_timezone);
+        $date = allday_start_date($date, $timezone);
         $duration = allday_actual_duration($date, $duration);
       }
       
@@ -6883,7 +6880,7 @@ function run_query_calendar_reset($id,$params) {
 /**
  * Get events for an entity
  */
-function get_json_entity_events($calendar, $entity_store, $timezone) {
+function get_json_entity_events($calendar, $entity_store) {
   global $obm, $display;
 
   $json = array();
@@ -6896,7 +6893,7 @@ function get_json_entity_events($calendar, $entity_store, $timezone) {
     $canRead = 0;
     $status = array('ACCEPTED', 'NEEDS-ACTION');
     $of = &OccurrenceFactory::getInstance();
-    calendar_events_model($date,$end,$entity_store, $timezone, $status);
+    calendar_events_model($date,$end,$entity_store, $status);
     $json_attendees = array();
     $user = array();
     if (is_array($calendar['user_id'])) {
