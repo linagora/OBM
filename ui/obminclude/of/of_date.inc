@@ -1803,9 +1803,10 @@ class Of_Date extends DateTime {
    * @return void
    */
   public function toString() {
-    $date = clone $this;
-    $date->setTimezone(new DateTimeZone('GMT'));
-    return $date->format(self::DATABASE_DATE);
+    $this->setTimezone(new DateTimeZone('GMT'));
+    $date = $this->get(self::DATABASE_DATE);
+    $this->setTimezone(new DateTimeZone(self::$_options['timezone']));
+    return $date;
   }
 
   /**
