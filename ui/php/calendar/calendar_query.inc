@@ -4746,10 +4746,7 @@ function calendar_localizeDate($format, $date) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $status, $category_filter='',$events=null, $opac=null) {
   global $cdg_sql;
-  $start = clone $start;
-  $start = $start->setTimezone(new DateTimeZone('UTC'));
-  $end = clone $end;
-  $end->setTimezone(new DateTimeZone('UTC'));
+
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
@@ -4921,10 +4918,6 @@ function run_query_calendar_get_parent_event($ids) {
 function run_query_calendar_repeat_events($start, $end, $calendar_entity, $status, $category_filter='', $events=null, $opac=null, $no_birthday=false) {
   global $cdg_sql;
 
-  $start = clone $start;
-  $end = clone $end;
-  $start->setTimezone(new DateTimeZone('UTC'));
-  $end->setTimezone(new DateTimeZone('UTC'));
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
