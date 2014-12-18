@@ -31,12 +31,12 @@
 package org.obm.imap.archive.resources;
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.obm.imap.archive.ExpectAuthorization.expectAdmin;
-import static org.obm.imap.archive.ExpectAuthorization.expectSimpleUser;
+import static org.obm.imap.archive.DBData.admin;
+import static org.obm.imap.archive.DBData.domain;
+import static org.obm.imap.archive.DBData.usera;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,8 +46,6 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
-import org.obm.domain.dao.DomainDao;
-import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
@@ -56,8 +54,6 @@ import org.obm.server.WebServer;
 import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class RootHandlerTest {
 
@@ -81,12 +77,9 @@ public class RootHandlerTest {
 				}
 			}, "sql/initial.sql"));
 
-	@Inject DomainDao domainDao;
-	@Inject UserDao userDao;
 	@Inject TemporaryFolder temporaryFolder;
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
-	@Inject IMocksControl control;
 	Expectations expectations;
 	
 	@Before
@@ -102,40 +95,28 @@ public class RootHandlerTest {
 	
 	@Test
 	public void testStatusOk() {
-		expectations.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
-		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
+		expectations.expectTrustedLogin(domain);
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/status");
-		
-		control.verify();
 	}
 	
 	@Test
 	public void unauthorizedWhenNotAdmin() {
-		expectations.expectTrustedLoginForUser(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"), "user");
-		
-		expectSimpleUser(domainDao, "mydomain.org", userDao, "user");
-		
-		control.replay();
+		expectations.expectTrustedLoginForUser(domain, usera);
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("user@mydomain.org", "trust3dToken").
+			.auth().basic(usera.getLogin() + "@" + domain.getName(), usera.getPassword().getStringValue()).
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/status");
-		
-		control.verify();
 	}
 	
 	@Test
@@ -143,7 +124,7 @@ public class RootHandlerTest {
 		expectations.expectTrustedLoginThrowAuthFault();
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()

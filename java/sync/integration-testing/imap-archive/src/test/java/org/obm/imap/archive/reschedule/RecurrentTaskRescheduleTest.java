@@ -31,11 +31,9 @@
 package org.obm.imap.archive.reschedule;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.easymock.EasyMock.expect;
 
 import java.util.concurrent.TimeUnit;
 
-import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 import org.junit.After;
@@ -48,9 +46,9 @@ import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
-import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.CyrusCompatGreenmailRule;
+import org.obm.imap.archive.DBData;
 import org.obm.imap.archive.FutureSchedulerBusClient;
 import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.TestImapArchiveModules.TimeBasedModule.TestDateProvider;
@@ -78,9 +76,6 @@ import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
-import fr.aliacom.obm.common.system.ObmSystemUser;
-import fr.aliacom.obm.common.user.UserPassword;
 
 public class RecurrentTaskRescheduleTest {
 
@@ -122,11 +117,7 @@ public class RecurrentTaskRescheduleTest {
 	@Inject TestDateProvider timeProvider;
 	@Inject FutureSchedulerBusClient futureBusClient;
 
-	@Inject IMocksControl control;
-	@Inject UserSystemDao userSystemDao;
-
 	int timeout = 2000;
-	ObmDomainUuid domainUuid = ObmDomainUuid.of("b9de411c-5375-4100-aedf-8e4d827c0a2c");
 	
 	@Before
 	public void setUp() {
@@ -146,12 +137,8 @@ public class RecurrentTaskRescheduleTest {
 		DateTime when = DateTime.parse("2026-11-02T13:37Z");
 		DateTime higherBoundary = DateTime.parse("2026-11-02T23:59Z");
 		
-		expect(userSystemDao.getByLogin("cyrus"))
-			.andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build())
-			.anyTimes();
-		
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-			.domain(ObmDomain.builder().uuid(domainUuid).name("mydomain.org").build())
+			.domain(ObmDomain.builder().uuid(DBData.domainId).name("mydomain.org").build())
 			.state(ConfigurationState.ENABLE)
 			.schedulingConfiguration(SchedulingConfiguration.builder()
 				.recurrence(ArchiveRecurrence.builder()
@@ -165,7 +152,6 @@ public class RecurrentTaskRescheduleTest {
 			.build();
 		domainConfigDao.create(domainConfiguration);
 		
-		control.replay();
 		server.start();
 
 		// SCHEDULE AND RUN A RECURRENT TASK
@@ -183,7 +169,6 @@ public class RecurrentTaskRescheduleTest {
 		
 		// AUTOMATIC RE-SCHEDULED TASK
 		assertThat(nextTaskState()).isEqualTo(State.WAITING);
-		control.verify();
 	}
 
 	private State nextTaskState() throws Exception {

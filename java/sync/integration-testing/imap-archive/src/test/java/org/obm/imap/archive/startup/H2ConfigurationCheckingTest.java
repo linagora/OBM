@@ -32,7 +32,6 @@ package org.obm.imap.archive.startup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,7 +73,6 @@ public class H2ConfigurationCheckingTest {
 	private @Inject TemporaryFolder temporaryFolder;
 	private @Inject H2InMemoryDatabase db;
 	private @Inject WebServer server;
-	private @Inject IMocksControl control;
 
 	@After
 	public void tearDown() throws Exception {
@@ -83,9 +81,7 @@ public class H2ConfigurationCheckingTest {
 	
 	@Test
 	public void startingShouldWorkWhenH2() throws Exception {
-		control.replay();
 		server.start();
 		assertThat(server.isStarted()).isTrue();
-		control.verify();
 	}
 }

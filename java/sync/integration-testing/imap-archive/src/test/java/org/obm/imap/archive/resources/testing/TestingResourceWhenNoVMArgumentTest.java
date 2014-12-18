@@ -31,10 +31,11 @@
 package org.obm.imap.archive.resources.testing;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.obm.imap.archive.DBData.admin;
+import static org.obm.imap.archive.DBData.domain;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,7 +77,6 @@ public class TestingResourceWhenNoVMArgumentTest {
 	private @Inject TemporaryFolder temporaryFolder;
 	private @Inject H2InMemoryDatabase db;
 	private @Inject WebServer server;
-	private @Inject IMocksControl control;
 
 	@After
 	public void tearDown() throws Exception {
@@ -85,34 +85,28 @@ public class TestingResourceWhenNoVMArgumentTest {
 	
 	@Test
 	public void setDateShouldNotBeAvailable() throws Exception {
-		control.replay();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.body("P1D").
 		expect()
 			.statusCode(Status.METHOD_NOT_ALLOWED.getStatusCode()).
 		when()
 			.put("/imap-archive/testing/date");
-		
-		control.verify();
 	}
 	
 	@Test
 	public void getDateShouldNotBeAvailable() throws Exception {
-		control.replay();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
 			.get("/imap-archive/testing/date");
-		
-		control.verify();
 	}
 }

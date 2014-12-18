@@ -31,11 +31,10 @@
 package org.obm.imap.archive.resources.cyrus;
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.easymock.EasyMock.expect;
+import static org.obm.imap.archive.DBData.admin;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,19 +43,14 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
-import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.TestImapArchiveModules;
-import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.icegreen.greenmail.util.GreenMail;
-
-import fr.aliacom.obm.common.system.ObmSystemUser;
-import fr.aliacom.obm.common.user.UserPassword;
 
 public class CyrusStatusHandlerTest {
 	
@@ -84,12 +78,9 @@ public class CyrusStatusHandlerTest {
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
 	@Inject GreenMail imapServer;
-	@Inject UserSystemDao userSystemDao;
-	@Inject IMocksControl control;
 
 	@After
 	public void tearDown() throws Exception {
-		control.verify();
 		server.stop();
 		imapServer.stop();
 	}
@@ -97,15 +88,13 @@ public class CyrusStatusHandlerTest {
 	@Test
 	public void testStatusIs200WhenImapIsUp() throws Exception {
 		imapServer.setUser("cyrus", "cyrus");
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build());
-		control.replay();
 		imapServer.start();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
+			.param("login", admin.getLogin())
+			.param("password", admin.getPassword())
 			.param("domain_name", "mydomain.org").
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
@@ -116,14 +105,11 @@ public class CyrusStatusHandlerTest {
 	@Test
 	public void testStatusIs503WhenImapIsUpButCyrusUserNotFound() throws Exception {
 		server.start();
-		expect(userSystemDao.getByLogin("cyrus")).andThrow(new SystemUserNotFoundException());
-		
-		control.replay();
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
+			.param("login", admin.getLogin())
+			.param("password", admin.getPassword())
 			.param("domain_name", "mydomain.org").
 		expect()
 			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
@@ -134,14 +120,11 @@ public class CyrusStatusHandlerTest {
 	@Test
 	public void testStatusIs503WhenImapIsUpButLoginFails() throws Exception {
 		server.start();
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build());
-		
-		control.replay();
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
+			.param("login", admin.getLogin())
+			.param("password", admin.getPassword())
 			.param("domain_name", "mydomain.org").
 		expect()
 			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
@@ -152,15 +135,12 @@ public class CyrusStatusHandlerTest {
 	@Test
 	public void testStatusIs503WhenImapIsDown() throws Exception {
 		server.start();
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build());
-		
-		control.replay();
 		imapServer.stop();
 		
 		given()
 			.port(server.getHttpPort())
-			.param("login", "admin")
-			.param("password", "trust3dToken")
+			.param("login", admin.getLogin())
+			.param("password", admin.getPassword())
 			.param("domain_name", "mydomain.org").
 		expect()
 			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).

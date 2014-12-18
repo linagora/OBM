@@ -35,7 +35,6 @@ import static org.hamcrest.Matchers.equalTo;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -98,7 +97,6 @@ public class TestingResourceWhenVMArgumentTest {
 	private @Inject TemporaryFolder temporaryFolder;
 	private @Inject H2InMemoryDatabase db;
 	private @Inject WebServer server;
-	private @Inject IMocksControl control;
 
 	@After
 	public void tearDown() throws Exception {
@@ -107,7 +105,6 @@ public class TestingResourceWhenVMArgumentTest {
 	
 	@Test
 	public void setDateShouldIncrement() throws Exception {
-		control.replay();
 		server.start();
 		
 		given()
@@ -125,13 +122,10 @@ public class TestingResourceWhenVMArgumentTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/testing/date");
-		
-		control.verify();
 	}
 	
 	@Test
 	public void setDateShouldDecrement() throws Exception {
-		control.replay();
 		server.start();
 		
 		given()
@@ -149,13 +143,10 @@ public class TestingResourceWhenVMArgumentTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/testing/date");
-		
-		control.verify();
 	}
 	
 	@Test
 	public void setDateShouldThrowWhenBadDuration() throws Exception {
-		control.replay();
 		server.start();
 		
 		given()
@@ -165,7 +156,5 @@ public class TestingResourceWhenVMArgumentTest {
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
 		when()
 			.put("/imap-archive/testing/date");
-		
-		control.verify();
 	}
 }

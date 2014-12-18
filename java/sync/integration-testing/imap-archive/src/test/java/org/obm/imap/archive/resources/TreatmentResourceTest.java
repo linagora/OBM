@@ -32,10 +32,11 @@ package org.obm.imap.archive.resources;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.easymock.EasyMock.expect;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.obm.imap.archive.ExpectAuthorization.expectAdmin;
+import static org.obm.imap.archive.DBData.admin;
+import static org.obm.imap.archive.DBData.domain;
+import static org.obm.imap.archive.DBData.domainId;
 
 import java.io.File;
 import java.util.Timer;
@@ -46,7 +47,6 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.FileUtils;
-import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -59,9 +59,6 @@ import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
-import org.obm.domain.dao.DomainDao;
-import org.obm.domain.dao.UserDao;
-import org.obm.domain.dao.UserSystemDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.CyrusCompatGreenmailRule;
 import org.obm.imap.archive.DatabaseOperations;
@@ -86,10 +83,6 @@ import com.jayway.restassured.http.ContentType;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
-
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
-import fr.aliacom.obm.common.system.ObmSystemUser;
-import fr.aliacom.obm.common.user.UserPassword;
 
 public class TreatmentResourceTest {
 
@@ -125,11 +118,7 @@ public class TreatmentResourceTest {
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
 	@Inject GreenMail imapServer;
-	@Inject UserSystemDao userSystemDao;
-	@Inject DomainDao domainDao;
-	@Inject UserDao userDao;
 	@Inject TestDateProvider testDateProvider;
-	@Inject IMocksControl control;
 	Expectations expectations;
 
 	@Before
@@ -141,7 +130,6 @@ public class TreatmentResourceTest {
 	public void tearDown() throws Exception {
 		server.stop();
 		imapServer.stop();
-		control.verify();
 	}
 
 	private void play(Operation operation) {
@@ -151,24 +139,20 @@ public class TreatmentResourceTest {
 	
 	@Test
 	public void getShouldReturnArchiveTreatment() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
 		expectations
-			.expectTrustedLogin(domainId)
-			.expectGetDomain(domainId);
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain);
 		
 		UUID runId = TestImapArchiveModules.uuid;
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
 		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.contentType(ContentType.JSON).
 		expect()
 			.contentType(ContentType.JSON)
@@ -182,194 +166,171 @@ public class TreatmentResourceTest {
 				"recurrent", equalTo(true))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/" + runId.toString());
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + runId.toString());
 	}
 	
 	@Ignore("To reintroduce when SIMULATION_RUN")
 	@Test
 	public void getShouldReturnNotFoundWhenBadRunId() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
 		expectations
-			.expectTrustedLogin(domainId)
-			.expectGetDomain(domainId);
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(TestImapArchiveModules.uuid), domainId)));
 		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/944e91fe-3cfc-422d-a3a3-0b0f8972edc8");
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/944e91fe-3cfc-422d-a3a3-0b0f8972edc8");
 	}
 	
 	@Test
 	public void getLogsShouldReturnTheLogsWhenArchiveTreatmentIsInTracking() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
 		expectations
-			.expectTrustedLogin(domainId)
-			.expectTrustedLogin(domainId)
-			.expectGetDomain(domainId)
-			.expectGetDomain(domainId);
+			.expectTrustedLogin(domain)
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain)
+			.expectGetDomain(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build());
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
 		server.start();
 		
 		UUID expectedRunId = TestImapArchiveModules.uuid;
 		given()
 			.config(RestAssuredConfig.config().redirect(RedirectConfig.redirectConfig().followRedirects(false)))
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
-			.header("Location", containsString("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/" + expectedRunId.toString()))
+			.header("Location", containsString("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + expectedRunId.toString()))
 			.statusCode(Status.SEE_OTHER.getStatusCode()).
 		when()
-			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+			.post("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments");
 		Thread.sleep(1);
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.contentType(ContentType.JSON).
 		expect()
 			.body(containsString("Starting IMAP Archive in REAL_RUN for domain mydomain"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/" + expectedRunId.toString() + "/logs");
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + expectedRunId.toString() + "/logs");
 	}
 	
 	@Test
 	public void getLogsShouldReturnNotFoundWhenBadRunId() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
 		expectations
-			.expectTrustedLogin(domainId)
-			.expectTrustedLogin(domainId)
-			.expectTrustedLogin(domainId)
-			.expectGetDomain(domainId)
-			.expectGetDomain(domainId)
-			.expectGetDomain(domainId);
+			.expectTrustedLogin(domain)
+			.expectTrustedLogin(domain)
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain)
+			.expectGetDomain(domain)
+			.expectGetDomain(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
 		
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build());
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
 		server.start();
 		
 		UUID expectedRunId = TestImapArchiveModules.uuid;
 		given()
 			.config(RestAssuredConfig.config().redirect(RedirectConfig.redirectConfig().followRedirects(false)))
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
-			.header("Location", containsString("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/" + expectedRunId.toString()))
+			.header("Location", containsString("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + expectedRunId.toString()))
 			.statusCode(Status.SEE_OTHER.getStatusCode()).
 		when()
-			.post("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments");
+			.post("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments");
 		Thread.sleep(1);
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.contentType(ContentType.JSON).
 		expect()
 			.body(containsString("Starting IMAP Archive in REAL_RUN for domain mydomain"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/" + expectedRunId.toString() + "/logs");
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + expectedRunId.toString() + "/logs");
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/b9a3c424-34f1-4f6d-86ab-c1025a48df9c/logs");
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/b9a3c424-34f1-4f6d-86ab-c1025a48df9c/logs");
 	}
 	
 	@Test
 	public void getLogsShouldReturnTheLogsFromFileWhenArchiveTreatmentIsNotInTracking() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
 		expectations
-			.expectTrustedLogin(domainId)
-			.expectGetDomain(domainId);
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain);
 		
 		UUID runId = TestImapArchiveModules.uuid;
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
-		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
 		
 		String expectedContent = "Old treatment file";
 		temporaryFolder.create();
 		File treatmentFile = temporaryFolder.newFile(runId.toString() + ".log");
 		FileUtils.write(treatmentFile, expectedContent, Charsets.UTF_8);
 		
-		control.replay();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.contentType(ContentType.JSON).
 		expect()
 			.body(equalTo(expectedContent))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/" + runId.toString() + "/logs");
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + runId.toString() + "/logs");
 	}
 	
 	@Test
 	public void getLogsShouldReturnNotFoundWhenArchiveTreatmentIsNotInTrackingAndNoFile() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
 		expectations
-			.expectTrustedLogin(domainId)
-			.expectGetDomain(domainId);
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain);
 		
 		UUID runId = TestImapArchiveModules.uuid;
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
 				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
 		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/" + runId.toString() + "/logs");
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + runId.toString() + "/logs");
 	}
 	
 	@Test
 	public void getLogsShouldWaitForTheLaunchWhenGettingLogsOnScheduleTreatment() throws Exception {
-		ObmDomainUuid domainId = ObmDomainUuid.of("2f096466-5a2a-463e-afad-4196c2952de3");
 		expectations
-			.expectTrustedLogin(domainId)
-			.expectGetDomain(domainId)
-			.expectGetDomain(domainId);
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain)
+			.expectGetDomain(domain);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(TestImapArchiveModules.uuid);
 		final DateTime scheduled = TestImapArchiveModules.LOCAL_DATE_TIME.plusSeconds(2);
@@ -390,10 +351,6 @@ public class TreatmentResourceTest {
 							true)
 					.build()));
 		
-		expect(userSystemDao.getByLogin("cyrus")).andReturn(ObmSystemUser.builder().login("cyrus").password(UserPassword.valueOf("cyrus")).id(12).build());
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
 		server.start();
 		
 		new Timer().schedule(new TimerTask() {
@@ -407,13 +364,13 @@ public class TreatmentResourceTest {
 		Stopwatch stopwatch = Stopwatch.createStarted();
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.contentType(ContentType.JSON).
 		expect()
 			.body(containsString("Starting IMAP Archive in REAL_RUN for domain mydomain"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/2f096466-5a2a-463e-afad-4196c2952de3/treatments/" + runId.serialize() + "/logs");
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + runId.serialize() + "/logs");
 		assertThat(stopwatch.elapsed(TimeUnit.SECONDS)).isGreaterThanOrEqualTo(2);
 	}
 }

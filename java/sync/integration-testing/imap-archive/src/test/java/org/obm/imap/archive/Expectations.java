@@ -32,6 +32,7 @@ package org.obm.imap.archive;
 
 import static com.github.restdriver.clientdriver.RestClientDriver.giveResponse;
 import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
+import static org.obm.imap.archive.DBData.admin;
 
 import javax.ws.rs.core.MediaType;
 
@@ -40,7 +41,8 @@ import org.hamcrest.Matchers;
 import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
 import com.github.restdriver.clientdriver.ClientDriverRule;
 
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
 
 public class Expectations {
 
@@ -50,21 +52,21 @@ public class Expectations {
 		this.driver = driver;
 	}
 	
-	public Expectations expectTrustedLogin(ObmDomainUuid domainId) {
-		return expectTrustedLoginForUser(domainId, "admin");
+	public Expectations expectTrustedLogin(ObmDomain domain) {
+		return expectTrustedLoginForUser(domain, admin);
 	}
 	
-	public Expectations expectTrustedLoginForUser(ObmDomainUuid domainId, String login) {
+	public Expectations expectTrustedLoginForUser(ObmDomain domain, ObmUser user) {
 		driver.addExpectation(
 				onRequestTo("/obm-sync/login/trustedLogin").withMethod(Method.POST)
 					.withBody(Matchers.allOf(
-								Matchers.containsString("login=" + login + "%40mydomain.org"),
-								Matchers.containsString("password=trust3dToken")),
+								Matchers.containsString("login=" + user.getLogin() + "%40" + domain.getName()),
+								Matchers.containsString("password=" + user.getPassword().getStringValue())),
 					MediaType.APPLICATION_FORM_URLENCODED),
 				giveResponse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 						+ "<token xmlns=\"http://www.obm.org/xsd/sync/token.xsd\">"
 						+ "<sid>06ae323a-0fa1-42ea-9ee8-313a023e4fd4</sid>"
-						+ "<domain uuid=\"" + domainId.toString() + "\">mydomain.org</domain>"
+						+ "<domain uuid=\"" + domain.getUuid().get() + "\">" + domain.getName() + "</domain>"
 						+ "</token>",
 					MediaType.APPLICATION_XML)
 				);
@@ -87,17 +89,17 @@ public class Expectations {
 		return this;
 	}
 	
-	public Expectations expectGetDomain(ObmDomainUuid domainId) {
-		expectDomain(domainId);
+	public Expectations expectGetDomain(ObmDomain domain) {
+		expectDomain(domain);
 		return this;
 	}
 
-	private void expectDomain(ObmDomainUuid domainId) {
+	private void expectDomain(ObmDomain domain) {
 		driver.addExpectation(
-				onRequestTo("/obm-sync/provisioning/v1/domains/" + domainId.toString()),
-				giveResponse("{\"id\":\"" + domainId.toString() + "\","
-							+ "\"name\":\"mydomain.org\","
-							+ "\"label\":\"mydomain.org\","
+				onRequestTo("/obm-sync/provisioning/v1/domains/" + domain.getUuid().get()),
+				giveResponse("{\"id\":\"" + domain.getUuid().get() + "\","
+							+ "\"name\":\"" + domain.getName() + "\","
+							+ "\"label\":\"" + domain.getName() + "\","
 							+ "\"aliases\":[]}",
 					MediaType.APPLICATION_JSON)
 				);

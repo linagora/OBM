@@ -33,11 +33,11 @@ package org.obm.imap.archive.resources;
 import static com.github.restdriver.clientdriver.RestClientDriver.giveEmptyResponse;
 import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static com.jayway.restassured.RestAssured.given;
-import static org.obm.imap.archive.ExpectAuthorization.expectAdmin;
+import static org.obm.imap.archive.DBData.admin;
+import static org.obm.imap.archive.DBData.domain;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,8 +47,6 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
-import org.obm.domain.dao.DomainDao;
-import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
@@ -57,8 +55,6 @@ import org.obm.server.WebServer;
 import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 public class DomainBasedSubResourceTest {
 
@@ -82,17 +78,14 @@ public class DomainBasedSubResourceTest {
 				}
 			}, "sql/initial.sql"));
 	
-	@Inject DomainDao domainDao;
-	@Inject UserDao userDao;
 	@Inject TemporaryFolder temporaryFolder;
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
-	@Inject IMocksControl control;
 	
 	@Before
 	public void setUp() throws Exception {
 		new Expectations(driver)
-			.expectTrustedLogin(ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309"));
+			.expectTrustedLogin(domain);
 		server.start();
 	}
 
@@ -103,19 +96,13 @@ public class DomainBasedSubResourceTest {
 	
 	@Test
 	public void getDomainConfigurationShouldReturnBadRequestOnInvalidUuid() {
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
-		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.statusCode(Status.BAD_REQUEST.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/toto/configuration");
-		
-		control.verify();
 	}
 	
 	@Test
@@ -125,19 +112,13 @@ public class DomainBasedSubResourceTest {
 				giveEmptyResponse().withStatus(Status.NOT_FOUND.getStatusCode())
 				);
 		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
-		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.statusCode(Status.NOT_FOUND.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/56077db7-ffdc-4e47-8fdd-40c69884bee6/configuration");
-		
-		control.verify();
 	}
 	
 }

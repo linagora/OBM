@@ -32,13 +32,14 @@ package org.obm.imap.archive.startup;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.obm.imap.archive.ExpectAuthorization.expectAdmin;
+import static org.obm.imap.archive.DBData.admin;
+import static org.obm.imap.archive.DBData.domain;
+import static org.obm.imap.archive.DBData.domainId;
 
 import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 import org.junit.After;
@@ -51,8 +52,6 @@ import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
-import org.obm.domain.dao.DomainDao;
-import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.Expectations;
 import org.obm.imap.archive.TestImapArchiveModules;
@@ -118,16 +117,13 @@ public class RestoreOnStartUpTest {
 	@Inject TestingOnlyOnePerDomainMonitorFactory monitor;
 	@Inject ArchiveTreatmentDao archiveTreatmentDao;
 	@Inject DomainConfigurationDao domainConfigurationDao;
-	@Inject DomainDao domainDao;
-	@Inject UserDao userDao;
-	@Inject IMocksControl control;
 
 	Expectations expectations;
 	
 	@Before
 	public void setUp() {
 		expectations = new Expectations(driver)
-			.expectTrustedLogin(ObmDomainUuid.of("ada1cd0a-f6e7-41f4-ac18-b0ce68573776"));
+			.expectTrustedLogin(domain);
 
 		Operation operation = Operations.deleteAllFrom("mail_archive_run");
 		new DbSetup(H2Destination.from(db), operation).launch();
@@ -142,7 +138,7 @@ public class RestoreOnStartUpTest {
 	public void testTasksAreWellRestoredOrMovedAsFailed() throws Exception {
 		ArchiveTreatmentRunId expectedScheduledRunId = ArchiveTreatmentRunId.from("45896372-cc9f-4ee9-9efd-8df63e2da8c3");
 		ObmDomain expectedScheduledDomain = ObmDomain.builder()
-				.uuid(ObmDomainUuid.of("65ae0168-cb77-43b8-bda3-0aa81f79ab5c"))
+				.uuid(domainId)
 				.name("mydomain.org")
 				.label("mydomain.org")
 				.build();
@@ -207,21 +203,16 @@ public class RestoreOnStartUpTest {
 				.build());
 		
 		expectations
-			.expectGetDomain(expectedScheduledDomain.getUuid());
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-
-		control.replay();
+			.expectGetDomain(expectedScheduledDomain);
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/status");
-		
-		control.verify();
 		
 		List<ScheduledTask<ArchiveDomainTask>> tasks = monitor.get().all();
 		assertThat(tasks).hasSize(1);

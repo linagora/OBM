@@ -35,14 +35,16 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.obm.imap.archive.ExpectAuthorization.expectAdmin;
-import static org.obm.imap.archive.ExpectAuthorization.expectCheckUsers;
-
-import java.util.UUID;
+import static org.obm.imap.archive.DBData.admin;
+import static org.obm.imap.archive.DBData.domain;
+import static org.obm.imap.archive.DBData.domainId;
+import static org.obm.imap.archive.DBData.otherDomain;
+import static org.obm.imap.archive.DBData.usera;
+import static org.obm.imap.archive.DBData.userb;
+import static org.obm.imap.archive.DBData.userc;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,8 +55,6 @@ import org.junit.rules.TestRule;
 import org.obm.dao.utils.H2Destination;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
-import org.obm.domain.dao.DomainDao;
-import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceRule;
 import org.obm.imap.archive.DatabaseOperations;
 import org.obm.imap.archive.Expectations;
@@ -62,7 +62,6 @@ import org.obm.imap.archive.TestImapArchiveModules;
 import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
-import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
@@ -77,9 +76,6 @@ import com.jayway.restassured.http.ContentType;
 import com.ninja_squad.dbsetup.DbSetup;
 import com.ninja_squad.dbsetup.Operations;
 import com.ninja_squad.dbsetup.operation.Operation;
-
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
-import fr.aliacom.obm.common.user.UserExtId;
 
 public class ConfigurationResourceTest {
 
@@ -103,23 +99,16 @@ public class ConfigurationResourceTest {
 				}
 			}, "sql/initial.sql"));
 
-	@Inject DomainDao domainDao;
-	@Inject UserDao userDao;
 	@Inject TemporaryFolder temporaryFolder;
 	@Inject H2InMemoryDatabase db;
 	@Inject WebServer server;
-	@Inject IMocksControl control;
 	Expectations expectations;
 
-	private ObmDomainUuid domainId;
-
-	
 	@Before
 	public void setUp() {
-		domainId = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		expectations = new Expectations(driver)
-			.expectTrustedLogin(domainId)
-			.expectGetDomain(domainId);
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain);
 	}
 
 	private void initDb(Operation... operationToAppend) {
@@ -140,28 +129,22 @@ public class ConfigurationResourceTest {
 	public void getDomainConfigurationShouldReturnADefaultConfiguration() throws Exception {
 		initDb();
 		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.contentType(ContentType.JSON)
-			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
+			.body("domainId", equalTo(domainId.get()),
 				"enabled", equalTo(false))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
-		
-		control.verify();
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/configuration");
 	}
 
 	@Test
 	public void getDomainConfigurationShouldReturnStoredConfiguration() throws Exception {
-		String domainId = "a6af9131-60b6-4e3a-a9f3-df5b43a89309";
 		initDb(Operations.insertInto(DomainConfigurationJdbcImpl.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.TABLE.FIELDS.DOMAIN_UUID, 
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.ACTIVATED, 
@@ -176,11 +159,11 @@ public class ConfigurationResourceTest {
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
-					.values(domainId, "08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera")
+					.values(domainId, usera.getExtId().getExtId(), usera.getLogin())
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
-					.values(domainId, "8e30e673-1c47-4ca8-85e8-4609d4228c10", "userb")
+					.values(domainId, userb.getExtId().getExtId(), userb.getLogin())
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL)
@@ -191,26 +174,21 @@ public class ConfigurationResourceTest {
 					.values(domainId, "user2@mydomain.org")
 					.build());
 		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.contentType(ContentType.JSON)
-			.body("domainId", equalTo(domainId),
+			.body("domainId", equalTo(domainId.get()),
 				"enabled", equalTo(true),
-				"excludedUserIdToLoginMap", hasEntry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera"),
-				"excludedUserIdToLoginMap", hasEntry("8e30e673-1c47-4ca8-85e8-4609d4228c10", "userb"),
+				"excludedUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
+				"excludedUserIdToLoginMap", hasEntry(userb.getExtId().getExtId(), userb.getLogin()),
 				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user2@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
-		
-		control.verify();
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/configuration");
 	}
 
 	@Test
@@ -225,33 +203,29 @@ public class ConfigurationResourceTest {
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
-						.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
+						.values(domainId, Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
 						.build());
 		
-		ObmDomainUuid otherDomain = ObmDomainUuid.of("31ae9172-ca35-4045-8ea3-c3125dab771e");
 		expectations
 			.expectTrustedLogin(otherDomain)
 			.expectGetDomain(otherDomain);
 		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.contentType(ContentType.JSON)
-			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
+			.body("domainId", equalTo(domainId.get()),
 				"enabled", equalTo(true))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/configuration");
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + otherDomain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.contentType(ContentType.JSON)
 			.body("domainId", equalTo("31ae9172-ca35-4045-8ea3-c3125dab771e"),
@@ -259,57 +233,36 @@ public class ConfigurationResourceTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.get("/imap-archive/service/v1/domains/31ae9172-ca35-4045-8ea3-c3125dab771e/configuration");
-		
-		control.verify();
 	}
 
 	@Test
 	public void updateDomainConfigurationShouldThrowExceptionWhenBadInputs() throws Exception {
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
-		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		domainConfigurationDto.domainId = domainId.getUUID();
 		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		control.replay();
 		server.start();
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
 		expect()
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
 		when()
-			.put("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
-		
-		control.verify();
+			.put("/imap-archive/service/v1/domains/" + domainId.get() + "/configuration");
 	}
 
 	@Test
 	public void updateDomainConfigurationShouldCreateWhenNoData() throws Exception {
-		ObmDomainUuid newDomainUuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		expectations
-			.expectTrustedLogin(newDomainUuid)
-			.expectGetDomain(newDomainUuid);
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain);
 		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		expectCheckUsers(userDao, "mydomain.org", 
-				ExcludedUser.builder()
-					.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
-					.login("usera")
-					.build(),
-				ExcludedUser.builder()
-					.id(UserExtId.valueOf("8e30e673-1c47-4ca8-85e8-4609d4228c10"))
-					.login("userb")
-					.build());
-		
-		control.replay();
 		server.start();
 		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
-		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		domainConfigurationDto.domainId = domainId.getUUID();
 		domainConfigurationDto.enabled = true;
 		domainConfigurationDto.repeatKind = RepeatKind.WEEKLY.toString();
 		domainConfigurationDto.dayOfWeek = DayOfWeek.TUESDAY.getSpecificationValue();
@@ -317,36 +270,34 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(100).getDayOfYear();
 		domainConfigurationDto.hour = 11;
 		domainConfigurationDto.minute = 32;
-		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera", "8e30e673-1c47-4ca8-85e8-4609d4228c10", "userb");
+		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of(usera.getExtId().getExtId(), usera.getLogin(), userb.getExtId().getExtId(), userb.getLogin());
 		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user2@mydomain.org");
 		
 		given()
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.port(server.getHttpPort())
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
 		expect()
-			.header("Location", endsWith("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration"))
+			.header("Location", endsWith("/imap-archive/service/v1/domains/" + domainId.get() + "/configuration"))
 			.statusCode(Status.CREATED.getStatusCode()).
 		when()
-			.put("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+			.put("/imap-archive/service/v1/domains/" + domainId.get() + "/configuration");
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.contentType(ContentType.JSON)
-			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
+			.body("domainId", equalTo(domainId.get()),
 				"enabled", equalTo(true),
 				"dayOfWeek", equalTo(DayOfWeek.TUESDAY.getSpecificationValue()),
-				"excludedUserIdToLoginMap", hasEntry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera"),
-				"excludedUserIdToLoginMap", hasEntry("8e30e673-1c47-4ca8-85e8-4609d4228c10", "userb"),
+				"excludedUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
+				"excludedUserIdToLoginMap", hasEntry(userb.getExtId().getExtId(), userb.getLogin()),
 				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user2@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
-		
-		control.verify();
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/configuration");
 	}
 
 	@Test
@@ -361,15 +312,15 @@ public class ConfigurationResourceTest {
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
-					.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
+					.values(domainId.get(), Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
-					.values(domainId, "08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera")
+					.values(domainId, usera.getExtId().getExtId(), usera.getLogin())
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
-					.values(domainId, "8e30e673-1c47-4ca8-85e8-4609d4228c10", "userb")
+					.values(domainId, userb.getExtId().getExtId(), userb.getLogin())
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL)
@@ -379,28 +330,13 @@ public class ConfigurationResourceTest {
 					.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL)
 					.values(domainId, "user2@mydomain.org")
 					.build());
-		ObmDomainUuid newDomainUuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		expectations
-			.expectTrustedLogin(newDomainUuid)
-			.expectGetDomain(newDomainUuid);
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain);
 		
-		expectAdmin(domainDao, "mydomain.org", userDao, "admin");
-		
-		expectCheckUsers(userDao, "mydomain.org", 
-				ExcludedUser.builder()
-					.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
-					.login("usera")
-					.build(),
-				ExcludedUser.builder()
-					.id(UserExtId.valueOf("2d7a5942-46ab-4fad-9bd2-608bde249671"))
-					.login("userc")
-					.build());
-		
-		
-		control.replay();
 		server.start();
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
-		domainConfigurationDto.domainId = UUID.fromString("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		domainConfigurationDto.domainId = domainId.getUUID();
 		domainConfigurationDto.enabled = true;
 		domainConfigurationDto.repeatKind = RepeatKind.WEEKLY.toString();
 		domainConfigurationDto.dayOfWeek = DayOfWeek.WEDNESDAY.getSpecificationValue();
@@ -409,35 +345,33 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.hour = 11;
 		domainConfigurationDto.minute = 32;
 		domainConfigurationDto.excludedFolder = "anotherExcluded";
-		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera", "2d7a5942-46ab-4fad-9bd2-608bde249671", "userc");
+		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of(usera.getExtId().getExtId(), usera.getLogin(), userc.getExtId().getExtId(), userc.getLogin());
 		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user3@mydomain.org");
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken")
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
 			.contentType(ContentType.JSON)
 			.body(domainConfigurationDto).
 		expect()
 			.statusCode(Status.NO_CONTENT.getStatusCode()).
 		when()
-			.put("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
+			.put("/imap-archive/service/v1/domains/" + domainId.get() + "/configuration");
 		
 		given()
 			.port(server.getHttpPort())
-			.auth().basic("admin@mydomain.org", "trust3dToken").
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
 		expect()
 			.contentType(ContentType.JSON)
-			.body("domainId", equalTo("a6af9131-60b6-4e3a-a9f3-df5b43a89309"),
+			.body("domainId", equalTo(domainId.get()),
 				"enabled", equalTo(true),
 				"dayOfWeek", equalTo(DayOfWeek.WEDNESDAY.getSpecificationValue()),
 				"excludedFolder", equalTo("anotherExcluded"),
-				"excludedUserIdToLoginMap", hasEntry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera"),
-				"excludedUserIdToLoginMap", hasEntry("2d7a5942-46ab-4fad-9bd2-608bde249671", "userc"),
+				"excludedUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
+				"excludedUserIdToLoginMap", hasEntry(userc.getExtId().getExtId(), userc.getLogin()),
 				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user3@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.get("/imap-archive/service/v1/domains/a6af9131-60b6-4e3a-a9f3-df5b43a89309/configuration");
-		
-		control.verify();
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/configuration");
 	}
 }

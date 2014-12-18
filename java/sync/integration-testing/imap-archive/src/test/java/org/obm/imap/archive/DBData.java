@@ -28,67 +28,53 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
 
-
 package org.obm.imap.archive;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.eq;
-import static org.easymock.EasyMock.expect;
-
-import java.sql.SQLException;
-
-import org.obm.domain.dao.DomainDao;
-import org.obm.domain.dao.UserDao;
-import org.obm.imap.archive.beans.ExcludedUser;
-import org.obm.provisioning.dao.exceptions.UserNotFoundException;
-
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserPassword;
 
-public class ExpectAuthorization {
-	
-	public static void expectAdmin(DomainDao domainDao, String domainName, UserDao userDao, String login) {
-		ObmDomain domain = expectDomain(domainDao, domainName);
-		
-		expect(userDao.findUserByLogin(login, domain))
-			.andReturn(ObmUser.builder()
-					.extId(UserExtId.valueOf("d4ad341d-89eb-4f3d-807a-cb372314845d"))
-					.login(UserLogin.valueOf(login))
-					.domain(domain)
-					.admin(true)
-					.build()).anyTimes();
-	}
-	
-	public static void expectCheckUsers(UserDao userDao, String domainName, ExcludedUser... users) throws SQLException, UserNotFoundException {
-		ObmDomain domain = ObmDomain.builder().name(domainName).build();
-		for (ExcludedUser user : users) {
-			expect(userDao.getByExtId(eq(user.getId()), anyObject(ObmDomain.class)))
-				.andReturn(ObmUser.builder()
-						.extId(user.getId())
-						.login(UserLogin.valueOf(user.getLogin()))
-						.domain(domain)
-						.build());
-		}
-	}
-	
-	public static void expectSimpleUser(DomainDao domainDao, String domainName, UserDao userDao, String login) {
-		ObmDomain domain = expectDomain(domainDao, domainName);
-		
-		expect(userDao.findUserByLogin(login, domain))
-			.andReturn(ObmUser.builder()
-					.extId(UserExtId.valueOf("d4ad341d-89eb-4f3d-807a-cb372314845d"))
-					.login(UserLogin.valueOf(login))
-					.domain(domain)
-					.build()).anyTimes();
-	}
+public interface DBData {
 
-	private static ObmDomain expectDomain(DomainDao domainDao, String domainName) {
-		ObmDomain domain = ObmDomain.builder().name(domainName).build();
-		expect(domainDao.findDomainByName(domainName))
-			.andReturn(domain).anyTimes();
-		return domain;
-	}
-
+	ObmDomainUuid domainId = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+	ObmDomain domain = ObmDomain.builder()
+			.name("mydomain.org")
+			.uuid(domainId)
+			.id(1)
+			.build();
+	ObmDomainUuid otherDomainId = ObmDomainUuid.of("31ae9172-ca35-4045-8ea3-c3125dab771e");
+	ObmDomain otherDomain = ObmDomain.builder()
+			.name("otherDomain.org")
+			.uuid(otherDomainId)
+			.id(2)
+			.build();
+	
+	ObmUser admin = ObmUser.builder()
+		.extId(UserExtId.valueOf("d4ad341d-89eb-4f3d-807a-cb372314845d"))
+		.login(UserLogin.valueOf("admin"))
+		.password(UserPassword.valueOf("trust3dToken"))
+		.admin(true)
+		.domain(domain)
+		.build();
+	ObmUser usera = ObmUser.builder()
+		.extId(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+		.login(UserLogin.valueOf("usera"))
+		.password(UserPassword.valueOf("usera"))
+		.domain(domain)
+		.build();
+	ObmUser userb = ObmUser.builder()
+		.extId(UserExtId.valueOf("8e30e673-1c47-4ca8-85e8-4609d4228c10"))
+		.login(UserLogin.valueOf("userb"))
+		.password(UserPassword.valueOf("userb"))
+		.domain(domain)
+		.build();
+	ObmUser userc = ObmUser.builder()
+		.extId(UserExtId.valueOf("2d7a5942-46ab-4fad-9bd2-608bde249671"))
+		.login(UserLogin.valueOf("userc"))
+		.password(UserPassword.valueOf("userc"))
+		.domain(domain)
+		.build();
 }

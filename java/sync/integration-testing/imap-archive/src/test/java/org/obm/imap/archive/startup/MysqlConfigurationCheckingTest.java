@@ -32,7 +32,6 @@ package org.obm.imap.archive.startup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.easymock.IMocksControl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -65,16 +64,13 @@ public class MysqlConfigurationCheckingTest {
 	
 	private @Inject TemporaryFolder temporaryFolder;
 	private @Inject WebServer server;
-	private @Inject IMocksControl control;
 
 	@Test(expected=UnsupportedDatabaseFlavourException.class)
 	public void startingShouldFailWhenMysql() throws Exception {
 		try {
-			control.replay();
 			server.start();
 		} finally {
 			assertThat(server.isStarted()).isFalse();
-			control.verify();
 		}
 	}
 }

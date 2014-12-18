@@ -35,8 +35,6 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.rules.TemporaryFolder;
@@ -46,9 +44,6 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.configuration.DatabaseFlavour;
 import org.obm.configuration.TransactionConfiguration;
 import org.obm.dao.utils.DaoTestModule;
-import org.obm.domain.dao.DomainDao;
-import org.obm.domain.dao.UserDao;
-import org.obm.domain.dao.UserSystemDao;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.Mailing;
 import org.obm.imap.archive.logging.LoggerFileNameService;
@@ -126,12 +121,6 @@ public class TestImapArchiveModules {
 					
 					@Override
 					protected void configure() {
-						IMocksControl control = EasyMock.createControl();
-						bind(IMocksControl.class).toInstance(control);
-						bind(UserSystemDao.class).toInstance(control.createMock(UserSystemDao.class));
-						bind(DomainDao.class).toInstance(control.createMock(DomainDao.class));
-						bind(UserDao.class).toInstance(control.createMock(UserDao.class));
-
 						Multibinder<ArchiveSchedulerBus.Client> busClients = Multibinder.newSetBinder(binder(), ArchiveSchedulerBus.Client.class);
 						busClients.addBinding().to(FutureSchedulerBusClient.class);
 						
