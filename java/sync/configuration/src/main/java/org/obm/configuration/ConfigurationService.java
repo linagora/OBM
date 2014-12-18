@@ -63,4 +63,6 @@ public interface ConfigurationService extends DomainConfiguration, DataConfigura
 	String getObmUIUrlPrefix();
 
 	boolean isLdapModuleEnabled();
+
+	boolean isConfidentialEventsEnabled();
 }

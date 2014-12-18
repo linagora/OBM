@@ -67,6 +67,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	private final static String OBM_SYNC_PORT = "8080";
 	private final static String OBM_SYNC_APP_NAME = "obm-sync";
 	private final static String SERVICES_APP_NAME = "services";
+
+	private final static String CONFIDENTIAL_EVENTS_ENABLED = "enable-confidential-events";
+	private final static boolean CONFIDENTIAL_EVENTS_ENABLED_DEFAULT = true;
 	
 	public static class Factory {
 		
@@ -208,5 +211,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public boolean isLdapModuleEnabled() {
 		return this.iniFile.getBooleanValue("obm-ldap");
+	}
+
+	@Override
+	public boolean isConfidentialEventsEnabled() {
+		return iniFile.getBooleanValue(CONFIDENTIAL_EVENTS_ENABLED, CONFIDENTIAL_EVENTS_ENABLED_DEFAULT);
 	}
 }
