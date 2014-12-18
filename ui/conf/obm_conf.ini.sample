@@ -49,6 +49,9 @@ external-url = obm
 external-protocol = http
 obm-prefix = /
 
+;Set this to false to disable the use of the 'confidential' privacy level
+;enable-confidential-events = false
+
 ; Synchronize global OBM address book
 globalAddressBookSync = true
 
