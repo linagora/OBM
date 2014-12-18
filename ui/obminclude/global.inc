@@ -302,7 +302,14 @@ $perm_admin = '1F';
 ///////////////////////////////////////////////////////////////////////////////
 // Load global parameters from .ini file
 ///////////////////////////////////////////////////////////////////////////////
+$enable_confidential_events = true;
+
 $ini_array = parse_ini_file("$path/../conf/obm_conf.ini");
+
+// Crappy hack to work-around the PHP bug about parsing booleans in ini files
+if (isset($ini_array['enable-confidential-events'])) {
+  $enable_confidential_events = $ini_array['enable-confidential-events'] == 1;
+}
 
 $obmdb_host = $ini_array['host'];
 $obmdb_dbtype = $ini_array['dbtype']; 

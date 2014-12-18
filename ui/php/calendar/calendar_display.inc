@@ -4523,13 +4523,19 @@ function dis_event_commented_decision_popup( $display_wait ) {
 }
 
 function get_available_privacy_options() {
+  global $enable_confidential_events;
   global $l_private, $l_public, $l_confidential;
-  
-  return array(
+
+  $options = array(
       0 => $l_public,
-      1 => $l_private,
-      2 => $l_confidential
+      1 => $l_private
   );
+
+  if ($enable_confidential_events) {
+    $options[2] = $l_confidential;
+  }
+
+  return $options;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
