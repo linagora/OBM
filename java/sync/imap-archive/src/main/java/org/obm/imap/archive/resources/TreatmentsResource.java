@@ -35,6 +35,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -113,6 +114,24 @@ public class TreatmentsResource {
 		try {
 			ArchiveTreatmentKind actualTreatmentKind = Objects.firstNonNull(archiveTreatmentKind, ArchiveTreatmentKind.REAL_RUN);
 			ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain, dateTimeProvider.now(), actualTreatmentKind);
+			return Response.seeOther(buildUri(runId)).build();
+		} catch (DaoException e) {
+			logger.error("Cannot schedule an archiving", e);
+			return Response.serverError().build();
+		} catch (DomainConfigurationNotFoundException e) {
+			return Response.status(Status.NOT_FOUND).build();
+		} catch (DomainConfigurationDisableException e) {
+			return Response.status(Status.CONFLICT).build();
+		}
+	}
+	
+	@DELETE
+	public Response delete(@QueryParam("all") Boolean all) {
+		if (all == null || all == false) {
+			return Response.status(Status.NOT_IMPLEMENTED).build();
+		}
+		try {
+			ArchiveTreatmentRunId runId = archiveSchedulingService.schedule(domain, dateTimeProvider.now(), ArchiveTreatmentKind.DELETE_ALL);
 			return Response.seeOther(buildUri(runId)).build();
 		} catch (DaoException e) {
 			logger.error("Cannot schedule an archiving", e);

@@ -493,4 +493,39 @@ public class TreatmentsResourceTest {
 		when()
 			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments");
 	}
+	
+	@Test
+	public void resetShouldThrowWhenNotInTestingMode() throws Exception {
+		expectations
+			.expectTrustedLogin(domain)
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain)
+			.expectGetDomain(domain);
+		
+		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
+				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
+		
+		server.start();
+		
+		UUID expectedRunId = TestImapArchiveModules.uuid;
+		given()
+			.config(RestAssuredConfig.config().redirect(RedirectConfig.redirectConfig().followRedirects(false)))
+			.port(server.getHttpPort())
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
+			.queryParam("all", true).
+		expect()
+			.header("Location", containsString("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + expectedRunId.toString()))
+			.statusCode(Status.SEE_OTHER.getStatusCode()).
+		when()
+			.delete("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments");
+		
+		given()
+			.port(server.getHttpPort())
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
+			.contentType(ContentType.JSON).
+		expect()
+			.body(containsString("Starting IMAP Archive reset for domain mydomain")).
+		when()
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + expectedRunId.toString() + "/logs");
+	}
 }
