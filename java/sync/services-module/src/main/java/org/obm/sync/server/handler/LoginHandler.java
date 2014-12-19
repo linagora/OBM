@@ -45,6 +45,7 @@ import org.obm.sync.server.mailer.ErrorMailer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
@@ -52,6 +53,7 @@ import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserSettings;
+import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 /**
  * Responds to the following urls :
@@ -67,18 +69,22 @@ public class LoginHandler implements ISyncHandler {
 	private final VersionValidator versionValidator;
 	private final SettingsService settingsService;
 	private final UserService userService;
+	private final ObmSyncConfigurationService configurationService;
 
 	@Inject
-	private LoginHandler(LoginBindingImpl loginBindingImpl,
+	@VisibleForTesting
+	LoginHandler(LoginBindingImpl loginBindingImpl,
 			TrustedLoginBindingImpl trustedLoginBindingImpl,
 			ErrorMailer errorMailer, SettingsService settingsService,
-			VersionValidator versionValidator, UserService userService) {
+			VersionValidator versionValidator, UserService userService,
+			ObmSyncConfigurationService configurationService) {
 		this.binding = loginBindingImpl;
 		this.trustedBinding = trustedLoginBindingImpl;
 		this.errorMailer = errorMailer;
 		this.settingsService = settingsService;
 		this.versionValidator = versionValidator;
 		this.userService = userService;
+		this.configurationService = configurationService;
 	}
 
 	@Override
@@ -205,11 +211,22 @@ public class LoginHandler implements ISyncHandler {
 
 		token.setUserSettings(settings);
 	}
-	
-	private void fillTokenWithServerCapabilities(AccessToken token) {
-		Map<ServerCapability, String> serverCapabilities = token.getServerCapabilities();
-		for (ServerCapability serverCapability: ServerCapability.values()) {
-			serverCapabilities.put(serverCapability, "true");
+
+	@VisibleForTesting
+	void fillTokenWithServerCapabilities(AccessToken token) {
+		Map<ServerCapability, String> capabilities = token.getServerCapabilities();
+
+		for (ServerCapability capability: ServerCapability.values()) {
+			capabilities.put(capability, String.valueOf(isServerCapabilityEnabled(capability)));
+		}
+	}
+
+	private boolean isServerCapabilityEnabled(ServerCapability capability) {
+		switch (capability) {
+			case CONFIDENTIAL_EVENTS:
+				return configurationService.isConfidentialEventsEnabled();
+			default:
+				return true;
 		}
 	}
 
