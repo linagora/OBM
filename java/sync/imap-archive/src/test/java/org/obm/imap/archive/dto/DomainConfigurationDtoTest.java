@@ -73,6 +73,7 @@ public class DomainConfigurationDtoTest {
 								.build())
 							.time(LocalTime.parse("13:23"))
 							.build())
+					.archiveMainFolder("arChive")
 					.excludedFolder("excluded")
 					.excludedUsers(ImmutableList.of(ExcludedUser.builder()
 								.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
@@ -89,6 +90,7 @@ public class DomainConfigurationDtoTest {
 		assertThat(dto.dayOfYear).isEqualTo(234);
 		assertThat(dto.hour).isEqualTo(13);
 		assertThat(dto.minute).isEqualTo(23);
+		assertThat(dto.archiveMainFolder).isEqualTo("arChive");
 		assertThat(dto.excludedFolder).isEqualTo("excluded");
 		assertThat(dto.excludedUserIdToLoginMap).containsExactly(MapEntry.entry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "user"));
 		assertThat(dto.mailingEmails).containsOnly("usera@mydomain.org", "userb@mydomain.org");

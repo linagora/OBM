@@ -56,6 +56,7 @@ public class DomainConfigurationDto {
 		dto.dayOfYear = configuration.getDayOfYear() != null ? configuration.getDayOfYear().getDayOfYear() : null;
 		dto.hour = configuration.getHour();
 		dto.minute = configuration.getMinute();
+		dto.archiveMainFolder = configuration.getArchiveMainFolder();
 		dto.excludedFolder = configuration.getExcludedFolder();
 		dto.excludedUserIdToLoginMap = toMap(configuration.getExcludedUsers());
 		dto.mailingEmails = toStrings(configuration.getMailing());
@@ -112,6 +113,7 @@ public class DomainConfigurationDto {
 	public Integer dayOfYear;
 	public Integer hour;
 	public Integer minute;
+	public String archiveMainFolder;
 	public String excludedFolder;
 	public Map<String, String> excludedUserIdToLoginMap;
 	public List<String> mailingEmails;

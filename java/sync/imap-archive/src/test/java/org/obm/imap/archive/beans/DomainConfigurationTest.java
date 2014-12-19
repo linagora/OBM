@@ -57,6 +57,11 @@ public class DomainConfigurationTest {
 		DomainConfiguration.builder().state(ConfigurationState.DISABLE).build();
 	}
 
+	@Test(expected=NullPointerException.class)
+	public void builderShouldThrowWhenNullState() {
+		DomainConfiguration.builder().state(null);
+	}
+
 	@Test(expected=IllegalStateException.class)
 	public void builderShouldThrowWhenEnabledIsNotProvided() {
 		DomainConfiguration.builder()
@@ -68,6 +73,62 @@ public class DomainConfigurationTest {
 		DomainConfiguration.builder().state(ConfigurationState.ENABLE).domain(
 				ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build()).build();
 	}
+
+	@Test(expected=NullPointerException.class)
+	public void builderShouldThrowWhenNullArchiveMainFolder() {
+		DomainConfiguration.builder().archiveMainFolder(null);
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThrowWhenArchiveMainFolderIsNotProvided() {
+		DomainConfiguration.builder()
+			.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
+			.state(ConfigurationState.ENABLE)
+			.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+			.build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThrowWhenArchiveMainFolderIsEmpty() {
+		DomainConfiguration.builder()
+			.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
+			.state(ConfigurationState.ENABLE)
+			.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+			.archiveMainFolder("")
+			.build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThrowWhenArchiveMainFolderContainsSlash() {
+		DomainConfiguration.builder()
+			.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
+			.state(ConfigurationState.ENABLE)
+			.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+			.archiveMainFolder("ar/chive")
+			.build();
+	}
+	
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThrowWhenArchiveMainFolderContainsAt() {
+		DomainConfiguration.builder()
+			.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
+			.state(ConfigurationState.ENABLE)
+			.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+			.archiveMainFolder("arch@ive")
+			.build();
+	}
 	
 	@Test(expected=IllegalStateException.class)
 	public void builderShouldThrowWhenExcludeFolderContainsSlash() {
@@ -78,7 +139,8 @@ public class DomainConfigurationTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
-			.excludedFolder("exclud/ed")
+			.archiveMainFolder("arChive")
+			.excludedFolder("ex/cluded")
 			.build();
 	}
 	
@@ -91,6 +153,7 @@ public class DomainConfigurationTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
+			.archiveMainFolder("arChive")
 			.excludedFolder("ex@cluded")
 			.build();
 	}
@@ -105,6 +168,7 @@ public class DomainConfigurationTest {
 							.recurrence(ArchiveRecurrence.daily())
 							.time(LocalTime.parse("13:23"))
 							.build())
+					.archiveMainFolder("arChive")
 					.excludedFolder("excluded")
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
@@ -112,6 +176,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
 		assertThat(configuration.getHour()).isEqualTo(13);
 		assertThat(configuration.getMinute()).isEqualTo(23);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
 	}
 	
@@ -125,12 +190,14 @@ public class DomainConfigurationTest {
 							.recurrence(ArchiveRecurrence.daily())
 							.time(LocalTime.parse("13:23"))
 							.build())
+					.archiveMainFolder("arChive")
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
 		assertThat(configuration.isEnabled()).isTrue();
 		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
 		assertThat(configuration.getHour()).isEqualTo(13);
 		assertThat(configuration.getMinute()).isEqualTo(23);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(configuration.getExcludedFolder()).isNull();
 	}
 	
@@ -144,6 +211,7 @@ public class DomainConfigurationTest {
 							.recurrence(ArchiveRecurrence.daily())
 							.time(LocalTime.parse("13:23"))
 							.build())
+					.archiveMainFolder("arChive")
 					.excludedFolder("excluded")
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
@@ -151,6 +219,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
 		assertThat(configuration.getHour()).isEqualTo(13);
 		assertThat(configuration.getMinute()).isEqualTo(23);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
 		assertThat(configuration.getExcludedUsers()).isEmpty();
 	}
@@ -169,6 +238,7 @@ public class DomainConfigurationTest {
 							.recurrence(ArchiveRecurrence.daily())
 							.time(LocalTime.parse("13:23"))
 							.build())
+					.archiveMainFolder("arChive")
 					.excludedFolder("excluded")
 					.excludedUsers(ImmutableList.of(expectedExcludedUser))
 					.build();
@@ -177,6 +247,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
 		assertThat(configuration.getHour()).isEqualTo(13);
 		assertThat(configuration.getMinute()).isEqualTo(23);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
 		assertThat(configuration.getExcludedUsers()).containsOnly(expectedExcludedUser);
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
@@ -188,10 +259,12 @@ public class DomainConfigurationTest {
 				DomainConfiguration.builder()
 					.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
 					.state(ConfigurationState.DISABLE)
+					.archiveMainFolder("arChive")
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
 		assertThat(configuration.getState()).isEqualTo(ConfigurationState.DISABLE);
 		assertThat(configuration.isEnabled()).isFalse();
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 	}
 
 	@Test
@@ -204,12 +277,14 @@ public class DomainConfigurationTest {
 							.recurrence(ArchiveRecurrence.daily())
 							.time(LocalTime.parse("13:23"))
 							.build())
+					.archiveMainFolder("arChive")
 					.build();
 		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
 		assertThat(configuration.isEnabled()).isFalse();
 		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
 		assertThat(configuration.getHour()).isEqualTo(13);
 		assertThat(configuration.getMinute()).isEqualTo(23);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 	}
 	
 	@Test
@@ -237,6 +312,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getHour()).isEqualTo(0);
 		assertThat(configuration.getMinute()).isEqualTo(0);
 		assertThat(configuration.getSchedulingConfiguration()).isEqualTo(schedulingConfiguration);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("ARCHIVE");
 		assertThat(configuration.getExcludedFolder()).isNull();
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
 	}
@@ -261,6 +337,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.dayOfYear = expectedDayOfYear.getDayOfYear();
 		domainConfigurationDto.hour = expectedHour;
 		domainConfigurationDto.minute = expectedMinute;
+		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.excludedFolder = "excluded";
 		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
 		domainConfigurationDto.mailingEmails = ImmutableList.of("usera@mydomain.org", "userb@mydomain.org");
@@ -275,6 +352,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getDomainId()).isEqualTo(expectedDomainId);
 		assertThat(configuration.getHour()).isEqualTo(expectedHour);
 		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
 		assertThat(configuration.getExcludedUsers()).containsOnly(ExcludedUser.builder()
 				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
@@ -303,6 +381,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.dayOfYear = expectedDayOfYear.getDayOfYear();
 		domainConfigurationDto.hour = expectedHour;
 		domainConfigurationDto.minute = expectedMinute;
+		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.excludedFolder = "excluded";
 		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of();
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
@@ -318,6 +397,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getDomainId()).isEqualTo(expectedDomainId);
 		assertThat(configuration.getHour()).isEqualTo(expectedHour);
 		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
 		assertThat(configuration.getExcludedUsers()).isEmpty();
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
@@ -343,6 +423,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.dayOfYear = expectedDayOfYear.getDayOfYear();
 		domainConfigurationDto.hour = expectedHour;
 		domainConfigurationDto.minute = expectedMinute;
+		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.excludedFolder = "excluded";
 		domainConfigurationDto.excludedUserIdToLoginMap = null;
 		
@@ -370,6 +451,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.dayOfYear = expectedDayOfYear.getDayOfYear();
 		domainConfigurationDto.hour = expectedHour;
 		domainConfigurationDto.minute = expectedMinute;
+		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.excludedFolder = "excluded";
 		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
@@ -384,6 +466,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getDomainId()).isEqualTo(expectedDomainId);
 		assertThat(configuration.getHour()).isEqualTo(expectedHour);
 		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
 		assertThat(configuration.getExcludedUsers()).containsOnly(ExcludedUser.builder()
 				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
@@ -412,6 +495,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.dayOfYear = expectedDayOfYear.getDayOfYear();
 		domainConfigurationDto.hour = expectedHour;
 		domainConfigurationDto.minute = expectedMinute;
+		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.excludedFolder = "excluded";
 		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
 		domainConfigurationDto.mailingEmails = null;
@@ -426,6 +510,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getDomainId()).isEqualTo(expectedDomainId);
 		assertThat(configuration.getHour()).isEqualTo(expectedHour);
 		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
 		assertThat(configuration.getExcludedUsers()).containsOnly(ExcludedUser.builder()
 				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))

@@ -39,6 +39,7 @@ import org.obm.imap.archive.dto.DomainConfigurationDto;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -47,15 +48,19 @@ import fr.aliacom.obm.common.user.UserExtId;
 
 public class DomainConfiguration {
 	
+	private static final String DEFAULT_ARCHIVE_MAIN_FOLDER = "ARCHIVE";
+	
 	public static final DomainConfiguration.Builder DEFAULT_VALUES_BUILDER = 
 		builder()
 			.state(ConfigurationState.DISABLE)
-			.schedulingConfiguration(SchedulingConfiguration.DEFAULT_VALUES_BUILDER);
+			.schedulingConfiguration(SchedulingConfiguration.DEFAULT_VALUES_BUILDER)
+			.archiveMainFolder(DEFAULT_ARCHIVE_MAIN_FOLDER);
 
 	public static DomainConfiguration from(DomainConfigurationDto configuration, ObmDomain domain) {
 		return DomainConfiguration.builder()
 				.domain(domain)
 				.state(configuration.enabled ? ConfigurationState.ENABLE : ConfigurationState.DISABLE)
+				.archiveMainFolder(configuration.archiveMainFolder)
 				.schedulingConfiguration(SchedulingConfiguration.builder()
 						.recurrence(ArchiveRecurrence.builder()
 							.repeat(RepeatKind.valueOf(configuration.repeatKind))
@@ -91,6 +96,7 @@ public class DomainConfiguration {
 		
 		private ObmDomain domain;
 		private ConfigurationState state;
+		private String archiveMainFolder;
 		private SchedulingConfiguration schedulingConfiguration;
 		private String excludedFolder;
 		private ImmutableList.Builder<ExcludedUser> excludedUsers;
@@ -107,7 +113,14 @@ public class DomainConfiguration {
 		}
 
 		public Builder state(ConfigurationState state) {
+			Preconditions.checkNotNull(state);
 			this.state = state;
+			return this;
+		}
+		
+		public Builder archiveMainFolder(String archiveMainFolder) {
+			Preconditions.checkNotNull(archiveMainFolder);
+			this.archiveMainFolder = archiveMainFolder;
 			return this;
 		}
 
@@ -141,21 +154,27 @@ public class DomainConfiguration {
 				Preconditions.checkState(excludedFolder.contains("/") == false);
 				Preconditions.checkState(excludedFolder.contains("@") == false);
 			}
-			return new DomainConfiguration(domain, state, schedulingConfiguration, excludedFolder, excludedUsers.build(), Objects.firstNonNull(mailing, Mailing.empty()));
+			Preconditions.checkState(!Strings.isNullOrEmpty(archiveMainFolder));
+			Preconditions.checkState(archiveMainFolder.contains("/") == false);
+			Preconditions.checkState(archiveMainFolder.contains("@") == false);
+			
+			return new DomainConfiguration(domain, state, schedulingConfiguration, archiveMainFolder, excludedFolder, excludedUsers.build(), Objects.firstNonNull(mailing, Mailing.empty()));
 		}
 	}
 	
 	private final ObmDomain domain;
 	private final ConfigurationState state;
 	private final SchedulingConfiguration schedulingConfiguration;
+	private final String archiveMainFolder;
 	private final String excludedFolder;
 	private final List<ExcludedUser> excludedUsers;
 	private final Mailing mailing;
 
-	private DomainConfiguration(ObmDomain domain, ConfigurationState state, SchedulingConfiguration schedulingConfiguration, String excludedFolder, ImmutableList<ExcludedUser> excludedUsers, Mailing mailing) {
+	private DomainConfiguration(ObmDomain domain, ConfigurationState state, SchedulingConfiguration schedulingConfiguration, String archiveMainFolder, String excludedFolder, ImmutableList<ExcludedUser> excludedUsers, Mailing mailing) {
 		this.domain = domain;
 		this.state = state;
 		this.schedulingConfiguration = schedulingConfiguration;
+		this.archiveMainFolder = archiveMainFolder;
 		this.excludedFolder = excludedFolder;
 		this.excludedUsers = excludedUsers;
 		this.mailing = mailing;
@@ -212,6 +231,10 @@ public class DomainConfiguration {
 	public Integer getMinute() {
 		return schedulingConfiguration != null ? schedulingConfiguration.getMinute() : null;
 	}
+	
+	public String getArchiveMainFolder() {
+		return archiveMainFolder;
+	}
 
 	public String getExcludedFolder() {
 		return excludedFolder;
@@ -227,7 +250,7 @@ public class DomainConfiguration {
 	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(domain, state, schedulingConfiguration, excludedFolder, excludedUsers, mailing);
+		return Objects.hashCode(domain, state, schedulingConfiguration, archiveMainFolder, excludedFolder, excludedUsers, mailing);
 	}
 	
 	@Override
@@ -237,6 +260,7 @@ public class DomainConfiguration {
 			return Objects.equal(this.domain, that.domain)
 				&& Objects.equal(this.state, that.state)
 				&& Objects.equal(this.schedulingConfiguration, that.schedulingConfiguration)
+				&& Objects.equal(this.archiveMainFolder, that.archiveMainFolder)
 				&& Objects.equal(this.excludedFolder, that.excludedFolder)
 				&& Objects.equal(this.excludedUsers, that.excludedUsers)
 				&& Objects.equal(this.mailing, that.mailing);
@@ -250,6 +274,7 @@ public class DomainConfiguration {
 			.add("domain", domain)
 			.add("state", state)
 			.add("recurrence", schedulingConfiguration)
+			.add("archiveMainFolder", archiveMainFolder)
 			.add("excludedFolder", excludedFolder)
 			.add("excludedUsers", excludedUsers)
 			.add("mailing", mailing)
