@@ -149,6 +149,7 @@ public class RecurrentTaskRescheduleTest {
 					.build())
 				.time(LocalTime.parse("13:37"))
 				.build())
+			.archiveMainFolder("arChive")
 			.build();
 		domainConfigDao.create(domainConfiguration);
 		

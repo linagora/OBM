@@ -126,6 +126,7 @@ public class DryRunImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());

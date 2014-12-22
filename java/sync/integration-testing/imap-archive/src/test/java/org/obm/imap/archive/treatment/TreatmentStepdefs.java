@@ -100,7 +100,8 @@ public class TreatmentStepdefs {
 	@Before
 	public void setup() throws Exception {
 		configurationBuilder = DomainConfiguration.builder()
-				.domain(domain);
+				.domain(domain)
+				.archiveMainFolder("arChive");
 		
 		expectations = new Expectations(driver);
 		initDb();

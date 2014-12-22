@@ -174,6 +174,7 @@ public class DomainConfigurationServiceTest {
 						SchedulingConfiguration.builder()
 								.time(LocalTime.parse("22:15"))
 								.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.excludedUsers(ImmutableList.of(ExcludedUser.builder()
 						.id(userId)
 						.login("badlogin")
@@ -197,6 +198,7 @@ public class DomainConfigurationServiceTest {
 						SchedulingConfiguration.builder()
 								.time(LocalTime.parse("22:15"))
 								.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 	}
 }

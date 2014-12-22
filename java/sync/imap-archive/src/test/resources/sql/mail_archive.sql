@@ -9,6 +9,7 @@ CREATE TABLE mail_archive (
  id                           SERIAL PRIMARY KEY,
  mail_archive_domain_uuid     character(36) NOT NULL,
  mail_archive_activated       BOOLEAN DEFAULT FALSE,
+ mail_archive_main_folder     TEXT NOT NULL,
  mail_archive_repeat_kind     repeat_kind,
  mail_archive_day_of_week     INTEGER,
  mail_archive_day_of_month    INTEGER,

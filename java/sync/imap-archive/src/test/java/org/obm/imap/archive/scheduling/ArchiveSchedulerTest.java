@@ -157,6 +157,7 @@ public class ArchiveSchedulerTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ff43907a-af02-4509-b66b-a712a4da6146");
 		DateTime when = DateTime.parse("2024-11-1T05:04Z");
@@ -181,6 +182,7 @@ public class ArchiveSchedulerTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 		DateTime when1 = DateTime.parse("2024-11-1T05:04Z");
 		DateTime when2 = DateTime.parse("2024-11-5T05:04Z");
@@ -212,6 +214,7 @@ public class ArchiveSchedulerTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 		DateTime when = DateTime.parse("2024-11-1T05:04Z");
 		DateTime whenToEnqueue = DateTime.parse("2024-11-2T05:04Z");
@@ -248,6 +251,7 @@ public class ArchiveSchedulerTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 		DateTime when = DateTime.parse("2024-11-1T00:00");
 		DateTime earlierWhenEnqueuedAfter = DateTime.parse("2024-11-5T00:00");
@@ -295,6 +299,7 @@ public class ArchiveSchedulerTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 		DomainConfiguration configuration2 = DomainConfiguration.builder()
 				.domain(domain2)
@@ -303,6 +308,7 @@ public class ArchiveSchedulerTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 		DateTime when1 = DateTime.parse("2024-11-1T05:04Z");
 		DateTime when2 = DateTime.parse("2024-11-2T05:04Z");
@@ -342,6 +348,7 @@ public class ArchiveSchedulerTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 		DomainConfiguration configuration2 = DomainConfiguration.builder()
 				.domain(domain2)
@@ -350,6 +357,7 @@ public class ArchiveSchedulerTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 		DateTime when1 = DateTime.parse("2024-11-1T05:04Z");
 		DateTime when2 = DateTime.parse("2024-11-2T05:04Z");
@@ -414,6 +422,7 @@ public class ArchiveSchedulerTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 
 		DateTime when1 = DateTime.parse("2024-11-1T00:00");
@@ -451,6 +460,7 @@ public class ArchiveSchedulerTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 		DomainConfiguration configuration2 = DomainConfiguration.builder()
 				.domain(domain2)
@@ -459,6 +469,7 @@ public class ArchiveSchedulerTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build();
 		DateTime when1 = DateTime.parse("2024-11-1T00:00");
 		DateTime when2 = DateTime.parse("2024-11-9T00:00");

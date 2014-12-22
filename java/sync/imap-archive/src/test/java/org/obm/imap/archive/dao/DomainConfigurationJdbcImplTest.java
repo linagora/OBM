@@ -112,8 +112,9 @@ public class DomainConfigurationJdbcImplTest {
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.ARCHIVE_MAIN_FOLDER,
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
-			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
+			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "arChive", "excluded")
 			.build();
 	}	
 
@@ -153,6 +154,7 @@ public class DomainConfigurationJdbcImplTest {
 		assertThat(domainConfiguration.getDayOfYear()).isEqualTo(DayOfYear.of(355));
 		assertThat(domainConfiguration.getHour()).isEqualTo(10);
 		assertThat(domainConfiguration.getMinute()).isEqualTo(32);
+		assertThat(domainConfiguration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(domainConfiguration.getExcludedFolder()).isEqualTo("excluded");
 		assertThat(domainConfiguration.getExcludedUsers()).isEmpty();
 	}
@@ -224,6 +226,7 @@ public class DomainConfigurationJdbcImplTest {
 							.build())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("ARcHIVE")
 				.excludedFolder("anotherExcluded")
 				.build();
 		
@@ -263,6 +266,7 @@ public class DomainConfigurationJdbcImplTest {
 							.build())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("ARcHIVE")
 				.excludedFolder("anotherExcluded")
 				.excludedUsers(ImmutableList.of(excludedUser, excludedUser3))
 				.build();
@@ -295,6 +299,7 @@ public class DomainConfigurationJdbcImplTest {
 							.build())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("ARcHIVE")
 				.excludedFolder("anotherExcluded")
 				.mailing(Mailing.from(ImmutableList.of(emailAddress, emailAddress3)))
 				.build();
@@ -334,6 +339,7 @@ public class DomainConfigurationJdbcImplTest {
 							.build())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("ARcHIVE")
 				.excludedFolder("excluded")
 				.build();
 		
@@ -369,6 +375,7 @@ public class DomainConfigurationJdbcImplTest {
 							.build())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("ARcHIVE")
 				.excludedFolder("excluded")
 				.excludedUsers(ImmutableList.of(excludedUser, excludedUser2))
 				.build();
@@ -399,6 +406,7 @@ public class DomainConfigurationJdbcImplTest {
 							.build())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("ARcHIVE")
 				.excludedFolder("excluded")
 				.mailing(Mailing.from(ImmutableList.of(emailAddress, emailAddress2)))
 				.build();

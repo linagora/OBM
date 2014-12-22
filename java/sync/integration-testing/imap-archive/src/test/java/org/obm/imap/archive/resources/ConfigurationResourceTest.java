@@ -154,8 +154,9 @@ public class ConfigurationResourceTest {
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.ARCHIVE_MAIN_FOLDER,
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
-					.values(domainId, Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
+					.values(domainId, Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "arChive", "excluded")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
@@ -202,8 +203,9 @@ public class ConfigurationResourceTest {
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.ARCHIVE_MAIN_FOLDER,
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
-						.values(domainId, Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
+						.values(domainId, Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "arChive", "excluded")
 						.build());
 		
 		expectations
@@ -270,6 +272,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(100).getDayOfYear();
 		domainConfigurationDto.hour = 11;
 		domainConfigurationDto.minute = 32;
+		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of(usera.getExtId().getExtId(), usera.getLogin(), userb.getExtId().getExtId(), userb.getLogin());
 		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user2@mydomain.org");
 		
@@ -311,8 +314,9 @@ public class ConfigurationResourceTest {
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
+						DomainConfigurationJdbcImpl.TABLE.FIELDS.ARCHIVE_MAIN_FOLDER,
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
-					.values(domainId.get(), Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "excluded")
+					.values(domainId.get(), Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "arChive", "excluded")
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
@@ -344,6 +348,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(100).getDayOfYear();
 		domainConfigurationDto.hour = 11;
 		domainConfigurationDto.minute = 32;
+		domainConfigurationDto.archiveMainFolder = "ARCHIVE";
 		domainConfigurationDto.excludedFolder = "anotherExcluded";
 		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of(usera.getExtId().getExtId(), usera.getLogin(), userc.getExtId().getExtId(), userc.getLogin());
 		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user3@mydomain.org");
@@ -366,6 +371,7 @@ public class ConfigurationResourceTest {
 			.body("domainId", equalTo(domainId.get()),
 				"enabled", equalTo(true),
 				"dayOfWeek", equalTo(DayOfWeek.WEDNESDAY.getSpecificationValue()),
+				"archiveMainFolder", equalTo("ARCHIVE"),
 				"excludedFolder", equalTo("anotherExcluded"),
 				"excludedUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
 				"excludedUserIdToLoginMap", hasEntry(userc.getExtId().getExtId(), userc.getLogin()),

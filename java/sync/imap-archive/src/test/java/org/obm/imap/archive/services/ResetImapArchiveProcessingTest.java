@@ -158,6 +158,7 @@ public class ResetImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
@@ -193,6 +194,7 @@ public class ResetImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
@@ -235,6 +237,7 @@ public class ResetImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
@@ -275,6 +278,7 @@ public class ResetImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");

@@ -98,6 +98,7 @@ public class ArchiveSchedulingServiceTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build());
 	}
 
@@ -113,6 +114,7 @@ public class ArchiveSchedulingServiceTest {
 					SchedulingConfiguration.builder()
 						.time(LocalTime.parse("22:15"))
 						.recurrence(ArchiveRecurrence.daily()).build())
+				.archiveMainFolder("arChive")
 				.build());
 	}
 
@@ -159,6 +161,7 @@ public class ArchiveSchedulingServiceTest {
 				SchedulingConfiguration.builder()
 					.time(LocalTime.parse("22:15"))
 					.recurrence(ArchiveRecurrence.daily()).build())
+			.archiveMainFolder("arChive")
 			.build();
 		
 		expect(domainConfigDao.get(domain)).andReturn(config);
@@ -178,6 +181,7 @@ public class ArchiveSchedulingServiceTest {
 				SchedulingConfiguration.builder()
 					.time(LocalTime.parse("22:15"))
 					.recurrence(ArchiveRecurrence.daily()).build())
+			.archiveMainFolder("arChive")
 			.build();
 
 		expectScheduleByConfig(config);
@@ -196,6 +200,7 @@ public class ArchiveSchedulingServiceTest {
 				SchedulingConfiguration.builder()
 					.time(LocalTime.parse("22:15"))
 					.recurrence(ArchiveRecurrence.daily()).build())
+			.archiveMainFolder("arChive")
 			.build();
 		
 		expectScheduleByConfig(config);

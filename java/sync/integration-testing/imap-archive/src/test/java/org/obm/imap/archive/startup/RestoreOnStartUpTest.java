@@ -156,6 +156,7 @@ public class RestoreOnStartUpTest {
 								.build())
 						.time(LocalTime.parse("03:04"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		ArchiveTreatmentRunId expectedFailedRunId = ArchiveTreatmentRunId.from("c6eb4f70-2304-4bb4-aa38-441935dc6a47");
@@ -179,6 +180,7 @@ public class RestoreOnStartUpTest {
 								.build())
 						.time(LocalTime.parse("03:04"))
 						.build())
+				.archiveMainFolder("ARcHIVE")
 				.build();
 		
 

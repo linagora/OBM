@@ -83,10 +83,11 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			String DAY_OF_YEAR = "mail_archive_day_of_year";
 			String HOUR = "mail_archive_hour";
 			String MINUTE = "mail_archive_minute";
+			String ARCHIVE_MAIN_FOLDER = "mail_archive_main_folder";
 			String EXCLUDED_FOLDER = "mail_archive_excluded_folder";
 			
-			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, EXCLUDED_FOLDER);
-			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, EXCLUDED_FOLDER);
+			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER);
+			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER);
 		}
 	}
 	
@@ -99,7 +100,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				"UPDATE %s SET %s = ? WHERE %s = ?", TABLE.NAME, FIELDS.UPDATABLE, FIELDS.DOMAIN_UUID);
 		
 		String INSERT = String.format(
-				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
+				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
 	}
 	
 	public interface EXCLUDED_USERS {
@@ -192,6 +193,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 							.build())
 						.time(new LocalTime(rs.getInt(FIELDS.HOUR), rs.getInt(FIELDS.MINUTE)))
 						.build())
+				.archiveMainFolder(rs.getString(FIELDS.ARCHIVE_MAIN_FOLDER))
 				.excludedFolder(rs.getString(FIELDS.EXCLUDED_FOLDER))
 				.excludedUsers(get(connection, domain.getUuid()))
 				.mailing(getMailing(connection, domain.getUuid()))
@@ -212,6 +214,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setInt(idx++, domainConfiguration.getDayOfYear().getDayOfYear());
 			ps.setInt(idx++, domainConfiguration.getHour());
 			ps.setInt(idx++, domainConfiguration.getMinute());
+			ps.setString(idx++, domainConfiguration.getArchiveMainFolder());
 			ps.setString(idx++, domainConfiguration.getExcludedFolder());
 			ps.setString(idx++, domainConfiguration.getDomainId().toString());
 
@@ -241,6 +244,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setInt(idx++, domainConfiguration.getDayOfYear().getDayOfYear());
 			ps.setInt(idx++, domainConfiguration.getHour());
 			ps.setInt(idx++, domainConfiguration.getMinute());
+			ps.setString(idx++, domainConfiguration.getArchiveMainFolder());
 			ps.setString(idx++, domainConfiguration.getExcludedFolder());
 
 			ps.executeUpdate();

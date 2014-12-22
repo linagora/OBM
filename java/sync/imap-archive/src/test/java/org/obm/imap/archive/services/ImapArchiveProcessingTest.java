@@ -158,6 +158,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -215,6 +216,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -282,6 +284,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -331,6 +334,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		DateTime previousTreatmentDate = DateTime.parse("2014-08-25T12:18:00.000Z");
@@ -421,6 +425,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
@@ -501,6 +506,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
@@ -601,6 +607,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -726,6 +733,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -1187,6 +1195,7 @@ public class ImapArchiveProcessingTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		expect(storeClientFactory.create(domain.getName()))
@@ -1237,6 +1246,7 @@ public class ImapArchiveProcessingTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
+			.archiveMainFolder("arChive")
 			.excludedFolder("Excluded")
 			.build();
 		
@@ -1294,6 +1304,7 @@ public class ImapArchiveProcessingTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
+			.archiveMainFolder("arChive")
 			.excludedUsers(ImmutableList.of(ExcludedUser.builder()
 					.id(UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9"))
 					.login("userb")
@@ -1343,6 +1354,7 @@ public class ImapArchiveProcessingTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
+			.archiveMainFolder("arChive")
 			.excludedUsers(ImmutableList.of(ExcludedUser.builder()
 					.id(UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9"))
 					.login("usera")
@@ -1399,6 +1411,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		expect(storeClientFactory.create(domain.getName()))
@@ -1453,6 +1466,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		expect(storeClientFactory.create(domain.getName()))
@@ -1703,6 +1717,7 @@ public class ImapArchiveProcessingTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		expect(storeClientFactory.create(domain.getName()))
@@ -1752,6 +1767,7 @@ public class ImapArchiveProcessingTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		expect(storeClientFactory.create(domain.getName()))
@@ -1808,6 +1824,7 @@ public class ImapArchiveProcessingTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		expect(storeClientFactory.create(domain.getName()))
@@ -1862,6 +1879,7 @@ public class ImapArchiveProcessingTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		expect(storeClientFactory.create(domain.getName()))
@@ -1916,6 +1934,7 @@ public class ImapArchiveProcessingTest {
 					.recurrence(ArchiveRecurrence.daily())
 					.time(LocalTime.parse("13:23"))
 					.build())
+				.archiveMainFolder("arChive")
 				.build();
 		
 		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(

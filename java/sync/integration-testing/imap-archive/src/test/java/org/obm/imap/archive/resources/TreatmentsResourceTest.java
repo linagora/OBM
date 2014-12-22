@@ -151,6 +151,7 @@ public class TreatmentsResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(1).getDayOfYear();
 		domainConfigurationDto.hour = 0;
 		domainConfigurationDto.minute = 0;
+		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of();
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		
@@ -182,6 +183,7 @@ public class TreatmentsResourceTest {
 		domainConfigurationDto.dayOfYear = DayOfYear.of(1).getDayOfYear();
 		domainConfigurationDto.hour = 0;
 		domainConfigurationDto.minute = 0;
+		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of();
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		

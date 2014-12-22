@@ -70,11 +70,13 @@ public class DatabaseOperations {
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_MONTH, 
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.DAY_OF_YEAR, 
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
-					DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE)
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.ARCHIVE_MAIN_FOLDER)
 			.values(domainId.get(), 
 					ConfigurationState.ENABLE == state ? true : false, 
 					RepeatKind.DAILY, 
-					2, 10, 355, 10, 32)
+					2, 10, 355, 10, 32,
+					"arChive")
 			.build();
 	}
 	
