@@ -137,25 +137,40 @@ function loadLogs() {
   }).get({ajax : 1, action : 'archiving_logs', 'run' : run});
 }
 
-function addMailingEmail() {
-  var validity = $('mailing_email').validity;
+function addMailingEmail(event) {
+  var email = $('mailing_email');
+  var validity = email.validity;
+  if (!event) {
+    event = window.event;
+  }
   if (!validity.valid) {
 	  return;
   }
-  
-  var mailingEmail = $('mailing_email').get('value');
+  var mailingEmail = email.get('value');
   if (mailingEmail) {
     var mailingEmails = $('mailing_emails');
     if (!mailingEmails.rows.namedItem(mailingEmail)) {
       insertNewRow(mailingEmails, mailingEmail);
     }
   }
+  email.value = "";
+}
+
+function enterHandler(event) {
+  if (!event) {
+    event = window.event;
+  }
+  if (event.keyCode == 13) {
+    event.keyCode = 0;
+    event.preventDefault();
+    addMailingEmail(event);
+  }
 }
 
 function insertNewRow(table, value) {
   var row = table.insertRow(-1);
   row.id = value;
-  
+
   var valueCell = row.insertCell(0);
   var divId = new Element('div');
   divId.appendText(value);

@@ -379,7 +379,7 @@ function get_block_excluded_users($excludedUserIdToLoginMap) {
 }
 
 function get_block_mailing($mailingEmails) {
-  global $l_mailing_email, $ico_delete;
+  global $l_mailing_email, $ico_delete, $ico_add;
 
   if (is_array($mailingEmails)) {
   	$dis_mailing_emails = "";
@@ -404,7 +404,8 @@ function get_block_mailing($mailingEmails) {
       <tr>
         <th>$l_mailing_email</th>
         <td>
-          <input type='email' name='' value='' id='mailing_email' onblur='addMailingEmail();' />
+          <input type='email' name='' value='' id='mailing_email' onKeyPress='enterHandler(event);' />
+          <a><img src='$ico_add' onclick='addMailingEmail(event);' /></a>
         </td>
       </tr>
       <table class='spreadSheet'>
