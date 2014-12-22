@@ -29,6 +29,7 @@ $l_hour = "小时";
 $l_minute = "分钟";
 $l_next_run = "下一次运行";
 $l_folder = "夹";
+$l_archive_main_folder = "主存档文件夹";
 $l_excluded_folder = "排除的文件夹";
 $l_excluded_users = "排除用户";
 $l_name = "名称";

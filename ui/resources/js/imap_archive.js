@@ -95,6 +95,7 @@ function nextTreatmentDate() {
   var dayOfYear = $('day_of_year').get('value');
   var hour = $('hour').get('value');
   var minute = $('minute').get('value');
+  var archiveMainFolder = $('tf_archive_main_folder').get('value');
     
   var configuration = {};
   configuration.enabled = (activation) ? 1 : 0;
@@ -104,6 +105,7 @@ function nextTreatmentDate() {
   configuration.dayOfYear = dayOfYear;
   configuration.hour = hour;
   configuration.minute = minute;
+  configuration.archiveMainFolder = archiveMainFolder;
     
   new Request.JSON({
     url: obm.vars.consts.obmUrl+'/imap_archive/imap_archive_index.php',

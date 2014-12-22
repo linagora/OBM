@@ -29,6 +29,7 @@ $l_hour = "Giờ";
 $l_minute = "Phút";
 $l_next_run = "Chạy tiếp theo";
 $l_folder = "Thư mục";
+$l_archive_main_folder = "Thư mục lưu trữ chính";
 $l_excluded_folder = "Thư mục loại trừ";
 $l_excluded_users = "Người sử dụng loại trừ";
 $l_name = "Tên";

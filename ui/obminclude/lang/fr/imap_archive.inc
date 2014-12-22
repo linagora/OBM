@@ -29,6 +29,7 @@ $l_hour = "Heure";
 $l_minute = "Minute";
 $l_next_run = "Prochaine exécution";
 $l_folder = "Dossier";
+$l_archive_main_folder = "Dossier d'archivage principal";
 $l_excluded_folder = "Dossier à exclure";
 $l_excluded_users = "Utilisateurs à exclure";
 $l_name = "Nom";

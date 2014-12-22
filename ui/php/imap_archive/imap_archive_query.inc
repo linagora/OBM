@@ -112,6 +112,7 @@ function toJson($configuration) {
   $dayOfYear = $configuration->dayOfYear;
   $hour = $configuration->hour;
   $minute = $configuration->minute;
+  $archiveMainFolder = $configuration->archiveMainFolder;
   $excludedFolder = $configuration->excludedFolder;
   $excludedUserIdToLoginMapFromConfig = $configuration->excludedUserIdToLoginMap;
   $excludedUserIdToLoginMap = $excludedUserIdToLoginMapFromConfig != null ? $excludedUserIdToLoginMapFromConfig : new stdClass();
@@ -126,6 +127,7 @@ function toJson($configuration) {
     "dayOfYear" => ($dayOfYear) ? $dayOfYear : 1,
     "hour" => ($hour) ? $hour : 0,
     "minute" => ($minute) ? $minute : 0,
+    "archiveMainFolder" => $archiveMainFolder,
     "excludedFolder" => $excludedFolder,
     "excludedUserIdToLoginMap" => $excludedUserIdToLoginMap,
     "mailingEmails" => $mailingEmails
@@ -189,6 +191,7 @@ function paramToJson($paramsAsConfiguration) {
 	$dayOfYear = $paramsAsConfiguration->day_of_year;
 	$hour = $paramsAsConfiguration->hour;
 	$minute = $paramsAsConfiguration->minute;
+	$archiveMainFolder = $paramsAsConfiguration->archive_main_folder;
 	$excludedFolder = $paramsAsConfiguration->excluded_folder;
 	$excludedUserIdToLoginMap = excludedUserIdsToMap($paramsAsConfiguration->excluded_user_id);
 	$mailingEmailsFromConfig = $paramsAsConfiguration->mailing_emails;
@@ -202,6 +205,7 @@ function paramToJson($paramsAsConfiguration) {
 			"dayOfYear" => ($dayOfYear) ? $dayOfYear : 1,
 			"hour" => ($hour) ? $hour : 0,
 			"minute" => ($minute) ? $minute : 0,
+			"archiveMainFolder" => $archiveMainFolder,
 			"excludedFolder" => $excludedFolder,
 			"excludedUserIdToLoginMap" => $excludedUserIdToLoginMap,
 			"mailingEmails" => $mailingEmails

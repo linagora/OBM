@@ -51,7 +51,7 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   global $l_validate;
   global $l_service_activating, $l_activating;
   global $l_scheduling;
-  global $l_excluded_folder, $l_folder, $l_excluded_users;
+  global $l_archive_main_folder, $l_excluded_folder, $l_folder, $l_excluded_users;
   global $l_mailing_feedback;
 
   $user_id = $params['user_id'];
@@ -64,6 +64,7 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   $enabled = $configuration->enabled;
   $hour = $configuration->hour;
   $minute = $configuration->minute;
+  $archiveMainFolder = $configuration->archiveMainFolder;
   $excludedFolder = $configuration->excludedFolder;
   $excludedUserIdToLoginMap = $configuration->excludedUserIdToLoginMap;
   $mailingEmails = $configuration->mailingEmails;
@@ -123,6 +124,15 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
         <tr>
           $block_next_treatment_date
         </tr>
+      </table>
+    </fieldset>
+    <fieldset class='detail infos'>
+      <legend>$l_archive_main_folder</legend>
+      <table>
+        <th>$l_folder</th>
+        <td>
+          <input type='text' name='tf_archive_main_folder' id='tf_archive_main_folder' class='configuration' $disabled value='$archiveMainFolder'/>
+        </td>
       </table>
     </fieldset>
     <fieldset class='detail infos'>

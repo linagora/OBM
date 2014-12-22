@@ -29,6 +29,7 @@ $l_hour = "Hour";
 $l_minute = "Minute";
 $l_next_run = "Next run";
 $l_folder = "Folder";
+$l_archive_main_folder = "Main archive folder";
 $l_excluded_folder = "Excluded folder";
 $l_excluded_users = "Excluded users";
 $l_name = "Name";
