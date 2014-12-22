@@ -45,9 +45,6 @@ public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigura
 	@VisibleForTesting static final String CYRUS_PARTITION_SUFFIX = "partition_suffix";
 	public static final String DEFAULT_CYRUS_PARTITION_SUFFIX = "archive";
 	
-	@VisibleForTesting static final String ARCHIVE_MAIN_FOLDER = "main_folder";
-	public static final String DEFAULT_ARCHIVE_MAIN_FOLDER = "ARCHIVE";
-	
 	@VisibleForTesting static final String PROCESSING_BATCH_SIZE = "batch_size";
 	public static final int DEFAULT_PROCESSING_BATCH_SIZE = 20;
 	
@@ -103,11 +100,6 @@ public class ImapArchiveConfigurationServiceImpl implements ImapArchiveConfigura
 	public String getCyrusPartitionSuffix() {
 		return iniFile.getStringValue(CYRUS_PARTITION_SUFFIX, DEFAULT_CYRUS_PARTITION_SUFFIX);
 		
-	}
-
-	@Override
-	public String getArchiveMainFolder() {
-		return iniFile.getStringValue(ARCHIVE_MAIN_FOLDER, DEFAULT_ARCHIVE_MAIN_FOLDER);
 	}
 
 	@Override

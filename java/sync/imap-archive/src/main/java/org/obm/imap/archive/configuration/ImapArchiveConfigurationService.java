@@ -37,8 +37,6 @@ public interface ImapArchiveConfigurationService extends TransactionConfiguratio
 	
 	String getCyrusPartitionSuffix();
 	
-	String getArchiveMainFolder();
-	
 	int getProcessingBatchSize();
 	
 	int getQuotaMaxSize();

@@ -97,8 +97,6 @@ public class ResetImapArchiveProcessingTest {
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		processedFolderDao = control.createMock(ProcessedFolderDao.class);
 		imapArchiveConfigurationService = control.createMock(ImapArchiveConfigurationService.class);
-		expect(imapArchiveConfigurationService.getArchiveMainFolder())
-			.andReturn("ARCHIVE").anyTimes();
 		expect(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 			.andReturn("archive").anyTimes();
 		expect(imapArchiveConfigurationService.getProcessingBatchSize())
@@ -113,9 +111,10 @@ public class ResetImapArchiveProcessingTest {
 
 	@Test
 	public void listImapFoldersShouldFilderArchiveFolders() throws Exception {
+		String archiveMainFolder = "arChive";
 		List<ListInfo> expectedListInfos = ImmutableList.of(
-				new ListInfo("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded@mydomain.org", true, false),
-				new ListInfo("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded/subfolder@mydomain.org", true, false));
+				new ListInfo("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org", true, false),
+				new ListInfo("user/usera/" + archiveMainFolder + "/Excluded/subfolder@mydomain.org", true, false));
 		ListResult listResult = new ListResult(6);
 		listResult.addAll(expectedListInfos);
 		listResult.add(new ListInfo("user/usera@mydomain.org", true, false));
@@ -134,11 +133,21 @@ public class ResetImapArchiveProcessingTest {
 		expectLastCall();
 		
 		ObmDomain domain = ObmDomain.builder().name("mydomain.org").uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.ENABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.daily())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.archiveMainFolder(archiveMainFolder)
+				.build();
+
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
 
 		control.replay();
-		ImmutableList<ListInfo> listImapFolders = testee.listImapFolders(domain, logger);
+		ImmutableList<ListInfo> listImapFolders = testee.listImapFolders(domain, logger, domainConfiguration);
 		control.verify();
 		
 		assertThat(listImapFolders).isEqualTo(expectedListInfos);
@@ -212,17 +221,18 @@ public class ResetImapArchiveProcessingTest {
 		archiveTreatmentDao.deleteAll(domain.getUuid());
 		expectLastCall();
 		
+		String archiveMainFolder = "arChive";
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall().times(3);
 		ListResult listResult = new ListResult(2);
-		listResult.add(new ListInfo("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded/subfolder@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded/subfolder@mydomain.org", true, false));
 		expect(storeClient.listAll())
 			.andReturn(listResult);
-		expect(storeClient.delete("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded@mydomain.org"))
+		expect(storeClient.delete("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org"))
 			.andReturn(true);
-		expect(storeClient.delete("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded/subfolder@mydomain.org"))
+		expect(storeClient.delete("user/usera/" + archiveMainFolder + "/Excluded/subfolder@mydomain.org"))
 			.andReturn(true);
 		storeClient.close();
 		expectLastCall().times(3);
@@ -237,7 +247,7 @@ public class ResetImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
-				.archiveMainFolder("arChive")
+				.archiveMainFolder(archiveMainFolder)
 				.build();
 
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
@@ -255,15 +265,16 @@ public class ResetImapArchiveProcessingTest {
 		archiveTreatmentDao.deleteAll(domain.getUuid());
 		expectLastCall();
 		
+		String archiveMainFolder = "arChive";
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall().times(3);
 		ListResult listResult = new ListResult(2);
-		listResult.add(new ListInfo("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded/subfolder@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded/subfolder@mydomain.org", true, false));
 		expect(storeClient.listAll())
 			.andReturn(listResult);
-		expect(storeClient.delete("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded@mydomain.org"))
+		expect(storeClient.delete("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org"))
 			.andReturn(false);
 		storeClient.close();
 		expectLastCall().times(3);
@@ -278,7 +289,7 @@ public class ResetImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
-				.archiveMainFolder("arChive")
+				.archiveMainFolder(archiveMainFolder)
 				.build();
 
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");

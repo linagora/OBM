@@ -353,7 +353,7 @@ public class ImapArchiveProcessing {
 				.from(mailbox) 
 				.year(year)
 				.domainName(domainName)
-				.archiveMainFolder(imapArchiveConfigurationService.getArchiveMainFolder())
+				.archiveMainFolder(processedTask.getDomainConfiguration().getArchiveMainFolder())
 				.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 				.build();
 		createFolder(archiveMailbox, logger);
@@ -399,7 +399,7 @@ public class ImapArchiveProcessing {
 					.filter(filterDomain(domain, processedTask.getLogger()))
 					.filter(filterExcludedFolder(processedTask))
 					.filter(filterOutExcludedUsers(processedTask))
-					.filter(filterFolders(processedTask, imapArchiveConfigurationService.getArchiveMainFolder(), TemporaryMailbox.TEMPORARY_FOLDER))
+					.filter(filterFolders(processedTask, processedTask.getDomainConfiguration().getArchiveMainFolder(), TemporaryMailbox.TEMPORARY_FOLDER))
 					.toList();
 		}
 	}

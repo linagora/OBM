@@ -34,9 +34,7 @@ package org.obm.imap.archive.configuration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.ARCHIVE_MAIN_FOLDER;
 import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.CYRUS_PARTITION_SUFFIX;
-import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER;
 import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.DEFAULT_CYRUS_PARTITION_SUFFIX;
 import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.DEFAULT_PROCESSING_BATCH_SIZE;
 import static org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE;
@@ -144,31 +142,6 @@ public class ImapArchiveConfigurationServiceImplTest {
 		control.verify();
 		
 		assertThat(cyrusPartitionSuffix).isEqualTo(DEFAULT_CYRUS_PARTITION_SUFFIX);
-	}
-	
-	@Test
-	public void archiveMainFolderShouldBeDefaultValueWhenNotInFile() {
-		expect(iniFile.getStringValue(ARCHIVE_MAIN_FOLDER, DEFAULT_ARCHIVE_MAIN_FOLDER))
-			.andReturn(DEFAULT_ARCHIVE_MAIN_FOLDER);
-		
-		control.replay();
-		String archiveMainFolder = testee.getArchiveMainFolder();
-		control.verify();
-		
-		assertThat(archiveMainFolder).isEqualTo(DEFAULT_ARCHIVE_MAIN_FOLDER);
-	}
-	
-	@Test
-	public void archiveMainFolderShouldReturnInFileValue() {
-		String expectedArchiveMainFolder = "myfolder";
-		expect(iniFile.getStringValue(ARCHIVE_MAIN_FOLDER, DEFAULT_ARCHIVE_MAIN_FOLDER))
-			.andReturn(expectedArchiveMainFolder);
-		
-		control.replay();
-		String archiveMainFolder = testee.getArchiveMainFolder();
-		control.verify();
-		
-		assertThat(archiveMainFolder).isEqualTo(expectedArchiveMainFolder);
 	}
 	
 	@Test

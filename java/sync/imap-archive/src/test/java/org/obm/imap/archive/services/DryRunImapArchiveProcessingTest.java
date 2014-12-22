@@ -102,8 +102,6 @@ public class DryRunImapArchiveProcessingTest {
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		processedFolderDao = control.createMock(ProcessedFolderDao.class);
 		imapArchiveConfigurationService = control.createMock(ImapArchiveConfigurationService.class);
-		expect(imapArchiveConfigurationService.getArchiveMainFolder())
-			.andReturn("ARCHIVE").anyTimes();
 		expect(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 			.andReturn("archive").anyTimes();
 		expect(imapArchiveConfigurationService.getQuotaMaxSize())

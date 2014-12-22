@@ -132,8 +132,6 @@ public class ImapArchiveProcessingTest {
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		processedFolderDao = control.createMock(ProcessedFolderDao.class);
 		imapArchiveConfigurationService = control.createMock(ImapArchiveConfigurationService.class);
-		expect(imapArchiveConfigurationService.getArchiveMainFolder())
-			.andReturn("ARCHIVE").anyTimes();
 		expect(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 			.andReturn("archive").anyTimes();
 		expect(imapArchiveConfigurationService.getProcessingBatchSize())
@@ -149,6 +147,7 @@ public class ImapArchiveProcessingTest {
 	
 	@Test
 	public void archiveShouldWork() throws Exception {
+		String archiveMainFolder = "arChive";
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
@@ -158,7 +157,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
-				.archiveMainFolder("arChive")
+				.archiveMainFolder(archiveMainFolder)
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -186,12 +185,12 @@ public class ImapArchiveProcessingTest {
 			.andReturn(listResult);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
-		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
+		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
 				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
-		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org", 
+		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org", 
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)), 
 				higherBoundary, treatmentDate, runId, storeClient);
-		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org", 
+		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org", 
 				ImmutableSet.of(Range.singleton(1230l)), higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.close();
@@ -207,6 +206,7 @@ public class ImapArchiveProcessingTest {
 	
 	@Test
 	public void lastUidShouldBeDefaultWhenNoPreviousTreatmentAndNoMails() throws Exception {
+		String archiveMainFolder = "arChive";
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
@@ -216,7 +216,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
-				.archiveMainFolder("arChive")
+				.archiveMainFolder(archiveMainFolder)
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -275,6 +275,7 @@ public class ImapArchiveProcessingTest {
 	
 	@Test
 	public void uidNextShouldBeEqualsToMaxPlusOneWhenNoPreviousTreatment() throws Exception {
+		String archiveMainFolder = "arChive";
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
@@ -284,7 +285,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
-				.archiveMainFolder("arChive")
+				.archiveMainFolder(archiveMainFolder)
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -309,7 +310,7 @@ public class ImapArchiveProcessingTest {
 			.andReturn(listResult);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
-		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
+		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
 				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.close();
@@ -416,6 +417,7 @@ public class ImapArchiveProcessingTest {
 	
 	@Test
 	public void archiveShouldContinueWhenAnExceptionIsThrownByAFolderProcessing() throws Exception {
+		String archiveMainFolder = "arChive";
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
@@ -425,7 +427,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
-				.archiveMainFolder("arChive")
+				.archiveMainFolder(archiveMainFolder)
 				.build();
 		
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
@@ -455,7 +457,7 @@ public class ImapArchiveProcessingTest {
 			.andReturn(listResult);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
-		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
+		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
 				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.login(false);
@@ -477,7 +479,7 @@ public class ImapArchiveProcessingTest {
 			.build());
 		expectLastCall();
 		
-		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org",
+		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org",
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)),
 				higherBoundary, treatmentDate, runId, storeClient);
 		
@@ -497,6 +499,7 @@ public class ImapArchiveProcessingTest {
 	@Test
 	public void archiveShouldContinuePreviousTreatmentWhenPreviousWasInError() throws Exception {
 		// First launch
+		String archiveMainFolder = "arChive";
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
@@ -506,7 +509,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
-				.archiveMainFolder("arChive")
+				.archiveMainFolder(archiveMainFolder)
 				.build();
 		
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
@@ -536,14 +539,14 @@ public class ImapArchiveProcessingTest {
 			.andReturn(listResult);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
-		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
+		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
 				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
 		
-		expectImapCommandsOnMailboxProcessingFails("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org",
+		expectImapCommandsOnMailboxProcessingFails("user/usera/Drafts@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org",
 				ImmutableSet.of(Range.closed(2l, 21l), Range.closed(22l, 41l), Range.closed(42l, 61l)), 21l,
 				higherBoundary, treatmentDate, runId, storeClient);
 		
-		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/ARCHIVE/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org",
+		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org",
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)),
 				higherBoundary, treatmentDate, runId, storeClient);
 		
@@ -570,7 +573,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(processedFolderDao.get(runId, ImapFolder.from("user/usera/Drafts@mydomain.org")))
 			.andReturn(Optional.<ProcessedFolder> absent());
-		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/ARCHIVE/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org", 
+		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org", 
 				ImmutableSet.of(Range.closed(2l, 21l), Range.closed(22l, 41l), Range.closed(42l, 61l)), 
 				higherBoundary, treatmentDate, secondRunId, storeClient);
 		
@@ -598,6 +601,7 @@ public class ImapArchiveProcessingTest {
 	
 	@Test
 	public void archiveShouldCopyInCorrespondingYearFolder() throws Exception {
+		String archiveMainFolder = "arChive";
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
@@ -607,7 +611,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
-				.archiveMainFolder("arChive")
+				.archiveMainFolder(archiveMainFolder)
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -631,7 +635,7 @@ public class ImapArchiveProcessingTest {
 			.andReturn(listResult);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
-		expectImapCommandsOnMailboxProcessingWhenTwoYearsInRange("user/usera@mydomain.org", "user/usera/ARCHIVE/2014/INBOX@mydomain.org", "user/usera/ARCHIVE/2015/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
+		expectImapCommandsOnMailboxProcessingWhenTwoYearsInRange("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/" + archiveMainFolder + "/2015/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
 				Range.closed(1l, 10l), Range.closed(11l, 15l), higherBoundary, treatmentDate, runId, storeClient);
 		
 		storeClient.close();
@@ -724,6 +728,7 @@ public class ImapArchiveProcessingTest {
 	
 	@Test
 	public void archiveShouldCopyInCorrespondingYearFolderWhenThreeYearsInABatch() throws Exception {
+		String archiveMainFolder = "arChive";
 		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
 		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
@@ -733,7 +738,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
-				.archiveMainFolder("arChive")
+				.archiveMainFolder(archiveMainFolder)
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -799,7 +804,7 @@ public class ImapArchiveProcessingTest {
 		
 		MessageSet currentYearRangeCopiedUids = MessageSet.builder().add(Range.closed(3l, 7l)).build();
 		MessageSet firstYearMessageSet = MessageSet.builder().add(currentYearRange).build();
-		String currentYearArchiveMailboxName = "user/usera/ARCHIVE/2014/INBOX@mydomain.org";
+		String currentYearArchiveMailboxName = "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org";
 		expectCreateMailbox(currentYearArchiveMailboxName, storeClient);
 		expect(storeClient.uidCopy(firstYearMessageSet, currentYearArchiveMailboxName)).andReturn(currentYearRangeCopiedUids);
 		expect(storeClient.select(currentYearArchiveMailboxName)).andReturn(true);
@@ -816,7 +821,7 @@ public class ImapArchiveProcessingTest {
 			.andReturn(otherYearsInternalDates.build());
 		
 		// previous Year
-		String previousYearArchiveMailboxName = "user/usera/ARCHIVE/2013/INBOX@mydomain.org";
+		String previousYearArchiveMailboxName = "user/usera/" + archiveMainFolder + "/2013/INBOX@mydomain.org";
 		expectCreateMailbox(previousYearArchiveMailboxName, storeClient);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		MessageSet previousYearRangeCopiedUids = MessageSet.builder().add(Range.closed(8l, 12l)).build();
@@ -826,7 +831,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidStore(previousYearRangeCopiedUids, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		// next Year
-		String nextYearArchiveMailboxName = "user/usera/ARCHIVE/2015/INBOX@mydomain.org";
+		String nextYearArchiveMailboxName = "user/usera/" + archiveMainFolder + "/2015/INBOX@mydomain.org";
 		expectCreateMailbox(nextYearArchiveMailboxName, storeClient);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		MessageSet nextYearRangeCopiedUids = MessageSet.builder().add(Range.closed(13l, 17l)).build();
@@ -1383,6 +1388,7 @@ public class ImapArchiveProcessingTest {
 	
 	@Test
 	public void listImapFoldersShouldFilterArchiveFolder() throws Exception {
+		String archiveMainFolder = "arChive";
 		List<ListInfo> expectedListInfos = ImmutableList.of(
 				new ListInfo("user/usera@mydomain.org", true, false),
 				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
@@ -1392,8 +1398,8 @@ public class ImapArchiveProcessingTest {
 				new ListInfo("user/usera/Excluded/subfolder@mydomain.org", true, false));
 		ListResult listResult = new ListResult(6);
 		listResult.addAll(expectedListInfos);
-		listResult.add(new ListInfo("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/usera/" + ImapArchiveConfigurationServiceImpl.DEFAULT_ARCHIVE_MAIN_FOLDER + "/Excluded/subfolder@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded/subfolder@mydomain.org", true, false));
 		
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
@@ -1411,7 +1417,7 @@ public class ImapArchiveProcessingTest {
 						.recurrence(ArchiveRecurrence.daily())
 						.time(LocalTime.parse("13:23"))
 						.build())
-				.archiveMainFolder("arChive")
+				.archiveMainFolder(archiveMainFolder)
 				.build();
 		
 		expect(storeClientFactory.create(domain.getName()))
