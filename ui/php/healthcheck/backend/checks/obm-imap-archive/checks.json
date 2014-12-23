@@ -4,14 +4,21 @@
             "id": "ConnectionStatus",
             "name": "OBM IMAP Archive Connection Check",
             "description": "Checks that the OBM IMAP Archive server(s) are up and running.",
-            "url": null,
+            "url": "http://docs.obm.org/obm-imap-archive/imap-archive.html",
             "parentId": null
         },
         {
             "id": "CyrusConnectionStatus",
             "name": "OBM IMAP Archive Cyrus Connection Check",
             "description": "Checks that the OBM IMAP Archive server(s) can connect to Cyrus.",
-            "url": null,
+            "url": "http://docs.obm.org/obm-imap-archive/imap-archive.html",
+            "parentId": null
+        },
+        {
+            "id": "CyrusArchivePartitionStatus",
+            "name": "OBM IMAP Archive Cyrus Archive Partition Check",
+            "description": "Checks that the OBM IMAP Archive server(s) can access the Cyrus archive partition.",
+            "url": "http://docs.obm.org/obm-imap-archive/imap-archive.html",
             "parentId": null
         }
     ]
