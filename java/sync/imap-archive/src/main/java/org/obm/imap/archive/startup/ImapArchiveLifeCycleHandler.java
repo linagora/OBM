@@ -32,6 +32,7 @@
 package org.obm.imap.archive.startup;
 
 import org.obm.ElementNotFoundException;
+import org.obm.configuration.module.LoggerModule;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.server.LifeCycleHandler;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class ImapArchiveLifeCycleHandler implements LifeCycleHandler {
 
@@ -49,15 +51,18 @@ public class ImapArchiveLifeCycleHandler implements LifeCycleHandler {
 	private final RestoreTasksOnStartupService restoreTasksOnStartupService;
 	private final ConfigurationCheckingService configurationCheckingService;
 	private final ArchiveScheduler archiveScheduler;
+	private final Logger configurationLogger;
 
 	@Inject
 	@VisibleForTesting ImapArchiveLifeCycleHandler(ConfigurationCheckingService configurationCheckingService,
 			RestoreTasksOnStartupService restoreTasksOnStartupService,
-			ArchiveScheduler archiveScheduler) {
+			ArchiveScheduler archiveScheduler,
+			@Named(LoggerModule.CONFIGURATION) Logger configurationLogger) {
 		
 		this.configurationCheckingService = configurationCheckingService;
 		this.restoreTasksOnStartupService = restoreTasksOnStartupService;
 		this.archiveScheduler = archiveScheduler;
+		this.configurationLogger = configurationLogger;
 	}
 	
 	@Override
@@ -80,7 +85,12 @@ public class ImapArchiveLifeCycleHandler implements LifeCycleHandler {
 	}
 
 	private void checkConfiguration() {
-		configurationCheckingService.checkConfiguration();
+		try {
+			configurationCheckingService.checkConfiguration();
+		} catch (Exception e) {
+			configurationLogger.error("Error when checking the configuration", e);
+			throw e;
+		}
 	}
 	
 	private void restoreScheduledTasks() throws DaoException, ElementNotFoundException {
