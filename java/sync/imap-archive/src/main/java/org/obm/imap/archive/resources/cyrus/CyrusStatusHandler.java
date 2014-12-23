@@ -36,44 +36,45 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.obm.imap.archive.services.StoreClientFactory;
-import org.obm.push.minig.imap.StoreClient;
+import org.obm.imap.archive.services.CyrusService;
+import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
-
 @Singleton
-@Path("/cyrus/status")
+@Path("/cyrus")
 @Produces(MediaType.APPLICATION_JSON)
 public class CyrusStatusHandler {
 
 	public static final Logger logger = LoggerFactory.getLogger(CyrusStatusHandler.class);
 	
 	@Inject
-	@Context
-	private Application application;
-
-	private final StoreClientFactory storeClientFactory;
-	
-	@Inject
-	@VisibleForTesting CyrusStatusHandler(StoreClientFactory storeClientFactory) {
-		this.storeClientFactory = storeClientFactory;
-	}
+	private CyrusService cyrusService;
 	
 	@GET
+	@Path("/status")
 	public Response status(@QueryParam("domain_name") String domainName) {
-		try (StoreClient storeClient = storeClientFactory.create(domainName)) {
-			storeClient.login(false);
+		try {
+			cyrusService.checkLogin(new DomainName(domainName));
 			return Response.ok().build();
 		} catch (Exception e) {
 			logger.error("The server failed to connect to Cyrus", e);
+			return Response.status(Status.SERVICE_UNAVAILABLE).build();
+		}
+	}
+	
+	@GET
+	@Path("/partition")
+	public Response partition(@QueryParam("domain_name") String domainName, @QueryParam("test_user") String testUser) {
+		try {
+			cyrusService.checkCyrusPartitionFordomain(new DomainName(domainName), testUser);
+			return Response.ok().build();
+		} catch (Exception e) {
+			logger.error("The server failed to create a folder in archive partition", e);
 			return Response.status(Status.SERVICE_UNAVAILABLE).build();
 		}
 	}

@@ -73,6 +73,7 @@ import org.obm.imap.archive.services.ArchiveDaoTracking;
 import org.obm.imap.archive.services.ArchiveRecurrentTaskRescheduler;
 import org.obm.imap.archive.services.ArchiveService;
 import org.obm.imap.archive.services.ArchiveServiceImpl;
+import org.obm.imap.archive.services.CyrusService;
 import org.obm.imap.archive.services.DateTimeProviderImpl;
 import org.obm.imap.archive.services.DomainClient;
 import org.obm.imap.archive.services.DomainClientImpl;
@@ -185,6 +186,7 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(StoreClientFactory.class);
 		bind(DomainClient.class).to(DomainClientImpl.class);
 		bind(Mailer.class).to(MailerImpl.class);
+		bind(CyrusService.class);
 		
 		Multibinder<DatabaseFlavour> supportedDatabases = Multibinder.newSetBinder(binder(), DatabaseFlavour.class);
 		supportedDatabases.addBinding().toInstance(DatabaseFlavour.PGSQL);

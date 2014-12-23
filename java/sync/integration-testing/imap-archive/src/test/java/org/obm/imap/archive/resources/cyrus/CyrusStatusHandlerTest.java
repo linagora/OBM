@@ -32,6 +32,7 @@ package org.obm.imap.archive.resources.cyrus;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.obm.imap.archive.DBData.admin;
+import static org.obm.imap.archive.DBData.usera;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -146,5 +147,36 @@ public class CyrusStatusHandlerTest {
 			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
 		when()
 			.get("/imap-archive/healthcheck/cyrus/status");
+	}
+	
+	@Test
+	public void getPartitionShouldWork() throws Exception {
+		imapServer.setUser("cyrus", "cyrus");
+		imapServer.start();
+		server.start();
+		
+		given()
+			.port(server.getHttpPort())
+			.param("test_user", usera.getLogin())
+			.param("domain_name", "mydomain.org").
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/healthcheck/cyrus/partition");
+	}
+	
+	@Test
+	public void getPartitionShouldThrowWhenImapIsDown() throws Exception {
+		imapServer.stop();
+		server.start();
+		
+		given()
+			.port(server.getHttpPort())
+			.param("test_user", usera.getLogin())
+			.param("domain_name", "mydomain.org").
+		expect()
+			.statusCode(Status.SERVICE_UNAVAILABLE.getStatusCode()).
+		when()
+			.get("/imap-archive/healthcheck/cyrus/partition");
 	}
 }
