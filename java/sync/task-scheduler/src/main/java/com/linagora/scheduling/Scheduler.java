@@ -41,6 +41,7 @@ import org.joda.time.ReadablePeriod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -110,7 +111,7 @@ public class Scheduler<T extends Task> implements AutoCloseable {
 	private final int resolution;
 	private final TimeUnit unit;
 	private final ImmutableList<Listener<T>> listeners;
-	private final TaskQueue<T> queue;
+	@VisibleForTesting final TaskQueue<T> queue;
 	private ActualScheduler actualScheduler;
 	
 	private Scheduler(TaskQueue<T> queue, DateTimeProvider dateTimeProvider, int resolution, TimeUnit unit, ImmutableList<Listener<T>> listeners) {
@@ -200,8 +201,12 @@ public class Scheduler<T extends Task> implements AutoCloseable {
 		
 		@Override
 		protected void shutDown() throws Exception {
-			workers.shutdownNow();
-			super.shutDown();
+			try {
+				tasks.clear();
+			} finally {
+				workers.shutdownNow();
+				super.shutDown();
+			}
 		}
 		
 	}

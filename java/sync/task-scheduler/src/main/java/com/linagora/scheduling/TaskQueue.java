@@ -43,6 +43,10 @@ public interface TaskQueue<T extends Task> {
 	void put(ScheduledTask<T> task);
 	
 	boolean remove(ScheduledTask<T> task);
+	
+	void clear();
+
+	boolean hasAnyTask();
 		
 	public static class DelayedQueue<T extends Task> implements TaskQueue<T> {
 
@@ -69,6 +73,16 @@ public interface TaskQueue<T extends Task> {
 		@Override
 		public boolean remove(ScheduledTask<T> task) {
 			return queue.remove(task);
+		}
+
+		@Override
+		public void clear() {
+			queue.clear();
+		}
+
+		@Override
+		public boolean hasAnyTask() {
+			return !queue.isEmpty();
 		}
 
 	}

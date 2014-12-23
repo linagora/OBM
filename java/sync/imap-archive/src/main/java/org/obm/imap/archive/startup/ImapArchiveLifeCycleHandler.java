@@ -32,8 +32,11 @@
 package org.obm.imap.archive.startup;
 
 import org.obm.ElementNotFoundException;
+import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.server.LifeCycleHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
@@ -41,15 +44,20 @@ import com.google.inject.Inject;
 
 public class ImapArchiveLifeCycleHandler implements LifeCycleHandler {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ImapArchiveLifeCycleHandler.class);
+	
 	private final RestoreTasksOnStartupService restoreTasksOnStartupService;
 	private final ConfigurationCheckingService configurationCheckingService;
+	private final ArchiveScheduler archiveScheduler;
 
 	@Inject
 	@VisibleForTesting ImapArchiveLifeCycleHandler(ConfigurationCheckingService configurationCheckingService,
-			RestoreTasksOnStartupService restoreTasksOnStartupService) {
+			RestoreTasksOnStartupService restoreTasksOnStartupService,
+			ArchiveScheduler archiveScheduler) {
 		
 		this.configurationCheckingService = configurationCheckingService;
 		this.restoreTasksOnStartupService = restoreTasksOnStartupService;
+		this.archiveScheduler = archiveScheduler;
 	}
 	
 	@Override
@@ -59,6 +67,15 @@ public class ImapArchiveLifeCycleHandler implements LifeCycleHandler {
 			restoreScheduledTasks();
 		} catch (Exception e) {
 			Throwables.propagate(e);
+		}
+	}
+
+	@Override
+	public void stopping() {
+		try {
+			archiveScheduler.close();
+		} catch (Exception e) {
+			LOGGER.error("Error while stoping scheduler", e);
 		}
 	}
 

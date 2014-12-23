@@ -341,7 +341,17 @@ public class SchedulerTest {
 		}
 	}
 	
-
+	@Test
+	public void scheduleShouldClearTasksWhenStoping() throws Exception {
+		start();
+		FutureTestListener<Task> testListener = new FutureTestListener<>();
+		Period waitingPeriod = Period.hours(2);
+		testee.schedule(new DummyTask()).addListener(testListener).in(waitingPeriod);
+		assertThat(testee.queue.hasAnyTask()).isTrue();
+		testee.stop();
+		assertThat(testee.queue.hasAnyTask()).isFalse();
+	}
+	
 	@Test
 	public void schedulerListenerFailureShouldNotBreakNotification() throws Exception {
 		FutureTestListener<Task> testListener = new FutureTestListener<>();

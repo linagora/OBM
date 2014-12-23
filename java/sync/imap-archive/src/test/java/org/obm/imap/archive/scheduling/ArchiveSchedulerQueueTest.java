@@ -268,4 +268,56 @@ public class ArchiveSchedulerQueueTest {
 		
 		assertThat(tasks).containsOnly(scheduled1, scheduled2);
 	}
+	
+	@Test
+	public void hasAnyTaskShouldFalseWhenNone() {
+		mocks.replay();
+		boolean hasAnyTask = testee.hasAnyTask();
+		mocks.verify();
+		
+		assertThat(hasAnyTask).isFalse();
+	}
+	
+	@Test
+	public void hasAnyTaskShouldReturnTrueWhenOne() {
+		ArchiveDomainTask task = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration = mocks.createMock(ArchiveConfiguration.class);
+		expect(task.getArchiveConfiguration()).andReturn(configuration);
+		TestScheduledTask expectedScheduled = new TestScheduledTask(State.WAITING, task, scheduler, DateTime.parse("2024-11-1T01:04Z"));
+		expect(configuration.getDomainId()).andReturn(domain);
+		
+		mocks.replay();
+		testee.put(expectedScheduled);
+		
+		boolean hasAnyTask = testee.hasAnyTask();
+		mocks.verify();
+		
+		assertThat(hasAnyTask).isTrue();
+	}
+	
+	@Test
+	public void hasAnyTaskShouldReturnTrueWhenMulti() {
+		ObmDomainUuid domain2 = ObmDomainUuid.of("b9b7ea0f-a65e-4d2e-89b1-fb9ef4d2c97d");
+		
+		ArchiveDomainTask task1 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration1 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task1.getArchiveConfiguration()).andReturn(configuration1);
+		TestScheduledTask scheduled1 = new TestScheduledTask(State.WAITING, task1, scheduler, DateTime.parse("2024-11-1T01:04Z"));
+		expect(configuration1.getDomainId()).andReturn(domain);
+		
+		ArchiveDomainTask task2 = mocks.createMock(ArchiveDomainTask.class);
+		ArchiveConfiguration configuration2 = mocks.createMock(ArchiveConfiguration.class);
+		expect(task2.getArchiveConfiguration()).andReturn(configuration2);
+		TestScheduledTask expectedScheduled = new TestScheduledTask(State.WAITING, task2, scheduler, DateTime.parse("2024-11-1T03:04Z"));
+		expect(configuration2.getDomainId()).andReturn(domain2);
+		
+		mocks.replay();
+		testee.put(scheduled1);
+		testee.put(expectedScheduled);
+		
+		boolean hasAnyTask = testee.hasAnyTask();
+		mocks.verify();
+		
+		assertThat(hasAnyTask).isTrue();
+	}
 }

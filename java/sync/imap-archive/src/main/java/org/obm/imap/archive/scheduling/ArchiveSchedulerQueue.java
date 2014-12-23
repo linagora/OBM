@@ -32,9 +32,13 @@ package org.obm.imap.archive.scheduling;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.DelayQueue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
@@ -56,6 +60,8 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 @Singleton
 public class ArchiveSchedulerQueue implements TaskQueue<ArchiveDomainTask> {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveSchedulerQueue.class);
+	
 	@VisibleForTesting final Monitor<ArchiveDomainTask> monitor;
 	@VisibleForTesting final DelayQueueMultimap domainTasks;
 
@@ -91,6 +97,16 @@ public class ArchiveSchedulerQueue implements TaskQueue<ArchiveDomainTask> {
 			}
 		}
 		return polledTasks.build();
+	}
+
+	@Override
+	public void clear() {
+		domainTasks.clear();
+	}
+
+	@Override
+	public boolean hasAnyTask() {
+		return domainTasks.hasAnyTask();
 	}
 	
 	/* package */ Collection<ScheduledTask<ArchiveDomainTask>> getDomainTasks(ObmDomainUuid domain) {
@@ -135,6 +151,25 @@ public class ArchiveSchedulerQueue implements TaskQueue<ArchiveDomainTask> {
 				map.put(domain, domainQueue);
 			}
 			return domainQueue;
+		}
+
+		public void clear() {
+			for (Entry<ObmDomainUuid, Queue<ScheduledTask<ArchiveDomainTask>>> entry : map.entrySet()) {
+				try {
+					entry.getValue().clear();
+				} catch (Exception e) {
+					LOGGER.error("Error when emptying the queue", e);
+				}
+			}
+		}
+		
+		public boolean hasAnyTask() {
+			for (Queue<ScheduledTask<ArchiveDomainTask>> queue : map.values()) {
+				if (!queue.isEmpty()) {
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

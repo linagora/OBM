@@ -97,6 +97,7 @@ public class JettyServerFactory {
 			
 			@Override
 			public void stop() throws Exception {
+				injector.getInstance(config.lifeCycleHandlerClass()).stopping();
 				jetty.stop();
 			}
 			

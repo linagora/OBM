@@ -35,10 +35,17 @@ public interface LifeCycleHandler {
 
 	void starting();
 	
+	void stopping();
+	
 	class Noop implements LifeCycleHandler {
 		
 		@Override
 		public void starting() {
+			// noop
+		}
+		
+		@Override
+		public void stopping() {
 			// noop
 		}
 	}
