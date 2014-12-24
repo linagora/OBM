@@ -124,8 +124,7 @@ public class ResetImapArchiveProcessing extends ImapArchiveProcessing {
 		try (StoreClient storeClient = storeClientFactory.create(domain.getName())) {
 			storeClient.login(false);
 			
-			return FluentIterable.from(storeClient.listAll())
-					.filter(filterOutNonUserMailboxes())
+			return FluentIterable.from(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME))
 					.transform(appendDomainWhenNone(domain))
 					.filter(filterDomain(domain, logger))
 					.filter(filterArchiveFolder(logger, domainConfiguration))

@@ -148,7 +148,7 @@ public class DryRunImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll())
+		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME))
 			.andReturn(listResult);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");

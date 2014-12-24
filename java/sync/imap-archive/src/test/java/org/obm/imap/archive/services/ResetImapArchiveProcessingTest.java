@@ -127,7 +127,7 @@ public class ResetImapArchiveProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll())
+		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME))
 			.andReturn(listResult);
 		storeClient.close();
 		expectLastCall();
@@ -188,7 +188,7 @@ public class ResetImapArchiveProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll())
+		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME))
 			.andReturn(new ListResult(0));
 		storeClient.close();
 		expectLastCall();
@@ -228,7 +228,7 @@ public class ResetImapArchiveProcessingTest {
 		ListResult listResult = new ListResult(2);
 		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org", true, false));
 		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded/subfolder@mydomain.org", true, false));
-		expect(storeClient.listAll())
+		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME))
 			.andReturn(listResult);
 		expect(storeClient.delete("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org"))
 			.andReturn(true);
@@ -272,7 +272,7 @@ public class ResetImapArchiveProcessingTest {
 		ListResult listResult = new ListResult(2);
 		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org", true, false));
 		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded/subfolder@mydomain.org", true, false));
-		expect(storeClient.listAll())
+		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME))
 			.andReturn(listResult);
 		expect(storeClient.delete("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org"))
 			.andReturn(false);

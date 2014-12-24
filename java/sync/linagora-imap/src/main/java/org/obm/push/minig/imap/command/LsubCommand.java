@@ -34,8 +34,8 @@ package org.obm.push.minig.imap.command;
 
 public class LsubCommand extends AbstractListCommand {
 
-	public LsubCommand() {
-		super(true);
+	public LsubCommand(String referenceName) {
+		super(true, referenceName);
 	}
 
 }

@@ -81,7 +81,7 @@ public class DeleteCommandIntegrationTest {
 	public void testDeleteOneMailboxWithAccent() throws ImapTimeoutException {
 		client.create("déplacements");
 		boolean result = client.delete("déplacements");
-		ListResult folders = client.listAll();
+		ListResult folders = client.listAll(null);
 		
 		assertThat(result).isTrue();
 		assertThat(folders).containsOnly(
@@ -95,7 +95,7 @@ public class DeleteCommandIntegrationTest {
 		client.create("another/déplacements");
 		boolean result1 = client.delete("another/déplacements");
 		boolean result2 = client.delete("déplacements");
-		ListResult folders = client.listAll();
+		ListResult folders = client.listAll(null);
 		
 		assertThat(result1).isEqualTo(result2).isTrue();
 		assertThat(folders).containsOnly(
@@ -109,7 +109,7 @@ public class DeleteCommandIntegrationTest {
 		client.create("another");
 		client.create("another/déplacements");
 		boolean result1 = client.delete("unknown");
-		ListResult folders = client.listAll();
+		ListResult folders = client.listAll(null);
 		
 		assertThat(result1).isFalse();
 		assertThat(folders).containsOnly(

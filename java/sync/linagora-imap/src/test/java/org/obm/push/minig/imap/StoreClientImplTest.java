@@ -196,7 +196,7 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("INBOX/sub", true, false));
 		listResult.add(new ListInfo("TRASH", true, false));
-		expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll(null)).andReturn(listResult);
 		expect(clientSupport.select("INBOX/sub")).andReturn(true);
 		storeClientImpl.activeMailbox = "INBOX";
 		
@@ -296,7 +296,7 @@ public class StoreClientImplTest {
 		ListResult listResult = new ListResult(2);
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo(mailbox, true, false));
-		expect(clientSupport.listAll())
+		expect(clientSupport.listAll(null))
 			.andReturn(listResult);
 	
 		control.replay();
@@ -313,7 +313,7 @@ public class StoreClientImplTest {
 		ListResult listResult = new ListResult(2);
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo(mailbox, true, false));
-		expect(clientSupport.listAll())
+		expect(clientSupport.listAll(null))
 			.andReturn(listResult);
 
 		control.replay();
@@ -339,7 +339,7 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("INBOXX", true, false));
-		expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll(null)).andReturn(listResult);
 		
 		control.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("INBOXX");
@@ -354,7 +354,7 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("INBOXX", true, false));
-		expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll(null)).andReturn(listResult);
 		
 		control.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("INBO");
@@ -369,7 +369,7 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("Trash", true, false));
-		expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll(null)).andReturn(listResult);
 		
 		control.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("Trash");
@@ -384,7 +384,7 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("TRASH", true, false));
-		expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll(null)).andReturn(listResult);
 		
 		control.replay();
 		String found = storeClientImpl.findMailboxNameWithServerCase("Trash");
@@ -399,7 +399,7 @@ public class StoreClientImplTest {
 		listResult.add(new ListInfo("INBO", true, false));
 		listResult.add(new ListInfo("INBOX", true, false));
 		listResult.add(new ListInfo("TRASH", true, false));
-		expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll(null)).andReturn(listResult);
 		
 		control.replay();
 		storeClientImpl.findMailboxNameWithServerCase("Youpi");
@@ -466,7 +466,7 @@ public class StoreClientImplTest {
 		
 		ListResult listResult = new ListResult(1);
 		listResult.add(new ListInfo(destMailbox, true, false));
-		expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll(null)).andReturn(listResult);
 		
 		MessageSet messageSet = MessageSet.empty();
 		expect(clientSupport.uidCopy(messageSet, destMailbox))
@@ -485,7 +485,7 @@ public class StoreClientImplTest {
 		
 		ListResult listResult = new ListResult(1);
 		listResult.add(new ListInfo(destMailbox, true, false));
-		expect(clientSupport.listAll()).andReturn(listResult);
+		expect(clientSupport.listAll(null)).andReturn(listResult);
 		
 		MessageSet messageSet = MessageSet.builder().add(1l).add(2l).build();
 		expect(clientSupport.uidCopy(messageSet, destMailbox))

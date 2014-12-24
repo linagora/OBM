@@ -285,12 +285,12 @@ public class ClientSupport {
 		return run(new SelectCommand(mailbox));
 	}
 	
-	public ListResult listSubscribed() throws ImapTimeoutException {
-	 	return run(new LsubCommand());
+	public ListResult listSubscribed(String referenceName) throws ImapTimeoutException {
+	 	return run(new LsubCommand(referenceName));
 	}
 	
-	public ListResult listAll() throws ImapTimeoutException {
-		return run(new ListCommand());
+	public ListResult listAll(String referenceName) throws ImapTimeoutException {
+		return run(new ListCommand(referenceName));
 	}
 
 	public Set<String> capabilities() throws ImapTimeoutException {

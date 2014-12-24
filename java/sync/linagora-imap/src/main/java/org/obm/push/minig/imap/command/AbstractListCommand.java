@@ -41,13 +41,22 @@ import com.google.common.annotations.VisibleForTesting;
 public class AbstractListCommand extends SimpleCommand<ListResult> {
 
 	private static final int CHAR_SEPARATOR_BLOCK_SIZE = ") \".\" ".length();
+	private static final String DOUBLE_QUOTE = "\"";
+	private static final String EMPTY_REFERENCE_NAME = DOUBLE_QUOTE + DOUBLE_QUOTE;
 	protected boolean subscribedOnly;
 
-	protected AbstractListCommand(boolean subscribedOnly) {
-		super((subscribedOnly ? "LSUB " : "LIST ") + "\"\" \"*\"");
+	protected AbstractListCommand(boolean subscribedOnly, String referenceName) {
+		super((subscribedOnly ? "LSUB " : "LIST ") + referenceName(referenceName) + " \"*\"");
 		this.subscribedOnly = subscribedOnly;
 	}
 	
+	private static String referenceName(String referenceName) {
+		if (referenceName != null) {
+			return String.format("%s%s%s", DOUBLE_QUOTE, referenceName, DOUBLE_QUOTE);
+		}
+		return EMPTY_REFERENCE_NAME;
+	}
+
 	@Override
 	public boolean isMatching(IMAPResponse response) {
 		String p = response.getPayload();

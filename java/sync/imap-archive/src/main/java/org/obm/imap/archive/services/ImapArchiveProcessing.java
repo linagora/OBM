@@ -106,6 +106,7 @@ public class ImapArchiveProcessing {
 	@VisibleForTesting static final long DEFAULT_LAST_UID = -1l;
 	private static final long UID_MIN = 0;
 	private static final long UID_MAX = Long.MAX_VALUE;
+	protected static final String USERS_REFERENCE_NAME = "*user";
 
 	private final DateTimeProvider dateTimeProvider;
 	private final SchedulingDatesService schedulingDatesService;
@@ -393,8 +394,7 @@ public class ImapArchiveProcessing {
 		try (StoreClient storeClient = storeClientFactory.create(domain.getName())) {
 			storeClient.login(false);
 			
-			return FluentIterable.from(storeClient.listAll())
-					.filter(filterOutNonUserMailboxes())
+			return FluentIterable.from(storeClient.listAll(USERS_REFERENCE_NAME))
 					.transform(appendDomainWhenNone(domain))
 					.filter(filterDomain(domain, processedTask.getLogger()))
 					.filter(filterExcludedFolder(processedTask))
@@ -447,19 +447,6 @@ public class ImapArchiveProcessing {
 					logger.error(String.format("The mailbox %s can't be parsed", listInfo.getName()));
 				}
 				return false;
-			}
-		};
-	}
-
-	protected Predicate<? super ListInfo> filterOutNonUserMailboxes() {
-		return new Predicate<ListInfo>() {
-
-			@Override
-			public boolean apply(ListInfo listInfo) {
-				if (!listInfo.getName().startsWith("user/")) {
-					return false;
-				}
-				return true;
 			}
 		};
 	}
