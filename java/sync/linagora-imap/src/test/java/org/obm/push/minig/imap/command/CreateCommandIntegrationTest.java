@@ -81,7 +81,7 @@ public class CreateCommandIntegrationTest {
 	@Test
 	public void testCreateMailboxWithAccent() throws ImapTimeoutException {
 		boolean result = client.create("déplacements");
-		ListResult folders = client.listAll(null);
+		ListResult folders = client.listAll();
 		
 		assertThat(result).isTrue();
 		assertThat(folders).containsOnly(
@@ -94,7 +94,7 @@ public class CreateCommandIntegrationTest {
 		boolean result1 = client.create("déplacements");
 		boolean result2 = client.create("another");
 		boolean result3 = client.create("another/déplacements");
-		ListResult folders = client.listAll(null);
+		ListResult folders = client.listAll();
 		
 		assertThat(result1).isEqualTo(result2).isEqualTo(result3).isTrue();
 		assertThat(folders).containsOnly(
@@ -107,7 +107,7 @@ public class CreateCommandIntegrationTest {
 	@Test
 	public void testCreateMailboxChinese() throws ImapTimeoutException {
 		boolean result = client.create("&Ti1W,YuwX1U-");
-		ListResult folders = client.listAll(null);
+		ListResult folders = client.listAll();
 		
 		assertThat(result).isTrue();
 		assertThat(folders).containsOnly(
@@ -118,7 +118,7 @@ public class CreateCommandIntegrationTest {
 	@Test
 	public void testCreateMailboxWithPartition() throws ImapTimeoutException {
 		boolean result = client.create("SentBox", "my_partition");
-		ListResult folders = client.listAll(null);
+		ListResult folders = client.listAll();
 		
 		assertThat(result).isTrue();
 		assertThat(folders).containsOnly(

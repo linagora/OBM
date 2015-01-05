@@ -50,7 +50,7 @@ public class ListCommandTest {
 
 	@Before
 	public void setup() {
-		listCommand = new ListCommand(null);
+		listCommand = new ListCommand();
 	}
 	
 	@Test

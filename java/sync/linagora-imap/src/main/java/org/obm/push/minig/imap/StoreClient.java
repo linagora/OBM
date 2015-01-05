@@ -126,9 +126,11 @@ public interface StoreClient extends AutoCloseable {
 
 	void expunge() throws ImapTimeoutException;
 	
-	ListResult listSubscribed(String referenceName) throws ImapTimeoutException;
+	ListResult listSubscribed() throws ImapTimeoutException;
+	ListResult listSubscribed(String referenceName, String mailboxName) throws ImapTimeoutException;
 	
-	ListResult listAll(String referenceName) throws ImapTimeoutException;
+	ListResult listAll() throws ImapTimeoutException;
+	ListResult listAll(String referenceName, String mailboxName) throws ImapTimeoutException;
 
 	boolean append(String mailbox, Reader message, FlagsList fl) throws MailboxNotFoundException, ImapTimeoutException;
 	

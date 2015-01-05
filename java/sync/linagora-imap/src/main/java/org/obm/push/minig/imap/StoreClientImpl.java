@@ -220,13 +220,23 @@ public class StoreClientImpl implements StoreClient {
 	}
 	
 	@Override
-	public  ListResult listSubscribed(String referenceName) throws ImapTimeoutException {
-		return clientSupport.listSubscribed(referenceName);
+	public  ListResult listSubscribed() throws ImapTimeoutException {
+		return clientSupport.listSubscribed();
 	}
 	
 	@Override
-	public  ListResult listAll(String referenceName) throws ImapTimeoutException {
-		return clientSupport.listAll(referenceName);
+	public  ListResult listSubscribed(String referenceName, String mailboxName) throws ImapTimeoutException {
+		return clientSupport.listSubscribed(referenceName, mailboxName);
+	}
+	
+	@Override
+	public  ListResult listAll() throws ImapTimeoutException {
+		return clientSupport.listAll();
+	}
+	
+	@Override
+	public  ListResult listAll(String referenceName, String mailboxName) throws ImapTimeoutException {
+		return clientSupport.listAll(referenceName, mailboxName);
 	}
 
 	@Override
@@ -354,7 +364,7 @@ public class StoreClientImpl implements StoreClient {
 			case NEVER:
 				return mailboxName;
 			case ALWAYS:
-				ListResult listResult = listAll(null);
+				ListResult listResult = listAll();
 
 				for (ListInfo result: listResult) {
 					if (result.getName().toLowerCase().equals(mailboxName.toLowerCase())) {

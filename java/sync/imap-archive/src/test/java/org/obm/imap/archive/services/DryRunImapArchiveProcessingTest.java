@@ -137,18 +137,25 @@ public class DryRunImapArchiveProcessingTest {
 		expect(schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.DAILY))
 			.andReturn(higherBoundary);
 		
+		ListInfo inboxListInfo = new ListInfo("user/usera@mydomain.org", true, false);
 		List<ListInfo> expectedListInfos = ImmutableList.of(
-				new ListInfo("user/usera@mydomain.org", true, false),
+				inboxListInfo,
 				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
 				new ListInfo("user/usera/SPAM@mydomain.org", true, false));
 		ListResult listResult = new ListResult(3);
 		listResult.addAll(expectedListInfos);
+		ListResult inboxListResult = new ListResult(1);
+		inboxListResult.add(inboxListInfo);
 		
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME))
+		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+			.andReturn(inboxListResult);
+		storeClient.login(false);
+		expectLastCall();
+		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME +  "/usera", ImapArchiveProcessing.ALL_MAILBOXES_NAME))
 			.andReturn(listResult);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
@@ -157,10 +164,10 @@ public class DryRunImapArchiveProcessingTest {
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", Range.singleton(1230l), higherBoundary, storeClient);
 		
 		storeClient.close();
-		expectLastCall();
+		expectLastCall().times(2);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(4);
+			.andReturn(storeClient).times(5);
 		
 		control.replay();
 		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));

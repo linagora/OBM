@@ -47,7 +47,7 @@ public class AbstractListCommandTest {
 	public void testParseMailboxName() {
 		String responseLine = "* LIST () \".\" INBOX";
 		
-		String name = new AbstractListCommand(false, null).parseMailboxName(responseLine, responseLine.indexOf(')'));
+		String name = new AbstractListCommand(false).parseMailboxName(responseLine, responseLine.indexOf(')'));
 		
 		assertThat(name).isEqualTo("INBOX");
 	}
@@ -56,7 +56,7 @@ public class AbstractListCommandTest {
 	public void testParseMailboxNameWhenFlags() {
 		String responseLine = "* LIST (\\Noinferiors) \".\" INBOX";
 		
-		String name = new AbstractListCommand(false, null).parseMailboxName(responseLine, responseLine.indexOf(')'));
+		String name = new AbstractListCommand(false).parseMailboxName(responseLine, responseLine.indexOf(')'));
 		
 		assertThat(name).isEqualTo("INBOX");
 	}
@@ -65,7 +65,7 @@ public class AbstractListCommandTest {
 	public void testParseMailboxNameWithLeadingSpace() {
 		String responseLine = "* LIST (\\Noinferiors) \".\" INBOX  ";
 		
-		String name = new AbstractListCommand(false, null).parseMailboxName(responseLine, responseLine.indexOf(')'));
+		String name = new AbstractListCommand(false).parseMailboxName(responseLine, responseLine.indexOf(')'));
 		
 		assertThat(name).isEqualTo("INBOX");
 	}
@@ -74,7 +74,7 @@ public class AbstractListCommandTest {
 	public void testParseMailboxNameWithSpaceInName() {
 		String responseLine = "* LIST (\\Noinferiors) \".\" INB OX  ";
 		
-		String name = new AbstractListCommand(false, null).parseMailboxName(responseLine, responseLine.indexOf(')'));
+		String name = new AbstractListCommand(false).parseMailboxName(responseLine, responseLine.indexOf(')'));
 		
 		assertThat(name).isEqualTo("INB OX");
 	}
@@ -83,7 +83,7 @@ public class AbstractListCommandTest {
 	public void testParseMailboxNameWhenSpecialUTF7Char() {
 		String responseLine = "* LIST (\\Noinferiors) \".\" INB&-OX  ";
 		
-		String name = new AbstractListCommand(false, null).parseMailboxName(responseLine, responseLine.indexOf(')'));
+		String name = new AbstractListCommand(false).parseMailboxName(responseLine, responseLine.indexOf(')'));
 		
 		assertThat(name).isEqualTo("INB&OX");
 	}
@@ -99,28 +99,46 @@ public class AbstractListCommandTest {
 		ListInfo expectedListInfo2 = new ListInfo("#news.comp.mail.misc", true, true);
 		ListInfo expectedListInfo3 = new ListInfo("#news.comp.mail.others", false, true);
 		
-		AbstractListCommand abstractListCommand = new AbstractListCommand(true, null);
+		AbstractListCommand abstractListCommand = new AbstractListCommand(true);
 		abstractListCommand.handleResponses(ImmutableList.of(response, response2, response3, response4));
 		ListResult listResult = abstractListCommand.getReceivedData();
 		assertThat(listResult).hasSize(3);
 		assertThat(listResult).containsOnly(expectedListInfo, expectedListInfo2, expectedListInfo3);
 	}
 
-	@Test
-	public void referenceNameShouldBeEmptyWhenNull() {
-		AbstractListCommand abstractListCommand = new AbstractListCommand(false, null);
-		assertThat(abstractListCommand.getImapCommand()).isEqualTo("LIST \"\" \"*\"");
+	@SuppressWarnings("unused")
+	@Test(expected=IllegalArgumentException.class)
+	public void referenceNameShouldThrowWhenNull() {
+		new AbstractListCommand(false, null, null);
 	}
 
 	@Test
 	public void referenceNameShouldBeEmptyWhenEmpty() {
-		AbstractListCommand abstractListCommand = new AbstractListCommand(false, "");
+		AbstractListCommand abstractListCommand = new AbstractListCommand(false, "", "*");
 		assertThat(abstractListCommand.getImapCommand()).isEqualTo("LIST \"\" \"*\"");
 	}
 
 	@Test
 	public void referenceNameShouldSetWhenGiven() {
-		AbstractListCommand abstractListCommand = new AbstractListCommand(false, "*user");
+		AbstractListCommand abstractListCommand = new AbstractListCommand(false, "*user", "*");
 		assertThat(abstractListCommand.getImapCommand()).isEqualTo("LIST \"*user\" \"*\"");
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void mailboxNameShouldThrowsWhenNull() {
+		AbstractListCommand abstractListCommand = new AbstractListCommand(false, "", null);
+		assertThat(abstractListCommand.getImapCommand()).isEqualTo("LIST \"\" \"*\"");
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void mailboxNameShouldThrowsWhenEmpty() {
+		AbstractListCommand abstractListCommand = new AbstractListCommand(false, "", "");
+		assertThat(abstractListCommand.getImapCommand()).isEqualTo("LIST \"\" \"*\"");
+	}
+
+	@Test
+	public void mailboxNameShouldSetWhenGiven() {
+		AbstractListCommand abstractListCommand = new AbstractListCommand(false, "*user", "/%");
+		assertThat(abstractListCommand.getImapCommand()).isEqualTo("LIST \"*user\" \"/%\"");
 	}
 }

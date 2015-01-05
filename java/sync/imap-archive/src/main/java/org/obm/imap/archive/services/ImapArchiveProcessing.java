@@ -107,6 +107,8 @@ public class ImapArchiveProcessing {
 	private static final long UID_MIN = 0;
 	private static final long UID_MAX = Long.MAX_VALUE;
 	protected static final String USERS_REFERENCE_NAME = "*user";
+	protected static final String INBOX_MAILBOX_NAME = "/%";
+	protected static final String ALL_MAILBOXES_NAME = "*";
 
 	private final DateTimeProvider dateTimeProvider;
 	private final SchedulingDatesService schedulingDatesService;
@@ -183,7 +185,22 @@ public class ImapArchiveProcessing {
 		boolean isSuccess = true;
 		Logger logger = processedTask.getLogger();
 		logStart(logger, processedTask.getDomain());
-		for (ListInfo listInfo : listImapFolders(processedTask)) {
+		for (ListInfo listInfo : listUsers(processedTask)) {
+			Optional<String> maybeUserName = listInfo.getUserName();
+			if (!maybeUserName.isPresent()) {
+				continue;
+			}
+			if (!processUser(maybeUserName.get(), processedTask)) {
+				isSuccess = false;
+			}
+		}
+		return isSuccess;
+	}
+	
+	private boolean processUser(String user, ProcessedTask processedTask) throws Exception {
+		boolean isSuccess = true;
+		Logger logger = processedTask.getLogger();
+		for (ListInfo listInfo : listImapFolders(user, processedTask)) {
 			try {
 				processMailbox(MailboxImpl.from(listInfo.getName(), logger, storeClientFactory.create(processedTask.getDomain().getName())), 
 						processedTask);
@@ -389,16 +406,26 @@ public class ImapArchiveProcessing {
 		}
 	}
 	
-	@VisibleForTesting ImmutableList<ListInfo> listImapFolders(final ProcessedTask processedTask) throws Exception {
+	@VisibleForTesting ImmutableList<ListInfo> listUsers(final ProcessedTask processedTask) throws Exception {
 		ObmDomain domain = processedTask.getDomain();
 		try (StoreClient storeClient = storeClientFactory.create(domain.getName())) {
 			storeClient.login(false);
 			
-			return FluentIterable.from(storeClient.listAll(USERS_REFERENCE_NAME))
+			return FluentIterable.from(storeClient.listAll(USERS_REFERENCE_NAME, INBOX_MAILBOX_NAME))
 					.transform(appendDomainWhenNone(domain))
 					.filter(filterDomain(domain, processedTask.getLogger()))
-					.filter(filterExcludedFolder(processedTask))
 					.filter(filterOutExcludedUsers(processedTask))
+					.toList();
+		}
+	}
+	
+	@VisibleForTesting ImmutableList<ListInfo> listImapFolders(final String user, final ProcessedTask processedTask) throws Exception {
+		ObmDomain domain = processedTask.getDomain();
+		try (StoreClient storeClient = storeClientFactory.create(domain.getName())) {
+			storeClient.login(false);
+			
+			return FluentIterable.from(storeClient.listAll(USERS_REFERENCE_NAME + "/" + user, ALL_MAILBOXES_NAME))
+					.filter(filterExcludedFolder(processedTask))
 					.filter(filterFolders(processedTask, processedTask.getDomainConfiguration().getArchiveMainFolder(), TemporaryMailbox.TEMPORARY_FOLDER))
 					.toList();
 		}

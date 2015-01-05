@@ -37,24 +37,35 @@ import org.obm.push.mail.bean.ListResult;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 public class AbstractListCommand extends SimpleCommand<ListResult> {
 
 	private static final int CHAR_SEPARATOR_BLOCK_SIZE = ") \".\" ".length();
 	private static final String DOUBLE_QUOTE = "\"";
 	private static final String EMPTY_REFERENCE_NAME = DOUBLE_QUOTE + DOUBLE_QUOTE;
+	private static final String ALL_MAILBOXES = DOUBLE_QUOTE + "*" + DOUBLE_QUOTE;
 	protected boolean subscribedOnly;
 
-	protected AbstractListCommand(boolean subscribedOnly, String referenceName) {
-		super((subscribedOnly ? "LSUB " : "LIST ") + referenceName(referenceName) + " \"*\"");
+	protected AbstractListCommand(boolean subscribedOnly) {
+		super((subscribedOnly ? "LSUB " : "LIST ") + EMPTY_REFERENCE_NAME + " " + ALL_MAILBOXES);
+		this.subscribedOnly = subscribedOnly;
+	}
+
+	protected AbstractListCommand(boolean subscribedOnly, String referenceName, String mailboxName) {
+		super((subscribedOnly ? "LSUB " : "LIST ") + referenceName(referenceName) + " " + mailboxName(mailboxName));
 		this.subscribedOnly = subscribedOnly;
 	}
 	
 	private static String referenceName(String referenceName) {
-		if (referenceName != null) {
-			return String.format("%s%s%s", DOUBLE_QUOTE, referenceName, DOUBLE_QUOTE);
-		}
-		return EMPTY_REFERENCE_NAME;
+		Preconditions.checkArgument(referenceName != null);
+		return String.format("%s%s%s", DOUBLE_QUOTE, referenceName, DOUBLE_QUOTE);
+	}
+	
+	private static String mailboxName(String mailboxName) {
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(mailboxName));
+		return String.format("%s%s%s", DOUBLE_QUOTE, mailboxName, DOUBLE_QUOTE);
 	}
 
 	@Override

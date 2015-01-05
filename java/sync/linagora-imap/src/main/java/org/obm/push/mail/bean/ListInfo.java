@@ -32,10 +32,17 @@
 
 package org.obm.push.mail.bean;
 
+import org.obm.push.utils.UserEmailParserUtils;
+
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 
 public final class ListInfo {
 
+	private static final String IMAP_SEPARATOR = "/";
+	private static final String USER_NAMESPACE = "user" + IMAP_SEPARATOR;
+	
 	private String name;
 
 	private boolean selectable;
@@ -66,6 +73,21 @@ public final class ListInfo {
 
 	public boolean canCreateSubfolder() {
 		return createSubfolder;
+	}
+	
+	public Optional<String> getUserName() {
+		if (!name.startsWith(USER_NAMESPACE) || name.equals(USER_NAMESPACE)) {
+			return Optional.absent();
+		}
+		
+		Iterable<String> splitFolders = Splitter.on(IMAP_SEPARATOR).limit(2).split(name.substring(USER_NAMESPACE.length()));
+		String nameAtDomain = splitFolders.iterator().next();
+		if (new UserEmailParserUtils().isAddress(nameAtDomain)) {
+			// user/usera@mydomain.org
+			return Optional.of(new UserEmailParserUtils().getLogin(nameAtDomain));
+		}
+		// user/usera
+		return Optional.of(nameAtDomain);
 	}
 	
 	@Override

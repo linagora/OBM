@@ -34,8 +34,12 @@ package org.obm.push.minig.imap.command;
 
 public class LsubCommand extends AbstractListCommand {
 
-	public LsubCommand(String referenceName) {
-		super(true, referenceName);
+	public LsubCommand() {
+		super(true);
+	}
+
+	public LsubCommand(String referenceName, String mailboxName) {
+		super(true, referenceName, mailboxName);
 	}
 
 }
