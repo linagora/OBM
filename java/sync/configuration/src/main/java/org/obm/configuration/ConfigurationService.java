@@ -65,4 +65,6 @@ public interface ConfigurationService extends DomainConfiguration, DataConfigura
 	boolean isLdapModuleEnabled();
 
 	boolean isConfidentialEventsEnabled();
+	
+	boolean  isPrivateEventAnonymizationEnabled();
 }

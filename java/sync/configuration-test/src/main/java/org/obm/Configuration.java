@@ -86,5 +86,6 @@ public class Configuration {
 	public String obmUiBaseUrl = null;
 	public String obmSyncServices = "services";
 	public String activeSyncServletUrl = null;
+	public boolean anonymizePrivateEvent = true;
 
 }

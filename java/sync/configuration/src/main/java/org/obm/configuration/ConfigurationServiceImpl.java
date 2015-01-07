@@ -67,6 +67,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	private final static String OBM_SYNC_PORT = "8080";
 	private final static String OBM_SYNC_APP_NAME = "obm-sync";
 	private final static String SERVICES_APP_NAME = "services";
+	
+	private final static String ANONYMIZE_PRIVATE_EVENTS = "anonymize-private-events";
+	private final static boolean ANONYMIZE_PRIVATE_EVENTS_DEFAULT = true;
 
 	private final static String CONFIDENTIAL_EVENTS_ENABLED = "enable-confidential-events";
 	private final static boolean CONFIDENTIAL_EVENTS_ENABLED_DEFAULT = true;
@@ -201,6 +204,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public String getObmSyncServicesUrl(String obmSyncHost) {
 		return getObmSyncBaseUrl(obmSyncHost) + "/" + SERVICES_APP_NAME;
+	}
+
+	@Override
+	public boolean isPrivateEventAnonymizationEnabled() {
+		return iniFile.getBooleanValue(ANONYMIZE_PRIVATE_EVENTS, ANONYMIZE_PRIVATE_EVENTS_DEFAULT);
 	}
 
 	@Override

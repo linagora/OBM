@@ -179,6 +179,11 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 	public String getObmUIUrlPrefix() {
 		return "";
 	}
+	
+	@Override
+	public boolean isPrivateEventAnonymizationEnabled() {
+		return configuration.anonymizePrivateEvent;
+	}
 
 	@Override
 	public boolean isConfidentialEventsEnabled() {

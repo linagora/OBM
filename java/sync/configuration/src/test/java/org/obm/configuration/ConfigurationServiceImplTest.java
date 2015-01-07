@@ -39,6 +39,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.utils.IniFile;
 
+import com.google.common.io.Resources;
+
 
 public class ConfigurationServiceImplTest {
 
@@ -50,41 +52,70 @@ public class ConfigurationServiceImplTest {
 	public void setup() {
 		control = createControl();
 		iniFile = control.createMock(IniFile.class);
-		
+
 		configurationServiceImpl = new ConfigurationServiceImpl(iniFile, "obm");
 	}
-	
+
 	@Test
 	public void testGetGlobalDomain() {
 		assertThat(configurationServiceImpl.getGlobalDomain()).isEqualTo(ConfigurationServiceImpl.GLOBAL_DOMAIN);
 	}
-	
+
 	@Test
 	public void testGetObmUIBaseUrl() {
 		String protocol = "http";
-		expect(iniFile.getStringValue("external-protocol"))
-			.andReturn(protocol);
+		expect(iniFile.getStringValue("external-protocol")).andReturn(protocol);
 		String externalUrl = "10.69.1.23";
-		expect(iniFile.getStringValue(LocatorConfigurationImpl.EXTERNAL_URL_KEY))
-			.andReturn(externalUrl);
+		expect(iniFile.getStringValue(LocatorConfigurationImpl.EXTERNAL_URL_KEY)).andReturn(externalUrl);
 		String obmPrefix = "/obm/";
-		expect(iniFile.getStringValue("obm-prefix", ""))
-			.andReturn(obmPrefix);
-		
+		expect(iniFile.getStringValue("obm-prefix", "")).andReturn(obmPrefix);
+
 		control.replay();
 		String obmUIBaseUrl = configurationServiceImpl.getObmUIBaseUrl();
 		control.verify();
-		
+
 		assertThat(obmUIBaseUrl).isEqualTo(protocol + "://" + externalUrl + obmPrefix);
 	}
-	
+
 	@Test
 	public void testGetObmSyncUrl() {
 		assertThat(configurationServiceImpl.getObmSyncServicesUrl("10.69.1.23")).isEqualTo("http://10.69.1.23:8080/obm-sync/services");
 	}
-	
+
 	@Test
 	public void testGetObmSyncBaseUrl() {
 		assertThat(configurationServiceImpl.getObmSyncBaseUrl("10.69.1.23")).isEqualTo("http://10.69.1.23:8080/obm-sync");
+	}
+
+	@Test
+	public void testIsPrivateEventAnonymizationShouldBeEnabledWhenDefaultValue(){
+		iniFile = buildIniFileFromResourceFile("obm_conf.ini");
+		configurationServiceImpl = new ConfigurationServiceImpl(iniFile, "obm");
+		assertThat(configurationServiceImpl.isPrivateEventAnonymizationEnabled()).isTrue();
+	}
+
+	@Test
+	public void testIsPrivateEventAnonymizationShouldBeEnabledWhenSetToTrue(){
+		iniFile = buildIniFileFromResourceFile("anonymizePrivateEventsTrue.ini");
+		configurationServiceImpl = new ConfigurationServiceImpl(iniFile, "obm");
+		assertThat(configurationServiceImpl.isPrivateEventAnonymizationEnabled()).isTrue();
+	}
+
+	@Test
+	public void testIsPrivateEventAnonymizationShouldNotBeEnabledWhenSetToFalse(){
+		iniFile = buildIniFileFromResourceFile("anonymizePrivateEventsFalse.ini");
+		configurationServiceImpl = new ConfigurationServiceImpl(iniFile, "obm");
+		assertThat(configurationServiceImpl.isPrivateEventAnonymizationEnabled()).isFalse();
+	}
+
+	@Test
+	public void testIsPrivateEventAnonymizationShouldNotBeEnabledWhenSetWithAString(){
+		iniFile = buildIniFileFromResourceFile("anonymizePrivateEventsString.ini");
+		configurationServiceImpl = new ConfigurationServiceImpl(iniFile, "obm");
+		assertThat(configurationServiceImpl.isPrivateEventAnonymizationEnabled()).isFalse();
+	}
+
+	private IniFile buildIniFileFromResourceFile(String file) {
+		return new IniFile.Factory().build(Resources.getResource(file).getFile());
 	}
 }
