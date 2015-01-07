@@ -53,6 +53,8 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
+import fr.aliacom.obm.common.calendar.AnonymizerService;
+import fr.aliacom.obm.common.calendar.AnonymizerServiceImpl;
 import fr.aliacom.obm.common.calendar.AttendeeServiceJdbcImpl;
 import fr.aliacom.obm.common.calendar.CalendarBindingImpl;
 import fr.aliacom.obm.common.calendar.EventNotificationService;
@@ -82,6 +84,7 @@ public class ObmSyncServicesModule extends AbstractModule {
         bind(SettingsService.class).to(SettingsServiceImpl.class);
         bind(LocatorService.class).to(LocatorCache.class);
         bind(HelperService.class).to(HelperServiceImpl.class);
+        bind(AnonymizerService.class).to(AnonymizerServiceImpl.class);
         bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
         bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
         bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);

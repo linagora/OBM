@@ -135,6 +135,7 @@ public class CalendarBindingImpl implements ICalendar {
 
 	private final ICalendarFactory calendarFactory;
 	private final AttendeeService attendeeService;
+	private final AnonymizerService anonymizerService;
 	
 	@Inject
 	protected CalendarBindingImpl(EventChangeHandler eventChangeHandler,
@@ -143,7 +144,10 @@ public class CalendarBindingImpl implements ICalendar {
 			CategoryDao categoryDao,
 			CommitedOperationDao commitedOperationDao,
 			HelperService helperService, 
-			Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory, AttendeeService attendeeService) {
+			Ical4jHelper ical4jHelper, 
+			ICalendarFactory calendarFactory, 
+			AttendeeService attendeeService,
+			AnonymizerService anonymizerService) {
 		this.eventChangeHandler = eventChangeHandler;
 		this.domainService = domainService;
 		this.userService = userService;
@@ -154,6 +158,7 @@ public class CalendarBindingImpl implements ICalendar {
 		this.ical4jHelper = ical4jHelper;
 		this.calendarFactory = calendarFactory;
 		this.attendeeService = attendeeService;
+		this.anonymizerService = anonymizerService;
 	}
 
 	@Override
@@ -958,11 +963,8 @@ public class CalendarBindingImpl implements ICalendar {
 					+ changesFromDatabase.getDeletedEvents().size() + " rmed.");
 			
 			EventChanges changesToSend = moveConfidentalEventsOnDelegation(token, calendarUser, changesFromDatabase);
-			boolean userHasReadOnlyDelegation = !helperService.canWriteOnCalendar(token, calendar);
 
-			if (userHasReadOnlyDelegation) {
-				return changesToSend.anonymizePrivateItems(userService.getUserFromAccessToken(token));
-			}
+			changesToSend = anonymizerService.anonymize(changesToSend, calendar, token);
 
 			return inheritAlertsFromOwnerIfNotSet(token.getObmId(), calendarUser.getUid(), changesToSend);
 		} catch (Throwable e) {
