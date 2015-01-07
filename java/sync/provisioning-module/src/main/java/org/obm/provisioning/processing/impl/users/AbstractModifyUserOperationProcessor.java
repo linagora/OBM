@@ -66,6 +66,7 @@ public abstract class AbstractModifyUserOperationProcessor extends AbstractUserO
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		final UserExtId extId = OperationUtils.getUserExtIdFromRequest(operation);
 		final ObmDomain domain = batch.getDomain();
+
 		existingUser = getUserFromDao(extId, domain);
 		ObmUser user = getUserFromRequestBody(operation, getObjectMapper(domain));
 
@@ -77,7 +78,14 @@ public abstract class AbstractModifyUserOperationProcessor extends AbstractUserO
 			updateUserMailbox(newUser);
 		}
 
-		modifyUserInLdap(newUser, existingUser);
+		if (existingUser.isArchived() && !newUser.isArchived()) {
+			createUserInLdapAndAddUserToExistingGroups(newUser, getDefaultGroup(domain));
+		} else if (!existingUser.isArchived() && newUser.isArchived()) {
+			deleteUserInLdap(newUser);
+		} else {
+			modifyUserInLdap(newUser, existingUser);
+		}
+
 		updateUserInPTables(newUser);
 	}
 

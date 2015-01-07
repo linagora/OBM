@@ -247,6 +247,85 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 	}
 
 	@Test
+	public void testProcessCreateArchivedUser() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/")
+								.verb(HttpVerb.POST)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"archived\": true,"
+										+ "\"mails\":[\"john@domain\"]" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domain).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		final ObmUser user = ObmUser.builder().login(user1Login).identity(user1Name)
+				.password("secret")
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("host").build())
+					.domain(domain)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1")).domain(domain)
+				.archived(true)
+				.build();
+		final ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.login(user1Login)
+				.password("secret")
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("host").localhost().build())
+					.domain(domain)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.archived(true)
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getAllEmailsFrom(domain, user.getExtId())).andReturn(ImmutableSet.<String>of());
+		expect(userDao.create(user)).andReturn(userFromDao);
+		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(
+				usersGroup);
+		groupDao.addUser(domain, usersGroup.getUid(), userFromDao);
+		expectLastCall();
+		expectSetDefaultRights(userFromDao);
+		expectCyrusCreateMailbox(userFromDao);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+		expectPUserDaoInsert(userFromDao);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
 	public void testProcessCreateUserWithNoLdap() throws Exception {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
 		Operation.Builder opBuilder = Operation
@@ -609,10 +688,12 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expectLastCall();
 	}
 
-	private void expectLdapdeleteUser(ObmUser userToRemove, Group defaultGroup) {
+	private void expectLdapdeleteUser(ObmUser userToRemove, Group defaultGroup) throws SQLException {
 		LdapManager ldapManager = expectLdapBuild();
-		ldapManager.removeUserFromDefaultGroup(userToRemove.getDomain(),
-				defaultGroup, userToRemove);
+
+		expect(groupDao.getAllGroupsForUserExtId(domainWithImapAndLdap, UserExtId.valueOf("extIdUser1"))).andReturn(Collections.EMPTY_SET);
+
+		ldapManager.removeUserFromDefaultGroup(userToRemove.getDomain(), defaultGroup, userToRemove);
 		expectLastCall();
 		ldapManager.deleteUser(userToRemove);
 		expectLastCall();
@@ -744,9 +825,6 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				usersGroup);
 		expectLdapdeleteUser(user, usersGroup);
 		expect(
-				groupDao.getAllGroupsForUserExtId(user.getDomain(),
-						user.getExtId())).andReturn(Collections.EMPTY_SET);
-		expect(
 				batchDao.update(batchBuilder
 						.operation(
 								opBuilder.status(BatchStatus.SUCCESS)
@@ -802,9 +880,6 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				usersGroup);
 		expectLdapdeleteUser(user, usersGroup);
 		expect(
-				groupDao.getAllGroupsForUserExtId(user.getDomain(),
-						user.getExtId())).andReturn(Collections.EMPTY_SET);
-		expect(
 				batchDao.update(batchBuilder
 						.operation(
 								opBuilder.status(BatchStatus.SUCCESS)
@@ -859,9 +934,6 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(
 				usersGroup);
 		expectLdapdeleteUser(user, usersGroup);
-		expect(
-				groupDao.getAllGroupsForUserExtId(user.getDomain(),
-						user.getExtId())).andReturn(Collections.EMPTY_SET);
 		expect(
 				batchDao.update(batchBuilder
 						.operation(
@@ -1205,6 +1277,214 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 										.error("org.obm.provisioning.exception.ProcessingException: Cannot change user mail host")
 										.build()).status(BatchStatus.SUCCESS)
 						.timecommit(date).build())).andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testModifyWhenArchivingNonArchivedUser() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PUT)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"archived\": true" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.archived(true)
+				.build();
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domainWithImapAndLdap)).andReturn(userFromDao);
+		expect(userDao.update(user)).andReturn(user);
+		expect(groupDao.getByGid(domainWithImapAndLdap, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		expectLdapdeleteUser(user, usersGroup);
+		expectPUserDaoDelete(user);
+		expectPUserDaoInsert(user);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testModifyWhenArchivingArchivedUser() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PUT)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"archived\": true" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.archived(true)
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domainWithImapAndLdap)).andReturn(user);
+		expect(userDao.update(user)).andReturn(user);
+		expectLdapModifyUser(user, user);
+		expectPUserDaoDelete(user);
+		expectPUserDaoInsert(user);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testModifyWhenUnarchivingArchivedUser() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PUT)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"archived\": false" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.build();
+		ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.password("secret")
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.archived(true)
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domainWithImapAndLdap)).andReturn(userFromDao);
+		expect(userDao.update(user)).andReturn(user);
+		expect(groupDao.getByGid(domainWithImapAndLdap, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		expect(groupDao.getAllGroupsForUserExtId(domainWithImapAndLdap, UserExtId.valueOf("extIdUser1"))).andReturn(Collections.EMPTY_SET);
+		expectLdapCreateUser(user, usersGroup);
+		expectPUserDaoDelete(user);
+		expectPUserDaoInsert(user);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
 
 		mocksControl.replay();
 

@@ -42,7 +42,6 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
-import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.push.mail.bean.Acl;
 import org.obm.sync.Right;
 import org.obm.sync.dao.EntityId;
@@ -93,7 +92,10 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 			createUserMailboxes(userFromDao);
 		}
 
-		createUserInLdap(userFromDao, defaultGroup);
+		if (!user.isArchived()) {
+			createUserInLdap(userFromDao, defaultGroup);
+		}
+
 		createUserInPTables(userFromDao);
 	}
 
@@ -178,28 +180,6 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		}
 		catch (DaoException e) {
 			throw new ProcessingException(String.format("Cannot add user '%s' (%s) in the default group.", user.getLogin(), user.getExtId()), e);
-		}
-	}
-
-	private void createUserInLdap(ObmUser user, Group defaultGroup) {
-		LdapManager ldapManager = buildLdapManager(user.getDomain());
-
-		try {
-			ldapManager.createUser(user);
-			addUserToDefaultGroupInLdap(ldapManager, user, defaultGroup);
-		} catch (Exception e) {
-			throw new ProcessingException(
-					String.format("Cannot insert new user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
-		} finally {
-			ldapManager.shutdown();
-		}
-	}
-
-	private void addUserToDefaultGroupInLdap(LdapManager ldapManager, ObmUser user, Group defaultGroup) {
-		try {
-			ldapManager.addUserToDefaultGroup(user.getDomain(), defaultGroup, user);
-		} catch (Exception e) {
-			throw new ProcessingException(String.format("Cannot add user '%s' (%s) in his/her default group in LDAP.", user.getLogin(), user.getExtId()), e);
 		}
 	}
 

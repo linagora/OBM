@@ -41,6 +41,7 @@ import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusManager;
 import org.obm.domain.dao.PUserDao;
 import org.obm.domain.dao.UserSystemDao;
+import org.obm.provisioning.Group;
 import org.obm.provisioning.ProvisioningService;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
@@ -49,6 +50,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
+import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
 import org.obm.push.mail.imap.IMAPException;
 
@@ -114,6 +116,68 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 			}
 		} catch (SQLException e) {
 			throw new ProcessingException(e);
+		}
+	}
+
+	protected void createUserInLdap(ObmUser user, Group defaultGroup) {
+		insertUserInLdap(user, defaultGroup, false);
+	}
+
+	protected void createUserInLdapAndAddUserToExistingGroups(ObmUser user, Group defaultGroup) {
+		insertUserInLdap(user, defaultGroup, true);
+	}
+
+	private void insertUserInLdap(ObmUser user, Group defaultGroup, boolean addUserToExistingGroups) {
+		LdapManager ldapManager = buildLdapManager(user.getDomain());
+
+		try {
+			ldapManager.createUser(user);
+			ldapManager.addUserToDefaultGroup(user.getDomain(), defaultGroup, user);
+
+			if (addUserToExistingGroups) {
+				addUserToGroupsExceptDefaultOneInLdap(ldapManager, defaultGroup, user);
+			}
+		} catch (Exception e) {
+			throw new ProcessingException(String.format("Cannot insert new user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId()), e);
+		} finally {
+			ldapManager.shutdown();
+		}
+	}
+
+	private void addUserToGroupsExceptDefaultOneInLdap(LdapManager ldapManager, Group defaultGroup, ObmUser user) throws SQLException {
+		Set<Group> groups = groupDao.getAllGroupsForUserExtId(user.getDomain(), user.getExtId());
+
+		for (Group group: groups) {
+			if (!group.equals(defaultGroup)) {
+				ldapManager.addUserToGroup(user.getDomain(), group, user);
+			}
+		}
+	}
+
+	protected void deleteUserInLdap(ObmUser user) {
+		LdapManager ldapManager = buildLdapManager(user.getDomain());
+
+		try {
+			Group defaultGroup = getDefaultGroup(user.getDomain());
+
+			ldapManager.removeUserFromDefaultGroup(user.getDomain(), defaultGroup, user);
+			deleteUserFromGroupsExceptDefaultOneInLdap(ldapManager, defaultGroup, user);
+			ldapManager.deleteUser(user);
+		} catch (Exception e) {
+			throw new ProcessingException(
+					String.format("Cannot delete user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId().getExtId()), e);
+		} finally {
+			ldapManager.shutdown();
+		}
+	}
+
+	protected void deleteUserFromGroupsExceptDefaultOneInLdap(LdapManager ldapManager, Group defaultGroup, ObmUser user) throws SQLException {
+		Set<Group> groups = groupDao.getAllGroupsForUserExtId(user.getDomain(), user.getExtId());
+
+		for (Group group: groups) {
+			if (!group.equals(defaultGroup)) {
+				ldapManager.removeUserFromGroup(user.getDomain(), group, user);
+			}
 		}
 	}
 

@@ -33,19 +33,14 @@ package org.obm.provisioning.processing.impl.users;
 
 import static fr.aliacom.obm.common.system.ObmSystemUser.CYRUS;
 
-import java.sql.SQLException;
-import java.util.Set;
-
 import org.obm.annotations.transactional.Transactional;
 import org.obm.cyrus.imap.admin.CyrusManager;
-import org.obm.provisioning.Group;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
-import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.processing.impl.OperationUtils;
 import org.obm.push.mail.bean.Acl;
 
@@ -92,31 +87,6 @@ public class DeleteUserOperationProcessor extends AbstractUserOperationProcessor
 			userDao.archive(user);
 		} catch (Exception e) {
 			throw new ProcessingException(String.format("Cannot archive user '%s' (%s) in database", user.getLogin(), user.getExtId().getExtId()), e);
-		}
-	}
-
-	private void deleteUserInLdap(ObmUser user) {
-		LdapManager ldapManager = buildLdapManager(user.getDomain());
-
-		try {
-			Group defaultGroup = getDefaultGroup(user.getDomain());
-			ldapManager.removeUserFromDefaultGroup(user.getDomain(), defaultGroup, user);
-			deleteUserFromGroupsExceptDefaultOneInLdap(ldapManager, defaultGroup, user);
-			ldapManager.deleteUser(user);
-		} catch (Exception e) {
-			throw new ProcessingException(
-					String.format("Cannot delete user '%s' (%s) in LDAP.", user.getLogin(), user.getExtId().getExtId()), e);
-		} finally {
-			ldapManager.shutdown();
-		}
-	}
-
-	private void deleteUserFromGroupsExceptDefaultOneInLdap(LdapManager ldapManager, Group defaultGroup, ObmUser user) throws SQLException {
-		Set<Group> groups = groupDao.getAllGroupsForUserExtId(user.getDomain(), user.getExtId());
-		for (Group group: groups) {
-			if (!group.equals(defaultGroup)) {
-				ldapManager.removeUserFromGroup(user.getDomain(), group, user);
-			}
 		}
 	}
 
