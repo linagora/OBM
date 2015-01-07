@@ -1149,70 +1149,6 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 	}
 
 	@Test
-	public void testProcessModifyUserCannotChangeArchivedState()
-			throws Exception {
-		Date date = DateUtils.date("2013-08-01T12:00:00");
-		Operation.Builder opBuilder = Operation
-				.builder()
-				.id(operationId(1))
-				.status(BatchStatus.IDLE)
-				.entityType(BatchEntityType.USER)
-				.request(
-						org.obm.provisioning.beans.Request
-								.builder()
-								.resourcePath("/users/1")
-								.param(Request.USERS_ID_KEY, "extIdUser1")
-								.verb(HttpVerb.PUT)
-								.body("{" + "\"id\": \"extIdUser1\","
-										+ "\"login\": \"user1\","
-										+ "\"lastname\": \"user1\","
-										+ "\"profile\": \"user\","
-										+ "\"mails\":[\"john@domain\"],"
-										+ "\"archived\": true" + "}").build());
-		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
-				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
-				.operation(opBuilder.build());
-
-		ObmUser userFromDao = ObmUser
-				.builder()
-				.uid(1)
-				.entityId(EntityId.valueOf(1))
-				.login(user1Login)
-				.password("secret")
-				.emails(UserEmails.builder()
-					.addAddress("john@domain")
-					.server(ObmHost.builder().name("Cyrus").localhost().build())
-					.domain(domainWithImapAndLdap)
-					.build())
-				.profileName(ProfileName.valueOf("user"))
-				.extId(UserExtId.valueOf("extIdUser1"))
-				.domain(domainWithImapAndLdap)
-				.build();
-
-		expectDomain();
-		expectBatchCreationAndRetrieval(batchBuilder.build());
-		expect(
-				userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
-						domainWithImapAndLdap)).andReturn(userFromDao);
-
-		expect(
-				batchDao.update(batchBuilder
-						.operation(
-								opBuilder
-										.status(BatchStatus.ERROR)
-										.timecommit(date)
-										.error("org.obm.provisioning.exception.ProcessingException: Cannot change user archived state")
-										.build()).status(BatchStatus.SUCCESS)
-						.timecommit(date).build())).andReturn(null);
-
-		mocksControl.replay();
-
-		createBatchWithOneUserUpdateAndCommit();
-
-		mocksControl.verify();
-	}
-
-	@Test
 	public void testProcessModifyUserCannotChangeMailHost() throws Exception {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
 		Operation.Builder opBuilder = Operation
@@ -1401,65 +1337,6 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		mocksControl.replay();
 
 		createBatchWithOneUserPatchAndCommit();
-
-		mocksControl.verify();
-	}
-
-	@Test
-	public void testProcessPatchUserCannotChangeArchivedState()
-			throws Exception {
-		Date date = DateUtils.date("2013-08-01T12:00:00");
-		Operation.Builder opBuilder = Operation
-				.builder()
-				.id(operationId(1))
-				.status(BatchStatus.IDLE)
-				.entityType(BatchEntityType.USER)
-				.request(
-						org.obm.provisioning.beans.Request.builder()
-								.resourcePath("/users/1")
-								.param(Request.USERS_ID_KEY, "extIdUser1")
-								.verb(HttpVerb.PATCH)
-								.body("{" + "\"archived\": true" + "}").build());
-		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
-				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
-				.operation(opBuilder.build());
-
-		ObmUser userFromDao = ObmUser
-				.builder()
-				.uid(1)
-				.entityId(EntityId.valueOf(1))
-				.login(user1Login)
-				.identity(user1Name)
-				.password("secret")
-				.emails(UserEmails.builder()
-					.addAddress("john@domain")
-					.server(ObmHost.builder().name("Cyrus").localhost().build())
-					.domain(domainWithImapAndLdap)
-					.build())
-				.profileName(ProfileName.valueOf("user"))
-				.extId(UserExtId.valueOf("extIdUser1"))
-				.domain(domainWithImapAndLdap)
-				.build();
-
-		expectDomain();
-		expectBatchCreationAndRetrieval(batchBuilder.build());
-		expect(
-				userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
-						domainWithImapAndLdap)).andReturn(userFromDao);
-
-		expect(
-				batchDao.update(batchBuilder
-						.operation(
-								opBuilder
-										.status(BatchStatus.ERROR)
-										.timecommit(date)
-										.error("org.obm.provisioning.exception.ProcessingException: Cannot change user archived state")
-										.build()).status(BatchStatus.SUCCESS)
-						.timecommit(date).build())).andReturn(null);
-
-		mocksControl.replay();
-
-		createBatchWithOneUserUpdateAndCommit();
 
 		mocksControl.verify();
 	}

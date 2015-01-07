@@ -89,9 +89,6 @@ public abstract class AbstractModifyUserOperationProcessor extends AbstractUserO
 		if (!Objects.equal(modifiedUser.getLogin(), existingUser.getLogin())) {
 			throw new ProcessingException("Cannot change user login");
 		}
-		if (modifiedUser.isArchived() != existingUser.isArchived()) {
-			throw new ProcessingException("Cannot change user archived state");
-		}
 		if (!Objects.equal(modifiedUser.getEmail(), existingUser.getEmail()) ||
 			!Objects.equal(modifiedUser.getEmailAlias(), existingUser.getEmailAlias())) {
 			validateUserEmail(modifiedUser);
