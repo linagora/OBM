@@ -32,11 +32,12 @@ package org.obm.push.minig.imap.impl;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
+import com.beetstra.jutf7.CharsetProvider;
 import com.google.common.base.Charsets;
 
 public class MailboxNameUTF7Converter {
 
-	private static final Charset UTF_7 = Charset.forName("x-modified-UTF-7");
+	private static final Charset UTF_7 = new CharsetProvider().charsetForName("X-MODIFIED-UTF-7");
 	
 	public static String encode(String mailboxName) {
 		ByteBuffer byteBuffer = UTF_7.encode(mailboxName);
