@@ -752,7 +752,8 @@ public class UserDaoJdbcImpl implements UserDao {
                     "userobm_mail_server_id = ?, " +
                     "userobm_mail_quota = ?, " +
                     "userobm_mail_perms = ?, " +
-                    "userobm_hidden = ? " +
+                    "userobm_hidden = ?, " +
+                    "userobm_archive = ? " +
                     "WHERE userobm_id = ?";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -817,6 +818,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			}
 
 			ps.setInt(idx++, user.isHidden() ? 1 : 0);
+			ps.setInt(idx++, user.isArchived() ? 1 : 0);
 			
 			ps.setInt(idx++, user.getUid());
 

@@ -461,6 +461,18 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	}
 
 	@Test
+	public void testUpdateShouldWriteArchiveFlag() throws SQLException, UserNotFoundException {
+		ObmUser user = sampleUserBuilder(1, 3, "1")
+				.identity(johnIdentity)
+				.archived(true)
+				.build();
+
+		dao.update(user);
+
+		assertThat(dao.findUserById(1, domain)).isEqualTo(user);
+	}
+
+	@Test
 	public void testGetAfterUpdate() throws SQLException, UserNotFoundException {
 		ObmUser user = sampleUserBuilder(1, 3, "1")
 				.identity(johnIdentity)
