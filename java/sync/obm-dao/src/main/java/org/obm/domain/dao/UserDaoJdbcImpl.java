@@ -599,12 +599,14 @@ public class UserDaoJdbcImpl implements UserDao {
 				"userobm_mail_quota," +
 				"userobm_mail_perms, " +
 				"userobm_hidden, " +
+				"userobm_archive, " +
 				"userobm_uid," +
 				"userobm_gid" +
 				") VALUES (" +
-				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-				"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?" +
+					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+					"?, ?, ?, ?, ?" +
 				")";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -674,6 +676,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			}
 			
 			ps.setInt(idx++, user.isHidden() ? 1 : 0);
+			ps.setInt(idx++, user.isArchived() ? 1 : 0);
 			
 			if (user.getUidNumber() != null) {
 				ps.setInt(idx++, user.getUidNumber());

@@ -428,6 +428,23 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.build());
 	}
 
+	@Test
+	public void testCreateShouldWriteArchivedFlag() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("123456"))
+				.login(validLogin)
+				.password("secure")
+				.profileName(ProfileName.valueOf("user"))
+				.identity(johnIdentity)
+				.domain(domain)
+				.archived(true);
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+
+		assertThat(createdUser.isArchived()).isTrue();
+	}
+
 	@Test(expected = UserNotFoundException.class)
 	public void testUpdateWhenUserDoestExist() throws SQLException, UserNotFoundException {
 		ObmUser user = ObmUser
