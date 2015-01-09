@@ -71,6 +71,7 @@ $l_lang = "Ngôn ngữ";
 $l_default = "Mặc định";
 $l_status = "Trạng thái";
 $l_archive = "Tài liệu lưu trữ";
+$l_deactivated = "vô hiệu hoá";
 $l_archive_first = "Tài liệu lưu trữ đầu";
 $l_show_archive = "Hiển thị tài liệu lưu trữ";
 $l_dates = "Nhiều ngày";

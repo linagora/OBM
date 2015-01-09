@@ -57,7 +57,7 @@ if($perm->check_right('user', $cright_read)) {
   $fieldnames['userobm_ext_id'] = $l_ext_id;
   $fieldnames['userobm_perms'] = $l_profile;
   $fieldnames['userobm_delegation'] = $l_delegation;
-  $fieldnames['userobm_archive'] = $l_archive;
+  $fieldnames['userobm_archive'] = $l_deactivate;
   $fieldnames['userobm_title'] = $l_title;
   $fieldnames['userobm_phone'] = $l_phone;
   $fieldnames['userobm_phone2'] = $l_phone2;
@@ -368,7 +368,7 @@ function html_batch_user_search_form($user) {
 //   - $user[]   : default form values
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
-  global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
+  global $l_login, $l_lastname, $l_profile, $l_domain, $l_deactivate, $l_add_user;
   global $l_group, $l_phone, $l_desc, $l_find, $l_all, $l_firstname, $l_exp, $l_commonname;
   global $l_email, $l_quota, $l_delegation_target, $l_datebegin, $l_mail_server;
   global $display, $c_all, $l_recursive, $obm;
@@ -568,7 +568,7 @@ $dis_delegation";
   }
   if ($display_pref['userobm_archive']['status'] != 0) {
     $block .= "
-    <label>$l_archive<br />
+    <label>$l_deactivate<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </label>";
   }
@@ -780,7 +780,7 @@ function dis_user_consult($user) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname, $l_commonname;
-  global $l_domain, $l_user, $l_lastaccess, $l_archive, $l_datebegin, $l_dateexp, $l_desc;
+  global $l_domain, $l_user, $l_lastaccess, $l_deactivate, $l_datebegin, $l_dateexp, $l_desc;
   global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal, $l_title;
   global $l_delegation_target, $l_delegation, $l_direction, $l_service;
   global $l_company, $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_email;
@@ -1133,7 +1133,7 @@ function html_user_consult($obm_q) {
     <td>$local</td>
   </tr>
   <tr>
-    <th>$l_archive</th>
+    <th>$l_deactivate</th>
     <td>$archive</td>
   </tr>    
   <tr>
@@ -1556,7 +1556,7 @@ function dis_user_form($action, $user, $field='') {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($action, $usr_q, $user, $groups, $field='') {
   global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname, $l_commonname;
-  global $l_user, $l_title, $l_archive, $l_datebegin, $l_dateexp, $l_noexperie;
+  global $l_user, $l_title, $l_deactivate, $l_datebegin, $l_dateexp, $l_noexperie;
   global $l_insert, $l_update, $l_validate;
   global $l_update_valid, $l_change_password_confirm, $l_password_update;
   global $l_delegation_target, $l_hidden, $l_photo, $l_generate_passwd; 
@@ -2226,7 +2226,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   } else {
     $dis_archive = "
       <tr>
-        <th class=\"$class[archive]\"><label for=\"cba_archive\">$l_archive</label></th>
+        <th class=\"$class[archive]\"><label for=\"cba_archive\">$l_deactivate</label></th>
         <td><input id=\"cba_archive\" name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
       </tr>";
   }
@@ -3584,7 +3584,7 @@ function html_user_batch_form($params) {
   // Globalize detail header
   global $l_user, $l_mail, $l_nomade, $l_coord;
   // Globalize form labels
-  global $l_archive, $l_profile, $l_quota, $l_perms, $l_enabled, $l_local_copy;
+  global $l_deactivate, $l_profile, $l_quota, $l_perms, $l_enabled, $l_local_copy;
   global $l_phone, $l_mphone, $l_fax, $l_company, $l_direction, $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
   // other
   global $l_yes, $l_no, $l_do_batch_processing;
@@ -3699,7 +3699,7 @@ function html_user_batch_form($params) {
   <legend>$l_user</legend>
     <table>
     <tr>
-      <th>$l_archive</th>
+      <th>$l_deactivate</th>
       <td>$archive_block</td>
     </tr>
     <tr>

@@ -71,6 +71,7 @@ $l_lang = "Language";
 $l_default = "Default";
 $l_status = "Status";
 $l_archive = "Archive";
+$l_deactivate = "Disabled";
 $l_archive_first = "Arc";
 $l_show_archive = "Show archives";
 $l_dates = "Dates";
