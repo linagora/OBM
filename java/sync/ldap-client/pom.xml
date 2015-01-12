@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.1.1-SNAPSHOT</version>
+		<version>3.1.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>ldap-client</artifactId>
 	<packaging>jar</packaging>
 	<name>LDAP Client library</name>
 	<url>http://www.obm.org/</url>
-	<version>3.1.1-SNAPSHOT</version>
+	<version>3.1.2-SNAPSHOT</version>
 
 	<licenses>
 		<license>
