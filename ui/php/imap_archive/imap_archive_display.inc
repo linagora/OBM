@@ -372,7 +372,7 @@ function get_block_excluded_users($excludedUserIdToLoginMap) {
         <th></th>
         <td class='autocompleteResult'>
           <span class='legend'>$GLOBALS[l_user]</span>
-          <div id='sel_excluded_user_id'>$dis_sel_user</div>
+          <div id='sel_excluded_user_id' class='userList'>$dis_sel_user</div>
         </td>
       </tr>
     </table>";

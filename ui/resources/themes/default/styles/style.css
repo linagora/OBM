@@ -1472,6 +1472,11 @@ input.datePicker {
   padding-right: 2px;
 }
 
+.userList {
+  max-height: 100px;
+  overflow: auto;
+}
+
 /*-------------------------------------------------------------------------- */
 /* Specific styles for the portlets.
 /* ------------------------------------------------------------------------- */
