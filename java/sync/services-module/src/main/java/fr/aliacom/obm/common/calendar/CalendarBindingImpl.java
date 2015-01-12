@@ -53,6 +53,7 @@ import net.fortuna.ical4j.model.DateTime;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.Months;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.configuration.ConfigurationService;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
@@ -135,10 +136,11 @@ public class CalendarBindingImpl implements ICalendar {
 	private final ICalendarFactory calendarFactory;
 	private final AttendeeService attendeeService;
 	private final AnonymizerService anonymizerService;
-	
+	private final ConfigurationService configuration;
 	@Inject
 	protected CalendarBindingImpl(EventChangeHandler eventChangeHandler,
-			DomainService domainService, UserService userService,
+			DomainService domainService,
+			UserService userService,
 			CalendarDao calendarDao,
 			CategoryDao categoryDao,
 			CommitedOperationDao commitedOperationDao,
@@ -146,7 +148,8 @@ public class CalendarBindingImpl implements ICalendar {
 			Ical4jHelper ical4jHelper, 
 			ICalendarFactory calendarFactory, 
 			AttendeeService attendeeService,
-			AnonymizerService anonymizerService) {
+			AnonymizerService anonymizerService,
+			ConfigurationService configuration) {
 		this.eventChangeHandler = eventChangeHandler;
 		this.domainService = domainService;
 		this.userService = userService;
@@ -157,6 +160,7 @@ public class CalendarBindingImpl implements ICalendar {
 		this.ical4jHelper = ical4jHelper;
 		this.calendarFactory = calendarFactory;
 		this.attendeeService = attendeeService;
+		this.configuration = configuration;
 		this.anonymizerService = anonymizerService;
 	}
 
@@ -937,7 +941,8 @@ public class CalendarBindingImpl implements ICalendar {
 				.build();
 	}
 
-	private EventChanges getSync(AccessToken token, String calendar,
+	@VisibleForTesting
+	EventChanges getSync(AccessToken token, String calendar,
 			Date lastSync, SyncRange syncRange, boolean onEventDate) throws ServerFault, NotAllowedException {
 
 		logger.info("Calendar : getSync(" + calendar
@@ -952,8 +957,9 @@ public class CalendarBindingImpl implements ICalendar {
 			logger.info("Calendar : getSync("
 					+ calendar + ") => " + changesFromDatabase.getUpdated().size() + " upd, "
 					+ changesFromDatabase.getDeletedEvents().size() + " rmed.");
-			
-			EventChanges changesToSend = moveConfidentalEventsOnDelegation(token, calendarUser, changesFromDatabase);
+
+			EventChanges changesToSend = moveConfidentalEventsOnDelegation(token, calendarUser, changesFromDatabase)
+					.subtractLastSyncBy(configuration.getTransactionToleranceTimeoutInSeconds());
 
 			changesToSend = anonymizerService.anonymize(changesToSend, calendar, token);
 
