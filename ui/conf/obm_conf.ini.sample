@@ -49,11 +49,11 @@ external-url = obm
 external-protocol = http
 obm-prefix = /
 
-;Set this to false to disable the use of the 'confidential' privacy level
+;Set this to false (default value: true) to disable the use of the 'confidential' privacy level (obm-tomcat must be restarted)
 ;enable-confidential-events = false
 
-;Hide private event to user have read rights
-;anonymize-private-events=false
+;Anonymize private events for users with Read and Write rights on a calendar (obm-tomcat must be restarted). Default value is false.
+;anonymize-private-events = false
 
 ; Synchronize global OBM address book
 globalAddressBookSync = true
