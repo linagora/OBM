@@ -120,23 +120,27 @@ function nextTreatmentDate() {
   }).get({ajax : 1, action : 'next_treatment_date', 'configuration' : configuration});
 }
 
-function loadLogs() {
-  var runId = $('runId').get('text');
+function loadLogs(runId) {
+  var periodicalFunction = function() {
+    new Request({
+      url: obm.vars.consts.obmUrl+'/imap_archive/imap_archive_index.php',
+      secure: false,
+      async: true,
+      onFailure: function (response) {
+        Obm.Error.parseStatus(this);
+      },
+      onComplete: function(response) {
+        var content = $('archivingLogs').contentWindow;
+        content.document.open();
+        content.document.write(response);
+        content.document.close();
+        content.scrollBy(0, content.innerHeight);
+      }
+    }).get({ajax : 1, action : 'archiving_logs', 'run_id' : runId});
+  };
   
-  var run = {};
-  run.id = runId;
-  
-  new Request.JSON({
-    url: obm.vars.consts.obmUrl+'/imap_archive/imap_archive_index.php',
-    secure: false,
-    async: true,
-    onFailure: function (response) {
-      Obm.Error.parseStatus(this);
-    },
-    onComplete: function(response) {
-//      $('archivingLogs').set('text', response);
-    }
-  }).get({ajax : 1, action : 'archiving_logs', 'run' : run});
+  var tenSeconds = 10000;
+  periodicalFunction.periodical(tenSeconds);
 }
 
 function addMailingEmail(event) {

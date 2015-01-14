@@ -572,16 +572,19 @@ function dis_log_page($params) {
   $queryParams = array("run_id" => $runId,
       "action" => "archiving_logs");
 
-  $url = "$path/imap_archive/".basename($_SERVER['SCRIPT_NAME'])."?".http_build_query($queryParams);
-
   $block = "
     <div class='detail extra' >
       <h1>$l_archiving_running</h1>
-  	  <iframe id='archivingLogs' src='$url' frameborder='0'>
+  	  <iframe id='archivingLogs' frameborder='0'>
   	    <p>$l_unsupported_iframe</p>
   	  </iframe>
   	</div>
-  ";
+
+    <script type=\"text/javascript\">
+      obm.initialize.chain(function () {
+        loadLogs(\"$runId\");
+      });
+    </script>";
 
   return $block;
 }
