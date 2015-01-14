@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
+import com.google.common.base.Objects;
+
 public class Partition {
 
 	private final String name;
@@ -46,12 +48,37 @@ public class Partition {
 	public String getName() {
 		return name;
 	}
-	
+
 	private static String preparePartitionName(String obmDomainName) {
-		return obmDomainName.replace(".", "_");
+		return obmDomainName.replace(".", "_").replace("-", "_");
 	}
-	
+
 	public static Partition fromObmDomain(String obmDomainName) {
 		return valueOf(preparePartitionName(obmDomainName));
 	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof Partition) {
+			Partition that = (Partition) object;
+
+			return Objects.equal(this.name, that.name);
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(name);
+	}
+
+	@Override
+	public String toString() {
+		return Objects
+				.toStringHelper(this)
+				.add("name", name)
+				.toString();
+	}
+
 }
