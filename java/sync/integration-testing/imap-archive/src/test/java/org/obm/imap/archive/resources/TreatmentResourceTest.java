@@ -220,6 +220,7 @@ public class TreatmentResourceTest {
 		given()
 			.port(server.getHttpPort())
 			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
+			.queryParam("live_view", true)
 			.contentType(ContentType.JSON).
 		expect()
 			.body(containsString("Starting IMAP Archive in REAL_RUN for domain mydomain"))
@@ -296,6 +297,37 @@ public class TreatmentResourceTest {
 		given()
 			.port(server.getHttpPort())
 			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
+			.queryParam("live_view", true)
+			.contentType(ContentType.JSON).
+		expect()
+			.body(equalTo(expectedContent))
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + runId.toString() + "/logs");
+	}
+	
+	@Test
+	public void getLogsShouldReturnTheLogsFromFileWhenAskingForIt() throws Exception {
+		expectations
+			.expectTrustedLogin(domain)
+			.expectGetDomain(domain);
+		
+		UUID runId = TestImapArchiveModules.uuid;
+		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
+				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
+				DatabaseOperations.insertArchiveTreatment(ArchiveTreatmentRunId.from(runId), domainId)));
+		
+		String expectedContent = "Old treatment file";
+		temporaryFolder.create();
+		File treatmentFile = temporaryFolder.newFile(runId.toString() + ".log");
+		FileUtils.write(treatmentFile, expectedContent, Charsets.UTF_8);
+		
+		server.start();
+		
+		given()
+			.port(server.getHttpPort())
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
+			.queryParam("live_view", false)
 			.contentType(ContentType.JSON).
 		expect()
 			.body(equalTo(expectedContent))
@@ -367,6 +399,7 @@ public class TreatmentResourceTest {
 		given()
 			.port(server.getHttpPort())
 			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
+			.queryParam("live_view", true)
 			.contentType(ContentType.JSON).
 		expect()
 			.body(containsString("Starting IMAP Archive in REAL_RUN for domain mydomain"))

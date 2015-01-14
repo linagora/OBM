@@ -65,7 +65,11 @@ public class ArchiveServiceImpl implements ArchiveService {
 			ArchiveDomainTask task = optional.get();
 			return Optional.<Object> of(task.getArchiveConfiguration().getLoggerAppenders().getChunkAppender().chunk());
 		}
-		
+		return fileLogs(runId);
+	}
+
+	@Override
+	public Optional<Object> fileLogs(ArchiveTreatmentRunId runId) throws IOException {
 		File loggerFile = new File(loggerFileNameService.loggerFileName(runId));
 		if (!loggerFile.exists()) {
 			return Optional.absent();

@@ -37,6 +37,7 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -44,6 +45,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.obm.imap.archive.beans.ArchiveTreatment;
+import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.dto.ArchiveTreatmentDto;
 import org.obm.imap.archive.services.ArchiveService;
 
@@ -67,9 +69,9 @@ public class TreatmentResource {
 	@GET
 	@Path("logs")
 	@Produces(MediaType.TEXT_PLAIN)
-	public Response getLogs() {
+	public Response getLogs(@QueryParam("live_view") boolean liveView) {
 		try {
-			Optional<Object> optionalLogs = archiveService.archiveTreatmentLogs(archiveTreatment.getRunId());
+			Optional<Object> optionalLogs = getLogs(archiveTreatment.getRunId(), liveView);
 			if (!optionalLogs.isPresent()) {
 				return Response.status(Status.NOT_FOUND).build();
 			}
@@ -77,5 +79,12 @@ public class TreatmentResource {
 		} catch (IOException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
+	}
+	
+	private Optional<Object> getLogs(ArchiveTreatmentRunId runId, boolean liveView) throws IOException {
+		if (!liveView) {
+			return archiveService.fileLogs(runId);
+		}
+		return archiveService.archiveTreatmentLogs(runId);
 	}
 }

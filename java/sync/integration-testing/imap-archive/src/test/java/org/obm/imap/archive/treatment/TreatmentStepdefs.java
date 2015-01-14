@@ -235,6 +235,7 @@ public class TreatmentStepdefs {
 		given()
 			.port(server.getHttpPort())
 			.auth().basic("admin@" + domain.getName(), "trust3dToken")
+			.queryParam("live_view", true)
 			.contentType(ContentType.JSON).
 		expect()
 			.body(containsString("Starting IMAP Archive in REAL_RUN for domain mydomain.org")).

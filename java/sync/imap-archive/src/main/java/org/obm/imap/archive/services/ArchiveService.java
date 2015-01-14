@@ -40,4 +40,6 @@ import com.google.common.base.Optional;
 public interface ArchiveService {
 
 	Optional<Object> archiveTreatmentLogs(ArchiveTreatmentRunId runId) throws IOException;
+
+	Optional<Object> fileLogs(ArchiveTreatmentRunId runId) throws IOException;
 }
