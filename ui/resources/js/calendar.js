@@ -1634,7 +1634,7 @@ Obm.CalendarEvent = new Class({
    * Fill event with custom color
    */
   setColor: function(color) {
-    if(color) {
+    if(color && color.body) {
       this.content.setStyle('background',color.body);
       var dragHandlerBackgroundColor = this.kind == 'all_day' ? color.body : color.header;
       this.dragHandler.setStyle('background', dragHandlerBackgroundColor);
