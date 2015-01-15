@@ -63,6 +63,7 @@ import org.obm.sync.services.IAddressBook;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
@@ -100,7 +101,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 	private final BookItemsWriter bookItemsWriter;
 	private final Locator locator;
 
-	private BookClient(SyncClientAssert syncClientException,
+	@VisibleForTesting BookClient(SyncClientAssert syncClientException,
 			Locator locator,
 			@Named(LoggerModule.OBM_SYNC)Logger obmSyncLogger,
 			BookItemsParser bookItemsParser,
@@ -321,6 +322,7 @@ public class BookClient extends AbstractClientImpl implements IAddressBook {
 		Multimap<String, Parameter> params = initParams(token);
 		params.put("bookId", new IntegerParameter(addressBookId));
 		params.put("contact", new StringParameter(bookItemsWriter.getContactAsString(contact)));
+		params.put("clientId", new StringParameter(clientId));
 		Document doc = execute(token, "/book/storeContact", params);
 		exceptionFactory.checkModifyContactException(doc);
 		return bookItemsParser.parseContact(doc.getDocumentElement());

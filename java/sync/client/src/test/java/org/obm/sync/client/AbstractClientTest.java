@@ -39,6 +39,8 @@ import org.junit.Before;
 import org.obm.sync.Parameter;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.MavenVersion;
+import org.obm.sync.base.EmailAddress;
+import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventType;
@@ -48,6 +50,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -175,6 +178,15 @@ public abstract class AbstractClientTest {
 		return event;
 	}
 
+	protected Contact createContact() {
+		Contact contact = new Contact();
+		contact.setFirstname("firstname");
+		contact.setLastname("lastname");
+		contact.setEmails(ImmutableMap.<String, EmailAddress>of("main", EmailAddress.loginAtDomain("login@domain")));
+
+		return contact;
+	}
+	
 	protected static interface Responder {
 		Document execute(AccessToken token, String action, Multimap<String, Parameter> parameters);
 	}
