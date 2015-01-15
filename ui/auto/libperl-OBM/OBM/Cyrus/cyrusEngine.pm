@@ -472,52 +472,65 @@ sub _imapSetMailboxAcls {
         return 1;
     }
     # Gestion des ACL
+    my $isRootMailbox = 1;
     my $errors = 0;
     foreach my $boxStruct(@boxStructs) {
-        my $mailboxPath = $boxStruct[0];
-        while( my( $right, $oldUserList ) = each( %$oldAclList ) ) {
-            my $newUserList = $newAclList->{$right};
+        my $mailboxPath = $boxStruct->[0];
+        # The first mailbox is the root one
+        $errors += $self->_updateAcls($mailboxPath, $oldAclList, $newAclList, $entity->{entityDesc}, $isRootMailbox);
+        $isRootMailbox = 0;
+    }
+    if ($errors > 0) {
+        $self->_log("Errors have occured when updating the ACLs", 1);
+    }
 
-            while( my( $userName, $value ) = each( %$oldUserList ) ) {
-                if( !defined($newUserList) || !exists( $newUserList->{$userName} ) ) {
-                    if( !$self->_imapSetMailboxAcl( $mailboxPath, $userName, 'none' ) ) {
-                        $errors++;
-                    }
+    return 0;
+}
+
+sub _updateAcls {
+    my ($self, $mailboxPath, $oldAclList, $newAclList, $entityDesc, $isRootMailbox) = @_;
+    my $errors = 0;
+    while( my( $right, $oldUserList ) = each( %$oldAclList ) ) {
+        my $newUserList = $newAclList->{$right};
+
+        while( my( $userName, $value ) = each( %$oldUserList ) ) {
+            if( !defined($newUserList) || !exists( $newUserList->{$userName} ) ) {
+                if ($self->_imapSetMailboxAcl( $mailboxPath, $userName, 'none' )) {
+                    $errors++;
                 }
-            }
-        }
-
-        my $anyoneRight = 0;
-        while( my( $right, $newUserList ) = each( %$newAclList ) ) {
-            my $oldUserList = $oldAclList->{$right};
-
-            while( my( $userName, $value ) = each( %$newUserList ) ) {
-                if( !defined($oldUserList) || !exists($oldUserList->{$userName} ) ) {
-                    if( !$self->_imapSetMailboxAcl( $mailboxPath, $userName, $right ) ) {
-                        $errors++;
-                    }
-
-                    # The first mailbox is the root one, we need to remove the 'x' right to prevent
-                    # accidental deletion of mailshares by the user. This should only be done through OBM.
-                    if (defined($entity->{'entityDesc'}) && defined($entity->{'entityDesc'}->{'mailshare_id'}) && $i == 0) {
-                        $self->_imapSetMailboxAcl($mailboxPath, $userName, 'nodelete');
-                    }
-                }
-
-                if( $userName eq 'anyone' ) {
-                    $anyoneRight = 1;
-                }
-            }
-        }
-
-        if( !$anyoneRight ) {
-            if( !$self->_imapSetMailboxAcl( $mailboxPath, 'anyone', 'post' ) ) {
-                $errors++
             }
         }
     }
 
-    return 0;
+    my $anyoneRight = 0;
+    while( my( $right, $newUserList ) = each( %$newAclList ) ) {
+        my $oldUserList = $oldAclList->{$right};
+
+        while( my( $userName, $value ) = each( %$newUserList ) ) {
+            if( !defined($oldUserList) || !exists($oldUserList->{$userName} ) ) {
+                if( !$self->_imapSetMailboxAcl( $mailboxPath, $userName, $right ) ) {
+                    $errors++;
+                }
+
+                # For the root mailbox, we need to remove the 'x' right to prevent
+                # accidental deletion of mailshares by the user. This should only be done through OBM.
+                if (defined($entityDesc) && defined($entityDesc->{'mailshare_id'}) && $isRootMailbox) {
+                    $self->_imapSetMailboxAcl($mailboxPath, $userName, 'nodelete');
+                }
+            }
+
+            if( $userName eq 'anyone' ) {
+                $anyoneRight = 1;
+            }
+        }
+    }
+
+    if( !$anyoneRight ) {
+        if( !$self->_imapSetMailboxAcl( $mailboxPath, 'anyone', 'post' ) ) {
+            $errors++
+        }
+    }
+    return $errors;
 }
 
 
