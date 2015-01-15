@@ -459,28 +459,27 @@ sub _imapSetMailboxAcls {
 
     # Obtention de la liste des sous-répertoires de la boite
     my $boxPattern = $boxPrefix.$boxName;
-    my @boxStruct = $cyrusSrv->listmailbox( $boxPattern, '' );
+    my @boxStructs = $cyrusSrv->listmailbox( $boxPattern, '' );
     if( $cyrusSrv->error ) {
         $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 1 );
         return 1;
     }
 
     $boxPattern =~ s/(@.*)$/\/*$1/;
-    push( @boxStruct, $cyrusSrv->listmailbox( $boxPattern, '' ) );
+    push( @boxStructs, $cyrusSrv->listmailbox( $boxPattern, '' ) );
     if( $cyrusSrv->error ) {
         $self->_log( 'erreur Cyrus a l\'obtention de la structure de la BAL : '.$cyrusSrv->error(), 1 );
         return 1;
     }
-
     # Gestion des ACL
     my $errors = 0;
-    for( my $i=0; $i<=$#boxStruct; $i++ ) {
+    foreach my $boxStruct(@boxStructs) {
         while( my( $right, $oldUserList ) = each( %$oldAclList ) ) {
             my $newUserList = $newAclList->{$right};
 
             while( my( $userName, $value ) = each( %$oldUserList ) ) {
                 if( !defined($newUserList) || !exists( $newUserList->{$userName} ) ) {
-                    if( !$self->_imapSetMailboxAcl( $boxStruct[$i][0], $userName, 'none' ) ) {
+                    if( !$self->_imapSetMailboxAcl( $boxStruct[0], $userName, 'none' ) ) {
                         $errors++;
                     }
                 }
@@ -493,14 +492,14 @@ sub _imapSetMailboxAcls {
 
             while( my( $userName, $value ) = each( %$newUserList ) ) {
                 if( !defined($oldUserList) || !exists($oldUserList->{$userName} ) ) {
-                    if( !$self->_imapSetMailboxAcl( $boxStruct[$i][0], $userName, $right ) ) {
+                    if( !$self->_imapSetMailboxAcl( $boxStruct[0], $userName, $right ) ) {
                         $errors++;
                     }
 
                     # The first mailbox is the root one, we need to remove the 'x' right to prevent
                     # accidental deletion of mailshares by the user. This should only be done through OBM.
                     if (defined($entity->{'entityDesc'}) && defined($entity->{'entityDesc'}->{'mailshare_id'}) && $i == 0) {
-                    	$self->_imapSetMailboxAcl($boxStruct[$i][0], $userName, 'nodelete');
+                        $self->_imapSetMailboxAcl($boxStruct[0], $userName, 'nodelete');
                     }
                 }
 
@@ -511,7 +510,7 @@ sub _imapSetMailboxAcls {
         }
 
         if( !$anyoneRight ) {
-            if( !$self->_imapSetMailboxAcl( $boxStruct[$i][0], 'anyone', 'post' ) ) {
+            if( !$self->_imapSetMailboxAcl( $boxStruct[0], 'anyone', 'post' ) ) {
                 $errors++
             }
         }
