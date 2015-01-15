@@ -474,12 +474,13 @@ sub _imapSetMailboxAcls {
     # Gestion des ACL
     my $errors = 0;
     foreach my $boxStruct(@boxStructs) {
+        my $mailboxPath = $boxStruct[0];
         while( my( $right, $oldUserList ) = each( %$oldAclList ) ) {
             my $newUserList = $newAclList->{$right};
 
             while( my( $userName, $value ) = each( %$oldUserList ) ) {
                 if( !defined($newUserList) || !exists( $newUserList->{$userName} ) ) {
-                    if( !$self->_imapSetMailboxAcl( $boxStruct[0], $userName, 'none' ) ) {
+                    if( !$self->_imapSetMailboxAcl( $mailboxPath, $userName, 'none' ) ) {
                         $errors++;
                     }
                 }
@@ -492,14 +493,14 @@ sub _imapSetMailboxAcls {
 
             while( my( $userName, $value ) = each( %$newUserList ) ) {
                 if( !defined($oldUserList) || !exists($oldUserList->{$userName} ) ) {
-                    if( !$self->_imapSetMailboxAcl( $boxStruct[0], $userName, $right ) ) {
+                    if( !$self->_imapSetMailboxAcl( $mailboxPath, $userName, $right ) ) {
                         $errors++;
                     }
 
                     # The first mailbox is the root one, we need to remove the 'x' right to prevent
                     # accidental deletion of mailshares by the user. This should only be done through OBM.
                     if (defined($entity->{'entityDesc'}) && defined($entity->{'entityDesc'}->{'mailshare_id'}) && $i == 0) {
-                        $self->_imapSetMailboxAcl($boxStruct[0], $userName, 'nodelete');
+                        $self->_imapSetMailboxAcl($mailboxPath, $userName, 'nodelete');
                     }
                 }
 
@@ -510,7 +511,7 @@ sub _imapSetMailboxAcls {
         }
 
         if( !$anyoneRight ) {
-            if( !$self->_imapSetMailboxAcl( $boxStruct[0], 'anyone', 'post' ) ) {
+            if( !$self->_imapSetMailboxAcl( $mailboxPath, 'anyone', 'post' ) ) {
                 $errors++
             }
         }
