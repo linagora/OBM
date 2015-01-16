@@ -228,6 +228,7 @@ public class TreatmentResourceTest {
 			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + expectedRunId.toString() + "/logs");
 	}
 	
+	@Ignore("OBMFULL-6314")
 	@Test
 	public void getLogsShouldReturnNotFoundWhenBadRunId() throws Exception {
 		expectations
