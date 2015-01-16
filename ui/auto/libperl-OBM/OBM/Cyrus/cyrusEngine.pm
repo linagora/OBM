@@ -43,12 +43,18 @@ require Exporter;
 use strict;
 
 use Cyrus::IMAP::Admin;
+use DBI qw(:sql_types);
 
+our $IMAP_PATH_SEPARATOR = '/';
+our $NORMAL_USER_ARCHIVE_RIGHTS = 'read';
+
+our $CYRUS_RIGHTS = 'archiveAdmin';
 
 sub new {
     my $class = shift;
 
-    my $self = bless { }, $class;
+    my $self = bless {
+    }, $class;
 
     require OBM::Parameters::common;
     if( !$OBM::Parameters::common::obmModules->{'mail'} ) {
@@ -74,7 +80,8 @@ sub new {
         writeAdmin => 'lrswicd',
         admin => 'lc',
         post => 'p',
-        nodelete => '-x'
+        nodelete => '-x',
+        archiveAdmin => 'lrswipkxtecda',
     };
 
     return $self;
@@ -474,17 +481,170 @@ sub _imapSetMailboxAcls {
     # Gestion des ACL
     my $isRootMailbox = 1;
     my $errors = 0;
+    my $archiveAclList;
+    my $archiveMailboxFolder = $self->_findArchiveMailboxFolder($entity->getDomainId());
+    if (!defined $archiveMailboxFolder) {
+        $self->_log("Impossible de recuperer le nom du dossier d'archivage", 1);
+        return 1;
+    }
     foreach my $boxStruct(@boxStructs) {
         my $mailboxPath = $boxStruct->[0];
+        my $currentNewAclList;
+        if ($self->_isArchiveMailbox($mailboxPath, $archiveMailboxFolder)) {
+            $self->_log("$mailboxPath is an archive mailbox", 3);
+            if (!(defined $archiveAclList)) {
+                $archiveAclList = $self->_buildArchiveAclList($newAclList);
+            }
+            $currentNewAclList = $archiveAclList;
+        }
+        else {
+            $currentNewAclList = $newAclList;
+        }
         # The first mailbox is the root one
-        $errors += $self->_updateAcls($mailboxPath, $oldAclList, $newAclList, $entity->{entityDesc}, $isRootMailbox);
+        $errors += $self->_updateAcls(
+            $mailboxPath, $oldAclList, $currentNewAclList, $entity->{entityDesc}, $isRootMailbox);
         $isRootMailbox = 0;
     }
     if ($errors > 0) {
         $self->_log("Errors have occured when updating the ACLs", 1);
+        return 1;
     }
 
     return 0;
+}
+
+sub _findArchiveMailboxFolder {
+    my ($self, $domainId) = @_;
+
+    require OBM::Tools::obmDbHandler;
+    # Violates encapsulation, I know, but the wrapper is crap
+    my $dbHandler = OBM::Tools::obmDbHandler->instance()->{dbHandler};
+
+    if (!$dbHandler) {
+        $self->_log( 'connexion à la base de données impossible', 1 );
+        return undef;
+    }
+    my $query = "SELECT mail_archive_main_folder ".
+        "FROM mail_archive JOIN domain ON domain_uuid = mail_archive_domain_uuid ".
+        "WHERE domain_id=?";
+    my $sth = $dbHandler->prepare($query);
+    $sth->bind_param(1, $domainId, SQL_INTEGER);
+    my $queryResult;
+    $sth->execute();
+    my ($archiveMailboxFolder) = $sth->fetchrow_array();
+    if (defined $archiveMailboxFolder) {
+        if ($self->_isValidArchiveMailboxFolder($archiveMailboxFolder)) {
+            return $archiveMailboxFolder;
+        }
+    }
+    $self->_log("chargement de la configuration de l'archivage IMAP depuis la BD impossible (".$sth->errstr.")", 1);
+    return undef;
+}
+
+sub _isValidArchiveMailboxFolder {
+    my ($self, $archiveMailboxFolder) = @_;
+
+    if ($archiveMailboxFolder eq '') {
+        $self->_log("Nom du dossier d'archivage vide", 1);
+        return 0;
+    }
+    if ($archiveMailboxFolder =~ m![/\@]!) {
+        $self->_log("Nom du dossier d'archivage invalide: '$archiveMailboxFolder' contient / ou \@", 1);
+        return 0;
+    }
+    return 1;
+}
+
+sub _isArchiveMailbox {
+    my ($self, $mailboxPath, $archiveMailboxFolder) = @_;
+    # my ($foo, $bar) = split('/', 'a/b/c/d') -> $foo == 'a', $bar == 'b'
+    my ($_namespace, $_username, $rootFolderName) = split($IMAP_PATH_SEPARATOR, $mailboxPath);
+    return $rootFolderName eq $archiveMailboxFolder;
+}
+
+sub _obmRightsToCyrusRights {
+    my ($self, $obmRights) = @_;
+    my $cyrusRightsString = $self->{rightDefinition}->{$obmRights};
+    my %cyrusRights = map { $_ => 1 } split('', $cyrusRightsString);
+    return \%cyrusRights;
+}
+
+sub _cyrusRightsToObmRight {
+    my ($self, $cyrusRights) = @_;
+    my $cyrusRightsSize = keys %$cyrusRights;
+    my $matchingObmRight;
+    foreach my $obmRight (keys %{$self->{rightDefinition}}) {
+        my $currentCyrusRights = $self->_obmRightsToCyrusRights($obmRight);
+        next unless ($cyrusRightsSize == keys %$currentCyrusRights);
+        my $rightsIntersection = $self->_getCyrusRightsIntersection($cyrusRights, $currentCyrusRights);
+        if (keys %$rightsIntersection == $cyrusRightsSize) {
+            $matchingObmRight = $obmRight;
+            last;
+        }
+    }
+    return $matchingObmRight;
+}
+
+sub _getCyrusRightsIntersection {
+    my ($self, $cyrusRights1, $cyrusRights2) = @_;
+    my %cyrusRightsIntersection = ();
+    foreach my $right (keys(%$cyrusRights1)) {
+        if ((exists $cyrusRights2->{$right})) {
+            $cyrusRightsIntersection{$right} = 1;
+        }
+    }
+    return \%cyrusRightsIntersection;
+}
+
+# Ensures that Cyrus has all the rights on the archive folders, and that other
+# users have at most lrs
+sub _buildArchiveAclList {
+    my ($self, $aclListForStandard) = @_;
+    my %newAclListForArchive;
+    my $cyrusUser = $OBM::Parameters::common::cyrusAdminLogin;
+    while (my ($right, $userListForStandard) = each (%$aclListForStandard)) {
+        my %userListWithoutCyrus = map { $_ => 1 } grep { $_ ne $cyrusUser } keys %$userListForStandard;
+        if (%userListWithoutCyrus) {
+            my $cyrusRightsIntersection = $self->_getCyrusRightsIntersection(
+                $self->_obmRightsToCyrusRights($right),
+                $self->_obmRightsToCyrusRights($NORMAL_USER_ARCHIVE_RIGHTS));
+            # Normal users can't have more than lrs - users with neither l, r,
+            # nor s don't get any right on archived mailboxes
+            if (%$cyrusRightsIntersection) {
+                my $rightsIntersection = $self->_cyrusRightsToObmRight($cyrusRightsIntersection);
+                if (defined $rightsIntersection) {
+                    while (my ($userName, $value) = each (%userListWithoutCyrus)) {
+                        $newAclListForArchive{$rightsIntersection}->{$userName} = $value;
+                    }
+                }
+                else {
+                    # Users having rights which are not a superset of lrs (eg,
+                    # lsc) and which do not have a matching obm right in
+                    # rightDefinition don't get any right on archived mailboxes
+                    $self->_log("Les droits utilisateurs normaux ne peuvent pas ".
+                        "être au-delà de '$NORMAL_USER_ARCHIVE_RIGHTS' sur une boite archivee, ".
+                        "mais les droits en commun entre '$right' et '$NORMAL_USER_ARCHIVE_RIGHTS' ".
+                        "ne forment pas une combinaison legale pour OBM - les utilisateurs ".
+                        join(", ", keys %userListWithoutCyrus)." n'auront donc aucun droit sur ".                        "les boites archivees", 1);
+                }
+            }
+            else {
+                $self->_log("Les utilisateurs ".join(", ", keys %userListWithoutCyrus)." n'ont ".
+                    "pas de droit '$NORMAL_USER_ARCHIVE_RIGHTS', ils ne beneficieront d'aucun ".
+                    "droit sur les boites archivees", 1);
+            }
+        }
+    }
+    my $aclListForArchiveWithCyrusRights = $self->_addCyrusRights(\%newAclListForArchive);
+    return $aclListForArchiveWithCyrusRights;
+}
+
+sub _addCyrusRights {
+    my ($self, $aclList) = @_;
+    my $cyrusUser = $OBM::Parameters::common::cyrusAdminLogin;
+    my %aclListWithCyrusUser = %$aclList;
+    $aclListWithCyrusUser{$CYRUS_RIGHTS}->{$cyrusUser} = 1;
+    return \%aclListWithCyrusUser;
 }
 
 sub _updateAcls {
@@ -508,7 +668,7 @@ sub _updateAcls {
 
         while( my( $userName, $value ) = each( %$newUserList ) ) {
             if( !defined($oldUserList) || !exists($oldUserList->{$userName} ) ) {
-                if( !$self->_imapSetMailboxAcl( $mailboxPath, $userName, $right ) ) {
+                if($self->_imapSetMailboxAcl( $mailboxPath, $userName, $right ) ) {
                     $errors++;
                 }
 
@@ -526,13 +686,12 @@ sub _updateAcls {
     }
 
     if( !$anyoneRight ) {
-        if( !$self->_imapSetMailboxAcl( $mailboxPath, 'anyone', 'post' ) ) {
+        if ($self->_imapSetMailboxAcl( $mailboxPath, 'anyone', 'post' ) ) {
             $errors++
         }
     }
     return $errors;
 }
-
 
 sub _deleteBox {
     my $self = shift;
@@ -777,7 +936,6 @@ sub _imapSetMailboxAcl {
     if( ($boxRightUser eq 'anyone') && ($boxRight ne 'none') ) {
         $imapRight .= $definedRight->{'post'};
     }
-
     $self->_log( 'SETACLMAILBOX ' . $boxName . ' ' . $boxRightUser . ' ' . $imapRight, 4 );
 
     $cyrusSrvConn->setaclmailbox( $boxName, $boxRightUser => $imapRight );
