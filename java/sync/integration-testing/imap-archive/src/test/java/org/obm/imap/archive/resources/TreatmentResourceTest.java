@@ -192,6 +192,7 @@ public class TreatmentResourceTest {
 			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/944e91fe-3cfc-422d-a3a3-0b0f8972edc8");
 	}
 	
+	@Ignore("OBMFULL-6314")
 	@Test
 	public void getLogsShouldReturnTheLogsWhenArchiveTreatmentIsInTracking() throws Exception {
 		expectations
