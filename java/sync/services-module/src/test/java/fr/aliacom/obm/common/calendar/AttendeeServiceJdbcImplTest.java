@@ -143,7 +143,6 @@ public class AttendeeServiceJdbcImplTest {
 				.withConstructor(ObmHelper.class, ObmInfoDao.class, AddressBookDao.class, UserPatternDao.class, GroupDao.class, ProfileDao.class)
 				.withArgs(obmHelper, null, null, null, null, null)
 				.addMockedMethod("findUser")
-				.addMockedMethod("findUserByLogin")
 				.createMock(mocksControl);
 		contactDao = createMockBuilder(ContactDaoJdbcImpl.class)
 				.withConstructor(ContactConfiguration.class, CalendarDao.class, SolrHelper.Factory.class, ObmHelper.class, EventExtId.Factory.class)
@@ -221,18 +220,7 @@ public class AttendeeServiceJdbcImplTest {
 		assertThat(attendee.getEmail()).isEqualTo("johndoe@test.tlse.lng");
 		assertThat(attendee.getEntityId()).isEqualTo(EntityId.valueOf(2));
 	}
-
-	@Test
-	public void testFindUserAttendeeNoEmail() {
-		expect(userDao.findUserByLogin(eq("johndoe"), eq(domain))).andReturn(johnDoe).once();
-		mocksControl.replay();
-
-		UserAttendee attendee = attendeeService.findUserAttendee("johndoe", null, domain);
-
-		assertThat(attendee).isNotNull();
-		assertThat(attendee.getEmail()).isEqualTo("johndoe@test.tlse.lng");
-		assertThat(attendee.getEntityId()).isEqualTo(EntityId.valueOf(2));
-	}
+	
 	@Test
 	public void testFindContactAttendee() throws Exception {
 		expect(contactDao.findAttendeeContactFromEmailForUser(eq("external.to@my.domain"), eq(1))).andReturn(externalContact).once();
