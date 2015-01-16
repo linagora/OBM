@@ -189,18 +189,6 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	}
 
 	@Test
-	public void testFindUserByEntityId() throws DaoException {
-		EntityId user2EntityId = EntityId.valueOf(4);
-		int user2Id = 2;
-		assertThat(dao.findUserIdByEntityId(user2EntityId)).isEqualTo(user2Id);
-	}
-
-	@Test
-	public void testFindUserByEntityIdWhenUserDoesntExist() throws DaoException {
-		assertThat(dao.findUserIdByEntityId(EntityId.valueOf(404))).isNull();
-	}
-
-	@Test
 	public void testGetByExtIdFetchesOneCreatorLevelOnly() throws Exception {
 		ObmUser creator = dao.findUserById(1, domain);
 		UserExtId extId = UserExtId.valueOf("testExtId");

@@ -2665,7 +2665,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 							+ "VALUES (?, ?, ?, now(), ?)");
 			EventObmId databaseId = ev.getObmId();
 			for (Attendee at : ev.getAttendees()) {
-				Integer userId = userDao.findUserIdByEntityId(at.getEntityId());
+				Integer userId = userDao.userIdFromEmail(con,
+						at.getEmail(), token.getDomain().getId());
 				if (userId != null) {
 					dev.setInt(1, databaseId.getObmId());
 					dev.setInt(2, userId);

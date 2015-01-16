@@ -38,7 +38,6 @@ import java.util.Set;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
-import org.obm.sync.dao.EntityId;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -60,8 +59,6 @@ public interface UserDao {
 
 	ObmUser getByExtIdWithGroups(UserExtId userExtId, ObmDomain domain) throws SQLException, UserNotFoundException;
 
-	Integer findUserIdByEntityId(EntityId entityId) throws DaoException;
-
 	List<ObmUser> list(ObmDomain domain) throws SQLException;
 
 	ObmUser create(ObmUser user) throws SQLException, DaoException;
@@ -79,5 +76,4 @@ public interface UserDao {
 	Set<String> getAllEmailsFrom(ObmDomain domain, UserExtId toIgnore) throws SQLException;
 
 	String getUniqueObmDomain(String userLogin) throws DomainNotFoundException;
-
 }
