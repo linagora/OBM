@@ -482,15 +482,16 @@ sub _imapSetMailboxAcls {
     my $isRootMailbox = 1;
     my $errors = 0;
     my $archiveAclList;
-    my $archiveMailboxFolder = $self->_findArchiveMailboxFolder($entity->getDomainId());
-    if (!defined $archiveMailboxFolder) {
+    my $archiveMailboxFolderStruct = $self->_findArchiveMailboxFolder($entity->getDomainId());
+    if (!defined $archiveMailboxFolderStruct) {
         $self->_log("Impossible de recuperer le nom du dossier d'archivage", 1);
         return 1;
     }
+    my $archiveMailboxFolder = $archiveMailboxFolderStruct->{archiveMailboxFolder};
     foreach my $boxStruct(@boxStructs) {
         my $mailboxPath = $boxStruct->[0];
         my $currentNewAclList;
-        if ($self->_isArchiveMailbox($mailboxPath, $archiveMailboxFolder)) {
+        if (defined $archiveMailboxFolder && $self->_isArchiveMailbox($mailboxPath, $archiveMailboxFolder)) {
             $self->_log("$mailboxPath is an archive mailbox", 3);
             if (!(defined $archiveAclList)) {
                 $archiveAclList = $self->_buildArchiveAclList($newAclList);
@@ -524,6 +525,7 @@ sub _findArchiveMailboxFolder {
         $self->_log( 'connexion à la base de données impossible', 1 );
         return undef;
     }
+
     my $query = "SELECT mail_archive_main_folder ".
         "FROM mail_archive JOIN domain ON domain_uuid = mail_archive_domain_uuid ".
         "WHERE domain_id=?";
@@ -534,11 +536,20 @@ sub _findArchiveMailboxFolder {
     my ($archiveMailboxFolder) = $sth->fetchrow_array();
     if (defined $archiveMailboxFolder) {
         if ($self->_isValidArchiveMailboxFolder($archiveMailboxFolder)) {
-            return $archiveMailboxFolder;
+            return { archiveMailboxFolder => $archiveMailboxFolder };
+        }
+        else {
+            return undef;
         }
     }
-    $self->_log("chargement de la configuration de l'archivage IMAP depuis la BD impossible (".$sth->errstr.")", 1);
-    return undef;
+    elsif ($sth->err) {
+        $self->_log("chargement de la configuration de l'archivage IMAP depuis la BD impossible (".$sth->errstr.")", 1);
+        return undef;
+    }
+    else {
+        $self->_log("L'archivage ne semble pas etre configure pour ce domaine", 2);
+        return { archiveMailboxFolder => undef };
+    }
 }
 
 sub _isValidArchiveMailboxFolder {
