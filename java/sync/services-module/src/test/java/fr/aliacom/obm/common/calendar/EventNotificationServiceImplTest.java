@@ -73,7 +73,6 @@ import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.server.mailer.EventChangeMailer;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.ServicesToolBox;
@@ -1198,46 +1197,5 @@ public class EventNotificationServiceImplTest {
 			assertThat(groups.get(AttendeeStateValue.REMOVED)).containsOnly(createRequiredAttendee("old@testing.org", Participation.accepted()));
 		}
 	}
-
-	public static class FilterAttendeesTests {
-
-		@Test
-		public void testFilterAttendees() {
-			Event event = new Event();
-			event.setOwnerEmail("owner@email");
-			Attendee owner = UserAttendee.builder().email("owner@email").build();
-			Attendee usera = UserAttendee.builder().email("usera@email").build();
-			Attendee userb = UserAttendee.builder().email("userb@email").build();
-			Set<Attendee> attendees = ImmutableSet.of(owner, usera, userb);
-
-			assertThat(EventNotificationServiceImpl.filterAttendees(event, attendees))
-					.containsExactly(usera, userb);
-		}
-
-		@Test
-		public void testFilterAttendeesNoOwner() {
-			Event event = new Event();
-			event.setOwnerEmail("owner@email");
-			Attendee usera = UserAttendee.builder().email("usera@email").build();
-			Attendee userb = UserAttendee.builder().email("userb@email").build();
-			Set<Attendee> attendees = ImmutableSet.of(usera, userb);
-
-			assertThat(EventNotificationServiceImpl.filterAttendees(event, attendees))
-					.containsExactly(usera, userb);
-		}
-
-		@Test
-		public void testFilterAttendeesNoEmail() {
-			Event event = new Event();
-			event.setOwnerEmail("owner@email");
-			Attendee owner = UserAttendee.builder().email("owner@email").build();
-			Attendee usera = UserAttendee.builder().email("usera@email").build();
-			Attendee userNoEmail = UserAttendee.builder().build();
-			Set<Attendee> attendees = ImmutableSet.of(owner, usera, userNoEmail);
-
-			assertThat(EventNotificationServiceImpl.filterAttendees(event, attendees))
-					.containsExactly(usera);
-		}
-
-	}
+	
 }

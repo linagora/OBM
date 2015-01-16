@@ -385,13 +385,12 @@ public class EventNotificationServiceImpl implements EventNotificationService {
 				AttendeeStateValue.ADDED, addedAttendees);
 	}
 	
-	@VisibleForTesting static Collection<Attendee> filterAttendees(final Event event, Collection<Attendee> attendees) {
+	private Collection<Attendee> filterAttendees(final Event event, Collection<Attendee> attendees) {
 		return FluentIterable.from(attendees)
 					.filter(new Predicate<Attendee>() {
 						@Override
 						public boolean apply(Attendee attendee) {
-							String attendeeEmail = attendee.getEmail();
-							return attendeeEmail!= null && !attendeeEmail.equalsIgnoreCase(event.getOwnerEmail());
+							return !attendee.getEmail().equalsIgnoreCase(event.getOwnerEmail());
 						}
 					})
 					.filter(Predicates.not(Predicates.instanceOf(ResourceAttendee.class)))
