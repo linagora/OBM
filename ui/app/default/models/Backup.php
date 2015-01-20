@@ -250,10 +250,9 @@ class Backup {
   protected function restoreUser($data,$method='') {
 
     //calendar data to restore
-    $domain_id = $this->details['realm_id'];
     if ($data['calendar']) {
       if (empty($method) || $method=='all' || $method=='calendar')
-        $this->user_vcalendar_import($data['calendar'], $this->details['id'], $domain_id);
+        $this->user_vcalendar_import($data['calendar'], $this->details['id']);
     }
 
     //contacts data to restore
@@ -342,7 +341,7 @@ class Backup {
   /**
    * Perform the import of the vcalendar
    */
-  private function user_vcalendar_import($fd, $user_id, $domain_id) {
+  private function user_vcalendar_import($fd,$user_id) {
     include_once('php/calendar/calendar_query.inc');
     include_once('php/calendar/event_observer.php');
     include_once('obminclude/lib/Solr/Document.php');
@@ -352,9 +351,7 @@ class Backup {
     include_once('obminclude/of/vcalendar/reader/ICS.php');
 
     $remember_uid = $GLOBALS['obm']['uid'];
-    $remember_domain_id = $GLOBALS['obm']['domain_id'];
     $GLOBALS['obm']['uid'] = $user_id; // some kind of sudo $user_id
-    $GLOBALS['obm']['domain_id'] = $domain_id; // if admin0 restores the user
 
     //reset calendar
     run_query_calendar_reset($user_id,array('delete_meeting' => true));
@@ -367,7 +364,6 @@ class Backup {
     $document->destroy();
 
     $GLOBALS['obm']['uid'] = $remember_uid;
-    $GLOBALS['obm']['domain_id'] = $remember_domain_id;
   }
 
   /**
