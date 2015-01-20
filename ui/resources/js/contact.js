@@ -157,15 +157,15 @@ Obm.Contact.AddressBook = new Class ({
 
   storeContact: function(form, id) {
     var self = this;
+    var lastname = form.lastname.value.trim();
     function callback(contacts) {
 
-      if ( contacts.length <= 0 || form.lastname.value != '') {
-        if (confirm(obm.vars.labels.confirmAddHomonym)) {
-          self.storeContactRequest(form);
-        }
-      }
+      if (contacts.length <= 0  || confirm(obm.vars.labels.confirmAddHomonym)) {
+	self.storeContactRequest(form);
+      } 
     }
-    if (id != '' || form.lastname.value == '') {
+
+    if (id != '' || lastname.length == 0) {
       $('informationGrid').show();
       this.storeContactRequest(form);
     } else {
