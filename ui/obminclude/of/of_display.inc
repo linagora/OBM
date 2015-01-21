@@ -1144,7 +1144,7 @@ function display_head($p_module, $standard=true) {
   } else {
     $stylecss .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css?version=$obm_version\" />";
   }
-  $set_top_bar = ($_SESSION['set_top_bar'] && $_SESSION['set_theme'] == 'default') ? true : false;
+  $set_top_bar = ($_SESSION['set_top_bar'] == 'yes' && $_SESSION['set_theme'] == 'default');
 
   if($standard) {
     $headers_e .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
@@ -1202,7 +1202,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.conf = new Object();
   obm.initialize = new Chain();
   obm.resize = new Chain();
-  obm.vars.newTopbar = '$set_top_bar';
+  obm.vars.newTopbar = ".($set_top_bar ? 'true' : 'false').";
   obm.vars.images.minus = '$ico_minus';
   obm.vars.images.plus = '$ico_plus';
   obm.vars.images.datePicker = '$ico_datepicker';
