@@ -167,7 +167,9 @@ public class DryRunImapArchiveProcessingTest {
 		expectLastCall().times(2);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(5);
+			.andReturn(storeClient);
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+			.andReturn(storeClient).times(4);
 		
 		control.replay();
 		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));

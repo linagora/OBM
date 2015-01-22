@@ -166,7 +166,7 @@ CREATE TABLE userentity (
 
 INSERT INTO host (host_domain_id, host_name, host_ip, host_fqdn)
   VALUES
-    (1, 'mail', '1.2.3.4', 'mail.tlse.lng');
+    (1, 'mail', '127.0.0.1', 'localhost');
 
 INSERT INTO domain (domain_name, domain_uuid, domain_label, domain_global) 
   VALUES 

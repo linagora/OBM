@@ -204,7 +204,9 @@ public class ImapArchiveProcessingTest {
 		expectLastCall().times(2);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(5);
+			.andReturn(storeClient);
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+			.andReturn(storeClient).times(4);
 		
 		control.replay();
 		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
@@ -277,7 +279,9 @@ public class ImapArchiveProcessingTest {
 		expectLastCall().times(3);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(3);
+			.andReturn(storeClient);
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+			.andReturn(storeClient).times(2);
 		
 		control.replay();
 		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
@@ -332,7 +336,9 @@ public class ImapArchiveProcessingTest {
 		expectLastCall().times(2);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(3);
+			.andReturn(storeClient);
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+			.andReturn(storeClient).times(2);
 		
 		control.replay();
 		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
@@ -427,7 +433,9 @@ public class ImapArchiveProcessingTest {
 		expectLastCall().times(3);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(3);
+			.andReturn(storeClient);
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+			.andReturn(storeClient).times(2);
 		
 		control.replay();
 		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
@@ -513,7 +521,9 @@ public class ImapArchiveProcessingTest {
 		expectLastCall().times(2);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(5);
+			.andReturn(storeClient);
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+			.andReturn(storeClient).times(4);
 		
 		expectedException.expectCause(ImapArchiveProcessingException.class);
 		
@@ -587,7 +597,9 @@ public class ImapArchiveProcessingTest {
 		expectLastCall().times(2);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(5);
+			.andReturn(storeClient);
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+			.andReturn(storeClient).times(4);
 		
 		// Continuing previous treatment
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
@@ -613,7 +625,9 @@ public class ImapArchiveProcessingTest {
 		expectImapCommandsOnAlreadyProcessedMailbox("user/usera/SPAM@mydomain.org", treatmentDate, higherBoundary, runId, secondRunId, 100, storeClient);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(5);
+			.andReturn(storeClient);
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+			.andReturn(storeClient).times(4);
 		storeClient.login(false);
 		expectLastCall();
 		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
@@ -683,7 +697,9 @@ public class ImapArchiveProcessingTest {
 		expectLastCall().times(2);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(3);
+			.andReturn(storeClient);
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+			.andReturn(storeClient).times(2);
 		
 		control.replay();
 		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
@@ -907,7 +923,9 @@ public class ImapArchiveProcessingTest {
 		expectLastCall().times(2);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient).times(3);
+			.andReturn(storeClient);
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+			.andReturn(storeClient).times(2);
 		
 		control.replay();
 		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
@@ -1248,7 +1266,7 @@ public class ImapArchiveProcessingTest {
 				.archiveMainFolder("arChive")
 				.build();
 		
-		expect(storeClientFactory.create(domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
 			.andReturn(storeClient);
 		
 		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
@@ -1300,7 +1318,7 @@ public class ImapArchiveProcessingTest {
 			.excludedFolder("Excluded")
 			.build();
 		
-		expect(storeClientFactory.create(domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
 			.andReturn(storeClient);
 		
 		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
@@ -1465,7 +1483,7 @@ public class ImapArchiveProcessingTest {
 				.archiveMainFolder(archiveMainFolder)
 				.build();
 		
-		expect(storeClientFactory.create(domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
 			.andReturn(storeClient);
 
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
@@ -1520,7 +1538,7 @@ public class ImapArchiveProcessingTest {
 				.archiveMainFolder("arChive")
 				.build();
 		
-		expect(storeClientFactory.create(domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
 			.andReturn(storeClient);
 
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
@@ -1771,7 +1789,7 @@ public class ImapArchiveProcessingTest {
 				.archiveMainFolder("arChive")
 				.build();
 		
-		expect(storeClientFactory.create(domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
 			.andReturn(storeClient);
 		
 		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(

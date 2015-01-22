@@ -69,6 +69,7 @@ import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.imap.archive.mailbox.MailboxPaths;
 import org.obm.imap.archive.mailbox.TemporaryMailbox;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.mail.bean.ListInfo;
@@ -190,8 +191,14 @@ public class ImapArchiveProcessing {
 			if (!maybeUserName.isPresent()) {
 				continue;
 			}
-			if (!processUser(maybeUserName.get(), processedTask)) {
-				isSuccess = false;
+			
+			String user = maybeUserName.get();
+			try {
+				if (!processUser(user, processedTask)) {
+					isSuccess = false;
+				}
+			} catch (UserNotFoundException e) {
+				logger.warn("User {} not found in OBM database", user);
 			}
 		}
 		return isSuccess;
@@ -202,7 +209,7 @@ public class ImapArchiveProcessing {
 		Logger logger = processedTask.getLogger();
 		for (ListInfo listInfo : listImapFolders(user, processedTask)) {
 			try {
-				processMailbox(MailboxImpl.from(listInfo.getName(), logger, storeClientFactory.create(processedTask.getDomain().getName())), 
+				processMailbox(MailboxImpl.from(listInfo.getName(), logger, storeClientFactory.createOnUserBackend(user, processedTask.getDomain())), 
 						processedTask);
 			} catch (Exception e) {
 				logger.error("Error on archive treatment: ", e);
@@ -421,7 +428,7 @@ public class ImapArchiveProcessing {
 	
 	@VisibleForTesting ImmutableList<ListInfo> listImapFolders(final String user, final ProcessedTask processedTask) throws Exception {
 		ObmDomain domain = processedTask.getDomain();
-		try (StoreClient storeClient = storeClientFactory.create(domain.getName())) {
+		try (StoreClient storeClient = storeClientFactory.createOnUserBackend(user, domain)) {
 			storeClient.login(false);
 			
 			return FluentIterable.from(storeClient.listAll(USERS_REFERENCE_NAME + "/" + user, ALL_MAILBOXES_NAME))
