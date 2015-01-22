@@ -87,7 +87,7 @@ class OBM_DISPLAY {
   function OBM_DISPLAY($type, $pref, $module, $entity='', $name='') {
     global $params;
 
-    if ( ($type != 'PREFERENCES') &&
+    if ( ($type != 'PREFERENCES') && 
 	($type != 'DATA') ) {
       die('ERROR: the type MUST be PREFERENCES or DATA');
     } else {
@@ -109,7 +109,7 @@ class OBM_DISPLAY {
     }
     $this->sql_order_dir = ($params['sql_order_dir'] == 'DESC' ? 'DESC' : 'ASC');
   }
-
+  
   /////////////////////////////////////////////////////////////////////////////
   // OBM_DISPLAY main display function
   /////////////////////////////////////////////////////////////////////////////
@@ -157,7 +157,7 @@ class OBM_DISPLAY {
     // Images
     global $ico_arrow_mount, $ico_arrow_umount, $ico_nok;
     global $fieldnames, $cgp_hide, $ico_ok, $ico_lock;
-
+    
     $nb_field = count($this->display_pref) - 1;
 
     // actions names
@@ -210,7 +210,7 @@ class OBM_DISPLAY {
       if ($cgp_hide[$entity][$fieldname]
 	  || $cgp_hide[$entity][$fieldname_base] || !isset($fieldnames[$fieldname])) {
 	$td_class = 'resultPrefHide';
-      }
+      } 
       if($i%2 == 0) {
         $class = "class=\"pair\"";
       } else {
@@ -257,7 +257,7 @@ class OBM_DISPLAY {
         <a href=\"$url?action=$action_level&amp;entity=$entity&amp;fieldname=$fieldname&amp;fieldorder=$sql_order_field\">
         <img alt=\"$l_down\" src=\"$ico_arrow_umount\" /></a>";
       }
-
+      
       // If first field we don't display the up arrow
       if ($i != 0) {
         $sql_order_field = $fieldorder - 1;
@@ -346,8 +346,8 @@ class OBM_DISPLAY {
       }
       if (!$rowstyle && $cpt%2 == 0) {
         $rowstyle = "class='pair'";
-      }
-
+      } 
+      
       $cpt++;
       $block .= "<tr $rowstyle>";
 
@@ -372,7 +372,7 @@ class OBM_DISPLAY {
 	  if (function_exists($dis_data_entity)) {
 	    $data_element = $dis_data_entity($this, 'data_element', $link_ok);
 	    $data_element = $data_element['name'];
-	  }
+	  }	  
 	  $block .= "<td $style>
                 <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check />$data_element </td>";
 	}
@@ -418,7 +418,7 @@ class OBM_DISPLAY {
 	  else if ($fieldname == 'timecreate') {
 	    $name = of_datetime_format($this->data_set->f($fieldname), 1);
 	  }
-
+	  
 	  //--------------------------------------------------
 	  // We call module specific field display disposition
 	  //--------------------------------------------------
@@ -437,12 +437,12 @@ class OBM_DISPLAY {
             if(!$this->footer_data[$fieldname]) $this->footer_data[$fieldname] = '';
             $func = $this->dis_data_footer;
             $func($this, $fieldname, $link_ok);
-	  }
+	  }	 
 	  //--------------------------------------------------
 	  // Column display
 	  //--------------------------------------------------
 	  $content = '';
-
+	  
 	  // Set the style
 	  if ($style != '') {
 	    $td = "<td $style>";
@@ -453,7 +453,7 @@ class OBM_DISPLAY {
 	  } else {
 	    $td = '<td>';
 	  }
-
+	  
 	  // Pre cell display (open popup, link)
 	  if ($popup) {
 	    $content = "<a href=\"#\" onclick=\"window.name='root';popup('$url',''); return false;\">";
@@ -462,15 +462,15 @@ class OBM_DISPLAY {
 	  } else if ($url != '') {
 	    $content = "<a href=\"".url_prepare("$url")."\">";
 	  }
-
+	
 	  // Cell display
 	  $content .= $name;
-
+	  
 	  // Post cell display (close link, popup)
 	  if ($popup || ($url != '')) {
 	    $content .= '</a>';
 	  }
-
+	  
 	  // Cell writing
 	  $block .= "$td $content </td>\n";
 	}
@@ -564,7 +564,7 @@ class OBM_DISPLAY {
       $user_results_limit = get_user_results_limit($obm['profile']);
       $nb_rows = min($user_results_limit, $this->data_set->num_rows_total());
     } else {
-      $nb_rows = $this->data_set->num_rows_total();
+      $nb_rows = $this->data_set->num_rows_total(); 
     }
     // If we delete all contacts of the last page, we must go to $page-1 (list)
     if ($lpage > 1) {
@@ -577,7 +577,7 @@ class OBM_DISPLAY {
     $first_row = ($lpage - 1) * $_SESSION['set_rows'];
     $start_page =  (floor(($lpage - 1) / $nb_page_dis) * $nb_page_dis) + 1;
     $end_page = $start_page + $nb_page_dis - 1;
-    $end_page = min ($end_page, $nb_page);
+    $end_page = min ($end_page, $nb_page); 
 
     if ($nb_rows < $_SESSION['set_rows']) {
       $export_rows = $nb_rows;
@@ -614,9 +614,9 @@ class OBM_DISPLAY {
 
     if ($module != 'people') {
       $content .="
-        <a href=\"#\" onclick=\"return exportResultSet_{$this_entity}_{$this_name}('$first_row','$export_rows');\" >$l_export</a>
+        <a href=\"#\" onclick=\"return exportResultSet_{$this_entity}_{$this_name}('$first_row','$export_rows');\" >$l_export</a>      
         <a href=\"#\" onclick=\"return exportResultSet_{$this_entity}_{$this_name}('0','$nb_rows');\" >$l_export_all</a>";
-    }
+    } 
 
     $content .= "$l_entries $nb_rows | $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
 
@@ -700,11 +700,11 @@ class OBM_DISPLAY {
     $entity = $this->display_entity;
     $this_name = $this->display_name;
     $sql_order_dir = $this->sql_order_dir;
-    $new_sql_order_dir = ($sql_order_dir == 'ASC' ? 'DESC' : 'ASC');
+    $new_sql_order_dir = ($sql_order_dir == 'ASC' ? 'DESC' : 'ASC'); 
     $block = "
       <thead>
     <tr>";
-
+    
     // If debug level Id is set, display the entity id
     if (($_SESSION['set_debug'] > 0) && (($_SESSION['set_debug'] & $cdg_id) == $cdg_id)) {
       $block .= "<td>$l_id</td>";
@@ -731,9 +731,9 @@ class OBM_DISPLAY {
       if (! ($cgp_hide[$entity][$fieldname]
 	     || $cgp_hide[$entity][$fieldname_base]) && isset($fieldnames[$fieldname])) {
 	$label = $fieldnames[$fieldname];
-
+  
         $img = '';
-        $onclick = '';
+        $onclick = ''; 
 	if ($this->data_order) {
 	  $furl = $url;
           if ($url != '') {
@@ -853,13 +853,13 @@ class OBM_DISPLAY {
 	  else if ($fieldname == 'timecreate') {
 	    $txt_name = of_datetime_format($this->data_set->f($fieldname));
 	  }
-
+	  
 	  //--------------------------------------------------
 	  // We call module specific field display disposition
 	  //--------------------------------------------------
 	  if (function_exists($dis_data_entity)) {
 	    $res = $dis_data_entity($this, $fieldname, $link_ok);
-	  }
+	  }	  
 
 	  if ($res['txt_name'] != '') {
 	    $name = $res['txt_name'];
@@ -905,8 +905,8 @@ function display_page(&$display) {
   // If a theme specif function is provided
   if (function_exists('display_page_theme')) {
     return display_page_theme($display);
-  }
-
+  }  
+  
   global $output_target, $ico_nav_close;
   global $ico_nav_open, $l_hide, $l_show;
   global $l_print,  $params;
@@ -920,22 +920,22 @@ function display_page(&$display) {
       die();
     }
   }
-
+  
   // If header is null, display only the detail (Popup windows)
   if ($display['header'] == '') {
-    echo $display['head'] .
+    echo $display['head'] . 
       "<span class='RF' id='spinner' style='display:none' ><img src='$GLOBALS[ico_spinner]' alt='' /></span>".
       $display['title'] .
-      $display['msg'] .
+      $display['msg'] . 
       "
       <div id=\"mainContent\">
       <div id=\"ajaxMessage\"></div>".
       $display['search'] .
-      $display['detail']."
+      $display['detail']." 
        <p class=\"LC\"></p>
        </div>
       ".
-      $display['result'] .
+      $display['result'] . 
       $display['end'];
 
     return;
@@ -943,7 +943,7 @@ function display_page(&$display) {
 
   echo $display['head'] . $display['header'] . "
     <!-- left panel -->
-    <div id=\"portletsPanel\">
+    <div id=\"portletsPanel\"> 
       <div id='portletsHandler'>
        <span>
         <img src='$ico_nav_close' alt='Hide this bar' />
@@ -951,12 +951,12 @@ function display_page(&$display) {
        <span id='portletsHandlerShow'>
         <img src='$ico_nav_open' alt='Show this bar' />
        </span>
-      </div>
-     <div id=\"portlets\">
+      </div>         
+     <div id=\"portlets\">          
       $display[todo]
-      $display[features]
-      $display[link]
-      $display[detailInfo]
+      $display[features] 
+      $display[link] 
+      $display[detailInfo] 
       $display[last]
      </div>
     </div>
@@ -967,7 +967,7 @@ echo "$display[title]
     $display[action]
     $display[msg]" ;
     if ($display['search'] != '' || $display['detail'] != '') {
-      echo
+      echo  
         "<div id=\"mainContent\">
          <div id=\"ajaxMessage\"></div>
         ".
@@ -981,8 +981,8 @@ echo "$display[title]
     <script type=\"text/javascript\">
       obm.portlets = new Obm.Portlets();
       obm.tip = new Obm.Tip($$('.obmTip'));
-    </script>
-    <!-- center zone end -->
+    </script>  
+    <!-- center zone end -->  
     ".$display['end'];
 
   if (isset($_SESSION['obm_message'])) {
@@ -1037,7 +1037,7 @@ function display_outframe(&$display) {
   // If a theme specif function is provided
   if (function_exists('display_outframe_theme')) {
     return display_outframe_theme($display);
-  }
+  }  
   echo $display['head'] . $display['header'] .$display['detail'];
 }
 
@@ -1056,7 +1056,7 @@ function show_topmenupopin() {
 		if (!isset($_SESSION['displayed_popin']) OR $_SESSION['displayed_popin'] != 1) {
 				return true;
 		}
-	}
+	} 
 	return false;
 }
 
@@ -1078,7 +1078,7 @@ function display_head($p_module, $standard=true) {
 			$_SESSION['set_top_bar'] = 'yes';
 		}
 	}
-
+	
   // If a theme specif function is provided
   if (function_exists('display_head_theme')) {
     return display_head_theme($module);
@@ -1173,7 +1173,7 @@ function display_head($p_module, $standard=true) {
     }
   }
 
-  return "$headers_e
+  return "$headers_e   
 <head>
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
   <meta http-equiv=\"X-UA-Compatible\" content=\"chrome=1\" />
@@ -1182,14 +1182,12 @@ function display_head($p_module, $standard=true) {
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_print_obm?version=$obm_version\" media=\"print\" />
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$resources_path/js/introjs/introjs.css\" />
   $dis_extra_css
-  <link rel=\"icon\" type=\"image/png\" href=\"$resources_path/themes/default/images/faviconOBM.png\" />
   <script type=\"text/javascript\" src=\"$resources_path/js/q.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/mootools-1.2-more.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/clientcide.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/css3-mediaqueries.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/introjs/intro.js\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/favico.min.js\" ></script>
   <script type=\"text/javascript\">
   //<![CDATA[
   var obm = Obm = {};
@@ -1251,7 +1249,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.userNotificationDelay = '".$_SESSION['notification_delay']."';
   $obm_vars
   // ]]>
-  </script>
+  </script> 
   <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/utils.js?version=$obm_version\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/obm.js?version=$obm_version\" ></script>
@@ -1368,7 +1366,7 @@ function display_menu($module) {
     /*
       function logout_roundcube() {
         var url = 'https://' + window.location.hostname + '/webmail/index.php?_task=logout';
-
+        
         var rcLogoutRequest = new Request({
           method: 'get',
           url: url,
@@ -1491,7 +1489,7 @@ function display_unified_menu($module) {
 
   array_push( $data["buttons"],
     array(
-      "name" => $l_section_more,
+      "name" => $l_section_more, 
       "idmore" => "moremenu_button",
       "url" => "#",
       "notifier" => false,
@@ -1633,7 +1631,7 @@ function display_modules($section, $module, $portlet = false) {
     foreach ($section_link as $mod) {
       $module_name = $modules[$mod]['Name'];
       $module_tooltip = $modules[$mod]['Tooltip'];
-      $module_right = $perm->get_module_rights($mod);
+      $module_right = $perm->get_module_rights($mod); 
       if (($module_right & $modules[$mod]['Right']) == $modules[$mod]['Right']) {
 	// XXX specifier une target au lien du module (non configurable
 	// actuellement car cgp_show[module][webmail] = valeur et non tableau
@@ -1681,11 +1679,11 @@ function display_actions($section, $module) {
   beautify_title($module, $action);
 
   if (is_array($actions[$module])) {
-    $module_right = $perm->get_module_rights($module);
-    $block = "<ul id=\"action\">";
+    $module_right = $perm->get_module_rights($module); 
+    $block = "<ul id=\"action\">"; 
     foreach ($actions[$module] as $key => $value) {
       // If the current action has this action in target
-      if (!in_array("!$action",$value['Condition'])
+      if (!in_array("!$action",$value['Condition']) 
         && (in_array('all', $value['Condition'])
 	|| in_array($action, $value['Condition']))) {
 	if (($module_right & $value['Right']) == $value['Right']) {
@@ -1697,8 +1695,8 @@ function display_actions($section, $module) {
 	      $wtarget = "window.name='" . $value['Target'] . "';";
 	    }
 	    $content = "
-              <a href=\"\"
-              title=\"".$value['tooltip']."\"
+              <a href=\"\" 
+              title=\"".$value['tooltip']."\" 
               onclick=\"$wtarget popup('".$value['Url']."',''); return false;\">
 	      ".$value['Name']."</a> &nbsp;";
 	  } else {
@@ -1710,8 +1708,8 @@ function display_actions($section, $module) {
 	}
       }
     }
-    $block .= "</ul>";
-
+    $block .= "</ul>"; 
+    
   }
 
   return $block;
@@ -1759,10 +1757,10 @@ function display_last_visited() {
   // Last created|updated event
   $obm_q = new DB_OBM;
   $cal_url = "$path/calendar/calendar_index.php?action=detailconsult&calendar_id=";
-  $query = "SELECT event_id, event_timeupdate, event_title
-    FROM Event
-    WHERE event_usercreate='$uid'
-      AND event_timeupdate = (SELECT max(event_timeupdate) FROM Event WHERE event_usercreate='$uid'
+  $query = "SELECT event_id, event_timeupdate, event_title 
+    FROM Event 
+    WHERE event_usercreate='$uid' 
+      AND event_timeupdate = (SELECT max(event_timeupdate) FROM Event WHERE event_usercreate='$uid' 
       AND event_type='VEVENT')";
   display_debug_msg($query, $cdg_sql, 'display_last_visited(Last created|updated event)');
   $obm_q->query($query);
@@ -1794,7 +1792,7 @@ function display_last_visited() {
       <img src=\"$GLOBALS[ico_calendar]\" alt=\"Calendar\" />$GLOBALS[l_module_calendar]</a></li>";
   }
   $block .= "
-  <div class=\"portlet\" id=\"lastVisitPortlet\">
+  <div class=\"portlet\" id=\"lastVisitPortlet\"> 
     <h1>$l_last_visit</h1>
     <ul>
     $dis_last
@@ -1852,7 +1850,7 @@ function display_todos($path='..') {
 ///////////////////////////////////////////////////////////////////////////////
 // Display : end of an HTML page
 ///////////////////////////////////////////////////////////////////////////////
-function display_end() {
+function display_end() { 
 
   // If a theme specif function is provided
   if (function_exists('display_end_theme')) {
@@ -1890,7 +1888,7 @@ function display_record_info($obm_q) {
     } else {
       $dis_dsrc = '';
     }
-
+    
     $block = "<div class=\"portlet\" id=\"recordPortlet\"><h1>$l_infos</h1>
       <ul>
       <li><img src=\"$ico_new\" alt=\"created by\"/> $created</li>
@@ -1926,13 +1924,13 @@ function display_debug() {
       $global_dis_debug_solr";
   }
 
-
+    
   if (debug_level_isset($cdg_param)) {
     $dis_debug_param = "
       <h1>$l_dg_param</h1>
       $global_dis_debug_param";
   }
-
+    
   if (debug_level_isset($cdg_sess)) {
     $dis_session_content = "
       <h1>$l_dg_sess</h1>
@@ -1943,7 +1941,7 @@ function display_debug() {
       <h1>$l_dg_custom</h1>
       $global_dis_debug_custom";
   }
-
+  
   if ($_SESSION['set_debug'] > 0) {
     return "
       <div class=\"debug\">".
@@ -1953,7 +1951,7 @@ function display_debug() {
       $dis_debug_param.
       $dis_debug_custom.
       "</div>";
-  } else {
+  } else { 
     return '';
   }
 }
@@ -1962,7 +1960,7 @@ function display_debug() {
 ///////////////////////////////////////////////////////////////////////////////
 // Display : title
 ///////////////////////////////////////////////////////////////////////////////
-function display_title($title) {
+function display_title($title) { 
 
   return "<div class=\"title\">$title</div>";
 }
@@ -1972,7 +1970,7 @@ function display_title($title) {
 ///////////////////////////////////////////////////////////////////////////////
 function beautify_title($module, $action) {
   global $actions, $display;
-
+  
   $mod_title = $GLOBALS["l_module_$module"];
   if(!empty($actions[$module][$action]['Title'])) {
     $act_title = '- '.$actions[$module][$action]['Title'].' ';
@@ -1984,7 +1982,7 @@ function beautify_title($module, $action) {
     $display['title'] = "<h1 class=\"title\">$mod_title $act_title</h1>";
   } else if ($display['title'] == strip_tags($display['title'])) {
     $display['title'] = "<h1 class=\"title\">$mod_title $act_title: $display[title]</h1>";
-  }
+  } 
 }
 
 
@@ -2002,7 +2000,7 @@ function display_ok_msg($msg, $special=true) {
     }
     $ret = "<p id=\"message_ok\" name=\"displayMessageOk\" class=\"message ok\">$msg</p>";
   }
-
+  
   return $ret;
 }
 
@@ -2021,7 +2019,7 @@ function display_info_msg($msg, $special=true) {
     }
     $ret = "<p name=\"displayMessageInfo\" class=\"message info\">$msg</p>";
   }
-
+  
   return $ret;
 }
 
@@ -2033,7 +2031,6 @@ function display_info_msg($msg, $special=true) {
 //   - $special : if true (default), html special chars just displayed
 ///////////////////////////////////////////////////////////////////////////////
 function display_warn_msg($msg, $special=true, $warning_class=NULL) {
-
   if ($msg != '') {
     if ($special) {
       $msg = htmlspecialchars($msg);
@@ -2044,7 +2041,7 @@ function display_warn_msg($msg, $special=true, $warning_class=NULL) {
     }
     $ret .= "\">$msg</p>";
   }
-
+  
   return $ret;
 }
 
@@ -2067,15 +2064,15 @@ function display_err_msg($msg, $special=true, $msg_class=NULL) {
     }
     $ret .= "\">$msg</p>";
   }
-
+  
   return $ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display document form
 // Parameters:
-//   - $params[] :
-//   - $label    :
+//   - $params[] : 
+//   - $label    :  
 ///////////////////////////////////////////////////////////////////////////////
 function display_document_form($params, $label='') {
   global $l_document;
@@ -2123,7 +2120,7 @@ function get_sections_data() {
   $data[] = array(
     "section_name" => "section-key",
     "name" => "section-name",
-    "links" => array(
+    "links" => array( 
       array( 'url' => "uri", "ico" => src_to_ico, "title" => "TxT", "tooltip" => "TxT"),
       array( 'url' => "uri", "ico" => src_to_ico, "title" => "TxT",  "tooltip" => "TxT"),
     )

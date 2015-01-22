@@ -712,6 +712,14 @@ function displayUnreadMail(count) {
   }
 }
 
+function displayInTitleTab(page, count){
+  var title = document.title;
+  if (window.location.pathname == '/' + page + '/' + page + '_index.php'){
+    title = title.split(')');
+    document.title = '(' + count + ') ' + title.pop();
+  }
+}
+
 function getWebmailUnreadMail(callback) {
   var r = new Request({
     url: obm.vars.consts.obmUrl+'/webmail/',
@@ -786,21 +794,6 @@ function resizeForBadges(elem, count){
     elem.getParent('li').setStyle('margin-right', '10px');
   } else {
     elem.getParent('li').setStyle('margin-right', '20px');
-  }
-}
-
-function displayInTitleTab(page, count){
-  var title = document.title;
-  var favicon = new Favico({
-    animation:'none',
-    bgColor : '#ef5a04',
-    textColor : '#ffffff',
-  });
-
-  if (window.location.pathname == '/' + page + '/' + page + '_index.php'){
-    title = title.split(' (');
-    document.title =  title[0]  + ' (' + count + ') ' ;
-    favicon.badge(count.toString());
   }
 }
 
