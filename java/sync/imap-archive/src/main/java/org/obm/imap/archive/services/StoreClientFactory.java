@@ -31,38 +31,67 @@
 
 package org.obm.imap.archive.services;
 
+import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
 import org.obm.locator.store.LocatorService;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.push.minig.imap.StoreClient.Factory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.system.ObmSystemUser;
+import fr.aliacom.obm.common.user.ObmUser;
 
 @Singleton
 public class StoreClientFactory {
 
 	private final LocatorService locatorService;
 	private final UserSystemDao userSystemDao;
+	private final UserDao userDao;
 	private final Factory storeClientFactory;
 
 	@Inject
-	private StoreClientFactory(LocatorService locatorService, UserSystemDao userSystemDao, StoreClient.Factory storeClientFactory) {
+	@VisibleForTesting StoreClientFactory(LocatorService locatorService, 
+			UserSystemDao userSystemDao, 
+			UserDao userDao, 
+			StoreClient.Factory storeClientFactory) {
+		
 		this.locatorService = locatorService;
 		this.userSystemDao = userSystemDao;
+		this.userDao = userDao;
 		this.storeClientFactory = storeClientFactory;
 	}
 	
 	public StoreClient create(String domainName) throws SystemUserNotFoundException, DaoException {
-		Preconditions.checkArgument(domainName != null);
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(domainName));
 		 
 		ObmSystemUser cyrusUser = userSystemDao.getByLogin(ObmSystemUser.CYRUS);
 		String cyrusAddress = locatorService.getServiceLocation("mail/imap_frontend", domainName);
 		return storeClientFactory.create(cyrusAddress, cyrusUser.getLogin(), cyrusUser.getPassword().getStringValue().toCharArray());
-     }
+	}
+	
+	public StoreClient createOnUserBackend(String user, ObmDomain domain) throws SystemUserNotFoundException, DaoException, UserNotFoundException {
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(user));
+		Preconditions.checkArgument(domain != null);
+		 
+		ObmSystemUser cyrusUser = userSystemDao.getByLogin(ObmSystemUser.CYRUS);
+		return storeClientFactory.create(cyrusBackendFor(user, domain), cyrusUser.getLogin(), cyrusUser.getPassword().getStringValue().toCharArray());
+	}
+	
+	private String cyrusBackendFor(String user, ObmDomain domain) throws UserNotFoundException {
+		ObmUser userObm = userDao.findUserByLogin(user, domain);
+		if (userObm == null) {
+			throw new UserNotFoundException(String.format("User %s on domain %s not found in OBM database", user, domain.getName()));
+		}
+		
+		return userObm.getUserEmails().getServer().getIp();
+	}
 }
