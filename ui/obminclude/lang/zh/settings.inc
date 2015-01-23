@@ -55,6 +55,3 @@ $l_csvd_tab = "tab键";  //"tab"
 $l_with_weekend = "包括周末";  //"Including week-end"
 $l_without_weekend = "不包括周末";  //"Without including week-end"
 $l_set_public_fb = "公开您的忙/闲信息";  //"Publicize your free/busy information"
-
-$l_set_topbar = "启用统一OBM顶栏";
-$l_browser_notification = "添加桌面通知弹出的事件和邮件 (不兼容的 Internet Explorer)";

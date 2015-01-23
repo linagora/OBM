@@ -566,7 +566,6 @@ $l_of_right_err_share_resource = "Le partage de l'agenda d'une resource nécessi
 // Home page portlets
 //---------------------------------------------------------------------------//
 $l_waiting_events = "Evénement(s) en attente";
-$l_unread_mails = "Mail(s) non lu(s)";
 $l_unfilled = "Jour(s) non remplis";
 $l_my_calendar = "Mon agenda";
 $l_my_time = "Ma gestion du temps";
@@ -627,7 +626,6 @@ $l_resource_found_error = "ressource(s) de ce type trouvée(s), vous devez au pr
 $l_popin_message = "OBM 3 a un nouveau menu! Voulez-vous l'essayer ?";
 $l_popin_activation_button = "Essayer";
 $l_close_popin_button = "Je ne suis pas interressé.";
-$l_desktop_notification_title = "Notification OBM";
 
 $l_intro_next = "Suivant";
 $l_intro_previous = "Précédent";

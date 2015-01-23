@@ -489,7 +489,6 @@ $l_of_right_err_user = "Insufficient rights on users !";
 $l_of_right_err_resource = "Insufficient rights on resources !";
 $l_of_right_err_share_resource = "You are not allowed to share the calendar of this resource if it has not at least the public read right. Please upgrade its rights.";
 $l_waiting_events = "Waiting event(s)";
-$l_unread_mails = "Unread mail(s)";
 $l_unfilled = "Day(s) unfilled";
 $l_my_calendar = "My calendar";
 $l_my_time = "My time management";
@@ -543,7 +542,6 @@ $l_resource_found_error = "resource(s) of this type found, you should first remo
 $l_popin_message = "Hey ! New top bar is awesome, try it ?";
 $l_popin_activation_button = "New Top Bar";
 $l_close_popin_button = "Don't show this again.";
-$l_desktop_notification_title = "OBM Notification";
 
 $l_intro_next = "Next";
 $l_intro_previous = "Back";

@@ -35,7 +35,6 @@ $l_send_mail = "Accept meeting invitation emails";
 $l_send_mail_participation = "Accept meeting participation emails";
 
 $l_set_topbar = "Enable the unified OBM Topbar";
-$l_browser_notification = "Add a desktop notification popup for events and mails (Not supported by Internet Explorer)";
 
 $l_update_ok = "Settings updated successfully";
 

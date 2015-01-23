@@ -482,7 +482,6 @@ $l_of_right_err_user = "Không có đủ Quyền trên người sử dụng!";
 $l_of_right_err_resource = "Không có đủ quyền về các nguồn tài nguyên!";
 $l_of_right_err_share_resource = "Bạn không được phép chia lịch làm việc của những người này nếu nó không được cấp quyền cho tất cả cùng đọc. Vui lòng nâng cấp quyền cho nó.";
 $l_waiting_events = "Các sự kiện đang chờ";
-$l_unread_mails = "mail chưa đọc";
 $l_unfilled = "Những ngày bỏ trống";
 $l_my_calendar = "Lịch của tôi";
 $l_my_time = "Quản lý thời gian";
@@ -541,7 +540,6 @@ $l_resource_found_error = "Tài nguyên của loại này được tìm thấy, 
 $l_popin_message = " Hi ! Một thanh công cụ rất hữu ích, dùng thử ngay? ";
 $l_popin_activation_button = "Thanh công cụ mới";
 $l_close_popin_button = "Không hiển thị nữa.";
-$l_desktop_notification_title = "OBM thông báo";
 
 $l_intro_next = "Tiếp";
 $l_intro_previous = "Trở lại";

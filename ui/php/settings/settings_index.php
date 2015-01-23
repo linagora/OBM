@@ -151,11 +151,6 @@ if ($params['form_user_pref']) {
   }
   update_user_pref($obm['uid'], 'set_mail_participation', $_SESSION['set_mail_participation']);
 
-  if ($params['notification_delay'] != '') {
-    $_SESSION['notification_delay'] = $params['notification_delay'];
-    update_user_pref($obm['uid'], 'notification_delay', $_SESSION['notification_delay']);
-  }
-
   // days to display in the week view
   if ($params['display_days']=='0000000') {
     $params['display_days'] = '1111111';
@@ -376,31 +371,6 @@ $topbar_display_block = is_global_admin() ? "" : "<tr id='settings_new_topbar'>
   </td>
 </tr>";
 
-$sel_alert = "<select name=\"notification_delay\">
-      <option value=\"".addslashes($c_none)."\">$l_none_f</option>";
-$user_alert = $ccalendar_alerts;
-
-if ($selected_alert && $selected_alert != $c_none && !($_SESSION['notification_delay'])) {
-  $user_alert[$selected_alert] = Of_Date::secondToString($selected_alert);
-}
-
-foreach ($user_alert as $alert_sec => $alert_label) {
-  if ($alert_sec >= 300 && $alert_sec <= 18000) {
-    if(!$alert_label) $alert_label = Of_Date::secondToString($alert_sec);
-    $sel_alert .= "<option value=\"".addslashes($alert_sec)."\"";
-    if ($alert_sec == $_SESSION['notification_delay']) {
-      $sel_alert .= " selected=\"selected\"";
-    }
-    $sel_alert .= ">".addslashes($alert_label)."</option>";
-  }
-}
-$sel_alert .= '</select></tr>';
-
-$notification_display_block = "<tr id=\"browser_notification_delay\">
-  <th>$l_browser_notification</th>
-  <td>" . $sel_alert . "</td>
-  </tr>";
-
 $display['detail'] .= "
 <!--User preferences current config -->
 
@@ -414,10 +384,7 @@ $display['detail'] .= "
       <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_txt\" $me_txt />$l_me_txt</label></span>
       <span class=\"NW\"><label><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_both\" $me_both />$l_me_both</label></span>
     </td>
-  </tr>
-  $topbar_display_block 
-  $notification_display_block
-  <tr id='settings_autoDispay'>
+  </tr>$topbar_display_block<tr id='settings_autoDispay'>
     <th><label for=\"lbl_auto_display\">$l_auto_display</label></th>
     <td>
       <input type=\"checkbox\" class=\"box\" id=\"lbl_auto_display\" name=\"display\" value=\"yes\" ";

@@ -34,7 +34,6 @@ $l_send_mail = "Accepter les notifications d'invitation par e-mail";
 $l_send_mail_participation = "Accepter les notifications de participation par e-mail";
 
 $l_set_topbar = "Activer la nouvelle barre de menu d'OBM";
-$l_browser_notification = "Ajouter une notification de bureau pour les évènements et les emails (incompatible Internet Explorer)";
 
 // Dates format
 $l_da_iso = "aaaa-mm-jj";

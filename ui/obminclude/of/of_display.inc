@@ -1243,10 +1243,6 @@ function display_head($p_module, $standard=true) {
   obm.vars.labels.intro.done = '".phpStringToJsString($GLOBALS['l_intro_done'])."';
   obm.vars.labels.intro.next = '".phpStringToJsString($GLOBALS['l_intro_next'])."';
   obm.vars.labels.intro.previous = '".phpStringToJsString($GLOBALS['l_intro_previous'])."';
-  obm.vars.labels.l_waiting_events = '".phpStringToJsString($GLOBALS['l_waiting_events'])."';
-  obm.vars.labels.l_unread_mails = '".phpStringToJsString($GLOBALS['l_unread_mails'])."';
-  obm.vars.labels.l_desktop_notification_title = '".phpStringToJsString($GLOBALS['l_desktop_notification_title'])."';
-  obm.vars.userNotificationDelay = '".$_SESSION['notification_delay']."';
   $obm_vars
   // ]]>
   </script> 
@@ -1271,7 +1267,6 @@ function display_head($p_module, $standard=true) {
   obm.initialize.chain(refreshUnreadMail);
   setInterval(refreshUnreadMail,300000);
   setInterval(refreshWaitEvent,300000);
-  setInterval(browserNotificationGetters,300000);
   window.addEvent('load', function () {
     while(obm.initialize.\$chain && obm.initialize.\$chain.length > 0) {
       obm.initialize.callChain();
