@@ -205,7 +205,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient).times(4);
 		
 		control.replay();
@@ -280,7 +280,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient).times(2);
 		
 		control.replay();
@@ -337,7 +337,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient).times(2);
 		
 		control.replay();
@@ -434,7 +434,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient).times(2);
 		
 		control.replay();
@@ -522,7 +522,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient).times(4);
 		
 		expectedException.expectCause(ImapArchiveProcessingException.class);
@@ -598,7 +598,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient).times(4);
 		
 		// Continuing previous treatment
@@ -626,7 +626,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient).times(4);
 		storeClient.login(false);
 		expectLastCall();
@@ -698,7 +698,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient).times(2);
 		
 		control.replay();
@@ -924,7 +924,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(storeClientFactory.create(domain.getName()))
 			.andReturn(storeClient);
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient).times(2);
 		
 		control.replay();
@@ -1266,7 +1266,7 @@ public class ImapArchiveProcessingTest {
 				.archiveMainFolder("arChive")
 				.build();
 		
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient);
 		
 		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
@@ -1318,7 +1318,7 @@ public class ImapArchiveProcessingTest {
 			.excludedFolder("Excluded")
 			.build();
 		
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient);
 		
 		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
@@ -1483,7 +1483,7 @@ public class ImapArchiveProcessingTest {
 				.archiveMainFolder(archiveMainFolder)
 				.build();
 		
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient);
 
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
@@ -1538,7 +1538,7 @@ public class ImapArchiveProcessingTest {
 				.archiveMainFolder("arChive")
 				.build();
 		
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient);
 
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
@@ -1789,7 +1789,7 @@ public class ImapArchiveProcessingTest {
 				.archiveMainFolder("arChive")
 				.build();
 		
-		expect(storeClientFactory.createOnUserBackend("usera", domain.getName()))
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient);
 		
 		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(

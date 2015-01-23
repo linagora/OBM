@@ -32,6 +32,7 @@ package org.obm.imap.archive.startup;
 
 import org.obm.ElementNotFoundException;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.domain.dao.DomainDao;
 import org.obm.imap.archive.ImapArchiveModule.LoggerModule;
 import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.DomainConfiguration;
@@ -39,12 +40,11 @@ import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
-import org.obm.imap.archive.services.DomainClient;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
@@ -59,7 +59,7 @@ public class RestoreTasksOnStartupService {
 	private final ArchiveTreatmentDao archiveTreatmentDao;
 	private final ArchiveDomainTaskFactory taskFactory;
 	private final DomainConfigurationDao configurationDao;
-	private final DomainClient domainClient;
+	private final DomainDao domainDao;
 
 	@Inject
 	@VisibleForTesting RestoreTasksOnStartupService(
@@ -68,17 +68,17 @@ public class RestoreTasksOnStartupService {
 			ArchiveTreatmentDao archiveTreatmentDao,
 			DomainConfigurationDao configurationDao,
 			ArchiveDomainTaskFactory taskFactory,
-			DomainClient domainClient) {
+			DomainDao domainDao) {
 		this.logger = logger;
 		this.scheduler = scheduler;
 		this.archiveTreatmentDao = archiveTreatmentDao;
 		this.configurationDao = configurationDao;
 		this.taskFactory = taskFactory;
-		this.domainClient = domainClient;
+		this.domainDao = domainDao;
 	}
 	
 	@Transactional
-	public void restoreScheduledTasks() throws DaoException, ElementNotFoundException {
+	public void restoreScheduledTasks() throws DaoException, ElementNotFoundException, DomainNotFoundException {
 		for (ArchiveTreatment treatment: archiveTreatmentDao.findAllScheduledOrRunning()) {
 			switch (treatment.getArchiveStatus()) {
 			case SCHEDULED:
@@ -95,13 +95,13 @@ public class RestoreTasksOnStartupService {
 		}
 	}
 
-	private void reSchedule(ArchiveTreatment treatment) throws DaoException {
+	private void reSchedule(ArchiveTreatment treatment) throws DaoException, DomainNotFoundException {
 		logger.info("Re-schedule task uuid:{} for domain:{} at:{}", 
 				treatment.getRunId().serialize(), treatment.getDomainUuid().get(), treatment.getScheduledTime());
 		
-		Optional<ObmDomain> domain = domainClient.getById(treatment.getDomainUuid());
+		ObmDomain domain = domainDao.findDomainByUuid(treatment.getDomainUuid());
 		
-		DomainConfiguration domainConfiguration = configurationDao.get(domain.get());
+		DomainConfiguration domainConfiguration = configurationDao.get(domain);
 		scheduler.schedule(taskFactory.createAsRecurrent(
 				domainConfiguration, 
 				treatment.getScheduledTime(), 

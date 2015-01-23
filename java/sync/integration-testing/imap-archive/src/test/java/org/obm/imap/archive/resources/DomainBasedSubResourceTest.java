@@ -30,8 +30,6 @@
 
 package org.obm.imap.archive.resources;
 
-import static com.github.restdriver.clientdriver.RestClientDriver.giveEmptyResponse;
-import static com.github.restdriver.clientdriver.RestClientDriver.onRequestTo;
 import static com.jayway.restassured.RestAssured.given;
 import static org.obm.imap.archive.DBData.admin;
 import static org.obm.imap.archive.DBData.domain;
@@ -107,11 +105,6 @@ public class DomainBasedSubResourceTest {
 	
 	@Test
 	public void getDomainConfigurationShouldReturnNotFoundOnAbsentDomain() {
-		driver.addExpectation(
-				onRequestTo("/obm-sync/provisioning/v1/domains/56077db7-ffdc-4e47-8fdd-40c69884bee6"),
-				giveEmptyResponse().withStatus(Status.NOT_FOUND.getStatusCode())
-				);
-		
 		given()
 			.port(server.getHttpPort())
 			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).

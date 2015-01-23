@@ -137,8 +137,7 @@ public class TreatmentsResourceTest {
 	@Test
 	public void calculateNextScheduledDateShouldReturnNoContentWhenConfigurationInactive() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		server.start();
 		
@@ -169,8 +168,7 @@ public class TreatmentsResourceTest {
 	@Test
 	public void calculateNextScheduledDateShouldReturnNextTreatmentDateWhenConfigurationActive() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		server.start();
 		
@@ -203,8 +201,7 @@ public class TreatmentsResourceTest {
 	@Test
 	public void startArchivingShouldReturnNotFoundWhenNoConfiguration() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		server.start();
 		
@@ -221,8 +218,7 @@ public class TreatmentsResourceTest {
 	@Test
 	public void startArchivingShouldReturnConflictWhenConfigurationIsDisable() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.DISABLE)));
@@ -242,8 +238,7 @@ public class TreatmentsResourceTest {
 	@Test
 	public void startArchivingShouldCreate() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
@@ -267,9 +262,7 @@ public class TreatmentsResourceTest {
 	public void startArchivingShouldRedirect() throws Exception {
 		expectations
 			.expectTrustedLogin(domain)
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
@@ -292,9 +285,7 @@ public class TreatmentsResourceTest {
 	public void startArchivingShouldProcessARealRunWhenMissingArchiveTreatmentKind() throws Exception {
 		expectations
 			.expectTrustedLogin(domain)
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
@@ -326,9 +317,7 @@ public class TreatmentsResourceTest {
 	public void startArchivingShouldProcessADryRunWhenArchiveTreatmentKindIsDry() throws Exception {
 		expectations
 			.expectTrustedLogin(domain)
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
@@ -360,9 +349,7 @@ public class TreatmentsResourceTest {
 	public void startArchivingTwiceShouldStackSchedules() throws Exception {
 		expectations
 			.expectTrustedLogin(domain)
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
@@ -398,8 +385,7 @@ public class TreatmentsResourceTest {
 	@Test
 	public void getShouldReturnNotImplemented() throws Exception {
 		expectations
-		.expectTrustedLogin(domain)
-		.expectGetDomain(domain);
+		.expectTrustedLogin(domain);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("7624b49f-4eb8-4b79-a396-c814ee5039bd");
 		play(Operations.sequenceOf(DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE),
@@ -420,8 +406,7 @@ public class TreatmentsResourceTest {
 	@Test
 	public void getShouldReturnEmptyListWhenNoTreatments() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
@@ -443,8 +428,7 @@ public class TreatmentsResourceTest {
 	@Test
 	public void getShouldReturnTheOnlyOne() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("7624b49f-4eb8-4b79-a396-c814ee5039bd");
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
@@ -469,8 +453,7 @@ public class TreatmentsResourceTest {
 	@Test
 	public void getShouldReturnMultiple() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("7624b49f-4eb8-4b79-a396-c814ee5039bd");
 		ArchiveTreatmentRunId runId2 = ArchiveTreatmentRunId.from("049bdc76-f991-4e40-ad96-1aeb3d9d3bae");
@@ -500,9 +483,7 @@ public class TreatmentsResourceTest {
 	public void resetShouldThrowWhenNotInTestingMode() throws Exception {
 		expectations
 			.expectTrustedLogin(domain)
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));

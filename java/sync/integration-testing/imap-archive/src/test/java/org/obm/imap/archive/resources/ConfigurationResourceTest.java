@@ -107,8 +107,7 @@ public class ConfigurationResourceTest {
 	@Before
 	public void setUp() {
 		expectations = new Expectations(driver)
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 	}
 
 	private void initDb(Operation... operationToAppend) {
@@ -209,8 +208,7 @@ public class ConfigurationResourceTest {
 						.build());
 		
 		expectations
-			.expectTrustedLogin(otherDomain)
-			.expectGetDomain(otherDomain);
+			.expectTrustedLogin(otherDomain);
 		
 		server.start();
 		
@@ -258,8 +256,7 @@ public class ConfigurationResourceTest {
 	@Test
 	public void updateDomainConfigurationShouldCreateWhenNoData() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		server.start();
 		
@@ -335,8 +332,7 @@ public class ConfigurationResourceTest {
 					.values(domainId, "user2@mydomain.org")
 					.build());
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		server.start();
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();

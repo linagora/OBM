@@ -36,9 +36,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.hk2.api.Factory;
-import org.obm.imap.archive.services.DomainClient;
+import org.obm.domain.dao.DomainDao;
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
-import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -48,14 +50,14 @@ public class ObmDomainFactory implements Factory<ObmDomain> {
 	public static final String PATH_PARAM = "treatment";
 	public static final String PATH = "{" + PATH_PARAM + "}";
 	
-	private final DomainClient domainClient;
+	private final DomainDao domainDao;
 	
 	@PathParam(PATH_PARAM)
 	private String domainUuid;
 
 	@Inject
-	private ObmDomainFactory(DomainClient domainClient) {
-		this.domainClient = domainClient;
+	private ObmDomainFactory(DomainDao domainDao) {
+		this.domainDao = domainDao;
 	}
 	
 	@Override
@@ -69,12 +71,14 @@ public class ObmDomainFactory implements Factory<ObmDomain> {
 			throw new WebApplicationException(Status.BAD_REQUEST);
 		}
 
-		ObmDomainUuid checkedDomainUuid = checkDomainUuid(domainUuid);
-		Optional<ObmDomain> domain = domainClient.getById(checkedDomainUuid);
-		if (!domain.isPresent()) {
+		try {
+			ObmDomainUuid checkedDomainUuid = checkDomainUuid(domainUuid);
+			return domainDao.findDomainByUuid(checkedDomainUuid);
+		} catch (DomainNotFoundException e) {
 			throw new WebApplicationException(Status.NOT_FOUND);
+		} catch (DaoException e) {
+			throw Throwables.propagate(e);
 		}
-		return domain.get();
 	}
 	
 	private ObmDomainUuid checkDomainUuid(String domainUuid) {

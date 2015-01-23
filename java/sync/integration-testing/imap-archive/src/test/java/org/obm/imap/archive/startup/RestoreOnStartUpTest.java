@@ -138,6 +138,7 @@ public class RestoreOnStartUpTest {
 	public void testTasksAreWellRestoredOrMovedAsFailed() throws Exception {
 		ArchiveTreatmentRunId expectedScheduledRunId = ArchiveTreatmentRunId.from("45896372-cc9f-4ee9-9efd-8df63e2da8c3");
 		ObmDomain expectedScheduledDomain = ObmDomain.builder()
+				.id(1)
 				.uuid(domainId)
 				.name("mydomain.org")
 				.label("mydomain.org")
@@ -204,8 +205,6 @@ public class RestoreOnStartUpTest {
 				.startedAt(expectedFailedStartTime)
 				.build());
 		
-		expectations
-			.expectGetDomain(expectedScheduledDomain);
 		server.start();
 		
 		given()

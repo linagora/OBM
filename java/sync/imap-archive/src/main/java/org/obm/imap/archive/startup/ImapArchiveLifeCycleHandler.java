@@ -35,6 +35,7 @@ import org.obm.ElementNotFoundException;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.server.LifeCycleHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +94,7 @@ public class ImapArchiveLifeCycleHandler implements LifeCycleHandler {
 		}
 	}
 	
-	private void restoreScheduledTasks() throws DaoException, ElementNotFoundException {
+	private void restoreScheduledTasks() throws DaoException, ElementNotFoundException, DomainNotFoundException {
 		restoreTasksOnStartupService.restoreScheduledTasks();
 	}
 }

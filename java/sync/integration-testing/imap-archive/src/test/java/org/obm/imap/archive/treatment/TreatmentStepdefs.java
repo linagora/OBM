@@ -190,10 +190,7 @@ public class TreatmentStepdefs {
 		expectations
 			.expectTrustedLogin(domain)
 			.expectTrustedLogin(domain)
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		putConfiguration();
 		
@@ -266,9 +263,7 @@ public class TreatmentStepdefs {
 	public void processShouldBeFired(int sleepTimeInSeconds) throws Exception {
 		expectations
 			.expectTrustedLogin(domain)
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		putConfiguration();
 		

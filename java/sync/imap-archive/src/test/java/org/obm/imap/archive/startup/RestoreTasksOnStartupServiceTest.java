@@ -37,6 +37,7 @@ import org.easymock.IMocksControl;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.domain.dao.DomainDao;
 import org.obm.imap.archive.beans.ArchiveRunningTreatment;
 import org.obm.imap.archive.beans.ArchiveScheduledTreatment;
 import org.obm.imap.archive.beans.ArchiveStatus;
@@ -49,11 +50,9 @@ import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.scheduling.ArchiveDomainTask;
 import org.obm.imap.archive.scheduling.ArchiveDomainTaskFactory;
 import org.obm.imap.archive.scheduling.ArchiveScheduler;
-import org.obm.imap.archive.services.DomainClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.linagora.scheduling.ScheduledTask;
 
@@ -70,7 +69,7 @@ public class RestoreTasksOnStartupServiceTest {
 	ArchiveTreatmentDao archiveTreatmentDao;
 	DomainConfigurationDao domainConfigurationDao;
 	ArchiveDomainTaskFactory taskFactory;
-	DomainClient domainClient;
+	DomainDao domainDao;
 	ObmDomain domain;
 	RestoreTasksOnStartupService testee;
 	
@@ -83,8 +82,8 @@ public class RestoreTasksOnStartupServiceTest {
 		scheduler = control.createMock(ArchiveScheduler.class);
 		taskFactory = control.createMock(ArchiveDomainTaskFactory.class);
 		domainConfigurationDao = control.createMock(DomainConfigurationDao.class);
-		domainClient = control.createMock(DomainClient.class);
-		testee = new RestoreTasksOnStartupService(logger, scheduler, archiveTreatmentDao, domainConfigurationDao, taskFactory, domainClient);
+		domainDao = control.createMock(DomainDao.class);
+		testee = new RestoreTasksOnStartupService(logger, scheduler, archiveTreatmentDao, domainConfigurationDao, taskFactory, domainDao);
 	}
 
 	@Test
@@ -103,7 +102,7 @@ public class RestoreTasksOnStartupServiceTest {
 		DateTime higherBoundary = DateTime.parse("2014-12-1T01:01Z");
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("aee2d1ab-b237-4077-a61b-a85e3cb67742");
 		
-		expect(domainClient.getById(domainUuid)).andReturn(Optional.of(domain));
+		expect(domainDao.findDomainByUuid(domainUuid)).andReturn(domain);
 		
 		DomainConfiguration domainConfiguration = control.createMock(DomainConfiguration.class);
 		expect(domainConfigurationDao.get(domain)).andReturn(domainConfiguration);

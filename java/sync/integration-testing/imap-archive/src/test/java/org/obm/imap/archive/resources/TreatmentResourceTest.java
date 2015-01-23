@@ -140,8 +140,7 @@ public class TreatmentResourceTest {
 	@Test
 	public void getShouldReturnArchiveTreatment() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		UUID runId = TestImapArchiveModules.uuid;
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
@@ -173,8 +172,7 @@ public class TreatmentResourceTest {
 	@Test
 	public void getShouldReturnNotFoundWhenBadRunId() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE), 
@@ -197,9 +195,7 @@ public class TreatmentResourceTest {
 	public void getLogsShouldReturnTheLogsWhenArchiveTreatmentIsInTracking() throws Exception {
 		expectations
 			.expectTrustedLogin(domain)
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
@@ -235,10 +231,7 @@ public class TreatmentResourceTest {
 		expectations
 			.expectTrustedLogin(domain)
 			.expectTrustedLogin(domain)
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
@@ -279,8 +272,7 @@ public class TreatmentResourceTest {
 	@Test
 	public void getLogsShouldReturnTheLogsFromFileWhenArchiveTreatmentIsNotInTracking() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		UUID runId = TestImapArchiveModules.uuid;
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
@@ -309,8 +301,7 @@ public class TreatmentResourceTest {
 	@Test
 	public void getLogsShouldReturnTheLogsFromFileWhenAskingForIt() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		UUID runId = TestImapArchiveModules.uuid;
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
@@ -339,8 +330,7 @@ public class TreatmentResourceTest {
 	@Test
 	public void getLogsShouldReturnNotFoundWhenArchiveTreatmentIsNotInTrackingAndNoFile() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		UUID runId = TestImapArchiveModules.uuid;
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(), 
@@ -362,9 +352,7 @@ public class TreatmentResourceTest {
 	@Test
 	public void getLogsShouldWaitForTheLaunchWhenGettingLogsOnScheduleTreatment() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectGetDomain(domain)
-			.expectGetDomain(domain);
+			.expectTrustedLogin(domain);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from(TestImapArchiveModules.uuid);
 		final DateTime scheduled = TestImapArchiveModules.LOCAL_DATE_TIME.plusSeconds(2);
