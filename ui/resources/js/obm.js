@@ -682,6 +682,8 @@ function refreshWaitEvent() {
                 displayInTitleTab('calendar', displayedCount);
                 elem.setStyle('display', 'inline-block');
                 resizeForBadges(elem, count);
+              } else {
+                displayInTitleTab('calendar', count);
               }
             } else {
               elem.set('text',response.msg);
@@ -699,9 +701,7 @@ function displayUnreadMail(count) {
   var elem = $('bannerUnreadMail');
   var displayedCount = getDisplayedcount(count);
 
-  if(count > 0){
-    displayInTitleTab('webmail', displayedCount);
-  }
+  displayInTitleTab('webmail', displayedCount);
 
   if(count > 0 && $('webmail_iframe') == null){
     elem.set('text', displayedCount);
@@ -715,8 +715,8 @@ function displayUnreadMail(count) {
 function displayInTitleTab(page, count){
   var title = document.title;
   if (window.location.pathname == '/' + page + '/' + page + '_index.php'){
-    title = title.split(')');
-    document.title = '(' + count + ') ' + title.pop();
+    var rawTitle = title.split(')').pop();
+    document.title = count == 0 ? rawTitle : '(' + count + ') ' + rawTitle ;
   }
 }
 
@@ -743,7 +743,7 @@ function getWebmailUnreadMail(callback) {
 }
 
 function getDisplayedcount(count){
-  return count < 99 ? count.toString() : '99+';
+  return count <= 99 ? count.toString() : '99+';
 }
 
 function resizeForBadges(elem, count){
