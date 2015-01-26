@@ -10,6 +10,11 @@ OBM Core Team <lgs-obm-dev@linagora.com>;
 
 == About
 
+[IMPORTANT]
+====
+This *OBM* component is only available for *OBM* configured on a *Postgresql* database.
+====
+
 include::debian-installation.adoc[]
 
 include::rhel-installation.adoc[]

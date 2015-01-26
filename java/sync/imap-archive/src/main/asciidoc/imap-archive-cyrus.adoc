@@ -37,6 +37,12 @@ Under *RHEL/CentOS*, this folder is not created, you should create it manually, 
 and give rights to _cyrus_ user such as other partitions.
 ====
 
+
+[WARNING]
+====
+In a *Cyrus murder* configuration, the archive partition should be added in each murder backends.
+====
+
 Then, you will have to restart *Cyrus* in order to run with the new configuration.
 
 Each domain configured for *IMAP Archive* service should have a corresponding https://cyrusimap.org/[*Cyrus*] partition.

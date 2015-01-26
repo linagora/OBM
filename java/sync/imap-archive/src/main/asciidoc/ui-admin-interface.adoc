@@ -48,11 +48,11 @@ In other words, when you are setting the repeat kind:
 
 This page is displaying some basic information:
 
- * *Past operations* last three runs, with start time, end time and status linked to the treatment logs
- * *Simulation button* immediately launches a simulation run
- * *Manual launch* immediately launches a run
- * *Next run* date and time of the next scheduled treatment
- * *Last failure* last failure, with start time, end time and status linked to the treatment logs
+ * +Past operations+ last three runs, with start time, end time and status linked to the treatment logs
+ * +Simulation button+ immediately launches a simulation run
+ * +Manual launch+ immediately launches a run
+ * +Next run+ date and time of the next scheduled treatment
+ * +Last failure+ last failure, with start time, end time and status linked to the treatment logs
   
 .*IMAP Archive* consultation
 image::admin_consult.png[*IMAP Archive* consultation]
@@ -61,19 +61,33 @@ image::admin_consult.png[*IMAP Archive* consultation]
 
 This page is used to configure the treatment:
 
- * *Activating* check to activate the *IMAP Archive* on this domain
- * *Scheduling* basic scheduling configuration, with the next scheduled treatment
- * *Excluded folder* IMAP folder to be excluded for each user
- * *Excluded users* users to be excluded
- * *Send emails to* list of emails to be annotated at the end of each treatment 
+ * +Activating+ check to activate the *IMAP Archive* on this domain
+ * +Scheduling+ basic scheduling configuration, with the next scheduled treatment
+ * +Main archive folder+ IMAP folder where all archives will be stored
+ * +Excluded folder+ IMAP folder to be excluded for each user
+ * +Excluded users+ users to be excluded
+ * +Send emails to+ list of emails to be annotated at the end of each treatment 
   
+[WARNING]
+====
+Changing the value of the +Main archive folder+ after one or more archive treatments 
+will lead to undefined behaviour. +
+In this case, the previous +Main archive folder+ will be interpreted as a standard IMAP folder, and so will be archived.
+====
+  
+
 .*IMAP Archive* update
 image::admin_update.png[*IMAP Archive* update]
 
 === Logs page
 
 When launching a simulation launch or a manual launch, a new tab containing logs will be opened.
-Emails annotation at the end of the treatment will also include a link to this page. 
+Emails annotation at the end of the treatment will also include a link to this page.
+
+[NOTE]
+====
+This page will be automatically refreshed every ten seconds.
+==== 
   
 .*IMAP Archive* logs
 image::logs.png[*IMAP Archive* logs]
