@@ -684,6 +684,7 @@ function refreshWaitEvent() {
                 resizeForBadges(elem, count);
               } else {
                 displayInTitleTab('calendar', count);
+                elem.setStyle('display', 'none');
               }
             } else {
               elem.set('text',response.msg);
