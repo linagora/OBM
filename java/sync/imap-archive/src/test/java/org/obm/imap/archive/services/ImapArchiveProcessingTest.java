@@ -1236,6 +1236,65 @@ public class ImapArchiveProcessingTest {
 	}
 	
 	@Test
+	public void listImapFoldersShouldAppendDomainWhenMailboxesDoesntContainDomain() throws Exception {
+		List<ListInfo> givenListInfos = ImmutableList.of(
+				new ListInfo("user/usera", true, false),
+				new ListInfo("user/usera/Drafts", true, false),
+				new ListInfo("user/usera/SPAM", true, false),
+				new ListInfo("user/usera/Sent", true, false),
+				new ListInfo("user/usera/Excluded", true, false),
+				new ListInfo("user/usera/Excluded/subfolder", true, false));
+		ListResult listResult = new ListResult(6);
+		listResult.addAll(givenListInfos);
+		
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		storeClient.login(false);
+		expectLastCall();
+		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME + "/usera", ImapArchiveProcessing.ALL_MAILBOXES_NAME))
+			.andReturn(listResult);
+		storeClient.close();
+		expectLastCall();
+		
+		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.ENABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+				.archiveMainFolder("arChive")
+				.build();
+		
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
+			.andReturn(storeClient);
+		
+		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
+				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
+		
+		List<ListInfo> expectedListInfos = ImmutableList.of(
+				new ListInfo("user/usera@mydomain.org", true, false),
+				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
+				new ListInfo("user/usera/SPAM@mydomain.org", true, false),
+				new ListInfo("user/usera/Sent@mydomain.org", true, false),
+				new ListInfo("user/usera/Excluded@mydomain.org", true, false),
+				new ListInfo("user/usera/Excluded/subfolder@mydomain.org", true, false));
+		
+		control.replay();
+		ProcessedTask processedTask = ProcessedTask.builder()
+				.archiveConfiguration(archiveConfiguration)
+				.higherBoundary(HigherBoundary.builder()
+						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
+						.build())
+				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
+				.build();
+		
+		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders("usera", processedTask);
+		control.verify();
+		assertThat(listImapFolders).isEqualTo(expectedListInfos);
+	}
+	
+	@Test
 	public void listImapFoldersShouldListAllWhenNoExcludedFolder() throws Exception {
 		List<ListInfo> expectedListInfos = ImmutableList.of(
 				new ListInfo("user/usera@mydomain.org", true, false),
@@ -1283,7 +1342,7 @@ public class ImapArchiveProcessingTest {
 		
 		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders("usera", processedTask);
 		control.verify();
-		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+		assertThat(listImapFolders).isEqualTo(expectedListInfos);
 	}
 	
 	@Test
@@ -1335,7 +1394,7 @@ public class ImapArchiveProcessingTest {
 		
 		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders("usera", processedTask);
 		control.verify();
-		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+		assertThat(listImapFolders).isEqualTo(expectedListInfos);
 	}
 	
 	@Test
@@ -1396,7 +1455,7 @@ public class ImapArchiveProcessingTest {
 		
 		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listUsers(processedTask);
 		control.verify();
-		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+		assertThat(listImapFolders).isEqualTo(expectedListInfos);
 	}
 	
 	@Test
@@ -1446,7 +1505,7 @@ public class ImapArchiveProcessingTest {
 		
 		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listUsers(processedTask);
 		control.verify();
-		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+		assertThat(listImapFolders).isEqualTo(expectedListInfos);
 	}
 	
 	@Test
@@ -1502,7 +1561,7 @@ public class ImapArchiveProcessingTest {
 		
 		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders("usera", processedTask);
 		control.verify();
-		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+		assertThat(listImapFolders).isEqualTo(expectedListInfos);
 	}
 	
 	@Test
@@ -1557,7 +1616,7 @@ public class ImapArchiveProcessingTest {
 		
 		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders("usera", processedTask);
 		control.verify();
-		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+		assertThat(listImapFolders).isEqualTo(expectedListInfos);
 	}
 	
 	@Test
@@ -1806,7 +1865,7 @@ public class ImapArchiveProcessingTest {
 		
 		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders("usera", processedTask);
 		control.verify();
-		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+		assertThat(listImapFolders).isEqualTo(expectedListInfos);
 	}
 	
 	@Test
@@ -1863,7 +1922,7 @@ public class ImapArchiveProcessingTest {
 		
 		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listUsers(processedTask);
 		control.verify();
-		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+		assertThat(listImapFolders).isEqualTo(expectedListInfos);
 	}
 	
 	@Test
@@ -1918,7 +1977,7 @@ public class ImapArchiveProcessingTest {
 		
 		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listUsers(processedTask);
 		control.verify();
-		assertThat(listImapFolders).containsOnly(FluentIterable.from(expectedListInfos).toArray(ListInfo.class));
+		assertThat(listImapFolders).isEqualTo(expectedListInfos);
 	}
 	
 	@Test(expected=IllegalStateException.class)

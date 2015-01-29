@@ -432,6 +432,7 @@ public class ImapArchiveProcessing {
 			storeClient.login(false);
 			
 			return FluentIterable.from(storeClient.listAll(USERS_REFERENCE_NAME + "/" + user, ALL_MAILBOXES_NAME))
+					.transform(appendDomainWhenNone(domain))
 					.filter(filterExcludedFolder(processedTask))
 					.filter(filterFolders(processedTask, processedTask.getDomainConfiguration().getArchiveMainFolder(), TemporaryMailbox.TEMPORARY_FOLDER))
 					.toList();
