@@ -46,7 +46,6 @@ import org.obm.sync.calendar.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -64,7 +63,6 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserService;
 
@@ -120,9 +118,7 @@ public class HelperServiceImpl implements HelperService {
 	public CalendarRights listRightsOnCalendars(AccessToken accessToken,
 			Iterable<String> emails) {
 		Set<String> emailSet = ImmutableSet.copyOf(emails);
-		Set<String> emailsOnDifferentDomains = findEmailsOnDifferentDomains(accessToken, emailSet);
-		Set<String> emailsOnCurrentDomain = Sets.difference(emailSet, emailsOnDifferentDomains);
-		Map<String, String> loginToEmail = buildLoginToEmailMap(emailsOnCurrentDomain);
+		Map<String, String> loginToEmail = buildLoginToEmailMap(emailSet);
 		Set<String> loginsOnCurrentDomain = loginToEmail.keySet();
 		Set<String> loginsWithImplicitRights = findEmailsWithImplicitRights(accessToken,
 				loginsOnCurrentDomain);
@@ -136,13 +132,11 @@ public class HelperServiceImpl implements HelperService {
 			Throwables.propagate(e);
 		}
 
-		Map<String, EnumSet<Right>> calsOnOtherDomainsToRights = buildOtherDomainRights(emailsOnDifferentDomains);
 		Map<String, EnumSet<Right>> calsWithImplicitRightsToRights = buildCalsWithImplicitRightsToRights(
 				loginsToEmails(loginsWithImplicitRights, loginToEmail));
 		Map<String, EnumSet<Right>> otherCalsToRights = loginMapToEmailMap(otherLoginsToRights,
 				loginToEmail);
 		Map<String, EnumSet<Right>> almostCompleteResults = Maps.newHashMap();
-		almostCompleteResults.putAll(calsOnOtherDomainsToRights);
 		almostCompleteResults.putAll(calsWithImplicitRightsToRights);
 		almostCompleteResults.putAll(otherCalsToRights);
 
@@ -198,17 +192,6 @@ public class HelperServiceImpl implements HelperService {
 		return builder.build();
 	}
 
-	private static Map<String, EnumSet<Right>> buildOtherDomainRights(Set<String> emails) {
-		return Maps.asMap(emails, new Function<String, EnumSet<Right>>() {
-
-			@Override
-			public EnumSet<Right> apply(String input) {
-				return EnumSet.of(Right.ACCESS);
-			}
-
-		});
-	}
-
 	private static Map<String, EnumSet<Right>> buildCalsWithImplicitRightsToRights(
 			Set<String> emails) {
 		return Maps.asMap(emails, new Function<String, EnumSet<Right>>() {
@@ -221,18 +204,6 @@ public class HelperServiceImpl implements HelperService {
 		});
 	}
 
-	private Set<String> findEmailsOnDifferentDomains(final AccessToken accessToken,
-			Set<String> emails) {
-		return ImmutableSet.copyOf(Iterables.filter(emails, new Predicate<String>() {
-
-			@Override
-			public boolean apply(String email) {
-				return !isSameDomain(accessToken, email);
-			}
-
-		}));
-	}
-
 	private Set<String> findEmailsWithImplicitRights(final AccessToken token, Set<String> emails) {
 		return ImmutableSet.copyOf(Iterables.filter(emails, new Predicate<String>() {
 
@@ -242,33 +213,6 @@ public class HelperServiceImpl implements HelperService {
 			}
 
 		}));
-	}
-
-	@VisibleForTesting boolean isSameDomain(AccessToken accessToken, String email) {
-		String emailDomain = userService.getDomainNameFromEmail(email);
-		
-		if (emailDomain == null) {
-			return true;
-		}
-		
-		ObmDomain domain = accessToken.getDomain();
-		boolean sameDomain = domain.getName().equalsIgnoreCase(emailDomain);
-		
-		if (sameDomain) {
-			return true;
-		}
-		
-		return isAliasOfDomain(domain, emailDomain);
-	}
-
-	private boolean isAliasOfDomain(ObmDomain domain, String emailDomain) {
-		for (String alias : domain.getAliases()) {
-			if (alias.equalsIgnoreCase(emailDomain)) {
-				return true;
-			}
-		}
-		
-		return false;
 	}
 
 	/**

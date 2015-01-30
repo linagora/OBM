@@ -3140,9 +3140,8 @@ public class CalendarBindingImplTest {
 				calendarToRights).atLeastOnce();
 		CalendarRights calendarToRights2 = CalendarRights.builder()
 				.addRights(calendar, EnumSet.of(Right.ACCESS, Right.WRITE))
-				.addRights(attendeeEmail, EnumSet.of(Right.ACCESS))
 				.build();
-		expect(helperService.listRightsOnCalendars(token, ImmutableSet.of(calendar, attendeeEmail, resourceEmail)))
+		expect(helperService.listRightsOnCalendars(token, ImmutableSet.of(calendar, resourceEmail)))
 				.andReturn(calendarToRights2).atLeastOnce();
 
 		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user).anyTimes();
@@ -3190,10 +3189,9 @@ public class CalendarBindingImplTest {
 		expect(helperService.canWriteOnCalendar(token, userEmail)).andReturn(true).atLeastOnce();
 		CalendarRights calendarToRights = CalendarRights.builder()
 				.addRights(userEmail, EnumSet.of(Right.ACCESS, Right.WRITE))
-				.addRights(attendeeEmail, EnumSet.of(Right.ACCESS))
 				.build();
 		expect(helperService.listRightsOnCalendars(token,
-						ImmutableSet.of(userEmail, attendeeEmail))).andReturn(calendarToRights)
+						ImmutableSet.of(userEmail))).andReturn(calendarToRights)
 				.atLeastOnce();
 		expect(helperService.canWriteOnCalendar(token, attendeeEmail)).andReturn(false).anyTimes();
 		expect(userService.getUserFromCalendar(userEmail, user.getDomain().getName())).andReturn(user).anyTimes();
@@ -3236,9 +3234,8 @@ public class CalendarBindingImplTest {
 		expect(helperService.canWriteOnCalendar(token, userEmail)).andReturn(true).atLeastOnce();
 		CalendarRights calendarToRights = CalendarRights.builder()
 				.addRights(userEmail, EnumSet.of(Right.ACCESS, Right.WRITE))
-				.addRights(attendeeEmail, EnumSet.of(Right.ACCESS))
 				.build();
-		expect(helperService.listRightsOnCalendars(token, ImmutableSet.of(userEmail, attendeeEmail))).andReturn(calendarToRights).atLeastOnce();
+		expect(helperService.listRightsOnCalendars(token, ImmutableSet.of(userEmail))).andReturn(calendarToRights).atLeastOnce();
 		expect(helperService.canWriteOnCalendar(token, attendeeEmail)).andReturn(false).anyTimes();
 		expect(userService.getUserFromCalendar(userEmail, user.getDomain().getName())).andReturn(user).anyTimes();
 		expect(attendeeService.findUserAttendee(null, userEmail, user.getDomain())).andReturn(userAttendee);
@@ -3276,9 +3273,8 @@ public class CalendarBindingImplTest {
 		expect(helperService.canWriteOnCalendar(token, userEmail)).andReturn(true).anyTimes();
 		CalendarRights calendarToRights = CalendarRights.builder()
 				.addRights(userEmail, EnumSet.of(Right.ACCESS, Right.WRITE))
-				.addRights(attendeeEmail, EnumSet.of(Right.ACCESS))
 				.build();
-		expect(helperService.listRightsOnCalendars(token, ImmutableSet.of(userEmail, attendeeEmail))).andReturn(calendarToRights).atLeastOnce();
+		expect(helperService.listRightsOnCalendars(token, ImmutableSet.of(userEmail))).andReturn(calendarToRights).atLeastOnce();
 		expect(userService.getUserFromCalendar(userEmail, user.getDomain().getName())).andReturn(user).anyTimes();
 		expect(attendeeService.findUserAttendee(null, userEmail, user.getDomain())).andReturn(userAttendee);
 		expect(attendeeService.findContactAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid()))
@@ -3318,11 +3314,6 @@ public class CalendarBindingImplTest {
 
 		mockCommitedOperationNewEvent(event, clientId);
 		expect(helperService.canWriteOnCalendar(token, userEmail)).andReturn(true).anyTimes();
-		CalendarRights calendarToRights = CalendarRights.builder()
-				.addRights(userEmail, EnumSet.of(Right.ACCESS, Right.WRITE))
-				.addRights(attendeeEmail, EnumSet.of(Right.ACCESS))
-				.build();
-		expect(helperService.listRightsOnCalendars(token, ImmutableSet.of(userEmail, attendeeEmail))).andReturn(calendarToRights).atLeastOnce();
 		CalendarRights calendarToRights2 = CalendarRights.builder()
 				.addRights(userEmail, EnumSet.of(Right.ACCESS, Right.WRITE))
 				.build();

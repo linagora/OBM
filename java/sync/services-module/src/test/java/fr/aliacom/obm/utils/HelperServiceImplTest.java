@@ -31,17 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.utils;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 
 import java.sql.SQLException;
 import java.util.EnumSet;
-import java.util.Set;
 
 import org.assertj.core.api.Assertions;
 import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.DatabaseConfiguration;
@@ -101,9 +98,6 @@ public class HelperServiceImplTest {
 			bind(cls).toInstance(mocksControl.createMock(cls));
 		}
 	}
-	
-	@Inject
-	private UserService userService;
 
 	@Inject
 	private HelperDao helperDao;
@@ -111,64 +105,6 @@ public class HelperServiceImplTest {
 	@Inject
 	private IMocksControl mocksControl;
 
-	private HelperServiceImpl helperService;
-	private AccessToken accessToken;
-
-	@Before
-	public void setUp() {
-		accessToken = new AccessToken(1, "o-push");
-		helperService = new HelperServiceImpl(null, userService);
-	}
-
-	@Test
-	public void testIsNotSameDomainWhenDifferent() {
-		accessToken.setDomain(domainWithName("otherdomain.org"));
-
-		assertThat(helperService.isSameDomain(accessToken, "test@domain.org")).isFalse();
-	}
-
-	@Test
-	public void testIsSameDomainWhenSame() {
-		accessToken.setDomain(domainWithName("domain.org"));
-
-		assertThat(helperService.isSameDomain(accessToken, "test@domain.org")).isTrue();
-	}
-	
-	@Test
-	public void testIsSameDomainWhenSameButCaseDiffers() {
-		accessToken.setDomain(domainWithName("DOmaiN.org"));
-
-		assertThat(helperService.isSameDomain(accessToken, "test@domain.org")).isTrue();
-	}
-
-	@Test
-	public void testIsSameDomainWhenNoDomain() {
-		accessToken.setDomain(domainWithName("domain.org"));
-
-		assertThat(helperService.isSameDomain(accessToken, "test")).isTrue();
-	}
-	
-	@Test
-	public void testIsSameDomainWhenDomainHasOneAlias(){
-		accessToken.setDomain(domainWithAliases("domain.org", ImmutableSet.of("alias.org")));
-
-		assertThat(helperService.isSameDomain(accessToken, "test@alias.org")).isTrue();
-	}
-	
-	@Test
-	public void testIsSameDomainWhenDomainHasMultipleAliases(){
-		accessToken.setDomain(domainWithAliases("domain.org", ImmutableSet.of("alias.org", "alias2.org")));
-		
-		assertThat(helperService.isSameDomain(accessToken, "test@alias2.org")).isTrue();
-	}
-	
-	@Test
-	public void testIsSameDomainWhenDomainHasOneAliasButCaseDiffers(){
-		accessToken.setDomain(domainWithAliases("domain.org", ImmutableSet.of("AliAs.org")));
-
-		assertThat(helperService.isSameDomain(accessToken, "test@alias.org")).isTrue();
-	}
-	
 	@Test(expected=IllegalArgumentException.class)
 	public void testEventBelongsToCalendarWhenNoCalendar() {
 		new HelperServiceImpl(null, null).eventBelongsToCalendar(new Event(), null);
@@ -230,7 +166,6 @@ public class HelperServiceImplTest {
 		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of())).andReturn(
 				ImmutableMap.<String, EnumSet<Right>> of()).once();
 		UserService userService = mocksControl.createMock(UserService.class);
-		expect(userService.getDomainNameFromEmail("foo@bar")).andReturn("bar").once();
 		expect(userService.getLoginFromEmail("foo@bar")).andReturn("foo").once();
 		mocksControl.replay();
 
@@ -252,7 +187,6 @@ public class HelperServiceImplTest {
 		accessToken.setDomain(domainWithName("bar"));
 		accessToken.setRootAccount(true);
 		UserService userService = mocksControl.createMock(UserService.class);
-		expect(userService.getDomainNameFromEmail("foo@bar")).andReturn("bar").once();
 		expect(userService.getLoginFromEmail("foo@bar")).andReturn("foo").once();
 		mocksControl.replay();
 
@@ -269,29 +203,6 @@ public class HelperServiceImplTest {
 	}
 
 	@Test
-	public void testListRightsOnCalendarWithOtherDomainCalendar() throws SQLException {
-		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
-		AccessToken accessToken = new AccessToken(1, "outer space");
-		accessToken.setUserLogin("foo");
-		accessToken.setDomain(domainWithName("bar"));
-		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of())).andReturn(
-				ImmutableMap.<String, EnumSet<Right>> of()).once();
-		UserService userService = mocksControl.createMock(UserService.class);
-		expect(userService.getDomainNameFromEmail("foo@pub")).andReturn("pub").once();
-		mocksControl.replay();
-
-		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
-		CalendarRights expectedMailToRights = CalendarRights.builder()
-				.addRights("foo@pub", EnumSet.of(Right.ACCESS))
-				.build();
-		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
-				accessToken, ImmutableSet.of("foo@pub"));
-
-		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
-		mocksControl.verify();
-	}
-
-	@Test
 	public void testListRightsOnCalendarWithOwnDomainCalendar() throws SQLException {
 		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
 		AccessToken accessToken = new AccessToken(1, "outer space");
@@ -302,7 +213,6 @@ public class HelperServiceImplTest {
 						ImmutableMap.<String, EnumSet<Right>> of(
 								"beer", EnumSet.of(Right.ACCESS, Right.READ))).once();
 		UserService userService = mocksControl.createMock(UserService.class);
-		expect(userService.getDomainNameFromEmail("beer@bar")).andReturn("bar").once();
 		expect(userService.getLoginFromEmail("beer@bar")).andReturn("beer").once();
 		mocksControl.replay();
 
@@ -328,7 +238,6 @@ public class HelperServiceImplTest {
 				.andReturn(
 						ImmutableMap.<String, EnumSet<Right>> of()).once();
 		UserService userService = mocksControl.createMock(UserService.class);
-		expect(userService.getDomainNameFromEmail("beer@bar")).andReturn("bar").once();
 		expect(userService.getLoginFromEmail("beer@bar")).andReturn("beer").once();
 		mocksControl.replay();
 
@@ -338,37 +247,6 @@ public class HelperServiceImplTest {
 				.build();
 		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
 				accessToken, ImmutableSet.of("beer@bar"));
-
-		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
-		mocksControl.verify();
-	}
-
-	@Test
-	public void testListRightsOnCalendarWithMixedCalendars() throws SQLException {
-		HelperDao helperDao = mocksControl.createMock(HelperDao.class);
-		AccessToken accessToken = new AccessToken(1, "outer space");
-		accessToken.setUserLogin("foo");
-		accessToken.setDomain(domainWithName("bar"));
-		expect(helperDao.listRightsOnCalendars(accessToken, ImmutableSet.<String> of("beer")))
-				.andReturn(
-						ImmutableMap.<String, EnumSet<Right>> of(
-								"beer", EnumSet.of(Right.ACCESS, Right.READ))).once();
-		UserService userService = mocksControl.createMock(UserService.class);
-		expect(userService.getDomainNameFromEmail("foo@bar")).andReturn("bar").once();
-		expect(userService.getLoginFromEmail("foo@bar")).andReturn("foo").once();
-		expect(userService.getDomainNameFromEmail("foo@pub")).andReturn("pub").once();
-		expect(userService.getDomainNameFromEmail("beer@bar")).andReturn("bar").once();
-		expect(userService.getLoginFromEmail("beer@bar")).andReturn("beer").once();
-		mocksControl.replay();
-
-		HelperServiceImpl helperServiceImpl = new HelperServiceImpl(helperDao, userService);
-		CalendarRights expectedMailToRights = CalendarRights.builder()
-				.addRights("foo@bar", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE))
-				.addRights("foo@pub", EnumSet.of(Right.ACCESS))
-				.addRights("beer@bar", EnumSet.of(Right.ACCESS, Right.READ))
-				.build();
-		CalendarRights mailToRights = helperServiceImpl.listRightsOnCalendars(
-				accessToken, ImmutableSet.of("foo@bar", "foo@pub", "beer@bar"));
 
 		Assertions.assertThat(mailToRights).isEqualTo(expectedMailToRights);
 		mocksControl.verify();
@@ -385,7 +263,6 @@ public class HelperServiceImplTest {
 						ImmutableMap.<String, EnumSet<Right>> of(
 								"other", EnumSet.of(Right.ACCESS, Right.READ))).once();
 		UserService userService = mocksControl.createMock(UserService.class);
-		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
 		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
 		mocksControl.replay();
 
@@ -407,7 +284,6 @@ public class HelperServiceImplTest {
 						ImmutableMap.<String, EnumSet<Right>> of(
 								"other", EnumSet.of(Right.ACCESS))).once();
 		UserService userService = mocksControl.createMock(UserService.class);
-		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
 		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
 		mocksControl.replay();
 
@@ -429,7 +305,6 @@ public class HelperServiceImplTest {
 						ImmutableMap.<String, EnumSet<Right>> of(
 								"other", EnumSet.of(Right.WRITE))).once();
 		UserService userService = mocksControl.createMock(UserService.class);
-		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
 		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
 		mocksControl.replay();
 
@@ -452,7 +327,6 @@ public class HelperServiceImplTest {
 						ImmutableMap.<String, EnumSet<Right>> of(
 								"other", EnumSet.of(Right.ACCESS, Right.READ, Right.WRITE))).once();
 		UserService userService = mocksControl.createMock(UserService.class);
-		expect(userService.getDomainNameFromEmail("other@bar")).andReturn("bar").once();
 		expect(userService.getLoginFromEmail("other@bar")).andReturn("other").once();
 		mocksControl.replay();
 
@@ -469,12 +343,5 @@ public class HelperServiceImplTest {
 				.name(domainName)
 				.build();
 	}
-	
-	private ObmDomain domainWithAliases(String domainName, Set<String> aliases) {
-		return ObmDomain
-				.builder()
-				.name(domainName)
-				.aliases(aliases)
-				.build();
-	}
+
 }

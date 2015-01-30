@@ -30,6 +30,8 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.calendar;
+import static com.google.common.base.Predicates.instanceOf;
+import static com.google.common.base.Predicates.not;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -69,6 +71,7 @@ import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
+import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -804,15 +807,16 @@ public class CalendarBindingImpl implements ICalendar {
 	@VisibleForTesting
 	protected void assignDelegationRightsOnAttendees(AccessToken token, Event event) throws PermissionException {
 		applyDelegationRightsOnAttendeesToEvent(token, event);
-		Set<Event> eventsExceptions = event.getEventsExceptions();
-		for (Event eventException : eventsExceptions) {
+
+		for (Event eventException : event.getEventsExceptions()) {
 			applyDelegationRightsOnAttendeesToEvent(token, eventException);
 		}
 	}
 	
 	private void applyDelegationRightsOnAttendeesToEvent(AccessToken token, Event event)
 			throws PermissionException {
-		Iterable<Attendee> attendeesWithEmails = filterAttendeesWithEmail(event.getAttendees());
+		Iterable<Attendee> internalAttendees = filterContactAttendees(event.getAttendees());
+		Iterable<Attendee> attendeesWithEmails = filterAttendeesWithEmail(internalAttendees);
 		Map<String, Attendee> emailToAttendee = emailToAttendee(attendeesWithEmails);
 		CalendarRights emailToRights = helperService.listRightsOnCalendars(token,
 				emailToAttendee.keySet());
@@ -829,14 +833,19 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private static Iterable<Attendee> filterAttendeesWithEmail(List<Attendee> attendees) {
+	private static Iterable<Attendee> filterAttendeesWithEmail(Iterable<Attendee> attendees) {
 		return Iterables.filter(attendees, new Predicate<Attendee>() {
 
 			@Override
 			public boolean apply(Attendee attendee) {
 				return !Strings.isNullOrEmpty(attendee.getEmail());
 			}
+
 		});
+	}
+
+	private static Iterable<Attendee> filterContactAttendees(Iterable<Attendee> attendees) {
+		return Iterables.filter(attendees, not(instanceOf(ContactAttendee.class)));
 	}
 
 	private static Map<String, Attendee> emailToAttendee(Iterable<Attendee> attendees) {
