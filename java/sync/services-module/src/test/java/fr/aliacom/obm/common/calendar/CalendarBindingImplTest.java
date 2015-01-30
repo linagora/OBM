@@ -3138,11 +3138,6 @@ public class CalendarBindingImplTest {
 				.build();
 		expect(helperService.listRightsOnCalendars(token, ImmutableSet.of(calendar))).andReturn(
 				calendarToRights).atLeastOnce();
-		CalendarRights calendarToRights2 = CalendarRights.builder()
-				.addRights(calendar, EnumSet.of(Right.ACCESS, Right.WRITE))
-				.build();
-		expect(helperService.listRightsOnCalendars(token, ImmutableSet.of(calendar, resourceEmail)))
-				.andReturn(calendarToRights2).atLeastOnce();
 
 		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user).anyTimes();
 		// times(3) = 1 for the event, 1 for each exception

@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.calendar;
 import static com.google.common.base.Predicates.instanceOf;
-import static com.google.common.base.Predicates.not;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -71,7 +70,6 @@ import org.obm.sync.base.Category;
 import org.obm.sync.base.KeyList;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
-import org.obm.sync.calendar.ContactAttendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -813,22 +811,22 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 	
-	private void applyDelegationRightsOnAttendeesToEvent(AccessToken token, Event event)
-			throws PermissionException {
-		Iterable<Attendee> internalAttendees = filterContactAttendees(event.getAttendees());
-		Iterable<Attendee> attendeesWithEmails = filterAttendeesWithEmail(internalAttendees);
+	private void applyDelegationRightsOnAttendeesToEvent(AccessToken token, Event event) throws PermissionException {
+		Iterable<Attendee> userAttendees = findUserAttendees(event.getAttendees());
+		Iterable<Attendee> attendeesWithEmails = filterAttendeesWithEmail(userAttendees);
 		Map<String, Attendee> emailToAttendee = emailToAttendee(attendeesWithEmails);
-		CalendarRights emailToRights = helperService.listRightsOnCalendars(token,
-				emailToAttendee.keySet());
+		CalendarRights emailToRights = helperService.listRightsOnCalendars(token, emailToAttendee.keySet());
+
 		for (CalendarRightsPair pair : emailToRights) {
 			String email = pair.getCalendar();
 			Set<Right> rights = pair.getRights();
+
 			if (!rights.contains(Right.ACCESS) && !rights.contains(Right.WRITE)) {
 				throw new PermissionException(email, Right.ACCESS, event.getTitle());
 			}
+
 			if (rights.contains(Right.WRITE)) {
-				Attendee att = emailToAttendee.get(email);
-				att.setCanWriteOnCalendar(true);
+				emailToAttendee.get(email).setCanWriteOnCalendar(true);
 			}
 		}
 	}
@@ -844,15 +842,17 @@ public class CalendarBindingImpl implements ICalendar {
 		});
 	}
 
-	private static Iterable<Attendee> filterContactAttendees(Iterable<Attendee> attendees) {
-		return Iterables.filter(attendees, not(instanceOf(ContactAttendee.class)));
+	private static Iterable<Attendee> findUserAttendees(Iterable<Attendee> attendees) {
+		return Iterables.filter(attendees, instanceOf(UserAttendee.class));
 	}
 
 	private static Map<String, Attendee> emailToAttendee(Iterable<Attendee> attendees) {
 		ImmutableMap.Builder<String, Attendee> builder = ImmutableMap.builder();
+
 		for (Attendee attendee : attendees) {
 			builder.put(attendee.getEmail(), attendee);
 		}
+
 		return builder.build();
 	}
 
