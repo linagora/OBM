@@ -29,6 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -39,9 +40,12 @@ import org.obm.provisioning.processing.BatchProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
+import com.google.inject.Key;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import com.google.inject.servlet.ServletScopes;
 
 @Singleton
 public class ParallelBatchProcessor implements BatchProcessor {
@@ -60,17 +64,28 @@ public class ParallelBatchProcessor implements BatchProcessor {
 	@Override
 	public void process(final Batch toProcess) throws ProcessingException {
 		pool.execute(new Runnable() {
-
 			@Override
 			public void run() {
 				try {
-					delegate.process(toProcess);
-				}
-				catch (Exception e) {
-					logger.error(String.format("Error processing batch %s.", toProcess.getId()), e);
+					ServletScopes.scopeRequest(new Callable<Void>() {
+
+						@Override
+						public Void call() throws Exception {
+							try {
+								delegate.process(toProcess);
+							}
+							catch (Exception e) {
+								logger.error(String.format("Error processing batch %s.", toProcess.getId()), e);
+							}
+							return null;
+						}
+					}, ImmutableMap.<Key<?>, Object> of())
+					.call();
+
+				} catch (Exception e) {
+					throw new ProcessingException(e);
 				}
 			}
-
 		});
 	}
 
