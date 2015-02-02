@@ -154,7 +154,7 @@ ldapConnectionPooling=1
 ; Enable Cyrus partition support
 ; if cyrusPartition is enable, a dedicated Cyrus partition is created for each OBM domain
 ; Going cyrusPartition enabled from cyrusPartition disabled needs system work
-cyrusPartition = true
+cyrusPartition = false
 
 ; Certificate and key for Cyrus TLS support
 ; cyrusKeyAndCert = /etc/obm/certs/obm_cert.pem
