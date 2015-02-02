@@ -76,7 +76,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private final static String CONFIDENTIAL_EVENTS_ENABLED = "enable-confidential-events";
 	private final static boolean CONFIDENTIAL_EVENTS_ENABLED_DEFAULT = true;
-	
+
+	private final static String CYRUS_PARTITION = "cyrusPartition";
+	private final static boolean CYRUS_PARTITION_DEFAULT = false;
+
 	public static class Factory {
 		
 		protected IniFile.Factory iniFileFactory;
@@ -233,4 +236,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	public boolean isConfidentialEventsEnabled() {
 		return iniFile.getBooleanValue(CONFIDENTIAL_EVENTS_ENABLED, CONFIDENTIAL_EVENTS_ENABLED_DEFAULT);
 	}
+
+	@Override
+	public boolean isCyrusPartitionEnabled() {
+		return iniFile.getBooleanValue(CYRUS_PARTITION, CYRUS_PARTITION_DEFAULT);
+	}
+
 }

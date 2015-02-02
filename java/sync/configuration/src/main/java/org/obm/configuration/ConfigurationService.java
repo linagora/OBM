@@ -69,4 +69,7 @@ public interface ConfigurationService extends DomainConfiguration, DataConfigura
 	int getTransactionToleranceTimeoutInSeconds();
 	
 	boolean  isPrivateEventAnonymizationEnabled();
+
+	boolean isCyrusPartitionEnabled();
+
 }

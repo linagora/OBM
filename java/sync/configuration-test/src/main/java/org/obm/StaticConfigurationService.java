@@ -195,4 +195,9 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 		return true;
 	}
 
+	@Override
+	public boolean isCyrusPartitionEnabled() {
+		return false;
+	}
+
 }
