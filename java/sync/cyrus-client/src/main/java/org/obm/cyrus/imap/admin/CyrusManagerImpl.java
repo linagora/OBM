@@ -31,12 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
+import org.obm.configuration.ConfigurationService;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.minig.imap.StoreClient;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
@@ -44,54 +46,55 @@ import fr.aliacom.obm.common.user.UserPassword;
 
 public class CyrusManagerImpl implements CyrusManager {
 
-	private final static String TRASH = "Trash";
-	private final static String DRAFTS = "Drafts";
-	private final static String SPAM = "SPAM";
-	private final static String TEMPLATES = "Templates";
-	private final static String SENT = "Sent";
+	@VisibleForTesting final static String TRASH = "Trash";
+	@VisibleForTesting final static String DRAFTS = "Drafts";
+	@VisibleForTesting final static String SPAM = "SPAM";
+	@VisibleForTesting final static String TEMPLATES = "Templates";
+	@VisibleForTesting final static String SENT = "Sent";
 
 	public static class Factory implements CyrusManager.Factory {
 
 		private final Connection.Factory connectionFactory;
 		private final StoreClient.Factory storeClientFactory;
+		private final ConfigurationService configurationService;
 
 		@Inject
-		public Factory(Connection.Factory connectionFactory, StoreClient.Factory storeClientFactory) {
+		public Factory(Connection.Factory connectionFactory, StoreClient.Factory storeClientFactory, ConfigurationService configurationService) {
 			this.connectionFactory = connectionFactory;
 			this.storeClientFactory = storeClientFactory;
+			this.configurationService = configurationService;
 		}
 
 		@Override
 		public CyrusManagerImpl create(String hostname, String login, UserPassword password) throws IMAPException, ImapTimeoutException {
 			StoreClient storeClient = storeClientFactory.create(hostname, login, password.getStringValue().toCharArray());
 			storeClient.login(false);
-			return new CyrusManagerImpl(connectionFactory.create(storeClient));
+			return new CyrusManagerImpl(connectionFactory.create(storeClient), configurationService);
 		}
 		
 	}
 
 	private final Connection conn;
+	private final ConfigurationService configurationService;
 
-	private CyrusManagerImpl(Connection conn) {
+	@VisibleForTesting
+	CyrusManagerImpl(Connection conn, ConfigurationService configurationService) {
 		this.conn = conn;
+		this.configurationService = configurationService;
 	}
 
 	@Override
 	public void create(ObmUser obmUser) throws ImapOperationException, ConnectionException, ImapTimeoutException {
-		final String domain = obmUser.getDomain().getName();
 		String user = obmUser.getLogin();
-		Partition partition = Partition.fromObmDomain(domain);
-		conn.createUserMailboxes(
-				partition,
-				ImapPath.builder().user(user).domain(domain).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(TRASH).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(DRAFTS).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(SPAM).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(TEMPLATES).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(SENT).build()
-				);
+		String domain = obmUser.getDomain().getName();
+
+		if (configurationService.isCyrusPartitionEnabled()) {
+			conn.createUserMailboxes(Partition.fromObmDomain(domain), buildUserImapPaths(user, domain));
+		} else {
+			conn.createUserMailboxes(buildUserImapPaths(user, domain));
+		}
 	}
-	
+
 	@Override
 	public void delete(ObmUser obmUser) throws ImapOperationException, ConnectionException, ImapTimeoutException {
 		final String domain = obmUser.getDomain().getName();
@@ -123,4 +126,14 @@ public class CyrusManagerImpl implements CyrusManager {
 		conn.shutdown();
 	}
 
+	private ImapPath[] buildUserImapPaths(String user, String domain) {
+		return new ImapPath[] {
+				ImapPath.builder().user(user).domain(domain).build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment(TRASH).build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment(DRAFTS).build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment(SPAM).build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment(TEMPLATES).build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment(SENT).build()
+		};
+	}
 }

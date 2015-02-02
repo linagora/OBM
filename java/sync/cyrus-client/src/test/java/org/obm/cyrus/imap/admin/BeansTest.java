@@ -44,7 +44,7 @@ public class BeansTest {
 
 	@Test
 	public void test() {
-		equalsVerifierUtilsTest.test(Partition.class);
+		equalsVerifierUtilsTest.test(Partition.class, ImapPath.class);
 	}
 
 }

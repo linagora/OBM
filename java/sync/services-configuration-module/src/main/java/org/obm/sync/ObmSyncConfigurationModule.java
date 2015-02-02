@@ -50,7 +50,9 @@ public class ObmSyncConfigurationModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		final GlobalAppConfiguration<ObmSyncConfigurationService> globalConfiguration = buildConfiguration();
+
 		bind(ObmSyncConfigurationService.class).toInstance(globalConfiguration.getConfiguration());
+		bind(ConfigurationService.class).toInstance(globalConfiguration.getConfiguration());
 		install(new ConfigurationModule<ObmSyncConfigurationService> (globalConfiguration, ObmSyncConfigurationService.class));
 		
 		CyrusClientEmailConfiguration emailConfiguration = new CyrusClientEmailConfiguration.Factory().create(GLOBAL_CONFIGURATION_FILE);

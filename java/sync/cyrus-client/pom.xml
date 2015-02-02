@@ -15,11 +15,11 @@
 
 	<licenses>
 		<license>
-		<name>GNU AFFERO GENERAL PUBLIC LICENSE Version 3</name>
-		<url>http://www.gnu.org/licenses/agpl-3.0.html</url>
+			<name>GNU AFFERO GENERAL PUBLIC LICENSE Version 3</name>
+			<url>http://www.gnu.org/licenses/agpl-3.0.html</url>
 		</license>
 	</licenses>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
@@ -33,6 +33,11 @@
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>obm-domain-objects</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>obm-domain-objects-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>

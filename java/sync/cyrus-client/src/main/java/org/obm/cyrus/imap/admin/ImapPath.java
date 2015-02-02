@@ -31,9 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
+import java.util.List;
+
 import org.parboiled.common.Preconditions;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
@@ -88,7 +91,7 @@ public class ImapPath {
 
 	final private String user;
 	final private String domain;
-	final private ImmutableList<String> pathFragments;
+	final private List<String> pathFragments;
 
 	private ImapPath(String user, String domain, ImmutableList<String> pathFragments) {
 		this.user = user;
@@ -104,7 +107,7 @@ public class ImapPath {
 		return domain;
 	}
 
-	public ImmutableList<String> getPathFragments() {
+	public List<String> getPathFragments() {
 		return pathFragments;
 	}
 
@@ -114,4 +117,28 @@ public class ImapPath {
 				.concat(DOMAIN_SEPARATOR)
 				.concat(domain);
 	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof ImapPath) {
+			ImapPath that = (ImapPath) object;
+
+			return Objects.equal(this.user, that.user)
+					&& Objects.equal(this.domain, that.domain)
+					&& Objects.equal(this.pathFragments, that.pathFragments);
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(user, domain, pathFragments);
+	}
+
+	@Override
+	public String toString() {
+		return format();
+	}
+
 }
