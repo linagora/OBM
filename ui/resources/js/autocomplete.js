@@ -99,12 +99,15 @@ obm.AutoComplete.View = new Class({
   },
 
   // used to move the index of visible elements
-  move: function(offset) {
-    this.first += offset;
-    if ( this.first > (this.elementNb - this.visibleNb)) {
-      this.first = (this.elementNb - this.visibleNb);
+  move: function(position) {
+    this.first = position;
+    if (this.first > this.elementNb) {
+      var resultsInLastPage = this.first%this.visibleNb;
+      this.first = this.elementNb - resultsInLastPage;
     } else if ( this.first < 0 ) {
       this.first = 0;
+    } else if(this.first >= this.visibleNb){
+      this.first = this.visibleNb * parseInt(this.first / this.visibleNb);
     }
   }
 
@@ -113,7 +116,7 @@ obm.AutoComplete.View = new Class({
 
 obm.AutoComplete.Search = new Class({
 
-  Implements: Options,   
+  Implements: Options,
 
   options: {
     chars: 1,                        // min number of chars to type before requesting
@@ -162,7 +165,7 @@ obm.AutoComplete.Search = new Class({
       } else {
         this.textChangedFunc = function() {this.resetResultBox();};
       }
-      // 'mono' mode initializations 
+      // 'mono' mode initializations
       if (this.selectedBox.value != '')
         this.currentValue = this.inputField.value;
       if (this.inputField.value != '') {
@@ -196,7 +199,7 @@ obm.AutoComplete.Search = new Class({
         this.inputField.value = this.options.fieldText;
         this.lockedKey = this.options.fieldText;
         this.lockedLabel = this.options.fieldText;
-        this.inputField.addClass('downlight');      
+        this.inputField.addClass('downlight');
       }.bind(this)).setStyle('cursor', 'pointer');
     }
     this.resultBox = new Element('div').addClass('autoCompleteResultBox')
@@ -337,12 +340,12 @@ obm.AutoComplete.Search = new Class({
         onFailure:this.onFailure.bindWithEvent(this),
         onComplete:this.onNewRequestSuccess.bindWithEvent(this,[this.requestId])
       }).post({
-        pattern:this.currentValue, 
+        pattern:this.currentValue,
         limit:(this.options.results*3),
         filter_pattern: this.options.filter_pattern,
         filter_entity: this.options.filter_entity,
         restriction:this.options.restriction,
-        extension:this.options.extension});      
+        extension:this.options.extension});
     }
   },
 
@@ -364,7 +367,7 @@ obm.AutoComplete.Search = new Class({
             filter_pattern: this.options.filter_pattern,
             filter_entity: this.options.filter_entity,
             restriction:this.options.restriction,
-            extension:this.options.extension});        
+            extension:this.options.extension});
         this.cache.setSize(this.cache.getSize()+requestNbr);
       }
     }
@@ -461,10 +464,10 @@ obm.AutoComplete.Search = new Class({
       this.selection = 0;
     } else if (this.selection >= this.cache.getSize()) {
       this.selection = this.cache.getSize()-1;
-    } 
+    }
     if(!this.view.inView(this.selection)) {
-        this.flushView();
-        this.view.move(offset);
+        this.hideViewsResults();
+        this.view.move(this.selection);
         this.drawView();
         this.updateInfo();
     }
@@ -506,7 +509,7 @@ obm.AutoComplete.Search = new Class({
   // show the Result Box
   showResultBox: function() {
     var inputCoords = this.inputField.getCoordinates();
-    this.resultBox.setStyles({                  
+    this.resultBox.setStyles({
       'top':  this.inputField.offsetTop + inputCoords.height + 2  + 'px',
      'left': this.inputField.offsetLeft + 'px'
       });
@@ -521,8 +524,15 @@ obm.AutoComplete.Search = new Class({
     if (this.totalNbr>0) {
       var topLimit = this.view.getLast();
       for (var i=this.view.getFirst(); i<=topLimit; i++) {
-        this.cache.getElementAt(i).injectBefore(this.infos);
+        this.cache.getElementAt(i).setStyle('display','').injectBefore(this.infos);
       }
+    }
+  },
+
+  // hide all non-viewable result
+  hideViewsResults: function(){
+    for (var i=0; i<this.totalNbr; i++) {
+      this.cache.getElementAt(i).setStyle('display', 'none');
     }
   },
 
@@ -695,7 +705,7 @@ obm.AutoComplete.Search = new Class({
       case 'enter' :
         if(this.resultBox.getStyle('display')!='none') e.stop();
         break;
-      case 'esc' : 
+      case 'esc' :
         this.inputField.blur();
         break;
     }
@@ -829,7 +839,7 @@ obm.AutoComplete.ParallelExtSearch = new Class({
 obm.AutoComplete.ShareCalendarSearch = new Class({
   Extends: obm.AutoComplete.Search,
 
-  Implements: Options,   
+  Implements: Options,
 
   options: {
     chars: 1,                        // min number of chars to type before requesting
@@ -848,7 +858,7 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
     noresult: false,
     strict: false
   },
-  
+
   initialize: function(getUrlFunc, selectedBox, inputField, options) {
     this.parent(getUrlFunc, selectedBox, inputField, options);
     this.currentValue = this.options.fieldText;
@@ -857,7 +867,7 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
 
  // parse a response of a request and add results to cache
   parseResponse: function(response) {
-    var present = false; 
+    var present = false;
     var email = this.currentValue;
     response.datas.each(function(data) {
       var res = new Element('div').setProperty('id','item_'+data.id)
@@ -923,7 +933,7 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
         onFailure:this.onFailure.bindWithEvent(this),
         onComplete:this.onNewRequestSuccess.bindWithEvent(this,[this.requestId])
       }).post({
-        pattern:value, 
+        pattern:value,
         limit:(this.options.results*3),
         filter_pattern: this.options.filter_pattern,
         filter_entity: this.options.filter_entity,
@@ -932,4 +942,3 @@ obm.AutoComplete.ShareCalendarSearch = new Class({
     }
   }
 });
-
