@@ -32,6 +32,8 @@ package org.obm.sync.server.handler;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.isA;
 
 import org.easymock.IMocksControl;
 import org.junit.After;
@@ -39,8 +41,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
+import org.obm.sync.login.LoginBackend;
 import org.obm.sync.login.LoginBindingImpl;
 import org.obm.sync.login.TrustedLoginBindingImpl;
+import org.obm.sync.server.Request;
+import org.obm.sync.server.XmlResponder;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -121,4 +127,26 @@ public class SimpleLoginHandlerTest {
 				.build());
 	}
 
+	@Test
+	public void testLoginShouldNotConsiderPasswordAsMandatory() throws Exception {
+		Request request = control.createMock(Request.class);
+		XmlResponder responder = control.createMock(XmlResponder.class);
+		LoginBackend loginBackend = control.createMock(LoginBackend.class);
+
+		request.createSession();
+		expectLastCall();
+		expect(request.getMandatoryParameter("login")).andReturn("login");
+		expect(request.getMandatoryParameter("origin")).andReturn("origin");
+		expect(request.getParameter("password")).andReturn(null);
+		expect(request.getParameter("isPasswordHashed")).andReturn(null);
+		expect(request.getLemonLdapDomain()).andReturn("domain");
+		expect(request.getLemonLdapLogin()).andReturn("login");
+		expect(request.getRemoteIP()).andReturn("127.0.0.1");
+		expect(request.getClientIP()).andReturn("127.0.0.1");
+		expect(loginBackend.logUserIn("login", null, "origin", "127.0.0.1", "127.0.0.1", "login", "domain", false)).andReturn(null);
+		expect(responder.sendError(isA(AuthFault.class))).andReturn(null);
+		control.replay();
+
+		handler.doLogin(request, responder, loginBackend);
+	}
 }

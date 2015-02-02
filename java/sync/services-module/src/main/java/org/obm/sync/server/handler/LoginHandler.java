@@ -174,7 +174,8 @@ public class LoginHandler implements ISyncHandler {
 
 
 
-	private void doLogin(Request request, XmlResponder responder, LoginBackend loginBackend) {
+	@VisibleForTesting
+	void doLogin(Request request, XmlResponder responder, LoginBackend loginBackend) {
 		try {
 			request.createSession();
 			String origin = getOrigin(request);
@@ -221,7 +222,9 @@ public class LoginHandler implements ISyncHandler {
 	}
 	
 	private UserPassword getPassword(Request request) {
-		return UserPassword.valueOf(request.getMandatoryParameter("password"));
+		String password = request.getParameter("password");
+
+		return password != null ? UserPassword.valueOf(password) : null;
 	}
 
 
