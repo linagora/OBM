@@ -114,6 +114,12 @@ public class UserStepdefs {
 		createUserPage.open();
 	}
 	
+	@Given("on delete user page")
+	public void deleteUserPage() {
+		deleteUserPage = pageFactory.create(driver, DeleteUserPage.class);
+		deleteUserPage.open();
+	}
+	
 	@When("user creates a user without name")
 	public void createUserWithoutName() {
 		processedCreateUserPage = createUserPage.createUserAsExpectingError(UIUser.builder()
@@ -238,13 +244,12 @@ public class UserStepdefs {
 		WebElement findElement = okMessages.get(1).findElement(By.id("download_user_card"));
 	}
 
-	@When("delete user \"([^\"]*)\"")
+	@When("user deletes \"([^\"]*)\"")
 	public void deleteUser(String userLogin) {
 
 		findUserPage.gotoUsers();
 		findUserPage.findUserByLogin(userLogin);
 
-		deleteUserPage = pageFactory.create(driver, DeleteUserPage.class);
 		deleteUserPage.deleteUserByLogin(userLogin);
 	}
 	

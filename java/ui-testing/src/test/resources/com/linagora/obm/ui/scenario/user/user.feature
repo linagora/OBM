@@ -31,7 +31,7 @@
  # ***** END LICENSE BLOCK ***** */
 Feature: tests on users
 
-  Scenario: create a user without name fails
+   Scenario: create a user without name fails
     Given connected as "admin" with password "admin" on domain "obm.domain"
     Given on create user page
     When user creates a user without name 
@@ -64,8 +64,9 @@ Feature: tests on users
    Scenario: delete an admin user
      Given connected as admin0
      Given on create user page
-     Given "testAdmin2" exists with admin profile 
-     When delete user "testAdmin2"
+     Given "testAdmin2" exists with admin profile
+     Given on delete user page
+     When user deletes "testAdmin2"
      Then deletion succeeds
      And "testAdmin2" is no longer in user list
      And "testAdmin2" can t connect anymore with password "admin" on domain "obm.domain"
@@ -74,7 +75,8 @@ Feature: tests on users
      Given connected as "admin" with password "admin" on domain "obm.domain"
      Given on create user page
      Given "testUser2" exists with user profile
-     When delete user "testUser2"
+     Given on delete user page
+     When user deletes "testUser2"
      Then deletion succeeds
      And "testUser2" is no longer in user list
      And "testUser2" can t connect anymore with password "testUser2" on domain "obm.domain"
