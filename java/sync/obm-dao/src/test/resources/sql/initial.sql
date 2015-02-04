@@ -17052,9 +17052,11 @@ INSERT INTO domain (domain_name, domain_uuid, domain_label) VALUES ('test.tlse.l
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (1, 1);
 INSERT INTO domain (domain_name, domain_uuid, domain_label) VALUES ('test2.tlse.lng', '3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf', 'test2.tlse.lng');
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (2, 2);
-INSERT INTO domain (domain_name, domain_uuid, domain_label, domain_global)
+INSERT INTO domain (domain_name, domain_uuid, domain_label, domain_global, domain_alias)
     VALUES
-        ('global.virt', '00000000-1111-2222-3333-444444444444', 'Global', TRUE);
+        ('global.virt', '00000000-1111-2222-3333-444444444444', 'Global', TRUE, NULL),
+        ('domain.with.one.alias', '3b7da76a-ff7c-46f6-bd5b-700cfb21c5e3', 'WithOneAlias', FALSE, 'one.alias.alias.1'),
+        ('domain.with.three.alias', '227f8925-e95c-464d-9a37-032d2b045c7b', 'WithThreeAlias', FALSE, STRINGDECODE('three.alias.alias.1\r\nthree.alias.alias.2\r\nthree.alias.alias.3'));
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (28, 3);
 
 INSERT INTO host (host_domain_id, host_name, host_ip, host_fqdn)

@@ -47,6 +47,7 @@ import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
@@ -78,34 +79,78 @@ public class DomainDaoJdbcImplTest implements H2TestClass {
 
 	@Inject
 	private DomainDao dao;
+
+	private ObmDomain.Builder globalVirtBuilder = ObmDomain
+			.builder()
+			.uuid(ObmDomainUuid.of("00000000-1111-2222-3333-444444444444"))
+			.label("Global")
+			.name("global.virt")
+			.id(3)
+			.global(true);
+	private ObmDomain.Builder testTlseBuilder = ObmDomain
+			.builder()
+			.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
+			.label("test.tlse.lng")
+			.name("test.tlse.lng")
+			.id(1)
+			.global(false);
+	private ObmDomain.Builder testTlse2Builder = ObmDomain
+			.builder()
+			.uuid(ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf"))
+			.label("test2.tlse.lng")
+			.name("test2.tlse.lng")
+			.id(2)
+			.global(false);
+	private ObmDomain.Builder withOneAliasBuilder = ObmDomain
+			.builder()
+			.uuid(ObmDomainUuid.of("3b7da76a-ff7c-46f6-bd5b-700cfb21c5e3"))
+			.label("WithOneAlias")
+			.name("domain.with.one.alias")
+			.alias("one.alias.alias.1")
+			.id(4)
+			.global(false);
+	private ObmDomain.Builder withThreeAliasBuilder = ObmDomain
+			.builder()
+			.uuid(ObmDomainUuid.of("227f8925-e95c-464d-9a37-032d2b045c7b"))
+			.label("WithThreeAlias")
+			.name("domain.with.three.alias")
+			.aliases(ImmutableSet.of("three.alias.alias.1", "three.alias.alias.2", "three.alias.alias.3"))
+			.id(5)
+			.global(false);
+
+	private ObmHost.Builder mailHostBuilder = ObmHost
+			.builder()
+			.id(1)
+			.ip("1.2.3.4")
+			.name("mail")
+			.fqdn("mail.tlse.lng")
+			.domainId(1);
+	private ObmHost.Builder syncHostBuilder = ObmHost
+			.builder()
+			.id(2)
+			.ip("1.2.3.5")
+			.name("sync")
+			.fqdn("sync.tlse.lng")
+			.domainId(1);
 	
 	@Test
 	public void testCreateThenGet() {
-		Builder domainBuilder = ObmDomain.builder()
-			.uuid(ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66"))
-			.name("mydomain")
-			.label("my domain");
+		Builder domainBuilder = ObmDomain
+				.builder()
+				.uuid(ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66"))
+				.name("mydomain")
+				.label("my domain");
+
 		dao.create(domainBuilder.build());
-		assertThat(dao.findDomainByName("mydomain")).isEqualTo(domainBuilder.id(4).global(false).build());
+
+		assertThat(dao.findDomainByName("mydomain")).isEqualTo(domainBuilder.id(6).global(false).build());
 	}
 
 	@Test
 	public void testGetFetchesDomainHosts() {
 		ObmDomain domain = dao.findDomainByName("test.tlse.lng");
-		ObmHost mailHost = ObmHost.builder()
-				.id(1)
-				.ip("1.2.3.4")
-				.name("mail")
-				.fqdn("mail.tlse.lng")
-				.domainId(1)
-				.build();
-		ObmHost syncHost = ObmHost.builder()
-				.id(2)
-				.ip("1.2.3.5")
-				.name("sync")
-				.fqdn("sync.tlse.lng")
-				.domainId(1)
-				.build();
+		ObmHost mailHost = mailHostBuilder.build();
+		ObmHost syncHost = syncHostBuilder.build();
 		ImmutableMultimap<ServiceProperty, ObmHost> hosts = ImmutableMultimap
 				.<ServiceProperty, ObmHost>builder()
 				.put(ServiceProperty.SMTP_IN, mailHost)
@@ -124,15 +169,16 @@ public class DomainDaoJdbcImplTest implements H2TestClass {
 	@Test
 	public void testCreateThenGetByUuid() throws DaoException, DomainNotFoundException {
 		ObmDomainUuid uuid = ObmDomainUuid.of("dcf3a388-6dc4-4ac1-bf4f-88c5e4457a66");
-		Builder domainBuilder = ObmDomain.builder()
-			.uuid(uuid)
-			.name("mydomain")
-			.label("my domain")
-			.global(false);
+		Builder domainBuilder = ObmDomain
+				.builder()
+				.uuid(uuid)
+				.name("mydomain")
+				.label("my domain")
+				.global(false);
 
 		dao.create(domainBuilder.build());
 
-		assertThat(dao.findDomainByUuid(uuid)).isEqualTo(domainBuilder.id(4).global(false).build());
+		assertThat(dao.findDomainByUuid(uuid)).isEqualTo(domainBuilder.id(6).global(false).build());
 	}
 	
 	@Test
@@ -142,31 +188,16 @@ public class DomainDaoJdbcImplTest implements H2TestClass {
 			.name("mydomain")
 			.label("my domain")
 			.global(false);
+
 		dao.create(domainBuilder.build());
+
 		assertThat(dao.list()).containsOnly(
-				domainBuilder.id(4).build(),
-				ObmDomain.builder()
-					.uuid(ObmDomainUuid.of("00000000-1111-2222-3333-444444444444"))
-					.label("Global")
-					.name("global.virt")
-					.id(3)
-					.global(true)
-					.build(),
-				ObmDomain.builder()
-					.uuid(ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf"))
-					.label("test2.tlse.lng")
-					.name("test2.tlse.lng")
-					.id(2)
-					.global(false)
-					.build(),
-				ObmDomain.builder()
-					.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
-					.label("test.tlse.lng")
-					.name("test.tlse.lng")
-					.id(1)
-					.global(false)
-					.build()
-					);
+				domainBuilder.id(6).build(),
+				globalVirtBuilder.build(),
+				testTlseBuilder.build(),
+				testTlse2Builder.build(),
+				withOneAliasBuilder.build(),
+				withThreeAliasBuilder.build());
 	}
 	
 	@Test
@@ -177,31 +208,16 @@ public class DomainDaoJdbcImplTest implements H2TestClass {
 			.label("my domain")
 			.alias("myalias")
 			.global(false);
+
 		dao.create(domainBuilder.build());
+
 		assertThat(dao.list()).containsOnly(
-				domainBuilder.id(4).alias("myalias").build(), 
-				ObmDomain.builder()
-					.uuid(ObmDomainUuid.of("00000000-1111-2222-3333-444444444444"))
-					.label("Global")
-					.name("global.virt")
-					.id(3)
-					.global(true)
-					.build(),
-				ObmDomain.builder()
-					.uuid(ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf"))
-					.label("test2.tlse.lng")
-					.name("test2.tlse.lng")
-					.id(2)
-					.global(false)
-					.build(),
-				ObmDomain.builder()
-					.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
-					.label("test.tlse.lng")
-					.name("test.tlse.lng")
-					.id(1)
-					.global(false)
-					.build()
-					);
+				domainBuilder.id(6).build(),
+				globalVirtBuilder.build(),
+				testTlseBuilder.build(),
+				testTlse2Builder.build(),
+				withOneAliasBuilder.build(),
+				withThreeAliasBuilder.build());
 	}
 	
 	@Test
@@ -226,44 +242,46 @@ public class DomainDaoJdbcImplTest implements H2TestClass {
 			.label("my domain")
 			.global(false)
 			.aliases(ImmutableList.of("myalias1", "myalias2"));
+
 		dao.create(domainBuilder.build());
+
 		assertThat(dao.list()).containsOnly(
-				domainBuilder.id(4).aliases(ImmutableList.of("myalias2", "myalias1")).build(), 
-				ObmDomain.builder()
-					.uuid(ObmDomainUuid.of("00000000-1111-2222-3333-444444444444"))
-					.label("Global")
-					.name("global.virt")
-					.id(3)
-					.global(true)
-					.build(),
-				ObmDomain.builder()
-					.uuid(ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf"))
-					.label("test2.tlse.lng")
-					.name("test2.tlse.lng")
-					.id(2)
-					.global(false)
-					.build(),
-				ObmDomain.builder()
-					.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
-					.label("test.tlse.lng")
-					.name("test.tlse.lng")
-					.global(false)
-					.id(1)
-					.build()
-				);
+				domainBuilder.id(6).alias("myalias1").alias("myalias2").build(),
+				globalVirtBuilder.build(),
+				testTlseBuilder.build(),
+				testTlse2Builder.build(),
+				withOneAliasBuilder.build(),
+				withThreeAliasBuilder.build());
 	}
 	
 	@Test
 	public void testFindDomainByNameIsGlobal() {
-		ObmDomain domain = dao.findDomainByName("global.virt");
-
-		assertThat(domain.isGlobal()).isTrue();
+		assertThat(dao.findDomainByName("global.virt").isGlobal()).isTrue();
 	}
 	
 	@Test
 	public void testFindDomainByNameIsNotGlobal() {
-		ObmDomain domain = dao.findDomainByName("test.tlse.lng");
-
-		assertThat(domain.isGlobal()).isFalse();
+		assertThat(dao.findDomainByName("test.tlse.lng").isGlobal()).isFalse();
 	}
+
+	@Test
+	public void testFindDomainByNameShouldSucceedWhenDomainExists() {
+		assertThat(dao.findDomainByName("test.tlse.lng")).isEqualTo(testTlseBuilder.build());
+	}
+
+	@Test
+	public void testFindDomainByNameShouldReturnNullWhenDomainDoesntExist() {
+		assertThat(dao.findDomainByName("i.dont.exist")).isNull();
+	}
+
+	@Test
+	public void testFindDomainByNameShouldSucceedWithOneAlias() {
+		assertThat(dao.findDomainByName("one.alias.alias.1")).isEqualTo(withOneAliasBuilder.build());
+	}
+
+	@Test
+	public void testFindDomainByNameShouldSucceedWithMultipleAliases() {
+		assertThat(dao.findDomainByName("three.alias.alias.3")).isEqualTo(withThreeAliasBuilder.build());
+	}
+
 }
