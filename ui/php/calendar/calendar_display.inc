@@ -4653,6 +4653,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $owner = $event_q->f('event_owner');
     $owner_lastname = $event_q->f('owner_lastname');
     $owner_firstname = $event_q->f('owner_firstname');
+    $organizer_name = $event_q->f('owner_lastname')." ".$event_q->f('owner_firstname');
     $opacity = $event_q->f('event_opacity');
     $priority = $event_q->f('event_priority');
     $properties = $event_q->f('event_properties');
