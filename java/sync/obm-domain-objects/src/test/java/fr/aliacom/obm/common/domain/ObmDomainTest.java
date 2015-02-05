@@ -32,6 +32,8 @@ package fr.aliacom.obm.common.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.obm.sync.host.ObmHost;
+import org.obm.sync.serviceproperty.ServiceProperty;
 
 
 public class ObmDomainTest {
@@ -116,4 +118,51 @@ public class ObmDomainTest {
 		
 		assertThat(domain.isGlobal()).isFalse();
 	}
+
+	@Test
+	public void testGetByIdShouldReturnNullWhenNoHostExist() {
+		ObmDomain domain = ObmDomain
+				.builder()
+				.name("name")
+				.build();
+
+		assertThat(domain.getHostById(1)).isNull();
+	}
+
+	@Test
+	public void testGetByIdShouldReturnNullWhenHostDoesntExist() {
+		ObmHost host = ObmHost
+				.builder()
+				.id(1)
+				.name("host")
+				.domainId(1)
+				.build();
+		ObmDomain domain = ObmDomain
+				.builder()
+				.id(1)
+				.name("name")
+				.host(ServiceProperty.IMAP, host)
+				.build();
+
+		assertThat(domain.getHostById(2)).isNull();
+	}
+
+	@Test
+	public void testGetByIdShouldSucceedWhenHostExists() {
+		ObmHost host = ObmHost
+				.builder()
+				.id(1)
+				.name("host")
+				.domainId(1)
+				.build();
+		ObmDomain domain = ObmDomain
+				.builder()
+				.id(1)
+				.name("name")
+				.host(ServiceProperty.IMAP, host)
+				.build();
+
+		assertThat(domain.getHostById(1)).isEqualTo(host);
+	}
+
 }

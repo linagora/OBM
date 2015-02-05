@@ -39,8 +39,10 @@ import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
@@ -197,6 +199,17 @@ public class ObmDomain implements Serializable {
 
 	public Integer getMailChooserHookId() {
 		return mailChooserHookId;
+	}
+
+	public ObmHost getHostById(final int id) {
+		return Iterables.tryFind(hosts.values(), new Predicate<ObmHost>() {
+
+			@Override
+			public boolean apply(ObmHost host) {
+				return id == host.getId();
+			}
+
+		}).orNull();
 	}
 
 	@Override
