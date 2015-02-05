@@ -55,6 +55,7 @@ public class ObmDomain implements Serializable {
 		private String label;
 		private Boolean global;
 		private final ImmutableMultimap.Builder<ServiceProperty, ObmHost> hosts;
+		private Integer mailChooserHookId;
 		
 		private Builder() {
 			aliases = ImmutableSet.builder();
@@ -67,7 +68,8 @@ public class ObmDomain implements Serializable {
 				.uuid(domain.uuid)
 				.aliases(domain.aliases)
 				.hosts(domain.hosts)
-				.global(domain.global);
+				.global(domain.global)
+				.mailChooserHookId(domain.mailChooserHookId);
 		}
 		
 		public Builder id(int id) {
@@ -124,10 +126,15 @@ public class ObmDomain implements Serializable {
 			return this;
 		}
 
+		public Builder mailChooserHookId(Integer mailChooserHookId) {
+			this.mailChooserHookId = mailChooserHookId;
+			return this;
+		}
+
 		public ObmDomain build() {
 			global = Objects.firstNonNull(global, false);
 			
-			return new ObmDomain(id, name, uuid, label, aliases.build(), hosts.build(), global);
+			return new ObmDomain(id, name, uuid, label, aliases.build(), hosts.build(), global, mailChooserHookId);
 		}
 	}
 	
@@ -142,8 +149,10 @@ public class ObmDomain implements Serializable {
 	private final String label;
 	private final Multimap<ServiceProperty, ObmHost> hosts;
 	private final boolean global;
+	private final Integer mailChooserHookId;
 
-	private ObmDomain(Integer id, String name, ObmDomainUuid uuid, String label, Set<String> aliases, Multimap<ServiceProperty, ObmHost> hosts, boolean global) {
+	private ObmDomain(Integer id, String name, ObmDomainUuid uuid, String label, Set<String> aliases,
+			Multimap<ServiceProperty, ObmHost> hosts, boolean global, Integer mailChooserHookId) {
 		this.id = id;
 		this.name = name;
 		this.uuid = uuid;
@@ -151,6 +160,7 @@ public class ObmDomain implements Serializable {
 		this.aliases = aliases;
 		this.hosts = hosts;
 		this.global = global;
+		this.mailChooserHookId = mailChooserHookId;
 	}
 
 	public boolean isGlobal() {
@@ -183,6 +193,10 @@ public class ObmDomain implements Serializable {
 
 	public Multimap<ServiceProperty, ObmHost> getHosts() {
 		return hosts;
+	}
+
+	public Integer getMailChooserHookId() {
+		return mailChooserHookId;
 	}
 
 	@Override

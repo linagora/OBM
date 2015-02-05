@@ -192,10 +192,12 @@ public class DomainDao {
 				.aliases(aliasToIterable(rs.getString("domain_alias")))
 				.global(rs.getBoolean("domain_global"));
 
+		fetchDomainMailChooserHookId(id, domainBuilder);
+
 		return fetchDomainHosts(id, domainBuilder).build();
 	}
 
-	private ObmDomain.Builder fetchDomainHosts(Integer domainId, ObmDomain.Builder domainBuilder) throws SQLException {
+	private ObmDomain.Builder fetchDomainHosts(int domainId, ObmDomain.Builder domainBuilder) throws SQLException {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -237,4 +239,24 @@ public class DomainDao {
 
 		return domainBuilder;
 	}
+
+	private void fetchDomainMailChooserHookId(int domainId, ObmDomain.Builder domainBuilder) throws SQLException {
+		try (Connection con = dbcp.getConnection();
+			PreparedStatement ps = con.prepareStatement(
+				"SELECT CAST(serviceproperty_value AS INTEGER) " +
+				"FROM ServiceProperty " +
+				"INNER JOIN DomainEntity ON serviceproperty_entity_id = domainentity_entity_id " +
+				"WHERE domainentity_domain_id = ? AND serviceproperty_property = ?")) {
+
+			ps.setInt(1, domainId);
+			ps.setString(2, ServiceProperty.IMAP_AUTOSELECT);
+
+			ResultSet rs = ps.executeQuery();
+
+			if (rs.next()) {
+				domainBuilder.mailChooserHookId(rs.getInt(1));
+			}
+		}
+	}
+
 }

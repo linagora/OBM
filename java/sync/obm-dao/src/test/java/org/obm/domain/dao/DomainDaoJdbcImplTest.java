@@ -284,4 +284,24 @@ public class DomainDaoJdbcImplTest implements H2TestClass {
 		assertThat(dao.findDomainByName("three.alias.alias.3")).isEqualTo(withThreeAliasBuilder.build());
 	}
 
+	@Test
+	public void testFindDomainByNameShouldFetchMailChooserHookIdWhenDefined() {
+		assertThat(dao.findDomainByName("test.tlse.lng").getMailChooserHookId()).isEqualTo(98);
+	}
+
+	@Test
+	public void testFindDomainByNameShouldNotFetchMailChooserHookIdWhenNotDefined() {
+		assertThat(dao.findDomainByName("domain.with.one.alias").getMailChooserHookId()).isNull();
+	}
+
+	@Test
+	public void testFindDomainByUUIDShouldFetchMailChooserHookIdWhenDefined() throws Exception {
+		assertThat(dao.findDomainByUuid(ObmDomainUuid.of("3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf")).getMailChooserHookId()).isEqualTo(99);
+	}
+
+	@Test
+	public void testFindDomainByUUIDShouldNotFetchMailChooserHookIdWhenNotDefined() throws Exception {
+		assertThat(dao.findDomainByUuid(ObmDomainUuid.of("3b7da76a-ff7c-46f6-bd5b-700cfb21c5e3")).getMailChooserHookId()).isNull();
+	}
+
 }
