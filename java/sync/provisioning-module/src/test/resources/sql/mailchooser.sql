@@ -17044,13 +17044,13 @@ INSERT INTO serviceproperty (serviceproperty_service, serviceproperty_property, 
         ('mail', 'imap', 3, 2),
         ('mail', 'imap', 3, 3);
 
-INSERT INTO UserObm (userobm_ext_id, userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
+INSERT INTO UserObm (userobm_ext_id, userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id, userobm_mail_quota_use) 
     VALUES
-        (1, 2, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1),
-        (2, 2, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1),
-        (3, 3, 'user3','user3','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user3', 1),
-        (4, 3, 'user4','user4','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user4', 1),
-        (5, 3, 'user5','user5','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user5', 2),
-        (6, 3, 'user6','user6','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'user6', 2),
-        (7, 3, 'user7','user7','PLAIN', 'user', 'Lastname', 'Firstname', '1000', '512', '1', 'user7', 2),
-        (8, 3, 'user8','user8','PLAIN', 'user', 'Lastname', 'Firstname', '1000', '512', '0', 'user8', 3);
+        (1, 2, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1', 1, 250),
+        (2, 2, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2', 1, 500),
+        (3, 3, 'user3','user3','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user3', 1, 500),
+        (4, 3, 'user4','user4','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user4', 1, 100),
+        (5, 3, 'user5','user5','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user5', 2, 1000),
+        (6, 3, 'user6','user6','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'user6', 2, 1000),
+        (7, 3, 'user7','user7','PLAIN', 'user', 'Lastname', 'Firstname', '1000', '512', '1', 'user7', 2, 1000),
+        (8, 3, 'user8','user8','PLAIN', 'user', 'Lastname', 'Firstname', '1000', '512', '0', 'user8', 3, 4000);
