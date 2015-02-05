@@ -141,6 +141,7 @@ public class ProvisioningService extends ServletModule {
 		install(new ShiroAopModule());
 		install(new AuthorizingModule(servletContext, PROVISIONING_URL_PREFIX + "/"));
 		install(new JerseyServletModule());
+		install(new ImapBackendChooserModule());
 	}
 
 	private void bindRestResources() {

@@ -1,0 +1,2 @@
+org.obm.provisioning.mailchooser.LeastMailboxesImapBackendChooser
+org.obm.provisioning.mailchooser.LeastDiskUsageImapBackendChooser
