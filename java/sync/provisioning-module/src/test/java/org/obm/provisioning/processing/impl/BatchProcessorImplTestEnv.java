@@ -37,6 +37,8 @@ import org.obm.configuration.ConfigurationService;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
+import org.obm.provisioning.mailchooser.ImapBackendChooser;
+import org.obm.provisioning.mailchooser.LeastMailboxesImapBackendChooser;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
 import org.obm.sync.date.DateProvider;
@@ -44,6 +46,7 @@ import org.obm.sync.date.DateProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.util.Modules;
+import com.google.inject.util.Providers;
 
 public class BatchProcessorImplTestEnv extends CommonDomainEndPointEnvTest {
 
@@ -56,9 +59,13 @@ public class BatchProcessorImplTestEnv extends CommonDomainEndPointEnvTest {
 
 						@Override
 						protected void configure() {
-							bind(BatchProcessor.class).to(
-									BatchProcessorImpl.class);
+							ImapBackendChooser imapBackendChooser = new LeastMailboxesImapBackendChooser();
+
+							requestInjection(imapBackendChooser);
+
+							bind(BatchProcessor.class).to(BatchProcessorImpl.class);
 							bind(BatchTracker.class).to(BatchTrackerImpl.class);
+							bind(ImapBackendChooser.class).toProvider(Providers.of(imapBackendChooser));
 						}
 
 					}));

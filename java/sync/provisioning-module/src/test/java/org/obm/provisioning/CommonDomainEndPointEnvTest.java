@@ -79,6 +79,7 @@ import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 import org.obm.provisioning.ldap.client.Configuration;
 import org.obm.provisioning.ldap.client.LdapConfiguration;
 import org.obm.provisioning.ldap.client.LdapService;
+import org.obm.provisioning.mailchooser.LeastMailboxesImapBackendChooser;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
 import org.obm.push.utils.UUIDFactory;
@@ -183,16 +184,22 @@ public abstract class CommonDomainEndPointEnvTest {
 
 	protected static final ProfileName userProfile = ProfileName.builder().name("user").build();
 
+	protected static ObmHost cyrusHost = ObmHost
+			.builder()
+			.id(1)
+			.name("Cyrus")
+			.localhost()
+			.build();
+
 	protected static final ObmDomain domain = ObmDomain
 			.builder()
 			.name("domain")
 			.id(1)
 			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
-			.host(
-					ServiceProperty.IMAP,
-					ObmHost.builder().name("host").build())
-			.host(ServiceProperty.LDAP, ObmHost.builder().ip("1.2.3.4").build())
+			.host(ServiceProperty.IMAP, cyrusHost)
+			.host(ServiceProperty.LDAP, ObmHost.builder().id(2).ip("1.2.3.4").build())
 			.alias("domain.com")
+			.mailChooserHookId(LeastMailboxesImapBackendChooser.ID)
 			.build();
 
 	protected static final ProfileName profileName = ProfileName
@@ -389,7 +396,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"faxes\":[\"fax\",\"fax2\"]," +
 					"\"archived\":false," +
 					"\"mail_quota\":\"1234\"," +
-					"\"mail_server\":\"host\"," +
+					"\"mail_server\":\"Cyrus\"," +
 					"\"mails\":[\"john@domain\",\"jo@*\",\"john@alias\"]," +
 					"\"effectiveMails\":[\"john@domain\",\"jo@domain\",\"jo@domain.com\",\"john@alias\"]," +
 					"\"hidden\":true," +

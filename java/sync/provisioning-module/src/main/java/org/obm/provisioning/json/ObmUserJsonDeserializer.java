@@ -42,6 +42,7 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 import org.obm.provisioning.bean.UserJsonFields;
+import org.obm.provisioning.mailchooser.ImapBackendChooserProvider;
 import org.obm.sync.host.ObmHost;
 
 import com.google.common.base.Preconditions;
@@ -65,10 +66,12 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 	private final UserPhones.Builder userPhonesBuilder;
 	private final UserWork.Builder userWorkBuilder;
 	private final UserEmails.Builder userEmailsBuilder;
+	private final ImapBackendChooserProvider imapBackendChooserProvider;
 
 	@Inject
-	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider) {
+	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ImapBackendChooserProvider imapBackendChooserProvider) {
 		this.domainProvider = domainProvider;
+		this.imapBackendChooserProvider = imapBackendChooserProvider;
 		this.userBuilder = ObmUser.builder();
 		this.userIdentityBuilder = UserIdentity.builder();
 		this.userAddressBuilder = UserAddress.builder();
@@ -77,8 +80,10 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		this.userEmailsBuilder = UserEmails.builder();
 	}
 
-	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ObmUser fromUser) {
-		this(domainProvider);
+	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ImapBackendChooserProvider imapBackendChooserProvider,
+			ObmUser fromUser) {
+		this(domainProvider, imapBackendChooserProvider);
+
 		this.userBuilder.from(fromUser);
 		this.userIdentityBuilder.from(fromUser.getIdentity());
 		this.userAddressBuilder.from(fromUser.getAddress());
@@ -97,7 +102,8 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 					userAddressBuilder, userPhonesBuilder, userWorkBuilder, userEmailsBuilder);
 		}
 
-		ObmHost mailServer = getMailHostValue(jsonNode, domain);
+		ObmHost mailServer = getMailHostValue(jsonNode, domain, imapBackendChooserProvider.getImapBackendChooserForDomain(domain));
+
 		if (mailServer != null) {
 			userEmailsBuilder.server(mailServer);
 		}

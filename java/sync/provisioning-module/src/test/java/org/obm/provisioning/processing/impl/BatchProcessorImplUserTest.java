@@ -1,12 +1,15 @@
 package org.obm.provisioning.processing.impl;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.easymock.EasyMock.anyInt;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.isNull;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
@@ -16,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.cyrus.imap.admin.CyrusImapService;
 import org.obm.cyrus.imap.admin.CyrusManager;
+import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.EntityRightDao;
 import org.obm.domain.dao.PUserDao;
 import org.obm.domain.dao.UserDao;
@@ -36,6 +40,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.ldap.client.LdapManager;
+import org.obm.provisioning.mailchooser.LeastMailboxesImapBackendChooser;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.imap.IMAPException;
@@ -80,6 +85,8 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 	private CyrusImapService cyrusService;
 	@Inject
 	private SatelliteService satelliteService;
+	@Inject
+	private DatabaseConnectionProvider dbcp;
 
 	private final Date date = DateUtils.date("2013-08-01T12:00:00");
 
@@ -112,13 +119,13 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 			.name("domain")
 			.id(1)
 			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
+			.host(ServiceProperty.IMAP, cyrusHost)
 			.host(ServiceProperty.IMAP,
-					ObmHost.builder().name("Cyrus").localhost().build())
-			.host(ServiceProperty.IMAP,
-					ObmHost.builder().name("NewCyrus").localhost().build())
+					ObmHost.builder().id(2).name("NewCyrus").localhost().build())
 			.host(ServiceProperty.LDAP,
-					ObmHost.builder().name("OpenLDAP").localhost().build())
+					ObmHost.builder().id(3).name("OpenLDAP").localhost().build())
 			.alias("domain.com")
+			.mailChooserHookId(LeastMailboxesImapBackendChooser.ID)
 			.build();
 
 	private final ObmDomain domainWithImapWithoutLdap = ObmDomain
@@ -126,9 +133,9 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 			.name("domain")
 			.id(1)
 			.uuid(ObmDomainUuid.of("a3443822-bb58-4585-af72-543a287f7c0e"))
-			.host(ServiceProperty.IMAP,
-					ObmHost.builder().name("host").ip("127.0.0.1").localhost().build())
+			.host(ServiceProperty.IMAP, cyrusHost)
 			.alias("domain.com")
+			.mailChooserHookId(LeastMailboxesImapBackendChooser.ID)
 			.build();
 
 	private final UserLogin user1Login = UserLogin.valueOf("user1");
@@ -198,7 +205,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("host").build())
+					.server(cyrusHost)
 					.domain(domain)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -211,7 +218,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("host").localhost().build())
+					.server(cyrusHost)
 					.domain(domain)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -220,6 +227,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.build();
 
 		expectDomain();
+		expectImapBackendChooser();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(userDao.getAllEmailsFrom(domain, user.getExtId())).andReturn(ImmutableSet.<String>of());
 		expect(userDao.create(user)).andReturn(userFromDao);
@@ -276,7 +284,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("host").build())
+					.server(cyrusHost)
 					.domain(domain)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -290,7 +298,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("host").localhost().build())
+					.server(cyrusHost)
 					.domain(domain)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -300,6 +308,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.build();
 
 		expectDomain();
+		expectImapBackendChooser();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(userDao.getAllEmailsFrom(domain, user.getExtId())).andReturn(ImmutableSet.<String>of());
 		expect(userDao.create(user)).andReturn(userFromDao);
@@ -354,7 +363,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("host").ip("127.0.0.1").build())
+					.server(cyrusHost)
 					.domain(domainWithImapWithoutLdap)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -367,7 +376,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("host").localhost().build())
+					.server(cyrusHost)
 					.domain(domainWithImapWithoutLdap)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -376,6 +385,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.build();
 
 		expectDomain(domainWithImapWithoutLdap);
+		expectImapBackendChooser();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(userDao.getAllEmailsFrom(domainWithImapWithoutLdap, user.getExtId())).andReturn(ImmutableSet.<String>of());
 		expect(userDao.create(user)).andReturn(userFromDao);
@@ -428,6 +438,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.operation(opBuilder.build());
 
 		expectDomain();
+		expectImapBackendChooser();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(userDao.getAllEmailsFrom(domain, UserExtId.valueOf("extIdUser1"))).andReturn(ImmutableSet.of("john@domain"));
 
@@ -505,7 +516,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("host").build())
+					.server(cyrusHost)
 					.domain(domain)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -517,7 +528,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("host").localhost().build())
+					.server(cyrusHost)
 					.domain(domain)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -526,6 +537,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.build();
 
 		expectDomain();
+		expectImapBackendChooser();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(userDao.getAllEmailsFrom(domain, user.getExtId())).andReturn(ImmutableSet.<String>of());
 		expect(userDao.create(user)).andReturn(userFromDao);
@@ -654,6 +666,29 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		given().auth().basic("username@domain", "password")
 				.patch("/batches/1/users/1");
 		given().auth().basic("username@domain", "password").put("/batches/1");
+	}
+
+	private void expectImapBackendChooser() throws Exception {
+		java.sql.Connection connection = mocksControl.createMock(java.sql.Connection.class);
+		PreparedStatement ps = mocksControl.createMock(PreparedStatement.class);
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+
+		expect(dbcp.getConnection()).andReturn(connection);
+		expect(connection.prepareStatement(isA(String.class))).andReturn(ps);
+		expect(ps.executeQuery()).andReturn(rs);
+		ps.setInt(eq(1), anyInt());
+		expectLastCall();
+		ps.setString(eq(2), isA(String.class));
+		expectLastCall();
+		ps.setString(eq(3), isA(String.class));
+		expectLastCall();
+		expect(rs.next()).andReturn(true);
+		expect(rs.getInt("host_id")).andReturn(1);
+		expect(rs.getInt("count")).andReturn(1);
+		ps.close();
+		expectLastCall();
+		connection.close();
+		expectLastCall();
 	}
 
 	private void expectBatchCreationAndRetrieval(Batch batch) throws Exception {
@@ -1043,7 +1078,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.server(cyrusHost)
 					.domain(domainWithImapAndLdap)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -1058,7 +1093,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.server(cyrusHost)
 					.domain(domainWithImapAndLdap)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -1067,6 +1102,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.build();
 
 		expectDomain();
+		expectImapBackendChooser();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(
 				userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
@@ -1126,7 +1162,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.server(cyrusHost)
 					.domain(domainWithImapAndLdap)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -1135,6 +1171,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.build();
 
 		expectDomain();
+		expectImapBackendChooser();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
 						domainWithImapAndLdap)).andReturn(userFromDao);
@@ -1190,7 +1227,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.server(cyrusHost)
 					.domain(domain)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -1256,7 +1293,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
 					.domain(domain)
-					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.server(cyrusHost)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
 				.extId(UserExtId.valueOf("extIdUser1"))
@@ -1521,7 +1558,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.server(cyrusHost)
 					.domain(domain)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -1580,7 +1617,8 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 										+ "\"mails\":[\"john@domain\", \"alias1\"]" + "}")
 								.build());
 		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
-				.domain(domain).status(BatchStatus.IDLE)
+				.domain(domain)
+				.status(BatchStatus.IDLE)
 				.operation(opBuilder.build());
 
 		ObmUser.Builder builder = ObmUser
@@ -1591,7 +1629,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("host").build())
+					.server(cyrusHost)
 					.domain(domain)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
@@ -1601,6 +1639,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		ObmUser userFromDao = builder.build();
 
 		expectDomain();
+		expectImapBackendChooser();
 		expectBatchCreationAndRetrieval(batchBuilder.build());
 		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domain))
 				.andReturn(userFromDao);
@@ -1650,7 +1689,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
 					.domain(domainWithImapAndLdap)
-					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.server(cyrusHost)
 					.build())
 				.profileName(ProfileName.valueOf("user"))
 				.identity(user1Name)
@@ -1709,7 +1748,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				.password(UserPassword.valueOf("secret"))
 				.emails(UserEmails.builder()
 					.addAddress("john@domain")
-					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.server(cyrusHost)
 					.domain(domain)
 					.build())
 				.profileName(ProfileName.valueOf("user"))

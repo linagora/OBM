@@ -55,8 +55,9 @@ public class PatchUserOperationProcessor extends AbstractModifyUserOperationProc
 	@Override
 	protected ObjectMapper getObjectMapper(ObmDomain domain) {
 		Module module = new SimpleModule("InBatch", new Version(0, 0, 0, null))
-			.addDeserializer(ObmUser.class, new ObmUserJsonDeserializer(Providers.of(domain), getExistingUser()));
+			.addDeserializer(ObmUser.class, new ObmUserJsonDeserializer(Providers.of(domain), imapBackendChooserProvider, getExistingUser()));
 
 		return ProvisioningService.createObjectMapper(module);
 	}
+
 }

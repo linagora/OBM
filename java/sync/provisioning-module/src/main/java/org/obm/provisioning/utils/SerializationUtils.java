@@ -46,6 +46,7 @@ import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.bean.UserJsonFields;
+import org.obm.provisioning.mailchooser.ImapBackendChooser;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
@@ -71,27 +72,20 @@ import fr.aliacom.obm.common.user.UserWork;
 public class SerializationUtils {
 	
 	private static final String PATTERN_AT_STAR = "@*";
-	
-	public static final ServiceProperty IMAP_SERVICE_PROPERTY = ServiceProperty
-			.builder()
-			.service("mail")
-			.property("imap")
-			.build();
 
-	public static ObmHost getMailHostValue(JsonNode jsonNode, ObmDomain domain) {
+	public static ObmHost getMailHostValue(JsonNode jsonNode, ObmDomain domain, ImapBackendChooser imapBackendChooser) {
 		ObmHost mailHost = null;
 
 		JsonNode serverNode = jsonNode.findValue(MAIL_SERVER.asSpecificationValue());
 		JsonNode emailsNode = jsonNode.findValue(MAILS.asSpecificationValue());
 
-		final Collection<String> mails = !isNullOrNullNode(emailsNode) ? getCurrentTokenTextValues(emailsNode) : null;
-		final Collection<ObmHost> imapServices = domain.getHosts().get(IMAP_SERVICE_PROPERTY);
+		Collection<String> mails = !isNullOrNullNode(emailsNode) ? getCurrentTokenTextValues(emailsNode) : null;
+		Collection<ObmHost> imapServices = domain.getHosts().get(ServiceProperty.IMAP);
 
 		if (!isNullOrNullNode(serverNode)) {
 			mailHost = findMailHostForUser(serverNode.asText(), imapServices);
-		}
-		else if (mails != null && !mails.isEmpty()) {
-			mailHost = Iterables.getFirst(imapServices, null);
+		} else if (mails != null && !mails.isEmpty()) {
+			mailHost = imapBackendChooser.choose(domain);
 		}
 		
 		return mailHost;
