@@ -32,10 +32,10 @@ applicable to the OBM software.
 
 ?>Email này đã được tự động gửi từ OBM
 ------------------------------------------------------------------
-Chia sẻ calendar
+Chia sẻ lịch
 ------------------------------------------------------------------
 
-<?php echo $user['firstname'].' '.$user['lastname']; ?> bây giờ cho phép bạn nhập calendar OBM.
+<?php echo $user['firstname'].' '.$user['lastname']; ?> bây giờ cho phép bạn nhập lịch trong OBM.
 
-:: Nhập ical: 
+:: Nhập ical:
   <?php echo $url; ?>

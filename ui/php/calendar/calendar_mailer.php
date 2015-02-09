@@ -480,48 +480,67 @@ class shareCalendarMailer extends OBM_Mailer {
 
   public function userShareHtml($user) {
     $this->from = $this->getSender();
-    $this->subject = __('Partage d\'agenda : %firstname% %name%', 
+
+    $this->subject = __('Partage d\'agenda : %firstname% %name%',
       array('%name%' => $user['lastname'], '%firstname%' => $user['firstname']));
-    $this->body = array('user' => $user, 'url' => $this->getHtmlCalUri($user)); 
+    $this->body = array('user' => $user, 'url' => $this->getHtmlCalUri($user));
+
   }
-  
+
+  public function resourceShareHtml($resource) {
+    $this->from = $this->getSender();
+
+    $this->subject = __('Partage d\'agenda de ressource: '. $resource['name']);
+    $this->body = array('resource' => $resource, 'url' => $this->getHtmlCalUri($resource));
+
+  }
+
+
   public function userShareFreebusy($user) {
   	$this->from = $this->getSender();
   	$this->subject = __('OBM free/busy information sharing : %firstname% %name%',
   	array('%name%' => $user['lastname'], '%firstname%' => $user['firstname']));
   	$this->body = array('user' => $user, 'url' => $this->getFreebusyCalUri($user));
-  	
+
   	if ($this->attachVcard) {
   		$this->attachments[] = array(
-  	        'content' => (string) $this->generateVcard($user), 
+  	        'content' => (string) $this->generateVcard($user),
   	        'filename' => 'contact.vcf', 'content_type' => 'text/x-vcard'
   		);
   	}
-  } 
+  }
 
   public function userShareIcs($user) {
     $this->from = $this->getSender();
-    $this->subject = __('Partage d\'agenda : %firstname% %name%', 
+
+    $this->subject = __('Partage d\'agenda : %firstname% %name%',
       array('%name%' => $user['lastname'], '%firstname%' => $user['firstname']));
     $this->body = array('user' => $user, 'url' => $this->getCalUri($user));
-    
+
     if ($this->attachVcard) {
       $this->attachments[] = array(
-        'content' => (string) $this->generateVcard($user), 
+        'content' => (string) $this->generateVcard($user),
         'filename' => 'contact.vcf', 'content_type' => 'text/x-vcard'
       );
     }
   }
-  
+
+  public function resourceShareIcs($resource) {
+    $this->from = $this->getSender();
+
+    $this->subject = __('Partage d\'agenda de ressource: '. $resource['name']);
+    $this->body = array('resource' => $resource, 'url' => $this->getHtmlCalUri($resource));
+  }
+
   private function generateVcard($user) {
     $card = new Vpdi_Vcard();
-    
+
     $name = new Vpdi_Vcard_Name();
     $name->family = $user['lastname'];
     $name->given  = $user['firstname'];
     //$name->fullname =  ;
     $card->setName($name);
-    
+
     $add = new Vpdi_Vcard_Address();
     $add->street = $user['address1'];
     $add->extended = $user['address2'];

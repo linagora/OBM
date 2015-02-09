@@ -118,12 +118,19 @@ function handle_send_url($params, $obm) {
     assert_has_right_to_share($obm, $params);
     $format = $params['format'];
     $params['others_attendees'][]=$params['mail'];
-    $entity = get_user_info($params['entity_id']);
+    $type = $params['entity_type'];
+
+    if($type == 'user'){
+      $entity = get_user_info($params['entity_id']);
+    } else {
+      $entity = get_resource_info($params['entity_id']);
+    }
+
     $entity['token'] = get_calendar_entity_share($params['entity_id'],$params['entity_type'],$params['type']);
     run_query_insert_others_attendees($params);
     $sharemail = new shareCalendarMailer();
     $sharemail->addRecipient($params['mail']);
-    $sharemail->send("userShare$format",array($entity));
+    $sharemail->send($type . "Share" . $format,array($entity));
 }
 
 class UnknownEntityTypeException extends Exception {
