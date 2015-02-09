@@ -115,6 +115,9 @@ function handle_share_reinit($params, $obm) {
 }
 
 function handle_send_url($params, $obm) {
+
+    global $l_calendar_share_subject, $l_resource_share_subject;
+  
     assert_has_right_to_share($obm, $params);
     $format = $params['format'];
     $params['others_attendees'][]=$params['mail'];
@@ -122,8 +125,10 @@ function handle_send_url($params, $obm) {
 
     if($type == 'user'){
       $entity = get_user_info($params['entity_id']);
+      $entity['subject']= $l_calendar_share_subject;
     } else {
       $entity = get_resource_info($params['entity_id']);
+      $entity['subject']= $l_resource_share_subject;
     }
 
     $entity['token'] = get_calendar_entity_share($params['entity_id'],$params['entity_type'],$params['type']);

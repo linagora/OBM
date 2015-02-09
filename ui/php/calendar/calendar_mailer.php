@@ -481,7 +481,7 @@ class shareCalendarMailer extends OBM_Mailer {
   public function userShareHtml($user) {
     $this->from = $this->getSender();
 
-    $this->subject = __('Partage d\'agenda : %firstname% %name%',
+    $this->subject = __($user['subject'].' : %firstname% %name%',
       array('%name%' => $user['lastname'], '%firstname%' => $user['firstname']));
     $this->body = array('user' => $user, 'url' => $this->getHtmlCalUri($user));
 
@@ -490,7 +490,7 @@ class shareCalendarMailer extends OBM_Mailer {
   public function resourceShareHtml($resource) {
     $this->from = $this->getSender();
 
-    $this->subject = __('Partage d\'agenda de ressource: '. $resource['name']);
+    $this->subject = __($resource['subject'].": ".$resource['name']);
     $this->body = array('resource' => $resource, 'url' => $this->getHtmlCalUri($resource));
 
   }
@@ -513,7 +513,7 @@ class shareCalendarMailer extends OBM_Mailer {
   public function userShareIcs($user) {
     $this->from = $this->getSender();
 
-    $this->subject = __('Partage d\'agenda : %firstname% %name%',
+    $this->subject = __($user['subject'].' : %firstname% %name%',
       array('%name%' => $user['lastname'], '%firstname%' => $user['firstname']));
     $this->body = array('user' => $user, 'url' => $this->getCalUri($user));
 
@@ -528,7 +528,7 @@ class shareCalendarMailer extends OBM_Mailer {
   public function resourceShareIcs($resource) {
     $this->from = $this->getSender();
 
-    $this->subject = __('Partage d\'agenda de ressource: '. $resource['name']);
+    $this->subject = __($resource['subject'].": ".$resource['name']);
     $this->body = array('resource' => $resource, 'url' => $this->getHtmlCalUri($resource));
   }
 
