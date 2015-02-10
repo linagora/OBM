@@ -40,6 +40,7 @@ import static org.obm.provisioning.bean.UserJsonFields.COUNTRY;
 import static org.obm.provisioning.bean.UserJsonFields.DESCRIPTION;
 import static org.obm.provisioning.bean.UserJsonFields.DIRECTION;
 import static org.obm.provisioning.bean.UserJsonFields.EFFECTIVEMAILS;
+import static org.obm.provisioning.bean.UserJsonFields.EXPIRATIONDATE;
 import static org.obm.provisioning.bean.UserJsonFields.FAXES;
 import static org.obm.provisioning.bean.UserJsonFields.FIRSTNAME;
 import static org.obm.provisioning.bean.UserJsonFields.GROUPS;
@@ -123,6 +124,7 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeBooleanField(HIDDEN.asSpecificationValue(), value.isHidden());
 		jgen.writeObjectField(TIMECREATE.asSpecificationValue(), value.getTimeCreate());
 		jgen.writeObjectField(TIMEUPDATE.asSpecificationValue(), value.getTimeUpdate());
+		jgen.writeObjectField(EXPIRATIONDATE.asSpecificationValue(), value.getExpirationDate());
 		jgen.writeObjectField(GROUPS.asSpecificationValue(), extractGroupIdentifiers(value.getGroups(), value.getDomain()));
 		jgen.writeEndObject();
 	}

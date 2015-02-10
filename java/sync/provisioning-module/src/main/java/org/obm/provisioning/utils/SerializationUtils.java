@@ -221,6 +221,9 @@ public class SerializationUtils {
 			case HIDDEN:
 				toBuild.hidden(value.asBoolean());
 				break;
+			case EXPIRATIONDATE:
+				toBuild.expirationDate(date(value.asText()));
+				break;
 		}
 	}
 

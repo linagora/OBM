@@ -179,6 +179,7 @@ public abstract class CommonDomainEndPointEnvTest {
 
 	private static Date TIMECREATE = DateUtils.date("2013-06-11T14:00:00Z");
 	private static Date TIMEUPDATE = DateUtils.date("2013-06-11T15:00:00Z");
+	private static Date EXPIRATIONDATE = DateUtils.date("2015-12-31T00:00:00Z");
 	
 	protected static final ProfileName adminProfile = ProfileName.builder().name("admin").build();
 
@@ -402,6 +403,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"hidden\":true," +
 					"\"timecreate\":\"2013-06-11T14:00:00.000+0000\"," +
 					"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
+					"\"expiration_date\":\"2015-12-31T00:00:00.000+0000\"," +
 					"\"groups\":" +
 						"[]" +
 				"}";
@@ -439,6 +441,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"hidden\":true," +
 				"\"timecreate\":\"2013-06-11T14:00:00.000+0000\"," +
 				"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
+				"\"expiration_date\":\"2015-12-31T00:00:00.000+0000\"," +
 				"\"groups\":" +
 					"[" +
 						"{" +
@@ -523,6 +526,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"hidden\":false," +
 					"\"timecreate\":null," +
 					"\"timeupdate\":null," +
+					"\"expiration_date\":null," +
 					"\"groups\":[]" +
 				"}";
 	}
@@ -573,6 +577,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					.build())
 				.timeCreate(TIMECREATE)
 				.timeUpdate(TIMEUPDATE)
+				.expirationDate(EXPIRATIONDATE)
 				.groups(fakeGroups())
 				.build();
 	}
