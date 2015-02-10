@@ -138,7 +138,8 @@ public class UserDaoJdbcImpl implements UserDao {
 			"host_fqdn, " +
 			"host_ip, " +
 			"host_domain_id," +
-			"userobm_account_dateexp";
+			"userobm_account_dateexp," +
+			"userobm_delegation";
 	private static final AddressBook CONTACTS_BOOK = AddressBook
 			.builder()
 			.name("contacts")
@@ -381,6 +382,7 @@ public class UserDaoJdbcImpl implements UserDao {
 					.updatedBy(updator)
 					.groups(Objects.firstNonNull(groups, Collections.EMPTY_SET))
 					.expirationDate(JDBCUtils.getDate(rs, "userobm_account_dateexp"))
+					.delegation(emptyToNull(rs.getString("userobm_delegation")))	
 					.build();
 		} catch (DaoException e) {
 			throw new SQLException(e);
@@ -607,12 +609,13 @@ public class UserDaoJdbcImpl implements UserDao {
 				"userobm_archive, " +
 				"userobm_uid," +
 				"userobm_gid," +
-				"userobm_account_dateexp"+
+				"userobm_account_dateexp," +
+				"userobm_delegation" +
 				") VALUES (" +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-					"?, ?, ?, ?, ?, ?" +
+					"?, ?, ?, ?, ?, ?, ? " +
 				")";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -701,6 +704,8 @@ public class UserDaoJdbcImpl implements UserDao {
 				 ps.setNull(idx++, Types.DATE);
 			 }
 
+			ps.setString(idx++, user.getDelegation());
+
 			ps.executeUpdate();
 
 			int userId = obmHelper.lastInsertId(conn);
@@ -777,7 +782,8 @@ public class UserDaoJdbcImpl implements UserDao {
                     "userobm_mail_perms = ?, " +
                     "userobm_hidden = ?, " +
                     "userobm_archive = ?, " +
-                    "userobm_account_dateexp = ? " +
+                    "userobm_account_dateexp = ?, " +
+                    "userobm_delegation = ? " +
                     "WHERE userobm_id = ?";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -849,6 +855,8 @@ public class UserDaoJdbcImpl implements UserDao {
 			} else {
 				ps.setNull(idx++, Types.DATE);
 			}
+			
+			ps.setString(idx++, user.getDelegation());
 			
 			ps.setInt(idx++, user.getUid());
 

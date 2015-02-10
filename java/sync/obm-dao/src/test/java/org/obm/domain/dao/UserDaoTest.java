@@ -362,6 +362,7 @@ public class UserDaoTest {
 		expect(rs.getInt("userobm_userupdate")).andReturn(0);
 		expect(rs.getInt("userobm_usercreate")).andReturn(0);
 		expect(rs.getTimestamp("userobm_account_dateexp")).andReturn(null);
+		expect(rs.getString("userobm_delegation")).andReturn(null);
 		
 		mocksControl.replay();
 		ObmUser obmUser = userDao.createUserFromResultSetAndFetchCreators(domain, rs);

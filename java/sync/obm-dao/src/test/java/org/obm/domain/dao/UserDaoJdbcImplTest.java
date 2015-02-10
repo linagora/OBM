@@ -491,6 +491,49 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		assertThat(dao.update(user)).isEqualTo(user);
 	}
 
+	@Test
+	public void testFindByLoginShouldReadDelegation() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("123456"))
+				.login(UserLogin.valueOf("haveadelegation"))
+				.password(UserPassword.valueOf("secure"))
+				.profileName(ProfileName.valueOf("user"))
+				.identity(johnIdentity)
+				.domain(domain)
+				.delegation("delegation");
+
+		dao.create(userBuilder.build());
+
+		assertThat(dao.findUserByLogin("haveadelegation", domain).getDelegation()).isEqualTo("delegation");
+	}
+	
+	@Test
+	public void testCreateShouldWriteDelegation() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("123456"))
+				.login(validLogin)
+				.password(UserPassword.valueOf("secure"))
+				.profileName(ProfileName.valueOf("user"))
+				.identity(johnIdentity)
+				.domain(domain)
+				.delegation("delegation");
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+		
+		assertThat(createdUser.getDelegation()).isEqualTo("delegation");
+	}
+
+	@Test
+	public void testUpdateShouldWriteDelegation() throws Exception {
+		ObmUser user = sampleUserBuilder(1, 3, "1")
+				.delegation("delegation")
+				.build();
+
+		assertThat(dao.update(user)).isEqualTo(user);
+	}
+
 	@Test(expected = UserNotFoundException.class)
 	public void testUpdateWhenUserDoestExist() throws SQLException, UserNotFoundException {
 		ObmUser user = ObmUser
