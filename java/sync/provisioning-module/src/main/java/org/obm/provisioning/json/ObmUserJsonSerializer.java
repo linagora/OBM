@@ -37,6 +37,7 @@ import static org.obm.provisioning.bean.UserJsonFields.BUSINESS_ZIPCODE;
 import static org.obm.provisioning.bean.UserJsonFields.COMMONNAME;
 import static org.obm.provisioning.bean.UserJsonFields.COMPANY;
 import static org.obm.provisioning.bean.UserJsonFields.COUNTRY;
+import static org.obm.provisioning.bean.UserJsonFields.DELEGATION;
 import static org.obm.provisioning.bean.UserJsonFields.DESCRIPTION;
 import static org.obm.provisioning.bean.UserJsonFields.DIRECTION;
 import static org.obm.provisioning.bean.UserJsonFields.EFFECTIVEMAILS;
@@ -125,6 +126,7 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeObjectField(TIMECREATE.asSpecificationValue(), value.getTimeCreate());
 		jgen.writeObjectField(TIMEUPDATE.asSpecificationValue(), value.getTimeUpdate());
 		jgen.writeObjectField(EXPIRATIONDATE.asSpecificationValue(), value.getExpirationDate());
+		jgen.writeStringField(DELEGATION.asSpecificationValue(), value.getDelegation());
 		jgen.writeObjectField(GROUPS.asSpecificationValue(), extractGroupIdentifiers(value.getGroups(), value.getDomain()));
 		jgen.writeEndObject();
 	}

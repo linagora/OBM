@@ -224,6 +224,9 @@ public class SerializationUtils {
 			case EXPIRATIONDATE:
 				toBuild.expirationDate(date(value.asText()));
 				break;
+			case DELEGATION:
+				toBuild.delegation(value.asText());
+				break;
 		}
 	}
 
