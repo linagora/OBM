@@ -82,6 +82,8 @@ public class ObmUser {
 
 		private Integer uidNumber;
 		private Integer gidNumber;
+
+		private Date expirationDate;
 		
 		private final ImmutableSet.Builder<Group> groups;
 
@@ -112,7 +114,8 @@ public class ObmUser {
 					.updatedBy(user.updatedBy)
 					.uidNumber(user.uidNumber)
 					.gidNumber(user.gidNumber)
-					.groups(user.groups);
+					.groups(user.groups)
+					.expirationDate(user.expirationDate);
 		}
 
 		public Builder uid(Integer uid) {
@@ -213,7 +216,10 @@ public class ObmUser {
 			this.gidNumber = gidNumber;
 			return this;
 		}
-
+		public Builder expirationDate(Date expirationDate) {
+			this.expirationDate =  expirationDate;
+			return this;
+		}
 		public Builder groups(Iterable<Group> groups) {
 			Preconditions.checkNotNull(groups);
 			this.groups.addAll(groups);
@@ -240,7 +246,7 @@ public class ObmUser {
 					hidden, address, phones, work, emails,
 					description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName,
-					archived, password, uidNumber, gidNumber, groups.build());
+					archived, password, uidNumber, gidNumber, groups.build(), expirationDate);
 		}
 		
 	}
@@ -275,13 +281,14 @@ public class ObmUser {
 	private final Integer gidNumber;
 	
 	private final Set<Group> groups;
+	private final Date expirationDate;
 
 	private ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, UserIdentity identity,
 			boolean hidden, UserAddress address, UserPhones phones, UserWork work, UserEmails emails,
 			String description, Date timeCreate, Date timeUpdate,
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName,
-			boolean archived, UserPassword password, Integer uidNumber, Integer gidNumber, Set<Group> groups) {
+			boolean archived, UserPassword password, Integer uidNumber, Integer gidNumber, Set<Group> groups,  Date expirationDate) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -306,6 +313,7 @@ public class ObmUser {
 		this.uidNumber = uidNumber;
 		this.gidNumber = gidNumber;
 		this.groups = groups;
+		this.expirationDate = expirationDate;
 	}
 
 	public int getUid() {
@@ -529,12 +537,16 @@ public class ObmUser {
 		return emails.isEmailAvailable();
 	}
 
+	public Date getExpirationDate() {
+		return expirationDate;
+	}
+
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(uid, entityId, login, extId, admin, identity, emails,
 				hidden, address, phones, work,
 				description, createdBy, updatedBy, domain, publicFreeBusy, profileName,
-				archived, password, uidNumber, gidNumber, groups);
+				archived, password, uidNumber, gidNumber, groups, expirationDate);
 	}
 	
 	@Override
@@ -562,7 +574,8 @@ public class ObmUser {
 				&& Objects.equal(this.password, that.password)
 				&& Objects.equal(this.uidNumber, that.uidNumber)
 				&& Objects.equal(this.gidNumber, that.gidNumber)
-				&& Objects.equal(this.groups, that.groups);
+				&& Objects.equal(this.groups, that.groups)
+				&& Objects.equal(this.expirationDate, that.expirationDate);
 		}
 		return false;
 	}
@@ -593,6 +606,7 @@ public class ObmUser {
 			.add("uidNumber", uidNumber)
 			.add("gidNumber", gidNumber)
 			.add("groups", groups)
+			.add("expirationDate", expirationDate)
 			.toString();
 	}
 
