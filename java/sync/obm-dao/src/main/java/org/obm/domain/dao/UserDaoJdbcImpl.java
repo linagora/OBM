@@ -137,7 +137,8 @@ public class UserDaoJdbcImpl implements UserDao {
 			"host_name, " +
 			"host_fqdn, " +
 			"host_ip, " +
-			"host_domain_id";
+			"host_domain_id," +
+			"userobm_account_dateexp";
 	private static final AddressBook CONTACTS_BOOK = AddressBook
 			.builder()
 			.name("contacts")
@@ -379,6 +380,7 @@ public class UserDaoJdbcImpl implements UserDao {
 					.createdBy(creator)
 					.updatedBy(updator)
 					.groups(Objects.firstNonNull(groups, Collections.EMPTY_SET))
+					.expirationDate(JDBCUtils.getDate(rs, "userobm_account_dateexp"))
 					.build();
 		} catch (DaoException e) {
 			throw new SQLException(e);
@@ -604,12 +606,13 @@ public class UserDaoJdbcImpl implements UserDao {
 				"userobm_hidden, " +
 				"userobm_archive, " +
 				"userobm_uid," +
-				"userobm_gid" +
+				"userobm_gid," +
+				"userobm_account_dateexp"+
 				") VALUES (" +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-					"?, ?, ?, ?, ?" +
+					"?, ?, ?, ?, ?, ?" +
 				")";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -691,6 +694,12 @@ public class UserDaoJdbcImpl implements UserDao {
 			} else {
 				ps.setInt(idx++, DEFAULT_GID);
 			}
+			
+			 if (user.getExpirationDate() != null) {
+				ps.setDate(idx++, new java.sql.Date(user.getExpirationDate().getTime()));
+			 } else {
+				 ps.setNull(idx++, Types.DATE);
+			 }
 
 			ps.executeUpdate();
 
@@ -767,7 +776,8 @@ public class UserDaoJdbcImpl implements UserDao {
                     "userobm_mail_quota = ?, " +
                     "userobm_mail_perms = ?, " +
                     "userobm_hidden = ?, " +
-                    "userobm_archive = ? " +
+                    "userobm_archive = ?, " +
+                    "userobm_account_dateexp = ? " +
                     "WHERE userobm_id = ?";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -833,6 +843,12 @@ public class UserDaoJdbcImpl implements UserDao {
 
 			ps.setInt(idx++, user.isHidden() ? 1 : 0);
 			ps.setInt(idx++, user.isArchived() ? 1 : 0);
+			
+			if (user.getExpirationDate() != null) {
+				ps.setDate(idx++, new java.sql.Date(user.getExpirationDate().getTime()));
+			} else {
+				ps.setNull(idx++, Types.DATE);
+			}
 			
 			ps.setInt(idx++, user.getUid());
 

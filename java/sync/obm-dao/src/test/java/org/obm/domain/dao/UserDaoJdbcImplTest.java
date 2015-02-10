@@ -39,6 +39,7 @@ import java.util.Set;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.DateUtils;
 import org.obm.dao.utils.DaoTestModule;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseRule;
@@ -50,7 +51,6 @@ import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
-import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.sync.dao.EntityId;
@@ -446,6 +446,49 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		ObmUser createdUser = dao.create(userBuilder.build());
 
 		assertThat(createdUser.isArchived()).isTrue();
+	}
+	
+	@Test
+	public void testFindByLoginShouldReadExpirationDate() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("123456"))
+				.login(UserLogin.valueOf("iwillexpiresoon"))
+				.password(UserPassword.valueOf("secure"))
+				.profileName(ProfileName.valueOf("user"))
+				.identity(johnIdentity)
+				.domain(domain)
+				.expirationDate(DateUtils.date("2015-12-31"));
+
+		dao.create(userBuilder.build());
+
+		assertThat(dao.findUserByLogin("iwillexpiresoon", domain).getExpirationDate()).isEqualTo(DateUtils.date("2015-12-31"));
+	}
+	
+	@Test
+	public void testCreateShouldWriteExpirationDate() throws Exception {
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("123456"))
+				.login(validLogin)
+				.password(UserPassword.valueOf("secure"))
+				.profileName(ProfileName.valueOf("user"))
+				.identity(johnIdentity)
+				.domain(domain)
+				.expirationDate(DateUtils.date("2015-12-31"));
+
+		ObmUser createdUser = dao.create(userBuilder.build());
+		
+		assertThat(createdUser.getExpirationDate()).isEqualTo(DateUtils.date("2015-12-31"));
+	}
+
+	@Test
+	public void testUpdateShouldWriteExpirationDate() throws Exception {
+		ObmUser user = sampleUserBuilder(1, 3, "1")
+				.expirationDate(DateUtils.date("2015-12-31"))
+				.build();
+
+		assertThat(dao.update(user)).isEqualTo(user);
 	}
 
 	@Test(expected = UserNotFoundException.class)
