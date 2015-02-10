@@ -29,7 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
-import org.obm.provisioning.mailchooser.ImapBackendChooserProvider;
+import org.obm.provisioning.mailchooser.ImapBackendChooserSelector;
 
 import com.google.inject.AbstractModule;
 
@@ -37,7 +37,7 @@ public class ImapBackendChooserModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind(ImapBackendChooserProvider.class).to(ServiceLoaderImapBackendChooserProvider.class);
+		bind(ImapBackendChooserSelector.class).to(ServiceLoaderImapBackendChooserSelector.class);
 	}
 
 }

@@ -51,7 +51,7 @@ import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.json.ObmUserJsonDeserializer;
 import org.obm.provisioning.ldap.client.LdapManager;
-import org.obm.provisioning.mailchooser.ImapBackendChooserProvider;
+import org.obm.provisioning.mailchooser.ImapBackendChooserSelector;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
 import org.obm.push.mail.imap.IMAPException;
 
@@ -74,7 +74,7 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 	@Inject
 	protected PUserDao pUserDao;
 	@Inject
-	protected ImapBackendChooserProvider imapBackendChooserProvider;
+	protected ImapBackendChooserSelector imapBackendChooserSelector;
 	
 	protected AbstractUserOperationProcessor(HttpVerb verb) {
 		super(BatchEntityType.USER, verb);
@@ -186,7 +186,7 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 
 	protected ObjectMapper getDefaultObjectMapper(ObmDomain domain) {
 		SimpleModule module = new SimpleModule("InBatch", new Version(0, 0, 0, null)).addDeserializer(ObmUser.class,
-				new ObmUserJsonDeserializer(Providers.of(domain), imapBackendChooserProvider));
+				new ObmUserJsonDeserializer(Providers.of(domain), imapBackendChooserSelector));
 
 		return ProvisioningService.createObjectMapper(module);
 	}

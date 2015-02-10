@@ -46,8 +46,8 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 @RunWith(GuiceRunner.class)
-@GuiceModule(ServiceLoaderImapBackendChooserProviderTest.Env.class)
-public class ServiceLoaderImapBackendChooserProviderTest {
+@GuiceModule(ServiceLoaderImapBackendChooserSelectorTest.Env.class)
+public class ServiceLoaderImapBackendChooserSelectorTest {
 
 	public static class Env extends AbstractModule {
 
@@ -59,7 +59,7 @@ public class ServiceLoaderImapBackendChooserProviderTest {
 	}
 
 	@Inject
-	private ServiceLoaderImapBackendChooserProvider testee;
+	private ServiceLoaderImapBackendChooserSelector testee;
 
 	@Test
 	public void testGetShouldFindLeastDiskUsageImapBackendChooser() {
@@ -68,7 +68,7 @@ public class ServiceLoaderImapBackendChooserProviderTest {
 				.mailChooserHookId(LeastDiskUsageImapBackendChooser.ID)
 				.build();
 
-		assertThat(testee.getImapBackendChooserForDomain(domain)).isInstanceOf(LeastDiskUsageImapBackendChooser.class);
+		assertThat(testee.selectImapBackendChooserForDomain(domain)).isInstanceOf(LeastDiskUsageImapBackendChooser.class);
 	}
 
 	@Test
@@ -78,7 +78,7 @@ public class ServiceLoaderImapBackendChooserProviderTest {
 				.mailChooserHookId(LeastMailboxesImapBackendChooser.ID)
 				.build();
 
-		assertThat(testee.getImapBackendChooserForDomain(domain)).isInstanceOf(LeastMailboxesImapBackendChooser.class);
+		assertThat(testee.selectImapBackendChooserForDomain(domain)).isInstanceOf(LeastMailboxesImapBackendChooser.class);
 	}
 
 	@Test(expected = RuntimeException.class)
@@ -87,7 +87,7 @@ public class ServiceLoaderImapBackendChooserProviderTest {
 				.builder()
 				.build();
 
-		testee.getImapBackendChooserForDomain(domain);
+		testee.selectImapBackendChooserForDomain(domain);
 	}
 
 	@Test(expected = RuntimeException.class)
@@ -97,7 +97,7 @@ public class ServiceLoaderImapBackendChooserProviderTest {
 				.mailChooserHookId(0)
 				.build();
 
-		testee.getImapBackendChooserForDomain(domain);
+		testee.selectImapBackendChooserForDomain(domain);
 	}
 
 }

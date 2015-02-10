@@ -42,7 +42,7 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.DeserializationContext;
 import org.codehaus.jackson.map.JsonDeserializer;
 import org.obm.provisioning.bean.UserJsonFields;
-import org.obm.provisioning.mailchooser.ImapBackendChooserProvider;
+import org.obm.provisioning.mailchooser.ImapBackendChooserSelector;
 import org.obm.sync.host.ObmHost;
 
 import com.google.common.base.Preconditions;
@@ -66,12 +66,12 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 	private final UserPhones.Builder userPhonesBuilder;
 	private final UserWork.Builder userWorkBuilder;
 	private final UserEmails.Builder userEmailsBuilder;
-	private final ImapBackendChooserProvider imapBackendChooserProvider;
+	private final ImapBackendChooserSelector imapBackendChooserSelector;
 
 	@Inject
-	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ImapBackendChooserProvider imapBackendChooserProvider) {
+	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ImapBackendChooserSelector imapBackendChooserSelector) {
 		this.domainProvider = domainProvider;
-		this.imapBackendChooserProvider = imapBackendChooserProvider;
+		this.imapBackendChooserSelector = imapBackendChooserSelector;
 		this.userBuilder = ObmUser.builder();
 		this.userIdentityBuilder = UserIdentity.builder();
 		this.userAddressBuilder = UserAddress.builder();
@@ -80,9 +80,9 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		this.userEmailsBuilder = UserEmails.builder();
 	}
 
-	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ImapBackendChooserProvider imapBackendChooserProvider,
+	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ImapBackendChooserSelector imapBackendChooserSelector,
 			ObmUser fromUser) {
-		this(domainProvider, imapBackendChooserProvider);
+		this(domainProvider, imapBackendChooserSelector);
 
 		this.userBuilder.from(fromUser);
 		this.userIdentityBuilder.from(fromUser.getIdentity());
@@ -102,7 +102,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 					userAddressBuilder, userPhonesBuilder, userWorkBuilder, userEmailsBuilder);
 		}
 
-		ObmHost mailServer = getMailHostValue(jsonNode, domain, imapBackendChooserProvider.getImapBackendChooserForDomain(domain));
+		ObmHost mailServer = getMailHostValue(jsonNode, domain, imapBackendChooserSelector.selectImapBackendChooserForDomain(domain));
 
 		if (mailServer != null) {
 			userEmailsBuilder.server(mailServer);

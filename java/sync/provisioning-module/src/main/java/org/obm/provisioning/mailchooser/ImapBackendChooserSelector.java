@@ -31,8 +31,8 @@ package org.obm.provisioning.mailchooser;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-public interface ImapBackendChooserProvider {
+public interface ImapBackendChooserSelector {
 
-	ImapBackendChooser getImapBackendChooserForDomain(ObmDomain domain);
+	ImapBackendChooser selectImapBackendChooserForDomain(ObmDomain domain);
 
 }

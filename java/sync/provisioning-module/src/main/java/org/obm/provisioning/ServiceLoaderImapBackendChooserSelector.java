@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import org.obm.provisioning.mailchooser.ImapBackendChooser;
-import org.obm.provisioning.mailchooser.ImapBackendChooserProvider;
+import org.obm.provisioning.mailchooser.ImapBackendChooserSelector;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -44,13 +44,13 @@ import com.google.inject.Singleton;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 @Singleton
-public class ServiceLoaderImapBackendChooserProvider implements ImapBackendChooserProvider {
+public class ServiceLoaderImapBackendChooserSelector implements ImapBackendChooserSelector {
 
 	private final Map<Integer, ImapBackendChooser> choosers;
 
 	@Inject
 	@VisibleForTesting
-	ServiceLoaderImapBackendChooserProvider(Injector injector) {
+	ServiceLoaderImapBackendChooserSelector(Injector injector) {
 		ImmutableMap.Builder<Integer, ImapBackendChooser> builder = ImmutableMap.builder();
 
 		for (ImapBackendChooser chooser : ServiceLoader.load(ImapBackendChooser.class)) {
@@ -60,7 +60,7 @@ public class ServiceLoaderImapBackendChooserProvider implements ImapBackendChoos
 	}
 
 	@Override
-	public ImapBackendChooser getImapBackendChooserForDomain(ObmDomain domain) {
+	public ImapBackendChooser selectImapBackendChooserForDomain(ObmDomain domain) {
 		Integer mailChooserHookId = domain.getMailChooserHookId();
 
 		if (mailChooserHookId == null) {
