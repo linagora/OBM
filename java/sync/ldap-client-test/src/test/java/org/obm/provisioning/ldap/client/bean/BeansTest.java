@@ -33,9 +33,6 @@ package org.obm.provisioning.ldap.client.bean;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.provisioning.ldap.client.bean.LdapGroup;
-import org.obm.provisioning.ldap.client.bean.LdapUser;
-import org.obm.provisioning.ldap.client.bean.LdapUserMembership;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
 import com.google.common.collect.ImmutableList;

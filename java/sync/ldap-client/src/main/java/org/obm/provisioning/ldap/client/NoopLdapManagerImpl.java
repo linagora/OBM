@@ -67,16 +67,7 @@ public class NoopLdapManagerImpl implements LdapManager {
 	}
 
 	@Override
-	public void addUserToDefaultGroup(ObmDomain domain, Group defaultGroup, ObmUser userToAdd) {
-	}
-
-	@Override
 	public void removeUserFromGroup(ObmDomain domain, Group group, ObmUser userToRemove) {
-	}
-
-	@Override
-	public void removeUserFromDefaultGroup(ObmDomain domain, Group defaultGroup,
-			ObmUser userToRemove) {
 	}
 
 	@Override

@@ -34,10 +34,13 @@ package org.obm.provisioning.ldap.client.bean;
 import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Modification;
 import org.apache.directory.api.ldap.model.entry.ModificationOperation;
+import org.obm.provisioning.Group;
 import org.obm.provisioning.ldap.client.Configuration;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
@@ -48,6 +51,7 @@ public class LdapUserMembership {
 		private String memberUid;
 		private String mailBox;
 		private LdapDomain domain;
+		private Boolean targetGroupHasEmail;
 		
 		private final Configuration configuration;
 
@@ -63,7 +67,16 @@ public class LdapUserMembership {
 
 			return this;
 		}
-		
+
+		public Builder targetGroupHasEmail(boolean targetGroupHasEmail) {
+			this.targetGroupHasEmail = targetGroupHasEmail;
+			return this;
+		}
+
+		public Builder forGroup(Group group) {
+			return targetGroupHasEmail(!Strings.isNullOrEmpty(group.getEmail()));
+		}
+
 		public Builder memberUid(String memberUid) {
 			this.memberUid = memberUid;
 			return this;
@@ -83,7 +96,10 @@ public class LdapUserMembership {
 			Preconditions.checkState(memberUid != null, "memberUid should not be null");
 			Preconditions.checkState(domain != null, "domain should not be null");
 			Preconditions.checkState(mailBox != null, "mailBox should not be null");
-			return new LdapUserMembership(memberUid, buildMember(domain), mailBox);
+
+			Boolean groupHasEmail = Objects.firstNonNull(targetGroupHasEmail, false);
+
+			return new LdapUserMembership(memberUid, buildMember(domain), mailBox, groupHasEmail);
 		}
 
 		private String buildMember(LdapDomain domain) {
@@ -94,11 +110,13 @@ public class LdapUserMembership {
 	private final String memberUid;
 	private final String member;
 	private final String mailBox;
+	private final boolean targetGroupHasEmail;
 	
-	private LdapUserMembership(String memberUid, String member, String mailBox) {
+	private LdapUserMembership(String memberUid, String member, String mailBox, boolean targetGroupHasEmail) {
 		this.memberUid = memberUid;
 		this.member = member;
 		this.mailBox = mailBox;
+		this.targetGroupHasEmail = targetGroupHasEmail;
 	}
 	
 	public String getMemberUid() {
@@ -113,6 +131,10 @@ public class LdapUserMembership {
 		return mailBox;
 	}
 
+	public boolean isTargetGroupHasEmail() {
+		return targetGroupHasEmail;
+	}
+
 	public Modification[] buildAddModifications() {
 		return buildModifications(ModificationOperation.ADD_ATTRIBUTE);
 	}
@@ -122,32 +144,23 @@ public class LdapUserMembership {
 	}
 
 	private Modification[] buildModifications(ModificationOperation operation) {
-		return new Modification[] {
-				new DefaultModification(operation, "memberUid", getMemberUid()),
-				new DefaultModification(operation, "member", getMember()),
-				new DefaultModification(operation, "mailBox", getMailBox())
-		};
-	}
-	
-	public Modification[] buildAddModificationsForDefaultGroup() {
-		return buildModificationsForDefaultGroup(ModificationOperation.ADD_ATTRIBUTE);
-	}
+		ImmutableList.Builder<Modification> modifications = ImmutableList
+				.<Modification>builder()
+				.add(new DefaultModification(operation, "memberUid", getMemberUid()))
+				.add(new DefaultModification(operation, "member", getMember()));
 
-	public Modification[] buildRemoveModificationsForDefaultGroup() {
-		return buildModificationsForDefaultGroup(ModificationOperation.REMOVE_ATTRIBUTE);
-	}
-	
-	private Modification[] buildModificationsForDefaultGroup(ModificationOperation operation) {
-		return new Modification[] {
-				new DefaultModification(operation, "memberUid", getMemberUid()),
-				new DefaultModification(operation, "member", getMember())
-		};
-	}
+		if (targetGroupHasEmail) {
+			modifications.add(new DefaultModification(operation, "mailBox", getMailBox()));
+		}
 
+		ImmutableList<Modification> list = modifications.build();
+
+		return list.toArray(new Modification[list.size()]);
+	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(memberUid, member, mailBox);
+		return Objects.hashCode(memberUid, member, mailBox, targetGroupHasEmail);
 	}
 	
 	@Override
@@ -156,7 +169,8 @@ public class LdapUserMembership {
 			LdapUserMembership that = (LdapUserMembership) object;
 			return Objects.equal(this.memberUid, that.memberUid)
 				&& Objects.equal(this.member, that.member)
-				&& Objects.equal(this.mailBox, that.mailBox);
+				&& Objects.equal(this.mailBox, that.mailBox)
+				&& Objects.equal(this.targetGroupHasEmail, that.targetGroupHasEmail);
 		}
 		return false;
 	}
@@ -167,6 +181,7 @@ public class LdapUserMembership {
 			.add("memberUid", memberUid)
 			.add("member", member)
 			.add("mailBox", mailBox)
+			.add("targetGroupHasEmail", targetGroupHasEmail)
 			.toString();
 	}
 }

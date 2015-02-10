@@ -54,11 +54,7 @@ public interface LdapManager {
 	
 	void addUserToGroup(ObmDomain domain, Group group, ObmUser userToAdd);
 	
-	void addUserToDefaultGroup(ObmDomain domain, Group defaultGroup, ObmUser userToAdd);
-
 	void removeUserFromGroup(ObmDomain domain, Group group, ObmUser userToRemove);
-
-	void removeUserFromDefaultGroup(ObmDomain domain, Group defaultGroup, ObmUser userToRemove);
 
 	void addSubgroupToGroup(ObmDomain domain, Group group, Group subgroup);
 	

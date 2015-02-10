@@ -347,8 +347,7 @@ public class ConnectionImplTest {
 	}
 	
 	@Test
-	public void testAddUserToGroup() throws Exception {
-		
+	public void testAddUserToGroupWithEmail() throws Exception {
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
 				.cn(LdapGroup.Cn.valueOf("group1"))
@@ -364,14 +363,16 @@ public class ConnectionImplTest {
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
 				.domain(ldapDomain)
+				.targetGroupHasEmail(true)
 				.build();
 		connection.addUserToGroup(userMembership, groupCn, ldapDomain);
-		
-		Attribute attribute = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain)
-			.get(new AttributeType("member"));
-		assertThat(attribute.contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
-		
+
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+		Attribute memberAttribute = entry.get(new AttributeType("member"));
+		Attribute mailBoxAttribute = entry.get(new AttributeType("mailbox"));
+
+		assertThat(memberAttribute.contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
+		assertThat(mailBoxAttribute.getString()).isEqualTo("test@test.obm.org");
 
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
@@ -380,7 +381,40 @@ public class ConnectionImplTest {
 		assertThat(entry.get(new AttributeType("obmdomain")).getString()).isEqualTo("test.obm.org");
 		assertThat(entry.get(new AttributeType("member")).getString()).isEqualTo("uid=test,ou=users,dc=test.obm.org,dc=local");
 	}
-	
+
+	@Test
+	public void testAddUserToGroupWithoutEmail() throws Exception {
+		LdapGroup ldapGroup = groupBuilderProvider.get()
+				.objectClasses(new String[] {"posixGroup", "obmGroup"})
+				.cn(LdapGroup.Cn.valueOf("group1"))
+				.gidNumber(1001)
+				.mailAccess("REJECT")
+				.domain(ldapDomain)
+				.build();
+		connection.createGroup(ldapGroup);
+		LdapGroup.Cn groupCn = ldapGroup.getCn();
+
+		LdapUserMembership userMembership = groupMemberShipProvider.get()
+				.memberUid("test")
+				.mailBox("test@test.obm.org")
+				.domain(ldapDomain)
+				.build();
+		connection.addUserToGroup(userMembership, groupCn, ldapDomain);
+
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+		Attribute memberAttribute = entry.get(new AttributeType("member"));
+		Attribute mailBoxAttribute = entry.get(new AttributeType("mailbox"));
+
+		assertThat(memberAttribute.contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
+		assertThat(mailBoxAttribute).isNull();
+
+		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
+		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
+		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("REJECT");
+		assertThat(entry.get(new AttributeType("obmdomain")).getString()).isEqualTo("test.obm.org");
+		assertThat(entry.get(new AttributeType("member")).getString()).isEqualTo("uid=test,ou=users,dc=test.obm.org,dc=local");
+	}
+
 	@Test
 	public void testAddUsersToEmptyGroup() throws Exception {
 		
@@ -464,7 +498,7 @@ public class ConnectionImplTest {
 	}
 	
 	@Test
-	public void testRemoveUserToGroup() throws Exception {
+	public void testRemoveUserFromGroupWithEmail() throws Exception {
 		
 		LdapGroup ldapGroup = groupBuilderProvider.get()
 				.objectClasses(new String[] {"posixGroup", "obmGroup"})
@@ -481,6 +515,49 @@ public class ConnectionImplTest {
 				.memberUid("test")
 				.mailBox("test@test.obm.org")
 				.domain(ldapDomain)
+				.targetGroupHasEmail(true)
+				.build();
+		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
+				.memberUid("test2")
+				.mailBox("test2@test.obm.org")
+				.domain(ldapDomain)
+				.targetGroupHasEmail(true)
+				.build();
+		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
+
+		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
+		assertThat(entry.get(new AttributeType("member")).contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
+		assertThat(entry.get(new AttributeType("mailbox")).contains("test@test.obm.org")).isTrue();
+		
+		connection.removeUserFromGroup(userMembership, groupCn, ldapDomain);
+		entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
+		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
+		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
+		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
+		assertThat(entry.get(new AttributeType("mail")).getString()).isEqualTo("group1@test.obm.org");
+		assertThat(entry.get(new AttributeType("obmdomain")).getString()).isEqualTo("test.obm.org");
+		assertThat(entry.get(new AttributeType("member")).contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isFalse();
+		assertThat(entry.get(new AttributeType("mailbox")).contains("test@test.obm.org")).isFalse();
+	}
+
+	@Test
+	public void testRemoveUserFromGroupWithoutEmail() throws Exception {
+		LdapGroup ldapGroup = groupBuilderProvider.get()
+				.objectClasses(new String[] {"posixGroup", "obmGroup"})
+				.cn(LdapGroup.Cn.valueOf("group1"))
+				.gidNumber(1001)
+				.mailAccess("REJECT")
+				.domain(ldapDomain)
+				.build();
+		connection.createGroup(ldapGroup);
+		LdapGroup.Cn groupCn = ldapGroup.getCn();
+
+		LdapUserMembership userMembership = groupMemberShipProvider.get()
+				.memberUid("test")
+				.mailBox("test@test.obm.org")
+				.domain(ldapDomain)
 				.build();
 		LdapUserMembership userMembership2 = groupMemberShipProvider.get()
 				.memberUid("test2")
@@ -488,23 +565,23 @@ public class ConnectionImplTest {
 				.domain(ldapDomain)
 				.build();
 		connection.addUsersToGroup(ImmutableList.of(userMembership, userMembership2), groupCn, ldapDomain);
-		
-		// In order to be sure that user is really inserted
-		Attribute attributeInserted = 	connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain)
-			.get(new AttributeType("member"));
-		assertThat(attributeInserted.contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
-		
-		connection.removeUserFromGroup(userMembership, groupCn, ldapDomain);
+
 		org.apache.directory.api.ldap.model.entry.Entry entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
+
+		assertThat(entry.get(new AttributeType("member")).contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isTrue();
+		assertThat(entry.get(new AttributeType("mailbox"))).isNull();
+
+		connection.removeUserFromGroup(userMembership, groupCn, ldapDomain);
+		entry = connection.getGroupEntry(LdapGroup.Cn.valueOf("group1"), ldapDomain);
 
 		assertThat(entry.get(new AttributeType("cn")).getString()).isEqualTo("group1");
 		assertThat(entry.get(new AttributeType("gidnumber")).getString()).isEqualTo("1001");
-		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("PERMIT");
-		assertThat(entry.get(new AttributeType("mail")).getString()).isEqualTo("group1@test.obm.org");
+		assertThat(entry.get(new AttributeType("mailaccess")).getString()).isEqualTo("REJECT");
 		assertThat(entry.get(new AttributeType("obmdomain")).getString()).isEqualTo("test.obm.org");
-		assertThat(entry.get(new AttributeType("member")).contains("uid=test2,ou=users,dc=test.obm.org,dc=local")).isTrue();
+		assertThat(entry.get(new AttributeType("member")).contains("uid=test,ou=users,dc=test.obm.org,dc=local")).isFalse();
+		assertThat(entry.get(new AttributeType("mailbox"))).isNull();
 	}
-	
+
 	@Test
 	public void testRemoveUsersToGroup() throws Exception {
 		

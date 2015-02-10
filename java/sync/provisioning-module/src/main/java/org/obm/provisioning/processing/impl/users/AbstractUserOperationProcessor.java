@@ -135,7 +135,7 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 
 		try {
 			ldapManager.createUser(user);
-			ldapManager.addUserToDefaultGroup(user.getDomain(), defaultGroup, user);
+			ldapManager.addUserToGroup(user.getDomain(), defaultGroup, user);
 
 			if (addUserToExistingGroups) {
 				addUserToGroupsExceptDefaultOneInLdap(ldapManager, defaultGroup, user);
@@ -163,7 +163,7 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 		try {
 			Group defaultGroup = getDefaultGroup(user.getDomain());
 
-			ldapManager.removeUserFromDefaultGroup(user.getDomain(), defaultGroup, user);
+			ldapManager.removeUserFromGroup(user.getDomain(), defaultGroup, user);
 			deleteUserFromGroupsExceptDefaultOneInLdap(ldapManager, defaultGroup, user);
 			ldapManager.deleteUser(user);
 		} catch (Exception e) {

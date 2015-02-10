@@ -708,8 +708,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		LdapManager ldapManager = expectLdapBuild();
 		ldapManager.createUser(userToAdd);
 		expectLastCall();
-		ldapManager.addUserToDefaultGroup(userToAdd.getDomain(), defaultGroup,
-				userToAdd);
+		ldapManager.addUserToGroup(userToAdd.getDomain(), defaultGroup, userToAdd);
 		expectLastCall();
 		ldapManager.shutdown();
 		expectLastCall();
@@ -729,7 +728,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 		expect(groupDao.getAllGroupsForUserExtId(domainWithImapAndLdap, UserExtId.valueOf("extIdUser1"))).andReturn(Collections.EMPTY_SET);
 
-		ldapManager.removeUserFromDefaultGroup(userToRemove.getDomain(), defaultGroup, userToRemove);
+		ldapManager.removeUserFromGroup(userToRemove.getDomain(), defaultGroup, userToRemove);
 		expectLastCall();
 		ldapManager.deleteUser(userToRemove);
 		expectLastCall();

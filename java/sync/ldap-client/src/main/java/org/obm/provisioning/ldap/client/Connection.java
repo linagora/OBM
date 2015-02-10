@@ -66,13 +66,7 @@ public interface Connection {
 	void addUserToGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn, LdapDomain domain)
 			throws LdapException, ConnectionException;
 
-	void addUserToDefaultGroup(LdapUserMembership build, LdapGroup.Cn fromLdapGroupCn, LdapDomain domain)
-			throws LdapException, ConnectionException;
-	
 	void removeUserFromGroup(LdapUserMembership ldapUserMembership, LdapGroup.Cn ldapGroupCn, LdapDomain domain)
-			throws LdapException, ConnectionException;
-
-	void removeUserFromDefaultGroup(LdapUserMembership build, LdapGroup.Cn fromLdapGroupCn, LdapDomain domain)
 			throws LdapException, ConnectionException;
 
 	void addUsersToGroup(List<LdapUserMembership> ldapUserMemberships, LdapGroup.Cn ldapGroupCn, LdapDomain domain)

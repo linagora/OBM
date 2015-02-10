@@ -131,36 +131,19 @@ public class LdapManagerImpl implements LdapManager {
 	@Override
 	public void addUserToGroup(ObmDomain domain, Group group, ObmUser user) {
 		conn.addUserToGroup(
-				userMembershipBuilderProvider.get().fromObmUser(user).build(),
+				userMembershipBuilderProvider.get().fromObmUser(user).forGroup(group).build(),
 				Cn.valueOf(group.getName()),
 				LdapDomain.valueOf(domain.getName()));
 	}
 
-	@Override
-	public void addUserToDefaultGroup(ObmDomain domain, Group defaultGroup, ObmUser user) {
-		conn.addUserToDefaultGroup(
-				userMembershipBuilderProvider.get().fromObmUser(user).build(),
-				Cn.valueOf(defaultGroup.getName()),
-				LdapDomain.valueOf(domain.getName()));
-		
-	}
-	
 	@Override
 	public void removeUserFromGroup(ObmDomain domain, Group group, ObmUser user) {
 		conn.removeUserFromGroup(
-				userMembershipBuilderProvider.get().fromObmUser(user).build(),
+				userMembershipBuilderProvider.get().fromObmUser(user).forGroup(group).build(),
 				Cn.valueOf(group.getName()),
 				LdapDomain.valueOf(domain.getName()));
 	}
 
-	@Override
-	public void removeUserFromDefaultGroup(ObmDomain domain, Group defaultGroup, ObmUser user) {
-		conn.removeUserFromDefaultGroup(
-				userMembershipBuilderProvider.get().fromObmUser(user).build(),
-				Cn.valueOf(defaultGroup.getName()),
-				LdapDomain.valueOf(domain.getName()));
-	}
-	
 	@Override
 	public void addSubgroupToGroup(ObmDomain domain, Group group, Group subgroup) {
 		conn.addGroupToGroup(
