@@ -495,7 +495,6 @@ class shareCalendarMailer extends OBM_Mailer {
 
   }
 
-
   public function userShareFreebusy($user) {
   	$this->from = $this->getSender();
   	$this->subject = __('OBM free/busy information sharing : %firstname% %name%',
@@ -529,7 +528,14 @@ class shareCalendarMailer extends OBM_Mailer {
     $this->from = $this->getSender();
 
     $this->subject = __($resource['subject'].": ".$resource['name']);
-    $this->body = array('resource' => $resource, 'url' => $this->getHtmlCalUri($resource));
+    $this->body = array('resource' => $resource, 'url' => $this->getResourceCalUri($resource));
+
+    if ($this->attachVcard) {
+      $this->attachments[] = array(
+          'content' => (string) $this->generateResourceVcard($resource),
+          'filename' => 'contact.vcf', 'content_type' => 'text/x-vcard'
+      );
+    }
   }
 
   private function generateVcard($user) {
@@ -573,7 +579,19 @@ class shareCalendarMailer extends OBM_Mailer {
     
     return $card;
   }
+
+  private function generateResourceVcard($resource) {
+    $card = new Vpdi_Vcard();
   
+    $name = new Vpdi_Vcard_Name();
+    $name->family = $resource['name'];
+    $card->setName($name);
+
+    $card[] = new Vpdi_Property('caluri', $this->getResourceCalUri($resource));
+
+    return $card;
+  }
+
   private function getFreebusyCalUri($user) {
   	return $GLOBALS['cgp_host'].'calendar/calendar_freebusy_export.php?action=freebusy_export'
   	.'&email='.urlencode($user['email']);
@@ -586,7 +604,11 @@ class shareCalendarMailer extends OBM_Mailer {
       .'&firstname='.urlencode($user['firstname'])
       .'&email='.urlencode($user['email']);
   }
-  
+
+  private function getResourceCalUri($user) {
+    return $GLOBALS['cgp_host'].'calendar/calendar_render.php?action=ics_export&externalToken=' . $user['token'];
+  }
+
   private function getHtmlCalUri($user) {
     return $GLOBALS['cgp_host'].'calendar/calendar_render.php?externalToken='.$user['token'];
   }
