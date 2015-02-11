@@ -1018,6 +1018,65 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		assertThat(dao.getUniqueObmDomain("user8")).isEqualTo("test2.tlse.lng");
 	}
 
+	@Test
+	public void createShouldPersistSambaPermsWhenSet() throws Exception {
+		UserExtId userExtId = UserExtId.valueOf("8bf2d32f-cd6d-4c74-a312-867ea763277a");
+		ObmUser user = ObmUser
+				.builder()
+				.extId(userExtId)
+				.login(validLogin)
+				.identity(johnIdentity)
+				.domain(domain)
+				.sambaAllowed(true)
+				.build();
+
+		dao.create(user);
+		ResultSet rs = db.execute("SELECT userobm_samba_perms FROM UserObm WHERE userobm_ext_id = ?", userExtId.getExtId());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getInt(1)).isEqualTo(1);
+	}
+
+	@Test
+	public void findShouldRetrieveSambaPermsWhenSet() throws Exception {
+		ObmUser user = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("8bf2d32f-cd6d-4c74-a312-867ea763277a"))
+				.login(validLogin)
+				.identity(johnIdentity)
+				.domain(domain)
+				.sambaAllowed(true)
+				.build();
+
+		dao.create(user);
+		ObmUser obmUser = dao.findUserByLogin(validLogin.getStringValue(), domain);
+
+		assertThat(obmUser.isSambaAllowed()).isTrue();
+	}
+
+	@Test
+	public void updateShouldPersistSambaPermsWhenSet() throws Exception {
+		UserExtId userExtId = UserExtId.valueOf("8bf2d32f-cd6d-4c74-a312-867ea763277a");
+		ObmUser.Builder builder = ObmUser
+				.builder()
+				.extId(userExtId)
+				.login(validLogin)
+				.identity(johnIdentity)
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(builder.build());
+		dao.findUserByLogin(validLogin.getStringValue(), domain);
+
+		builder.uid(createdUser.getUid());
+		builder.sambaAllowed(true);
+		dao.update(builder.build());
+
+		ResultSet rs = db.execute("SELECT userobm_samba_perms FROM UserObm WHERE userobm_ext_id = ?", userExtId.getExtId());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getInt(1)).isEqualTo(1);
+	}
+
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId, String extId) {
 		return ObmUser
 				.builder()
