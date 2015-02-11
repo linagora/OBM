@@ -230,6 +230,9 @@ public class SerializationUtils {
 			case DELEGATIONTARGET:
 				toBuild.delegationTarget(value.asText());
 				break;
+			case SAMBA_ALLOWED:
+				toBuild.sambaAllowed(value.asBoolean());
+				break;
 		}
 	}
 

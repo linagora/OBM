@@ -45,7 +45,7 @@ public class ProvisioningIntegrationTestUtils {
 				+ "\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],\"archived\":false,\"mail_quota\":\"0\","
 				+ "\"mail_server\":null,\"mails\":[\"admin0@*\"],\"effectiveMails\":[\"admin0@test.tlse.lng\"],\"hidden\":false,\"timecreate\":null,\"timeupdate\":null,"
 				+ "\"expiration_date\":null,\"delegation\":null,\"delegation_target\":null,"
-				+ "\"groups\":[]}";
+				+ "\"groups\":[],\"samba_allowed\":false}";
 	}
 	
 	public static String getAdminUserJsonWithGroup(){
@@ -55,7 +55,8 @@ public class ProvisioningIntegrationTestUtils {
 				+ "\"zipcode\":null,\"business_zipcode\":null,\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],\"archived\":false,"
 				+ "\"mail_quota\":\"0\",\"mail_server\":null,\"mails\":[\"admin0@*\"],\"effectiveMails\":[\"admin0@global.virt\"],\"hidden\":false,\"timecreate\":null,\"timeupdate\":null,"
 				+ "\"expiration_date\":null,\"delegation\":null,\"delegation_target\":null,"
-				+ "\"groups\":[{\"id\":\"GroupWithUsers\",\"url\":\"/abf7c2bc-aa84-461c-b057-ee42c5dce40a/groups/GroupWithUsers\"}]}";
+				+ "\"groups\":[{\"id\":\"GroupWithUsers\",\"url\":\"/abf7c2bc-aa84-461c-b057-ee42c5dce40a/groups/GroupWithUsers\"}],"
+				+ "\"samba_allowed\":false}";
 	}
 
 	public static String groupUrl(URL baseURL, ObmDomainUuid domain) {
