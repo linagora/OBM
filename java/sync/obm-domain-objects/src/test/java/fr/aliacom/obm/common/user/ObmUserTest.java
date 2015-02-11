@@ -345,4 +345,26 @@ public class ObmUserTest {
 		assertThat(obmUser.getLoginAtDomain()).isEqualTo("login@domain");
 	}
 
+	@Test
+	public void sambaAllowedShouldBeFalseWhenNotSet() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login(validLogin)
+				.domain(domain)
+				.build();
+
+		assertThat(obmUser.isSambaAllowed()).isFalse();
+	}
+
+	@Test
+	public void sambaAllowedShouldBeSetWhenBuilding() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login(validLogin)
+				.domain(domain)
+				.sambaAllowed(true)
+				.build();
+
+		assertThat(obmUser.isSambaAllowed()).isTrue();
+	}
 }

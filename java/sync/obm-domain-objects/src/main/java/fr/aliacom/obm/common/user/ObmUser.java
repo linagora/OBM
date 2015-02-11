@@ -87,6 +87,8 @@ public class ObmUser {
 		private String delegation;
 		private String delegationTarget;
 		
+		private boolean sambaAllowed;
+		
 		private final ImmutableSet.Builder<Group> groups;
 
 		private Builder() {
@@ -119,7 +121,8 @@ public class ObmUser {
 					.groups(user.groups)
 					.expirationDate(user.expirationDate)
 					.delegation(user.delegation)
-					.delegationTarget(user.delegationTarget);
+					.delegationTarget(user.delegationTarget)
+					.sambaAllowed(user.sambaAllowed);
 		}
 
 		public Builder uid(Integer uid) {
@@ -240,6 +243,11 @@ public class ObmUser {
 			this.groups.addAll(groups);
 			return this;
 		}
+		
+		public Builder sambaAllowed(boolean sambaAllowed) {
+			this.sambaAllowed = sambaAllowed;
+			return this;
+		}
 
 		public ObmUser build() {
 			Preconditions.checkState(uid != null || extId != null);
@@ -261,7 +269,8 @@ public class ObmUser {
 					hidden, address, phones, work, emails,
 					description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName,
-					archived, password, uidNumber, gidNumber, groups.build(), expirationDate, delegation, delegationTarget);
+					archived, password, uidNumber, gidNumber, groups.build(), expirationDate, delegation, delegationTarget,
+					sambaAllowed);
 		}
 		
 	}
@@ -299,6 +308,8 @@ public class ObmUser {
 	private final Date expirationDate;
 	private final String delegation;
 	private final String delegationTarget;
+	
+	private final boolean sambaAllowed;
 
 	private ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, UserIdentity identity,
 			boolean hidden, UserAddress address, UserPhones phones, UserWork work, UserEmails emails,
@@ -306,7 +317,8 @@ public class ObmUser {
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName,
 			boolean archived, UserPassword password, Integer uidNumber, Integer gidNumber, Set<Group> groups,  Date expirationDate,
-			String delegation, String delegationTarget) {
+			String delegation, String delegationTarget,
+			boolean sambaAllowed) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -334,6 +346,7 @@ public class ObmUser {
 		this.expirationDate = expirationDate;
 		this.delegation = delegation;
 		this.delegationTarget = delegationTarget;
+		this.sambaAllowed = sambaAllowed;
 	}
 
 	public int getUid() {
@@ -556,6 +569,10 @@ public class ObmUser {
 	public boolean isEmailAvailable() {
 		return emails.isEmailAvailable();
 	}
+	
+	public boolean isSambaAllowed() {
+		return sambaAllowed;
+	}
 
 	public Date getExpirationDate() {
 		return expirationDate;
@@ -574,7 +591,8 @@ public class ObmUser {
 		return Objects.hashCode(uid, entityId, login, extId, admin, identity, emails,
 				hidden, address, phones, work,
 				description, createdBy, updatedBy, domain, publicFreeBusy, profileName,
-				archived, password, uidNumber, gidNumber, groups, expirationDate, delegation, delegationTarget);
+				archived, password, uidNumber, gidNumber, groups, expirationDate, delegation, delegationTarget,
+				sambaAllowed);
 	}
 	
 	@Override
@@ -605,7 +623,8 @@ public class ObmUser {
 				&& Objects.equal(this.groups, that.groups)
 				&& Objects.equal(this.expirationDate, that.expirationDate)
 				&& Objects.equal(this.delegation, that.delegation)
-				&& Objects.equal(this.delegationTarget, that.delegationTarget);
+				&& Objects.equal(this.delegationTarget, that.delegationTarget)
+				&& Objects.equal(this.sambaAllowed, that.sambaAllowed);
 		}
 		return false;
 	}
@@ -639,6 +658,7 @@ public class ObmUser {
 			.add("expirationDate", expirationDate)
 			.add("delegation", delegation)
 			.add("delegationTarget", delegationTarget)
+			.add("sambaAllowed", sambaAllowed)
 			.toString();
 	}
 
