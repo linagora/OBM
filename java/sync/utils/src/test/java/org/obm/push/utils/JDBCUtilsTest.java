@@ -33,6 +33,7 @@ package org.obm.push.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
@@ -40,10 +41,13 @@ import static org.easymock.EasyMock.verify;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.Date;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -388,4 +392,51 @@ public class JDBCUtilsTest {
 		
 		assertThat(JDBCUtils.toTimestamp(dateTime)).isEqualTo(expectedTimestamp);
 	}
+
+	@Test(expected=NullPointerException.class)
+	public void testSetOptionalDateShouldFailWhenPreparedStatementIsNull() throws SQLException {
+		JDBCUtils.setOptionalDate(null, null, 0);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testSetOptionalDateShouldFailWhenIndexIsZero() throws SQLException {
+		JDBCUtils.setOptionalDate(createNiceMock(PreparedStatement.class), null, 0);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testSetOptionalDateShouldFailWhenIndexIsNegative() throws SQLException {
+		JDBCUtils.setOptionalDate(createNiceMock(PreparedStatement.class), null, -1);
+	}
+
+	@Test
+	public void testSetOptionalDateAndReturnFalseShouldSetNullWhenDateIsNull() throws Exception {
+		PreparedStatement ps = createMock(PreparedStatement.class);
+
+		ps.setNull(1, Types.DATE);
+		expectLastCall();
+		replay(ps);
+
+		try {
+			assertThat(JDBCUtils.setOptionalDate(ps, null, 1)).isFalse();
+		} finally {
+			verify(ps);
+		}
+	}
+
+	@Test
+	public void testSetOptionalDateAndReturnTrueShouldSetDateWhenDateIsNotNull() throws Exception {
+		Date date = DateUtils.date("2015-02-11");
+		PreparedStatement ps = createMock(PreparedStatement.class);
+
+		ps.setDate(1, JDBCUtils.getDateWithoutTime(date));
+		expectLastCall();
+		replay(ps);
+
+		try {
+			assertThat(JDBCUtils.setOptionalDate(ps, date, 1)).isTrue();
+		} finally {
+			verify(ps);
+		}
+	}
+
 }

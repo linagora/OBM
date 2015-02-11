@@ -697,13 +697,8 @@ public class UserDaoJdbcImpl implements UserDao {
 			} else {
 				ps.setInt(idx++, DEFAULT_GID);
 			}
-			
-			 if (user.getExpirationDate() != null) {
-				ps.setDate(idx++, new java.sql.Date(user.getExpirationDate().getTime()));
-			 } else {
-				 ps.setNull(idx++, Types.DATE);
-			 }
 
+			JDBCUtils.setOptionalDate(ps, user.getExpirationDate(), idx++);
 			ps.setString(idx++, user.getDelegation());
 
 			ps.executeUpdate();
@@ -849,15 +844,8 @@ public class UserDaoJdbcImpl implements UserDao {
 
 			ps.setInt(idx++, user.isHidden() ? 1 : 0);
 			ps.setInt(idx++, user.isArchived() ? 1 : 0);
-			
-			if (user.getExpirationDate() != null) {
-				ps.setDate(idx++, new java.sql.Date(user.getExpirationDate().getTime()));
-			} else {
-				ps.setNull(idx++, Types.DATE);
-			}
-			
+			JDBCUtils.setOptionalDate(ps, user.getExpirationDate(), idx++);
 			ps.setString(idx++, user.getDelegation());
-			
 			ps.setInt(idx++, user.getUid());
 
 			int updateCount = ps.executeUpdate();

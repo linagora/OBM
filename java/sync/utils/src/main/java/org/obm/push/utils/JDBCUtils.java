@@ -33,10 +33,12 @@
 package org.obm.push.utils;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.Date;
 
 import javax.transaction.UserTransaction;
@@ -210,4 +212,18 @@ public class JDBCUtils {
 		}
 		return new Timestamp(dateTime.getMillis());
 	}
+
+	public static boolean setOptionalDate(PreparedStatement ps, Date date, int idx) throws SQLException {
+		Preconditions.checkNotNull(ps);
+		Preconditions.checkArgument(idx >= 1, "indexes in prepared statements are >= 1");
+
+		if (date != null) {
+			ps.setDate(idx, getDateWithoutTime(date));
+			return true;
+		} else {
+			ps.setNull(idx, Types.DATE);
+			return false;
+		}
+	}
+
 }
