@@ -36,7 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 
-import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.TextMessage;
 
@@ -92,12 +91,12 @@ public class HornetQTransactionalModeTest {
 		@Inject private Producer producer;
 		
 		@Transactional
-		public void put(String text) throws JMSException {
+		public void put(String text) throws Exception {
 			producer.write(text);
 		}
 		
 		@Transactional
-		public void putAndthrowException(String text) throws TestRollbackException, JMSException {
+		public void putAndthrowException(String text) throws Exception {
 			put(text);
 			throw new TestRollbackException();
 		}
