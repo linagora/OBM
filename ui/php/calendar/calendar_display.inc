@@ -92,7 +92,7 @@ function dis_calendar_calendar_view($calendar, &$current_view) {
   }
   if (function_exists($calendar_function)) {
     $block = $calendar_function($current_view, $calendar_entity, $writable_entity);
-    $block .= dis_calendar_quick_form($calendar_entity);
+    $block .= dis_calendar_quick_form($calendar_entity, $writable_entity);
     $block .= dis_calendar_conflict_popup();
     $block .= dis_calendar_occurency_popup();
     $calendar_function_pdf = $calendar_function."_pdf";
@@ -4140,7 +4140,7 @@ function check_loggued_user_is_the_only_attendee($attendees){
  * @access public
  * @return HTML
  */
-function dis_calendar_quick_form($calendar_entity) {
+function dis_calendar_quick_form($calendar_entity, $writable_entity = null) {
   $user_id = $GLOBALS["obm"]["uid"];
   $user_entities = array();
   if ( $calendar_entity['user'] && is_array($calendar_entity['user']) ) {
@@ -4159,6 +4159,20 @@ function dis_calendar_quick_form($calendar_entity) {
       "id" => $user_id
     );
     $logged_user_is_displayed = false;
+  }
+
+  // Add all writable calendars that aren't yet displayed to the list of selectable calendars
+  if (isset($writable_entity)) {
+    foreach ($writable_entity["entity"] as $calendarId => $calendar) {
+      if (!array_key_exists($calendarId, $user_entities)) {
+        $user_entities[$calendarId] = array(
+            "name" => $calendar["label"],
+            "class" => "eventOwner",
+            "type" => "user",
+            "id" => $calendarId
+        );
+      }
+    }
   }
 
   if( sizeof($user_entities) > 1 ){
@@ -4607,29 +4621,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
   }
 
-
-
-
-  $displayedPeople = array();
-  if ($current_view->users_count() > 0) {
-    $displayed_users = OBM_Acl_Utils::expandEntitiesArray(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $current_view->get_users()));
-    foreach($displayed_users['entity'] as $id => $entity) {
-      $name = phpStringToJsString($entity['label']);
-      $displayedPeople[$id] = $name;
-    }
-  }
-
-  //always add current user to the list of users that can be organizers
-  if ( !array_key_exists($uid, $displayedPeople) ) {
-    $displayedPeople[$uid] = phpStringToJsString($uid_label);
-  }
-
   $possible_organizers = array();
-  if(is_array($displayedPeople)){
-    foreach($displayedPeople as $displayed_person_id=>$displayed_person_name){
-      if(OBM_Acl::canWrite($uid, 'calendar',$displayed_person_id)) {
-        $possible_organizers[$displayed_person_id] = $displayed_person_name;
-      }
+  if(is_array($possible_owners)){
+    foreach($possible_owners as $possible_organizer_id => $possible_organizer){
+      $possible_organizers[$possible_organizer_id] = $possible_organizer["label"];
     }
     if(!array_key_exists($organizer_id, $possible_organizers)) $organizer_id = $uid;
   }
@@ -5024,7 +5019,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       ".__("Organizer")."
     </th>
     <td>";
-      if( count($displayedPeople) == 1 && $organizer_id == $uid){
+      if( count($possible_organizers) == 1 && $organizer_id == $uid){
         $block_organizer .= "
         <span>$organizer_name</span>
         <input type=\"hidden\" name=\"sel_organizer\" value=\"".$organizer_id."\" />";
@@ -5032,12 +5027,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       else{
         $block_organizer .= "
         <select name=\"sel_organizer\">";
-        foreach($possible_organizers as $displayed_person_id=>$displayed_person_name){
-          $selected_person = $displayed_person_id == $organizer_id ? "selected=selected" : "";
-          $block_organizer .= "<option $selected_person
-                                      value=\"".$displayed_person_id."\">".
-                                $displayed_person_name.
-                              "</option>";
+        foreach($possible_organizers as $possible_organizer_id => $possible_organizer){
+          $selected_person = $possible_organizer_id == $organizer_id ? "selected=selected" : "";
+          $block_organizer .= "<option $selected_person value=\"" . $possible_organizer_id . "\">" . phpStringToJsString($possible_organizer) . "</option>";
         }
       }
       $block_organizer .=
