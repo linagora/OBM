@@ -367,4 +367,27 @@ public class ObmUserTest {
 
 		assertThat(obmUser.isSambaAllowed()).isTrue();
 	}
+
+	@Test
+	public void sambaHomeDriveShouldNullWhenNotSet() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login(validLogin)
+				.domain(domain)
+				.build();
+
+		assertThat(obmUser.getSambaHomeDrive()).isNull();
+	}
+
+	@Test
+	public void sambaHomeDriveShouldBeSetWhenBuilding() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login(validLogin)
+				.domain(domain)
+				.sambaHomeDrive("drive")
+				.build();
+
+		assertThat(obmUser.getSambaHomeDrive()).isEqualTo("drive");
+	}
 }

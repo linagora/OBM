@@ -88,6 +88,7 @@ public class ObmUser {
 		private String delegationTarget;
 		
 		private boolean sambaAllowed;
+		private String sambaHomeDrive;
 		
 		private final ImmutableSet.Builder<Group> groups;
 
@@ -122,7 +123,8 @@ public class ObmUser {
 					.expirationDate(user.expirationDate)
 					.delegation(user.delegation)
 					.delegationTarget(user.delegationTarget)
-					.sambaAllowed(user.sambaAllowed);
+					.sambaAllowed(user.sambaAllowed)
+					.sambaHomeDrive(user.sambaHomeDrive);
 		}
 
 		public Builder uid(Integer uid) {
@@ -248,6 +250,11 @@ public class ObmUser {
 			this.sambaAllowed = sambaAllowed;
 			return this;
 		}
+		
+		public Builder sambaHomeDrive(String sambaHomeDrive) {
+			this.sambaHomeDrive = sambaHomeDrive;
+			return this;
+		}
 
 		public ObmUser build() {
 			Preconditions.checkState(uid != null || extId != null);
@@ -270,7 +277,7 @@ public class ObmUser {
 					description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName,
 					archived, password, uidNumber, gidNumber, groups.build(), expirationDate, delegation, delegationTarget,
-					sambaAllowed);
+					sambaAllowed, sambaHomeDrive);
 		}
 		
 	}
@@ -310,6 +317,7 @@ public class ObmUser {
 	private final String delegationTarget;
 	
 	private final boolean sambaAllowed;
+	private final String sambaHomeDrive;
 
 	private ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, UserIdentity identity,
 			boolean hidden, UserAddress address, UserPhones phones, UserWork work, UserEmails emails,
@@ -318,7 +326,7 @@ public class ObmUser {
 			boolean publicFreeBusy, ProfileName profileName,
 			boolean archived, UserPassword password, Integer uidNumber, Integer gidNumber, Set<Group> groups,  Date expirationDate,
 			String delegation, String delegationTarget,
-			boolean sambaAllowed) {
+			boolean sambaAllowed, String sambaHomeDrive) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -347,6 +355,7 @@ public class ObmUser {
 		this.delegation = delegation;
 		this.delegationTarget = delegationTarget;
 		this.sambaAllowed = sambaAllowed;
+		this.sambaHomeDrive = sambaHomeDrive;
 	}
 
 	public int getUid() {
@@ -586,13 +595,17 @@ public class ObmUser {
 		return delegationTarget;
 	}
 
+	public String getSambaHomeDrive() {
+		return sambaHomeDrive;
+	}
+	
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(uid, entityId, login, extId, admin, identity, emails,
 				hidden, address, phones, work,
 				description, createdBy, updatedBy, domain, publicFreeBusy, profileName,
 				archived, password, uidNumber, gidNumber, groups, expirationDate, delegation, delegationTarget,
-				sambaAllowed);
+				sambaAllowed, sambaHomeDrive);
 	}
 	
 	@Override
@@ -624,7 +637,8 @@ public class ObmUser {
 				&& Objects.equal(this.expirationDate, that.expirationDate)
 				&& Objects.equal(this.delegation, that.delegation)
 				&& Objects.equal(this.delegationTarget, that.delegationTarget)
-				&& Objects.equal(this.sambaAllowed, that.sambaAllowed);
+				&& Objects.equal(this.sambaAllowed, that.sambaAllowed)
+				&& Objects.equal(this.sambaHomeDrive, that.sambaHomeDrive);
 		}
 		return false;
 	}
@@ -659,6 +673,7 @@ public class ObmUser {
 			.add("delegation", delegation)
 			.add("delegationTarget", delegationTarget)
 			.add("sambaAllowed", sambaAllowed)
+			.add("sambaHomeDrive", sambaHomeDrive)
 			.toString();
 	}
 
