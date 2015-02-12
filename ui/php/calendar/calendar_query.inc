@@ -4787,11 +4787,14 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
     eventtag_label as tag,
     eventtag_id,
     event_allday,
-    event_sequence,";
+    event_sequence,
+    domain_name as owner_domain,
+    domain_uuid as owner_domain_uuid,";
 
   $left_q = "
     LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
     INNER JOIN UserObm ON event_owner = userobm_id
+    INNER JOIN Domain ON domain_id = userobm_domain_id
     LEFT JOIN EventTag ON event_tag_id = eventtag_id 
     INNER JOIN EventLink ON event_id = eventlink_event_id";
 
@@ -4963,12 +4966,15 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     eventtag_label as tag,
     eventtag_id,
     event_allday,
-    event_sequence,";
+    event_sequence,
+    domain_name as owner_domain,
+    domain_uuid as owner_domain_uuid,";
 
   $left_q = "
     LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
     LEFT JOIN EventTag ON event_tag_id = eventtag_id 
     INNER JOIN UserObm ON event_owner = userobm_id
+    INNER JOIN Domain ON domain_id = userobm_domain_id
     INNER JOIN EventLink ON event_id = eventlink_event_id";
 
   if ($no_birthday) {
