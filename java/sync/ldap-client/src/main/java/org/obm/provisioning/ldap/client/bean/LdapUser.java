@@ -42,7 +42,9 @@ import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.obm.provisioning.ldap.client.Configuration;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
@@ -51,6 +53,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.domain.Samba;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserPassword;
 
@@ -58,6 +61,7 @@ public class LdapUser {
 
 	private final static String[] DEFAULT_OBJECT_CLASSES = {
 		"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser" };
+	private final static String SAMBA_SAM_ACCOUNT_OBJECT_CLASS = "sambaSamAccount";
 
 	private final static String DEFAULT_LOGIN_SHELL = "/bin/bash";
 	private final static String DEFAULT_WEB_ACCESS = "REJECT";
@@ -122,6 +126,9 @@ public class LdapUser {
 		private final ImmutableSet.Builder<String> mailAlias;
 		private boolean hiddenUser;
 		private LdapDomain domain;
+		private boolean sambaAllowed;
+		private String sambaSid;
+		private String sambaPrimaryGroupSid;
 		
 		private final Configuration configuration;
 
@@ -168,6 +175,16 @@ public class LdapUser {
 			this.mail = obmUser.getEmailAtDomain();
 			addAllMailAliases(obmUser);
 			this.loginShell = DEFAULT_LOGIN_SHELL;
+			
+			Optional<Samba> optional = obmUser.getDomain().getSamba();
+			if (optional.isPresent()) {
+				Samba samba = optional.get();
+				this.sambaSid = Joiner.on("-").join(samba.getSid(), uidNumber);
+				this.sambaPrimaryGroupSid = Joiner.on("-").join(samba.getSid(), gidNumber);
+				
+				this.sambaAllowed = obmUser.isSambaAllowed();
+			}
+			
 			return this;
 		}
 
@@ -310,6 +327,11 @@ public class LdapUser {
 			return this;
 		}
 		
+		public Builder sambaAllowed(boolean sambaAllowed) {
+			this.sambaAllowed = sambaAllowed;
+			return this;
+		}
+		
 		public LdapUser build() {
 			Preconditions.checkState(uid != null, "uid should not be null");
 			Preconditions.checkState(objectClasses != null && objectClasses.length > 0, "objectClasses should not be empty");
@@ -320,7 +342,8 @@ public class LdapUser {
 	
 			return new LdapUser(configuration.getUserBaseDn(domain), objectClasses, uid, uidNumber, gidNumber, loginShell,
 					cn, displayName, sn, givenName, homeDirectory, userPassword, webAccess,
-					mailBox, mailBoxServer, mailAccess, mail, mailAlias.build(), hiddenUser, domain);
+					mailBox, mailBoxServer, mailAccess, mail, mailAlias.build(), hiddenUser, domain,
+					sambaAllowed, sambaSid, sambaPrimaryGroupSid);
 		}
 	}
 	
@@ -344,10 +367,14 @@ public class LdapUser {
 	private final Set<String> mailAlias;
 	private final boolean hiddenUser;
 	private final LdapDomain domain;
+	private final boolean sambaAllowed;
+	private final String sambaSid;
+	private final String sambaPrimaryGroupSid;
 	
 	private LdapUser(Dn userBaseDn, String[] objectClasses, Uid uid, int uidNumber, int gidNumber, String loginShell,
 			String cn, String displayName, String sn, String givenName, String homeDirectory, UserPassword userPassword, String webAccess,
-			String mailBox, String mailBoxServer, String mailAccess, String mail, Set<String>mailAlias, boolean hiddenUser, LdapDomain domain) {
+			String mailBox, String mailBoxServer, String mailAccess, String mail, Set<String>mailAlias, boolean hiddenUser, LdapDomain domain,
+			boolean sambaAllowed, String sambaSid, String sambaPrimaryGroupSid) {
 		this.userBaseDn = userBaseDn;
 		this.objectClasses = objectClasses;
 		this.uid = uid;
@@ -368,6 +395,9 @@ public class LdapUser {
 		this.mailAlias = mailAlias;
 		this.hiddenUser = hiddenUser;
 		this.domain = domain;
+		this.sambaAllowed = sambaAllowed;
+		this.sambaSid = sambaSid;
+		this.sambaPrimaryGroupSid = sambaPrimaryGroupSid;
 	}
 
 	public String[] getObjectClasses() {
@@ -445,7 +475,19 @@ public class LdapUser {
 	public LdapDomain getDomain() {
 		return domain;
 	}
-
+	
+	public boolean isSambaAllowed() {
+		return sambaAllowed;
+	}
+	
+	public String getSambaSid() {
+		return sambaSid;
+	}
+	
+	public String getSambaPrimaryGroupSid() {
+		return sambaPrimaryGroupSid;
+	}
+	
 	public Entry buildEntry() throws LdapException {
 		LdapEntry.Builder builder = LdapEntry.builder()
 				.dn(buildDn());
@@ -455,7 +497,8 @@ public class LdapUser {
 		for (String mail: mailAlias) {
 			builder.attribute(Attribute.valueOf("MAILALIAS", mail));
 		}
-		LdapEntry ldapEntry = builder
+		
+		builder
 			.attribute(Attribute.valueOf("uid", uid.get()))
 			.attribute(Attribute.valueOf("uidNumber", uidNumber))
 			.attribute(Attribute.valueOf("gidNumber", gidNumber))
@@ -472,9 +515,16 @@ public class LdapUser {
 			.attribute(Attribute.valueOf("mailAccess", mailAccess))
 			.attribute(Attribute.valueOf("mail", mail))
 			.attribute(Attribute.valueOf("hiddenUser", Boolean.valueOf(hiddenUser).toString().toUpperCase()))
-			.attribute(Attribute.valueOf("obmDomain", domain.get()))
-			.build();
-		return ldapEntry.toDefaultEntry();
+			.attribute(Attribute.valueOf("obmDomain", domain.get()));
+		
+		
+		if (isSambaAllowed()) {
+			builder.attribute(Attribute.valueOf("objectClass", SAMBA_SAM_ACCOUNT_OBJECT_CLASS));
+			builder.attribute(Attribute.valueOf("sambaSID", sambaSid));
+			builder.attribute(Attribute.valueOf("sambaPrimaryGroupSID", sambaPrimaryGroupSid));
+		}
+		
+		return builder.build().toDefaultEntry();
 	}
 
 	public Modification[] buildDiffModifications(LdapUser oldUser) {
@@ -533,6 +583,15 @@ public class LdapUser {
 		if (!Objects.equal(hiddenUser, oldUser.hiddenUser)) {
 			mods.add(buildAttributeModification("hiddenUser", String.valueOf(hiddenUser).toUpperCase()));
 		}
+		if (!Objects.equal(sambaAllowed, oldUser.sambaAllowed)) {
+			if (!sambaAllowed) {
+				mods.add(removeAttributeModification("sambaSID", sambaSid));
+				mods.add(removeAttributeModification("sambaPrimaryGroupSID", sambaPrimaryGroupSid));
+			} else {
+				mods.add(buildAttributeModification("sambaSID", sambaSid));
+				mods.add(buildAttributeModification("sambaPrimaryGroupSID", sambaPrimaryGroupSid));
+			}
+		}
 
 		return mods.toArray(new Modification[mods.size()]);
 	}
@@ -561,7 +620,8 @@ public class LdapUser {
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(uid, uidNumber, gidNumber, loginShell, cn, displayName, sn, givenName, 
-				homeDirectory, userPassword, webAccess, mailBox, mailBoxServer, mailAccess, mail, mailAlias, hiddenUser, domain);
+				homeDirectory, userPassword, webAccess, mailBox, mailBoxServer, mailAccess, mail, mailAlias, hiddenUser, domain,
+				sambaAllowed);
 	}
 	
 	@Override
@@ -585,7 +645,8 @@ public class LdapUser {
 				&& Objects.equal(this.mail, that.mail)
 				&& Objects.equal(this.mailAlias, that.mailAlias)
 				&& Objects.equal(this.hiddenUser, that.hiddenUser)
-				&& Objects.equal(this.domain, that.domain);
+				&& Objects.equal(this.domain, that.domain)
+				&& Objects.equal(this.sambaAllowed, that.sambaAllowed);
 		}
 		return false;
 	}
@@ -611,6 +672,7 @@ public class LdapUser {
 			.add("mailAlias", mailAlias)
 			.add("hiddenUser", hiddenUser)
 			.add("obmDomain", domain)
+			.add("sambaAllowed", sambaAllowed)
 			.toString();
 	}
 }
