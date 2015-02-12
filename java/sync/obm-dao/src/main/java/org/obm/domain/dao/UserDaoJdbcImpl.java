@@ -139,7 +139,8 @@ public class UserDaoJdbcImpl implements UserDao {
 			"host_ip, " +
 			"host_domain_id," +
 			"userobm_account_dateexp," +
-			"userobm_delegation";
+			"userobm_delegation, " +
+			"userobm_delegation_target";
 	private static final AddressBook CONTACTS_BOOK = AddressBook
 			.builder()
 			.name("contacts")
@@ -382,7 +383,8 @@ public class UserDaoJdbcImpl implements UserDao {
 					.updatedBy(updator)
 					.groups(Objects.firstNonNull(groups, Collections.EMPTY_SET))
 					.expirationDate(JDBCUtils.getDate(rs, "userobm_account_dateexp"))
-					.delegation(emptyToNull(rs.getString("userobm_delegation")))	
+					.delegation(emptyToNull(rs.getString("userobm_delegation")))
+					.delegationTarget(emptyToNull(rs.getString("userobm_delegation_target")))
 					.build();
 		} catch (DaoException e) {
 			throw new SQLException(e);
@@ -610,12 +612,13 @@ public class UserDaoJdbcImpl implements UserDao {
 				"userobm_uid," +
 				"userobm_gid," +
 				"userobm_account_dateexp," +
-				"userobm_delegation" +
+				"userobm_delegation, " +
+				"userobm_delegation_target" +
 				") VALUES (" +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-					"?, ?, ?, ?, ?, ?, ? " +
+					"?, ?, ?, ?, ?, ?, ?, ? " +
 				")";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -700,6 +703,7 @@ public class UserDaoJdbcImpl implements UserDao {
 
 			JDBCUtils.setOptionalDate(ps, user.getExpirationDate(), idx++);
 			ps.setString(idx++, user.getDelegation());
+			ps.setString(idx++, user.getDelegationTarget());
 
 			ps.executeUpdate();
 
@@ -778,7 +782,8 @@ public class UserDaoJdbcImpl implements UserDao {
                     "userobm_hidden = ?, " +
                     "userobm_archive = ?, " +
                     "userobm_account_dateexp = ?, " +
-                    "userobm_delegation = ? " +
+                    "userobm_delegation = ?, " +
+                    "userobm_delegation_target = ? " +
                     "WHERE userobm_id = ?";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -846,6 +851,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			ps.setInt(idx++, user.isArchived() ? 1 : 0);
 			JDBCUtils.setOptionalDate(ps, user.getExpirationDate(), idx++);
 			ps.setString(idx++, user.getDelegation());
+			ps.setString(idx++, user.getDelegationTarget());
 			ps.setInt(idx++, user.getUid());
 
 			int updateCount = ps.executeUpdate();
