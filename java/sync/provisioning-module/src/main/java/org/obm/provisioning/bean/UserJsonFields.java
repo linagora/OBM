@@ -44,7 +44,7 @@ public enum UserJsonFields {
 	COUNTRY("country"), PHONES("phones"), MOBILE("mobile"), FAXES("faxes"), MAIL_QUOTA("mail_quota"), MAIL_SERVER("mail_server"),
 	ARCHIVED("archived"), HIDDEN("hidden"), MAILS("mails"), EFFECTIVEMAILS("effectiveMails"), TIMECREATE("timecreate"),
 	TIMEUPDATE("timeupdate"), GROUPS("groups"), EXPIRATIONDATE("expiration_date"), DELEGATION("delegation"), DELEGATIONTARGET("delegation_target"),
-	SAMBA_ALLOWED("samba_allowed");
+	SAMBA_ALLOWED("samba_allowed"), SAMBA_HOME_DRIVE("samba_home_drive");
 	
 	private String value;
 	

@@ -233,6 +233,9 @@ public class SerializationUtils {
 			case SAMBA_ALLOWED:
 				toBuild.sambaAllowed(value.asBoolean());
 				break;
+			case SAMBA_HOME_DRIVE:
+				toBuild.sambaHomeDrive(value.asText());
+				break;
 		}
 	}
 

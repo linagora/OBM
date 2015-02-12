@@ -59,6 +59,7 @@ import static org.obm.provisioning.bean.UserJsonFields.PASSWORD;
 import static org.obm.provisioning.bean.UserJsonFields.PHONES;
 import static org.obm.provisioning.bean.UserJsonFields.PROFILE;
 import static org.obm.provisioning.bean.UserJsonFields.SAMBA_ALLOWED;
+import static org.obm.provisioning.bean.UserJsonFields.SAMBA_HOME_DRIVE;
 import static org.obm.provisioning.bean.UserJsonFields.SERVICE;
 import static org.obm.provisioning.bean.UserJsonFields.TIMECREATE;
 import static org.obm.provisioning.bean.UserJsonFields.TIMEUPDATE;
@@ -132,6 +133,7 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeStringField(DELEGATIONTARGET.asSpecificationValue(), value.getDelegationTarget());
 		jgen.writeObjectField(GROUPS.asSpecificationValue(), extractGroupIdentifiers(value.getGroups(), value.getDomain()));
 		jgen.writeBooleanField(SAMBA_ALLOWED.asSpecificationValue(), value.isSambaAllowed());
+		jgen.writeStringField(SAMBA_HOME_DRIVE.asSpecificationValue(), value.getSambaHomeDrive());
 		jgen.writeEndObject();
 	}
 

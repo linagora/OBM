@@ -408,7 +408,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"delegation_target\":\"delegationTarget\"," +
 					"\"groups\":" +
 						"[]," +
-					"\"samba_allowed\":true" +
+					"\"samba_allowed\":true," +
+					"\"samba_home_drive\":\"ab\"" +
 				"}";
 	}
 	
@@ -456,7 +457,8 @@ public abstract class CommonDomainEndPointEnvTest {
 							"\"id\":\"group2\",\"url\":\"/a3443822-bb58-4585-af72-543a287f7c0e/groups/group2\"" +
 						"}" +
 					"]," +
-				"\"samba_allowed\":true" +
+				"\"samba_allowed\":true," +
+				"\"samba_home_drive\":\"ab\"" +
 			"}";
 	}
 
@@ -536,7 +538,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"delegation\":null," +
 					"\"delegation_target\":null," +
 					"\"groups\":[]," +
-					"\"samba_allowed\":false" +
+					"\"samba_allowed\":false," +
+					"\"samba_home_drive\":null" +
 				"}";
 	}
 
@@ -591,6 +594,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				.delegationTarget("delegationTarget")
 				.groups(fakeGroups())
 				.sambaAllowed(true)
+				.sambaHomeDrive("ab")
 				.build();
 	}
 	
