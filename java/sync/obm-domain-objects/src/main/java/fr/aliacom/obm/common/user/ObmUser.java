@@ -85,6 +85,7 @@ public class ObmUser {
 
 		private Date expirationDate;
 		private String delegation;
+		private String delegationTarget;
 		
 		private final ImmutableSet.Builder<Group> groups;
 
@@ -117,7 +118,8 @@ public class ObmUser {
 					.gidNumber(user.gidNumber)
 					.groups(user.groups)
 					.expirationDate(user.expirationDate)
-					.delegation(user.delegation);
+					.delegation(user.delegation)
+					.delegationTarget(user.delegationTarget);
 		}
 
 		public Builder uid(Integer uid) {
@@ -222,10 +224,17 @@ public class ObmUser {
 			this.expirationDate =  expirationDate;
 			return this;
 		}
+
 		public Builder delegation(String delegation) {
 			this.delegation = delegation;
 			return this;
 		}
+
+		public Builder delegationTarget(String delegationTarget) {
+			this.delegationTarget = delegationTarget;
+			return this;
+		}
+
 		public Builder groups(Iterable<Group> groups) {
 			Preconditions.checkNotNull(groups);
 			this.groups.addAll(groups);
@@ -252,7 +261,7 @@ public class ObmUser {
 					hidden, address, phones, work, emails,
 					description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName,
-					archived, password, uidNumber, gidNumber, groups.build(), expirationDate, delegation);
+					archived, password, uidNumber, gidNumber, groups.build(), expirationDate, delegation, delegationTarget);
 		}
 		
 	}
@@ -289,13 +298,15 @@ public class ObmUser {
 	private final Set<Group> groups;
 	private final Date expirationDate;
 	private final String delegation;
+	private final String delegationTarget;
 
 	private ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, UserIdentity identity,
 			boolean hidden, UserAddress address, UserPhones phones, UserWork work, UserEmails emails,
 			String description, Date timeCreate, Date timeUpdate,
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName,
-			boolean archived, UserPassword password, Integer uidNumber, Integer gidNumber, Set<Group> groups,  Date expirationDate, String delegation) {
+			boolean archived, UserPassword password, Integer uidNumber, Integer gidNumber, Set<Group> groups,  Date expirationDate,
+			String delegation, String delegationTarget) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -322,6 +333,7 @@ public class ObmUser {
 		this.groups = groups;
 		this.expirationDate = expirationDate;
 		this.delegation = delegation;
+		this.delegationTarget = delegationTarget;
 	}
 
 	public int getUid() {
@@ -553,12 +565,16 @@ public class ObmUser {
 		return delegation;
 	}
 
+	public String getDelegationTarget() {
+		return delegationTarget;
+	}
+
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(uid, entityId, login, extId, admin, identity, emails,
 				hidden, address, phones, work,
 				description, createdBy, updatedBy, domain, publicFreeBusy, profileName,
-				archived, password, uidNumber, gidNumber, groups, expirationDate, delegation);
+				archived, password, uidNumber, gidNumber, groups, expirationDate, delegation, delegationTarget);
 	}
 	
 	@Override
@@ -588,7 +604,8 @@ public class ObmUser {
 				&& Objects.equal(this.gidNumber, that.gidNumber)
 				&& Objects.equal(this.groups, that.groups)
 				&& Objects.equal(this.expirationDate, that.expirationDate)
-				&& Objects.equal(this.delegation, that.delegation);
+				&& Objects.equal(this.delegation, that.delegation)
+				&& Objects.equal(this.delegationTarget, that.delegationTarget);
 		}
 		return false;
 	}
@@ -621,6 +638,7 @@ public class ObmUser {
 			.add("groups", groups)
 			.add("expirationDate", expirationDate)
 			.add("delegation", delegation)
+			.add("delegationTarget", delegationTarget)
 			.toString();
 	}
 
