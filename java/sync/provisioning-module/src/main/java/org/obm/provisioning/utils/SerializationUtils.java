@@ -227,6 +227,9 @@ public class SerializationUtils {
 			case DELEGATION:
 				toBuild.delegation(value.asText());
 				break;
+			case DELEGATIONTARGET:
+				toBuild.delegationTarget(value.asText());
+				break;
 		}
 	}
 

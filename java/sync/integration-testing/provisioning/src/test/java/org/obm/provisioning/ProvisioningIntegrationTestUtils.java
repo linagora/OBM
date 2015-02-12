@@ -44,7 +44,7 @@ public class ProvisioningIntegrationTestUtils {
 				+ "\"direction\":null,\"addresses\":[],\"town\":null,\"zipcode\":null,\"business_zipcode\":null,"
 				+ "\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],\"archived\":false,\"mail_quota\":\"0\","
 				+ "\"mail_server\":null,\"mails\":[\"admin0@*\"],\"effectiveMails\":[\"admin0@test.tlse.lng\"],\"hidden\":false,\"timecreate\":null,\"timeupdate\":null,"
-				+ "\"expiration_date\":null,\"delegation\":null,"
+				+ "\"expiration_date\":null,\"delegation\":null,\"delegation_target\":null,"
 				+ "\"groups\":[]}";
 	}
 	
@@ -54,7 +54,7 @@ public class ProvisioningIntegrationTestUtils {
 				+ "\"description\":null,\"company\":null,\"service\":null,\"direction\":null,\"addresses\":[],\"town\":null,"
 				+ "\"zipcode\":null,\"business_zipcode\":null,\"country\":\"0\",\"phones\":[],\"mobile\":null,\"faxes\":[],\"archived\":false,"
 				+ "\"mail_quota\":\"0\",\"mail_server\":null,\"mails\":[\"admin0@*\"],\"effectiveMails\":[\"admin0@global.virt\"],\"hidden\":false,\"timecreate\":null,\"timeupdate\":null,"
-				+ "\"expiration_date\":null,\"delegation\":null,"
+				+ "\"expiration_date\":null,\"delegation\":null,\"delegation_target\":null,"
 				+ "\"groups\":[{\"id\":\"GroupWithUsers\",\"url\":\"/abf7c2bc-aa84-461c-b057-ee42c5dce40a/groups/GroupWithUsers\"}]}";
 	}
 

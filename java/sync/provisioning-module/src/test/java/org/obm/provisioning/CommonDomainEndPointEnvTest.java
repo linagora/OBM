@@ -405,6 +405,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
 					"\"expiration_date\":\"2015-12-31T00:00:00.000+0000\"," +
 					"\"delegation\":\"delegation\"," +
+					"\"delegation_target\":\"delegationTarget\"," +
 					"\"groups\":" +
 						"[]" +
 				"}";
@@ -444,6 +445,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
 				"\"expiration_date\":\"2015-12-31T00:00:00.000+0000\"," +
 				"\"delegation\":\"delegation\"," +
+				"\"delegation_target\":\"delegationTarget\"," +
 				"\"groups\":" +
 					"[" +
 						"{" +
@@ -530,6 +532,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"timeupdate\":null," +
 					"\"expiration_date\":null," +
 					"\"delegation\":null," +
+					"\"delegation_target\":null," +
 					"\"groups\":[]" +
 				"}";
 	}
@@ -582,6 +585,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				.timeUpdate(TIMEUPDATE)
 				.expirationDate(EXPIRATIONDATE)
 				.delegation("delegation")
+				.delegationTarget("delegationTarget")
 				.groups(fakeGroups())
 				.build();
 	}
