@@ -57,6 +57,7 @@ public class BeansTest {
 					.add(LdapUser.Uid.class)
 					.add(LdapUserMembership.class)
 					.add(LdapDomain.class)
+					.add(NTLMPassword.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
 	}
