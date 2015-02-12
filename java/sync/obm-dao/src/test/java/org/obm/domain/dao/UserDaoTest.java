@@ -365,6 +365,7 @@ public class UserDaoTest {
 		expect(rs.getString("userobm_delegation")).andReturn(null);
 		expect(rs.getString("userobm_delegation_target")).andReturn(null);
 		expect(rs.getBoolean("userobm_samba_perms")).andReturn(true);
+		expect(rs.getString("userobm_samba_home_drive")).andReturn("ab");
 		
 		mocksControl.replay();
 		ObmUser obmUser = userDao.createUserFromResultSetAndFetchCreators(domain, rs);
@@ -404,6 +405,7 @@ public class UserDaoTest {
 			.uidNumber(1001)
 			.gidNumber(1000)
 			.sambaAllowed(true)
+			.sambaHomeDrive("ab")
 			.build();
 		
 		assertThat(obmUser).isEqualToComparingFieldByField(expectedObmUser);

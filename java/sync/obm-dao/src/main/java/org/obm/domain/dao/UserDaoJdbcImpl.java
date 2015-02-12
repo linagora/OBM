@@ -132,6 +132,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			"userobm_uid, " +
 			"userobm_gid, " +
 			"userobm_samba_perms, " +
+			"userobm_samba_home_drive, " +
 			"defpref.userobmpref_value AS defpref_userobmpref_value, " +
 			"userpref.userobmpref_value AS userpref_userobmpref_value, " +
 			"userentity_entity_id, " +
@@ -387,6 +388,7 @@ public class UserDaoJdbcImpl implements UserDao {
 					.delegation(emptyToNull(rs.getString("userobm_delegation")))
 					.delegationTarget(emptyToNull(rs.getString("userobm_delegation_target")))
 					.sambaAllowed(rs.getBoolean("userobm_samba_perms"))
+					.sambaHomeDrive(emptyToNull(rs.getString("userobm_samba_home_drive")))
 					.build();
 		} catch (DaoException e) {
 			throw new SQLException(e);
@@ -616,12 +618,13 @@ public class UserDaoJdbcImpl implements UserDao {
 				"userobm_account_dateexp," +
 				"userobm_delegation, " +
 				"userobm_delegation_target, " +
-				"userobm_samba_perms" +
+				"userobm_samba_perms, " +
+				"userobm_samba_home_drive" +
 				") VALUES (" +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-					"?, ?, ?, ?, ?, ?, ?, ?, ? " +
+					"?, ?, ?, ?, ?, ?, ?, ?, ?, ? " +
 				")";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -709,6 +712,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			ps.setString(idx++, user.getDelegationTarget());
 			
 			ps.setInt(idx++, user.isSambaAllowed() ? 1 : 0);
+			ps.setString(idx++, nullToEmpty(user.getSambaHomeDrive()));
 
 			ps.executeUpdate();
 
@@ -789,7 +793,8 @@ public class UserDaoJdbcImpl implements UserDao {
                     "userobm_account_dateexp = ?, " +
                     "userobm_delegation = ?, " +
                     "userobm_delegation_target = ?, " +
-                    "userobm_samba_perms = ? " +
+                    "userobm_samba_perms = ?, " +
+                    "userobm_samba_home_drive = ? " +
                     "WHERE userobm_id = ?";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -859,6 +864,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			ps.setString(idx++, user.getDelegation());
 			ps.setString(idx++, user.getDelegationTarget());
 			ps.setInt(idx++, user.isSambaAllowed() ? 1 : 0);
+			ps.setString(idx++, nullToEmpty(user.getSambaHomeDrive()));
 			
 			ps.setInt(idx++, user.getUid());
 
