@@ -42,6 +42,7 @@ import org.obm.sync.host.ObmHost;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -91,6 +92,7 @@ public class ObmUser {
 		
 		private boolean sambaAllowed;
 		private String sambaHomeDrive;
+		private String sambaHomeFolder;
 		
 		private final ImmutableSet.Builder<Group> groups;
 
@@ -127,7 +129,8 @@ public class ObmUser {
 					.delegation(user.delegation)
 					.delegationTarget(user.delegationTarget)
 					.sambaAllowed(user.sambaAllowed)
-					.sambaHomeDrive(user.sambaHomeDrive);
+					.sambaHomeDrive(user.sambaHomeDrive)
+					.sambaHomeFolder(user.sambaHomeFolder);
 		}
 
 		public Builder uid(Integer uid) {
@@ -263,6 +266,11 @@ public class ObmUser {
 			this.sambaHomeDrive = sambaHomeDrive;
 			return this;
 		}
+		
+		public Builder sambaHomeFolder(String sambaHomeFolder) {
+			this.sambaHomeFolder = sambaHomeFolder;
+			return this;
+		}
 
 		public ObmUser build() {
 			Preconditions.checkState(uid != null || extId != null);
@@ -280,6 +288,10 @@ public class ObmUser {
 			UserEmails emails = Objects.firstNonNull(this.emails, UserEmails.builder().domain(domain).build());
 			UserNomad nomad = Objects.firstNonNull(this.nomad, UserNomad.empty());
 			
+			if (!Strings.isNullOrEmpty(sambaHomeFolder)) {
+				sambaHomeFolder = sambaHomeFolder.replaceAll("%u", login.getStringValue());
+			}
+			
 			return new ObmUser(
 					uid, entityId, login, extId, admin, identity,
 					hidden, address, phones, work, emails,
@@ -287,7 +299,7 @@ public class ObmUser {
 					domain, publicFreeBusy, profileName,
 					archived, password, uidNumber, gidNumber, groups.build(), expirationDate,
 					nomad, delegation, delegationTarget,
-                    sambaAllowed, sambaHomeDrive);
+					sambaAllowed, sambaHomeDrive, sambaHomeFolder);
 		}
 		
 	}
@@ -330,6 +342,7 @@ public class ObmUser {
 	
 	private final boolean sambaAllowed;
 	private final String sambaHomeDrive;
+	private final String sambaHomeFolder;
 
 	private ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, UserIdentity identity,
 			boolean hidden, UserAddress address, UserPhones phones, UserWork work, UserEmails emails,
@@ -339,7 +352,7 @@ public class ObmUser {
 			boolean archived, UserPassword password, Integer uidNumber, Integer gidNumber, Set<Group> groups,  Date expirationDate,
 			UserNomad nomad,
 			String delegation, String delegationTarget,
-			boolean sambaAllowed, String sambaHomeDrive) {
+			boolean sambaAllowed, String sambaHomeDrive, String sambaHomeFolder) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -370,6 +383,7 @@ public class ObmUser {
 		this.delegationTarget = delegationTarget;
 		this.sambaAllowed = sambaAllowed;
 		this.sambaHomeDrive = sambaHomeDrive;
+		this.sambaHomeFolder = sambaHomeFolder;
 	}
 
 	public int getUid() {
@@ -616,6 +630,10 @@ public class ObmUser {
 	public String getSambaHomeDrive() {
 		return sambaHomeDrive;
 	}
+
+	public String getSambaHomeFolder() {
+		return sambaHomeFolder;
+	}
 	
 	@Override
 	public final int hashCode() {
@@ -624,7 +642,7 @@ public class ObmUser {
 				description, createdBy, updatedBy, domain, publicFreeBusy, profileName,
 				archived, password, nomad, uidNumber, gidNumber, groups, expirationDate,
 				delegation, delegationTarget,
-				sambaAllowed, sambaHomeDrive);
+				sambaAllowed, sambaHomeDrive, sambaHomeFolder);
 	}
 	
 	@Override
@@ -658,7 +676,8 @@ public class ObmUser {
 				&& Objects.equal(this.delegation, that.delegation)
 				&& Objects.equal(this.delegationTarget, that.delegationTarget)
 				&& Objects.equal(this.sambaAllowed, that.sambaAllowed)
-				&& Objects.equal(this.sambaHomeDrive, that.sambaHomeDrive);
+				&& Objects.equal(this.sambaHomeDrive, that.sambaHomeDrive)
+				&& Objects.equal(this.sambaHomeFolder, that.sambaHomeFolder);
 		}
 		return false;
 	}
@@ -695,6 +714,7 @@ public class ObmUser {
 			.add("delegationTarget", delegationTarget)
 			.add("sambaAllowed", sambaAllowed)
 			.add("sambaHomeDrive", sambaHomeDrive)
+			.add("sambaHomeFolder", sambaHomeFolder)
 			.toString();
 	}
 

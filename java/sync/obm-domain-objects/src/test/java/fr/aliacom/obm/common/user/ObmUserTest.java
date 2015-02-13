@@ -390,4 +390,41 @@ public class ObmUserTest {
 
 		assertThat(obmUser.getSambaHomeDrive()).isEqualTo("drive");
 	}
+
+	@Test
+	public void sambaHomeFolderShouldBeNullWhenNotSet() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login(validLogin)
+				.domain(domain)
+				.build();
+
+		assertThat(obmUser.getSambaHomeFolder()).isNull();
+	}
+
+	@Test
+	public void sambaHomeFolderShouldBeSetWhenBuilding() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login(validLogin)
+				.domain(domain)
+				.sambaHomeFolder("folder")
+				.build();
+
+		assertThat(obmUser.getSambaHomeFolder()).isEqualTo("folder");
+	}
+
+	@Test
+	public void sambaHomeFolderShouldParsedWhenBuilding() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login(validLogin)
+				.domain(domain)
+				.sambaHomeFolder("myfolder/%u/subfolder")
+				.build();
+
+		String expectedSambaHomeFolder = "myfolder/" + validLogin.getStringValue() + "/subfolder";
+		
+		assertThat(obmUser.getSambaHomeFolder()).isEqualTo(expectedSambaHomeFolder);
+	}
 }
