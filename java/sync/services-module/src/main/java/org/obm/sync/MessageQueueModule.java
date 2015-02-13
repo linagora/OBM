@@ -80,7 +80,9 @@ public class MessageQueueModule extends AbstractModule {
 				.journalDirectory(dataDirectory + "/journal")
 				.pagingDirectory(dataDirectory + "/paging")
 				.connector(HornetQConfiguration.Connector.HornetQInVMCore)
+				.connector(HornetQConfiguration.Connector.HornetQSocketCore)
 				.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
+				.acceptor(HornetQConfiguration.Acceptor.HornetQSocketCore)
 				.acceptor(HornetQConfiguration.Acceptor.Stomp)
 				.build();
 	}
