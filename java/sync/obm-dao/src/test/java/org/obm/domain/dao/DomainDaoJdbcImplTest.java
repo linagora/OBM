@@ -54,6 +54,7 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomain.Builder;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.domain.Samba;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(DomainDaoJdbcImplTest.Env.class)
@@ -100,7 +101,13 @@ public class DomainDaoJdbcImplTest implements H2TestClass {
 			.label("test2.tlse.lng")
 			.name("test2.tlse.lng")
 			.id(2)
-			.global(false);
+			.global(false)
+			.samba(Samba.builder()
+				.sid("S-1-5-21-1895063688-3870457350-1790443141")
+				.profile("\\\\samba\\chemin\\profile")
+				.home("\\\\samba\\chemin\\profile\\%u")
+				.drive("E")
+				.build());
 	private ObmDomain.Builder withOneAliasBuilder = ObmDomain
 			.builder()
 			.uuid(ObmDomainUuid.of("3b7da76a-ff7c-46f6-bd5b-700cfb21c5e3"))
@@ -159,6 +166,17 @@ public class DomainDaoJdbcImplTest implements H2TestClass {
 				.build();
 
 		assertThat(domain.getHosts()).isEqualTo(hosts);
+	}
+
+	@Test
+	public void findDomainShouldFetchesSambaProperties() {
+		ObmDomain domain = dao.findDomainByName("test2.tlse.lng");
+		Samba samba = domain.getSamba().get();
+		assertThat(samba).isNotNull();
+		assertThat(samba.getSid()).isEqualTo("S-1-5-21-1895063688-3870457350-1790443141");
+		assertThat(samba.getProfile()).isEqualTo("\\\\samba\\chemin\\profile");
+		assertThat(samba.getHome()).isEqualTo("\\\\samba\\chemin\\profile\\%u");
+		assertThat(samba.getDrive()).isEqualTo("E");
 	}
 
 	@Test(expected=DomainNotFoundException.class)

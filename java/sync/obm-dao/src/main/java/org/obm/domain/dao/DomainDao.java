@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.domain.dao;
 
+import static org.obm.sync.serviceproperty.ServiceProperty.SAMBA_SERVICE;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -50,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
@@ -57,6 +60,7 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.domain.Samba;
 
 @Singleton
 public class DomainDao {
@@ -89,7 +93,7 @@ public class DomainDao {
 			rs = ps.executeQuery();
 
 			if (rs.next()) {
-				return domainFromCursor(rs);
+				return domainFromCursor(rs, con);
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(), e);
@@ -113,7 +117,7 @@ public class DomainDao {
 			rs = ps.executeQuery();
 
 			if (rs.next()) {
-				return domainFromCursor(rs);
+				return domainFromCursor(rs, con);
 			}
 		} catch (SQLException e) {
             throw new DaoException(e);
@@ -165,7 +169,7 @@ public class DomainDao {
 			rs = statement.executeQuery(query);
 
 			while (rs.next()) {
-				domains.add(domainFromCursor(rs));
+				domains.add(domainFromCursor(rs, con));
 			}
 			
 		} catch (SQLException e) {
@@ -181,7 +185,7 @@ public class DomainDao {
 		return aliases == null ? ImmutableSet.<String>of() : Splitter.on("\r\n").omitEmptyStrings().split(aliases);
 	}
 	
-	private ObmDomain domainFromCursor(ResultSet rs) throws SQLException {
+	private ObmDomain domainFromCursor(ResultSet rs, Connection connection) throws SQLException {
 		int id = rs.getInt("domain_id");
 		ObmDomain.Builder domainBuilder = ObmDomain
 				.builder()
@@ -192,29 +196,27 @@ public class DomainDao {
 				.aliases(aliasToIterable(rs.getString("domain_alias")))
 				.global(rs.getBoolean("domain_global"));
 
-		fetchDomainMailChooserHookId(id, domainBuilder);
+		fetchDomainMailChooserHookId(id, connection, domainBuilder);
 
-		return fetchDomainHosts(id, domainBuilder).build();
+		fetchDomainHosts(id, connection, domainBuilder);
+		
+		fetchSamba(id, connection, domainBuilder);
+		
+		return domainBuilder.build();
 	}
 
-	private ObmDomain.Builder fetchDomainHosts(int domainId, ObmDomain.Builder domainBuilder) throws SQLException {
-		Connection con = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
-		try {
-			con = dbcp.getConnection();
-			ps = con.prepareStatement(
+	private void fetchDomainHosts(int domainId, Connection connection, ObmDomain.Builder domainBuilder) throws SQLException {
+		try (PreparedStatement ps = connection.prepareStatement(
 				"SELECT serviceproperty_service, serviceproperty_property, host_id, host_name, host_ip, host_fqdn, host_domain_id " +
 				"FROM Domain " +
 				"INNER JOIN DomainEntity ON domainentity_domain_id = domain_id " +
 				"LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id " +
 				"LEFT JOIN Host ON CAST(host_id AS CHAR(9)) = serviceproperty_value " +
 				"WHERE domain_id = ? AND host_id IS NOT NULL " +
-				"GROUP BY serviceproperty_service, serviceproperty_property, host_id, host_name, host_ip, host_fqdn, host_domain_id");
+				"GROUP BY serviceproperty_service, serviceproperty_property, host_id, host_name, host_ip, host_fqdn, host_domain_id")) {
 
 			ps.setInt(1, domainId);
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
 				ServiceProperty serviceProperty = ServiceProperty
@@ -233,16 +235,11 @@ public class DomainDao {
 
 				domainBuilder.host(serviceProperty, host);
 			}
-		} finally {
-			DBUtils.cleanup(con, ps, rs);
 		}
-
-		return domainBuilder;
 	}
 
-	private void fetchDomainMailChooserHookId(int domainId, ObmDomain.Builder domainBuilder) throws SQLException {
-		try (Connection con = dbcp.getConnection();
-			PreparedStatement ps = con.prepareStatement(
+	private void fetchDomainMailChooserHookId(int domainId, Connection connection, ObmDomain.Builder domainBuilder) throws SQLException {
+		try (PreparedStatement ps = connection.prepareStatement(
 				"SELECT CAST(serviceproperty_value AS INTEGER) " +
 				"FROM ServiceProperty " +
 				"INNER JOIN DomainEntity ON serviceproperty_entity_id = domainentity_entity_id " +
@@ -259,4 +256,27 @@ public class DomainDao {
 		}
 	}
 
+	private void fetchSamba(int domainId, Connection connection, ObmDomain.Builder domainBuilder) throws SQLException {
+		try (PreparedStatement ps = connection.prepareStatement(
+				"SELECT serviceproperty_property, serviceproperty_value " +
+				"FROM ServiceProperty " +
+				"INNER JOIN DomainEntity ON serviceproperty_entity_id = domainentity_entity_id " +
+				"WHERE domainentity_domain_id = ? AND serviceproperty_service = ?")) {
+
+			ps.setInt(1, domainId);
+			ps.setString(2, SAMBA_SERVICE);
+
+			ResultSet rs = ps.executeQuery();
+
+			ImmutableMap.Builder<String, String> sambaPropertiesBuilder = ImmutableMap.builder();
+			while (rs.next()) {
+				sambaPropertiesBuilder.put(rs.getString("serviceproperty_property"), rs.getString("serviceproperty_value"));
+			}
+			
+			ImmutableMap<String, String> sambaProperties = sambaPropertiesBuilder.build();
+			if (!sambaProperties.isEmpty()) {
+				domainBuilder.samba(Samba.from(sambaProperties));
+			}
+		}
+	}
 }

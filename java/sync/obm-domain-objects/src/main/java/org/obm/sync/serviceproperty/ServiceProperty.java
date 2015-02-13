@@ -38,6 +38,7 @@ import com.google.common.base.Preconditions;
 public class ServiceProperty implements Serializable {
 
 	public static final String IMAP_AUTOSELECT = "imap_autoselect";
+	public static final String SAMBA_SERVICE = "samba";
 	public static final ServiceProperty IMAP = ServiceProperty
 			.builder()
 			.service("mail")

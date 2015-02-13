@@ -38,6 +38,7 @@ import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMultimap;
@@ -58,6 +59,7 @@ public class ObmDomain implements Serializable {
 		private Boolean global;
 		private final ImmutableMultimap.Builder<ServiceProperty, ObmHost> hosts;
 		private Integer mailChooserHookId;
+		private Samba samba;
 		
 		private Builder() {
 			aliases = ImmutableSet.builder();
@@ -71,7 +73,8 @@ public class ObmDomain implements Serializable {
 				.aliases(domain.aliases)
 				.hosts(domain.hosts)
 				.global(domain.global)
-				.mailChooserHookId(domain.mailChooserHookId);
+				.mailChooserHookId(domain.mailChooserHookId)
+				.samba(domain.samba);
 		}
 		
 		public Builder id(int id) {
@@ -132,11 +135,16 @@ public class ObmDomain implements Serializable {
 			this.mailChooserHookId = mailChooserHookId;
 			return this;
 		}
+		
+		public Builder samba(Samba samba) {
+			this.samba = samba;
+			return this;
+		}
 
 		public ObmDomain build() {
 			global = Objects.firstNonNull(global, false);
 			
-			return new ObmDomain(id, name, uuid, label, aliases.build(), hosts.build(), global, mailChooserHookId);
+			return new ObmDomain(id, name, uuid, label, aliases.build(), hosts.build(), global, mailChooserHookId, samba);
 		}
 	}
 	
@@ -152,9 +160,10 @@ public class ObmDomain implements Serializable {
 	private final Multimap<ServiceProperty, ObmHost> hosts;
 	private final boolean global;
 	private final Integer mailChooserHookId;
+	private final Samba samba;
 
 	private ObmDomain(Integer id, String name, ObmDomainUuid uuid, String label, Set<String> aliases,
-			Multimap<ServiceProperty, ObmHost> hosts, boolean global, Integer mailChooserHookId) {
+			Multimap<ServiceProperty, ObmHost> hosts, boolean global, Integer mailChooserHookId, Samba samba) {
 		this.id = id;
 		this.name = name;
 		this.uuid = uuid;
@@ -163,6 +172,7 @@ public class ObmDomain implements Serializable {
 		this.hosts = hosts;
 		this.global = global;
 		this.mailChooserHookId = mailChooserHookId;
+		this.samba = samba;
 	}
 
 	public boolean isGlobal() {
@@ -211,10 +221,14 @@ public class ObmDomain implements Serializable {
 
 		}).orNull();
 	}
+	
+	public Optional<Samba> getSamba() {
+		return Optional.fromNullable(samba);
+	}
 
 	@Override
 	public final int hashCode() {
-		return Objects.hashCode(id, name, uuid, label, aliases, global);
+		return Objects.hashCode(id, name, uuid, label, aliases, global, samba);
 	}
 
 	@Override
@@ -227,7 +241,8 @@ public class ObmDomain implements Serializable {
 				&& Objects.equal(this.label, that.label)
 				&& Objects.equal(this.uuid, that.uuid)
 				&& Objects.equal(this.aliases, that.aliases)
-				&& Objects.equal(this.global, that.global);
+				&& Objects.equal(this.global, that.global)
+				&& Objects.equal(this.samba, that.samba);
 		}
 		
 		return false;
@@ -243,6 +258,7 @@ public class ObmDomain implements Serializable {
 			.add("uuid", uuid)
 			.add("hosts", hosts)
 			.add("global", global)
+			.add("samba", samba)
 			.toString();
 	}
 

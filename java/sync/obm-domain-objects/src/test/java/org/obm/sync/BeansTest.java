@@ -69,6 +69,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.domain.Samba;
 import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
 import fr.aliacom.obm.common.profile.Profile;
 import fr.aliacom.obm.common.resource.Resource;
@@ -136,7 +137,8 @@ public class BeansTest {
 				UserAddress.class,
 				UserPhones.class,
 				UserWork.class,
-				UserPassword.class);
+				UserPassword.class,
+				Samba.class);
 	}
 	
 	@Test

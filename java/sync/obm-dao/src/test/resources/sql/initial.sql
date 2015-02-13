@@ -17070,6 +17070,10 @@ INSERT INTO serviceproperty (serviceproperty_service, serviceproperty_property, 
         ('sync', 'obm_sync', 1, 2),
         ('mail', 'smtp_in', 2, 1),
         ('samba', 'domain', 2, 'Yeepee, a SAMBA domain !'),
+        ('samba', 'sid', 2, 'S-1-5-21-1895063688-3870457350-1790443141'),
+        ('samba', 'profile', 2, '\\samba\chemin\profile'),
+        ('samba', 'home', 2, '\\samba\chemin\profile\%u'),
+        ('samba', 'drive', 2, 'E'),
         ('mail', 'imap_autoselect', 1, '98'),
         ('mail', 'imap_autoselect', 2, '99');
 

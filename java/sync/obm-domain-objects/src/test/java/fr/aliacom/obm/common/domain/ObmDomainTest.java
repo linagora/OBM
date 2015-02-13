@@ -30,10 +30,13 @@
 package fr.aliacom.obm.common.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.guava.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
+
+import com.google.common.base.Optional;
 
 
 public class ObmDomainTest {
@@ -165,4 +168,29 @@ public class ObmDomainTest {
 		assertThat(domain.getHostById(1)).isEqualTo(host);
 	}
 
+	@Test
+	public void getDomainShouldBeAbsentWhenNone() {
+		ObmDomain domain = ObmDomain.builder()
+				.build();
+		
+		assertThat(domain.getSamba()).isAbsent();
+	}
+
+	@Test
+	public void getDomainShouldBePresentWhenProvided() {
+		Samba expectedSamba = Samba.builder()
+				.sid("S-1-5-21-1895063688-3870457350-1790443141")
+				.profile("\\\\samba\\chemin\\profile")
+				.home("\\\\samba\\chemin\\profile\\%u")
+				.drive("E")
+				.build();
+		
+		ObmDomain domain = ObmDomain.builder()
+				.samba(expectedSamba)
+				.build();
+		
+		Optional<Samba> optional = domain.getSamba();
+		assertThat(optional).isPresent();
+		assertThat(optional.get()).isEqualTo(expectedSamba);
+	}
 }
