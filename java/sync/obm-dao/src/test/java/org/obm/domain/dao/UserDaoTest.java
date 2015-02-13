@@ -367,9 +367,10 @@ public class UserDaoTest {
 		expect(rs.getString("userobm_delegation_target")).andReturn(null);
 		expect(rs.getBoolean("userobm_samba_perms")).andReturn(true);
 		expect(rs.getString("userobm_samba_home_drive")).andReturn("ab");
+		expect(rs.getString("userobm_samba_home")).andReturn("myfolder");
 		expect(rs.getInt("userobm_nomade_enable")).andReturn(0);
 		expect(rs.getString("userobm_email_nomade")).andReturn("nomad_email");
-
+		
 		mocksControl.replay();
 		ObmUser obmUser = userDao.createUserFromResultSetAndFetchCreators(domain, rs);
 		mocksControl.verify();
@@ -410,6 +411,7 @@ public class UserDaoTest {
 			.gidNumber(1000)
 			.sambaAllowed(true)
 			.sambaHomeDrive("ab")
+			.sambaHomeFolder("myfolder")
 			.build();
 		
 		assertThat(obmUser).isEqualToComparingFieldByField(expectedObmUser);

@@ -1201,6 +1201,65 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		assertThat(rs.getString(1)).isEqualTo("ab");
 	}
 
+	@Test
+	public void createShouldPersistSambaHomeFolderWhenSet() throws Exception {
+		UserExtId userExtId = UserExtId.valueOf("8bf2d32f-cd6d-4c74-a312-867ea763277a");
+		ObmUser user = ObmUser
+				.builder()
+				.extId(userExtId)
+				.login(validLogin)
+				.identity(johnIdentity)
+				.domain(domain)
+				.sambaHomeFolder("myfolder")
+				.build();
+
+		dao.create(user);
+		ResultSet rs = db.execute("SELECT userobm_samba_home FROM UserObm WHERE userobm_ext_id = ?", userExtId.getExtId());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getString(1)).isEqualTo("myfolder");
+	}
+
+	@Test
+	public void findShouldRetrieveSambaHomeFolderWhenSet() throws Exception {
+		ObmUser user = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("8bf2d32f-cd6d-4c74-a312-867ea763277a"))
+				.login(validLogin)
+				.identity(johnIdentity)
+				.domain(domain)
+				.sambaHomeFolder("myfolder")
+				.build();
+
+		dao.create(user);
+		ObmUser obmUser = dao.findUserByLogin(validLogin.getStringValue(), domain);
+
+		assertThat(obmUser.getSambaHomeFolder()).isEqualTo("myfolder");
+	}
+
+	@Test
+	public void updateShouldPersistSambaHomeFolderWhenSet() throws Exception {
+		UserExtId userExtId = UserExtId.valueOf("8bf2d32f-cd6d-4c74-a312-867ea763277a");
+		ObmUser.Builder builder = ObmUser
+				.builder()
+				.extId(userExtId)
+				.login(validLogin)
+				.identity(johnIdentity)
+				.domain(domain);
+
+		ObmUser createdUser = dao.create(builder.build());
+		dao.findUserByLogin(validLogin.getStringValue(), domain);
+
+		builder.uid(createdUser.getUid());
+		builder.sambaHomeFolder("myfolder");
+		dao.update(builder.build());
+
+		ResultSet rs = db.execute("SELECT userobm_samba_home FROM UserObm WHERE userobm_ext_id = ?", userExtId.getExtId());
+
+		assertThat(rs.next()).isTrue();
+		assertThat(rs.getString(1)).isEqualTo("myfolder");
+	}
+
 	private ObmUser.Builder sampleUserBuilder(int id, int entityId, String extId) {
 		return ObmUser
 				.builder()
