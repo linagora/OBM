@@ -68,7 +68,7 @@ public class UserResourceModifyUserTest extends CommonDomainEndPointEnvTest {
 		
 		given()
 			.auth().basic("username@domain", "password")
-			.content(obmUserToJsonString()).contentType(ContentType.JSON).
+			.content(inputObmUserToJsonString()).contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -92,7 +92,7 @@ public class UserResourceModifyUserTest extends CommonDomainEndPointEnvTest {
 		
 		given()
 			.auth().basic("username@domain", "password")
-			.content(obmUserToJsonString()).contentType(ContentType.JSON).
+			.content(inputObmUserToJsonString()).contentType(ContentType.JSON).
 		expect()
 			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
 		when()

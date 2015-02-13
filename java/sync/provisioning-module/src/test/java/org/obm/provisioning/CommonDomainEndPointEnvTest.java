@@ -415,7 +415,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"groups\":" +
 						"[]," +
 					"\"samba_allowed\":true," +
-					"\"samba_home_drive\":\"ab\"" +
+					"\"samba_home_drive\":\"ab\"," +
+					"\"samba_home_folder\":\"\\\\\\\\myfolder\\\\folder\\\\profile\\\\\"" +
 				"}";
 	}
 	
@@ -466,7 +467,60 @@ public abstract class CommonDomainEndPointEnvTest {
 						"}" +
 					"]," +
 				"\"samba_allowed\":true," +
-				"\"samba_home_drive\":\"ab\"" +
+				"\"samba_home_drive\":\"ab\"," +
+				"\"samba_home_folder\":\"\\\\\\\\myfolder\\\\folder\\\\profile\\\\\"" +
+			"}";
+	}
+	
+	protected String inputObmUserToJsonString() {
+		return
+			"{" +
+				"\"id\":\"extId\"," +
+				"\"login\":\"user1\"," +
+				"\"lastname\":\"Doe\"," +
+				"\"profile\":\"Utilisateurs\"," +
+				"\"firstname\":\"Jesus\"," +
+				"\"commonname\":\"John Doe\"," +
+				"\"password\":\"password\"," +
+				"\"kind\":\"kind\"," +
+				"\"title\":\"title\"," +
+				"\"description\":\"description\"," +
+				"\"company\":\"company\"," +
+				"\"service\":\"service\"," +
+				"\"direction\":\"direction\"," +
+				"\"addresses\":[\"address1\",\"address2\"]," +
+				"\"town\":\"town\"," +
+				"\"zipcode\":\"zipcode\"," +
+				"\"business_zipcode\":\"1234\"," +
+				"\"country\":\"1234\"," +
+				"\"phones\":[\"phone\",\"phone2\"]," +
+				"\"mobile\":\"mobile\"," +
+				"\"faxes\":[\"fax\",\"fax2\"]," +
+				"\"archived\":false," +
+				"\"mail_quota\":\"1234\"," +
+				"\"mail_server\":\"host\"," +
+				"\"mails\":[\"john@domain\",\"jo@*\",\"john@alias\"]," +
+				"\"effectiveMails\":[\"john@domain\",\"jo@domain\",\"jo@domain.com\",\"john@alias\"]," +
+				"\"hidden\":true," +
+				"\"nomad_enabled\":true," +
+				"\"nomad_mail\":\"redirect@newdomain\"," +
+				"\"timecreate\":\"2013-06-11T14:00:00.000+0000\"," +
+				"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
+				"\"expiration_date\":\"2015-12-31T00:00:00.000+0000\"," +
+				"\"delegation\":\"delegation\"," +
+				"\"delegation_target\":\"delegationTarget\"," +
+				"\"groups\":" +
+					"[" +
+						"{" +
+							"\"id\":\"group1\",\"url\":\"/a3443822-bb58-4585-af72-543a287f7c0e/groups/group1\"" +
+						"}," +
+						"{" +
+							"\"id\":\"group2\",\"url\":\"/a3443822-bb58-4585-af72-543a287f7c0e/groups/group2\"" +
+						"}" +
+					"]," +
+				"\"samba_allowed\":true," +
+				"\"samba_home_drive\":\"ab\"," +
+				"\"samba_home_folder\":\"\\\\myfolder\\folder\\profile\\\"" +
 			"}";
 	}
 
@@ -549,7 +603,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"delegation_target\":null," +
 					"\"groups\":[]," +
 					"\"samba_allowed\":false," +
-					"\"samba_home_drive\":null" +
+					"\"samba_home_drive\":null," +
+					"\"samba_home_folder\":null" +
 				"}";
 	}
 
@@ -609,6 +664,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				.groups(fakeGroups())
 				.sambaAllowed(true)
 				.sambaHomeDrive("ab")
+				.sambaHomeFolder("\\\\\\\\myfolder\\\\folder\\\\profile\\\\")
 				.build();
 	}
 	

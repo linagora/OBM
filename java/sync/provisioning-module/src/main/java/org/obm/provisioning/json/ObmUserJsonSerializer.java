@@ -60,6 +60,7 @@ import static org.obm.provisioning.bean.UserJsonFields.PHONES;
 import static org.obm.provisioning.bean.UserJsonFields.PROFILE;
 import static org.obm.provisioning.bean.UserJsonFields.SAMBA_ALLOWED;
 import static org.obm.provisioning.bean.UserJsonFields.SAMBA_HOME_DRIVE;
+import static org.obm.provisioning.bean.UserJsonFields.SAMBA_HOME_FOLDER;
 import static org.obm.provisioning.bean.UserJsonFields.SERVICE;
 import static org.obm.provisioning.bean.UserJsonFields.TIMECREATE;
 import static org.obm.provisioning.bean.UserJsonFields.TIMEUPDATE;
@@ -140,6 +141,7 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeObjectField(GROUPS.asSpecificationValue(), extractGroupIdentifiers(value.getGroups(), value.getDomain()));
 		jgen.writeBooleanField(SAMBA_ALLOWED.asSpecificationValue(), value.isSambaAllowed());
 		jgen.writeStringField(SAMBA_HOME_DRIVE.asSpecificationValue(), value.getSambaHomeDrive());
+		writeRawField(jgen, SAMBA_HOME_FOLDER.asSpecificationValue(), value.getSambaHomeFolder());
 		jgen.writeEndObject();
 	}
 
@@ -160,6 +162,16 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 			}
 		}
 		jgen.writeEndArray();
+	}
+	
+	private void writeRawField(JsonGenerator jgen, String fieldName, String value) throws JsonGenerationException, IOException {
+		if (value == null) {
+			jgen.writeStringField(fieldName, null);
+		} else {
+			String asStringValue = ",\"" + fieldName + "\":\"" + value.replace("\"", "") + "\"";
+			
+			jgen.writeRaw(asStringValue, 0, asStringValue.length());
+		}
 	}
 	
 	private Set<GroupIdentifier> extractGroupIdentifiers(Set<Group> groups, ObmDomain domain) {

@@ -46,8 +46,8 @@ public enum UserJsonFields {
 	NOMAD_ENABLED("nomad_enabled"), NOMAD_EMAIL("nomad_mail"),
 	TIMECREATE("timecreate"), TIMEUPDATE("timeupdate"), GROUPS("groups"), EXPIRATIONDATE("expiration_date"),
 	DELEGATION("delegation"), DELEGATIONTARGET("delegation_target"),
-	SAMBA_ALLOWED("samba_allowed"), SAMBA_HOME_DRIVE("samba_home_drive");
-
+	SAMBA_ALLOWED("samba_allowed"), SAMBA_HOME_DRIVE("samba_home_drive"), SAMBA_HOME_FOLDER("samba_home_folder");
+	
 	private String value;
 	
 	private UserJsonFields(String right) {

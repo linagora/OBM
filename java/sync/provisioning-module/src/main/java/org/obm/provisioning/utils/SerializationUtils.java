@@ -33,6 +33,7 @@ package org.obm.provisioning.utils;
 
 import static org.obm.provisioning.bean.UserJsonFields.MAILS;
 import static org.obm.provisioning.bean.UserJsonFields.MAIL_SERVER;
+import static org.obm.provisioning.bean.UserJsonFields.SAMBA_HOME_FOLDER;
 import static org.obm.push.utils.DateUtils.date;
 
 import java.io.IOException;
@@ -244,7 +245,14 @@ public class SerializationUtils {
 			case SAMBA_HOME_DRIVE:
 				toBuild.sambaHomeDrive(value.asText());
 				break;
+			case SAMBA_HOME_FOLDER:
+				toBuild.sambaHomeFolder(toStringWithoutDoubleQuotes(jsonNode.get(SAMBA_HOME_FOLDER.asSpecificationValue())));
+				break;
 		}
+	}
+	
+	private static String toStringWithoutDoubleQuotes(JsonNode node) {
+		return node.toString().replace("\"", "");
 	}
 
 	public static void readJsonGroup(JsonParser jp, Group.Builder builder) throws IOException, JsonProcessingException {

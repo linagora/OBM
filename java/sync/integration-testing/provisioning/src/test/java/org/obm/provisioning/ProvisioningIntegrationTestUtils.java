@@ -46,7 +46,7 @@ public class ProvisioningIntegrationTestUtils {
 				+ "\"mail_server\":null,\"mails\":[\"admin0@*\"],\"effectiveMails\":[\"admin0@test.tlse.lng\"],\"hidden\":false,"
 				+ "\"nomad_enabled\":false,\"nomad_mail\":null,\"timecreate\":null,\"timeupdate\":null,"
 				+ "\"expiration_date\":null,\"delegation\":null,\"delegation_target\":null,"
-				+ "\"groups\":[],\"samba_allowed\":false,\"samba_home_drive\":null}";
+				+ "\"groups\":[],\"samba_allowed\":false,\"samba_home_drive\":null,\"samba_home_folder\":null}";
 	}
 	
 	public static String getAdminUserJsonWithGroup(){
@@ -58,7 +58,7 @@ public class ProvisioningIntegrationTestUtils {
 				+ "\"nomad_enabled\":false,\"nomad_mail\":null,\"timecreate\":null,\"timeupdate\":null,"
 				+ "\"expiration_date\":null,\"delegation\":null,\"delegation_target\":null,"
 				+ "\"groups\":[{\"id\":\"GroupWithUsers\",\"url\":\"/abf7c2bc-aa84-461c-b057-ee42c5dce40a/groups/GroupWithUsers\"}],"
-				+ "\"samba_allowed\":false,\"samba_home_drive\":null}";
+				+ "\"samba_allowed\":false,\"samba_home_drive\":null,\"samba_home_folder\":null}";
 	}
 
 	public static String groupUrl(URL baseURL, ObmDomainUuid domain) {

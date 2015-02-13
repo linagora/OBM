@@ -57,7 +57,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	@Transactional
 	public Response create(String user) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_create);
-		return addBatchOperation(user, HttpVerb.POST, BatchEntityType.USER);
+		return addBatchOperation(user.replace("\\", "\\\\"), HttpVerb.POST, BatchEntityType.USER);
 	}
 
 	@PUT
@@ -67,7 +67,7 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	@Transactional
 	public Response modify(String user) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_update);
-		return addBatchOperation(user, HttpVerb.PUT, BatchEntityType.USER);
+		return addBatchOperation(user.replace("\\", "\\\\"), HttpVerb.PUT, BatchEntityType.USER);
 	}
 
 	@DELETE
@@ -86,6 +86,6 @@ public class UserWriteResource extends AbstractBatchAwareResource {
 	@Transactional
 	public Response patch(String user) throws DaoException {
 		ResourceAuthorizationHelper.assertAuthorized(domain, users_patch);
-		return addBatchOperation(user, HttpVerb.PATCH, BatchEntityType.USER);
+		return addBatchOperation(user.replace("\\", "\\\\"), HttpVerb.PATCH, BatchEntityType.USER);
 	}
 }
