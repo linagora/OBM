@@ -46,13 +46,13 @@ Feature: tests on users
    Scenario: create an admin user
      Given connected as admin0
      Given on create user page
-     When user creates a user "testAdmin" with admin profile 
+     When user creates a user "testAdminUser" with admin profile 
      Then creation succeeds
 
    Scenario: create a user
      Given connected as "admin" with password "admin" on domain "obm.domain"
      Given on create user page
-     When user creates a user "testUser"
+     When user creates a user "testRegularUser"
      Then creation succeeds
 
    Scenario: create a user already existing
@@ -63,8 +63,6 @@ Feature: tests on users
 
    Scenario: delete an admin user
      Given connected as admin0
-     Given on create user page
-     Given "testAdmin2" exists with admin profile
      Given on delete user page
      When user deletes "testAdmin2"
      Then deletion succeeds
@@ -73,8 +71,6 @@ Feature: tests on users
 
    Scenario: delete a non admin user
      Given connected as "admin" with password "admin" on domain "obm.domain"
-     Given on create user page
-     Given "testUser2" exists with user profile
      Given on delete user page
      When user deletes "testUser2"
      Then deletion succeeds

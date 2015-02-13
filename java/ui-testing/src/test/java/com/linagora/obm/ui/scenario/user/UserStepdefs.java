@@ -45,22 +45,19 @@ import com.linagora.obm.ui.bean.UIUser;
 import com.linagora.obm.ui.bean.UIUserKind;
 import com.linagora.obm.ui.bean.UIUserProfile;
 import com.linagora.obm.ui.page.CreateUserPage;
-import com.linagora.obm.ui.page.FindUserPage;
-import com.linagora.obm.ui.page.FindUserAsAdmin0Page;
-import com.linagora.obm.ui.page.DeleteUserPage;
 import com.linagora.obm.ui.page.CreateUserSummaryPage;
+import com.linagora.obm.ui.page.DeleteUserPage;
+import com.linagora.obm.ui.page.FindUserPage;
 import com.linagora.obm.ui.page.LoginPage;
-import com.linagora.obm.ui.page.LogoutPage;
 import com.linagora.obm.ui.page.LogoutAsAdmin0Page;
+import com.linagora.obm.ui.page.LogoutPage;
 import com.linagora.obm.ui.page.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import cucumber.api.java.After;
-import cucumber.api.java.Before;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import cucumber.api.java.en.And;
 
 public class UserStepdefs {
 
@@ -101,7 +98,7 @@ public class UserStepdefs {
 		uiUser = UIUser.admin0();
 		uiDomain = UIDomain.globalDomain();
 
-		findUserPage = pageFactory.create(driver, FindUserAsAdmin0Page.class);
+		findUserPage = pageFactory.create(driver, FindUserPage.class);
 		logoutPage = pageFactory.create(driver, LogoutAsAdmin0Page.class);
 		loginPage = pageFactory.create(driver, LoginPage.class);
 		loginPage.open();
@@ -247,7 +244,7 @@ public class UserStepdefs {
 	@When("user deletes \"([^\"]*)\"")
 	public void deleteUser(String userLogin) {
 
-		findUserPage.gotoUsers();
+		findUserPage.open();
 		findUserPage.findUserByLogin(userLogin);
 
 		deleteUserPage.deleteUserByLogin(userLogin);
@@ -256,7 +253,7 @@ public class UserStepdefs {
 	@And("\"([^\"]*)\" is no longer in user list")
 	public void isUserListed(String userLogin) {
 
-		findUserPage.gotoUsers();
+		findUserPage.open();
 		findUserPage.findUserByLogin(userLogin);
 
 		assertThat(findUserPage.elMessagesWarning()).hasSize(1);

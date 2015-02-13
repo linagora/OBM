@@ -45,6 +45,7 @@ import com.linagora.obm.ui.page.ContactPage;
 import com.linagora.obm.ui.page.CreateCalendarPage;
 import com.linagora.obm.ui.page.CreateContactPage;
 import com.linagora.obm.ui.page.CreateUserPage;
+import com.linagora.obm.ui.page.FindUserPage;
 import com.linagora.obm.ui.page.HomePage;
 import com.linagora.obm.ui.page.LoginPage;
 import com.linagora.obm.ui.service.Service;
@@ -66,6 +67,7 @@ public class ServiceUrlMapping {
 				.put(CreateContactPage.class, new URL(serverUrl, "/contact/contact_index.php"))
 				.put(CalendarPage.class, new URL(serverUrl, "/calendar/calendar_index.php"))
 				.put(CreateCalendarPage.class, new URL(serverUrl, "/calendar/calendar_index.php"))
+				.put(FindUserPage.class, new URL(serverUrl, "/user/user_index.php?action=index"))
 				.build();
 	}
 	

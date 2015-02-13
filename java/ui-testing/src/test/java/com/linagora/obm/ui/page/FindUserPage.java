@@ -31,18 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.page;
 
-import java.text.SimpleDateFormat;
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-
-import com.google.common.collect.Iterables;
-import com.linagora.obm.ui.bean.UIUser;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class FindUserPage extends RootPage {
 	
@@ -50,9 +40,9 @@ public class FindUserPage extends RootPage {
 		super(driver);
 	}
 	
-	public void gotoUsers() {
-		driver.findElement(By.id("moremenu_button")).click();
-		waitForElementAndClick(By.id("user_module"));
+	@Override
+	public void open() {
+		driver.get(mapping.lookup(FindUserPage.class).toExternalForm());
 	}
 
 	public void findUserByLogin(String userLogin) {
