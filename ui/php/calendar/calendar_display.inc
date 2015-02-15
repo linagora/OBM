@@ -4140,61 +4140,64 @@ function check_loggued_user_is_the_only_attendee($attendees){
  * @access public
  * @return HTML
  */
-function dis_calendar_quick_form($calendar_entity, $writable_entity = null) {
+function dis_calendar_quick_form($calendar_entity, $writable_entity) {
   $user_id = $GLOBALS["obm"]["uid"];
   $user_entities = array();
-  if ( $calendar_entity['user'] && is_array($calendar_entity['user']) ) {
-    foreach ( $calendar_entity['user'] as $key => $val ) {
-      $user_entities[$key] = $val;
+  $writable_entities = $writable_entity["entity"];
+
+  if ($calendar_entity['user'] && is_array($calendar_entity['user'])) {
+    foreach ($calendar_entity['user'] as $calendarId => $calendar) {
+      if (array_key_exists($calendarId, $writable_entities)) {
+        $user_entities[$calendarId] = $calendar;
+      }
     }
   }
-  $logged_user_is_displayed = true;
+
   // add the current logged user to the list of selectable calendars if he's not already present
-  if ( ! array_key_exists($user_id, $user_entities) ) {
+  if (!array_key_exists($user_id, $user_entities)) {
     $session_user_infos = get_user_info($user_id);
     $user_entities[$user_id] = array(
       "name" => $session_user_infos["lastname"]." ".$session_user_infos["firstname"],
       "class" => "eventOwner",
       "type" => "user",
-      "id" => $user_id
+      "id" => $user_id,
+      "default" => false
     );
-    $logged_user_is_displayed = false;
+    // OBMFULL-6296
+    // If the calendar of the logged-in user isn't displayed, the first displayed
+    // writable calendar is selected as the default organizer for the quick form popup.
+    // This is true whatever the number of displayed calendars...
+    $user_entities[key($user_entities)]["default"] = true;
+  } else {
+    // OBMFULL-6296
+    // If the calendar of the logged-in user is displayed it is selected
+    // as the default organizer for the quick form popup
+    $user_entities[$user_id]["default"] = true;
   }
 
   // Add all writable calendars that aren't yet displayed to the list of selectable calendars
   if (isset($writable_entity)) {
-    foreach ($writable_entity["entity"] as $calendarId => $calendar) {
+    foreach ($writable_entities as $calendarId => $calendar) {
       if (!array_key_exists($calendarId, $user_entities)) {
         $user_entities[$calendarId] = array(
             "name" => $calendar["label"],
             "class" => "eventOwner",
             "type" => "user",
-            "id" => $calendarId
+            "id" => $calendarId,
+            "default" => false
         );
       }
     }
   }
 
-  if( sizeof($user_entities) > 1 ){
-    $entity_view.="<select id=\"calendarViewEntity\">";
-    $one_calendar_display = ( sizeof($user_entities) == 2 ) ? true : false;
-    $multiple_calendar_displayed = (sizeof($user_entities) > 2);
+  if (sizeof($user_entities) > 1) {
+    $entity_view .= "<select id=\"calendarViewEntity\">";
 
-    foreach($user_entities as $user){
-      $logged_user = ($user_id == $user['id']);
-
-      if(OBM_Acl::canWrite($user_id, 'calendar',array($user['id']))) {
-
-        $selected = '';
-        if ( ( $logged_user && ( $logged_user_is_displayed || $multiple_calendar_displayed ) ) 
-          || ( !$logged_user && !$logged_user_is_displayed && $one_calendar_display ) ) {
-          $selected = 'selected=\"selected\"';
-        }
-
-        $entity_view.= "<option id='calendarViewEntity$user[id]' value='$user[id]' $selected>$user[name]</option>";
-      }
-
+    foreach ($user_entities as $user) {
+      $selected = $user["default"] ? 'selected="selected"' : '';
+      $entity_view.= "<option id='calendarViewEntity$user[id]' value='$user[id]' $selected>$user[name]</option>";
     }
+
     $entity_view.="</select>";
     $entity_view.="<input id='calendarKindEntity' type='hidden' value='user' />";
     $calendar_list = "
