@@ -66,6 +66,8 @@ import static org.obm.provisioning.bean.UserJsonFields.TIMEUPDATE;
 import static org.obm.provisioning.bean.UserJsonFields.TITLE;
 import static org.obm.provisioning.bean.UserJsonFields.TOWN;
 import static org.obm.provisioning.bean.UserJsonFields.ZIPCODE;
+import static org.obm.provisioning.bean.UserJsonFields.NOMAD_ENABLED;
+import static org.obm.provisioning.bean.UserJsonFields.NOMAD_EMAIL;
 
 import java.io.IOException;
 import java.util.Set;
@@ -126,6 +128,10 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 		jgen.writeObjectField(MAILS.asSpecificationValue(), SerializationUtils.serializeUserEmailAddresses(value.getUserEmails()));
 		jgen.writeObjectField(EFFECTIVEMAILS.asSpecificationValue(), Iterables.toArray(value.expandAllEmailDomainTuples(), String.class));
 		jgen.writeBooleanField(HIDDEN.asSpecificationValue(), value.isHidden());
+
+		jgen.writeBooleanField(NOMAD_ENABLED.asSpecificationValue(), value.getNomad().isEnabled());
+		jgen.writeStringField(NOMAD_EMAIL.asSpecificationValue(), value.getNomad().getEmail());
+
 		jgen.writeObjectField(TIMECREATE.asSpecificationValue(), value.getTimeCreate());
 		jgen.writeObjectField(TIMEUPDATE.asSpecificationValue(), value.getTimeUpdate());
 		jgen.writeObjectField(EXPIRATIONDATE.asSpecificationValue(), value.getExpirationDate());

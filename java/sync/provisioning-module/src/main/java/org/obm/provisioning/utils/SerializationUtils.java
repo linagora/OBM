@@ -65,6 +65,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserNomad;
 import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
@@ -126,7 +127,8 @@ public class SerializationUtils {
 	
 	public static void addFieldValueToBuilder(JsonNode jsonNode, UserJsonFields jsonFields, 
 			ObmUser.Builder toBuild, UserIdentity.Builder userIdentityBuilder, UserAddress.Builder addressBuilder,
-			UserPhones.Builder phonesBuilder, UserWork.Builder userWorkBuilder, UserEmails.Builder emailsBuilder) {
+			UserPhones.Builder phonesBuilder, UserWork.Builder userWorkBuilder, UserEmails.Builder emailsBuilder,
+			UserNomad.Builder nomadBuilder) {
 		JsonNode value = jsonNode.findValue(jsonFields.asSpecificationValue());
 
 		if (isNullOrNullNode(value)) {
@@ -223,6 +225,12 @@ public class SerializationUtils {
 				break;
 			case EXPIRATIONDATE:
 				toBuild.expirationDate(date(value.asText()));
+				break;
+			case NOMAD_ENABLED:
+				nomadBuilder.enabled(value.asBoolean());
+				break;
+			case NOMAD_EMAIL:
+				nomadBuilder.email(value.asText());
 				break;
 			case DELEGATION:
 				toBuild.delegation(value.asText());

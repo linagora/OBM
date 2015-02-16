@@ -54,6 +54,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserAddress;
 import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserNomad;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
 
@@ -67,6 +68,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 	private final UserWork.Builder userWorkBuilder;
 	private final UserEmails.Builder userEmailsBuilder;
 	private final ImapBackendChooserSelector imapBackendChooserSelector;
+	private final UserNomad.Builder userNomadBuilder;
 
 	@Inject
 	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ImapBackendChooserSelector imapBackendChooserSelector) {
@@ -78,6 +80,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		this.userPhonesBuilder = UserPhones.builder();
 		this.userWorkBuilder = UserWork.builder();
 		this.userEmailsBuilder = UserEmails.builder();
+		this.userNomadBuilder = UserNomad.builder();
 	}
 
 	public ObmUserJsonDeserializer(Provider<ObmDomain> domainProvider, ImapBackendChooserSelector imapBackendChooserSelector,
@@ -90,6 +93,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		this.userPhonesBuilder.from(fromUser.getPhones());
 		this.userWorkBuilder.from(fromUser.getWork());
 		this.userEmailsBuilder.from(fromUser.getUserEmails());
+		this.userNomadBuilder.from(fromUser.getNomad());
 	}
 
 	@Override
@@ -99,7 +103,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 
 		for (UserJsonFields field : UserJsonFields.fields) {
 			addFieldValueToBuilder(jsonNode, field, userBuilder, userIdentityBuilder, 
-					userAddressBuilder, userPhonesBuilder, userWorkBuilder, userEmailsBuilder);
+					userAddressBuilder, userPhonesBuilder, userWorkBuilder, userEmailsBuilder, userNomadBuilder);
 		}
 
 		ObmHost mailServer = getMailHostValue(jsonNode, domain, imapBackendChooserSelector.selectImapBackendChooserForDomain(domain));
@@ -115,6 +119,7 @@ public class ObmUserJsonDeserializer extends JsonDeserializer<ObmUser> {
 		userBuilder.phones(userPhonesBuilder.build());
 		userBuilder.work(userWorkBuilder.build());
 		userBuilder.emails(userEmailsBuilder.build());
+		userBuilder.nomad(userNomadBuilder.build());
 
 		ObmUser newUser = userBuilder.domain(domain).build();
 

@@ -104,6 +104,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserNomad;
 import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
@@ -401,6 +402,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"mails\":[\"john@domain\",\"jo@*\",\"john@alias\"]," +
 					"\"effectiveMails\":[\"john@domain\",\"jo@domain\",\"jo@domain.com\",\"john@alias\"]," +
 					"\"hidden\":true," +
+					"\"nomad_enabled\":true," +
+					"\"nomad_mail\":\"redirect@newdomain\"," +
 					"\"timecreate\":\"2013-06-11T14:00:00.000+0000\"," +
 					"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
 					"\"expiration_date\":\"2015-12-31T00:00:00.000+0000\"," +
@@ -443,6 +446,8 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"mails\":[\"john@domain\",\"jo@*\",\"john@alias\"]," +
 				"\"effectiveMails\":[\"john@domain\",\"jo@domain\",\"jo@domain.com\",\"john@alias\"]," +
 				"\"hidden\":true," +
+				"\"nomad_enabled\":true," +
+				"\"nomad_mail\":\"redirect@newdomain\"," +
 				"\"timecreate\":\"2013-06-11T14:00:00.000+0000\"," +
 				"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
 				"\"expiration_date\":\"2015-12-31T00:00:00.000+0000\"," +
@@ -532,6 +537,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"mails\":[]," +
 					"\"effectiveMails\":[]," +
 					"\"hidden\":false," +
+					"\"nomad_enabled\":false," +
+					"\"nomad_mail\":null," +
 					"\"timecreate\":null," +
 					"\"timeupdate\":null," +
 					"\"expiration_date\":null," +
@@ -587,6 +594,10 @@ public abstract class CommonDomainEndPointEnvTest {
 						.addAddress("john@alias")
 						.domain(domain)
 					.build())
+				.nomad(UserNomad.builder()
+						.enabled(true)
+						.email("redirect@newdomain")
+						.build())
 				.timeCreate(TIMECREATE)
 				.timeUpdate(TIMEUPDATE)
 				.expirationDate(EXPIRATIONDATE)
