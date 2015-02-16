@@ -80,6 +80,8 @@ public class ObmUser {
 		private ProfileName profileName;
 		private Boolean archived;
 
+		private UserNomad nomad;
+
 		private Integer uidNumber;
 		private Integer gidNumber;
 
@@ -113,6 +115,7 @@ public class ObmUser {
 					.phones(user.phones)
 					.archived(user.archived)
 					.hidden(user.hidden)
+					.nomad(user.nomad)
 					.timeCreate(user.timeCreate)
 					.timeUpdate(user.timeUpdate)
 					.createdBy(user.createdBy)
@@ -217,6 +220,11 @@ public class ObmUser {
 			return this;
 		}
 
+		public Builder nomad(UserNomad nomad) {
+			this.nomad= nomad;
+			return this;
+		}
+
 		public Builder uidNumber(Integer uidNumber) {
 			this.uidNumber = uidNumber;
 			return this;
@@ -270,14 +278,16 @@ public class ObmUser {
 			UserPhones phones = Objects.firstNonNull(this.phones, UserPhones.empty());
 			UserWork work = Objects.firstNonNull(this.work, UserWork.empty());
 			UserEmails emails = Objects.firstNonNull(this.emails, UserEmails.builder().domain(domain).build());
+			UserNomad nomad = Objects.firstNonNull(this.nomad, UserNomad.empty());
 			
 			return new ObmUser(
 					uid, entityId, login, extId, admin, identity,
 					hidden, address, phones, work, emails,
 					description, timeCreate, timeUpdate, createdBy, updatedBy,
 					domain, publicFreeBusy, profileName,
-					archived, password, uidNumber, gidNumber, groups.build(), expirationDate, delegation, delegationTarget,
-					sambaAllowed, sambaHomeDrive);
+					archived, password, uidNumber, gidNumber, groups.build(), expirationDate,
+					nomad, delegation, delegationTarget,
+                    sambaAllowed, sambaHomeDrive);
 		}
 		
 	}
@@ -308,6 +318,8 @@ public class ObmUser {
 	private final ProfileName profileName;
 	private final boolean archived;
 
+	private final UserNomad nomad;
+
 	private final Integer uidNumber;
 	private final Integer gidNumber;
 	
@@ -325,6 +337,7 @@ public class ObmUser {
 			ObmUser createdBy, ObmUser updatedBy, ObmDomain domain,
 			boolean publicFreeBusy, ProfileName profileName,
 			boolean archived, UserPassword password, Integer uidNumber, Integer gidNumber, Set<Group> groups,  Date expirationDate,
+			UserNomad nomad,
 			String delegation, String delegationTarget,
 			boolean sambaAllowed, String sambaHomeDrive) {
 		this.uid = uid;
@@ -348,6 +361,7 @@ public class ObmUser {
 		this.profileName = profileName;
 		this.archived = archived;
 		this.password = password;
+		this.nomad = nomad;
 		this.uidNumber = uidNumber;
 		this.gidNumber = gidNumber;
 		this.groups = groups;
@@ -563,6 +577,10 @@ public class ObmUser {
 		return password;
 	}
 
+	public UserNomad getNomad() {
+		return nomad;
+	}
+
 	public Integer getUidNumber() {
 		return uidNumber;
 	}
@@ -604,7 +622,8 @@ public class ObmUser {
 		return Objects.hashCode(uid, entityId, login, extId, admin, identity, emails,
 				hidden, address, phones, work,
 				description, createdBy, updatedBy, domain, publicFreeBusy, profileName,
-				archived, password, uidNumber, gidNumber, groups, expirationDate, delegation, delegationTarget,
+				archived, password, nomad, uidNumber, gidNumber, groups, expirationDate,
+				delegation, delegationTarget,
 				sambaAllowed, sambaHomeDrive);
 	}
 	
@@ -631,6 +650,7 @@ public class ObmUser {
 				&& Objects.equal(this.profileName, that.profileName)
 				&& Objects.equal(this.archived, that.archived)
 				&& Objects.equal(this.password, that.password)
+				&& Objects.equal(this.nomad, that.nomad)
 				&& Objects.equal(this.uidNumber, that.uidNumber)
 				&& Objects.equal(this.gidNumber, that.gidNumber)
 				&& Objects.equal(this.groups, that.groups)
@@ -666,6 +686,7 @@ public class ObmUser {
 			.add("publicFreeBusy", publicFreeBusy)
 			.add("profileName", profileName)
 			.add("archived", archived)
+			.add("nomad", nomad)
 			.add("uidNumber", uidNumber)
 			.add("gidNumber", gidNumber)
 			.add("groups", groups)

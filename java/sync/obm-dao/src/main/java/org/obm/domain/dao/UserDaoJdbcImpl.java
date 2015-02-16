@@ -84,6 +84,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserNomad;
 import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
@@ -93,6 +94,7 @@ public class UserDaoJdbcImpl implements UserDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
 	private static final int HIDDEN_TRUE = 1;
+	private static final int NOMAD_ENABLED = 1;
 	private static final String USER_FIELDS = 
 			"userobm_id, " +
 			"userobm_email, " +
@@ -133,6 +135,8 @@ public class UserDaoJdbcImpl implements UserDao {
 			"userobm_gid, " +
 			"userobm_samba_perms, " +
 			"userobm_samba_home_drive, " +
+			"userobm_nomade_enable, " +
+			"userobm_email_nomade, " +
 			"defpref.userobmpref_value AS defpref_userobmpref_value, " +
 			"userpref.userobmpref_value AS userpref_userobmpref_value, " +
 			"userentity_entity_id, " +
@@ -369,6 +373,10 @@ public class UserDaoJdbcImpl implements UserDao {
 								.addFax(emptyToNull(rs.getString("userobm_fax")))
 								.addFax(emptyToNull(rs.getString("userobm_fax2")))
 								.build())
+					.nomad(UserNomad.builder()
+							.enabled(rs.getInt("userobm_nomade_enable") == NOMAD_ENABLED)
+							.email(rs.getString("userobm_email_nomade"))
+							.build())
 					.emails(UserEmails.builder()
 						.quota(quotaToNullable(quota))
 						.server(hostFromCursor(rs))
@@ -616,6 +624,8 @@ public class UserDaoJdbcImpl implements UserDao {
 				"userobm_uid," +
 				"userobm_gid," +
 				"userobm_account_dateexp," +
+				"userobm_nomade_enable, " +
+				"userobm_email_nomade, " +
 				"userobm_delegation, " +
 				"userobm_delegation_target, " +
 				"userobm_samba_perms, " +
@@ -624,7 +634,8 @@ public class UserDaoJdbcImpl implements UserDao {
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-					"?, ?, ?, ?, ?, ?, ?, ?, ?, ? " +
+					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+					"?, ?" +
 				")";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -708,9 +719,13 @@ public class UserDaoJdbcImpl implements UserDao {
 			}
 
 			JDBCUtils.setOptionalDate(ps, user.getExpirationDate(), idx++);
+
+			ps.setInt(idx++, user.getNomad().isEnabled() ? 1 : 0);
+			ps.setString(idx++, user.getNomad().getEmail());
+
 			ps.setString(idx++, user.getDelegation());
 			ps.setString(idx++, user.getDelegationTarget());
-			
+
 			ps.setInt(idx++, user.isSambaAllowed() ? 1 : 0);
 			ps.setString(idx++, nullToEmpty(user.getSambaHomeDrive()));
 
@@ -791,6 +806,8 @@ public class UserDaoJdbcImpl implements UserDao {
                     "userobm_hidden = ?, " +
                     "userobm_archive = ?, " +
                     "userobm_account_dateexp = ?, " +
+                    "userobm_nomade_enable = ?," +
+                    "userobm_email_nomade = ?, " +
                     "userobm_delegation = ?, " +
                     "userobm_delegation_target = ?, " +
                     "userobm_samba_perms = ?, " +
@@ -861,6 +878,10 @@ public class UserDaoJdbcImpl implements UserDao {
 			ps.setInt(idx++, user.isHidden() ? 1 : 0);
 			ps.setInt(idx++, user.isArchived() ? 1 : 0);
 			JDBCUtils.setOptionalDate(ps, user.getExpirationDate(), idx++);
+
+			ps.setInt(idx++, user.getNomad().isEnabled() ? 1 : 0);
+			ps.setString(idx++, user.getNomad().getEmail());
+
 			ps.setString(idx++, user.getDelegation());
 			ps.setString(idx++, user.getDelegationTarget());
 			ps.setInt(idx++, user.isSambaAllowed() ? 1 : 0);

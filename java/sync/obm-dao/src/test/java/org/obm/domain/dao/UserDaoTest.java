@@ -72,6 +72,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserNomad;
 import fr.aliacom.obm.common.user.UserPassword;
 
 
@@ -366,7 +367,9 @@ public class UserDaoTest {
 		expect(rs.getString("userobm_delegation_target")).andReturn(null);
 		expect(rs.getBoolean("userobm_samba_perms")).andReturn(true);
 		expect(rs.getString("userobm_samba_home_drive")).andReturn("ab");
-		
+		expect(rs.getInt("userobm_nomade_enable")).andReturn(0);
+		expect(rs.getString("userobm_email_nomade")).andReturn("nomad_email");
+
 		mocksControl.replay();
 		ObmUser obmUser = userDao.createUserFromResultSetAndFetchCreators(domain, rs);
 		mocksControl.verify();
@@ -402,6 +405,7 @@ public class UserDaoTest {
 			.profileName(ProfileName.builder().name("user").build())
 			.address(UserAddress.builder().countryCode("0").build())
 			.hidden(true)
+			.nomad(UserNomad.builder().email("nomad_email").build())
 			.uidNumber(1001)
 			.gidNumber(1000)
 			.sambaAllowed(true)

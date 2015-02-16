@@ -71,6 +71,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserNomad;
 import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
@@ -269,6 +270,25 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 		dao.create(userBuilder.build());
 
 		assertThat(dao.getByExtId(extId, domain).getDelegationTarget()).isEqualTo("delegationTarget");
+	}
+
+	@Test
+	public void testGetByExtIdShouldReadNomad() throws Exception {
+		UserExtId extId = UserExtId.valueOf("testExtId");
+		UserNomad nomad = UserNomad.builder().enabled(true).email("redirect@newdomain").build();
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(extId)
+				.login(UserLogin.valueOf("havenomad"))
+				.password(UserPassword.valueOf("secure"))
+				.profileName(ProfileName.valueOf("user"))
+				.identity(johnIdentity)
+				.domain(domain)
+				.nomad(nomad);
+
+		dao.create(userBuilder.build());
+
+		assertThat(dao.getByExtId(extId, domain).getNomad()).isEqualTo(nomad);
 	}
 
 	@Test
@@ -561,6 +581,24 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	}
 
 	@Test
+	public void testFindByLoginShouldReadNomad() throws Exception {
+		UserNomad nomad = UserNomad.builder().enabled(true).email("redirect@newdomain").build();
+		ObmUser.Builder userBuilder = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("123456"))
+				.login(UserLogin.valueOf("havenomad"))
+				.password(UserPassword.valueOf("secure"))
+				.profileName(ProfileName.valueOf("user"))
+				.identity(johnIdentity)
+				.domain(domain)
+				.nomad(nomad);
+
+		dao.create(userBuilder.build());
+
+		assertThat(dao.findUserByLogin("havenomad", domain).getNomad()).isEqualTo(nomad);
+	}
+
+	@Test
 	public void testCreateShouldWriteDelegation() throws Exception {
 		ObmUser.Builder userBuilder = ObmUser
 				.builder()
@@ -594,6 +632,23 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	}
 
 	@Test
+	public void testCreateShouldWriteNomad() throws Exception {
+		UserNomad nomad = UserNomad.builder().enabled(true).email("redirect@newdomain").build();
+		ObmUser user = ObmUser
+				.builder()
+				.extId(UserExtId.valueOf("123456"))
+				.login(validLogin)
+				.password(UserPassword.valueOf("secure"))
+				.profileName(ProfileName.valueOf("user"))
+				.identity(johnIdentity)
+				.domain(domain)
+				.nomad(nomad)
+				.build();
+
+		assertThat(dao.create(user).getNomad()).isEqualTo(nomad);
+	}
+
+	@Test
 	public void testUpdateShouldWriteDelegation() throws Exception {
 		ObmUser user = sampleUserBuilder(1, 3, "1")
 				.delegation("delegation")
@@ -606,6 +661,16 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	public void testUpdateShouldWriteDelegationTarget() throws Exception {
 		ObmUser user = sampleUserBuilder(1, 3, "1")
 				.delegationTarget("delegationTarget")
+				.build();
+
+		assertThat(dao.update(user)).isEqualTo(user);
+	}
+
+	@Test
+	public void testUpdateShouldWriteNomad() throws Exception {
+		UserNomad nomad = UserNomad.builder().enabled(true).email("redirect@newdomain").build();
+		ObmUser user = sampleUserBuilder(1, 3, "1")
+				.nomad(nomad)
 				.build();
 
 		assertThat(dao.update(user)).isEqualTo(user);
