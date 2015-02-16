@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,32 +30,63 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve;
+package org.obm.imap.sieve;
 
-public class SieveArg {
+import java.util.List;
 
-	private byte[] raw;
-	private boolean literal;
+import org.apache.mina.core.session.IoSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	public SieveArg(byte[] raw, boolean literal) {
-		this.raw = raw;
-		this.literal = literal;
+import com.google.common.base.Charsets;
+
+public abstract class SieveCommand<T> {
+
+	protected static final Logger logger = LoggerFactory
+			.getLogger(SieveCommand.class);
+	
+	protected T retVal;
+	private static final byte[] CRLF = "\r\n".getBytes(Charsets.UTF_8);
+
+	public void execute(IoSession session) {
+
+		List<SieveArg> cmd = buildCommand();
+
+		for (int i = 0; i < cmd.size(); i++) {
+			SieveArg arg = cmd.get(i);
+			if (!arg.isLiteral()) {
+				StringBuilder sb = new StringBuilder(new String(arg.getRaw(), Charsets.UTF_8));
+				if (i < cmd.size() - 1 && cmd.get(i + 1).isLiteral()) {
+					SieveArg next = cmd.get(i + 1);
+					sb.append(" {");
+					sb.append(next.getRaw().length);
+					sb.append("+}");
+				}
+
+				session.write(sb.toString().getBytes(Charsets.UTF_8));
+			} else {
+				session.write(arg.getRaw());
+			}
+			session.write(CRLF);
+		}
 	}
 
-	public byte[] getRaw() {
-		return raw;
+	public abstract void responseReceived(List<SieveResponse> rs);
+
+	protected abstract List<SieveArg> buildCommand();
+
+	protected boolean commandSucceeded(List<SieveResponse> rs) {
+		return rs.size() > 0 && rs.get(0).getData().endsWith("OK");
 	}
 
-	public void setRaw(byte[] raw) {
-		this.raw = raw;
+	protected void reportErrors(List<SieveResponse> rs) {
+		for (SieveResponse sr : rs) {
+			logger.error(sr.getData());
+		}
 	}
 
-	public boolean isLiteral() {
-		return literal;
-	}
-
-	public void setLiteral(boolean literal) {
-		this.literal = literal;
+	public T getReceivedData() {
+		return retVal;
 	}
 
 }

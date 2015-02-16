@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,63 +30,37 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve;
+package org.obm.imap.sieve;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.mina.core.session.IoSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Charsets;
-
-public abstract class SieveCommand<T> {
-
-	protected static final Logger logger = LoggerFactory
-			.getLogger(SieveCommand.class);
+public class SieveMessage {
 	
-	protected T retVal;
-	private static final byte[] CRLF = "\r\n".getBytes(Charsets.UTF_8);
+	private final List<String> lines;
+	
+	public SieveMessage() {
+		lines = new LinkedList<String>();
+	}
+	
+	public void addLine(String s) {
+		lines.add(s);
+	}
 
-	public void execute(IoSession session) {
+	public List<String> getLines() {
+		return lines;
+	}
 
-		List<SieveArg> cmd = buildCommand();
-
-		for (int i = 0; i < cmd.size(); i++) {
-			SieveArg arg = cmd.get(i);
-			if (!arg.isLiteral()) {
-				StringBuilder sb = new StringBuilder(new String(arg.getRaw(), Charsets.UTF_8));
-				if (i < cmd.size() - 1 && cmd.get(i + 1).isLiteral()) {
-					SieveArg next = cmd.get(i + 1);
-					sb.append(" {");
-					sb.append(next.getRaw().length);
-					sb.append("+}");
-				}
-
-				session.write(sb.toString().getBytes(Charsets.UTF_8));
-			} else {
-				session.write(arg.getRaw());
-			}
-			session.write(CRLF);
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(super.toString());
+		sb.append(":\n");
+		for (String l :lines) {
+			sb.append(l);
+			sb.append("\n");
 		}
-	}
-
-	public abstract void responseReceived(List<SieveResponse> rs);
-
-	protected abstract List<SieveArg> buildCommand();
-
-	protected boolean commandSucceeded(List<SieveResponse> rs) {
-		return rs.size() > 0 && rs.get(0).getData().endsWith("OK");
-	}
-
-	protected void reportErrors(List<SieveResponse> rs) {
-		for (SieveResponse sr : rs) {
-			logger.error(sr.getData());
-		}
-	}
-
-	public T getReceivedData() {
-		return retVal;
+		return sb.toString();
 	}
 
 }

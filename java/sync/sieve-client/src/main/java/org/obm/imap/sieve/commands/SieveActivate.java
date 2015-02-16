@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,14 +30,43 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve;
+package org.obm.imap.sieve.commands;
 
-public class SieveException extends Exception {
+import java.util.ArrayList;
+import java.util.List;
 
-	private static final long serialVersionUID = -4049948643858366581L;
+import org.obm.imap.sieve.SieveArg;
+import org.obm.imap.sieve.SieveCommand;
+import org.obm.imap.sieve.SieveResponse;
 
-	public SieveException(String message, Throwable cause) {
-		super(message, cause);
+import com.google.common.base.Charsets;
+
+public class SieveActivate extends SieveCommand<Boolean> {
+
+	private final String name;
+
+	public SieveActivate(String name) {
+		this.name = name;
+		retVal = false;
+	}
+
+	@Override
+	protected List<SieveArg> buildCommand() {
+		List<SieveArg> args = new ArrayList<SieveArg>(1);
+		args.add(new SieveArg(("SETACTIVE \""+name+"\"").getBytes(Charsets.UTF_8), false));
+		return args;
+	}
+
+	@Override
+	public void responseReceived(List<SieveResponse> rs) {
+		logger.info("setactive response received.");
+		if (commandSucceeded(rs)) {
+			retVal = true;
+		} else {
+			for (SieveResponse sr : rs) {
+				logger.error(sr.getData());
+			}
+		}
 	}
 
 }

@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,80 +30,43 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve.commands;
+package org.obm.imap.sieve.commands;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Base64;
-import org.obm.push.minig.imap.sieve.SieveArg;
-import org.obm.push.minig.imap.sieve.SieveCommand;
-import org.obm.push.minig.imap.sieve.SieveResponse;
+import org.obm.imap.sieve.SieveArg;
+import org.obm.imap.sieve.SieveCommand;
+import org.obm.imap.sieve.SieveResponse;
 
 import com.google.common.base.Charsets;
 
-public class SieveAuthenticate extends SieveCommand<Boolean> {
+public class SieveDeleteScript extends SieveCommand<Boolean> {
 
-	private final String login;
-	private final String password;
-	private final byte[] encoded;
+	private final String name;
 
-	public SieveAuthenticate(String login, String password) {
-		this.login = login;
-		this.password = password;
-		this.encoded = encodeAuthString(login, password);
-		this.retVal = Boolean.FALSE;
-	}
-
-	@Override
-	public void responseReceived(List<SieveResponse> rs) {
-		if (commandSucceeded(rs)) {
-			retVal = true;
-		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("response received for login " + login + " " + password
-					+ " => " + retVal);
-		}
+	public SieveDeleteScript(String name) {
+		this.name = name;
+		retVal = false;
 	}
 
 	@Override
 	protected List<SieveArg> buildCommand() {
-		List<SieveArg> ret = new ArrayList<SieveArg>(2);
-
-		ret.add(new SieveArg("AUTHENTICATE \"PLAIN\"".getBytes(Charsets.UTF_8), false));
-		ret.add(new SieveArg(encoded, true));
-
-		return ret;
+		List<SieveArg> args = new ArrayList<SieveArg>(1);
+		args.add(new SieveArg(("DELETESCRIPT \""+name+"\"").getBytes(Charsets.UTF_8), false));
+		return args;
 	}
 
-	private byte[] encodeAuthString(String login, String password) {
-		byte[] log = login.getBytes(Charsets.UTF_8);
-		byte[] pass = password.getBytes();
-		byte[] data = new byte[log.length * 2 + pass.length + 2];
-		int i = 0;
-		for (int j = 0; j < log.length; j++) {
-			data[i++] = log[j];
+	@Override
+	public void responseReceived(List<SieveResponse> rs) {
+		logger.info("listscripts response received.");
+		if (commandSucceeded(rs)) {
+			retVal = true;
+		} else {
+			for (SieveResponse sr : rs) {
+				logger.error(sr.getData());
+			}
 		}
-		data[i++] = 0x0;
-		for (int j = 0; j < log.length; j++) {
-			data[i++] = log[j];
-		}
-		data[i++] = 0x0;
-
-		for (int j = 0; j < pass.length; j++) {
-			data[i++] = pass[j];
-		}
-
-		ByteBuffer encoded = ByteBuffer.allocate(data.length);
-		encoded.put(data);
-		encoded.flip();
-
-		String ret = Base64.encodeBase64String(encoded.array());
-		if (logger.isDebugEnabled()) {
-			logger.info("encoded auth string: " + ret);
-		}
-		return ret.getBytes();
 	}
 
 }

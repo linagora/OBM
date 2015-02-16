@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,34 +30,52 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve;
+package org.obm.imap.sieve.commands;
 
-public class SieveScript {
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-	
-	private String name;
-	private boolean active;
-	
-	public SieveScript(String name, boolean active) {
-		this.name = name;
-		this.active = active;
+import org.obm.imap.sieve.SieveArg;
+import org.obm.imap.sieve.SieveCommand;
+import org.obm.imap.sieve.SieveResponse;
+import org.obm.imap.sieve.SieveScript;
+
+import com.google.common.base.Charsets;
+
+public class SieveListscripts extends SieveCommand<List<SieveScript>> {
+
+	public SieveListscripts() {
+		retVal = new LinkedList<SieveScript>();
 	}
 
-	public String getName() {
-		return name;
+	@Override
+	protected List<SieveArg> buildCommand() {
+		List<SieveArg> args = new ArrayList<SieveArg>(1);
+		args.add(new SieveArg("LISTSCRIPTS".getBytes(Charsets.UTF_8), false));
+		return args;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	@Override
+	public void responseReceived(List<SieveResponse> rs) {
+		if (commandSucceeded(rs)) {
+			String[] list = rs.get(0).getData().split("\r\n");
+			for (int i = 0; i < list.length - 1; i++) {
+				boolean active = list[i].endsWith("ACTIVE");
+				int idx = list[i].lastIndexOf("\"");
+				if (idx > 0) {
+					String name = list[i].substring(1, idx);
+					retVal.add(new SieveScript(name, active));
+				} else {
+					logger.warn("receveid from listscripts: '" + list[i] + "'");
+				}
+			}
+		} else {
+			reportErrors(rs);
+		}
+		logger
+				.info("returning a list of " + retVal.size()
+						+ " sieve script(s)");
 	}
 
-	public boolean isActive() {
-		return active;
-	}
-
-	public void setActive(boolean active) {
-		this.active = active;
-	}
-
-	
 }

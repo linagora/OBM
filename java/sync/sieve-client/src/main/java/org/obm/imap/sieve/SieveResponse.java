@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,36 +30,18 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve.commands;
+package org.obm.imap.sieve;
 
-import java.util.ArrayList;
-import java.util.List;
+public class SieveResponse {
 
-import org.obm.push.minig.imap.sieve.SieveArg;
-import org.obm.push.minig.imap.sieve.SieveCommand;
-import org.obm.push.minig.imap.sieve.SieveResponse;
+	private final String data;
 
-import com.google.common.base.Charsets;
-
-/**
- * cyrus 2.3.X only :'(
- */
-public class SieveUnauthenticate extends SieveCommand<Boolean> {
-
-	@Override
-	protected List<SieveArg> buildCommand() {
-		List<SieveArg> args = new ArrayList<SieveArg>(1);
-		args.add(new SieveArg("UNAUTHENTICATE".getBytes(Charsets.UTF_8), false));
-		return args;
+	public SieveResponse(String data) {
+		this.data = data;
 	}
 
-	@Override
-	public void responseReceived(List<SieveResponse> rs) {
-		if (!commandSucceeded(rs)) {
-			for (SieveResponse sr : rs) {
-				logger.error(sr.getData());
-			}
-		}
+	public String getData() {
+		return data;
 	}
 
 }

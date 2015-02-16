@@ -134,6 +134,7 @@
 		<module>services-configuration-module</module>
 		<module>services-module</module>
 		<module>services-webapp</module>
+		<module>sieve-client</module>
 		<module>smtp</module>
 		<module>task-scheduler</module>
 		<module>transaction-test</module>
@@ -532,6 +533,11 @@ org.eclipse.jdt.core.compiler.source=1.7
 			<dependency>
 				<groupId>com.linagora.obm</groupId>
 				<artifactId>services-module</artifactId>
+				<version>${obm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.linagora.obm</groupId>
+				<artifactId>sieve-client</artifactId>
 				<version>${obm.version}</version>
 			</dependency>
 			<dependency>

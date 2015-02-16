@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,18 +30,18 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap;
+package org.obm.imap.sieve;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
 
-import org.obm.push.minig.imap.sieve.SieveClientHandler;
-import org.obm.push.minig.imap.sieve.SieveClientSupport;
-import org.obm.push.minig.imap.sieve.SieveScript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Charsets;
 
 /**
  * Client API to cyrus sieve server
@@ -83,6 +83,10 @@ public class SieveClient {
 		return cs.listscripts();
 	}
 
+	public boolean putscript(String name, String scriptContent) {
+		return cs.putscript(name, new ByteArrayInputStream(scriptContent.getBytes(Charsets.UTF_8)));
+	}
+
 	public boolean putscript(String name, InputStream scriptContent) {
 		return cs.putscript(name, scriptContent);
 	}
@@ -101,6 +105,10 @@ public class SieveClient {
 
 	public String getScript() {
 		return "require [ \"fileinto\", \"imapflags\", \"vacation\" ];\n";
+	}
+
+	public String getScriptContent(String name) {
+		return cs.getScriptContent(name);
 	}
 
 	public void activate(String newName) {

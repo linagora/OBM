@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,43 +30,34 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve.commands;
+package org.obm.imap.sieve;
 
-import java.util.ArrayList;
-import java.util.List;
+public class SieveScript {
 
-import org.obm.push.minig.imap.sieve.SieveArg;
-import org.obm.push.minig.imap.sieve.SieveCommand;
-import org.obm.push.minig.imap.sieve.SieveResponse;
-
-import com.google.common.base.Charsets;
-
-public class SieveActivate extends SieveCommand<Boolean> {
-
-	private final String name;
-
-	public SieveActivate(String name) {
+	
+	private String name;
+	private boolean active;
+	
+	public SieveScript(String name, boolean active) {
 		this.name = name;
-		retVal = false;
+		this.active = active;
 	}
 
-	@Override
-	protected List<SieveArg> buildCommand() {
-		List<SieveArg> args = new ArrayList<SieveArg>(1);
-		args.add(new SieveArg(("SETACTIVE \""+name+"\"").getBytes(Charsets.UTF_8), false));
-		return args;
+	public String getName() {
+		return name;
 	}
 
-	@Override
-	public void responseReceived(List<SieveResponse> rs) {
-		logger.info("setactive response received.");
-		if (commandSucceeded(rs)) {
-			retVal = true;
-		} else {
-			for (SieveResponse sr : rs) {
-				logger.error(sr.getData());
-			}
-		}
+	public void setName(String name) {
+		this.name = name;
 	}
 
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	
 }

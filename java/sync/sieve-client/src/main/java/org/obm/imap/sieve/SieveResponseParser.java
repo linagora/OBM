@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,66 +30,27 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve;
+package org.obm.imap.sieve;
 
-import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.codec.ProtocolCodecFactory;
-import org.apache.mina.filter.codec.ProtocolDecoder;
-import org.apache.mina.filter.codec.ProtocolDecoderAdapter;
-import org.apache.mina.filter.codec.ProtocolDecoderOutput;
-import org.apache.mina.filter.codec.ProtocolEncoder;
-import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
-import org.apache.mina.filter.codec.ProtocolEncoderOutput;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Charsets;
+public class SieveResponseParser {
 
-public final class SieveCodecFactory implements ProtocolCodecFactory {
-	
 	private static final Logger logger = LoggerFactory
-			.getLogger(SieveClientSupport.class);
+			.getLogger(SieveResponseParser.class);
 
-	private final ProtocolDecoder decoder = new ProtocolDecoderAdapter() {
-
-		@Override
-		public void decode(IoSession arg0, IoBuffer arg1,
-				ProtocolDecoderOutput arg2) throws Exception {
-			java.nio.ByteBuffer received = arg1.buf();
-			java.nio.ByteBuffer copy = java.nio.ByteBuffer.allocate(received
-					.remaining());
-			copy.put(received);
-			// copy.flip();
-			byte[] data = copy.array();
+	public void parse(List<SieveResponse> toFill, SieveMessage sm) {
+		for (String l : sm.getLines()) {
+			int idx = l.lastIndexOf("\r\n");
+			String data = l.substring(0, idx);
 			if (logger.isDebugEnabled()) {
-				logger.debug("decoded: " + new String(data, Charsets.UTF_8));
+				logger.debug("parsed: '" + data + "' len: " + data.length());
 			}
-			SieveMessage sm = new SieveMessage();
-			sm.addLine(new String(data));
-			arg2.write(sm);
+			toFill.add(new SieveResponse(data));
 		}
-	};
-
-	private final ProtocolEncoder encoder = new ProtocolEncoderAdapter() {
-
-		@Override
-		public void encode(IoSession arg0, Object arg1,
-				ProtocolEncoderOutput arg2) throws Exception {
-			byte[] raw = (byte[]) arg1;
-			IoBuffer b = IoBuffer.wrap(raw);
-			arg2.write(b);
-		}
-	};
-
-	@Override
-	public ProtocolDecoder getDecoder(IoSession session) throws Exception {
-		return decoder;
-	}
-	
-	@Override
-	public ProtocolEncoder getEncoder(IoSession session) throws Exception {
-		return encoder;
 	}
 
 }

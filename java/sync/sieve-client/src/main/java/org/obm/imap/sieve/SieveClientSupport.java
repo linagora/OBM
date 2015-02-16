@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,7 +30,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve;
+package org.obm.imap.sieve;
 
 import java.io.InputStream;
 import java.net.SocketAddress;
@@ -43,12 +43,13 @@ import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
-import org.obm.push.minig.imap.sieve.commands.SieveActivate;
-import org.obm.push.minig.imap.sieve.commands.SieveAuthenticate;
-import org.obm.push.minig.imap.sieve.commands.SieveDeleteScript;
-import org.obm.push.minig.imap.sieve.commands.SieveListscripts;
-import org.obm.push.minig.imap.sieve.commands.SievePutscript;
-import org.obm.push.minig.imap.sieve.commands.SieveUnauthenticate;
+import org.obm.imap.sieve.commands.SieveActivate;
+import org.obm.imap.sieve.commands.SieveAuthenticate;
+import org.obm.imap.sieve.commands.SieveDeleteScript;
+import org.obm.imap.sieve.commands.SieveGetScript;
+import org.obm.imap.sieve.commands.SieveListscripts;
+import org.obm.imap.sieve.commands.SievePutscript;
+import org.obm.imap.sieve.commands.SieveUnauthenticate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,6 +154,10 @@ public class SieveClientSupport {
 		lastResponses.clear();
 		lastResponses.addAll(copy);
 		lock.release();
+	}
+
+	public String getScriptContent(String name) {
+		return run(new SieveGetScript(name));
 	}
 
 	public List<SieveScript> listscripts() {

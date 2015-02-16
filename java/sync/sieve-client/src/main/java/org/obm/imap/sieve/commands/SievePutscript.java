@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,69 +30,58 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap;
+package org.obm.imap.sieve.commands;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.nio.ByteBuffer;
+import org.obm.imap.sieve.SieveArg;
+import org.obm.imap.sieve.SieveCommand;
+import org.obm.imap.sieve.SieveResponse;
+import org.obm.push.utils.FileUtils;
 
-import org.apache.commons.codec.binary.Base64;
-import org.junit.Ignore;
+import com.google.common.base.Charsets;
 
-@Ignore("It's necessary to do again all tests")
-public class SieveLoginTests extends SieveTestCase {
+public class SievePutscript extends SieveCommand<Boolean> {
 
-	private final SieveClient sc = null;
-	
-	public void testConstructor() {
-		SieveClient sc = null;
-		assertNotNull(sc);
-	}
+	private final String name;
+	private byte[] data;
 
-	public void testB64Decode() {
-		String value = "dGhvbWFzQHp6LmNvbQB0aG9tYXNAenouY29tAGFsaWFjb20=";
-		ByteBuffer decoded = ByteBuffer.wrap(Base64.decodeBase64(value));
-	
-		value = "dGhvbWFzAHRob21hcwBhbGlhY29t";
-		decoded = ByteBuffer.wrap(Base64.decodeBase64(value));
-		assertNotNull(decoded);
-	}
-
-	public void testLoginLogout() {
-
+	public SievePutscript(String name, InputStream scriptContent) {
+		retVal = false;
+		this.name = name;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			boolean ret = sc.login();
-			assertTrue(ret);
-			sc.logout();
-		} catch (Throwable t) {
-			fail("should not get an exception");
+			FileUtils.transfer(scriptContent, out, true);
+			this.data = out.toByteArray();
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
 		}
+
 	}
 
-	public void testUnauthenticate() {
-
-		try {
-			boolean ret = sc.login();
-			assertTrue(ret);
-			sc.unauthenticate();
-			sc.logout();
-		} catch (Throwable t) {
-			fail("should not get an exception");
-		}
+	@Override
+	protected List<SieveArg> buildCommand() {
+		List<SieveArg> args = new ArrayList<SieveArg>(1);
+		args
+				.add(new SieveArg(("PUTSCRIPT \"" + name + "\"").getBytes(Charsets.UTF_8),
+						false));
+		args.add(new SieveArg(data, true));
+		return args;
 	}
 
-	public void testLoginLogoutPerf() throws InterruptedException {
-		final int IT_COUNT = 10000;
-
-		for (int i = 0; i < 1000; i++) {
-			sc.login();
-			sc.logout();
-		}
-		for (int i = 0; i < IT_COUNT; i++) {
-			sc.login();
-			sc.logout();
+	@Override
+	public void responseReceived(List<SieveResponse> rs) {
+		logger.info("putscript response received.");
+		if (commandSucceeded(rs)) {
+			retVal = true;
+		} else {
+			for (SieveResponse sr : rs) {
+				logger.error(sr.getData());
+			}
 		}
 	}
 

@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,18 +30,60 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve;
+package org.obm.imap.sieve;
 
-public class SieveResponse {
+import java.util.ArrayList;
 
-	private final String data;
+import org.apache.mina.core.filterchain.IoFilter;
+import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.codec.ProtocolCodecFactory;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	public SieveResponse(String data) {
-		this.data = data;
+public class SieveClientHandler extends IoHandlerAdapter {
+
+	private static final Logger logger = LoggerFactory
+			.getLogger(SieveClientHandler.class);
+
+	private final SieveResponseParser srp = new SieveResponseParser();
+
+	private final SieveClientSupport cs;
+
+	private IoFilter getSieveFilter() {
+		ProtocolCodecFactory pcf = new SieveCodecFactory();
+		return new ProtocolCodecFilter(pcf);
 	}
 
-	public String getData() {
-		return data;
+	public SieveClientHandler(SieveClientSupport cb) {
+		// TODO Auto-generated constructor stub
+		this.cs = cb;
+	}
+
+	public void sessionCreated(IoSession session) throws Exception {
+		session.getFilterChain().addLast("codec", getSieveFilter());
+	}
+
+	public void sessionOpened(IoSession session) throws Exception {
+	}
+
+	public void messageReceived(IoSession session, Object message)
+			throws Exception {
+		SieveMessage msg = (SieveMessage) message;
+		ArrayList<SieveResponse> copy = new ArrayList<SieveResponse>(10);
+		srp.parse(copy, msg);
+		cs.setResponses(copy);
+	}
+
+	public void sessionClosed(IoSession session) throws Exception {
+	}
+
+	@Override
+	public void exceptionCaught(IoSession session, Throwable cause)
+			throws Exception {
+		logger.error(cause.getMessage(), cause);
+		throw new SieveException(cause.getMessage(), cause);
 	}
 
 }

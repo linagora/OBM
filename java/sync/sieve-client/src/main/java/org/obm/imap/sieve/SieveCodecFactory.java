@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,60 +30,66 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve;
+package org.obm.imap.sieve;
 
-import java.util.ArrayList;
-
-import org.apache.mina.core.filterchain.IoFilter;
-import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFactory;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.ProtocolDecoder;
+import org.apache.mina.filter.codec.ProtocolDecoderAdapter;
+import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+import org.apache.mina.filter.codec.ProtocolEncoder;
+import org.apache.mina.filter.codec.ProtocolEncoderAdapter;
+import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SieveClientHandler extends IoHandlerAdapter {
+import com.google.common.base.Charsets;
 
+public final class SieveCodecFactory implements ProtocolCodecFactory {
+	
 	private static final Logger logger = LoggerFactory
-			.getLogger(SieveClientHandler.class);
+			.getLogger(SieveClientSupport.class);
 
-	private final SieveResponseParser srp = new SieveResponseParser();
+	private final ProtocolDecoder decoder = new ProtocolDecoderAdapter() {
 
-	private final SieveClientSupport cs;
+		@Override
+		public void decode(IoSession arg0, IoBuffer arg1,
+				ProtocolDecoderOutput arg2) throws Exception {
+			java.nio.ByteBuffer received = arg1.buf();
+			java.nio.ByteBuffer copy = java.nio.ByteBuffer.allocate(received
+					.remaining());
+			copy.put(received);
+			// copy.flip();
+			byte[] data = copy.array();
+			if (logger.isDebugEnabled()) {
+				logger.debug("decoded: " + new String(data, Charsets.UTF_8));
+			}
+			SieveMessage sm = new SieveMessage();
+			sm.addLine(new String(data));
+			arg2.write(sm);
+		}
+	};
 
-	private IoFilter getSieveFilter() {
-		ProtocolCodecFactory pcf = new SieveCodecFactory();
-		return new ProtocolCodecFilter(pcf);
-	}
+	private final ProtocolEncoder encoder = new ProtocolEncoderAdapter() {
 
-	public SieveClientHandler(SieveClientSupport cb) {
-		// TODO Auto-generated constructor stub
-		this.cs = cb;
-	}
-
-	public void sessionCreated(IoSession session) throws Exception {
-		session.getFilterChain().addLast("codec", getSieveFilter());
-	}
-
-	public void sessionOpened(IoSession session) throws Exception {
-	}
-
-	public void messageReceived(IoSession session, Object message)
-			throws Exception {
-		SieveMessage msg = (SieveMessage) message;
-		ArrayList<SieveResponse> copy = new ArrayList<SieveResponse>(10);
-		srp.parse(copy, msg);
-		cs.setResponses(copy);
-	}
-
-	public void sessionClosed(IoSession session) throws Exception {
-	}
+		@Override
+		public void encode(IoSession arg0, Object arg1,
+				ProtocolEncoderOutput arg2) throws Exception {
+			byte[] raw = (byte[]) arg1;
+			IoBuffer b = IoBuffer.wrap(raw);
+			arg2.write(b);
+		}
+	};
 
 	@Override
-	public void exceptionCaught(IoSession session, Throwable cause)
-			throws Exception {
-		logger.error(cause.getMessage(), cause);
-		throw new SieveException(cause.getMessage(), cause);
+	public ProtocolDecoder getDecoder(IoSession session) throws Exception {
+		return decoder;
+	}
+	
+	@Override
+	public ProtocolEncoder getEncoder(IoSession session) throws Exception {
+		return encoder;
 	}
 
 }

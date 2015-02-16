@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -30,37 +30,14 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.push.minig.imap.sieve;
+package org.obm.imap.sieve;
 
-import java.util.LinkedList;
-import java.util.List;
+public class SieveException extends Exception {
 
-public class SieveMessage {
-	
-	private final List<String> lines;
-	
-	public SieveMessage() {
-		lines = new LinkedList<String>();
-	}
-	
-	public void addLine(String s) {
-		lines.add(s);
-	}
+	private static final long serialVersionUID = -4049948643858366581L;
 
-	public List<String> getLines() {
-		return lines;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(super.toString());
-		sb.append(":\n");
-		for (String l :lines) {
-			sb.append(l);
-			sb.append("\n");
-		}
-		return sb.toString();
+	public SieveException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 }
