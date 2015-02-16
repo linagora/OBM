@@ -65,7 +65,7 @@ public class ContactStepdefs {
 	private CreateContactPage createContactPage;
 	private CreateContactPage processedCreateContactPage;
 	private UIContact contactToCreate;
-	private ContactPage okCreationPage;
+	private ContactPage contactsPage;
 	
 	@Before
 	public void setUp() {
@@ -80,6 +80,17 @@ public class ContactStepdefs {
 	@After
 	public void tearDown() {
 		driver.quit();
+	}
+
+	@Given("on contacts page")
+	public void goToContactsPage() {
+		contactsPage = pageFactory.create(driver, ContactPage.class);
+		contactsPage.open();
+	}
+
+	@Given("^address book \"([^\"]*)\" is selected$")
+	public void selectAddressBook(String bookName) {
+		contactsPage.selectAddressBook(bookName);
 	}
 
 	@Given("on create contact page")
@@ -110,12 +121,12 @@ public class ContactStepdefs {
 
 	@And("user validate")
 	public void userValidate() {
-		okCreationPage = createContactPage.createContact(contactToCreate);
+		contactsPage = createContactPage.createContact(contactToCreate);
 	}
 	
 	@And("user validate accepting existing popup") 
 	public void userValidateAcceptingExistingPopup() {
-		okCreationPage = createContactPage.createContactAndRespondOKTOConfirmCreation(contactToCreate);
+		contactsPage = createContactPage.createContactAndRespondOKTOConfirmCreation(contactToCreate);
 	}
 	
 	@And("user validate cancelling existing popup") 
@@ -128,19 +139,33 @@ public class ContactStepdefs {
 		WebElement lastNameField = processedCreateContactPage.elLastname();
 		assertThat(lastNameField.getAttribute("value")).isEqualTo(lastname);
 	}
-	
-	@Then("^\"([^\"]*)\" is once in contact list$")
-	public void isOnceInContactList(String name) {
-		count(name, 1);
+
+	@Then("^\"([^\"]*)\" is (\\d+) times in \"([^\"]*)\" address book$")
+	public void isNTimesInContactList(String name, int count, String bookName) {
+		assertThat(contactsPage.countNameInAddressBookList(name, bookName)).isEqualTo(count);
 	}
-	
-	@Then("^\"([^\"]*)\" is twice in contact list$")
-	public void isTwiceInContactList(String name) {
-		count(name, 2);
+
+	@When("^user deletes contact \"([^\"]*)\"$")
+	public void userDeletesContact(String contactDisplayName) throws Throwable {
+		userSelectsContact(contactDisplayName);
+		contactsPage.deleteContact();
 	}
-	
-	private void count(String name, int times) {
-		assertThat(okCreationPage.countNameInList(name)).isEqualTo(times);
+
+	@When("^user accepts confirmation popup$")
+	public void userAcceptsConfirmationPopup() throws Throwable {
+		contactsPage.managePopup(true);
+
+		goToContactsPage();
 	}
-	
+
+	@When("^user selects contact \"([^\"]*)\"$")
+	public void userSelectsContact(String contactDisplayName) throws Throwable {
+		contactsPage.selectContact(contactDisplayName);
+	}
+
+	@Then("there is no delete button")
+	public void thereIsNoDeleteButton() {
+		assertThat(contactsPage.findDeleteButton()).isNull();
+	}
+
 }

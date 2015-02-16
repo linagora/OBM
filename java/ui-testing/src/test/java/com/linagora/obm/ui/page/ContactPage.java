@@ -32,12 +32,16 @@
 package com.linagora.obm.ui.page;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.linagora.obm.ui.bean.UIContact;
 
 public class ContactPage extends RootPage {
@@ -69,8 +73,60 @@ public class ContactPage extends RootPage {
 		String text = dataContainer.getText();
 		return text.contains(contactToCheck.getFirstName() + " " + contactToCheck.getLastName()) ? 1 : 0;
 	}
-	
-	public int countNameInList(String name) {
+
+	public int countNameInAddressBookList(String name, String bookName) {
+		selectAddressBook(bookName);
+
 		return StringUtils.countMatches(dataContainer.getText(), name);
 	}
+
+	public void selectContact(final String contactDisplayName) {
+		WebElement contactElement = Iterables.find(driver.findElements(By.className("contactHeader")), new Predicate<WebElement>() {
+
+			@Override
+			public boolean apply(WebElement input) {
+				return StringUtils.contains(input.getText(), contactDisplayName);
+			}
+
+		});
+
+		contactElement.click();
+		waitForAjaxRequestToComplete();
+	}
+
+	public void selectAddressBook(String bookName) {
+		driver.findElement(By.partialLinkText(bookName)).click();
+		waitForAjaxRequestToComplete();
+	}
+
+	public void deleteContact() {
+		findDeleteButton().click();
+	}
+
+	public WebElement findDeleteButton() {
+		return Iterables.getFirst(driver.findElements(By.className("deleteButton")), null);
+	}
+
+	public void managePopup(final boolean accept) {
+		new FluentWait<WebDriver>(driver).until(new Predicate<WebDriver>() {
+			@Override
+			public boolean apply(WebDriver input) {
+				Alert alert = driver.switchTo().alert();
+				if (alert != null) {
+					if (accept) {
+						alert.accept();
+					} else {
+						alert.dismiss();
+					}
+					return true;
+				}
+				return false;
+			}
+		});
+	}
+
+	private void waitForAjaxRequestToComplete() {
+		new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.id("spinner")));
+	}
+
 }

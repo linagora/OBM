@@ -33,7 +33,6 @@ package com.linagora.obm.ui.page;
 
 import java.util.concurrent.TimeUnit;
 
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -80,24 +79,6 @@ public class CreateContactPage extends ContactPage {
 		managePopup(false);
 		
 		return this;
-	}
-
-	private void managePopup(final boolean accept) {
-		new FluentWait<WebDriver>(driver).until(new Predicate<WebDriver>() {
-			@Override
-			public boolean apply(WebDriver input) {
-				Alert alert = driver.switchTo().alert();
-				if (alert != null) {
-					if (accept) {
-						alert.accept();
-					} else {
-						alert.dismiss();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
 	}
 
 	private ContactPage createContactPage() {
