@@ -130,6 +130,7 @@ public class LdapUser {
 		private String sambaSid;
 		private String sambaPrimaryGroupSid;
 		private String sambaHomeDrive;
+		private String sambaHomeFolder;
 		
 		private final Configuration configuration;
 
@@ -185,6 +186,7 @@ public class LdapUser {
 				
 				this.sambaAllowed = obmUser.isSambaAllowed();
 				this.sambaHomeDrive = obmUser.getSambaHomeDrive();
+				this.sambaHomeFolder = Objects.firstNonNull(obmUser.getSambaHomeFolder(), samba.getHome());
 			}
 			
 			return this;
@@ -339,6 +341,11 @@ public class LdapUser {
 			return this;
 		}
 		
+		public Builder sambaHomeFolder(String sambaHomeFolder) {
+			this.sambaHomeFolder = sambaHomeFolder;
+			return this;
+		}
+		
 		public LdapUser build() {
 			Preconditions.checkState(uid != null, "uid should not be null");
 			Preconditions.checkState(objectClasses != null && objectClasses.length > 0, "objectClasses should not be empty");
@@ -350,7 +357,7 @@ public class LdapUser {
 			return new LdapUser(configuration.getUserBaseDn(domain), objectClasses, uid, uidNumber, gidNumber, loginShell,
 					cn, displayName, sn, givenName, homeDirectory, userPassword, webAccess,
 					mailBox, mailBoxServer, mailAccess, mail, mailAlias.build(), hiddenUser, domain,
-					sambaAllowed, sambaSid, sambaPrimaryGroupSid, sambaHomeDrive);
+					sambaAllowed, sambaSid, sambaPrimaryGroupSid, sambaHomeDrive, sambaHomeFolder);
 		}
 	}
 	
@@ -378,11 +385,12 @@ public class LdapUser {
 	private final String sambaSid;
 	private final String sambaPrimaryGroupSid;
 	private final String sambaHomeDrive;
+	private final String sambaHomeFolder;
 	
 	private LdapUser(Dn userBaseDn, String[] objectClasses, Uid uid, int uidNumber, int gidNumber, String loginShell,
 			String cn, String displayName, String sn, String givenName, String homeDirectory, UserPassword userPassword, String webAccess,
 			String mailBox, String mailBoxServer, String mailAccess, String mail, Set<String>mailAlias, boolean hiddenUser, LdapDomain domain,
-			boolean sambaAllowed, String sambaSid, String sambaPrimaryGroupSid, String sambaHomeDrive) {
+			boolean sambaAllowed, String sambaSid, String sambaPrimaryGroupSid, String sambaHomeDrive, String sambaHomeFolder) {
 		this.userBaseDn = userBaseDn;
 		this.objectClasses = objectClasses;
 		this.uid = uid;
@@ -407,6 +415,7 @@ public class LdapUser {
 		this.sambaSid = sambaSid;
 		this.sambaPrimaryGroupSid = sambaPrimaryGroupSid;
 		this.sambaHomeDrive = sambaHomeDrive;
+		this.sambaHomeFolder = sambaHomeFolder;
 	}
 
 	public String[] getObjectClasses() {
@@ -500,6 +509,10 @@ public class LdapUser {
 	public String getSambaHomeDrive() {
 		return sambaHomeDrive;
 	}
+	
+	public String getSambaHomeFolder() {
+		return sambaHomeFolder;
+	}
 
 	public Entry buildEntry() throws LdapException {
 		LdapEntry.Builder builder = LdapEntry.builder()
@@ -536,6 +549,7 @@ public class LdapUser {
 			builder.attribute(Attribute.valueOf("sambaSID", sambaSid));
 			builder.attribute(Attribute.valueOf("sambaPrimaryGroupSID", sambaPrimaryGroupSid));
 			builder.attribute(Attribute.valueOf("sambaHomeDrive", sambaHomeDrive));
+			builder.attribute(Attribute.valueOf("sambaHomePath", sambaHomeFolder));
 		}
 		
 		return builder.build().toDefaultEntry();
@@ -602,10 +616,12 @@ public class LdapUser {
 				mods.add(removeAttributeModification("sambaSID", sambaSid));
 				mods.add(removeAttributeModification("sambaPrimaryGroupSID", sambaPrimaryGroupSid));
 				mods.add(removeAttributeModification("sambaHomeDrive", sambaHomeDrive));
+				mods.add(removeAttributeModification("sambaHomePath", sambaHomeFolder));
 			} else {
 				mods.add(buildAttributeModification("sambaSID", sambaSid));
 				mods.add(buildAttributeModification("sambaPrimaryGroupSID", sambaPrimaryGroupSid));
 				mods.add(buildAttributeModification("sambaHomeDrive", sambaHomeDrive));
+				mods.add(buildAttributeModification("sambaHomePath", sambaHomeFolder));
 			}
 		}
 
@@ -637,7 +653,7 @@ public class LdapUser {
 	public final int hashCode(){
 		return Objects.hashCode(uid, uidNumber, gidNumber, loginShell, cn, displayName, sn, givenName, 
 				homeDirectory, userPassword, webAccess, mailBox, mailBoxServer, mailAccess, mail, mailAlias, hiddenUser, domain,
-				sambaAllowed, sambaHomeDrive);
+				sambaAllowed, sambaHomeDrive, sambaHomeFolder);
 	}
 	
 	@Override
@@ -663,7 +679,8 @@ public class LdapUser {
 				&& Objects.equal(this.hiddenUser, that.hiddenUser)
 				&& Objects.equal(this.domain, that.domain)
 				&& Objects.equal(this.sambaAllowed, that.sambaAllowed)
-				&& Objects.equal(this.sambaHomeDrive, that.sambaHomeDrive);
+				&& Objects.equal(this.sambaHomeDrive, that.sambaHomeDrive)
+				&& Objects.equal(this.sambaHomeFolder, that.sambaHomeFolder);
 		}
 		return false;
 	}
@@ -691,6 +708,7 @@ public class LdapUser {
 			.add("obmDomain", domain)
 			.add("sambaAllowed", sambaAllowed)
 			.add("sambaHomeDrive", sambaHomeDrive)
+			.add("sambaHomeFolder", sambaHomeFolder)
 			.toString();
 	}
 }
