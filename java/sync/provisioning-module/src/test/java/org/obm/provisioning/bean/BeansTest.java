@@ -31,30 +31,43 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.bean;
 
-import org.junit.Before;
+import java.util.List;
+
 import org.junit.Test;
+import org.obm.provisioning.processing.impl.users.sieve.NewSieveContent;
+import org.obm.provisioning.processing.impl.users.sieve.ObmRule;
+import org.obm.provisioning.processing.impl.users.sieve.OldSieveContent;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-
 
 public class BeansTest {
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
-	}
-	
 	@Test
 	public void test() {
-		ImmutableList<Class<?>> list = 
-				ImmutableList.<Class<?>>builder()
-					.add(UserIdentifier.class)
-					.add(GroupIdentifier.class)
-					.build();
-		equalsVerifierUtilsTest.test(list);
+		List<String> requires1 = ImmutableList.of("foo1", "bar1");
+		List<String> rules1 = ImmutableList.of("rule1;");
+		List<String> requires2 = ImmutableList.of("foo2", "bar2");
+		List<String> rules2 = ImmutableList.of("rule2;");
+		OldSieveContent oldSieveContent1 = new OldSieveContent(requires1, rules1);
+		OldSieveContent oldSieveContent2 = new OldSieveContent(requires2, rules2);
+
+		ImmutableList<Class<?>> list =
+				ImmutableList.<Class<?>> builder()
+						.add(UserIdentifier.class)
+						.add(GroupIdentifier.class)
+						.add(OldSieveContent.class)
+						.add(ObmRule.class)
+						.add(NewSieveContent.class)
+						.build();
+		EqualsVerifierUtils.EqualsVerifierBuilder
+				.builder()
+				.prefabValue(Optional.class,
+						Optional.of(oldSieveContent1),
+						Optional.of(oldSieveContent2))
+				.equalsVerifiers(list)
+				.verify();
 	}
-	
+
 }

@@ -82,6 +82,7 @@ import org.obm.provisioning.ldap.client.LdapService;
 import org.obm.provisioning.mailchooser.LeastMailboxesImapBackendChooser;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
+import org.obm.provisioning.processing.impl.users.sieve.SieveScriptUpdaterFactory;
 import org.obm.push.utils.UUIDFactory;
 import org.obm.satellite.client.SatelliteService;
 import org.obm.sync.date.DateProvider;
@@ -159,6 +160,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					configuration.applicationName = ProvisioningServerService.APPLICATION_NAME; 
 					bind(ConfigurationService.class).toInstance(mocksControl.createMock(ConfigurationService.class));
 					bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(configuration.transaction));
+					
+					bind(SieveScriptUpdaterFactory.class).toInstance(mocksControl.createMock(SieveScriptUpdaterFactory.class));
 				}
 			}));
 		}

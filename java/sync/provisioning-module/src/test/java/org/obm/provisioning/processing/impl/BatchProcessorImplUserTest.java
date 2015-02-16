@@ -41,6 +41,8 @@ import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.mailchooser.LeastMailboxesImapBackendChooser;
+import org.obm.provisioning.processing.impl.users.sieve.SieveScriptUpdater;
+import org.obm.provisioning.processing.impl.users.sieve.SieveScriptUpdaterFactory;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.imap.IMAPException;
@@ -67,6 +69,7 @@ import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
 import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserLogin;
+import fr.aliacom.obm.common.user.UserNomad;
 import fr.aliacom.obm.common.user.UserPassword;
 
 @RunWith(GuiceRunner.class)
@@ -87,6 +90,8 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 	private SatelliteService satelliteService;
 	@Inject
 	private DatabaseConnectionProvider dbcp;
+	@Inject
+	private SieveScriptUpdaterFactory sieveScriptUpdaterFactory;
 
 	private final Date date = DateUtils.date("2013-08-01T12:00:00");
 
@@ -238,6 +243,76 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expectSetDefaultRights(userFromDao);
 		expectLdapCreateUser(userFromDao, usersGroup);
 		expectCyrusCreateMailbox(userFromDao);
+		expectSieveScriptUpdate(userFromDao);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+		expectPUserDaoInsert(userFromDao);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testProcessCreateUserWithoutEmail() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/")
+								.verb(HttpVerb.POST)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"nomad_enabled\":true,"
+										+ "\"nomad_mail\":\"redirect@newdomain\""
+										+ "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domain).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		final ObmUser user = ObmUser.builder().login(user1Login).identity(user1Name)
+				.password(UserPassword.valueOf("secret"))
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1")).domain(domain)
+				.build();
+		final ObmUser userFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.login(user1Login)
+				.password(UserPassword.valueOf("secret"))
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domain)
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.create(user)).andReturn(userFromDao);
+		expect(groupDao.getByGid(domain, UserDao.DEFAULT_GID)).andReturn(
+				usersGroup);
+		groupDao.addUser(domain, usersGroup.getUid(), userFromDao);
+		expectLastCall();
+		expectSetDefaultRights(userFromDao);
+		expectLdapCreateUser(userFromDao, usersGroup);
 
 		expect(
 				batchDao.update(batchBuilder
@@ -396,6 +471,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expect(configurationService.isLdapModuleEnabled()).andReturn(false);
 		expectSetDefaultRights(userFromDao);
 		expectCyrusCreateMailbox(userFromDao);
+		expectSieveScriptUpdate(userFromDao);
 
 		expect(
 				batchDao.update(batchBuilder
@@ -1457,6 +1533,70 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 	}
 
 	@Test
+	public void testModifyWhenArchivingArchivedUserWithNomadAndNoEmail() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PUT)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"nomad_enabled\": true,"
+										+ "\"nomad_mail\": \"redirect@newdomain\","
+										+ "\"archived\": true" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.password(UserPassword.valueOf("secret"))
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.archived(true)
+				.build();
+
+		expectDomain();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domainWithImapAndLdap)).andReturn(user);
+		expect(userDao.update(user)).andReturn(user);
+		expectLdapModifyUser(user, user);
+		expectPUserDaoDelete(user);
+		expectPUserDaoInsert(user);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
 	public void testModifyWhenUnarchivingArchivedUser() throws Exception {
 		Date date = DateUtils.date("2013-08-01T12:00:00");
 		Operation.Builder opBuilder = Operation
@@ -1514,6 +1654,102 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expectLdapCreateUser(user, usersGroup);
 		expectPUserDaoDelete(user);
 		expectPUserDaoInsert(user);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testModifyWhenUnarchivingArchivedUserWithNomadAndEmail() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PUT)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"nomad_enabled\": true,"
+										+ "\"nomad_mail\": \"redirect@newdomain\","
+										+ "\"archived\": false,"
+										+ "\"mails\":[\"john@domain\"]" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser existingUserFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(cyrusHost)
+					.domain(domain)
+					.build())
+				.password(UserPassword.valueOf("secret"))
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.archived(true)
+				.build();
+		ObmUser updatedUserFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(cyrusHost)
+					.domain(domain)
+					.build())
+				.password(UserPassword.valueOf("secret"))
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.archived(false)
+				.build();
+
+
+		expectDomain();
+		expectImapBackendChooser();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domainWithImapAndLdap)).andReturn(existingUserFromDao);
+		expect(userDao.update(updatedUserFromDao)).andReturn(updatedUserFromDao);
+		expect(groupDao.getByGid(domainWithImapAndLdap, UserDao.DEFAULT_GID)).andReturn(usersGroup);
+		expect(groupDao.getAllGroupsForUserExtId(domainWithImapAndLdap, UserExtId.valueOf("extIdUser1"))).andReturn(Collections.EMPTY_SET);
+		CyrusManager cyrusManager = expectCyrusBuild();
+		expectApplyQuota(cyrusManager, updatedUserFromDao);
+		expectCyrusShutDown(cyrusManager);
+		expectLdapCreateUser(updatedUserFromDao, usersGroup);
+		expectPUserDaoDelete(updatedUserFromDao);
+		expectPUserDaoInsert(updatedUserFromDao);
+		expectSieveScriptUpdate(updatedUserFromDao);
 
 		expect(
 				batchDao.update(batchBuilder
@@ -1779,6 +2015,444 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		mocksControl.verify();
 	}
 
+	@Test
+	public void testProcessModifyUserEnableNomad() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PUT)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"nomad_enabled\": true,"
+										+ "\"nomad_mail\": \"redirect@newdomain\","
+										+ "\"mails\":[\"john@domain\"]" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.build();
+		ObmUser existingUserFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.build();
+		ObmUser updatedUserFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.build();
+
+		expectDomain();
+		expectImapBackendChooser();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(
+				userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
+						domainWithImapAndLdap)).andReturn(existingUserFromDao);
+		expect(userDao.update(user)).andReturn(updatedUserFromDao);
+		expectLdapModifyUser(updatedUserFromDao, existingUserFromDao);
+		CyrusManager cyrusManager = expectCyrusBuild();
+		expectApplyQuota(cyrusManager, updatedUserFromDao);
+		expectCyrusShutDown(cyrusManager);
+		expectPUserDaoDelete(updatedUserFromDao);
+		expectPUserDaoInsert(updatedUserFromDao);
+		expectSieveScriptUpdate(updatedUserFromDao);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testProcessModifyUserDisableNomad() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PUT)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"nomad_enabled\": false,"
+										+ "\"nomad_mail\": \"redirect@newdomain\","
+										+ "\"mails\":[\"john@domain\"]" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(false).email("redirect@newdomain").build())
+				.build();
+		ObmUser existingUserFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.build();
+		ObmUser updatedUserFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(false).email("redirect@newdomain").build())
+				.build();
+
+		expectDomain();
+		expectImapBackendChooser();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(
+				userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
+						domainWithImapAndLdap)).andReturn(existingUserFromDao);
+		expect(userDao.update(user)).andReturn(updatedUserFromDao);
+		expectLdapModifyUser(updatedUserFromDao, existingUserFromDao);
+		CyrusManager cyrusManager = expectCyrusBuild();
+		expectApplyQuota(cyrusManager, updatedUserFromDao);
+		expectCyrusShutDown(cyrusManager);
+		expectPUserDaoDelete(updatedUserFromDao);
+		expectPUserDaoInsert(updatedUserFromDao);
+		expectSieveScriptUpdate(updatedUserFromDao);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testProcessModifyUserChangeNomadAddress() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PUT)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"nomad_enabled\": true,"
+										+ "\"nomad_mail\": \"redirect@newdomain\","
+										+ "\"mails\":[\"john@domain\"]" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.build();
+		ObmUser existingUserFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@olddomain").build())
+				.build();
+		ObmUser updatedUserFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.build();
+
+		expectDomain();
+		expectImapBackendChooser();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(
+				userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
+						domainWithImapAndLdap)).andReturn(existingUserFromDao);
+		expect(userDao.update(user)).andReturn(updatedUserFromDao);
+		expectLdapModifyUser(updatedUserFromDao, existingUserFromDao);
+		CyrusManager cyrusManager = expectCyrusBuild();
+		expectApplyQuota(cyrusManager, updatedUserFromDao);
+		expectCyrusShutDown(cyrusManager);
+		expectPUserDaoDelete(updatedUserFromDao);
+		expectPUserDaoInsert(updatedUserFromDao);
+		expectSieveScriptUpdate(updatedUserFromDao);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testProcessModifyUserNoChangeInNomad() throws Exception {
+		Date date = DateUtils.date("2013-08-01T12:00:00");
+		Operation.Builder opBuilder = Operation
+				.builder()
+				.id(operationId(1))
+				.status(BatchStatus.IDLE)
+				.entityType(BatchEntityType.USER)
+				.request(
+						org.obm.provisioning.beans.Request
+								.builder()
+								.resourcePath("/users/1")
+								.param(Request.USERS_ID_KEY, "extIdUser1")
+								.verb(HttpVerb.PUT)
+								.body("{" + "\"id\": \"extIdUser1\","
+										+ "\"login\": \"user1\","
+										+ "\"lastname\": \"user1\","
+										+ "\"profile\": \"user\","
+										+ "\"password\": \"secret\","
+										+ "\"nomad_enabled\": true,"
+										+ "\"nomad_mail\": \"redirect@newdomain\","
+										+ "\"mails\":[\"john@domain\"]" + "}")
+								.build());
+		Batch.Builder batchBuilder = Batch.builder().id(batchId(1))
+				.domain(domainWithImapAndLdap).status(BatchStatus.IDLE)
+				.operation(opBuilder.build());
+
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.identity(user1Name)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.build();
+		ObmUser existingUserFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.build();
+		ObmUser updatedUserFromDao = ObmUser
+				.builder()
+				.uid(1)
+				.entityId(EntityId.valueOf(1))
+				.login(user1Login)
+				.password(UserPassword.valueOf("secret"))
+				.emails(UserEmails.builder()
+					.addAddress("john@domain")
+					.server(ObmHost.builder().name("Cyrus").localhost().build())
+					.domain(domainWithImapAndLdap)
+					.server(cyrusHost)
+					.build())
+				.profileName(ProfileName.valueOf("user"))
+				.extId(UserExtId.valueOf("extIdUser1"))
+				.domain(domainWithImapAndLdap)
+				.nomad(UserNomad.builder().enabled(true).email("redirect@newdomain").build())
+				.build();
+
+		expectDomain();
+		expectImapBackendChooser();
+		expectBatchCreationAndRetrieval(batchBuilder.build());
+		expect(
+				userDao.getByExtId(UserExtId.valueOf("extIdUser1"),
+						domainWithImapAndLdap)).andReturn(existingUserFromDao);
+		expect(userDao.update(user)).andReturn(updatedUserFromDao);
+		expectLdapModifyUser(updatedUserFromDao, existingUserFromDao);
+		CyrusManager cyrusManager = expectCyrusBuild();
+		expectApplyQuota(cyrusManager, updatedUserFromDao);
+		expectCyrusShutDown(cyrusManager);
+		expectPUserDaoDelete(updatedUserFromDao);
+		expectPUserDaoInsert(updatedUserFromDao);
+
+		expect(
+				batchDao.update(batchBuilder
+						.operation(
+								opBuilder.status(BatchStatus.SUCCESS)
+										.timecommit(date).build())
+						.status(BatchStatus.SUCCESS).timecommit(date).build()))
+				.andReturn(null);
+
+		mocksControl.replay();
+
+		createBatchWithOneUserUpdateAndCommit();
+
+		mocksControl.verify();
+	}
+
 	private void expectDeleteUserMailbox(final ObmUser user) throws Exception {
 		CyrusManager cyrusManager = expectCyrusBuild();
 		cyrusManager.setAcl(user, "cyrus",
@@ -1807,4 +2481,10 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		return cyrusManager;
 	}
 
+	private void expectSieveScriptUpdate(ObmUser user) {
+		SieveScriptUpdater mockUpdater = this.mocksControl.createMock(SieveScriptUpdater.class);
+		expect(this.sieveScriptUpdaterFactory.build(user)).andReturn(mockUpdater);
+		mockUpdater.update();
+		expectLastCall();
+	}
 }

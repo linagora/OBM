@@ -39,9 +39,11 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.processing.impl.OperationUtils;
+import org.obm.provisioning.processing.impl.users.sieve.SieveScriptUpdaterFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
+import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -50,6 +52,8 @@ import fr.aliacom.obm.common.user.UserExtId;
 public abstract class AbstractModifyUserOperationProcessor extends AbstractUserOperationProcessor {
 
 	private ObmUser existingUser;
+	@Inject
+	private SieveScriptUpdaterFactory sieveScriptUpdaterFactory;
 
 	AbstractModifyUserOperationProcessor(HttpVerb verb) {
 		super(verb);
@@ -80,12 +84,17 @@ public abstract class AbstractModifyUserOperationProcessor extends AbstractUserO
 
 		if (existingUser.isArchived() && !newUser.isArchived()) {
 			createUserInLdapAndAddUserToExistingGroups(newUser, getDefaultGroup(domain));
+			if (newUser.isEmailAvailable()) {
+				this.sieveScriptUpdaterFactory.build(newUser).update();
+			}
 		} else if (!existingUser.isArchived() && newUser.isArchived()) {
 			deleteUserInLdap(newUser);
 		} else {
 			modifyUserInLdap(newUser, existingUser);
+			if (newUser.isEmailAvailable() && (!existingUser.getNomad().equals(newUser.getNomad()))) {
+				this.sieveScriptUpdaterFactory.build(newUser).update();
+			}
 		}
-
 		updateUserInPTables(newUser);
 	}
 

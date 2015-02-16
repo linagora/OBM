@@ -46,6 +46,8 @@ import org.obm.provisioning.processing.impl.users.CreateUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.DeleteUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.PatchUserOperationProcessor;
 import org.obm.provisioning.processing.impl.users.PutUserOperationProcessor;
+import org.obm.provisioning.processing.impl.users.sieve.SieveClientFactory;
+import org.obm.provisioning.processing.impl.users.sieve.SieveScriptUpdaterFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -62,6 +64,8 @@ public class BatchProcessingModule extends AbstractModule {
 		bindConstant().annotatedWith(Names.named("nbParallelBatches")).to(NB_PARALLEL_BATCHES);
 		bind(BatchProcessor.class).to(ParallelBatchProcessor.class);
 		bind(BatchTracker.class).to(BatchTrackerImpl.class);
+		bind(SieveClientFactory.class);
+		bind(SieveScriptUpdaterFactory.class);
 
 		multibinder.addBinding().to(CreateUserOperationProcessor.class);
 		multibinder.addBinding().to(DeleteUserOperationProcessor.class);

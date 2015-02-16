@@ -42,6 +42,7 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.processing.impl.users.sieve.SieveScriptUpdaterFactory;
 import org.obm.push.mail.bean.Acl;
 import org.obm.sync.Right;
 import org.obm.sync.dao.EntityId;
@@ -68,6 +69,8 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 	private EntityRightDao entityRightDao;
 	@Inject
 	private ObmHelper obmHelper;
+	@Inject
+	private SieveScriptUpdaterFactory sieveScriptUpdaterFactory;
 
 	@Inject
 	CreateUserOperationProcessor() {
@@ -78,22 +81,26 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 	@Transactional
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		ObmUser user = getUserFromRequestBody(operation, getDefaultObjectMapper(batch.getDomain()));
-		
+
 		validateUserEmail(user);
-		
+
 		ObmUser userFromDao = createUserInDao(user);
 
 		Group defaultGroup = getDefaultGroup(user.getDomain());
-		
+
 		addUserInDefaultGroup(userFromDao, defaultGroup);
 		setDefaultUserRights(userFromDao);
 
-		if (user.isEmailAvailable()) {
-			createUserMailboxes(userFromDao);
-		}
-
 		if (!user.isArchived()) {
 			createUserInLdap(userFromDao, defaultGroup);
+		}
+
+
+		if (user.isEmailAvailable()) {
+			createUserMailboxes(userFromDao);
+			if (!user.isArchived()) {
+				sieveScriptUpdaterFactory.build(userFromDao).update();
+			}
 		}
 
 		createUserInPTables(userFromDao);
