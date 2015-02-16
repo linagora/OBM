@@ -85,14 +85,14 @@ public abstract class AbstractModifyUserOperationProcessor extends AbstractUserO
 		if (existingUser.isArchived() && !newUser.isArchived()) {
 			createUserInLdapAndAddUserToExistingGroups(newUser, getDefaultGroup(domain));
 			if (newUser.isEmailAvailable()) {
-				this.sieveScriptUpdaterFactory.build(newUser).update();
+				this.sieveScriptUpdaterFactory.build(findCyrusUser(), newUser).update();
 			}
 		} else if (!existingUser.isArchived() && newUser.isArchived()) {
 			deleteUserInLdap(newUser);
 		} else {
 			modifyUserInLdap(newUser, existingUser);
 			if (newUser.isEmailAvailable() && (!existingUser.getNomad().equals(newUser.getNomad()))) {
-				this.sieveScriptUpdaterFactory.build(newUser).update();
+				this.sieveScriptUpdaterFactory.build(findCyrusUser(), newUser).update();
 			}
 		}
 		updateUserInPTables(newUser);

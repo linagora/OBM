@@ -33,6 +33,7 @@ import org.obm.imap.sieve.SieveClient;
 
 import com.google.inject.Inject;
 
+import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class SieveScriptUpdaterFactory {
@@ -44,9 +45,9 @@ public class SieveScriptUpdaterFactory {
 		this.sieveClientFactory = sieveClientFactory;
 	}
 
-	public SieveScriptUpdater build(ObmUser user) {
-		SieveClient sieveClient = this.sieveClientFactory.build(user);
-		return new SieveScriptUpdater(user, sieveClient,
-				new SieveBuilder(user));
+	public SieveScriptUpdater build(ObmSystemUser authUser, ObmUser autzUser) {
+		SieveClient sieveClient = this.sieveClientFactory.build(authUser, autzUser);
+		return new SieveScriptUpdater(autzUser, sieveClient,
+				new SieveBuilder(autzUser));
 	}
 }

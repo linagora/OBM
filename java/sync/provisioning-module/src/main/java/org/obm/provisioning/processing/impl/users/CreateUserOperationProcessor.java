@@ -99,7 +99,7 @@ public class CreateUserOperationProcessor extends AbstractUserOperationProcessor
 		if (user.isEmailAvailable()) {
 			createUserMailboxes(userFromDao);
 			if (!user.isArchived()) {
-				sieveScriptUpdaterFactory.build(userFromDao).update();
+				sieveScriptUpdaterFactory.build(this.findCyrusUser(), userFromDao).update();
 			}
 		}
 

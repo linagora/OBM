@@ -32,27 +32,27 @@
 
 package org.obm.imap.sieve.commands;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.obm.imap.sieve.AuthenticationIdentity;
+import org.obm.imap.sieve.AuthorizationIdentity;
 import org.obm.imap.sieve.SieveArg;
 import org.obm.imap.sieve.SieveCommand;
 import org.obm.imap.sieve.SieveResponse;
 
 import com.google.common.base.Charsets;
+import com.google.common.primitives.Bytes;
 
 public class SieveAuthenticate extends SieveCommand<Boolean> {
 
-	private final String login;
-	private final String password;
-	private final byte[] encoded;
+	private AuthenticationIdentity authIdentity;
+	private AuthorizationIdentity autzIdentity;
 
-	public SieveAuthenticate(String login, String password) {
-		this.login = login;
-		this.password = password;
-		this.encoded = encodeAuthString(login, password);
+	public SieveAuthenticate(AuthenticationIdentity authIdentity, AuthorizationIdentity autzIdentity) {
+		this.authIdentity = authIdentity;
+		this.autzIdentity = autzIdentity;
 		this.retVal = Boolean.FALSE;
 	}
 
@@ -62,8 +62,9 @@ public class SieveAuthenticate extends SieveCommand<Boolean> {
 			retVal = true;
 		}
 		if (logger.isDebugEnabled()) {
-			logger.debug("response received for login " + login + " " + password
-					+ " => " + retVal);
+			logger.debug(String.format(
+					"response received for authentication identity %s and authorization identity %s " +
+					" => %s", authIdentity, autzIdentity, retVal));
 		}
 	}
 
@@ -71,39 +72,27 @@ public class SieveAuthenticate extends SieveCommand<Boolean> {
 	protected List<SieveArg> buildCommand() {
 		List<SieveArg> ret = new ArrayList<SieveArg>(2);
 
+		byte[] authString = this.encodeAuthString();
 		ret.add(new SieveArg("AUTHENTICATE \"PLAIN\"".getBytes(Charsets.UTF_8), false));
-		ret.add(new SieveArg(encoded, true));
+		ret.add(new SieveArg(authString, true));
 
 		return ret;
 	}
 
-	private byte[] encodeAuthString(String login, String password) {
-		byte[] log = login.getBytes(Charsets.UTF_8);
-		byte[] pass = password.getBytes();
-		byte[] data = new byte[log.length * 2 + pass.length + 2];
-		int i = 0;
-		for (int j = 0; j < log.length; j++) {
-			data[i++] = log[j];
-		}
-		data[i++] = 0x0;
-		for (int j = 0; j < log.length; j++) {
-			data[i++] = log[j];
-		}
-		data[i++] = 0x0;
+	private byte[] encodeAuthString() {
+		byte[] NULL = {0x0};
+		byte[] authBytes = Bytes.concat(
+				autzIdentity.getLogin().getBytes(Charsets.UTF_8),
+				NULL,
+				authIdentity.getLogin().getBytes(Charsets.UTF_8),
+				NULL,
+				authIdentity.getPassword().getStringValue().getBytes(Charsets.UTF_8));
 
-		for (int j = 0; j < pass.length; j++) {
-			data[i++] = pass[j];
-		}
-
-		ByteBuffer encoded = ByteBuffer.allocate(data.length);
-		encoded.put(data);
-		encoded.flip();
-
-		String ret = Base64.encodeBase64String(encoded.array());
+		String authString = Base64.encodeBase64String(authBytes);
 		if (logger.isDebugEnabled()) {
-			logger.info("encoded auth string: " + ret);
+			logger.info("encoded auth string: " + authString);
 		}
-		return ret.getBytes();
+		return authString.getBytes();
 	}
 
 }

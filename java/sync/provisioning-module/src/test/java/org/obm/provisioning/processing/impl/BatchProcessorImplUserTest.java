@@ -2483,7 +2483,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 	private void expectSieveScriptUpdate(ObmUser user) {
 		SieveScriptUpdater mockUpdater = this.mocksControl.createMock(SieveScriptUpdater.class);
-		expect(this.sieveScriptUpdaterFactory.build(user)).andReturn(mockUpdater);
+		expect(this.sieveScriptUpdaterFactory.build(obmCyrusUser, user)).andReturn(mockUpdater);
 		mockUpdater.update();
 		expectLastCall();
 	}

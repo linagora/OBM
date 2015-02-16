@@ -27,33 +27,26 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.processing.impl.users.sieve;
+package org.obm.imap.sieve;
 
-import org.obm.imap.sieve.AuthenticationIdentity;
-import org.obm.imap.sieve.AuthorizationIdentity;
-import org.obm.imap.sieve.SieveClient;
-import org.obm.sync.host.ObmHost;
+import com.google.common.base.Objects;
 
-import fr.aliacom.obm.common.system.ObmSystemUser;
-import fr.aliacom.obm.common.user.ObmUser;
+public class AuthorizationIdentity {
 
-public class SieveClientFactory {
+	private final String login;
 
-	private final static int SIEVE_PORT = 4190;
+	public AuthorizationIdentity(String login) {
+		this.login = login;
+	}
 
-	public SieveClient build(ObmSystemUser authUser, ObmUser autzUser) {
-		ObmHost mailHost = autzUser.getMailHost();
-		if (mailHost == null) {
-			throw new IllegalArgumentException(String.format(
-					"The user %s has no email, can't update sieve scripts", autzUser.getLogin()));
-		}
-		String ip = mailHost.getIp();
-		AuthenticationIdentity authIdentity = new AuthenticationIdentity(authUser.getLogin(), authUser.getPassword());
-		AuthorizationIdentity autzIdentity = new AuthorizationIdentity(autzUser.getLoginAtDomain());
-		SieveClient sieveClient = new SieveClient(ip, SIEVE_PORT, authIdentity, autzIdentity);
-		if (!sieveClient.login()) {
-			throw new IllegalStateException("Could not login to sieve server");
-		}
-		return sieveClient;
+	public String getLogin() {
+		return login;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("login", this.login)
+				.toString();
 	}
 }

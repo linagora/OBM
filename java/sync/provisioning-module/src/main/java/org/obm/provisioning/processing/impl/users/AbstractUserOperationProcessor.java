@@ -75,13 +75,27 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 	protected PUserDao pUserDao;
 	@Inject
 	protected ImapBackendChooserSelector imapBackendChooserSelector;
+	private ObmSystemUser cyrusUserSystem = null;
 	
 	protected AbstractUserOperationProcessor(HttpVerb verb) {
 		super(BatchEntityType.USER, verb);
 	}
 
-	protected CyrusManager buildCyrusManager(ObmUser user) throws DaoException, SystemUserNotFoundException, IMAPException {
-		ObmSystemUser cyrusUserSystem = userSystemDao.getByLogin(CYRUS);
+	protected ObmSystemUser findCyrusUser() throws ProcessingException {
+		if (this.cyrusUserSystem == null) {
+			try {
+				this.cyrusUserSystem = userSystemDao.getByLogin(CYRUS);
+			} catch (SystemUserNotFoundException e) {
+				throw new ProcessingException(e);
+			} catch (DaoException e) {
+				throw new ProcessingException(e);
+			}
+		}
+		return this.cyrusUserSystem;
+	}
+	
+	protected CyrusManager buildCyrusManager(ObmUser user) throws IMAPException {
+		ObmSystemUser cyrusUserSystem = this.findCyrusUser();
 
 		return cyrusService.buildManager(user.getMailHost().getIp(), cyrusUserSystem.getLogin(), cyrusUserSystem.getPassword());
 	}

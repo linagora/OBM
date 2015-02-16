@@ -64,11 +64,11 @@ public class SieveClientSupport {
 	private final SieveAuthenticate authenticate;
 	private final NioSocketConnector socketConnector;
 
-	public SieveClientSupport(String login, String password) {
+	public SieveClientSupport(AuthenticationIdentity authIdentity, AuthorizationIdentity autzIdentity) {
 		this.socketConnector = new NioSocketConnector();
 		this.lock = new Semaphore(1);
 		this.lastResponses = new LinkedList<SieveResponse>();
-		this.authenticate = new SieveAuthenticate(login, password);
+		this.authenticate = new SieveAuthenticate(authIdentity, autzIdentity);
 	}
 
 	private void lock() {
