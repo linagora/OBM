@@ -40,6 +40,7 @@ public class UserNomad {
 
 		private Boolean enabled;
 		private String email;
+		private Boolean allowed;
 
 		private Builder() {}
 
@@ -53,18 +54,25 @@ public class UserNomad {
 			return this;
 		}
 
+		public Builder allowed(boolean allowed) {
+			this.allowed = allowed;
+			return this;
+		}
+
 		public Builder from(UserNomad userNomad) {
 			this.enabled = userNomad.enabled;
 			this.email = userNomad.email;
+			this.allowed = userNomad.allowed;
 			return this;
 		}
 
 		public UserNomad build() {
 			this.enabled = Objects.firstNonNull(this.enabled, false);
 			this.email = Strings.emptyToNull(email);
+			this.allowed = Objects.firstNonNull(this.allowed, false);
 			// In theory, should ensure that enable is only on if email is not null, but who knows what crap we'll find in the database?
 			// This may prevent us from loading existing users
-			return new UserNomad(enabled, email);
+			return new UserNomad(enabled, email, allowed);
 		}
 
 	}
@@ -79,10 +87,12 @@ public class UserNomad {
 	
 	private final boolean enabled;
 	private final String email;
+	private final boolean allowed;
 
-	private UserNomad(boolean enabled, String email) {
+	private UserNomad(boolean enabled, String email, boolean allowed) {
 		this.enabled = enabled;
 		this.email = email;
+		this.allowed = allowed;
 	}
 
 	public boolean isEnabled() {
@@ -93,9 +103,13 @@ public class UserNomad {
 		return email;
 	}
 
+	public boolean isAllowed() {
+		return allowed;
+	}
+
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(enabled, email);
+		return Objects.hashCode(enabled, email, allowed);
 	}
 
 	@Override
@@ -103,7 +117,8 @@ public class UserNomad {
 		if (object instanceof UserNomad) {
 			UserNomad that = (UserNomad) object;
 			return Objects.equal(this.enabled, that.enabled)
-					&& Objects.equal(this.email, that.email);
+					&& Objects.equal(this.email, that.email)
+					&& Objects.equal(this.allowed, that.allowed);
 		}
 		return false;
 	}
@@ -113,6 +128,7 @@ public class UserNomad {
 		return Objects.toStringHelper(this)
 				.add("allowed", enabled)
 				.add("email", email)
+				.add("allowed", allowed)
 				.toString();
 	}
 
