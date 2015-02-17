@@ -37,7 +37,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 
 public class SieveSerializer {
-	private NewSieveContent newSieveContent;
+	private final NewSieveContent newSieveContent;
 	private StringBuilder lines;
 
 	public SieveSerializer(NewSieveContent newSieveContent) {

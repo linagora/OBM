@@ -31,13 +31,10 @@ package org.obm.provisioning.processing.impl.users.sieve;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
-import org.assertj.core.util.Lists;
 import org.junit.Test;
-import org.parboiled.common.ImmutableList;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 
 public class SieveParserTest {
 
@@ -99,7 +96,7 @@ public class SieveParserTest {
 				"rule2;",
 				"rule3;"
 		});
-		List<String> empty = ImmutableList.of();
+		ImmutableList<String> empty = ImmutableList.of();
 		OldSieveContent expected = new OldSieveContent(
 				empty,
 				ImmutableList.of("rule1;", "rule2;", "rule3;"));
@@ -109,9 +106,9 @@ public class SieveParserTest {
 	@Test
 	public void sieveParserShouldParseWhenNoRules() {
 		String content = "{666}\nrequire \"require1\";";
-		List<String> empty = ImmutableList.of();
+		ImmutableList<String> empty = ImmutableList.of();
 		OldSieveContent expected = new OldSieveContent(
-				Lists.newArrayList("require1"),
+				ImmutableList.of("require1"),
 				empty);
 		assertThat(new SieveParser(content).parse()).isEqualTo(expected);
 	}
@@ -119,7 +116,7 @@ public class SieveParserTest {
 	@Test
 	public void sieveParserShouldParseWhenOnlyID() {
 		String content = "{666}";
-		List<String> empty = ImmutableList.of();
+		ImmutableList<String> empty = ImmutableList.of();
 		OldSieveContent expected = new OldSieveContent(
 				empty, empty);
 		assertThat(new SieveParser(content).parse()).isEqualTo(expected);

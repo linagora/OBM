@@ -34,19 +34,20 @@ import java.util.Set;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 
 public class NewSieveContent {
 
-	private Optional<OldSieveContent> maybeOldSieveContent;
-	private List<ObmRule> obmRules;
+	private final Optional<OldSieveContent> maybeOldSieveContent;
+	private final ImmutableList<ObmRule> obmRules;
 
-	public NewSieveContent(List<ObmRule> obmRules) {
+	public NewSieveContent(ImmutableList<ObmRule> obmRules) {
 		this.maybeOldSieveContent = Optional.absent();
 		this.obmRules = obmRules;
 	}
 
-	public NewSieveContent(OldSieveContent oldSieveContent, List<ObmRule> obmRules) {
+	public NewSieveContent(OldSieveContent oldSieveContent, ImmutableList<ObmRule> obmRules) {
 		this.maybeOldSieveContent = Optional.of(oldSieveContent);
 		this.obmRules = obmRules;
 	}

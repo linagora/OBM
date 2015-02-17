@@ -29,21 +29,18 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.users.sieve;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
 public class SieveBuilder {
 
-	private ObmUser obmUser;
+	private final ObmUser obmUser;
 
 	private static final Logger logger = LoggerFactory.getLogger(SieveBuilder.class);
 
@@ -53,24 +50,24 @@ public class SieveBuilder {
 
 	public String buildFromOldContent(String oldStringContent) {
 		OldSieveContent oldContent = new SieveParser(oldStringContent).parse();
-		List<ObmRule> rules = this.buildRules();
+		ImmutableList<ObmRule> rules = this.buildRules();
 		NewSieveContent content = new NewSieveContent(oldContent, rules);
 		return new SieveSerializer(content).serialize();
 	}
 
 	public String build() {
-		List<ObmRule> rules = this.buildRules();
+		ImmutableList<ObmRule> rules = this.buildRules();
 		NewSieveContent content = new NewSieveContent(rules);
 		return new SieveSerializer(content).serialize();
 	}
 
-	private List<ObmRule> buildRules() {
-		List<ObmRule> rules = Lists.newArrayList();
+	private ImmutableList<ObmRule> buildRules() {
+		ImmutableList.Builder<ObmRule> rulesBuilder = ImmutableList.builder();
 		Optional<ObmRule> maybeRedirectRule = this.emailRedirectRule();
 		if (maybeRedirectRule.isPresent()) {
-			rules.add(maybeRedirectRule.get());
+			rulesBuilder.add(maybeRedirectRule.get());
 		}
-		return rules;
+		return rulesBuilder.build();
 	}
 
 	private Optional<ObmRule> emailRedirectRule() {

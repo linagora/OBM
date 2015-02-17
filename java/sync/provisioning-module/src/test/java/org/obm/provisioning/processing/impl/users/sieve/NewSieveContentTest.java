@@ -31,8 +31,6 @@ package org.obm.provisioning.processing.impl.users.sieve;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -60,7 +58,7 @@ public class NewSieveContentTest {
 
 	@Test
 	public void getAllRequiresShouldHandleEmptyOldRequires() {
-		List<String> empty = ImmutableList.of();
+		ImmutableList<String> empty = ImmutableList.of();
 		NewSieveContent sieveContent = new NewSieveContent(
 				new OldSieveContent(
 						empty,
@@ -80,7 +78,7 @@ public class NewSieveContentTest {
 
 	@Test
 	public void getAllRequiresShouldHandleEmptyObmRules() {
-		List<ObmRule> empty = ImmutableList.of();
+		ImmutableList<ObmRule> empty = ImmutableList.of();
 		NewSieveContent sieveContent = new NewSieveContent(
 				new OldSieveContent(
 						ImmutableList.of("oldrequire1", "oldrequire2"),
@@ -92,8 +90,8 @@ public class NewSieveContentTest {
 
 	@Test
 	public void getAllRequiresShouldHandleAllEmpty() {
-		List<String> emptyOldRequires = ImmutableList.of();
-		List<ObmRule> emptyRules = ImmutableList.of();
+		ImmutableList<String> emptyOldRequires = ImmutableList.of();
+		ImmutableList<ObmRule> emptyRules = ImmutableList.of();
 		NewSieveContent sieveContent = new NewSieveContent(
 				new OldSieveContent(
 						emptyOldRequires,

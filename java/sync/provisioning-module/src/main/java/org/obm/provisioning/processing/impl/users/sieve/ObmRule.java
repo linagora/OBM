@@ -36,17 +36,17 @@ import com.google.common.collect.ImmutableList;
 
 public class ObmRule {
 
-	private String name;
-	private List<String> requires;
-	private List<String> content;
+	private final String name;
+	private final ImmutableList<String> requires;
+	private final ImmutableList<String> content;
 
-	public ObmRule(String name, List<String> content) {
+	public ObmRule(String name, ImmutableList<String> content) {
 		this.name = name;
 		this.requires = ImmutableList.of();
 		this.content = content;
 	}
 
-	public ObmRule(String name, List<String> requires, List<String> content) {
+	public ObmRule(String name, ImmutableList<String> requires, ImmutableList<String> content) {
 		this.name = name;
 		this.requires = requires;
 		this.content = content;

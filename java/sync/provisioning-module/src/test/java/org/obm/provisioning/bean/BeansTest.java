@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.bean;
 
-import java.util.List;
-
 import org.junit.Test;
 import org.obm.provisioning.processing.impl.users.sieve.NewSieveContent;
 import org.obm.provisioning.processing.impl.users.sieve.ObmRule;
@@ -46,10 +44,10 @@ public class BeansTest {
 
 	@Test
 	public void test() {
-		List<String> requires1 = ImmutableList.of("foo1", "bar1");
-		List<String> rules1 = ImmutableList.of("rule1;");
-		List<String> requires2 = ImmutableList.of("foo2", "bar2");
-		List<String> rules2 = ImmutableList.of("rule2;");
+		ImmutableList<String> requires1 = ImmutableList.of("foo1", "bar1");
+		ImmutableList<String> rules1 = ImmutableList.of("rule1;");
+		ImmutableList<String> requires2 = ImmutableList.of("foo2", "bar2");
+		ImmutableList<String> rules2 = ImmutableList.of("rule2;");
 		OldSieveContent oldSieveContent1 = new OldSieveContent(requires1, rules1);
 		OldSieveContent oldSieveContent2 = new OldSieveContent(requires2, rules2);
 
@@ -66,6 +64,9 @@ public class BeansTest {
 				.prefabValue(Optional.class,
 						Optional.of(oldSieveContent1),
 						Optional.of(oldSieveContent2))
+				.prefabValue(ImmutableList.class,
+						ImmutableList.of("red"),
+						ImmutableList.of("black"))
 				.equalsVerifiers(list)
 				.verify();
 	}

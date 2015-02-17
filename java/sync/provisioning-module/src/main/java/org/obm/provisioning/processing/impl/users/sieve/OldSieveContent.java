@@ -32,13 +32,14 @@ package org.obm.provisioning.processing.impl.users.sieve;
 import java.util.List;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 
 public class OldSieveContent {
 
-	private List<String> requires;
-	private List<String> userRules;
+	private final ImmutableList<String> requires;
+	private final ImmutableList<String> userRules;
 
-	public OldSieveContent(List<String> requires, List<String> userRules) {
+	public OldSieveContent(ImmutableList<String> requires, ImmutableList<String> userRules) {
 		this.requires = requires;
 		this.userRules = userRules;
 	}

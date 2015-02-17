@@ -38,7 +38,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public class SieveScriptUpdaterFactory {
 
-	private SieveClientFactory sieveClientFactory;
+	private final SieveClientFactory sieveClientFactory;
 
 	@Inject
 	public SieveScriptUpdaterFactory(SieveClientFactory sieveClientFactory) {

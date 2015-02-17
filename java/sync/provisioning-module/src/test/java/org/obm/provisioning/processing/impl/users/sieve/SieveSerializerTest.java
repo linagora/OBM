@@ -29,14 +29,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.users.sieve;
 
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class SieveSerializerTest {
 
@@ -114,7 +112,7 @@ public class SieveSerializerTest {
 
 	@Test
 	public void sieveSerializerShouldNotSerializeEmptyObmRules() {
-		List<ObmRule> empty = ImmutableList.of();
+		ImmutableList<ObmRule> empty = ImmutableList.of();
 		NewSieveContent sieveContent = new NewSieveContent(
 				new OldSieveContent(
 						ImmutableList.of("old_require1", "duplicate_require", "duplicate_require", "old_require2"),
@@ -133,7 +131,7 @@ public class SieveSerializerTest {
 
 	@Test
 	public void sieveSerializerShouldNotPrintRequireLineIfNoRequires() {
-		List<String> empty = ImmutableList.of();
+		ImmutableList<String> empty = ImmutableList.of();
 		NewSieveContent sieveContent = new NewSieveContent(
 				new OldSieveContent(
 						empty,

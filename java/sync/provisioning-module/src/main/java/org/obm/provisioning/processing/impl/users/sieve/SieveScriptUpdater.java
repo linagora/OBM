@@ -42,9 +42,9 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public class SieveScriptUpdater {
 
-	private ObmUser obmUser;
-	private SieveClient sieveClient;
-	private SieveBuilder sieveBuilder;
+	private final ObmUser obmUser;
+	private final SieveClient sieveClient;
+	private final SieveBuilder sieveBuilder;
 
 	public SieveScriptUpdater(ObmUser obmUser, SieveClient sieveClient, SieveBuilder sieveBuilder) {
 		this.obmUser = obmUser;
