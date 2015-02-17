@@ -233,6 +233,9 @@ public class SerializationUtils {
 			case NOMAD_EMAIL:
 				nomadBuilder.email(value.asText());
 				break;
+			case NOMAD_ALLOWED:
+				nomadBuilder.allowed(value.asBoolean());
+				break;
 			case DELEGATION:
 				toBuild.delegation(value.asText());
 				break;

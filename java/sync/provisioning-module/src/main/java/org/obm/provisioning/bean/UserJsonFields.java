@@ -43,7 +43,7 @@ public enum UserJsonFields {
 	DIRECTION("direction"), ADDRESSES("addresses"), TOWN("town"), ZIPCODE("zipcode"), BUSINESS_ZIPCODE("business_zipcode"),
 	COUNTRY("country"), PHONES("phones"), MOBILE("mobile"), FAXES("faxes"), MAIL_QUOTA("mail_quota"), MAIL_SERVER("mail_server"),
 	ARCHIVED("archived"), HIDDEN("hidden"), MAILS("mails"), EFFECTIVEMAILS("effectiveMails"),
-	NOMAD_ENABLED("nomad_enabled"), NOMAD_EMAIL("nomad_mail"),
+	NOMAD_ENABLED("nomad_enabled"), NOMAD_EMAIL("nomad_mail"), NOMAD_ALLOWED("nomad_allowed"),
 	TIMECREATE("timecreate"), TIMEUPDATE("timeupdate"), GROUPS("groups"), EXPIRATIONDATE("expiration_date"),
 	DELEGATION("delegation"), DELEGATIONTARGET("delegation_target"),
 	SAMBA_ALLOWED("samba_allowed"), SAMBA_HOME_DRIVE("samba_home_drive"), SAMBA_HOME_FOLDER("samba_home_folder"), SAMBA_LOGON_SCRIPT("samba_logon_script");

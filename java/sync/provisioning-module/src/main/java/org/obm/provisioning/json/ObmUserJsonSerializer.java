@@ -70,6 +70,7 @@ import static org.obm.provisioning.bean.UserJsonFields.TOWN;
 import static org.obm.provisioning.bean.UserJsonFields.ZIPCODE;
 import static org.obm.provisioning.bean.UserJsonFields.NOMAD_ENABLED;
 import static org.obm.provisioning.bean.UserJsonFields.NOMAD_EMAIL;
+import static org.obm.provisioning.bean.UserJsonFields.NOMAD_ALLOWED;
 
 import java.io.IOException;
 import java.util.Set;
@@ -133,6 +134,7 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 
 		jgen.writeBooleanField(NOMAD_ENABLED.asSpecificationValue(), value.getNomad().isEnabled());
 		jgen.writeStringField(NOMAD_EMAIL.asSpecificationValue(), value.getNomad().getEmail());
+		jgen.writeBooleanField(NOMAD_ALLOWED.asSpecificationValue(), value.getNomad().isAllowed());
 
 		jgen.writeObjectField(TIMECREATE.asSpecificationValue(), value.getTimeCreate());
 		jgen.writeObjectField(TIMEUPDATE.asSpecificationValue(), value.getTimeUpdate());

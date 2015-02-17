@@ -407,6 +407,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"hidden\":true," +
 					"\"nomad_enabled\":true," +
 					"\"nomad_mail\":\"redirect@newdomain\"," +
+					"\"nomad_allowed\":true," +
 					"\"timecreate\":\"2013-06-11T14:00:00.000+0000\"," +
 					"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
 					"\"expiration_date\":\"2015-12-31T00:00:00.000+0000\"," +
@@ -453,6 +454,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"hidden\":true," +
 				"\"nomad_enabled\":true," +
 				"\"nomad_mail\":\"redirect@newdomain\"," +
+				"\"nomad_allowed\":true," +
 				"\"timecreate\":\"2013-06-11T14:00:00.000+0000\"," +
 				"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
 				"\"expiration_date\":\"2015-12-31T00:00:00.000+0000\"," +
@@ -506,6 +508,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"hidden\":true," +
 				"\"nomad_enabled\":true," +
 				"\"nomad_mail\":\"redirect@newdomain\"," +
+				"\"nomad_allowed\":true," +
 				"\"timecreate\":\"2013-06-11T14:00:00.000+0000\"," +
 				"\"timeupdate\":\"2013-06-11T15:00:00.000+0000\"," +
 				"\"expiration_date\":\"2015-12-31T00:00:00.000+0000\"," +
@@ -599,6 +602,7 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"hidden\":false," +
 					"\"nomad_enabled\":false," +
 					"\"nomad_mail\":null," +
+					"\"nomad_allowed\":false," +
 					"\"timecreate\":null," +
 					"\"timeupdate\":null," +
 					"\"expiration_date\":null," +
@@ -659,6 +663,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				.nomad(UserNomad.builder()
 						.enabled(true)
 						.email("redirect@newdomain")
+						.allowed(true)
 						.build())
 				.timeCreate(TIMECREATE)
 				.timeUpdate(TIMEUPDATE)
