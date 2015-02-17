@@ -427,4 +427,27 @@ public class ObmUserTest {
 		
 		assertThat(obmUser.getSambaHomeFolder()).isEqualTo(expectedSambaHomeFolder);
 	}
+	
+	@Test
+	public void sambaLogonScriptShouldBeNullWhenNotSet() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login(validLogin)
+				.domain(domain)
+				.build();
+
+		assertThat(obmUser.getSambaLogonScript()).isNull();
+	}
+
+	@Test
+	public void sambaLogonScriptShouldBeSetWhenBuilding() {
+		ObmUser obmUser = ObmUser.builder()
+				.uid(1)
+				.login(validLogin)
+				.domain(domain)
+				.sambaLogonScript("script")
+				.build();
+
+		assertThat(obmUser.getSambaLogonScript()).isEqualTo("script");
+	}
 }

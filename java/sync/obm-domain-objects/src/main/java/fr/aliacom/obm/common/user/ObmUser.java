@@ -93,6 +93,7 @@ public class ObmUser {
 		private boolean sambaAllowed;
 		private String sambaHomeDrive;
 		private String sambaHomeFolder;
+		private String sambaLogonScript;
 		
 		private final ImmutableSet.Builder<Group> groups;
 
@@ -130,7 +131,8 @@ public class ObmUser {
 					.delegationTarget(user.delegationTarget)
 					.sambaAllowed(user.sambaAllowed)
 					.sambaHomeDrive(user.sambaHomeDrive)
-					.sambaHomeFolder(user.sambaHomeFolder);
+					.sambaHomeFolder(user.sambaHomeFolder)
+					.sambaLogonScript(user.sambaLogonScript);
 		}
 
 		public Builder uid(Integer uid) {
@@ -271,6 +273,11 @@ public class ObmUser {
 			this.sambaHomeFolder = sambaHomeFolder;
 			return this;
 		}
+		
+		public Builder sambaLogonScript(String sambaLogonScript) {
+			this.sambaLogonScript = sambaLogonScript;
+			return this;
+		}
 
 		public ObmUser build() {
 			Preconditions.checkState(uid != null || extId != null);
@@ -299,7 +306,7 @@ public class ObmUser {
 					domain, publicFreeBusy, profileName,
 					archived, password, uidNumber, gidNumber, groups.build(), expirationDate,
 					nomad, delegation, delegationTarget,
-					sambaAllowed, sambaHomeDrive, sambaHomeFolder);
+					sambaAllowed, sambaHomeDrive, sambaHomeFolder, sambaLogonScript);
 		}
 		
 	}
@@ -343,6 +350,7 @@ public class ObmUser {
 	private final boolean sambaAllowed;
 	private final String sambaHomeDrive;
 	private final String sambaHomeFolder;
+	private final String sambaLogonScript;
 
 	private ObmUser(Integer uid, EntityId entityId, UserLogin login, UserExtId extId, boolean admin, UserIdentity identity,
 			boolean hidden, UserAddress address, UserPhones phones, UserWork work, UserEmails emails,
@@ -352,7 +360,7 @@ public class ObmUser {
 			boolean archived, UserPassword password, Integer uidNumber, Integer gidNumber, Set<Group> groups,  Date expirationDate,
 			UserNomad nomad,
 			String delegation, String delegationTarget,
-			boolean sambaAllowed, String sambaHomeDrive, String sambaHomeFolder) {
+			boolean sambaAllowed, String sambaHomeDrive, String sambaHomeFolder, String sambaLogonScript) {
 		this.uid = uid;
 		this.entityId = entityId;
 		this.login = login;
@@ -384,6 +392,7 @@ public class ObmUser {
 		this.sambaAllowed = sambaAllowed;
 		this.sambaHomeDrive = sambaHomeDrive;
 		this.sambaHomeFolder = sambaHomeFolder;
+		this.sambaLogonScript = sambaLogonScript;
 	}
 
 	public int getUid() {
@@ -635,6 +644,10 @@ public class ObmUser {
 		return sambaHomeFolder;
 	}
 	
+	public String getSambaLogonScript() {
+		return sambaLogonScript;
+	}
+	
 	@Override
 	public final int hashCode() {
 		return Objects.hashCode(uid, entityId, login, extId, admin, identity, emails,
@@ -642,7 +655,7 @@ public class ObmUser {
 				description, createdBy, updatedBy, domain, publicFreeBusy, profileName,
 				archived, password, nomad, uidNumber, gidNumber, groups, expirationDate,
 				delegation, delegationTarget,
-				sambaAllowed, sambaHomeDrive, sambaHomeFolder);
+				sambaAllowed, sambaHomeDrive, sambaHomeFolder, sambaLogonScript);
 	}
 	
 	@Override
@@ -677,7 +690,8 @@ public class ObmUser {
 				&& Objects.equal(this.delegationTarget, that.delegationTarget)
 				&& Objects.equal(this.sambaAllowed, that.sambaAllowed)
 				&& Objects.equal(this.sambaHomeDrive, that.sambaHomeDrive)
-				&& Objects.equal(this.sambaHomeFolder, that.sambaHomeFolder);
+				&& Objects.equal(this.sambaHomeFolder, that.sambaHomeFolder)
+				&& Objects.equal(this.sambaLogonScript, that.sambaLogonScript);
 		}
 		return false;
 	}
@@ -715,6 +729,7 @@ public class ObmUser {
 			.add("sambaAllowed", sambaAllowed)
 			.add("sambaHomeDrive", sambaHomeDrive)
 			.add("sambaHomeFolder", sambaHomeFolder)
+			.add("sambaLogonScript", sambaLogonScript)
 			.toString();
 	}
 
