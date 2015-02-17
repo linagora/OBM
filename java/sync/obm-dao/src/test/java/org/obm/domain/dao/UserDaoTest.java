@@ -368,6 +368,7 @@ public class UserDaoTest {
 		expect(rs.getBoolean("userobm_samba_perms")).andReturn(true);
 		expect(rs.getString("userobm_samba_home_drive")).andReturn("ab");
 		expect(rs.getString("userobm_samba_home")).andReturn("myfolder");
+		expect(rs.getString("userobm_samba_logon_script")).andReturn("script");
 		expect(rs.getInt("userobm_nomade_enable")).andReturn(0);
 		expect(rs.getString("userobm_email_nomade")).andReturn("nomad_email");
 		
@@ -412,6 +413,7 @@ public class UserDaoTest {
 			.sambaAllowed(true)
 			.sambaHomeDrive("ab")
 			.sambaHomeFolder("myfolder")
+			.sambaLogonScript("script")
 			.build();
 		
 		assertThat(obmUser).isEqualToComparingFieldByField(expectedObmUser);
