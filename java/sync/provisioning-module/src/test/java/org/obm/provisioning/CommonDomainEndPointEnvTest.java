@@ -416,7 +416,8 @@ public abstract class CommonDomainEndPointEnvTest {
 						"[]," +
 					"\"samba_allowed\":true," +
 					"\"samba_home_drive\":\"ab\"," +
-					"\"samba_home_folder\":\"\\\\\\\\myfolder\\\\folder\\\\profile\\\\\"" +
+					"\"samba_home_folder\":\"\\\\\\\\myfolder\\\\folder\\\\profile\\\\\"," +
+					"\"samba_logon_script\":\"script\""+
 				"}";
 	}
 	
@@ -468,7 +469,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"]," +
 				"\"samba_allowed\":true," +
 				"\"samba_home_drive\":\"ab\"," +
-				"\"samba_home_folder\":\"\\\\\\\\myfolder\\\\folder\\\\profile\\\\\"" +
+				"\"samba_home_folder\":\"\\\\\\\\myfolder\\\\folder\\\\profile\\\\\"," +
+				"\"samba_logon_script\":\"script\""+
 			"}";
 	}
 	
@@ -520,7 +522,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"]," +
 				"\"samba_allowed\":true," +
 				"\"samba_home_drive\":\"ab\"," +
-				"\"samba_home_folder\":\"\\\\myfolder\\folder\\profile\\\"" +
+				"\"samba_home_folder\":\"\\\\myfolder\\folder\\profile\\\"," +
+				"\"samba_logon_script\":\"script\""+
 			"}";
 	}
 
@@ -604,7 +607,8 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"groups\":[]," +
 					"\"samba_allowed\":false," +
 					"\"samba_home_drive\":null," +
-					"\"samba_home_folder\":null" +
+					"\"samba_home_folder\":null," +
+					"\"samba_logon_script\":null"+
 				"}";
 	}
 
@@ -665,6 +669,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				.sambaAllowed(true)
 				.sambaHomeDrive("ab")
 				.sambaHomeFolder("\\\\\\\\myfolder\\\\folder\\\\profile\\\\")
+				.sambaLogonScript("script")
 				.build();
 	}
 	

@@ -248,6 +248,9 @@ public class SerializationUtils {
 			case SAMBA_HOME_FOLDER:
 				toBuild.sambaHomeFolder(toStringWithoutDoubleQuotes(jsonNode.get(SAMBA_HOME_FOLDER.asSpecificationValue())));
 				break;
+			case SAMBA_LOGON_SCRIPT:
+				toBuild.sambaLogonScript(value.asText());
+				break;
 		}
 	}
 	
