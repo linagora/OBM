@@ -635,6 +635,11 @@ org.eclipse.jdt.core.compiler.source=1.7
 				<artifactId>guice-servlet</artifactId>
 				<version>${guice.version}</version>
  	  		</dependency>
+	                <dependency>
+				<groupId>com.github.jnr</groupId>
+	                        <artifactId>jnr-netdb</artifactId>
+				<version>1.1.4</version>
+	                </dependency>
 			<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>

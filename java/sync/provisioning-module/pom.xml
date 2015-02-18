@@ -90,6 +90,10 @@
 			<artifactId>guice-servlet</artifactId>
 		</dependency>
 		<dependency>
+                        <groupId>com.github.jnr</groupId>
+                        <artifactId>jnr-netdb</artifactId>
+                </dependency>
+		<dependency>
 			<groupId>com.jayway.restassured</groupId>
 			<artifactId>rest-assured</artifactId>
 		</dependency>
