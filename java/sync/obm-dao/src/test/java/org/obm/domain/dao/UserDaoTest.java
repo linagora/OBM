@@ -372,6 +372,7 @@ public class UserDaoTest {
 		expect(rs.getInt("userobm_nomade_enable")).andReturn(0);
 		expect(rs.getString("userobm_email_nomade")).andReturn("nomad_email");
 		expect(rs.getInt("userobm_nomade_perms")).andReturn(0);
+		expect(rs.getInt("userobm_nomade_local_copy")).andReturn(0);
 
 		mocksControl.replay();
 		ObmUser obmUser = userDao.createUserFromResultSetAndFetchCreators(domain, rs);

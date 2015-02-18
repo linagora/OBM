@@ -96,6 +96,7 @@ public class UserDaoJdbcImpl implements UserDao {
 	private static final int HIDDEN_TRUE = 1;
 	private static final int NOMAD_ENABLED = 1;
 	private static final int NOMAD_ALLOWED = 1;
+	private static final int NOMAD_LOCAL_COPY = 1;
 
 	private static final String USER_FIELDS = 
 			"userobm_id, " +
@@ -142,6 +143,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			"userobm_nomade_enable, " +
 			"userobm_email_nomade, " +
 			"userobm_nomade_perms, " +
+			"userobm_nomade_local_copy, " +
 			"defpref.userobmpref_value AS defpref_userobmpref_value, " +
 			"userpref.userobmpref_value AS userpref_userobmpref_value, " +
 			"userentity_entity_id, " +
@@ -382,6 +384,7 @@ public class UserDaoJdbcImpl implements UserDao {
 							.enabled(rs.getInt("userobm_nomade_enable") == NOMAD_ENABLED)
 							.email(rs.getString("userobm_email_nomade"))
 							.allowed(rs.getInt("userobm_nomade_perms") == NOMAD_ALLOWED)
+							.localCopy(rs.getInt("userobm_nomade_local_copy") == NOMAD_LOCAL_COPY)
 							.build())
 					.emails(UserEmails.builder()
 						.quota(quotaToNullable(quota))
@@ -635,6 +638,7 @@ public class UserDaoJdbcImpl implements UserDao {
 				"userobm_nomade_enable, " +
 				"userobm_email_nomade, " +
 				"userobm_nomade_perms, " +
+				"userobm_nomade_local_copy, " +
 				"userobm_delegation, " +
 				"userobm_delegation_target, " +
 				"userobm_samba_perms, " +
@@ -646,7 +650,7 @@ public class UserDaoJdbcImpl implements UserDao {
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-					"?, ?, ?, ?, ?" +
+					"?, ?, ?, ?, ?, ?" +
 				")";
 
 		try (Connection conn = obmHelper.getConnection();
@@ -734,6 +738,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			ps.setInt(idx++, user.getNomad().isEnabled() ? 1 : 0);
 			ps.setString(idx++, user.getNomad().getEmail());
 			ps.setInt(idx++, user.getNomad().isAllowed() ? 1 : 0);
+			ps.setInt(idx++, user.getNomad().hasLocalCopy() ? 1 : 0);
 
 			ps.setString(idx++, user.getDelegation());
 			ps.setString(idx++, user.getDelegationTarget());
@@ -823,6 +828,7 @@ public class UserDaoJdbcImpl implements UserDao {
                     "userobm_nomade_enable = ?," +
                     "userobm_email_nomade = ?, " +
                     "userobm_nomade_perms = ?, " +
+                    "userobm_nomade_local_copy = ?, " +
                     "userobm_delegation = ?, " +
                     "userobm_delegation_target = ?, " +
                     "userobm_samba_perms = ?, " +
@@ -899,6 +905,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			ps.setInt(idx++, user.getNomad().isEnabled() ? 1 : 0);
 			ps.setString(idx++, user.getNomad().getEmail());
 			ps.setInt(idx++, user.getNomad().isAllowed() ? 1 : 0);
+			ps.setInt(idx++, user.getNomad().hasLocalCopy() ? 1 : 0);
 
 			ps.setString(idx++, user.getDelegation());
 			ps.setString(idx++, user.getDelegationTarget());

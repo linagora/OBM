@@ -41,6 +41,7 @@ public class UserNomad {
 		private Boolean enabled;
 		private String email;
 		private Boolean allowed;
+		private Boolean localCopy;
 
 		private Builder() {}
 
@@ -59,10 +60,16 @@ public class UserNomad {
 			return this;
 		}
 
+		public Builder localCopy(boolean localCopy) {
+			this.localCopy = localCopy;
+			return this;
+		}
+
 		public Builder from(UserNomad userNomad) {
 			this.enabled = userNomad.enabled;
 			this.email = userNomad.email;
 			this.allowed = userNomad.allowed;
+			this.localCopy = userNomad.localCopy;
 			return this;
 		}
 
@@ -70,9 +77,10 @@ public class UserNomad {
 			this.enabled = Objects.firstNonNull(this.enabled, false);
 			this.email = Strings.emptyToNull(email);
 			this.allowed = Objects.firstNonNull(this.allowed, false);
+			this.localCopy = Objects.firstNonNull(this.localCopy, false);
 			// In theory, should ensure that enable is only on if email is not null, but who knows what crap we'll find in the database?
 			// This may prevent us from loading existing users
-			return new UserNomad(enabled, email, allowed);
+			return new UserNomad(enabled, email, allowed, localCopy);
 		}
 
 	}
@@ -88,11 +96,13 @@ public class UserNomad {
 	private final boolean enabled;
 	private final String email;
 	private final boolean allowed;
+	private final boolean localCopy;
 
-	private UserNomad(boolean enabled, String email, boolean allowed) {
+	private UserNomad(boolean enabled, String email, boolean allowed, boolean localCopy) {
 		this.enabled = enabled;
 		this.email = email;
 		this.allowed = allowed;
+		this.localCopy = localCopy;
 	}
 
 	public boolean isEnabled() {
@@ -107,9 +117,13 @@ public class UserNomad {
 		return allowed;
 	}
 
+	public boolean hasLocalCopy() {
+		return localCopy;
+	}
+
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(enabled, email, allowed);
+		return Objects.hashCode(enabled, email, allowed, localCopy);
 	}
 
 	@Override
@@ -118,7 +132,8 @@ public class UserNomad {
 			UserNomad that = (UserNomad) object;
 			return Objects.equal(this.enabled, that.enabled)
 					&& Objects.equal(this.email, that.email)
-					&& Objects.equal(this.allowed, that.allowed);
+					&& Objects.equal(this.allowed, that.allowed)
+					&& Objects.equal(this.localCopy, that.localCopy);
 		}
 		return false;
 	}
@@ -129,6 +144,7 @@ public class UserNomad {
 				.add("allowed", enabled)
 				.add("email", email)
 				.add("allowed", allowed)
+				.add("localCopy", localCopy)
 				.toString();
 	}
 
