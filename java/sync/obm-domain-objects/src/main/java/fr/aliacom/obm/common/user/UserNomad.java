@@ -141,7 +141,7 @@ public class UserNomad {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)
-				.add("allowed", enabled)
+				.add("enabled", enabled)
 				.add("email", email)
 				.add("allowed", allowed)
 				.add("localCopy", localCopy)
