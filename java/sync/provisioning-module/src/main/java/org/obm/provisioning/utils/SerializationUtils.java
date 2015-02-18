@@ -236,6 +236,9 @@ public class SerializationUtils {
 			case NOMAD_ALLOWED:
 				nomadBuilder.allowed(value.asBoolean());
 				break;
+			case NOMAD_LOCAL_COPY:
+				nomadBuilder.localCopy(value.asBoolean());
+				break;
 			case DELEGATION:
 				toBuild.delegation(value.asText());
 				break;
