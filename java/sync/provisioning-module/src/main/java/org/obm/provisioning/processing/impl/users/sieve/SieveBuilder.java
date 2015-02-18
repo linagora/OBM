@@ -66,6 +66,10 @@ public class SieveBuilder {
 		Optional<ObmRule> maybeRedirectRule = this.emailRedirectRule();
 		if (maybeRedirectRule.isPresent()) {
 			rulesBuilder.add(maybeRedirectRule.get());
+			Optional<ObmRule> maybeKeepRule = this.keepRule();
+			if (maybeKeepRule.isPresent()) {
+				rulesBuilder.add(maybeKeepRule.get());
+			}
 		}
 		return rulesBuilder.build();
 	}
@@ -83,6 +87,17 @@ public class SieveBuilder {
 					"The user {} has nomad enabled but no redirection email configured, the redirection rule will not be applied",
 					obmUser);
 			maybeRule = Optional.absent();
+		}
+		else {
+			maybeRule = Optional.absent();
+		}
+		return maybeRule;
+	}
+	
+	private Optional<ObmRule> keepRule() {
+		Optional<ObmRule> maybeRule;
+		if (obmUser.getNomad().isEnabled() && obmUser.getNomad().hasLocalCopy()) {
+			maybeRule = Optional.of(new ObmRule("Nomade_keep", ImmutableList.of("keep;")));
 		}
 		else {
 			maybeRule = Optional.absent();

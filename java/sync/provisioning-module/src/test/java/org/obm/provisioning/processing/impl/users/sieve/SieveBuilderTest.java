@@ -43,14 +43,16 @@ public class SieveBuilderTest {
 
 	@Test
 	public void sieveBuilderShouldUpdateOldContentWithRedirectRule() {
-		ObmUser user = ObmUser.builder()
+		ObmUser user = ObmUser
+				.builder()
 				.uid(1)
 				.login(UserLogin.valueOf("scipio.africanus"))
 				.domain(ObmDomain.builder().name("rome.it").build())
-				.nomad(UserNomad.builder().enabled(true).email("scipio.africanus@carthage.tn").build())
+				.nomad(UserNomad.builder().enabled(true).email("scipio.africanus@carthage.tn")
+						.build())
 				.build();
 		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
-		String expected = Joiner.on('\n').join(new String[]{
+		String expected = Joiner.on('\n').join(new String[] {
 				"require [\"foo\"];",
 				"old rule;",
 				"# rule:[OBM Nomade]",
@@ -68,7 +70,7 @@ public class SieveBuilderTest {
 				.nomad(UserNomad.builder().enabled(true).build())
 				.build();
 		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
-		String expected = Joiner.on('\n').join(new String[]{
+		String expected = Joiner.on('\n').join(new String[] {
 				"require [\"foo\"];",
 				"old rule;\n",
 		});
@@ -77,14 +79,36 @@ public class SieveBuilderTest {
 
 	@Test
 	public void sieveBuilderShouldUpdateOldContentWithNomadDisabled() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login(UserLogin.valueOf("scipio.africanus"))
+				.domain(ObmDomain.builder().name("rome.it").build())
+				.nomad(UserNomad.builder().enabled(false).email("scipio.africanus@carthage.tn")
+						.build())
+				.build();
+		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
+		String expected = Joiner.on('\n').join(new String[] {
+				"require [\"foo\"];",
+				"old rule;\n",
+		});
+		assertThat(new SieveBuilder(user).buildFromOldContent(oldContent)).isEqualTo(expected);
+	}
+
+	@Test
+	public void sieveBuilderShouldUpdateOldContentWithNomadDisabledAlsoWithKeepRule() {
 		ObmUser user = ObmUser.builder()
 				.uid(1)
 				.login(UserLogin.valueOf("scipio.africanus"))
 				.domain(ObmDomain.builder().name("rome.it").build())
-				.nomad(UserNomad.builder().enabled(false).email("scipio.africanus@carthage.tn").build())
+				.nomad(UserNomad.builder()
+						.enabled(false)
+						.email("scipio.africanus@carthage.tn")
+						.localCopy(true)
+						.build())
 				.build();
 		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
-		String expected = Joiner.on('\n').join(new String[]{
+		String expected = Joiner.on('\n').join(new String[] {
 				"require [\"foo\"];",
 				"old rule;\n",
 		});
@@ -93,16 +117,96 @@ public class SieveBuilderTest {
 
 	@Test
 	public void sieveBuilderShouldBuildNewContentWithRedirectRule() {
+		ObmUser user = ObmUser
+				.builder()
+				.uid(1)
+				.login(UserLogin.valueOf("scipio.africanus"))
+				.domain(ObmDomain.builder().name("rome.it").build())
+				.nomad(UserNomad.builder().enabled(true).email("scipio.africanus@carthage.tn")
+						.build())
+				.build();
+		String expected = Joiner.on('\n').join(new String[] {
+				"# rule:[OBM Nomade]",
+				"redirect \"scipio.africanus@carthage.tn\";\n"
+		});
+		assertThat(new SieveBuilder(user).build()).isEqualTo(expected);
+	}
+
+	@Test
+	public void sieveBuilderShouldBuildNewContentWithKeepRule() {
 		ObmUser user = ObmUser.builder()
 				.uid(1)
 				.login(UserLogin.valueOf("scipio.africanus"))
 				.domain(ObmDomain.builder().name("rome.it").build())
-				.nomad(UserNomad.builder().enabled(true).email("scipio.africanus@carthage.tn").build())
+				.nomad(UserNomad.builder()
+						.enabled(true)
+						.email("scipio.africanus@carthage.tn")
+						.localCopy(true)
+						.build())
 				.build();
-		String expected = Joiner.on('\n').join(new String[]{
+		String expected = Joiner.on('\n').join(new String[] {
 				"# rule:[OBM Nomade]",
-				"redirect \"scipio.africanus@carthage.tn\";\n"
+				"redirect \"scipio.africanus@carthage.tn\";",
+				"# rule:[OBM Nomade_keep]",
+				"keep;\n"
 		});
+		assertThat(new SieveBuilder(user).build()).isEqualTo(expected);
+	}
+
+	@Test
+	public void sieveBuilderShouldUpdateOldContentWithKeepRuleIfRedirectPresent() {
+		ObmUser user = ObmUser.builder()
+				.uid(1)
+				.login(UserLogin.valueOf("scipio.africanus"))
+				.domain(ObmDomain.builder().name("rome.it").build())
+				.nomad(UserNomad.builder()
+						.enabled(true)
+						.email("scipio.africanus@carthage.tn")
+						.localCopy(true)
+						.build())
+				.build();
+		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
+		String expected = Joiner.on('\n').join(new String[] {
+				"require [\"foo\"];",
+				"old rule;",
+				"# rule:[OBM Nomade]",
+				"redirect \"scipio.africanus@carthage.tn\";",
+				"# rule:[OBM Nomade_keep]",
+				"keep;\n"
+		});
+		assertThat(new SieveBuilder(user).buildFromOldContent(oldContent)).isEqualTo(expected);
+	}
+
+	@Test
+	public void sieveBuilderShouldNotAddRuleToOldContentIfEmailAddressIsMissing() {
+		ObmUser user = ObmUser.builder()
+				.uid(1)
+				.login(UserLogin.valueOf("scipio.africanus"))
+				.domain(ObmDomain.builder().name("rome.it").build())
+				.nomad(UserNomad.builder()
+						.enabled(true)
+						.localCopy(true)
+						.build())
+				.build();
+		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
+		String expected = Joiner.on('\n').join(new String[] {
+				"require [\"foo\"];",
+				"old rule;\n" });
+		assertThat(new SieveBuilder(user).buildFromOldContent(oldContent)).isEqualTo(expected);
+	}
+
+	@Test
+	public void sieveBuilderShouldNotAddRuleToNewContentIfEmailAddressIsMissing() {
+		ObmUser user = ObmUser.builder()
+				.uid(1)
+				.login(UserLogin.valueOf("scipio.africanus"))
+				.domain(ObmDomain.builder().name("rome.it").build())
+				.nomad(UserNomad.builder()
+						.enabled(true)
+						.localCopy(true)
+						.build())
+				.build();
+		String expected = "";
 		assertThat(new SieveBuilder(user).build()).isEqualTo(expected);
 	}
 }
