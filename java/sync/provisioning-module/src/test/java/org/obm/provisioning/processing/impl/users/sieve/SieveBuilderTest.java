@@ -51,12 +51,12 @@ public class SieveBuilderTest {
 				.nomad(UserNomad.builder().enabled(true).email("scipio.africanus@carthage.tn")
 						.build())
 				.build();
-		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
-		String expected = Joiner.on('\n').join(new String[] {
+		String oldContent = "require \"foo\";\r\nold rule;";
+		String expected = Joiner.on("\r\n").join(new String[] {
 				"require [\"foo\"];",
 				"old rule;",
 				"# rule:[OBM Nomade]",
-				"redirect \"scipio.africanus@carthage.tn\";\n"
+				"redirect \"scipio.africanus@carthage.tn\";\r\n"
 		});
 		assertThat(new SieveBuilder(user).buildFromOldContent(oldContent)).isEqualTo(expected);
 	}
@@ -69,10 +69,10 @@ public class SieveBuilderTest {
 				.domain(ObmDomain.builder().name("rome.it").build())
 				.nomad(UserNomad.builder().enabled(true).build())
 				.build();
-		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
-		String expected = Joiner.on('\n').join(new String[] {
+		String oldContent = "require \"foo\";\r\nold rule;";
+		String expected = Joiner.on("\r\n").join(new String[] {
 				"require [\"foo\"];",
-				"old rule;\n",
+				"old rule;\r\n",
 		});
 		assertThat(new SieveBuilder(user).buildFromOldContent(oldContent)).isEqualTo(expected);
 	}
@@ -87,10 +87,10 @@ public class SieveBuilderTest {
 				.nomad(UserNomad.builder().enabled(false).email("scipio.africanus@carthage.tn")
 						.build())
 				.build();
-		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
-		String expected = Joiner.on('\n').join(new String[] {
+		String oldContent = "require \"foo\";\r\nold rule;";
+		String expected = Joiner.on("\r\n").join(new String[] {
 				"require [\"foo\"];",
-				"old rule;\n",
+				"old rule;\r\n",
 		});
 		assertThat(new SieveBuilder(user).buildFromOldContent(oldContent)).isEqualTo(expected);
 	}
@@ -107,10 +107,10 @@ public class SieveBuilderTest {
 						.localCopy(true)
 						.build())
 				.build();
-		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
-		String expected = Joiner.on('\n').join(new String[] {
+		String oldContent = "require \"foo\";\r\nold rule;";
+		String expected = Joiner.on("\r\n").join(new String[] {
 				"require [\"foo\"];",
-				"old rule;\n",
+				"old rule;\r\n",
 		});
 		assertThat(new SieveBuilder(user).buildFromOldContent(oldContent)).isEqualTo(expected);
 	}
@@ -125,9 +125,9 @@ public class SieveBuilderTest {
 				.nomad(UserNomad.builder().enabled(true).email("scipio.africanus@carthage.tn")
 						.build())
 				.build();
-		String expected = Joiner.on('\n').join(new String[] {
+		String expected = Joiner.on("\r\n").join(new String[] {
 				"# rule:[OBM Nomade]",
-				"redirect \"scipio.africanus@carthage.tn\";\n"
+				"redirect \"scipio.africanus@carthage.tn\";\r\n"
 		});
 		assertThat(new SieveBuilder(user).build()).isEqualTo(expected);
 	}
@@ -144,11 +144,11 @@ public class SieveBuilderTest {
 						.localCopy(true)
 						.build())
 				.build();
-		String expected = Joiner.on('\n').join(new String[] {
+		String expected = Joiner.on("\r\n").join(new String[] {
 				"# rule:[OBM Nomade]",
 				"redirect \"scipio.africanus@carthage.tn\";",
 				"# rule:[OBM Nomade_keep]",
-				"keep;\n"
+				"keep;\r\n"
 		});
 		assertThat(new SieveBuilder(user).build()).isEqualTo(expected);
 	}
@@ -165,14 +165,14 @@ public class SieveBuilderTest {
 						.localCopy(true)
 						.build())
 				.build();
-		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
-		String expected = Joiner.on('\n').join(new String[] {
+		String oldContent = "require \"foo\";\r\nold rule;";
+		String expected = Joiner.on("\r\n").join(new String[] {
 				"require [\"foo\"];",
 				"old rule;",
 				"# rule:[OBM Nomade]",
 				"redirect \"scipio.africanus@carthage.tn\";",
 				"# rule:[OBM Nomade_keep]",
-				"keep;\n"
+				"keep;\r\n"
 		});
 		assertThat(new SieveBuilder(user).buildFromOldContent(oldContent)).isEqualTo(expected);
 	}
@@ -188,10 +188,10 @@ public class SieveBuilderTest {
 						.localCopy(true)
 						.build())
 				.build();
-		String oldContent = "{666}\nrequire \"foo\";\nold rule;";
-		String expected = Joiner.on('\n').join(new String[] {
+		String oldContent = "require \"foo\";\r\nold rule;";
+		String expected = Joiner.on("\r\n").join(new String[] {
 				"require [\"foo\"];",
-				"old rule;\n" });
+				"old rule;\r\n" });
 		assertThat(new SieveBuilder(user).buildFromOldContent(oldContent)).isEqualTo(expected);
 	}
 

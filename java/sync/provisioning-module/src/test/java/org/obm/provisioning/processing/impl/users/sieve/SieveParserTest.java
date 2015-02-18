@@ -40,7 +40,7 @@ public class SieveParserTest {
 
 	@Test
 	public void sieveParserShouldParse() {
-		String content = Joiner.on('\n').join(new String[] {
+		String content = Joiner.on("\r\n").join(new String[] {
 				"require [\"require1\", \"require2\"];",
 				"rule1;",
 				"rule2;",
@@ -54,7 +54,7 @@ public class SieveParserTest {
 
 	@Test
 	public void sieveParserShouldEatObmRules() {
-		String content = Joiner.on('\n').join(new String[] {
+		String content = Joiner.on("\r\n").join(new String[] {
 				"require [\"require1\", \"require2\"];",
 				"rule1;",
 				"rule2;",
@@ -73,7 +73,7 @@ public class SieveParserTest {
 
 	@Test
 	public void sieveParserShouldParseSingleRequire() {
-		String content = Joiner.on('\n').join(new String[] {
+		String content = Joiner.on("\r\n").join(new String[] {
 				"require \"require1\";",
 				"rule1;",
 				"rule2;",
@@ -87,7 +87,7 @@ public class SieveParserTest {
 
 	@Test
 	public void sieveParserShouldParseWhenNoRequire() {
-		String content = Joiner.on('\n').join(new String[] {
+		String content = Joiner.on("\r\n").join(new String[] {
 				"rule1;",
 				"rule2;",
 				"rule3;"

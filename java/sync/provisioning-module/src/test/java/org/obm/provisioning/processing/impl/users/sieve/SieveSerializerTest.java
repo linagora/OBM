@@ -59,7 +59,7 @@ public class SieveSerializerTest {
 						)
 				);
 		String expectedContent = Joiner
-				.on('\n')
+				.on("\r\n")
 				.join(new String[] {
 						"require [\"new_require1\", \"new_require2\", \"new_require3\", \"new_require4\", \"old_and_new_require\", \"old_require1\", \"old_require2\"];",
 						"old_rule1;",
@@ -72,7 +72,7 @@ public class SieveSerializerTest {
 						"rule2_line2;",
 						"# rule:[OBM second_rule_with_requires]",
 						"rule3_line1;",
-						"rule3_line2;\n",
+						"rule3_line2;\r\n",
 				});
 		assertThat(new SieveSerializer(sieveContent).serialize()).isEqualTo(expectedContent);
 	}
@@ -94,7 +94,7 @@ public class SieveSerializerTest {
 						)
 				);
 		String expectedContent = Joiner
-				.on('\n')
+				.on("\r\n")
 				.join(new String[] {
 						"require [\"duplicate_require\", \"new_require1\", \"new_require2\", \"new_require3\", \"new_require4\"];",
 						"# rule:[OBM first_rule_with_requires]",
@@ -105,7 +105,7 @@ public class SieveSerializerTest {
 						"rule2_line2;",
 						"# rule:[OBM second_rule_with_requires]",
 						"rule3_line1;",
-						"rule3_line2;\n",
+						"rule3_line2;\r\n",
 				});
 		assertThat(new SieveSerializer(sieveContent).serialize()).isEqualTo(expectedContent);
 	}
@@ -120,11 +120,11 @@ public class SieveSerializerTest {
 				),
 				empty);
 		String expectedContent = Joiner
-				.on('\n')
+				.on("\r\n")
 				.join(new String[] {
 						"require [\"duplicate_require\", \"old_require1\", \"old_require2\"];",
 						"old_rule1;",
-						"old_rule2;\n",
+						"old_rule2;\r\n",
 				});
 		assertThat(new SieveSerializer(sieveContent).serialize()).isEqualTo(expectedContent);
 	}
@@ -147,7 +147,7 @@ public class SieveSerializerTest {
 						)
 				);
 		String expectedContent = Joiner
-				.on('\n')
+				.on("\r\n")
 				.join(new String[] {
 						"old_rule1;",
 						"old_rule2;",
@@ -159,7 +159,7 @@ public class SieveSerializerTest {
 						"rule2_line2;",
 						"# rule:[OBM third_rule]",
 						"rule3_line1;",
-						"rule3_line2;\n",
+						"rule3_line2;\r\n",
 				});
 		assertThat(new SieveSerializer(sieveContent).serialize()).isEqualTo(expectedContent);
 	}

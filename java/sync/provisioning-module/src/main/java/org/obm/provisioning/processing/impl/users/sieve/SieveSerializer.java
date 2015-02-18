@@ -31,6 +31,8 @@ package org.obm.provisioning.processing.impl.users.sieve;
 
 import java.util.Set;
 
+import org.obm.imap.sieve.SieveConstants;
+
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -92,6 +94,6 @@ public class SieveSerializer {
 	
 	private void addLine(String line) {
 		this.lines.append(line);
-		this.lines.append('\n');
+		this.lines.append(SieveConstants.SEP);
 	}
 }

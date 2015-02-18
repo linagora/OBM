@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.obm.imap.sieve.SieveConstants;
+
 import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -54,7 +56,7 @@ public class SieveParser {
 	}
 
 	public OldSieveContent parse() {
-		this.scriptLines = Splitter.on('\n').splitToList(scriptContent);
+		this.scriptLines = Splitter.on(SieveConstants.SEP).splitToList(scriptContent);
 		ImmutableList<String> requires = parseRequires();
 		this.stripOBMRules();
 		return new OldSieveContent(requires, ImmutableList.copyOf(scriptLines));
