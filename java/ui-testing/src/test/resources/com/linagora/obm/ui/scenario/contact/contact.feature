@@ -42,7 +42,7 @@ Feature: tests on contacts
     And address book "My Addressbook" is selected
     When user deletes contact "Contact2 Test"
     And user accepts confirmation popup
-    Then "Contact2 Test" is 0 times in "Mes contacts" address book
+    Then "Contact2 Test" is 0 times in "My Addressbook" address book
     And "Contact2 Test" is 1 times in "Archive" address book
 
    Scenario: cannot delete an existing contact in an address book I have no WRITE rights on
