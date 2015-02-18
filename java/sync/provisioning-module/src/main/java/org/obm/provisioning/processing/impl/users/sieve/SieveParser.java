@@ -55,17 +55,11 @@ public class SieveParser {
 
 	public OldSieveContent parse() {
 		this.scriptLines = Splitter.on('\n').splitToList(scriptContent);
-		this.stripID();
 		ImmutableList<String> requires = parseRequires();
 		this.stripOBMRules();
 		return new OldSieveContent(requires, ImmutableList.copyOf(scriptLines));
 	}
 
-	private void stripID() {
-		if (!this.scriptLines.isEmpty()) {
-			this.scriptLines = this.scriptLines.subList(1, this.scriptLines.size());
-		}
-	}
 	private ImmutableList<String> parseRequires() {
 		ImmutableList.Builder<String> requiresBuilder = ImmutableList.builder();
 		ImmutableList.Builder<String> scriptLinesWithoutRequiresBuilder = ImmutableList.builder();

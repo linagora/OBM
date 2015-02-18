@@ -41,7 +41,6 @@ public class SieveParserTest {
 	@Test
 	public void sieveParserShouldParse() {
 		String content = Joiner.on('\n').join(new String[] {
-				"{666}",
 				"require [\"require1\", \"require2\"];",
 				"rule1;",
 				"rule2;",
@@ -56,7 +55,6 @@ public class SieveParserTest {
 	@Test
 	public void sieveParserShouldEatObmRules() {
 		String content = Joiner.on('\n').join(new String[] {
-				"{666}",
 				"require [\"require1\", \"require2\"];",
 				"rule1;",
 				"rule2;",
@@ -76,7 +74,6 @@ public class SieveParserTest {
 	@Test
 	public void sieveParserShouldParseSingleRequire() {
 		String content = Joiner.on('\n').join(new String[] {
-				"{666}",
 				"require \"require1\";",
 				"rule1;",
 				"rule2;",
@@ -91,7 +88,6 @@ public class SieveParserTest {
 	@Test
 	public void sieveParserShouldParseWhenNoRequire() {
 		String content = Joiner.on('\n').join(new String[] {
-				"{666}",
 				"rule1;",
 				"rule2;",
 				"rule3;"
@@ -105,20 +101,11 @@ public class SieveParserTest {
 
 	@Test
 	public void sieveParserShouldParseWhenNoRules() {
-		String content = "{666}\nrequire \"require1\";";
+		String content = "require \"require1\";";
 		ImmutableList<String> empty = ImmutableList.of();
 		OldSieveContent expected = new OldSieveContent(
 				ImmutableList.of("require1"),
 				empty);
-		assertThat(new SieveParser(content).parse()).isEqualTo(expected);
-	}
-
-	@Test
-	public void sieveParserShouldParseWhenOnlyID() {
-		String content = "{666}";
-		ImmutableList<String> empty = ImmutableList.of();
-		OldSieveContent expected = new OldSieveContent(
-				empty, empty);
 		assertThat(new SieveParser(content).parse()).isEqualTo(expected);
 	}
 }

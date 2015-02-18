@@ -27,54 +27,8 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.imap.sieve.commands;
+package org.obm.imap.sieve;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.obm.imap.sieve.SieveArg;
-import org.obm.imap.sieve.SieveCommand;
-import org.obm.imap.sieve.SieveConstants;
-import org.obm.imap.sieve.SieveResponse;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.FluentIterable;
-
-public class SieveGetScript extends SieveCommand<String> {
-
-	private String scriptName;
-
-	public SieveGetScript(String scriptName) {
-		retVal = null;
-		this.scriptName = scriptName;
-	}
-
-	@Override
-	protected List<SieveArg> buildCommand() {
-		List<SieveArg> args = new ArrayList<SieveArg>(1);
-		args.add(new SieveArg(String.format("GETSCRIPT \"%s\"", scriptName).getBytes(Charsets.UTF_8), false));
-		return args;
-	}
-
-	@Override
-	public void responseReceived(List<SieveResponse> rs) {
-		if (commandSucceeded(rs)) {
-			String data = rs.get(0).getData();
-			Iterable<String> splitData = Splitter.on(SieveConstants.SEP).split(data);
-			FluentIterable<String> splitDataNoByteCount = FluentIterable.from(splitData).skip(1);
-			FluentIterable<String> splitDataNoByteCountAndNoReturnCode = splitDataNoByteCount.limit(splitDataNoByteCount.size() -1);
-			if (!splitDataNoByteCountAndNoReturnCode.isEmpty()) {
-				this.retVal = Joiner.on(SieveConstants.SEP).join(splitDataNoByteCountAndNoReturnCode) + "\r\n";
-			}
-			else {
-				throw new RuntimeException("Couldn't parse sieve response");
-			}
-		} else {
-			reportErrors(rs);
-		}
-		logger.info("returning a sieve script");
-	}
-
+public final class SieveConstants {
+	public static String SEP = "\r\n";
 }
