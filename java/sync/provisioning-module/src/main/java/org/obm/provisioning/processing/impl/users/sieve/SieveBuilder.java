@@ -44,8 +44,7 @@ public class SieveBuilder {
 
 	private static final Logger logger = LoggerFactory.getLogger(SieveBuilder.class);
 	private static final String NOMAD_RULE = "Nomade";
-	private static final String NOMAD_KEEP_RULE = "Nomade_keep";
-	private static final String[] KNOWN_RULES = { NOMAD_RULE, NOMAD_KEEP_RULE };
+	private static final String[] KNOWN_RULES = { NOMAD_RULE };
 
 	public SieveBuilder(ObmUser obmUser) {
 		this.obmUser = obmUser;
@@ -78,10 +77,6 @@ public class SieveBuilder {
 		Optional<ObmRule> maybeRedirectRule = this.emailRedirectRule();
 		if (maybeRedirectRule.isPresent()) {
 			rulesBuilder.add(maybeRedirectRule.get());
-			Optional<ObmRule> maybeKeepRule = this.keepRule();
-			if (maybeKeepRule.isPresent()) {
-				rulesBuilder.add(maybeKeepRule.get());
-			}
 		}
 		return rulesBuilder.build();
 	}
@@ -89,9 +84,13 @@ public class SieveBuilder {
 	private Optional<ObmRule> emailRedirectRule() {
 		Optional<ObmRule> maybeRule;
 		if (obmUser.getNomad().isEnabled() && !Strings.isNullOrEmpty(obmUser.getNomad().getEmail())) {
-			maybeRule = Optional.of(new ObmRule(NOMAD_RULE,
-					ImmutableList.of(String
-							.format("redirect \"%s\";", obmUser.getNomad().getEmail()))));
+			ImmutableList.Builder<String> rulesBuilder = ImmutableList.builder();
+			rulesBuilder.add(String
+							.format("redirect \"%s\";", obmUser.getNomad().getEmail()));
+			if (obmUser.getNomad().hasLocalCopy()) {
+				rulesBuilder.add("keep;");
+			}
+			maybeRule = Optional.of(new ObmRule(NOMAD_RULE, rulesBuilder.build()));
 		}
 		else if (obmUser.getNomad().isEnabled()
 				&& Strings.isNullOrEmpty(obmUser.getNomad().getEmail())) {
@@ -99,17 +98,6 @@ public class SieveBuilder {
 					"The user {} has nomad enabled but no redirection email configured, the redirection rule will not be applied",
 					obmUser);
 			maybeRule = Optional.absent();
-		}
-		else {
-			maybeRule = Optional.absent();
-		}
-		return maybeRule;
-	}
-	
-	private Optional<ObmRule> keepRule() {
-		Optional<ObmRule> maybeRule;
-		if (obmUser.getNomad().isEnabled() && obmUser.getNomad().hasLocalCopy()) {
-			maybeRule = Optional.of(new ObmRule(NOMAD_KEEP_RULE, ImmutableList.of("keep;")));
 		}
 		else {
 			maybeRule = Optional.absent();

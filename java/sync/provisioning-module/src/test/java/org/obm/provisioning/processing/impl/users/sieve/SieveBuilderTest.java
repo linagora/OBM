@@ -147,7 +147,6 @@ public class SieveBuilderTest {
 		String expected = Joiner.on("\r\n").join(new String[] {
 				"# rule:[OBM Nomade]",
 				"redirect \"scipio.africanus@carthage.tn\";",
-				"# rule:[OBM Nomade_keep]",
 				"keep;\r\n"
 		});
 		assertThat(new SieveBuilder(user).build()).isEqualTo(expected);
@@ -171,7 +170,6 @@ public class SieveBuilderTest {
 				"old rule;",
 				"# rule:[OBM Nomade]",
 				"redirect \"scipio.africanus@carthage.tn\";",
-				"# rule:[OBM Nomade_keep]",
 				"keep;\r\n"
 		});
 		assertThat(new SieveBuilder(user).buildFromOldContent(oldContent)).isEqualTo(expected);

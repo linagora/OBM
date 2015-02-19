@@ -63,8 +63,6 @@ public class SieveParserTest {
 				"obm rule 1;",
 				"# rule:[OBM Nomade]",
 				"obm rule nomade;",
-				"# rule:[OBM Nomade_keep]",
-				"obm rule keep;",
 				"# rule:[OBM obm_rule_2]",
 				"obm rule 2;",
 				"obm rule 3;",
