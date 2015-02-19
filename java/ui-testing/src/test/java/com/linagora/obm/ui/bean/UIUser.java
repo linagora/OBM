@@ -252,11 +252,22 @@ public class UIUser {
 
 		public UIUser build() {
 			return new UIUser(
-					login, password, firstName, lastName, commonName, mailboxHidden,
-					mailboxArchive, delegation, title, dateBegin, dateExpire, noExpire, 
-					phone, phone2, phoneMobile, phoneFax, phoneFax2, company, direction, 
-					service, address1, address2, address3, addressZip, addressTown, addressCedex, 
-					description, emailInternalEnabled, emailAddress, kind, profile);
+					nullToEmpty(login), nullToEmpty(password), nullToEmpty(firstName), nullToEmpty(lastName),
+					nullToEmpty(commonName), mailboxHidden, mailboxArchive,
+					nullToEmpty(delegation), nullToEmpty(title), dateBegin, dateExpire,
+					noExpire, nullToEmpty(phone), nullToEmpty(phone2), nullToEmpty(phoneMobile),
+					nullToEmpty(phoneFax), nullToEmpty(phoneFax2), nullToEmpty(company), nullToEmpty(direction), 
+					nullToEmpty(service), nullToEmpty(address1), nullToEmpty(address2), nullToEmpty(address3),
+					nullToEmpty(addressZip), nullToEmpty(addressTown), nullToEmpty(addressCedex), 
+					nullToEmpty(description), emailInternalEnabled, nullToEmpty(emailAddress),
+					kind, profile);
+		}
+		
+		private String nullToEmpty(String string) {
+			if (string == null) {
+				return "";
+			}
+			return string;
 		}
 	}
 	

@@ -38,7 +38,7 @@ Feature: tests on users
     Then creation fails with "Le nom doit être correctement renseigné ! :" as message
 
    Scenario: create a user without email fails
-     Given connected as admin on obm.domain
+     Given connected as "admin" with password "admin" on domain "obm.domain"
      Given on create user page
      When user creates a user without email 
      Then creation fails with "Vous devez saisir une adresse E-mail afin d'activer la messagerie !" as message
@@ -66,13 +66,13 @@ Feature: tests on users
      Given on delete user page
      When user deletes "testAdmin2"
      Then deletion succeeds
-     And "testAdmin2" is no longer in user list
-     And "testAdmin2" can t connect anymore with password "admin" on domain "obm.domain"
+     And "testadmin2" is no longer in user list
+     And "testadmin2" can t connect anymore with password "testadmin2" on domain "obm.domain"
 
    Scenario: delete a non admin user
      Given connected as "admin" with password "admin" on domain "obm.domain"
      Given on delete user page
-     When user deletes "testUser2"
+     When user deletes "testuser2"
      Then deletion succeeds
-     And "testUser2" is no longer in user list
-     And "testUser2" can t connect anymore with password "testUser2" on domain "obm.domain"
+     And "testuser2" is no longer in user list
+     And "testuser2" can t connect anymore with password "testuser2" on domain "obm.domain"
