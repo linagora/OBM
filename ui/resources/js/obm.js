@@ -593,7 +593,7 @@ function showMessageWithoutTimeout(klass, message) {
 }
 
 function showMessage(klass, message) {
-  showMessageWithTimeout(klass, message, 3000);
+  showMessageWithoutTimeout(klass, message);
 }
 
 function overListBoxFix(overObject, forceDisplay) {
