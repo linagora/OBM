@@ -221,7 +221,7 @@ public class EventStepdefs {
 	public void eventHasBeenInserted() {
 		List<WebElement> okMessages = processedCalendarPage.elMessagesOk();
 		assertThat(okMessages).hasSize(1);
-		assertThat(okMessages.get(0).getText()).isEqualTo("Evénement: Insertion réussie -\nConsulter");
+		assertThat(okMessages.get(0).getText()).contains("Evénement: Insertion réussie");
 	}
 	
 	@And("^event \"([^\"]*)\" is inserted in the calendar from (\\d+):(\\d+) to (\\d+):(\\d+)$")

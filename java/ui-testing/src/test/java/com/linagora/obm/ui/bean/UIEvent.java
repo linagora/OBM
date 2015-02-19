@@ -33,6 +33,8 @@ package com.linagora.obm.ui.bean;
 
 import java.util.Date;
 
+import com.google.common.base.Strings;
+
 import lombok.Data;
 
 @Data
@@ -190,11 +192,11 @@ public class UIEvent {
 		
 		public UIEvent build() {
 			return new UIEvent(
-					title, location, force, privacy, allday,
+					Strings.nullToEmpty(title), Strings.nullToEmpty(location), force, privacy, allday,
 					dateBegin, hourBegin, minBegin, dateEnd,
 					hourEnd, minEnd, isBusy, isFree,
-					tagLabel, userSearch,  showUserCalendar,
-					description, attendeesNotification,
+					Strings.nullToEmpty(tagLabel), Strings.nullToEmpty(userSearch),  showUserCalendar,
+					Strings.nullToEmpty(description), attendeesNotification,
 					daily, weekly, monthlybydate, monthlybyday, yearly);
 		}
 	}
