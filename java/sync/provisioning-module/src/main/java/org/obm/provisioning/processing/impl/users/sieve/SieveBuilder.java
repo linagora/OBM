@@ -43,6 +43,9 @@ public class SieveBuilder {
 	private final ObmUser obmUser;
 
 	private static final Logger logger = LoggerFactory.getLogger(SieveBuilder.class);
+	private static final String NOMAD_RULE = "Nomade";
+	private static final String NOMAD_KEEP_RULE = "Nomade_keep";
+	private static final String[] KNOWN_RULES = { NOMAD_RULE, NOMAD_KEEP_RULE };
 
 	public SieveBuilder(ObmUser obmUser) {
 		this.obmUser = obmUser;
@@ -61,6 +64,15 @@ public class SieveBuilder {
 		return new SieveSerializer(content).serialize();
 	}
 
+	public static boolean isKnownRule(String ruleHeader) {
+		for (String ruleName : KNOWN_RULES) {
+			if (SieveSerializer.buildObmRuleHeader(ruleName).equals(ruleHeader)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private ImmutableList<ObmRule> buildRules() {
 		ImmutableList.Builder<ObmRule> rulesBuilder = ImmutableList.builder();
 		Optional<ObmRule> maybeRedirectRule = this.emailRedirectRule();
@@ -77,7 +89,7 @@ public class SieveBuilder {
 	private Optional<ObmRule> emailRedirectRule() {
 		Optional<ObmRule> maybeRule;
 		if (obmUser.getNomad().isEnabled() && !Strings.isNullOrEmpty(obmUser.getNomad().getEmail())) {
-			maybeRule = Optional.of(new ObmRule("Nomade",
+			maybeRule = Optional.of(new ObmRule(NOMAD_RULE,
 					ImmutableList.of(String
 							.format("redirect \"%s\";", obmUser.getNomad().getEmail()))));
 		}
@@ -97,7 +109,7 @@ public class SieveBuilder {
 	private Optional<ObmRule> keepRule() {
 		Optional<ObmRule> maybeRule;
 		if (obmUser.getNomad().isEnabled() && obmUser.getNomad().hasLocalCopy()) {
-			maybeRule = Optional.of(new ObmRule("Nomade_keep", ImmutableList.of("keep;")));
+			maybeRule = Optional.of(new ObmRule(NOMAD_KEEP_RULE, ImmutableList.of("keep;")));
 		}
 		else {
 			maybeRule = Optional.absent();

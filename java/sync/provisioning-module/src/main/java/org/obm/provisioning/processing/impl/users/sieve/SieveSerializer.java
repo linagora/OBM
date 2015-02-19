@@ -55,6 +55,10 @@ public class SieveSerializer {
 		return lines.toString();
 	}
 
+	public static String buildObmRuleHeader(String ruleName) {
+		return String.format("# rule:[OBM %s]", ruleName);
+	}
+
 	private void appendRequires() {
 		Set<String> requires = this.newSieveContent.getAllRequires();
 		if (requires.isEmpty()) {
@@ -84,7 +88,7 @@ public class SieveSerializer {
 	
 	private void appendObmRules() {
 		for (ObmRule obmRule : newSieveContent.getObmRules()) {
-			String header = String.format("# rule:[OBM %s]", obmRule.getName());
+			String header = buildObmRuleHeader(obmRule.getName());
 			addLine(header);
 			for (String line : obmRule.getContent()) {
 				addLine(line);

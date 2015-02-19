@@ -53,7 +53,7 @@ public class SieveParserTest {
 	}
 
 	@Test
-	public void sieveParserShouldEatObmRules() {
+	public void sieveParserShouldEatKnownObmRules() {
 		String content = Joiner.on("\r\n").join(new String[] {
 				"require [\"require1\", \"require2\"];",
 				"rule1;",
@@ -61,13 +61,32 @@ public class SieveParserTest {
 				"rule3;",
 				"# rule:[OBM obm_rule_1]",
 				"obm rule 1;",
+				"# rule:[OBM Nomade]",
+				"obm rule nomade;",
+				"# rule:[OBM Nomade_keep]",
+				"obm rule keep;",
 				"# rule:[OBM obm_rule_2]",
 				"obm rule 2;",
-				"obm rule 3;"
+				"obm rule 3;",
+				"# rule:RoundcubeRule",
+				"roundcube rule 1;",
+				"roundcube rule 2;"
 		});
 		OldSieveContent expected = new OldSieveContent(
 				ImmutableList.of("require1", "require2"),
-				ImmutableList.of("rule1;", "rule2;", "rule3;"));
+				ImmutableList.of(
+						"rule1;",
+						"rule2;",
+						"rule3;",
+						"# rule:[OBM obm_rule_1]",
+						"obm rule 1;",
+						"# rule:[OBM obm_rule_2]",
+						"obm rule 2;",
+						"obm rule 3;",
+						"# rule:RoundcubeRule",
+						"roundcube rule 1;",
+						"roundcube rule 2;"
+						));
 		assertThat(new SieveParser(content).parse()).isEqualTo(expected);
 	}
 

@@ -45,7 +45,7 @@ public class SieveParser {
 	private final static Pattern REQUIRE_RX = Pattern
 			.compile("\\s*require\\s+(?:\\[)?(.+?)(?:\\])?;");
 	private final static Pattern NON_EMPTY_STRING_RX = Pattern.compile("\"([^\"]+)\"");
-	private final static String OBM_SECTION_START_MARK = "# rule";
+	private final static String GENERATED_RULE_START_MARK = "# rule";
 
 	private final String scriptContent;
 	private List<String> scriptLines;
@@ -99,11 +99,17 @@ public class SieveParser {
 
 	private void stripOBMRules() {
 		ImmutableList.Builder<String> scriptLinesWithoutOBMRulesBuilder = ImmutableList.builder();
+		boolean discard = false;
 		for (String line : scriptLines) {
-			if (line.startsWith(OBM_SECTION_START_MARK)) {
-				break;
+			if (line.startsWith(GENERATED_RULE_START_MARK)) {
+				// Only discard known rules, they will be recreated later, keep
+				// all OBM/Roundcube generated rules we don't know how to
+				// process
+				discard = SieveBuilder.isKnownRule(line.trim());
 			}
-			scriptLinesWithoutOBMRulesBuilder.add(line);
+			if (!discard) {
+				scriptLinesWithoutOBMRulesBuilder.add(line);
+			}
 		}
 		this.scriptLines = scriptLinesWithoutOBMRulesBuilder.build();
 	}
