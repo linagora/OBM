@@ -52,6 +52,7 @@ Group:          Development/Tools
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-sync
 Requires:       %{name}-imap-archive = %{version}-%{release}
+Requires:       %{name}-provisioning = %{version}-%{release}
 
 %description    full
 This package is a metapackage that, when installed, guarantees that you have
