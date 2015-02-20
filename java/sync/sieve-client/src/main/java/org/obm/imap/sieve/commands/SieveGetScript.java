@@ -62,7 +62,7 @@ public class SieveGetScript extends SieveCommand<String> {
 	public void responseReceived(List<SieveResponse> rs) {
 		if (commandSucceeded(rs)) {
 			String data = rs.get(0).getData();
-			Iterable<String> splitData = Splitter.on(SieveConstants.SEP).split(data);
+			Iterable<String> splitData = Splitter.on(SieveConstants.SPLIT_EXPR).split(data);
 			FluentIterable<String> splitDataNoByteCount = FluentIterable.from(splitData).skip(1);
 			FluentIterable<String> splitDataNoByteCountAndNoReturnCode = splitDataNoByteCount.limit(splitDataNoByteCount.size() -1);
 			if (!splitDataNoByteCountAndNoReturnCode.isEmpty()) {

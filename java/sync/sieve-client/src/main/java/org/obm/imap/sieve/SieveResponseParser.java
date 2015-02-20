@@ -44,7 +44,7 @@ public class SieveResponseParser {
 
 	public void parse(List<SieveResponse> toFill, SieveMessage sm) {
 		for (String l : sm.getLines()) {
-			int idx = l.lastIndexOf("\r\n");
+			int idx = l.lastIndexOf(SieveConstants.SEP);
 			String data = l.substring(0, idx);
 			if (logger.isDebugEnabled()) {
 				logger.debug("parsed: '" + data + "' len: " + data.length());

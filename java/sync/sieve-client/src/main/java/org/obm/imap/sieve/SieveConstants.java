@@ -29,6 +29,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.imap.sieve;
 
+import java.util.regex.Pattern;
+
 public final class SieveConstants {
 	public static String SEP = "\r\n";
+	public static Pattern SPLIT_EXPR = Pattern.compile("[\r\n]+");
 }

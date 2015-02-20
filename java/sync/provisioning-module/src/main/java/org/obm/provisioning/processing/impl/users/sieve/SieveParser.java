@@ -56,7 +56,7 @@ public class SieveParser {
 	}
 
 	public OldSieveContent parse() {
-		this.scriptLines = Splitter.on(SieveConstants.SEP).splitToList(scriptContent);
+		this.scriptLines = Splitter.on(SieveConstants.SPLIT_EXPR).omitEmptyStrings().splitToList(scriptContent);
 		ImmutableList<String> requires = parseRequires();
 		this.stripOBMRules();
 		return new OldSieveContent(requires, ImmutableList.copyOf(scriptLines));
