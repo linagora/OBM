@@ -42,8 +42,6 @@ import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 
 @RunWith(GuiceRunner.class)
@@ -51,9 +49,9 @@ import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 
 	@Test
-	public void testUnknownUrl() throws DaoException, DomainNotFoundException {
+	public void testUnknownUrl() throws Exception {
 		expectDomain();
-		expectSuccessfulAuthentication("username", "password");
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		mocksControl.replay();
 
 		given()
@@ -85,9 +83,9 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testGetAUserOnNonExistentDomain() throws DaoException, DomainNotFoundException {
+	public void testGetAUserOnNonExistentDomain() throws Exception {
 		expectNoDomain();
-		expectSuccessfulAuthentication("username", "password");
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		mocksControl.replay();
 
 		given()

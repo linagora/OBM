@@ -40,6 +40,8 @@ import org.obm.provisioning.authentication.AuthenticationServiceImpl;
 import org.obm.provisioning.authentication.ObmJDBCAuthorizingRealm;
 import org.obm.provisioning.authorization.AuthorizationService;
 import org.obm.provisioning.authorization.AuthorizationServiceImpl;
+import org.obm.provisioning.authorization.SubBatchResourceAuthorizationFilter;
+import org.obm.provisioning.authorization.SubDomainAuthorizationFilter;
 
 import com.google.inject.Key;
 
@@ -67,10 +69,12 @@ public class AuthorizingModule extends ShiroWebModule {
 		bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
 		bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
 
-		addFilterChain(baseUrl + "*/users/**", AUTHC_BASIC);
-		addFilterChain(baseUrl + "*/groups/**", AUTHC_BASIC);
-		addFilterChain(baseUrl + "*/profiles/**", AUTHC_BASIC);
-		addFilterChain(baseUrl + "*/batches/**", AUTHC_BASIC);
+		addFilterChain(baseUrl + "**/batches/**/users/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubBatchResourceAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**/batches/**/groups/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubBatchResourceAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**/users/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**/groups/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**/profiles/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**/batches/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
 		addFilterChain(baseUrl + "**", Key.get(MDCFilter.class));
 		expose(Realm.class);
 	}

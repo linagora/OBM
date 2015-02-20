@@ -29,11 +29,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
-import static org.obm.provisioning.bean.Permissions.groups_create;
-import static org.obm.provisioning.bean.Permissions.groups_delete;
-import static org.obm.provisioning.bean.Permissions.groups_patch;
-import static org.obm.provisioning.bean.Permissions.groups_update;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
@@ -44,7 +39,6 @@ import javax.ws.rs.core.Response;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.annotations.PATCH;
-import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -56,7 +50,6 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional
 	public Response create(String group) throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_create);
 		return addBatchOperation(group, HttpVerb.POST, BatchEntityType.GROUP);
 	}
 
@@ -66,7 +59,6 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional
 	public Response modify(String group) throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_update);
 		return addBatchOperation(group, HttpVerb.PUT, BatchEntityType.GROUP);
 	}
 
@@ -75,7 +67,6 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional
 	public Response delete() throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_delete);
 		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.GROUP);
 	}
 	
@@ -85,7 +76,6 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional
 	public Response patch(String group) throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_patch);
 		return addBatchOperation(group, HttpVerb.PATCH, BatchEntityType.GROUP);
 	}
 
@@ -95,7 +85,6 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional
 	public Response addUsertoGroup() throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_update);
 		return addBatchOperation(null, HttpVerb.PUT, BatchEntityType.USER_MEMBERSHIP);
 	}
 
@@ -104,7 +93,6 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional
 	public Response deleteUserFromGroup() throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_delete);
 		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.USER_MEMBERSHIP);
 	}
 
@@ -114,7 +102,6 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional
 	public Response addSubgrouptoGroup() throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_update);
 		return addBatchOperation(null, HttpVerb.PUT, BatchEntityType.GROUP_MEMBERSHIP);
 	}
 
@@ -123,7 +110,6 @@ public class GroupWriteResource extends AbstractBatchAwareResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional
 	public Response deleteSubgroupFromGroup() throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_delete);
 		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.GROUP_MEMBERSHIP);
 	}
 }

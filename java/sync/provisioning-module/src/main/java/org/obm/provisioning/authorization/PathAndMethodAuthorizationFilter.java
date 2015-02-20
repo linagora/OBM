@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2015  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -27,55 +27,28 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.resources;
+package org.obm.provisioning.authorization;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
+import java.io.IOException;
 
-import org.obm.annotations.transactional.Transactional;
-import org.obm.provisioning.annotations.PATCH;
-import org.obm.provisioning.beans.BatchEntityType;
-import org.obm.provisioning.beans.HttpVerb;
-import org.obm.provisioning.dao.exceptions.DaoException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
-public class UserWriteResource extends AbstractBatchAwareResource {
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter;
 
-	@POST
-	@Consumes(JSON_WITH_UTF8)
-	@Produces(JSON_WITH_UTF8)
-	@Transactional
-	public Response create(String user) throws DaoException {
-		return addBatchOperation(user.replace("\\", "\\\\"), HttpVerb.POST, BatchEntityType.USER);
-	}
+public abstract class PathAndMethodAuthorizationFilter extends HttpMethodPermissionFilter {
 
-	@PUT
-	@Path("/{userId}")
-	@Consumes(JSON_WITH_UTF8)
-	@Produces(JSON_WITH_UTF8)
-	@Transactional
-	public Response modify(String user) throws DaoException {
-		return addBatchOperation(user.replace("\\", "\\\\"), HttpVerb.PUT, BatchEntityType.USER);
-	}
-
-	@DELETE
-	@Path("/{userId}")
-	@Produces(JSON_WITH_UTF8)
-	@Transactional
-	public Response delete() throws DaoException {
-		return addBatchOperation(null, HttpVerb.DELETE, BatchEntityType.USER);
-	}
+	protected static final int DOMAIN_UID_PATH_INDEX = 2;
+	protected static final int SUB_DOMAIN_PATH_INDEX = 3;
+	protected static final int SUB_BATCH_PATH_INDEX = 5;
 	
-	@PATCH
-	@Path("/{userId}")
-	@Consumes(JSON_WITH_UTF8)
-	@Produces(JSON_WITH_UTF8)
-	@Transactional
-	public Response patch(String user) throws DaoException {
-		return addBatchOperation(user.replace("\\", "\\\\"), HttpVerb.PATCH, BatchEntityType.USER);
+	@Override
+	public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws IOException {
+		String action = getHttpMethodAction(request);
+		String domainContextualPermission = String.format("%s:%s", getPathPermission(request), action);
+		return SecurityUtils.getSubject().isPermitted(domainContextualPermission);
 	}
+
+	protected abstract String getPathPermission(ServletRequest request);
 }

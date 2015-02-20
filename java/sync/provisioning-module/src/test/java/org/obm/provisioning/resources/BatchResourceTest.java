@@ -46,7 +46,6 @@ import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchStatus;
 import org.obm.provisioning.dao.exceptions.BatchNotFoundException;
 import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.BatchProcessor;
 import org.obm.provisioning.processing.BatchTracker;
@@ -71,9 +70,9 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 			.build();
 
 	@Test
-	public void testDeleteWithUnknownDomain() throws DaoException, DomainNotFoundException {
+	public void testDeleteWithUnknownDomain() throws Exception {
 		expectNoDomain();
-		expectSuccessfulAuthentication("username", "password");
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		mocksControl.replay();
 		given()
 			.auth().basic("username@domain", "password").
@@ -149,9 +148,9 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testCreateWithUnknownDomain() throws DaoException, DomainNotFoundException {
+	public void testCreateWithUnknownDomain() throws Exception {
 		expectNoDomain();
-		expectSuccessfulAuthentication("username", "password");
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		mocksControl.replay();
 
 		given()
@@ -191,18 +190,18 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 
 		given()
 			.auth().basic("username@domain", "password").
-			expect()
-				.statusCode(Status.NOT_FOUND.getStatusCode()).
-			when()
-				.get("/batches/12");
+		expect()
+			.statusCode(Status.NOT_FOUND.getStatusCode()).
+		when()
+			.get("/batches/12");
 
 		mocksControl.verify();
 	}
 
 	@Test
-	public void testGetWithUnknownDomain() throws DaoException, DomainNotFoundException {
+	public void testGetWithUnknownDomain() throws Exception {
 		expectNoDomain();
-		expectSuccessfulAuthentication("username", "password");
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		mocksControl.replay();
 
 		given()
@@ -225,10 +224,10 @@ public class BatchResourceTest extends CommonDomainEndPointEnvTest {
 
 		given()
 			.auth().basic("username@domain", "password").
-			expect()
-				.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
-			when()
-				.get("/batches/12");
+		expect()
+			.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).
+		when()
+			.get("/batches/12");
 
 		mocksControl.verify();
 	}

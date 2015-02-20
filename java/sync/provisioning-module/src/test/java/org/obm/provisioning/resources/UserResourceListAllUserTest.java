@@ -44,16 +44,14 @@ import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 
 import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
-import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
 
 
 @RunWith(GuiceRunner.class)
@@ -61,9 +59,9 @@ import fr.aliacom.obm.common.user.UserIdentity;
 public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 
 	@Test
-	public void testListAllUserOnNonExistentDomain() throws DaoException, DomainNotFoundException {
+	public void testListAllUserOnNonExistentDomain() throws Exception {
 		expectNoDomain();
-		expectSuccessfulAuthentication("username", "password");
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		mocksControl.replay();
 
 		given()

@@ -1,6 +1,5 @@
 package org.obm.provisioning.resources;
 
-import static org.obm.provisioning.bean.Permissions.profiles_read;
 import static org.obm.provisioning.resources.AbstractBatchAwareResource.JSON_WITH_UTF8;
 
 import java.util.Set;
@@ -16,7 +15,6 @@ import javax.ws.rs.core.Response.Status;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
-import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -39,8 +37,6 @@ public class ProfileResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional(readOnly = true)
 	public Set<ProfileEntry> getProfileEntries() throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, profiles_read);
-
 		return profileDao.getProfileEntries(domain.getUuid());
 	}
 
@@ -49,8 +45,6 @@ public class ProfileResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional(readOnly = true)
 	public ProfileName getProfileName(@PathParam("profileId") ProfileId profileId) throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, profiles_read);
-
 		try {
 			return profileDao.getProfileName(domain.getUuid(), profileId);
 		}

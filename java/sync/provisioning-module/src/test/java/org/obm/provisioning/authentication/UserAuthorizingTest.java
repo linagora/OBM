@@ -102,7 +102,6 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotGetWithWrongPermissions() throws Exception {
-		expectDomain();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:create, delete")));
 		mocksControl.replay();
@@ -119,8 +118,6 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotPostWithWrongPermissions() throws Exception {
-		expectDomain();
-		expectBatch();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read, delete")));
 		mocksControl.replay();
@@ -137,8 +134,6 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotDeleteWithWrongPermissions() throws Exception {
-		expectDomain();
-		expectBatch();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read, create")));
 		mocksControl.replay();
@@ -155,8 +150,6 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotPatchWithWrongPermissions() throws Exception {
-		expectDomain();
-		expectBatch();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read, create")));
 		mocksControl.replay();
@@ -173,8 +166,6 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotPutWithWrongPermissions() throws Exception {
-		expectDomain();
-		expectBatch();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read, create")));
 		mocksControl.replay();
@@ -207,7 +198,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		
 		mocksControl.verify();
 	}
-	
+
 	@Test
 	public void testSubjectCanGetUserWithUrlWithLastSlash() throws Exception {
 		expectDomain();

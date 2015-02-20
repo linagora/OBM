@@ -93,7 +93,6 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 
 	@Test
 	public void testSubjectCannotGetProfilesWithWrongPermissions() throws Exception {
-		expectDomain();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("batches:*"), domainAwarePerm("users:*")));
 		mocksControl.replay();
@@ -110,7 +109,6 @@ public class ProfileAuthorizingTest extends CommonDomainEndPointEnvTest {
 
 	@Test
 	public void testSubjectCannotGetProfileWithWrongPermissions() throws Exception {
-		expectDomain();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("profiles:create")));
 		mocksControl.replay();

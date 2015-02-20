@@ -29,7 +29,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
-import static org.obm.provisioning.bean.Permissions.groups_read;
 import static org.obm.provisioning.resources.AbstractBatchAwareResource.JSON_WITH_UTF8;
 
 import java.util.Collection;
@@ -49,7 +48,6 @@ import javax.ws.rs.core.Response.Status;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.Group;
 import org.obm.provisioning.GroupExtId;
-import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.bean.GroupIdentifier;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -74,8 +72,6 @@ public class GroupResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional(readOnly = true)
 	public Collection<GroupIdentifier> listPublicGroups() throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_read);
-
 		Set<Group> groups = groupDao.listPublicGroups(domain);
 
 		if (groups == null) {
@@ -95,8 +91,6 @@ public class GroupResource {
 	@Produces(JSON_WITH_UTF8)
 	public Group get(@PathParam("groupExtId") GroupExtId groupExtId, @QueryParam("expandDepth") @DefaultValue("0") int expandDepth)
 			throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_read);
-		
 		try {
 			return groupDao.getRecursive(domain, groupExtId, true, expandDepth);
 		} catch (GroupNotFoundException e) {
@@ -108,8 +102,6 @@ public class GroupResource {
 	@Path("/{groupExtId}/users")
 	@Produces(JSON_WITH_UTF8)
 	public Set<ObmUser> getUserMembers(@PathParam("groupExtId") GroupExtId groupExtId) throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_read);
-		
 		try {
 			return groupDao.getRecursive(domain, groupExtId, true, 0).getUsers();
 		} catch (GroupNotFoundException e) {
@@ -121,8 +113,6 @@ public class GroupResource {
 	@Path("/{groupExtId}/subgroups")
 	@Produces(JSON_WITH_UTF8)
 	public Set<Group> getUserMembersOfSubgroups(@PathParam("groupExtId") GroupExtId groupExtId) throws DaoException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, groups_read);
-		
 		try {
 			return groupDao.getRecursive(domain, groupExtId, true, 1).getSubgroups();
 		} catch (GroupNotFoundException e) {

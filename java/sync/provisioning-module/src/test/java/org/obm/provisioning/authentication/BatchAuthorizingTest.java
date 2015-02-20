@@ -31,8 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.authentication;
 
-import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
 import static org.easymock.EasyMock.expect;
 
 import javax.ws.rs.core.Response.Status;
@@ -117,7 +117,6 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotGetWithWrongPermissions() throws Exception {
-		expectDomain();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("batches:create, delete")));
 		mocksControl.replay();
@@ -134,7 +133,6 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotPostWithWrongPermissions() throws Exception {
-		expectDomain();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("batches:read, delete")));
 		mocksControl.replay();
@@ -163,7 +161,6 @@ public class BatchAuthorizingTest extends CommonDomainEndPointEnvTest {
 	
 	@Test
 	public void testSubjectCannotDeleteWithWrongPermissions() throws Exception {
-		expectDomain();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("batches:read, create")));
 		mocksControl.replay();

@@ -47,7 +47,6 @@ import org.obm.provisioning.ProfileName;
 import org.obm.provisioning.beans.ProfileEntry;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.provisioning.dao.exceptions.ProfileNotFoundException;
 
 import com.google.common.collect.ImmutableSet;
@@ -124,9 +123,9 @@ public class ProfileResourceTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testGetProfilesOnNonExistentDomain() throws DaoException, DomainNotFoundException {
+	public void testGetProfilesOnNonExistentDomain() throws Exception {
 		expectNoDomain();
-		expectSuccessfulAuthentication("username", "password");
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		mocksControl.replay();
 
 		given()
@@ -175,9 +174,9 @@ public class ProfileResourceTest extends CommonDomainEndPointEnvTest {
 	}
 
 	@Test
-	public void testGetProfileOnNonExistentDomain() throws DaoException, DomainNotFoundException {
+	public void testGetProfileOnNonExistentDomain() throws Exception {
 		expectNoDomain();
-		expectSuccessfulAuthentication("username", "password");
+		expectSuccessfulAuthenticationAndFullAuthorization();
 		mocksControl.replay();
 
 		given()

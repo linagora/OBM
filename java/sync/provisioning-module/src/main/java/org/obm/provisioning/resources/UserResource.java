@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.resources;
 
-import static org.obm.provisioning.bean.Permissions.users_read;
 import static org.obm.provisioning.resources.AbstractBatchAwareResource.JSON_WITH_UTF8;
 
 import java.sql.SQLException;
@@ -48,7 +47,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.domain.dao.UserDao;
-import org.obm.provisioning.authorization.ResourceAuthorizationHelper;
 import org.obm.provisioning.bean.UserIdentifier;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 
@@ -73,7 +71,6 @@ public class UserResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional(readOnly = true)
 	public ObmUser get(@PathParam("userExtId") UserExtId userExtId) throws SQLException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, users_read);
 		try {
 			return userDao.getByExtIdWithGroups(userExtId, domain);
 		} catch (UserNotFoundException e) {
@@ -85,7 +82,6 @@ public class UserResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional(readOnly = true)
 	public List<UserIdentifier> listAll() throws SQLException {
-		ResourceAuthorizationHelper.assertAuthorized(domain, users_read);
 		List<ObmUser> users = userDao.list(domain);
 		if (users == null) {
 			return Collections.emptyList();
