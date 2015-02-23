@@ -35,6 +35,9 @@ import java.io.Serializable;
 
 import org.obm.annotations.database.DatabaseField;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
+
 
 public class Website implements Serializable {
 
@@ -76,34 +79,39 @@ public class Website implements Serializable {
 		}
 		return false;
 	}
-	
+
+
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public int hashCode(){
+		return Objects.hashCode(
+			Strings.nullToEmpty(label).toLowerCase(), 
+			url
+		);
+	}
+
+	@Override
+	public boolean equals(Object object){
+		if (this == object) {
 			return true;
 		}
-		if (obj == null) {
+		if (object == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		Website other = (Website) obj;
-		if (label != null && label.equalsIgnoreCase(other.label)) {
-			return true;
+		if (object instanceof Website) {
+			Website that = (Website) object;
+			return Objects.equal(this.url, that.url)
+				&& Objects.equal(
+					this.label != null ? this.label.toLowerCase() : null,
+					that.label != null ? that.label.toLowerCase() : null);
 		}
 		return false;
 	}
 
 	@Override
-	public int hashCode() {
-		int prime = 31;
-		int result = 1;
-		result = prime * result + 
-		((label == null) ? 0 : label.toLowerCase().hashCode());
-		result = prime * result + 
-		((url == null) ? 0 : url.hashCode());
-		return result;
+	public String toString() {
+		return Objects.toStringHelper(this)
+				.add("label", label)
+				.add("url", url)
+				.toString();
 	}
-
 }

@@ -51,6 +51,8 @@ import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.sync.host.ObmHost;
+import org.obm.sync.serviceproperty.ServiceProperty;
 import org.obm.sync.solr.jms.Command;
 import org.obm.sync.solr.jms.SolrJmsQueue;
 
@@ -58,6 +60,8 @@ import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.QueueManager;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.domain.Samba;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 
@@ -159,7 +163,20 @@ public class SolrManagerTest {
   }
 	@Test
  	public void solrDocumentIndexerShouldBeSerializable() throws Exception {
-		SolrDocumentIndexer indexer = new SolrDocumentIndexer(ObmDomain.builder().name("d").build(), SolrService.CONTACT_SERVICE, new SolrInputDocument());
+		ObmDomain domain = ObmDomain
+			.builder()
+			.id(1)
+			.name("domain_name")
+			.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
+			.label("domain_label")
+			.alias("domain_alias")
+			.global(false)
+			.host(ServiceProperty.IMAP,
+				ObmHost.builder().id(1).domainId(1).name("imap").ip("1.2.3.4").fqdn("imap.domain_name").build())
+			.samba(Samba.builder().sid("sid").profile("profile").home("home").drive("drive").build())
+			.build();
+		
+		SolrDocumentIndexer indexer = new SolrDocumentIndexer(domain, SolrService.CONTACT_SERVICE, new SolrInputDocument());
   		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 
@@ -174,6 +191,7 @@ public class SolrManagerTest {
   		
   		assertThat(object).isInstanceOf(SolrDocumentIndexer.class).isEqualToComparingFieldByField(indexer);
   }
+	
 	@Test
 	public void solrShouldBeMarkedAsDownWhenRequestFails() throws Exception {        
 		expect(server.ping()).andThrow(new IOException()).anyTimes();

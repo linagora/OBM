@@ -36,6 +36,7 @@ import org.obm.provisioning.GroupExtId;
 import org.obm.provisioning.ProfileId;
 import org.obm.provisioning.ProfileName;
 import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.sync.book.Website;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.UserNomad;
@@ -58,7 +59,8 @@ public class BeansTest {
 				ProfileId.class,
 				ProfileName.class,
 				ObmDomainUuid.class,
-				UserNomad.class);
+				UserNomad.class,
+				Website.class);
 	}
 
 }
