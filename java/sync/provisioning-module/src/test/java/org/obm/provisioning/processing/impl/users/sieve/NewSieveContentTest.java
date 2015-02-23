@@ -101,4 +101,36 @@ public class NewSieveContentTest {
 				);
 		assertThat(sieveContent.getAllRequires()).isEmpty();
 	}
+
+	@Test
+	public void emptyNewSieveContentShouldBeEmpty() {
+		ImmutableList<String> empty = ImmutableList.of();
+		ImmutableList<ObmRule> emptyRules = ImmutableList.of();
+		OldSieveContent emptyOldSieveContent = new OldSieveContent(empty, empty);
+		NewSieveContent sieveContent = new NewSieveContent(
+				emptyOldSieveContent,
+				emptyRules);
+		assertThat(sieveContent.isEmpty()).isTrue();
+	}
+
+	@Test
+	public void newSieveContentWithNonEmptyOldSieveContentShouldNotBeEmpty() {
+		ImmutableList<String> empty = ImmutableList.of();
+		ImmutableList<ObmRule> emptyRules = ImmutableList.of();
+		OldSieveContent oldSieveContent = new OldSieveContent(empty, ImmutableList.of("old rule;"));
+		NewSieveContent sieveContent = new NewSieveContent(
+				oldSieveContent,
+				emptyRules);
+		assertThat(sieveContent.isEmpty()).isFalse();
+	}
+
+	@Test
+	public void newSieveContentWithNonEmptyRulesShouldNotBeEmpty() {
+		ImmutableList<String> empty = ImmutableList.of();
+		OldSieveContent emptyOldSieveContent = new OldSieveContent(empty, empty);
+		NewSieveContent sieveContent = new NewSieveContent(
+				emptyOldSieveContent,
+				ImmutableList.of(new ObmRule("rule name", ImmutableList.of("rule content"))));
+		assertThat(sieveContent.isEmpty()).isFalse();
+	}
 }

@@ -73,6 +73,12 @@ public class NewSieveContent {
 		return requiresBuilder.build();
 	}
 
+	public boolean isEmpty() {
+		boolean isOldContentEmpty = this.maybeOldSieveContent.isPresent() ?
+				this.maybeOldSieveContent.get().isEmpty() : true;
+		return isOldContentEmpty && this.obmRules.isEmpty();
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof NewSieveContent)) {

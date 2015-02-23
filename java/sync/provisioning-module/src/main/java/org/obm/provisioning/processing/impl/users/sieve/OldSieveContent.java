@@ -52,6 +52,10 @@ public class OldSieveContent {
 		return userRules;
 	}
 
+	public boolean isEmpty() {
+		return this.requires.isEmpty() && this.userRules.isEmpty();
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof OldSieveContent)) {

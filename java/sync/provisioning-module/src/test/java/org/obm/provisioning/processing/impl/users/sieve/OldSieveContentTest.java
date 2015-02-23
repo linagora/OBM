@@ -29,58 +29,32 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.users.sieve;
 
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.obm.imap.sieve.SieveClient;
-import org.obm.imap.sieve.SieveScript;
+import org.junit.Test;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.ImmutableList;
 
-import fr.aliacom.obm.common.user.ObmUser;
+public class OldSieveContentTest {
 
-public class SieveScriptUpdater {
-
-	private final ObmUser obmUser;
-	private final SieveClient sieveClient;
-	private final SieveBuilder sieveBuilder;
-
-	public SieveScriptUpdater(ObmUser obmUser, SieveClient sieveClient, SieveBuilder sieveBuilder) {
-		this.obmUser = obmUser;
-		this.sieveClient = sieveClient;
-		this.sieveBuilder = sieveBuilder;
+	@Test
+	public void emptyOldSieveContentShouldBeEmpty() {
+		ImmutableList<String> empty = ImmutableList.of();
+		OldSieveContent oldSieveContent = new OldSieveContent(empty, empty);
+		assertThat(oldSieveContent.isEmpty()).isTrue();
 	}
 
-	public void update() {
-		List<SieveScript> scripts = this.sieveClient.listscripts();
-		Optional<SieveScript> maybeActiveScript = Iterables.tryFind(scripts,
-				new Predicate<SieveScript>() {
+	@Test
+	public void oldSieveContentWithRequiresShouldNotBeEmpty() {
+		ImmutableList<String> empty = ImmutableList.of();
+		OldSieveContent oldSieveContent = new OldSieveContent(ImmutableList.of("package"), empty);
+		assertThat(oldSieveContent.isEmpty()).isFalse();
+	}
 
-					@Override
-					public boolean apply(SieveScript script) {
-						return script.isActive();
-					}
-				});
-		if (maybeActiveScript.isPresent()) {
-			SieveScript script = maybeActiveScript.get();
-			String oldContent = sieveClient.getScriptContent(script.getName());
-			Optional<String> maybeNewContent = sieveBuilder.buildFromOldContent(oldContent);
-			if (maybeNewContent.isPresent()) {
-				this.sieveClient.putscript(script.getName(), maybeNewContent.get());
-			}
-			else {
-				this.sieveClient.activate("");
-				this.sieveClient.deletescript(script.getName());
-			}
-		}
-		else {
-			Optional<String> maybeContent = sieveBuilder.build();
-			if (maybeContent.isPresent()) {
-				String scriptName = SieveUtils.getSieveScriptName(obmUser);
-				this.sieveClient.putscript(scriptName, maybeContent.get());
-				this.sieveClient.activate(scriptName);
-			}
-		}
+	@Test
+	public void oldSieveContentWithRulesShouldNotBeEmpty() {
+		ImmutableList<String> empty = ImmutableList.of();
+		OldSieveContent oldSieveContent = new OldSieveContent(empty, ImmutableList.of("old rule"));
+		assertThat(oldSieveContent.isEmpty()).isFalse();
 	}
 }

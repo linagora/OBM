@@ -50,17 +50,23 @@ public class SieveBuilder {
 		this.obmUser = obmUser;
 	}
 
-	public String buildFromOldContent(String oldStringContent) {
+	public Optional<String> buildFromOldContent(String oldStringContent) {
 		OldSieveContent oldContent = new SieveParser(oldStringContent).parse();
 		ImmutableList<ObmRule> rules = this.buildRules();
 		NewSieveContent content = new NewSieveContent(oldContent, rules);
-		return new SieveSerializer(content).serialize();
+		return asOptionalString(content);
 	}
 
-	public String build() {
+	public Optional<String> build() {
 		ImmutableList<ObmRule> rules = this.buildRules();
 		NewSieveContent content = new NewSieveContent(rules);
-		return new SieveSerializer(content).serialize();
+		return asOptionalString(content);
+	}
+
+	private Optional<String> asOptionalString(NewSieveContent content) {
+		return content.isEmpty() ?
+				Optional.<String>absent() :
+				Optional.of(new SieveSerializer(content).serialize());
 	}
 
 	public static boolean isKnownRule(String ruleHeader) {
