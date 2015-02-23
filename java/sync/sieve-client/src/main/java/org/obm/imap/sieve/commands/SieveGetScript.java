@@ -69,7 +69,7 @@ public class SieveGetScript extends SieveCommand<String> {
 				this.retVal = Joiner.on(SieveConstants.SEP).join(splitDataNoByteCountAndNoReturnCode) + "\r\n";
 			}
 			else {
-				throw new RuntimeException("Couldn't parse sieve response");
+				this.retVal = "";
 			}
 		} else {
 			reportErrors(rs);
