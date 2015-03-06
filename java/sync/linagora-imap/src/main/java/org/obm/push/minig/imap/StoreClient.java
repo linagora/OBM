@@ -141,6 +141,8 @@ public interface StoreClient extends AutoCloseable {
 	boolean setQuota(String mailbox, long quotaInKo) throws MailboxNotFoundException, ImapTimeoutException;
 
 	InputStream uidFetchMessage(long uid) throws ImapTimeoutException;
+	
+	InputStream uidFetchMessage(long uid, long truncation) throws ImapTimeoutException;
 
 	MessageSet uidSearch(SearchQuery sq) throws ImapTimeoutException;
 

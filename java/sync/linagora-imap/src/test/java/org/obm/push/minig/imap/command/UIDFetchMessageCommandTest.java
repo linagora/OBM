@@ -46,6 +46,18 @@ import com.google.common.io.ByteStreams;
 public class UIDFetchMessageCommandTest {
 	
 	@Test
+	public void requestWithoutTruncation() {
+		assertThat(new UIDFetchMessageCommand(12, null).buildCommand().getCommandString())
+			.isEqualTo("UID FETCH 12 (UID BODY.PEEK[])");
+	}
+	
+	@Test
+	public void requestWithTruncation() {
+		assertThat(new UIDFetchMessageCommand(12, 15l).buildCommand().getCommandString())
+			.isEqualTo("UID FETCH 12 (UID BODY.PEEK[]<0.15>)");
+	}
+	
+	@Test
 	public void testHandleMultipleResponsesWithOnlyOneCorresponding() throws IOException {
 		IMAPResponse response = new IMAPResponse("OK", "* OK [COPY 23 1 2]");
 		IMAPResponse response2 = new IMAPResponse("OK", "* 1 FETCH (UID 12 BODY[] {1321}");

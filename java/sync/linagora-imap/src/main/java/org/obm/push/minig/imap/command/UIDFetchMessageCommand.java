@@ -48,16 +48,30 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 	private final static String IMAP_COMMAND = "UID FETCH";
 	private final static String IMAP_SUB_COMMAND = "UID BODY.PEEK[]";
 	private final long uid;
+	private final Long truncation;
 
 	public UIDFetchMessageCommand(long uid) {
+		this(uid, null);
+	}
+	
+	public UIDFetchMessageCommand(long uid, Long truncation) {
 		this.uid = uid;
+		this.truncation = truncation;
 	}
 
 	@Override
 	protected CommandArgument buildCommand() {
-		String cmd = IMAP_COMMAND + " " + uid + " (" + IMAP_SUB_COMMAND + ")";
+		String cmd = IMAP_COMMAND + " " + uid + " (" + IMAP_SUB_COMMAND + truncation() + ")";
 		CommandArgument args = new CommandArgument(cmd, null);
 		return args;
+	}
+
+	private String truncation() {
+		if (truncation != null) {
+			return "<0."+truncation+">";
+		} else {
+			return "";
+		}
 	}
 
 	@Override

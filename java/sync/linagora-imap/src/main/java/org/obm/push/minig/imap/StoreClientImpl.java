@@ -268,6 +268,11 @@ public class StoreClientImpl implements StoreClient {
 	public InputStream uidFetchMessage(long uid) throws ImapTimeoutException {
 		return clientSupport.uidFetchMessage(uid);
 	}
+	
+	@Override
+	public InputStream uidFetchMessage(long uid, long truncation) throws ImapTimeoutException {
+		return clientSupport.uidFetchMessage(uid, truncation);
+	}
 
 	@Override
 	public MessageSet uidSearch(SearchQuery sq) throws ImapTimeoutException {

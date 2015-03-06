@@ -365,6 +365,10 @@ public class ClientSupport {
 		return run(new UIDFetchMessageCommand(uid));
 	}
 
+	public InputStream uidFetchMessage(long uid, long truncation) {
+		return run(new UIDFetchMessageCommand(uid, truncation));
+	}
+
 	public MessageSet uidSearch(SearchQuery sq) throws ImapTimeoutException {
 		return run(new UIDSearchCommand(sq));
 	}
