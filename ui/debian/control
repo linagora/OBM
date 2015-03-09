@@ -47,7 +47,7 @@ Description: configuration system for Open Business Management
 Package: obm-storage
 Architecture: all
 Pre-Depends: obm-core (= ${binary:Version}), dbconfig-common, obm-conf (= ${binary:Version}), postgresql-8.3 | postgresql-8.4 | postgresql-9.1 | mysql-server
-Depends: obm-locator, obm-munin-node, ${misc:Depends}
+Depends: obm-locator, ${misc:Depends}
 Description: database for Open Business Management
  This package initializes the OBM database, which can be either Postgres or
  MySQL.
@@ -87,7 +87,7 @@ Description: certificate generation for OBM
 
 Package: obm-ui
 Architecture: all
-Depends:  obm-core (= ${binary:Version}), obm-certs (= ${binary:Version}), php5, apache2, libapache2-mod-php5, php5-pgsql | php5-mysql, php5-gd, php5-imap, php-db, obm-munin-master, php5-ldap, ${misc:Depends}
+Depends:  obm-core (= ${binary:Version}), obm-certs (= ${binary:Version}), php5, apache2, libapache2-mod-php5, php5-pgsql | php5-mysql, php5-gd, php5-imap, php-db, php5-ldap, ${misc:Depends}
 Recommends: php5-imagick
 Description: web interface configuration for OBM
  This package configures Apache to serve OBM components (obm-ui, obm-storage).
@@ -112,7 +112,7 @@ Description: library for the integration of OBM with LDAP/Postfix/Cyrus
 
 Package: obm-services
 Architecture: all
-Depends:  obm-conf (= ${binary:Version}), sudo, libobm-perl (= ${binary:Version}), obm-munin-node, ${misc:Depends}
+Depends:  obm-conf (= ${binary:Version}), sudo, libobm-perl (= ${binary:Version}), ${misc:Depends}
 Description: integration of OBM with LDAP/Postfix/Cyrus
  This package is responsible for propagating changes in OBM to third-party
  software used by OBM, namely Open LDAP, Postfix and Cyrus.
@@ -124,7 +124,7 @@ Description: integration of OBM with LDAP/Postfix/Cyrus
 
 Package: obm-ldap
 Architecture: all
-Depends:  obm-conf (= ${binary:Version}), slapd, ldap-utils, obm-munin-node, ${misc:Depends}
+Depends:  obm-conf (= ${binary:Version}), slapd, ldap-utils, ${misc:Depends}
 Description: LDAP configuration for OBM
  This package configures Open LDAP for use with OBM.
  .
@@ -136,7 +136,7 @@ Description: LDAP configuration for OBM
 Package: obm-cyrus
 Architecture: all
 Pre-depends: obm-satellite
-Depends:  obm-conf (= ${binary:Version}), cyrus-common-2.4|cyrus-common-2.3|cyrus-common-2.2, cyrus-admin-2.4|cyrus-admin-2.3|cyrus-admin-2.2, cyrus-imapd-2.4|cyrus-imapd-2.3|cyrus-imapd-2.2, cyrus-pop3d-2.4|cyrus-pop3d-2.3|cyrus-pop3d-2.2, cyrus-sasl2-dbg, cyrus-sasl2-doc, cyrus-clients-2.4|cyrus-clients-2.3|cyrus-clients-2.2, sasl2-bin, libsasl2|libsasl2-2, libsasl2-modules, obm-munin-node, ${misc:Depends}
+Depends:  obm-conf (= ${binary:Version}), cyrus-common-2.4|cyrus-common-2.3|cyrus-common-2.2, cyrus-admin-2.4|cyrus-admin-2.3|cyrus-admin-2.2, cyrus-imapd-2.4|cyrus-imapd-2.3|cyrus-imapd-2.2, cyrus-pop3d-2.4|cyrus-pop3d-2.3|cyrus-pop3d-2.2, cyrus-sasl2-dbg, cyrus-sasl2-doc, cyrus-clients-2.4|cyrus-clients-2.3|cyrus-clients-2.2, sasl2-bin, libsasl2|libsasl2-2, libsasl2-modules, ${misc:Depends}
 Description: Cyrus/SASL configuration for OBM
  This package configures Cyrus/SASL for OBM.
  .
@@ -148,7 +148,7 @@ Description: Cyrus/SASL configuration for OBM
 Package: obm-postfix
 Architecture: all
 Pre-depends: obm-satellite
-Depends:  postfix, obm-munin-node, ${misc:Depends}
+Depends:  postfix, ${misc:Depends}
 Description: Postfix configuration for OBM
  This package configures Postfix for OBM.
  .
@@ -172,32 +172,9 @@ Description: email content checker configuration for OBM
 Package: obm-samba
 Architecture: all
 Pre-Depends: obm-storage (= ${binary:Version})
-Depends:  obm-munin-node, obm-ldap, ${misc:Depends}
+Depends:  obm-ldap, ${misc:Depends}
 Description: Samba configuration for OBM
  This package configures Samba for OBM.
- .
- OBM is a global groupware, messaging and CRM application. It is intended to
- be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
- simple contact database. OBM also features integration with PDAs, smartphones,
- Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
-
-Package: obm-munin-master
-Architecture: all
-Pre-Depends: munin
-Depends: obm-munin-node, ${misc:Depends}
-Description: Munin master configuration for OBM
- This package configures an OBM server as a Munin master.
- .
- OBM is a global groupware, messaging and CRM application. It is intended to
- be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
- simple contact database. OBM also features integration with PDAs, smartphones,
- Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
-
-Package: obm-munin-node
-Architecture: all
-Pre-Depends: munin-node, munin-plugins-extra, ${misc:Depends}
-Description: OBM munin node configuration
- This package configures an OBM server as a Munin node.
  .
  OBM is a global groupware, messaging and CRM application. It is intended to
  be an Exchange Or Notes/Domino Mail replacement, but can also be used as a

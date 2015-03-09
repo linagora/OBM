@@ -1,8 +1,0 @@
-usr/share/munin/plugins/cpu etc/munin/plugins/cpu
-usr/share/munin/plugins/df etc/munin/plugins/df
-usr/share/munin/plugins/load etc/munin/plugins/load
-usr/share/munin/plugins/postfix_mailqueue etc/munin/plugins/postfix_mailqueue
-usr/share/munin/plugins/postfix_mailvolume etc/munin/plugins/postfix_mailvolume
-usr/share/munin/plugins/postfix_mailstats etc/munin/plugins/postfix_mailstats
-usr/share/munin/plugins/swap etc/munin/plugins/swap
-

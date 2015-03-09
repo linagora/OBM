@@ -1,8 +1,0 @@
-Template: obm-munin-node/ip_of_munin_master
-Type: string
-Default: 127.0.0.1
-Description: IP adress of munin-node-master
- .
- Enter IP adress (and just IP address) of munin-node-master.
- munin-node-master is intalled on server with OBM-UI.
-
