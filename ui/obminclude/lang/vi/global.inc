@@ -358,7 +358,6 @@ $l_module_resource = "Các tài nguyên";
 $l_module_group = "Các nhóm";
 $l_module_resourcegroup = "Nhóm tài nguyên";
 $l_module_host = "Hosts";
-$l_module_monitoring = "Giám sát";
 $l_module_mailshare = "Mailshares";
 $l_module_organizationalchart = "Sơ đồ tổ chức";
 $l_module_admin_lang = "Ngôn nghữ";

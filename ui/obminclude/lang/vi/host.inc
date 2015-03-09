@@ -35,7 +35,6 @@ $l_update_error = "Cập nhật host thất bại !";
 $l_delete_ok = "Đã xóa host thành công.";
 $l_delete_error = "Xóa host thất bại !";
 $l_can_delete = "Host có thể xóa";
-$l_err_host_monitoring = "Host phải có địa chỉ IP và tên đầy đủ để theo dõi"; 
 $l_err_host_name_empty = "Tên Host phải được điền"; 
 $l_err_host_name_exist = "Tên Host đã được sử dụng";
 $l_err_host_name = "Tên host không hợp lệ";
@@ -55,7 +54,6 @@ $l_obm_sync = 'OBM đồng bộ';
 $l_imap_frontend = 'IMAP Frontend';
 $l_provisioning = 'cung cấp';
 $l_solr = 'Solr';
-$l_monitor = 'Giám sát';
 $l_fqdn = 'Tên đầy đủ của máy';
 $l_err_host_fqdn = 'Tên đầy đủ của máy không chính xác (tênmáy.miền.tên)';
 

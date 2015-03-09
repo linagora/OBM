@@ -12,8 +12,6 @@
 
     <!-- Is set if this host have an obm-sync server installed -->
     <service key='obm_sync' />
-    <!-- Is set if this host is monitoring by munin -->
-    <service key='monitor' />
     <!-- Is set if this host has solr server-->
     <service key='solr' />
     <!-- Is set if this host has imap frontend server-->

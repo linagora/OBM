@@ -396,7 +396,6 @@ $l_module_resource = "Ressources";
 $l_module_group = "Groupes";
 $l_module_resourcegroup = "Groupes de ressources";
 $l_module_host = "Hôtes";
-$l_module_monitoring = "Supervision";
 $l_module_mailshare = "Partages Mail";
 $l_module_organizationalchart = "Organigramme";
 $l_module_userbackup = "Sauvegarder/Restaurer";

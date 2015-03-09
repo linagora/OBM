@@ -43,8 +43,6 @@ NameVirtualHost *:443
 
     LimitRequestBody 20971520
 
-    Alias /stats /var/www/munin
-
 #obm#<Location /obm-sync>
 #obm#  Order allow,deny
 #obm#  Allow from all

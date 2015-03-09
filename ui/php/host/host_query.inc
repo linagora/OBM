@@ -66,7 +66,6 @@ function run_query_host_search($host) {
   $opush_frontend = $host['opush_frontend'];
   $ldap = $host['ldap'];
   $imap_frontend = $host['imap_frontend'];
-  $monitor = $host['monitor'];
   $imap = $host['imap'];
   $imap_archive = $host['imap_archive'];
   $backup_ftp = $host['backup_ftp'];
@@ -116,9 +115,6 @@ function run_query_host_search($host) {
   if ($imap_frontend != '') {
     $where .= ' AND imap_frontend.service_id IS NOT NULL';
   }
-  if ($monitor != '') {
-    $where .= ' AND monitor.service_id IS NOT NULL';
-  }
   if ($imap != '') {
     $where .= ' AND imap.service_id IS NOT NULL';
   }
@@ -148,7 +144,6 @@ function run_query_host_search($host) {
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as solr ON solr.service_service = 'solr' AND solr.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as imap_frontend ON imap_frontend.service_service = 'imap_frontend' AND imap_frontend.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as backup_ftp ON backup_ftp.service_service = 'backup_ftp' AND backup_ftp.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as opush ON opush.service_service = 'opush' AND opush.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as opush_frontend ON opush_frontend.service_service = 'opush_frontend' AND opush_frontend.service_entity_id = hostentity_entity_id
@@ -167,7 +162,6 @@ function run_query_host_search($host) {
       opush.service_id as host_opush,
       opush_frontend.service_id as host_opush_frontend,
       ldap.service_id as host_ldap,
-      monitor.service_id as host_monitor,
       backup_ftp.service_id as host_backup_ftp,
       provisioning.service_id as host_provisioning,
       host_id as id,
@@ -224,7 +218,6 @@ function run_query_host_detail($id) {
       opush_frontend.service_id as host_opush_frontend,
       ldap.service_id as host_ldap,
       imap_frontend.service_id as host_imap_frontend,
-      monitor.service_id as host_monitor,
       backup_ftp.service_id as host_backup_ftp,
       provisioning.service_id as host_provisioning,
       $timecreate,
@@ -246,7 +239,6 @@ function run_query_host_detail($id) {
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as solr ON solr.service_service = 'solr' AND solr.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as imap_frontend ON imap_frontend.service_service = 'imap_frontend' AND imap_frontend.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as backup_ftp ON backup_ftp.service_service = 'backup_ftp' AND backup_ftp.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as opush ON opush.service_service = 'opush' AND opush.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as opush_frontend ON opush_frontend.service_service = 'opush_frontend' AND opush_frontend.service_entity_id = hostentity_entity_id
@@ -286,7 +278,6 @@ function run_query_host_insert($host) {
   $opush_frontend = sql_parse_int($host['opush_frontend']);
   $ldap = sql_parse_int($host['ldap']);
   $imap_frontend = sql_parse_int($host['imap_frontend']);
-  $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
   $imap_archive = sql_parse_int($host['imap_archive']);
   $backup_ftp = sql_parse_int($host['backup_ftp']);
@@ -368,9 +359,6 @@ function run_query_host_insert($host) {
   if($imap_frontend > 0) {
     of_service_insert('imap_frontend', $entity_id); 
   }
-  if($monitor > 0) {
-    of_service_insert('monitor', $entity_id); 
-  }
   if($imap > 0) {
     of_service_insert('imap', $entity_id); 
   }
@@ -402,10 +390,6 @@ function run_query_host_insert($host) {
     $retour = $obm_q->query($query);
   }
  
-  if ( !(write_munin_conf()) ){
-	$retour = false;
-  }
-
   return $retour;
 }
 
@@ -433,7 +417,6 @@ function run_query_host_update($host) {
   $opush_frontend = sql_parse_int($host['opush_frontend']);
   $ldap = sql_parse_int($host['ldap']);
   $imap_frontend = sql_parse_int($host['imap_frontend']);
-  $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
   $imap_archive = sql_parse_int($host['imap_archive']);
   $backup_ftp = sql_parse_int($host['backup_ftp']);
@@ -506,11 +489,6 @@ function run_query_host_update($host) {
     } else {
       of_service_delete('imap_frontend', $entity_id); 
     }
-    if($monitor > 0) {
-      of_service_insert('monitor', $entity_id); 
-    } else {
-      of_service_delete('monitor', $entity_id); 
-    }
     if($imap > 0) {
       of_service_insert('imap', $entity_id); 
     } else {
@@ -569,9 +547,6 @@ function run_query_host_update($host) {
       display_debug_msg($query, $cdg_sql, 'run_query_host_update()');
       $retour = $obm_q->query($query);
     }
-  }
-  if ( !(write_munin_conf()) ){
-	$retour = false;
   }
   return $retour;
 
@@ -661,7 +636,6 @@ function get_host_info($id) {
       ldap.service_id as host_ldap,
       obm_sync.service_id as host_obm_sync,
       imap_frontend.service_id as host_imap_frontend,
-      monitor.service_id as host_monitor,
       backup_ftp.service_id as host_backup_ftp,
       provisioning.service_id as host_provisioning
     FROM Host
@@ -674,7 +648,6 @@ function get_host_info($id) {
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as solr ON solr.service_service = 'solr' AND solr.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as imap_frontend ON imap_frontend.service_service = 'imap_frontend' AND imap_frontend.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as backup_ftp ON backup_ftp.service_service = 'backup_ftp' AND backup_ftp.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as opush ON opush.service_service = 'opush' AND opush.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as opush_frontend ON opush_frontend.service_service = 'opush_frontend' AND opush_frontend.service_entity_id = hostentity_entity_id
@@ -697,7 +670,6 @@ function get_host_info($id) {
   $h['obm_sync'] = $obm_q->f('host_obm_sync');
   $h['solr'] = $obm_q->f('host_solr');
   $h['imap_frontend'] = $obm_q->f('host_imap_frontend');
-  $h['monitor'] = $obm_q->f('host_monitor');
   $h['imap'] = $obm_q->f('host_imap');
   $h['imap_archive'] = $obm_q->f('host_imap_archive');
   $h['backup_ftp'] = $obm_q->f('host_backup_ftp');
@@ -890,46 +862,6 @@ function check_host_can_delete($id) {
   return $delete_ok;
 }
 
-function write_munin_conf(){
-  global $cdg_sql, $err;
-  $muninFile = "/etc/munin/munin.conf";
-  $muninContentConf = "#This is generate by OBM\n".
-	"dbdir /var/lib/munin\n".
-	"htmldir /var/www/munin\n".
-	"logdir /var/log/munin\n".
-	"rundir /var/run/munin\n".
-	"tmpldir /etc/munin/templates\n\n";
-
-  $query = "
-    SELECT DISTINCT host_fqdn, host_ip, host_id, hostentity_host_id, hostentity_entity_id, service_entity_id from Host
-	  LEFT JOIN HostEntity ON host_id=hostentity_host_id
-	  LEFT JOIN Service ON hostentity_entity_id=service_entity_id
-	  WHERE service_service = 'monitor' 
-		AND host_fqdn != '' AND host_ip != ''
-		AND host_ip is not null AND host_fqdn is not null";
-   $obm_q = new DB_OBM;
-   display_debug_msg($query, $cdg_sql, 'write_munin_conf');
-   $obm_q->query($query);
-   while ($obm_q->next_record()) {
-     $muninContentConf .= 
-    	"[".$obm_q->f('host_fqdn')."]\n".
-		"\taddress ".$obm_q->f('host_ip')."\n".
-		"\tuse_node_name yes\n";
-   }
-    if (file_exists($muninFile)) {
-      if($fh=fopen($muninFile, 'w')) {
-        fwrite($fh, $muninContentConf);
-        fclose($fh);
-        return true;
-      }else{
-        return false;
-      }
-    }else{
-      return true;
-    }
-
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Host context checking (same hosts exists ?)
 // Parameters:
@@ -992,7 +924,7 @@ function check_host_data_form($host) {
   global $cgp_use, $err, $l_err_host_name, $l_err_host_delegation_exist;
   global $php_regexp_ip, $l_err_host_ip, $l_err_host_ip_exist,$php_regexp_fqdn;
   global $l_err_host_ip_not_in_lan, $l_err_firewall_perms, $l_err_web_all;
-  global $l_err_host_windows_not_global, $l_err_host_fqdn, $l_err_host_monitoring;
+  global $l_err_host_windows_not_global, $l_err_host_fqdn;
   
   $id = $host['host_id'];
   $name = $host['name'];
@@ -1001,7 +933,6 @@ function check_host_data_form($host) {
   $fqdn = $host['fqdn'];
   $web_list = $host['web_list'];
   $web_all = $host['web_all'];
-  $monitor = $host['monitor'];
   $backup_ftp = $host['backup_ftp'];
   $delegation = $host['delegation'];
 
@@ -1107,44 +1038,5 @@ function check_host_data_form($host) {
       return false;
     }
   } 
-  //ip + fqdn to add host monitor
-  if ( $monitor == '1' && ( $fqdn == '' || $ip == '') ){
-	$err['field'] = 'supervision' ;
-	$err['msg'] = "$l_err_host_monitoring";
-	return false;
-  }
   return true;
 }
-
-/**
- * get_host_graph_list
- * return an array of graph
- *
- * $host_fqdn string of host fqdn
- * @return array $graph_list
- */
-function get_host_graph_list($host_fqdn) {
-  
-  $host_domain_explode = explode('.', $host_fqdn, 2 );
-  $host_domain = $host_domain_explode[1];
-  $host_name = $host_domain_explode[0];
-  $munin_folder = '/var/www/munin/'.$host_domain;
-  
-  $graph_list = array();
-  if (is_dir($munin_folder) ) {
-    if ($munin_handler = opendir($munin_folder)) {
-      while (($file = readdir($munin_handler)) !==false) {
-        if (preg_match('/'.$host_fqdn.'.*day.*/', $file)){
-          $desc_stat_extension = explode('-day.png', $file, -1);
-          $desc_stat =  explode('-', $desc_stat_extension[0]);
-          array_push( $graph_list, end($desc_stat));
-        }
-      }
-    }
-    sort($graph_list);
-    return $graph_list;
-  }else{
-    return $graph_list;
-  }
-}
-

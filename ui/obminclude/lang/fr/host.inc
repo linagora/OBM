@@ -44,7 +44,6 @@ $l_delete_ok = "La suppression de l'hôte a été correctement effectuée.";
 $l_delete_error = "La suppression de l'hôte a échoué !";
 $l_can_delete = "L'hôte peut être supprimé";
 
-$l_err_host_monitoring = "Un hôte requiert une adresse ip et un nom complet pour être supervisé";
 $l_err_host_name_empty = "Le nom de l'hôte doit être renseigné";
 $l_err_host_name_exist = "Le nom de l'hôte est déjà utilisé";
 $l_err_host_name = "Le nom de l'hôte est incorrect";
@@ -68,7 +67,6 @@ $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM Sync';
 $l_solr = 'Solr';
 $l_imap_frontend = 'IMAP Frontal';
-$l_monitor = 'Supervision';
 $l_opush = 'OPush';
 $l_opush_frontend = 'OPush Frontal';
 $l_ldap = 'LDAP';

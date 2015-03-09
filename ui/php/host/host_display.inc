@@ -52,7 +52,6 @@ $fieldnames['host_imap_archive'] = $l_imap_archive;
 $fieldnames['host_smtp_in'] = $l_smtp_in;
 $fieldnames['host_smtp_out'] = $l_smtp_out;
 $fieldnames['host_obm_sync'] = $l_obm_sync;
-$fieldnames['host_monitor'] = $l_monitor;
 $fieldnames['host_description'] = $l_desc;
 $fieldnames['host_provisioning'] = $l_provisioning;
 $fieldnames['usercreate'] = $l_creator;
@@ -134,14 +133,6 @@ function dis_data_host(&$OD, $fieldname, $link_ok) {
       $res['name'] = ' ';
     }
   }
-  else if ($fieldname == 'host_monitor') {
-    $res['align'] = 'center';
-    if ($OD->data_set->f($fieldname)) {
-      $res['name'] = 'X';
-    } else {
-      $res['name'] = ' ';
-    }
-  }
 
   else if ($fieldname == 'host_provisioning') {
     $res['align'] = 'center';
@@ -213,7 +204,6 @@ function html_host_search_form($host) {
   $ldap = ($host['ldap'] == '1' ? "checked = \"checked\"" : '');
   $imap = ($host['imap'] == '1' ? "checked = \"checked\"" : '');
   $imap_archive = ($host['imap_archive'] == '1' ? "checked = \"checked\"" : '');
-  $monitor = ($host['monitor'] == '1' ? "checked = \"checked\"" : '');
   $imap_frontend = ($host['imap_frontend'] == '1' ? "checked = \"checked\"" : '');
   $backup_ftp = ($host['backup_ftp'] == '1' ? "checked = \"checked\"" : '');
   $provisioning = ($host['provisioning'] == '1' ? "checked = \"checked\"" : '');
@@ -302,9 +292,6 @@ function html_host_search_form($host) {
       $block_ldap
       $block_backup_ftp
       $block_provisioning
-      <label>$GLOBALS[l_monitor]<br />
-        <input type=\"checkbox\" name=\"cb_monitor\" value=\"1\" $monitor />
-      </label>
       <label>&nbsp;<br />
         <input name=\"action\" type=\"hidden\" value=\"search\" />
         <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
@@ -377,11 +364,10 @@ function html_host_search_list($obm_q, $pref_q, $host) {
   $smtp_out = $host['smtp_out'];
   $obm_sync = $host['obm_sync'];
   $solr = $host['solr'];
-  $monitor = $host['monitor'];
   $provisioning = $host['provisioning'];
 
 
-  $url = url_prepare("host_index.php?action=search&amp;tf_name=$name&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_samba=$smb&amp;cb_imap=$imap&amp;cb_imap_archive=$imap_archive&amp;cb_smtp_in=$smtp_in&amp;cb_smtp_out=$smtp_out&amp;cb_obm_sync=$obm_sync&amp;cb_solr=$solr&amp;cb_monitor=$monitor;cb_provisioning=$provisioning$url_ext");
+  $url = url_prepare("host_index.php?action=search&amp;tf_name=$name&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_samba=$smb&amp;cb_imap=$imap&amp;cb_imap_archive=$imap_archive&amp;cb_smtp_in=$smtp_in&amp;cb_smtp_out=$smtp_out&amp;cb_obm_sync=$obm_sync&amp;cb_solr=$solr&amp;cb_provisioning=$provisioning$url_ext");
 
   $dis_host = new OBM_DISPLAY('DATA', $pref_q, $module);
 
@@ -436,7 +422,7 @@ function html_host_consult($host_q) {
   global $l_yes, $l_no, $l_module_host, $l_name, $l_ip, $l_desc, $l_smb;
   global $l_perms, $l_enable, $l_disable, $l_empty, $l_not_assigned;
   global $l_user, $l_fqdn, $l_system, $l_help_system,$l_domain;
-  global $l_module_monitoring, $l_day, $l_week, $l_month, $l_year;
+  global $l_day, $l_week, $l_month, $l_year;
 
   // Check if domain is a samba domain
   $samba_domain = false;
@@ -461,7 +447,6 @@ function html_host_consult($host_q) {
   $solr = $host_q->f('host_solr');
   $imap_frontend = $host_q->f('host_imap_frontend');
   $smtp_in = $host_q->f('host_smtp_in');
-  $monitor = $host_q->f('host_monitor');
   $backup_ftp = $host_q->f('host_backup_ftp');
   $provisioning = $host_q->f('host_provisioning');
   $name = $host_q->f('host_name');
@@ -495,7 +480,6 @@ function html_host_consult($host_q) {
   if ($obm_sync) $obm_sync = $l_yes; else $obm_sync = $l_no;
   if ($solr) $solr = $l_yes; else $solr = $l_no;
   if ($imap_frontend) $imap_frontend = $l_yes; else $imap_frontend = $l_no;
-  if ($monitor) $monitor = $l_yes; else $monitor = $l_no;
   if ($provisioning) $provisioning = $l_yes; else $provisioning = $l_no;
   if ($backup_ftp) {
     $backup_ftp = $l_yes;
@@ -613,47 +597,6 @@ function html_host_consult($host_q) {
 
   $host_domain_explode = explode('.', $fqdn, 2 );
   $host_domain = $host_domain_explode[1];
-  $graph_list = get_host_graph_list($fqdn);
-  
-  if ( $graph_list[0] !== NULL ){
-    $block_stat_menu .=  "
-      <div id='stat_menu'>
-      <ul>
-      ";
-    foreach ( $graph_list as $graph){
-      $block_stat_menu .= "
-        <li> <a href=# title='".$graph."'>".$graph."</a></li>
-        ";
-    }
-    $block_stat_menu .= "
-      </ul>
-      </div>
-      ";
-
-    $block_stat = "
-     <h1>$l_module_monitoring</h1>
-      <div id=\"menuDay\" >
-        <a href=# title='day'>
-          ".$l_day."
-        </a>
-        <a href=# title='week'>
-          ".$l_week."
-        </a>
-        <a href=# title='month'>
-          ".$l_month."
-        </a>
-        <a href=# title='year'>
-          ".$l_year."
-        </a>
-      </div> 
-      ".$block_stat_menu."
-      <div id='stat_img'>
-        <img src=/stats/$host_domain/$fqdn-$graph_list[0]-day.png>
-      </div>
-      ";
-    }
-
-
 
   $block = "
     <div class=\"detail extras\" style=\"overflow:hidden\">
@@ -691,10 +634,6 @@ function html_host_consult($host_q) {
     $block_ldap
     $block_backup_ftp
     $block_provisioning
-    <tr>
-      <th>$GLOBALS[l_monitor]</th>
-      <td>$monitor</td>
-    </tr>
     </table>
     $block_stat
     </div>";
@@ -748,7 +687,6 @@ function html_host_form($action, $host_q, $host, $field='') {
     $opush_frontend = $host_q->f('host_opush_frontend');
     $ldap = $host_q->f('host_ldap');
     $imap_frontend = $host_q->f('host_imap_frontend');
-    $monitor = $host_q->f('host_monitor');
     $backup_ftp = $host_q->f('host_backup_ftp');
     $provisioning = $host_q->f('host_provisioning');
     $desc = $host_q->f('host_description');
@@ -784,8 +722,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (isset($host['opush_frontend'])) { $opush_frontend = $host['opush_frontend']; }
   if (isset($host['ldap'])) { $ldap = $host['ldap']; }
   if (isset($host['imap_frontend'])) { $imap_frontend = $host['imap_frontend']; }
-  if (isset($host['monitor'])) { $monitor = $host['monitor']; }
-  if (isset($host['provisioning'])) { $monitor = $host['provisioning']; }
+  if (isset($host['provisioning'])) { $provisioning = $host['provisioning']; }
   if (isset($host['backup_ftp'])) { $backup_ftp = $host['backup_ftp']; }
   if (isset($host['backup_ftp_login'])) { $backup_ftp_login = $host['backup_ftp_login']; }
   if (isset($host['backup_ftp_password'])) { $backup_ftp_password = $host['backup_ftp_password']; }
@@ -816,7 +753,6 @@ function html_host_form($action, $host_q, $host, $field='') {
   $opush_frontend_state  = ($opush_frontend ? 'checked' : '');
   $ldap_state  = ($ldap ? 'checked' : '');
   $imap_frontend_state  = ($imap_frontend ? 'checked' : '');
-  $monitor_state  = ($monitor ? 'checked' : '');
   $backup_ftp_state  = ($backup_ftp ? 'checked' : '');
   $provisioning_state  = ($provisioning ? 'checked' : '');
 
@@ -1003,12 +939,6 @@ function html_host_form($action, $host_q, $host, $field='') {
   $block_ldap
   $block_backup_ftp
   $block_provisioning
-   <tr>
-     <th class=\"$class[monitor]\"><label for=\"cb_monitor\">$GLOBALS[l_monitor]</label></th>
-     <td>
-       <input id=\"cb_monitor\" name=\"cb_monitor\" type=\"checkbox\" value=\"1\" $monitor_state>
-     </td>
-   </tr>
   <tr>
     <th class=\"$class[desc]\">$l_desc</th>
     <td>

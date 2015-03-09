@@ -357,7 +357,6 @@ $l_module_resource = "资源"; //"Resources"
 $l_module_group = "分组"; //"Groups";
 $l_module_resourcegroup = "资源分组"; //"Resource group"
 $l_module_host = "主机"; //"Hosts"
-$l_module_monitoring = "监控"; //"Monitoring"
 $l_module_mailshare = "Mailshares"; //"Mailshares"
 $l_module_organizationalchart = "组织结构图"; //"Organizational chart"
 $l_module_userbackup = "备份/还原"; //"Backup/Restore"
