@@ -167,6 +167,10 @@ public class ContentType {
 		return contentDisposition;
 	}
 	
+	public boolean isAttachment() {
+		return ContentDisposition.ATTACHMENT == contentDisposition;
+	}
+	
 	@Override
 	public final int hashCode(){
 		return Objects.hashCode(primaryType, subType, bodyParams);

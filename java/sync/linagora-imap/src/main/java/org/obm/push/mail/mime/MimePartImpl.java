@@ -268,9 +268,10 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 	
 	@Override
 	public boolean isAttachment() {
-		return (!isFirstElementInParent()	
+		return contentType.isAttachment()
+				|| (!isFirstElementInParent()	
 				&& !isMultipart()
-				&& contentTypeIsAttachment());
+				&& hasParentNonMultipartAlternative());
 	}
 	
 	@Override
@@ -278,7 +279,7 @@ public class MimePartImpl extends AbstractMimePart implements MimePart {
 		return AttachmentExtensionMapper.extensionFromContentType(getContentType());
 	}
 	
-	private boolean contentTypeIsAttachment() {
+	private boolean hasParentNonMultipartAlternative() {
 		if (parent != null) {
 			if (!parent.getFullMimeType().equalsIgnoreCase("multipart/alternative")) {
 				return true;

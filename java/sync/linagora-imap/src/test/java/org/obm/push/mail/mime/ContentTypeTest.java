@@ -131,4 +131,30 @@ public class ContentTypeTest {
 		ContentType contentType = ContentType.builder().contentType("multipart/mixed; boundary=\"----=_Part_0_1330682067197\"").build();
 		assertThat(contentType.getBodyParams()).containsOnly(new BodyParam("boundary", "----=_Part_0_1330682067197"));
 	}
+	
+	@Test
+	public void isAttachmentShouldBeFalseWhenContentDispositionIsNotAttachment() {
+		ContentType contentType = ContentType.builder()
+				.contentType("image/jpeg")
+				.contentDisposition(ContentDisposition.INLINE.name())
+				.build();
+		assertThat(contentType.isAttachment()).isFalse();
+	}
+	
+	@Test
+	public void isAttachmentShouldBeFalseWhenContentDispositionIsNotSet() {
+		ContentType contentType = ContentType.builder()
+				.contentType("image/jpeg")
+				.build();
+		assertThat(contentType.isAttachment()).isFalse();
+	}
+	
+	@Test
+	public void isAttachmentShouldBeTrueWhenContentDispositionIsAttachment() {
+		ContentType contentType = ContentType.builder()
+				.contentType("image/jpeg")
+				.contentDisposition(ContentDisposition.ATTACHMENT.name())
+				.build();
+		assertThat(contentType.isAttachment()).isTrue();
+	}
 }
