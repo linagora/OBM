@@ -191,6 +191,24 @@ public class UserDaoTest {
 		
 		assertThat(dao.userIdFromEmailQuery(connection, login, new DomainName(domain))).isEqualTo(1);
 	}
+
+	@Test
+	public void testUserIdFromEmailQueryWithEmptyAlias() throws Exception {
+		EmailLogin login = new EmailLogin("usera");
+		String domain = "test.com";
+		String alias = "alias.com";
+		
+		Connection connection = mocksControl.createMock(Connection.class);
+		ResultSet rs = mocksControl.createMock(ResultSet.class);
+		UserDaoJdbcImpl dao = new UserDaoJdbcImpl(obmHelper, obmInfoDao, addressBookDao, userPatternDao, groupDao, profileDao);
+		
+		expectEmailQueryCalls(connection, rs, 1);
+		expectMatchingUserOfEmailQuery(rs, 1, login.get(), domain, Joiner.on("\r\n").join(new String[]{"", alias}).toString());
+		mocksControl.replay();
+		
+		assertThat(dao.userIdFromEmailQuery(connection, login, new DomainName(alias))).isEqualTo(1);
+	}
+
 	
 	@Test
 	public void testUserIdFromEmailQueryLoginDifferentCase() throws Exception {

@@ -246,7 +246,7 @@ public class UserDaoJdbcImpl implements UserDao {
 			}
 			
 			if (domainsAliasToCompare != null) {
-				Iterable<String> domains = Splitter.on(DB_INNER_FIELD_SEPARATOR).split(domainsAliasToCompare);					
+				Iterable<String> domains = Splitter.on(DB_INNER_FIELD_SEPARATOR).omitEmptyStrings().split(domainsAliasToCompare);					
 				for (String domainToCompare: domains) {
 					if (domain.equals(new DomainName(domainToCompare))) {
 						return true;
