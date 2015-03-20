@@ -57,9 +57,6 @@ page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => '
 if ($action == 'logout') {
   include_once("$obminclude/global_pref.inc");
 
-  // TODO: check si roundcube est présent
-  setcookie('roundcube_obm_sessid', false, time()-3600 );
-
   run_query_logout();
   if($auth_kind == "CAS" || strcasecmp($auth_kind,"LemonLDAP") == 0) {
     $auth->logout();

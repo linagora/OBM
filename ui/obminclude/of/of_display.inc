@@ -1276,7 +1276,19 @@ function display_head($p_module, $standard=true) {
   $extra_js
   // ]]>
   </script>
+  <script type=\"text/javascript\">
+    window.addEvent('load', function() {
+      $('logout').addEvent('click', function(event) {
+        event.stop();
 
+        new Request({
+          method: 'get',
+          url: '/webmail/obm.php?_task=logout',
+          onComplete: function() { window.location.href = $('logout').href; }
+        }).send();
+      });
+    });
+  </script>
 </head>
 
 <body onload=\"if (document.f_search && document.f_search.elements[0]) {
@@ -1351,25 +1363,12 @@ function display_menu($module) {
       $wait_event
       <li id='informationUser'>$login ($domain)</li>
       <li id='informationProfile'>$l_profile: $p</li>
-      <li><a id='bannerLogoutLink' href='".$path."/obm.php?action=logout' onclick='logout_roundcube()'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
+      <li><a id='logout' href='".$path."/obm.php?action=logout'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
       $dis_printer
     </ul>
     </div>
 
     </div>
-    <script type='text/javascript'>
-    /*
-      function logout_roundcube() {
-        var url = 'https://' + window.location.hostname + '/webmail/index.php?_task=logout';
-        
-        var rcLogoutRequest = new Request({
-          method: 'get',
-          url: url,
-          onComplete: function(response) { confirm('Response: ' + response); }
-        }).send();
-      }
-      */
-    </script>
     ".$display['module'];
 
   return $block;
