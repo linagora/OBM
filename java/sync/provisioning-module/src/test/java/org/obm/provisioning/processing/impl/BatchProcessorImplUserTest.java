@@ -802,7 +802,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 	private void expectLdapdeleteUser(ObmUser userToRemove, Group defaultGroup) throws SQLException {
 		LdapManager ldapManager = expectLdapBuild();
 
-		expect(groupDao.getAllGroupsForUserExtId(domainWithImapAndLdap, UserExtId.valueOf("extIdUser1"))).andReturn(Collections.EMPTY_SET);
+		expect(groupDao.getAllPublicGroupsForUserExtId(domainWithImapAndLdap, UserExtId.valueOf("extIdUser1"))).andReturn(Collections.EMPTY_SET);
 
 		ldapManager.removeUserFromGroup(userToRemove.getDomain(), defaultGroup, userToRemove);
 		expectLastCall();
@@ -1650,7 +1650,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domainWithImapAndLdap)).andReturn(userFromDao);
 		expect(userDao.update(user)).andReturn(user);
 		expect(groupDao.getByGid(domainWithImapAndLdap, UserDao.DEFAULT_GID)).andReturn(usersGroup);
-		expect(groupDao.getAllGroupsForUserExtId(domainWithImapAndLdap, UserExtId.valueOf("extIdUser1"))).andReturn(Collections.EMPTY_SET);
+		expect(groupDao.getAllPublicGroupsForUserExtId(domainWithImapAndLdap, UserExtId.valueOf("extIdUser1"))).andReturn(Collections.EMPTY_SET);
 		expectLdapCreateUser(user, usersGroup);
 		expectPUserDaoDelete(user);
 		expectPUserDaoInsert(user);
@@ -1742,7 +1742,7 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expect(userDao.getByExtId(UserExtId.valueOf("extIdUser1"), domainWithImapAndLdap)).andReturn(existingUserFromDao);
 		expect(userDao.update(updatedUserFromDao)).andReturn(updatedUserFromDao);
 		expect(groupDao.getByGid(domainWithImapAndLdap, UserDao.DEFAULT_GID)).andReturn(usersGroup);
-		expect(groupDao.getAllGroupsForUserExtId(domainWithImapAndLdap, UserExtId.valueOf("extIdUser1"))).andReturn(Collections.EMPTY_SET);
+		expect(groupDao.getAllPublicGroupsForUserExtId(domainWithImapAndLdap, UserExtId.valueOf("extIdUser1"))).andReturn(Collections.EMPTY_SET);
 		CyrusManager cyrusManager = expectCyrusBuild();
 		expectApplyQuota(cyrusManager, updatedUserFromDao);
 		expectCyrusShutDown(cyrusManager);

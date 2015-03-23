@@ -160,7 +160,7 @@ public interface GroupDao {
 
     Set<Group> listPublicGroups(ObmDomain domain) throws DaoException;
 
-    Set<Group> getAllGroupsForUserExtId(ObmDomain domain, UserExtId userExtId) throws SQLException;
+    Set<Group> getAllPublicGroupsForUserExtId(ObmDomain domain, UserExtId userExtId) throws SQLException;
 
     /**
      * Recursively get parent group id of group

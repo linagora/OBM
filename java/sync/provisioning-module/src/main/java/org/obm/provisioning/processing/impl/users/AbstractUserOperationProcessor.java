@@ -162,7 +162,7 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 	}
 
 	private void addUserToGroupsExceptDefaultOneInLdap(LdapManager ldapManager, Group defaultGroup, ObmUser user) throws SQLException {
-		Set<Group> groups = groupDao.getAllGroupsForUserExtId(user.getDomain(), user.getExtId());
+		Set<Group> groups = groupDao.getAllPublicGroupsForUserExtId(user.getDomain(), user.getExtId());
 
 		for (Group group: groups) {
 			if (!group.equals(defaultGroup)) {
@@ -189,7 +189,7 @@ public abstract class AbstractUserOperationProcessor extends AbstractOperationPr
 	}
 
 	protected void deleteUserFromGroupsExceptDefaultOneInLdap(LdapManager ldapManager, Group defaultGroup, ObmUser user) throws SQLException {
-		Set<Group> groups = groupDao.getAllGroupsForUserExtId(user.getDomain(), user.getExtId());
+		Set<Group> groups = groupDao.getAllPublicGroupsForUserExtId(user.getDomain(), user.getExtId());
 
 		for (Group group: groups) {
 			if (!group.equals(defaultGroup)) {

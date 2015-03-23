@@ -329,7 +329,7 @@ public class UserDaoJdbcImpl implements UserDao {
 		ObmUser creator = findUserById(rs.getInt("userobm_usercreate"), domain, false);
 		ObmUser updator = findUserById(rs.getInt("userobm_userupdate"), domain, false);
 
-		Set<Group> groups = groupDao.getAllGroupsForUserExtId(domain, UserExtId.builder().extId(rs.getString("userobm_ext_id")).build());
+		Set<Group> groups = groupDao.getAllPublicGroupsForUserExtId(domain, UserExtId.builder().extId(rs.getString("userobm_ext_id")).build());
 
 		return createUserFromResultSet(domain, rs, creator, updator, groups);
 	}

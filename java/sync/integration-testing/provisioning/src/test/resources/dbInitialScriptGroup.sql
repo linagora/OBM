@@ -260,7 +260,8 @@ INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, g
  (2, 0, 0, 4, 'GroupWhoSubgroupHaveUser', 0, 1002, 'GroupWhoSubgroupHaveUser', 'Group Who Subgroup Have User', 'group_with_subgroup@obm.org'),
  (2, 0, 0, 5, 'GroupA', 0, 1002, 'GroupA', 'Group A', 'groupA@obm.org'), 
  (2, 0, 0, 6, 'GroupAA', 0, 1002, 'GroupAA', 'Group AA', 'groupAA@obm.org'),
- (2, 0, 0, 7, 'GroupAB', 0, 1002, 'GroupAB', 'Group AB', 'groupAB@obm.org');
+ (2, 0, 0, 7, 'GroupAB', 0, 1002, 'GroupAB', 'Group AB', 'groupAB@obm.org'),
+ (2, 0, 1, 8, 'GroupPrivate', 0, 1003, 'GroupPrivate', 'Group Private', 'GroupPrivate@obm.org');
  
 INSERT INTO entity (entity_mailing)
     VALUES

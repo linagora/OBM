@@ -262,7 +262,8 @@ INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, g
  VALUES (2, 0, 0, 1, 'AdminExtId', 0, 1001, 'Admin', 'Admin Group Desc', 'group_admin@obm.org'), 
  (2, 0, 0, 2, 'GroupWithUsers', 0, 1002, 'GroupWithUsers', 'Group With Users', 'group_with_user@obm.org'), 
  (2, 0, 0, 3, 'GroupWithSubGroup', 0, 1002, 'GroupWithSubGroup', 'Group With SubGroup', 'group_with_subgroup@obm.org'),
- (2, 0, 0, 4, 'GroupWhoSubgroupHaveUser', 0, 1002, 'GroupWhoSubgroupHaveUser', 'Group Who Subgroup Have User', 'group_with_subgroup@obm.org');
+ (2, 0, 0, 4, 'GroupWhoSubgroupHaveUser', 0, 1002, 'GroupWhoSubgroupHaveUser', 'Group Who Subgroup Have User', 'group_with_subgroup@obm.org'),
+ (2, 0, 1, 5, 'GroupPrivate', 0, 1003, 'GroupPrivate', 'Group Private', 'GroupPrivate@obm.org');
  
 INSERT INTO entity (entity_mailing)
     VALUES
@@ -274,15 +275,16 @@ INSERT INTO entity (entity_mailing)
         
 INSERT INTO userentity (userentity_entity_id, userentity_user_id)
     VALUES (4, 1), (5, 2);
- 
+
 INSERT INTO UserObm (userobm_domain_id, userobm_ext_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
 	 VALUES (1, 'Admin0ExtId','admin0','admin0','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'admin0', NULL),
 		(2, 'User1','user1','','','', '', '', '2002', '512', '0', 'user1', NULL);
  
-INSERT INTO userobmgroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES (2, 1);
+INSERT INTO userobmgroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES (2, 1), (5, 1);
+
 INSERT INTO groupgroup (groupgroup_parent_id, groupgroup_child_id) VALUES (3, 1), (4, 2);
 
-INSERT INTO of_usergroup (of_usergroup_group_id, of_usergroup_user_id) VALUES (2, 1);
+INSERT INTO of_usergroup (of_usergroup_group_id, of_usergroup_user_id) VALUES (2, 1), (5, 1);
 
 INSERT INTO UserSystem (usersystem_login, usersystem_password, usersystem_homedir)
     VALUES

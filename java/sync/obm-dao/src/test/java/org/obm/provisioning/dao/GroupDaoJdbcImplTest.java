@@ -694,16 +694,16 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
 	}
 
 	@Test
-	public void testGetAllGroupsForUserExtId() throws Exception {
+	public void testGetAllPublicGroupsForUserExtIdFromDifferentTypeOfGroup() throws Exception {
 		Group group1 = dao.create(user1.getDomain(),
-				Group.builder()
+		Group.builder()
 				.name("group1")
 				.extId(GroupExtId.valueOf("extIdGroup1"))
-				.privateGroup(true)
+				.privateGroup(false)
 				.email("group1@domain").build());
 
 		Group group2 = dao.create(user1.getDomain(),
-				Group.builder()
+		Group.builder()
 				.name("group2")
 				.extId(GroupExtId.valueOf("extIdGroup2"))
 				.privateGroup(true)
@@ -711,14 +711,12 @@ public class GroupDaoJdbcImplTest implements H2TestClass {
 
 		ImmutableSet.Builder<Group> expectedGroupsBuilder = ImmutableSet.builder();
 
-		expectedGroupsBuilder
-				.add(group1)
-				.add(group2);
+		expectedGroupsBuilder.add(group1);
 
 		dao.addUser(domain1, group1.getUid(), user1);
 		dao.addUser(domain1, group2.getUid(), user1);
 
-		Set<Group> groups = dao.getAllGroupsForUserExtId(user1.getDomain(), user1.getExtId());
+		Set<Group> groups = dao.getAllPublicGroupsForUserExtId(user1.getDomain(), user1.getExtId());
 
 		assertThat(groups).isEqualTo(expectedGroupsBuilder.build());
 	}

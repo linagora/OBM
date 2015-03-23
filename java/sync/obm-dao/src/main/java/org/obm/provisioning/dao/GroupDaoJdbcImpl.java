@@ -750,7 +750,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 	}
 
     @Override
-	public Set<Group> getAllGroupsForUserExtId(ObmDomain domain, UserExtId userExtId) throws SQLException {
+	public Set<Group> getAllPublicGroupsForUserExtId(ObmDomain domain, UserExtId userExtId) throws SQLException {
 		ImmutableSet.Builder<Group> userGroups = ImmutableSet.builder();
 		String query =
 				"     SELECT " + FIELDS +
@@ -760,6 +760,7 @@ public class GroupDaoJdbcImpl implements GroupDao {
 				" INNER JOIN UserObm " +
 				"         ON userobm_id = of_usergroup_user_id " +
 				"      WHERE userobm_ext_id = ? " +
+				"        AND group_privacy = 0 " +
 				"        AND userobm_domain_id = ? ";
 
 		try (Connection con = connectionProvider.getConnection();
