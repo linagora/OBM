@@ -109,6 +109,8 @@ fi
 
 
 %changelog
+* Mon Mar 30 2015 Thomas Sarboni <tsarboni@linagora.com> - obm-ca-3.1.4-1
+- New upstream release.
 * Thu Mar 26 2015 Thomas Sarboni <tsarboni@linagora.com> - obm-ca-3.1.4-0.rc1
 - New upstream release.
 * Mon Mar 02 2015 Thomas Sarboni <tsarboni@linagora.com> - obm-ca-3.1.3-
