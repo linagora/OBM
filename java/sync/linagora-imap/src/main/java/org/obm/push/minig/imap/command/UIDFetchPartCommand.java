@@ -35,12 +35,11 @@ package org.obm.push.minig.imap.command;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.io.SequenceInputStream;
 
 import org.obm.push.minig.imap.impl.IMAPResponse;
 
 import com.google.common.io.ByteStreams;
-import com.google.common.primitives.Bytes;
 
 public class UIDFetchPartCommand extends Command<InputStream> {
 
@@ -89,17 +88,8 @@ public class UIDFetchPartCommand extends Command<InputStream> {
 	public void handleResponse(IMAPResponse response) {
 		if (response.getStreamData() != null) {
 			try {
-				byte[] rawData = ByteStreams.toByteArray(response.getStreamData());
-				if (rawData[rawData.length - 1] == ')') {
-					rawData = Arrays.copyOf(rawData, rawData.length - 1);
-				}
-				
-				if (data == null) {
-					data = new ByteArrayInputStream(rawData);
-				} else {
-					byte[] byteArray = ByteStreams.toByteArray(data);
-					data = new ByteArrayInputStream(Bytes.concat(byteArray, rawData));
-				}
+				InputStream dataStream = removeTrailingParenthesis(response);
+				data = new SequenceInputStream(data, dataStream);
 			}
 			catch (IOException e) {
 				logger.error("Error reading response stream", e);
@@ -108,6 +98,15 @@ public class UIDFetchPartCommand extends Command<InputStream> {
 			if (data == null) {
 				data = new ByteArrayInputStream("[empty]".getBytes());
 			}
+		}
+	}
+
+	private InputStream removeTrailingParenthesis(IMAPResponse response) throws IOException {
+		byte[] rawData = ByteStreams.toByteArray(response.getStreamData());
+		if (rawData[rawData.length - 1] == ')') {
+			return ByteStreams.limit(new ByteArrayInputStream(rawData), rawData.length - 1);
+		} else {
+			return new ByteArrayInputStream(rawData);
 		}
 	}
 	

@@ -35,13 +35,13 @@ package org.obm.push.minig.imap.command;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.SequenceInputStream;
 
 import org.obm.push.exception.ImapMessageNotFoundException;
 import org.obm.push.minig.imap.impl.IMAPResponse;
 import org.obm.push.utils.FileUtils;
 
 import com.google.common.io.ByteStreams;
-import com.google.common.primitives.Bytes;
 
 public class UIDFetchMessageCommand extends Command<InputStream> {
 
@@ -91,24 +91,21 @@ public class UIDFetchMessageCommand extends Command<InputStream> {
 	public void handleResponse(IMAPResponse response) {
 		InputStream in = response.getStreamData();
 		if (in != null) {
-			// -1 pattern of the day to remove "\0" at end of stream
 			try {
-				byte[] byteData = FileUtils.streamBytes(in, true);
-				byte[] dest = new byte[byteData.length - 1];
-				System.arraycopy(byteData, 0, dest, 0, dest.length);
-				
-				if (data == null) {
-					data = new ByteArrayInputStream(dest);
-				} else {
-					byte[] byteArray = ByteStreams.toByteArray(data);
-					data = new ByteArrayInputStream(Bytes.concat(byteArray, dest));
-				}
+				InputStream dataWithoutLastByte = removeTrailingBackslashZero(in);
+				data = new SequenceInputStream(data, dataWithoutLastByte);
 			} catch (IOException e) {
+				logger.error("Cannot handle response of the UIDFetchMessageCommand", e);
 			}
 		} else {
 			logger.warn("fetch is ok with no stream in response. Printing received responses :");
 			throw new ImapMessageNotFoundException("UIDFetchMessage failed for uid " + uid);
 		}
+	}
+
+	private InputStream removeTrailingBackslashZero(InputStream in) throws IOException {
+		byte[] byteData = FileUtils.streamBytes(in, true);
+		return ByteStreams.limit(new ByteArrayInputStream(byteData), byteData.length - 1);
 	}
 	
 	@Override
