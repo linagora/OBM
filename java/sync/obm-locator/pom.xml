@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.1.4</version>
+		<version>3.1.5-rc1</version>
 	</parent>
 	
 	<artifactId>obm-locator</artifactId>
 	<packaging>jar</packaging>
 	<name>obm-locator</name>
 	<url>http://www.obm.org/</url>
-	<version>3.1.4</version>
+	<version>3.1.5-rc1</version>
 
 	<licenses>
 		<license>
