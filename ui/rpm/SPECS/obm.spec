@@ -674,6 +674,8 @@ fi
 #empty package :(
 
 %changelog
+* Tue May 12 2015 Thomas Sarboni <tsarboni@linagora.com> - obm-3.1.5-0.rc1
+- New upstream release.
 * Mon Mar 30 2015 Thomas Sarboni <tsarboni@linagora.com> - obm-3.1.4-1
 - New upstream release.
 * Thu Mar 26 2015 Thomas Sarboni <tsarboni@linagora.com> - obm-3.1.4-0.rc1
