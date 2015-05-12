@@ -69,13 +69,14 @@ public class AuthorizingModule extends ShiroWebModule {
 		bind(AuthenticationService.class).to(AuthenticationServiceImpl.class);
 		bind(AuthorizationService.class).to(AuthorizationServiceImpl.class);
 
-		addFilterChain(baseUrl + "**/batches/**/users/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubBatchResourceAuthorizationFilter.class));
-		addFilterChain(baseUrl + "**/batches/**/groups/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubBatchResourceAuthorizationFilter.class));
-		addFilterChain(baseUrl + "**/users/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
-		addFilterChain(baseUrl + "**/groups/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
-		addFilterChain(baseUrl + "**/profiles/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
-		addFilterChain(baseUrl + "**/batches/**", Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
-		addFilterChain(baseUrl + "**", Key.get(MDCFilter.class));
+		addFilterChain(baseUrl + "**/batches/**/users/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubBatchResourceAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**/batches/**/groups/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubBatchResourceAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**/users/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**/groups/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**/profiles/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**/batches/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**", NO_SESSION_CREATION, Key.get(MDCFilter.class));
+
 		expose(Realm.class);
 	}
 
