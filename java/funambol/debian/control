@@ -8,13 +8,13 @@ Homepage: http://www.obm.org
 
 Package: obm-funambol
 Architecture: all
-Depends: obm-funambol-storage (= ${binary:Version}), obm-munin-node
+Depends: obm-funambol-storage (= ${binary:Version})
 Description: Funambol server with obm plugin
  Plugin for funambol used to provide OBM data as syncml.
 
 Package: obm-funambol-storage
 Architecture: all
-Depends: dbconfig-common, postgresql-8.3, obm-munin-node
+Depends: dbconfig-common, postgresql-8.3
 Provides: obm-funambol-core
 Conflicts: obm-funambol-core
 Replaces: obm-funambol-core

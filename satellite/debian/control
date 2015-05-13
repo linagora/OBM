@@ -8,7 +8,7 @@ Homepage: http://www.obm.org
 
 Package: obm-satellite
 Architecture: all
-Depends: obm-conf ,libobmsatellite-perl (= ${binary:Version}), obm-munin-node, ucf, obm-certs, ${misc:Depends}
+Depends: obm-conf ,libobmsatellite-perl (= ${binary:Version}), ucf, obm-certs, ${misc:Depends}
 Description: integration of OBM with Cyrus and Postfix
  This package contains a daemon which manages Cyrus partitions and Postfix maps
  for OBM. This package needs to be installed on each server containing

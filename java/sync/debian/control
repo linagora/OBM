@@ -9,7 +9,6 @@ Homepage: http://www.obm.org
 Package: obm-sync
 Architecture: all
 Pre-Depends: obm-conf, obm-tomcat, obm-tomcat-common-libs
-Depends: obm-munin-node
 Description: synchronization application for Open Business Management
  This package contains a J2E web application used to synchronize OBM data with
  Icedove/Thunderbird, Outlook, etc.
@@ -46,7 +45,7 @@ Description: Provisioning API for Open Business Management
 Package: obm-autoconf
 Architecture: all
 Pre-Depends: obm-conf
-Depends: obm-tomcat,  obm-munin-node
+Depends: obm-tomcat
 Description: Icedove/Thunderbird autoconfiguration service for Open Business Management
  This package contains a J2E web service to autoconfigure Icedove/Thunderbird
  clients for use with OBM.
