@@ -118,4 +118,53 @@ public class ConfigurationServiceImplTest {
 	private IniFile buildIniFileFromResourceFile(String file) {
 		return new IniFile.Factory().build(Resources.getResource(file).getFile());
 	}
+
+	@Test
+	public void testGetPasswordHashShouldReturnDefaultWhenNotSet() {
+		expect(iniFile.getStringValue("password-hash")).andReturn(null);
+		control.replay();
+
+		try {
+			assertThat(configurationServiceImpl.getPasswordHash()).isEqualTo(Hash.NONE);
+		} finally {
+			control.verify();
+		}
+	}
+
+	@Test
+	public void testGetPasswordHashShouldReturnCorrespondingEnumWhenSet() {
+		expect(iniFile.getStringValue("password-hash")).andReturn("SHA256");
+		control.replay();
+
+		try {
+			assertThat(configurationServiceImpl.getPasswordHash()).isEqualTo(Hash.SHA256);
+		} finally {
+			control.verify();
+		}
+	}
+
+	@Test
+	public void testGetPasswordHashShouldBeCaseInsensitive() {
+		expect(iniFile.getStringValue("password-hash")).andReturn("sha512");
+		control.replay();
+
+		try {
+			assertThat(configurationServiceImpl.getPasswordHash()).isEqualTo(Hash.SHA512);
+		} finally {
+			control.verify();
+		}
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetPasswordHashShouldThrowIAEWhenSetToInvalidValue() {
+		expect(iniFile.getStringValue("password-hash")).andReturn("crc32");
+		control.replay();
+
+		try {
+			configurationServiceImpl.getPasswordHash();
+		} finally {
+			control.verify();
+		}
+	}
+
 }

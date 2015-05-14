@@ -37,6 +37,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
+import org.obm.configuration.Hash;
+
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 
@@ -100,5 +102,6 @@ public class Configuration {
 	public String obmSyncServices = "services";
 	public String activeSyncServletUrl = null;
 	public boolean anonymizePrivateEvent = true;
+	public Hash passwordHash = Hash.NONE;
 
 }

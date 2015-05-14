@@ -72,4 +72,6 @@ public interface ConfigurationService extends DomainConfiguration, DataConfigura
 
 	boolean isCyrusPartitionEnabled();
 
+	Hash getPasswordHash();
+
 }

@@ -128,6 +128,11 @@ documentDefaultPath="/"
 ; LemonLDAP-ng)
 ;show-domain-in-login-pdf=false
 
+; Algorithm used to hash the password to avoid clear text transmission
+; This might not be supported by all OBM components
+; Default: NONE
+;password-hash = SHA256
+
 [automate]
 ; Automate specific parameters
 ;

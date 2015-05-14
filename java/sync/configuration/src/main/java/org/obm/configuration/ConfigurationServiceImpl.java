@@ -77,6 +77,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	private final static String CYRUS_PARTITION = "cyrusPartition";
 	private final static boolean CYRUS_PARTITION_DEFAULT = false;
 
+	private final static String PASSWORD_HASH = "password-hash";
+	private final static Hash PASSWORD_HASH_DEFAULT = Hash.NONE;
+
 	public static class Factory {
 		
 		protected IniFile.Factory iniFileFactory;
@@ -232,6 +235,13 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public boolean isCyrusPartitionEnabled() {
 		return iniFile.getBooleanValue(CYRUS_PARTITION, CYRUS_PARTITION_DEFAULT);
+	}
+
+	@Override
+	public Hash getPasswordHash() {
+		String strValue = iniFile.getStringValue(PASSWORD_HASH);
+
+		return strValue == null ? PASSWORD_HASH_DEFAULT : Hash.valueOf(strValue.toUpperCase());
 	}
 
 }

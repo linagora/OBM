@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.Hash;
 import org.obm.configuration.TransactionConfiguration;
 
 import com.google.common.base.Throwables;
@@ -191,6 +192,11 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 	@Override
 	public boolean isCyrusPartitionEnabled() {
 		return false;
+	}
+
+	@Override
+	public Hash getPasswordHash() {
+		return configuration.passwordHash;
 	}
 
 }
