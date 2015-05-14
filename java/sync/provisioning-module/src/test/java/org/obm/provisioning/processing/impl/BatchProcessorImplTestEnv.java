@@ -33,7 +33,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
-import org.obm.configuration.ConfigurationService;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
@@ -78,11 +77,8 @@ public class BatchProcessorImplTestEnv extends CommonDomainEndPointEnvTest {
 	protected DateProvider dateProvider;
 	@Inject
 	private LdapService ldapService;
-	@Inject
-	protected ConfigurationService configurationService;
 
 	protected LdapManager expectLdapBuild() {
-		expect(configurationService.isLdapModuleEnabled()).andReturn(true);
 		LdapManager ldapManager = mocksControl.createMock(LdapManager.class);
 
 		expect(ldapService.buildManager(isA(LdapConnectionConfig.class)))

@@ -71,6 +71,7 @@ import org.obm.provisioning.json.ObmUserJsonSerializer;
 import org.obm.provisioning.json.OperationJsonSerializer;
 import org.obm.provisioning.json.UserExtIdJsonDeserializer;
 import org.obm.provisioning.json.UserExtIdJsonSerializer;
+import org.obm.provisioning.json.UserPasswordJsonSerializer;
 import org.obm.provisioning.ldap.client.Configuration;
 import org.obm.provisioning.ldap.client.LdapModule;
 import org.obm.provisioning.resources.BatchResource;
@@ -101,6 +102,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserExtId;
+import fr.aliacom.obm.common.user.UserPassword;
 
 public class ProvisioningService extends ServletModule {
 
@@ -205,7 +207,8 @@ public class ProvisioningService extends ServletModule {
 	@Singleton
 	public static ObjectMapper createObjectMapper(Injector injector) {
 		SimpleModule module = new SimpleModule("RequestScoped", new Version(0, 0, 0, null))
-			.addDeserializer(ObmUser.class, injector.getInstance(ObmUserJsonDeserializer.class));
+			.addDeserializer(ObmUser.class, injector.getInstance(ObmUserJsonDeserializer.class))
+			.addSerializer(UserPassword.class, injector.getInstance(UserPasswordJsonSerializer.class));
 
 		return createObjectMapper(module);
 	}

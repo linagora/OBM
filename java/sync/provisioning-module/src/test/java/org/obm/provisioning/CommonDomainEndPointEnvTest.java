@@ -158,7 +158,9 @@ public abstract class CommonDomainEndPointEnvTest {
 					
 					org.obm.Configuration configuration = new org.obm.Configuration();
 					configuration.applicationName = ProvisioningServerService.APPLICATION_NAME; 
-					bind(ConfigurationService.class).toInstance(mocksControl.createMock(ConfigurationService.class));
+
+					bind(org.obm.Configuration.class).toInstance(configuration);
+					bind(ConfigurationService.class).toInstance(new StaticConfigurationService(configuration));
 					bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(configuration.transaction));
 					
 					bind(SieveScriptUpdaterFactory.class).toInstance(mocksControl.createMock(SieveScriptUpdaterFactory.class));
@@ -267,9 +269,12 @@ public abstract class CommonDomainEndPointEnvTest {
 	protected PermissionDao roleDao;
 	@Inject
 	protected Realm realm;
+	@Inject
+	protected org.obm.Configuration configuration;
 
 	protected String baseUrl;
 	protected int serverPort;
+
 	@Inject
 	private UUIDFactory uuidFactory;
 
@@ -422,8 +427,12 @@ public abstract class CommonDomainEndPointEnvTest {
 					"\"samba_logon_script\":\"script\""+
 				"}";
 	}
-	
+
 	protected String obmUserToJsonString() {
+		return obmUserToJsonString("password");
+	}
+
+	protected String obmUserToJsonString(String password) {
 		return
 			"{" +
 				"\"id\":\"extId\"," +
@@ -432,7 +441,7 @@ public abstract class CommonDomainEndPointEnvTest {
 				"\"profile\":\"Utilisateurs\"," +
 				"\"firstname\":\"Jesus\"," +
 				"\"commonname\":\"John Doe\"," +
-				"\"password\":\"password\"," +
+				"\"password\":\"" + password + "\"," +
 				"\"kind\":\"kind\"," +
 				"\"title\":\"title\"," +
 				"\"description\":\"description\"," +

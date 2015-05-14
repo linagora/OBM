@@ -103,5 +103,6 @@ public class Configuration {
 	public String activeSyncServletUrl = null;
 	public boolean anonymizePrivateEvent = true;
 	public Hash passwordHash = Hash.NONE;
+	public boolean isLdapModuleEnabled = true;
 
 }

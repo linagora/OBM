@@ -55,6 +55,10 @@ import static org.obm.provisioning.bean.UserJsonFields.MAILS;
 import static org.obm.provisioning.bean.UserJsonFields.MAIL_QUOTA;
 import static org.obm.provisioning.bean.UserJsonFields.MAIL_SERVER;
 import static org.obm.provisioning.bean.UserJsonFields.MOBILE;
+import static org.obm.provisioning.bean.UserJsonFields.NOMAD_ALLOWED;
+import static org.obm.provisioning.bean.UserJsonFields.NOMAD_EMAIL;
+import static org.obm.provisioning.bean.UserJsonFields.NOMAD_ENABLED;
+import static org.obm.provisioning.bean.UserJsonFields.NOMAD_LOCAL_COPY;
 import static org.obm.provisioning.bean.UserJsonFields.PASSWORD;
 import static org.obm.provisioning.bean.UserJsonFields.PHONES;
 import static org.obm.provisioning.bean.UserJsonFields.PROFILE;
@@ -68,10 +72,6 @@ import static org.obm.provisioning.bean.UserJsonFields.TIMEUPDATE;
 import static org.obm.provisioning.bean.UserJsonFields.TITLE;
 import static org.obm.provisioning.bean.UserJsonFields.TOWN;
 import static org.obm.provisioning.bean.UserJsonFields.ZIPCODE;
-import static org.obm.provisioning.bean.UserJsonFields.NOMAD_ENABLED;
-import static org.obm.provisioning.bean.UserJsonFields.NOMAD_EMAIL;
-import static org.obm.provisioning.bean.UserJsonFields.NOMAD_ALLOWED;
-import static org.obm.provisioning.bean.UserJsonFields.NOMAD_LOCAL_COPY;
 
 import java.io.IOException;
 import java.util.Set;
@@ -109,8 +109,7 @@ public class ObmUserJsonSerializer extends JsonSerializer<ObmUser> {
 				value.getProfileName() != null ? value.getProfileName().getName() : null);
 		jgen.writeStringField(FIRSTNAME.asSpecificationValue(), value.getFirstName());
 		jgen.writeStringField(COMMONNAME.asSpecificationValue(), value.getCommonName());
-		jgen.writeStringField(PASSWORD.asSpecificationValue(), 
-				value.getPassword() != null ? value.getPassword().getStringValue() : null);
+		jgen.writeObjectField(PASSWORD.asSpecificationValue(), value.getPassword());
 		jgen.writeStringField(KIND.asSpecificationValue(), value.getKind());
 		jgen.writeStringField(TITLE.asSpecificationValue(), value.getTitle());
 		jgen.writeStringField(DESCRIPTION.asSpecificationValue(), value.getDescription());

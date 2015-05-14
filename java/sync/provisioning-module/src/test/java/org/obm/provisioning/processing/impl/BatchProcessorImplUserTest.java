@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.cyrus.imap.admin.CyrusImapService;
@@ -145,7 +146,12 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 
 	private final UserLogin user1Login = UserLogin.valueOf("user1");
 	private final UserIdentity user1Name = UserIdentity.builder().lastName("user1").build();
-	
+
+	@Before
+	public void defineIsLdapModuleEnabled() {
+		configuration.isLdapModuleEnabled = true;
+	}
+
 	@Test
 	public void testProcessCreateUserWithInvalidJSONData() throws Exception {
 		Operation.Builder opBuilder = Operation
@@ -468,7 +474,9 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 				usersGroup);
 		groupDao.addUser(domainWithImapWithoutLdap, usersGroup.getUid(), userFromDao);
 		expectLastCall();
-		expect(configurationService.isLdapModuleEnabled()).andReturn(false);
+		
+		configuration.isLdapModuleEnabled = false;
+		
 		expectSetDefaultRights(userFromDao);
 		expectCyrusCreateMailbox(userFromDao);
 		expectSieveScriptUpdate(userFromDao);

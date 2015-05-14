@@ -161,7 +161,7 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 
 	@Override
 	public boolean isLdapModuleEnabled() {
-		return true;
+		return configuration.isLdapModuleEnabled;
 	}
 
 	@Override

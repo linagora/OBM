@@ -37,16 +37,26 @@ import static org.hamcrest.Matchers.containsString;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.configuration.Hash;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.CommonDomainEndPointEnvTest;
+
+import com.google.common.base.Charsets;
+import com.google.common.hash.Hashing;
 
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
 public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
+
+	@Before
+	public void defineDefaultPasswordHash() {
+		configuration.passwordHash = Hash.NONE;
+	}
 
 	@Test
 	public void testUnknownUrl() throws Exception {
@@ -79,6 +89,86 @@ public class UserResourceGetUserTest extends CommonDomainEndPointEnvTest {
 		when()
 			.get("/users/1");
 		
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetAUserShouldHashPasswordWhenSha1IsUsed() throws Exception {
+		configuration.passwordHash = Hash.SHA1;
+
+		expectDomain();
+		expectSuccessfulAuthenticationAndFullAuthorization();
+		expect(userDao.getByExtIdWithGroups(userExtId("1"), domain)).andReturn(fakeUser());
+		mocksControl.replay();
+
+		given()
+			.auth().basic("username@domain", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString(obmUserToJsonString(Hashing.sha1().hashString("password", Charsets.UTF_8).toString()))).
+		when()
+			.get("/users/1");
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetAUserShouldHashPasswordWhenSha512IsUsed() throws Exception {
+		configuration.passwordHash = Hash.SHA512;
+
+		expectDomain();
+		expectSuccessfulAuthenticationAndFullAuthorization();
+		expect(userDao.getByExtIdWithGroups(userExtId("1"), domain)).andReturn(fakeUser());
+		mocksControl.replay();
+
+		given()
+			.auth().basic("username@domain", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString(obmUserToJsonString(Hashing.sha512().hashString("password", Charsets.UTF_8).toString()))).
+		when()
+			.get("/users/1");
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetAUserShouldHashPasswordWhenSha256IsUsed() throws Exception {
+		configuration.passwordHash = Hash.SHA256;
+
+		expectDomain();
+		expectSuccessfulAuthenticationAndFullAuthorization();
+		expect(userDao.getByExtIdWithGroups(userExtId("1"), domain)).andReturn(fakeUser());
+		mocksControl.replay();
+
+		given()
+			.auth().basic("username@domain", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString(obmUserToJsonString(Hashing.sha256().hashString("password", Charsets.UTF_8).toString()))).
+		when()
+			.get("/users/1");
+
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testGetAUserShouldHashPasswordWhenMD5IsUsed() throws Exception {
+		configuration.passwordHash = Hash.MD5;
+
+		expectDomain();
+		expectSuccessfulAuthenticationAndFullAuthorization();
+		expect(userDao.getByExtIdWithGroups(userExtId("1"), domain)).andReturn(fakeUser());
+		mocksControl.replay();
+
+		given()
+			.auth().basic("username@domain", "password").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString(obmUserToJsonString(Hashing.md5().hashString("password", Charsets.UTF_8).toString()))).
+		when()
+			.get("/users/1");
+
 		mocksControl.verify();
 	}
 
