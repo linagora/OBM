@@ -82,15 +82,16 @@ public class UserResource {
 	@Produces(JSON_WITH_UTF8)
 	@Transactional(readOnly = true)
 	public List<UserIdentifier> listAll() throws SQLException {
-		List<ObmUser> users = userDao.list(domain);
-		if (users == null) {
+		List<UserExtId> extIds = userDao.listExtIds(domain);
+
+		if (extIds == null) {
 			return Collections.emptyList();
 		}
 
-		return Lists.transform(users, new Function<ObmUser, UserIdentifier>() {
+		return Lists.transform(extIds, new Function<UserExtId, UserIdentifier>() {
 			@Override
-			public UserIdentifier apply(ObmUser user) {
-				return UserIdentifier.builder().id(user.getExtId()).domainUuid(domain.getUuid()).build();
+			public UserIdentifier apply(UserExtId id) {
+				return UserIdentifier.builder().id(id).domainUuid(domain.getUuid()).build();
 			}
 		});
 	}

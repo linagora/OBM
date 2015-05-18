@@ -69,6 +69,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -592,6 +593,27 @@ public class UserDaoJdbcImpl implements UserDao {
 		}
 
 		return users;
+	}
+
+	@Override
+	public List<UserExtId> listExtIds(ObmDomain domain) throws SQLException {
+		ImmutableList.Builder<UserExtId> extIds = ImmutableList.builder();
+
+		String query = "SELECT userobm_ext_id FROM UserObm " + 
+				"INNER JOIN UserEntity ON userentity_user_id = userobm_id " + 
+				"WHERE userobm_domain_id = ?";
+
+		try (Connection conn = obmHelper.getConnection();
+				PreparedStatement ps =  conn.prepareStatement(query)) {
+			ps.setInt(1, domain.getId());
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				extIds.add(UserExtId.valueOf(rs.getString("userobm_ext_id")));
+			}
+		}
+
+		return extIds.build();
 	}
 
 	@Override

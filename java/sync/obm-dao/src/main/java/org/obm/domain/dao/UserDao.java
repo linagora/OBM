@@ -61,6 +61,8 @@ public interface UserDao {
 
 	List<ObmUser> list(ObmDomain domain) throws SQLException;
 
+	List<UserExtId> listExtIds(ObmDomain domain) throws SQLException;
+
 	ObmUser create(ObmUser user) throws SQLException, DaoException;
 
 	ObmUser update(ObmUser user) throws SQLException, UserNotFoundException;

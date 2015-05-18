@@ -1353,4 +1353,25 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 				.build();
 	}
 
+	@Test
+	public void testListExtIds() throws Exception {
+		List<UserExtId> extIds = ImmutableList.of(
+				UserExtId.valueOf("1"),
+				UserExtId.valueOf("2"),
+				UserExtId.valueOf("3"),
+				UserExtId.valueOf("4"));
+
+		assertThat(dao.listExtIds(domain)).isEqualTo(extIds);
+	}
+
+	@Test
+	public void testListExtIdsShouldAlsoListArchivedUsers() throws Exception {
+		List<UserExtId> extIds = ImmutableList.of(
+				UserExtId.valueOf("5"),
+				UserExtId.valueOf("6"),
+				UserExtId.valueOf("7"));
+
+		assertThat(dao.listExtIds(domain2)).isEqualTo(extIds);
+	}
+
 }

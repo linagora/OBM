@@ -47,11 +47,7 @@ import org.obm.provisioning.CommonDomainEndPointEnvTest;
 
 import com.google.common.collect.ImmutableList;
 
-import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserExtId;
-import fr.aliacom.obm.common.user.UserIdentity;
-import fr.aliacom.obm.common.user.UserLogin;
 
 
 @RunWith(GuiceRunner.class)
@@ -78,7 +74,7 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	public void testListAllUser() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(userDao.list(domain)).andReturn(fakeListOfUser());
+		expect(userDao.listExtIds(domain)).andReturn(fakeListOfUserExtIds());
 		mocksControl.replay();
 		
 		given()
@@ -96,7 +92,7 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	public void testListAllUserReturnNothing() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(userDao.list(domain)).andReturn(null);
+		expect(userDao.listExtIds(domain)).andReturn(null);
 		mocksControl.replay();
 		
 		given()
@@ -114,7 +110,7 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	public void testListAllUserReturnEmptyList() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(userDao.list(domain)).andReturn(ImmutableList.<ObmUser>of());
+		expect(userDao.listExtIds(domain)).andReturn(ImmutableList.<UserExtId>of());
 		mocksControl.replay();
 		
 		given()
@@ -132,7 +128,7 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 	public void testListAllThrowError() throws Exception {
 		expectDomain();
 		expectSuccessfulAuthenticationAndFullAuthorization();
-		expect(userDao.list(domain)).andThrow(new RuntimeException("bad things happen"));
+		expect(userDao.listExtIds(domain)).andThrow(new RuntimeException("bad things happen"));
 		mocksControl.replay();
 		
 		given()
@@ -145,8 +141,8 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 		mocksControl.verify();
 	}
 
-	private List<ObmUser> fakeListOfUser() {
-		return ImmutableList.of(fakeUser(1), fakeUser(2));
+	private List<UserExtId> fakeListOfUserExtIds() {
+		return ImmutableList.of(newExtId(1), newExtId(2));
 	}
 	
 	private String expectedJsonSetOfUser() {
@@ -156,23 +152,7 @@ public class UserResourceListAllUserTest extends CommonDomainEndPointEnvTest {
 				"]";
 	}
 
-	private ObmUser fakeUser(int id) {
-		return ObmUser
-				.builder()
-				.login(UserLogin.valueOf("user" + id))
-				.uid(id)
-				.extId(UserExtId.builder().extId("ExtId" + id).build())
-				.identity(UserIdentity.builder()
-						.lastName("Lastname")
-						.firstName("Firstname")
-						.commonName("")
-					.build())
-				.domain(domain)
-				.emails(UserEmails.builder()
-					.addAddress("user" + id)
-					.domain(domain)
-					.build())
-				.publicFreeBusy(true)
-				.build();
+	private UserExtId newExtId(int id) {
+		return UserExtId.valueOf("ExtId" + id);
 	}
 }

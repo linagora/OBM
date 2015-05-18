@@ -49,7 +49,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserExtId;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(CommonDomainEndPointEnvTest.Env.class)
@@ -223,7 +223,7 @@ public class UserAuthorizingTest extends CommonDomainEndPointEnvTest {
 		expectDomain();
 		expectSuccessfulAuthentication("username", "password");
 		expectAuthorizingReturns("username", ImmutableSet.of(domainAwarePerm("users:read")));
-		expect(userDao.list(domain)).andReturn(ImmutableList.<ObmUser>of());
+		expect(userDao.listExtIds(domain)).andReturn(ImmutableList.<UserExtId>of());
 		mocksControl.replay();
 		
 		given()
