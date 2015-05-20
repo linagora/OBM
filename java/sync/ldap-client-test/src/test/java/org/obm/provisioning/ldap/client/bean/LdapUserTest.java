@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.domain.Samba;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserIdentity;
@@ -69,6 +70,27 @@ public class LdapUserTest {
 				.password(UserPassword.valueOf("secret password"))
 				.build();
 		return obmUser;
+	}
+
+	private ObmUser buildObmUserWithSambaAllowed() {
+		return ObmUser.builder()
+				.uid(666)
+				.login(validLogin)
+				.uidNumber(1895)
+				.gidNumber(1066)
+				.identity(richardSorgeIdentity)
+				.domain(ObmDomain
+						.builder()
+						.name("gru.gov.ru")
+						.samba(Samba
+								.builder()
+								.drive("D")
+								.sid("sid")
+								.build())
+						.build())
+				.password(UserPassword.valueOf("secret password"))
+				.sambaAllowed(true)
+				.build();
 	}
 
 	private ObmUser buildObmUserNoUidNumber() {
@@ -253,7 +275,35 @@ public class LdapUserTest {
 		ObmUser obmUser = buildObmUserNoMailHostIP();
 		ldapUserBuilder.fromObmUser(obmUser).build();
 	}
-	
+
+	@Test
+	public void testFromObmUserShouldNotInheritSambaHomeDriveFromTheDomain() {
+		LdapUser expectedLdapUser = ldapUserBuilder
+				.objectClasses(new String[]{"posixAccount", "shadowAccount", "inetOrgPerson", "obmUser"})
+				.uid(LdapUser.Uid.valueOf("richard.sorge"))
+				.uidNumber(1895)
+				.gidNumber(1066)
+				.cn("Richard Sorge")
+				.displayName("Richard Sorge")
+				.sn("Sorge")
+				.givenName("Richard")
+				.homeDirectory("/home/richard.sorge")
+				.userPassword(UserPassword.valueOf("secret password"))
+				.webAccess("REJECT")
+				.mailBox("richard.sorge@gru.gov.ru")
+				.mailAccess("REJECT")
+				.hiddenUser(false)
+				.domain(LdapDomain.valueOf("gru.gov.ru"))
+				.loginShell("/bin/bash")
+				.sambaAllowed(true)
+				.sambaNTPassword("E3718ECE8AB74792CBBFFFD316D2D19A")
+				.sambaLMPassword("500E1646BF66EF98E52CAC67419A9A22")
+				.build();
+		LdapUser ldapUser = ldapUserBuilder.fromObmUser(buildObmUserWithSambaAllowed()).build();
+
+		assertThat(ldapUser).isEqualTo(expectedLdapUser);
+	}
+
 	@Test(expected=IllegalStateException.class)
 	public void testNoUid() {
 		ldapUserBuilder

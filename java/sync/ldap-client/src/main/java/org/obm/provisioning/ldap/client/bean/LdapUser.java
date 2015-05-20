@@ -194,7 +194,7 @@ public class LdapUser {
 				this.sambaLMPassword = ntlmPassword.getLmHash();
 				this.sambaAllowed = obmUser.isSambaAllowed();
 				this.sambaHomeDrive = obmUser.getSambaHomeDrive();
-				this.sambaHomeFolder = Objects.firstNonNull(obmUser.getSambaHomeFolder(), samba.getHome());
+				this.sambaHomeFolder = obmUser.getSambaHomeFolder();
 				this.sambaLogonScript = obmUser.getSambaLogonScript();
 			}
 			
