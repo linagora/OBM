@@ -84,6 +84,8 @@ if [ "$1" = "0" ]; then
 fi
 
 %changelog
+* Thu May 21 2015 Thomas Sarboni <tsarboni@linagora.com> - obm-tomcat-3.1.5-0.rc4
+- New upstream release.
 * Wed May 20 2015 Thomas Sarboni <tsarboni@linagora.com> - obm-tomcat-3.1.5-0.rc3
 - New upstream release.
 * Wed May 13 2015 Thomas Sarboni <tsarboni@linagora.com> - obm-tomcat-3.1.5-0.rc2
