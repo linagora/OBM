@@ -66,14 +66,15 @@ public class SieveClient {
 	}
 
 	public boolean login() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("login called");
-		}
+		logger.debug("login called");
+
 		SieveClientHandler handler = new SieveClientHandler(cs);
 		SocketAddress sa = new InetSocketAddress(host, port);
+
 		if (cs.login(sa, handler)) {
 			return true;
 		}
+
 		return false;
 	}
 
@@ -94,6 +95,7 @@ public class SieveClient {
 	}
 	
 	public void logout() throws InterruptedException {
+		logger.debug("logout called");
 		cs.logout();
 	}
 

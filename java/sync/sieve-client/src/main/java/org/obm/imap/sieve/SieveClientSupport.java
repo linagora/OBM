@@ -119,8 +119,19 @@ public class SieveClientSupport {
 	}
 
 	public void logout() throws InterruptedException {
+		try {
+			if (session != null) {
+				session.close(false).await();
+			}
+		} finally {
+			cleanupClientState();
+		}
+	}
+
+	private void cleanupClientState() {
 		if (session != null) {
-			session.close(false).await();
+			session.close(true);
+			socketConnector.dispose();
 			session = null;
 		}
 	}

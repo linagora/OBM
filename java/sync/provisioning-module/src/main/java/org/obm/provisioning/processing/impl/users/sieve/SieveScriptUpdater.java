@@ -36,6 +36,7 @@ import org.obm.imap.sieve.SieveScript;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 
 import fr.aliacom.obm.common.user.ObmUser;
@@ -53,6 +54,18 @@ public class SieveScriptUpdater {
 	}
 
 	public void update() {
+		try {
+			doUpdate();
+		} finally {
+			try {
+				sieveClient.logout();
+			} catch (Exception e) {
+				throw Throwables.propagate(e);
+			}
+		}
+	}
+
+	private void doUpdate() {
 		List<SieveScript> scripts = this.sieveClient.listscripts();
 		Optional<SieveScript> maybeActiveScript = Iterables.tryFind(scripts,
 				new Predicate<SieveScript>() {
