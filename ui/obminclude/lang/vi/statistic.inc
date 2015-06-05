@@ -14,13 +14,12 @@
 
 $l_statistic = "Thống kê";
 $l_stats_manager = "Quản lý số liệu thống kê";
-$l_stats_contact_date_evolution = "Thống kê ngày liên hệ ";
+$l_stats_contact_date_evolution = "Thống kê các số liên lạc theo ngày ";
 $l_key = "Từ khóa";
 $l_totals = "Tổng";
 $l_null = "Không có ";
 $l_compcat = "Danh mục";
 $l_stats_from_list = "Với một tập hợp đã cho (danh sách)";
 $l_stats_from_all = "Với tất cả";
-$l_contact_date_evolution_graph = "Mở rộng số liên lạc (hàng tháng)";
-$l_contcat = "Loại hợp đồng"; 
-
+$l_contact_date_evolution_graph = "Sự phát triển các số liên lạc (hàng tháng)";
+$l_contcat = "Loại liên lạc"; 

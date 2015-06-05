@@ -9,8 +9,8 @@
 $l_import = "Nhập";
 $l_format = "Định dạng";
 $l_csv_sep = "Dấu phân cách CSV";
-$l_enclosed = "Các trường được bao bởi";
-$l_mapping = "Lập bản đồ các trường";
+$l_enclosed = "Các trường được đính kèm bởi";
+$l_mapping = "Các cặp trường tương ứng";
 $l_field_num = "# Trường";
 $l_field = "Trường";
 $l_default = "Giá trị mặc định";

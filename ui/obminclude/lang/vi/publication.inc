@@ -9,7 +9,7 @@
 $l_publication_title = "Tiêu đề công bố";
 $l_type = "Loại";
 $l_market = "Quản lý marketing";
-$l_header_new_auto = "Làm mới";
+$l_header_new_auto = "Tự động làm mới";
 $l_type_manage = "Quản lý loại ấn phẩm";
 $l_type_exist = "Các loại hiện có";
 $l_type_new = "Loại mới";
