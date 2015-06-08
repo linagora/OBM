@@ -7,18 +7,18 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_cur_settings = "Thiết lập hiện tại của bạn";
+$l_cur_settings = "Thiết lập hiện tại";
 $l_auto_display = "Hiển thị danh sách tự động";
 $l_submit = "Xác nhận";
-$l_cur_lang = "Ngôn ngữ hiện tại của bạn";
-$l_cur_theme = "Chủ đề hiện tại của bạn";
+$l_cur_lang = "Ngôn ngữ hiện tại";
+$l_cur_theme = "Chủ đề hiện tại";
 $l_new_settings = "Để thay đổi thiết lập của bạn, hãy chọn ở đây các thông số mới";
-$l_set_lang = "Chọn ngôn ngữ của bạn";
-$l_set_theme = "Chọn chủ đề của bạn";
+$l_set_lang = "Chọn ngôn ngữ";
+$l_set_theme = "Chọn chủ đề";
 $l_set_menu = "Hiển thị menu";
-$l_set_rows = "#Hàng trên mỗi trang";
+$l_set_rows = "Số Hàng trên mỗi trang";
 $l_set_todo = "Sắp xếp thứ tự các nhiệm vụ cần làm";
-$l_set_date_upd = "Định dạng ngày vào";
+$l_set_date_upd = "Định dạng ngày nhập";
 $l_set_date = "Định dạng ngày";
 $l_set_commentorder = "Hiển thị bình luận";
 $l_set_display_days = "Lịch hiển thị các ngày trong tuần ";
@@ -26,7 +26,7 @@ $l_set_cal_interval = "Khoảng thời gian  trong lịch";
 $l_set_cal_first_hour = "Giờ bắt đầu trong Lịch";
 $l_set_cal_last_hour = "Giờ kết thúc trong Lịch";
 $l_set_cal_alert = "Nhắc nhở lịch (phút)";
-$l_set_csv_sep = "Dấu phân cách CSV";
+$l_set_csv_sep = "Dấu phân cách trong CSV";
 $l_set_debug = "Mức Debugging";
 $l_send_mail = "Chấp nhận email mời họp";
 $l_send_mail_participation = "Chấp nhận email tham gia cuộc họp";
@@ -56,4 +56,4 @@ $l_with_weekend = "Bao gồm cuối tuần";
 $l_without_weekend = "Không bao gồm cuối tuần";
 $l_set_public_fb = "Công khai thông tin rảnh / bận rộn của bạn";
 
-$l_set_topbar = "Kích hoạt thanh công cụ OBM Topbar.";
+$l_set_topbar = "Kích hoạt thanh công cụ mới của OBM .";
