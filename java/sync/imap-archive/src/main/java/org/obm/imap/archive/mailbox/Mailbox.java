@@ -37,6 +37,7 @@ import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
 import org.obm.push.exception.ImapMessageNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
@@ -62,4 +63,6 @@ public interface Mailbox {
 	MessageSet uidCopy(MessageSet messages, Mailbox mailbox) throws MailboxNotFoundException;
 	
 	List<InternalDate> fetchInternalDate(MessageSet messageSet) throws ImapMessageNotFoundException ;
+
+	boolean uidStore(MessageSet messageSet, Flag imapArchiveFlag);
 }

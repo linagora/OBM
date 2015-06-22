@@ -33,8 +33,6 @@ package org.obm.imap.archive.beans;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.NoSuchElementException;
-
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -78,20 +76,11 @@ public class ProcessedFolderTest {
 			.build();
 	}
 
-	@Test(expected=NoSuchElementException.class)
-	public void builderShouldThrowWhenUidNextNotProvided() {
-		ProcessedFolder.builder()
-			.runId(ArchiveTreatmentRunId.from("1fa66563-926c-4600-a7a3-f56877f38737"))
-			.folder(ImapFolder.from("user/usera/Test@mydomain.org"))
-			.build();
-	}
-
 	@Test(expected=IllegalStateException.class)
 	public void builderShouldThrowWhenStartNotProvided() {
 		ProcessedFolder.builder()
 			.runId(ArchiveTreatmentRunId.from("1fa66563-926c-4600-a7a3-f56877f38737"))
 			.folder(ImapFolder.from("user/usera/Test@mydomain.org"))
-			.addUid(12l)
 			.build();
 	}
 
@@ -100,7 +89,6 @@ public class ProcessedFolderTest {
 		ProcessedFolder.builder()
 			.runId(ArchiveTreatmentRunId.from("1fa66563-926c-4600-a7a3-f56877f38737"))
 			.folder(ImapFolder.from("user/usera/Test@mydomain.org"))
-			.addUid(12l)
 			.start(DateTime.parse("2014-07-23T08:21:00.000Z"))
 			.build();
 	}
@@ -110,7 +98,6 @@ public class ProcessedFolderTest {
 		ProcessedFolder processedFolder = ProcessedFolder.builder()
 			.runId(ArchiveTreatmentRunId.from("1fa66563-926c-4600-a7a3-f56877f38737"))
 			.folder(ImapFolder.from("user/usera/Test@mydomain.org"))
-			.addUid(12l)
 			.start(DateTime.parse("2014-07-23T08:21:00.000Z"))
 			.end(DateTime.parse("2014-07-23T08:21:03.000Z"))
 			.build();
@@ -122,7 +109,6 @@ public class ProcessedFolderTest {
 	public void builderShouldBuildWhenEveryThingIsProvided() {
 		ArchiveTreatmentRunId archiveTreatmentRunId = ArchiveTreatmentRunId.from("1fa66563-926c-4600-a7a3-f56877f38737");
 		ImapFolder imapFolder = ImapFolder.from("user/usera/Test@mydomain.org");
-		long uidNext = 12;
 		DateTime start = DateTime.parse("2014-07-23T08:21:00.000Z");
 		DateTime end = DateTime.parse("2014-07-23T08:21:03.000Z");
 		ArchiveStatus status = ArchiveStatus.SUCCESS;
@@ -130,7 +116,6 @@ public class ProcessedFolderTest {
 		ProcessedFolder processedFolder = ProcessedFolder.builder()
 			.runId(archiveTreatmentRunId)
 			.folder(imapFolder)
-			.addUid(uidNext)
 			.start(start)
 			.end(end)
 			.status(status)
@@ -138,35 +123,6 @@ public class ProcessedFolderTest {
 		
 		assertThat(processedFolder.getRunId()).isEqualTo(archiveTreatmentRunId);
 		assertThat(processedFolder.getFolder()).isEqualTo(imapFolder);
-		assertThat(processedFolder.getLastUid()).isEqualTo(uidNext);
-		assertThat(processedFolder.getStart()).isEqualTo(start);
-		assertThat(processedFolder.getEnd()).isEqualTo(end);
-		assertThat(processedFolder.getStatus()).isEqualTo(status);
-	}
-
-	@Test
-	public void lastUidShouldKeepTheHighestValue() {
-		ArchiveTreatmentRunId archiveTreatmentRunId = ArchiveTreatmentRunId.from("1fa66563-926c-4600-a7a3-f56877f38737");
-		ImapFolder imapFolder = ImapFolder.from("user/usera/Test@mydomain.org");
-		long uidNext = 12;
-		long highestUid = 43;
-		DateTime start = DateTime.parse("2014-07-23T08:21:00.000Z");
-		DateTime end = DateTime.parse("2014-07-23T08:21:03.000Z");
-		ArchiveStatus status = ArchiveStatus.SUCCESS;
-		
-		ProcessedFolder processedFolder = ProcessedFolder.builder()
-			.runId(archiveTreatmentRunId)
-			.folder(imapFolder)
-			.addUid(highestUid)
-			.addUid(uidNext)
-			.start(start)
-			.end(end)
-			.status(status)
-			.build();
-		
-		assertThat(processedFolder.getRunId()).isEqualTo(archiveTreatmentRunId);
-		assertThat(processedFolder.getFolder()).isEqualTo(imapFolder);
-		assertThat(processedFolder.getLastUid()).isEqualTo(highestUid);
 		assertThat(processedFolder.getStart()).isEqualTo(start);
 		assertThat(processedFolder.getEnd()).isEqualTo(end);
 		assertThat(processedFolder.getStatus()).isEqualTo(status);

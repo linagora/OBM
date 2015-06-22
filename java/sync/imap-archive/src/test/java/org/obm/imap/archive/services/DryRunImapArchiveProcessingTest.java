@@ -188,7 +188,7 @@ public class DryRunImapArchiveProcessingTest {
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
-				.messageSet(MessageSet.builder().add(Range.closed(0l, Long.MAX_VALUE)).build())
+				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(messageSet);
 		

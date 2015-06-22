@@ -35,8 +35,6 @@ import org.joda.time.DateTime;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Ordering;
 
 public class ProcessedFolder {
 
@@ -50,13 +48,11 @@ public class ProcessedFolder {
 		
 		private ArchiveTreatmentRunId runId;
 		private ImapFolder folder;
-		private ImmutableList.Builder<Long> uids;
 		private DateTime start;
 		private DateTime end;
 		private ArchiveStatus status;
 		
 		private Builder() {
-			this.uids = ImmutableList.builder();
 		}
 		
 		public Builder runId(ArchiveTreatmentRunId runId) {
@@ -68,11 +64,6 @@ public class ProcessedFolder {
 		public Builder folder(ImapFolder folder) {
 			Preconditions.checkNotNull(folder);
 			this.folder = folder;
-			return this;
-		}
-		
-		public Builder addUid(long uid) {
-			this.uids.add(uid);
 			return this;
 		}
 		
@@ -97,25 +88,22 @@ public class ProcessedFolder {
 		public ProcessedFolder build() {
 			Preconditions.checkState(runId != null);
 			Preconditions.checkState(folder != null);
-			Long lastUid = Ordering.natural().max(uids.build());
 			Preconditions.checkState(start != null);
 			Preconditions.checkState(end != null);
 			
-			return new ProcessedFolder(runId, folder, lastUid, start, end, Objects.firstNonNull(status, DEFAULT_STATUS));
+			return new ProcessedFolder(runId, folder, start, end, Objects.firstNonNull(status, DEFAULT_STATUS));
 		}
 	}
 
 	private final ArchiveTreatmentRunId runId;
 	private final ImapFolder folder;
-	private final long lastUid;
 	private final DateTime start;
 	private final DateTime end;
 	private final ArchiveStatus status;
 
-	private ProcessedFolder(ArchiveTreatmentRunId runId, ImapFolder folder, long lastUid, DateTime start, DateTime end, ArchiveStatus status) {
+	private ProcessedFolder(ArchiveTreatmentRunId runId, ImapFolder folder, DateTime start, DateTime end, ArchiveStatus status) {
 		this.runId = runId;
 		this.folder = folder;
-		this.lastUid = lastUid;
 		this.start = start;
 		this.end = end;
 		this.status = status;
@@ -127,10 +115,6 @@ public class ProcessedFolder {
 
 	public ImapFolder getFolder() {
 		return folder;
-	}
-
-	public long getLastUid() {
-		return lastUid;
 	}
 
 	public DateTime getStart() {
@@ -147,7 +131,7 @@ public class ProcessedFolder {
 
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(runId, folder, lastUid, start, end, status);
+		return Objects.hashCode(runId, folder, start, end, status);
 	}
 	
 	@Override
@@ -156,7 +140,6 @@ public class ProcessedFolder {
 			ProcessedFolder that = (ProcessedFolder) object;
 			return Objects.equal(this.runId, that.runId)
 				&& Objects.equal(this.folder, that.folder)
-				&& Objects.equal(this.lastUid, that.lastUid)
 				&& Objects.equal(this.start, that.start)
 				&& Objects.equal(this.end, that.end)
 				&& Objects.equal(this.status, that.status);
@@ -169,7 +152,6 @@ public class ProcessedFolder {
 		return Objects.toStringHelper(this)
 			.add("runId", runId)
 			.add("folder", folder)
-			.add("lastUid", lastUid)
 			.add("start", start)
 			.add("end", end)
 			.add("status", status)

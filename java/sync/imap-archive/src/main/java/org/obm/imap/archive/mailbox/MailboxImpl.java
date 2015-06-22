@@ -37,6 +37,8 @@ import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
 import org.obm.push.exception.ImapMessageNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
@@ -119,6 +121,11 @@ public class MailboxImpl implements Mailbox {
 	@Override
 	public MessageSet uidCopy(MessageSet messages, Mailbox mailbox) throws MailboxNotFoundException {
 		return storeClient.uidCopy(messages, mailbox.getName());
+	}
+
+	@Override
+	public boolean uidStore(MessageSet messageSet, Flag imapArchiveFlag) {
+		return storeClient.uidStore(messageSet, new FlagsList(ImmutableList.of(imapArchiveFlag)), true);
 	}
 	
 	@Override

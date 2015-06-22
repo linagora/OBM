@@ -279,7 +279,6 @@ CREATE TABLE mail_archive_processed_folder (
    id                                       SERIAL PRIMARY KEY,
    mail_archive_processed_folder_run_uuid   character(36) NOT NULL,
    mail_archive_processed_folder_id         INTEGER NOT NULL,
-   mail_archive_processed_folder_lastuid    NUMERIC(10,0) NOT NULL,
    mail_archive_processed_folder_start      TIMESTAMP NOT NULL,
    mail_archive_processed_folder_end        TIMESTAMP NOT NULL,
     mail_archive_processed_folder_status    mail_archive_status NOT NULL,

@@ -66,12 +66,11 @@ public class ProcessedFolderJdbcImpl implements ProcessedFolderDao {
 		interface FIELDS {
 			String RUN_ID = "mail_archive_processed_folder_run_uuid";
 			String FOLDER_ID = "mail_archive_processed_folder_id";
-			String LASTUID = "mail_archive_processed_folder_lastuid";
 			String START = "mail_archive_processed_folder_start";
 			String END = "mail_archive_processed_folder_end";
 			String STATUS = "mail_archive_processed_folder_status";
 			
-			String ALL = Joiner.on(", ").join(RUN_ID, FOLDER_ID, LASTUID, START, END, STATUS);
+			String ALL = Joiner.on(", ").join(RUN_ID, FOLDER_ID, START, END, STATUS);
 		}
 	}
 	
@@ -83,7 +82,7 @@ public class ProcessedFolderJdbcImpl implements ProcessedFolderDao {
 					FIELDS.FOLDER_ID, ImapFolderJdbcImpl.TABLE.NAME);
 		
 		String INSERT = String.format(
-				"INSERT INTO %s (%s) VALUES (?, (SELECT id FROM %s WHERE %s = ?), ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL,
+				"INSERT INTO %s (%s) VALUES (?, (SELECT id FROM %s WHERE %s = ?), ?, ?, ?)", TABLE.NAME, FIELDS.ALL,
 					ImapFolderJdbcImpl.TABLE.NAME, ImapFolderJdbcImpl.TABLE.FIELDS.FOLDER);
 	}
 	
@@ -119,7 +118,6 @@ public class ProcessedFolderJdbcImpl implements ProcessedFolderDao {
 		return ProcessedFolder.builder()
 				.runId(ArchiveTreatmentRunId.from(rs.getString(FIELDS.RUN_ID)))
 				.folder(ImapFolder.from(rs.getString(ImapFolderJdbcImpl.TABLE.FIELDS.FOLDER)))
-				.addUid(rs.getLong(FIELDS.LASTUID))
 				.start(JDBCUtils.getDateTime(rs, FIELDS.START, DateTimeZone.UTC))
 				.end(JDBCUtils.getDateTime(rs, FIELDS.END, DateTimeZone.UTC))
 				.status(ArchiveStatus.fromSpecificationValue(rs.getString(FIELDS.STATUS)))
@@ -139,7 +137,6 @@ public class ProcessedFolderJdbcImpl implements ProcessedFolderDao {
 			int idx = 1;
 			ps.setString(idx++, processedFolder.getRunId().serialize());
 			ps.setString(idx++, imapFolder.getName());
-			ps.setLong(idx++, processedFolder.getLastUid());
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(processedFolder.getStart()));
 			ps.setTimestamp(idx++, JDBCUtils.toTimestamp(processedFolder.getEnd()));
 			ps.setObject(idx++, obmHelper.getDBCP().getJdbcObject("mail_archive_status", processedFolder.getStatus().asSpecificationValue()));

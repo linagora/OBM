@@ -119,13 +119,11 @@ public class ProcessedFolderJdbcImplTest {
 						Operations.insertInto(ProcessedFolderJdbcImpl.TABLE.NAME)
 						.columns(ProcessedFolderJdbcImpl.TABLE.FIELDS.RUN_ID,
 								ProcessedFolderJdbcImpl.TABLE.FIELDS.FOLDER_ID,
-								ProcessedFolderJdbcImpl.TABLE.FIELDS.LASTUID,
 								ProcessedFolderJdbcImpl.TABLE.FIELDS.START,
 								ProcessedFolderJdbcImpl.TABLE.FIELDS.END,
 								ProcessedFolderJdbcImpl.TABLE.FIELDS.STATUS)
 						.values("c3c5cb24-f5df-45ed-8918-99c7555a02c4",
 								1,
-								12,
 								DateTime.parse("2014-06-01T00:02:02.000Z").toDate(),
 								DateTime.parse("2014-06-01T00:02:04.000Z").toDate(),
 								ArchiveStatus.SUCCESS)
@@ -147,7 +145,6 @@ public class ProcessedFolderJdbcImplTest {
 		ProcessedFolder processedFolder = optionProcessedFolder.get();
 		assertThat(processedFolder.getRunId()).isEqualTo(runId);
 		assertThat(processedFolder.getFolder()).isEqualTo(imapFolder);
-		assertThat(processedFolder.getLastUid()).isEqualTo(12);
 		assertThat(processedFolder.getStart()).isEqualTo(DateTime.parse("2014-06-01T00:02:02.000Z"));
 		assertThat(processedFolder.getEnd()).isEqualTo(DateTime.parse("2014-06-01T00:02:04.000Z"));
 		assertThat(processedFolder.getStatus()).isEqualTo(ArchiveStatus.SUCCESS);
@@ -174,7 +171,6 @@ public class ProcessedFolderJdbcImplTest {
 		ProcessedFolder expectedProcessedFolder = ProcessedFolder.builder()
 				.runId(runId)
 				.folder(imapFolder)
-				.addUid(56l)
 				.start(DateTime.parse("2014-06-02T00:02:02.000Z"))
 				.end(DateTime.parse("2014-06-02T00:02:32.000Z"))
 				.status(ArchiveStatus.ERROR)
@@ -190,7 +186,6 @@ public class ProcessedFolderJdbcImplTest {
 		ProcessedFolder processedFolder = ProcessedFolder.builder()
 				.runId(ArchiveTreatmentRunId.from("c3c5cb24-f5df-45ed-8918-99c7555a02c4"))
 				.folder(ImapFolder.from("user/usera/Test@mydomain.org"))
-				.addUid(56l)
 				.start(DateTime.parse("2014-06-02T00:02:02.000Z"))
 				.end(DateTime.parse("2014-06-02T00:02:32.000Z"))
 				.status(ArchiveStatus.ERROR)
