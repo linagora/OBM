@@ -32,35 +32,87 @@
 
 package org.obm.push.mail.bean;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 
-public enum Flag {
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 
-	SEEN("Seen"), 
-	DRAFT("Draft"), 
-	DELETED("Deleted"), 
-	FLAGGED("Flagged"), 
-	ANSWERED("Answered");
 
-	private final String flag;
-	
-	private final static Map<String, Flag> flags = new HashMap<String, Flag>();
-	static {
-		for (Flag flag: Flag.values()) {
-			flags.put(flag.flag.toLowerCase(), flag);
+public class Flag {
+
+	public static final Flag SEEN = new Flag("Seen", true); 
+	public static final Flag DRAFT = new Flag("Draft", true); 
+	public static final Flag DELETED = new Flag("Deleted", true); 
+	public static final Flag FLAGGED = new Flag("Flagged", true); 
+	public static final Flag ANSWERED = new Flag("Answered", true);
+	public static final Flag[] FLAGS = new Flag[] { SEEN, DRAFT, DELETED, FLAGGED, ANSWERED };
+
+	public static Flag from(String value) {
+		Optional<Flag> systemFlag = isSystemFlag(value);
+		if (systemFlag.isPresent()) {
+			return systemFlag.get();
 		}
+		return new Flag(value, false);
 	}
 
-	private Flag(String flag) {
-		this.flag = flag;
+	private static Optional<Flag> isSystemFlag(final String value) {
+		return FluentIterable.from(Arrays.asList(FLAGS))
+				.firstMatch(new Predicate<Flag>() {
+
+					@Override
+					public boolean apply(Flag flag) {
+						return flag.get().equalsIgnoreCase(value);
+					}
+				});
+	}
+
+	private final String value;
+	private final boolean system;
+	
+	private Flag(String value, boolean system) {
+		this.value = value;
+		this.system = system;
+	}
+	
+	public String get() {
+		return value;
+	}
+	
+	@VisibleForTesting boolean isSystem() {
+		return system;
 	}
 	
 	public String asCommandValue() {
-		return "\\" + flag;
+		return (system ? "\\" : "") + value;
+	}
+
+	public static Flag[] values() {
+		return FLAGS;
 	}
 	
-	public static Flag toFlag(String flag) {
-		return flags.get(flag.toLowerCase());
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(value, system);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof Flag) {
+			Flag that = (Flag) object;
+				return Objects.equal(this.value, that.value)
+					&& Objects.equal(this.system, that.system);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("value", value)
+			.add("system", system)
+			.toString();
 	}
 }

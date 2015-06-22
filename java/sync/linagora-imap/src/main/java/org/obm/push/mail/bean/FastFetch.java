@@ -32,10 +32,10 @@
 package org.obm.push.mail.bean;
 
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.Set;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 
 public class FastFetch {
 
@@ -46,11 +46,11 @@ public class FastFetch {
 	public static class Builder {
 		private long uid;
 		private Date internalDate;
-		private Set<Flag> flags;
+		private ImmutableSet.Builder<Flag> flags;
 		private Integer size;
 		
 		private Builder() {
-			flags = EnumSet.noneOf(Flag.class);
+			flags = ImmutableSet.builder();
 		}
 		
 		public Builder uid(long uid) {
@@ -94,14 +94,11 @@ public class FastFetch {
 		}
 		
 		public FastFetch build() {
-			return new FastFetch(uid, internalDate, flags, size);
+			return new FastFetch(uid, internalDate, flags.build(), size);
 		}
 
 		public Builder flags(Set<Flag> flags) {
-			if (!this.flags.isEmpty()) {
-				throw new IllegalStateException("Flags can't be set because the builder already has some");
-			}
-			this.flags = flags;
+			this.flags.addAll(flags);
 			return this;
 		}
 	}
