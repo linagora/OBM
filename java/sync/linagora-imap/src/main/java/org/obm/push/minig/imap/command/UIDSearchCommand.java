@@ -78,6 +78,12 @@ public class UIDSearchCommand extends Command<MessageSet> {
 		if (sq.getMessageSet() != null) {
 			cmd += " UID " + ImapMessageSet.wrap(sq.getMessageSet()).asString(); 
 		}
+		if (sq.getMatchingFlag().isPresent()) {
+			cmd += " KEYWORD " + sq.getMatchingFlag().get().asCommandValue();
+		}
+		if (sq.getUnmatchingFlag().isPresent()) {
+			cmd += " UNKEYWORD " + sq.getUnmatchingFlag().get().asCommandValue();
+		}
 		
 		// logger.info("cmd "+cmd);
 		CommandArgument args = new CommandArgument(cmd, null);

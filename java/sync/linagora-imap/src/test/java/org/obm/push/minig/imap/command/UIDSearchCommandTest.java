@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.minig.imap.impl.IMAPResponse;
@@ -88,5 +89,27 @@ public class UIDSearchCommandTest {
 		CommandArgument commandArgument = command.buildCommand();
 		
 		assertThat(commandArgument.getCommandString()).isEqualTo("UID SEARCH OR BEFORE 1-Jan-2014 SINCE 1-Jan-2015");
+	}
+	
+	@Test
+	public void buildCommandShouldManageMatchingFlag() {
+		UIDSearchCommand command = new UIDSearchCommand(SearchQuery.builder()
+				.includeDeleted(true)
+				.matchingFlag(Flag.from("myFlag"))
+				.build());
+		CommandArgument commandArgument = command.buildCommand();
+		
+		assertThat(commandArgument.getCommandString()).isEqualTo("UID SEARCH KEYWORD myFlag");
+	}
+	
+	@Test
+	public void buildCommandShouldManageUnmatchingFlag() {
+		UIDSearchCommand command = new UIDSearchCommand(SearchQuery.builder()
+				.includeDeleted(true)
+				.unmatchingFlag(Flag.from("myFlag"))
+				.build());
+		CommandArgument commandArgument = command.buildCommand();
+		
+		assertThat(commandArgument.getCommandString()).isEqualTo("UID SEARCH UNKEYWORD myFlag");
 	}
 }

@@ -35,12 +35,13 @@ package org.obm.push.mail.bean;
 import java.util.Date;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 public class SearchQuery {
 
 	public static final SearchQuery MATCH_ALL = new SearchQuery(null, null); 
-	public static final SearchQuery MATCH_ALL_EVEN_DELETED = new SearchQuery(null, null, false, true, null);
+	public static final SearchQuery MATCH_ALL_EVEN_DELETED = new SearchQuery(null, null, false, true, null, Optional.<Flag> absent(), Optional.<Flag> absent());
 	
 	public static Builder builder() {
 		return new Builder();
@@ -52,6 +53,8 @@ public class SearchQuery {
 		private boolean between;
 		private boolean includeDeleted;
 		private MessageSet messageSet;
+		private Flag matchingFlag;
+		private Flag unmatchingFlag;
 		
 		private Builder() {
 			this.includeDeleted = false;
@@ -82,6 +85,16 @@ public class SearchQuery {
 			return this;
 		}
 		
+		public Builder matchingFlag(Flag matchingFlag) {
+			this.matchingFlag = matchingFlag;
+			return this;
+		}
+		
+		public Builder unmatchingFlag(Flag imapArchiveFlag) {
+			this.unmatchingFlag = imapArchiveFlag;
+			return this;
+		}
+		
 		public SearchQuery build() {
 			if (messageSet != null) {
 				Preconditions.checkState(!messageSet.isEmpty());
@@ -90,7 +103,7 @@ public class SearchQuery {
 				Preconditions.checkState(before != null);
 				Preconditions.checkState(after != null);
 			}
-			return new SearchQuery(before, after, between, includeDeleted, messageSet);
+			return new SearchQuery(before, after, between, includeDeleted, messageSet, Optional.fromNullable(matchingFlag), Optional.fromNullable(unmatchingFlag));
 		}
 	}
 
@@ -99,6 +112,8 @@ public class SearchQuery {
 	private final boolean between;
 	private final boolean matchDeleted;
 	private final MessageSet messageSet;
+	private final Optional<Flag> matchingFlag;
+	private final Optional<Flag> unmatchingFlag;
 	
 	/**
 	 * 
@@ -107,15 +122,17 @@ public class SearchQuery {
 	 *            is within or later than the specified date.
 	 */
 	private SearchQuery(Date before, Date after) {
-		this(before, after, false, false, null);
+		this(before, after, false, false, null, Optional.<Flag> absent(), Optional.<Flag> absent());
 	}
 	
-	private SearchQuery(Date before, Date after, boolean between, boolean matchDeleted, MessageSet messageSet) {
+	private SearchQuery(Date before, Date after, boolean between, boolean matchDeleted, MessageSet messageSet, Optional<Flag> matchingFlag, Optional<Flag> unmatchingFlag) {
 		this.after = after;
 		this.before = before;
 		this.between = between;
 		this.matchDeleted = matchDeleted;
 		this.messageSet = messageSet;
+		this.matchingFlag = matchingFlag;
+		this.unmatchingFlag = unmatchingFlag;
 	}
 
 	public Date getBefore() {
@@ -138,9 +155,17 @@ public class SearchQuery {
 		return messageSet;
 	}
 	
+	public Optional<Flag> getMatchingFlag() {
+		return matchingFlag;
+	}
+	
+	public Optional<Flag> getUnmatchingFlag() {
+		return unmatchingFlag;
+	}
+	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(before, after, between, matchDeleted, messageSet);
+		return Objects.hashCode(before, after, between, matchDeleted, messageSet, matchingFlag, unmatchingFlag);
 	}
 	
 	@Override
@@ -151,7 +176,9 @@ public class SearchQuery {
 				&& Objects.equal(this.after, that.after)
 				&& Objects.equal(this.between, that.between)
 				&& Objects.equal(this.matchDeleted, that.matchDeleted)
-				&& Objects.equal(this.messageSet, that.messageSet);
+				&& Objects.equal(this.messageSet, that.messageSet)
+				&& Objects.equal(this.matchingFlag, that.matchingFlag)
+				&& Objects.equal(this.unmatchingFlag, that.unmatchingFlag);
 		}
 		return false;
 	}
@@ -164,6 +191,8 @@ public class SearchQuery {
 			.add("between", between)
 			.add("matchDeleted", matchDeleted)
 			.add("messageSet", messageSet)
+			.add("matchingFlag", matchingFlag)
+			.add("unmatchingFlag", unmatchingFlag)
 			.toString();
 	}
 }

@@ -33,6 +33,7 @@
 package org.obm.push.mail.bean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.guava.api.Assertions.assertThat;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -88,5 +89,35 @@ public class SearchQueryTest {
 			.afterInclusive(DateTime.parse("2015-01-01").toDate())
 			.build();
 		assertThat(searchQuery.isBetween()).isTrue();
+	}
+	
+	@Test
+	public void builderShouldBuildWhenNoMatchingFlag() {
+		SearchQuery searchQuery = SearchQuery.builder()
+				.build();
+		assertThat(searchQuery.getMatchingFlag()).isAbsent();
+	}
+	
+	@Test
+	public void builderShouldBuildWhenMatchingFlag() {
+		SearchQuery searchQuery = SearchQuery.builder()
+				.matchingFlag(Flag.from("myFlag"))
+				.build();
+		assertThat(searchQuery.getMatchingFlag()).isPresent();
+	}
+	
+	@Test
+	public void builderShouldBuildWhenNoUnmatchingFlag() {
+		SearchQuery searchQuery = SearchQuery.builder()
+				.build();
+		assertThat(searchQuery.getUnmatchingFlag()).isAbsent();
+	}
+	
+	@Test
+	public void builderShouldBuildWhenUnmatchingFlag() {
+		SearchQuery searchQuery = SearchQuery.builder()
+				.unmatchingFlag(Flag.from("myFlag"))
+				.build();
+		assertThat(searchQuery.getUnmatchingFlag()).isPresent();
 	}
 }

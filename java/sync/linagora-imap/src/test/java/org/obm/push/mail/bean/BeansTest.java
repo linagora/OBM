@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.sync.bean.EqualsVerifierUtils;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 
@@ -52,9 +53,18 @@ public class BeansTest {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 					.add(MessageSet.class)
-					.add(SearchQuery.class)
 					.build();
 		equalsVerifierUtilsTest.test(list);
+	}
+	
+	@Test
+	public void testSearchQuery() {
+		EqualsVerifierUtils
+			.createEqualsVerifier(SearchQuery.class)
+			.withPrefabValues(Optional.class,
+				Optional.of(Flag.DELETED),
+				Optional.of(Flag.ANSWERED))
+			.verify();
 	}
 	
 }
