@@ -73,6 +73,7 @@ public class DomainConfiguration {
 				.excludedFolder(configuration.excludedFolder)
 				.excludedUsers(from(configuration.excludedUserIdToLoginMap))
 				.mailing(Mailing.fromStrings(configuration.mailingEmails))
+				.moveEnabled(configuration.moveEnabled)
 				.build();
 	}
 	
@@ -101,6 +102,7 @@ public class DomainConfiguration {
 		private String excludedFolder;
 		private ImmutableList.Builder<ExcludedUser> excludedUsers;
 		private Mailing mailing;
+		private Boolean moveEnabled;
 		
 		private Builder() {
 			excludedUsers = ImmutableList.builder();
@@ -143,6 +145,11 @@ public class DomainConfiguration {
 			this.mailing = mailing;
 			return this;
 		}
+
+		public Builder moveEnabled(Boolean moveEnabled) {
+			this.moveEnabled = moveEnabled;
+			return this;
+		}
 		
 		public DomainConfiguration build() {
 			Preconditions.checkState(domain != null);
@@ -158,7 +165,10 @@ public class DomainConfiguration {
 			Preconditions.checkState(archiveMainFolder.contains("/") == false);
 			Preconditions.checkState(archiveMainFolder.contains("@") == false);
 			
-			return new DomainConfiguration(domain, state, schedulingConfiguration, archiveMainFolder, excludedFolder, excludedUsers.build(), Objects.firstNonNull(mailing, Mailing.empty()));
+			return new DomainConfiguration(domain, state, schedulingConfiguration, 
+					archiveMainFolder, excludedFolder, excludedUsers.build(), 
+					Objects.firstNonNull(mailing, Mailing.empty()), 
+					Objects.firstNonNull(moveEnabled, false));
 		}
 	}
 	
@@ -169,8 +179,13 @@ public class DomainConfiguration {
 	private final String excludedFolder;
 	private final List<ExcludedUser> excludedUsers;
 	private final Mailing mailing;
+	private final boolean moveEnabled;
 
-	private DomainConfiguration(ObmDomain domain, ConfigurationState state, SchedulingConfiguration schedulingConfiguration, String archiveMainFolder, String excludedFolder, ImmutableList<ExcludedUser> excludedUsers, Mailing mailing) {
+	private DomainConfiguration(ObmDomain domain, ConfigurationState state, 
+			SchedulingConfiguration schedulingConfiguration, String archiveMainFolder, 
+			String excludedFolder, ImmutableList<ExcludedUser> excludedUsers, 
+			Mailing mailing, boolean moveEnabled) {
+		
 		this.domain = domain;
 		this.state = state;
 		this.schedulingConfiguration = schedulingConfiguration;
@@ -178,6 +193,7 @@ public class DomainConfiguration {
 		this.excludedFolder = excludedFolder;
 		this.excludedUsers = excludedUsers;
 		this.mailing = mailing;
+		this.moveEnabled = moveEnabled;
 	}
 
 	public ObmDomain getDomain() {
@@ -247,10 +263,16 @@ public class DomainConfiguration {
 	public Mailing getMailing() {
 		return mailing;
 	}
+
+	public boolean isMoveEnabled() {
+		return moveEnabled;
+	}
 	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(domain, state, schedulingConfiguration, archiveMainFolder, excludedFolder, excludedUsers, mailing);
+		return Objects.hashCode(domain, state, schedulingConfiguration, 
+				archiveMainFolder, excludedFolder, excludedUsers, 
+				mailing, moveEnabled);
 	}
 	
 	@Override
@@ -263,7 +285,8 @@ public class DomainConfiguration {
 				&& Objects.equal(this.archiveMainFolder, that.archiveMainFolder)
 				&& Objects.equal(this.excludedFolder, that.excludedFolder)
 				&& Objects.equal(this.excludedUsers, that.excludedUsers)
-				&& Objects.equal(this.mailing, that.mailing);
+				&& Objects.equal(this.mailing, that.mailing)
+				&& Objects.equal(this.moveEnabled, that.moveEnabled);
 		}
 		return false;
 	}
@@ -278,6 +301,7 @@ public class DomainConfiguration {
 			.add("excludedFolder", excludedFolder)
 			.add("excludedUsers", excludedUsers)
 			.add("mailing", mailing)
+			.add("moveEnabled", moveEnabled)
 			.toString();
 	}
 }

@@ -266,6 +266,22 @@ public class DomainConfigurationTest {
 		assertThat(configuration.isEnabled()).isFalse();
 		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 	}
+	
+	@Test
+	public void builderShouldBuildConfigurationWhenMoveEnabledIsTrueAndRequiredFieldsAreProvided() {
+		DomainConfiguration configuration = 
+				DomainConfiguration.builder()
+					.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
+					.state(ConfigurationState.DISABLE)
+					.archiveMainFolder("arChive")
+					.moveEnabled(true)
+					.build();
+		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
+		assertThat(configuration.getState()).isEqualTo(ConfigurationState.DISABLE);
+		assertThat(configuration.isEnabled()).isFalse();
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
+		assertThat(configuration.isMoveEnabled()).isTrue();
+	}
 
 	@Test
 	public void builderShouldKeepUnusedConfigurationWhenProvidingDisabledFields() {
@@ -315,10 +331,58 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getArchiveMainFolder()).isEqualTo("ARCHIVE");
 		assertThat(configuration.getExcludedFolder()).isNull();
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
+		assertThat(configuration.isMoveEnabled()).isFalse();
 	}
 	
 	@Test
 	public void fromDto() {
+		ObmDomainUuid expectedDomainId = ObmDomainUuid.of("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
+		boolean expectedEnabled = true;
+		RepeatKind expectedRepeatKind = RepeatKind.WEEKLY;
+		DayOfWeek expectedDayOfWeek = DayOfWeek.TUESDAY;
+		DayOfMonth expectedDayOfMonth = DayOfMonth.of(10);
+		DayOfYear expectedDayOfYear = DayOfYear.of(100);
+		Integer expectedHour = 11;
+		Integer expectedMinute = 32;
+		boolean expectedMoveEnabled = true;
+		
+		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
+		domainConfigurationDto.domainId = expectedDomainId.getUUID();
+		domainConfigurationDto.enabled = expectedEnabled;
+		domainConfigurationDto.repeatKind = expectedRepeatKind.toString();
+		domainConfigurationDto.dayOfWeek = expectedDayOfWeek.getSpecificationValue();
+		domainConfigurationDto.dayOfMonth = expectedDayOfMonth.getDayIndex();
+		domainConfigurationDto.dayOfYear = expectedDayOfYear.getDayOfYear();
+		domainConfigurationDto.hour = expectedHour;
+		domainConfigurationDto.minute = expectedMinute;
+		domainConfigurationDto.archiveMainFolder = "arChive";
+		domainConfigurationDto.excludedFolder = "excluded";
+		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
+		domainConfigurationDto.mailingEmails = ImmutableList.of("usera@mydomain.org", "userb@mydomain.org");
+		domainConfigurationDto.moveEnabled = expectedMoveEnabled;
+		
+		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
+		DomainConfiguration configuration = DomainConfiguration.from(domainConfigurationDto, domain);
+		assertThat(configuration.isEnabled()).isEqualTo(expectedEnabled);
+		assertThat(configuration.getRepeatKind()).isEqualTo(expectedRepeatKind);
+		assertThat(configuration.getDayOfMonth()).isEqualTo(expectedDayOfMonth);
+		assertThat(configuration.getDayOfWeek()).isEqualTo(expectedDayOfWeek);
+		assertThat(configuration.getDayOfYear()).isEqualTo(expectedDayOfYear);
+		assertThat(configuration.getDomainId()).isEqualTo(expectedDomainId);
+		assertThat(configuration.getHour()).isEqualTo(expectedHour);
+		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
+		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
+		assertThat(configuration.getExcludedUsers()).containsOnly(ExcludedUser.builder()
+				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+				.login("usera")
+				.build());
+		assertThat(configuration.getMailing()).isEqualTo(Mailing.from(ImmutableList.of(EmailAddress.loginAtDomain("usera@mydomain.org"), EmailAddress.loginAtDomain("userb@mydomain.org"))));
+		assertThat(configuration.isMoveEnabled()).isEqualTo(expectedMoveEnabled);
+	}
+	
+	@Test
+	public void fromDtoShouldBuildWhenExcludedUsersIsEmpty() {
 		ObmDomainUuid expectedDomainId = ObmDomainUuid.of("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
 		boolean expectedEnabled = true;
 		RepeatKind expectedRepeatKind = RepeatKind.WEEKLY;
@@ -362,7 +426,7 @@ public class DomainConfigurationTest {
 	}
 	
 	@Test
-	public void fromDtoShouldBuildWhenExcludedUsersIsEmpty() {
+	public void fromDtoShouldBuildWhenMoveEnabledIsFalse() {
 		ObmDomainUuid expectedDomainId = ObmDomainUuid.of("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
 		boolean expectedEnabled = true;
 		RepeatKind expectedRepeatKind = RepeatKind.WEEKLY;
@@ -371,6 +435,7 @@ public class DomainConfigurationTest {
 		DayOfYear expectedDayOfYear = DayOfYear.of(100);
 		Integer expectedHour = 11;
 		Integer expectedMinute = 32;
+		boolean expectedMoveEnabled = false;
 		
 		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
 		domainConfigurationDto.domainId = expectedDomainId.getUUID();
@@ -385,6 +450,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.excludedFolder = "excluded";
 		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of();
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
+		domainConfigurationDto.moveEnabled = expectedMoveEnabled;
 		
 		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
 		DomainConfiguration configuration = DomainConfiguration.from(domainConfigurationDto, domain);
@@ -401,6 +467,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
 		assertThat(configuration.getExcludedUsers()).isEmpty();
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
+		assertThat(configuration.isMoveEnabled()).isEqualTo(expectedMoveEnabled);
 	}
 	
 	@Test(expected=NullPointerException.class)

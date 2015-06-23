@@ -60,6 +60,7 @@ public class DomainConfigurationDto {
 		dto.excludedFolder = configuration.getExcludedFolder();
 		dto.excludedUserIdToLoginMap = toMap(configuration.getExcludedUsers());
 		dto.mailingEmails = toStrings(configuration.getMailing());
+		dto.moveEnabled = configuration.isMoveEnabled();
 		return dto;
 	}
 
@@ -117,5 +118,6 @@ public class DomainConfigurationDto {
 	public String excludedFolder;
 	public Map<String, String> excludedUserIdToLoginMap;
 	public List<String> mailingEmails;
+	public Boolean moveEnabled;
 	
 }

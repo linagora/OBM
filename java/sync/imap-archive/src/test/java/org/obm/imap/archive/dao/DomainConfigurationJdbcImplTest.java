@@ -113,8 +113,9 @@ public class DomainConfigurationJdbcImplTest {
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.HOUR, 
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.ARCHIVE_MAIN_FOLDER,
-					DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
-			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "arChive", "excluded")
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER,
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.MOVE_ENABLED)
+			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "arChive", "excluded", false)
 			.build();
 	}	
 

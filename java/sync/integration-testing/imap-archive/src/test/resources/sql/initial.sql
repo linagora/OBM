@@ -228,6 +228,7 @@ CREATE TABLE mail_archive (
    mail_archive_hour              INTEGER,
    mail_archive_minute            INTEGER,
    mail_archive_excluded_folder   TEXT,
+   mail_archive_move              BOOLEAN DEFAULT FALSE,
 
    CONSTRAINT mail_archive_domain_uuid_ukey UNIQUE (mail_archive_domain_uuid)
 );

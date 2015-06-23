@@ -85,9 +85,10 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			String MINUTE = "mail_archive_minute";
 			String ARCHIVE_MAIN_FOLDER = "mail_archive_main_folder";
 			String EXCLUDED_FOLDER = "mail_archive_excluded_folder";
+			String MOVE_ENABLED = "mail_archive_move";
 			
-			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER);
-			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER);
+			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, MOVE_ENABLED);
+			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, MOVE_ENABLED);
 		}
 	}
 	
@@ -100,7 +101,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				"UPDATE %s SET %s = ? WHERE %s = ?", TABLE.NAME, FIELDS.UPDATABLE, FIELDS.DOMAIN_UUID);
 		
 		String INSERT = String.format(
-				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
+				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
 	}
 	
 	public interface EXCLUDED_USERS {
@@ -197,6 +198,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				.excludedFolder(rs.getString(FIELDS.EXCLUDED_FOLDER))
 				.excludedUsers(get(connection, domain.getUuid()))
 				.mailing(getMailing(connection, domain.getUuid()))
+				.moveEnabled(rs.getBoolean(FIELDS.MOVE_ENABLED))
 				.build();
 	}
 
@@ -216,6 +218,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setInt(idx++, domainConfiguration.getMinute());
 			ps.setString(idx++, domainConfiguration.getArchiveMainFolder());
 			ps.setString(idx++, domainConfiguration.getExcludedFolder());
+			ps.setBoolean(idx++, domainConfiguration.isMoveEnabled());
 			ps.setString(idx++, domainConfiguration.getDomainId().toString());
 
 			if (ps.executeUpdate() < 1) {
@@ -246,6 +249,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setInt(idx++, domainConfiguration.getMinute());
 			ps.setString(idx++, domainConfiguration.getArchiveMainFolder());
 			ps.setString(idx++, domainConfiguration.getExcludedFolder());
+			ps.setBoolean(idx++, domainConfiguration.isMoveEnabled());
 
 			ps.executeUpdate();
 			
