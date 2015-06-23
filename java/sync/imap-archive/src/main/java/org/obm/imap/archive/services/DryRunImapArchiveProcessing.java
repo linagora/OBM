@@ -47,10 +47,10 @@ import org.obm.imap.archive.mailbox.CreatableMailbox;
 import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.imap.IMAPException;
 import org.slf4j.Logger;
 
-import com.google.common.collect.FluentIterable;
 import com.linagora.scheduling.DateTimeProvider;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -86,7 +86,7 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 	}
 	
 	@Override
-	protected void processingImapCopy(Mailbox mailbox, FluentIterable<Long> mailUids, ProcessedTask processedTask) 
+	protected void processingImapCopy(Mailbox mailbox, MessageSet mailUids, ProcessedTask processedTask) 
 			throws IMAPException, MailboxFormatException, MailboxNotFoundException {
 	}
 }

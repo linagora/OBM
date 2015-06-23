@@ -237,10 +237,10 @@ public class ImapArchiveProcessing {
 			
 			grantRightsWhenNotSelectable(mailbox);
 			
-			FluentIterable<Long> mailUids = searchMailUids(mailbox, processedTask.getHigherBoundary());
+			MessageSet mailUids = searchMailUids(mailbox, processedTask.getHigherBoundary());
 			if (!mailUids.isEmpty()) {
 				logger.info("Processing: {}", mailbox.getName());
-				logger.info("{} mails will be archived, from UID {} to {}", mailUids.size(), mailUids.first().get(), mailUids.last().get());
+				logger.info("{} mails will be archived, from UID {} to {}", mailUids.size(), mailUids.first().get(), mailUids.max());
 				
 				processingImapCopy(mailbox, mailUids, processedTask);
 			}
@@ -250,21 +250,20 @@ public class ImapArchiveProcessing {
 		}
 	}
 
-	protected void processingImapCopy(Mailbox mailbox, FluentIterable<Long> mailUids, ProcessedTask processedTask) 
+	protected void processingImapCopy(Mailbox mailbox, MessageSet mailUids, ProcessedTask processedTask) 
 			throws IMAPException, MailboxFormatException, MailboxNotFoundException {
 		
 		DomainName domainName = new DomainName(processedTask.getDomain().getName());
 		Logger logger = processedTask.getLogger();
 		
-		MessageSet messageSet = MessageSet.builder().addAll(mailUids).build();
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
 				.from(mailbox)
 				.domainName(domainName)
 				.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 				.build();
 		try {
-			MessageSet copiedMessageSet = copyToTemporary(mailbox, temporaryMailbox, logger, messageSet);
-			MappedMessageSets mappedMessageSets = MappedMessageSets.builder().origin(messageSet).destination(copiedMessageSet).build();
+			MessageSet copiedMessageSet = copyToTemporary(mailbox, temporaryMailbox, logger, mailUids);
+			MappedMessageSets mappedMessageSets = MappedMessageSets.builder().origin(mailUids).destination(copiedMessageSet).build();
 			
 			batchCopyFromTemporaryToArchive(mailbox, temporaryMailbox, mappedMessageSets, processedTask);
 	
@@ -564,12 +563,11 @@ public class ImapArchiveProcessing {
 	}
 
 
-	@VisibleForTesting FluentIterable<Long> searchMailUids(Mailbox mailbox, HigherBoundary higherBoundary) {
-		return FluentIterable.from(
-				mailbox.uidSearch(SearchQuery.builder()
+	@VisibleForTesting MessageSet searchMailUids(Mailbox mailbox, HigherBoundary higherBoundary) {
+		return mailbox.uidSearch(SearchQuery.builder()
 					.beforeExclusive(higherBoundary.getHigherBoundary().toDate())
 					.unmatchingFlag(IMAP_ARCHIVE_FLAG)
-					.build()));
+					.build());
 	}
 
 	@VisibleForTesting boolean continuePrevious(Optional<ArchiveTreatment> previousArchiveTreatment, DateTime higherBoundary) {

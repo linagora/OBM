@@ -93,7 +93,6 @@ import pl.wkr.fluentrule.api.FluentExpectedException;
 import ch.qos.logback.classic.Logger;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -1732,7 +1731,7 @@ public class ImapArchiveProcessingTest {
 
 		try {
 			control.replay();
-			imapArchiveProcessing.processingImapCopy(mailbox, FluentIterable.from(messageSet.asDiscreteValues()), processedTask);
+			imapArchiveProcessing.processingImapCopy(mailbox, messageSet, processedTask);
 		} finally {
 			control.verify();
 		}
