@@ -39,7 +39,10 @@ public class ListResult extends ArrayList<ListInfo> {
 	private static final long serialVersionUID = -1402141425321463033L;
 	
 	private char imapSeparator;
-	
+
+	public ListResult() {
+	}
+
 	public ListResult(int size) {
 		super(size);
 	}

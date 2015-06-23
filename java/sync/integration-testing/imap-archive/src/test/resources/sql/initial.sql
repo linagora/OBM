@@ -189,7 +189,8 @@ INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm
     (2, 'admin', 'trust3dToken', 'PLAIN', 'admin', 'Lastname', 'Firstname', '1000', '512', 'd4ad341d-89eb-4f3d-807a-cb372314845d', '0', 'admin', 1),
     (1, 'usera', 'usera', 'PLAIN', 'user', 'Usera', 'Usera', '1001', '513', '08607f19-05a4-42a2-9b02-6f11f3ceff3b', '0', 'usera', 1),
     (1, 'userb', 'userb', 'PLAIN', 'user', 'Userb', 'Userb', '1002', '514', '8e30e673-1c47-4ca8-85e8-4609d4228c10', '0', 'userb', 1),
-    (1, 'userc', 'userc', 'PLAIN', 'user', 'Userc', 'Userc', '1003', '515', '2d7a5942-46ab-4fad-9bd2-608bde249671', '0', 'userc', 1);
+    (1, 'userc', 'userc', 'PLAIN', 'user', 'Userc', 'Userc', '1003', '515', '2d7a5942-46ab-4fad-9bd2-608bde249671', '0', 'userc', 1),
+    (1, 'usera-test', 'usera-test', 'PLAIN', 'user', 'Usera-test', 'Usera-test', '1004', '516', '546cc0f9-5e02-4f86-8b29-91bbab23334e', '0', 'usera-test', 1);
 
 INSERT INTO userentity (userentity_entity_id, userentity_user_id)
   VALUES
@@ -197,7 +198,8 @@ INSERT INTO userentity (userentity_entity_id, userentity_user_id)
     (4, 2),
     (5, 3),
     (6, 4),
-    (7, 5);
+    (7, 5),
+    (8, 6);
 
 INSERT INTO UserSystem (usersystem_login, usersystem_password, usersystem_homedir)
   VALUES

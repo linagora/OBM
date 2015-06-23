@@ -32,6 +32,7 @@
 package org.obm.imap.archive.services;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +91,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimaps;
 import com.google.inject.Inject;
@@ -108,6 +110,7 @@ public class ImapArchiveProcessing {
 	protected static final String INBOX_MAILBOX_NAME = "/%";
 	protected static final String ALL_MAILBOXES_NAME = "*";
 	protected static final Flag IMAP_ARCHIVE_FLAG = Flag.from("ImapArchive");
+	protected static final String ALL_USER_FOLDERS_BUT_INBOX = USERS_REFERENCE_NAME + "/%s/";
 
 	private final DateTimeProvider dateTimeProvider;
 	private final SchedulingDatesService schedulingDatesService;
@@ -183,29 +186,33 @@ public class ImapArchiveProcessing {
 	private boolean run(ProcessedTask processedTask) throws Exception {
 		boolean isSuccess = true;
 		Logger logger = processedTask.getLogger();
+
 		logStart(logger, processedTask.getDomain());
-		for (ListInfo listInfo : listUsers(processedTask)) {
-			Optional<String> maybeUserName = listInfo.getUserName();
+		for (ListInfo inboxListInfo : listUsers(processedTask)) {
+			Optional<String> maybeUserName = inboxListInfo.getUserName();
+
 			if (!maybeUserName.isPresent()) {
 				continue;
 			}
-			
+
 			String user = maybeUserName.get();
+
 			try {
-				if (!processUser(user, processedTask)) {
+				if (!processUser(inboxListInfo, user, processedTask)) {
 					isSuccess = false;
 				}
 			} catch (UserNotFoundException e) {
 				logger.warn("User {} not found in OBM database", user);
 			}
 		}
+
 		return isSuccess;
 	}
 	
-	private boolean processUser(String user, ProcessedTask processedTask) throws Exception {
+	private boolean processUser(ListInfo inboxListInfo, String user, ProcessedTask processedTask) throws Exception {
 		boolean isSuccess = true;
 		Logger logger = processedTask.getLogger();
-		for (ListInfo listInfo : listImapFolders(user, processedTask)) {
+		for (ListInfo listInfo : listImapFolders(inboxListInfo, user, processedTask)) {
 			try {
 				processMailbox(MailboxImpl.from(listInfo.getName(), logger, storeClientFactory.createOnUserBackend(user, processedTask.getDomain())), 
 						processedTask);
@@ -428,13 +435,16 @@ public class ImapArchiveProcessing {
 					.toList();
 		}
 	}
-	
-	@VisibleForTesting ImmutableList<ListInfo> listImapFolders(final String user, final ProcessedTask processedTask) throws Exception {
+
+	@VisibleForTesting ImmutableList<ListInfo> listImapFolders(ListInfo inboxListInfo, final String user, final ProcessedTask processedTask) throws Exception {
 		ObmDomain domain = processedTask.getDomain();
 		try (StoreClient storeClient = storeClientFactory.createOnUserBackend(user, domain)) {
 			storeClient.login(false);
-			
-			return FluentIterable.from(storeClient.listAll(USERS_REFERENCE_NAME + "/" + user, ALL_MAILBOXES_NAME))
+
+			return FluentIterable.from(
+					Iterables.concat(
+						Collections.singleton(inboxListInfo),
+						storeClient.listAll(String.format(ALL_USER_FOLDERS_BUT_INBOX, user), ALL_MAILBOXES_NAME)))
 					.transform(appendDomainWhenNone(domain))
 					.filter(filterExcludedFolder(processedTask))
 					.filter(filterFolders(processedTask, processedTask.getDomainConfiguration().getArchiveMainFolder(), TemporaryMailbox.TEMPORARY_FOLDER))

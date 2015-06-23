@@ -139,7 +139,6 @@ public class DryRunImapArchiveProcessingTest {
 		
 		ListInfo inboxListInfo = new ListInfo("user/usera@mydomain.org", true, false);
 		List<ListInfo> expectedListInfos = ImmutableList.of(
-				inboxListInfo,
 				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
 				new ListInfo("user/usera/SPAM@mydomain.org", true, false));
 		ListResult listResult = new ListResult(3);
@@ -155,7 +154,7 @@ public class DryRunImapArchiveProcessingTest {
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME +  "/usera", ImapArchiveProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME +  "/usera/", ImapArchiveProcessing.ALL_MAILBOXES_NAME))
 			.andReturn(listResult);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");

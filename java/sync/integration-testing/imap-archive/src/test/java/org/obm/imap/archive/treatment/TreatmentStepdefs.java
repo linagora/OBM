@@ -63,6 +63,7 @@ import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.imap.AuthorizationException;
 import com.icegreen.greenmail.store.FolderException;
@@ -94,7 +95,7 @@ public class TreatmentStepdefs {
 	private Expectations expectations;
 	private DomainConfiguration.Builder configurationBuilder;
 	private GreenMailUser adminUser;
-	private GreenMailUser greenMailUser;
+	private List<GreenMailUser> users;
 	private MailFolder imapFolder;
 	
 	@Before
@@ -108,6 +109,7 @@ public class TreatmentStepdefs {
 		initGreenMail();
 		
 		server.start();
+		users = Lists.newArrayList();
 	}
 
 	private void initDb() throws Exception {
@@ -135,7 +137,9 @@ public class TreatmentStepdefs {
 		server.stop();
 		
 		adminUser.delete();
-		greenMailUser.delete();
+		for (GreenMailUser user : users) {
+			user.delete();
+		}
 		imapServer.stop();
 		
 		db.closeConnections();
@@ -159,11 +163,14 @@ public class TreatmentStepdefs {
 				.build());
 	}
 	
-	@Given("a user \"(.*?)\" with \"(.*?)\" imap folder")
-	public void createUserWithFolder(String user, String imapFolder) throws Exception {
-		greenMailUser = createUser(user, user);
+	@Given("a user \"(.*?)\" with \"(.*?)\" imap folders?")
+	public void createUserWithFolder(String user, List<String> imapFolders) throws Exception {
+		GreenMailUser greenMailUser = createUser(user, user);
+		users.add(greenMailUser);
 		
-		this.imapFolder = imapServer.getManagers().getImapHostManager().createMailbox(greenMailUser, imapFolder);
+		for (String imapFolder : imapFolders) {
+			this.imapFolder = imapServer.getManagers().getImapHostManager().createMailbox(greenMailUser, imapFolder);
+		}
 	}
 
 	@Given("this user has (\\d+) mails? at \"(.*?)\" in this folder with subject \"(.*?)\"")
@@ -242,7 +249,7 @@ public class TreatmentStepdefs {
 	
 	@Then("(\\d+) mails? should be archived in the \"(.*?)\" imap folder with subject \"(.*?)\"")
 	public void mailsShouldBeArchivedInFolder(int numberOfArchivedEmails, String archiveFolderName, String subject) throws Exception {
-		MailFolder archivedFolder = imapServer.getManagers().getImapHostManager().getFolder(greenMailUser, archiveFolderName);
+		MailFolder archivedFolder = imapServer.getManagers().getImapHostManager().getFolder(adminUser, archiveFolderName);
 		assertThat(archivedFolder).isNotNull();
 		
 		List<SimpleStoredMessage> messages = archivedFolder.getMessages();
@@ -255,7 +262,7 @@ public class TreatmentStepdefs {
 	
 	@Then("this user imap folders should contain (\\d+) mails?")
 	public void userHasMails(int numberOfEmails) {
-		List<SimpleStoredMessage> messages = imapServer.getManagers().getImapHostManager().getAllMessages(greenMailUser);
+		List<SimpleStoredMessage> messages = imapServer.getManagers().getImapHostManager().getAllMessages(adminUser);
 		assertThat(messages).hasSize(numberOfEmails);
 	}
 	
