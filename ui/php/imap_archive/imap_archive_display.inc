@@ -50,6 +50,7 @@ require_once('imap_archive_ordering.php');
 function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   global $l_validate;
   global $l_service_activating, $l_activating;
+  global $l_options, $l_copy_title, $l_copy_only, $l_copy_and_delete;
   global $l_scheduling;
   global $l_archive_main_folder, $l_excluded_folder, $l_folder, $l_excluded_users;
   global $l_mailing_feedback;
@@ -62,6 +63,7 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   $dayOfMonth = $configuration->dayOfMonth;
   $dayOfYear = $configuration->dayOfYear;
   $enabled = $configuration->enabled;
+  $moveEnabled = $configuration->moveEnabled;
   $hour = $configuration->hour;
   $minute = $configuration->minute;
   $archiveMainFolder = $configuration->archiveMainFolder;
@@ -85,15 +87,38 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   $block = "
     <form method='post' name='f_imap_archive' action='imap_archive_index.php'>
 
-    <fieldset class='detail infos'>
-      <legend>$l_service_activating</legend>
-      <table>
-        <tr>
-          <th>$l_activating</th>
-          <td><input id='activation' name='cb_enabled' type='checkbox' value='1' ".(($enabled)?"checked='checked'":"")." onclick='enableConfiguration(this.checked);'/></td>
-        </tr>
-      </table>
-    </fieldset>
+    <table class='infos'>
+      <tr>
+        <td>
+          <fieldset class='detail'>
+            <legend>$l_service_activating</legend>
+            <table>
+              <tr>
+                <th>$l_activating</th>
+                <td><input id='activation' name='cb_enabled' type='checkbox' value='1' ".(($enabled)?"checked='checked'":"")." onclick='enableConfiguration(this.checked);'/></td>
+              </tr>
+            </table>
+          </fieldset>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <fieldset class='detail'>
+            <legend>$l_options</legend>
+            <table>
+              <tr>
+                <th>$l_copy_title</th>
+                <td>
+                  <input name='cb_move_enabled' type='radio' value='0' ".((!$moveEnabled)?"checked='checked'":"")." ".(($enabled)?"":"disabled")." class='configuration'/>$l_copy_only
+                  <br>
+                  <input name='cb_move_enabled' type='radio' value='1' ".(($moveEnabled)?"checked='checked'":"")." ".(($enabled)?"":"disabled")." class='configuration'/>$l_copy_and_delete
+                </td>
+              </tr>
+            </table>
+          </fieldset>
+        </td>
+      </tr>
+    </table>
     <fieldset class='detail infos'>
       <legend>$l_scheduling</legend>
       <table>

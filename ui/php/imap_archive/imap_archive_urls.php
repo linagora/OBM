@@ -34,7 +34,7 @@ class ImapArchiveUrls {
   const IMAP_ARCHIVE_VERSION = "v1";
   const MAIN_PATH = "/imap-archive/service/";
   const TREATMENT_PATH = "/treatments";
-  
+
   public static function status() {
   	return self::MAIN_PATH.self::IMAP_ARCHIVE_VERSION."/status";
   }
@@ -42,7 +42,7 @@ class ImapArchiveUrls {
   private static function domainBasedUrl($domainUuid) {
   	return self::MAIN_PATH.self::IMAP_ARCHIVE_VERSION."/domains/".$domainUuid;
   }
-  
+
   public static function configuration($domainUuid) {
   	return self::domainBasedUrl($domainUuid)."/configuration";
   }

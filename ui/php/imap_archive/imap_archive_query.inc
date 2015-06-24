@@ -118,9 +118,10 @@ function toJson($configuration) {
   $excludedUserIdToLoginMap = $excludedUserIdToLoginMapFromConfig != null ? $excludedUserIdToLoginMapFromConfig : new stdClass();
   $mailingEmailsFromConfig = $configuration->mailingEmails;
   $mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
-	
+
   return json_encode(array("domainId" => $obm['domain_uuid'],
     "enabled" => ($configuration->enabled) ? "true" : "false",
+    "moveEnabled" => ($configuration->moveEnabled) ? "true" : "false",
     "repeatKind" => ($repeatKind) ? $repeatKind : "MONTHLY",
     "dayOfWeek" => ($dayOfWeek) ? $dayOfWeek : 1,
     "dayOfMonth" => ($dayOfMonth) ? $dayOfMonth : -1,
@@ -131,7 +132,7 @@ function toJson($configuration) {
     "excludedFolder" => $excludedFolder,
     "excludedUserIdToLoginMap" => $excludedUserIdToLoginMap,
     "mailingEmails" => $mailingEmails
-  ));	
+  ));
 }
 
 function jsonHeaders() {
@@ -199,6 +200,7 @@ function paramToJson($paramsAsConfiguration) {
 
 	return json_encode(array("domainId" => $obm['domain_uuid'],
 			"enabled" => ($paramsAsConfiguration->enabled) ? "true" : "false",
+			"moveEnabled" => ($paramsAsConfiguration->move_enabled) ? "true" : "false",
 			"repeatKind" => ($repeatKind) ? $repeatKind : "MONTHLY",
 			"dayOfWeek" => ($dayOfWeek) ? $dayOfWeek : 1,
 			"dayOfMonth" => ($dayOfMonth) ? $dayOfMonth : -1,
