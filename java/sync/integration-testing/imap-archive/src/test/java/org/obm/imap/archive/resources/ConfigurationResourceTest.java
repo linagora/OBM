@@ -157,12 +157,12 @@ public class ConfigurationResourceTest {
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
 					.values(domainId, Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "arChive", "excluded")
 					.build(),
-				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
-					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
+				Operations.insertInto(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_LOGIN)
 					.values(domainId, usera.getExtId().getExtId(), usera.getLogin())
 					.build(),
-				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
-					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
+				Operations.insertInto(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_LOGIN)
 					.values(domainId, userb.getExtId().getExtId(), userb.getLogin())
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
@@ -183,8 +183,8 @@ public class ConfigurationResourceTest {
 			.contentType(ContentType.JSON)
 			.body("domainId", equalTo(domainId.get()),
 				"enabled", equalTo(true),
-				"excludedUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
-				"excludedUserIdToLoginMap", hasEntry(userb.getExtId().getExtId(), userb.getLogin()),
+				"scopeUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
+				"scopeUserIdToLoginMap", hasEntry(userb.getExtId().getExtId(), userb.getLogin()),
 				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user2@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -270,7 +270,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.hour = 11;
 		domainConfigurationDto.minute = 32;
 		domainConfigurationDto.archiveMainFolder = "arChive";
-		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of(usera.getExtId().getExtId(), usera.getLogin(), userb.getExtId().getExtId(), userb.getLogin());
+		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of(usera.getExtId().getExtId(), usera.getLogin(), userb.getExtId().getExtId(), userb.getLogin());
 		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user2@mydomain.org");
 		
 		given()
@@ -292,8 +292,8 @@ public class ConfigurationResourceTest {
 			.body("domainId", equalTo(domainId.get()),
 				"enabled", equalTo(true),
 				"dayOfWeek", equalTo(DayOfWeek.TUESDAY.getSpecificationValue()),
-				"excludedUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
-				"excludedUserIdToLoginMap", hasEntry(userb.getExtId().getExtId(), userb.getLogin()),
+				"scopeUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
+				"scopeUserIdToLoginMap", hasEntry(userb.getExtId().getExtId(), userb.getLogin()),
 				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user2@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -315,12 +315,12 @@ public class ConfigurationResourceTest {
 						DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER)
 					.values(domainId.get(), Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "arChive", "excluded")
 					.build(),
-				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
-					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
+				Operations.insertInto(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_LOGIN)
 					.values(domainId, usera.getExtId().getExtId(), usera.getLogin())
 					.build(),
-				Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
-					.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN)
+				Operations.insertInto(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_LOGIN)
 					.values(domainId, userb.getExtId().getExtId(), userb.getLogin())
 					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
@@ -346,7 +346,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.minute = 32;
 		domainConfigurationDto.archiveMainFolder = "ARCHIVE";
 		domainConfigurationDto.excludedFolder = "anotherExcluded";
-		domainConfigurationDto.excludedUserIdToLoginMap = ImmutableMap.of(usera.getExtId().getExtId(), usera.getLogin(), userc.getExtId().getExtId(), userc.getLogin());
+		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of(usera.getExtId().getExtId(), usera.getLogin(), userc.getExtId().getExtId(), userc.getLogin());
 		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user3@mydomain.org");
 		
 		given()
@@ -369,8 +369,8 @@ public class ConfigurationResourceTest {
 				"dayOfWeek", equalTo(DayOfWeek.WEDNESDAY.getSpecificationValue()),
 				"archiveMainFolder", equalTo("ARCHIVE"),
 				"excludedFolder", equalTo("anotherExcluded"),
-				"excludedUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
-				"excludedUserIdToLoginMap", hasEntry(userc.getExtId().getExtId(), userc.getLogin()),
+				"scopeUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
+				"scopeUserIdToLoginMap", hasEntry(userc.getExtId().getExtId(), userc.getLogin()),
 				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user3@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()

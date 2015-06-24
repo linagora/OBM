@@ -40,7 +40,7 @@ import org.obm.configuration.module.LoggerModule;
 import org.obm.domain.dao.UserDao;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.beans.ExcludedUser;
+import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.imap.archive.beans.PersistedResult;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.exception.LoginMismatchException;
@@ -94,10 +94,10 @@ public class DomainConfigurationService {
 
 	private void checkDomainConfiguration(DomainConfiguration domainConfiguration) throws UserNotFoundException, LoginMismatchException, DaoException {
 		try {
-			for (ExcludedUser excludedUser : domainConfiguration.getExcludedUsers()) {
-				ObmUser obmUser = userDao.getByExtId(UserExtId.valueOf(excludedUser.serializeId()), domainConfiguration.getDomain());
-				if (!obmUser.getLogin().equals(excludedUser.getLogin())) {
-					throw new LoginMismatchException(String.format("Bad login for user id: %s", excludedUser.serializeId()));
+			for (ScopeUser scopeUser : domainConfiguration.getScopeUsers()) {
+				ObmUser obmUser = userDao.getByExtId(UserExtId.valueOf(scopeUser.serializeId()), domainConfiguration.getDomain());
+				if (!obmUser.getLogin().equals(scopeUser.getLogin())) {
+					throw new LoginMismatchException(String.format("Bad login for user id: %s", scopeUser.serializeId()));
 				}
 			}
 		} catch (SQLException e) {

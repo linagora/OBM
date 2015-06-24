@@ -31,83 +31,44 @@
 
 package org.obm.imap.archive.beans;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.Test;
 
 import fr.aliacom.obm.common.user.UserExtId;
 
-public class ExcludedUser {
+public class ScopeUserTest {
 
-	public static Builder builder() {
-		return new Builder();
-	}
-	
-	public static class Builder {
-		
-		private UserExtId id;
-		private String login;
-		private Builder() {}
-		
-		public Builder id(UserExtId id) {
-			Preconditions.checkNotNull(id);
-			this.id = id;
-			return this;
-		}
-		
-		public Builder login(String login) {
-			Preconditions.checkNotNull(login);
-			this.login = login;
-			return this;
-		}
-		
-		public ExcludedUser build() {
-			Preconditions.checkState(id != null);
-			Preconditions.checkState(login != null);
-			
-			return new ExcludedUser(id, login);
-		}
-	}
-	
-	private final UserExtId id;
-	private final String login;
-	
-	private ExcludedUser(UserExtId id, String login) {
-		this.id = id;
-		this.login = login;
-	}
-	
-	public UserExtId getId() {
-		return id;
-	}
-	
-	public String getLogin() {
-		return login;
-	}
-	
-	public String serializeId() {
-		return id.getExtId();
+	@Test(expected=NullPointerException.class)
+	public void builderShouldThrowWhenIdIsNull() {
+		ScopeUser.builder().id(null);
 	}
 
-	@Override
-	public int hashCode(){
-		return Objects.hashCode(id, login);
-	}
-	
-	@Override
-	public boolean equals(Object object){
-		if (object instanceof ExcludedUser) {
-			ExcludedUser that = (ExcludedUser) object;
-			return Objects.equal(this.id, that.id)
-				&& Objects.equal(this.login, that.login);
-		}
-		return false;
+	@Test(expected=NullPointerException.class)
+	public void builderShouldThrowWhenLoginIsNull() {
+		ScopeUser.builder().login(null);
 	}
 
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this)
-			.add("id", id)
-			.add("login", login)
-			.toString();
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThrowWhenIdNotProvided() {
+		ScopeUser.builder().build();
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void builderShouldThrowWhenLoginNotProvided() {
+		ScopeUser.builder().id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b")).build();
+	}
+	
+	@Test
+	public void builderShouldBuild() {
+		ScopeUser scopeUser = ScopeUser.builder().id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b")).login("user").build();
+		assertThat(scopeUser.getId()).isEqualTo(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"));
+		assertThat(scopeUser.getLogin()).isEqualTo("user");
+	}
+	
+	@Test
+	public void serializeId() {
+		ScopeUser scopeUser = ScopeUser.builder().id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b")).login("user").build();
+		assertThat(scopeUser.serializeId()).isEqualTo("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
 	}
 }

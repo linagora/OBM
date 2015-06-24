@@ -36,7 +36,9 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.obm.imap.archive.DBData.domain;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -59,11 +61,13 @@ import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
+import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
 import com.github.restdriver.clientdriver.ClientDriverRule;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.icegreen.greenmail.imap.AuthorizationException;
 import com.icegreen.greenmail.store.FolderException;
@@ -83,6 +87,7 @@ import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import fr.aliacom.obm.common.user.UserExtId;
 
 public class TreatmentStepdefs {
 	
@@ -166,6 +171,32 @@ public class TreatmentStepdefs {
 	@Given("move feature is enabled")
 	public void configurationMove() {
 		configurationBuilder.moveEnabled(true);
+	}
+	
+	@Given("configuration excludes users?")
+	public void configurationExcludeUsers(Map<String, String> users) {
+		configurationBuilder.scopeIncludes(false)
+			.scopeUsers(usersMapToScopeUserList(users));
+	}
+	
+	@Given("configuration includes users?")
+	public void configurationIncludeUsers(Map<String, String> users) {
+		configurationBuilder.scopeIncludes(true)
+			.scopeUsers(usersMapToScopeUserList(users));
+	}
+
+	private ArrayList<ScopeUser> usersMapToScopeUserList(Map<String, String> users) {
+		return Lists.newArrayList(
+			Maps.transformEntries(users, new Maps.EntryTransformer<String, String, ScopeUser>() {
+
+				@Override
+				public ScopeUser transformEntry(String user, String extId) {
+					return ScopeUser.builder()
+							.login(user)
+							.id(UserExtId.valueOf(extId))
+							.build();
+				}
+		}).values());
 	}
 	
 	@Given("a user \"(.*?)\" with \"(.*?)\" imap folders?")
@@ -286,5 +317,11 @@ public class TreatmentStepdefs {
 		
 		UUID expectedRunId = TestImapArchiveModules.uuid;
 		waitForTheEnd(expectedRunId, sleepTimeInSeconds);
+	}
+	
+	@Then("^imap folder \"(.*?)\" doesn't exists$")
+	public void imapFolderDoesntExists(String folderName) throws Exception {
+		MailFolder archivedFolder = imapServer.getManagers().getImapHostManager().getFolder(adminUser, folderName);
+		assertThat(archivedFolder).isNull();
 	}
 }

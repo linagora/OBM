@@ -31,44 +31,83 @@
 
 package org.obm.imap.archive.beans;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.Test;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 import fr.aliacom.obm.common.user.UserExtId;
 
-public class ExcludedUserTest {
+public class ScopeUser {
 
-	@Test(expected=NullPointerException.class)
-	public void builderShouldThrowWhenIdIsNull() {
-		ExcludedUser.builder().id(null);
-	}
-
-	@Test(expected=NullPointerException.class)
-	public void builderShouldThrowWhenLoginIsNull() {
-		ExcludedUser.builder().login(null);
-	}
-
-	@Test(expected=IllegalStateException.class)
-	public void builderShouldThrowWhenIdNotProvided() {
-		ExcludedUser.builder().build();
-	}
-
-	@Test(expected=IllegalStateException.class)
-	public void builderShouldThrowWhenLoginNotProvided() {
-		ExcludedUser.builder().id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b")).build();
+	public static Builder builder() {
+		return new Builder();
 	}
 	
-	@Test
-	public void builderShouldBuild() {
-		ExcludedUser excludedUser = ExcludedUser.builder().id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b")).login("user").build();
-		assertThat(excludedUser.getId()).isEqualTo(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"));
-		assertThat(excludedUser.getLogin()).isEqualTo("user");
+	public static class Builder {
+		
+		private UserExtId id;
+		private String login;
+		private Builder() {}
+		
+		public Builder id(UserExtId id) {
+			Preconditions.checkNotNull(id);
+			this.id = id;
+			return this;
+		}
+		
+		public Builder login(String login) {
+			Preconditions.checkNotNull(login);
+			this.login = login;
+			return this;
+		}
+		
+		public ScopeUser build() {
+			Preconditions.checkState(id != null);
+			Preconditions.checkState(login != null);
+			
+			return new ScopeUser(id, login);
+		}
 	}
 	
-	@Test
-	public void serializeId() {
-		ExcludedUser excludedUser = ExcludedUser.builder().id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b")).login("user").build();
-		assertThat(excludedUser.serializeId()).isEqualTo("08607f19-05a4-42a2-9b02-6f11f3ceff3b");
+	private final UserExtId id;
+	private final String login;
+	
+	private ScopeUser(UserExtId id, String login) {
+		this.id = id;
+		this.login = login;
+	}
+	
+	public UserExtId getId() {
+		return id;
+	}
+	
+	public String getLogin() {
+		return login;
+	}
+	
+	public String serializeId() {
+		return id.getExtId();
+	}
+
+	@Override
+	public int hashCode(){
+		return Objects.hashCode(id, login);
+	}
+	
+	@Override
+	public boolean equals(Object object){
+		if (object instanceof ScopeUser) {
+			ScopeUser that = (ScopeUser) object;
+			return Objects.equal(this.id, that.id)
+				&& Objects.equal(this.login, that.login);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("id", id)
+			.add("login", login)
+			.toString();
 	}
 }

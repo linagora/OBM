@@ -44,10 +44,10 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.Mailing;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
+import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl.TABLE.FIELDS;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
@@ -85,10 +85,11 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			String MINUTE = "mail_archive_minute";
 			String ARCHIVE_MAIN_FOLDER = "mail_archive_main_folder";
 			String EXCLUDED_FOLDER = "mail_archive_excluded_folder";
+			String SCOPE_INCLUDES = "mail_archive_scope_includes";
 			String MOVE_ENABLED = "mail_archive_move";
 			
-			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, MOVE_ENABLED);
-			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, MOVE_ENABLED);
+			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, SCOPE_INCLUDES, MOVE_ENABLED);
+			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, SCOPE_INCLUDES, MOVE_ENABLED);
 		}
 	}
 	
@@ -101,18 +102,18 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				"UPDATE %s SET %s = ? WHERE %s = ?", TABLE.NAME, FIELDS.UPDATABLE, FIELDS.DOMAIN_UUID);
 		
 		String INSERT = String.format(
-				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
+				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
 	}
 	
-	public interface EXCLUDED_USERS {
+	public interface SCOPE_USERS {
 		interface TABLE {
 			
-			String NAME = "mail_archive_excluded_users";
+			String NAME = "mail_archive_scope_users";
 			
 			interface FIELDS {
-				String DOMAIN_UUID = "mail_archive_excluded_users_domain_uuid";
-				String USER_UUID = "mail_archive_excluded_users_user_uuid";
-				String USER_LOGIN = "mail_archive_excluded_users_user_login";
+				String DOMAIN_UUID = "mail_archive_scope_users_domain_uuid";
+				String USER_UUID = "mail_archive_scope_users_user_uuid";
+				String USER_LOGIN = "mail_archive_scope_users_user_login";
 				
 				String ALL = Joiner.on(", ").join(DOMAIN_UUID, USER_UUID, USER_LOGIN);
 			}
@@ -196,7 +197,8 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 						.build())
 				.archiveMainFolder(rs.getString(FIELDS.ARCHIVE_MAIN_FOLDER))
 				.excludedFolder(rs.getString(FIELDS.EXCLUDED_FOLDER))
-				.excludedUsers(get(connection, domain.getUuid()))
+				.scopeIncludes(rs.getBoolean(FIELDS.SCOPE_INCLUDES))
+				.scopeUsers(get(connection, domain.getUuid()))
 				.mailing(getMailing(connection, domain.getUuid()))
 				.moveEnabled(rs.getBoolean(FIELDS.MOVE_ENABLED))
 				.build();
@@ -218,6 +220,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setInt(idx++, domainConfiguration.getMinute());
 			ps.setString(idx++, domainConfiguration.getArchiveMainFolder());
 			ps.setString(idx++, domainConfiguration.getExcludedFolder());
+			ps.setBoolean(idx++, domainConfiguration.isScopeIncludes());
 			ps.setBoolean(idx++, domainConfiguration.isMoveEnabled());
 			ps.setString(idx++, domainConfiguration.getDomainId().toString());
 
@@ -225,7 +228,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				throw new DomainNotFoundException(domainConfiguration.getDomainId());
 			}
 			
-			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getExcludedUsers());
+			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getScopeUsers());
 			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getMailing());
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -249,29 +252,30 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setInt(idx++, domainConfiguration.getMinute());
 			ps.setString(idx++, domainConfiguration.getArchiveMainFolder());
 			ps.setString(idx++, domainConfiguration.getExcludedFolder());
+			ps.setBoolean(idx++, domainConfiguration.isScopeIncludes());
 			ps.setBoolean(idx++, domainConfiguration.isMoveEnabled());
 
 			ps.executeUpdate();
 			
-			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getExcludedUsers());
+			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getScopeUsers());
 			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getMailing());
 		} catch (SQLException e) {
 			throw new DaoException(e);
 		}
 	}
 	
-	private List<ExcludedUser> get(Connection connection, ObmDomainUuid domainId) throws DaoException {
-		try (PreparedStatement ps = connection.prepareStatement(EXCLUDED_USERS.REQUESTS.SELECT)) {
+	private List<ScopeUser> get(Connection connection, ObmDomainUuid domainId) throws DaoException {
+		try (PreparedStatement ps = connection.prepareStatement(SCOPE_USERS.REQUESTS.SELECT)) {
 
 			ps.setString(1, domainId.get());
 
 			ResultSet rs = ps.executeQuery();
 			
-			ImmutableList.Builder<ExcludedUser> builder = ImmutableList.builder();
+			ImmutableList.Builder<ScopeUser> builder = ImmutableList.builder();
 			while (rs.next()) {
-				builder.add(ExcludedUser.builder()
-						.id(UserExtId.valueOf(rs.getString(EXCLUDED_USERS.TABLE.FIELDS.USER_UUID)))
-						.login(rs.getString(EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN))
+				builder.add(ScopeUser.builder()
+						.id(UserExtId.valueOf(rs.getString(SCOPE_USERS.TABLE.FIELDS.USER_UUID)))
+						.login(rs.getString(SCOPE_USERS.TABLE.FIELDS.USER_LOGIN))
 						.build());
 			}
 			return builder.build();
@@ -281,18 +285,18 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 		}
 	}
 
-	private void update(Connection connection, ObmDomainUuid domainId, List<ExcludedUser> users) throws DaoException {
-		try (PreparedStatement psDelete = connection.prepareStatement(EXCLUDED_USERS.REQUESTS.DELETE);
-				PreparedStatement psInsert = connection.prepareStatement(EXCLUDED_USERS.REQUESTS.INSERT)) {
+	private void update(Connection connection, ObmDomainUuid domainId, List<ScopeUser> users) throws DaoException {
+		try (PreparedStatement psDelete = connection.prepareStatement(SCOPE_USERS.REQUESTS.DELETE);
+				PreparedStatement psInsert = connection.prepareStatement(SCOPE_USERS.REQUESTS.INSERT)) {
 
 			psDelete.setString(1, domainId.get());
 			psDelete.executeUpdate();
 			
-			for (ExcludedUser excludedUser : users) {
+			for (ScopeUser scopeUser : users) {
 				int idx = 1;
 				psInsert.setString(idx++, domainId.get());
-				psInsert.setString(idx++, excludedUser.serializeId());
-				psInsert.setString(idx++, excludedUser.getLogin());
+				psInsert.setString(idx++, scopeUser.serializeId());
+				psInsert.setString(idx++, scopeUser.getLogin());
 				
 				psInsert.executeUpdate();
 			}

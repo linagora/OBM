@@ -45,13 +45,13 @@ import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.HigherBoundary;
 import org.obm.imap.archive.beans.ImapFolder;
 import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.MappedMessageSets;
 import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.beans.RepeatKind;
+import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.imap.archive.beans.Year;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
@@ -448,7 +448,7 @@ public class ImapArchiveProcessing {
 			return FluentIterable.from(storeClient.listAll(USERS_REFERENCE_NAME, INBOX_MAILBOX_NAME))
 					.transform(appendDomainWhenNone(domain))
 					.filter(filterDomain(domain, processedTask.getLogger()))
-					.filter(filterOutExcludedUsers(processedTask))
+					.filter(filterScopeUsers(processedTask))
 					.toList();
 		}
 	}
@@ -530,30 +530,31 @@ public class ImapArchiveProcessing {
 		};
 	}
 
-	private Predicate<? super ListInfo> filterOutExcludedUsers(ProcessedTask processedTask) {
-		final List<String> excludedUserLogins = excludedUserLogins(processedTask.getDomainConfiguration()); 
+	private Predicate<? super ListInfo> filterScopeUsers(ProcessedTask processedTask) {
+		final List<String> scopeUserLogins = scopeUserLogins(processedTask.getDomainConfiguration());
+		final boolean scopeIncludes = processedTask.getDomainConfiguration().isScopeIncludes();
 		return new Predicate<ListInfo>() {
 
 			@Override
 			public boolean apply(ListInfo listInfo) {
-				for (String excludedUserLogin : excludedUserLogins) {
-					if (listInfo.getName().startsWith("user/" + excludedUserLogin + "/") || 
-							listInfo.getName().startsWith("user/" + excludedUserLogin + "@")) {
-						return false;
+				for (String scopeUserLogin : scopeUserLogins) {
+					if (listInfo.getName().startsWith("user/" + scopeUserLogin + "/") || 
+							listInfo.getName().startsWith("user/" + scopeUserLogin + "@")) {
+						return scopeIncludes;
 					}
 				}
-				return true;
+				return !scopeIncludes;
 			}
 		};
 	}
 
-	private List<String> excludedUserLogins(DomainConfiguration domainConfiguration) {
-		return FluentIterable.from(domainConfiguration.getExcludedUsers())
-				.transform(new Function<ExcludedUser, String>() {
+	private List<String> scopeUserLogins(DomainConfiguration domainConfiguration) {
+		return FluentIterable.from(domainConfiguration.getScopeUsers())
+				.transform(new Function<ScopeUser, String>() {
 
 					@Override
-					public String apply(ExcludedUser excludedUser) {
-						return excludedUser.getLogin();
+					public String apply(ScopeUser scopeUser) {
+						return scopeUser.getLogin();
 					}
 				}).toList();
 	}

@@ -43,7 +43,7 @@ import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.beans.ExcludedUser;
+import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.dao.DomainConfigurationDao;
 import org.obm.imap.archive.exception.LoginMismatchException;
@@ -175,7 +175,7 @@ public class DomainConfigurationServiceTest {
 								.time(LocalTime.parse("22:15"))
 								.recurrence(ArchiveRecurrence.daily()).build())
 				.archiveMainFolder("arChive")
-				.excludedUsers(ImmutableList.of(ExcludedUser.builder()
+				.scopeUsers(ImmutableList.of(ScopeUser.builder()
 						.id(userId)
 						.login("badlogin")
 						.build()))

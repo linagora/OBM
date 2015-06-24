@@ -67,7 +67,7 @@ public class BeansTest {
 				HigherBoundary.class,
 				Year.class,
 				Limit.class,
-				ExcludedUser.class,
+				ScopeUser.class,
 				Mailing.class,
 				MailboxPaths.class,
 				MappedMessageSets.class

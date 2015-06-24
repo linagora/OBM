@@ -49,10 +49,10 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.Mailing;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
+import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.base.EmailAddress;
@@ -99,7 +99,7 @@ public class DomainConfigurationJdbcImplTest {
 	private Operation delete() {
 		return Operations.sequenceOf(
 				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.TABLE.NAME),
-				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME));
+				Operations.deleteAllFrom(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.NAME));
 	}
 
 	private Insert domainConfiguration() {
@@ -114,17 +114,18 @@ public class DomainConfigurationJdbcImplTest {
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.ARCHIVE_MAIN_FOLDER,
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER,
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.SCOPE_INCLUDES,
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.MOVE_ENABLED)
-			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "arChive", "excluded", false)
+			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "arChive", "excluded", true, false)
 			.build();
 	}	
 
-	private Insert excludedUser(ExcludedUser excludedUser) {
-		return Operations.insertInto(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.NAME)
-			.columns(DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.DOMAIN_UUID, 
-					DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_UUID,
-					DomainConfigurationJdbcImpl.EXCLUDED_USERS.TABLE.FIELDS.USER_LOGIN) 
-			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", excludedUser.serializeId(), excludedUser.getLogin())
+	private Insert scopeUser(ScopeUser scopeUser) {
+		return Operations.insertInto(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.NAME)
+			.columns(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.DOMAIN_UUID, 
+					DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_UUID,
+					DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_LOGIN) 
+			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", scopeUser.serializeId(), scopeUser.getLogin())
 			.build();
 	}
 	
@@ -157,7 +158,8 @@ public class DomainConfigurationJdbcImplTest {
 		assertThat(domainConfiguration.getMinute()).isEqualTo(32);
 		assertThat(domainConfiguration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(domainConfiguration.getExcludedFolder()).isEqualTo("excluded");
-		assertThat(domainConfiguration.getExcludedUsers()).isEmpty();
+		assertThat(domainConfiguration.isScopeIncludes()).isTrue();
+		assertThat(domainConfiguration.getScopeUsers()).isEmpty();
 	}
 	
 	@Test
@@ -170,21 +172,21 @@ public class DomainConfigurationJdbcImplTest {
 	}
 	
 	@Test
-	public void getShouldLoadExcludedUsers() throws Exception {
-		ExcludedUser excludedUser = ExcludedUser.builder()
+	public void getShouldLoadScopeUsers() throws Exception {
+		ScopeUser scopeUser = ScopeUser.builder()
 				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
 				.login("usera")
 				.build();
-		ExcludedUser excludedUser2 = ExcludedUser.builder()
+		ScopeUser scopeUser2 = ScopeUser.builder()
 				.id(UserExtId.valueOf("8e30e673-1c47-4ca8-85e8-4609d4228c10"))
 				.login("userb")
 				.build();
-		play(Operations.sequenceOf(delete(), domainConfiguration(), excludedUser(excludedUser), excludedUser(excludedUser2)));
+		play(Operations.sequenceOf(delete(), domainConfiguration(), scopeUser(scopeUser), scopeUser(scopeUser2)));
 		
 		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
 		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
-		assertThat(domainConfiguration.getExcludedUsers()).containsOnly(excludedUser, excludedUser2);
+		assertThat(domainConfiguration.getScopeUsers()).containsOnly(scopeUser, scopeUser2);
 	}
 	
 	@Test
@@ -229,6 +231,7 @@ public class DomainConfigurationJdbcImplTest {
 						.build())
 				.archiveMainFolder("ARcHIVE")
 				.excludedFolder("anotherExcluded")
+				.scopeIncludes(false)
 				.build();
 		
 		domainConfigurationJdbcImpl.update(expectedDomainConfiguration);
@@ -238,20 +241,20 @@ public class DomainConfigurationJdbcImplTest {
 	}
 	
 	@Test
-	public void updateShouldUpdateExcludedUsers() throws Exception {
-		ExcludedUser excludedUser = ExcludedUser.builder()
+	public void updateShouldUpdateScopeUsers() throws Exception {
+		ScopeUser scopeUser = ScopeUser.builder()
 				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
 				.login("usera")
 				.build();
-		ExcludedUser excludedUser2 = ExcludedUser.builder()
+		ScopeUser scopeUser2 = ScopeUser.builder()
 				.id(UserExtId.valueOf("8e30e673-1c47-4ca8-85e8-4609d4228c10"))
 				.login("userb")
 				.build();
-		play(Operations.sequenceOf(delete(), domainConfiguration(), excludedUser(excludedUser), excludedUser(excludedUser2)));
+		play(Operations.sequenceOf(delete(), domainConfiguration(), scopeUser(scopeUser), scopeUser(scopeUser2)));
 		
 		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
-		ExcludedUser excludedUser3 = ExcludedUser.builder()
+		ScopeUser scopeUser3 = ScopeUser.builder()
 				.id(UserExtId.valueOf("2d7a5942-46ab-4fad-9bd2-608bde249671"))
 				.login("userc")
 				.build();
@@ -269,13 +272,13 @@ public class DomainConfigurationJdbcImplTest {
 						.build())
 				.archiveMainFolder("ARcHIVE")
 				.excludedFolder("anotherExcluded")
-				.excludedUsers(ImmutableList.of(excludedUser, excludedUser3))
+				.scopeUsers(ImmutableList.of(scopeUser, scopeUser3))
 				.build();
 		
 		domainConfigurationJdbcImpl.update(expectedDomainConfiguration);
 		
 		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
-		assertThat(domainConfiguration.getExcludedUsers()).containsOnly(excludedUser, excludedUser3);
+		assertThat(domainConfiguration.getScopeUsers()).containsOnly(scopeUser, scopeUser3);
 	}
 	
 	@Test
@@ -351,16 +354,16 @@ public class DomainConfigurationJdbcImplTest {
 	}
 	
 	@Test
-	public void createShouldCreateExcludedUsers() throws Exception {
+	public void createShouldCreateScopeUsers() throws Exception {
 		play(Operations.sequenceOf(delete(), domainConfiguration()));
 		
 		ObmDomainUuid uuid = ObmDomainUuid.of("1383b12c-6d79-40c7-acf9-c79bcc673fff");
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
-		ExcludedUser excludedUser = ExcludedUser.builder()
+		ScopeUser scopeUser = ScopeUser.builder()
 				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
 				.login("usera")
 				.build();
-		ExcludedUser excludedUser2 = ExcludedUser.builder()
+		ScopeUser scopeUser2 = ScopeUser.builder()
 				.id(UserExtId.valueOf("8e30e673-1c47-4ca8-85e8-4609d4228c10"))
 				.login("userb")
 				.build();
@@ -378,13 +381,13 @@ public class DomainConfigurationJdbcImplTest {
 						.build())
 				.archiveMainFolder("ARcHIVE")
 				.excludedFolder("excluded")
-				.excludedUsers(ImmutableList.of(excludedUser, excludedUser2))
+				.scopeUsers(ImmutableList.of(scopeUser, scopeUser2))
 				.build();
 		
 		domainConfigurationJdbcImpl.create(expectedDomainConfiguration);
 		
 		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain); 
-		assertThat(domainConfiguration.getExcludedUsers()).containsOnly(excludedUser, excludedUser2);
+		assertThat(domainConfiguration.getScopeUsers()).containsOnly(scopeUser, scopeUser2);
 	}
 	
 	@Test

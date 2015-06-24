@@ -56,13 +56,13 @@ import org.obm.imap.archive.beans.ArchiveTreatment;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
 import org.obm.imap.archive.beans.ConfigurationState;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.HigherBoundary;
 import org.obm.imap.archive.beans.ImapFolder;
 import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
+import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.imap.archive.beans.Year;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl;
@@ -1338,7 +1338,7 @@ public class ImapArchiveProcessingTest {
 	}
 	
 	@Test
-	public void listUsersShouldFilterWhenExcludedUsers() throws Exception {
+	public void listUsersShouldFilterWhenScopeUsersAndScopeExcludes() throws Exception {
 		List<ListInfo> expectedListInfos = ImmutableList.of(
 				new ListInfo("user/usera@mydomain.org", true, false),
 				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
@@ -1372,7 +1372,7 @@ public class ImapArchiveProcessingTest {
 					.time(LocalTime.parse("13:23"))
 					.build())
 			.archiveMainFolder("arChive")
-			.excludedUsers(ImmutableList.of(ExcludedUser.builder()
+			.scopeUsers(ImmutableList.of(ScopeUser.builder()
 					.id(UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9"))
 					.login("userb")
 					.build()))
@@ -1399,7 +1399,69 @@ public class ImapArchiveProcessingTest {
 	}
 	
 	@Test
-	public void listUsersShouldNotFilterWhenPathDoesntStartWithExcludedUser() throws Exception {
+	public void listUsersShouldNotFilterWhenScopeUsersAndScopeIncludes() throws Exception {
+		List<ListInfo> expectedListInfos = ImmutableList.of(
+				new ListInfo("user/userb@mydomain.org", true, false),
+				new ListInfo("user/userb/Drafts@mydomain.org", true, false),
+				new ListInfo("user/userb/SPAM@mydomain.org", true, false),
+				new ListInfo("user/userb/Sent@mydomain.org", true, false));
+		ListResult listResult = new ListResult(12);
+		listResult.addAll(expectedListInfos);
+		listResult.add(new ListInfo("user/usera@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/Drafts@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/SPAM@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/usera/Sent@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/userc@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/userc/Drafts@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/userc/SPAM@mydomain.org", true, false));
+		listResult.add(new ListInfo("user/userc/Sent@mydomain.org", true, false));
+		
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		storeClient.login(false);
+		expectLastCall();
+		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+			.andReturn(listResult);
+		storeClient.close();
+		expectLastCall();
+		
+		ObmDomain domain = ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).name("mydomain.org").build();
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+			.domain(domain)
+			.state(ConfigurationState.ENABLE)
+			.schedulingConfiguration(SchedulingConfiguration.builder()
+					.recurrence(ArchiveRecurrence.daily())
+					.time(LocalTime.parse("13:23"))
+					.build())
+			.archiveMainFolder("arChive")
+			.scopeIncludes(true)
+			.scopeUsers(ImmutableList.of(ScopeUser.builder()
+					.id(UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9"))
+					.login("userb")
+					.build()))
+			.build();
+		
+		expect(storeClientFactory.create(domain.getName()))
+			.andReturn(storeClient);
+		
+		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
+				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
+		
+		control.replay();
+		ProcessedTask processedTask = ProcessedTask.builder()
+				.archiveConfiguration(archiveConfiguration)
+				.higherBoundary(HigherBoundary.builder()
+						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
+						.build())
+				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
+				.build();
+		
+		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listUsers(processedTask);
+		control.verify();
+		assertThat(listImapFolders).isEqualTo(expectedListInfos);
+	}
+	
+	@Test
+	public void listUsersShouldNotFilterWhenPathDoesntStartWithScopeUser() throws Exception {
 		List<ListInfo> expectedListInfos = ImmutableList.of(
 				new ListInfo("user/user/usera@mydomain.org", true, false));
 		ListResult listResult = new ListResult(1);
@@ -1422,7 +1484,7 @@ public class ImapArchiveProcessingTest {
 					.time(LocalTime.parse("13:23"))
 					.build())
 			.archiveMainFolder("arChive")
-			.excludedUsers(ImmutableList.of(ExcludedUser.builder()
+			.scopeUsers(ImmutableList.of(ScopeUser.builder()
 					.id(UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9"))
 					.login("usera")
 					.build()))

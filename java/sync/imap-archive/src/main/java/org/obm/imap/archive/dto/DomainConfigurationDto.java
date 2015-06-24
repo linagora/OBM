@@ -36,7 +36,7 @@ import java.util.UUID;
 
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.beans.ExcludedUser;
+import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.imap.archive.beans.Mailing;
 import org.obm.sync.base.EmailAddress;
 
@@ -58,7 +58,8 @@ public class DomainConfigurationDto {
 		dto.minute = configuration.getMinute();
 		dto.archiveMainFolder = configuration.getArchiveMainFolder();
 		dto.excludedFolder = configuration.getExcludedFolder();
-		dto.excludedUserIdToLoginMap = toMap(configuration.getExcludedUsers());
+		dto.scopeIncludes = configuration.isScopeIncludes();
+		dto.scopeUserIdToLoginMap = toMap(configuration.getScopeUsers());
 		dto.mailingEmails = toStrings(configuration.getMailing());
 		dto.moveEnabled = configuration.isMoveEnabled();
 		return dto;
@@ -87,10 +88,10 @@ public class DomainConfigurationDto {
 		throw new IllegalArgumentException(dayOfWeek.name() + " can't be converted to Integer");
 	}
 	
-	private static Map<String, String> toMap(List<ExcludedUser> excludedUsers) {
+	private static Map<String, String> toMap(List<ScopeUser> scopeUsers) {
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-		for (ExcludedUser excludedUser : excludedUsers) {
-			builder.put(excludedUser.serializeId(), excludedUser.getLogin());
+		for (ScopeUser scopeUser : scopeUsers) {
+			builder.put(scopeUser.serializeId(), scopeUser.getLogin());
 		}
 		return builder.build();
 	}
@@ -116,7 +117,8 @@ public class DomainConfigurationDto {
 	public Integer minute;
 	public String archiveMainFolder;
 	public String excludedFolder;
-	public Map<String, String> excludedUserIdToLoginMap;
+	public Boolean scopeIncludes;
+	public Map<String, String> scopeUserIdToLoginMap;
 	public List<String> mailingEmails;
 	public Boolean moveEnabled;
 	

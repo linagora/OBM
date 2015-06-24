@@ -43,10 +43,10 @@ import org.obm.imap.archive.beans.DayOfMonth;
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DayOfYear;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.beans.ExcludedUser;
 import org.obm.imap.archive.beans.Mailing;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
+import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.sync.base.EmailAddress;
 
 import com.google.common.collect.ImmutableList;
@@ -75,7 +75,8 @@ public class DomainConfigurationDtoTest {
 							.build())
 					.archiveMainFolder("arChive")
 					.excludedFolder("excluded")
-					.excludedUsers(ImmutableList.of(ExcludedUser.builder()
+					.scopeIncludes(true)
+					.scopeUsers(ImmutableList.of(ScopeUser.builder()
 								.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
 								.login("user")
 								.build()))
@@ -92,7 +93,8 @@ public class DomainConfigurationDtoTest {
 		assertThat(dto.minute).isEqualTo(23);
 		assertThat(dto.archiveMainFolder).isEqualTo("arChive");
 		assertThat(dto.excludedFolder).isEqualTo("excluded");
-		assertThat(dto.excludedUserIdToLoginMap).containsExactly(MapEntry.entry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "user"));
+		assertThat(dto.scopeIncludes).isTrue();
+		assertThat(dto.scopeUserIdToLoginMap).containsExactly(MapEntry.entry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "user"));
 		assertThat(dto.mailingEmails).containsOnly("usera@mydomain.org", "userb@mydomain.org");
 	}
 	

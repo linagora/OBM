@@ -147,3 +147,61 @@ Feature: Mail archive - Treatment
     When admin launches an immediate treatment
     Then 5 mails should be archived in the "user/usera/arChive/2014/INBOX@mydomain.org" imap folder with subject "subject"
     Then 2 mails should be archived in the "user/usera-test/arChive/2014/INBOX@mydomain.org" imap folder with subject "subject-test"
+
+  Scenario: archive treatment on a user excluded
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And configuration excludes users 
+      | userb | 8e30e673-1c47-4ca8-85e8-4609d4228c10 |
+    And a user "usera" with "user/usera@mydomain.org" imap folder
+    And this user has 5 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject"
+    And a user "userb" with "user/userb@mydomain.org" imap folder
+    And this user has 2 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then 5 mails should be archived in the "user/usera/arChive/2014/INBOX@mydomain.org" imap folder with subject "subject"
+    Then imap folder "user/userb/arChive/2014/INBOX@mydomain.org" doesn't exists
+
+  Scenario: archive treatment on  all users excluded
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And configuration excludes users 
+      | usera | 08607f19-05a4-42a2-9b02-6f11f3ceff3b |
+      | userb | 8e30e673-1c47-4ca8-85e8-4609d4228c10 |
+    And a user "usera" with "user/usera@mydomain.org" imap folder
+    And this user has 5 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject"
+    And a user "userb" with "user/userb@mydomain.org" imap folder
+    And this user has 2 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then imap folder "user/usera/arChive/2014/INBOX@mydomain.org" doesn't exists
+    Then imap folder "user/userb/arChive/2014/INBOX@mydomain.org" doesn't exists
+
+  Scenario: archive treatment on a user included
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And configuration includes users 
+      | usera | 08607f19-05a4-42a2-9b02-6f11f3ceff3b |
+    And a user "usera" with "user/usera@mydomain.org" imap folder
+    And this user has 5 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject"
+    And a user "userb" with "user/userb@mydomain.org" imap folder
+    And this user has 2 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject2"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then 5 mails should be archived in the "user/usera/arChive/2014/INBOX@mydomain.org" imap folder with subject "subject"
+    Then imap folder "user/userb/arChive/2014/INBOX@mydomain.org" doesn't exists
+
+  Scenario: archive treatment on all users included
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And configuration includes users 
+      | usera | 08607f19-05a4-42a2-9b02-6f11f3ceff3b |
+      | userb | 8e30e673-1c47-4ca8-85e8-4609d4228c10 |
+    And a user "usera" with "user/usera@mydomain.org" imap folder
+    And this user has 5 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject"
+    And a user "userb" with "user/userb@mydomain.org" imap folder
+    And this user has 2 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject2"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then 5 mails should be archived in the "user/usera/arChive/2014/INBOX@mydomain.org" imap folder with subject "subject"
+    Then 2 mails should be archived in the "user/userb/arChive/2014/INBOX@mydomain.org" imap folder with subject "subject2"
