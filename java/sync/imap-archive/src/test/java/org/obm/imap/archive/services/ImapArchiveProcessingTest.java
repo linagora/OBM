@@ -156,6 +156,7 @@ public class ImapArchiveProcessingTest {
 						.time(LocalTime.parse("13:23"))
 						.build())
 				.archiveMainFolder(archiveMainFolder)
+				.moveEnabled(false)
 				.build();
 		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
 			.andReturn(ImmutableList.<ArchiveTreatment> of());
@@ -200,6 +201,76 @@ public class ImapArchiveProcessingTest {
 		control.replay();
 		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
 		control.verify();
+	}
+	
+	@Test
+	public void givenAnyArchiveRunShouldDeleteEmailsWhenMoveIsEnabled() throws Exception {
+		String archiveMainFolder = "arChive";
+		ObmDomainUuid domainId = ObmDomainUuid.of("fc2f915e-9df4-4560-b141-7b4c7ddecdd6");
+		ObmDomain domain = ObmDomain.builder().uuid(domainId).name("mydomain.org").build();
+		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.ENABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.daily())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.archiveMainFolder(archiveMainFolder)
+				.moveEnabled(true)
+				.build();
+		expect(archiveTreatmentDao.findLastTerminated(domainId, Limit.from(1)))
+			.andReturn(ImmutableList.<ArchiveTreatment> of());
+		
+		DateTime treatmentDate = DateTime.parse("2014-08-27T12:18:00.000Z");
+		expect(dateTimeProvider.now())
+			.andReturn(treatmentDate).times(4);
+		
+		DateTime higherBoundary = DateTime.parse("2014-08-26T12:18:00.000Z");
+		expect(schedulingDatesService.higherBoundary(treatmentDate, RepeatKind.DAILY))
+			.andReturn(higherBoundary);
+		
+		ListResult inboxListResult = getUserMailboxList("usera", "");
+		ListResult listResult = getUserMailboxList("usera", "/Drafts", "/SPAM");
+		
+		StoreClient storeClient = control.createMock(StoreClient.class);
+		
+		storeClient.login(false);
+		expectLastCall();
+		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+			.andReturn(inboxListResult);
+		storeClient.login(false);
+		expectLastCall();
+		expectListImapFolders(storeClient, "usera", listResult);
+		
+		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
+		MessageSet archived1 = expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
+				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
+		MessageSet archived2 = expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org", 
+				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)), 
+				higherBoundary, treatmentDate, runId, storeClient);
+		MessageSet archived3 = expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org", 
+				ImmutableSet.of(Range.singleton(1230l)), higherBoundary, treatmentDate, runId, storeClient);
+		
+		expectMove("user/usera@mydomain.org", storeClient, archived1);
+		expectMove("user/usera/Drafts@mydomain.org", storeClient, archived2);
+		expectMove("user/usera/SPAM@mydomain.org", storeClient, archived3);
+		
+		storeClient.close();
+		expectLastCall().times(2);
+		
+		expect(storeClientFactory.create(domain.getName()))
+			.andReturn(storeClient);
+		expect(storeClientFactory.createOnUserBackend("usera", domain))
+			.andReturn(storeClient).times(4);
+		
+		control.replay();
+		imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
+		control.verify();
+	}
+
+	private void expectMove(String folder, StoreClient storeClient, MessageSet messages) throws Exception {
+		expect(storeClient.select(folder)).andReturn(true);
+		expect(storeClient.uidStore(messages, new FlagsList(ImmutableList.of(Flag.DELETED)), true)).andReturn(true);
 	}
 	
 	@Test
@@ -885,7 +956,7 @@ public class ImapArchiveProcessingTest {
 		expectLastCall();
 	}
 	
-	private void expectImapCommandsOnMailboxProcessing(String mailboxName, String archiveMailboxName, String temporaryMailboxName, Set<Range<Long>> uids,
+	private MessageSet expectImapCommandsOnMailboxProcessing(String mailboxName, String archiveMailboxName, String temporaryMailboxName, Set<Range<Long>> uids,
 				DateTime higherBoundary, DateTime treatmentDate, ArchiveTreatmentRunId runId, StoreClient storeClient) 
 			throws Exception {
 		
@@ -926,6 +997,8 @@ public class ImapArchiveProcessingTest {
 				.status(ArchiveStatus.SUCCESS)
 				.build());
 		expectLastCall();
+		
+		return messageSet;
 	}
 
 	private void expectCreateMailbox(String archiveMailboxName, StoreClient storeClient) throws MailboxNotFoundException {

@@ -162,6 +162,11 @@ public class TreatmentStepdefs {
 				.time(new LocalTime(hour, minute))
 				.build());
 	}
+
+	@Given("move feature is enabled")
+	public void configurationMove() {
+		configurationBuilder.moveEnabled(true);
+	}
 	
 	@Given("a user \"(.*?)\" with \"(.*?)\" imap folders?")
 	public void createUserWithFolder(String user, List<String> imapFolders) throws Exception {
@@ -249,15 +254,20 @@ public class TreatmentStepdefs {
 	
 	@Then("(\\d+) mails? should be archived in the \"(.*?)\" imap folder with subject \"(.*?)\"")
 	public void mailsShouldBeArchivedInFolder(int numberOfArchivedEmails, String archiveFolderName, String subject) throws Exception {
-		MailFolder archivedFolder = imapServer.getManagers().getImapHostManager().getFolder(adminUser, archiveFolderName);
+		List<SimpleStoredMessage> messages = mailsShouldBeInFolder(numberOfArchivedEmails, archiveFolderName);
+		for (SimpleStoredMessage message : messages) {
+			assertThat(message.getMimeMessage().getSubject()).isEqualTo(subject);
+		}
+	}
+	
+	@Then("(\\d+) mails? should be in the \"(.*?)\" imap folder")
+	public List<SimpleStoredMessage> mailsShouldBeInFolder(int numberOfArchivedEmails, String folderName) throws Exception {
+		MailFolder archivedFolder = imapServer.getManagers().getImapHostManager().getFolder(adminUser, folderName);
 		assertThat(archivedFolder).isNotNull();
 		
 		List<SimpleStoredMessage> messages = archivedFolder.getMessages();
 		assertThat(messages).hasSize(numberOfArchivedEmails);
-		
-		for (SimpleStoredMessage message : messages) {
-			assertThat(message.getMimeMessage().getSubject()).isEqualTo(subject);
-		}
+		return messages;
 	}
 	
 	@Then("this user imap folders should contain (\\d+) mails?")

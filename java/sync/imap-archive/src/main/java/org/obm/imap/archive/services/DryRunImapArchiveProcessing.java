@@ -89,4 +89,9 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 	protected void processingImapCopy(Mailbox mailbox, MessageSet mailUids, ProcessedTask processedTask) 
 			throws IMAPException, MailboxFormatException, MailboxNotFoundException {
 	}
+	
+	@Override
+	protected void processingImapMove(Mailbox mailbox, MessageSet mailUids, ProcessedTask processedTask) 
+			throws ImapSelectException, MailboxNotFoundException {
+	}
 }

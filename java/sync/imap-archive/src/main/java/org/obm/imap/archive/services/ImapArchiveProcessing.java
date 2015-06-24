@@ -73,6 +73,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Flag;
+import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.MessageSet;
@@ -243,6 +244,7 @@ public class ImapArchiveProcessing {
 				logger.info("{} mails will be archived, from UID {} to {}", mailUids.size(), mailUids.first().get(), mailUids.max());
 				
 				processingImapCopy(mailbox, mailUids, processedTask);
+				processingImapMove(mailbox, mailUids, processedTask);
 			}
 			processedFolder.status(ArchiveStatus.SUCCESS);
 		} finally {
@@ -250,6 +252,22 @@ public class ImapArchiveProcessing {
 		}
 	}
 
+	protected void processingImapMove(Mailbox mailbox, MessageSet mailUids, ProcessedTask processedTask) 
+			throws ImapSelectException, MailboxNotFoundException {
+		
+		Logger logger = processedTask.getLogger();
+		
+		if (!processedTask.domainConfiguration.isMoveEnabled()) {
+			logger.debug("Moving archived emails is disabled");
+			return;
+		}
+
+		logger.debug("Moving archived emails is enabled");
+		mailbox.select();
+		logger.debug("Set deleted flag on %s", mailUids.toString());
+		mailbox.getStoreClient().uidStore(mailUids, new FlagsList(ImmutableList.of(Flag.DELETED)), true);
+	}
+	
 	protected void processingImapCopy(Mailbox mailbox, MessageSet mailUids, ProcessedTask processedTask) 
 			throws IMAPException, MailboxFormatException, MailboxNotFoundException {
 		
