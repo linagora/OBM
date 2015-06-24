@@ -114,8 +114,9 @@ function toJson($configuration) {
   $minute = $configuration->minute;
   $archiveMainFolder = $configuration->archiveMainFolder;
   $excludedFolder = $configuration->excludedFolder;
-  $excludedUserIdToLoginMapFromConfig = $configuration->excludedUserIdToLoginMap;
-  $excludedUserIdToLoginMap = $excludedUserIdToLoginMapFromConfig != null ? $excludedUserIdToLoginMapFromConfig : new stdClass();
+  $scopeUserIdToLoginMapFromConfig = $configuration->scopeUserIdToLoginMap;
+  $scopeUserIdToLoginMap = $scopeUserIdToLoginMapFromConfig != null ? $scopeUserIdToLoginMapFromConfig : new stdClass();
+  $scopeIncludes = $configuration->scopeIncludes;
   $mailingEmailsFromConfig = $configuration->mailingEmails;
   $mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
 
@@ -130,7 +131,8 @@ function toJson($configuration) {
     "minute" => ($minute) ? $minute : 0,
     "archiveMainFolder" => $archiveMainFolder,
     "excludedFolder" => $excludedFolder,
-    "excludedUserIdToLoginMap" => $excludedUserIdToLoginMap,
+    "scopeUserIdToLoginMap" => $scopeUserIdToLoginMap,
+    "scopeIncludes" => $scopeIncludes,
     "mailingEmails" => $mailingEmails
   ));
 }
@@ -194,7 +196,8 @@ function paramToJson($paramsAsConfiguration) {
 	$minute = $paramsAsConfiguration->minute;
 	$archiveMainFolder = $paramsAsConfiguration->archive_main_folder;
 	$excludedFolder = $paramsAsConfiguration->excluded_folder;
-	$excludedUserIdToLoginMap = excludedUserIdsToMap($paramsAsConfiguration->excluded_user_id);
+	$scopeUserIdToLoginMap = scopeUserIdsToMap($paramsAsConfiguration->scope_user_id);
+	$scopeIncludes = $paramsAsConfiguration->scope_includes;
 	$mailingEmailsFromConfig = $paramsAsConfiguration->mailing_emails;
 	$mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
 
@@ -209,17 +212,18 @@ function paramToJson($paramsAsConfiguration) {
 			"minute" => ($minute) ? $minute : 0,
 			"archiveMainFolder" => $archiveMainFolder,
 			"excludedFolder" => $excludedFolder,
-			"excludedUserIdToLoginMap" => $excludedUserIdToLoginMap,
+			"scopeUserIdToLoginMap" => $scopeUserIdToLoginMap,
+			"scopeIncludes" => ($scopeIncludes) ? "true" : "false",
 			"mailingEmails" => $mailingEmails
 	));
 }
 
-function excludedUserIdsToMap($excludedUserIds) {
+function scopeUserIdsToMap($scopeUserIds) {
   $map = new stdClass();
-  if ($excludedUserIds == null) {
+  if ($scopeUserIds == null) {
     return $map;
   }
-  $users = get_userobm_from_ext_ids($excludedUserIds, false);
+  $users = get_userobm_from_ext_ids($scopeUserIds, false);
   foreach ($users['entity'] as $u_ext_id => $u_ent) {
     $map->$u_ext_id = $u_ent['login'];
   }

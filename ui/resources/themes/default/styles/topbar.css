@@ -938,7 +938,7 @@ fieldset.detail {
   text-align: right;
   font-style: italic;
   font-weight: normal;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .detail td {

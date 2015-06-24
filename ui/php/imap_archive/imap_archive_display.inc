@@ -52,7 +52,7 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   global $l_service_activating, $l_activating;
   global $l_options, $l_copy_title, $l_copy_only, $l_copy_and_delete;
   global $l_scheduling;
-  global $l_archive_main_folder, $l_excluded_folder, $l_folder, $l_excluded_users;
+  global $l_archive_main_folder, $l_excluded_folder, $l_folder, $l_scope;
   global $l_mailing_feedback;
 
   $user_id = $params['user_id'];
@@ -68,7 +68,8 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   $minute = $configuration->minute;
   $archiveMainFolder = $configuration->archiveMainFolder;
   $excludedFolder = $configuration->excludedFolder;
-  $excludedUserIdToLoginMap = $configuration->excludedUserIdToLoginMap;
+  $scopeUserIdToLoginMap = $configuration->scopeUserIdToLoginMap;
+  $scopeIncludes = $configuration->scopeIncludes;
   $mailingEmails = $configuration->mailingEmails;
 
   $disabled = ($enabled == 0) ? "disabled" : "";
@@ -79,10 +80,10 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   $block_hour = get_block_hour($hour, $disabled);
   $block_minute = get_block_minute($minute, $disabled);
   $block_next_treatment_date = get_block_next_treatment_date($next_treatment_date);
-  $block_excluded_users = get_block_excluded_users($excludedUserIdToLoginMap);
+  $block_scope = get_block_scope($scopeUserIdToLoginMap, $scopeIncludes);
   $block_mailing = get_block_mailing($mailingEmails);
 
-  $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_excluded_user_id', 'userSearch', {filter_pattern:'access', item_id_property:'ext_id', filter_archived:false});";
+  $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_scope_user_id', 'userSearch', {filter_pattern:'access', item_id_property:'ext_id', filter_archived:false});";
 
   $block = "
     <form method='post' name='f_imap_archive' action='imap_archive_index.php'>
@@ -170,8 +171,8 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
       </table>
     </fieldset>
     <fieldset class='detail infos'>
-      <legend>$l_excluded_users</legend>
-      $block_excluded_users
+      <legend>$l_scope</legend>
+      $block_scope
     </fieldset>
     <fieldset class='detail infos'>
       <legend>$l_mailing_feedback</legend>
@@ -369,27 +370,28 @@ function formatStringAsDateString($dateAsString) {
   return $l_not_configured;
 }
 
-function get_block_excluded_users($excludedUserIdToLoginMap) {
+function get_block_scope($scopeUserIdToLoginMap, $scopeIncludes = false) {
   global $l_users, $ico_delete;
-  global $l_name, $l_delete, $l_remove_archive;
+  global $l_name, $l_delete, $l_remove_archive, $l_scope_includes, $l_scope_excludes, $l_scope_type;
 
-  $excludedUserIds = array();
-  foreach (get_object_vars($excludedUserIdToLoginMap) as $name => $value) {
-    array_push($excludedUserIds, $name);
+  $scopeUserIds = array();
+  foreach (get_object_vars($scopeUserIdToLoginMap) as $name => $value) {
+    array_push($scopeUserIds, $name);
   }
-  $users = (count($excludedUserIds) > 0) ? get_userobm_from_ext_ids($excludedUserIds, false) : array();
+  $users = (count($scopeUserIds) > 0) ? get_userobm_from_ext_ids($scopeUserIds, false) : array();
+
   if (is_array($users['entity'])) {
     $dis_sel_user = "";
     foreach ($users['entity'] as $u_ext_id => $u_ent) {
       $u_name = $u_ent['label'];
       $sel_id = $u_ext_id;
-      $div_id = "sel_excluded_user_id-$sel_id";
+      $div_id = "sel_scope_user_id-$sel_id";
       $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-      <a href=\"javascript: remove_element('$div_id', 'sel_excluded_user_id');\">
+      <a href=\"javascript: remove_element('$div_id', 'sel_scope_user_id');\">
       <img src=\"$ico_delete\" alt=\"[Delete]\" />
       </a>
       $u_name
-      <input value=\"$sel_id\" name=\"sel_excluded_user_id[]\" type=\"hidden\" />
+      <input value=\"$sel_id\" name=\"sel_scope_user_id[]\" type=\"hidden\" />
       </div>";
     }
   }
@@ -397,17 +399,25 @@ function get_block_excluded_users($excludedUserIdToLoginMap) {
   return "
     <table>
       <tr>
+        <th>$l_scope_type</th>
+        <td>
+          <input type='radio' name='cb_scope_includes' value='1'" . (($scopeIncludes) ? " checked='checked'" : "") . " /> $l_scope_includes
+          <br />
+          <input type='radio' name='cb_scope_includes' value='0'" . ((!$scopeIncludes) ? " checked='checked'" : "") . " /> $l_scope_excludes
+        </td>
+      </tr>
+      <tr>
         <th>$l_users</th>
         <td class='autocompleteField'>
           <input type='text' name='' value='' id='userSearch' autocomplete='off' />
-          <input type='hidden' id='userSearchContainer' value='sel_excluded_user_id'/>
+          <input type='hidden' id='userSearchContainer' value='sel_scope_user_id'/>
         </td>
       </tr>
       <tr>
         <th></th>
         <td class='autocompleteResult'>
           <span class='legend'>$GLOBALS[l_user]</span>
-          <div id='sel_excluded_user_id' class='userList'>$dis_sel_user</div>
+          <div id='sel_scope_user_id' class='userList'>$dis_sel_user</div>
         </td>
       </tr>
     </table>";
