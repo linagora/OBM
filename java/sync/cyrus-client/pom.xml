@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.1.5</version>
+		<version>3.1.6-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>cyrus-client</artifactId>
 	<packaging>jar</packaging>
 	<name>Cyrus client library</name>
 	<url>http://www.obm.org/</url>
-	<version>3.1.5</version>
+	<version>3.1.6-SNAPSHOT</version>
 
 	<licenses>
 		<license>
