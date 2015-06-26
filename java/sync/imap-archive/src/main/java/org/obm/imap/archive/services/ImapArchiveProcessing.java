@@ -312,7 +312,7 @@ public class ImapArchiveProcessing {
 				MessageSet originUids = entry.getValue();
 				MessageSet yearMessageSet = mappedMessageSets.getDestinationUidFor(originUids);
 				copyTemporaryMessagesToArchive(temporaryMailbox, yearMessageSet, archiveMailbox, processedTask.getLogger());
-				if (!originUids.isEmpty()) {
+				if (!originUids.isEmpty() && !processedTask.getDomainConfiguration().isMoveEnabled()) {
 					addArchiveFlag(mailbox, originUids);
 				}
 			}

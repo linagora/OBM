@@ -183,12 +183,12 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
-				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, false, storeClient);
 		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org", 
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)), 
-				higherBoundary, treatmentDate, runId, storeClient);
+				higherBoundary, treatmentDate, runId, false, storeClient);
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org", 
-				ImmutableSet.of(Range.singleton(1230l)), higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.singleton(1230l)), higherBoundary, treatmentDate, runId, false, storeClient);
 		
 		storeClient.close();
 		expectLastCall().times(2);
@@ -244,12 +244,12 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		MessageSet archived1 = expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
-				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, true, storeClient);
 		MessageSet archived2 = expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org", 
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)), 
-				higherBoundary, treatmentDate, runId, storeClient);
+				higherBoundary, treatmentDate, runId, true, storeClient);
 		MessageSet archived3 = expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org", 
-				ImmutableSet.of(Range.singleton(1230l)), higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.singleton(1230l)), higherBoundary, treatmentDate, runId, true, storeClient);
 		
 		expectMove("user/usera@mydomain.org", storeClient, archived1);
 		expectMove("user/usera/Drafts@mydomain.org", storeClient, archived2);
@@ -311,7 +311,7 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
-				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, false, storeClient);
 		
 		storeClient.close();
 		expectLastCall().times(2);
@@ -450,7 +450,7 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
-				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, false, storeClient);
 		
 		storeClient.login(false);
 		expectLastCall();
@@ -472,7 +472,7 @@ public class ImapArchiveProcessingTest {
 		
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org",
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)),
-				higherBoundary, treatmentDate, runId, storeClient);
+				higherBoundary, treatmentDate, runId, false, storeClient);
 		
 		storeClient.close();
 		expectLastCall().times(2);
@@ -530,14 +530,14 @@ public class ImapArchiveProcessingTest {
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
-				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, storeClient);
+				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, false, storeClient);
 		
 		expectImapCommandsOnMailboxProcessingFails("user/usera/Drafts@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org",
 				ImmutableSet.of(Range.closed(2l, 21l), Range.closed(22l, 41l), Range.closed(42l, 61l)), higherBoundary, treatmentDate, runId, storeClient);
 		
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org",
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)),
-				higherBoundary, treatmentDate, runId, storeClient);
+				higherBoundary, treatmentDate, runId, false, storeClient);
 		
 		storeClient.close();
 		expectLastCall().times(2);
@@ -564,7 +564,7 @@ public class ImapArchiveProcessingTest {
 		
 		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/Drafts@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/Drafts@mydomain.org", 
 				ImmutableSet.of(Range.closed(2l, 21l), Range.closed(22l, 41l), Range.closed(42l, 61l)), 
-				higherBoundary, treatmentDate, secondRunId, storeClient);
+				higherBoundary, treatmentDate, secondRunId, false, storeClient);
 		
 		expectImapCommandsOnAlreadyProcessedMailbox("user/usera/SPAM@mydomain.org", treatmentDate, higherBoundary, secondRunId, storeClient);
 		
@@ -962,7 +962,7 @@ public class ImapArchiveProcessingTest {
 	}
 	
 	private MessageSet expectImapCommandsOnMailboxProcessing(String mailboxName, String archiveMailboxName, String temporaryMailboxName, Set<Range<Long>> uids,
-				DateTime higherBoundary, DateTime treatmentDate, ArchiveTreatmentRunId runId, StoreClient storeClient) 
+				DateTime higherBoundary, DateTime treatmentDate, ArchiveTreatmentRunId runId, boolean isMoveEnabled, StoreClient storeClient) 
 			throws Exception {
 		
 		MessageSet.Builder messageSetBuilder = MessageSet.builder();
@@ -985,7 +985,7 @@ public class ImapArchiveProcessingTest {
 		
 		expectCreateMailbox(temporaryMailboxName, storeClient);
 		
-		expectCopyPartition(mailboxName, archiveMailboxName, temporaryMailboxName, uids, storeClient);
+		expectCopyPartition(mailboxName, archiveMailboxName, temporaryMailboxName, uids, isMoveEnabled, storeClient);
 		
 		expect(storeClient.uidCopy(messageSet, temporaryMailboxName)).andReturn(messageSet);
 		expect(storeClient.delete(temporaryMailboxName)).andReturn(true);
@@ -1065,7 +1065,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidCopy(secondMessageSet, archiveMailboxName)).andThrow(new ImapTimeoutException());
 	}
 
-	private void expectCopyPartition(String mailboxName, String archiveMailboxName, String temporaryMailboxName, Set<Range<Long>> uids, StoreClient storeClient) throws MailboxNotFoundException {
+	private void expectCopyPartition(String mailboxName, String archiveMailboxName, String temporaryMailboxName, Set<Range<Long>> uids, boolean isMoveEnabled, StoreClient storeClient) throws MailboxNotFoundException {
 		boolean first = true;
 		for (Range<Long> partition : uids) {
 			if (first) {
@@ -1096,9 +1096,11 @@ public class ImapArchiveProcessingTest {
 			expect(storeClient.select(archiveMailboxName)).andReturn(true);
 			expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 			
-			expect(storeClient.select(mailboxName)).andReturn(true);
-			expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableList.of(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)), true))
-				.andReturn(true);
+			if (!isMoveEnabled) {
+				expect(storeClient.select(mailboxName)).andReturn(true);
+				expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableList.of(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)), true))
+					.andReturn(true);
+			}
 		}
 	}
 	
