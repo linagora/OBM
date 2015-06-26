@@ -584,6 +584,7 @@ public class ImapArchiveProcessing {
 	@VisibleForTesting MessageSet searchMailUids(Mailbox mailbox, HigherBoundary higherBoundary) {
 		return mailbox.uidSearch(SearchQuery.builder()
 					.beforeExclusive(higherBoundary.getHigherBoundary().toDate())
+					.includeDeleted(false)
 					.unmatchingFlag(IMAP_ARCHIVE_FLAG)
 					.build());
 	}

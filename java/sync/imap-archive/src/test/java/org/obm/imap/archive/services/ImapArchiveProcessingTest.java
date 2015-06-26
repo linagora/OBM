@@ -380,6 +380,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select("user/usera@mydomain.org")).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
+				.includeDeleted(false)
 				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(MessageSet.empty());
@@ -659,6 +660,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(mailboxName)).andReturn(true).times(2);
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
+				.includeDeleted(false)
 				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(messageSet);
@@ -780,6 +782,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(mailboxName)).andReturn(true).times(2);
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
+				.includeDeleted(false)
 				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(messageSet);
@@ -898,6 +901,7 @@ public class ImapArchiveProcessingTest {
 		
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
+				.includeDeleted(false)
 				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(MessageSet.empty());
@@ -928,6 +932,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(mailboxName)).andReturn(true).times(2);
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
+				.includeDeleted(false)
 				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(messageSet);
@@ -971,6 +976,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
+				.includeDeleted(false)
 				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(messageSet);
