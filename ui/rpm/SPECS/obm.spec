@@ -175,6 +175,8 @@ Requires:	perl-DBD-MySQL
 Requires:	perl-DBD-Pg
 Requires:	perl-LDAP
 Requires:	perl-XML-Simple
+Requires:	perl-core
+Requires:	cyrus-sasl-plain
 
 %description	services
 This package is responsible for propagating changes in OBM to third-party

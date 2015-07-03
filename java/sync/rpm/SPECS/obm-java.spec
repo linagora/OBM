@@ -70,6 +70,7 @@ Summary: Provisioning API for Open Business Management
 Group:  Development/Tools
 Requires: java-1.7.0-openjdk >= 1.7.0
 Requires: obm-config
+Requires: cyrus-sasl-plain
 
 %description -n obm-provisioning
 This package is an HTTP web service, which can be queried to provision an OBM
