@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.1.6-rc2</version>
+		<version>3.1.6-rc3</version>
 	</parent>
 
 	<groupId>com.linagora.obm.integration-testing</groupId>
@@ -13,7 +13,7 @@
 	<packaging>pom</packaging>
 	<name>OBM parent integration testing</name>
 	<url>http://www.obm.org/</url>
-	<version>3.1.6-rc2</version>
+	<version>3.1.6-rc3</version>
 
 	<modules>
 		<module>utils</module>
