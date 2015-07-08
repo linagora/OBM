@@ -6,8 +6,8 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_download = "Tải về";
-$l_download_active = "Đang tải về";
+$l_download = "Download";
+$l_download_active = "Đang Download";
 
 $l_invalid_action = "Hành động không hợp lệ";
 

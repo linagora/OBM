@@ -7,7 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_archive = "Lưu trữ";
-$l_contract_contracttype = "Kiểu hợp đồng";
+$l_contract_contracttype = "Kiểu contract";
 $l_after = "Hết hạn sau";
 $l_before = "Hết hạn trước";
 $l_incident_list = "Sự cố";
@@ -60,8 +60,8 @@ $l_pri_update = "Cập nhật ưu tiên";
 $l_pri_checkdelete = "Kiểm tra hoặc Xóa ưu tiên";
 $l_pri_delete = "Xóa ưu tiên";
 $l_pri_insert = "Thêm ưu tiên";
-$l_sta_update = "Cập nhật trạng thái";
-$l_sta_checkdelete = "Kiểm tra hoặc Xóa trạng thái";
+$l_sta_update = "Cập nhật trạng";
+$l_sta_checkdelete = "Kiểm tra hoặc Xóa Trạng thái";
 $l_sta_delete = "Xóa Trạng thái";
 $l_sta_insert = "Thêm Trạng thái";
 $l_insert = "Thêm hợp đồng";
