@@ -80,7 +80,7 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   $block_hour = get_block_hour($hour, $disabled);
   $block_minute = get_block_minute($minute, $disabled);
   $block_next_treatment_date = get_block_next_treatment_date($next_treatment_date);
-  $block_scope = get_block_scope($scopeUserIdToLoginMap, $scopeIncludes);
+  $block_scope = get_block_scope($scopeUserIdToLoginMap, $scopeIncludes, $disabled);
   $block_mailing = get_block_mailing($mailingEmails);
 
   $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_scope_user_id', 'userSearch', {filter_pattern:'access', item_id_property:'ext_id', filter_archived:false});";
@@ -370,7 +370,7 @@ function formatStringAsDateString($dateAsString) {
   return $l_not_configured;
 }
 
-function get_block_scope($scopeUserIdToLoginMap, $scopeIncludes = false) {
+function get_block_scope($scopeUserIdToLoginMap, $scopeIncludes = false, $disabled) {
   global $l_users, $ico_delete;
   global $l_name, $l_delete, $l_remove_archive, $l_scope_includes, $l_scope_excludes, $l_scope_type;
 
@@ -387,7 +387,7 @@ function get_block_scope($scopeUserIdToLoginMap, $scopeIncludes = false) {
       $sel_id = $u_ext_id;
       $div_id = "sel_scope_user_id-$sel_id";
       $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-      <a href=\"javascript: remove_element('$div_id', 'sel_scope_user_id');\">
+      ". (($disabled) ? "" : "<a href=\"javascript: remove_element('$div_id', 'sel_scope_user_id');\">") ."
       <img src=\"$ico_delete\" alt=\"[Delete]\" />
       </a>
       $u_name
@@ -401,15 +401,15 @@ function get_block_scope($scopeUserIdToLoginMap, $scopeIncludes = false) {
       <tr>
         <th>$l_scope_type</th>
         <td>
-          <input type='radio' name='cb_scope_includes' value='1'" . (($scopeIncludes) ? " checked='checked'" : "") . " /> $l_scope_includes
+          <input type='radio' name='cb_scope_includes' value='1'" . (($scopeIncludes) ? " checked='checked'" : "") ." ".(($disabled) ? "disabled" : "")." class='configuration'/> $l_scope_includes
           <br />
-          <input type='radio' name='cb_scope_includes' value='0'" . ((!$scopeIncludes) ? " checked='checked'" : "") . " /> $l_scope_excludes
+          <input type='radio' name='cb_scope_includes' value='0'" . ((!$scopeIncludes) ? " checked='checked'" : "") ." ".(($disabled) ? "disabled" : "")." class='configuration'/> $l_scope_excludes
         </td>
       </tr>
       <tr>
         <th>$l_users</th>
         <td class='autocompleteField'>
-          <input type='text' name='' value='' id='userSearch' autocomplete='off' />
+          <input type='text' name='' value='' id='userSearch' autocomplete='off' class='configuration'/>
           <input type='hidden' id='userSearchContainer' value='sel_scope_user_id'/>
         </td>
       </tr>
@@ -417,7 +417,7 @@ function get_block_scope($scopeUserIdToLoginMap, $scopeIncludes = false) {
         <th></th>
         <td class='autocompleteResult'>
           <span class='legend'>$GLOBALS[l_user]</span>
-          <div id='sel_scope_user_id' class='userList'>$dis_sel_user</div>
+          <div id='sel_scope_user_id' class='userList configuration'>$dis_sel_user</div>
         </td>
       </tr>
     </table>";
