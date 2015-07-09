@@ -414,7 +414,7 @@ public class ImapArchiveProcessing {
 	private void addArchiveFlag(Mailbox mailbox, MessageSet messageSet) throws ImapSelectException, MailboxNotFoundException {
 		if (!messageSet.isEmpty()) {
 			mailbox.select();
-			mailbox.uidStore(messageSet, IMAP_ARCHIVE_FLAG);
+			mailbox.uidStore(messageSet, IMAP_ARCHIVE_FLAG, true);
 		}
 	}
 

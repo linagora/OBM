@@ -64,5 +64,5 @@ public interface Mailbox {
 	
 	List<InternalDate> fetchInternalDate(MessageSet messageSet) throws ImapMessageNotFoundException ;
 
-	boolean uidStore(MessageSet messageSet, Flag imapArchiveFlag);
+	boolean uidStore(MessageSet messageSet, Flag imapArchiveFlag, boolean addFlag);
 }

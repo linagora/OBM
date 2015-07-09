@@ -124,8 +124,8 @@ public class MailboxImpl implements Mailbox {
 	}
 
 	@Override
-	public boolean uidStore(MessageSet messageSet, Flag imapArchiveFlag) {
-		return storeClient.uidStore(messageSet, new FlagsList(ImmutableList.of(imapArchiveFlag)), true);
+	public boolean uidStore(MessageSet messageSet, Flag imapArchiveFlag, boolean addFlag) {
+		return storeClient.uidStore(messageSet, new FlagsList(ImmutableList.of(imapArchiveFlag)), addFlag);
 	}
 	
 	@Override
