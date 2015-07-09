@@ -5,7 +5,7 @@
 	<groupId>com.linagora.obm</groupId>
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
-	<version>3.1.6-rc3</version>
+	<version>3.1.6-rc4</version>
 	<name>OBM Java parent project</name>
 
 	<inceptionYear>2000</inceptionYear>
@@ -20,7 +20,7 @@
 
 
 	<properties>
-		<obm.version>3.1.6-rc3</obm.version>
+		<obm.version>3.1.6-rc4</obm.version>
 
 		<postgresql.version>9.3-1102-jdbc4</postgresql.version>
 		<mysql-connector-java.version>5.1.26</mysql-connector-java.version>
