@@ -1,3 +1,9 @@
+obm-solr (3.1.6~0.rc5) stable; urgency=low
+
+  * New upstream release.
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Fri, 10 Jul 2015 11:09:58 +0000
+
 obm-solr (3.1.6~0.rc4) stable; urgency=low
 
   * New upstream release.
