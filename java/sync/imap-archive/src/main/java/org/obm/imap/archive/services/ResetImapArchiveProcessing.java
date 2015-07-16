@@ -37,7 +37,6 @@ import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.MailboxFormatException;
 import org.obm.imap.archive.exception.TestingModeRequiredException;
 import org.obm.imap.archive.mailbox.DeletableMailbox;
@@ -45,11 +44,11 @@ import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.imap.archive.mailbox.MailboxPaths;
 import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.StoreClient;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
@@ -66,6 +65,8 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 @Singleton
 public class ResetImapArchiveProcessing extends ImapArchiveProcessing {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ResetImapArchiveProcessing.class);
 	
 	private static final long UID_MIN = 0;
 	private static final long UID_MAX = Long.MAX_VALUE;
@@ -118,9 +119,13 @@ public class ResetImapArchiveProcessing extends ImapArchiveProcessing {
 	private void resetArchiveMailboxes(ObmDomain domain, Logger logger, DomainConfiguration domainConfiguration) throws Exception {
 		String domainName = domain.getName();
 		for (ListInfo listInfo : listArchiveFolders(domain, logger, domainConfiguration)) {
-			DeletableMailbox mailbox = DeletableMailbox.from(listInfo.getName(), logger, storeClientFactory.create(domainName));
-			logger.info("Deleting: {}", mailbox.getName());
-			delete(mailbox);
+			try {
+				DeletableMailbox mailbox = DeletableMailbox.from(listInfo.getName(), logger, storeClientFactory.create(domainName));
+				logger.info("Deleting: {}", mailbox.getName());
+				delete(mailbox);
+			} catch (Exception e) {
+				LOGGER.error("An exception occurred when resetting " + listInfo.getName(), e);
+			}
 		}
 	}
 
@@ -165,15 +170,22 @@ public class ResetImapArchiveProcessing extends ImapArchiveProcessing {
 	private void resetArchiveFlag(ObmDomain domain, Logger logger, DomainConfiguration domainConfiguration) throws Exception {
 		String domainName = domain.getName();
 		for (ListInfo listInfo : listStandardFolders(domain, logger, domainConfiguration)) {
-			MailboxImpl mailbox = MailboxImpl.from(listInfo.getName(), logger, storeClientFactory.create(domainName));
-			logger.info("Removing ImapArchive flag: {}", mailbox.getName());
-			removeArchiveFlag(mailbox);
+			try {
+				MailboxImpl mailbox = MailboxImpl.from(listInfo.getName(), logger, storeClientFactory.create(domainName));
+				logger.info("Removing ImapArchive flag: {}", mailbox.getName());
+				removeArchiveFlag(mailbox);
+			} catch (Exception e) {
+				LOGGER.error("An exception occurred when resetting " + listInfo.getName(), e);
+			}
 		}
 	}
 
-	private void removeArchiveFlag(Mailbox mailbox) throws ImapSelectException, MailboxNotFoundException {
-		mailbox.select();
-		mailbox.uidStore(ALL, IMAP_ARCHIVE_FLAG, false);
+	private void removeArchiveFlag(Mailbox mailbox) throws Exception {
+		try (StoreClient storeClient = mailbox.getStoreClient()) {
+			storeClient.login(false);
+			mailbox.select();
+			mailbox.uidStore(ALL, IMAP_ARCHIVE_FLAG, false);
+		}
 	}
 
 	@VisibleForTesting ImmutableList<ListInfo> listStandardFolders(ObmDomain domain, Logger logger, DomainConfiguration domainConfiguration) throws Exception {
