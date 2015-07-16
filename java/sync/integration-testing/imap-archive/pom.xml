@@ -4,14 +4,14 @@
 	<parent>
 		<groupId>com.linagora.obm.integration-testing</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.1.6-rc5</version>
+		<version>3.1.6</version>
 	</parent>
 	
 	<artifactId>imap-archive-integration-testing</artifactId>
 	<packaging>jar</packaging>
 	<name>OBM IMAP archive integration testing</name>
 	<url>http://www.obm.org/</url>
-	<version>3.1.6-rc5</version>
+	<version>3.1.6</version>
 
 	<dependencies>
 		<dependency>
