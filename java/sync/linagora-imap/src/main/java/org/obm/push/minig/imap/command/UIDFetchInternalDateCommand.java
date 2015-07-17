@@ -32,12 +32,7 @@
 
 package org.obm.push.minig.imap.command;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.mail.bean.MessageSet;
@@ -52,12 +47,9 @@ public class UIDFetchInternalDateCommand extends Command<List<InternalDate>> {
 	private final static String IMAP_COMMAND = "UID FETCH";
 	private final static String IMAP_SUB_COMMAND = "UID INTERNALDATE";
 	private final ImapMessageSet imapMessageSet;
-	DateFormat df;
 
 	public UIDFetchInternalDateCommand(MessageSet messages) {
 		imapMessageSet = ImapMessageSet.wrap(messages);
-		//22-Mar-2010 14:26:18 +0100
-		df = new SimpleDateFormat("d-MMM-yyyy HH:mm:ss Z", Locale.ENGLISH);
 	}
 
 	@Override
@@ -123,16 +115,7 @@ public class UIDFetchInternalDateCommand extends Command<List<InternalDate>> {
 		if (data == null || data.isEmpty()) {
 			data = Lists.newArrayList();
 		}
-		data.add(new InternalDate(uid,parseDate(internalDate)));
-	}
-
-	private Date parseDate(String date) {
-		try {
-			return df .parse(date);
-		} catch (ParseException e) {
-			logger.error("Can't parse date {}", date);
-		}
-		return new Date();
+		data.add(new InternalDate(uid, internalDate));
 	}
 	
 	@Override

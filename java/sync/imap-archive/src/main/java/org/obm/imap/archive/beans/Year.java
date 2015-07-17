@@ -35,6 +35,7 @@ import java.util.Date;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.obm.push.mail.bean.InternalDate;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -48,9 +49,9 @@ public class Year {
 		return new Year(year);
 	}
 	
-	public static Year from(Date date) {
+	public static Year from(InternalDate date) {
 		Preconditions.checkNotNull(date);
-		return new Year(new DateTime(date, DateTimeZone.UTC).getYear());
+		return new Year(date.getYear());
 	}
 	
 	private final int year;

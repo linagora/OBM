@@ -680,7 +680,7 @@ public class ImapArchiveProcessingTest {
 		// first Year
 		long firstUid = messageSet.first().get();
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
-				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
+				.andReturn(ImmutableList.of(new InternalDate(firstUid, "3-Dec-2014 11:53:00 +0000")));
 		
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		expect(storeClient.uidCopy(messageSet, temporaryMailboxName)).andReturn(messageSet);
@@ -698,7 +698,7 @@ public class ImapArchiveProcessingTest {
 		// second Year
 		ImmutableList.Builder<InternalDate> internalDates = ImmutableList.builder();
 		for (long uid : secondYearMessageSet.asDiscreteValues()) {
-			internalDates.add(new InternalDate(uid, DateTime.parse("2015-01-03T11:53:00.000Z").toDate()));
+			internalDates.add(new InternalDate(uid, "3-Jan-2015 11:53:00 +0000"));
 		}
 		expect(storeClient.uidFetchInternalDate(secondYearMessageSet))
 			.andReturn(internalDates.build());
@@ -803,7 +803,7 @@ public class ImapArchiveProcessingTest {
 		// current Year
 		long firstUid = messageSet.first().get();
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
-				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
+				.andReturn(ImmutableList.of(new InternalDate(firstUid, "3-Dec-2014 11:53:00 +0000")));
 		
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
@@ -822,10 +822,10 @@ public class ImapArchiveProcessingTest {
 		
 		ImmutableList.Builder<InternalDate> otherYearsInternalDates = ImmutableList.builder();
 		for (long uid : previousYearMessageSet.asDiscreteValues()) {
-			otherYearsInternalDates.add(new InternalDate(uid, DateTime.parse("2013-01-03T11:53:00.000Z").toDate()));
+			otherYearsInternalDates.add(new InternalDate(uid, "3-Jan-2013 11:53:00 +0000"));
 		}
 		for (long uid : nextYearMessageSet.asDiscreteValues()) {
-			otherYearsInternalDates.add(new InternalDate(uid, DateTime.parse("2015-01-03T11:53:00.000Z").toDate()));
+			otherYearsInternalDates.add(new InternalDate(uid, "3-Jan-2015 11:53:00 +0000"));
 		}
 		expect(storeClient.uidFetchInternalDate(MessageSet.builder().add(previousYearMessageSet).add(nextYearMessageSet).build()))
 			.andReturn(otherYearsInternalDates.build());
@@ -1033,7 +1033,7 @@ public class ImapArchiveProcessingTest {
 		long firstRangeLowerEndpoint = first.lowerEndpoint();
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstRangeLowerEndpoint)))
-				.andReturn(ImmutableList.of(new InternalDate(firstRangeLowerEndpoint, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
+				.andReturn(ImmutableList.of(new InternalDate(firstRangeLowerEndpoint, "3-Dec-2014 11:53:00 +0000")));
 		
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
 		expect(storeClient.uidCopy(firstMessageSet, archiveMailboxName)).andReturn(firstMessageSet);
@@ -1056,7 +1056,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(archiveMailboxName)).andReturn(true);
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidFetchInternalDate(MessageSet.singleton(secondRangeLowerEndpoint)))
-				.andReturn(ImmutableList.of(new InternalDate(secondRangeLowerEndpoint, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
+				.andReturn(ImmutableList.of(new InternalDate(secondRangeLowerEndpoint, "3-Dec-2014 11:53:00 +0000")));
 		
 		MessageSet secondMessageSet = MessageSet.builder()
 				.add(Iterables.get(uids, 1))
@@ -1078,7 +1078,7 @@ public class ImapArchiveProcessingTest {
 			expect(storeClient.select(mailboxName)).andReturn(true);
 			long firstUid = partition.lowerEndpoint();
 			expect(storeClient.uidFetchInternalDate(MessageSet.singleton(firstUid)))
-				.andReturn(ImmutableList.of(new InternalDate(firstUid, DateTime.parse("2014-12-03T11:53:00.000Z").toDate())));
+				.andReturn(ImmutableList.of(new InternalDate(firstUid, "3-Dec-2014 11:53:00 +0000")));
 			
 			expect(storeClient.uidSearch(SearchQuery.builder()
 					.between(true)

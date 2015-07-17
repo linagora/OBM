@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2015  Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,54 +29,36 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-
 package org.obm.push.mail.bean;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.base.Splitter;
-import com.google.common.base.Throwables;
-import com.google.common.collect.FluentIterable;
+import org.junit.Test;
 
-public class InternalDate extends Date {
 
-	private static final long serialVersionUID = -8557645090248136216L;
-
-	private final long uid;
-	private final int year;
-
-	public InternalDate(long uid, String date){
-		super();
-		this.uid = uid;
-		this.year = year(date);
-		this.setTime(parseDate(date).getTime());
-	}
-
-	private int year(String date) {
-		Iterable<String> split = Splitter.on('-').split(date);
-		
-		return Integer.valueOf(FluentIterable.from(split)
-				.get(2).substring(0, 4));
-	}
+public class InternalDateTest {
 	
-	private Date parseDate(String date) {
-		try {
-			//22-Mar-2010 14:26:18 +0100
-			return new SimpleDateFormat("d-MMM-yyyy HH:mm:ss Z", Locale.ENGLISH).parse(date);
-		} catch (ParseException e) {
-			throw Throwables.propagate(e);
-		}
+	@Test
+	public void yearShouldWorkWhenFirstSecond() {
+		InternalDate internalDate = new InternalDate(1, "1-Jan-2012 00:00:01 +0000");
+		assertThat(internalDate.getYear()).isEqualTo(2012);
 	}
 
-	public long getUid() {
-		return uid;
+	@Test
+	public void yearShouldWorkWhenFirstSecondAndHigherTimeZone() {
+		InternalDate internalDate = new InternalDate(1, "1-Jan-2012 00:00:01 +0100");
+		assertThat(internalDate.getYear()).isEqualTo(2012);
 	}
-	
-	@Override
-	public int getYear() {
-		return year;
+
+	@Test
+	public void yearShouldWorkWhenLastSecond() {
+		InternalDate internalDate = new InternalDate(1, "31-Dec-2012 23:59:59 +0000");
+		assertThat(internalDate.getYear()).isEqualTo(2012);
+	}
+
+	@Test
+	public void yearShouldWorkWhenLastSecondLowerTimeZone() {
+		InternalDate internalDate = new InternalDate(1, "31-Dec-2012 23:59:59 -0100");
+		assertThat(internalDate.getYear()).isEqualTo(2012);
 	}
 }

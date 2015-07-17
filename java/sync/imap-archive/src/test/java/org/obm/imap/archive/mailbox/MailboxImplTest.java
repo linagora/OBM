@@ -40,7 +40,6 @@ import static org.easymock.EasyMock.expectLastCall;
 import java.util.List;
 
 import org.easymock.IMocksControl;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -238,7 +237,7 @@ public class MailboxImplTest {
 	public void fetchInternalDateShouldReturnInternalDate() throws Exception {
 		int uid = 1;
 		MessageSet messageSet = MessageSet.singleton(uid);
-		InternalDate expectedInternalDate = new InternalDate(uid, DateTime.parse("2014-02-12T14:26:00.000Z").toDate());
+		InternalDate expectedInternalDate = new InternalDate(uid, "12-Feb-2014 14:26:00 +0000");
 		expect(storeClient.uidFetchInternalDate(messageSet))
 			.andReturn(ImmutableList.<InternalDate> of(expectedInternalDate));
 		

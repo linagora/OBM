@@ -37,6 +37,7 @@ import java.util.Date;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
+import org.obm.push.mail.bean.InternalDate;
 
 
 public class YearTest {
@@ -61,14 +62,14 @@ public class YearTest {
 	
 	@Test(expected=NullPointerException.class)
 	public void fromDateShouldThrowWhenNull() {
-		Year.from((Date) null);
+		Year.from((InternalDate) null);
 	}
 	
 	@Test
 	public void fromDate() {
 		Year expectedYear = Year.from(2014);
 		
-		Year year = Year.from(DateTime.parse("2014-12-02T14:33:00.000Z").toDate());
+		Year year = Year.from(new InternalDate(1, "2-Dec-2014 14:33:00 +0000"));
 		assertThat(year).isEqualTo(expectedYear);
 	}
 	
