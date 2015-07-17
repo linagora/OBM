@@ -205,3 +205,39 @@ Feature: Mail archive - Treatment
     When admin launches an immediate treatment
     Then 5 mails should be archived in the "user/usera/arChive/2014/INBOX@mydomain.org" imap folder with subject "subject"
     Then 2 mails should be archived in the "user/userb/arChive/2014/INBOX@mydomain.org" imap folder with subject "subject2"
+
+  Scenario: archive treatment should archive one mail in the year when first second
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And a user "usera" with "user/usera@mydomain.org" imap folder
+    And this user has 1 mail at "2012-01-01T00:00:01.000Z" in this folder with subject "subject"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then 1 mail should be archived in the "user/usera/arChive/2012/INBOX@mydomain.org" imap folder with subject "subject"
+
+  Scenario: archive treatment should archive one mail in the year when first second and higher time zone
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And a user "usera" with "user/usera@mydomain.org" imap folder
+    And this user has 1 mail at "2012-01-01T02:00:01.000+0200" in this folder with subject "subject"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then 1 mail should be archived in the "user/usera/arChive/2012/INBOX@mydomain.org" imap folder with subject "subject"
+
+  Scenario: archive treatment should archive one mail in the year when last second
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And a user "usera" with "user/usera@mydomain.org" imap folder
+    And this user has 1 mail at "2012-12-31T23:59:59.000Z" in this folder with subject "subject"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then 1 mail should be archived in the "user/usera/arChive/2012/INBOX@mydomain.org" imap folder with subject "subject"
+
+  Scenario: archive treatment should archive one mail in the year when last second and lower time zone
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And a user "usera" with "user/usera@mydomain.org" imap folder
+    And this user has 1 mail at "2012-12-31T21:59:59.000-0200" in this folder with subject "subject"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then 1 mail should be archived in the "user/usera/arChive/2012/INBOX@mydomain.org" imap folder with subject "subject"
