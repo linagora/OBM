@@ -95,6 +95,14 @@ if ( $auth_kind && $auth_kind == "CAS" ) {
   $config['cas_port'] = $cas_server_port;
   // CAS service URI on the CAS server.
   $config['cas_uri'] = $cas_server_uri;
+
+  $config['cas_pgt_dir'] = '/tmp';
+  $config['cas_login_url'] = '';
+  $config['cas_logout_url'] = '';
+  $config['cas_imap_name'] = 'imap://myimap.obm';
+  $config['username_domain'] = 'mydomain.obm';
+  $config['username_domain_forced'] = false;
+
   // CAS validation type
   if ( $cas_validation ) {
     $config['cas_validation'] = $cas_validation;
