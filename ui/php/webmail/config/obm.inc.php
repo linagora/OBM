@@ -34,7 +34,7 @@ while ($obm_q->next_record()) {
 }
 
 // Use this folder to store log files (must be writeable for apache user)
-$config['log_dir'] = 'logs/';
+$config['log_dir'] = '/var/log/webmail/';
 
 // Store spam messages in this mailbox
 $config['junk_mbox'] = 'SPAM';

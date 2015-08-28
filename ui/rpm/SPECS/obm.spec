@@ -387,6 +387,7 @@ install -p -m 755 %{SOURCE6} $RPM_BUILD_ROOT%{_bindir}/obm-core
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}-ui
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/log/webmail
 install -p -m 755 %{SOURCE11} $RPM_BUILD_ROOT%{_bindir}/%{name}-ui
 install -p -m 644 doc/conf/apache-virtualhost_obm.conf.sample $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/%{name}.conf
 install -p -m 644 utils/timezone-generator.php $RPM_BUILD_ROOT%{_datadir}/%{name}-ui
@@ -516,6 +517,7 @@ fi
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/*.conf
 %{_bindir}/%{name}-ui
 %{_datadir}/%{name}-ui
+%attr(2750, apache, apache) %{_localstatedir}/log/webmail
 
 %files          -n %{name}-full
 #no files in this package

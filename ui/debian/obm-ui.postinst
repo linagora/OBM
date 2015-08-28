@@ -21,6 +21,10 @@ is_initial_configuration() {
 	return 1 
 } 
 
+chown www-data:www-data /var/log/webmail
+chmod 750 /var/log/webmail
+chmod g+s /var/log/webmail
+
 if is_initial_configuration "$@"; then
   #Mise en place du virtualHost
   db_get  obm-ui/virtualhostinstall
