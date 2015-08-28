@@ -1067,10 +1067,6 @@ $config['autocomplete_single'] = false;
 // Georgia, Helvetica, Impact, Tahoma, Terminal, Times New Roman, Trebuchet MS, Verdana
 $config['default_font'] = 'Verdana';
 
-// OBM specific configuration
-require_once("config/obm.inc.php");
-// /OBM specific configuration
-
 // Default font size for composed HTML message.
 // Supported sizes: 8pt, 10pt, 12pt, 14pt, 18pt, 24pt, 36pt
 $config['default_font_size'] = '10pt';

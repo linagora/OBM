@@ -1,16 +1,5 @@
 <?php
 
-// This queries the OBM database to retrieve the available domains and associated mail servers.
-// This then exposes the rcmail_x variables with the proper information.
-
-$path = '..';
-$module = "webmail";
-$obminclude = getenv('OBM_INCLUDE_VAR');
-if ($obminclude == '') {
-	$obminclude = 'obminclude';
-}
-require_once("$obminclude/global.inc");
-
 // Ugly hack for DB_OBM
 $GLOBALS['obmdb_host'] = $obmdb_host;
 $GLOBALS['obmdb_user'] = $obmdb_user;
@@ -44,11 +33,29 @@ while ($obm_q->next_record()) {
     }
 }
 
+// Use this folder to store log files (must be writeable for apache user)
+$config['log_dir'] = 'logs/';
+
+// Store spam messages in this mailbox
+$config['junk_mbox'] = 'SPAM';
+
+// Display these folders separately in the mailbox list.
+// These folders will also be displayed with localized names
+$config['default_folders'] = array('INBOX', 'Drafts', 'Sent', 'SPAM', 'Trash');
+
+// Automatically create the above listed default folders on first login
+$config['create_default_folders'] = true;
+
+// Lifetime of message cache. Possible units: s, m, h, d, w
+$config['message_cache_lifetime'] = '10d';
+
 // authenticate to the SMTP server
 $config['smtp_user'] = '%u';
 $config['smtp_pass'] = '%p';
 
-// setup a DES key
+// This key is used to encrypt the users imap password which is stored
+// in the session record (and the client cookie if remember password is enabled).
+// Please provide a string of exactly 24 chars.
 $config['des_key'] = 'NIZLhTml&d$sl=g=AHPfi7Jx';
 
 // compose in new window
