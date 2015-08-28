@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>com.linagora.obm</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.1.6</version>
+		<version>3.2.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>services-webapp</artifactId>
 	<packaging>war</packaging>
 	<name>obm-sync services</name>
 	<url>http://www.obm.org/</url>
-	<version>3.1.6</version>
+	<version>3.2.0-SNAPSHOT</version>
 
 	<licenses>
 		<license>
