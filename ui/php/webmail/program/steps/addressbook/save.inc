@@ -174,6 +174,10 @@ if (!empty($cid)) {
             $a_js_cols[] = rcube::Q((string)$record[$col]);
         }
 
+        // performance: unset some big data items we don't need here
+        $record = array_intersect_key($record, array('ID' => 1,'email' => 1,'name' => 1));
+        $record['_type'] = 'person';
+
         // update the changed col in list
         $OUTPUT->command('parent.update_contact_row', $cid, $a_js_cols, $newcid, $source, $record);
 
@@ -222,13 +226,15 @@ else {
             $plugin = $RCMAIL->plugins->exec_hook('group_addmembers', array(
                 'group_id' => $CONTACTS->group_id, 'ids' => $insert_id, 'source' => $source));
 
-            $counts = $CONTACTS->count();
-
             if (!$plugin['abort']) {
-                if (($maxnum = $RCMAIL->config->get('max_group_members', 0)) && ($counts->count + 1 > $maxnum))
-                    $OUTPUT->show_message('maxgroupmembersreached', 'warning', array('max' => $maxnum));
-
-                $CONTACTS->add_to_group($plugin['group_id'], $plugin['ids']);
+                if (($maxnum = $RCMAIL->config->get('max_group_members', 0)) && ($CONTACTS->count()->count + 1 > $maxnum)) {
+                    // @FIXME: should we remove the contact?
+                    $msgtext = $RCMAIL->gettext(array('name' => 'maxgroupmembersreached', 'vars' => array('max' => $maxnum)));
+                    $OUTPUT->command('parent.display_message', $msgtext, 'warning');
+                }
+                else {
+                    $CONTACTS->add_to_group($plugin['group_id'], $plugin['ids']);
+                }
             }
         }
 

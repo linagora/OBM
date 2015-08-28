@@ -24,12 +24,10 @@
 // init IMAP connection
 $STORAGE = $RCMAIL->get_storage();
 
-$name = trim(rcube_utils::get_input_value('_name', rcube_utils::INPUT_POST, true));
-$old  = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_POST, true);
-$path = rcube_utils::get_input_value('_parent', rcube_utils::INPUT_POST, true);
-
+$name      = trim(rcube_utils::get_input_value('_name', rcube_utils::INPUT_POST, true));
+$path      = rcube_utils::get_input_value('_parent', rcube_utils::INPUT_POST, true);
+$old_imap  = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_POST, true);
 $name_imap = rcube_charset::convert($name, RCUBE_CHARSET, 'UTF7-IMAP');
-$old_imap  = rcube_charset::convert($old, RCUBE_CHARSET, 'UTF7-IMAP');
 // $path is in UTF7-IMAP already
 
 $delimiter = $STORAGE->get_hierarchy_delimiter();
@@ -70,7 +68,9 @@ else {
 }
 
 // Check access rights to the parent folder
-if (!$error && strlen($path) && (!strlen($old_imap) || $old_imap != $name_imap)) {
+if (!$error && strlen($path) && (!strlen($old_imap) || $old_imap != $name_imap)
+    && $STORAGE->get_capability('ACL')
+) {
     $parent_opts = $STORAGE->folder_info($path);
     if ($parent_opts['namespace'] != 'personal'
         && (empty($parent_opts['rights']) || !preg_match('/[ck]/', implode($parent_opts['rights'])))
@@ -96,7 +96,7 @@ else {
 }
 
 // create a new mailbox
-if (!$error && !strlen($old)) {
+if (!$error && !strlen($old_imap)) {
     $folder['subscribe'] = true;
 
     $plugin = $RCMAIL->plugins->exec_hook('folder_create', array('record' => $folder));
@@ -176,6 +176,7 @@ else if (!$error) {
         }
 
         $OUTPUT->show_message('folderupdated', 'confirmation');
+        $OUTPUT->set_env('folder', $folder['name']);
 
         if ($rename) {
             // #1488692: update session

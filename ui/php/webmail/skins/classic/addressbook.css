@@ -23,7 +23,7 @@
   padding: 0;
   margin: 0 5px;
   overflow: hidden;
-  background: url(images/abook_toolbar.png?v=025d.15594) 0 0 no-repeat transparent;
+  background: url(images/abook_toolbar.png?v=8259.4881) 0 0 no-repeat transparent;
   opacity: 0.99; /* this is needed to make buttons appear correctly in Chrome */
 }
 
@@ -41,6 +41,16 @@
 
 #abooktoolbar a.composeSel {
   background-position: -32px -32px;
+}
+
+#abooktoolbar a.print {
+  background: url(images/mail_toolbar.png?v=6409.13340) 0 0 no-repeat transparent;
+  background-position: -256px 0;
+}
+
+#abooktoolbar a.printSel {
+  background: url(images/mail_toolbar.png?v=6409.13340) 0 0 no-repeat transparent;
+  background-position: -256px -32px;
 }
 
 #abooktoolbar a.delete {
@@ -116,13 +126,6 @@
   overflow: hidden;
 }
 
-#directorylistbox input
-{
-  margin: 0 0 0 20px;
-  font-size: 11px;
-  width: 90%;
-}
-
 #addresslist
 {
   position: absolute;
@@ -144,29 +147,8 @@
   width: 280px;
 }
 
-#directorylist,
-#directorylist li ul
-{
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  background-color: #FFFFFF;
-}
-
-#directorylist li ul
-{
-  border-top: 1px solid #EBEBEB;
-}
-
-#directorylist li
-{
-  display: block;
-  font-size: 11px;
-  border-bottom: 1px solid #EBEBEB;
-  white-space: nowrap;
-}
-
-#directorylist li a
+#directorylist li a,
+#savedsearchlist li a
 {
   cursor: default;
   display: block;
@@ -176,39 +158,52 @@
   height: 16px;
   text-decoration: none;
   white-space: nowrap;
-  background: url(images/icons/folders.png?v=d9d2.5356) 5px -108px no-repeat;
+  background-image: url(images/icons/folders.png?v=d9d2.5356);
+  background-position: 5px -108px;
+  background-repeat: no-repeat;
 }
 
-#directorylist li ul li a
+#directorylist ul li a
 {
   padding-left: 45px;
+  background-position: 22px -108px;
 }
 
-#directorylist li ul li:last-child
+#directorylist ul ul li a
 {
-  border-bottom: 0;
+  padding-left: 62px;
+  background-position: 39px -108px;
+}
+
+#directorylist ul ul ul li a
+{
+  padding-left: 79px;
+  background-position: 39px -108px;
 }
 
 #directorylist li.contactgroup a
 {
+  background-position: 5px -143px;
+}
+
+#directorylist ul li.contactgroup a
+{
   background-position: 22px -143px;
 }
 
-#directorylist li.contactsearch a
+#directorylist ul ul li.contactgroup a
+{
+  background-position: 39px -143px;
+}
+
+#directorylist ul ul ul li.contactgroup a
+{
+  background-position: 56px -143px;
+}
+
+#savedsearchlist li.contactsearch a
 {
   background-position: 6px -162px;
-}
-
-#directorylist li.selected > a
-{
-  color: #FFF;
-  font-weight: bold;
-  background-color: #929292;
-}
-
-#directorylist li.droptarget
-{
-  background-color: #FFFFA6;
 }
 
 #contacts-table
@@ -314,6 +309,11 @@ body.iframe,
 	margin-bottom: 1em;
 	border: 0;
 	padding: 0;
+}
+
+#contacthead > legend
+{
+	display: none;
 }
 
 #contacthead .names span.namefield,

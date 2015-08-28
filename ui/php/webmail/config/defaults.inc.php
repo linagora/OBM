@@ -51,12 +51,18 @@ $config['db_table_dsn'] = array(
 //    'cache_messages' => 'r',
 );
 
+// It is possible to specify database variable values e.g. some limits here.
+// Use them if your server is not MySQL or for better performance.
+// For example Roundcube uses max_allowed_packet value (in bytes)
+// which limits query size for database cache operations.
+$config['db_max_allowed_packet'] = null;
+
 
 // ----------------------------------
 // LOGGING/DEBUGGING
 // ----------------------------------
 
-// system error reporting, sum of: 1 = log; 4 = show, 8 = trace
+// system error reporting, sum of: 1 = log; 4 = show
 $config['debug_level'] = 1;
 
 // log driver:  'syslog' or 'file'.
@@ -65,6 +71,10 @@ $config['log_driver'] = 'file';
 // date format for log entries
 // (read http://php.net/manual/en/function.date.php for all format characters)  
 $config['log_date_format'] = 'd-M-Y H:i:s O';
+
+// length of the session ID to prepend each log line with
+// set to 0 to avoid session IDs being logged.
+$config['log_session_id'] = 8;
 
 // Syslog ident string to use, if using the 'syslog' log driver.
 $config['syslog_id'] = 'roundcube';
@@ -181,6 +191,10 @@ $config['imap_force_ns'] = false;
 // Note: Because the list is cached, re-login is required after change.
 $config['imap_disabled_caps'] = array();
 
+// Log IMAP session identifers after each IMAP login.
+// This is used to relate IMAP session with Roundcube user sessions
+$config['imap_log_session'] = false;
+
 // Type of IMAP indexes cache. Supported values: 'db', 'apc' and 'memcache'.
 $config['imap_cache'] = null;
 
@@ -285,6 +299,9 @@ $config['enable_installer'] = false;
 // don't allow these settings to be overriden by the user
 $config['dont_override'] = array();
 
+// List of disabled UI elements/actions
+$config['disabled_actions'] = array();
+
 // define which settings should be listed under the 'advanced' block
 // which is hidden by default
 $config['advanced_prefs'] = array();
@@ -307,11 +324,13 @@ $config['auto_create_user'] = true;
 // Enables possibility to log in using email address from user identities
 $config['user_aliases'] = false;
 
-// use this folder to store log files (must be writeable for apache user)
+// use this folder to store log files
+// must be writeable for the user who runs PHP process (Apache user if mod_php is being used)
 // This is used by the 'file' log driver.
 $config['log_dir'] = RCUBE_INSTALL_PATH . 'logs/';
 
-// use this folder to store temp files (must be writeable for apache user)
+// use this folder to store temp files
+// must be writeable for the user who runs PHP process (Apache user if mod_php is being used)
 $config['temp_dir'] = RCUBE_INSTALL_PATH . 'temp/';
 
 // expire files in temp_dir after 48 hours
@@ -370,6 +389,19 @@ $config['session_storage'] = 'db';
 // Use these hosts for accessing memcached
 // Define any number of hosts in the form of hostname:port or unix:///path/to/socket.file
 $config['memcache_hosts'] = null; // e.g. array( 'localhost:11211', '192.168.1.12:11211', 'unix:///var/tmp/memcached.sock' );
+
+// Controls the use of a persistent connections to memcache servers
+// See http://php.net/manual/en/memcache.addserver.php
+$config['memcache_pconnect'] = true;
+
+// Value in seconds which will be used for connecting to the daemon
+// See http://php.net/manual/en/memcache.addserver.php
+$config['memcache_timeout'] = 1;
+
+// Controls how often a failed server will be retried (value in seconds).
+// Setting this parameter to -1 disables automatic retry.
+// See http://php.net/manual/en/memcache.addserver.php
+$config['memcache_retry_interval'] = 15;
 
 // check client IP in session authorization
 $config['ip_check'] = false;
@@ -481,6 +513,10 @@ $config['mdn_use_from'] = false;
 // 4 - one identity with possibility to edit only signature
 $config['identities_level'] = 0;
 
+// Maximum size of uploaded image in kilobytes
+// Images (in html signatures) are stored in database as data URIs
+$config['identity_image_size'] = 64;
+
 // Mimetypes supported by the browser.
 // attachments of these types will open in a preview window
 // either a comma-separated list or an array: 'text/plain,text/html,text/xml,image/jpeg,image/gif,image/png,application/pdf'
@@ -496,10 +532,10 @@ $config['mime_magic'] = null;
 // download it from http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
 $config['mime_types'] = null;
 
-// path to imagemagick identify binary
+// path to imagemagick identify binary (if not set we'll use Imagick or GD extensions)
 $config['im_identify_path'] = null;
 
-// path to imagemagick convert binary
+// path to imagemagick convert binary (if not set we'll use Imagick or GD extensions)
 $config['im_convert_path'] = null;
 
 // Size of thumbnails from image attachments displayed below the message content.
@@ -516,6 +552,28 @@ $config['email_dns_check'] = false;
 // Disables saving sent messages in Sent folder (like gmail) (Default: false)
 // Note: useful when SMTP server stores sent mail in user mailbox
 $config['no_save_sent_messages'] = false;
+
+// Improve system security by using special URL with security token.
+// This can be set to a number defining token length. Default: 16.
+// Warning: This requires http server configuration. Sample:
+//    RewriteRule ^/roundcubemail/[a-f0-9]{16}/(.*) /roundcubemail/$1 [PT]
+//    Alias /roundcubemail /var/www/roundcubemail/
+// Note: Use assets_path to not prevent the browser from caching assets
+$config['use_secure_urls'] = false;
+
+// Allows to define separate server/path for image/js/css files
+// Warning: If the domain is different cross-domain access to some
+// resources need to be allowed
+// Sample:
+//    <FilesMatch ".(eot|ttf|woff)">
+//    Header set Access-Control-Allow-Origin "*"
+//    </FilesMatch>
+$config['assets_path'] = '';
+
+// While assets_path is for the browser, assets_dir informs
+// PHP code about the location of asset files in filesystem
+$config['assets_dir'] = '';
+
 
 // ----------------------------------
 // PLUGINS
@@ -581,19 +639,14 @@ $config['sent_mbox'] = 'Sent';
 // NOTE: Use folder names with namespace prefix (INBOX. on Courier-IMAP)
 $config['trash_mbox'] = 'Trash';
 
-// display these folders separately in the mailbox list.
-// these folders will also be displayed with localized names
-// NOTE: Use folder names with namespace prefix (INBOX. on Courier-IMAP)
-$config['default_folders'] = array('INBOX', 'Drafts', 'Sent', 'Junk', 'Trash');
-
-// Disable localization of the default folder names listed above
-$config['show_real_foldernames'] = false;
-
 // automatically create the above listed default folders on first login
 $config['create_default_folders'] = false;
 
 // protect the default folders from renames, deletes, and subscription changes
 $config['protect_default_folders'] = true;
+
+// Disable localization of the default folder names listed above
+$config['show_real_foldernames'] = false;
 
 // if in your system 0 quota means no limit set this option to true 
 $config['quota_zero_as_unlimited'] = false;
@@ -608,12 +661,13 @@ $config['enable_spellcheck'] = true;
 $config['spellcheck_dictionary'] = false;
 
 // Set the spell checking engine. Possible values:
-// - 'googie'  - the default
+// - 'googie'  - the default (also used for connecting to Nox Spell Server, see 'spellcheck_uri' setting)
 // - 'pspell'  - requires the PHP Pspell module and aspell installed
 // - 'enchant' - requires the PHP Enchant module
 // - 'atd'     - install your own After the Deadline server or check with the people at http://www.afterthedeadline.com before using their API
-// Since Google shut down their public spell checking service, you need to 
-// connect to a Nox Spell Server when using 'googie' here. Therefore specify the 'spellcheck_uri'
+// Since Google shut down their public spell checking service, the default settings
+// connect to http://spell.roundcube.net which is a hosted service provided by Roundcube.
+// You can connect to any other googie-compliant service by setting 'spellcheck_uri' accordingly.
 $config['spellcheck_engine'] = 'googie';
 
 // For locally installed Nox Spell Server or After the Deadline services,
@@ -882,6 +936,11 @@ $config['address_template'] = '{street}<br/>{locality} {zipcode}<br/>{country} {
 // Note: For LDAP sources fuzzy_search must be enabled to use 'partial' or 'prefix' mode
 $config['addressbook_search_mode'] = 0;
 
+// Template of contact entry on the autocompletion list.
+// You can use contact fields as: name, email, organization, department, etc.
+// See program/steps/addressbook/func.inc for a list
+$config['contact_search_name'] = '{name} <{email}>';
+
 // ----------------------------------
 // USER PREFERENCES
 // ----------------------------------
@@ -935,6 +994,10 @@ $config['compose_extwin'] = false;
 // compose html formatted messages by default
 // 0 - never, 1 - always, 2 - on reply to HTML message, 3 - on forward or reply to HTML message
 $config['htmleditor'] = 0;
+
+// save copies of compose messages in the browser's local storage
+// for recovery in case of browser crashes and session timeout.
+$config['compose_save_localstorage'] = true;
 
 // show pretty dates as standard
 $config['prettydate'] = true;
@@ -1011,13 +1074,18 @@ $config['strip_existing_sig'] = true;
 // 3 - Forwards and Replies only
 $config['show_sig'] = 1;
 
+// By default the signature is placed depending on cursor position (reply_mode).
+// Sometimes it might be convenient to start the reply on top but keep
+// the signature below the quoted text (sig_below = true).
+$config['sig_below'] = false;
+
 // Use MIME encoding (quoted-printable) for 8bit characters in message body
 $config['force_7bit'] = false;
 
 // Defaults of the search field configuration.
 // The array can contain a per-folder list of header fields which should be considered when searching
 // The entry with key '*' stands for all folders which do not have a specific list set.
-// Please note that folder names should to be in sync with $config['default_folders']
+// Please note that folder names should to be in sync with $config['*_mbox'] options
 $config['search_mods'] = null;  // Example: array('*' => array('subject'=>1, 'from'=>1), 'Sent' => array('subject'=>1, 'to'=>1));
 
 // Defaults of the addressbook search field configuration.

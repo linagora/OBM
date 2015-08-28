@@ -1,2 +1,2 @@
-Order allow,deny
-Deny from all 
+# deny webserver access to this directory
+Deny from all

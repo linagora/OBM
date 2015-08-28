@@ -64,12 +64,18 @@ function rcmail_contact_head($attrib)
 
     $form = array(
         'head' => array(  // section 'head' is magic!
+            'name' => $RCMAIL->gettext('contactnameandorg'),
             'content' => array(
-                'prefix' => array('type' => 'text'),
-                'firstname' => array('type' => 'text'),
-                'middlename' => array('type' => 'text'),
-                'surname' => array('type' => 'text'),
-                'suffix' => array('type' => 'text'),
+                'prefix'       => array('type' => 'text'),
+                'firstname'    => array('type' => 'text'),
+                'middlename'   => array('type' => 'text'),
+                'surname'      => array('type' => 'text'),
+                'suffix'       => array('type' => 'text'),
+                'name'         => array('type' => 'text'),
+                'nickname'     => array('type' => 'text'),
+                'organization' => array('type' => 'text'),
+                'department'   => array('type' => 'text'),
+                'jobtitle'     => array('type' => 'text'),
             ),
         ),
     );

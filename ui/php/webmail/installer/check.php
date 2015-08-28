@@ -1,6 +1,6 @@
 <?php
 
-if (!class_exists('rcube_install') || !is_object($RCI)) {
+if (!class_exists('rcmail_install', false) || !is_object($RCI)) {
     die("Not allowed! Please open installer/index.php instead.");
 }
 
@@ -25,19 +25,25 @@ $optional_php_exts = array(
     'Mcrypt'    => 'mcrypt',
     'Intl'      => 'intl',
     'Exif'      => 'exif',
+    'LDAP'      => 'ldap',
 );
 
 $required_libs = array(
-    'PEAR'      => 'PEAR.php',
-    'Net_SMTP'  => 'Net/SMTP.php',
-    'Net_IDNA2' => 'Net/IDNA2.php',
-    'Mail_mime' => 'Mail/mime.php',
+    'PEAR'      => 'pear.php.net',
+    'Auth_SASL' => 'pear.php.net',
+    'Net_SMTP'  => 'pear.php.net',
+    'Net_IDNA2' => 'pear.php.net',
+    'Mail_mime' => 'pear.php.net',
+    'Mail_mimeDecode' => 'pear.php.net',
+);
+
+$optional_libs = array(
+    'Net_LDAP3' => 'git.kolab.org',
 );
 
 $ini_checks = array(
     'file_uploads'                  => 1,
     'session.auto_start'            => 0,
-    'zend.ze1_compatibility_mode'   => 0,
     'mbstring.func_overload'        => 0,
     'suhosin.session.encrypt'       => 0,
     'magic_quotes_runtime'          => 0,
@@ -64,7 +70,9 @@ $source_urls = array(
     'DOM'       => 'http://www.php.net/manual/en/book.dom.php',
     'Intl'      => 'http://www.php.net/manual/en/book.intl.php',
     'Exif'      => 'http://www.php.net/manual/en/book.exif.php',
+    'oci8'      => 'http://www.php.net/manual/en/book.oci8.php',
     'PDO'       => 'http://www.php.net/manual/en/book.pdo.php',
+    'LDAP'      => 'http://www.php.net/manual/en/book.ldap.php',
     'pdo_mysql'   => 'http://www.php.net/manual/en/ref.pdo-mysql.php',
     'pdo_pgsql'   => 'http://www.php.net/manual/en/ref.pdo-pgsql.php',
     'pdo_sqlite'  => 'http://www.php.net/manual/en/ref.pdo-sqlite.php',
@@ -74,7 +82,9 @@ $source_urls = array(
     'PEAR'      => 'http://pear.php.net',
     'Net_SMTP'  => 'http://pear.php.net/package/Net_SMTP',
     'Mail_mime' => 'http://pear.php.net/package/Mail_mime',
+    'Mail_mimeDecode' => 'http://pear.php.net/package/Mail_mimeDecode',
     'Net_IDNA2' => 'http://pear.php.net/package/Net_IDNA2',
+    'Net_LDAP3' => 'https://git.kolab.org/diffusion/PNL',
 );
 
 echo '<input type="hidden" name="_step" value="' . ($RCI->configured ? 3 : 2) . '" />';
@@ -83,7 +93,7 @@ echo '<input type="hidden" name="_step" value="' . ($RCI->configured ? 3 : 2) . 
 <h3>Checking PHP version</h3>
 <?php
 
-define('MIN_PHP_VERSION', '5.2.1');
+define('MIN_PHP_VERSION', '5.3.7');
 if (version_compare(PHP_VERSION, MIN_PHP_VERSION, '>=')) {
     $RCI->pass('Version', 'PHP ' . PHP_VERSION . ' detected');
 } else {
@@ -138,14 +148,8 @@ foreach ($optional_php_exts as $name => $ext) {
 $prefix = (PHP_SHLIB_SUFFIX === 'dll') ? 'php_' : '';
 foreach ($RCI->supported_dbs as $database => $ext) {
     if (extension_loaded($ext)) {
-        // MySQL driver requires PHP >= 5.3 (#1488875)
-        if ($ext == 'pdo_mysql' && version_compare(PHP_VERSION, '5.3.0', '<')) {
-            $RCI->fail($database, 'PHP >= 5.3 required', null, true);
-        }
-        else {
-            $RCI->pass($database);
-            $found_db_driver = true;
-        }
+        $RCI->pass($database);
+        $found_db_driver = true;
     }
     else {
         $_ext = $ext_dir . '/' . $prefix . $ext . '.' . PHP_SHLIB_SUFFIX;
@@ -166,17 +170,25 @@ if (empty($found_db_driver)) {
 
 <?php
 
-foreach ($required_libs as $classname => $file) {
-    @include_once $file;
+foreach ($required_libs as $classname => $vendor) {
     if (class_exists($classname)) {
         $RCI->pass($classname);
     }
     else {
-        $RCI->fail($classname, "Failed to load $file", $source_urls[$classname]);
+        $RCI->fail($classname, "Failed to load class $classname from $vendor", $source_urls[$classname]);
     }
     echo "<br />";
 }
 
+foreach ($optional_libs as $classname => $vendor) {
+    if (class_exists($classname)) {
+        $RCI->pass($classname);
+    }
+    else {
+        $RCI->na($classname, "Recommended to install $classname from $vendor", $source_urls[$classname]);
+    }
+    echo "<br />";
+}
 
 ?>
 

@@ -102,7 +102,7 @@ if ($uid) {
     }
     if (empty($_SESSION['browser_caps']['tif']) && ($key = array_search('image/tiff', $mimetypes)) !== false) {
         // we can convert tiff to jpeg
-        if (!$RCMAIL->config->get('im_convert_path')) {
+        if (!rcube_image::is_convertable('image/tiff')) {
             unset($mimetypes[$key]);
         }
     }
@@ -178,15 +178,19 @@ else
 
 // mark message as read
 if (!empty($set_seen_flag)) {
-    if ($RCMAIL->storage->set_flag($MESSAGE->uid, 'SEEN')) {
+    if ($RCMAIL->storage->set_flag($MESSAGE->uid, 'SEEN', $mbox_name)) {
         if ($count = rcmail_get_unseen_count($mbox_name)) {
             rcmail_set_unseen_count($mbox_name, $count - 1);
         }
     }
 }
 
-exit;
+// Save preview_pane preference, if not set yet (#1490362)
+if ($RCMAIL->action == 'preview' && !$RCMAIL->config->get('preview_pane')) {
+    $RCMAIL->user->save_prefs(array('preview_pane' => true));
+}
 
+exit;
 
 
 function rcmail_message_attachments($attrib)
@@ -199,10 +203,10 @@ function rcmail_message_attachments($attrib)
     if (sizeof($MESSAGE->attachments)) {
         foreach ($MESSAGE->attachments as $attach_prop) {
             $filename = rcmail_attachment_name($attach_prop, true);
+            $filesize = $RCMAIL->message_part_size($attach_prop);
 
             if ($PRINT_MODE) {
-                $size = $RCMAIL->message_part_size($attach_prop);
-                $ol .= html::tag('li', null, rcube::Q(sprintf("%s (%s)", $filename, $size)));
+                $ol .= html::tag('li', null, rcube::Q(sprintf("%s (%s)", $filename, $filesize)));
             }
             else {
                 if ($attrib['maxlength'] && mb_strlen($filename) > $attrib['maxlength']) {
@@ -211,6 +215,10 @@ function rcmail_message_attachments($attrib)
                 }
                 else {
                     $title = '';
+                }
+
+                if ($attach_prop->size) {
+                    $size = ' ' . html::span('attachment-size', '(' . rcube::Q($filesize) . ')');
                 }
 
                 $mimetype = rcmail_fix_mimetype($attach_prop->mimetype);
@@ -222,7 +230,7 @@ function rcmail_message_attachments($attrib)
                         rcmail_output::JS_OBJECT_NAME, $attach_prop->mime_id),
                     'onmouseover' => $title ? '' : 'rcube_webmail.long_subject_title_ex(this, 0)',
                     'title'       => rcube::Q($title),
-                    ), rcube::Q($filename));
+                    ), rcube::Q($filename) . $size);
 
                 $ol .= html::tag('li', array('class' => $class, 'id' => $id), $link);
 
@@ -270,14 +278,13 @@ function rcmail_remote_objects_msg()
 
 function rcmail_message_buttons()
 {
-    global $RCMAIL;
+    global $RCMAIL, $MESSAGE;
 
-    $mbox  = $RCMAIL->storage->get_folder();
     $delim = $RCMAIL->storage->get_hierarchy_delimiter();
     $dbox  = $RCMAIL->config->get('drafts_mbox');
 
     // the message is not a draft
-    if ($mbox != $dbox && strpos($mbox, $dbox.$delim) !== 0) {
+    if ($MESSAGE->folder != $dbox && strpos($MESSAGE->folder, $dbox.$delim) !== 0) {
         return '';
     }
 
@@ -337,21 +344,21 @@ function rcmail_message_contactphoto($attrib)
 {
     global $RCMAIL, $MESSAGE;
 
-    $placeholder = $attrib['placeholder'] ? $RCMAIL->config->get('skin_path') . $attrib['placeholder'] : null;
+    $placeholder = $attrib['placeholder'] ? $RCMAIL->output->abs_url($attrib['placeholder'], true) : null;
+    $placeholder = $RCMAIL->output->asset_url($placeholder ? $placeholder : 'program/resources/blank.gif');
 
     if ($MESSAGE->sender) {
         $photo_img = $RCMAIL->url(array(
             '_task'   => 'addressbook',
             '_action' => 'photo',
             '_email'  => $MESSAGE->sender['mailto'],
-            '_alt'    => $placeholder,
         ));
 
-        $attrib['onerror'] = "this.src = '" . ($placeholder ? $placeholder : 'program/resources/blank.gif') . "'";
+        $attrib['onerror'] = "this.src = '$placeholder'";
     }
     else {
-        $photo_img = $placeholder ? $placeholder : 'program/resources/blank.gif';
+        $photo_img = $placeholder;
     }
 
-    return html::img(array('src' => $photo_img) + $attrib);
+    return html::img(array('src' => $photo_img, 'alt' => $RCMAIL->gettext('contactphoto')) + $attrib);
 }
