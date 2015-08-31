@@ -160,7 +160,7 @@ Description: Postfix configuration for OBM
 Package: obm-filter
 Architecture: all
 Pre-Depends: amavisd-new
-Depends: obm-postfix (= ${binary:Version}), clamav-daemon, spamassassin, lha, arj, unrar, zoo, nomarch, lzop, cabextract, bzip2, libnet-dns-perl, libmail-spf-query-perl | libmail-spf-perl, ${misc:Depends}
+Depends: obm-postfix (= ${binary:Version}), clamav-daemon, spamassassin, lha, arj, unrar, zoo, nomarch, lzop, cabextract, bzip2, libnet-dns-perl, libmail-spf-query-perl | libmail-spf-perl, clamav-unofficial-sigs, ${misc:Depends}
 Description: email content checker configuration for OBM
  This package configures amavisd-new, clamav and SpamAssassin for OBM.
  .
