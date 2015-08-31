@@ -289,6 +289,9 @@ Obm.Error = {
       window.location.href= obm.vars.consts.obmUrl + '/';
       exit;
     }
+    else if (caller.status == 0 || (caller.status >= 300 && caller.status < 400))  {
+      window.location.reload();
+    }
     else {
       try {
         var errors = JSON.decode(caller.xhr.responseText, false);
