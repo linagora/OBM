@@ -61,6 +61,10 @@ $config['des_key'] = 'NIZLhTml&d$sl=g=AHPfi7Jx';
 // compose in new window
 $config['compose_extwin'] = true;
 
+// Disable local storage by default
+// See https://ci-obm.linagora.com/jira/browse/OBMFULL-6377
+$config['compose_save_localstorage'] = false;
+
 // session name.
 $config['session_name'] = 'roundcube_obm_sessid';
 // session lifetime
