@@ -88,7 +88,7 @@ if(isset($params['set_cal_view_id']) && $params['set_cal_view_id']!=0) {
 if (!($current_view instanceOf CalendarView) && isset($_SESSION['cal_current_view']) && (is_string($_SESSION['cal_current_view']))) {
   $current_view = unserialize($_SESSION['cal_current_view']);
 }
-if(!($current_view instanceOf CalendarView) && isset($_SESSION['set_cal_default_view'])) {
+if(!($current_view instanceOf CalendarView) && isset($_SESSION['set_cal_default_view']) && $_SESSION['set_cal_default_view'] != 0) {
   $current_view = CalendarView::get_from_id($_SESSION['set_cal_default_view']);
 }
 if(!($current_view instanceOf CalendarView)) {
