@@ -218,10 +218,7 @@ class obm_addressbook_backend extends rcube_addressbook {
   public function search($fields, $value, $mode=0, $select=true, $nocount=false, $required=array()) {
     if (!empty($value)) {
         $this->set_search_set($value);
-        if ($select) {
-            $this->list_records(array('value'=>$value, 'strict'=>$mode), 0, true);
-        } else
-            $this->result = $this->count();
+        $this->list_records(array('value'=>$value, 'strict'=>$mode), 0, true);
     }
 
     return $this->result;

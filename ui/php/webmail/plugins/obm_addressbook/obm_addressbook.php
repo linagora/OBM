@@ -157,18 +157,25 @@ class obm_addressbook extends rcube_plugin
   }
 
   protected function sanitizeContact($contact) {
-    $emailName = array_shift(explode("@",$contact["record"]["email"]));
-
-    if ( !$contact["record"]["surname"] ) {
-      $contact["record"]["surname"] = $contact["record"]["name"] ? $contact["record"]["name"] : $emailName;
+    // Sometimes RC sends us [email] so we must normalize here to our [email:<label>] convention
+    if ($contact["record"]["email"]) {
+      $contact["record"]["email:work"] = array($contact["record"]["email"]);
     }
+
+    if (!$contact["record"]["surname"]) {
+      $contact["record"]["surname"] = $contact["record"]["name"] ? $contact["record"]["name"] : array_shift(explode("@", $contact["record"]["email:work"][0]));
+    }
+
     unset($contact["record"]["ID"]);
+    unset($contact["record"]["abort"]);
+    unset($contact["record"]["email"]);
     unset($contact["record"]["contact_id"]);
     unset($contact["record"]["changed"]);
     unset($contact["record"]["del"]);
     unset($contact["record"]["vcard"]);
     unset($contact["record"]["words"]);
     unset($contact["record"]["user_id"]);
+
     if ( !$contact["record"]["nickname"] ) { $contact["record"]["nickname"] = ''; }
     if ( !$contact["record"]["jobtitle"] ) { $contact["record"]["jobtitle"] = ''; }
     if ( !$contact["record"]["organization"] ) { $contact["record"]["organization"] = ''; }
@@ -182,6 +189,7 @@ class obm_addressbook extends rcube_plugin
                                                           "country" => ''));
     }
     if ( !$contact["record"]["notes"] ) { $contact["record"]["notes"] = '';}
+
     return $contact;
   }
 
@@ -266,20 +274,23 @@ class obm_addressbook extends rcube_plugin
 
   public function contact_create(array $contact){
     global $OUTPUT;
+
     $contact = $this->sanitizeContact($contact);
     if ( !$contact["source"] ) {
-      $ad = $this->getContactsAddressbook();
+      $ad = $this->getCollectedContactsAddressbook();
       $contact["source"] = $ad->uid;
     } else {
       $contact["abort"] = true;
     }
+
     $response = $this->requester->callObmSyncService("createContact", array("contact"=>$contact));
-    if ( $response ) {
+    if ($response) {
       $contact["result"] = $response->getElementsByTagName('contact')->item(0)->getAttribute("uid");
-      $OUTPUT->show_message('addedsuccessfully', 'confirmation');
+      $contact["abort"] = true;
     } else {
       $contact["result"] = false;
     }
+
     return $contact;
   }
 
@@ -441,7 +452,7 @@ class obm_addressbook extends rcube_plugin
           $book = $rcmail->get_address_book($bookid);
 
           if(!$this->isPublicAddressbook($book)) {
-            $previous_entries = $book->search('email', $recipient['mailto'], false, true, true);
+            $previous_entries = $book->search(array('email'), $recipient['mailto'], 1, true /* select */, false /* nocount */);
             if ($previous_entries->count) {
               break;
             }
