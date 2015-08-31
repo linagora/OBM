@@ -1198,6 +1198,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.regexp = new Object();
   obm.vars.consts = new Object();
   obm.vars.conf = new Object();
+  obm.vars.rc = new Object();
   obm.initialize = new Chain();
   obm.resize = new Chain();
   obm.vars.newTopbar = ".($set_top_bar ? 'true' : 'false').";
@@ -1243,6 +1244,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.labels.intro.done = '".phpStringToJsString($GLOBALS['l_intro_done'])."';
   obm.vars.labels.intro.next = '".phpStringToJsString($GLOBALS['l_intro_next'])."';
   obm.vars.labels.intro.previous = '".phpStringToJsString($GLOBALS['l_intro_previous'])."';
+  obm.vars.rc.secureToken = 'OBMWithRoundcubeIsGreat';
   $obm_vars
   // ]]>
   </script> 
@@ -1283,7 +1285,7 @@ function display_head($p_module, $standard=true) {
 
         new Request({
           method: 'get',
-          url: '/webmail/obm.php?_task=logout',
+          url: '/webmail/obm.php?_task=logout&_token=' + obm.vars.rc.secureToken,
           onComplete: function() { window.location.href = $('logout').href; }
         }).send();
       });

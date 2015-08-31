@@ -77,6 +77,7 @@ $config["plugins"][] = "multiple_smtp_server";
 $config["plugins"][] = "obm_addressbook";
 $config["plugins"][] = "obm_identities";
 $config["plugins"][] = "obm_unread";
+$config["plugins"][] = "obm_securetoken";
 
 if ( $auth_kind && $auth_kind == "CAS" ) {
   $config["plugins"][] = "obm_cas_authn";
