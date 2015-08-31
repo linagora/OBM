@@ -49,7 +49,7 @@ $config['managesieve_script_name'] = 'managesieve';
 // Sieve RFC says that we should use UTF-8 endcoding for mailbox names,
 // but some implementations does not covert UTF-8 to modified UTF-7.
 // Defaults to UTF7-IMAP
-$config['managesieve_mbox_encoding'] = 'UTF-8';
+$config['managesieve_mbox_encoding'] = 'UTF7-IMAP';
 
 // I need this because my dovecot (with listescape plugin) uses
 // ':' delimiter, but creates folders with dot delimiter
