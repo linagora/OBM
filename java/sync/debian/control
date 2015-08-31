@@ -8,7 +8,7 @@ Homepage: http://www.obm.org
 
 Package: obm-sync
 Architecture: all
-Pre-Depends: obm-conf, obm-tomcat, obm-tomcat-common-libs
+Pre-Depends: obm-conf (= ${binary:Version}), obm-tomcat (= ${binary:Version}), obm-tomcat-common-libs (= ${binary:Version})
 Description: synchronization application for Open Business Management
  This package contains a J2E web application used to synchronize OBM data with
  Icedove/Thunderbird, Outlook, etc.
@@ -20,7 +20,7 @@ Description: synchronization application for Open Business Management
 
 Package: obm-locator
 Architecture: all
-Depends: openjdk-7-jre-headless, obm-conf, openssl
+Depends: openjdk-7-jre-headless, obm-conf (= ${binary:Version}), openssl
 Description: Locator for Open Business Management
  This package is a J2E web service, which allows can be queried to retrieve
  the location of an OBM component.
@@ -32,7 +32,7 @@ Description: Locator for Open Business Management
 
 Package: obm-provisioning
 Architecture: all
-Depends: openjdk-7-jre-headless, obm-conf
+Depends: openjdk-7-jre-headless, obm-conf (= ${binary:Version})
 Description: Provisioning API for Open Business Management
  This package is an HTTP web service, which can be queried to provision an OBM
  server.
@@ -44,8 +44,8 @@ Description: Provisioning API for Open Business Management
 
 Package: obm-autoconf
 Architecture: all
-Pre-Depends: obm-conf
-Depends: obm-tomcat
+Pre-Depends: obm-conf (= ${binary:Version})
+Depends: obm-tomcat (= ${binary:Version})
 Description: Icedove/Thunderbird autoconfiguration service for Open Business Management
  This package contains a J2E web service to autoconfigure Icedove/Thunderbird
  clients for use with OBM.
@@ -57,7 +57,7 @@ Description: Icedove/Thunderbird autoconfiguration service for Open Business Man
 
 Package: obm-tomcat-common-libs
 Architecture: all
-Pre-Depends: obm-tomcat
+Pre-Depends: obm-tomcat (= ${binary:Version})
 Description: Tomcat common libs for Open Business Management
  This package contains the library used by obm webapps deployed in tomcat.
  .
@@ -68,7 +68,7 @@ Description: Tomcat common libs for Open Business Management
 
 Package: obm-imap-archive
 Architecture: all
-Depends: openjdk-7-jre-headless, obm-conf
+Depends: openjdk-7-jre-headless, obm-conf (= ${binary:Version})
 Description: OBM component that perform email archiving
  obm-imap-archive is a http server exposing webservices to perform email archiving.
  .

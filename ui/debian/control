@@ -75,7 +75,7 @@ Description: web interface for Open Business Management
 
 Package: obm-certs
 Architecture: all
-Pre-Depends: obm-ca, obm-conf (= ${binary:Version})
+Pre-Depends: obm-ca (= ${binary:Version}), obm-conf (= ${binary:Version})
 Depends:  openssl, ${misc:Depends}
 Description: certificate generation for OBM
  This package generates SSL certificates for OBM.
