@@ -17,7 +17,6 @@ Source1:        %{name}-core.cron.d
 Source2:        %{name}-admin.sh
 Source3:        %{name}-config.sh
 Source4:        %{name}-ldap.sh
-Source5:        %{name}-mysql.sh
 Source6:        %{name}-core.sh
 Source7:        %{name}-cyrus.sh
 Source8:        %{name}-postfix.sh
@@ -25,7 +24,6 @@ Source9:        %{name}-pgsql.sh
 Source10:       %{name}-sysusers.sh
 Source11:       %{name}-ui.sh
 Source12:       pgadmin.sh
-Source13:       myadmin.sh
 Source14:       %{name}-services.cron.d
 Source15:       %{name}-services.logrotate.d
 
@@ -92,31 +90,12 @@ Summary:        web interface for Open Business Management
 Group:          Development/Tools
 Requires:       %{name}-config = %{version}-%{release}
 Requires(post):        vixie-cron
-Requires:       php >= 5.3, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap, php-pecl-apc, php-pecl-imagick
+Requires:       php >= 5.3, php-xml, php-gd, php-cli, php-pgsql, php-ldap, php-pecl-apc, php-pecl-imagick
 Conflicts:	opush < 3
 
 %description    core
 This package contains the web interface for OBM. It has no dependency on the
 other services needed by OBM, such as obm-storage.
-
-OBM is a global groupware, messaging and CRM application. It is intended to
-be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
-simple contact database. OBM also features integration with PDAs, smartphones,
-Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
-
-%package	MySQL
-Summary:	MySQL backend for OBM
-Group:		Development/Tools
-
-Requires:	%{name}-config = %{version}-%{release}
-Requires:	%{name}-core = %{version}-%{release}
-Requires:	obm-locator
-Requires:	mysql-server >= 5.0
-Conflicts:	%{name}-PostgreSQL
-Provides:	%{name}-DataBase = %{version}-%{release}
-
-%description	MySQL
-This package is the MySQL database backend for OBM.
 
 OBM is a global groupware, messaging and CRM application. It is intended to
 be an Exchange Or Notes/Domino Mail replacement, but can also be used as a
@@ -131,13 +110,15 @@ Requires:       postgresql-server >= 8.3
 Requires:       %{name}-core = %{version}-%{release}
 Requires:       %{name}-config = %{version}-%{release}
 Requires:       obm-locator
-Conflicts:      %{name}-MySQL
 Provides:       %{name}-DataBase = %{version}-%{release}
 #Introduced in 2.4.0
 Provides:       %{name}-PostgreSQL91 = %{version}-%{release}
 Obsoletes:      %{name}-PostgreSQL91 < %{version}
 Provides:       %{name}-PostgreSQL83 = %{version}-%{release}
 Obsoletes:      %{name}-PostgreSQL83 < %{version}
+#Introduced in 3.2
+Provides:       %{name}-MySQL = %{version}-%{release}
+Obsoletes:      %{name}-MySQL < 3.2
 
 %description	PostgreSQL
 This package contains PostgreSQL schemas and configuration
@@ -154,7 +135,7 @@ Summary:        web interface configuration for OBM
 Group:          Development/Tools
 
 Requires:       %{name}-core = %{version}-%{release}
-Requires: 	php >= 5.3, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap, php-mbstring, php-imap, curl >= 7.20
+Requires: 	php >= 5.3, php-xml, php-gd, php-cli, php-pgsql, php-ldap, php-mbstring, php-imap, curl >= 7.20
 Requires(pre):  httpd
 
 %description    ui
@@ -171,7 +152,6 @@ Group:		Development/Tools
 
 Requires:	%{name}-config = %{version}-%{release}
 Requires:	perl-OBM = %{version}-%{release}
-Requires:	perl-DBD-MySQL 
 Requires:	perl-DBD-Pg
 Requires:	perl-LDAP
 Requires:	perl-XML-Simple
@@ -422,12 +402,6 @@ mkdir -p $RPM_BUILD_ROOT%{_bindir}
 
 install -p -m 755 %{SOURCE8} $RPM_BUILD_ROOT%{_bindir}/obm-postfix
 
-# obm-mysql
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-MySQL-%{version}
-install -p -m 755 %{SOURCE5} $RPM_BUILD_ROOT%{_bindir}/%{name}-mysql
-install -p -m 755 %{SOURCE13} $RPM_BUILD_ROOT%{_bindir}/myadmin.lib
-
 # obm-pgsql
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 mkdir -p $RPM_BUILD_ROOT%{_docdir}/%{name}-PostgreSQL-%{version}
@@ -533,16 +507,6 @@ fi
 %verify(not size,not md5) %config(noreplace) %{_sysconfdir}/%{name}/%{name}_conf.ini
 %verify(not size,not md5) %config(noreplace) %{_sysconfdir}/%{name}/%{name}_conf.inc
 %verify(not size,not md5) %config(noreplace) %{_sysconfdir}/%{name}/automateLdapMapping.xml
-
-%files		-n %{name}-MySQL
-%defattr(-,root,root,-)
-%{_bindir}/obm-mysql
-%{_bindir}/myadmin.lib
-
-%post           -n %{name}-MySQL
-if [ "$1" = "2" ]; then
-        echo "Finish upgrade Database, check /usr/share/obm/script upgrade script"
-fi
 
 %files          -n %{name}-PostgreSQL
 %defattr(-,root,root,-)
