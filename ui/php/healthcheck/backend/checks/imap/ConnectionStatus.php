@@ -45,7 +45,11 @@ class ConnectionStatus extends AbstractUserStatus {
     $obm['domain_id'] = $domain['id']; //So that get_user_id works as expected
     $userInfo = get_user_info(get_user_id($user['login']));
     
-    foreach ($servers as $server) {
+    foreach ($servers as $id => $server) {
+      if ($id != $userInfo['mail_server_id']) {
+        continue;
+      }
+
       $host = $server[0];      
       $url = str_replace("%HOST%", $host["ip"], self::IMAP_INBOX_URL);
       $curl = CheckHelper::curlGet($url, $userInfo['email'], $user['password']);
