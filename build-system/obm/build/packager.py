@@ -147,6 +147,8 @@ class Packager(object):
             perl_version = "5.8"
         elif self.osversion == 'el6':
             perl_version = "5.10"
+        elif self.osversion == 'el7':
+            perl_version = "5.16"
         else:
              raise PackagingError("Unknown OS version: %s" % \
                     self.osversion)
