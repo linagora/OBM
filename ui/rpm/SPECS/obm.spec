@@ -92,7 +92,7 @@ Summary:        web interface for Open Business Management
 Group:          Development/Tools
 Requires:       %{name}-config = %{version}-%{release}
 Requires(post):        vixie-cron
-Requires:       php >= 5.2, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap, php-pecl-apc, php-pecl-imagick
+Requires:       php >= 5.3, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap, php-pecl-apc, php-pecl-imagick
 Conflicts:	opush < 3
 
 %description    core
@@ -154,7 +154,7 @@ Summary:        web interface configuration for OBM
 Group:          Development/Tools
 
 Requires:       %{name}-core = %{version}-%{release}
-Requires: 	php >= 5.2, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap, php-mbstring, php-imap, curl >= 7.20
+Requires: 	php >= 5.3, php-xml, php-mysql, php-gd, php-cli, php-pgsql, php-ldap, php-mbstring, php-imap, curl >= 7.20
 Requires(pre):  httpd
 
 %description    ui
