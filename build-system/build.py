@@ -31,6 +31,7 @@ import obm.build as ob
 
 OS_TO_PKGTYPE = {'el5' : 'rpm',
                  'el6' : 'rpm',
+                 'el7' : 'rpm',
                 'etch' : 'deb',
                 'lenny': 'deb',
              'squeeze' : 'deb',
