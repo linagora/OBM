@@ -7,6 +7,7 @@ gpgcheck=0
 [obm-contrib]
 name=obm-contrib
 baseurl=http://rpm.obm.org/31/contrib/$releasever
+skip_if_unavailable=1
 enabled=1
 gpgcheck=0
 

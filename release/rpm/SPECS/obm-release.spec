@@ -6,7 +6,7 @@
 
 Name:           obm-release
 Version:        3.1
-Release:        1
+Release:        2
 Summary:        Open Business Management repository configuration
 Group:          System Environment/Base
 License:        AGPLv3
@@ -48,6 +48,9 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/yum.repos.d/*
 
 %changelog
+* Wed Sep 02 2015 Nicolas Chauvet <nchauvet@linagora.com> - 3.1-2
+- Avoid contrib if unavailable
+
 * Mon Dec 1 2014 OBM <lgs-obm-dev@linagora.com> - 3.1-1
         3.1 release.
 
