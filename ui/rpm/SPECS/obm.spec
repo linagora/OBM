@@ -89,7 +89,7 @@ Mozilla Thunderbird/Lightning and Microsoft Outlook via specific connectors.
 Summary:        web interface for Open Business Management
 Group:          Development/Tools
 Requires:       %{name}-config = %{version}-%{release}
-Requires(post):        vixie-cron
+Requires(post): cronie
 Requires:       php >= 5.3, php-xml, php-gd, php-cli, php-pgsql, php-ldap, php-pecl-apc, php-pecl-imagick
 Conflicts:	opush < 3
 
