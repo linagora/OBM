@@ -33,8 +33,9 @@ package org.obm.locator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+
 import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.junit.After;
 import org.junit.Before;
@@ -83,9 +84,39 @@ public class StartupTest implements H2TestClass {
 	
 	@Test
 	@RunAsClient
-	public void testStartup() throws Exception {
-		Response result = Request.Get(webAppUrl + "location/host/sync/obm_sync/login@test-domain").execute();
-		assertThat(result.returnContent().asString()).isEqualTo("12.23.34.45\n");
+	public void testSyncObmSyncForUserShouldReturnASingleHost() throws Exception {
+		assertThat(request("sync/obm_sync/login@test-domain")).isEqualTo("12.23.34.45\n");
 	}
 
+	@Test
+	@RunAsClient
+	public void testSyncObmSyncForDomainShouldReturnASingleHost() throws Exception {
+		assertThat(request("sync/obm_sync/test-domain")).isEqualTo("12.23.34.45\n");
+	}
+
+	@Test
+	@RunAsClient
+	public void testMailImapForDomainShouldReturnThreeHosts() throws Exception {
+		assertThat(request("mail/imap/test-domain")).isEqualTo("1.2.3.1\n1.2.3.2\n1.2.3.3\n");
+	}
+
+	@Test
+	@RunAsClient
+	public void testMailImapForUserAShouldReturnHisBackend() throws Exception {
+		assertThat(request("mail/imap/usera@test-domain")).isEqualTo("1.2.3.1\n");
+	}
+
+	@Test
+	@RunAsClient
+	public void testMailImapForUserBShouldReturnHisBackend() throws Exception {
+		assertThat(request("mail/imap/userb@test-domain")).isEqualTo("1.2.3.2\n");
+	}
+
+	private String request(String query) throws IOException {
+		return Request
+				.Get(webAppUrl + "location/host/" + query)
+				.execute()
+				.returnContent()
+				.asString();
+	}
 }

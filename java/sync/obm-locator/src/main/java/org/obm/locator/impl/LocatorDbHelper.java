@@ -33,15 +33,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.obm.configuration.DomainConfiguration;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.push.utils.JDBCUtils;
+import org.obm.sync.base.EmailAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -61,7 +62,31 @@ public class LocatorDbHelper {
 		this.dbcp = dbcp;
 		this.domainConfiguration = configurationService;
 	}
-	
+
+	public Set<String> findImapBackendHost(EmailAddress loginAtDomain) {
+		String query = "SELECT host_ip "
+				+ "FROM Host "
+				+ "INNER JOIN UserObm ON userobm_mail_server_id = host_id "
+				+ "INNER JOIN Domain ON domain_id = userobm_domain_id "
+				+ "WHERE domain_name = ? AND userobm_login = ?";
+		ImmutableSet.Builder<String> ips = ImmutableSet.builder();
+
+		try (Connection con = dbcp.getConnection(); PreparedStatement ps = con.prepareStatement(query)) {
+			ps.setString(1, loginAtDomain.getDomain().get());
+			ps.setString(2, loginAtDomain.getLogin().get());
+
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					ips.add(rs.getString("host_ip"));
+				}
+			}
+		} catch (SQLException e) {
+			logger.error("Failed to query IMAP backend for user " + loginAtDomain, e);
+		}
+
+		return ips.build();
+	}
+
 	/**
 	 * Returns the ips of the hosts with the given service/property in the users
 	 * domain.
@@ -71,18 +96,17 @@ public class LocatorDbHelper {
 	 * @param prop
 	 * @return
 	 */
-	public Set<String> findDomainHost(String loginAtDomain,
-			String service, String prop) {
-		HashSet<String> ret = new HashSet<String>();
-
+	public Set<String> findDomainHost(String loginAtDomain, String service, String prop) {
+		ImmutableSet.Builder<String> ret = ImmutableSet.builder();
 		String q = "SELECT host_ip "
 				+ "FROM Domain "
 				+ "INNER JOIN DomainEntity ON domainentity_domain_id=domain_id "
-				+ " INNER JOIN ServiceProperty ON serviceproperty_entity_id=domainentity_entity_id "
+				+ "INNER JOIN ServiceProperty ON serviceproperty_entity_id=domainentity_entity_id "
 				+ "INNER JOIN Host ON CAST(host_id as CHAR(" + MAX_CHAR_FOR_CAST + ")) = serviceproperty_value "
 				+ "WHERE domain_name LIKE ? "
 				+ "AND serviceproperty_service=? "
-				+ "AND serviceproperty_property=?";
+				+ "AND serviceproperty_property=? "
+				+ "ORDER BY host_ip ASC";
 
 		Connection con = null;
 		PreparedStatement ps = null;
@@ -106,7 +130,7 @@ public class LocatorDbHelper {
 			JDBCUtils.cleanup(con, ps, rs);
 		}
 
-		return ret;
+		return ret.build();
 	}
 
 	private String getDomainAsJdbcString(String loginAtDomain) {

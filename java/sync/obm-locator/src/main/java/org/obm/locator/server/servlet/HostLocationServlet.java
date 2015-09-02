@@ -39,6 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.locator.impl.LocatorDbHelper;
+import org.obm.sync.base.EmailAddress;
+import org.obm.sync.serviceproperty.ServiceProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,21 +77,31 @@ public class HostLocationServlet extends HttpServlet {
 			return;
 		}
 
-		String service = split[1];
-		String property = split[2];
 		String loginAtDomain = split[3];
-
-		Set<String> ips = locatorDbHelper.findDomainHost(
-				loginAtDomain, service, property);
+		ServiceProperty serviceProperty = ServiceProperty
+				.builder()
+				.service(split[1])
+				.property(split[2])
+				.build();
+		Set<String> ips = findHost(loginAtDomain, serviceProperty);
 
 		if (ips.size() > 0) {
 			writeResponse(req, resp, ips);
 		} else {
-			sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND,
-					"Could not find " + service + "/" + property + " for "
-							+ loginAtDomain);
+			sendErrorResponse(resp, HttpServletResponse.SC_NOT_FOUND, "Could not find " + serviceProperty + " for " + loginAtDomain);
 		}
 
+	}
+
+	private Set<String> findHost(String loginAtDomain, ServiceProperty serviceProperty) {
+		// OBMFULL-6426
+		// If the query is for the IMAP backend and loginAtDomain is actually a login @ domain
+		// Request the actual imap backend of the user from the database
+		if (ServiceProperty.IMAP.equals(serviceProperty) && EmailAddress.isEmailAddress(loginAtDomain)) {
+			return locatorDbHelper.findImapBackendHost(EmailAddress.loginAtDomain(loginAtDomain));
+		}
+
+		return locatorDbHelper.findDomainHost(loginAtDomain, serviceProperty.getService(), serviceProperty.getProperty());
 	}
 
 	private void writeResponse(HttpServletRequest req,
