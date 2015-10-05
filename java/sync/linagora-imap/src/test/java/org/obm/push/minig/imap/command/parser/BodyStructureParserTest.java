@@ -129,6 +129,24 @@ public class BodyStructureParserTest {
 	}
 	
 	@Test
+	public void testFilenameWithAsterix() {
+		String bs = "("
+				+ "(\"TEXT\" \"HTML\" (\"CHARSET\" \"iso-8859-1\") NIL NIL \"7BIT\" 440 1 NIL NIL NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" (\"NAME\" \"Flyer-rdv compte 50.pdf\") NIL NIL \"BASE64\" 1284767 NIL (\"ATTACHMENT\" (\"FILENAME*\" {27}Flyer-rdv%20compte%2050.pdf)) NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" (\"NAME\" \"Flyer502.png\") \"<image1>\" NIL \"BASE64\" 663451 NIL (\"INLINE\" (\"FILENAME\" \"Flyer502.png\")) NIL)"
+				+ " \"RELATED\" (\"BOUNDARY\" \"----=_Part_18061_639893781.1426286004062\") NIL NIL)";
+		MimePart result = parseStringAsBodyStructure(bs);
+		checkMimeTree(
+			createSimpleMimeTree("multipart", "related", null, null, ImmutableMap.of("BOUNDARY", "----=_Part_18061_639893781.1426286004062"),
+				createSimpleMimePart("TEXT", "HTML", null, null, "7BIT", 440, ImmutableMap.of("CHARSET", "iso-8859-1")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", null, null, "BASE64", 1284767, 
+					ImmutableMap.of("NAME", "Flyer-rdv compte 50.pdf", "FILENAME", "Flyer-rdv compte 50.pdf")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "image1", null, "BASE64", 663451, 
+					ImmutableMap.of("NAME", "Flyer502.png", "FILENAME", "Flyer502.png"))),
+			result);
+	}
+	
+	@Test
 	public void testBugzilla1502Adrien() {
 		String bs = "(" +
 				"(\"TEXT\" \"HTML\" (\"CHARSET\" \"UTF-8\") NIL NIL \"QUOTED-PRINTABLE\" 489 6 NIL NIL NIL NIL)" +

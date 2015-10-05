@@ -33,12 +33,14 @@ package org.obm.push.minig.imap.mime.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 
 import org.obm.push.mail.EncodedWord;
 import org.obm.push.mail.mime.BodyParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 
 
@@ -52,6 +54,8 @@ public class BodyParamParser {
 			}
 		}).parse();
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(BodyParamParser.class);
 	
 	private final String key;
 	private final String value;
@@ -78,18 +82,28 @@ public class BodyParamParser {
 	
 	
 	private String decodeAsterixEncodedValue() {
-		final int firstQuote = value.indexOf("'");
-		final int secondQuote = value.indexOf("'", firstQuote + 1);
-		final String charsetName = value.substring(0, firstQuote);
-		final String text = value.substring(secondQuote + 1);
 		try {
-			Charset charset = Charset.forName(charsetName);
-			return URLDecoder.decode(text, charset.displayName());
-		} catch (UnsupportedEncodingException e) {
-		} catch (IllegalCharsetNameException e) {
-		} catch (IllegalArgumentException e) {
+			return decodeUrlEncodedValueWithCharset();
+		} catch (StringIndexOutOfBoundsException e) {
+			return decodeUrlEncodedValue(value, Charsets.UTF_8.name());
 		}
-		return text;
+	}
+
+	private String decodeUrlEncodedValueWithCharset() {
+		int firstQuote = value.indexOf("'");
+		int secondQuote = value.indexOf("'", firstQuote + 1);
+		String charsetName = value.substring(0, firstQuote);
+		String text = value.substring(secondQuote + 1);
+		return decodeUrlEncodedValue(text, charsetName);
+	}
+
+	private String decodeUrlEncodedValue(String text, String charset) {
+		try {
+			return URLDecoder.decode(text, charset);
+		} catch (UnsupportedEncodingException | IllegalCharsetNameException e) {
+			logger.error("Unsupported charset, returning raw value", e);
+			return text;
+		}
 	}
 
 	private String decodeQuotedPrintable() {
