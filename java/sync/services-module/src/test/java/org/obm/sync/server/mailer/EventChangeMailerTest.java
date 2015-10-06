@@ -32,7 +32,14 @@
 package org.obm.sync.server.mailer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.capture;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
 import static org.obm.DateUtils.date;
 
 import java.io.ByteArrayOutputStream;
@@ -563,7 +570,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getRecurrentCancelPlainMessage());
 		checkHtmlMessage(parts, getRecurrentCancelHtmlMessage());
 		icsToCheck.add("METHOD:CANCEL");
-		icsToCheck.add("DTSTART:20101108T110000Z");
+		icsToCheck.add("DTSTART;TZID=Europe/Paris:20101108T120000");
 		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
 		checkIcs(parts, icsToCheck);
 	}
@@ -625,7 +632,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getRecurrentInvitationPlainMessage());
 		checkHtmlMessage(parts, getRecurrentInvitationHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T110000Z");
+		icsToCheck.add("DTSTART;TZID=Europe/Paris:20101108T120000");
 		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
 		checkIcs(parts, icsToCheck);
 	}
@@ -711,7 +718,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getRecurrentUpdatePlainMessage());
 		checkHtmlMessage(parts, getRecurrentUpdateHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T120000Z");
+		icsToCheck.add("DTSTART;TZID=Europe/Paris:20101108T130000");
 		icsToCheck.remove("SEQUENCE:2");
 		icsToCheck.add("SEQUENCE:4");
 		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
@@ -874,7 +881,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getNonRecurrentToRecurrentUpdatePlainMessage());
 		checkHtmlMessage(parts, getNonRecurrentToRecurrentUpdateHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T110000Z");
+		icsToCheck.add("DTSTART;TZID=Europe/Paris:20101108T120000");
 		icsToCheck.remove("SEQUENCE:2");
 		icsToCheck.add("SEQUENCE:4");
 		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
@@ -907,7 +914,7 @@ public abstract class EventChangeMailerTest {
 		checkPlainMessage(parts, getNonRecurrentToRecurrentUpdatePlainMessage());
 		checkHtmlMessage(parts, getNonRecurrentToRecurrentUpdateHtmlMessage());
 		icsToCheck.add("METHOD:REQUEST");
-		icsToCheck.add("DTSTART:20101108T110000Z");
+		icsToCheck.add("DTSTART;TZID=Europe/Paris:20101108T120000");
 		icsToCheck.add("RRULE:FREQ=WEEKLY;UNTIL=20121123T120000;INTERVAL=2;BYDAY=TH,MO,WE");
 		checkIcs(parts, icsToCheck);
 	}

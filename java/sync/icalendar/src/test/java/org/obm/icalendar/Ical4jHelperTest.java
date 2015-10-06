@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.icalendar;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.eq;
@@ -39,7 +40,6 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.isNull;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -2146,5 +2146,55 @@ public class Ical4jHelperTest {
 		String resultFreebusy = ical4jHelper.parseFreeBusy(freebusy);
 		
 		assertThat(stripTimestamps(resultFreebusy)).isEqualTo(stripTimestamps(expectedFreebusy));
+	}
+
+	private Event buildSimplestEvent() {
+		Event event = new Event();
+
+		event.setExtId(new EventExtId("ExtId"));
+		event.setStartDate(DateUtils.dateInZone("2015-10-06T12:00:00", "Europe/Paris"));
+		event.setTimezoneName("Europe/Paris");
+		event.addAttendee(UserAttendee.builder().email("organizer@obm.org").asOrganizer().build());
+
+		return event;
+	}
+
+	@Test
+	public void testInvitationRequestShouldNotIncludeVTimeZoneWhenEventIsNotRecurring() throws Exception {
+		assertIcsEquals("OBMFULL-6433/requestWithoutTimeZone.ics", ical4jHelper.buildIcsInvitationRequest(getDefaultObmUser(), buildSimplestEvent(), new AccessToken(0, "Origin")));
+	}
+
+	@Test
+	public void testInvitationRequestShouldIncludeVTimeZoneWhenEventIsRecurring() throws Exception {
+		Event event = buildSimplestEvent();
+		event.getRecurrence().setKind(RecurrenceKind.daily);
+
+		assertIcsEquals("OBMFULL-6433/requestWithTimeZone.ics", ical4jHelper.buildIcsInvitationRequest(getDefaultObmUser(), event, new AccessToken(0, "Origin")));
+	}
+
+	@Test
+	public void testInvitationCancelShouldNotIncludeVTimeZoneWhenEventIsNotRecurring() throws Exception {
+		assertIcsEquals("OBMFULL-6433/cancelWithoutTimeZone.ics", ical4jHelper.buildIcsInvitationCancel(getDefaultObmUser(), buildSimplestEvent(), new AccessToken(0, "Origin")));
+	}
+
+	@Test
+	public void testInvitationCancelShouldIncludeVTimeZoneWhenEventIsRecurring() throws Exception {
+		Event event = buildSimplestEvent();
+		event.getRecurrence().setKind(RecurrenceKind.daily);
+
+		assertIcsEquals("OBMFULL-6433/cancelWithTimeZone.ics", ical4jHelper.buildIcsInvitationCancel(getDefaultObmUser(), event, new AccessToken(0, "Origin")));
+	}
+
+	@Test
+	public void testInvitationReplyShouldNotIncludeVTimeZoneWhenEventIsNotRecurring() throws Exception {
+		assertIcsEquals("OBMFULL-6433/replyWithoutTimeZone.ics", ical4jHelper.buildIcsInvitationReply(buildSimplestEvent(), getDefaultObmUser(), new AccessToken(0, "Origin")));
+	}
+
+	@Test
+	public void testInvitationReplyShouldIncludeVTimeZoneWhenEventIsRecurring() throws Exception {
+		Event event = buildSimplestEvent();
+		event.getRecurrence().setKind(RecurrenceKind.daily);
+
+		assertIcsEquals("OBMFULL-6433/replyWithTimeZone.ics", ical4jHelper.buildIcsInvitationReply(event, getDefaultObmUser(), new AccessToken(0, "Origin")));
 	}
 }
