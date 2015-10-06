@@ -31,9 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.bean;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.obm.push.mail.mime.BodyParam;
 import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -41,20 +42,19 @@ import com.google.common.collect.ImmutableList;
 
 public class BeansTest {
 
-	private EqualsVerifierUtils equalsVerifierUtilsTest;
-	
-	@Before
-	public void init() {
-		equalsVerifierUtilsTest = new EqualsVerifierUtils();
-	}
-	
 	@Test
 	public void test() {
 		ImmutableList<Class<?>> list = 
 				ImmutableList.<Class<?>>builder()
 					.add(MessageSet.class)
+					.add(BodyParam.class)
 					.build();
-		equalsVerifierUtilsTest.test(list);
+
+		EqualsVerifierBuilder.builder()
+			.equalsVerifiers(list)
+			.hasCharsetField()
+			.prefabValue(Optional.class, Optional.absent(), Optional.of(5))
+			.verify();
 	}
 	
 	@Test

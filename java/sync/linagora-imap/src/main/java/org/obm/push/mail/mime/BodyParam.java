@@ -32,15 +32,24 @@
 package org.obm.push.mail.mime;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 
 public class BodyParam {
-	
+
 	private final String key;
 	private final String value;
+	private final Optional<String> charset;
+	private final Optional<Integer> groupIndex;
 	
 	public BodyParam(String key, String value) {
+		this(key, value, Optional.<String>absent(), Optional.<Integer>absent());
+	}
+	
+	public BodyParam(String key, String value, Optional<String> charset, Optional<Integer> groupIndex) {
 		this.key = key.toLowerCase().trim();
 		this.value = value;
+		this.charset = charset;
+		this.groupIndex = groupIndex;
 	}
 
 	public String getKey() {
@@ -50,10 +59,18 @@ public class BodyParam {
 	public String getValue() {
 		return value;
 	}
+	
+	public Optional<String> getCharset() {
+		return charset;
+	}
+
+	public Optional<Integer> getGroupIndex() {
+		return groupIndex;
+	}
 
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(key, value);
+		return Objects.hashCode(key, value, groupIndex, charset);
 	}
 	
 	@Override
@@ -63,12 +80,14 @@ public class BodyParam {
 			if (this.key != null && that.key != null && 
 					this.value != null && that.value != null) {
 				return this.key.equalsIgnoreCase(that.key)
-						&& this.value.trim().equalsIgnoreCase(that.value.trim());	
+					&& this.value.trim().equalsIgnoreCase(that.value.trim())
+					&& Objects.equal(this.groupIndex, that.groupIndex)
+					&& Objects.equal(this.charset, that.charset);
 			}
-			if (this.key == null && that.key == null) {
-				return true;
-			}
-			return this.value == null && that.value == null;
+			return Objects.equal(this.key, that.key)
+				&& Objects.equal(this.value, that.value)
+				&& Objects.equal(this.groupIndex, that.groupIndex)
+				&& Objects.equal(this.charset, that.charset);
 		}
 		return false;
 	}
@@ -78,6 +97,8 @@ public class BodyParam {
 		return Objects.toStringHelper(this)
 			.add("key", key)
 			.add("value", value)
+			.add("groupIndex", groupIndex)
+			.add("charset", charset)
 			.toString();
 	}
 }

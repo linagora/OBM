@@ -31,13 +31,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.mail.mime;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -50,10 +61,10 @@ public class BodyParams implements Iterable<BodyParam> {
 	
 	public static class Builder {
 	
-		private final Map<String, BodyParam> params;
+		private final ImmutableListMultimap.Builder<String, BodyParam> params;
 		
 		private Builder() {
-			params = Maps.newHashMap();
+			params = ImmutableListMultimap.builder();
 		}
 
 		public Builder add(BodyParam bodyParam) {
@@ -104,9 +115,87 @@ public class BodyParams implements Iterable<BodyParam> {
 		}
 
 		public BodyParams build() {
-			return new BodyParams(ImmutableMap.copyOf(params));
+			return new BodyParams(transformByGroupingBodyParams(params.build()));
 		}
 
+		private ImmutableMap<String, BodyParam> transformByGroupingBodyParams(ImmutableListMultimap<String, BodyParam> params) {
+			Map<String, BodyParam> transformedMap = Maps.newHashMap();
+
+			GroupedBodyParamBuilder groupBuilder = new GroupedBodyParamBuilder();
+			for (BodyParam bodyParam : params.values()) {
+				if (bodyParam.getGroupIndex().isPresent()) {
+					groupBuilder.add(bodyParam.getGroupIndex().get(), bodyParam);
+				} else {
+					transformedMap.put(bodyParam.getKey(), bodyParam);
+				}
+			}
+			
+			if (groupBuilder.hasItem()) {
+				BodyParam groupedBodyParam = groupBuilder.build();
+				transformedMap.put(groupedBodyParam.getKey(), groupedBodyParam);
+			}
+			
+			return ImmutableMap.copyOf(transformedMap);
+		}
+
+	}
+	
+	private static class GroupedBodyParamBuilder {
+
+		private static final Logger logger = LoggerFactory.getLogger(GroupedBodyParamBuilder.class);
+		private static final String DEFAULT_CHARSET = Charsets.UTF_8.name();
+		
+		private final TreeMap<Integer, String> indexToValueMap;
+		private String groupKey;
+		private String groupCharset;
+
+		public GroupedBodyParamBuilder() {
+			indexToValueMap = Maps.newTreeMap();
+		}
+
+		public void add(int index, BodyParam bodyParam) {
+			indexToValueMap.put(index, bodyParam.getValue());
+			
+			assignGroupKey(bodyParam);
+			assignGroupCharset(bodyParam);
+		}
+
+		private void assignGroupKey(BodyParam bodyParam) {
+			if (groupKey == null) {
+				groupKey = bodyParam.getKey(); 
+			} else if (groupKey != null && !bodyParam.getKey().equals(groupKey)) {
+				throw new IllegalStateException("A key has already been found for this group");
+			}
+		}
+
+		private void assignGroupCharset(BodyParam bodyParam) {
+			if (!bodyParam.getCharset().isPresent()) {
+				return;
+			}
+
+			if (groupCharset == null) {
+				groupCharset = bodyParam.getCharset().get(); 
+			} else if (groupCharset != null && !bodyParam.getCharset().get().equalsIgnoreCase(groupCharset)) {
+				throw new IllegalStateException("A charset has already been found for this group");
+			}
+		}
+
+		public boolean hasItem() {
+			return !indexToValueMap.isEmpty();
+		}
+		
+		public BodyParam build() {
+			String joinedValues = Joiner.on("").join(indexToValueMap.values());
+			try {
+				Charset usingCharset = Charset.forName(Objects.firstNonNull(groupCharset, DEFAULT_CHARSET));
+				String groupValue = URLDecoder.decode(joinedValues, usingCharset.displayName());
+				return new BodyParam(groupKey, groupValue);
+			} catch (UnsupportedEncodingException| UnsupportedCharsetException e) {
+				logger.warn("Charset not supported, returning raw value", e);
+				return new BodyParam(groupKey, joinedValues);
+			}
+		}
+		
 	}
 	
 	private final ImmutableMap<String, BodyParam> params;
