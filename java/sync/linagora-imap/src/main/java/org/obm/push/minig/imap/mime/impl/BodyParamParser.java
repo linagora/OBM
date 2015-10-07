@@ -41,43 +41,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Function;
-
 
 public class BodyParamParser {
 	
 	public static BodyParam parse(String key, String value) {
-		return new BodyParamParser(key, value, new Function<String, String>() {
-			@Override
-			public String apply(String input) {
-				return input;
-			}
-		}).parse();
+		return new BodyParamParser(key, value).parse();
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(BodyParamParser.class);
 	
 	private final String key;
 	private final String value;
-	private String decodedKey;
-	private String decodedValue;
-	private final Function<String, String> keyRewriter;
 	
-	public BodyParamParser(String key, String value, Function<String, String> keyRewriter) {
+	private BodyParamParser(String key, String value) {
 		this.key = key;
 		this.value = value;
-		this.keyRewriter = keyRewriter;
 	}
 	
 	public BodyParam parse() {
 		if (key.endsWith("*")) {
-			decodedKey = key.substring(0, key.length() - 1);
-			decodedValue = decodeAsterixEncodedValue();
+			String decodedKey = key.substring(0, key.length() - 1);
+			return new BodyParam(decodedKey, decodeAsterixEncodedValue());
 		} else {
-			decodedKey = key;
-			decodedValue = decodeQuotedPrintable();
+			return new BodyParam(key, decodeQuotedPrintable());
 		}
-		return new BodyParam(keyRewriter.apply(decodedKey), decodedValue);
 	}
 	
 	
