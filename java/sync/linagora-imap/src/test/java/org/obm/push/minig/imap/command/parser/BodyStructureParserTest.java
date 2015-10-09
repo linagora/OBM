@@ -42,6 +42,7 @@ import org.junit.Test;
 import org.obm.push.mail.mime.MimeMessage;
 import org.obm.push.mail.mime.MimeMessageImpl;
 import org.obm.push.mail.mime.MimePart;
+import org.parboiled.errors.ParserRuntimeException;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -126,6 +127,206 @@ public class BodyStructureParserTest {
 						createSimpleMimePart("TEXT", "HTML", null, null, "QUOTED-PRINTABLE", 533, ImmutableMap.of("CHARSET", "us-ascii"))),
 					createSimpleMimePart("IMAGE", "JPEG", "555343607@11062013-0EC1", "TB_import.JPG", "BASE64", 38260, ImmutableMap.of("NAME", "TB_import.JPG"))),
 				result);
+	}
+	
+	@Test
+	public void testFilenameWithAsterix() {
+		String bs = "("
+				+ "(\"TEXT\" \"HTML\" (\"CHARSET\" \"iso-8859-1\") NIL NIL \"7BIT\" 440 1 NIL NIL NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" (\"NAME\" \"Flyer-rdv compte 50.pdf\") NIL NIL \"BASE64\" 1284767 NIL (\"ATTACHMENT\" (\"FILENAME*\" {27}Flyer-rdv%20compte%2050.pdf)) NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" (\"NAME\" \"Flyer502.png\") \"<image1>\" NIL \"BASE64\" 663451 NIL (\"INLINE\" (\"FILENAME\" \"Flyer502.png\")) NIL)"
+				+ " \"RELATED\" (\"BOUNDARY\" \"----=_Part_18061_639893781.1426286004062\") NIL NIL)";
+		MimePart result = parseStringAsBodyStructure(bs);
+		checkMimeTree(
+			createSimpleMimeTree("multipart", "related", null, null, ImmutableMap.of("BOUNDARY", "----=_Part_18061_639893781.1426286004062"),
+				createSimpleMimePart("TEXT", "HTML", null, null, "7BIT", 440, ImmutableMap.of("CHARSET", "iso-8859-1")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", null, null, "BASE64", 1284767, 
+					ImmutableMap.of("NAME", "Flyer-rdv compte 50.pdf", "FILENAME", "Flyer-rdv compte 50.pdf")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "image1", null, "BASE64", 663451, 
+					ImmutableMap.of("NAME", "Flyer502.png", "FILENAME", "Flyer502.png"))),
+			result);
+	}
+	
+	@Test
+	public void testMultipleFilenameWithAsterix() {
+		String bs = "("
+				+ "(\"TEXT\" \"HTML\" (\"CHARSET\" \"iso-8859-1\") NIL NIL \"7BIT\" 440 1 NIL NIL NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" ("
+						+ "\"NAME*1*\" {43}utf-8''%42%41%20%2B%20%51%53%20%5F%20%41%73 "
+						+ "\"NAME*2*\" {36}%73%75%72%61%6E%63%65%20%44%C3%A9%63 "
+						+ "\"NAME*3*\" {36}%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"NAME*4*\" {39}%65%73%74%69%73%73%65%75%72%2E%70%64%66) "
+					+ "\"<3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com>\" NIL \"BASE64\" 1284767 NIL (\"ATTACHMENT\" ("
+						+ "\"FILENAME*1*\" {43}utf-8''%42%41%20%2B%20%51%53%20%5F%20%41%73 "
+						+ "\"FILENAME*2*\" {36}%73%75%72%61%6E%63%65%20%44%C3%A9%63 "
+						+ "\"FILENAME*3*\" {36}%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"FILENAME*4*\" {39}%65%73%74%69%73%73%65%75%72%2E%70%64%66)) NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" (\"NAME\" \"Flyer502.png\") \"<image1>\" NIL \"BASE64\" 663451 NIL (\"INLINE\" (\"FILENAME\" \"Flyer502.png\")) NIL)"
+				+ " \"RELATED\" (\"BOUNDARY\" \"----=_Part_18061_639893781.1426286004062" + 
+				"\") NIL NIL)";
+		MimePart result = parseStringAsBodyStructure(bs);
+		checkMimeTree(
+			createSimpleMimeTree("multipart", "related", null, null, ImmutableMap.of("BOUNDARY", "----=_Part_18061_639893781.1426286004062"),
+				createSimpleMimePart("TEXT", "HTML", null, null, "7BIT", 440, ImmutableMap.of("CHARSET", "iso-8859-1")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com", null, "BASE64", 1284767, 
+					ImmutableMap.of(
+						"NAME", "BA + QS _ Assurance Décès pour Investisseur.pdf", 
+						"FILENAME", "BA + QS _ Assurance Décès pour Investisseur.pdf")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "image1", null, "BASE64", 663451, 
+					ImmutableMap.of("NAME", "Flyer502.png", "FILENAME", "Flyer502.png"))),
+			result);
+	}
+	
+	@Test
+	public void testMultipleFilenameWithAsterixWhenCharsetIsNotDefined() {
+		String bs = "("
+				+ "(\"TEXT\" \"HTML\" (\"CHARSET\" \"iso-8859-1\") NIL NIL \"7BIT\" 440 1 NIL NIL NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" ("
+						+ "\"NAME*1*\" {36}%42%41%20%2B%20%51%53%20%5F%20%41%73 "
+						+ "\"NAME*2*\" {36}%73%75%72%61%6E%63%65%20%44%C3%A9%63 "
+						+ "\"NAME*3*\" {36}%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"NAME*4*\" {39}%65%73%74%69%73%73%65%75%72%2E%70%64%66) "
+					+ "\"<3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com>\" NIL \"BASE64\" 1284767 NIL (\"ATTACHMENT\" ("
+						+ "\"FILENAME*1*\" {36}%42%41%20%2B%20%51%53%20%5F%20%41%73 "
+						+ "\"FILENAME*2*\" {36}%73%75%72%61%6E%63%65%20%44%C3%A9%63 "
+						+ "\"FILENAME*3*\" {36}%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"FILENAME*4*\" {39}%65%73%74%69%73%73%65%75%72%2E%70%64%66)) NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" (\"NAME\" \"Flyer502.png\") \"<image1>\" NIL \"BASE64\" 663451 NIL (\"INLINE\" (\"FILENAME\" \"Flyer502.png\")) NIL)"
+				+ " \"RELATED\" (\"BOUNDARY\" \"----=_Part_18061_639893781.1426286004062" + 
+				"\") NIL NIL)";
+		MimePart result = parseStringAsBodyStructure(bs);
+		checkMimeTree(
+			createSimpleMimeTree("multipart", "related", null, null, ImmutableMap.of("BOUNDARY", "----=_Part_18061_639893781.1426286004062"),
+				createSimpleMimePart("TEXT", "HTML", null, null, "7BIT", 440, ImmutableMap.of("CHARSET", "iso-8859-1")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com", null, "BASE64", 1284767, 
+					ImmutableMap.of(
+						"NAME", "BA + QS _ Assurance Décès pour Investisseur.pdf", 
+						"FILENAME", "BA + QS _ Assurance Décès pour Investisseur.pdf")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "image1", null, "BASE64", 663451, 
+					ImmutableMap.of("NAME", "Flyer502.png", "FILENAME", "Flyer502.png"))),
+			result);
+	}
+	
+	@Test
+	public void testMultipleFilenameWithAsterixWhenCharsetIsNotSupported() {
+		String bs = "("
+				+ "(\"TEXT\" \"HTML\" (\"CHARSET\" \"iso-8859-1\") NIL NIL \"7BIT\" 440 1 NIL NIL NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" ("
+						+ "\"NAME*1*\" {57}unsupported-charset''%42%41%20%2B%20%51%53%20%5F%20%41%73) "
+					+ "\"<3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com>\" NIL \"BASE64\" 1284767 NIL (\"ATTACHMENT\" ("
+						+ "\"FILENAME*1*\" {57}unsupported-charset''%42%41%20%2B%20%51%53%20%5F%20%41%73)) NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" (\"NAME\" \"Flyer502.png\") \"<image1>\" NIL \"BASE64\" 663451 NIL (\"INLINE\" (\"FILENAME\" \"Flyer502.png\")) NIL)"
+				+ " \"RELATED\" (\"BOUNDARY\" \"----=_Part_18061_639893781.1426286004062" + 
+				"\") NIL NIL)";
+		MimePart result = parseStringAsBodyStructure(bs);
+		checkMimeTree(
+			createSimpleMimeTree("multipart", "related", null, null, ImmutableMap.of("BOUNDARY", "----=_Part_18061_639893781.1426286004062"),
+				createSimpleMimePart("TEXT", "HTML", null, null, "7BIT", 440, ImmutableMap.of("CHARSET", "iso-8859-1")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com", null, "BASE64", 1284767, 
+					ImmutableMap.of(
+						"NAME", "%42%41%20%2B%20%51%53%20%5F%20%41%73", 
+						"FILENAME", "%42%41%20%2B%20%51%53%20%5F%20%41%73")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "image1", null, "BASE64", 663451, 
+					ImmutableMap.of("NAME", "Flyer502.png", "FILENAME", "Flyer502.png"))),
+			result);
+	}
+	
+	@Test
+	public void testMultipleFilenameWithAsterixWhenSameCharsetDefinedMultipleTimes() {
+		String bs = "("
+				+ "(\"TEXT\" \"HTML\" (\"CHARSET\" \"iso-8859-1\") NIL NIL \"7BIT\" 440 1 NIL NIL NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" ("
+						+ "\"NAME*1*\" {43}utf-8''%42%41%20%2B%20%51%53%20%5F%20%41%73 "
+						+ "\"NAME*2*\" {36}%73%75%72%61%6E%63%65%20%44%C3%A9%63 "
+						+ "\"NAME*3*\" {36}%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"NAME*4*\" {46}utf-8''%65%73%74%69%73%73%65%75%72%2E%70%64%66) "
+					+ "\"<3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com>\" NIL \"BASE64\" 1284767 NIL (\"ATTACHMENT\" ("
+						+ "\"FILENAME*1*\" {43}utf-8''%42%41%20%2B%20%51%53%20%5F%20%41%73 "
+						+ "\"FILENAME*2*\" {36}%73%75%72%61%6E%63%65%20%44%C3%A9%63 "
+						+ "\"FILENAME*3*\" {43}utf-8''%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"FILENAME*4*\" {39}%65%73%74%69%73%73%65%75%72%2E%70%64%66)) NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" (\"NAME\" \"Flyer502.png\") \"<image1>\" NIL \"BASE64\" 663451 NIL (\"INLINE\" (\"FILENAME\" \"Flyer502.png\")) NIL)"
+				+ " \"RELATED\" (\"BOUNDARY\" \"----=_Part_18061_639893781.1426286004062" + 
+				"\") NIL NIL)";
+		MimePart result = parseStringAsBodyStructure(bs);
+		checkMimeTree(
+			createSimpleMimeTree("multipart", "related", null, null, ImmutableMap.of("BOUNDARY", "----=_Part_18061_639893781.1426286004062"),
+				createSimpleMimePart("TEXT", "HTML", null, null, "7BIT", 440, ImmutableMap.of("CHARSET", "iso-8859-1")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com", null, "BASE64", 1284767, 
+					ImmutableMap.of(
+						"NAME", "BA + QS _ Assurance Décès pour Investisseur.pdf", 
+						"FILENAME", "BA + QS _ Assurance Décès pour Investisseur.pdf")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "image1", null, "BASE64", 663451, 
+					ImmutableMap.of("NAME", "Flyer502.png", "FILENAME", "Flyer502.png"))),
+			result);
+	}
+	
+	@Test
+	public void testMultipleFilenameWithAsterixWithUnexpecteedOrdering() {
+		String bs = "("
+				+ "(\"TEXT\" \"HTML\" (\"CHARSET\" \"iso-8859-1\") NIL NIL \"7BIT\" 440 1 NIL NIL NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" ("
+						+ "\"NAME*3*\" {36}%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"NAME*1*\" {43}utf-8''%42%41%20%2B%20%51%53%20%5F%20%41%73 "
+						+ "\"NAME*4*\" {39}%65%73%74%69%73%73%65%75%72%2E%70%64%66) "
+					+ "\"<3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com>\" NIL \"BASE64\" 1284767 NIL (\"ATTACHMENT\" ("
+						+ "\"FILENAME*1*\" {36}%42%41%20%2B%20%51%53%20%5F%20%41%73 "
+						+ "\"FILENAME*4*\" {46}utf-8''%65%73%74%69%73%73%65%75%72%2E%70%64%66 "
+						+ "\"FILENAME*3*\" {36}%C3%A8%73%20%70%6F%75%72%20%49%6E%76)) NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" (\"NAME\" \"Flyer502.png\") \"<image1>\" NIL \"BASE64\" 663451 NIL (\"INLINE\" (\"FILENAME\" \"Flyer502.png\")) NIL)"
+				+ " \"RELATED\" (\"BOUNDARY\" \"----=_Part_18061_639893781.1426286004062" + 
+				"\") NIL NIL)";
+		MimePart result = parseStringAsBodyStructure(bs);
+		checkMimeTree(
+			createSimpleMimeTree("multipart", "related", null, null, ImmutableMap.of("BOUNDARY", "----=_Part_18061_639893781.1426286004062"),
+				createSimpleMimePart("TEXT", "HTML", null, null, "7BIT", 440, ImmutableMap.of("CHARSET", "iso-8859-1")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com", null, "BASE64", 1284767, 
+					ImmutableMap.of(
+						"NAME", "BA + QS _ Asès pour Investisseur.pdf", 
+						"FILENAME", "BA + QS _ Asès pour Investisseur.pdf")),
+				createSimpleMimePart("APPLICATION", "OCTET-STREAM", "image1", null, "BASE64", 663451, 
+					ImmutableMap.of("NAME", "Flyer502.png", "FILENAME", "Flyer502.png"))),
+			result);
+	}
+	
+	@Test(expected=ParserRuntimeException.class)
+	public void testMultipleFilenameWithAsterixWithMixedBodyParamNameShouldTriggerAnException() {
+		String bs = "("
+				+ "(\"TEXT\" \"HTML\" (\"CHARSET\" \"iso-8859-1\") NIL NIL \"7BIT\" 440 1 NIL NIL NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" ("
+						+ "\"NAME*3*\" {36}%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"UNEXPECTED*1*\" {36}%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"NAME*1*\" {43}utf-8''%42%41%20%2B%20%51%53%20%5F%20%41%73 "
+						+ "\"NAME*4*\" {39}%65%73%74%69%73%73%65%75%72%2E%70%64%66) "
+					+ "\"<3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com>\" NIL \"BASE64\" 1284767 NIL (\"ATTACHMENT\" ("
+						+ "\"FILENAME*2*\" {36}%73%75%72%61%6E%63%65%20%44%C3%A9%63 "
+						+ "\"UNEXPECTED*1*\" {36}%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"FILENAME*4*\" {39}utf-8''%65%73%74%69%73%73%65%75%72%2E%70%64%66)) NIL)"
+						+ "\"FILENAME*3*\" {36}%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" (\"NAME\" \"Flyer502.png\") \"<image1>\" NIL \"BASE64\" 663451 NIL (\"INLINE\" (\"FILENAME\" \"Flyer502.png\")) NIL)"
+				+ " \"RELATED\" (\"BOUNDARY\" \"----=_Part_18061_639893781.1426286004062" + 
+				"\") NIL NIL)";
+		parseStringAsBodyStructure(bs);
+	}
+
+	@Test(expected=ParserRuntimeException.class)
+	public void testMultipleFilenameWithAsterixWithMixedBodyParamCharsetShouldTriggerAnException() {
+		String bs = "("
+				+ "(\"TEXT\" \"HTML\" (\"CHARSET\" \"iso-8859-1\") NIL NIL \"7BIT\" 440 1 NIL NIL NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" ("
+						+ "\"NAME*1*\" {43}utf-8''%42%41%20%2B%20%51%53%20%5F%20%41%73 "
+						+ "\"NAME*2*\" {36}%73%75%72%61%6E%63%65%20%44%C3%A9%63 "
+						+ "\"NAME*3*\" {48}iso-8859-1''%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"NAME*4*\" {39}%65%73%74%69%73%73%65%75%72%2E%70%64%66) "
+					+ "\"<3b1a53bf-8776-4156-0178-cb5d38fdcd72@icloud.com>\" NIL \"BASE64\" 1284767 NIL (\"ATTACHMENT\" ("
+						+ "\"FILENAME*1*\" {43}utf-8''%42%41%20%2B%20%51%53%20%5F%20%41%73 "
+						+ "\"FILENAME*2*\" {36}%73%75%72%61%6E%63%65%20%44%C3%A9%63 "
+						+ "\"FILENAME*3*\" {48}iso-8859-1''%C3%A8%73%20%70%6F%75%72%20%49%6E%76 "
+						+ "\"FILENAME*4*\" {39}%65%73%74%69%73%73%65%75%72%2E%70%64%66)) NIL)"
+				+ "(\"APPLICATION\" \"OCTET-STREAM\" (\"NAME\" \"Flyer502.png\") \"<image1>\" NIL \"BASE64\" 663451 NIL (\"INLINE\" (\"FILENAME\" \"Flyer502.png\")) NIL)"
+				+ " \"RELATED\" (\"BOUNDARY\" \"----=_Part_18061_639893781.1426286004062" + 
+				"\") NIL NIL)";
+		parseStringAsBodyStructure(bs);
 	}
 	
 	@Test
