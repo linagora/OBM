@@ -85,9 +85,9 @@ else
 fi
 
 if [ ! -s $FIC_PID_POSTFIX ]; then
-	/etc/init.d/postfix start
+	service postfix start
 else
-	/etc/init.d/postfix restart
+	service postfix restart
 fi
 
 echo

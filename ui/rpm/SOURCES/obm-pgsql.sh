@@ -84,7 +84,7 @@ if [ "${OBM_HOST}" != "127.0.0.1" ]; then
 	fi
 fi
 if [ "${restart_pgsql}" -eq 1 ]; then
-	/etc/init.d/postgresql restart
+	service postgresql restart
 	 while [ ! -S /tmp/.s.PGSQL.5432 ];do
                 echo "Attente de PostgreSQL"
                 sleep 2

@@ -95,15 +95,15 @@ else
 fi
 
 if [ ! -s $FIC_PID_CYRUS ]; then
-	/etc/init.d/cyrus-imapd start
+	service cyrus-imapd start
 else
-	/etc/init.d/cyrus-imapd restart
+	service cyrus-imapd restart
 fi
 
 if [ ! -s $FIC_SASL_PID ]; then
-	/etc/init.d/saslauthd start
+	service saslauthd start
 else
-	/etc/init.d/saslauthd restart
+	service saslauthd restart
 fi
 
 echo

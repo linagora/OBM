@@ -79,7 +79,7 @@ if [ -x $BINOBM/obm-funambol-storage ] && [ -s $BINOBM/obm-funambol-storage ] ;t
 #		sed -i -e "s/^\(local.*\)$/local ${FU_DBNAME} ${FU_DBUSER} trust\n\1/" /var/lib/pgsql/data/pg_hba.conf
 #		sed -i -e "s/^\(host.*\)$/host ${FU_DBNAME} ${FU_DBUSER} ${FU_HOST}\/32 trust\n\1/" /var/lib/pgsql/data/pg_hba.conf
 	#	echo "Redémarrage de PostgreSQL pour prise en compte des nouveaux droits"
-	#	/etc/init.d/postgresql restart
+	#	service postgresql restart
 	#	while [ ! -S /tmp/.s.PGSQL.5432 ];do
 	#		echo "Attente de PostgreSQL"
 	#		sleep 2

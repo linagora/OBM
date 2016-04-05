@@ -107,7 +107,7 @@ if [ -e $FIC_HTTPD_OBM ]; then
                 sed -i -e "s%#opush#%%" ${FIC_HTTPD_OBM}
                 sed -i -e "s%_OPUSH_SERVER_%${opush_server}%" ${FIC_HTTPD_OBM}
 
-		/etc/init.d/httpd restart
+		service httpd restart
 	fi
 else
 	echo "$0 (Err): the file $FIC_HTTPD_OBM doesn't exist."
