@@ -23,7 +23,7 @@ PROVISIONING_RUNNABLE="/usr/share/obm-provisioning/provisioning-start.sh"
 JAVA_OPTS="\"-Xmx200m -Djava.awt.headless=true\""
 
 if [ -z "$JAVA_HOME" ]; then
-    JAVA_HOME="/usr/lib/jvm/jre-1.7.0-openjdk."`arch`
+    JAVA_HOME="/usr/lib/jvm/jre-1.7.0"
 fi
 
 if [ -z "$SHUTDOWN_WAIT" ]; then
