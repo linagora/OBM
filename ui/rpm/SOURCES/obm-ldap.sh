@@ -57,13 +57,6 @@ case $OBM_DBTYPE in
     fi
     ;;
 
-  MYSQL)
-    if [ ! -e /usr/bin/mysql ] ; then
-      echo "$0 (Err) Please run: yum install mysql"
-      exit 1
-    fi
-    ;;
-
   *)
     echo "$0 (Err) OBM_DBTYPE missconfigured"
     exit 1
@@ -152,18 +145,11 @@ if [ -e ${REP_ETC_LDAP}/slapd.conf ]; then
 			
 		fi
 		# Mise à jour du mdp rootdn
-		if [ ${OBM_DBTYPE} == "MYSQL" ]; then
-			MDP_BD=`mysql -u ${OBM_DBUSER} -p${OBM_PASSWD} ${OBM_DBNAME} -NB -e \
-				"SELECT usersystem_password 
-				FROM UserSystem 
-				WHERE usersystem_login = 'ldapadmin'"`
+		MDP_BD=`psql -t -U ${OBM_DBUSER} ${OBM_DBNAME} -h ${OBM_HOST} -c \
+			"SELECT usersystem_password 
+			FROM usersystem 
+			WHERE usersystem_login = 'ldapadmin'"`
 
-		elif [ ${OBM_DBTYPE} == "PGSQL" ]; then
-			MDP_BD=`psql -t -U ${OBM_DBUSER} ${OBM_DBNAME} -h ${OBM_HOST} -c \
-				"SELECT usersystem_password 
-				FROM usersystem 
-				WHERE usersystem_login = 'ldapadmin'"`
-		fi 
 		if [ -z "$MDP_BD" ] ; then
 			echo "$0 (Err): Access denied to DB ${OBM_HOST}"
 			exit 1

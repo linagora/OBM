@@ -88,17 +88,9 @@ PG_LDAPADMIN_PW="UPDATE usersystem SET usersystem_password = '${rootpw}' WHERE u
 PG_SAMBA_PW="UPDATE usersystem SET usersystem_password = '${sambapw}' WHERE usersystem_login = 'samba';"
 PG_CYRUS_PW="UPDATE usersystem SET usersystem_password = '${cyruspw}' WHERE usersystem_login = 'cyrus';"
 
-# MYSQL update/insert requests
-MY_SYNCREPL="INSERT into UserSystem (usersystem_login,usersystem_password,usersystem_uid,usersystem_gid,usersystem_homedir,usersystem_lastname,usersystem_firstname,usersystem_shell) VALUES ('syncrepl','${synreplpw}','102','65534','/','LDAP Syncrepl user','LDAP Syncrepl user','/sbin/nologin');"
-MY_LDAPADMIN_PW="UPDATE UserSystem SET usersystem_password = '${rootpw}' WHERE usersystem_login = 'ldapadmin';"
-MY_SAMBA_PW="UPDATE UserSystem SET usersystem_password = '${sambapw}' WHERE usersystem_login = 'samba';"
-MY_CYRUS_PW="UPDATE UserSystem SET usersystem_password = '${cyruspw}' WHERE usersystem_login = 'cyrus';"
-
 echo "Inserting system users into the database..."
-if [ "${OBM_DBTYPE}" == "PGSQL" ]; then
-export PGPASSWORD="${OBM_PASSWD}";
 
-export PGPASSWORD=${OBM_PASSWD}
+export PGPASSWORD="${OBM_PASSWD}";
 psql -U ${OBM_DBUSER} -h ${OBM_HOST} ${OBM_DBNAME} -c "SELECT nextval('usersystem_usersystem_id_seq');" 1>/dev/null 2>&1
 	if [ "x${add_synrepl}" == "xy" ]; then 
 		psql -U ${OBM_DBUSER} -h ${OBM_HOST} ${OBM_DBNAME} -c "${PG_SYNCREPL}" \
@@ -117,31 +109,6 @@ psql -U ${OBM_DBUSER} -h ${OBM_HOST} ${OBM_DBNAME} -c "SELECT nextval('usersyste
 	fi
 
 	unset PGPASSWORD
-
-elif [ "${OBM_DBTYPE}" == "MYSQL" ];then
-	if [ "x${add_synrepl}" == "xy" ]; then
-		mysql -u ${OBM_DBUSER} -h ${OBM_HOST} \
-			-p${OBM_PASSWD} ${OBM_DBNAME} -e \
-			"${MY_SYNCREPL}" 1>/dev/null 2>&1
-	fi
-	if [ "${sambapw}" != 'm#Pa!NtA' ]; then
-		mysql -u ${OBM_DBUSER} -h ${OBM_HOST} \
-			-p${OBM_PASSWD} ${OBM_DBNAME} -e \
-			"${MY_SAMBA_PW}" 1>/dev/null 2>&1
-		
-	fi	
-	if [ "${rootpw}" != "mdp3PaAL" ]; then
-		mysql -u ${OBM_DBUSER} -h ${OBM_HOST} \
-			-p${OBM_PASSWD} ${OBM_DBNAME} -e \
-			"${MY_LDAPADMIN_PW}" 1>/dev/null 2>&1
-	fi
-	if [ "${cyruspw}" != "cyrus" ]; then
-		mysql -u ${OBM_DBUSER} -h ${OBM_HOST} \
-			-p${OBM_PASSWD} ${OBM_DBNAME} -e \
-			"${MY_CYRUS_PW}" 1>/dev/null 2>&1
-	fi
-	
-fi
 
 echo
 echo -e "================= End of OBM system user configuration ==================\n"

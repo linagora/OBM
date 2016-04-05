@@ -42,13 +42,7 @@ fi
 #	quel type de BD installer
 . ${OBMCONF}
 
-if [ "x$OBM_DBTYPE" == "xPGSQL" -a -x $BINOBM/obm-pgsql ]; then
-	${BINOBM}/obm-pgsql
-elif [ "x$OBM_DBTYPE" == "xMYSQL" -a -x ${BINOBM}/obm-mysql ]; then
-	${BINOBM}/obm-mysql
-else 
-	echo "Erreur dans le type de la base OBM"
-fi
+${BINOBM}/obm-pgsql
 
 if [ -x $BINOBM/obm-sysusers ]; then
 	${BINOBM}/obm-sysusers

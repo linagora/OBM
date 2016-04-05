@@ -77,17 +77,7 @@ echo -e "o Please enter the DataBase hostname: \c"
 read value
 echo "OBM_HOST=$value" >> $obmconf
 
-echo -e "o Please enter the DataBase type (MYSQL/PGSQL): \c"
-read value
-if [ "x$value" == "x" ];then
-	echo "OBM_DBTYPE=MYSQL" >> $obmconf
-fi
-if [ "$value" != "MYSQL" -o "$value" != "PGSQL" ];then
-	value=`echo $value | tr '[:lower:]' '[:upper:]'`
-	echo "OBM_DBTYPE=$value" >> $obmconf
-else
-	echo "OBM_DBTYPE=$value" >> $obmconf
-fi
+echo "OBM_DBTYPE=PGSQL" >> $obmconf
 
 echo -e "o Enter the DataBase name: \c"
 read value
