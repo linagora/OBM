@@ -59,7 +59,7 @@ fi
 
 
 # Modules stuff
-for modules in LDAP MAIL SAMBA WEB ; do
+for modules in LDAP MAIL ; do
 	echo -e "o Enable module $modules, (y)es (n)o : \c"
 	read value
 		if [ "x$value" = "xy" -o "x$value" = "yes" ] ; then
@@ -70,6 +70,9 @@ for modules in LDAP MAIL SAMBA WEB ; do
 			fi
 		fi
 done
+
+echo "SAMBA_MODULE=false" >> $obmconf
+echo "WEB_MODULE=false" >> $obmconf
               
 echo -e "\n"
 echo -e "=============== OBM DataBase configuration ================\n"
