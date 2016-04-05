@@ -157,6 +157,7 @@ Requires:	perl-LDAP
 Requires:	perl-XML-Simple
 Requires:	perl-core
 Requires:	cyrus-sasl-plain
+Requires:	perl(LWP::Protocol::https)
 
 %description	services
 This package is responsible for propagating changes in OBM to third-party

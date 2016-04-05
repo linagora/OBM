@@ -53,6 +53,7 @@ Requires:       perl(Class::Singleton)
 Requires:       perl(Digest::SHA)
 Requires:       perl(Time::HiRes)
 Requires:       perl(Config::IniFiles)
+Requires:       perl(IO::Socket::INET6)
 
 %description    -n perl-ObmSatellite
 This package contains the library used by obm-satellite to interact with Cyrus
