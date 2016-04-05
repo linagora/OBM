@@ -5,7 +5,7 @@
 %global _source_payload w9.gzdio
 
 Name:           obm-release
-Version:        3.1
+Version:        3.2
 Release:        2
 Summary:        Open Business Management repository configuration
 Group:          System Environment/Base
@@ -48,14 +48,17 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/yum.repos.d/*
 
 %changelog
+* Wed Apr 06 2016 OBM <lgs-obm-dev@linagora.com> - 3.2-1
+  3.2 release
+
 * Wed Sep 02 2015 Nicolas Chauvet <nchauvet@linagora.com> - 3.1-2
-- Avoid contrib if unavailable
+  - Avoid contrib if unavailable
 
 * Mon Dec 1 2014 OBM <lgs-obm-dev@linagora.com> - 3.1-1
-        3.1 release.
+  3.1 release.
 
 * Wed Dec 18 2013 Jeremie Kornobis <jkornobis@linagora.com> - 2.6-1
   2.6 release.
 
 * Wed Aug 28 2012 Erwan Queffelec <equeffelec@linagora.com> - 2.4-1
-	Initial release.
+  Initial release.
