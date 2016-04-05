@@ -81,31 +81,34 @@ if [ -e $FIC_HTTPD_OBM ]; then
 	echo "The $FIC_HTTPD_OBM file already exists"
 	echo -e "Do you want to replace it? (y)es,(n)o ?\c"
 	read replace_httpd_conf
+
 	if [ "x$replace_httpd_conf" == "xy" ]; then
 		cp $FIC_HTTPD_OBM ${FIC_HTTPD_OBM}.old
-		sed -i -e "s%.*ServerName.*%ServerName ${EXTERNALURL}%" ${FIC_HTTPD_OBM}
-                sed -i -e "s%.*DocumentRoot.*%DocumentRoot /usr/share/obm/php%" ${FIC_HTTPD_OBM} 
-                sed -i -e "s%.*ErrorLog.*%ErrorLog /var/log/httpd/obm-error.log%" ${FIC_HTTPD_OBM} 
-                sed -i -e "s%.*CustomLog.*%CustomLog /var/log/httpd/obm-access.log common%" ${FIC_HTTPD_OBM} 
-                sed -i -e "s%.*Alias.*/images.*%Alias /images /usr/share/obm/resources%" ${FIC_HTTPD_OBM} 
-                sed -i -e "s%.*include_path.*%php_value include_path  \".:/usr/share/obm\"%" ${FIC_HTTPD_OBM} 
-                # Activation SSL dans la conf obm apache
-                #echo "Activation SSL directive to obm apache config"
-                #sed -i -e '/## SSL/ , /## End SSL/ s/#//' ${FIC_HTTPD_CONF}
-                #sed -i -e '/## Rewrite SLL/ , /## End Rewrite SLL/ s/#//' ${FIC_HTTPD_CONF}
-                #sed -i -e "s/^NameVirtualHost \*:80/NameVirtualHost *:443/" ${FIC_HTTPD_CONF}
-                #sed -i -e "s/^<VirtualHost \*:80>/<VirtualHost *:443>/" ${FIC_HTTPD_CONF}
-                echo "Activation of the Tomcat proxy"
-                echo -e "what is the IP adress of the OBM-TOMCAT server (obm-sync, funambol) ?\c"
-                read tomcat_server
-                sed -i -e "s%#obm#%%" ${FIC_HTTPD_OBM}
-                sed -i -e "s%_TOMCAT_SERVER_%${tomcat_server}%" ${FIC_HTTPD_OBM}
-                echo "Activation of the opush proxy"
 
-                echo -e "what is the IP adress of the OPUSH server ?\c"
-                read opush_server
-                sed -i -e "s%#opush#%%" ${FIC_HTTPD_OBM}
-                sed -i -e "s%_OPUSH_SERVER_%${opush_server}%" ${FIC_HTTPD_OBM}
+    sed -i -e "s%.*ServerName.*%ServerName ${EXTERNALURL}%" ${FIC_HTTPD_OBM}
+    sed -i -e "s%.*DocumentRoot.*%DocumentRoot /usr/share/obm/php%" ${FIC_HTTPD_OBM} 
+    sed -i -e "s%.*ErrorLog.*%ErrorLog /var/log/httpd/obm-error.log%" ${FIC_HTTPD_OBM} 
+    sed -i -e "s%.*CustomLog.*%CustomLog /var/log/httpd/obm-access.log common%" ${FIC_HTTPD_OBM} 
+    sed -i -e "s%.*Alias.*/images.*%Alias /images /usr/share/obm/resources%" ${FIC_HTTPD_OBM} 
+    sed -i -e "s%.*include_path.*%php_value include_path  \".:/usr/share/obm\"%" ${FIC_HTTPD_OBM} 
+
+    echo "Activation of the Provisioning proxy"
+    echo -e "what is the IP adress of the obm-provisioning server ?\c"
+    read provisioning_server
+    sed -i -e "s%#provisioning#%%" ${FIC_HTTPD_OBM}
+    sed -i -e "s%_PROVISIONING_SERVER_%${provisioning_server}%" ${FIC_HTTPD_OBM}
+
+    echo "Activation of the Tomcat proxy"
+    echo -e "what is the IP adress of the OBM-TOMCAT server (obm-sync, funambol) ?\c"
+    read tomcat_server
+    sed -i -e "s%#obm#%%" ${FIC_HTTPD_OBM}
+    sed -i -e "s%_TOMCAT_SERVER_%${tomcat_server}%" ${FIC_HTTPD_OBM}
+
+    echo "Activation of the opush proxy"
+    echo -e "what is the IP adress of the OPUSH server ?\c"
+    read opush_server
+    sed -i -e "s%#opush#%%" ${FIC_HTTPD_OBM}
+    sed -i -e "s%_OPUSH_SERVER_%${opush_server}%" ${FIC_HTTPD_OBM}
 
 		service httpd restart
 	fi
