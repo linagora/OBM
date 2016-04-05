@@ -23,7 +23,7 @@ LOCATOR_RUNNABLE="/usr/share/obm-locator/obm-locator-start.sh"
 JAVA_OPTS="\"-Xmx100m -Djava.awt.headless=true\""
 
 if [ -z "$JAVA_HOME" ]; then
-    JAVA_HOME="/usr/lib/jvm/jre-1.7.0-openjdk."`arch`
+    JAVA_HOME="/usr/lib/jvm/jre-1.7.0"
 fi
 
 if [ -z "$SHUTDOWN_WAIT" ]; then
