@@ -34,7 +34,6 @@ $required_libs = array(
     'Net_SMTP'  => 'pear.php.net',
     'Net_IDNA2' => 'pear.php.net',
     'Mail_mime' => 'pear.php.net',
-    'Mail_mimeDecode' => 'pear.php.net',
 );
 
 $optional_libs = array(
@@ -82,7 +81,6 @@ $source_urls = array(
     'PEAR'      => 'http://pear.php.net',
     'Net_SMTP'  => 'http://pear.php.net/package/Net_SMTP',
     'Mail_mime' => 'http://pear.php.net/package/Mail_mime',
-    'Mail_mimeDecode' => 'http://pear.php.net/package/Mail_mimeDecode',
     'Net_IDNA2' => 'http://pear.php.net/package/Net_IDNA2',
     'Net_LDAP3' => 'https://git.kolab.org/diffusion/PNL',
 );
@@ -95,8 +93,14 @@ echo '<input type="hidden" name="_step" value="' . ($RCI->configured ? 3 : 2) . 
 
 define('MIN_PHP_VERSION', '5.3.7');
 if (version_compare(PHP_VERSION, MIN_PHP_VERSION, '>=')) {
-    $RCI->pass('Version', 'PHP ' . PHP_VERSION . ' detected');
-} else {
+    if (PHP_MAJOR_VERSION != 5) {
+        $RCI->fail('Version', 'PHP5 is required, ' . PHP_VERSION . ' detected');
+    }
+    else {
+        $RCI->pass('Version', 'PHP ' . PHP_VERSION . ' detected');
+    }
+}
+else {
     $RCI->fail('Version', 'PHP Version ' . MIN_PHP_VERSION . ' or greater is required ' . PHP_VERSION . ' detected');
 }
 ?>
