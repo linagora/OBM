@@ -3461,8 +3461,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts,
          }else{
            $comment_style = 'text-align:center;';
            $resource_comment_display =  "
-           <a class=\"editcomment\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.commentedDecisionPopup.compute($r_id, $id,'ACCEPTED', '$state', 'resource', '$GLOBALS[l_add_comment]...', '$escaped_title', 'detailconsult', 'placeholder')\" />
-           <a class=\"editcomment\" onclick=\"obm.calendarCommentPopup.compute($r_id, $id , '$GLOBALS[l_add_comment]...', 'resource', true);\" title=\"$l_add\"></a>";
+           <a class=\"editcomment\" name=\"rd_contact_decision\" value=\"ACCEPTED\" onclick=\"obm.commentedDecisionPopup.compute($r_id, $id,'ACCEPTED', '$state', 'resource', '$GLOBALS[l_add_comment]...', '$escaped_title', 'detailconsult', 'placeholder')\" />";
          }
           $escaped_title = phpStringToJsString(str_replace("\n\r", ', ', $title));
           $label = $entity['label'];
