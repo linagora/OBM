@@ -10783,7 +10783,7 @@ function html_calendar_file_block() {
   }
 
   $ini_max_filesize = upload_max_filesize_to_bytes(ini_get('upload_max_filesize'));
-  $space_left_in_bytes = $c_quota_private_document - run_query_calendar_user_quota($obm['uid']);
+  $space_left_in_bytes = min($ini_max_filesize, $c_quota_private_document) - run_query_calendar_user_quota($obm['uid']);
 
   return "<th class='' id='calendarFileBlock'>
     $GLOBALS[l_other_files]
