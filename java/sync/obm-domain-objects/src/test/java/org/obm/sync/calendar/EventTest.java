@@ -1405,6 +1405,7 @@ public class EventTest {
 		assertThat(att1.getParticipation()).isEqualTo(Participation.needsAction());
 	}
 
+	@Test
 	public void testAcceptedAttendeeWithoutDelegationEndsUpInNeedsAction() {
 		Event event = createNonRecurrentEventWithMostFields();
 		List<Attendee> attendees = event.getAttendees();
@@ -1414,6 +1415,55 @@ public class EventTest {
 		event.updateParticipation();
 
 		assertThat(att1.getParticipation()).isEqualTo(Participation.needsAction());
+	}
+
+	@Test
+	public void testAcceptedResourceRemainsAcceptedWhenUpdatingParticipation() {
+		Event event = createNonRecurrentEventWithMostFields();
+		ResourceAttendee resource = ResourceAttendee
+				.builder()
+				.participation(Participation.accepted())
+				.displayName("Res")
+				.email("res-1@obm.test")
+				.build();
+
+		event.addAttendee(resource);
+		event.updateParticipation();
+
+		assertThat(resource.getParticipation()).isEqualTo(Participation.accepted());
+	}
+
+	@Test
+	public void testDeclinedResourceRemainsDeclinedWhenUpdatingParticipation() {
+		Event event = createNonRecurrentEventWithMostFields();
+		ResourceAttendee resource = ResourceAttendee
+				.builder()
+				.participation(Participation.declined())
+				.displayName("Res")
+				.email("res-1@obm.test")
+				.build();
+
+		event.addAttendee(resource);
+		event.updateParticipation();
+
+		assertThat(resource.getParticipation()).isEqualTo(Participation.declined());
+	}
+
+	@Test
+	public void testNeedsActionResourceRemainsNeedsActionWhenUpdatingParticipation() {
+		Event event = createNonRecurrentEventWithMostFields();
+		ResourceAttendee resource = ResourceAttendee
+				.builder()
+				.participation(Participation.needsAction())
+				.displayName("Res")
+				.email("res-1@obm.test")
+				.canWriteOnCalendar(true) // Cannot happen, but tests that even with a delegation the resource state does not change
+				.build();
+
+		event.addAttendee(resource);
+		event.updateParticipation();
+
+		assertThat(resource.getParticipation()).isEqualTo(Participation.needsAction());
 	}
 
 	@Test
@@ -1673,5 +1723,21 @@ public class EventTest {
 		Attendee newEventOrganizer = event.withOrganizerIfNone(organizer).findOrganizer();
 
 		assertThat(newEventOrganizer).isEqualTo(organizer).isEqualToComparingFieldByField(organizer);
+	}
+
+	@Test
+	public void testGetHumanAttendeesReturnsOnlyHumans() {
+		Event event = new Event();
+		UserAttendee user1 = UserAttendee.builder().email("att1@email.com").build();
+		UserAttendee user2 = UserAttendee.builder().email("att2@email.com").build();
+		ContactAttendee contact = ContactAttendee.builder().email("external@domain.fr").build();
+
+		event.setTitle("my event");
+		event.addAttendee(user1);
+		event.addAttendee(user2);
+		event.addAttendee(contact);
+		event.addAttendee(ResourceAttendee.builder().email("res-1@obm.test").build());
+
+		assertThat(event.getHumanAttendees()).containsOnly(user1, user2, contact);
 	}
 }

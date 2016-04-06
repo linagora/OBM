@@ -186,6 +186,10 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Cloneable, 
 		return Collections2.filter(attendees, Predicates.instanceOf(ResourceAttendee.class));
 	}
 
+	public Collection<Attendee> getHumanAttendees() {
+		return Collections2.filter(attendees, Predicates.not(Predicates.instanceOf(ResourceAttendee.class)));
+	}
+
 	public List<Attendee> getAttendees() {
 		return attendees;
 	}
@@ -717,16 +721,16 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Cloneable, 
 	}
 
 	private void changeAttendeesParticipation() {
-		for (Attendee att: getAttendees()) {
+		for (Attendee att: getHumanAttendees()) {
 			if (att.isCanWriteOnCalendar()) {
 				att.setParticipation(Participation.accepted());
 			} else {
 				att.setParticipation(Participation.needsAction());
 			}
+
 			att.getParticipation().setComment(Comment.EMPTY);
 		}
 	}
-
 
 	public boolean hasAnyExceptionAtDate(Date exceptionDateToFind) {
 		return recurrence.hasAnyExceptionAtDate(exceptionDateToFind);
