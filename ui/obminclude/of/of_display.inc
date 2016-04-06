@@ -1408,6 +1408,7 @@ function display_unified_menu($module) {
     $user_photo_id = $user_infos["photo_id"];
     $common_name = $user_infos["commonname"];
     $email = $user_infos["email"];
+    $hasHostedMailbox = $user_infos["mail_perms"] == 1;
   }
 
   $m = new Mustache_Engine(array(
@@ -1450,7 +1451,7 @@ function display_unified_menu($module) {
   $data[] = array("buttons");
   $data["buttons"] = array();
 
-  if (isset($email) && !empty($email)) {
+  if ($hasHostedMailbox) {
     array_push( $data["buttons"],
       array(
         "name" => $l_section_webmail,
@@ -1501,7 +1502,7 @@ function display_unified_menu($module) {
     $data["show_intro"] = true;
     $data["intro-steps"] = array();
 
-    if ( !empty($data["user_infos"]["email"]) ) {
+    if ($hasHostedMailbox) {
       $data["intro-steps"][] = array(
         "id" => "webmail",
         "position" => "right",
