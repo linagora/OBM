@@ -54,15 +54,16 @@ function generate_token(){
 	global $obm, $path;
 
 	$userInfo = get_user_info($obm['uid']);
+	$hasHostedMailbox = $userInfo["mail_perms"] == 1;
 
-	if( isset($userInfo['email']) && !empty($userInfo['email'])){
+	if ($hasHostedMailbox) {
 		$token = get_trust_token($userInfo);
 	} else {
-		$url_redirect = $path."/calendar/calendar_index.php";
 		header('Status: 301 OK');
-		header("Location: $url_redirect");
+		header("Location: $path/calendar/calendar_index.php");
 		exit();
 	}
+
 	return $token;
 }
 
