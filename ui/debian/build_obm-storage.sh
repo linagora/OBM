@@ -17,8 +17,7 @@ OBM_UPDATE_SCRIPTS_25=${CURDIR}/scripts/2.5/updates
 OBM_UPDATE_SCRIPTS_26=${CURDIR}/scripts/2.6/updates
 OBM_UPDATE_SCRIPTS_30=${CURDIR}/scripts/3.0/updates
 OBM_UPDATE_SCRIPTS_31=${CURDIR}/scripts/3.1/updates
-
-
+OBM_UPDATE_SCRIPTS_32=${CURDIR}/scripts/3.2/updates
 
 ##Mysql OBM Installation
 cp ${CURDIR}/debian/misc/db/mysql/mysql.sh ${INSTALL_DIR_SCRIPT}/mysql
@@ -208,6 +207,11 @@ cp ${OBM_UPDATE_SCRIPTS_31}/update-3.1.2~2.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.
 cp ${OBM_UPDATE_SCRIPTS_31}/update-3.1.2~3.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.1.2~3
 cp ${OBM_UPDATE_SCRIPTS_31}/update-3.1.2~4.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.1.2~4
 cp ${OBM_UPDATE_SCRIPTS_31}/update-3.1.2~5.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.1.2~5
+
+# Upgrade Pg OBM 3.1.6
 cp ${OBM_UPDATE_SCRIPTS_31}/update-3.1.6~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.1.6~1
+
+# Upgrade Pg OBM 3.2.0
+cp ${OBM_UPDATE_SCRIPTS_32}/update-3.2.0~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.2.0~1
 
 exit 0
