@@ -1799,7 +1799,7 @@ function check_user_data_form($p_id, &$user) {
   global $php_regexp_password;
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
   global $obm, $cgp_use, $c_imagetype;
-  global $c_max_image_size;
+  global $c_max_image_size, $cuser_external_email_check_usage;
   global $l_err_delegation_outside_domain, $l_err_delegation_outside_target;
   
   // Hook : Pre
@@ -2090,6 +2090,14 @@ function check_user_data_form($p_id, &$user) {
       $err['field'] = 'email';
       return false;
     }
+
+    // OBMFULL-6420 Check that the email is not already used by a user
+    if ($cuser_external_email_check_usage && is_email_used($email)) {
+      $err['msg'] = "$l_email_exist : $email";
+      $err['field'] = 'email';
+
+      return false;
+    }
   }
 
   // Email quota
@@ -2197,6 +2205,24 @@ function check_user_data_form($p_id, &$user) {
   }
 
   return true;
+}
+
+function is_email_used($email) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $multidomain = sql_multidomain('userobm');
+  $query = "
+      SELECT userobm_id, userobmemail_email
+      FROM UserObm
+      INNER JOIN UserObmEmail ON userobmemail_userobm_id = userobm_id
+      WHERE LOWER(userobmemail_email) = LOWER('" . $obm_q->escape($email) . "')
+      $multidomain";
+
+  display_debug_msg($query, $cdg_sql, "is_email_used($email)");
+  $obm_q->query($query);
+
+  return $obm_q->num_rows() > 0;
 }
 
 /**

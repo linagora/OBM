@@ -223,6 +223,8 @@ $cmailshare_default_quota = 0;
 // User : default user mailbox quota
 $cuser_default_quota = 0;
 
+// User: check for external email usage in database. This might be costy on large databases
+$cuser_external_email_check_usage = true;
 
 // Incident : Generic E-mail for Incident module
 $cmail_incident = '';
