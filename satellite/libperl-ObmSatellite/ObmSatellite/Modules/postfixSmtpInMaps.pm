@@ -115,7 +115,7 @@ sub _generateMaps {
 
     foreach my $map ( @{$datas->{'maps'}} ) {
         $self->_log( 'Generate flat map \''.$map.'\', file '.$self->{$map}, 3 );
-        if( $self->_generateFlatMap( $map, $domainList ) ) {
+        if( $self->_generateFlatMap( $map, $domainList, $map eq 'domainMap' ) ) {
             $self->_log( 'Fail to generate flat map \''.$map.'\', file '.$self->{$map}, 1 );
             return $self->_response( RC_INTERNAL_SERVER_ERROR, { content => [ 'Fail to generate flat map \''.$map.'\', file '.$self->{$map} ] } );
         }
@@ -136,7 +136,7 @@ sub _generateMaps {
 
 sub _generateFlatMap {
     my $self = shift;
-    my( $map, $domainList ) = @_;
+    my( $map, $domainList, $deduplicate ) = @_;
 
     my $ldapFilter = $self->{'description'}->{$map}->{'ldapFilter'};
     my $ldapAttrsLeft = $self->{'description'}->{$map}->{'ldapAttributePostfixKey'};
@@ -162,6 +162,8 @@ sub _generateFlatMap {
         return 1;
     }
 
+    my @leftColumnValues = ();
+
     foreach my $entry ( @{$ldapEntries} ) {
         my $mapLeftColumn;
         for( my $i=0; $i<=$#{$ldapAttrsLeft}; $i++ ) {
@@ -183,6 +185,16 @@ sub _generateFlatMap {
         }
 
         for( my $i=0; $i<=$#{$mapLeftColumn}; $i++ ) {
+            if ($deduplicate) {
+                if (grep(/$mapLeftColumn->[$i]/, @leftColumnValues)) {
+                    $self->_log('Skipping key "' . $mapLeftColumn->[$i] . '" for map ' . $self->{$map} . ' as it was already included.', 4);
+
+                    next;
+                }
+
+                push(@leftColumnValues, $mapLeftColumn->[$i]);
+            }
+
             print POSTFIX_MAP $mapLeftColumn->[$i]."\t".$mapRightColumn."\n" if ($mapLeftColumn->[$i] && $mapRightColumn);
         }
     }
