@@ -7,32 +7,6 @@ $GLOBALS['obmdb_password'] = $obmdb_password;
 $GLOBALS['obmdb_db'] = $obmdb_db;
 $GLOBALS['obmdb_dbtype'] = $obmdb_dbtype;
 
-$query = "SELECT
-		    domain_name, serviceproperty_property, host_ip
-		    FROM Domain
-		    INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
-		    LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id
-		    LEFT JOIN Host ON host_id = #CAST(serviceproperty_value, INTEGER)
-		    WHERE
-		    serviceproperty_property = 'imap_frontend'
-            OR serviceproperty_property = 'smtp_out'
-            OR serviceproperty_property = 'obm_sync'";
-$obm_q = new DB_OBM;
-$obm_q->query($query);
-
-$config['default_host'] = array();
-$config['multiple_smtp_server'] = array();
-
-while ($obm_q->next_record()) {
-	if ($obm_q->f('serviceproperty_property') == 'imap_frontend') {
-		$config['default_host'][$obm_q->f('host_ip')] = $obm_q->f('domain_name');
-	} else if ($obm_q->f('serviceproperty_property') == 'smtp_out') {
-		$config['multiple_smtp_server'][$obm_q->f('domain_name')] = $obm_q->f('host_ip');
-	} else if ($obm_q->f('serviceproperty_property') == 'obm_sync') {
-      $config["obmSyncIp"] = $obm_q->f('host_ip');
-    }
-}
-
 // Use this folder to store log files (must be writeable for apache user)
 $config['log_dir'] = '/var/log/webmail/';
 
@@ -50,8 +24,8 @@ $config['create_default_folders'] = true;
 $config['message_cache_lifetime'] = '10d';
 
 // authenticate to the SMTP server
-$config['smtp_user'] = '%u';
-$config['smtp_pass'] = '%p';
+$config['smtp_user'] = '';
+$config['smtp_pass'] = '';
 
 // This key is used to encrypt the users imap password which is stored
 // in the session record (and the client cookie if remember password is enabled).
@@ -77,7 +51,7 @@ if ( $cs_lifetime ) {
 $config['session_lifetime'] = $rcSessionLifetime;
 
 // setup required OBM modules
-$config["plugins"][] = "multiple_smtp_server";
+$config["plugins"][] = "obm_multidomain";
 $config["plugins"][] = "obm_addressbook";
 $config["plugins"][] = "obm_identities";
 $config["plugins"][] = "obm_unread";

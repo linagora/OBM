@@ -76,22 +76,19 @@ $display['header'] = display_menu($module);
 
 $get_params = params_for_iframe($token);
 
-$display['detail'] = '<iframe src="index.php'.$get_params.'" id="webmail_iframe" frameBorder="0"></iframe>';
+$display['detail'] = '<iframe src="index.php?' . $get_params . '" id="webmail_iframe" frameBorder="0"></iframe>';
 display_outframe($display);
 
 
 function params_for_iframe($token){
-	$get_params = ( isset($token) ) ? '?obm_token='.$token : '';
-	if (!empty($_GET)) {
-		foreach ($_GET as $key => $value) {
-			if ($get_params == '') {
-				$get_params .= '?'.$key.'='.$value;
-			} else {
-				$get_params .= '&'.$key.'='.$value;
-			}
-		}
-	}
-	return $get_params;
+  global $obm;
+
+  $data = array('userobm_id' => $obm['uid']);
+  if (isset($token)) {
+    $data['obm_token'] = $token;
+  }
+
+  return http_build_query(array_merge($data, $_GET));
 }
 
 ?>
