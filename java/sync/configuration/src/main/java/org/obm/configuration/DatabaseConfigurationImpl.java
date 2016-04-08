@@ -34,7 +34,6 @@ package org.obm.configuration;
 
 import org.obm.configuration.utils.IniFile;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -93,14 +92,9 @@ public class DatabaseConfigurationImpl implements DatabaseConfiguration {
 		return iniFile.getStringValue(DB_USER_KEY);
 	}
 
-	@VisibleForTesting String removeEnclosingDoubleQuotes(String toUnquote)
-	{
-		return toUnquote.replaceAll("^\"(.+)\"$", "$1");
-	}
-
 	@Override
 	public String getDatabasePassword() {
-		return removeEnclosingDoubleQuotes(iniFile.getStringValue(DB_PASSWORD_KEY));
+		return IniFile.removeEnclosingQuotes(iniFile.getStringValue(DB_PASSWORD_KEY));
 	}
 
 	@Override

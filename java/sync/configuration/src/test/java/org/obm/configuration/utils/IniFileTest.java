@@ -450,4 +450,44 @@ public class IniFileTest {
 		return new IniFile.Factory().build(Resources.getResource(file).getFile());
 	}
 
+	@Test
+	public void testRemoveEnclosingQuotesShouldRemoveDoubleQuotes() {
+		assertThat(IniFile.removeEnclosingQuotes("\"obm\"")).isEqualTo("obm");
+	}
+
+	@Test
+	public void testRemoveEnclosingQuotesShouldRemoveSingleQuotes() {
+		assertThat(IniFile.removeEnclosingQuotes("'obm'")).isEqualTo("obm");
+	}
+
+	@Test
+	public void testRemoveEnclosingQuotesShouldOnlyRemoveEnclosingSingleQuotes() {
+		assertThat(IniFile.removeEnclosingQuotes("'obm")).isEqualTo("'obm");
+	}
+
+	@Test
+	public void testRemoveEnclosingQuotesShouldOnlyRemoveEnclosingDoubleQuotes() {
+		assertThat(IniFile.removeEnclosingQuotes("obm\"")).isEqualTo("obm\"");
+	}
+
+	@Test
+	public void testRemoveEnclosingQuotesShouldRemoveDoubleQuotesWhenEmpty() {
+		assertThat(IniFile.removeEnclosingQuotes("\"\"")).isEqualTo("");
+	}
+
+	@Test
+	public void testRemoveEnclosingQuotesShouldRemoveSingleQuotesWhenEmpty() {
+		assertThat(IniFile.removeEnclosingQuotes("''")).isEqualTo("");
+	}
+
+	@Test
+	public void testRemoveEnclosingQuotesShouldNotRemoveQuotesInsideString() {
+		assertThat(IniFile.removeEnclosingQuotes("'A \"B\" 'C' D'")).isEqualTo("A \"B\" 'C' D");
+	}
+
+	@Test
+	public void testRemoveEnclosingQuotesShouldNotRemoveQuotesIfClosingQuoteIsInsideString() {
+		assertThat(IniFile.removeEnclosingQuotes("'AB' C")).isEqualTo("'AB' C");
+	}
+
 }

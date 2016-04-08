@@ -86,6 +86,10 @@ public class IniFile {
 		this.settings = settings;
 	}
 
+	public static String removeEnclosingQuotes(String quoted) {
+		return quoted.replaceAll("^['\"](.*)['\"]$", "$1");
+	}
+
 	public Collection<String> getIniSectionNames() {
 		return settings.keySet();
 	}
