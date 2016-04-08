@@ -31,26 +31,24 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
+import java.util.Collection;
+
 import org.obm.configuration.ConfigurationService;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.imap.IMAPException;
 import org.obm.push.minig.imap.StoreClient;
+import org.obm.push.minig.imap.impl.MailboxNameUTF7Converter;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserPassword;
 
 public class CyrusManagerImpl implements CyrusManager {
-
-	@VisibleForTesting final static String TRASH = "Trash";
-	@VisibleForTesting final static String DRAFTS = "Drafts";
-	@VisibleForTesting final static String SPAM = "SPAM";
-	@VisibleForTesting final static String TEMPLATES = "Templates";
-	@VisibleForTesting final static String SENT = "Sent";
 
 	public static class Factory implements CyrusManager.Factory {
 
@@ -126,14 +124,17 @@ public class CyrusManagerImpl implements CyrusManager {
 		conn.shutdown();
 	}
 
-	private ImapPath[] buildUserImapPaths(String user, String domain) {
-		return new ImapPath[] {
-				ImapPath.builder().user(user).domain(domain).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(TRASH).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(DRAFTS).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(SPAM).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(TEMPLATES).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(SENT).build()
-		};
+	private Collection<ImapPath> buildUserImapPaths(String user, String domain) {
+		ImmutableList.Builder<ImapPath> paths = ImmutableList.builder();
+
+		// Always create the Inbox...
+		paths.add(ImapPath.builder().user(user).domain(domain).build());
+		// ...and also create custom folders, as per the configuration
+		for (String folder : configurationService.getUserMailboxDefaultFolders()) {
+			paths.add(ImapPath.builder().user(user).domain(domain).pathFragment(MailboxNameUTF7Converter.decode(folder)).build());
+		}
+
+		return paths.build();
 	}
+
 }

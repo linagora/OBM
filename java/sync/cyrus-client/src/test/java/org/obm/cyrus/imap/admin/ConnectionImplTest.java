@@ -43,6 +43,8 @@ import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.minig.imap.StoreClient;
 
+import com.google.common.collect.ImmutableSet;
+
 @RunWith(GuiceRunner.class)
 public class ConnectionImplTest {
 	private IMocksControl control;
@@ -62,10 +64,10 @@ public class ConnectionImplTest {
 		expect(storeClient.create("user/ident4/Trash@vm.obm.org", "partition")).andReturn(true);
 		control.replay();
 	
-		connection.createUserMailboxes(Partition.valueOf("partition"),
+		connection.createUserMailboxes(Partition.valueOf("partition"), ImmutableSet.of(
 				ImapPath.builder().user("ident4").domain("vm.obm.org").build(),
 				ImapPath.builder().user("ident4").domain("vm.obm.org").pathFragment("Trash").build()
-				);
+			));
 		control.verify();
 	}
 
@@ -75,10 +77,10 @@ public class ConnectionImplTest {
 		expect(storeClient.create("user/ident4/Trash@vm.obm.org")).andReturn(true);
 		control.replay();
 	
-		connection.createUserMailboxes(
+		connection.createUserMailboxes(ImmutableSet.of(
 				ImapPath.builder().user("ident4").domain("vm.obm.org").build(),
 				ImapPath.builder().user("ident4").domain("vm.obm.org").pathFragment("Trash").build()
-				);
+			));
 		control.verify();
 	}
 

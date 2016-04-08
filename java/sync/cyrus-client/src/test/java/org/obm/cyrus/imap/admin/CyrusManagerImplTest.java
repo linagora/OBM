@@ -32,17 +32,15 @@ package org.obm.cyrus.imap.admin;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.obm.cyrus.imap.admin.CyrusManagerImpl.DRAFTS;
-import static org.obm.cyrus.imap.admin.CyrusManagerImpl.SENT;
-import static org.obm.cyrus.imap.admin.CyrusManagerImpl.SPAM;
-import static org.obm.cyrus.imap.admin.CyrusManagerImpl.TEMPLATES;
-import static org.obm.cyrus.imap.admin.CyrusManagerImpl.TRASH;
 
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.ConfigurationService;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
@@ -75,13 +73,12 @@ public class CyrusManagerImplTest {
 		String user = obmUser.getLogin(), domain = obmUser.getDomain().getName();
 
 		expect(configurationService.isCyrusPartitionEnabled()).andReturn(false);
-		connection.createUserMailboxes(
+		expect(configurationService.getUserMailboxDefaultFolders()).andReturn(ImmutableSet.of("Custom"));
+
+		connection.createUserMailboxes(ImmutableList.of(
 				ImapPath.builder().user(user).domain(domain).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(TRASH).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(DRAFTS).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(SPAM).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(TEMPLATES).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(SENT).build());
+				ImapPath.builder().user(user).domain(domain).pathFragment("Custom").build()
+			));
 		expectLastCall();
 		control.replay();
 
@@ -94,14 +91,53 @@ public class CyrusManagerImplTest {
 		String user = obmUser.getLogin(), domain = obmUser.getDomain().getName();
 
 		expect(configurationService.isCyrusPartitionEnabled()).andReturn(true);
+		expect(configurationService.getUserMailboxDefaultFolders()).andReturn(ImmutableSet.of("Custom", "Test"));
+
 		connection.createUserMailboxes(
-				Partition.fromObmDomain(domain),
+			Partition.fromObmDomain(domain), ImmutableList.of(
 				ImapPath.builder().user(user).domain(domain).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(TRASH).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(DRAFTS).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(SPAM).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(TEMPLATES).build(),
-				ImapPath.builder().user(user).domain(domain).pathFragment(SENT).build());
+				ImapPath.builder().user(user).domain(domain).pathFragment("Custom").build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment("Test").build()
+			)
+		);
+		expectLastCall();
+		control.replay();
+
+		manager.create(obmUser);
+	}
+
+	@Test
+	public void testCreateOnlyInboxIfNoCustomFoldersAreConfigured() throws Exception {
+		ObmUser obmUser = ToolBox.getDefaultObmUser();
+		String user = obmUser.getLogin(), domain = obmUser.getDomain().getName();
+
+		expect(configurationService.isCyrusPartitionEnabled()).andReturn(false);
+		expect(configurationService.getUserMailboxDefaultFolders()).andReturn(ImmutableSet.<String>of());
+
+		connection.createUserMailboxes(ImmutableList.of(
+				ImapPath.builder().user(user).domain(domain).build()
+			));
+		expectLastCall();
+		control.replay();
+
+		manager.create(obmUser);
+	}
+
+	@Test
+	public void testCreateShouldDecodeCustomFoldersAsUTF7() throws Exception {
+		ObmUser obmUser = ToolBox.getDefaultObmUser();
+		String user = obmUser.getLogin(), domain = obmUser.getDomain().getName();
+
+		expect(configurationService.isCyrusPartitionEnabled()).andReturn(true);
+		expect(configurationService.getUserMailboxDefaultFolders()).andReturn(ImmutableSet.of("Envoy&AOk-s", "Pr&AOg-s"));
+
+		connection.createUserMailboxes(
+			Partition.fromObmDomain(domain), ImmutableList.of(
+				ImapPath.builder().user(user).domain(domain).build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment("Envoyés").build(),
+				ImapPath.builder().user(user).domain(domain).pathFragment("Près").build()
+			)
+		);
 		expectLastCall();
 		control.replay();
 

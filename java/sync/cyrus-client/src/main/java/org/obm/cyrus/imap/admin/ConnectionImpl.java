@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.cyrus.imap.admin;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.obm.push.exception.ImapTimeoutException;
@@ -54,7 +55,7 @@ public class ConnectionImpl implements Connection {
 	}
 	
 	@Override
-	public void createUserMailboxes(ImapPath... paths)
+	public void createUserMailboxes(Collection<ImapPath> paths)
 			throws ImapOperationException, ConnectionException, ImapTimeoutException {
 		for (ImapPath path : paths) {
 			storeClient.create(path.format());
@@ -62,7 +63,7 @@ public class ConnectionImpl implements Connection {
 	}
 
 	@Override
-	public void createUserMailboxes(Partition partition, ImapPath... paths)
+	public void createUserMailboxes(Partition partition, Collection<ImapPath> paths)
 			throws ImapOperationException, ConnectionException, ImapTimeoutException {
 		for (ImapPath path : paths) {
 			storeClient.create(path.format(), partition.getName());
