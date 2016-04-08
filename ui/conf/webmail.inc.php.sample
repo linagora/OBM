@@ -116,11 +116,15 @@ $config['ldap_public'] ['obm'] = array(
   'timelimit'     => '0'
 );
 
-// The following makes use of the above LDAP configuration in address books and
-// autocomplete
+// The following makes use of the above LDAP configuration in address books and autocomplete
 $config['address_book_type'] = array('sql', 'ldap');
 $config['autocomplete_addressbooks'] = array('sql', 'obm');
 
-// The html editor is enabled by default. Uncomment this line if you would like
-// to disable it.
+// The html editor is enabled by default. Uncomment this line if you would like to disable it.
 // $config['htmleditor'] = 0;
+
+// Use tls or ssl if you want to use such protocol for SMTP
+$config['smtp_server_scheme'] = '';
+
+// Use tls or ssl if you want to use such protocol for IMAP
+$config['default_host_scheme'] = '';

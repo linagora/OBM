@@ -79,10 +79,10 @@ class obm_multidomain extends rcube_plugin
     foreach ($_SESSION['obm_hosts'] as $type => $hostIp) {
       switch ($type) {
         case 'imap_frontend' :
-          $rcmail->config->set('default_host', $hostIp);
+          $rcmail->config->set('default_host', $this->formatUrl($rcmail->config->get('default_host_scheme', ''), $hostIp));
           break;
         case 'smtp_out' :
-          $rcmail->config->set('smtp_server', $hostIp);
+          $rcmail->config->set('smtp_server', $this->formatUrl($rcmail->config->get('smtp_server_scheme', ''), $hostIp));
           break;
         case 'obm_sync' :
           $rcmail->config->set('obmSyncIp', $hostIp);
@@ -94,6 +94,10 @@ class obm_multidomain extends rcube_plugin
 
   function logout_after() {
     setcookie('userobm_id', false, time() - 3600);
+  }
+
+  private function formatUrl($scheme, $host) {
+    return $scheme ? sprintf("%s://%s", strtolower($scheme), $host) : $host;
   }
 
   private function findUserObmId() {
