@@ -67,9 +67,7 @@ if [ -e $FIC_MAIN ]; then
 		fi
 		echo -e "o Please enter your 'mynetwork' (default empty)"
 		read mynetwork_postfix_conf
-		if [ -z ${mynetwork_postfix_conf} ] ; then
-		  /usr/sbin/postconf -e mynetworks=''
-		else
+		if [ "x${mynetwork_postfix_conf}" != "x" ] ; then
 		  /usr/sbin/postconf -e mynetworks="${mynetwork_postfix_conf}"
 		fi
 	fi

@@ -44,7 +44,6 @@ local_recipient_maps = $alias_maps
 
 # Les domaines a considérer comme locaux
 mydestination = localhost, $myhostname
-mynetworks = /etc/postfix/mynetworks
 
 # Test multi-domaines
 # Le moyen de transport par defaut pour les BAL des domaines virtuels
