@@ -1011,6 +1011,13 @@ function run_query_calendar_insert_event_data($calendar, $organizer) {
   $event_duration = event_duration($datebegin, $calendar['event_duration'], $all_day == 'TRUE');
   $privacy = $calendar['privacy'];
   $repeat_kind = $calendar['repeat_kind'];
+
+  // OBMFULL-6448
+  // As a protection, we force the value 'none' here if we don't have a valid value for the repeat_kind
+  if (!$repeat_kind) {
+    $repeat_kind = 'none';
+  }
+
   $repeat_days = $calendar['repeat_days'];
   if (isset($calendar['repeat_end'])) {
     $repeat_end = "'$calendar[repeat_end]'";

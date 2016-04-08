@@ -5477,7 +5477,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
   $add_date = "<a href=\"javascript: add_exdate();\"><img src=\"$ico_add\" alt=\"[Date]\" /></a>";
 
-  if ($is_exception) {
+  if ($is_exception && $action != 'duplicate') {
     $parent_event_id = $event_q->f('event_eventexception_parent_id') ? $event_q->f('event_eventexception_parent_id') : $calendar['calendar_id'];
     $parent_event_url = "$path/calendar/".basename($_SERVER['SCRIPT_NAME'])."?action=detailconsult&calendar_id=$parent_event_id";
     $show_parent_link = "<a href=\"$parent_event_url\" title=\"$GLOBALS[l_parent_event]\">$GLOBALS[l_show_parent_event]</a>";
