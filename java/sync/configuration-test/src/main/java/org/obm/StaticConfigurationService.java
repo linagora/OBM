@@ -34,6 +34,7 @@ package org.obm;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 
 import org.obm.configuration.ConfigurationService;
 import org.obm.configuration.Hash;
@@ -197,6 +198,11 @@ public class StaticConfigurationService extends StaticLocatorConfiguration imple
 	@Override
 	public Hash getPasswordHash() {
 		return configuration.passwordHash;
+	}
+
+	@Override
+	public Collection<String> getUserMailboxDefaultFolders() {
+		return configuration.userMailboxDefaultFolders;
 	}
 
 }

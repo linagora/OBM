@@ -32,6 +32,7 @@
 package org.obm.configuration;
 
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.obm.configuration.utils.IniFile;
@@ -39,6 +40,8 @@ import org.obm.configuration.utils.TimeUnitMapper;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 
 public class ConfigurationServiceImpl implements ConfigurationService {
@@ -79,6 +82,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
 	private final static String PASSWORD_HASH = "password-hash";
 	private final static Hash PASSWORD_HASH_DEFAULT = Hash.NONE;
+
+	private final static String USER_MAILBOX_DEFAULT_FOLDERS = "userMailboxDefaultFolders";
 
 	public static class Factory {
 		
@@ -242,6 +247,17 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 		String strValue = iniFile.getStringValue(PASSWORD_HASH);
 
 		return strValue == null ? PASSWORD_HASH_DEFAULT : Hash.valueOf(strValue.toUpperCase());
+	}
+
+	@Override
+	public Collection<String> getUserMailboxDefaultFolders() {
+		String value = iniFile.getStringValue(USER_MAILBOX_DEFAULT_FOLDERS);
+
+		return Splitter
+				.on(',')
+				.omitEmptyStrings()
+				.trimResults()
+				.splitToList(IniFile.removeEnclosingQuotes(Strings.nullToEmpty(value)));
 	}
 
 }

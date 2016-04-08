@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.configuration.utils.IniFile;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.Resources;
 
 
@@ -162,6 +163,102 @@ public class ConfigurationServiceImplTest {
 
 		try {
 			configurationServiceImpl.getPasswordHash();
+		} finally {
+			control.verify();
+		}
+	}
+
+	@Test
+	public void testGetUserMailboxDefaultFoldersShouldReturnEmptyListWhenNotSet() {
+		expect(iniFile.getStringValue("userMailboxDefaultFolders")).andReturn(null);
+		control.replay();
+
+		try {
+			assertThat(configurationServiceImpl.getUserMailboxDefaultFolders()).hasSize(0);
+		} finally {
+			control.verify();
+		}
+	}
+
+	@Test
+	public void testGetUserMailboxDefaultFoldersShouldReturnEmptyListWhenEmpty() {
+		expect(iniFile.getStringValue("userMailboxDefaultFolders")).andReturn("");
+		control.replay();
+
+		try {
+			assertThat(configurationServiceImpl.getUserMailboxDefaultFolders()).hasSize(0);
+		} finally {
+			control.verify();
+		}
+	}
+
+	@Test
+	public void testGetUserMailboxDefaultFoldersShouldReturnListWhenSetToASingleElement() {
+		expect(iniFile.getStringValue("userMailboxDefaultFolders")).andReturn("Drafts");
+		control.replay();
+
+		try {
+			assertThat(configurationServiceImpl.getUserMailboxDefaultFolders()).isEqualTo(ImmutableList.of("Drafts"));
+		} finally {
+			control.verify();
+		}
+	}
+
+	@Test
+	public void testGetUserMailboxDefaultFoldersShouldReturnListWhenSetToAList() {
+		expect(iniFile.getStringValue("userMailboxDefaultFolders")).andReturn("Drafts,Sent,CyrusRocks");
+		control.replay();
+
+		try {
+			assertThat(configurationServiceImpl.getUserMailboxDefaultFolders()).isEqualTo(ImmutableList.of("Drafts", "Sent", "CyrusRocks"));
+		} finally {
+			control.verify();
+		}
+	}
+
+	@Test
+	public void testGetUserMailboxDefaultFoldersShouldReturnListWhenSetToAMalformedList() {
+		expect(iniFile.getStringValue("userMailboxDefaultFolders")).andReturn("Drafts Sent-CyrusRocks");
+		control.replay();
+
+		try {
+			assertThat(configurationServiceImpl.getUserMailboxDefaultFolders()).isEqualTo(ImmutableList.of("Drafts Sent-CyrusRocks"));
+		} finally {
+			control.verify();
+		}
+	}
+
+	@Test
+	public void testGetUserMailboxDefaultFoldersShouldTrimAndSkipEmptyFolders() {
+		expect(iniFile.getStringValue("userMailboxDefaultFolders")).andReturn("Drafts ,, Sent");
+		control.replay();
+
+		try {
+			assertThat(configurationServiceImpl.getUserMailboxDefaultFolders()).isEqualTo(ImmutableList.of("Drafts", "Sent"));
+		} finally {
+			control.verify();
+		}
+	}
+
+	@Test
+	public void testGetUserMailboxDefaultFoldersShouldRemoveEnclosingSingleQuotes() {
+		expect(iniFile.getStringValue("userMailboxDefaultFolders")).andReturn("'Drafts,Sent'");
+		control.replay();
+
+		try {
+			assertThat(configurationServiceImpl.getUserMailboxDefaultFolders()).isEqualTo(ImmutableList.of("Drafts", "Sent"));
+		} finally {
+			control.verify();
+		}
+	}
+
+	@Test
+	public void testGetUserMailboxDefaultFoldersShouldRemoveEnclosingDoubleQuotes() {
+		expect(iniFile.getStringValue("userMailboxDefaultFolders")).andReturn("\"Drafts,Sent\"");
+		control.replay();
+
+		try {
+			assertThat(configurationServiceImpl.getUserMailboxDefaultFolders()).isEqualTo(ImmutableList.of("Drafts", "Sent"));
 		} finally {
 			control.verify();
 		}

@@ -33,6 +33,7 @@
 package org.obm.configuration;
 
 import java.nio.charset.Charset;
+import java.util.Collection;
 
 public interface ConfigurationService extends DomainConfiguration, DataConfiguration {
 	
@@ -73,5 +74,7 @@ public interface ConfigurationService extends DomainConfiguration, DataConfigura
 	boolean isCyrusPartitionEnabled();
 
 	Hash getPasswordHash();
+
+	Collection<String> getUserMailboxDefaultFolders();
 
 }

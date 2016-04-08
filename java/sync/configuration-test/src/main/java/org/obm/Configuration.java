@@ -33,6 +33,8 @@ package org.obm;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
@@ -104,5 +106,6 @@ public class Configuration {
 	public boolean anonymizePrivateEvent = true;
 	public Hash passwordHash = Hash.NONE;
 	public boolean isLdapModuleEnabled = true;
+	public Collection<String> userMailboxDefaultFolders = Collections.emptySet();
 
 }
