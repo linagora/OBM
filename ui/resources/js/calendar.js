@@ -2760,7 +2760,7 @@ Obm.CalendarView = new Class({
     var id = this.view_id.value;
     var default_id = this.default_view_id.value;
 
-    if (id != "") {
+    if (id != "" && id != 0) {
       if (id != default_id) {
         action = 'insert_default_view';
         confirm_message = obm.vars.labels.insert_default_view;
