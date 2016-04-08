@@ -47,6 +47,12 @@ applicable to the OBM software.
  */
 class obm_multidomain extends rcube_plugin
 {
+  private static $servicePropertyToConfigKey = array(
+    'imap_frontend' => 'default_host',
+    'smtp_out' => 'smtp_server',
+    'obm_sync' => 'obmSyncIp'
+  );
+
   function init()
   {
     $rcmail = rcmail::get_instance();
@@ -55,6 +61,8 @@ class obm_multidomain extends rcube_plugin
       $id = $this->findUserObmId();
 
       if (!$id) {
+        $this->log('Cannot read userobm_id');
+
         return;
       }
 
@@ -71,29 +79,29 @@ class obm_multidomain extends rcube_plugin
         WHERE serviceproperty_property IN ('imap_frontend', 'smtp_out', 'obm_sync') AND userobm_id = " . $obm_q->escape($id) . ";
       ");
 
+      $logMessage = "Setting configuration for userobm_id=$id";
+
       while ($obm_q->next_record()) {
-        $_SESSION['obm_hosts'][$obm_q->f('serviceproperty_property')] = $obm_q->f('host_ip');
+        $key = obm_multidomain::$servicePropertyToConfigKey[$obm_q->f('serviceproperty_property')];
+        $value = $this->formatUrl($rcmail->config->get($key . '_scheme', ''), $obm_q->f('host_ip'));
+
+        $_SESSION['obm_hosts'][$key] = $value;
+        $logMessage .= " $key=$value";
       }
+
+      $this->log($logMessage);
     }
 
-    foreach ($_SESSION['obm_hosts'] as $type => $hostIp) {
-      switch ($type) {
-        case 'imap_frontend' :
-          $rcmail->config->set('default_host', $this->formatUrl($rcmail->config->get('default_host_scheme', ''), $hostIp));
-          break;
-        case 'smtp_out' :
-          $rcmail->config->set('smtp_server', $this->formatUrl($rcmail->config->get('smtp_server_scheme', ''), $hostIp));
-          break;
-        case 'obm_sync' :
-          $rcmail->config->set('obmSyncIp', $hostIp);
-      }
-    }
-
+    $rcmail->config->merge($_SESSION['obm_hosts']);
     $this->add_hook('logout_after', array($this, 'logout_after'));
   }
 
   function logout_after() {
     setcookie('userobm_id', false, time() - 3600);
+  }
+
+  private function log($message) {
+    rcmail::write_log('obm_multidomain', $message);
   }
 
   private function formatUrl($scheme, $host) {
