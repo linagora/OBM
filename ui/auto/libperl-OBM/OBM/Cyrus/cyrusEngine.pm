@@ -944,7 +944,7 @@ sub _imapSetMailboxAcl {
     }
 
     my $imapRight = $definedRight->{$boxRight};
-    if( ($boxRightUser eq 'anyone') && ($boxRight ne 'none') ) {
+    if( ($boxRightUser eq 'anyone') && ($boxRight ne 'none') && ($boxRight ne 'nodelete') ) {
         $imapRight .= $definedRight->{'post'};
     }
     $self->_log( 'SETACLMAILBOX ' . $boxName . ' ' . $boxRightUser . ' ' . $imapRight, 4 );
