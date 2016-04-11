@@ -235,8 +235,8 @@ public class ProfileDaoJdbcImplTest implements H2TestClass {
 						.builder()
 						.module(Module.CALENDAR)
 						.checkBoxState(Right.ACCESS, CheckBoxState.CHECKED)
-						.checkBoxState(Right.READ, CheckBoxState.DISABLED_CHECKED)
-						.checkBoxState(Right.WRITE, CheckBoxState.DISABLED_UNCHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.DISABLED)
+						.checkBoxState(Right.WRITE, CheckBoxState.DISABLED_CHECKED)
 						.build())
 				.defaultCheckBoxState(Module.MAILBOX, ModuleCheckBoxStates
 						.builder()

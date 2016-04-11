@@ -48,12 +48,12 @@ public class CheckBoxStateTest {
 
 	@Test
 	public void testFromValueMinus1() {
-		assertThat(CheckBoxState.fromValue(-1)).isEqualTo(CheckBoxState.DISABLED_CHECKED);
+		assertThat(CheckBoxState.fromValue(-1)).isEqualTo(CheckBoxState.DISABLED);
 	}
 
 	@Test
 	public void testFromValueMinus2() {
-		assertThat(CheckBoxState.fromValue(-2)).isEqualTo(CheckBoxState.DISABLED_UNCHECKED);
+		assertThat(CheckBoxState.fromValue(-2)).isEqualTo(CheckBoxState.DISABLED_CHECKED);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

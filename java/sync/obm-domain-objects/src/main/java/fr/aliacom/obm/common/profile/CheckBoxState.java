@@ -33,8 +33,8 @@ public enum CheckBoxState {
 
 	UNCHECKED(0),
 	CHECKED(1),
-	DISABLED_CHECKED(-1),
-	DISABLED_UNCHECKED(-2);
+	DISABLED_CHECKED(-2),
+	DISABLED(-1);
 
 	private int value;
 

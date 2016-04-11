@@ -13,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +50,7 @@ import org.obm.push.utils.DateUtils;
 import org.obm.satellite.client.Configuration;
 import org.obm.satellite.client.Connection;
 import org.obm.satellite.client.SatelliteService;
+import org.obm.sync.Right;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
@@ -61,6 +61,7 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.profile.CheckBoxState;
 import fr.aliacom.obm.common.profile.Module;
 import fr.aliacom.obm.common.profile.ModuleCheckBoxStates;
 import fr.aliacom.obm.common.profile.Profile;
@@ -113,12 +114,23 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 			.domain(domain)
 			.defaultCheckBoxState(
 					Module.CALENDAR,
-					ModuleCheckBoxStates.builder().module(Module.CALENDAR)
-							.build())
+					ModuleCheckBoxStates
+						.builder()
+						.module(Module.CALENDAR)
+						.checkBoxState(Right.ACCESS, CheckBoxState.CHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.DISABLED)
+						.checkBoxState(Right.WRITE, CheckBoxState.DISABLED_CHECKED)
+						.build()
+					)
 			.defaultCheckBoxState(
 					Module.MAILBOX,
-					ModuleCheckBoxStates.builder().module(Module.MAILBOX)
-							.build()).build();
+					ModuleCheckBoxStates
+						.builder()
+						.module(Module.MAILBOX)
+						.checkBoxState(Right.ACCESS, CheckBoxState.CHECKED)
+						.checkBoxState(Right.READ, CheckBoxState.DISABLED_CHECKED)
+						.build()
+					).build();
 
 	private final ObmDomain domainWithImapAndLdap = ObmDomain
 			.builder()
@@ -549,10 +561,10 @@ public class BatchProcessorImplUserTest extends BatchProcessorImplTestEnv {
 		expect(obmHelper.fetchEntityId("Mailbox", 1)).andReturn(
 				EntityId.valueOf(3));
 		entityRightDao.grantRights(eq(EntityId.valueOf(2)),
-				isNull(EntityId.class), isA(Set.class));
+				isNull(EntityId.class), eq(ImmutableSet.of(Right.ACCESS, Right.WRITE)));
 		expectLastCall();
 		entityRightDao.grantRights(eq(EntityId.valueOf(3)),
-				isNull(EntityId.class), isA(Set.class));
+				isNull(EntityId.class), eq(ImmutableSet.of(Right.ACCESS, Right.READ)));
 		expectLastCall();
 	}
 
