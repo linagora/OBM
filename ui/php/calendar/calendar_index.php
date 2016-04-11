@@ -2255,9 +2255,10 @@ function update_calendar_action($writable_calendars) {
     // which is the case for events in shared, external calendars
     if ($event_info) {
       $owner = $event_info['owner'];
-      $organizerUserObmId = get_event_organizer_userObm_id($id);
+      $organizerType = get_event_organizer_entity_type($id);
     }
-    if (!$event_info || !$organizerUserObmId || $owner != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $owner)) {
+
+    if (!$event_info || ($organizerType == 'contact') || $owner != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $owner)) {
       // Detail Update
       unset($actions['calendar']['detailupdate']);
 

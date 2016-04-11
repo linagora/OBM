@@ -5190,17 +5190,18 @@ function run_query_get_events_deletedAttendees($events) {
 }
 
 /**
-* Get the ID of the userObm user that is organizer of this event
-* if the organizer is not a userObm it returns FALSE
+* Get the type of the organizer of an event.
+* This method might return 'user', 'contact' or FALSE if the event has no organizer.
 */
-function get_event_organizer_userObm_id($event_id) {
-  $res=run_query_get_events_attendee(array($event_id), false, false);
+function get_event_organizer_entity_type($event_id) {
+  $res=run_query_get_events_attendee(array($event_id), false, true);
+
   while($res->next_record()) {
-    if($res->f('eventlink_is_organizer')
-    AND $res->f('eventlink_entity') == "user" ){
-      return $res->f('eventlink_entity_id');
+    if ($res->f('eventlink_is_organizer')){
+      return $res->f('eventlink_entity');
     }
   }
+
   return false;
 }
 

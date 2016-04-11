@@ -516,7 +516,7 @@ class OBM_EventFactory extends OBM_ASubject {
    * @return OBM_Event
    */
   public function getById($id) {
-    $query = 'SELECT Event.*, owner.userobm_id AS owner_id, owner.userobm_lastname AS owner_lastname, owner.userobm_firstname AS owner_firstname, creator.userobm_id AS creator_id, creator.userobm_lastname AS creator_lastname, creator.userobm_firstname AS creator_firstname FROM Event INNER JOIN UserObm owner ON owner.userobm_id = event_owner INNER JOIN UserObm creator ON creator.userobm_id = event_usercreate WHERE event_id = '.$id.'';
+    $query = 'SELECT Event.*, owner.userobm_id AS owner_id, owner.userobm_lastname AS owner_lastname, owner.userobm_firstname AS owner_firstname, creator.userobm_id AS creator_id, creator.userobm_lastname AS creator_lastname, creator.userobm_firstname AS creator_firstname FROM Event INNER JOIN UserObm owner ON owner.userobm_id = event_owner LEFT JOIN UserObm creator ON creator.userobm_id = event_usercreate WHERE event_id = '.$id.'';
     $this->db->query($query);
     $this->db->next_record();
     $event = new OBM_Event($id);
