@@ -68,5 +68,9 @@ public enum ServerCapability {
 	* Used to advertise that a new hash tag of value Event.hashCode is present
 	* in the serialization of an event.
 	*/
-	HASH_IN_EVENT_SERIALIZATION
+	HASH_IN_EVENT_SERIALIZATION,
+	/**
+	 * Used to advertise the presence of "addressbookid" in contact removals
+	 */
+	ADDRESSBOOK_HANDLER_SUPPORTS_ADDRESSBOOKID_IN_REMOVALS
 }

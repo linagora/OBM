@@ -102,6 +102,7 @@ public class SimpleLoginHandlerTest {
 				.put(ServerCapability.SERVER_SIDE_ANONYMIZATION, "true")
 				.put(ServerCapability.HASH_IN_EVENT_SERIALIZATION, "true")
 				.put(ServerCapability.LOGIN_HANDLER_SUPPORTS_AUTHFAULT, "true")
+				.put(ServerCapability.ADDRESSBOOK_HANDLER_SUPPORTS_ADDRESSBOOKID_IN_REMOVALS, "true")
 				.build());
 	}
 
@@ -124,6 +125,7 @@ public class SimpleLoginHandlerTest {
 				.put(ServerCapability.SERVER_SIDE_ANONYMIZATION, "true")
 				.put(ServerCapability.HASH_IN_EVENT_SERIALIZATION, "true")
 				.put(ServerCapability.LOGIN_HANDLER_SUPPORTS_AUTHFAULT, "true")
+				.put(ServerCapability.ADDRESSBOOK_HANDLER_SUPPORTS_ADDRESSBOOKID_IN_REMOVALS, "true")
 				.build());
 	}
 

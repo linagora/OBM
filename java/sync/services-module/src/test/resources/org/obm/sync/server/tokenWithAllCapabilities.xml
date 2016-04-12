@@ -14,5 +14,6 @@
 		<server-capability name="ADDRESS_BOOK_HANDLER_SUPPORTS_STORECONTACT">true</server-capability>
 		<server-capability name="LOGIN_HANDLER_SUPPORTS_AUTHFAULT">true</server-capability>
 		<server-capability name="HASH_IN_EVENT_SERIALIZATION">true</server-capability>
+		<server-capability name="ADDRESSBOOK_HANDLER_SUPPORTS_ADDRESSBOOKID_IN_REMOVALS">true</server-capability>
 	</server-capabilities>
 </token>
