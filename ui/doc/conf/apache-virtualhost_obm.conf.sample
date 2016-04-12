@@ -44,6 +44,8 @@ NameVirtualHost *:443
     LimitRequestBody 20971520
 
 <Directory /usr/share/obm>
+  AllowOverride All
+
   Order allow,deny
   Allow from all
   Require all granted
