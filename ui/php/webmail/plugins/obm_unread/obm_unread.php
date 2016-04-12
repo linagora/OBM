@@ -31,12 +31,15 @@ applicable to the OBM software.
 
 class obm_unread extends rcube_plugin {
 
+  public $noajax = true; // DO NOT REMOVE ! This disables the plugin in Roundcube's Ajax requests
+
   function init() {
     $this->add_hook('ready', array($this, 'ready'));
   }
 
   function ready($args) {
     $RCMAIL = rcmail::get_instance();
+
     if ($args["task"] == "mail" && $args["action"] == "unread_plugin") {
       // action to get the unread count
       echo $RCMAIL->get_storage()->count('INBOX', 'UNSEEN', null);
@@ -44,9 +47,9 @@ class obm_unread extends rcube_plugin {
     }
 
     $filter = get_input_value('_filter', RCUBE_INPUT_GET);
-    if ($args["task"] == "mail" && $filter) {
-      // request to filter the view for a specific type of messages
-      $_SESSION['search_filter'] = $filter;
+
+    if ($args["task"] == "mail" && $filter == 'UNSEEN') {
+      $RCMAIL->output->command('filter_mailbox', 'UNSEEN');
     }
   }
 }
