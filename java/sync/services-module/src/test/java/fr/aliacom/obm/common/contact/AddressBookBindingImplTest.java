@@ -61,6 +61,7 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.items.AddressBookChangesResponse;
@@ -139,6 +140,14 @@ public class AddressBookBindingImplTest {
 		mocksControl.verify();
 	}
 
+	private DeletedContact dc(int id) {
+		return DeletedContact
+				.builder()
+				.id(id)
+				.addressbookId(1)
+				.build();
+	}
+
 	/**
 	 * Tests that getSync() returns the updated contacts and address books,
 	 * including the full list of users from the user DAO, when
@@ -153,14 +162,14 @@ public class AddressBookBindingImplTest {
 
 		ContactUpdates contactUpdates = new ContactUpdates();
 		contactUpdates.setContacts(ImmutableList.of(newContact));
-		contactUpdates.setArchived(ImmutableSet.of(1, 2));
+		contactUpdates.setArchived(ImmutableSet.of(dc(1), dc(2)));
 
 		Contact newUser = new Contact();
 		newUser.setLastname("obmuser");
 
 		ContactUpdates userUpdates = new ContactUpdates();
 		userUpdates.setContacts(ImmutableList.of(newUser));
-		userUpdates.setArchived(ImmutableSet.of(5, 7, 8));
+		userUpdates.setArchived(ImmutableSet.of(dc(5), dc(7), dc(8)));
 
 		Folder updatedContactFolder1 = Folder.builder().uid(1).name("updatedContactFolder1").ownerLoginAtDomain("login@obm.org").build();
 		Folder updatedContactFolder2 = Folder.builder().uid(2).name("updatedContactFolder2").ownerLoginAtDomain("login@obm.org").build();
@@ -173,10 +182,11 @@ public class AddressBookBindingImplTest {
 		Set<Folder> removedContactFolders =  Sets.newHashSet(removedContactFolder1, removedContactFolder2);
 
 		expect(contactDao.findUpdatedContacts(timestamp, token)).andReturn(contactUpdates).once();
-		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(ImmutableSet.of(3)).once();
+		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(ImmutableSet.of(dc(3))).once();
 		expect(contactDao.findUpdatedFolders(timestamp, token)).andReturn(updatedContactFolders).once();
 		expect(contactDao.findRemovedFolders(timestamp, token)).andReturn(removedContactFolders).once();
 		expect(userDao.findUpdatedUsers(timestamp, token)).andReturn(userUpdates).once();
+		expect(userDao.findRemovalCandidates(timestamp, token)).andReturn(ImmutableSet.<DeletedContact>of()).once();
 		expect(configuration.syncUsersAsAddressBook()).andReturn(true).atLeastOnce();
 		expect(contactConfiguration.getAddressBookUserId()).andReturn(-1);
 		expect(contactConfiguration.getAddressBookUsersName()).andReturn("users");
@@ -187,7 +197,7 @@ public class AddressBookBindingImplTest {
 		AddressBookChangesResponse changes = binding.getAddressBookSync(token, timestamp);
 
 		assertThat(changes.getContactChanges().getUpdated()).containsOnly(newContact, newUser);
-		assertThat(changes.getRemovedContacts()).containsOnly(1, 2, 3, 5, 7, 8);
+		assertThat(changes.getRemovedContacts()).containsOnly(dc(1), dc(2), dc(3), dc(5), dc(7), dc(8));
 		assertThat(changes.getUpdatedAddressBooks()).containsOnly(updatedContactFolder1, updatedContactFolder2, updatedUserFolder);
 		assertThat(changes.getRemovedAddressBooks()).containsOnly(removedContactFolder1, removedContactFolder2);
 	}
@@ -206,7 +216,7 @@ public class AddressBookBindingImplTest {
 
 		ContactUpdates contactUpdates = new ContactUpdates();
 		contactUpdates.setContacts(ImmutableList.of(newContact));
-		contactUpdates.setArchived(ImmutableSet.of(1, 2));
+		contactUpdates.setArchived(ImmutableSet.of(dc(1), dc(2)));
 
 		Folder updatedContactFolder1 = Folder.builder().uid(1).name("updatedContactFolder1").ownerLoginAtDomain("login@obm.org").build();
 		Folder updatedContactFolder2 = Folder.builder().uid(2).name("updatedContactFolder2").ownerLoginAtDomain("login@obm.org").build();
@@ -217,7 +227,7 @@ public class AddressBookBindingImplTest {
 		Set<Folder> removedContactFolders =  Sets.newHashSet(removedContactFolder1, removedContactFolder2);
 
 		expect(contactDao.findUpdatedContacts(timestamp, token)).andReturn(contactUpdates).once();
-		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(ImmutableSet.of(3)).once();
+		expect(contactDao.findRemovalCandidates(timestamp, token)).andReturn(ImmutableSet.of(dc(3))).once();
 		expect(contactDao.findUpdatedFolders(timestamp, token)).andReturn(updatedContactFolders).once();
 		expect(contactDao.findRemovedFolders(timestamp, token)).andReturn(removedContactFolders).once();
 		expect(configuration.syncUsersAsAddressBook()).andReturn(false).atLeastOnce();
@@ -229,7 +239,7 @@ public class AddressBookBindingImplTest {
 		AddressBookChangesResponse changes = binding.getAddressBookSync(token, timestamp);
 
 		assertThat(changes.getContactChanges().getUpdated()).containsOnly(newContact);
-		assertThat(changes.getRemovedContacts()).containsOnly(1, 2, 3);
+		assertThat(changes.getRemovedContacts()).containsOnly(dc(1), dc(2), dc(3));
 		assertThat(changes.getUpdatedAddressBooks()).containsOnly(updatedContactFolder1, updatedContactFolder2);
 		assertThat(changes.getRemovedAddressBooks()).containsOnly(removedContactFolder1, removedContactFolder2);
 	}
@@ -540,11 +550,11 @@ public class AddressBookBindingImplTest {
 
 		ContactUpdates contactUpdates = new ContactUpdates();
 		contactUpdates.setContacts(ImmutableList.of(newContact));
-		contactUpdates.setArchived(ImmutableSet.of(1, 2));
+		contactUpdates.setArchived(ImmutableSet.of(dc(1), dc(2)));
 
 		expect(contactConfiguration.getAddressBookUserId()).andReturn(-1).once();
 		expect(contactDao.findUpdatedContacts(lastSync, addressBookId, token)).andReturn(contactUpdates).once();
-		expect(contactDao.findRemovalCandidates(lastSync, addressBookId, token)).andReturn(ImmutableSet.of(3)).once();
+		expect(contactDao.findRemovalCandidates(lastSync, addressBookId, token)).andReturn(ImmutableSet.of(dc(3))).once();
 	}
 
 	@Test
@@ -588,11 +598,11 @@ public class AddressBookBindingImplTest {
 
 		ContactUpdates contactUpdates = new ContactUpdates();
 		contactUpdates.setContacts(ImmutableList.of(newContact));
-		contactUpdates.setArchived(ImmutableSet.of(1, 2));
+		contactUpdates.setArchived(ImmutableSet.of(dc(1), dc(2)));
 
 		expect(contactDao.findUpdatedContacts(lastSync, token)).andReturn(contactUpdates).once();
 		expect(configuration.syncUsersAsAddressBook()).andReturn(false).once();
-		expect(contactDao.findRemovalCandidates(lastSync, token)).andReturn(ImmutableSet.of(3)).once();
+		expect(contactDao.findRemovalCandidates(lastSync, token)).andReturn(ImmutableSet.of(dc(3))).once();
 	}
 
 	@Test

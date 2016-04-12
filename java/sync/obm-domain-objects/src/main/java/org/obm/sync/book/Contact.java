@@ -369,6 +369,14 @@ public class Contact implements Serializable {
 		this.websites = websites;
 	}
 
+	public DeletedContact asDeletedContact() {
+		return DeletedContact
+				.builder()
+				.id(getUid())
+				.addressbookId(getFolderId())
+				.build();
+	}
+
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this)

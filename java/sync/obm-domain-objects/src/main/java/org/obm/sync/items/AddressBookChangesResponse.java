@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Folder;
 
 public class AddressBookChangesResponse {
@@ -61,7 +62,7 @@ public class AddressBookChangesResponse {
 		return contactChanges.getUpdated();
 	}
 
-	public Set<Integer> getRemovedContacts() {
+	public Set<DeletedContact> getRemovedContacts() {
 		return contactChanges.getRemoved();
 	}
 

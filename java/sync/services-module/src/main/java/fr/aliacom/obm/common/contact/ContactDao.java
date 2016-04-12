@@ -46,6 +46,7 @@ import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.exception.ContactNotFoundException;
 
@@ -83,7 +84,7 @@ public interface ContactDao {
 
 	Contact removeContact(AccessToken at, Contact c) throws ServerFault, SQLException;
 
-	Set<Integer> findRemovalCandidates(Date d, AccessToken at) throws SQLException;
+	Set<DeletedContact> findRemovalCandidates(Date d, AccessToken at) throws SQLException;
 
 	List<AddressBook> findAddressBooks(AccessToken at) throws SQLException;
 
@@ -107,7 +108,7 @@ public interface ContactDao {
 
 	ContactUpdates findUpdatedContacts(Date lastSync, Integer addressBookId, AccessToken token) throws SQLException;
 
-	Set<Integer> findRemovalCandidates(Date lastSync, Integer addressBookId, AccessToken token) throws SQLException;
+	Set<DeletedContact> findRemovalCandidates(Date lastSync, Integer addressBookId, AccessToken token) throws SQLException;
 
 	Collection<AddressBook> listSynchronizedAddressBooks(AccessToken token) throws SQLException;
 

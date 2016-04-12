@@ -208,10 +208,14 @@ public class BookItemsParser extends AbstractItemsParser {
 		Element updated = DOMUtils.getUniqueElement(root, "updated");
 
 		NodeList rmed = removed.getElementsByTagName("contact");
-		Set<Integer> removedIds = new HashSet<Integer>();
+		Set<DeletedContact> removedIds = new HashSet<DeletedContact>();
 		for (int i = 0; i < rmed.getLength(); i++) {
 			Element e = (Element) rmed.item(i);
-			removedIds.add(Integer.parseInt(e.getAttribute("uid")));
+			removedIds.add(DeletedContact
+					.builder()
+					.id(Integer.parseInt(e.getAttribute("uid")))
+					.addressbookId(Integer.parseInt(e.getAttribute("addressbookid")))
+					.build());
 		}
 
 		NodeList upd = updated.getElementsByTagName("contact");

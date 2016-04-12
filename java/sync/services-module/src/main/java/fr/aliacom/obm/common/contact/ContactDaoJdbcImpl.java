@@ -51,7 +51,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -75,6 +74,7 @@ import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.book.InstantMessagingId;
 import org.obm.sync.book.Phone;
@@ -175,7 +175,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 				+ "LEFT JOIN EntityRight prights ON prights.entityright_entity_id=addressbookentity_entity_id AND prights.entityright_consumer_id IS NULL "
 				+ "WHERE "
 				+ "(owner=? OR urights.entityright_read=1 OR grights.entityright_read=1 OR prights.entityright_read=1)";
-		sql += " AND (contact_timecreate >= ? OR contact_timeupdate >= ? OR s.timestamp >= ?)";
+		sql += " AND (contact_timecreate >= ? OR contact_timeupdate >= ? OR s.\"timestamp\" >= ?)";
 		return sql;
 	}
 	
@@ -187,7 +187,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 
 	private String getSelectForFindRemovalCandidates(AccessToken at) {
 		String q = "SELECT "
-			+ "deletedcontact_contact_id "
+			+ "deletedcontact_contact_id, deletedcontact_addressbook_id "
 			+ "FROM DeletedContact "
 			+ "INNER JOIN SyncedAddressbook s ON ( s.addressbook_id=deletedcontact_addressbook_id AND s.user_id= "
 			+ at.getObmId() + ")";
@@ -216,7 +216,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 		try {
 
 			List<Contact> contacts = new ArrayList<Contact>();
-			Set<Integer> archivedContactIds = new TreeSet<Integer>();
+			Set<DeletedContact> archivedContacts = new HashSet<DeletedContact>();
 
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(sql);
@@ -239,7 +239,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 					entityContact.put(c.getEntityId(), c);
 					contacts.add(c);
 				} else {
-					archivedContactIds.add(c.getUid());
+					archivedContacts.add(c.asDeletedContact());
 				}
 			}
 			rs.close();
@@ -255,12 +255,13 @@ public class ContactDaoJdbcImpl implements ContactDao {
 				loadAnniversary(con, entityContact);
 			}
 			
-			upd.setArchived(archivedContactIds);
+			upd.setArchived(archivedContacts);
 			upd.setContacts(contacts);
 			
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
+
 		return upd;
 	}
 
@@ -1369,17 +1370,17 @@ public class ContactDaoJdbcImpl implements ContactDao {
 	}
 
 	@Override
-	public Set<Integer> findRemovalCandidates(Date d, AccessToken at) throws SQLException {
+	public Set<DeletedContact> findRemovalCandidates(Date d, AccessToken at) throws SQLException {
 		String sql = getSelectForFindRemovalCandidates(at);
 		return findRemovalCandidates(sql, d);
 	}
 	
-	private Set<Integer> findRemovalCandidates(String sql, Date d) throws SQLException {
+	private Set<DeletedContact> findRemovalCandidates(String sql, Date d) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection con = null;
+		Set<DeletedContact> contacts = new HashSet<DeletedContact>();
 
-		Set<Integer> l = new HashSet<Integer>();
 		try {
 			con = obmHelper.getConnection();
 			ps = con.prepareStatement(sql);
@@ -1389,12 +1390,17 @@ public class ContactDaoJdbcImpl implements ContactDao {
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
-				l.add(rs.getInt(1));
+				contacts.add(DeletedContact
+						.builder()
+						.id(rs.getInt("deletedcontact_contact_id"))
+						.addressbookId(rs.getInt("deletedcontact_addressbook_id"))
+						.build());
 			}
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
-		return l;
+
+		return contacts;
 	}
 
 	/**
@@ -1677,7 +1683,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 			+ " INNER JOIN UserObm ON (owner=userobm_id) "
 			+ " INNER JOIN Domain as domain ON (userobm_domain_id=domain.domain_id) "
 			+ "WHERE (a.syncable OR a.name=?) AND "
-			+ "(a.timeupdate >= ? OR a.timecreate >= ? OR s.timestamp >= ?)";
+			+ "(a.timeupdate >= ? OR a.timecreate >= ? OR s.\"timestamp\" >= ?)";
 
 		int idx = 1;
 
@@ -1727,7 +1733,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 				   " INNER JOIN DeletedAddressbook ON (addressbook_id = id)" +
 				   " INNER JOIN UserObm ON (owner = userobm_id)" +
 				   " INNER JOIN Domain as domain ON (userobm_domain_id=domain.domain_id) " +
-				   " WHERE user_id = ? AND timestamp >= ?";
+				   " WHERE user_id = ? AND \"timestamp\" >= ?";
 		
 		Set<Folder> folders = new HashSet<Folder>();
 		
@@ -1759,7 +1765,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 				   " INNER JOIN DeletedSyncedAddressbook ON (addressbook_id = id)" +
 				   " INNER JOIN UserObm ON (owner = userobm_id)" +
 				   " INNER JOIN Domain as domain ON (userobm_domain_id=domain.domain_id) " +
-				   " WHERE user_id = ? AND timestamp >= ?";
+				   " WHERE user_id = ? AND \"timestamp\" >= ?";
 		
 		Set<Folder> folders = new HashSet<Folder>();
 		
@@ -1853,7 +1859,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 	}
 
 	@Override
-	public Set<Integer> findRemovalCandidates(Date lastSync, Integer addressBookId, AccessToken token) throws SQLException {
+	public Set<DeletedContact> findRemovalCandidates(Date lastSync, Integer addressBookId, AccessToken token) throws SQLException {
 		String sql = getSelectForFindRemovalCandidates(addressBookId, token);
 		return findRemovalCandidates(sql, lastSync);
 	}

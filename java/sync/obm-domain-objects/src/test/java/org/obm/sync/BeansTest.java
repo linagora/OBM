@@ -46,6 +46,7 @@ import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.InstantMessagingId;
 import org.obm.sync.book.Phone;
 import org.obm.sync.calendar.ContactAttendee;
@@ -138,7 +139,8 @@ public class BeansTest {
 				UserPhones.class,
 				UserWork.class,
 				UserPassword.class,
-				Samba.class);
+				Samba.class,
+				DeletedContact.class);
 	}
 	
 	@Test

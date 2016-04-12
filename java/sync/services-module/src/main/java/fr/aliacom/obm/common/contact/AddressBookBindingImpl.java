@@ -54,6 +54,7 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.exception.ContactNotFoundException;
@@ -166,6 +167,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 	
 	private AddressBookChangesResponse getSync(AccessToken token, Date timestamp) throws ServerFault {
 		AddressBookChangesResponse response = new AddressBookChangesResponse();
+
 		try {
 			response.setContactChanges(getContactsChanges(token, timestamp));
 			response.setBooksChanges(listAddressBooksChanged(token, timestamp));
@@ -179,24 +181,28 @@ public class AddressBookBindingImpl implements IAddressBook {
 	}
 	
 	private ContactChanges getContactsChanges(AccessToken token, Date timestamp) throws ServerFault, SQLException {
-		ContactUpdates contactUpdates = contactDao.findUpdatedContacts(timestamp, token);
-
 		ContactUpdates userUpdates;
+		ContactUpdates contactUpdates = contactDao.findUpdatedContacts(timestamp, token);
+		Set<DeletedContact> userRemovals;
+		Set<DeletedContact> contactRemovals = contactDao.findRemovalCandidates(timestamp, token);
+
 		if (configuration.syncUsersAsAddressBook()) {
 			userUpdates = userDao.findUpdatedUsers(timestamp, token);
+			userRemovals = userDao.findRemovalCandidates(timestamp, token);
 		} else {
 			userUpdates = new ContactUpdates();
+			userRemovals = ImmutableSet.of();
 		}
-		Set<Integer> removalCandidates = contactDao.findRemovalCandidates(timestamp, token);
-		
+
 		return new ContactChanges(getUpdatedContacts(contactUpdates, userUpdates),
-				getRemovedContacts(contactUpdates, userUpdates, removalCandidates), getLastSyncSubtractByTransactionToleranceTimeout());
+				getRemovedContacts(contactUpdates, userUpdates, contactRemovals, userRemovals), getLastSyncSubtractByTransactionToleranceTimeout());
 	}
-	
-	private Set<Integer> getRemovedContacts(ContactUpdates contactUpdates,
-			ContactUpdates userUpdates, Set<Integer> removalCandidates) {
-		SetView<Integer> archived = Sets.union( contactUpdates.getArchived(), userUpdates.getArchived());
-		return Sets.union(archived, removalCandidates);
+
+	private Set<DeletedContact> getRemovedContacts(ContactUpdates contactUpdates, ContactUpdates userUpdates, Set<DeletedContact> contactRemovals, Set<DeletedContact> userRemovals) {
+		SetView<DeletedContact> archived = Sets.union(contactUpdates.getArchived(), userUpdates.getArchived());
+		SetView<DeletedContact> removed = Sets.union(contactRemovals, userRemovals);
+
+		return Sets.union(archived, removed);
 	}
 
 	private List<Contact> getUpdatedContacts(ContactUpdates contactUpdates, ContactUpdates userUpdates) {
@@ -418,9 +424,9 @@ public class AddressBookBindingImpl implements IAddressBook {
 	@Transactional(readOnly=true)
 	public ContactChanges listContactsChanged(AccessToken token, Date lastSync, Integer addressBookId) throws ServerFault {
 		try {
-			Set<Integer> removal = null;
+			Set<DeletedContact> removal = null;
 			ContactUpdates contactUpdates = null;
-			
+
 			if (addressBookId == contactConfiguration.getAddressBookUserId()) {
 				contactUpdates = userDao.findUpdatedUsers(lastSync, token);
 				removal = userDao.findRemovalCandidates(lastSync, token);
@@ -428,7 +434,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 				contactUpdates = contactDao.findUpdatedContacts(lastSync, addressBookId, token);
 				removal = contactDao.findRemovalCandidates(lastSync, addressBookId, token);
 			}
-			
+
 			return new ContactChanges(
 					contactUpdates.getContacts(), 
 					Sets.union(contactUpdates.getArchived(), removal), 
@@ -445,7 +451,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		
 		ContactChanges allContactsChanged = listContactsChanged(token, lastSync);
 		return new ContactChanges(allContactsChanged.getUpdated(), 
-				ImmutableSet.<Integer> of(), 
+				ImmutableSet.<DeletedContact> of(), 
 				allContactsChanged.getLastSync());
 	}
 
@@ -455,7 +461,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		
 		ContactChanges allContactsChanged = listContactsChanged(token, lastSync, addressBookId);
 		return new ContactChanges(allContactsChanged.getUpdated(), 
-				ImmutableSet.<Integer> of(), 
+				ImmutableSet.<DeletedContact> of(), 
 				allContactsChanged.getLastSync());
 	}
 		

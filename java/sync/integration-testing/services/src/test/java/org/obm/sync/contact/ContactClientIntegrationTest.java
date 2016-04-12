@@ -46,6 +46,7 @@ import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
 import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
 import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
+import org.obm.sync.H2GuiceServletContextListener;
 import org.obm.sync.IntegrationTestUtils;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
@@ -53,10 +54,12 @@ import org.obm.sync.ServicesClientModule;
 import org.obm.sync.ServicesClientModule.ArquillianLocatorService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Website;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.client.login.LoginClient;
 import org.obm.sync.exception.ContactNotFoundException;
+import org.obm.sync.items.AddressBookChangesResponse;
 
 import com.google.inject.Inject;
 
@@ -65,6 +68,8 @@ import fr.aliacom.obm.common.user.UserPassword;
 @RunWith(ManagedTomcatGuiceArquillianRunner.class)
 @GuiceModule(ServicesClientModule.class)
 public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
+
+	private static final int USERS_BOOK_ID = -1;
 
 	@Inject ArquillianLocatorService locatorService;
 	@Inject BookClient bookClient;
@@ -237,9 +242,38 @@ public class ContactClientIntegrationTest extends ObmSyncIntegrationTest {
 		bookClient.storeContact(token, addressBookId, contact, null);
 	}	
 
+	@Test
+	@RunAsClient
+	public void testGetAddressbookSyncShouldReturnAddressBookIdForDeletedUsersAndContacts(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		int syncedBookId = 4;
+		DeletedContact.Builder deletedUser = DeletedContact
+				.builder()
+				.addressbookId(USERS_BOOK_ID);
+
+		locatorService.configure(baseUrl);
+
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		Contact createdContact = bookClient.createContact(token, syncedBookId, contact, null);
+		AddressBookChangesResponse sync = bookClient.getAddressBookSync(token, null);
+
+		assertThat(sync.getRemovedContacts()).containsOnly(deletedUser.id(666).build(), deletedUser.id(5).build());
+
+		bookClient.removeContact(token, syncedBookId, createdContact.getUid());
+		sync = bookClient.getAddressBookSync(token, sync.getLastSync());
+
+		assertThat(sync.getRemovedContacts()).containsOnly(DeletedContact
+				.builder()
+				.id(1)
+				.addressbookId(syncedBookId)
+				.build());
+	}
+
 	@DeployForEachTests
 	@Deployment(managed=false, name=ARCHIVE)
 	public static WebArchive createDeployment() {
-		return ObmSyncArchiveUtils.createDeployment();
+		return ObmSyncArchiveUtils
+				.createDeployment()
+				.addAsResource("sql/org/obm/sync/contact/ContactClientIntegrationTestAdditionalDBScripts", H2GuiceServletContextListener.ADDITIONAL_DB_SCRIPTS_FILE)
+				.addAsResource("sql/org/obm/sync/contact/archivedOrDeletedUsers.sql");
 	}
 }

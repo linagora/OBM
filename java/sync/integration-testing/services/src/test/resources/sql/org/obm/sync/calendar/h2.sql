@@ -734,11 +734,41 @@ CREATE TABLE category (
     category_label character varying(100) DEFAULT ''::character varying NOT NULL
 );
 
+ALTER TABLE categorylink
+	ADD CONSTRAINT categorylink_pkey PRIMARY KEY (categorylink_category_id, categorylink_entity_id);
 
-    ALTER TABLE categorylink
-    ADD CONSTRAINT categorylink_pkey PRIMARY KEY (categorylink_category_id, categorylink_entity_id);
-    CREATE INDEX categorylink_category_id_fkey ON categorylink(categorylink_category_id);
+CREATE INDEX categorylink_category_id_fkey ON categorylink(categorylink_category_id);
 
+CREATE TABLE deletedsyncedaddressbook (
+    user_id integer NOT NULL,
+    addressbook_id integer NOT NULL,
+    "timestamp" timestamp DEFAULT now() NOT NULL
+);
+
+CREATE TABLE syncedaddressbook (
+    user_id integer NOT NULL,
+    addressbook_id integer NOT NULL,
+    "timestamp" timestamp DEFAULT now() NOT NULL
+);
+
+CREATE TABLE deletedcontact (
+    deletedcontact_contact_id integer NOT NULL,
+    deletedcontact_addressbook_id integer,
+    deletedcontact_timestamp timestamp,
+    deletedcontact_origin character varying(255) NOT NULL
+);
+
+CREATE TABLE deletedaddressbook (
+    addressbook_id integer NOT NULL,
+    user_id integer NOT NULL,
+    "timestamp" timestamp,
+    origin character varying(255) NOT NULL
+);
+
+CREATE TABLE deleteduser (
+    deleteduser_user_id integer NOT NULL,
+    deleteduser_timestamp timestamp DEFAULT now()
+);
 
 --
 -- Name: categorylink_entity_id_fkey; Type: INDEX; Schema: public; Owner: obm; Tablespace: 
@@ -903,6 +933,30 @@ ALTER TABLE resource
 ALTER TABLE profilemodule
     ADD CONSTRAINT profilemodule_profile_id_profile_id_fkey FOREIGN KEY (profilemodule_profile_id) REFERENCES profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+ALTER TABLE deletedsyncedaddressbook
+    ADD CONSTRAINT deletedsyncedaddressbook_pkey PRIMARY KEY (user_id, addressbook_id);
+
+ALTER TABLE syncedaddressbook
+    ADD CONSTRAINT syncedaddressbook_pkey PRIMARY KEY (user_id, addressbook_id);
+
+ALTER TABLE deletedsyncedaddressbook
+    ADD CONSTRAINT deletedsyncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES addressbook(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE deletedsyncedaddressbook
+    ADD CONSTRAINT deletedsyncedaddressbook_user_id_userobm_id_fkey FOREIGN KEY (user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE syncedaddressbook
+    ADD CONSTRAINT syncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES addressbook(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE syncedaddressbook
+    ADD CONSTRAINT syncedaddressbook_user_id_userobm_id_fkey FOREIGN KEY (user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE deletedaddressbook
+    ADD CONSTRAINT deletedaddressbook_pkey PRIMARY KEY (addressbook_id);
+
+ALTER TABLE deleteduser
+    ADD CONSTRAINT deleteduser_pkey PRIMARY KEY (deleteduser_user_id);
+
 --
 -- Data inserts
 --
@@ -917,7 +971,7 @@ INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm
         (1, 'user1','user1','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user1'),
         (1, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2'),
         (1, 'user3','user3','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user3'),
-        (2, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2'),;
+        (2, 'user2','user2','PLAIN','user', 'Lastname', 'Firstname', '1000', '512', '0', 'user2');
 
 INSERT INTO entity (entity_mailing) VALUES (TRUE), (TRUE), (TRUE), (TRUE), (TRUE), (TRUE);
 INSERT INTO userentity (userentity_entity_id, userentity_user_id) VALUES (1, 1), (2, 2), (3, 3), (4, 4);
@@ -943,6 +997,10 @@ INSERT INTO AddressBookEntity (addressbookentity_entity_id, addressbookentity_ad
 		            (2, 2),
 		            (3, 3),
 		            (4, 4);
+
+INSERT INTO SyncedAddressBook (user_id, addressbook_id)
+    VALUES
+        (1, 4);
 
 INSERT INTO eventcategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label)
     VALUES (1, NULL,NULL,NULL,NULL,'existing_category');

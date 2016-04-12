@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.DeletedContact;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -43,14 +44,14 @@ import com.google.common.collect.Sets;
 public class ContactChanges {
 	
 	private final List<Contact> updated;
-	private final Set<Integer> removed;
+	private final Set<DeletedContact> removed;
 	private final Date lastSync;
 	
 	public ContactChanges() {
-		this(Lists.<Contact>newArrayList(), Sets.<Integer>newHashSet(), null);
+		this(Lists.<Contact>newArrayList(), Sets.<DeletedContact>newHashSet(), null);
 	}
 	
-	public ContactChanges(List<Contact> updated, Set<Integer> removed, Date lastSync) {
+	public ContactChanges(List<Contact> updated, Set<DeletedContact> removed, Date lastSync) {
 		this.updated = updated;
 		this.removed = removed;
 		this.lastSync = lastSync;
@@ -60,7 +61,7 @@ public class ContactChanges {
 		return updated;
 	}
 	
-	public Set<Integer> getRemoved() {
+	public Set<DeletedContact> getRemoved() {
 		return removed;
 	}
 

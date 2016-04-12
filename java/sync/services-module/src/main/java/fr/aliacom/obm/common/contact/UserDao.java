@@ -50,6 +50,7 @@ import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.ContactLabel;
+import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Phone;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.utils.ObmHelper;
@@ -214,8 +215,8 @@ public class UserDao {
 		return m;
 	}
 
-	public Set<Integer> findRemovalCandidates(Date d, AccessToken at) throws SQLException {
-		Set<Integer> ret = new HashSet<Integer>();
+	public Set<DeletedContact> findRemovalCandidates(Date d, AccessToken at) throws SQLException {
+		Set<DeletedContact> ret = new HashSet<DeletedContact>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection con = null;
@@ -240,12 +241,17 @@ public class UserDao {
 			}
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				ret.add(rs.getInt(1));
+				ret.add(DeletedContact
+						.builder()
+						.id(rs.getInt(1))
+						.addressbookId(contactConfiguration.getAddressBookUserId())
+						.build());
 			}
 
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
+
 		return ret;
 	}
 

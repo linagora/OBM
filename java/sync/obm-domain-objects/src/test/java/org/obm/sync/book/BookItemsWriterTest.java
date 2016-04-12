@@ -231,7 +231,7 @@ public class BookItemsWriterTest {
 	private ContactChanges mockContactChanges() {
 		return new ContactChanges(
 				ImmutableList.of(mockContact()),
-				ImmutableSet.of(123),
+				ImmutableSet.of(DeletedContact.builder().id(123).addressbookId(1).build()),
 				DateUtils.date("2014-10-03T12:00:00Z"));
 	}
 
