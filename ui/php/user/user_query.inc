@@ -2092,7 +2092,7 @@ function check_user_data_form($p_id, &$user) {
     }
 
     // OBMFULL-6420 Check that the email is not already used by a user
-    if ($cuser_external_email_check_usage && is_email_used($email)) {
+    if ($cuser_external_email_check_usage && is_email_used($email, $id)) {
       $err['msg'] = "$l_email_exist : $email";
       $err['field'] = 'email';
 
@@ -2207,16 +2207,18 @@ function check_user_data_form($p_id, &$user) {
   return true;
 }
 
-function is_email_used($email) {
+function is_email_used($email, $id = null) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('userobm');
+  $skipUser = $id ? "AND userobm_id " . sql_parse_id($id, true, true) : "";
   $query = "
       SELECT userobm_id, userobmemail_email
       FROM UserObm
       INNER JOIN UserObmEmail ON userobmemail_userobm_id = userobm_id
       WHERE LOWER(userobmemail_email) = LOWER('" . $obm_q->escape($email) . "')
+      $skipUser
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "is_email_used($email)");
