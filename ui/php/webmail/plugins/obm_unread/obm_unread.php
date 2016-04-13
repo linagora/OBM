@@ -49,6 +49,7 @@ class obm_unread extends rcube_plugin {
     $filter = get_input_value('_filter', RCUBE_INPUT_GET);
 
     if ($args["task"] == "mail" && $filter == 'UNSEEN') {
+      $_SESSION['search_filter'] = 'UNSEEN';
       $RCMAIL->output->command('filter_mailbox', 'UNSEEN');
     }
   }
