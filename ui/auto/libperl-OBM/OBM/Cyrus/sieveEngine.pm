@@ -45,6 +45,7 @@ use strict;
 use Cyrus::SIEVE::managesieve;
 
 use constant HEADER => '# rule';
+use constant GLOBAL_HEADER => '# rule:[OBM main inclusion]';
 use constant VACATION_HEADER => '# rule:[OBM Vacation]';
 use constant NOMADE_HEADER => '# rule:[OBM Nomade]';
 
@@ -197,6 +198,11 @@ sub _updateSieveScript {
     my @headers;
     $self->_sieveGetHeaders( $oldSieveScript, \@headers );
 
+    my @globalsieve;
+    if( $self->_updateSieveGlobal( \@headers, $oldSieveScript, \@globalsieve) ) {
+        return 1;
+    }
+
     my @vacation;
     if( $self->_updateSieveVacation( \@headers, $oldSieveScript, \@vacation ) ) {
         return 1;
@@ -209,7 +215,7 @@ sub _updateSieveScript {
 
     splice( @{$newSieveScript}, 0 );
 
-    if( ( $#vacation < 0 ) && ( $#nomade < 0 ) && ($#{$oldSieveScript} < 0) ) {
+    if( ( $#globalsieve < 0 ) && ( $#vacation < 0 ) && ( $#nomade < 0 ) && ($#{$oldSieveScript} < 0) ) {
         return 0;
     }
 
@@ -217,6 +223,7 @@ sub _updateSieveScript {
         push( @{$newSieveScript}, 'require [' . join(',', @headers) . '];' );
     }
 
+    push( @{$newSieveScript}, @globalsieve);
     push( @{$newSieveScript}, @vacation );
     push( @{$newSieveScript}, @nomade );
     push( @{$newSieveScript}, @{$oldSieveScript} );
@@ -224,6 +231,31 @@ sub _updateSieveScript {
     return 0;
 }
 
+sub _updateSieveGlobal {
+    my $self = shift;
+    my( $headers, $oldSieveScript, $newSieveScript ) = @_;
+    my $globalMark = GLOBAL_HEADER;
+
+    if( !defined($self->{'currentEntity'}) ) {
+        $self->_log( 'entite à mettre à jour non défini', 1 );
+        return 1;
+    }
+
+    $self->_sieveDeleteMark( $oldSieveScript, $globalMark );
+
+    require OBM::Parameters::common;
+    if( $OBM::Parameters::common::useGlobalSieveScript ) {
+        push( @{$newSieveScript}, $globalMark);
+        push( @{$newSieveScript}, "include :global \"main\";\r\n" );
+
+        # we need 'include' in headers
+        if (!grep(/\"include\"/, @{$headers})) {
+            push(@{$headers}, "\"include\"");
+        }
+    }
+
+    return 0;
+}
 
 sub _updateSieveVacation {
     my $self = shift;
@@ -252,7 +284,6 @@ sub _updateSieveVacation {
 
     return 0;
 }
-
 
 sub _updateSieveNomade {
     my $self = shift;

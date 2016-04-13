@@ -201,6 +201,10 @@ oldSidMapping = false
 ; Set to 1 to change this behavior
 ; 0 is the default prior to libwww-perl 5.840
 satelliteHTTPSVerifyHostName = 0
+
+; Enable global Sieve scripts
+;useGlobalSieveScript = true
+
 ;
 ; Settings use by OBM Thunderbird autoconf
 

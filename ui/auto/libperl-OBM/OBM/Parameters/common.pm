@@ -42,7 +42,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($Bin $logLevel $logFile $sieveSrv $backupRoot $documentRoot $documentDefaultPath $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $cyrusKeyAndCert $cyrusCa $cyrusCaPath $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER $ldapConnectionPooling);
+@EXPORT_const = qw($Bin $logLevel $logFile $sieveSrv $backupRoot $documentRoot $documentDefaultPath $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $cyrusKeyAndCert $cyrusCa $cyrusCaPath $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER $ldapConnectionPooling $useGlobalSieveScript);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db $dbType);
@@ -280,6 +280,13 @@ if( defined( $shareMailboxDefaultFolders ) && $shareMailboxDefaultFolders =~ /^[
     $shareMailboxDefaultFolders = $1;
 }else {
     $shareMailboxDefaultFolders = undef;
+}
+
+$useGlobalSieveScript = $cfgFile->val('automate', 'useGlobalSieveScript');
+if (defined($useGlobalSieveScript) && lc($useGlobalSieveScript) eq "true") {
+    $useGlobalSieveScript = 1;
+} else {
+    $useGlobalSieveScript = 0;
 }
 
 # Le repertoire pere des repertoires personnels
