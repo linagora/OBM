@@ -38,6 +38,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.hamcrest.Matchers;
 
+import com.github.restdriver.clientdriver.ClientDriverExpectation;
 import com.github.restdriver.clientdriver.ClientDriverRequest.Method;
 import com.github.restdriver.clientdriver.ClientDriverRule;
 
@@ -56,8 +57,22 @@ public class Expectations {
 		return expectTrustedLoginForUser(domain, admin);
 	}
 	
+	public Expectations expectTrustedLoginAnyTime(ObmDomain domain) {
+		return expectTrustedLoginForUserAnyTime(domain, admin);
+	}
+	
 	public Expectations expectTrustedLoginForUser(ObmDomain domain, ObmUser user) {
-		driver.addExpectation(
+		expect(domain, user);
+		return this;
+	}
+	
+	public Expectations expectTrustedLoginForUserAnyTime(ObmDomain domain, ObmUser user) {
+		expect(domain, user).anyTimes();
+		return this;
+	}
+	
+	private ClientDriverExpectation expect(ObmDomain domain, ObmUser user) {
+		return driver.addExpectation(
 				onRequestTo("/obm-sync/login/trustedLogin").withMethod(Method.POST)
 					.withBody(Matchers.allOf(
 								Matchers.containsString("login=" + user.getLogin() + "%40" + domain.getName()),
@@ -70,7 +85,6 @@ public class Expectations {
 						+ "</token>",
 					MediaType.APPLICATION_XML)
 				);
-		return this;
 	}
 	
 	public Expectations expectTrustedLoginThrowAuthFault() {
