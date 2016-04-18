@@ -45,6 +45,7 @@ import org.junit.runner.RunWith;
 import org.obm.guice.GuiceModule;
 import org.obm.push.arquillian.ManagedTomcatGuiceArquillianRunner;
 import org.obm.push.arquillian.extension.deployment.DeployForEachTests;
+import org.obm.sync.H2GuiceServletContextListener;
 import org.obm.sync.IntegrationTestUtils;
 import org.obm.sync.ObmSyncArchiveUtils;
 import org.obm.sync.ObmSyncIntegrationTest;
@@ -162,10 +163,53 @@ public class CalendarClientIntegrationTest extends ObmSyncIntegrationTest {
 		assertThat(firstEvent.getObmId()).isNotNull();
 		assertThat(secondEvent.getObmId()).isNotNull().isNotEqualTo(firstEvent.getObmId());
 	}
-	
+
+	@Test
+	@RunAsClient
+	public void testStoreEventIgnoresParticipationChangeOnResources(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		Event event = newEvent(calendar, "user1", "testStoreEventIgnoresParticipationChangeOnResources");
+		ResourceAttendee resource = ResourceAttendee.builder().email("res@domain.org").participation(Participation.accepted()).build();
+
+		event.addAttendee(resource);
+		calendarClient.storeEvent(token, calendar, event, false, null);
+
+		// This tries to set the resource as DECLINED
+		resource.setParticipation(Participation.declined());
+		calendarClient.storeEvent(token, calendar, event, false, null);
+
+		Event eventFromServer = calendarClient.getEventFromExtId(token, calendar, event.getExtId());
+
+		assertThat(eventFromServer.findAttendeeFromEmail("res@domain.org").getParticipation()).isEqualTo(Participation.accepted());
+	}
+
+	@Test
+	@RunAsClient
+	public void testModifyEventIgnoresParticipationChangeOnResources(@ArquillianResource @OperateOnDeployment(ARCHIVE) URL baseUrl) throws Exception {
+		locatorService.configure(baseUrl);
+		AccessToken token = loginClient.login(calendar, UserPassword.valueOf("user1"));
+		Event event = newEvent(calendar, "user1", "testStoreEventIgnoresParticipationChangeOnResources");
+		ResourceAttendee resource = ResourceAttendee.builder().email("res@domain.org").participation(Participation.accepted()).build();
+
+		event.addAttendee(resource);
+		calendarClient.storeEvent(token, calendar, event, false, null);
+
+		// This tries to set the resource as DECLINED
+		resource.setParticipation(Participation.declined());
+		calendarClient.modifyEvent(token, calendar, event, true, false);
+
+		Event eventFromServer = calendarClient.getEventFromExtId(token, calendar, event.getExtId());
+
+		assertThat(eventFromServer.findAttendeeFromEmail("res@domain.org").getParticipation()).isEqualTo(Participation.accepted());
+	}
+
 	@DeployForEachTests
 	@Deployment(managed=false, name=ARCHIVE)
 	public static WebArchive createDeployment() {
-		return ObmSyncArchiveUtils.createDeployment();
+		return ObmSyncArchiveUtils
+				.createDeployment()
+				.addAsResource("sql/org/obm/sync/calendar/CalendarClientIntegrationTestAdditionalDBScripts", H2GuiceServletContextListener.ADDITIONAL_DB_SCRIPTS_FILE)
+				.addAsResource("sql/org/obm/sync/calendar/resources.sql");
 	}
 }

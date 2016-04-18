@@ -2606,7 +2606,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, null, attendeeService, null, null);
 
-		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(after.getAttendees()).isEmpty();
 	}
 
@@ -2620,7 +2620,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, null, attendeeService, null, null);
 
-		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
 	}
 
@@ -2634,7 +2634,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, null, attendeeService, null, null);
 
-		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(after.getAttendees()).isEmpty();
 	}
 
@@ -2648,7 +2648,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, null, attendeeService, null, null);
 
-		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(after.getAttendees()).isEqualTo(expectedAttendees);
 	}
 
@@ -2742,7 +2742,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, null, attendeeService, null, null);
 
-		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
 	}
 
@@ -2763,7 +2763,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, null, attendeeService, null, null);
 
-		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(after.getEventsExceptions()).isEmpty();
 	}
 
@@ -2787,7 +2787,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, null, attendeeService, null, null);
 
-		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
 	}
 
@@ -2817,7 +2817,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, null, attendeeService, null, null);
 
-		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendeesException);
 	}
 
@@ -2844,7 +2844,7 @@ public class CalendarBindingImplTest {
 		CalendarBindingImpl calendarService =
 				new CalendarBindingImpl(null, null, null, null, null, null, null, null, null, null, attendeeService, null, null);
 
-		calendarService.inheritsParticipationFromExistingEventForObmUsers(before, after);
+		calendarService.inheritsParticipationFromExistingEvent(before, after);
 		assertThat(afterException.getAttendees()).isEqualTo(expectedAttendees);
 	}
 
