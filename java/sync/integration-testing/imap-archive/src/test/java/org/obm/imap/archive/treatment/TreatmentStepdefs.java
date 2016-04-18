@@ -175,13 +175,13 @@ public class TreatmentStepdefs {
 	
 	@Given("configuration excludes users?")
 	public void configurationExcludeUsers(Map<String, String> users) {
-		configurationBuilder.scopeIncludes(false)
+		configurationBuilder.scopeUsersIncludes(false)
 			.scopeUsers(usersMapToScopeUserList(users));
 	}
 	
 	@Given("configuration includes users?")
 	public void configurationIncludeUsers(Map<String, String> users) {
-		configurationBuilder.scopeIncludes(true)
+		configurationBuilder.scopeUsersIncludes(true)
 			.scopeUsers(usersMapToScopeUserList(users));
 	}
 

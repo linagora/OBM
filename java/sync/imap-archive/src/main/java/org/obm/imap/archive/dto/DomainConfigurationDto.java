@@ -58,7 +58,7 @@ public class DomainConfigurationDto {
 		dto.minute = configuration.getMinute();
 		dto.archiveMainFolder = configuration.getArchiveMainFolder();
 		dto.excludedFolder = configuration.getExcludedFolder();
-		dto.scopeIncludes = configuration.isScopeIncludes();
+		dto.scopeUsersIncludes = configuration.isScopeUsersIncludes();
 		dto.scopeUserIdToLoginMap = toMap(configuration.getScopeUsers());
 		dto.mailingEmails = toStrings(configuration.getMailing());
 		dto.moveEnabled = configuration.isMoveEnabled();
@@ -117,7 +117,7 @@ public class DomainConfigurationDto {
 	public Integer minute;
 	public String archiveMainFolder;
 	public String excludedFolder;
-	public Boolean scopeIncludes;
+	public Boolean scopeUsersIncludes;
 	public Map<String, String> scopeUserIdToLoginMap;
 	public List<String> mailingEmails;
 	public Boolean moveEnabled;

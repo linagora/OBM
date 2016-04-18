@@ -75,7 +75,7 @@ public class DomainConfigurationDtoTest {
 							.build())
 					.archiveMainFolder("arChive")
 					.excludedFolder("excluded")
-					.scopeIncludes(true)
+					.scopeUsersIncludes(true)
 					.scopeUsers(ImmutableList.of(ScopeUser.builder()
 								.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
 								.login("user")
@@ -93,7 +93,7 @@ public class DomainConfigurationDtoTest {
 		assertThat(dto.minute).isEqualTo(23);
 		assertThat(dto.archiveMainFolder).isEqualTo("arChive");
 		assertThat(dto.excludedFolder).isEqualTo("excluded");
-		assertThat(dto.scopeIncludes).isTrue();
+		assertThat(dto.scopeUsersIncludes).isTrue();
 		assertThat(dto.scopeUserIdToLoginMap).containsExactly(MapEntry.entry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "user"));
 		assertThat(dto.mailingEmails).containsOnly("usera@mydomain.org", "userb@mydomain.org");
 	}

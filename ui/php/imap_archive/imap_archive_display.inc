@@ -52,7 +52,7 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   global $l_service_activating, $l_activating;
   global $l_options, $l_copy_title, $l_copy_only, $l_copy_and_delete;
   global $l_scheduling;
-  global $l_archive_main_folder, $l_excluded_folder, $l_folder, $l_scope;
+  global $l_archive_main_folder, $l_excluded_folder, $l_folder, $l_user_scope;
   global $l_mailing_feedback;
 
   $user_id = $params['user_id'];
@@ -69,7 +69,7 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   $archiveMainFolder = $configuration->archiveMainFolder;
   $excludedFolder = $configuration->excludedFolder;
   $scopeUserIdToLoginMap = $configuration->scopeUserIdToLoginMap;
-  $scopeIncludes = $configuration->scopeIncludes;
+  $scopeUsersIncludes = $configuration->scopeUsersIncludes;
   $mailingEmails = $configuration->mailingEmails;
 
   $disabled = ($enabled == 0) ? "disabled" : "";
@@ -80,7 +80,7 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   $block_hour = get_block_hour($hour, $disabled);
   $block_minute = get_block_minute($minute, $disabled);
   $block_next_treatment_date = get_block_next_treatment_date($next_treatment_date);
-  $block_scope = get_block_scope($scopeUserIdToLoginMap, $scopeIncludes, $disabled);
+  $block_user_scope = get_block_user_scope($scopeUserIdToLoginMap, $scopeUsersIncludes, $disabled);
   $block_mailing = get_block_mailing($mailingEmails);
 
   $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_scope_user_id', 'userSearch', {filter_pattern:'access', item_id_property:'ext_id', filter_archived:false});";
@@ -171,8 +171,8 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
       </table>
     </fieldset>
     <fieldset class='detail infos'>
-      <legend>$l_scope</legend>
-      $block_scope
+      <legend>$l_user_scope</legend>
+      $block_user_scope
     </fieldset>
     <fieldset class='detail infos'>
       <legend>$l_mailing_feedback</legend>
@@ -370,9 +370,9 @@ function formatStringAsDateString($dateAsString) {
   return $l_not_configured;
 }
 
-function get_block_scope($scopeUserIdToLoginMap, $scopeIncludes = false, $disabled) {
+function get_block_user_scope($scopeUserIdToLoginMap, $scopeUsersIncludes = false, $disabled) {
   global $l_users, $ico_delete;
-  global $l_name, $l_delete, $l_remove_archive, $l_scope_includes, $l_scope_excludes, $l_scope_type;
+  global $l_name, $l_delete, $l_remove_archive, $l_user_scope_includes, $l_user_scope_excludes, $l_scope_type;
 
   $scopeUserIds = array();
   foreach (get_object_vars($scopeUserIdToLoginMap) as $name => $value) {
@@ -401,9 +401,9 @@ function get_block_scope($scopeUserIdToLoginMap, $scopeIncludes = false, $disabl
       <tr>
         <th>$l_scope_type</th>
         <td>
-          <input type='radio' name='cb_scope_includes' value='1'" . (($scopeIncludes) ? " checked='checked'" : "") ." ".(($disabled) ? "disabled" : "")." class='configuration'/> $l_scope_includes
+          <input type='radio' name='cb_scope_users_includes' value='1'" . (($scopeUsersIncludes) ? " checked='checked'" : "") ." ".(($disabled) ? "disabled" : "")." class='configuration'/> $l_user_scope_includes
           <br />
-          <input type='radio' name='cb_scope_includes' value='0'" . ((!$scopeIncludes) ? " checked='checked'" : "") ." ".(($disabled) ? "disabled" : "")." class='configuration'/> $l_scope_excludes
+          <input type='radio' name='cb_scope_users_includes' value='0'" . ((!$scopeUsersIncludes) ? " checked='checked'" : "") ." ".(($disabled) ? "disabled" : "")." class='configuration'/> $l_user_scope_excludes
         </td>
       </tr>
       <tr>

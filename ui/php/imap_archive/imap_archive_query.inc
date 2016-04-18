@@ -116,7 +116,7 @@ function toJson($configuration) {
   $excludedFolder = $configuration->excludedFolder;
   $scopeUserIdToLoginMapFromConfig = $configuration->scopeUserIdToLoginMap;
   $scopeUserIdToLoginMap = $scopeUserIdToLoginMapFromConfig != null ? $scopeUserIdToLoginMapFromConfig : new stdClass();
-  $scopeIncludes = $configuration->scopeIncludes;
+  $scopeUsersIncludes = $configuration->scopeUsersIncludes;
   $mailingEmailsFromConfig = $configuration->mailingEmails;
   $mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
 
@@ -132,7 +132,7 @@ function toJson($configuration) {
     "archiveMainFolder" => $archiveMainFolder,
     "excludedFolder" => $excludedFolder,
     "scopeUserIdToLoginMap" => $scopeUserIdToLoginMap,
-    "scopeIncludes" => $scopeIncludes,
+    "scopeUsersIncludes" => $scopeUsersIncludes,
     "mailingEmails" => $mailingEmails
   ));
 }
@@ -197,7 +197,7 @@ function paramToJson($paramsAsConfiguration) {
 	$archiveMainFolder = $paramsAsConfiguration->archive_main_folder;
 	$excludedFolder = $paramsAsConfiguration->excluded_folder;
 	$scopeUserIdToLoginMap = scopeUserIdsToMap($paramsAsConfiguration->scope_user_id);
-	$scopeIncludes = $paramsAsConfiguration->scope_includes;
+	$scopeUsersIncludes = $paramsAsConfiguration->scope_users_includes;
 	$mailingEmailsFromConfig = $paramsAsConfiguration->mailing_emails;
 	$mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
 
@@ -213,7 +213,7 @@ function paramToJson($paramsAsConfiguration) {
 			"archiveMainFolder" => $archiveMainFolder,
 			"excludedFolder" => $excludedFolder,
 			"scopeUserIdToLoginMap" => $scopeUserIdToLoginMap,
-			"scopeIncludes" => ($scopeIncludes) ? "true" : "false",
+			"scopeUsersIncludes" => ($scopeUsersIncludes) ? "true" : "false",
 			"mailingEmails" => $mailingEmails
 	));
 }

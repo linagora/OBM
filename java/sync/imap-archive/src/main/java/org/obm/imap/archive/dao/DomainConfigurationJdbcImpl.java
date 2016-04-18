@@ -85,11 +85,11 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			String MINUTE = "mail_archive_minute";
 			String ARCHIVE_MAIN_FOLDER = "mail_archive_main_folder";
 			String EXCLUDED_FOLDER = "mail_archive_excluded_folder";
-			String SCOPE_INCLUDES = "mail_archive_scope_includes";
+			String SCOPE_USERS_INCLUDES = "mail_archive_scope_users_includes";
 			String MOVE_ENABLED = "mail_archive_move";
 			
-			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, SCOPE_INCLUDES, MOVE_ENABLED);
-			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, SCOPE_INCLUDES, MOVE_ENABLED);
+			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, SCOPE_USERS_INCLUDES, MOVE_ENABLED);
+			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, SCOPE_USERS_INCLUDES, MOVE_ENABLED);
 		}
 	}
 	
@@ -197,7 +197,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 						.build())
 				.archiveMainFolder(rs.getString(FIELDS.ARCHIVE_MAIN_FOLDER))
 				.excludedFolder(rs.getString(FIELDS.EXCLUDED_FOLDER))
-				.scopeIncludes(rs.getBoolean(FIELDS.SCOPE_INCLUDES))
+				.scopeUsersIncludes(rs.getBoolean(FIELDS.SCOPE_USERS_INCLUDES))
 				.scopeUsers(get(connection, domain.getUuid()))
 				.mailing(getMailing(connection, domain.getUuid()))
 				.moveEnabled(rs.getBoolean(FIELDS.MOVE_ENABLED))
@@ -220,7 +220,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setInt(idx++, domainConfiguration.getMinute());
 			ps.setString(idx++, domainConfiguration.getArchiveMainFolder());
 			ps.setString(idx++, domainConfiguration.getExcludedFolder());
-			ps.setBoolean(idx++, domainConfiguration.isScopeIncludes());
+			ps.setBoolean(idx++, domainConfiguration.isScopeUsersIncludes());
 			ps.setBoolean(idx++, domainConfiguration.isMoveEnabled());
 			ps.setString(idx++, domainConfiguration.getDomainId().toString());
 
@@ -252,7 +252,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setInt(idx++, domainConfiguration.getMinute());
 			ps.setString(idx++, domainConfiguration.getArchiveMainFolder());
 			ps.setString(idx++, domainConfiguration.getExcludedFolder());
-			ps.setBoolean(idx++, domainConfiguration.isScopeIncludes());
+			ps.setBoolean(idx++, domainConfiguration.isScopeUsersIncludes());
 			ps.setBoolean(idx++, domainConfiguration.isMoveEnabled());
 
 			ps.executeUpdate();

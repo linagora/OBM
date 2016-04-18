@@ -533,7 +533,7 @@ public class ImapArchiveProcessing {
 
 	private Predicate<? super ListInfo> filterScopeUsers(ProcessedTask processedTask) {
 		final List<String> scopeUserLogins = scopeUserLogins(processedTask.getDomainConfiguration());
-		final boolean scopeIncludes = processedTask.getDomainConfiguration().isScopeIncludes();
+		final boolean scopeIncludes = processedTask.getDomainConfiguration().isScopeUsersIncludes();
 		return new Predicate<ListInfo>() {
 
 			@Override

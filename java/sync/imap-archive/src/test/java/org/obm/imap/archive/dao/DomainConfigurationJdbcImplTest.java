@@ -114,7 +114,7 @@ public class DomainConfigurationJdbcImplTest {
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.MINUTE,
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.ARCHIVE_MAIN_FOLDER,
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.EXCLUDED_FOLDER,
-					DomainConfigurationJdbcImpl.TABLE.FIELDS.SCOPE_INCLUDES,
+					DomainConfigurationJdbcImpl.TABLE.FIELDS.SCOPE_USERS_INCLUDES,
 					DomainConfigurationJdbcImpl.TABLE.FIELDS.MOVE_ENABLED)
 			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", Boolean.TRUE, RepeatKind.DAILY, 2, 10, 355, 10, 32, "arChive", "excluded", true, false)
 			.build();
@@ -158,7 +158,7 @@ public class DomainConfigurationJdbcImplTest {
 		assertThat(domainConfiguration.getMinute()).isEqualTo(32);
 		assertThat(domainConfiguration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(domainConfiguration.getExcludedFolder()).isEqualTo("excluded");
-		assertThat(domainConfiguration.isScopeIncludes()).isTrue();
+		assertThat(domainConfiguration.isScopeUsersIncludes()).isTrue();
 		assertThat(domainConfiguration.getScopeUsers()).isEmpty();
 	}
 	
@@ -231,7 +231,7 @@ public class DomainConfigurationJdbcImplTest {
 						.build())
 				.archiveMainFolder("ARcHIVE")
 				.excludedFolder("anotherExcluded")
-				.scopeIncludes(false)
+				.scopeUsersIncludes(false)
 				.build();
 		
 		domainConfigurationJdbcImpl.update(expectedDomainConfiguration);

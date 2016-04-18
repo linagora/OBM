@@ -72,7 +72,7 @@ public class DomainConfiguration {
 						.time(LocalTime.parse(configuration.hour + ":" + configuration.minute))
 						.build())
 				.excludedFolder(configuration.excludedFolder)
-				.scopeIncludes((configuration.scopeIncludes != null) ? configuration.scopeIncludes : false)
+				.scopeUsersIncludes((configuration.scopeUsersIncludes != null) ? configuration.scopeUsersIncludes : DEFAULT_SCOPE_INCLUDES)
 				.scopeUsers(from(configuration.scopeUserIdToLoginMap))
 				.mailing(Mailing.fromStrings(configuration.mailingEmails))
 				.moveEnabled(configuration.moveEnabled)
@@ -102,7 +102,7 @@ public class DomainConfiguration {
 		private String archiveMainFolder;
 		private SchedulingConfiguration schedulingConfiguration;
 		private String excludedFolder;
-		private Boolean scopeIncludes;
+		private Boolean scopeUsersIncludes;
 		private ImmutableList.Builder<ScopeUser> scopeUsers;
 		private Mailing mailing;
 		private Boolean moveEnabled;
@@ -139,8 +139,8 @@ public class DomainConfiguration {
 			return this;
 		}
 		
-		public Builder scopeIncludes(boolean scopeIncludes) {
-			this.scopeIncludes = scopeIncludes;
+		public Builder scopeUsersIncludes(boolean scopeUsersIncludes) {
+			this.scopeUsersIncludes = scopeUsersIncludes;
 			return this;
 		}
 		
@@ -178,7 +178,7 @@ public class DomainConfiguration {
 					schedulingConfiguration, 
 					archiveMainFolder, 
 					excludedFolder, 
-					Objects.firstNonNull(scopeIncludes, DEFAULT_SCOPE_INCLUDES), 
+					Objects.firstNonNull(scopeUsersIncludes, DEFAULT_SCOPE_INCLUDES), 
 					scopeUsers.build(), 
 					Objects.firstNonNull(mailing, Mailing.empty()),
 					Objects.firstNonNull(moveEnabled, false));
@@ -190,21 +190,21 @@ public class DomainConfiguration {
 	private final SchedulingConfiguration schedulingConfiguration;
 	private final String archiveMainFolder;
 	private final String excludedFolder;
-	private final boolean scopeIncludes;
+	private final boolean scopeUsersIncludes;
 	private final List<ScopeUser> scopeUsers;
 	private final Mailing mailing;
 	private final boolean moveEnabled;
 
 	private DomainConfiguration(ObmDomain domain, ConfigurationState state, 
 			SchedulingConfiguration schedulingConfiguration, String archiveMainFolder, 
-			String excludedFolder, boolean scopeIncludes, ImmutableList<ScopeUser> scopeUsers, 
+			String excludedFolder, boolean scopeUsersIncludes, ImmutableList<ScopeUser> scopeUsers, 
 			Mailing mailing, boolean moveEnabled) {
 		this.domain = domain;
 		this.state = state;
 		this.schedulingConfiguration = schedulingConfiguration;
 		this.archiveMainFolder = archiveMainFolder;
 		this.excludedFolder = excludedFolder;
-		this.scopeIncludes = scopeIncludes;
+		this.scopeUsersIncludes = scopeUsersIncludes;
 		this.scopeUsers = scopeUsers;
 		this.mailing = mailing;
 		this.moveEnabled = moveEnabled;
@@ -270,8 +270,8 @@ public class DomainConfiguration {
 		return excludedFolder;
 	}
 
-	public boolean isScopeIncludes() {
-		return scopeIncludes;
+	public boolean isScopeUsersIncludes() {
+		return scopeUsersIncludes;
 	}
 	
 	public List<ScopeUser> getScopeUsers() {
@@ -289,7 +289,7 @@ public class DomainConfiguration {
 	@Override
 	public int hashCode(){
 		return Objects.hashCode(domain, state, schedulingConfiguration, 
-				archiveMainFolder, excludedFolder, scopeIncludes, scopeUsers, 
+				archiveMainFolder, excludedFolder, scopeUsersIncludes, scopeUsers, 
 				mailing, moveEnabled);
 	}
 	
@@ -302,7 +302,7 @@ public class DomainConfiguration {
 				&& Objects.equal(this.schedulingConfiguration, that.schedulingConfiguration)
 				&& Objects.equal(this.archiveMainFolder, that.archiveMainFolder)
 				&& Objects.equal(this.excludedFolder, that.excludedFolder)
-				&& Objects.equal(this.scopeIncludes, that.scopeIncludes)
+				&& Objects.equal(this.scopeUsersIncludes, that.scopeUsersIncludes)
 				&& Objects.equal(this.scopeUsers, that.scopeUsers)
 				&& Objects.equal(this.mailing, that.mailing)
 				&& Objects.equal(this.moveEnabled, that.moveEnabled);
@@ -318,7 +318,7 @@ public class DomainConfiguration {
 			.add("recurrence", schedulingConfiguration)
 			.add("archiveMainFolder", archiveMainFolder)
 			.add("excludedFolder", excludedFolder)
-			.add("scopeIncludes", scopeIncludes)
+			.add("scopeUsersIncludes", scopeUsersIncludes)
 			.add("scopeUsers", scopeUsers)
 			.add("mailing", mailing)
 			.add("moveEnabled", moveEnabled)

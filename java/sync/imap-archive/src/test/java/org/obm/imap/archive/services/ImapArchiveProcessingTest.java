@@ -1433,7 +1433,7 @@ public class ImapArchiveProcessingTest {
 					.time(LocalTime.parse("13:23"))
 					.build())
 			.archiveMainFolder("arChive")
-			.scopeIncludes(true)
+			.scopeUsersIncludes(true)
 			.scopeUsers(ImmutableList.of(ScopeUser.builder()
 					.id(UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9"))
 					.login("userb")

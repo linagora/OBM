@@ -330,7 +330,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getSchedulingConfiguration()).isEqualTo(schedulingConfiguration);
 		assertThat(configuration.getArchiveMainFolder()).isEqualTo("ARCHIVE");
 		assertThat(configuration.getExcludedFolder()).isNull();
-		assertThat(configuration.isScopeIncludes()).isFalse();
+		assertThat(configuration.isScopeUsersIncludes()).isFalse();
 		assertThat(configuration.getScopeUsers()).isEmpty();
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
 		assertThat(configuration.isMoveEnabled()).isFalse();
@@ -359,7 +359,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.minute = expectedMinute;
 		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.excludedFolder = "excluded";
-		domainConfigurationDto.scopeIncludes = true;
+		domainConfigurationDto.scopeUsersIncludes = true;
 		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
 		domainConfigurationDto.mailingEmails = ImmutableList.of("usera@mydomain.org", "userb@mydomain.org");
 		domainConfigurationDto.moveEnabled = expectedMoveEnabled;
@@ -376,7 +376,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
 		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
-		assertThat(configuration.isScopeIncludes()).isTrue();
+		assertThat(configuration.isScopeUsersIncludes()).isTrue();
 		assertThat(configuration.getScopeUsers()).containsOnly(ScopeUser.builder()
 				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
 				.login("usera")
@@ -425,7 +425,7 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getMinute()).isEqualTo(expectedMinute);
 		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
-		assertThat(configuration.isScopeIncludes()).isFalse();
+		assertThat(configuration.isScopeUsersIncludes()).isFalse();
 		assertThat(configuration.getScopeUsers()).isEmpty();
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
 		assertThat(configuration.isMoveEnabled()).isEqualTo(expectedMoveEnabled);

@@ -23,4 +23,7 @@ CREATE VIEW UserObmEmail
     INNER JOIN UserObmEmailAlias ON userobmemailalias_userobm_id = userobm_id
     LEFT JOIN DomainAlias ON domainalias_domain_id = userobm_domain_id AND position('@' in userobmemailalias_alias) = 0;
 
+ALTER TABLE mail_archive
+  RENAME mail_archive_scope_includes TO mail_archive_scope_users_includes;
+
 COMMIT;
