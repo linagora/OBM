@@ -48,6 +48,7 @@ import org.obm.imap.archive.beans.Mailing;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.beans.ScopeUser;
+import org.obm.imap.archive.beans.SharedMailbox;
 import org.obm.imap.archive.dao.DomainConfigurationJdbcImpl.TABLE.FIELDS;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
@@ -86,10 +87,11 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			String ARCHIVE_MAIN_FOLDER = "mail_archive_main_folder";
 			String EXCLUDED_FOLDER = "mail_archive_excluded_folder";
 			String SCOPE_USERS_INCLUDES = "mail_archive_scope_users_includes";
+			String SCOPE_SHARED_MAILBOXES_INCLUDES = "mail_archive_scope_shared_mailboxes_includes";
 			String MOVE_ENABLED = "mail_archive_move";
 			
-			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, SCOPE_USERS_INCLUDES, MOVE_ENABLED);
-			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, SCOPE_USERS_INCLUDES, MOVE_ENABLED);
+			String ALL = Joiner.on(", ").join(DOMAIN_UUID, ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, SCOPE_USERS_INCLUDES, SCOPE_SHARED_MAILBOXES_INCLUDES, MOVE_ENABLED);
+			String UPDATABLE = Joiner.on(" = ?, ").join(ACTIVATED, REPEAT_KIND, DAY_OF_WEEK, DAY_OF_MONTH, DAY_OF_YEAR, HOUR, MINUTE, ARCHIVE_MAIN_FOLDER, EXCLUDED_FOLDER, SCOPE_USERS_INCLUDES, SCOPE_SHARED_MAILBOXES_INCLUDES, MOVE_ENABLED);
 		}
 	}
 	
@@ -102,7 +104,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				"UPDATE %s SET %s = ? WHERE %s = ?", TABLE.NAME, FIELDS.UPDATABLE, FIELDS.DOMAIN_UUID);
 		
 		String INSERT = String.format(
-				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
+				"INSERT INTO %s (%s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", TABLE.NAME, FIELDS.ALL);
 	}
 	
 	public interface SCOPE_USERS {
@@ -116,6 +118,32 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				String USER_LOGIN = "mail_archive_scope_users_user_login";
 				
 				String ALL = Joiner.on(", ").join(DOMAIN_UUID, USER_UUID, USER_LOGIN);
+			}
+		}
+				
+		interface REQUESTS {
+			String SELECT = String.format(
+					"SELECT %s FROM %s WHERE %s = ?", TABLE.FIELDS.ALL, TABLE.NAME, TABLE.FIELDS.DOMAIN_UUID);
+			
+			String DELETE = String.format(
+					"DELETE FROM %s WHERE %s = ?", TABLE.NAME, TABLE.FIELDS.DOMAIN_UUID);
+			
+			String INSERT = String.format(
+					"INSERT INTO %s (%s) VALUES (?, ?, ?)", TABLE.NAME, TABLE.FIELDS.ALL);
+		}
+	}
+	
+	public interface SCOPE_SHARED_MAILBOXES {
+		interface TABLE {
+			
+			String NAME = "mail_archive_scope_shared_mailboxes";
+			
+			interface FIELDS {
+				String DOMAIN_UUID = "mail_archive_scope_shared_mailboxes_domain_uuid";
+				String SHARED_MAILBOX_ID = "mail_archive_scope_shared_mailboxes_mailbox_id";
+				String SHARED_MAILBOX_NAME = "mail_archive_scope_shared_mailboxes_mailbox_name";
+				
+				String ALL = Joiner.on(", ").join(DOMAIN_UUID, SHARED_MAILBOX_ID, SHARED_MAILBOX_NAME);
 			}
 		}
 				
@@ -198,7 +226,9 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				.archiveMainFolder(rs.getString(FIELDS.ARCHIVE_MAIN_FOLDER))
 				.excludedFolder(rs.getString(FIELDS.EXCLUDED_FOLDER))
 				.scopeUsersIncludes(rs.getBoolean(FIELDS.SCOPE_USERS_INCLUDES))
+				.scopeSharedMailboxesIncludes(rs.getBoolean(FIELDS.SCOPE_SHARED_MAILBOXES_INCLUDES))
 				.scopeUsers(get(connection, domain.getUuid()))
+				.scopeSharedMailboxes(getSharedMailboxes(connection, domain.getUuid()))
 				.mailing(getMailing(connection, domain.getUuid()))
 				.moveEnabled(rs.getBoolean(FIELDS.MOVE_ENABLED))
 				.build();
@@ -221,6 +251,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setString(idx++, domainConfiguration.getArchiveMainFolder());
 			ps.setString(idx++, domainConfiguration.getExcludedFolder());
 			ps.setBoolean(idx++, domainConfiguration.isScopeUsersIncludes());
+			ps.setBoolean(idx++, domainConfiguration.isScopeSharedMailboxesIncludes());
 			ps.setBoolean(idx++, domainConfiguration.isMoveEnabled());
 			ps.setString(idx++, domainConfiguration.getDomainId().toString());
 
@@ -229,6 +260,7 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			}
 			
 			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getScopeUsers());
+			updateSharedMailboxes(connection, domainConfiguration.getDomainId(), domainConfiguration.getScopeSharedMailboxes());
 			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getMailing());
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -253,11 +285,13 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 			ps.setString(idx++, domainConfiguration.getArchiveMainFolder());
 			ps.setString(idx++, domainConfiguration.getExcludedFolder());
 			ps.setBoolean(idx++, domainConfiguration.isScopeUsersIncludes());
+			ps.setBoolean(idx++, domainConfiguration.isScopeSharedMailboxesIncludes());
 			ps.setBoolean(idx++, domainConfiguration.isMoveEnabled());
 
 			ps.executeUpdate();
 			
 			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getScopeUsers());
+			updateSharedMailboxes(connection, domainConfiguration.getDomainId(), domainConfiguration.getScopeSharedMailboxes());
 			update(connection, domainConfiguration.getDomainId(), domainConfiguration.getMailing());
 		} catch (SQLException e) {
 			throw new DaoException(e);
@@ -335,6 +369,47 @@ public class DomainConfigurationJdbcImpl implements DomainConfigurationDao {
 				psInsert.setString(idx++, domainId.get());
 				psInsert.setString(idx++, emailAddress.get());
 	
+				psInsert.executeUpdate();
+			}
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		}
+	}
+	
+	private List<SharedMailbox> getSharedMailboxes(Connection connection, ObmDomainUuid domainId) throws DaoException {
+		try (PreparedStatement ps = connection.prepareStatement(SCOPE_SHARED_MAILBOXES.REQUESTS.SELECT)) {
+
+			ps.setString(1, domainId.get());
+
+			ResultSet rs = ps.executeQuery();
+			
+			ImmutableList.Builder<SharedMailbox> builder = ImmutableList.builder();
+			while (rs.next()) {
+				builder.add(SharedMailbox.builder()
+						.id(rs.getInt(SCOPE_SHARED_MAILBOXES.TABLE.FIELDS.SHARED_MAILBOX_ID))
+						.name(rs.getString(SCOPE_SHARED_MAILBOXES.TABLE.FIELDS.SHARED_MAILBOX_NAME))
+						.build());
+			}
+			return builder.build();
+		}
+		catch (SQLException e) {
+			throw new DaoException(e);
+		}
+	}
+
+	private void updateSharedMailboxes(Connection connection, ObmDomainUuid domainId, List<SharedMailbox> sharedMailboxes) throws DaoException {
+		try (PreparedStatement psDelete = connection.prepareStatement(SCOPE_SHARED_MAILBOXES.REQUESTS.DELETE);
+				PreparedStatement psInsert = connection.prepareStatement(SCOPE_SHARED_MAILBOXES.REQUESTS.INSERT)) {
+
+			psDelete.setString(1, domainId.get());
+			psDelete.executeUpdate();
+			
+			for (SharedMailbox scopeSharedMailbox : sharedMailboxes) {
+				int idx = 1;
+				psInsert.setString(idx++, domainId.get());
+				psInsert.setInt(idx++, scopeSharedMailbox.getId());
+				psInsert.setString(idx++, scopeSharedMailbox.getName());
+				
 				psInsert.executeUpdate();
 			}
 		} catch (SQLException e) {

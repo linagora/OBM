@@ -165,6 +165,7 @@ public class TreatmentsResourceTest {
 		domainConfigurationDto.minute = 0;
 		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of();
+		domainConfigurationDto.scopeSharedMailboxIdToNameMap = ImmutableMap.of();
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		
 		given()
@@ -196,6 +197,7 @@ public class TreatmentsResourceTest {
 		domainConfigurationDto.minute = 0;
 		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of();
+		domainConfigurationDto.scopeSharedMailboxIdToNameMap = ImmutableMap.of();
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		
 		given()

@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2014  Linagora
+ * Copyright (C) 2014-2016  Linagora
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -74,6 +74,8 @@ public class DomainConfiguration {
 				.excludedFolder(configuration.excludedFolder)
 				.scopeUsersIncludes((configuration.scopeUsersIncludes != null) ? configuration.scopeUsersIncludes : DEFAULT_SCOPE_INCLUDES)
 				.scopeUsers(from(configuration.scopeUserIdToLoginMap))
+				.scopeSharedMailboxesIncludes((configuration.scopeSharedMailboxesIncludes != null) ? configuration.scopeSharedMailboxesIncludes : DEFAULT_SCOPE_INCLUDES)
+				.scopeSharedMailboxes(fromSharedMailboxes(configuration.scopeSharedMailboxIdToNameMap))
 				.mailing(Mailing.fromStrings(configuration.mailingEmails))
 				.moveEnabled(configuration.moveEnabled)
 				.build();
@@ -86,6 +88,18 @@ public class DomainConfiguration {
 			builder.add(ScopeUser.builder()
 					.id(UserExtId.valueOf(scopeUserIdToLogin.getKey()))
 					.login(scopeUserIdToLogin.getValue())
+					.build());
+		}
+		return builder.build();
+	}
+	
+	private static List<SharedMailbox> fromSharedMailboxes(Map<Integer, String> map) {
+		Preconditions.checkNotNull(map);
+		ImmutableList.Builder<SharedMailbox> builder = ImmutableList.builder();
+		for (Entry<Integer, String> entry : map.entrySet()) {
+			builder.add(SharedMailbox.builder()
+					.id(entry.getKey())
+					.name(entry.getValue())
 					.build());
 		}
 		return builder.build();
@@ -104,11 +118,14 @@ public class DomainConfiguration {
 		private String excludedFolder;
 		private Boolean scopeUsersIncludes;
 		private ImmutableList.Builder<ScopeUser> scopeUsers;
+		private Boolean scopeSharedMailboxesIncludes;
+		private ImmutableList.Builder<SharedMailbox> scopeSharedMailboxes;
 		private Mailing mailing;
 		private Boolean moveEnabled;
 		
 		private Builder() {
 			scopeUsers = ImmutableList.builder();
+			scopeSharedMailboxes = ImmutableList.builder();
 		}
 		
 		public Builder domain(ObmDomain domain) {
@@ -149,6 +166,16 @@ public class DomainConfiguration {
 			return this;
 		}
 		
+		public Builder scopeSharedMailboxesIncludes(boolean scopeSharedMailboxesIncludes) {
+			this.scopeSharedMailboxesIncludes = scopeSharedMailboxesIncludes;
+			return this;
+		}
+		
+		public Builder scopeSharedMailboxes(List<SharedMailbox> scopeSharedMailboxes) {
+			this.scopeSharedMailboxes.addAll(scopeSharedMailboxes);
+			return this;
+		}
+		
 		public Builder mailing(Mailing mailing) {
 			this.mailing = mailing;
 			return this;
@@ -180,6 +207,8 @@ public class DomainConfiguration {
 					excludedFolder, 
 					Objects.firstNonNull(scopeUsersIncludes, DEFAULT_SCOPE_INCLUDES), 
 					scopeUsers.build(), 
+					Objects.firstNonNull(scopeSharedMailboxesIncludes, DEFAULT_SCOPE_INCLUDES), 
+					scopeSharedMailboxes.build(), 
 					Objects.firstNonNull(mailing, Mailing.empty()),
 					Objects.firstNonNull(moveEnabled, false));
 		}
@@ -192,13 +221,15 @@ public class DomainConfiguration {
 	private final String excludedFolder;
 	private final boolean scopeUsersIncludes;
 	private final List<ScopeUser> scopeUsers;
+	private final boolean scopeSharedMailboxesIncludes;
+	private final List<SharedMailbox> scopeSharedMailboxes;
 	private final Mailing mailing;
 	private final boolean moveEnabled;
 
 	private DomainConfiguration(ObmDomain domain, ConfigurationState state, 
 			SchedulingConfiguration schedulingConfiguration, String archiveMainFolder, 
 			String excludedFolder, boolean scopeUsersIncludes, ImmutableList<ScopeUser> scopeUsers, 
-			Mailing mailing, boolean moveEnabled) {
+			boolean scopeSharedMailboxesIncludes, ImmutableList<SharedMailbox> scopeSharedMailboxes, Mailing mailing, boolean moveEnabled) {
 		this.domain = domain;
 		this.state = state;
 		this.schedulingConfiguration = schedulingConfiguration;
@@ -206,6 +237,8 @@ public class DomainConfiguration {
 		this.excludedFolder = excludedFolder;
 		this.scopeUsersIncludes = scopeUsersIncludes;
 		this.scopeUsers = scopeUsers;
+		this.scopeSharedMailboxesIncludes = scopeSharedMailboxesIncludes;
+		this.scopeSharedMailboxes = scopeSharedMailboxes;
 		this.mailing = mailing;
 		this.moveEnabled = moveEnabled;
 	}
@@ -277,6 +310,14 @@ public class DomainConfiguration {
 	public List<ScopeUser> getScopeUsers() {
 		return scopeUsers;
 	}
+
+	public boolean isScopeSharedMailboxesIncludes() {
+		return scopeSharedMailboxesIncludes;
+	}
+	
+	public List<SharedMailbox> getScopeSharedMailboxes() {
+		return scopeSharedMailboxes;
+	}
 	
 	public Mailing getMailing() {
 		return mailing;
@@ -290,7 +331,7 @@ public class DomainConfiguration {
 	public int hashCode(){
 		return Objects.hashCode(domain, state, schedulingConfiguration, 
 				archiveMainFolder, excludedFolder, scopeUsersIncludes, scopeUsers, 
-				mailing, moveEnabled);
+				scopeSharedMailboxesIncludes, scopeSharedMailboxes, mailing, moveEnabled);
 	}
 	
 	@Override
@@ -304,6 +345,8 @@ public class DomainConfiguration {
 				&& Objects.equal(this.excludedFolder, that.excludedFolder)
 				&& Objects.equal(this.scopeUsersIncludes, that.scopeUsersIncludes)
 				&& Objects.equal(this.scopeUsers, that.scopeUsers)
+				&& Objects.equal(this.scopeSharedMailboxesIncludes, that.scopeSharedMailboxesIncludes)
+				&& Objects.equal(this.scopeSharedMailboxes, that.scopeSharedMailboxes)
 				&& Objects.equal(this.mailing, that.mailing)
 				&& Objects.equal(this.moveEnabled, that.moveEnabled);
 		}
@@ -320,6 +363,8 @@ public class DomainConfiguration {
 			.add("excludedFolder", excludedFolder)
 			.add("scopeUsersIncludes", scopeUsersIncludes)
 			.add("scopeUsers", scopeUsers)
+			.add("scopeSharedMailboxesIncludes", scopeSharedMailboxesIncludes)
+			.add("scopeSharedMailboxes", scopeSharedMailboxes)
 			.add("mailing", mailing)
 			.add("moveEnabled", moveEnabled)
 			.toString();

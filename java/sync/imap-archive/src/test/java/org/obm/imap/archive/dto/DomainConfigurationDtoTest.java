@@ -47,6 +47,7 @@ import org.obm.imap.archive.beans.Mailing;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.beans.ScopeUser;
+import org.obm.imap.archive.beans.SharedMailbox;
 import org.obm.sync.base.EmailAddress;
 
 import com.google.common.collect.ImmutableList;
@@ -80,6 +81,11 @@ public class DomainConfigurationDtoTest {
 								.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
 								.login("user")
 								.build()))
+					.scopeSharedMailboxesIncludes(true)
+					.scopeSharedMailboxes(ImmutableList.of(SharedMailbox.builder()
+								.id(1)
+								.name("shared")
+								.build()))
 					.mailing(Mailing.from(ImmutableList.of(EmailAddress.loginAtDomain("usera@mydomain.org"), EmailAddress.loginAtDomain("userb@mydomain.org"))))
 					.build();
 		DomainConfigurationDto dto = DomainConfigurationDto.from(configuration);
@@ -95,6 +101,8 @@ public class DomainConfigurationDtoTest {
 		assertThat(dto.excludedFolder).isEqualTo("excluded");
 		assertThat(dto.scopeUsersIncludes).isTrue();
 		assertThat(dto.scopeUserIdToLoginMap).containsExactly(MapEntry.entry("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "user"));
+		assertThat(dto.scopeSharedMailboxesIncludes).isTrue();
+		assertThat(dto.scopeSharedMailboxIdToNameMap).containsExactly(MapEntry.entry(1, "shared"));
 		assertThat(dto.mailingEmails).containsOnly("usera@mydomain.org", "userb@mydomain.org");
 	}
 	

@@ -271,6 +271,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.minute = 32;
 		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of(usera.getExtId().getExtId(), usera.getLogin(), userb.getExtId().getExtId(), userb.getLogin());
+		domainConfigurationDto.scopeSharedMailboxIdToNameMap = ImmutableMap.of(1, "shared", 2, "shared2");
 		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user2@mydomain.org");
 		
 		given()
@@ -294,6 +295,8 @@ public class ConfigurationResourceTest {
 				"dayOfWeek", equalTo(DayOfWeek.TUESDAY.getSpecificationValue()),
 				"scopeUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
 				"scopeUserIdToLoginMap", hasEntry(userb.getExtId().getExtId(), userb.getLogin()),
+				"scopeSharedMailboxIdToNameMap", hasEntry("1", "shared"),
+				"scopeSharedMailboxIdToNameMap", hasEntry("2", "shared2"),
 				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user2@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()
@@ -323,6 +326,16 @@ public class ConfigurationResourceTest {
 					.columns(DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_UUID, DomainConfigurationJdbcImpl.SCOPE_USERS.TABLE.FIELDS.USER_LOGIN)
 					.values(domainId, userb.getExtId().getExtId(), userb.getLogin())
 					.build(),
+				Operations.insertInto(DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.FIELDS.DOMAIN_UUID, 
+							DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.FIELDS.SHARED_MAILBOX_ID, DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.FIELDS.SHARED_MAILBOX_NAME)
+					.values(domainId, 1, "shared")
+					.build(),
+				Operations.insertInto(DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.NAME)
+					.columns(DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.FIELDS.DOMAIN_UUID, 
+							DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.FIELDS.SHARED_MAILBOX_ID, DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.FIELDS.SHARED_MAILBOX_NAME)
+					.values(domainId, 2, "share2")
+					.build(),
 				Operations.insertInto(DomainConfigurationJdbcImpl.MAILING.TABLE.NAME)
 					.columns(DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.DOMAIN_UUID, DomainConfigurationJdbcImpl.MAILING.TABLE.FIELDS.EMAIL)
 					.values(domainId, "user@mydomain.org")
@@ -347,6 +360,7 @@ public class ConfigurationResourceTest {
 		domainConfigurationDto.archiveMainFolder = "ARCHIVE";
 		domainConfigurationDto.excludedFolder = "anotherExcluded";
 		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of(usera.getExtId().getExtId(), usera.getLogin(), userc.getExtId().getExtId(), userc.getLogin());
+		domainConfigurationDto.scopeSharedMailboxIdToNameMap = ImmutableMap.of(1, "shared", 2, "shared2");
 		domainConfigurationDto.mailingEmails = ImmutableList.of("user@mydomain.org", "user3@mydomain.org");
 		
 		given()
@@ -371,6 +385,8 @@ public class ConfigurationResourceTest {
 				"excludedFolder", equalTo("anotherExcluded"),
 				"scopeUserIdToLoginMap", hasEntry(usera.getExtId().getExtId(), usera.getLogin()),
 				"scopeUserIdToLoginMap", hasEntry(userc.getExtId().getExtId(), userc.getLogin()),
+				"scopeSharedMailboxIdToNameMap", hasEntry("1", "shared"),
+				"scopeSharedMailboxIdToNameMap", hasEntry("2", "shared2"),
 				"mailingEmails", containsInAnyOrder("user@mydomain.org", "user3@mydomain.org"))
 			.statusCode(Status.OK.getStatusCode()).
 		when()

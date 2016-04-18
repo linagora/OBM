@@ -225,7 +225,7 @@ public class DomainConfigurationTest {
 	}
 	
 	@Test
-	public void builderShouldBuildConfigurationWhenMailingIsNotProvided() {
+	public void builderShouldBuildConfigurationWhenScopeSharedMailboxesIsNotProvided() {
 		ScopeUser expectedScopeUser = ScopeUser.builder()
 				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
 				.login("usera")
@@ -250,6 +250,41 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
 		assertThat(configuration.getScopeUsers()).containsOnly(expectedScopeUser);
+		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
+	}
+
+	@Test
+	public void builderShouldBuildConfigurationWhenMailingIsNotProvided() {
+		ScopeUser expectedScopeUser = ScopeUser.builder()
+				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
+				.login("usera")
+				.build();
+		SharedMailbox expectedSharedMailbox = SharedMailbox.builder()
+				.id(1)
+				.name("shared")
+				.build();
+		DomainConfiguration configuration = 
+				DomainConfiguration.builder()
+					.domain(ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build())
+					.state(ConfigurationState.ENABLE)
+					.schedulingConfiguration(SchedulingConfiguration.builder()
+							.recurrence(ArchiveRecurrence.daily())
+							.time(LocalTime.parse("13:23"))
+							.build())
+					.archiveMainFolder("arChive")
+					.excludedFolder("excluded")
+					.scopeUsers(ImmutableList.of(expectedScopeUser))
+					.scopeSharedMailboxes(ImmutableList.of(expectedSharedMailbox))
+					.build();
+		assertThat(configuration.getDomainId()).isEqualTo(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888"));
+		assertThat(configuration.isEnabled()).isTrue();
+		assertThat(configuration.getRepeatKind()).isEqualTo(RepeatKind.DAILY);
+		assertThat(configuration.getHour()).isEqualTo(13);
+		assertThat(configuration.getMinute()).isEqualTo(23);
+		assertThat(configuration.getArchiveMainFolder()).isEqualTo("arChive");
+		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
+		assertThat(configuration.getScopeUsers()).containsOnly(expectedScopeUser);
+		assertThat(configuration.getScopeSharedMailboxes()).containsOnly(expectedSharedMailbox);
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
 	}
 	
@@ -332,6 +367,8 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getExcludedFolder()).isNull();
 		assertThat(configuration.isScopeUsersIncludes()).isFalse();
 		assertThat(configuration.getScopeUsers()).isEmpty();
+		assertThat(configuration.isScopeSharedMailboxesIncludes()).isFalse();
+		assertThat(configuration.getScopeSharedMailboxes()).isEmpty();
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
 		assertThat(configuration.isMoveEnabled()).isFalse();
 	}
@@ -361,6 +398,8 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.excludedFolder = "excluded";
 		domainConfigurationDto.scopeUsersIncludes = true;
 		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
+		domainConfigurationDto.scopeSharedMailboxesIncludes = true;
+		domainConfigurationDto.scopeSharedMailboxIdToNameMap = ImmutableMap.of(1, "shared");
 		domainConfigurationDto.mailingEmails = ImmutableList.of("usera@mydomain.org", "userb@mydomain.org");
 		domainConfigurationDto.moveEnabled = expectedMoveEnabled;
 		
@@ -380,6 +419,11 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getScopeUsers()).containsOnly(ScopeUser.builder()
 				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
 				.login("usera")
+				.build());
+		assertThat(configuration.isScopeSharedMailboxesIncludes()).isTrue();
+		assertThat(configuration.getScopeSharedMailboxes()).containsOnly(SharedMailbox.builder()
+				.id(1)
+				.name("shared")
 				.build());
 		assertThat(configuration.getMailing()).isEqualTo(Mailing.from(ImmutableList.of(EmailAddress.loginAtDomain("usera@mydomain.org"), EmailAddress.loginAtDomain("userb@mydomain.org"))));
 		assertThat(configuration.isMoveEnabled()).isEqualTo(expectedMoveEnabled);
@@ -410,6 +454,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.excludedFolder = "excluded";
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of();
+		domainConfigurationDto.scopeSharedMailboxIdToNameMap = ImmutableMap.of();
 		domainConfigurationDto.moveEnabled = expectedMoveEnabled;
 		
 		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
@@ -427,6 +472,8 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getExcludedFolder()).isEqualTo("excluded");
 		assertThat(configuration.isScopeUsersIncludes()).isFalse();
 		assertThat(configuration.getScopeUsers()).isEmpty();
+		assertThat(configuration.isScopeSharedMailboxesIncludes()).isFalse();
+		assertThat(configuration.getScopeSharedMailboxes()).isEmpty();
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
 		assertThat(configuration.isMoveEnabled()).isEqualTo(expectedMoveEnabled);
 	}
@@ -456,6 +503,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.excludedFolder = "excluded";
 		domainConfigurationDto.mailingEmails = ImmutableList.of("usera@mydomain.org", "userb@mydomain.org");
 		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
+		domainConfigurationDto.scopeSharedMailboxIdToNameMap = ImmutableMap.of(1, "shared");
 		domainConfigurationDto.moveEnabled = expectedMoveEnabled;
 		
 		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
@@ -473,6 +521,10 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getScopeUsers()).containsOnly(ScopeUser.builder()
 				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
 				.login("usera")
+				.build());
+		assertThat(configuration.getScopeSharedMailboxes()).containsOnly(SharedMailbox.builder()
+				.id(1)
+				.name("shared")
 				.build());
 		assertThat(configuration.getMailing()).isEqualTo(Mailing.from(ImmutableList.of(EmailAddress.loginAtDomain("usera@mydomain.org"), EmailAddress.loginAtDomain("userb@mydomain.org"))));
 	}
@@ -505,6 +557,35 @@ public class DomainConfigurationTest {
 		DomainConfiguration.from(domainConfigurationDto, domain);
 	}
 	
+	@Test(expected=NullPointerException.class)
+	public void fromDtoShouldThrowWhenScopeSharedMailboxesNull() {
+		ObmDomainUuid expectedDomainId = ObmDomainUuid.of("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
+		boolean expectedEnabled = true;
+		RepeatKind expectedRepeatKind = RepeatKind.WEEKLY;
+		DayOfWeek expectedDayOfWeek = DayOfWeek.TUESDAY;
+		DayOfMonth expectedDayOfMonth = DayOfMonth.of(10);
+		DayOfYear expectedDayOfYear = DayOfYear.of(100);
+		Integer expectedHour = 11;
+		Integer expectedMinute = 32;
+		
+		DomainConfigurationDto domainConfigurationDto = new DomainConfigurationDto();
+		domainConfigurationDto.domainId = expectedDomainId.getUUID();
+		domainConfigurationDto.enabled = expectedEnabled;
+		domainConfigurationDto.repeatKind = expectedRepeatKind.toString();
+		domainConfigurationDto.dayOfWeek = expectedDayOfWeek.getSpecificationValue();
+		domainConfigurationDto.dayOfMonth = expectedDayOfMonth.getDayIndex();
+		domainConfigurationDto.dayOfYear = expectedDayOfYear.getDayOfYear();
+		domainConfigurationDto.hour = expectedHour;
+		domainConfigurationDto.minute = expectedMinute;
+		domainConfigurationDto.archiveMainFolder = "arChive";
+		domainConfigurationDto.excludedFolder = "excluded";
+		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
+		domainConfigurationDto.scopeSharedMailboxIdToNameMap = null;
+		
+		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
+		DomainConfiguration.from(domainConfigurationDto, domain);
+	}
+	
 	@Test
 	public void fromDtoShouldBuildWhenEmailAddressesIsEmpty() {
 		ObmDomainUuid expectedDomainId = ObmDomainUuid.of("85bd08f7-d5a4-4b19-a37a-a738113e1d0a");
@@ -528,6 +609,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.excludedFolder = "excluded";
 		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
+		domainConfigurationDto.scopeSharedMailboxIdToNameMap = ImmutableMap.of(1, "shared");
 		domainConfigurationDto.mailingEmails = ImmutableList.of();
 		
 		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();
@@ -545,6 +627,10 @@ public class DomainConfigurationTest {
 		assertThat(configuration.getScopeUsers()).containsOnly(ScopeUser.builder()
 				.id(UserExtId.valueOf("08607f19-05a4-42a2-9b02-6f11f3ceff3b"))
 				.login("usera")
+				.build());
+		assertThat(configuration.getScopeSharedMailboxes()).containsOnly(SharedMailbox.builder()
+				.id(1)
+				.name("shared")
 				.build());
 		assertThat(configuration.getMailing().getEmailAddresses()).isEmpty();
 	}
@@ -572,6 +658,7 @@ public class DomainConfigurationTest {
 		domainConfigurationDto.archiveMainFolder = "arChive";
 		domainConfigurationDto.excludedFolder = "excluded";
 		domainConfigurationDto.scopeUserIdToLoginMap = ImmutableMap.of("08607f19-05a4-42a2-9b02-6f11f3ceff3b", "usera");
+		domainConfigurationDto.scopeSharedMailboxIdToNameMap = ImmutableMap.of(1, "shared");
 		domainConfigurationDto.mailingEmails = null;
 		
 		ObmDomain domain = ObmDomain.builder().uuid(expectedDomainId).build();

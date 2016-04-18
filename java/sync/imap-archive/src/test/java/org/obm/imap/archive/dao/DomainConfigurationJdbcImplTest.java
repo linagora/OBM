@@ -53,11 +53,10 @@ import org.obm.imap.archive.beans.Mailing;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.beans.ScopeUser;
+import org.obm.imap.archive.beans.SharedMailbox;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
 import org.obm.sync.base.EmailAddress;
-
-import pl.wkr.fluentrule.api.FluentExpectedException;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
@@ -70,6 +69,7 @@ import com.ninja_squad.dbsetup.operation.Operation;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.UserExtId;
+import pl.wkr.fluentrule.api.FluentExpectedException;
 
 public class DomainConfigurationJdbcImplTest {
 
@@ -128,6 +128,15 @@ public class DomainConfigurationJdbcImplTest {
 			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", scopeUser.serializeId(), scopeUser.getLogin())
 			.build();
 	}
+
+	private Insert scopeSharedMailbox(SharedMailbox sharedMailbox) {
+		return Operations.insertInto(DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.NAME)
+			.columns(DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.FIELDS.DOMAIN_UUID, 
+					DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.FIELDS.SHARED_MAILBOX_ID,
+					DomainConfigurationJdbcImpl.SCOPE_SHARED_MAILBOXES.TABLE.FIELDS.SHARED_MAILBOX_NAME) 
+			.values("a6af9131-60b6-4e3a-a9f3-df5b43a89309", sharedMailbox.getId(), sharedMailbox.getName())
+			.build();
+	}
 	
 	private Operation mailing(Mailing mailing) {
 		ImmutableList.Builder<Insert> inserts = ImmutableList.builder();
@@ -160,6 +169,7 @@ public class DomainConfigurationJdbcImplTest {
 		assertThat(domainConfiguration.getExcludedFolder()).isEqualTo("excluded");
 		assertThat(domainConfiguration.isScopeUsersIncludes()).isTrue();
 		assertThat(domainConfiguration.getScopeUsers()).isEmpty();
+		assertThat(domainConfiguration.getScopeSharedMailboxes()).isEmpty();
 	}
 	
 	@Test
@@ -187,6 +197,24 @@ public class DomainConfigurationJdbcImplTest {
 		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
 		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
 		assertThat(domainConfiguration.getScopeUsers()).containsOnly(scopeUser, scopeUser2);
+	}
+	
+	@Test
+	public void getShouldLoadScopeSharedMailboxes() throws Exception {
+		SharedMailbox sharedMailbox = SharedMailbox.builder()
+				.id(1)
+				.name("shared")
+				.build();
+		SharedMailbox sharedMailbox2 = SharedMailbox.builder()
+				.id(2)
+				.name("shared2")
+				.build();
+		play(Operations.sequenceOf(delete(), domainConfiguration(), scopeSharedMailbox(sharedMailbox), scopeSharedMailbox(sharedMailbox2)));
+		
+		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
+		assertThat(domainConfiguration.getScopeSharedMailboxes()).containsOnly(sharedMailbox, sharedMailbox2);
 	}
 	
 	@Test
@@ -279,6 +307,47 @@ public class DomainConfigurationJdbcImplTest {
 		
 		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
 		assertThat(domainConfiguration.getScopeUsers()).containsOnly(scopeUser, scopeUser3);
+	}
+	
+	@Test
+	public void updateShouldUpdateScopeSharedMailboxes() throws Exception {
+		SharedMailbox sharedMailbox = SharedMailbox.builder()
+				.id(1)
+				.name("shared")
+				.build();
+		SharedMailbox sharedMailbox2 = SharedMailbox.builder()
+				.id(2)
+				.name("shared2")
+				.build();
+		play(Operations.sequenceOf(delete(), domainConfiguration(), scopeSharedMailbox(sharedMailbox), scopeSharedMailbox(sharedMailbox2)));
+		
+		ObmDomainUuid uuid = ObmDomainUuid.of("a6af9131-60b6-4e3a-a9f3-df5b43a89309");
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
+		SharedMailbox sharedMailbox3 = SharedMailbox.builder()
+				.id(3)
+				.name("shared3")
+				.build();
+		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.DISABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+							.repeat(RepeatKind.YEARLY)
+							.dayOfMonth(DayOfMonth.of(1))
+							.dayOfWeek(DayOfWeek.MONDAY)
+							.dayOfYear(DayOfYear.of(100))
+							.build())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.archiveMainFolder("ARcHIVE")
+				.excludedFolder("anotherExcluded")
+				.scopeSharedMailboxes(ImmutableList.of(sharedMailbox, sharedMailbox3))
+				.build();
+		
+		domainConfigurationJdbcImpl.update(expectedDomainConfiguration);
+		
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain);
+		assertThat(domainConfiguration.getScopeSharedMailboxes()).containsOnly(sharedMailbox, sharedMailbox3);
 	}
 	
 	@Test
@@ -388,6 +457,43 @@ public class DomainConfigurationJdbcImplTest {
 		
 		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain); 
 		assertThat(domainConfiguration.getScopeUsers()).containsOnly(scopeUser, scopeUser2);
+	}
+	
+	@Test
+	public void createShouldCreateScopeSharedMailboxes() throws Exception {
+		play(Operations.sequenceOf(delete(), domainConfiguration()));
+		
+		ObmDomainUuid uuid = ObmDomainUuid.of("1383b12c-6d79-40c7-acf9-c79bcc673fff");
+		ObmDomain domain = ObmDomain.builder().uuid(uuid).build();
+		SharedMailbox sharedMailbox = SharedMailbox.builder()
+				.id(1)
+				.name("shared")
+				.build();
+		SharedMailbox sharedMailbox2 = SharedMailbox.builder()
+				.id(2)
+				.name("shared2")
+				.build();
+		DomainConfiguration expectedDomainConfiguration = DomainConfiguration.builder()
+				.domain(domain)
+				.state(ConfigurationState.DISABLE)
+				.schedulingConfiguration(SchedulingConfiguration.builder()
+						.recurrence(ArchiveRecurrence.builder()
+							.repeat(RepeatKind.YEARLY)
+							.dayOfMonth(DayOfMonth.of(1))
+							.dayOfWeek(DayOfWeek.MONDAY)
+							.dayOfYear(DayOfYear.of(100))
+							.build())
+						.time(LocalTime.parse("13:23"))
+						.build())
+				.archiveMainFolder("ARcHIVE")
+				.excludedFolder("excluded")
+				.scopeSharedMailboxes(ImmutableList.of(sharedMailbox, sharedMailbox2))
+				.build();
+		
+		domainConfigurationJdbcImpl.create(expectedDomainConfiguration);
+		
+		DomainConfiguration domainConfiguration = domainConfigurationJdbcImpl.get(domain); 
+		assertThat(domainConfiguration.getScopeSharedMailboxes()).containsOnly(sharedMailbox, sharedMailbox2);
 	}
 	
 	@Test

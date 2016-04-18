@@ -36,8 +36,9 @@ import java.util.UUID;
 
 import org.obm.imap.archive.beans.DayOfWeek;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.imap.archive.beans.Mailing;
+import org.obm.imap.archive.beans.ScopeUser;
+import org.obm.imap.archive.beans.SharedMailbox;
 import org.obm.sync.base.EmailAddress;
 
 import com.google.common.base.Function;
@@ -60,6 +61,8 @@ public class DomainConfigurationDto {
 		dto.excludedFolder = configuration.getExcludedFolder();
 		dto.scopeUsersIncludes = configuration.isScopeUsersIncludes();
 		dto.scopeUserIdToLoginMap = toMap(configuration.getScopeUsers());
+		dto.scopeSharedMailboxesIncludes = configuration.isScopeSharedMailboxesIncludes();
+		dto.scopeSharedMailboxIdToNameMap = toSharedMailboxesMap(configuration.getScopeSharedMailboxes());
 		dto.mailingEmails = toStrings(configuration.getMailing());
 		dto.moveEnabled = configuration.isMoveEnabled();
 		return dto;
@@ -96,6 +99,14 @@ public class DomainConfigurationDto {
 		return builder.build();
 	}
 	
+	private static Map<Integer, String> toSharedMailboxesMap(List<SharedMailbox> scopeSharedMailboxes) {
+		ImmutableMap.Builder<Integer, String> builder = ImmutableMap.builder();
+		for (SharedMailbox scopeSharedMailbox : scopeSharedMailboxes) {
+			builder.put(scopeSharedMailbox.getId(), scopeSharedMailbox.getName());
+		}
+		return builder.build();
+	}
+	
 	private static List<String> toStrings(Mailing mailing) {
 		return FluentIterable.from(mailing.getEmailAddresses())
 				.transform(new Function<EmailAddress, String>() {
@@ -119,6 +130,8 @@ public class DomainConfigurationDto {
 	public String excludedFolder;
 	public Boolean scopeUsersIncludes;
 	public Map<String, String> scopeUserIdToLoginMap;
+	public Boolean scopeSharedMailboxesIncludes;
+	public Map<Integer, String> scopeSharedMailboxIdToNameMap;
 	public List<String> mailingEmails;
 	public Boolean moveEnabled;
 	

@@ -25,5 +25,16 @@ CREATE VIEW UserObmEmail
 
 ALTER TABLE mail_archive
   RENAME mail_archive_scope_includes TO mail_archive_scope_users_includes;
+ALTER TABLE mail_archive
+  ADD mail_archive_scope_shared_mailboxes_includes BOOLEAN DEFAULT FALSE;
+
+CREATE TABLE mail_archive_scope_shared_mailboxes (
+  id                                                SERIAL PRIMARY KEY,
+  mail_archive_scope_shared_mailboxes_domain_uuid   character(36) NOT NULL,
+  mail_archive_scope_shared_mailboxes_mailbox_id    INTEGER NOT NULL,
+  mail_archive_scope_shared_mailboxes_mailbox_name  TEXT NOT NULL,
+
+  CONSTRAINT mail_archive_scope_shared_mailboxes_ukey UNIQUE (mail_archive_scope_shared_mailboxes_domain_uuid, mail_archive_scope_shared_mailboxes_mailbox_id)
+);
 
 COMMIT;
