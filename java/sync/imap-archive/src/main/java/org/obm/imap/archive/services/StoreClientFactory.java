@@ -52,7 +52,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.resource.SharedMailbox;
+import fr.aliacom.obm.common.mailshare.SharedMailbox;
 import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 
@@ -114,13 +114,13 @@ public class StoreClientFactory {
 		return storeClientFactory.create(cyrusBackendForSharedMailbox(sharedMailboxName, domain), cyrusUser.getLogin(), cyrusUser.getPassword().getStringValue().toCharArray());
 	}
 	
-	private String cyrusBackendForSharedMailbox(String name, ObmDomain domain) throws SharedMailboxNotFoundException, NoBackendDefineForSharedMailboxException {
-		Optional<SharedMailbox> sharedMailbox = sharedMailboxDao.findSharedMailboxByName(name, domain);
-		if (!sharedMailbox.isPresent()) {
+	private String cyrusBackendForSharedMailbox(String name, ObmDomain domain) throws SharedMailboxNotFoundException, NoBackendDefineForSharedMailboxException, DaoException {
+		SharedMailbox sharedMailbox = sharedMailboxDao.findSharedMailboxByName(name, domain);
+		if (sharedMailbox == null) {
 			throw new SharedMailboxNotFoundException(name);
 		}
 		
-		Optional<ObmHost> server = sharedMailbox.get().getServer();
+		Optional<ObmHost> server = sharedMailbox.getServer();
 		if (!server.isPresent()) {
 			throw new NoBackendDefineForSharedMailboxException(name);
 		}

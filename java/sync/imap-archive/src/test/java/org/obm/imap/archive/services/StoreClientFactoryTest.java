@@ -51,10 +51,8 @@ import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.host.ObmHost;
 
-import com.google.common.base.Optional;
-
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.resource.SharedMailbox;
+import fr.aliacom.obm.common.mailshare.SharedMailbox;
 import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserEmails;
@@ -297,7 +295,7 @@ public class StoreClientFactoryTest {
 		
 		String name = "name";
 		expect(sharedMailboxDao.findSharedMailboxByName(name, obmDomain))
-			.andReturn(Optional.<SharedMailbox> absent());
+			.andReturn(null);
 		
 		control.replay();
 		try {
@@ -323,10 +321,10 @@ public class StoreClientFactoryTest {
 		
 		String name = "name";
 		expect(sharedMailboxDao.findSharedMailboxByName(name, obmDomain))
-			.andReturn(Optional.of(SharedMailbox.builder()
+			.andReturn(SharedMailbox.builder()
 					.id(1)
 					.domain(obmDomain)
-					.build()));
+					.build());
 		
 		control.replay();
 		try {
@@ -353,13 +351,13 @@ public class StoreClientFactoryTest {
 		String hostIp = "10.69.43.33";
 		String name = "name";
 		expect(sharedMailboxDao.findSharedMailboxByName(name, obmDomain))
-			.andReturn(Optional.of(SharedMailbox.builder()
+			.andReturn(SharedMailbox.builder()
 					.id(1)
 					.domain(obmDomain)
 					.server(ObmHost.builder()
 							.ip(hostIp)
 							.build())
-					.build()));
+					.build());
 		
 		StoreClient expectedStoreClient = control.createMock(StoreClient.class);
 		expect(storeClientFactory.create(eq(hostIp), eq("cyrus"), aryEq("cyrus".toCharArray())))

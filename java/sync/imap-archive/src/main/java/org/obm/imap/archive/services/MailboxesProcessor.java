@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2014  Linagora
+ * Copyright (C) 2016  Linagora
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -28,50 +28,12 @@
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.imap.archive.beans;
 
-import java.util.concurrent.ConcurrentLinkedDeque;
+package org.obm.imap.archive.services;
 
-import org.joda.time.LocalTime;
-import org.junit.Test;
-import org.obm.imap.archive.mailbox.MailboxPaths;
-import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
-import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
-import ch.qos.logback.classic.Logger;
+public interface MailboxesProcessor {
 
-public class BeansTest {
-
-	@Test
-	public void beanShouldRespectBeanContract() {
-		EqualsVerifierBuilder.builder()
-			.prefabValue(LocalTime.class, LocalTime.parse("23:32"), LocalTime.parse("12:22"))
-			.prefabValue(Logger.class, (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("1"), (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("2"))
-			.prefabValue(ConcurrentLinkedDeque.class, new ConcurrentLinkedDeque<String>(), new ConcurrentLinkedDeque<String>())
-			.equalsVerifiers(
-				ArchiveRecurrence.class,
-				DayOfMonth.class,
-				DayOfYear.class,
-				DomainConfiguration.class,
-				PersistedResult.class,
-				SchedulingConfiguration.class,
-				SchedulingDates.class,
-				ArchiveConfiguration.class,
-				ArchiveTreatment.class,
-				ArchiveScheduledTreatment.class,
-				ArchiveRunningTreatment.class,
-				ArchiveTerminatedTreatment.class,
-				ArchiveTreatmentRunId.class,
-				ImapFolder.class,
-				ProcessedFolder.class,
-				HigherBoundary.class,
-				Year.class,
-				Limit.class,
-				ScopeUser.class,
-				Mailing.class,
-				MailboxPaths.class,
-				MappedMessageSets.class,
-				SharedMailbox.class
-			).verify();
-	}	
+	boolean processMailboxes(ProcessedTask processedTask, Logger logger, MailboxProcessing mailboxProcessing) throws Exception;
 }

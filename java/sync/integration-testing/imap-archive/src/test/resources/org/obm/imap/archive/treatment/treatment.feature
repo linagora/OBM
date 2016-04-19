@@ -241,3 +241,75 @@ Feature: Mail archive - Treatment
     And current date is "2014-12-10T15:07:00Z"
     When admin launches an immediate treatment
     Then 1 mail should be archived in the "user/usera/arChive/2012/INBOX@mydomain.org" imap folder with subject "subject"
+
+  Scenario: archive treatment on shared mailbox containing 5 mails one month old
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And a shared mailbox "shared" without imap folder
+    And this shared mailbox has 5 mails at "2014-11-08T10:00:00Z" with subject "subject"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then 5 mails should be archived in the "shared/arChive/2014@mydomain.org" imap folder with subject "subject"
+
+  Scenario: archive treatment on shared mailbox folder containing 5 mails one month old
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And a shared mailbox "shared" with "shared/myFolder@mydomain.org" imap folders
+    And this shared mailbox has 5 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then 5 mails should be archived in the "shared/arChive/2014/myFolder@mydomain.org" imap folder with subject "subject"
+    Then imap folder "shared/arChive/2014@mydomain.org" doesn't exists
+
+  Scenario: archive treatment on  all shared mailboxes excluded
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And configuration excludes shared mailboxes 
+      | shared | 1 |
+      | shared2 | 2 |
+    And a shared mailbox "shared" without imap folder
+    And this shared mailbox has 5 mails at "2014-11-08T10:00:00Z" with subject "subject"
+    And a shared mailbox "shared2" with "shared2/myFolder@mydomain.org" imap folders
+    And this shared mailbox has 5 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then imap folder "shared/arChive/2014/myFolder@mydomain.org" doesn't exists
+    Then imap folder "shared/arChive/2014/myFolder@mydomain.org" doesn't exists
+
+  Scenario: archive treatment on all shared mailboxes included
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And configuration includes shared mailboxes 
+      | shared | 1 |
+      | shared2 | 2 |
+    And a shared mailbox "shared" without imap folder
+    And this shared mailbox has 5 mails at "2014-11-08T10:00:00Z" with subject "subject"
+    And a shared mailbox "shared2" with "shared2/myFolder@mydomain.org" imap folders
+    And this shared mailbox has 2 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject2"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then 5 mails should be archived in the "shared/arChive/2014@mydomain.org" imap folder with subject "subject"
+    Then 2 mails should be archived in the "shared2/arChive/2014/myFolder@mydomain.org" imap folder with subject "subject2"
+
+  Scenario: archive treatment on one shared mailboxes and one user included
+    Given configuration state is "ENABLE"
+    And configuration repeat kind is set to "DAILY" at 10:30
+    And configuration includes shared mailboxes 
+      | shared2 | 2 |
+    And configuration includes users 
+      | usera | 08607f19-05a4-42a2-9b02-6f11f3ceff3b |
+    And a shared mailbox "shared" without imap folder
+    And this shared mailbox has 5 mails at "2014-11-08T10:00:00Z" with subject "subject"
+    And a shared mailbox "shared2" with "shared2/myFolder@mydomain.org" imap folders
+    And this shared mailbox has 2 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject2"
+    And a user "usera" with "user/usera@mydomain.org" imap folder
+    And this user has 5 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject"
+    And a user "userb" with "user/userb@mydomain.org" imap folder
+    And this user has 2 mails at "2014-11-08T10:00:00Z" in this folder with subject "subject2"
+    And current date is "2014-12-10T15:07:00Z"
+    When admin launches an immediate treatment
+    Then imap folder "shared/arChive/2014@mydomain.org" doesn't exists
+    Then 2 mails should be archived in the "shared2/arChive/2014/myFolder@mydomain.org" imap folder with subject "subject2"
+    Then 5 mails should be archived in the "user/usera/arChive/2014/INBOX@mydomain.org" imap folder with subject "subject"
+    Then imap folder "user/userb/arChive/2014/INBOX@mydomain.org" doesn't exists
+    

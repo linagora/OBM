@@ -51,8 +51,8 @@ public class MailboxPaths {
 	public static final String AT = "@";
 	public static final String INBOX = "INBOX";
 	
-	public static MailboxPaths from(String mailbox) throws MailboxFormatException {
-		return parse(mailbox, null, new Builder());
+	public static MailboxPaths from(String mailbox, boolean sharedMailbox) throws MailboxFormatException {
+		return parse(mailbox, null, new Builder(), sharedMailbox);
 	}
 	
 	public static class Builder {
@@ -61,6 +61,7 @@ public class MailboxPaths {
 		private String user;
 		private String subPaths;
 		private DomainName domainName;
+		private boolean sharedMailbox;
 		
 		@VisibleForTesting Builder() {
 		}
@@ -89,19 +90,36 @@ public class MailboxPaths {
 			return this;
 		}
 	
+		public Builder sharedMailbox(boolean sharedMailbox) {
+			this.sharedMailbox = sharedMailbox;
+			return this;
+		}
+
 		public MailboxPaths build() {
 			Preconditions.checkState(!Strings.isNullOrEmpty(mainPath));
-			Preconditions.checkState(!Strings.isNullOrEmpty(user));
-			Preconditions.checkState(!Strings.isNullOrEmpty(subPaths));
-			Preconditions.checkState(domainName != null);
-			return new MailboxPaths(mainPath, user, subPaths, domainName);
+			if (!sharedMailbox) {
+				Preconditions.checkState(!Strings.isNullOrEmpty(user));
+				Preconditions.checkState(!Strings.isNullOrEmpty(subPaths));
+				Preconditions.checkState(domainName != null);
+			}
+			return new MailboxPaths(mainPath, user, subPaths, domainName, sharedMailbox);
 		}
 	}
 
-	@VisibleForTesting static MailboxPaths parse(String mailbox, String mainSubPath, Builder builder) throws MailboxFormatException {
+	@VisibleForTesting static MailboxPaths parse(String mailbox, String mainSubPath, Builder builder, boolean sharedMailbox) throws MailboxFormatException {
 		Iterator<String> split = Splitter.on(IMAP_FOLDER_SEPARATOR).split(mailbox).iterator();
+		if (!sharedMailbox) {
+			parseUserMailbox(mailbox, mainSubPath, builder, split);
+		} else {
+			parseSharedMailbox(mailbox, mainSubPath, builder, split);
+		}
+		return builder.sharedMailbox(sharedMailbox)
+				.build();
+	}
+
+	private static void parseUserMailbox(String mailbox, String mainSubPath, Builder builder, Iterator<String> split) throws MailboxFormatException {
 		builder.mainPath(nextMandatoryElement(split, mailbox));
-		
+
 		String userPart = nextMandatoryElement(split, mailbox);
 		if (userPart.contains(AT)) {
 			Iterator<String> splitPathAtDomain = splitPathAtDomain(userPart);
@@ -109,13 +127,27 @@ public class MailboxPaths {
 			builder.subPaths(inbox(mainSubPath));
 			builder.domainName(new DomainName(nextMandatoryElement(splitPathAtDomain, mailbox)));
 		} else {
-			parseMailboxWithSubPaths(mailbox, mainSubPath, userPart, builder, split);
+			parseMailboxWithSubPaths(mailbox, mainSubPath, userPart, builder, split, false);
 		}
-		return builder.build();
 	}
 
-	private static void parseMailboxWithSubPaths(String mailbox, String mainSubPath, String userPart, Builder builder, Iterator<String> split) throws MailboxFormatException {
-		builder.user(userPart);
+	private static void parseSharedMailbox(String mailbox, String mainSubPath, Builder builder, Iterator<String> split) throws MailboxFormatException {
+		String firstElement = nextMandatoryElement(split, mailbox);
+
+		if (firstElement.contains(AT)) {
+			Iterator<String> splitPathAtDomain = splitPathAtDomain(firstElement);
+			builder.mainPath(nextMandatoryElement(splitPathAtDomain, mailbox));
+			builder.domainName(new DomainName(nextMandatoryElement(splitPathAtDomain, mailbox)));
+		} else {
+			builder.mainPath(firstElement);
+			parseMailboxWithSubPaths(mailbox, mainSubPath, firstElement, builder, split, true);
+		}
+	}
+
+	private static void parseMailboxWithSubPaths(String mailbox, String mainSubPath, String userPart, Builder builder, Iterator<String> split, boolean sharedMailbox) throws MailboxFormatException {
+		if (!sharedMailbox) {
+			builder.user(userPart);
+		}
 		
 		List<String> subPaths = Lists.newArrayList();
 		if (!Strings.isNullOrEmpty(mainSubPath)) {
@@ -157,12 +189,14 @@ public class MailboxPaths {
 	private final String user;
 	private final String subPaths;
 	private final DomainName domainName;
+	private final boolean sharedMailbox;
 	
-	protected MailboxPaths(String mainPath, String user, String subPaths, DomainName domainName) {
+	protected MailboxPaths(String mainPath, String user, String subPaths, DomainName domainName, boolean sharedMailbox) {
 		this.mainPath = mainPath;
 		this.user = user;
 		this.subPaths = subPaths;
 		this.domainName = domainName;
+		this.sharedMailbox = sharedMailbox;
 	}
 	
 	public String getMainPath() {
@@ -181,24 +215,50 @@ public class MailboxPaths {
 		return domainName;
 	}
 	
+	public boolean isSharedMailbox() {
+		return sharedMailbox;
+	}
+	
 	public String getName() {
-		if (subPaths != null) {
-			return Joiner.on(AT).join(Joiner.on(IMAP_FOLDER_SEPARATOR).join(mainPath, user, subPaths), domainName.get());
+		if( !isSharedMailbox()) {
+			if (subPaths != null) {
+				return Joiner.on(AT).join(Joiner.on(IMAP_FOLDER_SEPARATOR).join(mainPath, user, subPaths), domainName.get());
+			}
+			return Joiner.on(AT).join(Joiner.on(IMAP_FOLDER_SEPARATOR).join(mainPath, user), domainName.get());
+		} else {
+			if (subPaths != null) {
+				return Joiner.on(AT).join(Joiner.on(IMAP_FOLDER_SEPARATOR).join(mainPath, subPaths), domainName.get());
+			}
+			return Joiner.on(AT).join(mainPath, domainName.get());
 		}
-		return Joiner.on(AT).join(Joiner.on(IMAP_FOLDER_SEPARATOR).join(mainPath, user), domainName.get());
 	}
 	
 	public String getUserAtDomain() {
-		return Joiner.on(AT).join(user, domainName.get());
+		if( !isSharedMailbox()) {
+			return Joiner.on(AT).join(user, domainName.get());
+		}
+		return null;
 	}
 	
 	public MailboxPaths prepend(String mainSubPath) {
 		Preconditions.checkArgument(!Strings.isNullOrEmpty(mainSubPath));
-		return new Builder()
+		Builder builder = new Builder()
 			.mainPath(getMainPath())
-			.user(getUser())
-			.subPaths(Joiner.on(IMAP_FOLDER_SEPARATOR).join(mainSubPath, getSubPaths()))
 			.domainName(getDomainName())
+			.sharedMailbox(isSharedMailbox());
+		
+		String subPaths = getSubPaths();
+		if (!isSharedMailbox()) {
+			builder.subPaths(Joiner.on(IMAP_FOLDER_SEPARATOR).join(mainSubPath, subPaths))
+				.user(getUser());
+		} else {
+			if (!Strings.isNullOrEmpty(subPaths)) {
+				builder.subPaths(Joiner.on(IMAP_FOLDER_SEPARATOR).join(mainSubPath, subPaths));
+			} else {
+				builder.subPaths(mainSubPath);
+			}
+		}
+		return builder
 			.build();
 	}
 	
@@ -208,7 +268,7 @@ public class MailboxPaths {
 	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(mainPath, user, subPaths, domainName);
+		return Objects.hashCode(mainPath, user, subPaths, domainName, sharedMailbox);
 	}
 	
 	@Override
@@ -218,7 +278,8 @@ public class MailboxPaths {
 			return Objects.equal(this.mainPath, that.mainPath)
 				&& Objects.equal(this.user, that.user)
 				&& Objects.equal(this.subPaths, that.subPaths)
-				&& Objects.equal(this.domainName, that.domainName);
+				&& Objects.equal(this.domainName, that.domainName)
+				&& Objects.equal(this.sharedMailbox, that.sharedMailbox);
 		}
 		return false;
 	}
@@ -230,6 +291,7 @@ public class MailboxPaths {
 			.add("user", user)
 			.add("subPaths", subPaths)
 			.add("domainName", domainName)
+			.add("sharedMailbox", sharedMailbox)
 			.toString();
 	}
 }

@@ -45,6 +45,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.obm.domain.dao.SharedMailboxDao;
 import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatment;
@@ -67,6 +68,7 @@ import org.obm.push.minig.imap.StoreClient;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
 import com.linagora.scheduling.DateTimeProvider;
 
@@ -85,6 +87,7 @@ public class DryRunImapArchiveProcessingTest {
 	private SchedulingDatesService schedulingDatesService;
 	private StoreClientFactory storeClientFactory;
 	private ArchiveTreatmentDao archiveTreatmentDao;
+	private SharedMailboxDao sharedMailboxDao;
 	private ProcessedFolderDao processedFolderDao;
 	private ImapArchiveConfigurationService imapArchiveConfigurationService;
 	private Logger logger;
@@ -100,6 +103,7 @@ public class DryRunImapArchiveProcessingTest {
 		schedulingDatesService = control.createMock(SchedulingDatesService.class);
 		storeClientFactory = control.createMock(StoreClientFactory.class);
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
+		sharedMailboxDao = control.createMock(SharedMailboxDao.class);
 		processedFolderDao = control.createMock(ProcessedFolderDao.class);
 		imapArchiveConfigurationService = control.createMock(ImapArchiveConfigurationService.class);
 		expect(imapArchiveConfigurationService.getCyrusPartitionSuffix())
@@ -111,7 +115,9 @@ public class DryRunImapArchiveProcessingTest {
 		
 		dryMailboxProcessing = new DryMailboxProcessing(dateTimeProvider, processedFolderDao, imapArchiveConfigurationService);
 		imapArchiveProcessing = new DryRunImapArchiveProcessing(dateTimeProvider, 
-				schedulingDatesService, storeClientFactory, archiveTreatmentDao, dryMailboxProcessing);
+				schedulingDatesService, storeClientFactory, archiveTreatmentDao, dryMailboxProcessing,
+				ImmutableSet.of(new UserMailboxesProcessor(storeClientFactory),
+						new SharedMailboxesProcessor(storeClientFactory, sharedMailboxDao)));
 	}
 	
 	@Test
@@ -151,11 +157,11 @@ public class DryRunImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME +  "/usera/", UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME +  "/usera/", UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(listResult);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
@@ -163,11 +169,19 @@ public class DryRunImapArchiveProcessingTest {
 		expectImapCommandsOnMailboxProcessing("user/usera/Drafts@mydomain.org", Range.closed(3l, 100l), higherBoundary, storeClient);
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", Range.singleton(1230l), higherBoundary, storeClient);
 		
+		storeClient.login(false);
+		expectLastCall();
+		List<ListInfo> sharedMailboxesListInfos = ImmutableList.of(new ListInfo("shared@mydomain.org", true, false));
+		ListResult sharedMailboxesListResult = new ListResult(1);
+		listResult.addAll(sharedMailboxesListInfos);
+		expect(storeClient.listAll("", UserMailboxesProcessor.ALL_MAILBOXES_NAME))
+			.andReturn(sharedMailboxesListResult);
+
 		storeClient.close();
-		expectLastCall().times(2);
+		expectLastCall().times(3);
 		
 		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient);
+			.andReturn(storeClient).times(2);
 		expect(storeClientFactory.createOnUserBackend("usera", domain))
 			.andReturn(storeClient).times(4);
 		

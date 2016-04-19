@@ -53,9 +53,9 @@ import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
-import pl.wkr.fluentrule.api.FluentExpectedException;
-
 import com.google.common.collect.ImmutableList;
+
+import pl.wkr.fluentrule.api.FluentExpectedException;
 
 
 public class MailboxImplTest {
@@ -76,29 +76,29 @@ public class MailboxImplTest {
 	
 	@Test(expected=NullPointerException.class)
 	public void nameShouldNotBeNull() {
-		MailboxImpl.from(null, null, null);
+		MailboxImpl.from(null, null, null, false);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void nameShouldNotBeEmpty() {
-		MailboxImpl.from("", null, null);
+		MailboxImpl.from("", null, null, false);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void loggerShouldBeProvided() {
-		MailboxImpl.from("mailbox", null, null);
+		MailboxImpl.from("mailbox", null, null, false);
 	}
 	
 	@Test(expected=NullPointerException.class)
 	public void storeClientShouldBeProvided() {
-		MailboxImpl.from("mailbox", logger, null);
+		MailboxImpl.from("mailbox", logger, null, false);
 	}
 	
 	@Test
 	public void getName() {
 		String expectedName = "mailbox";
 		
-		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient, false);
 		String name = mailbox.getName();
 		assertThat(name).isEqualTo(expectedName);
 	}
@@ -107,7 +107,7 @@ public class MailboxImplTest {
 	public void getLogger() {
 		Logger expectedlogger = logger;
 		
-		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient, false);
 		Logger logger = mailbox.getLogger();
 		assertThat(logger).isEqualTo(expectedlogger);
 	}
@@ -116,9 +116,15 @@ public class MailboxImplTest {
 	public void getStoreClient() {
 		StoreClient expectedStoreClient = storeClient;
 		
-		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient, false);
 		StoreClient storeClient = mailbox.getStoreClient();
 		assertThat(storeClient).isEqualTo(expectedStoreClient);
+	}
+	
+	@Test
+	public void isSharedMailbox() {
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient, true);
+		assertThat(mailbox.isSharedMailbox()).isTrue();
 	}
 	
 	@Test
@@ -129,7 +135,7 @@ public class MailboxImplTest {
 		expectLastCall().anyTimes();
 		
 		control.replay();
-		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient, false);
 		mailbox.select();
 		control.verify();
 	}
@@ -144,7 +150,7 @@ public class MailboxImplTest {
 		expectedException.expect(ImapSelectException.class);
 		
 		control.replay();
-		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient, false);
 		mailbox.select();
 		control.verify();
 	}
@@ -159,7 +165,7 @@ public class MailboxImplTest {
 		expectLastCall().anyTimes();
 		
 		control.replay();
-		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient, false);
 		mailbox.setAcl(user, acl);
 		control.verify();
 	}
@@ -176,7 +182,7 @@ public class MailboxImplTest {
 		expectedException.expect(ImapSetAclException.class);
 		
 		control.replay();
-		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("mailbox", logger, storeClient, false);
 		mailbox.setAcl(user, acl);
 		control.verify();
 	}
@@ -188,7 +194,7 @@ public class MailboxImplTest {
 			.andReturn(expectedMessageSet);
 		
 		control.replay();
-		MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false);
 		MessageSet messageSet = mailbox.uidCopy(expectedMessageSet, TemporaryMailbox.builder()
 				.from(mailbox)
 				.domainName(new DomainName("mydomain.org"))
@@ -207,7 +213,7 @@ public class MailboxImplTest {
 		
 		try {
 			control.replay();
-			MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+			MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false);
 			mailbox.uidCopy(expectedMessageSet, TemporaryMailbox.builder()
 					.from(mailbox)
 					.domainName(new DomainName("mydomain.org"))
@@ -226,7 +232,7 @@ public class MailboxImplTest {
 		
 		try {
 			control.replay();
-			MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+			MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false);
 			mailbox.fetchInternalDate(messageSet);
 		} finally {
 			control.verify();
@@ -242,7 +248,7 @@ public class MailboxImplTest {
 			.andReturn(ImmutableList.<InternalDate> of(expectedInternalDate));
 		
 		control.replay();
-		MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false);
 		List<InternalDate> internalDates = mailbox.fetchInternalDate(messageSet);
 		control.verify();
 		
@@ -254,7 +260,7 @@ public class MailboxImplTest {
 		MessageSet messageSet = MessageSet.empty();
 		
 		control.replay();
-		MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+		MailboxImpl mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false);
 		List<InternalDate> internalDates = mailbox.fetchInternalDate(messageSet);
 		control.verify();
 		

@@ -87,7 +87,7 @@ public class CyrusService {
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
 				.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 				.domainName(domainName)
-				.from(MailboxImpl.from("user/" + testUser + "@" + domainName.get(), LOGGER, storeClient))
+				.from(MailboxImpl.from("user/" + testUser + "@" + domainName.get(), LOGGER, storeClient, false))
 				.build();
 		
 		temporaryMailbox.create();

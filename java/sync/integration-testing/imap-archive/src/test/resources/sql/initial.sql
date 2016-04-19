@@ -205,6 +205,27 @@ INSERT INTO UserSystem (usersystem_login, usersystem_password, usersystem_homedi
   VALUES
     ('cyrus', 'cyrus', '');
 
+CREATE TABLE mailshare (
+    mailshare_id integer PRIMARY KEY AUTO_INCREMENT,
+    mailshare_domain_id integer NOT NULL,
+    mailshare_timeupdate timestamp,
+    mailshare_timecreate timestamp DEFAULT now(),
+    mailshare_userupdate integer,
+    mailshare_usercreate integer,
+    mailshare_name character varying(32),
+    mailshare_archive smallint DEFAULT 0 NOT NULL,
+    mailshare_quota character varying(8) DEFAULT '0'::character varying NOT NULL,
+    mailshare_mail_server_id integer,
+    mailshare_delegation character varying(256) DEFAULT ''::character varying,
+    mailshare_description character varying(255),
+    mailshare_email text
+);
+
+INSERT INTO mailshare (mailshare_domain_id, mailshare_name, mailshare_archive, mailshare_quota, mailshare_mail_server_id, mailshare_delegation, mailshare_description, mailshare_email)
+    VALUES
+       (1, 'shared', 1, '2', 1, 'delegation', 'description', 'email'),
+       (1, 'shared2', 1, '2', 1, 'delegation2', 'description2', 'email2');
+
 
 --
 -- IMAP Archive

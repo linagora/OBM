@@ -76,22 +76,23 @@ public class TemporaryMailbox extends CreatableMailboxImpl implements Mailbox {
 			Preconditions.checkState(mailbox != null);
 			Preconditions.checkState(domainName != null);
 			Preconditions.checkState(cyrusPartitionSuffix != null);
-			MailboxPaths mailboxPaths = temporaryMailbox(mailbox.getName());
+			MailboxPaths mailboxPaths = temporaryMailbox(mailbox);
 			return new TemporaryMailbox( 
 					mailboxPaths.getName(), 
+					mailbox.isSharedMailbox(),
 					mailboxPaths.getUserAtDomain(),
 					ArchivePartitionName.from(domainName, cyrusPartitionSuffix),
 					mailbox.getLogger(), 
 					mailbox.getStoreClient());
 		}
 		
-		@VisibleForTesting static MailboxPaths temporaryMailbox(String mailbox) throws MailboxFormatException {
-			return MailboxPaths.from(mailbox).prepend(TEMPORARY_FOLDER);
+		@VisibleForTesting static MailboxPaths temporaryMailbox(Mailbox mailbox) throws MailboxFormatException {
+			return MailboxPaths.from(mailbox.getName(), mailbox.isSharedMailbox()).prepend(TEMPORARY_FOLDER);
 		}
 	}
 	
-	private TemporaryMailbox(String name, String userAtDomain, String archivePartitionName, Logger logger, StoreClient storeClient) {
-		super(name, logger, storeClient, userAtDomain, archivePartitionName);
+	private TemporaryMailbox(String name, boolean sharedMailbox, String userAtDomain, String archivePartitionName, Logger logger, StoreClient storeClient) {
+		super(name, logger, storeClient, sharedMailbox, userAtDomain, archivePartitionName);
 	}
 
 	public void delete() throws ImapDeleteException {

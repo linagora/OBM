@@ -115,7 +115,7 @@ public class TemporaryMailboxTest {
 		
 		control.replay();
 		TemporaryMailbox.builder()
-			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 			.domainName(new DomainName("mydomain.org"))
 			.cyrusPartitionSuffix("archive")
 			.build();
@@ -124,15 +124,15 @@ public class TemporaryMailboxTest {
 	
 	@Test
 	public void temporaryMailboxShouldWorkWhenMailboxIsINBOX() throws Exception {
-		String mailbox = "user/usera@mydomain.org";
-		
+		TestMailbox mailbox = new TestMailbox("user/usera@mydomain.org", null, null, false);
+
 		MailboxPaths temporaryMailbox = TemporaryMailbox.Builder.temporaryMailbox(mailbox);
 		assertThat(temporaryMailbox.getName()).isEqualTo("user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org");
 	}
 	
 	@Test
 	public void temporaryMailboxShouldWorkWhenMailboxIsAFolder() throws Exception {
-		String mailbox = "user/usera/Test@mydomain.org";
+		TestMailbox mailbox = new TestMailbox("user/usera/Test@mydomain.org", null, null, false);
 		
 		MailboxPaths temporaryMailbox = TemporaryMailbox.Builder.temporaryMailbox(mailbox);
 		assertThat(temporaryMailbox.getName()).isEqualTo("user/usera/TEMPORARY_ARCHIVE_FOLDER/Test@mydomain.org");
@@ -140,7 +140,7 @@ public class TemporaryMailboxTest {
 	
 	@Test
 	public void temporaryMailboxShouldWorkWhenMailboxIsASubFolder() throws Exception {
-		String mailbox = "user/usera/Test/subfolder@mydomain.org";
+		TestMailbox mailbox = new TestMailbox("user/usera/Test/subfolder@mydomain.org", null, null, false);
 		
 		MailboxPaths temporaryMailbox = TemporaryMailbox.Builder.temporaryMailbox(mailbox);
 		assertThat(temporaryMailbox.getName()).isEqualTo("user/usera/TEMPORARY_ARCHIVE_FOLDER/Test/subfolder@mydomain.org");
@@ -148,11 +148,17 @@ public class TemporaryMailboxTest {
 	
 	@Test(expected=MailboxFormatException.class)
 	public void temporaryMailboxShouldThrowWhenBadMailbox() throws Exception {
-		String mailbox = "user";
+		TestMailbox mailbox = new TestMailbox("user", null, null, false);
 		
 		TemporaryMailbox.Builder.temporaryMailbox(mailbox);
 	}
 	
+	private static class TestMailbox extends MailboxImpl {
+
+		protected TestMailbox(String name, Logger logger, StoreClient storeClient, boolean sharedMailbox) {
+			super(name, logger, storeClient, sharedMailbox);
+		}
+	}
 	@Test
 	public void deleteShouldNotThrowWhenSuccess() throws Exception {
 		Logger logger = control.createMock(Logger.class);
@@ -165,7 +171,7 @@ public class TemporaryMailboxTest {
 		
 		control.replay();
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
-			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 			.domainName(new DomainName("mydomain.org"))
 			.cyrusPartitionSuffix("archive")
 			.build();
@@ -184,7 +190,7 @@ public class TemporaryMailboxTest {
 		try {
 			control.replay();
 			TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
-					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 					.domainName(new DomainName("mydomain.org"))
 					.cyrusPartitionSuffix("archive")
 					.build();
@@ -206,7 +212,7 @@ public class TemporaryMailboxTest {
 		
 		control.replay();
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
-				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 				.domainName(new DomainName("mydomain.org"))
 				.cyrusPartitionSuffix("archive")
 				.build();
@@ -225,7 +231,7 @@ public class TemporaryMailboxTest {
 		try {
 			control.replay();
 			TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
-					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 					.domainName(new DomainName("mydomain.org"))
 					.cyrusPartitionSuffix("archive")
 					.build();
@@ -241,7 +247,7 @@ public class TemporaryMailboxTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
-				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 				.domainName(new DomainName("mydomain.org"))
 				.cyrusPartitionSuffix("archive")
 				.build();
@@ -262,7 +268,7 @@ public class TemporaryMailboxTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
-				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 				.domainName(new DomainName("mydomain.org"))
 				.cyrusPartitionSuffix("archive")
 				.build();
@@ -284,7 +290,7 @@ public class TemporaryMailboxTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
-				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 				.domainName(new DomainName("mydomain.org"))
 				.cyrusPartitionSuffix("archive")
 				.build();
@@ -304,7 +310,7 @@ public class TemporaryMailboxTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
-				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 				.domainName(new DomainName("mydomain.org"))
 				.cyrusPartitionSuffix("archive")
 				.build();

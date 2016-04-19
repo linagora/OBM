@@ -36,6 +36,8 @@ import org.obm.domain.dao.AddressBookDaoJdbcImpl;
 import org.obm.domain.dao.DomainDao;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.ObmInfoDaoJdbcImpl;
+import org.obm.domain.dao.SharedMailboxDao;
+import org.obm.domain.dao.SharedMailboxDaoJdbcImpl;
 import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
 import org.obm.domain.dao.UserPatternDaoJdbcImpl;
@@ -76,6 +78,7 @@ public class DaoModule extends AbstractModule {
 			bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
 			bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
 			bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
+			bind(SharedMailboxDao.class).to(SharedMailboxDaoJdbcImpl.class);
 		}
 	}
 }

@@ -62,6 +62,7 @@ import org.obm.imap.archive.beans.DomainConfiguration;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.beans.ScopeUser;
+import org.obm.imap.archive.beans.SharedMailbox;
 import org.obm.imap.archive.dto.DomainConfigurationDto;
 import org.obm.server.WebServer;
 
@@ -102,6 +103,7 @@ public class TreatmentStepdefs {
 	private GreenMailUser adminUser;
 	private List<GreenMailUser> users;
 	private MailFolder imapFolder;
+	private MailFolder sharedMailbox;
 	
 	@Before
 	public void setup() throws Exception {
@@ -134,6 +136,10 @@ public class TreatmentStepdefs {
 		GreenMailUser user = imapServer.setAdminUser(login, password);
 		imapServer.getManagers().getImapHostManager().deleteMailbox(user, "INBOX");
 		return user;
+	}
+	
+	private MailFolder createRootMailbox(String mailboxName) throws FolderException, AuthorizationException {
+		return imapServer.getManagers().getImapHostManager().createMailbox(adminUser, mailboxName + "@" + domain.getName());
 	}
 
 	@After
@@ -184,6 +190,32 @@ public class TreatmentStepdefs {
 		configurationBuilder.scopeUsersIncludes(true)
 			.scopeUsers(usersMapToScopeUserList(users));
 	}
+	
+	@Given("configuration excludes shared mailboxes?")
+	public void configurationExcludeSharedMailboxes(Map<String, Integer> sharedMailboxes) {
+		configurationBuilder.scopeSharedMailboxesIncludes(false)
+			.scopeSharedMailboxes(usersMapToScopeSharedMailboxList(sharedMailboxes));
+	}
+	
+	@Given("configuration includes shared mailboxes?")
+	public void configurationIncludeSharedMailboxes(Map<String, Integer> sharedMailboxes) {
+		configurationBuilder.scopeSharedMailboxesIncludes(true)
+			.scopeSharedMailboxes(usersMapToScopeSharedMailboxList(sharedMailboxes));
+	}
+
+	private ArrayList<SharedMailbox> usersMapToScopeSharedMailboxList(Map<String, Integer> sharedMailboxes) {
+		return Lists.newArrayList(
+			Maps.transformEntries(sharedMailboxes, new Maps.EntryTransformer<String, Integer, SharedMailbox>() {
+
+				@Override
+				public SharedMailbox transformEntry(String sharedMailbox, Integer id) {
+					return SharedMailbox.builder()
+							.name(sharedMailbox)
+							.id(id)
+							.build();
+				}
+		}).values());
+	}
 
 	private ArrayList<ScopeUser> usersMapToScopeUserList(Map<String, String> users) {
 		return Lists.newArrayList(
@@ -208,11 +240,41 @@ public class TreatmentStepdefs {
 			this.imapFolder = imapServer.getManagers().getImapHostManager().createMailbox(greenMailUser, imapFolder);
 		}
 	}
+	
+	@Given("a shared mailbox \"(.*?)\" without imap folder")
+	public void createSharedMailbox(String sharedMailboxName) throws Exception {
+		sharedMailbox = createRootMailbox(sharedMailboxName);
+	}
+	
+	@Given("a shared mailbox \"(.*?)\" with \"(.*?)\" imap folders?")
+	public void createSharedMailboxWithFolder(String sharedMailboxName, List<String> imapFolders) throws Exception {
+		sharedMailbox = createRootMailbox(sharedMailboxName);
+		
+		for (String imapFolder : imapFolders) {
+			this.imapFolder = imapServer.getManagers().getImapHostManager().createMailbox(adminUser, imapFolder);
+		}
+	}
 
 	@Given("this user has (\\d+) mails? at \"(.*?)\" in this folder with subject \"(.*?)\"")
 	public void appendMails(int numberOfMails, String internalDate, String subject) throws Exception {
 		for (int i = 0; i < numberOfMails; i++) {
 			imapFolder.store(GreenMailUtil.buildSimpleMessage("from@" + domain.getName(), subject, "message", imapServer.getSmtp().getServerSetup()), 
+					DateTime.parse(internalDate).toDate());
+		}
+	}
+
+	@Given("this shared mailbox has (\\d+) mails? at \"(.*?)\" in this folder with subject \"(.*?)\"")
+	public void appendMailsInSharedMailboxFolder(int numberOfMails, String internalDate, String subject) throws Exception {
+		for (int i = 0; i < numberOfMails; i++) {
+			imapFolder.store(GreenMailUtil.buildSimpleMessage("from@" + domain.getName(), subject, "message", imapServer.getSmtp().getServerSetup()), 
+					DateTime.parse(internalDate).toDate());
+		}
+	}
+
+	@Given("this shared mailbox has (\\d+) mails? at \"(.*?)\" with subject \"(.*?)\"")
+	public void appendMailsToSharedMailbox(int numberOfMails, String internalDate, String subject) throws Exception {
+		for (int i = 0; i < numberOfMails; i++) {
+			sharedMailbox.store(GreenMailUtil.buildSimpleMessage("from@" + domain.getName(), subject, "message", imapServer.getSmtp().getServerSetup()), 
 					DateTime.parse(internalDate).toDate());
 		}
 	}

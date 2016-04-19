@@ -78,14 +78,17 @@ import org.obm.imap.archive.services.DateTimeProviderImpl;
 import org.obm.imap.archive.services.DomainClient;
 import org.obm.imap.archive.services.DomainClientImpl;
 import org.obm.imap.archive.services.DomainConfigurationService;
+import org.obm.imap.archive.services.MailboxesProcessor;
 import org.obm.imap.archive.services.Mailer;
 import org.obm.imap.archive.services.MailerImpl;
 import org.obm.imap.archive.services.NotificationTracking;
 import org.obm.imap.archive.services.ScheduledArchivingTracker;
 import org.obm.imap.archive.services.SchedulingDatesService;
+import org.obm.imap.archive.services.SharedMailboxesProcessor;
 import org.obm.imap.archive.services.StoreClientFactory;
 import org.obm.imap.archive.services.TestingDateProvider;
 import org.obm.imap.archive.services.TestingDateProviderImpl;
+import org.obm.imap.archive.services.UserMailboxesProcessor;
 import org.obm.imap.archive.startup.ImapArchiveLifeCycleHandler;
 import org.obm.jersey.injection.JerseyResourceConfig;
 import org.obm.locator.store.LocatorCache;
@@ -187,6 +190,10 @@ public class ImapArchiveModule extends AbstractModule {
 		bind(DomainClient.class).to(DomainClientImpl.class);
 		bind(Mailer.class).to(MailerImpl.class);
 		bind(CyrusService.class);
+		
+		Multibinder<MailboxesProcessor> mailboxesProcessor = Multibinder.newSetBinder(binder(), MailboxesProcessor.class);
+		mailboxesProcessor.addBinding().to(UserMailboxesProcessor.class);
+		mailboxesProcessor.addBinding().to(SharedMailboxesProcessor.class);
 		
 		Multibinder<DatabaseFlavour> supportedDatabases = Multibinder.newSetBinder(binder(), DatabaseFlavour.class);
 		supportedDatabases.addBinding().toInstance(DatabaseFlavour.PGSQL);

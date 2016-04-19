@@ -96,9 +96,10 @@ public class ArchiveMailbox extends CreatableMailboxImpl implements Mailbox {
 			Preconditions.checkState(domainName != null);
 			Preconditions.checkState(archiveMainFolder != null);
 			Preconditions.checkState(cyrusPartitionSuffix != null);
-			MailboxPaths mailboxPaths = archiveMailbox(mailbox.getName(), year, archiveMainFolder);
+			MailboxPaths mailboxPaths = archiveMailbox(mailbox.getName(), mailbox.isSharedMailbox(), year, archiveMainFolder);
 			return new ArchiveMailbox( 
 					mailboxPaths.getName(), 
+					mailbox.isSharedMailbox(),
 					mailboxPaths.getUserAtDomain(),
 					ArchivePartitionName.from(domainName, cyrusPartitionSuffix),
 					year,
@@ -106,15 +107,15 @@ public class ArchiveMailbox extends CreatableMailboxImpl implements Mailbox {
 					mailbox.getStoreClient());
 		}
 		
-		@VisibleForTesting static MailboxPaths archiveMailbox(String mailbox, Year year, String archiveMainFolder) throws MailboxFormatException {
-			return MailboxPaths.from(mailbox).prepend(Joiner.on(MailboxPaths.IMAP_FOLDER_SEPARATOR).join(archiveMainFolder, year.serialize()));
+		@VisibleForTesting static MailboxPaths archiveMailbox(String mailbox, boolean sharedMailbox, Year year, String archiveMainFolder) throws MailboxFormatException {
+			return MailboxPaths.from(mailbox, sharedMailbox).prepend(Joiner.on(MailboxPaths.IMAP_FOLDER_SEPARATOR).join(archiveMainFolder, year.serialize()));
 		}
 	}
 	
 	private final Year year;
 	
-	private ArchiveMailbox(String name, String userAtDomain, String archivePartitionName, Year year, Logger logger, StoreClient storeClient) {
-		super(name, logger, storeClient, userAtDomain, archivePartitionName);
+	private ArchiveMailbox(String name, boolean sharedMailbox, String userAtDomain, String archivePartitionName, Year year, Logger logger, StoreClient storeClient) {
+		super(name, logger, storeClient, sharedMailbox, userAtDomain, archivePartitionName);
 		this.year = year;
 	}
 

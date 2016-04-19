@@ -97,169 +97,229 @@ public class MailboxPathsTest {
 	
 	@Test(expected=MailboxFormatException.class)
 	public void fromShouldThrowWhenEmptyMailbox() throws Exception {
-		MailboxPaths.from("");
+		MailboxPaths.from("", false);
 	}
 	
 	@Test(expected=MailboxFormatException.class)
 	public void fromShouldThrowWhenNoUser() throws Exception {
-		MailboxPaths.from("user");
+		MailboxPaths.from("user", false);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void fromShouldThrowWhenNoDomain() throws Exception {
-		MailboxPaths.from("user/usera@");
+		MailboxPaths.from("user/usera@", false);
 	}
 	
 	@Test
 	public void fromShouldBuild() throws Exception {
-		MailboxPaths expectedMailboxPaths = new MailboxPaths("user", "usera", "path/subpath/subsubpath", new DomainName("mydomain.org"));
+		MailboxPaths expectedMailboxPaths = new MailboxPaths("user", "usera", "path/subpath/subsubpath", new DomainName("mydomain.org"), false);
 		
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org", false);
+		
+		assertThat(mailboxPaths).isEqualTo(expectedMailboxPaths);
+	}
+	
+	@Test
+	public void fromShouldBuildWhenSharedMailbox() throws Exception {
+		MailboxPaths expectedMailboxPaths = new MailboxPaths("shared", null, null, new DomainName("mydomain.org"), true);
+		
+		MailboxPaths mailboxPaths = MailboxPaths.from("shared@mydomain.org", true);
+		
+		assertThat(mailboxPaths).isEqualTo(expectedMailboxPaths);
+	}
+	
+	@Test
+	public void fromShouldBuildWhenSharedMailboxWithFolder() throws Exception {
+		MailboxPaths expectedMailboxPaths = new MailboxPaths("shared", null, "path/subpath/subsubpath", new DomainName("mydomain.org"), true);
+		
+		MailboxPaths mailboxPaths = MailboxPaths.from("shared/path/subpath/subsubpath@mydomain.org", true);
 		
 		assertThat(mailboxPaths).isEqualTo(expectedMailboxPaths);
 	}
 	
 	@Test
 	public void getMainPath() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org", false);
 		assertThat(mailboxPaths.getMainPath()).isEqualTo("user");
 	}
 
 	@Test
 	public void getUserWhenNoLevel() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org", false);
 		assertThat(mailboxPaths.getUser()).isEqualTo("usera");
 	}
 
 	@Test
 	public void getUserWhenOneLevel() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path@mydomain.org", false);
 		assertThat(mailboxPaths.getUser()).isEqualTo("usera");
 	}
 
 	@Test
 	public void getUserWhenMultipleLevels() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org", false);
 		assertThat(mailboxPaths.getUser()).isEqualTo("usera");
 	}
 
 	@Test
 	public void getSubPathsWhenNoLevel() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org", false);
 		assertThat(mailboxPaths.getSubPaths()).isEqualTo("INBOX");
 	}
 
 	@Test
 	public void getSubPathsWhenOneLevel() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path@mydomain.org", false);
 		assertThat(mailboxPaths.getSubPaths()).isEqualTo("path");
 	}
 
 	@Test
 	public void getSubPathsWhenMultipleLevels() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org", false);
 		assertThat(mailboxPaths.getSubPaths()).isEqualTo("path/subpath/subsubpath");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void prependShouldThrowWhenMainSubPathIsNull() throws Exception {
-		MailboxPaths.from("user/usera@mydomain.org").prepend(null);
+		MailboxPaths.from("user/usera@mydomain.org", false).prepend(null);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void prependShouldThrowWhenMainSubPathIsEmpty() throws Exception {
-		MailboxPaths.from("user/usera@mydomain.org").prepend("");
+		MailboxPaths.from("user/usera@mydomain.org", false).prepend("");
 	}
-
+	
 	@Test
 	public void getSubPathsWhenNoLevelAndPrepend() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org").prepend("mainSubPath");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org", false).prepend("mainSubPath");
 		assertThat(mailboxPaths.getSubPaths()).isEqualTo("mainSubPath/INBOX");
 	}
 
 	@Test
 	public void getSubPathsWhenOneLevelAndPrepend() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path@mydomain.org").prepend("mainSubPath");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path@mydomain.org", false).prepend("mainSubPath");
 		assertThat(mailboxPaths.getSubPaths()).isEqualTo("mainSubPath/path");
 	}
 
 	@Test
 	public void getSubPathsWhenMultipleLevelsAndPrepend() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org").prepend("mainSubPath");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org", false).prepend("mainSubPath");
+		assertThat(mailboxPaths.getSubPaths()).isEqualTo("mainSubPath/path/subpath/subsubpath");
+	}
+	
+	@Test
+	public void getSubPathsWhenNoLevelAndPrependOnSharedMailbox() throws Exception {
+		MailboxPaths mailboxPaths = MailboxPaths.from("shared@mydomain.org", true).prepend("mainSubPath");
+		assertThat(mailboxPaths.getSubPaths()).isEqualTo("mainSubPath");
+	}
+
+	@Test
+	public void getSubPathsWhenOneLevelAndPrependOnSharedMailbox() throws Exception {
+		MailboxPaths mailboxPaths = MailboxPaths.from("shared/path@mydomain.org", true).prepend("mainSubPath");
+		assertThat(mailboxPaths.getSubPaths()).isEqualTo("mainSubPath/path");
+	}
+
+	@Test
+	public void getSubPathsWhenMultipleLevelsAndPrependOnSharedMailbox() throws Exception {
+		MailboxPaths mailboxPaths = MailboxPaths.from("shared/path/subpath/subsubpath@mydomain.org", true).prepend("mainSubPath");
 		assertThat(mailboxPaths.getSubPaths()).isEqualTo("mainSubPath/path/subpath/subsubpath");
 	}
 
 	@Test
 	public void getDomainNameWhenNoLevel() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org", false);
 		assertThat(mailboxPaths.getDomainName()).isEqualTo(new DomainName("mydomain.org"));
 	}
 
 	@Test
 	public void getDomainNameWhenOneLevel() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path@mydomain.org", false);
 		assertThat(mailboxPaths.getDomainName()).isEqualTo(new DomainName("mydomain.org"));
 	}
 
 	@Test
 	public void getDomainNameWhenMultipleLevels() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org", false);
 		assertThat(mailboxPaths.getDomainName()).isEqualTo(new DomainName("mydomain.org"));
 	}
 	
 	@Test
 	public void getNameWhenNoLevel() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org", false);
 		assertThat(mailboxPaths.getName()).isEqualTo("user/usera/INBOX@mydomain.org");
 	}
 	
 	@Test
 	public void getNameWhenOneLevel() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path@mydomain.org", false);
 		assertThat(mailboxPaths.getName()).isEqualTo("user/usera/path@mydomain.org");
 	}
 	
 	@Test
 	public void getNameWhenMultipleLevels() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/path/subpath/subsubpath@mydomain.org", false);
 		assertThat(mailboxPaths.getName()).isEqualTo("user/usera/path/subpath/subsubpath@mydomain.org");
 	}
 	
 	@Test
+	public void getNameWhenNoLevelOnSharedMailbox() throws Exception {
+		MailboxPaths mailboxPaths = MailboxPaths.from("shared@mydomain.org", true);
+		assertThat(mailboxPaths.getName()).isEqualTo("shared@mydomain.org");
+	}
+	
+	@Test
+	public void getNameWhenOneLevelOnSharedMailbox() throws Exception {
+		MailboxPaths mailboxPaths = MailboxPaths.from("shared/path@mydomain.org", true);
+		assertThat(mailboxPaths.getName()).isEqualTo("shared/path@mydomain.org");
+	}
+	
+	@Test
+	public void getNameWhenMultipleLevelsOnSharedMailbox() throws Exception {
+		MailboxPaths mailboxPaths = MailboxPaths.from("shared/path/subpath/subsubpath@mydomain.org", true);
+		assertThat(mailboxPaths.getName()).isEqualTo("shared/path/subpath/subsubpath@mydomain.org");
+	}
+	
+	@Test
 	public void getUserAtDomainShoudWorkWhenMailboxIsINBOX() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera@mydomain.org", false);
 		assertThat(mailboxPaths.getUserAtDomain()).isEqualTo("usera@mydomain.org");
 	}
 	
 	@Test
 	public void getUserAtDomainShoudWorkWhenMailboxIsAFolder() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test@mydomain.org", false);
 		assertThat(mailboxPaths.getUserAtDomain()).isEqualTo("usera@mydomain.org");
 	}
 	
 	@Test
 	public void getUserAtDomainShoudWorkWhenMailboxIsASubFolder() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org", false);
 		assertThat(mailboxPaths.getUserAtDomain()).isEqualTo("usera@mydomain.org");
 	}
 	
 	@Test
+	public void getUserAtDomainShoudBeNullWhenSharedMailbox() throws Exception {
+		MailboxPaths mailboxPaths = MailboxPaths.from("shared@mydomain.org", true);
+		assertThat(mailboxPaths.getUserAtDomain()).isNull();
+	}
+	
+	@Test
 	public void belongsToShouldThrowWhenNull() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org", false);
 		boolean belongsTo = mailboxPaths.belongsTo(null);
 		assertThat(belongsTo).isFalse();
 	}
 	
 	@Test
 	public void belongsToShouldReturnFalseWhenOtherDomain() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org", false);
 		boolean belongsTo = mailboxPaths.belongsTo(new DomainName("otherdomain.org"));
 		assertThat(belongsTo).isFalse();
 	}
 	
 	@Test
 	public void belongsToShouldReturnTrueWhenMatching() throws Exception {
-		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org");
+		MailboxPaths mailboxPaths = MailboxPaths.from("user/usera/Test/subfolder@mydomain.org", false);
 		boolean belongsTo = mailboxPaths.belongsTo(new DomainName("mydomain.org"));
 		assertThat(belongsTo).isTrue();
 	}

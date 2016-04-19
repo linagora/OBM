@@ -31,6 +31,8 @@
 
 package org.obm.imap.archive.services;
 
+import java.util.Set;
+
 import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ProcessedFolderDao;
@@ -43,8 +45,10 @@ import org.obm.imap.archive.mailbox.CreatableMailbox;
 import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.mail.imap.IMAPException;
+import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -67,7 +71,7 @@ public class DryMailboxProcessing extends MailboxProcessing {
 	}
 	
 	@Override
-	protected void createFolder(CreatableMailbox creatableMailbox, Logger logger) 
+	protected void createFolder(CreatableMailbox creatableMailbox, Set<Acl> rights, DomainName domainName, Logger logger) 
 			throws MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException {
 	}
 	

@@ -30,6 +30,8 @@
 
 package org.obm.imap.archive.services;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -50,9 +52,10 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 			SchedulingDatesService schedulingDatesService,
 			StoreClientFactory storeClientFactory,
 			ArchiveTreatmentDao archiveTreatmentDao,
-			DryMailboxProcessing mailboxProcessing) {
+			DryMailboxProcessing mailboxProcessing,
+			Set<MailboxesProcessor> mailboxesProcessors) {
 		
-		super(dateTimeProvider, schedulingDatesService, storeClientFactory, archiveTreatmentDao, mailboxProcessing);
+		super(dateTimeProvider, schedulingDatesService, storeClientFactory, archiveTreatmentDao, mailboxProcessing, mailboxesProcessors);
 	}
 	
 	@Override

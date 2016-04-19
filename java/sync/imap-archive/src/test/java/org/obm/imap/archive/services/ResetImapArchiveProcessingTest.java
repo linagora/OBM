@@ -46,6 +46,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.obm.domain.dao.SharedMailboxDao;
 import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveTreatmentRunId;
@@ -64,6 +65,7 @@ import org.obm.push.minig.imap.StoreClient;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.linagora.scheduling.DateTimeProvider;
 
 import ch.qos.logback.classic.Logger;
@@ -82,6 +84,7 @@ public class ResetImapArchiveProcessingTest {
 	private SchedulingDatesService schedulingDatesService;
 	private StoreClientFactory storeClientFactory;
 	private ArchiveTreatmentDao archiveTreatmentDao;
+	private SharedMailboxDao sharedMailboxDao;
 	private ProcessedFolderDao processedFolderDao;
 	private ImapArchiveConfigurationService imapArchiveConfigurationService;
 	private Logger logger;
@@ -96,6 +99,7 @@ public class ResetImapArchiveProcessingTest {
 		schedulingDatesService = control.createMock(SchedulingDatesService.class);
 		storeClientFactory = control.createMock(StoreClientFactory.class);
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
+		sharedMailboxDao = control.createMock(SharedMailboxDao.class);
 		processedFolderDao = control.createMock(ProcessedFolderDao.class);
 		imapArchiveConfigurationService = control.createMock(ImapArchiveConfigurationService.class);
 		expect(imapArchiveConfigurationService.getCyrusPartitionSuffix())
@@ -108,7 +112,10 @@ public class ResetImapArchiveProcessingTest {
 		
 		mailboxProcessing = new MailboxProcessing(dateTimeProvider, processedFolderDao, imapArchiveConfigurationService);
 		testee = new ResetImapArchiveProcessing(dateTimeProvider, 
-				schedulingDatesService, storeClientFactory, archiveTreatmentDao, mailboxProcessing, true);
+				schedulingDatesService, storeClientFactory, archiveTreatmentDao, mailboxProcessing, 
+				ImmutableSet.of(new UserMailboxesProcessor(storeClientFactory),
+						new SharedMailboxesProcessor(storeClientFactory, sharedMailboxDao)),
+				true);
 	}
 
 	@Test
@@ -129,7 +136,7 @@ public class ResetImapArchiveProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(listResult);
 		storeClient.close();
 		expectLastCall();
@@ -173,7 +180,7 @@ public class ResetImapArchiveProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(listResult);
 		storeClient.close();
 		expectLastCall();
@@ -202,7 +209,10 @@ public class ResetImapArchiveProcessingTest {
 	@Test(expected=TestingModeRequiredException.class)
 	public void resetShouldThrowWhenNotInTestingMode() {
 		ResetImapArchiveProcessing resetImapArchiveProcessing = new ResetImapArchiveProcessing(dateTimeProvider, 
-				schedulingDatesService, storeClientFactory, archiveTreatmentDao, mailboxProcessing, false);
+				schedulingDatesService, storeClientFactory, archiveTreatmentDao, mailboxProcessing, 
+				ImmutableSet.of(new UserMailboxesProcessor(storeClientFactory),
+						new SharedMailboxesProcessor(storeClientFactory, sharedMailboxDao)),
+				false);
 		
 		ObmDomain domain = ObmDomain.builder().name("mydomain.org").uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
 		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
@@ -234,7 +244,7 @@ public class ResetImapArchiveProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(new ListResult(0));
 		storeClient.close();
 		expectLastCall();
@@ -245,7 +255,7 @@ public class ResetImapArchiveProcessingTest {
 		// STORE -ImapArchive flag
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(new ListResult(0));
 		storeClient.close();
 		expectLastCall();
@@ -286,7 +296,7 @@ public class ResetImapArchiveProcessingTest {
 		ListResult listResult = new ListResult(2);
 		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org", true, false));
 		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded/subfolder@mydomain.org", true, false));
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(listResult);
 		expect(storeClient.delete("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org"))
 			.andReturn(true);
@@ -301,7 +311,7 @@ public class ResetImapArchiveProcessingTest {
 		// STORE -ImapArchive flag
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(new ListResult(0));
 		storeClient.close();
 		expectLastCall();
@@ -339,7 +349,7 @@ public class ResetImapArchiveProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(new ListResult(0));
 		storeClient.close();
 		expectLastCall();
@@ -355,7 +365,7 @@ public class ResetImapArchiveProcessingTest {
 		listResult.add(new ListInfo("user/usera/Excluded/subfolder@mydomain.org", true, false));
 		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org", true, false));
 		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded/subfolder@mydomain.org", true, false));
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(listResult);
 		expect(storeClient.select("user/usera/Excluded@mydomain.org"))
 			.andReturn(true);
@@ -402,7 +412,7 @@ public class ResetImapArchiveProcessingTest {
 		ListResult listResult = new ListResult(2);
 		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org", true, false));
 		listResult.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded/subfolder@mydomain.org", true, false));
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(listResult);
 		expect(storeClient.delete("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org"))
 			.andReturn(false); // Exception
@@ -419,7 +429,7 @@ public class ResetImapArchiveProcessingTest {
 		listResult2.add(new ListInfo("user/usera/Excluded/subfolder@mydomain.org", true, false));
 		listResult2.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded@mydomain.org", true, false));
 		listResult2.add(new ListInfo("user/usera/" + archiveMainFolder + "/Excluded/subfolder@mydomain.org", true, false));
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(listResult2);
 		expect(storeClient.select("user/usera/Excluded@mydomain.org"))
 			.andReturn(true);

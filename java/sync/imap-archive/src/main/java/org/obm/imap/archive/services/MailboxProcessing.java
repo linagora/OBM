@@ -34,6 +34,7 @@ package org.obm.imap.archive.services;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.beans.ArchiveStatus;
@@ -53,9 +54,11 @@ import org.obm.imap.archive.exception.MailboxFormatException;
 import org.obm.imap.archive.mailbox.ArchiveMailbox;
 import org.obm.imap.archive.mailbox.CreatableMailbox;
 import org.obm.imap.archive.mailbox.Mailbox;
+import org.obm.imap.archive.mailbox.MailboxPaths;
 import org.obm.imap.archive.mailbox.TemporaryMailbox;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.InternalDate;
@@ -154,7 +157,7 @@ public class MailboxProcessing {
 				.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 				.build();
 		try {
-			MessageSet copiedMessageSet = copyToTemporary(mailbox, temporaryMailbox, logger, mailUids);
+			MessageSet copiedMessageSet = copyToTemporary(mailbox, temporaryMailbox, domainName, logger, mailUids);
 			MappedMessageSets mappedMessageSets = MappedMessageSets.builder().origin(mailUids).destination(copiedMessageSet).build();
 			
 			batchCopyFromTemporaryToArchive(mailbox, temporaryMailbox, mappedMessageSets, processedTask);
@@ -168,8 +171,8 @@ public class MailboxProcessing {
 		}
 	}
 
-	private MessageSet copyToTemporary(Mailbox mailbox, TemporaryMailbox temporaryMailbox, Logger logger, MessageSet messageSet) throws IMAPException, MailboxNotFoundException {
-		createFolder(temporaryMailbox, logger);
+	private MessageSet copyToTemporary(Mailbox mailbox, TemporaryMailbox temporaryMailbox, DomainName domainName, Logger logger, MessageSet messageSet) throws IMAPException, MailboxNotFoundException {
+		createFolder(temporaryMailbox, mailbox.getRights(), domainName, logger);
 		
 		mailbox.select();
 		return mailbox.uidCopy(messageSet, temporaryMailbox);
@@ -274,7 +277,7 @@ public class MailboxProcessing {
 				.archiveMainFolder(processedTask.getDomainConfiguration().getArchiveMainFolder())
 				.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 				.build();
-		createFolder(archiveMailbox, logger);
+		createFolder(archiveMailbox, mailbox.getRights(), domainName, logger);
 		return archiveMailbox;
 	}
 
@@ -304,13 +307,13 @@ public class MailboxProcessing {
 		}
 	}
 
-	protected void createFolder(CreatableMailbox creatableMailbox, Logger logger) 
+	protected void createFolder(CreatableMailbox creatableMailbox, Set<Acl> rights, DomainName domainName, Logger logger) 
 			throws MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException, ImapAnnotationException {
 		
 		try {
 			creatableMailbox.select();
 		} catch (ImapSelectException e) {
-			createMailbox(creatableMailbox, logger);
+			createMailbox(creatableMailbox, rights, domainName, logger);
 		}
 	}
 	
@@ -322,7 +325,7 @@ public class MailboxProcessing {
 					.build());
 	}
 
-	private void createMailbox(CreatableMailbox creatableMailbox, Logger logger) 
+	private void createMailbox(CreatableMailbox creatableMailbox, Set<Acl> rights, DomainName domainName, Logger logger) 
 			throws MailboxNotFoundException, ImapSetAclException, ImapCreateException, ImapSelectException, ImapQuotaException, ImapAnnotationException {
 		
 		String archiveMailboxName = creatableMailbox.getName();
@@ -330,10 +333,20 @@ public class MailboxProcessing {
 		
 		creatableMailbox.create();
 		creatableMailbox.grantAllRightsTo(ObmSystemUser.CYRUS);
-		creatableMailbox.grantReadRightsTo(creatableMailbox.getUserAtDomain());
+		if (!creatableMailbox.isSharedMailbox()) {
+			creatableMailbox.grantReadRightsTo(creatableMailbox.getUserAtDomain());
+		} else {
+			for (Acl acl : rights) {
+				creatableMailbox.grantReadRightsTo(userAtDomain(acl.getUser(), domainName));
+			}
+		}
 		creatableMailbox.setMaxQuota(imapArchiveConfigurationService.getQuotaMaxSize());
 		creatableMailbox.setSharedSeenAnnotation();
 		creatableMailbox.select();
+	}
+
+	private String userAtDomain(String user, DomainName domainName) {
+		return (user.contains(MailboxPaths.AT)) ? user : user + MailboxPaths.AT + domainName.get();
 	}
 
 	@Transactional

@@ -32,11 +32,13 @@
 package org.obm.imap.archive.mailbox;
 
 import java.util.List;
+import java.util.Set;
 
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
 import org.obm.push.exception.ImapMessageNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.InternalDate;
 import org.obm.push.mail.bean.MessageSet;
@@ -52,7 +54,11 @@ public interface Mailbox {
 	
 	StoreClient getStoreClient();
 	
+	boolean isSharedMailbox();
+
 	void select() throws MailboxNotFoundException, ImapSelectException;
+	
+	Set<Acl> getRights();
 
 	void grantReadRightsTo(String user) throws ImapSetAclException;
 

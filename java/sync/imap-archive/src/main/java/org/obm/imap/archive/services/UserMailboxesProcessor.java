@@ -40,10 +40,10 @@ import org.obm.imap.archive.exception.MailboxFormatException;
 import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.imap.archive.mailbox.MailboxPaths;
 import org.obm.imap.archive.mailbox.TemporaryMailbox;
+import org.obm.imap.archive.utils.GuavaUtils;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.minig.imap.StoreClient;
-import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -53,10 +53,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-public class UserMailboxesProcessing {
+@Singleton
+public class UserMailboxesProcessor implements MailboxesProcessor {
 	
 	protected static final String USERS_REFERENCE_NAME = "*user";
 	protected static final String INBOX_MAILBOX_NAME = "/%";
@@ -64,15 +67,14 @@ public class UserMailboxesProcessing {
 	protected static final String ALL_USER_FOLDERS_BUT_INBOX = USERS_REFERENCE_NAME + "/%s/";
 
 	protected final StoreClientFactory storeClientFactory;
-	private final MailboxProcessing mailboxProcessing;
 
-	
-	public UserMailboxesProcessing(StoreClientFactory storeClientFactory, MailboxProcessing mailboxProcessing) {
+	@Inject
+	@VisibleForTesting UserMailboxesProcessor(StoreClientFactory storeClientFactory) {
 		this.storeClientFactory = storeClientFactory;
-		this.mailboxProcessing = mailboxProcessing;
 	}
 
-	public boolean processUsers(ProcessedTask processedTask, Logger logger) throws Exception {
+	@Override
+	public boolean processMailboxes(ProcessedTask processedTask, Logger logger, MailboxProcessing mailboxProcessing) throws Exception {
 		boolean isSuccess = true;
 		for (ListInfo inboxListInfo : listUsers(processedTask)) {
 			Optional<String> maybeUserName = inboxListInfo.getUserName();
@@ -84,7 +86,7 @@ public class UserMailboxesProcessing {
 			String user = maybeUserName.get();
 
 			try {
-				if (!processUser(inboxListInfo, user, processedTask)) {
+				if (!processUser(inboxListInfo, user, processedTask, mailboxProcessing)) {
 					isSuccess = false;
 				}
 			} catch (UserNotFoundException e) {
@@ -94,12 +96,13 @@ public class UserMailboxesProcessing {
 		return isSuccess;
 	}
 	
-	private boolean processUser(ListInfo inboxListInfo, String user, ProcessedTask processedTask) throws Exception {
+	private boolean processUser(ListInfo inboxListInfo, String user, ProcessedTask processedTask, MailboxProcessing mailboxProcessing) throws Exception {
 		boolean isSuccess = true;
 		Logger logger = processedTask.getLogger();
 		for (ListInfo listInfo : listImapFolders(inboxListInfo, user, processedTask)) {
 			try {
-				mailboxProcessing.processMailbox(MailboxImpl.from(listInfo.getName(), logger, storeClientFactory.createOnUserBackend(user, processedTask.getDomain())), 
+				mailboxProcessing.processMailbox(MailboxImpl.from(listInfo.getName(), logger, 
+						storeClientFactory.createOnUserBackend(user, processedTask.getDomain()), false), 
 						processedTask);
 			} catch (Exception e) {
 				logger.error("Error on archive treatment: ", e);
@@ -115,8 +118,8 @@ public class UserMailboxesProcessing {
 			storeClient.login(false);
 			
 			return FluentIterable.from(storeClient.listAll(USERS_REFERENCE_NAME, INBOX_MAILBOX_NAME))
-					.transform(appendDomainWhenNone(domain))
-					.filter(filterDomain(domain, processedTask.getLogger()))
+					.transform(GuavaUtils.appendDomainWhenNone(domain))
+					.filter(GuavaUtils.filterDomain(domain, processedTask.getLogger()))
 					.filter(filterScopeUsers(processedTask))
 					.toList();
 		}
@@ -131,59 +134,12 @@ public class UserMailboxesProcessing {
 					Iterables.concat(
 						Collections.singleton(inboxListInfo),
 						storeClient.listAll(String.format(ALL_USER_FOLDERS_BUT_INBOX, user), ALL_MAILBOXES_NAME)))
-					.transform(appendDomainWhenNone(domain))
+					.transform(GuavaUtils.appendDomainWhenNone(domain))
 					.filter(filterExcludedFolder(processedTask))
 					.filter(filterFolders(processedTask, processedTask.getDomainConfiguration().getArchiveMainFolder(), TemporaryMailbox.TEMPORARY_FOLDER))
-					.filter(filterNoSelected(processedTask))
+					.filter(GuavaUtils.filterNoSelected(processedTask))
 					.toList();
 		}
-	}
-
-	protected Function<ListInfo, ListInfo> appendDomainWhenNone(ObmDomain domain) {
-		final String domainName = domain.getName();
-		return new Function<ListInfo, ListInfo>() {
-
-			@Override
-			public ListInfo apply(ListInfo listInfo) {
-				if (!hasDomain(listInfo)) {
-					return appendDomainToListInfo(listInfo, domainName);
-				}
-				return listInfo;
-			}
-
-			private boolean hasDomain(ListInfo listInfo) {
-				return listInfo.getName().contains(MailboxPaths.AT);
-			}
-
-			private ListInfo appendDomainToListInfo(ListInfo listInfo, String domainName) {
-				return new ListInfo(
-						new StringBuilder()
-							.append(listInfo.getName())
-							.append(MailboxPaths.AT)
-							.append(domainName)
-							.toString(), 
-						listInfo.isSelectable(), listInfo.canCreateSubfolder());
-			}
-		};
-	}
-
-	protected Predicate<ListInfo> filterDomain(ObmDomain domain, final Logger logger) {
-		final DomainName domainName = new DomainName(domain.getName());
-		return new Predicate<ListInfo>() {
-
-			@Override
-			public boolean apply(ListInfo listInfo) {
-				try {
-					MailboxPaths mailboxPaths = MailboxPaths.from(listInfo.getName());
-					if (mailboxPaths.belongsTo(domainName)) {
-						return true;
-					}
-				} catch (MailboxFormatException e) {
-					logger.error(String.format("The mailbox %s can't be parsed", listInfo.getName()));
-				}
-				return false;
-			}
-		};
 	}
 
 	private Predicate<ListInfo> filterExcludedFolder(final ProcessedTask processedTask) {
@@ -236,7 +192,7 @@ public class UserMailboxesProcessing {
 			@Override
 			public boolean apply(ListInfo listInfo) {
 				try {
-					MailboxPaths mailboxPaths = MailboxPaths.from(listInfo.getName());
+					MailboxPaths mailboxPaths = MailboxPaths.from(listInfo.getName(), false);
 					for (String folder : folders) {
 						if (mailboxPaths.getSubPaths().startsWith(folder + MailboxPaths.IMAP_FOLDER_SEPARATOR)) {
 							return false;
@@ -244,21 +200,6 @@ public class UserMailboxesProcessing {
 					}
 				} catch (MailboxFormatException e) {
 					logger.error(String.format("The mailbox %s can't be parsed", listInfo.getName()));
-					return false;
-				}
-				return true;
-			}
-		};
-	}
-
-	private Predicate<ListInfo> filterNoSelected(ProcessedTask processedTask) {
-		final Logger logger = processedTask.getLogger();
-		return new Predicate<ListInfo>() {
-
-			@Override
-			public boolean apply(ListInfo listInfo) {
-				if (!listInfo.isSelectable()) {
-					logger.info(String.format("The mailbox %s can't be selected (\\Noselect flag)", listInfo.getName()));
 					return false;
 				}
 				return true;

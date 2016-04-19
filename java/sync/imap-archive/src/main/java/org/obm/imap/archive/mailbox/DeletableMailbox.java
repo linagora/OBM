@@ -54,6 +54,7 @@ public class DeletableMailbox extends MailboxImpl {
 		private String name;
 		private Logger logger;
 		private StoreClient storeClient;
+		private boolean sharedMailbox;
 		
 		public Builder name(String name) {
 			Preconditions.checkNotNull(name);
@@ -74,16 +75,21 @@ public class DeletableMailbox extends MailboxImpl {
 			return this;
 		}
 		
+		public Builder sharedMailbox(boolean sharedMailbox) {
+			this.sharedMailbox = sharedMailbox;
+			return this;
+		}
+		
 		public DeletableMailbox build() {
 			Preconditions.checkState(name != null);
 			Preconditions.checkState(logger != null);
 			Preconditions.checkState(storeClient != null);
-			return new DeletableMailbox(name, logger, storeClient);
+			return new DeletableMailbox(name, logger, storeClient, sharedMailbox);
 		}
 	}
 	
-	private DeletableMailbox(String name, Logger logger, StoreClient storeClient) {
-		super(name, logger, storeClient);
+	private DeletableMailbox(String name, Logger logger, StoreClient storeClient, boolean sharedMailbox) {
+		super(name, logger, storeClient, sharedMailbox);
 	}
 	
 	public String getName() {

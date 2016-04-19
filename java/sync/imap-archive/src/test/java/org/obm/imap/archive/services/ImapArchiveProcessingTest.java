@@ -47,6 +47,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.obm.domain.dao.SharedMailboxDao;
 import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveRecurrence;
 import org.obm.imap.archive.beans.ArchiveStatus;
@@ -73,6 +74,7 @@ import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.imap.archive.mailbox.TemporaryMailbox;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.AnnotationEntry;
 import org.obm.push.mail.bean.AttributeValue;
 import org.obm.push.mail.bean.Flag;
@@ -109,6 +111,7 @@ public class ImapArchiveProcessingTest {
 	private SchedulingDatesService schedulingDatesService;
 	private StoreClientFactory storeClientFactory;
 	private ArchiveTreatmentDao archiveTreatmentDao;
+	private SharedMailboxDao sharedMailboxDao;
 	private ProcessedFolderDao processedFolderDao;
 	private ImapArchiveConfigurationService imapArchiveConfigurationService;
 	private Logger logger;
@@ -125,6 +128,7 @@ public class ImapArchiveProcessingTest {
 		storeClientFactory = control.createMock(StoreClientFactory.class);
 		archiveTreatmentDao = control.createMock(ArchiveTreatmentDao.class);
 		processedFolderDao = control.createMock(ProcessedFolderDao.class);
+		sharedMailboxDao = control.createMock(SharedMailboxDao.class);
 		imapArchiveConfigurationService = control.createMock(ImapArchiveConfigurationService.class);
 		expect(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 			.andReturn("archive").anyTimes();
@@ -137,7 +141,9 @@ public class ImapArchiveProcessingTest {
 
 		mailboxProcessing = new MailboxProcessing(dateTimeProvider, processedFolderDao, imapArchiveConfigurationService);
 		imapArchiveProcessing = new ImapArchiveProcessing(dateTimeProvider, 
-				schedulingDatesService, storeClientFactory, archiveTreatmentDao, mailboxProcessing);
+				schedulingDatesService, storeClientFactory, archiveTreatmentDao, mailboxProcessing,
+				ImmutableSet.of(new UserMailboxesProcessor(storeClientFactory),
+						new SharedMailboxesProcessor(storeClientFactory, sharedMailboxDao)));
 	}
 
 	@Test
@@ -172,7 +178,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -187,6 +193,8 @@ public class ImapArchiveProcessingTest {
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org", 
 				ImmutableSet.of(Range.singleton(1230l)), higherBoundary, treatmentDate, runId, false, storeClient);
 		
+		expectSharedMailboxes(storeClient, domain, 1);
+
 		storeClient.close();
 		expectLastCall().times(2);
 		
@@ -233,7 +241,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -252,6 +260,8 @@ public class ImapArchiveProcessingTest {
 		expectMove("user/usera/Drafts@mydomain.org", storeClient, archived2);
 		expectMove("user/usera/SPAM@mydomain.org", storeClient, archived3);
 		
+		expectSharedMailboxes(storeClient, domain, 1);
+
 		storeClient.close();
 		expectLastCall().times(2);
 		
@@ -300,7 +310,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -310,6 +320,8 @@ public class ImapArchiveProcessingTest {
 		expectImapCommandsOnMailboxProcessing("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
 				ImmutableSet.of(Range.closed(1l, 10l)), higherBoundary, treatmentDate, runId, false, storeClient);
 		
+		expectSharedMailboxes(storeClient, domain, 1);
+
 		storeClient.close();
 		expectLastCall().times(2);
 		
@@ -365,7 +377,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -393,6 +405,8 @@ public class ImapArchiveProcessingTest {
 				.build());
 		expectLastCall();
 		
+		expectSharedMailboxes(storeClient, domain, 1);
+
 		storeClient.close();
 		expectLastCall().times(3);
 		
@@ -439,7 +453,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -471,6 +485,8 @@ public class ImapArchiveProcessingTest {
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)),
 				higherBoundary, treatmentDate, runId, false, storeClient);
 		
+		expectSharedMailboxes(storeClient, domain, 1);
+
 		storeClient.close();
 		expectLastCall().times(2);
 		
@@ -519,7 +535,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -535,7 +551,9 @@ public class ImapArchiveProcessingTest {
 		expectImapCommandsOnMailboxProcessing("user/usera/SPAM@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/SPAM@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/SPAM@mydomain.org",
 				ImmutableSet.of(Range.closed(3l, 22l), Range.closed(23l, 42l), Range.closed(43l, 62l), Range.closed(63l, 82l), Range.closed(83l, 100l)),
 				higherBoundary, treatmentDate, runId, false, storeClient);
-		
+
+		expectSharedMailboxes(storeClient, domain, 1);
+
 		storeClient.close();
 		expectLastCall().times(2);
 		
@@ -571,7 +589,7 @@ public class ImapArchiveProcessingTest {
 			.andReturn(storeClient).times(4);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -585,11 +603,24 @@ public class ImapArchiveProcessingTest {
 			imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, runId, logger, loggerAppenders, false));
 		} catch (Exception e) {
 			imapArchiveProcessing.archive(new ArchiveConfiguration(domainConfiguration, null, null, secondRunId, logger, loggerAppenders, false));
+		} catch (Throwable t) {
+			System.out.println(t);
 		} finally {
 			control.verify();
 		}
 	}
 	
+	private void expectSharedMailboxes(StoreClient storeClient, ObmDomain domain, int expectingTimes) throws Exception {
+		expect(storeClientFactory.create(domain.getName()))
+			.andReturn(storeClient).times(expectingTimes);
+		storeClient.login(false);
+		expectLastCall().times(expectingTimes);
+		expect(storeClient.listAll("", UserMailboxesProcessor.ALL_MAILBOXES_NAME))
+			.andReturn(new ListResult()).times(expectingTimes);
+		storeClient.close();
+		expectLastCall().times(expectingTimes);
+	}
+
 	@Test
 	public void archiveShouldCopyInCorrespondingYearFolder() throws Exception {
 		String archiveMainFolder = "arChive";
@@ -620,7 +651,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -630,6 +661,8 @@ public class ImapArchiveProcessingTest {
 		expectImapCommandsOnMailboxProcessingWhenTwoYearsInRange("user/usera@mydomain.org", "user/usera/" + archiveMainFolder + "/2014/INBOX@mydomain.org", "user/usera/" + archiveMainFolder + "/2015/INBOX@mydomain.org", "user/usera/TEMPORARY_ARCHIVE_FOLDER/INBOX@mydomain.org", 
 				Range.closed(1l, 10l), Range.closed(11l, 15l), higherBoundary, treatmentDate, runId, storeClient);
 		
+		expectSharedMailboxes(storeClient, domain, 1);
+
 		storeClient.close();
 		expectLastCall().times(2);
 		
@@ -664,6 +697,9 @@ public class ImapArchiveProcessingTest {
 		
 		expectCreateMailbox(temporaryMailboxName, storeClient);
 		
+		expect(storeClient.getAcl(mailboxName))
+			.andReturn(ImmutableSet.<Acl> of())
+			.times(3);
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		MessageSet secondYearMessageSet = MessageSet.builder().add(secondYearRange).build();
 		expect(storeClient.uidSearch(SearchQuery.builder()
@@ -759,7 +795,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -828,6 +864,9 @@ public class ImapArchiveProcessingTest {
 			.andReturn(otherYearsInternalDates.build());
 		
 		// previous Year
+		expect(storeClient.getAcl(mailboxName))
+			.andReturn(ImmutableSet.<Acl> of())
+			.times(2);
 		String previousYearArchiveMailboxName = "user/usera/" + archiveMainFolder + "/2013/INBOX@mydomain.org";
 		expectCreateMailbox(previousYearArchiveMailboxName, storeClient);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
@@ -841,6 +880,9 @@ public class ImapArchiveProcessingTest {
 			.andReturn(true);
 		
 		// next Year
+		expect(storeClient.getAcl(mailboxName))
+			.andReturn(ImmutableSet.<Acl> of())
+			.times(2);
 		String nextYearArchiveMailboxName = "user/usera/" + archiveMainFolder + "/2015/INBOX@mydomain.org";
 		expectCreateMailbox(nextYearArchiveMailboxName, storeClient);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
@@ -855,6 +897,8 @@ public class ImapArchiveProcessingTest {
 		
 		expect(storeClient.delete(temporaryMailboxName)).andReturn(true);
 		
+		expectSharedMailboxes(storeClient, domain, 1);
+
 		storeClient.close();
 		expectLastCall();
 		
@@ -936,6 +980,9 @@ public class ImapArchiveProcessingTest {
 		
 		expectCreateMailbox(archiveMailboxName, storeClient);
 		
+		expect(storeClient.getAcl(mailboxName))
+			.andReturn(ImmutableSet.<Acl> of())
+			.times(3);
 		expectCreateMailbox(temporaryMailboxName, storeClient);
 		expect(storeClient.uidCopy(messageSet, temporaryMailboxName)).andReturn(messageSet);
 		
@@ -979,7 +1026,7 @@ public class ImapArchiveProcessingTest {
 			.andReturn(messageSet);
 		
 		expect(storeClient.select(mailboxName)).andReturn(true);
-		
+
 		expectCreateMailbox(temporaryMailboxName, storeClient);
 		
 		expectCopyPartition(mailboxName, archiveMailboxName, temporaryMailboxName, uids, isMoveEnabled, storeClient);
@@ -1066,9 +1113,14 @@ public class ImapArchiveProcessingTest {
 		boolean first = true;
 		for (Range<Long> partition : uids) {
 			if (first) {
+				expect(storeClient.getAcl(mailboxName))
+					.andReturn(ImmutableSet.<Acl> of())
+					.times(2);
 				expectCreateMailbox(archiveMailboxName, storeClient);
 				first = false;
 			} else {
+				expect(storeClient.getAcl(mailboxName))
+					.andReturn(ImmutableSet.<Acl> of());
 				expect(storeClient.select(archiveMailboxName)).andReturn(true);
 			}
 			
@@ -1262,14 +1314,17 @@ public class ImapArchiveProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		MessageSet messageSet = MessageSet.builder().add(Range.closed(1l, 100l)).build();
 		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
-		Mailbox mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient);
+		Mailbox mailbox = MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false);
 		TemporaryMailbox temporaryMailbox = TemporaryMailbox.builder()
 				.from(mailbox)
 				.domainName(new DomainName(domain.getName()))
 				.cyrusPartitionSuffix("archive")
 				.build();
 		
-		expect(storeClient.select(mailbox.getName()))
+		String mailboxName = mailbox.getName();
+		expect(storeClient.getAcl(mailboxName))
+			.andReturn(ImmutableSet.<Acl> of());
+		expect(storeClient.select(mailboxName))
 			.andReturn(true);
 		// Throws IllegalStateException
 		expect(storeClient.uidCopy(messageSet, temporaryMailbox.getName()))
@@ -1310,7 +1365,7 @@ public class ImapArchiveProcessingTest {
 	}
 
 	private void expectListImapFolders(StoreClient storeClient, String user, ListResult subFolderslistResult) {
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME + "/" + user + "/", UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME + "/" + user + "/", UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(subFolderslistResult);
 	}
 

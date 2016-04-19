@@ -57,7 +57,6 @@ import org.obm.imap.archive.beans.SchedulingConfiguration;
 import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl;
-import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.mailbox.TemporaryMailbox;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.ListResult;
@@ -66,7 +65,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.linagora.scheduling.DateTimeProvider;
 
 import ch.qos.logback.classic.Logger;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -74,7 +72,7 @@ import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.user.UserExtId;
 import pl.wkr.fluentrule.api.FluentExpectedException;
 
-public class UserMailboxesProcessingTest {
+public class UserMailboxesProcessorTest {
 
 	@Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 	@Rule public FluentExpectedException expectedException = FluentExpectedException.none();
@@ -83,14 +81,12 @@ public class UserMailboxesProcessingTest {
 	private StoreClientFactory storeClientFactory;
 	private Logger logger;
 	
-	private UserMailboxesProcessing sut;
+	private UserMailboxesProcessor sut;
 
 	@Before
 	public void setup() throws IOException {
 		control = createControl();
-		DateTimeProvider dateTimeProvider = control.createMock(DateTimeProvider.class);
 		storeClientFactory = control.createMock(StoreClientFactory.class);
-		ProcessedFolderDao processedFolderDao = control.createMock(ProcessedFolderDao.class);
 		ImapArchiveConfigurationService imapArchiveConfigurationService = control.createMock(ImapArchiveConfigurationService.class);
 		expect(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 			.andReturn("archive").anyTimes();
@@ -100,8 +96,7 @@ public class UserMailboxesProcessingTest {
 			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE).anyTimes();
 		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
 
-		MailboxProcessing mailboxProcessing = new MailboxProcessing(dateTimeProvider, processedFolderDao, imapArchiveConfigurationService);
-		sut = new UserMailboxesProcessing(storeClientFactory, mailboxProcessing);
+		sut = new UserMailboxesProcessor(storeClientFactory);
 	}
 
 	
@@ -272,7 +267,7 @@ public class UserMailboxesProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.close();
 		expectLastCall();
@@ -333,7 +328,7 @@ public class UserMailboxesProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.close();
 		expectLastCall();
@@ -384,7 +379,7 @@ public class UserMailboxesProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.close();
 		expectLastCall();
@@ -575,7 +570,7 @@ public class UserMailboxesProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.close();
 		expectLastCall();
@@ -632,7 +627,7 @@ public class UserMailboxesProcessingTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME, UserMailboxesProcessor.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.close();
 		expectLastCall();
@@ -674,7 +669,7 @@ public class UserMailboxesProcessingTest {
 	}
 
 	private void expectListImapFolders(StoreClient storeClient, String user, ListResult subFolderslistResult) {
-		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME + "/" + user + "/", UserMailboxesProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessor.USERS_REFERENCE_NAME + "/" + user + "/", UserMailboxesProcessor.ALL_MAILBOXES_NAME))
 			.andReturn(subFolderslistResult);
 	}
 

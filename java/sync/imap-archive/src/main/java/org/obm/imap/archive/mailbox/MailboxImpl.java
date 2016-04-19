@@ -32,11 +32,13 @@
 package org.obm.imap.archive.mailbox;
 
 import java.util.List;
+import java.util.Set;
 
 import org.obm.imap.archive.exception.ImapSelectException;
 import org.obm.imap.archive.exception.ImapSetAclException;
 import org.obm.push.exception.ImapMessageNotFoundException;
 import org.obm.push.exception.MailboxNotFoundException;
+import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.FlagsList;
 import org.obm.push.mail.bean.InternalDate;
@@ -55,22 +57,24 @@ public class MailboxImpl implements Mailbox {
 	public static final String ALL_IMAP_RIGHTS = "lrswipkxtecda";
 	public static final String READ_SEENFLAG_IMAP_RIGHTS = "lrs";
 
-	public static MailboxImpl from(String name, Logger logger, StoreClient storeClient) {
+	public static MailboxImpl from(String name, Logger logger, StoreClient storeClient, boolean sharedMailbox) {
 		Preconditions.checkNotNull(name);
 		Preconditions.checkArgument(name != "");
 		Preconditions.checkNotNull(logger);
 		Preconditions.checkNotNull(storeClient);
-		return new MailboxImpl(name, logger, storeClient);
+		return new MailboxImpl(name, logger, storeClient, sharedMailbox);
 	}
 	
 	protected final String name;
 	protected final Logger logger;
 	protected final StoreClient storeClient;
+	protected final boolean sharedMailbox;
 	
-	protected MailboxImpl(String name, Logger logger, StoreClient storeClient) {
+	protected MailboxImpl(String name, Logger logger, StoreClient storeClient, boolean sharedMailbox) {
 		this.name = name;
 		this.logger = logger;
 		this.storeClient = storeClient;
+		this.sharedMailbox = sharedMailbox;
 	}
 
 	@Override
@@ -87,6 +91,11 @@ public class MailboxImpl implements Mailbox {
 	public StoreClient getStoreClient() {
 		return storeClient;
 	}
+
+	@Override
+	public boolean isSharedMailbox() {
+		return sharedMailbox;
+	}
 	
 	@Override
 	public void select() throws MailboxNotFoundException, ImapSelectException {
@@ -94,6 +103,11 @@ public class MailboxImpl implements Mailbox {
 			throw new ImapSelectException(String.format("Wasn't able to select %s mailbox", name));
 		}
 		logger.debug("Mailbox {} selected", name);
+	}
+
+	@Override
+	public Set<Acl> getRights() {
+		return storeClient.getAcl(name);
 	}
 
 	@Override
@@ -142,14 +156,15 @@ public class MailboxImpl implements Mailbox {
 	
 	@Override
 	public int hashCode(){
-		return Objects.hashCode(name);
+		return Objects.hashCode(name, sharedMailbox);
 	}
 	
 	@Override
 	public boolean equals(Object object){
 		if (object instanceof MailboxImpl) {
 			MailboxImpl that = (MailboxImpl) object;
-			return Objects.equal(this.name, that.name);
+			return Objects.equal(this.name, that.name)
+				&& Objects.equal(this.sharedMailbox, that.sharedMailbox);
 		}
 		return false;
 	}
@@ -158,6 +173,7 @@ public class MailboxImpl implements Mailbox {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("name", name)
+			.add("sharedMailbox", sharedMailbox)
 			.toString();
 	}
 }

@@ -45,8 +45,8 @@ public abstract class CreatableMailboxImpl extends MailboxImpl implements Creata
 	private final String userAtDomain;
 	private final String archivePartitionName;
 
-	protected CreatableMailboxImpl(String name, Logger logger, StoreClient storeClient, String userAtDomain, String archivePartitionName) {
-		super(name, logger, storeClient);
+	protected CreatableMailboxImpl(String name, Logger logger, StoreClient storeClient, boolean sharedMailbox, String userAtDomain, String archivePartitionName) {
+		super(name, logger, storeClient, sharedMailbox);
 		this.userAtDomain = userAtDomain;
 		this.archivePartitionName = archivePartitionName;
 	}

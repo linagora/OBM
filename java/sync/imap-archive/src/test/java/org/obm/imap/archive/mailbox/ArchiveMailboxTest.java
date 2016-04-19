@@ -161,7 +161,7 @@ public class ArchiveMailboxTest {
 		
 		control.replay();
 		ArchiveMailbox.builder()
-			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 			.year(Year.from(2015))
 			.domainName(new DomainName("mydomain.org"))
 			.archiveMainFolder("ARCHIVE")
@@ -179,7 +179,7 @@ public class ArchiveMailboxTest {
 		
 		control.replay();
 		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
-			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 			.year(expectedYear)
 			.domainName(new DomainName("mydomain.org"))
 			.archiveMainFolder("ARCHIVE")
@@ -193,7 +193,7 @@ public class ArchiveMailboxTest {
 	public void archiveMailboxShouldWorkWhenMailboxIsINBOX() throws Exception {
 		String mailbox = "user/usera@mydomain.org";
 		
-		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014), "ARCHIVE");
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, false,Year.from(2014), "ARCHIVE");
 		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/INBOX@mydomain.org");
 	}
 	
@@ -201,7 +201,7 @@ public class ArchiveMailboxTest {
 	public void archiveMailboxShouldWorkWhenMailboxIsAFolder() throws Exception {
 		String mailbox = "user/usera/Test@mydomain.org";
 		
-		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014), "ARCHIVE");
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, false,Year.from(2014), "ARCHIVE");
 		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/Test@mydomain.org");
 	}
 	
@@ -209,15 +209,39 @@ public class ArchiveMailboxTest {
 	public void archiveMailboxShouldWorkWhenMailboxIsASubFolder() throws Exception {
 		String mailbox = "user/usera/Test/subfolder@mydomain.org";
 		
-		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014), "ARCHIVE");
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, false,Year.from(2014), "ARCHIVE");
 		assertThat(archiveMailbox.getName()).isEqualTo("user/usera/ARCHIVE/2014/Test/subfolder@mydomain.org");
+	}
+	
+	@Test
+	public void archiveMailboxShouldWorkWhenSharedMailbox() throws Exception {
+		String mailbox = "shared@mydomain.org";
+		
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, true, Year.from(2014), "ARCHIVE");
+		assertThat(archiveMailbox.getName()).isEqualTo("shared/ARCHIVE/2014@mydomain.org");
+	}
+	
+	@Test
+	public void archiveMailboxShouldWorkWhenSharedMailboxAndAFolder() throws Exception {
+		String mailbox = "shared/Test@mydomain.org";
+		
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, true, Year.from(2014), "ARCHIVE");
+		assertThat(archiveMailbox.getName()).isEqualTo("shared/ARCHIVE/2014/Test@mydomain.org");
+	}
+	
+	@Test
+	public void archiveMailboxShouldWorkWhenSharedMailboxAndASubFolder() throws Exception {
+		String mailbox = "shared/Test/subfolder@mydomain.org";
+		
+		MailboxPaths archiveMailbox = ArchiveMailbox.Builder.archiveMailbox(mailbox, true, Year.from(2014), "ARCHIVE");
+		assertThat(archiveMailbox.getName()).isEqualTo("shared/ARCHIVE/2014/Test/subfolder@mydomain.org");
 	}
 
 	@Test(expected=MailboxFormatException.class)
 	public void archiveMailboxShouldThrowWhenBadMailbox() throws Exception {
 		String mailbox = "user";
 		
-		ArchiveMailbox.Builder.archiveMailbox(mailbox, Year.from(2014), "ARCHIVE");
+		ArchiveMailbox.Builder.archiveMailbox(mailbox, false, Year.from(2014), "ARCHIVE");
 	}
 	
 	@Test
@@ -227,7 +251,7 @@ public class ArchiveMailboxTest {
 		
 		control.replay();
 		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
-			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+			.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 			.year(Year.from(2015))
 			.domainName(new DomainName("mydomain.org"))
 			.archiveMainFolder("ARCHIVE")
@@ -251,7 +275,7 @@ public class ArchiveMailboxTest {
 		
 		control.replay();
 		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
-				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 				.year(Year.from(2015))
 				.domainName(new DomainName("mydomain.org"))
 				.archiveMainFolder("ARCHIVE")
@@ -272,7 +296,7 @@ public class ArchiveMailboxTest {
 		try {
 			control.replay();
 			ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
-					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 					.year(Year.from(2015))
 					.domainName(new DomainName("mydomain.org"))
 					.archiveMainFolder("ARCHIVE")
@@ -297,7 +321,7 @@ public class ArchiveMailboxTest {
 		
 		control.replay();
 		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
-				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 				.year(Year.from(2015))
 				.domainName(new DomainName("mydomain.org"))
 				.archiveMainFolder("ARCHIVE")
@@ -319,7 +343,7 @@ public class ArchiveMailboxTest {
 		try {
 			control.replay();
 			ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
-					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+					.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 					.year(Year.from(2015))
 					.domainName(new DomainName("mydomain.org"))
 					.archiveMainFolder("ARCHIVE")
@@ -337,7 +361,7 @@ public class ArchiveMailboxTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
-				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 				.year(Year.from(2015))
 				.domainName(new DomainName("mydomain.org"))
 				.archiveMainFolder("ARCHIVE")
@@ -360,7 +384,7 @@ public class ArchiveMailboxTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
-				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 				.year(Year.from(2015))
 				.domainName(new DomainName("mydomain.org"))
 				.archiveMainFolder("ARCHIVE")
@@ -384,7 +408,7 @@ public class ArchiveMailboxTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
-				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 				.year(Year.from(2015))
 				.domainName(new DomainName("mydomain.org"))
 				.archiveMainFolder("ARCHIVE")
@@ -406,7 +430,7 @@ public class ArchiveMailboxTest {
 		StoreClient storeClient = control.createMock(StoreClient.class);
 		
 		ArchiveMailbox archiveMailbox = ArchiveMailbox.builder()
-				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient))
+				.from(MailboxImpl.from("user/usera@mydomain.org", logger, storeClient, false))
 				.year(Year.from(2015))
 				.domainName(new DomainName("mydomain.org"))
 				.archiveMainFolder("ARCHIVE")

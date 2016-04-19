@@ -31,6 +31,8 @@
 
 package org.obm.imap.archive.services;
 
+import java.util.Set;
+
 import org.joda.time.DateTime;
 import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.ArchiveStatus;
@@ -62,6 +64,7 @@ public class ImapArchiveProcessing {
 	private final SchedulingDatesService schedulingDatesService;
 	protected final StoreClientFactory storeClientFactory;
 	protected final ArchiveTreatmentDao archiveTreatmentDao;
+	private final Set<MailboxesProcessor> mailboxesProcessors;
 	private final MailboxProcessing mailboxProcessing;
 
 	
@@ -70,13 +73,15 @@ public class ImapArchiveProcessing {
 			SchedulingDatesService schedulingDatesService,
 			StoreClientFactory storeClientFactory,
 			ArchiveTreatmentDao archiveTreatmentDao,
-			MailboxProcessing mailboxProcessing) {
+			MailboxProcessing mailboxProcessing,
+			Set<MailboxesProcessor> mailboxesProcessors) {
 		
 		this.dateTimeProvider = dateTimeProvider;
 		this.schedulingDatesService = schedulingDatesService;
 		this.storeClientFactory = storeClientFactory;
 		this.archiveTreatmentDao = archiveTreatmentDao;
 		this.mailboxProcessing = mailboxProcessing;
+		this.mailboxesProcessors = mailboxesProcessors;
 	}
 	
 	public void archive(ArchiveConfiguration configuration) {
@@ -129,11 +134,14 @@ public class ImapArchiveProcessing {
 	private boolean run(ProcessedTask processedTask) throws Exception {
 		Logger logger = processedTask.getLogger();
 		logStart(logger, processedTask.getDomain());
-		boolean isSuccess = new UserMailboxesProcessing(storeClientFactory, mailboxProcessing).processUsers(processedTask, logger);
+
+		boolean isSuccess = true;
+		for (MailboxesProcessor mailboxesProcessor : mailboxesProcessors) {
+			isSuccess = isSuccess && mailboxesProcessor.processMailboxes(processedTask, logger, mailboxProcessing);
+		}
 
 		return isSuccess;
 	}
-
 	@VisibleForTesting boolean continuePrevious(Optional<ArchiveTreatment> previousArchiveTreatment, DateTime higherBoundary) {
 		return previousArchiveTreatment.isPresent() && previousArchiveTreatment.get().getArchiveStatus() != ArchiveStatus.SUCCESS
 				&& previousArchiveTreatment.get().getHigherBoundary().equals(higherBoundary);
