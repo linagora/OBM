@@ -104,6 +104,15 @@ if ($action == 'ext_get_id') {
   $display['search'] = html_mailshare_search_form($params);
   $display['result'] = dis_mailshare_search_list($params);
 
+} else if ($action == 'ext_search') {
+///////////////////////////////////////////////////////////////////////////////
+  // Makes it possible to process other requests in parallel, do not remove
+  session_write_close();
+  $mailshare_q = run_query_mailshare_ext_search($params);
+  json_search_mailshares($mailshare_q);
+  echo '('.$display['json'].')';
+  exit();
+
 } else if ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = html_mailshare_form($action, '', $params);
@@ -356,6 +365,13 @@ function get_mailshare_action() {
 
 // Search
   $actions['mailshare']['search'] = array (
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+  );
+
+// Search
+  $actions['mailshare']['ext_search'] = array (
+    'Url'      => "$path/mailshare/mailshare_index.php?action=ext_search",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
   );

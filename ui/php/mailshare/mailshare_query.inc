@@ -116,6 +116,22 @@ function run_query_mailshare_search($mailshare) {
 }
 
 
+function run_query_mailshare_ext_search($mailshare) {
+
+  $pattern = $mailshare['pattern'];
+  $mailshare = array();
+  $mailshare['name'] = $pattern;
+  $obm_q = run_query_mailshare_search($mailshare);
+
+  $rows =  array();
+  while($obm_q->next_record()) {
+    $rows[$obm_q->f("mailshare_name")." ".$obm_q->f("mailshare_description")." ".$obm_q->f('mailshare_id')] = $obm_q->Record;
+  }
+  $resultsCount = count($rows);
+  ksort($rows);
+  return array('length' => $resultsCount, 'datas' => $rows);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // MailShare detail query execution
 // Parameters:
@@ -490,8 +506,8 @@ function check_mailshare_update_rights($params) {
       $m = get_mailshare_info($id);
       // Check delegation update right
       if (! of_delegation_check_update_rights($params, $m['delegation'])) {
-	$err['msg'] .= $l_error_delegation;
-	return false;
+        $err['msg'] .= $l_error_delegation;
+        return false;
       }
     }
   }
@@ -594,13 +610,13 @@ function check_mailshare_data_form($mailshare) {
     while ($em) {
       if (! preg_match($php_regexp_email_name, $em) && !preg_match($php_regexp_email, $em)) {
         $err['msg'] .= "$em : $l_err_mailshare_email";
-	$err['field'] = 'email';
+        $err['field'] = 'email';
         return false;
       }
       // Email address not already used by this user
       if (in_array($em, $um)) {
-	$err['msg'] = "$l_err_mailshare_uemail_exist : $em";
-	$err['field'] = 'email';
+        $err['msg'] = "$l_err_mailshare_uemail_exist : $em";
+        $err['field'] = 'email';
         return false;
       }
       $emails[] = $em;

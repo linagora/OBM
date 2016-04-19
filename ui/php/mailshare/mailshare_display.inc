@@ -787,3 +787,25 @@ function dis_mailshare_backup_form($backup, $params) {
   return $block;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Build a JSON array with all search results
+// @param $results array of 'length' => DB user results nb, and 'datas' => DB User search query results
+// @access public
+// @return void
+///////////////////////////////////////////////////////////////////////////////
+function json_search_mailshares($results) {
+  global $display, $module, $cright_write_admin, $perm;
+
+  $mailshare_q = $results['datas'];
+
+  $mailshares = array();
+  foreach($mailshare_q as $name => $data) {
+    $id = $data['mailshare_id'];
+    $ext_id = $data['mailshare_id'];
+    $label = phpStringToJsString($data['mailshare_name']);
+    $extra = phpStringToJsString(get_entity_email($data['mailshare_email']));
+    $mailshares[] = "{id:'data-mailshare-$id', label:'$label', extra:'$extra', type: 'mailshare', ext_id:'$ext_id'}";
+  }
+  $display['json'] = "{length:".$results['length'].", datas:[".implode(',',$mailshares)."]}";
+}
