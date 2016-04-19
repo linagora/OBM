@@ -52,7 +52,7 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   global $l_service_activating, $l_activating;
   global $l_options, $l_copy_title, $l_copy_only, $l_copy_and_delete;
   global $l_scheduling;
-  global $l_archive_main_folder, $l_excluded_folder, $l_folder, $l_user_scope;
+  global $l_archive_main_folder, $l_excluded_folder, $l_folder, $l_user_scope, $l_shared_mailbox_scope;
   global $l_mailing_feedback;
 
   $user_id = $params['user_id'];
@@ -70,6 +70,8 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   $excludedFolder = $configuration->excludedFolder;
   $scopeUserIdToLoginMap = $configuration->scopeUserIdToLoginMap;
   $scopeUsersIncludes = $configuration->scopeUsersIncludes;
+  $scopeSharedMailboxIdToNameMap = $configuration->scopeSharedMailboxIdToNameMap;
+  $scopeSharedMailboxesIncludes = $configuration->scopeSharedMailboxesIncludes;
   $mailingEmails = $configuration->mailingEmails;
 
   $disabled = ($enabled == 0) ? "disabled" : "";
@@ -81,9 +83,11 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
   $block_minute = get_block_minute($minute, $disabled);
   $block_next_treatment_date = get_block_next_treatment_date($next_treatment_date);
   $block_user_scope = get_block_user_scope($scopeUserIdToLoginMap, $scopeUsersIncludes, $disabled);
+  $block_shared_mailbox_scope = get_block_shared_mailbox_scope($scopeSharedMailboxIdToNameMap, $scopeSharedMailboxesIncludes, $disabled);
   $block_mailing = get_block_mailing($mailingEmails);
 
   $user_js = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_scope_user_id', 'userSearch', {filter_pattern:'access', item_id_property:'ext_id', filter_archived:false});";
+  $shared_mailbox_js = "new obm.AutoComplete.Search('$path/mailshare/mailshare_index.php?action=ext_search&ajax=1', 'sel_scope_shared_mailbox_id', 'sharedMailboxSearch', {item_id_property:'ext_id'});";
 
   $block = "
     <form method='post' name='f_imap_archive' action='imap_archive_index.php'>
@@ -175,6 +179,10 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
       $block_user_scope
     </fieldset>
     <fieldset class='detail infos'>
+      <legend>$l_shared_mailbox_scope</legend>
+      $block_shared_mailbox_scope
+    </fieldset>
+    <fieldset class='detail infos'>
       <legend>$l_mailing_feedback</legend>
       $block_mailing
     </fieldset>
@@ -187,6 +195,7 @@ function dis_imap_archive_form($params, $configuration, $next_treatment_date) {
     <script type=\"text/javascript\">
       obm.initialize.chain(function () {
         $user_js
+        $shared_mailbox_js
       });
     </script>";
 
@@ -423,11 +432,55 @@ function get_block_user_scope($scopeUserIdToLoginMap, $scopeUsersIncludes = fals
     </table>";
 }
 
+function get_block_shared_mailbox_scope($scopeSharedMailboxIdToNameMap, $scopeSharedMailboxesIncludes, $disabled) {
+  global $l_shared_mailbox, $l_shared_mailboxes, $ico_delete;
+  global $l_name, $l_delete, $l_remove_archive, $l_shared_mailbox_scope_includes, $l_shared_mailbox_scope_excludes, $l_scope_type;
+
+  foreach ($scopeSharedMailboxIdToNameMap as $mailboxId => $name) {
+    $sm_name = $name;
+    $sel_id = $mailboxId;
+    $div_id = "sel_scope_shared_mailbox_id-$sel_id";
+    $dis_sel_shared_mailbox .= "<div class=\"elementRow\" id=\"$div_id\">
+    ". (($disabled) ? "" : "<a href=\"javascript: remove_element('$div_id', 'sel_scope_shared_mailbox_id');\">") ."
+    <img src=\"$ico_delete\" alt=\"[Delete]\" />
+    </a>
+    $sm_name
+    <input value=\"$sel_id\" name=\"sel_scope_shared_mailbox_id[]\" type=\"hidden\" />
+    </div>";
+  }
+
+  return "
+    <table>
+      <tr>
+        <th>$l_scope_type</th>
+        <td>
+          <input type='radio' name='cb_scope_shared_mailboxes_includes' value='1'" . (($scopeSharedMailboxesIncludes) ? " checked='checked'" : "") ." ".(($disabled) ? "disabled" : "")." class='configuration'/> $l_shared_mailbox_scope_includes
+          <br />
+          <input type='radio' name='cb_scope_shared_mailboxes_includes' value='0'" . ((!$scopeSharedMailboxesIncludes) ? " checked='checked'" : "") ." ".(($disabled) ? "disabled" : "")." class='configuration'/> $l_shared_mailbox_scope_excludes
+        </td>
+      </tr>
+      <tr>
+        <th>$l_shared_mailboxes</th>
+        <td class='autocompleteField'>
+          <input type='text' name='' value='' id='sharedMailboxSearch' autocomplete='off' class='configuration'/>
+          <input type='hidden' id='sharedMailboxSearchContainer' value='sel_scope_shared_mailbox_id'/>
+        </td>
+      </tr>
+      <tr>
+        <th></th>
+        <td class='autocompleteResult'>
+          <span class='legend'>$l_shared_mailbox</span>
+          <div id='sel_scope_shared_mailbox_id' class='userList configuration'>$dis_sel_shared_mailbox</div>
+        </td>
+      </tr>
+    </table>";
+}
+
 function get_block_mailing($mailingEmails) {
   global $l_mailing_email, $ico_delete, $ico_add;
 
   if (is_array($mailingEmails)) {
-  	$dis_mailing_emails = "";
+    $dis_mailing_emails = "";
     foreach ($mailingEmails as $mailingEmail) {
       $dis_mailing_emails .=
         "<tr id='$mailingEmail'>
@@ -590,7 +643,7 @@ function statusAsString($status, $runId) {
 
   $link = "$path/imap_archive/imap_archive_index.php?action=log_page&run_id=$runId";
   if ($status == 'ERROR') {
-  	return "<a href='$link'>$l_status_error</a>";
+    return "<a href='$link'>$l_status_error</a>";
   }
   return "<a href='$link'>$l_status_success</a>";
 }
@@ -610,10 +663,10 @@ function dis_log_page($params) {
   $block = "
     <div class='detail extra' >
       <h1>$l_archiving_running</h1>
-  	  <iframe id='archivingLogs' frameborder='0'>
-  	    <p>$l_unsupported_iframe</p>
-  	  </iframe>
-  	</div>
+        <iframe id='archivingLogs' frameborder='0'>
+          <p>$l_unsupported_iframe</p>
+        </iframe>
+      </div>
 
     <script type=\"text/javascript\">
       obm.initialize.chain(function () {

@@ -98,7 +98,6 @@ function calculate_next_treatment_date_from_imap_archive_service($configuration)
 
   $configurationPath = ImapArchiveUrls::nextTreatment($obm["domain_uuid"]);
 
-  //return http_post($configurationPath, array(), toJson($configuration))->as_json();
   $result = http_post($configurationPath, array(), toJson($configuration))->as_json();
   return $result->nextTreatmentDate;
 }
@@ -117,6 +116,9 @@ function toJson($configuration) {
   $scopeUserIdToLoginMapFromConfig = $configuration->scopeUserIdToLoginMap;
   $scopeUserIdToLoginMap = $scopeUserIdToLoginMapFromConfig != null ? $scopeUserIdToLoginMapFromConfig : new stdClass();
   $scopeUsersIncludes = $configuration->scopeUsersIncludes;
+  $scopeSharedMailboxIdToNameMapFromConfig = $configuration->scopeSharedMailboxIdToNameMap;
+  $scopeSharedMailboxIdToNameMap = $scopeSharedMailboxIdToNameMapFromConfig != null ? $scopeSharedMailboxIdToNameMapFromConfig : new stdClass();
+  $scopeSharedMailboxesIncludes = $configuration->scopeSharedMailboxesIncludes;
   $mailingEmailsFromConfig = $configuration->mailingEmails;
   $mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
 
@@ -133,6 +135,8 @@ function toJson($configuration) {
     "excludedFolder" => $excludedFolder,
     "scopeUserIdToLoginMap" => $scopeUserIdToLoginMap,
     "scopeUsersIncludes" => $scopeUsersIncludes,
+    "scopeSharedMailboxIdToNameMap" => $scopeSharedMailboxIdToNameMap,
+    "scopeSharedMailboxesIncludes" => $scopeSharedMailboxesIncludes,
     "mailingEmails" => $mailingEmails
   ));
 }
@@ -188,34 +192,38 @@ function run_query_imap_archive_update($paramsAsConfiguration) {
 function paramToJson($paramsAsConfiguration) {
   global $obm;
 
-	$repeatKind = $paramsAsConfiguration->repeat_kind;
-	$dayOfWeek = $paramsAsConfiguration->day_of_week;
-	$dayOfMonth = $paramsAsConfiguration->day_of_month;
-	$dayOfYear = $paramsAsConfiguration->day_of_year;
-	$hour = $paramsAsConfiguration->hour;
-	$minute = $paramsAsConfiguration->minute;
-	$archiveMainFolder = $paramsAsConfiguration->archive_main_folder;
-	$excludedFolder = $paramsAsConfiguration->excluded_folder;
-	$scopeUserIdToLoginMap = scopeUserIdsToMap($paramsAsConfiguration->scope_user_id);
-	$scopeUsersIncludes = $paramsAsConfiguration->scope_users_includes;
-	$mailingEmailsFromConfig = $paramsAsConfiguration->mailing_emails;
-	$mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
+  $repeatKind = $paramsAsConfiguration->repeat_kind;
+  $dayOfWeek = $paramsAsConfiguration->day_of_week;
+  $dayOfMonth = $paramsAsConfiguration->day_of_month;
+  $dayOfYear = $paramsAsConfiguration->day_of_year;
+  $hour = $paramsAsConfiguration->hour;
+  $minute = $paramsAsConfiguration->minute;
+  $archiveMainFolder = $paramsAsConfiguration->archive_main_folder;
+  $excludedFolder = $paramsAsConfiguration->excluded_folder;
+  $scopeUserIdToLoginMap = scopeUserIdsToMap($paramsAsConfiguration->scope_user_id);
+  $scopeUsersIncludes = $paramsAsConfiguration->scope_users_includes;
+  $scopeSharedMailboxIdToNameMap = scopeSharedMailboxIdToNameMap($paramsAsConfiguration->scope_shared_mailbox_id);
+  $scopeSharedMailboxesIncludes = $paramsAsConfiguration->scope_shared_mailboxes_includes;
+  $mailingEmailsFromConfig = $paramsAsConfiguration->mailing_emails;
+  $mailingEmails = $mailingEmailsFromConfig != null ? $mailingEmailsFromConfig : array();
 
-	return json_encode(array("domainId" => $obm['domain_uuid'],
-			"enabled" => ($paramsAsConfiguration->enabled) ? "true" : "false",
-			"moveEnabled" => ($paramsAsConfiguration->move_enabled) ? "true" : "false",
-			"repeatKind" => ($repeatKind) ? $repeatKind : "MONTHLY",
-			"dayOfWeek" => ($dayOfWeek) ? $dayOfWeek : 1,
-			"dayOfMonth" => ($dayOfMonth) ? $dayOfMonth : -1,
-			"dayOfYear" => ($dayOfYear) ? $dayOfYear : 1,
-			"hour" => ($hour) ? $hour : 0,
-			"minute" => ($minute) ? $minute : 0,
-			"archiveMainFolder" => $archiveMainFolder,
-			"excludedFolder" => $excludedFolder,
-			"scopeUserIdToLoginMap" => $scopeUserIdToLoginMap,
-			"scopeUsersIncludes" => ($scopeUsersIncludes) ? "true" : "false",
-			"mailingEmails" => $mailingEmails
-	));
+  return json_encode(array("domainId" => $obm['domain_uuid'],
+      "enabled" => ($paramsAsConfiguration->enabled) ? "true" : "false",
+      "moveEnabled" => ($paramsAsConfiguration->move_enabled) ? "true" : "false",
+      "repeatKind" => ($repeatKind) ? $repeatKind : "MONTHLY",
+      "dayOfWeek" => ($dayOfWeek) ? $dayOfWeek : 1,
+      "dayOfMonth" => ($dayOfMonth) ? $dayOfMonth : -1,
+      "dayOfYear" => ($dayOfYear) ? $dayOfYear : 1,
+      "hour" => ($hour) ? $hour : 0,
+      "minute" => ($minute) ? $minute : 0,
+      "archiveMainFolder" => $archiveMainFolder,
+      "excludedFolder" => $excludedFolder,
+      "scopeUserIdToLoginMap" => $scopeUserIdToLoginMap,
+      "scopeUsersIncludes" => ($scopeUsersIncludes) ? "true" : "false",
+      "scopeSharedMailboxIdToNameMap" => $scopeSharedMailboxIdToNameMap,
+      "scopeSharedMailboxesIncludes" => ($scopeSharedMailboxesIncludes) ? "true" : "false",
+      "mailingEmails" => $mailingEmails
+  ));
 }
 
 function scopeUserIdsToMap($scopeUserIds) {
@@ -226,6 +234,18 @@ function scopeUserIdsToMap($scopeUserIds) {
   $users = get_userobm_from_ext_ids($scopeUserIds, false);
   foreach ($users['entity'] as $u_ext_id => $u_ent) {
     $map->$u_ext_id = $u_ent['login'];
+  }
+  return $map;
+}
+
+function scopeSharedMailboxIdToNameMap($scopeSharedMailboxIds) {
+  $map = new stdClass();
+  if ($scopeSharedMailboxIds == null) {
+    return $map;
+  }
+  foreach ($scopeSharedMailboxIds as $mailshareId) {
+    $mailshare = get_entity_info($mailshareId, 'mailshare');
+    $map->$mailshareId = $mailshare['label'];
   }
   return $map;
 }
