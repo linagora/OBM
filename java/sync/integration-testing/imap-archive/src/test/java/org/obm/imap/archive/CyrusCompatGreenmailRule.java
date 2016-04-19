@@ -54,7 +54,7 @@ public class CyrusCompatGreenmailRule implements TestRule {
 			@Override
 			public void evaluate() throws Throwable {
 				GreenMail greenMail = greenMailProvider.get();
-				GreenMailUser greenMailUser = greenMail.setUser("cyrus", "cyrus");
+				GreenMailUser greenMailUser = greenMail.setAdminUser("cyrus", "cyrus");
 				greenMail.start();
 				greenMail.getManagers().getImapHostManager().deleteMailbox(greenMailUser, "INBOX");
 				greenMail.getManagers().getImapHostManager().createMailbox(greenMailUser, "user/cyrus@mydomain");

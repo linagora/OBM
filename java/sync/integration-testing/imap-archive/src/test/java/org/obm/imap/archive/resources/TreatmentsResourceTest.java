@@ -30,6 +30,7 @@
 
 package org.obm.imap.archive.resources;
 
+import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -40,10 +41,17 @@ import static org.obm.imap.archive.DBData.domain;
 import static org.obm.imap.archive.DBData.domainId;
 
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
+import javax.mail.Flags;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.ws.rs.core.Response.Status;
 
 import org.hamcrest.Matchers;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -74,7 +82,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.icegreen.greenmail.imap.AuthorizationException;
+import com.icegreen.greenmail.store.FolderException;
+import com.icegreen.greenmail.store.MailFolder;
+import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
+import com.jayway.awaitility.Duration;
 import com.jayway.restassured.config.RedirectConfig;
 import com.jayway.restassured.config.RestAssuredConfig;
 import com.jayway.restassured.http.ContentType;
@@ -284,8 +297,7 @@ public class TreatmentsResourceTest {
 	@Test
 	public void startArchivingShouldProcessARealRunWhenMissingArchiveTreatmentKind() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectTrustedLogin(domain);
+			.expectTrustedLoginAnyTime(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
@@ -302,7 +314,13 @@ public class TreatmentsResourceTest {
 			.statusCode(Status.SEE_OTHER.getStatusCode()).
 		when()
 			.post("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments");
-		Thread.sleep(1);
+		
+		await()
+			.atMost(1, TimeUnit.MINUTES)
+			.pollDelay(Duration.ONE_SECOND)
+			.pollInterval(Duration.ONE_SECOND)
+			.until(endOfTheTreatment(expectedRunId));
+
 		given()
 			.port(server.getHttpPort())
 			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
@@ -348,8 +366,7 @@ public class TreatmentsResourceTest {
 	@Test
 	public void startArchivingTwiceShouldStackSchedules() throws Exception {
 		expectations
-			.expectTrustedLogin(domain)
-			.expectTrustedLogin(domain);
+			.expectTrustedLoginAnyTime(domain);
 		
 		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
 				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
@@ -368,7 +385,13 @@ public class TreatmentsResourceTest {
 			.statusCode(Status.SEE_OTHER.getStatusCode()).
 		when()
 			.post("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments");
-		Thread.sleep(1);
+
+		await()
+			.atMost(1, TimeUnit.MINUTES)
+			.pollDelay(Duration.ONE_SECOND)
+			.pollInterval(Duration.ONE_SECOND)
+			.until(endOfTheTreatment(expectedRunId));
+
 		given()
 			.config(RestAssuredConfig.config().redirect(RedirectConfig.redirectConfig().followRedirects(false)))
 			.port(server.getHttpPort())
@@ -379,7 +402,6 @@ public class TreatmentsResourceTest {
 			.statusCode(Status.SEE_OTHER.getStatusCode()).
 		when()
 			.post("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments");
-		Thread.sleep(1);
 	}
 	
 	@Test
@@ -510,5 +532,81 @@ public class TreatmentsResourceTest {
 			.body(containsString("Starting IMAP Archive reset for domain mydomain")).
 		when()
 			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + expectedRunId.toString() + "/logs");
+	}
+
+	@Test
+	public void startArchivingShouldNotSelectMailboxWhenFlagNoSelectIsSet() throws Exception {
+		expectations
+			.expectTrustedLoginAnyTime(domain);
+		
+		play(Operations.sequenceOf(DatabaseOperations.cleanDB(),
+				DatabaseOperations.insertDomainConfiguration(domainId, ConfigurationState.ENABLE)));
+		
+		GreenMailUser usera = imapServer.setAdminUser("usera", "usera");
+		imapServer.getManagers().getImapHostManager().deleteMailbox(usera, "INBOX");
+		MailFolder mailbox = imapServer.getManagers().getImapHostManager().createMailbox(usera, "user/usera@mydomain.org");
+		createNoSelectFolder(usera);
+		MimeMessage mimeMessage = new MimeMessage((Session) null);
+		mimeMessage.setSubject("subject");
+		mimeMessage.setFrom(new InternetAddress("user/usera@mydomain.org"));
+		mimeMessage.setText("msg");
+		mailbox.appendMessage(mimeMessage, new Flags(), DateTime.parse("2014-05-19T00:00:00.000Z").toDate());
+
+		server.start();
+		
+		UUID expectedRunId = TestImapArchiveModules.uuid;
+		given()
+			.config(RestAssuredConfig.config().redirect(RedirectConfig.redirectConfig().followRedirects(false)))
+			.port(server.getHttpPort())
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue()).
+		expect()
+			.header("Location", containsString("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments/" + expectedRunId.toString()))
+			.statusCode(Status.SEE_OTHER.getStatusCode()).
+		when()
+			.post("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments");
+
+		await().atMost(1, TimeUnit.MINUTES)
+			.pollDelay(Duration.ONE_SECOND)
+			.pollInterval(Duration.ONE_SECOND)
+			.until(endOfTheTreatment(expectedRunId));
+
+		given()
+			.config(RestAssuredConfig.config().redirect(RedirectConfig.redirectConfig().followRedirects(false)))
+			.port(server.getHttpPort())
+			.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
+			.queryParam("filter_terminated", true).
+		when()
+			.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments").
+		then()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("\"archiveStatus\":\"SUCCESS\""));
+	}
+
+	private void createNoSelectFolder(GreenMailUser usera) throws AuthorizationException, FolderException {
+		imapServer.getManagers().getImapHostManager().createMailbox(usera, "user/usera.folder@mydomain.org");
+	}
+
+	private Callable<Boolean> endOfTheTreatment(final UUID expectedRunId) {
+		return new Callable<Boolean>() {
+
+			@Override
+			public Boolean call() throws Exception {
+				try {
+					given()
+						.config(RestAssuredConfig.config().redirect(RedirectConfig.redirectConfig().followRedirects(false)))
+						.port(server.getHttpPort())
+						.auth().basic(admin.getLogin() + "@" + domain.getName(), admin.getPassword().getStringValue())
+						.queryParam("filter_terminated", true).
+					when()
+						.get("/imap-archive/service/v1/domains/" + domainId.get() + "/treatments").
+					then()
+						.statusCode(Status.OK.getStatusCode())
+						.body(containsString(expectedRunId.toString()));
+					return true;
+				} catch (AssertionError e) {
+					return false;
+				}
+			}
+		};
 	}
 }

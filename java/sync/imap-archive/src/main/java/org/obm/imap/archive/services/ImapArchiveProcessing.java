@@ -465,6 +465,7 @@ public class ImapArchiveProcessing {
 					.transform(appendDomainWhenNone(domain))
 					.filter(filterExcludedFolder(processedTask))
 					.filter(filterFolders(processedTask, processedTask.getDomainConfiguration().getArchiveMainFolder(), TemporaryMailbox.TEMPORARY_FOLDER))
+					.filter(filterNoSelected(processedTask))
 					.toList();
 		}
 	}
@@ -574,6 +575,21 @@ public class ImapArchiveProcessing {
 					}
 				} catch (MailboxFormatException e) {
 					logger.error(String.format("The mailbox %s can't be parsed", listInfo.getName()));
+					return false;
+				}
+				return true;
+			}
+		};
+	}
+
+	private Predicate<ListInfo> filterNoSelected(ProcessedTask processedTask) {
+		final Logger logger = processedTask.getLogger();
+		return new Predicate<ListInfo>() {
+
+			@Override
+			public boolean apply(ListInfo listInfo) {
+				if (!listInfo.isSelectable()) {
+					logger.info(String.format("The mailbox %s can't be selected (\\Noselect flag)", listInfo.getName()));
 					return false;
 				}
 				return true;
