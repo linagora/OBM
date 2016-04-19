@@ -10772,7 +10772,8 @@ function html_calendar_template_name_popup() {
  * @return string
  */
 function html_calendar_file_block() {
-  global $c_quota_private_document, $l_space_left, $obm;
+  global $c_quota_private_document, $obm;
+  global $l_space_left, $l_other_files, $l_other_files_maxsize, $l_other_files_quota;
 
   $nbdocs = $c_quota_private_document - $nb_private;
   $GLOBALS['js']['vars']['consts']['nbdocs'] = $nbdocs-1;
@@ -10785,7 +10786,7 @@ function html_calendar_file_block() {
   $space_left_in_bytes = $c_quota_private_document - run_query_calendar_user_quota($obm['uid']);
 
   return "<th class='' id='calendarFileBlock'>
-    $GLOBALS[l_other_files]
+    $l_other_files
     <a id='addFileButton' href='#' $style onclick=\"add_file_field();return false;\">
       <img src=\"$GLOBALS[ico_add]\" alt=\"[Add file field]\" />
     </a>
@@ -10793,7 +10794,8 @@ function html_calendar_file_block() {
 
   <td id='calendarFileHome'>
     <div>
-       $GLOBALS[l_other_files_maxsize]" . dis_filesize(min($ini_max_filesize, $c_quota_private_document)) . " (" . dis_filesize($space_left_in_bytes) . " $l_space_left) $test
+       <div>" . sprintf($l_other_files_maxsize, dis_filesize(min($ini_max_filesize, $c_quota_private_document))) . "</div>
+       <div>" . sprintf($l_other_files_quota, dis_filesize($space_left_in_bytes), dis_filesize($c_quota_private_document)) . "</div>
     </div>
     <div class=\"multiple\">
       <a onclick=\"remove_element(this.parentNode,'calendarFileHome');obm.vars.consts.nbdocs++;$('addFileButton').style.display = '';return false\" href=\"\">

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                   //
 //     - File     : calendar.inc                                             //
@@ -605,6 +605,8 @@ $l_cal_range = "显示时间段";  //"Display period"
 $l_tag_management = "标签管理"; //"Tag Management"
 $l_other_files = "其它文件";  //"Other files"
 $l_other_files_maxsize = "提醒：文件大小最大是";  //"Warning: max file size is "
+$l_other_files_maxsize = "电视附件的累积大小必须小于 %s";
+$l_other_files_quota = "%s 剩余的 %s 您的日历配额";
 $l_other_files_detached = "提醒：以下文件没有上传，请重新附加它们：";  //"Warning: the following files were not uploaded, please reattach them:"
 $l_error_upload = "文件上传错误。";  //"file upload error."
 $l_other_files_upload_error = "由于大小超出了最大允许范围，以下文件无法上传：";  //"The following files could not be uploaded because they exceed the maximum allowed size "
