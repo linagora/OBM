@@ -82,6 +82,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.icegreen.greenmail.imap.AuthorizationException;
+import com.icegreen.greenmail.store.FolderException;
 import com.icegreen.greenmail.store.MailFolder;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMail;
@@ -543,7 +545,7 @@ public class TreatmentsResourceTest {
 		GreenMailUser usera = imapServer.setAdminUser("usera", "usera");
 		imapServer.getManagers().getImapHostManager().deleteMailbox(usera, "INBOX");
 		MailFolder mailbox = imapServer.getManagers().getImapHostManager().createMailbox(usera, "user/usera@mydomain.org");
-		imapServer.getManagers().getImapHostManager().createMailbox(usera, "user/usera.folder@mydomain.org");
+		createNoSelectFolder(usera);
 		MimeMessage mimeMessage = new MimeMessage((Session) null);
 		mimeMessage.setSubject("subject");
 		mimeMessage.setFrom(new InternetAddress("user/usera@mydomain.org"));
@@ -578,6 +580,10 @@ public class TreatmentsResourceTest {
 		then()
 			.statusCode(Status.OK.getStatusCode())
 			.body(containsString("\"archiveStatus\":\"SUCCESS\""));
+	}
+
+	private void createNoSelectFolder(GreenMailUser usera) throws AuthorizationException, FolderException {
+		imapServer.getManagers().getImapHostManager().createMailbox(usera, "user/usera.folder@mydomain.org");
 	}
 
 	private Callable<Boolean> endOfTheTreatment(final UUID expectedRunId) {
