@@ -1021,7 +1021,7 @@ public class UserDaoJdbcImplTest implements H2TestClass {
 	public void testGetAllEmailsFrom() throws SQLException {
 		ImmutableSet<String> allEmails = dao.getAllEmailsFrom(domain, UserExtId.valueOf("1"));
 		
-		assertThat(allEmails).containsOnly("group1", "group2", "mailshare1", "user2", "user3");
+		assertThat(allEmails).containsOnly("group1", "group2", "mailshare1", "user2", "user3", "email");
 	}
 	
 

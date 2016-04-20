@@ -17236,3 +17236,7 @@ INSERT INTO mailshare (mailshare_domain_id, mailshare_email)
 INSERT INTO trusttoken (id, token, userobm_id, time_created)
 	VALUES  
 		(1, '7f6f35f8-10e1-4d40-8556-1583b6a12d10', 1, '2014-06-05 13:36:00');
+
+INSERT INTO mailshare (mailshare_domain_id, mailshare_name, mailshare_archive, mailshare_quota, mailshare_mail_server_id, mailshare_delegation, mailshare_description, mailshare_email)
+    VALUES
+       (1, 'name', 1, '2', 1, 'delegation', 'description', 'email');
