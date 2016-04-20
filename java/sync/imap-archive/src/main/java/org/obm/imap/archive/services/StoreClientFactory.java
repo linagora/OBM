@@ -31,22 +31,28 @@
 
 package org.obm.imap.archive.services;
 
+import org.obm.domain.dao.SharedMailboxDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
+import org.obm.imap.archive.exception.NoBackendDefineForSharedMailboxException;
+import org.obm.imap.archive.exception.SharedMailboxNotFoundException;
 import org.obm.locator.store.LocatorService;
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
 import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.push.minig.imap.StoreClient.Factory;
+import org.obm.sync.host.ObmHost;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.resource.SharedMailbox;
 import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 
@@ -56,17 +62,20 @@ public class StoreClientFactory {
 	private final LocatorService locatorService;
 	private final UserSystemDao userSystemDao;
 	private final UserDao userDao;
+	private final SharedMailboxDao sharedMailboxDao;
 	private final Factory storeClientFactory;
 
 	@Inject
 	@VisibleForTesting StoreClientFactory(LocatorService locatorService, 
 			UserSystemDao userSystemDao, 
-			UserDao userDao, 
+			UserDao userDao,
+			SharedMailboxDao sharedMailboxDao,
 			StoreClient.Factory storeClientFactory) {
 		
 		this.locatorService = locatorService;
 		this.userSystemDao = userSystemDao;
 		this.userDao = userDao;
+		this.sharedMailboxDao = sharedMailboxDao;
 		this.storeClientFactory = storeClientFactory;
 	}
 	
@@ -93,5 +102,28 @@ public class StoreClientFactory {
 		}
 		
 		return userObm.getUserEmails().getServer().getIp();
+	}
+	
+	public StoreClient createOnSharedMailboxBackend(String sharedMailboxName, ObmDomain domain) 
+			throws SystemUserNotFoundException, DaoException, SharedMailboxNotFoundException, NoBackendDefineForSharedMailboxException {
+
+		Preconditions.checkArgument(!Strings.isNullOrEmpty(sharedMailboxName));
+		Preconditions.checkArgument(domain != null);
+		 
+		ObmSystemUser cyrusUser = userSystemDao.getByLogin(ObmSystemUser.CYRUS);
+		return storeClientFactory.create(cyrusBackendForSharedMailbox(sharedMailboxName, domain), cyrusUser.getLogin(), cyrusUser.getPassword().getStringValue().toCharArray());
+	}
+	
+	private String cyrusBackendForSharedMailbox(String name, ObmDomain domain) throws SharedMailboxNotFoundException, NoBackendDefineForSharedMailboxException {
+		Optional<SharedMailbox> sharedMailbox = sharedMailboxDao.findSharedMailboxByName(name, domain);
+		if (!sharedMailbox.isPresent()) {
+			throw new SharedMailboxNotFoundException(name);
+		}
+		
+		Optional<ObmHost> server = sharedMailbox.get().getServer();
+		if (!server.isPresent()) {
+			throw new NoBackendDefineForSharedMailboxException(name);
+		}
+		return server.get().getIp();
 	}
 }

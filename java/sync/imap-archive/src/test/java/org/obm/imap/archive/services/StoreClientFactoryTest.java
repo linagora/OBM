@@ -39,8 +39,11 @@ import static org.easymock.EasyMock.expect;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.domain.dao.SharedMailboxDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
+import org.obm.imap.archive.exception.NoBackendDefineForSharedMailboxException;
+import org.obm.imap.archive.exception.SharedMailboxNotFoundException;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
 import org.obm.provisioning.dao.exceptions.SystemUserNotFoundException;
@@ -48,7 +51,10 @@ import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.host.ObmHost;
 
+import com.google.common.base.Optional;
+
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.resource.SharedMailbox;
 import fr.aliacom.obm.common.system.ObmSystemUser;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserEmails;
@@ -61,6 +67,7 @@ public class StoreClientFactoryTest {
 	private LocatorService locatorService;
 	private UserSystemDao userSystemDao;
 	private UserDao userDao;
+	private SharedMailboxDao sharedMailboxDao;
 	private StoreClient.Factory storeClientFactory;
 	private StoreClientFactory testee;
 	
@@ -71,9 +78,10 @@ public class StoreClientFactoryTest {
 		locatorService = control.createMock(LocatorService.class);
 		userSystemDao = control.createMock(UserSystemDao.class);
 		userDao = control.createMock(UserDao.class);
+		sharedMailboxDao = control.createMock(SharedMailboxDao.class);
 		storeClientFactory = control.createMock(StoreClient.Factory.class);
 		
-		testee = new StoreClientFactory(locatorService, userSystemDao, userDao, storeClientFactory);
+		testee = new StoreClientFactory(locatorService, userSystemDao, userDao, sharedMailboxDao, storeClientFactory);
 		
 	}
 	
@@ -238,6 +246,127 @@ public class StoreClientFactoryTest {
 		
 		control.replay();
 		StoreClient storeClient = testee.createOnUserBackend(user, obmDomain);
+		control.verify();
+		
+		assertThat(storeClient).isEqualTo(expectedStoreClient);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void createOnSharedMailboxBackendShouldThrowWhenUserIsNull() throws Exception {
+		testee.createOnSharedMailboxBackend(null, null);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void createOnSharedMailboxBackendShouldThrowWhenUserIsEmpty() throws Exception {
+		testee.createOnSharedMailboxBackend("", null);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void createOnSharedMailboxBackendShouldThrowWhenDomainIsNull() throws Exception {
+		testee.createOnSharedMailboxBackend("user", null);
+	}
+	
+	@Test(expected=SystemUserNotFoundException.class)
+	public void createOnSharedMailboxBackendShouldThrowWhenCyrusUserNotFound() throws Exception {
+		expect(userSystemDao.getByLogin(ObmSystemUser.CYRUS))
+			.andThrow(new SystemUserNotFoundException());
+		
+		control.replay();
+		try {
+			testee.createOnSharedMailboxBackend("user", ObmDomain.builder()
+					.name("mydomain.org")
+					.build());
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test(expected=SharedMailboxNotFoundException.class)
+	public void createOnSharedMailboxBackendShouldThrowWhenSharedMailboxNotFound() throws Exception {
+		expect(userSystemDao.getByLogin(ObmSystemUser.CYRUS))
+			.andReturn(ObmSystemUser.builder()
+					.id(1)
+					.login("cyrus")
+					.password(UserPassword.valueOf("cyrus"))
+					.build());
+		
+		String domainName = "mydomain.org";
+		ObmDomain obmDomain = ObmDomain.builder()
+				.name(domainName)
+				.build();
+		
+		String name = "name";
+		expect(sharedMailboxDao.findSharedMailboxByName(name, obmDomain))
+			.andReturn(Optional.<SharedMailbox> absent());
+		
+		control.replay();
+		try {
+			testee.createOnSharedMailboxBackend(name, obmDomain);
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test(expected=NoBackendDefineForSharedMailboxException.class)
+	public void createOnSharedMailboxBackendShouldThrowWhenSharedMailboxHasNoServer() throws Exception {
+		expect(userSystemDao.getByLogin(ObmSystemUser.CYRUS))
+			.andReturn(ObmSystemUser.builder()
+					.id(1)
+					.login("cyrus")
+					.password(UserPassword.valueOf("cyrus"))
+					.build());
+		
+		String domainName = "mydomain.org";
+		ObmDomain obmDomain = ObmDomain.builder()
+				.name(domainName)
+				.build();
+		
+		String name = "name";
+		expect(sharedMailboxDao.findSharedMailboxByName(name, obmDomain))
+			.andReturn(Optional.of(SharedMailbox.builder()
+					.id(1)
+					.domain(obmDomain)
+					.build()));
+		
+		control.replay();
+		try {
+			testee.createOnSharedMailboxBackend(name, obmDomain);
+		} finally {
+			control.verify();
+		}
+	}
+	
+	@Test
+	public void createOnSharedMailboxBackendShouldWork() throws Exception {
+		expect(userSystemDao.getByLogin(ObmSystemUser.CYRUS))
+			.andReturn(ObmSystemUser.builder()
+					.id(1)
+					.login("cyrus")
+					.password(UserPassword.valueOf("cyrus"))
+					.build());
+		
+		String domainName = "mydomain.org";
+		ObmDomain obmDomain = ObmDomain.builder()
+				.name(domainName)
+				.build();
+		
+		String hostIp = "10.69.43.33";
+		String name = "name";
+		expect(sharedMailboxDao.findSharedMailboxByName(name, obmDomain))
+			.andReturn(Optional.of(SharedMailbox.builder()
+					.id(1)
+					.domain(obmDomain)
+					.server(ObmHost.builder()
+							.ip(hostIp)
+							.build())
+					.build()));
+		
+		StoreClient expectedStoreClient = control.createMock(StoreClient.class);
+		expect(storeClientFactory.create(eq(hostIp), eq("cyrus"), aryEq("cyrus".toCharArray())))
+			.andReturn(expectedStoreClient);
+		
+		control.replay();
+		StoreClient storeClient = testee.createOnSharedMailboxBackend(name, obmDomain);
 		control.verify();
 		
 		assertThat(storeClient).isEqualTo(expectedStoreClient);
