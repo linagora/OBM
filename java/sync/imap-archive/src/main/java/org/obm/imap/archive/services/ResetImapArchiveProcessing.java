@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2014  Linagora
+ * Copyright (C) 2014-2016  Linagora
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -34,9 +34,7 @@ package org.obm.imap.archive.services;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.beans.ArchiveConfiguration;
 import org.obm.imap.archive.beans.DomainConfiguration;
-import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.ProcessedFolderDao;
 import org.obm.imap.archive.exception.MailboxFormatException;
 import org.obm.imap.archive.exception.TestingModeRequiredException;
 import org.obm.imap.archive.mailbox.DeletableMailbox;
@@ -44,13 +42,16 @@ import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.imap.archive.mailbox.MailboxPaths;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.push.mail.bean.Flag;
 import org.obm.push.mail.bean.ListInfo;
 import org.obm.push.mail.bean.MessageSet;
 import org.obm.push.minig.imap.StoreClient;
+import org.obm.sync.base.DomainName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
@@ -71,7 +72,10 @@ public class ResetImapArchiveProcessing extends ImapArchiveProcessing {
 	private static final long UID_MIN = 0;
 	private static final long UID_MAX = Long.MAX_VALUE;
 	@VisibleForTesting static final MessageSet ALL = MessageSet.builder().add(Range.openClosed(UID_MIN, UID_MAX)).build();
-	
+	private static final String USERS_REFERENCE_NAME = "*user";
+	private static final String ALL_MAILBOXES_NAME = "*";
+	private static final Flag IMAP_ARCHIVE_FLAG = Flag.from("ImapArchive");
+
 	private final boolean testingMode;
 
 	@Inject
@@ -79,10 +83,9 @@ public class ResetImapArchiveProcessing extends ImapArchiveProcessing {
 			SchedulingDatesService schedulingDatesService,
 			StoreClientFactory storeClientFactory,
 			ArchiveTreatmentDao archiveTreatmentDao,
-			ProcessedFolderDao processedFolderDao,
-			ImapArchiveConfigurationService imapArchiveConfigurationService,
+			MailboxProcessing mailboxProcessing,
 			@Named("testingMode") Boolean testingMode) {
-		super(dateTimeProvider, schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao, imapArchiveConfigurationService);
+		super(dateTimeProvider, schedulingDatesService, storeClientFactory, archiveTreatmentDao, mailboxProcessing);
 		this.testingMode = testingMode;
 	}
 
@@ -140,12 +143,59 @@ public class ResetImapArchiveProcessing extends ImapArchiveProcessing {
 		try (StoreClient storeClient = storeClientFactory.create(domain.getName())) {
 			storeClient.login(false);
 			
-			return FluentIterable.from(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.ALL_MAILBOXES_NAME))
+			return FluentIterable.from(storeClient.listAll(USERS_REFERENCE_NAME, ALL_MAILBOXES_NAME))
 					.transform(appendDomainWhenNone(domain))
 					.filter(filterDomain(domain, logger))
 					.filter(filterArchiveFolder(logger, domainConfiguration))
 					.toList();
 		}
+	}
+
+	protected Function<ListInfo, ListInfo> appendDomainWhenNone(ObmDomain domain) {
+		final String domainName = domain.getName();
+		return new Function<ListInfo, ListInfo>() {
+
+			@Override
+			public ListInfo apply(ListInfo listInfo) {
+				if (!hasDomain(listInfo)) {
+					return appendDomainToListInfo(listInfo, domainName);
+				}
+				return listInfo;
+			}
+
+			private boolean hasDomain(ListInfo listInfo) {
+				return listInfo.getName().contains(MailboxPaths.AT);
+			}
+
+			private ListInfo appendDomainToListInfo(ListInfo listInfo, String domainName) {
+				return new ListInfo(
+						new StringBuilder()
+							.append(listInfo.getName())
+							.append(MailboxPaths.AT)
+							.append(domainName)
+							.toString(), 
+						listInfo.isSelectable(), listInfo.canCreateSubfolder());
+			}
+		};
+	}
+
+	protected Predicate<ListInfo> filterDomain(ObmDomain domain, final Logger logger) {
+		final DomainName domainName = new DomainName(domain.getName());
+		return new Predicate<ListInfo>() {
+
+			@Override
+			public boolean apply(ListInfo listInfo) {
+				try {
+					MailboxPaths mailboxPaths = MailboxPaths.from(listInfo.getName());
+					if (mailboxPaths.belongsTo(domainName)) {
+						return true;
+					}
+				} catch (MailboxFormatException e) {
+					logger.error(String.format("The mailbox %s can't be parsed", listInfo.getName()));
+				}
+				return false;
+			}
+		};
 	}
 
 	private Predicate<ListInfo> filterArchiveFolder(final Logger logger, final DomainConfiguration domainConfiguration) {
@@ -192,7 +242,7 @@ public class ResetImapArchiveProcessing extends ImapArchiveProcessing {
 		try (StoreClient storeClient = storeClientFactory.create(domain.getName())) {
 			storeClient.login(false);
 			
-			return FluentIterable.from(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.ALL_MAILBOXES_NAME))
+			return FluentIterable.from(storeClient.listAll(USERS_REFERENCE_NAME, ALL_MAILBOXES_NAME))
 					.transform(appendDomainWhenNone(domain))
 					.filter(filterDomain(domain, logger))
 					.filter(filterOutArchiveFolder(logger, domainConfiguration))

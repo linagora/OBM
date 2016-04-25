@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2014  Linagora
+ * Copyright (C) 2014-2016  Linagora
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -34,21 +34,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.obm.imap.archive.beans.ArchiveTreatmentKind;
-import org.obm.imap.archive.beans.ProcessedFolder;
-import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.dao.ArchiveTreatmentDao;
-import org.obm.imap.archive.dao.ProcessedFolderDao;
-import org.obm.imap.archive.exception.ImapCreateException;
-import org.obm.imap.archive.exception.ImapQuotaException;
-import org.obm.imap.archive.exception.ImapSelectException;
-import org.obm.imap.archive.exception.ImapSetAclException;
-import org.obm.imap.archive.exception.MailboxFormatException;
-import org.obm.imap.archive.mailbox.CreatableMailbox;
-import org.obm.imap.archive.mailbox.Mailbox;
-import org.obm.provisioning.dao.exceptions.DaoException;
-import org.obm.push.exception.MailboxNotFoundException;
-import org.obm.push.mail.bean.MessageSet;
-import org.obm.push.mail.imap.IMAPException;
 import org.slf4j.Logger;
 
 import com.linagora.scheduling.DateTimeProvider;
@@ -64,34 +50,13 @@ public class DryRunImapArchiveProcessing extends ImapArchiveProcessing {
 			SchedulingDatesService schedulingDatesService,
 			StoreClientFactory storeClientFactory,
 			ArchiveTreatmentDao archiveTreatmentDao,
-			ProcessedFolderDao processedFolderDao,
-			ImapArchiveConfigurationService imapArchiveConfigurationService) {
+			DryMailboxProcessing mailboxProcessing) {
 		
-		super(dateTimeProvider, schedulingDatesService, storeClientFactory,
-				archiveTreatmentDao, processedFolderDao, imapArchiveConfigurationService);
+		super(dateTimeProvider, schedulingDatesService, storeClientFactory, archiveTreatmentDao, mailboxProcessing);
 	}
 	
 	@Override
 	protected void logStart(Logger logger, ObmDomain domain) {
 		logger.info("Starting IMAP Archive in {} for domain {}", ArchiveTreatmentKind.DRY_RUN, domain.getName());
-	}
-	
-	@Override
-	protected void folderProcessed(ProcessedFolder.Builder processedFolder) throws DaoException {
-	}
-	
-	@Override
-	protected void createFolder(CreatableMailbox creatableMailbox, Logger logger) 
-			throws MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException {
-	}
-	
-	@Override
-	protected void processingImapCopy(Mailbox mailbox, MessageSet mailUids, ProcessedTask processedTask) 
-			throws IMAPException, MailboxFormatException, MailboxNotFoundException {
-	}
-	
-	@Override
-	protected void processingImapMove(Mailbox mailbox, MessageSet mailUids, ProcessedTask processedTask) 
-			throws ImapSelectException, MailboxNotFoundException {
 	}
 }

@@ -38,7 +38,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 import org.easymock.IMocksControl;
@@ -62,7 +61,6 @@ import org.obm.imap.archive.beans.Limit;
 import org.obm.imap.archive.beans.ProcessedFolder;
 import org.obm.imap.archive.beans.RepeatKind;
 import org.obm.imap.archive.beans.SchedulingConfiguration;
-import org.obm.imap.archive.beans.ScopeUser;
 import org.obm.imap.archive.beans.Year;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationService;
 import org.obm.imap.archive.configuration.ImapArchiveConfigurationServiceImpl;
@@ -73,7 +71,6 @@ import org.obm.imap.archive.logging.LoggerAppenders;
 import org.obm.imap.archive.mailbox.Mailbox;
 import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.imap.archive.mailbox.TemporaryMailbox;
-import org.obm.imap.archive.services.ImapArchiveProcessing.ProcessedTask;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.exception.MailboxNotFoundException;
 import org.obm.push.mail.bean.AnnotationEntry;
@@ -89,9 +86,6 @@ import org.obm.push.minig.imap.StoreClient;
 import org.obm.sync.base.DomainName;
 import org.slf4j.LoggerFactory;
 
-import pl.wkr.fluentrule.api.FluentExpectedException;
-import ch.qos.logback.classic.Logger;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -99,10 +93,11 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.linagora.scheduling.DateTimeProvider;
 
+import ch.qos.logback.classic.Logger;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.system.ObmSystemUser;
-import fr.aliacom.obm.common.user.UserExtId;
+import pl.wkr.fluentrule.api.FluentExpectedException;
 
 public class ImapArchiveProcessingTest {
 
@@ -120,6 +115,7 @@ public class ImapArchiveProcessingTest {
 	private LoggerAppenders loggerAppenders;
 	
 	private ImapArchiveProcessing imapArchiveProcessing;
+	private MailboxProcessing mailboxProcessing;
 
 	@Before
 	public void setup() throws IOException {
@@ -138,11 +134,12 @@ public class ImapArchiveProcessingTest {
 			.andReturn(ImapArchiveConfigurationServiceImpl.DEFAULT_QUOTA_MAX_SIZE).anyTimes();
 		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
 		loggerAppenders = control.createMock(LoggerAppenders.class);
-		
+
+		mailboxProcessing = new MailboxProcessing(dateTimeProvider, processedFolderDao, imapArchiveConfigurationService);
 		imapArchiveProcessing = new ImapArchiveProcessing(dateTimeProvider, 
-				schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao, imapArchiveConfigurationService);
+				schedulingDatesService, storeClientFactory, archiveTreatmentDao, mailboxProcessing);
 	}
-	
+
 	@Test
 	public void archiveShouldWork() throws Exception {
 		String archiveMainFolder = "arChive";
@@ -175,7 +172,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -236,7 +233,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -303,7 +300,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -368,7 +365,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -381,7 +378,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
 				.includeDeleted(false)
-				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
+				.unmatchingFlag(MailboxProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(MessageSet.empty());
 		
@@ -442,7 +439,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -522,7 +519,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -574,7 +571,7 @@ public class ImapArchiveProcessingTest {
 			.andReturn(storeClient).times(4);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -623,7 +620,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -661,7 +658,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
 				.includeDeleted(false)
-				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
+				.unmatchingFlag(MailboxProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(messageSet);
 		
@@ -692,7 +689,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidStore(firstYearMessageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidStore(firstYearMessageSet, new FlagsList(ImmutableList.of(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)), true))
+		expect(storeClient.uidStore(firstYearMessageSet, new FlagsList(ImmutableList.of(MailboxProcessing.IMAP_ARCHIVE_FLAG)), true))
 			.andReturn(true);
 		
 		// second Year
@@ -711,7 +708,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidStore(secondYearMessageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		
 		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidStore(secondYearMessageSet, new FlagsList(ImmutableList.of(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)), true))
+		expect(storeClient.uidStore(secondYearMessageSet, new FlagsList(ImmutableList.of(MailboxProcessing.IMAP_ARCHIVE_FLAG)), true))
 			.andReturn(true);
 		
 		expect(storeClient.delete(temporaryMailboxName)).andReturn(true);
@@ -762,7 +759,7 @@ public class ImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
 			.andReturn(listResult);
 		storeClient.login(false);
 		expectLastCall();
@@ -783,7 +780,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
 				.includeDeleted(false)
-				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
+				.unmatchingFlag(MailboxProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(messageSet);
 		
@@ -817,7 +814,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(currentYearArchiveMailboxName)).andReturn(true);
 		expect(storeClient.uidStore(currentYearRangeCopiedUids, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidStore(firstYearMessageSet, new FlagsList(ImmutableSet.of(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)), true))
+		expect(storeClient.uidStore(firstYearMessageSet, new FlagsList(ImmutableSet.of(MailboxProcessing.IMAP_ARCHIVE_FLAG)), true))
 			.andReturn(true);
 		
 		ImmutableList.Builder<InternalDate> otherYearsInternalDates = ImmutableList.builder();
@@ -840,7 +837,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(previousYearArchiveMailboxName)).andReturn(true);
 		expect(storeClient.uidStore(previousYearRangeCopiedUids, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidStore(previousYearMessageSet, new FlagsList(ImmutableSet.of(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)), true))
+		expect(storeClient.uidStore(previousYearMessageSet, new FlagsList(ImmutableSet.of(MailboxProcessing.IMAP_ARCHIVE_FLAG)), true))
 			.andReturn(true);
 		
 		// next Year
@@ -853,7 +850,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(nextYearArchiveMailboxName)).andReturn(true);
 		expect(storeClient.uidStore(nextYearRangeCopiedUids, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidStore(nextYearMessageSet, new FlagsList(ImmutableSet.of(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)), true))
+		expect(storeClient.uidStore(nextYearMessageSet, new FlagsList(ImmutableSet.of(MailboxProcessing.IMAP_ARCHIVE_FLAG)), true))
 			.andReturn(true);
 		
 		expect(storeClient.delete(temporaryMailboxName)).andReturn(true);
@@ -902,7 +899,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
 				.includeDeleted(false)
-				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
+				.unmatchingFlag(MailboxProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(MessageSet.empty());
 		processedFolderDao.insert(ProcessedFolder.builder()
@@ -933,7 +930,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
 				.includeDeleted(false)
-				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
+				.unmatchingFlag(MailboxProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(messageSet);
 		
@@ -977,7 +974,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
 				.includeDeleted(false)
-				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
+				.unmatchingFlag(MailboxProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(messageSet);
 		
@@ -1040,7 +1037,7 @@ public class ImapArchiveProcessingTest {
 		expect(storeClient.select(archiveMailboxName)).andReturn(true);
 		expect(storeClient.uidStore(firstMessageSet, new FlagsList(ImmutableSet.of(Flag.SEEN)), true)).andReturn(true);
 		expect(storeClient.select(mailboxName)).andReturn(true);
-		expect(storeClient.uidStore(firstMessageSet, new FlagsList(ImmutableList.of(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)), true))
+		expect(storeClient.uidStore(firstMessageSet, new FlagsList(ImmutableList.of(MailboxProcessing.IMAP_ARCHIVE_FLAG)), true))
 			.andReturn(true);
 		
 		Range<Long> second = Iterables.get(uids, 1);
@@ -1098,7 +1095,7 @@ public class ImapArchiveProcessingTest {
 			
 			if (!isMoveEnabled) {
 				expect(storeClient.select(mailboxName)).andReturn(true);
-				expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableList.of(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)), true))
+				expect(storeClient.uidStore(messageSet, new FlagsList(ImmutableList.of(MailboxProcessing.IMAP_ARCHIVE_FLAG)), true))
 					.andReturn(true);
 			}
 		}
@@ -1192,418 +1189,6 @@ public class ImapArchiveProcessingTest {
 	}
 	
 	@Test
-	public void listImapFoldersShouldAppendDomainWhenMailboxesDoesntContainDomain() throws Exception {
-		List<ListInfo> givenListInfos = ImmutableList.of(
-				new ListInfo("user/usera/Drafts", true, false),
-				new ListInfo("user/usera/SPAM", true, false),
-				new ListInfo("user/usera/Sent", true, false),
-				new ListInfo("user/usera/Excluded", true, false),
-				new ListInfo("user/usera/Excluded/subfolder", true, false));
-		ListResult listResult = new ListResult(6);
-		listResult.addAll(givenListInfos);
-		ListResult inboxListResult = new ListResult();
-		inboxListResult.add(new ListInfo("user/usera", true, false));
-		
-		StoreClient storeClient = control.createMock(StoreClient.class);
-		storeClient.login(false);
-		expectLastCall();
-		expectListImapFolders(storeClient, "usera", listResult);
-		storeClient.close();
-		expectLastCall();
-		
-		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-				.domain(domain)
-				.state(ConfigurationState.ENABLE)
-				.schedulingConfiguration(SchedulingConfiguration.builder()
-					.recurrence(ArchiveRecurrence.daily())
-					.time(LocalTime.parse("13:23"))
-					.build())
-				.archiveMainFolder("arChive")
-				.build();
-		
-		expect(storeClientFactory.createOnUserBackend("usera", domain))
-			.andReturn(storeClient);
-		
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
-		
-		List<ListInfo> expectedListInfos = ImmutableList.of(
-				new ListInfo("user/usera@mydomain.org", true, false),
-				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
-				new ListInfo("user/usera/SPAM@mydomain.org", true, false),
-				new ListInfo("user/usera/Sent@mydomain.org", true, false),
-				new ListInfo("user/usera/Excluded@mydomain.org", true, false),
-				new ListInfo("user/usera/Excluded/subfolder@mydomain.org", true, false));
-		
-		control.replay();
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.higherBoundary(HigherBoundary.builder()
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders(inboxListResult.get(0), "usera", processedTask);
-		control.verify();
-		assertThat(listImapFolders).isEqualTo(expectedListInfos);
-	}
-	
-	@Test
-	public void listImapFoldersShouldListAllWhenNoExcludedFolder() throws Exception {
-		ListResult inboxListResult = getUserMailboxList("usera", "");
-		ListResult listResult = getUserMailboxList("usera", "/Drafts", "/SPAM", "/Sent", "/Excluded", "/Excluded/subfolder");
-		StoreClient storeClient = control.createMock(StoreClient.class);
-
-		storeClient.login(false);
-		expectLastCall();
-		expectListImapFolders(storeClient, "usera", listResult);
-		storeClient.close();
-		expectLastCall();
-		
-		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-				.domain(domain)
-				.state(ConfigurationState.ENABLE)
-				.schedulingConfiguration(SchedulingConfiguration.builder()
-					.recurrence(ArchiveRecurrence.daily())
-					.time(LocalTime.parse("13:23"))
-					.build())
-				.archiveMainFolder("arChive")
-				.build();
-		
-		expect(storeClientFactory.createOnUserBackend("usera", domain))
-			.andReturn(storeClient);
-		
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
-		
-		control.replay();
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.higherBoundary(HigherBoundary.builder()
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders(inboxListResult.get(0), "usera", processedTask);
-		control.verify();
-		assertThat(listImapFolders).isEqualTo(getUserMailboxList("usera", "", "/Drafts", "/SPAM", "/Sent", "/Excluded", "/Excluded/subfolder"));
-	}
-	
-	@Test
-	public void listImapFoldersShouldFilterWhenExcludedFolder() throws Exception {
-		ListResult inboxListResult = getUserMailboxList("usera", "");
-		ListResult listResult = getUserMailboxList("usera", "/Drafts", "/SPAM", "/Sent", "/Excluded", "/Excluded/subfolder");
-		StoreClient storeClient = control.createMock(StoreClient.class);
-		
-		storeClient.login(false);
-		expectLastCall();
-		expectListImapFolders(storeClient, "usera", listResult);
-		storeClient.close();
-		expectLastCall();
-
-		ObmDomain domain = ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).name("mydomain.org").build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-			.domain(domain)
-			.state(ConfigurationState.ENABLE)
-			.schedulingConfiguration(SchedulingConfiguration.builder()
-					.recurrence(ArchiveRecurrence.daily())
-					.time(LocalTime.parse("13:23"))
-					.build())
-			.archiveMainFolder("arChive")
-			.excludedFolder("Excluded")
-			.build();
-		
-		expect(storeClientFactory.createOnUserBackend("usera", domain))
-			.andReturn(storeClient);
-		
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
-		
-		control.replay();
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.higherBoundary(HigherBoundary.builder()
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders(inboxListResult.get(0), "usera", processedTask);
-		control.verify();
-		assertThat(listImapFolders).isEqualTo(getUserMailboxList("usera", "", "/Drafts", "/SPAM", "/Sent"));
-	}
-	
-	@Test
-	public void listUsersShouldFilterWhenScopeUsersAndScopeExcludes() throws Exception {
-		List<ListInfo> expectedListInfos = ImmutableList.of(
-				new ListInfo("user/usera@mydomain.org", true, false),
-				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
-				new ListInfo("user/usera/SPAM@mydomain.org", true, false),
-				new ListInfo("user/usera/Sent@mydomain.org", true, false),
-				new ListInfo("user/userc@mydomain.org", true, false),
-				new ListInfo("user/userc/Drafts@mydomain.org", true, false),
-				new ListInfo("user/userc/SPAM@mydomain.org", true, false),
-				new ListInfo("user/userc/Sent@mydomain.org", true, false));
-		ListResult listResult = new ListResult(12);
-		listResult.addAll(expectedListInfos);
-		listResult.add(new ListInfo("user/userb@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/userb/Drafts@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/userb/SPAM@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/userb/Sent@mydomain.org", true, false));
-		
-		StoreClient storeClient = control.createMock(StoreClient.class);
-		storeClient.login(false);
-		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
-			.andReturn(listResult);
-		storeClient.close();
-		expectLastCall();
-		
-		ObmDomain domain = ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).name("mydomain.org").build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-			.domain(domain)
-			.state(ConfigurationState.ENABLE)
-			.schedulingConfiguration(SchedulingConfiguration.builder()
-					.recurrence(ArchiveRecurrence.daily())
-					.time(LocalTime.parse("13:23"))
-					.build())
-			.archiveMainFolder("arChive")
-			.scopeUsers(ImmutableList.of(ScopeUser.builder()
-					.id(UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9"))
-					.login("userb")
-					.build()))
-			.build();
-		
-		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient);
-		
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
-		
-		control.replay();
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.higherBoundary(HigherBoundary.builder()
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listUsers(processedTask);
-		control.verify();
-		assertThat(listImapFolders).isEqualTo(expectedListInfos);
-	}
-	
-	@Test
-	public void listUsersShouldNotFilterWhenScopeUsersAndScopeIncludes() throws Exception {
-		List<ListInfo> expectedListInfos = ImmutableList.of(
-				new ListInfo("user/userb@mydomain.org", true, false),
-				new ListInfo("user/userb/Drafts@mydomain.org", true, false),
-				new ListInfo("user/userb/SPAM@mydomain.org", true, false),
-				new ListInfo("user/userb/Sent@mydomain.org", true, false));
-		ListResult listResult = new ListResult(12);
-		listResult.addAll(expectedListInfos);
-		listResult.add(new ListInfo("user/usera@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/usera/Drafts@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/usera/SPAM@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/usera/Sent@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/userc@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/userc/Drafts@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/userc/SPAM@mydomain.org", true, false));
-		listResult.add(new ListInfo("user/userc/Sent@mydomain.org", true, false));
-		
-		StoreClient storeClient = control.createMock(StoreClient.class);
-		storeClient.login(false);
-		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
-			.andReturn(listResult);
-		storeClient.close();
-		expectLastCall();
-		
-		ObmDomain domain = ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).name("mydomain.org").build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-			.domain(domain)
-			.state(ConfigurationState.ENABLE)
-			.schedulingConfiguration(SchedulingConfiguration.builder()
-					.recurrence(ArchiveRecurrence.daily())
-					.time(LocalTime.parse("13:23"))
-					.build())
-			.archiveMainFolder("arChive")
-			.scopeUsersIncludes(true)
-			.scopeUsers(ImmutableList.of(ScopeUser.builder()
-					.id(UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9"))
-					.login("userb")
-					.build()))
-			.build();
-		
-		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient);
-		
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
-		
-		control.replay();
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.higherBoundary(HigherBoundary.builder()
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listUsers(processedTask);
-		control.verify();
-		assertThat(listImapFolders).isEqualTo(expectedListInfos);
-	}
-	
-	@Test
-	public void listUsersShouldNotFilterWhenPathDoesntStartWithScopeUser() throws Exception {
-		List<ListInfo> expectedListInfos = ImmutableList.of(
-				new ListInfo("user/user/usera@mydomain.org", true, false));
-		ListResult listResult = new ListResult(1);
-		listResult.addAll(expectedListInfos);
-		
-		StoreClient storeClient = control.createMock(StoreClient.class);
-		storeClient.login(false);
-		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
-			.andReturn(listResult);
-		storeClient.close();
-		expectLastCall();
-		
-		ObmDomain domain = ObmDomain.builder().uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).name("mydomain.org").build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-			.domain(domain)
-			.state(ConfigurationState.ENABLE)
-			.schedulingConfiguration(SchedulingConfiguration.builder()
-					.recurrence(ArchiveRecurrence.daily())
-					.time(LocalTime.parse("13:23"))
-					.build())
-			.archiveMainFolder("arChive")
-			.scopeUsers(ImmutableList.of(ScopeUser.builder()
-					.id(UserExtId.valueOf("3fb10c50-52fa-4a48-9554-2ae8c9c734b9"))
-					.login("usera")
-					.build()))
-			.build();
-		
-		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient);
-		
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
-		
-		control.replay();
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.higherBoundary(HigherBoundary.builder()
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listUsers(processedTask);
-		control.verify();
-		assertThat(listImapFolders).isEqualTo(expectedListInfos);
-	}
-	
-	@Test
-	public void listImapFoldersShouldFilterArchiveFolder() throws Exception {
-		String archiveMainFolder = "arChive";
-		ListResult inboxListResult = getUserMailboxList("usera", "");
-		ListResult listResult = getUserMailboxList("usera", "/Drafts", "/SPAM", "/Sent", "/Excluded", "/Excluded/subfolder",
-				"/" + archiveMainFolder + "/Excluded", "/" + archiveMainFolder + "/Excluded/subfolder");
-		StoreClient storeClient = control.createMock(StoreClient.class);
-
-		storeClient.login(false);
-		expectLastCall();
-		expectListImapFolders(storeClient, "usera", listResult);
-		storeClient.close();
-		expectLastCall();
-		
-		ObmDomain domain = ObmDomain.builder().name("mydomain.org").uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-				.domain(domain)
-				.state(ConfigurationState.ENABLE)
-				.schedulingConfiguration(SchedulingConfiguration.builder()
-						.recurrence(ArchiveRecurrence.daily())
-						.time(LocalTime.parse("13:23"))
-						.build())
-				.archiveMainFolder(archiveMainFolder)
-				.build();
-		
-		expect(storeClientFactory.createOnUserBackend("usera", domain))
-			.andReturn(storeClient);
-
-		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, runId, logger, null, false);
-		
-		control.replay();
-		
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.higherBoundary(HigherBoundary.builder()
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders(inboxListResult.get(0), "usera", processedTask);
-		control.verify();
-		assertThat(listImapFolders).isEqualTo(getUserMailboxList("usera", "", "/Drafts", "/SPAM", "/Sent", "/Excluded", "/Excluded/subfolder"));
-	}
-	
-	@Test
-	public void listImapFoldersShouldFilterTemporaryFolder() throws Exception {
-		ListResult inboxListResult = getUserMailboxList("usera", "");
-		ListResult listResult = getUserMailboxList("usera", "/Drafts", "/SPAM", "/Sent", "/Excluded", "/Excluded/subfolder",
-				"/" + TemporaryMailbox.TEMPORARY_FOLDER + "/Excluded", "/" + TemporaryMailbox.TEMPORARY_FOLDER + "/Excluded/subfolder");
-		StoreClient storeClient = control.createMock(StoreClient.class);
-
-		storeClient.login(false);
-		expectLastCall();
-		expectListImapFolders(storeClient, "usera", listResult);
-		storeClient.close();
-		expectLastCall();
-		
-		ObmDomain domain = ObmDomain.builder().name("mydomain.org").uuid(ObmDomainUuid.of("e953d0ab-7053-4f84-b83a-abfe479d3888")).build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-				.domain(domain)
-				.state(ConfigurationState.ENABLE)
-				.schedulingConfiguration(SchedulingConfiguration.builder()
-						.recurrence(ArchiveRecurrence.daily())
-						.time(LocalTime.parse("13:23"))
-						.build())
-				.archiveMainFolder("arChive")
-				.build();
-		
-		expect(storeClientFactory.createOnUserBackend("usera", domain))
-			.andReturn(storeClient);
-
-		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7");
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, runId, logger, null, false);
-		
-		control.replay();
-		
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.higherBoundary(HigherBoundary.builder()
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders(inboxListResult.get(0), "usera", processedTask);
-		control.verify();
-		assertThat(listImapFolders).isEqualTo(getUserMailboxList("usera", "", "/Drafts", "/SPAM", "/Sent", "/Excluded", "/Excluded/subfolder"));
-	}
-	
-	@Test
 	public void continuePreviousShouldBeFalseWhenPreviousArchiveTreatmentIsAbsent() {
 		
 		control.replay();
@@ -1672,162 +1257,6 @@ public class ImapArchiveProcessingTest {
 		assertThat(continuePrevious).isFalse();
 	}
 	
-	@Test
-	public void listImapFoldersShouldNotFailWhenMailboxFormatExceptionIsThrown() throws Exception {
-		ListResult inboxListResult = getUserMailboxList("usera", "");
-		ListResult listResult = getUserMailboxList("usera", "/Drafts", "/SPAM", "/Sent", "/Excluded");
-		StoreClient storeClient = control.createMock(StoreClient.class);
-
-		listResult.add(new ListInfo("bad", true, false));
-		storeClient.login(false);
-		expectLastCall();
-		expectListImapFolders(storeClient, "usera", listResult);
-		storeClient.close();
-		expectLastCall();
-		
-		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-				.domain(domain)
-				.state(ConfigurationState.ENABLE)
-				.schedulingConfiguration(SchedulingConfiguration.builder()
-					.recurrence(ArchiveRecurrence.daily())
-					.time(LocalTime.parse("13:23"))
-					.build())
-				.archiveMainFolder("arChive")
-				.build();
-		
-		expect(storeClientFactory.createOnUserBackend("usera", domain))
-			.andReturn(storeClient);
-		
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
-		
-		control.replay();
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.higherBoundary(HigherBoundary.builder()
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listImapFolders(inboxListResult.get(0), "usera", processedTask);
-		control.verify();
-		assertThat(listImapFolders).isEqualTo(getUserMailboxList("usera", "", "/Drafts", "/SPAM", "/Sent", "/Excluded"));
-	}
-	
-	@Test
-	public void listUsersShouldAppendDomainWhenMailboxesDoesntContainDomain() throws Exception {
-		List<ListInfo> givenListInfos = ImmutableList.of(
-				new ListInfo("user/usera", true, false),
-				new ListInfo("user/usera/Drafts", true, false),
-				new ListInfo("user/usera/SPAM", true, false),
-				new ListInfo("user/usera/Sent", true, false),
-				new ListInfo("user/usera/Excluded", true, false));
-		ListResult listResult = new ListResult(6);
-		listResult.addAll(givenListInfos);
-		
-		StoreClient storeClient = control.createMock(StoreClient.class);
-		storeClient.login(false);
-		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
-			.andReturn(listResult);
-		storeClient.close();
-		expectLastCall();
-		
-		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-				.domain(domain)
-				.state(ConfigurationState.ENABLE)
-				.schedulingConfiguration(SchedulingConfiguration.builder()
-					.recurrence(ArchiveRecurrence.daily())
-					.time(LocalTime.parse("13:23"))
-					.build())
-				.archiveMainFolder("arChive")
-				.build();
-		
-		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient);
-		
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
-		
-		List<ListInfo> expectedListInfos = ImmutableList.of(
-				new ListInfo("user/usera@mydomain.org", true, false),
-				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
-				new ListInfo("user/usera/SPAM@mydomain.org", true, false),
-				new ListInfo("user/usera/Sent@mydomain.org", true, false),
-				new ListInfo("user/usera/Excluded@mydomain.org", true, false));
-		
-		control.replay();
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.higherBoundary(HigherBoundary.builder()
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listUsers(processedTask);
-		control.verify();
-		assertThat(listImapFolders).isEqualTo(expectedListInfos);
-	}
-	
-	@Test
-	public void listUsersShouldFilterDomain() throws Exception {
-		List<ListInfo> givenListInfos = ImmutableList.of(
-				new ListInfo("user/usera@mydomain.org", true, false),
-				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
-				new ListInfo("user/usera/SPAM@mydomain.org", true, false),
-				new ListInfo("user/usera/Sent@otherdomain.org", true, false),
-				new ListInfo("user/usera/Excluded@otherdomain.org", true, false));
-		ListResult listResult = new ListResult(6);
-		listResult.addAll(givenListInfos);
-		
-		StoreClient storeClient = control.createMock(StoreClient.class);
-		storeClient.login(false);
-		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
-			.andReturn(listResult);
-		storeClient.close();
-		expectLastCall();
-		
-		ObmDomain domain = ObmDomain.builder().name("mydomain.org").build();
-		DomainConfiguration domainConfiguration = DomainConfiguration.builder()
-				.domain(domain)
-				.state(ConfigurationState.ENABLE)
-				.schedulingConfiguration(SchedulingConfiguration.builder()
-					.recurrence(ArchiveRecurrence.daily())
-					.time(LocalTime.parse("13:23"))
-					.build())
-				.archiveMainFolder("arChive")
-				.build();
-		
-		expect(storeClientFactory.create(domain.getName()))
-			.andReturn(storeClient);
-		
-		ArchiveConfiguration archiveConfiguration = new ArchiveConfiguration(
-				domainConfiguration, null, null, ArchiveTreatmentRunId.from("259ef5d1-9dfd-4fdb-84b0-09d33deba1b7"), logger, null, false);
-		
-		List<ListInfo> expectedListInfos = ImmutableList.of(
-				new ListInfo("user/usera@mydomain.org", true, false),
-				new ListInfo("user/usera/Drafts@mydomain.org", true, false),
-				new ListInfo("user/usera/SPAM@mydomain.org", true, false));
-		
-		control.replay();
-		ProcessedTask processedTask = ProcessedTask.builder()
-				.archiveConfiguration(archiveConfiguration)
-				.higherBoundary(HigherBoundary.builder()
-						.higherBoundary(DateTime.parse("2014-07-26T08:46:00.000Z"))
-						.build())
-				.previousArchiveTreatment(Optional.<ArchiveTreatment> absent())
-				.build();
-		
-		ImmutableList<ListInfo> listImapFolders = imapArchiveProcessing.listUsers(processedTask);
-		control.verify();
-		assertThat(listImapFolders).isEqualTo(expectedListInfos);
-	}
-	
 	@Test(expected=IllegalStateException.class)
 	public void processingImapCopyShouldThrowOriginException() throws Exception {
 		StoreClient storeClient = control.createMock(StoreClient.class);
@@ -1874,14 +1303,14 @@ public class ImapArchiveProcessingTest {
 
 		try {
 			control.replay();
-			imapArchiveProcessing.processingImapCopy(mailbox, messageSet, processedTask);
+			mailboxProcessing.processingImapCopy(mailbox, messageSet, processedTask);
 		} finally {
 			control.verify();
 		}
 	}
 
 	private void expectListImapFolders(StoreClient storeClient, String user, ListResult subFolderslistResult) {
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME + "/" + user + "/", ImapArchiveProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME + "/" + user + "/", UserMailboxesProcessing.ALL_MAILBOXES_NAME))
 			.andReturn(subFolderslistResult);
 	}
 

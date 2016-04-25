@@ -66,15 +66,14 @@ import org.obm.push.mail.bean.SearchQuery;
 import org.obm.push.minig.imap.StoreClient;
 import org.slf4j.LoggerFactory;
 
-import pl.wkr.fluentrule.api.FluentExpectedException;
-import ch.qos.logback.classic.Logger;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.linagora.scheduling.DateTimeProvider;
 
+import ch.qos.logback.classic.Logger;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import pl.wkr.fluentrule.api.FluentExpectedException;
 
 public class DryRunImapArchiveProcessingTest {
 
@@ -91,6 +90,7 @@ public class DryRunImapArchiveProcessingTest {
 	private Logger logger;
 	private LoggerAppenders loggerAppenders;
 	
+	private DryMailboxProcessing dryMailboxProcessing;
 	private DryRunImapArchiveProcessing imapArchiveProcessing;
 
 	@Before
@@ -109,8 +109,9 @@ public class DryRunImapArchiveProcessingTest {
 		logger = (Logger) LoggerFactory.getLogger(temporaryFolder.newFile().getAbsolutePath());
 		loggerAppenders = control.createMock(LoggerAppenders.class);
 		
+		dryMailboxProcessing = new DryMailboxProcessing(dateTimeProvider, processedFolderDao, imapArchiveConfigurationService);
 		imapArchiveProcessing = new DryRunImapArchiveProcessing(dateTimeProvider, 
-				schedulingDatesService, storeClientFactory, archiveTreatmentDao, processedFolderDao, imapArchiveConfigurationService);
+				schedulingDatesService, storeClientFactory, archiveTreatmentDao, dryMailboxProcessing);
 	}
 	
 	@Test
@@ -150,11 +151,11 @@ public class DryRunImapArchiveProcessingTest {
 		
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME, ImapArchiveProcessing.INBOX_MAILBOX_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME, UserMailboxesProcessing.INBOX_MAILBOX_NAME))
 			.andReturn(inboxListResult);
 		storeClient.login(false);
 		expectLastCall();
-		expect(storeClient.listAll(ImapArchiveProcessing.USERS_REFERENCE_NAME +  "/usera/", ImapArchiveProcessing.ALL_MAILBOXES_NAME))
+		expect(storeClient.listAll(UserMailboxesProcessing.USERS_REFERENCE_NAME +  "/usera/", UserMailboxesProcessing.ALL_MAILBOXES_NAME))
 			.andReturn(listResult);
 		
 		ArchiveTreatmentRunId runId = ArchiveTreatmentRunId.from("ae7e9726-4d00-4259-a89e-2dbdb7b65a77");
@@ -187,7 +188,7 @@ public class DryRunImapArchiveProcessingTest {
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		expect(storeClient.uidSearch(SearchQuery.builder()
 				.beforeExclusive(higherBoundary.toDate())
-				.unmatchingFlag(ImapArchiveProcessing.IMAP_ARCHIVE_FLAG)
+				.unmatchingFlag(MailboxProcessing.IMAP_ARCHIVE_FLAG)
 				.build()))
 			.andReturn(messageSet);
 		
