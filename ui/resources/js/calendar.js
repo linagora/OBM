@@ -2773,8 +2773,6 @@ Obm.CalendarView = new Class({
       if (default_id != "") {
         action = 'delete_default_view';
         confirm_message = obm.vars.labels.delete_default_view;
-      } else {
-        message_error = obm.vars.labels.no_default_view;
       }
     }
 
@@ -2814,7 +2812,8 @@ Obm.CalendarView = new Class({
                   $('opt_'+default_id).erase("default");
                   
                   //hidde option for default view
-                  if ($('view_id').value == "") {
+                  var currentlySelectedViewId = $('view_id').value;
+                  if (currentlySelectedViewId === "" || currentlySelectedViewId === "0") {
                     $('default').set('styles',{'display':'none'});
                   }
 
