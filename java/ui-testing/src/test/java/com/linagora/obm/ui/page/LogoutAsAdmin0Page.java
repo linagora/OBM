@@ -31,21 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.ui.page;
 
-import java.util.List;
-import java.lang.Integer;
-
-import org.openqa.selenium.By.ByCssSelector;
-import org.openqa.selenium.WebDriver;
-import com.thoughtworks.selenium.webdriven.WebDriverCommandProcessor;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.google.inject.Inject;
-import com.linagora.obm.ui.service.Services.Logout;
-import com.linagora.obm.ui.url.ServiceUrlMapping;
+import org.openqa.selenium.WebDriver;
 
 public class LogoutAsAdmin0Page extends LogoutPage {
 
@@ -55,7 +42,7 @@ public class LogoutAsAdmin0Page extends LogoutPage {
 	
 	@Override
 	public void disconnect() {
-		driver.findElement(By.id("bannerLogoutLink")).click();
+		driver.findElement(By.id("logout")).click();
 	}
 
 }
