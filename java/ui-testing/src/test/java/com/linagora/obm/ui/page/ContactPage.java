@@ -37,7 +37,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.common.base.Predicate;
@@ -95,7 +94,8 @@ public class ContactPage extends RootPage {
 	}
 
 	public void selectAddressBook(String bookName) {
-		driver.findElement(By.partialLinkText(bookName)).click();
+		new WebDriverWait(driver, 5).until(ExpectedConditions.elementToBeClickable(By.partialLinkText(bookName))).click();
+
 		waitForAjaxRequestToComplete();
 	}
 
@@ -108,24 +108,16 @@ public class ContactPage extends RootPage {
 	}
 
 	public void managePopup(final boolean accept) {
-		new FluentWait<WebDriver>(driver).until(new Predicate<WebDriver>() {
-			@Override
-			public boolean apply(WebDriver input) {
-				Alert alert = driver.switchTo().alert();
-				if (alert != null) {
-					if (accept) {
-						alert.accept();
-					} else {
-						alert.dismiss();
-					}
-					return true;
-				}
-				return false;
-			}
-		});
+		Alert alert = new WebDriverWait(driver, 5).until(ExpectedConditions.alertIsPresent());
+
+		if (accept) {
+			alert.accept();
+		} else {
+			alert.dismiss();
+		}
 	}
 
-	private void waitForAjaxRequestToComplete() {
+	protected void waitForAjaxRequestToComplete() {
 		new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.id("spinner")));
 	}
 

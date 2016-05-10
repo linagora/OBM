@@ -61,6 +61,7 @@ public class CreateContactPage extends ContactPage {
 
 	public ContactPage createContact(UIContact contactToCreate) {
 		doCreateContact(contactToCreate);
+		waitForAjaxRequestToComplete();
 		
 		return createContactPage();
 	}
