@@ -33,6 +33,7 @@ package com.linagora.obm.ui.page;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -108,12 +109,12 @@ public class CreateContactPage extends ContactPage {
 	}
 
 	private void doCreateContact(UIContact contactToCreate) {
-		firstname.sendKeys(contactToCreate.getFirstName());
-		lastname.sendKeys(contactToCreate.getLastName());
-		companyField.sendKeys(contactToCreate.getCompanyField());
+		firstname.sendKeys(StringUtils.defaultIfBlank(contactToCreate.getFirstName(), ""));
+		lastname.sendKeys(StringUtils.defaultIfBlank(contactToCreate.getLastName(), ""));
+		companyField.sendKeys(StringUtils.defaultIfBlank(contactToCreate.getCompanyField(), ""));
 		clickCheckbox(mailokField, contactToCreate.isMailokField());
 		clickCheckbox(newsletterField, contactToCreate.isNewsletterField());
-		
+
 		contactForm.submit();
 	}
 
