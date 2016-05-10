@@ -41,10 +41,10 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
-import com.google.common.base.Objects;
 
 public class Module extends AbstractModule {
 
@@ -62,7 +62,21 @@ public class Module extends AbstractModule {
 		if (clientUrl != null) {
 			bind(WebDriver.class).toInstance(new RemoteWebDriver(clientUrl, buildDriverCapabilities()));
 		} else {
-			bind(WebDriver.class).toInstance(new FirefoxDriver());
+			bind(WebDriver.class).toInstance(buildLocalDriver());
+		}
+	}
+
+	private WebDriver buildLocalDriver() {
+		String driverClass = System.getProperty("driverClass");
+
+		if (driverClass == null) {
+			return new FirefoxDriver();
+		}
+
+		try {
+			return (WebDriver) Class.forName(driverClass).newInstance();
+		} catch (Exception e) {
+			throw new IllegalStateException("driverClass VM argument is invalid", e);
 		}
 	}
 
