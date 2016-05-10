@@ -49,7 +49,6 @@ import com.linagora.obm.ui.page.CreateUserSummaryPage;
 import com.linagora.obm.ui.page.DeleteUserPage;
 import com.linagora.obm.ui.page.FindUserPage;
 import com.linagora.obm.ui.page.LoginPage;
-import com.linagora.obm.ui.page.LogoutAsAdmin0Page;
 import com.linagora.obm.ui.page.LogoutPage;
 import com.linagora.obm.ui.page.PageFactory;
 
@@ -82,24 +81,22 @@ public class UserStepdefs {
 
 	@Given("connected as \"([^\"]*)\" with password \"([^\"]*)\" on domain \"([^\"]*)\"")
 	public void connectAsUserToDomain(String userName, String password, String domainName) {
-		uiUser = UIUser.builder().login(userName).password(password).build();
-		uiDomain = UIDomain.builder().name(domainName).build();
-
-		findUserPage = pageFactory.create(driver, FindUserPage.class);
-		logoutPage = pageFactory.create(driver, LogoutPage.class);
-		loginPage = pageFactory.create(driver, LoginPage.class);
-		loginPage.open();
-		loginPage.login(uiUser, uiDomain);
+		connectAs(UIUser.builder().login(userName).password(password).build(), UIDomain.builder().name(domainName).build());
 	}
 
 	@Given("connected as admin0")
 	public void connectAsAdmin0()
 	{
-		uiUser = UIUser.admin0();
-		uiDomain = UIDomain.globalDomain();
+		connectAs(UIUser.admin0(), UIDomain.globalDomain());
+	}
+
+	private void connectAs(UIUser user, UIDomain domain)
+	{
+		uiUser = user;
+		uiDomain = domain;
 
 		findUserPage = pageFactory.create(driver, FindUserPage.class);
-		logoutPage = pageFactory.create(driver, LogoutAsAdmin0Page.class);
+		logoutPage = pageFactory.create(driver, LogoutPage.class);
 		loginPage = pageFactory.create(driver, LoginPage.class);
 		loginPage.open();
 		loginPage.login(uiUser, uiDomain);
@@ -263,7 +260,7 @@ public class UserStepdefs {
 	@And("\"([^\"]*)\" can t connect anymore with password \"([^\"]*)\" on domain \"([^\"]*)\"")
 	public void connectionFailedTest(String userLogin, String password, String domainName)
 	{
-		logoutPage.disconnect();
+		logoutPage.logoutByUrl();
 		connectAsUserToDomain(userLogin, password, domainName);
 		WebElement errorLegend = loginPage.elErrorLegend();
 		assertThat(errorLegend).isNotNull();
