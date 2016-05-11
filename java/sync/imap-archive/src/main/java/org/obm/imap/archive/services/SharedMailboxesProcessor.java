@@ -186,6 +186,7 @@ public class SharedMailboxesProcessor implements MailboxesProcessor {
 					.filter(filterOutUsersMailboxes(processedTask))
 					.filter(filterScopeMailboxes(processedTask))
 					.filter(GuavaUtils.filterNoSelected(processedTask))
+					.filter(filterFirstLevel())
 					.toList();
 		}
 	}
@@ -238,6 +239,16 @@ public class SharedMailboxesProcessor implements MailboxesProcessor {
 					return false;
 				}
 				return true;
+			}
+		};
+	}
+
+	private Predicate<? super ListInfo> filterFirstLevel() {
+		return new Predicate<ListInfo>() {
+
+			@Override
+			public boolean apply(ListInfo listInfo) {
+				return !listInfo.getName().contains(Character.toString(MailboxPaths.IMAP_FOLDER_SEPARATOR));
 			}
 		};
 	}
