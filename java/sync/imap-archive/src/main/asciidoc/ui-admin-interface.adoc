@@ -65,7 +65,8 @@ This page is used to configure the treatment:
  * +Scheduling+ basic scheduling configuration, with the next scheduled treatment
  * +Main archive folder+ IMAP folder where all archives will be stored
  * +Excluded folder+ IMAP folder to be excluded for each user
- * +Scope+ Allows selecting a list of users to either include or exclude of the archiving process
+ * +Users concerned+ Allows selecting a list of users to either include or exclude of the archiving process
+ * +Shared mailboxes concerned+ Allows selecting a list of shared mailboxes to either include or exclude of the archiving process
  * +Send emails to+ list of emails to be annotated at the end of each treatment 
   
 [WARNING]
