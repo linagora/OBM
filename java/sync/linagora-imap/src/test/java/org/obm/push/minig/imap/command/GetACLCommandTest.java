@@ -31,7 +31,7 @@ public class GetACLCommandTest {
 				"* ACL user/admin@vm.obm.org anyone p admin@vm.obm.org lrswikxtecd";
 		IMAPResponse imapResponse = new IMAPResponse("OK", response);
 		
-		GetACLCommand getACLCommand = new GetACLCommand("mailboxPath");
+		GetACLCommand getACLCommand = new GetACLCommand("user/admin@vm.obm.org");
 		getACLCommand.responseReceived(ImmutableList.of(imapResponse, new IMAPResponse("OK", "")));
 		assertThat(getACLCommand.data).contains(
 				Acl.builder().user("anyone").rights("p").build(),
@@ -44,7 +44,7 @@ public class GetACLCommandTest {
 				"* ACL user/admin@vm.obm.org anyone p admin@vm.obm.org lrswikxtecd thAnnoyingOne";
 		IMAPResponse imapResponse = new IMAPResponse("OK", response);
 		
-		GetACLCommand getACLCommand = new GetACLCommand("mailboxPath");
+		GetACLCommand getACLCommand = new GetACLCommand("user/admin@vm.obm.org");
 		getACLCommand.responseReceived(ImmutableList.of(imapResponse, new IMAPResponse("OK", "")));
 	}
 	
@@ -54,8 +54,60 @@ public class GetACLCommandTest {
 				"* ACL user/admin@vm.obm.org";
 		IMAPResponse imapResponse = new IMAPResponse("OK", response);
 		
-		GetACLCommand getACLCommand = new GetACLCommand("mailboxPath");
+		GetACLCommand getACLCommand = new GetACLCommand("user/admin@vm.obm.org");
 		getACLCommand.responseReceived(ImmutableList.of(imapResponse, new IMAPResponse("OK", "")));
 		assertThat(getACLCommand.data).isEmpty();
+	}
+	
+	@Test
+	public void testGetACLCommandHandleResponseOnFolderWithOneSpace() {
+		String response = 
+				"* ACL user/projets tiers@vm.obm.org anyone p admin@vm.obm.org lrswikxtecd";
+		IMAPResponse imapResponse = new IMAPResponse("OK", response);
+		
+		GetACLCommand getACLCommand = new GetACLCommand("user/projets tiers@vm.obm.org");
+		getACLCommand.responseReceived(ImmutableList.of(imapResponse, new IMAPResponse("OK", "")));
+		assertThat(getACLCommand.data).contains(
+				Acl.builder().user("anyone").rights("p").build(),
+				Acl.builder().user("admin@vm.obm.org").rights("lrswikxtecd").build());
+	}
+	
+	@Test
+	public void testGetACLCommandHandleResponseOnFolderWithMultipleSpaces() {
+		String response = 
+				"* ACL user/projets tiers others@vm.obm.org anyone p admin@vm.obm.org lrswikxtecd";
+		IMAPResponse imapResponse = new IMAPResponse("OK", response);
+		
+		GetACLCommand getACLCommand = new GetACLCommand("user/projets tiers others@vm.obm.org");
+		getACLCommand.responseReceived(ImmutableList.of(imapResponse, new IMAPResponse("OK", "")));
+		assertThat(getACLCommand.data).contains(
+				Acl.builder().user("anyone").rights("p").build(),
+				Acl.builder().user("admin@vm.obm.org").rights("lrswikxtecd").build());
+	}
+	
+	@Test
+	public void testGetACLCommandHandleResponseOnFolderHierarchyWithMultipleSpaces() {
+		String response = 
+				"* ACL user/projets tiers others/then other@vm.obm.org anyone p admin@vm.obm.org lrswikxtecd";
+		IMAPResponse imapResponse = new IMAPResponse("OK", response);
+		
+		GetACLCommand getACLCommand = new GetACLCommand("user/projets tiers others/then other@vm.obm.org");
+		getACLCommand.responseReceived(ImmutableList.of(imapResponse, new IMAPResponse("OK", "")));
+		assertThat(getACLCommand.data).contains(
+				Acl.builder().user("anyone").rights("p").build(),
+				Acl.builder().user("admin@vm.obm.org").rights("lrswikxtecd").build());
+	}
+	
+	@Test
+	public void testGetACLCommandHandleResponseWithDoubleQuote() {
+		String response = 
+				"* ACL \"user/projets tiers others/then other@vm.obm.org\" anyone p admin@vm.obm.org lrswikxtecd";
+		IMAPResponse imapResponse = new IMAPResponse("OK", response);
+		
+		GetACLCommand getACLCommand = new GetACLCommand("\"user/projets tiers others/then other@vm.obm.org\"");
+		getACLCommand.responseReceived(ImmutableList.of(imapResponse, new IMAPResponse("OK", "")));
+		assertThat(getACLCommand.data).contains(
+				Acl.builder().user("anyone").rights("p").build(),
+				Acl.builder().user("admin@vm.obm.org").rights("lrswikxtecd").build());
 	}
 }
