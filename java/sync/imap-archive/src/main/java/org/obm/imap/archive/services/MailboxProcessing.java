@@ -331,7 +331,6 @@ public class MailboxProcessing {
 		logger.debug("Creating {} mailbox", archiveMailboxName);
 		
 		creatableMailbox.create();
-		creatableMailbox.grantAllRightsTo(ObmSystemUser.CYRUS);
 		if (!creatableMailbox.isSharedMailbox()) {
 			creatableMailbox.grantReadRightsTo(creatableMailbox.getUserAtDomain());
 		} else {
@@ -339,6 +338,7 @@ public class MailboxProcessing {
 				creatableMailbox.grantReadRightsTo(userAtDomain(acl.getUser(), domainName));
 			}
 		}
+		creatableMailbox.grantAllRightsTo(ObmSystemUser.CYRUS);
 		creatableMailbox.setMaxQuota(imapArchiveConfigurationService.getQuotaMaxSize());
 		creatableMailbox.setSharedSeenAnnotation();
 		creatableMailbox.select();
