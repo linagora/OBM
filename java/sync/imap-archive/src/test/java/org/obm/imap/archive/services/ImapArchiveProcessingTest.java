@@ -74,7 +74,6 @@ import org.obm.imap.archive.mailbox.MailboxImpl;
 import org.obm.imap.archive.mailbox.TemporaryMailbox;
 import org.obm.push.exception.ImapTimeoutException;
 import org.obm.push.exception.MailboxNotFoundException;
-import org.obm.push.mail.bean.Acl;
 import org.obm.push.mail.bean.AnnotationEntry;
 import org.obm.push.mail.bean.AttributeValue;
 import org.obm.push.mail.bean.Flag;
@@ -697,9 +696,6 @@ public class ImapArchiveProcessingTest {
 		
 		expectCreateMailbox(temporaryMailboxName, storeClient);
 		
-		expect(storeClient.getAcl(mailboxName))
-			.andReturn(ImmutableSet.<Acl> of())
-			.times(3);
 		expect(storeClient.select(mailboxName)).andReturn(true);
 		MessageSet secondYearMessageSet = MessageSet.builder().add(secondYearRange).build();
 		expect(storeClient.uidSearch(SearchQuery.builder()
@@ -864,9 +860,6 @@ public class ImapArchiveProcessingTest {
 			.andReturn(otherYearsInternalDates.build());
 		
 		// previous Year
-		expect(storeClient.getAcl(mailboxName))
-			.andReturn(ImmutableSet.<Acl> of())
-			.times(2);
 		String previousYearArchiveMailboxName = "user/usera/" + archiveMainFolder + "/2013/INBOX@mydomain.org";
 		expectCreateMailbox(previousYearArchiveMailboxName, storeClient);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
@@ -880,9 +873,6 @@ public class ImapArchiveProcessingTest {
 			.andReturn(true);
 		
 		// next Year
-		expect(storeClient.getAcl(mailboxName))
-			.andReturn(ImmutableSet.<Acl> of())
-			.times(2);
 		String nextYearArchiveMailboxName = "user/usera/" + archiveMainFolder + "/2015/INBOX@mydomain.org";
 		expectCreateMailbox(nextYearArchiveMailboxName, storeClient);
 		expect(storeClient.select(temporaryMailboxName)).andReturn(true);
@@ -980,9 +970,6 @@ public class ImapArchiveProcessingTest {
 		
 		expectCreateMailbox(archiveMailboxName, storeClient);
 		
-		expect(storeClient.getAcl(mailboxName))
-			.andReturn(ImmutableSet.<Acl> of())
-			.times(3);
 		expectCreateMailbox(temporaryMailboxName, storeClient);
 		expect(storeClient.uidCopy(messageSet, temporaryMailboxName)).andReturn(messageSet);
 		
@@ -1113,14 +1100,9 @@ public class ImapArchiveProcessingTest {
 		boolean first = true;
 		for (Range<Long> partition : uids) {
 			if (first) {
-				expect(storeClient.getAcl(mailboxName))
-					.andReturn(ImmutableSet.<Acl> of())
-					.times(2);
 				expectCreateMailbox(archiveMailboxName, storeClient);
 				first = false;
 			} else {
-				expect(storeClient.getAcl(mailboxName))
-					.andReturn(ImmutableSet.<Acl> of());
 				expect(storeClient.select(archiveMailboxName)).andReturn(true);
 			}
 			
@@ -1322,8 +1304,6 @@ public class ImapArchiveProcessingTest {
 				.build();
 		
 		String mailboxName = mailbox.getName();
-		expect(storeClient.getAcl(mailboxName))
-			.andReturn(ImmutableSet.<Acl> of());
 		expect(storeClient.select(mailboxName))
 			.andReturn(true);
 		// Throws IllegalStateException

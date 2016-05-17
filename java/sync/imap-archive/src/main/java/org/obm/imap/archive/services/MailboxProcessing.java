@@ -34,7 +34,6 @@ package org.obm.imap.archive.services;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.imap.archive.beans.ArchiveStatus;
@@ -172,7 +171,7 @@ public class MailboxProcessing {
 	}
 
 	private MessageSet copyToTemporary(Mailbox mailbox, TemporaryMailbox temporaryMailbox, DomainName domainName, Logger logger, MessageSet messageSet) throws IMAPException, MailboxNotFoundException {
-		createFolder(temporaryMailbox, mailbox.getRights(), domainName, logger);
+		createFolder(temporaryMailbox, mailbox, domainName, logger);
 		
 		mailbox.select();
 		return mailbox.uidCopy(messageSet, temporaryMailbox);
@@ -277,7 +276,7 @@ public class MailboxProcessing {
 				.archiveMainFolder(processedTask.getDomainConfiguration().getArchiveMainFolder())
 				.cyrusPartitionSuffix(imapArchiveConfigurationService.getCyrusPartitionSuffix())
 				.build();
-		createFolder(archiveMailbox, mailbox.getRights(), domainName, logger);
+		createFolder(archiveMailbox, mailbox, domainName, logger);
 		return archiveMailbox;
 	}
 
@@ -307,13 +306,13 @@ public class MailboxProcessing {
 		}
 	}
 
-	protected void createFolder(CreatableMailbox creatableMailbox, Set<Acl> rights, DomainName domainName, Logger logger) 
+	protected void createFolder(CreatableMailbox creatableMailbox, Mailbox mailbox, DomainName domainName, Logger logger) 
 			throws MailboxNotFoundException, ImapSelectException, ImapSetAclException, ImapCreateException, ImapQuotaException, ImapAnnotationException {
 		
 		try {
 			creatableMailbox.select();
 		} catch (ImapSelectException e) {
-			createMailbox(creatableMailbox, rights, domainName, logger);
+			createMailbox(creatableMailbox, mailbox, domainName, logger);
 		}
 	}
 	
@@ -325,7 +324,7 @@ public class MailboxProcessing {
 					.build());
 	}
 
-	private void createMailbox(CreatableMailbox creatableMailbox, Set<Acl> rights, DomainName domainName, Logger logger) 
+	private void createMailbox(CreatableMailbox creatableMailbox, Mailbox mailbox, DomainName domainName, Logger logger) 
 			throws MailboxNotFoundException, ImapSetAclException, ImapCreateException, ImapSelectException, ImapQuotaException, ImapAnnotationException {
 		
 		String archiveMailboxName = creatableMailbox.getName();
@@ -336,7 +335,7 @@ public class MailboxProcessing {
 		if (!creatableMailbox.isSharedMailbox()) {
 			creatableMailbox.grantReadRightsTo(creatableMailbox.getUserAtDomain());
 		} else {
-			for (Acl acl : rights) {
+			for (Acl acl : mailbox.getRights()) {
 				creatableMailbox.grantReadRightsTo(userAtDomain(acl.getUser(), domainName));
 			}
 		}
