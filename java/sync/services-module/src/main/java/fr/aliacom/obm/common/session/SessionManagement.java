@@ -31,10 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.session;
 
-import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
@@ -78,7 +76,7 @@ public class SessionManagement {
 	private static final Logger logger = LoggerFactory
 			.getLogger(SessionManagement.class);
 
-	private final AtomicInteger conversationUidGenerator;
+	private final AccessToken.Factory accessTokenFactory;
 	private final AuthentificationServiceFactory authentificationServiceFactory;
 	private final UserDao userManagementDAO;
 	private final DomainService domainService;
@@ -86,14 +84,16 @@ public class SessionManagement {
 	private final SpecialAccounts specialAccounts;
 
 	@Inject
-	@VisibleForTesting SessionManagement(AuthentificationServiceFactory authentificationServiceFactory,
+	@VisibleForTesting SessionManagement(
+			AccessToken.Factory accessTokenFactory,
+			AuthentificationServiceFactory authentificationServiceFactory,
 			DomainService domainService, UserDao userDao, ObmSyncConfigurationService configurationService,
 			SpecialAccounts specialAccounts) {
 
+		this.accessTokenFactory = accessTokenFactory;
 		this.userManagementDAO = userDao;
 		this.configuration = configurationService;
 		this.specialAccounts = specialAccounts;
-		this.conversationUidGenerator = new AtomicInteger();
 		this.sessions = configureSessionCache();
 		this.domainService = domainService;
 		this.authentificationServiceFactory = authentificationServiceFactory;
@@ -118,10 +118,6 @@ public class SessionManagement {
 					}
 				});
 		return cache.asMap();
-	}
-
-	private String newSessionId() {
-		return UUID.randomUUID().toString();
 	}
 
 	private boolean doAuthSpecialAccount(String userLogin, ObmDomain obmDomain,	String clientIP) {
@@ -268,7 +264,7 @@ public class SessionManagement {
 		sessions.put(token.getSessionId(), token);
 	}
 
-	private AccessToken buildAccessToken(String origin,	String userLogin, ObmDomain obmDomain) throws ObmSyncVersionNotFoundException {
+	public AccessToken buildAccessToken(String origin,	String userLogin, ObmDomain obmDomain) throws ObmSyncVersionNotFoundException {
 		ObmUser databaseUser = userManagementDAO.findUserByLogin(userLogin, obmDomain);
 		if (databaseUser == null) {
 			logger.info("access refused to login: " + userLogin
@@ -276,17 +272,10 @@ public class SessionManagement {
 					+ "=> user not found in database");
 			return null;
 		}
-		AccessToken token = new AccessToken(databaseUser.getUid(), origin);
-		token.setDomain(obmDomain);
-		token.setUserDisplayName(databaseUser.getDisplayName());
-		token.setUserLogin(userLogin);
-		token.setUserEmail(databaseUser.getEmailAtDomain());
-
-		token.setSessionId(newSessionId());
-		token.setConversationUid(conversationUidGenerator.incrementAndGet());
+		
+		
+		AccessToken token = accessTokenFactory.build(databaseUser, origin);
 		token.setVersion(getObmSyncVersion());
-		//FIXME: probably broken
-		token.setRootAccount(false);
 		token.setServiceProperties(userManagementDAO.loadUserProperties(databaseUser.getUid()));
 		return token;
 	}

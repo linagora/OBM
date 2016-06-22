@@ -82,6 +82,8 @@ public class SessionManagementTest {
 	@Before
 	public void setup() {
 		control = createControl();
+
+		AccessToken.Factory accessTokenFactory = new AccessToken.Factory();
 		authentificationServiceFactory = control.createMock(AuthentificationServiceFactory.class);
 		domainService = control.createMock(DomainService.class);
 		userDao = control.createMock(UserDao.class);
@@ -89,7 +91,7 @@ public class SessionManagementTest {
 		specialAccounts = control.createMock(SpecialAccounts.class);
 		authenticationService = control.createMock(IAuthentificationService.class);
 		sessionManagement = createMockBuilder(SessionManagement.class)
-				.withConstructor(authentificationServiceFactory, domainService, userDao, configurationService, specialAccounts)
+				.withConstructor(accessTokenFactory, authentificationServiceFactory, domainService, userDao, configurationService, specialAccounts)
 				.addMockedMethod("getObmSyncVersion")
 				.createMock(control);
 		obmDomain = ToolBox.getDefaultObmDomain();

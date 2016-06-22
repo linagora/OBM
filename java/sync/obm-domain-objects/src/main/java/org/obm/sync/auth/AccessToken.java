@@ -33,16 +33,49 @@ package org.obm.sync.auth;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.obm.sync.ServerCapability;
 
 import com.google.common.base.Objects;
+import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserSettings;
 
 public class AccessToken {
 
+	@Singleton
+	public static class Factory {
+
+		private final AtomicInteger conversationUidGenerator;
+		
+		public Factory() {
+			this.conversationUidGenerator = new AtomicInteger();
+		}
+
+		private String newSessionId() {
+			return UUID.randomUUID().toString();
+		}
+		
+		public AccessToken build(ObmUser databaseUser, String origin) {
+			AccessToken token = new AccessToken(databaseUser.getUid(), origin);
+			token.setDomain(databaseUser.getDomain());
+			token.setUserDisplayName(databaseUser.getDisplayName());
+			token.setUserLogin(databaseUser.getLogin());
+			token.setUserEmail(databaseUser.getEmailAtDomain());
+
+			token.setSessionId(newSessionId());
+			token.setConversationUid(conversationUidGenerator.incrementAndGet());
+			//FIXME: probably broken
+			token.setRootAccount(false);
+			
+			return token;
+		}
+	}
+	
 	private String userLogin;
 	private String userDisplayName;
 	private String userEmail;
