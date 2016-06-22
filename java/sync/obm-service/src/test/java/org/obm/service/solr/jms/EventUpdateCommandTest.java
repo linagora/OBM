@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr.jms;
+package org.obm.service.solr.jms;
 
 import static fr.aliacom.obm.ToolBox.getDefaultObmDomain;
 import static fr.aliacom.obm.ToolBox.getDefaultObmUser;
@@ -42,6 +42,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.domain.dao.UserDao;
+import org.obm.service.solr.jms.EventUpdateCommand;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
@@ -52,7 +53,6 @@ import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.calendar.UserAttendee;
-import org.obm.sync.solr.jms.EventUpdateCommand;
 import org.obm.utils.ObmHelper;
 
 import fr.aliacom.obm.common.domain.ObmDomain;

@@ -27,20 +27,53 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr.jms;
+package org.obm.service.solr;
 
-public enum SolrJmsQueue
-{
-	CALENDAR_CHANGES_QUEUE("/topic/calendar/changes"),
-	CONTACT_CHANGES_QUEUE("/topic/contact/changes");
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.obm.service.solr.SolrRequest;
+import org.obm.service.solr.SolrService;
+
+import fr.aliacom.obm.common.domain.ObmDomain;
+
+public class PingSolrRequest extends SolrRequest {
+
+	public static Lock lock;
+	public static Condition condition;
+	public static Throwable error;
 	
-	private String name;
-
-	private SolrJmsQueue(String name) {
-		this.name = name;
+	public PingSolrRequest(ObmDomain domain, SolrService solrService) {
+		super(domain, solrService);
 	}
 
-	public String getName() {
-		return name;
+	@Override
+	public void run(CommonsHttpSolrServer server) throws Exception {
+		server.ping();
+	}
+
+	@Override
+	public void postProcess() {
+		requestProcessed();
+	}
+
+	private void requestProcessed() {
+		if (lock == null) {
+			return;
+		}
+		
+		lock.lock();
+		condition.signal();
+		lock.unlock();
+	}
+	
+	@Override
+	public void onError(Throwable t) {
+		error = t;
+	}
+	
+	public Throwable getError() {
+		return error;
 	}
 }

@@ -27,27 +27,55 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr.jms;
+package org.obm.service.solr;
 
-import org.obm.sync.book.Contact;
-import org.obm.sync.solr.SolrService;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.easymock.IMocksControl;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.obm.locator.store.LocatorService;
+import org.obm.service.solr.SolrClientFactory;
+import org.obm.service.solr.SolrClientFactoryImpl;
+import org.obm.service.solr.SolrService;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-public abstract class ContactCommand extends Command<Contact> {
+public class SolrClientFactoryTest {
 
-	public ContactCommand(ObmDomain domain, String login, Contact data) {
-		super(domain, login, data);
+	private SolrClientFactory factory;
+	private LocatorService locatorService;
+	private IMocksControl control;
+
+	@Before
+	public void setUp() {
+		control = createControl();
+		locatorService = control.createMock(LocatorService.class);
+		factory = new SolrClientFactoryImpl(locatorService);
 	}
 
-	@Override
-	public SolrJmsQueue getQueue() {
-		return SolrJmsQueue.CONTACT_CHANGES_QUEUE;
+	@After
+	public void tearDown() {
+		control.verify();
 	}
 
-	@Override
-	public SolrService getSolrService() {
-		return SolrService.CONTACT_SERVICE;
+	@Test
+	public void testCreateShouldSucceedWhenServiceIsSolrEvent() throws Exception {
+		expect(locatorService.getServiceLocation("solr/event", "d")).andReturn("1.2.3.4");
+		control.replay();
+
+		assertThat(factory.create(SolrService.EVENT_SERVICE, ObmDomain.builder().name("d").build()).getBaseURL()).isEqualTo("http://1.2.3.4:8080/solr/event");
+	}
+
+	@Test
+	public void testCreateShouldSucceedWhenServiceIsSolrContact() throws Exception {
+		expect(locatorService.getServiceLocation("solr/contact", "d")).andReturn("1.2.3.4");
+		control.replay();
+
+		assertThat(factory.create(SolrService.CONTACT_SERVICE, ObmDomain.builder().name("d").build()).getBaseURL()).isEqualTo("http://1.2.3.4:8080/solr/contact");
 	}
 
 }

@@ -27,11 +27,11 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr.jms;
+package org.obm.service.solr.jms;
 
+import org.obm.service.solr.Remover;
+import org.obm.service.solr.SolrRequest;
 import org.obm.sync.book.Contact;
-import org.obm.sync.solr.Remover;
-import org.obm.sync.solr.SolrRequest;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 

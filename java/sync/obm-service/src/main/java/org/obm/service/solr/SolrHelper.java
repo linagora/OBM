@@ -29,16 +29,16 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.service.solr;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.obm.service.solr.jms.ContactDeleteCommand;
+import org.obm.service.solr.jms.ContactUpdateCommand;
+import org.obm.service.solr.jms.EventDeleteCommand;
+import org.obm.service.solr.jms.EventUpdateCommand;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.solr.jms.ContactDeleteCommand;
-import org.obm.sync.solr.jms.ContactUpdateCommand;
-import org.obm.sync.solr.jms.EventDeleteCommand;
-import org.obm.sync.solr.jms.EventUpdateCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

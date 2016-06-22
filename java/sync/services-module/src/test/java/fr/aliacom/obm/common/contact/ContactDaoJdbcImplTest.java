@@ -50,12 +50,12 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
+import org.obm.service.solr.SolrHelper;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.dao.EntityId;
-import org.obm.sync.solr.SolrHelper;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.collect.ImmutableMap;

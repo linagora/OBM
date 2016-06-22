@@ -27,51 +27,27 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.service.solr.jms;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.obm.service.solr.SolrService;
+import org.obm.sync.calendar.Event;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-public class PingSolrRequest extends SolrRequest {
-
-	public static Lock lock;
-	public static Condition condition;
-	public static Throwable error;
+public abstract class EventCommand extends Command<Event> {
 	
-	public PingSolrRequest(ObmDomain domain, SolrService solrService) {
-		super(domain, solrService);
-	}
-
-	@Override
-	public void run(CommonsHttpSolrServer server) throws Exception {
-		server.ping();
-	}
-
-	@Override
-	public void postProcess() {
-		requestProcessed();
-	}
-
-	private void requestProcessed() {
-		if (lock == null) {
-			return;
-		}
-		
-		lock.lock();
-		condition.signal();
-		lock.unlock();
+	public EventCommand(ObmDomain domain, String login, Event data) {
+		super(domain, login, data);
 	}
 	
 	@Override
-	public void onError(Throwable t) {
-		error = t;
+	public SolrJmsQueue getQueue() {
+		return SolrJmsQueue.CALENDAR_CHANGES_QUEUE;
 	}
 	
-	public Throwable getError() {
-		return error;
+	@Override
+	public SolrService getSolrService() {
+		return SolrService.EVENT_SERVICE;
 	}
+	
 }

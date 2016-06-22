@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.service.solr;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 

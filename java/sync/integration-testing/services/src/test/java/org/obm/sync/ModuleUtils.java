@@ -59,9 +59,9 @@ import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
+import org.obm.service.solr.SolrClientFactory;
+import org.obm.service.solr.SolrService;
 import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
-import org.obm.sync.solr.SolrClientFactory;
-import org.obm.sync.solr.SolrService;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;

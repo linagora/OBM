@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2014  Linagora
+ * Copyright (C) 2011-2014  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -27,26 +27,47 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.service.solr.jms;
 
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.common.SolrInputDocument;
+import java.io.Serializable;
+
+import org.obm.service.solr.SolrRequest;
+import org.obm.service.solr.SolrService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-public class SolrDocumentIndexer extends SolrRequest {
+public abstract class Command<T extends Serializable> implements Serializable {
+	
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	
+	private final ObmDomain domain;
+	private final T object;
 
-	private final SolrInputDocument document;
+	private String login;
 
-	public SolrDocumentIndexer(ObmDomain domain, SolrService solrService, SolrInputDocument document) {
-		super(domain, solrService);
-		this.document = document;
+	protected Command(ObmDomain domain, String login, T object) {
+		this.domain = domain;
+		this.login = login;
+		this.object = object;
 	}
 
-	@Override
-	public void run(CommonsHttpSolrServer server) throws Exception {
-		server.add(document);
-		server.commit();
+	public ObmDomain getDomain() {
+		return domain;
 	}
 
+	public String getLogin() {
+		return login;
+	}
+	
+	public T getObject() {
+		return object;
+	}
+
+	public abstract SolrJmsQueue getQueue();
+	
+	public abstract SolrService getSolrService();
+	
+	public abstract SolrRequest asSolrRequest();
 }

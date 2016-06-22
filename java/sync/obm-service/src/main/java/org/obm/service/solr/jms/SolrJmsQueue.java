@@ -27,27 +27,20 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr.jms;
+package org.obm.service.solr.jms;
 
-import org.obm.sync.calendar.Event;
-import org.obm.sync.solr.SolrService;
+public enum SolrJmsQueue
+{
+	CALENDAR_CHANGES_QUEUE("/topic/calendar/changes"),
+	CONTACT_CHANGES_QUEUE("/topic/contact/changes");
+	
+	private String name;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
+	private SolrJmsQueue(String name) {
+		this.name = name;
+	}
 
-public abstract class EventCommand extends Command<Event> {
-	
-	public EventCommand(ObmDomain domain, String login, Event data) {
-		super(domain, login, data);
+	public String getName() {
+		return name;
 	}
-	
-	@Override
-	public SolrJmsQueue getQueue() {
-		return SolrJmsQueue.CALENDAR_CHANGES_QUEUE;
-	}
-	
-	@Override
-	public SolrService getSolrService() {
-		return SolrService.EVENT_SERVICE;
-	}
-	
 }

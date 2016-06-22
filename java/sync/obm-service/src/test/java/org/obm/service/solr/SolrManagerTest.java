@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.service.solr;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
@@ -51,10 +51,11 @@ import org.hornetq.jms.server.config.JMSConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.configuration.ConfigurationService;
+import org.obm.service.solr.jms.Command;
+import org.obm.service.solr.jms.SolrJmsQueue;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
-import org.obm.sync.solr.jms.Command;
-import org.obm.sync.solr.jms.SolrJmsQueue;
 
 import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.QueueManager;
@@ -62,7 +63,6 @@ import com.linagora.obm.sync.QueueManager;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.domain.Samba;
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 
 public class SolrManagerTest {
@@ -72,7 +72,7 @@ public class SolrManagerTest {
 	private PingSolrRequest pingRequest;
 	private Command<Integer> pingCommand;
 	private QueueManager queueManager;
-	private ObmSyncConfigurationService configurationService;
+	private ConfigurationService configurationService;
 	private SolrClientFactory solrClientFactory;
 	private IMocksControl control;
 	
@@ -108,7 +108,7 @@ public class SolrManagerTest {
 		queueManager = new QueueManager(hornetQConfiguration(), jmsConfiguration());
 		queueManager.start();
 		
-		configurationService = control.createMock(ObmSyncConfigurationService.class);
+		configurationService = control.createMock(ConfigurationService.class);
 		solrClientFactory = control.createMock(SolrClientFactoryImpl.class);
 		server = control.createMock(CommonsHttpSolrServer.class);
 		

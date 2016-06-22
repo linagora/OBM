@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2014  Linagora
+ * Copyright (C) 2011-2014  Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -27,59 +27,45 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.service.solr;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.Serializable;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.obm.locator.LocatorClientException;
-import org.obm.locator.store.LocatorService;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-@Singleton
-public class SolrClientFactoryImpl implements SolrClientFactory {
+public abstract class SolrRequest implements Serializable {
 
-	private HttpClient httpClient;
-	private LocatorService locatorService;
-
-	@Inject
-	@VisibleForTesting
-	SolrClientFactoryImpl(LocatorService locatorService) {
-		this.locatorService = locatorService;
-		this.httpClient = buildHttpClient();
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	private final ObmDomain domain;
+	private final SolrService solrService;
+	
+	public SolrRequest(ObmDomain domain, SolrService solrService) {
+		this.domain = domain;
+		this.solrService = solrService;
 	}
 
-	private HttpClient buildHttpClient() {
-		MultiThreadedHttpConnectionManager cnxManager = new MultiThreadedHttpConnectionManager();
-		cnxManager.getParams().setDefaultMaxConnectionsPerHost(10);
-		cnxManager.getParams().setMaxTotalConnections(100);
-		return new HttpClient(cnxManager);
+	public abstract void run(CommonsHttpSolrServer server) throws Exception;
+
+	/**
+	 * Gets called after processing of this {@link SolrRequest} is done.<br />
+	 * It's up to subclasses to implement any logic they need in this method (cleanup, etc.).
+	 */
+	public void postProcess() {
 	}
 
-	public CommonsHttpSolrServer create(SolrService service, ObmDomain domain) {
-		try {
-			URI uri = new URIBuilder()
-			.setScheme("http")
-			.setHost(locatorService.getServiceLocation(service.getName(), domain.getName()))
-			.setPort(8080)
-			.setPath('/' + service.getName())
-			.build();
-			return new CommonsHttpSolrServer(uri.toURL(), httpClient);
-		} catch (MalformedURLException e) {
-			throw new LocatorClientException(e);
-		} catch (URISyntaxException e) {
-			throw new LocatorClientException(e);
-		}
+	public ObmDomain getDomain() {
+		return domain;
+	}
+
+	public SolrService getSolrService() {
+		return solrService;
+	}
+
+	public void onError(@SuppressWarnings("unused") Throwable t) {
 	}
 
 }

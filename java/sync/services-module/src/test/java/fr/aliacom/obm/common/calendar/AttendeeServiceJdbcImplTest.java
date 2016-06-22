@@ -55,6 +55,7 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.ProfileDao;
+import org.obm.service.solr.SolrHelper;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
@@ -66,7 +67,6 @@ import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.AttendeeService;
-import org.obm.sync.solr.SolrHelper;
 import org.obm.utils.ObmHelper;
 
 import com.google.inject.AbstractModule;

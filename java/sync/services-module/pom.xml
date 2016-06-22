@@ -62,10 +62,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
-			<artifactId>message-queue</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.linagora.obm</groupId>
 			<artifactId>obm-dao</artifactId>
 		</dependency>
 		<dependency>
@@ -76,6 +72,10 @@
 			<groupId>com.linagora.obm</groupId>
 			<artifactId>obm-domain-objects-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
+			<artifactId>obm-service</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
@@ -126,11 +126,6 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.solr</groupId>
-			<artifactId>solr-solrj</artifactId>
-			<version>1.4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>

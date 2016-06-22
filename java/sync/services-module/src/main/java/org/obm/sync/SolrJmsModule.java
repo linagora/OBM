@@ -29,8 +29,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import org.obm.sync.solr.SolrClientFactory;
-import org.obm.sync.solr.SolrClientFactoryImpl;
+import org.obm.service.solr.SolrClientFactory;
+import org.obm.service.solr.SolrClientFactoryImpl;
 
 import com.google.inject.AbstractModule;
 

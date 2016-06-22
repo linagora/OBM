@@ -37,7 +37,7 @@ import javax.jms.Session;
 
 import org.hornetq.core.config.Configuration;
 import org.hornetq.jms.server.config.JMSConfiguration;
-import org.obm.sync.solr.jms.SolrJmsQueue;
+import org.obm.service.solr.jms.SolrJmsQueue;
 
 import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;

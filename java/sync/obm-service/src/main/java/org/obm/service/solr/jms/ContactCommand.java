@@ -27,45 +27,27 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.service.solr.jms;
 
-import java.io.Serializable;
-
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.obm.service.solr.SolrService;
+import org.obm.sync.book.Contact;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 
-public abstract class SolrRequest implements Serializable {
+public abstract class ContactCommand extends Command<Contact> {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
-	private final ObmDomain domain;
-	private final SolrService solrService;
-	
-	public SolrRequest(ObmDomain domain, SolrService solrService) {
-		this.domain = domain;
-		this.solrService = solrService;
+	public ContactCommand(ObmDomain domain, String login, Contact data) {
+		super(domain, login, data);
 	}
 
-	public abstract void run(CommonsHttpSolrServer server) throws Exception;
-
-	/**
-	 * Gets called after processing of this {@link SolrRequest} is done.<br />
-	 * It's up to subclasses to implement any logic they need in this method (cleanup, etc.).
-	 */
-	public void postProcess() {
+	@Override
+	public SolrJmsQueue getQueue() {
+		return SolrJmsQueue.CONTACT_CHANGES_QUEUE;
 	}
 
-	public ObmDomain getDomain() {
-		return domain;
-	}
-
+	@Override
 	public SolrService getSolrService() {
-		return solrService;
-	}
-
-	public void onError(@SuppressWarnings("unused") Throwable t) {
+		return SolrService.CONTACT_SERVICE;
 	}
 
 }

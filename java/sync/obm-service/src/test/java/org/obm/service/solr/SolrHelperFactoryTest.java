@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.service.solr;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createControl;
@@ -41,19 +41,19 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClientException;
+import org.obm.service.solr.jms.ContactUpdateCommand;
+import org.obm.service.solr.jms.EventUpdateCommand;
+import org.obm.service.solr.jms.SolrJmsQueue;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
-import org.obm.sync.solr.jms.ContactUpdateCommand;
-import org.obm.sync.solr.jms.EventUpdateCommand;
-import org.obm.sync.solr.jms.SolrJmsQueue;
 
 import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.QueueManager;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class SolrHelperFactoryTest {
 
@@ -62,7 +62,7 @@ public class SolrHelperFactoryTest {
 	private SolrHelper.Factory factory;
 	private SolrManager manager;
 	private QueueManager queueManager;
-	private ObmSyncConfigurationService configurationService;
+	private ConfigurationService configurationService;
 	private IMocksControl control;
 	private SolrClientFactory solrClientFactory;
 
@@ -99,7 +99,7 @@ public class SolrHelperFactoryTest {
  		control = createControl();
  		accessToken = ToolBox.mockAccessToken(control);
  		solrClientFactory = control.createMock(SolrClientFactoryImpl.class);
- 		configurationService = control.createMock(ObmSyncConfigurationService.class);
+ 		configurationService = control.createMock(ConfigurationService.class);
  		CommonsHttpSolrServer solrClient = control.createMock(CommonsHttpSolrServer.class);
  		ContactUpdateCommand.Factory contactCommandFactory = control.createMock(ContactUpdateCommand.Factory.class);
  		EventUpdateCommand.Factory eventCommandFactory = control.createMock(EventUpdateCommand.Factory.class);

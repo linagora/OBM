@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr;
+package org.obm.service.solr;
 
 import java.util.EnumMap;
 import java.util.Timer;
@@ -42,10 +42,11 @@ import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.obm.configuration.ConfigurationService;
 import org.obm.locator.LocatorClientException;
+import org.obm.service.solr.jms.Command;
+import org.obm.service.solr.jms.SolrJmsQueue;
 import org.obm.sync.LifecycleListener;
-import org.obm.sync.solr.jms.Command;
-import org.obm.sync.solr.jms.SolrJmsQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +55,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.linagora.obm.sync.Producer;
 import com.linagora.obm.sync.QueueManager;
-
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 @Singleton
 public class SolrManager implements LifecycleListener {
@@ -80,7 +79,7 @@ public class SolrManager implements LifecycleListener {
 
 	@Inject
 	@VisibleForTesting
-	protected SolrManager(ObmSyncConfigurationService configurationService, QueueManager queueManager,
+	protected SolrManager(ConfigurationService configurationService, QueueManager queueManager,
 			SolrClientFactory solrClientFactory) throws JMSException {
 		this.solrClientFactory = solrClientFactory;
 		solrCheckingInterval = configurationService.solrCheckingInterval() * 1000;

@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.solr.jms;
+package org.obm.service.solr.jms;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,12 +38,12 @@ import java.util.List;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.obm.domain.dao.UserDao;
+import org.obm.service.solr.SolrDocumentIndexer;
+import org.obm.service.solr.SolrRequest;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventOpacity;
 import org.obm.sync.calendar.EventPrivacy;
-import org.obm.sync.solr.SolrDocumentIndexer;
-import org.obm.sync.solr.SolrRequest;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
