@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.icalendar;
+package org.obm.sync.utils;
 
 import java.util.Date;
 import java.util.List;
@@ -38,7 +38,7 @@ import java.util.Set;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
 
-public interface Ical4jRecurrenceHelper {
+public interface RecurrenceHelper {
 
 	Date isInIntervalDate(Event event, Date start, Date end, Set<Date> dateExce);
 

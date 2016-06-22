@@ -144,6 +144,7 @@ import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.exception.IllegalRecurrenceKindException;
 import org.obm.sync.services.AttendeeService;
+import org.obm.sync.utils.RecurrenceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,7 +173,7 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
 @Singleton
-public class Ical4jHelper implements Ical4jRecurrenceHelper {
+public class Ical4jHelper implements RecurrenceHelper {
 	
 	private static final String MAILTO = "mailto:";
 	private static final int MAX_FOLD_LENGTH = 74;

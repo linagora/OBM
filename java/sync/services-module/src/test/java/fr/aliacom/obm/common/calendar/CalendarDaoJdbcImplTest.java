@@ -64,7 +64,6 @@ import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.icalendar.Ical4jHelper;
-import org.obm.icalendar.Ical4jRecurrenceHelper;
 import org.obm.locator.store.LocatorService;
 import org.obm.push.utils.DateUtils;
 import org.obm.service.solr.SolrClientFactory;
@@ -87,6 +86,7 @@ import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.services.AttendeeService;
+import org.obm.sync.utils.RecurrenceHelper;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -131,7 +131,7 @@ public class CalendarDaoJdbcImplTest {
 			bindWithMock(SolrClientFactory.class);
 			bind(AttendeeService.class).to(SimpleAttendeeService.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
-			bind(Ical4jRecurrenceHelper.class).to(Ical4jHelper.class);
+			bind(RecurrenceHelper.class).to(Ical4jHelper.class);
 		}
 		
 		private <T> void bindWithMock(Class<T> cls) {
