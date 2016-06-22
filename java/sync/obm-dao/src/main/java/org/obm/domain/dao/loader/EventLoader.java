@@ -29,7 +29,7 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.calendar.loader;
+package org.obm.domain.dao.loader;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -43,6 +43,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.domain.dao.loader.filter.DeclinedAttendeeFilter;
+import org.obm.domain.dao.loader.filter.EventFilter;
+import org.obm.domain.dao.loader.filter.EventsByIdFilter;
 import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -56,12 +59,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import fr.aliacom.obm.common.calendar.EventUtils;
-import fr.aliacom.obm.common.calendar.loader.filter.DeclinedAttendeeFilter;
-import fr.aliacom.obm.common.calendar.loader.filter.EventFilter;
-import fr.aliacom.obm.common.calendar.loader.filter.EventsByIdFilter;
-import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 
 public class EventLoader {
 

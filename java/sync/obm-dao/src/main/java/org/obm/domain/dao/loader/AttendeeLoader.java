@@ -29,7 +29,7 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.calendar.loader;
+package org.obm.domain.dao.loader;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -55,8 +55,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-
-import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 
 public class AttendeeLoader {
 	

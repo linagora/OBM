@@ -29,7 +29,7 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.calendar.loader.filter;
+package org.obm.domain.dao.loader.filter;
 
 import java.util.Collection;
 import java.util.Map;

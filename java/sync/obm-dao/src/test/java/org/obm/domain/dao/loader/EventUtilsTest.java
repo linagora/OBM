@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.calendar;
+package org.obm.domain.dao.loader;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

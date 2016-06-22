@@ -29,33 +29,13 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.calendar.loader.filter;
+package org.obm.domain.dao.loader.filter;
 
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventObmId;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
-
-public class EventsByIdFilter implements EventFilter {
-	private Set<Integer> idsToFilter;
-
-	public EventsByIdFilter(Set<Integer> idsToFilter) {
-		this.idsToFilter = idsToFilter;
-	}
-
-	@Override
-	public Map<EventObmId, Event> filter(Map<EventObmId, Event> events) {
-		return Maps.filterEntries(events, new Predicate<Map.Entry<EventObmId, Event>>() {
-			@Override
-			public boolean apply(Entry<EventObmId, Event> input) {
-				return !idsToFilter.contains(input.getKey().getObmId());
-			}
-		});
-	}
-
+public interface EventFilter {
+	Map<EventObmId, Event> filter(Map<EventObmId, Event> events);
 }

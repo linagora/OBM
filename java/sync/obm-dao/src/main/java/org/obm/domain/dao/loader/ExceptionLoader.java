@@ -29,7 +29,7 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.calendar.loader;
+package org.obm.domain.dao.loader;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -47,8 +47,6 @@ import org.obm.utils.DBUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-
-import fr.aliacom.obm.utils.EventObmIdSQLCollectionHelper;
 
 public class ExceptionLoader {
 	public static class Builder {

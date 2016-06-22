@@ -29,7 +29,7 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.calendar.loader;
+package org.obm.domain.dao.loader;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
