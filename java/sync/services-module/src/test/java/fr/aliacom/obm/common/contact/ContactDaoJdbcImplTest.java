@@ -48,6 +48,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
+import org.obm.domain.dao.CalendarDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.service.solr.SolrHelper;
@@ -62,8 +63,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-
-import fr.aliacom.obm.common.calendar.CalendarDao;
 
 @GuiceModule(ContactDaoJdbcImplTest.Env.class)
 @RunWith(GuiceRunner.class)

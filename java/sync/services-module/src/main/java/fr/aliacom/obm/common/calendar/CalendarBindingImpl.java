@@ -54,9 +54,11 @@ import net.fortuna.ical4j.model.DateTime;
 
 import org.joda.time.Months;
 import org.obm.annotations.transactional.Transactional;
+import org.obm.domain.dao.CalendarDao;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.sync.NotAllowedException;
 import org.obm.sync.PermissionException;
 import org.obm.sync.Right;
@@ -110,7 +112,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.inject.Inject;
 
-import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;

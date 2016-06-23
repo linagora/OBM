@@ -47,6 +47,7 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.AddressBookDao;
+import org.obm.domain.dao.CalendarDao;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserDaoJdbcImpl;

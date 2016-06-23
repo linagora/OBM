@@ -31,10 +31,9 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.user;
 
+import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
-
-import fr.aliacom.obm.common.FindException;
 
 public interface UserService {
 

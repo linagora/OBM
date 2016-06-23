@@ -34,6 +34,7 @@ package fr.aliacom.obm.freebusy;
 import java.util.List;
 
 import org.obm.annotations.transactional.Transactional;
+import org.obm.domain.dao.CalendarDao;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.FreeBusy;
@@ -44,7 +45,6 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserService;
 

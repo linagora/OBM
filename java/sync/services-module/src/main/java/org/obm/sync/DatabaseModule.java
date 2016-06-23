@@ -33,6 +33,8 @@ package org.obm.sync;
 
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseDriversModule;
+import org.obm.domain.dao.CalendarDao;
+import org.obm.domain.dao.CalendarDaoJdbcImpl;
 import org.obm.domain.dao.CalendarDaoListener;
 import org.obm.service.calendar.CalendarDaoListenerImpl;
 
@@ -41,8 +43,6 @@ import com.google.inject.multibindings.Multibinder;
 
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.common.addition.CommitedOperationDaoJdbcImpl;
-import fr.aliacom.obm.common.calendar.CalendarDao;
-import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
 import fr.aliacom.obm.common.contact.ContactDao;
 import fr.aliacom.obm.common.contact.ContactDaoJdbcImpl;
 

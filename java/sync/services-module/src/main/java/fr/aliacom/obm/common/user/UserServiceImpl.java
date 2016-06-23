@@ -33,6 +33,7 @@ package fr.aliacom.obm.common.user;
 
 import org.apache.commons.lang.StringUtils;
 import org.obm.domain.dao.UserDao;
+import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.slf4j.Logger;
@@ -44,7 +45,6 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 

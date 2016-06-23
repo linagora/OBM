@@ -63,7 +63,9 @@ import org.apache.solr.common.SolrDocumentList;
 import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.configuration.ContactConfiguration;
+import org.obm.domain.dao.CalendarDao;
 import org.obm.locator.LocatorClientException;
+import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
@@ -110,8 +112,6 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.FindException;
-import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 /**

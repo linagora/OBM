@@ -34,6 +34,7 @@ package fr.aliacom.obm.common.calendar;
 import java.sql.SQLException;
 import java.text.ParseException;
 
+import org.obm.domain.dao.CalendarDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;

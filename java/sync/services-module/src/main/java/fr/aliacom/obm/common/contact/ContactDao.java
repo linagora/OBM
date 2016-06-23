@@ -41,6 +41,7 @@ import java.util.Set;
 
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.locator.LocatorClientException;
+import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
@@ -50,7 +51,6 @@ import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.exception.ContactNotFoundException;
 
-import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.ObmDomain;
 
 public interface ContactDao {

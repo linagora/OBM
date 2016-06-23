@@ -36,9 +36,9 @@ import static org.easymock.EasyMock.expect;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obm.domain.dao.UserDao;
+import org.obm.provisioning.dao.exceptions.FindException;
 
 import fr.aliacom.obm.ServicesToolBox;
-import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 

@@ -38,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.domain.dao.CalendarDao;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Comment;
 import org.obm.sync.calendar.Event;

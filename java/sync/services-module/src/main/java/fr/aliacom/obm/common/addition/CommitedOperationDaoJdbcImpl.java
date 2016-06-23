@@ -37,6 +37,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.obm.domain.dao.CalendarDao;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
@@ -53,7 +54,6 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.calendar.CalendarDao;
 import fr.aliacom.obm.common.contact.ContactDao;
 
 /**

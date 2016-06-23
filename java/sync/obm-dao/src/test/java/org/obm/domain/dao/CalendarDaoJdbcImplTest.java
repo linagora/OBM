@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.calendar;
+package org.obm.domain.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyBoolean;
@@ -60,8 +60,6 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.domain.dao.CalendarDaoListener;
-import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.icalendar.Ical4jHelper;
@@ -121,9 +119,9 @@ public class CalendarDaoJdbcImplTest {
 			
 			bindWithMock(UserDao.class);
 			bindWithMock(CalendarDao.class);
-			bindWithMock(CalendarDaoListener.class);
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(DateProvider.class);
+			bindWithMock(CalendarDaoListener.class);
 			bind(AttendeeService.class).to(SimpleAttendeeService.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 			bind(RecurrenceHelper.class).to(Ical4jHelper.class);
@@ -314,6 +312,7 @@ public class CalendarDaoJdbcImplTest {
 		
 		calendarDaoListener.eventHasBeenCreated(token, event);
 		expectLastCall();
+		
 		expect(dbcp.getConnection())
 			.andReturn(connection).once();
 		

@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common;
+package org.obm.provisioning.dao.exceptions;
 
 public class FindException extends Exception {
 

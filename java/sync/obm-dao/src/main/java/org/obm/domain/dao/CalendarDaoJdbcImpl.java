@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.calendar;
+package org.obm.domain.dao;
 
 import static org.apache.commons.lang.StringUtils.startsWithIgnoreCase;
 
@@ -55,12 +55,11 @@ import java.util.TimeZone;
 
 import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
-import org.obm.domain.dao.CalendarDaoListener;
-import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.loader.AttendeeLoader;
 import org.obm.domain.dao.loader.EventLoader;
 import org.obm.domain.dao.loader.EventUtils;
 import org.obm.domain.dao.loader.ResourceLoader;
+import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.push.utils.DateUtils;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.push.utils.jdbc.AbstractSQLCollectionHelper;
@@ -121,7 +120,6 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.FindException;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 
