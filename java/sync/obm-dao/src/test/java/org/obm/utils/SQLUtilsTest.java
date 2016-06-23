@@ -1,4 +1,4 @@
-package fr.aliacom.obm.common;
+package org.obm.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.junit.Test;
+
+import org.obm.utils.SQLUtils;
 
 public class SQLUtilsTest {
 

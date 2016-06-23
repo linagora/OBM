@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common;
+package org.obm.utils;
 
 import java.util.Collection;
 import java.util.Collections;

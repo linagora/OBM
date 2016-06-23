@@ -100,9 +100,11 @@ import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.utils.DisplayNameUtils;
+import org.obm.sync.utils.RFC2445;
 import org.obm.sync.utils.RecurrenceHelper;
 import org.obm.utils.LinkedEntity;
 import org.obm.utils.ObmHelper;
+import org.obm.utils.SQLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,10 +125,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.FindException;
-import fr.aliacom.obm.common.SQLUtils;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.utils.RFC2445;
 
 /**
  * Calendar data access functions

@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.utils;
+package org.obm.sync.utils;
 
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.Participation;
