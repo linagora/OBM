@@ -60,15 +60,12 @@ import org.junit.runner.RunWith;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.domain.dao.CalendarDaoListener;
 import org.obm.domain.dao.UserDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.icalendar.Ical4jHelper;
-import org.obm.locator.store.LocatorService;
 import org.obm.push.utils.DateUtils;
-import org.obm.service.solr.SolrClientFactory;
-import org.obm.service.solr.SolrManager;
-import org.obm.service.solr.jms.EventUpdateCommand;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -97,8 +94,8 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserIdentity;
+import fr.aliacom.obm.common.user.UserLogin;
 
 @GuiceModule(CalendarDaoJdbcImplTest.Env.class)
 @RunWith(GuiceRunner.class)
@@ -123,12 +120,10 @@ public class CalendarDaoJdbcImplTest {
 			bind(IMocksControl.class).toInstance(mocksControl);
 			
 			bindWithMock(UserDao.class);
-			bindWithMock(LocatorService.class);
 			bindWithMock(CalendarDao.class);
+			bindWithMock(CalendarDaoListener.class);
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(DateProvider.class);
-			bindWithMock(SolrManager.class);
-			bindWithMock(SolrClientFactory.class);
 			bind(AttendeeService.class).to(SimpleAttendeeService.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 			bind(RecurrenceHelper.class).to(Ical4jHelper.class);
@@ -148,7 +143,7 @@ public class CalendarDaoJdbcImplTest {
 	@Inject
 	private DatabaseConnectionProvider dbcp;
 	@Inject
-	private SolrManager solrManager;
+	private CalendarDaoListener calendarDaoListener;
 	
 	@Test
 	public void touchParentOfDeclinedRecurrentEventsMustNotIncludeDuplicatesWhenExDatesDiffer() {
@@ -316,8 +311,9 @@ public class CalendarDaoJdbcImplTest {
 		Connection connection = mocksControl.createMock(Connection.class);
 		PreparedStatement ps = mocksControl.createMock(PreparedStatement.class);
 		AccessToken token = ToolBox.mockAccessToken(user.getLogin(), user.getDomain(), mocksControl);
-		expect(solrManager.isSolrAvailable()).andReturn(true);
-		solrManager.process(anyObject(EventUpdateCommand.class));
+		
+		calendarDaoListener.eventHasBeenCreated(token, event);
+		expectLastCall();
 		expect(dbcp.getConnection())
 			.andReturn(connection).once();
 		

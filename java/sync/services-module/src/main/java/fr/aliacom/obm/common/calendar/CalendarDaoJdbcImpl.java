@@ -55,6 +55,7 @@ import java.util.TimeZone;
 
 import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
+import org.obm.domain.dao.CalendarDaoListener;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.loader.AttendeeLoader;
 import org.obm.domain.dao.loader.EventLoader;
@@ -67,8 +68,6 @@ import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
 import org.obm.push.utils.jdbc.WildcardStringSQLCollectionHelper;
-import org.obm.service.solr.SolrHelper;
-import org.obm.service.solr.SolrHelper.Factory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
@@ -223,18 +222,17 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	private final UserDao userDao;
 	private final ObmHelper obmHelper;
-
 	private final RecurrenceHelper recurrenceHelper;
-
-	private final Factory solrHelperFactory;
+	private final CalendarDaoListener calendarDaoListener;
 
 
 	@Inject
-	@VisibleForTesting CalendarDaoJdbcImpl(UserDao userDao, SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper, RecurrenceHelper recurrenceHelper) {
+	@VisibleForTesting CalendarDaoJdbcImpl(UserDao userDao, ObmHelper obmHelper, 
+			RecurrenceHelper recurrenceHelper, CalendarDaoListener calendarDaoListener) {
 		this.userDao = userDao;
-		this.solrHelperFactory = solrHelperFactory;
 		this.obmHelper = obmHelper;
 		this.recurrenceHelper = recurrenceHelper;
+		this.calendarDaoListener = calendarDaoListener;
 	}
 	
 	private Integer catIdFromString(Connection con, String category,
@@ -341,17 +339,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			insertEventAlert(con, editor, ownerId, ev);
 		}
 
-		indexEvent(editor, ev);	
+		calendarDaoListener.eventHasBeenCreated(editor, ev);
 
 		return ev;
-	}
-
-	private void indexEvent(AccessToken editor, Event ev) {
-		try {
-			solrHelperFactory.createClient(editor).createOrUpdate(ev);
-		} catch (Throwable t) {
-			logger.error("indexing error " + t.getMessage(), t);
-		}
 	}
 
 	private List<Event> insertEventExceptions(AccessToken editor, String calendar,
@@ -1833,7 +1823,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(null, ps, null);
 		}
 		
-		indexEvent(editor, ev);
+		calendarDaoListener.eventHasBeenCreated(editor, ev);
 	}
 
 	private void insertDeletedEventLinks(AccessToken editor, Connection con, List<Attendee> attendeetoRemove, Event ev)
@@ -2144,17 +2134,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		insertIntoDeletedEvent(con, token, event, eventType, attendeeIds);
 		removeFromEvent(con, event);
-		removeEventFromSolr(token, event);
+		calendarDaoListener.eventHasBeenRemoved(token, event);
 
 		return event;
-	}
-
-	private void removeEventFromSolr(AccessToken token, Event ev) {
-		try {
-			solrHelperFactory.createClient(token).delete(ev);
-		} catch (Throwable t) {
-			logger.error("indexing error " + t.getMessage(), t);
-		}
 	}
 
 	@VisibleForTesting void insertAttendees(AccessToken editor, Event ev, Connection con,

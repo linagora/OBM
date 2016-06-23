@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2016 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,35 +29,54 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.service.calendar;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.dbcp.DatabaseDriversModule;
 import org.obm.domain.dao.CalendarDaoListener;
-import org.obm.service.calendar.CalendarDaoListenerImpl;
+import org.obm.service.solr.SolrHelper;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.calendar.Event;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.addition.CommitedOperationDao;
-import fr.aliacom.obm.common.addition.CommitedOperationDaoJdbcImpl;
-import fr.aliacom.obm.common.calendar.CalendarDao;
-import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
-import fr.aliacom.obm.common.contact.ContactDao;
-import fr.aliacom.obm.common.contact.ContactDaoJdbcImpl;
+@Singleton
+public class CalendarDaoListenerImpl implements CalendarDaoListener {
 
-public class DatabaseModule extends AbstractModule {
+	private static final Logger logger = LoggerFactory.getLogger(CalendarDaoListener.class);
+	
+	private final SolrHelper.Factory solrHelperFactory;
+
+	@Inject
+	public CalendarDaoListenerImpl(SolrHelper.Factory solrHelperFactory) {
+		this.solrHelperFactory = solrHelperFactory;
+	}
+	
+	@Override
+	public void eventHasBeenCreated(AccessToken editor, Event event) {
+		indexEvent(editor, event);
+	}
 
 	@Override
-	protected void configure() {
-		install(new DatabaseDriversModule());
-		bind(DatabaseConnectionProvider.class).to(RequestScopedDatabaseConnectionProvider.class);
-		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		lifecycleListeners.addBinding().to(RequestScopedDatabaseConnectionProvider.class);
-		
-		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-		bind(CalendarDaoListener.class).to(CalendarDaoListenerImpl.class);
-		bind(ContactDao.class).to(ContactDaoJdbcImpl.class);
-		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
+	public void eventHasBeenRemoved(AccessToken editor, Event event) {
+		removeEventFromSolr(editor, event);
 	}
+
+	private void indexEvent(AccessToken editor, Event ev) {
+		try {
+			solrHelperFactory.createClient(editor).createOrUpdate(ev);
+		} catch (Throwable t) {
+			logger.error("indexing error " + t.getMessage(), t);
+		}
+	}
+
+	private void removeEventFromSolr(AccessToken token, Event ev) {
+		try {
+			solrHelperFactory.createClient(token).delete(ev);
+		} catch (Throwable t) {
+			logger.error("indexing error " + t.getMessage(), t);
+		}
+	}
+
 }

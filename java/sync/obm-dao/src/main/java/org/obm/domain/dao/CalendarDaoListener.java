@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2016 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,35 +29,14 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.domain.dao;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.dbcp.DatabaseDriversModule;
-import org.obm.domain.dao.CalendarDaoListener;
-import org.obm.service.calendar.CalendarDaoListenerImpl;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.calendar.Event;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+public interface CalendarDaoListener {
+	
+	void eventHasBeenCreated(AccessToken editor, Event event);
+	void eventHasBeenRemoved(AccessToken editor, Event event);
 
-import fr.aliacom.obm.common.addition.CommitedOperationDao;
-import fr.aliacom.obm.common.addition.CommitedOperationDaoJdbcImpl;
-import fr.aliacom.obm.common.calendar.CalendarDao;
-import fr.aliacom.obm.common.calendar.CalendarDaoJdbcImpl;
-import fr.aliacom.obm.common.contact.ContactDao;
-import fr.aliacom.obm.common.contact.ContactDaoJdbcImpl;
-
-public class DatabaseModule extends AbstractModule {
-
-	@Override
-	protected void configure() {
-		install(new DatabaseDriversModule());
-		bind(DatabaseConnectionProvider.class).to(RequestScopedDatabaseConnectionProvider.class);
-		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		lifecycleListeners.addBinding().to(RequestScopedDatabaseConnectionProvider.class);
-		
-		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-		bind(CalendarDaoListener.class).to(CalendarDaoListenerImpl.class);
-		bind(ContactDao.class).to(ContactDaoJdbcImpl.class);
-		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
-	}
 }
