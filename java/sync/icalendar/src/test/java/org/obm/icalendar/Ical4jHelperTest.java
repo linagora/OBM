@@ -2197,4 +2197,19 @@ public class Ical4jHelperTest {
 
 		assertIcsEquals("OBMFULL-6433/replyWithTimeZone.ics", ical4jHelper.buildIcsInvitationReply(event, getDefaultObmUser(), new AccessToken(0, "Origin")));
 	}
+	
+	@Test
+	public void testTimestampFromDateStringWhenValidDate() throws Exception {
+		assertThat(ical4jHelper.timestampFromDateString("19960120T120000Z").getTime()).isEqualTo(822139200000L);
+	}
+	
+	@Test
+	public void testTimestampFromDateStringWhenValidDateTime() throws Exception {
+		assertThat(ical4jHelper.timestampFromDateString("19960120").getTime()).isEqualTo(822096000000L);
+	}
+	
+	@Test(expected=ParseException.class)
+	public void testTimestampFromDateStringWhenInvalidDate() throws Exception {
+		ical4jHelper.timestampFromDateString("199601E20T120000");
+	}
 }

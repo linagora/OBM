@@ -53,8 +53,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 
-import net.fortuna.ical4j.model.DateTime;
-
 import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.domain.dao.UserDao;
@@ -2433,9 +2431,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			con = obmHelper.getConnection();
 			evps = con.prepareStatement(ev);
 			evps.setString(1, extId.getExtId());
-			
-			Date recId = new DateTime(recurrenceId.getRecurrenceId());
-			evps.setTimestamp(2, new Timestamp(recId.getTime()));
+			evps.setTimestamp(2, recurrenceHelper.timestampFromDateString(recurrenceId.getRecurrenceId()));
 			evps.setString(3, calendar.getLogin());
 
 			evrs = evps.executeQuery();
@@ -2788,8 +2784,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			ps.setInt(idx++, loggedUserId);
 			ps.setString(idx++, participation.getSerializedCommentToString());
 			ps.setString(idx++, extId.getExtId());
-			Date recId = new DateTime(recurrenceId.getRecurrenceId());
-			ps.setTimestamp(idx++, new Timestamp(recId.getTime()));
+			ps.setTimestamp(idx++, recurrenceHelper.timestampFromDateString(recurrenceId.getRecurrenceId()));
 			ps.setInt(idx++, calendarOwner.getUid());
 			ps.execute();
 			if (ps.getUpdateCount() > 0) {

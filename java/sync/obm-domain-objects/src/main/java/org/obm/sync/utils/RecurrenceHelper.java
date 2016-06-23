@@ -31,6 +31,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.utils;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -46,4 +48,5 @@ public interface RecurrenceHelper {
 
 	List<Date> dateInInterval(EventRecurrence recurrence, Date eventDate, Date start, Date end, Set<Date> dateExce);
 
+	Timestamp timestampFromDateString(String dateAsString) throws ParseException;
 }

@@ -37,6 +37,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URISyntaxException;
 import java.security.InvalidParameterException;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1809,5 +1811,10 @@ public class Ical4jHelper implements RecurrenceHelper {
 
 	@VisibleForTesting DtStart getDtStart(Date start) {
 		return new DtStart(new DateTime(start), true);
+	}
+	
+	@Override
+	public Timestamp timestampFromDateString(String dateAsString) throws ParseException {
+		return new Timestamp(new DateTime(dateAsString).getTime());
 	}
 }
