@@ -34,9 +34,9 @@ package org.obm.provisioning.group;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.batchUrl;
-import static org.obm.provisioning.ProvisioningIntegrationTestUtils.domainUrl;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.getAdminUserJson;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.groupUrl;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.startBatch;
 
 import java.net.URL;
 
@@ -452,7 +452,7 @@ public class GroupIntegrationTest {
 	@Test
 	public void testCreateGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		String batchId = getBatchId(baseURL, obmDomainUuid);
+		String batchId = startBatch(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		String body = "{" +
@@ -497,7 +497,7 @@ public class GroupIntegrationTest {
 	@Test
 	public void testModifyGroupByPutMethod() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		String batchId = getBatchId(baseURL, obmDomainUuid);
+		String batchId = startBatch(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		String body = "{" +
@@ -550,7 +550,7 @@ public class GroupIntegrationTest {
 	@Test
 	public void testModifyGroupByPatchMethod() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		String batchId = getBatchId(baseURL, obmDomainUuid);
+		String batchId = startBatch(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		String body = "{" + "\"description\":\"Patched AdminExtId group\"" + "}";
@@ -589,7 +589,7 @@ public class GroupIntegrationTest {
 	@Test
 	public void testDeleteGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		String batchId = getBatchId(baseURL, obmDomainUuid);
+		String batchId = startBatch(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		given()
@@ -624,7 +624,7 @@ public class GroupIntegrationTest {
 	@Test
 	public void testAddUserToGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		String batchId = getBatchId(baseURL, obmDomainUuid);
+		String batchId = startBatch(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		given()
@@ -659,7 +659,7 @@ public class GroupIntegrationTest {
 	@Test
 	public void testDeleteUserFromGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		String batchId = getBatchId(baseURL, obmDomainUuid);
+		String batchId = startBatch(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		given()
@@ -694,7 +694,7 @@ public class GroupIntegrationTest {
 	@Test
 	public void testAddSubgroupToGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		String batchId = getBatchId(baseURL, obmDomainUuid);
+		String batchId = startBatch(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		given()
@@ -729,7 +729,7 @@ public class GroupIntegrationTest {
 	@Test
 	public void testDeleteSubgroupFromGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
-		String batchId = getBatchId(baseURL, obmDomainUuid);
+		String batchId = startBatch(baseURL, obmDomainUuid);
 		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		given()
@@ -803,15 +803,5 @@ public class GroupIntegrationTest {
 				"]")).
 		when()
 			.get("/");
-	}
-
-	private static String getBatchId(URL baseURL, ObmDomainUuid obmDomainUuid) {
-		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
-
-		  String batchId =  given()
-				.auth().basic("admin0@global.virt", "admin0")
-			.post("/batches").jsonPath().getString("id");
-
-		return batchId;
 	}
 }

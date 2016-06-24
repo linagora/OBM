@@ -31,7 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
+import static com.jayway.restassured.RestAssured.given;
+
 import java.net.URL;
+
+import com.jayway.restassured.RestAssured;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
@@ -61,6 +65,16 @@ public class ProvisioningIntegrationTestUtils {
 				+ "\"samba_allowed\":false,\"samba_home_drive\":null,\"samba_home_folder\":null,\"samba_logon_script\":null}";
 	}
 
+	public static String startBatch(URL baseURL, ObmDomainUuid obmDomainUuid) {
+		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
+
+		return given()
+				.auth().basic("admin0@global.virt", "admin0")
+				.post("/batches")
+				.jsonPath()
+				.getString("id");
+	}
+	
 	public static String groupUrl(URL baseURL, ObmDomainUuid domain) {
 		return domainUrl(baseURL, domain) + "/groups/";
 	}
