@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+import org.obm.service.domain.DomainService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Credentials;
@@ -59,7 +60,6 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.ObmSyncVersion;
 import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
-import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserPassword;

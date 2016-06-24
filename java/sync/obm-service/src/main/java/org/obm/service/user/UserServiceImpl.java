@@ -29,11 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.user;
+package org.obm.service.user;
 
 import org.apache.commons.lang.StringUtils;
 import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.dao.exceptions.FindException;
+import org.obm.service.domain.DomainService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.slf4j.Logger;
@@ -45,8 +46,8 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
 
 @Singleton
 public class UserServiceImpl implements UserService {

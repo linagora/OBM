@@ -36,6 +36,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.obm.service.domain.DomainService;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.server.auth.IAuthentificationService;
@@ -45,7 +46,6 @@ import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.ldap.UnixCrypt;

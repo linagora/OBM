@@ -56,7 +56,9 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.ProfileDao;
+import org.obm.service.domain.DomainService;
 import org.obm.service.solr.SolrHelper;
+import org.obm.service.user.UserService;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
@@ -76,14 +78,12 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.contact.ContactDao;
 import fr.aliacom.obm.common.contact.ContactDaoJdbcImpl;
-import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.resource.Resource;
 import fr.aliacom.obm.common.resource.ResourceDao;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserLogin;
-import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.utils.HelperService;
 
 @GuiceModule(AttendeeServiceJdbcImplTest.Env.class)

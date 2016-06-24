@@ -227,8 +227,8 @@ public abstract class EventChangeMailerTest {
 		attendeeService = new SimpleAttendeeService();
 		ical4jHelper = new Ical4jHelper(dateProvider, null, attendeeService);
 		accessToken = new AccessToken(1, "unitTest");
-		accessToken.setDomain(ServicesToolBox.getDefaultObmDomain());
-		obmUser = ServicesToolBox.getDefaultObmUser();
+		accessToken.setDomain(ToolBox.getDefaultObmDomain());
+		obmUser = ToolBox.getDefaultObmUser();
 		smtpConf = control.createMock(ObmSmtpConf.class);
 		expect(smtpConf.getServerAddr(anyObject(String.class))).andReturn("1.2.3.4").anyTimes();
 		expect(smtpConf.getServerPort(anyObject(String.class))).andReturn(234).anyTimes();
@@ -490,7 +490,7 @@ public abstract class EventChangeMailerTest {
 
 		eventChangeMailer.notifyUpdateParticipation(
 				event, event.findOrganizer(),
-				ServicesToolBox.getSpecificObmUserFrom("mbaechler@linagora.com", "Matthieu", "BAECHLER"),
+				ToolBox.getSpecificObmUserFrom("mbaechler@linagora.com", "Matthieu", "BAECHLER"),
 				updatedAttendeeStatus, getLocale(),
 				TIMEZONE, ics, accessToken);
 		
@@ -526,7 +526,7 @@ public abstract class EventChangeMailerTest {
 		
 		String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), event, accessToken);
 		eventChangeMailer.notifyRemovedUsers(
-				ServicesToolBox.getDefaultObmUser(), event.getAttendees(),
+				ToolBox.getDefaultObmUser(), event.getAttendees(),
 				event, getLocale(),
 				TIMEZONE, ics,
 				accessToken);
@@ -557,7 +557,7 @@ public abstract class EventChangeMailerTest {
 		
 		String ics = ical4jHelper.buildIcsInvitationCancel(ServicesToolBox.getIcal4jUser(), recurrentEvent, accessToken);
 		eventChangeMailer.notifyRemovedUsers(
-				ServicesToolBox.getDefaultObmUser(), recurrentEvent.getAttendees(),
+				ToolBox.getDefaultObmUser(), recurrentEvent.getAttendees(),
 				recurrentEvent, getLocale(),
 				TIMEZONE, ics,
 				accessToken);
@@ -588,7 +588,7 @@ public abstract class EventChangeMailerTest {
 		
 		String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), event, accessToken);
 		eventChangeMailer.notifyNeedActionNewUsers(
-				ServicesToolBox.getDefaultObmUser(),event.getAttendees(),
+				ToolBox.getDefaultObmUser(),event.getAttendees(),
 				event, getLocale(),
 				TIMEZONE, ics,
 				accessToken);
@@ -619,7 +619,7 @@ public abstract class EventChangeMailerTest {
 		
 		String ics  = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), recurrentEvent, accessToken);
 		eventChangeMailer.notifyNeedActionNewUsers(
-				ServicesToolBox.getDefaultObmUser(), recurrentEvent.getAttendees(),
+				ToolBox.getDefaultObmUser(), recurrentEvent.getAttendees(),
 				recurrentEvent, getLocale(),
 				TIMEZONE, ics,
 				accessToken);
@@ -659,7 +659,7 @@ public abstract class EventChangeMailerTest {
 		
 		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
 		eventChangeMailer.notifyNeedActionUpdateUsers(
-				ServicesToolBox.getDefaultObmUser(), before.getAttendees(),
+				ToolBox.getDefaultObmUser(), before.getAttendees(),
 				before, after,
 				getLocale(), TIMEZONE,
 				ics, accessToken);
@@ -704,7 +704,7 @@ public abstract class EventChangeMailerTest {
 		
 		String ics = ical4jHelper.buildIcsInvitationRequest(ServicesToolBox.getIcal4jUser(), after, accessToken);
 		eventChangeMailer.notifyNeedActionUpdateUsers(
-				ServicesToolBox.getDefaultObmUser(), before.getAttendees(),
+				ToolBox.getDefaultObmUser(), before.getAttendees(),
 				before, after,
 				getLocale(), TIMEZONE,
 				ics, accessToken);
@@ -747,7 +747,7 @@ public abstract class EventChangeMailerTest {
 		}
 		
 		eventChangeMailer.notifyAcceptedUpdateUsers(
-				ServicesToolBox.getDefaultObmUser(), before.getAttendees(),
+				ToolBox.getDefaultObmUser(), before.getAttendees(),
 				before, after,
 				getLocale(), TIMEZONE,
 				"", accessToken);
@@ -783,7 +783,7 @@ public abstract class EventChangeMailerTest {
 		}
 		
 		eventChangeMailer.notifyAcceptedUpdateUsers(
-				ServicesToolBox.getDefaultObmUser(), before.getAttendees(),
+				ToolBox.getDefaultObmUser(), before.getAttendees(),
 				before, after,
 				getLocale(), TIMEZONE,
 				"", accessToken);

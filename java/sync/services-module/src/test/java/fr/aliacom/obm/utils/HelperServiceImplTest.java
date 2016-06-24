@@ -55,6 +55,9 @@ import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.GroupDaoJdbcImpl;
 import org.obm.provisioning.dao.ProfileDao;
 import org.obm.provisioning.dao.ProfileDaoJdbcImpl;
+import org.obm.service.domain.DomainService;
+import org.obm.service.user.UserService;
+import org.obm.service.user.UserServiceImpl;
 import org.obm.sync.Right;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
@@ -65,10 +68,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
-import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.user.UserService;
-import fr.aliacom.obm.common.user.UserServiceImpl;
 
 @GuiceModule(HelperServiceImplTest.Env.class)
 @RunWith(GuiceRunner.class)

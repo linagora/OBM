@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.user;
+package org.obm.service.user;
 
 import static org.easymock.EasyMock.expect;
 
@@ -37,10 +37,11 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.dao.exceptions.FindException;
+import org.obm.service.domain.DomainService;
 
-import fr.aliacom.obm.ServicesToolBox;
-import fr.aliacom.obm.common.domain.DomainService;
+import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
+import fr.aliacom.obm.common.user.ObmUser;
 
 
 public class UserServiceImplTest {
@@ -94,7 +95,7 @@ public class UserServiceImplTest {
 		String userEmail = "User@domain";
 		String domainName = "domain";
 		ObmDomain obmDomain = ObmDomain.builder().name(domainName).build();
-		ObmUser obmUser = ServicesToolBox.getSpecificObmUserFrom(userEmail, "firstname", "lastname");
+		ObmUser obmUser = ToolBox.getSpecificObmUserFrom(userEmail, "firstname", "lastname");
 
 		DomainService domainService = EasyMock.createMock(DomainService.class);
 		expect(domainService.findDomainByName(domainName)).andReturn(obmDomain).once();

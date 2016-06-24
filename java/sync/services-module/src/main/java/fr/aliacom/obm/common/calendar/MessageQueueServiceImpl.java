@@ -34,6 +34,7 @@ package fr.aliacom.obm.common.calendar;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.service.user.UserService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
@@ -43,7 +44,6 @@ import com.google.inject.Singleton;
 import com.linagora.obm.sync.Producer;
 
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserService;
 
 @Singleton
 public class MessageQueueServiceImpl implements MessageQueueService {

@@ -30,6 +30,7 @@
 
 package fr.aliacom.obm.common.calendar;
 
+import org.obm.service.user.UserService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Anonymizable;
 
@@ -37,7 +38,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.HelperService;
 

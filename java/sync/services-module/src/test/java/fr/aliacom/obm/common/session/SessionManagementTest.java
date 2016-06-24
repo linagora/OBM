@@ -43,6 +43,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.obm.domain.dao.UserDao;
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+import org.obm.service.domain.DomainService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.Login;
@@ -54,7 +55,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import fr.aliacom.obm.ToolBox;
-import fr.aliacom.obm.common.domain.DomainService;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;

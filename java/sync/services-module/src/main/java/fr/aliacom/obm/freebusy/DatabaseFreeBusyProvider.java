@@ -36,6 +36,7 @@ import java.util.List;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.domain.dao.CalendarDao;
 import org.obm.icalendar.Ical4jHelper;
+import org.obm.service.user.UserService;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyRequest;
@@ -46,7 +47,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserService;
 
 /**
  * Retrieves freebusy data from the local database.

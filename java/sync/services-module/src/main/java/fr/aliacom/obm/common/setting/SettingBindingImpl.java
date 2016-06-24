@@ -34,6 +34,7 @@ package fr.aliacom.obm.common.setting;
 import java.util.Map;
 
 import org.obm.annotations.transactional.Transactional;
+import org.obm.service.user.UserService;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.services.ISetting;
@@ -46,7 +47,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserService;
 
 @Singleton
 public class SettingBindingImpl implements ISetting {

@@ -39,6 +39,7 @@ import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.obm.service.user.UserService;
 import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -51,7 +52,6 @@ import org.obm.sync.server.XmlResponder;
 import com.google.common.collect.ImmutableMap;
 
 import fr.aliacom.obm.common.setting.SettingsService;
-import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class SimpleLoginHandlerTest {

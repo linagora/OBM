@@ -15,6 +15,7 @@ import org.obm.domain.dao.CalendarDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.icalendar.Ical4jHelper;
+import org.obm.service.user.UserService;
 import org.obm.sync.calendar.FreeBusy;
 import org.obm.sync.calendar.FreeBusyInterval;
 import org.obm.sync.calendar.FreeBusyRequest;
@@ -28,7 +29,6 @@ import com.google.inject.Inject;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserLogin;
-import fr.aliacom.obm.common.user.UserService;
 
 @GuiceModule(DatabaseFreeBusyProviderTest.Env.class)
 @RunWith(GuiceRunner.class)

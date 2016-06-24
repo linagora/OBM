@@ -144,13 +144,26 @@ public class ToolBox {
 			.login(UserLogin.valueOf("user"))
 			.domain(getDefaultObmDomain())
 			.emails(UserEmails.builder()
-					.addAddress("user@test")
-					.domain(getDefaultObmDomain())
-					.build())
+				.addAddress("user@test")
+				.domain(getDefaultObmDomain())
+				.build())
 			.identity(UserIdentity.builder()
 				.firstName("Obm")
 				.lastName("User")
 				.build());
+	}
+
+	public static ObmUser getSpecificObmUserFrom(String email, String firstName, String lastName) {
+		return buildCommonObmUser()
+				.emails(UserEmails.builder()
+					.addresses(Arrays.asList(email))
+					.domain(getDefaultObmDomain())
+					.build())
+				.identity(UserIdentity.builder()
+					.firstName(firstName)
+					.lastName(lastName)
+					.build())
+				.build();
 	}
 
 	public static Attendee getFakeAttendee(String userEmail) {

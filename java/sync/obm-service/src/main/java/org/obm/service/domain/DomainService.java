@@ -29,19 +29,12 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.user;
+package org.obm.service.domain;
 
-import org.obm.provisioning.dao.exceptions.FindException;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.calendar.Attendee;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-public interface UserService {
+public interface DomainService {
 
-	ObmUser getUserFromAccessToken(AccessToken token);
-	ObmUser getUserFromLogin(String login, String domainName);
-	ObmUser getUserFromCalendar(String calendar, String domainName) throws FindException;
-	ObmUser getUserFromAttendee(Attendee organizer, String domainName);
-	ObmUser getUserFromEmail(String email);
-	String getLoginFromEmail(String email);
-	String getDomainNameFromEmail(String email);
+	ObmDomain findDomainByName(String domainName);
+
 }

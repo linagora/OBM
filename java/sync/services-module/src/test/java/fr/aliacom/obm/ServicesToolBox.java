@@ -36,62 +36,15 @@ import java.util.TimeZone;
 
 import org.easymock.EasyMock;
 import org.obm.icalendar.Ical4jUser;
-import org.obm.sync.dao.EntityId;
 
 import com.linagora.obm.sync.Producer;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.domain.ObmDomainUuid;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
-import fr.aliacom.obm.common.user.UserEmails;
-import fr.aliacom.obm.common.user.UserLogin;
-import fr.aliacom.obm.common.user.UserIdentity;
 import fr.aliacom.obm.common.user.UserSettings;
 
 public class ServicesToolBox {
-
-	public static ObmDomain getDefaultObmDomain() {
-		return ObmDomain
-				.builder()
-				.name("test.tlse.lng")
-				.uuid(ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6"))
-				.build();
-	}
-
-	public static ObmUser getDefaultObmUser(){
-		return ObmUser.builder()
-			.uid(1)
-			.entityId(EntityId.valueOf(2))
-			.login(UserLogin.valueOf("user"))
-			.domain(getDefaultObmDomain())
-			.emails(UserEmails.builder()
-				.addAddress("user@test")
-				.domain(getDefaultObmDomain())
-				.build())
-			.identity(UserIdentity.builder()
-				.firstName("Obm")
-				.lastName("User")
-				.build())
-			.build();
-	}
-
-	public static ObmUser getSpecificObmUserFrom(String email, String firstName, String lastName) {
-		return ObmUser.builder()
-			.uid(1)
-			.entityId(EntityId.valueOf(2))
-			.login(UserLogin.valueOf("user"))
-			.domain(getDefaultObmDomain())
-			.emails(UserEmails.builder()
-				.addAddress(email)
-				.domain(getDefaultObmDomain())
-				.build())
-			.identity(UserIdentity.builder()
-				.firstName(firstName)
-				.lastName(lastName)
-				.build())
-			.build();
-	}
 
 	public static Ical4jUser getIcal4jUser() {
 		ObmUser obmUser = ToolBox.getDefaultObmUser();
@@ -104,7 +57,7 @@ public class ServicesToolBox {
 	}
 
 	public static Ical4jUser getIcal4jUserFrom(String email) {
-		ObmDomain obmDomain = getDefaultObmDomain();
+		ObmDomain obmDomain = ToolBox.getDefaultObmDomain();
 		return Ical4jUser.Factory.create().createIcal4jUser(email, obmDomain);
 	}
 

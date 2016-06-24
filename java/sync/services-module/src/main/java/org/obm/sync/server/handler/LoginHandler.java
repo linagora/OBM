@@ -34,6 +34,7 @@ package org.obm.sync.server.handler;
 import java.util.Map;
 
 import org.obm.provisioning.dao.exceptions.DomainNotFoundException;
+import org.obm.service.user.UserService;
 import org.obm.sync.ServerCapability;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -52,7 +53,6 @@ import fr.aliacom.obm.common.ObmSyncVersionNotFoundException;
 import fr.aliacom.obm.common.setting.SettingsService;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserPassword;
-import fr.aliacom.obm.common.user.UserService;
 import fr.aliacom.obm.common.user.UserSettings;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 

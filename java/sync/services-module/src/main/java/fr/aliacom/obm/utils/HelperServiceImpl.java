@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.service.user.UserService;
 import org.obm.sync.Right;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
@@ -64,7 +65,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.user.UserPassword;
-import fr.aliacom.obm.common.user.UserService;
 
 @Singleton
 public class HelperServiceImpl implements HelperService {
