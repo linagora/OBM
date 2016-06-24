@@ -40,6 +40,7 @@ import org.obm.configuration.module.LoggerModule;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
+import org.obm.service.attendee.AttendeeServiceJdbcImpl;
 import org.obm.service.domain.DomainCache;
 import org.obm.service.domain.DomainService;
 import org.obm.service.user.UserService;
@@ -59,7 +60,6 @@ import com.google.inject.name.Names;
 
 import fr.aliacom.obm.common.calendar.AnonymizerService;
 import fr.aliacom.obm.common.calendar.AnonymizerServiceImpl;
-import fr.aliacom.obm.common.calendar.AttendeeServiceJdbcImpl;
 import fr.aliacom.obm.common.calendar.CalendarBindingImpl;
 import fr.aliacom.obm.common.calendar.EventNotificationService;
 import fr.aliacom.obm.common.calendar.EventNotificationServiceImpl;

@@ -29,13 +29,10 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.contact;
+package org.obm.sync.book;
 
 import java.util.List;
 import java.util.Set;
-
-import org.obm.sync.book.Contact;
-import org.obm.sync.book.DeletedContact;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

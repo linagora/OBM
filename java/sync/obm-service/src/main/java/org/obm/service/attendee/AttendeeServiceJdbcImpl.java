@@ -27,8 +27,10 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.calendar;
+package org.obm.service.attendee;
 
+import org.obm.domain.dao.ContactDao;
+import org.obm.domain.dao.ResourceDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Attendee;
@@ -48,10 +50,8 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.contact.ContactDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.resource.Resource;
-import fr.aliacom.obm.common.resource.ResourceDao;
 import fr.aliacom.obm.common.user.ObmUser;
 
 @Singleton

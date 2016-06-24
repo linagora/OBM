@@ -50,6 +50,7 @@ import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.ContactLabel;
+import org.obm.sync.book.ContactUpdates;
 import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Phone;
 import org.obm.sync.exception.ContactNotFoundException;

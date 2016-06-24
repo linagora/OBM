@@ -36,6 +36,7 @@ import org.obm.dbcp.DatabaseDriversModule;
 import org.obm.domain.dao.CalendarDao;
 import org.obm.domain.dao.CalendarDaoJdbcImpl;
 import org.obm.domain.dao.CalendarDaoListener;
+import org.obm.domain.dao.ContactDao;
 import org.obm.service.calendar.CalendarDaoListenerImpl;
 
 import com.google.inject.AbstractModule;
@@ -43,7 +44,6 @@ import com.google.inject.multibindings.Multibinder;
 
 import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.common.addition.CommitedOperationDaoJdbcImpl;
-import fr.aliacom.obm.common.contact.ContactDao;
 import fr.aliacom.obm.common.contact.ContactDaoJdbcImpl;
 
 public class DatabaseModule extends AbstractModule {

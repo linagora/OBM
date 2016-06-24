@@ -29,6 +29,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.linagora.obm</groupId>
+			<artifactId>common-dao-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.linagora.obm</groupId>
 			<artifactId>configuration</artifactId>
 		</dependency>
 		<dependency>

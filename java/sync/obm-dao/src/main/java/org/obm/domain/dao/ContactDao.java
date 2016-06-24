@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.contact;
+package org.obm.domain.dao;
 
 import java.net.MalformedURLException;
 import java.sql.Connection;
@@ -40,13 +40,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.obm.annotations.database.DatabaseEntity;
-import org.obm.locator.LocatorClientException;
 import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.ContactUpdates;
 import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.exception.ContactNotFoundException;
@@ -90,7 +90,7 @@ public interface ContactDao {
 
 	List<Contact> searchContactsInAddressBooksList(AccessToken at, Collection<AddressBook> addrBooks, String query,
 			int limit, Integer offset)
-			throws MalformedURLException, LocatorClientException, SQLException;
+			throws MalformedURLException, SQLException;
 
 	/**
 	 * Search contacts. Query will match against lastname, firstname & email

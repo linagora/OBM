@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.resource;
+package org.obm.domain.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,6 +40,8 @@ import org.obm.utils.ObmHelper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import fr.aliacom.obm.common.resource.Resource;
 
 
 @Singleton

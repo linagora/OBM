@@ -27,13 +27,13 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.calendar;
+package org.obm.service.attendee;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.createMockBuilder;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.SQLException;
 
@@ -42,13 +42,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.obm.configuration.ContactConfiguration;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.CalendarDao;
+import org.obm.domain.dao.ContactDao;
 import org.obm.domain.dao.ObmInfoDao;
+import org.obm.domain.dao.ResourceDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserDaoJdbcImpl;
 import org.obm.domain.dao.UserPatternDao;
@@ -64,7 +65,6 @@ import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.ContactAttendee;
-import org.obm.sync.calendar.EventExtId;
 import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.dao.EntityId;
@@ -76,15 +76,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
 import fr.aliacom.obm.ToolBox;
-import fr.aliacom.obm.common.contact.ContactDao;
-import fr.aliacom.obm.common.contact.ContactDaoJdbcImpl;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.resource.Resource;
-import fr.aliacom.obm.common.resource.ResourceDao;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserEmails;
 import fr.aliacom.obm.common.user.UserLogin;
-import fr.aliacom.obm.utils.HelperService;
 
 @GuiceModule(AttendeeServiceJdbcImplTest.Env.class)
 @RunWith(GuiceRunner.class)
@@ -101,7 +97,6 @@ public class AttendeeServiceJdbcImplTest {
 			bindWithMock(CalendarDao.class);
 			bindWithMock(DomainService.class);
 			bindWithMock(UserService.class);
-			bindWithMock(HelperService.class);
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(DateProvider.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
@@ -116,14 +111,6 @@ public class AttendeeServiceJdbcImplTest {
 	private IMocksControl mocksControl;
 	@Inject
 	private ObmHelper obmHelper;
-	@Inject
-	private ContactConfiguration contactConfiguration;
-	@Inject
-	private CalendarDao calendarDao;
-	@Inject
-	private SolrHelper.Factory solrHelperFactory;
-	@Inject
-	private EventExtId.Factory eventExtIdFactory;
 	
 	private UserDao userDao;
 	private ContactDao contactDao;
@@ -145,12 +132,7 @@ public class AttendeeServiceJdbcImplTest {
 				.withArgs(obmHelper, null, null, null, null, null)
 				.addMockedMethod("findUser")
 				.createMock(mocksControl);
-		contactDao = createMockBuilder(ContactDaoJdbcImpl.class)
-				.withConstructor(ContactConfiguration.class, CalendarDao.class, SolrHelper.Factory.class, ObmHelper.class, EventExtId.Factory.class)
-				.withArgs(contactConfiguration, calendarDao, solrHelperFactory, obmHelper, eventExtIdFactory)
-				.addMockedMethod("findAttendeeContactFromEmailForUser")
-				.addMockedMethod("createCollectedContact")
-				.createMock(mocksControl);
+		contactDao = mocksControl.createMock(ContactDao.class);
 		resourceDao = createMockBuilder(ResourceDao.class)
 				.withConstructor(ObmHelper.class)
 				.withArgs(obmHelper)

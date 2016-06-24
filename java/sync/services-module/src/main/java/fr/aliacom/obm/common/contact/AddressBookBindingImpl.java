@@ -44,6 +44,7 @@ import javax.naming.NoPermissionException;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.ContactConfiguration;
+import org.obm.domain.dao.ContactDao;
 import org.obm.locator.LocatorClientException;
 import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.push.utils.DateUtils;
@@ -55,6 +56,7 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.ContactUpdates;
 import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Folder;
 import org.obm.sync.dao.EntityId;
