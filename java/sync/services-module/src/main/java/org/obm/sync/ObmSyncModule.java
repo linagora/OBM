@@ -35,6 +35,7 @@ import org.obm.dbcp.MultiNodeDatabaseModule;
 import org.obm.domain.dao.DaoModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
+import org.obm.service.MessageQueueServerModule;
 import org.obm.sync.transactional.JdbcTransactionalModule;
 
 import com.google.inject.AbstractModule;
@@ -50,8 +51,8 @@ public class ObmSyncModule extends AbstractModule {
 		install(new ObmSyncConfigurationModule());
 		install(new ObmSyncServletModule());
 		install(new ObmSyncServicesModule());
+		install(new MessageQueueServerModule());
 		install(new SmtpModule());
-		install(new MessageQueueModule());
 		install(new JdbcTransactionalModule());
 		install(new DatabaseModule());
 		install(new MultiNodeDatabaseModule());

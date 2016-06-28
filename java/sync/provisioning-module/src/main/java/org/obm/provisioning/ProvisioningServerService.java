@@ -62,7 +62,9 @@ public class ProvisioningServerService extends ServletModule {
 
 	@Override
 	protected void configureServlets() {
+		bind(Boolean.class).annotatedWith(Names.named("queueIsRemote")).toInstance(true);
 		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
+		
 		install(new ConfigurationModule<ConfigurationService>(buildConfiguration(), ConfigurationService.class));
 		install(new LoggerModule());
 		install(new DatabaseModule());

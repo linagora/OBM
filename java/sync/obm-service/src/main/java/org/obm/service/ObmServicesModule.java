@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2016 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,59 +29,32 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.service;
 
-import org.obm.Configuration;
-import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.dbcp.MultiNodeDatabaseModule;
-import org.obm.domain.dao.DaoModule;
-import org.obm.service.MessageQueueServerModule;
+import org.obm.icalendar.Ical4jHelper;
+import org.obm.locator.store.LocatorCache;
+import org.obm.locator.store.LocatorService;
+import org.obm.service.attendee.AttendeeServiceJdbcImpl;
+import org.obm.service.domain.DomainCache;
+import org.obm.service.domain.DomainService;
+import org.obm.service.user.UserService;
+import org.obm.service.user.UserServiceImpl;
+import org.obm.sync.services.AttendeeService;
+import org.obm.sync.utils.RecurrenceHelper;
 
-import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
-import com.google.inject.Module;
-import com.google.inject.util.Modules;
-import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
-public class ServicesTestModule extends AbstractModule {
-	
-	public final Configuration configuration;
-
-	public ServicesTestModule() {
-		configuration = new Configuration();
-		configuration.obmUiBaseUrl = "localhost";
-		configuration.locator.url = "localhost";
-		configuration.dataDir = Files.createTempDir();
-		configuration.transaction.timeoutInSeconds = 3600;
-	}
+public class ObmServicesModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		OverriddenModuleBuilder override = Modules.override(
-				new MessageQueueServerModule(),
-				new ObmSyncServletModule(),
-				new ObmSyncServicesModule(),
-				new MultiNodeDatabaseModule(),
-				new TransactionalModule(),
-				new DatabaseModule(),
-				new DaoModule(),
-				new DatabaseMetadataModule());
-		try {
-			install(override.with(overrideModule()));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+		install(new MessageQueueClientModule());
 
-	public Module overrideModule() {
-		return Modules.combine(
-				getConfigurationModule(),
-				ModuleUtils.buildDummySmtpModule(),
-				ModuleUtils.buildDummySolrModule());
-	}
-
-	protected Module getConfigurationModule() {
-		return ModuleUtils.buildDummyConfigurationModule(configuration);
+		bind(DomainService.class).to(DomainCache.class);
+		bind(UserService.class).to(UserServiceImpl.class);
+		bind(LocatorService.class).to(LocatorCache.class);
+		bind(AttendeeService.class).to(AttendeeServiceJdbcImpl.class);
+		bind(RecurrenceHelper.class).to(Ical4jHelper.class);
 	}
 
 }

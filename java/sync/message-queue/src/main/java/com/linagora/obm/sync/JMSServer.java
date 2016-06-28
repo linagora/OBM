@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2016 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -31,14 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package com.linagora.obm.sync;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.Topic;
-
 import org.hornetq.core.config.Configuration;
 import org.hornetq.jms.server.config.JMSConfiguration;
 import org.hornetq.jms.server.embedded.EmbeddedJMS;
@@ -46,31 +38,42 @@ import org.obm.sync.LifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class QueueManager implements LifecycleListener {
+import com.google.common.base.Throwables;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-	private static final Logger logger = LoggerFactory.getLogger(QueueManager.class);
+@Singleton
+public class JMSServer implements LifecycleListener {
+
+	private static final Logger logger = LoggerFactory.getLogger(JMSServer.class);
+	
 	private final EmbeddedJMS jmsServer;
 	private boolean started;
-	private ConnectionFactory cf;
 
-	public QueueManager(Configuration configuration, JMSConfiguration jmsConfiguration) {
+	@Inject
+	public JMSServer(Configuration configuration, JMSConfiguration jmsConfiguration) {
 		super();
 		jmsServer = new EmbeddedJMS();
 		jmsServer.setConfiguration(configuration);
 		jmsServer.setJmsConfiguration(jmsConfiguration);
 		started = false;
+
+		try {
+			start();
+		} catch (Exception e) {
+			Throwables.propagate(e);
+		}
 	}
-	
+
 	public synchronized void start() throws Exception {
 		if (started) {
 			throw new IllegalStateException(this.getClass().getName() + " can't be started twice");
 		}
-        jmsServer.start();
-        logger.info("Embedded JMS Server Started");
-        cf = (ConnectionFactory)jmsServer.lookup("ConnectionFactory");
-        started = true;
+		jmsServer.start();
+		logger.info("Embedded JMS Server Started");
+		started = true;
 	}
-	
+
 	public synchronized void stop() throws Exception {
 		if (started) {
 			jmsServer.stop();
@@ -79,39 +82,9 @@ public class QueueManager implements LifecycleListener {
 		}
 	}
 
-	public Connection createConnection() throws JMSException {
-		Connection connection = cf.createConnection();
-        return connection;
-	}
-	
-	public Session createSession(Connection c) throws JMSException {
-        Session session = c.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        return session;
-	}
-	
-	public Producer createProducerOnTopic(Session session, String topicPath) throws JMSException {
-		Topic queue = (Topic)jmsServer.lookup(topicPath);
-		MessageProducer producer = session.createProducer(queue);
-		return new Producer(session, producer);
-	}
-	
-	public MessageConsumer createConsumerOnTopic(Session session, String topicPath) throws JMSException {
-		Topic queue = (Topic)jmsServer.lookup(topicPath);
-		MessageConsumer consumer = session.createConsumer(queue);
-		return consumer;
-	}
-
-	public MessageConsumer createDurableConsumerOnTopic(Session session, String topicPath, String clientId)
-		throws JMSException {
-		
-		Topic queue = (Topic)jmsServer.lookup(topicPath);
-		MessageConsumer consumer = session.createDurableSubscriber(queue, clientId);
-		return consumer;
-	}
-
 	@Override
 	public void shutdown() throws Exception {
 		stop();
 	}
-	
+
 }

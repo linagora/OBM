@@ -29,48 +29,37 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
-
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Session;
+package org.obm.service;
 
 import org.hornetq.core.config.Configuration;
 import org.hornetq.jms.server.config.JMSConfiguration;
+import org.obm.configuration.ConfigurationService;
 import org.obm.service.solr.jms.SolrJmsQueue;
+import org.obm.sync.LifecycleListener;
 
-import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.linagora.obm.sync.HornetQConfiguration;
-import com.linagora.obm.sync.Producer;
-import com.linagora.obm.sync.QueueManager;
+import com.linagora.obm.sync.JMSServer;
 
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
-
-public class MessageQueueModule extends AbstractModule {
-
-	public static final String TOPIC_NAME_CONTACT = "contactChanges";
-	public static final String TOPIC_NAME_CALENDAR = "calendarChanges";
-	public static final String TOPIC_NAME_EVENT = "eventChanges";
+public class MessageQueueServerModule extends AbstractModule {
 	
-	private static final String EVENT_CHANGES_TOPIC = "/topic/eventChanges";
-	
-	public MessageQueueModule() {
+	public MessageQueueServerModule() {
 		super();
 	}
 
 	@Override
 	protected void configure() {
-		bind(JMSConfiguration.class).toInstance(jmsConfiguration());
+		bind(JMSServer.class).asEagerSingleton();
+		
 		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
-		lifecycleListeners.addBinding().to(QueueManager.class);
+		lifecycleListeners.addBinding().to(JMSServer.class);
 	}
 	
 	@Provides @Singleton
-	public static Configuration hornetQConfiguration(ObmSyncConfigurationService configurationService) {
+	public static Configuration hornetQConfiguration(ConfigurationService configurationService) {
 		String dataDirectory = configurationService.getDataDirectory() + "/" + "jms/data";
 		return HornetQConfiguration.configuration()
 				.enablePersistence(true)
@@ -86,39 +75,22 @@ public class MessageQueueModule extends AbstractModule {
 				.acceptor(HornetQConfiguration.Acceptor.Stomp)
 				.build();
 	}
-	
-	private JMSConfiguration jmsConfiguration() {
+
+	@Provides @Singleton
+	public static JMSConfiguration jmsConfiguration() {
 		return 
 			HornetQConfiguration.jmsConfiguration()
 			.connectionFactory(
 					HornetQConfiguration.connectionFactoryConfigurationBuilder()
 					.name("ConnectionFactory")
 					.connector(HornetQConfiguration.Connector.HornetQInVMCore)
+					.connector(HornetQConfiguration.Connector.HornetQSocketCore)
 					.binding("ConnectionFactory")
 					.build())
-			.topic(TOPIC_NAME_EVENT, EVENT_CHANGES_TOPIC)
-			.topic(TOPIC_NAME_CALENDAR, SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName())
-			.topic(TOPIC_NAME_CONTACT, SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName())
+			.topic(SolrJmsQueue.EVENT_CHANGES_QUEUE.getId(), SolrJmsQueue.EVENT_CHANGES_QUEUE.getName())
+			.topic(SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getId(), SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName())
+			.topic(SolrJmsQueue.CONTACT_CHANGES_QUEUE.getId(), SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName())
 			.build();
-	}
-	
-	@Provides @Singleton
-	public static QueueManager queueManager(Configuration configuration, JMSConfiguration jms) {
-		try {
-			QueueManager queueManager = new QueueManager(configuration, jms);
-			queueManager.start();
-			return queueManager;
-		} catch (Exception e) {
-			Throwables.propagate(e);
-		}
-		throw new RuntimeException("Cannot construct queue manager");
-	}
-	
-	@Provides @Singleton
-	Producer provideMessageProducer(QueueManager queueManager) throws JMSException {
-		Connection connection = queueManager.createConnection();
-		Session session = queueManager.createSession(connection);
-		return queueManager.createProducerOnTopic(session, EVENT_CHANGES_TOPIC);
 	}
 	
 }

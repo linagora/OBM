@@ -29,80 +29,35 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.annotations.transactional;
+package org.obm.service;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
-import org.hornetq.api.jms.JMSFactoryType;
-import org.hornetq.core.config.Configuration;
-import org.hornetq.jms.server.config.JMSConfiguration;
+import org.obm.service.solr.jms.SolrJmsQueue;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.google.inject.name.Names;
-import com.linagora.obm.sync.HornetQConfiguration;
 import com.linagora.obm.sync.JMSClient;
-import com.linagora.obm.sync.JMSServer;
 import com.linagora.obm.sync.Producer;
 
-public class MessageQueueModule extends AbstractModule {
-
-	private final String TOPIC = "test";
-	private final JMSServer jmsServer;
+public class MessageQueueClientModule extends AbstractModule {
 	
-	public MessageQueueModule() {
+	public MessageQueueClientModule() {
 		super();
-		this.jmsServer = new JMSServer(hornetQConfiguration(), jmsConfiguration());
 	}
 
 	@Override
 	protected void configure() {
-		bind(JMSServer.class).toInstance(jmsServer);
-		bind(Boolean.class).annotatedWith(Names.named("queueIsRemote")).toInstance(false);
-	}
-	
-	public static Configuration hornetQConfiguration() {
-		return HornetQConfiguration.configuration()
-				.enablePersistence(true)
-				.enableSecurity(false)
-				.connector(HornetQConfiguration.Connector.HornetQInVMCore)
-				.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
-				.build();
-	}
-	
-	private JMSConfiguration jmsConfiguration() {
-		return 
-				HornetQConfiguration.jmsConfiguration()
-				.connectionFactory(
-						HornetQConfiguration.connectionFactoryConfigurationBuilder()
-						.name("ConnectionFactory")
-						.connector(HornetQConfiguration.Connector.HornetQInVMCore)
-						.binding("ConnectionFactory")
-						.binding("XAConnectionFactory")
-						.factoryType(JMSFactoryType.XA_CF)
-						.build())
-				.topic(TOPIC, "/topic/test")
-				.build();
-	}
-	
-	@Provides @Singleton
-	MessageConsumer provideMessageConsumer(JMSClient client) throws JMSException {
-		Connection connection = client.createConnection();
-		connection.start();
-		Session consumerSession = client.createSession(connection);
-		return client.createConsumerOnTopic(consumerSession, TOPIC);
-	}
-	
-	@Provides @Singleton
-	Producer provideMessageProducer(JMSClient queueManager) throws JMSException {
-		Connection connection = queueManager.createConnection();
-		Session session = queueManager.createSession(connection);
-		return queueManager.createProducerOnTopic(session, TOPIC);
 	}
 
+	@Provides @Singleton
+	Producer provideMessageProducer(JMSClient jmsClient) throws JMSException {
+		Connection connection = jmsClient.createConnection();
+		Session session = jmsClient.createSession(connection);
+		return jmsClient.createProducerOnTopic(session, SolrJmsQueue.EVENT_CHANGES_QUEUE.getId());
+	}
 	
 }

@@ -31,13 +31,20 @@ package org.obm.service.solr.jms;
 
 public enum SolrJmsQueue
 {
-	CALENDAR_CHANGES_QUEUE("/topic/calendar/changes"),
-	CONTACT_CHANGES_QUEUE("/topic/contact/changes");
-	
-	private String name;
+	CALENDAR_CHANGES_QUEUE("calendarChanges", "/topic/calendar/changes"),
+	EVENT_CHANGES_QUEUE("eventChanges", "/topic/eventChanges"),
+	CONTACT_CHANGES_QUEUE("contactChanges", "/topic/contact/changes");
 
-	private SolrJmsQueue(String name) {
+	private final String id;
+	private final String name;
+
+	private SolrJmsQueue(String id, String name) {
+		this.id = id;
 		this.name = name;
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public String getName() {

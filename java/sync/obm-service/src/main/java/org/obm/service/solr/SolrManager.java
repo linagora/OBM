@@ -53,8 +53,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.linagora.obm.sync.JMSClient;
 import com.linagora.obm.sync.Producer;
-import com.linagora.obm.sync.QueueManager;
 
 @Singleton
 public class SolrManager implements LifecycleListener {
@@ -79,24 +79,24 @@ public class SolrManager implements LifecycleListener {
 
 	@Inject
 	@VisibleForTesting
-	protected SolrManager(ConfigurationService configurationService, QueueManager queueManager,
+	protected SolrManager(ConfigurationService configurationService, JMSClient jmsClient,
 			SolrClientFactory solrClientFactory) throws JMSException {
 		this.solrClientFactory = solrClientFactory;
 		solrCheckingInterval = configurationService.solrCheckingInterval() * 1000;
 		queueNameToProducerMap = new EnumMap<SolrJmsQueue, Producer>(SolrJmsQueue.class);
 		
-		jmsConnection = queueManager.createConnection();
+		jmsConnection = jmsClient.createConnection();
 		jmsConnection.setClientID(CONNECTION_CLIENT_ID);
 		
-		jmsProducerSession = queueManager.createSession(jmsConnection);
+		jmsProducerSession = jmsClient.createSession(jmsConnection);
 		jmsContactConsumerSession = jmsConnection.createSession(true, Session.SESSION_TRANSACTED);
 		jmsEventConsumerSession = jmsConnection.createSession(true, Session.SESSION_TRANSACTED);
-		jmsContactConsumer = queueManager.createDurableConsumerOnTopic(jmsContactConsumerSession, SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName(), CONTACT_CLIENT_ID);
+		jmsContactConsumer = jmsClient.createDurableConsumerOnTopic(jmsContactConsumerSession, SolrJmsQueue.CONTACT_CHANGES_QUEUE.getId(), CONTACT_CLIENT_ID);
 		jmsContactConsumer.setMessageListener(new Listener(jmsContactConsumerSession));
-		jmsEventConsumer = queueManager.createDurableConsumerOnTopic(jmsEventConsumerSession, SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName(), EVENT_CLIENT_ID);
+		jmsEventConsumer = jmsClient.createDurableConsumerOnTopic(jmsEventConsumerSession, SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getId(), EVENT_CLIENT_ID);
 		jmsEventConsumer.setMessageListener(new Listener(jmsEventConsumerSession));
-		queueNameToProducerMap.put(SolrJmsQueue.CONTACT_CHANGES_QUEUE, queueManager.createProducerOnTopic(jmsProducerSession, SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName()));
-		queueNameToProducerMap.put(SolrJmsQueue.CALENDAR_CHANGES_QUEUE, queueManager.createProducerOnTopic(jmsProducerSession, SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName()));
+		queueNameToProducerMap.put(SolrJmsQueue.CONTACT_CHANGES_QUEUE, jmsClient.createProducerOnTopic(jmsProducerSession, SolrJmsQueue.CONTACT_CHANGES_QUEUE.getId()));
+		queueNameToProducerMap.put(SolrJmsQueue.CALENDAR_CHANGES_QUEUE, jmsClient.createProducerOnTopic(jmsProducerSession, SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getId()));
 
 		// We are supposedly available at startup for two reasons:
 		// 1. This is backwards compatible with the previous implementation

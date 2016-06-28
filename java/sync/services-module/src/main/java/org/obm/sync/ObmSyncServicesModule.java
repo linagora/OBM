@@ -37,21 +37,10 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import org.obm.configuration.module.LoggerModule;
-import org.obm.icalendar.Ical4jHelper;
-import org.obm.locator.store.LocatorCache;
-import org.obm.locator.store.LocatorService;
-import org.obm.service.attendee.AttendeeServiceJdbcImpl;
-import org.obm.service.domain.DomainCache;
-import org.obm.service.domain.DomainService;
-import org.obm.service.user.UserService;
-import org.obm.service.user.UserServiceImpl;
-import org.obm.sync.date.DateProvider;
+import org.obm.service.ObmServicesModule;
 import org.obm.sync.server.template.ITemplateLoader;
 import org.obm.sync.server.template.TemplateLoaderFreeMarkerImpl;
-import org.obm.sync.services.AttendeeService;
 import org.obm.sync.services.ICalendar;
-import org.obm.sync.utils.RecurrenceHelper;
-import org.obm.utils.ObmHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,38 +65,34 @@ import fr.aliacom.obm.utils.HelperServiceImpl;
 public class ObmSyncServicesModule extends AbstractModule {
 
 	private static final String APPLICATION_NAME = "obm-sync";
-	
-    @Override
-    protected void configure() {
-        bind(DomainService.class).to(DomainCache.class);
-        bind(UserService.class).to(UserServiceImpl.class);
-        bind(SettingsService.class).to(SettingsServiceImpl.class);
-        bind(LocatorService.class).to(LocatorCache.class);
-        bind(HelperService.class).to(HelperServiceImpl.class);
-        bind(AnonymizerService.class).to(AnonymizerServiceImpl.class);
-        bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
-        bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
-        bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
-        
-        bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
-        bind(ICalendar.class).to(CalendarBindingImpl.class);
-        ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader
-                .load(FreeBusyPluginModule.class);
 
-        List<FreeBusyPluginModule> pluginModulesList = new ArrayList<FreeBusyPluginModule>();
-        for (FreeBusyPluginModule pluginModule : pluginModules) {
-            pluginModulesList.add(pluginModule);
-        }
+	@Override
+	protected void configure() {
+		install(new ObmServicesModule());
+		
+		bind(SettingsService.class).to(SettingsServiceImpl.class);
+		bind(HelperService.class).to(HelperServiceImpl.class);
+		bind(AnonymizerService.class).to(AnonymizerServiceImpl.class);
+		bind(LocalFreeBusyProvider.class).to(DatabaseFreeBusyProvider.class);
+		bind(MessageQueueService.class).to(MessageQueueServiceImpl.class);
+		bind(EventNotificationService.class).to(EventNotificationServiceImpl.class);
 
-        Collections.sort(pluginModulesList, Collections.reverseOrder());
-        for (FreeBusyPluginModule pluginModule : pluginModulesList) {
-            this.install(pluginModule);
-        }
-        
+		bind(ITemplateLoader.class).to(TemplateLoaderFreeMarkerImpl.class);
+		bind(ICalendar.class).to(CalendarBindingImpl.class);
+		ServiceLoader<FreeBusyPluginModule> pluginModules = ServiceLoader.load(FreeBusyPluginModule.class);
+
+		List<FreeBusyPluginModule> pluginModulesList = new ArrayList<FreeBusyPluginModule>();
+		for (FreeBusyPluginModule pluginModule : pluginModules) {
+			pluginModulesList.add(pluginModule);
+		}
+
+		Collections.sort(pluginModulesList, Collections.reverseOrder());
+		for (FreeBusyPluginModule pluginModule : pluginModulesList) {
+			this.install(pluginModule);
+		}
+
+		bind(Boolean.class).annotatedWith(Names.named("queueIsRemote")).toInstance(false);
 		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
-		bind(DateProvider.class).to(ObmHelper.class);
-		bind(AttendeeService.class).to(AttendeeServiceJdbcImpl.class);
-		bind(RecurrenceHelper.class).to(Ical4jHelper.class);
-    }
+	}
 }

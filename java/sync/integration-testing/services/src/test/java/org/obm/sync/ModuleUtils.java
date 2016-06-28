@@ -50,7 +50,6 @@ import org.obm.Configuration;
 import org.obm.Configuration.ObmSyncWithLDAPAuth;
 import org.obm.ConfigurationModule;
 import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.MultiNodeDatabaseConfiguration;
 import org.obm.dao.utils.H2ConnectionProvider;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
@@ -99,6 +98,7 @@ public class ModuleUtils {
 						FileUtils.deleteDirectory(configuration.dataDir);						
 					}
 				});
+				install(buildSocketJMSModule(configuration));
 				install(new ConfigurationModule(configuration));
 				Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
 				databaseDrivers.addBinding().to(H2DriverConfiguration.class);
@@ -114,7 +114,6 @@ public class ModuleUtils {
 				ObmSyncStaticConfigurationService.ObmSyncConfiguration obmSyncConfiguration = 
 						new ObmSyncStaticConfigurationService.ObmSyncConfiguration(configuration, new Configuration.ObmSync());
 				bind(ObmSyncConfigurationService.class).toInstance(obmSyncConfiguration);
-				bind(LocatorConfiguration.class).toInstance(obmSyncConfiguration);
 				bind(LocatorService.class).toInstance(new LocatorService() {
 					
 					@Override
@@ -122,18 +121,6 @@ public class ModuleUtils {
 						return "localhost";
 					}
 				});
-				
-				String jmsDataDirectory = configuration.dataDir + "/" + "jms/data";
-				bind(org.hornetq.core.config.Configuration.class).toInstance(
-						HornetQConfiguration.configuration()
-						.enablePersistence(true)
-						.enableSecurity(false)
-						.largeMessagesDirectory(jmsDataDirectory + "/large-messages")
-						.bindingsDirectory(jmsDataDirectory + "/bindings")
-						.journalDirectory(jmsDataDirectory + "/journal")
-						.connector(HornetQConfiguration.Connector.HornetQInVMCore)
-						.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
-						.build());
 			}
 		};
 	}
@@ -196,6 +183,7 @@ public class ModuleUtils {
 						.bindingsDirectory(jmsDataDirectory + "/bindings")
 						.journalDirectory(jmsDataDirectory + "/journal")
 						.connector(HornetQConfiguration.Connector.HornetQInVMCore)
+						.connector(HornetQConfiguration.Connector.HornetQSocketCore)
 						.acceptor(HornetQConfiguration.Acceptor.HornetQInVMCore)
 						.acceptor(HornetQConfiguration.acceptorBuilder()
 							.name("obmAcceptor")

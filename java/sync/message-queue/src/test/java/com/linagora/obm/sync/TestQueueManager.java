@@ -54,18 +54,22 @@ import org.slf4j.LoggerFactory;
 
 public class TestQueueManager {
 
-	private static final String TOPIC = "/topic/eventChanges";
+	private static final String TOPIC_ID = "eventChanges";
+	private static final String TOPIC_NAME = "/topic/eventChanges";
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	private QueueManager queueManager;
+	private JMSServer jmsServer;
+	private JMSClient jmsClient;
 	private List<Connection> connections;
 	private List<Session> sessions;
 	private final static long TIMEOUT = 1000;
+
 	
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		startQueueManager();
+		jmsClient = new JMSClient(false);
 	}
 
 	private static JMSConfiguration jmsConfiguration() {
@@ -77,7 +81,7 @@ public class TestQueueManager {
 					.connector(HornetQConfiguration.Connector.HornetQInVMCore)
 					.binding("ConnectionFactory")
 					.build())
-			.topic("eventChanges", TOPIC)
+			.topic(TOPIC_ID, TOPIC_NAME)
 			.build();
 	}
 	
@@ -90,11 +94,10 @@ public class TestQueueManager {
 				.build();
 	}
 	
-	private void startQueueManager() throws Exception {
+	private void startQueueManager() {
 		connections = new ArrayList<Connection>();
 		sessions = new ArrayList<Session>();
-		queueManager = new QueueManager(hornetQConfiguration(), jmsConfiguration());
-		queueManager.start();
+		jmsServer = new JMSServer(hornetQConfiguration(), jmsConfiguration());
 	}
 
 	@After
@@ -124,21 +127,21 @@ public class TestQueueManager {
 			}
 		}
 		try {
-			queueManager.stop();
+			jmsServer.stop();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
 
 	private Connection createManagedConnection() throws JMSException {
-		Connection connection = queueManager.createConnection();
+		Connection connection = jmsClient.createConnection();
 		connections.add(connection);
 		return connection;
 	}
 
 	private Session createManagedSession(Connection connection)
 			throws JMSException {
-		Session consumerSession = queueManager.createSession(connection);
+		Session consumerSession = jmsClient.createSession(connection);
 		sessions.add(consumerSession);
 		return consumerSession;
 	}
@@ -150,9 +153,9 @@ public class TestQueueManager {
 		Connection connection = createManagedConnection();
 		connection.start();
 		Session consumerSession = createManagedSession(connection);
-		MessageConsumer consumer = queueManager.createConsumerOnTopic(consumerSession, TOPIC);
+		MessageConsumer consumer = jmsClient.createConsumerOnTopic(consumerSession, TOPIC_ID);
 		
-		writeMessageOnTopic(testText, TOPIC, queueManager);
+		writeMessageOnTopic(testText, TOPIC_ID, jmsClient);
 		
 	
 		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
@@ -165,17 +168,17 @@ public class TestQueueManager {
 
 		Connection connection = createManagedConnection();
 		connection.start();
-		Session consumerSession = queueManager.createSession(connection);
-		MessageConsumer consumer = queueManager.createConsumerOnTopic(consumerSession, TOPIC);
+		Session consumerSession = jmsClient.createSession(connection);
+		MessageConsumer consumer = jmsClient.createConsumerOnTopic(consumerSession, TOPIC_ID);
 		
-		writeMessageOnTopic(testText, TOPIC, queueManager);
+		writeMessageOnTopic(testText, TOPIC_ID, jmsClient);
 		
 		TextMessage messageReceived1 = (TextMessage) consumer.receive(TIMEOUT);
 		consumerSession.close();
 
-		writeMessageOnTopic(testText, TOPIC, queueManager);
+		writeMessageOnTopic(testText, TOPIC_ID, jmsClient);
 		consumerSession = createManagedSession(connection);
-		consumer = queueManager.createConsumerOnTopic(consumerSession, TOPIC);
+		consumer = jmsClient.createConsumerOnTopic(consumerSession, TOPIC_ID);
 		
 		TextMessage messageReceived2 = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertEquals(testText, messageReceived1.getText());
@@ -187,22 +190,22 @@ public class TestQueueManager {
 		String testText = "test text";
 		String clientId = "c1";
 
-		Connection connection = queueManager.createConnection();
+		Connection connection = jmsClient.createConnection();
 		connection.setClientID(clientId);
 		connection.start();
-		Session consumerSession = queueManager.createSession(connection);
-		MessageConsumer consumer = queueManager.createDurableConsumerOnTopic(consumerSession, TOPIC, clientId);
+		Session consumerSession = jmsClient.createSession(connection);
+		MessageConsumer consumer = jmsClient.createDurableConsumerOnTopic(consumerSession, TOPIC_ID, clientId);
 		consumerSession.close();
 		connection.close();
 		
-		writeMessageOnTopic(testText, TOPIC, queueManager);
+		writeMessageOnTopic(testText, TOPIC_ID, jmsClient);
 		
 		Connection connection2 = createManagedConnection();
 		connection2.setClientID(clientId);
 		connection2.start();
 
-		consumerSession = queueManager.createSession(connection2);
-		consumer = queueManager.createDurableConsumerOnTopic(consumerSession, TOPIC, clientId);
+		consumerSession = jmsClient.createSession(connection2);
+		consumer = jmsClient.createDurableConsumerOnTopic(consumerSession, TOPIC_ID, clientId);
 		
 		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertEquals(testText, messageReceived.getText());
@@ -217,9 +220,9 @@ public class TestQueueManager {
 		connection.setClientID(clientId);
 		connection.start();
 		Session consumerSession = createManagedSession(connection);
-		MessageConsumer consumer = queueManager.createDurableConsumerOnTopic(consumerSession, TOPIC, clientId);
+		MessageConsumer consumer = jmsClient.createDurableConsumerOnTopic(consumerSession, TOPIC_ID, clientId);
 		
-		writeMessageOnTopic(testText, TOPIC, queueManager);
+		writeMessageOnTopic(testText, TOPIC_ID, jmsClient);
 		shutdownQueueManager();
 		startQueueManager();
 		
@@ -228,7 +231,7 @@ public class TestQueueManager {
 		connection2.start();
 
 		consumerSession = createManagedSession(connection2);
-		consumer = queueManager.createDurableConsumerOnTopic(consumerSession, TOPIC, clientId);
+		consumer = jmsClient.createDurableConsumerOnTopic(consumerSession, TOPIC_ID, clientId);
 		
 		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertEquals(testText, messageReceived.getText());
@@ -238,12 +241,12 @@ public class TestQueueManager {
 	public void testConsumeLater() throws Exception {
 		String testText = "test text";
 
-		writeMessageOnTopic(testText, TOPIC, queueManager);
+		writeMessageOnTopic(testText, TOPIC_ID, jmsClient);
 
 		Connection connection = createManagedConnection();
 		connection.start();
 		Session consumerSession = createManagedSession(connection);
-		MessageConsumer consumer = queueManager.createConsumerOnTopic(consumerSession, TOPIC);
+		MessageConsumer consumer = jmsClient.createConsumerOnTopic(consumerSession, TOPIC_ID);
 		TextMessage messageReceived = (TextMessage) consumer.receive(TIMEOUT);
 		Assert.assertNull(messageReceived);
 	}
@@ -255,12 +258,12 @@ public class TestQueueManager {
 		Connection connection = createManagedConnection();
 		connection.start();
 		Session consumerSession1 = createManagedSession(connection);
-		MessageConsumer consumer1 = queueManager.createConsumerOnTopic(consumerSession1, TOPIC);
+		MessageConsumer consumer1 = jmsClient.createConsumerOnTopic(consumerSession1, TOPIC_ID);
 		
 		Session consumerSession2 = createManagedSession(connection);
-		MessageConsumer consumer2 = queueManager.createConsumerOnTopic(consumerSession2, TOPIC);
+		MessageConsumer consumer2 = jmsClient.createConsumerOnTopic(consumerSession2, TOPIC_ID);
 		
-		writeMessageOnTopic(testText, TOPIC, queueManager);
+		writeMessageOnTopic(testText, TOPIC_ID, jmsClient);
 		
 		TextMessage messageReceived1 = (TextMessage) consumer1.receive(TIMEOUT);
 		TextMessage messageReceived2 = (TextMessage) consumer2.receive(TIMEOUT);
@@ -268,12 +271,12 @@ public class TestQueueManager {
 		Assert.assertEquals(testText, messageReceived2.getText());
 	}
 
-	private void writeMessageOnTopic(String testText, String topicName,
-			QueueManager queueManager) throws JMSException, TimeoutException {
+	private void writeMessageOnTopic(String testText, String topicId,
+			JMSClient queueManager) throws JMSException, TimeoutException {
 		
 		Connection connection = createManagedConnection();
 		Session producerSession = queueManager.createSession(connection);
-		Producer producer = queueManager.createProducerOnTopic(producerSession, topicName);
+		Producer producer = queueManager.createProducerOnTopic(producerSession, topicId);
 		producer.write(testText);
 	}
 

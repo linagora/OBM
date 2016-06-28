@@ -42,7 +42,7 @@ import org.hornetq.core.remoting.impl.netty.NettyConnectorFactory;
 import org.hornetq.core.remoting.impl.netty.TransportConstants;
 import org.hornetq.jms.client.HornetQConnectionFactory;
 import org.hornetq.jms.client.HornetQTopic;
-import org.obm.sync.MessageQueueModule;
+import org.obm.service.solr.jms.SolrJmsQueue;
 import org.obm.sync.ServicesClientModule;
 
 import com.google.common.base.Preconditions;
@@ -84,7 +84,7 @@ public class ServicesClientWithJMSModule extends AbstractModule {
 		@Inject
 		private MessageConsumerResourcesManager(HornetQConnectionFactory connectionFactory) {
 			this.connectionFactory = connectionFactory;
-			this.topic = new HornetQTopic(MessageQueueModule.TOPIC_NAME_EVENT);
+			this.topic = new HornetQTopic(SolrJmsQueue.EVENT_CHANGES_QUEUE.getId());
 		}
 
 		public MessageConsumer getConsumer() {

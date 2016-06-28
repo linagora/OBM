@@ -50,7 +50,8 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 
 import com.linagora.obm.sync.HornetQConfiguration;
-import com.linagora.obm.sync.QueueManager;
+import com.linagora.obm.sync.JMSClient;
+import com.linagora.obm.sync.JMSServer;
 
 import fr.aliacom.obm.ToolBox;
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -61,7 +62,7 @@ public class SolrHelperFactoryTest {
 	private AccessToken accessToken;
 	private SolrHelper.Factory factory;
 	private SolrManager manager;
-	private QueueManager queueManager;
+	private JMSServer jmsServer;
 	private ConfigurationService configurationService;
 	private IMocksControl control;
 	private SolrClientFactory solrClientFactory;
@@ -92,8 +93,7 @@ public class SolrHelperFactoryTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		queueManager = new QueueManager(hornetQConfiguration(), jmsConfiguration());
-		queueManager.start();
+		jmsServer = new JMSServer(hornetQConfiguration(), jmsConfiguration());
 		contact = new Contact();
 
  		control = createControl();
@@ -111,7 +111,7 @@ public class SolrHelperFactoryTest {
 
  		control.replay();
 
- 		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
+ 		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
 		factory = new SolrHelper.Factory(manager, solrClientFactory, contactCommandFactory, eventCommandFactory);
   
  		contact.setUid(1);
@@ -120,7 +120,7 @@ public class SolrHelperFactoryTest {
 	@After
 	public void tearDown() throws Exception {
 		manager.stop();
-		queueManager.stop();
+		jmsServer.stop();
 	}
 
 	@Test(expected = IllegalStateException.class)

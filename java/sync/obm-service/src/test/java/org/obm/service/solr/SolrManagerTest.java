@@ -58,7 +58,8 @@ import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
 import com.linagora.obm.sync.HornetQConfiguration;
-import com.linagora.obm.sync.QueueManager;
+import com.linagora.obm.sync.JMSClient;
+import com.linagora.obm.sync.JMSServer;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -71,7 +72,7 @@ public class SolrManagerTest {
 	private SolrManager manager;
 	private PingSolrRequest pingRequest;
 	private Command<Integer> pingCommand;
-	private QueueManager queueManager;
+	private JMSServer jmsServer;
 	private ConfigurationService configurationService;
 	private SolrClientFactory solrClientFactory;
 	private IMocksControl control;
@@ -95,18 +96,17 @@ public class SolrManagerTest {
 					.connector(HornetQConfiguration.Connector.HornetQInVMCore)
 					.binding("ConnectionFactory")
 					.build())
-			.topic("eventChanges", "/topic/eventChanges")
-			.topic("calendarChanges", SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName())
-			.topic("contactChanges", SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName())
+			.topic(SolrJmsQueue.EVENT_CHANGES_QUEUE.getId(), SolrJmsQueue.EVENT_CHANGES_QUEUE.getName())
+			.topic(SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getId(), SolrJmsQueue.CALENDAR_CHANGES_QUEUE.getName())
+			.topic(SolrJmsQueue.CONTACT_CHANGES_QUEUE.getId(), SolrJmsQueue.CONTACT_CHANGES_QUEUE.getName())
 			.build();
 	}
 	
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		control = createControl();
 		ObmDomain domain = ObmDomain.builder().name("d").build();
-		queueManager = new QueueManager(hornetQConfiguration(), jmsConfiguration());
-		queueManager.start();
+		jmsServer = new JMSServer(hornetQConfiguration(), jmsConfiguration());
 		
 		configurationService = control.createMock(ConfigurationService.class);
 		solrClientFactory = control.createMock(SolrClientFactoryImpl.class);
@@ -127,13 +127,13 @@ public class SolrManagerTest {
 		if (manager != null) {
 			manager.stop();
 		}
-		queueManager.stop();
+		jmsServer.stop();
 	}
 	
 	@Test(expected=IllegalStateException.class)
 	public void requestShouldBerejectedWhenQueueUnknown() throws JMSException {
 		control.replay();
-		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
+		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
 		manager.process(new PingCommand(pingRequest) {
 
 			@Override
@@ -197,7 +197,7 @@ public class SolrManagerTest {
 		expect(server.ping()).andThrow(new IOException()).anyTimes();
 		control.replay();
 		
-		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
+		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
 		manager.process(pingCommand);
 		
 		assertThat(waitForRequestProcessing()).isTrue();
@@ -211,7 +211,7 @@ public class SolrManagerTest {
 		expect(server.ping()).andReturn(null).anyTimes();
 		control.replay();
 		
-		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
+		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
 		manager.process(pingCommand);
 		
 		assertThat(waitForRequestProcessing()).isTrue();
@@ -227,7 +227,7 @@ public class SolrManagerTest {
 		expect(server.ping()).andReturn(null); // This one's for the actual request that must be processed once SolR is back up
 		control.replay();
 		
-		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
+		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
 		manager.setSolrCheckingInterval(100);
 		manager.process(pingCommand);
 		
@@ -242,7 +242,7 @@ public class SolrManagerTest {
 		expect(server.ping()).andThrow(new IOException()).anyTimes(); 
 		control.replay();
 		
-		manager = new SolrManager(configurationService, queueManager, solrClientFactory);
+		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
 		manager.setSolrAvailable(false);
 		manager.process(pingCommand);
 		
