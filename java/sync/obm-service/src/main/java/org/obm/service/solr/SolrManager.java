@@ -53,14 +53,16 @@ import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import com.linagora.obm.sync.JMSClient;
 import com.linagora.obm.sync.Producer;
 
 @Singleton
 public class SolrManager implements LifecycleListener {
-	private static final String CONTACT_CLIENT_ID = "solrManagerContactClientId";
-	private static final String EVENT_CLIENT_ID = "solrManagerEventClientId";
-	private static final String CONNECTION_CLIENT_ID = "solrManagerConnectionClientId";
+	
+	private static final String CONTACT_CLIENT_ID = "_solrManagerContactClientId";
+	private static final String EVENT_CLIENT_ID = "_solrManagerEventClientId";
+	private static final String CONNECTION_CLIENT_ID = "_solrManagerConnectionClientId";
 	
 	private boolean solrAvailable;
 	private Timer checker;
@@ -79,14 +81,14 @@ public class SolrManager implements LifecycleListener {
 
 	@Inject
 	@VisibleForTesting
-	protected SolrManager(ConfigurationService configurationService, JMSClient jmsClient,
-			SolrClientFactory solrClientFactory) throws JMSException {
+	protected SolrManager(ConfigurationService configurationService, JMSClient jmsClient, SolrClientFactory solrClientFactory,
+			@Named("application-name") String applicationName) throws JMSException {
 		this.solrClientFactory = solrClientFactory;
 		solrCheckingInterval = configurationService.solrCheckingInterval() * 1000;
 		queueNameToProducerMap = new EnumMap<SolrJmsQueue, Producer>(SolrJmsQueue.class);
 		
 		jmsConnection = jmsClient.createConnection();
-		jmsConnection.setClientID(CONNECTION_CLIENT_ID);
+		jmsConnection.setClientID(applicationName + CONNECTION_CLIENT_ID);
 		
 		jmsProducerSession = jmsClient.createSession(jmsConnection);
 		jmsContactConsumerSession = jmsConnection.createSession(true, Session.SESSION_TRANSACTED);

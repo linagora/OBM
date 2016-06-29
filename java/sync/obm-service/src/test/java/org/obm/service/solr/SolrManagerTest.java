@@ -133,7 +133,7 @@ public class SolrManagerTest {
 	@Test(expected=IllegalStateException.class)
 	public void requestShouldBerejectedWhenQueueUnknown() throws JMSException {
 		control.replay();
-		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
+		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory, "app-name");
 		manager.process(new PingCommand(pingRequest) {
 
 			@Override
@@ -197,7 +197,7 @@ public class SolrManagerTest {
 		expect(server.ping()).andThrow(new IOException()).anyTimes();
 		control.replay();
 		
-		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
+		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory, "app-name");
 		manager.process(pingCommand);
 		
 		assertThat(waitForRequestProcessing()).isTrue();
@@ -211,7 +211,7 @@ public class SolrManagerTest {
 		expect(server.ping()).andReturn(null).anyTimes();
 		control.replay();
 		
-		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
+		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory, "app-name");
 		manager.process(pingCommand);
 		
 		assertThat(waitForRequestProcessing()).isTrue();
@@ -227,7 +227,7 @@ public class SolrManagerTest {
 		expect(server.ping()).andReturn(null); // This one's for the actual request that must be processed once SolR is back up
 		control.replay();
 		
-		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
+		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory, "app-name");
 		manager.setSolrCheckingInterval(100);
 		manager.process(pingCommand);
 		
@@ -242,7 +242,7 @@ public class SolrManagerTest {
 		expect(server.ping()).andThrow(new IOException()).anyTimes(); 
 		control.replay();
 		
-		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
+		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory, "app-name");
 		manager.setSolrAvailable(false);
 		manager.process(pingCommand);
 		
@@ -250,6 +250,22 @@ public class SolrManagerTest {
 		assertThat(pingRequest.getError()).isNull();
 		assertThat(manager.isSolrAvailable()).isFalse();
 		
+		control.verify();
+	}
+	
+	@Test
+	public void multipleClientsCanConnectToTheSameServer() throws Exception {
+		expect(server.ping()).andReturn(null).anyTimes();
+		control.replay();
+		
+		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory, "app1");
+		SolrManager manager2 = new SolrManager(configurationService, new JMSClient(false), solrClientFactory, "app2");
+		manager.process(pingCommand);
+		manager2.process(pingCommand);
+		
+		assertThat(waitForRequestProcessing()).isTrue();
+		assertThat(pingRequest.getError()).isNull();
+		assertThat(manager.isSolrAvailable()).isTrue();
 		control.verify();
 	}
 	

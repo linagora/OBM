@@ -111,7 +111,7 @@ public class SolrHelperFactoryTest {
 
  		control.replay();
 
- 		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory);
+ 		manager = new SolrManager(configurationService, new JMSClient(false), solrClientFactory, "app-name");
 		factory = new SolrHelper.Factory(manager, solrClientFactory, contactCommandFactory, eventCommandFactory);
   
  		contact.setUid(1);
