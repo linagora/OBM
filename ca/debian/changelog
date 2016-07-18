@@ -1,3 +1,9 @@
+obm-ca (3.2.1~0.alpha0) stable; urgency=low
+
+  * New upstream release.
+
+ -- Thomas Sarboni <tsarboni@linagora.com>  Mon, 18 Jul 2016 15:09:24 +0000
+
 obm-ca (3.1.6~2) stable; urgency=low
 
   * New upstream release.
