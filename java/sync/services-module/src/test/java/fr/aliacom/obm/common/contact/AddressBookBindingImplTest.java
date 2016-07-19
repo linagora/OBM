@@ -56,6 +56,7 @@ import org.obm.domain.dao.ContactDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.push.utils.DateUtils;
+import org.obm.service.calendar.ContactService;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
@@ -100,6 +101,7 @@ public class AddressBookBindingImplTest {
 			bindWithMock(ContactConfiguration.class);
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(CommitedOperationDao.class);
+			bindWithMock(ContactService.class);
 			bindWithMock(ObmSyncConfigurationService.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 		}

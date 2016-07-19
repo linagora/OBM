@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.domain.dao;
 
-import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -80,6 +79,8 @@ public interface ContactDao {
 	 */
 	Contact findContact(AccessToken token, int contactId) throws ContactNotFoundException, SQLException;
 
+	List<Contact> findContacts(AccessToken at, Set<Integer> contactIds, int limit);
+
 	Contact findAttendeeContactFromEmailForUser(String email, Integer userId) throws SQLException;
 
 	Contact removeContact(AccessToken at, Contact c) throws ServerFault, SQLException;
@@ -87,16 +88,6 @@ public interface ContactDao {
 	Set<DeletedContact> findRemovalCandidates(Date d, AccessToken at) throws SQLException;
 
 	List<AddressBook> findAddressBooks(AccessToken at) throws SQLException;
-
-	List<Contact> searchContactsInAddressBooksList(AccessToken at, Collection<AddressBook> addrBooks, String query,
-			int limit, Integer offset)
-			throws MalformedURLException, SQLException;
-
-	/**
-	 * Search contacts. Query will match against lastname, firstname & email
-	 * prefixes.
-	 */
-	List<Contact> searchContact(AccessToken at, AddressBook book, String query, int limit, Integer offset);
 
 	Set<Folder> findUpdatedFolders(Date timestamp, AccessToken at) throws SQLException;
 

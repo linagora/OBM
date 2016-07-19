@@ -31,10 +31,10 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
-import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +48,7 @@ import org.obm.domain.dao.ContactDao;
 import org.obm.locator.LocatorClientException;
 import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.push.utils.DateUtils;
+import org.obm.service.calendar.ContactService;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
@@ -97,11 +98,12 @@ public class AddressBookBindingImpl implements IAddressBook {
 	private final ObmSyncConfigurationService configuration;
 	private final ContactConfiguration contactConfiguration;
 	private final CommitedOperationDao commitedOperationDao;
+	private final ContactService contactService;
 
 	@Inject
 	/*package*/ AddressBookBindingImpl(ContactDao contactDao, UserDao userDao, ContactMerger contactMerger, ObmHelper obmHelper, 
 			ObmSyncConfigurationService configuration, ContactConfiguration contactConfiguration,
-			CommitedOperationDao commitedOperationDao) {
+			CommitedOperationDao commitedOperationDao, ContactService contactService) {
 		this.contactDao = contactDao;
 		this.userDao = userDao;
 		this.contactMerger = contactMerger;
@@ -109,6 +111,7 @@ public class AddressBookBindingImpl implements IAddressBook {
 		this.configuration = configuration;
 		this.contactConfiguration = contactConfiguration;
 		this.commitedOperationDao = commitedOperationDao;
+		this.contactService = contactService;
 	}
 
 	@Override
@@ -351,14 +354,9 @@ public class AddressBookBindingImpl implements IAddressBook {
 	public List<Contact> searchContact(AccessToken token, String query, int limit, Integer offset) throws ServerFault {
 		try {
 			List<AddressBook> addrBooks = contactDao.findAddressBooks(token);
-			return contactDao.searchContactsInAddressBooksList(token, addrBooks, query, limit, offset);
-		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
-			throw new ServerFault(e.getMessage(), e);
-		} catch (MalformedURLException e) {
-			logger.error(e.getMessage(), e);
-			throw new ServerFault(e.getMessage(), e);
-		} catch (LocatorClientException e) {
+			Set<Integer> contactIds = contactService.searchContactIds(token, query, addrBooks, limit, offset);
+			return contactDao.findContacts(token, contactIds, limit);
+		} catch (SQLException | LocatorClientException e) {
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
 		}
@@ -369,7 +367,8 @@ public class AddressBookBindingImpl implements IAddressBook {
 	public List<Contact> searchContactInGroup(AccessToken token, AddressBook book, String query, int limit, Integer offset) throws ServerFault {
 
 		try {
-			return contactDao.searchContact(token, book, query, limit, offset);
+			Set<Integer> contactIds = contactService.searchContactIds(token, query, Arrays.asList(book), limit, offset);
+			return contactDao.findContacts(token, contactIds, limit);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
@@ -472,14 +471,9 @@ public class AddressBookBindingImpl implements IAddressBook {
 	public List<Contact> searchContactsInSynchronizedAddressBooks(AccessToken token, String query, int limit, Integer offset) throws ServerFault {
 		try {
 			Collection<AddressBook> addressBooks = contactDao.listSynchronizedAddressBooks(token);
-			return contactDao.searchContactsInAddressBooksList(token, addressBooks, query, limit, offset);
-		} catch (SQLException e) {
-			logger.error(e.getMessage(), e);
-			throw new ServerFault(e.getMessage(), e);
-		} catch (MalformedURLException e) {
-			logger.error(e.getMessage(), e);
-			throw new ServerFault(e.getMessage(), e);
-		} catch (LocatorClientException e) {
+			Set<Integer> contactIds = contactService.searchContactIds(token, query, addressBooks, limit, offset);
+			return contactDao.findContacts(token, contactIds, limit);
+		} catch (SQLException | LocatorClientException e) {
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage(), e);
 		}

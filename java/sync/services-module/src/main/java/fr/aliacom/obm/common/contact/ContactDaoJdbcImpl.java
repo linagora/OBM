@@ -31,7 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.contact;
 
-import java.net.MalformedURLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,7 +38,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -53,26 +51,16 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.domain.dao.CalendarDao;
 import org.obm.domain.dao.ContactDao;
 import org.obm.domain.dao.EntityDaoListener;
-import org.obm.locator.LocatorClientException;
 import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
 import org.obm.push.utils.jdbc.StringSQLCollectionHelper;
-import org.obm.service.solr.SolrHelper;
-import org.obm.service.solr.SolrHelper.Factory;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
@@ -139,7 +127,6 @@ public class ContactDaoJdbcImpl implements ContactDao {
 		+ "INNER JOIN GroupEntity ON of_usergroup_group_id=groupentity_group_id WHERE of_usergroup_user_id=?";
 
 	private final CalendarDao calendarDao;
-	private final Factory solrHelperFactory;
 	private final EntityDaoListener entityDaoListener;
 	private final ObmHelper obmHelper;
 	private final ContactConfiguration contactConfiguration;
@@ -157,10 +144,9 @@ public class ContactDaoJdbcImpl implements ContactDao {
 	@VisibleForTesting
 	@Inject
 	ContactDaoJdbcImpl(ContactConfiguration contactConfiguration, CalendarDao calendarDao, EntityDaoListener entityDaoListener,
-			SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper, EventExtId.Factory eventExtIdFactory) {
+			ObmHelper obmHelper, EventExtId.Factory eventExtIdFactory) {
 		this.contactConfiguration = contactConfiguration;
 		this.calendarDao = calendarDao;
-		this.solrHelperFactory = solrHelperFactory;
 		this.entityDaoListener = entityDaoListener;
 		this.obmHelper = obmHelper;
 		this.eventExtIdFactory = eventExtIdFactory;
@@ -1523,63 +1509,8 @@ public class ContactDaoJdbcImpl implements ContactDao {
 		}
 	}
 
-	private List<Contact> searchContact(AccessToken at, Collection<AddressBook> addrBooks, Connection con, String query, int limit, Integer offset) 
-			throws SQLException, LocatorClientException {
+	private List<Contact> findContacts(AccessToken at, Connection con, Set<Integer> contactIds, int limit) throws SQLException {
 		
-		Set<Integer> contactIds = new HashSet<Integer>();
-
-		if (addrBooks.size() > 0) {
-			SolrHelper solrHelper = solrHelperFactory.createClient(at);
-			CommonsHttpSolrServer solrServer = solrHelper.getSolrContact();
-			StringBuilder sb = new StringBuilder();
-			sb.append("-is:archive ");
-			sb.append("+addressbookId:(");
-			int idx = 0;
-			for (AddressBook book : addrBooks) {
-				if (idx > 0) {
-					sb.append(" OR ");
-				}
-				sb.append(book.getUid());
-				idx++;
-			}
-			sb.append(")");
-			if (query != null && !"".equals(query)) {
-				sb.append(" +(displayname:(");
-				sb.append(query.toLowerCase());
-				sb.append("*) OR firstname:(");
-				sb.append(query.toLowerCase());
-				sb.append("*) OR lastname:(");
-				sb.append(query.toLowerCase());
-				sb.append("*) OR email:(");
-				sb.append(query.toLowerCase());
-				sb.append("*))");
-			}
-			SolrQuery params = new SolrQuery();
-			params.setQuery(sb.toString());
-			params.setIncludeScore(true);
-			params.setRows(limit);
-			params.setStart(offset);
-
-			try {
-				QueryResponse resp = solrServer.query(params);
-
-				SolrDocumentList results = resp.getResults();
-				if (logger.isDebugEnabled()) {
-					logger.debug("SOLR query time for " + results.size()
-							+ " results: " + resp.getElapsedTime() + "ms.");
-				}
-
-				for (int i = 0; i < limit && i < results.size(); i++) {
-					SolrDocument doc = results.get(i);
-					Map<String, Object> payload = doc.getFieldValueMap();
-					contactIds.add((Integer) payload.get("id"));
-				}
-			} catch (SolrServerException e) {
-				logger.error("Error querying server for '" + sb.toString()
-						+ " url: "
-						+ ClientUtils.toQueryString(params, false), e);
-			}
-		}
 		ContactResults contactResults = loadContactsFromDB(contactIds, con, limit);
 
 		if (!contactResults.contactMap.isEmpty()) {
@@ -1631,28 +1562,11 @@ public class ContactDaoJdbcImpl implements ContactDao {
 	}
 
 	@Override
-	public List<Contact> searchContactsInAddressBooksList(AccessToken at, Collection<AddressBook> addrBooks, String query, int limit, Integer offset) 
-			throws MalformedURLException, LocatorClientException, SQLException {
-		
+	public List<Contact> findContacts(AccessToken at, Set<Integer> contactIds, int limit) {
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			return searchContact(at, addrBooks, con, query, limit, offset);
-		} finally {
-			obmHelper.cleanup(con, null, null);
-		}
-	}
-
-	/**
-	 * Search contacts. Query will match against lastname, firstname & email
-	 * prefixes.
-	 */
-	@Override
-	public List<Contact> searchContact(AccessToken at, AddressBook book, String query, int limit, Integer offset) {
-		Connection con = null;
-		try {
-			con = obmHelper.getConnection();
-			return searchContact(at, Arrays.asList(book), con, query, limit, offset);
+			return findContacts(at, con, contactIds, limit);
 		} catch (Throwable e1) {
 			logger.error(e1.getMessage(), e1);
 		} finally {
