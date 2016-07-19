@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.contact;
+package org.obm.domain.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
@@ -48,11 +48,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
-import org.obm.domain.dao.CalendarDao;
-import org.obm.domain.dao.EntityDaoListener;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
-import org.obm.service.solr.SolrHelper;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.EventExtId;
@@ -355,7 +352,6 @@ public class ContactDaoJdbcImplTest {
 			bind(IMocksControl.class).toInstance(control);
 			bindMock(ContactConfiguration.class);
 			bindMock(CalendarDao.class);
-			bindMock(SolrHelper.Factory.class);
 			bindMock(ObmHelper.class);
 			bindMock(EventExtId.Factory.class);
 			bindMock(EntityDaoListener.class);

@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.contact;
+package org.obm.domain.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -54,9 +54,6 @@ import org.apache.commons.lang.StringUtils;
 import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.configuration.ContactConfiguration;
-import org.obm.domain.dao.CalendarDao;
-import org.obm.domain.dao.ContactDao;
-import org.obm.domain.dao.EntityDaoListener;
 import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
 import org.obm.push.utils.jdbc.IntegerSQLCollectionHelper;
