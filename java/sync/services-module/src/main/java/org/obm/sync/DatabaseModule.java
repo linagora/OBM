@@ -35,9 +35,9 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseDriversModule;
 import org.obm.domain.dao.CalendarDao;
 import org.obm.domain.dao.CalendarDaoJdbcImpl;
-import org.obm.domain.dao.CalendarDaoListener;
+import org.obm.domain.dao.EntityDaoListener;
 import org.obm.domain.dao.ContactDao;
-import org.obm.service.calendar.CalendarDaoListenerImpl;
+import org.obm.service.solr.SolrEntityDaoListener;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
@@ -56,7 +56,7 @@ public class DatabaseModule extends AbstractModule {
 		lifecycleListeners.addBinding().to(RequestScopedDatabaseConnectionProvider.class);
 		
 		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
-		bind(CalendarDaoListener.class).to(CalendarDaoListenerImpl.class);
+		bind(EntityDaoListener.class).to(SolrEntityDaoListener.class);
 		bind(ContactDao.class).to(ContactDaoJdbcImpl.class);
 		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
 	}

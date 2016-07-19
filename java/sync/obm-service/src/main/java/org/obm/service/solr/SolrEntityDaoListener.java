@@ -29,11 +29,11 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.service.calendar;
+package org.obm.service.solr;
 
-import org.obm.domain.dao.CalendarDaoListener;
-import org.obm.service.solr.SolrHelper;
+import org.obm.domain.dao.EntityDaoListener;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,14 +42,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class CalendarDaoListenerImpl implements CalendarDaoListener {
+public class SolrEntityDaoListener implements EntityDaoListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(CalendarDaoListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(EntityDaoListener.class);
 	
 	private final SolrHelper.Factory solrHelperFactory;
 
 	@Inject
-	public CalendarDaoListenerImpl(SolrHelper.Factory solrHelperFactory) {
+	public SolrEntityDaoListener(SolrHelper.Factory solrHelperFactory) {
 		this.solrHelperFactory = solrHelperFactory;
 	}
 	
@@ -61,6 +61,16 @@ public class CalendarDaoListenerImpl implements CalendarDaoListener {
 	@Override
 	public void eventHasBeenRemoved(AccessToken editor, Event event) {
 		removeEventFromSolr(editor, event);
+	}
+	
+	@Override
+	public void contactHasBeenCreated(AccessToken editor, Contact contact) {
+		indexContact(editor, contact);
+	}
+	
+	@Override
+	public void contactHasBeenRemoved(AccessToken editor, Contact contact) {
+		removeContactFromSolr(editor, contact);
 	}
 
 	private void indexEvent(AccessToken editor, Event ev) {
@@ -74,6 +84,22 @@ public class CalendarDaoListenerImpl implements CalendarDaoListener {
 	private void removeEventFromSolr(AccessToken token, Event ev) {
 		try {
 			solrHelperFactory.createClient(token).delete(ev);
+		} catch (Throwable t) {
+			logger.error("indexing error " + t.getMessage(), t);
+		}
+	}
+
+	private void indexContact(AccessToken editor, Contact contact) {
+		try {
+			solrHelperFactory.createClient(editor).createOrUpdate(contact);
+		} catch (Throwable t) {
+			logger.error("indexing error " + t.getMessage(), t);
+		}
+	}
+
+	private void removeContactFromSolr(AccessToken token, Contact contact) {
+		try {
+			solrHelperFactory.createClient(token).delete(contact);
 		} catch (Throwable t) {
 			logger.error("indexing error " + t.getMessage(), t);
 		}

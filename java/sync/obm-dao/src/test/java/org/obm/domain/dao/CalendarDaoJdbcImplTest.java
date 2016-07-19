@@ -121,7 +121,7 @@ public class CalendarDaoJdbcImplTest {
 			bindWithMock(CalendarDao.class);
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(DateProvider.class);
-			bindWithMock(CalendarDaoListener.class);
+			bindWithMock(EntityDaoListener.class);
 			bind(AttendeeService.class).to(SimpleAttendeeService.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 			bind(RecurrenceHelper.class).to(Ical4jHelper.class);
@@ -141,7 +141,7 @@ public class CalendarDaoJdbcImplTest {
 	@Inject
 	private DatabaseConnectionProvider dbcp;
 	@Inject
-	private CalendarDaoListener calendarDaoListener;
+	private EntityDaoListener calendarDaoListener;
 	
 	@Test
 	public void touchParentOfDeclinedRecurrentEventsMustNotIncludeDuplicatesWhenExDatesDiffer() {

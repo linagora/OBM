@@ -65,6 +65,7 @@ import org.obm.annotations.database.DatabaseEntity;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.domain.dao.CalendarDao;
 import org.obm.domain.dao.ContactDao;
+import org.obm.domain.dao.EntityDaoListener;
 import org.obm.locator.LocatorClientException;
 import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.push.utils.jdbc.IntegerIndexedSQLCollectionHelper;
@@ -139,6 +140,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 
 	private final CalendarDao calendarDao;
 	private final Factory solrHelperFactory;
+	private final EntityDaoListener entityDaoListener;
 	private final ObmHelper obmHelper;
 	private final ContactConfiguration contactConfiguration;
 	private final EventExtId.Factory eventExtIdFactory;
@@ -154,11 +156,12 @@ public class ContactDaoJdbcImpl implements ContactDao {
 
 	@VisibleForTesting
 	@Inject
-	ContactDaoJdbcImpl(ContactConfiguration contactConfiguration, CalendarDao calendarDao,
+	ContactDaoJdbcImpl(ContactConfiguration contactConfiguration, CalendarDao calendarDao, EntityDaoListener entityDaoListener,
 			SolrHelper.Factory solrHelperFactory, ObmHelper obmHelper, EventExtId.Factory eventExtIdFactory) {
 		this.contactConfiguration = contactConfiguration;
 		this.calendarDao = calendarDao;
 		this.solrHelperFactory = solrHelperFactory;
+		this.entityDaoListener = entityDaoListener;
 		this.obmHelper = obmHelper;
 		this.eventExtIdFactory = eventExtIdFactory;
 	}
@@ -396,18 +399,8 @@ public class ContactDaoJdbcImpl implements ContactDao {
 		} catch (EventNotFoundException e) {
 			throw new ServerFault(e.getMessage());
 		}
-		indexContact(at, c);
+		entityDaoListener.contactHasBeenCreated(at, c);
 		return c;
-	}
-
-	private void indexContact(AccessToken at, Contact c) throws ServerFault {
-		try {
-			// no need to pass the sql connection as indexing will be done in a
-			// separate thread
-			solrHelperFactory.createClient(at).createOrUpdate(c);
-		} catch (Exception e) {
-			throw new ServerFault("Indexing server is unavailable", e);
-		}
 	}
 
 	@Override
@@ -1002,7 +995,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 			obmHelper.cleanup(con, ps, null);
 		}
 
-		indexContact(token, c);
+		entityDaoListener.contactHasBeenCreated(token, c);
 
 		return c;
 	}
@@ -1073,7 +1066,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 			obmHelper.cleanup(con, ps, null);
 		}
 
-		indexContact(token, contact);
+		entityDaoListener.contactHasBeenCreated(token, contact);
 
 		return contact;
 	}
@@ -1358,17 +1351,9 @@ public class ContactDaoJdbcImpl implements ContactDao {
 			obmHelper.cleanup(con, ps, null);
 		}
 
-		removeContactFromSolr(at, c);
+		entityDaoListener.contactHasBeenRemoved(at, c);
 
 		return c;
-	}
-
-	private void removeContactFromSolr(AccessToken at, Contact c) throws ServerFault {
-		try {
-			solrHelperFactory.createClient(at).delete(c);
-		} catch (Exception e) {
-			throw new ServerFault("Indexing server is unavailable", e);
-		}
 	}
 
 	@Override
@@ -1595,7 +1580,6 @@ public class ContactDaoJdbcImpl implements ContactDao {
 						+ ClientUtils.toQueryString(params, false), e);
 			}
 		}
-
 		ContactResults contactResults = loadContactsFromDB(contactIds, con, limit);
 
 		if (!contactResults.contactMap.isEmpty()) {

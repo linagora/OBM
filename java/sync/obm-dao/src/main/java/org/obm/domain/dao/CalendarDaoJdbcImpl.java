@@ -221,16 +221,16 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	private final UserDao userDao;
 	private final ObmHelper obmHelper;
 	private final RecurrenceHelper recurrenceHelper;
-	private final CalendarDaoListener calendarDaoListener;
+	private final EntityDaoListener entityDaoListener;
 
 
 	@Inject
 	@VisibleForTesting CalendarDaoJdbcImpl(UserDao userDao, ObmHelper obmHelper, 
-			RecurrenceHelper recurrenceHelper, CalendarDaoListener calendarDaoListener) {
+			RecurrenceHelper recurrenceHelper, EntityDaoListener entityDaoListener) {
 		this.userDao = userDao;
 		this.obmHelper = obmHelper;
 		this.recurrenceHelper = recurrenceHelper;
-		this.calendarDaoListener = calendarDaoListener;
+		this.entityDaoListener = entityDaoListener;
 	}
 	
 	private Integer catIdFromString(Connection con, String category,
@@ -337,7 +337,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			insertEventAlert(con, editor, ownerId, ev);
 		}
 
-		calendarDaoListener.eventHasBeenCreated(editor, ev);
+		entityDaoListener.eventHasBeenCreated(editor, ev);
 
 		return ev;
 	}
@@ -1821,7 +1821,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 			obmHelper.cleanup(null, ps, null);
 		}
 		
-		calendarDaoListener.eventHasBeenCreated(editor, ev);
+		entityDaoListener.eventHasBeenCreated(editor, ev);
 	}
 
 	private void insertDeletedEventLinks(AccessToken editor, Connection con, List<Attendee> attendeetoRemove, Event ev)
@@ -2132,7 +2132,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		insertIntoDeletedEvent(con, token, event, eventType, attendeeIds);
 		removeFromEvent(con, event);
-		calendarDaoListener.eventHasBeenRemoved(token, event);
+		entityDaoListener.eventHasBeenRemoved(token, event);
 
 		return event;
 	}

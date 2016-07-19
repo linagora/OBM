@@ -32,11 +32,15 @@
 package org.obm.domain.dao;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 
-public interface CalendarDaoListener {
+public interface EntityDaoListener {
 	
 	void eventHasBeenCreated(AccessToken editor, Event event);
 	void eventHasBeenRemoved(AccessToken editor, Event event);
+	
+	void contactHasBeenCreated(AccessToken editor, Contact contact);
+	void contactHasBeenRemoved(AccessToken editor, Contact contact);
 
 }

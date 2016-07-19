@@ -49,6 +49,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.configuration.ContactConfiguration;
 import org.obm.domain.dao.CalendarDao;
+import org.obm.domain.dao.EntityDaoListener;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.service.solr.SolrHelper;
@@ -357,6 +358,7 @@ public class ContactDaoJdbcImplTest {
 			bindMock(SolrHelper.Factory.class);
 			bindMock(ObmHelper.class);
 			bindMock(EventExtId.Factory.class);
+			bindMock(EntityDaoListener.class);
 		}
 	}
 

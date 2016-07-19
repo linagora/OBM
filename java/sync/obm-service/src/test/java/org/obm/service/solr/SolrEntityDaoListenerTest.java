@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.service.calendar;
+package org.obm.service.solr;
 
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
@@ -38,33 +38,34 @@ import static org.easymock.EasyMock.expectLastCall;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.obm.service.solr.SolrHelper;
-import org.obm.service.solr.SolrHelper.Factory;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 
 
-public class CalendarDaoListenerImplTest {
+public class SolrEntityDaoListenerTest {
 
-	private CalendarDaoListenerImpl testee;
+	private SolrEntityDaoListener testee;
 	private IMocksControl control;
-	private Factory solrHelperFactory;
+	private SolrHelper.Factory solrHelperFactory;
 	private SolrHelper solrHelper;
 	private AccessToken token;
 	private Event event;
+	private Contact contact;
 
 	@Before
 	public void setUp() {
 		control = createControl();
 
-		solrHelperFactory = control.createMock(Factory.class);
+		solrHelperFactory = control.createMock(SolrHelper.Factory.class);
 		solrHelper = control.createMock(SolrHelper.class);
 		token = control.createMock(AccessToken.class);
 		event = control.createMock(Event.class);
+		contact = control.createMock(Contact.class);
 		
 		expect(solrHelperFactory.createClient(token)).andReturn(solrHelper);
 		
-		testee = new CalendarDaoListenerImpl(solrHelperFactory);
+		testee = new SolrEntityDaoListener(solrHelperFactory);
 	}
 	
 	@Test
@@ -104,6 +105,46 @@ public class CalendarDaoListenerImplTest {
 		
 		control.replay();
 		testee.eventHasBeenRemoved(token, event);
+		control.verify();
+	}
+	
+	@Test
+	public void contactHasBeenCreatedCallShouldIndexEvent() {
+		solrHelper.createOrUpdate(contact);
+		expectLastCall();
+		
+		control.replay();
+		testee.contactHasBeenCreated(token, contact);
+		control.verify();
+	}
+	
+	@Test
+	public void contactHasBeenCreatedCallShouldFailWithoutPropagatingExpection() {
+		solrHelper.createOrUpdate(contact);
+		expectLastCall().andThrow(new RuntimeException("unexpected"));
+		
+		control.replay();
+		testee.contactHasBeenCreated(token, contact);
+		control.verify();
+	}
+	
+	@Test
+	public void contactHasBeenRemovedCallShouldIndexEvent() {
+		solrHelper.delete(contact);
+		expectLastCall();
+		
+		control.replay();
+		testee.contactHasBeenRemoved(token, contact);
+		control.verify();
+	}
+	
+	@Test
+	public void contactHasBeenRemovedCallShouldFailWithoutPropagatingExpection() {
+		solrHelper.delete(contact);
+		expectLastCall().andThrow(new RuntimeException("unexpected"));
+		
+		control.replay();
+		testee.contactHasBeenRemoved(token, contact);
 		control.verify();
 	}
 	
