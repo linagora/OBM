@@ -72,6 +72,7 @@ import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.CalendarDao;
+import org.obm.domain.dao.CommitedOperationDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.icalendar.Ical4jHelper;
@@ -126,7 +127,6 @@ import com.google.inject.Inject;
 
 import fr.aliacom.obm.ServicesToolBox;
 import fr.aliacom.obm.ToolBox;
-import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.user.ObmUser;
 import fr.aliacom.obm.common.user.UserEmails;

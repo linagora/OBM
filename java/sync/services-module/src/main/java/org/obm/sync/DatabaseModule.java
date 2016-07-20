@@ -35,6 +35,8 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.dbcp.DatabaseDriversModule;
 import org.obm.domain.dao.CalendarDao;
 import org.obm.domain.dao.CalendarDaoJdbcImpl;
+import org.obm.domain.dao.CommitedOperationDao;
+import org.obm.domain.dao.CommitedOperationDaoJdbcImpl;
 import org.obm.domain.dao.ContactDaoJdbcImpl;
 import org.obm.domain.dao.EntityDaoListener;
 import org.obm.domain.dao.ContactDao;
@@ -42,9 +44,6 @@ import org.obm.service.solr.SolrEntityDaoListener;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-
-import fr.aliacom.obm.common.addition.CommitedOperationDao;
-import fr.aliacom.obm.common.addition.CommitedOperationDaoJdbcImpl;
 
 public class DatabaseModule extends AbstractModule {
 

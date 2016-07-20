@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.addition;
+package org.obm.domain.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,8 +37,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.codec.binary.Base64;
-import org.obm.domain.dao.CalendarDao;
-import org.obm.domain.dao.ContactDao;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;

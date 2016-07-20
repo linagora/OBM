@@ -44,6 +44,7 @@ import javax.naming.NoPermissionException;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.ContactConfiguration;
+import org.obm.domain.dao.CommitedOperationDao;
 import org.obm.domain.dao.ContactDao;
 import org.obm.locator.LocatorClientException;
 import org.obm.provisioning.dao.exceptions.FindException;
@@ -79,7 +80,6 @@ import com.google.common.collect.Sets.SetView;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import fr.aliacom.obm.common.addition.CommitedOperationDao;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 /**

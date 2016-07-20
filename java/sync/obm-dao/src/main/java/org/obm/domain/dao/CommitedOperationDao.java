@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.common.addition;
+package org.obm.domain.dao;
 
 import java.sql.SQLException;
 
