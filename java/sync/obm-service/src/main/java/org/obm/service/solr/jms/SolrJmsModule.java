@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.service.solr.jms;
 
 import org.obm.service.solr.SolrClientFactory;
 import org.obm.service.solr.SolrClientFactoryImpl;

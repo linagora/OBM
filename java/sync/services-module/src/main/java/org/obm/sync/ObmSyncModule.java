@@ -36,6 +36,7 @@ import org.obm.domain.dao.DaoModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
 import org.obm.healthcheck.HealthCheckModule;
 import org.obm.service.MessageQueueServerModule;
+import org.obm.service.solr.jms.SolrJmsModule;
 import org.obm.sync.transactional.JdbcTransactionalModule;
 
 import com.google.inject.AbstractModule;
