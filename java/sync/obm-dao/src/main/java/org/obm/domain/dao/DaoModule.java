@@ -66,5 +66,8 @@ public class DaoModule extends AbstractModule {
 		bind(UserPatternDao.class).to(UserPatternDaoJdbcImpl.class);
 		bind(UserDao.class).to(UserDaoJdbcImpl.class);
 		bind(GroupDao.class).to(GroupDaoJdbcImpl.class);
+		bind(CalendarDao.class).to(CalendarDaoJdbcImpl.class);
+		bind(ContactDao.class).to(ContactDaoJdbcImpl.class);
+		bind(CommitedOperationDao.class).to(CommitedOperationDaoJdbcImpl.class);
 	}
 }

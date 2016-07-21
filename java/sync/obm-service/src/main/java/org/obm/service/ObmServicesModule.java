@@ -31,12 +31,14 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.service;
 
+import org.obm.domain.dao.EntityDaoListener;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.locator.store.LocatorCache;
 import org.obm.locator.store.LocatorService;
 import org.obm.service.attendee.AttendeeServiceJdbcImpl;
 import org.obm.service.domain.DomainCache;
 import org.obm.service.domain.DomainService;
+import org.obm.service.solr.SolrEntityDaoListener;
 import org.obm.service.user.UserService;
 import org.obm.service.user.UserServiceImpl;
 import org.obm.sync.services.AttendeeService;
@@ -55,6 +57,7 @@ public class ObmServicesModule extends AbstractModule {
 		bind(LocatorService.class).to(LocatorCache.class);
 		bind(AttendeeService.class).to(AttendeeServiceJdbcImpl.class);
 		bind(RecurrenceHelper.class).to(Ical4jHelper.class);
+		bind(EntityDaoListener.class).to(SolrEntityDaoListener.class);
 	}
 
 }
