@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2016 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,60 +29,65 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm;
 
-import org.obm.Configuration;
-import org.obm.SolrModuleUtils;
-import org.obm.annotations.transactional.TransactionalModule;
-import org.obm.dbcp.MultiNodeDatabaseModule;
-import org.obm.domain.dao.DaoModule;
-import org.obm.service.MessageQueueServerModule;
+import java.io.IOException;
+import java.net.MalformedURLException;
 
-import com.google.common.io.Files;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrInputDocument;
+import org.obm.service.solr.SolrClientFactory;
+import org.obm.service.solr.SolrService;
+
+import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
-import com.google.inject.util.Modules;
-import com.google.inject.util.Modules.OverriddenModuleBuilder;
 
-public class ServicesTestModule extends AbstractModule {
-	
-	public final Configuration configuration;
+import fr.aliacom.obm.common.domain.ObmDomain;
 
-	public ServicesTestModule() {
-		configuration = new Configuration();
-		configuration.obmUiBaseUrl = "localhost";
-		configuration.locator.url = "localhost";
-		configuration.dataDir = Files.createTempDir();
-		configuration.transaction.timeoutInSeconds = 3600;
-	}
+public class SolrModuleUtils {
 
-	@Override
-	protected void configure() {
-		OverriddenModuleBuilder override = Modules.override(
-				new MessageQueueServerModule(),
-				new ObmSyncServletModule(),
-				new ObmSyncServicesModule(),
-				new MultiNodeDatabaseModule(),
-				new TransactionalModule(),
-				new DatabaseModule(),
-				new DaoModule(),
-				new DatabaseMetadataModule());
-		try {
-			install(override.with(overrideModule()));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+	private static class DummyCommonsHttpSolrServer extends CommonsHttpSolrServer {
+		public DummyCommonsHttpSolrServer() throws MalformedURLException {
+			super("http://localhost:8983/solr/");
+		}
+		
+		@Override
+		public UpdateResponse deleteById(String id) throws SolrServerException, IOException {
+			return null;
+		}
+		
+		@Override
+		public UpdateResponse add(SolrInputDocument doc) throws SolrServerException, IOException {
+			return null;
+		}
+		
+		@Override
+		public UpdateResponse commit() throws SolrServerException, IOException {
+			return null;
 		}
 	}
-
-	public Module overrideModule() {
-		return Modules.combine(
-				getConfigurationModule(),
-				ModuleUtils.buildDummySmtpModule(),
-				SolrModuleUtils.buildDummySolrModule());
+	
+	public static Module buildDummySolrModule() {
+		return new AbstractModule() {
+			
+			@Override
+			protected void configure() {
+				bind(SolrClientFactory.class).toInstance(new SolrClientFactory() {
+					
+					@Override
+					public CommonsHttpSolrServer create(SolrService service, ObmDomain domain) {
+						try {
+							return new DummyCommonsHttpSolrServer();
+						} catch (MalformedURLException e) {
+							throw Throwables.propagate(e);
+						}
+					}
+				});
+			}
+		};
 	}
-
-	protected Module getConfigurationModule() {
-		return ModuleUtils.buildDummyConfigurationModule(configuration);
-	}
-
+	
 }

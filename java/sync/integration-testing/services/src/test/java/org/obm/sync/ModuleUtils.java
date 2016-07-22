@@ -31,8 +31,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Map;
 
 import javax.mail.MessagingException;
@@ -40,10 +38,6 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrInputDocument;
 import org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory;
 import org.hornetq.core.remoting.impl.netty.TransportConstants;
 import org.obm.Configuration;
@@ -58,11 +52,8 @@ import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
 import org.obm.locator.LocatorClientException;
 import org.obm.locator.store.LocatorService;
-import org.obm.service.solr.SolrClientFactory;
-import org.obm.service.solr.SolrService;
 import org.obm.sync.ObmSyncStaticConfigurationService.ObmSyncConfiguration;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
@@ -70,7 +61,6 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.util.Modules;
 import com.linagora.obm.sync.HornetQConfiguration;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class ModuleUtils {
@@ -119,50 +109,6 @@ public class ModuleUtils {
 					@Override
 					public String getServiceLocation(String serviceSlashProperty, String loginAtDomain) throws LocatorClientException {
 						return "localhost";
-					}
-				});
-			}
-		};
-	}
-	
-	private static class DummyCommonsHttpSolrServer extends CommonsHttpSolrServer {
-		public DummyCommonsHttpSolrServer() throws MalformedURLException {
-			super("http://localhost:8983/solr/");
-		}
-		
-		@Override
-		public UpdateResponse deleteById(String id) throws SolrServerException,
-				IOException {
-			return null;
-		}
-		
-		@Override
-		public UpdateResponse add(SolrInputDocument doc)
-				throws SolrServerException, IOException {
-			return null;
-		}
-		
-		@Override
-		public UpdateResponse commit() throws SolrServerException, IOException {
-			return null;
-		}
-	}
-	
-	public static Module buildDummySolrModule() {
-		return new AbstractModule() {
-			
-			@Override
-			protected void configure() {
-				bind(SolrClientFactory.class).toInstance(new SolrClientFactory() {
-					
-					@Override
-					public CommonsHttpSolrServer create(SolrService service,
-							ObmDomain domain) {
-						try {
-							return new DummyCommonsHttpSolrServer();
-						} catch (MalformedURLException e) {
-							throw Throwables.propagate(e);
-						}
 					}
 				});
 			}

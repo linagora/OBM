@@ -49,6 +49,7 @@
 		<jsoup.version>1.7.2</jsoup.version>
 		<guice.version>3.0</guice.version>
 		<apache-mime4j.version>0.7.2</apache-mime4j.version>
+		<apache-solr.version>1.4.1</apache-solr.version>
 		<btm.version>3.0.0-1a33e59482fd29f6993ef3dfb5fab12efa0b24d2</btm.version>
 		<parboiled.version>1.1.6</parboiled.version>
 		<jersey.version>1.17.1</jersey.version>
@@ -848,6 +849,11 @@ org.eclipse.jdt.core.compiler.source=1.7
 				<groupId>org.apache.shiro</groupId>
 				<artifactId>shiro-web</artifactId>
 				<version>${shiro.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.solr</groupId>
+				<artifactId>solr-solrj</artifactId>
+				<version>${apache-solr.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.assertj</groupId>
