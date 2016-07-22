@@ -41,6 +41,7 @@ import org.obm.configuration.ConfigurationServiceImpl;
 import org.obm.configuration.DatabaseConfigurationImpl;
 import org.obm.configuration.DefaultTransactionConfiguration;
 import org.obm.configuration.GlobalAppConfiguration;
+import org.obm.configuration.LocatorConfigurationImpl;
 import org.obm.configuration.module.LoggerModule;
 import org.obm.dbcp.DatabaseModule;
 import org.obm.healthcheck.HealthCheckDefaultHandlersModule;
@@ -79,6 +80,7 @@ public class ProvisioningServerService extends ServletModule {
 				.mainConfiguration(new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME))
 				.databaseConfiguration(new DatabaseConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
 				.transactionConfiguration(new DefaultTransactionConfiguration.Factory().create(APPLICATION_NAME, new ConfigurationServiceImpl.Factory().create(GLOBAL_CONFIGURATION_FILE, APPLICATION_NAME)))
+				.locatorConfiguration(new LocatorConfigurationImpl.Factory().create(GLOBAL_CONFIGURATION_FILE))
 				.build();
 	}
 

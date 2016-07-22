@@ -62,6 +62,7 @@ import org.obm.domain.dao.PGroupDao;
 import org.obm.domain.dao.PUserDao;
 import org.obm.domain.dao.UserDao;
 import org.obm.domain.dao.UserSystemDao;
+import org.obm.locator.store.LocatorService;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.BatchStatus;
@@ -85,6 +86,7 @@ import org.obm.provisioning.processing.BatchTracker;
 import org.obm.provisioning.processing.impl.users.sieve.SieveScriptUpdaterFactory;
 import org.obm.push.utils.UUIDFactory;
 import org.obm.satellite.client.SatelliteService;
+import org.obm.service.solr.SolrManager;
 import org.obm.sync.date.DateProvider;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.serviceproperty.ServiceProperty;
@@ -96,6 +98,7 @@ import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.util.Modules;
 import com.jayway.restassured.RestAssured;
+import com.linagora.obm.sync.JMSClient;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -148,6 +151,9 @@ public abstract class CommonDomainEndPointEnvTest {
 					bind(BatchProcessor.class).toInstance(mocksControl.createMock(BatchProcessor.class));
 					bind(DomainBasedSubResourceForTest.class);
 					bind(CyrusImapService.class).toInstance(mocksControl.createMock(CyrusImapService.class));
+					bind(JMSClient.class).toInstance(mocksControl.createMock(JMSClient.class));
+					bind(LocatorService.class).toInstance(mocksControl.createMock(LocatorService.class));
+					bind(SolrManager.class).toInstance(mocksControl.createMock(SolrManager.class));
 
 					bind(DateProvider.class).toInstance(mocksControl.createMock(DateProvider.class));
 					bind(DatabaseConnectionProvider.class).toInstance(mocksControl.createMock(DatabaseConnectionProvider.class));

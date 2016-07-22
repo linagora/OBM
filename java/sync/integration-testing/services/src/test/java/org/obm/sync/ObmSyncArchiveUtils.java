@@ -47,6 +47,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.CoordinateParseException;
 import org.jboss.shrinkwrap.resolver.api.ResolutionException;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.obm.SolrModuleUtils;
 import org.obm.StaticConfigurationService;
 import org.obm.StaticLocatorConfiguration;
 import org.obm.arquillian.GuiceWebXmlDescriptor;
@@ -89,6 +90,7 @@ public class ObmSyncArchiveUtils {
 				.addAsLibraries(resolveArtifacts("com.h2database:h2"))
 				.addClasses(
 						ModuleUtils.class,
+						SolrModuleUtils.class,
 						org.obm.Configuration.class,
 						org.obm.ConfigurationModule.class,
 						DatabaseConfigurationFixtureH2.class,

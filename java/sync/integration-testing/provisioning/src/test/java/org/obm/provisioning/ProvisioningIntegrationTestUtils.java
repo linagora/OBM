@@ -31,10 +31,17 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning;
 
+import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 
 import java.net.URL;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.core.Response.Status;
+
+import com.jayway.awaitility.Duration;
 import com.jayway.restassured.RestAssured;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
@@ -68,11 +75,20 @@ public class ProvisioningIntegrationTestUtils {
 	public static String startBatch(URL baseURL, ObmDomainUuid obmDomainUuid) {
 		RestAssured.baseURI = domainUrl(baseURL, obmDomainUuid);
 
-		return given()
+		String batchId = given()
 				.auth().basic("admin0@global.virt", "admin0")
 				.post("/batches")
 				.jsonPath()
 				.getString("id");
+
+		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
+		return batchId;
+	}
+
+	public static void commitBatch() {
+		given()
+			.auth().basic("admin0@global.virt", "admin0")
+			.put();
 	}
 	
 	public static String groupUrl(URL baseURL, ObmDomainUuid domain) {
@@ -86,6 +102,14 @@ public class ProvisioningIntegrationTestUtils {
 	public static String profileUrl(URL baseURL, ObmDomainUuid domain) {
 		return domainUrl(baseURL, domain) + "/profiles/";
 	}
+	
+	public static String eventUrl(URL baseURL, ObmDomainUuid domain) {
+		return domainUrl(baseURL, domain) + "/events/";
+	}
+	
+	public static String batchUrl(URL baseURL, ObmDomainUuid domain, String batchId) {
+		return domainUrl(baseURL, domain) + "/batches/" + batchId;
+	}
 
 	public static String domainUrl(URL baseURL, ObmDomainUuid domain) {
 		return baseUrl(baseURL) + "/" + domain.get();
@@ -94,8 +118,35 @@ public class ProvisioningIntegrationTestUtils {
 	public static String baseUrl(URL baseURL) {
 		return baseURL.toExternalForm() + ProvisioningService.PROVISIONING_ROOT_PATH;
 	}
-	
-	public static String batchUrl(URL baseURL, ObmDomainUuid domain, String batchId) {
-		return domainUrl(baseURL, domain) + "/batches/" + batchId;
+
+	public static void waitForBatchSuccess(final String batchId) {
+        await()
+	        .atMost(1, TimeUnit.MINUTES)
+	        .pollDelay(Duration.ONE_SECOND)
+	        .pollInterval(Duration.ONE_SECOND)
+	        .until(new Callable<Boolean>() {
+
+				@Override
+				public Boolean call() throws Exception {
+					try {
+						given()
+							.auth().basic("admin0@global.virt", "admin0").
+						expect()
+							.statusCode(Status.OK.getStatusCode())
+							.body(containsString("{"
+									+ "\"id\":" + batchId + ","
+									+ "\"status\":\"SUCCESS\","
+									+ "\"operationCount\":1,"
+									+ "\"operationDone\":1,"
+								)).
+						when()
+							.get("");
+						return true;
+					} catch (AssertionError e) {
+						return false;
+					}
+				}
+	        	
+	        });
 	}
 }

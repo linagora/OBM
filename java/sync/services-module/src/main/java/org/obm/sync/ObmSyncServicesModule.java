@@ -94,5 +94,5 @@ public class ObmSyncServicesModule extends AbstractModule {
 		bind(Boolean.class).annotatedWith(Names.named("queueIsRemote")).toInstance(false);
 		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
-	}
+    }
 }

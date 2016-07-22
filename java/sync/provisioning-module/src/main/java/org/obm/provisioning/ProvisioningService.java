@@ -77,12 +77,15 @@ import org.obm.provisioning.ldap.client.LdapModule;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
 import org.obm.provisioning.resources.DomainResource;
+import org.obm.provisioning.resources.EventResource;
 import org.obm.provisioning.resources.GroupResource;
 import org.obm.provisioning.resources.GroupWriteResource;
 import org.obm.provisioning.resources.ProfileResource;
 import org.obm.provisioning.resources.UserResource;
 import org.obm.provisioning.resources.UserWriteResource;
 import org.obm.satellite.client.SatelliteClientModule;
+import org.obm.service.ObmServicesModule;
+import org.obm.service.solr.jms.SolrJmsModule;
 import org.obm.sync.XTrustProvider;
 
 import com.google.common.collect.ImmutableMap;
@@ -135,6 +138,8 @@ public class ProvisioningService extends ServletModule {
 		
 		bindRestResources();
 		
+		install(new ObmServicesModule());
+		install(new SolrJmsModule());
 		install(new DaoModule());
 		install(new BatchProcessingModule());
 		install(new LdapModule());
@@ -155,6 +160,7 @@ public class ProvisioningService extends ServletModule {
 		bind(UserWriteResource.class);
 		bind(GroupResource.class);
 		bind(GroupWriteResource.class);
+		bind(EventResource.class);
 		bind(ObmDomainProvider.class);
 		bind(BatchProvider.class);
 		bind(WebApplicationExceptionMapper.class);

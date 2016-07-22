@@ -49,23 +49,31 @@ import fr.aliacom.obm.common.domain.ObmDomain;
 
 public class SolrModuleUtils {
 
-	private static class DummyCommonsHttpSolrServer extends CommonsHttpSolrServer {
+	public static class DummyCommonsHttpSolrServer extends CommonsHttpSolrServer {
+		
+		public Integer deleteByIdCount = 0; 
+		public Integer addCount = 0; 
+		public Integer commitCount = 0; 
+		
 		public DummyCommonsHttpSolrServer() throws MalformedURLException {
 			super("http://localhost:8983/solr/");
 		}
 		
 		@Override
 		public UpdateResponse deleteById(String id) throws SolrServerException, IOException {
+			deleteByIdCount++;
 			return null;
 		}
 		
 		@Override
 		public UpdateResponse add(SolrInputDocument doc) throws SolrServerException, IOException {
+			addCount++;
 			return null;
 		}
 		
 		@Override
 		public UpdateResponse commit() throws SolrServerException, IOException {
+			commitCount++;
 			return null;
 		}
 	}
@@ -75,17 +83,24 @@ public class SolrModuleUtils {
 			
 			@Override
 			protected void configure() {
+				final DummyCommonsHttpSolrServer solrServer = buildSolrServer();
+				
+				bind(DummyCommonsHttpSolrServer.class).toInstance(solrServer);
 				bind(SolrClientFactory.class).toInstance(new SolrClientFactory() {
 					
 					@Override
 					public CommonsHttpSolrServer create(SolrService service, ObmDomain domain) {
-						try {
-							return new DummyCommonsHttpSolrServer();
-						} catch (MalformedURLException e) {
-							throw Throwables.propagate(e);
-						}
+						return solrServer;
 					}
 				});
+			}
+
+			private DummyCommonsHttpSolrServer buildSolrServer() {
+				try {
+					return new DummyCommonsHttpSolrServer();
+				} catch (MalformedURLException e) {
+					throw Throwables.propagate(e);
+				}
 			}
 		};
 	}

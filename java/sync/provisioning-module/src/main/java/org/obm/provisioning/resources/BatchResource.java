@@ -140,5 +140,10 @@ public class BatchResource {
 	public Class<GroupWriteResource> groups() {
 		return GroupWriteResource.class;
 	}
+	
+	@Path("{batchId}/events")
+	public Class<EventResource> events() {
+		return EventResource.class;
+	}
 
 }

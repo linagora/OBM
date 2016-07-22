@@ -65,7 +65,14 @@ public class OperationJsonSerializer extends JsonSerializer<Operation> {
 			case PUT:
 			case PATCH:
 				if (body != null) {
-					jgen.writeRawValue(body);
+					switch (value.getEntityType()) {
+					case EVENT:
+						jgen.writeString(body);
+						break;
+					default:
+						jgen.writeRawValue(body);
+						break;
+					}
 				} else {
 					jgen.writeNull();
 				}
@@ -94,6 +101,10 @@ public class OperationJsonSerializer extends JsonSerializer<Operation> {
 								new String[]{"subgroupId", Request.SUBGROUPS_ID_KEY});
 						params.add(
 								new String[]{"groupId", Request.GROUPS_ID_KEY});
+						break;
+					case EVENT:
+						params.add(
+								new String[]{"userEmail", Request.USERS_EMAIL_KEY});
 						break;
 				}
 

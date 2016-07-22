@@ -33,7 +33,6 @@ package org.obm.provisioning.group;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
-import static org.obm.provisioning.ProvisioningIntegrationTestUtils.batchUrl;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.getAdminUserJson;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.groupUrl;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.startBatch;
@@ -453,7 +452,6 @@ public class GroupIntegrationTest {
 	public void testCreateGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		String body = "{" +
 				"\"id\":\"CreatedGroup\"," +
@@ -498,7 +496,6 @@ public class GroupIntegrationTest {
 	public void testModifyGroupByPutMethod() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		String body = "{" +
 				"\"id\":\"AdminExtId\"," +
@@ -551,7 +548,6 @@ public class GroupIntegrationTest {
 	public void testModifyGroupByPatchMethod() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		String body = "{" + "\"description\":\"Patched AdminExtId group\"" + "}";
 				
@@ -590,7 +586,6 @@ public class GroupIntegrationTest {
 	public void testDeleteGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		given()
 			.auth().basic("admin0@global.virt", "admin0").
@@ -625,7 +620,6 @@ public class GroupIntegrationTest {
 	public void testAddUserToGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		given()
 			.auth().basic("admin0@global.virt", "admin0").
@@ -660,7 +654,6 @@ public class GroupIntegrationTest {
 	public void testDeleteUserFromGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		given()
 			.auth().basic("admin0@global.virt", "admin0").
@@ -695,7 +688,6 @@ public class GroupIntegrationTest {
 	public void testAddSubgroupToGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		given()
 			.auth().basic("admin0@global.virt", "admin0").
@@ -730,7 +722,6 @@ public class GroupIntegrationTest {
 	public void testDeleteSubgroupFromGroup() {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		RestAssured.baseURI = batchUrl(baseURL, obmDomainUuid, batchId);
 
 		given()
 			.auth().basic("admin0@global.virt", "admin0").

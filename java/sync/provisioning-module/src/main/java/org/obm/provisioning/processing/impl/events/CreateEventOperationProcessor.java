@@ -27,8 +27,51 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.beans;
+package org.obm.provisioning.processing.impl.events;
 
-public enum BatchEntityType {
-	USER, GROUP, USER_MEMBERSHIP, GROUP_MEMBERSHIP, EVENT
+import org.obm.annotations.transactional.Transactional;
+import org.obm.provisioning.beans.Batch;
+import org.obm.provisioning.beans.BatchEntityType;
+import org.obm.provisioning.beans.HttpVerb;
+import org.obm.provisioning.beans.Operation;
+import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.exception.ProcessingException;
+import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
+import org.obm.service.calendar.CalendarService;
+import org.obm.sync.auth.AccessToken;
+
+import com.google.inject.Inject;
+
+import fr.aliacom.obm.common.user.ObmUser;
+
+public class CreateEventOperationProcessor extends AbstractOperationProcessor {
+
+	private static final String PAPI_ORIGIN = "papi";
+
+	@Inject
+	private CalendarService calendarService;
+	
+	@Inject
+	private AccessToken.Factory accessTokenFactory;
+
+	@Inject
+	CreateEventOperationProcessor() {
+		super(BatchEntityType.EVENT, HttpVerb.POST);
+	}
+
+	@Override
+	@Transactional
+	public void process(Operation operation, Batch batch) throws ProcessingException {
+		try {
+			String userEmail = operation.getRequest().getParams().get(Request.USERS_EMAIL_KEY);
+
+			ObmUser user = userDao.findUser(userEmail, batch.getDomain());
+			AccessToken token = accessTokenFactory.build(user, PAPI_ORIGIN);
+			
+			calendarService.importICalendar(token, userEmail, operation.getRequest().getBody());
+		} catch (Exception e) {
+			throw new ProcessingException(e);
+		}
+	}
+
 }

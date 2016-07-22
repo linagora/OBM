@@ -32,19 +32,24 @@
 package org.obm.provisioning;
 
 import org.obm.Configuration;
-import org.obm.StaticConfigurationService;
+import org.obm.ConfigurationModule;
+import org.obm.SolrModuleUtils;
 import org.obm.configuration.DatabaseConfiguration;
-import org.obm.configuration.TransactionConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixtureH2;
 import org.obm.dbcp.jdbc.DatabaseDriverConfiguration;
 import org.obm.dbcp.jdbc.H2DriverConfiguration;
+import org.obm.locator.LocatorClientException;
+import org.obm.locator.store.LocatorService;
 import org.obm.server.EmbeddedServerModule;
 import org.obm.server.ServerConfiguration;
 import org.obm.server.context.NoContext;
+import org.obm.service.MessageQueueServerModule;
 
+import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 
 public class TestingProvisioningModule extends AbstractModule {
@@ -54,7 +59,7 @@ public class TestingProvisioningModule extends AbstractModule {
 	public TestingProvisioningModule() {
 		module = Modules.override(new ProvisioningServerService(new NoContext())).with(new OverridingModule());
 	}
-	
+
 	@Override
 	protected void configure() {
 		install(module);
@@ -64,15 +69,36 @@ public class TestingProvisioningModule extends AbstractModule {
 		
 		@Override
 		protected void configure() {
-			Configuration.Transaction transaction = new Configuration.Transaction();
-			transaction.timeoutInSeconds = 3600;
-
-			bind(TransactionConfiguration.class).toInstance(new StaticConfigurationService.Transaction(transaction));
+			install(new ConfigurationModule(buildConfiguration()));
+			install(new EmbeddedServerModule(ServerConfiguration.defaultConfiguration()));
+			install(new MessageQueueServerModule());
+			install(SolrModuleUtils.buildDummySolrModule());
+			bind(Boolean.class).annotatedWith(Names.named("queueIsRemote")).toInstance(false);
+			bind(LocatorService.class).toInstance(alwaysLocalLocatorService());
+			
 			Multibinder<DatabaseDriverConfiguration> databaseDrivers = Multibinder.newSetBinder(binder(), DatabaseDriverConfiguration.class);
 			databaseDrivers.addBinding().to(H2DriverConfiguration.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixtureH2.class);
+		}
 
-			install(new EmbeddedServerModule(ServerConfiguration.defaultConfiguration()));
+		private LocatorService alwaysLocalLocatorService() {
+			return new LocatorService() {
+				
+				@Override
+				public String getServiceLocation(String serviceSlashProperty, String loginAtDomain)
+						throws LocatorClientException {
+					return "localhost";
+				}
+			};
+		}
+		
+		private Configuration buildConfiguration() {
+			Configuration configuration = new Configuration();
+			configuration.obmUiBaseUrl = "localhost";
+			configuration.locator.url = "localhost";
+			configuration.dataDir = Files.createTempDir();
+			configuration.transaction.timeoutInSeconds = 3600;
+			return configuration;
 		}
 	}
 }

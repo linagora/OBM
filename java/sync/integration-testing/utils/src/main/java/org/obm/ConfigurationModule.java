@@ -32,6 +32,7 @@
 package org.obm;
 
 import org.obm.configuration.ConfigurationService;
+import org.obm.configuration.LocatorConfiguration;
 import org.obm.configuration.TransactionConfiguration;
 
 import com.google.inject.AbstractModule;
@@ -42,7 +43,7 @@ public final class ConfigurationModule extends AbstractModule {
 	public interface PolicyConfigurationProvider extends Provider<String> {}
 	
 	private final TransactionConfiguration transactionConfiguration;
-	private final ConfigurationService configurationService;
+	private final StaticConfigurationService configurationService;
 
 	public ConfigurationModule(Configuration configuration) {
 		this.configurationService = new StaticConfigurationService(configuration);
@@ -51,6 +52,7 @@ public final class ConfigurationModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
+		bind(LocatorConfiguration.class).toInstance(configurationService);
 		bind(TransactionConfiguration.class).toInstance(transactionConfiguration);
 		bind(ConfigurationService.class).toInstance(configurationService);
 	}

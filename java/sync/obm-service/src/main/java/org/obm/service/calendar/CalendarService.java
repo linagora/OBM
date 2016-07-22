@@ -52,6 +52,8 @@ import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.services.AttendeeService;
 import org.obm.sync.services.ImportICalendarException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
@@ -66,6 +68,8 @@ import fr.aliacom.obm.common.user.ObmUser;
 @Singleton
 public class CalendarService {
 
+	private static final Logger logger = LoggerFactory.getLogger(CalendarService.class);
+	
 	private final CalendarDao calendarDao;
 	private final Ical4jHelper ical4jHelper;
 	private final UserService userService;
@@ -100,6 +104,8 @@ public class CalendarService {
 		List<Event> events = parseICSEvent(token, ics, calendarUser.getUid());
 		LoadingCache<Attendee, Optional<ObmUser>> cache = newObmUserCache(token.getDomain().getName());
 
+		logger.info(events.size() + " event(s) found in the ICS"); 
+		
 		for (Event event: events) {
 
 			removeAttendeeWithNoEmail(event);
@@ -108,6 +114,7 @@ public class CalendarService {
 			}
 			
 			if(event.isEventInThePast()){
+				logger.info("event {} is in the past", event.getExtId().getExtId());
 				changeCalendarOwnerAttendeeParticipationToAccepted(calendarUser, event, cache);
 			}
 
@@ -153,6 +160,8 @@ public class CalendarService {
 				if (newEvent != null) {
 					return true;
 				}
+			} else {
+				logger.info("event {} seems to already exist, skipping creation", event.getExtId().getExtId());
 			}
 		} catch (FindException e) {
 			throw new ImportICalendarException(e);
