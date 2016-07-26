@@ -1654,7 +1654,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throw new ServerFault("Invalid calendar '" + calendar + "'.");
 		}
 
-		if (calendarService.isEventExists(token, calendarUser, event)) {
+		if (calendarService.findEventByExtId(token, calendarUser, event).isPresent()) {
 			return modifyEvent(token, calendar, event, true, notification);
 		}
 

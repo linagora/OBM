@@ -103,13 +103,7 @@ public class EventIntegrationTest {
 		String ics = Resources.toString(Resources.getResource("ics/simple.ics"), Charsets.UTF_8);
 		String expectedICS = ics.replaceAll("\n", "\\\\n");
 		
-		given()
-			.auth().basic("admin0@global.virt", "admin0")
-			.body(ics).contentType(ContentType.TEXT).
-		expect()
-			.statusCode(Status.OK.getStatusCode()).
-		when()
-			.post("events/user1@test.tlse.lng");
+		importICS(ics);
 
 		given()
 			.auth().basic("admin0@global.virt", "admin0").
@@ -159,6 +153,66 @@ public class EventIntegrationTest {
 		assertThat(results.getInt(1)).isEqualTo(1);
 		assertThat(solrServer.addCount).isEqualTo(1);
 		assertThat(solrServer.commitCount).isEqualTo(1);
+	}
+	
+	@Test
+	public void testImportICSWhenTheEventIsAlreadyKnownButSameSequence() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String ics = Resources.toString(Resources.getResource("ics/simple.ics"), Charsets.UTF_8);
+		
+		// Create the event in OBM first
+		String batchId1 = startBatch(baseURL, obmDomainUuid);
+		importICS(ics);
+		commitBatch();
+		waitForBatchSuccess(batchId1);
+
+		// Then simulate a new import with the same sequence
+		String batchId2 = startBatch(baseURL, obmDomainUuid);
+		importICS(ics);
+		commitBatch();
+		waitForBatchSuccess(batchId2);
+		
+		// Only the first event is expected in the db and in solr
+		ResultSet results = db.execute("select count(1) from event");
+		results.next();
+		assertThat(results.getInt(1)).isEqualTo(1);
+		assertThat(solrServer.addCount).isEqualTo(1);
+		assertThat(solrServer.commitCount).isEqualTo(1);
+	}
+	
+	@Test
+	public void testImportICSWhenTheEventIsAlreadyKnownButHigherSequence() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String ics = Resources.toString(Resources.getResource("ics/simple.ics"), Charsets.UTF_8);
+		
+		// Create the event in OBM first
+		String batchId1 = startBatch(baseURL, obmDomainUuid);
+		importICS(ics);
+		commitBatch();
+		waitForBatchSuccess(batchId1);
+
+		// Then simulate a new import with the same sequence
+		String batchId2 = startBatch(baseURL, obmDomainUuid);
+		importICS(ics.replace("SEQUENCE:0", "SEQUENCE:1"));
+		commitBatch();
+		waitForBatchSuccess(batchId2);
+		
+		// Only the first event is expected in the db and in solr
+		ResultSet results = db.execute("select count(1) from event");
+		results.next();
+		assertThat(results.getInt(1)).isEqualTo(1);
+		assertThat(solrServer.addCount).isEqualTo(2);
+		assertThat(solrServer.commitCount).isEqualTo(2);
+	}
+
+	private void importICS(String ics) {
+		given()
+			.auth().basic("admin0@global.virt", "admin0")
+			.body(ics).contentType(ContentType.TEXT).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("events/user1@test.tlse.lng");
 	}
 
 }

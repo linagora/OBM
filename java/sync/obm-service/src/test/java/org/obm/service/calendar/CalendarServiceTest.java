@@ -54,6 +54,7 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
+import org.obm.sync.calendar.EventObmId;
 import org.obm.sync.calendar.Participation;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.date.DateProvider;
@@ -233,6 +234,53 @@ public class CalendarServiceTest {
 		expect(calendarDao.findEventByExtId(eq(token), eq(user), isA(EventExtId.class))).andReturn(null).times(4);
 		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class), eq(true))).andReturn(null).times(4);
 
+		mocksControl.replay();
+		testee.importICalendar(token, calendar, ics);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testImportICSShouldNotUpdateTheEventWhenExtIdIsAlreadyKnownAndSameSequence() throws Exception {
+		String ics = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("ics/inFutureEvent.ics"));
+		int icsSequence = 2;
+		Event alreadyInDbEvent = ToolBox.getFakeEvent(5);
+		alreadyInDbEvent.setExtId(new EventExtId("TheUid"));
+		alreadyInDbEvent.setUid(new EventObmId(5));
+		alreadyInDbEvent.setSequence(icsSequence);
+		UserAttendee organizer = UserAttendee.builder().email("organizer@test.tlse.lng").build();
+		UserAttendee attendee = UserAttendee.builder().email(user.getLoginAtDomain()).build();
+
+		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(user);
+		expect(userService.getUserFromAccessToken(token)).andReturn(user);
+		expect(userService.getUserFromAttendee(isA(Attendee.class), eq(domainName))).andReturn(user).anyTimes();
+		expect(attendeeService.findAttendee(null, attendee.getEmail(), true, user.getDomain(), user.getUid())).andReturn(attendee);
+		expect(attendeeService.findAttendee(null, organizer.getEmail(), true, user.getDomain(), user.getUid())).andReturn(organizer);
+		expect(calendarDao.findEventByExtId(token, user, alreadyInDbEvent.getExtId())).andReturn(alreadyInDbEvent);
+		
+		mocksControl.replay();
+		testee.importICalendar(token, calendar, ics);
+		mocksControl.verify();
+	}
+
+	@Test
+	public void testImportICSShouldUpdateTheEventWhenExtIdIsAlreadyKnownAndHigherSequence() throws Exception {
+		String ics = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("ics/inFutureEvent.ics"));
+		int icsSequence = 2;
+		Event alreadyInDbEvent = ToolBox.getFakeEvent(5);
+		alreadyInDbEvent.setExtId(new EventExtId("TheUid"));
+		alreadyInDbEvent.setUid(new EventObmId(5));
+		alreadyInDbEvent.setSequence(icsSequence - 1);
+		UserAttendee organizer = UserAttendee.builder().email("organizer@test.tlse.lng").build();
+		UserAttendee attendee = UserAttendee.builder().email(user.getLoginAtDomain()).build();
+
+		expect(userService.getUserFromCalendar(calendar, domainName)).andReturn(user);
+		expect(userService.getUserFromAccessToken(token)).andReturn(user);
+		expect(userService.getUserFromAttendee(isA(Attendee.class), eq(domainName))).andReturn(user).anyTimes();
+		expect(attendeeService.findAttendee(null, attendee.getEmail(), true, user.getDomain(), user.getUid())).andReturn(attendee);
+		expect(attendeeService.findAttendee(null, organizer.getEmail(), true, user.getDomain(), user.getUid())).andReturn(organizer);
+		expect(calendarDao.findEventByExtId(token, user, alreadyInDbEvent.getExtId())).andReturn(alreadyInDbEvent);
+		expect(calendarDao.modifyEvent(eq(token), eq(calendar), isA(Event.class), eq(true), eq(true))).andReturn(alreadyInDbEvent);
+		
 		mocksControl.replay();
 		testee.importICalendar(token, calendar, ics);
 		mocksControl.verify();

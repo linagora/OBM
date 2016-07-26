@@ -373,6 +373,19 @@ CREATE TABLE eventlink (
     eventlink_comment character varying(255)
 );
 
+CREATE SEQUENCE deletedeventlink_deletedeventlink_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    CACHE 1;
+
+CREATE TABLE deletedeventlink (
+    deletedeventlink_id integer DEFAULT nextval('deletedeventlink_deletedeventlink_id_seq') NOT NULL,
+    deletedeventlink_userobm_id integer NOT NULL,
+    deletedeventlink_event_id integer NOT NULL,
+    deletedeventlink_event_ext_id character varying(300) NOT NULL,
+    deletedeventlink_time_removed timestamp DEFAULT now() NOT NULL
+);
+
 CREATE TABLE eventtag (
     eventtag_id integer PRIMARY KEY AUTO_INCREMENT,
     eventtag_user_id integer NOT NULL,
@@ -561,6 +574,66 @@ CREATE TABLE groupentity (
     groupentity_entity_id integer NOT NULL,
     groupentity_group_id integer NOT NULL
 );
+
+CREATE TABLE resource (
+    resource_id integer NOT NULL,
+    resource_domain_id integer NOT NULL,
+    resource_rtype_id integer,
+    resource_timeupdate timestamp,
+    resource_timecreate timestamp DEFAULT now(),
+    resource_userupdate integer,
+    resource_usercreate integer,
+    resource_name character varying(32) DEFAULT ''::character varying NOT NULL,
+    resource_delegation character varying(256) DEFAULT '',
+    resource_description character varying(255),
+    resource_qty integer DEFAULT 0,
+    resource_email text
+);
+
+CREATE SEQUENCE resource_resource_id_seq
+    INCREMENT BY 1
+    CACHE 1;
+    
+
+CREATE TABLE resourceentity (
+    resourceentity_entity_id integer NOT NULL,
+    resourceentity_resource_id integer NOT NULL
+);
+
+CREATE TABLE resourcegroup (
+    resourcegroup_rgroup_id integer NOT NULL,
+    resourcegroup_resource_id integer NOT NULL
+);
+
+CREATE TABLE resourcegroupentity (
+    resourcegroupentity_entity_id integer NOT NULL,
+    resourcegroupentity_resourcegroup_id integer NOT NULL
+);
+
+CREATE TABLE resourceitem (
+    resourceitem_id integer NOT NULL,
+    resourceitem_domain_id integer NOT NULL,
+    resourceitem_label character varying(32) NOT NULL,
+    resourceitem_resourcetype_id integer NOT NULL,
+    resourceitem_description text
+);
+
+CREATE SEQUENCE resourceitem_resourceitem_id_seq
+    INCREMENT BY 1
+    CACHE 1;
+
+CREATE TABLE resourcetype (
+    resourcetype_id integer NOT NULL,
+    resourcetype_domain_id integer NOT NULL,
+    resourcetype_label character varying(32) NOT NULL,
+    resourcetype_property character varying(32),
+    resourcetype_pkind integer DEFAULT 0 NOT NULL
+);
+
+CREATE SEQUENCE resourcetype_resourcetype_id_seq
+    INCREMENT BY 1
+    CACHE 1;
+
 
 
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (1, 1), (2, 2), (3, 3);

@@ -45,6 +45,7 @@ import org.obm.icalendar.Ical4jUser;
 import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.service.user.UserService;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
@@ -118,7 +119,10 @@ public class CalendarService {
 				changeCalendarOwnerAttendeeParticipationToAccepted(calendarUser, event, cache);
 			}
 
-			if (createEventIfNotExists(token, calendarUser, event)) {
+			Optional<Event> alreadyInDbEvent = findEventByExtId(token, calendarUser, event);
+			if (createEventIfNotExists(token, calendarUser, event, alreadyInDbEvent)) {
+				countEvent += 1;
+			} else if (updateEventIfExistsWithLowerSequence(token, calendarUser, event, alreadyInDbEvent)) {
 				countEvent += 1;
 			}
 		}
@@ -152,16 +156,16 @@ public class CalendarService {
 		event.setAttendees(newAttendees);
 	}
 
-	private boolean createEventIfNotExists(AccessToken token, ObmUser calendarUser, Event event)
+	private boolean createEventIfNotExists(AccessToken token, ObmUser calendarUser, Event event, Optional<Event> alreadyInDbEvent)
 			throws ImportICalendarException {
 		try {
-			if (!isEventExists(token, calendarUser, event)) {
+			if (alreadyInDbEvent.isPresent()) {
+				logger.info("event {} seems to already exist, skipping creation", event.getExtId().getExtId());
+			} else {
 				Event newEvent = calendarDao.createEvent(token, calendarUser.getLogin(), event, true);
 				if (newEvent != null) {
 					return true;
 				}
-			} else {
-				logger.info("event {} seems to already exist, skipping creation", event.getExtId().getExtId());
 			}
 		} catch (FindException e) {
 			throw new ImportICalendarException(e);
@@ -176,14 +180,33 @@ public class CalendarService {
 	public boolean isEventExists(AccessToken token, String calendar, Event event) throws FindException {
 		ObmUser calendarUser = userService.getUserFromCalendar(calendar, token.getDomain().getName());
 
-		return isEventExists(token, calendarUser, event);
+		return findEventByExtId(token, calendarUser, event).isPresent();
 	}
 
-	public boolean isEventExists(AccessToken token, ObmUser calendarUser, Event event) {
+	public Optional<Event> findEventByExtId(AccessToken token, ObmUser calendarUser, Event event) {
 		if (event.getExtId() != null && event.getExtId().getExtId() != null) {
-			return calendarDao.findEventByExtId(token, calendarUser, event.getExtId()) != null;
+			return Optional.fromNullable(calendarDao.findEventByExtId(token, calendarUser, event.getExtId()));
 		}
 	
+		return Optional.absent();
+	}
+
+	private boolean updateEventIfExistsWithLowerSequence(AccessToken token, ObmUser calendarUser, Event event, Optional<Event> alreadyInDbEvent)
+			throws ImportICalendarException {
+		try {
+			if (alreadyInDbEvent.isPresent() && alreadyInDbEvent.get().getSequence() < event.getSequence()) {
+				event.setUid(alreadyInDbEvent.get().getUid()); // Parsed events do not have their internal OBM id
+				return calendarDao.modifyEvent(token, calendarUser.getLogin(), event, true, true) != null;
+			}
+			if (alreadyInDbEvent.isPresent()) {
+				logger.info("event {} seems to already exist with sequence {}, newly imported event sequence is {}, skipping update",
+						event.getExtId().getExtId(), alreadyInDbEvent.get().getSequence(), event.getSequence());
+			}
+		} catch (EventNotFoundException e) {
+			logger.error("A previous version of the event seems to exist but is not findable anymore", e);
+		} catch (SQLException|ServerFault|FindException e) {
+			throw new ImportICalendarException(e);
+		}
 		return false;
 	}
 
