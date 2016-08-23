@@ -190,6 +190,14 @@ public class EventRecurrence implements Anonymizable<EventRecurrence>, Serializa
 		}
 		eventExceptions = eventExceptionsCopy;
 	}
+	
+	public void addOrReplaceEventException(Event newException) {
+		Event replacingException = getEventExceptionWithRecurrenceId(newException.getRecurrenceId());
+		if (replacingException != null) {
+			eventExceptions.remove(replacingException);
+		}
+		eventExceptions.add(newException);
+	}
 
 	public boolean hasAnyExceptionAtDate(Date exceptionDateToFind) {
 		return hasEventExceptionAtDate(exceptionDateToFind) ||

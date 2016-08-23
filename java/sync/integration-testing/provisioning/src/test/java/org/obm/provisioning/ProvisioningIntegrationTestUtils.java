@@ -41,6 +41,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+
 import com.jayway.awaitility.Duration;
 import com.jayway.restassured.RestAssured;
 
@@ -124,6 +127,10 @@ public class ProvisioningIntegrationTestUtils {
 	}
 	
 	public static void waitForBatchSuccess(final String batchId, final int operationCount, final int operationDone) {
+		waitForBatchSuccess(batchId, operationCount, operationDone, Matchers.any(String.class));
+	}
+	
+	public static void waitForBatchSuccess(final String batchId, final int operationCount, final int operationDone, final Matcher<String> extraMatcher) {
         await()
 	        .atMost(1, TimeUnit.MINUTES)
 	        .pollDelay(Duration.ONE_SECOND)
@@ -137,12 +144,14 @@ public class ProvisioningIntegrationTestUtils {
 							.auth().basic("admin0@global.virt", "admin0").
 						expect()
 							.statusCode(Status.OK.getStatusCode())
-							.body(containsString("{"
+							.body(Matchers.allOf(
+								extraMatcher,
+								containsString("{"
 									+ "\"id\":" + batchId + ","
 									+ "\"status\":\"SUCCESS\","
 									+ "\"operationCount\":" + operationCount + ","
 									+ "\"operationDone\":" + operationDone + ","
-								)).
+								))).
 						when()
 							.get("");
 						return true;

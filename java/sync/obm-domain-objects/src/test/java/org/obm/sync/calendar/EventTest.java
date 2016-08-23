@@ -1740,4 +1740,18 @@ public class EventTest {
 
 		assertThat(event.getHumanAttendees()).containsOnly(user1, user2, contact);
 	}
+
+	@Test
+	public void testIsAnExceptionWhenTheEventIsTheMaster() {
+		assertThat(new Event().isAnException()).isFalse();
+	}
+
+	@Test
+	public void testIsAnExceptionWhenTheEventIsAnException() {
+		Event event = new Event();
+		event.setRecurrenceId(new Date(1234));
+		
+		assertThat(event.isAnException()).isTrue();
+	}
+	
 }

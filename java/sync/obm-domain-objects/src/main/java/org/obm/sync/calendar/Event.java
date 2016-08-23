@@ -428,6 +428,10 @@ public class Event implements Indexed<Integer>, Anonymizable<Event>, Cloneable, 
 		return recurrenceId;
 	}
 
+	public boolean isAnException() {
+		return recurrenceId != null;
+	}
+
 	public void setTimeCreate(Date timeCreate) {
 		this.timeCreate = timeCreate;
 	}

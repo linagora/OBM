@@ -1586,7 +1586,20 @@ public class Ical4jHelperTest {
 		String icsFilename = "OBMFULL-2963onlyRecurrenceId.ics";
 		List<Event> events = testIcsParsing(icsFilename);
 
-		assertThat(events).isEmpty();
+		// With OBMFULL-6496 we are now able to import exception only ICS
+		assertThat(events).hasSize(4);
+		assertThat(events).extracting("extId").containsOnly(
+			new EventExtId("726801a1fe7ac516cf71cbb2d592aa2b0fdea9d4b0167ef54eff49f2dd191eac41349fb6ced07ef85ddb52ff9415209073892a78bdb22dae47ee5c640a2c2b5eeaf40d01ae1d0c7f"),
+			new EventExtId("726801a1fe7ac516cf71cbb2d592aa2b0fdea9d4b0167ef54eff49f2dd191eac41349fb6ced07ef85ddb52ff9415209073892a78bdb22dae47ee5c640a2c2b5eeaf40d01ae1d0c7f"),
+			new EventExtId("726801a1fe7ac516cf71cbb227d63f1e93f9d6a5820c521d1d2361ad308c4e4541349fb6ced07ef85ddb52ff9415209073892a7890687c2c43e1d1fb8cd9b1f97281344631cf3ceb"),
+			new EventExtId("726801a1fe7ac516cf71cbb227d63f1e93f9d6a5820c521d1d2361ad308c4e4541349fb6ced07ef85ddb52ff9415209073892a7890687c2c43e1d1fb8cd9b1f97281344631cf3ceb")
+		);
+		assertThat(events).extracting("recurrenceId").containsOnly(
+			DateUtils.date("2012-02-10T11:00:00Z"),
+			DateUtils.date("2012-02-12T11:00:00Z"),
+			DateUtils.date("2012-02-15T15:00:00Z"),
+			DateUtils.date("2012-02-21T15:00:00Z")
+		);
 	}
 	
 	@Test

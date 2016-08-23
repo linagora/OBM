@@ -392,27 +392,27 @@ public class Ical4jHelper implements RecurrenceHelper {
 				mapExceptionEvents.put(event.getExtId(), event);
 			}
 		}
-		return addEventExceptionToDefinedParentEvent(mapEvents, mapExceptionEvents);
+		return flattenEventsAndExceptions(mapEvents, mapExceptionEvents);
 	}
 
-	private Collection<Event> addEventExceptionToDefinedParentEvent(
+	private Collection<Event> flattenEventsAndExceptions(
 			Map<EventExtId, Event> mapEvents,
 			Multimap<EventExtId, Event> mapExceptionEvents) {
 
-		Collection<Entry<EventExtId, Collection<Event>>> mapExceptionEventsEntries = mapExceptionEvents.asMap().entrySet();
+		ImmutableSet.Builder<Event> flattenedEvents = ImmutableSet.<Event>builder().addAll(mapEvents.values());
 
-		for (Entry<EventExtId, Collection<Event>> entry : mapExceptionEventsEntries) {
-			Event parentEvent = mapEvents.get(entry.getKey());
-			Collection<Event> eventsException = entry.getValue();
+		for (Entry<EventExtId, Collection<Event>> exceptionsByExtId : mapExceptionEvents.asMap().entrySet()) {
+			Event parentEvent = mapEvents.get(exceptionsByExtId.getKey());
+			Collection<Event> eventsException = exceptionsByExtId.getValue();
 			if (parentEvent != null) {
 				addOrReplaceExceptions(parentEvent.getRecurrence(), eventsException);
 			} else {
-				logger.warn(
-						"Drop following events exception while parsing ICS file because parent was not defined: {}",
-						eventsException);
+				// No parent found, add these exceptions to the "parsed events" list
+				flattenedEvents.addAll(eventsException);
 			}
 		}
-		return mapEvents.values();
+		
+		return flattenedEvents.build();
 	}
 
 	private void addOrReplaceExceptions(EventRecurrence recurrenceTarget, Collection<Event> eventsToAdd) {

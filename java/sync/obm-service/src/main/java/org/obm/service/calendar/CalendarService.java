@@ -87,7 +87,7 @@ public class CalendarService {
 		this.attendeeService = attendeeService;
 		this.calendarFactory = calendarFactory;
 	}
-
+	
 	public int importICalendar(AccessToken token, String calendar, String ics) 
 			throws ImportICalendarException, ServerFault {
 
@@ -120,13 +120,41 @@ public class CalendarService {
 			}
 
 			Optional<Event> alreadyInDbEvent = findEventByExtId(token, calendarUser, event);
-			if (createEventIfNotExists(token, calendarUser, event, alreadyInDbEvent)) {
+			if (event.isAnException()) {
+				if (importException(token, calendarUser, alreadyInDbEvent, event)) {
+					countEvent += 1;
+				}
+			} else if (createEventIfNotExists(token, calendarUser, event, alreadyInDbEvent)) {
 				countEvent += 1;
 			} else if (updateEventIfExistsWithLowerSequence(token, calendarUser, event, alreadyInDbEvent)) {
 				countEvent += 1;
 			}
 		}
 		return countEvent;
+	}
+
+	private boolean importException(AccessToken token, ObmUser calendarUser, Optional<Event> parentEvent, Event event) throws ImportICalendarException {
+		if (!parentEvent.isPresent()) {
+			throw new ImportICalendarException("Trying to import a event exception but the parent can't be found: " + event.getExtId().getExtId());
+		}
+		
+		return addExceptionToParent(token, calendarUser, parentEvent.get(), event);
+	}
+	
+	private boolean addExceptionToParent(AccessToken token, ObmUser calendarUser, Event parentEvent, Event eventException) throws ImportICalendarException {
+		try {
+			Event alreadyInDbException = parentEvent.getRecurrence().getEventExceptionWithRecurrenceId(eventException.getRecurrenceId());
+			if (alreadyInDbException == null || alreadyInDbException.getSequence() < eventException.getSequence()) {
+				parentEvent.getRecurrence().addOrReplaceEventException(eventException);
+				calendarDao.modifyEvent(token, calendarUser.getLogin(), parentEvent, true);
+				return true;
+			}
+			logger.warn("event exception {} seems to already exist with sequence {}, newly imported exception sequence is {}, skipping update",
+					eventException.getExtId().getExtId(), alreadyInDbException.getSequence(), eventException.getSequence());
+			return false;
+		} catch (FindException | SQLException | EventNotFoundException | ServerFault e) {
+			throw new ImportICalendarException(e);
+		}
 	}
 
 	private LoadingCache<Attendee, Optional<ObmUser>> newObmUserCache(final String domainName) {
@@ -160,18 +188,14 @@ public class CalendarService {
 			throws ImportICalendarException {
 		try {
 			if (alreadyInDbEvent.isPresent()) {
-				logger.info("event {} seems to already exist, skipping creation", event.getExtId().getExtId());
+				logger.warn("event {} seems to already exist, skipping creation", event.getExtId().getExtId());
 			} else {
 				Event newEvent = calendarDao.createEvent(token, calendarUser.getLogin(), event);
 				if (newEvent != null) {
 					return true;
 				}
 			}
-		} catch (FindException e) {
-			throw new ImportICalendarException(e);
-		} catch (SQLException e) {
-			throw new ImportICalendarException(e);
-		} catch (ServerFault e) {
+		} catch (FindException | SQLException | ServerFault e) {
 			throw new ImportICalendarException(e);
 		}
 		return false;
@@ -199,7 +223,7 @@ public class CalendarService {
 				return calendarDao.modifyEvent(token, calendarUser.getLogin(), event, true) != null;
 			}
 			if (alreadyInDbEvent.isPresent()) {
-				logger.info("event {} seems to already exist with sequence {}, newly imported event sequence is {}, skipping update",
+				logger.warn("event {} seems to already exist with sequence {}, newly imported event sequence is {}, skipping update",
 						event.getExtId().getExtId(), alreadyInDbEvent.get().getSequence(), event.getSequence());
 			}
 		} catch (EventNotFoundException e) {

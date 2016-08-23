@@ -43,18 +43,24 @@ import java.sql.ResultSet;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
+import org.obm.DateUtils;
 import org.obm.SolrModuleUtils.DummyCommonsHttpSolrServer;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.domain.dao.CalendarDao;
 import org.obm.guice.GuiceRule;
 import org.obm.provisioning.TestingProvisioningModule;
 import org.obm.server.WebServer;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventExtId;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -63,7 +69,10 @@ import com.google.inject.Provider;
 import com.jayway.restassured.http.ContentType;
 import com.linagora.obm.sync.JMSServer;
 
+import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.user.ObmUser;
+import fr.aliacom.obm.common.user.UserLogin;
 
 public class EventIntegrationTest {
 
@@ -80,6 +89,7 @@ public class EventIntegrationTest {
 	@Inject private WebServer server;
 	@Inject private JMSServer jmsServer;
 	@Inject private DummyCommonsHttpSolrServer solrServer;
+	@Inject private CalendarDao calendarDao;
 	
 	private URL baseURL;
 	
@@ -238,6 +248,80 @@ public class EventIntegrationTest {
 		assertThat(results.getInt(1)).isEqualTo(1);
 		assertThat(solrServer.addCount).isEqualTo(2);
 		assertThat(solrServer.commitCount).isEqualTo(2);
+	}
+	
+	@Test
+	public void testImportICSWhenTheEventIsRecurrentWithExceptions() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String ics = Resources.toString(Resources.getResource("ics/recurrent-with-exceptions.ics"), Charsets.UTF_8);
+		ObmDomain domain = ObmDomain.builder().build();
+		ObmUser user = ObmUser.builder().uid(2).login(UserLogin.valueOf("user1")).domain(domain).build();
+		EventExtId icsEventExtId = new EventExtId("fb3b3cf0-cfdc-43da-96fe-688e30e6462d");
+		
+		String batchId = startBatch(baseURL, obmDomainUuid);
+		importICS(ics);
+		commitBatch();
+		waitForBatchSuccess(batchId);
+		
+		Event importedEvent = calendarDao.findEventByExtId(new AccessToken(2, "papi"), user, icsEventExtId);
+		assertThat(importedEvent.getRecurrence().getExceptions()).containsOnly(DateUtils.dateUTC("2116-08-27T08:45:00Z"));
+		assertThat(importedEvent.getRecurrence().getEventExceptions()).extracting("startDate").containsOnly(
+			DateUtils.dateUTC("2116-08-25T10:00:00Z"),
+			DateUtils.dateUTC("2116-08-26T10:00:00Z")
+		);
+		assertThat(solrServer.addCount).isEqualTo(1);
+		assertThat(solrServer.commitCount).isEqualTo(1);
+	}
+	
+	@Test
+	public void testImportICSWhenTheEventIsRecurrentWithMasterFirstThenException() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String icsOfMaster = Resources.toString(Resources.getResource("ics/recurrent-with-exceptions.ics"), Charsets.UTF_8);
+		String icsOfExceptions = Resources.toString(Resources.getResource("ics/recurrent-exceptions-only.ics"), Charsets.UTF_8);
+		ObmDomain domain = ObmDomain.builder().build();
+		ObmUser user = ObmUser.builder().uid(2).login(UserLogin.valueOf("user1")).domain(domain).build();
+		EventExtId icsEventExtId = new EventExtId("fb3b3cf0-cfdc-43da-96fe-688e30e6462d");
+
+		String batchId1 = startBatch(baseURL, obmDomainUuid);
+		importICS(icsOfMaster);
+		commitBatch();
+		waitForBatchSuccess(batchId1);
+		
+		String batchId2 = startBatch(baseURL, obmDomainUuid);
+		importICS(icsOfExceptions);
+		commitBatch();
+		waitForBatchSuccess(batchId2);
+		
+		Event importedEvent = calendarDao.findEventByExtId(new AccessToken(2, "papi"), user, icsEventExtId);
+		assertThat(importedEvent.getRecurrence().getExceptions()).containsOnly(DateUtils.dateUTC("2116-08-27T08:45:00Z"));
+		assertThat(importedEvent.getRecurrence().getEventExceptions()).extracting("startDate").containsOnly(
+			DateUtils.dateUTC("2116-08-25T10:00:00Z"),
+			DateUtils.dateUTC("2116-08-26T12:00:00Z"),
+			DateUtils.dateUTC("2116-08-28T12:00:00Z")
+		);
+		assertThat(solrServer.addCount).isGreaterThan(3);
+		assertThat(solrServer.commitCount).isGreaterThan(3);
+	}
+	
+	@Test
+	public void testImportICSWhenExceptionsOnlyAndMasterIsUnknown() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String icsOfExceptions = Resources.toString(Resources.getResource("ics/recurrent-exceptions-only.ics"), Charsets.UTF_8);
+		ObmDomain domain = ObmDomain.builder().build();
+		ObmUser user = ObmUser.builder().uid(2).login(UserLogin.valueOf("user1")).domain(domain).build();
+		EventExtId icsEventExtId = new EventExtId("db3b3cf0-cfdc-43da-96fe-688e30e6462d");
+
+		String batchId = startBatch(baseURL, obmDomainUuid);
+		importICS(icsOfExceptions);
+		commitBatch();
+		waitForBatchSuccess(batchId, 1, 0, Matchers.containsString("\"error\":\""
+			+ "org.obm.provisioning.exception.ProcessingException: org.obm.sync.services.ImportICalendarException: "
+			+ "Trying to import a event exception but the parent can't be found: fb3b3cf0-cfdc-43da-96fe-688e30e6462d"));
+		
+		Event importedEvent = calendarDao.findEventByExtId(new AccessToken(2, "papi"), user, icsEventExtId);
+		assertThat(importedEvent).isNull();
+		assertThat(solrServer.addCount).isEqualTo(0);
+		assertThat(solrServer.commitCount).isEqualTo(0);
 	}
 
 	private void importICS(String ics) {

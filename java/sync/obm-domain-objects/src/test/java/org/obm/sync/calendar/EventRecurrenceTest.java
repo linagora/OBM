@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync.calendar;
 
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,8 +39,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
 import org.junit.Test;
 import org.obm.DateUtils;
 
@@ -52,6 +51,45 @@ import fr.aliacom.obm.common.user.Users;
 public class EventRecurrenceTest {
 
 	@Test
+	public void testAddOrReplaceEventExceptionWhenNoExceptionAtAll() {
+		EventRecurrence rec = getOneDailyEventRecurence();
+		rec.setEventExceptions(Sets.<Event>newHashSet());
+		
+		Event newException = createEventException(1, 2);
+		rec.addOrReplaceEventException(newException);
+		
+		assertThat(rec.getEventExceptions()).containsOnly(newException);
+	}
+	
+	@Test
+	public void testAddOrReplaceEventExceptionWhenOtherException() {
+		EventRecurrence rec = getOneDailyEventRecurence();
+		Event otherException = createEventException(1, 2);
+		otherException.setRecurrenceId(DateUtils.date("2222-12-14T22:00:00Z"));
+		rec.setEventExceptions(Sets.newHashSet(otherException));
+		
+		Event newException = createEventException(3, 2);
+		newException.setRecurrenceId(DateUtils.date("2222-12-15T22:00:00Z"));
+		rec.addOrReplaceEventException(newException);
+		
+		assertThat(rec.getEventExceptions()).containsOnly(otherException, newException);
+	}
+	
+	@Test
+	public void testAddOrReplaceEventExceptionWhenMatchingException() {
+		EventRecurrence rec = getOneDailyEventRecurence();
+		Event matchingException = createEventException(1, 2);
+		matchingException.setRecurrenceId(DateUtils.date("2222-12-14T22:00:00Z"));
+		rec.setEventExceptions(Sets.newHashSet(matchingException));
+		
+		Event newException = createEventException(3, 2);
+		newException.setRecurrenceId(matchingException.getRecurrenceId());
+		rec.addOrReplaceEventException(newException);
+		
+		assertThat(rec.getEventExceptions()).containsOnly(newException);
+	}
+
+	@Test
 	public void testGetEventExceptionWithRecurrenceIdWithoutExistedEventException() {
 		EventRecurrence rec1 = getOneDailyEventRecurence();
 
@@ -61,7 +99,7 @@ public class EventRecurrenceTest {
 		rec1.setEventExceptions(Sets.newHashSet(e1, e2));
 
 		Event exception = rec1.getEventExceptionWithRecurrenceId(new Date());
-		Assert.assertNull(exception);
+		assertThat(exception).isNull();
 	}
 
 	@Test
@@ -73,50 +111,49 @@ public class EventRecurrenceTest {
 		rec1.setEventExceptions(Sets.newHashSet(e1));
 
 		Event exception = rec1.getEventExceptionWithRecurrenceId(e1.getRecurrenceId());
-		Assert.assertNotNull(exception);
-		Assert.assertEquals(e1, exception);
+		assertThat(exception).isNotNull().isEqualTo(e1);
 	}
 
 	@Test
 	public void testDailyIsRecurrent() {
 		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.daily);
 
-		Assert.assertTrue(rec1.isRecurrent());
+		assertThat(rec1.isRecurrent()).isTrue();
 	}
 
 	@Test
 	public void testWeeklyIsRecurrent() {
 		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.weekly);
 
-		Assert.assertTrue(rec1.isRecurrent());
+		assertThat(rec1.isRecurrent()).isTrue();
 	}
 
 	@Test
 	public void testMonthlyByDayIsRecurrent() {
 		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.monthlybyday);
 
-		Assert.assertTrue(rec1.isRecurrent());
+		assertThat(rec1.isRecurrent()).isTrue();
 	}
 
 	@Test
 	public void testMonthlyByDateIsRecurrent() {
 		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.monthlybydate);
 
-		Assert.assertTrue(rec1.isRecurrent());
+		assertThat(rec1.isRecurrent()).isTrue();
 	}
 
 	@Test
 	public void testYearlyIsRecurrent() {
 		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.yearly);
 
-		Assert.assertTrue(rec1.isRecurrent());
+		assertThat(rec1.isRecurrent()).isTrue();
 	}
 
 	@Test
 	public void testIsNotRecurrent() {
 		EventRecurrence rec1 = getOneEventRecurrenceByKind(RecurrenceKind.none);
 
-		Assert.assertFalse(rec1.isRecurrent());
+		assertThat(rec1.isRecurrent()).isFalse();
 	}
 
 	private EventRecurrence getOneEventRecurrenceByKind(RecurrenceKind recurrenceKind) {
@@ -140,8 +177,8 @@ public class EventRecurrenceTest {
 		String attendeeWithDeclinedEventEmail = "email0@email.com";
 		rec1.replaceUnattendedEventExceptionByException(attendeeWithDeclinedEventEmail);
 
-		Assertions.assertThat(rec1.getEventExceptions()).containsOnly(e2);
-		Assertions.assertThat(rec1.getExceptions()).containsOnly(e1.getRecurrenceId());
+		assertThat(rec1.getEventExceptions()).containsOnly(e2);
+		assertThat(rec1.getExceptions()).containsOnly(e1.getRecurrenceId());
 	}
 
 	@Test
@@ -163,7 +200,7 @@ public class EventRecurrenceTest {
 		String attendeeWithDeclinedEventEmail = "email2@email.com";
 		rec1.replaceUnattendedEventExceptionByException(attendeeWithDeclinedEventEmail);
 
-		Assert.assertEquals(rec1, rec2);
+		assertThat(rec1).isEqualTo(rec2);
 	}
 
 	@Test
@@ -176,7 +213,7 @@ public class EventRecurrenceTest {
 		recurrence.setExceptions(Collections.<Date>emptyList());
 
 		boolean exceptionFound = recurrence.hasAnyExceptionAtDate(DateUtils.date("2004-12-14T22:00:00Z"));
-		Assertions.assertThat(exceptionFound).isTrue();
+		assertThat(exceptionFound).isTrue();
 	}
 
 	@Test
@@ -187,7 +224,7 @@ public class EventRecurrenceTest {
 		recurrence.setEventExceptions(ImmutableSet.<Event>of());
 
 		boolean exceptionFound = recurrence.hasAnyExceptionAtDate(DateUtils.date("2004-12-14T22:00:00Z"));
-		Assertions.assertThat(exceptionFound).isTrue();
+		assertThat(exceptionFound).isTrue();
 	}
 
 	@Test
@@ -197,7 +234,7 @@ public class EventRecurrenceTest {
 		recurrence.setEventExceptions(ImmutableSet.<Event>of());
 
 		boolean exceptionFound = recurrence.hasAnyExceptionAtDate(DateUtils.date("2004-12-14T22:00:00Z"));
-		Assertions.assertThat(exceptionFound).isFalse();
+		assertThat(exceptionFound).isFalse();
 	}
 
 	@Test
@@ -209,7 +246,7 @@ public class EventRecurrenceTest {
 		recurrence.setEventExceptions(ImmutableSet.<Event>of());
 
 		boolean exceptionFound = recurrence.hasException();
-		Assertions.assertThat(exceptionFound).isTrue();
+		assertThat(exceptionFound).isTrue();
 	}
 
 	@Test
@@ -222,7 +259,7 @@ public class EventRecurrenceTest {
 		recurrence.setEventExceptions(Sets.newHashSet(eventException));
 
 		boolean exceptionFound = recurrence.hasEventException();
-		Assertions.assertThat(exceptionFound).isTrue();
+		assertThat(exceptionFound).isTrue();
 	}
 
 	@Test
@@ -236,7 +273,7 @@ public class EventRecurrenceTest {
 		recurrence.setEventExceptions(Sets.newHashSet(eventException));
 
 		boolean exceptionFound = recurrence.hasException();
-		Assertions.assertThat(exceptionFound).isFalse();
+		assertThat(exceptionFound).isFalse();
 	}
 
 	@Test
@@ -248,7 +285,7 @@ public class EventRecurrenceTest {
 		recurrence.setEventExceptions(ImmutableSet.<Event>of());
 
 		boolean exceptionFound = recurrence.hasEventException();
-		Assertions.assertThat(exceptionFound).isFalse();
+		assertThat(exceptionFound).isFalse();
 	}
 
 	@Test
@@ -270,7 +307,7 @@ public class EventRecurrenceTest {
 				publicEventException2));
 		recurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
 
-		Assertions.assertThat(recurrence.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(recurrence);
+		assertThat(recurrence.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(recurrence);
 	}
 
 	@Test
@@ -328,7 +365,7 @@ public class EventRecurrenceTest {
 				privateAnonymizedEventException2));
 		anonymizedRecurrence.setExceptions(Lists.newArrayList(exceptionDeleted));
 
-		Assertions.assertThat(recurrence.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(anonymizedRecurrence);
+		assertThat(recurrence.anonymizePrivateItems(Users.userAtLinagora)).isEqualTo(anonymizedRecurrence);
 	}
 
 	private EventRecurrence getOneDailyEventRecurence() {
