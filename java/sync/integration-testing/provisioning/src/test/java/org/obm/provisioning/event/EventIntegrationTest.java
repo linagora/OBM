@@ -96,6 +96,41 @@ public class EventIntegrationTest {
 	}
 	
 	@Test
+	public void testImportICSWhenTheUserIsUnknown() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String batchId = startBatch(baseURL, obmDomainUuid);
+		
+		String ics = Resources.toString(Resources.getResource("ics/simple.ics"), Charsets.UTF_8);
+		String expectedICS = ics.replaceAll("\n", "\\\\n");
+		
+		importICS(ics, "unexisting_user@test.tlse.lng");
+		commitBatch();
+		waitForBatchSuccess(batchId, 1, 0);
+
+		given()
+			.auth().basic("admin0@global.virt", "admin0").
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.body(containsString("{"
+					+ "\"id\":" + batchId + ","
+					+ "\"status\":\"SUCCESS\","
+					+ "\"operationCount\":1,"
+					+ "\"operationDone\":0,"
+					+ "\"operations\":["
+						+ "{\"status\":\"ERROR\","
+						+ "\"entityType\":\"EVENT\","
+						+ "\"entity\":\"" + expectedICS + "\","
+						+ "\"operation\":\"POST\","
+						+ "\"error\":\"org.obm.provisioning.exception.ProcessingException: "
+							+ "org.obm.provisioning.dao.exceptions.UserNotFoundException: "
+							+ "The user with login unexisting_user@test.tlse.lng with domain id ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6 was not found\"}"
+					+ "]"
+				+ "}")).
+		when()
+			.get("");
+	}
+	
+	@Test
 	public void testImportICSWhenTheEventIsUnknown() throws Exception {
 		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
 		String batchId = startBatch(baseURL, obmDomainUuid);
@@ -206,13 +241,17 @@ public class EventIntegrationTest {
 	}
 
 	private void importICS(String ics) {
+		importICS(ics, "user1@test.tlse.lng");
+	}
+	
+	private void importICS(String ics, String userEmail) {
 		given()
 			.auth().basic("admin0@global.virt", "admin0")
 			.body(ics).contentType(ContentType.TEXT).
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
-			.post("events/user1@test.tlse.lng");
+			.post("events/" + userEmail);
 	}
 
 }

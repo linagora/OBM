@@ -120,6 +120,10 @@ public class ProvisioningIntegrationTestUtils {
 	}
 
 	public static void waitForBatchSuccess(final String batchId) {
+		waitForBatchSuccess(batchId, 1, 1);
+	}
+	
+	public static void waitForBatchSuccess(final String batchId, final int operationCount, final int operationDone) {
         await()
 	        .atMost(1, TimeUnit.MINUTES)
 	        .pollDelay(Duration.ONE_SECOND)
@@ -136,8 +140,8 @@ public class ProvisioningIntegrationTestUtils {
 							.body(containsString("{"
 									+ "\"id\":" + batchId + ","
 									+ "\"status\":\"SUCCESS\","
-									+ "\"operationCount\":1,"
-									+ "\"operationDone\":1,"
+									+ "\"operationCount\":" + operationCount + ","
+									+ "\"operationDone\":" + operationDone + ","
 								)).
 						when()
 							.get("");

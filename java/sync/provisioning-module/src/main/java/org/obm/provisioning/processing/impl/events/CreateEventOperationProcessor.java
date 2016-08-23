@@ -35,6 +35,7 @@ import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
 import org.obm.service.calendar.CalendarService;
@@ -64,14 +65,20 @@ public class CreateEventOperationProcessor extends AbstractOperationProcessor {
 	public void process(Operation operation, Batch batch) throws ProcessingException {
 		try {
 			String userEmail = operation.getRequest().getParams().get(Request.USERS_EMAIL_KEY);
-
-			ObmUser user = userDao.findUser(userEmail, batch.getDomain());
-			AccessToken token = accessTokenFactory.build(user, PAPI_ORIGIN);
+			AccessToken token = accessTokenFactory.build(findUser(batch, userEmail), PAPI_ORIGIN);
 			
 			calendarService.importICalendar(token, userEmail, operation.getRequest().getBody());
 		} catch (Exception e) {
 			throw new ProcessingException(e);
 		}
+	}
+
+	private ObmUser findUser(Batch batch, String userEmail) throws UserNotFoundException {
+		ObmUser user = userDao.findUser(userEmail, batch.getDomain());
+		if (user == null) {
+			throw new UserNotFoundException(userEmail, batch.getDomain().getUuid());
+		}
+		return user;
 	}
 
 }
