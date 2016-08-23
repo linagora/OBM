@@ -335,7 +335,7 @@ public class CalendarDaoJdbcImplTest {
 		
 		mocksControl.replay();
 		
-		Event createdEvent = calendarDaoJdbcImpl.createEvent(token, email, event, true);
+		Event createdEvent = calendarDaoJdbcImpl.createEvent(token, email, event);
 		
 		mocksControl.verify();
 		assertThat(createdEvent.getEntityId()).isEqualTo(expectedEntityId);

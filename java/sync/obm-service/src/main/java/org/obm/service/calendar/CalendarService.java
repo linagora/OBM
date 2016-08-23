@@ -162,7 +162,7 @@ public class CalendarService {
 			if (alreadyInDbEvent.isPresent()) {
 				logger.info("event {} seems to already exist, skipping creation", event.getExtId().getExtId());
 			} else {
-				Event newEvent = calendarDao.createEvent(token, calendarUser.getLogin(), event, true);
+				Event newEvent = calendarDao.createEvent(token, calendarUser.getLogin(), event);
 				if (newEvent != null) {
 					return true;
 				}
@@ -196,7 +196,7 @@ public class CalendarService {
 		try {
 			if (alreadyInDbEvent.isPresent() && alreadyInDbEvent.get().getSequence() < event.getSequence()) {
 				event.setUid(alreadyInDbEvent.get().getUid()); // Parsed events do not have their internal OBM id
-				return calendarDao.modifyEvent(token, calendarUser.getLogin(), event, true, true) != null;
+				return calendarDao.modifyEvent(token, calendarUser.getLogin(), event, true) != null;
 			}
 			if (alreadyInDbEvent.isPresent()) {
 				logger.info("event {} seems to already exist with sequence {}, newly imported event sequence is {}, skipping update",

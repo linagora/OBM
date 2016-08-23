@@ -139,7 +139,7 @@ public class CalendarServiceTest {
 		expect(attendeeService.findAttendee(null, attendee.getEmail(), true, user.getDomain(), user.getUid())).andReturn(attendee);
 		expect(attendeeService.findAttendee(null, organizer.getEmail(), true, user.getDomain(), user.getUid())).andReturn(organizer);
 		expect(calendarDao.findEventByExtId(eq(token), eq(user), isA(EventExtId.class))).andReturn(null);
-		expect(calendarDao.createEvent(eq(token), eq(calendar), eventWithAttendeeParticipationState(expectedAttendeesParticipation), eq(true))).andReturn(null);
+		expect(calendarDao.createEvent(eq(token), eq(calendar), eventWithAttendeeParticipationState(expectedAttendeesParticipation))).andReturn(null);
 
 		mocksControl.replay();
 		testee.importICalendar(token, user.getLogin(), ics);
@@ -156,7 +156,7 @@ public class CalendarServiceTest {
 		expect(userService.getUserFromAttendee(isA(Attendee.class), eq(domainName))).andReturn(user);
 		expect(attendeeService.findUserAttendee(null, user.getLogin(), user.getDomain())).andReturn(attendee);
 		expect(calendarDao.findEventByExtId(eq(token), eq(user), isA(EventExtId.class))).andReturn(null);
-		expect(calendarDao.createEvent(eq(token), eq(calendar), eventWithSingleAttendeeAsOrganizer(), eq(true))).andReturn(null);
+		expect(calendarDao.createEvent(eq(token), eq(calendar), eventWithSingleAttendeeAsOrganizer())).andReturn(null);
 
 		mocksControl.replay();
 		testee.importICalendar(token, calendar, ics);
@@ -173,7 +173,7 @@ public class CalendarServiceTest {
 		expect(userService.getUserFromAttendee(isA(Attendee.class), eq(domainName))).andReturn(user);
 		expect(attendeeService.findUserAttendee(null, user.getLogin(), user.getDomain())).andReturn(attendee);
 		expect(calendarDao.findEventByExtId(eq(token), eq(user), isA(EventExtId.class))).andReturn(null);
-		expect(calendarDao.createEvent(eq(token), eq(calendar), eventWithDefinedOwner(), eq(true))).andReturn(null);
+		expect(calendarDao.createEvent(eq(token), eq(calendar), eventWithDefinedOwner())).andReturn(null);
 		
 		mocksControl.replay();
 		testee.importICalendar(token, calendar, ics);
@@ -192,7 +192,7 @@ public class CalendarServiceTest {
 		expect(attendeeService.findAttendee(null, attendee.getEmail(), true, user.getDomain(), user.getUid())).andReturn(attendee);
 		expect(attendeeService.findAttendee(null, organizer.getEmail(), true, user.getDomain(), user.getUid())).andReturn(organizer);
 		expect(calendarDao.findEventByExtId(eq(token), eq(user), isA(EventExtId.class))).andReturn(null).times(4);
-		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class), eq(true))).andReturn(null).times(4);
+		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class))).andReturn(null).times(4);
 		
 		mocksControl.replay();
 		testee.importICalendar(token, calendar, ics);
@@ -212,7 +212,7 @@ public class CalendarServiceTest {
 		expect(attendeeService.findAttendee(null, attendee.getEmail(), true, user.getDomain(), user.getUid())).andReturn(attendee);
 		expect(attendeeService.findAttendee(null, organizer.getEmail(), true, user.getDomain(), user.getUid())).andReturn(organizer);
 		expect(calendarDao.findEventByExtId(eq(token), eq(user), isA(EventExtId.class))).andReturn(null).times(4);
-		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class), eq(true))).andReturn(null).times(4);
+		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class))).andReturn(null).times(4);
 		
 		mocksControl.replay();
 		testee.importICalendar(token, calendar, ics);
@@ -232,7 +232,7 @@ public class CalendarServiceTest {
 		expect(attendeeService.findAttendee(null, "user@test.tlse.lng", true, user.getDomain(), user.getUid())).andReturn(attendee).once();
 		expect(attendeeService.findAttendee(null, "organizer@test.tlse.lng", true, user.getDomain(), user.getUid())).andReturn(organizer).once();
 		expect(calendarDao.findEventByExtId(eq(token), eq(user), isA(EventExtId.class))).andReturn(null).times(4);
-		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class), eq(true))).andReturn(null).times(4);
+		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class))).andReturn(null).times(4);
 
 		mocksControl.replay();
 		testee.importICalendar(token, calendar, ics);
@@ -279,7 +279,7 @@ public class CalendarServiceTest {
 		expect(attendeeService.findAttendee(null, attendee.getEmail(), true, user.getDomain(), user.getUid())).andReturn(attendee);
 		expect(attendeeService.findAttendee(null, organizer.getEmail(), true, user.getDomain(), user.getUid())).andReturn(organizer);
 		expect(calendarDao.findEventByExtId(token, user, alreadyInDbEvent.getExtId())).andReturn(alreadyInDbEvent);
-		expect(calendarDao.modifyEvent(eq(token), eq(calendar), isA(Event.class), eq(true), eq(true))).andReturn(alreadyInDbEvent);
+		expect(calendarDao.modifyEvent(eq(token), eq(calendar), isA(Event.class), eq(true))).andReturn(alreadyInDbEvent);
 		
 		mocksControl.replay();
 		testee.importICalendar(token, calendar, ics);
