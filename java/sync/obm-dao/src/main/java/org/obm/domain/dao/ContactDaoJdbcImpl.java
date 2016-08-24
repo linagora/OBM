@@ -505,7 +505,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 		logger.info("eventId != null");
 		Event e = calendarDao.findEventById(at, dateId);
 		e.setStartDate(date);
-		calendarDao.modifyEvent(con, at, at.getUserWithDomain(), e, false, true);
+		calendarDao.modifyEvent(con, at, at.getUserWithDomain(), e, false);
 		return e.getObmId();
 	}
 
@@ -515,7 +515,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 			FindException, ServerFault {
 		logger.info("eventId == null");
 		Event e = calendarDao.createEvent(con, at, at.getUserWithDomain(),
-				getEvent(at, DisplayNameUtils.getDisplayName(null, c.getFirstname(), c.getLastname()), date), true);
+				getEvent(at, DisplayNameUtils.getDisplayName(null, c.getFirstname(), c.getLastname()), date));
 		return e.getObmId();
 	}
 

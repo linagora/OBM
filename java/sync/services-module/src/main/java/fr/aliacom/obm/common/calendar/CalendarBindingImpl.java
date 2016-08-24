@@ -488,7 +488,7 @@ public class CalendarBindingImpl implements ICalendar {
 			applyParticipationModifications(before, event);
 			
 			Event after = calendarDao.modifyEventForcingSequence(
-					token, calendar, event, updateAttendees, event.getSequence(), true);
+					token, calendar, event, updateAttendees, event.getSequence());
 			logger.info("Calendar : internal event[" + after.getTitle() + "] modified");
 
 			assignDelegationRightsOnAttendees(token, after);
@@ -625,7 +625,7 @@ public class CalendarBindingImpl implements ICalendar {
 						"] removed, calendar owner won't attende to it");
 				return event;
 			} else {
-				Event after = calendarDao.modifyEvent(token,  calendar, event, updateAttendees, false);
+				Event after = calendarDao.modifyEvent(token,  calendar, event, updateAttendees);
 				logger.info("Calendar : External event[" + after.getTitle() + "] modified");
 				notifyOrganizerForExternalEvent(token, calendar, after, notification);
 				return after;
@@ -641,7 +641,7 @@ public class CalendarBindingImpl implements ICalendar {
 	public EventObmId createEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId)
 			throws ServerFault, EventAlreadyExistException, NotAllowedException, PermissionException {
 
-		assertEventNotNull(token, event);
+		assertEventNotNull(event);
 		assertEventIsNew(token, calendar, event);
 
 		return createEventNoExistenceCheck(token, calendar, event, notification, clientId).getObmId();
@@ -704,11 +704,10 @@ public class CalendarBindingImpl implements ICalendar {
 		}
 	}
 
-	private void assertEventNotNull(AccessToken token, Event event) throws ServerFault {
+	private void assertEventNotNull(Event event) throws ServerFault {
 		if (event == null) {
 			logger.warn("creating NULL event, returning fake id 0");
-			throw new ServerFault(
-					"event creation without any data");
+			throw new ServerFault("event creation without any data");
 		}
 	}
 
@@ -730,7 +729,7 @@ public class CalendarBindingImpl implements ICalendar {
 				return ev;
 			} else {
 				changeOrganizerParticipationToAccepted(event);
-				Event ev = calendarDao.createEvent(token, calendar, event, false);
+				Event ev = calendarDao.createEvent(token, calendar, event);
 				logger.info("Calendar : external event["+ ev.getTitle() + "] created");
 				notifyOrganizerForExternalEvent(token, calendar, ev, notification);
 				return ev;
@@ -744,7 +743,7 @@ public class CalendarBindingImpl implements ICalendar {
 	private Event createEventAsDeleted(AccessToken token, String calendar, Event event) 
 			throws SQLException, FindException, ServerFault {
 		
-		Event ev = calendarDao.createEvent(token, calendar, event, false);
+		Event ev = calendarDao.createEvent(token, calendar, event);
 		return calendarDao.removeEvent(token, ev, event.getType(), event.getSequence());
 	}
 
@@ -787,7 +786,7 @@ public class CalendarBindingImpl implements ICalendar {
 			throws ServerFault {
 		try{
 			event.updateParticipation();
-			Event ev = calendarDao.createEvent(token, calendar, event, true);
+			Event ev = calendarDao.createEvent(token, calendar, event);
 			ev = calendarDao.findEventById(token, ev.getObmId());
 			eventChangeHandler.create(ev, notification, token);
 			logger.info("Calendar : internal event["
@@ -1432,7 +1431,7 @@ public class CalendarBindingImpl implements ICalendar {
 				if(parentEvent != null) {
 					Event eventException = createOccurrence(parentEvent, recurrenceId);
 					parentEvent.getRecurrence().addEventException(eventException);
-					calendarDao.modifyEventForcingSequence(token, parentEvent.getOwner(), parentEvent, true, parentEvent.getSequence(), true);
+					calendarDao.modifyEventForcingSequence(token, parentEvent.getOwner(), parentEvent, true, parentEvent.getSequence());
 					currentEvent = eventException;
 				}
 			}
@@ -1646,7 +1645,7 @@ public class CalendarBindingImpl implements ICalendar {
 	@Override
 	@Transactional
 	public Event storeEvent(AccessToken token, String calendar, Event event, boolean notification, String clientId) throws ServerFault, NotAllowedException, PermissionException {
-		assertEventNotNull(token, event);
+		assertEventNotNull(event);
 
 		ObmUser calendarUser = userService.getUserFromLogin(calendar, token.getDomain().getName());
 

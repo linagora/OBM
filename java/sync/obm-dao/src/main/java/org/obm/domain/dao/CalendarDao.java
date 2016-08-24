@@ -60,7 +60,7 @@ import fr.aliacom.obm.common.user.ObmUser;
 
 public interface CalendarDao {
 
-	Event createEvent(AccessToken at, String calendar, Event event, Boolean useObmUser) throws FindException,  SQLException, ServerFault ;
+	Event createEvent(AccessToken at, String calendar, Event event) throws FindException,  SQLException, ServerFault ;
 
 	List<Event> findAllEvents(AccessToken token, ObmUser calendarUser, EventType typeFilter);
 
@@ -92,10 +92,10 @@ public interface CalendarDao {
 
 	Collection<ResourceInfo> listResources(ObmUser user, Integer limit, Integer offset, String pattern) throws FindException;
 
-	Event modifyEvent(AccessToken at, String calendar, Event event, boolean updateAttendees, Boolean useObmUser) throws FindException, SQLException, EventNotFoundException, ServerFault;
+	Event modifyEvent(AccessToken at, String calendar, Event event, boolean updateAttendees) throws FindException, SQLException, EventNotFoundException, ServerFault;
 
 	Event modifyEventForcingSequence(AccessToken at, String calendar, Event ev,
-			boolean updateAttendees, int sequence, Boolean useObmUser)
+			boolean updateAttendees, int sequence)
 			throws SQLException, FindException, EventNotFoundException, ServerFault;
 	
 	Event removeEventById(AccessToken token, EventObmId eventId, EventType eventType, int sequence) throws SQLException, EventNotFoundException, ServerFault;
@@ -106,14 +106,14 @@ public interface CalendarDao {
 	
 	Event removeEventByExtId(AccessToken token, ObmUser calendar, EventExtId eventExtId, int sequence) throws SQLException;
 
-	Event createEvent(Connection con, AccessToken editor, String calendar, Event ev, Boolean useObmUser) throws SQLException, FindException, ServerFault;
+	Event createEvent(Connection con, AccessToken editor, String calendar, Event ev) throws SQLException, FindException, ServerFault;
 
 	void modifyEvent(Connection con, AccessToken at,  String calendar, Event ev,
-			boolean updateAttendees, Boolean useObmUser)
+			boolean updateAttendees)
 			throws SQLException, FindException, ServerFault, EventNotFoundException;
 
 	void modifyEventForcingSequence(Connection con, AccessToken editor, String calendar,
-			Event ev, boolean updateAttendees, int sequence, Boolean useObmUser)
+			Event ev, boolean updateAttendees, int sequence)
 			throws SQLException, FindException, ServerFault, EventNotFoundException;
 	
 	boolean changeParticipation(AccessToken token, ObmUser calendarOwner, EventExtId extId, RecurrenceId recurrenceId, Participation participation) throws SQLException, ParseException ;

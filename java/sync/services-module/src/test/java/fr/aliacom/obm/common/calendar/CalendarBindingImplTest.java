@@ -708,7 +708,7 @@ public class CalendarBindingImplTest {
 				.build();
 		expect(helper.listRightsOnCalendars(accessToken, ImmutableSet.of(attendee.getEmail()))).andReturn(calendarToRights).atLeastOnce();
 		expect(helper.eventBelongsToCalendar(beforeEvent, calendar)).andReturn(true).atLeastOnce();
-		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, event, updateAttendee, 1, true)).andReturn(event).atLeastOnce();
+		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, event, updateAttendee, 1)).andReturn(event).atLeastOnce();
 		eventChangeHandler.update(beforeEvent, event, notification, accessToken);
 
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
@@ -863,9 +863,8 @@ public class CalendarBindingImplTest {
 						ImmutableSet.of(attendee.getEmail(), exceptionAttendee.getEmail())))
 				.andReturn(calendarToRights2).times(2);
 		expect(helper.eventBelongsToCalendar(beforeEvent, defaultUser.getEmailAtDomain())).andReturn(true).once();
-		expect(
-				calendarDao.modifyEventForcingSequence(accessToken, calendar, event,
-						updateAttendee, 1, true)).andReturn(event).atLeastOnce();
+		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, event,updateAttendee, 1))
+				.andReturn(event).atLeastOnce();
 		eventChangeHandler.update(beforeEvent, event, notification, accessToken);
 
 		replay(accessToken, helper, calendarDao, userService, eventChangeHandler);
@@ -1035,8 +1034,7 @@ public class CalendarBindingImplTest {
 				.build();
 		expect(helper.listRightsOnCalendars(accessToken, ImmutableSet.of(attendee.getEmail(), attendee2.getEmail()))).andReturn(calendarToRights).atLeastOnce();
 
-		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, event,
-						updateAttendee, 1, true)).andReturn(event).atLeastOnce();
+		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, event, updateAttendee, 1)).andReturn(event).atLeastOnce();
 
 		eventChangeHandler.update(beforeEvent, event, notification, accessToken);
 		expectLastCall().atLeastOnce();
@@ -1098,7 +1096,7 @@ public class CalendarBindingImplTest {
 
 		CalendarDao calendarDao = createMock(CalendarDao.class);
 		expect(calendarDao.findEventByExtId(accessToken, defaultUser, eventExtId)).andReturn(oldEvent).once();
-		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, newEvent, updateAttendees, sequence, true)).andReturn(newEvent).once();
+		expect(calendarDao.modifyEventForcingSequence(accessToken, calendar, newEvent, updateAttendees, sequence)).andReturn(newEvent).once();
 
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
 
@@ -1258,7 +1256,7 @@ public class CalendarBindingImplTest {
 		expect(commitedOperationDao.findAsEvent(accessToken, null)).andReturn(null);
 		expect(userService.getUserFromCalendar(calendar, defaultUser.getDomain().getName())).andReturn(defaultUser).atLeastOnce();
 		expect(calendarDao.findEventByExtId(accessToken, defaultUser, event.getExtId())).andReturn(null).once();
-		expect(calendarDao.createEvent(accessToken, calendar, event, false)).andReturn(eventCreated).once();
+		expect(calendarDao.createEvent(accessToken, calendar, event)).andReturn(eventCreated).once();
 		expect(calendarDao.removeEvent(accessToken, eventCreated, eventCreated.getType(), eventCreated.getSequence())).andReturn(eventCreated).once();
 		eventChangeHandler.updateParticipation(eventCreated, defaultUser, calOwner.getParticipation(), notification, accessToken);
 		expectLastCall().once();
@@ -1472,7 +1470,7 @@ public class CalendarBindingImplTest {
 		expectedEvent.setUid(new EventObmId(1));
 
 		CalendarDao calendarDao = createMock(CalendarDao.class);
-		expect(calendarDao.createEvent(accessToken, calendar, internalEvent, true)).andReturn(internalEvent).once();
+		expect(calendarDao.createEvent(accessToken, calendar, internalEvent)).andReturn(internalEvent).once();
 		expect(calendarDao.findEventById(accessToken, internalEvent.getObmId())).andReturn(internalEvent).once();
 
 		EventChangeHandler eventChangeHandler = createMock(EventChangeHandler.class);
@@ -1754,7 +1752,7 @@ public class CalendarBindingImplTest {
 				previousEvent).once();
 		expect(
 				calendarDao.modifyEventForcingSequence(token, user.getEmailAtDomain(), currentEvent,
-						updateAttendees, currentEvent.getSequence(), true)).andReturn(currentEvent);
+						updateAttendees, currentEvent.getSequence())).andReturn(currentEvent);
 
 		replay(token, eventChangeHandler, userService, rightsHelper, calendarDao);
 
@@ -3027,7 +3025,7 @@ public class CalendarBindingImplTest {
 		// times(2) = 1 for the event, 1 for the first exception
 		expect(attendeeService.findAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid())).andReturn(contactAttendee).times(2);
 		expect(attendeeService.findAttendee(null, resourceEmail, true, user.getDomain(), user.getUid())).andReturn(resourceAttendee).times(2);
-		expect(calendarDao.createEvent(token, calendar, event, true)).andReturn(event);
+		expect(calendarDao.createEvent(token, calendar, event)).andReturn(event);
 		expect(calendarDao.findEventById(token, null)).andReturn(event);
 		messageQueueService.writeIcsInvitationRequest(token, event);
 		expectLastCall();
@@ -3078,7 +3076,7 @@ public class CalendarBindingImplTest {
 		expect(attendeeService.findResourceAttendee(null, attendeeEmail, user.getDomain(), user.getUid()))
 			.andReturn(null).anyTimes();
 
-		expect(calendarDao.createEvent(token, userEmail, toStoreEvent, true)).andReturn(toStoreEvent);
+		expect(calendarDao.createEvent(token, userEmail, toStoreEvent)).andReturn(toStoreEvent);
 		expect(calendarDao.findEventById(token, null)).andReturn(toStoreEvent);
 		messageQueueService.writeIcsInvitationRequest(token, toStoreEvent);
 		expectLastCall();
@@ -3118,7 +3116,7 @@ public class CalendarBindingImplTest {
 		expect(attendeeService.findUserAttendee(null, userEmail, user.getDomain())).andReturn(userAttendee);
 		expect(attendeeService.findContactAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid()))
 			.andReturn(contactAttendee);
-		expect(calendarDao.createEvent(token, userEmail, event, false)).andReturn(event);
+		expect(calendarDao.createEvent(token, userEmail, event)).andReturn(event);
 		messageQueueService.writeIcsInvitationReply(token, event, user);
 		expectLastCall();
 
@@ -3199,7 +3197,7 @@ public class CalendarBindingImplTest {
 		// times(3) = 1 for the event, 1 for each exception
 		expect(attendeeService.findUserAttendee(null, userEmail, user.getDomain())).andReturn(userAttendee).times(3);
 		expect(attendeeService.findContactAttendee(null, attendeeEmail, true, user.getDomain(), user.getUid())).andReturn(contactAttendee).times(2);
-		expect(calendarDao.createEvent(token, userEmail, event, false)).andReturn(event);
+		expect(calendarDao.createEvent(token, userEmail, event)).andReturn(event);
 		messageQueueService.writeIcsInvitationReply(token, event, user);
 		expectLastCall();
 
@@ -3291,7 +3289,7 @@ public class CalendarBindingImplTest {
 		expect(userService.getUserFromAccessToken(token)).andReturn(obmUser);
 		expect(userService.getUserFromAttendee(isA(Attendee.class), eq(domainName))).andReturn(obmUser).anyTimes();
 		expect(calendarDao.findEventByExtId(eq(token), eq(obmUser), isA(EventExtId.class))).andReturn(null).anyTimes();
-		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class), eq(true))).andReturn(null).anyTimes();
+		expect(calendarDao.createEvent(eq(token), eq(calendar), isA(Event.class))).andReturn(null).anyTimes();
 		mocksControl.replay();
 
 		binding.importICalendar(token, calendar, ics, null);
@@ -3718,7 +3716,7 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.findEventByExtId(token, user, event.getExtId())).andReturn(null);
 		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user);
 		expect(commitedOperationDao.findAsEvent(token, null)).andReturn(null);
-		expect(calendarDao.createEvent(token, calendar, event, true)).andReturn(event);
+		expect(calendarDao.createEvent(token, calendar, event)).andReturn(event);
 		messageQueueService.writeIcsInvitationRequest(token, event);
 		expectLastCall();
 		expect(calendarDao.findEventById(token, null)).andReturn(event);
@@ -3829,7 +3827,7 @@ public class CalendarBindingImplTest {
 		expect(calendarDao.findEventByExtId(token, user, event.getExtId())).andReturn(event).anyTimes();
 		expect(helperService.eventBelongsToCalendar(event, calendar)).andReturn(true);
 		expect(userService.getUserFromCalendar(calendar, user.getDomain().getName())).andReturn(user);
-		expect(calendarDao.modifyEventForcingSequence(token, calendar, event, true, 0, true)).andReturn(event);
+		expect(calendarDao.modifyEventForcingSequence(token, calendar, event, true, 0)).andReturn(event);
 		mocksControl.replay();
 
 		binding.storeEvent(token, calendar, event, false, null);
@@ -3867,7 +3865,7 @@ public class CalendarBindingImplTest {
 
 		// FIRST CREATION
 		expect(calendarDao.findEventByExtId(token, user, event1.getExtId())).andReturn(null);
-		expect(calendarDao.createEvent(token, calendar, event1, true)).andReturn(event2);
+		expect(calendarDao.createEvent(token, calendar, event1)).andReturn(event2);
 		expect(calendarDao.findEventById(token, event2.getObmId())).andReturn(event2);
 		messageQueueService.writeIcsInvitationRequest(token, event2);
 		expectLastCall();
@@ -3881,7 +3879,7 @@ public class CalendarBindingImplTest {
 
 		// SECOND CREATION
 		expect(calendarDao.findEventByExtId(token, user, event1.getExtId())).andReturn(null);
-		expect(calendarDao.createEvent(token, calendar, event1, true)).andReturn(event3);
+		expect(calendarDao.createEvent(token, calendar, event1)).andReturn(event3);
 		expect(calendarDao.findEventById(token, event3.getObmId())).andReturn(event3);
 		messageQueueService.writeIcsInvitationRequest(token, event3);
 		expectLastCall();

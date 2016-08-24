@@ -258,13 +258,13 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Event createEvent(AccessToken editor, String calendar, Event ev, Boolean useObmUser)throws FindException, SQLException, ServerFault {
+	public Event createEvent(AccessToken editor, String calendar, Event ev)throws FindException, SQLException, ServerFault {
 		logger.info("create with token " + editor.getSessionId() + " from "
 				+ editor.getOrigin() + " for " + editor.getUserEmail());
 		Connection con = null;
 		try {
 			con = obmHelper.getConnection();
-			return createEvent(con, editor, calendar, ev, useObmUser);
+			return createEvent(con, editor, calendar, ev);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -272,8 +272,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 	@Override
 	@AutoTruncate
-	public Event createEvent(Connection con, AccessToken editor, String calendar, @DatabaseEntity Event ev,
-			Boolean useObmUser) throws SQLException, FindException, ServerFault {
+	public Event createEvent(Connection con, AccessToken editor, String calendar, @DatabaseEntity Event ev)
+			throws SQLException, FindException, ServerFault {
 		Integer ownerId = null;
 		logger.info("try to create with calendar owner:"
 				+ calendar);
@@ -329,8 +329,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		insertExceptions(editor, ev, con, id);
 		if (ev.isRecurrent()) {
-			insertEventExceptions(editor, calendar, ev.getRecurrence()
-					.getEventExceptions(), con, id, useObmUser);
+			insertEventExceptions(editor, calendar, ev.getRecurrence().getEventExceptions(), con, id);
 		}
 		Integer alert = ev.getAlert();
 		if (alert != null) {
@@ -343,14 +342,14 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	private List<Event> insertEventExceptions(AccessToken editor, String calendar,
-			Set<Event> eventException, Connection con, EventObmId id, Boolean useObmUser)
+			Set<Event> eventException, Connection con, EventObmId id)
 			throws SQLException, FindException, ServerFault {
 		List<Event> newEvExcepts = new LinkedList<Event>();
 		Event created = null;
 		Map<EventObmId, Date> eventsEx = new HashMap<EventObmId, Date>();
 
 		for (Event evExcept : eventException) {
-			created = createEvent(con, editor, calendar, evExcept, useObmUser);
+			created = createEvent(con, editor, calendar, evExcept);
 			newEvExcepts.add(created);
 			eventsEx.put(created.getObmId(),
 					evExcept.getRecurrenceId());
@@ -1729,8 +1728,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public Event modifyEventForcingSequence(AccessToken at, String calendar, Event ev,
-			boolean updateAttendees, int sequence, Boolean useObmUser) throws SQLException, FindException, ServerFault, EventNotFoundException {
+	public Event modifyEventForcingSequence(AccessToken at, String calendar, Event ev, boolean updateAttendees, int sequence)
+			throws SQLException, FindException, ServerFault, EventNotFoundException {
 
 		logger.info("should modify event with title " + ev.getTitle()
 				+ " date: " + ev.getStartDate() + " id: " + ev.getObmId());
@@ -1739,7 +1738,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		try {
 			con = obmHelper.getConnection();
-			modifyEventForcingSequence(con, at, calendar, ev, updateAttendees, sequence, useObmUser);
+			modifyEventForcingSequence(con, at, calendar, ev, updateAttendees, sequence);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -1748,8 +1747,8 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 	
 	@Override
-	public Event modifyEvent(AccessToken at, String calendar, Event ev,
-			boolean updateAttendees, Boolean useObmUser) throws SQLException, FindException, EventNotFoundException, ServerFault {
+	public Event modifyEvent(AccessToken at, String calendar, Event ev, boolean updateAttendees)
+			throws SQLException, FindException, EventNotFoundException, ServerFault {
 
 		logger.info("should modify event with title " + ev.getTitle()
 				+ " date: " + ev.getStartDate() + " id: " + ev.getObmId());
@@ -1758,7 +1757,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 		try {
 			con = obmHelper.getConnection();
-			modifyEvent(con, at, calendar, ev, updateAttendees, useObmUser);
+			modifyEvent(con, at, calendar, ev, updateAttendees);
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}
@@ -1767,16 +1766,16 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 	}
 
 	@Override
-	public void modifyEvent(Connection con, AccessToken editor, String calendar, Event ev, boolean updateAttendees, 
-			Boolean useObmUser) throws SQLException, FindException, ServerFault, EventNotFoundException {
+	public void modifyEvent(Connection con, AccessToken editor, String calendar, Event ev, boolean updateAttendees)
+			throws SQLException, FindException, ServerFault, EventNotFoundException {
 		
-		modifyEventForcingSequence(con, editor, calendar, ev, updateAttendees, ev.getSequence(), useObmUser);
+		modifyEventForcingSequence(con, editor, calendar, ev, updateAttendees, ev.getSequence());
 	}
 	
 	@Override
 	@AutoTruncate
 	public void modifyEventForcingSequence(Connection con, AccessToken editor, String calendar, @DatabaseEntity Event ev, 
-			boolean updateAttendees, int sequence, Boolean useObmUser)
+			boolean updateAttendees, int sequence)
 			throws SQLException, FindException, ServerFault, EventNotFoundException {
 		
 		Event old = findEventById(editor, ev.getObmId());
@@ -1814,8 +1813,7 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 
 			insertExceptions(editor, ev, con, ev.getObmId());
 			if (ev.isRecurrent()) {
-				insertEventExceptions(editor, calendar, ev.getRecurrence()
-						.getEventExceptions(), con, ev.getObmId(), useObmUser);
+				insertEventExceptions(editor, calendar, ev.getRecurrence().getEventExceptions(), con, ev.getObmId());
 			}
 		} finally {
 			obmHelper.cleanup(null, ps, null);
