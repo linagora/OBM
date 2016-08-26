@@ -57,7 +57,7 @@ import org.obm.domain.dao.ContactDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.push.utils.DateUtils;
-import org.obm.service.calendar.ContactService;
+import org.obm.service.contact.ContactService;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;

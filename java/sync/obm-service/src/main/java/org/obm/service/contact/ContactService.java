@@ -29,7 +29,7 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.service.calendar;
+package org.obm.service.contact;
 
 import java.util.Collection;
 import java.util.HashSet;
