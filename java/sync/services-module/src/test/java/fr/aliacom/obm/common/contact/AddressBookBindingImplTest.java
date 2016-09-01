@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2016 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -57,9 +57,7 @@ import org.obm.domain.dao.ContactDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.push.utils.DateUtils;
-import org.obm.service.contact.ContactService;
-import org.obm.sync.addition.CommitedElement;
-import org.obm.sync.addition.Kind;
+import org.obm.service.solr.SolrHelper;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.base.EmailAddress;
@@ -101,7 +99,7 @@ public class AddressBookBindingImplTest {
 			bindWithMock(ContactConfiguration.class);
 			bindWithMock(DatabaseConnectionProvider.class);
 			bindWithMock(CommitedOperationDao.class);
-			bindWithMock(ContactService.class);
+			bindWithMock(SolrHelper.Factory.class);
 			bindWithMock(ObmSyncConfigurationService.class);
 			bind(DatabaseConfiguration.class).to(DatabaseConfigurationFixturePostgreSQL.class);
 		}
@@ -246,83 +244,6 @@ public class AddressBookBindingImplTest {
 		assertThat(changes.getRemovedContacts()).containsOnly(dc(1), dc(2), dc(3));
 		assertThat(changes.getUpdatedAddressBooks()).containsOnly(updatedContactFolder1, updatedContactFolder2);
 		assertThat(changes.getRemovedAddressBooks()).containsOnly(removedContactFolder1, removedContactFolder2);
-	}
-
-	@Test
-	public void testCreateContactWithCommitedOperation() throws Exception {
-		Integer addressBookId = 1;
-		EntityId entityId = EntityId.valueOf(984);
-		Contact contact = new Contact(), expectedContact = new Contact();
-		String clientId = "6547";
-
-		expectedContact.setEntityId(entityId);
-
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
-		expect(contactDao.createContactInAddressBook(token, contact, addressBookId)).andReturn(expectedContact).once();
-		expect(contactDao.hasRightsOnAddressBook(token, addressBookId)).andReturn(true);
-		expect(commitedOperationDao.findAsContact(token, clientId)).andReturn(null).once();
-		commitedOperationDao.store(token,
-				CommitedElement.builder()
-					.clientId(clientId)
-					.entityId(entityId)
-					.kind(Kind.VCONTACT)
-					.build());
-		expectLastCall().once();
-		mocksControl.replay();
-		
-		Contact createdContact = binding.createContact(token, addressBookId, contact, clientId);
-		
-		assertThat(createdContact).isEqualTo(expectedContact);
-	}
-
-	@Test
-	public void testCreateContactAlreadyCommited() throws Exception {
-		Integer addressBookId = 1;
-		Contact contact = new Contact();
-		String clientId = "6547";
-
-		expect(contactDao.hasRightsOnAddressBook(token, addressBookId)).andReturn(true);
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
-		expect(commitedOperationDao.findAsContact(token, clientId)).andReturn(contact).once();
-		mocksControl.replay();
-		
-		Contact createdContact = binding.createContact(token, addressBookId, contact, clientId);
-		
-		assertThat(createdContact).isEqualTo(contact);
-	}
-
-	@Test
-	public void testCreateContactWhenNullClientId() throws Exception {
-		Integer addressBookId = 1, entityId = 984;
-		Contact contact = new Contact(), expectedContact = new Contact();
-
-		expectedContact.setEntityId(EntityId.valueOf(entityId));
-		
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
-		expect(contactDao.hasRightsOnAddressBook(token, addressBookId)).andReturn(true);
-		expect(contactDao.createContactInAddressBook(token, contact, addressBookId)).andReturn(expectedContact).once();
-		expect(commitedOperationDao.findAsContact(token, null)).andReturn(null).once();
-		mocksControl.replay();
-		
-		Contact createdContact = binding.createContact(token, addressBookId, contact, null);
-		
-		assertThat(createdContact).isEqualTo(expectedContact);
-	}
-
-	@Test
-	public void testCreateContact() throws Exception {
-		Contact contact = new Contact();
-		int addressBookId = 1;
-
-		expect(contactConfiguration.getAddressBookUserId()).andReturn(USERS_ADDRESS_BOOK_ID).once();
-		expect(contactDao.hasRightsOnAddressBook(token, addressBookId)).andReturn(true);
-		expect(contactDao.createContactInAddressBook(token, contact, addressBookId)).andReturn(contact).once();
-		expect(commitedOperationDao.findAsContact(token, null)).andReturn(null).once();
-		mocksControl.replay();
-
-		Contact createdContact = binding.createContact(token, addressBookId, contact, null);
-		
-		assertThat(createdContact).isNotNull();
 	}
 
 	@Test(expected = NoPermissionException.class)

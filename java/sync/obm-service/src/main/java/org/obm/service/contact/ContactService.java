@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.service.contact;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -43,11 +44,18 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.obm.domain.dao.CommitedOperationDao;
+import org.obm.domain.dao.ContactDao;
 import org.obm.locator.LocatorClientException;
 import org.obm.service.solr.SolrHelper;
 import org.obm.service.solr.SolrHelper.Factory;
+import org.obm.sync.addition.CommitedElement;
+import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
+import org.obm.sync.book.Contact;
+import org.obm.sync.dao.EntityId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,10 +68,16 @@ public class ContactService {
 	private static final Logger logger = LoggerFactory.getLogger(ContactService.class);
 
 	private final Factory solrHelperFactory;
+	private final ContactDao contactDao;
+	private final CommitedOperationDao commitedOperationDao;
+
 
 	@Inject
-	public ContactService(SolrHelper.Factory solrHelperFactory) {
+	public ContactService(SolrHelper.Factory solrHelperFactory, ContactDao contactDao,
+			CommitedOperationDao commitedOperationDao) {
 		this.solrHelperFactory = solrHelperFactory;
+		this.contactDao = contactDao;
+		this.commitedOperationDao = commitedOperationDao;
 	}
 
 	public Set<Integer> searchContactIds(AccessToken token, String query, Collection<AddressBook> addrBooks, Integer limit, Integer offset)
@@ -124,5 +138,28 @@ public class ContactService {
 		}
 		
 		return contactIds;
+	}
+
+	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact, String clientId) throws ServerFault {
+		try {
+			Contact commitedContact = commitedOperationDao.findAsContact(token, clientId);
+			if (commitedContact != null) {
+				return commitedContact;
+			}
+			
+			Contact createdContact = contactDao.createContactInAddressBook(token, contact, addressBookId);
+			EntityId entityId = createdContact.getEntityId();
+			if (clientId != null && entityId != null) {
+				commitedOperationDao.store(token, 
+						CommitedElement.builder()
+							.clientId(clientId)
+							.entityId(entityId)
+							.kind(Kind.VCONTACT)
+							.build());
+			}
+			return createdContact;
+		} catch (SQLException e) {
+			throw new ServerFault(e.getMessage());
+		}
 	}
 }

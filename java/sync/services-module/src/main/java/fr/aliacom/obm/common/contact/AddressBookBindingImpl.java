@@ -44,14 +44,11 @@ import javax.naming.NoPermissionException;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.configuration.ContactConfiguration;
-import org.obm.domain.dao.CommitedOperationDao;
 import org.obm.domain.dao.ContactDao;
 import org.obm.locator.LocatorClientException;
 import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.push.utils.DateUtils;
 import org.obm.service.contact.ContactService;
-import org.obm.sync.addition.CommitedElement;
-import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
@@ -61,7 +58,6 @@ import org.obm.sync.book.Contact;
 import org.obm.sync.book.ContactUpdates;
 import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.Folder;
-import org.obm.sync.dao.EntityId;
 import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.sync.items.AddressBookChangesResponse;
 import org.obm.sync.items.ContactChanges;
@@ -97,20 +93,17 @@ public class AddressBookBindingImpl implements IAddressBook {
 	private final ContactMerger contactMerger;
 	private final ObmSyncConfigurationService configuration;
 	private final ContactConfiguration contactConfiguration;
-	private final CommitedOperationDao commitedOperationDao;
 	private final ContactService contactService;
 
 	@Inject
 	/*package*/ AddressBookBindingImpl(ContactDao contactDao, UserDao userDao, ContactMerger contactMerger, ObmHelper obmHelper, 
-			ObmSyncConfigurationService configuration, ContactConfiguration contactConfiguration,
-			CommitedOperationDao commitedOperationDao, ContactService contactService) {
+			ObmSyncConfigurationService configuration, ContactConfiguration contactConfiguration, ContactService contactService) {
 		this.contactDao = contactDao;
 		this.userDao = userDao;
 		this.contactMerger = contactMerger;
 		this.obmHelper = obmHelper;
 		this.configuration = configuration;
 		this.contactConfiguration = contactConfiguration;
-		this.commitedOperationDao = commitedOperationDao;
 		this.contactService = contactService;
 	}
 
@@ -222,29 +215,10 @@ public class AddressBookBindingImpl implements IAddressBook {
 	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact, String clientId) 
 			throws ServerFault, NoPermissionException {
 		
-		try {
-			assertIsNotAddressBookOfOBMUsers(addressBookId);
-			assertHasRightsOnAddressBook(token, addressBookId);
-			
-			Contact commitedContact = commitedOperationDao.findAsContact(token, clientId);
-			if (commitedContact != null) {
-				return commitedContact;
-			}
-			
-			Contact createdContact = contactDao.createContactInAddressBook(token, contact, addressBookId);
-			EntityId entityId = createdContact.getEntityId();
-			if (clientId != null && entityId != null) {
-				commitedOperationDao.store(token, 
-						CommitedElement.builder()
-							.clientId(clientId)
-							.entityId(entityId)
-							.kind(Kind.VCONTACT)
-							.build());
-			}
-			return createdContact;
-		} catch (SQLException e) {
-			throw new ServerFault(e.getMessage());
-		}
+		assertIsNotAddressBookOfOBMUsers(addressBookId);
+		assertHasRightsOnAddressBook(token, addressBookId);
+		
+		return contactService.createContact(token, addressBookId, contact, clientId);
 	}
 
 	private void assertIsNotAddressBookOfOBMUsers(Integer addressBookId) throws NoPermissionException {
