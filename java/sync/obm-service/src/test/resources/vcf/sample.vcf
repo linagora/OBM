@@ -1,0 +1,37 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Gump;Forrest;;Mr.
+FN:Forrest Gump
+ORG:Bubba Gump Shrimp Co.
+TITLE:Shrimp Man
+PHOTO;VALUE=URI;TYPE=GIF:http://www.example.com/dir_photos/my_photo.gif
+TEL:(111) 555-1212
+TEL;fax:09090909
+ADR:;;111 Waters Edge;Baytown;LA;30314;United States of America
+EMAIL;internet:email1@example.com
+EMAIL:email2@example.com
+EMAIL;work:email3@example.com
+BDAY:2016-07-10
+REV:2008-04-24T19:52:43Z
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+N:Gump2;Forrest2;;Mr.
+FN:Gump2 Forrest
+TITLE:Business Man
+TITLE:Chief
+PHOTO;VALUE=URI;TYPE=GIF:http://www.example.com/other_photo.gif
+TEL;TYPE=WORK,VOICE:(111) 555-1313
+TEL;TYPE=HOME,VOICE:(404) 555-1313
+ADR;TYPE=POSTAL:;;100 Waters Edge;Baytown;LA;30314;United States of Amer
+ ica
+ADR;TYPE=WORK,PREF:;;999 Waters Edge;Baytown;LA;30314;United States of Amer
+ ica
+LABEL;TYPE=WORK,PREF:999 Waters Edge\nBaytown\, LA 30314\nUnited States of 
+ America
+ADR;TYPE=HOME:;;99 Plantation St.;Baytown;LA;30314;United States of America
+LABEL;TYPE=HOME:99 Plantation St.\nBaytown\, LA 30314\nUnited States of Ame
+ rica
+EMAIL:email4@example.com
+REV:2008-04-24T19:52:43Z
+END:VCARD

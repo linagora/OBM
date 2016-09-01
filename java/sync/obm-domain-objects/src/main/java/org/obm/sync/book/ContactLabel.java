@@ -36,6 +36,7 @@ public enum ContactLabel {
 	MOBILE("CELL;VOICE;X-OBM-Ref1"),
 	PHONE("WORK;VOICE;X-OBM-Ref1"),
 	PHONE2("WORK;VOICE;X-OBM-Ref2"),
+	PHONE_HOME("HOME;VOICE;X-OBM-Ref1"),
 	FAX("WORK;FAX;X-OBM-Ref1"),
 	FAX2("HOME;FAX;X-OBM-Ref1"),
 	
@@ -43,7 +44,8 @@ public enum ContactLabel {
 	EMAIL2("INTERNET;X-OBM-Ref2"),
 	EMAIL3("INTERNET;X-OBM-Ref3"),
 	
-	ADDRESS("WORK;X-OBM-Ref1");
+	ADDRESS("WORK;X-OBM-Ref1"),
+	ADDRESS_HOME("HOME;X-OBM-Ref1");
 
 	private final String contactLabel;
 
