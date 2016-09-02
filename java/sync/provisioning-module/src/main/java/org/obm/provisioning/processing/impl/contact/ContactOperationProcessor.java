@@ -1,5 +1,5 @@
 /* ***** BEGIN LICENSE BLOCK *****
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2016 Linagora
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.processing.impl.events;
+package org.obm.provisioning.processing.impl.contact;
 
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.beans.Batch;
@@ -37,24 +37,24 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
-import org.obm.service.calendar.CalendarService;
+import org.obm.service.contact.ContactService;
 import org.obm.sync.auth.AccessToken;
 
 import com.google.inject.Inject;
 
-public class CreateEventOperationProcessor extends AbstractOperationProcessor {
+public class ContactOperationProcessor extends AbstractOperationProcessor {
 
 	private static final String PAPI_ORIGIN = "papi";
 
 	@Inject
-	private CalendarService calendarService;
+	private ContactService contactService;
 	
 	@Inject
 	private AccessToken.Factory accessTokenFactory;
 
 	@Inject
-	CreateEventOperationProcessor() {
-		super(BatchEntityType.EVENT, HttpVerb.POST);
+	ContactOperationProcessor() {
+		super(BatchEntityType.CONTACT, HttpVerb.POST);
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class CreateEventOperationProcessor extends AbstractOperationProcessor {
 			String userEmail = operation.getRequest().getParams().get(Request.USERS_EMAIL_KEY);
 			AccessToken token = accessTokenFactory.build(getUserFromDao(userEmail, batch.getDomain()), PAPI_ORIGIN);
 			
-			calendarService.importICalendar(token, userEmail, operation.getRequest().getBody());
+			contactService.importVCF(token, operation.getRequest().getBody());
 		} catch (Exception e) {
 			throw new ProcessingException(e);
 		}

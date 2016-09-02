@@ -56,6 +56,7 @@ public interface ContactDao {
 
 	ContactUpdates findUpdatedContacts(Date timestamp, AccessToken at) throws SQLException;
 
+	Contact createContact(AccessToken at, Contact contact) throws SQLException, ServerFault;
 	Contact createContact(AccessToken at, Connection con, Contact c) throws SQLException, ServerFault;
 
 	Contact createContactInAddressBook(AccessToken at, Contact c, int addressbookId)

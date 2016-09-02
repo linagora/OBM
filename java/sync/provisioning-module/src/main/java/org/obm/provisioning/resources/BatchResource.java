@@ -145,5 +145,10 @@ public class BatchResource {
 	public Class<EventResource> events() {
 		return EventResource.class;
 	}
+	
+	@Path("{batchId}/contacts")
+	public Class<ContactResource> contacts() {
+		return ContactResource.class;
+	}
 
 }

@@ -75,6 +75,7 @@ import org.obm.provisioning.json.UserPasswordJsonSerializer;
 import org.obm.provisioning.ldap.client.Configuration;
 import org.obm.provisioning.ldap.client.LdapModule;
 import org.obm.provisioning.resources.BatchResource;
+import org.obm.provisioning.resources.ContactResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
 import org.obm.provisioning.resources.DomainResource;
 import org.obm.provisioning.resources.EventResource;
@@ -161,6 +162,7 @@ public class ProvisioningService extends ServletModule {
 		bind(GroupResource.class);
 		bind(GroupWriteResource.class);
 		bind(EventResource.class);
+		bind(ContactResource.class);
 		bind(ObmDomainProvider.class);
 		bind(BatchProvider.class);
 		bind(WebApplicationExceptionMapper.class);

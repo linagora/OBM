@@ -38,6 +38,7 @@ import org.obm.provisioning.beans.BatchEntityType;
 import org.obm.provisioning.beans.HttpVerb;
 import org.obm.provisioning.dao.GroupDao;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.dao.exceptions.UserNotFoundException;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.ldap.client.LdapManager;
 import org.obm.provisioning.ldap.client.LdapService;
@@ -96,6 +97,14 @@ public abstract class AbstractOperationProcessor extends HttpVerbBasedOperationP
 		catch (Exception e) {
 			throw new ProcessingException(String.format("Cannot fetch existing user %s from database.", extId), e);
 		}
+	}
+
+	protected ObmUser getUserFromDao(String userEmail, ObmDomain domain) throws UserNotFoundException {
+		ObmUser user = userDao.findUser(userEmail, domain);
+		if (user == null) {
+			throw new UserNotFoundException(userEmail, domain.getUuid());
+		}
+		return user;
 	}
 
 	protected Group getExistingGroupFromDao(GroupExtId extId, ObmDomain domain) {

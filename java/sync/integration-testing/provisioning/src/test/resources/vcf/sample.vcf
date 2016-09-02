@@ -1,0 +1,25 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Gump;Forrest;;Mr.
+FN:Forrest Gump
+ORG:Bubba Gump Shrimp Co.
+TITLE:Shrimp Man
+TEL:(111) 555-1212
+TEL;fax:09090909
+EMAIL;internet:email1@example.com
+EMAIL:email2@example.com
+EMAIL;work:email3@example.com
+BDAY:2016-07-10
+REV:2008-04-24T19:52:43Z
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+N:Gump2;Forrest2;;Mr.
+FN:Gump2 Forrest
+TITLE:Business Man
+TITLE:Chief
+TEL;TYPE=WORK,VOICE:(111) 555-1313
+TEL;TYPE=HOME,VOICE:(404) 555-1313
+EMAIL:email4@example.com
+REV:2008-04-24T19:52:43Z
+END:VCARD

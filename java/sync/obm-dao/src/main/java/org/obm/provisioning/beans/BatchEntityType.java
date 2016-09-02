@@ -30,5 +30,5 @@
 package org.obm.provisioning.beans;
 
 public enum BatchEntityType {
-	USER, GROUP, USER_MEMBERSHIP, GROUP_MEMBERSHIP, EVENT
+	USER, GROUP, USER_MEMBERSHIP, GROUP_MEMBERSHIP, EVENT, CONTACT
 }

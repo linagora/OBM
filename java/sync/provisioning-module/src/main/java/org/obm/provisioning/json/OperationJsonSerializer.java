@@ -67,6 +67,7 @@ public class OperationJsonSerializer extends JsonSerializer<Operation> {
 				if (body != null) {
 					switch (value.getEntityType()) {
 					case EVENT:
+					case CONTACT:
 						jgen.writeString(body);
 						break;
 					default:
@@ -103,6 +104,7 @@ public class OperationJsonSerializer extends JsonSerializer<Operation> {
 								new String[]{"groupId", Request.GROUPS_ID_KEY});
 						break;
 					case EVENT:
+					case CONTACT:
 						params.add(
 								new String[]{"userEmail", Request.USERS_EMAIL_KEY});
 						break;

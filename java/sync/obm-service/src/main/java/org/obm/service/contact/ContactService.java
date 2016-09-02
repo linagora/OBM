@@ -70,14 +70,24 @@ public class ContactService {
 	private final Factory solrHelperFactory;
 	private final ContactDao contactDao;
 	private final CommitedOperationDao commitedOperationDao;
-
+	private final VCFtoContactConverter contactConverter;
 
 	@Inject
-	public ContactService(SolrHelper.Factory solrHelperFactory, ContactDao contactDao,
-			CommitedOperationDao commitedOperationDao) {
+	public ContactService(SolrHelper.Factory solrHelperFactory, 
+			ContactDao contactDao, CommitedOperationDao commitedOperationDao,
+			VCFtoContactConverter contactConverter) {
 		this.solrHelperFactory = solrHelperFactory;
 		this.contactDao = contactDao;
+		this.contactConverter = contactConverter;
 		this.commitedOperationDao = commitedOperationDao;
+	}
+
+	public void importVCF(AccessToken token, String vcf) throws SQLException, ServerFault {
+		AddressBook.Id addressBookId = contactDao.findDefaultAddressBookId(token, false);
+		
+		for (Contact contact : contactConverter.convert(vcf)) {
+			createContact(token, addressBookId.getId(), contact, null);
+		}
 	}
 
 	public Set<Integer> searchContactIds(AccessToken token, String query, Collection<AddressBook> addrBooks, Integer limit, Integer offset)

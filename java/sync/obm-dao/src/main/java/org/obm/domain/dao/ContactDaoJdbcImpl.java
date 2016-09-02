@@ -387,6 +387,17 @@ public class ContactDaoJdbcImpl implements ContactDao {
 	}
 
 	@Override
+	public Contact createContact(AccessToken at, Contact contact) throws SQLException, ServerFault {
+		Connection con = null;
+		try {
+			con = obmHelper.getConnection();
+			return createContact(at, con, contact);
+		} finally {
+			obmHelper.cleanup(con, null, null);
+		}
+	}
+
+	@Override
 	public Contact createContact(AccessToken at, Connection con, Contact c) throws SQLException, ServerFault {
 		int addressbookId = chooseAddressBookFromContact(con, at.getObmId(), c.isCollected());
 		return createContactInAddressBook(con, at, c, addressbookId);

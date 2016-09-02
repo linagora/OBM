@@ -1,5 +1,5 @@
 CREATE DOMAIN batch_status AS VARCHAR CHECK VALUE IN ('IDLE', 'RUNNING', 'ERROR', 'SUCCESS');
-CREATE DOMAIN batch_entity_type AS VARCHAR CHECK VALUE IN ('GROUP', 'USER', 'GROUP_MEMBERSHIP', 'USER_MEMBERSHIP', 'EVENT');
+CREATE DOMAIN batch_entity_type AS VARCHAR CHECK VALUE IN ('GROUP', 'USER', 'GROUP_MEMBERSHIP', 'USER_MEMBERSHIP', 'EVENT', 'CONTACT');
 CREATE DOMAIN http_verb AS VARCHAR CHECK VALUE IN ('PUT', 'PATCH', 'GET', 'POST', 'DELETE');
 
 CREATE DOMAIN vcomponent AS VARCHAR (16) CHECK VALUE IN (
@@ -444,7 +444,7 @@ CREATE SEQUENCE eventtemplate_eventtemplate_id_seq
     CACHE 1;
 
 CREATE TABLE contact (
-    contact_id integer NOT NULL,
+    contact_id integer DEFAULT nextval('contact_contact_id_seq') NOT NULL,
     contact_domain_id integer NOT NULL,
     contact_timeupdate timestamp,
     contact_timecreate timestamp DEFAULT now(),
@@ -505,11 +505,32 @@ CREATE TABLE contactfunction (
     contactfunction_label character varying(64)
 );
 
-
 CREATE SEQUENCE contactfunction_contactfunction_id_seq
     START WITH 1
     INCREMENT BY 1
     CACHE 1;
+
+CREATE TABLE categorylink (
+    categorylink_category_id integer NOT NULL,
+    categorylink_entity_id integer NOT NULL,
+    categorylink_category character varying(24) DEFAULT ''::character varying NOT NULL
+);
+
+CREATE TABLE category (
+    category_id integer PRIMARY KEY AUTO_INCREMENT,
+    category_domain_id integer NOT NULL,
+    category_timeupdate timestamp,
+    category_timecreate timestamp DEFAULT now(),
+    category_userupdate integer,
+    category_usercreate integer,
+    category_category character varying(24) DEFAULT ''::character varying NOT NULL,
+    category_code character varying(100) DEFAULT ''::character varying NOT NULL,
+    category_label character varying(100) DEFAULT ''::character varying NOT NULL
+);
+
+ALTER TABLE categorylink ADD CONSTRAINT categorylink_pkey PRIMARY KEY (categorylink_category_id, categorylink_entity_id);
+
+CREATE INDEX categorylink_category_id_fkey ON categorylink(categorylink_category_id);
 
 CREATE TABLE contactgroup (
     contact_id integer NOT NULL,
@@ -522,7 +543,7 @@ CREATE TABLE contactlist (
 );
 
 CREATE TABLE email (
-    email_id integer NOT NULL,
+    email_id integer DEFAULT nextval('email_email_id_seq') NOT NULL,
     email_entity_id integer NOT NULL,
     email_label character varying(255) NOT NULL,
     email_address character varying(255)
@@ -533,7 +554,7 @@ CREATE SEQUENCE email_email_id_seq
     CACHE 1;
 
 CREATE TABLE addressbook (
-    id integer NOT NULL,
+    id integer DEFAULT nextval('deletedeventlink_deletedeventlink_id_seq') NOT NULL,
     domain_id integer NOT NULL,
     timeupdate timestamp,
     timecreate timestamp DEFAULT now(),
@@ -554,6 +575,12 @@ CREATE SEQUENCE addressbook_id_seq
 CREATE TABLE addressbookentity (
     addressbookentity_entity_id integer NOT NULL,
     addressbookentity_addressbook_id integer NOT NULL
+);
+
+CREATE TABLE syncedaddressbook (
+    user_id integer NOT NULL,
+    addressbook_id integer NOT NULL,
+    "timestamp" timestamp DEFAULT now() NOT NULL
 );
 
 CREATE TABLE entityright (
@@ -634,7 +661,83 @@ CREATE SEQUENCE resourcetype_resourcetype_id_seq
     INCREMENT BY 1
     CACHE 1;
 
+CREATE TABLE phone (
+    phone_id integer NOT NULL,
+    phone_entity_id integer NOT NULL,
+    phone_label character varying(255) NOT NULL,
+    phone_number character varying(32)
+);
+ALTER TABLE phone ALTER COLUMN phone_id SET DEFAULT nextval('phone_phone_id_seq');
+ALTER TABLE phone ADD CONSTRAINT phone_pkey PRIMARY KEY (phone_id);
+CREATE SEQUENCE phone_phone_id_seq INCREMENT BY 1 CACHE 1;
 
+CREATE TABLE address (
+    address_id integer NOT NULL,
+    address_entity_id integer NOT NULL,
+    address_street text,
+    address_zipcode character varying(14),
+    address_town character varying(128),
+    address_expresspostal character varying(16),
+    address_state character varying(128),
+    address_country character(2),
+    address_label character varying(255)
+);
+ALTER TABLE address ADD CONSTRAINT address_pkey PRIMARY KEY (address_id);
+ALTER TABLE address ALTER COLUMN address_id SET DEFAULT nextval('address_address_id_seq');
+CREATE SEQUENCE address_address_id_seq INCREMENT BY 1 CACHE 1;
+
+CREATE TABLE country (
+    country_domain_id integer NOT NULL,
+    country_timeupdate timestamp,
+    country_timecreate timestamp DEFAULT now(),
+    country_userupdate integer,
+    country_usercreate integer,
+    country_iso3166 character(2) NOT NULL,
+    country_name character varying(64),
+    country_lang character(2) NOT NULL,
+    country_phone character varying(4)
+);
+
+ALTER TABLE country ADD CONSTRAINT country_pkey PRIMARY KEY (country_iso3166, country_lang);
+
+CREATE TABLE website (
+    website_id integer NOT NULL,
+    website_entity_id integer NOT NULL,
+    website_label character varying(255) NOT NULL,
+    website_url text
+);
+ALTER TABLE website ADD CONSTRAINT website_pkey PRIMARY KEY (website_id);
+ALTER TABLE website ALTER COLUMN website_id SET DEFAULT nextval('website_website_id_seq');
+CREATE SEQUENCE website_website_id_seq START WITH 1 INCREMENT BY 1 CACHE 1;
+
+CREATE TABLE im (
+    im_id integer NOT NULL,
+    im_entity_id integer NOT NULL,
+    im_label character varying(255),
+    im_address character varying(255),
+    im_protocol character varying(255)
+);
+ALTER TABLE im ADD CONSTRAINT im_pkey PRIMARY KEY (im_id);
+ALTER TABLE im ALTER COLUMN im_id SET DEFAULT nextval('im_im_id_seq');
+CREATE SEQUENCE im_im_id_seq START WITH 1 INCREMENT BY 1 CACHE 1;
+
+CREATE TABLE kind (
+    kind_id integer DEFAULT nextval('kind_kind_id_seq') NOT NULL,
+    kind_domain_id integer NOT NULL,
+    kind_timeupdate timestamp,
+    kind_timecreate timestamp DEFAULT now(),
+    kind_userupdate integer,
+    kind_usercreate integer,
+    kind_minilabel character varying(64),
+    kind_header character varying(64),
+    kind_lang character(2),
+    kind_default integer DEFAULT 0 NOT NULL
+);
+
+CREATE SEQUENCE kind_kind_id_seq INCREMENT BY 1 CACHE 1;
+ALTER TABLE kind ADD CONSTRAINT kind_domain_id_domain_id_fkey FOREIGN KEY (kind_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE kind ADD CONSTRAINT kind_usercreate_userobm_id_fkey FOREIGN KEY (kind_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE kind ADD CONSTRAINT kind_userupdate_userobm_id_fkey FOREIGN KEY (kind_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (1, 1), (2, 2), (3, 3);
 
