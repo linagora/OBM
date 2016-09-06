@@ -35,9 +35,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 
 import org.apache.commons.codec.binary.Base64;
 import org.obm.sync.addition.CommitedElement;
+import org.obm.sync.addition.CommitedOperation;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
@@ -49,6 +52,7 @@ import org.obm.sync.exception.ContactNotFoundException;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -109,13 +113,14 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 	private PreparedStatement prepareInsertStatement(Connection con, CommitedElement commitedElement) throws SQLException {
 		PreparedStatement ps = con.prepareStatement(
 				"INSERT INTO CommitedOperation " +
-				"(commitedoperation_hash_client_id, commitedoperation_entity_id, commitedoperation_kind) " +
-				"VALUES (?, ?, ?) ");
+				"(commitedoperation_hash_client_id, commitedoperation_entity_id, commitedoperation_kind, commitedoperation_client_date) " +
+				"VALUES (?, ?, ?, ?) ");
 		int idx = 1;
 		try {
 			ps.setString(idx++, commitedElement.getClientId());
 			ps.setInt(idx++, commitedElement.getEntityId().getId());
 			ps.setObject(idx++, getJdbcObject(commitedElement.getKind()));
+			ps.setTimestamp(idx++, timestampOrNull(commitedElement.getClientDate()));
 			return ps;
 		} catch (SQLException e) {
 			ps.close();
@@ -126,14 +131,22 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 		}
 	}
 
+	private Timestamp timestampOrNull(Optional<Date> clientDate) {
+		if (clientDate.isPresent()) {
+			return new Timestamp(clientDate.get().getTime());
+		}
+		return null;
+	}
+
 	private PreparedStatement prepareUpdateStatement(Connection con, CommitedElement commitedElement) throws SQLException {
 		PreparedStatement ps = con.prepareStatement(
 				"UPDATE CommitedOperation " +
-				"SET commitedoperation_entity_id=? " +
+				"SET commitedoperation_entity_id=?, commitedoperation_client_date=? " +
 				"WHERE commitedoperation_hash_client_id=? ");
 		try {
 			int idx = 1;
 			ps.setInt(idx++, commitedElement.getEntityId().getId());
+			ps.setTimestamp(idx++, timestampOrNull(commitedElement.getClientDate()));
 			ps.setString(idx++, commitedElement.getClientId());
 			return ps;
 		} catch (SQLException e) {
@@ -146,7 +159,7 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 	}
 
 	@Override
-	public Event findAsEvent(AccessToken token, String clientId) throws SQLException, ServerFault {
+	public CommitedOperation<Event> findAsEvent(AccessToken token, String clientId) throws SQLException, ServerFault {
 		
 		if (clientId == null) {
 			return null;
@@ -154,7 +167,7 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 		
 		checkClientIdFormat(clientId);
 		
-		String q = "SELECT e.evententity_event_id FROM CommitedOperation a "
+		String q = "SELECT e.evententity_event_id, commitedoperation_client_date FROM CommitedOperation a "
 				+ "INNER JOIN EventEntity e ON a.commitedoperation_entity_id=evententity_entity_id "
 				+ "WHERE commitedoperation_hash_client_id = ? AND commitedoperation_kind = ?";
 
@@ -170,12 +183,13 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 			ps.setObject(idx++, getJdbcObject(Kind.VEVENT));
 			rs = ps.executeQuery();
 
-			Event ret = null;
+			CommitedOperation<Event> ret = null;
 			if (rs.next()) {
 				int id = rs.getInt(1);
 				EventObmId eventObmId = new EventObmId(id);
 				try {
-					ret = calendarDao.findEventById(token, eventObmId);
+					Event event = calendarDao.findEventById(token, eventObmId);
+					ret = buildCommitedOperationFromResultSet(event, rs);
 				} catch (EventNotFoundException e) {
 				}
 			}
@@ -187,7 +201,7 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 	}
 
 	@Override
-	public Contact findAsContact(AccessToken token, String clientId) throws SQLException {
+	public CommitedOperation<Contact> findAsContact(AccessToken token, String clientId) throws SQLException {
 		
 		if (clientId == null) {
 			return null;
@@ -195,7 +209,7 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 		
 		checkClientIdFormat(clientId);
 		
-		String q = "SELECT c.contactentity_contact_id FROM CommitedOperation a "
+		String q = "SELECT c.contactentity_contact_id, commitedoperation_client_date FROM CommitedOperation a "
 				+ "INNER JOIN ContactEntity c ON a.commitedoperation_entity_id=contactentity_entity_id "
 				+ "WHERE commitedoperation_hash_client_id = ? AND commitedoperation_kind = ?";
 
@@ -211,11 +225,12 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 			ps.setObject(idx++, getJdbcObject(Kind.VCONTACT));
 			rs = ps.executeQuery();
 
-			Contact ret = null;
+			CommitedOperation<Contact> ret = null;
 			if (rs.next()) {
 				int id = rs.getInt(1);
 				try {
-					ret = contactDao.findContact(token, id);
+					Contact contact = contactDao.findContact(token, id);
+					ret = buildCommitedOperationFromResultSet(contact, rs);
 				} catch (ContactNotFoundException e) {
 				}
 			}
@@ -224,6 +239,14 @@ public class CommitedOperationDaoJdbcImpl implements CommitedOperationDao {
 		} finally {
 			obmHelper.cleanup(con, ps, rs);
 		}
+	}
+
+	private <T> CommitedOperation<T> buildCommitedOperationFromResultSet(T entity, ResultSet rs) throws SQLException {
+		Timestamp commitDate = rs.getTimestamp("commitedoperation_client_date");
+		if (commitDate == null) {
+			return new CommitedOperation<T>(entity, Optional.<Date>absent());
+		}
+		return new CommitedOperation<T>(entity, Optional.of(new Date(commitDate.getTime())));
 	}
 
 	private Object getJdbcObject(Kind kind) throws SQLException {

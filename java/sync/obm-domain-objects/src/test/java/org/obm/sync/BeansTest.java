@@ -31,11 +31,12 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.sync;
 
-import nl.jqno.equalsverifier.Warning;
+import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.sync.addition.CommitedElement;
+import org.obm.sync.addition.CommitedOperation;
 import org.obm.sync.auth.Credentials;
 import org.obm.sync.auth.Login;
 import org.obm.sync.auth.MavenVersion;
@@ -43,6 +44,7 @@ import org.obm.sync.base.DomainName;
 import org.obm.sync.base.EmailAddress;
 import org.obm.sync.base.EmailLogin;
 import org.obm.sync.bean.EqualsVerifierUtils;
+import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
@@ -61,11 +63,13 @@ import org.obm.sync.calendar.ResourceAttendee;
 import org.obm.sync.calendar.SyncRange;
 import org.obm.sync.calendar.UserAttendee;
 import org.obm.sync.dao.EntityId;
+import org.obm.sync.dao.Tracking;
 import org.obm.sync.host.ObmHost;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.items.ParticipationChanges;
 import org.obm.sync.serviceproperty.ServiceProperty;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -85,6 +89,7 @@ import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
+import nl.jqno.equalsverifier.Warning;
 
 
 public class BeansTest {
@@ -115,7 +120,6 @@ public class BeansTest {
 				RecurrenceId.class,
 				Resource.class,
 				UserAttendee.class, ContactAttendee.class, ResourceAttendee.class,
-				CommitedElement.class,
 				EmailAddress.class,
 				EmailLogin.class,
 				DomainName.class,
@@ -140,7 +144,8 @@ public class BeansTest {
 				UserWork.class,
 				UserPassword.class,
 				Samba.class,
-				DeletedContact.class);
+				DeletedContact.class,
+				Tracking.class);
 	}
 	
 	@Test
@@ -202,5 +207,15 @@ public class BeansTest {
 			.createEqualsVerifier(RecurrenceDays.class)
 			.suppress(Warning.NULL_FIELDS)
 			.verify();
+	}
+	
+	@Test
+	public void testWithOptionalDate() {
+		EqualsVerifierBuilder.builder()
+			.prefabValue(Optional.class, Optional.absent(), Optional.of(new Date(54)))
+			.equalsVerifiers(
+				CommitedElement.class,
+				CommitedOperation.class
+			).verify();
 	}
 }

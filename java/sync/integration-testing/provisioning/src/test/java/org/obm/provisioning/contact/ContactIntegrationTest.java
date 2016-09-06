@@ -55,6 +55,7 @@ import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.domain.dao.AddressBookDao;
 import org.obm.guice.GuiceRule;
 import org.obm.provisioning.TestingProvisioningModule;
+import org.obm.provisioning.beans.Request;
 import org.obm.server.WebServer;
 import org.obm.sync.book.AddressBook;
 
@@ -210,6 +211,109 @@ public class ContactIntegrationTest {
 		assertThat(solrServer.addCount).isEqualTo(3);
 		assertThat(solrServer.commitCount).isEqualTo(3);
 	}
+	
+	@Test
+	public void testImportVCFShouldBeRefusedWhenTrackingIsUsedButVCFContainsTwoVcards() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String vcf = Resources.toString(Resources.getResource("vcf/sample.vcf"), Charsets.UTF_8);
+		
+		String batchId = startBatch(baseURL, obmDomainUuid);
+		importVCFAsTracked(vcf, "ref1", "2016-09-06T07:51:20Z");
+		commitBatch();
+		waitForBatchSuccess(batchId, 1, 0);
+		
+		ResultSet results = db.execute("select count(1) from contact");
+		results.next();
+		assertThat(results.getInt(1)).isEqualTo(0);
+		assertThat(solrServer.addCount).isEqualTo(0);
+		assertThat(solrServer.commitCount).isEqualTo(0);
+	}
+	
+	@Test
+	public void testImportVCFShouldBeDoneWhenTrackingIsUnknown() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String vcf = Resources.toString(Resources.getResource("vcf/only-one-vcard.vcf"), Charsets.UTF_8);
+		
+		String batchId = startBatch(baseURL, obmDomainUuid);
+		importVCFAsTracked(vcf, "ref1", "2016-09-06T07:51:20Z");
+		commitBatch();
+		waitForBatchSuccess(batchId);
+
+		ResultSet results = db.execute("select count(1) from contact");
+		results.next();
+		assertThat(results.getInt(1)).isEqualTo(1);
+		assertThat(solrServer.addCount).isEqualTo(1);
+		assertThat(solrServer.commitCount).isEqualTo(1);
+	}
+	
+	@Test
+	public void testImportVCFShouldBeDoneOnlyOnceWhenTheSameTrackingIsUsedTwice() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String vcf = Resources.toString(Resources.getResource("vcf/only-one-vcard.vcf"), Charsets.UTF_8);
+		String vcf2 = vcf.replace("Shrimp Man", "New title");
+		
+		String batchId1 = startBatch(baseURL, obmDomainUuid);
+		importVCFAsTracked(vcf, "ref1", "2016-09-06T07:51:20Z");
+		commitBatch();
+		waitForBatchSuccess(batchId1);
+		String batchId2 = startBatch(baseURL, obmDomainUuid);
+		importVCFAsTracked(vcf2, "ref1", "2016-09-06T07:51:20Z");
+		commitBatch();
+		waitForBatchSuccess(batchId2);
+
+		ResultSet results = db.execute("select count(1), contact_title from contact");
+		results.next();
+		assertThat(results.getInt(1)).isEqualTo(1);
+		assertThat(results.getString(2)).isEqualTo("Shrimp Man");
+		assertThat(solrServer.addCount).isEqualTo(1);
+		assertThat(solrServer.commitCount).isEqualTo(1);
+	}
+	
+	@Test
+	public void testImportVCFShouldUpdateWhenTheSameTrackingIsUsedWithDateAfter() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String vcf = Resources.toString(Resources.getResource("vcf/only-one-vcard.vcf"), Charsets.UTF_8);
+		String vcf2 = vcf.replace("Shrimp Man", "New title");
+		
+		String batchId1 = startBatch(baseURL, obmDomainUuid);
+		importVCFAsTracked(vcf, "ref1", "2016-09-06T07:51:20Z");
+		commitBatch();
+		waitForBatchSuccess(batchId1);
+		String batchId2 = startBatch(baseURL, obmDomainUuid);
+		importVCFAsTracked(vcf2, "ref1", "2016-09-10T07:51:20Z");
+		commitBatch();
+		waitForBatchSuccess(batchId2);
+
+		ResultSet results = db.execute("select count(1), contact_title from contact");
+		results.next();
+		assertThat(results.getInt(1)).isEqualTo(1);
+		assertThat(results.getString(2)).isEqualTo("New title");
+		assertThat(solrServer.addCount).isEqualTo(2);
+		assertThat(solrServer.commitCount).isEqualTo(2);
+	}
+	
+	@Test
+	public void testImportVCFShouldUpdateWhenTheSameTrackingIsUsedWithDateBefore() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String vcf = Resources.toString(Resources.getResource("vcf/only-one-vcard.vcf"), Charsets.UTF_8);
+		String vcf2 = vcf.replace("Shrimp Man", "New title");
+
+		String batchId1 = startBatch(baseURL, obmDomainUuid);
+		importVCFAsTracked(vcf, "ref1", "2016-09-06T07:51:20Z");
+		commitBatch();
+		waitForBatchSuccess(batchId1);
+		String batchId2 = startBatch(baseURL, obmDomainUuid);
+		importVCFAsTracked(vcf2, "ref1", "2016-09-02T07:51:20Z");
+		commitBatch();
+		waitForBatchSuccess(batchId2);
+
+		ResultSet results = db.execute("select count(1), contact_title from contact");
+		results.next();
+		assertThat(results.getInt(1)).isEqualTo(1);
+		assertThat(results.getString(2)).isEqualTo("Shrimp Man");
+		assertThat(solrServer.addCount).isEqualTo(1);
+		assertThat(solrServer.commitCount).isEqualTo(1);
+	}
 
 	private void importVCF(String vcf) {
 		importVCF(vcf, obmUser.getLoginAtDomain());
@@ -223,6 +327,18 @@ public class ContactIntegrationTest {
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.post("contacts/" + userEmail);
+	}
+	
+	private void importVCFAsTracked(String vcf, String ref, String date) {
+		given()
+			.auth().basic("admin0@global.virt", "admin0")
+			.body(vcf).contentType(ContentType.TEXT)
+			.queryParam(Request.TRACKING_REF, ref)
+			.queryParam(Request.TRACKING_DATE, date).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("contacts/" + obmUser.getLoginAtDomain());
 	}
 
 }

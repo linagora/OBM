@@ -34,6 +34,7 @@ package org.obm.domain.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.obm.sync.addition.CommitedOperation;
 import org.obm.sync.book.Contact;
 import org.obm.sync.calendar.Event;
 
@@ -42,14 +43,14 @@ public class CommitedOperationDaoJdbcImplTest {
 	@Test
 	public void testNullClientIdOnEvent() throws Exception {
 		CommitedOperationDaoJdbcImpl commitedOperationDaoJdbcImpl = new CommitedOperationDaoJdbcImpl(null, null, null);
-		Event event = commitedOperationDaoJdbcImpl.findAsEvent(null, null);
+		CommitedOperation<Event> event = commitedOperationDaoJdbcImpl.findAsEvent(null, null);
 		assertThat(event).isNull();
 	}
 
 	@Test
 	public void testNullClientIdOnContact() throws Exception {
 		CommitedOperationDaoJdbcImpl commitedOperationDaoJdbcImpl = new CommitedOperationDaoJdbcImpl(null, null, null);
-		Contact contact = commitedOperationDaoJdbcImpl.findAsContact(null, null);
+		CommitedOperation<Contact> contact = commitedOperationDaoJdbcImpl.findAsContact(null, null);
 		assertThat(contact).isNull();
 	}
 	

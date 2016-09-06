@@ -85,6 +85,7 @@ import org.obm.sync.NotAllowedException;
 import org.obm.sync.PermissionException;
 import org.obm.sync.Right;
 import org.obm.sync.addition.CommitedElement;
+import org.obm.sync.addition.CommitedOperation;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -3242,8 +3243,9 @@ public class CalendarBindingImplTest {
 		expect(userService.getUserFromCalendar(calendar, defaultUser.getDomain().getName())).andReturn(defaultUser).atLeastOnce();
 		expect(calendarDao.findEventByExtId(accessToken, defaultUser, event.getExtId())).andReturn(null).once();
 
+		CommitedOperation<Event> commitedOperation = new CommitedOperation<Event>(event, null);
 		CommitedOperationDao commitedOperationDao = createMock(CommitedOperationDao.class);
-		expect(commitedOperationDao.findAsEvent(accessToken, clientId)).andReturn(event).once();
+		expect(commitedOperationDao.findAsEvent(accessToken, clientId)).andReturn(commitedOperation).once();
 		commitedOperationDao.store(accessToken, CommitedElement.builder()
 				.entityId(event.getEntityId())
 				.clientId(clientId)
@@ -4031,7 +4033,8 @@ public class CalendarBindingImplTest {
 	}
 
 	private void mockCommitedOperationExistingEvent(Event event, String clientId) throws Exception {
-		expect(commitedOperationDao.findAsEvent(token, clientId)).andReturn(event).once();
+		CommitedOperation<Event> commitedOperation = new CommitedOperation<Event>(event, null);
+		expect(commitedOperationDao.findAsEvent(token, clientId)).andReturn(commitedOperation).once();
 		commitedOperationDao.store(token, CommitedElement.builder()
 				.entityId(event.getEntityId())
 				.clientId(clientId)

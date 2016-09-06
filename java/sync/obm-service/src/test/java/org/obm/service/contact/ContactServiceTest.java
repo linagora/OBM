@@ -36,6 +36,8 @@ import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
+import java.util.Date;
+
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
@@ -47,11 +49,13 @@ import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.service.solr.SolrHelper;
 import org.obm.sync.addition.CommitedElement;
+import org.obm.sync.addition.CommitedOperation;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.Contact;
 import org.obm.sync.dao.EntityId;
 
+import com.google.common.base.Optional;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 
@@ -126,7 +130,8 @@ public class ContactServiceTest {
 		Contact contact = new Contact();
 		String clientId = "6547";
 
-		expect(commitedOperationDao.findAsContact(token, clientId)).andReturn(contact).once();
+		CommitedOperation<Contact> commited = new CommitedOperation<Contact>(contact, Optional.<Date>absent());
+		expect(commitedOperationDao.findAsContact(token, clientId)).andReturn(commited).once();
 		mocksControl.replay();
 		
 		Contact createdContact = testee.createContact(token, addressBookId, contact, clientId);

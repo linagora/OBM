@@ -579,7 +579,8 @@ CREATE TABLE calendarentity (
 CREATE TABLE commitedoperation (
     commitedoperation_hash_client_id character varying(44) NOT NULL,
     commitedoperation_entity_id integer NOT NULL,
-    commitedoperation_kind vkind NOT NULL
+    commitedoperation_kind vkind NOT NULL,
+    commitedoperation_client_date timestamp
 );
 ALTER TABLE commitedoperation ADD CONSTRAINT commitedoperation_pkey PRIMARY KEY (commitedoperation_hash_client_id);
 

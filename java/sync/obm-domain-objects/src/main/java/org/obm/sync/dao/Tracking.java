@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2016 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,23 +29,58 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.domain.dao;
+package org.obm.sync.dao;
 
-import java.sql.SQLException;
+import java.util.Date;
 
-import org.obm.sync.addition.CommitedElement;
-import org.obm.sync.addition.CommitedOperation;
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ServerFault;
-import org.obm.sync.book.Contact;
-import org.obm.sync.calendar.Event;
 
-public interface CommitedOperationDao {
+import com.google.common.base.Objects;
+import com.google.common.hash.Hashing;
 
-	void store(AccessToken at, CommitedElement commitedElement) throws SQLException, ServerFault;
+public class Tracking {
 
-	CommitedOperation<Event> findAsEvent(AccessToken token, String clientId) throws SQLException, ServerFault;
+	private final AccessToken token;
+	private final String reference;
+	private final Date date;
+
+	public Tracking(AccessToken token, String reference, Date date) {
+		this.token = token;
+		this.reference = reference;
+		this.date = date;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public String getReferenceSha1() {
+		return Hashing.sha1().newHasher()
+				.putInt(token.getObmId())
+				.putUnencodedChars(reference)
+				.hash().toString();
+	}
 	
-	CommitedOperation<Contact> findAsContact(AccessToken token, String clientId) throws SQLException;
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(reference, date);
+	}
 	
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof Tracking) {
+			Tracking that = (Tracking) object;
+			return Objects.equal(this.reference, that.reference)
+				&& Objects.equal(this.date, that.date);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("reference", reference)
+			.add("date", date)
+			.toString();
+	}
 }

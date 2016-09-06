@@ -48,8 +48,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import net.fortuna.ical4j.model.DateTime;
-
 import org.joda.time.Months;
 import org.obm.annotations.transactional.Transactional;
 import org.obm.domain.dao.CalendarDao;
@@ -63,6 +61,7 @@ import org.obm.sync.NotAllowedException;
 import org.obm.sync.PermissionException;
 import org.obm.sync.Right;
 import org.obm.sync.addition.CommitedElement;
+import org.obm.sync.addition.CommitedOperation;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventAlreadyExistException;
@@ -115,6 +114,7 @@ import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 import fr.aliacom.obm.utils.CalendarRights;
 import fr.aliacom.obm.utils.CalendarRightsPair;
 import fr.aliacom.obm.utils.HelperService;
+import net.fortuna.ical4j.model.DateTime;
 
 public class CalendarBindingImpl implements ICalendar {
 
@@ -654,7 +654,7 @@ public class CalendarBindingImpl implements ICalendar {
 			convertAttendees(event, calendar, token.getDomain());
 			assignDelegationRightsOnAttendees(token, event);
 			
-			Event ev = commitedOperationDao.findAsEvent(token, clientId);
+			Event ev = findCommitedEvent(token, clientId);
 			if (ev == null) {
 				if (event.isInternalEvent()) {
 					ev = createInternalEvent(token, calendar, event, notification);
@@ -669,6 +669,14 @@ public class CalendarBindingImpl implements ICalendar {
 			logger.error(e.getMessage(), e);
 			throw new ServerFault(e.getMessage());
 		}
+	}
+
+	private Event findCommitedEvent(AccessToken token, String clientId) throws SQLException, ServerFault {
+		CommitedOperation<Event> operation = commitedOperationDao.findAsEvent(token, clientId);
+		if (operation == null) {
+			return null;
+		}
+		return operation.getEntity();
 	}
 
 	@VisibleForTesting void commitOperation(AccessToken token, Event event, String clientId) throws SQLException, ServerFault {

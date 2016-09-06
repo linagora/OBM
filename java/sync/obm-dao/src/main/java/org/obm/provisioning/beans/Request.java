@@ -43,6 +43,8 @@ public class Request {
 	public final static String SUBGROUPS_ID_KEY = "subgroupId";
 	public final static String BATCHS_ID_KEY = "batchId";
 	public final static String EXPUNGE_KEY = "expunge";
+	public final static String TRACKING_REF = "trackingRef";
+	public final static String TRACKING_DATE = "trackingDate";
 
 	public static Builder builder() {
 		return new Builder();

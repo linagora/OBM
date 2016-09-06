@@ -37,9 +37,12 @@ import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.beans.Request;
 import org.obm.provisioning.exception.ProcessingException;
 import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
+import org.obm.push.utils.DateUtils;
 import org.obm.service.contact.ContactService;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.dao.Tracking;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 
 public class ContactOperationProcessor extends AbstractOperationProcessor {
@@ -64,10 +67,21 @@ public class ContactOperationProcessor extends AbstractOperationProcessor {
 			String userEmail = operation.getRequest().getParams().get(Request.USERS_EMAIL_KEY);
 			AccessToken token = accessTokenFactory.build(getUserFromDao(userEmail, batch.getDomain()), PAPI_ORIGIN);
 			
-			contactService.importVCF(token, operation.getRequest().getBody());
+			contactService.importVCF(token, operation.getRequest().getBody(), buildTrackingIfPresent(token, operation));
 		} catch (Exception e) {
 			throw new ProcessingException(e);
 		}
 	}
+
+	private Optional<Tracking> buildTrackingIfPresent(AccessToken token, Operation operation) {
+		String reference = operation.getRequest().getParams().get(Request.TRACKING_REF);
+		String date = operation.getRequest().getParams().get(Request.TRACKING_DATE);
+		
+		if (reference != null && date != null) {
+			return Optional.of(new Tracking(token, reference, DateUtils.dateUTC(date)));
+		}
+		
+		return Optional.absent();
+	} 
 
 }

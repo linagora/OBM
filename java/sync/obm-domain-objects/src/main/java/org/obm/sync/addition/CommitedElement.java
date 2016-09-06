@@ -32,10 +32,12 @@
 package org.obm.sync.addition;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.obm.sync.dao.EntityId;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 public class CommitedElement implements Serializable {
@@ -47,6 +49,7 @@ public class CommitedElement implements Serializable {
 	public static class Builder {
 		
 		private String clientId;
+		private Date clientDate;
 		private EntityId entityId;
 		private Kind kind;
 		
@@ -56,6 +59,11 @@ public class CommitedElement implements Serializable {
 		
 		public Builder clientId(String clientId) {
 			this.clientId = clientId;
+			return this;
+		}
+		
+		public Builder clientDate(Date clientDate) {
+			this.clientDate = clientDate;
 			return this;
 		}
 		
@@ -73,22 +81,28 @@ public class CommitedElement implements Serializable {
 			Preconditions.checkArgument(clientId != null, "clientId is required");
 			Preconditions.checkArgument(entityId != null, "entityId is required");
 			Preconditions.checkArgument(kind != null, "kind is required");
-			return new CommitedElement(clientId, entityId, kind);
+			return new CommitedElement(clientId, entityId, kind, Optional.fromNullable(clientDate));
 		}
 	}
 	
 	private final String clientId;
+	private final Optional<Date> clientDate;
 	private final EntityId entityId;
 	private final Kind kind;
 	
-	private CommitedElement(String clientId, EntityId entityId, Kind kind) {
+	private CommitedElement(String clientId, EntityId entityId, Kind kind, Optional<Date> clientDate) {
 		this.clientId = clientId;
 		this.entityId = entityId;
 		this.kind = kind;
+		this.clientDate = clientDate;
 	}
 
 	public String getClientId() {
 		return clientId;
+	}
+
+	public Optional<Date> getClientDate() {
+		return clientDate;
 	}
 
 	public EntityId getEntityId() {
@@ -101,7 +115,7 @@ public class CommitedElement implements Serializable {
 	
 	@Override
 	public final int hashCode(){
-		return Objects.hashCode(clientId, entityId, kind);
+		return Objects.hashCode(clientId, clientDate, entityId, kind);
 	}
 	
 	@Override
@@ -109,6 +123,7 @@ public class CommitedElement implements Serializable {
 		if (object instanceof CommitedElement) {
 			CommitedElement that = (CommitedElement) object;
 			return Objects.equal(this.clientId, that.clientId)
+				&& Objects.equal(this.clientDate, that.clientDate)
 				&& Objects.equal(this.entityId, that.entityId)
 				&& Objects.equal(this.kind, that.kind);
 		}
@@ -119,6 +134,7 @@ public class CommitedElement implements Serializable {
 	public String toString() {
 		return Objects.toStringHelper(this)
 			.add("clientId", clientId)
+			.add("clientDate", clientDate)
 			.add("entityId", entityId)
 			.add("kind", kind)
 			.toString();

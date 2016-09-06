@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2016 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,23 +29,20 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.domain.dao;
+package org.obm.sync.services;
 
-import java.sql.SQLException;
+public class ImportVCardException extends RuntimeException {
 
-import org.obm.sync.addition.CommitedElement;
-import org.obm.sync.addition.CommitedOperation;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ServerFault;
-import org.obm.sync.book.Contact;
-import org.obm.sync.calendar.Event;
+	public ImportVCardException(Throwable t) {
+		super(t);
+	}
 
-public interface CommitedOperationDao {
-
-	void store(AccessToken at, CommitedElement commitedElement) throws SQLException, ServerFault;
-
-	CommitedOperation<Event> findAsEvent(AccessToken token, String clientId) throws SQLException, ServerFault;
+	public ImportVCardException(String message) {
+		super(message);
+	}
 	
-	CommitedOperation<Contact> findAsContact(AccessToken token, String clientId) throws SQLException;
-	
+	public ImportVCardException(String message, Throwable t) {
+		super(message, t);
+	}
+
 }

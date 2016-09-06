@@ -1,6 +1,8 @@
 CREATE DOMAIN batch_status AS VARCHAR CHECK VALUE IN ('IDLE', 'RUNNING', 'ERROR', 'SUCCESS');
 CREATE DOMAIN batch_entity_type AS VARCHAR CHECK VALUE IN ('GROUP', 'USER', 'GROUP_MEMBERSHIP', 'USER_MEMBERSHIP', 'EVENT', 'CONTACT');
 CREATE DOMAIN http_verb AS VARCHAR CHECK VALUE IN ('PUT', 'PATCH', 'GET', 'POST', 'DELETE');
+CREATE DOMAIN vkind AS VARCHAR (16) CHECK VALUE IN ('VEVENT', 'VCONTACT');
+
 
 CREATE DOMAIN vcomponent AS VARCHAR (16) CHECK VALUE IN (
     'VEVENT',
@@ -738,6 +740,14 @@ CREATE SEQUENCE kind_kind_id_seq INCREMENT BY 1 CACHE 1;
 ALTER TABLE kind ADD CONSTRAINT kind_domain_id_domain_id_fkey FOREIGN KEY (kind_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE kind ADD CONSTRAINT kind_usercreate_userobm_id_fkey FOREIGN KEY (kind_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 ALTER TABLE kind ADD CONSTRAINT kind_userupdate_userobm_id_fkey FOREIGN KEY (kind_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+CREATE TABLE commitedoperation (
+    commitedoperation_hash_client_id character varying(44) NOT NULL,
+    commitedoperation_entity_id integer NOT NULL,
+    commitedoperation_kind vkind NOT NULL,
+    commitedoperation_client_date timestamp
+);
+
 
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (1, 1), (2, 2), (3, 3);
 

@@ -1874,7 +1874,8 @@ CREATE TABLE categorylink (
 CREATE TABLE commitedoperation (
     commitedoperation_hash_client_id character varying(44) NOT NULL,
     commitedoperation_entity_id integer NOT NULL,
-    commitedoperation_kind vkind NOT NULL
+    commitedoperation_kind vkind NOT NULL,
+    commitedoperation_client_date timestamp
 );
 
 

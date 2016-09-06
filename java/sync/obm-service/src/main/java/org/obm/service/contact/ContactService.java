@@ -33,7 +33,9 @@ package org.obm.service.contact;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,6 +53,7 @@ import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.service.solr.SolrHelper;
 import org.obm.service.solr.SolrHelper.Factory;
 import org.obm.sync.addition.CommitedElement;
+import org.obm.sync.addition.CommitedOperation;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
@@ -58,9 +61,13 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
 import org.obm.sync.dao.EntityId;
+import org.obm.sync.dao.Tracking;
+import org.obm.sync.services.ImportVCardException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -84,10 +91,71 @@ public class ContactService {
 		this.commitedOperationDao = commitedOperationDao;
 	}
 
-	public void importVCF(AccessToken token, String vcf) throws SQLException, ServerFault {
+	public void importVCF(AccessToken token, String vcf, Optional<Tracking> tracking) throws ImportVCardException {
+		try {
+			Optional<CommitedOperation<Contact>> previousImport = getPreviousImport(token, tracking);
+			List<Contact> contactsToImport = contactConverter.convert(vcf);
+			
+			if (contactsToImport.isEmpty()) {
+				logger.warn("No contact found in the VCF");
+			} else if (!previousImport.isPresent()) {
+				importVCFAsNew(token, contactsToImport, tracking);
+			} else if (previousImportDateIsBelow(previousImport.get(), tracking.get())) {
+				importVCFAsUpdatingContact(token, contactsToImport, tracking.get(), previousImport.get());
+			} else {
+				logger.warn("Import is skipped as the tracking reference {} is already known with date {}",
+					tracking.get().getReferenceSha1(), previousImport.get().getClientDate());
+			}
+		} catch (Exception e) {
+			throw new ImportVCardException(e);
+		}
+	}
+
+	private Optional<CommitedOperation<Contact>> getPreviousImport(AccessToken token, Optional<Tracking> tracking) throws SQLException {
+		if (tracking.isPresent()) {
+			return Optional.fromNullable(commitedOperationDao.findAsContact(token, tracking.get().getReferenceSha1().toString()));
+		}
+		return Optional.absent();
+	}
+
+	private boolean previousImportDateIsBelow(CommitedOperation<Contact> commitedOperation, Tracking tracking) {
+		if (!commitedOperation.getClientDate().isPresent()) {
+			throw new ImportVCardException("Illegal state, a previous import matching this one has no date");
+		}
+		return commitedOperation.getClientDate().get().compareTo(tracking.getDate()) < 0;
+	}
+
+	private void importVCFAsNew(AccessToken token, List<Contact> contacts, Optional<Tracking> tracking) throws SQLException, ServerFault {
 		AddressBook.Id addressBookId = contactDao.findDefaultAddressBookId(token, false);
+
+		if (tracking.isPresent() && contacts.size() > 1) {
+			throw new ImportVCardException("Illegal state, the tracking cannot be used when the VCF contains multiple vCards");
+		} else if (tracking.isPresent()) {
+			importContact(token, addressBookId, Iterables.getOnlyElement(contacts), tracking.get());
+		} else {
+			importContacts(token, addressBookId, contacts);
+		}
+	}
+
+	private void importVCFAsUpdatingContact(AccessToken token, List<Contact> contacts, Tracking tracking, CommitedOperation<Contact> previousImport)
+			throws SQLException, ServerFault {
 		
-		for (Contact contact : contactConverter.convert(vcf)) {
+		if (contacts.size() > 1) {
+			throw new ImportVCardException("Illegal state, cannot do any update when the VCF contains multiple vCards");
+		}
+		
+		Contact updatedContact = updateContact(token, previousImport.getEntity(), Iterables.getOnlyElement(contacts));
+		trackOperation(token, tracking.getReferenceSha1(), tracking.getDate(), updatedContact);
+	}
+
+	private void importContact(AccessToken token, AddressBook.Id addressBookId, Contact contact, Tracking tracking) throws ServerFault {
+		logger.info("Creating the contact with tracking {} {}, {}", contact.getFirstname(), contact.getLastname(), tracking);
+		createContact(token, addressBookId.getId(), contact, tracking.getReferenceSha1(), tracking.getDate());
+	}
+
+	private void importContacts(AccessToken token, AddressBook.Id addressBookId, List<Contact> contactsToImport) throws ServerFault {
+		for (Contact contact : contactsToImport) {
+			logger.info("Creating the contact without tracking {} {}", contact.getFirstname(), contact.getLastname());
 			createContact(token, addressBookId.getId(), contact, null);
 		}
 	}
@@ -153,25 +221,34 @@ public class ContactService {
 	}
 
 	public Contact createContact(AccessToken token, Integer addressBookId, Contact contact, String clientId) throws ServerFault {
+		return createContact(token, addressBookId, contact, clientId, null);
+	}
+	
+	private Contact createContact(AccessToken token, Integer addressBookId, Contact contact, String clientId, Date clientDate) throws ServerFault {
 		try {
-			Contact commitedContact = commitedOperationDao.findAsContact(token, clientId);
+			CommitedOperation<Contact> commitedContact = commitedOperationDao.findAsContact(token, clientId);
 			if (commitedContact != null) {
-				return commitedContact;
+				return commitedContact.getEntity();
 			}
 			
 			Contact createdContact = contactDao.createContactInAddressBook(token, contact, addressBookId);
-			EntityId entityId = createdContact.getEntityId();
-			if (clientId != null && entityId != null) {
-				commitedOperationDao.store(token, 
-						CommitedElement.builder()
-							.clientId(clientId)
-							.entityId(entityId)
-							.kind(Kind.VCONTACT)
-							.build());
-			}
+			trackOperation(token, clientId, clientDate, createdContact);
 			return createdContact;
 		} catch (SQLException e) {
 			throw new ServerFault(e.getMessage());
+		}
+	}
+
+	private void trackOperation(AccessToken token, String clientId, Date clientDate, Contact createdContact) throws SQLException, ServerFault {
+		EntityId entityId = createdContact.getEntityId();
+		if (clientId != null && entityId != null) {
+			commitedOperationDao.store(token, 
+					CommitedElement.builder()
+						.clientId(clientId)
+						.clientDate(clientDate)
+						.entityId(entityId)
+						.kind(Kind.VCONTACT)
+						.build());
 		}
 	}
 
@@ -179,6 +256,10 @@ public class ContactService {
 		try {
 			newContact.setEntityId(previousContact.getEntityId());
 			newContact.setFolderId(previousContact.getFolderId());
+			
+			if (newContact.getUid() == null) {
+				newContact.setUid(previousContact.getUid());
+			}
 
 			return contactDao.updateContact(token, newContact);
 		} catch (SQLException|FindException|EventNotFoundException ex) {

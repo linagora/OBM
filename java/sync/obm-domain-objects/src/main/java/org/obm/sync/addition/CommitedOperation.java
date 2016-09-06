@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2016 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,23 +29,52 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package org.obm.domain.dao;
+package org.obm.sync.addition;
 
-import java.sql.SQLException;
+import java.util.Date;
 
-import org.obm.sync.addition.CommitedElement;
-import org.obm.sync.addition.CommitedOperation;
-import org.obm.sync.auth.AccessToken;
-import org.obm.sync.auth.ServerFault;
-import org.obm.sync.book.Contact;
-import org.obm.sync.calendar.Event;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 
-public interface CommitedOperationDao {
-
-	void store(AccessToken at, CommitedElement commitedElement) throws SQLException, ServerFault;
-
-	CommitedOperation<Event> findAsEvent(AccessToken token, String clientId) throws SQLException, ServerFault;
+public class CommitedOperation<T> {
 	
-	CommitedOperation<Contact> findAsContact(AccessToken token, String clientId) throws SQLException;
+	private final T entity;
+	private final Optional<Date> clientDate;
+
+	public CommitedOperation(T entity, Optional<Date> clientDate) {
+		this.entity = entity;
+		this.clientDate = clientDate;
+	}
+
+	public T getEntity() {
+		return entity;
+	}
+
+	public Optional<Date> getClientDate() {
+		return clientDate;
+	}
+	
+	@Override
+	public final int hashCode(){
+		return Objects.hashCode(entity, clientDate);
+	}
+	
+	@Override
+	public final boolean equals(Object object){
+		if (object instanceof CommitedOperation) {
+			CommitedOperation<?> that = (CommitedOperation<?>) object;
+			return Objects.equal(this.entity, that.entity)
+				&& Objects.equal(this.clientDate, that.clientDate);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this)
+			.add("entity", entity)
+			.add("clientDate", clientDate)
+			.toString();
+	}
 	
 }
