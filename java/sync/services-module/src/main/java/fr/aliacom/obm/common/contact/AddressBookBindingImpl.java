@@ -260,15 +260,8 @@ public class AddressBookBindingImpl implements IAddressBook {
 
 			assertHasRightsOnAddressBook(token, previous.getFolderId());
 
-			contact.setEntityId(previous.getEntityId());
-			contact.setFolderId(previous.getFolderId());
-
-			return contactDao.updateContact(token, contact);
+			return contactService.updateContact(token, previous, contact);
 		} catch (SQLException ex) {
-			throw new ServerFault(ex.getMessage());
-		} catch (FindException ex) {
-			throw new ServerFault(ex.getMessage());
-		} catch (EventNotFoundException ex) {
 			throw new ServerFault(ex.getMessage());
 		}
 	}

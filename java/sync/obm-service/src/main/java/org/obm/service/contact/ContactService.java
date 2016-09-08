@@ -47,11 +47,13 @@ import org.apache.solr.common.SolrDocumentList;
 import org.obm.domain.dao.CommitedOperationDao;
 import org.obm.domain.dao.ContactDao;
 import org.obm.locator.LocatorClientException;
+import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.service.solr.SolrHelper;
 import org.obm.service.solr.SolrHelper.Factory;
 import org.obm.sync.addition.CommitedElement;
 import org.obm.sync.addition.Kind;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.Contact;
@@ -170,6 +172,17 @@ public class ContactService {
 			return createdContact;
 		} catch (SQLException e) {
 			throw new ServerFault(e.getMessage());
+		}
+	}
+
+	public Contact updateContact(AccessToken token, Contact previousContact, Contact newContact) throws ServerFault {
+		try {
+			newContact.setEntityId(previousContact.getEntityId());
+			newContact.setFolderId(previousContact.getFolderId());
+
+			return contactDao.updateContact(token, newContact);
+		} catch (SQLException|FindException|EventNotFoundException ex) {
+			throw new ServerFault(ex.getMessage());
 		}
 	}
 }
