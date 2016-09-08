@@ -388,7 +388,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 
 	@Override
 	public Contact createContact(AccessToken at, Connection con, Contact c) throws SQLException, ServerFault {
-		int addressbookId = chooseAddressBookFromContact(con, at, c);
+		int addressbookId = chooseAddressBookFromContact(con, at.getObmId(), c.isCollected());
 		return createContactInAddressBook(con, at, c, addressbookId);
 	}
 
@@ -424,7 +424,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 		try {
 			con = obmHelper.getConnection();
 			
-			int addressbookId = chooseAddressBookFromContact(con, ownerId, c);
+			int addressbookId = chooseAddressBookFromContact(con, ownerId, c.isCollected());
 			AccessToken token = new AccessToken(ownerId, "automatically-collected");
 			
 			token.setDomain(domain);
@@ -826,18 +826,23 @@ public class ContactDaoJdbcImpl implements ContactDao {
 		return ps;
 	}
 
-	
-	private int chooseAddressBookFromContact(Connection con, AccessToken at, Contact c) throws SQLException {
-		return chooseAddressBookFromContact(con, at.getObmId(), c);
+	@Override
+	public AddressBook.Id findDefaultAddressBookId(AccessToken at, boolean collectedAddressBook) throws SQLException {
+		Connection con = obmHelper.getConnection();
+		try {
+			return AddressBook.Id.valueOf(chooseAddressBookFromContact(con, at.getObmId(), collectedAddressBook));
+		} finally {
+			obmHelper.cleanup(con, null, null);
+		}
 	}
 	
-	private int chooseAddressBookFromContact(Connection con, Integer ownerId, Contact c) throws SQLException {
+	private int chooseAddressBookFromContact(Connection con, Integer ownerId, boolean collectedAddressBook) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
 			ps = con.prepareStatement(
 			"SELECT id from AddressBook WHERE name=? AND owner=? AND is_default");
-			if (c.isCollected()) {
+			if (collectedAddressBook) {
 				ps.setString(1, contactConfiguration.getCollectedAddressBookName());
 			} else {
 				ps.setString(1, contactConfiguration.getDefaultAddressBookName());
