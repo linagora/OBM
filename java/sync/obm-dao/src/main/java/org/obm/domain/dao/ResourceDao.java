@@ -33,8 +33,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 
+import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.sync.Right;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.dao.EntityId;
+import org.obm.utils.LinkedEntity;
 import org.obm.utils.ObmHelper;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -46,18 +51,78 @@ import fr.aliacom.obm.common.resource.Resource;
 
 @Singleton
 public class ResourceDao {
+
+	private static final int ONE_QUANTITY = 1;
+	private static final EntityId PUBLIC_CONSUMER_ID = null;
 	
 	private static final String MY_GROUPS_QUERY = "SELECT groupentity_entity_id FROM of_usergroup "
 			+ "INNER JOIN GroupEntity ON of_usergroup_group_id=groupentity_group_id WHERE of_usergroup_user_id=?";
+
+	private static final String INSERT_QUERY = "INSERT INTO resource "
+			+ "(resource_domain_id, resource_name, resource_qty, resource_userupdate, resource_usercreate, resource_timeupdate) "
+			+ "VALUES (?, ?, ?, ?, ?, now())";
+	
+	private static final String UPDATE_EMAIL_QUERY = "UPDATE resource SET resource_email=? WHERE resource_id=?";
+	private static final String EMAIL_FORMAT = "res-%d@%s";
 	
 	private final ObmHelper obmHelper;
+	private final EntityRightDao entityRightDao;
 	
 	@Inject
 	@VisibleForTesting
-	ResourceDao(ObmHelper obmHelper) {
+	ResourceDao(ObmHelper obmHelper, EntityRightDao entityRightDao) {
 		this.obmHelper = obmHelper;
+		this.entityRightDao = entityRightDao;
 	}
 	
+	public void createWithPublicRights(AccessToken token, Resource resource, Set<Right> rights) throws DaoException {
+		Connection con = null;
+		try {
+			con = obmHelper.getConnection();
+			int resourceId = createResource(con, token, resource);
+			defineResourceEmail(con, token, resourceId);
+			LinkedEntity link = obmHelper.linkEntity(con, "ResourceEntity", "resource_id", resourceId);
+			entityRightDao.grantRights(con, link.getEntityId(), PUBLIC_CONSUMER_ID, rights);
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			obmHelper.cleanup(con, null, null);
+		}
+	}
+
+	private int createResource(Connection con, AccessToken token, Resource resource) throws SQLException {
+		PreparedStatement ps = null;
+
+		try {
+			ps = con.prepareStatement(INSERT_QUERY);
+
+			int index = 1;
+			ps.setInt(index++, token.getDomain().getId());
+			ps.setString(index++, resource.getName());
+			ps.setInt(index++, ONE_QUANTITY);
+			ps.setInt(index++, token.getObmId());
+			ps.setInt(index++, token.getObmId());
+			ps.executeUpdate();
+
+			return obmHelper.lastInsertId(con);
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+	}
+	
+	private void defineResourceEmail(Connection con, AccessToken token, int resourceId) throws SQLException {
+		PreparedStatement ps = null;
+
+		try {
+			ps = con.prepareStatement(UPDATE_EMAIL_QUERY);
+			ps.setString(1, String.format(EMAIL_FORMAT, resourceId, token.getDomain().getName()));
+			ps.setInt(2, resourceId);
+			ps.executeUpdate();
+		} finally {
+			obmHelper.cleanup(null, ps, null);
+		}
+	}
+
 	public Resource findAttendeeResourceFromEmailForUser(String email, Integer userId) throws SQLException {
 		String q = "SELECT resource_id, resource_name, resourceentity_entity_id, resource_email "
 				+ "FROM Resource "

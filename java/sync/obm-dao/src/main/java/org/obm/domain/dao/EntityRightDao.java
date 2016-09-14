@@ -29,6 +29,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.domain.dao;
 
+import java.sql.Connection;
 import java.util.Set;
 
 import org.obm.provisioning.dao.exceptions.DaoException;
@@ -42,6 +43,7 @@ public interface EntityRightDao {
 	Set<Right> getPublicRights(EntityId entityId) throws DaoException;
 
 	void grantRights(EntityId entityId, EntityId consumerId, Set<Right> rights) throws DaoException;
+	void grantRights(Connection con, EntityId entityId, EntityId consumerId, Set<Right> rights) throws DaoException;
 
 	void deleteRights(EntityId entityId, EntityId consumerId) throws DaoException;
 

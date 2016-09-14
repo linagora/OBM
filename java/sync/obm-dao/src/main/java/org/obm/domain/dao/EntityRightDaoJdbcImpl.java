@@ -141,13 +141,24 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 	@Override
 	public void grantRights(EntityId entityId, EntityId consumerId, Set<Right> rights) throws DaoException {
 		Connection connection = null;
-		PreparedStatement ps = null;
 
+		try {
+			connection = obmHelper.getConnection();
+			grantRights(connection, entityId, consumerId, rights);
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			obmHelper.cleanup(connection, null, null);
+		}
+	}
+	
+	@Override
+	public void grantRights(Connection connection, EntityId entityId, EntityId consumerId, Set<Right> rights) throws DaoException {
 		try {
 			int idx = 1;
 
 			connection = obmHelper.getConnection();
-			ps = connection.prepareStatement(
+			PreparedStatement ps = connection.prepareStatement(
 					"INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id, " + FIELDS + ") " +
 					"VALUES (?, ?, ?, ?, ?, ?)");
 
@@ -163,12 +174,8 @@ public class EntityRightDaoJdbcImpl implements EntityRightDao {
 			ps.setInt(idx++, rights.contains(Right.ADMIN) ? 1 : 0);
 
 			ps.executeUpdate();
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			throw new DaoException(e);
-		}
-		finally {
-			obmHelper.cleanup(connection, ps, null);
 		}
 	}
 
