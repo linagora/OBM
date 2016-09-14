@@ -29,6 +29,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.provisioning.processing.impl.events;
 
+import java.util.Set;
+
 import org.obm.annotations.transactional.Transactional;
 import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.BatchEntityType;
@@ -41,6 +43,8 @@ import org.obm.service.calendar.CalendarService;
 import org.obm.sync.auth.AccessToken;
 
 import com.google.inject.Inject;
+
+import fr.aliacom.obm.common.resource.Resource;
 
 public class CreateEventOperationProcessor extends AbstractOperationProcessor {
 
@@ -63,7 +67,9 @@ public class CreateEventOperationProcessor extends AbstractOperationProcessor {
 		try {
 			String userEmail = operation.getRequest().getParams().get(Request.USERS_EMAIL_KEY);
 			AccessToken token = accessTokenFactory.build(getUserFromDao(userEmail, batch.getDomain()), PAPI_ORIGIN);
+			Set<Resource> resources = calendarService.parseResources(operation.getRequest().getBody());
 			
+			calendarService.assertDomainResourcesExist(token, resources);
 			calendarService.importICalendar(token, userEmail, operation.getRequest().getBody());
 		} catch (Exception e) {
 			throw new ProcessingException(e);

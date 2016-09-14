@@ -48,6 +48,7 @@ import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.CalendarDao;
 import org.obm.domain.dao.ContactDao;
+import org.obm.domain.dao.EntityRightDao;
 import org.obm.domain.dao.ObmInfoDao;
 import org.obm.domain.dao.ResourceDao;
 import org.obm.domain.dao.UserDao;
@@ -134,8 +135,8 @@ public class AttendeeServiceJdbcImplTest {
 				.createMock(mocksControl);
 		contactDao = mocksControl.createMock(ContactDao.class);
 		resourceDao = createMockBuilder(ResourceDao.class)
-				.withConstructor(ObmHelper.class)
-				.withArgs(obmHelper)
+				.withConstructor(ObmHelper.class, EntityRightDao.class)
+				.withArgs(obmHelper, null)
 				.addMockedMethod("findAttendeeResourceFromEmailForUser")
 				.addMockedMethod("findAttendeeResourceFromNameForUser")
 				.createMock(mocksControl);

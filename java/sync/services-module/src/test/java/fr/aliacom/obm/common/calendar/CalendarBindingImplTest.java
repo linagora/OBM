@@ -73,6 +73,7 @@ import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.domain.dao.CalendarDao;
 import org.obm.domain.dao.CommitedOperationDao;
+import org.obm.domain.dao.ResourceDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.icalendar.Ical4jHelper;
@@ -149,6 +150,7 @@ public class CalendarBindingImplTest {
 			bind(IMocksControl.class).toInstance(mocksControl);
 
 			bindWithMock(CalendarDao.class);
+			bindWithMock(ResourceDao.class);
 			bindWithMock(CommitedOperationDao.class);
 			bindWithMock(EventNotificationService.class);
 			bindWithMock(MessageQueueService.class);

@@ -35,15 +35,17 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.fortuna.ical4j.data.ParserException;
+import java.util.Set;
 
 import org.obm.domain.dao.CalendarDao;
+import org.obm.domain.dao.ResourceDao;
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.service.user.UserService;
+import org.obm.sync.Right;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
@@ -57,31 +59,42 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import fr.aliacom.obm.common.resource.Resource;
 import fr.aliacom.obm.common.user.ObmUser;
+import net.fortuna.ical4j.data.ParserException;
 
 @Singleton
 public class CalendarService {
 
 	private static final Logger logger = LoggerFactory.getLogger(CalendarService.class);
+
+	private static final Set<Right> ACCESS_READ_RIGHTS = ImmutableSet.of(Right.ACCESS, Right.READ);
 	
 	private final CalendarDao calendarDao;
+	private final ResourceDao resourceDao;
 	private final Ical4jHelper ical4jHelper;
 	private final UserService userService;
 	private final AttendeeService attendeeService;
 	private final ICalendarFactory calendarFactory;
 
 	@Inject
-	public CalendarService(CalendarDao calendarDao, Ical4jHelper ical4jHelper, 
+	public CalendarService(CalendarDao calendarDao, ResourceDao resourceDao, 
+			Ical4jHelper ical4jHelper, 
 			UserService userService, AttendeeService attendeeService,
 			ICalendarFactory calendarFactory) {
 		this.calendarDao = calendarDao;
+		this.resourceDao = resourceDao;
 		this.ical4jHelper = ical4jHelper;
 		this.userService = userService;
 		this.attendeeService = attendeeService;
@@ -293,5 +306,35 @@ public class CalendarService {
 	public Ical4jUser createIcal4jUserFrom(AccessToken accessToken) {
 		ObmUser user = userService.getUserFromAccessToken(accessToken);
 		return calendarFactory.createIcal4jUserFromObmUser(user);
+	}
+
+	public Set<Resource> parseResources(String ics) throws IOException, ParserException {
+		return ical4jHelper.parseResources(ics);
+	}
+
+	public void assertDomainResourcesExist(AccessToken token, Set<Resource> resources) throws DaoException {
+		for (Resource resource : filterUnexistingAndDomainOnlyResources(token, resources)) {
+			resourceDao.createWithPublicRights(token, resource, ACCESS_READ_RIGHTS);
+		}
+	}
+
+	private ImmutableList<Resource> filterUnexistingAndDomainOnlyResources(final AccessToken token, Set<Resource> resources) {
+		return FluentIterable
+			.from(resources)
+			.filter(new Predicate<Resource>() {
+	
+				@Override
+				public boolean apply(Resource res) {
+					return res.getEmail().endsWith(token.getDomain().getName());
+				}
+				
+			}).filter(new Predicate<Resource>() {
+
+				@Override
+				public boolean apply(Resource res) {
+					return attendeeService.findResourceAttendee(res.getName(), res.getEmail(), token.getDomain(), token.getObmId()) == null;
+				}
+				
+			}).toList();
 	}
 }

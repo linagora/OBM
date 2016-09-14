@@ -47,6 +47,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.obm.domain.dao.CalendarDao;
+import org.obm.domain.dao.ResourceDao;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.service.user.UserService;
@@ -81,6 +82,7 @@ public class CalendarServiceTest {
 			bind(IMocksControl.class).toInstance(mocksControl);
 
 			bindWithMock(CalendarDao.class);
+			bindWithMock(ResourceDao.class);
 			bindWithMock(UserService.class);
 			bindWithMock(AttendeeService.class);
 			bindWithMock(DateProvider.class);

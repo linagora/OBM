@@ -598,6 +598,7 @@ CREATE TABLE entityright (
 CREATE SEQUENCE entityright_entityright_id_seq
     INCREMENT BY 1
     CACHE 1;
+ALTER TABLE entityright ALTER COLUMN entityright_id SET DEFAULT nextval('entityright_entityright_id_seq');
 
 CREATE TABLE groupentity (
     groupentity_entity_id integer NOT NULL,
@@ -605,7 +606,7 @@ CREATE TABLE groupentity (
 );
 
 CREATE TABLE resource (
-    resource_id integer NOT NULL,
+    resource_id integer PRIMARY KEY AUTO_INCREMENT,
     resource_domain_id integer NOT NULL,
     resource_rtype_id integer,
     resource_timeupdate timestamp,
@@ -616,7 +617,7 @@ CREATE TABLE resource (
     resource_delegation character varying(256) DEFAULT '',
     resource_description character varying(255),
     resource_qty integer DEFAULT 0,
-    resource_email text
+    resource_email text UNIQUE
 );
 
 CREATE SEQUENCE resource_resource_id_seq
