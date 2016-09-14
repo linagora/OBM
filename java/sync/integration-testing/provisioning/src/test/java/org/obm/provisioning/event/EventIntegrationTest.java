@@ -323,6 +323,20 @@ public class EventIntegrationTest {
 		assertThat(solrServer.addCount).isEqualTo(0);
 		assertThat(solrServer.commitCount).isEqualTo(0);
 	}
+	
+	@Test
+	public void testImportICSWhenUserIsNotAdmin() {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		
+		startBatch(baseURL, obmDomainUuid);
+		given()
+			.auth().basic("user1@test.tlse.lng", "user1")
+			.body("THE ICS").contentType(ContentType.TEXT).
+		expect()
+			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
+		when()
+			.post("events/user1@test.tlse.lng");
+	}
 
 	private void importICS(String ics) {
 		importICS(ics, "user1@test.tlse.lng");

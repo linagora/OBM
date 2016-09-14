@@ -314,6 +314,20 @@ public class ContactIntegrationTest {
 		assertThat(solrServer.addCount).isEqualTo(1);
 		assertThat(solrServer.commitCount).isEqualTo(1);
 	}
+	
+	@Test
+	public void testImportVCFWhenUserIsNotAdmin() {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		
+		startBatch(baseURL, obmDomainUuid);
+		given()
+			.auth().basic("user1@test.tlse.lng", "user1")
+			.body("THE VCF").contentType(ContentType.TEXT).
+		expect()
+			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
+		when()
+			.post("contacts/user1@test.tlse.lng");
+	}
 
 	private void importVCF(String vcf) {
 		importVCF(vcf, obmUser.getLoginAtDomain());

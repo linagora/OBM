@@ -777,7 +777,7 @@ INSERT INTO userentity (userentity_entity_id, userentity_user_id)
 
 INSERT INTO UserObm (userobm_domain_id, userobm_ext_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
 	 VALUES (1, 'Admin0ExtId','admin0','admin0','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'admin0', NULL),
-		(2, 'User1','user1','','','', '', '', '2002', '512', '0', 'user1', NULL);
+		(2, 'User1','user1','user1','PLAIN','user', '', '', '2002', '512', '0', 'user1', NULL);
  
 INSERT INTO userobmgroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES (2, 1), (5, 1);
 
