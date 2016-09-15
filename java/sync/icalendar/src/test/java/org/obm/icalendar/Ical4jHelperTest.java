@@ -143,6 +143,7 @@ import com.google.common.io.CharStreams;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.resource.Resource;
 
 
 public class Ical4jHelperTest {
@@ -2224,5 +2225,32 @@ public class Ical4jHelperTest {
 	@Test(expected=ParseException.class)
 	public void testTimestampFromDateStringWhenInvalidDate() throws Exception {
 		ical4jHelper.timestampFromDateString("199601E20T120000");
+	}
+	
+	@Test
+	public void testParseResources() throws Exception {
+		String ics = 
+				"BEGIN:VCALENDAR\r\n" +
+				"PRODID:-//Aliasource Groupe LINAGORA//OBM Calendar //FR\r\n" +
+				"VERSION:2.0\r\n" +
+				"BEGIN:VEVENT\r\n" +
+				"DTSTAMP:20130604T075838Z\r\n" +
+				"ORGANIZER:mailto:userb@ext.org\r\n" +
+				"DTSTART:20130328T170000Z\r\n" +
+				"DTEND:20130529T040000Z\r\n" +
+				"ATTENDEE;CN=Resource 1;PARTSTAT=NEEDS-ACTION;CUTYPE=RESOURCE:mailto:res1@ext.org\r\n" +
+				"ATTENDEE;CN=User;PARTSTAT=ACCEPTED;CUTYPE=INDIVIDUAL:mailto:user@ext.org\r\n" +
+				"ATTENDEE;CN=No cutype;PARTSTAT=ACCEPTED:mailto:user@ext.org\r\n" +
+				"ATTENDEE;PARTSTAT=ACCEPTED;CUTYPE=RESOURCE:mailto:res2@ext.org\r\n" +
+				"UID:uid\r\n" +
+				"END:VEVENT\r\n" +
+				"END:VCALENDAR\r\n";
+	
+		Set<Resource> resources = ical4jHelper.parseResources(ics);
+		
+		assertThat(resources).containsOnly(
+			Resource.builder().name("Resource 1").mail("res1@ext.org").build(),
+			Resource.builder().name(null).mail("res2@ext.org").build()
+		);
 	}
 }

@@ -154,11 +154,13 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.BiMap;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
@@ -173,6 +175,7 @@ import com.google.inject.Singleton;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
+import fr.aliacom.obm.common.resource.Resource;
 
 @Singleton
 public class Ical4jHelper implements RecurrenceHelper {
@@ -1816,5 +1819,38 @@ public class Ical4jHelper implements RecurrenceHelper {
 	@Override
 	public Timestamp timestampFromDateString(String dateAsString) throws ParseException {
 		return new Timestamp(new DateTime(dateAsString).getTime());
+	}
+
+	@SuppressWarnings("unchecked")
+	public Set<Resource> parseResources(String ics) throws IOException, ParserException {
+		return FluentIterable
+			.from(getComponents(buildCalendar(ics), Component.VEVENT))
+			.transformAndConcat(new Function<VEvent, Iterable<Property>>() {
+
+				@Override
+				public Iterable<Property> apply(VEvent vEvent) {
+					return getProperties(vEvent, Property.ATTENDEE);
+				}
+				
+			}).filter(new Predicate<Property>() {
+
+				@Override
+				public boolean apply(Property prop) {
+					String cuType = getParameterValue(prop.getParameter(Parameter.CUTYPE));
+					return CalendarUserType.RESOURCE.name().equalsIgnoreCase(cuType);
+				}
+				
+			}).transform(new Function<Property, Resource>() {
+
+				@Override
+				public Resource apply(Property prop) {
+					return Resource.builder()
+						.name(getParameterValue(prop.getParameter(Parameter.CN)))
+						.mail(removeMailto(prop))
+						.build();
+				}
+				
+			})
+			.toSet();
 	}
 }
