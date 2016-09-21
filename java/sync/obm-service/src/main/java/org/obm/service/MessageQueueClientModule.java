@@ -31,17 +31,11 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.service;
 
-import javax.jms.Connection;
-import javax.jms.JMSException;
-import javax.jms.Session;
-
-import org.obm.service.solr.jms.SolrJmsQueue;
+import org.obm.service.solr.SolrManager;
+import org.obm.sync.LifecycleListener;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.linagora.obm.sync.JMSClient;
-import com.linagora.obm.sync.Producer;
+import com.google.inject.multibindings.Multibinder;
 
 public class MessageQueueClientModule extends AbstractModule {
 	
@@ -51,13 +45,8 @@ public class MessageQueueClientModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-	}
-
-	@Provides @Singleton
-	Producer provideMessageProducer(JMSClient jmsClient) throws JMSException {
-		Connection connection = jmsClient.createConnection();
-		Session session = jmsClient.createSession(connection);
-		return jmsClient.createProducerOnTopic(session, SolrJmsQueue.EVENT_CHANGES_QUEUE.getId());
+		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
+		lifecycleListeners.addBinding().to(SolrManager.class);
 	}
 	
 }

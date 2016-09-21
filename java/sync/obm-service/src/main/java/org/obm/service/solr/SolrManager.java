@@ -233,6 +233,7 @@ public class SolrManager implements LifecycleListener {
 
 	}
 	
+	@Override
 	public void shutdown() throws Exception {
 		jmsConnection.close();
 	}
