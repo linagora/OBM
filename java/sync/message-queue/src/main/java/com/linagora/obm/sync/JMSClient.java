@@ -52,12 +52,15 @@ import com.google.inject.name.Named;
 @Singleton
 public class JMSClient {
 
+	private static final int UNLIMITED_RECONNECT_ATTEMPTS = -1; //https://docs.jboss.org/hornetq/2.4.0.Final/docs/user-manual/html/client-reconnection.html#d0e9666
+
 	private final HornetQConnectionFactory cf;
 
 	@Inject
 	public JMSClient(@Named("queueIsRemote") boolean queueIsRemote) {
 		TransportConfiguration transportConfiguration = new TransportConfiguration(getConnectorClass(queueIsRemote));
 		cf = HornetQJMSClient.createConnectionFactoryWithoutHA(JMSFactoryType.CF, transportConfiguration);
+		cf.setReconnectAttempts(UNLIMITED_RECONNECT_ATTEMPTS);
 	}
 
 	private String getConnectorClass(boolean queueIsRemote) {
