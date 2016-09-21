@@ -27,13 +27,26 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.metadata;
+package org.obm.metadata;
 
-import java.sql.SQLException;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.obm.annotations.database.AutoTruncate;
 
-import org.obm.sync.dao.TableDescription;
+import com.google.inject.AbstractModule;
+import com.google.inject.matcher.Matchers;
 
-public interface DatabaseMetadataService {
+public class DatabaseMetadataModule extends AbstractModule {
 
-	TableDescription getTableDescriptionOf(String tableName) throws SQLException;
+	@Override
+	protected void configure() {
+		bind(DatabaseMetadataDao.class);
+		bind(DatabaseMetadataService.class).to(DatabaseMetadataServiceImpl.class);
+		bind(DatabaseTruncationService.class).to(DatabaseTruncationServiceImpl.class);
+		
+		MethodInterceptor interceptor = new AutoTruncateMethodInterceptor();
+		
+		requestInjection(interceptor);
+		bindInterceptor(Matchers.annotatedWith(AutoTruncate.class), Matchers.annotatedWith(AutoTruncate.class), interceptor);
+	}
+
 }

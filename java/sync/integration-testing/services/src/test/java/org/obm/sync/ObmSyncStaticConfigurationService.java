@@ -123,11 +123,6 @@ public class ObmSyncStaticConfigurationService {
 		public CalendarEncoding getEmailCalendarEncoding() {
 			return CalendarEncoding.valueOf(obmSyncConfiguration.emailCalendarEncoding);
 		}
-
-		@Override
-		public boolean isAutoTruncateEnabled() {
-			return true;
-		}
 		
 		@Override
 		public ResourceBundle getResourceBundle(Locale locale) {

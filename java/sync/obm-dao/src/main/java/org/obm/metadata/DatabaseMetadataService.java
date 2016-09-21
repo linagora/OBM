@@ -27,14 +27,13 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.metadata;
+package org.obm.metadata;
 
 import java.sql.SQLException;
 
-public interface DatabaseTruncationService {
+import org.obm.sync.dao.TableDescription;
 
-	<T> T getTruncatingEntity(T entity) throws SQLException;
+public interface DatabaseMetadataService {
 
-	String truncate(String value, String table, String column) throws SQLException;
-
+	TableDescription getTableDescriptionOf(String tableName) throws SQLException;
 }

@@ -27,11 +27,11 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.metadata;
+package org.obm.metadata;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.easymock.IMocksControl;
@@ -42,6 +42,7 @@ import org.junit.runner.RunWith;
 import org.obm.annotations.database.AutoTruncate;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.annotations.database.DatabaseField;
+import org.obm.configuration.DatabaseConfiguration;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
 import org.obm.sync.dao.TableDescription;
@@ -49,8 +50,6 @@ import org.obm.sync.dao.TableDescription;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.matcher.Matchers;
-
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 @RunWith(GuiceRunner.class)
 @GuiceModule(AutoTruncateMethodInterceptorTest.Env.class)
@@ -68,7 +67,7 @@ public class AutoTruncateMethodInterceptorTest {
 			bind(IMocksControl.class).toInstance(control);
 			bindWithMock(DatabaseMetadataService.class);
 			bind(DatabaseTruncationService.class).to(DatabaseTruncationServiceImpl.class);
-			bindWithMock(ObmSyncConfigurationService.class);
+			bindWithMock(DatabaseConfiguration.class);
 
 			MethodInterceptor interceptor = new AutoTruncateMethodInterceptor();
 
@@ -91,7 +90,7 @@ public class AutoTruncateMethodInterceptorTest {
 	@Inject
 	private AutoTruncateTestServiceNoAnnotation serviceWithoutTruncation;
 	@Inject
-	private ObmSyncConfigurationService configuration;
+	private DatabaseConfiguration configuration;
 
 	private TableDescription tableDescription;
 

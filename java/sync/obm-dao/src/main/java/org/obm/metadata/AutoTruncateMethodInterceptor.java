@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.metadata;
+package org.obm.metadata;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -36,21 +36,20 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.obm.annotations.database.DatabaseEntity;
 import org.obm.annotations.database.DatabaseField;
+import org.obm.configuration.DatabaseConfiguration;
 
 import com.google.inject.Inject;
-
-import fr.aliacom.obm.services.constant.ObmSyncConfigurationService;
 
 public class AutoTruncateMethodInterceptor implements MethodInterceptor {
 
 	@Inject
 	private DatabaseTruncationService truncationService;
 	@Inject
-	private ObmSyncConfigurationService configurationService;
+	private DatabaseConfiguration dbConfiguration;
 
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		if (configurationService.isAutoTruncateEnabled()) {
+		if (dbConfiguration.isAutoTruncateEnabled()) {
 			Method method = invocation.getMethod();
 			Object[] args = invocation.getArguments();
 			Class<?>[] paramTypes = method.getParameterTypes();

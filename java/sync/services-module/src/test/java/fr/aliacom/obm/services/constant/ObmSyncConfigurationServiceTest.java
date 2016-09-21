@@ -29,9 +29,9 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.services.constant;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -104,30 +104,6 @@ public class ObmSyncConfigurationServiceTest {
 		control.replay();
 		service = new ObmSyncConfigurationServiceImpl(configuration, "appName");
 		assertThat(service.getEmailCalendarEncoding()).isEqualTo(CalendarEncoding.SevenBit);
-		control.verify();
-	}
-
-	@Test
-	public void testIsAutoTruncateEnabled() {
-		expect(configuration.getBooleanValue(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, ObmSyncConfigurationService.DB_AUTO_TRUNCATE_DEFAULT_VALUE)).andReturn(true);
-		control.replay();
-
-		service = new ObmSyncConfigurationServiceImpl(configuration, "appName");
-
-		assertThat(service.isAutoTruncateEnabled()).isTrue();
-
-		control.verify();
-	}
-
-	@Test
-	public void testIsAutoTruncateEnabledWhenDisabled() {
-		expect(configuration.getBooleanValue(ObmSyncConfigurationService.DB_AUTO_TRUNCATE_PARAMETER, ObmSyncConfigurationService.DB_AUTO_TRUNCATE_DEFAULT_VALUE)).andReturn(false);
-		control.replay();
-
-		service = new ObmSyncConfigurationServiceImpl(configuration, "appName");
-
-		assertThat(service.isAutoTruncateEnabled()).isFalse();
-
 		control.verify();
 	}
 }

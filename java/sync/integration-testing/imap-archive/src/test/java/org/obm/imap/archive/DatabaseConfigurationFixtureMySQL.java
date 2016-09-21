@@ -96,4 +96,9 @@ public class DatabaseConfigurationFixtureMySQL implements DatabaseConfiguration 
 	public boolean isReadOnly() {
 		return false;
 	}
+
+	@Override
+	public boolean isAutoTruncateEnabled() {
+		return true;
+	}
 }
