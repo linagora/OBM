@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  *
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2011-2016 Linagora
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License as
@@ -52,8 +52,10 @@ import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.obm.DateUtils;
 import org.obm.SolrModuleUtils.DummyCommonsHttpSolrServer;
+import org.obm.configuration.ContactConfiguration;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
+import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.CalendarDao;
 import org.obm.domain.dao.ResourceDao;
 import org.obm.guice.GuiceRule;
@@ -61,6 +63,7 @@ import org.obm.provisioning.TestingProvisioningModule;
 import org.obm.server.WebServer;
 import org.obm.sync.Right;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.book.AddressBook;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventExtId;
 
@@ -93,18 +96,24 @@ public class EventIntegrationTest {
 	@Inject private WebServer server;
 	@Inject private JMSServer jmsServer;
 	@Inject private DummyCommonsHttpSolrServer solrServer;
+	
+	@Inject private ContactConfiguration contactConfiguration;
 	@Inject private CalendarDao calendarDao;
 	@Inject private ResourceDao resourceDao;
+	@Inject private AddressBookDao addressBookDao;
 	
 	private URL baseURL;
 	private AccessToken token;
+	private ObmUser obmUser;
 	
 	@Before
 	public void init() throws Exception {
 		server.start();
 		baseURL = new URL("http", "localhost", server.getHttpPort(), "/");
+		ObmDomain domain = ObmDomain.builder().name("test.tlse.lng").id(2).build();
 		token = new AccessToken(2, "papi");
-		token.setDomain(ObmDomain.builder().name("test.tlse.lng").id(2).build());
+		token.setDomain(domain);
+		obmUser = ObmUser.builder().login(UserLogin.valueOf("user1")).uid(2).domain(domain).build();
 	}
 
 	@After
@@ -373,7 +382,29 @@ public class EventIntegrationTest {
 		assertThat(solrServer.addCount).isEqualTo(1);
 		assertThat(solrServer.commitCount).isEqualTo(1);
 	}
-
+	
+	@Test
+	public void testImportICSShouldAutoTruncateTooLongFields() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String ics = Resources.toString(Resources.getResource("ics/with-long-fields.ics"), Charsets.UTF_8);
+		
+		AddressBook book = AddressBook.builder().defaultBook(true).syncable(true)
+				.name(contactConfiguration.getCollectedAddressBookName())
+				.origin("papi").build();
+		addressBookDao.create(book, obmUser);
+		
+		String batchId = startBatch(baseURL, obmDomainUuid);
+		importICS(ics);
+		commitBatch();
+		waitForBatchSuccess(batchId);
+		
+		ResultSet results = db.execute("select count(1) from event");
+		results.next();
+		assertThat(results.getInt(1)).isEqualTo(1);
+		assertThat(solrServer.addCount).isEqualTo(1);
+		assertThat(solrServer.commitCount).isEqualTo(1);
+	}
+	
 	private void importICS(String ics) {
 		importICS(ics, "user1@test.tlse.lng");
 	}
