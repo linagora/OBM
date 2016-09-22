@@ -525,7 +525,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 			throws SQLException,
 			FindException, ServerFault {
 		logger.info("eventId == null");
-		Event e = calendarDao.createEvent(con, at, at.getUserWithDomain(),
+		Event e = calendarDao.createEvent(con, at, at.getUserLogin(),
 				getEvent(at, DisplayNameUtils.getDisplayName(null, c.getFirstname(), c.getLastname()), date));
 		return e.getObmId();
 	}

@@ -50,6 +50,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.obm.SolrModuleUtils.DummyCommonsHttpSolrServer;
+import org.obm.configuration.ContactConfiguration;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.domain.dao.AddressBookDao;
@@ -87,16 +88,18 @@ public class ContactIntegrationTest {
 	@Inject private JMSServer jmsServer;
 	@Inject private DummyCommonsHttpSolrServer solrServer;
 	@Inject private AddressBookDao addressBookDao;
+	@Inject private ContactConfiguration contactConfiguration;
 	
 	private URL baseURL;
 	private ObmUser obmUser;
+	private ObmDomain domain;
 	
 	@Before
 	public void init() throws Exception {
 		server.start();
 		baseURL = new URL("http", "localhost", server.getHttpPort(), "/");
 		
-		ObmDomain domain = ObmDomain.builder().id(2).name("test.tlse.lng").build();
+		domain = ObmDomain.builder().id(2).name("test.tlse.lng").build();
 		obmUser = ObmUser.builder().uid(2).login(UserLogin.valueOf("user1")).domain(domain).build();
 		AddressBook defaultAddressBook = addressBookDao.create(AddressBook.builder()
 			.origin("papi")
@@ -327,6 +330,34 @@ public class ContactIntegrationTest {
 			.statusCode(Status.UNAUTHORIZED.getStatusCode()).
 		when()
 			.post("contacts/user1@test.tlse.lng");
+	}
+	
+	@Test
+	public void testImportVCFWhenContactWithBirthDayAndUserHasLoginMismatchingItsEmail() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String vcf = Resources.toString(Resources.getResource("vcf/sample.vcf"), Charsets.UTF_8);
+		
+		AddressBook book = AddressBook.builder().defaultBook(true).syncable(true)
+				.name(contactConfiguration.getDefaultAddressBookName())
+				.origin("papi").build();
+		ObmUser mistmatchUser = ObmUser.builder().uid(3).login(UserLogin.valueOf("mismatch")).domain(domain).build();
+		addressBookDao.create(book, mistmatchUser);
+		
+		String batchId = startBatch(baseURL, obmDomainUuid);
+		importVCF(vcf, "mismatch@test.tlse.lng");
+		commitBatch();
+		waitForBatchSuccess(batchId);
+		
+		ResultSet eventsResults = db.execute("select count(1) from event");
+		eventsResults.next();
+		assertThat(eventsResults.getInt(1)).isEqualTo(1);
+		
+		ResultSet contactsResults = db.execute("select count(1) from contact");
+		contactsResults.next();
+		assertThat(contactsResults.getInt(1)).isEqualTo(2);
+		// expect 3 indexed documents, 2 contacts and 1 event for the birthday
+		assertThat(solrServer.addCount).isEqualTo(3);
+		assertThat(solrServer.commitCount).isEqualTo(3);
 	}
 
 	private void importVCF(String vcf) {
