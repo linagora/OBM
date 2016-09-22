@@ -27,32 +27,39 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync;
+package org.obm.metadata;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.obm.annotations.database.AutoTruncate;
-import org.obm.sync.metadata.AutoTruncateMethodInterceptor;
-import org.obm.sync.metadata.DatabaseMetadataDao;
-import org.obm.sync.metadata.DatabaseMetadataService;
-import org.obm.sync.metadata.DatabaseMetadataServiceImpl;
-import org.obm.sync.metadata.DatabaseTruncationService;
-import org.obm.sync.metadata.DatabaseTruncationServiceImpl;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.matcher.Matchers;
+import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.push.utils.JDBCUtils;
+import org.obm.sync.dao.TableDescription;
 
-public class DatabaseMetadataModule extends AbstractModule {
+import com.google.inject.Inject;
 
-	@Override
-	protected void configure() {
-		bind(DatabaseMetadataDao.class);
-		bind(DatabaseMetadataService.class).to(DatabaseMetadataServiceImpl.class);
-		bind(DatabaseTruncationService.class).to(DatabaseTruncationServiceImpl.class);
+public class DatabaseMetadataDao {
+
+	@Inject
+	DatabaseConnectionProvider dbcp;
+	
+	public TableDescription getResultSetMetadata(String tableName) throws SQLException {
+		Connection connection = null;
+		ResultSet rs = null;
+		Statement st = null;
 		
-		MethodInterceptor interceptor = new AutoTruncateMethodInterceptor();
-		
-		requestInjection(interceptor);
-		bindInterceptor(Matchers.annotatedWith(AutoTruncate.class), Matchers.annotatedWith(AutoTruncate.class), interceptor);
+		try {
+			connection = dbcp.getConnection();
+			st = connection.createStatement();
+			
+			rs = st.executeQuery("SELECT * FROM " + tableName + " LIMIT 1");
+			return new TableDescription(rs.getMetaData());
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			JDBCUtils.cleanup(connection, st, rs);
+		}
 	}
-
 }

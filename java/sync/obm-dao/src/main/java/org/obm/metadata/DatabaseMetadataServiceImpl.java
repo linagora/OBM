@@ -27,39 +27,49 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.metadata;
+package org.obm.metadata;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
-import org.obm.dbcp.DatabaseConnectionProvider;
-import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.dao.TableDescription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-public class DatabaseMetadataDao {
-
-	@Inject
-	DatabaseConnectionProvider dbcp;
+@Singleton
+public final class DatabaseMetadataServiceImpl implements DatabaseMetadataService {
 	
-	public TableDescription getResultSetMetadata(String tableName) throws SQLException {
-		Connection connection = null;
-		ResultSet rs = null;
-		Statement st = null;
-		
-		try {
-			connection = dbcp.getConnection();
-			st = connection.createStatement();
-			
-			rs = st.executeQuery("SELECT * FROM " + tableName + " LIMIT 1");
-			return new TableDescription(rs.getMetaData());
-		} catch (SQLException e) {
-			throw e;
-		} finally {
-			JDBCUtils.cleanup(connection, st, rs);
-		}
+	private static final Logger logger = LoggerFactory
+			.getLogger(DatabaseMetadataServiceImpl.class);
+	
+	private final LoadingCache<String, TableDescription> cache;
+	private final DatabaseMetadataDao metadataDao;
+	
+	@Inject
+	@VisibleForTesting DatabaseMetadataServiceImpl(DatabaseMetadataDao metadataDao) {
+		this.metadataDao = metadataDao;
+		cache = newColumnDescriptionsCache();
+	}
+
+	@Override
+	public TableDescription getTableDescriptionOf(String tableName) throws SQLException {
+		return cache.getUnchecked(tableName);
+	}
+	
+	private LoadingCache<String, TableDescription> newColumnDescriptionsCache() {
+		return CacheBuilder.newBuilder().build(new CacheLoader<String, TableDescription>() {
+
+			@Override
+			public TableDescription load(String tableName) throws SQLException {
+				logger.info("Caching metadata for table {}.", tableName);
+				return metadataDao.getResultSetMetadata(tableName);
+			}
+		});
 	}
 }

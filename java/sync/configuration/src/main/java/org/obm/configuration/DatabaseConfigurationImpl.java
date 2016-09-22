@@ -34,6 +34,7 @@ package org.obm.configuration;
 
 import org.obm.configuration.utils.IniFile;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -59,7 +60,11 @@ public class DatabaseConfigurationImpl implements DatabaseConfiguration {
 	
 	@Inject
 	DatabaseConfigurationImpl(IniFile.Factory iniFileFactory, @Named("globalConfigurationFile") String globalConfigurationFile) {
-		iniFile = iniFileFactory.build(globalConfigurationFile);
+		this(iniFileFactory.build(globalConfigurationFile));
+	}
+	
+	@VisibleForTesting DatabaseConfigurationImpl(IniFile iniFile) {
+		this.iniFile = iniFile;
 	}
 
 	@Override
@@ -120,6 +125,11 @@ public class DatabaseConfigurationImpl implements DatabaseConfiguration {
 	@Override
 	public boolean isReadOnly() {
 		return false;
+	}
+	
+	@Override
+	public boolean isAutoTruncateEnabled() {
+		return iniFile.getBooleanValue(DB_AUTO_TRUNCATE_PARAMETER, DB_AUTO_TRUNCATE_DEFAULT_VALUE);
 	}
 
 	@Override

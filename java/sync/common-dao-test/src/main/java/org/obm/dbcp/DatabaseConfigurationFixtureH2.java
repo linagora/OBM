@@ -117,4 +117,9 @@ public class DatabaseConfigurationFixtureH2 implements DatabaseConfiguration {
 		return false;
 	}
 
+	@Override
+	public boolean isAutoTruncateEnabled() {
+		return true;
+	}
+
 }

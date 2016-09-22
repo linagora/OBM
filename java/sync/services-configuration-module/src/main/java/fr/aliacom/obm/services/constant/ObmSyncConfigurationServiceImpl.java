@@ -54,8 +54,6 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 	private static final String GLOBAL_ADDRESS_BOOK_SYNC = "globalAddressBookSync";
 	private static final boolean GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE = true;
 	
-	private static final String DB_AUTO_TRUNCATE_PARAMETER = "database-auto-truncate";
-	private static final boolean DB_AUTO_TRUNCATE_DEFAULT_VALUE = true;
 	private static final String EMAIL_CALENDAR_ENCODING_PARAMETER = "email-calendar-encoding";
 	private static final CalendarEncoding DEFAULT_EMAIL_CALENDAR_ENCODING = CalendarEncoding.Auto;
 
@@ -135,11 +133,6 @@ public class ObmSyncConfigurationServiceImpl extends ConfigurationServiceImpl im
 			logger.warn("Invalid calendar encoding '{}', using default behaviour (automatic detection of appropriate encoding)", strEncoding);
 			return DEFAULT_EMAIL_CALENDAR_ENCODING;
 		}
-	}
-	
-	@Override
-	public boolean isAutoTruncateEnabled() {
-		return iniFile.getBooleanValue(DB_AUTO_TRUNCATE_PARAMETER, DB_AUTO_TRUNCATE_DEFAULT_VALUE);
 	}
 
 

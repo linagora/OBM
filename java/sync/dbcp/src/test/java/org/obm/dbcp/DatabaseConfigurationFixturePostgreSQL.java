@@ -98,4 +98,9 @@ public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfigura
 		return false;
 	}
 
+	@Override
+	public boolean isAutoTruncateEnabled() {
+		return DB_AUTO_TRUNCATE_DEFAULT_VALUE;
+	}
+
 }

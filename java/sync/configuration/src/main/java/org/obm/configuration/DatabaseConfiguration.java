@@ -45,8 +45,11 @@ public interface DatabaseConfiguration {
 	String DB_PG_SSL_NON_VALIDATING = "database-postgres-ssl-non-validating-factory";
 	String DB_READONLY_KEY = "read-only";
 	String DB_MIN_POOL_SIZE_KEY = "database-min-connection-pool-size";
+	String DB_AUTO_TRUNCATE_PARAMETER = "database-auto-truncate";
 
 	String NO_JDBC_OPTION = "";
+	
+	boolean DB_AUTO_TRUNCATE_DEFAULT_VALUE = true;
 
 	Integer getDatabaseMinConnectionPoolSize();
 
@@ -72,4 +75,5 @@ public interface DatabaseConfiguration {
 
 	boolean isReadOnly();
 
+	boolean isAutoTruncateEnabled();
 }

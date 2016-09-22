@@ -31,6 +31,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.domain.dao;
 
+import org.obm.metadata.DatabaseMetadataModule;
 import org.obm.provisioning.dao.BatchDao;
 import org.obm.provisioning.dao.BatchDaoJdbcImpl;
 import org.obm.provisioning.dao.GroupDao;
@@ -50,6 +51,8 @@ public class DaoModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
+		install(new DatabaseMetadataModule());
+		
 		bind(ProfileDao.class).to(ProfileDaoJdbcImpl.class);
 		bind(BatchDao.class).to(BatchDaoJdbcImpl.class);
 		bind(OperationDao.class).to(OperationDaoJdbcImpl.class);

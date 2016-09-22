@@ -98,4 +98,9 @@ public class DatabaseConfigurationFixturePostgreSQL implements DatabaseConfigura
 	public boolean isReadOnly() {
 		return false;
 	}
+
+	@Override
+	public boolean isAutoTruncateEnabled() {
+		return true;
+	}
 }

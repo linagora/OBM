@@ -107,6 +107,11 @@ public class IniFileSectionDatabaseConfiguration implements DatabaseConfiguratio
 	public boolean isReadOnly() {
 		return iniFile.getIniBooleanValue(section, DB_READONLY_KEY, false);
 	}
+	
+	@Override
+	public boolean isAutoTruncateEnabled() {
+		return iniFile.getBooleanValue(DB_AUTO_TRUNCATE_PARAMETER, DB_AUTO_TRUNCATE_DEFAULT_VALUE);
+	}
 
 	@Override
 	public int hashCode() {

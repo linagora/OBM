@@ -1,0 +1,29 @@
+BEGIN:VCALENDAR
+PRODID:-//Aliasource Groupe LINAGORA//OBM Calendar 3.2.0-rc1//FR
+CALSCALE:GREGORIAN
+VERSION:2.0
+METHOD:REQUEST
+BEGIN:VEVENT
+CREATED:20151116T090245Z
+LAST-MODIFIED:20151116T090245Z
+DTSTAMP:20260616T090245Z
+DTSTART:20260616T130000Z
+DURATION:PT30M
+TRANSP:OPAQUE
+SEQUENCE:0
+SUMMARY:Lorem ipsum dolor sit amet, nonummy ligula volutpat hac integer n
+ onummy. Suspendisse ultricies,
+DESCRIPTION:Test description
+CLASS:PUBLIC
+PRIORITY:5
+ORGANIZER;CN=user1 name:MAILTO:user1@test.tlse.lng
+LOCATION:Lorem ipsum dolor sit amet, nonummy ligula volutpat hac integer n
+ onummy. Suspendisse ultricies,
+ATTENDEE;CN=user1 name Lorem ipsum dolor sit amet, nonummy ligula volutpat
+ hac integer n;PARTSTAT=ACCEPTED;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;RS
+ VP=TRUE:mailto:contact@domain.org
+CATEGORIES:
+UID:d0514f44bf39311568d640723009ff302eff988fdaf6f8c5f984eead44579296e047fe
+ b2aab16e43439a608f28671ab7c10e754c58fbcf6e4ad25cd8b25da677939329af93c8cf8e
+END:VEVENT
+END:VCALENDAR

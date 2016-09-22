@@ -36,6 +36,7 @@ import org.obm.SolrModuleUtils;
 import org.obm.annotations.transactional.TransactionalModule;
 import org.obm.dbcp.MultiNodeDatabaseModule;
 import org.obm.domain.dao.DaoModule;
+import org.obm.metadata.DatabaseMetadataModule;
 import org.obm.service.MessageQueueServerModule;
 
 import com.google.common.io.Files;

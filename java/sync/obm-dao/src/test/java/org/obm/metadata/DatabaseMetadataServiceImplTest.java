@@ -27,7 +27,7 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.sync.metadata;
+package org.obm.metadata;
 
 import static org.easymock.EasyMock.createControl;
 import static org.easymock.EasyMock.expect;
@@ -42,6 +42,8 @@ import org.junit.runner.RunWith;
 import org.obm.dbcp.DatabaseConnectionProvider;
 import org.obm.guice.GuiceModule;
 import org.obm.guice.GuiceRunner;
+import org.obm.metadata.DatabaseMetadataDao;
+import org.obm.metadata.DatabaseMetadataServiceImpl;
 import org.obm.sync.dao.TableDescription;
 
 import com.google.common.util.concurrent.UncheckedExecutionException;

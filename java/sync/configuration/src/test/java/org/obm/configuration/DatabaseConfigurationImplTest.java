@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2016 Linagora
  *
  * This program is free software: you can redistribute it and/or 
  * modify it under the terms of the GNU Affero General Public License as 
@@ -29,33 +29,51 @@
  * OBM connectors. 
  * 
  * ***** END LICENSE BLOCK ***** */
-package fr.aliacom.obm.services.constant;
+package org.obm.configuration;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.easymock.EasyMock.createControl;
+import static org.easymock.EasyMock.expect;
 
-import org.obm.configuration.ConfigurationService;
-import org.obm.sync.auth.AccessToken;
+import org.easymock.IMocksControl;
+import org.junit.Before;
+import org.junit.Test;
+import org.obm.configuration.utils.IniFile;
 
-import fr.aliacom.obm.common.calendar.CalendarEncoding;
 
-public interface ObmSyncConfigurationService extends ConfigurationService {
+public class DatabaseConfigurationImplTest {
 
-	static final String OBM_SYNC_MAILER = "x-obm-sync";
-	static final String GLOBAL_ADDRESS_BOOK_SYNC = "globalAddressBookSync";
-	static final boolean GLOBAL_ADDRESS_BOOK_SYNC_DEFAULT_VALUE = true;
-	
-	static final String EMAIL_CALENDAR_ENCODING_PARAMETER = "email-calendar-encoding";
-	static final CalendarEncoding DEFAULT_EMAIL_CALENDAR_ENCODING = CalendarEncoding.Auto;
-	
-	String getDefaultTemplateFolder();
-	String getOverrideTemplateFolder();
-	String getObmSyncMailer(AccessToken accessToken);
-	Iterable<String> getLemonLdapIps();
-	String getRootAccounts();
-	String getAppliAccounts();
-	String getAnyUserAccounts();
-	boolean syncUsersAsAddressBook();
-	CalendarEncoding getEmailCalendarEncoding();
-	ResourceBundle getResourceBundle(Locale locale);
+	private IniFile configuration;
+	private IMocksControl control;
+
+	@Before
+	public void setUp() {
+		control = createControl();
+		configuration = control.createMock(IniFile.class);
+	}
+
+	@Test
+	public void testIsAutoTruncateEnabled() {
+		expect(configuration.getBooleanValue(DatabaseConfiguration.DB_AUTO_TRUNCATE_PARAMETER, true)).andReturn(true);
+		control.replay();
+
+		DatabaseConfiguration testee = new DatabaseConfigurationImpl(configuration);
+
+		assertThat(testee.isAutoTruncateEnabled()).isTrue();
+
+		control.verify();
+	}
+
+	@Test
+	public void testIsAutoTruncateEnabledWhenDisabled() {
+		expect(configuration.getBooleanValue(DatabaseConfiguration.DB_AUTO_TRUNCATE_PARAMETER, true)).andReturn(false);
+		control.replay();
+
+		DatabaseConfiguration testee = new DatabaseConfigurationImpl(configuration);
+
+		assertThat(testee.isAutoTruncateEnabled()).isFalse();
+
+		control.verify();
+	}
+
 }
