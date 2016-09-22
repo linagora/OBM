@@ -31,36 +31,45 @@
  * ***** END LICENSE BLOCK ***** */
 package fr.aliacom.obm.common.calendar;
 
+import javax.jms.Connection;
+import javax.jms.JMSException;
+
 import org.obm.icalendar.ICalendarFactory;
 import org.obm.icalendar.Ical4jHelper;
 import org.obm.icalendar.Ical4jUser;
+import org.obm.service.solr.jms.SolrJmsQueue;
 import org.obm.service.user.UserService;
+import org.obm.sync.LifecycleListener;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.server.mailer.AbstractMailer.NotificationException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.linagora.obm.sync.JMSClient;
 import com.linagora.obm.sync.Producer;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
 @Singleton
-public class MessageQueueServiceImpl implements MessageQueueService {
+public class MessageQueueServiceImpl implements MessageQueueService, LifecycleListener {
 
 	private final Ical4jHelper ical4jHelper;
 	private final UserService userService;
 	private final ICalendarFactory calendarFactory;
+	private final Connection connection;
 	private final Producer producer;
 
 	@Inject
 	private MessageQueueServiceImpl(UserService userService, Ical4jHelper ical4jHelper, ICalendarFactory calendarFactory,
-			Producer producer) {
+			JMSClient jmsClient) throws JMSException {
 		
 		this.userService = userService;
 		this.ical4jHelper = ical4jHelper;
 		this.calendarFactory = calendarFactory;
-		this.producer = producer;
+
+		this.connection = jmsClient.createConnection();
+		this.producer = jmsClient.createProducerOnTopic(jmsClient.createSession(connection), SolrJmsQueue.EVENT_CHANGES_QUEUE.getId());
 	}
 	
 	@Override
@@ -98,6 +107,11 @@ public class MessageQueueServiceImpl implements MessageQueueService {
 		} catch (Exception e) {
 			throw new NotificationException(e);
 		}
+	}
+
+	@Override
+	public void shutdown() throws Exception {
+		connection.close();
 	}
 
 }

@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 
 import fr.aliacom.obm.common.calendar.AnonymizerService;
@@ -94,5 +95,8 @@ public class ObmSyncServicesModule extends AbstractModule {
 		bind(Boolean.class).annotatedWith(Names.named("queueIsRemote")).toInstance(false);
 		bind(String.class).annotatedWith(Names.named("application-name")).toInstance(APPLICATION_NAME);
 		bind(Logger.class).annotatedWith(Names.named(LoggerModule.CONFIGURATION)).toInstance(LoggerFactory.getLogger(LoggerModule.CONFIGURATION));
+
+		Multibinder<LifecycleListener> lifecycleListeners = Multibinder.newSetBinder(binder(), LifecycleListener.class);
+		lifecycleListeners.addBinding().to(MessageQueueServiceImpl.class);
     }
 }

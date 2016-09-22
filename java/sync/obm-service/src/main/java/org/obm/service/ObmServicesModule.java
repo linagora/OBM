@@ -51,7 +51,7 @@ public class ObmServicesModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		install(new MessageQueueClientModule());
-
+		
 		bind(DomainService.class).to(DomainCache.class);
 		bind(UserService.class).to(UserServiceImpl.class);
 		bind(LocatorService.class).to(LocatorCache.class);
