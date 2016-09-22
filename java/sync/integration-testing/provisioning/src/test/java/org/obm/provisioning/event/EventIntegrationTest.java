@@ -401,8 +401,8 @@ public class EventIntegrationTest {
 		ResultSet results = db.execute("select count(1) from event");
 		results.next();
 		assertThat(results.getInt(1)).isEqualTo(1);
-		assertThat(solrServer.addCount).isEqualTo(1);
-		assertThat(solrServer.commitCount).isEqualTo(1);
+		assertThat(solrServer.addCount).isEqualTo(2);
+		assertThat(solrServer.commitCount).isEqualTo(2);
 	}
 	
 	private void importICS(String ics) {
