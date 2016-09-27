@@ -150,5 +150,10 @@ public class BatchResource {
 	public Class<ContactResource> contacts() {
 		return ContactResource.class;
 	}
+	
+	@Path("{batchId}/addressbooks")
+	public Class<AddressBookResource> addressbooks() {
+		return AddressBookResource.class;
+	}
 
 }

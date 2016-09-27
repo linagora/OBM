@@ -105,6 +105,7 @@ public class OperationJsonSerializer extends JsonSerializer<Operation> {
 						break;
 					case EVENT:
 					case CONTACT:
+					case ADDRESS_BOOK:
 						params.add(
 								new String[]{"userEmail", Request.USERS_EMAIL_KEY});
 						break;

@@ -49,6 +49,7 @@ import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.AddressBook;
+import org.obm.sync.book.AddressBookCreation;
 import org.obm.sync.book.AddressBookReference;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.DeletedContact;
@@ -219,6 +220,15 @@ public class BeansTest {
 			.equalsVerifiers(
 				CommitedElement.class,
 				CommitedOperation.class
+			).verify();
+	}
+	
+	@Test
+	public void testAddressBookCreation() {
+		EqualsVerifierBuilder.builder()
+			.prefabValue(Optional.class, Optional.absent(), Optional.of(new AddressBookReference("ref", "origin")))
+			.equalsVerifiers(
+				AddressBookCreation.class
 			).verify();
 	}
 }

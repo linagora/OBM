@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  *
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2016 Linagora
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License as
@@ -29,61 +29,39 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.json;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
+import java.io.IOException;
 
-import org.obm.provisioning.resources.AbstractBatchAwareResource;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.SerializerProvider;
 import org.obm.sync.book.AddressBookCreation;
+import org.obm.sync.book.AddressBookReference;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.user.ObmUser;
 
-public class ResourceForTest {
 
-	@Context
-	ObmDomain domain;
-	
-	@POST
-	@Path("/serialization/of/user")
-	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public ObmUser create(ObmUser user) {
-		return user;
-	}
+public class AddressBookCreationJsonSerializer extends JsonSerializer<AddressBookCreation> {
 
-	@POST
-	@Path("serialization/of/group")
-	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public Group create(Group group) {
-		return group;
-	}
-	
-	@POST
-	@Path("/serialization/of/addressbookcreation")
-	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public AddressBookCreation create(AddressBookCreation creation) {
-		return creation;
+	@Override
+	public void serialize(AddressBookCreation value, JsonGenerator jgen, SerializerProvider provider)
+			throws IOException, JsonProcessingException {
+		
+		jgen.writeStartObject();
+		jgen.writeObjectField("name", value.getName());
+		jgen.writeObjectField("role", value.getRole().name());
+		
+		if (value.getReference().isPresent()) {
+			AddressBookReference reference = value.getReference().get();
+			jgen.writeFieldName("reference");
+				jgen.writeStartObject();
+				jgen.writeObjectField("value", reference.getReference());
+				jgen.writeObjectField("origin", reference.getOrigin());
+				jgen.writeEndObject();
+		}
+		
+		jgen.writeEndObject();
 	}
 	
-	@GET
-	@Path("serialization/of/runtimeException")
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public void throwRuntimeException() {
-		throw new IllegalStateException("foo");
-	}
-	
-	@GET
-	@Path("serialization/of/exception")
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public void throwException() throws Exception {
-		throw new Exception("foo");
-	}
 }

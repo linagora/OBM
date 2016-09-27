@@ -56,6 +56,8 @@ import org.obm.provisioning.beans.Batch;
 import org.obm.provisioning.beans.Operation;
 import org.obm.provisioning.conf.SystemUserLdapConfiguration;
 import org.obm.provisioning.dao.exceptions.DaoException;
+import org.obm.provisioning.json.AddressBookCreationJsonDeserializer;
+import org.obm.provisioning.json.AddressBookCreationJsonSerializer;
 import org.obm.provisioning.json.BatchJsonSerializer;
 import org.obm.provisioning.json.ExceptionJsonSerializer;
 import org.obm.provisioning.json.GroupExtIdJsonDeserializer;
@@ -74,6 +76,7 @@ import org.obm.provisioning.json.UserExtIdJsonSerializer;
 import org.obm.provisioning.json.UserPasswordJsonSerializer;
 import org.obm.provisioning.ldap.client.Configuration;
 import org.obm.provisioning.ldap.client.LdapModule;
+import org.obm.provisioning.resources.AddressBookResource;
 import org.obm.provisioning.resources.BatchResource;
 import org.obm.provisioning.resources.ContactResource;
 import org.obm.provisioning.resources.DomainBasedSubResource;
@@ -88,6 +91,7 @@ import org.obm.satellite.client.SatelliteClientModule;
 import org.obm.service.ObmServicesModule;
 import org.obm.service.solr.jms.SolrJmsModule;
 import org.obm.sync.XTrustProvider;
+import org.obm.sync.book.AddressBookCreation;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
@@ -163,6 +167,7 @@ public class ProvisioningService extends ServletModule {
 		bind(GroupWriteResource.class);
 		bind(EventResource.class);
 		bind(ContactResource.class);
+		bind(AddressBookResource.class);
 		bind(ObmDomainProvider.class);
 		bind(BatchProvider.class);
 		bind(WebApplicationExceptionMapper.class);
@@ -196,6 +201,8 @@ public class ProvisioningService extends ServletModule {
 				.addDeserializer(GroupExtId.class, new GroupExtIdJsonDeserializer())
 				.addSerializer(Group.class, new GroupJsonSerializer())
 				.addDeserializer(Group.class, new GroupJsonDeserializer())
+				.addSerializer(AddressBookCreation.class, new AddressBookCreationJsonSerializer())
+				.addDeserializer(AddressBookCreation.class, new AddressBookCreationJsonDeserializer())
 				.addSerializer(Exception.class, new ExceptionJsonSerializer());
 
 		ObjectMapper mapper = new ObjectMapper()

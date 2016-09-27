@@ -288,7 +288,7 @@ public class SerializationUtils {
 		}
 	}
 
-	private static boolean isNullOrNullNode(JsonNode at) {
+	public static boolean isNullOrNullNode(JsonNode at) {
 		return at == null || at.isNull();
 	}
 

@@ -1,8 +1,8 @@
 BEGIN;
 
--- Add EVENT, CONTACT to the batch_entity_type ENUM
+-- Add EVENT, CONTACT, ADDRESS_BOOK to the batch_entity_type ENUM
 ALTER TYPE batch_entity_type rename to batch_entity_type_old;
-CREATE TYPE batch_entity_type AS ENUM ('GROUP', 'USER', 'GROUP_MEMBERSHIP', 'USER_MEMBERSHIP', 'EVENT', 'CONTACT');
+CREATE TYPE batch_entity_type AS ENUM ('GROUP', 'USER', 'GROUP_MEMBERSHIP', 'USER_MEMBERSHIP', 'EVENT', 'CONTACT', 'ADDRESS_BOOK');
 ALTER TABLE batch_operation ALTER COLUMN entity_type TYPE batch_entity_type USING entity_type::text::batch_entity_type;
 DROP TYPE batch_entity_type_old ;
 

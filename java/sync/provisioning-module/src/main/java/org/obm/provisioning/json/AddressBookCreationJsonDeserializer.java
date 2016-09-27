@@ -27,8 +27,60 @@
  * version 3 and <http://www.linagora.com/licenses/> for the Additional Terms
  * applicable to the OBM software.
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning.beans;
+package org.obm.provisioning.json;
 
-public enum BatchEntityType {
-	USER, GROUP, USER_MEMBERSHIP, GROUP_MEMBERSHIP, EVENT, CONTACT, ADDRESS_BOOK
+import static org.obm.provisioning.utils.SerializationUtils.isNullOrNullNode;
+
+import java.io.IOException;
+
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.DeserializationContext;
+import org.codehaus.jackson.map.JsonDeserializer;
+import org.obm.provisioning.Group;
+import org.obm.provisioning.Group.Builder;
+import org.obm.sync.book.AddressBookCreation;
+import org.obm.sync.book.AddressBookReference;
+import org.obm.sync.book.AddressBookRole;
+
+import com.google.common.base.Optional;
+
+public final class AddressBookCreationJsonDeserializer extends JsonDeserializer<AddressBookCreation> {
+
+	public final Builder builder;
+
+	public AddressBookCreationJsonDeserializer() {
+		builder = Group.builder();
+	}
+
+	public AddressBookCreationJsonDeserializer(Group fromGroup) {
+		builder = Group.builder().from(fromGroup);
+	}
+
+	@Override
+	public AddressBookCreation deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		JsonNode root = jp.readValueAsTree();
+		
+		return new AddressBookCreation(
+			root.findValue("name").asText(), 
+			AddressBookRole.of(root.findValue("role").asText()), 
+			deserializeReference(root)
+		);
+	}
+
+	private Optional<AddressBookReference> deserializeReference(JsonNode root) {
+		JsonNode referenceNode = root.findValue("reference");
+		
+		if (isNullOrNullNode(referenceNode)) {
+			return Optional.absent();
+		}
+		
+		return Optional.of(new AddressBookReference(
+			referenceNode.findValue("value").asText(), 
+			referenceNode.findValue("origin").asText()
+		));
+		
+	}
+
 }

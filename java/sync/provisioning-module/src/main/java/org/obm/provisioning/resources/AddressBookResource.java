@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  *
- * Copyright (C) 2011-2014  Linagora
+ * Copyright (C) 2016 Linagora
  *
  * This program is free software: you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License as
@@ -29,61 +29,30 @@
  * OBM connectors.
  *
  * ***** END LICENSE BLOCK ***** */
-package org.obm.provisioning;
+package org.obm.provisioning.resources;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-import org.obm.provisioning.resources.AbstractBatchAwareResource;
-import org.obm.sync.book.AddressBookCreation;
+import org.obm.annotations.transactional.Transactional;
+import org.obm.provisioning.beans.BatchEntityType;
+import org.obm.provisioning.beans.HttpVerb;
+import org.obm.provisioning.beans.Request;
+import org.obm.provisioning.dao.exceptions.DaoException;
 
-import fr.aliacom.obm.common.domain.ObmDomain;
-import fr.aliacom.obm.common.user.ObmUser;
-
-public class ResourceForTest {
-
-	@Context
-	ObmDomain domain;
-	
-	@POST
-	@Path("/serialization/of/user")
-	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public ObmUser create(ObmUser user) {
-		return user;
-	}
+public class AddressBookResource extends AbstractBatchAwareResource {
 
 	@POST
-	@Path("serialization/of/group")
-	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public Group create(Group group) {
-		return group;
+	@Path("{" + Request.USERS_EMAIL_KEY + "}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(JSON_WITH_UTF8)
+	@Transactional
+	public Response createOrUpdate(String body) throws DaoException {
+		return addBatchOperation(body, HttpVerb.POST, BatchEntityType.ADDRESS_BOOK);
 	}
 	
-	@POST
-	@Path("/serialization/of/addressbookcreation")
-	@Consumes(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public AddressBookCreation create(AddressBookCreation creation) {
-		return creation;
-	}
-	
-	@GET
-	@Path("serialization/of/runtimeException")
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public void throwRuntimeException() {
-		throw new IllegalStateException("foo");
-	}
-	
-	@GET
-	@Path("serialization/of/exception")
-	@Produces(AbstractBatchAwareResource.JSON_WITH_UTF8)
-	public void throwException() throws Exception {
-		throw new Exception("foo");
-	}
 }
