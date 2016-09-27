@@ -45,6 +45,8 @@ public class Request {
 	public final static String EXPUNGE_KEY = "expunge";
 	public final static String TRACKING_REF = "trackingRef";
 	public final static String TRACKING_DATE = "trackingDate";
+	public final static String ADDRESSBOOK_REF = "addressBookRef";
+	public final static String ADDRESSBOOK_REF_ORIGIN = "addressBookRefOrigin";
 
 	public static Builder builder() {
 		return new Builder();

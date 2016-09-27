@@ -33,16 +33,21 @@ package org.obm.provisioning.contact;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.guava.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.commitBatch;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.createAddressBook;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.startBatch;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.waitForBatchSuccess;
 
 import java.net.URL;
 import java.sql.ResultSet;
+import java.util.Date;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -54,13 +59,20 @@ import org.obm.configuration.ContactConfiguration;
 import org.obm.dao.utils.H2InMemoryDatabase;
 import org.obm.dao.utils.H2InMemoryDatabaseTestRule;
 import org.obm.domain.dao.AddressBookDao;
+import org.obm.domain.dao.ContactDao;
 import org.obm.guice.GuiceRule;
 import org.obm.provisioning.TestingProvisioningModule;
 import org.obm.provisioning.beans.Request;
 import org.obm.server.WebServer;
+import org.obm.sync.auth.AccessToken;
 import org.obm.sync.book.AddressBook;
+import org.obm.sync.book.AddressBook.Id;
+import org.obm.sync.book.AddressBookReference;
+import org.obm.sync.book.ContactUpdates;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -88,11 +100,13 @@ public class ContactIntegrationTest {
 	@Inject private JMSServer jmsServer;
 	@Inject private DummyCommonsHttpSolrServer solrServer;
 	@Inject private AddressBookDao addressBookDao;
+	@Inject private ContactDao contactDao;
 	@Inject private ContactConfiguration contactConfiguration;
 	
 	private URL baseURL;
 	private ObmUser obmUser;
 	private ObmDomain domain;
+	private AccessToken token;
 	
 	@Before
 	public void init() throws Exception {
@@ -108,6 +122,8 @@ public class ContactIntegrationTest {
 			.syncable(true)
 			.build(), obmUser);
 		addressBookDao.enableAddressBookSynchronization(defaultAddressBook.getUid(), obmUser);
+		token = new AccessToken(obmUser.getUid(), "papi");
+		token.setDomain(domain);
 	}
 
 	@After
@@ -221,7 +237,10 @@ public class ContactIntegrationTest {
 		String vcf = Resources.toString(Resources.getResource("vcf/sample.vcf"), Charsets.UTF_8);
 		
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		importVCFAsTracked(vcf, "ref1", "2016-09-06T07:51:20Z");
+		importVCF(vcf, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.TRACKING_REF, "ref1",
+				Request.TRACKING_DATE, "2016-09-06T07:51:20Z"
+		));
 		commitBatch();
 		waitForBatchSuccess(batchId, 1, 0);
 		
@@ -238,7 +257,10 @@ public class ContactIntegrationTest {
 		String vcf = Resources.toString(Resources.getResource("vcf/only-one-vcard.vcf"), Charsets.UTF_8);
 		
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		importVCFAsTracked(vcf, "ref1", "2016-09-06T07:51:20Z");
+		importVCF(vcf, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.TRACKING_REF, "ref1",
+				Request.TRACKING_DATE, "2016-09-06T07:51:20Z"
+		));
 		commitBatch();
 		waitForBatchSuccess(batchId);
 
@@ -256,11 +278,18 @@ public class ContactIntegrationTest {
 		String vcf2 = vcf.replace("Shrimp Man", "New title");
 		
 		String batchId1 = startBatch(baseURL, obmDomainUuid);
-		importVCFAsTracked(vcf, "ref1", "2016-09-06T07:51:20Z");
+		importVCF(vcf, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.TRACKING_REF, "ref1",
+				Request.TRACKING_DATE, "2016-09-06T07:51:20Z"
+		));
 		commitBatch();
 		waitForBatchSuccess(batchId1);
+		
 		String batchId2 = startBatch(baseURL, obmDomainUuid);
-		importVCFAsTracked(vcf2, "ref1", "2016-09-06T07:51:20Z");
+		importVCF(vcf2, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.TRACKING_REF, "ref1",
+				Request.TRACKING_DATE, "2016-09-06T07:51:20Z"
+		));
 		commitBatch();
 		waitForBatchSuccess(batchId2);
 
@@ -279,11 +308,18 @@ public class ContactIntegrationTest {
 		String vcf2 = vcf.replace("Shrimp Man", "New title");
 		
 		String batchId1 = startBatch(baseURL, obmDomainUuid);
-		importVCFAsTracked(vcf, "ref1", "2016-09-06T07:51:20Z");
+		importVCF(vcf, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.TRACKING_REF, "ref1",
+				Request.TRACKING_DATE, "2016-09-06T07:51:20Z"
+		));
 		commitBatch();
 		waitForBatchSuccess(batchId1);
+		
 		String batchId2 = startBatch(baseURL, obmDomainUuid);
-		importVCFAsTracked(vcf2, "ref1", "2016-09-10T07:51:20Z");
+		importVCF(vcf2, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.TRACKING_REF, "ref1",
+				Request.TRACKING_DATE, "2016-09-10T07:51:20Z"
+		));
 		commitBatch();
 		waitForBatchSuccess(batchId2);
 
@@ -302,11 +338,18 @@ public class ContactIntegrationTest {
 		String vcf2 = vcf.replace("Shrimp Man", "New title");
 
 		String batchId1 = startBatch(baseURL, obmDomainUuid);
-		importVCFAsTracked(vcf, "ref1", "2016-09-06T07:51:20Z");
+		importVCF(vcf, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.TRACKING_REF, "ref1",
+				Request.TRACKING_DATE, "2016-09-06T07:51:20Z"
+		));
 		commitBatch();
 		waitForBatchSuccess(batchId1);
+		
 		String batchId2 = startBatch(baseURL, obmDomainUuid);
-		importVCFAsTracked(vcf2, "ref1", "2016-09-02T07:51:20Z");
+		importVCF(vcf2, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.TRACKING_REF, "ref1",
+				Request.TRACKING_DATE, "2016-09-02T07:51:20Z"
+		));
 		commitBatch();
 		waitForBatchSuccess(batchId2);
 
@@ -359,31 +402,123 @@ public class ContactIntegrationTest {
 		assertThat(solrServer.addCount).isEqualTo(3);
 		assertThat(solrServer.commitCount).isEqualTo(3);
 	}
+	
+	@Test
+	public void testImportVCFShouldFailWhenInvalidReference() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String vcf = Resources.toString(Resources.getResource("vcf/only-one-vcard.vcf"), Charsets.UTF_8);
+		String referenceValue = "1234";
+		String referenceOrigin = "exchange";
+		
+		String batchId = startBatch(baseURL, obmDomainUuid);
+		importVCF(vcf, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.ADDRESSBOOK_REF, referenceValue,
+				Request.ADDRESSBOOK_REF_ORIGIN, referenceOrigin
+		));
+		commitBatch();
+		waitForBatchSuccess(batchId, 1, 0, Matchers.containsString("\"error\":\""
+			+ "org.obm.provisioning.exception.ProcessingException: org.obm.sync.services.ImportVCardException: java.lang.IllegalStateException: "
+			+ "No addressbook has been found for the given reference: AddressBookReference{reference=1234, origin=exchange}"));
+	}
+	
+	@Test
+	public void testImportVCFShouldBeDoneInTheRightAddressBookWhenValidReference() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String vcf = Resources.toString(Resources.getResource("vcf/only-one-vcard.vcf"), Charsets.UTF_8);
+		String referenceValue = "1234";
+		String referenceOrigin = "exchange";
+		String addressBookCreationJson = "{"
+				+ "\"name\":\"the name\","
+				+ "\"role\":\"custom\","
+				+ "\"reference\": {"
+					+ "\"value\":\"" + referenceValue + "\","
+					+ "\"origin\":\"" + referenceOrigin + "\""
+				+ "}"
+			+ "}";
+		
+		String batchIdOfAddressBookCreation = startBatch(baseURL, obmDomainUuid);
+		createAddressBook(addressBookCreationJson, obmUser.getLoginAtDomain());
+		commitBatch();
+		waitForBatchSuccess(batchIdOfAddressBookCreation);
+		
+		String batchIdOfImport = startBatch(baseURL, obmDomainUuid);
+		importVCF(vcf, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.ADDRESSBOOK_REF, referenceValue,
+				Request.ADDRESSBOOK_REF_ORIGIN, referenceOrigin
+		));
+		commitBatch();
+		waitForBatchSuccess(batchIdOfImport);
+
+		Optional<Id> idByReference = addressBookDao.findByReference(new AddressBookReference(referenceValue, referenceOrigin));
+		assertThat(idByReference).isPresent();
+		
+		ContactUpdates contacts = contactDao.findUpdatedContacts(new Date(0), idByReference.get().getId(), token);
+		assertThat(contacts.getContacts()).extracting("firstname").containsOnly("Forrest");
+	}
+	
+	@Test
+	public void testImportVCFShouldUpdateContactWhenTrackingAndReference() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String vcf = Resources.toString(Resources.getResource("vcf/only-one-vcard.vcf"), Charsets.UTF_8);
+		String vcf2 = vcf.replace("Shrimp Man", "New title");
+		String referenceValue = "1234";
+		String referenceOrigin = "exchange";
+		String addressBookCreationJson = "{"
+				+ "\"name\":\"the name\","
+				+ "\"role\":\"custom\","
+				+ "\"reference\": {"
+					+ "\"value\":\"" + referenceValue + "\","
+					+ "\"origin\":\"" + referenceOrigin + "\""
+				+ "}"
+			+ "}";
+		
+		String batchIdOfAddressBookCreation = startBatch(baseURL, obmDomainUuid);
+		createAddressBook(addressBookCreationJson, obmUser.getLoginAtDomain());
+		commitBatch();
+		waitForBatchSuccess(batchIdOfAddressBookCreation);
+		
+		String batchIdOfImport = startBatch(baseURL, obmDomainUuid);
+		importVCF(vcf, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.ADDRESSBOOK_REF, referenceValue,
+				Request.ADDRESSBOOK_REF_ORIGIN, referenceOrigin,
+				Request.TRACKING_REF, "ref1",
+				Request.TRACKING_DATE, "2016-09-02T07:51:20Z"
+		));
+		commitBatch();
+		waitForBatchSuccess(batchIdOfImport);
+		
+		String batchIdOfUpdate = startBatch(baseURL, obmDomainUuid);
+		importVCF(vcf2, obmUser.getLoginAtDomain(), ImmutableMap.of(
+				Request.TRACKING_REF, "ref1",
+				Request.TRACKING_DATE, "2016-09-11T07:51:20Z"
+		));
+		commitBatch();
+		waitForBatchSuccess(batchIdOfUpdate);
+
+		Optional<Id> idByReference = addressBookDao.findByReference(new AddressBookReference(referenceValue, referenceOrigin));
+		assertThat(idByReference).isPresent();
+		
+		ContactUpdates contacts = contactDao.findUpdatedContacts(new Date(0), idByReference.get().getId(), token);
+		assertThat(contacts.getContacts()).extracting("title").containsOnly("New title");
+	}
 
 	private void importVCF(String vcf) {
 		importVCF(vcf, obmUser.getLoginAtDomain());
 	}
 	
 	private void importVCF(String vcf, String userEmail) {
+		importVCF(vcf, userEmail, ImmutableMap.<String, Object>of());
+	}
+	
+	private void importVCF(String vcf, String userEmail, Map<String, ?> queryParams) {
 		given()
 			.auth().basic("admin0@global.virt", "admin0")
-			.body(vcf).contentType(ContentType.TEXT).
+			.body(vcf).contentType(ContentType.TEXT)
+			.queryParams(queryParams).
 		expect()
 			.statusCode(Status.OK.getStatusCode()).
 		when()
 			.post("contacts/" + userEmail);
 	}
 	
-	private void importVCFAsTracked(String vcf, String ref, String date) {
-		given()
-			.auth().basic("admin0@global.virt", "admin0")
-			.body(vcf).contentType(ContentType.TEXT)
-			.queryParam(Request.TRACKING_REF, ref)
-			.queryParam(Request.TRACKING_DATE, date).
-		expect()
-			.statusCode(Status.OK.getStatusCode()).
-		when()
-			.post("contacts/" + obmUser.getLoginAtDomain());
-	}
-
 }

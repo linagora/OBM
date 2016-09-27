@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.guava.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.commitBatch;
+import static org.obm.provisioning.ProvisioningIntegrationTestUtils.createAddressBook;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.startBatch;
 import static org.obm.provisioning.ProvisioningIntegrationTestUtils.waitForBatchSuccess;
 
@@ -66,7 +67,6 @@ import org.obm.sync.host.ObmHost;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.jayway.restassured.http.ContentType;
 import com.linagora.obm.sync.JMSServer;
 
 import fr.aliacom.obm.common.domain.ObmDomain;
@@ -124,7 +124,7 @@ public class AddressBookIntegrationTest {
 		String batchId = startBatch(baseURL, obmDomainUuid);
 		
 		String json = "{}";
-		post(json, "unexisting_user@test.tlse.lng");
+		createAddressBook(json, "unexisting_user@test.tlse.lng");
 		commitBatch();
 		waitForBatchSuccess(batchId, 1, 0);
 
@@ -165,7 +165,7 @@ public class AddressBookIntegrationTest {
 			+ "}";
 		
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		post(json);
+		createAddressBook(json, obmUser.getLoginAtDomain());
 		commitBatch();
 		waitForBatchSuccess(batchId);
 
@@ -196,7 +196,7 @@ public class AddressBookIntegrationTest {
 			+ "}";
 		
 		String batchId = startBatch(baseURL, obmDomainUuid);
-		post(json);
+		createAddressBook(json, obmUser.getLoginAtDomain());
 		commitBatch();
 		waitForBatchSuccess(batchId);
 
@@ -226,7 +226,7 @@ public class AddressBookIntegrationTest {
 				+ "}"
 			+ "}";
 		
-		post(json);
+		createAddressBook(json, obmUser.getLoginAtDomain());
 
 		given()
 			.auth().basic("admin0@global.virt", "admin0").
@@ -307,12 +307,12 @@ public class AddressBookIntegrationTest {
 			+ "}";
 		
 		String batchId1 = startBatch(baseURL, obmDomainUuid);
-		post(creationJson);
+		createAddressBook(creationJson, obmUser.getLoginAtDomain());
 		commitBatch();
 		waitForBatchSuccess(batchId1);
 
 		String batchId2 = startBatch(baseURL, obmDomainUuid);
-		post(updatingJson);
+		createAddressBook(updatingJson, obmUser.getLoginAtDomain());
 		commitBatch();
 		waitForBatchSuccess(batchId2);
 
@@ -334,20 +334,6 @@ public class AddressBookIntegrationTest {
 				+ "where addressbook_id=" + addressBookId.getId() + " and user_id=" + obmUser.getUid());
 		results.next();
 		assertThat(results.getInt(1)).isEqualTo(1);
-	}
-	
-	private void post(String json) {
-		post(json, obmUser.getLoginAtDomain());
-	}
-	
-	private void post(String json, String userEmail) {
-		given()
-			.auth().basic("admin0@global.virt", "admin0")
-			.body(json).contentType(ContentType.JSON).
-		expect()
-			.statusCode(Status.OK.getStatusCode()).
-		when()
-			.post("addressbooks/" + userEmail);
 	}
 
 }
