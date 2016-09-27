@@ -126,7 +126,7 @@ public class ContactService {
 	}
 
 	private void importVCFAsNew(AccessToken token, List<Contact> contacts, Optional<Tracking> tracking) throws SQLException, ServerFault {
-		AddressBook.Id addressBookId = contactDao.findDefaultAddressBookId(token, false);
+		AddressBook.Id addressBookId = contactDao.findDefaultAddressBookId(token.getObmId(), false);
 
 		if (tracking.isPresent() && contacts.size() > 1) {
 			throw new ImportVCardException("Illegal state, the tracking cannot be used when the VCF contains multiple vCards");
