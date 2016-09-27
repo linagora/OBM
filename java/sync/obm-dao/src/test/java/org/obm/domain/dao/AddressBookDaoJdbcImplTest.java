@@ -30,6 +30,7 @@
 package org.obm.domain.dao;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.guava.api.Assertions.assertThat;
 
 import java.sql.ResultSet;
 
@@ -46,6 +47,7 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.AddressBook.Builder;
 import org.obm.sync.book.AddressBook.Id;
+import org.obm.sync.book.AddressBookReference;
 
 import com.google.inject.Inject;
 
@@ -144,4 +146,67 @@ public class AddressBookDaoJdbcImplTest implements H2TestClass {
 		assertThat(rs.getInt(1)).isEqualTo(1);
 	}
 
+	@Test
+	public void testFindByReferenceWhenNoneMatch() throws Exception {
+		AddressBookReference reference = new AddressBookReference("reference", "origin");
+		
+		assertThat(dao.findByReference(reference)).isAbsent();
+	}
+
+	@Test(expected=DaoException.class)
+	public void testCreateReferenceTriggersAnErrorWhenTheIdDoesNotExist() throws Exception {
+		Id addressBookId = Id.valueOf(4);
+		AddressBookReference reference = new AddressBookReference("reference", "origin");
+		
+		dao.createReference(reference, addressBookId);
+	}
+
+	@Test(expected=DaoException.class)
+	public void testCreateReferenceTriggersAnErrorWhenTheTupleReferenceOriginAlreadyExist() throws Exception {
+		AddressBook book = createBook();
+		AddressBookReference reference = new AddressBookReference("reference", "origin");
+		
+		dao.createReference(reference, book.getUid());
+		dao.createReference(reference, book.getUid());
+	}
+
+	@Test
+	public void testCreateReferenceAllowsToFindItLater() throws Exception {
+		AddressBook book = createBook();
+		AddressBookReference reference = new AddressBookReference("reference", "origin");
+		
+		dao.createReference(reference, book.getUid());
+		
+		assertThat(dao.findByReference(reference)).contains(book.getUid());
+	}
+
+	@Test
+	public void testRenameCannotBeDoneOnDefaultBook() throws Exception {
+		AddressBook book = createBook(true);
+		
+		dao.rename(book.getUid(), "newName");
+		
+		assertThat(dao.get(book.getUid()).getName()).isEqualTo("bookOfUser1");
+	}
+
+	@Test
+	public void testRenameCanBeDoneOnNonDefaultBook() throws Exception {
+		AddressBook book = createBook(false);
+		
+		dao.rename(book.getUid(), "newName");
+		
+		assertThat(dao.get(book.getUid()).getName()).isEqualTo("newName");
+	}
+	
+	private AddressBook createBook() throws DaoException {
+		return createBook(true);
+	}
+
+	private AddressBook createBook(boolean isDefault) throws DaoException {
+		return dao.create(AddressBook.builder()
+				.name("bookOfUser1")
+				.origin("tests")
+				.syncable(false)
+				.defaultBook(isDefault).build(), ToolBox.getDefaultObmUser());
+	}
 }

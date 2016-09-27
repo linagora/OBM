@@ -38,8 +38,10 @@ import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.push.utils.JDBCUtils;
 import org.obm.sync.book.AddressBook;
 import org.obm.sync.book.AddressBook.Id;
+import org.obm.sync.book.AddressBookReference;
 import org.obm.utils.ObmHelper;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -131,6 +133,76 @@ public class AddressBookDaoJdbcImpl implements AddressBookDao {
 
 			ps.setInt(1, user.getUid());
 			ps.setInt(2, id.getId());
+
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			obmHelper.cleanup(con, ps, null);
+		}
+	}
+	
+	@Override
+	public void createReference(AddressBookReference reference, Id addressBookId) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		
+		String query = "INSERT INTO AddressbookReference (addressbook_id, reference, origin) VALUES (?, ?, ?)";
+
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(query);
+			ps.setInt(1, addressBookId.getId());
+			ps.setString(2, reference.getReference());
+			ps.setString(3, reference.getOrigin());
+
+			ps.executeUpdate();
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			obmHelper.cleanup(con, ps, null);
+		}
+	}
+	
+	@Override
+	public Optional<AddressBook.Id> findByReference(AddressBookReference addressBookReference) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		
+		String query = "SELECT addressbook_id FROM AddressbookReference WHERE reference=? AND origin=?";
+
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, addressBookReference.getReference());
+			ps.setString(2, addressBookReference.getOrigin());
+
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				return Optional.of(AddressBook.Id.valueOf(rs.getString("addressbook_id")));
+			}
+			return Optional.absent();
+		} catch (SQLException e) {
+			throw new DaoException(e);
+		} finally {
+			obmHelper.cleanup(con, ps, rs);
+		}
+	}
+	
+	@Override
+	public void rename(AddressBook.Id addressBookId, String name) throws DaoException {
+		Connection con = null;
+		PreparedStatement ps = null;
+		
+		String query = "UPDATE addressbook SET name = ?, timeupdate = now() WHERE is_default = false AND id = ?";
+
+		try {
+			con = obmHelper.getConnection();
+			ps = con.prepareStatement(query);
+			ps.setString(1, name);
+			ps.setInt(2, addressBookId.getId());
 
 			ps.executeUpdate();
 		} catch (SQLException e) {
