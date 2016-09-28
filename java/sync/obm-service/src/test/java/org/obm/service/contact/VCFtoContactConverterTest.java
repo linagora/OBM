@@ -106,6 +106,24 @@ public class VCFtoContactConverterTest {
 	}
 	
 	@Test
+	public void convertShouldNotConsiderPostalAddressIfWorkIsDefined() throws IOException {
+		Contact expectedContact = new Contact();
+		expectedContact.setAka("");
+		expectedContact.setTitle("");
+		expectedContact.setCompany("Org name");
+		expectedContact.addPhone(ContactLabel.PHONE.getContactLabel(), new Phone("(01) 99 99 99 99"));
+		expectedContact.addAddress(ContactLabel.ADDRESS.getContactLabel(), 
+				new Address("9/11 rue du test et tout..\n07000  VILLAGE COOLING", null, null, "Francehor", "France", null));
+		expectedContact.addAddress(ContactLabel.ADDRESS_HOME.getContactLabel(), 
+				new Address(null, null, null, null, null, null));
+		
+		String vcfData = Resources.toString(Resources.getResource("vcf/with-multiple-addresses.vcf"), Charsets.UTF_8);
+		List<Contact> contacts = new VCFtoContactConverter().convert(vcfData);
+		
+		assertThat(contacts).containsOnly(expectedContact);
+	}
+	
+	@Test
 	public void convertShouldBehaveSmartlyWhenNoTypeIsDefined() throws IOException {
 		Contact expectedContact = new Contact();
 		expectedContact.setTitle("Business Man");
@@ -149,6 +167,7 @@ public class VCFtoContactConverterTest {
 		expectedContact2.addAddress(ContactLabel.ADDRESS_HOME.getContactLabel(), 
 				new Address("99 Plantation St.", "30314", null, "Baytown", "United States of America", "LA"));
 		expectedContact2.addEmail(ContactLabel.EMAIL.getContactLabel(), EmailAddress.loginAtDomain("email4@example.com"));
+		expectedContact2.setComment("Multiple lines\n\nwith email <mailto:contact@domain.org>");
 		
 		String vcfData = Resources.toString(Resources.getResource("vcf/sample.vcf"), Charsets.UTF_8);
 		List<Contact> contacts = new VCFtoContactConverter().convert(vcfData);

@@ -58,6 +58,7 @@ import ezvcard.parameter.EmailType;
 import ezvcard.parameter.TelephoneType;
 import ezvcard.property.Email;
 import ezvcard.property.Telephone;
+import ezvcard.property.TextProperty;
 
 @Singleton
 public class VCFtoContactConverter {
@@ -94,14 +95,19 @@ public class VCFtoContactConverter {
 		contact.setFirstname(vCard.getStructuredName() != null ? vCard.getStructuredName().getGiven() : null);
 		contact.setAka(vCard.getFormattedName() != null ? vCard.getFormattedName().getValue() : null);
 		contact.setCompany(vCard.getOrganization() != null ? firstValueOrNull(vCard.getOrganization().getValues()) : null);
-		contact.setTitle(vCard.getTitles().isEmpty() ? null : vCard.getTitles().get(0).getValue());
+		contact.setTitle(firstTextValueOrNull(vCard.getTitles()));
 		contact.setAnniversary(vCard.getBirthday() != null ? vCard.getBirthday().getDate() : null);
+		contact.setComment(firstTextValueOrNull(vCard.getNotes()));
 		
 		addPhones(contact, vCard.getTelephoneNumbers());
 		addAddress(contact, vCard.getAddresses());
 		addEmails(contact, vCard.getEmails());
 		
 		return contact;
+	}
+
+	private <T extends TextProperty> String firstTextValueOrNull(List<T> values) {
+		return values.isEmpty() ? null : values.get(0).getValue();
 	}
 
 	private void addPhones(Contact contact, List<Telephone> phones) {
@@ -153,7 +159,7 @@ public class VCFtoContactConverter {
 	}
 
 	private boolean hasNoWorkAddressYet(Contact contact) {
-		return contact.getAddresses().get(ContactLabel.ADDRESS) == null;
+		return contact.getAddresses().get(ContactLabel.ADDRESS.getContactLabel()) == null;
 	}
 
 	private void addAddress(Contact contact, ContactLabel addressHome, ezvcard.property.Address from) {

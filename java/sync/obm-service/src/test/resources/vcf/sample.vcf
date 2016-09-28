@@ -32,6 +32,7 @@ LABEL;TYPE=WORK,PREF:999 Waters Edge\nBaytown\, LA 30314\nUnited States of
 ADR;TYPE=HOME:;;99 Plantation St.;Baytown;LA;30314;United States of America
 LABEL;TYPE=HOME:99 Plantation St.\nBaytown\, LA 30314\nUnited States of Ame
  rica
+NOTE:Multiple lines\n\nwith email <mailto:contact@domain.org>
 EMAIL:email4@example.com
 REV:2008-04-24T19:52:43Z
 END:VCARD

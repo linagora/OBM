@@ -880,8 +880,8 @@ public class ContactDaoJdbcImpl implements ContactDao {
 					+ "contact_company, contact_aka, contact_service, contact_title, contact_birthday_id, contact_anniversary_id, "
 					+ "contact_timecreate, "
 					+ "contact_suffix, contact_middlename, contact_manager, contact_spouse, contact_assistant, "
-					+ "contact_collected, contact_addressbook_id) "
-					+ " VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), ?, ?, ?, ?, ?, ?, ?) ");
+					+ "contact_collected, contact_addressbook_id, contact_comment) "
+					+ " VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), ?, ?, ?, ?, ?, ?, ?, ?) ");
 			int idx = 1;
 			ps.setString(idx++, c.getCommonname());
 			ps.setString(idx++, c.getFirstname());
@@ -913,6 +913,7 @@ public class ContactDaoJdbcImpl implements ContactDao {
 
 			ps.setBoolean(idx++, c.isCollected());
 			ps.setInt(idx++, addressBookId);
+			ps.setString(idx++, c.getComment());
 
 			ps.executeUpdate();
 
