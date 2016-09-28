@@ -45,7 +45,9 @@ public enum ContactLabel {
 	EMAIL3("INTERNET;X-OBM-Ref3"),
 	
 	ADDRESS("WORK;X-OBM-Ref1"),
-	ADDRESS_HOME("HOME;X-OBM-Ref1");
+	ADDRESS_HOME("HOME;X-OBM-Ref1"),
+	
+	WEBSITE("URL;X-OBM-Ref1");
 
 	private final String contactLabel;
 

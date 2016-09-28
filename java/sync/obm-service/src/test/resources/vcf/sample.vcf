@@ -12,6 +12,8 @@ EMAIL;internet:email1@example.com
 EMAIL:email2@example.com
 EMAIL;work:email3@example.com
 BDAY:2016-07-10
+URL;TYPE=WORK:http://www.domain.org
+CALURI:http://example.com/calendar/jdoe
 REV:2008-04-24T19:52:43Z
 END:VCARD
 BEGIN:VCARD
@@ -34,5 +36,6 @@ LABEL;TYPE=HOME:99 Plantation St.\nBaytown\, LA 30314\nUnited States of Ame
  rica
 NOTE:Multiple lines\n\nwith email <mailto:contact@domain.org>
 EMAIL:email4@example.com
+URL:http://www.domain2.org
 REV:2008-04-24T19:52:43Z
 END:VCARD

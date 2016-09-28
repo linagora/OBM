@@ -40,6 +40,7 @@ import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.ContactLabel;
 import org.obm.sync.book.Phone;
+import org.obm.sync.book.Website;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -59,6 +60,7 @@ import ezvcard.parameter.TelephoneType;
 import ezvcard.property.Email;
 import ezvcard.property.Telephone;
 import ezvcard.property.TextProperty;
+import ezvcard.property.Url;
 
 @Singleton
 public class VCFtoContactConverter {
@@ -98,10 +100,12 @@ public class VCFtoContactConverter {
 		contact.setTitle(firstTextValueOrNull(vCard.getTitles()));
 		contact.setAnniversary(vCard.getBirthday() != null ? vCard.getBirthday().getDate() : null);
 		contact.setComment(firstTextValueOrNull(vCard.getNotes()));
+		contact.setCalUri(firstTextValueOrNull(vCard.getCalendarUris()));
 		
 		addPhones(contact, vCard.getTelephoneNumbers());
 		addAddress(contact, vCard.getAddresses());
 		addEmails(contact, vCard.getEmails());
+		addWebsites(contact, vCard.getUrls());
 		
 		return contact;
 	}
@@ -110,6 +114,12 @@ public class VCFtoContactConverter {
 		return values.isEmpty() ? null : values.get(0).getValue();
 	}
 
+	private void addWebsites(Contact contact, List<Url> list) {
+		if (list != null && !list.isEmpty()) {
+			contact.addWebsite(new Website(ContactLabel.WEBSITE.getContactLabel(), list.get(0).getValue()));
+		}
+	}
+	
 	private void addPhones(Contact contact, List<Telephone> phones) {
 		if (phones != null) {
 			for (Telephone phone : phones) {

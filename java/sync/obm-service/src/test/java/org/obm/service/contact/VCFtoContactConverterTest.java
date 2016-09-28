@@ -46,6 +46,7 @@ import org.obm.sync.book.Address;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.ContactLabel;
 import org.obm.sync.book.Phone;
+import org.obm.sync.book.Website;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
@@ -154,6 +155,8 @@ public class VCFtoContactConverterTest {
 		expectedContact1.addEmail(ContactLabel.EMAIL.getContactLabel(), EmailAddress.loginAtDomain("email1@example.com"));
 		expectedContact1.addEmail(ContactLabel.EMAIL2.getContactLabel(), EmailAddress.loginAtDomain("email2@example.com"));
 		expectedContact1.addEmail(ContactLabel.EMAIL3.getContactLabel(), EmailAddress.loginAtDomain("email3@example.com"));
+		expectedContact1.addWebsite(new Website(ContactLabel.WEBSITE.getContactLabel(), "http://www.domain.org"));
+		expectedContact1.setCalUri("http://example.com/calendar/jdoe");
 		
 		Contact expectedContact2 = new Contact();
 		expectedContact2.setLastname("Gump2");
@@ -168,6 +171,7 @@ public class VCFtoContactConverterTest {
 				new Address("99 Plantation St.", "30314", null, "Baytown", "United States of America", "LA"));
 		expectedContact2.addEmail(ContactLabel.EMAIL.getContactLabel(), EmailAddress.loginAtDomain("email4@example.com"));
 		expectedContact2.setComment("Multiple lines\n\nwith email <mailto:contact@domain.org>");
+		expectedContact2.addWebsite(new Website(ContactLabel.WEBSITE.getContactLabel(), "http://www.domain2.org"));
 		
 		String vcfData = Resources.toString(Resources.getResource("vcf/sample.vcf"), Charsets.UTF_8);
 		List<Contact> contacts = new VCFtoContactConverter().convert(vcfData);
