@@ -59,7 +59,7 @@ if [ -z "$JAVA_HOME" ]; then
 fi
 
 # Timeout in seconds for the shutdown of all webapps
-PROVISIONING_SHUTDOWN=10
+SHUTDOWN_TIMEOUT=10
 
 export JAVA_HOME
 export JAVA="$JAVA_HOME/bin/java"
@@ -81,12 +81,12 @@ fi
 ##################################################
 # PROVISIONING FUNCTIONS
 ##################################################
-provisioningIsStopped () {
+isStopped () {
         start-stop-daemon --quiet --test --start --pidfile "$PIDFILE" \
                           --user "$PROVISIONING_USER" --startas $JAVA > /dev/null
 }
 
-startProvisioning () {
+doStart () {
         touch $LOGFILE
         chown -R $PROVISIONING_USER:adm "$LOGDIR"
 
@@ -94,11 +94,29 @@ startProvisioning () {
                           --chuid "$PROVISIONING_USER" --startas $PROVISIONING_COMMAND >> $LOGFILE 2>&1 &
 }
 
-stopProvisioning () {
-        start-stop-daemon --quiet --stop --signal 9 --pidfile "$PIDFILE" \
-                          --user "$PROVISIONING_USER" --startas $JAVA >> $LOGFILE 2>&1
-        rm -f "$PIDFILE"
+doStop () {
+        stopWithSigTERM
+        while ! isStopped ; do
+                sleep 1
+                log_progress_msg "."
+                SHUTDOWN_TIMEOUT=`expr $SHUTDOWN_TIMEOUT - 1` || true
+                if [ $SHUTDOWN_TIMEOUT -ge 0 ]; then
+                        stopWithSigTERM
+                else
+                        log_progress_msg " (killing) "
+                        stopWithSigKILL
+                fi
+        done
 
+        rm -f "$PIDFILE"
+}
+stopWithSigTERM () {
+        start-stop-daemon --quiet --stop --signal 15 --pidfile "$PIDFILE" --oknodo \
+                          --user "$PROVISIONING_USER" --startas $JAVA >> $LOGFILE 2>&1
+}
+stopWithSigKILL () {
+        start-stop-daemon --quiet --stop --signal 9 --pidfile "$PIDFILE" --oknodo \
+                          --user "$PROVISIONING_USER" --startas $JAVA >> $LOGFILE 2>&1
 }
 
 ##################################################
@@ -107,13 +125,13 @@ stopProvisioning () {
 case "$1" in
   start)
         log_daemon_msg "Starting $DESC." "$NAME"
-        if provisioningIsStopped ; then
+        if isStopped ; then
 
                 if [ -f $PIDFILE ] ; then
                         log_warning_msg "$PIDFILE exists, but obm-provisioning was not running. Ignoring $PIDFILE"
                 fi
 
-                if startProvisioning ; then
+                if doStart; then
 	                log_daemon_msg "$DESC started, reachable on http://$HOSTNAME:$PROVISIONING_PORT/." "$NAME"
                         log_end_msg 0
                 else
@@ -130,21 +148,21 @@ case "$1" in
   stop)
         log_daemon_msg "Stopping $DESC (was reachable on http://$HOSTNAME:$PROVISIONING_PORT/)." "$NAME"
 
-        if provisioningIsStopped ; then
+        if isStopped ; then
                 if [ -x "$PIDFILE" ]; then
                         log_warning_msg "(not running but $PIDFILE exists)."
                 else
                         log_warning_msg "(not running)."
                 fi
         else
-                stopProvisioning
+                doStop
                 log_daemon_msg "$DESC stopped." "$NAME"
                 log_end_msg 0
         fi
         ;;
 
   status)
-        if provisioningIsStopped ; then
+        if isStopped ; then
                 if [ -f "$PIDFILE" ]; then
                     log_success_msg "$DESC is not running, but pid file exists."
                         exit 1
@@ -158,7 +176,7 @@ case "$1" in
         ;;
 
   restart)
-        if ! provisioningIsStopped ; then
+        if ! isStopped ; then
                 $0 stop $*
                 sleep 1
         fi
