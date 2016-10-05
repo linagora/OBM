@@ -328,6 +328,41 @@ public class AddressBookIntegrationTest {
 				.syncable(true)
 				.build());
 	}
+	
+	@Test
+	public void testPostShouldBeIdempotentWhenSameReferenceIsUsed() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+
+		String json = "{"
+				+ "\"name\":\"the collected address book name can't be choosen\","
+				+ "\"role\":\"collected\","
+				+ "\"reference\": {"
+					+ "\"value\":\"1234\","
+					+ "\"origin\":\"exchange\""
+				+ "}"
+			+ "}";
+		
+		String batchId1 = startBatch(baseURL, obmDomainUuid);
+		createAddressBook(json, obmUser.getLoginAtDomain());
+		commitBatch();
+		waitForBatchSuccess(batchId1);
+		
+		String batchId2 = startBatch(baseURL, obmDomainUuid);
+		createAddressBook(json, obmUser.getLoginAtDomain());
+		commitBatch();
+		waitForBatchSuccess(batchId2);
+
+		Optional<Id> idByReference = addressBookDao.findByReference(new AddressBookReference("1234", "exchange"));
+		assertThat(idByReference).isPresent();
+		assertThat(addressBookDao.get(idByReference.get())).isEqualTo(AddressBook.builder()
+				.uid(idByReference.get())
+				.name("collected_contacts")
+				.origin("provisioning")
+				.defaultBook(true)
+				.readOnly(false)
+				.syncable(true)
+				.build());
+	}
 
 	private void assertThatAddressBookIsSynced(Id addressBookId) throws Exception {
 		ResultSet results = db.execute("select count(1) from syncedaddressbook "

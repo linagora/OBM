@@ -121,9 +121,11 @@ public class AddressBookOperationProcessor extends AbstractOperationProcessor {
 	}
 
 	private void trackReference(AddressBookCreation creation, Id addressBookId) throws DaoException {
-		logger.info("Creating a new addressbook reference for id {}, role {}, reference {}",
-				addressBookId.getId(), creation.getRole().name(), creation.getReference().get());
-		addressBookDao.createReference(creation.getReference().get(), addressBookId);
+		if (!addressBookDao.findByReference(creation.getReference().get()).isPresent()) {
+			logger.info("Creating a new addressbook reference for id {}, role {}, reference {}",
+					addressBookId.getId(), creation.getRole().name(), creation.getReference().get());
+			addressBookDao.createReference(creation.getReference().get(), addressBookId);	
+		}
 	}
 
 	private AddressBookCreation getAddressBookCreationFromRequestBody(Operation operation) {
