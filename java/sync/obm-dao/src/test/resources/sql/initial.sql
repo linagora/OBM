@@ -1461,6 +1461,17 @@ CREATE SEQUENCE addressbook_id_seq
     CACHE 1;
 
 
+CREATE TABLE addressbookreference (
+    addressbook_id integer NOT NULL,
+    reference character varying(255) NOT NULL,
+    origin character varying(255) NOT NULL
+);
+
+ALTER TABLE addressbookreference
+    ADD CONSTRAINT addressbookreference_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES addressbook(id) ON DELETE CASCADE;
+
+ALTER TABLE addressbookreference
+    ADD CONSTRAINT addressbookreference_uniquekey UNIQUE (reference, origin);
 
 --
 -- Name: addressbook_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: obm

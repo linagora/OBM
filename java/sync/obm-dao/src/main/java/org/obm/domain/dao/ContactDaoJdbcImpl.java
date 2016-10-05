@@ -838,10 +838,10 @@ public class ContactDaoJdbcImpl implements ContactDao {
 	}
 
 	@Override
-	public AddressBook.Id findDefaultAddressBookId(AccessToken at, boolean collectedAddressBook) throws SQLException {
+	public AddressBook.Id findDefaultAddressBookId(int userObmId, boolean collectedAddressBook) throws SQLException {
 		Connection con = obmHelper.getConnection();
 		try {
-			return AddressBook.Id.valueOf(chooseAddressBookFromContact(con, at.getObmId(), collectedAddressBook));
+			return AddressBook.Id.valueOf(chooseAddressBookFromContact(con, userObmId, collectedAddressBook));
 		} finally {
 			obmHelper.cleanup(con, null, null);
 		}

@@ -283,4 +283,66 @@ public class SerializerDeserializerTest extends CommonDomainEndPointEnvTest {
 		
 		mocksControl.verify();
 	}
+	
+	@Test
+	public void testAddressBookCreationDeserializerAndSerializerWhenNoReference() throws DaoException, DomainNotFoundException {
+		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
+		mocksControl.replay();
+		
+		given()
+			.auth().basic("user@domain", "password")
+			.content(
+					"{"
+						+ "\"name\":\"the name\","
+						+ "\"role\":\"PRIMARY\""
+					+ "}")
+			.contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.content(containsString(
+					"{"
+						+ "\"name\":\"the name\","
+						+ "\"role\":\"PRIMARY\""
+					+ "}")).
+		when()
+			.post("/do/tests/on/serialization/of/addressbookcreation");
+		
+		mocksControl.verify();
+	}
+	
+	@Test
+	public void testAddressBookCreationDeserializerAndSerializerWhenFull() throws DaoException, DomainNotFoundException {
+		expectDomain();
+		expectSuccessfulAuthentication("user", "password");
+		mocksControl.replay();
+		
+		given()
+			.auth().basic("user@domain", "password")
+			.content(
+					"{"
+						+ "\"name\":\"the name\","
+						+ "\"role\":\"collected\","
+						+ "\"reference\":{"
+							+ "\"value\":\"1234\","
+							+ "\"origin\":\"exchange\""
+						+ "}"
+					+ "}")
+			.contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode())
+			.content(containsString(
+					"{"
+						+ "\"name\":\"the name\","
+						+ "\"role\":\"COLLECTED\","
+						+ "\"reference\":{"
+							+ "\"value\":\"1234\","
+							+ "\"origin\":\"exchange\""
+						+ "}"
+					+ "}")).
+		when()
+			.post("/do/tests/on/serialization/of/addressbookcreation");
+		
+		mocksControl.verify();
+	}
 }

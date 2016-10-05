@@ -46,9 +46,11 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.CommitedOperationDao;
 import org.obm.domain.dao.ContactDao;
 import org.obm.locator.LocatorClientException;
+import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.provisioning.dao.exceptions.FindException;
 import org.obm.service.solr.SolrHelper;
 import org.obm.service.solr.SolrHelper.Factory;
@@ -59,6 +61,8 @@ import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.EventNotFoundException;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.AddressBook;
+import org.obm.sync.book.AddressBook.Id;
+import org.obm.sync.book.AddressBookReference;
 import org.obm.sync.book.Contact;
 import org.obm.sync.dao.EntityId;
 import org.obm.sync.dao.Tracking;
@@ -79,19 +83,22 @@ public class ContactService {
 	private final Factory solrHelperFactory;
 	private final ContactDao contactDao;
 	private final CommitedOperationDao commitedOperationDao;
+	private final AddressBookDao addressBookDao;
 	private final VCFtoContactConverter contactConverter;
+
 
 	@Inject
 	public ContactService(SolrHelper.Factory solrHelperFactory, 
 			ContactDao contactDao, CommitedOperationDao commitedOperationDao,
-			VCFtoContactConverter contactConverter) {
+			AddressBookDao addressBookDao, VCFtoContactConverter contactConverter) {
 		this.solrHelperFactory = solrHelperFactory;
 		this.contactDao = contactDao;
-		this.contactConverter = contactConverter;
 		this.commitedOperationDao = commitedOperationDao;
+		this.addressBookDao = addressBookDao;
+		this.contactConverter = contactConverter;
 	}
 
-	public void importVCF(AccessToken token, String vcf, Optional<Tracking> tracking) throws ImportVCardException {
+	public void importVCF(AccessToken token, String vcf, Optional<Tracking> tracking, Optional<AddressBookReference> book) throws ImportVCardException {
 		try {
 			Optional<CommitedOperation<Contact>> previousImport = getPreviousImport(token, tracking);
 			List<Contact> contactsToImport = contactConverter.convert(vcf);
@@ -99,7 +106,7 @@ public class ContactService {
 			if (contactsToImport.isEmpty()) {
 				logger.warn("No contact found in the VCF");
 			} else if (!previousImport.isPresent()) {
-				importVCFAsNew(token, contactsToImport, tracking);
+				importVCFAsNew(token, contactsToImport, tracking, book);
 			} else if (previousImportDateIsBelow(previousImport.get(), tracking.get())) {
 				importVCFAsUpdatingContact(token, contactsToImport, tracking.get(), previousImport.get());
 			} else {
@@ -125,8 +132,10 @@ public class ContactService {
 		return commitedOperation.getClientDate().get().compareTo(tracking.getDate()) < 0;
 	}
 
-	private void importVCFAsNew(AccessToken token, List<Contact> contacts, Optional<Tracking> tracking) throws SQLException, ServerFault {
-		AddressBook.Id addressBookId = contactDao.findDefaultAddressBookId(token, false);
+	private void importVCFAsNew(AccessToken token, List<Contact> contacts, Optional<Tracking> tracking, Optional<AddressBookReference> book)
+			throws SQLException, ServerFault, DaoException {
+		
+		AddressBook.Id addressBookId = findAddressBookId(token, book);
 
 		if (tracking.isPresent() && contacts.size() > 1) {
 			throw new ImportVCardException("Illegal state, the tracking cannot be used when the VCF contains multiple vCards");
@@ -135,6 +144,19 @@ public class ContactService {
 		} else {
 			importContacts(token, addressBookId, contacts);
 		}
+	}
+
+	private AddressBook.Id findAddressBookId(AccessToken token, Optional<AddressBookReference> reference)
+			throws SQLException, DaoException {
+		
+		if (reference.isPresent()) {
+			Optional<Id> idByReference = addressBookDao.findByReference(reference.get());
+			if (idByReference.isPresent()) {
+				return idByReference.get();
+			}
+			throw new IllegalStateException("No addressbook has been found for the given reference: " + reference.get().toString());
+		}
+		return contactDao.findDefaultAddressBookId(token.getObmId(), false);
 	}
 
 	private void importVCFAsUpdatingContact(AccessToken token, List<Contact> contacts, Tracking tracking, CommitedOperation<Contact> previousImport)

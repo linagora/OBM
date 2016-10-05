@@ -33,6 +33,8 @@ package org.obm.sync;
 
 import java.util.Date;
 
+import nl.jqno.equalsverifier.Warning;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.obm.sync.addition.CommitedElement;
@@ -47,6 +49,8 @@ import org.obm.sync.bean.EqualsVerifierUtils;
 import org.obm.sync.bean.EqualsVerifierUtils.EqualsVerifierBuilder;
 import org.obm.sync.book.Address;
 import org.obm.sync.book.AddressBook;
+import org.obm.sync.book.AddressBookCreation;
+import org.obm.sync.book.AddressBookReference;
 import org.obm.sync.book.Contact;
 import org.obm.sync.book.DeletedContact;
 import org.obm.sync.book.InstantMessagingId;
@@ -89,7 +93,6 @@ import fr.aliacom.obm.common.user.UserLogin;
 import fr.aliacom.obm.common.user.UserPassword;
 import fr.aliacom.obm.common.user.UserPhones;
 import fr.aliacom.obm.common.user.UserWork;
-import nl.jqno.equalsverifier.Warning;
 
 
 public class BeansTest {
@@ -134,6 +137,7 @@ public class BeansTest {
 				ObmDomainUuid.class,
 				ObmSystemUser.class,
 				AddressBook.class,
+				AddressBookReference.class,
 				ModuleCheckBoxStates.class,
 				Profile.class,
 				EntityId.class,
@@ -216,6 +220,15 @@ public class BeansTest {
 			.equalsVerifiers(
 				CommitedElement.class,
 				CommitedOperation.class
+			).verify();
+	}
+	
+	@Test
+	public void testAddressBookCreation() {
+		EqualsVerifierBuilder.builder()
+			.prefabValue(Optional.class, Optional.absent(), Optional.of(new AddressBookReference("ref", "origin")))
+			.equalsVerifiers(
+				AddressBookCreation.class
 			).verify();
 	}
 }

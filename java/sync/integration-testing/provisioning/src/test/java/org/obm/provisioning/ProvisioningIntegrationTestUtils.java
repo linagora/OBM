@@ -46,6 +46,7 @@ import org.hamcrest.Matchers;
 
 import com.jayway.awaitility.Duration;
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.http.ContentType;
 
 import fr.aliacom.obm.common.domain.ObmDomainUuid;
 
@@ -161,5 +162,15 @@ public class ProvisioningIntegrationTestUtils {
 				}
 	        	
 	        });
+	}
+	
+	public static void createAddressBook(String json, String userEmail) {
+		given()
+			.auth().basic("admin0@global.virt", "admin0")
+			.body(json).contentType(ContentType.JSON).
+		expect()
+			.statusCode(Status.OK.getStatusCode()).
+		when()
+			.post("addressbooks/" + userEmail);
 	}
 }

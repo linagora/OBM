@@ -43,6 +43,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.CommitedOperationDao;
 import org.obm.domain.dao.ContactDao;
 import org.obm.guice.GuiceModule;
@@ -74,6 +75,7 @@ public class ContactServiceTest {
 
 			bindWithMock(SolrHelper.Factory.class);
 			bindWithMock(ContactDao.class);
+			bindWithMock(AddressBookDao.class);
 			bindWithMock(CommitedOperationDao.class);
 		}
 

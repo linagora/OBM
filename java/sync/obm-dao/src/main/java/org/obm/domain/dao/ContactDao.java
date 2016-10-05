@@ -88,7 +88,7 @@ public interface ContactDao {
 
 	Set<DeletedContact> findRemovalCandidates(Date d, AccessToken at) throws SQLException;
 
-	AddressBook.Id findDefaultAddressBookId(AccessToken at, boolean collectedAddressBook) throws SQLException;
+	AddressBook.Id findDefaultAddressBookId(int userObmId, boolean collectedAddressBook) throws SQLException;
 	
 	List<AddressBook> findAddressBooks(AccessToken at) throws SQLException;
 

@@ -52,6 +52,7 @@ import org.obm.configuration.ContactConfiguration;
 import org.obm.configuration.DatabaseConfiguration;
 import org.obm.dbcp.DatabaseConfigurationFixturePostgreSQL;
 import org.obm.dbcp.DatabaseConnectionProvider;
+import org.obm.domain.dao.AddressBookDao;
 import org.obm.domain.dao.CommitedOperationDao;
 import org.obm.domain.dao.ContactDao;
 import org.obm.guice.GuiceModule;
@@ -94,6 +95,7 @@ public class AddressBookBindingImplTest {
 
 			bindWithMock(ObmHelper.class);
 			bindWithMock(ContactDao.class);
+			bindWithMock(AddressBookDao.class);
 			bindWithMock(UserDao.class);
 			bindWithMock(ContactMerger.class);
 			bindWithMock(ContactConfiguration.class);

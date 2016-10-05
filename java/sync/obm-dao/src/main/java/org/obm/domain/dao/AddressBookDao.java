@@ -31,6 +31,9 @@ package org.obm.domain.dao;
 
 import org.obm.provisioning.dao.exceptions.DaoException;
 import org.obm.sync.book.AddressBook;
+import org.obm.sync.book.AddressBookReference;
+
+import com.google.common.base.Optional;
 
 import fr.aliacom.obm.common.user.ObmUser;
 
@@ -41,5 +44,11 @@ public interface AddressBookDao {
 	AddressBook create(AddressBook book, ObmUser owner) throws DaoException;
 
 	void enableAddressBookSynchronization(AddressBook.Id id, ObmUser user) throws DaoException;
+
+	Optional<AddressBook.Id> findByReference(AddressBookReference reference) throws DaoException;
+
+	void rename(AddressBook.Id addressBookId, String name) throws DaoException;
+
+	void createReference(AddressBookReference reference, AddressBook.Id addressBookId) throws DaoException;
 
 }

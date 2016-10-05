@@ -40,6 +40,7 @@ import org.obm.provisioning.processing.impl.AbstractOperationProcessor;
 import org.obm.push.utils.DateUtils;
 import org.obm.service.contact.ContactService;
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.book.AddressBookReference;
 import org.obm.sync.dao.Tracking;
 
 import com.google.common.base.Optional;
@@ -67,7 +68,10 @@ public class ContactOperationProcessor extends AbstractOperationProcessor {
 			String userEmail = operation.getRequest().getParams().get(Request.USERS_EMAIL_KEY);
 			AccessToken token = accessTokenFactory.build(getUserFromDao(userEmail, batch.getDomain()), PAPI_ORIGIN);
 			
-			contactService.importVCF(token, operation.getRequest().getBody(), buildTrackingIfPresent(token, operation));
+			contactService.importVCF(token, operation.getRequest().getBody(), 
+				buildTrackingIfPresent(token, operation),
+				buildAddressBookReferenceIfPresent(operation)
+			);
 		} catch (Exception e) {
 			throw new ProcessingException(e);
 		}
@@ -79,6 +83,17 @@ public class ContactOperationProcessor extends AbstractOperationProcessor {
 		
 		if (reference != null && date != null) {
 			return Optional.of(new Tracking(token, reference, DateUtils.dateUTC(date)));
+		}
+		
+		return Optional.absent();
+	} 
+
+	private Optional<AddressBookReference> buildAddressBookReferenceIfPresent(Operation operation) {
+		String reference = operation.getRequest().getParams().get(Request.ADDRESSBOOK_REF);
+		String origin = operation.getRequest().getParams().get(Request.ADDRESSBOOK_REF_ORIGIN);
+		
+		if (reference != null && origin != null) {
+			return Optional.of(new AddressBookReference(reference, origin));
 		}
 		
 		return Optional.absent();

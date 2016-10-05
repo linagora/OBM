@@ -1,5 +1,5 @@
 CREATE DOMAIN batch_status AS VARCHAR CHECK VALUE IN ('IDLE', 'RUNNING', 'ERROR', 'SUCCESS');
-CREATE DOMAIN batch_entity_type AS VARCHAR CHECK VALUE IN ('GROUP', 'USER', 'GROUP_MEMBERSHIP', 'USER_MEMBERSHIP', 'EVENT', 'CONTACT');
+CREATE DOMAIN batch_entity_type AS VARCHAR CHECK VALUE IN ('GROUP', 'USER', 'GROUP_MEMBERSHIP', 'USER_MEMBERSHIP', 'EVENT', 'CONTACT', 'ADDRESS_BOOK');
 CREATE DOMAIN http_verb AS VARCHAR CHECK VALUE IN ('PUT', 'PATCH', 'GET', 'POST', 'DELETE');
 CREATE DOMAIN vkind AS VARCHAR (16) CHECK VALUE IN ('VEVENT', 'VCONTACT');
 
@@ -31,6 +31,11 @@ CREATE DOMAIN vrole AS VARCHAR (16) CHECK VALUE IN (
     'REQ',
     'OPT',
     'NON'
+);
+
+CREATE TABLE obminfo (
+    obminfo_name character varying(32) DEFAULT ''::character varying NOT NULL,
+    obminfo_value character varying(255) DEFAULT ''
 );
 
 CREATE TABLE serviceproperty (
@@ -217,14 +222,40 @@ CREATE TABLE userobm (
 );
 
  CREATE TABLE entity (
-    entity_id integer ,
+    entity_id integer PRIMARY KEY AUTO_INCREMENT,
     entity_mailing boolean
 );
 
 CREATE TABLE userentity (
-    userentity_entity_id integer PRIMARY KEY AUTO_INCREMENT,
+    userentity_entity_id integer NOT NULL,
     userentity_user_id integer NOT NULL
 );
+
+ALTER TABLE userentity
+    ADD CONSTRAINT userentity_entity_id_entity_id_fkey FOREIGN KEY (userentity_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE userentity
+    ADD CONSTRAINT userentity_user_id_user_id_fkey FOREIGN KEY (userentity_user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+CREATE TABLE calendarentity (
+    calendarentity_entity_id integer NOT NULL,
+    calendarentity_calendar_id integer NOT NULL
+);
+
+ALTER TABLE calendarentity
+    ADD CONSTRAINT calendarentity_calendar_id_calendar_id_fkey FOREIGN KEY (calendarentity_calendar_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE calendarentity
+    ADD CONSTRAINT calendarentity_entity_id_entity_id_fkey FOREIGN KEY (calendarentity_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+CREATE TABLE mailboxentity (
+    mailboxentity_entity_id integer NOT NULL,
+    mailboxentity_mailbox_id integer NOT NULL
+);
+
+ALTER TABLE mailboxentity
+    ADD CONSTRAINT mailboxentity_entity_id_entity_id_fkey FOREIGN KEY (mailboxentity_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE mailboxentity
+    ADD CONSTRAINT mailboxentity_mailbox_id_mailbox_id_fkey FOREIGN KEY (mailboxentity_mailbox_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
 
 CREATE TABLE userobmgroup (
     userobmgroup_group_id integer PRIMARY KEY AUTO_INCREMENT,
@@ -749,6 +780,24 @@ CREATE TABLE commitedoperation (
     commitedoperation_client_date timestamp
 );
 
+CREATE TABLE addressbookreference (
+    addressbook_id integer NOT NULL,
+    reference character varying(255) NOT NULL,
+    origin character varying(255) NOT NULL
+);
+
+ALTER TABLE addressbookreference
+    ADD CONSTRAINT addressbookreference_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES addressbook(id) ON DELETE CASCADE;
+
+ALTER TABLE addressbookreference
+    ADD CONSTRAINT addressbookreference_uniquekey UNIQUE (reference, origin);
+
+CREATE TABLE _userpattern (
+    id integer,
+    pattern character varying(255)
+);
+ALTER TABLE _userpattern
+    ADD CONSTRAINT _userpattern_id_userobm_id_fkey FOREIGN KEY (id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 INSERT INTO domainentity (domainentity_entity_id, domainentity_domain_id) VALUES (1, 1), (2, 2), (3, 3);
 
@@ -757,6 +806,8 @@ INSERT INTO domain (domain_name, domain_uuid, domain_label, domain_global)
 	('global.virt', 'abf7c2bc-aa84-461c-b057-ee42c5dce40a', 'global.virt', true),
 	('test.tlse.lng', 'ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6', 'test.tlse.lng', false),
 	('test2.tlse.lng', '3a2ba641-4ae0-4b40-aa5e-c3fd3acb78bf', 'test2.tlse.lng', false);
+
+INSERT INTO host (host_name, host_domain_id) VALUES ('mailhost', 2);
 
 INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email)
  VALUES (2, 0, 0, 1, 'AdminExtId', 0, 1001, 'Admin', 'Admin Group Desc', 'group_admin@obm.org'), 
@@ -773,14 +824,14 @@ INSERT INTO entity (entity_mailing)
         (true),
         (true),
         (true);
-        
-INSERT INTO userentity (userentity_entity_id, userentity_user_id)
-    VALUES (4, 1), (5, 2), (6, 3);
 
 INSERT INTO UserObm (userobm_domain_id, userobm_ext_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_archive, userobm_email, userobm_mail_server_id) 
 	 VALUES (1, 'Admin0ExtId','admin0','admin0','PLAIN','admin', 'Lastname', 'Firstname', '1000', '512', '0', 'admin0', NULL),
 		(2, 'User1','user1','user1','PLAIN','user', '', '', '2002', '512', '0', 'user1', NULL),
 		(2, 'mismatch','email-mismatch-login-user','secret','PLAIN','user', '', '', '2002', '512', '0', 'mismatch@test.tlse.lng', NULL);
+        
+INSERT INTO userentity (userentity_entity_id, userentity_user_id)
+    VALUES (4, 1), (5, 2), (6, 3);
  
 INSERT INTO userobmgroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES (2, 1), (5, 1);
 

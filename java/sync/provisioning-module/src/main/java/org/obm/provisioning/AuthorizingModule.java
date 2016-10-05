@@ -73,6 +73,7 @@ public class AuthorizingModule extends ShiroWebModule {
 		addFilterChain(baseUrl + "**/batches/**/groups/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubBatchResourceAuthorizationFilter.class));
 		addFilterChain(baseUrl + "**/batches/**/events/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubBatchResourceAuthorizationFilter.class));
 		addFilterChain(baseUrl + "**/batches/**/contacts/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubBatchResourceAuthorizationFilter.class));
+		addFilterChain(baseUrl + "**/batches/**/addressbooks/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubBatchResourceAuthorizationFilter.class));
 		addFilterChain(baseUrl + "**/users/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
 		addFilterChain(baseUrl + "**/groups/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
 		addFilterChain(baseUrl + "**/profiles/**", NO_SESSION_CREATION, Key.get(MDCFilter.class), AUTHC_BASIC, Key.get(SubDomainAuthorizationFilter.class));
