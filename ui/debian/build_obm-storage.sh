@@ -214,4 +214,7 @@ cp ${OBM_UPDATE_SCRIPTS_31}/update-3.1.6~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.
 # Upgrade Pg OBM 3.2.0
 cp ${OBM_UPDATE_SCRIPTS_32}/update-3.2.0~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.2.0~1
 
+# Upgrade Pg OBM 3.2.1
+cp ${OBM_UPDATE_SCRIPTS_32}/update-3.2.1~1.pgsql.sql ${UPGRADE_SQL_DIR_PGSQL}/3.2.1~1
+
 exit 0
