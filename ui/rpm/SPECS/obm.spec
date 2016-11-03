@@ -643,6 +643,8 @@ fi
 #empty package :(
 
 %changelog
+* Thu Nov 03 2016 Thomas Sarboni <tsarboni@linagora.com> - obm-3.2.2-0.alpha0
+- New upstream release.
 * Mon Oct 10 2016 Thomas Sarboni <tsarboni@linagora.com> - obm-3.2.1-0.rc2
 - New upstream release.
 * Mon Oct 10 2016 Thomas Sarboni <tsarboni@linagora.com> - obm-3.2.1-0.rc1
