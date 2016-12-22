@@ -32,9 +32,11 @@
 package org.obm.utils;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.Date;
 
 import org.obm.configuration.DatabaseConfiguration;
@@ -220,6 +222,14 @@ public class ObmHelper implements DateProvider {
 			throw Throwables.propagate(e);
 		} finally {
 			cleanup(con, null, null);
+		}
+	}
+
+	public void setInteger(PreparedStatement ps, int index, Integer value) throws SQLException {
+		if (value != null) {
+			ps.setInt(index, value);
+		} else {
+			ps.setNull(index, Types.INTEGER);
 		}
 	}
 }

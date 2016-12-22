@@ -1884,13 +1884,9 @@ public class CalendarDaoJdbcImpl implements CalendarDao {
 					.getJdbcObject(ObmHelper.VOPACITY, ev.getOpacity().toString()));
 			ps.setString(5, ev.getTitle());
 			ps.setString(6, ev.getLocation());
-			Integer cat = catIdFromString(con, ev.getCategory(), at.getDomain().getId());
-			if (cat != null) {
-				ps.setInt(7, cat);
-			} else {
-				ps.setNull(7, Types.INTEGER);
-			}
-			ps.setInt(8, ev.getPriority());
+			obmHelper.setInteger(ps, 7, catIdFromString(con, ev.getCategory(), at.getDomain().getId()));
+			obmHelper.setInteger(ps, 8, ev.getPriority());
+
 			// do not allow making a private event become public from sync
 			// ps.setInt(9, old.getPrivacy() != 1 ? ev.getPrivacy() : old
 			// .getPrivacy());

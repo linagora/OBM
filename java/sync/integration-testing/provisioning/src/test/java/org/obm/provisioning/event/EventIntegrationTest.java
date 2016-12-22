@@ -405,6 +405,27 @@ public class EventIntegrationTest {
 		assertThat(solrServer.commitCount).isEqualTo(2);
 	}
 	
+	@Test
+	public void testImportICSWhenTheEventIsAlreadyKnownAndNoPriority() throws Exception {
+		ObmDomainUuid obmDomainUuid = ObmDomainUuid.of("ac21bc0c-f816-4c52-8bb9-e50cfbfec5b6");
+		String ics = Resources.toString(Resources.getResource("ics/simple-no-priority.ics"), Charsets.UTF_8);
+		
+		// Create the event in OBM first
+		String batchId1 = startBatch(baseURL, obmDomainUuid);
+		importICS(ics);
+		commitBatch();
+		waitForBatchSuccess(batchId1);
+
+		// Then simulate a new import with the same sequence
+		String batchId2 = startBatch(baseURL, obmDomainUuid);
+		importICS(ics.replace("SEQUENCE:0", "SEQUENCE:1"));
+		commitBatch();
+		waitForBatchSuccess(batchId2);
+		
+		assertThat(solrServer.addCount).isEqualTo(2);
+		assertThat(solrServer.commitCount).isEqualTo(2);
+	}
+	
 	private void importICS(String ics) {
 		importICS(ics, "user1@test.tlse.lng");
 	}
