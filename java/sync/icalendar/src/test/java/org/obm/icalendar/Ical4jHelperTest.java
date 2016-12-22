@@ -1088,6 +1088,14 @@ public class Ical4jHelperTest {
 		}
 		assertTrue(true);
 	}
+	
+	@Test
+	public void testParsingICSWhenChairAndReqParticipant() throws IOException, ParserException {
+		List<Event> events = ical4jHelper.parseICS(getICSAsString("attendee.ics"), getDefaultObmUser(), 0);
+		
+		assertThat(events).hasSize(1);
+		assertThat(events.get(0).getAttendees()).extracting("participationRole").containsOnly(ParticipationRole.REQ, ParticipationRole.CHAIR);
+	}
 
 	@Test
 	public void testParsingICSFilesWhichDontProvideUid() throws IOException, ParserException {

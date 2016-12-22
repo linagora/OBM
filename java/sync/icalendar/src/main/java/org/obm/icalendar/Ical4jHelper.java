@@ -1721,6 +1721,8 @@ public class Ical4jHelper implements RecurrenceHelper {
 			
 			if (dashIndex != -1) {
 				attendee.setParticipationRole(ParticipationRole.valueOf(role.substring(0, dashIndex)));
+			} else if (ParticipationRole.CHAIR.name().equalsIgnoreCase(role)) {
+				attendee.setParticipationRole(ParticipationRole.CHAIR);
 			}
 		}
 
