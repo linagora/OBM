@@ -666,7 +666,7 @@ sub _updateAcls {
 
         while( my( $userName, $value ) = each( %$oldUserList ) ) {
             if( !defined($newUserList) || !exists( $newUserList->{$userName} ) ) {
-                if ($self->_imapSetMailboxAcl( $mailboxPath, $userName, 'none' )) {
+                if ($self->_imapDeleteMailboxAcl( $mailboxPath, $userName )) {
                     $errors++;
                 }
             }
@@ -952,6 +952,31 @@ sub _imapSetMailboxAcl {
     $cyrusSrvConn->setaclmailbox( $boxName, $boxRightUser => $imapRight );
     if( $cyrusSrvConn->error() ) {
         $self->_log( 'erreur Cyrus au positionnement des ACLs de la BAL \''.$boxName.'\' : '.$cyrusSrvConn->error(), 1 );
+        return 1;
+    }
+
+    return 0;
+}
+
+sub _imapDeleteMailboxAcl {
+    my $self = shift;
+    my( $boxName, $boxAclUser ) = @_;
+
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
+        return 1;
+    }
+
+    my $cyrusSrvConn = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
+    if( !defined($cyrusSrvConn) ) {
+        return 1;
+    }
+
+    $self->_log( 'DELETEACLMAILBOX ' . $boxName . ' ' . $boxAclUser, 4 );
+
+    $cyrusSrvConn->deleteaclmailbox( $boxName, $boxAclUser );
+    if( $cyrusSrvConn->error() ) {
+        $self->_log( 'erreur Cyrus a la suppression de l\'ACL \'' . $boxAclUser . '\' de la BAL \'' . $boxName . '\' : '.$cyrusSrvConn->error(), 1 );
         return 1;
     }
 
