@@ -2032,7 +2032,6 @@ function dis_contact_csv_export_all($contacts) {
   $csv = array();
   $f = array();
   $fields = array_keys(get_display_pref($GLOBALS['obm']['uid'], 'contact'));
-  $f[] = $GLOBALS['fieldnames']["displayname"];
   foreach($fields as $field) {
     $f[] = $GLOBALS['fieldnames'][$field];
   }
