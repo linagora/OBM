@@ -73,6 +73,9 @@
   color: #fff !important;
 }
 
+#addressBookContainer tbody td .dropDownMenu ul a {
+  color: #555 !important;
+}
 
 #addressBookContainer td div img {
   padding: 0 2px 2px 0;
