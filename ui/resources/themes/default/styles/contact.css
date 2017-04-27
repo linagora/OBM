@@ -130,9 +130,14 @@
   height: auto;
 }
 
-.addressBookMenu {
+#addressBookContainer form {
+  position: relative;
+}
+
+.addressBookMenu.dropDownMenu {
   display: inline;
-  margin-left: 13.5em;
+  float: right;
+  position: relative;
 }
 
 #addAddressBook {

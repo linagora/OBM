@@ -47,7 +47,7 @@
         <script type='text/javascript'>
           $('addressbook-<?php echo $_id ?>').store('write', <?php echo $_addressbook->write ?>);
           $('addressbook-<?php echo $_id ?>').store('search', 'addressbookId:<?php echo $_id ?> -is:archive');
-          new Obm.DropDownMenu($('addressbook-<?php echo $_id ?>').getElement('ul'));
+          new Obm.DropDownMenu($('addressbook-<?php echo $_id ?>').getElement('ul'), { positioning: 'fixed' });
         </script>
       </form>
       <span class='I legend' style='margin-left:20px;'><span id='count_addressbook_<?php echo $_id;?>'><?php echo $addressbooks->countContacts('addressbookId:'. $_id .' -is:archive'); ?></span><?php echo " ".__('contact(s)'); ?></span>
@@ -83,7 +83,7 @@
           <script type='text/javascript'>
             $('addressbook-search').store('write', 0);
             $('addressbook-search').store('search', '<?php $search ?>');
-            new Obm.DropDownMenu($('addressbook-search').getElement('ul'));
+            new Obm.DropDownMenu($('addressbook-search').getElement('ul'), { positioning: 'fixed' });
             function setSearchFolderLinks() {
               var pattern = $('searchpattern').value;
               $('saveSearchFolder').href = 'contact_index.php?action=save&searchpattern='+pattern;

@@ -7,7 +7,8 @@ Obm.DropDownMenu= new Class({
 		openDelay:10,	//if hover mode, duration the mouse must stay on target before submenu is opened. if exits before delay expires, timer is cleared 
 		closeDelay:350,	//delay before the submenu close when mouse exits. If mouse enter the submenu again before timer expires, it's cleared
 		link:'cancel',
-		mode:'horizontal' //if set to horizontal, the top level menu will be displayed horizontally. If set to vertical, it will be displayed vertically. If it does not match any of those two words, 'horizontal' will be used.
+		mode:'horizontal', //if set to horizontal, the top level menu will be displayed horizontally. If set to vertical, it will be displayed vertically. If it does not match any of those two words, 'horizontal' will be used.
+		positioning: 'absolute' // or 'fixed'
 	},
 
 	initialize: function(menu,options){
@@ -95,7 +96,7 @@ Obm.DropDownMenu= new Class({
 					this.options.link='chain';
 				}
 				innerUl.setStyles({
-					position:'absolute',
+					position: this.options.positioning,
 					top:y,
 					opacity:0
 				});
@@ -119,7 +120,7 @@ Obm.DropDownMenu= new Class({
                                                 } else {
                                                   e.stop();
                                                   $clear(li.retrieve('closeDelay'));
-                                                  this.showChildList(li);
+                                                  this.showChildList(li, e);
                                                 }
 					}.bind(this));
 				}else{
@@ -137,12 +138,21 @@ Obm.DropDownMenu= new Class({
 	},
 	
 	//display submenu
-	showChildList:function(li){
-                this.menu.setStyle('z-index', 1000);
-                li.setStyle('z-index', 1000);
-		li.getFirst('ul').setStyles({'opacity' : 1, 'display' :'block'});
-                li.getFirst('ul').getChildren('li').setStyles({'opacity' : 1, 'display' :'block', 'z-index' : 1000});
+	showChildList:function(li, event){
+		var dropdownMenuStyles = {
+			opacity : 1,
+			display :'block'
+		};
 
+        if (this.options.positioning === 'fixed') {
+            dropdownMenuStyles.left = event.event.pageX;
+            dropdownMenuStyles.top = event.event.pageY;
+        }
+
+		this.menu.setStyle('z-index', 1000);
+		li.setStyle('z-index', 1000);
+		li.getFirst('ul').setStyles(dropdownMenuStyles);
+		li.getFirst('ul').getChildren('li').setStyles({'opacity' : 1, 'display' :'block', 'z-index' : 1000});
 	},
 	
 	//hide the menu
