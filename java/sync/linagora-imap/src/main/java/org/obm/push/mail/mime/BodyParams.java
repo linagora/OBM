@@ -43,9 +43,11 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableListMultimap;
@@ -140,17 +142,18 @@ public class BodyParams implements Iterable<BodyParam> {
 
 	}
 	
-	private static class GroupedBodyParamBuilder {
+	@VisibleForTesting static class GroupedBodyParamBuilder {
 
 		private static final Logger logger = LoggerFactory.getLogger(GroupedBodyParamBuilder.class);
 		private static final String DEFAULT_CHARSET = Charsets.UTF_8.name();
 		
 		private final TreeMap<Integer, String> indexToValueMap;
 		private String groupKey;
-		private String groupCharset;
+		@VisibleForTesting Optional<String> groupCharset;
 
 		public GroupedBodyParamBuilder() {
 			indexToValueMap = Maps.newTreeMap();
+			groupCharset = Optional.absent();
 		}
 
 		public void add(int index, BodyParam bodyParam) {
@@ -168,16 +171,20 @@ public class BodyParams implements Iterable<BodyParam> {
 			}
 		}
 
-		private void assignGroupCharset(BodyParam bodyParam) {
-			if (!bodyParam.getCharset().isPresent()) {
+		@VisibleForTesting void assignGroupCharset(BodyParam bodyParam) {
+			if (!bodyParam.getCharset().isPresent() || Strings.isNullOrEmpty(bodyParam.getCharset().get())) {
 				return;
 			}
 
-			if (groupCharset == null) {
-				groupCharset = bodyParam.getCharset().get(); 
-			} else if (groupCharset != null && !bodyParam.getCharset().get().equalsIgnoreCase(groupCharset)) {
+			if (!groupCharset.isPresent()) {
+				groupCharset = bodyParam.getCharset(); 
+			} else if (!areCharsetsIdentical(bodyParam)) {
 				throw new IllegalStateException("A charset has already been found for this group");
 			}
+		}
+
+		private boolean areCharsetsIdentical(BodyParam bodyParam) {
+			return bodyParam.getCharset().get().equalsIgnoreCase(groupCharset.get());
 		}
 
 		public boolean hasItem() {
@@ -187,7 +194,7 @@ public class BodyParams implements Iterable<BodyParam> {
 		public BodyParam build() {
 			String joinedValues = Joiner.on("").join(indexToValueMap.values());
 			try {
-				Charset usingCharset = Charset.forName(Objects.firstNonNull(groupCharset, DEFAULT_CHARSET));
+				Charset usingCharset = Charset.forName(groupCharset.or(DEFAULT_CHARSET));
 				String groupValue = URLDecoder.decode(joinedValues, usingCharset.displayName());
 				return new BodyParam(groupKey, groupValue);
 			} catch (UnsupportedEncodingException| UnsupportedCharsetException e) {

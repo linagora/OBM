@@ -392,7 +392,7 @@ public class BodyStructureParser {
 	
 	private static final Rules parser = Parboiled.createParser(BodyStructureParser.Rules.class);
 	
-	public org.obm.push.mail.mime.MimeMessageImpl.Builder parseBodyStructureDebug(String payload) {
+	public MimeMessageImpl.Builder parseBodyStructureDebug(String payload) {
 		Rules parserInstance = parser.newInstance();
 		TracingParseRunner<MimeMessageImpl.Builder> runner = new TracingParseRunner<MimeMessageImpl.Builder>(parserInstance.rule());
 		try {

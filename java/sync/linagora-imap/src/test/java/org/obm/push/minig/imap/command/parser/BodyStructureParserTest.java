@@ -31,11 +31,13 @@
  * ***** END LICENSE BLOCK ***** */
 package org.obm.push.minig.imap.command.parser;
 
+
 import static org.obm.push.mail.imap.MimeMessageFactory.createSimpleMimeMessage;
 import static org.obm.push.mail.imap.MimeMessageFactory.createSimpleMimePart;
 import static org.obm.push.mail.imap.MimeMessageFactory.createSimpleMimeTree;
 import static org.obm.push.mail.imap.MimeMessageTestUtils.checkMimeTree;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import org.junit.Test;
@@ -789,5 +791,137 @@ public class BodyStructureParserTest {
 		MimePart result = parseStringAsBodyStructure(bs);
 		result.toString();
 		checkMimeTree(message, result);
+	}
+
+	@Test
+	public void parseStringAsBodyStructureShouldNotFailWhenBodiesWithDifferentCharsets() throws IOException {
+		String bodyStructure = "(" + 
+			"(" + 
+				"(\"TEXT\" \"PLAIN\" " + 
+					"(\"CHARSET\" \"iso-8859-1\"" + 
+					") NIL NIL \"QUOTED-PRINTABLE\" 464 18 NIL NIL NIL" + 
+				")" + 
+				"(\"MESSAGE\" \"RFC822\" NIL NIL \"=?UTF-8?B?SsOpcsO0bWUgQkVHVUlOIDxqLmJlZ3VpbkBkb2N1bWVudHN0b3JlLmZyPjogUkU6IEFjaGF0IFN3aXRjaHMgNSBvdSA4IHBvcnRzIEdpZ2FiaXQgQXV0byBBbGltZW50w6lz?= PoE + 2 switchs 24/48 ports Gigabit PoE\" \"7BIT\" 824248 " + 
+					"(\"Mon, 22 May 2017 09:27:22 +0000\" \"RE: Achat Switchs 5 ou 8 ports Gigabit Auto =?UTF-8?B?QWxpbWVudMOpcw==?= PoE + 2 switchs 24/48 ports Gigabit PoE\" " + 
+						"(" + 
+							"(\"=?ISO-8859-1?Q?J=E9r=F4me?= ABCDEF\" NIL \"a.bcdef\" \"something.fr\"" + 
+							")" + 
+						") " + 
+						"(" + 
+							"(\"=?ISO-8859-1?Q?J=E9r=F4me?= ABCDEF\" NIL \"a.bcdef\" \"something.fr\"" + 
+							")" + 
+						") " + 
+						"(" + 
+							"(\"=?ISO-8859-1?Q?J=E9r=F4me?= ABCDEF\" NIL \"a.bcdef\" \"something.fr\"" + 
+							")" + 
+						") " + 
+						"(" + 
+							"(\"Chapou AZAEL\" NIL \"cazael\" \"linagora.com\"" + 
+							")" + 
+						") " + 
+						"(" + 
+							"(\"Niza LIL\" NIL \"nlil\" \"linagora.com\"" + 
+							")" + 
+							"(\"Nassim ELKAD\" NIL \"n.elkad\" \"something.fr\"" + 
+							")" + 
+							"(\"SI\" NIL \"informatique\" \"linagora.com\"" + 
+							")" + 
+						") NIL \"<2bcb97fc-288f-62e6-2775-ed06e3eb7e35@linagora.com>\" \"<HE1PR0701MB25244962D24623DFD08624DEE6F80@HE1PR0701MB2524.eurprd07.prod.outlook.com>\"" + 
+					") " + 
+					"(" + 
+						"(" + 
+							"(" + 
+								"(\"TEXT\" \"PLAIN\" " + 
+									"(\"CHARSET\" \"utf-8\"" + 
+									") NIL NIL \"BASE64\" 12334 159 NIL NIL NIL" + 
+								")" + 
+								"(\"TEXT\" \"HTML\" " + 
+									"(\"CHARSET\" \"utf-8\"" + 
+									") NIL NIL \"BASE64\" 62184 798 NIL NIL NIL" + 
+								") \"ALTERNATIVE\" " + 
+								"(\"BOUNDARY\" \"_000_HE1PR0701MB25244962D24623DFD08624DEE6F80HE1PR0701MB2524_\"" + 
+								") NIL NIL" + 
+							")" + 
+							"(\"IMAGE\" \"JPEG\" " + 
+								"(\"NAME\" \"image001.jpg\"" + 
+								") \"<image001.jpg@01D2D2EE.5EFD6580>\" \"image001.jpg\" \"BASE64\" 612 NIL " + 
+								"(\"INLINE\" " + 
+									"(\"CREATION-DATE\" \"Mon, 22 May 2017 09:27:21 GMT\" \"FILENAME\" \"image001.jpg\" \"MODIFICATION-DATE\" \"Mon, 22 May 2017 09:27:21 GMT\" \"SIZE\" \"446\"" + 
+									")" + 
+								") NIL" + 
+							")" + 
+							"(\"IMAGE\" \"JPEG\" " + 
+								"(\"NAME\" \"image002.jpg\"" + 
+								") \"<image002.jpg@01D2D2EE.5EFD6580>\" \"image002.jpg\" \"BASE64\" 506 NIL " + 
+								"(\"INLINE\" " + 
+									"(\"CREATION-DATE\" \"Mon, 22 May 2017 09:27:21 GMT\" \"FILENAME\" \"image002.jpg\" \"MODIFICATION-DATE\" \"Mon, 22 May 2017 09:27:21 GMT\" \"SIZE\" \"368\"" + 
+									")" + 
+								") NIL" + 
+							")" + 
+							"(\"IMAGE\" \"JPEG\" " + 
+								"(\"NAME\" \"image003.jpg\"" + 
+								") \"<image003.jpg@01D2D2EE.5EFD6580>\" \"image003.jpg\" \"BASE64\" 464 NIL " + 
+								"(\"INLINE\" " + 
+									"(\"CREATION-DATE\" \"Mon, 22 May 2017 09:27:21 GMT\" \"FILENAME\" \"image003.jpg\" \"MODIFICATION-DATE\" \"Mon, 22 May 2017 09:27:21 GMT\" \"SIZE\" \"338\"" + 
+									")" + 
+								") NIL" + 
+							")" + 
+							"(\"IMAGE\" \"PNG\" " + 
+								"(\"NAME\" \"image004.png\"" + 
+								") \"<image004.png@01D2D2EE.5EFD6580>\" \"image004.png\" \"BASE64\" 222 NIL " + 
+								"(\"INLINE\" " + 
+									"(\"CREATION-DATE\" \"Mon, 22 May 2017 09:27:21 GMT\" \"FILENAME\" \"image004.png\" \"MODIFICATION-DATE\" \"Mon, 22 May 2017 09:27:21 GMT\" \"SIZE\" \"160\"" + 
+									")" + 
+								") NIL" + 
+							")" + 
+							"(\"IMAGE\" \"PNG\" " + 
+								"(\"NAME\" \"image005.png\"" + 
+								") \"<image005.png@01D2D2EE.5EFD6580>\" \"image005.png\" \"BASE64\" 156 NIL " + 
+								"(\"INLINE\" " + 
+									"(\"CREATION-DATE\" \"Mon, 22 May 2017 09:27:22 GMT\" \"FILENAME\" \"image005.png\" \"MODIFICATION-DATE\" \"Mon, 22 May 2017 09:27:22 GMT\" \"SIZE\" \"114\"" + 
+									")" + 
+								") NIL" + 
+							")" + 
+							"(\"IMAGE\" \"PNG\" " + 
+								"(\"NAME\" \"image006.png\"" + 
+								") \"<image006.png@01D2D2EE.5EFD6580>\" \"image006.png\" \"BASE64\" 136 NIL " + 
+								"(\"INLINE\" " + 
+									"(\"CREATION-DATE\" \"Mon, 22 May 2017 09:27:22 GMT\" \"FILENAME\" \"image006.png\" \"MODIFICATION-DATE\" \"Mon, 22 May 2017 09:27:22 GMT\" \"SIZE\" \"98\"" + 
+									")" + 
+								") NIL" + 
+							") \"RELATED\" " + 
+							"(\"BOUNDARY\" \"_010_HE1PR0701MB25244962D24623DFD08624DEE6F80HE1PR0701MB2524_\" \"TYPE\" \"multipart/alternative\"" + 
+							") NIL NIL" + 
+						")" + 
+						"(\"APPLICATION\" \"MSWORD\" " + 
+							"(\"NAME*\" {40}''LINAGORA%20n%C2%B0417-22-05-2017%2Edoc" + 
+							") NIL \"LINAGORA =?UTF-8?B?bsKwNDE3LTIyLTA1LTIwMTcuZG9j?=\" \"BASE64\" 737766 NIL " + 
+							"(\"ATTACHMENT\" " + 
+								"(\"CREATION-DATE\" \"Mon, 22 May 2017 09:27:16 GMT\" \"FILENAME*\" {40}''LINAGORA%20n%C2%B0417-22-05-2017%2Edoc \"MODIFICATION-DATE\" \"Mon, 22 May 2017 09:27:21 GMT\" \"SIZE\" \"539136\"" + 
+								")" + 
+							") NIL" + 
+						") \"MIXED\" " + 
+						"(\"BOUNDARY\" \"_011_HE1PR0701MB25244962D24623DFD08624DEE6F80HE1PR0701MB2524_\"" + 
+						") NIL " + 
+						"(\"FR-FR\"" + 
+						")" + 
+					") 10569 NIL " + 
+					"(\"INLINE\" " + 
+						"(\"FILENAME\" \"message suivi\"" + 
+						")" + 
+					") NIL" + 
+				") \"MIXED\" " + 
+				"(\"BOUNDARY\" \"nextPart2203518.5TlC0GnWqP\"" + 
+				") NIL NIL" + 
+			")" + 
+			"(\"APPLICATION\" \"PGP-SIGNATURE\" " + 
+				"(\"NAME\" \"signature.asc\"" + 
+				") NIL \"This is a digitally signed message part.\" \"7BIT\" 484 NIL NIL NIL" + 
+			") \"SIGNED\" " + 
+			"(\"BOUNDARY\" \"nextPart1736401.6FUNgLOmrZ\" \"MICALG\" \"pgp-sha1\" \"PROTOCOL\" \"application/pgp-signature\"" + 
+			") NIL NIL" + 
+		")";
+
+		parseStringAsBodyStructure(bodyStructure);
 	}
 }
