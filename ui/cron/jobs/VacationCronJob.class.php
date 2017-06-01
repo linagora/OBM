@@ -34,30 +34,27 @@ include_once('CronJob.class.php');
 
 class VacationCronJob extends CronJob{
 
-  var $jobDelta = 900;
-
   /**
    * mustExecute 
    * 
    * @param mixed $date 
    * @access public
-   * @return void
+   *
+   * @return boolean
    */
   function mustExecute($date) {
     global $cgp_use;
-    if ($cgp_use["service"]["mail"]) {
-      $min = date('i');
-      return ($min%15 === 0);
-    } else {
-      return false;
-    }
+
+    // Run every 5 minutes if the 'mail' service is enabled by configuration
+    return $cgp_use["service"]["mail"] ? date('i') % 5 === 0 : false;
   }
 
   /**
    * getJobsFiles 
    * 
    * @access public
-   * @return void
+   *
+   * @return array
    */
   function getJobsFiles() {
     return array('php/vacation/vacation_query.inc');
@@ -68,16 +65,14 @@ class VacationCronJob extends CronJob{
    * 
    * @param mixed $date 
    * @access public
+   *
    * @return void
    */
   function execute($date) {
-    $delta = $this->jobDelta - 1;
-    $end_time = new Of_Date($date + $this->jobDelta);
-    $this->logger->debug('Getting vacation to enable before '.$end_time->getIso());
-    $enable = $this->getVacationToInsert($end_time);
-    $this->logger->debug('Getting vacation to disable before '.$end_time->getIso());
-    $date = new Of_Date($date);
-    $disable = $this->getVacationToRemove($date);
+    $this->logger->debug('Getting vacation to enable before');
+    $enable = $this->getVacationToInsert();
+    $this->logger->debug('Getting vacation to disable');
+    $disable = $this->getVacationToRemove();
     $intersec = array_intersect(array_keys($enable),array_keys($disable));
     if(count($intersec) != 0) {
       $this->logger->warn(count($intersec).' vacation messages are set to be enabled AND disabled in the same job : '.implode(',',$intersec));
@@ -87,7 +82,6 @@ class VacationCronJob extends CronJob{
     }
     $this->enableVacation($enable);
     $this->disableVacation($disable);
-    
   }
 
   /**
@@ -95,18 +89,18 @@ class VacationCronJob extends CronJob{
    * 
    * @param mixed $end_time 
    * @access public
-   * @return void
+   *
+   * @return array
    */
-  function getVacationToInsert($date) {
+  function getVacationToInsert() {
     $vacation = array();
-    $obm_q = new DB_OBM;
-    $db_type = $obm_q->type;
 
     $obm_q = new DB_OBM;
-    $query = "SELECT userobm_id, userobm_login, userobm_domain_id, userobm_vacation_enable FROM UserObm
-      WHERE  userobm_mail_perms = 1 AND userobm_vacation_enable = 0 AND
-      userobm_vacation_datebegin IS NOT NULL AND
-      userobm_vacation_datebegin <= '$date'";
+    $query = "
+      SELECT userobm_id, userobm_login, userobm_domain_id, userobm_vacation_enable
+      FROM UserObm
+      WHERE userobm_mail_perms = 1 AND userobm_vacation_enable = 0 AND userobm_vacation_datebegin IS NOT NULL AND userobm_vacation_datebegin <= NOW()
+    ";
 
     $this->logger->core($query);
     $obm_q->query($query);
@@ -123,17 +117,19 @@ class VacationCronJob extends CronJob{
    * 
    * @param mixed $end_time 
    * @access public
-   * @return void
+   *
+   * @return array
    */
-  function getVacationToRemove($date) {
+  function getVacationToRemove() {
     $vacation = array();
-    $obm_q = new DB_OBM;
-    $db_type = $obm_q->type;
-    $vacation_dateend = sql_date_format($db_type,"userobm_vacation_dateend");
 
     $obm_q = new DB_OBM;
-    $query = "SELECT userobm_id, userobm_login, userobm_domain_id, userobm_vacation_enable FROM UserObm
-      WHERE userobm_mail_perms = 1 AND userobm_vacation_dateend <= '$date' AND userobm_vacation_dateend IS NOT NULL";
+    $query = "
+      SELECT userobm_id, userobm_login, userobm_domain_id, userobm_vacation_enable
+      FROM UserObm
+      WHERE userobm_mail_perms = 1 AND userobm_vacation_dateend IS NOT NULL AND userobm_vacation_dateend <= NOW()
+    ";
+
     $this->logger->core($query);
     $obm_q->query($query);
     $this->logger->info($obm_q->nf()." vacations to disable");
@@ -142,7 +138,8 @@ class VacationCronJob extends CronJob{
     }
     $this->logger->info('List of vacation to disable : '.implode(',', array_keys($vacation)));
     return $vacation;
-  }  
+  }
+
   /**
    * enableVacation 
    * 
@@ -191,18 +188,9 @@ class VacationCronJob extends CronJob{
         userobm_vacation_dateend = NULL
         WHERE userobm_id IN (".implode(',',array_keys($users)).")";
       $this->logger->core($query);
-      $obm_q->query($query);      
-      $disable = array();
-      foreach ($users as $id => $user) {
-        if($user['enable'] == 0) {
-          $this->logger->warn("User $login domain : $domain vacation is set to be disabled but is already disabled. Noting will be done.");
-        } else {
-          $disable[$id] = $user;
-        }
-      }
-      $this->logger->debug("Disabling ".count($users)."vacations in sieve");
-      if(count($disable) > 0)
-        $this->updateVacation($disable);
+      $obm_q->query($query);
+      $this->logger->debug("Disabling " . count($users) . "vacations in sieve");
+      $this->updateVacation($users);
     }    
   }
   /**
