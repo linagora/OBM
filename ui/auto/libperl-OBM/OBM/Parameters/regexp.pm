@@ -64,10 +64,10 @@ require OBM::Parameters::common;
 $regexp_id = '^[0-9]+$';
 
 # Domain regexp
-$regexp_domain = '^([a-z0-9-]+\.)+[a-z]{2,6}$';
+$regexp_domain = '^([a-z0-9-]+\.)+[a-z]{2,12}$';
 
 # Email
-$regexp_email = '^[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$';
+$regexp_email = '^[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@([a-z0-9-]+\.)+[a-z]{2,12}$';
 $regexp_email_left = '^[a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*$';
 $regexp_email_right = $regexp_domain;
 
