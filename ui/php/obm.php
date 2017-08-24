@@ -641,4 +641,4 @@ function dis_portlets_menu() {
 
   return $block;
 }
-</script>
+?>
