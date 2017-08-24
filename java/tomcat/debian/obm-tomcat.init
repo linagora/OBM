@@ -36,7 +36,7 @@ if [ -r /etc/default/rcS ]; then
 fi
 
 if [ -z "$JAVA_HOME" ]; then
-	JAVA_HOME="usr"
+	JAVA_HOME="/usr"
 fi
 if [ -z "$SHUTDOWN_TIMEOUT" ]; then
 	SHUTDOWN_TIMEOUT=10
