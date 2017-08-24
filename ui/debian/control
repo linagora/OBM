@@ -87,7 +87,7 @@ Description: certificate generation for OBM
 
 Package: obm-ui
 Architecture: all
-Depends:  obm-core (= ${binary:Version}), obm-certs (= ${binary:Version}), php, apache2, libapache2-mod-php, php-pgsql | php-mysql, php-gd, php-imap, php-db, php-ldap, ${misc:Depends}
+Depends:  obm-core (= ${binary:Version}), obm-certs (= ${binary:Version}), php, apache2, libapache2-mod-php, php-pgsql | php-mysql, php-gd, php-imap, php-db, php-ldap, php-mbstring, ${misc:Depends}
 Recommends: php-imagick
 Description: web interface configuration for OBM
  This package configures Apache to serve OBM components (obm-ui, obm-storage).
