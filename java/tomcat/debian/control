@@ -10,7 +10,7 @@ Homepage: http://www.obm.org
 
 Package: obm-tomcat
 Architecture: all
-Depends: openjdk-8-jre-headless, libapr1, ${misc:Depends}
+Depends: openjdk-7-jre-headless|openjdk-8-jre-headless, libapr1, ${misc:Depends}
 Description: the Tomcat web application server for Open Business Management
  This package contains the 6.0.20 version of the Apache Tomcat application
  server for OBM.
