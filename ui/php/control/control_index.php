@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -101,4 +101,4 @@ function get_control_action() {
                                     );
 
 }
-</script>
+?>

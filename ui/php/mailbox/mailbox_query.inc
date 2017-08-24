@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -103,4 +103,4 @@ function get_user_login($id) {
   $obm_q->next_record();
   return $obm_q->f('userobm_login');
 }
-</script>
+?>

@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : mailbox_index.php                                            //
 //     - Desc : Mailbox Index File                                           //
@@ -161,4 +161,4 @@ function get_mailbox_action() {
 }
 
 
-</script>
+?>

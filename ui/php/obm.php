@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : obm.php                                                      //
 //     - Desc : OBM Home Page (Login / Logout)                               //

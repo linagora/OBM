@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -219,4 +219,4 @@ function get_report_kind($report) {
   return $kind;
 
 }
-</script>
+?>

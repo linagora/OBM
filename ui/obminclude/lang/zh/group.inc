@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : group.inc                                                //

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Tiếng Việt                                                   //
 //     - File     : admin.inc                                                //

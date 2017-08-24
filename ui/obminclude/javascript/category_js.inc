@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -71,4 +71,4 @@ function updateLine(id,category) {
   return false;
 }
 ";
-</script>
+?>

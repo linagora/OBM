@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -91,4 +91,4 @@ function check_data_form($samba) {
   return true;
 }
 
-</script>
+?>

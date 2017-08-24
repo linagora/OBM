@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -61,4 +61,4 @@ function dis_mailbox_right_dis_admin($id="") {
 }
 
 
-</script>
+?>

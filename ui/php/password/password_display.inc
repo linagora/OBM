@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -89,4 +89,4 @@ function html_password_form($usr_q, $password, $field='') {
 }
 
 
-</script>
+?>

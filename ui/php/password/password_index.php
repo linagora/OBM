@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : password.php                                                 //
 //     - Desc : OBM Password Index File                                      //
@@ -138,4 +138,4 @@ function get_password_action() {
 
 }
 
-</script>
+?>

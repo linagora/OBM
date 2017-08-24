@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Tiếng việt                                               //
 //     - File     : userpattern.inc                                          //

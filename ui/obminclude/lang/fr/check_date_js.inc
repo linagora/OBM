@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM   - Language : French                                                 //
 //       - File     : check_date_js.inc                                      //

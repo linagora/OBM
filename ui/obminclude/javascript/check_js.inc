@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -130,4 +130,4 @@ function remove_all_element(parentId) {
 }
 
 ";
-</script>
+?>

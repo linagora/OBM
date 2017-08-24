@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -285,4 +285,4 @@ function html_vacation_form($usr_q, $vacation, $field='') {
 }
 
 
-</script>
+?>

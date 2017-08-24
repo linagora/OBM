@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -205,4 +205,4 @@ function html_control_consult($domain_id="") {
 }
 
 
-</script>
+?>

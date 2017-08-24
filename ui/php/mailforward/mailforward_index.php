@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : mailforward_index.php                                        //
 //     - Desc : Mail Forwarding Index File                                   //
@@ -173,4 +173,4 @@ function get_forward_action() {
 }
 
 
-</script>
+?>

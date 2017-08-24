@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : mailshare_index.php                                          //
 //     - Desc : MailShare Index File                                         //
@@ -533,4 +533,4 @@ function update_mailshare_action() {
 }
 
 
-</script>
+?>

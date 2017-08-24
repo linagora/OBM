@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_ref.inc                                                //
 //     - Desc : English language for Admin Referential                       //

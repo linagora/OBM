@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : obmlib.inc                                                   //
 //     - Desc : Local PHPLIB file for OBM                                    //
@@ -586,4 +586,4 @@ class LDAP_Auth extends Auth {
 }
 
 
-</script>
+?>

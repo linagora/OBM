@@ -32,7 +32,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : vacation_index.php
 //     - Desc : vacation Index File
@@ -172,4 +172,4 @@ function get_vacation_action() {
 }
 
 
-</script>
+?>

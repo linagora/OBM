@@ -29,7 +29,7 @@
 # applicable to the OBM software.
 */
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : update-2.1-2.2.php                                           //
 //     - Desc : Upgrade data from 2.1 to 2.2                                 //
