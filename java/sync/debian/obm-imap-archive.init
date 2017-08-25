@@ -43,7 +43,7 @@ if [ -z "$APP_PORT" ]; then
 	APP_PORT=8085
 fi
 if [ -z "$JAVA_HOME" ]; then
-	JAVA_HOME="/usr/lib/jvm/java-7-openjdk-"`dpkg --print-architecture`
+	JAVA_HOME="/usr"
 fi
 
 if [ ! -d "$TMP_DIR" ]; then

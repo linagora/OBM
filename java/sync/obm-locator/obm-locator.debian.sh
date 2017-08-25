@@ -56,7 +56,7 @@ if [ -z "$JAVA_HOME" ]; then
     }
 fi
 if [ -z "$JAVA_HOME" ]; then
-    JAVA_HOME="/usr/lib/jvm/java-7-openjdk-"`dpkg --print-architecture`
+    JAVA_HOME="/usr"
 fi
 
 # Timeout in seconds for the shutdown of all webapps
