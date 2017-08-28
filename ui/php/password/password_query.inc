@@ -217,4 +217,4 @@ function check_data_form($usr_q, $password) {
 }
 
 
-</script>
+?>
