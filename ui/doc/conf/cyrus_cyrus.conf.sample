@@ -44,7 +44,7 @@ SERVICES {
 
 	# useful if you need to give users remote access to sieve
 	# by default, we limit this to localhost in Debian
-  	sieve		cmd="timsieved" listen=":sieve" prefork=1 maxchild=100
+	sieve       cmd="timsieved" listen="localhost:sieve" prefork=0 maxchild=100
 
 	# this one is needed for the notification services
 	notify		cmd="notifyd" listen="/var/run/cyrus/socket/notify" proto="udp" prefork=1
