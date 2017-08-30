@@ -99,7 +99,7 @@ popminpoll: 0
 # If nonzero, normal users may create their own IMAP accounts by creating
 # the mailbox INBOX.  The user's quota is set to the value if it is positive,
 # otherwise the user has unlimited quota.
-autocreatequota: 0
+autocreate_quota: 0
 
 # umask used by Cyrus programs
 umask: 077
@@ -228,16 +228,16 @@ sasl_auto_transition: no
 #
 
 # Use OBM generated certs for TLS
-tls_cert_file: /etc/obm/certs/obm_cert.pem
-tls_key_file: /etc/obm/certs/obm_cert.pem
-tls_ca_file: /var/lib/obm-ca/cacert.pem
+tls_server_cert: /etc/obm/certs/obm_cert.pem
+tls_server_key: /etc/obm/certs/obm_cert.pem
+tls_client_ca_file: /var/lib/obm-ca/cacert.pem
 
 # File containing the global certificate used for ALL services (imap, pop3,
 # lmtp, sieve)
-#tls_cert_file: /etc/ssl/certs/ssl-cert-snakeoil.pem
+#tls_server_cert: /etc/ssl/certs/ssl-cert-snakeoil.pem
 
 # File containing the private key belonging to the global server certificate.
-#tls_key_file: /etc/ssl/private/ssl-cert-snakeoil.key
+#tls_server_key: /etc/ssl/private/ssl-cert-snakeoil.key
 
 # File containing the certificate used for imap. If not specified, the global
 # certificate is used.  A value of "disabled" will disable SSL/TLS for imap.
@@ -276,10 +276,10 @@ tls_ca_file: /var/lib/obm-ca/cacert.pem
 #sieve_tls_key_file: /etc/ssl/private/cyrus-sieve.key
 
 # File containing one or more Certificate Authority (CA) certificates.
-#tls_ca_file: /etc/ssl/certs/cyrus-imapd-ca.pem
+#tls_client_ca_file: /etc/ssl/certs/cyrus-imapd-ca.pem
 
 # Path to directory with certificates of CAs.
-tls_ca_path: /etc/ssl/certs
+tls_client_ca_dir: /etc/ssl/certs
 
 # The length of time (in minutes) that a TLS session will be cached for later
 # reuse.  The maximum value is 1440 (24 hours), the default.  A value of 0 will
@@ -291,7 +291,7 @@ tls_session_timeout: 1440
 # selects TLSv1 high-security ciphers only, and removes all anonymous ciphers
 # from the list (because they provide no defense against man-in-the-middle
 # attacks).  It also orders the list so that stronger ciphers come first.
-tls_cipher_list: TLSv1+HIGH:!aNULL:@STRENGTH
+tls_ciphers: TLSv1+HIGH:!aNULL:@STRENGTH
 
 # Require a client certificate for ALL services (imap, pop3, lmtp, sieve).
 #tls_require_cert: false
