@@ -204,7 +204,7 @@ function format_field_for_solr_query($string){
   $string = trim($string);
   $string = strtolower($string);
   $string = preg_replace('/([^\d\s][^\s])([0-9])/', '\1 \2', $string);
-  $words = split(' ', $string);
+  $words = explode(' ', $string);
   foreach ($words as $word){
     $formated_word = ( substr($word, -1) == '*' ) ? $word : $word.'*';
     $formated_string .= ( end($words) == $word ) ? $formated_word : $formated_word.' ';
@@ -8922,7 +8922,7 @@ Class CalendarPdf{
     
     $vowels = '/[aeiouy]/';
     
-    $words = split(' ', $string);
+    $words = explode(' ', $string);
     foreach ($words as $k => $v) {
       if ($this->getStringWidth($v) > $max_width) {
         $letters = str_split($v, 1);

@@ -112,7 +112,7 @@ class CampaignWS {
     
     $obm_q->query($query);
     while ($obm_q->next_record()) {
-      $emails = split("\n", $obm_q->f('email'));
+      $emails = explode("\n", $obm_q->f('email'));
 
       $newTarget = new Target();
 
@@ -159,7 +159,7 @@ class CampaignWS {
     
     $obm_q->query($query);
     while ($obm_q->next_record()) {
-      $emails = split("\n", $obm_q->f('email'));
+      $emails = explode("\n", $obm_q->f('email'));
 
       $newTarget = new Target();
 

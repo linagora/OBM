@@ -863,8 +863,8 @@ function dis_invoice_detail($inv_q) {
 
 $odf_relance = glob('relance_*.odt');
 
-list( $year_o, $month_o, $day_o ) = split( ',', date('Y,n,j', strtotime($inv_q->f('invoice_expiration_date'))));
-list( $year_c, $month_c, $day_c ) = split( ',', date('Y,n,j'));
+list( $year_o, $month_o, $day_o ) = explode( ',', date('Y,n,j', strtotime($inv_q->f('invoice_expiration_date'))));
+list( $year_c, $month_c, $day_c ) = explode( ',', date('Y,n,j'));
 
 $duration =  (mktime(0,0,0, $month_c, $day_c, $year_c) - mktime(0,0,0, $month_o, $day_o, $year_o));
 
@@ -1987,7 +1987,7 @@ function dis_invoice_all_reminder($inv_q) {
 <th>$l_expiration</th></tr>";
 
 	while($inv_q->next_record()) {
-		list( $year_o, $month_o, $day_o ) = split( ',', date('Y,n,j', strtotime($inv_q->f('expiration_date'))));
+		list( $year_o, $month_o, $day_o ) = explode( ',', date('Y,n,j', strtotime($inv_q->f('expiration_date'))));
 		$date_expiration=date('d/m/y',mktime(0,0,0, $month_o, $day_o, $year_o));
 	
 		$block.='<tr><td>'.$inv_q->f('company_name').'</td>
@@ -2005,8 +2005,8 @@ function dis_invoice_reminder_company($inv_q) {
 
 	while($inv_q->next_record()) {
 	
-		list( $year_o, $month_o, $day_o ) = split( ',', date('Y,n,j', strtotime($inv_q->f('invoice_expiration_date'))));
-		list( $year_c, $month_c, $day_c ) = split( ',', date('Y,n,j'));
+		list( $year_o, $month_o, $day_o ) = explode( ',', date('Y,n,j', strtotime($inv_q->f('invoice_expiration_date'))));
+		list( $year_c, $month_c, $day_c ) = explode( ',', date('Y,n,j'));
 		$duration =  (mktime(0,0,0, $month_c, $day_c, $year_c) - mktime(0,0,0, $month_o, $day_o, $year_o));
 		$duration_day = (int) ( $duration / (60 * 60 * 24));
 

@@ -87,7 +87,7 @@ function run_query_group_search($group) {
     $where .= " AND group_delegation $like '".$obm_q->escape($delegation)."%'";
   }
   if ($email != '') {
-    list($left,$right) = split('@',$email);
+    list($left,$right) = explode('@',$email);
     if ($right === null){
       $left = $obm_q->escape($left).'%';
       $right = $obm_q->escape($left);
