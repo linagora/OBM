@@ -30,7 +30,7 @@ SERVICES {
 	imap		cmd="imapd -U 30" listen="imap" prefork=10 maxchild=200 proto=tcp4 maxforkrate=4
 	imaps		cmd="imapd -s -U 30" listen="imaps" prefork=0 maxchild=100 proto=tcp4 maxforkrate=4
 	pop3		cmd="pop3d -U 30" listen="pop3" prefork=10 maxchild=50 proto=tcp4 maxforkrate=4
-	pop3s		cmd="pop3d -s -U 30" listen="pop3s" prefork=0 maxchild=50 proto=tcp4 maxforkrate
+	#pop3s		cmd="pop3d -s -U 30" listen="pop3s" prefork=0 maxchild=50 proto=tcp4 maxforkrate
 	#nntp		cmd="nntpd -U 30" listen="nntp" prefork=0 maxchild=100 proto=tcp4
 	#nntps		cmd="nntpd -s -U 30" listen="nntps" prefork=0 maxchild=100 proto=tcp4
 
