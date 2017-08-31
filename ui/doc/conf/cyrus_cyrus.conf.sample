@@ -36,8 +36,9 @@ SERVICES {
 
 	# At least one form of LMTP is required for delivery
 	# (you must keep the Unix socket name in sync with imap.conf)
-	lmtp		cmd="lmtpd -a" listen=":24" prefork=0 maxchild=20
-	lmtpunix	cmd="lmtpd" listen="/var/run/cyrus/socket/lmtp" prefork=0 maxchild=20
+	lmtp        cmd="lmtpd -a" listen="localhost:24" prefork=0 maxchild=20
+    lmtpunix    cmd="lmtpd" listen="/var/run/cyrus/socket/lmtp" prefork=0 maxchild=20
+
 	# ----------------------------------------------
 
 	# useful if you need to give users remote access to sieve
