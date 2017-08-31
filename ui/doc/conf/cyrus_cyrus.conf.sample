@@ -6,7 +6,7 @@
 
 START {
 	# do not delete this entry!
-	recover		cmd="/usr/sbin/ctl_cyrusdb -r"
+	recover		cmd="/usr/lib/cyrus/bin/ -r"
   
 	# this is only necessary if idlemethod is set to "idled" in imapd.conf
 	idled		cmd="idled"
@@ -14,12 +14,12 @@ START {
 	# this is useful on backend nodes of a Murder cluster
 	# it causes the backend to syncronize its mailbox list with
 	# the mupdate master upon startup
-	#mupdatepush   cmd="/usr/sbin/ctl_mboxlist -m"
+	#mupdatepush   cmd="/usr/lib/cyrus/bin/ctl_mboxlist -m"
 
 	# this is recommended if using duplicate delivery suppression
-	delprune	cmd="/usr/sbin/cyr_expire -E 3"
+	delprune	cmd="/usr/lib/cyrus/bin/cyr_expire -E 3"
 	# this is recommended if caching TLS sessions
-	tlsprune	cmd="/usr/sbin/tls_prune"
+	tlsprune	cmd="/usr/lib/cyrus/bin/tls_prune"
 }
 
 # UNIX sockets start with a slash and are absolute paths
@@ -30,9 +30,9 @@ SERVICES {
 	# --- Normal cyrus spool, or Murder backends ---
 	# add or remove based on preferences
 	imap		cmd="imapd -U 30" listen="imap" prefork=10 maxchild=200 proto=tcp4 maxforkrate=4
-	#imaps		cmd="imapd -s -U 30" listen="imaps" prefork=0 maxchild=100 proto=tcp4 maxforkrate=4
+	imaps		cmd="imapd -s -U 30" listen="imaps" prefork=0 maxchild=100 proto=tcp4 maxforkrate=4
 	pop3		cmd="pop3d -U 30" listen="pop3" prefork=10 maxchild=50 proto=tcp4 maxforkrate=4
-	#pop3s		cmd="pop3d -s -U 30" listen="pop3s" prefork=0 maxchild=50 proto=tcp4 maxforkrate
+	pop3s		cmd="pop3d -s -U 30" listen="pop3s" prefork=0 maxchild=50 proto=tcp4 maxforkrate
 	#nntp		cmd="nntpd -U 30" listen="nntp" prefork=0 maxchild=100 proto=tcp4
 	#nntps		cmd="nntpd -s -U 30" listen="nntps" prefork=0 maxchild=100 proto=tcp4
 
