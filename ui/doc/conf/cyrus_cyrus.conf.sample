@@ -6,7 +6,7 @@
 
 START {
 	# do not delete this entry!
-	recover		cmd="/usr/lib/cyrus/bin/ -r"
+	recover		cmd="/usr/lib/cyrus/bin/ctl_cyrusdb -r"
   
 	# this is only necessary if idlemethod is set to "idled" in imapd.conf
 	idled		cmd="idled"
@@ -18,8 +18,6 @@ START {
 
 	# this is recommended if using duplicate delivery suppression
 	delprune	cmd="/usr/lib/cyrus/bin/cyr_expire -E 3"
-	# this is recommended if caching TLS sessions
-	tlsprune	cmd="/usr/lib/cyrus/bin/tls_prune"
 }
 
 # UNIX sockets start with a slash and are absolute paths
@@ -70,13 +68,13 @@ SERVICES {
 
 EVENTS {
 	# this is required
-	checkpoint	cmd="/usr/sbin/ctl_cyrusdb -c" period=30
+	checkpoint	cmd="/usr/lib/cyrus/bin/ctl_cyrusdb -c" period=30
 
 	# this is only necessary if using duplicate delivery suppression
-	delprune	cmd="/usr/sbin/cyr_expire -E 3" at=0401
+	delprune	cmd="/usr/lib/cyrus/bin/cyr_expire -E 3" at=0401
 
 	# this is only necessary if caching TLS sessions
-	tlsprune	cmd="/usr/sbin/tls_prune" at=0401
+	tlsprune	cmd="/usr/lib/cyrus/bin/tls_prune" at=0401
 	
 	# indexing of mailboxs for server side fulltext searches
 
