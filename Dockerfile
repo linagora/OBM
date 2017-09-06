@@ -35,7 +35,7 @@ ADD . obm
 ## BUILD OBM PACKAGES
 RUN cd obm/java/sync && \
     mvn dependency:go-offline || true && \
-    mvn package -DskipTests -T1C
+    mvn package -T1C
 
 RUN cd obm/build-system && \
      ./build.py /root/build-deb --nocompile --osversion wheezy all && \
