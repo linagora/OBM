@@ -303,7 +303,7 @@ function run_query_publication_auto_subscription($publication) {
   $list_sub = $publication['list'];
   $recept = sql_parse_id($c_focsys);
   $lang = $publication['lang'];
-  $lang_array = split('-', $lang);
+  $lang_array = explode('-', $lang);
   $domain_id = sql_parse_id($obm['domain_id']);
   $nb = 0;
   $uid = sql_parse_id($obm['uid']);	

@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : test-list.php                                                //
 //     - Desc : Non-regression test : List                                   //
@@ -564,4 +564,4 @@ function display_help() {
 }
 
 
-</script>
+?>

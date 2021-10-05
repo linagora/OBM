@@ -71,7 +71,7 @@ abstract class OBM_Test {
     $code = substr($code, $start, $end - $start);
     
     $res_code = array();
-    foreach (split("\n", $code) as $line) {
+    foreach (explode("\n", $code) as $line) {
       if (!preg_match("/\/\/\ +OBM +TEST +delete/i", $line))
         $res_code[] = $line;
     }
@@ -82,7 +82,7 @@ abstract class OBM_Test {
   public static function get_body_function ($function_name) {
     $func = new ReflectionFunction($function_name);
     
-    $lines = split("\n", file_get_contents($func->getFileName()));
+    $lines = explode("\n", file_get_contents($func->getFileName()));
     $res = array();
     for ($i = $func->getStartLine(); $i <= $func->getEndLine(); $i += 1) {
       $res[] = $lines[$i];
@@ -217,7 +217,7 @@ class OBM_TestContext_Action extends OBM_TestContext {
 
 class OBM_Test_DB extends DB_OBM {
   function query_rand ($query, $primary_key, $count) {
-    list($select, $from) = split(' FROM ', $query);
+    list($select, $from) = explode(' FROM ', $query);
     
     $keys = array();
     
@@ -237,7 +237,7 @@ class OBM_Test_DB extends DB_OBM {
       }
     }
     
-    list($select, $where) = split(' WHERE ', $query);
+    list($select, $where) = explode(' WHERE ', $query);
     
     $query = $select;
     

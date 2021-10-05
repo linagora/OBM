@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : host_index.php                                               //
 //     - Desc : Host Index File                                              //
@@ -412,4 +412,4 @@ function update_host_action() {
     }
   }
 }
-</script>
+?>

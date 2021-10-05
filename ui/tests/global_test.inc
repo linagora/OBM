@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -63,4 +63,4 @@ function get2_format_town($name) {
 }
 
 
-</script>
+?>

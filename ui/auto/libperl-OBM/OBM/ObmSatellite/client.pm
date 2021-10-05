@@ -132,7 +132,13 @@ sub get {
     # Add authentication headers
     $request->authorization_basic( $self->{'obmSatelliteLogin'}, $self->{'obmSatellitePassword'} );
 
-    my $ua = LWP::UserAgent->new();
+	my $ua = LWP::UserAgent->new(
+        ssl_opts => {
+           verify_hostname => 0,
+           SSL_verify_mode => 0
+        }
+    );
+
     if( !$ua ) {
         $self->_log( 'erreur à l\'initialisation du navigateur LWP::UserAgent', 0 );
         return 1;
@@ -177,7 +183,12 @@ sub post {
     # Add authentication headers
     $request->authorization_basic( $self->{'obmSatelliteLogin'}, $self->{'obmSatellitePassword'} );
 
-    my $ua = LWP::UserAgent->new();
+	my $ua = LWP::UserAgent->new(
+        ssl_opts => {
+           verify_hostname => 0,
+           SSL_verify_mode => 0
+        }
+    );
     if( !$ua ) {
         $self->_log( 'erreur à l\'initialisation du navigateur LWP::UserAgent', 0 );
         return 1;

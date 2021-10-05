@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : Language : vi
 //      - File : obminclude/vi/imap_archive.inc

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : of_session.inc                                               //
 //     - Desc : OBM Framework Session Objects                                //
@@ -662,4 +662,4 @@ if ($cgp_sess_db) {
 }
 
 
-</script>
+?>

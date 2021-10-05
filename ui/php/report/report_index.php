@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : report_index.php                                             //
 //     - Desc : Report panel Index File                                      //
@@ -289,4 +289,4 @@ function get_control_action() {
 
 
 }
-</script>
+?>

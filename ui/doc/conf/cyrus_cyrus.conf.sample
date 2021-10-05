@@ -6,7 +6,7 @@
 
 START {
 	# do not delete this entry!
-	recover		cmd="/usr/sbin/ctl_cyrusdb -r"
+	recover		cmd="/usr/lib/cyrus/bin/ctl_cyrusdb -r"
   
 	# this is only necessary if idlemethod is set to "idled" in imapd.conf
 	idled		cmd="idled"
@@ -14,12 +14,10 @@ START {
 	# this is useful on backend nodes of a Murder cluster
 	# it causes the backend to syncronize its mailbox list with
 	# the mupdate master upon startup
-	#mupdatepush   cmd="/usr/sbin/ctl_mboxlist -m"
+	#mupdatepush   cmd="/usr/lib/cyrus/bin/ctl_mboxlist -m"
 
 	# this is recommended if using duplicate delivery suppression
-	delprune	cmd="/usr/sbin/cyr_expire -E 3"
-	# this is recommended if caching TLS sessions
-	tlsprune	cmd="/usr/sbin/tls_prune"
+	delprune	cmd="/usr/lib/cyrus/bin/cyr_expire -E 3"
 }
 
 # UNIX sockets start with a slash and are absolute paths
@@ -30,7 +28,7 @@ SERVICES {
 	# --- Normal cyrus spool, or Murder backends ---
 	# add or remove based on preferences
 	imap		cmd="imapd -U 30" listen="imap" prefork=10 maxchild=200 proto=tcp4 maxforkrate=4
-	#imaps		cmd="imapd -s -U 30" listen="imaps" prefork=0 maxchild=100 proto=tcp4 maxforkrate=4
+	imaps		cmd="imapd -s -U 30" listen="imaps" prefork=0 maxchild=100 proto=tcp4 maxforkrate=4
 	pop3		cmd="pop3d -U 30" listen="pop3" prefork=10 maxchild=50 proto=tcp4 maxforkrate=4
 	#pop3s		cmd="pop3d -s -U 30" listen="pop3s" prefork=0 maxchild=50 proto=tcp4 maxforkrate
 	#nntp		cmd="nntpd -U 30" listen="nntp" prefork=0 maxchild=100 proto=tcp4
@@ -38,13 +36,14 @@ SERVICES {
 
 	# At least one form of LMTP is required for delivery
 	# (you must keep the Unix socket name in sync with imap.conf)
-	lmtp		cmd="lmtpd -a" listen=":24" prefork=0 maxchild=20
-	lmtpunix	cmd="lmtpd" listen="/var/run/cyrus/socket/lmtp" prefork=0 maxchild=20
+	lmtp        cmd="lmtpd -a" listen="localhost:24" prefork=0 maxchild=20
+    lmtpunix    cmd="lmtpd" listen="/var/run/cyrus/socket/lmtp" prefork=0 maxchild=20
+
 	# ----------------------------------------------
 
 	# useful if you need to give users remote access to sieve
 	# by default, we limit this to localhost in Debian
-  	sieve		cmd="timsieved" listen=":sieve" prefork=1 maxchild=100
+	sieve       cmd="timsieved" listen="localhost:sieve" prefork=0 maxchild=100
 
 	# this one is needed for the notification services
 	notify		cmd="notifyd" listen="/var/run/cyrus/socket/notify" proto="udp" prefork=1
@@ -70,13 +69,13 @@ SERVICES {
 
 EVENTS {
 	# this is required
-	checkpoint	cmd="/usr/sbin/ctl_cyrusdb -c" period=30
+	checkpoint	cmd="/usr/lib/cyrus/bin/ctl_cyrusdb -c" period=30
 
 	# this is only necessary if using duplicate delivery suppression
-	delprune	cmd="/usr/sbin/cyr_expire -E 3" at=0401
+	delprune	cmd="/usr/lib/cyrus/bin/cyr_expire -E 3" at=0401
 
 	# this is only necessary if caching TLS sessions
-	tlsprune	cmd="/usr/sbin/tls_prune" at=0401
+	tlsprune	cmd="/usr/lib/cyrus/bin/tls_prune" at=0401
 	
 	# indexing of mailboxs for server side fulltext searches
 

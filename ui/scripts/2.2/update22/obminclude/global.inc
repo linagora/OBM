@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : global.inc                                                   //
 //     - Desc : Global common OBM include file                               //
@@ -1963,4 +1963,4 @@ function get_color_data($color) {
   $colors['#b08b59'] = array('body' => '#c4a883', 'header' => '#8d6f47'); 
   return $colors[$color];
 }
-</script>
+?>

@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : samba_index.php                                              //
 //     - Desc : Aliamin Samba Administration Index File                      //
@@ -143,4 +143,4 @@ function get_samba_action() {
 
 }
 
-</script>
+?>

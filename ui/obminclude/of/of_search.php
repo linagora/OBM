@@ -51,7 +51,7 @@ class  OBM_Search {
           // $pattern = strtolower($pattern); => do not work because of solr keyword "OR" and "AND"
           // replace compound word in pattern
           $pattern = preg_replace("/(?<=[a-zA-Z])-(?=[a-zA-Z])/"," + ", $pattern);
-          $pattern = preg_replace("/(\w*)\*/e", "strtolower('$1').'*'", $pattern);
+          $pattern = preg_replace_callback("/(\w*)\*/", function($m){return strtolower($m[1]).'*';}, $pattern);
           $response = $solr->search($pattern, $offset, $limit, $options);
           display_debug_solr($pattern, $cdg_solr, "OBM_Search::search($core)");
           if($response->response->numFound > 0) {
@@ -80,7 +80,7 @@ class  OBM_Search {
           $pattern = "domain:$obm[domain_id]";
         }
         $pattern = preg_replace("/(?<=[a-zA-Z])-(?=[a-zA-Z])/"," + ", $pattern);
-        $pattern = preg_replace("/(\w*)\*/e", "strtolower('$1').'*'", $pattern);
+		$pattern = preg_replace_callback("/(\w*)\*/", function($m){return strtolower($m[1]).'*';}, $pattern);
         $response = $solr->search($pattern);
         return $response->response->numFound;
       } catch(Exception $e) {

@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -192,4 +192,4 @@ function html_samba_form($samba, $smb, $field="") {
   return $block;
 }
 
-</script>
+?>

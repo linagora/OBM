@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : obmlib.inc                                                   //
 //     - Desc : Local PHPLIB file for OBM                                    //
@@ -828,4 +828,4 @@ class OBM_No_Auth extends Auth {
 //    return false;
   }
 }
-</script>
+?>

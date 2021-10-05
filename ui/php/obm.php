@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : obm.php                                                      //
 //     - Desc : OBM Home Page (Login / Logout)                               //
@@ -641,4 +641,4 @@ function dis_portlets_menu() {
 
   return $block;
 }
-</script>
+?>

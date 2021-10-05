@@ -409,7 +409,7 @@ class DB_Sql {
       // #X(Y) => self:X(Y)
       if(!empty($match[1][$key])) {
         if(!is_null($args) && method_exists(__CLASS__, $match[2][$key])) {
-          $pcode = self::$match[2][$key]($args);
+          $pcode = self::{$match[2][$key]}($args);
         } elseif(property_exists(__CLASS__, $match[2][$key])) {
           $pcode = self::${$match[2][$key]};
         }  else {

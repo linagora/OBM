@@ -20,7 +20,7 @@ Description: synchronization application for Open Business Management
 
 Package: obm-locator
 Architecture: all
-Depends: openjdk-7-jre-headless, obm-conf (= ${binary:Version}), openssl
+Depends: openjdk-7-jre-headless|openjdk-8-jre-headless, obm-conf (= ${binary:Version}), openssl, insserv
 Description: Locator for Open Business Management
  This package is a J2E web service, which allows can be queried to retrieve
  the location of an OBM component.
@@ -32,7 +32,7 @@ Description: Locator for Open Business Management
 
 Package: obm-provisioning
 Architecture: all
-Depends: openjdk-7-jre-headless, obm-conf (= ${binary:Version})
+Depends: openjdk-7-jre-headless|openjdk-8-jre-headless, obm-conf (= ${binary:Version})
 Description: Provisioning API for Open Business Management
  This package is an HTTP web service, which can be queried to provision an OBM
  server.
@@ -68,7 +68,7 @@ Description: Tomcat common libs for Open Business Management
 
 Package: obm-imap-archive
 Architecture: all
-Depends: openjdk-7-jre-headless, obm-conf (= ${binary:Version})
+Depends: openjdk-7-jre-headless|openjdk-8-jre-headless, obm-conf (= ${binary:Version})
 Description: OBM component that perform email archiving
  obm-imap-archive is a http server exposing webservices to perform email archiving.
  .

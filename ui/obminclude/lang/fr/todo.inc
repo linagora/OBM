@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : todo.inc                                                 //
@@ -35,4 +35,3 @@ $l_err_percent = "Le pourcentage doit être compris entre 0 et 100";
 $l_todo_display = "Options d'affichage des listes de tâches à faire";
 $l_todo_prefs = "Options d'affichage des listes de tâches urgentes";
 
-</script>

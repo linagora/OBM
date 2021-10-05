@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : admin_code.inc                                           //

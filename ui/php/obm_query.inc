@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -352,4 +352,4 @@ function run_query_contract_range($user_id) {
   return $res;
 }
 
-</script>
+?>

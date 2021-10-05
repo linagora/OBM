@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : Language : zh
 //      - File : obminclude/zh/imap_archive.inc

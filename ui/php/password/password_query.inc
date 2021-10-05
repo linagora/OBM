@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -217,4 +217,4 @@ function check_data_form($usr_q, $password) {
 }
 
 
-</script>
+?>

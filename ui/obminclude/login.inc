@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -97,4 +97,4 @@ $template = get_template($lp);
 eval ("\$template = \"$template\";");
 echo $template;
 
-</script>
+?>

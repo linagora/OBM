@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -353,4 +353,4 @@ $backup_desactived_mail = false;
 // New Top Bar OBM 3.0
 $conf_obm3_topbar = true;
 
-</script>
+?>

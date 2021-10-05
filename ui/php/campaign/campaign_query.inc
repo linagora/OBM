@@ -592,7 +592,7 @@ function check_campaign_can_delete($p_id) {
 
 function check_compare_convert_to_value ($str) {
   if (preg_match('/..\/..\/../', $str)) {
-    list($month, $day, $year) = split('/', $str);
+    list($month, $day, $year) = explode('/', $str);
     return mktime(0,0,0, $month, $day, $year);
   }
   return $str;
@@ -725,8 +725,8 @@ function run_query_campaign_import_sent_emails () {
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
-    foreach (split("\n", $obm_q->f('campaignpushtarget_properties')) as $line) {
-      list($var, $value) = split('=', $line);
+    foreach (explode("\n", $obm_q->f('campaignpushtarget_properties')) as $line) {
+      list($var, $value) = explode('=', $line);
       if ($var == 'id')
         $entity_id = $value +0;
 

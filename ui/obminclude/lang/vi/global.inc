@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Tiếng Việt                                               //
 //     - File     : global.inc                                               //

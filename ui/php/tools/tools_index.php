@@ -31,7 +31,7 @@ applicable to the OBM software.
 
 
 ?>
-<script language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : tools_index.php                                              //
 //     - Desc : OBM Tools Index File                                         //
@@ -297,4 +297,4 @@ function get_tools_action() {
 
 }
 
-</script>
+?>

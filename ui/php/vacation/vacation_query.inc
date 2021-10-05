@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -176,4 +176,4 @@ function check_vacation_data_form($params) {
 }
 
 
-</script>
+?>

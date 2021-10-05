@@ -46,7 +46,7 @@ Description: configuration system for Open Business Management
 
 Package: obm-storage
 Architecture: all
-Pre-Depends: obm-core (= ${binary:Version}), dbconfig-common, obm-conf (= ${binary:Version}), postgresql-8.3 | postgresql-8.4 | postgresql-9.1 | mysql-server
+Pre-Depends: obm-core (= ${binary:Version}), dbconfig-common, obm-conf (= ${binary:Version}), postgresql-8.3 | postgresql-8.4 | postgresql-9.1 | postgresql-9.6 |mysql-server
 Depends: obm-locator, ${misc:Depends}
 Description: database for Open Business Management
  This package initializes the OBM database, which can be either Postgres or
@@ -62,7 +62,7 @@ Description: database for Open Business Management
 Package: obm-core
 Architecture: all
 Pre-Depends: debconf
-Depends:  obm-conf (= ${binary:Version}), php5-cli, php5-pgsql | php5-mysql, tzdata, php5-curl, php-apc, ${misc:Depends}
+Depends:  obm-conf (= ${binary:Version}), php-cli, php-pgsql | php-mysql, tzdata, php-curl, php-apc | php-apcu, ${misc:Depends}
 Conflicts: opush (<< 3)
 Description: web interface for Open Business Management
  This package contains the web interface for OBM. It has no dependency on the
@@ -87,8 +87,8 @@ Description: certificate generation for OBM
 
 Package: obm-ui
 Architecture: all
-Depends:  obm-core (= ${binary:Version}), obm-certs (= ${binary:Version}), php5, apache2, libapache2-mod-php5, php5-pgsql | php5-mysql, php5-gd, php5-imap, php-db, php5-ldap, ${misc:Depends}
-Recommends: php5-imagick
+Depends:  obm-core (= ${binary:Version}), obm-certs (= ${binary:Version}), php, apache2, libapache2-mod-php, php-pgsql | php-mysql, php-gd, php-imap, php-db, php-ldap, php-mbstring, ${misc:Depends}
+Recommends: php-imagick
 Description: web interface configuration for OBM
  This package configures Apache to serve OBM components (obm-ui, obm-storage).
  .
@@ -100,7 +100,7 @@ Description: web interface configuration for OBM
 Package: libobm-perl
 Section: perl
 Architecture: all
-Depends: libnet-telnet-perl, libcyrus-imap-perl23|libcyrus-imap-perl22, libnet-server-perl, libcrypt-smbhash-perl, libunicode-maputf8-perl, libconfig-inifiles-perl, libnet-ldap-perl, libclass-singleton-perl, libdbi-perl, libdbd-pg-perl | libdbd-mysql-perl, libsasl2-modules, libio-socket-ssl-perl, libxml-simple-perl, liblog-log4perl-perl, ${perl:Depends}, ${misc:Depends}
+Depends: libnet-telnet-perl, libcyrus-imap-perl23|libcyrus-imap-perl22|libcyrus-imap-perl, libnet-server-perl, libcrypt-smbhash-perl, libunicode-maputf8-perl, libconfig-inifiles-perl, libnet-ldap-perl, libclass-singleton-perl, libdbi-perl, libdbd-pg-perl | libdbd-mysql-perl, libsasl2-modules, libio-socket-ssl-perl, libxml-simple-perl, liblog-log4perl-perl, ${perl:Depends}, ${misc:Depends}
 Description: library for the integration of OBM with LDAP/Postfix/Cyrus
  This package contains the library used by obm-services to interact with LDAP,
  Postfix and Cyrus.
@@ -136,7 +136,7 @@ Description: LDAP configuration for OBM
 Package: obm-cyrus
 Architecture: all
 Pre-depends: obm-satellite
-Depends:  obm-conf (= ${binary:Version}), cyrus-common-2.4|cyrus-common-2.3|cyrus-common-2.2, cyrus-admin-2.4|cyrus-admin-2.3|cyrus-admin-2.2, cyrus-imapd-2.4|cyrus-imapd-2.3|cyrus-imapd-2.2, cyrus-pop3d-2.4|cyrus-pop3d-2.3|cyrus-pop3d-2.2, cyrus-sasl2-dbg, cyrus-sasl2-doc, cyrus-clients-2.4|cyrus-clients-2.3|cyrus-clients-2.2, sasl2-bin, libsasl2|libsasl2-2, libsasl2-modules, ${misc:Depends}
+Depends:  obm-conf (= ${binary:Version}), cyrus-common-2.4|cyrus-common-2.3|cyrus-common-2.2|cyrus-common, cyrus-admin-2.4|cyrus-admin-2.3|cyrus-admin-2.2|cyrus-admin, cyrus-imapd-2.4|cyrus-imapd-2.3|cyrus-imapd-2.2|cyrus-imapd, cyrus-pop3d-2.4|cyrus-pop3d-2.3|cyrus-pop3d-2.2|cyrus-pop3d, cyrus-sasl2-dbg|sasl2-bin, cyrus-sasl2-doc, cyrus-clients-2.4|cyrus-clients-2.3|cyrus-clients-2.2|cyrus-clients, sasl2-bin, libsasl2|libsasl2-2, libsasl2-modules, ${misc:Depends}
 Description: Cyrus/SASL configuration for OBM
  This package configures Cyrus/SASL for OBM.
  .

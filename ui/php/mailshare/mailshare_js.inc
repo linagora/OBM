@@ -1,4 +1,4 @@
-<script language="php">
+<?php
 /******************************************************************************
 Copyright (C) 2011-2014 Linagora
 
@@ -93,4 +93,4 @@ function show_hide_add_button() {
 ";  
 
 
-</script>
+?>

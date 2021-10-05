@@ -171,7 +171,7 @@ function run_query_user_search($user, $user_results_limit, $strongest_profile_le
   // If an email indication has been specified, get it
   if (trim($email) != '') {
     if (trim($where) != '') $where .= ' AND';
-    list($left,$right) = split('@',$email);
+    list($left,$right) = explode('@',$email);
     if ($right === null){
       $left = $left.'%';
       $right = $left;

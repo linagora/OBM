@@ -22,7 +22,7 @@ Description: integration of OBM with Cyrus and Postfix
 Package: libobmsatellite-perl
 Section: perl
 Architecture: all
-Depends: libnet-server-perl, libnet-ldap-perl, libunicode-maputf8-perl, libio-socket-ssl-perl, libclass-singleton-perl, libxml-simple-perl, liblog-log4perl-perl, libmime-lite-perl, libmailtools-perl, libmime-types-perl, ${perl:Depends}, ${misc:Depends}
+Depends: libnet-server-perl, libnet-ldap-perl, libunicode-maputf8-perl, libio-socket-ssl-perl, libclass-singleton-perl, libxml-simple-perl, liblog-log4perl-perl, libmime-lite-perl, libmailtools-perl, libmime-types-perl, libhttp-daemon-perl, ${perl:Depends}, ${misc:Depends}
 Description: library for the integration of OBM with Cyrus and Postfix
  This package contains the library used by obm-satellite to interact with Cyrus
  and Postfix.
